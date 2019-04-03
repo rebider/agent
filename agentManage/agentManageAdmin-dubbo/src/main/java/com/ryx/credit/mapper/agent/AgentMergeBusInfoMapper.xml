@@ -40,6 +40,9 @@
     <result column="BUS_SCOPE" jdbcType="VARCHAR" property="busScope" />
     <result column="DREDGE_S0" jdbcType="DECIMAL" property="dredgeS0" />
     <result column="BUS_LOGIN_NUM" jdbcType="VARCHAR" property="busLoginNum" />
+    <result column="DEBIT_RATE_LOWER" jdbcType="VARCHAR" property="debitRateLower" />
+    <result column="DEBIT_CAPPING" jdbcType="VARCHAR" property="debitCapping" />
+    <result column="DEBIT_APPEAR_RATE" jdbcType="VARCHAR" property="debitAppearRate" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -71,12 +74,13 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, AGENT_MARGE_ID, BUS_ID, MAIN_AGENT_ID, SUB_AGENT_ID, BUS_NUM, BUS_PLATFORM, BUS_TYPE, 
-    BUS_PARENT, BUS_RISK_PARENT, BUS_ACTIVATION_PARENT, BUS_REGION, BUS_SENT_DIRECTLY, 
-    BUS_DIRECT_CASHBACK, BUS_INDE_ASS, BUS_CONTACT, BUS_CONTACT_MOBILE, BUS_CONTACT_EMAIL, 
-    BUS_CONTACT_PERSON, BUS_RISK_EMAIL, CLO_TAX_POINT, CLO_INVOICE, CLO_RECEIPT, CLO_PAY_COMPANY, 
-    CLO_AGENT_COLINFO, AG_ZBH, BUS_STATUS, BUS_USE_ORGAN, CLO_REVIEW_STATUS, C_TIME, 
-    C_UTIME, C_USER, MERGE_STATUS, STATUS, VERSION, BUS_SCOPE, DREDGE_S0, BUS_LOGIN_NUM
+    ID, AGENT_MARGE_ID, BUS_ID, MAIN_AGENT_ID, SUB_AGENT_ID, BUS_NUM, BUS_PLATFORM, BUS_TYPE,
+    BUS_PARENT, BUS_RISK_PARENT, BUS_ACTIVATION_PARENT, BUS_REGION, BUS_SENT_DIRECTLY,
+    BUS_DIRECT_CASHBACK, BUS_INDE_ASS, BUS_CONTACT, BUS_CONTACT_MOBILE, BUS_CONTACT_EMAIL,
+    BUS_CONTACT_PERSON, BUS_RISK_EMAIL, CLO_TAX_POINT, CLO_INVOICE, CLO_RECEIPT, CLO_PAY_COMPANY,
+    CLO_AGENT_COLINFO, AG_ZBH, BUS_STATUS, BUS_USE_ORGAN, CLO_REVIEW_STATUS, C_TIME,
+    C_UTIME, C_USER, MERGE_STATUS, STATUS, VERSION, BUS_SCOPE, DREDGE_S0, BUS_LOGIN_NUM,
+    DEBIT_RATE_LOWER, DEBIT_CAPPING, DEBIT_APPEAR_RATE
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentMergeBusInfoExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -95,7 +99,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from A_AGENT_MERGE_BUSINFO
     where ID = #{id,jdbcType=VARCHAR}
@@ -107,32 +111,34 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AgentMergeBusInfo">
-    insert into A_AGENT_MERGE_BUSINFO (ID, AGENT_MARGE_ID, BUS_ID, 
-      MAIN_AGENT_ID, SUB_AGENT_ID, BUS_NUM, 
-      BUS_PLATFORM, BUS_TYPE, BUS_PARENT, 
-      BUS_RISK_PARENT, BUS_ACTIVATION_PARENT, BUS_REGION, 
-      BUS_SENT_DIRECTLY, BUS_DIRECT_CASHBACK, BUS_INDE_ASS, 
-      BUS_CONTACT, BUS_CONTACT_MOBILE, BUS_CONTACT_EMAIL, 
-      BUS_CONTACT_PERSON, BUS_RISK_EMAIL, CLO_TAX_POINT, 
-      CLO_INVOICE, CLO_RECEIPT, CLO_PAY_COMPANY, 
-      CLO_AGENT_COLINFO, AG_ZBH, BUS_STATUS, 
-      BUS_USE_ORGAN, CLO_REVIEW_STATUS, C_TIME, 
-      C_UTIME, C_USER, MERGE_STATUS, 
-      STATUS, VERSION, BUS_SCOPE, 
-      DREDGE_S0, BUS_LOGIN_NUM)
-    values (#{id,jdbcType=VARCHAR}, #{agentMargeId,jdbcType=VARCHAR}, #{busId,jdbcType=VARCHAR}, 
-      #{mainAgentId,jdbcType=VARCHAR}, #{subAgentId,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR}, 
-      #{busPlatform,jdbcType=VARCHAR}, #{busType,jdbcType=VARCHAR}, #{busParent,jdbcType=VARCHAR}, 
-      #{busRiskParent,jdbcType=VARCHAR}, #{busActivationParent,jdbcType=VARCHAR}, #{busRegion,jdbcType=VARCHAR}, 
-      #{busSentDirectly,jdbcType=DECIMAL}, #{busDirectCashback,jdbcType=DECIMAL}, #{busIndeAss,jdbcType=DECIMAL}, 
-      #{busContact,jdbcType=VARCHAR}, #{busContactMobile,jdbcType=VARCHAR}, #{busContactEmail,jdbcType=VARCHAR}, 
-      #{busContactPerson,jdbcType=VARCHAR}, #{busRiskEmail,jdbcType=VARCHAR}, #{cloTaxPoint,jdbcType=DECIMAL}, 
-      #{cloInvoice,jdbcType=DECIMAL}, #{cloReceipt,jdbcType=DECIMAL}, #{cloPayCompany,jdbcType=VARCHAR}, 
-      #{cloAgentColinfo,jdbcType=VARCHAR}, #{agZbh,jdbcType=VARCHAR}, #{busStatus,jdbcType=DECIMAL}, 
-      #{busUseOrgan,jdbcType=VARCHAR}, #{cloReviewStatus,jdbcType=DECIMAL}, #{cTime,jdbcType=TIMESTAMP}, 
-      #{cUtime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{mergeStatus,jdbcType=DECIMAL}, 
-      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{busScope,jdbcType=VARCHAR}, 
-      #{dredgeS0,jdbcType=DECIMAL}, #{busLoginNum,jdbcType=VARCHAR})
+    insert into A_AGENT_MERGE_BUSINFO (ID, AGENT_MARGE_ID, BUS_ID,
+    MAIN_AGENT_ID, SUB_AGENT_ID, BUS_NUM,
+    BUS_PLATFORM, BUS_TYPE, BUS_PARENT,
+    BUS_RISK_PARENT, BUS_ACTIVATION_PARENT, BUS_REGION,
+    BUS_SENT_DIRECTLY, BUS_DIRECT_CASHBACK, BUS_INDE_ASS,
+    BUS_CONTACT, BUS_CONTACT_MOBILE, BUS_CONTACT_EMAIL,
+    BUS_CONTACT_PERSON, BUS_RISK_EMAIL, CLO_TAX_POINT,
+    CLO_INVOICE, CLO_RECEIPT, CLO_PAY_COMPANY,
+    CLO_AGENT_COLINFO, AG_ZBH, BUS_STATUS,
+    BUS_USE_ORGAN, CLO_REVIEW_STATUS, C_TIME,
+    C_UTIME, C_USER, MERGE_STATUS,
+    STATUS, VERSION, BUS_SCOPE,
+    DREDGE_S0, BUS_LOGIN_NUM, DEBIT_RATE_LOWER,
+    DEBIT_CAPPING, DEBIT_APPEAR_RATE)
+    values (#{id,jdbcType=VARCHAR}, #{agentMargeId,jdbcType=VARCHAR}, #{busId,jdbcType=VARCHAR},
+    #{mainAgentId,jdbcType=VARCHAR}, #{subAgentId,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR},
+    #{busPlatform,jdbcType=VARCHAR}, #{busType,jdbcType=VARCHAR}, #{busParent,jdbcType=VARCHAR},
+    #{busRiskParent,jdbcType=VARCHAR}, #{busActivationParent,jdbcType=VARCHAR}, #{busRegion,jdbcType=VARCHAR},
+    #{busSentDirectly,jdbcType=DECIMAL}, #{busDirectCashback,jdbcType=DECIMAL}, #{busIndeAss,jdbcType=DECIMAL},
+    #{busContact,jdbcType=VARCHAR}, #{busContactMobile,jdbcType=VARCHAR}, #{busContactEmail,jdbcType=VARCHAR},
+    #{busContactPerson,jdbcType=VARCHAR}, #{busRiskEmail,jdbcType=VARCHAR}, #{cloTaxPoint,jdbcType=DECIMAL},
+    #{cloInvoice,jdbcType=DECIMAL}, #{cloReceipt,jdbcType=DECIMAL}, #{cloPayCompany,jdbcType=VARCHAR},
+    #{cloAgentColinfo,jdbcType=VARCHAR}, #{agZbh,jdbcType=VARCHAR}, #{busStatus,jdbcType=DECIMAL},
+    #{busUseOrgan,jdbcType=VARCHAR}, #{cloReviewStatus,jdbcType=DECIMAL}, #{cTime,jdbcType=TIMESTAMP},
+    #{cUtime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{mergeStatus,jdbcType=DECIMAL},
+    #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{busScope,jdbcType=VARCHAR},
+    #{dredgeS0,jdbcType=DECIMAL}, #{busLoginNum,jdbcType=VARCHAR}, #{debitRateLower,jdbcType=VARCHAR},
+    #{debitCapping,jdbcType=VARCHAR}, #{debitAppearRate,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentMergeBusInfo">
     insert into A_AGENT_MERGE_BUSINFO
@@ -251,6 +257,15 @@
       <if test="busLoginNum != null">
         BUS_LOGIN_NUM,
       </if>
+      <if test="debitRateLower != null">
+        DEBIT_RATE_LOWER,
+      </if>
+      <if test="debitCapping != null">
+        DEBIT_CAPPING,
+      </if>
+      <if test="debitAppearRate != null">
+        DEBIT_APPEAR_RATE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -366,6 +381,15 @@
       </if>
       <if test="busLoginNum != null">
         #{busLoginNum,jdbcType=VARCHAR},
+      </if>
+      <if test="debitRateLower != null">
+        #{debitRateLower,jdbcType=VARCHAR},
+      </if>
+      <if test="debitCapping != null">
+        #{debitCapping,jdbcType=VARCHAR},
+      </if>
+      <if test="debitAppearRate != null">
+        #{debitAppearRate,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -489,53 +513,65 @@
       <if test="busLoginNum != null">
         BUS_LOGIN_NUM = #{busLoginNum,jdbcType=VARCHAR},
       </if>
+      <if test="debitRateLower != null">
+        DEBIT_RATE_LOWER = #{debitRateLower,jdbcType=VARCHAR},
+      </if>
+      <if test="debitCapping != null">
+        DEBIT_CAPPING = #{debitCapping,jdbcType=VARCHAR},
+      </if>
+      <if test="debitAppearRate != null">
+        DEBIT_APPEAR_RATE = #{debitAppearRate,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AgentMergeBusInfo">
     update A_AGENT_MERGE_BUSINFO
     set AGENT_MARGE_ID = #{agentMargeId,jdbcType=VARCHAR},
-      BUS_ID = #{busId,jdbcType=VARCHAR},
-      MAIN_AGENT_ID = #{mainAgentId,jdbcType=VARCHAR},
-      SUB_AGENT_ID = #{subAgentId,jdbcType=VARCHAR},
-      BUS_NUM = #{busNum,jdbcType=VARCHAR},
-      BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
-      BUS_TYPE = #{busType,jdbcType=VARCHAR},
-      BUS_PARENT = #{busParent,jdbcType=VARCHAR},
-      BUS_RISK_PARENT = #{busRiskParent,jdbcType=VARCHAR},
-      BUS_ACTIVATION_PARENT = #{busActivationParent,jdbcType=VARCHAR},
-      BUS_REGION = #{busRegion,jdbcType=VARCHAR},
-      BUS_SENT_DIRECTLY = #{busSentDirectly,jdbcType=DECIMAL},
-      BUS_DIRECT_CASHBACK = #{busDirectCashback,jdbcType=DECIMAL},
-      BUS_INDE_ASS = #{busIndeAss,jdbcType=DECIMAL},
-      BUS_CONTACT = #{busContact,jdbcType=VARCHAR},
-      BUS_CONTACT_MOBILE = #{busContactMobile,jdbcType=VARCHAR},
-      BUS_CONTACT_EMAIL = #{busContactEmail,jdbcType=VARCHAR},
-      BUS_CONTACT_PERSON = #{busContactPerson,jdbcType=VARCHAR},
-      BUS_RISK_EMAIL = #{busRiskEmail,jdbcType=VARCHAR},
-      CLO_TAX_POINT = #{cloTaxPoint,jdbcType=DECIMAL},
-      CLO_INVOICE = #{cloInvoice,jdbcType=DECIMAL},
-      CLO_RECEIPT = #{cloReceipt,jdbcType=DECIMAL},
-      CLO_PAY_COMPANY = #{cloPayCompany,jdbcType=VARCHAR},
-      CLO_AGENT_COLINFO = #{cloAgentColinfo,jdbcType=VARCHAR},
-      AG_ZBH = #{agZbh,jdbcType=VARCHAR},
-      BUS_STATUS = #{busStatus,jdbcType=DECIMAL},
-      BUS_USE_ORGAN = #{busUseOrgan,jdbcType=VARCHAR},
-      CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL},
-      C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      MERGE_STATUS = #{mergeStatus,jdbcType=DECIMAL},
-      STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL},
-      BUS_SCOPE = #{busScope,jdbcType=VARCHAR},
-      DREDGE_S0 = #{dredgeS0,jdbcType=DECIMAL},
-      BUS_LOGIN_NUM = #{busLoginNum,jdbcType=VARCHAR}
+    BUS_ID = #{busId,jdbcType=VARCHAR},
+    MAIN_AGENT_ID = #{mainAgentId,jdbcType=VARCHAR},
+    SUB_AGENT_ID = #{subAgentId,jdbcType=VARCHAR},
+    BUS_NUM = #{busNum,jdbcType=VARCHAR},
+    BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+    BUS_TYPE = #{busType,jdbcType=VARCHAR},
+    BUS_PARENT = #{busParent,jdbcType=VARCHAR},
+    BUS_RISK_PARENT = #{busRiskParent,jdbcType=VARCHAR},
+    BUS_ACTIVATION_PARENT = #{busActivationParent,jdbcType=VARCHAR},
+    BUS_REGION = #{busRegion,jdbcType=VARCHAR},
+    BUS_SENT_DIRECTLY = #{busSentDirectly,jdbcType=DECIMAL},
+    BUS_DIRECT_CASHBACK = #{busDirectCashback,jdbcType=DECIMAL},
+    BUS_INDE_ASS = #{busIndeAss,jdbcType=DECIMAL},
+    BUS_CONTACT = #{busContact,jdbcType=VARCHAR},
+    BUS_CONTACT_MOBILE = #{busContactMobile,jdbcType=VARCHAR},
+    BUS_CONTACT_EMAIL = #{busContactEmail,jdbcType=VARCHAR},
+    BUS_CONTACT_PERSON = #{busContactPerson,jdbcType=VARCHAR},
+    BUS_RISK_EMAIL = #{busRiskEmail,jdbcType=VARCHAR},
+    CLO_TAX_POINT = #{cloTaxPoint,jdbcType=DECIMAL},
+    CLO_INVOICE = #{cloInvoice,jdbcType=DECIMAL},
+    CLO_RECEIPT = #{cloReceipt,jdbcType=DECIMAL},
+    CLO_PAY_COMPANY = #{cloPayCompany,jdbcType=VARCHAR},
+    CLO_AGENT_COLINFO = #{cloAgentColinfo,jdbcType=VARCHAR},
+    AG_ZBH = #{agZbh,jdbcType=VARCHAR},
+    BUS_STATUS = #{busStatus,jdbcType=DECIMAL},
+    BUS_USE_ORGAN = #{busUseOrgan,jdbcType=VARCHAR},
+    CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL},
+    C_TIME = #{cTime,jdbcType=TIMESTAMP},
+    C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
+    C_USER = #{cUser,jdbcType=VARCHAR},
+    MERGE_STATUS = #{mergeStatus,jdbcType=DECIMAL},
+    STATUS = #{status,jdbcType=DECIMAL},
+    VERSION = #{version,jdbcType=DECIMAL},
+    BUS_SCOPE = #{busScope,jdbcType=VARCHAR},
+    DREDGE_S0 = #{dredgeS0,jdbcType=DECIMAL},
+    BUS_LOGIN_NUM = #{busLoginNum,jdbcType=VARCHAR},
+    DEBIT_RATE_LOWER = #{debitRateLower,jdbcType=VARCHAR},
+    DEBIT_CAPPING = #{debitCapping,jdbcType=VARCHAR},
+    DEBIT_APPEAR_RATE = #{debitAppearRate,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">

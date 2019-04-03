@@ -91,6 +91,13 @@ public class AgentMergeBusInfo implements Serializable {
 
     private String mergeStatusName;
 
+    private String debitRateLower;
+
+    private String debitCapping;
+
+    private String debitAppearRate;
+
+
     public String getMergeStatusName() {
         return mergeStatusName;
     }
@@ -433,5 +440,29 @@ public class AgentMergeBusInfo implements Serializable {
 
     public void setSubAgentName(String subAgentName) {
         this.subAgentName = subAgentName;
+    }
+
+    public String getDebitRateLower() {
+        return debitRateLower;
+    }
+
+    public void setDebitRateLower(String debitRateLower) {
+        this.debitRateLower = debitRateLower;
+    }
+
+    public String getDebitCapping() {
+        return debitCapping;
+    }
+
+    public void setDebitCapping(String debitCapping) {
+        this.debitCapping = debitCapping;
+    }
+
+    public String getDebitAppearRate() {
+        return debitAppearRate;
+    }
+
+    public void setDebitAppearRate(String debitAppearRate) {
+        this.debitAppearRate = debitAppearRate;
     }
 }
