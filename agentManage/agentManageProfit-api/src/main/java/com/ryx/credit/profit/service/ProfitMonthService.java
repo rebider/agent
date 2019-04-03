@@ -205,12 +205,12 @@ public interface ProfitMonthService {
     List<Map<String,Object>> exportByF(Map<String, Object> param);
 
     /**
-     * 代理商日分润冻结
+     * 代理商手刷分润冻结
      */
     Map<String,String> doFrozenByAgent(List<String> list);
 
     /**
-     * 代理商日分润解冻
+     * 代理商手刷分润解冻
      */
     Map<String,String>  doUnFrozenAgentProfit(List<String> list);
 
