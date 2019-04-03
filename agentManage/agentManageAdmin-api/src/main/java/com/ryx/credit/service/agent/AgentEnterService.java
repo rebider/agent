@@ -69,7 +69,7 @@ public interface AgentEnterService {
      * @param userId
      * @return
      */
-    public ResultVO updateAgentVo(AgentVo agent,String userId)throws Exception;
+    public ResultVO updateAgentVo(AgentVo agent,String userId,Boolean isPass)throws Exception;
 
 
     public Map startPar(String cuserId);

@@ -846,9 +846,18 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         return ResultVO.success(null);
     }
 
+
+    /**
+     * 信息修改
+     * @param agent
+     * @param userId
+     * @param isPass  是否审批通过  审批通过传true ,未提交审批修改传 false
+     * @return
+     * @throws Exception
+     */
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public ResultVO updateAgentVo(AgentVo agent, String userId) throws Exception {
+    public ResultVO updateAgentVo(AgentVo agent, String userId,Boolean isPass) throws Exception {
         try {
             verifyOrgAndBZYD(agent.getBusInfoVoList());
 //            verifyOther(agent.getBusInfoVoList());
@@ -876,7 +885,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
             if (agent.getBusInfoVoList() != null && agent.getBusInfoVoList().size() > 0) {
                 logger.info("用户{}{}修改代理商业务信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent.getBusInfoVoList()));
-                ResultVO updateAgentBusInfoVoRes = agentBusinfoService.updateAgentBusInfoVo(agent.getBusInfoVoList(), agent.getAgent(),userId);
+                ResultVO updateAgentBusInfoVoRes = agentBusinfoService.updateAgentBusInfoVo(agent.getBusInfoVoList(), agent.getAgent(),userId,isPass);
                 logger.info("用户{}{}修改代理商业务信息结果{}", userId, agent.getAgent().getId(), updateAgentBusInfoVoRes.getResInfo());
             }
 
