@@ -368,6 +368,9 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         agentNotifyVo.setBaseMessage(agent);
         agentNotifyVo.setBusMessage(agentBusInfo);
         agentNotifyVo.setHasS0(agentBusInfo.getDredgeS0().equals(new BigDecimal(1))?"0":"1");
+        agentNotifyVo.setDebitTop(agentBusInfo.getDebitCapping());//借记封顶额（元）
+        agentNotifyVo.setCkDebitRate(agentBusInfo.getDebitAppearRate());//借记出款费率（%）
+        agentNotifyVo.setLowDebitRate(agentBusInfo.getDebitRateLower());//借记费率下限（%）
         if(StringUtils.isNotBlank(agentBusInfo.getBusLoginNum())){
             agentNotifyVo.setLoginName(agentBusInfo.getBusLoginNum());
         }
@@ -710,6 +713,9 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         agentNotifyVo.setBaseMessage(agent);
         agentNotifyVo.setBusMessage(agentBusInfo);
         agentNotifyVo.setHasS0(agentBusInfo.getDredgeS0().equals(new BigDecimal(1))?"0":"1");
+        agentNotifyVo.setDebitTop(agentBusInfo.getDebitCapping());//借记封顶额（元）
+        agentNotifyVo.setCkDebitRate(agentBusInfo.getDebitAppearRate());//借记出款费率（%）
+        agentNotifyVo.setLowDebitRate(agentBusInfo.getDebitRateLower());//借记费率下限（%）
         if(StringUtils.isNotBlank(agentBusInfo.getBusLoginNum())){
             agentNotifyVo.setLoginName(agentBusInfo.getBusLoginNum());
         }
@@ -925,6 +931,9 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             data.put("busiAreas",agentNotifyVo.getBusiAreas());
             data.put("hasS0",agentNotifyVo.getHasS0());
             data.put("busiType",agentNotifyVo.getBusiType());
+            data.put("debitTop",agentNotifyVo.getDebitTop());
+            data.put("ckDebitRate",agentNotifyVo.getCkDebitRate());
+            data.put("lowDebitRate",agentNotifyVo.getLowDebitRate());
             if(StringUtils.isNotBlank(agentNotifyVo.getOrgId())){
                 data.put("orgId",agentNotifyVo.getOrgId());
             }
