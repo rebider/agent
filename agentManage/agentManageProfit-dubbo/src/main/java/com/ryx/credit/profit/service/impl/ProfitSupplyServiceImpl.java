@@ -162,13 +162,9 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
             throw new MessageException("导入数据为空");
         }
         for (List<Object> supply : data) {
-            if(supply.size() != 6){
-                logger.info("代理商唯一码导入有误，请检查");
-                throw new MessageException("代理商唯一码导入有误，请检查");
-            }
             if (supply.size() == 6){
                 if(null==supply.get(0) || "".equals(supply.get(0))){
-                    logger.info("代理商唯一码导入有误，请检查");
+                    logger.info("代理商唯一码不能为空");
                     throw new MessageException("代理商唯一码导入有误，请检查");
                 }
                 if( null==supply.get(1) || "".equals(supply.get(1))){
@@ -186,8 +182,8 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
                     try {
                         new BigDecimal(String.valueOf(supply.get(5)));
                     }catch (Exception e){
-                        logger.info("补款金额不是小数，请检查");
-                        throw new MessageException("补款金额不是小数，请检查");
+                        logger.info("补款金额格式不正确，请检查");
+                        throw new MessageException("补款金额格式不正确，请检查");
                     }
                 }
             }

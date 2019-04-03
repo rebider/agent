@@ -70,6 +70,11 @@ public class TransProfitDetailServiceImpl implements TransProfitDetailService {
     }
 
     @Override
+    public List<Map<String, Object>> queryBusNum(String type) {
+        return transProfitDetailMapper.queryBusNum(type);
+    }
+
+    @Override
     public List<TransProfitDetail> getPosTransProfitDetailSumList(String prfitDate) {
         return transProfitDetailMapper.getPosTransProfitDetailSumList(prfitDate);
     }

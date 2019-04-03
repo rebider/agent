@@ -133,4 +133,11 @@ public interface ProfitDetailMonthMapper {
 
     ProfitDetailMonth selectByIdAndMonth(ProfitDetailMonth record);
 
+    void updateAgentPayCompany(@Param("profitDate")String profitDate);
+
+    /**代理商退出冻结*/
+    void updateMonthProfitFozzen(@Param("profitDate")String profitDate);
+    /***代理商退出失败解冻*/
+    void updateMonthProfitUnFozzen(@Param("profitDate")String profitDate);
+
 }
