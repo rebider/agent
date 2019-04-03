@@ -19,4 +19,6 @@
     <dubbo:reference interface="com.ryx.credit.service.agent.AgentService" id="agentService"  timeout="1200000" registry="myGroup"/>
     <dubbo:reference interface="com.ryx.credit.service.order.OrderService" id="orderService"  timeout="1200000" registry="myGroup"/>
     <dubbo:reference interface="com.ryx.credit.service.order.IOPdSumService" id="OPdSumService"  timeout="1200000" registry="myGroup"/>
+    <dubbo:reference interface="com.ryx.credit.service.agent.ColinfoTaskService" id="colinfoTaskService"  timeout="1200000" registry="myGroup"/>
+
 </beans>

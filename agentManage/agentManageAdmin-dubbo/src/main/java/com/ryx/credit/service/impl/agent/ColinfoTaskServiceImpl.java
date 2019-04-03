@@ -1,4 +1,4 @@
-package com.ryx.credit.task;
+package com.ryx.credit.service.impl.agent;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -12,15 +12,14 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AColinfoPaymentMapper;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentColinfoMapper;
-import com.ryx.credit.dao.agent.PlatFormMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.AgentNotifyService;
 import com.ryx.credit.service.agent.AimportService;
+import com.ryx.credit.service.agent.ColinfoTaskService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -31,10 +30,10 @@ import java.util.*;
  * 收款账户同步出款表
  * Created by RYX on 2018/9/14.
  */
-@Service
-public class ColinfoTask {
+@Service("colinfoTaskService")
+public class ColinfoTaskServiceImpl implements ColinfoTaskService {
 
-    private static final Logger log = LoggerFactory.getLogger(ColinfoTask.class);
+    private static final Logger log = LoggerFactory.getLogger(ColinfoTaskServiceImpl.class);
 
     private static final  String COLINFO_URL =  AppConfig.getProperty("colinfo_out_money");
 
@@ -66,7 +65,8 @@ public class ColinfoTask {
      * 9:00 - 21:30
      */
 //    @Scheduled(cron = "0/30 * * * * ?")
-    @Scheduled(cron = "0 0/30 9-21 * * ? ")
+//    @Scheduled(cron = "0 0/30 9-21 * * ? ")
+    @Override
     public void synColinfoToPayment() {
         log.info("synColinfoToPayment定时任务启动:{}",new Date());
         String indentifier = null;
@@ -160,7 +160,8 @@ public class ColinfoTask {
      * 30分钟执行一次
      */
 //  @Scheduled(cron = "0/30 * * * * ?")
-    @Scheduled(cron = "0 0/30 * * * ?")
+//    @Scheduled(cron = "0 0/30 * * * ?")
+    @Override
     public void synColinfoToQueryPayment() {
         String indentifier = null;
         try {

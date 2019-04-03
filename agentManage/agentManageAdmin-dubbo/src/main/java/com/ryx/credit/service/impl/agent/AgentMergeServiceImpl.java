@@ -319,6 +319,9 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             agentMergeBusInfo.setBusScope(agentBusInfo.getBusScope());
             agentMergeBusInfo.setDredgeS0(agentBusInfo.getDredgeS0());
             agentMergeBusInfo.setBusLoginNum(agentBusInfo.getBusLoginNum());
+            agentMergeBusInfo.setDebitAppearRate(agentBusInfo.getDebitAppearRate());
+            agentMergeBusInfo.setDebitCapping(agentBusInfo.getDebitCapping());
+            agentMergeBusInfo.setDebitRateLower(agentBusInfo.getDebitRateLower());
             agentMergeBusInfoMapper.insertSelective(agentMergeBusInfo);
         }
 
