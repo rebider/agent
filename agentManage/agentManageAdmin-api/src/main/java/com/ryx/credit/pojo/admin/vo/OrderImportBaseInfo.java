@@ -25,24 +25,24 @@ public class OrderImportBaseInfo implements Serializable {
 
     public void loadInfoFromJsonArray(JSONArray data,String importId){
         if(data!=null){
-            this.setOrder_id(data.getString(colum.indexOf("order_id")));
-            this.setOrder_orgid(data.getString(colum.indexOf("order_orgid")));
-            this.setOrder_platform(data.getString(colum.indexOf("order_platform")));
-            this.setOrder_agname(data.getString(colum.indexOf("order_agname")));
-            this.setOrder_date(data.getString(colum.indexOf("order_date")));
-            this.setOrder_amt(data.getString(colum.indexOf("order_amt")));
-            this.setOrder_have_amt(data.getString(colum.indexOf("order_have_amt")));
-            this.setOrder_paymethod(data.getString(colum.indexOf("order_paymethod")));
-            this.setOrder_shoufu_amt(data.getString(colum.indexOf("order_shoufu_amt")));
-            this.setOrder_fenqi_count(data.getString(colum.indexOf("order_fenqi_count")));
-            this.setOrder_fenqi_date(data.getString(colum.indexOf("order_fenqi_date")));
-            this.setOrder_colcomp(data.getString(colum.indexOf("order_colcomp")));
-            this.setOrder_pay_user(data.getString(colum.indexOf("order_pay_user")));
-            this.setOrder_is_fp(data.getString(colum.indexOf("order_is_fp")));
-            this.setOrder_dk_type(data.getString(colum.indexOf("order_dk_type")));
-            this.setOrder_dk_amt(data.getString(colum.indexOf("order_dk_amt")));
-            this.setOrder_hkr(data.getString(colum.indexOf("order_hkr")));
-            this.setOrder_hk_date(data.getString(colum.indexOf("order_hk_date")));
+            this.setOrder_id((colum.indexOf("order_id")<data.size())?data.getString(colum.indexOf("order_id")):"");
+            this.setOrder_orgid((colum.indexOf("order_orgid")<data.size())?data.getString(colum.indexOf("order_orgid")):"");
+            this.setOrder_platform((colum.indexOf("order_platform")<data.size())?data.getString(colum.indexOf("order_platform")):"");
+            this.setOrder_agname((colum.indexOf("order_agname")<data.size())?data.getString(colum.indexOf("order_agname")):"");
+            this.setOrder_date((colum.indexOf("order_date")<data.size())?data.getString(colum.indexOf("order_date")):"");
+            this.setOrder_amt((colum.indexOf("order_amt")<data.size())?data.getString(colum.indexOf("order_amt")):"");
+            this.setOrder_have_amt((colum.indexOf("order_have_amt")<data.size())?data.getString(colum.indexOf("order_have_amt")):"");
+            this.setOrder_paymethod((colum.indexOf("order_paymethod")<data.size())?data.getString(colum.indexOf("order_paymethod")):"");
+            this.setOrder_shoufu_amt((colum.indexOf("order_shoufu_amt")<data.size())?data.getString(colum.indexOf("order_shoufu_amt")):"");
+            this.setOrder_fenqi_count((colum.indexOf("order_fenqi_count")<data.size())?data.getString(colum.indexOf("order_fenqi_count")):"");
+            this.setOrder_fenqi_date((colum.indexOf("order_fenqi_date")<data.size())?data.getString(colum.indexOf("order_fenqi_date")):"");
+            this.setOrder_colcomp((colum.indexOf("order_colcomp")<data.size())?data.getString(colum.indexOf("order_colcomp")):"");
+            this.setOrder_pay_user((colum.indexOf("order_pay_user")<data.size())?data.getString(colum.indexOf("order_pay_user")):"");
+            this.setOrder_is_fp((colum.indexOf("order_is_fp")<data.size())?data.getString(colum.indexOf("order_is_fp")):"");
+            this.setOrder_dk_type((colum.indexOf("order_dk_type")<data.size())?data.getString(colum.indexOf("order_dk_type")):"");
+            this.setOrder_dk_amt((colum.indexOf("order_dk_amt")<data.size())?data.getString(colum.indexOf("order_dk_amt")):"");
+            this.setOrder_hkr((colum.indexOf("order_hkr")<data.size())?data.getString(colum.indexOf("order_hkr")):"");
+            this.setOrder_hk_date((colum.indexOf("order_hk_date")<data.size())?data.getString(colum.indexOf("order_hk_date")):"");
             this.setOrder_remark((colum.indexOf("order_remark")<data.size())?data.getString(colum.indexOf("order_remark")):"");
         }
         this.importId=importId;

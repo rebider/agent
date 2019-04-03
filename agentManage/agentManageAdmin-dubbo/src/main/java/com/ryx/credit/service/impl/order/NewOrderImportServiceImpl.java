@@ -374,7 +374,7 @@ public class NewOrderImportServiceImpl implements NewOrderImportService{
         //busid
         orderFormVo.setBusId(agentBusInfo.getId());
         //新老订单
-        orderFormVo.setOxOrder(Oreturntype.OLD.code);
+        orderFormVo.setOxOrder(Oreturntype.OLDNOSN.code);
         orderFormVo.setReviewStatus(AgStatus.Approved.status);
         orderFormVo.setOrderStatus(OrderStatus.ENABLE.status);
         if(newOrderImportBaseInfo.getOrder_amt().equals(newOrderImportBaseInfo.getOrder_have_amt())) {
@@ -432,7 +432,9 @@ public class NewOrderImportServiceImpl implements NewOrderImportService{
             }
         }
         //抵扣金额
-        oPayment.setDeductionAmount(newOrderImportBaseInfo.getOrder_dk_amt()!=null?new BigDecimal(newOrderImportBaseInfo.getOrder_dk_amt()):BigDecimal.ZERO);
+        oPayment.setDeductionAmount(
+                StringUtils.isNotBlank(
+                        newOrderImportBaseInfo.getOrder_dk_amt())?new BigDecimal(newOrderImportBaseInfo.getOrder_dk_amt()):BigDecimal.ZERO);
         //首付金额
         if(StringUtils.isNotBlank(newOrderImportBaseInfo.getOrder_shoufu_amt())) {
             oPayment.setDownPayment(

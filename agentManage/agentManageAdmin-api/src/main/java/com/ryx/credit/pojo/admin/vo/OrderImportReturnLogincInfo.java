@@ -27,15 +27,15 @@ public class OrderImportReturnLogincInfo   implements Serializable {
 
     public void loadInfoFromJsonArray(JSONArray data,String importId){
         if(data!=null){
-            this.setReturnOrderId(data.getString(colum.indexOf("returnOrderId")));
-            this.setPlatformOrgNum(data.getString(colum.indexOf("platformOrgNum")));
-            this.setAgentName(data.getString(colum.indexOf("agentName")));
-            this.setReturnDate(data.getString(colum.indexOf("returnDate")));
-            this.setReturnCS(data.getString(colum.indexOf("returnCS")));
-            this.setSnStart(data.getString(colum.indexOf("snStart")));
-            this.setSnEnd(data.getString(colum.indexOf("snEnd")));
-            this.setSnStartNum(data.getString(colum.indexOf("snStartNum")));
-            this.setSnEndNum(data.getString(colum.indexOf("snEndNum")));
+            this.setReturnOrderId((colum.indexOf("returnOrderId")<data.size())?data.getString(colum.indexOf("returnOrderId")):"");
+            this.setPlatformOrgNum((colum.indexOf("platformOrgNum")<data.size())?data.getString(colum.indexOf("platformOrgNum")):"");
+            this.setAgentName((colum.indexOf("agentName")<data.size())?data.getString(colum.indexOf("agentName")):"");
+            this.setReturnDate((colum.indexOf("returnDate")<data.size())?data.getString(colum.indexOf("returnDate")):"");
+            this.setReturnCS((colum.indexOf("returnCS")<data.size())?data.getString(colum.indexOf("returnCS")):"");
+            this.setSnStart((colum.indexOf("snStart")<data.size())?data.getString(colum.indexOf("snStart")):"");
+            this.setSnEnd((colum.indexOf("snEnd")<data.size())?data.getString(colum.indexOf("snEnd")):"");
+            this.setSnStartNum((colum.indexOf("snStartNum")<data.size())?data.getString(colum.indexOf("snStartNum")):"");
+            this.setSnEndNum((colum.indexOf("snEndNum")<data.size())?data.getString(colum.indexOf("snEndNum")):"");
         }
         this.importId = importId;
     }
