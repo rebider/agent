@@ -1,32 +1,35 @@
-package com.ryx.credit.task;
+package com.ryx.job.task;
 
+import com.dangdang.ddframe.job.api.ShardingContext;
+import com.dangdang.ddframe.job.api.simple.SimpleJob;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.service.order.IOPdSumService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
 
 /**
- * 作者：chenliang
- * 时间：2019/3/18
+ * 作者：cx
+ * 时间：2019/4/3
  * 描述：分润抵扣机具欠款分期汇总
  */
-@Component
-public class OPdSumCreateTask {
-    private Logger logger = LoggerFactory.getLogger(OPdSumCreateTask.class);
+@Service("oPdSumCreateJob")
+public class OPdSumCreateJob   implements SimpleJob {
+
+    private static Logger logger = LoggerFactory.getLogger(OPdSumCreateJob.class);
     @Autowired
     IOPdSumService oPdSumService;
 
     /**
      * 每月1号的0点30分
+     * @param shardingContext
      */
-    @Scheduled(cron = "0 30 0 1 * ?")
-    public void CreateOPdSum() {
-
+    @Override
+    public void execute(ShardingContext shardingContext) {
+        logger.info("======job:{}，开始",shardingContext.getJobName());
         logger.info("======分润抵扣机具欠款分期汇总开始任务执行======");
         Calendar c = Calendar.getInstance();
         c.set(Calendar.MONTH, +1);
@@ -37,10 +40,10 @@ public class OPdSumCreateTask {
             logger.info("======分润抵扣机具欠款分期汇总完成");
         } catch (Exception e) {
             e.printStackTrace();
-            logger.info("======分润抵扣机具欠款分期汇总异常");
+            logger.error("Job:"+shardingContext.getJobName()+",出错",e);
+        }finally {
+            logger.info("======job:{}，结束",shardingContext.getJobName());
         }
-
 
     }
 }
-
