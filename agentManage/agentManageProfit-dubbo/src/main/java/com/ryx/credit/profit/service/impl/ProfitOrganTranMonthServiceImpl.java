@@ -7,24 +7,24 @@ package com.ryx.credit.profit.service.impl;/**
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.ProfitOrganTranMonthMapper;
-import com.ryx.credit.profit.dao.TranPlatformMapper;
+import com.ryx.credit.profit.dao.TranCheckDataMapper;
+import com.ryx.credit.profit.dao.TranCheckPlatFormMapper;
 import com.ryx.credit.profit.jobs.NewProfitDataJob;
 import com.ryx.credit.profit.jobs.TranDataJob;
-import com.ryx.credit.profit.pojo.ProfitOrganTranMonth;
-import com.ryx.credit.profit.pojo.ProfitOrganTranMonthExample;
+import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.ProfitOrganTranMonthService;
 import com.ryx.credit.profit.unitmain.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 月交易实现
@@ -41,7 +41,9 @@ public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthServ
     @Autowired
     private ProfitOrganTranMonthMapper profitOrganTranMonthMapper;
     @Autowired
-    private TranPlatformMapper tranPlatformMapper;
+    private TranCheckPlatFormMapper tranCheckPlatFormMapper;
+    @Autowired
+    private TranCheckDataMapper tranCheckDataMapper;
 
     @Autowired
     private TranDataJob tranDataJob;
@@ -164,24 +166,6 @@ public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthServ
     }
 
     @Override
-    public Map<String, Object> getAllTranPlatform() {
-        Map<String,Object> result=new HashMap<String, Object>();
-        List<String> allPlatformType = tranPlatformMapper.selectAllPlatformType();
-        List<Map<String, String>> allTranPlatform = tranPlatformMapper.selectAllTranPlatform();
-        for (String platformType:allPlatformType) {
-            ArrayList<String> list = new ArrayList<>();
-            for (int i = 0; i < allTranPlatform.size(); i++) {
-                Map<String, String> map=allTranPlatform.get(i);
-                if(map.get("PLATFORM_TYPE").equals(platformType)){
-                    list.add(map.get("PLATFORM_NAME"));
-                }
-            }
-            result.put(platformType,list);
-        }
-        return result;
-    }
-
-    @Override
     public String doProfitNewMonth(Map<String,String> param){
         String params = JsonUtil.objectToJson(param);
         String res = HttpClientUtil.doPostJson
@@ -191,6 +175,109 @@ public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthServ
 
     @Override
     public Map<String, Object> getTranAmtByMonth(String tranMonth) {
-        return tranPlatformMapper.getTranAmtByMonth(tranMonth);
+        return tranCheckPlatFormMapper.getTranAmtByMonth(tranMonth);
+    }
+
+    @Override
+    public List<TranCheckPlatForm> getAllPlatForm() {
+        TranCheckPlatFormExample example=new TranCheckPlatFormExample();
+        List<TranCheckPlatForm> tranCheckPlatForms = tranCheckPlatFormMapper.selectByExample(example);
+        return tranCheckPlatForms;
+    }
+
+    @Override
+    public int insertTranCheckData(TranCheckData tranCheckData) {
+        return tranCheckDataMapper.insert(tranCheckData);
+    }
+
+    @Override
+    public int updateTranCheckData(TranCheckData tranCheckData) {
+        return tranCheckDataMapper.updateByPrimaryKeySelective(tranCheckData);
+    }
+
+    @Override
+    @Transactional
+    public int synchronizeTranCheckData(List<TranCheckData> list) {
+        return tranCheckDataMapper.synchronizeTranCheckData(list);
+    }
+
+    @Override
+    public List<TranCheckData> getAllCheckDataByProfitMonth(String profitMonth) {
+        TranCheckDataExample example=new TranCheckDataExample();
+        TranCheckDataExample.Criteria criteria = example.createCriteria();
+        if(StringUtils.isNotBlank(profitMonth)){
+            criteria.andProfitMonthEqualTo(profitMonth);
+        }
+        List<TranCheckData> checkData = tranCheckDataMapper.selectByExample(example);
+        return checkData;
+    }
+
+    @Override
+    public List<TranCheckData> getAllCheckDataByPlatFormTypeAndProfitMonth(String plarFormType, String profitMonth) {
+        TranCheckDataExample example=new TranCheckDataExample();
+        TranCheckDataExample.Criteria criteria = example.createCriteria();
+        if (StringUtils.isNotBlank(plarFormType)){
+            criteria.andPlatformTypeEqualTo(plarFormType);
+        }
+        if(StringUtils.isNotBlank(profitMonth)){
+            criteria.andProfitMonthEqualTo(profitMonth);
+        }
+        List<TranCheckData> checkData = tranCheckDataMapper.selectByExample(example);
+        return checkData;
+    }
+
+    @Override
+    public List<Map<String, String>> getAllPlatFormType() {
+        List<String> allPlatFormType = tranCheckPlatFormMapper.getAllPlatFormType();
+        List<Map<String, String>> result=new ArrayList<>();
+        int i=0;
+        for (String platFormType:allPlatFormType) {
+            i++;
+            Map<String,String> temp=new HashMap<>();
+            temp.put("num","0"+i);
+            temp.put("name",platFormType);
+            result.add(temp);
+        }
+        return result;
+    }
+
+    /**
+     * 手动同步核对数据
+     * @return
+     */
+    @Override
+    public Map<String,String> doSynchronizeTranCheckData() {
+        //先删除本月已拉取数据
+        TranCheckDataExample example=new TranCheckDataExample();
+        TranCheckDataExample.Criteria criteria = example.createCriteria();
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MONTH, -1);
+        String tranMonth= new SimpleDateFormat("yyyyMM").format(calendar.getTime());
+        criteria.andProfitMonthEqualTo(tranMonth);
+        tranCheckDataMapper.deleteByExample(example);
+
+        //拉取并拆入数据
+        Map<String, String> objectMap = tranDataJob.synchronizeTranCheckData();
+        return objectMap;
+    }
+
+    @Override
+    public TranCheckData getTranCheckDataByProfitMonthAndPlatFormId(String profitMonth, BigDecimal platFormId) {
+        TranCheckDataExample example=new TranCheckDataExample();
+        TranCheckDataExample.Criteria criteria = example.createCriteria();
+        if (platFormId==null){
+            return null;
+        }else {
+            criteria.andPlatformIdEqualTo(platFormId);
+        }
+        if(StringUtils.isNotBlank(profitMonth)){
+            criteria.andProfitMonthEqualTo(profitMonth);
+        }
+        List<TranCheckData> checkDatas = tranCheckDataMapper.selectByExample(example);
+        if (checkDatas.size()!=1){
+            return null;
+        }else{
+            return checkDatas.get(0);
+        }
     }
 }

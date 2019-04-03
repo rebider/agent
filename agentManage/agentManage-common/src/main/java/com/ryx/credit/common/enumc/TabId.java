@@ -95,7 +95,8 @@ public enum TabId {
     O_INVOICE("OI%s%014d"),
     P_CITYAPPLICATION_DETAIL("PCD%s%015d"),
     P_INVOICE_APPLY("PIA%s%015d"),
-    P_DATA_ADJUST("PDA%s%015d");
+    P_DATA_ADJUST("PDA%s%015d"),
+    TRANCHECK_DATA("TCD%s%014d");
 
 
     TabId(String thePatt){
