@@ -18,7 +18,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
     <build>
-    <finalName>agentManagejob</finalName>
+    <finalName>agentManage-job</finalName>
     <filters>
         <!-- 全局配置 -->
         <filter>${project.basedir}/../src/main/filters/filter-global.properties</filter>
