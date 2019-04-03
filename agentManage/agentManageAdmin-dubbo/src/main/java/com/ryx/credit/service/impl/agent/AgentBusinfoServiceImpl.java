@@ -13,6 +13,7 @@ import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.service.agent.AgentAssProtocolService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
 import com.ryx.credit.service.agent.PlatFormService;
+import com.ryx.credit.service.dict.DictOptionsService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	private AgentMapper agentMapper;
 	@Autowired
 	private PlatFormMapper platFormMapper;
+	@Autowired
+	private DictOptionsService dictOptionsService;
 
     /**
      * 代理商查询插件数据获取
@@ -105,7 +108,20 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					}
 				}
 			}
-        	if(1!=agentBusInfoMapper.insert(agentBusInfo)){
+			Dict debitRateLower = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitRateLower");//借记费率下限（%）
+			Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitCapping");//借记封顶额（元）
+			Dict debitAppearRate = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitAppearRate");//借记出款费率（%）
+			if(debitRateLower!=null){
+				agentBusInfo.setDebitRateLower(debitRateLower.getdItemvalue());
+			}
+			if(debitCapping!=null){
+				agentBusInfo.setDebitCapping(debitCapping.getdItemvalue());
+			}
+			if(debitAppearRate!=null){
+				agentBusInfo.setDebitAppearRate(debitAppearRate.getdItemvalue());
+			}
+
+			if(1!=agentBusInfoMapper.insert(agentBusInfo)){
         		throw new ProcessException("业务添加失败");
 			}
 			//记录历史业务平台
@@ -162,9 +178,18 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		return null;
 	}
 
+	/**
+	 * 业务修改
+	 * @param busInfoVoList
+	 * @param agent
+	 * @param userId
+	 * @param isPass  是否审批通过  审批通过传true ,未提交审批修改传 false
+	 * @return
+	 * @throws Exception
+	 */
 	@Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
 	@Override
-	public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent,String userId)throws Exception {
+	public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent,String userId,Boolean isPass)throws Exception {
 		try {
 			if(agent==null)throw new ProcessException("代理商信息不能为空");
 			Set<String> resultSet = new HashSet<>();
@@ -303,7 +328,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 				}
 
 			}
-			if(resultSet.size()>1){
+			if(!isPass && resultSet.size()>1){
 				throw new MessageException("不能同时提交pos和手刷平台");
 			}
 			return ResultVO.success(null);

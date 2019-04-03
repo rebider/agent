@@ -72,4 +72,6 @@ public interface AgentService {
 
 
     void createUser(String agentId)throws Exception;
+
+    AgentResult createAgentAccount();
 }

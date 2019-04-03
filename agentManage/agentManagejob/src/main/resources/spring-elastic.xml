@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:reg="http://www.dangdang.com/schema/ddframe/reg"
+       xmlns:job="http://www.dangdang.com/schema/ddframe/job"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.dangdang.com/schema/ddframe/reg
+                        http://www.dangdang.com/schema/ddframe/reg/reg.xsd
+                        http://www.dangdang.com/schema/ddframe/job
+                        http://www.dangdang.com/schema/ddframe/job/job.xsd
+                        ">
+    <!--configure registry center -->
+    <reg:zookeeper id="regCenter" server-lists="${zk.server}" namespace="agentManage-job" base-sleep-time-milliseconds="1000" max-sleep-time-milliseconds="3000" max-retries="3" />
+
+
+
+    <!--configure job 样例配置 -->
+    <job:simple id="mySimpleTask"
+                job-ref="mySimpleTask"
+                registry-center-ref="regCenter"
+                cron="0/10 * * * * ?"
+                sharding-total-count="1"
+                sharding-item-parameters="0=A"
+                description="这是一个测试作业，这里可以写描述"
+                overwrite="true"
+                failover="true"
+                misfire="true"
+                job-parameter="job-parameter"
+                disabled="true">
+        <!--前置后置任务监听实现类-->
+        <job:listener class="com.ryx.job.listener.ExmpListener" />
+        <!--前置后置任务分布式监听实现类-->
+        <job:distributed-listener class="com.ryx.job.listener.ExmpDistributedListener"
+                                  started-timeout-milliseconds="100"
+                                  completed-timeout-milliseconds="100" />
+    </job:simple>
+
+    <!--Dataflow类型作业 样例配置-->
+    <job:dataflow id="myDataFlowTask"
+                  job-ref="myDataFlowTask"
+                  registry-center-ref="regCenter"
+                  cron="0/10 * * * * ?"
+                  sharding-total-count="1"
+                  sharding-item-parameters="0=C"
+                  streaming-process="false"
+                  overwrite="true"
+                  disabled="true"/>
+
+
+
+    <!-- 配置脚本作业 样例配置-->
+    <job:script
+            id="scriptElasticJob"
+            registry-center-ref="regCenter"
+            cron="0/10 * * * * ?"
+            sharding-total-count="1"
+            sharding-item-parameters="0=A"
+            script-command-line="/your/file/path/demo.sh"
+            overwrite="true"
+            disabled="true"/>
+
+
+    <!--代理商账户完善任务-->
+    <job:simple id="agentLoginAccountCreateTask"
+                  job-ref="agentLoginAccountCreateTask"
+                  registry-center-ref="regCenter"
+                  cron="0/10 * * * * ?"
+                  overwrite="true"
+                  sharding-total-count="3"
+                  sharding-item-parameters="0=Server0,1=Server1,2=Server2">
+        <job:distributed-listener class="com.ryx.job.listener.ExmpDistributedListener" started-timeout-milliseconds="100" completed-timeout-milliseconds="100" />
+    </job:simple>
+
+</beans>
