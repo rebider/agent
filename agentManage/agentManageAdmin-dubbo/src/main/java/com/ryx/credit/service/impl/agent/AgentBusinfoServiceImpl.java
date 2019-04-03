@@ -178,9 +178,18 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		return null;
 	}
 
+	/**
+	 * 业务修改
+	 * @param busInfoVoList
+	 * @param agent
+	 * @param userId
+	 * @param isPass  是否审批通过  审批通过传true ,未提交审批修改传 false
+	 * @return
+	 * @throws Exception
+	 */
 	@Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
 	@Override
-	public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent,String userId)throws Exception {
+	public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent,String userId,Boolean isPass)throws Exception {
 		try {
 			if(agent==null)throw new ProcessException("代理商信息不能为空");
 			Set<String> resultSet = new HashSet<>();
@@ -319,7 +328,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 				}
 
 			}
-			if(resultSet.size()>1){
+			if(!isPass && resultSet.size()>1){
 				throw new MessageException("不能同时提交pos和手刷平台");
 			}
 			return ResultVO.success(null);

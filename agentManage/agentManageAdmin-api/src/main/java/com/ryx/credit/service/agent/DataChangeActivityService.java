@@ -2,6 +2,7 @@ package com.ryx.credit.service.agent;
 
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.pojo.admin.agent.DateChangeRequest;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 
 import java.math.BigDecimal;
@@ -30,4 +31,6 @@ public interface DataChangeActivityService {
 
     AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception;
 
+
+    int updateByPrimaryKeySelective(DateChangeRequest dateChangeRequest);
 }
