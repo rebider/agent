@@ -493,8 +493,8 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     OActivityExample oActivityExample = new OActivityExample();
                     OActivityExample.Criteria activityCriteria = oActivityExample.createCriteria();
                     activityCriteria.andStatusEqualTo(Status.STATUS_1.status);
-                    activityCriteria.andVenderEqualTo(manufaValue);
-                    activityCriteria.andProModelEqualTo(tmsModel);
+//                    activityCriteria.andVenderEqualTo(manufaValue);
+//                    activityCriteria.andProModelEqualTo(tmsModel);
                     activityCriteria.andPosTypeEqualTo(posType);
                     activityCriteria.andBusProCodeEqualTo(machineId);
                     List<OActivity> oActivities = activityMapper.selectByExample(oActivityExample);
