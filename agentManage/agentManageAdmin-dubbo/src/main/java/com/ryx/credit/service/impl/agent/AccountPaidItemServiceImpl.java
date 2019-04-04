@@ -55,7 +55,7 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
-    public AgentResult insertAccountPaid(Capital capital,List<String> fileIdList,String cUser)throws Exception{
+    public AgentResult insertAccountPaid(Capital capital,List<String> fileIdList,String cUser,Boolean isPass)throws Exception{
 
         AgentResult result = new AgentResult(500,"参数错误","");
         if(StringUtils.isBlank(cUser)){
@@ -73,13 +73,22 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
         capital.setcTime(nowDate);
         capital.setcUtime(nowDate);
         capital.setCloReviewStatus(AgStatus.Create.status);
-        capital.setcInAmount(Status.STATUS_0.status);
+        capital.setcInAmount(capital.getcInAmount()==null?Status.STATUS_0.status:capital.getcInAmount());
         capital.setFreezeAmt(Status.STATUS_0.status);
-        if(PayType.YHHK.code.equals(capital.getcPayType())) {
-            capital.setcFqInAmount(capital.getcAmount());
+        if(!isPass){
+            if(PayType.YHHK.code.equals(capital.getcPayType())) {
+                capital.setcFqInAmount(capital.getcAmount());
+            }else{
+                capital.setcFqInAmount(Status.STATUS_0.status);
+            }
         }else{
-            capital.setcFqInAmount(Status.STATUS_0.status);
+            if(PayType.YHHK.code.equals(capital.getcPayType())) {
+                capital.setcFqInAmount(capital.getcInAmount());
+            }else{
+                capital.setcFqInAmount(Status.STATUS_0.status);
+            }
         }
+
         int insertResult = capitalMapper.insertSelective(capital);
         if(1==insertResult){
             if(fileIdList!=null) {
@@ -140,7 +149,7 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
 
     @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public ResultVO updateListCapitalVo(List<CapitalVo> capitalVoList, Agent agent,String userId) throws Exception {
+    public ResultVO updateListCapitalVo(List<CapitalVo> capitalVoList, Agent agent,String userId,Boolean isPass) throws Exception {
             try {
                 if(agent==null)throw new ProcessException("代理商信息不能为空");
                 for (CapitalVo capitalVo : capitalVoList) {
@@ -148,7 +157,7 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
                     capitalVo.setcAgentId(agent.getId());
                     if(StringUtils.isEmpty(capitalVo.getId())) {
                         //直接新曾
-                        AgentResult result =   insertAccountPaid(capitalVo, capitalVo.getCapitalTableFile(), userId);
+                        AgentResult result =   insertAccountPaid(capitalVo, capitalVo.getCapitalTableFile(), userId,isPass);
                         if(!result.isOK())throw new ProcessException("新增收款信息失败");
                     }else{
 
@@ -168,10 +177,16 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
                         db_capital.setcInCom(capitalVo.getcInCom());
                         db_capital.setcPayType(capitalVo.getcPayType());
 
-                        if(PayType.YHHK.code.equals(db_capital.getcPayType())) {
-                            db_capital.setcFqInAmount(db_capital.getcAmount());
+                        if(!isPass){
+                            if(PayType.YHHK.code.equals(db_capital.getcPayType())) {
+                                db_capital.setcFqInAmount(db_capital.getcAmount());
+                            }else{
+                                db_capital.setcFqInAmount(Status.STATUS_0.status);
+                            }
                         }else{
-                            db_capital.setcFqInAmount(Status.STATUS_0.status);
+                            if(PayType.YHHK.code.equals(db_capital.getcPayType())) {
+                                db_capital.setcFqInAmount(db_capital.getcInAmount());
+                            }
                         }
 
                         if(1!=capitalMapper.updateByPrimaryKeySelective(db_capital)){

@@ -299,7 +299,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 if (StringUtils.isNotBlank(agent.getcUser()) && StringUtils.isNotBlank(agent.getId())) {
                     item.setcAgentId(agent.getId());
                     item.setcUser(agent.getcUser());
-                    AgentResult result = accountPaidItemService.insertAccountPaid(item, item.getCapitalTableFile(), agentVo.getAgent().getcUser());
+                    AgentResult result = accountPaidItemService.insertAccountPaid(item, item.getCapitalTableFile(), agentVo.getAgent().getcUser(),false);
                     if (!result.isOK()) {
                         throw new ProcessException("缴纳款项信息录入失败");
                     }

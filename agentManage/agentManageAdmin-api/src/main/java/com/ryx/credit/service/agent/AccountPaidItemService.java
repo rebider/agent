@@ -18,13 +18,13 @@ import java.util.List;
  */
 public interface AccountPaidItemService {
 
-    AgentResult insertAccountPaid(Capital capital, List<String> fileIdList, String cUser)throws Exception;
+    AgentResult insertAccountPaid(Capital capital, List<String> fileIdList, String cUser,Boolean isPass)throws Exception;
 
     int removeAccountPaid(String id);
 
     List<Capital> queryCap(String agentId,String type, BigDecimal isIn,BigDecimal cloReviewStatus);
 
-    public ResultVO updateListCapitalVo(List<CapitalVo> capitalVoList, Agent agent,String userId)throws Exception;
+    public ResultVO updateListCapitalVo(List<CapitalVo> capitalVoList, Agent agent,String userId,Boolean isPass)throws Exception;
 
     public int update(Capital capital);
 
