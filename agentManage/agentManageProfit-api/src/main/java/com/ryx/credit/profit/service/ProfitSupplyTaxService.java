@@ -13,4 +13,6 @@ public interface ProfitSupplyTaxService {
      * @Date: 0:12 2018/12/21
      */
     void taxSupplyComputer(Map<String,Object> params);
+
+    Map<String,Object> profitCount(Map<String,Object> param,boolean isQuerySubordinate);
 }
