@@ -73,6 +73,17 @@ public class Capital implements Serializable{
     //新增
     private BigDecimal debt;
 
+    //新增时间
+    private String time;
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
     public BigDecimal getDebt() {
         return debt;
     }

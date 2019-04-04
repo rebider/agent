@@ -112,7 +112,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 }
                 item.setcAgentId(agent.getId());
                 item.setcUser(agent.getcUser());
-                AgentResult res = accountPaidItemService.insertAccountPaid(item, item.getCapitalTableFile(), agentVo.getAgent().getcUser());
+                AgentResult res = accountPaidItemService.insertAccountPaid(item, item.getCapitalTableFile(), agentVo.getAgent().getcUser(),false);
                 if (!res.isOK()) {
                     throw new ProcessException("添加交款项异常");
                 }
@@ -870,7 +870,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
 
             if (agent.getCapitalVoList() != null && agent.getCapitalVoList().size() > 0) {
                 logger.info("用户{}{}修改代理商收款信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent.getCapitalVoList()));
-                ResultVO updateAccountPaidUpdateRes = accountPaidItemService.updateListCapitalVo(agent.getCapitalVoList(), agent.getAgent(),userId);
+                ResultVO updateAccountPaidUpdateRes = accountPaidItemService.updateListCapitalVo(agent.getCapitalVoList(), agent.getAgent(),userId,isPass);
                 logger.info("用户{}{}修改代理商收款信息结果{}", userId, agent.getAgent().getId(), updateAccountPaidUpdateRes.getResInfo());
             }
             if (agent.getContractVoList() != null && agent.getContractVoList().size() > 0) {
