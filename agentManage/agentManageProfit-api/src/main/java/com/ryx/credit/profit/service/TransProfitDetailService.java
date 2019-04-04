@@ -7,6 +7,7 @@ package com.ryx.credit.profit.service;/**
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.pojo.TransProfitDetail;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -60,5 +61,13 @@ public interface TransProfitDetailService {
      * @return
      */
     List<TransProfitDetail> getTransProfitDetailByBusNum(TransProfitDetail transProfitDetail);
+
+
+    /**
+     * 根据类型查询平台号
+     * @param type
+     * @return
+     */
+    List<Map<String,Object>> queryBusNum(@Param("type") String type);
 
 }

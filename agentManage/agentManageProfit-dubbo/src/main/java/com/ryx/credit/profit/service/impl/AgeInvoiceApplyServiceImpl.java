@@ -1,7 +1,7 @@
 package com.ryx.credit.profit.service.impl;
 
 import com.ryx.credit.common.enumc.TabId;
-import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -109,9 +109,53 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
     }
 
     @Override
-    public void volumeImportData(List<List<Object>> lists,String agentId,String agentName) {
+    public void volumeImportData(List<List<Object>> lists,String agentId,String agentName) throws MessageException{
         if(lists.size()<=0){
-            throw new ProcessException("导入数据为空");
+            throw new MessageException("导入数据为空");
+        }
+        //检查数据格式
+        for (List<Object> list:lists) {
+            if(list.size()>0 && list!= null){
+
+                //开票日期的格式  yyyy-MM-dd
+                if(StringUtils.isBlank(list.get(0).toString())){
+                    throw new MessageException("开票日期不能为空");
+                } else{
+                    String pattern = "^[0-9]\\d{3}-[0-1]{1}\\d-[0-3][0-9]$";
+                    Boolean flag = list.get(1).toString().matches(pattern);
+                    if(!flag){
+                        throw new MessageException("开票日期的格式应为,例如：2019-08-01");
+                    }
+                }
+                //寄出时间的格式不能为空 yyyy-MM-dd
+                if(StringUtils.isBlank(list.get(11).toString())){
+                    throw new MessageException("寄出时间不能为空");
+                } else{
+                    String pattern = "^[0-9]\\d{3}-[0-1]{1}\\d-[0-3][0-9]$";
+                    Boolean flag = list.get(11).toString().matches(pattern);
+                    if(!flag){
+                        throw new MessageException("寄出日期的格式应为,例如：2019-08-01");
+                    }
+                }
+
+                //发票号不能有字母
+                if(StringUtils.isBlank(list.get(2).toString())){
+                    throw new MessageException("发票号不能为空");
+                } else{
+                    String pattern = "^[0-9]+$";  //yyyy-MM-dd
+                   String str = null;
+                   if(list.get(2).toString().indexOf(".") != -1){
+                       str = list.get(2).toString().substring(0,list.get(2).toString().indexOf("."));
+                   }else{
+                       str = list.get(2).toString();
+                   }
+                    Boolean flag = str.matches(pattern);
+                    if(!flag){
+                        throw new MessageException("发票号只能包含数字");
+                    }
+                }
+
+            }
         }
         try{
             for (List<Object> list:lists) {
@@ -121,7 +165,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
             }
         }catch (Exception e){
             e.printStackTrace();
-            throw new ProcessException("导入数据格式不正确");
+            throw new MessageException("部分导入数据格式不正确");
         }
     }
 
@@ -213,7 +257,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
     }
 
     @Override
-    public void commitSHResult(InvoiceApply invoiceApply) {
+    public void commitSHResult(InvoiceApply invoiceApply) throws MessageException {
         //获取终审状态
         String finalStatus = p_redisService.getValue("commitFinal");
         if("1".equals(finalStatus)){//终审状态
@@ -235,7 +279,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
             try{
                 ownInvoiceService.invoiceApplyComputer(invoiceApply1);
             }catch (Exception e){
-                throw new ProcessException("欠票汇总失败");
+                throw new MessageException("欠票汇总失败");
 
             }
         }
