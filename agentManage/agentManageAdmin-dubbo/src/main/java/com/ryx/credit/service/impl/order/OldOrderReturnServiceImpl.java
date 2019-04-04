@@ -169,6 +169,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
            );
            if(checkCount>0)  return AgentResult.fail(oldOrderReturnSubmitProVo.getSnStart()+":"+oldOrderReturnSubmitProVo.getSnEnd()+"在退货中");
         }
+        //fixme 检查用户删除的sn是否是当前申请代理商的sn(是否是代理商的sn机具)
         Agent agent = agentMapper.selectByPrimaryKey(oldOrderReturnVo.getAgentId());
         //保存审批中的退货申请单
         OReturnOrder oReturnOrder = new OReturnOrder();
