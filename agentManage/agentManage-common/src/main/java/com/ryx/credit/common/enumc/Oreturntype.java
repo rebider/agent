@@ -10,7 +10,8 @@ import java.math.BigDecimal;
 public enum Oreturntype {
 
     NEW("NEW","新订单"),
-    OLD("OLD","历史订单");
+    OLD("OLD","历史订单"),
+    OLDNOSN("OLDNOSN","历史订单无SN");
 
     public String code;
 

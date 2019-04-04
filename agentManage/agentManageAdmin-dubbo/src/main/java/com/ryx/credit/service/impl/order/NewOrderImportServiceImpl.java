@@ -374,7 +374,7 @@ public class NewOrderImportServiceImpl implements NewOrderImportService{
         //busid
         orderFormVo.setBusId(agentBusInfo.getId());
         //新老订单
-        orderFormVo.setOxOrder(Oreturntype.OLD.code);
+        orderFormVo.setOxOrder(Oreturntype.OLDNOSN.code);
         orderFormVo.setReviewStatus(AgStatus.Approved.status);
         orderFormVo.setOrderStatus(OrderStatus.ENABLE.status);
         if(newOrderImportBaseInfo.getOrder_amt().equals(newOrderImportBaseInfo.getOrder_have_amt())) {
