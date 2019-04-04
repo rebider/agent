@@ -402,7 +402,11 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     logger.info("查询手刷根据SN号段查询机具信息数量：{},count:{}",data.size(),count);
                     throw new MessageException("sn数量有误");
                 }
+                String orgid = "";
                 for (Map<String, Object> map : data) {
+                    if(StringUtils.isBlank(orgid)) {
+                        orgid = String.valueOf(map.get("agencyId"));
+                    }
                     String termActiveId = String.valueOf(map.get("termActiveId"));
                     String termActiveName = String.valueOf(map.get("termActiveName"));
                     String termBatchId = String.valueOf(map.get("termBatchId"));
@@ -452,6 +456,10 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 for (OActivity activity : actSet) {
                     redisService.lpushList(snStart+","+snEnd+"_act",activity.getId());
                 }
+
+                //放入代理商信息
+                redisService.setValue(snStart+","+snEnd+"_org",orgid,60*60*24L);
+
                 OActivity oActivity = actSet.iterator().next();
                 res.putKeyV("snStart",snStart)
                         .putKeyV("snEnd",snEnd)
@@ -479,7 +487,11 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     logger.info("查询pos根据SN号段查询机具信息数量：{},count:{}",termMachineListMap.size(),count);
                     throw new MessageException("sn数量有误");
                 }
+                String orgid = "";
                 for (Map<String, Object> map : termMachineListMap) {
+                    if(StringUtils.isBlank(orgid)) {
+                        orgid = String.valueOf(map.get("orgId"));
+                    }
                     String posSn = String.valueOf(map.get("posSn"));
                     String tmsModel = String.valueOf(map.get("tmsModel"));
                     String machineManufName = String.valueOf(map.get("machineManufName"));
@@ -538,6 +550,8 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 for (OActivity activity : actSet) {
                     redisService.lpushList(snStart+","+snEnd+"_act",activity.getId());
                 }
+                //放入代理商信息
+                redisService.setValue(snStart+","+snEnd+"_org",orgid,60*60*24L);
                 OActivity oActivity = actSet.iterator().next();
                 res.putKeyV("snStart",snStart)
                         .putKeyV("snEnd",snEnd)
