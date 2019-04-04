@@ -411,11 +411,11 @@ public class AimportServiceImpl implements AimportService {
                             c.setVersion(capital.getVersion());
                             capitalMapper.updateByPrimaryKeySelective(c);
                         }else{
-                            AgentResult result = accountPaidItemService.insertAccountPaid(capital,Arrays.asList(),userid);
+                            AgentResult result = accountPaidItemService.insertAccountPaid(capital,Arrays.asList(),userid,false);
                             if(null==result || !result.isOK())throw new ProcessException("代理商交款导入失败"+result.getMsg());
                         }
                     }else{
-                        AgentResult result = accountPaidItemService.insertAccountPaid(capital,Arrays.asList(),userid);
+                        AgentResult result = accountPaidItemService.insertAccountPaid(capital,Arrays.asList(),userid,false);
                         if(null==result || !result.isOK())throw new ProcessException("代理商交款导入失败"+result.getMsg());
                     }
                     ImportAgent payment =  importAgentMapper.selectByPrimaryKey(datum.getId());

@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -404,20 +405,16 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             logger.info("请填写实际到账金额");
                             throw new ProcessException("请填写实际到账金额");
                         }
-                    }
-                    Capital capital = capitalMapper.selectByPrimaryKey(capitalVo.getId());
-                    capitalVo.setcUtime(new Date());
-                    capitalVo.setVersion(capital.getVersion());
-                    capitalVo.setcInAmount(capitalVo.getcInAmount());
-                    capitalVo.setcFqInAmount(capitalVo.getcInAmount());
-                    capitalVo.setId(capitalVo.getId());
-                    int i = capitalMapper.updateByPrimaryKeySelective(capitalVo);
-                    if(i!=1){
-                        logger.info("实际到账金额填写失败");
-                        throw new ProcessException("实际到账金额填写失败");
+                        if (StringUtils.isNotBlank(capitalVo.getTime())){
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                            Date cPaytime = sdf.parse(capitalVo.getTime());
+                            capitalVo.setcPaytime(cPaytime);
+                        }
+                        if(null!=capitalVo.getcInAmount()){
+                            capitalVo.setcFqInAmount(capitalVo.getcInAmount());
+                        }
                     }
                 }
-
                 //数据修改
                 if(dateChangeRequest.getDataType().equals(DataChangeApyType.DC_Agent.name())){
                     AgentVo vo = JSONObject.parseObject(dateChangeRequest.getDataContent(), AgentVo.class);
@@ -426,6 +423,9 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                     }
                     vo.setDebt(agentVo.getDebt());
                     vo.setOweTicket(agentVo.getOweTicket());
+                    if(orgCode.equals("finance")){
+                        vo.setCapitalVoList(agentVo.getCapitalVoList());
+                    }
                     String voJson = JSONObject.toJSONString(vo);
                     dateChangeRequest.setDataContent(voJson);
                     int i = dataChangeActivityService.updateByPrimaryKeySelective(dateChangeRequest);
