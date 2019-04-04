@@ -20,10 +20,7 @@ import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.AdjustmentMachineVo;
 import com.ryx.credit.machine.vo.LowerHairMachineVo;
 import com.ryx.credit.machine.vo.MposSnVo;
-import com.ryx.credit.pojo.admin.agent.Agent;
-import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
-import com.ryx.credit.pojo.admin.agent.BusActRel;
-import com.ryx.credit.pojo.admin.agent.Dict;
+import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OldOrderReturnBusEditVo;
@@ -152,6 +149,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         if(oldOrderReturnSubmitProVos==null || oldOrderReturnSubmitProVos.size()==0){
             return AgentResult.fail("请填写退货sn号码段");
         }
+        Agent agent = agentMapper.selectByPrimaryKey(oldOrderReturnVo.getAgentId());
         for (OldOrderReturnSubmitProVo oldOrderReturnSubmitProVo : oldOrderReturnVo.getOldOrderReturnSubmitProVoList()) {
             if(StringUtils.isBlank(oldOrderReturnSubmitProVo.getSnStart())||
                StringUtils.isBlank(oldOrderReturnSubmitProVo.getSnEnd())){
@@ -168,9 +166,19 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                    .putKeyV("sts",Arrays.asList(RetSchedule.DFH.code,RetSchedule.FHZ.code,RetSchedule.SPZ.code,RetSchedule.TH.code,RetSchedule.TKZ.code,RetSchedule.YFH.code))
            );
            if(checkCount>0)  return AgentResult.fail(oldOrderReturnSubmitProVo.getSnStart()+":"+oldOrderReturnSubmitProVo.getSnEnd()+"在退货中");
+
+           //检查机构编号
+           String org = redisService.getValue(oldOrderReturnSubmitProVo.getSnStart()+","+oldOrderReturnSubmitProVo.getSnEnd()+"_org");
+           if(StringUtils.isNotBlank(org)){
+               AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+               agentBusInfoExample.or().andBusNumEqualTo(org).andAgentIdEqualTo(agent.getId()).andStatusEqualTo(Status.STATUS_1.status);
+               List<AgentBusInfo> businfo = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+               if(businfo==null || businfo.size()==0){
+                   return AgentResult.fail(oldOrderReturnSubmitProVo.getSnStart()+","+oldOrderReturnSubmitProVo.getSnEnd()+"不是代理商"+agent.getAgName()+"的sn");
+               }
+           }
         }
-        //fixme 检查用户删除的sn是否是当前申请代理商的sn(是否是代理商的sn机具)
-        Agent agent = agentMapper.selectByPrimaryKey(oldOrderReturnVo.getAgentId());
+
         //保存审批中的退货申请单
         OReturnOrder oReturnOrder = new OReturnOrder();
         oReturnOrder.setId(idService.genId(TabId.o_return_order));
