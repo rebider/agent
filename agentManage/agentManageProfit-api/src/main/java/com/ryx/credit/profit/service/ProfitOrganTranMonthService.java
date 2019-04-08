@@ -7,7 +7,11 @@ package com.ryx.credit.profit.service;/**
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.pojo.ProfitOrganTranMonth;
+import com.ryx.credit.profit.pojo.TranCheckData;
+import com.ryx.credit.profit.pojo.TranCheckPlatForm;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -67,17 +71,58 @@ public interface ProfitOrganTranMonthService {
     String doSettleTranAmount(Map<String,String> param);
 
     /**
-     * 获取数据库中所有交易类型表头信息
-     * @return
-     */
-    Map<String,Object> getAllTranPlatform();
-
-    /**
      * 调用日结分润接口 获取月结分润
      * @param param
      * @return
      */
     String doProfitNewMonth(Map<String,String> param);
 
+    /**
+     * 获取自主品牌交易量及手续费
+     * @param tranMonth
+     * @return
+     */
     Map<String,Object> getTranAmtByMonth(String tranMonth);
+
+    /**
+     * 获取TRANCHECK_PLATFORM表中所有业务类型对象
+     * @return
+     */
+    List<TranCheckPlatForm> getAllPlatForm();
+
+    /**
+     * 添加数据
+     * @param tranCheckData
+     * @return
+     */
+    int insertTranCheckData(TranCheckData tranCheckData);
+
+    /**
+     * 同步数据
+     * @param list
+     * @return
+     */
+    int synchronizeTranCheckData(List<TranCheckData> list);
+
+    Map<String,String> doSynchronizeTranCheckData();
+
+    int updateTranCheckData(TranCheckData tranCheckData);
+
+    List<Map<String,String>> getAllPlatFormType();
+
+    TranCheckData getTranCheckDataByProfitMonthAndPlatFormId(String profitMonth, BigDecimal platFormId);
+    /**
+     * 根据分润月份获取核对数据
+     * @param profitMonth
+     * @return
+     */
+    List<TranCheckData> getAllCheckDataByProfitMonth(String profitMonth);
+
+    /**
+     * 根据分润月份和业务平台获取核对数据
+     * @param plarFormType
+     * @param profitMonth
+     * @return
+     */
+    List<TranCheckData> getAllCheckDataByPlatFormTypeAndProfitMonth(String plarFormType, String profitMonth);
 }

@@ -38,4 +38,8 @@ public interface ProfitSupplyTaxMapper {
     long getClassificationCount(Map<String, Object> param);
 
     void deleteByMonth(@Param("profitMonth") String profitMonth);
+
+    Map<String,Object> profitCountWithSubordinate(Map<String,Object> param);
+
+    Map<String,Object>profitCount(Map<String,Object> param);
 }
