@@ -479,6 +479,7 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
         ApprovalFlowRecordExample approvalFlowRecordExample = new ApprovalFlowRecordExample();
         ApprovalFlowRecordExample.Criteria criteria = approvalFlowRecordExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andActivityStatusEqualTo(Status.STATUS_1.status);
         criteria.andExecutionIdEqualTo(executionId);
         List<ApprovalFlowRecord> approvalFlowRecords = approvalFlowRecordMapper.selectByExample(approvalFlowRecordExample);
         for (ApprovalFlowRecord approvalFlowRecord : approvalFlowRecords) {
