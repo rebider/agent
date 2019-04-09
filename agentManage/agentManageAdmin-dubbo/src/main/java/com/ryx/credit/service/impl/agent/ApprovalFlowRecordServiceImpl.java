@@ -488,7 +488,7 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
             if(null!=cUser){
                 resultMap.put("approvalPerson",cUser.getName());
             }else{
-                resultMap.put("approvalPerson","");
+                resultMap.put("approvalPerson",approvalFlowRecord.getApprovalPerson());
             }
             resultMap.put("createTime",DateUtil.format(approvalFlowRecord.getApprovalTime(),DateUtil.DATE_FORMAT_1));
             resultMap.put("rs",approvalFlowRecord.getApprovalResult());
