@@ -21,6 +21,36 @@ public class DataHistory implements Serializable{
 
     private String dataCotent;
 
+    private String dataTypeName;
+
+    private String cUserName;
+
+    private Object dataCotentObj;
+
+    public Object getDataCotentObj() {
+        return dataCotentObj;
+    }
+
+    public void setDataCotentObj(Object dataCotentObj) {
+        this.dataCotentObj = dataCotentObj;
+    }
+
+    public String getDataTypeName() {
+        return dataTypeName;
+    }
+
+    public void setDataTypeName(String dataTypeName) {
+        this.dataTypeName = dataTypeName;
+    }
+
+    public String getcUserName() {
+        return cUserName;
+    }
+
+    public void setcUserName(String cUserName) {
+        this.cUserName = cUserName;
+    }
+
     public String getId() {
         return id;
     }
