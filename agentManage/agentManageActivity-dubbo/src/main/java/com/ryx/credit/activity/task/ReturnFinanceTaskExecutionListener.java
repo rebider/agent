@@ -14,10 +14,12 @@ import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.DelegateTask;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.TaskListener;
+import org.activiti.engine.task.IdentityLink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * ReturnFinanceTaskExecutionListener
@@ -61,6 +63,10 @@ public class ReturnFinanceTaskExecutionListener implements TaskListener, Executi
 
     @Override
     public void notify(DelegateTask delegateTask) {
+        Set<IdentityLink> candidates = delegateTask.getCandidates();
+        String assignee = delegateTask.getAssignee();
+        String category = delegateTask.getCategory();
+        DelegateExecution execution = delegateTask.getExecution();
         String eventName = delegateTask.getEventName();
         if ("create".endsWith(eventName)) {
             ThreadPool.putThreadPool(() -> {
