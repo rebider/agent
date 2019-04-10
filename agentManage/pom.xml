@@ -560,13 +560,13 @@
         <repository>
             <id>pro-release</id>
             <name>Proj Release Repository</name>
-            <url>http://12.3.10.224:9081/nexus/content/repositories/wq-release/</url>
+            <url>http://12.3.10.225:9081/nexus/content/repositories/wq-release/</url>
         </repository>
 
         <snapshotRepository>
             <id>pro-snapshot</id>
             <name>Proj Snapshot Repository</name>
-            <url>http://12.3.10.224:9081/nexus/content/repositories/wq-snapshot/</url>
+            <url>http://12.3.10.225:9081/nexus/content/repositories/wq-snapshot/</url>
         </snapshotRepository>
     </distributionManagement>
 
