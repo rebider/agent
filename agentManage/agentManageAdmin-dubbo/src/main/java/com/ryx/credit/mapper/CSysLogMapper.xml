@@ -1,10 +1,169 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ryx.credit.dao.CSysLogMapper">
-
-    <!-- 通用查询结果列-->
-    <sql id="Base_Column_List">
-        id, login_name AS loginName, role_name AS roleName, opt_content AS optContent, client_ip AS clientIp, create_time AS createTime
-    </sql>
-
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.CSysLog">
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="LOGIN_NAME" jdbcType="VARCHAR" property="loginName" />
+    <result column="ROLE_NAME" jdbcType="VARCHAR" property="roleName" />
+    <result column="OPT_CONTENT" jdbcType="VARCHAR" property="optContent" />
+    <result column="CLIENT_IP" jdbcType="VARCHAR" property="clientIp" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, LOGIN_NAME, ROLE_NAME, OPT_CONTENT, CLIENT_IP, CREATE_TIME
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.CSysLogExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from C_SYS_LOG
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.math.BigDecimal" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from C_SYS_LOG
+    where ID = #{id,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.CSysLogExample">
+    delete from C_SYS_LOG
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.CSysLog">
+    insert into C_SYS_LOG (ID, LOGIN_NAME, ROLE_NAME, 
+      OPT_CONTENT, CLIENT_IP, CREATE_TIME
+      )
+    values (#{id,jdbcType=DECIMAL}, #{loginName,jdbcType=VARCHAR}, #{roleName,jdbcType=VARCHAR}, 
+      #{optContent,jdbcType=VARCHAR}, #{clientIp,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.CSysLog">
+    insert into C_SYS_LOG
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="loginName != null">
+        LOGIN_NAME,
+      </if>
+      <if test="roleName != null">
+        ROLE_NAME,
+      </if>
+      <if test="optContent != null">
+        OPT_CONTENT,
+      </if>
+      <if test="clientIp != null">
+        CLIENT_IP,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=DECIMAL},
+      </if>
+      <if test="loginName != null">
+        #{loginName,jdbcType=VARCHAR},
+      </if>
+      <if test="roleName != null">
+        #{roleName,jdbcType=VARCHAR},
+      </if>
+      <if test="optContent != null">
+        #{optContent,jdbcType=VARCHAR},
+      </if>
+      <if test="clientIp != null">
+        #{clientIp,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.CSysLogExample" resultType="java.lang.Long">
+    select count(*) from C_SYS_LOG
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.CSysLog">
+    update C_SYS_LOG
+    <set>
+      <if test="loginName != null">
+        LOGIN_NAME = #{loginName,jdbcType=VARCHAR},
+      </if>
+      <if test="roleName != null">
+        ROLE_NAME = #{roleName,jdbcType=VARCHAR},
+      </if>
+      <if test="optContent != null">
+        OPT_CONTENT = #{optContent,jdbcType=VARCHAR},
+      </if>
+      <if test="clientIp != null">
+        CLIENT_IP = #{clientIp,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.CSysLog">
+    update C_SYS_LOG
+    set LOGIN_NAME = #{loginName,jdbcType=VARCHAR},
+      ROLE_NAME = #{roleName,jdbcType=VARCHAR},
+      OPT_CONTENT = #{optContent,jdbcType=VARCHAR},
+      CLIENT_IP = #{clientIp,jdbcType=VARCHAR},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP}
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
 </mapper>

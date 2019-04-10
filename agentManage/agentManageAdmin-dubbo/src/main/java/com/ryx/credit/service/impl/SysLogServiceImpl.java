@@ -1,15 +1,16 @@
 package com.ryx.credit.service.impl;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.plugins.Page;
-import com.baomidou.mybatisplus.service.impl.ServiceImpl;
-import com.ryx.credit.commons.utils.PageInfo;
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.dao.CSysLogMapper;
 import com.ryx.credit.pojo.admin.CSysLog;
+import com.ryx.credit.pojo.admin.CSysLogExample;
 import com.ryx.credit.service.ISysLogService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  *
@@ -17,17 +18,27 @@ import java.util.ArrayList;
  *
  */
 @Service("sysLogService")
-public class SysLogServiceImpl extends ServiceImpl<CSysLogMapper, CSysLog> implements ISysLogService {
-    
+public class SysLogServiceImpl implements ISysLogService {
+
+    @Autowired
+    private CSysLogMapper cSysLogMapper;
+
     @Override
-    public PageInfo selectDataGrid(PageInfo pageInfo) {
-        Page<CSysLog> page = new Page<CSysLog>(pageInfo.getNowpage(), pageInfo.getSize());
-        EntityWrapper<CSysLog> wrapper = new EntityWrapper<CSysLog>();
-        wrapper.orderBy(pageInfo.getSort(), pageInfo.getOrder().equalsIgnoreCase("ASC"));
-        selectPage(page, wrapper);
-        pageInfo.setRows((ArrayList) page.getRecords());
-        pageInfo.setTotal(page.getTotal());
+    public PageInfo selectDataGrid(Page page) {
+
+        CSysLogExample cSysLogExample = new CSysLogExample();
+        cSysLogExample.setPage(page);
+        cSysLogExample.setOrderByClause(" create_time desc ");
+        List<CSysLog> cSysLogs = cSysLogMapper.selectByExample(cSysLogExample);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(cSysLogs);
+        pageInfo.setTotal((int)cSysLogMapper.countByExample(cSysLogExample));
         return pageInfo;
+
     }
-    
+
+    @Override
+    public void insert(CSysLog sysLog){
+        cSysLogMapper.insert(sysLog);
+    }
 }

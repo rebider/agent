@@ -512,9 +512,10 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             if(order==null){
                 throw new MessageException("订单"+oldOrderReturnBusEditVo.getOrderid()+"不存在");
             }
-            if(!Oreturntype.OLD.code.equals(order.getOxOrder()+"")){
+            if(Oreturntype.NEW.code.equals(order.getOxOrder())){
                 throw new MessageException("订单"+oldOrderReturnBusEditVo.getOrderid()+"非历史订单");
             }
+
             OProduct product = oProductMapper.selectByPrimaryKey(oldOrderReturnBusEditVo.getProductid());
             //检查订单中是否有此商品
             OSubOrderExample oSubOrderExample = new OSubOrderExample();
