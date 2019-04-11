@@ -925,23 +925,38 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if(datas == null || datas.size() == 0){
             throw new MessageException("导入数据为空");
         }
-
         for (List<Object> list:datas) {
-            if(list.size() != 7){
-                throw new MessageException("请检查表格中是否存在空格！");
+            if (list.size() != 7){
+                throw new MessageException("导入有误，请检查是否存在不合理单元格");
             }
-            if(StringUtils.isNotBlank(list.get(0).toString()) && StringUtils.isNotBlank(list.get(1).toString()) &&
-                    StringUtils.isNotBlank(list.get(4).toString()) && StringUtils.isNotBlank(list.get(5).toString()) &&
-                    StringUtils.isNotBlank(list.get(6).toString())){
-                try{
-                    insertCheckDeduction(list, userId);
-                }catch (Exception e){
-                    throw new MessageException("请检查表格中是否存在不合理数据格式！");
-                }
+            if (StringUtils.isBlank(list.get(0).toString())){
+                throw new MessageException("导入有误，代理商唯一码不能为空！");
+            }
+            if(StringUtils.isBlank(list.get(1).toString())){
+                throw new MessageException("导入有误，代理商名称不能为空！");
+            }
+            if(StringUtils.isBlank(list.get(4).toString())){
+                throw new MessageException("导入有误，月份不能为空！");
+            }
+            if(StringUtils.isBlank(list.get(5).toString())){
+                throw new MessageException("导入有误，扣款类型不能为空！");
+            }
+            if(StringUtils.isBlank(list.get(6).toString())){
+                throw new MessageException("导入有误，扣款金额不能为空！");
             }else{
-                throw new MessageException("请检查表格中是否存在不合理空格！");
+                try{
+                    new BigDecimal(list.get(6).toString());
+                }catch (Exception e){
+                    throw new MessageException("导入有误，扣款金额格式有误！");
+                }
             }
-
+        }
+        for (List<Object> list:datas) {
+            try{
+                insertCheckDeduction(list, userId);
+            }catch (Exception e){
+                throw new MessageException("导入失败！");
+            }
         }
     }
 
