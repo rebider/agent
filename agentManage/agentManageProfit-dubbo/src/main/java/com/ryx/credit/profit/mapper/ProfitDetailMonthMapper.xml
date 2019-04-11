@@ -1476,7 +1476,7 @@ update P_PROFIT_DETAIL_M dd
            bb.AGENT_ID  as parentAgentId, ROWNUM as rn from A_AGENT_BUSINFO
       aa left join A_AGENT_BUSINFO bb  on aa.BUS_PARENT =bb.ID) cc
        where cc.AGENT_ID = dd.AGENT_ID
-             and dd.PROFIT_DATE =#{profitDate}
+             and dd.PROFIT_DATE ='${profitDate}'
              and cc.CLO_PAY_COMPANY is not null
              and (nvl(cc.parentAgentId,'-') = nvl(dd.PARENT_AGENT_ID,'-'))
              and cc.rn = 1)
