@@ -1056,13 +1056,13 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             String count = "";
             String proModel = "";
             try {
-                snBegin = String.valueOf(excel.get(0));
-                snEnd = String.valueOf(excel.get(1));
-                count = String.valueOf(excel.get(2));
-                proModel = String.valueOf(excel.get(3));
+                snBegin = String.valueOf(excel.get(0)).trim();
+                snEnd = String.valueOf(excel.get(1)).trim();
+                count = String.valueOf(excel.get(2)).trim();
+                proModel = String.valueOf(excel.get(3)).trim();
 
             } catch (Exception e) {
-                throw new MessageException("导入解析文件失败");
+                throw new MessageException("导入解析文件失败，检查是否缺少字段");
             }
             try {
                 //检查是否在退货中
