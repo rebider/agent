@@ -1183,6 +1183,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
 
                 agentNotifyVo.setOrgName(agentName);
+                agentNotifyVo.setActivityType(platForm.getPosanameprefix());
                 AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentMergeBusInfo.getBusId());
                 Agent agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
                 agentNotifyVo.setUniqueId(agentBusInfo.getId());
