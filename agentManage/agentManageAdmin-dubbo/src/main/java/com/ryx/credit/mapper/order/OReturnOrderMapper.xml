@@ -415,9 +415,13 @@
   <select id="getOrderReturnList" parameterType="java.util.Map" resultType="java.util.Map">
     <include refid="PAGING_START" />
     select
-    to_char(coalesce((select max(o_logistics.send_date) from O_Receipt_plan left join o_logistics on o_logistics.receipt_plan_id = O_Receipt_plan.Id where odetail.id = O_Receipt_plan.Return_Order_Detail_Id),to_date('1990-01-01','yyyy-MM-dd')),'yyyy-MM-dd') as rotime,
+    to_char(coalesce((select max(o_logistics.send_date) from O_Receipt_plan
+    left join o_logistics on o_logistics.receipt_plan_id = O_Receipt_plan.Id
+    where odetail.id = O_Receipt_plan.Return_Order_Detail_Id), to_date('','yyyy-MM-dd')),'yyyy-MM-dd') as rotime,
     to_char(odetail.return_time,'YYYY-MM-DD') as returntime,
     to_char(ro.refundtime,'YYYY-MM-DD') as refundtime,
+    to_char(ro.c_time,'YYYY-MM-DD') as cTime,
+    to_char(ro.u_time,'YYYY-MM-DD') as uTime,
     ro.refundpeople, ro.auditor,
     c.PLATFORM_NAME, ro.ret_schedule,
     ro.id, odetail.return_count,
