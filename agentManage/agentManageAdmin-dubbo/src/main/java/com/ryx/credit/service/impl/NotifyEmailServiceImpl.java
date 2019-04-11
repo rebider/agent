@@ -7,7 +7,6 @@ import com.ryx.credit.common.util.ThreadPool;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.CUserMapper;
-import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
@@ -20,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -47,6 +46,7 @@ public class NotifyEmailServiceImpl implements NotifyEmailService {
     @Autowired
     private CUserMapper cUserMapper;
 
+
     public void notifyEmail(String groupId,String executionId,String eventName){
         ThreadPool.putThreadPool(() -> {
             if ("create".endsWith(eventName)) {
@@ -55,7 +55,7 @@ public class NotifyEmailServiceImpl implements NotifyEmailService {
                 } catch (InterruptedException e) {
                     log.error("待办任务通知:Thread error");
                 }
-                List<String> notityEmail = new ArrayList<>();
+                Set<String> notityEmail = new HashSet<>();
                 BusActRel busActRel = busActRelService.findById(executionId);
                 if(busActRel==null){
                     log.info("待办任务通知:未找到关联关系表,executionId:{}",executionId);
