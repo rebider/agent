@@ -1,7 +1,6 @@
 package com.ryx.credit.activity.task;
 
 import com.ryx.credit.service.NotifyEmailService;
-import com.ryx.credit.service.order.OrderService;
 import com.ryx.credit.spring.MySpringContextHandler;
 import org.activiti.engine.delegate.DelegateTask;
 import org.activiti.engine.task.IdentityLink;
