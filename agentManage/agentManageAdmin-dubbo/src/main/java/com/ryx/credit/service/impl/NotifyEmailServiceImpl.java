@@ -2,12 +2,14 @@ package com.ryx.credit.service.impl;
 
 import com.ryx.credit.common.enumc.BusActRelBusType;
 import com.ryx.credit.common.util.AppConfig;
+import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.ThreadPool;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.CUserMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.pojo.admin.COrganization;
+import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.vo.UserVo;
 import com.ryx.credit.service.CRoleService;
@@ -36,8 +38,6 @@ public class NotifyEmailServiceImpl implements NotifyEmailService {
     private static final String netInUrlsPid = AppConfig.getProperty("netInUrls_pid");
     private static final Logger log = LoggerFactory.getLogger(NotifyEmailServiceImpl.class);
 
-    @Autowired
-    private BusActRelMapper busActRelMapper;
     @Autowired
     private BusActRelService busActRelService;
     @Autowired
@@ -95,12 +95,14 @@ public class NotifyEmailServiceImpl implements NotifyEmailService {
                 StringBuffer sb = new StringBuffer();
                 sb.append("<b>"+"您有一条待办任务需处理,如已处理请忽略！：</b>\r\n");
                 sb.append("<table border='1' cellspacing='0' cellpadding='0'>");
-                sb.append("<tr>");
-                sb.append("<th>任务类型</th><th>代理商编号</th><th>代理商名称</th><th>业务编号</th></tr>");
+                sb.append("<tr><th>任务编号</th><th>任务类型</th><th>代理商编号</th><th>代理商名称</th><th>业务编号</th><th>申请时间</th><th>申请人</th></tr>");
                 sb.append("<br><br><br>\r\n \r\n");
 
                 String busType = BusActRelBusType.getItemString(busActRel.getBusType());
                 sb.append("<tr>");
+                sb.append("<td>");
+                sb.append(busActRel.getActivId());
+                sb.append("</td>");
                 sb.append("<td>");
                 sb.append(busType);
                 sb.append("</td>");
@@ -112,6 +114,13 @@ public class NotifyEmailServiceImpl implements NotifyEmailService {
                 sb.append("</td>");
                 sb.append("<td>");
                 sb.append(busActRel.getBusId());
+                sb.append("</td>");
+                sb.append("<td>");
+                sb.append(DateUtil.format(busActRel.getcTime()));
+                sb.append("</td>");
+                sb.append("<td>");
+                CUser cUser = cUserMapper.selectById(Long.valueOf(busActRel.getcUser()));
+                sb.append(cUser!=null?cUser.getName():busActRel.getcUser());
                 sb.append("</td>");
                 sb.append("</tr>");
                 sb.append("</table>");
