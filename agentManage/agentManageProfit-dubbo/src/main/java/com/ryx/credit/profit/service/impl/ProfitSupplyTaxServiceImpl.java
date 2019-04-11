@@ -314,4 +314,13 @@ public class ProfitSupplyTaxServiceImpl implements ProfitSupplyTaxService {
         profitSupplyTax.setCreateTime(DateUtils.dateToStringss(new Date()));
         profitSupplyTaxMapper.insertSelective(profitSupplyTax);
     }
+
+    @Override
+    public Map<String, Object> profitCount(Map<String, Object> param, boolean isQuerySubordinate) {
+        if (isQuerySubordinate) {//包含下级
+            return profitSupplyTaxMapper.profitCountWithSubordinate(param);
+        }else{
+            return profitSupplyTaxMapper.profitCount(param);
+        }
+    }
 }

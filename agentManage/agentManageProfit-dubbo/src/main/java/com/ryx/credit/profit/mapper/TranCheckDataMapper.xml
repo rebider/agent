@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.TranCheckDataMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.TranCheckData">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="PROFIT_MONTH" jdbcType="VARCHAR" property="profitMonth" />
+    <result column="PLATFORM_TYPE" jdbcType="VARCHAR" property="platformType" />
+    <result column="PLATFORM_NUM" jdbcType="VARCHAR" property="platformNum" />
+    <result column="TECHNOLOGY_AMT" jdbcType="DECIMAL" property="technologyAmt" />
+    <result column="TECHNOLOGY_FEE" jdbcType="DECIMAL" property="technologyFee" />
+    <result column="CLEAR_AMT" jdbcType="DECIMAL" property="clearAmt" />
+    <result column="CLEAR_FEE" jdbcType="DECIMAL" property="clearFee" />
+    <result column="SEARCH_TIME" jdbcType="VARCHAR" property="searchTime" />
+    <result column="PLATFORM_ID" jdbcType="DECIMAL" property="platformId" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, PROFIT_MONTH, PLATFORM_TYPE, PLATFORM_NUM, TECHNOLOGY_AMT, TECHNOLOGY_FEE, CLEAR_AMT, 
+    CLEAR_FEE, SEARCH_TIME, PLATFORM_ID
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.TranCheckDataExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from TRANCHECK_DATA
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from TRANCHECK_DATA
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.TranCheckDataExample">
+    delete from TRANCHECK_DATA
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.TranCheckData">
+    insert into TRANCHECK_DATA (ID, PROFIT_MONTH, PLATFORM_TYPE,
+      PLATFORM_NUM, TECHNOLOGY_AMT, TECHNOLOGY_FEE,
+      CLEAR_AMT, CLEAR_FEE, SEARCH_TIME,
+      PLATFORM_ID)
+    values (#{id,jdbcType=VARCHAR}, #{profitMonth,jdbcType=VARCHAR}, #{platformType,jdbcType=VARCHAR}, 
+      #{platformNum,jdbcType=VARCHAR}, #{technologyAmt,jdbcType=DECIMAL}, #{technologyFee,jdbcType=DECIMAL}, 
+      #{clearAmt,jdbcType=DECIMAL}, #{clearFee,jdbcType=DECIMAL}, #{searchTime,jdbcType=VARCHAR}, 
+      #{platformId,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.TranCheckData">
+    insert into TRANCHECK_DATA
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="profitMonth != null">
+        PROFIT_MONTH,
+      </if>
+      <if test="platformType != null">
+        PLATFORM_TYPE,
+      </if>
+      <if test="platformNum != null">
+        PLATFORM_NUM,
+      </if>
+      <if test="technologyAmt != null">
+        TECHNOLOGY_AMT,
+      </if>
+      <if test="technologyFee != null">
+        TECHNOLOGY_FEE,
+      </if>
+      <if test="clearAmt != null">
+        CLEAR_AMT,
+      </if>
+      <if test="clearFee != null">
+        CLEAR_FEE,
+      </if>
+      <if test="searchTime != null">
+        SEARCH_TIME,
+      </if>
+      <if test="platformId != null">
+        PLATFORM_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="profitMonth != null">
+        #{profitMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="platformType != null">
+        #{platformType,jdbcType=VARCHAR},
+      </if>
+      <if test="platformNum != null">
+        #{platformNum,jdbcType=VARCHAR},
+      </if>
+      <if test="technologyAmt != null">
+        #{technologyAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="technologyFee != null">
+        #{technologyFee,jdbcType=DECIMAL},
+      </if>
+      <if test="clearAmt != null">
+        #{clearAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="clearFee != null">
+        #{clearFee,jdbcType=DECIMAL},
+      </if>
+      <if test="searchTime != null">
+        #{searchTime,jdbcType=VARCHAR},
+      </if>
+      <if test="platformId != null">
+        #{platformId,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.TranCheckDataExample" resultType="java.lang.Long">
+    select count(*) from TRANCHECK_DATA
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.TranCheckData">
+    update TRANCHECK_DATA
+    <set>
+      <if test="profitMonth != null">
+        PROFIT_MONTH = #{profitMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="platformType != null">
+        PLATFORM_TYPE = #{platformType,jdbcType=VARCHAR},
+      </if>
+      <if test="platformNum != null">
+        PLATFORM_NUM = #{platformNum,jdbcType=VARCHAR},
+      </if>
+      <if test="technologyAmt != null">
+        TECHNOLOGY_AMT = #{technologyAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="technologyFee != null">
+        TECHNOLOGY_FEE = #{technologyFee,jdbcType=DECIMAL},
+      </if>
+      <if test="clearAmt != null">
+        CLEAR_AMT = #{clearAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="clearFee != null">
+        CLEAR_FEE = #{clearFee,jdbcType=DECIMAL},
+      </if>
+      <if test="searchTime != null">
+        SEARCH_TIME = #{searchTime,jdbcType=VARCHAR},
+      </if>
+      <if test="platformId != null">
+        PLATFORM_ID = #{platformId,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.TranCheckData">
+    update TRANCHECK_DATA
+    set PROFIT_MONTH = #{profitMonth,jdbcType=VARCHAR},
+      PLATFORM_TYPE = #{platformType,jdbcType=VARCHAR},
+      PLATFORM_NUM = #{platformNum,jdbcType=VARCHAR},
+      TECHNOLOGY_AMT = #{technologyAmt,jdbcType=DECIMAL},
+      TECHNOLOGY_FEE = #{technologyFee,jdbcType=DECIMAL},
+      CLEAR_AMT = #{clearAmt,jdbcType=DECIMAL},
+      CLEAR_FEE = #{clearFee,jdbcType=DECIMAL},
+      SEARCH_TIME = #{searchTime,jdbcType=VARCHAR},
+      PLATFORM_ID = #{platformId,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+  <!-- ======================以上为自动生成代码，请务必把自己添加代码写到下面，防止被覆盖================================-->
+
+  <insert id="synchronizeTranCheckData" useGeneratedKeys="false">
+    insert into TRANCHECK_DATA (ID, PROFIT_MONTH, PLATFORM_TYPE,
+     PLATFORM_NUM, TECHNOLOGY_AMT, TECHNOLOGY_FEE,
+     CLEAR_AMT, CLEAR_FEE, SEARCH_TIME,
+     PLATFORM_ID)
+    <!--values
+    <foreach collection ="list" item="checkData" separator =",">
+      (#{checkData.id,jdbcType=VARCHAR},#{checkData.profitMonth,jdbcType=VARCHAR},#{checkData.platformType,jdbcType=VARCHAR},
+      #{checkData.platformNum,jdbcType=VARCHAR},#{checkData.technologyAmt,jdbcType=DECIMAL},#{checkData.technologyFee,jdbcType=DECIMAL},#{checkData.clearAmt,jdbcType=DECIMAL},
+      #{checkData.clearFee,jdbcType=DECIMAL},#{checkData.searchTime,jdbcType=VARCHAR},#{checkData.platformId,jdbcType=DECIMAL})
+    </foreach >-->
+    SELECT  A.*
+    FROM(
+    <foreach collection="list" item="checkData" separator="UNION ALL">
+      SELECT
+      #{checkData.id,jdbcType=VARCHAR} ID,
+      #{checkData.profitMonth,jdbcType=VARCHAR} PROFIT_MONTH,
+      #{checkData.platformType,jdbcType=VARCHAR} PLATFORM_TYPE,
+      #{checkData.platformNum,jdbcType=VARCHAR} PLATFORM_NUM,
+      #{checkData.technologyAmt,jdbcType=DECIMAL} TECHNOLOGY_AMT,
+      #{checkData.technologyFee,jdbcType=DECIMAL} TECHNOLOGY_FEE,
+      #{checkData.clearAmt,jdbcType=DECIMAL} CLEAR_AMT,
+      #{checkData.clearFee,jdbcType=DECIMAL} CLEAR_FEE,
+      #{checkData.searchTime,jdbcType=VARCHAR} SEARCH_TIME,
+      #{checkData.platformId,jdbcType=DECIMAL} PLATFORM_ID
+      FROM dual
+    </foreach>
+    )A
+  </insert>
+</mapper>

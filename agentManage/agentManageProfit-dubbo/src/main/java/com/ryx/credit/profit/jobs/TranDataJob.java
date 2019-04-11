@@ -7,10 +7,15 @@ import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.pojo.ProfitOrganTranMonth;
+import com.ryx.credit.profit.pojo.TranCheckData;
+import com.ryx.credit.profit.pojo.TranCheckPlatForm;
+import com.ryx.credit.profit.pojo.TransProfitDetail;
 import com.ryx.credit.profit.service.ProfitComputerService;
 import com.ryx.credit.profit.service.ProfitOrganTranMonthService;
+import com.ryx.credit.profit.service.TransProfitDetailService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.profit.IPosProfitDataService;
+import org.junit.Test;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,8 +23,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 /**
  * @author zhaodw
@@ -38,6 +46,9 @@ public class TranDataJob {
 
     @Autowired
     private IPosProfitDataService posProfitDataService;
+
+    @Autowired
+    private TransProfitDetailService transProfitDetailServiceImpl;
 
     @Autowired
     private ProfitOrganTranMonthService profitOrganTranMonthService;
@@ -212,4 +223,291 @@ public class TranDataJob {
         return null;
     }
 
+
+
+
+    /*
+    * 新核对
+    * renshenghao
+    * */
+
+    /**
+     * @Author: Renshenghao
+     * @Description: 新-获取交易量数据同步
+     * 每月3号12点执行
+     * @Date: 15:05 2019/4/2
+     */
+    @Scheduled(cron = "0 0 12 3 * ?")
+    public void doSynchronizeTranCheckData() {
+        synchronizeTranCheckData();
+    }
+
+    /**
+     * 拉取数据并存入数据库
+     * @return
+     */
+    public Map<String,String> synchronizeTranCheckData(){
+        Calendar calendar = Calendar.getInstance();
+        String searchTime=new SimpleDateFormat("yyyy-MM-dd HH:MM:ss").format(calendar.getTime());
+        calendar.add(Calendar.MONTH, -1);
+        String tranMonth= new SimpleDateFormat("yyyyMM").format(calendar.getTime());
+        LOG.info("================"+tranMonth+"交易量核对数据同步开始================");
+        Map<String,String> resultMap=new HashMap<>();
+
+        //月份润交易接口数据（技术列）:
+        Map<String, Object> tradingVolumeData1 = doProfitTradingVolume(calendar.getTime(),"PFT003");
+        if(tradingVolumeData1==null||tradingVolumeData1.size()==0){
+            LOG.error("================月份润交易接口数据（技术列）拉取失败================");
+            resultMap.put("resultCode","error");
+            resultMap.put("msg","月份润交易接口数据（技术列）拉取异常");
+            return resultMap;
+        }
+        LOG.info("================月份润交易接口数据（技术列）拉取完成================");
+        //手刷平台的交易量和手续费(技术)
+        Map<String, Object> tranAmt = getTranAmtByMonth(calendar.getTime());
+        if(tranAmt==null||tranAmt.size()==0){
+            LOG.error("================手刷平台的交易量和手续费(技术)拉取失败================");
+            resultMap.put("resultCode","error");
+            resultMap.put("msg","手刷平台的交易量和手续费(技术)拉取异常");
+            return resultMap;
+        }
+        LOG.info("================手刷平台的交易量和手续费(技术)拉取完成================");
+        //手刷百卡通数据：
+        TransProfitDetail tranBkt = getTranBktByProfitMonth(tranMonth);
+        if (tranBkt==null){
+            LOG.error("================手刷百卡通数据拉取失败================");
+            resultMap.put("resultCode","error");
+            resultMap.put("msg","手刷百卡通数据拉取异常");
+            return resultMap;
+        }
+        LOG.info("================手刷百卡通数据拉取完成================");
+        //新月结分润接口数据：
+        Map<String, Object> newMonthData = doProfitNewMonth(calendar.getTime());
+        if(newMonthData==null){
+            LOG.error("================新月结分润接口数据拉取失败================");
+            resultMap.put("resultCode","error");
+            resultMap.put("msg","新月结分润接口数据拉取异常");
+            return resultMap;
+        }
+        LOG.info("================新月结分润接口数据拉取完成================");
+        //清结算接口数据：
+        Map<String,Object> settleData = doSettleTranAmount(calendar.getTime());
+        if(settleData==null||settleData.size()==0){
+            LOG.error("================清结算接口数据拉取失败================");
+            resultMap.put("resultCode","error");
+            resultMap.put("msg","清结算接口数据拉取异常");
+            return resultMap;
+        }
+        LOG.info("================清结算接口数据拉取完成================");
+        //月份润交易接口数据（清算列）:
+        Map<String, Object> tradingVolumeData2 = doProfitTradingVolume(calendar.getTime(),"PFT004");
+        if(tradingVolumeData2==null||tradingVolumeData2.size()==0){
+            LOG.error("================月份润交易接口数据（清算列）拉取失败================");
+            resultMap.put("resultCode","error");
+            resultMap.put("msg","月份润交易接口数据（清算列）拉取异常");
+            return resultMap;
+        }
+        LOG.info("================月份润交易接口数据（清算列）拉取完成================");
+
+
+
+        List<TranCheckPlatForm> platForms = profitOrganTranMonthService.getAllPlatForm();
+        List<TranCheckData> list=new ArrayList<>();
+
+        for (TranCheckPlatForm platForm:platForms) {
+            TranCheckData checkData=new TranCheckData();
+            checkData.setId(idService.genId(TabId.TRANCHECK_DATA));
+            checkData.setProfitMonth(tranMonth);
+            checkData.setPlatformType(platForm.getPlatformType());
+            checkData.setPlatformNum(platForm.getPlatformNum());
+            checkData.setSearchTime(searchTime);
+            checkData.setPlatformId(platForm.getId());
+            switch (platForm.getTechnologyAddress()==null?"":platForm.getTechnologyAddress()){
+                case "tranMonthProfit1":{
+                    Object technologyAmt = tradingVolumeData1.get(platForm.getTechnologyAmt());
+                    Object technologyFee = tradingVolumeData1.get(platForm.getTechnologyFee());
+                    if(technologyAmt==null){
+                        checkData.setTechnologyAmt(null);
+                    }else{
+                        checkData.setTechnologyAmt(new BigDecimal(technologyAmt.toString()));
+                    }
+                    if(technologyFee==null){
+                        checkData.setTechnologyFee(null);
+                    }else{
+                        checkData.setTechnologyFee(new BigDecimal(technologyFee.toString()));
+                    }
+                    break;
+                }
+                case "tranAmt":{
+                    Object technologyAmt = tranAmt.get(platForm.getTechnologyAmt());
+                    Object technologyFee = tranAmt.get(platForm.getTechnologyFee());
+                    if(technologyAmt==null){
+                        checkData.setTechnologyAmt(null);
+                    }else{
+                        checkData.setTechnologyAmt(new BigDecimal(technologyAmt.toString()));
+                    }
+                    if(technologyFee==null){
+                        checkData.setTechnologyFee(null);
+                    }else{
+                        checkData.setTechnologyFee(new BigDecimal(technologyFee.toString()));
+                    }
+                    break;
+                }
+                case "tranBkt":{
+                    if(tranBkt!=null){
+                        checkData.setTechnologyAmt(tranBkt.getInTransAmt());
+                        checkData.setTechnologyFee(tranBkt.getTransFee());
+                    }
+                    break;
+                }
+                case "tranNewMonth":{
+                    Object technologyAmt = newMonthData.get(platForm.getTechnologyAmt());
+                    Object technologyFee = newMonthData.get(platForm.getTechnologyFee());
+                    if(technologyAmt==null){
+                        checkData.setTechnologyAmt(null);
+                    }else{
+                        checkData.setTechnologyAmt(new BigDecimal(technologyAmt.toString()));
+                    }
+                    if(technologyFee==null){
+                        checkData.setTechnologyFee(null);
+                    }else{
+                        checkData.setTechnologyFee(new BigDecimal(technologyFee.toString()));
+                    }
+                    break;
+                }
+                case "tranSettle":{
+                    Object technologyAmt = settleData.get(platForm.getTechnologyAmt());
+                    Object technologyFee = settleData.get(platForm.getTechnologyFee());
+                    if(technologyAmt==null){
+                        checkData.setTechnologyAmt(null);
+                    }else{
+                        checkData.setTechnologyAmt(new BigDecimal(technologyAmt.toString()));
+                    }
+                    if(technologyFee==null){
+                        checkData.setTechnologyFee(null);
+                    }else{
+                        checkData.setTechnologyFee(new BigDecimal(technologyFee.toString()));
+                    }
+                    break;
+                }
+                default:{
+                    checkData.setTechnologyAmt(null);
+                    checkData.setTechnologyFee(null);
+                }
+            }
+            switch (platForm.getClearAddress()==null?"":platForm.getClearAddress()){
+                case "tranSettle":{
+                    Object clearAmt = settleData.get(platForm.getClearAmt());
+                    Object clearFee = settleData.get(platForm.getClearFee());
+                    if(clearAmt==null){
+                        checkData.setClearAmt(null);
+                    }else{
+                        checkData.setClearAmt(new BigDecimal(clearAmt.toString()));
+                    }
+                    if(clearFee==null){
+                        checkData.setClearFee(null);
+                    }else{
+                        checkData.setClearFee(new BigDecimal(clearFee.toString()));
+                    }
+                    break;
+                }
+                case "tranMonthProfit2":{
+                    Object clearAmt = tradingVolumeData2.get(platForm.getClearAmt());
+                    Object clearFee = tradingVolumeData2.get(platForm.getClearFee());
+                    if(clearAmt==null){
+                        checkData.setClearAmt(null);
+                    }else{
+                        checkData.setClearAmt(new BigDecimal(clearAmt.toString()));
+                    }
+                    if(clearFee==null){
+                        checkData.setClearFee(null);
+                    }else{
+                        checkData.setClearFee(new BigDecimal(clearFee.toString()));
+                    }
+                    break;
+                }
+                default:{
+                    checkData.setClearAmt(null);
+                    checkData.setClearFee(null);
+                }
+            }
+            list.add(checkData);
+        }
+        if (list.size()==platForms.size()){
+            try{
+                profitOrganTranMonthService.synchronizeTranCheckData(list);
+                LOG.info("数据同步成功!");
+                resultMap.put("resultCode","success");
+                resultMap.put("msg","数据同步成功！");
+            }catch (Exception e){
+                LOG.info("数据同步失败,msg:"+e.getMessage());
+                e.printStackTrace();
+                resultMap.put("resultCode","error");
+                resultMap.put("msg",e.getMessage());
+            }
+        }else{
+            LOG.info("数据同步失败!");
+            resultMap.put("resultCode","error");
+            resultMap.put("msg","数据生成异常");
+        }
+        return resultMap;
+    }
+    public Map<String,Object> doSettleTranAmount(Date tranMon){
+        String tranMonth= new SimpleDateFormat("yyyyMM").format(tranMon);
+        Map<String, String> param=new HashMap<>();
+        param.put("tranType","22");
+        param.put("tranMon",tranMonth);
+        String resultStr = profitOrganTranMonthService.doSettleTranAmount(param);
+        JSONObject jsonObject = JSONObject.parseObject(resultStr);
+        if(jsonObject==null){
+            LOG.info("清算接口访问异常,resultStr=====>"+resultStr+"\n\n");
+            return null;
+        }
+        Map<String, Object> result = (Map<String, Object>) jsonObject.get("info");
+        return result;
+    }
+    public Map<String,Object> doProfitNewMonth(Date tranMon){
+        String tranMonth= new SimpleDateFormat("yyyyMM").format(tranMon);
+        Map<String, String> param=new HashMap<>();
+        param.put("pageNumber","1");
+        param.put("pageSize","2");
+        param.put("frMonth",tranMonth);
+        String resultStr = profitOrganTranMonthService.doProfitNewMonth(param);
+        JSONObject jsonObject = JSONObject.parseObject(resultStr);
+        return jsonObject;
+    }
+    public Map<String,Object> doProfitTradingVolume(Date tranMon,String tranCode){
+        String tranMonth= new SimpleDateFormat("yyyyMM").format(tranMon);
+        AgentResult agentResult = posProfitDataService.getTradingVolume(tranMonth,tranCode);
+        Map<String, Object> agentResultData;
+        try{
+            if(!"".equals(agentResult.getData())){
+                agentResultData = (Map<String, Object>) agentResult.getData();
+            }else{
+                LOG.info("月份润交易接口访问异常:"+agentResult.getMsg());
+                agentResultData=null;
+            }
+        }catch (Exception e){
+            LOG.info("月份润交易接口访问异常:"+e.getMessage());
+            throw new RuntimeException("月份润交易接口访问异常！");
+        }
+        return agentResultData;
+    }
+    public Map<String,Object> getTranAmtByMonth(Date tranMon){
+        String tranMonth= new SimpleDateFormat("yyyyMM").format(tranMon);
+        Map<String, Object> tranAmt = profitOrganTranMonthService.getTranAmtByMonth(tranMonth);
+        return tranAmt;
+    }
+    public TransProfitDetail getTranBktByProfitMonth(String profitMonth){
+        TransProfitDetail transProfitDetail=new TransProfitDetail();
+        transProfitDetail.setBusNum("3000111423");
+        transProfitDetail.setProfitDate(profitMonth);
+        List<TransProfitDetail> transProfitDetailList = transProfitDetailServiceImpl.getTransProfitDetailByBusNum(transProfitDetail);
+        if (transProfitDetailList.size()==1){
+            transProfitDetail=transProfitDetailList.get(0);
+        }else{
+            transProfitDetail=null;
+        }
+        return transProfitDetail;
+    }
 }

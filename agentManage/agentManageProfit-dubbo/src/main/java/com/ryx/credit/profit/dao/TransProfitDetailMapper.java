@@ -54,6 +54,6 @@ public interface TransProfitDetailMapper {
 
     Integer  baseProfitLowerCount (Map<String,Object> params);
 
-
+    List<Map<String,Object>> queryBusNum(@Param("type") String type);
 
 }

@@ -1,6 +1,7 @@
 package com.ryx.credit.profit.service.impl;
 
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.util.Page;
@@ -159,22 +160,21 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
             throw new ProcessException("导入数据为空");
         }
         for (List<Object> list : deductionist) {
-            if (list.size() != 7){
-                throw new ProcessException("请检查文件内数据是否准确！");
-            }
-            if(StringUtils.isBlank(list.get(0).toString()) ){
-                throw new ProcessException("代理商唯一码不能为空！");
-            }
-            if(StringUtils.isBlank(list.get(1).toString()) ){
-                throw new ProcessException("代理商姓名不能为空！");
-            }
-            if(StringUtils.isBlank(list.get(4).toString()) ){
-                throw new ProcessException("月份不能为空！");
-            }
-            if(StringUtils.isBlank(list.get(5).toString()) ){
-                throw new ProcessException("扣款类型不能为空！");
-            }if(StringUtils.isBlank(list.get(6).toString()) ){
-                throw new ProcessException("扣款金额不能为空！");
+            if (list.size() == 7){
+                if(StringUtils.isBlank(list.get(0).toString()) ){
+                    throw new ProcessException("代理商唯一码不能为空！");
+                }
+                if(StringUtils.isBlank(list.get(1).toString()) ){
+                    throw new ProcessException("代理商姓名不能为空！");
+                }
+                if(StringUtils.isBlank(list.get(4).toString()) ){
+                    throw new ProcessException("月份不能为空！");
+                }
+                if(StringUtils.isBlank(list.get(5).toString()) ){
+                    throw new ProcessException("扣款类型不能为空！");
+                }if(StringUtils.isBlank(list.get(6).toString()) ){
+                    throw new ProcessException("扣款金额不能为空！");
+                }
             }
         }
             try{
@@ -921,21 +921,41 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
      * @param userId
      */
     @Override
-    public void batchInsertCheckDeduction(List<List<Object>> datas, String userId) {
+    public void batchInsertCheckDeduction(List<List<Object>> datas, String userId) throws MessageException{
         if(datas == null || datas.size() == 0){
-            throw new RuntimeException("导入数据为空");
+            throw new MessageException("导入数据为空");
         }
-        if (datas != null && datas.size() > 0) {
-            for (List<Object> list:datas) {
-                if(list != null && list.size() > 0 &&
-                        StringUtils.isNotBlank(list.get(0).toString()) && StringUtils.isNotBlank(list.get(1).toString()) &&
-                        StringUtils.isNotBlank(list.get(4).toString()) && StringUtils.isNotBlank(list.get(5).toString()) &&
-                        StringUtils.isNotBlank(list.get(6).toString())){
-                    insertCheckDeduction(list, userId);
-                }else{
-                    throw new RuntimeException(list.get(0).toString()+":存在不合理数据格式");
+        for (List<Object> list:datas) {
+            if (list.size() != 7){
+                throw new MessageException("导入有误，请检查是否存在不合理单元格");
+            }
+            if (StringUtils.isBlank(list.get(0).toString())){
+                throw new MessageException("导入有误，代理商唯一码不能为空！");
+            }
+            if(StringUtils.isBlank(list.get(1).toString())){
+                throw new MessageException("导入有误，代理商名称不能为空！");
+            }
+            if(StringUtils.isBlank(list.get(4).toString())){
+                throw new MessageException("导入有误，月份不能为空！");
+            }
+            if(StringUtils.isBlank(list.get(5).toString())){
+                throw new MessageException("导入有误，扣款类型不能为空！");
+            }
+            if(StringUtils.isBlank(list.get(6).toString())){
+                throw new MessageException("导入有误，扣款金额不能为空！");
+            }else{
+                try{
+                    new BigDecimal(list.get(6).toString());
+                }catch (Exception e){
+                    throw new MessageException("导入有误，扣款金额格式有误！");
                 }
-
+            }
+        }
+        for (List<Object> list:datas) {
+            try{
+                insertCheckDeduction(list, userId);
+            }catch (Exception e){
+                throw new MessageException("导入失败！");
             }
         }
     }

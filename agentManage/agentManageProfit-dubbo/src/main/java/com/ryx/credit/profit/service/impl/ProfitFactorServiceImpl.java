@@ -95,50 +95,67 @@ public class ProfitFactorServiceImpl implements ProfitFactorService {
      * 商业保理：
      * 1、导入保理数据
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public List<String> addList(List<List<String>> data, String userId) throws Exception {
-        List<String> list = new ArrayList<>();
-        if (null == data && data.size() == 0) {
-            logger.info("导入数据为空");
+    public void addList(List<List<Object>> data, String userId) throws MessageException {
+        if(data == null && data.size() == 0){
             throw new MessageException("导入数据为空");
         }
-        for (List<String> factor : data) {
+        for (List<Object> list: data) {
+            if(list.size() == 9){
+                if(list.get(0).toString() == null || "".equals(list.get(0).toString())){
+                    throw new MessageException("月份不能为空");
+                }
+                if(list.get(1).toString() == null || "".equals(list.get(1).toString())){
+                    throw new MessageException("代理商唯一码不能为空");
+                }
+                if(list.get(2).toString() == null || "".equals(list.get(2).toString())){
+                    throw new MessageException("代理商名称不能为空");
+                }
+                if(list.get(5).toString() == null || "".equals(list.get(5).toString())){
+                    throw new MessageException("应扣款不能为空");
+                }
+                if(list.get(6).toString() == null || "".equals(list.get(6).toString())){
+                    throw new MessageException("已扣款不能为空");
+                }
+                if(list.get(7).toString() == null || "".equals(list.get(7).toString())){
+                    throw new MessageException("未扣款不能为空");
+                }
+                if(list.get(8).toString() == null || "".equals(list.get(8).toString())){
+                    throw new MessageException("备注不能为空");
+                }
+            }
+        }
+        for (List<Object> list: data) {
             PProfitFactor profitFactor = new PProfitFactor();
-            profitFactor.setFactorDate(Calendar.getInstance().getTime());//导入时间
-            profitFactor.setId(idService.genId(TabId.p_profit_factor));//ID序列号
-            if(null == factor.get(1) || "".equals(factor.get(1))){
-                throw new MessageException(factor.get(2)+":代理商唯一码为空!");
+            profitFactor.setAgentId(list.get(1).toString());
+            String str = list.get(0).toString();
+            if (str.indexOf(".") != -1){
+                str = str.substring(0,str.indexOf("."));
             }
-            try {
-                profitFactor.setFactorMonth(null != factor.get(0) ? String.valueOf(factor.get(0)).substring(0, 6) : "");//月份
-                profitFactor.setAgentPid(null != factor.get(1) ? String.valueOf(factor.get(1)) : "");//代理商唯一码(因业务中无pid，现将pid取值更改为AG码)
-                profitFactor.setAgentName(null != factor.get(2) ? String.valueOf(factor.get(2)) : "");//代理商名称
-                profitFactor.setAgentId(null != factor.get(1) ? String.valueOf(factor.get(1)) : "");//代理商编号
-                profitFactor.setParentAgentId(null != factor.get(3) ? String.valueOf(factor.get(3)) : "");//上级代理商编号
-                profitFactor.setParentAgentName(null != factor.get(4) ? String.valueOf(factor.get(4)) : "");//上级代理商名称
-                profitFactor.setTatolAmt(new BigDecimal(String.valueOf(factor.get(5))));//应还款
-                profitFactor.setBuckleAmt(new BigDecimal(String.valueOf(factor.get(6))));//已扣款
-                profitFactor.setSurplusAmt(new BigDecimal(String.valueOf(factor.get(7))));//未扣足
-                profitFactor.setRemark(null != factor.get(8) ? String.valueOf(factor.get(8)) : "");//备注
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw e;
-            }
-            PProfitFactor profit = selectByData(profitFactor);//查询列表中是否有重复数据
-            if (profit != null) {
+            profitFactor.setFactorMonth(str);
+            PProfitFactor profit = selectByData(profitFactor);
+            if(profit == null){
+               try{
+                   profitFactor.setFactorDate(Calendar.getInstance().getTime());
+                   profitFactor.setId(idService.genId(TabId.p_profit_factor));
+                   profitFactor.setAgentName(list.get(2).toString());//代理商名称
+                   profitFactor.setParentAgentId(null != list.get(3) ? list.get(3).toString() : "");//上级代理商编号
+                   profitFactor.setParentAgentName(null != list.get(4) ? list.get(4).toString() : "");//上级代理商名称
+                   profitFactor.setTatolAmt(new BigDecimal(list.get(5).toString()));//应还款
+                   profitFactor.setBuckleAmt(new BigDecimal(String.valueOf(list.get(6).toString())));//已扣款
+                   profitFactor.setSurplusAmt(new BigDecimal(String.valueOf(list.get(7).toString())));//未扣足
+                   profitFactor.setRemark(list.get(8).toString());//备注
+
+                   insertImportData(profitFactor);
+               }catch (Exception e){
+                   e.printStackTrace();
+                   throw new MessageException("请检查数据格式!");
+               }
+            }else{
                 logger.info(profitFactor.getAgentId() + "此条数据已存在！");
                 throw new MessageException(profitFactor.getAgentId() + "此条数据已存在！");
-            } else {
-                if (insertImportData(profitFactor) == 0) {
-                    logger.info("导入失败！");
-                    throw new MessageException(factor.toString() + "导入失败！");
-                }
-                logger.info("保理数据信息：" + JSONObject.toJSON(profitFactor));
             }
-            list.add(profitFactor.getId());
         }
-        return list;
     }
 
 

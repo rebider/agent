@@ -471,8 +471,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             LOG.info("清理机具扣款实扣、未扣足数据，{}月，{}", profitDate,DeductionType.MACHINE.getType());
             profitDeductionMapper.clearComputData(profitDate,DeductionType.MACHINE.getType());
 
-
-
+            //更新代理商打款公司
+            profitDetailMonthMapper.updateAgentPayCompany(profitDate);
 
             //更新代理商税点
             LOG.info("更新代理商税点开始，{}月", profitDate);
@@ -524,6 +524,9 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             // 更新实发分润
             profitDetailMonthMapper.updateRealProfitAmt(params);
 
+            //代理商退出分润状态更改
+            this.updateAgentQuitProfit(profitDate);
+
             long send = System.currentTimeMillis();
             LOG.info("执行完毕，处理共耗时：{}",(send-sstart));
             temp.clear();
@@ -532,6 +535,18 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             LOG.error("没有获取到分润明细");
         }
     }
+
+
+    /**
+     *  代理商退出月分润冻结/解冻
+     */
+    private void updateAgentQuitProfit(String profitDate){
+        profitDetailMonthMapper.updateMonthProfitFozzen(profitDate);
+        LOG.info("代理商退出申请发起，月分润冻结");
+        profitDetailMonthMapper.updateMonthProfitUnFozzen(profitDate);
+        LOG.info("代理商退出申请失败，月分润解冻");
+    }
+
 
 
 
@@ -1084,6 +1099,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
     /**
      * 代理商日分润冻结
+     * @param list 手刷平台机构编码
+     * @return
      */
     @Override
     public Map<String, String> doFrozenByAgent(List<String> list) {
@@ -1107,6 +1124,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
     /**
      * 代理商日分润解冻
+     * @param list 手刷平台机构编码
+     * @return
      */
     @Override
     public Map<String, String> doUnFrozenAgentProfit(List<String> list) {

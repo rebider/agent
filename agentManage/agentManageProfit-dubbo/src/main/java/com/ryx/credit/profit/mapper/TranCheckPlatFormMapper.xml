@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.TranCheckPlatFormMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.TranCheckPlatForm">
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="PLATFORM_TYPE" jdbcType="VARCHAR" property="platformType" />
+    <result column="PLATFORM_NUM" jdbcType="VARCHAR" property="platformNum" />
+    <result column="TECHNOLOGY_ADDRESS" jdbcType="VARCHAR" property="technologyAddress" />
+    <result column="TECHNOLOGY_AMT" jdbcType="VARCHAR" property="technologyAmt" />
+    <result column="TECHNOLOGY_FEE" jdbcType="VARCHAR" property="technologyFee" />
+    <result column="CLEAR_ADDRESS" jdbcType="VARCHAR" property="clearAddress" />
+    <result column="CLEAR_AMT" jdbcType="VARCHAR" property="clearAmt" />
+    <result column="CLEAR_FEE" jdbcType="VARCHAR" property="clearFee" />
+    <result column="ORDER_NUM" jdbcType="DECIMAL" property="orderNum" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="CREATE_PERSON" jdbcType="VARCHAR" property="createPerson" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, PLATFORM_TYPE, PLATFORM_NUM, TECHNOLOGY_ADDRESS, TECHNOLOGY_AMT, TECHNOLOGY_FEE, 
+    CLEAR_ADDRESS, CLEAR_AMT, CLEAR_FEE, ORDER_NUM, CREATE_TIME, CREATE_PERSON
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.TranCheckPlatFormExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from TRANCHECK_PLATFORM
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.math.BigDecimal" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from TRANCHECK_PLATFORM
+    where ID = #{id,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.TranCheckPlatFormExample">
+    delete from TRANCHECK_PLATFORM
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.TranCheckPlatForm">
+    insert into TRANCHECK_PLATFORM (ID, PLATFORM_TYPE, PLATFORM_NUM, 
+      TECHNOLOGY_ADDRESS, TECHNOLOGY_AMT, TECHNOLOGY_FEE, 
+      CLEAR_ADDRESS, CLEAR_AMT, CLEAR_FEE, 
+      ORDER_NUM, CREATE_TIME, CREATE_PERSON
+      )
+    values (#{id,jdbcType=DECIMAL}, #{platformType,jdbcType=VARCHAR}, #{platformNum,jdbcType=VARCHAR}, 
+      #{technologyAddress,jdbcType=VARCHAR}, #{technologyAmt,jdbcType=VARCHAR}, #{technologyFee,jdbcType=VARCHAR}, 
+      #{clearAddress,jdbcType=VARCHAR}, #{clearAmt,jdbcType=VARCHAR}, #{clearFee,jdbcType=VARCHAR}, 
+      #{orderNum,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, #{createPerson,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.TranCheckPlatForm">
+    insert into TRANCHECK_PLATFORM
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="platformType != null">
+        PLATFORM_TYPE,
+      </if>
+      <if test="platformNum != null">
+        PLATFORM_NUM,
+      </if>
+      <if test="technologyAddress != null">
+        TECHNOLOGY_ADDRESS,
+      </if>
+      <if test="technologyAmt != null">
+        TECHNOLOGY_AMT,
+      </if>
+      <if test="technologyFee != null">
+        TECHNOLOGY_FEE,
+      </if>
+      <if test="clearAddress != null">
+        CLEAR_ADDRESS,
+      </if>
+      <if test="clearAmt != null">
+        CLEAR_AMT,
+      </if>
+      <if test="clearFee != null">
+        CLEAR_FEE,
+      </if>
+      <if test="orderNum != null">
+        ORDER_NUM,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+      <if test="createPerson != null">
+        CREATE_PERSON,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=DECIMAL},
+      </if>
+      <if test="platformType != null">
+        #{platformType,jdbcType=VARCHAR},
+      </if>
+      <if test="platformNum != null">
+        #{platformNum,jdbcType=VARCHAR},
+      </if>
+      <if test="technologyAddress != null">
+        #{technologyAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="technologyAmt != null">
+        #{technologyAmt,jdbcType=VARCHAR},
+      </if>
+      <if test="technologyFee != null">
+        #{technologyFee,jdbcType=VARCHAR},
+      </if>
+      <if test="clearAddress != null">
+        #{clearAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="clearAmt != null">
+        #{clearAmt,jdbcType=VARCHAR},
+      </if>
+      <if test="clearFee != null">
+        #{clearFee,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNum != null">
+        #{orderNum,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createPerson != null">
+        #{createPerson,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.TranCheckPlatFormExample" resultType="java.lang.Long">
+    select count(*) from TRANCHECK_PLATFORM
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.TranCheckPlatForm">
+    update TRANCHECK_PLATFORM
+    <set>
+      <if test="platformType != null">
+        PLATFORM_TYPE = #{platformType,jdbcType=VARCHAR},
+      </if>
+      <if test="platformNum != null">
+        PLATFORM_NUM = #{platformNum,jdbcType=VARCHAR},
+      </if>
+      <if test="technologyAddress != null">
+        TECHNOLOGY_ADDRESS = #{technologyAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="technologyAmt != null">
+        TECHNOLOGY_AMT = #{technologyAmt,jdbcType=VARCHAR},
+      </if>
+      <if test="technologyFee != null">
+        TECHNOLOGY_FEE = #{technologyFee,jdbcType=VARCHAR},
+      </if>
+      <if test="clearAddress != null">
+        CLEAR_ADDRESS = #{clearAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="clearAmt != null">
+        CLEAR_AMT = #{clearAmt,jdbcType=VARCHAR},
+      </if>
+      <if test="clearFee != null">
+        CLEAR_FEE = #{clearFee,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNum != null">
+        ORDER_NUM = #{orderNum,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createPerson != null">
+        CREATE_PERSON = #{createPerson,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.TranCheckPlatForm">
+    update TRANCHECK_PLATFORM
+    set PLATFORM_TYPE = #{platformType,jdbcType=VARCHAR},
+      PLATFORM_NUM = #{platformNum,jdbcType=VARCHAR},
+      TECHNOLOGY_ADDRESS = #{technologyAddress,jdbcType=VARCHAR},
+      TECHNOLOGY_AMT = #{technologyAmt,jdbcType=VARCHAR},
+      TECHNOLOGY_FEE = #{technologyFee,jdbcType=VARCHAR},
+      CLEAR_ADDRESS = #{clearAddress,jdbcType=VARCHAR},
+      CLEAR_AMT = #{clearAmt,jdbcType=VARCHAR},
+      CLEAR_FEE = #{clearFee,jdbcType=VARCHAR},
+      ORDER_NUM = #{orderNum,jdbcType=DECIMAL},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      CREATE_PERSON = #{createPerson,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+  <!-- ======================以上为自动生成代码，请务必把自己添加代码写到下面，防止被覆盖================================-->
+  <select id="getAllPlatFormType" resultType="java.lang.String">
+    select distinct PLATFORM_TYPE from TRANCHECK_PLATFORM
+  </select>
+
+  <select id="getTranAmtByMonth" resultType="java.util.Map">
+      select
+            (select sum(IN_TRANS_AMT)from TRANS_PROFIT_DETAIL
+                where PROFIT_DATE=#{tranMonth}
+                and SOURCE_INFO='MPOS')+(select  sum(TRANS_AMT)from P_PROFIT_DIRECT where TRANS_MONTH=#{tranMonth})
+                as MPOS_TRAN_AMT,
+             (select sum(TRANS_FEE)from TRANS_PROFIT_DETAIL
+                where PROFIT_DATE=#{tranMonth}
+                and SOURCE_INFO='MPOS')+(select  sum(TRANS_FEE)from P_PROFIT_DIRECT where TRANS_MONTH=#{tranMonth})
+                as TRANS_FEE
+       from dual
+  </select>
+</mapper>

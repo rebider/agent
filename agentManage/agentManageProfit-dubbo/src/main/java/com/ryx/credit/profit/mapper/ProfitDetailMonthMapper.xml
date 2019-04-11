@@ -1047,6 +1047,7 @@
     ppd.supply_tax_amt,
     ppd.account_name, ppd.status
     from P_PROFIT_DETAIL_M ppd
+      <if test="orgId != null and orgId != ''">INNER JOIN A_AGENT AGENT ON ppd.agent_id = AGENT.ID LEFT JOIN C_ORGANIZATION COR ON AGENT.AG_DOC_PRO= COR.ID</if>
     <include refid="queryWhere"/>
     order by ppd.profit_date desc ) bb left join A_AGENT aa on bb.PARENT_AGENT_ID=aa.ID
     <include refid="paging_end" />
@@ -1100,7 +1101,7 @@
 
 <select id="queryProfitDetailLowerMonthList" parameterType="java.util.Map" resultType="java.util.Map">
   <include refid="paging_start" />
- select zzz.* from (select bb.* ,aa.ag_name as PARENT_AGENT_NAME from(select
+ select eee.* from (select zzz.* from (select bb.* ,aa.ag_name as PARENT_AGENT_NAME from(select
   ppd.id, ppd.profit_date, ppd.agent_id, ppd.agent_name,ppd.PARENT_AGENT_ID,
   ppd.profit_sum_amt,ppd.REAL_PROFIT_AMT,ppd.BU_DEDUCTION_AMT,
   nvl(ppd.tran_profit_amt,0)+nvl(ppd.pay_profit_amt,0) as SUM_POS,
@@ -1136,7 +1137,8 @@
   <if test="agentName != null and agentName !=''">and zzz.agent_name = #{agentName}</if>
   <if test="profitDateStart != null and profitDateStart != ''">and zzz.PROFIT_DATE &gt;= #{profitDateStart}</if>
   <if test="profitDateEnd != null and profitDateEnd != ''">and zzz.PROFIT_DATE &lt;= #{profitDateEnd}</if>
-  CONNECT BY PRIOR zzz.agent_id = zzz.PARENT_AGENT_ID
+  CONNECT BY PRIOR zzz.agent_id = zzz.PARENT_AGENT_ID) eee
+  <if test="orgId != null and orgId != ''">INNER JOIN A_AGENT AGENT ON eee.agent_id = AGENT.ID LEFT JOIN C_ORGANIZATION COR ON AGENT.AG_DOC_PRO= COR.ID where COR.ID = #{orgId}</if>
   <include refid="paging_end" />
 </select>
 
@@ -1194,6 +1196,7 @@
     select count(1) from(
     select ppd.*
     from P_PROFIT_DETAIL_M ppd
+    <if test="orgId != null and orgId != ''">INNER JOIN A_AGENT AGENT ON ppd.AGENT_ID = AGENT.ID LEFT JOIN C_ORGANIZATION COR ON AGENT.AG_DOC_PRO= COR.ID </if>
     <include refid="queryWhere"/>
     )
   </select>
@@ -1210,7 +1213,10 @@
     1=1
     <if test="agentId != null and agentId !=''">and aaa.agent_id = #{agentId}</if>
     <if test="agentName != null and agentName !=''">and aaa.agent_name = #{agentName}</if>
-    CONNECT BY PRIOR aaa.agent_id = aaa.PARENT_AGENT_ID)) cc where 1=1
+    CONNECT BY PRIOR aaa.agent_id = aaa.PARENT_AGENT_ID)) cc
+    <if test="orgId != null and orgId != ''">INNER JOIN A_AGENT AGENT ON cc.AGENT_ID = AGENT.ID LEFT JOIN C_ORGANIZATION COR ON AGENT.AG_DOC_PRO= COR.ID </if>
+    where 1=1
+    <if test="orgId != null and orgId != ''">and COR.ID = #{orgId}</if>
     <if test="profitDateStart != null and profitDateStart != ''">and cc.PROFIT_DATE &gt;= #{profitDateStart}</if>
     <if test="profitDateEnd != null and profitDateEnd != ''">and cc.PROFIT_DATE &lt;= #{profitDateEnd}</if>
   </select>
@@ -1329,6 +1335,7 @@
   <sql id="queryWhere">
     <where>
       1=1
+      <if test="orgId != null and orgId != ''"> and COR.ID = #{orgId} </if>
       <if test="agentId != null and agentId !=''">and ppd.agent_id = #{agentId}</if>
       <if test="agentName != null and agentName !=''">and ppd.agent_name = #{agentName}</if>
       <if test="profitDateStart != null and profitDateStart != ''">and ppd.PROFIT_DATE &gt;= #{profitDateStart}</if>
@@ -1456,9 +1463,50 @@
   <update id="updateAgentInfoBeforeComput" parameterType="java.lang.String">
     update P_PROFIT_DETAIL_M a
     set(TAX) =
-      (select TAX from A_AGENT_COLINFO b where b.AGENT_ID=a.AGENT_ID)
+      (select CLO_TAX_POINT from A_AGENT_COLINFO b where b.AGENT_ID=a.AGENT_ID)
     where a.PROFIT_DATE = '${profitDate}'
           and exists(select 1 from A_AGENT_COLINFO c where c.AGENT_ID=a.AGENT_ID)
+  </update>
+
+  <update id="updateAgentPayCompany" parameterType="java.lang.String">
+
+
+update P_PROFIT_DETAIL_M dd
+        set (PAY_COMPANY) =(select distinct cc.CLO_PAY_COMPANY from  (select distinct  aa.AGENT_ID,aa.CLO_PAY_COMPANY,
+           bb.AGENT_ID  as parentAgentId, ROWNUM as rn from A_AGENT_BUSINFO
+      aa left join A_AGENT_BUSINFO bb  on aa.BUS_PARENT =bb.ID) cc
+       where cc.AGENT_ID = dd.AGENT_ID
+             and dd.PROFIT_DATE =#{profitDate}
+             and cc.CLO_PAY_COMPANY is not null
+             and (nvl(cc.parentAgentId,'-') = nvl(dd.PARENT_AGENT_ID,'-'))
+             and cc.rn = 1)
+       where
+       exists(select 1 from A_AGENT_BUSINFO ee where ee.AGENT_ID=dd.AGENT_ID)
+
+
+
+
+/*  update P_PROFIT_DETAIL_M dd
+        set (PAY_COMPANY) =(select cc.CLO_PAY_COMPANY from  (select distinct  aa.AGENT_ID,aa.CLO_PAY_COMPANY,
+        bb.AGENT_ID  as parentAgentId from A_AGENT_BUSINFO
+      aa join A_AGENT_BUSINFO bb  on aa.BUS_PARENT =bb.ID) cc
+      where cc.AGENT_ID = dd.AGENT_ID and cc.parentAgentId = dd.PARENT_AGENT_ID)
+      where dd.PROFIT_DATE =#{profitDate}
+   and  exists(select 1 from A_AGENT_BUSINFO ee where ee.AGENT_ID=dd.AGENT_ID)*/
+  </update>
+
+  <update id="updateMonthProfitFozzen" parameterType="java.lang.String">
+  update P_PROFIT_DETAIL_M dd
+        set STATUS = '1'
+        where dd.PROFIT_DATE = #{profitDate}
+        and dd.AGENT_ID in (select distinct AGENT_ID from A_AGENT_QUIT where STATUS=1 and CLO_REVIEW_STATUS in (2,3,5))
+  </update>
+
+  <update id="updateMonthProfitUnFozzen" parameterType="java.lang.String">
+  update P_PROFIT_DETAIL_M dd
+        set STATUS = '4'
+        where dd.PROFIT_DATE = #{profitDate}
+        and dd.AGENT_ID in (select distinct AGENT_ID from A_AGENT_QUIT where STATUS=1 and CLO_REVIEW_STATUS = 4)
   </update>
 
 </mapper>

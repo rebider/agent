@@ -1,5 +1,6 @@
 package com.ryx.credit.profit.service;
 
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.pojo.InvoiceApply;
@@ -34,7 +35,7 @@ public interface IAgeInvoiceApplyService {
     /**
      * 财务提交审核结果
      */
-    void commitSHResult(InvoiceApply invoiceApply);
+    void commitSHResult(InvoiceApply invoiceApply) throws MessageException ;
 
     /**
      * 根据id获得数据
@@ -44,7 +45,7 @@ public interface IAgeInvoiceApplyService {
     /**
      * 代理商批量导入发票信息
      */
-    void volumeImportData(List<List<Object>> list,String agentId,String agentName);
+    void volumeImportData(List<List<Object>> list,String agentId,String agentName) throws MessageException;
 
     /**
      * 根据发票号得到数据
