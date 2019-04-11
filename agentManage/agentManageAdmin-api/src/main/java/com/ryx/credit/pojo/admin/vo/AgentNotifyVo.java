@@ -38,6 +38,7 @@ public class AgentNotifyVo implements Serializable{
     private String debitTop;
     private String ckDebitRate;
     private String lowDebitRate;
+    private String activityType;
 
     public String getUniqueId() {
         return uniqueId;
@@ -221,5 +222,13 @@ public class AgentNotifyVo implements Serializable{
 
     public void setLowDebitRate(String lowDebitRate) {
         this.lowDebitRate = lowDebitRate;
+    }
+
+    public String getActivityType() {
+        return activityType;
+    }
+
+    public void setActivityType(String activityType) {
+        this.activityType = activityType;
     }
 }

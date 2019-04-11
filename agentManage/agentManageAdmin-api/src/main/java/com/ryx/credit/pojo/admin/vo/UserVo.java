@@ -49,7 +49,18 @@ public class UserVo implements Serializable {
 	private String roleIds;
 
 	private Date createdateStart;
+
 	private Date createdateEnd;
+
+	private String userEmail;
+
+	public String getUserEmail() {
+		return userEmail;
+	}
+
+	public void setUserEmail(String userEmail) {
+		this.userEmail = userEmail;
+	}
 
 	public Long getId() {
 		return id;
