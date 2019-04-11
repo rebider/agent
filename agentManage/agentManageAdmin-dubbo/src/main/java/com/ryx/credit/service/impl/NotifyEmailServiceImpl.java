@@ -65,10 +65,16 @@ public class NotifyEmailServiceImpl implements NotifyEmailService {
                     log.info("待办任务通知:代理商暂不发送邮件,groupId:{}",groupId);
                     return;
                 }
-                COrganization cOrganization = organizationMapper.selectByCode(groupId);
-                if(cOrganization==null){
-                    log.info("待办任务通知:没有找到部门,groupId:{}",groupId);
-                    return;
+                COrganization cOrganization = new COrganization();
+                if(groupId.equals("city")){
+                    CUser cUser = cUserMapper.selectById(Long.valueOf(busActRel.getcUser()));
+                    cOrganization.setId(cUser.getOrganizationId().longValue());
+                }else {
+                    cOrganization = organizationMapper.selectByCode(groupId);
+                    if(cOrganization==null){
+                        log.info("待办任务通知:没有找到部门,groupId:{}",groupId);
+                        return;
+                    }
                 }
                 List<UserVo> userVos = cUserMapper.selectUserByOrgId(cOrganization.getId());
                 if(userVos.size()==0){
