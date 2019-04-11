@@ -147,7 +147,7 @@ public interface ProfitDeductionService {
      * @param datas
      * @param userId
      */
-    public void batchInsertCheckDeduction(List<List<Object>> datas , String userId);
+    public void batchInsertCheckDeduction(List<List<Object>> datas , String userId) throws MessageException;
 
     /**
      * @Author: Zhang Lei

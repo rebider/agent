@@ -1,5 +1,6 @@
 package com.ryx.credit.profit.service;
 
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.pojo.PProfitFactor;
 
@@ -18,7 +19,7 @@ public interface ProfitFactorService {
 
     public int insertImportData(PProfitFactor pProfitFactor);
 
-    public List<String> addList(List<List<String>> data, String userId)throws Exception;
+    void addList(List<List<Object>> data, String userId)throws MessageException;
 
     PProfitFactor selectByData(PProfitFactor profitFactor);
 
