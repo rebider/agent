@@ -133,13 +133,13 @@ public class NotifyEmailServiceImpl implements NotifyEmailService {
 
                 String title = "[代理商系统]工作流审批任务:"+busType;
                 AppConfig.sendEmail(notityEmail.toArray(new String[]{}),sb.toString() ,title);
+                log.info("待办任务通知:邮件发送成功,收件人:{},标题:{}",notityEmail.toString(),title);
             } else if ("assignment".endsWith(eventName)) {
-
-
+                
             } else if ("complete".endsWith(eventName)) {
 
             }
-
         });
     }
+
 }
