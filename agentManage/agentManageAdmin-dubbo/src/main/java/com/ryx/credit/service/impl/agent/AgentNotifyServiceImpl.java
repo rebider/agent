@@ -410,7 +410,8 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
                 //智能POS代理商名加N区分 CXINFO pos平台的名称前缀从数据库中获取
                 if(org.apache.commons.lang.StringUtils.isNotEmpty(platForm.getPosanameprefix())){
-                    agentNotifyVo.setOrgName(platForm.getPosanameprefix()+agentNotifyVo.getOrgName());
+                    agentNotifyVo.setOrgName(agentNotifyVo.getOrgName());
+                    agentNotifyVo.setActivityType(platForm.getPosanameprefix());
                 }else{
                     agentNotifyVo.setOrgName(agentNotifyVo.getOrgName());
                 }
@@ -753,7 +754,8 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
                 //智能POS代理商名加N区分 cxinfo pos商户名称使用数据库配置字段
                 if(org.apache.commons.lang.StringUtils.isNotEmpty(platForm.getPosanameprefix())){
-                    agentNotifyVo.setOrgName(platForm.getPosanameprefix()+agentNotifyVo.getOrgName());
+                    agentNotifyVo.setOrgName(agentNotifyVo.getOrgName());
+                    agentNotifyVo.setActivityType(platForm.getPosanameprefix());
                 }
                 //POS传递业务ID
                 agentNotifyVo.setUniqueId(agentBusInfo.getId());
@@ -926,6 +928,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             jsonParams.put("msgType", "01");
             jsonParams.put("reqDate", reqDate);
             data.put("uniqueId",agentNotifyVo.getUniqueId());
+            data.put("activityType",agentNotifyVo.getActivityType());
             data.put("useOrgan",agentNotifyVo.getUseOrgan()); //使用范围
             data.put("orgName",agentNotifyVo.getOrgName());
             data.put("busiAreas",agentNotifyVo.getBusiAreas());
