@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  * 时间：2019/3/7
  * 描述：历史订单监听
  */
-public class OldOrderReturnTaskExcutionListener  implements TaskListener, ExecutionListener {
+public class OldOrderReturnTaskExcutionListener  extends BaseTaskListener  implements TaskListener, ExecutionListener {
 
     private Logger logger = LoggerFactory.getLogger(OldOrderReturnTaskExcutionListener.class);
 
@@ -48,6 +48,6 @@ public class OldOrderReturnTaskExcutionListener  implements TaskListener, Execut
 
     @Override
     public void notify(DelegateTask delegateTask) {
-        logger.info("======{}==={}==={}==={}",delegateTask.getProcessInstanceId(),delegateTask.getEventName(),delegateTask.getId(),delegateTask.getName());
+        notity(delegateTask);
     }
 }

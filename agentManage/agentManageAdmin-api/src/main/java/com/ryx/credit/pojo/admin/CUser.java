@@ -61,6 +61,17 @@ public class CUser implements Serializable {
 	@TableField(value = "create_time")
 	private Date createTime;
 
+	/** 邮箱 */
+	@TableField(value = "user_email")
+	private String userEmail;
+
+	public String getUserEmail() {
+		return userEmail;
+	}
+
+	public void setUserEmail(String userEmail) {
+		this.userEmail = userEmail;
+	}
 
 	public Long getId() {
 		return this.id;
