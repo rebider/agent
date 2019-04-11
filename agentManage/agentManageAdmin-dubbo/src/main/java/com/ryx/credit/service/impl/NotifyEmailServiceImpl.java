@@ -2,12 +2,13 @@ package com.ryx.credit.service.impl;
 
 import com.ryx.credit.common.enumc.BusActRelBusType;
 import com.ryx.credit.common.util.AppConfig;
+import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.ThreadPool;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.CUserMapper;
-import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.pojo.admin.COrganization;
+import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.vo.UserVo;
 import com.ryx.credit.service.CRoleService;
@@ -18,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -37,8 +38,6 @@ public class NotifyEmailServiceImpl implements NotifyEmailService {
     private static final Logger log = LoggerFactory.getLogger(NotifyEmailServiceImpl.class);
 
     @Autowired
-    private BusActRelMapper busActRelMapper;
-    @Autowired
     private BusActRelService busActRelService;
     @Autowired
     private CRoleService roleService;
@@ -46,6 +45,7 @@ public class NotifyEmailServiceImpl implements NotifyEmailService {
     private COrganizationMapper organizationMapper;
     @Autowired
     private CUserMapper cUserMapper;
+
 
     public void notifyEmail(String groupId,String executionId,String eventName){
         ThreadPool.putThreadPool(() -> {
@@ -55,7 +55,7 @@ public class NotifyEmailServiceImpl implements NotifyEmailService {
                 } catch (InterruptedException e) {
                     log.error("待办任务通知:Thread error");
                 }
-                List<String> notityEmail = new ArrayList<>();
+                Set<String> notityEmail = new HashSet<>();
                 BusActRel busActRel = busActRelService.findById(executionId);
                 if(busActRel==null){
                     log.info("待办任务通知:未找到关联关系表,executionId:{}",executionId);
@@ -65,10 +65,16 @@ public class NotifyEmailServiceImpl implements NotifyEmailService {
                     log.info("待办任务通知:代理商暂不发送邮件,groupId:{}",groupId);
                     return;
                 }
-                COrganization cOrganization = organizationMapper.selectByCode(groupId);
-                if(cOrganization==null){
-                    log.info("待办任务通知:没有找到部门,groupId:{}",groupId);
-                    return;
+                COrganization cOrganization = new COrganization();
+                if(groupId.equals("city")){
+                    CUser cUser = cUserMapper.selectById(Long.valueOf(busActRel.getcUser()));
+                    cOrganization.setId(cUser.getOrganizationId().longValue());
+                }else {
+                    cOrganization = organizationMapper.selectByCode(groupId);
+                    if(cOrganization==null){
+                        log.info("待办任务通知:没有找到部门,groupId:{}",groupId);
+                        return;
+                    }
                 }
                 List<UserVo> userVos = cUserMapper.selectUserByOrgId(cOrganization.getId());
                 if(userVos.size()==0){
@@ -95,12 +101,14 @@ public class NotifyEmailServiceImpl implements NotifyEmailService {
                 StringBuffer sb = new StringBuffer();
                 sb.append("<b>"+"您有一条待办任务需处理,如已处理请忽略！：</b>\r\n");
                 sb.append("<table border='1' cellspacing='0' cellpadding='0'>");
-                sb.append("<tr>");
-                sb.append("<th>任务类型</th><th>代理商编号</th><th>代理商名称</th><th>业务编号</th></tr>");
+                sb.append("<tr><th>任务编号</th><th>任务类型</th><th>代理商编号</th><th>代理商名称</th><th>业务编号</th><th>申请时间</th><th>申请人</th></tr>");
                 sb.append("<br><br><br>\r\n \r\n");
 
                 String busType = BusActRelBusType.getItemString(busActRel.getBusType());
                 sb.append("<tr>");
+                sb.append("<td>");
+                sb.append(busActRel.getActivId());
+                sb.append("</td>");
                 sb.append("<td>");
                 sb.append(busType);
                 sb.append("</td>");
@@ -113,18 +121,25 @@ public class NotifyEmailServiceImpl implements NotifyEmailService {
                 sb.append("<td>");
                 sb.append(busActRel.getBusId());
                 sb.append("</td>");
+                sb.append("<td>");
+                sb.append(DateUtil.format(busActRel.getcTime()));
+                sb.append("</td>");
+                sb.append("<td>");
+                CUser cUser = cUserMapper.selectById(Long.valueOf(busActRel.getcUser()));
+                sb.append(cUser!=null?cUser.getName():busActRel.getcUser());
+                sb.append("</td>");
                 sb.append("</tr>");
                 sb.append("</table>");
 
                 String title = "[代理商系统]工作流审批任务:"+busType;
                 AppConfig.sendEmail(notityEmail.toArray(new String[]{}),sb.toString() ,title);
+                log.info("待办任务通知:邮件发送成功,收件人:{},标题:{}",notityEmail.toString(),title);
             } else if ("assignment".endsWith(eventName)) {
-
-
+                
             } else if ("complete".endsWith(eventName)) {
 
             }
-
         });
     }
+
 }
