@@ -1010,4 +1010,12 @@
     </where>
   </select>
 
+  <!--查询有重复的打款公司的代理商-->
+  <select id="queryAgentHaveMutPayCompany" resultType="string">
+    select  b.agent_id from (
+      select  a.agent_id,a.clo_pay_company  from a_agent_businfo a group by a.agent_id,a.clo_pay_company
+    )b group by b.agent_id having count(b.clo_pay_company)>1
+  </select>
+
+
 </mapper>
