@@ -350,10 +350,10 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             //财务最后审批时上传打款凭证,并且是已经执行退款方案
             if (agentVo.getApprovalResult()!=null && ApprovalType.PASS.getValue().equals(agentVo.getApprovalResult())) {
                 OAccountAdjustExample oAccountAdjustExample = new OAccountAdjustExample();
-                oAccountAdjustExample.or().andSrcIdEqualTo(agentVo.getReturnId()).andAdjustTypeEqualTo(AdjustType.TKTH.adjustType);
+                oAccountAdjustExample.or().andSrcIdEqualTo(agentVo.getReturnId()).andAdjustTypeEqualTo(AdjustType.TKTH.adjustType).andStatusEqualTo(Status.STATUS_1.status);
                 List<OAccountAdjust> oAccountAdjusts = accountAdjustMapper.selectByExample(oAccountAdjustExample);
-                if (oAccountAdjusts == null || oAccountAdjusts.size() <= 0) {
-                    throw new MessageException("您还未执行退款方案");
+                if (oAccountAdjusts == null || oAccountAdjusts.size() <= 0) {//todo cxinfo 是否强制抵扣机具款
+//                    throw new MessageException("您还未执行退款方案");
                 }
 
                 if (oReturnOrder.getRelReturnAmo().compareTo(BigDecimal.ZERO) > 0 && agentVo.getAttachments().length <= 0) {
