@@ -720,6 +720,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 			agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
 			if(agentBusInfoList.size()>0) {
 				agentBusInfoList.forEach(agentBusInfo -> {
+					agentDataHistoryService.saveDataHistory(agentBusInfo,agentBusInfo.getId(),DataHistoryType.BUSINESS.code,"-1",agentBusInfo.getVersion());
 					logger.info("分组结果：{}，最大值：{},更新{}",group,c,agentBusInfo.getId());
 					agentBusInfo.setCloPayCompany(c);
 					if (1 != agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)) {
