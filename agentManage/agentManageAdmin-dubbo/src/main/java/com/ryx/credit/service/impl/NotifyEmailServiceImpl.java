@@ -1,14 +1,21 @@
 package com.ryx.credit.service.impl;
 
+import com.alibaba.dubbo.common.utils.ConcurrentHashSet;
 import com.ryx.credit.common.enumc.BusActRelBusType;
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.ThreadPool;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.CUserMapper;
+import com.ryx.credit.dao.CuserAgentMapper;
+import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.CUser;
+import com.ryx.credit.pojo.admin.CuserAgent;
+import com.ryx.credit.pojo.admin.CuserAgentExample;
+import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.vo.UserVo;
 import com.ryx.credit.service.CRoleService;
@@ -45,6 +52,10 @@ public class NotifyEmailServiceImpl implements NotifyEmailService {
     private COrganizationMapper organizationMapper;
     @Autowired
     private CUserMapper cUserMapper;
+    @Autowired
+    private CuserAgentMapper userAgentMapper;
+    @Autowired
+    private AgentMapper agentMapper;
 
 
     public void notifyEmail(String groupId,String executionId,String eventName){
@@ -55,7 +66,7 @@ public class NotifyEmailServiceImpl implements NotifyEmailService {
                 } catch (InterruptedException e) {
                     log.error("待办任务通知:Thread error");
                 }
-                Set<String> notityEmail = new HashSet<>();
+                Set<String> notityEmail = new ConcurrentHashSet<>();
                 BusActRel busActRel = busActRelService.findById(executionId);
                 if(busActRel==null){
                     log.info("待办任务通知:未找到关联关系表,executionId:{}",executionId);
@@ -68,7 +79,27 @@ public class NotifyEmailServiceImpl implements NotifyEmailService {
                 COrganization cOrganization = new COrganization();
                 if(groupId.equals("city")){
                     CUser cUser = cUserMapper.selectById(Long.valueOf(busActRel.getcUser()));
-                    cOrganization.setId(cUser.getOrganizationId().longValue());
+                    //判断是代理商发起还是省区发起的审批
+                    COrganization organization = organizationMapper.selectByPrimaryKey(String.valueOf(cUser.getOrganizationId()));
+                    if(organization.getCode().equals("agent")){
+                        CuserAgentExample cuserAgentExample = new CuserAgentExample();
+                        CuserAgentExample.Criteria criteria = cuserAgentExample.createCriteria();
+                        criteria.andStatusEqualTo(Status.STATUS_1.status);
+                        criteria.andUseridEqualTo(busActRel.getcUser());
+                        List<CuserAgent> cuserAgents = userAgentMapper.selectByExample(cuserAgentExample);
+                        if(cuserAgents.size()!=1){
+                            log.info("待办任务通知:没有该代理商,userId:{}",busActRel.getcUser());
+                            return;
+                        }
+                        Agent agent = agentMapper.selectByPrimaryKey(cuserAgents.get(0).getAgentid());
+                        if(null==agent){
+                            log.info("待办任务通知:没有该代理商,userId:{}",busActRel.getcUser());
+                            return;
+                        }
+                        cOrganization.setId(Long.parseLong(agent.getAgDocPro()));
+                    }else{
+                        cOrganization.setId(cUser.getOrganizationId().longValue());
+                    }
                 }else {
                     cOrganization = organizationMapper.selectByCode(groupId);
                     if(cOrganization==null){
