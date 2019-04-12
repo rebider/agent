@@ -19,6 +19,10 @@ public interface TransProfitDetailMapper {
 
     List<TransProfitDetail> selectByExample(TransProfitDetailExample example);
 
+    int updateByExampleSelective(@Param("record") TransProfitDetail record, @Param("example") TransProfitDetailExample example);
+
+    int updateByExample(@Param("record") TransProfitDetail record, @Param("example") TransProfitDetailExample example);
+
     List<TransProfitDetail> selectListByDate(String profitDate);
 
     List<TransProfitDetail> selectCompanyByDoubleId(TransProfitDetail record);
@@ -55,5 +59,7 @@ public interface TransProfitDetailMapper {
     Integer  baseProfitLowerCount (Map<String,Object> params);
 
     List<Map<String,Object>> queryBusNum(@Param("type") String type);
+
+    List<Map<String,String>> selectByBusNum(@Param("date") String date, @Param("busNum")String busNum);
 
 }
