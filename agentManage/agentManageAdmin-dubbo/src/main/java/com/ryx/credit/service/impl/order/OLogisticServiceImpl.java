@@ -171,23 +171,23 @@ public class OLogisticServiceImpl implements OLogisticsService {
             String planProNum="";
             String proComString="";
             List col = Arrays.asList(ReceiptPlanExportColum.ReceiptPlanExportColum_column.col);
-            planNum = String.valueOf(objectList.get(col.indexOf("PLAN_NUM")));
-            orderId = String.valueOf(objectList.get(col.indexOf("ORDER_ID")));
-            proCode = String.valueOf(objectList.get(col.indexOf("PRO_CODE")));
-            proId = String.valueOf(objectList.get(col.indexOf("PRO_ID")));
-            proName = String.valueOf(objectList.get(col.indexOf("PRO_NAME")));
+            planNum = String.valueOf(objectList.get(col.indexOf("PLAN_NUM"))).trim();
+            orderId = String.valueOf(objectList.get(col.indexOf("ORDER_ID"))).trim();
+            proCode = String.valueOf(objectList.get(col.indexOf("PRO_CODE"))).trim();
+            proId = String.valueOf(objectList.get(col.indexOf("PRO_ID"))).trim();
+            proName = String.valueOf(objectList.get(col.indexOf("PRO_NAME"))).trim();
 
-            sendDate = String.valueOf(objectList.get(col.indexOf("h")));
-            sendProNum = String.valueOf(objectList.get(col.indexOf("g")));
-            logCom = String.valueOf(objectList.get(col.indexOf("a")));
-            wNumber = String.valueOf(objectList.get(col.indexOf("b")));
-            beginSn = String.valueOf(objectList.get(col.indexOf("c")));
-            endSn = String.valueOf(objectList.get(col.indexOf("d")));
-            beginSnCount = String.valueOf(objectList.get(col.indexOf("e")));
-            endSnCount = String.valueOf(objectList.get(col.indexOf("f")));
-            proType = String.valueOf(objectList.get(col.indexOf("PRO_TYPE")));
-            planProNum = String.valueOf(objectList.get(col.indexOf("PLAN_PRO_NUM")));
-            proComString = String.valueOf(objectList.get(col.indexOf("PRO_COM_STRING")));
+            sendDate = String.valueOf(objectList.get(col.indexOf("h"))).trim();
+            sendProNum = String.valueOf(objectList.get(col.indexOf("g"))).trim();
+            logCom = String.valueOf(objectList.get(col.indexOf("a"))).trim();
+            wNumber = String.valueOf(objectList.get(col.indexOf("b"))).trim();
+            beginSn = String.valueOf(objectList.get(col.indexOf("c"))).trim();
+            endSn = String.valueOf(objectList.get(col.indexOf("d"))).trim();
+            beginSnCount = String.valueOf(objectList.get(col.indexOf("e"))).trim();
+            endSnCount = String.valueOf(objectList.get(col.indexOf("f"))).trim();
+            proType = String.valueOf(objectList.get(col.indexOf("PRO_TYPE"))).trim();
+            planProNum = String.valueOf(objectList.get(col.indexOf("PLAN_PRO_NUM"))).trim();
+            proComString = String.valueOf(objectList.get(col.indexOf("PRO_COM_STRING"))).trim();
 
             if (StringUtils.isBlank(sendDate)) {
                 logger.info("发货日期不能为空");
