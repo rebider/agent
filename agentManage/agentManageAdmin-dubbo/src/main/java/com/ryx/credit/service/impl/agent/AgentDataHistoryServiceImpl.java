@@ -119,6 +119,7 @@ public class AgentDataHistoryServiceImpl implements AgentDataHistoryService {
             dataHistory.setStatus(Status.STATUS_1.status);
             int insert = dataHistoryMapper.insert(dataHistory);
             if (insert == 1) {
+                logger.info("历史数据插入成功，{}，{},{}",dataType,id,dataCotent);
                 return AgentResult.ok();
             }else{
                 return AgentResult.fail("历史数据插入错误");

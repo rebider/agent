@@ -7,7 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lrr
@@ -121,6 +123,35 @@ public class Conver10ToConver33Utils {
         }
         return numStr + sub;
     }
+
+    public static Map getDigit(String firstSn, String lastSn) {
+        if (StringUtils.isBlank(firstSn)){
+            log.info("起始SN为空");
+            throw new ProcessException("起始SN为空");
+        }
+        if (StringUtils.isBlank(lastSn)){
+            log.info("结束SN为空");
+            throw new ProcessException("结束SN为空");
+        }
+        char[] chars = firstSn.toCharArray();
+        char[] charss = lastSn.toCharArray();
+        int num=0;
+        for (int i=1;i<= chars.length;i++){
+            if (chars[i]!=charss[i]){
+                num=i;
+                break;
+            }
+        }
+        HashMap<String, Object> map = new HashMap<>();
+        String start = firstSn.substring(num, chars.length);
+        String end = lastSn.substring(num, charss.length);
+        map.put("start",start);
+        map.put("end",end);
+        map.put("num",num);
+        map.put("length",chars.length);
+        return map;
+    }
+
 
     public static void main(String[] args) {
       /*  String param1="1922AA8M9998";
