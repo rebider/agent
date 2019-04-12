@@ -74,4 +74,10 @@ public interface AgentBusInfoMapper {
 
     List<Map<String,Object>> queryEditAgentMerge(Map<String,Object> reqMap);
 
+    /**
+     * 询有重复的打款公司的代理商
+     * @return
+     */
+    List<String> queryAgentHaveMutPayCompany();
+
 }

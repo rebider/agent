@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.agent.Agent;
@@ -91,4 +92,16 @@ public interface AgentBusinfoService {
     AgentBusInfo selectBusInfo(String busNum);
 
     List<AgentBusInfo> selectExistsById(String id);
+
+    /**
+     * 查询所有有多个打款公司的代理商并顺序更新为统一的一个
+     * @return
+     */
+    AgentResult completAllAgentBusInfoCompany();
+    /**
+     * 修复代理商的打款公司为一个
+     * @param agentId
+     * @return
+     */
+    AgentResult completAgentBusInfoCompany(String agentId)throws Exception;
 }
