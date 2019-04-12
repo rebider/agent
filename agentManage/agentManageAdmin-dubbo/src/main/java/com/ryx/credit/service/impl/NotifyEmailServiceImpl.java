@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl;
 
+import com.alibaba.dubbo.common.utils.ConcurrentHashSet;
 import com.ryx.credit.common.enumc.BusActRelBusType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.util.AppConfig;
@@ -65,7 +66,7 @@ public class NotifyEmailServiceImpl implements NotifyEmailService {
                 } catch (InterruptedException e) {
                     log.error("待办任务通知:Thread error");
                 }
-                Set<String> notityEmail = new HashSet<>();
+                Set<String> notityEmail = new ConcurrentHashSet<>();
                 BusActRel busActRel = busActRelService.findById(executionId);
                 if(busActRel==null){
                     log.info("待办任务通知:未找到关联关系表,executionId:{}",executionId);
