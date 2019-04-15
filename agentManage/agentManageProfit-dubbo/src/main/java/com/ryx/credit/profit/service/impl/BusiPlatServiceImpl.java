@@ -44,12 +44,12 @@ public class BusiPlatServiceImpl implements BusiPlatService {
         if (!JSONObject.parseObject(res).get("respCode").equals("000000")) {
             log.error("请求失败！");
             AppConfig.sendEmails("代理商冻结失败" + res,"代理商冻结失败");
-            return true;
+            return false;
         }
         String data = JSONObject.parseObject(res).get("data").toString();
         log.debug("data：" + data);
         log.debug("代理商冻结成功！");
-        return false;
+        return true;
     }
 
     @Override
@@ -67,12 +67,12 @@ public class BusiPlatServiceImpl implements BusiPlatService {
         if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
             log.error("请求失败！");
             AppConfig.sendEmails("代理商解冻失败："+res,"代理商解冻失败");
-            return true;
+            return false;
         }
         String data = JSONObject.parseObject(res).get("data").toString();
         log.debug(data);
         log.debug("代理商解冻成功！");
-        return false;
+        return true;
     }
 
     @Override

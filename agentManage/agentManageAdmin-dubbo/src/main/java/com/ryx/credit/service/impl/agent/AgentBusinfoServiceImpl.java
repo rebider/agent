@@ -2,9 +2,11 @@ package com.ryx.credit.service.impl.agent;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.dao.agent.*;
@@ -57,6 +59,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	private PlatFormMapper platFormMapper;
 	@Autowired
 	private DictOptionsService dictOptionsService;
+	@Autowired
+	private AgentBusinfoService agentBusinfoService;
 
     /**
      * 代理商查询插件数据获取
@@ -667,6 +671,73 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		criteria.andIdEqualTo(id);
 		List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
 		return agentBusInfos;
+	}
+
+
+	@Override
+	public AgentResult completAllAgentBusInfoCompany() {
+		List<String> agentS = agentBusInfoMapper.queryAgentHaveMutPayCompany();
+		StringBuffer sb = new StringBuffer();
+		agentS.forEach(
+				agentId -> {
+					try {
+						AgentResult res = agentBusinfoService.completAgentBusInfoCompany(agentId);
+						sb.append("[修复打款公司"+agentId+":"+res.getMsg()+"]");
+					} catch (Exception e) {
+						e.printStackTrace();
+						logger.error("[修复打款公司"+agentId+":"+e.getLocalizedMessage()+"]");
+					}
+				}
+		);
+		logger.info(sb.toString());
+		return AgentResult.ok();
+	}
+
+	@Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
+	@Override
+	public AgentResult completAgentBusInfoCompany(String agentId) throws Exception{
+
+		//如果 公户收款，开票，瑞银信出款，缺一不可
+		//如果公户，不开票，非瑞银信出款
+		//如果私户，不可能开票，非瑞银信出款
+		//检查收款账户是否是对公 开票 修复打款公司为瑞银信打款公司(Q000029564)
+		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+		agentBusInfoExample.or().andAgentIdEqualTo(agentId).andStatusEqualTo(Status.STATUS_1.status).andCloPayCompanyIsNotNull();
+		agentBusInfoExample.setOrderByClause(" C_UTIME desc");
+		List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+		//分组统计
+		Map<String,Long> group = agentBusInfoList.stream().collect(Collectors.groupingBy(AgentBusInfo::getCloPayCompany,Collectors.counting()));
+		logger.info("分组结果：{}",group);
+		Iterator<String> ite = group.keySet().iterator();
+		Long a = 0L; String comp=null;
+		//取出最多的打款公司
+		while (ite.hasNext()){
+			String cop = ite.next();
+			if(group.get(cop)>a){a=group.get(cop);comp=cop;}else{}
+		}
+
+		final String c = comp;
+		logger.info("分组结果：{}，最大值：{}",group,comp);
+		if(StringUtils.isNotEmpty(c)) {
+			//更新为company
+		    agentBusInfoExample = new AgentBusInfoExample();
+			agentBusInfoExample.or().andAgentIdEqualTo(agentId).andStatusEqualTo(Status.STATUS_1.status).andCloPayCompanyNotEqualTo(c);
+			agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+			if(agentBusInfoList.size()>0) {
+				agentBusInfoList.forEach(agentBusInfo -> {
+					agentDataHistoryService.saveDataHistory(agentBusInfo,agentBusInfo.getId(),DataHistoryType.BUSINESS.code,"-1",agentBusInfo.getVersion());
+					logger.info("分组结果：{}，最大值：{},更新{}",group,c,agentBusInfo.getId());
+					agentBusInfo.setCloPayCompany(c);
+					if (1 != agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)) {
+						logger.info("更新打开公司失败");
+					}
+				});
+				return AgentResult.ok();
+			}else{
+				return AgentResult.ok();
+			}
+		}
+		return AgentResult.fail();
 	}
 }
 

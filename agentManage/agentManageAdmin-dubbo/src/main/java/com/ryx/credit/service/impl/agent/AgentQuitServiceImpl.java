@@ -20,6 +20,7 @@ import com.ryx.credit.pojo.admin.order.OPaymentDetail;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
+import com.ryx.credit.profit.service.BusiPlatService;
 import com.ryx.credit.profit.service.ProfitMonthService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
@@ -99,6 +100,8 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
     private CapitalService capitalService;
     @Autowired
     private CapitalFlowMapper capitalFlowMapper;
+    @Autowired
+    private BusiPlatService busiPlatService;
 
     /**
      * 退出列表
@@ -498,12 +501,15 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                                       agentQuit.getAgentName(),"代理商退出扣除");
 
         try {
-            //冻结分润
-//            Map<String, String> resultMap = profitMonthService.doFrozenByAgent(agentQuit.getAgentId());
-//            String respCode = resultMap.get("key");
-//            if(!respCode.equals("000000")){
-//                throw new MessageException(resultMap.get("value"));
-//            }
+            if(agentQuit.getQuitPlatform().equals(QuitPlatform.MPOS.getValue())){
+                //冻结分润
+                ArrayList<String> agList = new ArrayList<>();
+                agList.add(agentQuit.getAgentId());
+                Boolean result = busiPlatService.mPos_Frozen(agList);
+                if(!result){
+                    throw new MessageException("冻结分润失败");
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
             throw new MessageException("冻结分润失败");
@@ -804,11 +810,13 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         //拒绝
         if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
             try {
-//                Map<String,String> resultMap = profitMonthService.doUnFrozenAgentProfit(agentQuit.getAgentId());
-//                String respCode = resultMap.get("key");
-//                if(!respCode.equals("000000")){
-//                    throw new MessageException(resultMap.get("value"));
-//                }
+                //解冻分润
+                ArrayList<String> agList = new ArrayList<>();
+                agList.add(agentQuit.getAgentId());
+                Boolean result = busiPlatService.mPos_unFrozen(agList);
+                if(!result){
+                    throw new MessageException("解冻分润失败");
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new MessageException("代理商退出：分润解冻失败");
