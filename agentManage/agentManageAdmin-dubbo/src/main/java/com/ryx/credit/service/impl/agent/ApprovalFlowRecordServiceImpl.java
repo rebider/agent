@@ -481,7 +481,7 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         criteria.andActivityStatusEqualTo(Status.STATUS_1.status);
         criteria.andExecutionIdEqualTo(executionId);
-        approvalFlowRecordExample.setOrderByClause(" order by APPROVAL_TIME ");
+        approvalFlowRecordExample.setOrderByClause(" APPROVAL_TIME ");
         List<ApprovalFlowRecord> approvalFlowRecords = approvalFlowRecordMapper.selectByExample(approvalFlowRecordExample);
         for (ApprovalFlowRecord approvalFlowRecord : approvalFlowRecords) {
             Map<String,Object> resultMap = new HashMap<>();
