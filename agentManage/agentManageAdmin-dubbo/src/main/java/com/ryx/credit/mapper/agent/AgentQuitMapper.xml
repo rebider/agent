@@ -480,6 +480,7 @@
       <if test="map.id != null"> and m.id = #{map.id} </if>
       <if test="map.agentId != null"> and q.agent_id = #{map.agentId} </if>
       <if test="map.agentName != null"> and q.agent_name = #{map.agentName} </if>
+      <if test="map.userId != null"> and q.c_user = #{map.userId} </if>
       <if test="map.cloReviewStatus != null"> and q.clo_review_status = #{map.cloReviewStatus} </if>
       <if test="map.orgId != null and map.orgId != ''"> and (a.AG_DOC_PRO = #{map.orgId} or a.AG_DOC_DISTRICT = #{map.orgId}) </if>
     </where>
