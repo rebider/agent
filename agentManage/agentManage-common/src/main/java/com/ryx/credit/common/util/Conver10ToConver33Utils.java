@@ -143,12 +143,10 @@ public class Conver10ToConver33Utils {
             }
         }
         HashMap<String, Object> map = new HashMap<>();
-        String start = firstSn.substring(num, chars.length);
-        String end = lastSn.substring(num, charss.length);
-        map.put("start",start);
-        map.put("end",end);
         map.put("num",num);
         map.put("length",chars.length);
+        map.put("firstSn",firstSn);
+        map.put("lastSn",lastSn);
         return map;
     }
 

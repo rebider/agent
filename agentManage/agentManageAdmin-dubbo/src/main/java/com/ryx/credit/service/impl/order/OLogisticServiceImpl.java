@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import static com.ryx.credit.common.util.Conver10ToConver33Utils.getBetweenValues;
 
@@ -221,7 +222,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 logger.info("请填写结束SN序列号");
                 throw new MessageException("请填写结束SN序列号");
             }
-           if (!proComString.equals(CardImportType.LD.msg)) {
+         /*  if (!proComString.equals(CardImportType.LD.msg)) {
                if (StringUtils.isBlank(beginSnCount)) {
                 logger.info("请填写起始SN位数");
                 throw new MessageException("请填写起始SN位数");
@@ -240,7 +241,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                    logger.info("请检查开始SN码与结束SN码截取之前的是否一致");
                    throw new MessageException("请检查开始SN码与结束SN码截取之前的是否一致");
                }
-          }
+          }*/
 
 
             if (StringUtils.isBlank(logCom)) {
@@ -948,19 +949,29 @@ public class OLogisticServiceImpl implements OLogisticsService {
         if (CardImportType.LD.name().equals(proCom) || proCom.equals(CardImportType.LD.msg) || proCom.equals(CardImportType.LD.code)) {
             list= getBetweenValues(startSn, endSn);
         }else {
+            Map digit = Conver10ToConver33Utils.getDigit(startSn, endSn);
+            //截取出来的数
+            /*String firstSn= (String) digit.get("start");
+            String lastSn = (String) digit.get("end");*/
+            //SN码
+            String end = (String) digit.get("lastSn");
+            String start = (String) digit.get("firstSn");
+            //位数
+            finish = (Integer) digit.get("length");
+            begins = (Integer) digit.get("num");
+            Pattern p = Pattern.compile("[a-zA-z]");
+            if (p.matcher(start).find() || p.matcher(end).find()) {
+                list = getBetweenValues(startSn, endSn);
+                System.out.println("含有英文字符" + "----起始位数:" + begins + "---结束位数:" + finish);
+            } else {
+                System.out.println("不含英文字符");
             int begin = begins - 1;
-            String start = startSn;
-            String end = endSn;
-            if (startSn.length() < begins || endSn.length() <finish) {
-                logger.info("请输入正确的起始和结束SN号位数");
-                throw new MessageException("请输入正确的起始和结束SN号位数");
-            }
             String sSub = start.substring(begin, finish);
             String eSub = end.substring(begin, finish);
             if ("".equals(eSub) || "".equals(sSub)) {
-                logger.info("请输入正确的起始和结束SN号位数");
-                throw new MessageException("请输入正确的起始和结束SN号位数");
-            }
+                    logger.info("请输入正确的起始和结束SN号位数");
+                    throw new MessageException("请输入正确的起始和结束SN号位数");
+             }
             int num = Integer.parseInt(sSub);
             int w = finish - begin;
             for (int j = Integer.parseInt(eSub) - Integer.parseInt(sSub); j >= 0; j--) {
@@ -969,6 +980,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 String c = start.substring(0, begin) + format + start.substring(finish);
                 list.add(c);
             }
+        }
         }
         return list;
     }
