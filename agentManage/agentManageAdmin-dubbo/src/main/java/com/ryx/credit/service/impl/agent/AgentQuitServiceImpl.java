@@ -133,7 +133,11 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                 return null;
             }
             Map<String, Object> stringObjectMap = orgCodeRes.get(0);
-            reqMap.put("orgId", String.valueOf(stringObjectMap.get("ORGID")));
+            if(String.valueOf(stringObjectMap.get("ORGANIZATIONCODE")).equals("agent")){
+                reqMap.put("userId",userId);
+            }else{
+                reqMap.put("orgId", String.valueOf(stringObjectMap.get("ORGID")));
+            }
         }
         List<Map<String, Object>> agentMergeList = agentQuitMapper.queryAgentQuitList(reqMap, page);
         PageInfo pageInfo = new PageInfo();
