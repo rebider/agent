@@ -696,6 +696,11 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	@Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
 	@Override
 	public AgentResult completAgentBusInfoCompany(String agentId) throws Exception{
+
+		//如果 公户收款，开票，瑞银信出款，缺一不可
+		//如果公户，不开票，非瑞银信出款
+		//如果私户，不可能开票，非瑞银信出款
+		//检查收款账户是否是对公 开票 修复打款公司为瑞银信打款公司(Q000029564)
 		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
 		agentBusInfoExample.or().andAgentIdEqualTo(agentId).andStatusEqualTo(Status.STATUS_1.status).andCloPayCompanyIsNotNull();
 		agentBusInfoExample.setOrderByClause(" C_UTIME desc");
