@@ -276,6 +276,10 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         AgentQuitExample.Criteria criteria = agentQuitExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         criteria.andAgentIdEqualTo(agentId);
+        List<BigDecimal> cloReviewStatusList = new ArrayList<>();
+        cloReviewStatusList.add(AgStatus.Approving.getValue());
+        cloReviewStatusList.add(AgStatus.Create.getValue());
+        criteria.andCloReviewStatusIn(cloReviewStatusList);
         List<AgentQuit> agentQuits = agentQuitMapper.selectByExample(agentQuitExample);
         if(agentQuits.size()!=0){
             throw new MessageException("已经提交申请请勿重复提交");
