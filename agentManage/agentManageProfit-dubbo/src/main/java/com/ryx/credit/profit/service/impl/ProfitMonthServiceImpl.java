@@ -542,9 +542,13 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
      */
     private void updateAgentQuitProfit(String profitDate){
         profitDetailMonthMapper.updateMonthProfitFozzen(profitDate);
-        LOG.info("代理商退出申请发起，月分润冻结");
+        LOG.info("代理商退出发起，月分润冻结完成");
         profitDetailMonthMapper.updateMonthProfitUnFozzen(profitDate);
-        LOG.info("代理商退出申请失败，月分润解冻");
+        LOG.info("代理商退出失败，月分润解冻完成");
+        directMapper.updateDirectProfitFozzen(profitDate);
+        LOG.info("代理商退出发起，直发分润冻结完成");
+        directMapper.updateDirectProfitUnFozzen(profitDate);
+        LOG.info("代理商退出失败，直发分润解冻完成");
     }
 
 
@@ -1097,53 +1101,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 
 
-    /**
-     * 代理商日分润冻结
-     * @param list 手刷平台机构编码
-     * @return
-     */
-    @Override
-    public Map<String, String> doFrozenByAgent(List<String> list) {
-
-        HashMap<String, String> map = new HashMap<String, String>();
-        map.put("agencyBlack_type", "1");
-        map.put("type", "1");
-        map.put("unfreeze", "0");
-        map.put("flag", "4");
-        map.put("batchIds", list.toString());
-        String params = JsonUtil.objectToJson(map);
-        String res = HttpClientUtil.doPostJson
-                (AppConfig.getProperty("busiPlat.refuse"), params);
-        LOG.debug("请求信息：" + res);
-        Map<String, String> map1 = new HashMap<String, String>();
-        map1.put(JSONObject.parseObject(res).get("respCode").toString(),
-                JSONObject.parseObject(res).get("respMsg").toString());
-        return map1;
-
-    }
-
-    /**
-     * 代理商日分润解冻
-     * @param list 手刷平台机构编码
-     * @return
-     */
-    @Override
-    public Map<String, String> doUnFrozenAgentProfit(List<String> list) {
-        HashMap<String, String> map = new HashMap<String, String>();
-        map.put("agencyBlack_type", "0");
-        map.put("type", "1");
-        map.put("unfreeze", "0");
-        map.put("flag", "0");
-        map.put("batchIds", list.toString());//AG码list
-        String params = JsonUtil.objectToJson(map);
-        String res = HttpClientUtil.doPostJson
-                (AppConfig.getProperty("busiPlat.refuse"), params);
-        Map<String, String> map1 = new HashMap<String, String>();
-        map1.put(JSONObject.parseObject(res).get("respCode").toString(),
-                JSONObject.parseObject(res).get("respMsg").toString());
-        return map1;
-
-    }
 
 
     /***
