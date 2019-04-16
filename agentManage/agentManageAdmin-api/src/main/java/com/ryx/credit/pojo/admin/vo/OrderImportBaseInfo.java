@@ -3,7 +3,6 @@ package com.ryx.credit.pojo.admin.vo;
 import com.alibaba.fastjson.JSONArray;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

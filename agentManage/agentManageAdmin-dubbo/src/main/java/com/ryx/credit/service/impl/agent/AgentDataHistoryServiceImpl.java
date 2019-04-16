@@ -119,6 +119,7 @@ public class AgentDataHistoryServiceImpl implements AgentDataHistoryService {
             dataHistory.setStatus(Status.STATUS_1.status);
             int insert = dataHistoryMapper.insert(dataHistory);
             if (insert == 1) {
+                logger.info("历史数据插入成功，{}，{},{}",dataType,id,dataCotent);
                 return AgentResult.ok();
             }else{
                 return AgentResult.fail("历史数据插入错误");
@@ -132,31 +133,38 @@ public class AgentDataHistoryServiceImpl implements AgentDataHistoryService {
 
     @Override
     public PageInfo selectAll(Page page, DataHistory dataHistory, String time) {
-        Map<String, Object> map = new HashMap<>();
-        if (null != dataHistory.getDataType() && StringUtils.isNotBlank(dataHistory.getDataType())) {
-            map.put("dataType", dataHistory.getDataType());
+
+        DataHistoryExample dataHistoryExample = new DataHistoryExample();
+        DataHistoryExample.Criteria criteria = dataHistoryExample.createCriteria();
+        if(StringUtils.isNotBlank(dataHistory.getDataType())){
+            criteria.andDataTypeEqualTo(dataHistory.getDataType());
         }
-        if (null != time && !time.equals("")) {
-            String reltime = time.substring(0, 10);
-            map.put("time", reltime);
+        if(StringUtils.isNotBlank(dataHistory.getDataId())){
+            criteria.andDataIdEqualTo(dataHistory.getDataId());
         }
-        if (null != dataHistory.getDataId() && !dataHistory.getDataId().equals("")) {
-            map.put("dataId", dataHistory.getDataId());
-        }
-        List<Map<String, Object>> dataList = dataHistoryMapper.selectAll(map, page);
-        if (null != dataList && dataList.size() > 0) {
-            for (Map<String, Object> maps : dataList) {
-                maps.put("DATA_TYPE_STRING", DataHistoryType.getContentByValue(String.valueOf(maps.get("DATA_TYPE"))));
-            }
+
+        dataHistoryExample.setPage(page);
+        dataHistoryExample.setOrderByClause(" c_time desc ");
+        List<DataHistory> dataHistories = dataHistoryMapper.selectByExampleWithBLOBs(dataHistoryExample);
+        for (DataHistory history : dataHistories) {
+            history.setDataTypeName(DataHistoryType.getContentByValue(history.getDataType()));
         }
         PageInfo pageInfo = new PageInfo();
-        pageInfo.setRows(dataList);
-        pageInfo.setTotal(dataHistoryMapper.getCount(map));
+        pageInfo.setRows(dataHistories);
+        pageInfo.setTotal(dataHistoryMapper.countByExample(dataHistoryExample));
         return pageInfo;
     }
 
     @Override
-    public List<Map> selectHistory(String dataId, String dataType) {
-       return dataHistoryMapper.selectAll(FastMap.fastMap("dataId",dataId).putKeyV("dataType",dataType), null);
+    public List<DataHistory> selectHistory(String dataId, String dataType) {
+
+        DataHistoryExample dataHistoryExample = new DataHistoryExample();
+        DataHistoryExample.Criteria criteria = dataHistoryExample.createCriteria();
+        criteria.andDataTypeEqualTo(dataType);
+        criteria.andDataIdEqualTo(dataId);
+        dataHistoryExample.setOrderByClause(" c_time desc ");
+        List<DataHistory> dataHistories = dataHistoryMapper.selectByExampleWithBLOBs(dataHistoryExample);
+
+        return dataHistories;
     }
 }

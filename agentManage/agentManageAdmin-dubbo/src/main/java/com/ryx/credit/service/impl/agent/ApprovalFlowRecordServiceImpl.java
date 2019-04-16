@@ -479,7 +479,9 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
         ApprovalFlowRecordExample approvalFlowRecordExample = new ApprovalFlowRecordExample();
         ApprovalFlowRecordExample.Criteria criteria = approvalFlowRecordExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andActivityStatusEqualTo(Status.STATUS_1.status);
         criteria.andExecutionIdEqualTo(executionId);
+        approvalFlowRecordExample.setOrderByClause(" APPROVAL_TIME ");
         List<ApprovalFlowRecord> approvalFlowRecords = approvalFlowRecordMapper.selectByExample(approvalFlowRecordExample);
         for (ApprovalFlowRecord approvalFlowRecord : approvalFlowRecords) {
             Map<String,Object> resultMap = new HashMap<>();
@@ -487,7 +489,7 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
             if(null!=cUser){
                 resultMap.put("approvalPerson",cUser.getName());
             }else{
-                resultMap.put("approvalPerson","");
+                resultMap.put("approvalPerson",approvalFlowRecord.getApprovalPerson());
             }
             resultMap.put("createTime",DateUtil.format(approvalFlowRecord.getApprovalTime(),DateUtil.DATE_FORMAT_1));
             resultMap.put("rs",approvalFlowRecord.getApprovalResult());

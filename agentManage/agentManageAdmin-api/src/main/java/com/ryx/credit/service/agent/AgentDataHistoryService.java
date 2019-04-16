@@ -34,5 +34,5 @@ public interface AgentDataHistoryService {
      * @param dataType
      * @return
      */
-    List<Map> selectHistory(String dataId,String dataType);
+    List<DataHistory> selectHistory(String dataId,String dataType);
 }

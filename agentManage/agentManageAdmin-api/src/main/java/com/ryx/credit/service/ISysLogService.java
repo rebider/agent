@@ -1,7 +1,7 @@
 package com.ryx.credit.service;
 
-import com.baomidou.mybatisplus.service.IService;
-import com.ryx.credit.commons.utils.PageInfo;
+import com.ryx.credit.common.util.Page;;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.CSysLog;
 
 /**
@@ -9,8 +9,9 @@ import com.ryx.credit.pojo.admin.CSysLog;
  * CSysLog 表数据服务层接口
  *
  */
-public interface ISysLogService extends IService<CSysLog> {
+public interface ISysLogService{
 
-    PageInfo selectDataGrid(PageInfo pageInfo);
+    PageInfo selectDataGrid(Page page);
 
+    void insert(CSysLog sysLog);
 }

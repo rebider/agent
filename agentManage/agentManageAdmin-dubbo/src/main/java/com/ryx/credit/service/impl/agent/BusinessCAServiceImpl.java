@@ -3,6 +3,7 @@ package com.ryx.credit.service.impl.agent;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.agentUtil.AESUtil;
 import com.ryx.credit.common.util.agentUtil.HttpUtil;
@@ -111,7 +112,7 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 		map.put("tranCode", tranCode);
 		map.put("reqMsgId", reqMsgId);
 
-		String respStr = HttpUtil.doPost(Constants.serverUrl, map);
+		String respStr = HttpUtil.doPost(AppConfig.getProperty("gs_auth_url"), map);
 		System.out.println("返回密文======" + respStr);
 
 		//返回报文解密开始

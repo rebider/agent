@@ -33,4 +33,10 @@
         <include refid="Base_Column_List" />
         from C_ORGANIZATION where ID = #{id}
     </select>
+
+    <select id="selectByCode" resultMap="BaseResultMap" parameterType="string" >
+        select
+        <include refid="Base_Column_List" />
+        from C_ORGANIZATION where code = #{code}
+    </select>
 </mapper> 

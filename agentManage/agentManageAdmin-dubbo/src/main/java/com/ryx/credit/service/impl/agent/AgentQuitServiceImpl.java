@@ -20,6 +20,7 @@ import com.ryx.credit.pojo.admin.order.OPaymentDetail;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
+import com.ryx.credit.profit.service.BusiPlatService;
 import com.ryx.credit.profit.service.ProfitMonthService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
@@ -99,6 +100,8 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
     private CapitalService capitalService;
     @Autowired
     private CapitalFlowMapper capitalFlowMapper;
+    @Autowired
+    private BusiPlatService busiPlatService;
 
     /**
      * 退出列表
@@ -130,7 +133,11 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                 return null;
             }
             Map<String, Object> stringObjectMap = orgCodeRes.get(0);
-            reqMap.put("orgId", String.valueOf(stringObjectMap.get("ORGID")));
+            if(String.valueOf(stringObjectMap.get("ORGANIZATIONCODE")).equals("agent")){
+                reqMap.put("userId",userId);
+            }else{
+                reqMap.put("orgId", String.valueOf(stringObjectMap.get("ORGID")));
+            }
         }
         List<Map<String, Object>> agentMergeList = agentQuitMapper.queryAgentQuitList(reqMap, page);
         PageInfo pageInfo = new PageInfo();
@@ -273,6 +280,10 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         AgentQuitExample.Criteria criteria = agentQuitExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         criteria.andAgentIdEqualTo(agentId);
+        List<BigDecimal> cloReviewStatusList = new ArrayList<>();
+        cloReviewStatusList.add(AgStatus.Approving.getValue());
+        cloReviewStatusList.add(AgStatus.Create.getValue());
+        criteria.andCloReviewStatusIn(cloReviewStatusList);
         List<AgentQuit> agentQuits = agentQuitMapper.selectByExample(agentQuitExample);
         if(agentQuits.size()!=0){
             throw new MessageException("已经提交申请请勿重复提交");
@@ -498,12 +509,15 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                                       agentQuit.getAgentName(),"代理商退出扣除");
 
         try {
-            //冻结分润
-//            Map<String, String> resultMap = profitMonthService.doFrozenByAgent(agentQuit.getAgentId());
-//            String respCode = resultMap.get("key");
-//            if(!respCode.equals("000000")){
-//                throw new MessageException(resultMap.get("value"));
-//            }
+            if(agentQuit.getQuitPlatform().equals(QuitPlatform.MPOS.getValue())){
+                //冻结分润
+                ArrayList<String> agList = new ArrayList<>();
+                agList.add(agentQuit.getAgentId());
+                Boolean result = busiPlatService.mPos_Frozen(agList);
+                if(!result){
+                    throw new MessageException("冻结分润失败");
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
             throw new MessageException("冻结分润失败");
@@ -804,11 +818,13 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         //拒绝
         if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
             try {
-//                Map<String,String> resultMap = profitMonthService.doUnFrozenAgentProfit(agentQuit.getAgentId());
-//                String respCode = resultMap.get("key");
-//                if(!respCode.equals("000000")){
-//                    throw new MessageException(resultMap.get("value"));
-//                }
+                //解冻分润
+                ArrayList<String> agList = new ArrayList<>();
+                agList.add(agentQuit.getAgentId());
+                Boolean result = busiPlatService.mPos_unFrozen(agList);
+                if(!result){
+                    throw new MessageException("解冻分润失败");
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new MessageException("代理商退出：分润解冻失败");

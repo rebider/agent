@@ -2,9 +2,11 @@ package com.ryx.credit.service.impl.agent;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.dao.agent.*;
@@ -13,6 +15,7 @@ import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.service.agent.AgentAssProtocolService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
 import com.ryx.credit.service.agent.PlatFormService;
+import com.ryx.credit.service.dict.DictOptionsService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +57,10 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	private AgentMapper agentMapper;
 	@Autowired
 	private PlatFormMapper platFormMapper;
+	@Autowired
+	private DictOptionsService dictOptionsService;
+	@Autowired
+	private AgentBusinfoService agentBusinfoService;
 
     /**
      * 代理商查询插件数据获取
@@ -105,7 +112,20 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					}
 				}
 			}
-        	if(1!=agentBusInfoMapper.insert(agentBusInfo)){
+			Dict debitRateLower = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitRateLower");//借记费率下限（%）
+			Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitCapping");//借记封顶额（元）
+			Dict debitAppearRate = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitAppearRate");//借记出款费率（%）
+			if(debitRateLower!=null){
+				agentBusInfo.setDebitRateLower(debitRateLower.getdItemvalue());
+			}
+			if(debitCapping!=null){
+				agentBusInfo.setDebitCapping(debitCapping.getdItemvalue());
+			}
+			if(debitAppearRate!=null){
+				agentBusInfo.setDebitAppearRate(debitAppearRate.getdItemvalue());
+			}
+
+			if(1!=agentBusInfoMapper.insert(agentBusInfo)){
         		throw new ProcessException("业务添加失败");
 			}
 			//记录历史业务平台
@@ -162,9 +182,18 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		return null;
 	}
 
+	/**
+	 * 业务修改
+	 * @param busInfoVoList
+	 * @param agent
+	 * @param userId
+	 * @param isPass  是否审批通过  审批通过传true ,未提交审批修改传 false
+	 * @return
+	 * @throws Exception
+	 */
 	@Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
 	@Override
-	public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent,String userId)throws Exception {
+	public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent,String userId,Boolean isPass)throws Exception {
 		try {
 			if(agent==null)throw new ProcessException("代理商信息不能为空");
 			Set<String> resultSet = new HashSet<>();
@@ -303,7 +332,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 				}
 
 			}
-			if(resultSet.size()>1){
+			if(!isPass && resultSet.size()>1){
 				throw new MessageException("不能同时提交pos和手刷平台");
 			}
 			return ResultVO.success(null);
@@ -642,6 +671,73 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		criteria.andIdEqualTo(id);
 		List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
 		return agentBusInfos;
+	}
+
+
+	@Override
+	public AgentResult completAllAgentBusInfoCompany() {
+		List<String> agentS = agentBusInfoMapper.queryAgentHaveMutPayCompany();
+		StringBuffer sb = new StringBuffer();
+		agentS.forEach(
+				agentId -> {
+					try {
+						AgentResult res = agentBusinfoService.completAgentBusInfoCompany(agentId);
+						sb.append("[修复打款公司"+agentId+":"+res.getMsg()+"]");
+					} catch (Exception e) {
+						e.printStackTrace();
+						logger.error("[修复打款公司"+agentId+":"+e.getLocalizedMessage()+"]");
+					}
+				}
+		);
+		logger.info(sb.toString());
+		return AgentResult.ok();
+	}
+
+	@Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
+	@Override
+	public AgentResult completAgentBusInfoCompany(String agentId) throws Exception{
+
+		//如果 公户收款，开票，瑞银信出款，缺一不可
+		//如果公户，不开票，非瑞银信出款
+		//如果私户，不可能开票，非瑞银信出款
+		//检查收款账户是否是对公 开票 修复打款公司为瑞银信打款公司(Q000029564)
+		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+		agentBusInfoExample.or().andAgentIdEqualTo(agentId).andStatusEqualTo(Status.STATUS_1.status).andCloPayCompanyIsNotNull();
+		agentBusInfoExample.setOrderByClause(" C_UTIME desc");
+		List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+		//分组统计
+		Map<String,Long> group = agentBusInfoList.stream().collect(Collectors.groupingBy(AgentBusInfo::getCloPayCompany,Collectors.counting()));
+		logger.info("分组结果：{}",group);
+		Iterator<String> ite = group.keySet().iterator();
+		Long a = 0L; String comp=null;
+		//取出最多的打款公司
+		while (ite.hasNext()){
+			String cop = ite.next();
+			if(group.get(cop)>a){a=group.get(cop);comp=cop;}else{}
+		}
+
+		final String c = comp;
+		logger.info("分组结果：{}，最大值：{}",group,comp);
+		if(StringUtils.isNotEmpty(c)) {
+			//更新为company
+		    agentBusInfoExample = new AgentBusInfoExample();
+			agentBusInfoExample.or().andAgentIdEqualTo(agentId).andStatusEqualTo(Status.STATUS_1.status).andCloPayCompanyNotEqualTo(c);
+			agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+			if(agentBusInfoList.size()>0) {
+				agentBusInfoList.forEach(agentBusInfo -> {
+					agentDataHistoryService.saveDataHistory(agentBusInfo,agentBusInfo.getId(),DataHistoryType.BUSINESS.code,"-1",agentBusInfo.getVersion());
+					logger.info("分组结果：{}，最大值：{},更新{}",group,c,agentBusInfo.getId());
+					agentBusInfo.setCloPayCompany(c);
+					if (1 != agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)) {
+						logger.info("更新打开公司失败");
+					}
+				});
+				return AgentResult.ok();
+			}else{
+				return AgentResult.ok();
+			}
+		}
+		return AgentResult.fail();
 	}
 }
 

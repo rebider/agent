@@ -63,6 +63,8 @@
     <dubbo:service interface="com.ryx.credit.service.agent.AgentQuitRefundService" ref="agentQuitRefundService" timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.agent.CapitalChangeApplyService" ref="capitalChangeApplyService" timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.agent.CapitalFlowService" ref="capitalFlowService" timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.agent.ColinfoTaskService" ref="colinfoTaskService" timeout="1200000" registry="${zk.group}"/>
+
 
     <dubbo:reference interface="com.ryx.credit.service.ActivityService" id="activityService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.ActUtilService" id="actUtilService"  timeout="1200000" registry="${zk.group}" check="false" />
@@ -126,10 +128,12 @@
     <dubbo:service interface="com.ryx.credit.service.order.NewOrderImportService" ref="newOrderImportService" timeout="1200000" registry="${zk.group}" />
     <dubbo:service interface="com.ryx.credit.service.order.OldCompensateService" ref="oldCompensateService"  timeout="1200000" registry="${zk.group}" />
     <dubbo:service interface="com.ryx.credit.service.CRoleService" ref="cRoleService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.credit.service.NotifyEmailService" ref="notifyEmailService"  timeout="1200000" registry="${zk.group}" />
 
 
   <!--  <dubbo:service interface="com.ryx.credit.service.order.OldOrderReturnService" ref="oldOrderReturnService"  timeout="1200000" registry="${zk.group}" />
     <dubbo:service interface="com.ryx.credit.service.order.NewOrderImportService" ref="newOrderImportService" timeout="1200000" registry="${zk.group}" />-->
     <dubbo:service interface="com.ryx.credit.service.profit.IPosProfitDataService" ref="posProfitDataService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:reference interface="com.ryx.credit.profit.service.BusiPlatService" id="busiPlatService"  timeout="1200000" registry="${zk.group}" check="false" />
 
 </beans>

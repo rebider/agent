@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.common.enumc.TerminalPlatformType;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.HttpClientUtil;
@@ -17,6 +18,7 @@ import com.ryx.credit.pojo.admin.agent.PlatForm;
 import com.ryx.credit.service.agent.PosOrgStatisticsService;
 import com.ryx.credit.util.Constants;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +45,16 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
         PlatForm platForm = platFormMapper.selectByPlatFormNum(busPlatform);
         String platformType = platForm.getPlatformType();
         AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
+        if(StringUtils.isBlank(busId)){
+            throw new MessageException("业务ID不存在");
+        }
+        if(StringUtils.isBlank(agentBusInfo.getBusParent())){
+            throw new MessageException("上级不能为空");
+        }
         AgentBusInfo parentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
+        if(parentBusInfo==null){
+            throw new MessageException("上级不能为空");
+        }
         if(PlatformType.MPOS.getValue().equals(platformType)){
             AgentResult agentResult = httpForMpos(orgId,parentBusInfo.getBusNum(),termType);
             agentResult.setMsg(platformType);
@@ -56,7 +67,7 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
         return AgentResult.fail();
     }
 
-    public AgentResult httpForPos(String orgId,String supDorgId)throws Exception{
+    public static AgentResult httpForPos(String orgId,String supDorgId)throws Exception{
         try {
             String cooperator = com.ryx.credit.util.Constants.cooperator;
             String charset = "UTF-8"; // 字符集
@@ -119,6 +130,8 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
                     Map<String, Object> resultMap = new HashMap<>();
                     if(respType.equals("S")){
                         resultMap = JSONArray.parseObject(String.valueOf(respXMLMap.get("data")));
+                    }else{
+                        return AgentResult.failObj(String.valueOf(respXMLMap.get("respMsg")));
                     }
                     return AgentResult.ok(resultMap);
                 }
@@ -131,7 +144,7 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
         }
     }
 
-    private AgentResult httpForMpos(String orgId,String parentAgencyId,String termType)throws Exception{
+    private static AgentResult httpForMpos(String orgId,String parentAgencyId,String termType)throws Exception{
         try {
             Map<String, String> map = new HashMap<>();
             map.put("agencyId",orgId);
@@ -166,4 +179,5 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
         }
         return AgentResult.fail();
     }
+
 }

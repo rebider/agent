@@ -35,6 +35,10 @@ public class AgentNotifyVo implements Serializable{
     private String loginName;
     private String remark;
     private java.util.List<String> batchIds;
+    private String debitTop;
+    private String ckDebitRate;
+    private String lowDebitRate;
+    private String activityType;
 
     public String getUniqueId() {
         return uniqueId;
@@ -194,5 +198,37 @@ public class AgentNotifyVo implements Serializable{
 
     public void setBatchIds(List<String> batchIds) {
         this.batchIds = batchIds;
+    }
+
+    public String getDebitTop() {
+        return debitTop;
+    }
+
+    public void setDebitTop(String debitTop) {
+        this.debitTop = debitTop;
+    }
+
+    public String getCkDebitRate() {
+        return ckDebitRate;
+    }
+
+    public void setCkDebitRate(String ckDebitRate) {
+        this.ckDebitRate = ckDebitRate;
+    }
+
+    public String getLowDebitRate() {
+        return lowDebitRate;
+    }
+
+    public void setLowDebitRate(String lowDebitRate) {
+        this.lowDebitRate = lowDebitRate;
+    }
+
+    public String getActivityType() {
+        return activityType;
+    }
+
+    public void setActivityType(String activityType) {
+        this.activityType = activityType;
     }
 }

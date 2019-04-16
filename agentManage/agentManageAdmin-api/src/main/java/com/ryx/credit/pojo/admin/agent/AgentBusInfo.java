@@ -75,6 +75,12 @@ public class AgentBusInfo implements Serializable {
 
     private String busLoginNum;
 
+    private String debitRateLower;
+
+    private String debitCapping;
+
+    private String debitAppearRate;
+
     private List<Attachment> attachmentList;
 
     private List<AgentColinfo> agentColinfoList;
@@ -405,5 +411,29 @@ public class AgentBusInfo implements Serializable {
 
     public void setParentInfo(Map<String, Object> parentInfo) {
         this.parentInfo = parentInfo;
+    }
+
+    public String getDebitRateLower() {
+        return debitRateLower;
+    }
+
+    public void setDebitRateLower(String debitRateLower) {
+        this.debitRateLower = debitRateLower;
+    }
+
+    public String getDebitCapping() {
+        return debitCapping;
+    }
+
+    public void setDebitCapping(String debitCapping) {
+        this.debitCapping = debitCapping;
+    }
+
+    public String getDebitAppearRate() {
+        return debitAppearRate;
+    }
+
+    public void setDebitAppearRate(String debitAppearRate) {
+        this.debitAppearRate = debitAppearRate;
     }
 }

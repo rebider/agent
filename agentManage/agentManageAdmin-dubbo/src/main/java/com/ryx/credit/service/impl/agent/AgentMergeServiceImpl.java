@@ -319,6 +319,9 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             agentMergeBusInfo.setBusScope(agentBusInfo.getBusScope());
             agentMergeBusInfo.setDredgeS0(agentBusInfo.getDredgeS0());
             agentMergeBusInfo.setBusLoginNum(agentBusInfo.getBusLoginNum());
+            agentMergeBusInfo.setDebitAppearRate(agentBusInfo.getDebitAppearRate());
+            agentMergeBusInfo.setDebitCapping(agentBusInfo.getDebitCapping());
+            agentMergeBusInfo.setDebitRateLower(agentBusInfo.getDebitRateLower());
             agentMergeBusInfoMapper.insertSelective(agentMergeBusInfo);
         }
 
@@ -1180,6 +1183,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
 
                 agentNotifyVo.setOrgName(agentName);
+                agentNotifyVo.setActivityType(platForm.getPosanameprefix());
                 AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentMergeBusInfo.getBusId());
                 Agent agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
                 agentNotifyVo.setUniqueId(agentBusInfo.getId());

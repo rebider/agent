@@ -45,6 +45,7 @@
     <dubbo:reference interface="com.ryx.credit.service.order.OldOrderReturnService" id="oldOrderReturnService"  timeout="1200000" registry="${zk.group}" />
     <dubbo:reference interface="com.ryx.credit.service.order.OldCompensateService" id="oldCompensateService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.CRoleService" id="cRoleService"  timeout="1200000" registry="${zk.group}" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.NotifyEmailService" id="notifyEmailService"  timeout="1200000" registry="${zk.group}" check="false"/>
 
     <dubbo:reference interface="com.ryx.credit.profit.service.IAgentRelateService" id="agentRelateService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.profit.service.IProfitCityApplicationService" id="profitCityApplicationService"  timeout="1200000" registry="${zk.group}" check="false"/>

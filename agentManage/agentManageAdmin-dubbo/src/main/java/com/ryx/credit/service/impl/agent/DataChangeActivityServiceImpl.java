@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -70,6 +71,8 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     private CapitalMapper capitalMapper;
     @Autowired
     private CapitalFlowService capitalFlowService;
+    @Autowired
+    private DataChangeActivityService dataChangeActivityService;
 
 
 
@@ -283,7 +286,17 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             }
                         }
 
-                        ResultVO res = agentEnterService.updateAgentVo(vo,rel.getcUser());
+                        ResultVO res = agentEnterService.updateAgentVo(vo,rel.getcUser(),true);
+                        for (AgentBusInfoVo agentBusInfoVo : vo.getEditDebitList()) {
+                            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                            agentBusInfoVo.setId(agentBusInfoVo.getId());
+                            agentBusInfoVo.setVersion(agentBusInfo.getVersion());
+                            agentBusInfoVo.setcUtime(new Date());
+                            int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfoVo);
+                            if(i!=1){
+                                throw new ProcessException("更新借记费率等信息失败");
+                            }
+                        }
                         logger.info("========审批流完成{}业务{}状态{},结果{}", proIns, rel.getBusType(), agStatus, res.getResInfo());
                         //更新数据状态为审批成功
                         if(res.isSuccess()){
@@ -378,9 +391,13 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                 throw new ProcessException("部门参数为空");
             }
             Map<String, Object> stringObjectMap = orgCodeRes.get(0);
-            String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+            String orgCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+            DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(agentVo.getAgentBusId());
+            if(null==dateChangeRequest){
+                throw new ProcessException("数据错误");
+            }
             //财务审批
-            if(orgId.equals("222")){
+            if(orgCode.equals("finance")){
 //                财务填写实际到账金额
                 for (CapitalVo  capitalVo:agentVo.getCapitalVoList()){
                     if (capitalVo.getcPayType().equals(PayType.YHHK.code)){
@@ -388,22 +405,15 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             logger.info("请填写实际到账金额");
                             throw new ProcessException("请填写实际到账金额");
                         }
+                        if (StringUtils.isNotBlank(capitalVo.getTime())){
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                            Date cPaytime = sdf.parse(capitalVo.getTime());
+                            capitalVo.setcPaytime(cPaytime);
+                        }
+                        if(null!=capitalVo.getcInAmount()){
+                            capitalVo.setcFqInAmount(capitalVo.getcInAmount());
+                        }
                     }
-                    Capital capital = capitalMapper.selectByPrimaryKey(capitalVo.getId());
-                    capitalVo.setcUtime(new Date());
-                    capitalVo.setVersion(capital.getVersion());
-                    capitalVo.setcInAmount(capitalVo.getcInAmount());
-                    capitalVo.setcFqInAmount(capitalVo.getcInAmount());
-                    capitalVo.setId(capitalVo.getId());
-                    int i = capitalMapper.updateByPrimaryKeySelective(capitalVo);
-                    if(i!=1){
-                        logger.info("实际到账金额填写失败");
-                        throw new ProcessException("实际到账金额填写失败");
-                    }
-                }
-                DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(agentVo.getAgentBusId());
-                if(null==dateChangeRequest){
-                    throw new ProcessException("数据错误");
                 }
                 //数据修改
                 if(dateChangeRequest.getDataType().equals(DataChangeApyType.DC_Agent.name())){
@@ -413,14 +423,30 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                     }
                     vo.setDebt(agentVo.getDebt());
                     vo.setOweTicket(agentVo.getOweTicket());
+                    if(orgCode.equals("finance")){
+                        vo.setCapitalVoList(agentVo.getCapitalVoList());
+                    }
                     String voJson = JSONObject.toJSONString(vo);
                     dateChangeRequest.setDataContent(voJson);
-                    int i = dateChangeRequestMapper.updateByPrimaryKeySelective(dateChangeRequest);
+                    int i = dataChangeActivityService.updateByPrimaryKeySelective(dateChangeRequest);
+                    if(i!=1){
+                        throw new ProcessException("处理任务：更新失败");
+                    }
+                }
+            }else if(orgCode.equals("business")){
+                //数据修改
+                if(dateChangeRequest.getDataType().equals(DataChangeApyType.DC_Agent.name())){
+                    AgentVo vo = JSONObject.parseObject(dateChangeRequest.getDataContent(), AgentVo.class);
+                    vo.setEditDebitList(agentVo.getEditDebitList());
+                    String voJson = JSONObject.toJSONString(vo);
+                    dateChangeRequest.setDataContent(voJson);
+                    int i = dataChangeActivityService.updateByPrimaryKeySelective(dateChangeRequest);
                     if(i!=1){
                         throw new ProcessException("处理任务：更新失败");
                     }
                 }
             }
+
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
             if(!result.isOK()){
                 logger.error(result.getMsg());
@@ -433,4 +459,10 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         return AgentResult.ok();
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public int updateByPrimaryKeySelective(DateChangeRequest dateChangeRequest){
+        int i = dateChangeRequestMapper.updateByPrimaryKeySelective(dateChangeRequest);
+        return i;
+    }
 }

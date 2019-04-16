@@ -411,11 +411,11 @@ public class AimportServiceImpl implements AimportService {
                             c.setVersion(capital.getVersion());
                             capitalMapper.updateByPrimaryKeySelective(c);
                         }else{
-                            AgentResult result = accountPaidItemService.insertAccountPaid(capital,Arrays.asList(),userid);
+                            AgentResult result = accountPaidItemService.insertAccountPaid(capital,Arrays.asList(),userid,false);
                             if(null==result || !result.isOK())throw new ProcessException("代理商交款导入失败"+result.getMsg());
                         }
                     }else{
-                        AgentResult result = accountPaidItemService.insertAccountPaid(capital,Arrays.asList(),userid);
+                        AgentResult result = accountPaidItemService.insertAccountPaid(capital,Arrays.asList(),userid,false);
                         if(null==result || !result.isOK())throw new ProcessException("代理商交款导入失败"+result.getMsg());
                     }
                     ImportAgent payment =  importAgentMapper.selectByPrimaryKey(datum.getId());
@@ -591,6 +591,10 @@ public class AimportServiceImpl implements AimportService {
                         agentBusInfoExample.or()
                                 .andAgentIdEqualTo(busItem.getAgentId())
                                 .andBusPlatformEqualTo(busItem.getBusPlatform())
+                                .andStatusEqualTo(Status.STATUS_1.status);
+                        agentBusInfoExample.or()
+                                .andAgentIdEqualTo(busItem.getAgentId())
+                                .andBusPlatformEqualTo(busItem.getBusNum())
                                 .andStatusEqualTo(Status.STATUS_1.status);
                         List<AgentBusInfo> agentBusInfoExamplelist = agentBusInfoMapper.selectByExample(agentBusInfoExample);
 

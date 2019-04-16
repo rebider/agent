@@ -101,7 +101,7 @@ public class AgentVo implements Serializable {
     private String remitTimeStr;
     private String remitPerson;
     private BigDecimal remitAmt;
-
+    private List<AgentBusInfoVo> editDebitList;
 
     public String getOperationType() {
         return operationType;
@@ -588,5 +588,13 @@ public class AgentVo implements Serializable {
 
     public void setRemitAmt(BigDecimal remitAmt) {
         this.remitAmt = remitAmt;
+    }
+
+    public List<AgentBusInfoVo> getEditDebitList() {
+        return editDebitList;
+    }
+
+    public void setEditDebitList(List<AgentBusInfoVo> editDebitList) {
+        this.editDebitList = editDebitList;
     }
 }

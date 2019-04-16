@@ -51,6 +51,7 @@
   </sql>
     <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs"
             parameterType="com.ryx.credit.pojo.admin.agent.DataHistoryExample">
+        <include refid="OracleDialectPrefix"/>
         select
         <if test="distinct">
             distinct
@@ -65,6 +66,7 @@
         <if test="orderByClause != null">
             order by ${orderByClause}
         </if>
+        <include refid="OracleDialectSuffix"/>
     </select>
     <select id="selectByExample" resultMap="BaseResultMap"
             parameterType="com.ryx.credit.pojo.admin.agent.DataHistoryExample">
