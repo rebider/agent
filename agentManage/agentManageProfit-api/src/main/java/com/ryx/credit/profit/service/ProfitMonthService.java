@@ -204,5 +204,6 @@ public interface ProfitMonthService {
      */
     List<Map<String,Object>> exportByF(Map<String, Object> param);
 
+    List<ProfitDetailMonth> byProfitDetailMonth(ProfitDetailMonthExample profitDetailMonthExample);
 
 }

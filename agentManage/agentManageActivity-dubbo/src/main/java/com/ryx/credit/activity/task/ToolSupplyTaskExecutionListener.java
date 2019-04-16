@@ -1,6 +1,9 @@
 package com.ryx.credit.activity.task;
 
 import com.ryx.credit.activity.task.taskListenterCommon.TaskListenterCommon;
+import com.ryx.credit.common.enumc.AgStatus;
+import com.ryx.credit.profit.service.ToolsDeductService;
+import com.ryx.credit.spring.MySpringContextHandler;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.DelegateTask;
 import org.activiti.engine.delegate.ExecutionListener;
@@ -27,16 +30,17 @@ public class ToolSupplyTaskExecutionListener implements TaskListener, ExecutionL
         } else if ("end".equals(eventName)) {
             String activityName = delegateExecution.getCurrentActivityName();
             //数据变更服务类
-          /*  TerminalTransferService terminalTransferService = (TerminalTransferService) MySpringContextHandler.applicationContext.getBean("terminalTransferService");*/
-            //审批拒绝
+            //数据变更服务类
+            ToolsDeductService toolsDeductService = (ToolsDeductService) MySpringContextHandler.applicationContext.getBean("toolsDeductService");
+            //省区审批拒绝
             if ("reject_end".equals(activityName)) {
-              /* *//* AgentResult res = terminalTransferService.compressTerminalTransferActivity(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.status);*//*
-                logger.info("=========TerminalTransferTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());*/
+                toolsDeductService.updateStatus(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.name(),"01");
+                logger.info("=========TerminalTransferTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName);
             }
             //审批同意更新数据库
             if ("finish_end".equals(activityName)) {
-               /* AgentResult res = terminalTransferService.compressTerminalTransferActivity(delegateExecution.getProcessInstanceId(), AgStatus.Approved.status);
-                logger.info("=========TerminalTransferTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());*/
+                toolsDeductService.updateStatus(delegateExecution.getProcessInstanceId(), AgStatus.Approved.name(),"02");
+                logger.info("=========TerminalTransferTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName);
             }
         } else if ("take".equals(eventName)) {
             logger.info("take=========" + "ActivityId:" + delegateExecution.getCurrentActivityId() + "  ProcessInstanceId:" + delegateExecution.getProcessInstanceId() + "  Execution:" + delegateExecution.getId());
