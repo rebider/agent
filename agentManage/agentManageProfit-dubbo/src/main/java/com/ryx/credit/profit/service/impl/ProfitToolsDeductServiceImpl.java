@@ -400,11 +400,17 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
         ProfitDetailMonth profitDetailMonth =  profitDetailMonthList.get(0);
         //上级代理商的月份润
         BigDecimal basicAmt = profitDetailMonth.getBasicsProfitAmt();
-        //需要上级代扣的款项
-        BigDecimal upSupplyAmt = pToolSupply.getToolsInvoiceAmt().subtract(pToolSupply.getRemitAmt());
-
         //线下补款
         profitDeduction.setRev2(pToolSupply.getRemitAmt().toString());
+        //需要上级代扣的款项
+        BigDecimal upSupplyAmt = BigDecimal.ZERO;
+        if(pToolSupply.getParenterSupplyAmt().compareTo(BigDecimal.ZERO)!=0){
+            //需要上级代扣的款项
+              upSupplyAmt = pToolSupply.getToolsInvoiceAmt().subtract(pToolSupply.getRemitAmt());
+        }
+
+
+
         //上级代扣明细
         ProfitDeduction insertup = new ProfitDeduction();
         if (upSupplyAmt.compareTo(BigDecimal.ZERO)==1){
