@@ -194,6 +194,23 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     }
 
     @Override
+    public AgentBusInfo findByAgentId(String id) {
+        AgentBusInfo agentBusInfo = null;
+        if (StringUtils.isBlank(id)) {
+            return agentBusInfo;
+        } else {
+            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+            AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andAgentIdEqualTo(id);
+            List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+            if (null!=agentBusInfos && agentBusInfos.size()>0){
+                agentBusInfo=agentBusInfos.get(0);
+            }
+
+        }
+        return agentBusInfo;
+    }
+
+    @Override
     public int updateByPrimaryKeySelective(AgentBusInfo agentBusInfo) {
         if (StringUtils.isBlank(agentBusInfo.getId())) {
             return 0;
@@ -446,6 +463,26 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             e.printStackTrace();
         } finally {
             agentNotifyService.asynNotifyPlatform();
+        }
+        return i;
+    }
+
+    @Override
+    public int updateCompany(AgentBusInfo agentBusInfo, String userId) throws MessageException {
+        int i=0;
+        AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+        AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andAgentIdEqualTo(agentBusInfo.getAgentId());
+        List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+        if (null!=agentBusInfos && agentBusInfos.size()>0){
+            for (AgentBusInfo busInfo : agentBusInfos) {
+                AgentBusInfo agBusInfo = new AgentBusInfo();
+                agBusInfo.setId(busInfo.getId());
+                agBusInfo.setcUtime(Calendar.getInstance().getTime());
+                agBusInfo.setVersion(busInfo.getVersion());
+                agBusInfo.setCloPayCompany(agentBusInfo.getCloPayCompany());
+                 i=agentBusInfoMapper.updateByPrimaryKeySelective(agBusInfo);
+                agentDataHistoryService.saveDataHistory(busInfo, DataHistoryType.BUSINESS.getValue());
+            }
         }
         return i;
     }
