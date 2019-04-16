@@ -156,7 +156,7 @@ public class NewProfitDataJob {
      */
     private void insertTransProfitDetail(Map<String, Object> agentMap, JSONObject profitData, String settleMonth,List<Map<String,String>> mapList) {
         TransProfitDetail transProfitDetail = new TransProfitDetail();
-        if(mapList.size() != 0){
+        if(mapList.size() > 0){
             Map<String,String> map = mapList.get(0);
             transProfitDetail.setRemark("合并");
             transProfitDetail.setAgentId( map.get("MAIN_AGENT_ID"));
