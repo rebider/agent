@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.PRemitInfoMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.PRemitInfo">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="IN_ACCOUNT_TYPE" jdbcType="VARCHAR" property="inAccountType" />
+    <result column="IN_ACCOUNT_NAME" jdbcType="VARCHAR" property="inAccountName" />
+    <result column="OUT_ACCOUNT" jdbcType="VARCHAR" property="outAccount" />
+    <result column="OUT_ACCOUNT_BANK" jdbcType="VARCHAR" property="outAccountBank" />
+    <result column="REMIT_AMT" jdbcType="DECIMAL" property="remitAmt" />
+    <result column="FILE_NAME" jdbcType="VARCHAR" property="fileName" />
+    <result column="FILE_PATH" jdbcType="VARCHAR" property="filePath" />
+    <result column="REMIT_DATE" jdbcType="TIMESTAMP" property="remitDate" />
+    <result column="CITY_SUPPLY_ID" jdbcType="VARCHAR" property="citySupplyId" />
+    <result column="REV1" jdbcType="VARCHAR" property="rev1" />
+    <result column="REV2" jdbcType="VARCHAR" property="rev2" />
+    <result column="REV3" jdbcType="VARCHAR" property="rev3" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, IN_ACCOUNT_TYPE, IN_ACCOUNT_NAME, OUT_ACCOUNT, OUT_ACCOUNT_BANK, REMIT_AMT, FILE_NAME, 
+    FILE_PATH, REMIT_DATE, CITY_SUPPLY_ID, REV1, REV2, REV3
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PRemitInfoExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_REMIT_INFO
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from P_REMIT_INFO
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PRemitInfoExample">
+    delete from P_REMIT_INFO
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PRemitInfo">
+    insert into P_REMIT_INFO (ID, IN_ACCOUNT_TYPE, IN_ACCOUNT_NAME, 
+      OUT_ACCOUNT, OUT_ACCOUNT_BANK, REMIT_AMT, 
+      FILE_NAME, FILE_PATH, REMIT_DATE, 
+      CITY_SUPPLY_ID, REV1, REV2, 
+      REV3)
+    values (#{id,jdbcType=VARCHAR}, #{inAccountType,jdbcType=VARCHAR}, #{inAccountName,jdbcType=VARCHAR}, 
+      #{outAccount,jdbcType=VARCHAR}, #{outAccountBank,jdbcType=VARCHAR}, #{remitAmt,jdbcType=DECIMAL}, 
+      #{fileName,jdbcType=VARCHAR}, #{filePath,jdbcType=VARCHAR}, #{remitDate,jdbcType=TIMESTAMP}, 
+      #{citySupplyId,jdbcType=VARCHAR}, #{rev1,jdbcType=VARCHAR}, #{rev2,jdbcType=VARCHAR}, 
+      #{rev3,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PRemitInfo">
+    insert into P_REMIT_INFO
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="inAccountType != null">
+        IN_ACCOUNT_TYPE,
+      </if>
+      <if test="inAccountName != null">
+        IN_ACCOUNT_NAME,
+      </if>
+      <if test="outAccount != null">
+        OUT_ACCOUNT,
+      </if>
+      <if test="outAccountBank != null">
+        OUT_ACCOUNT_BANK,
+      </if>
+      <if test="remitAmt != null">
+        REMIT_AMT,
+      </if>
+      <if test="fileName != null">
+        FILE_NAME,
+      </if>
+      <if test="filePath != null">
+        FILE_PATH,
+      </if>
+      <if test="remitDate != null">
+        REMIT_DATE,
+      </if>
+      <if test="citySupplyId != null">
+        CITY_SUPPLY_ID,
+      </if>
+      <if test="rev1 != null">
+        REV1,
+      </if>
+      <if test="rev2 != null">
+        REV2,
+      </if>
+      <if test="rev3 != null">
+        REV3,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="inAccountType != null">
+        #{inAccountType,jdbcType=VARCHAR},
+      </if>
+      <if test="inAccountName != null">
+        #{inAccountName,jdbcType=VARCHAR},
+      </if>
+      <if test="outAccount != null">
+        #{outAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="outAccountBank != null">
+        #{outAccountBank,jdbcType=VARCHAR},
+      </if>
+      <if test="remitAmt != null">
+        #{remitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="fileName != null">
+        #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="filePath != null">
+        #{filePath,jdbcType=VARCHAR},
+      </if>
+      <if test="remitDate != null">
+        #{remitDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="citySupplyId != null">
+        #{citySupplyId,jdbcType=VARCHAR},
+      </if>
+      <if test="rev1 != null">
+        #{rev1,jdbcType=VARCHAR},
+      </if>
+      <if test="rev2 != null">
+        #{rev2,jdbcType=VARCHAR},
+      </if>
+      <if test="rev3 != null">
+        #{rev3,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PRemitInfoExample" resultType="java.lang.Long">
+    select count(*) from P_REMIT_INFO
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PRemitInfo">
+    update P_REMIT_INFO
+    <set>
+      <if test="inAccountType != null">
+        IN_ACCOUNT_TYPE = #{inAccountType,jdbcType=VARCHAR},
+      </if>
+      <if test="inAccountName != null">
+        IN_ACCOUNT_NAME = #{inAccountName,jdbcType=VARCHAR},
+      </if>
+      <if test="outAccount != null">
+        OUT_ACCOUNT = #{outAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="outAccountBank != null">
+        OUT_ACCOUNT_BANK = #{outAccountBank,jdbcType=VARCHAR},
+      </if>
+      <if test="remitAmt != null">
+        REMIT_AMT = #{remitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="fileName != null">
+        FILE_NAME = #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="filePath != null">
+        FILE_PATH = #{filePath,jdbcType=VARCHAR},
+      </if>
+      <if test="remitDate != null">
+        REMIT_DATE = #{remitDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="citySupplyId != null">
+        CITY_SUPPLY_ID = #{citySupplyId,jdbcType=VARCHAR},
+      </if>
+      <if test="rev1 != null">
+        REV1 = #{rev1,jdbcType=VARCHAR},
+      </if>
+      <if test="rev2 != null">
+        REV2 = #{rev2,jdbcType=VARCHAR},
+      </if>
+      <if test="rev3 != null">
+        REV3 = #{rev3,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.PRemitInfo">
+    update P_REMIT_INFO
+    set IN_ACCOUNT_TYPE = #{inAccountType,jdbcType=VARCHAR},
+      IN_ACCOUNT_NAME = #{inAccountName,jdbcType=VARCHAR},
+      OUT_ACCOUNT = #{outAccount,jdbcType=VARCHAR},
+      OUT_ACCOUNT_BANK = #{outAccountBank,jdbcType=VARCHAR},
+      REMIT_AMT = #{remitAmt,jdbcType=DECIMAL},
+      FILE_NAME = #{fileName,jdbcType=VARCHAR},
+      FILE_PATH = #{filePath,jdbcType=VARCHAR},
+      REMIT_DATE = #{remitDate,jdbcType=TIMESTAMP},
+      CITY_SUPPLY_ID = #{citySupplyId,jdbcType=VARCHAR},
+      REV1 = #{rev1,jdbcType=VARCHAR},
+      REV2 = #{rev2,jdbcType=VARCHAR},
+      REV3 = #{rev3,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>
