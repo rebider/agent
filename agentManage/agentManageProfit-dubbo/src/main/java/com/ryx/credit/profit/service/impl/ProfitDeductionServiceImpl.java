@@ -1042,4 +1042,18 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         return list;
     }
 
+    /**
+     * 获取代理商各业务平台机具未扣款、分润数据
+     * @param agentId
+     * @param profitMonth
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> getPorfitDataByAgentIdAndProfitMonth(String agentId, String profitMonth) {
+        if (StringUtils.isBlank(agentId)||StringUtils.isBlank(profitMonth)){
+            logger.info("传参异常：agentId==="+agentId+",profitMonth==="+profitMonth);
+            return null;
+        }
+        return profitDeductionMapper.getPorfitDataByAgentIdAndProfitMonth(agentId,profitMonth);
+    }
 }
