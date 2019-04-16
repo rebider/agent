@@ -16,7 +16,7 @@
     <job:simple id="agentLoginAccountCreate"
                 job-ref="agentLoginAccountCreateJob"
                 registry-center-ref="regCenter"
-                cron="0 0/10 * * * ?"
+                cron="0 30 0 * * ?"
                 overwrite="true"
                 description="代理商账号补全任务"
                 sharding-total-count="1"
