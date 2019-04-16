@@ -11,7 +11,7 @@
                         http://www.dangdang.com/schema/ddframe/job/job.xsd
                         ">
     <!--configure registry center -->
-    <reg:zookeeper id="regCenter" server-lists="${zk.server}" namespace="agentManage-job" base-sleep-time-milliseconds="1000" max-sleep-time-milliseconds="3000" max-retries="3" />
+    <reg:zookeeper id="regCenter" server-lists="${zk.server}" namespace="agentManage-job" base-sleep-time-milliseconds="1000" max-sleep-time-milliseconds="3000" max-retries="0" />
     <!--代理商账户完善任务-->
     <job:simple id="agentLoginAccountCreate"
                 job-ref="agentLoginAccountCreateJob"
