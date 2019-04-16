@@ -1,5 +1,8 @@
 package com.ryx.credit.profit.dao;
 
+import com.ryx.credit.profit.pojo.PRemitInfo;
+import com.ryx.credit.profit.pojo.PRemitInfoExample;
+
 import java.util.List;
 
 public interface PRemitInfoMapper {
