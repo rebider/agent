@@ -7,6 +7,7 @@ import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.profit.dao.*;
+import com.ryx.credit.profit.enums.CitySupplyStatus;
 import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.*;
@@ -522,6 +523,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             PToolSupplyExample pToolSupplyExample = new PToolSupplyExample();
             PToolSupplyExample.Criteria criteria = pToolSupplyExample.createCriteria();
             criteria.andProfitDateEqualTo(profitDate);
+            criteria.andExaminrStatusEqualTo(CitySupplyStatus.STATUS_02.code);
             List<PToolSupply> pToolSupplies = pToolSupplyMapper.selectByExample(pToolSupplyExample);
             for (PToolSupply pToolSupply:pToolSupplies) {
                 Map<String, Object> map = new HashMap<>(10);
