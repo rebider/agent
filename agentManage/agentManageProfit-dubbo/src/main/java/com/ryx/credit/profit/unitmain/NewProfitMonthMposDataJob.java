@@ -170,7 +170,7 @@ public class NewProfitMonthMposDataJob {
             //本月之前通过的合并关系
             String mergeDate = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()).toString();
             List<Map<String,String>> mapList = transProfitDetailMapper.selectByBusNum(mergeDate,json.getString("AGENCYID"));
-            if(mapList == null){ //有合并关系
+            if(mapList.size() >0){ //有合并关系
                 Map<String,String> map = mapList.get(0);
                 detail.setRemark("合并");
                 detail.setAgentId(map.get("MAIN_AGENT_ID"));//合并代理商AG码
