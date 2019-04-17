@@ -594,7 +594,7 @@
         and pdd.REMARK like #{remark}
     </select>
 
-    <update id="clearComputData">
+    <update id="clearComputData" parameterType="java.lang.String">
         update P_DEDUCTION set ACTUAL_DEDUCTION_AMT=0,NOT_DEDUCTION_AMT=0
         where DEDUCTION_DATE = '${profitDate}' and DEDUCTION_TYPE='${decutionType}'
     </update>

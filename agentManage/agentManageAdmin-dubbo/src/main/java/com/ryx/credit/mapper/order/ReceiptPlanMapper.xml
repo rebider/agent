@@ -394,7 +394,7 @@
           and R.return_order_detail_id in ( select id from o_return_order_detail where return_id = #{returnId} )
         </if>
         <if test="activityName!=null and activityName !=''"> and oso.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%')</if>
-        <if test="platform!=null and platform!=''"> and c.PLATFORM_NUM=#{platform} </if>
+        <if test="platform!=null and platform!=''"> and a_platform.PLATFORM_NUM=#{platform} </if>
         <if test="agUniqNum!=null and agUniqNum!=''"> and agent.AG_UNIQ_NUM=#{agUniqNum} </if>
         <if test="proType!=null and proType!=''"> and os.PRO_TYPE=#{proType}</if>
         <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>

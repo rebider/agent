@@ -136,7 +136,6 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
             if(String.valueOf(stringObjectMap.get("ORGANIZATIONCODE")).equals("agent")){
                 reqMap.put("userId",userId);
             }else{
-                reqMap.put("userId",userId);
                 reqMap.put("orgId", String.valueOf(stringObjectMap.get("ORGID")));
             }
         }

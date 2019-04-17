@@ -19,11 +19,11 @@ public class ExmpDistributedListener extends AbstractDistributeOnceElasticJobLis
 
     @Override
     public void doBeforeJobExecutedAtLastStarted(ShardingContexts shardingContexts) {
-        logger.info("分布式监听器开始……{}",shardingContexts.getJobName());
+        logger.debug("分布式监听器开始……{}",shardingContexts.getJobName());
     }
 
     @Override
     public void doAfterJobExecutedAtLastCompleted(ShardingContexts shardingContexts) {
-        logger.info("分布式监听器结束……{}",shardingContexts.getJobName());
+        logger.debug("分布式监听器结束……{}",shardingContexts.getJobName());
     }
 }

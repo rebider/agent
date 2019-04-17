@@ -199,7 +199,14 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             agentMerge.setuUser(cUser);
             agentMerge.setStatus(Status.STATUS_1.status);
             agentMerge.setVersion(Status.STATUS_1.status);
-
+            String strBusType = "";
+            for(int i=0;i<busType.length;i++){
+                strBusType+=busType[i];
+                if(i!=busType.length-1){
+                    strBusType+=",";
+                }
+            }
+            agentMerge.setMergeBusIds(strBusType);
             //主代理商和副代理商必须是标准一代或机构，副代理商且不能有下级
             mainAndSubMustHaveLower(agentMerge);
             //合并中不能重复发起,判断是否有欠票欠款情况
@@ -212,14 +219,6 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             } else {
                 agentMerge.setCloReviewStatus(AgStatus.Create.status);
             }
-            String strBusType = "";
-            for(int i=0;i<busType.length;i++){
-                strBusType+=busType[i];
-                if(i!=busType.length-1){
-                    strBusType+=",";
-                }
-            }
-            agentMerge.setMergeBusIds(strBusType);
             if (1 != agentMergeMapper.insertSelective(agentMerge)) {
                 logger.info("代理商合并提交审批，新增数据失败:{}", cUser);
                 throw new MessageException("代理商合并提交审批，新增数据失败！");
@@ -410,14 +409,18 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         if(subAgentBusInfos.size()==0){
             throw new MessageException("副代理商业务信息有误");
         }
-        for (AgentBusInfo subAgentBusInfo : subAgentBusInfos) {
-            if(!subAgentBusInfo.getBusType().equals(BusType.BZYD.key) && !subAgentBusInfo.getBusType().equals(BusType.JG.key)){
+        String strMergeBusIds = agentMerge.getMergeBusIds();
+        String[] mergeBusIds = strMergeBusIds.split(",");
+        for(int i=0;i<mergeBusIds.length;i++) {
+            String mergeBusId = mergeBusIds[i];
+            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(mergeBusId);
+            if(!agentBusInfo.getBusType().equals(BusType.BZYD.key) && !agentBusInfo.getBusType().equals(BusType.JG.key)){
                 throw new MessageException("副代理商不是标准一代或机构");
             }
-            if(StringUtils.isBlank(subAgentBusInfo.getBusNum())){
+            if(StringUtils.isBlank(agentBusInfo.getBusNum())){
                 throw new MessageException("副代理商业务平台未入网成功");
             }
-            List<AgentBusInfo> childLevelBusInfos = agentBusinfoService.queryChildLevelByBusNum(null, subAgentBusInfo.getBusPlatform(), subAgentBusInfo.getBusNum());
+            List<AgentBusInfo> childLevelBusInfos = agentBusinfoService.queryChildLevelByBusNum(null, agentBusInfo.getBusPlatform(), agentBusInfo.getBusNum());
             if(childLevelBusInfos.size()!=0){
                 throw new MessageException("副代理商不能有下级");
             }
@@ -898,13 +901,6 @@ public class AgentMergeServiceImpl implements AgentMergeService {
 
             agentMerge.setuTime(new Date());
             agentMerge.setuUser(cUser);
-            //主代理商和副代理商必须是标准一代或机构，副代理商且不能有下级
-            mainAndSubMustHaveLower(agentMerge);
-            //合并中不能重复发起,判断是否有欠票欠款情况
-            verifyMergeing(agentMerge,busType,oCashReceivables);
-            //补款、退货、补差价、下订单流程中、有未排单的、未发货的,不可以合并
-            verifypprovaling(agentMerge.getSubAgentId());
-
             String strBusType = "";
             for(int i=0;i<busType.length;i++){
                 strBusType+=busType[i];
@@ -913,6 +909,13 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 }
             }
             agentMerge.setMergeBusIds(strBusType);
+            //主代理商和副代理商必须是标准一代或机构，副代理商且不能有下级
+            mainAndSubMustHaveLower(agentMerge);
+            //合并中不能重复发起,判断是否有欠票欠款情况
+            verifyMergeing(agentMerge,busType,oCashReceivables);
+            //补款、退货、补差价、下订单流程中、有未排单的、未发货的,不可以合并
+            verifypprovaling(agentMerge.getSubAgentId());
+
             if (1 != agentMergeMapper.updateByPrimaryKeySelective(agentMerge)) {
                 logger.info("代理商合并修改审批，更新数据失败:{}", cUser);
                 throw new MessageException("更新合并数据失败！");
