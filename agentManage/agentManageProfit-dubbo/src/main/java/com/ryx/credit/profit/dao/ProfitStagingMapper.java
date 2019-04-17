@@ -27,9 +27,8 @@ public interface ProfitStagingMapper {
 
     ProfitStaging getNotDeductionAmt(Map<String, Object> param);
 
-    /**获取分期未扣款*/
-    ProfitStaging getNotDeductionAmtTwo(Map<String, String> param);
-
+    /**获取所有分期未扣款*/
+    BigDecimal getNotDeductionAmtTwo(Map<String, String> param);
 
 
 }

@@ -55,4 +55,6 @@ public interface ProfitDeductionMapper {
     void clearComputData(@Param("profitDate") String profitDate, @Param("decutionType") String decutionType);
 
     List<Map<String, Object>> getPorfitDataByAgentIdAndProfitMonth(@Param("agentId") String agentId, @Param("profitMonth") String profitMonth);
+    /**获取机具扣款欠款*/
+    BigDecimal getToolsDebt(Map<String,String> param);
 }
