@@ -111,4 +111,5 @@ public interface ToolsDeductService {
     List<PRemitInfo> brCitySupplyId(String citySupplyId);
 
     public AgentResult approvalToolSupplyTask(AgentVo agentVo, String userId) throws ProcessException;
+    public int updateByPrimaryKey(PRemitInfo pRemitInfo);
 }
