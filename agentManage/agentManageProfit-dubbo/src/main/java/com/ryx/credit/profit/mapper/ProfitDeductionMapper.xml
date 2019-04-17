@@ -616,7 +616,7 @@
     <select id="getPorfitDataByAgentIdAndProfitMonth" resultType="java.util.Map">
         select
            tpd.PROFIT_DATE ,
-           A_AGENT.AGENT_NAME ,
+           A_AGENT.AG_NAME ,
            tpd.AGENT_ID ,
            tpd.PARENT_AGENT_NAME ,
            tpd.PARENT_AGENT_ID ,
