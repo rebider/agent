@@ -30,4 +30,6 @@ public interface AgentColinfoMapper {
     List<AgentColinfo> queryBusConinfoList(String busId);
 
     List<Map<String,Object>> synConinfo(@Param("params") Map<String,Object> params);
+
+    List<String> queryAgentHaveColinfo();
 }

@@ -54,4 +54,6 @@ public interface AgentColinfoService {
     AgentResult updateAgentColinfo(AgentColinfo agentColinfo);
 
     AgentResult saveAgentColinfo(AgentColinfo agentColinfo);
+
+    AgentResult checkAgentColinfo();
 }

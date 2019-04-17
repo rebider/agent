@@ -4,6 +4,7 @@ import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
@@ -12,7 +13,6 @@ import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
 import com.ryx.credit.service.dict.IdService;
-import net.sf.ehcache.search.impl.BaseResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -532,4 +532,21 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         }
         return AgentResult.ok("新增成功！");
     }
+
+    /**
+     * 查询代理商是否有多个收款账户
+     * @return
+     */
+    @Override
+    public AgentResult checkAgentColinfo() {
+        List<String> haveColinfo = agentColinfoMapper.queryAgentHaveColinfo();
+        if (haveColinfo.size() > 0) {
+            StringBuffer sb = new StringBuffer();
+            sb.append("代理商" + haveColinfo + "收款账户不唯一");
+            AppConfig.sendEmails(sb.toString(), "代理商收款账户不唯一");
+            logger.info("checkAgentColinfo: " + sb.toString());
+        }
+        return AgentResult.ok();
+    }
+
 }
