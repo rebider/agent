@@ -2,6 +2,7 @@ package com.ryx.credit.profit.dao;
 
 import com.ryx.credit.profit.pojo.PRemitInfo;
 import com.ryx.credit.profit.pojo.PRemitInfoExample;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -21,4 +22,6 @@ public interface PRemitInfoMapper {
     int updateByPrimaryKeySelective(PRemitInfo record);
 
     int updateByPrimaryKey(PRemitInfo record);
+
+    List<PRemitInfo> brCitySupplyId(@Param("citySupplyId") String citySupplyId);
 }

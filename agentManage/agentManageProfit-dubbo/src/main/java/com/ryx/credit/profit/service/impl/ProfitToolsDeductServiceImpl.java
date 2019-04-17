@@ -385,7 +385,7 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
         LOG.info("查询此条补款对应的月份润汇总");
         ProfitDetailMonthExample profitDetailMonthExample = new ProfitDetailMonthExample();
         ProfitDetailMonthExample.Criteria criteria = profitDetailMonthExample.createCriteria();
-        criteria.andAgentIdEqualTo(pToolSupply.getParenterAgentId());
+        criteria.andAgentIdEqualTo(pToolSupply.getAgentId());
         criteria.andProfitDateEqualTo(pToolSupply.getProfitDate());
         criteria.andParentAgentIdEqualTo(transProfitDetails.get(0).getParentAgentId());
         List<ProfitDetailMonth> profitDetailMonthList = profitMonthService.byProfitDetailMonth(profitDetailMonthExample);
@@ -399,13 +399,9 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
         BigDecimal basicAmt = profitDetailMonth.getBasicsProfitAmt();
         //线下补款
         profitDeduction.setRev2(pToolSupply.getRemitAmt().toString());
-        //需要上级代扣的款项
-        BigDecimal upSupplyAmt = BigDecimal.ZERO;
-        if(pToolSupply.getParenterSupplyAmt().compareTo(BigDecimal.ZERO)!=0){
-            //需要上级代扣的款项
-              upSupplyAmt = pToolSupply.getToolsInvoiceAmt().subtract(pToolSupply.getRemitAmt());
-        }
 
+        //需要上级代扣的款项
+        BigDecimal upSupplyAmt   = pToolSupply.getParenterSupplyAmt();
 
 
         //上级代扣明细

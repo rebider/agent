@@ -248,4 +248,9 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+  <!--========================================以上代码为自动生成，请勿修改============================================-->
+  <select id="brCitySupplyId" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" /> from P_REMIT_INFO where CITY_SUPPLY_ID = '${citySupplyId}';
+  </select>
+
 </mapper>

@@ -4,6 +4,7 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.pojo.*;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -106,4 +107,8 @@ public interface ToolsDeductService {
 
 
     List<PToolSupply> selectByExample(PToolSupplyExample example);
+
+    List<PRemitInfo> brCitySupplyId(String citySupplyId);
+
+    public AgentResult approvalToolSupplyTask(AgentVo agentVo, String userId) throws ProcessException;
 }

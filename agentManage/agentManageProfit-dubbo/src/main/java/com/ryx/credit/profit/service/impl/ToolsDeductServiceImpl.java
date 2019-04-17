@@ -1,13 +1,15 @@
 package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.enumc.AgStatus;
+import com.ryx.credit.common.enumc.BusActRelBusType;
+import com.ryx.credit.common.enumc.PaySign;
+import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
-import com.ryx.credit.pojo.admin.order.OPdSum;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.dao.PRemitInfoMapper;
 import com.ryx.credit.profit.dao.PToolSupplyMapper;
@@ -18,6 +20,8 @@ import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.enums.StagingDetailStatus;
 import com.ryx.credit.profit.pojo.*;
+import com.ryx.credit.profit.service.ProfitDetailMonthService;
+import com.ryx.credit.profit.service.ProfitMonthService;
 import com.ryx.credit.profit.service.ToolsDeductService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.TaskApprovalService;
@@ -55,7 +59,10 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
     private TaskApprovalService taskApprovalService;
     @Autowired
     private IPaymentDetailService iPaymentDetailService;
-
+    @Autowired
+    private ProfitDetailMonthService profitDetailMonthServiceImpl;
+    @Autowired
+    private ProfitMonthService profitMonthService;
     @Autowired
     IOPdSumService ioPdSumService;
     @Autowired
@@ -212,6 +219,11 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
     }
 
     @Override
+    public List<PRemitInfo> brCitySupplyId(String citySupplyId) {
+        return pRemitInfoMapper.brCitySupplyId(citySupplyId);
+    }
+
+    @Override
     public ProfitStagingDetail getProfitStagingDetail(String id) {
         if (StringUtils.isNotBlank(id)) {
             return profitStagingDetailMapper.selectByPrimaryKey(id);
@@ -232,6 +244,33 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                 && StringUtils.isBlank(agentVo.getOrderAprDept())) {
             reqMap.put("dept", "finish");
         }
+        reqMap.put("rs", agentVo.getApprovalResult());
+        reqMap.put("approvalOpinion", agentVo.getApprovalOpinion());
+        reqMap.put("approvalPerson", userId);
+        reqMap.put("createTime", DateUtils.dateToStringss(new Date()));
+        reqMap.put("taskId", agentVo.getTaskId());
+
+        LOG.info("创建下一审批流对象：{}", reqMap.toString());
+        Map resultMap = activityService.completeTask(agentVo.getTaskId(), reqMap);
+        Boolean rs = (Boolean) resultMap.get("rs");
+        String msg = String.valueOf(resultMap.get("msg"));
+        if (resultMap == null) {
+            return result;
+        }
+        if (!rs) {
+            result.setMsg(msg);
+            return result;
+        }
+        return AgentResult.ok(resultMap);
+    }
+
+
+    @Override
+    public AgentResult approvalToolSupplyTask(AgentVo agentVo, String userId) throws ProcessException {
+        LOG.info("审批对象：{}", JSONObject.toJSON(agentVo));
+        AgentResult result = new AgentResult(500, "系统异常", "");
+        Map<String, Object> reqMap = new HashMap<>();
+
         reqMap.put("rs", agentVo.getApprovalResult());
         reqMap.put("approvalOpinion", agentVo.getApprovalOpinion());
         reqMap.put("approvalPerson", userId);
@@ -419,7 +458,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public void applySupplystment(List<PToolSupply> pToolSupplys, String userId, String workId,PRemitInfo pRemitInfo) throws ProcessException {
-        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+        String uuid = pToolSupplys.get(0).getExaminrId();
         for (PToolSupply pToolSupply : pToolSupplys) {
             if (pToolSupply.getProfitDate() == null) {
                 LOG.info("月份为空");
@@ -435,6 +474,43 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
             }
 
             try {
+                TransProfitDetailExample transProfitDetailExample = new TransProfitDetailExample();
+                TransProfitDetailExample.Criteria criteria1 = transProfitDetailExample.createCriteria();
+                criteria1.andBusCodeEqualTo(pToolSupply.getBusCode());
+                criteria1.andAgentIdEqualTo(pToolSupply.getAgentId());
+                criteria1.andProfitDateEqualTo(pToolSupply.getProfitDate());
+                List<TransProfitDetail> transProfitDetails = profitDetailMonthServiceImpl.getTransProfitDetailByBusCode(transProfitDetailExample);
+                if(1!=transProfitDetails.size()){
+                    LOG.info("查询{}补款对应的月份润平台对应的上级失败",pToolSupply.getId());
+                    return ;
+                }
+                LOG.info("查询此条补款对应的月份润汇总");
+                ProfitDetailMonthExample profitDetailMonthExample = new ProfitDetailMonthExample();
+                ProfitDetailMonthExample.Criteria criteria = profitDetailMonthExample.createCriteria();
+                criteria.andAgentIdEqualTo(pToolSupply.getAgentId());
+                criteria.andProfitDateEqualTo(pToolSupply.getProfitDate());
+                criteria.andParentAgentIdEqualTo(transProfitDetails.get(0).getParentAgentId());
+                List<ProfitDetailMonth> profitDetailMonthList = profitMonthService.byProfitDetailMonth(profitDetailMonthExample);
+                if(1!=profitDetailMonthList.size()){
+                    LOG.info("查询{}补款对应的月份润汇总失败",pToolSupply.getId());
+                    return ;
+                }
+                ProfitDetailMonth profitDetailMonth =  profitDetailMonthList.get(0);
+                //上级代理商的月份润
+                BigDecimal basicAmt = profitDetailMonth.getBasicsProfitAmt();
+                //需要上级代扣的款项
+                BigDecimal upSupplyAmt = BigDecimal.ZERO;
+                if(pToolSupply.getParenterSupplyAmt().compareTo(BigDecimal.ZERO)!=0){
+                    //需要上级代扣的款项
+                    upSupplyAmt = pToolSupply.getToolsInvoiceAmt().subtract(pToolSupply.getRemitAmt());
+                }
+                if(basicAmt.compareTo(upSupplyAmt)!=-1){
+                    pToolSupply.setParenterSupplyAmt(upSupplyAmt);
+                }else{
+                    pToolSupply.setParenterSupplyAmt(basicAmt);
+                }
+
+
                 pToolSupply.setId(idService.genId(TabId.P_TOOL_SUPPLY));
                 pToolSupply.setcUser(userId);
                 pToolSupply.setcTime(new Date());
@@ -533,8 +609,11 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
             }
 
         }
-
-
+        if(pRemitInfo!=null){
+           List<PRemitInfo>  pRemitInfos = pRemitInfoMapper.brCitySupplyId(pToolSupplyList.get(0).getExaminrId());
+            pRemitInfo.setId(pRemitInfos.get(0).getId());
+            pRemitInfoMapper.updateByPrimaryKey(pRemitInfo);
+        }
 
     }
 
