@@ -42,9 +42,6 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
     @Autowired
     private IPaymentDetailService iPaymentDetailService;
 
-    @Autowired
-    private ToolsDeductServiceImpl toolsDeductService;
-
     private static final String RHB = "5000";
     private static final String POS = "100003";
     private static final String ZPOS = "100002";
