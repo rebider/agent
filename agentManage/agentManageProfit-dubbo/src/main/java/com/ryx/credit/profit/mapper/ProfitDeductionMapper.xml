@@ -559,14 +559,14 @@
     </select>
 
   <select id="getNotDeductionAmt" parameterType="java.util.Map" resultType="java.math.BigDecimal">
-    select sum(MUST_DEDUCTION_AMT) from P_DEDUCTION
+    select sum(case when pd.deduction_Status = '1' then pd.NOT_DEDUCTION_AMT  else  pd.MUST_DEDUCTION_AMT end) from P_DEDUCTION pd
     <where>
-      DEDUCTION_DATE = #{date} AND DEDUCTION_STATUS='0' AND DEDUCTION_TYPE=#{type}
+      pd.DEDUCTION_DATE = #{date}  AND pd.DEDUCTION_TYPE=#{type}
       <if test="agentId != null and agentId != ''">
-        and AGENT_ID = #{agentId}
+        and pd.AGENT_ID = #{agentId}
       </if>
       <if test="agentName != null and agentName != ''">
-        and AGENT_NAME = #{agentName}
+        and pd.AGENT_NAME = #{agentName}
       </if>
     </where>
   </select>
@@ -598,6 +598,20 @@
         update P_DEDUCTION set ACTUAL_DEDUCTION_AMT=0,NOT_DEDUCTION_AMT=0
         where DEDUCTION_DATE = '${profitDate}' and DEDUCTION_TYPE='${decutionType}'
     </update>
+
+    <select id="getToolsDebt" parameterType="java.util.Map" resultType="java.math.BigDecimal" >
+        select sum(case when pd.deduction_Status = '5' then pd.NOT_DEDUCTION_AMT  else  pd.MUST_DEDUCTION_AMT end)+sum(psd.MUST_AMT)
+          from P_DEDUCTION pd left join P_STAGING_DETAIL psd on psd.STAG_ID = pd.ID
+        <where>
+            pd.DEDUCTION_DATE = #{date} AND pd.DEDUCTION_TYPE=#{type}
+            <if test="agentId != null and agentId != ''">
+                and pd.AGENT_ID = #{agentId}
+            </if>
+            <if test="agentName != null and agentName != ''">
+                and pd.AGENT_NAME = #{agentName}
+            </if>
+        </where>
+    </select>
 
     <select id="getPorfitDataByAgentIdAndProfitMonth" resultType="java.util.Map">
         select

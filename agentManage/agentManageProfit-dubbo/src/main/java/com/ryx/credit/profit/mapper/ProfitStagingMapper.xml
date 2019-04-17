@@ -72,12 +72,12 @@
 
   </select>
 
-  <select id="getNotDeductionAmtTwo"  resultMap="BaseResultMap" parameterType="java.util.Map" >
+  <select id="getNotDeductionAmtTwo"  parameterType="java.util.Map" resultType="java.math.BigDecimal" >
     select
     sum(sd.must_amt) STAG_AMT
     from P_STAGING_DETAIL  sd
     inner join p_deduction d on d.id = sd.source_id
-    where  sd.deduction_date >= to_char(sysdate,'yyyy-mm') and d.deduction_type=#{type} and d.deduction_date =#{date}
+    where  sd.deduction_date >= to_char(sysdate,'yyyy-mm') and d.deduction_type=#{type}
     and d.staging_status='3'
     <if test="agentId != null" >
       and d.agent_id=#{agentId,jdbcType=VARCHAR}
