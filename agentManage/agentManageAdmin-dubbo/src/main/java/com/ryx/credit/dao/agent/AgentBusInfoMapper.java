@@ -80,4 +80,5 @@ public interface AgentBusInfoMapper {
      */
     List<String> queryAgentHaveMutPayCompany();
 
+    List<Map<String,Object>> selectAgentHaveMutPayCompany();
 }
