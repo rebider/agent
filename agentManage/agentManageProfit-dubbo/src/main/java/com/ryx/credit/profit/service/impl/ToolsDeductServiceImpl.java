@@ -214,9 +214,12 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
     }
 
     @Override
-    public List<PToolSupply> selectByExample(PToolSupplyExample example) {
+    public List<PToolSupply> selectByExample(PToolSupply pToolSupply) {
 
-        return pToolSupplyMapper.selectByExample(example);
+        PToolSupplyExample pToolSupplyExample = new PToolSupplyExample();
+        PToolSupplyExample.Criteria criteria = pToolSupplyExample.createCriteria();
+        criteria.andExaminrIdEqualTo(pToolSupply.getExaminrId());
+        return pToolSupplyMapper.selectByExample(pToolSupplyExample);
     }
     @Override
     public int updateByPrimaryKey(PRemitInfo pRemitInfo) {

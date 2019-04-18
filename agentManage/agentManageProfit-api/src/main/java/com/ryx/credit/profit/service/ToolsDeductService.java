@@ -106,7 +106,7 @@ public interface ToolsDeductService {
 
 
 
-    List<PToolSupply> selectByExample(PToolSupplyExample example);
+    public List<PToolSupply> selectByExample(PToolSupply pToolSupply);
 
     List<PRemitInfo> brCitySupplyId(String citySupplyId);
 
