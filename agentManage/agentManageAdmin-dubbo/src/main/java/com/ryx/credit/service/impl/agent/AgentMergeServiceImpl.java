@@ -11,6 +11,7 @@ import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.agent.AgentMergeMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.agent.*;
+import com.ryx.credit.dao.bank.DPosRegionMapper;
 import com.ryx.credit.dao.order.*;
 import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.AgentMerge;
@@ -31,6 +32,7 @@ import com.ryx.credit.pojo.admin.CuserAgent;
 import com.ryx.credit.pojo.admin.CuserAgentExample;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.service.bank.PosRegionService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OCashReceivablesService;
@@ -57,7 +59,7 @@ import java.util.List;
  * @return
  **/
 @Service("agentMergeService")
-public class AgentMergeServiceImpl implements AgentMergeService {
+public class AgentMergeServiceImpl extends AgentNotifyServiceImpl implements AgentMergeService {
 
     private static Logger logger = LoggerFactory.getLogger(AgentMergeServiceImpl.class);
     @Autowired
@@ -134,6 +136,10 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     private OPaymentMapper paymentMapper;
     @Autowired
     private CapitalChangeApplyMapper capitalChangeApplyMapper;
+    @Autowired
+    private DPosRegionMapper posRegionMapper;
+    @Autowired
+    private PosRegionService posRegionService;
 
     /**
      * 合并列表
@@ -1200,6 +1206,42 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 agentNotifyVo.setBusiType(platType.equals(PlatformType.POS.getValue())?"01":"02"); //cxinfo 新增瑞易送，瑞享送的等平台 pos结构 业务类型 变更
                 Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
                 agentNotifyVo.setOrgType(dictByValue.getdItemname().contains(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
+                //业务区域
+                String[] split = new String[1];
+                if(StringUtils.isNotBlank(agentBusInfo.getBusRegion())){
+                    String[] busRegion = agentBusInfo.getBusRegion().split(",");
+                    Boolean flag = false;
+                    for(int i=0;i<busRegion.length;i++){
+                        if(busRegion[i].equals("0")){
+                            flag = true;
+                            break;
+                        }
+                    }
+                    if(flag){
+                        Set<String> dPosRegions = posRegionMapper.queryNationwide();
+                        split = dPosRegions.toArray(new String[]{});
+                    }else{
+                        Set<String> dPosRegions = posRegionService.queryCityByCode(agentBusInfo.getBusRegion());
+                        split = dPosRegions.toArray(new String[]{});
+                    }
+                }
+                agentNotifyVo.setBusiAreas(split);
+                //注册区域
+                if(agent.getAgRegArea()!=null){
+                    List<String> regionList = getParent(agent.getAgRegArea());
+                    if(regionList!=null){
+                        if(regionList.size()==3){
+                            agentNotifyVo.setProvince(regionList.get(0));
+                            agentNotifyVo.setCity(regionList.get(1));
+                            agentNotifyVo.setCityArea(regionList.get(2));
+                        }else if(regionList.size()==2){
+                            agentNotifyVo.setProvince(regionList.get(0));
+                            agentNotifyVo.setCity(regionList.get(1));
+                        }else if(regionList.size()==1){
+                            agentNotifyVo.setProvince(regionList.get(0));
+                        }
+                    }
+                }
                 AgentBusInfo agentParent = null;
                 if(StringUtils.isNotBlank(agentBusInfo.getBusParent())){
                     //取出上级业务
@@ -1208,6 +1250,9 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                         agentNotifyVo.setSupDorgId(agentParent.getBusNum());
                     }
                 }
+                agentNotifyVo.setDebitTop(agentBusInfo.getDebitCapping());//借记封顶额（元）
+                agentNotifyVo.setCkDebitRate(agentBusInfo.getDebitAppearRate());//借记出款费率（%）
+                agentNotifyVo.setLowDebitRate(agentBusInfo.getDebitRateLower());//借记费率下限（%）
                 String sendJson = JsonUtil.objectToJson(agentNotifyVo);
                 record.setId(idService.genId(TabId.a_agent_platformsyn));
                 record.setNotifyTime(new Date());
