@@ -162,7 +162,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
 
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
-    public void updateStatus(String activId, String status,String type) {
+    public void updateStatus(String activId, String type) {
         BusActRel busActRel = new BusActRel();
         busActRel.setActivId(activId);
         try {
@@ -184,7 +184,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                             //更新为审批拒绝
                             rel.setActivStatus(AgStatus.Refuse.name());
                             taskApprovalService.updateABusActRel(rel);
-
+                            pToolSupply.setExaminrStatus(CitySupplyStatus.STATUS_01.code);
                         }
                         if ("finish_end".equals(type)){
                             ProfitDeduction   profitDeduction =  profitDeductionMapper.selectByPrimaryKey(pToolSupply.getDeductionId());
@@ -196,9 +196,11 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                             //更新为审批通过
                             rel.setActivStatus(AgStatus.Approved.name());
                             taskApprovalService.updateABusActRel(rel);
+                            pToolSupply.setExaminrStatus(CitySupplyStatus.STATUS_02.code);
                         }
 
-                        pToolSupply.setExaminrStatus(status);
+
+
 
                         //更新申请补款表中的状态.
                         pToolSupplyMapper.updateByPrimaryKey(pToolSupply);

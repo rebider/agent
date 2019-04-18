@@ -102,7 +102,7 @@ public interface ToolsDeductService {
      */
     void editToolSupply(List<PToolSupply> pToolSupplys, String detailId, PRemitInfo pRemitInfo);
 
-    void updateStatus(String activId, String status,String type);
+    public void updateStatus(String activId, String type);
 
 
 
