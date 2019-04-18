@@ -509,7 +509,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                 List<TransProfitDetail> transProfitDetails = profitDetailMonthServiceImpl.getTransProfitDetailByBusCode(transProfitDetailExample1);
                 if(1!=transProfitDetails.size()){
                     LOG.info("查询{}补款对应的月份润平台对应的上级失败",pToolSupply.getId());
-                    return ;
+                    throw new ProcessException("查询补款对应的月份润平台对应的上级失败");
                 }
                 LOG.info("查询此条补款对应的月份润汇总");
                 ProfitDetailMonthExample profitDetailMonthExample = new ProfitDetailMonthExample();
@@ -526,7 +526,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                 List<ProfitDetailMonth> profitDetailMonthList = profitMonthService.byProfitDetailMonth(profitDetailMonthExample);
                 if(1!=profitDetailMonthList.size()){
                     LOG.info("查询{}补款对应的月份润汇总失败",pToolSupply.getId());
-                    return ;
+                    throw new ProcessException("查询补款对应的月份润汇总失败");
                 }
                 ProfitDetailMonth profitDetailMonth =  profitDetailMonthList.get(0);
                 //上级代理商的月份润
@@ -552,7 +552,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                 pToolSupplyMapper.insert(pToolSupply);
             } catch (Exception e) {
                 LOG.error("更新补款内容失败{}", pToolSupply.getDeductionId());
-                return;
+                throw new ProcessException("更新补款内容失败");
             }
 
             //更新扣款表中的状态为补款中。
@@ -562,7 +562,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                 profitDeductionMapper.updateByPrimaryKey(profitDeduction);
             } catch (Exception e) {
                 LOG.error("更新扣款表状态失败失败{}", pToolSupply.getDeductionId());
-                return;
+                throw new ProcessException("更新扣款表状态失败失败");
             }
 
         }
