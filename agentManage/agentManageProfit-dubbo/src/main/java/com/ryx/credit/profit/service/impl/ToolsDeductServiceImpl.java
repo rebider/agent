@@ -511,9 +511,16 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                 LOG.info("查询此条补款对应的月份润汇总");
                 ProfitDetailMonthExample profitDetailMonthExample = new ProfitDetailMonthExample();
                 ProfitDetailMonthExample.Criteria criteria = profitDetailMonthExample.createCriteria();
-                criteria.andAgentIdEqualTo(pToolSupply.getParenterAgentId());
-                criteria.andProfitDateEqualTo(pToolSupply.getProfitDate());
-                criteria.andParentAgentIdEqualTo(transProfitDetails.get(0).getParentAgentId());
+                if(StringUtils.isNotBlank(pToolSupply.getParenterAgentId())){
+                    criteria.andAgentIdEqualTo(pToolSupply.getParenterAgentId());
+                }
+                if(StringUtils.isNotBlank(transProfitDetails1.get(0).getParentAgentId())){
+                    criteria.andParentAgentIdEqualTo(transProfitDetails.get(0).getParentAgentId());
+                }
+                if(StringUtils.isNotBlank(pToolSupply.getProfitDate())){
+                    criteria.andProfitDateEqualTo(pToolSupply.getProfitDate());
+                }
+
                 List<ProfitDetailMonth> profitDetailMonthList = profitMonthService.byProfitDetailMonth(profitDetailMonthExample);
                 if(1!=profitDetailMonthList.size()){
                     LOG.info("查询{}补款对应的月份润汇总失败",pToolSupply.getId());
