@@ -59,7 +59,7 @@ import java.util.List;
  * @return
  **/
 @Service("agentMergeService")
-public class AgentMergeServiceImpl extends AgentNotifyServiceImpl implements AgentMergeService {
+public class AgentMergeServiceImpl  implements AgentMergeService {
 
     private static Logger logger = LoggerFactory.getLogger(AgentMergeServiceImpl.class);
     @Autowired
@@ -140,6 +140,9 @@ public class AgentMergeServiceImpl extends AgentNotifyServiceImpl implements Age
     private DPosRegionMapper posRegionMapper;
     @Autowired
     private PosRegionService posRegionService;
+    @Autowired
+    private RegionMapper regionMapper;
+
 
     /**
      * 合并列表
@@ -1336,6 +1339,29 @@ public class AgentMergeServiceImpl extends AgentNotifyServiceImpl implements Age
             }
         }
         return AgentResult.ok();
+    }
+
+    public List<String> getParent(String busRegion){
+        List<String> resultList = new ArrayList<>();
+        Region region = queryParent(busRegion);
+        resultList.add(0,region.getrCode());
+        while (true){
+            if(!region.getpCode().equals("0")){
+                region = queryParent(region.getpCode());
+                resultList.add(0,region.getrCode());
+            }else{
+                break;
+            }
+        }
+        return resultList;
+    }
+
+    private Region queryParent(String busRegion){
+        RegionExample example = new RegionExample();
+        RegionExample.Criteria criteria = example.createCriteria();
+        criteria.andRCodeEqualTo(busRegion);
+        List<Region> regions = regionMapper.selectByExample(example);
+        return regions.get(0);
     }
 
     /**
