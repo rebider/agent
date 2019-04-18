@@ -481,15 +481,28 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
             try {
                 TransProfitDetailExample transProfitDetailExample = new TransProfitDetailExample();
                 TransProfitDetailExample.Criteria criteria1 = transProfitDetailExample.createCriteria();
-                criteria1.andBusCodeEqualTo(pToolSupply.getBusCode());
-                criteria1.andAgentIdEqualTo(pToolSupply.getAgentId());
-                criteria1.andProfitDateEqualTo(pToolSupply.getProfitDate());
+                if(StringUtils.isNotBlank(pToolSupply.getBusCode())){
+                    criteria1.andBusCodeEqualTo(pToolSupply.getBusCode());
+                }
+                if(StringUtils.isNotBlank(pToolSupply.getAgentId())){
+                    criteria1.andAgentIdEqualTo(pToolSupply.getAgentId());
+                }
+                if(StringUtils.isNotBlank(pToolSupply.getProfitDate())){
+                    criteria1.andProfitDateEqualTo(pToolSupply.getProfitDate());
+                }
+
                 List<TransProfitDetail> transProfitDetails1 = profitDetailMonthServiceImpl.getTransProfitDetailByBusCode(transProfitDetailExample);
                 TransProfitDetailExample transProfitDetailExample1 = new TransProfitDetailExample();
                 TransProfitDetailExample.Criteria criteria2 = transProfitDetailExample1.createCriteria();
-                criteria2.andBusCodeEqualTo(pToolSupply.getBusCode());
-                criteria2.andAgentIdEqualTo(transProfitDetails1.get(0).getParentAgentId());
-                criteria2.andProfitDateEqualTo(pToolSupply.getProfitDate());
+                if(StringUtils.isNotBlank(pToolSupply.getBusCode())){
+                    criteria2.andBusCodeEqualTo(pToolSupply.getBusCode());
+                }
+                if(StringUtils.isNotBlank(transProfitDetails1.get(0).getParentAgentId())){
+                    criteria2.andAgentIdEqualTo(transProfitDetails1.get(0).getParentAgentId());
+                }
+                if(StringUtils.isNotBlank(pToolSupply.getProfitDate())){
+                    criteria2.andProfitDateEqualTo(pToolSupply.getProfitDate());
+                }
                 List<TransProfitDetail> transProfitDetails = profitDetailMonthServiceImpl.getTransProfitDetailByBusCode(transProfitDetailExample1);
                 if(1!=transProfitDetails.size()){
                     LOG.info("查询{}补款对应的月份润平台对应的上级失败",pToolSupply.getId());
