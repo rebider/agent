@@ -35,6 +35,7 @@
     <result column="QR_TRAN_AMT" jdbcType="DECIMAL" property="qrTranAmt" />
     <result column="QR_TRAN_FEE" jdbcType="DECIMAL" property="qrTranFee" />
     <result column="QR_PFT_AMT" jdbcType="DECIMAL" property="qrPftAmt" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -95,11 +96,11 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, BUS_NUM, AGENT_ID, AGENT_NAME, PARENT_BUS_NUM, PARENT_AGENT_ID, PROFIT_DATE, 
-    IN_TRANS_AMT, OUT_TRANS_AMT, PROFIT_AMT, BUS_CODE, IN_PROFIT_SCALE, OUT_PROFIT_SCALE, 
-    IN_PROFIT_AMT, OUT_PROFIT_AMT, POS_CREDIT_AMT, IPOS_CREDIT_AMT, POS_REWARD_AMT, PAY_COMPANY, 
-    NOTAX_AMT, SUPPLY_AMT, TRANS_FEE, UNICODE, SOURCE_INFO, AGENT_TYPE, UNLINE_AMT, PARENT_AGENT_NAME, 
-    POS_TRAN_AMT, POS_TRAN_FEE, POS_PFT_AMT, QR_TRAN_AMT, QR_TRAN_FEE, QR_PFT_AMT
+    ID, BUS_NUM, AGENT_ID, AGENT_NAME, PARENT_BUS_NUM, PARENT_AGENT_ID, PROFIT_DATE,
+    IN_TRANS_AMT, OUT_TRANS_AMT, PROFIT_AMT, BUS_CODE, IN_PROFIT_SCALE, OUT_PROFIT_SCALE,
+    IN_PROFIT_AMT, OUT_PROFIT_AMT, POS_CREDIT_AMT, IPOS_CREDIT_AMT, POS_REWARD_AMT, PAY_COMPANY,
+    NOTAX_AMT, SUPPLY_AMT, TRANS_FEE, UNICODE, SOURCE_INFO, AGENT_TYPE, UNLINE_AMT, PARENT_AGENT_NAME,
+    POS_TRAN_AMT, POS_TRAN_FEE, POS_PFT_AMT, QR_TRAN_AMT, QR_TRAN_FEE, QR_PFT_AMT, REMARK
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.TransProfitDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -124,30 +125,30 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail">
-    insert into TRANS_PROFIT_DETAIL (ID, BUS_NUM, AGENT_ID, 
-      AGENT_NAME, PARENT_BUS_NUM, PARENT_AGENT_ID, 
-      PROFIT_DATE, IN_TRANS_AMT, OUT_TRANS_AMT, 
-      PROFIT_AMT, BUS_CODE, IN_PROFIT_SCALE, 
-      OUT_PROFIT_SCALE, IN_PROFIT_AMT, OUT_PROFIT_AMT, 
-      POS_CREDIT_AMT, IPOS_CREDIT_AMT, POS_REWARD_AMT, 
-      PAY_COMPANY, NOTAX_AMT, SUPPLY_AMT, 
-      TRANS_FEE, UNICODE, SOURCE_INFO, 
-      AGENT_TYPE, UNLINE_AMT, PARENT_AGENT_NAME, 
-      POS_TRAN_AMT, POS_TRAN_FEE, POS_PFT_AMT, 
-      QR_TRAN_AMT, QR_TRAN_FEE, QR_PFT_AMT
-      )
-    values (#{id,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
-      #{agentName,jdbcType=VARCHAR}, #{parentBusNum,jdbcType=VARCHAR}, #{parentAgentId,jdbcType=VARCHAR}, 
-      #{profitDate,jdbcType=VARCHAR}, #{inTransAmt,jdbcType=DECIMAL}, #{outTransAmt,jdbcType=DECIMAL}, 
-      #{profitAmt,jdbcType=DECIMAL}, #{busCode,jdbcType=VARCHAR}, #{inProfitScale,jdbcType=DECIMAL}, 
-      #{outProfitScale,jdbcType=DECIMAL}, #{inProfitAmt,jdbcType=DECIMAL}, #{outProfitAmt,jdbcType=DECIMAL}, 
-      #{posCreditAmt,jdbcType=DECIMAL}, #{iposCreditAmt,jdbcType=DECIMAL}, #{posRewardAmt,jdbcType=DECIMAL}, 
-      #{payCompany,jdbcType=VARCHAR}, #{notaxAmt,jdbcType=DECIMAL}, #{supplyAmt,jdbcType=DECIMAL}, 
-      #{transFee,jdbcType=DECIMAL}, #{unicode,jdbcType=VARCHAR}, #{sourceInfo,jdbcType=VARCHAR}, 
-      #{agentType,jdbcType=VARCHAR}, #{unlineAmt,jdbcType=DECIMAL}, #{parentAgentName,jdbcType=VARCHAR}, 
-      #{posTranAmt,jdbcType=DECIMAL}, #{posTranFee,jdbcType=DECIMAL}, #{posPftAmt,jdbcType=DECIMAL}, 
-      #{qrTranAmt,jdbcType=DECIMAL}, #{qrTranFee,jdbcType=DECIMAL}, #{qrPftAmt,jdbcType=DECIMAL}
-      )
+    insert into TRANS_PROFIT_DETAIL (ID, BUS_NUM, AGENT_ID,
+      AGENT_NAME, PARENT_BUS_NUM, PARENT_AGENT_ID,
+      PROFIT_DATE, IN_TRANS_AMT, OUT_TRANS_AMT,
+      PROFIT_AMT, BUS_CODE, IN_PROFIT_SCALE,
+      OUT_PROFIT_SCALE, IN_PROFIT_AMT, OUT_PROFIT_AMT,
+      POS_CREDIT_AMT, IPOS_CREDIT_AMT, POS_REWARD_AMT,
+      PAY_COMPANY, NOTAX_AMT, SUPPLY_AMT,
+      TRANS_FEE, UNICODE, SOURCE_INFO,
+      AGENT_TYPE, UNLINE_AMT, PARENT_AGENT_NAME,
+      POS_TRAN_AMT, POS_TRAN_FEE, POS_PFT_AMT,
+      QR_TRAN_AMT, QR_TRAN_FEE, QR_PFT_AMT,
+      REMARK)
+    values (#{id,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
+      #{agentName,jdbcType=VARCHAR}, #{parentBusNum,jdbcType=VARCHAR}, #{parentAgentId,jdbcType=VARCHAR},
+      #{profitDate,jdbcType=VARCHAR}, #{inTransAmt,jdbcType=DECIMAL}, #{outTransAmt,jdbcType=DECIMAL},
+      #{profitAmt,jdbcType=DECIMAL}, #{busCode,jdbcType=VARCHAR}, #{inProfitScale,jdbcType=DECIMAL},
+      #{outProfitScale,jdbcType=DECIMAL}, #{inProfitAmt,jdbcType=DECIMAL}, #{outProfitAmt,jdbcType=DECIMAL},
+      #{posCreditAmt,jdbcType=DECIMAL}, #{iposCreditAmt,jdbcType=DECIMAL}, #{posRewardAmt,jdbcType=DECIMAL},
+      #{payCompany,jdbcType=VARCHAR}, #{notaxAmt,jdbcType=DECIMAL}, #{supplyAmt,jdbcType=DECIMAL},
+      #{transFee,jdbcType=DECIMAL}, #{unicode,jdbcType=VARCHAR}, #{sourceInfo,jdbcType=VARCHAR},
+      #{agentType,jdbcType=VARCHAR}, #{unlineAmt,jdbcType=DECIMAL}, #{parentAgentName,jdbcType=VARCHAR},
+      #{posTranAmt,jdbcType=DECIMAL}, #{posTranFee,jdbcType=DECIMAL}, #{posPftAmt,jdbcType=DECIMAL},
+      #{qrTranAmt,jdbcType=DECIMAL}, #{qrTranFee,jdbcType=DECIMAL}, #{qrPftAmt,jdbcType=DECIMAL},
+      #{remark,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail">
     insert into TRANS_PROFIT_DETAIL
@@ -251,6 +252,9 @@
       <if test="qrPftAmt != null">
         QR_PFT_AMT,
       </if>
+      <if test="remark != null">
+        REMARK,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -351,6 +355,9 @@
       </if>
       <if test="qrPftAmt != null">
         #{qrPftAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -462,6 +469,9 @@
       <if test="record.qrPftAmt != null">
         QR_PFT_AMT = #{record.qrPftAmt,jdbcType=DECIMAL},
       </if>
+      <if test="record.remark != null">
+        REMARK = #{record.remark,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -470,45 +480,46 @@
   <update id="updateByExample" parameterType="map">
     update TRANS_PROFIT_DETAIL
     set ID = #{record.id,jdbcType=VARCHAR},
-      BUS_NUM = #{record.busNum,jdbcType=VARCHAR},
-      AGENT_ID = #{record.agentId,jdbcType=VARCHAR},
-      AGENT_NAME = #{record.agentName,jdbcType=VARCHAR},
-      PARENT_BUS_NUM = #{record.parentBusNum,jdbcType=VARCHAR},
-      PARENT_AGENT_ID = #{record.parentAgentId,jdbcType=VARCHAR},
-      PROFIT_DATE = #{record.profitDate,jdbcType=VARCHAR},
-      IN_TRANS_AMT = #{record.inTransAmt,jdbcType=DECIMAL},
-      OUT_TRANS_AMT = #{record.outTransAmt,jdbcType=DECIMAL},
-      PROFIT_AMT = #{record.profitAmt,jdbcType=DECIMAL},
-      BUS_CODE = #{record.busCode,jdbcType=VARCHAR},
-      IN_PROFIT_SCALE = #{record.inProfitScale,jdbcType=DECIMAL},
-      OUT_PROFIT_SCALE = #{record.outProfitScale,jdbcType=DECIMAL},
-      IN_PROFIT_AMT = #{record.inProfitAmt,jdbcType=DECIMAL},
-      OUT_PROFIT_AMT = #{record.outProfitAmt,jdbcType=DECIMAL},
-      POS_CREDIT_AMT = #{record.posCreditAmt,jdbcType=DECIMAL},
-      IPOS_CREDIT_AMT = #{record.iposCreditAmt,jdbcType=DECIMAL},
-      POS_REWARD_AMT = #{record.posRewardAmt,jdbcType=DECIMAL},
-      PAY_COMPANY = #{record.payCompany,jdbcType=VARCHAR},
-      NOTAX_AMT = #{record.notaxAmt,jdbcType=DECIMAL},
-      SUPPLY_AMT = #{record.supplyAmt,jdbcType=DECIMAL},
-      TRANS_FEE = #{record.transFee,jdbcType=DECIMAL},
-      UNICODE = #{record.unicode,jdbcType=VARCHAR},
-      SOURCE_INFO = #{record.sourceInfo,jdbcType=VARCHAR},
-      AGENT_TYPE = #{record.agentType,jdbcType=VARCHAR},
-      UNLINE_AMT = #{record.unlineAmt,jdbcType=DECIMAL},
-      PARENT_AGENT_NAME = #{record.parentAgentName,jdbcType=VARCHAR},
-      POS_TRAN_AMT = #{record.posTranAmt,jdbcType=DECIMAL},
-      POS_TRAN_FEE = #{record.posTranFee,jdbcType=DECIMAL},
-      POS_PFT_AMT = #{record.posPftAmt,jdbcType=DECIMAL},
-      QR_TRAN_AMT = #{record.qrTranAmt,jdbcType=DECIMAL},
-      QR_TRAN_FEE = #{record.qrTranFee,jdbcType=DECIMAL},
-      QR_PFT_AMT = #{record.qrPftAmt,jdbcType=DECIMAL}
+    BUS_NUM = #{record.busNum,jdbcType=VARCHAR},
+    AGENT_ID = #{record.agentId,jdbcType=VARCHAR},
+    AGENT_NAME = #{record.agentName,jdbcType=VARCHAR},
+    PARENT_BUS_NUM = #{record.parentBusNum,jdbcType=VARCHAR},
+    PARENT_AGENT_ID = #{record.parentAgentId,jdbcType=VARCHAR},
+    PROFIT_DATE = #{record.profitDate,jdbcType=VARCHAR},
+    IN_TRANS_AMT = #{record.inTransAmt,jdbcType=DECIMAL},
+    OUT_TRANS_AMT = #{record.outTransAmt,jdbcType=DECIMAL},
+    PROFIT_AMT = #{record.profitAmt,jdbcType=DECIMAL},
+    BUS_CODE = #{record.busCode,jdbcType=VARCHAR},
+    IN_PROFIT_SCALE = #{record.inProfitScale,jdbcType=DECIMAL},
+    OUT_PROFIT_SCALE = #{record.outProfitScale,jdbcType=DECIMAL},
+    IN_PROFIT_AMT = #{record.inProfitAmt,jdbcType=DECIMAL},
+    OUT_PROFIT_AMT = #{record.outProfitAmt,jdbcType=DECIMAL},
+    POS_CREDIT_AMT = #{record.posCreditAmt,jdbcType=DECIMAL},
+    IPOS_CREDIT_AMT = #{record.iposCreditAmt,jdbcType=DECIMAL},
+    POS_REWARD_AMT = #{record.posRewardAmt,jdbcType=DECIMAL},
+    PAY_COMPANY = #{record.payCompany,jdbcType=VARCHAR},
+    NOTAX_AMT = #{record.notaxAmt,jdbcType=DECIMAL},
+    SUPPLY_AMT = #{record.supplyAmt,jdbcType=DECIMAL},
+    TRANS_FEE = #{record.transFee,jdbcType=DECIMAL},
+    UNICODE = #{record.unicode,jdbcType=VARCHAR},
+    SOURCE_INFO = #{record.sourceInfo,jdbcType=VARCHAR},
+    AGENT_TYPE = #{record.agentType,jdbcType=VARCHAR},
+    UNLINE_AMT = #{record.unlineAmt,jdbcType=DECIMAL},
+    PARENT_AGENT_NAME = #{record.parentAgentName,jdbcType=VARCHAR},
+    POS_TRAN_AMT = #{record.posTranAmt,jdbcType=DECIMAL},
+    POS_TRAN_FEE = #{record.posTranFee,jdbcType=DECIMAL},
+    POS_PFT_AMT = #{record.posPftAmt,jdbcType=DECIMAL},
+    QR_TRAN_AMT = #{record.qrTranAmt,jdbcType=DECIMAL},
+    QR_TRAN_FEE = #{record.qrTranFee,jdbcType=DECIMAL},
+    QR_PFT_AMT = #{record.qrPftAmt,jdbcType=DECIMAL},
+    REMARK = #{record.remark,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
@@ -558,7 +569,7 @@
   IN_TRANS_AMT, OUT_TRANS_AMT, PROFIT_AMT, BUS_CODE,BUS_CODE as BUS_NAME, IN_PROFIT_SCALE, OUT_PROFIT_SCALE,
   IN_PROFIT_AMT, OUT_PROFIT_AMT, POS_CREDIT_AMT, IPOS_CREDIT_AMT, POS_REWARD_AMT, PAY_COMPANY,
   NOTAX_AMT, SUPPLY_AMT, TRANS_FEE, UNICODE, SOURCE_INFO, AGENT_TYPE, UNLINE_AMT,
-  POS_TRAN_AMT, POS_TRAN_FEE, POS_PFT_AMT, QR_TRAN_AMT, QR_TRAN_FEE, QR_PFT_AMT from TRANS_PROFIT_DETAIL) aa
+  POS_TRAN_AMT, POS_TRAN_FEE, POS_PFT_AMT, QR_TRAN_AMT, QR_TRAN_FEE, QR_PFT_AMT ,REMARK from TRANS_PROFIT_DETAIL) aa
 left join  A_AGENT  bb on aa.PARENT_AGENT_ID = bb.ID
 where
   <if test="SOURCE_INFO=='POS'">(aa.SOURCE_INFO='POS'or aa.SOURCE_INFO='ZPOS')</if>
@@ -590,7 +601,7 @@ where
     IN_TRANS_AMT, OUT_TRANS_AMT, PROFIT_AMT, BUS_CODE,BUS_CODE as BUS_NAME, IN_PROFIT_SCALE, OUT_PROFIT_SCALE,
     IN_PROFIT_AMT, OUT_PROFIT_AMT, POS_CREDIT_AMT, IPOS_CREDIT_AMT, POS_REWARD_AMT, PAY_COMPANY,
     NOTAX_AMT, SUPPLY_AMT, TRANS_FEE, UNICODE, SOURCE_INFO, AGENT_TYPE, UNLINE_AMT,
-    POS_TRAN_AMT, POS_TRAN_FEE, POS_PFT_AMT, QR_TRAN_AMT, QR_TRAN_FEE, QR_PFT_AMT from TRANS_PROFIT_DETAIL) aa
+    POS_TRAN_AMT, POS_TRAN_FEE, POS_PFT_AMT, QR_TRAN_AMT, QR_TRAN_FEE, QR_PFT_AMT,REMARK from TRANS_PROFIT_DETAIL) aa
     left join  A_AGENT  bb on aa.PARENT_AGENT_ID = bb.ID
     start with
     <if test="SOURCE_INFO=='POS'">(aa.SOURCE_INFO='POS'or aa.SOURCE_INFO='ZPOS')</if>
@@ -692,5 +703,12 @@ where
 
   </select>
 
+  <select id="selectByBusNum" resultType="java.util.Map">
+    select amb.MAIN_AGENT_ID ,a.AG_NAME from a_agent_merge_businfo amb
+      left join A_AGENT a on amb.MAIN_AGENT_ID = a.ID
+      left join a_agent_merge am on am.ID = amb.AGENT_MARGE_ID
+        where am.STATUS= 1  and amb.STATUS= 1 and amb.MERGE_STATUS = 1
+        and amb.BUS_NUM = #{busNum} and  to_date(#{date},'yyyy-MM-dd HH24:MI:ss') > am.U_TIME
+  </select>
 
   </mapper>

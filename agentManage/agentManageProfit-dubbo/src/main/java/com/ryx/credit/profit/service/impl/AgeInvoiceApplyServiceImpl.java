@@ -118,7 +118,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
             if(list.size()>0 && list!= null){
 
                 //开票日期的格式  yyyy-MM-dd
-                if(StringUtils.isBlank(list.get(0).toString())){
+                if(StringUtils.isBlank(list.get(1).toString())){
                     throw new MessageException("开票日期不能为空");
                 } else{
                     String pattern = "^[0-9]\\d{3}-[0-1]{1}\\d-[0-3][0-9]$";

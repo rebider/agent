@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.PToolSupplyMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.PToolSupply">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="PROFIT_DATE" jdbcType="VARCHAR" property="profitDate" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="PARENTER_AGENT_NAME" jdbcType="VARCHAR" property="parenterAgentName" />
+    <result column="PARENTER_AGENT_ID" jdbcType="VARCHAR" property="parenterAgentId" />
+    <result column="BUS_CODE" jdbcType="VARCHAR" property="busCode" />
+    <result column="NET_IN_DATE" jdbcType="VARCHAR" property="netInDate" />
+    <result column="TOOLS_INVOICE_AMT" jdbcType="DECIMAL" property="toolsInvoiceAmt" />
+    <result column="MONTH_PROFIT_AMT" jdbcType="DECIMAL" property="monthProfitAmt" />
+    <result column="REPAYMENT_PERIOD" jdbcType="DECIMAL" property="repaymentPeriod" />
+    <result column="REMIT_AMT" jdbcType="DECIMAL" property="remitAmt" />
+    <result column="PARENTER_SUPPLY_AMT" jdbcType="DECIMAL" property="parenterSupplyAmt" />
+    <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
+    <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
+    <result column="EXAMINR_ID" jdbcType="VARCHAR" property="examinrId" />
+    <result column="EXAMINR_STATUS" jdbcType="VARCHAR" property="examinrStatus" />
+    <result column="DEDUCTION_ID" jdbcType="VARCHAR" property="deductionId" />
+    <result column="REV1" jdbcType="VARCHAR" property="rev1" />
+    <result column="REV2" jdbcType="VARCHAR" property="rev2" />
+    <result column="REV3" jdbcType="VARCHAR" property="rev3" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, PROFIT_DATE, AGENT_NAME, AGENT_ID, PARENTER_AGENT_NAME, PARENTER_AGENT_ID, BUS_CODE, 
+    NET_IN_DATE, TOOLS_INVOICE_AMT, MONTH_PROFIT_AMT, REPAYMENT_PERIOD, REMIT_AMT, PARENTER_SUPPLY_AMT, 
+    C_USER, C_TIME, EXAMINR_ID, EXAMINR_STATUS, DEDUCTION_ID, REV1, REV2, REV3
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PToolSupplyExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_TOOL_SUPPLY
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from P_TOOL_SUPPLY
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PToolSupplyExample">
+    delete from P_TOOL_SUPPLY
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PToolSupply">
+    insert into P_TOOL_SUPPLY (ID, PROFIT_DATE, AGENT_NAME, 
+      AGENT_ID, PARENTER_AGENT_NAME, PARENTER_AGENT_ID, 
+      BUS_CODE, NET_IN_DATE, TOOLS_INVOICE_AMT, 
+      MONTH_PROFIT_AMT, REPAYMENT_PERIOD, REMIT_AMT, 
+      PARENTER_SUPPLY_AMT, C_USER, C_TIME, 
+      EXAMINR_ID, EXAMINR_STATUS, DEDUCTION_ID, 
+      REV1, REV2, REV3)
+    values (#{id,jdbcType=VARCHAR}, #{profitDate,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR}, 
+      #{agentId,jdbcType=VARCHAR}, #{parenterAgentName,jdbcType=VARCHAR}, #{parenterAgentId,jdbcType=VARCHAR}, 
+      #{busCode,jdbcType=VARCHAR}, #{netInDate,jdbcType=VARCHAR}, #{toolsInvoiceAmt,jdbcType=DECIMAL}, 
+      #{monthProfitAmt,jdbcType=DECIMAL}, #{repaymentPeriod,jdbcType=DECIMAL}, #{remitAmt,jdbcType=DECIMAL}, 
+      #{parenterSupplyAmt,jdbcType=DECIMAL}, #{cUser,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, 
+      #{examinrId,jdbcType=VARCHAR}, #{examinrStatus,jdbcType=VARCHAR}, #{deductionId,jdbcType=VARCHAR}, 
+      #{rev1,jdbcType=VARCHAR}, #{rev2,jdbcType=VARCHAR}, #{rev3,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PToolSupply">
+    insert into P_TOOL_SUPPLY
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="profitDate != null">
+        PROFIT_DATE,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="parenterAgentName != null">
+        PARENTER_AGENT_NAME,
+      </if>
+      <if test="parenterAgentId != null">
+        PARENTER_AGENT_ID,
+      </if>
+      <if test="busCode != null">
+        BUS_CODE,
+      </if>
+      <if test="netInDate != null">
+        NET_IN_DATE,
+      </if>
+      <if test="toolsInvoiceAmt != null">
+        TOOLS_INVOICE_AMT,
+      </if>
+      <if test="monthProfitAmt != null">
+        MONTH_PROFIT_AMT,
+      </if>
+      <if test="repaymentPeriod != null">
+        REPAYMENT_PERIOD,
+      </if>
+      <if test="remitAmt != null">
+        REMIT_AMT,
+      </if>
+      <if test="parenterSupplyAmt != null">
+        PARENTER_SUPPLY_AMT,
+      </if>
+      <if test="cUser != null">
+        C_USER,
+      </if>
+      <if test="cTime != null">
+        C_TIME,
+      </if>
+      <if test="examinrId != null">
+        EXAMINR_ID,
+      </if>
+      <if test="examinrStatus != null">
+        EXAMINR_STATUS,
+      </if>
+      <if test="deductionId != null">
+        DEDUCTION_ID,
+      </if>
+      <if test="rev1 != null">
+        REV1,
+      </if>
+      <if test="rev2 != null">
+        REV2,
+      </if>
+      <if test="rev3 != null">
+        REV3,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="profitDate != null">
+        #{profitDate,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="parenterAgentName != null">
+        #{parenterAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="parenterAgentId != null">
+        #{parenterAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="busCode != null">
+        #{busCode,jdbcType=VARCHAR},
+      </if>
+      <if test="netInDate != null">
+        #{netInDate,jdbcType=VARCHAR},
+      </if>
+      <if test="toolsInvoiceAmt != null">
+        #{toolsInvoiceAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="monthProfitAmt != null">
+        #{monthProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="repaymentPeriod != null">
+        #{repaymentPeriod,jdbcType=DECIMAL},
+      </if>
+      <if test="remitAmt != null">
+        #{remitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="parenterSupplyAmt != null">
+        #{parenterSupplyAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="cUser != null">
+        #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="cTime != null">
+        #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="examinrId != null">
+        #{examinrId,jdbcType=VARCHAR},
+      </if>
+      <if test="examinrStatus != null">
+        #{examinrStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="deductionId != null">
+        #{deductionId,jdbcType=VARCHAR},
+      </if>
+      <if test="rev1 != null">
+        #{rev1,jdbcType=VARCHAR},
+      </if>
+      <if test="rev2 != null">
+        #{rev2,jdbcType=VARCHAR},
+      </if>
+      <if test="rev3 != null">
+        #{rev3,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PToolSupplyExample" resultType="java.lang.Long">
+    select count(*) from P_TOOL_SUPPLY
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PToolSupply">
+    update P_TOOL_SUPPLY
+    <set>
+      <if test="profitDate != null">
+        PROFIT_DATE = #{profitDate,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="parenterAgentName != null">
+        PARENTER_AGENT_NAME = #{parenterAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="parenterAgentId != null">
+        PARENTER_AGENT_ID = #{parenterAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="busCode != null">
+        BUS_CODE = #{busCode,jdbcType=VARCHAR},
+      </if>
+      <if test="netInDate != null">
+        NET_IN_DATE = #{netInDate,jdbcType=VARCHAR},
+      </if>
+      <if test="toolsInvoiceAmt != null">
+        TOOLS_INVOICE_AMT = #{toolsInvoiceAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="monthProfitAmt != null">
+        MONTH_PROFIT_AMT = #{monthProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="repaymentPeriod != null">
+        REPAYMENT_PERIOD = #{repaymentPeriod,jdbcType=DECIMAL},
+      </if>
+      <if test="remitAmt != null">
+        REMIT_AMT = #{remitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="parenterSupplyAmt != null">
+        PARENTER_SUPPLY_AMT = #{parenterSupplyAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="cUser != null">
+        C_USER = #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="cTime != null">
+        C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="examinrId != null">
+        EXAMINR_ID = #{examinrId,jdbcType=VARCHAR},
+      </if>
+      <if test="examinrStatus != null">
+        EXAMINR_STATUS = #{examinrStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="deductionId != null">
+        DEDUCTION_ID = #{deductionId,jdbcType=VARCHAR},
+      </if>
+      <if test="rev1 != null">
+        REV1 = #{rev1,jdbcType=VARCHAR},
+      </if>
+      <if test="rev2 != null">
+        REV2 = #{rev2,jdbcType=VARCHAR},
+      </if>
+      <if test="rev3 != null">
+        REV3 = #{rev3,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.PToolSupply">
+    update P_TOOL_SUPPLY
+    set PROFIT_DATE = #{profitDate,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      PARENTER_AGENT_NAME = #{parenterAgentName,jdbcType=VARCHAR},
+      PARENTER_AGENT_ID = #{parenterAgentId,jdbcType=VARCHAR},
+      BUS_CODE = #{busCode,jdbcType=VARCHAR},
+      NET_IN_DATE = #{netInDate,jdbcType=VARCHAR},
+      TOOLS_INVOICE_AMT = #{toolsInvoiceAmt,jdbcType=DECIMAL},
+      MONTH_PROFIT_AMT = #{monthProfitAmt,jdbcType=DECIMAL},
+      REPAYMENT_PERIOD = #{repaymentPeriod,jdbcType=DECIMAL},
+      REMIT_AMT = #{remitAmt,jdbcType=DECIMAL},
+      PARENTER_SUPPLY_AMT = #{parenterSupplyAmt,jdbcType=DECIMAL},
+      C_USER = #{cUser,jdbcType=VARCHAR},
+      C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      EXAMINR_ID = #{examinrId,jdbcType=VARCHAR},
+      EXAMINR_STATUS = #{examinrStatus,jdbcType=VARCHAR},
+      DEDUCTION_ID = #{deductionId,jdbcType=VARCHAR},
+      REV1 = #{rev1,jdbcType=VARCHAR},
+      REV2 = #{rev2,jdbcType=VARCHAR},
+      REV3 = #{rev3,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+  <!--=====================================以上代码自动生成请勿修改==============================================-->
+
+
+
+
+
+
+
+</mapper>

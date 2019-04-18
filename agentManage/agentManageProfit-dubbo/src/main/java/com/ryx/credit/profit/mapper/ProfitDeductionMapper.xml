@@ -559,14 +559,14 @@
     </select>
 
   <select id="getNotDeductionAmt" parameterType="java.util.Map" resultType="java.math.BigDecimal">
-    select sum(MUST_DEDUCTION_AMT) from P_DEDUCTION
+    select sum(case when pd.deduction_Status = '1' then pd.NOT_DEDUCTION_AMT  else  pd.MUST_DEDUCTION_AMT end) from P_DEDUCTION pd
     <where>
-      DEDUCTION_DATE = #{date} AND DEDUCTION_STATUS='0' AND DEDUCTION_TYPE=#{type}
+      pd.DEDUCTION_DATE = #{date}  AND pd.DEDUCTION_TYPE=#{type}
       <if test="agentId != null and agentId != ''">
-        and AGENT_ID = #{agentId}
+        and pd.AGENT_ID = #{agentId}
       </if>
       <if test="agentName != null and agentName != ''">
-        and AGENT_NAME = #{agentName}
+        and pd.AGENT_NAME = #{agentName}
       </if>
     </where>
   </select>
@@ -594,9 +594,39 @@
         and pdd.REMARK like #{remark}
     </select>
 
-    <update id="clearComputData">
+    <update id="clearComputData" parameterType="java.lang.String">
         update P_DEDUCTION set ACTUAL_DEDUCTION_AMT=0,NOT_DEDUCTION_AMT=0
         where DEDUCTION_DATE = '${profitDate}' and DEDUCTION_TYPE='${decutionType}'
     </update>
+
+    <select id="getToolsDebt" parameterType="java.util.Map" resultType="java.math.BigDecimal" >
+        select sum(case when pd.deduction_Status = '5' then pd.NOT_DEDUCTION_AMT  else  pd.MUST_DEDUCTION_AMT end)+sum(psd.MUST_AMT)
+          from P_DEDUCTION pd left join P_STAGING_DETAIL psd on psd.STAG_ID = pd.ID
+        <where>
+            pd.DEDUCTION_DATE = #{date} AND pd.DEDUCTION_TYPE=#{type}
+            <if test="agentId != null and agentId != ''">
+                and pd.AGENT_ID = #{agentId}
+            </if>
+            <if test="agentName != null and agentName != ''">
+                and pd.AGENT_NAME = #{agentName}
+            </if>
+        </where>
+    </select>
+
+    <select id="getPorfitDataByAgentIdAndProfitMonth" resultType="java.util.Map">
+        select
+           tpd.PROFIT_DATE ,
+           A_AGENT.AG_NAME ,
+           tpd.AGENT_ID ,
+           tpd.PARENT_AGENT_NAME ,
+           tpd.PARENT_AGENT_ID ,
+           tpd.BUS_CODE ,
+           A_AGENT.C_INCOM_TIME ,
+           pd.ID,
+           pd.MUST_DEDUCTION_AMT ,
+           tpd.PROFIT_AMT
+        from TRANS_PROFIT_DETAIL tpd inner join  (select * from P_DEDUCTION p where p.DEDUCTION_TYPE='02') pd on tpd.AGENT_ID=pd.AGENT_ID and tpd.PROFIT_DATE=pd.DEDUCTION_DATE and tpd.BUS_CODE=pd.DEDUCTION_DESC left join A_AGENT on tpd.AGENT_ID=A_AGENT.ID
+        where pd.STAGING_STATUS in('0','1','4')and tpd.AGENT_ID=#{agentId,jdbcType=VARCHAR} and PROFIT_DATE=#{profitMonth,jdbcType=VARCHAR}
+    </select>
 
 </mapper>

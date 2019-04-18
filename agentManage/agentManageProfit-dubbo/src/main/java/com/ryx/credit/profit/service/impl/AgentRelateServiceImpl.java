@@ -20,6 +20,7 @@ import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.TaskApprovalService;
 import com.ryx.credit.service.dict.IdService;
+import com.sun.corba.se.spi.ior.ObjectKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -221,5 +222,10 @@ public class AgentRelateServiceImpl implements IAgentRelateService {
             e.printStackTrace();
             logger.error("代理商关联审批流回调异常，activId：{}" + insid);
         }
+    }
+
+    @Override
+    public List<String> getRelateAgentIdByAgentIdAndTime(String agentId, String profitDate) {
+        return agentRelateMapper.getRelateAgentIdByAgentIdAndTime(agentId,profitDate);
     }
 }
