@@ -60,6 +60,7 @@
                 description="收款账户同步出款表"
                 sharding-total-count="1"
                 sharding-item-parameters="0=Server0"/>
+
   <!--  <job:simple id="completAllAgentBusInfoCompany"
                 job-ref="completAllAgentBusInfoCompanyJob"
                 registry-center-ref="regCenter"
@@ -69,6 +70,23 @@
                 sharding-total-count="1"
                 sharding-item-parameters="0=Server0"/>-->
 
+    <job:simple id="checkAgentColinfoJob"
+                job-ref="checkAgentColinfoJob"
+                registry-center-ref="regCenter"
+                cron="0 0 5 * * ?"
+                overwrite="true"
+                description="代理商收款账户不唯一"
+                sharding-total-count="1"
+                sharding-item-parameters="0=Server0"/>
+
+    <!--<job:simple id="completAllAgentBusInfoCompany"-->
+                <!--job-ref="completAllAgentBusInfoCompanyJob"-->
+                <!--registry-center-ref="regCenter"-->
+                <!--cron="0 0/2 * * * ?"-->
+                <!--overwrite="true"-->
+                <!--description="修复代理商业务平台的打款公司"-->
+                <!--sharding-total-count="1"-->
+                <!--sharding-item-parameters="0=Server0"/>-->
 
     <!--&lt;!&ndash;configure job 样例配置 &ndash;&gt;-->
     <!--<job:simple id="mySimpleTask"-->
