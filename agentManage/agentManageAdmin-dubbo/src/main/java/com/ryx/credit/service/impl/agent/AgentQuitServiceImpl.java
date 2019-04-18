@@ -1139,14 +1139,14 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
             agentNotifyVo.setOrgId(agentBusInfo.getBusNum());
             agentNotifyVo.setRemark("代理商退出");
             record.setSendJson("orgId:" + agentNotifyVo.getOrgId());
-            agentResult = httpRequestForPos(agentNotifyVo);
+            agentResult = httpRequestForPosQuit(agentNotifyVo);
         } else if (platType.equals(PlatformType.MPOS.getValue())) {
             AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
             List<String> list = new ArrayList<>();
             list.add(agentBusInfo.getBusNum());
             agentNotifyVo.setBatchIds(list);
             record.setSendJson("batchIds:" + JsonUtil.objectToJson(list));
-            agentResult = httpRequestForMPOS(agentNotifyVo);
+            agentResult = httpRequestForMPOSQuit(agentNotifyVo);
         }
         //接口请求成功
         if (null != agentResult && !"".equals(agentResult) && agentResult.isOK()) {
@@ -1166,7 +1166,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
     }
 
 
-    public static AgentResult httpRequestForPos(AgentNotifyVo agentNotifyVo)throws Exception{
+    private AgentResult httpRequestForPosQuit(AgentNotifyVo agentNotifyVo)throws Exception{
         try {
 
             String cooperator = com.ryx.credit.util.Constants.cooperator;
@@ -1245,7 +1245,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         }
     }
 
-    private AgentResult httpRequestForMPOS(AgentNotifyVo agentNotifyVo)throws Exception{
+    private AgentResult httpRequestForMPOSQuit(AgentNotifyVo agentNotifyVo)throws Exception{
 
         try {
             Map<String,Object> jsonParams = new HashMap<>();
