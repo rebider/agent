@@ -24,9 +24,9 @@ public class AgentLoginAccountCreateJob implements SimpleJob {
     @Override
     public void execute(ShardingContext shardingContext) {
         try {
-            logger.info("======job:{}，开始",shardingContext.getJobName());
+            logger.debug("======job:{}，开始",shardingContext.getJobName());
             AgentResult agentResult = agentService.createAgentAccount();
-            logger.info("======job:{}，结束:{}",shardingContext.getJobName(),agentResult.getMsg());
+            logger.debug("======job:{}，结束:{}",shardingContext.getJobName(),agentResult.getMsg());
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("Job:"+shardingContext.getJobName()+",出错",e);

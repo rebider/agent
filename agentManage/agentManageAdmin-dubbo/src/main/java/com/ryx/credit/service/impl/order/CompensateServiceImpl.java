@@ -165,9 +165,9 @@ public class CompensateServiceImpl implements CompensateService {
         String snEnd = "";
         String count = "";
         try {
-            snBegin =  String.valueOf(excelList.get(0));
-            snEnd =  String.valueOf(excelList.get(1));
-            count =  String.valueOf(excelList.get(2));
+            snBegin =  String.valueOf(excelList.get(0)).trim();
+            snEnd =  String.valueOf(excelList.get(1)).trim();
+            count =  String.valueOf(excelList.get(2)).trim();
         } catch (Exception e) {
             throw new ProcessException("导入解析文件失败");
         }

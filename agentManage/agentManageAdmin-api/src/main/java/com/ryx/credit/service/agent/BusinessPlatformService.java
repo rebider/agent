@@ -1,5 +1,6 @@
 package com.ryx.credit.service.agent;
 
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -30,6 +31,8 @@ public interface BusinessPlatformService {
 
     AgentBusInfo findById(String id);
 
+    AgentBusInfo findByAgentId(String id);
+
     int updateByPrimaryKeySelective(AgentBusInfo agentBusInfo);
 
     void updateBusInfoList(List<AgentBusInfoVo> busInfoVoList)throws Exception;
@@ -48,6 +51,14 @@ public interface BusinessPlatformService {
     public List<String> addList(List<List<Object>> list, String userid) throws Exception;
 
     int updateBusPlatDkgsBySelective(AgentBusInfo agentBusInfo,String userId);
+
+    /**
+     * 代理商入网修改打款公司
+     * @param agentBusInfo
+     * @param userId
+     * @return
+     */
+    int updateCompany(AgentBusInfo agentBusInfo,String userId) throws MessageException;
 
     /**
      * 业务部的导出数据

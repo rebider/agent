@@ -11,6 +11,7 @@ import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.agent.AgentMergeMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.agent.*;
+import com.ryx.credit.dao.bank.DPosRegionMapper;
 import com.ryx.credit.dao.order.*;
 import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.AgentMerge;
@@ -31,6 +32,7 @@ import com.ryx.credit.pojo.admin.CuserAgent;
 import com.ryx.credit.pojo.admin.CuserAgentExample;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.service.bank.PosRegionService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OCashReceivablesService;
@@ -57,7 +59,7 @@ import java.util.List;
  * @return
  **/
 @Service("agentMergeService")
-public class AgentMergeServiceImpl implements AgentMergeService {
+public class AgentMergeServiceImpl  implements AgentMergeService {
 
     private static Logger logger = LoggerFactory.getLogger(AgentMergeServiceImpl.class);
     @Autowired
@@ -134,6 +136,13 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     private OPaymentMapper paymentMapper;
     @Autowired
     private CapitalChangeApplyMapper capitalChangeApplyMapper;
+    @Autowired
+    private DPosRegionMapper posRegionMapper;
+    @Autowired
+    private PosRegionService posRegionService;
+    @Autowired
+    private RegionMapper regionMapper;
+
 
     /**
      * 合并列表
@@ -199,7 +208,14 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             agentMerge.setuUser(cUser);
             agentMerge.setStatus(Status.STATUS_1.status);
             agentMerge.setVersion(Status.STATUS_1.status);
-
+            String strBusType = "";
+            for(int i=0;i<busType.length;i++){
+                strBusType+=busType[i];
+                if(i!=busType.length-1){
+                    strBusType+=",";
+                }
+            }
+            agentMerge.setMergeBusIds(strBusType);
             //主代理商和副代理商必须是标准一代或机构，副代理商且不能有下级
             mainAndSubMustHaveLower(agentMerge);
             //合并中不能重复发起,判断是否有欠票欠款情况
@@ -212,14 +228,6 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             } else {
                 agentMerge.setCloReviewStatus(AgStatus.Create.status);
             }
-            String strBusType = "";
-            for(int i=0;i<busType.length;i++){
-                strBusType+=busType[i];
-                if(i!=busType.length-1){
-                    strBusType+=",";
-                }
-            }
-            agentMerge.setMergeBusIds(strBusType);
             if (1 != agentMergeMapper.insertSelective(agentMerge)) {
                 logger.info("代理商合并提交审批，新增数据失败:{}", cUser);
                 throw new MessageException("代理商合并提交审批，新增数据失败！");
@@ -410,14 +418,18 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         if(subAgentBusInfos.size()==0){
             throw new MessageException("副代理商业务信息有误");
         }
-        for (AgentBusInfo subAgentBusInfo : subAgentBusInfos) {
-            if(!subAgentBusInfo.getBusType().equals(BusType.BZYD.key) && !subAgentBusInfo.getBusType().equals(BusType.JG.key)){
+        String strMergeBusIds = agentMerge.getMergeBusIds();
+        String[] mergeBusIds = strMergeBusIds.split(",");
+        for(int i=0;i<mergeBusIds.length;i++) {
+            String mergeBusId = mergeBusIds[i];
+            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(mergeBusId);
+            if(!agentBusInfo.getBusType().equals(BusType.BZYD.key) && !agentBusInfo.getBusType().equals(BusType.JG.key)){
                 throw new MessageException("副代理商不是标准一代或机构");
             }
-            if(StringUtils.isBlank(subAgentBusInfo.getBusNum())){
+            if(StringUtils.isBlank(agentBusInfo.getBusNum())){
                 throw new MessageException("副代理商业务平台未入网成功");
             }
-            List<AgentBusInfo> childLevelBusInfos = agentBusinfoService.queryChildLevelByBusNum(null, subAgentBusInfo.getBusPlatform(), subAgentBusInfo.getBusNum());
+            List<AgentBusInfo> childLevelBusInfos = agentBusinfoService.queryChildLevelByBusNum(null, agentBusInfo.getBusPlatform(), agentBusInfo.getBusNum());
             if(childLevelBusInfos.size()!=0){
                 throw new MessageException("副代理商不能有下级");
             }
@@ -898,13 +910,6 @@ public class AgentMergeServiceImpl implements AgentMergeService {
 
             agentMerge.setuTime(new Date());
             agentMerge.setuUser(cUser);
-            //主代理商和副代理商必须是标准一代或机构，副代理商且不能有下级
-            mainAndSubMustHaveLower(agentMerge);
-            //合并中不能重复发起,判断是否有欠票欠款情况
-            verifyMergeing(agentMerge,busType,oCashReceivables);
-            //补款、退货、补差价、下订单流程中、有未排单的、未发货的,不可以合并
-            verifypprovaling(agentMerge.getSubAgentId());
-
             String strBusType = "";
             for(int i=0;i<busType.length;i++){
                 strBusType+=busType[i];
@@ -913,6 +918,13 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 }
             }
             agentMerge.setMergeBusIds(strBusType);
+            //主代理商和副代理商必须是标准一代或机构，副代理商且不能有下级
+            mainAndSubMustHaveLower(agentMerge);
+            //合并中不能重复发起,判断是否有欠票欠款情况
+            verifyMergeing(agentMerge,busType,oCashReceivables);
+            //补款、退货、补差价、下订单流程中、有未排单的、未发货的,不可以合并
+            verifypprovaling(agentMerge.getSubAgentId());
+
             if (1 != agentMergeMapper.updateByPrimaryKeySelective(agentMerge)) {
                 logger.info("代理商合并修改审批，更新数据失败:{}", cUser);
                 throw new MessageException("更新合并数据失败！");
@@ -1183,6 +1195,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
 
                 agentNotifyVo.setOrgName(agentName);
+                agentNotifyVo.setActivityType(platForm.getPosanameprefix());
                 AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentMergeBusInfo.getBusId());
                 Agent agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
                 agentNotifyVo.setUniqueId(agentBusInfo.getId());
@@ -1196,6 +1209,42 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 agentNotifyVo.setBusiType(platType.equals(PlatformType.POS.getValue())?"01":"02"); //cxinfo 新增瑞易送，瑞享送的等平台 pos结构 业务类型 变更
                 Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
                 agentNotifyVo.setOrgType(dictByValue.getdItemname().contains(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
+                //业务区域
+                String[] split = new String[1];
+                if(StringUtils.isNotBlank(agentBusInfo.getBusRegion())){
+                    String[] busRegion = agentBusInfo.getBusRegion().split(",");
+                    Boolean flag = false;
+                    for(int i=0;i<busRegion.length;i++){
+                        if(busRegion[i].equals("0")){
+                            flag = true;
+                            break;
+                        }
+                    }
+                    if(flag){
+                        Set<String> dPosRegions = posRegionMapper.queryNationwide();
+                        split = dPosRegions.toArray(new String[]{});
+                    }else{
+                        Set<String> dPosRegions = posRegionService.queryCityByCode(agentBusInfo.getBusRegion());
+                        split = dPosRegions.toArray(new String[]{});
+                    }
+                }
+                agentNotifyVo.setBusiAreas(split);
+                //注册区域
+                if(agent.getAgRegArea()!=null){
+                    List<String> regionList = getParent(agent.getAgRegArea());
+                    if(regionList!=null){
+                        if(regionList.size()==3){
+                            agentNotifyVo.setProvince(regionList.get(0));
+                            agentNotifyVo.setCity(regionList.get(1));
+                            agentNotifyVo.setCityArea(regionList.get(2));
+                        }else if(regionList.size()==2){
+                            agentNotifyVo.setProvince(regionList.get(0));
+                            agentNotifyVo.setCity(regionList.get(1));
+                        }else if(regionList.size()==1){
+                            agentNotifyVo.setProvince(regionList.get(0));
+                        }
+                    }
+                }
                 AgentBusInfo agentParent = null;
                 if(StringUtils.isNotBlank(agentBusInfo.getBusParent())){
                     //取出上级业务
@@ -1204,6 +1253,9 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                         agentNotifyVo.setSupDorgId(agentParent.getBusNum());
                     }
                 }
+                agentNotifyVo.setDebitTop(agentBusInfo.getDebitCapping());//借记封顶额（元）
+                agentNotifyVo.setCkDebitRate(agentBusInfo.getDebitAppearRate());//借记出款费率（%）
+                agentNotifyVo.setLowDebitRate(agentBusInfo.getDebitRateLower());//借记费率下限（%）
                 String sendJson = JsonUtil.objectToJson(agentNotifyVo);
                 record.setId(idService.genId(TabId.a_agent_platformsyn));
                 record.setNotifyTime(new Date());
@@ -1287,6 +1339,29 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             }
         }
         return AgentResult.ok();
+    }
+
+    public List<String> getParent(String busRegion){
+        List<String> resultList = new ArrayList<>();
+        Region region = queryParent(busRegion);
+        resultList.add(0,region.getrCode());
+        while (true){
+            if(!region.getpCode().equals("0")){
+                region = queryParent(region.getpCode());
+                resultList.add(0,region.getrCode());
+            }else{
+                break;
+            }
+        }
+        return resultList;
+    }
+
+    private Region queryParent(String busRegion){
+        RegionExample example = new RegionExample();
+        RegionExample.Criteria criteria = example.createCriteria();
+        criteria.andRCodeEqualTo(busRegion);
+        List<Region> regions = regionMapper.selectByExample(example);
+        return regions.get(0);
     }
 
     /**
