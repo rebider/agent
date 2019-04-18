@@ -162,7 +162,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
 
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
-    public void updateStatus(String activId, String status,String type) {
+    public void updateStatus(String activId, String type) {
         BusActRel busActRel = new BusActRel();
         busActRel.setActivId(activId);
         try {
@@ -184,7 +184,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                             //更新为审批拒绝
                             rel.setActivStatus(AgStatus.Refuse.name());
                             taskApprovalService.updateABusActRel(rel);
-
+                            pToolSupply.setExaminrStatus(CitySupplyStatus.STATUS_01.code);
                         }
                         if ("finish_end".equals(type)){
                             ProfitDeduction   profitDeduction =  profitDeductionMapper.selectByPrimaryKey(pToolSupply.getDeductionId());
@@ -196,9 +196,11 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                             //更新为审批通过
                             rel.setActivStatus(AgStatus.Approved.name());
                             taskApprovalService.updateABusActRel(rel);
+                            pToolSupply.setExaminrStatus(CitySupplyStatus.STATUS_02.code);
                         }
 
-                        pToolSupply.setExaminrStatus(status);
+
+
 
                         //更新申请补款表中的状态.
                         pToolSupplyMapper.updateByPrimaryKey(pToolSupply);
@@ -214,9 +216,12 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
     }
 
     @Override
-    public List<PToolSupply> selectByExample(PToolSupplyExample example) {
+    public List<PToolSupply> selectByExample(PToolSupply pToolSupply) {
 
-        return pToolSupplyMapper.selectByExample(example);
+        PToolSupplyExample pToolSupplyExample = new PToolSupplyExample();
+        PToolSupplyExample.Criteria criteria = pToolSupplyExample.createCriteria();
+        criteria.andExaminrIdEqualTo(pToolSupply.getExaminrId());
+        return pToolSupplyMapper.selectByExample(pToolSupplyExample);
     }
     @Override
     public int updateByPrimaryKey(PRemitInfo pRemitInfo) {
@@ -481,30 +486,49 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
             try {
                 TransProfitDetailExample transProfitDetailExample = new TransProfitDetailExample();
                 TransProfitDetailExample.Criteria criteria1 = transProfitDetailExample.createCriteria();
-                criteria1.andBusCodeEqualTo(pToolSupply.getBusCode());
-                criteria1.andAgentIdEqualTo(pToolSupply.getAgentId());
-                criteria1.andProfitDateEqualTo(pToolSupply.getProfitDate());
+                if(StringUtils.isNotBlank(pToolSupply.getBusCode())){
+                    criteria1.andBusCodeEqualTo(pToolSupply.getBusCode());
+                }
+                if(StringUtils.isNotBlank(pToolSupply.getAgentId())){
+                    criteria1.andAgentIdEqualTo(pToolSupply.getAgentId());
+                }
+                if(StringUtils.isNotBlank(pToolSupply.getProfitDate())){
+                    criteria1.andProfitDateEqualTo(pToolSupply.getProfitDate());
+                }
+
                 List<TransProfitDetail> transProfitDetails1 = profitDetailMonthServiceImpl.getTransProfitDetailByBusCode(transProfitDetailExample);
                 TransProfitDetailExample transProfitDetailExample1 = new TransProfitDetailExample();
                 TransProfitDetailExample.Criteria criteria2 = transProfitDetailExample1.createCriteria();
-                criteria2.andBusCodeEqualTo(pToolSupply.getBusCode());
-                criteria2.andAgentIdEqualTo(transProfitDetails1.get(0).getParentAgentId());
-                criteria2.andProfitDateEqualTo(pToolSupply.getProfitDate());
+                if(StringUtils.isNotBlank(pToolSupply.getBusCode())){
+                    criteria2.andBusCodeEqualTo(pToolSupply.getBusCode());
+                }
+                if(StringUtils.isNotBlank(transProfitDetails1.get(0).getParentAgentId())){
+                    criteria2.andAgentIdEqualTo(transProfitDetails1.get(0).getParentAgentId());
+                }
+                if(StringUtils.isNotBlank(pToolSupply.getProfitDate())){
+                    criteria2.andProfitDateEqualTo(pToolSupply.getProfitDate());
+                }
                 List<TransProfitDetail> transProfitDetails = profitDetailMonthServiceImpl.getTransProfitDetailByBusCode(transProfitDetailExample1);
                 if(1!=transProfitDetails.size()){
                     LOG.info("查询{}补款对应的月份润平台对应的上级失败",pToolSupply.getId());
-                    return ;
+                    throw new ProcessException("查询补款对应的月份润平台对应的上级失败");
                 }
                 LOG.info("查询此条补款对应的月份润汇总");
                 ProfitDetailMonthExample profitDetailMonthExample = new ProfitDetailMonthExample();
                 ProfitDetailMonthExample.Criteria criteria = profitDetailMonthExample.createCriteria();
-                criteria.andAgentIdEqualTo(pToolSupply.getParenterAgentId());
-                criteria.andProfitDateEqualTo(pToolSupply.getProfitDate());
-                criteria.andParentAgentIdEqualTo(transProfitDetails.get(0).getParentAgentId());
+                if(StringUtils.isNotBlank(pToolSupply.getParenterAgentId())) {
+                    criteria.andAgentIdEqualTo(pToolSupply.getParenterAgentId());
+                }
+                if(StringUtils.isNotBlank(pToolSupply.getProfitDate())) {
+                    criteria.andProfitDateEqualTo(pToolSupply.getProfitDate());
+                }
+                if(StringUtils.isNotBlank(transProfitDetails.get(0).getParentAgentId())) {
+                    criteria.andParentAgentIdEqualTo(transProfitDetails.get(0).getParentAgentId());
+                }
                 List<ProfitDetailMonth> profitDetailMonthList = profitMonthService.byProfitDetailMonth(profitDetailMonthExample);
                 if(1!=profitDetailMonthList.size()){
                     LOG.info("查询{}补款对应的月份润汇总失败",pToolSupply.getId());
-                    return ;
+                    throw new ProcessException("查询补款对应的月份润汇总失败");
                 }
                 ProfitDetailMonth profitDetailMonth =  profitDetailMonthList.get(0);
                 //上级代理商的月份润
@@ -530,7 +554,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                 pToolSupplyMapper.insert(pToolSupply);
             } catch (Exception e) {
                 LOG.error("更新补款内容失败{}", pToolSupply.getDeductionId());
-                return;
+                throw new ProcessException("更新补款内容失败");
             }
 
             //更新扣款表中的状态为补款中。
@@ -540,7 +564,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                 profitDeductionMapper.updateByPrimaryKey(profitDeduction);
             } catch (Exception e) {
                 LOG.error("更新扣款表状态失败失败{}", pToolSupply.getDeductionId());
-                return;
+                throw new ProcessException("更新扣款表状态失败失败");
             }
 
         }

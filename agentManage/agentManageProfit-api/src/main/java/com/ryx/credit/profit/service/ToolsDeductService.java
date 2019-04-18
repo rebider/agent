@@ -102,11 +102,11 @@ public interface ToolsDeductService {
      */
     void editToolSupply(List<PToolSupply> pToolSupplys, String detailId, PRemitInfo pRemitInfo);
 
-    void updateStatus(String activId, String status,String type);
+    public void updateStatus(String activId, String type);
 
 
 
-    List<PToolSupply> selectByExample(PToolSupplyExample example);
+    public List<PToolSupply> selectByExample(PToolSupply pToolSupply);
 
     List<PRemitInfo> brCitySupplyId(String citySupplyId);
 

@@ -34,12 +34,12 @@ public class ToolSupplyTaskExecutionListener implements TaskListener, ExecutionL
             ToolsDeductService toolsDeductService = (ToolsDeductService) MySpringContextHandler.applicationContext.getBean("toolsDeductService");
             //省区审批拒绝
             if ("reject_end".equals(activityName)) {
-                toolsDeductService.updateStatus(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.name(),"01");
+                toolsDeductService.updateStatus(delegateExecution.getProcessInstanceId(), activityName);
                 logger.info("=========TerminalTransferTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName);
             }
             //审批同意更新数据库
             if ("finish_end".equals(activityName)) {
-                toolsDeductService.updateStatus(delegateExecution.getProcessInstanceId(), AgStatus.Approved.name(),"02");
+                toolsDeductService.updateStatus(delegateExecution.getProcessInstanceId(), activityName);
                 logger.info("=========TerminalTransferTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName);
             }
         } else if ("take".equals(eventName)) {
