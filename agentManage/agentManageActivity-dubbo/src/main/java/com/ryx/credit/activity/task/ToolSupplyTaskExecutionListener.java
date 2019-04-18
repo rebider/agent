@@ -19,8 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class ToolSupplyTaskExecutionListener implements TaskListener, ExecutionListener {
     private static final Logger logger = LoggerFactory.getLogger(ToolSupplyTaskExecutionListener.class);
-  @Autowired
-  TaskListenterCommon taskListenterCommon;
+
+
 
     @Override
     public void notify(DelegateExecution delegateExecution) throws Exception {
@@ -49,6 +49,7 @@ public class ToolSupplyTaskExecutionListener implements TaskListener, ExecutionL
 
     @Override
     public void notify(DelegateTask delegateTask) {
+        TaskListenterCommon taskListenterCommon = new TaskListenterCommon();
         taskListenterCommon.notify(delegateTask,logger);
     }
 }

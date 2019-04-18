@@ -365,6 +365,7 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
      */
 
     private Map<String, Object> fourRound(Map<String, Object> map, PToolSupply pToolSupply, String computType) throws Exception {
+        try {
         String typename = (String) map.get("rotation");
         LOG.info("查询此条补款对应的扣款");
         //此平台下对应的机具扣款
@@ -402,36 +403,16 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
 
         //需要上级代扣的款项
         BigDecimal upSupplyAmt   = pToolSupply.getParenterSupplyAmt();
-
-
+        //更新机具扣款表
+        profitDeduction.setRev3(upSupplyAmt.toString());
+        profitDeduction.setActualDeductionAmt(profitDeduction.getActualDeductionAmt().add(pToolSupply.getRemitAmt()).add(upSupplyAmt));
+        profitDeduction.setNotDeductionAmt(profitDeduction.getMustDeductionAmt().subtract(profitDeduction.getActualDeductionAmt()));
         //上级代扣明细
         ProfitDeduction insertup = new ProfitDeduction();
-        if (upSupplyAmt.compareTo(BigDecimal.ZERO)==1){
-            if(basicAmt.compareTo(upSupplyAmt)!=-1){//不够扣
-                profitDeduction.setRev3(basicAmt.toString());
-                profitDeduction.setActualDeductionAmt(profitDeduction.getActualDeductionAmt().add(pToolSupply.getRemitAmt()).add(basicAmt));
-                profitDeduction.setNotDeductionAmt(profitDeduction.getMustDeductionAmt().subtract(profitDeduction.getActualDeductionAmt()));
-                insertup.setMustDeductionAmt(upSupplyAmt);
-                insertup.setActualDeductionAmt(basicAmt);
-                insertup.setNotDeductionAmt(upSupplyAmt.subtract(basicAmt));
-                basicAmt = BigDecimal.ZERO;
-                profitDetailMonth.setBasicsProfitAmt(basicAmt);
-            }else{//够扣
-                profitDeduction.setRev3(pToolSupply.getParenterSupplyAmt().toString());
-                profitDeduction.setActualDeductionAmt(profitDeduction.getActualDeductionAmt().add(pToolSupply.getRemitAmt()).add(pToolSupply.getParenterSupplyAmt()));
-                profitDeduction.setNotDeductionAmt(profitDeduction.getMustDeductionAmt().subtract(profitDeduction.getActualDeductionAmt()));
-                insertup.setMustDeductionAmt(upSupplyAmt);
-                insertup.setActualDeductionAmt(upSupplyAmt);
-                insertup.setNotDeductionAmt(BigDecimal.ZERO);
-                basicAmt = basicAmt.subtract(upSupplyAmt);
-                profitDetailMonth.setBasicsProfitAmt(basicAmt);
-            }
-
-        }else{
-            profitDeduction.setRev3("0");
-        }
-
-        try {
+        if(pToolSupply.getParenterSupplyAmt().compareTo(BigDecimal.ZERO)==1){
+            insertup.setMustDeductionAmt(pToolSupply.getToolsInvoiceAmt().subtract(pToolSupply.getRemitAmt()));
+            insertup.setActualDeductionAmt(upSupplyAmt);
+            insertup.setNotDeductionAmt(insertup.getMustDeductionAmt().subtract(insertup.getActualDeductionAmt()));
             insertup.setAgentPid(profitDeduction.getAgentId());
             insertup.setAgentId(profitDeduction.getAgentId());
             insertup.setAgentName(profitDeduction.getAgentName());
@@ -442,7 +423,9 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
             insertup.setRemark(typename + "上级代理商代理商代扣机具款，扣款明细：" + profitDeduction.getSourceId());
             insertup.setUserId(profitDeduction.getAgentId());
             profitDeducttionDetailService.insertDeducttionDetail(insertup);
-
+        }
+        basicAmt = basicAmt.subtract(pToolSupply.getParenterSupplyAmt());
+        profitDetailMonth.setBasicsProfitAmt(basicAmt);
 
 
             //更新剩余分润
