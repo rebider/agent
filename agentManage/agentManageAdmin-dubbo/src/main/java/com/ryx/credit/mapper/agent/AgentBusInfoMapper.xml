@@ -1017,5 +1017,9 @@
     )b group by b.agent_id having count(b.clo_pay_company)>1
   </select>
 
-
+  <!--代理商打款公司出现不统一问题修复任务-->
+  <select id="selectAgentHaveMutPayCompany" resultType="map">
+   select bus.ID,col.CLO_TYPE,col.CLO_INVOICE,bus.CLO_PAY_COMPANY from
+   a_agent_businfo bus  left join A_agent_colinfo col  on bus.agent_id=col.agent_id
+  </select>
 </mapper>

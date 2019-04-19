@@ -889,7 +889,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
      * @param busRegion
      * @return
      */
-    private List<String> getParent(String busRegion){
+    public List<String> getParent(String busRegion){
         List<String> resultList = new ArrayList<>();
         Region region = queryParent(busRegion);
         resultList.add(0,region.getrCode());

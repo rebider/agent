@@ -676,8 +676,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 	@Override
 	public AgentResult completAllAgentBusInfoCompany() {
-		List<String> agentS = agentBusInfoMapper.queryAgentHaveMutPayCompany();
 		StringBuffer sb = new StringBuffer();
+	/*	List<String> agentS = agentBusInfoMapper.queryAgentHaveMutPayCompany();
 		agentS.forEach(
 				agentId -> {
 					try {
@@ -688,7 +688,31 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 						logger.error("[修复打款公司"+agentId+":"+e.getLocalizedMessage()+"]");
 					}
 				}
-		);
+		);*/
+		List<Map<String,Object>> PayCompanyMap=agentBusInfoMapper.selectAgentHaveMutPayCompany();
+		for (Map map : PayCompanyMap) {
+			String id =(String) map.get("ID");
+			BigDecimal clo_invoice = (BigDecimal)map.get("CLO_INVOICE");//是否开具发票
+			BigDecimal clo_type = (BigDecimal)map.get("CLO_TYPE");//收款账户类型
+			String CLO_PAY_COMPANY = (String)map.get("CLO_PAY_COMPANY");//打款公司
+			AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(id);
+			//开始修复打款公司
+			if (null!=clo_type && null!=clo_invoice){
+				if (clo_type.compareTo(new BigDecimal(1))==0 && clo_invoice.compareTo(new BigDecimal(1))==0){
+					//对公并开发票---深圳瑞银信
+					agentBusInfo.setCloPayCompany("Q000029564");
+					agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+				}else if(clo_type.compareTo(new BigDecimal(1))==0 && clo_invoice.compareTo(new BigDecimal(0))==0){
+					//对公不开发票---瑞熙
+					agentBusInfo.setCloPayCompany("Q000029560");
+					agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+				}else if(clo_type.compareTo(new BigDecimal(2))==0){
+			        //对私不管是否开发票---瑞熙
+					agentBusInfo.setCloPayCompany("Q000029560");
+					agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+				}
+			}
+		}
 		logger.info(sb.toString());
 		return AgentResult.ok();
 	}
