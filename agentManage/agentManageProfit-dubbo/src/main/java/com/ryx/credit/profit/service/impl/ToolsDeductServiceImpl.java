@@ -484,6 +484,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
             }
 
             try {
+                if(pToolSupply.getParenterSupplyAmt().compareTo(BigDecimal.ZERO)!=0){
                 TransProfitDetailExample transProfitDetailExample = new TransProfitDetailExample();
                 TransProfitDetailExample.Criteria criteria1 = transProfitDetailExample.createCriteria();
                 if(StringUtils.isNotBlank(pToolSupply.getBusCode())){
@@ -535,15 +536,16 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                 BigDecimal basicAmt = profitDetailMonth.getBasicsProfitAmt();
                 //需要上级代扣的款项
                 BigDecimal upSupplyAmt = BigDecimal.ZERO;
-                if(pToolSupply.getParenterSupplyAmt().compareTo(BigDecimal.ZERO)!=0){
+
                     //需要上级代扣的款项
                     upSupplyAmt = pToolSupply.getToolsInvoiceAmt().subtract(pToolSupply.getRemitAmt());
+                    if(basicAmt.compareTo(upSupplyAmt)!=-1){
+                        pToolSupply.setParenterSupplyAmt(upSupplyAmt);
+                    }else{
+                        pToolSupply.setParenterSupplyAmt(basicAmt);
+                    }
                 }
-                if(basicAmt.compareTo(upSupplyAmt)!=-1){
-                    pToolSupply.setParenterSupplyAmt(upSupplyAmt);
-                }else{
-                    pToolSupply.setParenterSupplyAmt(basicAmt);
-                }
+
 
 
                 pToolSupply.setId(idService.genId(TabId.P_TOOL_SUPPLY));
@@ -553,8 +555,9 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                 pToolSupply.setExaminrStatus(CitySupplyStatus.STATUS_00.code);
                 pToolSupplyMapper.insert(pToolSupply);
             } catch (Exception e) {
-                LOG.error("更新补款内容失败{}", pToolSupply.getDeductionId());
-                throw new ProcessException("更新补款内容失败");
+                e.printStackTrace();
+                LOG.error("插入补款内容失败{}", pToolSupply.getDeductionId());
+                throw new ProcessException("插入补款内容失败");
             }
 
             //更新扣款表中的状态为补款中。
