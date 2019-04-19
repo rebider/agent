@@ -640,6 +640,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                         throw new ProcessException("省区补款/上级代理商代扣申请审批流修改是失败!:{}");
                     }*/
                     PToolSupply1.setRemitAmt(pToolSupply2.getRemitAmt());
+                    if(pToolSupply2.getParenterSupplyAmt().compareTo(BigDecimal.ZERO)!=0){
                     TransProfitDetailExample transProfitDetailExample = new TransProfitDetailExample();
                     TransProfitDetailExample.Criteria criteria1 = transProfitDetailExample.createCriteria();
                     criteria1.andBusCodeEqualTo(pToolSupply2.getBusCode());
@@ -672,16 +673,16 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                     BigDecimal basicAmt = profitDetailMonth.getBasicsProfitAmt();
                     //需要上级代扣的款项
                     BigDecimal upSupplyAmt = BigDecimal.ZERO;
-                    if(pToolSupply2.getParenterSupplyAmt().compareTo(BigDecimal.ZERO)!=0){
+
                         //需要上级代扣的款项
                         upSupplyAmt = pToolSupply2.getToolsInvoiceAmt().subtract(pToolSupply2.getRemitAmt());
+                        if(basicAmt.compareTo(upSupplyAmt)!=-1){
+                            PToolSupply1.setParenterSupplyAmt(upSupplyAmt);
+                        }else{
+                            PToolSupply1.setParenterSupplyAmt(basicAmt);
+                        }
+
                     }
-                    if(basicAmt.compareTo(upSupplyAmt)!=-1){
-                        PToolSupply1.setParenterSupplyAmt(upSupplyAmt);
-                    }else{
-                        PToolSupply1.setParenterSupplyAmt(basicAmt);
-                    }
-                   /* PToolSupply1.setParenterSupplyAmt(pToolSupply2.getParenterSupplyAmt());*/
                     pToolSupplyMapper.updateByPrimaryKey(PToolSupply1);
                 }
 
