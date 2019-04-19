@@ -417,7 +417,8 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     OActivityExample.Criteria activityCriteria = oActivityExample.createCriteria();
                     activityCriteria.andStatusEqualTo(Status.STATUS_1.status);
                     activityCriteria.andBusProCodeEqualTo(termActiveId);
-                    activityCriteria.andBusProNameEqualTo(termActiveName);
+                    // 活动E - > 满5K返120+20+20(第2、3个月20月结)
+                    //activityCriteria.andBusProNameEqualTo(termActiveName);
                     activityCriteria.andTermBatchcodeEqualTo(termBatchId);
                     activityCriteria.andTermtypeEqualTo(termTypeId);
                     List<OActivity> oActivities = activityMapper.selectByExample(oActivityExample);
