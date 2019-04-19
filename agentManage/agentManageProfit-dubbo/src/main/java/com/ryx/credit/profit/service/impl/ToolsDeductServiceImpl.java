@@ -322,6 +322,10 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
             profitStagingDetail.setMustAmt(mustDeductionAmt);
             profitStagingDetail.setRemark("机具扣款分期调整下月扣款明细");
             profitStagingDetailMapper.updateByPrimaryKeySelective(profitStagingDetail);
+            ProfitDeduction profitDeductionUpdate = new ProfitDeduction();
+            profitDeductionUpdate.setId(profitDeduction.getId());
+            profitDeductionUpdate.setRemark(profitDeduction.getRemark());
+            profitDeductionMapper.updateByPrimaryKeySelective(profitDeductionUpdate);
         } catch (Exception e) {
             e.printStackTrace();
             throw new Exception();
