@@ -337,7 +337,7 @@
         </trim>
     </insert>
     <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDeductionExample" resultType="java.lang.Integer">
-        select count(*) from P_DEDUCTION
+        select count(*) from P_DEDUCTION N ${innerJoinDepartment}
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
         </if>

@@ -72,4 +72,6 @@ public interface AgentService {
 
 
     void createUser(String agentId)throws Exception;
+
+    List<Agent> getListByORGAndId(Map<String,String> map);
 }

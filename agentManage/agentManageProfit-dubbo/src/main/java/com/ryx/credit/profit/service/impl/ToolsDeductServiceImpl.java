@@ -322,6 +322,10 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
             profitStagingDetail.setMustAmt(mustDeductionAmt);
             profitStagingDetail.setRemark("机具扣款分期调整下月扣款明细");
             profitStagingDetailMapper.updateByPrimaryKeySelective(profitStagingDetail);
+            ProfitDeduction profitDeductionUpdate = new ProfitDeduction();
+            profitDeductionUpdate.setId(profitDeduction.getId());
+            profitDeductionUpdate.setRemark(profitDeduction.getRemark());
+            profitDeductionMapper.updateByPrimaryKeySelective(profitDeductionUpdate);
         } catch (Exception e) {
             e.printStackTrace();
             throw new Exception();
@@ -484,6 +488,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
             }
 
             try {
+                if(pToolSupply.getParenterSupplyAmt().compareTo(BigDecimal.ZERO)!=0){
                 TransProfitDetailExample transProfitDetailExample = new TransProfitDetailExample();
                 TransProfitDetailExample.Criteria criteria1 = transProfitDetailExample.createCriteria();
                 if(StringUtils.isNotBlank(pToolSupply.getBusCode())){
@@ -535,15 +540,16 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                 BigDecimal basicAmt = profitDetailMonth.getBasicsProfitAmt();
                 //需要上级代扣的款项
                 BigDecimal upSupplyAmt = BigDecimal.ZERO;
-                if(pToolSupply.getParenterSupplyAmt().compareTo(BigDecimal.ZERO)!=0){
+
                     //需要上级代扣的款项
                     upSupplyAmt = pToolSupply.getToolsInvoiceAmt().subtract(pToolSupply.getRemitAmt());
+                    if(basicAmt.compareTo(upSupplyAmt)!=-1){
+                        pToolSupply.setParenterSupplyAmt(upSupplyAmt);
+                    }else{
+                        pToolSupply.setParenterSupplyAmt(basicAmt);
+                    }
                 }
-                if(basicAmt.compareTo(upSupplyAmt)!=-1){
-                    pToolSupply.setParenterSupplyAmt(upSupplyAmt);
-                }else{
-                    pToolSupply.setParenterSupplyAmt(basicAmt);
-                }
+
 
 
                 pToolSupply.setId(idService.genId(TabId.P_TOOL_SUPPLY));
@@ -553,8 +559,9 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                 pToolSupply.setExaminrStatus(CitySupplyStatus.STATUS_00.code);
                 pToolSupplyMapper.insert(pToolSupply);
             } catch (Exception e) {
-                LOG.error("更新补款内容失败{}", pToolSupply.getDeductionId());
-                throw new ProcessException("更新补款内容失败");
+                e.printStackTrace();
+                LOG.error("插入补款内容失败{}", pToolSupply.getDeductionId());
+                throw new ProcessException("插入补款内容失败");
             }
 
             //更新扣款表中的状态为补款中。
@@ -637,6 +644,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                         throw new ProcessException("省区补款/上级代理商代扣申请审批流修改是失败!:{}");
                     }*/
                     PToolSupply1.setRemitAmt(pToolSupply2.getRemitAmt());
+                    if(pToolSupply2.getParenterSupplyAmt().compareTo(BigDecimal.ZERO)!=0){
                     TransProfitDetailExample transProfitDetailExample = new TransProfitDetailExample();
                     TransProfitDetailExample.Criteria criteria1 = transProfitDetailExample.createCriteria();
                     criteria1.andBusCodeEqualTo(pToolSupply2.getBusCode());
@@ -669,16 +677,16 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                     BigDecimal basicAmt = profitDetailMonth.getBasicsProfitAmt();
                     //需要上级代扣的款项
                     BigDecimal upSupplyAmt = BigDecimal.ZERO;
-                    if(pToolSupply2.getParenterSupplyAmt().compareTo(BigDecimal.ZERO)!=0){
+
                         //需要上级代扣的款项
                         upSupplyAmt = pToolSupply2.getToolsInvoiceAmt().subtract(pToolSupply2.getRemitAmt());
+                        if(basicAmt.compareTo(upSupplyAmt)!=-1){
+                            PToolSupply1.setParenterSupplyAmt(upSupplyAmt);
+                        }else{
+                            PToolSupply1.setParenterSupplyAmt(basicAmt);
+                        }
+
                     }
-                    if(basicAmt.compareTo(upSupplyAmt)!=-1){
-                        PToolSupply1.setParenterSupplyAmt(upSupplyAmt);
-                    }else{
-                        PToolSupply1.setParenterSupplyAmt(basicAmt);
-                    }
-                   /* PToolSupply1.setParenterSupplyAmt(pToolSupply2.getParenterSupplyAmt());*/
                     pToolSupplyMapper.updateByPrimaryKey(PToolSupply1);
                 }
 
