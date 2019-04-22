@@ -1,7 +1,6 @@
 package com.ryx.credit.profit.pojo;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 public class FreezeAgent implements Serializable {
     private String id;
@@ -16,7 +15,9 @@ public class FreezeAgent implements Serializable {
 
     private String freezeType;
 
-    private BigDecimal freezeAmt;
+    private String status;
+
+    private String operationBatch;
 
     private String rev1;
 
@@ -70,12 +71,20 @@ public class FreezeAgent implements Serializable {
         this.freezeType = freezeType == null ? null : freezeType.trim();
     }
 
-    public BigDecimal getFreezeAmt() {
-        return freezeAmt;
+    public String getStatus() {
+        return status;
     }
 
-    public void setFreezeAmt(BigDecimal freezeAmt) {
-        this.freezeAmt = freezeAmt;
+    public void setStatus(String status) {
+        this.status = status == null ? null : status.trim();
+    }
+
+    public String getOperationBatch() {
+        return operationBatch;
+    }
+
+    public void setOperationBatch(String operationBatch) {
+        this.operationBatch = operationBatch == null ? null : operationBatch.trim();
     }
 
     public String getRev1() {

@@ -2,7 +2,6 @@ package com.ryx.credit.profit.pojo;
 
 import com.ryx.credit.common.util.Page;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -557,63 +556,143 @@ public class FreezeAgentExample {
             return (Criteria) this;
         }
 
-        public Criteria andFreezeAmtIsNull() {
-            addCriterion("FREEZE_AMT is null");
+        public Criteria andStatusIsNull() {
+            addCriterion("STATUS is null");
             return (Criteria) this;
         }
 
-        public Criteria andFreezeAmtIsNotNull() {
-            addCriterion("FREEZE_AMT is not null");
+        public Criteria andStatusIsNotNull() {
+            addCriterion("STATUS is not null");
             return (Criteria) this;
         }
 
-        public Criteria andFreezeAmtEqualTo(BigDecimal value) {
-            addCriterion("FREEZE_AMT =", value, "freezeAmt");
+        public Criteria andStatusEqualTo(String value) {
+            addCriterion("STATUS =", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andFreezeAmtNotEqualTo(BigDecimal value) {
-            addCriterion("FREEZE_AMT <>", value, "freezeAmt");
+        public Criteria andStatusNotEqualTo(String value) {
+            addCriterion("STATUS <>", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andFreezeAmtGreaterThan(BigDecimal value) {
-            addCriterion("FREEZE_AMT >", value, "freezeAmt");
+        public Criteria andStatusGreaterThan(String value) {
+            addCriterion("STATUS >", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andFreezeAmtGreaterThanOrEqualTo(BigDecimal value) {
-            addCriterion("FREEZE_AMT >=", value, "freezeAmt");
+        public Criteria andStatusGreaterThanOrEqualTo(String value) {
+            addCriterion("STATUS >=", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andFreezeAmtLessThan(BigDecimal value) {
-            addCriterion("FREEZE_AMT <", value, "freezeAmt");
+        public Criteria andStatusLessThan(String value) {
+            addCriterion("STATUS <", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andFreezeAmtLessThanOrEqualTo(BigDecimal value) {
-            addCriterion("FREEZE_AMT <=", value, "freezeAmt");
+        public Criteria andStatusLessThanOrEqualTo(String value) {
+            addCriterion("STATUS <=", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andFreezeAmtIn(List<BigDecimal> values) {
-            addCriterion("FREEZE_AMT in", values, "freezeAmt");
+        public Criteria andStatusLike(String value) {
+            addCriterion("STATUS like", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andFreezeAmtNotIn(List<BigDecimal> values) {
-            addCriterion("FREEZE_AMT not in", values, "freezeAmt");
+        public Criteria andStatusNotLike(String value) {
+            addCriterion("STATUS not like", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andFreezeAmtBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("FREEZE_AMT between", value1, value2, "freezeAmt");
+        public Criteria andStatusIn(List<String> values) {
+            addCriterion("STATUS in", values, "status");
             return (Criteria) this;
         }
 
-        public Criteria andFreezeAmtNotBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("FREEZE_AMT not between", value1, value2, "freezeAmt");
+        public Criteria andStatusNotIn(List<String> values) {
+            addCriterion("STATUS not in", values, "status");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusBetween(String value1, String value2) {
+            addCriterion("STATUS between", value1, value2, "status");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusNotBetween(String value1, String value2) {
+            addCriterion("STATUS not between", value1, value2, "status");
+            return (Criteria) this;
+        }
+
+        public Criteria andOperationBatchIsNull() {
+            addCriterion("OPERATION_BATCH is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOperationBatchIsNotNull() {
+            addCriterion("OPERATION_BATCH is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOperationBatchEqualTo(String value) {
+            addCriterion("OPERATION_BATCH =", value, "operationBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andOperationBatchNotEqualTo(String value) {
+            addCriterion("OPERATION_BATCH <>", value, "operationBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andOperationBatchGreaterThan(String value) {
+            addCriterion("OPERATION_BATCH >", value, "operationBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andOperationBatchGreaterThanOrEqualTo(String value) {
+            addCriterion("OPERATION_BATCH >=", value, "operationBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andOperationBatchLessThan(String value) {
+            addCriterion("OPERATION_BATCH <", value, "operationBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andOperationBatchLessThanOrEqualTo(String value) {
+            addCriterion("OPERATION_BATCH <=", value, "operationBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andOperationBatchLike(String value) {
+            addCriterion("OPERATION_BATCH like", value, "operationBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andOperationBatchNotLike(String value) {
+            addCriterion("OPERATION_BATCH not like", value, "operationBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andOperationBatchIn(List<String> values) {
+            addCriterion("OPERATION_BATCH in", values, "operationBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andOperationBatchNotIn(List<String> values) {
+            addCriterion("OPERATION_BATCH not in", values, "operationBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andOperationBatchBetween(String value1, String value2) {
+            addCriterion("OPERATION_BATCH between", value1, value2, "operationBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andOperationBatchNotBetween(String value1, String value2) {
+            addCriterion("OPERATION_BATCH not between", value1, value2, "operationBatch");
             return (Criteria) this;
         }
 
