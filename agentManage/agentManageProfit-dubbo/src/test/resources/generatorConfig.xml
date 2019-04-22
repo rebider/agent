@@ -76,7 +76,9 @@
 <!--		<table tableName="P_PROFIT_FACTOR" domainObjectName="PProfitFactor" enableUpdateByExample="true" enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="P_INVOICE_APPLY" domainObjectName="InvoiceApply" enableUpdateByExample="true" enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="P_INVOICE_DETAIL" domainObjectName="InvoiceDetail" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>-->
-		<table tableName="TRANCHECK_PLATFORM" domainObjectName="TranCheckPlatForm" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>
-		<table tableName="TRANCHECK_DATA" domainObjectName="TranCheckData" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>
+		<!--<table tableName="TRANCHECK_PLATFORM" domainObjectName="TranCheckPlatForm" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>
+		<table tableName="TRANCHECK_DATA" domainObjectName="TranCheckData" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>-->
+		<table tableName="P_FREEZE_OPERATION_RECORD" domainObjectName="FreezeOperationRecord" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>
+		<table tableName="P_FREEZE_AGENT" domainObjectName="FreezeAgent" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>
 	</context>
 </generatorConfiguration>

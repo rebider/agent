@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.FreezeAgentMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.FreezeAgent">
+    <result column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="PARENT_AGENT_ID" jdbcType="VARCHAR" property="parentAgentId" />
+    <result column="FREEZE_TYPE" jdbcType="CHAR" property="freezeType" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, AGENT_ID, PARENT_AGENT_ID, FREEZE_TYPE
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.FreezeAgentExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_FREEZE_AGENT
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.FreezeAgentExample">
+    delete from P_FREEZE_AGENT
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.FreezeAgent">
+    insert into P_FREEZE_AGENT (ID, AGENT_ID, PARENT_AGENT_ID, 
+      FREEZE_TYPE)
+    values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{parentAgentId,jdbcType=VARCHAR}, 
+      #{freezeType,jdbcType=CHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.FreezeAgent">
+    insert into P_FREEZE_AGENT
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="parentAgentId != null">
+        PARENT_AGENT_ID,
+      </if>
+      <if test="freezeType != null">
+        FREEZE_TYPE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentId != null">
+        #{parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeType != null">
+        #{freezeType,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.FreezeAgentExample" resultType="java.lang.Long">
+    select count(*) from P_FREEZE_AGENT
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>
