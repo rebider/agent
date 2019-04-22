@@ -1,6 +1,8 @@
 package com.ryx.credit.profit.pojo;
 
 import com.ryx.credit.common.util.Page;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -205,6 +207,76 @@ public class FreezeAgentExample {
             return (Criteria) this;
         }
 
+        public Criteria andAgentNameIsNull() {
+            addCriterion("AGENT_NAME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameIsNotNull() {
+            addCriterion("AGENT_NAME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameEqualTo(String value) {
+            addCriterion("AGENT_NAME =", value, "agentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameNotEqualTo(String value) {
+            addCriterion("AGENT_NAME <>", value, "agentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameGreaterThan(String value) {
+            addCriterion("AGENT_NAME >", value, "agentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameGreaterThanOrEqualTo(String value) {
+            addCriterion("AGENT_NAME >=", value, "agentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameLessThan(String value) {
+            addCriterion("AGENT_NAME <", value, "agentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameLessThanOrEqualTo(String value) {
+            addCriterion("AGENT_NAME <=", value, "agentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameLike(String value) {
+            addCriterion("AGENT_NAME like", value, "agentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameNotLike(String value) {
+            addCriterion("AGENT_NAME not like", value, "agentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameIn(List<String> values) {
+            addCriterion("AGENT_NAME in", values, "agentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameNotIn(List<String> values) {
+            addCriterion("AGENT_NAME not in", values, "agentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameBetween(String value1, String value2) {
+            addCriterion("AGENT_NAME between", value1, value2, "agentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameNotBetween(String value1, String value2) {
+            addCriterion("AGENT_NAME not between", value1, value2, "agentName");
+            return (Criteria) this;
+        }
+
         public Criteria andAgentIdIsNull() {
             addCriterion("AGENT_ID is null");
             return (Criteria) this;
@@ -272,6 +344,76 @@ public class FreezeAgentExample {
 
         public Criteria andAgentIdNotBetween(String value1, String value2) {
             addCriterion("AGENT_ID not between", value1, value2, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameIsNull() {
+            addCriterion("PARENT_AGENT_NAME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameIsNotNull() {
+            addCriterion("PARENT_AGENT_NAME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameEqualTo(String value) {
+            addCriterion("PARENT_AGENT_NAME =", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameNotEqualTo(String value) {
+            addCriterion("PARENT_AGENT_NAME <>", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameGreaterThan(String value) {
+            addCriterion("PARENT_AGENT_NAME >", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameGreaterThanOrEqualTo(String value) {
+            addCriterion("PARENT_AGENT_NAME >=", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameLessThan(String value) {
+            addCriterion("PARENT_AGENT_NAME <", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameLessThanOrEqualTo(String value) {
+            addCriterion("PARENT_AGENT_NAME <=", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameLike(String value) {
+            addCriterion("PARENT_AGENT_NAME like", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameNotLike(String value) {
+            addCriterion("PARENT_AGENT_NAME not like", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameIn(List<String> values) {
+            addCriterion("PARENT_AGENT_NAME in", values, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameNotIn(List<String> values) {
+            addCriterion("PARENT_AGENT_NAME not in", values, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameBetween(String value1, String value2) {
+            addCriterion("PARENT_AGENT_NAME between", value1, value2, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameNotBetween(String value1, String value2) {
+            addCriterion("PARENT_AGENT_NAME not between", value1, value2, "parentAgentName");
             return (Criteria) this;
         }
 
@@ -412,6 +554,206 @@ public class FreezeAgentExample {
 
         public Criteria andFreezeTypeNotBetween(String value1, String value2) {
             addCriterion("FREEZE_TYPE not between", value1, value2, "freezeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeAmtIsNull() {
+            addCriterion("FREEZE_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeAmtIsNotNull() {
+            addCriterion("FREEZE_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeAmtEqualTo(BigDecimal value) {
+            addCriterion("FREEZE_AMT =", value, "freezeAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeAmtNotEqualTo(BigDecimal value) {
+            addCriterion("FREEZE_AMT <>", value, "freezeAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeAmtGreaterThan(BigDecimal value) {
+            addCriterion("FREEZE_AMT >", value, "freezeAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("FREEZE_AMT >=", value, "freezeAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeAmtLessThan(BigDecimal value) {
+            addCriterion("FREEZE_AMT <", value, "freezeAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("FREEZE_AMT <=", value, "freezeAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeAmtIn(List<BigDecimal> values) {
+            addCriterion("FREEZE_AMT in", values, "freezeAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeAmtNotIn(List<BigDecimal> values) {
+            addCriterion("FREEZE_AMT not in", values, "freezeAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("FREEZE_AMT between", value1, value2, "freezeAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("FREEZE_AMT not between", value1, value2, "freezeAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev1IsNull() {
+            addCriterion("REV1 is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev1IsNotNull() {
+            addCriterion("REV1 is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev1EqualTo(String value) {
+            addCriterion("REV1 =", value, "rev1");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev1NotEqualTo(String value) {
+            addCriterion("REV1 <>", value, "rev1");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev1GreaterThan(String value) {
+            addCriterion("REV1 >", value, "rev1");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev1GreaterThanOrEqualTo(String value) {
+            addCriterion("REV1 >=", value, "rev1");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev1LessThan(String value) {
+            addCriterion("REV1 <", value, "rev1");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev1LessThanOrEqualTo(String value) {
+            addCriterion("REV1 <=", value, "rev1");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev1Like(String value) {
+            addCriterion("REV1 like", value, "rev1");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev1NotLike(String value) {
+            addCriterion("REV1 not like", value, "rev1");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev1In(List<String> values) {
+            addCriterion("REV1 in", values, "rev1");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev1NotIn(List<String> values) {
+            addCriterion("REV1 not in", values, "rev1");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev1Between(String value1, String value2) {
+            addCriterion("REV1 between", value1, value2, "rev1");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev1NotBetween(String value1, String value2) {
+            addCriterion("REV1 not between", value1, value2, "rev1");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev2IsNull() {
+            addCriterion("REV2 is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev2IsNotNull() {
+            addCriterion("REV2 is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev2EqualTo(String value) {
+            addCriterion("REV2 =", value, "rev2");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev2NotEqualTo(String value) {
+            addCriterion("REV2 <>", value, "rev2");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev2GreaterThan(String value) {
+            addCriterion("REV2 >", value, "rev2");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev2GreaterThanOrEqualTo(String value) {
+            addCriterion("REV2 >=", value, "rev2");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev2LessThan(String value) {
+            addCriterion("REV2 <", value, "rev2");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev2LessThanOrEqualTo(String value) {
+            addCriterion("REV2 <=", value, "rev2");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev2Like(String value) {
+            addCriterion("REV2 like", value, "rev2");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev2NotLike(String value) {
+            addCriterion("REV2 not like", value, "rev2");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev2In(List<String> values) {
+            addCriterion("REV2 in", values, "rev2");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev2NotIn(List<String> values) {
+            addCriterion("REV2 not in", values, "rev2");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev2Between(String value1, String value2) {
+            addCriterion("REV2 between", value1, value2, "rev2");
+            return (Criteria) this;
+        }
+
+        public Criteria andRev2NotBetween(String value1, String value2) {
+            addCriterion("REV2 not between", value1, value2, "rev2");
             return (Criteria) this;
         }
     }
