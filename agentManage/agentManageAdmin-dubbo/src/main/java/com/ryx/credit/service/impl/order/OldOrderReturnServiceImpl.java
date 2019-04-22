@@ -750,7 +750,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         oLogistics.setId(idService.genId(TabId.o_logistics));           // 物流ID序列号
         oLogistics.setcUser(user);                                      // 创建人
         oLogistics.setStatus(Status.STATUS_1.status);                   // 默认记录状态为1
-        oLogistics.setLogType(LogType.Deliver.getValue());              // 默认物流类型为1
+        oLogistics.setLogType(LogType.Refund.getValue());              // 默认物流类型为1
         try {
             oLogistics.setSendDate(DateUtil.sdfDays.parse(sendDate));
         }catch (Exception e){

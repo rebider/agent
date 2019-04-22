@@ -528,4 +528,11 @@
     and  <![CDATA[sn_num >= #{startSn,jdbcType=VARCHAR} and sn_num <= #{endSn,jdbcType=VARCHAR}]]>
   </update>
 
+<!--查询物流id-->
+<select id="queryLogicInfoIdByStatus" parameterType="map" resultType="string">
+    select a.id from o_logistics a where a.status=1
+                                         and a.log_type=#{logType,jdbcType=VARCHAR}
+                                         and a.send_status = #{sendStatus,jdbcType=DECIMAL}
+</select>
+
 </mapper>

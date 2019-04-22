@@ -950,9 +950,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
             list= getBetweenValues(startSn, endSn);
         }else {
             Map digit = Conver10ToConver33Utils.getDigit(startSn, endSn);
-            //截取出来的数
-            /*String firstSn= (String) digit.get("start");
-            String lastSn = (String) digit.get("end");*/
             //SN码
             String end = (String) digit.get("lastSn");
             String start = (String) digit.get("firstSn");
@@ -960,12 +957,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
             finish = (Integer) digit.get("length");
             begins = (Integer) digit.get("num");
             if(!begins.equals(Integer.valueOf(0))){
-//                Pattern p = Pattern.compile("[a-zA-z]");
-//                if (p.matcher(start).find() || p.matcher(end).find()) {
-//                    list = getBetweenValues(startSn, endSn);
-//                    logger.info("含有英文字符" + "----起始位数:" + begins + "---结束位数:" + finish);
-//                } else {
-//                    logger.info("不含英文字符");
                     int begin = begins - 1;
                     String sSub = start.substring(begin, finish);
                     String eSub = end.substring(begin, finish);
@@ -981,7 +972,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
                         String c = start.substring(0, begin) + format + start.substring(finish);
                         list.add(c);
                     }
-//                }
             }else{
                 list.add(startSn);
             }
