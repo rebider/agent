@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ryx.credit.profit.pojo.FreezeAgentMapper">
+<mapper namespace="com.ryx.credit.profit.dao.FreezeAgentMapper">
   <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.FreezeAgent">
     <id column="ID" jdbcType="VARCHAR" property="id" />
     <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
@@ -218,7 +218,7 @@
 
   <select id="selectAllNotFreeze" parameterType="java.util.Map" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
-select gg.*,hh.AG_NAME as PARENT_AGENT_NAME from (select ee.*,ff.AG_NAME from (select * from (select * from
+select gg.*,hh.AG_NAME as PARENT_AGENT_NAME from (select ee.*,ff.AG_NAME as AGENT_NAME from (select * from (select * from
 (select distinct aa.AGENT_ID ,bb.AGENT_ID as PARENT_AGENT_ID,'00'FREEZE_TYPE from A_AGENT_BUSINFO aa left join
 (select AGENT_ID,BUS_PARENT from A_AGENT_BUSINFO) bb on aa.id = bb.BUS_PARENT
 UNION ALL
@@ -253,8 +253,8 @@ where 1=1
 
 
 
-  <select id="selectAllNotFreezeCount" parameterType="java.util.Map" resultMap="java.lang.Integer">
-    Select count(*) from (select gg.*,hh.AG_NAME as PARENT_AGENT_NAME from (select ee.*,ff.AG_NAME from (select * from
+  <select id="selectAllNotFreezeCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+    Select count(*) from (select gg.*,hh.AG_NAME as PARENT_AGENT_NAME from (select ee.*,ff.AG_NAME as AGENT_NAME from (select * from
     (select * from
     (select distinct aa.AGENT_ID ,bb.AGENT_ID as PARENT_AGENT_ID,'00'FREEZE_TYPE from A_AGENT_BUSINFO aa left join
     (select AGENT_ID,BUS_PARENT from A_AGENT_BUSINFO) bb on aa.id = bb.BUS_PARENT
@@ -294,7 +294,7 @@ where 1=1
 
   <select id="selectAllNotFreezeLower" parameterType="java.util.Map" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
-select * from (select gg.*,hh.AG_NAME as PARENT_AGENT_NAME from (select ee.*,ff.AG_NAME from (select * from (select * from (select distinct aa.AGENT_ID ,bb.AGENT_ID as PARENT_AGENT_ID,'00'FREEZE_TYPE from A_AGENT_BUSINFO aa left join
+select * from (select gg.*,hh.AG_NAME as PARENT_AGENT_NAME from (select ee.*,ff.AG_NAME as AGENT_NAME from (select * from (select * from (select distinct aa.AGENT_ID ,bb.AGENT_ID as PARENT_AGENT_ID,'00'FREEZE_TYPE from A_AGENT_BUSINFO aa left join
 (select AGENT_ID,BUS_PARENT from A_AGENT_BUSINFO) bb on aa.id = bb.BUS_PARENT
 UNION ALL
 select distinct aa.AGENT_ID ,bb.AGENT_ID as PARENT_AGENT_ID,'01'FREEZE_TYPE from A_AGENT_BUSINFO aa  left join
@@ -324,7 +324,7 @@ connect by prior AGENT_ID =  PARENT_AGENT_ID
 
 UNION ALL
 
-select * from (select gg.*,hh.AG_NAME as PARENT_AGENT_NAME from (select ee.*,ff.AG_NAME from (select * from (select * from (select distinct aa.AGENT_ID ,bb.AGENT_ID as PARENT_AGENT_ID,'00'FREEZE_TYPE from A_AGENT_BUSINFO aa left join
+select * from (select gg.*,hh.AG_NAME as PARENT_AGENT_NAME from (select ee.*,ff.AG_NAME as AGENT_NAME from (select * from (select * from (select distinct aa.AGENT_ID ,bb.AGENT_ID as PARENT_AGENT_ID,'00'FREEZE_TYPE from A_AGENT_BUSINFO aa left join
 (select AGENT_ID,BUS_PARENT from A_AGENT_BUSINFO) bb on aa.id = bb.BUS_PARENT
 UNION ALL
 select distinct aa.AGENT_ID ,bb.AGENT_ID as PARENT_AGENT_ID,'01'FREEZE_TYPE from A_AGENT_BUSINFO aa  left join
@@ -355,7 +355,7 @@ connect by prior AGENT_ID =  PARENT_AGENT_ID
 
 UNION ALL
 
-select * from (select gg.*,hh.AG_NAME as PARENT_AGENT_NAME from (select ee.*,ff.AG_NAME from (select * from (select * from (select distinct aa.AGENT_ID ,bb.AGENT_ID as PARENT_AGENT_ID,'00'FREEZE_TYPE from A_AGENT_BUSINFO aa left join
+select * from (select gg.*,hh.AG_NAME as PARENT_AGENT_NAME from (select ee.*,ff.AG_NAME as AGENT_NAME from (select * from (select * from (select distinct aa.AGENT_ID ,bb.AGENT_ID as PARENT_AGENT_ID,'00'FREEZE_TYPE from A_AGENT_BUSINFO aa left join
 (select AGENT_ID,BUS_PARENT from A_AGENT_BUSINFO) bb on aa.id = bb.BUS_PARENT
 UNION ALL
 select distinct aa.AGENT_ID ,bb.AGENT_ID as PARENT_AGENT_ID,'01'FREEZE_TYPE from A_AGENT_BUSINFO aa  left join
@@ -386,7 +386,7 @@ start with
   </select>
 
 
-  <select id="selectAllNotFreezeLowerCount" parameterType="java.util.Map" resultMap="java.lang.Integer">
+  <select id="selectAllNotFreezeLowerCount" parameterType="java.util.Map" resultType="java.lang.Integer">
     select count(*) from (select * from (select gg.*,hh.AG_NAME as PARENT_AGENT_NAME from (select ee.*,ff.AG_NAME from (select * from (select
     * from (select distinct aa.AGENT_ID ,bb.AGENT_ID as PARENT_AGENT_ID,'00'FREEZE_TYPE from A_AGENT_BUSINFO aa left
     join

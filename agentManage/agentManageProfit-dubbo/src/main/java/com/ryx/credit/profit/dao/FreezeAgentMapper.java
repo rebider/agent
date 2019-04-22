@@ -4,6 +4,7 @@ import com.ryx.credit.profit.pojo.FreezeAgent;
 import com.ryx.credit.profit.pojo.FreezeAgentExample;
 
 import java.util.List;
+import java.util.Map;
 
 public interface FreezeAgentMapper {
     long countByExample(FreezeAgentExample example);
@@ -21,4 +22,10 @@ public interface FreezeAgentMapper {
     int updateByPrimaryKeySelective(FreezeAgent record);
 
     int updateByPrimaryKey(FreezeAgent record);
+        //正常查询不冻洁
+    List<FreezeAgent> selectAllNotFreeze(Map<String,Object> perms);
+    Integer selectAllNotFreezeCount(Map<String,Object> perms);
+    //不冻结查询下级
+    List<FreezeAgent> selectAllNotFreezeLower(Map<String,Object> perms);
+    Integer selectAllNotFreezeLowerCount (Map<String,Object> perms);
 }
