@@ -27,7 +27,7 @@
     <job:simple id="cashSummaryMouthData"
                 job-ref="cashSummaryMouthDataJob"
                 registry-center-ref="regCenter"
-                cron="0 10 0 1 * ?"
+                cron="0 15 10 ? * *"
                 overwrite="true"
                 description="线下打款开票不开票数据汇总，每月1号的0点十分执行"
                 sharding-total-count="1"

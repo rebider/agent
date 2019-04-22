@@ -81,4 +81,10 @@ public interface AgentBusInfoMapper {
     List<String> queryAgentHaveMutPayCompany();
 
     List<Map<String,Object>> selectAgentHaveMutPayCompany();
+
+    List<Map<String,Object>> selectDgKfp(@Param("dg")  String dg);
+
+    List<Map<String,Object>> selectDgBkfp();
+
+    List<Map<String,Object>> selectDs();
 }
