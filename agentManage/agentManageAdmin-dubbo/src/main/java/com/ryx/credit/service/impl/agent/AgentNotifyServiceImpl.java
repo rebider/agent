@@ -1103,19 +1103,5 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
         return pageInfo;
     }
 
-    public static void main(String[] args){
-        List<String> list = new ArrayList<>();
-        list.add("aaaa");
-        list.forEach(row->{
-            System.out.println(row);
-            throw new ProcessException("");
-//            lambdaThrowException(new Exception("aaa"));
-        });
-
-    }
-
-    static <E extends Exception> void lambdaThrowException(Exception e) throws E {
-        throw (E)e;
-    }
 
 }
