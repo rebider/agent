@@ -3,6 +3,7 @@ package com.ryx.credit.service.impl.agent;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.common.util.agentUtil.AESUtil;
@@ -42,7 +43,7 @@ import java.util.*;
  * @date: 2018/6/11 11:33
  */
 @Service("agentNotifyService")
-public class AgentNotifyServiceImpl implements AgentNotifyService {
+public class AgentNotifyServiceImpl implements AgentNotifyService{
 
     private static Logger log = LoggerFactory.getLogger(AgentNotifyServiceImpl.class);
 
@@ -1013,7 +1014,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 return new AgentResult(500,"http请求异常",respXML);
             }
         } catch (Exception e) {
-            AppConfig.sendEmails("http请求超时:"+e.getStackTrace(), "入网通知POS失败报警");
+            AppConfig.sendEmails("http请求超时:"+MailUtil.printStackTrace(e), "入网通知POS失败报警");
             log.info("http请求超时:{}",e.getMessage());
             throw e;
         }
@@ -1064,7 +1065,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 throw new Exception("http返回有误");
             }
         } catch (Exception e) {
-            AppConfig.sendEmails("通知手刷请求超时："+e.getStackTrace(), "入网通知手刷失败报警");
+            AppConfig.sendEmails("通知手刷请求超时："+ MailUtil.printStackTrace(e), "入网通知手刷失败报警");
             log.info("http请求超时:{}",e.getMessage());
             throw new Exception("http请求超时");
         }
@@ -1100,6 +1101,21 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         pageInfo.setRows(list);
         pageInfo.setTotal(agentPlatFormSynMapper.queryCount(map));
         return pageInfo;
+    }
+
+    public static void main(String[] args){
+        List<String> list = new ArrayList<>();
+        list.add("aaaa");
+        list.forEach(row->{
+            System.out.println(row);
+            throw new ProcessException("");
+//            lambdaThrowException(new Exception("aaa"));
+        });
+
+    }
+
+    static <E extends Exception> void lambdaThrowException(Exception e) throws E {
+        throw (E)e;
     }
 
 }

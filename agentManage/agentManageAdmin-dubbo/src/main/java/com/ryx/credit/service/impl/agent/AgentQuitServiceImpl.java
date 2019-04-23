@@ -1239,7 +1239,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                 return new AgentResult(500,"http请求异常",respXML);
             }
         } catch (Exception e) {
-            AppConfig.sendEmails("http请求超时:"+e.getStackTrace(), "入网通知POS失败报警");
+            AppConfig.sendEmails("http请求超时:"+MailUtil.printStackTrace(e), "入网通知POS失败报警");
             logger.info("http请求超时:{}",e.getMessage());
             throw e;
         }
@@ -1269,7 +1269,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                 return AgentResult.fail(respXMLObj.toString());
             }
         } catch (Exception e) {
-            AppConfig.sendEmails("通知手刷请求超时："+e.getStackTrace(), "入网通知手刷失败报警");
+            AppConfig.sendEmails("通知手刷请求超时："+MailUtil.printStackTrace(e), "入网通知手刷失败报警");
             logger.info("http请求超时:{}",e.getMessage());
             throw new Exception("http请求超时");
         }
