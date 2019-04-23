@@ -386,6 +386,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             oLogistics.setwNumber(wNumber);      // 物流单号
             oLogistics.setSnBeginNum(beginSn);   // 起始SN序列号
             oLogistics.setSnEndNum(endSn);     // 结束SN序列号
+            oLogistics.setSendStatus(LogisticsSendStatus.none_send.code);
             logger.info("导入物流数据============================================{}" , oLogistics.getId(),JSONObject.toJSON(oLogistics));
             if (1 != insertImportData(oLogistics)) {
                 throw new MessageException("排单编号为:"+planNum+"处理，插入物流信息失败,事物回滚");
@@ -408,6 +409,9 @@ public class OLogisticServiceImpl implements OLogisticsService {
                         throw new MessageException(snNum+"此物流已经存在,正在发货中!!!");
                     }
                 }
+            }
+            if(1==1) {
+                return AgentResult.ok();
             }
             ResultVO resultVO=new ResultVO();
             //遍历查询库里是否存在sn码

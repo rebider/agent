@@ -79,6 +79,26 @@
                 sharding-total-count="1"
                 sharding-item-parameters="0=Server0"/>
 
+    <job:simple id="osnFaHuoGenSnDetail"
+                job-ref="osnFaHuoGenSnDetailJob"
+                registry-center-ref="regCenter"
+                cron="0/10 * 6-22 * * ?"
+                overwrite="true"
+                description="发货sn生成明细"
+                sharding-total-count="1"
+                sharding-item-parameters="0=Server0"/>
+
+    <job:dataflow id="osnFaHuo"
+                job-ref="osnFaHuoJob"
+                registry-center-ref="regCenter"
+                cron="0/2 * * * * ?"
+                sharding-total-count="1"
+                sharding-item-parameters="0=C"
+                streaming-process="true"
+                description="发货sn下发业务系统任务"
+                overwrite="true"
+                disabled="false"/>
+
     <!--<job:simple id="completAllAgentBusInfoCompany"-->
                 <!--job-ref="completAllAgentBusInfoCompanyJob"-->
                 <!--registry-center-ref="regCenter"-->

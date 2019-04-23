@@ -129,6 +129,7 @@
     <dubbo:service interface="com.ryx.credit.service.order.OldCompensateService" ref="oldCompensateService"  timeout="1200000" registry="${zk.group}" />
     <dubbo:service interface="com.ryx.credit.service.CRoleService" ref="cRoleService"  timeout="1200000" registry="${zk.group}" />
     <dubbo:service interface="com.ryx.credit.service.NotifyEmailService" ref="notifyEmailService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.credit.service.order.OsnOperateService" ref="osnOperateService"  timeout="1200000" registry="${zk.group}" />
 
 
   <!--  <dubbo:service interface="com.ryx.credit.service.order.OldOrderReturnService" ref="oldOrderReturnService"  timeout="1200000" registry="${zk.group}" />

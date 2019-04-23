@@ -139,7 +139,7 @@
       #{standTime,jdbcType=DECIMAL}, #{busId,jdbcType=VARCHAR}, #{sbusStatus,jdbcType=DECIMAL}, 
       #{sbusBatch,jdbcType=DECIMAL}, #{sbusMsg,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.ryx.credit.activity.entity.OLogisticsDetail">
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
     insert into O_LOGISTICS_DETAIL
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">

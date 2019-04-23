@@ -99,39 +99,44 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
      */
     @Override
     public void genLogicDetailTask(){
+
         List<String>  list = queryLogicInfoIdByStatus(LogType.Deliver,LogisticsSendStatus.none_send);
-        list.forEach(id -> {
-            OLogistics logistics  = oLogisticsMapper.selectByPrimaryKey(id);
-            logistics.setSendStatus(LogisticsSendStatus.gen_detail_ing.code);
-            if(1==oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
-                try {
-                    if(osnOperateService.genOlogicDetailInfo(id)){
-                         logistics  = oLogisticsMapper.selectByPrimaryKey(id);
-                         logistics.setSendStatus(LogisticsSendStatus.gen_detail_sucess.code);
-                         oLogisticsMapper.updateByPrimaryKeySelective(logistics);
-                    } else{
-                        logistics  = oLogisticsMapper.selectByPrimaryKey(id);
+        if(list.size()>0) {
+            logger.info("开始执行sn明细生成任务");
+            list.forEach(id -> {
+                OLogistics logistics = oLogisticsMapper.selectByPrimaryKey(id);
+                logistics.setSendStatus(LogisticsSendStatus.gen_detail_ing.code);
+                if (1 == oLogisticsMapper.updateByPrimaryKeySelective(logistics)) {
+                    try {
+                        if (osnOperateService.genOlogicDetailInfo(id)) {
+                            logistics = oLogisticsMapper.selectByPrimaryKey(id);
+                            logistics.setSendStatus(LogisticsSendStatus.gen_detail_sucess.code);
+                            oLogisticsMapper.updateByPrimaryKeySelective(logistics);
+                        } else {
+                            logistics = oLogisticsMapper.selectByPrimaryKey(id);
+                            logistics.setSendStatus(LogisticsSendStatus.gen_detail_fail.code);
+                            oLogisticsMapper.updateByPrimaryKeySelective(logistics);
+                        }
+                    } catch (MessageException e) {
+                        e.printStackTrace();
+                        logger.error("生成物流明细任务异常：", e);
+                        logistics = oLogisticsMapper.selectByPrimaryKey(id);
                         logistics.setSendStatus(LogisticsSendStatus.gen_detail_fail.code);
+                        logistics.setSendMsg(e.getMsg());
+                        oLogisticsMapper.updateByPrimaryKeySelective(logistics);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        logger.error("生成物流明细任务异常：", e);
+                        logistics = oLogisticsMapper.selectByPrimaryKey(id);
+                        logistics.setSendStatus(LogisticsSendStatus.gen_detail_fail.code);
+                        logistics.setSendMsg(e.getLocalizedMessage().length() > 30 ? e.getLocalizedMessage().substring(0, 30) : e.getLocalizedMessage());
                         oLogisticsMapper.updateByPrimaryKeySelective(logistics);
                     }
-                } catch (MessageException e) {
-                    e.printStackTrace();
-                    logger.error("生成物流明细任务异常：",e);
-                    logistics  = oLogisticsMapper.selectByPrimaryKey(id);
-                    logistics.setSendStatus(LogisticsSendStatus.gen_detail_fail.code);
-                    logistics.setSendMsg(e.getMsg());
-                    oLogisticsMapper.updateByPrimaryKeySelective(logistics);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    logger.error("生成物流明细任务异常：",e);
-                    logistics  = oLogisticsMapper.selectByPrimaryKey(id);
-                    logistics.setSendStatus(LogisticsSendStatus.gen_detail_fail.code);
-                    logistics.setSendMsg(e.getLocalizedMessage().length()>30?e.getLocalizedMessage().substring(0,30):e.getLocalizedMessage());
-                    oLogisticsMapper.updateByPrimaryKeySelective(logistics);
                 }
-            }
 
-        });
+            });
+            logger.info("开始执行sn明细生成结束");
+        }
     }
 
 
@@ -290,6 +295,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
     @Override
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
     public boolean genOlogicDetailInfo(String logcId)throws Exception{
+        logger.info("开始生成物流明细：{}",logcId);
         OLogistics logistics = oLogisticsMapper.selectByPrimaryKey(logcId);
         //检查状态是否是为生成中，待处理
         if(!LogisticsSendStatus.gen_detail_ing.code.equals(logistics.getSendStatus())){
@@ -445,6 +451,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                 }
             }
         }
+        logger.info("开始生成物流明细完成：{}",logcId);
         return true;
     }
 
