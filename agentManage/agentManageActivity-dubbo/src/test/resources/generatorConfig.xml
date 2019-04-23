@@ -55,7 +55,7 @@
 
 		<!--<table tableName="o_return_order" domainObjectName="OReturnOrder" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
-		<table tableName="O_LOGISTICS_DETAIL" domainObjectName="OLogisticsDetail" enableUpdateByExample="false"
+		<table tableName="o_logistics" domainObjectName="OLogistics" enableUpdateByExample="false"
 		enableDeleteByPrimaryKey="false"/>
 
 	</context>

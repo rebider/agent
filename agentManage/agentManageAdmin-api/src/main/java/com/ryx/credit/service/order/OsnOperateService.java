@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -32,10 +33,10 @@ public interface OsnOperateService {
     boolean genOlogicDetailInfo(String logcId)throws Exception;
 
     /**
-     * 将已生成物流明细成功的物流，待联动的物流明细，分页发送到业务系统，并检查是否发送完成，完成后更新物流信息未发送完毕
+     * 将已生成物流明细成功的物流，待联动的物流明细，分批次送到业务系统，并检查是否发送完成，完成后更新物流信息未发送完毕
      * @param logcId
-     * @param pageSize
+     * @param batch
      * @return
      */
-    boolean sendInfoToBusinessSystem(String logcId, Integer pageSize,int batch)throws Exception;
+    boolean sendInfoToBusinessSystem(String logcId,BigDecimal batch)throws Exception;
 }

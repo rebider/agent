@@ -135,6 +135,35 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
 
 
     /**
+     * 执行同步sn任务，抓取待处理的物流信息id,进行分配处理
+     * @param server
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
+    public List<String> fetchFhData(int nodecount,int shardingItem)throws Exception{
+        //查询待处理的物流列表，并更新成处理中
+         List<String> data = oLogisticsMapper.queryLogicInfoIdByStatus(FastMap
+        .fastMap("logType",LogType.Deliver.code)
+        .putKeyV("sendStatus",LogisticsSendStatus.gen_detail_sucess.code)
+        .putKeyV("pagesize",50));
+        return data;
+    }
+
+
+    /**
+     * 处理要处理的物流信息
+     * @param ids
+     * @return
+     */
+    public boolean processData(List<String> ids){
+
+        return true;
+    }
+
+
+
+
+    /**
      * 根据物流信息生成物流明细,物流明细生成后进行物流状态的更新，更新为 4：生成明细失败 5：生成明细中 6：生成明细成功 添加版本号控制
      * @param logcId
      * @return
@@ -304,12 +333,12 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
     /**
      * 将已生成物流明细成功的物流，待联动的物流明细，分页发送到业务系统，并检查是否发送完成，完成后更新物流信息未发送完毕
      * @param logcId
-     * @param pageSize
+     * @param batch
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
-    public boolean sendInfoToBusinessSystem(String logcId, Integer pageSize,int batch)throws Exception {
+    public boolean sendInfoToBusinessSystem(String logcId,BigDecimal batch)throws Exception {
         OLogistics logistics = oLogisticsMapper.selectByPrimaryKey(logcId);
         //查询要发送的sn，根据sn进行排序
         OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
@@ -317,8 +346,8 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                 .andStatusEqualTo(Status.STATUS_1.status)//发货
                 .andRecordStatusEqualTo(Status.STATUS_1.status)//有效
                 .andSendStatusEqualTo(LogisticsDetailSendStatus.send_ing.code)//处理中的sn
-                .andLogisticsIdEqualTo(logcId);
-        oLogisticsDetailExample.setPage(new Page(0, pageSize));
+                .andLogisticsIdEqualTo(logcId)
+                .andSbusBatchEqualTo(batch);
         oLogisticsDetailExample.setOrderByClause(" SN_NUM asc ");
         List<OLogisticsDetail> listOLogisticsDetailSn = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
         List<String> snList = new ArrayList<>();
@@ -373,7 +402,6 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                     listOLogisticsDetailSn.forEach(detail -> {
                         detail.setSendStatus(LogisticsDetailSendStatus.send_success.code);
                         detail.setSbusMsg(posSendRes.getMsg());
-                        detail.setSbusBatch(new BigDecimal(batch));
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
@@ -384,7 +412,6 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                     listOLogisticsDetailSn.forEach(detail -> {
                         detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
                         detail.setSbusMsg(posSendRes.getMsg());
-                        detail.setSbusBatch(new BigDecimal(batch));
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
@@ -397,7 +424,6 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                 listOLogisticsDetailSn.forEach(detail -> {
                     detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
                     detail.setSbusMsg(e.getMsg());
-                    detail.setSbusBatch(new BigDecimal(batch));
                     detail.setuTime(date);
                     oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                 });
@@ -409,7 +435,6 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                 listOLogisticsDetailSn.forEach(detail -> {
                     detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
                     detail.setSbusMsg("异常");
-                    detail.setSbusBatch(new BigDecimal(batch));
                     detail.setuTime(date);
                     oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                 });
@@ -461,7 +486,6 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                     listOLogisticsDetailSn.forEach(detail -> {
                         detail.setSendStatus(LogisticsDetailSendStatus.send_success.code);
                         detail.setSbusMsg(lowerHairMachineRes.getMsg());
-                        detail.setSbusBatch(new BigDecimal(batch));
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
@@ -472,7 +496,6 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                     listOLogisticsDetailSn.forEach(detail -> {
                         detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
                         detail.setSbusMsg(lowerHairMachineRes.getMsg());
-                        detail.setSbusBatch(new BigDecimal(batch));
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
@@ -485,7 +508,6 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                 listOLogisticsDetailSn.forEach(detail -> {
                     detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
                     detail.setSbusMsg(e.getMsg());
-                    detail.setSbusBatch(new BigDecimal(batch));
                     detail.setuTime(date);
                     oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                 });
@@ -497,7 +519,6 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                 listOLogisticsDetailSn.forEach(detail -> {
                     detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
                     detail.setSbusMsg("异常");
-                    detail.setSbusBatch(new BigDecimal(batch));
                     detail.setuTime(date);
                     oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                 });
