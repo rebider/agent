@@ -2,6 +2,7 @@ package com.ryx.credit.service.order;
 
 import com.ryx.credit.common.enumc.LogType;
 import com.ryx.credit.common.enumc.LogisticsSendStatus;
+import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,11 @@ public interface OsnOperateService {
 
     void genLogicDetailTask();
 
+    public List<String> fetchFhData(int nodecount,int shardingItem)throws Exception;
+
+    public boolean processData(List<String> ids);
+
+    public List<OLogisticsDetail> updateDetailBatch(List<OLogisticsDetail>  datas, BigDecimal batch)throws Exception;
     /**
      * 根据物流信息生成物流明细,物流明细生成后进行物流状态的更新，更新为 4：生成明细失败 5：生成明细中 6：生成明细成功 添加版本号控制
      * @param logcId
@@ -38,5 +44,5 @@ public interface OsnOperateService {
      * @param batch
      * @return
      */
-    boolean sendInfoToBusinessSystem(String logcId,BigDecimal batch)throws Exception;
+    boolean sendInfoToBusinessSystem(List<OLogisticsDetail>  datas,String logcId,BigDecimal batch)throws Exception;
 }

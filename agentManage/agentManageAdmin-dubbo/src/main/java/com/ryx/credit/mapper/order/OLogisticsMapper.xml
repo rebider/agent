@@ -336,10 +336,10 @@
         SEND_MSG = #{sendMsg,jdbcType=VARCHAR},
       </if>
       <if test="version != null">
-        VERSION = #{version,jdbcType=DECIMAL},
+        VERSION = VERSION +1 ,
       </if>
     </set>
-    where ID = #{id,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OLogistics">
     update O_LOGISTICS
@@ -365,8 +365,8 @@
       STATUS = #{status,jdbcType=DECIMAL},
       SEND_STATUS = #{sendStatus,jdbcType=DECIMAL},
       SEND_MSG = #{sendMsg,jdbcType=VARCHAR},
-      VERSION = #{version,jdbcType=DECIMAL}
-    where ID = #{id,jdbcType=VARCHAR}
+      VERSION = VERSION + 1
+    where ID = #{id,jdbcType=VARCHAR}  and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
