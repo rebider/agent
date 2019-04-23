@@ -972,7 +972,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             map.put("tranCode", tranCode);
             map.put("reqMsgId", reqMsgId);
 
-            log.info("通知pos请求参数:{}",map);
+            log.info("通知pos请求参数:{}",data);
             String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("agent_pos_notify_url"), map);
             JSONObject jsonObject = JSONObject.parseObject(httpResult);
             if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
