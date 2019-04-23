@@ -1017,5 +1017,60 @@
     )b group by b.agent_id having count(b.clo_pay_company)>1
   </select>
 
+  <!--代理商打款公司出现不统一问题修复任务-->
+  <select id="selectAgentHaveMutPayCompany" resultType="map">
+   select bus.ID,col.CLO_TYPE,col.CLO_INVOICE,bus.CLO_PAY_COMPANY from
+   a_agent_businfo bus  left join A_agent_colinfo col  on bus.agent_id=col.agent_id
+  </select>
+
+<!--对公开发票-->
+  <select id="selectDgKfp" resultType="map" parameterType="string">
+   select bus.ID,col.CLO_TYPE,col.CLO_INVOICE,bus.CLO_PAY_COMPANY
+   from a_agent_businfo bus   left join A_agent_colinfo col  on
+   bus.agent_id =col.agent_id and col.status=1
+   where 1=1 and bus.status=1 and col.CLO_INVOICE =1
+   and col.CLO_TYPE =1
+   <if test="dg!=null and dg!=''">and bus.clo_pay_company != #{dg}</if>
+  </select>
+
+  <!--对公开不发票-->
+  <select id="selectDgBkfp" resultType="map" >
+select c.agent_id from (
+ select  a.agent_id,a.clo_pay_company
+ from a_agent_businfo a
+ left join a_agent_colinfo b on a.agent_id = b.agent_id and a.status=1 and b.status=1
+ where b.clo_type=1 and b.clo_invoice=0
+ group by a.agent_id,a.clo_pay_company
+ ) c group by c.agent_id having count(c.clo_pay_company)>1
+union
+ select c.agent_id from (
+   select  a.agent_id,a.clo_pay_company
+   from a_agent_businfo a
+   left join a_agent_colinfo b on a.agent_id = b.agent_id and a.status=1 and b.status=1
+   where b.clo_type=1 and b.clo_invoice=0
+   group by a.agent_id,a.clo_pay_company
+ ) c
+ group by c.agent_id having count(c.clo_pay_company)=1 and sum(case when c.clo_pay_company='Q000029564' then 1 else 0 end)>=1
+  </select>
+
+<!--对私-->
+  <select id="selectDs" resultType="map">
+    select c.agent_id from (
+    select  a.agent_id,a.clo_pay_company
+    from a_agent_businfo a
+    left join a_agent_colinfo b on a.agent_id = b.agent_id and a.status=1 and b.status=1
+    where b.clo_type=2
+    group by a.agent_id,a.clo_pay_company
+    ) c group by c.agent_id having count(c.clo_pay_company)>1
+    union
+    select c.agent_id from (
+    select  a.agent_id,a.clo_pay_company
+    from a_agent_businfo a
+    left join a_agent_colinfo b on a.agent_id = b.agent_id and a.status=1 and b.status=1
+    where b.clo_type=2
+    group by a.agent_id,a.clo_pay_company
+    ) c
+    group by c.agent_id having count(c.clo_pay_company)=1 and sum(case when c.clo_pay_company='Q000029564' then 1 else 0 end)>=1
+  </select>
 
 </mapper>

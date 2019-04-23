@@ -137,7 +137,7 @@ public class Conver10ToConver33Utils {
         char[] charss = lastSn.toCharArray();
         int num=0;
         for (int i=1;i<= chars.length;i++){
-            if (chars[i]!=charss[i]){
+            if (chars[i-1]!=charss[i-1]){
                 num=i;
                 break;
             }

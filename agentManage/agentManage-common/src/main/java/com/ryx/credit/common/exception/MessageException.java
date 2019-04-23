@@ -1,9 +1,11 @@
 package com.ryx.credit.common.exception;
 
+import com.ryx.credit.common.util.MailUtil;
+
 /**
  * Created by RYX on 2018/8/3.
  */
-public class MessageException  extends Exception {
+public class MessageException  extends Exception{
     private String code = "1000";
 
     private String msg = "失败";
@@ -33,5 +35,9 @@ public class MessageException  extends Exception {
 
     public void setMsg(String msg) {
         this.msg = msg;
+    }
+
+    public String getStackTraceString() {
+        return MailUtil.printStackTrace(this);
     }
 }

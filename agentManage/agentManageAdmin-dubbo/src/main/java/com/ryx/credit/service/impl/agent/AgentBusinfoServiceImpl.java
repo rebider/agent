@@ -676,23 +676,43 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 	@Override
 	public AgentResult completAllAgentBusInfoCompany() {
-		List<String> agentS = agentBusInfoMapper.queryAgentHaveMutPayCompany();
-		StringBuffer sb = new StringBuffer();
-		agentS.forEach(
-				agentId -> {
-					try {
-						AgentResult res = agentBusinfoService.completAgentBusInfoCompany(agentId);
-						sb.append("[修复打款公司"+agentId+":"+res.getMsg()+"]");
-					} catch (Exception e) {
-						e.printStackTrace();
-						logger.error("[修复打款公司"+agentId+":"+e.getLocalizedMessage()+"]");
-					}
-				}
-		);
-		logger.info(sb.toString());
+		String dg="Q000029564";
+			//对公开发票的---
+		List<Map<String,Object>> listMap=agentBusInfoMapper.selectDgKfp(dg);
+		for (Map<String, Object> map : listMap) {
+			String id =(String) map.get("ID");
+			String CLO_PAY_COMPANY = (String)map.get("CLO_PAY_COMPANY");//打款公司
+			AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(id);
+			agentBusInfo.setCloPayCompany(dg);
+			agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+		}
+		//对公不开发票
+		List<Map<String,Object>> BkfaMap=agentBusInfoMapper.selectDgBkfp();
+		updateMap(BkfaMap);
+
+		//对私
+		List<Map<String,Object>> BsMap=agentBusInfoMapper.selectDs();
+		updateMap(BkfaMap);
 		return AgentResult.ok();
 	}
 
+	private void updateMap(List<Map<String,Object>> map){
+		String ds="Q000029560";
+		for (Map<String, Object> mapBkfp : map) {
+			String agent_id =(String) mapBkfp.get("AGENT_ID");
+			if (StringUtils.isNotBlank(agent_id)){
+				AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+				AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria().andAgentIdEqualTo(agent_id);
+				List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+				if (null!=agentBusInfos && agentBusInfos.size()>0){
+					for (AgentBusInfo agentBusInfo : agentBusInfos) {
+						agentBusInfo.setCloPayCompany(ds);
+						agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+					}
+				}
+			}
+		}
+	}
 	@Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
 	@Override
 	public AgentResult completAgentBusInfoCompany(String agentId) throws Exception{

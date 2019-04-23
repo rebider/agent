@@ -2,9 +2,11 @@ import com.ryx.credit.common.enumc.AdjustType;
 import com.ryx.credit.common.enumc.GetMethod;
 import com.ryx.credit.common.enumc.PamentSrcType;
 import com.ryx.credit.common.enumc.PaySign;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.agent.PayComp;
 import com.ryx.credit.pojo.admin.order.OPaymentDetail;
+import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.dict.PayCompService;
 import com.ryx.credit.service.order.IAccountAdjustService;
 import com.ryx.credit.service.order.IPaymentDetailService;
@@ -26,7 +28,8 @@ public class PayCompServiceImplTest extends BaseSpringTest {
     private OrderService orderService;
     @Autowired
     private IAccountAdjustService iAccountAdjustService;
-
+    @Autowired
+    private AgentBusinfoService agentBusinfoService;
     @Test
     public void insertPayComp() throws Exception {
         PayComp paycomp = new PayComp();
@@ -90,6 +93,12 @@ public class PayCompServiceImplTest extends BaseSpringTest {
         System.out.println("查询分润接口");
         List<Map<String, Object>> money = paymentDetailService.getShareMoney(GetMethod.AGENTDATE.code, "AG20181018000000000006643", "2018-11");
         System.out.println(money);
+    }
+
+    @Test
+    public void completAllAgentBusInfoCompany(){
+        AgentResult ag =  agentBusinfoService.completAllAgentBusInfoCompany();
+        System.out.println(ag);
     }
 
 }
