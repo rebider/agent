@@ -1073,4 +1073,9 @@ union
     group by c.agent_id having count(c.clo_pay_company)=1 and sum(case when c.clo_pay_company='Q000029564' then 1 else 0 end)>=1
   </select>
 
+  <select id="selectComp" resultType="map" parameterType="string">
+   select  pc.id as payComanyId,pc.com_name from A_agent_businfo bus
+    left join A_pay_comp pc on bus.clo_pay_company = pc.id
+    where bus.agent_id=#{agentId} and bus.CLO_PAY_COMPANY is not null
+  </select>
 </mapper>

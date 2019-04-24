@@ -763,5 +763,17 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		}
 		return AgentResult.fail();
 	}
+
+	@Override
+	public Map selectComp(String busId) {
+		AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
+		if (null!=agentBusInfo){
+			List<Map<String, Object>> maps = agentBusInfoMapper.selectComp(agentBusInfo.getAgentId());
+			if (null!=maps){
+				return  maps.get(0);
+			}
+		}
+		return null;
+	}
 }
 
