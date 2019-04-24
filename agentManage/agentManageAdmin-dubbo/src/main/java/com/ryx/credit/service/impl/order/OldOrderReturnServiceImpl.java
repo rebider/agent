@@ -562,6 +562,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             oReturnOrderDetail.setReturnPrice(bus_activity.getPrice());
             oReturnOrderDetail.setReturnAmt(oReturnOrderDetail.getReturnCount().multiply(bus_activity.getPrice()).setScale(2,BigDecimal.ROUND_HALF_UP));
             oReturnOrderDetail.setReturnTime(new Date());
+            oReturnOrderDetail.setActid(bus_activity.getId());
             if(StringUtils.isBlank(returnid))returnid = oldOrderReturnBusEditVo.getReturnid();
              if(1!=returnOrderDetailMapper.updateByPrimaryKeySelective(oReturnOrderDetail)){
                  throw new MessageException("更新明细失败");
@@ -923,26 +924,29 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                 vo.setPlatformNum(returnbusInfo.getBusPlatform());
                 //新活动
                 vo.setNewAct(oSubOrderActivity.getBusProCode());
-                //老活动查询
-                OSubOrderExample old_OSubOrder = new OSubOrderExample();
-                old_OSubOrder.or()
-                        .andOrderIdEqualTo(oReturnOrderDetail.getOrderId())
-                        .andProIdEqualTo(oReturnOrderDetail.getProId())
-                        .andStatusEqualTo(Status.STATUS_1.status);
-                List<OSubOrder> list_osub_old = oSubOrderMapper.selectByExample(old_OSubOrder);
 
-                if(list_osub_old.size()==0){
-                    throw new MessageException("退货机具活动信息未找到");
-                }
-                OSubOrder old_suborder  = list_osub_old.get(0);
-                OSubOrderActivityExample example_old_activity = new OSubOrderActivityExample();
-                example_old_activity.or().andSubOrderIdEqualTo(old_suborder.getId()).andStatusEqualTo(Status.STATUS_1.status);
-                List<OSubOrderActivity>  list_old_act = subOrderActivityMapper.selectByExample(example_old_activity);
-                if(list_old_act.size()==0){
-                    throw new MessageException("退货机具活动信息未找到");
-                }
-                OSubOrderActivity old_act = list_old_act.get(0);
-                vo.setOldAct(old_act.getBusProCode());
+                //老活动查询 --老活动获取退货明细里的业务平台活动
+//                OSubOrderExample old_OSubOrder = new OSubOrderExample();
+//                old_OSubOrder.or()
+//                        .andOrderIdEqualTo(oReturnOrderDetail.getOrderId())
+//                        .andProIdEqualTo(oReturnOrderDetail.getProId())
+//                        .andStatusEqualTo(Status.STATUS_1.status);
+//                List<OSubOrder> list_osub_old = oSubOrderMapper.selectByExample(old_OSubOrder);
+//
+//                if(list_osub_old.size()==0){
+//                    throw new MessageException("退货机具活动信息未找到");
+//                }
+//                OSubOrder old_suborder  = list_osub_old.get(0);
+//                OSubOrderActivityExample example_old_activity = new OSubOrderActivityExample();
+//                example_old_activity.or().andSubOrderIdEqualTo(old_suborder.getId()).andStatusEqualTo(Status.STATUS_1.status);
+//                List<OSubOrderActivity>  list_old_act = subOrderActivityMapper.selectByExample(example_old_activity);
+//                if(list_old_act.size()==0){
+//                    throw new MessageException("退货机具活动信息未找到");
+//                }
+//                OSubOrderActivity old_act = list_old_act.get(0);
+//                vo.setOldAct(old_act.getBusProCode());
+                OActivity activity_return_detail = oActivityMapper.selectByPrimaryKey(oReturnOrderDetail.getActid());
+                vo.setOldAct(activity_return_detail.getBusProCode());
 
                 //机具退货调整首刷接口调用
                 OLogistics logistics =  oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());

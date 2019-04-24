@@ -463,7 +463,8 @@
             oact.vender as proCom,
             detail.sn_num as sn,
             logi.Receipt_plan_id as receiptId,
-            oact.id as actid
+            detail.activity_id as actId,
+            detail.activity_name as actName
         from o_logistics_detail detail,O_LOGISTICS logi,o_activity oact
         where detail.sn_num = #{SN,jdbcType=VARCHAR}
         and detail.status = '1'
@@ -488,7 +489,8 @@
         oact.vender as proCom,
         detail.sn_num as sn,
         logi.Receipt_plan_id as receiptId,
-        oact.id as actid
+        detail.activity_id as actId,
+        detail.activity_name as actName
     from o_logistics_detail detail,O_LOGISTICS logi,o_activity oact
     where
     <![CDATA[detail.sn_num >= #{startSn,jdbcType=VARCHAR} and detail.sn_num <= #{endSn,jdbcType=VARCHAR}]]>

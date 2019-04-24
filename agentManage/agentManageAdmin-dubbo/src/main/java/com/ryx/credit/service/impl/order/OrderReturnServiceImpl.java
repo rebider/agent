@@ -731,6 +731,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 returnOrderDetail.setuUser(agentId);
                 returnOrderDetail.setStatus(Status.STATUS_1.status);
                 returnOrderDetail.setVersion(Status.STATUS_1.status);
+                returnOrderDetail.setActid(MapUtil.getString(map, "actId"));
                 returnOrderDetailMapper.insertSelective(returnOrderDetail);
             } catch (Exception e) {
                 log.error("生成退货明细失败", e);
@@ -1790,7 +1791,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         //===============================================================================
                         //cxinfo 机具退货调整首刷接口调用
                     }else{
-
                         log.info("======首刷发货 更新库存记录:{}:{}",proType,stringList);
                         //起始sn
                         OLogisticsDetailExample exampleOLogisticsDetailExamplestart = new OLogisticsDetailExample();
@@ -1818,37 +1818,15 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
                         //退货订单的业务编号
                         OReturnOrderDetail oReturnOrderDetail = returnOrderDetailMapper.selectByPrimaryKey(receiptPlan.getReturnOrderDetailId());
+                        OActivity return_sn_activity = oActivityMapper.selectByPrimaryKey(oReturnOrderDetail.getActid());
                         OOrder orderreturn =  oOrderMapper.selectByPrimaryKey(oReturnOrderDetail.getOrderId());
                         AgentBusInfo returnbusInfo = agentBusInfoMapper.selectByPrimaryKey(orderreturn.getBusId());
                         vo.setOldBusNum(returnbusInfo.getBusNum());
                         vo.setPlatformNum(returnbusInfo.getBusPlatform());
-
                         //新活动
                         vo.setNewAct(oSubOrderActivity.getBusProCode());
-
-                        //老活动查询
-                        OSubOrderExample old_OSubOrder = new OSubOrderExample();
-                        old_OSubOrder.or()
-                                .andOrderIdEqualTo(oReturnOrderDetail.getOrderId())
-                                .andProIdEqualTo(oReturnOrderDetail.getProId())
-                                .andStatusEqualTo(Status.STATUS_1.status);
-                        List<OSubOrder> list_osub_old = oSubOrderMapper.selectByExample(old_OSubOrder);
-
-                        if(list_osub_old.size()==0){
-                            throw new MessageException("退货机具活动信息未找到");
-                        }
-                        OSubOrder old_suborder  = list_osub_old.get(0);
-                        OSubOrderActivityExample example_old_activity = new OSubOrderActivityExample();
-                        example_old_activity.or().andSubOrderIdEqualTo(old_suborder.getId()).andStatusEqualTo(Status.STATUS_1.status);
-                        List<OSubOrderActivity>  list_old_act = subOrderActivityMapper.selectByExample(example_old_activity);
-                        if(list_old_act.size()==0){
-                            throw new MessageException("退货机具活动信息未找到");
-                        }
-                        OSubOrderActivity old_act = list_old_act.get(0);
-                        vo.setOldAct(old_act.getBusProCode());
-
-
-
+                        //老活动查询 老活动采用退货明细中的活动编号
+                        vo.setOldAct(return_sn_activity.getBusProCode());
                         //cxinfo 机具退货调整首刷接口调用
                         OLogistics logistics =  oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
                         //同平台下发，不同平台不下发
