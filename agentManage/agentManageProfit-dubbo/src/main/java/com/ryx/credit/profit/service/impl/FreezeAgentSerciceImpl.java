@@ -1,9 +1,12 @@
 package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.FreezeAgentMapper;
 import com.ryx.credit.profit.pojo.FreezeAgent;
+import com.ryx.credit.profit.pojo.FreezeAgentExample;
 import com.ryx.credit.profit.service.IFreezeAgentSercice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,4 +44,39 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
         return pageInfo;
 
   }
+
+    @Override
+    public PageInfo getFreezeData(FreezeAgent freezeAgent, String isQuerySubordinate, Page page, String orgId) {
+        List<FreezeAgent> listAll;
+        long count;
+        if ("false".equals(isQuerySubordinate)){
+            FreezeAgentExample example=new FreezeAgentExample();
+            FreezeAgentExample.Criteria criteria=example.createCriteria();
+            criteria.andStatusEqualTo("1");
+            if(StringUtils.isNotBlank(freezeAgent.getAgentId())){
+                criteria.andAgentIdEqualTo(freezeAgent.getAgentId());
+            }
+            if(StringUtils.isNotBlank(freezeAgent.getAgentName())){
+                criteria.andAgentNameEqualTo(freezeAgent.getAgentName());
+            }
+            if(StringUtils.isNotBlank(freezeAgent.getParentAgentId())){
+                criteria.andParentAgentIdEqualTo(freezeAgent.getParentAgentId());
+            }
+            if(StringUtils.isNotBlank(freezeAgent.getParentAgentName())){
+                criteria.andParentAgentNameEqualTo(freezeAgent.getParentAgentName());
+            }
+            example.setPage(page);
+
+            listAll=freezeAgentMapper.selectByExampleWithCity(freezeAgent,page,orgId);
+            count = freezeAgentMapper.countByExampleWithCity(freezeAgent,orgId);
+
+        }else{
+            listAll=freezeAgentMapper.selectAllFreezeWithSubordinate(freezeAgent,page,orgId);
+            count=freezeAgentMapper.countAllFreezeWithSubordinate(freezeAgent,orgId);
+        }
+        PageInfo pageInfo=new PageInfo();
+        pageInfo.setRows(listAll);
+        pageInfo.setTotal((int) count);
+        return pageInfo;
+    }
 }

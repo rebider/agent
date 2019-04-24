@@ -248,11 +248,6 @@ where 1=1
     <include refid="OracleDialectSuffix" />
   </select>
 
-
-
-
-
-
   <select id="selectAllNotFreezeCount" parameterType="java.util.Map" resultType="java.lang.Integer">
     Select count(*) from (select gg.*,hh.AG_NAME as PARENT_AGENT_NAME from (select ee.*,ff.AG_NAME as AGENT_NAME from (select * from
     (select * from
@@ -286,11 +281,6 @@ where 1=1
     </if>
     )
   </select>
-
-
-
-
-
 
   <select id="selectAllNotFreezeLower" parameterType="java.util.Map" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -384,7 +374,6 @@ start with
   connect by prior AGENT_ID =  PARENT_AGENT_ID
     <include refid="OracleDialectSuffix" />
   </select>
-
 
   <select id="selectAllNotFreezeLowerCount" parameterType="java.util.Map" resultType="java.lang.Integer">
     select count(*) from (select * from (select gg.*,hh.AG_NAME as PARENT_AGENT_NAME from (select ee.*,ff.AG_NAME from (select * from (select
@@ -490,4 +479,103 @@ start with
     )
   </select>
 
+  <select id="selectAllFreezeWithSubordinate" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    <if test="orgId!=null and orgId!=''">
+        select aa.*,pfor.FREEZE_AMT from (
+    </if>
+    select
+    <include refid="Base_Column_List"/>  from P_FREEZE_AGENT start with STATUS='1'
+    <if test="freezeAgent.agentId!=null and freezeAgent.agentId!=''">
+     and AGENT_ID=#{freezeAgent.agentId,jdbcType=VARCHAR}
+    </if>
+    <if test="freezeAgent.agentName!=null and freezeAgent.agentName!=''">
+      and AGENT_NAME=#{freezeAgent.agentName,jdbcType=VARCHAR}
+    </if>
+    <if test="freezeAgent.parentAgentId!=null and freezeAgent.parentAgentId!=''">
+      and PARENT_AGENT_ID=#{freezeAgent.parentAgentId,jdbcType=VARCHAR}
+    </if>
+    <if test="freezeAgent.parentAgentName!=null and freezeAgent.parentAgentName!=''">
+      and PARENT_AGENT_NAME=#{freezeAgent.parentAgentName,jdbcType=VARCHAR}
+    </if>
+    CONNECT BY  PRIOR AGENT_ID=PARENT_AGENT_ID and STATUS='1'
+      <if test="orgId!=null and orgId!=''">
+         ) aa left join A_AGENT on aa.AGENT_ID = A_AGENT.ID
+        left join P_FREEZE_OPERATION_RECORD pfor on aa.AGENT_ID=pfor.AGENT_ID and aa.PARENT_AGENT_ID=pfor.PARENT_AGENT_ID and aa.FREEZE_TYPE=pfor.FREEZE_TYPE and aa.OPERATION_BATCH=pfor.THAW_OPERATOR
+          where A_AGENT.AG_DOC_PRO= #{orgId}
+      </if>
+
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="countAllFreezeWithSubordinate" resultType="java.lang.Long">
+    select count(1) from (
+    <if test="orgId!=null and orgId!=''">
+        select aa.* from (
+    </if>
+      select
+      <include refid="Base_Column_List" />
+      from P_FREEZE_AGENT start with STATUS='1'
+      <if test="freezeAgent.agentId!=null and freezeAgent.agentId!=''">
+        and AGENT_ID=#{freezeAgent.agentId,jdbcType=VARCHAR}
+      </if>
+      <if test="freezeAgent.agentName!=null and freezeAgent.agentName!=''">
+        and AGENT_NAME=#{freezeAgent.agentName,jdbcType=VARCHAR}
+      </if>
+      <if test="freezeAgent.parentAgentId!=null and freezeAgent.parentAgentId!=''">
+        and PARENT_AGENT_ID=#{freezeAgent.parentAgentId,jdbcType=VARCHAR}
+      </if>
+      <if test="freezeAgent.parentAgentName!=null and freezeAgent.parentAgentName!=''">
+        and PARENT_AGENT_NAME=#{freezeAgent.parentAgentName,jdbcType=VARCHAR}
+      </if>
+      CONNECT BY  PRIOR AGENT_ID=PARENT_AGENT_ID and STATUS='1'
+      <if test="orgId!=null and orgId!=''">
+         ) aa left join A_AGENT on aa.AGENT_ID = A_AGENT.ID where A_AGENT.AG_DOC_PRO= #{orgId}
+      </if>
+    )
+  </select>
+
+  <select id="selectByExampleWithCity" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select pfa.*,pfor.FREEZE_AMT from P_FREEZE_AGENT pfa left join A_AGENT a on pfa.AGENT_ID=a.ID
+    left join P_FREEZE_OPERATION_RECORD pfor on pfa.AGENT_ID=pfor.AGENT_ID and pfa.PARENT_AGENT_ID=pfor.PARENT_AGENT_ID and pfa.FREEZE_TYPE=pfor.FREEZE_TYPE and pfa.OPERATION_BATCH=pfor.THAW_OPERATOR
+    where pfa.STATUS='1'
+    <if test="orgId!=null and orgId!=''">
+      and a.AG_DOC_PRO= #{orgId}
+    </if>
+    <if test="freezeAgent.agentId!=null and freezeAgent.agentId!=''">
+        and pfa.AGENT_ID=#{freezeAgent.agentId,jdbcType=VARCHAR}
+    </if>
+    <if test="freezeAgent.agentName!=null and freezeAgent.agentName!=''">
+      and pfa.AGENT_NAME=#{freezeAgent.agentName,jdbcType=VARCHAR}
+    </if>
+    <if test="freezeAgent.parentAgentId!=null and freezeAgent.parentAgentId!=''">
+      and pfa.PARENT_AGENT_ID=#{freezeAgent.parentAgentId,jdbcType=VARCHAR}
+    </if>
+    <if test="freezeAgent.parentAgentName!=null and freezeAgent.parentAgentName!=''">
+      and pfa.PARENT_AGENT_NAME=#{freezeAgent.parentAgentName,jdbcType=VARCHAR}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="countByExampleWithCity" resultType="java.lang.Long">
+    select count(1) from (
+        select pfa.* from P_FREEZE_AGENT pfa left join A_AGENT a on pfa.AGENT_ID=a.ID where pfa.STATUS='1'
+        <if test="orgId!=null and orgId!=''">
+          and a.AG_DOC_PRO= #{orgId}
+        </if>
+         <if test="freezeAgent.agentId!=null and freezeAgent.agentId!=''">
+         and pfa.AGENT_ID=#{freezeAgent.agentId,jdbcType=VARCHAR}
+        </if>
+        <if test="freezeAgent.agentName!=null and freezeAgent.agentName!=''">
+          and pfa.AGENT_NAME=#{freezeAgent.agentName,jdbcType=VARCHAR}
+        </if>
+        <if test="freezeAgent.parentAgentId!=null and freezeAgent.parentAgentId!=''">
+          and pfa.PARENT_AGENT_ID=#{freezeAgent.parentAgentId,jdbcType=VARCHAR}
+        </if>
+        <if test="freezeAgent.parentAgentName!=null and freezeAgent.parentAgentName!=''">
+          and pfa.PARENT_AGENT_NAME=#{freezeAgent.parentAgentName,jdbcType=VARCHAR}
+        </if>
+    )
+  </select>
 </mapper>

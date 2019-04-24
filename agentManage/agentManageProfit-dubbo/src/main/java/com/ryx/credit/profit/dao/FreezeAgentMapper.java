@@ -1,7 +1,9 @@
 package com.ryx.credit.profit.dao;
 
+import com.ryx.credit.common.util.Page;
 import com.ryx.credit.profit.pojo.FreezeAgent;
 import com.ryx.credit.profit.pojo.FreezeAgentExample;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -28,4 +30,11 @@ public interface FreezeAgentMapper {
     //不冻结查询下级
     List<FreezeAgent> selectAllNotFreezeLower(Map<String,Object> perms);
     Integer selectAllNotFreezeLowerCount (Map<String,Object> perms);
+    //查询冻结代理商并下级
+    List<FreezeAgent> selectAllFreezeWithSubordinate(@Param("freezeAgent")FreezeAgent freezeAgent,@Param("page")Page page,@Param("orgId")String orgId);
+    long countAllFreezeWithSubordinate(@Param("freezeAgent")FreezeAgent freezeAgent,@Param("orgId")String orgId);
+
+    List<FreezeAgent> selectByExampleWithCity(@Param("freezeAgent")FreezeAgent freezeAgent,@Param("page")Page page, @Param("orgId")String orgId);
+
+    long countByExampleWithCity(@Param("freezeAgent")FreezeAgent freezeAgent, @Param("orgId")String orgId);
 }
