@@ -87,4 +87,6 @@ public interface AgentBusInfoMapper {
     List<Map<String,Object>> selectDgBkfp();
 
     List<Map<String,Object>> selectDs();
+
+    List<Map<String,Object>> selectComp(@Param("agentId")  String agentId);
 }

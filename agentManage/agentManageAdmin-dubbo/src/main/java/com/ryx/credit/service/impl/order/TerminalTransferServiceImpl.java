@@ -276,7 +276,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         AgentBusInfoExample agentExample = new AgentBusInfoExample();
         AgentBusInfoExample.Criteria agentCriteria = agentExample.createCriteria();
         agentCriteria.andStatusEqualTo(Status.STATUS_1.status);
-        agentCriteria.andBusStatusEqualTo(Status.STATUS_1.status);
+        agentCriteria.andBusStatusIn(busStatusList);
         agentCriteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
         agentCriteria.andAgentIdEqualTo(agentId);
         List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentExample);
