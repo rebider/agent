@@ -229,21 +229,21 @@ select distinct aa.AGENT_ID ,bb.AGENT_ID as PARENT_AGENT_ID,'02'FREEZE_TYPE from
 (select AGENT_ID,BUS_PARENT from A_AGENT_BUSINFO) bb on aa.id = bb.BUS_PARENT where (aa.BUS_PLATFORM = '6000'or aa.BUS_PLATFORM = '5000'))
  order by AGENT_ID)
 minus
-select AGENT_ID,PARENT_AGENT_ID,FREEZE_TYPE from P_FREEZE_AGENT) ee left join A_AGENT ff on ee.AGENT_ID = ff.ID) gg
+select AGENT_ID,PARENT_AGENT_ID,FREEZE_TYPE from P_FREEZE_AGENT where STATUS='1') ee left join A_AGENT ff on ee.AGENT_ID = ff.ID) gg
 left join A_AGENT hh on gg.PARENT_AGENT_ID=hh.ID
 
 where 1=1
-    <if test="AGENT_ID != null">
-      and gg.AGENT_ID = #{AGENT_ID,jdbcType=VARCHAR},
+    <if test="agentId != null">
+      and gg.AGENT_ID = #{agentId,jdbcType=VARCHAR},
     </if>
-    <if test="AGENT_NAME != null">
-      and gg.AGENT_NAME = #{AGENT_NAME,jdbcType=VARCHAR},
+    <if test="agentName != null">
+      and gg.AGENT_NAME = #{agentName,jdbcType=VARCHAR},
     </if>
-    <if test="AGENT_NAME  != null">
-      and gg.PARENT_AGENT_ID = #{PARENT_AGENT_ID,jdbcType=VARCHAR},
+    <if test="parentAgentId  != null">
+      and gg.PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
     </if>
-    <if test="PARENT_AGENT_NAME != null">
-      and gg.PARENT_AGENT_NAME = #{PARENT_AGENT_NAME,jdbcType=VARCHAR},
+    <if test="parentAgentName != null">
+      and gg.PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
@@ -263,21 +263,21 @@ where 1=1
     aa.BUS_PLATFORM = '5000'))
     order by AGENT_ID)
     minus
-    select AGENT_ID,PARENT_AGENT_ID,FREEZE_TYPE from P_FREEZE_AGENT) ee left join A_AGENT ff on ee.AGENT_ID = ff.ID) gg
+    select AGENT_ID,PARENT_AGENT_ID,FREEZE_TYPE from P_FREEZE_AGENT where STATUS='1') ee left join A_AGENT ff on ee.AGENT_ID = ff.ID) gg
     left join A_AGENT hh on gg.PARENT_AGENT_ID=hh.ID
 
     where 1=1
-    <if test="AGENT_ID != null">
-      and gg.AGENT_ID = #{AGENT_ID,jdbcType=VARCHAR},
+    <if test="agentId != null">
+      and gg.AGENT_ID = #{agentId,jdbcType=VARCHAR},
     </if>
-    <if test="AGENT_NAME != null">
-      and gg.AGENT_NAME = #{AGENT_NAME,jdbcType=VARCHAR},
+    <if test="agentName != null">
+      and gg.AGENT_NAME = #{agentName,jdbcType=VARCHAR},
     </if>
-    <if test="AGENT_NAME  != null">
-      and gg.PARENT_AGENT_ID = #{PARENT_AGENT_ID,jdbcType=VARCHAR},
+    <if test="parentAgentId  != null">
+      and gg.PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
     </if>
-    <if test="PARENT_AGENT_NAME != null">
-      and gg.PARENT_AGENT_NAME = #{PARENT_AGENT_NAME,jdbcType=VARCHAR},
+    <if test="parentAgentName != null">
+      and gg.PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
     </if>
     )
   </select>
@@ -294,21 +294,21 @@ select distinct aa.AGENT_ID ,bb.AGENT_ID as PARENT_AGENT_ID,'02'FREEZE_TYPE from
 (select AGENT_ID,BUS_PARENT from A_AGENT_BUSINFO) bb on aa.id = bb.BUS_PARENT where (aa.BUS_PLATFORM = '6000'or aa.BUS_PLATFORM = '5000'))
  order by AGENT_ID)
 minus
-select AGENT_ID,PARENT_AGENT_ID,FREEZE_TYPE from P_FREEZE_AGENT) ee left join A_AGENT ff on ee.AGENT_ID = ff.ID) gg
+select AGENT_ID,PARENT_AGENT_ID,FREEZE_TYPE from P_FREEZE_AGENT where STATUS='1') ee left join A_AGENT ff on ee.AGENT_ID = ff.ID) gg
 left join A_AGENT hh on gg.PARENT_AGENT_ID=hh.ID where gg.FREEZE_TYPE='00')
 start with
     1=1
-    <if test="AGENT_ID != null">
-      and AGENT_ID = #{AGENT_ID,jdbcType=VARCHAR},
+    <if test="agentId != null">
+      and AGENT_ID = #{agentId,jdbcType=VARCHAR},
     </if>
-    <if test="AGENT_NAME != null">
-      and AGENT_NAME = #{AGENT_NAME,jdbcType=VARCHAR},
+    <if test="agentName != null">
+      and AGENT_NAME = #{agentName,jdbcType=VARCHAR},
     </if>
-    <if test="AGENT_NAME  != null">
-      and PARENT_AGENT_ID = #{PARENT_AGENT_ID,jdbcType=VARCHAR},
+    <if test="parentAgentId  != null">
+      and PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
     </if>
-    <if test="PARENT_AGENT_NAME != null">
-      and PARENT_AGENT_NAME = #{PARENT_AGENT_NAME,jdbcType=VARCHAR},
+    <if test="parentAgentName != null">
+      and PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
     </if>
 connect by prior AGENT_ID =  PARENT_AGENT_ID
 
@@ -324,22 +324,22 @@ select distinct aa.AGENT_ID ,bb.AGENT_ID as PARENT_AGENT_ID,'02'FREEZE_TYPE from
 (select AGENT_ID,BUS_PARENT from A_AGENT_BUSINFO) bb on aa.id = bb.BUS_PARENT where (aa.BUS_PLATFORM = '6000'or aa.BUS_PLATFORM = '5000'))
  order by AGENT_ID)
 minus
-select AGENT_ID,PARENT_AGENT_ID,FREEZE_TYPE from P_FREEZE_AGENT) ee left join A_AGENT ff on ee.AGENT_ID = ff.ID) gg
+select AGENT_ID,PARENT_AGENT_ID,FREEZE_TYPE from P_FREEZE_AGENT where STATUS='1') ee left join A_AGENT ff on ee.AGENT_ID = ff.ID) gg
 left join A_AGENT hh on gg.PARENT_AGENT_ID=hh.ID where gg.FREEZE_TYPE='01')
 start with
 
     1=1
-    <if test="AGENT_ID != null">
-      and AGENT_ID = #{AGENT_ID,jdbcType=VARCHAR},
+    <if test="agentId != null">
+      and AGENT_ID = #{agentId,jdbcType=VARCHAR},
     </if>
-    <if test="AGENT_NAME != null">
-      and AGENT_NAME = #{AGENT_NAME,jdbcType=VARCHAR},
+    <if test="agentName != null">
+      and AGENT_NAME = #{agentName,jdbcType=VARCHAR},
     </if>
-    <if test="AGENT_NAME  != null">
-      and PARENT_AGENT_ID = #{PARENT_AGENT_ID,jdbcType=VARCHAR},
+    <if test="parentAgentId  != null">
+      and PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
     </if>
-    <if test="PARENT_AGENT_NAME != null">
-      and PARENT_AGENT_NAME = #{PARENT_AGENT_NAME,jdbcType=VARCHAR},
+    <if test="parentAgentName != null">
+      and PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
     </if>
 connect by prior AGENT_ID =  PARENT_AGENT_ID
 
@@ -355,25 +355,26 @@ select distinct aa.AGENT_ID ,bb.AGENT_ID as PARENT_AGENT_ID,'02'FREEZE_TYPE from
 (select AGENT_ID,BUS_PARENT from A_AGENT_BUSINFO) bb on aa.id = bb.BUS_PARENT where (aa.BUS_PLATFORM = '6000'or aa.BUS_PLATFORM = '5000'))
  order by AGENT_ID)
 minus
-select AGENT_ID,PARENT_AGENT_ID,FREEZE_TYPE from P_FREEZE_AGENT) ee left join A_AGENT ff on ee.AGENT_ID = ff.ID) gg
+    select AGENT_ID,PARENT_AGENT_ID,FREEZE_TYPE from P_FREEZE_AGENT where STATUS='1') ee left join A_AGENT ff on ee.AGENT_ID = ff.ID) gg
 left join A_AGENT hh on gg.PARENT_AGENT_ID=hh.ID where gg.FREEZE_TYPE='02')
 start with
     1=1
-    <if test="AGENT_ID != null">
-      and AGENT_ID = #{AGENT_ID,jdbcType=VARCHAR},
+    <if test="agentId != null">
+      and AGENT_ID = #{agentId,jdbcType=VARCHAR},
     </if>
-    <if test="AGENT_NAME != null">
-      and AGENT_NAME = #{AGENT_NAME,jdbcType=VARCHAR},
+    <if test="agentName != null">
+      and AGENT_NAME = #{agentName,jdbcType=VARCHAR},
     </if>
-    <if test="AGENT_NAME  != null">
-      and PARENT_AGENT_ID = #{PARENT_AGENT_ID,jdbcType=VARCHAR},
+    <if test="parentAgentId  != null">
+      and PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
     </if>
-    <if test="PARENT_AGENT_NAME != null">
-      and PARENT_AGENT_NAME = #{PARENT_AGENT_NAME,jdbcType=VARCHAR},
+    <if test="parentAgentName != null">
+      and PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
     </if>
   connect by prior AGENT_ID =  PARENT_AGENT_ID
     <include refid="OracleDialectSuffix" />
   </select>
+
 
   <select id="selectAllNotFreezeLowerCount" parameterType="java.util.Map" resultType="java.lang.Integer">
     select count(*) from (select * from (select gg.*,hh.AG_NAME as PARENT_AGENT_NAME from (select ee.*,ff.AG_NAME from (select * from (select
@@ -390,21 +391,21 @@ start with
     aa.BUS_PLATFORM = '5000'))
     order by AGENT_ID)
     minus
-    select AGENT_ID,PARENT_AGENT_ID,FREEZE_TYPE from P_FREEZE_AGENT) ee left join A_AGENT ff on ee.AGENT_ID = ff.ID) gg
+    select AGENT_ID,PARENT_AGENT_ID,FREEZE_TYPE from P_FREEZE_AGENT where STATUS='1') ee left join A_AGENT ff on ee.AGENT_ID = ff.ID) gg
     left join A_AGENT hh on gg.PARENT_AGENT_ID=hh.ID where gg.FREEZE_TYPE='00')
     start with
     1=1
-    <if test="AGENT_ID != null">
-      and AGENT_ID = #{AGENT_ID,jdbcType=VARCHAR},
+    <if test="agentId != null">
+      and AGENT_ID = #{agentId,jdbcType=VARCHAR},
     </if>
-    <if test="AGENT_NAME != null">
-      and AGENT_NAME = #{AGENT_NAME,jdbcType=VARCHAR},
+    <if test="agentName != null">
+      and AGENT_NAME = #{agentName,jdbcType=VARCHAR},
     </if>
-    <if test="AGENT_NAME  != null">
-      and PARENT_AGENT_ID = #{PARENT_AGENT_ID,jdbcType=VARCHAR},
+    <if test="parentAgentId  != null">
+      and PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
     </if>
-    <if test="PARENT_AGENT_NAME != null">
-      and PARENT_AGENT_NAME = #{PARENT_AGENT_NAME,jdbcType=VARCHAR},
+    <if test="parentAgentName != null">
+      and PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
     </if>
     connect by prior AGENT_ID = PARENT_AGENT_ID
 
@@ -424,22 +425,22 @@ start with
     aa.BUS_PLATFORM = '5000'))
     order by AGENT_ID)
     minus
-    select AGENT_ID,PARENT_AGENT_ID,FREEZE_TYPE from P_FREEZE_AGENT) ee left join A_AGENT ff on ee.AGENT_ID = ff.ID) gg
+    select AGENT_ID,PARENT_AGENT_ID,FREEZE_TYPE from P_FREEZE_AGENT where STATUS='1') ee left join A_AGENT ff on ee.AGENT_ID = ff.ID) gg
     left join A_AGENT hh on gg.PARENT_AGENT_ID=hh.ID where gg.FREEZE_TYPE='01')
     start with
 
     1=1
-    <if test="AGENT_ID != null">
-      and AGENT_ID = #{AGENT_ID,jdbcType=VARCHAR},
+    <if test="agentId != null">
+      and AGENT_ID = #{agentId,jdbcType=VARCHAR},
     </if>
-    <if test="AGENT_NAME != null">
-      and AGENT_NAME = #{AGENT_NAME,jdbcType=VARCHAR},
+    <if test="agentName != null">
+      and AGENT_NAME = #{agentName,jdbcType=VARCHAR},
     </if>
-    <if test="AGENT_NAME  != null">
-      and PARENT_AGENT_ID = #{PARENT_AGENT_ID,jdbcType=VARCHAR},
+    <if test="parentAgentId  != null">
+      and PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
     </if>
-    <if test="PARENT_AGENT_NAME != null">
-      and PARENT_AGENT_NAME = #{PARENT_AGENT_NAME,jdbcType=VARCHAR},
+    <if test="parentAgentName != null">
+      and PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
     </if>
     connect by prior AGENT_ID = PARENT_AGENT_ID
 
@@ -459,24 +460,78 @@ start with
     aa.BUS_PLATFORM = '5000'))
     order by AGENT_ID)
     minus
-    select AGENT_ID,PARENT_AGENT_ID,FREEZE_TYPE from P_FREEZE_AGENT) ee left join A_AGENT ff on ee.AGENT_ID = ff.ID) gg
+    select AGENT_ID,PARENT_AGENT_ID,FREEZE_TYPE from P_FREEZE_AGENT where STATUS='1') ee left join A_AGENT ff on ee.AGENT_ID = ff.ID) gg
     left join A_AGENT hh on gg.PARENT_AGENT_ID=hh.ID where gg.FREEZE_TYPE='02')
     start with
     1=1
-    <if test="AGENT_ID != null">
-      and AGENT_ID = #{AGENT_ID,jdbcType=VARCHAR},
+    <if test="agentId != null">
+      and AGENT_ID = #{agentId,jdbcType=VARCHAR},
     </if>
-    <if test="AGENT_NAME != null">
-      and AGENT_NAME = #{AGENT_NAME,jdbcType=VARCHAR},
+    <if test="agentName != null">
+      and AGENT_NAME = #{agentName,jdbcType=VARCHAR},
     </if>
-    <if test="AGENT_NAME  != null">
-      and PARENT_AGENT_ID = #{PARENT_AGENT_ID,jdbcType=VARCHAR},
+    <if test="parentAgentId  != null">
+      and PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
     </if>
-    <if test="PARENT_AGENT_NAME != null">
-      and PARENT_AGENT_NAME = #{PARENT_AGENT_NAME,jdbcType=VARCHAR},
+    <if test="parentAgentName != null">
+      and PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
     </if>
     connect by prior AGENT_ID = PARENT_AGENT_ID
     )
+  </select>
+
+
+
+  <select id="freezeDetail" resultType="java.util.Map" parameterType="java.util.Map">
+select* from(
+select aa.ID ,aa.AGENT_NAME,aa.AGENT_ID,aa.PARENT_AGENT_ID,aa.PARENT_AGENT_NAME,aa.FREEZE_TYPE,
+aa.OPERATION_BATCH,aa.STATUS,bb.FREEZE_AMT,bb.OPERATION_TIME as FREEZE_TIME, bb.FREEZE_REASON,bb.THAW_TIME,
+cast('' as varchar2(32)) as RELIEVE_TIME,cast('' as varchar2(256)) as RELIEVE_REASON,cast(0.00 as number(16,2)) as RELIEVE_AMT
+from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
+where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') = nvl(bb.PARENT_AGENT_NAME,'-')
+and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '1'
+
+union all
+
+select aa.ID ,aa.AGENT_NAME,aa.AGENT_ID,aa.PARENT_AGENT_ID,aa.PARENT_AGENT_NAME,aa.FREEZE_TYPE,
+aa.OPERATION_BATCH,aa.STATUS,bb.FREEZE_AMT,bb.OPERATION_TIME as FREEZE_TIME, bb.FREEZE_REASON,bb.THAW_TIME,
+cast('' as varchar2(32)) as RELIEVE_TIME,cast('' as varchar2(256)) as RELIEVE_REASON,cast(0.00 as number(16,2)) as RELIEVE_AMT
+from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
+where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') = nvl(bb.PARENT_AGENT_NAME,'-')
+and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '2'
+
+union all
+
+select xxx.ID ,xxx.AGENT_NAME,xxx.AGENT_ID,xxx.PARENT_AGENT_ID,xxx.PARENT_AGENT_NAME,xxx.FREEZE_TYPE,
+xxx.OPERATION_BATCH,xxx.STATUS,xxx.FREEZE_AMT,xxx.FREEZE_TIME, xxx.FREEZE_REASON,xxx.THAW_TIME,zzz.RELIEVE_TIME,zzz.RELIEVE_REASON,zzz.RELIEVE_AMT from
+    (select aa.ID ,aa.AGENT_NAME,aa.AGENT_ID,aa.PARENT_AGENT_ID,aa.PARENT_AGENT_NAME,aa.FREEZE_TYPE,
+aa.OPERATION_BATCH,aa.STATUS,aa.REV1,bb.FREEZE_AMT,bb.OPERATION_TIME as FREEZE_TIME, bb.FREEZE_REASON,bb.THAW_TIME
+from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
+where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') = nvl(bb.PARENT_AGENT_NAME,'-')
+and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '0') xxx,
+(select aa.ID ,aa.AGENT_NAME,aa.AGENT_ID,aa.PARENT_AGENT_ID,aa.PARENT_AGENT_NAME,aa.FREEZE_TYPE,
+aa.OPERATION_BATCH,aa.STATUS,aa.REV1,bb.FREEZE_AMT as RELIEVE_AMT,bb.OPERATION_TIME as RELIEVE_TIME,
+bb.FREEZE_REASON as RELIEVE_REASON,bb.THAW_TIME
+from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
+where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') = nvl(bb.PARENT_AGENT_NAME,'-')
+and aa.REV1=bb.FREEZE_BATCH and aa.STATUS = '0') zzz where xxx.AGENT_ID = zzz.AGENT_ID and
+nvl(xxx.PARENT_AGENT_NAME,'-') = nvl(zzz.PARENT_AGENT_NAME,'-') and xxx.FREEZE_TYPE = zzz.FREEZE_TYPE)
+    where 1=1
+    <if test="agentId != null">
+      and AGENT_ID = #{agentId,jdbcType=VARCHAR},
+    </if>
+    <if test="agentName != null">
+      and AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+    </if>
+    <if test="parentAgentId  != null">
+      and PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+    </if>
+    <if test="parentAgentName != null">
+      and PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
+    </if>
+ order by  AGENT_ID
+
+
   </select>
 
   <select id="selectAllFreezeWithSubordinate" resultMap="BaseResultMap">
