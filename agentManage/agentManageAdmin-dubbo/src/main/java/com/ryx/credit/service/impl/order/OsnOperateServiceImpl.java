@@ -72,6 +72,8 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
     @Autowired
     private PlatFormMapper platFormMapper;
     @Autowired
+    private OActivityMapper oActivityMapper;
+    @Autowired
     private OLogisticsService oLogisticsService;
     @Autowired
     private ImsTermWarehouseDetailService imsTermWarehouseDetailService;
@@ -332,6 +334,8 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
         List<OSubOrderActivity>  OSubOrderActivitylist = oSubOrderActivityMapper.selectByExample(oSubOrderActivityExample);
         OOrder order = oOrderMapper.selectByPrimaryKey(oSubOrder.getOrderId());
 
+
+
         //手刷生成物流方式 根据机具类型确定机具明细的生成方式，首刷更新明细记录
         if(logistics.getProType().equals(PlatformType.MPOS.msg) || logistics.getProType().equals(PlatformType.MPOS.code)){
             logger.info("首刷发货 更新库存记录:{}:{}-{}",logistics.getProType(),logistics.getSnBeginNum(),logistics.getSnEndNum());
@@ -451,7 +455,6 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                 }
             }
         }
-        logger.info("开始生成物流明细完成：{}",logcId);
         return true;
     }
 
@@ -501,10 +504,27 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
         if (OSubOrderActivitylist.size() > 0) {
             oSubOrderActivity = OSubOrderActivitylist.get(0);
         }
+
         //订单信息
         OOrder order = oOrderMapper.selectByPrimaryKey(oSubOrder.getOrderId());
         PlatForm platForm = platFormMapper.selectByPlatFormNum(order.getOrderPlatform());
         Date date = Calendar.getInstance().getTime();
+
+
+        OActivity oActivity = oActivityMapper.selectByPrimaryKey(oSubOrderActivity.getActivityId());
+
+        //流量卡不进行下发操作
+        if(oActivity!=null && com.ryx.credit.commons.utils.StringUtils.isNotBlank(oActivity.getActCode()) && "2204".equals(oActivity.getActCode())){
+            logger.info("导入物流数据,流量卡不进行下发操作，活动代码{}={}={}" ,oActivity.getActCode(),logcId, JSONObject.toJSON(logistics));
+            listOLogisticsDetailSn.forEach(detail -> {
+                detail.setSendStatus(LogisticsDetailSendStatus.send_success.code);
+                detail.setSbusMsg("流量卡不下发");
+                detail.setuTime(date);
+                oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
+            });
+            return true;
+        }
+
         if (platForm.getPlatformType().equals(PlatformType.POS.code) || platForm.getPlatformType().equals(PlatformType.ZPOS.code)) {
             ImsTermWarehouseDetail imsTermWarehouseDetail = new ImsTermWarehouseDetail();
             if (null == order) {
