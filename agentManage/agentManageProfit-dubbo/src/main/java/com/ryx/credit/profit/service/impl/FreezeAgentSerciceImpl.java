@@ -51,11 +51,11 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
        Integer count = 0;
         List<FreezeAgent> listAll;
         if ("true".equals(param.get("isQuerySubordinate"))){
-            logger.info("不含下级查询");
+            logger.info("下级查询");
             listAll = freezeAgentMapper.selectAllNotFreezeLower(param);
             count = freezeAgentMapper.selectAllNotFreezeLowerCount(param);
         }else{
-            logger.info("下级查询");
+            logger.info("不含下级查询");
             listAll = freezeAgentMapper.selectAllNotFreeze(param);
             count = freezeAgentMapper.selectAllNotFreezeCount(param);
         }
