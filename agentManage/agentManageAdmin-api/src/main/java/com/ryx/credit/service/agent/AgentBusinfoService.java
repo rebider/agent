@@ -104,4 +104,6 @@ public interface AgentBusinfoService {
      * @return
      */
     AgentResult completAgentBusInfoCompany(String agentId)throws Exception;
+
+    Map selectComp(String busId);
 }

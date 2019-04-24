@@ -608,10 +608,13 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		}
 		//当前代理商
 		AgentBusInfoExample example = new AgentBusInfoExample();
+		List<BigDecimal> busStatusList = new ArrayList<>();
+		busStatusList.add(BusinessStatus.Enabled.status);
+		busStatusList.add(BusinessStatus.inactive.status);
 		example.or().andBusNumEqualTo(busNum)
 				.andBusPlatformEqualTo(platformCode)
 				.andStatusEqualTo(Status.STATUS_1.status)
-				.andBusStatusEqualTo(Status.STATUS_1.status);
+				.andBusStatusIn(busStatusList);
 		List<AgentBusInfo> plats = agentBusInfoMapper.selectByExample(example);
 		if(plats.size()==0) {
 			return list;
@@ -622,8 +625,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		AgentBusInfoExample child_example = new AgentBusInfoExample();
 		child_example.or().andBusParentEqualTo(platInfo.getId())
 				.andBusPlatformEqualTo(platformCode)
-				.andBusStatusEqualTo(Status.STATUS_1.status)
-				.andStatusEqualTo(Status.STATUS_1.status)
+				.andBusStatusIn(busStatusList)
 				.andBusNumIsNotNull();
 		List<AgentBusInfo> child_plat = agentBusInfoMapper.selectByExample(child_example);
 		//没有下级别就返回
@@ -684,20 +686,22 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 			String CLO_PAY_COMPANY = (String)map.get("CLO_PAY_COMPANY");//打款公司
 			AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(id);
 			agentBusInfo.setCloPayCompany(dg);
+			agentBusInfo.setcUtime(Calendar.getInstance().getTime());
 			agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
 		}
 		//对公不开发票
-		List<Map<String,Object>> BkfaMap=agentBusInfoMapper.selectDgBkfp();
-		updateMap(BkfaMap);
+		List<Map<String,Object>> bkfaMap=agentBusInfoMapper.selectDgBkfp();
+		updateMap(bkfaMap);
 
 		//对私
-		List<Map<String,Object>> BsMap=agentBusInfoMapper.selectDs();
-		updateMap(BkfaMap);
+		List<Map<String,Object>> bsMap=agentBusInfoMapper.selectDs();
+		updateMap(bsMap);
 		return AgentResult.ok();
 	}
 
 	private void updateMap(List<Map<String,Object>> map){
 		String ds="Q000029560";
+	if (null!=map && map.size()>0){
 		for (Map<String, Object> mapBkfp : map) {
 			String agent_id =(String) mapBkfp.get("AGENT_ID");
 			if (StringUtils.isNotBlank(agent_id)){
@@ -707,11 +711,13 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 				if (null!=agentBusInfos && agentBusInfos.size()>0){
 					for (AgentBusInfo agentBusInfo : agentBusInfos) {
 						agentBusInfo.setCloPayCompany(ds);
+						agentBusInfo.setcUtime(Calendar.getInstance().getTime());
 						agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
 					}
 				}
 			}
 		}
+	}
 	}
 	@Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
 	@Override
@@ -758,6 +764,18 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 			}
 		}
 		return AgentResult.fail();
+	}
+
+	@Override
+	public Map selectComp(String busId) {
+		AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
+		if (null!=agentBusInfo){
+			List<Map<String, Object>> maps = agentBusInfoMapper.selectComp(agentBusInfo.getAgentId());
+			if (null!=maps){
+				return  maps.get(0);
+			}
+		}
+		return null;
 	}
 }
 
