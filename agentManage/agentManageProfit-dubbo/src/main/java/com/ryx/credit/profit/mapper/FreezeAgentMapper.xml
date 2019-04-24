@@ -234,16 +234,16 @@ left join A_AGENT hh on gg.PARENT_AGENT_ID=hh.ID
 
 where 1=1
     <if test="agentId != null">
-      and gg.AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      and gg.AGENT_ID = #{agentId,jdbcType=VARCHAR}
     </if>
     <if test="agentName != null">
-      and gg.AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      and gg.AGENT_NAME = #{agentName,jdbcType=VARCHAR}
     </if>
     <if test="parentAgentId  != null">
-      and gg.PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      and gg.PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR}
     </if>
     <if test="parentAgentName != null">
-      and gg.PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
+      and gg.PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR}
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
@@ -268,16 +268,16 @@ where 1=1
 
     where 1=1
     <if test="agentId != null">
-      and gg.AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      and gg.AGENT_ID = #{agentId,jdbcType=VARCHAR}
     </if>
     <if test="agentName != null">
-      and gg.AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      and gg.AGENT_NAME = #{agentName,jdbcType=VARCHAR}
     </if>
     <if test="parentAgentId  != null">
-      and gg.PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      and gg.PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR}
     </if>
     <if test="parentAgentName != null">
-      and gg.PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
+      and gg.PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR}
     </if>
     )
   </select>
@@ -299,16 +299,16 @@ left join A_AGENT hh on gg.PARENT_AGENT_ID=hh.ID where gg.FREEZE_TYPE='00')
 start with
     1=1
     <if test="agentId != null">
-      and AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      and AGENT_ID = #{agentId,jdbcType=VARCHAR}
     </if>
     <if test="agentName != null">
-      and AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      and AGENT_NAME = #{agentName,jdbcType=VARCHAR}
     </if>
     <if test="parentAgentId  != null">
-      and PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      and PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR}
     </if>
     <if test="parentAgentName != null">
-      and PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
+      and PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR}
     </if>
 connect by prior AGENT_ID =  PARENT_AGENT_ID
 
@@ -330,16 +330,16 @@ start with
 
     1=1
     <if test="agentId != null">
-      and AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      and AGENT_ID = #{agentId,jdbcType=VARCHAR}
     </if>
     <if test="agentName != null">
-      and AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      and AGENT_NAME = #{agentName,jdbcType=VARCHAR}
     </if>
     <if test="parentAgentId  != null">
-      and PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      and PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR}
     </if>
     <if test="parentAgentName != null">
-      and PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
+      and PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR}
     </if>
 connect by prior AGENT_ID =  PARENT_AGENT_ID
 
@@ -360,16 +360,16 @@ left join A_AGENT hh on gg.PARENT_AGENT_ID=hh.ID where gg.FREEZE_TYPE='02')
 start with
     1=1
     <if test="agentId != null">
-      and AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      and AGENT_ID = #{agentId,jdbcType=VARCHAR}
     </if>
     <if test="agentName != null">
-      and AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      and AGENT_NAME = #{agentName,jdbcType=VARCHAR}
     </if>
     <if test="parentAgentId  != null">
-      and PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      and PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR}
     </if>
     <if test="parentAgentName != null">
-      and PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
+      and PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR}
     </if>
   connect by prior AGENT_ID =  PARENT_AGENT_ID
     <include refid="OracleDialectSuffix" />
@@ -396,16 +396,16 @@ start with
     start with
     1=1
     <if test="agentId != null">
-      and AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      and AGENT_ID = #{agentId,jdbcType=VARCHAR}
     </if>
     <if test="agentName != null">
-      and AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      and AGENT_NAME = #{agentName,jdbcType=VARCHAR}
     </if>
     <if test="parentAgentId  != null">
-      and PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      and PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR}
     </if>
     <if test="parentAgentName != null">
-      and PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
+      and PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR}
     </if>
     connect by prior AGENT_ID = PARENT_AGENT_ID
 
@@ -431,16 +431,16 @@ start with
 
     1=1
     <if test="agentId != null">
-      and AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      and AGENT_ID = #{agentId,jdbcType=VARCHAR}
     </if>
     <if test="agentName != null">
-      and AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      and AGENT_NAME = #{agentName,jdbcType=VARCHAR}
     </if>
     <if test="parentAgentId  != null">
-      and PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      and PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR}
     </if>
     <if test="parentAgentName != null">
-      and PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
+      and PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR}
     </if>
     connect by prior AGENT_ID = PARENT_AGENT_ID
 
@@ -465,16 +465,16 @@ start with
     start with
     1=1
     <if test="agentId != null">
-      and AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      and AGENT_ID = #{agentId,jdbcType=VARCHAR}
     </if>
     <if test="agentName != null">
-      and AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      and AGENT_NAME = #{agentName,jdbcType=VARCHAR}
     </if>
     <if test="parentAgentId  != null">
-      and PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      and PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR}
     </if>
     <if test="parentAgentName != null">
-      and PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
+      and PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR}
     </if>
     connect by prior AGENT_ID = PARENT_AGENT_ID
     )
@@ -482,7 +482,9 @@ start with
 
 
 
+
   <select id="freezeDetail" resultType="java.util.Map" parameterType="java.util.Map">
+      <trim prefix="(" suffixOverrides="union all" suffix=")">
 select* from(
 select aa.ID ,aa.AGENT_NAME,aa.AGENT_ID,aa.PARENT_AGENT_ID,aa.PARENT_AGENT_NAME,aa.FREEZE_TYPE,
 aa.OPERATION_BATCH,aa.STATUS,bb.FREEZE_AMT,bb.OPERATION_TIME as FREEZE_TIME, bb.FREEZE_REASON,bb.THAW_TIME,
@@ -518,19 +520,21 @@ and aa.REV1=bb.FREEZE_BATCH and aa.STATUS = '0') zzz where xxx.AGENT_ID = zzz.AG
 nvl(xxx.PARENT_AGENT_NAME,'-') = nvl(zzz.PARENT_AGENT_NAME,'-') and xxx.FREEZE_TYPE = zzz.FREEZE_TYPE)
     where 1=1
     <if test="agentId != null">
-      and AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      and AGENT_ID = #{agentId,jdbcType=VARCHAR}
     </if>
     <if test="agentName != null">
-      and AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      and AGENT_NAME = #{agentName,jdbcType=VARCHAR}
     </if>
     <if test="parentAgentId  != null">
-      and PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      and PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR}
     </if>
     <if test="parentAgentName != null">
-      and PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
+      and PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR}
     </if>
- order by  AGENT_ID
 
+
+ order by  AGENT_ID
+      </trim>
 
   </select>
 
