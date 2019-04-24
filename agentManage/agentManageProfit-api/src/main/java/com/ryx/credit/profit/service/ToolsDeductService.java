@@ -2,6 +2,8 @@ package com.ryx.credit.profit.service;
 
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.pojo.*;
 import org.apache.ibatis.annotations.Param;
@@ -112,4 +114,6 @@ public interface ToolsDeductService {
 
     public AgentResult approvalToolSupplyTask(AgentVo agentVo, String userId) throws ProcessException;
     public int updateByPrimaryKey(PRemitInfo pRemitInfo);
+
+    PageInfo getSupplyPromptList(Map<String,Object> map, Page page,ProfitDeduction profitDeduction);
 }

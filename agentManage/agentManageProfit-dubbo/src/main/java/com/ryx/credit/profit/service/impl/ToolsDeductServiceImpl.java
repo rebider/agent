@@ -8,6 +8,8 @@ import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtils;
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
@@ -38,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -701,5 +704,42 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
 
     }
 
+    /**
+     *获取需要进行补款的机具扣款进行提示
+     */
+    @Override
+    public PageInfo getSupplyPromptList(Map<String,Object> map, Page page, ProfitDeduction profitDeduction){
+        String deductionDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7).replace("-","");
+        ProfitDeductionExample example = new ProfitDeductionExample();
+        ProfitDeductionExample.Criteria criteria = example.createCriteria();
+        example.setPage(page);
+        example.setDistinct(true);
+        if(null != map){
+            example.setInnerJoinDepartment(map.get("ORGANIZATIONCODE").toString(),map.get("ORGID").toString());
+        }
+        if(StringUtils.isNotBlank(profitDeduction.getAgentId())){
+            criteria.andAgentIdEqualTo(profitDeduction.getAgentId());
+        }
+        if(StringUtils.isNotBlank(profitDeduction.getAgentName())){
+            criteria.andParentAgentNameEqualTo(profitDeduction.getAgentName());
+        }
+        if("0,1,3,4,01".equals(profitDeduction.getStagingStatus())){
+            List<String> list = new ArrayList<String>();
+            list.add("0");
+            list.add("1");
+            list.add("3");
+            list.add("4");
+            list.add("01");
+            criteria.andStagingStatusIn(list);
+        }
+        criteria.andNotDeductionAmtGreaterThan(BigDecimal.ZERO);
+        criteria.andDeductionTypeEqualTo("02");
+        criteria.andDeductionDateEqualTo(deductionDate);
+        List<Map<String,String>> profitDeductions = profitDeductionMapper.selectByExampleToolSupply(example);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(profitDeductions);
+        pageInfo.setTotal(profitDeductionMapper.countByExample(example));
+        return pageInfo;
+    }
 
 }
