@@ -1,8 +1,9 @@
 package com.ryx.credit.profit.pojo;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class FreezeOperationRecord {
+public class FreezeOperationRecord implements Serializable {
     private String id;
 
     private String agentId;
@@ -19,15 +20,11 @@ public class FreezeOperationRecord {
 
     private BigDecimal freezeAmt;
 
-    private BigDecimal thawAmt;
-
-    private String freezeTime;
-
-    private String freezeReason;
-
-    private String thawInitiateTime;
+    private String operationTime;
 
     private String thawTime;
+
+    private String freezeReason;
 
     private String thawReason;
 
@@ -113,36 +110,12 @@ public class FreezeOperationRecord {
         this.freezeAmt = freezeAmt;
     }
 
-    public BigDecimal getThawAmt() {
-        return thawAmt;
+    public String getOperationTime() {
+        return operationTime;
     }
 
-    public void setThawAmt(BigDecimal thawAmt) {
-        this.thawAmt = thawAmt;
-    }
-
-    public String getFreezeTime() {
-        return freezeTime;
-    }
-
-    public void setFreezeTime(String freezeTime) {
-        this.freezeTime = freezeTime == null ? null : freezeTime.trim();
-    }
-
-    public String getFreezeReason() {
-        return freezeReason;
-    }
-
-    public void setFreezeReason(String freezeReason) {
-        this.freezeReason = freezeReason == null ? null : freezeReason.trim();
-    }
-
-    public String getThawInitiateTime() {
-        return thawInitiateTime;
-    }
-
-    public void setThawInitiateTime(String thawInitiateTime) {
-        this.thawInitiateTime = thawInitiateTime == null ? null : thawInitiateTime.trim();
+    public void setOperationTime(String operationTime) {
+        this.operationTime = operationTime == null ? null : operationTime.trim();
     }
 
     public String getThawTime() {
@@ -151,6 +124,14 @@ public class FreezeOperationRecord {
 
     public void setThawTime(String thawTime) {
         this.thawTime = thawTime == null ? null : thawTime.trim();
+    }
+
+    public String getFreezeReason() {
+        return freezeReason;
+    }
+
+    public void setFreezeReason(String freezeReason) {
+        this.freezeReason = freezeReason == null ? null : freezeReason.trim();
     }
 
     public String getThawReason() {

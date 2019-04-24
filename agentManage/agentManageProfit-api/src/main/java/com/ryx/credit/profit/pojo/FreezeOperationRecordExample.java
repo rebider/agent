@@ -1,11 +1,13 @@
 package com.ryx.credit.profit.pojo;
 
 import com.ryx.credit.common.util.Page;
+
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FreezeOperationRecordExample {
+public class FreezeOperationRecordExample implements Serializable {
     protected String orderByClause;
 
     protected boolean distinct;
@@ -686,273 +688,73 @@ public class FreezeOperationRecordExample {
             return (Criteria) this;
         }
 
-        public Criteria andThawAmtIsNull() {
-            addCriterion("THAW_AMT is null");
+        public Criteria andOperationTimeIsNull() {
+            addCriterion("OPERATION_TIME is null");
             return (Criteria) this;
         }
 
-        public Criteria andThawAmtIsNotNull() {
-            addCriterion("THAW_AMT is not null");
+        public Criteria andOperationTimeIsNotNull() {
+            addCriterion("OPERATION_TIME is not null");
             return (Criteria) this;
         }
 
-        public Criteria andThawAmtEqualTo(BigDecimal value) {
-            addCriterion("THAW_AMT =", value, "thawAmt");
+        public Criteria andOperationTimeEqualTo(String value) {
+            addCriterion("OPERATION_TIME =", value, "operationTime");
             return (Criteria) this;
         }
 
-        public Criteria andThawAmtNotEqualTo(BigDecimal value) {
-            addCriterion("THAW_AMT <>", value, "thawAmt");
+        public Criteria andOperationTimeNotEqualTo(String value) {
+            addCriterion("OPERATION_TIME <>", value, "operationTime");
             return (Criteria) this;
         }
 
-        public Criteria andThawAmtGreaterThan(BigDecimal value) {
-            addCriterion("THAW_AMT >", value, "thawAmt");
+        public Criteria andOperationTimeGreaterThan(String value) {
+            addCriterion("OPERATION_TIME >", value, "operationTime");
             return (Criteria) this;
         }
 
-        public Criteria andThawAmtGreaterThanOrEqualTo(BigDecimal value) {
-            addCriterion("THAW_AMT >=", value, "thawAmt");
+        public Criteria andOperationTimeGreaterThanOrEqualTo(String value) {
+            addCriterion("OPERATION_TIME >=", value, "operationTime");
             return (Criteria) this;
         }
 
-        public Criteria andThawAmtLessThan(BigDecimal value) {
-            addCriterion("THAW_AMT <", value, "thawAmt");
+        public Criteria andOperationTimeLessThan(String value) {
+            addCriterion("OPERATION_TIME <", value, "operationTime");
             return (Criteria) this;
         }
 
-        public Criteria andThawAmtLessThanOrEqualTo(BigDecimal value) {
-            addCriterion("THAW_AMT <=", value, "thawAmt");
+        public Criteria andOperationTimeLessThanOrEqualTo(String value) {
+            addCriterion("OPERATION_TIME <=", value, "operationTime");
             return (Criteria) this;
         }
 
-        public Criteria andThawAmtIn(List<BigDecimal> values) {
-            addCriterion("THAW_AMT in", values, "thawAmt");
+        public Criteria andOperationTimeLike(String value) {
+            addCriterion("OPERATION_TIME like", value, "operationTime");
             return (Criteria) this;
         }
 
-        public Criteria andThawAmtNotIn(List<BigDecimal> values) {
-            addCriterion("THAW_AMT not in", values, "thawAmt");
+        public Criteria andOperationTimeNotLike(String value) {
+            addCriterion("OPERATION_TIME not like", value, "operationTime");
             return (Criteria) this;
         }
 
-        public Criteria andThawAmtBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("THAW_AMT between", value1, value2, "thawAmt");
+        public Criteria andOperationTimeIn(List<String> values) {
+            addCriterion("OPERATION_TIME in", values, "operationTime");
             return (Criteria) this;
         }
 
-        public Criteria andThawAmtNotBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("THAW_AMT not between", value1, value2, "thawAmt");
+        public Criteria andOperationTimeNotIn(List<String> values) {
+            addCriterion("OPERATION_TIME not in", values, "operationTime");
             return (Criteria) this;
         }
 
-        public Criteria andFreezeTimeIsNull() {
-            addCriterion("FREEZE_TIME is null");
+        public Criteria andOperationTimeBetween(String value1, String value2) {
+            addCriterion("OPERATION_TIME between", value1, value2, "operationTime");
             return (Criteria) this;
         }
 
-        public Criteria andFreezeTimeIsNotNull() {
-            addCriterion("FREEZE_TIME is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeTimeEqualTo(String value) {
-            addCriterion("FREEZE_TIME =", value, "freezeTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeTimeNotEqualTo(String value) {
-            addCriterion("FREEZE_TIME <>", value, "freezeTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeTimeGreaterThan(String value) {
-            addCriterion("FREEZE_TIME >", value, "freezeTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeTimeGreaterThanOrEqualTo(String value) {
-            addCriterion("FREEZE_TIME >=", value, "freezeTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeTimeLessThan(String value) {
-            addCriterion("FREEZE_TIME <", value, "freezeTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeTimeLessThanOrEqualTo(String value) {
-            addCriterion("FREEZE_TIME <=", value, "freezeTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeTimeLike(String value) {
-            addCriterion("FREEZE_TIME like", value, "freezeTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeTimeNotLike(String value) {
-            addCriterion("FREEZE_TIME not like", value, "freezeTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeTimeIn(List<String> values) {
-            addCriterion("FREEZE_TIME in", values, "freezeTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeTimeNotIn(List<String> values) {
-            addCriterion("FREEZE_TIME not in", values, "freezeTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeTimeBetween(String value1, String value2) {
-            addCriterion("FREEZE_TIME between", value1, value2, "freezeTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeTimeNotBetween(String value1, String value2) {
-            addCriterion("FREEZE_TIME not between", value1, value2, "freezeTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeReasonIsNull() {
-            addCriterion("FREEZE_REASON is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeReasonIsNotNull() {
-            addCriterion("FREEZE_REASON is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeReasonEqualTo(String value) {
-            addCriterion("FREEZE_REASON =", value, "freezeReason");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeReasonNotEqualTo(String value) {
-            addCriterion("FREEZE_REASON <>", value, "freezeReason");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeReasonGreaterThan(String value) {
-            addCriterion("FREEZE_REASON >", value, "freezeReason");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeReasonGreaterThanOrEqualTo(String value) {
-            addCriterion("FREEZE_REASON >=", value, "freezeReason");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeReasonLessThan(String value) {
-            addCriterion("FREEZE_REASON <", value, "freezeReason");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeReasonLessThanOrEqualTo(String value) {
-            addCriterion("FREEZE_REASON <=", value, "freezeReason");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeReasonLike(String value) {
-            addCriterion("FREEZE_REASON like", value, "freezeReason");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeReasonNotLike(String value) {
-            addCriterion("FREEZE_REASON not like", value, "freezeReason");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeReasonIn(List<String> values) {
-            addCriterion("FREEZE_REASON in", values, "freezeReason");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeReasonNotIn(List<String> values) {
-            addCriterion("FREEZE_REASON not in", values, "freezeReason");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeReasonBetween(String value1, String value2) {
-            addCriterion("FREEZE_REASON between", value1, value2, "freezeReason");
-            return (Criteria) this;
-        }
-
-        public Criteria andFreezeReasonNotBetween(String value1, String value2) {
-            addCriterion("FREEZE_REASON not between", value1, value2, "freezeReason");
-            return (Criteria) this;
-        }
-
-        public Criteria andThawInitiateTimeIsNull() {
-            addCriterion("THAW_INITIATE_TIME is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andThawInitiateTimeIsNotNull() {
-            addCriterion("THAW_INITIATE_TIME is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andThawInitiateTimeEqualTo(String value) {
-            addCriterion("THAW_INITIATE_TIME =", value, "thawInitiateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andThawInitiateTimeNotEqualTo(String value) {
-            addCriterion("THAW_INITIATE_TIME <>", value, "thawInitiateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andThawInitiateTimeGreaterThan(String value) {
-            addCriterion("THAW_INITIATE_TIME >", value, "thawInitiateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andThawInitiateTimeGreaterThanOrEqualTo(String value) {
-            addCriterion("THAW_INITIATE_TIME >=", value, "thawInitiateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andThawInitiateTimeLessThan(String value) {
-            addCriterion("THAW_INITIATE_TIME <", value, "thawInitiateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andThawInitiateTimeLessThanOrEqualTo(String value) {
-            addCriterion("THAW_INITIATE_TIME <=", value, "thawInitiateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andThawInitiateTimeLike(String value) {
-            addCriterion("THAW_INITIATE_TIME like", value, "thawInitiateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andThawInitiateTimeNotLike(String value) {
-            addCriterion("THAW_INITIATE_TIME not like", value, "thawInitiateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andThawInitiateTimeIn(List<String> values) {
-            addCriterion("THAW_INITIATE_TIME in", values, "thawInitiateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andThawInitiateTimeNotIn(List<String> values) {
-            addCriterion("THAW_INITIATE_TIME not in", values, "thawInitiateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andThawInitiateTimeBetween(String value1, String value2) {
-            addCriterion("THAW_INITIATE_TIME between", value1, value2, "thawInitiateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andThawInitiateTimeNotBetween(String value1, String value2) {
-            addCriterion("THAW_INITIATE_TIME not between", value1, value2, "thawInitiateTime");
+        public Criteria andOperationTimeNotBetween(String value1, String value2) {
+            addCriterion("OPERATION_TIME not between", value1, value2, "operationTime");
             return (Criteria) this;
         }
 
@@ -1023,6 +825,76 @@ public class FreezeOperationRecordExample {
 
         public Criteria andThawTimeNotBetween(String value1, String value2) {
             addCriterion("THAW_TIME not between", value1, value2, "thawTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeReasonIsNull() {
+            addCriterion("FREEZE_REASON is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeReasonIsNotNull() {
+            addCriterion("FREEZE_REASON is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeReasonEqualTo(String value) {
+            addCriterion("FREEZE_REASON =", value, "freezeReason");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeReasonNotEqualTo(String value) {
+            addCriterion("FREEZE_REASON <>", value, "freezeReason");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeReasonGreaterThan(String value) {
+            addCriterion("FREEZE_REASON >", value, "freezeReason");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeReasonGreaterThanOrEqualTo(String value) {
+            addCriterion("FREEZE_REASON >=", value, "freezeReason");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeReasonLessThan(String value) {
+            addCriterion("FREEZE_REASON <", value, "freezeReason");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeReasonLessThanOrEqualTo(String value) {
+            addCriterion("FREEZE_REASON <=", value, "freezeReason");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeReasonLike(String value) {
+            addCriterion("FREEZE_REASON like", value, "freezeReason");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeReasonNotLike(String value) {
+            addCriterion("FREEZE_REASON not like", value, "freezeReason");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeReasonIn(List<String> values) {
+            addCriterion("FREEZE_REASON in", values, "freezeReason");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeReasonNotIn(List<String> values) {
+            addCriterion("FREEZE_REASON not in", values, "freezeReason");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeReasonBetween(String value1, String value2) {
+            addCriterion("FREEZE_REASON between", value1, value2, "freezeReason");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeReasonNotBetween(String value1, String value2) {
+            addCriterion("FREEZE_REASON not between", value1, value2, "freezeReason");
             return (Criteria) this;
         }
 

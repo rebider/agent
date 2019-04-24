@@ -14,4 +14,10 @@ public interface FreezeOperationRecordMapper {
     int insertSelective(FreezeOperationRecord record);
 
     List<FreezeOperationRecord> selectByExample(FreezeOperationRecordExample example);
+
+    FreezeOperationRecord selectByPrimaryKey(String id);
+
+    int updateByPrimaryKeySelective(FreezeOperationRecord record);
+
+    int updateByPrimaryKey(FreezeOperationRecord record);
 }
