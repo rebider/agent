@@ -75,6 +75,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     private AgentBusinfoService agentBusinfoService;
     @Autowired
     private IUserService iUserService;
+    @Autowired
+    private OActivityMapper oActivityMapper;
 
     @Override
     public PageInfo terminalTransferList(TerminalTransfer terminalTransfer, Page page, String agName,String dataRole,Long userId) {
@@ -285,6 +287,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         for (AgentBusInfo busInfo : agentBusInfoList) {
             List<AgentBusInfo> childLevelBusInfos = agentBusinfoService.queryChildLevelByBusNum(null, busInfo.getBusPlatform(), busInfo.getBusNum());
             for (AgentBusInfo childLevelBusInfo : childLevelBusInfos) {
+                log.info("是否是下级,childLevelBusInfo:{}",JsonUtil.objectToJson(childLevelBusInfo));
                 if(childLevelBusInfo.getBusNum().equals(terminalTransferDetail.getGoalOrgId())){
                     isSub = true;
                 }
@@ -292,6 +295,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             }
         }
         if(!isSub){
+            log.info("目标机构,goalOrgId:{}",terminalTransferDetail.getGoalOrgId());
+            log.info("目标机构不是当前代理商下级,agentId:{}",agentId);
             throw new MessageException("目标机构不是当前代理商下级");
         }
         Map<String, Object> reqParam = new HashMap<>();
@@ -315,30 +320,13 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         Set<String> proComSet = new HashSet<>();
         Set<String> proModelSet = new HashSet<>();
         for (Map<String, Object> logisticsDetail : logisticsDetailList) {
-            String orderId = String.valueOf(logisticsDetail.get("ORDER_ID"));
-            String proId = String.valueOf(logisticsDetail.get("PRO_ID"));
             String activityId = String.valueOf(logisticsDetail.get("ACTIVITY_ID"));
-            OSubOrderExample oSubOrderExample = new OSubOrderExample();
-            OSubOrderExample.Criteria criteria = oSubOrderExample.createCriteria();
-            criteria.andStatusEqualTo(Status.STATUS_1.status);
-            criteria.andOrderIdEqualTo(orderId);
-            criteria.andProIdEqualTo(proId);
-            List<OSubOrder> oSubOrders = subOrderMapper.selectByExample(oSubOrderExample);
-            if(oSubOrders.size()!=1){
-                throw new MessageException("查询采购单数据有误");
+            OActivity oActivity = oActivityMapper.selectByPrimaryKey(activityId);
+            if(oActivity==null){
+                throw new MessageException("活动不存在");
             }
-            OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
-            OSubOrderActivityExample.Criteria criteria1 = oSubOrderActivityExample.createCriteria();
-            criteria1.andSubOrderIdEqualTo(oSubOrders.get(0).getId());
-            criteria1.andActivityIdEqualTo(activityId);
-            criteria1.andStatusEqualTo(Status.STATUS_1.status);
-            List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
-            if(oSubOrderActivities.size()!=1){
-                throw new MessageException("查询活动快照数据有误");
-            }
-            OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
-            proComSet.add(oSubOrderActivity.getVender());
-            proModelSet.add(oSubOrderActivity.getProModel());
+            proComSet.add(oActivity.getVender());
+            proModelSet.add(oActivity.getProModel());
         }
         if(proComSet.size()!=1){
             throw new MessageException(terminalTransferDetail.getSnBeginNum()+"到"+terminalTransferDetail.getSnEndNum()+"不是同一厂商");

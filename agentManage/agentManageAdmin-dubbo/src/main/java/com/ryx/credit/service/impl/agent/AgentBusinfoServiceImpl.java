@@ -608,10 +608,13 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		}
 		//当前代理商
 		AgentBusInfoExample example = new AgentBusInfoExample();
+		List<BigDecimal> busStatusList = new ArrayList<>();
+		busStatusList.add(BusinessStatus.Enabled.status);
+		busStatusList.add(BusinessStatus.inactive.status);
 		example.or().andBusNumEqualTo(busNum)
 				.andBusPlatformEqualTo(platformCode)
 				.andStatusEqualTo(Status.STATUS_1.status)
-				.andBusStatusEqualTo(Status.STATUS_1.status);
+				.andBusStatusIn(busStatusList);
 		List<AgentBusInfo> plats = agentBusInfoMapper.selectByExample(example);
 		if(plats.size()==0) {
 			return list;
@@ -622,8 +625,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		AgentBusInfoExample child_example = new AgentBusInfoExample();
 		child_example.or().andBusParentEqualTo(platInfo.getId())
 				.andBusPlatformEqualTo(platformCode)
-				.andBusStatusEqualTo(Status.STATUS_1.status)
-				.andStatusEqualTo(Status.STATUS_1.status)
+				.andBusStatusIn(busStatusList)
 				.andBusNumIsNotNull();
 		List<AgentBusInfo> child_plat = agentBusInfoMapper.selectByExample(child_example);
 		//没有下级别就返回
