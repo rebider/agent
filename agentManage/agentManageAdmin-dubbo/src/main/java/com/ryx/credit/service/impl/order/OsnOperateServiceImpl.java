@@ -6,10 +6,8 @@ import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.DateUtil;
-import com.ryx.credit.common.util.FastMap;
-import com.ryx.credit.common.util.JsonUtil;
-import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.*;
+import com.ryx.credit.dao.CUserMapper;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.PlatFormMapper;
 import com.ryx.credit.dao.order.*;
@@ -18,6 +16,7 @@ import com.ryx.credit.machine.service.ImsTermWarehouseDetailService;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.LowerHairMachineVo;
 import com.ryx.credit.machine.vo.MposSnVo;
+import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.PlatForm;
 import com.ryx.credit.pojo.admin.order.*;
@@ -80,6 +79,8 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
     @Autowired
     private TermMachineService termMachineService;
     @Autowired
+    private CUserMapper cUserMapper;
+    @Autowired
     private IdService idService;
     @Resource(name = "osnOperateService")
     private OsnOperateService osnOperateService;
@@ -90,6 +91,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
      * @param sendStatus
      * @return
      */
+    @Transactional(readOnly = true)
     @Override
     public List<String> queryLogicInfoIdByStatus(LogType logType, LogisticsSendStatus sendStatus){
         return oLogisticsMapper.queryLogicInfoIdByStatus(FastMap.fastMap("logType", logType.code).putKeyV("sendStatus",sendStatus.code));
@@ -209,6 +211,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                         List<OLogisticsDetail> list = osnOperateService.updateDetailBatch(logisticsDetails,new BigDecimal(batch));
                         //发送到业务系统，根据批次号
                         if(osnOperateService.sendInfoToBusinessSystem(list,id,new BigDecimal(batch))){
+                            //处理成功，不做物流更新待处理完成所有进行状态更新
                             logger.info("物流明细发送业务系统处理成功,{},{}",id,batch);
                         }else{
                             logger.info("物流明细发送业务系统处理失败,{},{}",id,batch);
@@ -255,14 +258,29 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                 //检查是否包含有未发送的sn，如果有继续循环发送，如果没有更新物流记录为发送成功
                 }while (logisticsDetails.size()>0);
 
-                //检查是否包含有未发送的sn,如果没有更新为处理成功
+                //检查是否包含有未发送的sn,如果没有更新为处理成功 ，如果处理中的物流没有
                 OLogistics logistics =  oLogisticsMapper.selectByPrimaryKey(id);
-                if(LogisticsSendStatus.send_fail.equals(logistics.getSendStatus()) && LogisticsSendStatus.send_part_fail.equals(logistics.getSendStatus())) {
+                if(LogisticsSendStatus.send_ing.equals(logistics.getSendStatus())) {
                     if(oLogisticsDetailMapper.countByExample(oLogisticsDetailExample)==0) {
                         logistics.setSendStatus(LogisticsSendStatus.send_success.code);
                         logistics.setSendMsg("成功");
                         if (oLogisticsMapper.updateByPrimaryKeySelective(logistics) != 1) {
                             logger.info("物流明细发送业务系统处理异常，更新数据库失败,{},{}", id, batch);
+                        }
+                    }
+                }
+
+                //发送邮件
+                logistics =  oLogisticsMapper.selectByPrimaryKey(id);
+                if(StringUtils.isNotEmpty(logistics.getcUser())) {
+                    CUser cUser  = cUserMapper.selectById(logistics.getcUser());
+                    if(cUser!=null && StringUtils.isNotEmpty(cUser.getUserEmail())) {
+                        if (LogisticsSendStatus.send_fail.equals(logistics.getSendStatus()) || LogisticsSendStatus.send_part_fail.equals(logistics.getSendStatus())) {
+                            //发送异常邮件
+                            AppConfig.sendEmail(new String[]{cUser.getUserEmail()},"物流发送失败，号码段:"+logistics.getSnBeginNum()+"-"+logistics.getSnBeginNum()+"("+logistics.getSendMsg()+")","物流发送失败，号码段:"+logistics.getSnBeginNum());
+                        } else if (LogisticsSendStatus.send_success.equals(logistics.getSendStatus())) {
+                            //发送成功邮件
+                            AppConfig.sendEmail(new String[]{cUser.getUserEmail()},"物流发送成功，号码段:"+logistics.getSnBeginNum()+"-"+logistics.getSnEndNum()+"("+logistics.getSendMsg()+")","物流发送成功,号码段:"+logistics.getSnBeginNum());
                         }
                     }
                 }
@@ -468,6 +486,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
     @Override
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
     public boolean sendInfoToBusinessSystem(List<OLogisticsDetail>  datas,String logcId,BigDecimal batch)throws Exception {
+        if(datas!=null && datas.size()>0)return true;
         OLogistics logistics = oLogisticsMapper.selectByPrimaryKey(logcId);
         //查询要发送的sn，根据sn进行排序
         OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
@@ -509,8 +528,6 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
         OOrder order = oOrderMapper.selectByPrimaryKey(oSubOrder.getOrderId());
         PlatForm platForm = platFormMapper.selectByPlatFormNum(order.getOrderPlatform());
         Date date = Calendar.getInstance().getTime();
-
-
         OActivity oActivity = oActivityMapper.selectByPrimaryKey(oSubOrderActivity.getActivityId());
 
         //流量卡不进行下发操作

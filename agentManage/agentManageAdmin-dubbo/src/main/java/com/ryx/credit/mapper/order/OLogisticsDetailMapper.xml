@@ -522,7 +522,7 @@
         SBUS_MSG = #{sbusMsg,jdbcType=VARCHAR},
       </if>
     </set>
-    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL},
+    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
     update O_LOGISTICS_DETAIL
