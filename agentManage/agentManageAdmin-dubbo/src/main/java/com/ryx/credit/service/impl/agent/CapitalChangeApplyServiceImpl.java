@@ -27,6 +27,7 @@ import com.ryx.credit.service.order.IPaymentDetailService;
 import com.ryx.credit.service.order.OCashReceivablesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.job.flow.support.state.FlowState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -516,30 +517,8 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
             throw new ProcessException("更新打款记录失败");
         }
         if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
-            CapitalExample capitalExample = new CapitalExample();
-            CapitalExample.Criteria criteria = capitalExample.createCriteria();
-            criteria.andCAgentIdEqualTo(capitalChangeApply.getAgentId());
-            criteria.andCTypeEqualTo(capitalChangeApply.getCapitalType());
-            List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
-            for (Capital capital : capitals) {
-                capital.setFreezeAmt(BigDecimal.ZERO);
-                int i = capitalMapper.updateByPrimaryKeySelective(capital);
-                if(i!=1){
-                    throw new MessageException("通过更新冻结金额失败！");
-                }
-                CapitalFlowExample capitalFlowExample = new CapitalFlowExample();
-                CapitalFlowExample.Criteria criteria1 = capitalFlowExample.createCriteria();
-                criteria1.andStatusEqualTo(Status.STATUS_1.status);
-                criteria1.andCapitalIdEqualTo(capital.getId());
-                List<CapitalFlow> capitalFlows = capitalFlowMapper.selectByExample(capitalFlowExample);
-                for (CapitalFlow capitalFlow : capitalFlows) {
-                    capitalFlow.setFlowStatus(Status.STATUS_1.status);
-                    int j = capitalFlowMapper.updateByPrimaryKey(capitalFlow);
-                    if(j!=1){
-                        throw new MessageException("通过更新资金流水记录失败！");
-                    }
-                }
-            }
+            //扣除冻结保证金
+            capitalService.approvedDeduct(busActRel.getBusId(),SrcType.BZJ,busActRel.getcUser());
             if (capitalChangeApply.getOperationType().compareTo(OperationType.TK.getValue()) == 0) {
                 OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
                 OPaymentDetailExample.Criteria detailcriteria = oPaymentDetailExample.createCriteria();
@@ -556,7 +535,7 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
                         if(oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())==0){
                             oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
                         }else{
-                            oPaymentDetail.setPaymentStatus(PaymentStatus.YF.code);
+                            oPaymentDetail.setPaymentStatus(PaymentStatus.BF.code);
                         }
                     }
                     int i = oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail);
@@ -566,19 +545,8 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
                 }
             }
         }else{
-            CapitalExample capitalExample = new CapitalExample();
-            CapitalExample.Criteria criteria = capitalExample.createCriteria();
-            criteria.andCAgentIdEqualTo(capitalChangeApply.getAgentId());
-            criteria.andCTypeEqualTo(capitalChangeApply.getCapitalType());
-            List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
-            for (Capital capital : capitals) {
-                capital.setcFqInAmount(capital.getcFqInAmount().add(capital.getFreezeAmt()));
-                capital.setFreezeAmt(BigDecimal.ZERO);
-                int i = capitalMapper.updateByPrimaryKeySelective(capital);
-                if(i!=1){
-                    throw new MessageException("拒绝更新冻结金额失败！");
-                }
-            }
+            //拒绝解冻
+            capitalService.refuseUnfreeze(busActRel.getBusId(),SrcType.BZJ,busActRel.getcUser());
             if (capitalChangeApply.getOperationType().compareTo(OperationType.TK.getValue()) == 0) {
                 OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
                 OPaymentDetailExample.Criteria detailcriteria = oPaymentDetailExample.createCriteria();
@@ -616,20 +584,13 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
      */
     public void disposeAmt(CapitalChangeApply capitalChangeApply)throws Exception {
 
-        CapitalExample capitalExample = new CapitalExample();
-        CapitalExample.Criteria criteria = capitalExample.createCriteria();
-        criteria.andStatusEqualTo(Status.STATUS_1.status);
-        criteria.andCAgentIdEqualTo(capitalChangeApply.getAgentId());
-        criteria.andCTypeEqualTo(capitalChangeApply.getCapitalType());
-        capitalExample.setOrderByClause(" c_fq_in_amount asc");
-        List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
         if (capitalChangeApply.getOperationType().compareTo(OperationType.KQ.getValue()) == 0) {
-            capitalService.disposeCapital(capitals,capitalChangeApply.getRealOperationAmt(),capitalChangeApply.getId(),
+            capitalService.disposeCapital(capitalChangeApply.getCapitalType(),capitalChangeApply.getRealOperationAmt(),capitalChangeApply.getId(),
                     capitalChangeApply.getcUser(),capitalChangeApply.getAgentId(),capitalChangeApply.getAgentName(),"保证金扣款");
         } else if (capitalChangeApply.getOperationType().compareTo(OperationType.TK.getValue()) == 0) {
             //查询所有机具欠款
             BigDecimal sumDebt = paymentDetailService.getSumDebt(capitalChangeApply.getAgentId());
-            capitalService.disposeCapital(capitals,capitalChangeApply.getOperationAmt(), capitalChangeApply.getId(),capitalChangeApply.getcUser(),
+            capitalService.disposeCapital(capitalChangeApply.getCapitalType(),capitalChangeApply.getOperationAmt(), capitalChangeApply.getId(),capitalChangeApply.getcUser(),
                                           capitalChangeApply.getAgentId(),capitalChangeApply.getAgentName(),"保证金扣款");
             if(capitalChangeApply.getMachinesDeptAmt().signum()==-1){
                 throw new MessageException("抵扣金额必须是正数！");

@@ -1,5 +1,6 @@
 package com.ryx.credit.service.agent;
 
+import com.ryx.credit.common.enumc.SrcType;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.Capital;
@@ -25,6 +26,10 @@ public interface CapitalService {
 
     PageInfo queryCapitalList(Capital capital, Page page, String dataRole, Long userId);
 
-    void disposeCapital(List<Capital> capitals, BigDecimal amt, String srcId, String cUser,
+    void disposeCapital(String capitalType, BigDecimal amt, String srcId, String cUser,
                         String agentId, String agentName,String remark)throws Exception;
+
+    void approvedDeduct(String srcId, SrcType srcType, String uUser)throws Exception;
+
+    void refuseUnfreeze(String srcId,SrcType srcType,String uUser)throws Exception;
 }
