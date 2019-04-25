@@ -157,7 +157,7 @@ public class CapitalServiceImpl implements CapitalService {
     }
 
     /**
-     * 扣除资金记录表
+     * 冻结扣除资金记录表
      * @param capitalType
      * @param amt
      * @param srcId
@@ -168,8 +168,8 @@ public class CapitalServiceImpl implements CapitalService {
      * @throws Exception
      */
     @Override
-    public void disposeCapital(String capitalType, BigDecimal amt,String srcId,String cUser,
-                               String agentId,String agentName,String remark)throws Exception{
+    public void disposeCapital(String capitalType, BigDecimal amt, String srcId,String cUser,
+                               String agentId,String agentName,String remark,SrcType srcType)throws Exception{
 
         //传递进来的扣除金额不能小于0
         //额度不足 不给扣除
@@ -207,7 +207,7 @@ public class CapitalServiceImpl implements CapitalService {
             capitalFlow.setId(idService.genId(TabId.A_CAPITAL_FLOW));
             capitalFlow.setcType(capital.getcType());
             capitalFlow.setCapitalId(capital.getId());
-            capitalFlow.setSrcType(SrcType.BZJ.getValue());
+            capitalFlow.setSrcType(srcType.code);
             capitalFlow.setSrcId(srcId);
             capitalFlow.setBeforeAmount(fqInAmount);
             capitalFlow.setcAmount(operationAmt);
