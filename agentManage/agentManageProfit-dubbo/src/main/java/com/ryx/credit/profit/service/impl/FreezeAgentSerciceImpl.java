@@ -66,12 +66,34 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
         return pageInfo;
 
   }
+
+
+    @Override
+    public PageInfo getselectDetailFreezeDate(Map<String, Object> param, PageInfo pageInfo){
+        Integer count = 0;
+        List<Map<String,Object>> listAll;
+        if ("true".equals(param.get("isNo"))){
+            logger.info("下级查询");
+           listAll = freezeAgentMapper.freezeDetailLower(param);
+           count = freezeAgentMapper.freezeDetailLowerCount(param);
+        }else{
+            logger.info("不含下级查询");
+            listAll = freezeAgentMapper.freezeDetail(param);
+            count = freezeAgentMapper.freezeDetailCount(param);
+        }
+        pageInfo.setTotal(count);
+        pageInfo.setRows(listAll);
+        logger.info("查询============================================" + JSONObject.toJSON(listAll));
+        return pageInfo;
+
+    }
+
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     public void operationFreezeDate(List<FreezeOperationRecord> freezeOperationRecords,String user){
        if(freezeOperationRecords!=null){
+           String uuid = UUID.randomUUID().toString().replaceAll("-", "");
            for (FreezeOperationRecord freezeOperationRecord:freezeOperationRecords) {
-               String uuid = UUID.randomUUID().toString().replaceAll("-", "");
                //更新月份润状态
                ProfitDetailMonth profitDetailMonth1;
                if("00".equals(freezeOperationRecord.getFreezeType())){
@@ -79,8 +101,8 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
                        ProfitDetailMonth profitDetailMonth = new ProfitDetailMonth();
                        profitDetailMonth.setAgentId(freezeOperationRecord.getAgentId());
                        profitDetailMonth.setParentAgentId(freezeOperationRecord.getParentAgentId());
-                       profitDetailMonth.setParentAgentId(LocalDate.now().plusMonths(-1).toString().substring(0, 7).replaceAll("-", ""));
-                       profitDetailMonth1 =  profitDetailMonthService.selectByPIdAndMonth(profitDetailMonth);
+                       profitDetailMonth.setProfitDate(LocalDate.now().plusMonths(-1).toString().substring(0, 7).replaceAll("-", ""));
+                       profitDetailMonth1 =  profitDetailMonthService.selectByIdAndParent(profitDetailMonth);
                        profitDetailMonth1.setStatus("1");
                        profitDetailMonthService.updateByPrimaryKeySelective(profitDetailMonth1);
                        freezeOperationRecord.setFreezeAmt(profitDetailMonth1.getBasicsProfitAmt());
@@ -102,6 +124,7 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
                    freezeOperationRecord.setFreezeBatch(uuid);
                    freezeOperationRecord.setId(idService.genId(TabId.P_FREEZE_OPERATION_RECORD));
                    freezeOperationRecord.setStatus("0");
+                   freezeOperationRecord.setFreezeOperator(user);
                    freezeOperationRecordMapper.insertSelective(freezeOperationRecord);
                }catch (Exception e){
                    e.printStackTrace();
@@ -146,13 +169,11 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
                        logger.info("查询冻结解冻数据时失败");
                        throw new RuntimeException("查询冻结解冻数据时失败");
                    }else{
+                       freezeAgent.setStatus("1");
                        freezeAgent.setId((idService.genId(TabId.P_FREEZE_AGENT)));
                        freezeAgent.setOperationBatch(uuid);
                        freezeAgentMapper.insertSelective(freezeAgent);
                    }
-
-
-
                }catch (Exception e){
                    e.printStackTrace();
 
