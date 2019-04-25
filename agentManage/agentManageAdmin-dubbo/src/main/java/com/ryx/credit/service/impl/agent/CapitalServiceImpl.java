@@ -238,13 +238,18 @@ public class CapitalServiceImpl implements CapitalService {
         for (Capital capital : capitals) {
             BigDecimal fqInAmount = capital.getcFqInAmount();//可用余额
             BigDecimal operationAmt = BigDecimal.ZERO; //当前资金要扣除的金额
-            //当前金额大于要冻结的金额
+            //当前可用金额大于要冻结的金额
             if(fqInAmount.compareTo(residueAmt)>=1){
-                residueAmt = BigDecimal.ZERO;//下一笔需要扣除
-                operationAmt = residueAmt;//当前资金需要冻结的金额
+                //当前资金需要冻结的金额
+                operationAmt = residueAmt;
+                //下一笔需要扣除 为0  因为本次已经全部扣除
+                residueAmt = BigDecimal.ZERO;
+            //当前可用金额小于要冻结的金额
             } else {
-                residueAmt =residueAmt.subtract(fqInAmount);//下一笔需要扣除
+                //全部扣除可用余额
                 operationAmt = fqInAmount; //当前资金需要冻结的金额
+                //下笔要扣除的金额为未扣除 - 全部扣除的可用余额
+                residueAmt =residueAmt.subtract(fqInAmount);//下一笔需要扣除
             }
             //冻结可用余额
             capital.setcFqInAmount(capital.getcFqInAmount().subtract(operationAmt));
