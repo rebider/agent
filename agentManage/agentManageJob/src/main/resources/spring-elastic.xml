@@ -61,14 +61,14 @@
                 sharding-total-count="1"
                 sharding-item-parameters="0=Server0"/>
 
-  <!--  <job:simple id="completAllAgentBusInfoCompany"
+    <job:simple id="completAllAgentBusInfoCompany"
                 job-ref="completAllAgentBusInfoCompanyJob"
                 registry-center-ref="regCenter"
-                cron="0 0/2 * * * ?"
+                 cron="0 15 10 ? * *"
                 overwrite="true"
                 description="修复代理商业务平台的打款公司"
                 sharding-total-count="1"
-                sharding-item-parameters="0=Server0"/>-->
+                sharding-item-parameters="0=Server0"/>
 
     <job:simple id="checkAgentColinfoJob"
                 job-ref="checkAgentColinfoJob"

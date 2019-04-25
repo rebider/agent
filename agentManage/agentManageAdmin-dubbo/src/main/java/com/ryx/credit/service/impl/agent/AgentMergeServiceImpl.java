@@ -1549,8 +1549,8 @@ public class AgentMergeServiceImpl  implements AgentMergeService {
         reqMap.put("paymentTypes",typeList);
         BigDecimal orderDebt = paymentMapper.queryAgentDebtByType(reqMap);
         logger.info("代理商合并查询订单欠款：代理商id:{},欠款：{}",agentId,orderDebt);
-        BigDecimal bigDecimal = profitDebt(agentId);
-        return orderDebt.add(bigDecimal);
+//        BigDecimal bigDecimal = profitDebt(agentId);
+        return orderDebt;
     }
 
     /**
@@ -1568,8 +1568,8 @@ public class AgentMergeServiceImpl  implements AgentMergeService {
         reqMap.put("paymentTypes",typeList);
         BigDecimal orderDebt = paymentMapper.queryAgentDebtByType(reqMap);
         logger.info("代理商合并查询订单欠款：代理商id:{},欠款：{}",agentId,orderDebt);
-        BigDecimal bigDecimal = profitDebt(agentId);
-        return orderDebt.add(bigDecimal);
+//        BigDecimal bigDecimal = profitDebt(agentId);
+        return orderDebt;
     }
 
 
