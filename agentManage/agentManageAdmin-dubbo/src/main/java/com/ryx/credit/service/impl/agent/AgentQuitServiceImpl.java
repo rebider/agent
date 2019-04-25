@@ -412,7 +412,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
         BigDecimal sumAmt = new BigDecimal(0);
         for (Capital capital : capitals) {
-            if(!capital.getcType().equals(AgCapitalType.FUWUFEI.name()))
+            if(!capital.getcType().equals(AgCapitalType.FUWUFEI.name()) && !capital.getcType().equals(AgCapitalType.REIHEBAOFWF.name()))
             sumAmt = sumAmt.add(capital.getcFqInAmount());
         }
         return sumAmt;
@@ -1309,7 +1309,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         if (null != capitals && capitals.size() > 0) {
             for (Capital capital : capitals) {
                 capital.setAttachmentList(attachmentMapper.accessoryQuery(capital.getId(), AttachmentRelType.Capital.name()));
-                if(!capital.getcType().equals(AgCapitalType.FUWUFEI.name())){
+                if(!capital.getcType().equals(AgCapitalType.FUWUFEI.name()) && !capital.getcType().equals(AgCapitalType.REIHEBAOFWF.name())){
                     resultList.add(capital);
                 }
             }
