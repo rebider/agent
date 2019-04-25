@@ -73,6 +73,7 @@ public class CapitalServiceImpl implements CapitalService {
             criteria.andCAgentIdEqualTo(agentId);
             criteria.andCPayTypeEqualTo(cPayType);
             criteria.andStatusEqualTo(Status.STATUS_1.status);
+            criteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
             List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
             return capitals;
         }
@@ -157,7 +158,7 @@ public class CapitalServiceImpl implements CapitalService {
     }
 
     /**
-     * 扣除资金记录表
+     * 冻结扣除资金记录表
      * @param capitalType
      * @param amt
      * @param srcId
@@ -168,8 +169,8 @@ public class CapitalServiceImpl implements CapitalService {
      * @throws Exception
      */
     @Override
-    public void disposeCapital(String capitalType, BigDecimal amt,String srcId,String cUser,
-                               String agentId,String agentName,String remark)throws Exception{
+    public void disposeCapital(String capitalType, BigDecimal amt, String srcId,String cUser,
+                               String agentId,String agentName,String remark,SrcType srcType,PayType payType )throws Exception{
 
         //传递进来的扣除金额不能小于0
         //额度不足 不给扣除
@@ -177,8 +178,12 @@ public class CapitalServiceImpl implements CapitalService {
         CapitalExample capitalExample = new CapitalExample();
         CapitalExample.Criteria criteria = capitalExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
         criteria.andCAgentIdEqualTo(agentId);
+        if(null!=capitalType)
         criteria.andCTypeEqualTo(capitalType);
+        if(null!=payType)
+        criteria.andCPayTypeEqualTo(payType.code);
         capitalExample.setOrderByClause(" c_fq_in_amount asc");
         List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
         BigDecimal residueAmt = amt;  //算出未扣足的金额
@@ -207,7 +212,7 @@ public class CapitalServiceImpl implements CapitalService {
             capitalFlow.setId(idService.genId(TabId.A_CAPITAL_FLOW));
             capitalFlow.setcType(capital.getcType());
             capitalFlow.setCapitalId(capital.getId());
-            capitalFlow.setSrcType(SrcType.BZJ.getValue());
+            capitalFlow.setSrcType(srcType.code);
             capitalFlow.setSrcId(srcId);
             capitalFlow.setBeforeAmount(fqInAmount);
             capitalFlow.setcAmount(operationAmt);
