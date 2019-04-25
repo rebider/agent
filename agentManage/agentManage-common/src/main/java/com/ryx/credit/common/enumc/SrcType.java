@@ -12,7 +12,8 @@ public enum SrcType {
 
     BZJ(new BigDecimal("1"), "保证金管理"),
     RW(new BigDecimal("2"), "入网"),
-    FRHRU(new BigDecimal("3"), "分润入账"),;
+    FRHRU(new BigDecimal("3"), "分润入账"),
+    TC(new BigDecimal("4"), "代理商退出");
 
     public BigDecimal code;
 

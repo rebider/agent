@@ -73,6 +73,7 @@ public class CapitalServiceImpl implements CapitalService {
             criteria.andCAgentIdEqualTo(agentId);
             criteria.andCPayTypeEqualTo(cPayType);
             criteria.andStatusEqualTo(Status.STATUS_1.status);
+            criteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
             List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
             return capitals;
         }
@@ -169,7 +170,7 @@ public class CapitalServiceImpl implements CapitalService {
      */
     @Override
     public void disposeCapital(String capitalType, BigDecimal amt, String srcId,String cUser,
-                               String agentId,String agentName,String remark,SrcType srcType)throws Exception{
+                               String agentId,String agentName,String remark,SrcType srcType,PayType payType )throws Exception{
 
         //传递进来的扣除金额不能小于0
         //额度不足 不给扣除
@@ -177,8 +178,12 @@ public class CapitalServiceImpl implements CapitalService {
         CapitalExample capitalExample = new CapitalExample();
         CapitalExample.Criteria criteria = capitalExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
         criteria.andCAgentIdEqualTo(agentId);
+        if(null!=capitalType)
         criteria.andCTypeEqualTo(capitalType);
+        if(null!=payType)
+        criteria.andCPayTypeEqualTo(payType.code);
         capitalExample.setOrderByClause(" c_fq_in_amount asc");
         List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
         BigDecimal residueAmt = amt;  //算出未扣足的金额
