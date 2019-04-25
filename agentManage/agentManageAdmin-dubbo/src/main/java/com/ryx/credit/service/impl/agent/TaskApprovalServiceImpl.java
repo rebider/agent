@@ -122,6 +122,7 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                         //银行汇款 可用余额 财务填写提交金额
                         capitalVo.setcFqInAmount(capitalVo.getcInAmount());
                     }else if (capitalVo.getcPayType().equals(PayType.FRDK.code)) {
+                        capitalVo.setcInAmount(capitalVo.getcAmount());
                         //分润抵扣可用余额为0
                         capitalVo.setcFqInAmount(BigDecimal.ZERO);
                     }else{
