@@ -556,7 +556,7 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
                         if(oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())==0){
                             oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
                         }else{
-                            oPaymentDetail.setPaymentStatus(PaymentStatus.BF.code);
+                            oPaymentDetail.setPaymentStatus(PaymentStatus.YF.code);
                         }
                     }
                     int i = oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail);
