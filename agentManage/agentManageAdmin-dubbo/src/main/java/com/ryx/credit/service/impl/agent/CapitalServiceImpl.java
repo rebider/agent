@@ -162,36 +162,24 @@ public class CapitalServiceImpl implements CapitalService {
     @Override
     public void disposeCapital(List<Capital> capitals, BigDecimal amt,String srcId,String cUser,
                                String agentId,String agentName,String remark)throws Exception{
-        BigDecimal residueAmt = amt; //1000
+        BigDecimal residueAmt = amt;
         for (Capital capital : capitals) {
-            //可用余额
             BigDecimal fqInAmount = capital.getcFqInAmount();
-            //冻结金额
             BigDecimal freezeAmt = capital.getFreezeAmt();
-            //可用余额 - 冻结金额 = 当前可用余额
             BigDecimal lockAmt = capital.getcFqInAmount().subtract(residueAmt);
-
             BigDecimal operationAmt = BigDecimal.ZERO;
-            //当前可用余额 = 0
+            //如果等于已扣足
             if (lockAmt.compareTo(BigDecimal.ZERO) == 0) {
-                //操作前可用余额
-                operationAmt = residueAmt;
-                //设置冻结金额为  当前冻结金额 + 操作金额   （把操作金额冻结）
-                capital.setFreezeAmt(capital.getFreezeAmt().add(residueAmt)); //冻结1000
-            //当前可用余额 > 0
+                operationAmt = capital.getcFqInAmount();
+                capital.setFreezeAmt(capital.getFreezeAmt().add(capital.getcFqInAmount()));
             } else if (lockAmt.compareTo(BigDecimal.ZERO) == 1) {
                 operationAmt = residueAmt;
                 capital.setFreezeAmt(capital.getFreezeAmt().add(residueAmt));
-
-            //可用余额 小于 操作金额
             } else {
-                //全部可用余额冻结
                 operationAmt = capital.getcFqInAmount();
-                capital.setFreezeAmt(capital.getFreezeAmt().add(operationAmt));
-
+                capital.setFreezeAmt(capital.getFreezeAmt().add(capital.getcFqInAmount()));
                 String lockAmtStr = String.valueOf(lockAmt);
                 String substring = lockAmtStr.substring(1, lockAmtStr.length());
-                //剩余要扣除的金额
                 residueAmt = new BigDecimal(substring);
             }
             capital.setcFqInAmount(capital.getcFqInAmount().subtract(capital.getFreezeAmt()).add(freezeAmt));
