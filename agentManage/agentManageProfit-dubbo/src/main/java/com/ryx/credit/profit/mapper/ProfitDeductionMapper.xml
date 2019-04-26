@@ -607,7 +607,8 @@
     </update>
 
     <select id="getToolsDebt" parameterType="java.util.Map" resultType="java.math.BigDecimal" >
-        select sum(case when pd.deduction_Status = '5' then pd.NOT_DEDUCTION_AMT  else  pd.MUST_DEDUCTION_AMT end)+sum(psd.MUST_AMT)
+        select sum(case when pd.deduction_Status = '5' then pd.NOT_DEDUCTION_AMT  else  pd.MUST_DEDUCTION_AMT end)
+              +sum(case when pd.STAGING_STATUS = '3' then psd.MUST_AMT else 0 end )
           from P_DEDUCTION pd left join P_STAGING_DETAIL psd on psd.STAG_ID = pd.ID
         <where>
             pd.DEDUCTION_DATE = #{date} AND pd.DEDUCTION_TYPE=#{type}
