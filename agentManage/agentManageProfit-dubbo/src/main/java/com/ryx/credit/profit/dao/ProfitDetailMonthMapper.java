@@ -1,5 +1,6 @@
 package com.ryx.credit.profit.dao;
 
+import com.ryx.credit.profit.pojo.FreezeAgent;
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.ProfitDetailMonthExample;
 import com.ryx.credit.profit.pojo.ProfitDirect;
@@ -125,19 +126,14 @@ public interface ProfitDetailMonthMapper {
      */
     void updateAgentInfoBeforeComput(@Param("profitDate") String profitDate);
 
-    /**
-     * 设置数据冻结状态
-     * @param profitDetailMonth
-     */
-     int updateStatusByAgent(ProfitDetailMonth profitDetailMonth);
-
     ProfitDetailMonth selectByIdAndMonth(ProfitDetailMonth record);
 
     void updateAgentPayCompany(@Param("profitDate")String profitDate);
 
     /**代理商退出冻结*/
     void updateMonthProfitFozzen(@Param("profitDate")String profitDate);
-    /***代理商退出失败解冻*/
-    void updateMonthProfitUnFozzen(@Param("profitDate")String profitDate);
+
+    /**更改月分润分润状态*/
+    void updateStatusFreeze(@Param("date") String date,@Param("freezeAgent") FreezeAgent freezeAgent);
 
 }

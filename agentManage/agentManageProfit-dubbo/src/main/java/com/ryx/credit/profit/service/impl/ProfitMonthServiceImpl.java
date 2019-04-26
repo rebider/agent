@@ -106,6 +106,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     ProfitDeductionMapper profitDeductionMapper;
     @Autowired
     PToolSupplyMapper pToolSupplyMapper;
+    @Autowired
+    private IFreezeAgentSercice freezeAgentSercice;
 
 
     public final static Map<String, Map<String, Object>> temp = new HashMap<>();
@@ -565,7 +567,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             // 更新实发分润
             profitDetailMonthMapper.updateRealProfitAmt(params);
 
-            //代理商退出分润状态更改
+            //代理商月分润状态更改
             this.updateAgentQuitProfit(profitDate);
 
             long send = System.currentTimeMillis();
@@ -581,16 +583,19 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     /**
      *  代理商退出月分润冻结/解冻
      */
+    //@Override
     private void updateAgentQuitProfit(String profitDate){
         profitDetailMonthMapper.updateMonthProfitFozzen(profitDate);
-        LOG.info("代理商退出发起，月分润冻结完成");
-        profitDetailMonthMapper.updateMonthProfitUnFozzen(profitDate);
-        LOG.info("代理商退出失败，月分润解冻完成");
+        LOG.info("代理商退出，月分润冻结");
         directMapper.updateDirectProfitFozzen(profitDate);
-        LOG.info("代理商退出发起，直发分润冻结完成");
-        directMapper.updateDirectProfitUnFozzen(profitDate);
-        LOG.info("代理商退出失败，直发分润解冻完成");
+        LOG.info("代理商退出，直发分润冻结");
+        List<FreezeAgent> list = freezeAgentSercice.getFreezeList();
+        for (FreezeAgent freezeAgent : list) {
+            profitDetailMonthMapper.updateStatusFreeze(profitDate,freezeAgent);
+        }
+        LOG.info("批量更新月分润状态");
     }
+
 
    /* *//**
      * @Author: chenliang

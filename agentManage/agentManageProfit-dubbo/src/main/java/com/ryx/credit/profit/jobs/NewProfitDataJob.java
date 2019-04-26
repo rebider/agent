@@ -158,7 +158,7 @@ public class NewProfitDataJob {
         TransProfitDetail transProfitDetail = new TransProfitDetail();
         if(mapList.size() > 0){
             Map<String,String> map = mapList.get(0);
-            transProfitDetail.setRemark("合并");
+            transProfitDetail.setRemark("合并:"+agentMap.get("AGENT_ID")+","+agentMap.get("AG_NAME"));
             transProfitDetail.setAgentId( map.get("MAIN_AGENT_ID"));
             transProfitDetail.setAgentName(map.get("AG_NAME"));
         }else{

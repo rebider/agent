@@ -787,16 +787,9 @@
   <!--直发分润冻结-->
   <update id="updateDirectProfitFozzen" parameterType="java.lang.String">
   update P_PROFIT_DIRECT dd
-        set STATUS = '1'
+      set dd.STATUS = case when dd.FRIST_AGENT_ID in (select distinct AGENT_ID from A_AGENT_QUIT where STATUS=1 and CLO_REVIEW_STATUS in (2,3,5)) then '1'
+          when dd.FRIST_AGENT_ID in (select distinct AGENT_ID from A_AGENT_QUIT where STATUS=1 and CLO_REVIEW_STATUS = 4 ) then  '2' end
         where dd.TRANS_MONTH = #{profitDate}
-        and dd.FRIST_AGENT_ID in (select distinct AGENT_ID from A_AGENT_QUIT where STATUS=1 and CLO_REVIEW_STATUS in (2,3,5))
-  </update>
-
-  <update id="updateDirectProfitUnFozzen" parameterType="java.lang.String">
-  update P_PROFIT_DIRECT dd
-        set STATUS = '2'
-        where dd.TRANS_MONTH = #{profitDate}
-        and dd.FRIST_AGENT_ID in (select distinct AGENT_ID from A_AGENT_QUIT where STATUS=1 and CLO_REVIEW_STATUS = 4)
   </update>
 
 </mapper>

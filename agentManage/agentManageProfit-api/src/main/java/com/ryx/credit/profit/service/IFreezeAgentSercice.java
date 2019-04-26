@@ -13,5 +13,7 @@ public interface IFreezeAgentSercice {
     public void operationFreezeDate(List<FreezeOperationRecord> freezeOperationRecords, String user);
 
     PageInfo getFreezeData(FreezeAgent freezeAgent, String isQuerySubordinate, Page page, String orgId);
+
+    List<FreezeAgent> getFreezeList();
     public PageInfo getselectDetailFreezeDate(Map<String, Object> param, PageInfo pageInfo);
 }

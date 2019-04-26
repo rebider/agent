@@ -224,4 +224,16 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
         pageInfo.setTotal((int) count);
         return pageInfo;
     }
+
+    /**
+     * 获取月分润冻结数据
+     * @return
+     */
+    @Override
+    public List<FreezeAgent> getFreezeList(){
+        FreezeAgentExample example = new FreezeAgentExample();
+        FreezeAgentExample.Criteria criteria = example.createCriteria();
+        criteria.andFreezeTypeEqualTo("00");
+        return freezeAgentMapper.selectByExample(example);
+    }
 }
