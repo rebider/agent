@@ -2578,7 +2578,7 @@ public class OrderServiceImpl implements OrderService {
                 record_QT.setPaymentId(payment.getId());
                 record_QT.setPaymentType(PamentIdType.ORDER_FKD.code);
                 record_QT.setOrderId(payment.getOrderId());
-                record_QT.setPayType(payment.getDeductionType());
+                record_QT.setPayType(PaymentType.SF.code);
                 record_QT.setPayAmount(capitalFlow.getcAmount());
                 record_QT.setRealPayAmount(capitalFlow.getcAmount());
                 record_QT.setPlanPayTime(Calendar.getInstance().getTime());
@@ -2648,27 +2648,29 @@ public class OrderServiceImpl implements OrderService {
         } else {
             //总资金
             BigDecimal all = new BigDecimal(0);
+            BigDecimal cannot = new BigDecimal(0);
             for (Capital capital : listc) {
                 //银行汇款可抵扣
                 if(PayType.YHHK.code.equals(capital.getcPayType())) {
-                    all = all.add(capital.getcFqInAmount());
+                    all = all.add(capital.getcFqInAmount().add(capital.getFreezeAmt()));
+                    cannot = cannot.add(capital.getFreezeAmt());
                 }else if(PayType.FRDK.code.equals(capital.getcPayType())){
-                    BigDecimal cFqInAmount = capital.getcFqInAmount();
-                    all = all.add(cFqInAmount);
+                    all = all.add(capital.getcFqInAmount().add(capital.getFreezeAmt()));
+                    cannot = cannot.add(capital.getFreezeAmt());
                 }
             }
             f.putKeyV("all", all);
             //可用资金 审批中的订单
-            List<OPayment> pamentS = queryApprovePayment(agentId, AgStatus.Approving.status, Arrays.asList(OrderStatus.CREATE.status));
-            BigDecimal cannot = new BigDecimal(0);
-            for (OPayment pament : pamentS) {
-                if (StringUtils.isNotBlank(pament.getDeductionType())
-                        && pament.getDeductionType().equals(type)
-                        && pament.getDeductionAmount() != null
-                        && pament.getDeductionAmount().compareTo(BigDecimal.ZERO) > 0) {
-                    cannot = cannot.add(pament.getDeductionAmount());
-                }
-            }
+//            List<OPayment> pamentS = queryApprovePayment(agentId, AgStatus.Approving.status, Arrays.asList(OrderStatus.CREATE.status));
+//
+//            for (OPayment pament : pamentS) {
+//                if (StringUtils.isNotBlank(pament.getDeductionType())
+//                        && pament.getDeductionType().equals(type)
+//                        && pament.getDeductionAmount() != null
+//                        && pament.getDeductionAmount().compareTo(BigDecimal.ZERO) > 0) {
+//                    cannot = cannot.add(pament.getDeductionAmount());
+//                }
+//            }
             if (all.compareTo(cannot) >= 0) {
                 f.putKeyV("can", all.subtract(cannot));
             } else {

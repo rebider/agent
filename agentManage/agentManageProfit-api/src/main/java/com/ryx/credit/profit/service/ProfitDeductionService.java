@@ -190,5 +190,11 @@ public interface ProfitDeductionService {
      */
     void updateTdDetail(ProfitDeduction profitDeductionTemp, BigDecimal realDeductionAmt);
 
-
+    /**
+     *  获取代理商各业务平台机具未扣款、分润数据
+     * @param agentId
+     * @param profitMonth
+     * @return
+     */
+    List<Map<String,Object>> getPorfitDataByAgentIdAndProfitMonth(String agentId,String profitMonth);
 }

@@ -196,11 +196,11 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         Date date = calendar.getTime();
         String dateStr = new SimpleDateFormat("yyyyMM").format(date);
         map.put("date",dateStr);
-        //map.put("date","201810");
-        BigDecimal BLNotDeductionAmt = getBLDeduction(map);//保理欠款
+
+        BigDecimal BLNotDeductionAmt = getBLDebt(map); //保理欠款
         resultMap.put("BLNotDeductionAmt",BLNotDeductionAmt);
 
-        BigDecimal ToolNotDeductionAmt = getDeductionAmt(map,"02"); //机具扣款
+        BigDecimal ToolNotDeductionAmt = getToolsDebt(map,"02"); //机具扣款
         resultMap.put("ToolNotDeductionAmt",ToolNotDeductionAmt);
 
         BigDecimal otherNotDeductionAmt = getDeductionAmt(map,"03").add(getDeductionAmt(map,"07"));//其他扣款  03
@@ -215,29 +215,29 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         return resultMap;
     }
 
-   /**获得未扣款**/
+    /**
+     * 获得，考核扣款、其他扣款、退单扣款 欠款
+     * @param map
+     * @return
+     */
     private BigDecimal getDeductionAmt(Map<String,String> map,String type){
         map.put("type",type);
         //获得未扣款
         BigDecimal notDeductionAmt = profitDeductionMapper.getNotDeductionAmt(map)!=null ?profitDeductionMapper.getNotDeductionAmt(map):BigDecimal.ZERO;
         //获得分期未扣
-        BigDecimal notStagingAmt = getNotDeductionAmt(map)!= null?getNotDeductionAmt(map) : BigDecimal.ZERO;
+        BigDecimal notStagingAmt = profitStagingMapper.getNotDeductionAmtTwo(map)!= null ?profitStagingMapper.getNotDeductionAmtTwo(map) : BigDecimal.ZERO;
 
         return notDeductionAmt.add(notStagingAmt);
     }
 
-
     /**
-     * 获取分期欠款总计
-     * @param param
+     * 获取机具扣款欠款
      * @return
      */
-    private BigDecimal getNotDeductionAmt(Map<String, String> param){
-        ProfitStaging profitStaging = profitStagingMapper.getNotDeductionAmtTwo(param);
-        if (profitStaging != null) {
-            return profitStaging.getStagAmt();
-        }
-        return BigDecimal.ZERO;
+    private BigDecimal getToolsDebt(Map<String,String> map,String type){
+        map.put("type",type);
+        BigDecimal result = profitDeductionMapper.getToolsDebt(map) != null ?  profitDeductionMapper.getToolsDebt(map) :BigDecimal.ZERO;
+        return result;
     }
 
     /**
@@ -245,13 +245,15 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
      * @param map
      * @return
      */
-    private BigDecimal getBLDeduction(Map<String,String> map){
+    private BigDecimal getBLDebt(Map<String,String> map){
         BigDecimal result = pProfitFactorMapper.getSurplusAmt(map);
         if(result != null){
             return result;
         }
         return BigDecimal.ZERO;
     }
+
+
 
     /***
      * @Description: 插入其他扣款
@@ -522,7 +524,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     private BigDecimal otherDeduction(Map<String, Object> param) {
         // 获取代理商所有其它扣款信息
         param.put("type","03,07");
-        List<ProfitDeduction> deductionList = getProfitDeductionListByType(param);  // todo
+        List<ProfitDeduction> deductionList = getProfitDeductionListByType(param);
         return getDeductionAmt(deductionList, param);
     }
 
@@ -1042,4 +1044,18 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         return list;
     }
 
+    /**
+     * 获取代理商各业务平台机具未扣款、分润数据
+     * @param agentId
+     * @param profitMonth
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> getPorfitDataByAgentIdAndProfitMonth(String agentId, String profitMonth) {
+        if (StringUtils.isBlank(agentId)||StringUtils.isBlank(profitMonth)){
+            logger.info("传参异常：agentId==="+agentId+",profitMonth==="+profitMonth);
+            return null;
+        }
+        return profitDeductionMapper.getPorfitDataByAgentIdAndProfitMonth(agentId,profitMonth);
+    }
 }
