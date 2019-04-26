@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.OrgType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.AppConfig;
-import com.ryx.credit.common.util.FastMap;
-import com.ryx.credit.common.util.HttpClientUtil;
-import com.ryx.credit.common.util.JsonUtil;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.PlatFormMapper;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
@@ -140,7 +137,7 @@ public class PlatformSynServiceMpos implements PlatformSynService {
             }
         } catch (Exception e) {
             log.info("http请求超时:{}",e.getMessage());
-            AppConfig.sendEmails("http请求超时:"+e.getStackTrace(), "升级通知手刷失败报警");
+            AppConfig.sendEmails("http请求超时:"+ MailUtil.printStackTrace(e), "升级通知手刷失败报警");
             throw e;
         }
     }

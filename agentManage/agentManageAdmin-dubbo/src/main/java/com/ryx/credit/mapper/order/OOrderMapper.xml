@@ -469,7 +469,9 @@
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
-      <if test="agDocDistrict!=null and agDocDistrict!=''"> and b.AG_DOC_DISTRICT like  #{agDocDistrict} </if>
+        <if test="agDocDistrict!=null and agDocDistrict!=''">
+            and (b.AG_DOC_PRO = #{agDocDistrict} or b.AG_DOC_DISTRICT = #{agDocDistrict})
+        </if>
       <if test="agDocPro!=null and agDocPro!=''"> and b.AG_DOC_PRO like  #{agDocPro} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
@@ -549,7 +551,9 @@
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
-      <if test="agDocDistrict!=null and agDocDistrict!=''"> and b.AG_DOC_DISTRICT like  #{agDocDistrict} </if>
+        <if test="agDocDistrict!=null and agDocDistrict!=''">
+            and (b.AG_DOC_PRO = #{agDocDistrict} or b.AG_DOC_DISTRICT = #{agDocDistrict})
+        </if>
       <if test="agDocPro!=null and agDocPro!=''"> and b.AG_DOC_PRO like  #{agDocPro} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD')  between #{beginTime} and #{endTime}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
@@ -592,7 +596,9 @@
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
-      <if test="agDocDistrict!=null and agDocDistrict!=''"> and b.AG_DOC_DISTRICT like  #{agDocDistrict} </if>
+      <if test="agDocDistrict!=null and agDocDistrict!=''">
+        and (b.AG_DOC_PRO = #{agDocDistrict} or b.AG_DOC_DISTRICT = #{agDocDistrict})
+      </if>
       <if test="agDocPro!=null and agDocPro!=''"> and b.AG_DOC_PRO like  #{agDocPro} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
@@ -630,7 +636,9 @@
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
-      <if test="agDocDistrict!=null and agDocDistrict!=''"> and b.AG_DOC_DISTRICT like  #{agDocDistrict} </if>
+      <if test="agDocDistrict!=null and agDocDistrict!=''">
+        and (b.AG_DOC_PRO = #{agDocDistrict} or b.AG_DOC_DISTRICT = #{agDocDistrict})
+      </if>
       <if test="agDocPro!=null and agDocPro!=''"> and b.AG_DOC_PRO like  #{agDocPro} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD')  between #{beginTime} and #{endTime}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
@@ -735,6 +743,10 @@
       </if>
       <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus}</if>
       <if test="notLookTem=='true'"> and o.review_status != 1</if>
+      <if test="agDocDistrict!=null and agDocDistrict!=''">
+       and (b.AG_DOC_PRO = #{agDocDistrict} or b.AG_DOC_DISTRICT = #{agDocDistrict})
+      </if>
+      <if test="agDocPro!=null and agDocPro!=''"> and b.AG_DOC_PRO like  #{agDocPro} </if>
     </where>
     order by c_time desc
     <include refid="OracleDialectSuffix" />
@@ -776,6 +788,10 @@
         where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%') and soa.status=1 and os.order_id = o.id)
       </if>
       <if test="notLookTem=='true'"> and o.review_status != 1</if>
+      <if test="agDocDistrict!=null and agDocDistrict!=''">
+        and (b.AG_DOC_PRO = #{agDocDistrict} or b.AG_DOC_DISTRICT = #{agDocDistrict})
+      </if>
+      <if test="agDocPro!=null and agDocPro!=''"> and b.AG_DOC_PRO like  #{agDocPro} </if>
     </where>
     )
   </select>

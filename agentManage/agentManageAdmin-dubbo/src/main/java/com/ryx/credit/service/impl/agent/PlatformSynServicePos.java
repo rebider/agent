@@ -8,6 +8,7 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.HttpClientUtil;
+import com.ryx.credit.common.util.MailUtil;
 import com.ryx.credit.common.util.agentUtil.AESUtil;
 import com.ryx.credit.common.util.agentUtil.RSAUtil;
 import com.ryx.credit.dao.agent.PlatFormMapper;
@@ -229,7 +230,7 @@ public class PlatformSynServicePos implements PlatformSynService {
             e.printStackTrace();
             log.error(e.getMessage(),e);
             log.info("http请求超时:{}",e.getMessage());
-            AppConfig.sendEmails("http请求超时:"+e.getStackTrace(), "升级通知POS失败报警");
+            AppConfig.sendEmails("http请求超时:"+ MailUtil.printStackTrace(e), "升级通知POS失败报警");
             throw new Exception("http请求超时");
         }
     }

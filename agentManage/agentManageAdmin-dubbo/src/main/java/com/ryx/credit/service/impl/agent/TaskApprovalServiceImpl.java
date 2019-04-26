@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import sun.management.resources.agent;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -118,13 +119,21 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                             logger.info("请填写实际到账金额");
                             throw new ProcessException("请填写实际到账金额");
                         }
-
+                        //银行汇款 可用余额 财务填写提交金额
+                        capitalVo.setcFqInAmount(capitalVo.getcInAmount());
+                    }else if (capitalVo.getcPayType().equals(PayType.FRDK.code)) {
+                        //分润抵扣可用余额为0
+                        capitalVo.setcFqInAmount(BigDecimal.ZERO);
+                    }else{
+                        //其他不可知状态 可用余额
+                        capitalVo.setcFqInAmount(capitalVo.getcInAmount());
                     }
+                    //分润分期 银行汇款
                     Capital capital = capitalMapper.selectByPrimaryKey(capitalVo.getId());
                     capitalVo.setcUtime(new Date());
                     capitalVo.setVersion(capital.getVersion());
-                    capitalVo.setcInAmount(capitalVo.getcInAmount());
-                    capitalVo.setcFqInAmount(capitalVo.getcInAmount());
+                    //财务填写
+                    // capitalVo.setcInAmount(capitalVo.getcInAmount());
                     capitalVo.setId(capitalVo.getId());
                     int i = capitalMapper.updateByPrimaryKeySelective(capitalVo);
                     if (i != 1) {

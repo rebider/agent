@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ryx.credit.dao.order.OLogisticsDetailMapper">
-  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
+<mapper namespace="com.ryx.credit.dao.order.OLogisticsDetailHMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.OLogisticsDetailH">
     <id column="ID" jdbcType="VARCHAR" property="id" />
     <result column="ORDER_ID" jdbcType="VARCHAR" property="orderId" />
+    <result column="ORDER_NUM" jdbcType="VARCHAR" property="orderNum" />
     <result column="LOGISTICS_ID" jdbcType="VARCHAR" property="logisticsId" />
     <result column="PRO_ID" jdbcType="VARCHAR" property="proId" />
     <result column="PRO_NAME" jdbcType="VARCHAR" property="proName" />
@@ -22,24 +23,25 @@
     <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="RECORD_STATUS" jdbcType="DECIMAL" property="recordStatus" />
-    <result column="VERSION" jdbcType="DECIMAL" property="version" />
-    <result column="ORDER_NUM" jdbcType="VARCHAR" property="orderNum" />
     <result column="TERMINALID" jdbcType="VARCHAR" property="terminalid" />
     <result column="TERMINALID_KEY" jdbcType="VARCHAR" property="terminalidKey" />
+    <result column="TERMINALID_CHECK" jdbcType="VARCHAR" property="terminalidCheck" />
     <result column="TERMINALID_SEQ" jdbcType="VARCHAR" property="terminalidSeq" />
     <result column="TERMINALID_TYPE" jdbcType="VARCHAR" property="terminalidType" />
+    <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="BUS_PRO_CODE" jdbcType="VARCHAR" property="busProCode" />
     <result column="BUS_PRO_NAME" jdbcType="VARCHAR" property="busProName" />
     <result column="TERM_BATCHCODE" jdbcType="VARCHAR" property="termBatchcode" />
     <result column="TERM_BATCHNAME" jdbcType="VARCHAR" property="termBatchname" />
     <result column="TERMTYPE" jdbcType="VARCHAR" property="termtype" />
     <result column="TERMTYPENAME" jdbcType="VARCHAR" property="termtypename" />
-    <result column="SEND_STATUS" jdbcType="DECIMAL" property="sendStatus" />
-    <result column="TERMINALID_CHECK" jdbcType="VARCHAR" property="terminalidCheck" />
-    <result column="POS_SPE_PRICE" jdbcType="DECIMAL" property="posSpePrice" />
     <result column="POS_TYPE" jdbcType="VARCHAR" property="posType" />
+    <result column="POS_SPE_PRICE" jdbcType="DECIMAL" property="posSpePrice" />
     <result column="STAND_TIME" jdbcType="DECIMAL" property="standTime" />
     <result column="BUS_ID" jdbcType="VARCHAR" property="busId" />
+    <result column="SBUS_STATUS" jdbcType="DECIMAL" property="sbusStatus" />
+    <result column="SBUS_BATCH" jdbcType="DECIMAL" property="sbusBatch" />
+    <result column="SBUS_MSG" jdbcType="VARCHAR" property="sbusMsg" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -71,21 +73,21 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, ORDER_ID, LOGISTICS_ID, PRO_ID, PRO_NAME, SETTLEMENT_PRICE, ACTIVITY_ID, ACTIVITY_NAME,
-    G_TIME, SN_NUM, AGENT_ID, OPT_ID, OPT_TYPE, RETURN_ORDER_ID, C_TIME, U_TIME, C_USER,
-    U_USER, STATUS, RECORD_STATUS, VERSION, ORDER_NUM, TERMINALID, TERMINALID_KEY, TERMINALID_SEQ,
-    TERMINALID_TYPE, BUS_PRO_CODE, BUS_PRO_NAME, TERM_BATCHCODE, TERM_BATCHNAME, TERMTYPE,
-    TERMTYPENAME, SEND_STATUS, TERMINALID_CHECK, POS_SPE_PRICE, POS_TYPE, STAND_TIME,
-    BUS_ID
+    ID, ORDER_ID, ORDER_NUM, LOGISTICS_ID, PRO_ID, PRO_NAME, SETTLEMENT_PRICE, ACTIVITY_ID, 
+    ACTIVITY_NAME, G_TIME, SN_NUM, AGENT_ID, OPT_ID, OPT_TYPE, RETURN_ORDER_ID, C_TIME, 
+    U_TIME, C_USER, U_USER, STATUS, RECORD_STATUS, TERMINALID, TERMINALID_KEY, TERMINALID_CHECK, 
+    TERMINALID_SEQ, TERMINALID_TYPE, VERSION, BUS_PRO_CODE, BUS_PRO_NAME, TERM_BATCHCODE, 
+    TERM_BATCHNAME, TERMTYPE, TERMTYPENAME, POS_TYPE, POS_SPE_PRICE, STAND_TIME, BUS_ID, 
+    SBUS_STATUS, SBUS_BATCH, SBUS_MSG
   </sql>
-  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetailExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetailHExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
     <if test="distinct">
       distinct
     </if>
     <include refid="Base_Column_List" />
-    from O_LOGISTICS_DETAIL
+    from O_LOGISTICS_DETAIL_H
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -95,53 +97,58 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select
+    select 
     <include refid="Base_Column_List" />
-    from O_LOGISTICS_DETAIL
+    from O_LOGISTICS_DETAIL_H
     where ID = #{id,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetailExample">
-    delete from O_LOGISTICS_DETAIL
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetailHExample">
+    delete from O_LOGISTICS_DETAIL_H
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
-    insert into O_LOGISTICS_DETAIL (ID, ORDER_ID, LOGISTICS_ID,
-    PRO_ID, PRO_NAME, SETTLEMENT_PRICE,
-    ACTIVITY_ID, ACTIVITY_NAME, G_TIME,
-    SN_NUM, AGENT_ID, OPT_ID,
-    OPT_TYPE, RETURN_ORDER_ID, C_TIME,
-    U_TIME, C_USER, U_USER,
-    STATUS, RECORD_STATUS, VERSION,
-    ORDER_NUM, TERMINALID, TERMINALID_KEY,
-    TERMINALID_SEQ, TERMINALID_TYPE, BUS_PRO_CODE,
-    BUS_PRO_NAME, TERM_BATCHCODE, TERM_BATCHNAME,
-    TERMTYPE, TERMTYPENAME, SEND_STATUS,
-    TERMINALID_CHECK, POS_SPE_PRICE, POS_TYPE,
-    STAND_TIME, BUS_ID)
-    values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{logisticsId,jdbcType=VARCHAR},
-    #{proId,jdbcType=VARCHAR}, #{proName,jdbcType=VARCHAR}, #{settlementPrice,jdbcType=DECIMAL},
-    #{activityId,jdbcType=VARCHAR}, #{activityName,jdbcType=VARCHAR}, #{gTime,jdbcType=DECIMAL},
-    #{snNum,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{optId,jdbcType=VARCHAR},
-    #{optType,jdbcType=VARCHAR}, #{returnOrderId,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP},
-    #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR},
-    #{status,jdbcType=DECIMAL}, #{recordStatus,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL},
-    #{orderNum,jdbcType=VARCHAR}, #{terminalid,jdbcType=VARCHAR}, #{terminalidKey,jdbcType=VARCHAR},
-    #{terminalidSeq,jdbcType=VARCHAR}, #{terminalidType,jdbcType=VARCHAR}, #{busProCode,jdbcType=VARCHAR},
-    #{busProName,jdbcType=VARCHAR}, #{termBatchcode,jdbcType=VARCHAR}, #{termBatchname,jdbcType=VARCHAR},
-    #{termtype,jdbcType=VARCHAR}, #{termtypename,jdbcType=VARCHAR}, #{sendStatus,jdbcType=DECIMAL},
-    #{terminalidCheck,jdbcType=VARCHAR}, #{posSpePrice,jdbcType=DECIMAL}, #{posType,jdbcType=VARCHAR},
-    #{standTime,jdbcType=DECIMAL}, #{busId,jdbcType=VARCHAR})
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetailH">
+    insert into O_LOGISTICS_DETAIL_H (ID, ORDER_ID, ORDER_NUM, 
+      LOGISTICS_ID, PRO_ID, PRO_NAME, 
+      SETTLEMENT_PRICE, ACTIVITY_ID, ACTIVITY_NAME, 
+      G_TIME, SN_NUM, AGENT_ID, 
+      OPT_ID, OPT_TYPE, RETURN_ORDER_ID, 
+      C_TIME, U_TIME, C_USER, 
+      U_USER, STATUS, RECORD_STATUS, 
+      TERMINALID, TERMINALID_KEY, TERMINALID_CHECK, 
+      TERMINALID_SEQ, TERMINALID_TYPE, VERSION, 
+      BUS_PRO_CODE, BUS_PRO_NAME, TERM_BATCHCODE, 
+      TERM_BATCHNAME, TERMTYPE, TERMTYPENAME, 
+      POS_TYPE, POS_SPE_PRICE, STAND_TIME, 
+      BUS_ID, SBUS_STATUS, SBUS_BATCH, 
+      SBUS_MSG)
+    values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{orderNum,jdbcType=VARCHAR}, 
+      #{logisticsId,jdbcType=VARCHAR}, #{proId,jdbcType=VARCHAR}, #{proName,jdbcType=VARCHAR}, 
+      #{settlementPrice,jdbcType=DECIMAL}, #{activityId,jdbcType=VARCHAR}, #{activityName,jdbcType=VARCHAR}, 
+      #{gTime,jdbcType=DECIMAL}, #{snNum,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
+      #{optId,jdbcType=VARCHAR}, #{optType,jdbcType=VARCHAR}, #{returnOrderId,jdbcType=VARCHAR}, 
+      #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, 
+      #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{recordStatus,jdbcType=DECIMAL}, 
+      #{terminalid,jdbcType=VARCHAR}, #{terminalidKey,jdbcType=VARCHAR}, #{terminalidCheck,jdbcType=VARCHAR}, 
+      #{terminalidSeq,jdbcType=VARCHAR}, #{terminalidType,jdbcType=VARCHAR}, #{version,jdbcType=DECIMAL}, 
+      #{busProCode,jdbcType=VARCHAR}, #{busProName,jdbcType=VARCHAR}, #{termBatchcode,jdbcType=VARCHAR}, 
+      #{termBatchname,jdbcType=VARCHAR}, #{termtype,jdbcType=VARCHAR}, #{termtypename,jdbcType=VARCHAR}, 
+      #{posType,jdbcType=VARCHAR}, #{posSpePrice,jdbcType=DECIMAL}, #{standTime,jdbcType=DECIMAL}, 
+      #{busId,jdbcType=VARCHAR}, #{sbusStatus,jdbcType=DECIMAL}, #{sbusBatch,jdbcType=DECIMAL}, 
+      #{sbusMsg,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
-    insert into O_LOGISTICS_DETAIL
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetailH">
+    insert into O_LOGISTICS_DETAIL_H
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
         ID,
       </if>
       <if test="orderId != null">
         ORDER_ID,
+      </if>
+      <if test="orderNum != null">
+        ORDER_NUM,
       </if>
       <if test="logisticsId != null">
         LOGISTICS_ID,
@@ -197,23 +204,23 @@
       <if test="recordStatus != null">
         RECORD_STATUS,
       </if>
-      <if test="version != null">
-        VERSION,
-      </if>
-      <if test="orderNum != null">
-        ORDER_NUM,
-      </if>
       <if test="terminalid != null">
         TERMINALID,
       </if>
       <if test="terminalidKey != null">
         TERMINALID_KEY,
       </if>
+      <if test="terminalidCheck != null">
+        TERMINALID_CHECK,
+      </if>
       <if test="terminalidSeq != null">
         TERMINALID_SEQ,
       </if>
       <if test="terminalidType != null">
         TERMINALID_TYPE,
+      </if>
+      <if test="version != null">
+        VERSION,
       </if>
       <if test="busProCode != null">
         BUS_PRO_CODE,
@@ -233,23 +240,26 @@
       <if test="termtypename != null">
         TERMTYPENAME,
       </if>
-      <if test="sendStatus != null">
-        SEND_STATUS,
-      </if>
-      <if test="terminalidCheck != null">
-        TERMINALID_CHECK,
+      <if test="posType != null">
+        POS_TYPE,
       </if>
       <if test="posSpePrice != null">
         POS_SPE_PRICE,
-      </if>
-      <if test="posType != null">
-        POS_TYPE,
       </if>
       <if test="standTime != null">
         STAND_TIME,
       </if>
       <if test="busId != null">
         BUS_ID,
+      </if>
+      <if test="sbusStatus != null">
+        SBUS_STATUS,
+      </if>
+      <if test="sbusBatch != null">
+        SBUS_BATCH,
+      </if>
+      <if test="sbusMsg != null">
+        SBUS_MSG,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -258,6 +268,9 @@
       </if>
       <if test="orderId != null">
         #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNum != null">
+        #{orderNum,jdbcType=VARCHAR},
       </if>
       <if test="logisticsId != null">
         #{logisticsId,jdbcType=VARCHAR},
@@ -313,23 +326,23 @@
       <if test="recordStatus != null">
         #{recordStatus,jdbcType=DECIMAL},
       </if>
-      <if test="version != null">
-        #{version,jdbcType=DECIMAL},
-      </if>
-      <if test="orderNum != null">
-        #{orderNum,jdbcType=VARCHAR},
-      </if>
       <if test="terminalid != null">
         #{terminalid,jdbcType=VARCHAR},
       </if>
       <if test="terminalidKey != null">
         #{terminalidKey,jdbcType=VARCHAR},
       </if>
+      <if test="terminalidCheck != null">
+        #{terminalidCheck,jdbcType=VARCHAR},
+      </if>
       <if test="terminalidSeq != null">
         #{terminalidSeq,jdbcType=VARCHAR},
       </if>
       <if test="terminalidType != null">
         #{terminalidType,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=DECIMAL},
       </if>
       <if test="busProCode != null">
         #{busProCode,jdbcType=VARCHAR},
@@ -349,17 +362,11 @@
       <if test="termtypename != null">
         #{termtypename,jdbcType=VARCHAR},
       </if>
-      <if test="sendStatus != null">
-        #{sendStatus,jdbcType=DECIMAL},
-      </if>
-      <if test="terminalidCheck != null">
-        #{terminalidCheck,jdbcType=VARCHAR},
+      <if test="posType != null">
+        #{posType,jdbcType=VARCHAR},
       </if>
       <if test="posSpePrice != null">
         #{posSpePrice,jdbcType=DECIMAL},
-      </if>
-      <if test="posType != null">
-        #{posType,jdbcType=VARCHAR},
       </if>
       <if test="standTime != null">
         #{standTime,jdbcType=DECIMAL},
@@ -367,19 +374,31 @@
       <if test="busId != null">
         #{busId,jdbcType=VARCHAR},
       </if>
+      <if test="sbusStatus != null">
+        #{sbusStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="sbusBatch != null">
+        #{sbusBatch,jdbcType=DECIMAL},
+      </if>
+      <if test="sbusMsg != null">
+        #{sbusMsg,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetailExample" resultType="java.lang.Long">
-    select count(*) from O_LOGISTICS_DETAIL
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetailHExample" resultType="java.lang.Long">
+    select count(*) from O_LOGISTICS_DETAIL_H
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
-    update O_LOGISTICS_DETAIL
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetailH">
+    update O_LOGISTICS_DETAIL_H
     <set>
       <if test="orderId != null">
         ORDER_ID = #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNum != null">
+        ORDER_NUM = #{orderNum,jdbcType=VARCHAR},
       </if>
       <if test="logisticsId != null">
         LOGISTICS_ID = #{logisticsId,jdbcType=VARCHAR},
@@ -435,23 +454,23 @@
       <if test="recordStatus != null">
         RECORD_STATUS = #{recordStatus,jdbcType=DECIMAL},
       </if>
-      <if test="version != null">
-        VERSION = #{version,jdbcType=DECIMAL},
-      </if>
-      <if test="orderNum != null">
-        ORDER_NUM = #{orderNum,jdbcType=VARCHAR},
-      </if>
       <if test="terminalid != null">
         TERMINALID = #{terminalid,jdbcType=VARCHAR},
       </if>
       <if test="terminalidKey != null">
         TERMINALID_KEY = #{terminalidKey,jdbcType=VARCHAR},
       </if>
+      <if test="terminalidCheck != null">
+        TERMINALID_CHECK = #{terminalidCheck,jdbcType=VARCHAR},
+      </if>
       <if test="terminalidSeq != null">
         TERMINALID_SEQ = #{terminalidSeq,jdbcType=VARCHAR},
       </if>
       <if test="terminalidType != null">
         TERMINALID_TYPE = #{terminalidType,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null">
+        VERSION = #{version,jdbcType=DECIMAL},
       </if>
       <if test="busProCode != null">
         BUS_PRO_CODE = #{busProCode,jdbcType=VARCHAR},
@@ -471,17 +490,11 @@
       <if test="termtypename != null">
         TERMTYPENAME = #{termtypename,jdbcType=VARCHAR},
       </if>
-      <if test="sendStatus != null">
-        SEND_STATUS = #{sendStatus,jdbcType=DECIMAL},
-      </if>
-      <if test="terminalidCheck != null">
-        TERMINALID_CHECK = #{terminalidCheck,jdbcType=VARCHAR},
+      <if test="posType != null">
+        POS_TYPE = #{posType,jdbcType=VARCHAR},
       </if>
       <if test="posSpePrice != null">
         POS_SPE_PRICE = #{posSpePrice,jdbcType=DECIMAL},
-      </if>
-      <if test="posType != null">
-        POS_TYPE = #{posType,jdbcType=VARCHAR},
       </if>
       <if test="standTime != null">
         STAND_TIME = #{standTime,jdbcType=DECIMAL},
@@ -489,53 +502,64 @@
       <if test="busId != null">
         BUS_ID = #{busId,jdbcType=VARCHAR},
       </if>
+      <if test="sbusStatus != null">
+        SBUS_STATUS = #{sbusStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="sbusBatch != null">
+        SBUS_BATCH = #{sbusBatch,jdbcType=DECIMAL},
+      </if>
+      <if test="sbusMsg != null">
+        SBUS_MSG = #{sbusMsg,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
-    update O_LOGISTICS_DETAIL
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetailH">
+    update O_LOGISTICS_DETAIL_H
     set ORDER_ID = #{orderId,jdbcType=VARCHAR},
-    LOGISTICS_ID = #{logisticsId,jdbcType=VARCHAR},
-    PRO_ID = #{proId,jdbcType=VARCHAR},
-    PRO_NAME = #{proName,jdbcType=VARCHAR},
-    SETTLEMENT_PRICE = #{settlementPrice,jdbcType=DECIMAL},
-    ACTIVITY_ID = #{activityId,jdbcType=VARCHAR},
-    ACTIVITY_NAME = #{activityName,jdbcType=VARCHAR},
-    G_TIME = #{gTime,jdbcType=DECIMAL},
-    SN_NUM = #{snNum,jdbcType=VARCHAR},
-    AGENT_ID = #{agentId,jdbcType=VARCHAR},
-    OPT_ID = #{optId,jdbcType=VARCHAR},
-    OPT_TYPE = #{optType,jdbcType=VARCHAR},
-    RETURN_ORDER_ID = #{returnOrderId,jdbcType=VARCHAR},
-    C_TIME = #{cTime,jdbcType=TIMESTAMP},
-    U_TIME = #{uTime,jdbcType=TIMESTAMP},
-    C_USER = #{cUser,jdbcType=VARCHAR},
-    U_USER = #{uUser,jdbcType=VARCHAR},
-    STATUS = #{status,jdbcType=DECIMAL},
-    RECORD_STATUS = #{recordStatus,jdbcType=DECIMAL},
-    VERSION = #{version,jdbcType=DECIMAL},
-    ORDER_NUM = #{orderNum,jdbcType=VARCHAR},
-    TERMINALID = #{terminalid,jdbcType=VARCHAR},
-    TERMINALID_KEY = #{terminalidKey,jdbcType=VARCHAR},
-    TERMINALID_SEQ = #{terminalidSeq,jdbcType=VARCHAR},
-    TERMINALID_TYPE = #{terminalidType,jdbcType=VARCHAR},
-    BUS_PRO_CODE = #{busProCode,jdbcType=VARCHAR},
-    BUS_PRO_NAME = #{busProName,jdbcType=VARCHAR},
-    TERM_BATCHCODE = #{termBatchcode,jdbcType=VARCHAR},
-    TERM_BATCHNAME = #{termBatchname,jdbcType=VARCHAR},
-    TERMTYPE = #{termtype,jdbcType=VARCHAR},
-    TERMTYPENAME = #{termtypename,jdbcType=VARCHAR},
-    SEND_STATUS = #{sendStatus,jdbcType=DECIMAL},
-    TERMINALID_CHECK = #{terminalidCheck,jdbcType=VARCHAR},
-    POS_SPE_PRICE = #{posSpePrice,jdbcType=DECIMAL},
-    POS_TYPE = #{posType,jdbcType=VARCHAR},
-    STAND_TIME = #{standTime,jdbcType=DECIMAL},
-    BUS_ID = #{busId,jdbcType=VARCHAR}
+      ORDER_NUM = #{orderNum,jdbcType=VARCHAR},
+      LOGISTICS_ID = #{logisticsId,jdbcType=VARCHAR},
+      PRO_ID = #{proId,jdbcType=VARCHAR},
+      PRO_NAME = #{proName,jdbcType=VARCHAR},
+      SETTLEMENT_PRICE = #{settlementPrice,jdbcType=DECIMAL},
+      ACTIVITY_ID = #{activityId,jdbcType=VARCHAR},
+      ACTIVITY_NAME = #{activityName,jdbcType=VARCHAR},
+      G_TIME = #{gTime,jdbcType=DECIMAL},
+      SN_NUM = #{snNum,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      OPT_ID = #{optId,jdbcType=VARCHAR},
+      OPT_TYPE = #{optType,jdbcType=VARCHAR},
+      RETURN_ORDER_ID = #{returnOrderId,jdbcType=VARCHAR},
+      C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      U_TIME = #{uTime,jdbcType=TIMESTAMP},
+      C_USER = #{cUser,jdbcType=VARCHAR},
+      U_USER = #{uUser,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL},
+      RECORD_STATUS = #{recordStatus,jdbcType=DECIMAL},
+      TERMINALID = #{terminalid,jdbcType=VARCHAR},
+      TERMINALID_KEY = #{terminalidKey,jdbcType=VARCHAR},
+      TERMINALID_CHECK = #{terminalidCheck,jdbcType=VARCHAR},
+      TERMINALID_SEQ = #{terminalidSeq,jdbcType=VARCHAR},
+      TERMINALID_TYPE = #{terminalidType,jdbcType=VARCHAR},
+      VERSION = #{version,jdbcType=DECIMAL},
+      BUS_PRO_CODE = #{busProCode,jdbcType=VARCHAR},
+      BUS_PRO_NAME = #{busProName,jdbcType=VARCHAR},
+      TERM_BATCHCODE = #{termBatchcode,jdbcType=VARCHAR},
+      TERM_BATCHNAME = #{termBatchname,jdbcType=VARCHAR},
+      TERMTYPE = #{termtype,jdbcType=VARCHAR},
+      TERMTYPENAME = #{termtypename,jdbcType=VARCHAR},
+      POS_TYPE = #{posType,jdbcType=VARCHAR},
+      POS_SPE_PRICE = #{posSpePrice,jdbcType=DECIMAL},
+      STAND_TIME = #{standTime,jdbcType=DECIMAL},
+      BUS_ID = #{busId,jdbcType=VARCHAR},
+      SBUS_STATUS = #{sbusStatus,jdbcType=DECIMAL},
+      SBUS_BATCH = #{sbusBatch,jdbcType=DECIMAL},
+      SBUS_MSG = #{sbusMsg,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from (
+      select * from ( select row_.*, rownum rownum_ from ( 
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
@@ -543,107 +567,4 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
-  <select id="queryCompensateLList" parameterType="java.util.Map" resultType="java.util.Map">
-    select
-      ORDER_ID, LOGISTICS_ID, PRO_ID, PRO_NAME, SETTLEMENT_PRICE, ACTIVITY_ID, ACTIVITY_NAME, AGENT_ID,G_TIME,BUS_ID,
-      max(SN_NUM) as MAX_SN,min(SN_NUM) as MIN_SN,count(*) as PRO_NUM
-    from o_logistics_detail
-    where
-    sn_num between #{snBegin} and #{snEnd}
-    and status = #{status}
-    <if test="recordStatusList != null">
-      and RECORD_STATUS in
-      <foreach collection="recordStatusList" open="(" close=")" separator="," item="recordStatus">
-        #{recordStatus, jdbcType=SMALLINT}
-      </foreach>
-    </if>
-    <if test="activityId != null">
-      and ACTIVITY_ID = #{activityId}
-    </if>
-    <if test="optId != null">
-      and OPT_ID = #{optId}
-    </if>
-    group by
-      ORDER_ID, LOGISTICS_ID, PRO_ID, PRO_NAME, SETTLEMENT_PRICE, ACTIVITY_ID, ACTIVITY_NAME, AGENT_ID,G_TIME,BUS_ID
-  </select>
-
-  <update id="updateCompensate" parameterType="java.util.Map">
-      update o_logistics_detail
-         set RECORD_STATUS = #{setRecordStatus},
-         OPT_ID = #{refundPriceDiffDetailId}
-      where
-      SN_NUM between #{snBegin} and #{snEnd}
-      and RECORD_STATUS = #{recordStatus}
-      and STATUS = #{status}
-  </update>
-
-  <select id="querySnLList" parameterType="java.util.Map" resultType="java.lang.String">
-      select
-        sn_num
-      from o_logistics_detail
-      where
-      sn_num between #{snBegin} and #{snEnd}
-      and status = #{status} and RECORD_STATUS =#{recordStatus}
-      order by sn_num asc
-  </select>
-
-  <select id="querySnCount" parameterType="java.util.Map" resultType="java.lang.Integer">
-      select
-        count(*)
-      from o_logistics_detail
-      where
-      sn_num between #{snBegin} and #{snEnd}
-      and status = #{status} and RECORD_STATUS =#{recordStatus}
-  </select>
-
-  <select id="selectSn" resultType="map" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
-  select  ID,SN_NUM
-    from O_LOGISTICS_DETAIL where 1=1 and status=#{status} and RECORD_STATUS =#{recordStatus} and TERMINALID_TYPE=#{terminalidType} and SN_NUM=#{snNum}
-  </select>
-
-
-  <select id="getOLogisticsDetailCount" parameterType="java.util.Map" resultType="java.lang.Long">
-    SELECT COUNT(1)
-    FROM O_LOGISTICS_DETAIL detail
-    <include refid="BASE_WHERE_SQL"></include>
-  </select>
-
-  <select id="getOLogisticsDetailList" parameterType="java.util.Map" resultType="java.util.Map">
-    <include refid="PAGING_START" />
-    SELECT  <include refid="Base_Column_List"/>
-    FROM O_LOGISTICS_DETAIL detail
-    <include refid="BASE_WHERE_SQL"/>
-    <include refid="SORTING"/>
-    <include refid="PAGING_END" />
-
-  </select>
-  <sql id="PAGING_START">
-    <if test="begin != null  and end != null and end >0">
-      SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
-    </if>
-  </sql>
-
-  <sql id="PAGING_END">
-    <if test="begin != null  and end != null and end >0">
-      ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN > #{begin}
-    </if>
-  </sql>
-
-  <sql id="BASE_WHERE_SQL">
-    <where>
-      1=1
-      <if test="orderId!=null and orderId!=''"> and detail.ORDER_ID=#{orderId} </if>
-      <if test="snNum!=null and snNum!=''"> and detail.SN_NUM=#{snNum}</if>
-    </where>
-  </sql>
-  <sql id='SORTING'>
-    ORDER BY detail.C_TIME DESC
-  </sql>
-
-  <select id="queryHistoryOrder" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List"/>
-    from o_logistics_detail o
-    where o.opt_type='ORDER' and o.record_status=3
-  </select>
 </mapper>

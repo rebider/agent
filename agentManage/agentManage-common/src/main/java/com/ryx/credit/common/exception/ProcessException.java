@@ -1,9 +1,11 @@
 package com.ryx.credit.common.exception;
 
+import com.ryx.credit.common.util.MailUtil;
+
 /**
  * Created by cx on 2018/5/22.
  */
-public class ProcessException extends RuntimeException {
+public class ProcessException extends RuntimeException{
 
     private String code = "1000";
 
@@ -34,5 +36,9 @@ public class ProcessException extends RuntimeException {
 
     public void setMsg(String msg) {
         this.msg = msg;
+    }
+
+    public String getStackTraceString() {
+        return MailUtil.printStackTrace(this);
     }
 }

@@ -1,5 +1,6 @@
 package com.ryx.credit.common.util;
 
+import com.ryx.credit.common.exception.MessageException;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -12,6 +13,8 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Properties;
 
 /**
@@ -77,5 +80,10 @@ public class MailUtil {
 		return result;   
 	}
 	
-	
+	public static String printStackTrace(Exception e){
+		StringWriter writer = new StringWriter();
+		e.printStackTrace(new PrintWriter(writer,true));
+		return writer.toString();
+	}
+
 }

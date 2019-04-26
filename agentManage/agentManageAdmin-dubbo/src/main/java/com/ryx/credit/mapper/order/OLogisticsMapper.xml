@@ -387,7 +387,7 @@
         LEFT JOIN O_ORDER ORDERS ON L.ORDER_ID=ORDERS.ID
         LEFT JOIN A_AGENT AGENT ON ORDERS.AGENT_ID=AGENT.ID
         left join a_platform c on c.platform_num = ORDERS.order_platform
-        left join o_payment d on d.order_id = o.id
+        left join o_payment d on d.order_id = O.order_id
         left join o_sub_order os on os.order_id=L.order_id and os.pro_id=L.pro_id and os.status=1
         left join o_sub_order_activity oso on oso.sub_order_id=os.id and oso.status=1
         <include refid="BASE_WHERE_SQL"></include>
@@ -404,7 +404,7 @@
         LEFT JOIN O_ORDER ORDERS ON L.ORDER_ID=ORDERS.ID
         LEFT JOIN A_AGENT AGENT ON ORDERS.AGENT_ID=AGENT.ID
         left join a_platform c on c.platform_num = ORDERS.order_platform
-        left join o_payment d on d.order_id = o.id
+        left join o_payment d on d.order_id = O.order_id
         left join o_sub_order os on os.order_id=L.order_id and os.pro_id=L.pro_id and os.status=1
         left join o_sub_order_activity oso on oso.sub_order_id=os.id and oso.status=1
         <include refid="BASE_WHERE_SQL"></include>
