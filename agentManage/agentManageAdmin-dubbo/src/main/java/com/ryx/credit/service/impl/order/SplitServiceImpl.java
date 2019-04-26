@@ -1,6 +1,7 @@
 package com.ryx.credit.service.impl.order;
 
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.MapUtil;
 import com.ryx.credit.dao.order.OLogisticsDetailMapper;
@@ -26,9 +27,12 @@ public class SplitServiceImpl implements SplitService {
     private OLogisticsDetailMapper logisticsDetailMapper;
     @Autowired
     private OLogisticsService logisticsService;
+    @Autowired
+    private RedisService redisService;
+    private static final String APP_SPLIT = "APP_SPLIT";
 
     @Override
-    public List<Map<String,Object>> getOrderMsgByExcel(List<List<Object>> excelList)throws MessageException {
+    public List<Map<String,Object>> getOrderMsgByExcel(List<List<Object>> excelList,String cUser)throws MessageException {
         List<Map<String,Object>> resSeg = new ArrayList<>();
         for (List<Object> excel : excelList) {
             String snBegin = "";
@@ -75,6 +79,14 @@ public class SplitServiceImpl implements SplitService {
                 }
             }
             resSeg.add(aMap);
+        }
+        List<Map<String, Object>> maps = redisService.popListMap(APP_SPLIT+":"+cUser);
+        if(maps.size()!=0){
+            redisService.delete(APP_SPLIT+":"+cUser);
+        }
+        Long count = redisService.pushListMap(APP_SPLIT+":"+cUser, resSeg);
+        if(count==0){
+            throw new MessageException("上传SN失败");
         }
         return resSeg;
     }

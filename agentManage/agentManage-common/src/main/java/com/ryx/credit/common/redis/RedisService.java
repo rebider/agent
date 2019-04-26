@@ -3,6 +3,7 @@ package com.ryx.credit.common.redis;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import com.alibaba.fastjson.JSON;
 import org.springframework.data.redis.core.SessionCallback;
 import redis.clients.jedis.Transaction;
 import redis.clients.jedis.exceptions.JedisException;
+import sun.management.Agent;
 
 public class RedisService {
 
@@ -469,6 +471,59 @@ public class RedisService {
 
     public Set<String> hGet(String key) {
         return (Set) redisTemplate.opsForHash().keys(key);
+    }
+
+    /**
+     * 设置超时时间（秒）
+     * @param key
+     * @param timeout
+     * @return
+     */
+    public Boolean expire(String key,long timeout){
+        return redisTemplate.expire(key, timeout, TimeUnit.SECONDS);
+    }
+
+
+    public Long pushListString(String key,List<String> list) {
+        return redisTemplate.opsForList().leftPushAll(key, list);
+    }
+
+    public Long pushListString(String key,List<String> list,long timeout) {
+        Boolean expire = expire(key, timeout);
+        if(!expire){
+            return 0L;
+        }
+        return redisTemplate.opsForList().leftPushAll(key, list);
+    }
+
+    public List<String> popListString(String key) {
+        return redisTemplate.opsForList().range(key, 0, -1);
+    }
+
+    public Long pushListMap(String key,List<Map<String,Object>> list) {
+        List<String> reqList = new ArrayList<>();
+        for (Map<String, Object> map : list) {
+            reqList.add(JSONObject.toJSONString(map));
+        }
+        return pushListString(key, reqList);
+    }
+
+    public Long pushListMap(String key,List<Map<String,Object>> list,long timeout) {
+        List<String> reqList = new ArrayList<>();
+        for (Map<String, Object> map : list) {
+            reqList.add(JSONObject.toJSONString(map));
+        }
+        return pushListString(key, reqList,timeout);
+    }
+
+    public List<Map<String,Object>>  popListMap(String key) {
+        List<String> strings = popListString(key);
+        List<Map<String,Object>> resultList = new ArrayList<>();
+        for (String string : strings) {
+            JSONObject jsonObject = JSONObject.parseObject(string);
+            resultList.add(jsonObject);
+        }
+        return resultList;
     }
 
 }
