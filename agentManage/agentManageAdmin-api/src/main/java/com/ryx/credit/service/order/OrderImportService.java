@@ -53,6 +53,7 @@ public interface OrderImportService {
      */
     public AgentResult pareseOrder(ImportAgent importAgent,String User)throws MessageException;
 
+
     /**
      * 接卸订单对象
      * @param orderImportBaseInfo
@@ -61,6 +62,7 @@ public interface OrderImportService {
      * @throws Exception
      */
     public AgentResult pareseOrderImportBaseInfo(OrderImportBaseInfo orderImportBaseInfo, String User)throws MessageException;
+
 
     /**
      * 解析生成订单子订单，子订单活动信息
@@ -72,7 +74,6 @@ public interface OrderImportService {
     public AgentResult pareseOrderImportSubOrderInfo(OrderImportBaseInfo orderImportBaseInfo, OOrder order, OPayment oPayment, String User)throws MessageException;
 
 
-
     /**
      * 处理订单物流
      * 处理订单物流
@@ -81,6 +82,7 @@ public interface OrderImportService {
      */
     public AgentResult pareseOrderLogic(String value)throws MessageException;
 
+
     /**
      * 处理退货单
      * @return
@@ -88,8 +90,13 @@ public interface OrderImportService {
      */
     public AgentResult pareseReturn(ImportAgent importAgent,String User)throws MessageException;
 
+
     public AgentResult deleteFailImportAgentReturn(ImportAgent importAgent,String user)throws Exception;
+
+
     public AgentResult deleteFailImportAgentOrder(ImportAgent importAgent,String user)throws Exception;
 
+
+    AgentResult deleteDealstatusImportOrder(String dataId);
 
 }
