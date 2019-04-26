@@ -1,10 +1,13 @@
 package com.ryx.credit.service.impl.agent;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.CapitalFlowMapper;
 import com.ryx.credit.dao.agent.CapitalMapper;
 import com.ryx.credit.dao.agent.PayCompMapper;
@@ -13,6 +16,8 @@ import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.CapitalService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -20,10 +25,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Author Lihl
@@ -32,6 +34,8 @@ import java.util.Map;
  */
 @Service("capitalService")
 public class CapitalServiceImpl implements CapitalService {
+
+    private Logger logger = LoggerFactory.getLogger(CapitalServiceImpl.class);
 
     @Autowired
     private CapitalMapper capitalMapper;
@@ -45,6 +49,8 @@ public class CapitalServiceImpl implements CapitalService {
     private IdService idService;
     @Autowired
     private PayCompMapper payCompMapper;
+    @Autowired
+    private AgentMapper agentMapper;
 
 
     @Override
@@ -157,6 +163,45 @@ public class CapitalServiceImpl implements CapitalService {
         return pageInfo;
     }
 
+
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Override
+    public void profitIncom(String srcId,String capId,BigDecimal amount,String cUser)throws ProcessException{
+        Capital capital = capitalMapper.selectByPrimaryKey(capId);
+        Agent agent = agentMapper.selectByPrimaryKey(capital.getcAgentId());
+        BigDecimal fqInAmount = capital.getcFqInAmount()==null?new BigDecimal(0):capital.getcFqInAmount();
+        capital.setcFqInAmount(fqInAmount.add(amount));
+        if (1!=capitalMapper.updateByPrimaryKeySelective(capital)){
+            logger.info("资金记录抵扣金额更新失败");
+            throw new ProcessException("资金记录抵扣金额更新失败");
+        }
+        Calendar c = Calendar.getInstance();
+        //添加冻结资金流水
+        CapitalFlow capitalFlow = new CapitalFlow();
+        capitalFlow.setId(idService.genId(TabId.A_CAPITAL_FLOW));
+        capitalFlow.setcType(capital.getcType());
+        capitalFlow.setCapitalId(capital.getId());
+        capitalFlow.setSrcType(SrcType.FRHRU.code);
+        //资源类型id为 paymentdetail id
+        capitalFlow.setSrcId(srcId);
+        capitalFlow.setBeforeAmount(fqInAmount);
+        capitalFlow.setcAmount(amount);
+        capitalFlow.setOperationType(OperateTypes.RZ.getValue());
+        capitalFlow.setAgentId(capital.getcAgentId());
+        capitalFlow.setAgentName(agent.getAgName());
+        capitalFlow.setRemark("分润抵扣");
+        capitalFlow.setcTime(c.getTime());
+        capitalFlow.setuTime(c.getTime());
+        capitalFlow.setcUser(cUser);
+        capitalFlow.setuUser(cUser);
+        capitalFlow.setStatus(Status.STATUS_1.status);
+        capitalFlow.setVersion(BigDecimal.ZERO);
+        capitalFlow.setFlowStatus(Status.STATUS_1.status);//未生效
+        if(1!=capitalFlowMapper.insertSelective(capitalFlow)){
+            throw new ProcessException("明细生成失败");
+        }
+
+    }
     /**
      * 冻结扣除资金记录表
      * @param capitalType
@@ -168,12 +213,15 @@ public class CapitalServiceImpl implements CapitalService {
      * @param remark
      * @throws Exception
      */
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public void disposeCapital(String capitalType, BigDecimal amt, String srcId,String cUser,
                                String agentId,String agentName,String remark,SrcType srcType,PayType payType )throws Exception{
 
         //传递进来的扣除金额不能小于0
-        //额度不足 不给扣除
+        if(amt==null || amt.compareTo(BigDecimal.ZERO)<=0){
+            throw new ProcessException("冻结缴款金额错误");
+        }
 
         CapitalExample capitalExample = new CapitalExample();
         CapitalExample.Criteria criteria = capitalExample.createCriteria();
@@ -190,13 +238,18 @@ public class CapitalServiceImpl implements CapitalService {
         for (Capital capital : capitals) {
             BigDecimal fqInAmount = capital.getcFqInAmount();//可用余额
             BigDecimal operationAmt = BigDecimal.ZERO; //当前资金要扣除的金额
-            //当前金额大于要冻结的金额
+            //当前可用金额大于要冻结的金额
             if(fqInAmount.compareTo(residueAmt)>=1){
-                residueAmt = BigDecimal.ZERO;//下一笔需要扣除
-                operationAmt = residueAmt;//当前资金需要冻结的金额
+                //当前资金需要冻结的金额
+                operationAmt = residueAmt;
+                //下一笔需要扣除 为0  因为本次已经全部扣除
+                residueAmt = BigDecimal.ZERO;
+            //当前可用金额小于要冻结的金额
             } else {
-                residueAmt =residueAmt.subtract(fqInAmount);//下一笔需要扣除
+                //全部扣除可用余额
                 operationAmt = fqInAmount; //当前资金需要冻结的金额
+                //下笔要扣除的金额为未扣除 - 全部扣除的可用余额
+                residueAmt =residueAmt.subtract(fqInAmount);//下一笔需要扣除
             }
             //冻结可用余额
             capital.setcFqInAmount(capital.getcFqInAmount().subtract(operationAmt));
@@ -232,6 +285,56 @@ public class CapitalServiceImpl implements CapitalService {
                 break;
             }
         }
+
+        if (residueAmt.compareTo(BigDecimal.ZERO) == 1) {
+            throw new ProcessException("缴款金额不足，无法进行全额冻结");
+        }
+    }
+
+
+    /**
+     * 将冻结金额恢复
+     * @param capitalType
+     * @param amt
+     * @param srcId
+     * @param cUser
+     * @param agentId
+     * @param agentName
+     * @param remark
+     * @param srcType
+     * @param payType
+     * @throws Exception
+     */
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Override
+    public void unDisposeCapital(String capitalType, BigDecimal amt, String srcId,String cUser,
+                               String agentId,String agentName,String remark,SrcType srcType,PayType payType )throws Exception{
+        CapitalFlowExample capitalFlowExample = new CapitalFlowExample();
+        CapitalFlowExample.Criteria criteria1 = capitalFlowExample.createCriteria();
+        criteria1.andStatusEqualTo(Status.STATUS_1.status);
+        criteria1.andFlowStatusEqualTo(Status.STATUS_0.status);
+        criteria1.andSrcIdEqualTo(srcId);
+        criteria1.andSrcTypeEqualTo(srcType.code);
+        List<CapitalFlow> capitalFlows = capitalFlowMapper.selectByExample(capitalFlowExample);
+        for (CapitalFlow capitalFlow : capitalFlows) {
+            //解冻
+            Capital capital = capitalMapper.selectByPrimaryKey(capitalFlow.getCapitalId());
+            capital.setFreezeAmt(capital.getFreezeAmt().subtract(capitalFlow.getcAmount()));
+            capital.setcFqInAmount(capital.getcFqInAmount().add(capitalFlow.getcAmount()));
+            int i = capitalMapper.updateByPrimaryKeySelective(capital);
+            if(i!=1){
+                throw new MessageException("通过更新冻结金额失败！");
+            }
+            //删除资金流水
+            logger.info("删除资金流水:{}", JSONObject.toJSONString(capitalFlow));
+            CapitalFlowExample example = new CapitalFlowExample();
+            example.or().andIdEqualTo(capitalFlow.getId());
+            int j = capitalFlowMapper.deleteByExample(example);
+            if(j!=1){
+                throw new MessageException("通过更新资金流水记录失败！");
+            }
+
+        }
     }
 
     /**
@@ -243,7 +346,7 @@ public class CapitalServiceImpl implements CapitalService {
      */
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
-    public void approvedDeduct(String srcId,SrcType srcType,String uUser)throws Exception{
+    public List<CapitalFlow> approvedDeduct(String srcId,SrcType srcType,String uUser)throws Exception{
         CapitalFlowExample capitalFlowExample = new CapitalFlowExample();
         CapitalFlowExample.Criteria criteria1 = capitalFlowExample.createCriteria();
         criteria1.andStatusEqualTo(Status.STATUS_1.status);
@@ -266,6 +369,7 @@ public class CapitalServiceImpl implements CapitalService {
                 throw new MessageException("通过更新冻结金额失败！");
             }
         }
+        return capitalFlows;
     }
 
     /**
@@ -277,7 +381,7 @@ public class CapitalServiceImpl implements CapitalService {
      */
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
-    public void refuseUnfreeze(String srcId,SrcType srcType,String uUser)throws Exception{
+    public List<CapitalFlow> refuseUnfreeze(String srcId,SrcType srcType,String uUser)throws Exception{
         CapitalFlowExample capitalFlowExample = new CapitalFlowExample();
         CapitalFlowExample.Criteria criteria1 = capitalFlowExample.createCriteria();
         criteria1.andStatusEqualTo(Status.STATUS_1.status);
@@ -294,6 +398,7 @@ public class CapitalServiceImpl implements CapitalService {
                 throw new MessageException("通过更新冻结金额失败！");
             }
         }
+        return capitalFlows;
     }
 
 }
