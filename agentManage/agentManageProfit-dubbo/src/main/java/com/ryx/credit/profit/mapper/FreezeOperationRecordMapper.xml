@@ -341,4 +341,14 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <!--====================================以上代码自动生产，请勿更改=================================-->
+
+  <update id="updateByFreezeAgentId" parameterType="java.lang.String">
+    update P_FREEZE_OPERATION_RECORD b set b.STATUS='0',b.THAW_BATCH=null,THAW_REASON=null,THAW_OPERATOR=null,THAW_TIME=null
+    where b.AGENT_ID in (select AGENT_ID from P_FREEZE_AGENT where P_FREEZE_AGENT.ID=#{freezeAgentId})
+        and b.PARENT_AGENT_ID in (select PARENT_AGENT_ID from P_FREEZE_AGENT where P_FREEZE_AGENT.ID=#{freezeAgentId})
+        and b.THAW_BATCH in (select THAW_BATCH from P_FREEZE_AGENT where P_FREEZE_AGENT.ID=#{freezeAgentId})
+        and b.FREEZE_TYPE in (select FREEZE_TYPE from P_FREEZE_AGENT where P_FREEZE_AGENT.ID=#{freezeAgentId})
+  </update>
 </mapper>

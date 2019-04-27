@@ -13,6 +13,18 @@
     <result column="REV1" jdbcType="VARCHAR" property="rev1" />
     <result column="REV2" jdbcType="VARCHAR" property="rev2" />
   </resultMap>
+  <resultMap id="BaseResultMap1" type="com.ryx.credit.profit.pojo.FreezeAgent">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="PARENT_AGENT_NAME" jdbcType="VARCHAR" property="parentAgentName" />
+    <result column="PARENT_AGENT_ID" jdbcType="VARCHAR" property="parentAgentId" />
+    <result column="FREEZE_TYPE" jdbcType="CHAR" property="freezeType" />
+    <result column="STATUS" jdbcType="CHAR" property="status" />
+    <result column="OPERATION_BATCH" jdbcType="VARCHAR" property="operationBatch" />
+    <result column="REV1" jdbcType="VARCHAR" property="rev1" />
+    <result column="FREEZE_AMT" jdbcType="VARCHAR" property="rev2" />
+  </resultMap>
   <sql id="Example_Where_Clause">
     <where>
       <foreach collection="oredCriteria" item="criteria" separator="or">
@@ -851,14 +863,9 @@ select count(*) from(
     )
   </select>
 
-
-
-
-  <select id="selectAllFreezeWithSubordinate" resultMap="BaseResultMap">
+  <select id="selectAllFreezeWithSubordinate" resultMap="BaseResultMap1">
     <include refid="OracleDialectPrefix" />
-    <if test="orgId!=null and orgId!=''">
-        select aa.*,pfor.FREEZE_AMT from (
-    </if>
+    select aa.*,pfor.FREEZE_AMT from (
     select
     <include refid="Base_Column_List"/>  from P_FREEZE_AGENT start with STATUS='1'
     <if test="freezeAgent.agentId!=null and freezeAgent.agentId!=''">
@@ -874,9 +881,9 @@ select count(*) from(
       and PARENT_AGENT_NAME=#{freezeAgent.parentAgentName,jdbcType=VARCHAR}
     </if>
     CONNECT BY  PRIOR AGENT_ID=PARENT_AGENT_ID and STATUS='1'
-      <if test="orgId!=null and orgId!=''">
          ) aa left join A_AGENT on aa.AGENT_ID = A_AGENT.ID
-        left join P_FREEZE_OPERATION_RECORD pfor on aa.AGENT_ID=pfor.AGENT_ID and aa.PARENT_AGENT_ID=pfor.PARENT_AGENT_ID and aa.FREEZE_TYPE=pfor.FREEZE_TYPE and aa.OPERATION_BATCH=pfor.THAW_OPERATOR
+        left join P_FREEZE_OPERATION_RECORD pfor on aa.AGENT_ID=pfor.AGENT_ID and aa.PARENT_AGENT_ID=pfor.PARENT_AGENT_ID and aa.FREEZE_TYPE=pfor.FREEZE_TYPE and aa.OPERATION_BATCH=FREEZE_BATCH
+      <if test="orgId!=null and orgId!=''">
           where A_AGENT.AG_DOC_PRO= #{orgId}
       </if>
 
@@ -910,10 +917,10 @@ select count(*) from(
     )
   </select>
 
-  <select id="selectByExampleWithCity" resultMap="BaseResultMap">
+  <select id="selectByExampleWithCity" resultMap="BaseResultMap1">
     <include refid="OracleDialectPrefix" />
     select pfa.*,pfor.FREEZE_AMT from P_FREEZE_AGENT pfa left join A_AGENT a on pfa.AGENT_ID=a.ID
-    left join P_FREEZE_OPERATION_RECORD pfor on pfa.AGENT_ID=pfor.AGENT_ID and pfa.PARENT_AGENT_ID=pfor.PARENT_AGENT_ID and pfa.FREEZE_TYPE=pfor.FREEZE_TYPE and pfa.OPERATION_BATCH=pfor.THAW_OPERATOR
+    left join P_FREEZE_OPERATION_RECORD pfor on pfa.AGENT_ID=pfor.AGENT_ID and pfa.PARENT_AGENT_ID=pfor.PARENT_AGENT_ID and pfa.FREEZE_TYPE=pfor.FREEZE_TYPE and pfa.OPERATION_BATCH=FREEZE_BATCH
     where pfa.STATUS='1'
     <if test="orgId!=null and orgId!=''">
       and a.AG_DOC_PRO= #{orgId}
@@ -953,4 +960,24 @@ select count(*) from(
         </if>
     )
   </select>
+
+  <select id="getThawDataByBatch" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select pfa.ID, pfa.AGENT_NAME, pfa.AGENT_ID, pfa.PARENT_AGENT_NAME, pfa.PARENT_AGENT_ID, pfa.FREEZE_TYPE, pfa.STATUS,
+    pfa.OPERATION_BATCH, pfor.FREEZE_AMT as REV1, pfor.OPERATION_TIME as REV2
+    from P_FREEZE_AGENT pfa
+    left join P_FREEZE_OPERATION_RECORD pfor on pfa.AGENT_ID=pfor.AGENT_ID and pfa.PARENT_AGENT_ID=pfor.PARENT_AGENT_ID and pfa.FREEZE_TYPE=pfor.FREEZE_TYPE and pfa.REV1=THAW_BATCH
+    where pfa.REV1=#{batch}
+  </select>
+
+  <select id="getThawOperator" parameterType="java.lang.String" resultType="java.util.Map">
+      select distinct THAW_OPERATOR,THAW_TIME,THAW_REASON from P_FREEZE_OPERATION_RECORD where THAW_BATCH=#{batch}
+  </select>
+
+  <update id="updateThawAgentByBatch">
+        update P_FREEZE_AGENT set STATUS=#{status} where REV1=#{batch}
+  </update>
+
+  <update id="delteThawOperationById" parameterType="java.lang.String">
+    update P_FREEZE_AGENT set STATUS='1',REV1=null where ID=#{freezeAgentId}
+  </update>
 </mapper>
