@@ -7,10 +7,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.FreezeAgentMapper;
 import com.ryx.credit.profit.dao.FreezeOperationRecordMapper;
-import com.ryx.credit.profit.pojo.FreezeAgent;
-import com.ryx.credit.profit.pojo.FreezeAgentExample;
-import com.ryx.credit.profit.pojo.FreezeOperationRecord;
-import com.ryx.credit.profit.pojo.ProfitDetailMonth;
+import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.IFreezeAgentSercice;
 import com.ryx.credit.profit.service.ProfitDetailMonthService;
 import com.ryx.credit.service.dict.IdService;
@@ -102,7 +99,12 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
                        profitDetailMonth.setAgentId(freezeOperationRecord.getAgentId());
                        profitDetailMonth.setParentAgentId(freezeOperationRecord.getParentAgentId());
                        profitDetailMonth.setProfitDate(LocalDate.now().plusMonths(-1).toString().substring(0, 7).replaceAll("-", ""));
+
                        profitDetailMonth1 =  profitDetailMonthService.selectByIdAndParent(profitDetailMonth);
+                       if(profitDetailMonth1==null){
+                           logger.info("此代理商"+freezeOperationRecord.getAgentId()+"没有月份润");
+                           continue;
+                       }
                        profitDetailMonth1.setStatus("1");
                        profitDetailMonthService.updateByPrimaryKeySelective(profitDetailMonth1);
                        freezeOperationRecord.setFreezeAmt(profitDetailMonth1.getBasicsProfitAmt());
@@ -185,8 +187,29 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
        }
 
     }
-
-
+@Override
+    public List<FreezeOperationRecord> getCheckHistoryDate(FreezeOperationRecord freezeOperationRecord){
+        FreezeOperationRecordExample freezeOperationRecordExample = new FreezeOperationRecordExample();
+        FreezeOperationRecordExample.Criteria criteria = freezeOperationRecordExample.createCriteria();
+        if(StringUtils.isNotBlank(freezeOperationRecord.getAgentId()) && !"undefined".equals(freezeOperationRecord.getAgentId())){
+            criteria.andAgentIdEqualTo(freezeOperationRecord.getAgentId());
+        }
+        if(StringUtils.isNotBlank(freezeOperationRecord.getParentAgentId())&& !"undefined".equals(freezeOperationRecord.getParentAgentId())){
+            criteria.andParentAgentIdEqualTo(freezeOperationRecord.getParentAgentId());
+        }
+        if(StringUtils.isNotBlank(freezeOperationRecord.getFreezeBatch())&& !"undefined".equals(freezeOperationRecord.getFreezeBatch())){
+            criteria.andFreezeBatchEqualTo(freezeOperationRecord.getFreezeBatch());
+        }
+        if(StringUtils.isNotBlank(freezeOperationRecord.getThawBatch())&& !"undefined".equals(freezeOperationRecord.getThawBatch())){
+            criteria.andThawBatchEqualTo(freezeOperationRecord.getThawBatch());
+        }
+        if(StringUtils.isNotBlank(freezeOperationRecord.getFreezeType())&& !"undefined".equals(freezeOperationRecord.getFreezeType())){
+            criteria.andFreezeTypeEqualTo(freezeOperationRecord.getFreezeType());
+        }
+        freezeOperationRecordExample.setOrderByClause("OPERATION_TIME desc");
+         List<FreezeOperationRecord> freezeOperationRecords =freezeOperationRecordMapper.selectByExample(freezeOperationRecordExample);
+    return freezeOperationRecords;
+}
 
 
 
