@@ -59,7 +59,7 @@ public interface AgentService {
      */
     public AgentResult checkAgentIsIn(String agentId);
 
-    PageInfo queryAgentTierList(Page page, Agent agent, Long userId);
+    PageInfo queryAgentTierList(Page page, Agent agent, Long userId,String dataType);
 
     /**
      * 代理商解冻
