@@ -141,6 +141,9 @@ public class ActivityServiceImpl implements ActivityService {
             List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(approvalPerson));
             String approvalDep = String.valueOf(orgCodeRes.get(0).get("ORGID"));
             ActRuTask actRuTask = actRuTaskService.selectByPrimaryKey(taskId);
+            if (null== actRuTask){
+                throw new ProcessException("任务不存在或者已经被处理！");
+            }
             String procInstId = String.valueOf(actRuTask.getProcInstId());
             String taskName = String.valueOf(actRuTask.getName());
             BusActRel busActRel = busActRelService.findById(procInstId);
