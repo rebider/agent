@@ -12,4 +12,6 @@ public interface SplitService {
 
     List<Map<String,Object>> getOrderMsgByExcel(List<List<Object>> excelList,String cUser)throws MessageException;
 
+    List<Map<String, Object>> exportSplit(String exportType,String cUser)throws MessageException;
+
 }
