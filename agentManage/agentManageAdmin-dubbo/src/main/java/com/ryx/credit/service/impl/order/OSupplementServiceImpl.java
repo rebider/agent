@@ -3,6 +3,7 @@ package com.ryx.credit.service.impl.order;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -361,7 +362,10 @@ public class OSupplementServiceImpl implements OSupplementService {
                 logger.error(result.getMsg());
                 throw new MessageException("工作流处理任务异常");
             }
-        } catch (MessageException e) {
+        } catch (MessageException | ProcessException e) {
+            e.printStackTrace();
+            throw new MessageException("catch工作流处理任务异常!"+e.getLocalizedMessage());
+        }catch (Exception e) {
             e.printStackTrace();
             throw new MessageException("catch工作流处理任务异常!");
         }

@@ -2,6 +2,7 @@ package com.ryx.credit.activity.service.impl;
 
 import com.ryx.credit.activity.entity.ActRuTask;
 import com.ryx.credit.common.enumc.Status;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.FastMap;
@@ -168,7 +169,15 @@ public class ActivityServiceImpl implements ActivityService {
             rs.put("rs",true);
             rs.put("msg","success");
             upFlowRecord.setActivityStatus(Status.STATUS_1.status);
-        } catch (Exception e) {
+        } catch (MessageException | ProcessException e) {
+            logger.error("completeTask error", e);
+            rs.put("rs",false);
+            rs.put("msg",e.getLocalizedMessage());
+            upFlowRecord.setStatus(Status.STATUS_0.status);
+            upFlowRecord.setActivityStatus(Status.STATUS_0.status);
+            upFlowRecord.setErrorMsg(e.getLocalizedMessage());
+            throw new ProcessException(e.getLocalizedMessage());
+        }catch (Exception e) {
             logger.error("completeTask error", e);
             rs.put("rs",false);
             rs.put("msg",e.getMessage());
