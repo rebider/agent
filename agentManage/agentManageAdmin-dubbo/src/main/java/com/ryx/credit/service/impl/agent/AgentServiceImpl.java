@@ -528,9 +528,10 @@ public class AgentServiceImpl implements AgentService {
         reqMap.put("orgId",orgId);
         reqMap.put("userId",userId);
         reqMap.put("status",Status.STATUS_1.status);
-        if(StringUtils.isNotBlank(agent.getAgStatus())){
-            reqMap.put("agStatus",agent.getAgStatus());
-        }
+//        if(StringUtils.isNotBlank(agent.getAgStatus())){
+//            reqMap.put("agStatus",agent.getAgStatus());
+//        }
+        reqMap.put("agStatus",AgStatus.Approved.getValue());
         if(StringUtils.isNotBlank(agent.getAgUniqNum())){
             reqMap.put("agUniqNum",agent.getAgUniqNum());
         }
