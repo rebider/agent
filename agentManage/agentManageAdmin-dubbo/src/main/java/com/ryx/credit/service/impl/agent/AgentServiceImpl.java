@@ -516,7 +516,7 @@ public class AgentServiceImpl implements AgentService {
      * @return
      */
     @Override
-    public PageInfo queryAgentTierList(Page page, Agent agent, Long userId) {
+    public PageInfo queryAgentTierList(Page page, Agent agent, Long userId,String dataType) {
 
         List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
         if(orgCodeRes==null && orgCodeRes.size()!=1){
@@ -528,10 +528,9 @@ public class AgentServiceImpl implements AgentService {
         reqMap.put("orgId",orgId);
         reqMap.put("userId",userId);
         reqMap.put("status",Status.STATUS_1.status);
-//        if(StringUtils.isNotBlank(agent.getAgStatus())){
-//            reqMap.put("agStatus",agent.getAgStatus());
-//        }
-        reqMap.put("agStatus",AgStatus.Approved.getValue());
+        if(StringUtils.isNotBlank(agent.getAgStatus())){
+            reqMap.put("agStatus",agent.getAgStatus());
+        }
         if(StringUtils.isNotBlank(agent.getAgUniqNum())){
             reqMap.put("agUniqNum",agent.getAgUniqNum());
         }
@@ -539,8 +538,12 @@ public class AgentServiceImpl implements AgentService {
             reqMap.put("agName",agent.getAgName());
         }
         List<String> agStatusList = new ArrayList<>();
-        agStatusList.add(AgStatus.Approving.name());
-        agStatusList.add(AgStatus.Approved.name());
+        if(dataType.equals("pass")){
+            agStatusList.add(AgStatus.Approved.name());
+        }else{
+            agStatusList.add(AgStatus.Approving.name());
+            agStatusList.add(AgStatus.Approved.name());
+        }
         reqMap.put("agStatusList",agStatusList);
         List<Agent> list = agentMapper.queryAgentTierList(reqMap,page);
         PageInfo pageInfo = new PageInfo();
