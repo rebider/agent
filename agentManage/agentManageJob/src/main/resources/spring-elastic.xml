@@ -79,6 +79,15 @@
                 sharding-total-count="1"
                 sharding-item-parameters="0=Server0"/>
 
+    <job:simple id="transferLogisticsHistoryJob"
+                job-ref="transferLogisticsHistoryJob"
+                registry-center-ref="regCenter"
+                cron="0 0 5 28 * ? "
+                overwrite="true"
+                description="物流明细历史记录移动到历史表"
+                sharding-total-count="1"
+                sharding-item-parameters="0=Server0"/>
+
     <!--<job:simple id="completAllAgentBusInfoCompany"-->
                 <!--job-ref="completAllAgentBusInfoCompanyJob"-->
                 <!--registry-center-ref="regCenter"-->

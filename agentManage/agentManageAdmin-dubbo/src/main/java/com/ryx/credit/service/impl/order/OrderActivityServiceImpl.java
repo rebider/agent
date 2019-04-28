@@ -478,7 +478,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             try {
                 AgentResult agentResult = termMachineService.querySnMsg(PlatformType.POS,snStart, snEnd);
                 if(!agentResult.isOK()){
-                    throw new MessageException("查询pos失败");
+                    throw new MessageException("未找到sn信息,请检查sn是否有效!");
                 }
                 logger.info("根据sn查询业务系统返回:"+agentResult.getMsg());
                 JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
@@ -564,7 +564,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                         .putKeyV("modelType",modelType.getdItemvalue());
             } catch (Exception e) {
                 e.printStackTrace();
-                throw new MessageException("sn信息查询异常:"+e.getMessage());
+                throw new MessageException(e.getMessage());
             }
         }
         AgentResult agentResult = AgentResult.ok();

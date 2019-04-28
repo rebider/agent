@@ -10,6 +10,6 @@ import java.util.Map;
  */
 public interface SplitService {
 
-    List<Map<String,Object>> getOrderMsgByExcel(List<List<Object>> excelList)throws MessageException;
+    List<Map<String,Object>> getOrderMsgByExcel(List<List<Object>> excelList,String cUser)throws MessageException;
 
 }

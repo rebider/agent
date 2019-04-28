@@ -143,7 +143,7 @@ public class OldCompensateServiceImpl implements OldCompensateService {
             activityCriteria.andEndTimeGreaterThanOrEqualTo(date);
             List<OActivity> oActivities = activityMapper.selectByExample(oActivityExample);
             if(oActivities.size()==0){
-                throw new MessageException(snBegin+"到"+snEnd+":无可变更活动");
+                throw new MessageException(snBegin+"到"+snEnd+":无可变更活动,当前活动"+oActivity.getActivityName());
             }
             resultMap.put("changeActivitys",oActivities); //可变更的活动
             resultList.add(resultMap);
