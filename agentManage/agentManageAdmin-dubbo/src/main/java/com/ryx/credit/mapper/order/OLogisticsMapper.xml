@@ -57,8 +57,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, ORDER_ID, SRC_ID, RECEIPT_PLAN_ID, PRO_COM, PRO_ID, PRO_NAME, PRO_TYPE, SEND_NUM, 
-    PRO_PRICE, PRO_MODEL, SEND_DATE, LOG_COM, W_NUMBER, ISDEALL, SN_BEGIN_NUM, SN_END_NUM, 
+    ID, ORDER_ID, SRC_ID, RECEIPT_PLAN_ID, PRO_COM, PRO_ID, PRO_NAME, PRO_TYPE, SEND_NUM,
+    PRO_PRICE, PRO_MODEL, SEND_DATE, LOG_COM, W_NUMBER, ISDEALL, SN_BEGIN_NUM, SN_END_NUM,
     LOG_TYPE, C_TIME, C_USER, STATUS, SEND_STATUS, SEND_MSG, VERSION
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsExample" resultMap="BaseResultMap">
@@ -78,7 +78,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from O_LOGISTICS
     where ID = #{id,jdbcType=VARCHAR}
@@ -90,22 +90,22 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OLogistics">
-    insert into O_LOGISTICS (ID, ORDER_ID, SRC_ID, 
-      RECEIPT_PLAN_ID, PRO_COM, PRO_ID, 
-      PRO_NAME, PRO_TYPE, SEND_NUM, 
-      PRO_PRICE, PRO_MODEL, SEND_DATE, 
-      LOG_COM, W_NUMBER, ISDEALL, 
-      SN_BEGIN_NUM, SN_END_NUM, LOG_TYPE, 
-      C_TIME, C_USER, STATUS, 
+    insert into O_LOGISTICS (ID, ORDER_ID, SRC_ID,
+      RECEIPT_PLAN_ID, PRO_COM, PRO_ID,
+      PRO_NAME, PRO_TYPE, SEND_NUM,
+      PRO_PRICE, PRO_MODEL, SEND_DATE,
+      LOG_COM, W_NUMBER, ISDEALL,
+      SN_BEGIN_NUM, SN_END_NUM, LOG_TYPE,
+      C_TIME, C_USER, STATUS,
       SEND_STATUS, SEND_MSG, VERSION
       )
-    values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{srcId,jdbcType=VARCHAR}, 
-      #{receiptPlanId,jdbcType=VARCHAR}, #{proCom,jdbcType=VARCHAR}, #{proId,jdbcType=VARCHAR}, 
-      #{proName,jdbcType=VARCHAR}, #{proType,jdbcType=VARCHAR}, #{sendNum,jdbcType=DECIMAL}, 
-      #{proPrice,jdbcType=DECIMAL}, #{proModel,jdbcType=VARCHAR}, #{sendDate,jdbcType=TIMESTAMP}, 
-      #{logCom,jdbcType=VARCHAR}, #{wNumber,jdbcType=VARCHAR}, #{isdeall,jdbcType=DECIMAL}, 
-      #{snBeginNum,jdbcType=VARCHAR}, #{snEndNum,jdbcType=VARCHAR}, #{logType,jdbcType=VARCHAR}, 
-      #{cTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, 
+    values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{srcId,jdbcType=VARCHAR},
+      #{receiptPlanId,jdbcType=VARCHAR}, #{proCom,jdbcType=VARCHAR}, #{proId,jdbcType=VARCHAR},
+      #{proName,jdbcType=VARCHAR}, #{proType,jdbcType=VARCHAR}, #{sendNum,jdbcType=DECIMAL},
+      #{proPrice,jdbcType=DECIMAL}, #{proModel,jdbcType=VARCHAR}, #{sendDate,jdbcType=TIMESTAMP},
+      #{logCom,jdbcType=VARCHAR}, #{wNumber,jdbcType=VARCHAR}, #{isdeall,jdbcType=DECIMAL},
+      #{snBeginNum,jdbcType=VARCHAR}, #{snEndNum,jdbcType=VARCHAR}, #{logType,jdbcType=VARCHAR},
+      #{cTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
       #{sendStatus,jdbcType=DECIMAL}, #{sendMsg,jdbcType=VARCHAR}, #{version,jdbcType=DECIMAL}
       )
   </insert>
@@ -370,7 +370,7 @@
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
@@ -462,50 +462,56 @@
 
 
   <select id="getOrderAndLogisticsBySn" resultType="java.util.Map" parameterType="java.lang.String">
-    select
-    detail.order_id as orderId,
-    detail.order_num as orderNum,
-    logi.id as logisticsId,
-    detail.pro_id as proId,
-    detail.pro_name as proName,
-    logi.pro_type as proType,
-    detail.settlement_price as proPrice,
-    logi.pro_MODEL as proModel,
-    logi.Log_type as logType,
-    detail.agent_id as agentId,
-    logi.pro_com as proCom,
-    detail.sn_num as sn,
-    logi.Receipt_plan_id as receiptId
-    from o_logistics_detail detail,O_LOGISTICS logi
-    where detail.sn_num = #{SN,jdbcType=VARCHAR}
-    and detail.status = '1'
-    and detail.record_status = '1'
-    and detail.agent_id = #{agentId,jdbcType=VARCHAR}
-    and detail.logistics_id=logi.ID
+        select
+            detail.order_id as orderId,
+            detail.order_num as orderNum,
+            logi.id as logisticsId,
+            detail.pro_id as proId,
+            detail.pro_name as proName,
+            oact.pro_type as proType,
+            detail.settlement_price as proPrice,
+            oact.pro_model as proModel,
+            logi.Log_type as logType,
+            detail.agent_id as agentId,
+            oact.vender as proCom,
+            detail.sn_num as sn,
+            logi.Receipt_plan_id as receiptId,
+            detail.activity_id as actId,
+            detail.activity_name as actName
+        from o_logistics_detail detail,O_LOGISTICS logi,o_activity oact
+        where detail.sn_num = #{SN,jdbcType=VARCHAR}
+        and detail.status = '1'
+        and detail.record_status = '1'
+        and detail.agent_id = #{agentId,jdbcType=VARCHAR}
+        and detail.logistics_id=logi.ID
+        and oact.id = detail.activity_id
   </select>
 
   <select id="getOrderAndLogisticsBySns" resultType="java.util.Map" parameterType="java.lang.String">
     select
-    detail.order_id as orderId,
-    detail.order_num as orderNum,
-    logi.id as logisticsId,
-    logi.pro_type as proType,
-    detail.pro_id as proId,
-    detail.pro_name as proName,
-    detail.settlement_price as proPrice,
-    logi.pro_MODEL as proModel,
-    logi.Log_type as logType,
-    detail.agent_id as agentId,
-    logi.pro_com as proCom,
-    detail.sn_num as sn,
-    logi.Receipt_plan_id as receiptId
-    from o_logistics_detail detail,O_LOGISTICS logi
+        detail.order_id as orderId,
+        detail.order_num as orderNum,
+        logi.id as logisticsId,
+        detail.pro_id as proId,
+        detail.pro_name as proName,
+        oact.pro_type as proType,
+        detail.settlement_price as proPrice,
+        oact.pro_model as proModel,
+        logi.Log_type as logType,
+        detail.agent_id as agentId,
+        oact.vender as proCom,
+        detail.sn_num as sn,
+        logi.Receipt_plan_id as receiptId,
+        detail.activity_id as actId,
+        detail.activity_name as actName
+    from o_logistics_detail detail,O_LOGISTICS logi,o_activity oact
     where
     <![CDATA[detail.sn_num >= #{startSn,jdbcType=VARCHAR} and detail.sn_num <= #{endSn,jdbcType=VARCHAR}]]>
     and detail.status = '1'
     and detail.record_status = '1'
     and detail.agent_id = #{agentId,jdbcType=VARCHAR}
     and detail.logistics_id=logi.ID
+    and oact.id = detail.activity_id
     order by detail.order_id asc , detail.pro_id asc, detail.sn_num asc
   </select>
 

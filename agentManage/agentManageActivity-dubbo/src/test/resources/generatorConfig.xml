@@ -58,5 +58,7 @@
 		<table tableName="o_logistics" domainObjectName="OLogistics" enableUpdateByExample="false"
 		enableDeleteByPrimaryKey="false"/>
 
+		<table tableName="O_RETURN_ORDER_DETAIL" domainObjectName="OReturnOrderDetail" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false"/>
 	</context>
 </generatorConfiguration>

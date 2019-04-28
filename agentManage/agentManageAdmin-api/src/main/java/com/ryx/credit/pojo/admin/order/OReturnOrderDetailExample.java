@@ -1,6 +1,7 @@
 package com.ryx.credit.pojo.admin.order;
 
 import com.ryx.credit.common.util.Page;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1974,6 +1975,76 @@ public class OReturnOrderDetailExample {
 
         public Criteria andVersionNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("VERSION not between", value1, value2, "version");
+            return (Criteria) this;
+        }
+
+        public Criteria andActidIsNull() {
+            addCriterion("ACTID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActidIsNotNull() {
+            addCriterion("ACTID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActidEqualTo(String value) {
+            addCriterion("ACTID =", value, "actid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActidNotEqualTo(String value) {
+            addCriterion("ACTID <>", value, "actid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActidGreaterThan(String value) {
+            addCriterion("ACTID >", value, "actid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActidGreaterThanOrEqualTo(String value) {
+            addCriterion("ACTID >=", value, "actid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActidLessThan(String value) {
+            addCriterion("ACTID <", value, "actid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActidLessThanOrEqualTo(String value) {
+            addCriterion("ACTID <=", value, "actid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActidLike(String value) {
+            addCriterion("ACTID like", value, "actid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActidNotLike(String value) {
+            addCriterion("ACTID not like", value, "actid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActidIn(List<String> values) {
+            addCriterion("ACTID in", values, "actid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActidNotIn(List<String> values) {
+            addCriterion("ACTID not in", values, "actid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActidBetween(String value1, String value2) {
+            addCriterion("ACTID between", value1, value2, "actid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActidNotBetween(String value1, String value2) {
+            addCriterion("ACTID not between", value1, value2, "actid");
             return (Criteria) this;
         }
     }
