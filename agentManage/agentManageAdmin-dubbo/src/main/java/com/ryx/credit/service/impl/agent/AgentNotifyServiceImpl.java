@@ -775,6 +775,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
         } catch (Exception e) {
             log.info("入网开户修改操作: 通知pos手刷http请求异常:{}",e.getMessage());
             record.setNotifyCount(new BigDecimal(1));
+            record.setNotifyJson(e.getLocalizedMessage());
             result = AgentResult.fail(e.getLocalizedMessage());
         }
         if(null!=result && !"".equals(result) && result.isOK()){
@@ -830,8 +831,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
             updateAgent.setcUtime(nowDate);
             int upResult1 = agentMapper.updateByPrimaryKeySelective(updateAgent);
             log.info("入网开户修改操作: 接收入网更新入网状态,业务id：{},upResult1:{}",upResult1);
-
-
             //更新任务记录
             if(upResult1!=1 || upResult2!=1){
                 if(impId!=null) {
@@ -999,7 +998,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
                         JSONObject respXMLObj = JSONObject.parseObject(respXML);
                         AppConfig.sendEmails(respXML, "入网通知POS失败报警:"+respXMLObj.get("respMsg"));
                         log.info("http请求超时返回错误:{}",respXML);
-                        return AgentResult.fail(respXMLObj.get("respMsg")+"");
+                        return AgentResult.fail(respXML);
                     }else{
                         AppConfig.sendEmails(respXML, "入网通知POS失败报警:"+respXML);
                         log.info("http请求超时返回错误:{}",respXML);
