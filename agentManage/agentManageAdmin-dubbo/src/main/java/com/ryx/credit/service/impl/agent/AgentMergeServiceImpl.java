@@ -1510,7 +1510,8 @@ public class AgentMergeServiceImpl  implements AgentMergeService {
         BigDecimal orderDebt = orderService.queryAgentDebt(agentId);
         logger.info("代理商合并查询订单欠款：代理商id:{},欠款：{}",agentId,orderDebt);
         BigDecimal bigDecimal = profitDebt(agentId);
-        return orderDebt.add(bigDecimal);
+        BigDecimal capitalFRDK = getCapitalFRDK(agentId);
+        return orderDebt.add(bigDecimal).add(capitalFRDK);
     }
 
     /**
@@ -1560,7 +1561,6 @@ public class AgentMergeServiceImpl  implements AgentMergeService {
      */
     @Override
     public BigDecimal getCapitalDebt(String agentId){
-
         Map<String,Object> reqMap = new HashMap<>();
         reqMap.put("agentId",agentId);
         List<String> typeList = new ArrayList<>();
@@ -1568,8 +1568,9 @@ public class AgentMergeServiceImpl  implements AgentMergeService {
         reqMap.put("paymentTypes",typeList);
         BigDecimal orderDebt = paymentMapper.queryAgentDebtByType(reqMap);
         logger.info("代理商合并查询订单欠款：代理商id:{},欠款：{}",agentId,orderDebt);
+        BigDecimal capitalFRDK = getCapitalFRDK(agentId);
 //        BigDecimal bigDecimal = profitDebt(agentId);
-        return orderDebt;
+        return orderDebt.add(capitalFRDK);
     }
 
 
@@ -1589,5 +1590,15 @@ public class AgentMergeServiceImpl  implements AgentMergeService {
         }
         String owminvoice = String.valueOf(resultMap.get("OWMINVOICE"));
         return new BigDecimal(owminvoice);
+    }
+
+
+    @Override
+    public BigDecimal getCapitalFRDK(String agentId) {
+        Map<String,Object> reqMap = new HashMap<>();
+        reqMap.put("cAgentId", agentId);
+        BigDecimal ffdk = paymentMapper.queryAgentJNKQK(reqMap);
+        logger.info("查询ffdk：代理商id:{},ffdk：{}", agentId, ffdk);
+        return ffdk;
     }
 }

@@ -510,4 +510,10 @@
     </if>
   </select>
 
+  <select id="queryAgentJNKQK" parameterType="map" resultType="java.math.BigDecimal">
+    select nvl(sum(ac.c_amount),0) from a_capital ac
+    where ac.c_agent_id = #{cAgentId,jdbcType=VARCHAR}
+    and ac.c_pay_type = 'FRDK' and ac.status = 1
+  </select>
+
 </mapper>
