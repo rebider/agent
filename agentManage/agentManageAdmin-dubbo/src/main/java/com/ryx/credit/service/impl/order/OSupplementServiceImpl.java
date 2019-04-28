@@ -364,7 +364,7 @@ public class OSupplementServiceImpl implements OSupplementService {
             }
         } catch (MessageException | ProcessException e) {
             e.printStackTrace();
-            throw new MessageException("catch工作流处理任务异常!"+e.getLocalizedMessage());
+            throw new MessageException(e.getLocalizedMessage());
         }catch (Exception e) {
             e.printStackTrace();
             throw new MessageException("catch工作流处理任务异常!");
