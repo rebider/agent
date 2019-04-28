@@ -998,11 +998,15 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
                         JSONObject respXMLObj = JSONObject.parseObject(respXML);
                         AppConfig.sendEmails(respXML, "入网通知POS失败报警:"+respXMLObj.get("respMsg"));
                         log.info("http请求超时返回错误:{}",respXML);
-                        return AgentResult.fail(respXML);
+                        AgentResult ag = AgentResult.fail(respXML);
+                        ag.setData(respXMLObj);
+                        return ag;
                     }else{
                         AppConfig.sendEmails(respXML, "入网通知POS失败报警:"+respXML);
                         log.info("http请求超时返回错误:{}",respXML);
-                        return AgentResult.fail("通知pos异常"+respXML);
+                        AgentResult ag = AgentResult.fail(respXML);
+                        ag.setData(respXML);
+                        return ag;
                     }
                 }
                 return new AgentResult(500,"http请求异常",respXML);
