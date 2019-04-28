@@ -425,7 +425,7 @@
 
   <sql id="BASE_WHERE_SQL">
     <where>
-      1=1
+      <if test="1==1"> and L.STATUS = 1 </if>
       <if test="PLAN_NUM != null and PLAN_NUM !=''">AND R.PLAN_NUM = #{PLAN_NUM}</if>
       <if test="ORDER_ID != null and ORDER_ID != ''">AND R.ORDER_ID = #{ORDER_ID}</if>
       <if test="AGENT_ID != null and AGENT_ID != ''">AND O.AGENT_ID = #{AGENT_ID}</if>
