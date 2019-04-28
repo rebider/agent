@@ -182,7 +182,7 @@
     select
     <include refid="Base_Column_List" />
     from A_PLATFORM
-    where PLATFORM_NUM = #{platFormNum}
+    where PLATFORM_NUM = #{platFormNum} and status=1
   </select>
 
   <select id="countPlatForm" parameterType="map" resultType="Integer">

@@ -2697,6 +2697,196 @@ public class OLogisticsDetailExample {
             addCriterion("BUS_ID not between", value1, value2, "busId");
             return (Criteria) this;
         }
+
+        public Criteria andSbusStatusIsNull() {
+            addCriterion("SBUS_STATUS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusStatusIsNotNull() {
+            addCriterion("SBUS_STATUS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusStatusEqualTo(BigDecimal value) {
+            addCriterion("SBUS_STATUS =", value, "sbusStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusStatusNotEqualTo(BigDecimal value) {
+            addCriterion("SBUS_STATUS <>", value, "sbusStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusStatusGreaterThan(BigDecimal value) {
+            addCriterion("SBUS_STATUS >", value, "sbusStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusStatusGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("SBUS_STATUS >=", value, "sbusStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusStatusLessThan(BigDecimal value) {
+            addCriterion("SBUS_STATUS <", value, "sbusStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusStatusLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("SBUS_STATUS <=", value, "sbusStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusStatusIn(List<BigDecimal> values) {
+            addCriterion("SBUS_STATUS in", values, "sbusStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusStatusNotIn(List<BigDecimal> values) {
+            addCriterion("SBUS_STATUS not in", values, "sbusStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusStatusBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SBUS_STATUS between", value1, value2, "sbusStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusStatusNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SBUS_STATUS not between", value1, value2, "sbusStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusBatchIsNull() {
+            addCriterion("SBUS_BATCH is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusBatchIsNotNull() {
+            addCriterion("SBUS_BATCH is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusBatchEqualTo(BigDecimal value) {
+            addCriterion("SBUS_BATCH =", value, "sbusBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusBatchNotEqualTo(BigDecimal value) {
+            addCriterion("SBUS_BATCH <>", value, "sbusBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusBatchGreaterThan(BigDecimal value) {
+            addCriterion("SBUS_BATCH >", value, "sbusBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusBatchGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("SBUS_BATCH >=", value, "sbusBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusBatchLessThan(BigDecimal value) {
+            addCriterion("SBUS_BATCH <", value, "sbusBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusBatchLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("SBUS_BATCH <=", value, "sbusBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusBatchIn(List<BigDecimal> values) {
+            addCriterion("SBUS_BATCH in", values, "sbusBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusBatchNotIn(List<BigDecimal> values) {
+            addCriterion("SBUS_BATCH not in", values, "sbusBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusBatchBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SBUS_BATCH between", value1, value2, "sbusBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusBatchNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SBUS_BATCH not between", value1, value2, "sbusBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusMsgIsNull() {
+            addCriterion("SBUS_MSG is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusMsgIsNotNull() {
+            addCriterion("SBUS_MSG is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusMsgEqualTo(String value) {
+            addCriterion("SBUS_MSG =", value, "sbusMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusMsgNotEqualTo(String value) {
+            addCriterion("SBUS_MSG <>", value, "sbusMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusMsgGreaterThan(String value) {
+            addCriterion("SBUS_MSG >", value, "sbusMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusMsgGreaterThanOrEqualTo(String value) {
+            addCriterion("SBUS_MSG >=", value, "sbusMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusMsgLessThan(String value) {
+            addCriterion("SBUS_MSG <", value, "sbusMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusMsgLessThanOrEqualTo(String value) {
+            addCriterion("SBUS_MSG <=", value, "sbusMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusMsgLike(String value) {
+            addCriterion("SBUS_MSG like", value, "sbusMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusMsgNotLike(String value) {
+            addCriterion("SBUS_MSG not like", value, "sbusMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusMsgIn(List<String> values) {
+            addCriterion("SBUS_MSG in", values, "sbusMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusMsgNotIn(List<String> values) {
+            addCriterion("SBUS_MSG not in", values, "sbusMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusMsgBetween(String value1, String value2) {
+            addCriterion("SBUS_MSG between", value1, value2, "sbusMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSbusMsgNotBetween(String value1, String value2) {
+            addCriterion("SBUS_MSG not between", value1, value2, "sbusMsg");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

@@ -459,7 +459,7 @@ public class OrderServiceImpl implements OrderService {
         logger.info("下订单:{}{}", userId, orderFormVo.getAgentId());
         //订单基础数据
         Date d = Calendar.getInstance().getTime();
-        orderFormVo.setId(idService.genId(TabId.o_order));
+        orderFormVo.setId(idService.genOrderId(TabId.o_order, Integer.valueOf(userId)));
         orderFormVo.setoNum(idService.genOrderId(TabId.o_order, Integer.valueOf(userId)));
         orderFormVo.setoApytime(orderFormVo.getcTime());
         orderFormVo.setUserId(userId);

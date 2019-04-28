@@ -84,10 +84,29 @@ public class SplitServiceImpl implements SplitService {
         if(maps.size()!=0){
             redisService.delete(RedisCachKey.APP_SPLIT+":"+cUser);
         }
-        Long count = redisService.pushListMap(RedisCachKey.APP_SPLIT+":"+cUser, resSeg);
+        Long count = redisService.pushListMap(RedisCachKey.APP_SPLIT+":"+cUser, resSeg,60 * 60 * 24);
         if(count==0){
             throw new MessageException("上传SN失败");
         }
         return resSeg;
+    }
+
+    @Override
+    public List<Map<String, Object>> exportSplit(String exportType,String cUser)throws MessageException {
+
+        List<Map<String, Object>> redisList = redisService.popListMap(RedisCachKey.APP_SPLIT+":"+cUser);
+        if(redisList==null){
+            throw new MessageException("导出数据不存在");
+        }
+        if(redisList.size()==0){
+            return redisList;
+        }
+        for (int i=0;i<redisList.size();i++){
+            String flag = String.valueOf(redisList.get(i).get("flag"));
+            if(!exportType.equals(flag)){
+                redisList.remove(redisList.get(i));
+            }
+        }
+        return redisList;
     }
 }

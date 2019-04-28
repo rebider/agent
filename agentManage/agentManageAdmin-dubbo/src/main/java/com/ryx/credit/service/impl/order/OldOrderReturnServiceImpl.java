@@ -8,10 +8,7 @@ import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.dao.agent.AgentBusInfoMapper;
-import com.ryx.credit.dao.agent.AgentMapper;
-import com.ryx.credit.dao.agent.AttachmentRelMapper;
-import com.ryx.credit.dao.agent.BusActRelMapper;
+import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.*;
 import com.ryx.credit.machine.entity.ImsTermAdjustDetail;
 import com.ryx.credit.machine.entity.ImsTermWarehouseDetail;
@@ -133,6 +130,8 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
     private DictOptionsService dictOptionsService;
     @Autowired
     private OrderActivityService orderActivityService;
+    @Autowired
+    private PlatFormMapper platFormMapper;
 
 
 
@@ -751,7 +750,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         oLogistics.setId(idService.genId(TabId.o_logistics));           // 物流ID序列号
         oLogistics.setcUser(user);                                      // 创建人
         oLogistics.setStatus(Status.STATUS_1.status);                   // 默认记录状态为1
-        oLogistics.setLogType(LogType.Deliver.getValue());              // 默认物流类型为1
+        oLogistics.setLogType(LogType.Refund.getValue());              // 默认物流类型为1
         try {
             oLogistics.setSendDate(DateUtil.sdfDays.parse(sendDate));
         }catch (Exception e){
@@ -845,9 +844,12 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             }
 
             //生成物流对应的物流明细
+            //平台查询，根据不同的平台走不同的逻辑
+            OOrder order_platForm = oOrderMapper.selectByPrimaryKey(orderId);
+            PlatForm platForm =platFormMapper.selectByPlatFormNum(order_platForm.getOrderPlatform());
             List<OLogisticsDetail> snList = initDetailFromRedis(stringList,oLogistics,receiptPlan,user);
             //进行机具调整操作
-            if (!proType.equals(PlatformType.MPOS.msg) && !proType.equals(PlatformType.MPOS.code)){
+            if (platForm.getPlatformType().equals(PlatformType.POS.code) || platForm.getPlatformType().equals(PlatformType.ZPOS.code)){
 
                 logger.info("======pos发货 更新库存记录:{}:{}",proType,stringList);
 
@@ -889,7 +891,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                     oLogisticsMapper.updateByPrimaryKeySelective(logistics);
                 }
             //机具退货调整首刷接口调用
-            }else{
+            }else if(platForm.getPlatformType().equals(PlatformType.MPOS.code) || platForm.getPlatformType().equals(PlatformType.MPOS.msg)){
                 logger.info("======历史订单首刷发货 更新库存记录:{}:{}",proType,stringList);
                 //起始sn sn码必须在查询的时候进行生成
                 OLogisticsDetailExample exampleOLogisticsDetailExamplestart = new OLogisticsDetailExample();
