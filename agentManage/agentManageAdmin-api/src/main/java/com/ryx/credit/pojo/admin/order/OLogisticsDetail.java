@@ -81,6 +81,12 @@ public class OLogisticsDetail implements Serializable {
 
     private String busId;
 
+    private BigDecimal sbusStatus;
+
+    private BigDecimal sbusBatch;
+
+    private String sbusMsg;
+
     public String getId() {
         return id;
     }
@@ -366,7 +372,7 @@ public class OLogisticsDetail implements Serializable {
     }
 
     public void setPosType(String posType) {
-        this.posType = posType;
+        this.posType = posType == null ? null : posType.trim();
     }
 
     public BigDecimal getStandTime() {
@@ -382,6 +388,30 @@ public class OLogisticsDetail implements Serializable {
     }
 
     public void setBusId(String busId) {
-        this.busId = busId;
+        this.busId = busId == null ? null : busId.trim();
+    }
+
+    public BigDecimal getSbusStatus() {
+        return sbusStatus;
+    }
+
+    public void setSbusStatus(BigDecimal sbusStatus) {
+        this.sbusStatus = sbusStatus;
+    }
+
+    public BigDecimal getSbusBatch() {
+        return sbusBatch;
+    }
+
+    public void setSbusBatch(BigDecimal sbusBatch) {
+        this.sbusBatch = sbusBatch;
+    }
+
+    public String getSbusMsg() {
+        return sbusMsg;
+    }
+
+    public void setSbusMsg(String sbusMsg) {
+        this.sbusMsg = sbusMsg == null ? null : sbusMsg.trim();
     }
 }
