@@ -14,7 +14,7 @@ public enum LogisticsDetailSendStatus {
     none_send(new BigDecimal(0),"未联动"),
     send_success(new BigDecimal(1),"已联动"),
     send_fail(new BigDecimal(2),"联动失败"),
-    send_ing(new BigDecimal(2),"联动业务系统处理中");
+    send_ing(new BigDecimal(3),"联动业务系统处理中");
 
     public BigDecimal code;
 
