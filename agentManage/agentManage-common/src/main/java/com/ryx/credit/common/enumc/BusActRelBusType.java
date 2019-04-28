@@ -35,7 +35,9 @@ public enum BusActRelBusType {
     capitalChange("/BusActRelBusType/capitalChange","保证金变更申请"),
     CityApplyDeduction("/BusActRelBusType/cityApplyDeduction","其他扣款申请"),
     INVOICEAPPLY("/BusActRelBusType/invoiceApply","代理商发票审批"),
-    CityApplySupply("/BusActRelBusType/CityApplySupply","省区其他补款申请");
+    CityApplySupply("/BusActRelBusType/CityApplySupply","省区其他补款申请"),
+    thawAgentByCity("/BusActRelBusType/thawAgentByCity","代理商月分润解冻省区申请"),
+    thawAgentByBusiness("/BusActRelBusType/thawAgentByBusiness","代理商月分润解冻业务申请");
 
 
     public String key;

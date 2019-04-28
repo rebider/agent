@@ -213,4 +213,30 @@ public class FreezeOperationRecord implements Serializable {
     public void setRev5(String rev5) {
         this.rev5 = rev5 == null ? null : rev5.trim();
     }
+
+    public String toString() {
+        return "FreezeOperationRecord{" +
+                "id='" + id + '\'' +
+                ", agentId='" + agentId + '\'' +
+                ", agentName='" + agentName + '\'' +
+                ", parentAgentId='" + parentAgentId + '\'' +
+                ", parentAgentName='" + parentAgentName + '\'' +
+                ", freezeType='" + freezeType + '\'' +
+                ", status='" + status + '\'' +
+                ", freezeAmt=" + freezeAmt +
+                ", operationTime='" + operationTime + '\'' +
+                ", thawTime='" + thawTime + '\'' +
+                ", freezeReason='" + freezeReason + '\'' +
+                ", thawReason='" + thawReason + '\'' +
+                ", freezeOperator='" + freezeOperator + '\'' +
+                ", thawOperator='" + thawOperator + '\'' +
+                ", freezeBatch='" + freezeBatch + '\'' +
+                ", thawBatch='" + thawBatch + '\'' +
+                ", rev1='" + rev1 + '\'' +
+                ", rev2='" + rev2 + '\'' +
+                ", rev3='" + rev3 + '\'' +
+                ", rev4='" + rev4 + '\'' +
+                ", rev5='" + rev5 + '\'' +
+                '}';
+    }
 }

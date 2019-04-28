@@ -102,4 +102,19 @@ public class FreezeAgent implements Serializable {
     public void setRev2(String rev2) {
         this.rev2 = rev2 == null ? null : rev2.trim();
     }
+
+    public String toString() {
+        return "FreezeAgent{" +
+                "id='" + id + '\'' +
+                ", agentName='" + agentName + '\'' +
+                ", agentId='" + agentId + '\'' +
+                ", parentAgentName='" + parentAgentName + '\'' +
+                ", parentAgentId='" + parentAgentId + '\'' +
+                ", freezeType='" + freezeType + '\'' +
+                ", status='" + status + '\'' +
+                ", operationBatch='" + operationBatch + '\'' +
+                ", rev1='" + rev1 + '\'' +
+                ", rev2='" + rev2 + '\'' +
+                '}';
+    }
 }

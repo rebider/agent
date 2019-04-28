@@ -517,7 +517,7 @@
           NVL(e.ADJUST_AMT,0) ADJUST_AMT,
           case when nvl(f.TAX_BASE,0) &lt; 0 then f.TAX_BASE else 0 end PRE_TAX_BASE,
           nvl(f.NOT_DEDUCTION_TAX_AMT,0) PRE_NOT_DEDUCTION_TAX_AMT,
-          0.06 TAX,
+          0.07 TAX,
           a.BOSS_CODE BUS_PLATFORM
     from P_PROFIT_DIRECT a
 

@@ -37,9 +37,16 @@ public interface FreezeAgentMapper {
     List<FreezeAgent> selectByExampleWithCity(@Param("freezeAgent")FreezeAgent freezeAgent,@Param("page")Page page, @Param("orgId")String orgId);
 
     long countByExampleWithCity(@Param("freezeAgent")FreezeAgent freezeAgent, @Param("orgId")String orgId);
+
+    List<FreezeAgent> getThawDataByBatch(String batch);
+
+    Map<String, Object> getThawOperator(String batch);
+
+    void updateThawAgentByBatch(@Param("batch") String batch, @Param("status") String status);
     List<Map<String,Object>> freezeDetail(Map<String,Object> parm);
     Integer freezeDetailCount(Map<String,Object> parm);
     List<Map<String,Object>> freezeDetailLower(Map<String,Object> parm);
     Integer freezeDetailLowerCount(Map<String,Object> parm);
 
+    int delteThawOperationById(String freezeAgentId);
 }

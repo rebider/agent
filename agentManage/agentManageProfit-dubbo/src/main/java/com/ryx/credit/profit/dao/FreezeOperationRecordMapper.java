@@ -21,4 +21,6 @@ public interface FreezeOperationRecordMapper {
     int updateByPrimaryKeySelective(FreezeOperationRecord record);
 
     int updateByPrimaryKey(FreezeOperationRecord record);
+
+    int updateByFreezeAgentId(String freezeAgentId);
 }

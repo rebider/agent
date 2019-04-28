@@ -76,6 +76,5 @@ public interface ProfitDirectMapper {
 
     /**代理商退出冻结*/
     void updateDirectProfitFozzen(@Param("profitDate")String profitDate);
-    /***代理商退出失败解冻*/
-    void updateDirectProfitUnFozzen(@Param("profitDate")String profitDate);
+
 }
