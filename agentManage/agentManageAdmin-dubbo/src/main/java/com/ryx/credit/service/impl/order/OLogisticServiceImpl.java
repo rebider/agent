@@ -959,28 +959,32 @@ public class OLogisticServiceImpl implements OLogisticsService {
             //位数
             finish = (Integer) digit.get("length");
             begins = (Integer) digit.get("num");
-            Pattern p = Pattern.compile("[a-zA-z]");
-            if (p.matcher(start).find() || p.matcher(end).find()) {
-                list = getBetweenValues(startSn, endSn);
-                System.out.println("含有英文字符" + "----起始位数:" + begins + "---结束位数:" + finish);
-            } else {
-                System.out.println("不含英文字符");
-            int begin = begins - 1;
-            String sSub = start.substring(begin, finish);
-            String eSub = end.substring(begin, finish);
-            if ("".equals(eSub) || "".equals(sSub)) {
-                    logger.info("请输入正确的起始和结束SN号位数");
-                    throw new MessageException("请输入正确的起始和结束SN号位数");
-             }
-            int num = Integer.parseInt(sSub);
-            int w = finish - begin;
-            for (int j = Integer.parseInt(eSub) - Integer.parseInt(sSub); j >= 0; j--) {
-                int x = num++;
-                String format = String.format("%0" + w + "d", x);
-                String c = start.substring(0, begin) + format + start.substring(finish);
-                list.add(c);
+            if(!begins.equals(Integer.valueOf(0))){
+//                Pattern p = Pattern.compile("[a-zA-z]");
+//                if (p.matcher(start).find() || p.matcher(end).find()) {
+//                    list = getBetweenValues(startSn, endSn);
+//                    logger.info("含有英文字符" + "----起始位数:" + begins + "---结束位数:" + finish);
+//                } else {
+//                    logger.info("不含英文字符");
+                    int begin = begins - 1;
+                    String sSub = start.substring(begin, finish);
+                    String eSub = end.substring(begin, finish);
+                    if ("".equals(eSub) || "".equals(sSub)) {
+                        logger.info("请输入正确的起始和结束SN号位数");
+                        throw new MessageException("请输入正确的起始和结束SN号位数");
+                    }
+                    int num = Integer.parseInt(sSub);
+                    int w = finish - begin;
+                    for (int j = Integer.parseInt(eSub) - Integer.parseInt(sSub); j >= 0; j--) {
+                        int x = num++;
+                        String format = String.format("%0" + w + "d", x);
+                        String c = start.substring(0, begin) + format + start.substring(finish);
+                        list.add(c);
+                    }
+//                }
+            }else{
+                list.add(startSn);
             }
-        }
         }
         return list;
     }

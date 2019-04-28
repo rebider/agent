@@ -9,7 +9,8 @@ public enum RedisCachKey {
     AGENTINFO("AGENTINFO:", "代理商信息"),
     DREGIONS("DREGIONS:", "区域信息"),
     DPOSREGION("DPosRegion:", "POS区域信息"),
-    TERMINAL_TRANSFER("TERMINAL_TRANSFER:", "终端划拨");
+    TERMINAL_TRANSFER("TERMINAL_TRANSFER:", "终端划拨"),
+    APP_SPLIT("APP_SPLIT:", "补差价退货申请拆分");
 
     public String code;
 

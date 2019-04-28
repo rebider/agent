@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class OReturnOrderDetail implements Serializable {
+public class OReturnOrderDetail implements Serializable{
     private String id;
 
     private String returnId;
@@ -60,6 +60,8 @@ public class OReturnOrderDetail implements Serializable {
     private BigDecimal status;
 
     private BigDecimal version;
+
+    private String actid;
 
     //活动id
     private OActivity act;
@@ -288,6 +290,13 @@ public class OReturnOrderDetail implements Serializable {
         this.version = version;
     }
 
+    public String getActid() {
+        return actid;
+    }
+
+    public void setActid(String actid) {
+        this.actid = actid == null ? null : actid.trim();
+    }
 
     public OActivity getAct() {
         return act;

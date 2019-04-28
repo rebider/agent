@@ -412,7 +412,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
         BigDecimal sumAmt = new BigDecimal(0);
         for (Capital capital : capitals) {
-            if(!capital.getcType().equals(AgCapitalType.FUWUFEI.name()))
+            if(!capital.getcType().equals(AgCapitalType.FUWUFEI.name()) && !capital.getcType().equals(AgCapitalType.REIHEBAOFWF.name()))
             sumAmt = sumAmt.add(capital.getcFqInAmount());
         }
         return sumAmt;
@@ -505,8 +505,8 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         for (Capital capital : capitals) {
             sumAmt = capital.getcFqInAmount().add(sumAmt);
         }
-        capitalService.disposeCapital(capitals, sumAmt, agentQuit.getId(), cUser, agentQuit.getAgentId(),
-                                      agentQuit.getAgentName(),"代理商退出扣除");
+        capitalService.disposeCapital(null, sumAmt, agentQuit.getId(), cUser, agentQuit.getAgentId(),
+                                      agentQuit.getAgentName(),"代理商退出扣除",SrcType.TC,PayType.YHHK);
 
         try {
             if(agentQuit.getQuitPlatform().equals(QuitPlatform.MPOS.getValue())){
@@ -792,25 +792,8 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
             for (Capital capital : capitals) {
                 sumAmt = capital.getcFqInAmount().add(sumAmt);
             }
-            for (Capital capital : capitals) {
-                capital.setFreezeAmt(BigDecimal.ZERO);
-                int k = capitalMapper.updateByPrimaryKeySelective(capital);
-                if(k!=1){
-                    throw new MessageException("通过更新冻结金额失败！");
-                }
-                CapitalFlowExample capitalFlowExample = new CapitalFlowExample();
-                CapitalFlowExample.Criteria criteria1 = capitalFlowExample.createCriteria();
-                criteria1.andStatusEqualTo(Status.STATUS_1.status);
-                criteria1.andCapitalIdEqualTo(capital.getId());
-                List<CapitalFlow> capitalFlows = capitalFlowMapper.selectByExample(capitalFlowExample);
-                for (CapitalFlow capitalFlow : capitalFlows) {
-                    capitalFlow.setFlowStatus(Status.STATUS_1.status);
-                    int j = capitalFlowMapper.updateByPrimaryKey(capitalFlow);
-                    if(j!=1){
-                        throw new MessageException("通过更新资金流水记录失败！");
-                    }
-                }
-            }
+            //扣除冻结保证金
+            capitalService.approvedDeduct(busActRel.getBusId(),SrcType.TC,busActRel.getcUser());
 
             //通知业务平台
             notityBusPlatform(agentQuit);
@@ -841,16 +824,8 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                     throw new MessageException("更新业务启用失败");
                 }
             }
-
-            List<Capital> capitals = capitalService.queryCapital(agentQuit.getAgentId(),PayType.YHHK.getValue());
-            for (Capital capital : capitals) {
-                capital.setcFqInAmount(capital.getcFqInAmount().add(capital.getFreezeAmt()));
-                capital.setFreezeAmt(BigDecimal.ZERO);
-                int j = capitalMapper.updateByPrimaryKeySelective(capital);
-                if(j!=1){
-                    throw new MessageException("拒绝更新冻结金额失败！");
-                }
-            }
+            //拒绝解冻
+            capitalService.refuseUnfreeze(busActRel.getBusId(),SrcType.TC,busActRel.getcUser());
         }
 
         return AgentResult.ok();
@@ -1239,7 +1214,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                 return new AgentResult(500,"http请求异常",respXML);
             }
         } catch (Exception e) {
-            AppConfig.sendEmails("http请求超时:"+e.getStackTrace(), "入网通知POS失败报警");
+            AppConfig.sendEmails("http请求超时:"+MailUtil.printStackTrace(e), "入网通知POS失败报警");
             logger.info("http请求超时:{}",e.getMessage());
             throw e;
         }
@@ -1269,7 +1244,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                 return AgentResult.fail(respXMLObj.toString());
             }
         } catch (Exception e) {
-            AppConfig.sendEmails("通知手刷请求超时："+e.getStackTrace(), "入网通知手刷失败报警");
+            AppConfig.sendEmails("通知手刷请求超时："+MailUtil.printStackTrace(e), "入网通知手刷失败报警");
             logger.info("http请求超时:{}",e.getMessage());
             throw new Exception("http请求超时");
         }
@@ -1309,7 +1284,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         if (null != capitals && capitals.size() > 0) {
             for (Capital capital : capitals) {
                 capital.setAttachmentList(attachmentMapper.accessoryQuery(capital.getId(), AttachmentRelType.Capital.name()));
-                if(!capital.getcType().equals(AgCapitalType.FUWUFEI.name())){
+                if(!capital.getcType().equals(AgCapitalType.FUWUFEI.name()) && !capital.getcType().equals(AgCapitalType.REIHEBAOFWF.name())){
                     resultList.add(capital);
                 }
             }

@@ -190,7 +190,7 @@ public class OrderImportServiceImpl implements OrderImportService {
                         importAgent.setDealTime(new Date());
                         importAgentMapper.updateByPrimaryKeySelective(importAgent);
                         logger.info("======处理订单解析{}完成{}",importAgent.getDataid(),e.getMsg());
-                    }catch (Exception e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                         importAgent = importAgentMapper.selectByPrimaryKey(importAgent.getId());
                         importAgent.setDealstatus(Status.STATUS_3.status);
@@ -198,6 +198,41 @@ public class OrderImportServiceImpl implements OrderImportService {
                         importAgent.setDealTime(new Date());
                         importAgentMapper.updateByPrimaryKeySelective(importAgent);
                         logger.info("======处理订单解析{}完成{}",importAgent.getDataid(),e.getLocalizedMessage());
+                    } finally {
+                        // 订单号查询物流 物流状态为失败 订单和商品状态也要更新为失败
+                        ImportAgentExample ologistics_example = new ImportAgentExample();
+                        ologistics_example.or().andDataidEqualTo(importAgent.getDataid())
+                                .andDatatypeEqualTo(AgImportType.OLOGISTICS.code)
+                                .andDealstatusEqualTo(Status.STATUS_3.status);
+                        List<ImportAgent> ologistics_importAgent = importAgentMapper.selectByExample(ologistics_example);
+                        if (ologistics_importAgent.size() != 0 && !ologistics_importAgent.isEmpty()) {
+                            // 更新订单状态
+                            ImportAgentExample obase_example = new ImportAgentExample();
+                            obase_example.or().andDataidEqualTo(importAgent.getDataid())
+                                    .andDatatypeEqualTo(AgImportType.OBASE.code);
+                            List<ImportAgent> obase_importAgent = importAgentMapper.selectByExample(obase_example);
+                            for (ImportAgent obase_agent : obase_importAgent) {
+                                obase_agent.setDealstatus(Status.STATUS_3.status);
+                                obase_agent.setDealmsg("失败");
+                                obase_agent.setDealTime(new Date());
+                                importAgentMapper.updateByPrimaryKeySelective(obase_agent);
+                                logger.info("订单处理状态更新成功~{}", importAgent.getDataid());
+                            }
+                            // 更新商品状态
+                            ImportAgentExample ogoods_example = new ImportAgentExample();
+                            ogoods_example.or().andDataidEqualTo(importAgent.getDataid())
+                                    .andDatatypeEqualTo(AgImportType.OGOODS.code);
+                            List<ImportAgent> ogoods_importAgent = importAgentMapper.selectByExample(ogoods_example);
+                            for (ImportAgent ogoods_agent : ogoods_importAgent) {
+                                ogoods_agent.setDealstatus(Status.STATUS_3.status);
+                                ogoods_agent.setDealmsg("失败");
+                                ogoods_agent.setDealTime(new Date());
+                                importAgentMapper.updateByPrimaryKeySelective(ogoods_agent);
+                                logger.info("商品处理状态更新成功~{}", importAgent.getDataid());
+                            }
+                            // 删除状态失败已插入的订单和商品数据
+                            deleteDealstatusImportOrder(importAgent.getDataid());
+                        }
                     }
                 }
             }
@@ -351,7 +386,7 @@ public class OrderImportServiceImpl implements OrderImportService {
             redisService.rpushList(import_order_imOrderMsg_key+importAgent.getDataid(),e.getLocalizedMessage());
             logger.error("解析导入订单失败",e);
             throw new MessageException(e.getLocalizedMessage());
-        }finally {
+        } finally {
             redisService.delete(import_order_logic_redis_key+importAgent.getDataid());
         }
     }
@@ -523,7 +558,6 @@ public class OrderImportServiceImpl implements OrderImportService {
         //首付实付金额
         BigDecimal acture = (shoufu==null||shoufu.compareTo(BigDecimal.ZERO)==0) ?BigDecimal.ZERO:(shoufu.subtract(dikou));
 
-
         oPayment.setActualReceipt(acture);
         oPayment.setActualReceiptDate(c.getTime());
         oPayment.setRemark("(老订单)");
@@ -669,6 +703,7 @@ public class OrderImportServiceImpl implements OrderImportService {
                 }
             }
         }
+
         //解析商品物流信息
         AgentResult suborder = orderImportService.pareseOrderImportSubOrderInfo(orderImportBaseInfo,orderFormVo,oPayment,User);
         if (!suborder.isOK()) {
@@ -825,7 +860,6 @@ public class OrderImportServiceImpl implements OrderImportService {
             }
             //发货单 排单 物流 生成
             for (OrderLogicInfo logicInfo : logicInfos) {
-
                 OReceiptOrder receiptOrder = new OReceiptOrder();
                 OReceiptPro oReceiptPro = new OReceiptPro();
                 ReceiptPlan receiptPlan = new ReceiptPlan();
@@ -951,58 +985,79 @@ public class OrderImportServiceImpl implements OrderImportService {
                     logger.info("排单信息添加失败" + orderImportBaseInfo.getOrder_id() + ":" + orderImportGoodsInfo.getGoodsCode());
                     throw new MessageException("排单信息添加失败");
                 }
+
+                boolean flag_sn_oLogisticsDetail = true;
                 //生成sn明细
                 List<String> idListArr = oLogisticsService.idList(logicInfo.getSnStart(), logicInfo.getSnEnd(), Integer.valueOf(logicInfo.getSnEndNum()),Integer.valueOf( logicInfo.getSnEndNum()),logistics.getProCom());
                 if (null != idListArr && idListArr.size() > 0) {
                     for (String idSn : idListArr) {
-                        OLogisticsDetail detail = new OLogisticsDetail();
-                        //id，物流id，创建人，更新人，状态
-                        detail.setId(idService.genId(TabId.o_logistics_detail));
-                        detail.setOrderId(oSubOrder.getOrderId());
-                        detail.setOrderNum(order.getoNum());
-                        detail.setLogisticsId(logistics.getId());
-                        detail.setProId(logistics.getProId());
-                        detail.setProName(logistics.getProName());
-                        detail.setSettlementPrice(oSubOrderActivity.getPrice());
-                        detail.setSnNum(idSn);
-                        detail.setAgentId(order.getAgentId());
-                        detail.setcUser(User);
-                        detail.setuUser(User);
-                        detail.setcTime(Calendar.getInstance().getTime());
-                        detail.setuTime(Calendar.getInstance().getTime());
-                        detail.setOptType(OLogisticsDetailOptType.ORDER.code);
-                        detail.setOptId(oSubOrder.getId());
-                        detail.setBusId(order.getBusId());
-                        detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
-                        detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
-                        detail.setSendStatus(Status.STATUS_1.status);
+                        // 查询明细表中是否已存在此条sn数据
+                        OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
+                        oLogisticsDetailExample.or().andSnNumEqualTo(idSn);
+                        List<OLogisticsDetail> oLogisticsDetailList = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
+                        // size==0&&list为空 则插入明细数据
+                        if (oLogisticsDetailList.size() == 0 && oLogisticsDetailList.isEmpty()) {
+                            OLogisticsDetail detail = new OLogisticsDetail();
+                            //id，物流id，创建人，更新人，状态
+                            detail.setId(idService.genId(TabId.o_logistics_detail));
+                            detail.setOrderId(oSubOrder.getOrderId());
+                            detail.setOrderNum(order.getoNum());
+                            detail.setLogisticsId(logistics.getId());
+                            detail.setProId(logistics.getProId());
+                            detail.setProName(logistics.getProName());
+                            detail.setSettlementPrice(oSubOrderActivity.getPrice());
+                            detail.setSnNum(idSn);
+                            detail.setAgentId(order.getAgentId());
+                            detail.setcUser(User);
+                            detail.setuUser(User);
+                            detail.setcTime(Calendar.getInstance().getTime());
+                            detail.setuTime(Calendar.getInstance().getTime());
+                            detail.setOptType(OLogisticsDetailOptType.ORDER.code);
+                            detail.setOptId(oSubOrder.getId());
+                            detail.setBusId(order.getBusId());
+                            detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
+                            detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+                            detail.setSendStatus(Status.STATUS_1.status);
 
-                        detail.setActivityId(oSubOrderActivity.getActivityId());
-                        detail.setActivityName(oSubOrderActivity.getActivityName());
-                        detail.setgTime(oSubOrderActivity.getgTime());
-                        detail.setBusProCode(oSubOrderActivity.getBusProCode());
-                        detail.setBusProName(oSubOrderActivity.getBusProName());
-                        detail.setTermBatchcode(oSubOrderActivity.getTermBatchcode());
-                        detail.setTermBatchname(oSubOrderActivity.getTermBatchname());
-                        detail.setTermtype(oSubOrderActivity.getTermtype());
-                        detail.setTermtypename(oSubOrderActivity.getTermtypename());
-                        detail.setSettlementPrice(oSubOrderActivity.getPrice());
-                        detail.setPosType(oSubOrderActivity.getPosType());
-                        detail.setPosSpePrice(oSubOrderActivity.getPosSpePrice());
-                        detail.setStandTime(oSubOrderActivity.getStandTime());
+                            detail.setActivityId(oSubOrderActivity.getActivityId());
+                            detail.setActivityName(oSubOrderActivity.getActivityName());
+                            detail.setgTime(oSubOrderActivity.getgTime());
+                            detail.setBusProCode(oSubOrderActivity.getBusProCode());
+                            detail.setBusProName(oSubOrderActivity.getBusProName());
+                            detail.setTermBatchcode(oSubOrderActivity.getTermBatchcode());
+                            detail.setTermBatchname(oSubOrderActivity.getTermBatchname());
+                            detail.setTermtype(oSubOrderActivity.getTermtype());
+                            detail.setTermtypename(oSubOrderActivity.getTermtypename());
+                            detail.setSettlementPrice(oSubOrderActivity.getPrice());
+                            detail.setPosType(oSubOrderActivity.getPosType());
+                            detail.setPosSpePrice(oSubOrderActivity.getPosSpePrice());
+                            detail.setStandTime(oSubOrderActivity.getStandTime());
 
-                        if (1 != oLogisticsDetailMapper.insertSelective(detail)) {
-                            redisService.rpushList(import_order_imOrderMsg_key+orderImportBaseInfo.getOrder_id(),"添加sn明细失败"+orderImportBaseInfo.getOrder_id()+":"+orderImportGoodsInfo.getGoodsCode());
-                            logger.info("添加sn明细失败"+orderImportBaseInfo.getOrder_id()+":"+orderImportGoodsInfo.getGoodsCode());
-                            throw new MessageException("添加失败");
+                            if (1 != oLogisticsDetailMapper.insertSelective(detail)) {
+                                redisService.rpushList(import_order_imOrderMsg_key+orderImportBaseInfo.getOrder_id(),"添加sn明细失败"+orderImportBaseInfo.getOrder_id()+":"+orderImportGoodsInfo.getGoodsCode());
+                                logger.info("添加sn明细失败"+orderImportBaseInfo.getOrder_id()+":"+orderImportGoodsInfo.getGoodsCode());
+                                flag_sn_oLogisticsDetail = false;
+                            }
+                        } else {
+                            redisService.rpushList(import_order_imOrderMsg_key
+                                    + orderImportBaseInfo.getOrder_id(), "明细表已存在此条sn数据" + "   sn为:" + idSn);
+                            logger.info("明细表已存在此条sn数据~" + "   sn为:" + idSn + "---" + oLogisticsDetailList.toString());
+                            flag_sn_oLogisticsDetail = false;
                         }
                     }
                 }
-
                 String importid =  logicInfo.getImportId();
                 ImportAgent logicInfo_importAgent = importAgentMapper.selectByPrimaryKey(importid);
-                logicInfo_importAgent.setDealstatus(Status.STATUS_2.status);
-                logicInfo_importAgent.setDealmsg("成功");
+                if (flag_sn_oLogisticsDetail == true) {
+                    logicInfo_importAgent.setDealstatus(Status.STATUS_2.status);
+                    logicInfo_importAgent.setDealmsg("成功");
+                    logicInfo_importAgent.setDealTime(new Date());
+                } else {
+                    // OLOGISTICS-物流 更新物流处理状态
+                    logicInfo_importAgent.setDealstatus(Status.STATUS_3.status);
+                    logicInfo_importAgent.setDealmsg("失败");
+                    logicInfo_importAgent.setDealTime(new Date());
+                }
                 if(importAgentMapper.updateByPrimaryKeySelective(logicInfo_importAgent)!=1){
                     redisService.rpushList(import_order_imOrderMsg_key+orderImportBaseInfo.getOrder_id(),"更新logicInfo_importAgent记录失败"+orderImportBaseInfo.getOrder_id()+":importid"+importid);
                     logger.info("更新logicInfo_importAgent记录失败"+orderImportBaseInfo.getOrder_id()+":importid"+importid);
@@ -1027,6 +1082,7 @@ public class OrderImportServiceImpl implements OrderImportService {
 
     private String import_order_logic_redis_key="imOrderLogic:";
     private String import_order_imOrderMsg_key="imOrderMsg:";
+
     /**
      * 物流信息存储到redis
      * @return
@@ -1060,6 +1116,7 @@ public class OrderImportServiceImpl implements OrderImportService {
         }
         return AgentResult.ok(orderlogiccount);
     }
+
 
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
     @Override
@@ -1457,7 +1514,6 @@ public class OrderImportServiceImpl implements OrderImportService {
     }
 
 
-
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
     @Override
     public AgentResult deleteFailImportAgentReturn(ImportAgent importAgent,String user)throws Exception{
@@ -1506,6 +1562,7 @@ public class OrderImportServiceImpl implements OrderImportService {
 
     }
 
+
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
     @Override
     public AgentResult deleteFailImportAgentOrder(ImportAgent importAgent,String user)throws Exception{
@@ -1539,6 +1596,7 @@ public class OrderImportServiceImpl implements OrderImportService {
         OPaymentExample oPaymentExample = new OPaymentExample();
         oPaymentExample.or().andOrderIdEqualTo(order.getId());
         oPaymentMapper.deleteByExample(oPaymentExample);
+
         //付款单明细
         OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
         oPaymentDetailExample.or().andOrderIdEqualTo(order.getId());
@@ -1570,6 +1628,78 @@ public class OrderImportServiceImpl implements OrderImportService {
         oLogisticsDetailMapper.deleteByExample(oLogisticsDetailExample);
 
         //删除订单
+        OOrderExample oOrderExample = new OOrderExample();
+        oOrderExample.or().andIdEqualTo(order.getId());
+        oOrderMapper.deleteByExample(oOrderExample);
+
+        return AgentResult.ok();
+    }
+
+
+    @Override
+    public AgentResult deleteDealstatusImportOrder(String dataId) {
+        OOrderExample query_oOrder  = new OOrderExample();
+        query_oOrder.or().andONumEqualTo(dataId);
+        List<OOrder> oOrders = oOrderMapper.selectByExample(query_oOrder);
+        if (oOrders.size() > 1) {
+            return AgentResult.fail("订单查出有多条~");
+        }
+        if (oOrders.size() == 0) {
+            return AgentResult.ok();
+        }
+        OOrder order = oOrders.get(0);
+
+        // 删除活动
+        OSubOrderExample OSubOrderExample_query = new OSubOrderExample();
+        OSubOrderExample_query.or().andOrderIdEqualTo(order.getId());
+        List<OSubOrder> oSubOrders =  oSubOrderMapper.selectByExample(OSubOrderExample_query);
+        for (OSubOrder oSubOrder : oSubOrders) {
+            OSubOrderActivityExample oOSubOrderActivityExample = new OSubOrderActivityExample();
+            oOSubOrderActivityExample.or().andSubOrderIdEqualTo(oSubOrder.getId());
+            oSubOrderActivityMapper.deleteByExample(oOSubOrderActivityExample);
+        }
+
+        // 删除子订单
+        OSubOrderExample oSubOrderExample = new OSubOrderExample();
+        oSubOrderExample.or().andOrderIdEqualTo(order.getId());
+        oSubOrderMapper.deleteByExample(oSubOrderExample);
+
+        // 删除付款单
+        OPaymentExample oPaymentExample = new OPaymentExample();
+        oPaymentExample.or().andOrderIdEqualTo(order.getId());
+        oPaymentMapper.deleteByExample(oPaymentExample);
+
+        // 删除付款单明细
+        OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
+        oPaymentDetailExample.or().andOrderIdEqualTo(order.getId());
+        oPaymentDetailMapper.deleteByExample(oPaymentDetailExample);
+
+        // 删除收货单
+        OReceiptOrderExample oReceiptOrderExample =new OReceiptOrderExample();
+        oReceiptOrderExample.or().andOrderIdEqualTo(order.getId());
+        oReceiptOrderMapper.deleteByExample(oReceiptOrderExample);
+
+        // 删除收货单商品
+        OReceiptProExample oReceiptProExample = new OReceiptProExample();
+        oReceiptProExample.or().andOrderidEqualTo(order.getId());
+        oReceiptProMapper.deleteByExample(oReceiptProExample);
+
+        // 删除排单
+        ReceiptPlanExample receiptPlanExample = new ReceiptPlanExample();
+        receiptPlanExample.or().andOrderIdEqualTo(order.getId());
+        receiptPlanMapper.deleteByExample(receiptPlanExample);
+
+        // 删除物流
+        OLogisticsExample oLogisticsExample = new OLogisticsExample();
+        oLogisticsExample.or().andOrderIdEqualTo(order.getId());
+        oLogisticsMapper.deleteByExample(oLogisticsExample);
+
+        // 删除物流明细
+        OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
+        oLogisticsDetailExample.or().andOrderIdEqualTo(order.getId());
+        oLogisticsDetailMapper.deleteByExample(oLogisticsDetailExample);
+
+        // 删除订单
         OOrderExample oOrderExample = new OOrderExample();
         oOrderExample.or().andIdEqualTo(order.getId());
         oOrderMapper.deleteByExample(oOrderExample);

@@ -3,6 +3,7 @@ package com.ryx.credit.service.impl.agent;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.common.util.agentUtil.AESUtil;
@@ -42,7 +43,7 @@ import java.util.*;
  * @date: 2018/6/11 11:33
  */
 @Service("agentNotifyService")
-public class AgentNotifyServiceImpl implements AgentNotifyService {
+public class AgentNotifyServiceImpl implements AgentNotifyService{
 
     private static Logger log = LoggerFactory.getLogger(AgentNotifyServiceImpl.class);
 
@@ -972,7 +973,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             map.put("tranCode", tranCode);
             map.put("reqMsgId", reqMsgId);
 
-            log.info("通知pos请求参数:{}",map);
+            log.info("通知pos请求参数:{}",data);
             String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("agent_pos_notify_url"), map);
             JSONObject jsonObject = JSONObject.parseObject(httpResult);
             if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
@@ -1013,7 +1014,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 return new AgentResult(500,"http请求异常",respXML);
             }
         } catch (Exception e) {
-            AppConfig.sendEmails("http请求超时:"+e.getStackTrace(), "入网通知POS失败报警");
+            AppConfig.sendEmails("http请求超时:"+MailUtil.printStackTrace(e), "入网通知POS失败报警");
             log.info("http请求超时:{}",e.getMessage());
             throw e;
         }
@@ -1064,7 +1065,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 throw new Exception("http返回有误");
             }
         } catch (Exception e) {
-            AppConfig.sendEmails("通知手刷请求超时："+e.getStackTrace(), "入网通知手刷失败报警");
+            AppConfig.sendEmails("通知手刷请求超时："+ MailUtil.printStackTrace(e), "入网通知手刷失败报警");
             log.info("http请求超时:{}",e.getMessage());
             throw new Exception("http请求超时");
         }
@@ -1101,5 +1102,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         pageInfo.setTotal(agentPlatFormSynMapper.queryCount(map));
         return pageInfo;
     }
+
 
 }
