@@ -73,6 +73,9 @@ public class ProfitSummaryDataJob {
 
         transDate = transDate == null ? DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6) : transDate;
 
+        logger.info("==========清除已汇总手刷月分润数据==========", transDate);
+        detailMonthMapper.updateMPOSAMT(transDate);
+
         logger.info("=========={}手刷月分润汇总开始==========", transDate);
         long t1 = System.currentTimeMillis();
 
@@ -95,9 +98,11 @@ public class ProfitSummaryDataJob {
             //BigDecimal transAmt = detailMonth.getTranAmt() == null ? BigDecimal.ZERO : detailMonth.getTranAmt();
             detailMonth.setMposTranAmt(detail.getInTransAmt());
             if (detail.getBusCode().equals("0001")) {//瑞银信
-                detailMonth.setRyxProfitAmt(detail.getProfitAmt());
+                //detailMonth.setRyxProfitAmt(detail.getProfitAmt());
+                detailMonth.setRyxProfitAmt(detailMonth.getRyxProfitAmt() == null ?detail.getProfitAmt(): detail.getProfitAmt().add(detailMonth.getRyxProfitAmt()));
             } else if (detail.getBusCode().equals("3000")) {//瑞刷活动
-                detailMonth.setRsHdProfitAmt(detail.getProfitAmt());
+                //detailMonth.setRsHdProfitAmt(detail.getProfitAmt());
+                detailMonth.setRsHdProfitAmt(detailMonth.getRsHdProfitAmt() == null ? detail.getProfitAmt() : detail.getProfitAmt().add(detailMonth.getRsHdProfitAmt()));
             } else if (detail.getBusCode().equals("4000")) {//瑞众通
                 //detailMonth
             } else if (detail.getBusCode().equals("5000")) {//瑞和宝
@@ -107,20 +112,25 @@ public class ProfitSummaryDataJob {
                 BigDecimal rhbDay = dayMapper.totalProfitAndReturnById(day);//瑞和宝日结分润-
                 rhbDay = rhbDay==null?BigDecimal.ZERO:rhbDay;
                 detailMonth.setRhbProfitAmt(detail.getProfitAmt().subtract(rhbDay));*/
-                detailMonth.setRhbProfitAmt(detail.getProfitAmt());
+               //detailMonth.setRhbProfitAmt(detail.getProfitAmt());
+               detailMonth.setRhbProfitAmt(detailMonth.getRhbProfitAmt() == null ?detail.getProfitAmt() : detail.getProfitAmt().add(detailMonth.getRhbProfitAmt()));
             } else if (detail.getBusCode().equals("6000")) {//直发
-                detailMonth.setZfProfitAmt(detail.getProfitAmt());
+                //detailMonth.setZfProfitAmt(detail.getProfitAmt());
+                detailMonth.setZfProfitAmt(detailMonth.getZfProfitAmt() == null ?detail.getProfitAmt() : detail.getProfitAmt().add(detailMonth.getZfProfitAmt()));
             } else if (detail.getBusCode().equals("2000")) {//瑞刷
-                detailMonth.setRsProfitAmt(detail.getProfitAmt());
+                //detailMonth.setRsProfitAmt(detail.getProfitAmt());
+                detailMonth.setRsProfitAmt(detailMonth.getRsProfitAmt() == null ? detail.getProfitAmt() : detail.getProfitAmt().add(detailMonth.getRsProfitAmt()));
             } else if (detail.getBusCode().equals("1111")) {//瑞银信活动
-                detailMonth.setRyxHdProfitAmt(detail.getProfitAmt());
+                //detailMonth.setTpProfitAmt(detail.getProfitAmt());
+                detailMonth.setRyxHdProfitAmt(detailMonth.getRyxHdProfitAmt() == null ? detail.getProfitAmt(): detail.getProfitAmt().add(detailMonth.getRyxHdProfitAmt()));
             } else {//贴牌
-                detailMonth.setTpProfitAmt(detail.getProfitAmt());
+                //detailMonth.setTpProfitAmt(detail.getProfitAmt());
+                detailMonth.setTpProfitAmt(detailMonth.getTpProfitAmt() == null ? detail.getProfitAmt() : detailMonth.getTpProfitAmt().add(detail.getProfitAmt()));
             }
 
             if (detail.getSupplyAmt() != null && detail.getSupplyAmt().compareTo(BigDecimal.ZERO) > 0) {
-                //detailMonth.setMposZqSupplyProfitAmt(detailMonth.getMposZqSupplyProfitAmt() == null ? detail.getSupplyAmt() : detailMonth.getMposZqSupplyProfitAmt().add(detail.getSupplyAmt()));//手刷补差
-                detailMonth.setMposZqSupplyProfitAmt(detail.getSupplyAmt());//手刷补差
+                //detailMonth.setMposZqSupplyProfitAmt(detail.getSupplyAmt());
+                detailMonth.setMposZqSupplyProfitAmt(detailMonth.getMposZqSupplyProfitAmt() == null ? detail.getSupplyAmt() : detailMonth.getMposZqSupplyProfitAmt().add(detail.getSupplyAmt()));//手刷补差
             }
             //获取账户信息
             List<AgentColinfo> agentColinfos = agentColinfoService.queryAgentColinfoService(detail.getAgentId(), null, AgStatus.Approved.status);

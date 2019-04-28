@@ -1506,4 +1506,11 @@ update P_PROFIT_DETAIL_M dd
        </if>
   </update>
 
+  <update id="updateMPOSAMT">
+    update  P_PROFIT_DETAIL_M set ryx_profit_amt = 0, ryx_hd_profit_amt = 0
+    , tp_profit_amt = 0 , rs_profit_amt = 0 , rs_hd_profit_amt = 0
+    , rhb_profit_amt = 0 , zf_profit_amt = 0 , mpos_zq_supply_profit_amt = 0
+    where PROFIT_DATE = #{date}
+  </update>
+
 </mapper>
