@@ -203,7 +203,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         BigDecimal ToolNotDeductionAmt = getToolsDebt(map,"02"); //机具扣款
         resultMap.put("ToolNotDeductionAmt",ToolNotDeductionAmt);
 
-        BigDecimal otherNotDeductionAmt = getDeductionAmt(map,"03").add(getDeductionAmt(map,"07"));//其他扣款  03
+        BigDecimal otherNotDeductionAmt = getDeductionAmt(map,"03").add(getDeductionAmt(map,"07")).add(getDeductionAmt(map,"06"));//其他扣款  03
         resultMap.put("otherNotDeductionAmt",otherNotDeductionAmt);
 
         BigDecimal chargeBackNotDeductionAmt = getDeductionAmt(map,"01"); //退单扣款

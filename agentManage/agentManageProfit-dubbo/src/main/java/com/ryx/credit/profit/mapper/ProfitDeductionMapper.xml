@@ -337,7 +337,14 @@
         </trim>
     </insert>
     <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDeductionExample" resultType="java.lang.Integer">
-        select count(*) from P_DEDUCTION
+        select count(
+        <if test="distinct">
+            distinct AGENT_ID
+        </if>
+        <if test="distinct ==  false">
+            *
+        </if>
+        ) from P_DEDUCTION N ${innerJoinDepartment}
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
         </if>
@@ -600,7 +607,8 @@
     </update>
 
     <select id="getToolsDebt" parameterType="java.util.Map" resultType="java.math.BigDecimal" >
-        select sum(case when pd.deduction_Status = '5' then pd.NOT_DEDUCTION_AMT  else  pd.MUST_DEDUCTION_AMT end)+sum(psd.MUST_AMT)
+        select sum(case when pd.deduction_Status = '5' then pd.NOT_DEDUCTION_AMT  else  pd.MUST_DEDUCTION_AMT end)
+              +sum(case when pd.STAGING_STATUS = '3' then psd.MUST_AMT else 0 end )
           from P_DEDUCTION pd left join P_STAGING_DETAIL psd on psd.STAG_ID = pd.ID
         <where>
             pd.DEDUCTION_DATE = #{date} AND pd.DEDUCTION_TYPE=#{type}
@@ -627,6 +635,23 @@
            tpd.PROFIT_AMT
         from TRANS_PROFIT_DETAIL tpd inner join  (select * from P_DEDUCTION p where p.DEDUCTION_TYPE='02') pd on tpd.AGENT_ID=pd.AGENT_ID and tpd.PROFIT_DATE=pd.DEDUCTION_DATE and tpd.BUS_CODE=pd.DEDUCTION_DESC left join A_AGENT on tpd.AGENT_ID=A_AGENT.ID
         where pd.STAGING_STATUS in('0','1','4')and tpd.AGENT_ID=#{agentId,jdbcType=VARCHAR} and PROFIT_DATE=#{profitMonth,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectByExampleToolSupply" parameterType="com.ryx.credit.profit.pojo.ProfitDeductionExample" resultType="java.util.Map">
+        <include refid="OracleDialectPrefix" />
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        AGENT_ID, AGENT_NAME,DEDUCTION_DATE
+        from P_DEDUCTION N ${innerJoinDepartment}
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+        <include refid="OracleDialectSuffix" />
     </select>
 
 </mapper>

@@ -618,7 +618,7 @@
     </select>
 
     <select id="getSurplusAmt" parameterType="java.util.Map" resultType="java.math.BigDecimal">
-        select sum(case when d.deduction_Status = '1' then d.SURPLUS_AMT  else  d.TATOL_AMT end) as SURPLUS_AMT
+        select sum(d.TATOL_AMT-d.BUCKLE_AMT) as SURPLUS_AMT
           from P_PROFIT_FACTOR d
         <where>
             FACTOR_MONTH=#{date}

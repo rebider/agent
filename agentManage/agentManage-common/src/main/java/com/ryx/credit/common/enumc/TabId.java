@@ -98,7 +98,9 @@ public enum TabId {
     P_DATA_ADJUST("PDA%s%015d"),
     TRANCHECK_DATA("TCD%s%014d"),
     P_TOOL_SUPPLY("PTS%s%015d"),
-    P_REMIT_INFO("PRI%s%015d");
+    P_REMIT_INFO("PRI%s%015d"),
+    P_FREEZE_OPERATION_RECORD("FOR%s%015d"),
+    P_FREEZE_AGENT("PFA%s%015d");
 
 
     TabId(String thePatt){
