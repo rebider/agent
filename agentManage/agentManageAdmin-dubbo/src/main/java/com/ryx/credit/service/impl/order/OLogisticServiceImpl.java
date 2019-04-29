@@ -909,7 +909,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     throw new MessageException("此SN码不存在");
                 }else if(listOLogisticsDetailSn.size()!=1){
                     logger.info("此SN码不存在");
-                    throw new MessageException("此SN码不存在");
+                    throw new MessageException("此SN码不唯一");
                 }
 
                 OLogisticsDetail detail = listOLogisticsDetailSn.get(0);
