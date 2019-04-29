@@ -4,6 +4,7 @@ import com.ryx.credit.common.util.Page;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class TaxDeductionDetailExample {
     protected String orderByClause;
@@ -17,6 +18,20 @@ public class TaxDeductionDetailExample {
     protected Integer limitStart;
 
     protected Integer limitEnd;
+
+    protected String innerJoinDepartment;
+
+    public void setInnerJoinDepartment(Map<String,String> map) {
+        if (null != map.get("area")) { // 大区
+            this.innerJoinDepartment = " INNER JOIN A_AGENT AGENT ON AGENT_ID = AGENT.ID AND AGENT.AG_DOC_DISTRICT= "+map.get("area");
+        } else if (null != map.get("orgId")) { //省区
+            this.innerJoinDepartment = " INNER JOIN A_AGENT AGENT ON AGENT_ID = AGENT.ID AND AGENT.AG_DOC_PRO= "+map.get("orgId");
+        }
+    }
+
+    public String getInnerJoinDepartment(){
+        return innerJoinDepartment;
+    }
 
     public TaxDeductionDetailExample() {
         oredCriteria = new ArrayList<Criteria>();

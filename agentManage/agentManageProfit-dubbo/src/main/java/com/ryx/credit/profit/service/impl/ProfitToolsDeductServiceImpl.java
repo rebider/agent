@@ -2,18 +2,21 @@ package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.PaySign;
+import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
+import com.ryx.credit.profit.enums.CitySupplyStatus;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
-import com.ryx.credit.profit.pojo.ProfitDeduction;
-import com.ryx.credit.profit.pojo.ProfitDeducttionDetail;
-import com.ryx.credit.profit.pojo.ProfitDetailMonth;
-import com.ryx.credit.profit.pojo.ProfitDetailMonthExample;
+import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.*;
 import com.ryx.credit.service.order.IPaymentDetailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import sun.rmi.runtime.Log;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -38,6 +41,7 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
     private ProfitDetailMonthService profitDetailMonthServiceImpl;
     @Autowired
     private IPaymentDetailService iPaymentDetailService;
+
     private static final String RHB = "5000";
     private static final String POS = "100003";
     private static final String ZPOS = "100002";
@@ -50,6 +54,10 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
         String parentAgentId =null;
         if(map.get("parentAgentId")!=null){
             parentAgentId = map.get("parentAgentId").toString();
+        }
+        PToolSupply pToolSupply  =null;
+        if(map.get("pToolSupply")!=null){
+               pToolSupply = (PToolSupply) map.get("pToolSupply");
         }
         ProfitDeduction profitDeduction = new ProfitDeduction();
         profitDeduction.setAgentId(agentPid);
@@ -67,12 +75,10 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
             }*/ else if (Objects.equals("3", map.get("rotation"))) {
                 LOG.info("第三轮机具扣款，扣关联代理商：代理商编号：{}", agentPid);
                 return this.secondRound(agentPid, map, list, computType);
-            } /*else {
-                map.put("agentProfitAmt", BigDecimal.ZERO);
-                LOG.info("第三轮机具扣款（担保代理商扣款）：代理商编号：{}", agentPid);
-                this.fristRound(map, agentPid, computType, list);
-                return map;
-            }*/
+            } else if (Objects.equals("4", map.get("rotation"))){
+                LOG.info("第四轮机具扣款（上级代扣或者下级补款）：代理商编号：{}", agentPid);
+                return  this.fourRound(map, pToolSupply, computType);
+            }
         }
         return map;
     }
@@ -318,6 +324,7 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                         if (Objects.equals(computType, "1")) {
                             updateDeduct.setStagingStatus(DeductionStatus.YES_WITHHOLD.getStatus());
                         }
+                        updateDeduct.setRev1(insert.getActualDeductionAmt().toString());
                         updateDeduct.setActualDeductionAmt(profitDeductionList.getActualDeductionAmt());
                         updateDeduct.setNotDeductionAmt(profitDeductionList.getNotDeductionAmt());
                         profitDeductionService.updateProfitDeduction(updateDeduct);
@@ -341,6 +348,108 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
         LOG.info("机具分润扣款响应参数：{}", map);
         return map;
     }
+
+
+
+
+
+
+
+    /**
+     * 代理商机具扣款，本级以及关联代理商不够扣，申请线下补款和上级代扣
+     * @param map
+     * @param computType
+     * @return
+     * @throws Exception
+     * chenliang
+     */
+
+    private Map<String, Object> fourRound(Map<String, Object> map, PToolSupply pToolSupply, String computType) throws Exception {
+        try {
+        String typename = (String) map.get("rotation");
+        LOG.info("查询此条补款对应的扣款");
+        //此平台下对应的机具扣款
+        ProfitDeduction profitDeduction = profitDeductionService.getProfitDeductionById(pToolSupply.getDeductionId());
+        //查询此条数据对应的月份润明细里的记录，中的平台码所对应的的上级
+        LOG.info("查询此条补款对应的月份润平台对应的上级");
+        TransProfitDetailExample transProfitDetailExample = new TransProfitDetailExample();
+        TransProfitDetailExample.Criteria criteria1 = transProfitDetailExample.createCriteria();
+        criteria1.andBusCodeEqualTo(pToolSupply.getBusCode());
+        criteria1.andAgentIdEqualTo(pToolSupply.getAgentId());
+        criteria1.andProfitDateEqualTo(pToolSupply.getProfitDate());
+        List<TransProfitDetail> transProfitDetails = profitDetailMonthServiceImpl.getTransProfitDetailByBusCode(transProfitDetailExample);
+        if(1!=transProfitDetails.size()){
+            LOG.info("查询{}补款对应的月份润平台对应的上级失败",pToolSupply.getId());
+            return null;
+        }
+
+        LOG.info("查询此条补款对应的月份润汇总");
+        ProfitDetailMonthExample profitDetailMonthExample = new ProfitDetailMonthExample();
+        ProfitDetailMonthExample.Criteria criteria = profitDetailMonthExample.createCriteria();
+        criteria.andAgentIdEqualTo(pToolSupply.getAgentId());
+        criteria.andProfitDateEqualTo(pToolSupply.getProfitDate());
+        criteria.andParentAgentIdEqualTo(transProfitDetails.get(0).getParentAgentId());
+        List<ProfitDetailMonth> profitDetailMonthList = profitMonthService.byProfitDetailMonth(profitDetailMonthExample);
+        if(1!=profitDetailMonthList.size()){
+            LOG.info("查询{}补款对应的月份润汇总失败",pToolSupply.getId());
+            return null;
+        }
+
+        ProfitDetailMonth profitDetailMonth =  profitDetailMonthList.get(0);
+        //上级代理商的月份润
+        BigDecimal basicAmt = profitDetailMonth.getBasicsProfitAmt();
+        //线下补款
+        profitDeduction.setRev2(pToolSupply.getRemitAmt().toString());
+
+        //需要上级代扣的款项
+        BigDecimal upSupplyAmt   = pToolSupply.getParenterSupplyAmt();
+        //更新机具扣款表
+        profitDeduction.setRev3(upSupplyAmt.toString());
+        profitDeduction.setActualDeductionAmt(profitDeduction.getActualDeductionAmt().add(pToolSupply.getRemitAmt()).add(upSupplyAmt));
+        profitDeduction.setNotDeductionAmt(profitDeduction.getMustDeductionAmt().subtract(profitDeduction.getActualDeductionAmt()));
+        //上级代扣明细
+        ProfitDeduction insertup = new ProfitDeduction();
+        if(pToolSupply.getParenterSupplyAmt().compareTo(BigDecimal.ZERO)==1){
+            insertup.setMustDeductionAmt(pToolSupply.getToolsInvoiceAmt().subtract(pToolSupply.getRemitAmt()));
+            insertup.setActualDeductionAmt(upSupplyAmt);
+            insertup.setNotDeductionAmt(insertup.getMustDeductionAmt().subtract(insertup.getActualDeductionAmt()));
+            insertup.setAgentPid(profitDeduction.getAgentId());
+            insertup.setAgentId(profitDeduction.getAgentId());
+            insertup.setAgentName(profitDeduction.getAgentName());
+            insertup.setDeductionType(DeductionType.MACHINE.getType());
+            insertup.setDeductionDesc(profitDeduction.getDeductionDesc());
+            insertup.setDeductionDate(profitDeduction.getDeductionDate());
+            insertup.setId(profitDeduction.getId());
+            insertup.setRemark(typename + "上级代理商代理商代扣机具款，扣款明细：" + profitDeduction.getSourceId());
+            insertup.setUserId(profitDeduction.getAgentId());
+            profitDeducttionDetailService.insertDeducttionDetail(insertup);
+        }
+        basicAmt = basicAmt.subtract(pToolSupply.getParenterSupplyAmt());
+        profitDetailMonth.setBasicsProfitAmt(basicAmt);
+
+
+            //更新剩余分润
+            LOG.info("更新扣款表{}",profitDetailMonth.getId());
+            BigDecimal posDgRealDeductionAmt = profitDetailMonth.getPosDgRealDeductionAmt() == null ? BigDecimal.ZERO : profitDetailMonth.getPosDgRealDeductionAmt();
+            profitDetailMonth.setPosDgRealDeductionAmt(posDgRealDeductionAmt.add(insertup.getActualDeductionAmt()));
+            profitMonthService.updateByPrimaryKeySelective(profitDetailMonth);
+
+
+
+            LOG.info("更新扣款表{}",profitDeduction.getId());
+            //更新扣款表
+            profitDeductionService.updateProfitDeduction(profitDeduction);
+
+        }catch (Exception e ){
+
+            e.printStackTrace();
+        }
+
+           return null;
+    }
+
+
+
 
 
     /**
@@ -376,6 +485,8 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
     public void clearDetail() {
 
     }
+
+
 
     /*private void deduceParentAgent(ProfitDeduction profitDeduction, BigDecimal mustAmt, String computType){
         LOG.info("机具扣款流水号：{}，代理商唯一码：{}，汇总分润不足：{}",

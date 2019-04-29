@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.FreezeOperationRecordMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.FreezeOperationRecord">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="PARENT_AGENT_ID" jdbcType="VARCHAR" property="parentAgentId" />
+    <result column="PARENT_AGENT_NAME" jdbcType="VARCHAR" property="parentAgentName" />
+    <result column="FREEZE_TYPE" jdbcType="CHAR" property="freezeType" />
+    <result column="STATUS" jdbcType="CHAR" property="status" />
+    <result column="FREEZE_AMT" jdbcType="DECIMAL" property="freezeAmt" />
+    <result column="OPERATION_TIME" jdbcType="VARCHAR" property="operationTime" />
+    <result column="THAW_TIME" jdbcType="VARCHAR" property="thawTime" />
+    <result column="FREEZE_REASON" jdbcType="VARCHAR" property="freezeReason" />
+    <result column="THAW_REASON" jdbcType="VARCHAR" property="thawReason" />
+    <result column="FREEZE_OPERATOR" jdbcType="VARCHAR" property="freezeOperator" />
+    <result column="THAW_OPERATOR" jdbcType="VARCHAR" property="thawOperator" />
+    <result column="FREEZE_BATCH" jdbcType="VARCHAR" property="freezeBatch" />
+    <result column="THAW_BATCH" jdbcType="VARCHAR" property="thawBatch" />
+    <result column="REV1" jdbcType="VARCHAR" property="rev1" />
+    <result column="REV2" jdbcType="VARCHAR" property="rev2" />
+    <result column="REV3" jdbcType="VARCHAR" property="rev3" />
+    <result column="REV4" jdbcType="VARCHAR" property="rev4" />
+    <result column="REV5" jdbcType="VARCHAR" property="rev5" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, AGENT_ID, AGENT_NAME, PARENT_AGENT_ID, PARENT_AGENT_NAME, FREEZE_TYPE, STATUS, 
+    FREEZE_AMT, OPERATION_TIME, THAW_TIME, FREEZE_REASON, THAW_REASON, FREEZE_OPERATOR,
+    THAW_OPERATOR, FREEZE_BATCH, THAW_BATCH, REV1, REV2, REV3, REV4, REV5
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.FreezeOperationRecordExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_FREEZE_OPERATION_RECORD
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from P_FREEZE_OPERATION_RECORD
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.FreezeOperationRecordExample">
+    delete from P_FREEZE_OPERATION_RECORD
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.FreezeOperationRecord">
+    insert into P_FREEZE_OPERATION_RECORD (ID, AGENT_ID, AGENT_NAME, 
+      PARENT_AGENT_ID, PARENT_AGENT_NAME, FREEZE_TYPE, 
+      STATUS, FREEZE_AMT, OPERATION_TIME,
+      THAW_TIME, FREEZE_REASON, THAW_REASON,
+      FREEZE_OPERATOR, THAW_OPERATOR, FREEZE_BATCH,
+      THAW_BATCH, REV1, REV2,
+      REV3, REV4, REV5)
+    values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR}, 
+      #{parentAgentId,jdbcType=VARCHAR}, #{parentAgentName,jdbcType=VARCHAR}, #{freezeType,jdbcType=CHAR}, 
+      #{status,jdbcType=CHAR}, #{freezeAmt,jdbcType=DECIMAL}, #{operationTime,jdbcType=VARCHAR},
+      #{thawTime,jdbcType=VARCHAR}, #{freezeReason,jdbcType=VARCHAR}, #{thawReason,jdbcType=VARCHAR},
+      #{freezeOperator,jdbcType=VARCHAR}, #{thawOperator,jdbcType=VARCHAR}, #{freezeBatch,jdbcType=VARCHAR},
+      #{thawBatch,jdbcType=VARCHAR}, #{rev1,jdbcType=VARCHAR}, #{rev2,jdbcType=VARCHAR},
+      #{rev3,jdbcType=VARCHAR}, #{rev4,jdbcType=VARCHAR}, #{rev5,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.FreezeOperationRecord">
+    insert into P_FREEZE_OPERATION_RECORD
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
+      <if test="parentAgentId != null">
+        PARENT_AGENT_ID,
+      </if>
+      <if test="parentAgentName != null">
+        PARENT_AGENT_NAME,
+      </if>
+      <if test="freezeType != null">
+        FREEZE_TYPE,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="freezeAmt != null">
+        FREEZE_AMT,
+      </if>
+      <if test="operationTime != null">
+        OPERATION_TIME,
+      </if>
+      <if test="thawTime != null">
+        THAW_TIME,
+      </if>
+      <if test="freezeReason != null">
+        FREEZE_REASON,
+      </if>
+      <if test="thawReason != null">
+        THAW_REASON,
+      </if>
+      <if test="freezeOperator != null">
+        FREEZE_OPERATOR,
+      </if>
+      <if test="thawOperator != null">
+        THAW_OPERATOR,
+      </if>
+      <if test="freezeBatch != null">
+        FREEZE_BATCH,
+      </if>
+      <if test="thawBatch != null">
+        THAW_BATCH,
+      </if>
+      <if test="rev1 != null">
+        REV1,
+      </if>
+      <if test="rev2 != null">
+        REV2,
+      </if>
+      <if test="rev3 != null">
+        REV3,
+      </if>
+      <if test="rev4 != null">
+        REV4,
+      </if>
+      <if test="rev5 != null">
+        REV5,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentId != null">
+        #{parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentName != null">
+        #{parentAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeType != null">
+        #{freezeType,jdbcType=CHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=CHAR},
+      </if>
+      <if test="freezeAmt != null">
+        #{freezeAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="operationTime != null">
+        #{operationTime,jdbcType=VARCHAR},
+      </if>
+      <if test="thawTime != null">
+        #{thawTime,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeReason != null">
+        #{freezeReason,jdbcType=VARCHAR},
+      </if>
+      <if test="thawReason != null">
+        #{thawReason,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeOperator != null">
+        #{freezeOperator,jdbcType=VARCHAR},
+      </if>
+      <if test="thawOperator != null">
+        #{thawOperator,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeBatch != null">
+        #{freezeBatch,jdbcType=VARCHAR},
+      </if>
+      <if test="thawBatch != null">
+        #{thawBatch,jdbcType=VARCHAR},
+      </if>
+      <if test="rev1 != null">
+        #{rev1,jdbcType=VARCHAR},
+      </if>
+      <if test="rev2 != null">
+        #{rev2,jdbcType=VARCHAR},
+      </if>
+      <if test="rev3 != null">
+        #{rev3,jdbcType=VARCHAR},
+      </if>
+      <if test="rev4 != null">
+        #{rev4,jdbcType=VARCHAR},
+      </if>
+      <if test="rev5 != null">
+        #{rev5,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.FreezeOperationRecordExample" resultType="java.lang.Long">
+    select count(*) from P_FREEZE_OPERATION_RECORD
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.FreezeOperationRecord">
+    update P_FREEZE_OPERATION_RECORD
+    <set>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentId != null">
+        PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentName != null">
+        PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeType != null">
+        FREEZE_TYPE = #{freezeType,jdbcType=CHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=CHAR},
+      </if>
+      <if test="freezeAmt != null">
+        FREEZE_AMT = #{freezeAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="operationTime != null">
+        OPERATION_TIME = #{operationTime,jdbcType=VARCHAR},
+      </if>
+      <if test="thawTime != null">
+        THAW_TIME = #{thawTime,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeReason != null">
+        FREEZE_REASON = #{freezeReason,jdbcType=VARCHAR},
+      </if>
+      <if test="thawReason != null">
+        THAW_REASON = #{thawReason,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeOperator != null">
+        FREEZE_OPERATOR = #{freezeOperator,jdbcType=VARCHAR},
+      </if>
+      <if test="thawOperator != null">
+        THAW_OPERATOR = #{thawOperator,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeBatch != null">
+        FREEZE_BATCH = #{freezeBatch,jdbcType=VARCHAR},
+      </if>
+      <if test="thawBatch != null">
+        THAW_BATCH = #{thawBatch,jdbcType=VARCHAR},
+      </if>
+      <if test="rev1 != null">
+        REV1 = #{rev1,jdbcType=VARCHAR},
+      </if>
+      <if test="rev2 != null">
+        REV2 = #{rev2,jdbcType=VARCHAR},
+      </if>
+      <if test="rev3 != null">
+        REV3 = #{rev3,jdbcType=VARCHAR},
+      </if>
+      <if test="rev4 != null">
+        REV4 = #{rev4,jdbcType=VARCHAR},
+      </if>
+      <if test="rev5 != null">
+        REV5 = #{rev5,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.FreezeOperationRecord">
+    update P_FREEZE_OPERATION_RECORD
+    set AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
+      FREEZE_TYPE = #{freezeType,jdbcType=CHAR},
+      STATUS = #{status,jdbcType=CHAR},
+      FREEZE_AMT = #{freezeAmt,jdbcType=DECIMAL},
+      OPERATION_TIME = #{operationTime,jdbcType=VARCHAR},
+      THAW_TIME = #{thawTime,jdbcType=VARCHAR},
+      FREEZE_REASON = #{freezeReason,jdbcType=VARCHAR},
+      THAW_REASON = #{thawReason,jdbcType=VARCHAR},
+      FREEZE_OPERATOR = #{freezeOperator,jdbcType=VARCHAR},
+      THAW_OPERATOR = #{thawOperator,jdbcType=VARCHAR},
+      FREEZE_BATCH = #{freezeBatch,jdbcType=VARCHAR},
+      THAW_BATCH = #{thawBatch,jdbcType=VARCHAR},
+      REV1 = #{rev1,jdbcType=VARCHAR},
+      REV2 = #{rev2,jdbcType=VARCHAR},
+      REV3 = #{rev3,jdbcType=VARCHAR},
+      REV4 = #{rev4,jdbcType=VARCHAR},
+      REV5 = #{rev5,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+  <!--====================================以上代码自动生产，请勿更改=================================-->
+
+  <update id="updateByFreezeAgentId" parameterType="java.lang.String">
+    update P_FREEZE_OPERATION_RECORD b set b.STATUS='0',b.THAW_BATCH=null,THAW_REASON=null,THAW_OPERATOR=null,THAW_TIME=null
+    where b.AGENT_ID in (select AGENT_ID from P_FREEZE_AGENT where P_FREEZE_AGENT.ID=#{freezeAgentId})
+        and b.PARENT_AGENT_ID in (select PARENT_AGENT_ID from P_FREEZE_AGENT where P_FREEZE_AGENT.ID=#{freezeAgentId})
+        and b.THAW_BATCH in (select THAW_BATCH from P_FREEZE_AGENT where P_FREEZE_AGENT.ID=#{freezeAgentId})
+        and b.FREEZE_TYPE in (select FREEZE_TYPE from P_FREEZE_AGENT where P_FREEZE_AGENT.ID=#{freezeAgentId})
+  </update>
+</mapper>

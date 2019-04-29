@@ -9,9 +9,7 @@
         <setting name="aggressiveLazyLoading" value="true"/>
         <setting name="defaultExecutorType" value="BATCH" />
         <!-- 打印查询语句-->
-<!--
         <setting name="logImpl" value="STDOUT_LOGGING" />
--->
     </settings>
 
     <!-- mapper已经在spring-mybatis.xml中的sqlSessionFactory配置，这里不再需要配置 -->

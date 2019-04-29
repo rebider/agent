@@ -16,6 +16,7 @@ public enum BusActRelBusType {
     STAGING("/BusActRelBusType/STAGING","退单分期"),
     OTHER_DEDUCTION("/BusActRelBusType/OTHER_DEDUCTION","其他扣款分期"),
     ASSESS_DEDUCTION("/BusActRelBusType/ASSESS_DEDUCTION","考核扣款分期"),
+    TOOL_SUPPLY("/BusActRelBusType/TOOL_SUPPLY","省区补款/代理商代扣"),
     THAW("/BusActRelBusType/THAW","分润解冻申请"),
     PkType("/BusActRelBusType/PkType","订单补款"),
     refund("/BusActRelBusType/refund","退货审批"),
@@ -34,7 +35,9 @@ public enum BusActRelBusType {
     capitalChange("/BusActRelBusType/capitalChange","保证金变更申请"),
     CityApplyDeduction("/BusActRelBusType/cityApplyDeduction","其他扣款申请"),
     INVOICEAPPLY("/BusActRelBusType/invoiceApply","代理商发票审批"),
-    CityApplySupply("/BusActRelBusType/CityApplySupply","省区其他补款申请");
+    CityApplySupply("/BusActRelBusType/CityApplySupply","省区其他补款申请"),
+    thawAgentByCity("/BusActRelBusType/thawAgentByCity","代理商月分润解冻省区申请"),
+    thawAgentByBusiness("/BusActRelBusType/thawAgentByBusiness","代理商月分润解冻业务申请");
 
 
     public String key;

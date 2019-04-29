@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -99,6 +100,7 @@ public class NewProfitDataJob {
     public void deal(String profitDate) {
 
         profitDate = profitDate == null ? LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6) : profitDate;
+        String mergeDate = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()).toString();  // 合并日期
         LOG.info("分润月份" + profitDate);
         LOG.info("========获取POS分润数据开始=====");
         long t1 = System.currentTimeMillis();
@@ -119,7 +121,9 @@ public class NewProfitDataJob {
                                 LOG.info("POS分润数据同步:{}", profitData.getString("ORG_ID"));
                                 Map<String, Object> agentMap = getAgentId(profitData.getString("ORG_ID"));
                                 if (agentMap != null) {
-                                    insertTransProfitDetail(agentMap, profitData, settleMonth);
+                                    //获取合并代理商主代理商信息
+                                    List<Map<String,String>> mapList = transProfitDetailMapper.selectByBusNum(mergeDate,profitData.getString("ORG_ID"));
+                                    insertTransProfitDetail(agentMap, profitData, settleMonth,mapList);
                                 }
                             });
                         }
@@ -150,14 +154,22 @@ public class NewProfitDataJob {
      * @Author: zhaodw
      * @Date: 2018/8/6
      */
-    private void insertTransProfitDetail(Map<String, Object> agentMap, JSONObject profitData, String settleMonth) {
+    private void insertTransProfitDetail(Map<String, Object> agentMap, JSONObject profitData, String settleMonth,List<Map<String,String>> mapList) {
         TransProfitDetail transProfitDetail = new TransProfitDetail();
-        transProfitDetail.setAgentId((String) agentMap.get("AGENT_ID"));
-        transProfitDetail.setBusNum(profitData.getString("ORG_ID"));
-        transProfitDetail.setAgentName((String) agentMap.get("AG_NAME"));
-        transProfitDetail.setParentAgentId((String) agentMap.get("parentAgentId"));
+        if(mapList.size() > 0){
+            Map<String,String> map = mapList.get(0);
+            transProfitDetail.setRemark("合并:"+agentMap.get("AGENT_ID")+","+agentMap.get("AG_NAME"));
+            transProfitDetail.setAgentId( map.get("MAIN_AGENT_ID"));
+            transProfitDetail.setAgentName(map.get("AG_NAME"));
+        }else{
+            transProfitDetail.setAgentId((String) agentMap.get("AGENT_ID"));
+            transProfitDetail.setAgentName((String) agentMap.get("AG_NAME"));
+            transProfitDetail.setParentAgentId((String) agentMap.get("parentAgentId"));
+            transProfitDetail.setParentAgentName((String) agentMap.get("parentAgentName"));
+        }
+
         transProfitDetail.setParentBusNum((String) agentMap.get("parentBusNum"));
-        transProfitDetail.setParentAgentName((String) agentMap.get("parentAgentName"));
+        transProfitDetail.setBusNum(profitData.getString("ORG_ID"));
         transProfitDetail.setProfitDate(settleMonth);
         transProfitDetail.setProfitAmt(profitData.getBigDecimal("PFT_AMT") == null ? BigDecimal.ZERO : profitData.getBigDecimal("PFT_AMT"));
         transProfitDetail.setInTransAmt(profitData.getBigDecimal("TRAN_01_AMT") == null ? BigDecimal.ZERO : profitData.getBigDecimal("TRAN_01_AMT"));

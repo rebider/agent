@@ -47,7 +47,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    ID, AGENT_PID, AGENT_ID, AGENT_NAME, SUPPLY_TYPE, SUPPLY_AMT, SUPPLY_DATE, REMERK, 
+    P_PROFIT_SUPPLY.ID, AGENT_PID, AGENT_ID, AGENT_NAME, SUPPLY_TYPE, SUPPLY_AMT, SUPPLY_DATE, REMERK,
     SOURCE_ID, SUPPLY_CODE, PARENT_AGENT_ID, PARENT_AGENT_NAME, BUS_TYPE,BUS_BIG_TYPE
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyExample" >
@@ -311,6 +311,12 @@
     SELECT
     <include refid="Base_Column_List" />
     FROM P_PROFIT_SUPPLY
+    <if test="orgId != null and orgId != '' ">
+      INNER JOIN A_AGENT AGENT ON AGENT_ID = AGENT.ID AND AGENT.AG_DOC_PRO= #{orgId}
+    </if>
+    <if test="daQu != null and daQu != '' ">
+      INNER JOIN A_AGENT AGENT ON AGENT_ID = AGENT.ID AND AGENT.AG_DOC_DISTRICT= #{daQu}
+    </if>
     <include refid="BASE_WHERE_SQL"></include>
     <include refid="SORTING"></include>
     <include refid="PAGING_END" />
@@ -324,6 +330,12 @@
   <select id="getProfitSupplyCount" parameterType="java.util.Map" resultType="java.lang.Long">
     SELECT COUNT(1)
     FROM P_PROFIT_SUPPLY
+    <if test="orgId != null and orgId != '' ">
+      INNER JOIN A_AGENT AGENT ON AGENT_ID = AGENT.ID AND AGENT.AG_DOC_PRO= #{orgId}
+    </if>
+    <if test="daQu != null and daQu != '' ">
+      INNER JOIN A_AGENT AGENT ON AGENT_ID = AGENT.ID AND AGENT.AG_DOC_DISTRICT= #{daQu}
+    </if>
     <include refid="BASE_WHERE_SQL"></include>
   </select>
 
