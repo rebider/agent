@@ -381,8 +381,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
             oLogistics.setwNumber(wNumber);      // 物流单号
             oLogistics.setSnBeginNum(beginSn);   // 起始SN序列号
             oLogistics.setSnEndNum(endSn);     // 结束SN序列号
-
-
             logger.info("导入物流数据:{}={}" , oLogistics.getId(),JSONObject.toJSON(oLogistics));
             //调用明细接口之前需要先去数据库进行查询是否已有数据
             if (null != stringList && stringList.size() > 0) {
@@ -401,8 +399,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     }
                 }
             }
-
-
             //更新排单表发货数量
             ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(planVo.getId());
             if (receiptPlan != null) {
