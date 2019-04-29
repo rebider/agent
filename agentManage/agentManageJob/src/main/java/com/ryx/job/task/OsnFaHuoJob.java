@@ -26,7 +26,7 @@ public class OsnFaHuoJob implements DataflowJob<String> {
     @Override
     public List<String> fetchData(ShardingContext shardingContext) {
         try {
-            logger.info("发货处理物流开始获取数据");
+            logger.debug("发货处理物流开始获取数据");
             return osnOperateService.fetchFhData(0,shardingContext.getShardingItem());
         } catch (Exception e) {
             e.printStackTrace();

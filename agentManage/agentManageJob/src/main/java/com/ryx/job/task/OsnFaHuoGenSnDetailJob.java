@@ -27,8 +27,8 @@ public class OsnFaHuoGenSnDetailJob implements SimpleJob {
 
     @Override
     public void execute(ShardingContext shardingContext) {
-        logger.info("sn明细生成任务开始执行");
+        logger.debug("sn明细生成任务开始执行");
         osnOperateService.genLogicDetailTask();
-        logger.info("sn明细生成任务结束执行");
+        logger.debug("sn明细生成任务结束执行");
     }
 }
