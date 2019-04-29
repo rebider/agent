@@ -212,9 +212,6 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
         if(StringUtils.isNotBlank(freezeOperationRecord.getFreezeBatch())&& !"undefined".equals(freezeOperationRecord.getFreezeBatch())){
             criteria.andFreezeBatchEqualTo(freezeOperationRecord.getFreezeBatch());
         }
-        if(StringUtils.isNotBlank(freezeOperationRecord.getThawBatch())&& !"undefined".equals(freezeOperationRecord.getThawBatch())){
-            criteria.andThawBatchEqualTo(freezeOperationRecord.getThawBatch());
-        }
         if(StringUtils.isNotBlank(freezeOperationRecord.getFreezeType())&& !"undefined".equals(freezeOperationRecord.getFreezeType())){
             criteria.andFreezeTypeEqualTo(freezeOperationRecord.getFreezeType());
         }
