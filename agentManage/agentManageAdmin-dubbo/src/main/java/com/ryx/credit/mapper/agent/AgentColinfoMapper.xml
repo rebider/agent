@@ -369,7 +369,7 @@
         select
             a.AG_UNIQ_NUM, a.AG_NAME, c.ID, c.CLO_TYPE, c.CLO_REALNAME, c.CLO_BANK, c.CLO_BANK_BRANCH, c.CLO_BANK_ACCOUNT,
             c.C_TIME, c.C_UTIME, c.REMARK, c.C_USER, c.CLO_REVIEW_STATUS, c.STATUS, c.VARSION, c.BRANCH_LINE_NUM,
-            c.ALL_LINE_NUM, c.BANK_REGION, c.CLO_BANK_CODE, c.PAY_STATUS
+            c.ALL_LINE_NUM, c.BANK_REGION, c.CLO_BANK_CODE, c.PAY_STATUS,a.id as AGENT_ID
         from
         A_agent a  inner join A_agent_colinfo c on c.agent_id = a.id
         <where>
