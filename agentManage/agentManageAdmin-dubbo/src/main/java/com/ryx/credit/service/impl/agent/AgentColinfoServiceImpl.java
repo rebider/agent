@@ -376,7 +376,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
     }
 
     @Override
-    public AgentResult checkColInfo(AgentColinfo agentColinfo) {
+    public AgentResult checkColInfo(AgentColinfo agentColinfo) throws ProcessException{
         if(agentColinfo.isImport())return AgentResult.ok();
         /**
          * cxinfo 系统对开票和税点进行系统控制

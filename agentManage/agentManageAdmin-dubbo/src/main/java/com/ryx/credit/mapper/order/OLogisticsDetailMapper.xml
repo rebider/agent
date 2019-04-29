@@ -585,6 +585,8 @@
     from o_logistics_detail
     where
     sn_num between #{snBegin} and #{snEnd}
+    and length(sn_num)=length(#{snBegin})
+    and length(sn_num)=length(#{snEnd})
     and status = #{status}
     <if test="recordStatusList != null">
       and RECORD_STATUS in
@@ -608,6 +610,8 @@
          OPT_ID = #{refundPriceDiffDetailId}
       where
       SN_NUM between #{snBegin} and #{snEnd}
+      and length(SN_NUM)=length(#{snBegin})
+      and length(SN_NUM)=length(#{snEnd})
       and RECORD_STATUS = #{recordStatus}
       and STATUS = #{status}
   </update>
@@ -618,6 +622,8 @@
       from o_logistics_detail
       where
       sn_num between #{snBegin} and #{snEnd}
+      and length(sn_num)=length(#{snBegin})
+      and length(sn_num)=length(#{snEnd})
       and status = #{status} and RECORD_STATUS =#{recordStatus}
       order by sn_num asc
   </select>
@@ -628,6 +634,8 @@
       from o_logistics_detail
       where
       sn_num between #{snBegin} and #{snEnd}
+      and length(sn_num)=length(#{snBegin})
+      and length(sn_num)=length(#{snEnd})
       and status = #{status} and RECORD_STATUS =#{recordStatus}
   </select>
 
