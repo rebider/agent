@@ -178,12 +178,6 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                 logger.info("查询待处理的物流列表，并更新成处理中失败:{}",ids);
             }
         });
-
-        //查询处理中的数据进行业务处理
-        data = oLogisticsMapper.queryLogicInfoIdByStatus(FastMap
-                .fastMap("logType",LogType.Deliver.code)
-                .putKeyV("sendStatus",LogisticsSendStatus.send_ing.code)
-                .putKeyV("pagesize",200));
         return data;
     }
 
@@ -201,7 +195,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
             ids.forEach(id -> {
 
                 OLogisticsExample example = new OLogisticsExample();
-                example.or().andSendStatusEqualTo(LogisticsSendStatus.none_send.code).andIdEqualTo(id);
+                example.or().andSendStatusEqualTo(LogisticsSendStatus.send_ing.code).andIdEqualTo(id);
                 List<OLogistics> logistics_list = oLogisticsMapper.selectByExample(example);
                 OLogistics logistics_item = null;
                 if(logistics_list.size()>0){
