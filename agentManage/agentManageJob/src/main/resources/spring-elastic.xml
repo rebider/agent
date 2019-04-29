@@ -88,25 +88,25 @@
                 sharding-total-count="1"
                 sharding-item-parameters="0=Server0"/>
 
-    <job:simple id="osnFaHuoGenSnDetail"
-                job-ref="osnFaHuoGenSnDetailJob"
-                registry-center-ref="regCenter"
-                cron="0 0/1 * * * ?"
-                overwrite="true"
-                description="发货sn生成明细 单节点 每分钟"
-                sharding-total-count="1"
-                sharding-item-parameters="0=Server0"/>
+    <!--<job:simple id="osnFaHuoGenSnDetail"-->
+                <!--job-ref="osnFaHuoGenSnDetailJob"-->
+                <!--registry-center-ref="regCenter"-->
+                <!--cron="0 0/1 * * * ?"-->
+                <!--overwrite="true"-->
+                <!--description="发货sn生成明细 单节点 每分钟"-->
+                <!--sharding-total-count="1"-->
+                <!--sharding-item-parameters="0=Server0"/>-->
 
-    <job:dataflow id="osnFaHuo"
-                job-ref="osnFaHuoJob"
-                registry-center-ref="regCenter"
-                cron="0 0/1 * * * ?"
-                sharding-total-count="1"
-                sharding-item-parameters="0=C"
-                streaming-process="true"
-                description="发货sn下发业务系统任务  单节点 每分钟 流模式处理"
-                overwrite="true"
-                disabled="false"/>
+    <!--<job:dataflow id="osnFaHuo"-->
+                <!--job-ref="osnFaHuoJob"-->
+                <!--registry-center-ref="regCenter"-->
+                <!--cron="0 0/1 * * * ?"-->
+                <!--sharding-total-count="1"-->
+                <!--sharding-item-parameters="0=C"-->
+                <!--streaming-process="true"-->
+                <!--description="发货sn下发业务系统任务  单节点 每分钟 流模式处理"-->
+                <!--overwrite="true"-->
+                <!--disabled="false"/>-->
 
 
 
