@@ -152,7 +152,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 listRes.add("物流["+objectList.toString()+"]导入失败:"+e.getMessage());
             }
         }
-        logger.info("user{}导入物流抛出异常的数据有{}",user,listRes.toString());
+        logger.info("user{}导入物流的数据有{}",user,listRes.toString());
         return listRes;
     }
 
@@ -420,7 +420,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             PlatForm platForm =platFormMapper.selectByPlatFormNum(order.getOrderPlatform());
 
             //如果发货数量大于200-此处大量数据走任务
-            if(oLogistics.getSendNum().compareTo(new BigDecimal(200))>0) {
+            if(oLogistics.getSendNum().compareTo(new BigDecimal(0))>0) {
                 //物流为未发送状态
                 oLogistics.setSendStatus(LogisticsSendStatus.none_send.code);
                 if (1 != insertImportData(oLogistics)) {
@@ -485,8 +485,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     }
                     //进行入库、机具划拨操作 POS下发业务系统
                     if (platForm.getPlatformType().equals(PlatformType.POS.code) || platForm.getPlatformType().equals(PlatformType.ZPOS.code)){
-
-                        List<String> snList = JsonUtil.jsonToPojo(JsonUtil.objectToJson(resultVO.getObj()), List.class);
                         ImsTermWarehouseDetail imsTermWarehouseDetail = new ImsTermWarehouseDetail();
                         OOrder oOrder = oOrderMapper.selectByPrimaryKey(subOrderItem.getOrderId());
                         if (null==oOrder) {
@@ -504,7 +502,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                         OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
                         try {
                             //机具下发接口
-                            AgentResult posSendRes = imsTermWarehouseDetailService.insertWarehouseAndTransfer(snList,imsTermWarehouseDetail);
+                            AgentResult posSendRes = imsTermWarehouseDetailService.insertWarehouseAndTransfer(stringList,imsTermWarehouseDetail);
                             if(posSendRes.isOK()){
                                 logistics_send.setSendMsg(posSendRes.getMsg());
                                 logistics_send.setSendStatus(Status.STATUS_1.status);
@@ -825,7 +823,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             }
         }
         List<String> idList = idList(startSn, endSn, begins, finish,ol.getProCom());
-
+        List<OLogisticsDetail> resOLogisticsDetail = new ArrayList();
         if (null != idList && idList.size() > 0) {
             for (String idSn : idList) {
                 OLogisticsDetail detail = new OLogisticsDetail();
@@ -878,9 +876,10 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     logger.info("添加失败");
                     throw new ProcessException("添加失败");
                 }
+                resOLogisticsDetail.add(detail);
             }
         }
-        return ResultVO.success(idList);
+        return ResultVO.success(resOLogisticsDetail);
     }
 
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
@@ -964,7 +963,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
                     detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
                 }
-                detail.setSendStatus(LogisticsDetailSendStatus.send_success.code);
+//                detail.setSendStatus(LogisticsDetailSendStatus.send_success.code);
                 if (1 != oLogisticsDetailMapper.updateByPrimaryKeySelective(detail)) {
                     logger.info("修改失败");
                     throw new ProcessException("修改失败");
