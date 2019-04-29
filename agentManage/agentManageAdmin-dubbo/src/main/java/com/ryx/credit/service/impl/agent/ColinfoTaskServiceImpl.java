@@ -115,8 +115,16 @@ public class ColinfoTaskServiceImpl implements ColinfoTaskService {
                 payment.setDatasource("13");  //收款账户同步清结算类型
                 AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
                 AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
-                criteria.andAgentIdEqualTo(payment.getMerchId());
+                criteria.andAgentIdEqualTo(String.valueOf(row.get("AGENT_ID")));
                 List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+                if(agentBusInfos==null){
+                    log.info("synColinfoToPayment,未分配打款公司,暂不出款");
+                    return;
+                }
+                if(agentBusInfos.size()==0){
+                    log.info("synColinfoToPayment,未分配打款公司,暂不出款");
+                    return;
+                }
                 payment.setAccountId(agentBusInfos.get(0).getCloPayCompany());  //出款
                 try {
                     agentColinfoService.insertByPayment(payment);
@@ -126,7 +134,7 @@ public class ColinfoTaskServiceImpl implements ColinfoTaskService {
                 }
             }
         } catch (Exception e) {
-            log.info("synColinfoToPayment同步出现异常:{},代理商ID:{}",e.getMessage(),merchId);
+            log.error("synColinfoToPayment同步出现异常:{},代理商ID:{}",e,merchId);
             e.printStackTrace();
         } finally {
             if(StringUtils.isNotBlank(indentifier)){
