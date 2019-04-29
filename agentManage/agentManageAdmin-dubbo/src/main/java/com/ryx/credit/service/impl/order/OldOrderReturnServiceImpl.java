@@ -795,6 +795,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         oLogistics.setwNumber(wNumber);      // 物流单号
         oLogistics.setSnBeginNum(beginSn);   // 起始SN序列号
         oLogistics.setSnEndNum(endSn);     // 结束SN序列号
+        oLogistics.setSendStatus(LogisticsSendStatus.send_ing.code);
         logger.info("导入物流数据============================================{}" , oLogistics.getId(),JSONObject.toJSON(oLogistics));
         if (1 != oLogisticsMapper.insertSelective(oLogistics)) {
             throw new MessageException("排单编号为:"+planNum+"处理，插入物流信息失败,事物回滚");
