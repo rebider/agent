@@ -36,10 +36,13 @@ public class TaxDeductionDetailServiceImpl implements ITaxDeductionDetailService
     private PDataAdjustMapper pDataAdjustMapper;
 
     @Override
-    public PageInfo posDeductTaxList(TaxDeductionDetail taxDeductionDetail, Page page,String dateStart,String dateEnd) {
+    public PageInfo posDeductTaxList(Map<String,String> map,TaxDeductionDetail taxDeductionDetail, Page page,String dateStart,String dateEnd) {
         //获取直签数据列表
         TaxDeductionDetailExample example=new TaxDeductionDetailExample();
         example.setPage(page);
+        if(map != null){
+            example.setInnerJoinDepartment(map);
+        }
         TaxDeductionDetailExample.Criteria criteria=example.createCriteria();
         if(StringUtils.isNotBlank(taxDeductionDetail.getAgentName())){
             criteria.andAgentNameEqualTo(taxDeductionDetail.getAgentName());
@@ -137,11 +140,11 @@ public class TaxDeductionDetailServiceImpl implements ITaxDeductionDetailService
      * @return
      */
     @Override
-    public PageInfo queryAndSubordinate(TaxDeductionDetail taxDeductionDetail,Page page) {
-        List<TaxDeductionDetail> taxDeductionDetails = taxDeductionDetailMapper.queryAndSubordinate(taxDeductionDetail,page);
+    public PageInfo queryAndSubordinate(Map<String,String> map,TaxDeductionDetail taxDeductionDetail,Page page) {
+        List<TaxDeductionDetail> taxDeductionDetails = taxDeductionDetailMapper.queryAndSubordinate(map,taxDeductionDetail,page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(taxDeductionDetails);
-        pageInfo.setTotal((int)taxDeductionDetailMapper.queryCountAndSubordinate(taxDeductionDetail));
+        pageInfo.setTotal((int)taxDeductionDetailMapper.queryCountAndSubordinate(map,taxDeductionDetail));
         return pageInfo;
     }
 

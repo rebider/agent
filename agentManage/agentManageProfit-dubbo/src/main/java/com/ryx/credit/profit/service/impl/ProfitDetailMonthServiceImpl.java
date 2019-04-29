@@ -73,6 +73,10 @@ public class ProfitDetailMonthServiceImpl implements ProfitDetailMonthService {
     public List<ProfitDetailMonth> selectByExample(ProfitDetailMonthExample example) {
         return profitDetailMonthMapper.selectByExample(example);
     }
+    @Override
+    public ProfitDetailMonth selectByIdAndParent(ProfitDetailMonth example) {
+        return profitDetailMonthMapper.selectByIdAndParent(example);
+    }
 
     @Override
     public ProfitDetailMonth selectByPrimaryKey(String id) {

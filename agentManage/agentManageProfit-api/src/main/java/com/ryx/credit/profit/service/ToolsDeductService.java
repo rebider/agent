@@ -2,9 +2,11 @@ package com.ryx.credit.profit.service;
 
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
-import com.ryx.credit.profit.pojo.ProfitDeduction;
-import com.ryx.credit.profit.pojo.ProfitStagingDetail;
+import com.ryx.credit.profit.pojo.*;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -80,4 +82,38 @@ public interface ToolsDeductService {
      */
     public List<Map<String, Object>> getNotDeductDetail(String beforeDeductDate, String deductDate, String type);
 
+    /**
+     * 省区补款审批流启动
+     * @param pToolSupplys
+     * @param userId
+     * @param workId
+     * @throws ProcessException
+     * chenliang
+     */
+    public void applySupplystment(List<PToolSupply> pToolSupplys, String userId, String workId,PRemitInfo pRemitInfo) throws ProcessException;
+
+    /**
+     * 根据扣款id查询扣款记录
+     * @param id
+     * @return
+     * chenliang
+     */
+    ProfitDeduction selectByPrimaryKey(String id);
+    /**
+     * 修改机具中线下补款明细/上级代扣的审批信息
+     */
+    void editToolSupply(List<PToolSupply> pToolSupplys, String detailId, PRemitInfo pRemitInfo);
+
+    public void updateStatus(String activId, String type);
+
+
+
+    public List<PToolSupply> selectByExample(PToolSupply pToolSupply);
+
+    List<PRemitInfo> brCitySupplyId(String citySupplyId);
+
+    public AgentResult approvalToolSupplyTask(AgentVo agentVo, String userId) throws ProcessException;
+    public int updateByPrimaryKey(PRemitInfo pRemitInfo);
+
+    PageInfo getSupplyPromptList(Map<String,Object> map, Page page,ProfitDeduction profitDeduction);
 }

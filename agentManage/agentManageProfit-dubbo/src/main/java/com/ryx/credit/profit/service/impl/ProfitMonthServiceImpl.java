@@ -7,6 +7,7 @@ import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.profit.dao.*;
+import com.ryx.credit.profit.enums.CitySupplyStatus;
 import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.*;
@@ -103,6 +104,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     private ProfitDirectMapper profitDirectMapper;
     @Autowired
     ProfitDeductionMapper profitDeductionMapper;
+    @Autowired
+    PToolSupplyMapper pToolSupplyMapper;
+    @Autowired
+    private IFreezeAgentSercice freezeAgentSercice;
 
 
     public final static Map<String, Map<String, Object>> temp = new HashMap<>();
@@ -512,6 +517,44 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 }
             });
 
+
+
+
+            //机具扣款未扣足，关联代理商未扣足，线下补款或者上级代扣。
+            //获取本月申请通过的所有代理商数据
+            PToolSupplyExample pToolSupplyExample = new PToolSupplyExample();
+            PToolSupplyExample.Criteria criteria = pToolSupplyExample.createCriteria();
+            criteria.andProfitDateEqualTo(profitDate);
+            criteria.andExaminrStatusEqualTo(CitySupplyStatus.STATUS_02.code);
+            List<PToolSupply> pToolSupplies = pToolSupplyMapper.selectByExample(pToolSupplyExample);
+            for (PToolSupply pToolSupply:pToolSupplies) {
+                Map<String, Object> map = new HashMap<>(10);
+                map.put("agentPid", pToolSupply.getAgentId());
+                map.put("parentAgentId",pToolSupply.getParenterAgentId());
+                map.put("deductDate", LocalDate.now().plusMonths(-1).toString().substring(0, 7).replaceAll("-", ""));   //扣款月份
+                map.put("computType", computType);
+                map.put("rotation", "4");
+                map.put("pToolSupply",pToolSupply);
+                try {
+                    profitToolsDeductService.execut(map);
+                }catch (Exception e){
+                    e.printStackTrace();
+                    LOG.error("机具扣款汇总补扣失败");
+                    throw new RuntimeException("机具扣款汇总补扣失败");
+                }
+
+            }
+
+
+
+           /* toolNotDeductionList.parallelStream().forEach(profitDetailMonthTemp -> {
+                List<Map<String, Object>> gsList = getSupplyAgent(profitDetailMonthTemp, profitAmtMap, profitDate);
+                if (gsList != null && gsList.size() > 0) {
+                    doSupplyToolDeduction(profitDetailMonthTemp, computType, gsList, "4");
+                }
+            });*/
+
+
             // 扣税
             taxDeductionService.taxDeductionComputer();
 
@@ -524,7 +567,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             // 更新实发分润
             profitDetailMonthMapper.updateRealProfitAmt(params);
 
-            //代理商退出分润状态更改
+            //代理商月分润状态更改
             this.updateAgentQuitProfit(profitDate);
 
             long send = System.currentTimeMillis();
@@ -540,15 +583,45 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     /**
      *  代理商退出月分润冻结/解冻
      */
+    //@Override
     private void updateAgentQuitProfit(String profitDate){
         profitDetailMonthMapper.updateMonthProfitFozzen(profitDate);
-        LOG.info("代理商退出申请发起，月分润冻结");
-        profitDetailMonthMapper.updateMonthProfitUnFozzen(profitDate);
-        LOG.info("代理商退出申请失败，月分润解冻");
+        LOG.info("代理商退出，月分润冻结");
+        directMapper.updateDirectProfitFozzen(profitDate);
+        LOG.info("代理商退出，直发分润冻结");
+        List<FreezeAgent> list = freezeAgentSercice.getFreezeList();
+        for (FreezeAgent freezeAgent : list) {
+            profitDetailMonthMapper.updateStatusFreeze(profitDate,freezeAgent);
+        }
+        LOG.info("批量更新月分润状态");
     }
 
 
-
+   /* *//**
+     * @Author: chenliang
+     * @Description: 组群代理商机具扣款线下补款
+     * @Date: 15:19 2019/4/15
+     *//*
+    private List<Map<String, Object>> doSupplyToolDeduction(ProfitDetailMonth profitDetailMonthTemp, String computType,
+                                                        List<Map<String, Object>> gsList, String rotation) {
+        Map<String, Object> map = new HashMap<>(10);
+        map.put("agentPid", profitDetailMonthTemp.getAgentId());
+        map.put("agentProfitAmt", profitDetailMonthTemp.getBasicsProfitAmt());
+        map.put("parentAgentId",profitDetailMonthTemp.getParentAgentId());
+        map.put("deductDate", LocalDate.now().plusMonths(-1).toString().substring(0, 7).replaceAll("-", ""));   //扣款月份
+        map.put("gsList", gsList);     //代理商组群
+        map.put("computType", computType);
+        map.put("rotation", rotation);
+        try {
+            map = profitToolsDeductService.execut(map);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("机具扣款汇总补扣失败");
+            throw new RuntimeException("机具扣款汇总补扣失败");
+        }
+        return ((List) map.get("gsList"));
+    }
+*/
 
     /**
      * @Author: Zhang Lei
@@ -948,6 +1021,40 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         return null;
     }
 
+
+ /*   *//**
+     * @Author: chenliang
+     * @Description: 获取省区补款代理商分润数据
+     * @Date:  2019/4/15
+     *//*
+    private List<Map<String, Object>> getSupplyAgent(ProfitDetailMonth profitDetailMonth, Map<String, List<Map<String, Object>>> profitAmtMap, String profitDate) {
+        PToolSupplyExample pToolSupplyExample = new PToolSupplyExample();
+        PToolSupplyExample.Criteria criteria = pToolSupplyExample.createCriteria();
+        if(StringUtils.isNotBlank(profitDetailMonth.getAgentId())){
+            criteria.andAgentIdEqualTo(profitDetailMonth.getAgentId());
+        }
+        if(StringUtils.isNotBlank(profitDetailMonth.getParentAgentId())){
+            criteria.andParenterAgentIdEqualTo(profitDetailMonth.getAgentId());
+        }
+        if(StringUtils.isNotBlank(profitDate)){
+            criteria.andProfitDateEqualTo(profitDate);
+        }
+        List<PToolSupply> pToolSupplies = pToolSupplyMapper.selectByExample(pToolSupplyExample);
+        if (pToolSupplies != null && pToolSupplies.size() > 0) {
+            List<Map<String, Object>> list = new ArrayList<Map<String, Object>>(10);
+            pToolSupplies.forEach(pToolSupply ->{
+                String pToolSupplyAgentId = pToolSupply.getAgentId();
+                if (profitAmtMap.containsKey(pToolSupplyAgentId)) {
+                    list.addAll(profitAmtMap.get(pToolSupplyAgentId));
+                }
+            });
+            return list;
+        }
+        return null;
+    }*/
+
+
+
     /**
      * 导出数据
      *
@@ -1078,6 +1185,11 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         return list;
     }
 
+    @Override
+    public List<ProfitDetailMonth> byProfitDetailMonth(ProfitDetailMonthExample profitDetailMonthExample) {
+        return profitDetailMonthMapper.selectByExample(profitDetailMonthExample);
+    }
+
 
     @Override
     public Map<String, Object> profitCount(Map<String, Object> param) {
@@ -1097,53 +1209,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 
 
-    /**
-     * 代理商日分润冻结
-     * @param list 手刷平台机构编码
-     * @return
-     */
-    @Override
-    public Map<String, String> doFrozenByAgent(List<String> list) {
-
-        HashMap<String, String> map = new HashMap<String, String>();
-        map.put("agencyBlack_type", "1");
-        map.put("type", "1");
-        map.put("unfreeze", "0");
-        map.put("flag", "4");
-        map.put("batchIds", list.toString());
-        String params = JsonUtil.objectToJson(map);
-        String res = HttpClientUtil.doPostJson
-                (AppConfig.getProperty("busiPlat.refuse"), params);
-        LOG.debug("请求信息：" + res);
-        Map<String, String> map1 = new HashMap<String, String>();
-        map1.put(JSONObject.parseObject(res).get("respCode").toString(),
-                JSONObject.parseObject(res).get("respMsg").toString());
-        return map1;
-
-    }
-
-    /**
-     * 代理商日分润解冻
-     * @param list 手刷平台机构编码
-     * @return
-     */
-    @Override
-    public Map<String, String> doUnFrozenAgentProfit(List<String> list) {
-        HashMap<String, String> map = new HashMap<String, String>();
-        map.put("agencyBlack_type", "0");
-        map.put("type", "1");
-        map.put("unfreeze", "0");
-        map.put("flag", "0");
-        map.put("batchIds", list.toString());//AG码list
-        String params = JsonUtil.objectToJson(map);
-        String res = HttpClientUtil.doPostJson
-                (AppConfig.getProperty("busiPlat.refuse"), params);
-        Map<String, String> map1 = new HashMap<String, String>();
-        map1.put(JSONObject.parseObject(res).get("respCode").toString(),
-                JSONObject.parseObject(res).get("respMsg").toString());
-        return map1;
-
-    }
 
 
     /***

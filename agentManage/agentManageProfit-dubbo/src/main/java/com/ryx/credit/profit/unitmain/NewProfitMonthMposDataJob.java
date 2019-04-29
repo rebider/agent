@@ -23,12 +23,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
+import java.util.*;
 
 /**
- * 手刷月分润数据同步、定时 cxinfo 同步手刷月分润明细数据 汪勇
+ * 手刷月分润数据同步、定时 cxinfo 同步手刷月分润明细数据 汪勇  todo
  */
 @Service("newProfitMonthMposDataJob")
 @Transactional(rollbackFor = RuntimeException.class)
@@ -167,15 +167,26 @@ public class NewProfitMonthMposDataJob {
                 platFormNum = "1001";
             }*/
 
+            //本月之前通过的合并关系
+            String mergeDate = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()).toString();
+            List<Map<String,String>> mapList = transProfitDetailMapper.selectByBusNum(mergeDate,json.getString("AGENCYID"));
+            if(mapList.size() >0){ //有合并关系
+                Map<String,String> map = mapList.get(0);
+                detail.setRemark("合并:"+ (null == Busime ? "AG01" : Busime.getAgentId())+","+json.getString("COMPANYNAME"));
+                detail.setAgentId(map.get("MAIN_AGENT_ID"));//合并代理商AG码
+                detail.setAgentName(map.get("AG_NAME"));//合并主代理商名称
+            }else{
+                detail.setAgentId(null == Busime ? "AG01" : Busime.getAgentId());//AG码
+                detail.setAgentName(json.getString("COMPANYNAME"));//代理商名称
+                detail.setParentAgentId(parentAgentId);//上级AG码
+                detail.setParentAgentName(json.getString("ONLINEAGENCYNAME"));
+            }
+
             detail.setId(idService.genId(TabId.P_PROFIT_DETAIL_M));//主键
             detail.setProfitDate(transDate);//月份
             detail.setBusNum(json.getString("AGENCYID"));//业务平台机构号
             detail.setParentBusNum(json.getString("ONLINEAGENCYID"));//业务平台上级机构号
             detail.setBusCode(platFormNum);//平台号
-            detail.setParentAgentId(parentAgentId);//上级AG码
-            detail.setParentAgentName(json.getString("ONLINEAGENCYNAME"));
-            detail.setAgentId(null == Busime ? "AG01" : Busime.getAgentId());//AG码
-            detail.setAgentName(json.getString("COMPANYNAME"));//代理商名称
             detail.setInTransAmt(json.getBigDecimal("SAMOUNT") == null ? BigDecimal.ZERO : json.getBigDecimal("SAMOUNT"));//付款交易额
             detail.setTransFee(json.getBigDecimal("FEEAMT"));//交易手续费
             detail.setUnicode(json.getString("UNIQUECODE"));//财务自编码
