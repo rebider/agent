@@ -136,4 +136,7 @@ public interface ProfitDetailMonthMapper {
     /**更改月分润分润状态*/
     void updateStatusFreeze(@Param("date") String date,@Param("freezeAgent") FreezeAgent freezeAgent);
 
+    /**清除已汇总手刷分润*/
+    void updateMPOSAMT(@Param("date")String date);
+
 }

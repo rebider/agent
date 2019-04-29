@@ -510,7 +510,7 @@ start with
       from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
       where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') =
       nvl(bb.PARENT_AGENT_NAME,'-')
-      and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '1'
+      and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '1'and bb.STATUS='0'
       <if test= "STATUS != 1">
         union all
     </if>
@@ -518,39 +518,37 @@ start with
     </if>
     <if test="STATUS == null or STATUS == '' or STATUS == 2">
 
-        select aa.ID ,aa.AGENT_NAME,aa.AGENT_ID,aa.PARENT_AGENT_ID,aa.PARENT_AGENT_NAME,aa.FREEZE_TYPE,
-        aa.OPERATION_BATCH as FREEZE_OPERATION_BATCH,aa.STATUS,bb.FREEZE_AMT,bb.OPERATION_TIME as FREEZE_TIME, bb.FREEZE_REASON,bb.THAW_TIME,
-        cast('' as varchar2(32)) as RELIEVE_TIME,cast('' as varchar2(256)) as RELIEVE_REASON,cast(0.00 as number(16,2))
-        as RELIEVE_AMT,cast('' as varchar2(32)) as RELIEVE_OPERATION_BATCH
-        from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
-        where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') =
-        nvl(bb.PARENT_AGENT_NAME,'-')
-        and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '2'
+      select aa.ID ,aa.AGENT_NAME,aa.AGENT_ID,aa.PARENT_AGENT_ID,aa.PARENT_AGENT_NAME,aa.FREEZE_TYPE,
+      aa.OPERATION_BATCH as FREEZE_OPERATION_BATCH,aa.STATUS,bb.FREEZE_AMT,bb.OPERATION_TIME as FREEZE_TIME, bb.FREEZE_REASON,bb.THAW_TIME,
+      cast('' as varchar2(32)) as RELIEVE_TIME,cast('' as varchar2(256)) as RELIEVE_REASON,cast(0.00 as number(16,2))
+      as RELIEVE_AMT,cast('' as varchar2(32)) as RELIEVE_OPERATION_BATCH
+      from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
+      where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') =
+      nvl(bb.PARENT_AGENT_NAME,'-')
+      and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '2'and bb.STATUS='2'
       <if test= "STATUS != 2">
         union all
       </if>
     </if>
     <if test="STATUS == null or STATUS == '' or STATUS == 0">
-
       select xxx.ID ,xxx.AGENT_NAME,xxx.AGENT_ID,xxx.PARENT_AGENT_ID,xxx.PARENT_AGENT_NAME,xxx.FREEZE_TYPE,
-        xxx.FREEZE_OPERATION_BATCH,xxx.STATUS,xxx.FREEZE_AMT,xxx.FREEZE_TIME,
-        xxx.FREEZE_REASON,xxx.THAW_TIME,zzz.RELIEVE_TIME,zzz.RELIEVE_REASON,zzz.RELIEVE_AMT,zzz.RELIEVE_OPERATION_BATCH from
-        (select aa.ID ,aa.AGENT_NAME,aa.AGENT_ID,aa.PARENT_AGENT_ID,aa.PARENT_AGENT_NAME,aa.FREEZE_TYPE,
-        aa.OPERATION_BATCH as FREEZE_OPERATION_BATCH,aa.STATUS,aa.REV1,bb.FREEZE_AMT,bb.OPERATION_TIME as FREEZE_TIME,
-        bb.FREEZE_REASON,bb.THAW_TIME
-        from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
-        where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') =
-        nvl(bb.PARENT_AGENT_NAME,'-')
-        and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '1') xxx,
-        (select aa.ID ,aa.AGENT_NAME,aa.AGENT_ID,aa.PARENT_AGENT_ID,aa.PARENT_AGENT_NAME,aa.FREEZE_TYPE,
-        aa.OPERATION_BATCH as RELIEVE_OPERATION_BATCH,aa.STATUS,aa.REV1,bb.FREEZE_AMT as RELIEVE_AMT,bb.OPERATION_TIME as RELIEVE_TIME,
-        bb.FREEZE_REASON as RELIEVE_REASON,bb.THAW_TIME
-        from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
-        where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') =
-        nvl(bb.PARENT_AGENT_NAME,'-')
-        and aa.REV1=bb.FREEZE_BATCH and aa.STATUS = '0') zzz where xxx.AGENT_ID = zzz.AGENT_ID and
-        nvl(xxx.PARENT_AGENT_NAME,'-') = nvl(zzz.PARENT_AGENT_NAME,'-') and xxx.FREEZE_TYPE = zzz.FREEZE_TYPE
-
+      xxx.FREEZE_OPERATION_BATCH,xxx.STATUS,xxx.FREEZE_AMT,xxx.FREEZE_TIME,
+      xxx.FREEZE_REASON,xxx.THAW_TIME,zzz.RELIEVE_TIME,zzz.RELIEVE_REASON,zzz.RELIEVE_AMT,zzz.RELIEVE_OPERATION_BATCH from
+      (select aa.ID ,aa.AGENT_NAME,aa.AGENT_ID,aa.PARENT_AGENT_ID,aa.PARENT_AGENT_NAME,aa.FREEZE_TYPE,
+      aa.OPERATION_BATCH as FREEZE_OPERATION_BATCH,aa.STATUS,aa.REV1,bb.FREEZE_AMT,bb.OPERATION_TIME as FREEZE_TIME,
+      bb.FREEZE_REASON,bb.THAW_TIME
+      from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
+      where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') =
+      nvl(bb.PARENT_AGENT_NAME,'-')
+      and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '0'and bb.STATUS='1') xxx,
+      (select aa.ID ,aa.AGENT_NAME,aa.AGENT_ID,aa.PARENT_AGENT_ID,aa.PARENT_AGENT_NAME,aa.FREEZE_TYPE,
+      aa.OPERATION_BATCH as RELIEVE_OPERATION_BATCH,aa.STATUS,aa.REV1,bb.FREEZE_AMT as RELIEVE_AMT,bb.OPERATION_TIME as RELIEVE_TIME,
+      bb.FREEZE_REASON as RELIEVE_REASON,bb.THAW_TIME
+      from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
+      where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') =
+      nvl(bb.PARENT_AGENT_NAME,'-')
+      and aa.REV1=bb.THAW_BATCH and aa.STATUS = '0'and bb.STATUS='1') zzz where xxx.AGENT_ID = zzz.AGENT_ID and
+      nvl(xxx.PARENT_AGENT_NAME,'-') = nvl(zzz.PARENT_AGENT_NAME,'-') and xxx.FREEZE_TYPE = zzz.FREEZE_TYPE
     </if>
     )
       where 1=1
@@ -578,51 +576,62 @@ start with
 
 
       select count(*) from(
-        select aa.ID ,aa.AGENT_NAME,aa.AGENT_ID,aa.PARENT_AGENT_ID,aa.PARENT_AGENT_NAME,aa.FREEZE_TYPE,
-        aa.OPERATION_BATCH as FREEZE_OPERATION_BATCH,aa.STATUS,bb.FREEZE_AMT,bb.OPERATION_TIME as FREEZE_TIME, bb.FREEZE_REASON,bb.THAW_TIME,
-        cast('' as varchar2(32)) as RELIEVE_TIME,cast('' as varchar2(256)) as RELIEVE_REASON,cast(0.00 as number(16,2))
-        as RELIEVE_AMT,cast('' as varchar2(32)) as RELIEVE_OPERATION_BATCH
-        from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
-        where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') =
-        nvl(bb.PARENT_AGENT_NAME,'-')
-        and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '1'
-
+    select * from(
+    <if test="STATUS == null or STATUS == '' or STATUS == 1">
+      select aa.ID ,aa.AGENT_NAME,aa.AGENT_ID,aa.PARENT_AGENT_ID,aa.PARENT_AGENT_NAME,aa.FREEZE_TYPE,
+      aa.OPERATION_BATCH as FREEZE_OPERATION_BATCH,aa.STATUS,bb.FREEZE_AMT,bb.OPERATION_TIME as FREEZE_TIME, bb.FREEZE_REASON,bb.THAW_TIME,
+      cast('' as varchar2(32)) as RELIEVE_TIME,cast('' as varchar2(256)) as RELIEVE_REASON,cast(0.00 as number(16,2))
+      as RELIEVE_AMT,cast('' as varchar2(32)) as RELIEVE_OPERATION_BATCH
+      from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
+      where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') =
+      nvl(bb.PARENT_AGENT_NAME,'-')
+      and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '1'and bb.STATUS='0'
+      <if test= "STATUS != 1">
         union all
-
-        select aa.ID ,aa.AGENT_NAME,aa.AGENT_ID,aa.PARENT_AGENT_ID,aa.PARENT_AGENT_NAME,aa.FREEZE_TYPE,
-        aa.OPERATION_BATCH as FREEZE_OPERATION_BATCH,aa.STATUS,bb.FREEZE_AMT,bb.OPERATION_TIME as FREEZE_TIME, bb.FREEZE_REASON,bb.THAW_TIME,
-        cast('' as varchar2(32)) as RELIEVE_TIME,cast('' as varchar2(256)) as RELIEVE_REASON,cast(0.00 as number(16,2))
-        as RELIEVE_AMT,cast('' as varchar2(32)) as RELIEVE_OPERATION_BATCH
-        from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
-        where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') =
-        nvl(bb.PARENT_AGENT_NAME,'-')
-        and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '2'
-
-        union all
-
-        select xxx.ID ,xxx.AGENT_NAME,xxx.AGENT_ID,xxx.PARENT_AGENT_ID,xxx.PARENT_AGENT_NAME,xxx.FREEZE_TYPE,
-        xxx.FREEZE_OPERATION_BATCH,xxx.STATUS,xxx.FREEZE_AMT,xxx.FREEZE_TIME,
-        xxx.FREEZE_REASON,xxx.THAW_TIME,zzz.RELIEVE_TIME,zzz.RELIEVE_REASON,zzz.RELIEVE_AMT,zzz.RELIEVE_OPERATION_BATCH from
-        (select aa.ID ,aa.AGENT_NAME,aa.AGENT_ID,aa.PARENT_AGENT_ID,aa.PARENT_AGENT_NAME,aa.FREEZE_TYPE,
-        aa.OPERATION_BATCH as FREEZE_OPERATION_BATCH,aa.STATUS,aa.REV1,bb.FREEZE_AMT,bb.OPERATION_TIME as FREEZE_TIME,
-        bb.FREEZE_REASON,bb.THAW_TIME
-        from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
-        where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') =
-        nvl(bb.PARENT_AGENT_NAME,'-')
-        and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '1') xxx,
-        (select aa.ID ,aa.AGENT_NAME,aa.AGENT_ID,aa.PARENT_AGENT_ID,aa.PARENT_AGENT_NAME,aa.FREEZE_TYPE,
-        aa.OPERATION_BATCH as RELIEVE_OPERATION_BATCH,aa.STATUS,aa.REV1,bb.FREEZE_AMT as RELIEVE_AMT,bb.OPERATION_TIME as RELIEVE_TIME,
-        bb.FREEZE_REASON as RELIEVE_REASON,bb.THAW_TIME
-        from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
-        where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') =
-        nvl(bb.PARENT_AGENT_NAME,'-')
-        and aa.REV1=bb.FREEZE_BATCH and aa.STATUS = '0') zzz where xxx.AGENT_ID = zzz.AGENT_ID and
-        nvl(xxx.PARENT_AGENT_NAME,'-') = nvl(zzz.PARENT_AGENT_NAME,'-') and xxx.FREEZE_TYPE = zzz.FREEZE_TYPE)
-
-      where 1=1
-      <if test="AGENT_ID != null and AGENT_ID != ''">
-        and AGENT_ID = #{AGENT_ID,jdbcType=VARCHAR}
       </if>
+
+    </if>
+    <if test="STATUS == null or STATUS == '' or STATUS == 2">
+
+      select aa.ID ,aa.AGENT_NAME,aa.AGENT_ID,aa.PARENT_AGENT_ID,aa.PARENT_AGENT_NAME,aa.FREEZE_TYPE,
+      aa.OPERATION_BATCH as FREEZE_OPERATION_BATCH,aa.STATUS,bb.FREEZE_AMT,bb.OPERATION_TIME as FREEZE_TIME, bb.FREEZE_REASON,bb.THAW_TIME,
+      cast('' as varchar2(32)) as RELIEVE_TIME,cast('' as varchar2(256)) as RELIEVE_REASON,cast(0.00 as number(16,2))
+      as RELIEVE_AMT,cast('' as varchar2(32)) as RELIEVE_OPERATION_BATCH
+      from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
+      where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') =
+      nvl(bb.PARENT_AGENT_NAME,'-')
+      and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '2'and bb.STATUS='2'
+      <if test= "STATUS != 2">
+        union all
+      </if>
+    </if>
+    <if test="STATUS == null or STATUS == '' or STATUS == 0">
+
+      select xxx.ID ,xxx.AGENT_NAME,xxx.AGENT_ID,xxx.PARENT_AGENT_ID,xxx.PARENT_AGENT_NAME,xxx.FREEZE_TYPE,
+      xxx.FREEZE_OPERATION_BATCH,xxx.STATUS,xxx.FREEZE_AMT,xxx.FREEZE_TIME,
+      xxx.FREEZE_REASON,xxx.THAW_TIME,zzz.RELIEVE_TIME,zzz.RELIEVE_REASON,zzz.RELIEVE_AMT,zzz.RELIEVE_OPERATION_BATCH from
+      (select aa.ID ,aa.AGENT_NAME,aa.AGENT_ID,aa.PARENT_AGENT_ID,aa.PARENT_AGENT_NAME,aa.FREEZE_TYPE,
+      aa.OPERATION_BATCH as FREEZE_OPERATION_BATCH,aa.STATUS,aa.REV1,bb.FREEZE_AMT,bb.OPERATION_TIME as FREEZE_TIME,
+      bb.FREEZE_REASON,bb.THAW_TIME
+      from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
+      where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') =
+      nvl(bb.PARENT_AGENT_NAME,'-')
+      and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '0'and bb.STATUS='1') xxx,
+      (select aa.ID ,aa.AGENT_NAME,aa.AGENT_ID,aa.PARENT_AGENT_ID,aa.PARENT_AGENT_NAME,aa.FREEZE_TYPE,
+      aa.OPERATION_BATCH as RELIEVE_OPERATION_BATCH,aa.STATUS,aa.REV1,bb.FREEZE_AMT as RELIEVE_AMT,bb.OPERATION_TIME as RELIEVE_TIME,
+      bb.FREEZE_REASON as RELIEVE_REASON,bb.THAW_TIME
+      from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
+      where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') =
+      nvl(bb.PARENT_AGENT_NAME,'-')
+      and aa.REV1=bb.THAW_BATCH and aa.STATUS = '0'and bb.STATUS='1') zzz where xxx.AGENT_ID = zzz.AGENT_ID and
+      nvl(xxx.PARENT_AGENT_NAME,'-') = nvl(zzz.PARENT_AGENT_NAME,'-') and xxx.FREEZE_TYPE = zzz.FREEZE_TYPE
+
+    </if>
+    )
+    where 1=1
+    <if test="AGENT_ID != null and AGENT_ID != ''">
+      and AGENT_ID = #{AGENT_ID,jdbcType=VARCHAR}
+    </if>
     <if test="AGENT_NAME != null and AGENT_NAME != '' ">
       and AGENT_NAME = #{AGENT_NAME,jdbcType=VARCHAR}
     </if>
@@ -635,10 +644,8 @@ start with
     <if test="FREEZE_TYPE != null and FREEZE_TYPE != ''">
       and FREEZE_TYPE = #{FREEZE_TYPE,jdbcType=VARCHAR}
     </if>
-    <if test="STATUS != null and STATUS != ''">
-      and STATUS = #{STATUS,jdbcType=VARCHAR}
-    </if>
-    order by AGENT_ID
+    order by AGENT_ID)
+
 
   </select>
 
@@ -655,7 +662,7 @@ start with
       from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
       where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') =
       nvl(bb.PARENT_AGENT_NAME,'-')
-      and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '1')
+      and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '1'and bb.STATUS='0')
       start with
        1=1
       <if test="AGENT_ID != null and AGENT_ID != ''">
@@ -689,7 +696,7 @@ start with
       from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
       where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') =
       nvl(bb.PARENT_AGENT_NAME,'-')
-      and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '2')
+      and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '2'and bb.STATUS='2')
       start with
        1=1
       <if test="AGENT_ID != null and AGENT_ID != ''">
@@ -726,14 +733,14 @@ start with
       from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
       where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') =
       nvl(bb.PARENT_AGENT_NAME,'-')
-      and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '1') xxx,
+      and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '0'and bb.STATUS='1') xxx,
       (select aa.ID ,aa.AGENT_NAME,aa.AGENT_ID,aa.PARENT_AGENT_ID,aa.PARENT_AGENT_NAME,aa.FREEZE_TYPE,
-      aa.OPERATION_BATCH as RELIEVE_OPERATION_BATCH ,aa.STATUS,aa.REV1,bb.FREEZE_AMT as RELIEVE_AMT,bb.OPERATION_TIME as RELIEVE_TIME,
+      aa.OPERATION_BATCH as RELIEVE_OPERATION_BATCH,aa.STATUS,aa.REV1,bb.FREEZE_AMT as RELIEVE_AMT,bb.OPERATION_TIME as RELIEVE_TIME,
       bb.FREEZE_REASON as RELIEVE_REASON,bb.THAW_TIME
       from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
       where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') =
       nvl(bb.PARENT_AGENT_NAME,'-')
-      and aa.REV1=bb.FREEZE_BATCH and aa.STATUS = '0') zzz where xxx.AGENT_ID = zzz.AGENT_ID and
+      and aa.REV1=bb.THAW_BATCH and aa.STATUS = '0'and bb.STATUS='1') zzz where xxx.AGENT_ID = zzz.AGENT_ID and
       nvl(xxx.PARENT_AGENT_NAME,'-') = nvl(zzz.PARENT_AGENT_NAME,'-') and xxx.FREEZE_TYPE = zzz.FREEZE_TYPE)
       start with
         1=1
@@ -768,7 +775,7 @@ select count(*) from(
       from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
       where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') =
       nvl(bb.PARENT_AGENT_NAME,'-')
-      and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '1')
+      and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '1'and bb.STATUS='0')
       start with
       1=1
       <if test="AGENT_ID != null and AGENT_ID != ''">
@@ -802,7 +809,7 @@ select count(*) from(
       from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
       where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') =
       nvl(bb.PARENT_AGENT_NAME,'-')
-      and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '2')
+      and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '2'and bb.STATUS='2')
       start with
       1=1
       <if test="AGENT_ID != null and AGENT_ID != ''">
@@ -839,14 +846,14 @@ select count(*) from(
       from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
       where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') =
       nvl(bb.PARENT_AGENT_NAME,'-')
-      and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '1') xxx,
+      and aa.OPERATION_BATCH=bb.FREEZE_BATCH and aa.STATUS = '0'and bb.STATUS='1') xxx,
       (select aa.ID ,aa.AGENT_NAME,aa.AGENT_ID,aa.PARENT_AGENT_ID,aa.PARENT_AGENT_NAME,aa.FREEZE_TYPE,
       aa.OPERATION_BATCH as RELIEVE_OPERATION_BATCH,aa.STATUS,aa.REV1,bb.FREEZE_AMT as RELIEVE_AMT,bb.OPERATION_TIME as RELIEVE_TIME,
       bb.FREEZE_REASON as RELIEVE_REASON,bb.THAW_TIME
       from P_FREEZE_AGENT aa,P_FREEZE_OPERATION_RECORD bb
       where aa.FREEZE_TYPE = bb.FREEZE_TYPE and aa.AGENT_ID = bb.AGENT_ID and nvl(aa.PARENT_AGENT_NAME,'-') =
       nvl(bb.PARENT_AGENT_NAME,'-')
-      and aa.REV1=bb.FREEZE_BATCH and aa.STATUS = '0') zzz where xxx.AGENT_ID = zzz.AGENT_ID and
+      and aa.REV1=bb.THAW_BATCH and aa.STATUS = '0'and bb.STATUS='1') zzz where xxx.AGENT_ID = zzz.AGENT_ID and
       nvl(xxx.PARENT_AGENT_NAME,'-') = nvl(zzz.PARENT_AGENT_NAME,'-') and xxx.FREEZE_TYPE = zzz.FREEZE_TYPE)
 
       start with
