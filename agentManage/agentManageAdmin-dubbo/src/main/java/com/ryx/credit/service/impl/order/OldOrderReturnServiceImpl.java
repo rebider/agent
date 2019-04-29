@@ -204,11 +204,10 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         BigDecimal tt = BigDecimal.ZERO;
         OReturnOrderDetail oReturnOrderDetail = new OReturnOrderDetail();
         for (OldOrderReturnSubmitProVo oldOrderReturnSubmitProVo : oldOrderReturnVo.getOldOrderReturnSubmitProVoList()) {
-            OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
-            oLogisticsDetailExample.or()
-                    .andSnNumGreaterThanOrEqualTo(oldOrderReturnSubmitProVo.getSnStart())
-                    .andSnNumLessThanOrEqualTo(oldOrderReturnSubmitProVo.getSnEnd());
-            List<OLogisticsDetail>  details = logisticsDetailMapper.selectByExample(oLogisticsDetailExample);
+            List<OLogisticsDetail>  details = logisticsDetailMapper.querySnCountObj(
+                    FastMap.fastMap("snBegin",oldOrderReturnSubmitProVo.getSnStart())
+                            .putKeyV("snEnd",oldOrderReturnSubmitProVo.getSnEnd())
+            );
             if(details.size()>0){
                 StringBuffer sb = new StringBuffer();
                 for (OLogisticsDetail detail : details) {

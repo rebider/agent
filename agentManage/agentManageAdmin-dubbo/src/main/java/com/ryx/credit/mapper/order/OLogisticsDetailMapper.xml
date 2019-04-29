@@ -689,4 +689,18 @@
     from o_logistics_detail o
     where o.opt_type='ORDER' and o.record_status=3
   </select>
+
+  <select id="querySnCountObj" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from o_logistics_detail
+    where
+    sn_num between #{snBegin} and #{snEnd}
+    and length(sn_num)=length(#{snBegin})
+    and length(sn_num)=length(#{snEnd})
+    <if test="status!=null and status!=''"> and status = #{status} </if>
+    <if test="recordStatus!=null and recordStatus!=''"> and RECORD_STATUS =#{recordStatus} </if>
+    <if test="agentId!=null and agentId!=''"> and AGENT_ID =#{agentId} </if>
+  </select>
+
 </mapper>
