@@ -437,28 +437,24 @@
   </select>
 
   <sql id="BASE_WHERE_SQL">
-    <where>
-      <trim prefixOverrides="and">
-        <if test="ORDER_ID != null and ORDER_ID != ''">AND R.ORDER_ID = #{ORDER_ID}</if>
-        <if test="planOrderStatus != null and planOrderStatus !=''">AND R.PLAN_ORDER_STATUS = #{planOrderStatus}</if>
-        <if test="PLAN_NUM != null and PLAN_NUM !=''">AND R.PLAN_NUM = #{PLAN_NUM}</if>
-        <if test="PLAN_ORDER_STATUS != null and PLAN_ORDER_STATUS != ''">AND R.PLAN_ORDER_STATUS = #{PLAN_ORDER_STATUS}</if>
-        <if test="proCom != null and proCom != ''">AND R.PRO_COM = #{proCom}</if>
-        <if test="C_DATE_START != null and C_DATE_START != ''">R.C_DATE >= TO_DATE(#{C_DATE},'yyyy-MM-dd') </if>
-        <if test="C_DATE_END != null and C_DATE_END != ''">R.C_DATE &lt;= TO_DATE(#{C_DATE},'yyyy-MM-dd')</if>
-        <if test="returnId != null and returnId!=''" >
-          and R.return_order_detail_id in ( select id from o_return_order_detail where return_id = #{returnId} )
-        </if>
-        <if test="activityName!=null and activityName !=''"> and oso.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%')</if>
-        <if test="platform!=null and platform!=''"> and a_platform.PLATFORM_NUM=#{platform} </if>
-        <if test="agUniqNum!=null and agUniqNum!=''"> and agent.AG_UNIQ_NUM=#{agUniqNum} </if>
-        <if test="proType!=null and proType!=''"> and os.PRO_TYPE=#{proType}</if>
-        <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
-        <if test="model!=null and model!=''"> and R.MODEL=#{model} </if>
-        <if test="beginTime!=null and endTime!=''"> and (to_char(R.c_date,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
-        <if test="agentId!=null and agentId!=''"> and agent.id = #{agentId}</if>
-      </trim>
-    </where>
+      <if test="ORDER_ID != null and ORDER_ID != ''">AND R.ORDER_ID = #{ORDER_ID}</if>
+      <if test="planOrderStatus != null and planOrderStatus !=''">AND R.PLAN_ORDER_STATUS = #{planOrderStatus}</if>
+      <if test="PLAN_NUM != null and PLAN_NUM !=''">AND R.PLAN_NUM = #{PLAN_NUM}</if>
+      <if test="PLAN_ORDER_STATUS != null and PLAN_ORDER_STATUS != ''">AND R.PLAN_ORDER_STATUS = #{PLAN_ORDER_STATUS}</if>
+      <if test="proCom != null and proCom != ''">AND R.PRO_COM = #{proCom}</if>
+      <if test="C_DATE_START != null and C_DATE_START != ''">R.C_DATE >= TO_DATE(#{C_DATE},'yyyy-MM-dd') </if>
+      <if test="C_DATE_END != null and C_DATE_END != ''">R.C_DATE &lt;= TO_DATE(#{C_DATE},'yyyy-MM-dd')</if>
+      <if test="returnId != null and returnId!=''" >
+        and R.return_order_detail_id in ( select id from o_return_order_detail where return_id = #{returnId} )
+      </if>
+      <if test="activityName!=null and activityName !=''"> and oso.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%')</if>
+      <if test="platform!=null and platform!=''"> and a_platform.PLATFORM_NUM=#{platform} </if>
+      <if test="agUniqNum!=null and agUniqNum!=''"> and agent.AG_UNIQ_NUM=#{agUniqNum} </if>
+      <if test="proType!=null and proType!=''"> and os.PRO_TYPE=#{proType}</if>
+      <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
+      <if test="model!=null and model!=''"> and R.MODEL=#{model} </if>
+      <if test="beginTime!=null and endTime!=''"> and (to_char(R.c_date,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+      <if test="agentId!=null and agentId!=''"> and agent.id = #{agentId}</if>
   </sql>
 
   <sql id='SORTING'>

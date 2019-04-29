@@ -79,7 +79,12 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         ac.setStatus(Status.STATUS_1.status);
         ac.setVarsion(Status.STATUS_1.status);
         ac.setId(idService.genId(TabId.a_agent_colinfo));
-        ac.setPayStatus(ColinfoPayStatus.A.getValue());
+        //导入的收款账户应该事收款成功
+        if(!ac.isImport()) {
+            ac.setPayStatus(ColinfoPayStatus.A.getValue());
+        }else {
+            ac.setPayStatus(ColinfoPayStatus.C.getValue());
+        }
         //银行卡扫描件
         boolean isHaveYHKSMJ = false;
         //开户许可证
