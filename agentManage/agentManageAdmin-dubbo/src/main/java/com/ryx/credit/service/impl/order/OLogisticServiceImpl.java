@@ -381,8 +381,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             oLogistics.setwNumber(wNumber);      // 物流单号
             oLogistics.setSnBeginNum(beginSn);   // 起始SN序列号
             oLogistics.setSnEndNum(endSn);     // 结束SN序列号
-            //物流为未发送状态
-            oLogistics.setSendStatus(LogisticsSendStatus.none_send.code);
+
 
             logger.info("导入物流数据:{}={}" , oLogistics.getId(),JSONObject.toJSON(oLogistics));
             //调用明细接口之前需要先去数据库进行查询是否已有数据
@@ -402,11 +401,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     }
                 }
             }
-            if (1 != insertImportData(oLogistics)) {
-                throw new MessageException("排单编号为:"+planNum+"处理，插入物流信息失败,事物回滚");
-            }else{
-                logger.info("导入物流数据,活动代码{}={}==========================================={}" ,oActivity.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
-            }
+
 
             //更新排单表发货数量
             ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(planVo.getId());
@@ -430,6 +425,13 @@ public class OLogisticServiceImpl implements OLogisticsService {
 
             //如果发货数量大于200-此处大量数据走任务
             if(oLogistics.getSendNum().compareTo(new BigDecimal(200))>0) {
+                //物流为未发送状态
+                oLogistics.setSendStatus(LogisticsSendStatus.none_send.code);
+                if (1 != insertImportData(oLogistics)) {
+                    throw new MessageException("排单编号为:"+planNum+"处理，插入物流信息失败,事物回滚");
+                }else{
+                    logger.info("导入物流数据,活动代码{}={}==========================================={}" ,oActivity.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
+                }
                 //如果是首刷进行sn检查库存中是否存在
                 if (platForm.getPlatformType().equals(PlatformType.MPOS.msg) || platForm.getPlatformType().equals(PlatformType.MPOS.code)){
                     for (String idSn : stringList) {
@@ -447,6 +449,14 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 }
                 logger.info("物流机具数量大于200，采用任务来处理：物流-{}，数量-{}" ,oLogistics.getId(), oLogistics.getSendNum());
                 return AgentResult.ok();
+            }else{
+                //物流为未发送状态
+                oLogistics.setSendStatus(LogisticsSendStatus.send_ing.code);
+                if (1 != insertImportData(oLogistics)) {
+                    throw new MessageException("排单编号为:"+planNum+"处理，插入物流信息失败,事物回滚");
+                }else{
+                    logger.info("导入物流数据,活动代码{}={}==========================================={}" ,oActivity.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
+                }
             }
 
             //直接发送逻辑-此处少量数据直接走接口
@@ -902,14 +912,18 @@ public class OLogisticServiceImpl implements OLogisticsService {
             for (String idSn : idList) {
 
                 OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
-                oLogisticsDetailExample.or().andStatusEqualTo(Status.STATUS_0.status).andRecordStatusEqualTo(Status.STATUS_1.status).andSnNumEqualTo(idSn).andTerminalidTypeEqualTo(PlatformType.MPOS.code);
+                oLogisticsDetailExample.or()
+                        .andStatusEqualTo(Status.STATUS_0.status)
+                        .andRecordStatusEqualTo(Status.STATUS_1.status)
+                        .andSnNumEqualTo(idSn)
+                        .andTerminalidTypeEqualTo(PlatformType.MPOS.code);
                 List<OLogisticsDetail>  listOLogisticsDetailSn = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
                 if (listOLogisticsDetailSn==null){
                     logger.info("此SN码不存在");
                     throw new MessageException("此SN码不存在");
                 }else if(listOLogisticsDetailSn.size()!=1){
                     logger.info("此SN码不存在");
-                    throw new MessageException("此SN码不存在");
+                    throw new MessageException("此SN码不唯一");
                 }
 
                 OLogisticsDetail detail = listOLogisticsDetailSn.get(0);
