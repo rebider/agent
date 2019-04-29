@@ -489,11 +489,12 @@ public class RedisService {
     }
 
     public Long pushListString(String key,List<String> list,long timeout) {
+        Long aLong = redisTemplate.opsForList().leftPushAll(key, list);
         Boolean expire = expire(key, timeout);
         if(!expire){
             return 0L;
         }
-        return redisTemplate.opsForList().leftPushAll(key, list);
+        return aLong;
     }
 
     public List<String> popListString(String key) {

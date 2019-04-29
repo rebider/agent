@@ -32,4 +32,6 @@ public interface OPaymentMapper {
     Double queryAgentDebt(@Param("agentId")String agentId);
 
     BigDecimal queryAgentDebtByType(Map<String,Object> params);
+
+    BigDecimal queryAgentJNKQK(Map<String,Object> params);
 }

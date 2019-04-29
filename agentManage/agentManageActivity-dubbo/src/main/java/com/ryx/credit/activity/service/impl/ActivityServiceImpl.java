@@ -2,6 +2,7 @@ package com.ryx.credit.activity.service.impl;
 
 import com.ryx.credit.activity.entity.ActRuTask;
 import com.ryx.credit.common.enumc.Status;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.FastMap;
@@ -140,6 +141,9 @@ public class ActivityServiceImpl implements ActivityService {
             List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(approvalPerson));
             String approvalDep = String.valueOf(orgCodeRes.get(0).get("ORGID"));
             ActRuTask actRuTask = actRuTaskService.selectByPrimaryKey(taskId);
+            if (null== actRuTask){
+                throw new ProcessException("任务不存在或者已经被处理！");
+            }
             String procInstId = String.valueOf(actRuTask.getProcInstId());
             String taskName = String.valueOf(actRuTask.getName());
             BusActRel busActRel = busActRelService.findById(procInstId);
@@ -168,7 +172,15 @@ public class ActivityServiceImpl implements ActivityService {
             rs.put("rs",true);
             rs.put("msg","success");
             upFlowRecord.setActivityStatus(Status.STATUS_1.status);
-        } catch (Exception e) {
+        } catch (MessageException | ProcessException e) {
+            logger.error("completeTask error", e);
+            rs.put("rs",false);
+            rs.put("msg",e.getLocalizedMessage());
+            upFlowRecord.setStatus(Status.STATUS_0.status);
+            upFlowRecord.setActivityStatus(Status.STATUS_0.status);
+            upFlowRecord.setErrorMsg(e.getLocalizedMessage());
+            throw new ProcessException(e.getLocalizedMessage());
+        }catch (Exception e) {
             logger.error("completeTask error", e);
             rs.put("rs",false);
             rs.put("msg",e.getMessage());

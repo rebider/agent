@@ -450,7 +450,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
             result = AgentResult.fail(e.getLocalizedMessage());
         }
         //接口请求成功
-        if(null!=result && !"".equals(result) && result.isOK()){
+        if(null!=result && result.isOK()){
             //添加请求记录
             record.setSuccesTime(new Date());
             record.setNotifyStatus(Status.STATUS_1.status);
@@ -476,9 +476,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
             //更新业务编号
             if(StringUtils.isNotBlank(jsonObject.getString("orgId"))) {
                 log.info("已有编号进行入网修改：返回orgid不为空,id:{},业务ID:{},返回结果:{}", record.getId(), busId, result.getMsg());
-                AgentBusInfo updateBusInfo = new AgentBusInfo();
-                updateBusInfo.setVersion(agentBusInfo.getVersion());
-                updateBusInfo.setId(agentBusInfo.getId());
+                AgentBusInfo updateBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getId());
                 if(agentBusInfo.getBusNum()!=null){
                     updateBusInfo.setBusNum(jsonObject.getString("orgId"));
                     updateBusInfo.setBusStatus(BusinessStatus.Enabled.status);
@@ -493,6 +491,11 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
                 log.info("已有编号进行入网修改：不存在orgid,id:{},业务ID:{},返回结果:{}", record.getId(), busId, jsonObject.toJSONString());
             }
         }else{
+//            AgentBusInfo updateBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getId());
+//            updateBusInfo.setBusStatus(BusinessStatus.pause.status);
+//            if(agentBusInfoMapper.updateByPrimaryKeySelective(updateBusInfo)!=1){
+//                log.info("已有编号进行入网修改：接口调用失败,插入记录成功,id:{},业务ID:{},返回结果:{}", record.getId(), busId, result.getMsg());
+//            }
             record.setSuccesTime(new Date());
             record.setNotifyStatus(Status.STATUS_0.status);
             if(1==agentPlatFormSynMapper.insertSelective(record)){
@@ -530,7 +533,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
 
                     log.info("升级开户接口{}平台编号不为空走升级接口 匹配服务类{}",agentBusInfo.getBusNum(),platformSynService.getClass().getSimpleName());
                     AgentPlatFormSyn record = new AgentPlatFormSyn();
-
                     AgentResult res = null;
                     log.info("升级开户接口{}平台编号不为空走升级接口,获取请求参数,审批流{}",agentBusInfo.getBusNum(),importAgent.getBatchcode());
 
@@ -587,43 +589,35 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
                                 log.info("升级开户接口{}平台编号不为空走升级接口,更新的代理商{}",agentBusInfo.getBusNum(),"入网状态更新成功");
                             }
                         }
-
                         agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
                         if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)){
                             log.info("升级开户接口{}平台编号不为空走升级接口,更新业务{}",agentBusInfo.getBusNum(),"入网成功状态更新失败");
                         }else{
                             log.info("升级开户接口{}平台编号不为空走升级接口,更新业务{}",agentBusInfo.getBusNum(),"入网成功状态更新成功");
                         }
-
                         if(impId!=null){
                           updateImportAgent(impId, Status.STATUS_2.status, "处理成功");
                         }
-
                         record.setSuccesTime(new Date());
                         record.setNotifyStatus(Status.STATUS_1.status);
                         if(agentPlatFormSynMapper.insert(record)==1){
                             log.info("升级开户接口{}添加记录成功,更新本地平台{}",agentBusInfo.getBusNum(),"入网成功");
                         }
-
                         //执行修改操作
                         notifyPlatformUpadteByBusId(agentBusInfo.getId(),agentBusInfo.getcUser());
-
                     }else{
-
                         agentBusInfo.setBusStatus(BusinessStatus.pause.status);
                         if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)){
                             log.info("升级开户接口{}平台编号不为空走升级接口,更新业务{}",agentBusInfo.getBusNum(),"入网失败状态更新失败");
                         }else{
                             log.info("升级开户接口{}平台编号不为空走升级接口,更新业务{}",agentBusInfo.getBusNum(),"入网失败状态更新成功");
                         }
-
                         log.info("升级开户接口{}平台编号不为空走升级接口,请求结果{}",agentBusInfo.getBusNum(),res.getMsg());
                         record.setSuccesTime(new Date());
                         record.setNotifyStatus(Status.STATUS_0.status);
                         if(agentPlatFormSynMapper.insert(record)==1){
                             log.info("开平台{}平台编号不为空走升级接口,更新本地平台{}",agentBusInfo.getBusNum(),"入网成功");
                         }
-
                         if(impId!=null) {
                             log.info("开平台{}ImportAgent,{}",agentBusInfo.getBusNum(),"更新异常");
                             updateImportAgent(impId, Status.STATUS_3.status, "更新异常");
@@ -781,32 +775,24 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
         } catch (Exception e) {
             log.info("入网开户修改操作: 通知pos手刷http请求异常:{}",e.getMessage());
             record.setNotifyCount(new BigDecimal(1));
+            record.setNotifyJson(e.getLocalizedMessage());
             result = AgentResult.fail(e.getLocalizedMessage());
         }
         if(null!=result && !"".equals(result) && result.isOK()){
             record.setSuccesTime(new Date());
             record.setNotifyStatus(Status.STATUS_1.status);
         }
-
-        int czResult =  agentPlatFormSynMapper.insert(record);
-
-        if(czResult==1 && null!=result && !"".equals(result) && result.isOK()){
+        if(agentPlatFormSynMapper.insert(record)==1 && null!=result && result.isOK()){
             log.info("入网开户修改操作: 接收入网更新入网状态开始,业务id：{},返回结果:{}",busId);
-
-
             //更新业务编号
-            AgentBusInfo updateBusInfo = new AgentBusInfo();
+            AgentBusInfo updateBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getId());
             JSONObject jsonObject = JSONObject.parseObject(String.valueOf(result.getData()));
-            updateBusInfo.setVersion(agentBusInfo.getVersion());
-            updateBusInfo.setId(agentBusInfo.getId());
             updateBusInfo.setBusNum(jsonObject.getString("orgId"));
             if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
                 updateBusInfo.setBusLoginNum(jsonObject.getString("loginName"));
             }else if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
                 updateBusInfo.setBusLoginNum(jsonObject.getString("orgId"));
             }
-
-
             //代理商修改也会走这里
             // cxinfo  如果有已有效的业务信息就为已入网，否则为已入网未激活 业务平台状态：1启用和0注销2开户未激活，注销是指代理商解除某项业务平台合作。
             if(updateBusInfo.getBusStatus()==null || !updateBusInfo.getBusStatus().equals(Status.STATUS_1.status)){
@@ -829,10 +815,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
             }
             int upResult2 = agentBusInfoMapper.updateByPrimaryKeySelective(updateBusInfo);
             log.info("入网开户修改操作: 接收入网更新入网状态,业务id：{},upResult2:{}",upResult2);
-
-
-
-
             //更新入网状态
             // cxinfo   如果有已有效的业务信息就为已入网，否则为已入网未激活 0未入网，1已入网，2已入网未激活
             Agent updateAgent = new Agent();
@@ -849,8 +831,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
             updateAgent.setcUtime(nowDate);
             int upResult1 = agentMapper.updateByPrimaryKeySelective(updateAgent);
             log.info("入网开户修改操作: 接收入网更新入网状态,业务id：{},upResult1:{}",upResult1);
-
-
             //更新任务记录
             if(upResult1!=1 || upResult2!=1){
                 if(impId!=null) {
@@ -862,6 +842,15 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
                 int clRes = updateImportAgent(impId, Status.STATUS_2.status, "处理成功");
                 log.info("入网开户修改操作: 接收入网更新入网状态,业务id：{},clRes:{}",clRes);
             }
+        }else{
+            log.info("入网开户修改操作: 接收入网更新入网状态开始,业务id：{},返回结果:{}",busId,"开通业务失败");
+            //更新业务编号
+            AgentBusInfo updateBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getId());
+            updateBusInfo.setBusStatus(BusinessStatus.pause.status);
+            if(agentBusInfoMapper.updateByPrimaryKeySelective(updateBusInfo)!=1){
+                log.info("入网开户修改操作: 接收入网更新入网状态开始,业务id：{},返回结果:{},更新数据库失败",busId,"开通业务失败");
+            }
+            updateImportAgent(impId, Status.STATUS_3.status, result.getMsg());
         }
     }
 
@@ -1005,10 +994,19 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
                         }
                         log.info(dataObj.toJSONString());
                         return AgentResult.ok(dataObj);
-                    }else{
-                        AppConfig.sendEmails(respXML, "入网通知POS失败报警");
+                    }else if (respXML.contains("respMsg")){
+                        JSONObject respXMLObj = JSONObject.parseObject(respXML);
+                        AppConfig.sendEmails(respXML, "入网通知POS失败报警:"+respXMLObj.get("respMsg"));
                         log.info("http请求超时返回错误:{}",respXML);
-                        throw new Exception("http返回有误");
+                        AgentResult ag = AgentResult.fail(respXML);
+                        ag.setData(respXMLObj);
+                        return ag;
+                    }else{
+                        AppConfig.sendEmails(respXML, "入网通知POS失败报警:"+respXML);
+                        log.info("http请求超时返回错误:{}",respXML);
+                        AgentResult ag = AgentResult.fail(respXML);
+                        ag.setData(respXML);
+                        return ag;
                     }
                 }
                 return new AgentResult(500,"http请求异常",respXML);

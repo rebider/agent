@@ -16,4 +16,7 @@ public interface IdService {
     public String genOrderId(TabId tablename,Integer userid);
 
 
+    public String genAgId(TabId tablename);
+
+
 }
