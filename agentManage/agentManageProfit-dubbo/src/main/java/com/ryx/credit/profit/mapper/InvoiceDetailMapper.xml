@@ -520,19 +520,19 @@
     </delete>
 
 
-  <!--Map<String,Object> getOwnInvoice(Map<String,String> map);-->
   <select id="getOwnInvoice" resultType="java.util.Map" parameterType="java.util.Map">
     select PROFIT_MONTH as profitMonth, OWN_INVOICE as owmInvoice
-      from P_INVOICE_DETAIL
-    <where>
-      PROFIT_MONTH = #{profitMonth}
-      <if test=" agentId!=null and agentId!='' ">
-        and AGENT_ID=#{agentId}
-      </if>
-      <if test=" agentName!= null and agentName!= '' ">
-        and AGENT_NAME=#{agentName}
-      </if>
-    </where>
+      from (select *  from P_INVOICE_DETAIL
+        where 1=1
+        <if test=" agentId!=null and agentId!='' ">
+            and AGENT_ID=#{agentId}
+        </if>
+        <if test=" agentName!= null and agentName!= '' ">
+            and AGENT_NAME=#{agentName}
+        </if>
+        order by  PROFIT_MONTH desc
+      ) where rownum =1
+
   </select>
 
   <select id="profitCount" resultType="java.util.Map" parameterType="com.ryx.credit.profit.pojo.InvoiceDetailExample">
