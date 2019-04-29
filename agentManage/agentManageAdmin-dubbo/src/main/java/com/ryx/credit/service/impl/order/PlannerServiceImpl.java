@@ -166,6 +166,7 @@ public class PlannerServiceImpl implements PlannerService {
                     .andActCodeEqualTo(current_activity.getActCode())
                     .andStatusEqualTo(Status.STATUS_1.status)
                     .andVenderEqualTo(sure_activity.getVender())
+                    .andProductIdEqualTo(sure_activity.getProductId())
                     .andProModelEqualTo(sure_activity.getProModel());
             List<OActivity> venderModeActivity =oActivityMapper.selectByExample(new_OActivityExample);
             if(venderModeActivity.size()!=1){
