@@ -110,7 +110,9 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
             list.forEach(id -> {
 
                 OLogisticsExample example = new OLogisticsExample();
-                example.or().andSendStatusEqualTo(LogisticsSendStatus.none_send.code).andIdEqualTo(id);
+                example.or()
+                        .andSendStatusEqualTo(LogisticsSendStatus.none_send.code)
+                        .andIdEqualTo(id);
                 List<OLogistics> logistics_list = oLogisticsMapper.selectByExample(example);
 
                 OLogistics logistics = null;

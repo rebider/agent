@@ -420,7 +420,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             PlatForm platForm =platFormMapper.selectByPlatFormNum(order.getOrderPlatform());
 
             //如果发货数量大于200-此处大量数据走任务
-            if(oLogistics.getSendNum().compareTo(new BigDecimal(200))>0) {
+            if(oLogistics.getSendNum().compareTo(new BigDecimal(0))>0) {
                 //物流为未发送状态
                 oLogistics.setSendStatus(LogisticsSendStatus.none_send.code);
                 if (1 != insertImportData(oLogistics)) {
