@@ -220,7 +220,7 @@ public class CapitalServiceImpl implements CapitalService {
 
         //传递进来的扣除金额不能小于0
         if(amt==null || amt.compareTo(BigDecimal.ZERO)<=0){
-            throw new ProcessException("冻结缴款金额错误");
+            throw new MessageException("冻结缴款金额错误");
         }
 
         CapitalExample capitalExample = new CapitalExample();
@@ -287,7 +287,7 @@ public class CapitalServiceImpl implements CapitalService {
         }
 
         if (residueAmt.compareTo(BigDecimal.ZERO) == 1) {
-            throw new ProcessException("缴款金额不足，无法进行全额冻结");
+            throw new MessageException("缴款金额不足，无法进行全额冻结");
         }
     }
 
