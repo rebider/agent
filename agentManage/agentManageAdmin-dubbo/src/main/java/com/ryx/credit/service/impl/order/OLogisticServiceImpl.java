@@ -904,12 +904,15 @@ public class OLogisticServiceImpl implements OLogisticsService {
                         .andSnNumEqualTo(idSn)
                         .andTerminalidTypeEqualTo(PlatformType.MPOS.code);
                 List<OLogisticsDetail>  listOLogisticsDetailSn = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
-                if (listOLogisticsDetailSn==null){
-                    logger.info("此SN码不存在");
-                    throw new MessageException("此SN码不存在");
+                if (listOLogisticsDetailSn==null||listOLogisticsDetailSn.size()==0){
+                    logger.info(idSn+"此SN码不存在");
+                    throw new MessageException(idSn+"此SN码不存在");
+                }else if (listOLogisticsDetailSn.size()==0){
+                    logger.info(idSn+"此SN码不存在");
+                    throw new MessageException(idSn+"此SN码不存在");
                 }else if(listOLogisticsDetailSn.size()!=1){
-                    logger.info("此SN码不存在");
-                    throw new MessageException("此SN码不唯一");
+                    logger.info(idSn+"此SN码不存在");
+                    throw new MessageException(idSn+"此SN码不唯一");
                 }
 
                 OLogisticsDetail detail = listOLogisticsDetailSn.get(0);
