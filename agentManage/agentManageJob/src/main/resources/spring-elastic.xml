@@ -91,7 +91,7 @@
     <job:simple id="osnFaHuoGenSnDetail"
                 job-ref="osnFaHuoGenSnDetailJob"
                 registry-center-ref="regCenter"
-                cron="0 0/2 * * * ?"
+                cron="0 0/1 * * * ?"
                 overwrite="true"
                 description="发货sn生成明细 单节点 每分钟"
                 sharding-total-count="1"
