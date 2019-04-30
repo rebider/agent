@@ -1690,7 +1690,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             oLogistics.setwNumber(wNumber);      // 物流单号
             oLogistics.setSnBeginNum(beginSn);   // 起始SN序列号
             oLogistics.setSnEndNum(endSn);     // 结束SN序列号
-            oLogistics.setSendStatus(LogisticsSendStatus.send_ing.code);
+            oLogistics.setSendStatus(LogisticsSendStatus.none_send.code);
             log.info("导入物流数据============================================{}" , JSONObject.toJSON(oLogistics));
             if (1 != oLogisticsService.insertImportData(oLogistics)) {
                 throw new MessageException("排单编号为:"+planNum+"处理，插入物流信息失败");

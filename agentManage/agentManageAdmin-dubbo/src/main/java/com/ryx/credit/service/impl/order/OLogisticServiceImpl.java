@@ -381,6 +381,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             oLogistics.setwNumber(wNumber);      // 物流单号
             oLogistics.setSnBeginNum(beginSn);   // 起始SN序列号
             oLogistics.setSnEndNum(endSn);     // 结束SN序列号
+            oLogistics.setSendStatus(LogisticsSendStatus.none_send.code);
             logger.info("导入物流数据:{}={}" , oLogistics.getId(),JSONObject.toJSON(oLogistics));
             //调用明细接口之前需要先去数据库进行查询是否已有数据
             if (null != stringList && stringList.size() > 0) {
@@ -418,16 +419,14 @@ public class OLogisticServiceImpl implements OLogisticsService {
             //平台查询，根据不同的平台走不同的逻辑
             OOrder order = oOrderMapper.selectByPrimaryKey(orderId);
             PlatForm platForm =platFormMapper.selectByPlatFormNum(order.getOrderPlatform());
-
+            if (1 != insertImportData(oLogistics)) {
+                throw new MessageException("排单编号为:"+planNum+"处理，插入物流信息失败,事物回滚");
+            }else{
+                logger.info("导入物流数据,活动代码{}={}==========================================={}" ,oActivity.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
+            }
             //如果发货数量大于200-此处大量数据走任务
-            if(oLogistics.getSendNum().compareTo(new BigDecimal(0))>0) {
+            if(oLogistics.getSendNum().compareTo(new BigDecimal(200))>0) {
                 //物流为未发送状态
-                oLogistics.setSendStatus(LogisticsSendStatus.none_send.code);
-                if (1 != insertImportData(oLogistics)) {
-                    throw new MessageException("排单编号为:"+planNum+"处理，插入物流信息失败,事物回滚");
-                }else{
-                    logger.info("导入物流数据,活动代码{}={}==========================================={}" ,oActivity.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
-                }
                 //如果是首刷进行sn检查库存中是否存在
                 if (platForm.getPlatformType().equals(PlatformType.MPOS.msg) || platForm.getPlatformType().equals(PlatformType.MPOS.code)){
                     for (String idSn : stringList) {
@@ -445,14 +444,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 }
                 logger.info("物流机具数量大于200，采用任务来处理：物流-{}，数量-{}" ,oLogistics.getId(), oLogistics.getSendNum());
                 return AgentResult.ok();
-            }else{
-                //物流为未发送状态
-                oLogistics.setSendStatus(LogisticsSendStatus.send_ing.code);
-                if (1 != insertImportData(oLogistics)) {
-                    throw new MessageException("排单编号为:"+planNum+"处理，插入物流信息失败,事物回滚");
-                }else{
-                    logger.info("导入物流数据,活动代码{}={}==========================================={}" ,oActivity.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
-                }
             }
 
             //直接发送逻辑-此处少量数据直接走接口
@@ -870,7 +861,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
                     detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
                 }
-                detail.setSendStatus(LogisticsDetailSendStatus.send_success.code);
+                detail.setSendStatus(LogisticsDetailSendStatus.none_send.code);
                 detail.setVersion(Status.STATUS_1.status);
                 if (1 != oLogisticsDetailMapper.insertSelective(detail)) {
                     logger.info("添加失败");
@@ -963,7 +954,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
                     detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
                 }
-//                detail.setSendStatus(LogisticsDetailSendStatus.send_success.code);
+                detail.setSendStatus(LogisticsDetailSendStatus.none_send.code);
                 if (1 != oLogisticsDetailMapper.updateByPrimaryKeySelective(detail)) {
                     logger.info("修改失败");
                     throw new ProcessException("修改失败");
