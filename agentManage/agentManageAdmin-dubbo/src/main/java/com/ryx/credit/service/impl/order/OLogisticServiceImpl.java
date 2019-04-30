@@ -524,7 +524,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                             }
                         }
                         //首刷下发业务系统
-                    }else if(platForm.getPlatformType().equals(PlatformType.ZPOS.code) || platForm.getPlatformType().equals(PlatformType.ZPOS.msg)){
+                    }else if(platForm.getPlatformType().equals(PlatformType.MPOS.code) || platForm.getPlatformType().equals(PlatformType.MPOS.msg)){
 
                         List<OLogisticsDetail> forsendSns = (List<OLogisticsDetail>)resultVO.getObj();
                         logger.info("物流下发发货数量sn查询获取数据：{}", JSONObject.toJSONString(forsendSns));
@@ -582,13 +582,13 @@ public class OLogisticServiceImpl implements OLogisticsService {
                                 logistics_send.setSendStatus(Status.STATUS_1.status);
                                 logistics_send.setSendMsg(lowerHairMachineRes.getMsg());
                                 if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
-                                    logger.info("pos下发物流更新记录STATUS_1失败{}",JSONObject.toJSONString(oLogistics));
+                                    logger.info("手刷下发物流更新记录STATUS_1失败{}",JSONObject.toJSONString(oLogistics));
                                 }
                             }else{
                                 logistics_send.setSendStatus(Status.STATUS_2.status);
                                 logistics_send.setSendMsg(lowerHairMachineRes.getMsg());
                                 if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
-                                    logger.info("pos下发物流更新记录STATUS_2失败{}",JSONObject.toJSONString(oLogistics));
+                                    logger.info("手刷下发物流更新记录STATUS_2失败{}",JSONObject.toJSONString(oLogistics));
                                 }
                             }
                         }catch (MessageException e) {
@@ -596,16 +596,19 @@ public class OLogisticServiceImpl implements OLogisticsService {
                             logistics_send.setSendStatus(Status.STATUS_2.status);
                             logistics_send.setSendMsg(e.getMsg());
                             if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
-                                logger.info("pos下发物流更新记录MessageException失败{}",JSONObject.toJSONString(oLogistics));
+                                logger.info("手刷下发物流更新记录MessageException失败{}",JSONObject.toJSONString(oLogistics));
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
                             logistics_send.setSendStatus(Status.STATUS_2.status);
                             logistics_send.setSendMsg("下发异常");
                             if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
-                                logger.info("pos下发物流更新记录Exception失败{}",JSONObject.toJSONString(oLogistics));
+                                logger.info("手刷下发物流更新记录Exception失败{}",JSONObject.toJSONString(oLogistics));
                             }
                         }
+                    }else{
+                        logger.info("发物流类型错误");
+                        throw new MessageException("发物流类型错误");
                     }
                 }
             }else{
