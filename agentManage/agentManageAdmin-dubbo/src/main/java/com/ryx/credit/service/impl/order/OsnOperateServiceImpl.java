@@ -50,6 +50,8 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
 
     private static Logger logger = LoggerFactory.getLogger(OsnOperateServiceImpl.class);
 
+    private static int count_wall = 200;
+
     @Autowired
     private OLogisticsMapper oLogisticsMapper;
     @Autowired
@@ -94,7 +96,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
     @Transactional(readOnly = true)
     @Override
     public List<String> queryLogicInfoIdByStatus(LogType logType, LogisticsSendStatus sendStatus){
-        return oLogisticsMapper.queryLogicInfoIdByStatus(FastMap.fastMap("logType", logType.code).putKeyV("sendStatus",sendStatus.code));
+        return oLogisticsMapper.queryLogicInfoIdByStatus(FastMap.fastMap("logType", logType.code).putKeyV("sendStatus",sendStatus.code).putKeyV("count",count_wall));
     }
 
 
@@ -103,25 +105,21 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
      */
     @Override
     public void genLogicDetailTask(){
-
+        //查询发货数量大于 count_wall的物流id
         List<String>  list = queryLogicInfoIdByStatus(LogType.Deliver,LogisticsSendStatus.none_send);
         if(list.size()>0) {
             logger.info("开始执行sn明细生成任务");
-            list.forEach(id -> {
-
+            for (String id : list) {
                 OLogisticsExample example = new OLogisticsExample();
-                example.or()
-                        .andSendStatusEqualTo(LogisticsSendStatus.none_send.code)
-                        .andIdEqualTo(id);
+                example.or().andSendStatusEqualTo(LogisticsSendStatus.none_send.code).andIdEqualTo(id);
                 List<OLogistics> logistics_list = oLogisticsMapper.selectByExample(example);
-
                 OLogistics logistics = null;
-
                 if(logistics_list.size()>0){
                     logistics = logistics_list.get(0);
                 }
-                if(logistics!=null) {
-
+                //info 此处禁止处理退货发货
+                ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(logistics.getReceiptPlanId());
+                if(logistics!=null && StringUtils.isEmpty(receiptPlan.getReturnOrderDetailId())) {
                     logistics.setSendStatus(LogisticsSendStatus.gen_detail_ing.code);
                     if (1 == oLogisticsMapper.updateByPrimaryKeySelective(logistics)) {
                         try {
@@ -152,7 +150,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                     }
                 }
 
-            });
+            }
             logger.info("开始执行sn明细生成结束");
         }
     }
@@ -169,8 +167,10 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
         //查询待处理的物流列表，并更新成处理中
          List<String> data = oLogisticsMapper.queryLogicInfoIdByStatus(FastMap
         .fastMap("logType",LogType.Deliver.code)
-        .putKeyV("sendStatus",LogisticsSendStatus.gen_detail_sucess.code)
-        .putKeyV("pagesize",200));
+            .putKeyV("sendStatus",LogisticsSendStatus.gen_detail_sucess.code)
+            .putKeyV("pagesize",200)
+            .putKeyV("count",count_wall)
+         );
 
          //更新物流为下发处理中，任务更新状态，下次不再查询
         data.forEach(ids ->{
