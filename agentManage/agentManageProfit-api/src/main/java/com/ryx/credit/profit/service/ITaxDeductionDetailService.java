@@ -9,7 +9,7 @@ import java.util.Map;
 
 public interface ITaxDeductionDetailService {
 
-    PageInfo posDeductTaxList(Map<String,String> map,TaxDeductionDetail taxDeductionDetail, Page page,String dateStart,String dateEnd);
+    PageInfo posDeductTaxList(TaxDeductionDetail taxDeductionDetail, Page page,String dateStart,String dateEnd);
 
     PageInfo posDirectlyDeductTaxList (TaxDeductionDetail taxDeductionDetail,Page page,String dateStart,String dateEnd);
 
@@ -19,7 +19,7 @@ public interface ITaxDeductionDetailService {
 
     List<TaxDeductionDetail> query(TaxDeductionDetail taxDeductionDetail);
 
-    PageInfo queryAndSubordinate(Map<String,String> map,TaxDeductionDetail taxDeductionDetail,Page page);
+    PageInfo queryAndSubordinate(TaxDeductionDetail taxDeductionDetail,Page page);
 
     Map<String,Object> profitCount(Map<String,Object> param,boolean isQuerySubordinate);
 

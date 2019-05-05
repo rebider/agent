@@ -63,7 +63,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    P_TAX_DEDUCTION_DETAIL.ID, AGENT_PID, PROFIT_MONTH, AGENT_ID, AGENT_NAME, FRIST_AGENT_ID, FRIST_AGENT_NAME,
+    ID, AGENT_PID, PROFIT_MONTH, AGENT_ID, AGENT_NAME, FRIST_AGENT_ID, FRIST_AGENT_NAME, 
     PARENT_AGENT_ID, PARENT_AGENT_NAME, PRE_LD_AMT, DAY_PROFIT_AMT, DAY_BACK_AMT, BASIC_PROFIT_AMT, 
     BL_AMT, MERCHAN_ORDER_AMT, AGENT_DF_AMT, ADJUST_AMT, ADJUST_ACCOUNT, ADJUST_RESON, 
     ADJUST_TIME, TAX_BASE, TAX_RATE, ADD_TAX_AMT, PRE_NOT_DEDUCTION_AMT1, SUPPOSED_TAX_AMT, 
@@ -76,7 +76,7 @@
       distinct
     </if>
     <include refid="Base_Column_List" />
-    from P_TAX_DEDUCTION_DETAIL ${innerJoinDepartment}
+    from P_TAX_DEDUCTION_DETAIL
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -309,7 +309,7 @@
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.TaxDeductionDetailExample" resultType="java.lang.Long">
-    select count(*) from P_TAX_DEDUCTION_DETAIL ${innerJoinDepartment}
+    select count(*) from P_TAX_DEDUCTION_DETAIL
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -542,56 +542,35 @@
     delete from P_TAX_DEDUCTION_DETAIL
     where PROFIT_MONTH = '${profitMonth}'
   </delete>
-
-  <sql id="Base_Column_List_Two">
-    ID, AGENT_PID, PROFIT_MONTH, AGENT_ID, AGENT_NAME, FRIST_AGENT_ID, FRIST_AGENT_NAME,
-    PARENT_AGENT_ID, PARENT_AGENT_NAME, PRE_LD_AMT, DAY_PROFIT_AMT, DAY_BACK_AMT, BASIC_PROFIT_AMT,
-    BL_AMT, MERCHAN_ORDER_AMT, AGENT_DF_AMT, ADJUST_AMT, ADJUST_ACCOUNT, ADJUST_RESON,
-    ADJUST_TIME, TAX_BASE, TAX_RATE, ADD_TAX_AMT, PRE_NOT_DEDUCTION_AMT1, SUPPOSED_TAX_AMT,
-    REAL_TAX_AMT, NOT_DEDUCTION_TAX_AMT, CREATE_TIME, UPDATE_TIME, BUS_PLATFORM
-  </sql>
-
   <select id="queryAndSubordinate" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
-    <include refid="Base_Column_List_Two" />
-    from P_TAX_DEDUCTION_DETAIL N
-    <if test="dept.orgId != null and dept.orgId != ''"> /*省区*/
-      INNER JOIN A_AGENT AGENT ON N.AGENT_ID = AGENT.ID AND AGENT.AG_DOC_PRO= #{dept.orgId}
-    </if>
-    <if test="dept.area != null and dept.area != ''"> /*大区*/
-      INNER JOIN A_AGENT AGENT ON N.AGENT_ID = AGENT.ID AND AGENT.AG_DOC_DISTRICT= #{dept.area}
-    </if>
-    START WITH N.PROFIT_MONTH=#{detail.profitMonth}
+    <include refid="Base_Column_List" />
+    from P_TAX_DEDUCTION_DETAIL
+    START WITH PROFIT_MONTH=#{detail.profitMonth}
     <if test="detail.agentId!=null and detail.agentId!=''">
-      AND N.AGENT_ID=#{detail.agentId}
+      AND AGENT_ID=#{detail.agentId}
     </if>
     <if test="detail.agentName!=null and detail.agentName!=''">
-      AND N.AGENT_NAME=#{detail.agentName}
+      AND AGENT_NAME=#{detail.agentName}
     </if>
-    CONNECT BY  PRIOR  N.AGENT_ID=N.PARENT_AGENT_ID AND N.PROFIT_MONTH=#{detail.profitMonth}
+    CONNECT BY  PRIOR  AGENT_ID=PARENT_AGENT_ID AND PROFIT_MONTH=#{detail.profitMonth}
     <include refid="OracleDialectSuffix" />
   </select>
-  <select id="queryCountAndSubordinate"  resultType="java.lang.Long">
+  <select id="queryCountAndSubordinate" parameterType="com.ryx.credit.profit.pojo.TaxDeductionDetail" resultType="java.lang.Long">
     select  count(1) from (
     select
     distinct
-    <include refid="Base_Column_List_Two" />
-    from P_TAX_DEDUCTION_DETAIL N
-    <if test="dept.orgId != null and dept.orgId != ''">
-      INNER JOIN A_AGENT AGENT ON N.AGENT_ID = AGENT.ID AND AGENT.AG_DOC_PRO= #{dept.orgId}
+    <include refid="Base_Column_List" />
+    from P_TAX_DEDUCTION_DETAIL
+    START WITH PROFIT_MONTH=#{profitMonth}
+    <if test="agentId!=null and agentId!=''">
+      AND AGENT_ID=#{agentId}
     </if>
-    <if test="dept.area != null and dept.area != ''">
-      INNER JOIN A_AGENT AGENT ON N.AGENT_ID = AGENT.ID AND AGENT.AG_DOC_DISTRICT= #{dept.area}
+    <if test="agentName!=null and agentName!=''">
+      AND AGENT_NAME=#{agentName}
     </if>
-    START WITH N.PROFIT_MONTH=#{detail.profitMonth}
-    <if test="detail.agentId!=null and detail.agentId!=''">
-      AND N.AGENT_ID=#{detail.agentId}
-    </if>
-    <if test="detail.agentName!=null and detail.agentName!=''">
-      AND N.AGENT_NAME=#{detail.agentName}
-    </if>
-    CONNECT BY  PRIOR  N.AGENT_ID=N.PARENT_AGENT_ID AND N.PROFIT_MONTH=#{detail.profitMonth}
+    CONNECT BY  PRIOR  AGENT_ID=PARENT_AGENT_ID AND PROFIT_MONTH=#{profitMonth}
     )
   </select>
   <select id="profitCount" parameterType="com.ryx.credit.profit.pojo.TaxDeductionDetailExample" resultType="java.util.Map">
