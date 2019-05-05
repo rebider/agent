@@ -44,11 +44,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, AGENT_PID, AGENT_ID, AGENT_NAME, CHECK_DATE_S, CHECK_DATE_E, TOTAL_AMT, POS_ORDERS,
-    PROFIT_SCALE, APP_DATE, CHECK_STATUS
-  </sql>
-  <sql id="Base_Column_List_Two">
-    N.ID, AGENT_PID, AGENT_ID, AGENT_NAME, CHECK_DATE_S, CHECK_DATE_E, TOTAL_AMT, POS_ORDERS,
+    ID, AGENT_PID, AGENT_ID, AGENT_NAME, CHECK_DATE_S, CHECK_DATE_E, TOTAL_AMT, POS_ORDERS, 
     PROFIT_SCALE, APP_DATE, CHECK_STATUS
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PosCheckExample" resultMap="BaseResultMap">
@@ -57,8 +53,8 @@
     <if test="distinct">
       distinct
     </if>
-    <include refid="Base_Column_List_Two" />
-    from P_POS_CHECK N ${innerJoinDepartment}
+    <include refid="Base_Column_List" />
+    from P_POS_CHECK
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -170,7 +166,7 @@
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PosCheckExample" resultType="java.lang.Long">
-    select count(*) from P_POS_CHECK N ${innerJoinDepartment}
+    select count(*) from P_POS_CHECK
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>

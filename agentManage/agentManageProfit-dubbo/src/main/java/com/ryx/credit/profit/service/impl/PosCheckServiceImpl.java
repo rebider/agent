@@ -55,9 +55,6 @@ public class PosCheckServiceImpl implements IPosCheckService {
         PosCheckExample example = checkEqualsTo(posCheck);
         example.setPage(page);
         example.setOrderByClause("APP_DATE DESC ");
-        if (param != null) {
-            example.setInnerJoinDepartment(param.get("ORGANIZATIONCODE").toString(), param.get("ORGID").toString());
-        }
         List<PosCheck> posCheckList = checkMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(posCheckList);

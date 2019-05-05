@@ -23,16 +23,11 @@ public class ProfitDeductionExample {
     protected String innerJoinDepartment;
     public void setInnerJoinDepartment(String innerJoinDepartment, String corId) {
         if (Objects.equals("south", innerJoinDepartment )|| Objects.equals("north", innerJoinDepartment)) {
-            this.innerJoinDepartment = " INNER JOIN A_AGENT AGENT ON N.AGENT_ID = AGENT.ID AND AGENT.AG_DOC_DISTRICT= "+corId;
+            this.innerJoinDepartment = " INNER JOIN A_AGENT AGENT ON AGENT_ID = AGENT.ID LEFT JOIN C_ORGANIZATION COR ON AGENT.AG_DOC_DISTRICT= COR.ID AND COR.ID ="+corId;
         } else if (innerJoinDepartment.contains("south") || innerJoinDepartment.contains("north")) {
-            this.innerJoinDepartment = " INNER JOIN A_AGENT AGENT ON N.AGENT_ID = AGENT.ID AND AGENT.AG_DOC_PRO= "+corId;
+            this.innerJoinDepartment = " INNER JOIN A_AGENT AGENT ON AGENT_ID = AGENT.ID LEFT JOIN C_ORGANIZATION COR ON AGENT.AG_DOC_PRO= COR.ID AND COR.ID ="+corId;
         }
     }
-
-    public String getInnerJoinDepartment(){
-        return innerJoinDepartment;
-    }
-
     public ProfitDeductionExample() {
         oredCriteria = new ArrayList<Criteria>();
     }
@@ -84,7 +79,6 @@ public class ProfitDeductionExample {
         oredCriteria.clear();
         orderByClause = null;
         distinct = false;
-        innerJoinDepartment = null;
     }
 
     public void setPage(Page page) {

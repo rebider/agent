@@ -13,7 +13,6 @@ import com.ryx.credit.profit.pojo.ProfitDayExample;
 
 import javax.print.DocFlavor;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -28,7 +27,7 @@ import java.util.Map;
 
 public interface IPTaxAdjustService {
 
-    PageInfo PTaxAdjustList(PTaxAdjust record, Page page, Map<String,Object> map);
+    PageInfo PTaxAdjustList(PTaxAdjust record, Page page);
 
     PTaxAdjust selectByAgentId(String agentId);
 
