@@ -1015,6 +1015,56 @@ public class OLogisticServiceImpl implements OLogisticsService {
         return list;
     }
 
+
+    @Override
+    public List<String> idList(String startSn, String endSn) throws MessageException {
+        //1.startSn  2.endSn  3.开始截取的位数   4.结束截取的位数
+        List<String> list = new ArrayList<>();
+        Map digit = Conver10ToConver33Utils.getDigit(startSn, endSn);
+        //结束sn
+        String end = (String) digit.get("lastSn");
+        //起始sn
+        String start = (String) digit.get("firstSn");
+        //sn长度
+        Integer finish = (Integer) digit.get("length");
+        //不同位置起始位置 从1开始，如果使用索引，需要减去1
+        Integer begins = (Integer) digit.get("num");
+        //如果不同位置为0说明起始和结束sn为同一个直接返回一个sn
+        if(!begins.equals(Integer.valueOf(0))){
+            int begin = begins - 1;//开始索引位置
+            //截取不一样的字符串
+            String sSub = start.substring(begin, finish);
+            String eSub = end.substring(begin, finish);
+            if ("".equals(eSub) || "".equals(sSub)) {
+                logger.info("请输入正确的起始和结束SN号位数");
+                throw new MessageException("请输入正确的起始和结束SN号位数");
+            }
+            //检查不一样的字符串是否是联迪sn 位数是是否是12位 变更为是否是字符开头 否则按照普通规则进行匹配
+            if(start.length()==12 && sSub.matches("^[A-Za-z]+\\d{4}")){
+                list= getBetweenValues(startSn, endSn);
+                logger.info("sn：{}，{}，使用联迪方式解析",start,end);
+                return list;
+            }
+            if(Integer.parseInt(eSub) - Integer.parseInt(sSub)<=0){
+                throw new MessageException("sn码填写有误");
+            }
+            ////按照普通规则进行匹配 不一样的部分不包含字母
+            if(sSub.matches(".*[A-Za-z]+.*") || eSub.matches(".*[A-Za-z]+.*")){
+                throw new MessageException("sn码填写有误");
+            }
+            //按照普通规则进行匹配 不一样的部分不包含字母
+            int num = Integer.parseInt(sSub);
+            int w = finish - begin;
+            for (int j = Integer.parseInt(eSub) - Integer.parseInt(sSub); j >= 0; j--) {
+                int x = num++;
+                list.add(start.substring(0, begin) + String.format("%0" + w + "d", x) + start.substring(finish));
+            }
+        }else{
+            list.add(startSn);
+        }
+        return list;
+    }
+
     /**
      * 查詢物流明细
      * @param param

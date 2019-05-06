@@ -57,11 +57,11 @@ public class Conver10ToConver33Utils {
               max = i1;
           }
           list.add(sn1+par1);
-          list.add(sn1+par2);
           for (int i = min + 1; i < max; i++) {
               String sub = StringSubTo33(i);
               list.add(sn1+sub);
           }
+          list.add(sn1+par2);
       }catch (Exception e){
           e.printStackTrace();
       }
@@ -143,10 +143,10 @@ public class Conver10ToConver33Utils {
             }
         }
         HashMap<String, Object> map = new HashMap<>();
-        map.put("num",num);
-        map.put("length",chars.length);
-        map.put("firstSn",firstSn);
-        map.put("lastSn",lastSn);
+        map.put("num",num);//sn码不同的起始位置
+        map.put("length",chars.length);//sn码长度
+        map.put("firstSn",firstSn);//起始sn
+        map.put("lastSn",lastSn);//结束sn
         return map;
     }
 
