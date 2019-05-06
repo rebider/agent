@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class PosCheckExample implements Serializable {
     protected String orderByClause;
@@ -19,6 +20,20 @@ public class PosCheckExample implements Serializable {
     protected Integer limitStart;
 
     protected Integer limitEnd;
+
+    protected String innerJoinDepartment;
+
+    public void setInnerJoinDepartment(String innerJoinDepartment, String corId) {
+        if (Objects.equals("south", innerJoinDepartment )|| Objects.equals("north", innerJoinDepartment)) {
+            this.innerJoinDepartment = " INNER JOIN A_AGENT AGENT ON N.AGENT_ID = AGENT.ID AND AGENT.AG_DOC_DISTRICT= "+corId;
+        } else if (innerJoinDepartment.contains("south") || innerJoinDepartment.contains("north")) {
+            this.innerJoinDepartment = " INNER JOIN A_AGENT AGENT ON N.AGENT_ID = AGENT.ID AND AGENT.AG_DOC_PRO= "+corId;
+        }
+    }
+
+    public String getInnerJoinDepartment(){
+        return innerJoinDepartment;
+    }
 
     public PosCheckExample() {
         oredCriteria = new ArrayList<Criteria>();
