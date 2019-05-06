@@ -10,7 +10,7 @@ import com.ryx.credit.dao.agent.PlatFormMapper;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.PlatForm;
 import com.ryx.credit.pojo.admin.agent.PlatFormExample;
-import com.ryx.credit.pojo.admin.agent.imsOrgan;
+import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.PlatformSynService;
 import org.slf4j.Logger;
@@ -139,6 +139,58 @@ public class PlatformSynServiceMpos implements PlatformSynService {
             log.info("http请求超时:{}",e.getMessage());
             AppConfig.sendEmails("http请求超时:"+ MailUtil.printStackTrace(e), "升级通知手刷失败报警");
             throw e;
+        }
+    }
+
+
+    @Override
+    public AgentResult httpRequestNetIn(AgentNotifyVo agentNotifyVo)throws Exception{
+        try {
+            Map<String,Object> jsonParams = new HashMap<>();
+            jsonParams.put("uniqueId",agentNotifyVo.getUniqueId());
+            if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentNotifyVo.getOrgId()))
+                jsonParams.put("orgId",agentNotifyVo.getOrgId());
+            jsonParams.put("useOrgan",agentNotifyVo.getUseOrgan()); //使用范围
+            jsonParams.put("orgName",agentNotifyVo.getOrgName());
+            jsonParams.put("busPlatform",agentNotifyVo.getBusPlatform());
+            jsonParams.put("agHeadMobile",agentNotifyVo.getAgHeadMobile());
+            jsonParams.put("baseMessage",agentNotifyVo.getBaseMessage());
+            jsonParams.put("busMessage",agentNotifyVo.getBusMessage());
+            jsonParams.put("colinfoMessage",agentNotifyVo.getColinfoMessage());
+            if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentNotifyVo.getProvince()))
+                jsonParams.put("province",agentNotifyVo.getProvince());
+            if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentNotifyVo.getCity()))
+                jsonParams.put("city",agentNotifyVo.getCity());
+            if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentNotifyVo.getCity()))
+                jsonParams.put("cityArea",agentNotifyVo.getCity());
+            jsonParams.put("orgType",agentNotifyVo.getOrgType());
+            if(agentNotifyVo.getOrgType().equals(OrgType.STR.getValue()))
+                jsonParams.put("supDorgId",agentNotifyVo.getSupDorgId());
+
+            String json = JsonUtil.objectToJson(jsonParams);
+            log.info("通知手刷请求参数：{}",json);
+
+            //发送请求
+            String httpResult = HttpClientUtil.doPostJson(AppConfig.getProperty("agent_mpos_notify_url"), json);
+
+            log.info("通知手刷返回参数：{}",httpResult);
+            if (httpResult.contains("data") && httpResult.contains("orgId")){
+                JSONObject respXMLObj = JSONObject.parseObject(httpResult);
+                JSONObject dataObj = JSONObject.parseObject(respXMLObj.get("data").toString());
+                log.info(dataObj.toJSONString());
+                if(com.ryx.credit.commons.utils.StringUtils.isBlank(respXMLObj.get("data").toString())){
+                    AppConfig.sendEmails(httpResult, "入网通知手刷失败报警");
+                }
+                return AgentResult.ok(dataObj);
+            }else{
+                AppConfig.sendEmails(httpResult, "入网通知手刷失败报警");
+                log.info("http请求超时返回错误:{}",httpResult);
+                throw new Exception("http返回有误");
+            }
+        } catch (Exception e) {
+            AppConfig.sendEmails("通知手刷请求超时："+ MailUtil.printStackTrace(e), "入网通知手刷失败报警");
+            log.info("http请求超时:{}",e.getMessage());
+            throw new Exception("http请求超时");
         }
     }
 }
