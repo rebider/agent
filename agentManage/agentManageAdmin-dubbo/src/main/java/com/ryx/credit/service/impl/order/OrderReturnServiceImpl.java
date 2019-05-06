@@ -619,18 +619,20 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 String endSn = (String) map.get("endSn");
                 Integer begins = (Integer) map.get("begins");
                 Integer finish = (Integer) map.get("finish");
-//                List<String> sns = oLogisticsService.idList(startSn, endSn, begins, finish);
+                int checkCount = returnOrderDetailMapper.checkSnIsReturn(FastMap
+                        .fastMap("begin",startSn)
+                        .putKeyV("end",endSn)
+                        .putKeyV("sts",Arrays.asList(RetSchedule.DFH.code,RetSchedule.FHZ.code,RetSchedule.SPZ.code,RetSchedule.TH.code,RetSchedule.TKZ.code,RetSchedule.YFH.code))
+                );
+                if(checkCount>0)throw new ProcessException(startSn+":"+endSn+"在退货中");
                 List<String> sns = logisticsDetailService.querySnLList(startSn, endSn);
                 for (String sn : sns) {
                     //根据sn查询物流信息
                     Map<String, Object> snmap = oLogisticsService.getLogisticsBySn(sn, agentId);
                 }
+                //检查sn是否在退货中
             }
-        }
-       /* catch (MessageException e) {
-            throw new ProcessException(e.getMessage());
-        } */
-        catch (ProcessException e) {
+        }catch (ProcessException e) {
             throw e;
         }
     }
@@ -652,6 +654,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             throw new ProcessException("解析退货商品失败");
         }
 
+        //检查SN是否允许退货
         //检查SN是否允许退货
         try {
             checkSn(list, agentId);
