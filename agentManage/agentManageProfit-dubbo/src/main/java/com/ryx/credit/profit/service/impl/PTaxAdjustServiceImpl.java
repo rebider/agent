@@ -63,13 +63,10 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
     private AgentService agentService;
 
     @Override
-    public PageInfo PTaxAdjustList(PTaxAdjust record, Page page,Map<String,Object> map) {
+    public PageInfo PTaxAdjustList(PTaxAdjust record, Page page) {
         PTaxAdjustExample example = adjustEqualsTo(record);
         example.setPage(page);
         example.setOrderByClause("VALID_DATE "+Page.ORDER_DIRECTION_DESC);
-        if (map != null) {
-            example.setInnerJoinDepartment(map.get("ORGANIZATIONCODE").toString(), map.get("ORGID").toString());
-        }
         List<PTaxAdjust> profitD = adjustMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(profitD);

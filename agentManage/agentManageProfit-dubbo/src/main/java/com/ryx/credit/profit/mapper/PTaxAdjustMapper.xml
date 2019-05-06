@@ -44,17 +44,14 @@
   <sql id="Base_Column_List">
     ID, AGENT_PID, AGENT_ID, AGENT_NAME, TAX_OLD, TAX_ING, VALID_DATE, TAX_STATUS, PROFIT_MONTH
   </sql>
-  <sql id="Base_Column_List_Two">
-    N.ID, AGENT_PID, AGENT_ID, AGENT_NAME, TAX_OLD, TAX_ING, VALID_DATE, TAX_STATUS, PROFIT_MONTH
-  </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PTaxAdjustExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
     <if test="distinct">
       distinct
     </if>
-    <include refid="Base_Column_List_Two" />
-    from P_TAX_ADJUST N ${innerJoinDepartment}
+    <include refid="Base_Column_List" />
+    from P_TAX_ADJUST
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -160,7 +157,7 @@
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PTaxAdjustExample" resultType="java.lang.Long">
-    select count(*) from P_TAX_ADJUST N ${innerJoinDepartment}
+    select count(*) from P_TAX_ADJUST
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>

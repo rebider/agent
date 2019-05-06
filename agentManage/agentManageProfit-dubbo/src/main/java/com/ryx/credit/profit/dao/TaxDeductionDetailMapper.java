@@ -28,9 +28,9 @@ public interface TaxDeductionDetailMapper {
 
     List<Map<String,Object>> queryTaxDeductionAgentList(Map<String,Object> params);
 
-    List<TaxDeductionDetail> queryAndSubordinate(@Param("dept") Map<String,String> dept,@Param("detail") TaxDeductionDetail taxDeductionDetail, @Param("page") Page page);
+    List<TaxDeductionDetail> queryAndSubordinate(@Param("detail") TaxDeductionDetail taxDeductionDetail, @Param("page") Page page);
 
-    long queryCountAndSubordinate(@Param("dept") Map<String,String> dept,@Param("detail") TaxDeductionDetail taxDeductionDetail);
+    long queryCountAndSubordinate(TaxDeductionDetail taxDeductionDetail);
 
     void deleteByMonth(@Param("profitMonth") String profitMonth);
 

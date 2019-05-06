@@ -565,18 +565,11 @@
 
 <select id="baseProfitList" parameterType="java.util.Map" resultType="java.util.Map">
   SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
-  select aa.*,bb.AG_NAME as PARENT_AGENT_NAME  from(select TRANS_PROFIT_DETAIL.ID, BUS_NUM, AGENT_ID, AGENT_NAME, PARENT_BUS_NUM, PARENT_AGENT_ID, PROFIT_DATE,
+  select aa.*,bb.AG_NAME as PARENT_AGENT_NAME  from(select ID, BUS_NUM, AGENT_ID, AGENT_NAME, PARENT_BUS_NUM, PARENT_AGENT_ID, PROFIT_DATE,
   IN_TRANS_AMT, OUT_TRANS_AMT, PROFIT_AMT, BUS_CODE,BUS_CODE as BUS_NAME, IN_PROFIT_SCALE, OUT_PROFIT_SCALE,
   IN_PROFIT_AMT, OUT_PROFIT_AMT, POS_CREDIT_AMT, IPOS_CREDIT_AMT, POS_REWARD_AMT, PAY_COMPANY,
   NOTAX_AMT, SUPPLY_AMT, TRANS_FEE, UNICODE, SOURCE_INFO, AGENT_TYPE, UNLINE_AMT,
-  POS_TRAN_AMT, POS_TRAN_FEE, POS_PFT_AMT, QR_TRAN_AMT, QR_TRAN_FEE, QR_PFT_AMT ,REMARK from TRANS_PROFIT_DETAIL
-  <if test="orgId != null and orgId != ''">
-    inner join  A_AGENT AGENT ON AGENT_ID = AGENT.ID AND AGENT.AG_DOC_PRO= #{orgId}
-  </if>
-  <if test="area != null and area != ''">
-    inner join  A_AGENT AGENT ON AGENT_ID = AGENT.ID AND AGENT.AG_DOC_DISTRICT= #{area}
-  </if>
-  ) aa
+  POS_TRAN_AMT, POS_TRAN_FEE, POS_PFT_AMT, QR_TRAN_AMT, QR_TRAN_FEE, QR_PFT_AMT ,REMARK from TRANS_PROFIT_DETAIL) aa
 left join  A_AGENT  bb on aa.PARENT_AGENT_ID = bb.ID
 where
   <if test="SOURCE_INFO=='POS'">(aa.SOURCE_INFO='POS'or aa.SOURCE_INFO='ZPOS')</if>
@@ -591,12 +584,6 @@ where
 
   <select id="baseProfitCount" parameterType="java.util.Map" resultType="java.lang.Integer">
    select count(*) from TRANS_PROFIT_DETAIL
-    <if test="orgId != null and orgId != ''">
-      inner join  A_AGENT AGENT ON AGENT_ID = AGENT.ID AND AGENT.AG_DOC_PRO= #{orgId}
-    </if>
-    <if test="area != null and area != ''">
-      inner join  A_AGENT AGENT ON AGENT_ID = AGENT.ID AND AGENT.AG_DOC_DISTRICT= #{area}
-    </if>
     where
     <if test="SOURCE_INFO=='POS'">(SOURCE_INFO='POS'or SOURCE_INFO='ZPOS')</if>
     <if test="SOURCE_INFO=='MPOS'">SOURCE_INFO='MPOS'</if>
@@ -610,18 +597,11 @@ where
 
   <select id="baseProfitLowerList" parameterType="java.util.Map" resultType="java.util.Map">
  SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
-    select aa.*,bb.AG_NAME as PARENT_AGENT_NAME  from(select TRANS_PROFIT_DETAIL.ID, BUS_NUM, AGENT_ID, AGENT_NAME, PARENT_BUS_NUM, PARENT_AGENT_ID, PROFIT_DATE,
+    select aa.*,bb.AG_NAME as PARENT_AGENT_NAME  from(select ID, BUS_NUM, AGENT_ID, AGENT_NAME, PARENT_BUS_NUM, PARENT_AGENT_ID, PROFIT_DATE,
     IN_TRANS_AMT, OUT_TRANS_AMT, PROFIT_AMT, BUS_CODE,BUS_CODE as BUS_NAME, IN_PROFIT_SCALE, OUT_PROFIT_SCALE,
     IN_PROFIT_AMT, OUT_PROFIT_AMT, POS_CREDIT_AMT, IPOS_CREDIT_AMT, POS_REWARD_AMT, PAY_COMPANY,
     NOTAX_AMT, SUPPLY_AMT, TRANS_FEE, UNICODE, SOURCE_INFO, AGENT_TYPE, UNLINE_AMT,
-    POS_TRAN_AMT, POS_TRAN_FEE, POS_PFT_AMT, QR_TRAN_AMT, QR_TRAN_FEE, QR_PFT_AMT,REMARK from TRANS_PROFIT_DETAIL
-    <if test="orgId != null and orgId != ''">
-      inner join  A_AGENT AGENT ON AGENT_ID = AGENT.ID AND AGENT.AG_DOC_PRO= #{orgId}
-    </if>
-    <if test="area != null and area != ''">
-      inner join  A_AGENT AGENT ON AGENT_ID = AGENT.ID AND AGENT.AG_DOC_DISTRICT= #{area}
-    </if>
-    ) aa
+    POS_TRAN_AMT, POS_TRAN_FEE, POS_PFT_AMT, QR_TRAN_AMT, QR_TRAN_FEE, QR_PFT_AMT,REMARK from TRANS_PROFIT_DETAIL) aa
     left join  A_AGENT  bb on aa.PARENT_AGENT_ID = bb.ID
     start with
     <if test="SOURCE_INFO=='POS'">(aa.SOURCE_INFO='POS'or aa.SOURCE_INFO='ZPOS')</if>
@@ -637,12 +617,7 @@ where
 
   <select id="baseProfitLowerCount" parameterType="java.util.Map" resultType="java.lang.Integer">
     select count(*) from TRANS_PROFIT_DETAIL
-    <if test="orgId != null and orgId != ''">
-      inner join  A_AGENT AGENT ON AGENT_ID = AGENT.ID AND AGENT.AG_DOC_PRO= #{orgId}
-    </if>
-    <if test="area != null and area != ''">
-      inner join  A_AGENT AGENT ON AGENT_ID = AGENT.ID AND AGENT.AG_DOC_DISTRICT= #{area}
-    </if>
+
     start with
     <if test="SOURCE_INFO=='POS'">(SOURCE_INFO='POS'or SOURCE_INFO='ZPOS')</if>
     <if test="SOURCE_INFO=='MPOS'">SOURCE_INFO='MPOS'</if>
