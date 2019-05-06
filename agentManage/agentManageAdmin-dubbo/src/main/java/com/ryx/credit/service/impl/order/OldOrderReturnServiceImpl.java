@@ -670,14 +670,6 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             logger.info("请填写结束SN序列号");
             throw new MessageException("请填写结束SN序列号");
         }
-        if (!proCom.equals(CardImportType.LD.msg)) {
-            if (com.ryx.credit.commons.utils.StringUtils.isBlank(beginSnCount)) {
-                throw new MessageException("请填写起始SN位数");
-            }
-            if (com.ryx.credit.commons.utils.StringUtils.isBlank(endSnCount)) {
-                throw new MessageException("请填写结束SN位数");
-            }
-        }
 
         if (com.ryx.credit.commons.utils.StringUtils.isBlank(logCom)) {
             logger.info("请填写物流公司");
