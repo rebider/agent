@@ -52,7 +52,7 @@ public interface AgentNotifyService {
 
     PageInfo queryList(Page page,AgentPlatFormSyn agentPlatFormSyn);
 
-    AgentResult httpRequestForPos(AgentNotifyVo agentNotifyVo)throws Exception;
+//    AgentResult httpRequestForPos(AgentNotifyVo agentNotifyVo)throws Exception;
 
     AgentPlatFormSyn findByBusId(String busId);
 

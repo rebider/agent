@@ -421,7 +421,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
                 log.info("已有编号进行入网修改：接收入网请求开始POS: busId：{},userId:{},data:{}",busId,userId,JSONObject.toJSONString(agentNotifyVo));
                 String sendJson = JsonUtil.objectToJson(agentNotifyVo);
                 record.setSendJson(sendJson);
-                result = httpRequestForPos(agentNotifyVo);
+//                result = httpRequestForPos(agentNotifyVo);
                 log.info("已有编号进行入网修改：接收入网请求结束POS: busId：{},userId:{},data:{}",busId,userId,JSONObject.toJSONString(agentNotifyVo));
             }
 
@@ -437,8 +437,14 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
                 log.info("已有编号进行入网修改：接收入网请求开始MPOS: busId：{},userId:{},data:{}",busId,userId,JSONObject.toJSONString(agentNotifyVo));
                 String sendJson = JsonUtil.objectToJson(agentNotifyVo);
                 record.setSendJson(sendJson);
-                result = httpRequestForMPOS(agentNotifyVo);
+//                result = httpRequestForMPOS(agentNotifyVo);
                 log.info("已有编号进行入网修改：接收入网请求结束MPOS: busId：{},userId:{},data:{}",busId,userId,JSONObject.toJSONString(agentNotifyVo));
+            }
+            for (PlatformSynService platformSynService : platformSynServiceList) {
+                log.info("已有编号进行入网修改,平台编号:{} 服务类:{}", agentBusInfo.getBusNum(), platformSynService.getClass().getSimpleName());
+                if (platformSynService.isMyPlatform(agentBusInfo.getId())) {
+                    result = platformSynService.httpRequestNetIn(agentNotifyVo);
+                }
             }
 
             log.info("已有编号进行入网修改：接收入网,业务id：{},返回结果:{}",busId,result);
@@ -756,7 +762,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
                 agentNotifyVo.setUniqueId(agentBusInfo.getId());
                 String sendJson = JsonUtil.objectToJson(agentNotifyVo);
                 record.setSendJson(sendJson);
-                result = httpRequestForPos(agentNotifyVo);
             }
             if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
                 PayComp payComp = apaycompService.selectById(agentBusInfo.getCloPayCompany());
@@ -768,8 +773,14 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
                 agentNotifyVo.setUniqueId(agentBusInfo.getAgentId());
                 String sendJson = JsonUtil.objectToJson(agentNotifyVo);
                 record.setSendJson(sendJson);
-                result = httpRequestForMPOS(agentNotifyVo);
             }
+            for (PlatformSynService platformSynService : platformSynServiceList) {
+                log.info("开户接口,平台编号:{} 服务类:{}", agentBusInfo.getBusNum(), platformSynService.getClass().getSimpleName());
+                if (platformSynService.isMyPlatform(agentBusInfo.getId())) {
+                    result = platformSynService.httpRequestNetIn(agentNotifyVo);
+                }
+            }
+
             log.info("入网开户修改操作: ,业务id：{},返回结果:{}",busId,result);
             record.setNotifyJson(String.valueOf(result.getData()));
         } catch (Exception e) {
@@ -902,172 +913,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
         return regions.get(0);
     }
 
-    @Override
-    public AgentResult httpRequestForPos(AgentNotifyVo agentNotifyVo)throws Exception{
-        try {
-
-            String cooperator = com.ryx.credit.util.Constants.cooperator;
-            String charset = "UTF-8"; // 字符集
-            String tranCode = "ORG001"; // 交易码
-            String reqMsgId = UUID.randomUUID().toString().replace("-", ""); // 请求流水
-            String reqDate = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"); // 请求时间
-
-            JSONObject jsonParams = new JSONObject();
-            JSONObject data = new JSONObject();
-            jsonParams.put("version", "1.0.0");
-            jsonParams.put("msgType", "01");
-            jsonParams.put("reqDate", reqDate);
-            data.put("uniqueId",agentNotifyVo.getUniqueId());
-            data.put("activityType",agentNotifyVo.getActivityType());
-            data.put("useOrgan",agentNotifyVo.getUseOrgan()); //使用范围
-            data.put("orgName",agentNotifyVo.getOrgName());
-            data.put("busiAreas",agentNotifyVo.getBusiAreas());
-            data.put("hasS0",agentNotifyVo.getHasS0());
-            data.put("busiType",agentNotifyVo.getBusiType());
-            data.put("debitTop",agentNotifyVo.getDebitTop());
-            data.put("ckDebitRate",agentNotifyVo.getCkDebitRate());
-            data.put("lowDebitRate",agentNotifyVo.getLowDebitRate());
-            if(StringUtils.isNotBlank(agentNotifyVo.getOrgId())){
-                data.put("orgId",agentNotifyVo.getOrgId());
-            }
-            if(StringUtils.isNotBlank(agentNotifyVo.getLoginName())){
-                data.put("loginName",agentNotifyVo.getLoginName());
-            }
-            if(StringUtils.isNotBlank(agentNotifyVo.getProvince()))
-                data.put("province",agentNotifyVo.getProvince());
-            if(StringUtils.isNotBlank(agentNotifyVo.getCity()))
-                data.put("city",agentNotifyVo.getCity());
-            if(StringUtils.isNotBlank(agentNotifyVo.getCityArea()))
-                data.put("cityArea",agentNotifyVo.getCityArea());
-            data.put("orgType",agentNotifyVo.getOrgType());
-            if(agentNotifyVo.getOrgType().equals(OrgType.STR.getValue()))
-                data.put("supDorgId",agentNotifyVo.getSupDorgId());
-
-            jsonParams.put("data", data);
-            String plainXML = jsonParams.toString();
-            // 请求报文加密开始
-            String keyStr = AESUtil.getAESKey();
-            byte[] plainBytes = plainXML.getBytes(charset);
-            byte[] keyBytes = keyStr.getBytes(charset);
-            String encryptData = new String(Base64.encodeBase64((AESUtil.encrypt(plainBytes, keyBytes, "AES", "AES/ECB/PKCS5Padding", null))), charset);
-            String signData = new String(Base64.encodeBase64(RSAUtil.digitalSign(plainBytes, Constants.privateKey, "SHA1WithRSA")), charset);
-            String encrtptKey = new String(org.apache.commons.codec.binary.Base64.encodeBase64(RSAUtil.encrypt(keyBytes, Constants.publicKey, 2048, 11, "RSA/ECB/PKCS1Padding")), charset);
-            // 请求报文加密结束
-
-            Map<String, String> map = new HashMap<>();
-            map.put("encryptData", encryptData);
-            map.put("encryptKey", encrtptKey);
-            map.put("cooperator", cooperator);
-            map.put("signData", signData);
-            map.put("tranCode", tranCode);
-            map.put("reqMsgId", reqMsgId);
-
-            log.info("通知pos请求参数:{}",data);
-            String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("agent_pos_notify_url"), map);
-            JSONObject jsonObject = JSONObject.parseObject(httpResult);
-            if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
-                 log.info("请求异常======" + httpResult);
-                AppConfig.sendEmails("http请求异常", "入网通知POS失败报警");
-                throw new Exception("http请求异常");
-            } else {
-                String resEncryptData = jsonObject.getString("encryptData");
-                String resEncryptKey = jsonObject.getString("encryptKey");
-                byte[] decodeBase64KeyBytes = Base64.decodeBase64(resEncryptKey.getBytes(charset));
-                byte[] merchantAESKeyBytes = RSAUtil.decrypt(decodeBase64KeyBytes, Constants.privateKey, 2048, 11, "RSA/ECB/PKCS1Padding");
-                byte[] decodeBase64DataBytes = Base64.decodeBase64(resEncryptData.getBytes(charset));
-                byte[] merchantXmlDataBytes = AESUtil.decrypt(decodeBase64DataBytes, merchantAESKeyBytes, "AES", "AES/ECB/PKCS5Padding", null);
-                String respXML = new String(merchantXmlDataBytes, charset);
-                log.info("通知pos返回参数：{}",respXML);
-
-                // 报文验签
-                String resSignData = jsonObject.getString("signData");
-                byte[] signBytes = Base64.decodeBase64(resSignData);
-                if (!RSAUtil.verifyDigitalSign(respXML.getBytes(charset), signBytes, Constants.publicKey, "SHA1WithRSA")) {
-                     log.info("签名验证失败");
-                } else {
-                     log.info("签名验证成功");
-                    if (respXML.contains("data") && respXML.contains("orgId")){
-                        JSONObject respXMLObj = JSONObject.parseObject(respXML);
-                        JSONObject dataObj = JSONObject.parseObject(respXMLObj.get("data").toString());
-                        if(StringUtils.isBlank(String.valueOf(respXMLObj.get("data"))) || "null".equals(String.valueOf(respXMLObj.get("data")))){
-                            AppConfig.sendEmails(respXML, "入网通知POS失败报警");
-                        }
-                        log.info(dataObj.toJSONString());
-                        return AgentResult.ok(dataObj);
-                    }else if (respXML.contains("respMsg")){
-                        JSONObject respXMLObj = JSONObject.parseObject(respXML);
-                        AppConfig.sendEmails(respXML, "入网通知POS失败报警:"+respXMLObj.get("respMsg"));
-                        log.info("http请求超时返回错误:{}",respXML);
-                        AgentResult ag = AgentResult.fail(respXML);
-                        ag.setData(respXMLObj);
-                        return ag;
-                    }else{
-                        AppConfig.sendEmails(respXML, "入网通知POS失败报警:"+respXML);
-                        log.info("http请求超时返回错误:{}",respXML);
-                        AgentResult ag = AgentResult.fail(respXML);
-                        ag.setData(respXML);
-                        return ag;
-                    }
-                }
-                return new AgentResult(500,"http请求异常",respXML);
-            }
-        } catch (Exception e) {
-            AppConfig.sendEmails("http请求超时:"+MailUtil.printStackTrace(e), "入网通知POS失败报警");
-            log.info("http请求超时:{}",e.getMessage());
-            throw e;
-        }
-    }
-
-    private AgentResult httpRequestForMPOS(AgentNotifyVo agentNotifyVo)throws Exception{
-
-        try {
-            Map<String,Object> jsonParams = new HashMap<>();
-            jsonParams.put("uniqueId",agentNotifyVo.getUniqueId());
-            if(StringUtils.isNotBlank(agentNotifyVo.getOrgId()))
-                jsonParams.put("orgId",agentNotifyVo.getOrgId());
-            jsonParams.put("useOrgan",agentNotifyVo.getUseOrgan()); //使用范围
-            jsonParams.put("orgName",agentNotifyVo.getOrgName());
-            jsonParams.put("busPlatform",agentNotifyVo.getBusPlatform());
-            jsonParams.put("agHeadMobile",agentNotifyVo.getAgHeadMobile());
-            jsonParams.put("baseMessage",agentNotifyVo.getBaseMessage());
-            jsonParams.put("busMessage",agentNotifyVo.getBusMessage());
-            jsonParams.put("colinfoMessage",agentNotifyVo.getColinfoMessage());
-            if(StringUtils.isNotBlank(agentNotifyVo.getProvince()))
-                jsonParams.put("province",agentNotifyVo.getProvince());
-            if(StringUtils.isNotBlank(agentNotifyVo.getCity()))
-                jsonParams.put("city",agentNotifyVo.getCity());
-            if(StringUtils.isNotBlank(agentNotifyVo.getCity()))
-                jsonParams.put("cityArea",agentNotifyVo.getCity());
-            jsonParams.put("orgType",agentNotifyVo.getOrgType());
-            if(agentNotifyVo.getOrgType().equals(OrgType.STR.getValue()))
-                jsonParams.put("supDorgId",agentNotifyVo.getSupDorgId());
-
-            String json = JsonUtil.objectToJson(jsonParams);
-            log.info("通知手刷请求参数：{}",json);
-
-            //发送请求
-            String httpResult = HttpClientUtil.doPostJson(AppConfig.getProperty("agent_mpos_notify_url"), json);
-
-            log.info("通知手刷返回参数：{}",httpResult);
-            if (httpResult.contains("data") && httpResult.contains("orgId")){
-                JSONObject respXMLObj = JSONObject.parseObject(httpResult);
-                JSONObject dataObj = JSONObject.parseObject(respXMLObj.get("data").toString());
-                log.info(dataObj.toJSONString());
-                if(StringUtils.isBlank(respXMLObj.get("data").toString())){
-                    AppConfig.sendEmails(httpResult, "入网通知手刷失败报警");
-                }
-                return AgentResult.ok(dataObj);
-            }else{
-                AppConfig.sendEmails(httpResult, "入网通知手刷失败报警");
-                log.info("http请求超时返回错误:{}",httpResult);
-                throw new Exception("http返回有误");
-            }
-        } catch (Exception e) {
-            AppConfig.sendEmails("通知手刷请求超时："+ MailUtil.printStackTrace(e), "入网通知手刷失败报警");
-            log.info("http请求超时:{}",e.getMessage());
-            throw new Exception("http请求超时");
-        }
-    }
 
     @Override
     public AgentPlatFormSyn findByBusId(String busId){
