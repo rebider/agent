@@ -513,6 +513,11 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             if(Oreturntype.NEW.code.equals(order.getOxOrder())){
                 throw new MessageException("订单"+oldOrderReturnBusEditVo.getOrderid()+"非历史订单");
             }
+            OLogisticsDetailExample  checkIsNoSn = new OLogisticsDetailExample();
+            checkIsNoSn.or().andOrderIdEqualTo(order.getId());
+            if(logisticsDetailMapper.countByExample(checkIsNoSn)>0){
+                throw new MessageException("订单"+oldOrderReturnBusEditVo.getOrderid()+"不是无sn订单，请填写无sn订单号");
+            }
 
             OProduct product = oProductMapper.selectByPrimaryKey(oldOrderReturnBusEditVo.getProductid());
             //检查订单中是否有此商品
