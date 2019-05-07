@@ -692,10 +692,20 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                 logger.info("校验Excel文档失败：[],[]",planNum,agentResult.getMsg());
                 throw new MessageException(agentResult.getMsg());
             }
+            //校验发货sn是否在退货号码段内
+            Object return_detail = listItem.get(0).get("RETURN_ORDER_DETAIL_ID");
+            if(return_detail!=null) {
+                OReturnOrderDetail returnOrderDetail = returnOrderDetailMapper.selectByPrimaryKey(return_detail+"");
+                AgentResult res = oLogisticsService.isInSnSegment(returnOrderDetail.getBeginSn(), returnOrderDetail.getEndSn(), beginSn, endSn);
+                if(!res.isOK()){
+                    throw new MessageException(res.getMsg());
+                }
+            }
+
         }else{
             throw new MessageException("排单信息未找到");
         }
-        if (beginSnCount.equals("") || endSnCount.equals("")){
+        if (StringUtils.isBlank(beginSnCount)|| StringUtils.isBlank(endSnCount)){
             beginSnCount="0";
             endSnCount="0";
         }

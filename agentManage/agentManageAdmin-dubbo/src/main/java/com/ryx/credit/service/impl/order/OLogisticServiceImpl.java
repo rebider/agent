@@ -1065,6 +1065,24 @@ public class OLogisticServiceImpl implements OLogisticsService {
         return list;
     }
 
+    @Override
+    public AgentResult isInSnSegment(String snStart, String snEnd, String isInStart, String isInEnd) {
+        if(StringUtils.isBlank(snStart)){return AgentResult.fail("开始SN号不能为空");}
+        if(StringUtils.isBlank(snEnd)){return AgentResult.fail("结束始SN号不能为空");}
+        if(StringUtils.isBlank(isInStart)){return AgentResult.fail("开始SN号不能为空");}
+        if(StringUtils.isBlank(isInEnd)){return AgentResult.fail("结束SN号不能为空");}
+        if(snStart.length()!=snEnd.length() || isInStart.length()!=isInEnd.length() || snStart.length()!=isInStart.length() ){
+            return AgentResult.fail("SN号错误");
+        }
+        if(snStart.compareTo(isInStart)>0 || snEnd.compareTo(isInStart)<0){
+            return AgentResult.fail("SN号"+isInStart+"不在指定区间，请检查SN");
+        }
+        if(snStart.compareTo(isInEnd)>0 || snEnd.compareTo(isInEnd)<0){
+            return AgentResult.fail("SN号"+isInEnd+"不在指定区间，请检查SN");
+        }
+        return AgentResult.ok();
+    }
+
     /**
      * 查詢物流明细
      * @param param

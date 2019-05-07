@@ -1574,14 +1574,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 log.info("请填写结束SN序列号");
                 throw new MessageException("请填写结束SN序列号");
             }
-        if (!proCom.equals(CardImportType.LD.msg)) {
-            if (com.ryx.credit.commons.utils.StringUtils.isBlank(beginSnCount)) {
-                throw new MessageException("请填写起始SN位数");
-            }
-            if (com.ryx.credit.commons.utils.StringUtils.isBlank(endSnCount)) {
-                throw new MessageException("请填写结束SN位数");
-            }
-        }
 
         if (com.ryx.credit.commons.utils.StringUtils.isBlank(logCom)) {
                 log.info("请填写物流公司");
@@ -1605,13 +1597,22 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                     log.info("校验Excel文档失败：[],[]",planNum,agentResult.getMsg());
                     throw new MessageException(agentResult.getMsg());
                 }
+                //校验发货sn是否在退货号码段内
+                Object return_detail = listItem.get(0).get("RETURN_ORDER_DETAIL_ID");
+                if(return_detail!=null) {
+                    OReturnOrderDetail returnOrderDetail = returnOrderDetailMapper.selectByPrimaryKey(return_detail+"");
+                    AgentResult res = oLogisticsService.isInSnSegment(returnOrderDetail.getBeginSn(), returnOrderDetail.getEndSn(), beginSn, endSn);
+                    if(!res.isOK()){
+                        throw new MessageException(res.getMsg());
+                    }
+                }
             }else{
                 throw new MessageException("排单信息未找到");
             }
-          if (beginSnCount.equals("") || endSnCount.equals("")){
-            beginSnCount="0";
-            endSnCount="0";
-          }
+            if (com.ryx.credit.commons.utils.StringUtils.isBlank(beginSnCount)|| com.ryx.credit.commons.utils.StringUtils.isBlank(endSnCount)){
+                beginSnCount="0";
+                endSnCount="0";
+            }
             //IDlist检查
             List<String> stringList = new OLogisticServiceImpl().idList(beginSn, endSn,Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount),proCom);
             if (Integer.valueOf(sendProNum) != stringList.size()) {

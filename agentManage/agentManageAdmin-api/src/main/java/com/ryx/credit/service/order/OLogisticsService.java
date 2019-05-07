@@ -34,6 +34,8 @@ public interface OLogisticsService {
 
     public List<String> idList(String startSn, String endSn) throws MessageException;
 
+    public AgentResult isInSnSegment(String snStart,String snEnd,String isInStart,String isInEnd);
+
     public AgentResult addListItem(List<Object> data, String user) throws Exception;
 
     public int insertImportData(OLogistics oLogistics);
