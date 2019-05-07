@@ -148,7 +148,7 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
         try {
             Map<String, String> map = new HashMap<>();
             map.put("agencyId",orgId);
-//            map.put("parentAgencyId",parentAgencyId);
+            map.put("parentAgencyId",parentAgencyId);
             map.put("type",termType);
             String toJson = JsonUtil.objectToJson(map);
             log.info("手刷机构统计信息查询请求参数:{}",toJson);
