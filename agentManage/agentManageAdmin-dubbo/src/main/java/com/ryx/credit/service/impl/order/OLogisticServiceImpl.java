@@ -226,27 +226,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 logger.info("请填写结束SN序列号");
                 throw new MessageException("请填写结束SN序列号");
             }
-         /*  if (!proComString.equals(CardImportType.LD.msg)) {
-               if (StringUtils.isBlank(beginSnCount)) {
-                logger.info("请填写起始SN位数");
-                throw new MessageException("请填写起始SN位数");
-              }
-               if (StringUtils.isBlank(endSnCount)) {
-                logger.info("请填写结束SN位数");
-                throw new MessageException("请填写结束SN位数");
-              }
-               //需要验证截取sn前面的字符是否一致
-               String startSnString = beginSn.substring(0,Integer.parseInt(beginSnCount)-1);
-               String endSnString = endSn.substring(0,Integer.parseInt(beginSnCount)-1);
-               HashSet<Object> set = new HashSet<>();
-               set.add(startSnString);
-               set.add(endSnString);
-               if (set.size()>1){
-                   logger.info("请检查开始SN码与结束SN码截取之前的是否一致");
-                   throw new MessageException("请检查开始SN码与结束SN码截取之前的是否一致");
-               }
-          }*/
-
 
             if (StringUtils.isBlank(logCom)) {
                 logger.info("请填写物流公司");
