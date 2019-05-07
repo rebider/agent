@@ -112,6 +112,9 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
                 throw new MessageException("Sn机具已激活");
             }
             ImsTermWarehouseDetail queryImsTerm = imsTermWarehouseDetailMapper.selectByPrimaryKey(imsTermWarehouseDetail.getPosSn());
+            if(queryImsTerm==null){
+                throw new MessageException("Sn机具不存在");
+            }
             //未使用
             if(!queryImsTerm.getUseStatus().equals("1")){
                 throw new MessageException("Sn机具已使用");

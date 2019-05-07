@@ -263,6 +263,7 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 refundPriceDiffDetail.setStatus(Status.STATUS_1.status);
                 refundPriceDiffDetail.setVersion(Status.STATUS_0.status);
                 refundPriceDiffDetail.setOrderType(OrderType.OLD.getValue());
+                refundPriceDiffDetail.setSendStatus(Status.STATUS_0.status);
                 int priceDiffDetailInsert = refundPriceDiffDetailMapper.insert(refundPriceDiffDetail);
                 if(priceDiffDetailInsert!=1){
                     log.info("插入补退差价详情表异常");
