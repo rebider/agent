@@ -133,6 +133,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                                 oLogisticsMapper.updateByPrimaryKeySelective(logistics);
                             }
                         } catch (MessageException e) {
+                            AppConfig.sendEmails("logisticId:"+id+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                             e.printStackTrace();
                             logger.error("生成物流明细任务异常：", e);
                             logistics = oLogisticsMapper.selectByPrimaryKey(id);
@@ -140,6 +141,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                             logistics.setSendMsg(e.getMsg());
                             oLogisticsMapper.updateByPrimaryKeySelective(logistics);
                         } catch (Exception e) {
+                            AppConfig.sendEmails("logisticId:"+id+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                             e.printStackTrace();
                             logger.error("生成物流明细任务异常：", e);
                             logistics = oLogisticsMapper.selectByPrimaryKey(id);
@@ -243,6 +245,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                                 //处理失败就停止
                             }
                         } catch (MessageException | ProcessException e) {
+                            AppConfig.sendEmails("logisticId:"+id+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                             e.printStackTrace();
                             logisticsDetails.forEach(det -> {
                                 OLogisticsDetail detail = oLogisticsDetailMapper.selectByPrimaryKey(det.getId());
@@ -260,6 +263,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                             //处理失败就停止
 
                         } catch (Exception e) {
+                            AppConfig.sendEmails("logisticId:"+id+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                             e.printStackTrace();
                             logisticsDetails.forEach(det -> {
                                 OLogisticsDetail detail = oLogisticsDetailMapper.selectByPrimaryKey(det.getId());
@@ -356,6 +360,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                 throw new MessageException("物流明细列表生成为空列表");
             }
         } catch (MessageException e) {
+            AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
             e.printStackTrace();
             logger.info("sn生成异常{},{},{}",logistics.getSnBeginNum(),logistics.getSnEndNum(),e.getLocalizedMessage());
             logger.error("sn生成异常",e);
@@ -599,6 +604,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                     return true;
                     //机具下发失败，更新物流明细为下发失败，并更新物流为发送失败
                 } else {
+                    AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+LogisticsDetailSendStatus.send_fail.msg, "任务生成物流明细错误报警OsnOperateServiceImpl");
                     logger.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), posSendRes.getMsg());
                     listOLogisticsDetailSn.forEach(detail -> {
                         detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
@@ -610,11 +616,13 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                 }
                 //机具下发失败，更新物流明细为下发失败，并更新物流为发送失败，禁止继续发送 ,人工介入
             } catch (MessageException e) {
+                AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                 e.printStackTrace();
                 logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage());
                 throw e;
                 //机具下发失败，更新物流明细为下发失败，并更新物流为发送失败 ，禁止继续发送,人工介入
             } catch (Exception e) {
+                AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                 e.printStackTrace();
                 logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage());
                throw e;
@@ -671,6 +679,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                     return true;
                     //机具下发失败，更新物流明细为下发失败，更新物流信息未下发失败，禁止再次发送，人工介入
                 } else {
+                    AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum(), "任务生成物流明细错误报警OsnOperateServiceImpl");
                     logger.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), lowerHairMachineRes.getMsg());
                     listOLogisticsDetailSn.forEach(detail -> {
                         detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
@@ -682,11 +691,13 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                 }
                 //机具下发失败，更新物流明细为下发失败，更新物流信息未下发失败，禁止再次发送，人工介入
             } catch (MessageException e) {
+                AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                 e.printStackTrace();
                 logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage());
                 throw e;
                 //机具下发失败，更新物流明细为下发失败，更新物流信息未下发失败，禁止再次发送，人工介入
             } catch (Exception e) {
+                AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                 e.printStackTrace();
                 logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage());
                 throw e;
