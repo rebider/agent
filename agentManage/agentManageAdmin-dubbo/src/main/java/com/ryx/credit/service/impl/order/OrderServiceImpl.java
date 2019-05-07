@@ -2924,7 +2924,9 @@ public class OrderServiceImpl implements OrderService {
         List<OReceiptPro> oReceiptProList = oReceiptProMapper.selectByExample(example);
         for (OReceiptPro oReceiptPro : oReceiptProList) {
             oReceiptPro.setReceiptProStatus(OReceiptStatus.WAITING_LIST.code);
-            oReceiptProMapper.updateByPrimaryKeySelective(oReceiptPro);
+            if(1!=oReceiptProMapper.updateByPrimaryKeySelective(oReceiptPro)){
+                throw new MessageException("配货失败");
+            }
         }
         return AgentResult.ok();
     }

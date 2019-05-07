@@ -501,6 +501,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                                     logger.info("pos下发物流更新失败STATUS_1成功{}",JSONObject.toJSONString(oLogistics));
                                 }
                             }else{
+                                AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",错误信息:"+posSendRes.getMsg(), "POS发物流错误报警");
                                 logistics_send.setSendMsg(posSendRes.getMsg());
                                 logistics_send.setSendStatus(Status.STATUS_2.status);
                                 if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
@@ -509,6 +510,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                             }
 
                         } catch (MessageException e) {
+                            AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",错误信息:"+MailUtil.printStackTrace(e), "POS发物流错误报警");
                             e.printStackTrace();
                             logistics_send.setSendMsg(e.getMsg());
                             logistics_send.setSendStatus(Status.STATUS_2.status);
@@ -516,6 +518,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                                 logger.info("pos下发物流更新失败MessageException{}",JSONObject.toJSONString(oLogistics));
                             }
                         }catch (Exception e){
+                            AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",错误信息:"+MailUtil.printStackTrace(e), "POS发物流错误报警");
                             e.printStackTrace();
                             logistics_send.setSendMsg("下发异常");
                             logistics_send.setSendStatus(Status.STATUS_2.status);
@@ -585,6 +588,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                                     logger.info("手刷下发物流更新记录STATUS_1失败{}",JSONObject.toJSONString(oLogistics));
                                 }
                             }else{
+                                AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",错误信息:"+lowerHairMachineRes.getMsg(), "手刷发物流错误报警");
                                 logistics_send.setSendStatus(Status.STATUS_2.status);
                                 logistics_send.setSendMsg(lowerHairMachineRes.getMsg());
                                 if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
@@ -592,6 +596,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                                 }
                             }
                         }catch (MessageException e) {
+                            AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",错误信息:"+MailUtil.printStackTrace(e), "手刷发物流错误报警");
                             e.printStackTrace();
                             logistics_send.setSendStatus(Status.STATUS_2.status);
                             logistics_send.setSendMsg(e.getMsg());
@@ -599,6 +604,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                                 logger.info("手刷下发物流更新记录MessageException失败{}",JSONObject.toJSONString(oLogistics));
                             }
                         } catch (Exception e) {
+                            AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",错误信息:"+MailUtil.printStackTrace(e), "手刷发物流错误报警");
                             e.printStackTrace();
                             logistics_send.setSendStatus(Status.STATUS_2.status);
                             logistics_send.setSendMsg("下发异常");
@@ -607,6 +613,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                             }
                         }
                     }else{
+                        AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",错误信息:发物流类型错误", "手刷发物流错误报警");
                         logger.info("发物流类型错误");
                         throw new MessageException("发物流类型错误");
                     }
