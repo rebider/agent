@@ -244,6 +244,7 @@
     select A.* ,ROWNUM rn from (
     select * from D_DICT
     <where>
+      1=1 and d_status=1
       <if test="dGroup != null and  ''!=dGroup" >
         and D_GROUP=#{dGroup}
       </if>
