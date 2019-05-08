@@ -133,7 +133,7 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
                map.put("batchIds",listBoth);
                String params1 = JsonUtil.objectToJson(map);
 
-               String res = HttpClientUtil.doPostJson("http://12.3.10.161:8007/qtfr-inter/agencynew/upAgencyProfitbyAgentId.do", params1);
+               String res = HttpClientUtil.doPostJson(AppConfig.getProperty("busiPlat.refuse"), params1);
                logger.info("调用接口年返回数据为:"+res);
 
                if (!JSONObject.parseObject(res).get("respCode").equals("000000")) {
@@ -171,7 +171,7 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
                map.put("batchIds",listProfit);
                String params2 = JsonUtil.objectToJson(map);
 
-               String res = HttpClientUtil.doPostJson("http://12.3.10.161:8007/qtfr-inter/agencynew/upAgencyProfitbyAgentId.do", params2);
+               String res = HttpClientUtil.doPostJson(AppConfig.getProperty("busiPlat.refuse"), params2);
                logger.info("调用接口年返回数据为:"+res);
                if (!JSONObject.parseObject(res).get("respCode").equals("000000")) {
                    logger.info("日分润冻结失败");
@@ -186,7 +186,7 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
                map.put("batchIds",listm);
                String params3 = JsonUtil.objectToJson(map);
 
-               String res = HttpClientUtil.doPostJson("http://12.3.10.161:8007/qtfr-inter/agencynew/upAgencyProfitbyAgentId.do", params3);
+               String res = HttpClientUtil.doPostJson(AppConfig.getProperty("busiPlat.refuse"), params3);
                logger.info("调用接口年返回数据为:"+res);
                if (!JSONObject.parseObject(res).get("respCode").equals("000000")) {
                    logger.info("日返现冻结失败");
