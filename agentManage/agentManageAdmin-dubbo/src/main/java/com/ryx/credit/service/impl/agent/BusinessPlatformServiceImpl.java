@@ -234,6 +234,10 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busInfoVoList.get(0).getId());
             List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByAgenId(agentBusInfo.getAgentId());
             for (AgentBusInfoVo item : busInfoVoList) {
+                if(item.getBusType().equals(BusType.ZQZF.key) || item.getBusType().equals(BusType.ZQBZF.key) || item.getBusType().equals(BusType.ZQ.key) ){
+                    if(StringUtils.isBlank(item.getBusParent()))
+                        throw new ProcessException("直签上级不能为空");
+                }
                 agentBusInfos.add(item);
             }
             String json = JsonUtil.objectToJson(agentBusInfos);
@@ -282,6 +286,10 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             agent.setId(agentVo.getAgentId());
             //先查询业务是否已添加 有个添加过 全部返回
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
+                if(item.getBusType().equals(BusType.ZQZF.key) || item.getBusType().equals(BusType.ZQBZF.key) || item.getBusType().equals(BusType.ZQ.key) ){
+                    if(StringUtils.isBlank(item.getBusParent()))
+                        throw new ProcessException("直签上级不能为空");
+                }
                 item.setAgentId(agent.getId());
                 Boolean busPlatExist = findBusPlatExist(item);
                 if (busPlatExist) {

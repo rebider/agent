@@ -127,6 +127,11 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             //判断平台是否重复
             List hav = new ArrayList();
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
+                if(item.getBusType().equals(BusType.ZQZF.key) || item.getBusType().equals(BusType.ZQBZF.key) || item.getBusType().equals(BusType.ZQ.key) ){
+                    if(StringUtils.isBlank(item.getBusParent()))
+                    throw new ProcessException("直签上级不能为空");
+                }
+
                 if (hav.contains(item.getBusPlatform())) {
                     throw new ProcessException("开通(" + item.getBusPlatform() + ")业务平台重复");
                 } else {
