@@ -15,6 +15,7 @@ import com.ryx.credit.profit.dao.FreezeOperationRecordMapper;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.IFreezeAgentSercice;
 import com.ryx.credit.profit.service.ProfitDetailMonthService;
+import com.ryx.credit.profit.unitmain.FreezeDayJob;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.TaskApprovalService;
@@ -54,6 +55,8 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
     private TaskApprovalService taskApprovalService;
     @Autowired
     private AgentEnterService agentEnterService;
+    @Autowired
+    FreezeDayJob freezeDayJob;
 
     @Override
     public PageInfo getselectFreezeDate(Map<String, Object> param, PageInfo pageInfo){
@@ -124,14 +127,10 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
            List<String> listBoth = new ArrayList<>(rs);
            //双冻结
            logger.info("得到日分润和日返现全部冻结的集合，并请求远程接口");
-           List<String> listBothBus = new ArrayList<>();
+
            if(listBoth.size()!=0){
-               for (String str:listBoth) {
-                   String bus = freezeAgentMapper.queryBumId(str);
-                   listBothBus.add(bus);
-               }
                map.put("unfreeze","0");
-               map.put("batchIds",listBothBus);
+               map.put("batchIds",listBoth);
                String params1 = JsonUtil.objectToJson(map);
 
                String res = HttpClientUtil.doPostJson("http://12.3.10.161:8007/qtfr-inter/agencynew/upAgencyProfitbyAgentId.do", params1);
@@ -152,7 +151,7 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
            //日分润
            List<String> listProfit = new ArrayList<>();
            //日返现
-           List<String> lism = new ArrayList<>();
+           List<String> listm = new ArrayList<>();
            for (String str:listOne) {
                for (FreezeOperationRecord fo :freezeDay) {
                    if (fo.getAgentId().equals(str)&&"01".equals(fo.getStatus())){
@@ -166,14 +165,10 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
            }
            logger.info("日分润请求远程接口");
           //日分润单独冻结
-           List<String> listProfitBus = new ArrayList<>();
            if(listProfit.size()!=0){
-               for (String str:listProfit) {
-                 String bus = freezeAgentMapper.queryBumId(str);
-                   listProfitBus.add(bus);
-               }
+
                map.put("unfreeze","1");
-               map.put("batchIds",listProfitBus);
+               map.put("batchIds",listProfit);
                String params2 = JsonUtil.objectToJson(map);
 
                String res = HttpClientUtil.doPostJson("http://12.3.10.161:8007/qtfr-inter/agencynew/upAgencyProfitbyAgentId.do", params2);
@@ -186,14 +181,9 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
            }
            logger.info("日返现请求远程接口");
            //日返现单独冻结
-           List<String> listmBus = new ArrayList<>();
-           if(lism.size()!=0){
-               for (String str:lism) {
-                   String bus = freezeAgentMapper.queryBumId(str);
-                   listmBus.add(bus);
-               }
+           if(listm.size()!=0){
                map.put("unfreeze","2");
-               map.put("batchIds",listmBus);
+               map.put("batchIds",listm);
                String params3 = JsonUtil.objectToJson(map);
 
                String res = HttpClientUtil.doPostJson("http://12.3.10.161:8007/qtfr-inter/agencynew/upAgencyProfitbyAgentId.do", params3);
@@ -297,6 +287,9 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
 
                }
            }
+
+           freezeDayJob.queryDayFreeze();
+
        }else{
            logger.info("未选择代理商" );
            throw new RuntimeException("未选择代理商");
