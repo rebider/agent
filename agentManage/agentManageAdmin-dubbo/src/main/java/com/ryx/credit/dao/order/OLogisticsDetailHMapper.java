@@ -1,9 +1,12 @@
 package com.ryx.credit.dao.order;
 
+import com.ryx.credit.common.util.Page;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetailH;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetailHExample;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface OLogisticsDetailHMapper {
     long countByExample(OLogisticsDetailHExample example);
@@ -21,4 +24,8 @@ public interface OLogisticsDetailHMapper {
     int updateByPrimaryKeySelective(OLogisticsDetailH record);
 
     int updateByPrimaryKey(OLogisticsDetailH record);
+
+    List<Map<String,Object>> getOLogDetailHistoryList(@Param("map") Map<String, Object> map, @Param("page") Page page);
+
+    int getOLogDetailHistoryCount(@Param("map") Map<String, Object> map);
 }

@@ -1,8 +1,11 @@
 package com.ryx.credit.service.impl.order;
 
-import com.ryx.credit.common.enumc.OLogisticsDetailStatus;
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.order.OLogisticsDetailMapper;
 import com.ryx.credit.dao.order.OLogisticsDetailHMapper;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
@@ -18,8 +21,9 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lhl on 2019/4/24.
@@ -43,21 +47,18 @@ public class OLogisticsDetailHServiceImpl implements OLogisticsDetailHService {
             try {
                 //数据转移
                 AgentResult agentResult =  oLogisticsDetailHService.clearLogisticsDetailOrder(detail);
-                logger.info("历史迁移结果:{}",agentResult.getMsg());
+                logger.info("历史迁移结果:{}", agentResult.getMsg());
             } catch (Exception e) {
                 e.printStackTrace();
-                logger.error("历史迁移异常："+detail.getId(),e);
+                logger.error("历史迁移异常：" + detail.getId(), e);
             }
         }
         return AgentResult.ok();
     }
 
-
-
-
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
     @Override
-    public AgentResult clearLogisticsDetailOrder(OLogisticsDetail detail)throws Exception {
+    public AgentResult clearLogisticsDetailOrder(OLogisticsDetail detail) throws Exception {
         OLogisticsDetailH oLogDetailH = new OLogisticsDetailH();
         oLogDetailH.setId(detail.getId());
         oLogDetailH.setOrderId(detail.getOrderId());
@@ -102,19 +103,42 @@ public class OLogisticsDetailHServiceImpl implements OLogisticsDetailHService {
         List<OLogisticsDetailH> oLogDetailHistoryList = oLogisticsDetailHMapper.selectByExample(historyExample);
         // size==0&&list为空 则迁移历史数据
         if (oLogDetailHistoryList.size() == 0 && oLogDetailHistoryList.isEmpty()) {
-            if(1 != oLogisticsDetailHMapper.insertSelective(oLogDetailH)) {
+            if (1 != oLogisticsDetailHMapper.insertSelective(oLogDetailH)) {
                 logger.info("数据保存失败，{}", oLogDetailH.getId());
-            }else{
+            } else {
                 OLogisticsDetailExample example = new OLogisticsDetailExample();
                 example.or().andIdEqualTo(detail.getId());
-                if(1!=oLogisticsDetailMapper.deleteByExample(example)){
-                  throw new MessageException("物流明细迁移异常，删除历史数据失败:"+oLogDetailH.getId());
+                if (1 != oLogisticsDetailMapper.deleteByExample(example)) {
+                  throw new MessageException("物流明细迁移异常，删除历史数据失败:" + oLogDetailH.getId());
                 }
             }
-            return AgentResult.ok("移除成功:"+oLogDetailH.getId());
-        }else{
-            return AgentResult.fail("历史已存在"+oLogDetailH.getId());
+            return AgentResult.ok("移除成功:" + oLogDetailH.getId());
+        } else {
+            return AgentResult.fail("历史已存在" + oLogDetailH.getId());
         }
+    }
+
+    /**
+     * 历史物流明细
+     * @param oLogisticsDetailH
+     * @param page
+     * @return
+     */
+    @Override
+    public PageInfo getOLogDetailHistoryList(OLogisticsDetailH oLogisticsDetailH, Page page) {
+        Map<String, Object> reqMap = new HashMap<>();
+        reqMap.put("status", Status.STATUS_1.status);
+        if (StringUtils.isNotBlank(oLogisticsDetailH.getOrderId())) {
+            reqMap.put("orderId", oLogisticsDetailH.getOrderId());
+        }
+        if (StringUtils.isNotBlank(oLogisticsDetailH.getSnNum())) {
+            reqMap.put("snNum", oLogisticsDetailH.getSnNum());
+        }
+        List<Map<String,Object>> agentMergeList = oLogisticsDetailHMapper.getOLogDetailHistoryList(reqMap, page);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(agentMergeList);
+        pageInfo.setTotal(oLogisticsDetailHMapper.getOLogDetailHistoryCount(reqMap));
+        return pageInfo;
     }
 
 }
