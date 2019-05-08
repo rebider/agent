@@ -49,4 +49,10 @@ public interface FreezeAgentMapper {
     Integer freezeDetailLowerCount(Map<String,Object> parm);
 
     int delteThawOperationById(String freezeAgentId);
+
+
+    String queryBumId(@Param("BUS_NUM") String BUS_NUM);
+
+    Integer queryDayFreezeCount();
+    List<FreezeAgent> queryDayFreezeDate(@Param("startNum")Integer startNum,@Param("endNum")Integer endNum);
 }
