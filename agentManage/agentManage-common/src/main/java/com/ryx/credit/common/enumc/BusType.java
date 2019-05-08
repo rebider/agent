@@ -6,14 +6,13 @@ package com.ryx.credit.common.enumc;
  */
 public enum BusType {
 
-    ZQ("1","二代直签直发"),
+    ZQZF("1","二代直签直发"),
     JG("2","机构"),
     JGYD("3","机构一代"),
-//    JGZQ("4","机构直签"),
     YDX("5","一代X"),
     BZYD("6","标准一代"),
-//    EDZQ("7","二代直签"),
-    ZQBZF("8","直签不直发");
+    ZQBZF("8","直签不直发"),
+    ZQ("9","直签");
 
 
     public String key;
