@@ -338,7 +338,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 			}
 			if(!isPass && resultSet.size()>1){
-				throw new MessageException("不能同时提交pos和手刷平台");
+				throw new MessageException("不能同时提交大pos和智能pos平台");
 			}
 			return ResultVO.success(null);
 		} catch (Exception e) {
