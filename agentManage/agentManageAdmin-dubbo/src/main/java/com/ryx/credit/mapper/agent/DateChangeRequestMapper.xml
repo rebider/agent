@@ -240,7 +240,8 @@
     <if test="map.agName != null and map.agName != '' " >
       and agent.AG_NAME = #{map.agName}
     </if>
-      order by data.c_time desc
+    and data.c_user  = #{map.cUser}
+    order by data.c_time desc
     <include refid="OracleDialectSuffix" />
   </select>
 
@@ -258,6 +259,7 @@
     <if test="map.agName != null and map.agName != '' " >
       and agent.AG_NAME = #{map.agName}
     </if>
+    and data.c_user  = #{map.cUser}
     order by data.c_time desc
   </select>
 </mapper>
