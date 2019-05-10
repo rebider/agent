@@ -24,10 +24,7 @@ import com.ryx.credit.profit.service.BusiPlatService;
 import com.ryx.credit.profit.service.ProfitMonthService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
-import com.ryx.credit.service.agent.AgentBusinfoService;
-import com.ryx.credit.service.agent.AgentEnterService;
-import com.ryx.credit.service.agent.AgentQuitService;
-import com.ryx.credit.service.agent.CapitalService;
+import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OCashReceivablesService;
@@ -102,6 +99,8 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
     private CapitalFlowMapper capitalFlowMapper;
     @Autowired
     private BusiPlatService busiPlatService;
+    @Autowired
+    private AgentQueryService agentQueryService;
 
     /**
      * 退出列表
@@ -409,6 +408,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         criteria.andCPayTypeEqualTo(PayType.YHHK.getValue());
         criteria.andCAgentIdEqualTo(agentId);
+        criteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
         List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
         BigDecimal sumAmt = new BigDecimal(0);
         for (Capital capital : capitals) {
@@ -1281,7 +1281,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
 
     @Override
     public List<Capital> queryCapital(String id) {
-        List<Capital> capitals = capitalMapper.paymentQuery(id);
+        List<Capital> capitals = agentQueryService.paymentQueryPass(id);
         List<Capital> resultList = new ArrayList<>();
         if (null != capitals && capitals.size() > 0) {
             for (Capital capital : capitals) {
