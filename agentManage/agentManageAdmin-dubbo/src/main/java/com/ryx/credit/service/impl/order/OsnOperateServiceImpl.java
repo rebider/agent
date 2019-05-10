@@ -50,7 +50,6 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
 
     private static Logger logger = LoggerFactory.getLogger(OsnOperateServiceImpl.class);
 
-    private static int count_wall = 200;
 
     @Autowired
     private OLogisticsMapper oLogisticsMapper;

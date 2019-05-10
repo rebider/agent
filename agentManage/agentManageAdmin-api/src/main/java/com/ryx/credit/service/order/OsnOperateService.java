@@ -16,6 +16,8 @@ import java.util.List;
  * 描述：
  */
 public interface OsnOperateService {
+
+    static int count_wall = 200;
     /**
      * 根据物流联动状态查询物流id
      * 0：未联动 1：已联动 2：联动失败， 3：部分联动失败， 4：生成明细失败，5：生成明细中，6：生成明细成功7：联动业务系统处理中
