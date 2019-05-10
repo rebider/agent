@@ -505,6 +505,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         for (Capital capital : capitals) {
             sumAmt = capital.getcFqInAmount().add(sumAmt);
         }
+        if(sumAmt.compareTo(BigDecimal.ZERO)==1)
         capitalService.disposeCapital(null, sumAmt, agentQuit.getId(), cUser, agentQuit.getAgentId(),
                                       agentQuit.getAgentName(),"代理商退出扣除",SrcType.TC,PayType.YHHK);
 
