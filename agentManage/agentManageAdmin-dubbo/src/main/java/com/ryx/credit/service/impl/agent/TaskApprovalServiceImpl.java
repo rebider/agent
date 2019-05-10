@@ -115,7 +115,7 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
             if(orgCode.equals("finance")){
                 for (CapitalVo capitalVo : agentVo.getCapitalVoList()) {
                     if (capitalVo.getcPayType().equals(PayType.YHHK.code)) {
-                        if (null == capitalVo.getcInAmount() || capitalVo.getcInAmount().equals("")) {
+                        if (null == capitalVo.getcInAmount()) {
                             logger.info("请填写实际到账金额");
                             throw new ProcessException("请填写实际到账金额");
                         }

@@ -201,7 +201,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             if(busType.equals(BusType.JG.key) || busType.equals(BusType.BZYD.key)){
                 for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
                     if(!agentBusInfoVo.getBusType().equals(BusType.JG.key) && !agentBusInfoVo.getBusType().equals(BusType.BZYD.key)){
-                        throw new ProcessException("业务平台类型为机构与标准一代时不能选择其他");
+                        throw new ProcessException("业务平台类型为机构与标准一代时不能选择其他,为其他类型时不能选择机构与标准一代");
                     }
                 }
             }
@@ -597,6 +597,19 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             if (1 != accountPaidItemService.update(capital)) {
                 logger.info("代理商审批通过，合同状态更新失败{}:{}", processingId, bus.getId());
                 throw new ProcessException("合同状态更新失败");
+            }
+            if(PayType.FRDK.code.equals(capital.getcPayType())) {
+                try {
+                    //生成保证金等分期数据
+                    AgentResult capitalFq = accountPaidItemService.capitalFq(capital);
+                    if (!capitalFq.isOK()) {
+                        logger.info("代理商审批，保证金{}:{}", processingId, capital.getId());
+                        throw new ProcessException("生成保证金分期失败");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new ProcessException(e.getMessage());
+                }
             }
             //插入资金流水
             try {
