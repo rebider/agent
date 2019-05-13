@@ -65,7 +65,7 @@ public class SysLogAspect {
         String strMessage = String
                 .format("[类名]:%s,[方法]:%s,[参数]:%s", strClassName, strMethodName, bfParams.toString());
         LOGGER.info(strMessage);
-//        if (isWriteLog(strMethodName)) {
+        if (isWriteLog(strMethodName)) {
             try {
                 Subject currentUser = SecurityUtils.getSubject();
                 PrincipalCollection collection = currentUser.getPrincipals();
@@ -85,7 +85,7 @@ public class SysLogAspect {
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
             }
-//        }
+        }
 
         return point.proceed();
     }
