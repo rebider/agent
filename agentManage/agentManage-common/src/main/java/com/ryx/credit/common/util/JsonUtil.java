@@ -93,4 +93,18 @@ public class JsonUtil {
         return data;
     }
 
+
+    public static Map<String, Object> objectToMap(Object obj) {
+        String jsonStr = objectToJson(obj);
+        HashMap<String, Object> data = new HashMap<>();
+        JSONObject jsonObject = JSONObject.fromObject(jsonStr);
+        Iterator it = jsonObject.keys();
+        while (it.hasNext())
+        {
+            String key = String.valueOf(it.next());
+            data.put(key, jsonObject.get(key));
+        }
+        return data;
+    }
+
 }

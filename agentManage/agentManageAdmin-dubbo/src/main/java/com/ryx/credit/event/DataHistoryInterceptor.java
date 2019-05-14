@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.commons.shiro.ShiroUser;
 import com.ryx.credit.dao.agent.DataHistoryRecordMapper;
 import com.ryx.credit.pojo.admin.agent.DataHistory;
@@ -19,8 +20,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Date;
+import java.util.Map;
 
 
 public class DataHistoryInterceptor implements MethodInterceptor {
@@ -35,11 +40,15 @@ public class DataHistoryInterceptor implements MethodInterceptor {
     public Object invoke(MethodInvocation mi) throws Throwable {
         Method method = mi.getMethod();
         String name = method.getName();
+
         boolean result = name.contains("update") || name.contains("insert") || name.contains("delete");
         String clazz = method.toString();
-        if(result && !clazz.contains("CSysLogMapper") && !clazz.contains("DataHistoryRecordMapper")){
+        if(result && !clazz.contains("CSysLogMapper") && !clazz.contains("DataHistoryRecordMapper") && !clazz.contains("DataHistoryMapper")){
             //获取该方法的传参
             Object[] paramsArr = mi.getArguments();
+            Object o = paramsArr[0];
+            Map<String, Object> objectMap = JsonUtil.objectToMap(o);
+
             String params = getParams(paramsArr);
             log.info("请求参数："+params);
             log.info("方法名："+method.getName());
@@ -51,7 +60,24 @@ public class DataHistoryInterceptor implements MethodInterceptor {
             dataHistory.setDataParameter(params);
             dataHistory.setDataVersion(Status.STATUS_1.status);
             dataHistory.setcTime(new Date());
-            dataHistory.setcUser(String.valueOf(""));
+            String user = "";
+            String cUser = String.valueOf(objectMap.get("cUser"));
+            String uUser = String.valueOf(objectMap.get("uUser"));
+            if(StringUtils.isNotBlank(cUser) && !cUser.equals("null")){
+                user = cUser;
+            }else if(StringUtils.isNotBlank(uUser) && !uUser.equals("null")){
+                user = uUser;
+            }
+            dataHistory.setcUser(user);
+            String busId = "";
+            String id = String.valueOf(objectMap.get("id"));
+            String busid = String.valueOf(objectMap.get("busId"));
+            if(StringUtils.isNotBlank(id) && !id.equals("null")){
+                busId = id;
+            }else if(StringUtils.isNotBlank(busid) && !busid.equals("null")){
+                busId = busid;
+            }
+            dataHistory.setBusId(busId);
             dataHistory.setStatus(Status.STATUS_1.status);
             dataHistoryRecordMapper.insert(dataHistory);
         }
