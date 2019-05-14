@@ -91,6 +91,13 @@ public class PosCheckServiceImpl implements IPosCheckService {
         return posCheckExample;
     }
 
+    @Override
+    public List<Map<String,Object>> queryAgentBusPlayformInfo(Map<String,String> map){
+        return checkMapper.queryByAgentInfo(map);
+    }
+
+
+
     /**
      * @author: Lihl
      * @desc 分润比例考核申请，进行审批流
