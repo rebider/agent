@@ -149,7 +149,7 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
 
                if (!JSONObject.parseObject(res).get("respCode").equals("000000")) {
                    logger.info("双冻结失败");
-                   throw new RuntimeException("冻结失败");
+                   /*throw new RuntimeException("冻结失败");*/
                }
 
            }
@@ -165,9 +165,9 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
            List<String> listm = new ArrayList<>();
            for (String str:listOne) {
                for (FreezeOperationRecord fo :freezeDay) {
-                   if (fo.getAgentId().equals(str)&&"01".equals(fo.getStatus())){
+                   if (fo.getAgentId().equals(str)&&"01".equals(fo.getFreezeType())){
                        listProfit.add(fo.getAgentId());
-                   }else if(fo.getAgentId().equals(str)&&"02".equals(fo.getStatus())){
+                   }else if(fo.getAgentId().equals(str)&&"02".equals(fo.getFreezeType())){
                        listProfit.add(fo.getAgentId());
                    }
 
@@ -194,7 +194,7 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
                logger.info("调用接口返回数据为:"+res);
                if (!JSONObject.parseObject(res).get("respCode").equals("000000")) {
                    logger.info("日分润冻结失败");
-                   throw new RuntimeException("冻结失败");
+                   /*throw new RuntimeException("冻结失败");*/
                }
 
            }
@@ -218,7 +218,7 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
                logger.info("调用接口返回数据为:"+res);
                if (!JSONObject.parseObject(res).get("respCode").equals("000000")) {
                    logger.info("日返现冻结失败");
-                   throw new RuntimeException("冻结失败");
+                  /* throw new RuntimeException("冻结失败");*/
                }
 
            }
@@ -251,6 +251,7 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
 
 
                }
+
                //插入操作表新的数据
                try{
 
@@ -316,7 +317,7 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
                }
            }
 
-           freezeDayJob.queryDayFreeze();
+          /* freezeDayJob.queryDayFreeze();*/
 
        }else{
            logger.info("未选择代理商" );
@@ -528,15 +529,15 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
             List<String> proAgentIds = freezeOperationRecords.stream().filter(freezeOperationRecord -> freezeOperationRecord.getFreezeType().equals("01")).map(FreezeOperationRecord::getAgentId).collect(Collectors.toList());
             List<String> proBatchIds = new ArrayList<>();
             for (String proAgentId : proAgentIds) {
-                String s = freezeAgentMapper.queryBumId(proAgentId);
-                proBatchIds.add(s);
+              /*  String s = freezeAgentMapper.queryBumId(proAgentId);
+                proBatchIds.add(s);*/
             }
             //获取日返现代理商
             List<String> backAgentIds = freezeOperationRecords.stream().filter(freezeOperationRecord -> freezeOperationRecord.getFreezeType().equals("02")).map(FreezeOperationRecord::getAgentId).collect(Collectors.toList());
             List<String> backBatchIds = new ArrayList<>();
             for (String backAgentId : backAgentIds) {
-                String s = freezeAgentMapper.queryBumId(backAgentId);
-                backBatchIds.add(s);
+              /*  String s = freezeAgentMapper.queryBumId(backAgentId);
+                backBatchIds.add(s);*/
             }
             boolean proTemp=false,backTemp=false;//是否解冻失败的标识
             HashMap<String,String> map = new HashMap<String,String>();
