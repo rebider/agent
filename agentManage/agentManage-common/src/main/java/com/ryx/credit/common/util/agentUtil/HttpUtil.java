@@ -20,7 +20,7 @@ public final class HttpUtil {
 		HttpClient httpClient = new HttpClient();
 		httpClient.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "UTF-8");
 		httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(60000);
-		httpClient.getHttpConnectionManager().getParams().setSoTimeout(60000);
+		httpClient.getHttpConnectionManager().getParams().setSoTimeout(300000);
 		PostMethod postMethod = new PostMethod(url);
 		try {
 			Iterator<Entry<String, String>> it = params.entrySet().iterator();

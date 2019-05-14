@@ -24,10 +24,7 @@ import com.ryx.credit.profit.service.BusiPlatService;
 import com.ryx.credit.profit.service.ProfitMonthService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
-import com.ryx.credit.service.agent.AgentBusinfoService;
-import com.ryx.credit.service.agent.AgentEnterService;
-import com.ryx.credit.service.agent.AgentQuitService;
-import com.ryx.credit.service.agent.CapitalService;
+import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OCashReceivablesService;
@@ -102,6 +99,8 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
     private CapitalFlowMapper capitalFlowMapper;
     @Autowired
     private BusiPlatService busiPlatService;
+    @Autowired
+    private AgentQueryService agentQueryService;
 
     /**
      * 退出列表
@@ -409,11 +408,13 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         criteria.andCPayTypeEqualTo(PayType.YHHK.getValue());
         criteria.andCAgentIdEqualTo(agentId);
+        criteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
         List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
         BigDecimal sumAmt = new BigDecimal(0);
         for (Capital capital : capitals) {
-            if(!capital.getcType().equals(AgCapitalType.FUWUFEI.name()) && !capital.getcType().equals(AgCapitalType.REIHEBAOFWF.name()))
-            sumAmt = sumAmt.add(capital.getcFqInAmount());
+            if(!capital.getcType().equals(AgCapitalType.FUWUFEI.name()) && !capital.getcType().equals(AgCapitalType.REIHEBAOFWF.name())){
+                sumAmt = sumAmt.add(capital.getcFqInAmount());
+            }
         }
         return sumAmt;
     }
@@ -505,6 +506,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         for (Capital capital : capitals) {
             sumAmt = capital.getcFqInAmount().add(sumAmt);
         }
+        if(sumAmt.compareTo(BigDecimal.ZERO)==1)
         capitalService.disposeCapital(null, sumAmt, agentQuit.getId(), cUser, agentQuit.getAgentId(),
                                       agentQuit.getAgentName(),"代理商退出扣除",SrcType.TC,PayType.YHHK);
 
@@ -1279,12 +1281,14 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
 
     @Override
     public List<Capital> queryCapital(String id) {
-        List<Capital> capitals = capitalMapper.paymentQuery(id);
+        List<Capital> capitals = agentQueryService.paymentQueryPass(id);
         List<Capital> resultList = new ArrayList<>();
         if (null != capitals && capitals.size() > 0) {
             for (Capital capital : capitals) {
                 capital.setAttachmentList(attachmentMapper.accessoryQuery(capital.getId(), AttachmentRelType.Capital.name()));
                 if(!capital.getcType().equals(AgCapitalType.FUWUFEI.name()) && !capital.getcType().equals(AgCapitalType.REIHEBAOFWF.name())){
+                    resultList.add(capital);
+                }else if(capital.getcPayType().equals(PayType.FRDK.getValue())){
                     resultList.add(capital);
                 }
             }

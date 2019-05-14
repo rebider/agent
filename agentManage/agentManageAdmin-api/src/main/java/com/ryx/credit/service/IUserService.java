@@ -25,7 +25,7 @@ public interface IUserService extends IService<CUser> {
 
     void updatePwdByUserId(Long userId, String md5Hex);
 
-    String selectDataGrid(PageInfo pageInfo);
+    Object selectDataGrid(PageInfo pageInfo);
 
     void deleteUserById(Long id);
 

@@ -49,8 +49,7 @@ public class SplitServiceImpl implements SplitService {
             } catch (Exception e) {
                 throw new MessageException(snBegin + "-" + snEnd+ ", 导入解析文件失败");
             }
-
-            List<String> snList = logisticsService.idList(snBegin, snEnd, 0, 0, "XDL");
+            List<String> snList = logisticsService.idList(snBegin, snEnd);
             if(snList.size()!=Integer.parseInt(count)){
                 throw new MessageException(logStr + ",解析明细失败与数量不符");
             }

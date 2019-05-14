@@ -981,7 +981,7 @@ select count(*) from(
     pfa.OPERATION_BATCH, pfor.FREEZE_AMT as REV1, pfor.OPERATION_TIME as REV2
     from P_FREEZE_AGENT pfa
     left join P_FREEZE_OPERATION_RECORD pfor on pfa.AGENT_ID=pfor.AGENT_ID and pfa.PARENT_AGENT_ID=pfor.PARENT_AGENT_ID and pfa.FREEZE_TYPE=pfor.FREEZE_TYPE and pfa.REV1=THAW_BATCH
-    where pfa.REV1=#{batch}
+    where pfa.REV1=#{batch} and pfor.OPERATION_TIME = ( select max(OPERATION_TIME) from P_FREEZE_OPERATION_RECORD where THAW_BATCH=#{batch})
   </select>
 
   <select id="getThawOperator" parameterType="java.lang.String" resultType="java.util.Map">
@@ -995,4 +995,31 @@ select count(*) from(
   <update id="delteThawOperationById" parameterType="java.lang.String">
     update P_FREEZE_AGENT set STATUS='1',REV1=null where ID=#{freezeAgentId}
   </update>
+
+ <select id="queryBumId" resultType="java.lang.String" parameterType="java.lang.String">
+
+  select BUS_NUM from A_AGENT_BUSINFO where AGENT_ID = ${BUS_NUM}
+
+ </select>
+
+<select id="queryDayFreezeCount" resultType="java.lang.Integer">
+
+select count(*) FROM P_FREEZE_AGENT where FREEZE_TYPE ='01'or FREEZE_TYPE='02'
+
+</select>
+
+
+  <select id="queryDayFreezeDate" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+
+    SELECT * FROM
+    (
+    SELECT A.*, ROWNUM RN
+    FROM (SELECT<include refid="Base_Column_List"/>
+    FROM P_FREEZE_AGENT where FREEZE_TYPE ='01'or FREEZE_TYPE='02'order by ID ) A
+    WHERE ROWNUM &lt;= ${endNum}
+    )
+    WHERE RN &gt;= ${startNum}
+
+  </select>
+
 </mapper>

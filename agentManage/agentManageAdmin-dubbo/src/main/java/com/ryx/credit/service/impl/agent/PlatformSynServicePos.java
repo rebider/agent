@@ -6,7 +6,6 @@ import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
-import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.MailUtil;
 import com.ryx.credit.common.util.agentUtil.AESUtil;
@@ -16,12 +15,10 @@ import com.ryx.credit.dao.agent.imsOrganMapper;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.PlatForm;
 import com.ryx.credit.pojo.admin.agent.PlatFormExample;
-import com.ryx.credit.pojo.admin.agent.imsOrgan;
+import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.service.agent.AgentBusinfoService;
-import com.ryx.credit.service.agent.PlatFormService;
 import com.ryx.credit.service.agent.PlatformSynService;
 import com.ryx.credit.util.Constants;
-import com.sun.org.apache.bcel.internal.generic.FASTORE;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -232,6 +229,122 @@ public class PlatformSynServicePos implements PlatformSynService {
             log.info("http请求超时:{}",e.getMessage());
             AppConfig.sendEmails("http请求超时:"+ MailUtil.printStackTrace(e), "升级通知POS失败报警");
             throw new Exception("http请求超时");
+        }
+    }
+
+    @Override
+    public AgentResult httpRequestNetIn(AgentNotifyVo agentNotifyVo)throws Exception{
+        try {
+
+            String cooperator = com.ryx.credit.util.Constants.cooperator;
+            String charset = "UTF-8"; // 字符集
+            String tranCode = "ORG001"; // 交易码
+            String reqMsgId = UUID.randomUUID().toString().replace("-", ""); // 请求流水
+            String reqDate = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"); // 请求时间
+
+            JSONObject jsonParams = new JSONObject();
+            JSONObject data = new JSONObject();
+            jsonParams.put("version", "1.0.0");
+            jsonParams.put("msgType", "01");
+            jsonParams.put("reqDate", reqDate);
+            data.put("uniqueId",agentNotifyVo.getUniqueId());
+            data.put("activityType",agentNotifyVo.getActivityType());
+            data.put("useOrgan",agentNotifyVo.getUseOrgan()); //使用范围
+            data.put("orgName",agentNotifyVo.getOrgName());
+            data.put("busiAreas",agentNotifyVo.getBusiAreas());
+            data.put("hasS0",agentNotifyVo.getHasS0());
+            data.put("busiType",agentNotifyVo.getBusiType());
+            data.put("debitTop",agentNotifyVo.getDebitTop());
+            data.put("ckDebitRate",agentNotifyVo.getCkDebitRate());
+            data.put("lowDebitRate",agentNotifyVo.getLowDebitRate());
+            if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentNotifyVo.getOrgId())){
+                data.put("orgId",agentNotifyVo.getOrgId());
+            }
+            if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentNotifyVo.getLoginName())){
+                data.put("loginName",agentNotifyVo.getLoginName());
+            }
+            if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentNotifyVo.getProvince()))
+                data.put("province",agentNotifyVo.getProvince());
+            if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentNotifyVo.getCity()))
+                data.put("city",agentNotifyVo.getCity());
+            if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentNotifyVo.getCityArea()))
+                data.put("cityArea",agentNotifyVo.getCityArea());
+            data.put("orgType",agentNotifyVo.getOrgType());
+            if(agentNotifyVo.getOrgType().equals(OrgType.STR.getValue()))
+                data.put("supDorgId",agentNotifyVo.getSupDorgId());
+
+            jsonParams.put("data", data);
+            String plainXML = jsonParams.toString();
+            // 请求报文加密开始
+            String keyStr = AESUtil.getAESKey();
+            byte[] plainBytes = plainXML.getBytes(charset);
+            byte[] keyBytes = keyStr.getBytes(charset);
+            String encryptData = new String(Base64.encodeBase64((AESUtil.encrypt(plainBytes, keyBytes, "AES", "AES/ECB/PKCS5Padding", null))), charset);
+            String signData = new String(Base64.encodeBase64(RSAUtil.digitalSign(plainBytes, Constants.privateKey, "SHA1WithRSA")), charset);
+            String encrtptKey = new String(org.apache.commons.codec.binary.Base64.encodeBase64(RSAUtil.encrypt(keyBytes, Constants.publicKey, 2048, 11, "RSA/ECB/PKCS1Padding")), charset);
+            // 请求报文加密结束
+
+            Map<String, String> map = new HashMap<>();
+            map.put("encryptData", encryptData);
+            map.put("encryptKey", encrtptKey);
+            map.put("cooperator", cooperator);
+            map.put("signData", signData);
+            map.put("tranCode", tranCode);
+            map.put("reqMsgId", reqMsgId);
+
+            log.info("通知pos请求参数:{}",data);
+            String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("agent_pos_notify_url"), map);
+            JSONObject jsonObject = JSONObject.parseObject(httpResult);
+            if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
+                log.info("请求异常======" + httpResult);
+                AppConfig.sendEmails("http请求异常", "入网通知POS失败报警");
+                throw new Exception("http请求异常");
+            } else {
+                String resEncryptData = jsonObject.getString("encryptData");
+                String resEncryptKey = jsonObject.getString("encryptKey");
+                byte[] decodeBase64KeyBytes = Base64.decodeBase64(resEncryptKey.getBytes(charset));
+                byte[] merchantAESKeyBytes = RSAUtil.decrypt(decodeBase64KeyBytes, Constants.privateKey, 2048, 11, "RSA/ECB/PKCS1Padding");
+                byte[] decodeBase64DataBytes = Base64.decodeBase64(resEncryptData.getBytes(charset));
+                byte[] merchantXmlDataBytes = AESUtil.decrypt(decodeBase64DataBytes, merchantAESKeyBytes, "AES", "AES/ECB/PKCS5Padding", null);
+                String respXML = new String(merchantXmlDataBytes, charset);
+                log.info("通知pos返回参数：{}",respXML);
+
+                // 报文验签
+                String resSignData = jsonObject.getString("signData");
+                byte[] signBytes = Base64.decodeBase64(resSignData);
+                if (!RSAUtil.verifyDigitalSign(respXML.getBytes(charset), signBytes, Constants.publicKey, "SHA1WithRSA")) {
+                    log.info("签名验证失败");
+                } else {
+                    log.info("签名验证成功");
+                    if (respXML.contains("data") && respXML.contains("orgId")){
+                        JSONObject respXMLObj = JSONObject.parseObject(respXML);
+                        JSONObject dataObj = JSONObject.parseObject(respXMLObj.get("data").toString());
+                        if(com.ryx.credit.commons.utils.StringUtils.isBlank(String.valueOf(respXMLObj.get("data"))) || "null".equals(String.valueOf(respXMLObj.get("data")))){
+                            AppConfig.sendEmails(respXML, "入网通知POS失败报警");
+                        }
+                        log.info(dataObj.toJSONString());
+                        return AgentResult.ok(dataObj);
+                    }else if (respXML.contains("respMsg")){
+                        JSONObject respXMLObj = JSONObject.parseObject(respXML);
+                        AppConfig.sendEmails(respXML, "入网通知POS失败报警:"+respXMLObj.get("respMsg"));
+                        log.info("http请求超时返回错误:{}",respXML);
+                        AgentResult ag = AgentResult.fail(respXML);
+                        ag.setData(respXMLObj);
+                        return ag;
+                    }else{
+                        AppConfig.sendEmails(respXML, "入网通知POS失败报警:"+respXML);
+                        log.info("http请求超时返回错误:{}",respXML);
+                        AgentResult ag = AgentResult.fail(respXML);
+                        ag.setData(respXML);
+                        return ag;
+                    }
+                }
+                return new AgentResult(500,"http请求异常",respXML);
+            }
+        } catch (Exception e) {
+            AppConfig.sendEmails("http请求超时:"+MailUtil.printStackTrace(e), "入网通知POS失败报警");
+            log.info("http请求超时:{}",e.getMessage());
+            throw e;
         }
     }
 }

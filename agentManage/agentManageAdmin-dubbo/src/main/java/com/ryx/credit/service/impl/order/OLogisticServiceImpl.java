@@ -152,7 +152,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 listRes.add("物流["+objectList.toString()+"]导入失败:"+e.getMessage());
             }
         }
-        logger.info("user{}导入物流抛出异常的数据有{}",user,listRes.toString());
+        logger.info("user{}导入物流的数据有{}",user,listRes.toString());
         return listRes;
     }
 
@@ -226,27 +226,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 logger.info("请填写结束SN序列号");
                 throw new MessageException("请填写结束SN序列号");
             }
-         /*  if (!proComString.equals(CardImportType.LD.msg)) {
-               if (StringUtils.isBlank(beginSnCount)) {
-                logger.info("请填写起始SN位数");
-                throw new MessageException("请填写起始SN位数");
-              }
-               if (StringUtils.isBlank(endSnCount)) {
-                logger.info("请填写结束SN位数");
-                throw new MessageException("请填写结束SN位数");
-              }
-               //需要验证截取sn前面的字符是否一致
-               String startSnString = beginSn.substring(0,Integer.parseInt(beginSnCount)-1);
-               String endSnString = endSn.substring(0,Integer.parseInt(beginSnCount)-1);
-               HashSet<Object> set = new HashSet<>();
-               set.add(startSnString);
-               set.add(endSnString);
-               if (set.size()>1){
-                   logger.info("请检查开始SN码与结束SN码截取之前的是否一致");
-                   throw new MessageException("请检查开始SN码与结束SN码截取之前的是否一致");
-               }
-          }*/
-
 
             if (StringUtils.isBlank(logCom)) {
                 logger.info("请填写物流公司");
@@ -381,9 +360,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             oLogistics.setwNumber(wNumber);      // 物流单号
             oLogistics.setSnBeginNum(beginSn);   // 起始SN序列号
             oLogistics.setSnEndNum(endSn);     // 结束SN序列号
-            //物流为未发送状态
             oLogistics.setSendStatus(LogisticsSendStatus.none_send.code);
-
             logger.info("导入物流数据:{}={}" , oLogistics.getId(),JSONObject.toJSON(oLogistics));
             //调用明细接口之前需要先去数据库进行查询是否已有数据
             if (null != stringList && stringList.size() > 0) {
@@ -402,12 +379,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     }
                 }
             }
-            if (1 != insertImportData(oLogistics)) {
-                throw new MessageException("排单编号为:"+planNum+"处理，插入物流信息失败,事物回滚");
-            }else{
-                logger.info("导入物流数据,活动代码{}={}==========================================={}" ,oActivity.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
-            }
-
             //更新排单表发货数量
             ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(planVo.getId());
             if (receiptPlan != null) {
@@ -427,9 +398,14 @@ public class OLogisticServiceImpl implements OLogisticsService {
             //平台查询，根据不同的平台走不同的逻辑
             OOrder order = oOrderMapper.selectByPrimaryKey(orderId);
             PlatForm platForm =platFormMapper.selectByPlatFormNum(order.getOrderPlatform());
-
+            if (1 != insertImportData(oLogistics)) {
+                throw new MessageException("排单编号为:"+planNum+"处理，插入物流信息失败,事物回滚");
+            }else{
+                logger.info("导入物流数据,活动代码{}={}==========================================={}" ,oActivity.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
+            }
             //如果发货数量大于200-此处大量数据走任务
             if(oLogistics.getSendNum().compareTo(new BigDecimal(200))>0) {
+                //物流为未发送状态
                 //如果是首刷进行sn检查库存中是否存在
                 if (platForm.getPlatformType().equals(PlatformType.MPOS.msg) || platForm.getPlatformType().equals(PlatformType.MPOS.code)){
                     for (String idSn : stringList) {
@@ -479,8 +455,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     }
                     //进行入库、机具划拨操作 POS下发业务系统
                     if (platForm.getPlatformType().equals(PlatformType.POS.code) || platForm.getPlatformType().equals(PlatformType.ZPOS.code)){
-
-                        List<String> snList = JsonUtil.jsonToPojo(JsonUtil.objectToJson(resultVO.getObj()), List.class);
                         ImsTermWarehouseDetail imsTermWarehouseDetail = new ImsTermWarehouseDetail();
                         OOrder oOrder = oOrderMapper.selectByPrimaryKey(subOrderItem.getOrderId());
                         if (null==oOrder) {
@@ -498,7 +472,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                         OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
                         try {
                             //机具下发接口
-                            AgentResult posSendRes = imsTermWarehouseDetailService.insertWarehouseAndTransfer(snList,imsTermWarehouseDetail);
+                            AgentResult posSendRes = imsTermWarehouseDetailService.insertWarehouseAndTransfer(stringList,imsTermWarehouseDetail);
                             if(posSendRes.isOK()){
                                 logistics_send.setSendMsg(posSendRes.getMsg());
                                 logistics_send.setSendStatus(Status.STATUS_1.status);
@@ -506,6 +480,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                                     logger.info("pos下发物流更新失败STATUS_1成功{}",JSONObject.toJSONString(oLogistics));
                                 }
                             }else{
+                                AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",错误信息:"+posSendRes.getMsg(), "POS发物流错误报警");
                                 logistics_send.setSendMsg(posSendRes.getMsg());
                                 logistics_send.setSendStatus(Status.STATUS_2.status);
                                 if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
@@ -514,6 +489,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                             }
 
                         } catch (MessageException e) {
+                            AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",错误信息:"+MailUtil.printStackTrace(e), "POS发物流错误报警");
                             e.printStackTrace();
                             logistics_send.setSendMsg(e.getMsg());
                             logistics_send.setSendStatus(Status.STATUS_2.status);
@@ -521,6 +497,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                                 logger.info("pos下发物流更新失败MessageException{}",JSONObject.toJSONString(oLogistics));
                             }
                         }catch (Exception e){
+                            AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",错误信息:"+MailUtil.printStackTrace(e), "POS发物流错误报警");
                             e.printStackTrace();
                             logistics_send.setSendMsg("下发异常");
                             logistics_send.setSendStatus(Status.STATUS_2.status);
@@ -529,7 +506,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                             }
                         }
                         //首刷下发业务系统
-                    }else if(platForm.getPlatformType().equals(PlatformType.ZPOS.code) || platForm.getPlatformType().equals(PlatformType.ZPOS.msg)){
+                    }else if(platForm.getPlatformType().equals(PlatformType.MPOS.code) || platForm.getPlatformType().equals(PlatformType.MPOS.msg)){
 
                         List<OLogisticsDetail> forsendSns = (List<OLogisticsDetail>)resultVO.getObj();
                         logger.info("物流下发发货数量sn查询获取数据：{}", JSONObject.toJSONString(forsendSns));
@@ -587,30 +564,37 @@ public class OLogisticServiceImpl implements OLogisticsService {
                                 logistics_send.setSendStatus(Status.STATUS_1.status);
                                 logistics_send.setSendMsg(lowerHairMachineRes.getMsg());
                                 if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
-                                    logger.info("pos下发物流更新记录STATUS_1失败{}",JSONObject.toJSONString(oLogistics));
+                                    logger.info("手刷下发物流更新记录STATUS_1失败{}",JSONObject.toJSONString(oLogistics));
                                 }
                             }else{
+                                AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",错误信息:"+lowerHairMachineRes.getMsg(), "手刷发物流错误报警");
                                 logistics_send.setSendStatus(Status.STATUS_2.status);
                                 logistics_send.setSendMsg(lowerHairMachineRes.getMsg());
                                 if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
-                                    logger.info("pos下发物流更新记录STATUS_2失败{}",JSONObject.toJSONString(oLogistics));
+                                    logger.info("手刷下发物流更新记录STATUS_2失败{}",JSONObject.toJSONString(oLogistics));
                                 }
                             }
                         }catch (MessageException e) {
+                            AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",错误信息:"+MailUtil.printStackTrace(e), "手刷发物流错误报警");
                             e.printStackTrace();
                             logistics_send.setSendStatus(Status.STATUS_2.status);
                             logistics_send.setSendMsg(e.getMsg());
                             if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
-                                logger.info("pos下发物流更新记录MessageException失败{}",JSONObject.toJSONString(oLogistics));
+                                logger.info("手刷下发物流更新记录MessageException失败{}",JSONObject.toJSONString(oLogistics));
                             }
                         } catch (Exception e) {
+                            AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",错误信息:"+MailUtil.printStackTrace(e), "手刷发物流错误报警");
                             e.printStackTrace();
                             logistics_send.setSendStatus(Status.STATUS_2.status);
                             logistics_send.setSendMsg("下发异常");
                             if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
-                                logger.info("pos下发物流更新记录Exception失败{}",JSONObject.toJSONString(oLogistics));
+                                logger.info("手刷下发物流更新记录Exception失败{}",JSONObject.toJSONString(oLogistics));
                             }
                         }
+                    }else{
+                        AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",错误信息:发物流类型错误", "手刷发物流错误报警");
+                        logger.info("发物流类型错误");
+                        throw new MessageException("发物流类型错误");
                     }
                 }
             }else{
@@ -819,7 +803,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             }
         }
         List<String> idList = idList(startSn, endSn, begins, finish,ol.getProCom());
-
+        List<OLogisticsDetail> resOLogisticsDetail = new ArrayList();
         if (null != idList && idList.size() > 0) {
             for (String idSn : idList) {
                 OLogisticsDetail detail = new OLogisticsDetail();
@@ -866,15 +850,16 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
                     detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
                 }
-                detail.setSendStatus(LogisticsDetailSendStatus.send_success.code);
+                detail.setSendStatus(LogisticsDetailSendStatus.none_send.code);
                 detail.setVersion(Status.STATUS_1.status);
                 if (1 != oLogisticsDetailMapper.insertSelective(detail)) {
                     logger.info("添加失败");
                     throw new ProcessException("添加失败");
                 }
+                resOLogisticsDetail.add(detail);
             }
         }
-        return ResultVO.success(idList);
+        return ResultVO.success(resOLogisticsDetail);
     }
 
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
@@ -902,14 +887,21 @@ public class OLogisticServiceImpl implements OLogisticsService {
             for (String idSn : idList) {
 
                 OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
-                oLogisticsDetailExample.or().andStatusEqualTo(Status.STATUS_0.status).andRecordStatusEqualTo(Status.STATUS_1.status).andSnNumEqualTo(idSn).andTerminalidTypeEqualTo(PlatformType.MPOS.code);
+                oLogisticsDetailExample.or()
+                        .andStatusEqualTo(Status.STATUS_0.status)
+                        .andRecordStatusEqualTo(Status.STATUS_1.status)
+                        .andSnNumEqualTo(idSn)
+                        .andTerminalidTypeEqualTo(PlatformType.MPOS.code);
                 List<OLogisticsDetail>  listOLogisticsDetailSn = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
-                if (listOLogisticsDetailSn==null){
-                    logger.info("此SN码不存在");
-                    throw new MessageException("此SN码不存在");
+                if (listOLogisticsDetailSn==null||listOLogisticsDetailSn.size()==0){
+                    logger.info(idSn+"此SN码不存在");
+                    throw new MessageException(idSn+"此SN码不存在");
+                }else if (listOLogisticsDetailSn.size()==0){
+                    logger.info(idSn+"此SN码不存在");
+                    throw new MessageException(idSn+"此SN码不存在");
                 }else if(listOLogisticsDetailSn.size()!=1){
-                    logger.info("此SN码不存在");
-                    throw new MessageException("此SN码不存在");
+                    logger.info(idSn+"此SN码不存在");
+                    throw new MessageException(idSn+"此SN码不唯一");
                 }
 
                 OLogisticsDetail detail = listOLogisticsDetailSn.get(0);
@@ -954,7 +946,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
                     detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
                 }
-                detail.setSendStatus(LogisticsDetailSendStatus.send_success.code);
+                detail.setSendStatus(LogisticsDetailSendStatus.none_send.code);
                 if (1 != oLogisticsDetailMapper.updateByPrimaryKeySelective(detail)) {
                     logger.info("修改失败");
                     throw new ProcessException("修改失败");
@@ -1007,6 +999,74 @@ public class OLogisticServiceImpl implements OLogisticsService {
             }
         }
         return list;
+    }
+
+
+    @Override
+    public List<String> idList(String startSn, String endSn) throws MessageException {
+        //1.startSn  2.endSn  3.开始截取的位数   4.结束截取的位数
+        List<String> list = new ArrayList<>();
+        Map digit = Conver10ToConver33Utils.getDigit(startSn, endSn);
+        //结束sn
+        String end = (String) digit.get("lastSn");
+        //起始sn
+        String start = (String) digit.get("firstSn");
+        //sn长度
+        Integer finish = (Integer) digit.get("length");
+        //不同位置起始位置 从1开始，如果使用索引，需要减去1
+        Integer begins = (Integer) digit.get("num");
+        //如果不同位置为0说明起始和结束sn为同一个直接返回一个sn
+        if(!begins.equals(Integer.valueOf(0))){
+            int begin = begins - 1;//开始索引位置
+            //截取不一样的字符串
+            String sSub = start.substring(begin, finish);
+            String eSub = end.substring(begin, finish);
+            if ("".equals(eSub) || "".equals(sSub)) {
+                logger.info("请输入正确的起始和结束SN号位数");
+                throw new MessageException("请输入正确的起始和结束SN号位数");
+            }
+            //检查不一样的字符串是否是联迪sn 位数是是否是12位 变更为是否是字符开头 否则按照普通规则进行匹配
+            if(start.length()==12 && sSub.matches("^[A-Za-z]+\\d{4}")){
+                list= getBetweenValues(startSn, endSn);
+                logger.info("sn：{}，{}，使用联迪方式解析",start,end);
+                return list;
+            }
+            if(Integer.parseInt(eSub) - Integer.parseInt(sSub)<=0){
+                throw new MessageException("sn码填写有误");
+            }
+            ////按照普通规则进行匹配 不一样的部分不包含字母
+            if(sSub.matches(".*[A-Za-z]+.*") || eSub.matches(".*[A-Za-z]+.*")){
+                throw new MessageException("sn码填写有误");
+            }
+            //按照普通规则进行匹配 不一样的部分不包含字母
+            int num = Integer.parseInt(sSub);
+            int w = finish - begin;
+            for (int j = Integer.parseInt(eSub) - Integer.parseInt(sSub); j >= 0; j--) {
+                int x = num++;
+                list.add(start.substring(0, begin) + String.format("%0" + w + "d", x) + start.substring(finish));
+            }
+        }else{
+            list.add(startSn);
+        }
+        return list;
+    }
+
+    @Override
+    public AgentResult isInSnSegment(String snStart, String snEnd, String isInStart, String isInEnd) {
+        if(StringUtils.isBlank(snStart)){return AgentResult.fail("开始SN号不能为空");}
+        if(StringUtils.isBlank(snEnd)){return AgentResult.fail("结束始SN号不能为空");}
+        if(StringUtils.isBlank(isInStart)){return AgentResult.fail("开始SN号不能为空");}
+        if(StringUtils.isBlank(isInEnd)){return AgentResult.fail("结束SN号不能为空");}
+        if(snStart.length()!=snEnd.length() || isInStart.length()!=isInEnd.length() || snStart.length()!=isInStart.length() ){
+            return AgentResult.fail("SN号错误");
+        }
+        if(snStart.compareTo(isInStart)>0 || snEnd.compareTo(isInStart)<0){
+            return AgentResult.fail("SN号"+isInStart+"不在指定区间，请检查SN");
+        }
+        if(snStart.compareTo(isInEnd)>0 || snEnd.compareTo(isInEnd)<0){
+            return AgentResult.fail("SN号"+isInEnd+"不在指定区间，请检查SN");
+        }
+        return AgentResult.ok();
     }
 
     /**

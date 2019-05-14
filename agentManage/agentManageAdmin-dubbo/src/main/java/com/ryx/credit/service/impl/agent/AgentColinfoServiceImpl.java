@@ -60,101 +60,105 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
      */
     @Override
     public AgentColinfo agentColinfoInsert(AgentColinfo ac, List<String> att)throws ProcessException{
-        if(StringUtils.isEmpty(ac.getcUser())){
-            throw new ProcessException("操作人不能为空");
-        }
-        if(StringUtils.isEmpty(ac.getAgentId())){
-            throw new ProcessException("代理商ID不能为空");
-        }
-        if(null!=ac.getCloTaxPoint() && ac.getCloTaxPoint().compareTo(new BigDecimal(1))>=0){
-            throw new ProcessException("税点不能大于1");
-        }
+        try {
+            if(StringUtils.isEmpty(ac.getcUser())){
+                throw new ProcessException("操作人不能为空");
+            }
+            if(StringUtils.isEmpty(ac.getAgentId())){
+                throw new ProcessException("代理商ID不能为空");
+            }
+            if(null!=ac.getCloTaxPoint() && ac.getCloTaxPoint().compareTo(new BigDecimal(1))>=0){
+                throw new ProcessException("税点不能大于1");
+            }
 
-        //检查属性
-        checkColInfo(ac);
+            //检查属性
+            checkColInfo(ac);
 
-        Date d = Calendar.getInstance().getTime();
-        ac.setcTime(d);
-        ac.setcUtime(d);
-        ac.setStatus(Status.STATUS_1.status);
-        ac.setVarsion(Status.STATUS_1.status);
-        ac.setId(idService.genId(TabId.a_agent_colinfo));
-        //导入的收款账户应该事收款成功
-        if(!ac.isImport()) {
-            ac.setPayStatus(ColinfoPayStatus.A.getValue());
-        }else {
-            ac.setPayStatus(ColinfoPayStatus.C.getValue());
-        }
-        //银行卡扫描件
-        boolean isHaveYHKSMJ = false;
-        //开户许可证
-        boolean isHaveKHXUZ = false;
-        //一般纳税人证明
-        boolean isHaveYBNSRZM = false;
+            Date d = Calendar.getInstance().getTime();
+            ac.setcTime(d);
+            ac.setcUtime(d);
+            ac.setStatus(Status.STATUS_1.status);
+            ac.setVarsion(Status.STATUS_1.status);
+            ac.setId(idService.genId(TabId.a_agent_colinfo));
+            //导入的收款账户应该事收款成功
+            if(!ac.isImport()) {
+                ac.setPayStatus(ColinfoPayStatus.A.getValue());
+            }else {
+                ac.setPayStatus(ColinfoPayStatus.C.getValue());
+            }
+            //银行卡扫描件
+            boolean isHaveYHKSMJ = false;
+            //开户许可证
+            boolean isHaveKHXUZ = false;
+            //一般纳税人证明
+            boolean isHaveYBNSRZM = false;
 
-        if(att!=null) {
-            for (String s : att) {
-                if (org.apache.commons.lang.StringUtils.isEmpty(s)) continue;
+            if(att!=null) {
+                for (String s : att) {
+                    if (org.apache.commons.lang.StringUtils.isEmpty(s)) continue;
 
-                Attachment attachment = attachmentMapper.selectByPrimaryKey(s);
-                if(attachment!=null){
-                    if(AttDataTypeStatic.YHKSMJ.code.equals(attachment.getAttDataType()+"")){
-                        isHaveYHKSMJ = true;
+                    Attachment attachment = attachmentMapper.selectByPrimaryKey(s);
+                    if(attachment!=null){
+                        if(AttDataTypeStatic.YHKSMJ.code.equals(attachment.getAttDataType()+"")){
+                            isHaveYHKSMJ = true;
+                        }
+                        if(AttDataTypeStatic.KHXUZ.code.equals(attachment.getAttDataType()+"")){
+                            isHaveKHXUZ = true;
+                        }
+                        if(AttDataTypeStatic.YBNSRZM.code.equals(attachment.getAttDataType()+"")){
+                            isHaveYBNSRZM = true;
+                        }
                     }
-                    if(AttDataTypeStatic.KHXUZ.code.equals(attachment.getAttDataType()+"")){
-                        isHaveKHXUZ = true;
-                    }
-                    if(AttDataTypeStatic.YBNSRZM.code.equals(attachment.getAttDataType()+"")){
-                        isHaveYBNSRZM = true;
+
+                    AttachmentRel record = new AttachmentRel();
+                    record.setAttId(s);
+                    record.setSrcId(ac.getId());
+                    record.setcUser(ac.getcUser());
+                    record.setcTime(ac.getcTime());
+                    record.setStatus(Status.STATUS_1.status);
+                    record.setBusType(AttachmentRelType.Proceeds.name());
+                    record.setId(idService.genId(TabId.a_attachment_rel));
+                    if (1 != attachmentRelMapper.insertSelective(record)) {
+                        logger.info("收款账号添加:{}", "收款账号添加附件关系失败");
+                        throw new ProcessException("收款账号添加附件关系失败");
                     }
                 }
+            }
 
-                AttachmentRel record = new AttachmentRel();
-                record.setAttId(s);
-                record.setSrcId(ac.getId());
-                record.setcUser(ac.getcUser());
-                record.setcTime(ac.getcTime());
-                record.setStatus(Status.STATUS_1.status);
-                record.setBusType(AttachmentRelType.Proceeds.name());
-                record.setId(idService.genId(TabId.a_attachment_rel));
-                if (1 != attachmentRelMapper.insertSelective(record)) {
-                    logger.info("收款账号添加:{}", "收款账号添加附件关系失败");
-                    throw new ProcessException("收款账号添加附件关系失败");
+            if(!ac.isImport())
+            if(ac.getCloType().compareTo(new BigDecimal("2"))==0) {//对私
+                if (!isHaveYHKSMJ) {
+                    throw new ProcessException("请添加银行卡扫描件");
                 }
-
             }
-        }
 
-        if(!ac.isImport())
-        if(ac.getCloType().compareTo(new BigDecimal("2"))==0) {//对私
-            if (!isHaveYHKSMJ) {
-                throw new ProcessException("请添加银行卡扫描件");
+            if(!ac.isImport())
+            if(ac.getCloType().compareTo(new BigDecimal("1"))==0) {//对公
+                if (!isHaveKHXUZ) {
+                    throw new ProcessException("请添加开户许可证");
+                }
             }
-        }
 
-        if(!ac.isImport())
-        if(ac.getCloType().compareTo(new BigDecimal("1"))==0) {//对公
-            if (!isHaveKHXUZ) {
-                throw new ProcessException("请添加开户许可证");
+            //对公并且税点等于0.06一般纳税人证明必填
+            if(!ac.isImport())
+            if(ac.getCloType().compareTo(new BigDecimal("1"))==0 && ac.getCloTaxPoint().compareTo(new BigDecimal("0.06"))==0) {
+                if (!isHaveYBNSRZM) {
+                    throw new ProcessException("请添加一般纳税人证明");
+                }
             }
-        }
 
-        //对公并且税点等于0.06一般纳税人证明必填
-        if(!ac.isImport())
-        if(ac.getCloType().compareTo(new BigDecimal("1"))==0 && ac.getCloTaxPoint().compareTo(new BigDecimal("0.06"))==0) {
-            if (!isHaveYBNSRZM) {
-                throw new ProcessException("请添加一般纳税人证明");
+            if(1!=agentColinfoMapper.insertSelective(ac)){
+                logger.info("收款账号添加:{}", "收款账号添加失败");
+                throw new ProcessException("收款账号添加失败");
             }
-        }
-
-        if(1!=agentColinfoMapper.insertSelective(ac)){
-            logger.info("收款账号添加:{}", "收款账号添加失败");
-            throw new ProcessException("收款账号添加失败");
-        }
-        //记录历史收款账户信息
-        if(!agentDataHistoryService.saveDataHistory(ac, DataHistoryType.GATHER.getValue()).isOK()){
-            logger.info("收款账号添加:{}", "收款账号添加失败,历史记录保存失败");
-            throw new ProcessException("收款账号添加失败");
+            //记录历史收款账户信息
+            if(!agentDataHistoryService.saveDataHistory(ac, DataHistoryType.GATHER.getValue()).isOK()){
+                logger.info("收款账号添加:{}", "收款账号添加失败,历史记录保存失败");
+                throw new ProcessException("收款账号添加失败");
+            }
+        } catch (ProcessException e) {
+            e.printStackTrace();
+            throw new ProcessException(e.getMessage());
         }
         return ac;
     }
@@ -228,13 +232,9 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         try {
             if(agent==null)throw new MessageException("代理商信息不能为空");
             for (AgentColinfoVo agentColinfoVo : colinfoVoList) {
-
-
                 if(null!=agentColinfoVo.getCloTaxPoint() && agentColinfoVo.getCloTaxPoint().compareTo(new BigDecimal(1))>=0){
                     throw new MessageException("税点不能大于1");
                 }
-
-
 
                 checkColInfo(agentColinfoVo);
 
@@ -339,12 +339,11 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                         }
                     }
                 }
-
             }
             return ResultVO.success(null);
         } catch (Exception e) {
             e.printStackTrace();
-            throw e;
+            throw new Exception(e.getMessage());
         }
     }
 
@@ -375,38 +374,44 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         return agentColinfoMapper.updateByPrimaryKeySelective(record);
     }
 
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
-    public AgentResult checkColInfo(AgentColinfo agentColinfo) {
-        if(agentColinfo.isImport())return AgentResult.ok();
-        /**
-         * cxinfo 系统对开票和税点进行系统控制
-         * 2、如果前面是对私户进行打款，那么是否开票默认为否且不可修改
-         3、如果代理商前面是对私户进行打款，那么扣税点在代理商填写时默认为6%且不可修改
-         4、如果代理商前面是对公户进行打款，且代理商是否开票为否，那么扣税点在代理商填写时默认为6%，且不可修改
-         5、如果代理商前面是对公户进行打款，且代理商是否开票为是，那么扣税点在代理商填写时只能选择6%或3%
-         */
-        if(agentColinfo.getCloType().compareTo(new BigDecimal(2))==0){ //对私
-            //税点检查
-            if(agentColinfo.getCloTaxPoint()==null || !"0.07".equals(agentColinfo.getCloTaxPoint().toString())){ //对私
-                throw new ProcessException("对私户进行打款，那么扣税点在代理商填写时默认为0.07且不可修改");
-            }
-            //是否开票检查
-            if(agentColinfo.getCloInvoice().compareTo(new BigDecimal(0))!=0){ //对私
-                throw new ProcessException("对私户进行打款，那么是否开票默认为否且不可修改");
-            }
-        }else if(agentColinfo.getCloType().compareTo(new BigDecimal(1))==0){//对公
-            //是否开票检查
-            if(agentColinfo.getCloInvoice().compareTo(new BigDecimal(0))==0){ //不开票
+    public AgentResult checkColInfo(AgentColinfo agentColinfo) throws ProcessException {
+        try {
+            if(agentColinfo.isImport())return AgentResult.ok();
+            /**
+             * cxinfo 系统对开票和税点进行系统控制
+             * 2、如果前面是对私户进行打款，那么是否开票默认为否且不可修改
+             3、如果代理商前面是对私户进行打款，那么扣税点在代理商填写时默认为6%且不可修改
+             4、如果代理商前面是对公户进行打款，且代理商是否开票为否，那么扣税点在代理商填写时默认为6%，且不可修改
+             5、如果代理商前面是对公户进行打款，且代理商是否开票为是，那么扣税点在代理商填写时只能选择6%或3%
+             */
+            if(agentColinfo.getCloType().compareTo(new BigDecimal(2))==0){ //对私
                 //税点检查
-                if(agentColinfo.getCloTaxPoint()==null || !"0.06".equals(agentColinfo.getCloTaxPoint().toString())){ //对私
-                    throw new ProcessException("对公户进行打款，且代理商是否开票为否，那么扣税点在代理商填写时默认为0.06，且不可修改");
+                if(agentColinfo.getCloTaxPoint()==null || !"0.07".equals(agentColinfo.getCloTaxPoint().toString())){ //对私
+                    throw new ProcessException("对私户进行打款，那么扣税点在代理商填写时默认为0.07且不可修改");
                 }
-            }else  if(agentColinfo.getCloInvoice().compareTo(new BigDecimal(1))==0){ //开票
-                //税点检查
-                if(!"0.06".equals(agentColinfo.getCloTaxPoint().toString()) && !"0.03".equals(agentColinfo.getCloTaxPoint().toString()) ){ //对私
-                    throw new ProcessException("对公户进行打款，且代理商是否开票为是，那么扣税点在代理商填写时只能选择0.06或0.03");
+                //是否开票检查
+                if(agentColinfo.getCloInvoice().compareTo(new BigDecimal(0))!=0){ //对私
+                    throw new ProcessException("对私户进行打款，那么是否开票默认为否且不可修改");
+                }
+            }else if(agentColinfo.getCloType().compareTo(new BigDecimal(1))==0) {//对公
+                //是否开票检查
+                if (agentColinfo.getCloInvoice().compareTo(new BigDecimal(0)) == 0) { //不开票
+                    //税点检查
+                    if (agentColinfo.getCloTaxPoint() == null || !"0.07".equals(agentColinfo.getCloTaxPoint().toString())) { //对私
+                        throw new ProcessException("对公户进行打款，且代理商是否开票为否，那么扣税点在代理商填写时默认为0.07，且不可修改");
+                    }
+                } else if (agentColinfo.getCloInvoice().compareTo(new BigDecimal(1)) == 0) { //开票
+                    //税点检查
+                    if (!"0.06".equals(agentColinfo.getCloTaxPoint().toString()) && !"0.03".equals(agentColinfo.getCloTaxPoint().toString())) { //对私
+                        throw new ProcessException("对公户进行打款，且代理商是否开票为是，那么扣税点在代理商填写时只能选择0.06或0.03");
+                    }
                 }
             }
+        } catch (ProcessException e) {
+            e.printStackTrace();
+            throw new ProcessException(e.getMessage());
         }
         return AgentResult.ok();
     }

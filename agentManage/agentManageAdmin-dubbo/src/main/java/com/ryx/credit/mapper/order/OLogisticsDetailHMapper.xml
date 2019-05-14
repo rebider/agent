@@ -567,4 +567,29 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+
+  <select id="getOLogDetailHistoryList" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix" />
+    select
+    <include refid="Base_Column_List"/>
+    from o_logistics_detail_h history
+    <include refid="historyListWhere" />
+    order by history.c_time desc
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="getOLogDetailHistoryCount" parameterType="map" resultType="java.lang.Integer">
+    select count(*)
+    from o_logistics_detail_h history
+    <include refid="historyListWhere" />
+  </select>
+
+  <sql id="historyListWhere">
+    <where>
+      history.status = #{map.status}
+      <if test="map.orderId != null"> and history.order_id = #{map.orderId} </if>
+      <if test="map.snNum != null"> and history.sn_num = #{map.snNum} </if>
+    </where>
+  </sql>
 </mapper>

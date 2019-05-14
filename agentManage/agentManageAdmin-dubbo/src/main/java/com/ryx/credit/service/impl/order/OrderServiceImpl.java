@@ -460,7 +460,7 @@ public class OrderServiceImpl implements OrderService {
         //订单基础数据
         Date d = Calendar.getInstance().getTime();
         orderFormVo.setId(idService.genOrderId(TabId.o_order, Integer.valueOf(userId)));
-        orderFormVo.setoNum(idService.genOrderId(TabId.o_order, Integer.valueOf(userId)));
+        orderFormVo.setoNum(orderFormVo.getId());
         orderFormVo.setoApytime(orderFormVo.getcTime());
         orderFormVo.setUserId(userId);
         orderFormVo.setPayAmo(orderFormVo.getoAmo());
@@ -2924,7 +2924,9 @@ public class OrderServiceImpl implements OrderService {
         List<OReceiptPro> oReceiptProList = oReceiptProMapper.selectByExample(example);
         for (OReceiptPro oReceiptPro : oReceiptProList) {
             oReceiptPro.setReceiptProStatus(OReceiptStatus.WAITING_LIST.code);
-            oReceiptProMapper.updateByPrimaryKeySelective(oReceiptPro);
+            if(1!=oReceiptProMapper.updateByPrimaryKeySelective(oReceiptPro)){
+                throw new MessageException("配货失败");
+            }
         }
         return AgentResult.ok();
     }

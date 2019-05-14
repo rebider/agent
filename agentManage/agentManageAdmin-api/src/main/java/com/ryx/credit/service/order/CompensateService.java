@@ -46,5 +46,9 @@ public interface CompensateService {
     AgentResult compensateAmtEdit(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,List<String> refundPriceDiffFile, String cUser, List<OCashReceivablesVo> cashReceivablesVoList);
 
     AgentResult compensateAmtDel(String busId, String cUser) throws Exception;
+
+    PageInfo compensateDetailList(ORefundPriceDiffDetail refundPriceDiffDetail, Page page, String dataRole,long userId);
+
+    void manualDispose(String id)throws ProcessException;
 }
 
