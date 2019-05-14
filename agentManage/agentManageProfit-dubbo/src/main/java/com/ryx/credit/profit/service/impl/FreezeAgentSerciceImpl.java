@@ -107,7 +107,7 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
        if(freezeOperationRecords!=null){
            logger.info("得到月份润冻结集合");
            //得到月份润冻结集合
-           List<FreezeOperationRecord> freezeMonth = freezeOperationRecords.stream().filter(f ->"00".equals(f.getStatus())).collect(Collectors.toList());
+           List<FreezeOperationRecord> freezeMonth = freezeOperationRecords.stream().filter(f ->"00".equals(f.getFreezeType())).collect(Collectors.toList());
            logger.info("得到日分润冻结集合");
            //得到日分润冻结集合
            Collection dd = CollectionUtils.disjunction(freezeOperationRecords,freezeMonth);
@@ -127,18 +127,28 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
            List<String> listBoth = new ArrayList<>(rs);
            //双冻结
            logger.info("得到日分润和日返现全部冻结的集合，并请求远程接口");
-
+           List<String> listBothBus = new ArrayList<>();
            if(listBoth.size()!=0){
-               map.put("unfreeze","0");
-               map.put("batchIds",listBoth);
-               String params1 = JsonUtil.objectToJson(map);
+               for (String str:listBoth) {
+                   List<Map<String,Object>> mapList1 = freezeAgentMapper.queryBumId(str);
+                   for (Map m:mapList1) {
+                       if("5000".equals(m.get("BUS_PLATFORM").toString()) || "6000".equals(m.get("BUS_PLATFORM").toString())){
+                           listBothBus.add(m.get("BUS_NUM").toString());
+                       }
+                   }
 
+
+               }
+               map.put("unfreeze","0");
+               map.put("batchIds",listBothBus.toString());
+               String params1 = JsonUtil.objectToJson(map);
+               logger.info("请求报文:"+params1);
                String res = HttpClientUtil.doPostJson(AppConfig.getProperty("busiPlat.refuse"), params1);
-               logger.info("调用接口年返回数据为:"+res);
+               logger.info("调用接口返回数据为:"+res);
 
                if (!JSONObject.parseObject(res).get("respCode").equals("000000")) {
                    logger.info("双冻结失败");
-                   return;
+                   throw new RuntimeException("冻结失败");
                }
 
            }
@@ -164,33 +174,50 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
 
            }
            logger.info("日分润请求远程接口");
-          //日分润单独冻结
+           //日分润单独冻结
+           List<String> listProfitBus = new ArrayList<>();
            if(listProfit.size()!=0){
-
+               for (String str:listProfit) {
+                   List<Map<String,Object>> mapList2 = freezeAgentMapper.queryBumId(str);
+                   for (Map m:mapList2) {
+                       if("5000".equals(m.get("BUS_PLATFORM").toString()) || "6000".equals(m.get("BUS_PLATFORM").toString())){
+                           listProfitBus.add(m.get("BUS_NUM").toString());
+                       }
+                   }
+               }
                map.put("unfreeze","1");
-               map.put("batchIds",listProfit);
+               map.put("batchIds",map.put("batchIds",listProfitBus.toString()));
                String params2 = JsonUtil.objectToJson(map);
-
+               logger.info("请求报文:"+params2);
                String res = HttpClientUtil.doPostJson(AppConfig.getProperty("busiPlat.refuse"), params2);
-               logger.info("调用接口年返回数据为:"+res);
+               logger.info("调用接口返回数据为:"+res);
                if (!JSONObject.parseObject(res).get("respCode").equals("000000")) {
                    logger.info("日分润冻结失败");
-                   return;
+                   throw new RuntimeException("冻结失败");
                }
 
            }
            logger.info("日返现请求远程接口");
            //日返现单独冻结
+           List<String> listmBus = new ArrayList<>();
            if(listm.size()!=0){
+               for (String str:listm) {
+                   List<Map<String,Object>> mapList3 = freezeAgentMapper.queryBumId(str);
+                   for (Map m:mapList3) {
+                       if("5000".equals(m.get("BUS_PLATFORM").toString()) || "6000".equals(m.get("BUS_PLATFORM").toString())){
+                           listmBus.add(m.get("BUS_NUM").toString());
+                       }
+                   }
+               }
                map.put("unfreeze","2");
-               map.put("batchIds",listm);
+               map.put("batchIds", map.put("batchIds",map.put("batchIds",listmBus.toString())));
                String params3 = JsonUtil.objectToJson(map);
-
+               logger.info("请求报文:"+params3);
                String res = HttpClientUtil.doPostJson(AppConfig.getProperty("busiPlat.refuse"), params3);
-               logger.info("调用接口年返回数据为:"+res);
+               logger.info("调用接口返回数据为:"+res);
                if (!JSONObject.parseObject(res).get("respCode").equals("000000")) {
                    logger.info("日返现冻结失败");
-                   return;
+                   throw new RuntimeException("冻结失败");
                }
 
            }
@@ -210,7 +237,7 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
                        profitDetailMonth1 =  profitDetailMonthService.selectByIdAndParent(profitDetailMonth);
                        if(profitDetailMonth1==null){
                            logger.info("此代理商"+freezeOperationRecord.getAgentId()+"没有月份润");
-                           continue;
+                           throw new RuntimeException("此代理商"+freezeOperationRecord.getAgentId()+"没有月份润");
                        }
                        profitDetailMonth1.setStatus("1");
                        profitDetailMonthService.updateByPrimaryKeySelective(profitDetailMonth1);

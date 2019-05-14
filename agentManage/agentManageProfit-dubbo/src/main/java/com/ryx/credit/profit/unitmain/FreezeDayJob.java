@@ -1,6 +1,7 @@
 package com.ryx.credit.profit.unitmain;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -52,11 +53,11 @@ public class FreezeDayJob {
     public void excut(List<FreezeAgent> freezeAgents) {
         List<String> agents = freezeAgents.stream().map((ff) -> (ff.getAgentId())).collect(Collectors.toList());
         Map<String, Object> map = new HashMap();
-        map.put("batchIds", agents);
+        map.put("batchIds", agents.toString());
         String params = JsonUtil.objectToJson(map);
-        String res = HttpClientUtil.doPostJson("http://12.3.10.161:8007/qtfr-inter/agencynew/upAgencyProfitbyAgentId.do", params);
+        String res = HttpClientUtil.doPostJson(AppConfig.getProperty("profit.qFreeze"), params);
         if (!JSONObject.parseObject(res).get("respCode").equals("000000")) {
-            logger.info("同步冻结数据失败");
+            logger.info("同步冻结数据失败"+res.toString());
             return;
         }
 
@@ -64,29 +65,32 @@ public class FreezeDayJob {
         List<Map> list = JSONObject.parseObject(data, List.class);
         for (Map dateMap : list) {
             for (FreezeAgent freezeAgent : freezeAgents) {
-                dateMap.get("uniqueId").toString().equals(freezeAgent.getAgentId());
-                FreezeOperationRecordExample freezeOperationRecordExample = new FreezeOperationRecordExample();
-                FreezeOperationRecordExample.Criteria criteria = freezeOperationRecordExample.createCriteria();
-                criteria.andAgentIdEqualTo(freezeAgent.getAgentId());
-                if (StringUtils.isNotBlank(freezeAgent.getParentAgentId())) {
-                    criteria.andParentAgentIdEqualTo(freezeAgent.getParentAgentId());
-                }
-                criteria.andFreezeBatchEqualTo(freezeAgent.getOperationBatch());
-                List<FreezeOperationRecord> freezeOperationRecords = freezeAgentSercice.selectByExample(freezeOperationRecordExample);
-                for (FreezeOperationRecord freezeOperationRecord:freezeOperationRecords) {
-                    if("01".equals(freezeOperationRecord.getFreezeType())){
-                        freezeOperationRecord.setFreezeAmt(new BigDecimal(dateMap.get("profit").toString()));
-                    }else if("02".equals(freezeOperationRecord.getFreezeType())){
-                        freezeOperationRecord.setFreezeAmt(new BigDecimal(dateMap.get("cashback").toString()));
+                if(dateMap.get("uniqueId").toString().equals(freezeAgent.getAgentId())){
+                    FreezeOperationRecordExample freezeOperationRecordExample = new FreezeOperationRecordExample();
+                    FreezeOperationRecordExample.Criteria criteria = freezeOperationRecordExample.createCriteria();
+                    criteria.andAgentIdEqualTo(freezeAgent.getAgentId());
+                    if (StringUtils.isNotBlank(freezeAgent.getParentAgentId())) {
+                        criteria.andParentAgentIdEqualTo(freezeAgent.getParentAgentId());
                     }
-                    try {
-                        freezeAgentSercice.updateByPrimaryKeySelective(freezeOperationRecord);
-                    }catch (Exception e ){
-                        e.printStackTrace();
-                        logger.error(e.getMessage());
-                        logger.info("同步冻结日分润和日返现失败");
+                    criteria.andFreezeBatchEqualTo(freezeAgent.getOperationBatch());
+                    List<FreezeOperationRecord> freezeOperationRecords = freezeAgentSercice.selectByExample(freezeOperationRecordExample);
+                    for (FreezeOperationRecord freezeOperationRecord:freezeOperationRecords) {
+                        if("01".equals(freezeOperationRecord.getFreezeType())){
+                            freezeOperationRecord.setFreezeAmt(new BigDecimal(dateMap.get("profit").toString()));
+                        }else if("02".equals(freezeOperationRecord.getFreezeType())){
+                            freezeOperationRecord.setFreezeAmt(new BigDecimal(dateMap.get("cashback").toString()));
+                        }
+                        try {
+                            freezeAgentSercice.updateByPrimaryKeySelective(freezeOperationRecord);
+                        }catch (Exception e ){
+                            e.printStackTrace();
+                            logger.error(e.getMessage());
+                            logger.info("同步冻结日分润和日返现失败");
+                        }
                     }
                 }
+
+
             }
         }
 

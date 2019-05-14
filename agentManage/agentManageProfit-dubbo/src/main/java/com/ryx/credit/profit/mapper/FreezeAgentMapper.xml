@@ -996,9 +996,9 @@ select count(*) from(
     update P_FREEZE_AGENT set STATUS='1',REV1=null where ID=#{freezeAgentId}
   </update>
 
- <select id="queryBumId" resultType="java.lang.String" parameterType="java.lang.String">
+ <select id="queryBumId" resultType="java.util.Map" parameterType="java.lang.String">
 
-  select BUS_NUM from A_AGENT_BUSINFO where AGENT_ID = ${BUS_NUM}
+   select BUS_NUM,BUS_PLATFORM from A_AGENT_BUSINFO where AGENT_ID = '${BUS_NUM}'
 
  </select>
 
