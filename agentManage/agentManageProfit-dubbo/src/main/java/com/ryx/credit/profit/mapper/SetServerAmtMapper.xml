@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.SetServerAmtMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.SetServerAmt">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="CREATE_DATE" jdbcType="VARCHAR" property="createDate" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="BUM_CODE" jdbcType="VARCHAR" property="bumCode" />
+    <result column="BUM_ID" jdbcType="VARCHAR" property="bumId" />
+    <result column="SERVER_TYPE" jdbcType="VARCHAR" property="serverType" />
+    <result column="CHARGE_PERIOD" jdbcType="VARCHAR" property="chargePeriod" />
+    <result column="CHARGE_PROPORTION" jdbcType="DECIMAL" property="chargeProportion" />
+    <result column="CHARGE_TYPE" jdbcType="VARCHAR" property="chargeType" />
+    <result column="CHARGE_BASE" jdbcType="VARCHAR" property="chargeBase" />
+    <result column="IS_NO_SON" jdbcType="CHAR" property="isNoSon" />
+    <result column="STATUS" jdbcType="CHAR" property="status" />
+    <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
+    <result column="REV1" jdbcType="VARCHAR" property="rev1" />
+    <result column="REV2" jdbcType="VARCHAR" property="rev2" />
+    <result column="REV3" jdbcType="VARCHAR" property="rev3" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, CREATE_DATE, AGENT_ID, AGENT_NAME, BUM_CODE, BUM_ID, SERVER_TYPE, CHARGE_PERIOD,
+    CHARGE_PROPORTION, CHARGE_TYPE, CHARGE_BASE, IS_NO_SON, STATUS, C_USER, REV1, REV2,
+    REV3
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.SetServerAmtExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_SERVER_AMT
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from P_SERVER_AMT
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.SetServerAmtExample">
+    delete from P_SERVER_AMT
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.SetServerAmt">
+    insert into P_SERVER_AMT (ID, CREATE_DATE, AGENT_ID,
+      AGENT_NAME, BUM_CODE, BUM_ID,
+      SERVER_TYPE, CHARGE_PERIOD, CHARGE_PROPORTION,
+      CHARGE_TYPE, CHARGE_BASE, IS_NO_SON,
+      STATUS, C_USER, REV1, REV2,
+      REV3)
+    values (#{id,jdbcType=VARCHAR}, #{createDate,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
+      #{agentName,jdbcType=VARCHAR}, #{bumCode,jdbcType=VARCHAR}, #{bumId,jdbcType=VARCHAR},
+      #{serverType,jdbcType=VARCHAR}, #{chargePeriod,jdbcType=VARCHAR}, #{chargeProportion,jdbcType=DECIMAL},
+      #{chargeType,jdbcType=VARCHAR}, #{chargeBase,jdbcType=VARCHAR}, #{isNoSon,jdbcType=CHAR},
+      #{status,jdbcType=CHAR}, #{cUser,jdbcType=VARCHAR}, #{rev1,jdbcType=VARCHAR}, #{rev2,jdbcType=VARCHAR},
+      #{rev3,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.SetServerAmt">
+    insert into P_SERVER_AMT
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="createDate != null">
+        CREATE_DATE,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
+      <if test="bumCode != null">
+        BUM_CODE,
+      </if>
+      <if test="bumId != null">
+        BUM_ID,
+      </if>
+      <if test="serverType != null">
+        SERVER_TYPE,
+      </if>
+      <if test="chargePeriod != null">
+        CHARGE_PERIOD,
+      </if>
+      <if test="chargeProportion != null">
+        CHARGE_PROPORTION,
+      </if>
+      <if test="chargeType != null">
+        CHARGE_TYPE,
+      </if>
+      <if test="chargeBase != null">
+        CHARGE_BASE,
+      </if>
+      <if test="isNoSon != null">
+        IS_NO_SON,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="cUser != null">
+        C_USER,
+      </if>
+      <if test="rev1 != null">
+        REV1,
+      </if>
+      <if test="rev2 != null">
+        REV2,
+      </if>
+      <if test="rev3 != null">
+        REV3,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="bumCode != null">
+        #{bumCode,jdbcType=VARCHAR},
+      </if>
+      <if test="bumId != null">
+        #{bumId,jdbcType=VARCHAR},
+      </if>
+      <if test="serverType != null">
+        #{serverType,jdbcType=VARCHAR},
+      </if>
+      <if test="chargePeriod != null">
+        #{chargePeriod,jdbcType=VARCHAR},
+      </if>
+      <if test="chargeProportion != null">
+        #{chargeProportion,jdbcType=DECIMAL},
+      </if>
+      <if test="chargeType != null">
+        #{chargeType,jdbcType=VARCHAR},
+      </if>
+      <if test="chargeBase != null">
+        #{chargeBase,jdbcType=VARCHAR},
+      </if>
+      <if test="isNoSon != null">
+        #{isNoSon,jdbcType=CHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=CHAR},
+      </if>
+      <if test="cUser != null">
+        #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="rev1 != null">
+        #{rev1,jdbcType=VARCHAR},
+      </if>
+      <if test="rev2 != null">
+        #{rev2,jdbcType=VARCHAR},
+      </if>
+      <if test="rev3 != null">
+        #{rev3,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.SetServerAmtExample" resultType="java.lang.Long">
+    select count(*) from P_SERVER_AMT
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.SetServerAmt">
+    update P_SERVER_AMT
+    <set>
+      <if test="createDate != null">
+        CREATE_DATE = #{createDate,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="bumCode != null">
+        BUM_CODE = #{bumCode,jdbcType=VARCHAR},
+      </if>
+      <if test="bumId != null">
+        BUM_ID = #{bumId,jdbcType=VARCHAR},
+      </if>
+      <if test="serverType != null">
+        SERVER_TYPE = #{serverType,jdbcType=VARCHAR},
+      </if>
+      <if test="chargePeriod != null">
+        CHARGE_PERIOD = #{chargePeriod,jdbcType=VARCHAR},
+      </if>
+      <if test="chargeProportion != null">
+        CHARGE_PROPORTION = #{chargeProportion,jdbcType=DECIMAL},
+      </if>
+      <if test="chargeType != null">
+        CHARGE_TYPE = #{chargeType,jdbcType=VARCHAR},
+      </if>
+      <if test="chargeBase != null">
+        CHARGE_BASE = #{chargeBase,jdbcType=VARCHAR},
+      </if>
+      <if test="isNoSon != null">
+        IS_NO_SON = #{isNoSon,jdbcType=CHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=CHAR},
+      </if>
+      <if test="cUser != null">
+        C_USER = #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="rev1 != null">
+        REV1 = #{rev1,jdbcType=VARCHAR},
+      </if>
+      <if test="rev2 != null">
+        REV2 = #{rev2,jdbcType=VARCHAR},
+      </if>
+      <if test="rev3 != null">
+        REV3 = #{rev3,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.SetServerAmt">
+    update P_SERVER_AMT
+    set CREATE_DATE = #{createDate,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      BUM_CODE = #{bumCode,jdbcType=VARCHAR},
+      BUM_ID = #{bumId,jdbcType=VARCHAR},
+      SERVER_TYPE = #{serverType,jdbcType=VARCHAR},
+      CHARGE_PERIOD = #{chargePeriod,jdbcType=VARCHAR},
+      CHARGE_PROPORTION = #{chargeProportion,jdbcType=DECIMAL},
+      CHARGE_TYPE = #{chargeType,jdbcType=VARCHAR},
+      CHARGE_BASE = #{chargeBase,jdbcType=VARCHAR},
+      IS_NO_SON = #{isNoSon,jdbcType=CHAR},
+      STATUS = #{status,jdbcType=CHAR},
+      C_USER = #{cUser,jdbcType=VARCHAR},
+      REV1 = #{rev1,jdbcType=VARCHAR},
+      REV2 = #{rev2,jdbcType=VARCHAR},
+      REV3 = #{rev3,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from (
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+  <!--====================================以上代码自动生成，请勿修改==============================================-->
+
+  <select id="queryBumCode" resultType="java.util.Map">
+select distinct BUM_NAME,BUM_ID from P_SERVER_D
+ </select>
+
+
+  <select id="setServerAmtCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+  select count(*) from P_SERVER_AMT
+  where 1=1
+  <if test="agentName != null and agentName!='' ">
+    and AGENT_NAME = #{agentName,jdbcType=VARCHAR}
+  </if>
+  <if test="agentId != null and agentId!='' ">
+    and AGENT_ID = #{agentId,jdbcType=VARCHAR}
+  </if>
+  <if test="bumId != null and bumId!='' ">
+    and BUM_ID = #{bumId,jdbcType=VARCHAR}
+  </if>
+  <if test="bumCode != null and bumCode!='' ">
+    and BUM_CODE = #{bumCode,jdbcType=VARCHAR}
+  </if>
+  <if test="bumCode != null and bumCode!='' ">
+    and BUM_CODE = #{bumCode,jdbcType=VARCHAR}
+  </if>
+  <if test="status != null and status!='' ">
+    and STATUS = #{status,jdbcType=VARCHAR}
+  </if>
+</select>
+
+
+  <select id="setServerAmtList" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from P_SERVER_AMT
+    where 1=1
+    <if test="agentName != null and agentName!='' ">
+      and AGENT_NAME = #{agentName,jdbcType=VARCHAR}
+    </if>
+    <if test="agentId != null and agentId!='' ">
+      and AGENT_ID = #{agentId,jdbcType=VARCHAR}
+    </if>
+    <if test="bumId != null and bumId!='' ">
+      and BUM_ID = #{bumId,jdbcType=VARCHAR}
+    </if>
+    <if test="bumCode != null and bumCode!='' ">
+      and BUM_CODE = #{bumCode,jdbcType=VARCHAR}
+    </if>
+    <if test="bumCode != null and bumCode!='' ">
+      and BUM_CODE = #{bumCode,jdbcType=VARCHAR}
+    </if>
+    <if test="status != null and status!='' ">
+      and STATUS = #{status,jdbcType=VARCHAR}
+    </if>
+  </select>
+
+
+    <select id="queryD" parameterType="java.lang.String" resultType="java.util.Map">
+
+    select ID,BUM_ID,BUM_NAME,AGENT_ID,AGENT_NAME from P_SERVER_D
+    where 1=1
+        <if test="bumId != null and bumId!='' ">
+            and BUM_ID = #{bumId,jdbcType=VARCHAR}
+        </if>
+    </select>
+
+
+</mapper>
