@@ -529,15 +529,21 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
             List<String> proAgentIds = freezeOperationRecords.stream().filter(freezeOperationRecord -> freezeOperationRecord.getFreezeType().equals("01")).map(FreezeOperationRecord::getAgentId).collect(Collectors.toList());
             List<String> proBatchIds = new ArrayList<>();
             for (String proAgentId : proAgentIds) {
-              /*  String s = freezeAgentMapper.queryBumId(proAgentId);
-                proBatchIds.add(s);*/
+                List<Map<String,Object>> s = freezeAgentMapper.queryBumId(proAgentId);
+                for (Map<String, Object> map : s) {
+                    if ("6000".equals(map.get("BUS_PLATFORM").toString())||"5000".equals(map.get("BUS_PLATFORM").toString()))
+                    proBatchIds.add(map.get("BUS_NUM")==null?"":map.get("BUS_NUM").toString());
+                }
             }
             //获取日返现代理商
             List<String> backAgentIds = freezeOperationRecords.stream().filter(freezeOperationRecord -> freezeOperationRecord.getFreezeType().equals("02")).map(FreezeOperationRecord::getAgentId).collect(Collectors.toList());
             List<String> backBatchIds = new ArrayList<>();
             for (String backAgentId : backAgentIds) {
-              /*  String s = freezeAgentMapper.queryBumId(backAgentId);
-                backBatchIds.add(s);*/
+                List<Map<String,Object>> s = freezeAgentMapper.queryBumId(backAgentId);
+                for (Map<String, Object> map : s) {
+                    if ("6000".equals(map.get("BUS_PLATFORM").toString())||"5000".equals(map.get("BUS_PLATFORM").toString()))
+                        backBatchIds.add(map.get("BUS_NUM")==null?"":map.get("BUS_NUM").toString());
+                }
             }
             boolean proTemp=false,backTemp=false;//是否解冻失败的标识
             HashMap<String,String> map = new HashMap<String,String>();
@@ -545,7 +551,7 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
             map.put("type", "2");//1-冻结本身以及下属，2-冻结自身（默认）；3-本身不冻结，冻结所有下级
             map.put("flag", "0");//4冻结;0解冻
             map.put("unfreeze", "1");//0-双冻结（默认）;1-分润冻结; 2-返现冻结
-            map.put("batchIds", proBatchIds.toString());//业务平台编码list
+            map.put("batchIds", JsonUtil.objectToJson(proBatchIds));//业务平台编码list
             String params = JsonUtil.objectToJson(map);
             String res = HttpClientUtil.doPostJson
                     (AppConfig.getProperty("busiPlat.refuse"), params);
@@ -556,7 +562,7 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
                 proTemp=true;//日分润接口解冻失败 标识更新
             }
             map.put("unfreeze", "2");
-            map.put("batchIds", backBatchIds.toString());//业务平台编码list
+            map.put("batchIds", JsonUtil.objectToJson(backBatchIds));//业务平台编码list
             params = JsonUtil.objectToJson(map);
             res = HttpClientUtil.doPostJson
                     (AppConfig.getProperty("busiPlat.refuse"), params);
