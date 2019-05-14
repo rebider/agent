@@ -56,7 +56,7 @@ public class FreezeDayJob {
         map.put("batchIds", agents.toString());
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson(AppConfig.getProperty("profit.qFreeze"), params);
-        if (!JSONObject.parseObject(res).get("respCode").equals("000000")) {
+        if (!("000000".equals( JSONObject.parseObject(res).get("respCode")))) {
             logger.info("同步冻结数据失败"+res.toString());
             return;
         }

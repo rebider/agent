@@ -149,7 +149,7 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
 
                if (!JSONObject.parseObject(res).get("respCode").equals("000000")) {
                    logger.info("双冻结失败");
-                   throw new RuntimeException("冻结失败");
+                   /*throw new RuntimeException("冻结失败");*/
                }
 
            }
@@ -194,7 +194,7 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
                logger.info("调用接口返回数据为:"+res);
                if (!JSONObject.parseObject(res).get("respCode").equals("000000")) {
                    logger.info("日分润冻结失败");
-                   throw new RuntimeException("冻结失败");
+                  /* throw new RuntimeException("冻结失败");*/
                }
 
            }
@@ -218,7 +218,7 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
                logger.info("调用接口返回数据为:"+res);
                if (!JSONObject.parseObject(res).get("respCode").equals("000000")) {
                    logger.info("日返现冻结失败");
-                   throw new RuntimeException("冻结失败");
+                 /*  throw new RuntimeException("冻结失败");*/
                }
 
            }
@@ -316,7 +316,7 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
                }
            }
 
-           freezeDayJob.queryDayFreeze();
+          /* freezeDayJob.queryDayFreeze();*/
 
        }else{
            logger.info("未选择代理商" );
