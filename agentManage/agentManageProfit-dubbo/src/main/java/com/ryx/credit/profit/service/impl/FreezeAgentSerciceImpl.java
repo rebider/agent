@@ -33,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * chenliang
@@ -514,7 +515,7 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
      * @param batch
      * @param result
      */
-    private void updateThawAgentByBatch(String batch, String result) {
+    private void updateThawAgentByBatch(String batch, String result){
         String time=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         if ("1".equals(result)){//解冻成功
             freezeAgentMapper.updateThawAgentByBatch(batch,"0");
@@ -523,10 +524,66 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
             FreezeOperationRecordExample.Criteria criteria=example.createCriteria();
             criteria.andThawBatchEqualTo(batch);
             List<FreezeOperationRecord> freezeOperationRecords = freezeOperationRecordMapper.selectByExample(example);//解冻申请中的数据
+            //获取日分润代理商
+            List<String> proAgentIds = freezeOperationRecords.stream().filter(freezeOperationRecord -> freezeOperationRecord.getFreezeType().equals("01")).map(FreezeOperationRecord::getAgentId).collect(Collectors.toList());
+            List<String> proBatchIds = new ArrayList<>();
+            for (String proAgentId : proAgentIds) {
+                String s = freezeAgentMapper.queryBumId(proAgentId);
+                proBatchIds.add(s);
+            }
+            //获取日返现代理商
+            List<String> backAgentIds = freezeOperationRecords.stream().filter(freezeOperationRecord -> freezeOperationRecord.getFreezeType().equals("02")).map(FreezeOperationRecord::getAgentId).collect(Collectors.toList());
+            List<String> backBatchIds = new ArrayList<>();
+            for (String backAgentId : backAgentIds) {
+                String s = freezeAgentMapper.queryBumId(backAgentId);
+                backBatchIds.add(s);
+            }
+            boolean proTemp=false,backTemp=false;//是否解冻失败的标识
+            HashMap<String,String> map = new HashMap<String,String>();
+            map.put("agencyBlack_type", "0");//1、冻结 0、解冻
+            map.put("type", "2");//1-冻结本身以及下属，2-冻结自身（默认）；3-本身不冻结，冻结所有下级
+            map.put("flag", "0");//4冻结;0解冻
+            map.put("unfreeze", "1");//0-双冻结（默认）;1-分润冻结; 2-返现冻结
+            map.put("batchIds", proBatchIds.toString());//业务平台编码list
+            String params = JsonUtil.objectToJson(map);
+            String res = HttpClientUtil.doPostJson
+                    (AppConfig.getProperty("busiPlat.refuse"), params);
+            logger.debug("请求信息：" + res);
+            if (!JSONObject.parseObject(res).get("respCode").equals("000000")) {    //请求失败
+                logger.error("请求失败！");
+                AppConfig.sendEmails("代理商冻结失败" + res,"代理商冻结失败");
+                proTemp=true;//日分润接口解冻失败 标识更新
+            }
+            map.put("unfreeze", "2");
+            map.put("batchIds", backBatchIds.toString());//业务平台编码list
+            params = JsonUtil.objectToJson(map);
+            res = HttpClientUtil.doPostJson
+                    (AppConfig.getProperty("busiPlat.refuse"), params);
+            logger.debug("请求信息：" + res);
+            if (!JSONObject.parseObject(res).get("respCode").equals("000000")) {
+                logger.error("请求失败！");
+                AppConfig.sendEmails("代理商冻结失败" + res,"代理商冻结失败");
+                backTemp=true;//日返现接口解冻失败 标识更新
+            }
+
             for (FreezeOperationRecord thawRecord : freezeOperationRecords) {
                 thawRecord.setId(idService.genId(TabId.P_FREEZE_OPERATION_RECORD));//设置新的id
-                thawRecord.setStatus("1");//状态设置为解冻
                 thawRecord.setOperationTime(time);//解冻成功时间
+                if ("01".equals(thawRecord.getFreezeType())&&proTemp){  //如果日分润接口解冻失败
+                    thawRecord.setStatus("0");//状态设置为冻结
+                    thawRecord.setThawBatch(null);
+                    thawRecord.setThawOperator(null);
+                    thawRecord.setThawTime(null);
+                    thawRecord.setThawReason(null);
+                }else if ("02".equals(thawRecord.getFreezeType())&&backTemp){   //如果日分润接口解冻失败
+                    thawRecord.setStatus("0");//状态设置为冻结
+                    thawRecord.setThawBatch(null);
+                    thawRecord.setThawOperator(null);
+                    thawRecord.setThawTime(null);
+                    thawRecord.setThawReason(null);
+                }else {
+                    thawRecord.setStatus("1");
+                }
                 freezeOperationRecordMapper.insert(thawRecord);
             }
 
@@ -584,7 +641,9 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
             FreezeOperationRecordExample freezeExample=new FreezeOperationRecordExample();
             FreezeOperationRecordExample.Criteria freezeCriteria=freezeExample.createCriteria();
             freezeCriteria.andAgentIdEqualTo(record.getAgentId());
-            freezeCriteria.andParentAgentIdEqualTo(record.getParentAgentId());
+            if (StringUtils.isNotBlank(record.getParentAgentId())){
+                freezeCriteria.andParentAgentIdEqualTo(record.getParentAgentId());
+            }
             freezeCriteria.andFreezeTypeEqualTo(record.getFreezeType());
             freezeCriteria.andStatusEqualTo("0");//查询已冻结
             List<FreezeOperationRecord> list = freezeOperationRecordMapper.selectByExample(freezeExample);

@@ -981,7 +981,7 @@ select count(*) from(
     pfa.OPERATION_BATCH, pfor.FREEZE_AMT as REV1, pfor.OPERATION_TIME as REV2
     from P_FREEZE_AGENT pfa
     left join P_FREEZE_OPERATION_RECORD pfor on pfa.AGENT_ID=pfor.AGENT_ID and pfa.PARENT_AGENT_ID=pfor.PARENT_AGENT_ID and pfa.FREEZE_TYPE=pfor.FREEZE_TYPE and pfa.REV1=THAW_BATCH
-    where pfa.REV1=#{batch}
+    where pfa.REV1=#{batch} and pfor.OPERATION_TIME = ( select max(OPERATION_TIME) from P_FREEZE_OPERATION_RECORD where THAW_BATCH=#{batch})
   </select>
 
   <select id="getThawOperator" parameterType="java.lang.String" resultType="java.util.Map">
