@@ -15,6 +15,7 @@ import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.InternetCardService;
 import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -35,6 +36,8 @@ import java.util.List;
 @Service("internetCardService")
 public class InternetCardServiceImpl implements InternetCardService {
 
+    private static final String[] dateFormat = new String[]{DateUtil.DATE_FORMAT_yyyy_MM_dd,DateUtil.DATE_FORMAT_yyyy_MM_dd2};
+
     @Autowired
     private OInternetCardMapper internetCardMapper;
     @Autowired
@@ -45,8 +48,9 @@ public class InternetCardServiceImpl implements InternetCardService {
     private AgentMapper agentMapper;
     @Autowired
     private DictOptionsService dictOptionsService;
+    @Autowired
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
-    private static final String[] dateFormat = new String[]{DateUtil.DATE_FORMAT_yyyy_MM_dd,DateUtil.DATE_FORMAT_yyyy_MM_dd2};
 
     @Override
     public PageInfo internetCardList(OInternetCard internetCard, Page page){
@@ -72,7 +76,7 @@ public class InternetCardServiceImpl implements InternetCardService {
 
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     @Override
-    public void importInternetCard(List<List<Object>> excelList, String importType, String userId)throws Exception{
+    public void importInternetCard(List<List<Object>> excelList, String importType, String userId,String batchNo)throws Exception{
 
         if(StringUtils.isBlank(CardImportType.getContentByValue(importType))){
              throw new MessageException("导入类型错误");
@@ -80,115 +84,115 @@ public class InternetCardServiceImpl implements InternetCardService {
         if(null==excelList && excelList.size()==0){
             throw new MessageException("excel列表为空");
         }
-        try {
-            int index = 1;
-            List<OInternetCard> cardList = new ArrayList<>();
-            String batchNo = IDUtils.getBatchNo();
-            OInternetCard oInternetCard = new OInternetCard();
-            for (List<Object> object : excelList) {
-                if(importType.equals(CardImportType.A.getValue())){
-                    String issuer = String.valueOf(object.get(0));//发卡方
-                    String InternetCardNum = String.valueOf(object.get(1));//物联卡号
-                    String iccidNum = String.valueOf(object.get(2));//ICCID
-                    String openAccountTime = String.valueOf(object.get(3));//开户日期
 
-                    oInternetCard.setIccidNum(iccidNum);
-                    oInternetCard.setIssuer(issuer);
-                    oInternetCard.setInternetCardNum(InternetCardNum);
-                    if(StringUtils.isNotBlank(openAccountTime))
-                    oInternetCard.setOpenAccountTime(DateUtils.parseDate(openAccountTime,dateFormat));
-                }else if(importType.equals(CardImportType.B.getValue())){
-                    String consigner = String.valueOf(object.get(0));//发货方
-                    String deliverTime = String.valueOf(object.get(1));//发货日期
-                    String orderId = String.valueOf(object.get(2));//订单号
-                    String agentName = String.valueOf(object.get(3));//代理商名称
-                    String snNum = String.valueOf(object.get(4));//机具SN
-                    String iccidNum = String.valueOf(object.get(5));//iccid
-                    String consignee = String.valueOf(object.get(6));//收货人
+        threadPoolTaskExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    OInternetCard oInternetCard = new OInternetCard();
+                    for (List<Object> object : excelList) {
+                        if(importType.equals(CardImportType.A.getValue())){
+                            String issuer = String.valueOf(object.get(0));//发卡方
+                            String InternetCardNum = String.valueOf(object.get(1));//物联卡号
+                            String iccidNum = String.valueOf(object.get(2));//ICCID
+                            String openAccountTime = String.valueOf(object.get(3));//开户日期
 
-                    oInternetCard.setConsigner(consigner);
-                    if(StringUtils.isNotBlank(deliverTime))
-                    oInternetCard.setDeliverTime(DateUtils.parseDate(deliverTime,dateFormat));
-                    oInternetCard.setOrderId(orderId);
-                    oInternetCard.setAgentName(agentName);
-                    oInternetCard.setSnNum(snNum);
-                    oInternetCard.setIccidNum(iccidNum);
-                    oInternetCard.setConsignee(consignee);
-                }else if(importType.equals(CardImportType.C.getValue())){
-                    String orderId = String.valueOf(object.get(0));//订单编号
-                    String agentName = String.valueOf(object.get(1));//代理商名称
-                    String snCount = String.valueOf(object.get(2));//数量
-                    String deliverTime = String.valueOf(object.get(3));//发货日期
-                    String beginSn = String.valueOf(object.get(4));//iccid开始号段
-                    String endSn = String.valueOf(object.get(5));//iccid结束号段
+                            oInternetCard.setIccidNum(iccidNum);
+                            oInternetCard.setIssuer(issuer);
+                            oInternetCard.setInternetCardNum(InternetCardNum);
+                            if(StringUtils.isNotBlank(openAccountTime))
+                            oInternetCard.setOpenAccountTime(DateUtils.parseDate(openAccountTime,dateFormat));
+                        }else if(importType.equals(CardImportType.B.getValue())){
+                            String consigner = String.valueOf(object.get(0));//发货方
+                            String deliverTime = String.valueOf(object.get(1));//发货日期
+                            String orderId = String.valueOf(object.get(2));//订单号
+                            String agentName = String.valueOf(object.get(3));//代理商名称
+                            String snNum = String.valueOf(object.get(4));//机具SN
+                            String iccidNum = String.valueOf(object.get(5));//iccid
+                            String consignee = String.valueOf(object.get(6));//收货人
 
-                    oInternetCard.setOrderId(orderId);
-                    oInternetCard.setAgentName(agentName);
-                    oInternetCard.setSnCount(snCount);
-                    if(StringUtils.isNotBlank(deliverTime))
-                    oInternetCard.setDeliverTime(DateUtils.parseDate(deliverTime,dateFormat));
-                    oInternetCard.setBeginSn(beginSn);
-                    oInternetCard.setEndSn(endSn);
-                }else if(importType.equals(CardImportType.D.getValue())){
-                    String orderId = String.valueOf(object.get(0));//订单号
-                    String agentName = String.valueOf(object.get(1));//公司名称
-                    String manufacturer = String.valueOf(object.get(2));//厂家
-                    String beginSn = String.valueOf(object.get(3));//机具sn起始编号
-                    String endSn = String.valueOf(object.get(4));//机具sn终端编号
-                    String snCount = String.valueOf(object.get(5));//数量
-                    String deliverTime = String.valueOf(object.get(6));//发货日期
+                            oInternetCard.setConsigner(consigner);
+                            if(StringUtils.isNotBlank(deliverTime))
+                            oInternetCard.setDeliverTime(DateUtils.parseDate(deliverTime,dateFormat));
+                            oInternetCard.setOrderId(orderId);
+                            oInternetCard.setAgentName(agentName);
+                            oInternetCard.setSnNum(snNum);
+                            oInternetCard.setIccidNum(iccidNum);
+                            oInternetCard.setConsignee(consignee);
+                        }else if(importType.equals(CardImportType.C.getValue())){
+                            String orderId = String.valueOf(object.get(0));//订单编号
+                            String agentName = String.valueOf(object.get(1));//代理商名称
+                            String snCount = String.valueOf(object.get(2));//数量
+                            String deliverTime = String.valueOf(object.get(3));//发货日期
+                            String beginSn = String.valueOf(object.get(4));//iccid开始号段
+                            String endSn = String.valueOf(object.get(5));//iccid结束号段
 
-                    oInternetCard.setOrderId(orderId);
-                    oInternetCard.setAgentName(agentName);
-                    oInternetCard.setManufacturer(manufacturer);
-                    oInternetCard.setBeginSn(beginSn);
-                    oInternetCard.setEndSn(endSn);
-                    oInternetCard.setSnCount(snCount);
-                    if(StringUtils.isNotBlank(deliverTime))
-                    oInternetCard.setDeliverTime(DateUtils.parseDate(deliverTime,dateFormat));
-                }else if(importType.equals(CardImportType.E.getValue())){
-                    String iccidNum = String.valueOf(object.get(0));//ICCID
-                    String internetCardStatus = String.valueOf(object.get(1));//物联卡状态
-                    String openAccountTime = String.valueOf(object.get(2));//开户日期
-                    String merId = String.valueOf(object.get(3));//商户编号
-                    String latelyPayTime = String.valueOf(object.get(4));//最近交易日期
-                    String merName = String.valueOf(object.get(5));//商户名称
-                    String agentName = String.valueOf(object.get(6));//代理商名称
+                            oInternetCard.setOrderId(orderId);
+                            oInternetCard.setAgentName(agentName);
+                            oInternetCard.setSnCount(snCount);
+                            if(StringUtils.isNotBlank(deliverTime))
+                            oInternetCard.setDeliverTime(DateUtils.parseDate(deliverTime,dateFormat));
+                            oInternetCard.setBeginSn(beginSn);
+                            oInternetCard.setEndSn(endSn);
+                        }else if(importType.equals(CardImportType.D.getValue())){
+                            String orderId = String.valueOf(object.get(0));//订单号
+                            String agentName = String.valueOf(object.get(1));//公司名称
+                            String manufacturer = String.valueOf(object.get(2));//厂家
+                            String beginSn = String.valueOf(object.get(3));//机具sn起始编号
+                            String endSn = String.valueOf(object.get(4));//机具sn终端编号
+                            String snCount = String.valueOf(object.get(5));//数量
+                            String deliverTime = String.valueOf(object.get(6));//发货日期
 
-                    oInternetCard.setIccidNum(iccidNum);
-                    BigDecimal contentByMsg = InternetCardStatus.getContentByMsg(internetCardStatus);
-                    if(contentByMsg==null){
-                        contentByMsg = InternetCardStatus.UNKNOWN.getValue();
+                            oInternetCard.setOrderId(orderId);
+                            oInternetCard.setAgentName(agentName);
+                            oInternetCard.setManufacturer(manufacturer);
+                            oInternetCard.setBeginSn(beginSn);
+                            oInternetCard.setEndSn(endSn);
+                            oInternetCard.setSnCount(snCount);
+                            if(StringUtils.isNotBlank(deliverTime))
+                            oInternetCard.setDeliverTime(DateUtils.parseDate(deliverTime,dateFormat));
+                        }else if(importType.equals(CardImportType.E.getValue())){
+                            String iccidNum = String.valueOf(object.get(0));//ICCID
+                            String internetCardStatus = String.valueOf(object.get(1));//物联卡状态
+                            String openAccountTime = String.valueOf(object.get(2));//开户日期
+                            String merId = String.valueOf(object.get(3));//商户编号
+                            String latelyPayTime = String.valueOf(object.get(4));//最近交易日期
+                            String merName = String.valueOf(object.get(5));//商户名称
+                            String agentName = String.valueOf(object.get(6));//代理商名称
+
+                            oInternetCard.setIccidNum(iccidNum);
+                            BigDecimal contentByMsg = InternetCardStatus.getContentByMsg(internetCardStatus);
+                            if(contentByMsg==null){
+                                contentByMsg = InternetCardStatus.UNKNOWN.getValue();
+                            }
+                            oInternetCard.setInternetCardStatus(contentByMsg);
+                            oInternetCard.setLatelyPayTime(latelyPayTime);
+                            if(StringUtils.isNotBlank(openAccountTime))
+                            oInternetCard.setOpenAccountTime(DateUtils.parseDate(openAccountTime,dateFormat));
+                            oInternetCard.setMerId(merId);
+                            oInternetCard.setMerName(merName);
+                            oInternetCard.setAgentName(agentName);
+                        }
+                        String jsonList = JsonUtil.objectToJson(oInternetCard);
+                        OInternetCardImport oInternetCardImport = new OInternetCardImport();
+                        oInternetCardImport.setId(idService.genId(TabId.O_INTERNET_CARD_IMPORT));
+                        oInternetCardImport.setImportMsg(jsonList);
+                        oInternetCardImport.setImportStatus(OInternetCardImportStatus.UNTREATED.getValue());
+                        oInternetCardImport.setImportType(importType);
+                        oInternetCardImport.setBatchNum(batchNo);
+                        Date date = new Date();
+                        oInternetCardImport.setcTime(date);
+                        oInternetCardImport.setuTime(date);
+                        oInternetCardImport.setcUser(userId);
+                        oInternetCardImport.setuUser(userId);
+                        oInternetCardImport.setStatus(Status.STATUS_1.status);
+                        oInternetCardImport.setVersion(BigDecimal.ONE);
+                        internetCardImportMapper.insert(oInternetCardImport);
                     }
-                    oInternetCard.setInternetCardStatus(contentByMsg);
-                    oInternetCard.setLatelyPayTime(latelyPayTime);
-                    if(StringUtils.isNotBlank(openAccountTime))
-                    oInternetCard.setOpenAccountTime(DateUtils.parseDate(openAccountTime,dateFormat));
-                    oInternetCard.setMerId(merId);
-                    oInternetCard.setMerName(merName);
-                    oInternetCard.setAgentName(agentName);
+                }catch (Exception e) {
+                    e.printStackTrace();
                 }
-                cardList.add(oInternetCard);
-                String jsonList = JsonUtil.objectToJson(cardList);
-                OInternetCardImport oInternetCardImport = new OInternetCardImport();
-                oInternetCardImport.setId(idService.genId(TabId.O_INTERNET_CARD_IMPORT));
-                oInternetCardImport.setImportMsg(jsonList);
-                oInternetCardImport.setImportStatus(OInternetCardImportStatus.UNTREATED.getValue());
-                oInternetCardImport.setImportType(importType);
-                oInternetCardImport.setBatchNum(batchNo);
-                Date date = new Date();
-                oInternetCardImport.setcTime(date);
-                oInternetCardImport.setuTime(date);
-                oInternetCardImport.setcUser(userId);
-                oInternetCardImport.setuUser(userId);
-                oInternetCardImport.setStatus(Status.STATUS_1.status);
-                oInternetCardImport.setVersion(BigDecimal.ONE);
-                internetCardImportMapper.insert(oInternetCardImport);
             }
-        }catch (Exception e) {
-            e.printStackTrace();
-            throw new MessageException("excel解析失败");
-        }
+        });
     }
-
 }
