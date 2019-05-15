@@ -22,6 +22,8 @@ public class DateUtil {
     public final static String DATE_FORMAT_3 = "yyyyMMdd";
     public final static String DATE_FORMAT_4 = "yyyyMMddHHmmssss";
     public final static String DATE_FORMAT_yyyyMM = "yyyyMM";
+    public final static String DATE_FORMAT_yyyy_MM_dd = "yyyy-MM-dd";
+    public final static String DATE_FORMAT_yyyy_MM_dd2 = "yyyy/MM/dd";
 
 
     public final static SimpleDateFormat sdfDays = new SimpleDateFormat(

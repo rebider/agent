@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.order.OInternetCardMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.OInternetCard">
+    <id column="ICCID_NUM" jdbcType="VARCHAR" property="iccidNum" />
+    <result column="CARD_IMPORT_ID" jdbcType="VARCHAR" property="cardImportId" />
+    <result column="BATCH_NUM" jdbcType="VARCHAR" property="batchNum" />
+    <result column="SN_NUM" jdbcType="VARCHAR" property="snNum" />
+    <result column="CONSIGNER" jdbcType="VARCHAR" property="consigner" />
+    <result column="DELIVER_TIME" jdbcType="TIMESTAMP" property="deliverTime" />
+    <result column="CONSIGNEE" jdbcType="VARCHAR" property="consignee" />
+    <result column="ORDER_ID" jdbcType="VARCHAR" property="orderId" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="INTERNET_CARD_NUM" jdbcType="VARCHAR" property="internetCardNum" />
+    <result column="ISSUER" jdbcType="VARCHAR" property="issuer" />
+    <result column="OPEN_ACCOUNT_TIME" jdbcType="TIMESTAMP" property="openAccountTime" />
+    <result column="EXPIRE_TIME" jdbcType="TIMESTAMP" property="expireTime" />
+    <result column="INTERNET_CARD_STATUS" jdbcType="DECIMAL" property="internetCardStatus" />
+    <result column="MER_ID" jdbcType="VARCHAR" property="merId" />
+    <result column="LATELY_PAY_TIME" jdbcType="VARCHAR" property="latelyPayTime" />
+    <result column="MER_NAME" jdbcType="VARCHAR" property="merName" />
+    <result column="MANUFACTURER" jdbcType="VARCHAR" property="manufacturer" />
+    <result column="RENEW" jdbcType="DECIMAL" property="renew" />
+    <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
+    <result column="U_TIME" jdbcType="TIMESTAMP" property="uTime" />
+    <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
+    <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="VERSION" jdbcType="DECIMAL" property="version" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ICCID_NUM, CARD_IMPORT_ID, BATCH_NUM, SN_NUM, CONSIGNER, DELIVER_TIME, CONSIGNEE,
+    ORDER_ID, AGENT_ID, AGENT_NAME, INTERNET_CARD_NUM, ISSUER, OPEN_ACCOUNT_TIME, EXPIRE_TIME,
+    INTERNET_CARD_STATUS, MER_ID, LATELY_PAY_TIME, MER_NAME, MANUFACTURER, RENEW, C_TIME,
+    U_TIME, C_USER, U_USER, STATUS, VERSION
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from O_INTERNET_CARD
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from O_INTERNET_CARD
+    where ICCID_NUM = #{iccidNum,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardExample">
+    delete from O_INTERNET_CARD
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OInternetCard">
+    insert into O_INTERNET_CARD (ICCID_NUM, CARD_IMPORT_ID, BATCH_NUM,
+    SN_NUM, CONSIGNER, DELIVER_TIME,
+    CONSIGNEE, ORDER_ID, AGENT_ID,
+    AGENT_NAME, INTERNET_CARD_NUM, ISSUER,
+    OPEN_ACCOUNT_TIME, EXPIRE_TIME, INTERNET_CARD_STATUS,
+    MER_ID, LATELY_PAY_TIME, MER_NAME,
+    MANUFACTURER, RENEW, C_TIME,
+    U_TIME, C_USER, U_USER,
+    STATUS, VERSION)
+    values (#{iccidNum,jdbcType=VARCHAR}, #{cardImportId,jdbcType=VARCHAR}, #{batchNum,jdbcType=VARCHAR},
+    #{snNum,jdbcType=VARCHAR}, #{consigner,jdbcType=VARCHAR}, #{deliverTime,jdbcType=TIMESTAMP},
+    #{consignee,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
+    #{agentName,jdbcType=VARCHAR}, #{internetCardNum,jdbcType=VARCHAR}, #{issuer,jdbcType=VARCHAR},
+    #{openAccountTime,jdbcType=TIMESTAMP}, #{expireTime,jdbcType=TIMESTAMP}, #{internetCardStatus,jdbcType=DECIMAL},
+    #{merId,jdbcType=VARCHAR}, #{latelyPayTime,jdbcType=VARCHAR}, #{merName,jdbcType=VARCHAR},
+    #{manufacturer,jdbcType=VARCHAR}, #{renew,jdbcType=DECIMAL}, #{cTime,jdbcType=TIMESTAMP},
+    #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR},
+    #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OInternetCard">
+    insert into O_INTERNET_CARD
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="iccidNum != null">
+        ICCID_NUM,
+      </if>
+      <if test="cardImportId != null">
+        CARD_IMPORT_ID,
+      </if>
+      <if test="batchNum != null">
+        BATCH_NUM,
+      </if>
+      <if test="snNum != null">
+        SN_NUM,
+      </if>
+      <if test="consigner != null">
+        CONSIGNER,
+      </if>
+      <if test="deliverTime != null">
+        DELIVER_TIME,
+      </if>
+      <if test="consignee != null">
+        CONSIGNEE,
+      </if>
+      <if test="orderId != null">
+        ORDER_ID,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
+      <if test="internetCardNum != null">
+        INTERNET_CARD_NUM,
+      </if>
+      <if test="issuer != null">
+        ISSUER,
+      </if>
+      <if test="openAccountTime != null">
+        OPEN_ACCOUNT_TIME,
+      </if>
+      <if test="expireTime != null">
+        EXPIRE_TIME,
+      </if>
+      <if test="internetCardStatus != null">
+        INTERNET_CARD_STATUS,
+      </if>
+      <if test="merId != null">
+        MER_ID,
+      </if>
+      <if test="latelyPayTime != null">
+        LATELY_PAY_TIME,
+      </if>
+      <if test="merName != null">
+        MER_NAME,
+      </if>
+      <if test="manufacturer != null">
+        MANUFACTURER,
+      </if>
+      <if test="renew != null">
+        RENEW,
+      </if>
+      <if test="cTime != null">
+        C_TIME,
+      </if>
+      <if test="uTime != null">
+        U_TIME,
+      </if>
+      <if test="cUser != null">
+        C_USER,
+      </if>
+      <if test="uUser != null">
+        U_USER,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="version != null">
+        VERSION,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="iccidNum != null">
+        #{iccidNum,jdbcType=VARCHAR},
+      </if>
+      <if test="cardImportId != null">
+        #{cardImportId,jdbcType=VARCHAR},
+      </if>
+      <if test="batchNum != null">
+        #{batchNum,jdbcType=VARCHAR},
+      </if>
+      <if test="snNum != null">
+        #{snNum,jdbcType=VARCHAR},
+      </if>
+      <if test="consigner != null">
+        #{consigner,jdbcType=VARCHAR},
+      </if>
+      <if test="deliverTime != null">
+        #{deliverTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="consignee != null">
+        #{consignee,jdbcType=VARCHAR},
+      </if>
+      <if test="orderId != null">
+        #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="internetCardNum != null">
+        #{internetCardNum,jdbcType=VARCHAR},
+      </if>
+      <if test="issuer != null">
+        #{issuer,jdbcType=VARCHAR},
+      </if>
+      <if test="openAccountTime != null">
+        #{openAccountTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="expireTime != null">
+        #{expireTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="internetCardStatus != null">
+        #{internetCardStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="merId != null">
+        #{merId,jdbcType=VARCHAR},
+      </if>
+      <if test="latelyPayTime != null">
+        #{latelyPayTime,jdbcType=VARCHAR},
+      </if>
+      <if test="merName != null">
+        #{merName,jdbcType=VARCHAR},
+      </if>
+      <if test="manufacturer != null">
+        #{manufacturer,jdbcType=VARCHAR},
+      </if>
+      <if test="renew != null">
+        #{renew,jdbcType=DECIMAL},
+      </if>
+      <if test="cTime != null">
+        #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uTime != null">
+        #{uTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUser != null">
+        #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="uUser != null">
+        #{uUser,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardExample" resultType="java.lang.Long">
+    select count(*) from O_INTERNET_CARD
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.OInternetCard">
+    update O_INTERNET_CARD
+    <set>
+      <if test="cardImportId != null">
+        CARD_IMPORT_ID = #{cardImportId,jdbcType=VARCHAR},
+      </if>
+      <if test="batchNum != null">
+        BATCH_NUM = #{batchNum,jdbcType=VARCHAR},
+      </if>
+      <if test="snNum != null">
+        SN_NUM = #{snNum,jdbcType=VARCHAR},
+      </if>
+      <if test="consigner != null">
+        CONSIGNER = #{consigner,jdbcType=VARCHAR},
+      </if>
+      <if test="deliverTime != null">
+        DELIVER_TIME = #{deliverTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="consignee != null">
+        CONSIGNEE = #{consignee,jdbcType=VARCHAR},
+      </if>
+      <if test="orderId != null">
+        ORDER_ID = #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="internetCardNum != null">
+        INTERNET_CARD_NUM = #{internetCardNum,jdbcType=VARCHAR},
+      </if>
+      <if test="issuer != null">
+        ISSUER = #{issuer,jdbcType=VARCHAR},
+      </if>
+      <if test="openAccountTime != null">
+        OPEN_ACCOUNT_TIME = #{openAccountTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="expireTime != null">
+        EXPIRE_TIME = #{expireTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="internetCardStatus != null">
+        INTERNET_CARD_STATUS = #{internetCardStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="merId != null">
+        MER_ID = #{merId,jdbcType=VARCHAR},
+      </if>
+      <if test="latelyPayTime != null">
+        LATELY_PAY_TIME = #{latelyPayTime,jdbcType=VARCHAR},
+      </if>
+      <if test="merName != null">
+        MER_NAME = #{merName,jdbcType=VARCHAR},
+      </if>
+      <if test="manufacturer != null">
+        MANUFACTURER = #{manufacturer,jdbcType=VARCHAR},
+      </if>
+      <if test="renew != null">
+        RENEW = #{renew,jdbcType=DECIMAL},
+      </if>
+      <if test="cTime != null">
+        C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uTime != null">
+        U_TIME = #{uTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUser != null">
+        C_USER = #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="uUser != null">
+        U_USER = #{uUser,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        VERSION = #{version,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ICCID_NUM = #{iccidNum,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OInternetCard">
+    update O_INTERNET_CARD
+    set CARD_IMPORT_ID = #{cardImportId,jdbcType=VARCHAR},
+      BATCH_NUM = #{batchNum,jdbcType=VARCHAR},
+      SN_NUM = #{snNum,jdbcType=VARCHAR},
+      CONSIGNER = #{consigner,jdbcType=VARCHAR},
+      DELIVER_TIME = #{deliverTime,jdbcType=TIMESTAMP},
+      CONSIGNEE = #{consignee,jdbcType=VARCHAR},
+      ORDER_ID = #{orderId,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      INTERNET_CARD_NUM = #{internetCardNum,jdbcType=VARCHAR},
+      ISSUER = #{issuer,jdbcType=VARCHAR},
+      OPEN_ACCOUNT_TIME = #{openAccountTime,jdbcType=TIMESTAMP},
+      EXPIRE_TIME = #{expireTime,jdbcType=TIMESTAMP},
+      INTERNET_CARD_STATUS = #{internetCardStatus,jdbcType=DECIMAL},
+      MER_ID = #{merId,jdbcType=VARCHAR},
+      LATELY_PAY_TIME = #{latelyPayTime,jdbcType=VARCHAR},
+      MER_NAME = #{merName,jdbcType=VARCHAR},
+      MANUFACTURER = #{manufacturer,jdbcType=VARCHAR},
+      RENEW = #{renew,jdbcType=DECIMAL},
+      C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      U_TIME = #{uTime,jdbcType=TIMESTAMP},
+      C_USER = #{cUser,jdbcType=VARCHAR},
+      U_USER = #{uUser,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL},
+      VERSION = #{version,jdbcType=DECIMAL}
+    where ICCID_NUM = #{iccidNum,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from (
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

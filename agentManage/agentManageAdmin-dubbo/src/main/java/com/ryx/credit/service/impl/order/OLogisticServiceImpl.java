@@ -792,7 +792,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             throw new ProcessException("无此物流信息");
         }
         OLogistics ol = oLogistics.get(0);
-        if (!ol.getProCom().equals(CardImportType.LD.msg)) {
+        if (!ol.getProCom().equals("联迪")) {
             if (null == begins) {
                 logger.info("开始截取的位数为空{}:", begins);
                 throw new ProcessException("开始截取的位数为空");
@@ -968,7 +968,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             logger.info("厂家为空");
             throw new MessageException("厂家为空");
         }
-        if (CardImportType.LD.name().equals(proCom) || proCom.equals(CardImportType.LD.msg) || proCom.equals(CardImportType.LD.code)) {
+        if ("LD".equals(proCom) || proCom.equals("联迪")) {
             list= getBetweenValues(startSn, endSn);
         }else {
             Map digit = Conver10ToConver33Utils.getDigit(startSn, endSn);

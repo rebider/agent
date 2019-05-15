@@ -13,7 +13,5 @@ public interface InternetCardService {
 
     PageInfo internetCardList(OInternetCard internetCard, Page page);
 
-    List<OInternetCard> exportInternetCard(OInternetCard internetCard);
-
     void importInternetCard(List<List<Object>> excelList, String importType, String userId)throws Exception;
 }
