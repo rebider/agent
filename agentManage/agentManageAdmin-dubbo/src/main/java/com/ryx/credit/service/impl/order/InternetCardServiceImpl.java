@@ -7,9 +7,12 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.order.OInternetCardImportMapper;
 import com.ryx.credit.dao.order.OInternetCardMapper;
+import com.ryx.credit.pojo.admin.agent.Agent;
+import com.ryx.credit.pojo.admin.agent.AgentExample;
 import com.ryx.credit.pojo.admin.order.OInternetCard;
 import com.ryx.credit.pojo.admin.order.OInternetCardExample;
 import com.ryx.credit.pojo.admin.order.OInternetCardImport;
+import com.ryx.credit.pojo.admin.order.OInternetCardImportExample;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.InternetCardService;
@@ -45,11 +48,11 @@ public class InternetCardServiceImpl implements InternetCardService {
     @Autowired
     private IdService idService;
     @Autowired
-    private AgentMapper agentMapper;
-    @Autowired
     private DictOptionsService dictOptionsService;
     @Autowired
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+    @Autowired
+    private AgentMapper agentMapper;
 
 
     @Override
@@ -74,7 +77,6 @@ public class InternetCardServiceImpl implements InternetCardService {
 
 
 
-    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     @Override
     public void importInternetCard(List<List<Object>> excelList, String importType, String userId,String batchNo)throws Exception{
 
@@ -189,10 +191,94 @@ public class InternetCardServiceImpl implements InternetCardService {
                         oInternetCardImport.setVersion(BigDecimal.ONE);
                         internetCardImportMapper.insert(oInternetCardImport);
                     }
+                    analysisImport(batchNo);
                 }catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
+    }
+
+
+    public void analysisImport(String batchNo){
+
+        OInternetCardImportExample oInternetCardImportExample = new OInternetCardImportExample();
+        OInternetCardImportExample.Criteria criteria = oInternetCardImportExample.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andBatchNumEqualTo(batchNo);
+        criteria.andImportStatusEqualTo(OInternetCardImportStatus.UNTREATED.getValue());
+        List<OInternetCardImport> oInternetCardImports = internetCardImportMapper.selectByExample(oInternetCardImportExample);
+        for (OInternetCardImport oInternetCardImport : oInternetCardImports) {
+            try {
+                String importType = oInternetCardImport.getImportType();
+                OInternetCard internetCard = JsonUtil.jsonToPojo(oInternetCardImport.getImportMsg(), OInternetCard.class);
+                if(importType.equals(CardImportType.A.getValue()) || importType.equals(CardImportType.B.getValue()) || importType.equals(CardImportType.E.getValue())){
+                    if(StringUtils.isBlank(internetCard.getIccidNum())){
+                        oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
+                        oInternetCardImport.setErrorMsg("缺少iccid");
+                        //更新导入记录
+                        updateInternetCardImport(oInternetCardImport);
+                    }
+                    OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(internetCard.getIccidNum());
+                    internetCard.setBatchNum(oInternetCardImport.getBatchNum());
+                    internetCard.setCardImportId(oInternetCardImport.getId());
+                    if(internetCard.getOpenAccountTime()!=null){
+                        Date date = DateUtil.aYearAgoDate(internetCard.getOpenAccountTime());
+                        internetCard.setExpireTime(date);
+                    }
+                    if(StringUtils.isNotBlank(internetCard.getAgentName())){
+                        AgentExample agentExample = new AgentExample();
+                        AgentExample.Criteria criteria1 = agentExample.createCriteria();
+                        criteria1.andStatusEqualTo(Status.STATUS_1.status);
+                        criteria1.andAgNameEqualTo(internetCard.getAgentName());
+                        List<Agent> agents = agentMapper.selectByExample(agentExample);
+                        if(agents.size()!=0){
+                            Agent agent = agents.get(0);
+                            internetCard.setAgentId(agent.getId());
+                        }
+                    }
+                    if(oInternetCard==null){
+                        internetCard.setcUser(oInternetCardImport.getcUser());
+                        insertInternetCard(internetCard);
+                    }else{
+                        updateInternetCard(internetCard);
+                    }
+                    oInternetCardImport.setImportStatus(OInternetCardImportStatus.SUCCESS.getValue());
+                    updateInternetCardImport(oInternetCardImport);
+                }else if(importType.equals(CardImportType.C.getValue())){
+
+                }else if(importType.equals(CardImportType.D.getValue())){
+
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void insertInternetCard(OInternetCard internetCard)throws Exception{
+        internetCard.setuUser(internetCard.getcUser());
+        Date date = new Date();
+        internetCard.setcTime(date);
+        internetCard.setuTime(date);
+        internetCard.setStatus(Status.STATUS_1.status);
+        internetCard.setVersion(BigDecimal.ONE);
+        internetCardMapper.insert(internetCard);
+    }
+
+    public void updateInternetCard(OInternetCard internetCard)throws MessageException{
+        if(StringUtils.isBlank(internetCard.getIccidNum())){
+            throw new MessageException("iccid为空");
+        }
+        internetCard.setuTime(new Date());
+        int i = internetCardMapper.updateByPrimaryKeySelective(internetCard);
+        if(i!=1){
+            throw new MessageException("更新失败");
+        }
+    }
+
+    public void updateInternetCardImport(OInternetCardImport internetCardImport)throws MessageException{
+        internetCardImport.setuTime(new Date());
+        internetCardImportMapper.updateByPrimaryKeySelective(internetCardImport);
     }
 }
