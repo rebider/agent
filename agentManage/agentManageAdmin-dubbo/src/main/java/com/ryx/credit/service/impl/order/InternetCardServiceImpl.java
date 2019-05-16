@@ -56,6 +56,8 @@ public class InternetCardServiceImpl implements InternetCardService {
     private AgentMapper agentMapper;
     @Autowired
     private OLogisticsService logisticsService;
+    @Autowired
+    private InternetCardService internetCardService;
 
 
     @Override
@@ -203,6 +205,10 @@ public class InternetCardServiceImpl implements InternetCardService {
     }
 
 
+    /**
+     * 处理导入表数据
+     * @param batchNo
+     */
     public void analysisImport(String batchNo){
 
         OInternetCardImportExample oInternetCardImportExample = new OInternetCardImportExample();
@@ -238,7 +244,22 @@ public class InternetCardServiceImpl implements InternetCardService {
                         disposeInternetCard(oInternetCardImport,internetCard);
                     }
                 }else if(importType.equals(CardImportType.D.getValue())){
-
+                    if(StringUtils.isBlank(internetCard.getBeginSn()) || StringUtils.isBlank(internetCard.getSnCount())){
+                        oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
+                        oInternetCardImport.setErrorMsg("缺少SN开始号段或总数量");
+                        //更新导入记录
+                        updateInternetCardImport(oInternetCardImport);
+                        continue;
+                    }
+                    List<String> snList = logisticsService.idList(internetCard.getBeginSn(), StringUtils.isBlank(internetCard.getEndSn())?internetCard.getBeginSn():internetCard.getEndSn());
+                    if(snList.size()!=Integer.parseInt(RegexUtil.rvZeroAndDot(internetCard.getSnCount()))){
+                        oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
+                        oInternetCardImport.setErrorMsg("SN号段与数量不匹配");
+                        //更新导入记录
+                        updateInternetCardImport(oInternetCardImport);
+                        continue;
+                    }
+                    internetCardService.disposeSn(snList,internetCard,oInternetCardImport);
                 }
             } catch (MessageException e) {
                 e.printStackTrace();
@@ -263,6 +284,12 @@ public class InternetCardServiceImpl implements InternetCardService {
         }
     }
 
+    /**
+     * 处理业务逻辑
+     * @param oInternetCardImport
+     * @param internetCard
+     * @throws Exception
+     */
     public void disposeInternetCard(OInternetCardImport oInternetCardImport,OInternetCard internetCard)throws Exception{
         if(StringUtils.isBlank(internetCard.getIccidNum())){
             oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
@@ -298,6 +325,40 @@ public class InternetCardServiceImpl implements InternetCardService {
         oInternetCardImport.setImportStatus(OInternetCardImportStatus.SUCCESS.getValue());
         updateInternetCardImport(oInternetCardImport);
     }
+
+    /**
+     * 退货转发sn 处理
+     * @param snList
+     * @param internetCard
+     * @param oInternetCardImport
+     * @throws MessageException
+     */
+    @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
+    @Override
+    public void disposeSn(List<String> snList,OInternetCard internetCard,OInternetCardImport oInternetCardImport)throws MessageException{
+        for (String snNum : snList) {
+            OInternetCardExample oInternetCardExample = new OInternetCardExample();
+            OInternetCardExample.Criteria criteria = oInternetCardExample.createCriteria();
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
+            criteria.andSnNumEqualTo(snNum);
+            List<OInternetCard> oInternetCards = internetCardMapper.selectByExample(oInternetCardExample);
+            if(oInternetCards.size()==0){
+                throw new MessageException("sn:"+snNum+"不存在");
+            }
+            if(oInternetCards.size()!=1){
+                throw new MessageException("sn:"+snNum+"不唯一");
+            }
+            OInternetCard oInternetCard = oInternetCards.get(0);
+            oInternetCard.setOrderId(internetCard.getOrderId());
+            oInternetCard.setAgentName(internetCard.getAgentName());
+            oInternetCard.setManufacturer(internetCard.getManufacturer());
+            oInternetCard.setDeliverTime(internetCard.getDeliverTime());
+            updateInternetCard(oInternetCard);
+            oInternetCardImport.setImportStatus(OInternetCardImportStatus.SUCCESS.getValue());
+            updateInternetCardImport(oInternetCardImport);
+        }
+    }
+
 
 
     public void insertInternetCard(OInternetCard internetCard)throws Exception{

@@ -43,7 +43,8 @@ public class DataHistoryInterceptor implements MethodInterceptor {
 
         boolean result = name.contains("update") || name.contains("insert") || name.contains("delete");
         String clazz = method.toString();
-        if(result && !clazz.contains("CSysLogMapper") && !clazz.contains("DataHistoryRecordMapper") && !clazz.contains("DataHistoryMapper")){
+        if(result && !clazz.contains("CSysLogMapper") && !clazz.contains("DataHistoryRecordMapper") && !clazz.contains("DataHistoryMapper")
+                && !clazz.contains("OInternetCardMapper") && !clazz.contains("OInternetCardImportMapper")){
             //获取该方法的传参
             Object[] paramsArr = mi.getArguments();
             Object o = paramsArr[0];
