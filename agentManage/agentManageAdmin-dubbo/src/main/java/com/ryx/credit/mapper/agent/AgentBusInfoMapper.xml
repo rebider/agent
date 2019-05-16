@@ -1089,4 +1089,10 @@ union
     left join A_pay_comp pc on bus.clo_pay_company = pc.id
     where bus.agent_id=#{agentId} and bus.CLO_PAY_COMPANY is not null
   </select>
+
+  <update id="updateBusLoginNum" parameterType="map">
+    update a_agent_businfo set BUS_LOGIN_NUM = #{reqMap.busLoginNum,jdbcType=VARCHAR}
+    where BUS_LOGIN_NUM = #{reqMap.oldBusLoginNum,jdbcType=VARCHAR}
+    and  bus_platform in (select platform_num from a_platform where platform_type=#{reqMap.platformType,jdbcType=VARCHAR})
+  </update>
 </mapper>

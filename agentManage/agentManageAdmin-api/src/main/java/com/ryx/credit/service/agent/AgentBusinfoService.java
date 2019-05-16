@@ -110,5 +110,5 @@ public interface AgentBusinfoService {
 
     String queryAgentId(String busNum)throws MessageException;
 
-    void updateBusLoginNum(String busNum,String BusLoginNum)throws MessageException;
+    void updateBusLoginNum(String oldBusLoginNum,String busLoginNum)throws MessageException;
 }
