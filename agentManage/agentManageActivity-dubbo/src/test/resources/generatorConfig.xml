@@ -53,7 +53,18 @@
 		<!--<table tableName="a_agent_quit_refund" domainObjectName="AgentQuitRefund" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
 
-		<table tableName="o_return_order" domainObjectName="OReturnOrder" enableUpdateByExample="false"
+		<!--<table tableName="o_return_order" domainObjectName="OReturnOrder" enableUpdateByExample="false"-->
+			   <!--enableDeleteByPrimaryKey="false"/>-->
+		<table tableName="o_logistics" domainObjectName="OLogistics" enableUpdateByExample="false"
+		enableDeleteByPrimaryKey="false"/>
+
+		<!--<table tableName="o_return_order" domainObjectName="OReturnOrder" enableUpdateByExample="false"-->
+			   <!--enableDeleteByPrimaryKey="false"/>-->
+		<!--<table tableName="o_logistics_detail_h" domainObjectName="OLogisticsDetailH" enableUpdateByExample="false"-->
+
+		<table tableName="O_RETURN_ORDER_DETAIL" domainObjectName="OReturnOrderDetail" enableUpdateByExample="false"
+		<table tableName="o_logistics_detail_h" domainObjectName="OLogisticsDetailH" enableUpdateByExample="false"
+		<table tableName="O_RETURN_ORDER_DETAIL" domainObjectName="OReturnOrderDetail" enableUpdateByExample="false"
 			   enableDeleteByPrimaryKey="false"/>
 	</context>
 </generatorConfiguration>

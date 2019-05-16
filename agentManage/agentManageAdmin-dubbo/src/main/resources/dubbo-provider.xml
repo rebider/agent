@@ -95,6 +95,7 @@
     <dubbo:service interface="com.ryx.credit.service.pay.LivenessDetectionService" ref="livenessDetectionService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.order.OCashReceivablesService" ref="oCashReceivablesService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.order.IOPdSumService" ref="OPdSumService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.order.OLogisticsDetailHService" ref="oLogisticsDetailHService" timeout="1200000" registry="${zk.group}"/>
 
     <!-- 基础资源维护-->
     <dubbo:service interface="com.ryx.credit.service.dict.PayCompService" ref="payCompService" timeout="1200000" registry="${zk.group}"></dubbo:service>
@@ -126,9 +127,12 @@
     <dubbo:service interface="com.ryx.credit.service.order.OrderImportService" ref="orderImportService"  timeout="1200000" registry="${zk.group}" />
     <dubbo:service interface="com.ryx.credit.service.order.OldOrderReturnService" ref="oldOrderReturnService"  timeout="1200000" registry="${zk.group}" />
     <dubbo:service interface="com.ryx.credit.service.order.NewOrderImportService" ref="newOrderImportService" timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.credit.service.profit.IPosProfitDataService" ref="posProfitDataService"  timeout="1200000" registry="${zk.group}" />
     <dubbo:service interface="com.ryx.credit.service.order.OldCompensateService" ref="oldCompensateService"  timeout="1200000" registry="${zk.group}" />
     <dubbo:service interface="com.ryx.credit.service.CRoleService" ref="cRoleService"  timeout="1200000" registry="${zk.group}" />
     <dubbo:service interface="com.ryx.credit.service.NotifyEmailService" ref="notifyEmailService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.credit.service.order.OsnOperateService" ref="osnOperateService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.credit.service.order.SplitService" ref="splitService"  timeout="1200000" registry="${zk.group}" />
 
 
   <!--  <dubbo:service interface="com.ryx.credit.service.order.OldOrderReturnService" ref="oldOrderReturnService"  timeout="1200000" registry="${zk.group}" />

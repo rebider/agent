@@ -30,6 +30,7 @@
     <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="ACTID" jdbcType="VARCHAR" property="actid" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -64,7 +65,7 @@
     ID, RETURN_ID, AGENT_ID, ORDER_ID, SUB_ORDER_ID, PRO_ID, PRO_CODE, PRO_NAME, PRO_TYPE, 
     PRO_COM, PRO_PRICE, IS_DEPOSIT, DEPOSIT, MODEL, BEGIN_SN, END_SN, BATCH_NO, ORDER_PRICE, 
     RETURN_PRICE, RETURN_COUNT, RETURN_AMT, RETURN_TIME, C_TIME, U_TIME, C_USER, U_USER, 
-    STATUS, VERSION
+    STATUS, VERSION, ACTID
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OReturnOrderDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -104,7 +105,7 @@
       RETURN_PRICE, RETURN_COUNT, RETURN_AMT, 
       RETURN_TIME, C_TIME, U_TIME, 
       C_USER, U_USER, STATUS, 
-      VERSION)
+      VERSION, ACTID)
     values (#{id,jdbcType=VARCHAR}, #{returnId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
       #{orderId,jdbcType=VARCHAR}, #{subOrderId,jdbcType=VARCHAR}, #{proId,jdbcType=VARCHAR}, 
       #{proCode,jdbcType=VARCHAR}, #{proName,jdbcType=VARCHAR}, #{proType,jdbcType=VARCHAR}, 
@@ -114,7 +115,7 @@
       #{returnPrice,jdbcType=DECIMAL}, #{returnCount,jdbcType=DECIMAL}, #{returnAmt,jdbcType=DECIMAL}, 
       #{returnTime,jdbcType=TIMESTAMP}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, 
       #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, 
-      #{version,jdbcType=DECIMAL})
+      #{version,jdbcType=DECIMAL}, #{actid,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OReturnOrderDetail">
     insert into O_RETURN_ORDER_DETAIL
@@ -203,6 +204,9 @@
       <if test="version != null">
         VERSION,
       </if>
+      <if test="actid != null">
+        ACTID,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -288,6 +292,9 @@
       </if>
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="actid != null">
+        #{actid,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -381,8 +388,11 @@
       <if test="version != null">
         VERSION = VERSION + 1,
       </if>
+      <if test="actid != null">
+        ACTID = #{actid,jdbcType=VARCHAR},
+      </if>
     </set>
-    where ID = #{id,jdbcType=VARCHAR} and  VERSION = #{version,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}  and  VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OReturnOrderDetail">
     update O_RETURN_ORDER_DETAIL
@@ -412,8 +422,9 @@
       C_USER = #{cUser,jdbcType=VARCHAR},
       U_USER = #{uUser,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = VERSION + 1
-    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
+      VERSION = VERSION + 1,
+      ACTID = #{actid,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}  and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
@@ -433,6 +444,7 @@
     (
      a.begin_sn &lt;= #{begin,jdbcType=VARCHAR}
      and a.end_sn &gt;= #{begin,jdbcType=VARCHAR}
+     and length(a.begin_sn) = length(#{begin,jdbcType=VARCHAR})
      and  b.ret_schedule in
     <foreach collection="sts" item="stsItem" open="(" separator="," close=")">
       ${stsItem}
@@ -442,6 +454,7 @@
     (
       a.begin_sn &lt;= #{end,jdbcType=VARCHAR}
       and a.end_sn &gt;= #{end,jdbcType=VARCHAR}
+      and length(a.end_sn) = length(#{end,jdbcType=VARCHAR})
       and  b.ret_schedule in
         <foreach collection="sts" item="stsItem" open="(" separator="," close=")">
           ${stsItem}

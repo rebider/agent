@@ -5,10 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.AppConfig;
-import com.ryx.credit.common.util.FastMap;
-import com.ryx.credit.common.util.HttpClientUtil;
-import com.ryx.credit.common.util.JsonUtil;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.*;
@@ -183,7 +180,7 @@ public class MposTermMachineServiceImpl implements TermMachineService {
         } catch (Exception e) {
             logger.error("首刷发送请求失败：",e);
             e.printStackTrace();
-            AppConfig.sendEmails("首刷发送请求失败："+e.getStackTrace(), "机具划拨通知手刷失败报警");
+            AppConfig.sendEmails("首刷发送请求失败："+ MailUtil.printStackTrace(e), "机具划拨通知手刷失败报警");
             throw e;
         }
 

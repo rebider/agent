@@ -4,6 +4,7 @@ import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
@@ -12,7 +13,6 @@ import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
 import com.ryx.credit.service.dict.IdService;
-import net.sf.ehcache.search.impl.BaseResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,7 +79,12 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         ac.setStatus(Status.STATUS_1.status);
         ac.setVarsion(Status.STATUS_1.status);
         ac.setId(idService.genId(TabId.a_agent_colinfo));
-        ac.setPayStatus(ColinfoPayStatus.A.getValue());
+        //导入的收款账户应该事收款成功
+        if(!ac.isImport()) {
+            ac.setPayStatus(ColinfoPayStatus.A.getValue());
+        }else {
+            ac.setPayStatus(ColinfoPayStatus.C.getValue());
+        }
         //银行卡扫描件
         boolean isHaveYHKSMJ = false;
         //开户许可证
@@ -371,7 +376,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
     }
 
     @Override
-    public AgentResult checkColInfo(AgentColinfo agentColinfo) {
+    public AgentResult checkColInfo(AgentColinfo agentColinfo) throws ProcessException{
         if(agentColinfo.isImport())return AgentResult.ok();
         /**
          * cxinfo 系统对开票和税点进行系统控制
@@ -382,8 +387,8 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
          */
         if(agentColinfo.getCloType().compareTo(new BigDecimal(2))==0){ //对私
             //税点检查
-            if(agentColinfo.getCloTaxPoint()==null || !"0.06".equals(agentColinfo.getCloTaxPoint().toString())){ //对私
-                throw new ProcessException("对私户进行打款，那么扣税点在代理商填写时默认为0.06且不可修改");
+            if(agentColinfo.getCloTaxPoint()==null || !"0.07".equals(agentColinfo.getCloTaxPoint().toString())){ //对私
+                throw new ProcessException("对私户进行打款，那么扣税点在代理商填写时默认为0.07且不可修改");
             }
             //是否开票检查
             if(agentColinfo.getCloInvoice().compareTo(new BigDecimal(0))!=0){ //对私
@@ -532,4 +537,21 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         }
         return AgentResult.ok("新增成功！");
     }
+
+    /**
+     * 查询代理商是否有多个收款账户
+     * @return
+     */
+    @Override
+    public AgentResult checkAgentColinfo() {
+        List<String> haveColinfo = agentColinfoMapper.queryAgentHaveColinfo();
+        if (haveColinfo.size() > 0) {
+            StringBuffer sb = new StringBuffer();
+            sb.append("代理商" + haveColinfo + "收款账户不唯一");
+            AppConfig.sendEmails(sb.toString(), "代理商收款账户不唯一");
+            logger.info("checkAgentColinfo: " + sb.toString());
+        }
+        return AgentResult.ok();
+    }
+
 }

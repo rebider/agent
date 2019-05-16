@@ -143,7 +143,7 @@ public class OldCompensateServiceImpl implements OldCompensateService {
             activityCriteria.andEndTimeGreaterThanOrEqualTo(date);
             List<OActivity> oActivities = activityMapper.selectByExample(oActivityExample);
             if(oActivities.size()==0){
-                throw new MessageException(snBegin+"到"+snEnd+":无可变更活动");
+                throw new MessageException(snBegin+"到"+snEnd+":无可变更活动,当前活动"+oActivity.getActivityName());
             }
             resultMap.put("changeActivitys",oActivities); //可变更的活动
             resultList.add(resultMap);
@@ -486,112 +486,118 @@ public class OldCompensateServiceImpl implements OldCompensateService {
         if(!agentResult.isOK()){
             throw new ProcessException("更新打款记录失败");
         }
+        if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
+            ORefundPriceDiffDetailExample oRefundPriceDiffDetailExample = new ORefundPriceDiffDetailExample();
+            ORefundPriceDiffDetailExample.Criteria criteria = oRefundPriceDiffDetailExample.createCriteria();
+            criteria.andRefundPriceDiffIdEqualTo(rel.getBusId());
+            List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(oRefundPriceDiffDetailExample);
+            oRefundPriceDiffDetails.forEach(row->{
 
-        ORefundPriceDiffDetailExample oRefundPriceDiffDetailExample = new ORefundPriceDiffDetailExample();
-        ORefundPriceDiffDetailExample.Criteria criteria = oRefundPriceDiffDetailExample.createCriteria();
-        criteria.andRefundPriceDiffIdEqualTo(rel.getBusId());
-        List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(oRefundPriceDiffDetailExample);
-
-        oRefundPriceDiffDetails.forEach(row->{
-
-            try {
-
-                ORefundPriceDiffDetailExample priceDiffDetailExample = new ORefundPriceDiffDetailExample();
-                ORefundPriceDiffDetailExample.Criteria detailcriteria = priceDiffDetailExample.createCriteria();
-                detailcriteria.andRefundPriceDiffIdEqualTo(oRefundPriceDiff.getId());
-                List<ORefundPriceDiffDetail> oRefundPriceDiffDetails1 = refundPriceDiffDetailMapper.selectByExample(priceDiffDetailExample);
-                for (ORefundPriceDiffDetail oRefundPriceDiffDetail : oRefundPriceDiffDetails1) {
-                    OSubOrderExample oSubOrderExample = new OSubOrderExample();
-                    OSubOrderExample.Criteria criteria2 = oSubOrderExample.createCriteria();
-                    criteria2.andProIdEqualTo(oRefundPriceDiffDetail.getProId());
-                    criteria2.andOrderIdEqualTo(oRefundPriceDiffDetail.getOrderId());
-                    criteria2.andStatusEqualTo(Status.STATUS_1.status);
-                    List<OSubOrder> oSubOrders = subOrderMapper.selectByExample(oSubOrderExample);
-                    if(oSubOrders.size()!=1){
-                        throw new ProcessException("退补差价:"+oRefundPriceDiffDetail.getOrderId()+":"+oRefundPriceDiffDetail.getProId()+"采购单查询数量不唯一");
-                    }
-                    OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
-                    OSubOrderActivityExample.Criteria criteria3 = oSubOrderActivityExample.createCriteria();
-                    criteria3.andSubOrderIdEqualTo(oSubOrders.get(0).getId()).andStatusEqualTo(Status.STATUS_1.status);
-                    List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
-                    if(oSubOrderActivities.size()!=1){
-                        throw new ProcessException("退补差价:"+oRefundPriceDiffDetail.getOrderId()+":"+oRefundPriceDiffDetail.getProId()+"采购单活动查询数量不唯一");
-                    }
-                    OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
-                    OActivity oActivity = activityMapper.selectByPrimaryKey(oRefundPriceDiffDetail.getActivityRealId());
-                    oSubOrderActivity.setActivityId(oActivity.getId());
-                    oSubOrderActivity.setActivityName(oActivity.getActivityName());
-                    oSubOrderActivity.setRuleId(oActivity.getRuleId());
-                    oSubOrderActivity.setActivityRule(oActivity.getActivityRule());
-                    oSubOrderActivity.setActivityWay(oActivity.getActivityWay());
-                    oSubOrderActivity.setProModel(oActivity.getProModel());
-                    oSubOrderActivity.setVender(oActivity.getVender());
-                    oSubOrderActivity.setgTime(oActivity.getgTime());
-                    oSubOrderActivity.setuTime(new Date());
-                    oSubOrderActivity.setuUser(oRefundPriceDiffDetail.getuUser());
-                    oSubOrderActivity.setPlatform(oActivity.getPlatform());
-                    oSubOrderActivity.setBusProCode(oActivity.getBusProCode());
-                    oSubOrderActivity.setBusProName(oActivity.getBusProName());
-                    oSubOrderActivity.setTermBatchcode(oActivity.getTermBatchcode());
-                    oSubOrderActivity.setTermBatchname(oActivity.getTermBatchname());
-                    oSubOrderActivity.setTermtype(oActivity.getTermtype());
-                    oSubOrderActivity.setTermtypename(oActivity.getTermtypename());
-                    oSubOrderActivity.setOriginalPrice(oActivity.getOriginalPrice());
-                    oSubOrderActivity.setPrice(oActivity.getPrice());
-                    oSubOrderActivity.setPosType(oActivity.getPosType());
-                    oSubOrderActivity.setPosSpePrice(oActivity.getPosSpePrice());
-                    oSubOrderActivity.setStandTime(oActivity.getStandTime());
-                    int j = subOrderActivityMapper.updateByPrimaryKeySelective(oSubOrderActivity);
-                    if(1!=j){
-                        throw new ProcessException("退补差价数据更新活动失败");
-                    }
-                }
-
-
-                //待调整集合 cxinfo 机具的调整  调货明细
-                OOrder oo = orderMapper.selectByPrimaryKey(row.getOrderId());
-                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oo.getBusId());
-                PlatformType platformType = platFormService.byPlatformCode(agentBusInfo.getBusPlatform());
-
-                OActivity activity = orderActivityService.findById(row.getActivityRealId());
-                OActivity activity_old = orderActivityService.findById(row.getActivityFrontId());
-                ChangeActMachineVo cav = new ChangeActMachineVo();
-                cav.setBusNum(agentBusInfo.getBusNum());
-                cav.setNewAct(activity.getBusProCode());
-                cav.setOldAct(activity_old.getBusProCode());
-                cav.setOptUser(row.getcUser());
-
-                String snBeginJson = redisService.hGet(row.getBeginSn() + "," + row.getEndSn(), row.getBeginSn());
-                Map<String, Object> snBeginMap = JsonUtil.jsonToMap(snBeginJson);
-                String snEndJson = redisService.hGet(row.getBeginSn() + "," + row.getEndSn(), row.getEndSn());
-                Map<String, Object> snEndMap = JsonUtil.jsonToMap(snEndJson);
-
-                cav.setSnStart(row.getBeginSn()+(StringUtils.isBlank(String.valueOf(snBeginMap.get("termCheck")))?"":String.valueOf(snBeginMap.get("termCheck"))));
-                cav.setSnEnd(row.getEndSn()+(StringUtils.isBlank(String.valueOf(snEndMap.get("termCheck")))?"":String.valueOf(snEndMap.get("termCheck"))));
-
-                cav.setPlatformType(platformType.code);
-                cav.setoRefundPriceDiffDetailId(row.getId());
-                List<OLogisticsDetail> logisticsDetailList = new ArrayList<>();
-                Set<String> snSet = redisService.hGet(row.getBeginSn() + "," + row.getEndSn());
-                for (String sn : snSet) {
-                    OLogisticsDetail oLogisticsDetail = new OLogisticsDetail();
-                    oLogisticsDetail.setSnNum(sn);
-                    oLogisticsDetail.setBusProCode(activity.getBusProCode());
-                    logisticsDetailList.add(oLogisticsDetail);
-                }
-                cav.setLogisticsDetailList(logisticsDetailList);
-                cav.setSnNum(String.valueOf(row.getChangeCount()));
-
-                //cxinfo 调用活动变更接口进行活动的变更
                 try {
-                    AgentResult chAgentResult = termMachineService.changeActMachine(cav);
-                    row.setSendMsg(chAgentResult.getMsg());
-                    if(chAgentResult.isOK()){
-                        row.setSendStatus(Status.STATUS_1.status);
-                    }else{
-                        row.setSendStatus(Status.STATUS_2.status);
+
+    //                ORefundPriceDiffDetailExample priceDiffDetailExample = new ORefundPriceDiffDetailExample();
+    //                ORefundPriceDiffDetailExample.Criteria detailcriteria = priceDiffDetailExample.createCriteria();
+    //                detailcriteria.andRefundPriceDiffIdEqualTo(oRefundPriceDiff.getId());
+    //                List<ORefundPriceDiffDetail> oRefundPriceDiffDetails1 = refundPriceDiffDetailMapper.selectByExample(priceDiffDetailExample);
+    //                for (ORefundPriceDiffDetail oRefundPriceDiffDetail : oRefundPriceDiffDetails1) {
+    //                    OSubOrderExample oSubOrderExample = new OSubOrderExample();
+    //                    OSubOrderExample.Criteria criteria2 = oSubOrderExample.createCriteria();
+    //                    criteria2.andProIdEqualTo(oRefundPriceDiffDetail.getProId());
+    //                    criteria2.andOrderIdEqualTo(oRefundPriceDiffDetail.getOrderId());
+    //                    criteria2.andStatusEqualTo(Status.STATUS_1.status);
+    //                    List<OSubOrder> oSubOrders = subOrderMapper.selectByExample(oSubOrderExample);
+    //                    if(oSubOrders.size()!=1){
+    //                        throw new ProcessException("退补差价:"+oRefundPriceDiffDetail.getOrderId()+":"+oRefundPriceDiffDetail.getProId()+"采购单查询数量不唯一");
+    //                    }
+    //                    OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
+    //                    OSubOrderActivityExample.Criteria criteria3 = oSubOrderActivityExample.createCriteria();
+    //                    criteria3.andSubOrderIdEqualTo(oSubOrders.get(0).getId()).andStatusEqualTo(Status.STATUS_1.status);
+    //                    List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
+    //                    if(oSubOrderActivities.size()!=1){
+    //                        throw new ProcessException("退补差价:"+oRefundPriceDiffDetail.getOrderId()+":"+oRefundPriceDiffDetail.getProId()+"采购单活动查询数量不唯一");
+    //                    }
+    //                    OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
+    //                    OActivity oActivity = activityMapper.selectByPrimaryKey(oRefundPriceDiffDetail.getActivityRealId());
+    //                    oSubOrderActivity.setActivityId(oActivity.getId());
+    //                    oSubOrderActivity.setActivityName(oActivity.getActivityName());
+    //                    oSubOrderActivity.setRuleId(oActivity.getRuleId());
+    //                    oSubOrderActivity.setActivityRule(oActivity.getActivityRule());
+    //                    oSubOrderActivity.setActivityWay(oActivity.getActivityWay());
+    //                    oSubOrderActivity.setProModel(oActivity.getProModel());
+    //                    oSubOrderActivity.setVender(oActivity.getVender());
+    //                    oSubOrderActivity.setgTime(oActivity.getgTime());
+    //                    oSubOrderActivity.setuTime(new Date());
+    //                    oSubOrderActivity.setuUser(oRefundPriceDiffDetail.getuUser());
+    //                    oSubOrderActivity.setPlatform(oActivity.getPlatform());
+    //                    oSubOrderActivity.setBusProCode(oActivity.getBusProCode());
+    //                    oSubOrderActivity.setBusProName(oActivity.getBusProName());
+    //                    oSubOrderActivity.setTermBatchcode(oActivity.getTermBatchcode());
+    //                    oSubOrderActivity.setTermBatchname(oActivity.getTermBatchname());
+    //                    oSubOrderActivity.setTermtype(oActivity.getTermtype());
+    //                    oSubOrderActivity.setTermtypename(oActivity.getTermtypename());
+    //                    oSubOrderActivity.setOriginalPrice(oActivity.getOriginalPrice());
+    //                    oSubOrderActivity.setPrice(oActivity.getPrice());
+    //                    oSubOrderActivity.setPosType(oActivity.getPosType());
+    //                    oSubOrderActivity.setPosSpePrice(oActivity.getPosSpePrice());
+    //                    oSubOrderActivity.setStandTime(oActivity.getStandTime());
+    //                    int j = subOrderActivityMapper.updateByPrimaryKeySelective(oSubOrderActivity);
+    //                    if(1!=j){
+    //                        throw new ProcessException("退补差价数据更新活动失败");
+    //                    }
+    //                }
+
+
+                    //待调整集合 cxinfo 机具的调整  调货明细
+                    OOrder oo = orderMapper.selectByPrimaryKey(row.getOrderId());
+                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oo.getBusId());
+                    PlatformType platformType = platFormService.byPlatformCode(agentBusInfo.getBusPlatform());
+
+                    OActivity activity = orderActivityService.findById(row.getActivityRealId());
+                    OActivity activity_old = orderActivityService.findById(row.getActivityFrontId());
+                    ChangeActMachineVo cav = new ChangeActMachineVo();
+                    cav.setBusNum(agentBusInfo.getBusNum());
+                    cav.setNewAct(activity.getBusProCode());
+                    cav.setOldAct(activity_old.getBusProCode());
+                    cav.setOptUser(row.getcUser());
+
+                    String snBeginJson = redisService.hGet(row.getBeginSn() + "," + row.getEndSn(), row.getBeginSn());
+                    Map<String, Object> snBeginMap = JsonUtil.jsonToMap(snBeginJson);
+                    String snEndJson = redisService.hGet(row.getBeginSn() + "," + row.getEndSn(), row.getEndSn());
+                    Map<String, Object> snEndMap = JsonUtil.jsonToMap(snEndJson);
+
+                    cav.setSnStart(row.getBeginSn()+(StringUtils.isBlank(String.valueOf(snBeginMap.get("termCheck")))?"":String.valueOf(snBeginMap.get("termCheck"))));
+                    cav.setSnEnd(row.getEndSn()+(StringUtils.isBlank(String.valueOf(snEndMap.get("termCheck")))?"":String.valueOf(snEndMap.get("termCheck"))));
+
+                    cav.setPlatformType(platformType.code);
+                    cav.setoRefundPriceDiffDetailId(row.getId());
+                    List<OLogisticsDetail> logisticsDetailList = new ArrayList<>();
+                    Set<String> snSet = redisService.hGet(row.getBeginSn() + "," + row.getEndSn());
+                    for (String sn : snSet) {
+                        OLogisticsDetail oLogisticsDetail = new OLogisticsDetail();
+                        oLogisticsDetail.setSnNum(sn);
+                        oLogisticsDetail.setBusProCode(activity.getBusProCode());
+                        logisticsDetailList.add(oLogisticsDetail);
                     }
-                    refundPriceDiffDetailMapper.updateByPrimaryKeySelective(row);
+                    cav.setLogisticsDetailList(logisticsDetailList);
+                    cav.setSnNum(String.valueOf(row.getChangeCount()));
+
+                    //cxinfo 调用活动变更接口进行活动的变更
+                    try {
+                        AgentResult chAgentResult = termMachineService.changeActMachine(cav);
+                        row.setSendMsg(chAgentResult.getMsg());
+                        if(chAgentResult.isOK()){
+                            row.setSendStatus(Status.STATUS_1.status);
+                        }else{
+                            row.setSendStatus(Status.STATUS_2.status);
+                        }
+                        refundPriceDiffDetailMapper.updateByPrimaryKeySelective(row);
+                    }catch (ProcessException e) {
+                        e.printStackTrace();
+                        throw new ProcessException(e.getMessage());
+                    }catch (Exception e) {
+                        e.printStackTrace();
+                        throw new ProcessException("处理失败");
+                    }
                 }catch (ProcessException e) {
                     e.printStackTrace();
                     throw new ProcessException(e.getMessage());
@@ -599,14 +605,8 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                     e.printStackTrace();
                     throw new ProcessException("处理失败");
                 }
-            }catch (ProcessException e) {
-                e.printStackTrace();
-                throw new ProcessException(e.getMessage());
-            }catch (Exception e) {
-                e.printStackTrace();
-                throw new ProcessException("处理失败");
-            }
-        });
+            });
+        }
         return AgentResult.ok();
     }
 

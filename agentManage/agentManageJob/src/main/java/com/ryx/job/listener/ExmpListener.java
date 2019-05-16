@@ -15,11 +15,11 @@ public class ExmpListener  implements ElasticJobListener {
 
     @Override
     public void beforeJobExecuted(ShardingContexts shardingContexts) {
-        logger.info("开始调度任务：{}",shardingContexts.getJobName());
+        logger.debug("开始调度任务：{}",shardingContexts.getJobName());
     }
 
     @Override
     public void afterJobExecuted(ShardingContexts shardingContexts) {
-        logger.info("任务调度完成：{}",shardingContexts.getJobName());
+        logger.debug("任务调度完成：{}",shardingContexts.getJobName());
     }
 }

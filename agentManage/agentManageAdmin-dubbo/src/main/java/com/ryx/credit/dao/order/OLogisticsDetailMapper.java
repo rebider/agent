@@ -36,4 +36,8 @@ public interface OLogisticsDetailMapper {
     Long getOLogisticsDetailCount(Map<String, Object> param);
 
     List<Map<String,Object>> getOLogisticsDetailList(Map<String, Object> param);
+
+    List<OLogisticsDetail> queryHistoryOrder();
+
+    List<OLogisticsDetail> querySnCountObj(Map<String, Object> param);
 }

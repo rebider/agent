@@ -8,10 +8,7 @@ import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.dao.agent.AgentBusInfoMapper;
-import com.ryx.credit.dao.agent.AgentMapper;
-import com.ryx.credit.dao.agent.AttachmentRelMapper;
-import com.ryx.credit.dao.agent.BusActRelMapper;
+import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.*;
 import com.ryx.credit.machine.entity.ImsTermAdjustDetail;
 import com.ryx.credit.machine.entity.ImsTermWarehouseDetail;
@@ -133,6 +130,8 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
     private DictOptionsService dictOptionsService;
     @Autowired
     private OrderActivityService orderActivityService;
+    @Autowired
+    private PlatFormMapper platFormMapper;
 
 
 
@@ -205,11 +204,10 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         BigDecimal tt = BigDecimal.ZERO;
         OReturnOrderDetail oReturnOrderDetail = new OReturnOrderDetail();
         for (OldOrderReturnSubmitProVo oldOrderReturnSubmitProVo : oldOrderReturnVo.getOldOrderReturnSubmitProVoList()) {
-            OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
-            oLogisticsDetailExample.or()
-                    .andSnNumGreaterThanOrEqualTo(oldOrderReturnSubmitProVo.getSnStart())
-                    .andSnNumLessThanOrEqualTo(oldOrderReturnSubmitProVo.getSnEnd());
-            List<OLogisticsDetail>  details = logisticsDetailMapper.selectByExample(oLogisticsDetailExample);
+            List<OLogisticsDetail>  details = logisticsDetailMapper.querySnCountObj(
+                    FastMap.fastMap("snBegin",oldOrderReturnSubmitProVo.getSnStart())
+                            .putKeyV("snEnd",oldOrderReturnSubmitProVo.getSnEnd())
+            );
             if(details.size()>0){
                 StringBuffer sb = new StringBuffer();
                 for (OLogisticsDetail detail : details) {
@@ -562,6 +560,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             oReturnOrderDetail.setReturnPrice(bus_activity.getPrice());
             oReturnOrderDetail.setReturnAmt(oReturnOrderDetail.getReturnCount().multiply(bus_activity.getPrice()).setScale(2,BigDecimal.ROUND_HALF_UP));
             oReturnOrderDetail.setReturnTime(new Date());
+            oReturnOrderDetail.setActid(bus_activity.getId());
             if(StringUtils.isBlank(returnid))returnid = oldOrderReturnBusEditVo.getReturnid();
              if(1!=returnOrderDetailMapper.updateByPrimaryKeySelective(oReturnOrderDetail)){
                  throw new MessageException("更新明细失败");
@@ -750,7 +749,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         oLogistics.setId(idService.genId(TabId.o_logistics));           // 物流ID序列号
         oLogistics.setcUser(user);                                      // 创建人
         oLogistics.setStatus(Status.STATUS_1.status);                   // 默认记录状态为1
-        oLogistics.setLogType(LogType.Deliver.getValue());              // 默认物流类型为1
+        oLogistics.setLogType(LogType.Refund.getValue());              // 默认物流类型为1
         try {
             oLogistics.setSendDate(DateUtil.sdfDays.parse(sendDate));
         }catch (Exception e){
@@ -796,6 +795,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         oLogistics.setwNumber(wNumber);      // 物流单号
         oLogistics.setSnBeginNum(beginSn);   // 起始SN序列号
         oLogistics.setSnEndNum(endSn);     // 结束SN序列号
+        oLogistics.setSendStatus(LogisticsSendStatus.none_send.code);
         logger.info("导入物流数据============================================{}" , oLogistics.getId(),JSONObject.toJSON(oLogistics));
         if (1 != oLogisticsMapper.insertSelective(oLogistics)) {
             throw new MessageException("排单编号为:"+planNum+"处理，插入物流信息失败,事物回滚");
@@ -844,9 +844,12 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             }
 
             //生成物流对应的物流明细
+            //平台查询，根据不同的平台走不同的逻辑
+            OOrder order_platForm = oOrderMapper.selectByPrimaryKey(orderId);
+            PlatForm platForm =platFormMapper.selectByPlatFormNum(order_platForm.getOrderPlatform());
             List<OLogisticsDetail> snList = initDetailFromRedis(stringList,oLogistics,receiptPlan,user);
             //进行机具调整操作
-            if (!proType.equals(PlatformType.MPOS.msg) && !proType.equals(PlatformType.MPOS.code)){
+            if (platForm.getPlatformType().equals(PlatformType.POS.code) || platForm.getPlatformType().equals(PlatformType.ZPOS.code)){
 
                 logger.info("======pos发货 更新库存记录:{}:{}",proType,stringList);
 
@@ -888,7 +891,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                     oLogisticsMapper.updateByPrimaryKeySelective(logistics);
                 }
             //机具退货调整首刷接口调用
-            }else{
+            }else if(platForm.getPlatformType().equals(PlatformType.MPOS.code) || platForm.getPlatformType().equals(PlatformType.MPOS.msg)){
                 logger.info("======历史订单首刷发货 更新库存记录:{}:{}",proType,stringList);
                 //起始sn sn码必须在查询的时候进行生成
                 OLogisticsDetailExample exampleOLogisticsDetailExamplestart = new OLogisticsDetailExample();
@@ -923,26 +926,32 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                 vo.setPlatformNum(returnbusInfo.getBusPlatform());
                 //新活动
                 vo.setNewAct(oSubOrderActivity.getBusProCode());
-                //老活动查询
-                OSubOrderExample old_OSubOrder = new OSubOrderExample();
-                old_OSubOrder.or()
-                        .andOrderIdEqualTo(oReturnOrderDetail.getOrderId())
-                        .andProIdEqualTo(oReturnOrderDetail.getProId())
-                        .andStatusEqualTo(Status.STATUS_1.status);
-                List<OSubOrder> list_osub_old = oSubOrderMapper.selectByExample(old_OSubOrder);
 
-                if(list_osub_old.size()==0){
-                    throw new MessageException("退货机具活动信息未找到");
+                //老活动查询 --老活动获取退货明细里的业务平台活动
+                if(oReturnOrderDetail.getActid()==null || StringUtils.isBlank(oReturnOrderDetail.getActid())) {
+                    OSubOrderExample old_OSubOrder = new OSubOrderExample();
+                    old_OSubOrder.or()
+                            .andOrderIdEqualTo(oReturnOrderDetail.getOrderId())
+                            .andProIdEqualTo(oReturnOrderDetail.getProId())
+                            .andStatusEqualTo(Status.STATUS_1.status);
+                    List<OSubOrder> list_osub_old = oSubOrderMapper.selectByExample(old_OSubOrder);
+
+                    if (list_osub_old.size() == 0) {
+                        throw new MessageException("退货机具活动信息未找到");
+                    }
+                    OSubOrder old_suborder = list_osub_old.get(0);
+                    OSubOrderActivityExample example_old_activity = new OSubOrderActivityExample();
+                    example_old_activity.or().andSubOrderIdEqualTo(old_suborder.getId()).andStatusEqualTo(Status.STATUS_1.status);
+                    List<OSubOrderActivity> list_old_act = subOrderActivityMapper.selectByExample(example_old_activity);
+                    if (list_old_act.size() == 0) {
+                        throw new MessageException("退货机具活动信息未找到");
+                    }
+                    OSubOrderActivity old_act = list_old_act.get(0);
+                    vo.setOldAct(old_act.getBusProCode());
+                }else {
+                    OActivity activity_return_detail = oActivityMapper.selectByPrimaryKey(oReturnOrderDetail.getActid());
+                    vo.setOldAct(activity_return_detail.getBusProCode());
                 }
-                OSubOrder old_suborder  = list_osub_old.get(0);
-                OSubOrderActivityExample example_old_activity = new OSubOrderActivityExample();
-                example_old_activity.or().andSubOrderIdEqualTo(old_suborder.getId()).andStatusEqualTo(Status.STATUS_1.status);
-                List<OSubOrderActivity>  list_old_act = subOrderActivityMapper.selectByExample(example_old_activity);
-                if(list_old_act.size()==0){
-                    throw new MessageException("退货机具活动信息未找到");
-                }
-                OSubOrderActivity old_act = list_old_act.get(0);
-                vo.setOldAct(old_act.getBusProCode());
 
                 //机具退货调整首刷接口调用
                 OLogistics logistics =  oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());

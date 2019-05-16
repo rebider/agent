@@ -25,7 +25,8 @@ import java.util.Date;
 @Service("idService")
 public class IdServiceImpl implements IdService {
 
-    private static final SimpleDateFormat sdf=new SimpleDateFormat("ddHHmmss");
+    private static final SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
+    private static final SimpleDateFormat sdf_yyMM=new SimpleDateFormat("yyMM");
 
     @PostConstruct
     public void init(){
@@ -36,6 +37,12 @@ public class IdServiceImpl implements IdService {
 
     @Override
     public String genId(TabId tablename) {
+        switch (tablename.name()){
+            case "a_agent"://agentId重写
+                return genAgId(tablename);
+            case "o_logistics_detail":
+                return String.valueOf(dictMapper.sqlId(tablename.name()));
+        }
         long id  = dictMapper.sqlId(tablename.name());
         return String.format(tablename.patt,DateUtil.getDateToString(new Date()),id);
     }
@@ -54,8 +61,20 @@ public class IdServiceImpl implements IdService {
         String data = sdf.format(Calendar.getInstance().getTime());
         long seq_id  = dictMapper.sqlId(tablename.name());
         String rund = RandomCharUtil.getRandomNumberChar(2);
-        String numId = String.format("%s%02d%04d%02d",data,(userid%100),(seq_id%10000),Integer.valueOf(rund));
+        String numId = String.format("OD%s%02d%04d%02d",data,(userid%100),(seq_id%10000),Integer.valueOf(rund));
         return numId;
+    }
+
+    @Override
+    public String genAgId(TabId tablename){
+        if(tablename.name().equals(TabId.a_agent.name())) {
+            String data = sdf_yyMM.format(Calendar.getInstance().getTime());
+            long seq_id = dictMapper.sqlId(TabId.a_agent.name());
+            String rund = RandomCharUtil.getRandomNumberChar(2);
+            String numId = String.format("AG%s%04d%02d", data, (seq_id % 10000), Integer.valueOf(rund));
+            return numId;
+        }
+        return null;
     }
 
 

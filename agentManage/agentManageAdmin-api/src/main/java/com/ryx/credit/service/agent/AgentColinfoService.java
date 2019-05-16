@@ -39,7 +39,7 @@ public interface AgentColinfoService {
 
     int updateByPrimaryKeySelective(AgentColinfo record);
 
-    public AgentResult checkColInfo(AgentColinfo agentColinfo);
+    public AgentResult checkColInfo(AgentColinfo agentColinfo) throws ProcessException;
 
     void insertByPayment(AColinfoPayment colinfoPayment) throws Exception;
 
@@ -54,4 +54,6 @@ public interface AgentColinfoService {
     AgentResult updateAgentColinfo(AgentColinfo agentColinfo);
 
     AgentResult saveAgentColinfo(AgentColinfo agentColinfo);
+
+    AgentResult checkAgentColinfo();
 }

@@ -51,6 +51,8 @@ public class OLogistics implements Serializable{
 
     private String sendMsg;
 
+    private BigDecimal version;
+
     public String getId() {
         return id;
     }
@@ -233,5 +235,13 @@ public class OLogistics implements Serializable{
 
     public void setSendMsg(String sendMsg) {
         this.sendMsg = sendMsg == null ? null : sendMsg.trim();
+    }
+
+    public BigDecimal getVersion() {
+        return version;
+    }
+
+    public void setVersion(BigDecimal version) {
+        this.version = version;
     }
 }

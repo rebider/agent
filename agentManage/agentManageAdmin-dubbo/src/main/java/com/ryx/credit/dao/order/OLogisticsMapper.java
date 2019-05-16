@@ -36,4 +36,11 @@ public interface OLogisticsMapper {
     List<Map<String, Object>> queryLogisticsList(Map<String, Object> param);
 
     int updateSnStatus(@Param("orderId") String orderId, @Param("startSn") String startSn, @Param("endSn") String endSn, @Param("status") BigDecimal status, @Param("recordStatus") BigDecimal recordStatus,@Param("returnId") String returnId);
+
+    /**
+     * 根据物流类型，物流下发状态查询物流编号
+     * @param param
+     * @return
+     */
+    List<String> queryLogicInfoIdByStatus(Map<String, Object> param);
 }
