@@ -75,6 +75,10 @@ public class AgentServiceImpl implements AgentService {
     private AgentBusInfoMapper agentBusInfoMapper;
     @Autowired
     private AgentService agentService;
+    @Autowired
+    private CUserMapper userMapper;
+    @Autowired
+    private CUserRoleMapper cUserRoleMapper;
 
 
     /**
