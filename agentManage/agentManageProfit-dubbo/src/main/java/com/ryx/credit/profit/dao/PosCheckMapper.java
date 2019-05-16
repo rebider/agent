@@ -2,6 +2,7 @@ package com.ryx.credit.profit.dao;
 
 import com.ryx.credit.profit.pojo.PosCheck;
 import com.ryx.credit.profit.pojo.PosCheckExample;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,9 @@ public interface PosCheckMapper {
 
     List<PosCheck> exportPosCheck(PosCheck posCheck);
 
-    List<PosCheck> selectByAgentId(String agentId);
+    List<PosCheck> selectByAgentId(@Param("agentId") String agentId,@Param("busNum")String busNum);
 
     List<Map<String,Object>> queryByAgentInfo(Map<String,String> map);
+
+    List<Map<String,Object>> selectById(String id);
 }
