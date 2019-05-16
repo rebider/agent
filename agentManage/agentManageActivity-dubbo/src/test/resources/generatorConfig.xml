@@ -33,38 +33,7 @@
 			<property name="enableSubPackages" value="true" />
 		</javaClientGenerator>
 		 <!--要生成那些表(更改tableName和domainObjectName就可以)-->
-
-		<!--<table tableName="o_activity" domainObjectName="OActivity" enableUpdateByExample="false"-->
-			   <!--enableDeleteByPrimaryKey="false"/>-->
-		<!--<table tableName="o_sub_order_activity" domainObjectName="OSubOrderActivity" enableUpdateByExample="false"-->
-			   <!--enableDeleteByPrimaryKey="false"/>-->
-
-		<!--<table tableName="P_AGENT_MERGE" domainObjectName="PAgentMerge" enableUpdateByExample="false"-->
-			   <!--enableDeleteByPrimaryKey="false"/>-->
-
-		<!--<table tableName="O_CASH_SUMMARY_MOUTH" domainObjectName="CashSummaryMouth" enableUpdateByExample="false"-->
-			   <!--enableDeleteByPrimaryKey="false"/>-->
-
-		<!--<table tableName="a_platform" domainObjectName="PlatForm" enableUpdateByExample="false"-->
-			   <!--enableDeleteByPrimaryKey="false"/>-->
-
-		<!--<table tableName="a_agent_quit" domainObjectName="AgentQuit" enableUpdateByExample="false"-->
-			   <!--enableDeleteByPrimaryKey="false"/>-->
-		<!--<table tableName="a_agent_quit_refund" domainObjectName="AgentQuitRefund" enableUpdateByExample="false"-->
-			   <!--enableDeleteByPrimaryKey="false"/>-->
-
-		<!--<table tableName="o_return_order" domainObjectName="OReturnOrder" enableUpdateByExample="false"-->
-			   <!--enableDeleteByPrimaryKey="false"/>-->
-		<table tableName="o_logistics" domainObjectName="OLogistics" enableUpdateByExample="false"
+		<table tableName="o_Internet_card" domainObjectName="OInternetCard" enableUpdateByExample="false"
 		enableDeleteByPrimaryKey="false"/>
-
-		<!--<table tableName="o_return_order" domainObjectName="OReturnOrder" enableUpdateByExample="false"-->
-			   <!--enableDeleteByPrimaryKey="false"/>-->
-		<!--<table tableName="o_logistics_detail_h" domainObjectName="OLogisticsDetailH" enableUpdateByExample="false"-->
-
-		<table tableName="O_RETURN_ORDER_DETAIL" domainObjectName="OReturnOrderDetail" enableUpdateByExample="false"
-		<table tableName="o_logistics_detail_h" domainObjectName="OLogisticsDetailH" enableUpdateByExample="false"
-		<table tableName="O_RETURN_ORDER_DETAIL" domainObjectName="OReturnOrderDetail" enableUpdateByExample="false"
-			   enableDeleteByPrimaryKey="false"/>
 	</context>
 </generatorConfiguration>

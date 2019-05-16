@@ -1,5 +1,6 @@
 package com.ryx.credit.common.enumc;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,19 +11,19 @@ import java.util.Map;
  * @author: Liudh
  * @date: 2018/12/4 18:11
  */
-public enum CardImportType {
+public enum OInternetCardImportStatus {
 
-    A("1","流量卡卡号"),
-    B("2","供应商发卡汇总"),
-    C("3","历史北京总部发卡"),
-    D("4","退货转发数据"),
-    E("5","流量卡状态");
+    UNTREATED(new BigDecimal("1"),"未处理"),
+    SUCCESS(new BigDecimal("2"),"成功"),
+    FAIL(new BigDecimal("3"),"失败"),
+    TIMEOUT(new BigDecimal("4"),"超时");
 
-    public String code;
+
+    public BigDecimal code;
 
     public String msg;
 
-    CardImportType(String c, String m){
+    OInternetCardImportStatus(BigDecimal c, String m){
         this.code=c;
         this.msg =m;
     }
@@ -31,7 +32,7 @@ public enum CardImportType {
      * 取得枚举对象值
      * @return 枚举对象值
      */
-    public String getValue() {
+    public BigDecimal getValue() {
         return this.code;
     }
     /**
@@ -48,8 +49,8 @@ public enum CardImportType {
      * @return
      */
     public static String getContentByValue(String value){
-        CardImportType[] status = CardImportType.values();
-        for(CardImportType cc : status){
+        OInternetCardImportStatus[] status = OInternetCardImportStatus.values();
+        for(OInternetCardImportStatus cc : status){
             if(cc.code.equals(value)){
                 return cc.msg;
             }
@@ -57,10 +58,10 @@ public enum CardImportType {
         return "";
     }
 
-    public static Map<String, Object> getSelectMap(){
-        Map<String, Object> resultMap = new HashMap<>();
-        CardImportType[] status = CardImportType.values();
-        for(CardImportType cc : status){
+    public static Map<BigDecimal, Object> getSelectMap(){
+        Map<BigDecimal, Object> resultMap = new HashMap<>();
+        OInternetCardImportStatus[] status = OInternetCardImportStatus.values();
+        for(OInternetCardImportStatus cc : status){
             resultMap.put(cc.code,cc.msg);
         }
         return resultMap;

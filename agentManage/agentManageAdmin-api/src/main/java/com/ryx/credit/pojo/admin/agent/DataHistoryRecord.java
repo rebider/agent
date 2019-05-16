@@ -19,6 +19,8 @@ public class DataHistoryRecord implements Serializable{
 
     private BigDecimal status;
 
+    private String busId;
+
     private String dataParameter;
 
     public String getId() {
@@ -75,6 +77,14 @@ public class DataHistoryRecord implements Serializable{
 
     public void setStatus(BigDecimal status) {
         this.status = status;
+    }
+
+    public String getBusId() {
+        return busId;
+    }
+
+    public void setBusId(String busId) {
+        this.busId = busId == null ? null : busId.trim();
     }
 
     public String getDataParameter() {

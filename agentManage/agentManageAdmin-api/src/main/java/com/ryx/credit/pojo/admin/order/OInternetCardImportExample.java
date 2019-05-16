@@ -1,4 +1,4 @@
-package com.ryx.credit.pojo.admin.agent;
+package com.ryx.credit.pojo.admin.order;
 
 import com.ryx.credit.common.util.Page;
 
@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class DataHistoryRecordExample {
+public class OInternetCardImportExample {
     protected String orderByClause;
 
     protected boolean distinct;
@@ -20,7 +20,7 @@ public class DataHistoryRecordExample {
 
     protected Integer limitEnd;
 
-    public DataHistoryRecordExample() {
+    public OInternetCardImportExample() {
         oredCriteria = new ArrayList<Criteria>();
     }
 
@@ -208,203 +208,273 @@ public class DataHistoryRecordExample {
             return (Criteria) this;
         }
 
-        public Criteria andDataClassIsNull() {
-            addCriterion("DATA_CLASS is null");
+        public Criteria andImportMsgIsNull() {
+            addCriterion("IMPORT_MSG is null");
             return (Criteria) this;
         }
 
-        public Criteria andDataClassIsNotNull() {
-            addCriterion("DATA_CLASS is not null");
+        public Criteria andImportMsgIsNotNull() {
+            addCriterion("IMPORT_MSG is not null");
             return (Criteria) this;
         }
 
-        public Criteria andDataClassEqualTo(String value) {
-            addCriterion("DATA_CLASS =", value, "dataClass");
+        public Criteria andImportMsgEqualTo(String value) {
+            addCriterion("IMPORT_MSG =", value, "importMsg");
             return (Criteria) this;
         }
 
-        public Criteria andDataClassNotEqualTo(String value) {
-            addCriterion("DATA_CLASS <>", value, "dataClass");
+        public Criteria andImportMsgNotEqualTo(String value) {
+            addCriterion("IMPORT_MSG <>", value, "importMsg");
             return (Criteria) this;
         }
 
-        public Criteria andDataClassGreaterThan(String value) {
-            addCriterion("DATA_CLASS >", value, "dataClass");
+        public Criteria andImportMsgGreaterThan(String value) {
+            addCriterion("IMPORT_MSG >", value, "importMsg");
             return (Criteria) this;
         }
 
-        public Criteria andDataClassGreaterThanOrEqualTo(String value) {
-            addCriterion("DATA_CLASS >=", value, "dataClass");
+        public Criteria andImportMsgGreaterThanOrEqualTo(String value) {
+            addCriterion("IMPORT_MSG >=", value, "importMsg");
             return (Criteria) this;
         }
 
-        public Criteria andDataClassLessThan(String value) {
-            addCriterion("DATA_CLASS <", value, "dataClass");
+        public Criteria andImportMsgLessThan(String value) {
+            addCriterion("IMPORT_MSG <", value, "importMsg");
             return (Criteria) this;
         }
 
-        public Criteria andDataClassLessThanOrEqualTo(String value) {
-            addCriterion("DATA_CLASS <=", value, "dataClass");
+        public Criteria andImportMsgLessThanOrEqualTo(String value) {
+            addCriterion("IMPORT_MSG <=", value, "importMsg");
             return (Criteria) this;
         }
 
-        public Criteria andDataClassLike(String value) {
-            addCriterion("DATA_CLASS like", value, "dataClass");
+        public Criteria andImportMsgLike(String value) {
+            addCriterion("IMPORT_MSG like", value, "importMsg");
             return (Criteria) this;
         }
 
-        public Criteria andDataClassNotLike(String value) {
-            addCriterion("DATA_CLASS not like", value, "dataClass");
+        public Criteria andImportMsgNotLike(String value) {
+            addCriterion("IMPORT_MSG not like", value, "importMsg");
             return (Criteria) this;
         }
 
-        public Criteria andDataClassIn(List<String> values) {
-            addCriterion("DATA_CLASS in", values, "dataClass");
+        public Criteria andImportMsgIn(List<String> values) {
+            addCriterion("IMPORT_MSG in", values, "importMsg");
             return (Criteria) this;
         }
 
-        public Criteria andDataClassNotIn(List<String> values) {
-            addCriterion("DATA_CLASS not in", values, "dataClass");
+        public Criteria andImportMsgNotIn(List<String> values) {
+            addCriterion("IMPORT_MSG not in", values, "importMsg");
             return (Criteria) this;
         }
 
-        public Criteria andDataClassBetween(String value1, String value2) {
-            addCriterion("DATA_CLASS between", value1, value2, "dataClass");
+        public Criteria andImportMsgBetween(String value1, String value2) {
+            addCriterion("IMPORT_MSG between", value1, value2, "importMsg");
             return (Criteria) this;
         }
 
-        public Criteria andDataClassNotBetween(String value1, String value2) {
-            addCriterion("DATA_CLASS not between", value1, value2, "dataClass");
+        public Criteria andImportMsgNotBetween(String value1, String value2) {
+            addCriterion("IMPORT_MSG not between", value1, value2, "importMsg");
             return (Criteria) this;
         }
 
-        public Criteria andDataMethodIsNull() {
-            addCriterion("DATA_METHOD is null");
+        public Criteria andImportStatusIsNull() {
+            addCriterion("IMPORT_STATUS is null");
             return (Criteria) this;
         }
 
-        public Criteria andDataMethodIsNotNull() {
-            addCriterion("DATA_METHOD is not null");
+        public Criteria andImportStatusIsNotNull() {
+            addCriterion("IMPORT_STATUS is not null");
             return (Criteria) this;
         }
 
-        public Criteria andDataMethodEqualTo(String value) {
-            addCriterion("DATA_METHOD =", value, "dataMethod");
+        public Criteria andImportStatusEqualTo(BigDecimal value) {
+            addCriterion("IMPORT_STATUS =", value, "importStatus");
             return (Criteria) this;
         }
 
-        public Criteria andDataMethodNotEqualTo(String value) {
-            addCriterion("DATA_METHOD <>", value, "dataMethod");
+        public Criteria andImportStatusNotEqualTo(BigDecimal value) {
+            addCriterion("IMPORT_STATUS <>", value, "importStatus");
             return (Criteria) this;
         }
 
-        public Criteria andDataMethodGreaterThan(String value) {
-            addCriterion("DATA_METHOD >", value, "dataMethod");
+        public Criteria andImportStatusGreaterThan(BigDecimal value) {
+            addCriterion("IMPORT_STATUS >", value, "importStatus");
             return (Criteria) this;
         }
 
-        public Criteria andDataMethodGreaterThanOrEqualTo(String value) {
-            addCriterion("DATA_METHOD >=", value, "dataMethod");
+        public Criteria andImportStatusGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("IMPORT_STATUS >=", value, "importStatus");
             return (Criteria) this;
         }
 
-        public Criteria andDataMethodLessThan(String value) {
-            addCriterion("DATA_METHOD <", value, "dataMethod");
+        public Criteria andImportStatusLessThan(BigDecimal value) {
+            addCriterion("IMPORT_STATUS <", value, "importStatus");
             return (Criteria) this;
         }
 
-        public Criteria andDataMethodLessThanOrEqualTo(String value) {
-            addCriterion("DATA_METHOD <=", value, "dataMethod");
+        public Criteria andImportStatusLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("IMPORT_STATUS <=", value, "importStatus");
             return (Criteria) this;
         }
 
-        public Criteria andDataMethodLike(String value) {
-            addCriterion("DATA_METHOD like", value, "dataMethod");
+        public Criteria andImportStatusIn(List<BigDecimal> values) {
+            addCriterion("IMPORT_STATUS in", values, "importStatus");
             return (Criteria) this;
         }
 
-        public Criteria andDataMethodNotLike(String value) {
-            addCriterion("DATA_METHOD not like", value, "dataMethod");
+        public Criteria andImportStatusNotIn(List<BigDecimal> values) {
+            addCriterion("IMPORT_STATUS not in", values, "importStatus");
             return (Criteria) this;
         }
 
-        public Criteria andDataMethodIn(List<String> values) {
-            addCriterion("DATA_METHOD in", values, "dataMethod");
+        public Criteria andImportStatusBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("IMPORT_STATUS between", value1, value2, "importStatus");
             return (Criteria) this;
         }
 
-        public Criteria andDataMethodNotIn(List<String> values) {
-            addCriterion("DATA_METHOD not in", values, "dataMethod");
+        public Criteria andImportStatusNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("IMPORT_STATUS not between", value1, value2, "importStatus");
             return (Criteria) this;
         }
 
-        public Criteria andDataMethodBetween(String value1, String value2) {
-            addCriterion("DATA_METHOD between", value1, value2, "dataMethod");
+        public Criteria andErrorMsgIsNull() {
+            addCriterion("ERROR_MSG is null");
             return (Criteria) this;
         }
 
-        public Criteria andDataMethodNotBetween(String value1, String value2) {
-            addCriterion("DATA_METHOD not between", value1, value2, "dataMethod");
+        public Criteria andErrorMsgIsNotNull() {
+            addCriterion("ERROR_MSG is not null");
             return (Criteria) this;
         }
 
-        public Criteria andDataVersionIsNull() {
-            addCriterion("DATA_VERSION is null");
+        public Criteria andErrorMsgEqualTo(String value) {
+            addCriterion("ERROR_MSG =", value, "errorMsg");
             return (Criteria) this;
         }
 
-        public Criteria andDataVersionIsNotNull() {
-            addCriterion("DATA_VERSION is not null");
+        public Criteria andErrorMsgNotEqualTo(String value) {
+            addCriterion("ERROR_MSG <>", value, "errorMsg");
             return (Criteria) this;
         }
 
-        public Criteria andDataVersionEqualTo(BigDecimal value) {
-            addCriterion("DATA_VERSION =", value, "dataVersion");
+        public Criteria andErrorMsgGreaterThan(String value) {
+            addCriterion("ERROR_MSG >", value, "errorMsg");
             return (Criteria) this;
         }
 
-        public Criteria andDataVersionNotEqualTo(BigDecimal value) {
-            addCriterion("DATA_VERSION <>", value, "dataVersion");
+        public Criteria andErrorMsgGreaterThanOrEqualTo(String value) {
+            addCriterion("ERROR_MSG >=", value, "errorMsg");
             return (Criteria) this;
         }
 
-        public Criteria andDataVersionGreaterThan(BigDecimal value) {
-            addCriterion("DATA_VERSION >", value, "dataVersion");
+        public Criteria andErrorMsgLessThan(String value) {
+            addCriterion("ERROR_MSG <", value, "errorMsg");
             return (Criteria) this;
         }
 
-        public Criteria andDataVersionGreaterThanOrEqualTo(BigDecimal value) {
-            addCriterion("DATA_VERSION >=", value, "dataVersion");
+        public Criteria andErrorMsgLessThanOrEqualTo(String value) {
+            addCriterion("ERROR_MSG <=", value, "errorMsg");
             return (Criteria) this;
         }
 
-        public Criteria andDataVersionLessThan(BigDecimal value) {
-            addCriterion("DATA_VERSION <", value, "dataVersion");
+        public Criteria andErrorMsgLike(String value) {
+            addCriterion("ERROR_MSG like", value, "errorMsg");
             return (Criteria) this;
         }
 
-        public Criteria andDataVersionLessThanOrEqualTo(BigDecimal value) {
-            addCriterion("DATA_VERSION <=", value, "dataVersion");
+        public Criteria andErrorMsgNotLike(String value) {
+            addCriterion("ERROR_MSG not like", value, "errorMsg");
             return (Criteria) this;
         }
 
-        public Criteria andDataVersionIn(List<BigDecimal> values) {
-            addCriterion("DATA_VERSION in", values, "dataVersion");
+        public Criteria andErrorMsgIn(List<String> values) {
+            addCriterion("ERROR_MSG in", values, "errorMsg");
             return (Criteria) this;
         }
 
-        public Criteria andDataVersionNotIn(List<BigDecimal> values) {
-            addCriterion("DATA_VERSION not in", values, "dataVersion");
+        public Criteria andErrorMsgNotIn(List<String> values) {
+            addCriterion("ERROR_MSG not in", values, "errorMsg");
             return (Criteria) this;
         }
 
-        public Criteria andDataVersionBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("DATA_VERSION between", value1, value2, "dataVersion");
+        public Criteria andErrorMsgBetween(String value1, String value2) {
+            addCriterion("ERROR_MSG between", value1, value2, "errorMsg");
             return (Criteria) this;
         }
 
-        public Criteria andDataVersionNotBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("DATA_VERSION not between", value1, value2, "dataVersion");
+        public Criteria andErrorMsgNotBetween(String value1, String value2) {
+            addCriterion("ERROR_MSG not between", value1, value2, "errorMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumIsNull() {
+            addCriterion("BATCH_NUM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumIsNotNull() {
+            addCriterion("BATCH_NUM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumEqualTo(String value) {
+            addCriterion("BATCH_NUM =", value, "batchNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumNotEqualTo(String value) {
+            addCriterion("BATCH_NUM <>", value, "batchNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumGreaterThan(String value) {
+            addCriterion("BATCH_NUM >", value, "batchNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumGreaterThanOrEqualTo(String value) {
+            addCriterion("BATCH_NUM >=", value, "batchNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumLessThan(String value) {
+            addCriterion("BATCH_NUM <", value, "batchNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumLessThanOrEqualTo(String value) {
+            addCriterion("BATCH_NUM <=", value, "batchNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumLike(String value) {
+            addCriterion("BATCH_NUM like", value, "batchNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumNotLike(String value) {
+            addCriterion("BATCH_NUM not like", value, "batchNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumIn(List<String> values) {
+            addCriterion("BATCH_NUM in", values, "batchNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumNotIn(List<String> values) {
+            addCriterion("BATCH_NUM not in", values, "batchNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumBetween(String value1, String value2) {
+            addCriterion("BATCH_NUM between", value1, value2, "batchNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumNotBetween(String value1, String value2) {
+            addCriterion("BATCH_NUM not between", value1, value2, "batchNum");
             return (Criteria) this;
         }
 
@@ -465,6 +535,66 @@ public class DataHistoryRecordExample {
 
         public Criteria andCTimeNotBetween(Date value1, Date value2) {
             addCriterion("C_TIME not between", value1, value2, "cTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUTimeIsNull() {
+            addCriterion("U_TIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUTimeIsNotNull() {
+            addCriterion("U_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUTimeEqualTo(Date value) {
+            addCriterion("U_TIME =", value, "uTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUTimeNotEqualTo(Date value) {
+            addCriterion("U_TIME <>", value, "uTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUTimeGreaterThan(Date value) {
+            addCriterion("U_TIME >", value, "uTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUTimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("U_TIME >=", value, "uTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUTimeLessThan(Date value) {
+            addCriterion("U_TIME <", value, "uTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUTimeLessThanOrEqualTo(Date value) {
+            addCriterion("U_TIME <=", value, "uTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUTimeIn(List<Date> values) {
+            addCriterion("U_TIME in", values, "uTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUTimeNotIn(List<Date> values) {
+            addCriterion("U_TIME not in", values, "uTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUTimeBetween(Date value1, Date value2) {
+            addCriterion("U_TIME between", value1, value2, "uTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUTimeNotBetween(Date value1, Date value2) {
+            addCriterion("U_TIME not between", value1, value2, "uTime");
             return (Criteria) this;
         }
 
@@ -538,6 +668,76 @@ public class DataHistoryRecordExample {
             return (Criteria) this;
         }
 
+        public Criteria andUUserIsNull() {
+            addCriterion("U_USER is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserIsNotNull() {
+            addCriterion("U_USER is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserEqualTo(String value) {
+            addCriterion("U_USER =", value, "uUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserNotEqualTo(String value) {
+            addCriterion("U_USER <>", value, "uUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserGreaterThan(String value) {
+            addCriterion("U_USER >", value, "uUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserGreaterThanOrEqualTo(String value) {
+            addCriterion("U_USER >=", value, "uUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserLessThan(String value) {
+            addCriterion("U_USER <", value, "uUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserLessThanOrEqualTo(String value) {
+            addCriterion("U_USER <=", value, "uUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserLike(String value) {
+            addCriterion("U_USER like", value, "uUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserNotLike(String value) {
+            addCriterion("U_USER not like", value, "uUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserIn(List<String> values) {
+            addCriterion("U_USER in", values, "uUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserNotIn(List<String> values) {
+            addCriterion("U_USER not in", values, "uUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserBetween(String value1, String value2) {
+            addCriterion("U_USER between", value1, value2, "uUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserNotBetween(String value1, String value2) {
+            addCriterion("U_USER not between", value1, value2, "uUser");
+            return (Criteria) this;
+        }
+
         public Criteria andStatusIsNull() {
             addCriterion("STATUS is null");
             return (Criteria) this;
@@ -598,73 +798,133 @@ public class DataHistoryRecordExample {
             return (Criteria) this;
         }
 
-        public Criteria andBusIdIsNull() {
-            addCriterion("BUS_ID is null");
+        public Criteria andVersionIsNull() {
+            addCriterion("VERSION is null");
             return (Criteria) this;
         }
 
-        public Criteria andBusIdIsNotNull() {
-            addCriterion("BUS_ID is not null");
+        public Criteria andVersionIsNotNull() {
+            addCriterion("VERSION is not null");
             return (Criteria) this;
         }
 
-        public Criteria andBusIdEqualTo(String value) {
-            addCriterion("BUS_ID =", value, "busId");
+        public Criteria andVersionEqualTo(BigDecimal value) {
+            addCriterion("VERSION =", value, "version");
             return (Criteria) this;
         }
 
-        public Criteria andBusIdNotEqualTo(String value) {
-            addCriterion("BUS_ID <>", value, "busId");
+        public Criteria andVersionNotEqualTo(BigDecimal value) {
+            addCriterion("VERSION <>", value, "version");
             return (Criteria) this;
         }
 
-        public Criteria andBusIdGreaterThan(String value) {
-            addCriterion("BUS_ID >", value, "busId");
+        public Criteria andVersionGreaterThan(BigDecimal value) {
+            addCriterion("VERSION >", value, "version");
             return (Criteria) this;
         }
 
-        public Criteria andBusIdGreaterThanOrEqualTo(String value) {
-            addCriterion("BUS_ID >=", value, "busId");
+        public Criteria andVersionGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("VERSION >=", value, "version");
             return (Criteria) this;
         }
 
-        public Criteria andBusIdLessThan(String value) {
-            addCriterion("BUS_ID <", value, "busId");
+        public Criteria andVersionLessThan(BigDecimal value) {
+            addCriterion("VERSION <", value, "version");
             return (Criteria) this;
         }
 
-        public Criteria andBusIdLessThanOrEqualTo(String value) {
-            addCriterion("BUS_ID <=", value, "busId");
+        public Criteria andVersionLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("VERSION <=", value, "version");
             return (Criteria) this;
         }
 
-        public Criteria andBusIdLike(String value) {
-            addCriterion("BUS_ID like", value, "busId");
+        public Criteria andVersionIn(List<BigDecimal> values) {
+            addCriterion("VERSION in", values, "version");
             return (Criteria) this;
         }
 
-        public Criteria andBusIdNotLike(String value) {
-            addCriterion("BUS_ID not like", value, "busId");
+        public Criteria andVersionNotIn(List<BigDecimal> values) {
+            addCriterion("VERSION not in", values, "version");
             return (Criteria) this;
         }
 
-        public Criteria andBusIdIn(List<String> values) {
-            addCriterion("BUS_ID in", values, "busId");
+        public Criteria andVersionBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("VERSION between", value1, value2, "version");
             return (Criteria) this;
         }
 
-        public Criteria andBusIdNotIn(List<String> values) {
-            addCriterion("BUS_ID not in", values, "busId");
+        public Criteria andVersionNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("VERSION not between", value1, value2, "version");
             return (Criteria) this;
         }
 
-        public Criteria andBusIdBetween(String value1, String value2) {
-            addCriterion("BUS_ID between", value1, value2, "busId");
+        public Criteria andImportTypeIsNull() {
+            addCriterion("IMPORT_TYPE is null");
             return (Criteria) this;
         }
 
-        public Criteria andBusIdNotBetween(String value1, String value2) {
-            addCriterion("BUS_ID not between", value1, value2, "busId");
+        public Criteria andImportTypeIsNotNull() {
+            addCriterion("IMPORT_TYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeEqualTo(String value) {
+            addCriterion("IMPORT_TYPE =", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeNotEqualTo(String value) {
+            addCriterion("IMPORT_TYPE <>", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeGreaterThan(String value) {
+            addCriterion("IMPORT_TYPE >", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeGreaterThanOrEqualTo(String value) {
+            addCriterion("IMPORT_TYPE >=", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeLessThan(String value) {
+            addCriterion("IMPORT_TYPE <", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeLessThanOrEqualTo(String value) {
+            addCriterion("IMPORT_TYPE <=", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeLike(String value) {
+            addCriterion("IMPORT_TYPE like", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeNotLike(String value) {
+            addCriterion("IMPORT_TYPE not like", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeIn(List<String> values) {
+            addCriterion("IMPORT_TYPE in", values, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeNotIn(List<String> values) {
+            addCriterion("IMPORT_TYPE not in", values, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeBetween(String value1, String value2) {
+            addCriterion("IMPORT_TYPE between", value1, value2, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeNotBetween(String value1, String value2) {
+            addCriterion("IMPORT_TYPE not between", value1, value2, "importType");
             return (Criteria) this;
         }
     }

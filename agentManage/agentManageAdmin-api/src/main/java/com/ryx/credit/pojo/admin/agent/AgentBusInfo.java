@@ -81,6 +81,8 @@ public class AgentBusInfo implements Serializable {
 
     private String debitAppearRate;
 
+    private String terminalsLower;
+
     private List<Attachment> attachmentList;
 
     private List<AgentColinfo> agentColinfoList;
@@ -92,6 +94,14 @@ public class AgentBusInfo implements Serializable {
     private String busRegionName;
 
     private Map<String,Object> parentInfo;
+
+    public String getTerminalsLower() {
+        return terminalsLower;
+    }
+
+    public void setTerminalsLower(String terminalsLower) {
+        this.terminalsLower = terminalsLower;
+    }
 
     public List<Attachment> getAttachmentList() {
         return attachmentList;
