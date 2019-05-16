@@ -73,9 +73,6 @@ public class PosRewardServiceImpl implements IPosRewardService {
         return pageInfo;
     }
 
-
-
-
     private PosRewardExample rewardEqualsTo(PosReward reward) {
         PosRewardExample posRewardExample = new PosRewardExample();
         if(reward == null ){
@@ -90,6 +87,12 @@ public class PosRewardServiceImpl implements IPosRewardService {
         }
         if(StringUtils.isNotBlank(reward.getApplyStatus())){
             criteria.andApplyStatusEqualTo(reward.getApplyStatus());
+        }
+        if(StringUtils.isNotBlank(reward.getBusPlatform())&&!reward.getBusPlatform().equals("0")){
+            criteria.andBusPlatformEqualTo(reward.getBusPlatform());
+        }
+        if(StringUtils.isNotBlank(reward.getBusNum())){
+            criteria.andBusNumEqualTo(reward.getBusNum());
         }
         return posRewardExample;
     }
@@ -250,6 +253,9 @@ public class PosRewardServiceImpl implements IPosRewardService {
         }
         if(StringUtils.isNotBlank(posReward.getApplyStatus())){
             criteria.andApplyStatusEqualTo(posReward.getApplyStatus());
+        }
+        if(StringUtils.isNotBlank(posReward.getBusNum())){
+            criteria.andBusNumEqualTo(posReward.getBusNum());
         }
         List<PosReward> list=rewardMapper.selectByExample(example);
         List<String> month=getMonthBetween(posReward.getTotalConsMonth(),posReward.getCreditConsMonth());
