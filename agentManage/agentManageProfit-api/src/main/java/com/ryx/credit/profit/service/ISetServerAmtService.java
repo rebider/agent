@@ -24,4 +24,6 @@ public interface ISetServerAmtService {
     PageInfo setServerAmtList(Map<String,Object> param, PageInfo pageInfo);
 
     List<Map<String,Object>> queryD(String bumId);
+    int insertSelective(SetServerAmt record);
+    int updateByPrimaryKeySelective(SetServerAmt record);
 }

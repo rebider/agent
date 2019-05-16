@@ -1,11 +1,13 @@
 package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.dao.SetServerAmtMapper;
 import com.ryx.credit.profit.pojo.SetServerAmt;
 import com.ryx.credit.profit.pojo.SetServerAmtExample;
 import com.ryx.credit.profit.service.ISetServerAmtService;
+import com.ryx.credit.service.dict.IdService;
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +28,8 @@ public class SetServerAmtServiceImpl implements ISetServerAmtService {
     private static Logger logger = LoggerFactory.getLogger(SetServerAmtServiceImpl.class);
     @Autowired
     SetServerAmtMapper setServerAmtMapper;
+    @Autowired
+    IdService idService;
 
     @Override
     public List<Map<String, Object>> queryBumCode() {
@@ -50,6 +54,18 @@ public class SetServerAmtServiceImpl implements ISetServerAmtService {
     @Override
     public List<Map<String, Object>> queryD(String bumId) {
         return setServerAmtMapper.queryD(bumId);
+    }
+    @Override
+    public int insertSelective(SetServerAmt record){
+        if(record.getId()==null||"".equals(record.getId())){
+            record.setId(idService.genId(TabId.P_SERVER_AMT));
+        }
+        return setServerAmtMapper.insertSelective(record);
+    }
+
+    @Override
+    public int updateByPrimaryKeySelective(SetServerAmt record) {
+        return setServerAmtMapper.updateByPrimaryKeySelective(record);
     }
 
 }
