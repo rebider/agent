@@ -64,6 +64,7 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
        Integer count = 0;
         List<FreezeAgent> listAll;
         if ("true".equals(param.get("isQuerySubordinate"))){
+
             logger.info("下级查询");
             listAll = freezeAgentMapper.selectAllNotFreezeLower(param);
             count = freezeAgentMapper.selectAllNotFreezeLowerCount(param);
@@ -130,7 +131,7 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
            logger.info("得到日分润和日返现全部冻结的集合，并请求远程接口");
            List<String> listBothBus = new ArrayList<>();
            if(listBoth.size()!=0){
-               for (String str:listBoth) {
+              /* for (String str:listBoth) {
                    List<Map<String,Object>> mapList1 = freezeAgentMapper.queryBumId(str);
                    for (Map m:mapList1) {
                        if("5000".equals(m.get("BUS_PLATFORM").toString()) || "6000".equals(m.get("BUS_PLATFORM").toString())){
@@ -139,9 +140,9 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
                    }
 
 
-               }
+               }*/
                map.put("unfreeze","0");
-               map.put("batchIds",listBothBus.toString());
+               map.put("batchIds",JsonUtil.objectToJson(listBoth));
                String params1 = JsonUtil.objectToJson(map);
                logger.info("请求报文:"+params1);
                String res = HttpClientUtil.doPostJson(AppConfig.getProperty("busiPlat.refuse"), params1);
@@ -149,7 +150,7 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
 
                if (!JSONObject.parseObject(res).get("respCode").equals("000000")) {
                    logger.info("双冻结失败");
-                   /*throw new RuntimeException("冻结失败");*/
+                  /* throw new RuntimeException("冻结失败");*/
                }
 
            }
@@ -178,16 +179,16 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
            //日分润单独冻结
            List<String> listProfitBus = new ArrayList<>();
            if(listProfit.size()!=0){
-               for (String str:listProfit) {
+               /*for (String str:listProfit) {
                    List<Map<String,Object>> mapList2 = freezeAgentMapper.queryBumId(str);
                    for (Map m:mapList2) {
                        if("5000".equals(m.get("BUS_PLATFORM").toString()) || "6000".equals(m.get("BUS_PLATFORM").toString())){
                            listProfitBus.add(m.get("BUS_NUM").toString());
                        }
                    }
-               }
+               }*/
                map.put("unfreeze","1");
-               map.put("batchIds",map.put("batchIds",listProfitBus.toString()));
+               map.put("batchIds",map.put("batchIds",JsonUtil.objectToJson(listProfit)));
                String params2 = JsonUtil.objectToJson(map);
                logger.info("请求报文:"+params2);
                String res = HttpClientUtil.doPostJson(AppConfig.getProperty("busiPlat.refuse"), params2);
@@ -202,16 +203,16 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
            //日返现单独冻结
            List<String> listmBus = new ArrayList<>();
            if(listm.size()!=0){
-               for (String str:listm) {
+              /* for (String str:listm) {
                    List<Map<String,Object>> mapList3 = freezeAgentMapper.queryBumId(str);
                    for (Map m:mapList3) {
                        if("5000".equals(m.get("BUS_PLATFORM").toString()) || "6000".equals(m.get("BUS_PLATFORM").toString())){
                            listmBus.add(m.get("BUS_NUM").toString());
                        }
                    }
-               }
+               }*/
                map.put("unfreeze","2");
-               map.put("batchIds", map.put("batchIds",map.put("batchIds",listmBus.toString())));
+               map.put("batchIds", map.put("batchIds",map.put("batchIds",JsonUtil.objectToJson(listm))));
                String params3 = JsonUtil.objectToJson(map);
                logger.info("请求报文:"+params3);
                String res = HttpClientUtil.doPostJson(AppConfig.getProperty("busiPlat.refuse"), params3);

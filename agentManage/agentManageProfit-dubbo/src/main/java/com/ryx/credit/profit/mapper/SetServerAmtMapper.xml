@@ -355,10 +355,11 @@ select distinct BUM_NAME,BUM_ID from P_SERVER_D
 
     <select id="queryD" parameterType="java.lang.String" resultType="java.util.Map">
 
-    select ID,BUM_ID,BUM_NAME,AGENT_ID,AGENT_NAME from P_SERVER_D
+      select psd.ID,psd.BUM_ID,psd.BUM_NAME,psd.AGENT_ID,psd.AGENT_NAME,aab.BUS_NUM as BUM_CODE from P_SERVER_D psd join
+      A_AGENT_BUSINFO aab on psd.AGENT_ID=aab.AGENT_ID and psd.BUM_ID = aab.BUS_PLATFORM
     where 1=1
         <if test="bumId != null and bumId!='' ">
-            and BUM_ID = #{bumId,jdbcType=VARCHAR}
+            and psd.BUM_ID = #{bumId,jdbcType=VARCHAR}
         </if>
     </select>
 

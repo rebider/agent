@@ -172,7 +172,7 @@ public class NewProfitMonthMposDataJob {
             List<Map<String,String>> mapList = transProfitDetailMapper.selectByBusNum(mergeDate,json.getString("AGENCYID"));
             if(mapList.size() >0){ //有合并关系
                 Map<String,String> map = mapList.get(0);
-                detail.setRemark("合并:"+ (null == Busime ? "AG01" : Busime.getAgentId())+","+json.getString("COMPANYNAME"));
+                detail.setRemark("合并:"+ map.get("SUB_AGENT_ID")+","+map.get("SUB_AGENT_NAME"));
                 detail.setAgentId(map.get("MAIN_AGENT_ID"));//合并代理商AG码
                 detail.setAgentName(map.get("AG_NAME"));//合并主代理商名称
             }else{

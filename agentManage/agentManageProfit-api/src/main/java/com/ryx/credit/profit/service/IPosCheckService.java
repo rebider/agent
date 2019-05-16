@@ -28,6 +28,8 @@ public interface IPosCheckService {
 
     PageInfo posCheckList(Map<String, Object> param, PosCheck posCheck, Page page);
 
+    List<Map<String,Object>> queryAgentBusPlayformInfo(Map<String,String> map);
+
     /**
      * 分润比例考核申请，进行审批流
      * @param posCheck

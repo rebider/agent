@@ -28,6 +28,12 @@ public class PosCheck implements Serializable {
 
     private String userId;
 
+    private String busNum;
+
+    private String playformCode;
+
+    private String checkType;
+
     public String getUserId() {
         return userId;
     }
@@ -122,5 +128,29 @@ public class PosCheck implements Serializable {
 
     public void setCheckStatus(String checkStatus) {
         this.checkStatus = checkStatus == null ? null : checkStatus.trim();
+    }
+
+    public String getBusNum() {
+        return busNum;
+    }
+
+    public void setBusNum(String busNum) {
+        this.busNum = busNum == null ? null : busNum.trim();
+    }
+
+    public String getPlayformCode() {
+        return playformCode;
+    }
+
+    public void setPlayformCode(String playformCode) {
+        this.playformCode = playformCode == null ? null : playformCode.trim();
+    }
+
+    public String getCheckType() {
+        return checkType;
+    }
+
+    public void setCheckType(String checkType) {
+        this.checkType = checkType == null ? null : checkType.trim();
     }
 }

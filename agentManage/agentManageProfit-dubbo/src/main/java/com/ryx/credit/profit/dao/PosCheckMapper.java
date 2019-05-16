@@ -26,4 +26,6 @@ public interface PosCheckMapper {
     List<PosCheck> exportPosCheck(PosCheck posCheck);
 
     List<PosCheck> selectByAgentId(String agentId);
+
+    List<Map<String,Object>> queryByAgentInfo(Map<String,String> map);
 }
