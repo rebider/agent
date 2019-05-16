@@ -821,19 +821,20 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 	/**
 	 * 为瑞大宝提供 — 根据平台编号修改登陆手机号
-	 * @param busNum
-	 * @param BusLoginNum
+	 * @param oldBusLoginNum
+	 * @param busLoginNum
 	 * @throws MessageException
 	 */
 	@Override
-	public void updateBusLoginNum(String busNum,String BusLoginNum)throws MessageException{
-		logger.info("根据平台编号修改登陆手机号请求参数:{},{}",busNum,BusLoginNum);
-		AgentBusInfo agentBusInfo = queryBusInfo(busNum);
-		agentBusInfo.setcUtime(new Date());
-		agentBusInfo.setBusLoginNum(BusLoginNum);
-		int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+	public void updateBusLoginNum(String oldBusLoginNum,String busLoginNum)throws MessageException{
+		logger.info("根据平台编号修改登陆手机号请求参数:{},{}",oldBusLoginNum,busLoginNum);
+		Map<String, Object> reqMap = new HashMap<>();
+		reqMap.put("oldBusLoginNum",oldBusLoginNum);
+		reqMap.put("busLoginNum",busLoginNum);
+		reqMap.put("platformType",PlatformType.RDBPOS.code);
+		int i = agentBusInfoMapper.updateBusLoginNum(reqMap);
 		logger.info("根据平台编号修改登陆手机号处理结果:{}",i);
-		if(i!=1){
+		if(i==0){
 			throw new MessageException("更新失败");
 		}
 	}
