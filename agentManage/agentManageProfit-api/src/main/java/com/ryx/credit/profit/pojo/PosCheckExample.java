@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class PosCheckExample implements Serializable {
     protected String orderByClause;
@@ -19,6 +20,20 @@ public class PosCheckExample implements Serializable {
     protected Integer limitStart;
 
     protected Integer limitEnd;
+
+    protected String innerJoinDepartment;
+
+    public void setInnerJoinDepartment(String innerJoinDepartment, String corId) {
+        if (Objects.equals("south", innerJoinDepartment )|| Objects.equals("north", innerJoinDepartment)) {
+            this.innerJoinDepartment = " INNER JOIN A_AGENT AGENT ON N.AGENT_ID = AGENT.ID AND AGENT.AG_DOC_DISTRICT= "+corId;
+        } else if (innerJoinDepartment.contains("south") || innerJoinDepartment.contains("north")) {
+            this.innerJoinDepartment = " INNER JOIN A_AGENT AGENT ON N.AGENT_ID = AGENT.ID AND AGENT.AG_DOC_PRO= "+corId;
+        }
+    }
+
+    public String getInnerJoinDepartment(){
+        return innerJoinDepartment;
+    }
 
     public PosCheckExample() {
         oredCriteria = new ArrayList<Criteria>();
@@ -875,6 +890,216 @@ public class PosCheckExample implements Serializable {
 
         public Criteria andCheckStatusNotBetween(String value1, String value2) {
             addCriterion("CHECK_STATUS not between", value1, value2, "checkStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumIsNull() {
+            addCriterion("BUS_NUM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumIsNotNull() {
+            addCriterion("BUS_NUM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumEqualTo(String value) {
+            addCriterion("BUS_NUM =", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumNotEqualTo(String value) {
+            addCriterion("BUS_NUM <>", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumGreaterThan(String value) {
+            addCriterion("BUS_NUM >", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumGreaterThanOrEqualTo(String value) {
+            addCriterion("BUS_NUM >=", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumLessThan(String value) {
+            addCriterion("BUS_NUM <", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumLessThanOrEqualTo(String value) {
+            addCriterion("BUS_NUM <=", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumLike(String value) {
+            addCriterion("BUS_NUM like", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumNotLike(String value) {
+            addCriterion("BUS_NUM not like", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumIn(List<String> values) {
+            addCriterion("BUS_NUM in", values, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumNotIn(List<String> values) {
+            addCriterion("BUS_NUM not in", values, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumBetween(String value1, String value2) {
+            addCriterion("BUS_NUM between", value1, value2, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumNotBetween(String value1, String value2) {
+            addCriterion("BUS_NUM not between", value1, value2, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlayformCodeIsNull() {
+            addCriterion("PLAYFORM_CODE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlayformCodeIsNotNull() {
+            addCriterion("PLAYFORM_CODE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlayformCodeEqualTo(String value) {
+            addCriterion("PLAYFORM_CODE =", value, "playformCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlayformCodeNotEqualTo(String value) {
+            addCriterion("PLAYFORM_CODE <>", value, "playformCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlayformCodeGreaterThan(String value) {
+            addCriterion("PLAYFORM_CODE >", value, "playformCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlayformCodeGreaterThanOrEqualTo(String value) {
+            addCriterion("PLAYFORM_CODE >=", value, "playformCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlayformCodeLessThan(String value) {
+            addCriterion("PLAYFORM_CODE <", value, "playformCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlayformCodeLessThanOrEqualTo(String value) {
+            addCriterion("PLAYFORM_CODE <=", value, "playformCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlayformCodeLike(String value) {
+            addCriterion("PLAYFORM_CODE like", value, "playformCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlayformCodeNotLike(String value) {
+            addCriterion("PLAYFORM_CODE not like", value, "playformCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlayformCodeIn(List<String> values) {
+            addCriterion("PLAYFORM_CODE in", values, "playformCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlayformCodeNotIn(List<String> values) {
+            addCriterion("PLAYFORM_CODE not in", values, "playformCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlayformCodeBetween(String value1, String value2) {
+            addCriterion("PLAYFORM_CODE between", value1, value2, "playformCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlayformCodeNotBetween(String value1, String value2) {
+            addCriterion("PLAYFORM_CODE not between", value1, value2, "playformCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTypeIsNull() {
+            addCriterion("CHECK_TYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTypeIsNotNull() {
+            addCriterion("CHECK_TYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTypeEqualTo(String value) {
+            addCriterion("CHECK_TYPE =", value, "checkType");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTypeNotEqualTo(String value) {
+            addCriterion("CHECK_TYPE <>", value, "checkType");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTypeGreaterThan(String value) {
+            addCriterion("CHECK_TYPE >", value, "checkType");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTypeGreaterThanOrEqualTo(String value) {
+            addCriterion("CHECK_TYPE >=", value, "checkType");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTypeLessThan(String value) {
+            addCriterion("CHECK_TYPE <", value, "checkType");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTypeLessThanOrEqualTo(String value) {
+            addCriterion("CHECK_TYPE <=", value, "checkType");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTypeLike(String value) {
+            addCriterion("CHECK_TYPE like", value, "checkType");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTypeNotLike(String value) {
+            addCriterion("CHECK_TYPE not like", value, "checkType");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTypeIn(List<String> values) {
+            addCriterion("CHECK_TYPE in", values, "checkType");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTypeNotIn(List<String> values) {
+            addCriterion("CHECK_TYPE not in", values, "checkType");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTypeBetween(String value1, String value2) {
+            addCriterion("CHECK_TYPE between", value1, value2, "checkType");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTypeNotBetween(String value1, String value2) {
+            addCriterion("CHECK_TYPE not between", value1, value2, "checkType");
             return (Criteria) this;
         }
     }

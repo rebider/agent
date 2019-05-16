@@ -6,6 +6,7 @@ import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.pojo.AgentRelate;
 import com.ryx.credit.profit.pojo.AgentRelateDetail;
 import com.ryx.credit.profit.pojo.AgentRelateExample;
+import com.sun.corba.se.spi.ior.ObjectKey;
 
 import java.util.List;
 import java.util.Map;
@@ -41,4 +42,6 @@ public interface IAgentRelateService {
      * @param status
      */
     public void completeTaskEnterActivity(String insid, String status);
+
+    public List<String> getRelateAgentIdByAgentIdAndTime(String agentId,String profitDate);
 }

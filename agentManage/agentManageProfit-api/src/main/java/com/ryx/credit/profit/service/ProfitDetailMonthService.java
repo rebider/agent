@@ -98,4 +98,5 @@ public interface ProfitDetailMonthService {
     List<TransProfitDetail> getChildTransProfitDetailList(List<String> agentId, List<String> profitDate, String agentType);
 
     List<TransProfitDetail> getTransProfitDetailByBusCode(TransProfitDetailExample transProfitDetailExample );
+    public ProfitDetailMonth selectByIdAndParent(ProfitDetailMonth example);
 }

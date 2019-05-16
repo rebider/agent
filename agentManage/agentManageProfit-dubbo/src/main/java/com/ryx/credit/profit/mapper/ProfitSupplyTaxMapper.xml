@@ -261,6 +261,12 @@
   <select id="getProfitSupplyTaxCount" parameterType="java.util.Map" resultType="java.lang.Long">
     SELECT COUNT(1)
     FROM PROFIT_SUPPLY_TAX
+    <if test="orgId != null and orgId != ''">
+      inner join  A_AGENT AGENT ON SUPPLY_TAX_AGENT_ID = AGENT.ID AND AGENT.AG_DOC_PRO= #{orgId}
+    </if>
+    <if test="area != null and area != ''">
+      inner join  A_AGENT AGENT ON SUPPLY_TAX_AGENT_ID = AGENT.ID AND AGENT.AG_DOC_DISTRICT= #{area}
+    </if>
     <include refid="BASE_WHERE_SQL"></include>
   </select>
 
@@ -295,8 +301,14 @@
     <include refid="PAGING_START" />
     select ps.ID,ps.SUPPLY_TAX_DATE ,ps.SUPPLY_TAX_AGENT_ID,ps.SUPPLY_TAX_AGENT_NAME,
     ps.SUPPLY_TAX_PLATFORM,ps.SUPPLY_TAX_SUB_ID,ps.SUPPLY_TAX_SUB_NAME,ps.SUPPLY_TAX_AMT,
-    ps.CREATE_TIME,ps.UPDATE_TIME,aa.bus_type as SUPPLY_TAX_TYPE from PROFIT_SUPPLY_TAX ps left
-    join (select  distinct  aab.bus_type ,aab.AGENT_ID as AGENT_IDA  from PROFIT_SUPPLY_TAX  pst
+    ps.CREATE_TIME,ps.UPDATE_TIME,aa.bus_type as SUPPLY_TAX_TYPE from PROFIT_SUPPLY_TAX ps
+    <if test="orgId != null and orgId != ''">
+      inner join  A_AGENT AGENT ON ps.SUPPLY_TAX_AGENT_ID = AGENT.ID AND AGENT.AG_DOC_PRO= #{orgId}
+    </if>
+    <if test="area != null and area != ''">
+      inner join  A_AGENT AGENT ON ps.SUPPLY_TAX_AGENT_ID = AGENT.ID AND AGENT.AG_DOC_DISTRICT= #{area}
+    </if>
+    left join (select  distinct  aab.bus_type ,aab.AGENT_ID as AGENT_IDA  from PROFIT_SUPPLY_TAX  pst
     left join A_agent_businfo aab on  pst.supply_Tax_agent_id = aab.Agent_id )
     aa on ps.supply_Tax_agent_id = aa.AGENT_IDA where
     1=1
@@ -318,7 +330,7 @@
 
   <select id="getClassificationList" parameterType="java.util.Map" resultType="java.util.Map">
     <include refid="PAGING_START" />
-    select * from (select * from (select ps.ID,ps.SUPPLY_TAX_DATE ,ps.SUPPLY_TAX_AGENT_ID,ps.SUPPLY_TAX_AGENT_NAME,
+    select * from (select zzz.* from (select ps.ID,ps.SUPPLY_TAX_DATE ,ps.SUPPLY_TAX_AGENT_ID,ps.SUPPLY_TAX_AGENT_NAME,
     ps.SUPPLY_TAX_PLATFORM,ps.SUPPLY_TAX_SUB_ID,ps.SUPPLY_TAX_SUB_NAME,ps.SUPPLY_TAX_AMT,
     ps.CREATE_TIME,ps.UPDATE_TIME,aa.bus_type as SUPPLY_TAX_TYPE from PROFIT_SUPPLY_TAX ps left
     join (select  distinct  aab.bus_type ,aab.AGENT_ID as AGENT_IDA  from PROFIT_SUPPLY_TAX  pst
@@ -328,6 +340,12 @@
     <if test="DATEEND != null and DATEEND !='' "> and ps.SUPPLY_TAX_DATE &lt;= #{DATEEND} </if>
     and SUPPLY_TAX_AMT  != 0.00
     ) zzz
+    <if test="orgId != null and orgId != ''">
+      inner join  A_AGENT AGENT ON zzz.SUPPLY_TAX_AGENT_ID = AGENT.ID AND AGENT.AG_DOC_PRO= #{orgId}
+    </if>
+    <if test="area != null and area != ''">
+      inner join  A_AGENT AGENT ON zzz.SUPPLY_TAX_AGENT_ID = AGENT.ID AND AGENT.AG_DOC_DISTRICT= #{area}
+    </if>
     START WITH
     zzz.SUPPLY_TAX_PLATFORM = '01'
     <if test="SUPPLY_TAX_AGENT_ID != null and SUPPLY_TAX_AGENT_ID !='' "> and zzz.SUPPLY_TAX_AGENT_ID = #{SUPPLY_TAX_AGENT_ID} </if>
@@ -348,7 +366,7 @@
 
   <select id="getClassificationCount" parameterType="java.util.Map" resultType="java.lang.Long">
 
-    select COUNT(1) from(select * from (select ps.ID,ps.SUPPLY_TAX_DATE ,ps.SUPPLY_TAX_AGENT_ID,ps.SUPPLY_TAX_AGENT_NAME,
+    select COUNT(1) from(select zzz.* from (select ps.ID,ps.SUPPLY_TAX_DATE ,ps.SUPPLY_TAX_AGENT_ID,ps.SUPPLY_TAX_AGENT_NAME,
     ps.SUPPLY_TAX_PLATFORM,ps.SUPPLY_TAX_SUB_ID,ps.SUPPLY_TAX_SUB_NAME,ps.SUPPLY_TAX_AMT,
     ps.CREATE_TIME,ps.UPDATE_TIME,aa.bus_type as SUPPLY_TAX_TYPE from PROFIT_SUPPLY_TAX ps left
     join (select  distinct  aab.bus_type ,aab.AGENT_ID as AGENT_IDA  from PROFIT_SUPPLY_TAX  pst
@@ -356,10 +374,14 @@
     aa on ps.supply_Tax_agent_id = aa.AGENT_IDA where 1=1
     <if test="DATESTART != null and DATESTART !='' "> and ps.SUPPLY_TAX_DATE &gt;= #{DATESTART} </if>
     <if test="DATEEND != null and DATEEND !='' "> and ps.SUPPLY_TAX_DATE &lt;= #{DATEEND} </if>
-
      and SUPPLY_TAX_AMT  != 0.00
-
     ) zzz
+    <if test="orgId != null and orgId != ''">
+      inner join  A_AGENT AGENT ON zzz.SUPPLY_TAX_AGENT_ID = AGENT.ID AND AGENT.AG_DOC_PRO= #{orgId}
+    </if>
+    <if test="area != null and area != ''">
+      inner join  A_AGENT AGENT ON zzz.SUPPLY_TAX_AGENT_ID = AGENT.ID AND AGENT.AG_DOC_DISTRICT= #{area}
+    </if>
     START WITH
     zzz.SUPPLY_TAX_PLATFORM = '01'
     <if test="SUPPLY_TAX_AGENT_ID != null and SUPPLY_TAX_AGENT_ID !='' "> and zzz.SUPPLY_TAX_AGENT_ID = #{SUPPLY_TAX_AGENT_ID} </if>

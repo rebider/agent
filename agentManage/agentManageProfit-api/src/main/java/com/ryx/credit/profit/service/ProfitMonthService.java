@@ -204,16 +204,6 @@ public interface ProfitMonthService {
      */
     List<Map<String,Object>> exportByF(Map<String, Object> param);
 
-    /**
-     * 代理商手刷分润冻结
-     */
-    Map<String,String> doFrozenByAgent(List<String> list);
-
-    /**
-     * 代理商手刷分润解冻
-     */
-    Map<String,String>  doUnFrozenAgentProfit(List<String> list);
-
-
+    List<ProfitDetailMonth> byProfitDetailMonth(ProfitDetailMonthExample profitDetailMonthExample);
 
 }

@@ -70,6 +70,8 @@ public class TransProfitDetail implements Serializable {
 
     private BigDecimal qrPftAmt;
 
+    private String remark;
+
     public String getId() {
         return id;
     }
@@ -332,5 +334,13 @@ public class TransProfitDetail implements Serializable {
 
     public void setQrPftAmt(BigDecimal qrPftAmt) {
         this.qrPftAmt = qrPftAmt;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark == null ? null : remark.trim();
     }
 }

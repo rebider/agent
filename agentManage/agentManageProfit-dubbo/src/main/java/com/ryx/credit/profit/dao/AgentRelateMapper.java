@@ -31,4 +31,6 @@ public interface AgentRelateMapper {
     List<Map<String, Object>> getList(Map<String, Object> param);
 
     Map<String,String> queryParentAgentByAgentId(Map<String, String> param);
+
+    List<String> getRelateAgentIdByAgentIdAndTime(@Param("agentId") String agentId, @Param("profitDate") String profitDate);
 }

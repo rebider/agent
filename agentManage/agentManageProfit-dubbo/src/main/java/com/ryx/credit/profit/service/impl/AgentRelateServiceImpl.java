@@ -1,20 +1,23 @@
 package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.enumc.*;
-import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.enumc.AgStatus;
+import com.ryx.credit.common.enumc.BusActRelBusType;
+import com.ryx.credit.common.enumc.Status;
+import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.pojo.admin.agent.AgentBusInfoExample;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
-import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.dao.AgentRelateDetailMapper;
 import com.ryx.credit.profit.dao.AgentRelateMapper;
-import com.ryx.credit.profit.pojo.*;
+import com.ryx.credit.profit.pojo.AgentRelate;
+import com.ryx.credit.profit.pojo.AgentRelateDetail;
+import com.ryx.credit.profit.pojo.AgentRelateDetailExample;
+import com.ryx.credit.profit.pojo.AgentRelateExample;
 import com.ryx.credit.profit.service.IAgentRelateService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentEnterService;
@@ -23,16 +26,12 @@ import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -85,6 +84,11 @@ public class AgentRelateServiceImpl implements IAgentRelateService {
         return pageInfo;
     }
 
+    /**
+     * 添加关联关系
+     * @param agentRelate
+     * @return
+     */
     @Override
     public int insertAgentRelate(AgentRelate agentRelate) {
         return agentRelateMapper.insert(agentRelate);
@@ -221,5 +225,10 @@ public class AgentRelateServiceImpl implements IAgentRelateService {
             e.printStackTrace();
             logger.error("代理商关联审批流回调异常，activId：{}" + insid);
         }
+    }
+
+    @Override
+    public List<String> getRelateAgentIdByAgentIdAndTime(String agentId, String profitDate) {
+        return agentRelateMapper.getRelateAgentIdByAgentIdAndTime(agentId,profitDate);
     }
 }

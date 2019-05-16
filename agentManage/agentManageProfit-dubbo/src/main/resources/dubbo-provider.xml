@@ -66,4 +66,6 @@
     <dubbo:service interface="com.ryx.credit.profit.service.IProfitCityApplicationService" ref="profitCityApplicationService"  timeout="1200000" registry="${zk.group}"/>
    <dubbo:service interface="com.ryx.credit.profit.service.IAgeInvoiceApplyService" ref="ageInvoiceApplyService"  timeout="1200000" registry="${zk.group}"/>
  <dubbo:service interface="com.ryx.credit.profit.service.TransProfitDetailService" ref="transProfitDetailServiceImpl"  timeout="1200000" registry="${zk.group}"/>
+ <dubbo:service interface="com.ryx.credit.profit.service.IFreezeAgentSercice" ref="freezeAgentSercice"  timeout="1200000" registry="${zk.group}"/>
+ <dubbo:service interface="com.ryx.credit.profit.service.ISetServerAmtService" ref="setServerAmtService"  timeout="1200000" registry="${zk.group}"/>
 </beans>

@@ -429,4 +429,10 @@
       and a.bus_platform=#{busPlatform}
     </if>
   </select>
+  <select id="getRelateAgentIdByAgentIdAndTime" resultType="java.lang.String">
+    select AGENT_ID from A_AGENT_RELATE_DETAIL where RELATE_ID in
+        (select * from
+            (select id from A_AGENT_RELATE where AGENT_ID=#{agentId} and START_MONTH  &lt;= #{profitDate} and STATUS='1' order by START_MONTH desc)
+        where rownum=1)
+  </select>
 </mapper>
