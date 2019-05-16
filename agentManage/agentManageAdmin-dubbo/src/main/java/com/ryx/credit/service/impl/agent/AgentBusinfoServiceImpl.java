@@ -782,5 +782,61 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		}
 		return null;
 	}
+
+
+	public AgentBusInfo queryBusInfo(String busNum)throws MessageException{
+		if(StringUtils.isBlank(busNum)){
+			throw new MessageException("业务编号不能为空");
+		}
+		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+		AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+		criteria.andStatusEqualTo(Status.STATUS_1.status);
+		criteria.andBusStatusNotEqualTo(BusinessStatus.pause.status);
+		criteria.andBusNumEqualTo(busNum);
+		List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+		if(agentBusInfos==null){
+			throw new MessageException("业务不存在");
+		}
+		if(agentBusInfos.size()==0){
+			throw new MessageException("业务不存在");
+		}
+		if(agentBusInfos.size()!=1){
+			throw new MessageException("业务不唯一");
+		}
+		AgentBusInfo agentBusInfo = agentBusInfos.get(0);
+		return agentBusInfo;
+	}
+
+	/**
+	 * 为瑞大宝提供 — 根据平台编号查询agentId
+	 * @param busNum
+	 * @return
+	 * @throws MessageException
+	 */
+	@Override
+	public String queryAgentId(String busNum)throws MessageException{
+		AgentBusInfo agentBusInfo = queryBusInfo(busNum);
+		return agentBusInfo.getAgentId();
+	}
+
+	/**
+	 * 为瑞大宝提供 — 根据平台编号修改登陆手机号
+	 * @param busNum
+	 * @param BusLoginNum
+	 * @throws MessageException
+	 */
+	@Override
+	public void updateBusLoginNum(String busNum,String BusLoginNum)throws MessageException{
+		logger.info("根据平台编号修改登陆手机号请求参数:{},{}",busNum,BusLoginNum);
+		AgentBusInfo agentBusInfo = queryBusInfo(busNum);
+		agentBusInfo.setcUtime(new Date());
+		agentBusInfo.setBusLoginNum(BusLoginNum);
+		int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+		logger.info("根据平台编号修改登陆手机号处理结果:{}",i);
+		if(i!=1){
+			throw new MessageException("更新失败");
+		}
+	}
+
 }
 
