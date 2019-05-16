@@ -729,11 +729,12 @@ where
   </select>
 
   <select id="selectByBusNum" resultType="java.util.Map">
-    select amb.MAIN_AGENT_ID ,a.AG_NAME from a_agent_merge_businfo amb
+select zzz.*,ag.AG_NAME as SUB_AGENT_NAME from (select amb.MAIN_AGENT_ID ,a.AG_NAME,amb.SUB_AGENT_ID from a_agent_merge_businfo amb
       left join A_AGENT a on amb.MAIN_AGENT_ID = a.ID
       left join a_agent_merge am on am.ID = amb.AGENT_MARGE_ID
         where am.STATUS= 1  and amb.STATUS= 1 and amb.MERGE_STATUS = 1
         and amb.BUS_NUM = #{busNum} and  to_date(#{date},'yyyy-MM-dd HH24:MI:ss') > am.U_TIME
+        ) zzz left join A_AGENT ag on zzz.SUB_AGENT_ID = ag.ID
   </select>
 
   </mapper>
