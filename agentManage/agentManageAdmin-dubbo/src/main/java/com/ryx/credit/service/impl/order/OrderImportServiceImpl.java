@@ -947,7 +947,7 @@ public class OrderImportServiceImpl implements OrderImportService {
                 logistics.setOrderId(order.getId());
                 logistics.setReceiptPlanId(receiptPlan.getId());
                 logistics.setProCom(receiptPlan.getProCom());
-                logistics.setProId(receiptPlan.getProId());
+                logistics.setProId(oReceiptPro.getProId());
                 logistics.setProName(product.getProName());
                 logistics.setProType(receiptPlan.getProType());
                 logistics.setSendNum(receiptPlan.getSendProNum());

@@ -100,15 +100,14 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
     }
 
     @Override
-    public String selectDataGrid(PageInfo pageInfo) {
-        Page<Map<String, Object>> page = new Page<Map<String, Object>>(pageInfo.getNowpage(), pageInfo.getSize());
+    public Object selectDataGrid(PageInfo pageInfo) {
+        Page<Map<String, Object>> page = new Page<>(pageInfo.getNowpage(), pageInfo.getSize());
         page.setOrderByField(pageInfo.getSort());
         page.setAsc(pageInfo.getOrder().equalsIgnoreCase("asc"));
         List<Map<String, Object>> list =  userMapper.selectUserPage(page, pageInfo.getCondition());
         pageInfo.setRows((ArrayList) list);
-        //pageInfo.setTotal(page.getTotal());
         pageInfo.setTotal(userMapper.selectUserCount(pageInfo.getCondition()));
-        return JSON.toJSON(pageInfo).toString();
+        return JSON.toJSON(pageInfo);
     }
 
     @Override

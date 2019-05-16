@@ -100,8 +100,8 @@ public class BusiPlatServiceImpl implements BusiPlatService {
     @Override
     public AgentResult pos_updateAgName(AgentNotifyVo agentNotifyVo) throws Exception {
         agentNotifyVo.setUseOrgan("886");//使用范围 886-代理商
-        return agentNotifyService.httpRequestForPos(agentNotifyVo);
-
+//        return agentNotifyService.httpRequestForPos(agentNotifyVo);
+        return null;
     }
 
     @Override

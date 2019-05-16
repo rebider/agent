@@ -52,6 +52,7 @@ public class MposTermMachineServiceImpl implements TermMachineService {
             }
             return resData;
         }else{
+            AppConfig.sendEmails(res.getString("respMsg"), "机具划拨通知手刷失败报警");
             throw new MessageException(res.getString("respMsg"));
         }
 
@@ -78,6 +79,7 @@ public class MposTermMachineServiceImpl implements TermMachineService {
             }
             return resData;
         }else{
+            AppConfig.sendEmails(res.getString("respMsg"), "机具划拨通知手刷失败报警");
             throw new MessageException(res.getString("respMsg"));
         }
     }
@@ -102,6 +104,7 @@ public class MposTermMachineServiceImpl implements TermMachineService {
             }
             return resData;
         }else{
+            AppConfig.sendEmails(res.getString("respMsg"), "机具划拨通知手刷失败报警");
             throw new MessageException(res.getString("respMsg"));
         }
     }
@@ -121,6 +124,7 @@ public class MposTermMachineServiceImpl implements TermMachineService {
             logger.info("Mpos机具的调整，下发:{}{}{}",AppConfig.getProperty("mpos.lowerHairMachine"),res.toJSONString(),res.getString("respMsg"));
             return AgentResult.ok();
         }else{
+            AppConfig.sendEmails(res.getString("respMsg"), "机具划拨通知手刷失败报警");
             throw new MessageException(res.getString("respMsg"));
         }
     }
@@ -140,6 +144,7 @@ public class MposTermMachineServiceImpl implements TermMachineService {
             logger.info("Mpos机具的调整，退货是使用:{}{}{}",AppConfig.getProperty("mpos.adjustmentMachine"),res.toJSONString(),res.getString("respMsg"));
             return AgentResult.ok();
         }else{
+            AppConfig.sendEmails(res.getString("respMsg"), "机具划拨通知手刷失败报警");
             throw new MessageException(res.getString("respMsg"));
         }
     }
@@ -159,6 +164,7 @@ public class MposTermMachineServiceImpl implements TermMachineService {
             logger.info("Mpos机具的调整，机具活动的变更:{}{}{}",AppConfig.getProperty("mpos.changeActMachine"),res.getString("respMsg"),res.toJSONString());
             return AgentResult.ok();
         }else{
+            AppConfig.sendEmails(res.getString("respMsg"), "机具划拨通知手刷失败报警");
             throw new MessageException(res.getString("respMsg"));
         }
     }

@@ -527,4 +527,33 @@ public class RedisService {
         return resultList;
     }
 
+    /**
+     * 添加到set集合
+     * @param key
+     * @param value
+     * @return
+     */
+    public long sAdd(String key,String ...value){
+        return redisTemplate.opsForSet().add(key,value);
+    }
+
+    /**
+     * 判断是否是集合成员
+     * @param key
+     * @param value
+     * @return
+     */
+    public boolean sismember(String key,String value){
+        return redisTemplate.opsForSet().isMember(key,value);
+    }
+
+    /**
+     * 返回结合所有元素
+     * @param key
+     * @return
+     */
+    public Set<String> smembers(String key){
+        return redisTemplate.opsForSet().members(key);
+    }
+
 }

@@ -45,6 +45,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -90,8 +91,8 @@ public class AgentMergeServiceImpl  implements AgentMergeService {
     private ApaycompService apaycompService;
     @Autowired
     private AgentColinfoService agentColinfoService;
-    @Autowired
-    private AgentNotifyService agentNotifyService;
+    @Resource(name="platformSynServicePos")
+    private PlatformSynService platformSynServicePos;
     @Autowired
     private DictOptionsService dictOptionsService;
     @Autowired
@@ -1270,7 +1271,7 @@ public class AgentMergeServiceImpl  implements AgentMergeService {
                 record.setNotifyType(NotifyType.AgentMerge.getValue());
                 AgentResult agentResult =new AgentResult();
                 try{
-                    agentResult =  agentNotifyService.httpRequestForPos(agentNotifyVo);
+                    agentResult =  platformSynServicePos.httpRequestNetIn(agentNotifyVo);
                 } catch (Exception e) {
                     e.printStackTrace();
                     logger.error("代理商合并申请-更改代理商名称异常，activId：{}" + busId);
@@ -1510,8 +1511,7 @@ public class AgentMergeServiceImpl  implements AgentMergeService {
         BigDecimal orderDebt = orderService.queryAgentDebt(agentId);
         logger.info("代理商合并查询订单欠款：代理商id:{},欠款：{}",agentId,orderDebt);
         BigDecimal bigDecimal = profitDebt(agentId);
-        BigDecimal capitalFRDK = getCapitalFRDK(agentId);
-        return orderDebt.add(bigDecimal).add(capitalFRDK);
+        return orderDebt.add(bigDecimal);
     }
 
     /**
@@ -1568,9 +1568,8 @@ public class AgentMergeServiceImpl  implements AgentMergeService {
         reqMap.put("paymentTypes",typeList);
         BigDecimal orderDebt = paymentMapper.queryAgentDebtByType(reqMap);
         logger.info("代理商合并查询订单欠款：代理商id:{},欠款：{}",agentId,orderDebt);
-        BigDecimal capitalFRDK = getCapitalFRDK(agentId);
 //        BigDecimal bigDecimal = profitDebt(agentId);
-        return orderDebt.add(capitalFRDK);
+        return orderDebt;
     }
 
 
@@ -1592,13 +1591,4 @@ public class AgentMergeServiceImpl  implements AgentMergeService {
         return new BigDecimal(owminvoice);
     }
 
-
-    @Override
-    public BigDecimal getCapitalFRDK(String agentId) {
-        Map<String,Object> reqMap = new HashMap<>();
-        reqMap.put("cAgentId", agentId);
-        BigDecimal ffdk = paymentMapper.queryAgentJNKQK(reqMap);
-        logger.info("查询ffdk：代理商id:{},ffdk：{}", agentId, ffdk);
-        return ffdk;
-    }
 }

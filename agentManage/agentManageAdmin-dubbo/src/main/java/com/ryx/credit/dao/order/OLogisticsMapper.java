@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface OLogisticsMapper {
-    int countByExample(OLogisticsExample example);
+    long countByExample(OLogisticsExample example);
 
     int deleteByExample(OLogisticsExample example);
 

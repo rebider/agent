@@ -105,6 +105,27 @@ public class AgentQueryServiceImpl implements AgentQueryService {
         return capitals;
     }
 
+    /**
+     * 查询审批通过的缴纳款项
+     * @param agentId
+     * @return
+     */
+    @Override
+    public List<Capital> paymentQueryPass(String agentId) {
+        CapitalExample capitalExample = new CapitalExample();
+        CapitalExample.Criteria criteria = capitalExample.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
+        criteria.andCAgentIdEqualTo(agentId);
+        List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
+        if (null != capitals && capitals.size() > 0) {
+            for (Capital capital : capitals) {
+                capital.setAttachmentList(accessoryQuery(capital.getId(), AttachmentRelType.Capital.name()));
+            }
+        }
+        return capitals;
+    }
+
     @Override
     public List<Capital> capitalQuery(String agentId, String type) {
         CapitalExample example = new CapitalExample();

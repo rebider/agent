@@ -71,7 +71,7 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
         try {
             String cooperator = com.ryx.credit.util.Constants.cooperator;
             String charset = "UTF-8"; // 字符集
-            String tranCode = "ORG006"; // 交易码
+            String tranCode = "ORG011"; // 交易码
             String reqMsgId = UUID.randomUUID().toString().replace("-", ""); // 请求流水
             String reqDate = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"); // 请求时间
 
@@ -175,6 +175,37 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
         }else if(TerminalPlatformType.POS.getValue().compareTo(new BigDecimal(termType))==0){
             AgentResult agentResult = httpForPos(orgId,orgId);
             agentResult.setMsg(PlatformType.POS.getValue());
+            return agentResult;
+        }
+        return AgentResult.fail();
+    }
+
+    @Override
+    public AgentResult posOrgStatistics(Map map) throws Exception {
+        if (null==map|| map.size()==0){
+            return AgentResult.fail();
+        }
+        String busPlatform =(String)map.get("busPlatform");
+        String busId =(String)map.get("busParent");
+        String orgId =(String)map.get("busNum");
+        String termType =(String)map.get("termType");
+        if (StringUtils.isBlank(busId) && StringUtils.isBlank(orgId)){
+            return  AgentResult.fail();
+        }
+        PlatForm platForm = platFormMapper.selectByPlatFormNum(busPlatform);
+        String platformType = platForm.getPlatformType();
+        AgentBusInfo parentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
+        String parentBusNum="";
+        if(parentBusInfo!=null){
+            parentBusNum=parentBusInfo.getBusNum();
+        }
+        if(PlatformType.MPOS.getValue().equals(platformType)){
+            AgentResult agentResult = httpForMpos(orgId,parentBusNum,termType);
+            agentResult.setMsg(platformType);
+            return agentResult;
+        }else if(PlatformType.POS.getValue().equals(platformType) || PlatformType.ZPOS.getValue().equals(platformType)){
+            AgentResult agentResult = httpForPos(orgId,parentBusNum);
+            agentResult.setMsg(platformType);
             return agentResult;
         }
         return AgentResult.fail();

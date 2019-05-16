@@ -32,6 +32,12 @@
             <aop:after-returning method="logArgAndReturn" returning="returnObj" pointcut-ref="myPointcut"/>
         </aop:aspect>
     </aop:config>
+    <bean id="dataHistoryInterceptor" class="com.ryx.credit.event.DataHistoryInterceptor"></bean>
+    <aop:config>
+        <aop:pointcut id="displayExecuteSql" expression="execution(public * com.ryx.credit.dao..*.*(..))"/>
+        <!--在该切入点使用自定义拦截器-->
+        <aop:advisor pointcut-ref="displayExecuteSql" advice-ref="dataHistoryInterceptor"/>
+    </aop:config>
     <!--<bean id="loginAuthFilter" class="com.ryx.common.filter.AuthFilter"></bean>-->
     <import resource="dubbo-provider.xml"/>
     <import resource="spring-redis.xml"/>

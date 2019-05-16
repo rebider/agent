@@ -98,6 +98,9 @@
             <if test=" name != null and name != '' ">
                 t.name = #{name}
             </if>
+            <if test=" loginName != null and loginName != '' ">
+                t.login_name = #{loginName}
+            </if>
             <if test=" organizationId != null ">
                 t.organization_id = #{organizationId}
             </if>

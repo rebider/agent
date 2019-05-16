@@ -100,4 +100,12 @@ public interface AgentQueryService {
      * @return
      */
     AgentColinfo queryUserColinfo(String agentId);
+
+
+    /**
+     * 查询审批通过的缴纳款项
+     * @param agentId
+     * @return
+     */
+    List<Capital> paymentQueryPass(String agentId);
 }

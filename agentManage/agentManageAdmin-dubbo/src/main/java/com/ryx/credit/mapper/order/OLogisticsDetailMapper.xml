@@ -687,7 +687,8 @@
     select
     <include refid="Base_Column_List"/>
     from o_logistics_detail o
-    where o.opt_type='ORDER' and o.record_status=3
+    where o.opt_type='ORDER' and o.record_status=3 and o.status=2 AND ROWNUM &lt;= 500
+    order by C_TIME ASC
   </select>
 
   <select id="querySnCountObj" parameterType="java.util.Map" resultMap="BaseResultMap">

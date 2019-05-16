@@ -133,6 +133,5 @@ public interface AgentMergeService {
 
     BigDecimal getCapitalDebt(String agentId);
 
-    BigDecimal getCapitalFRDK(String agentId);
 }
 

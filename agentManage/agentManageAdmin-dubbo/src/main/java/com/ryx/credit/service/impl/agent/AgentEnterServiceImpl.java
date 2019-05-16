@@ -127,6 +127,11 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             //判断平台是否重复
             List hav = new ArrayList();
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
+                if(item.getBusType().equals(BusType.ZQZF.key) || item.getBusType().equals(BusType.ZQBZF.key) || item.getBusType().equals(BusType.ZQ.key) ){
+                    if(StringUtils.isBlank(item.getBusParent()))
+                    throw new ProcessException("直签上级不能为空");
+                }
+
                 if (hav.contains(item.getBusPlatform())) {
                     throw new ProcessException("开通(" + item.getBusPlatform() + ")业务平台重复");
                 } else {
@@ -172,7 +177,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 }
             }
             if(resultSet.size()>1){
-                throw new ProcessException("不能同时提交pos和手刷平台");
+                throw new ProcessException("不能同时提交大pos和智能pos平台");
             }
             return ResultVO.success(agentVo);
         } catch (Exception e) {
@@ -196,7 +201,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             if(busType.equals(BusType.JG.key) || busType.equals(BusType.BZYD.key)){
                 for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
                     if(!agentBusInfoVo.getBusType().equals(BusType.JG.key) && !agentBusInfoVo.getBusType().equals(BusType.BZYD.key)){
-                        throw new ProcessException("业务平台类型为机构与标准一代时不能选择其他");
+                        throw new ProcessException("业务平台类型为机构与标准一代时不能选择其他,为其他类型时不能选择机构与标准一代");
                     }
                 }
             }
@@ -344,7 +349,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
 
             AgentBusInfo agentBusInfo = aginfo.get(0);
             PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
-            record.setNetInBusType("ACTIVITY_"+platForm.getPlatformType());
+            record.setNetInBusType("ACTIVITY_"+platForm.getPlatformNum());
             if (1 != busActRelMapper.insertSelective(record)) {
                 logger.info("代理商审批，启动审批异常，添加审批关系失败{}:{}", agentId, proce);
             }
@@ -446,7 +451,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         record.setDataShiro(BusActRelBusType.Business.key);
 
         PlatForm platForm = platFormMapper.selectByPlatFormNum(abus.getBusPlatform());
-        record.setNetInBusType("ACTIVITY_"+platForm.getPlatformType());
+        record.setNetInBusType("ACTIVITY_"+platForm.getPlatformNum());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("代理商业务启动审批异常，添加审批关系失败{}:{}", record.getBusId(), proce);
         }
@@ -592,6 +597,19 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             if (1 != accountPaidItemService.update(capital)) {
                 logger.info("代理商审批通过，合同状态更新失败{}:{}", processingId, bus.getId());
                 throw new ProcessException("合同状态更新失败");
+            }
+            if(PayType.FRDK.code.equals(capital.getcPayType())) {
+                try {
+                    //生成保证金等分期数据
+                    AgentResult capitalFq = accountPaidItemService.capitalFq(capital);
+                    if (!capitalFq.isOK()) {
+                        logger.info("代理商审批，保证金{}:{}", processingId, capital.getId());
+                        throw new ProcessException("生成保证金分期失败");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new ProcessException(e.getMessage());
+                }
             }
             //插入资金流水
             try {

@@ -513,6 +513,11 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             if(Oreturntype.NEW.code.equals(order.getOxOrder())){
                 throw new MessageException("订单"+oldOrderReturnBusEditVo.getOrderid()+"非历史订单");
             }
+            OLogisticsDetailExample  checkIsNoSn = new OLogisticsDetailExample();
+            checkIsNoSn.or().andOrderIdEqualTo(order.getId());
+            if(logisticsDetailMapper.countByExample(checkIsNoSn)>0){
+                throw new MessageException("订单"+oldOrderReturnBusEditVo.getOrderid()+"不是无sn订单，请填写无sn订单号");
+            }
 
             OProduct product = oProductMapper.selectByPrimaryKey(oldOrderReturnBusEditVo.getProductid());
             //检查订单中是否有此商品
@@ -665,14 +670,6 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             logger.info("请填写结束SN序列号");
             throw new MessageException("请填写结束SN序列号");
         }
-        if (!proCom.equals(CardImportType.LD.msg)) {
-            if (com.ryx.credit.commons.utils.StringUtils.isBlank(beginSnCount)) {
-                throw new MessageException("请填写起始SN位数");
-            }
-            if (com.ryx.credit.commons.utils.StringUtils.isBlank(endSnCount)) {
-                throw new MessageException("请填写结束SN位数");
-            }
-        }
 
         if (com.ryx.credit.commons.utils.StringUtils.isBlank(logCom)) {
             logger.info("请填写物流公司");
@@ -695,10 +692,20 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                 logger.info("校验Excel文档失败：[],[]",planNum,agentResult.getMsg());
                 throw new MessageException(agentResult.getMsg());
             }
+            //校验发货sn是否在退货号码段内
+            Object return_detail = listItem.get(0).get("RETURN_ORDER_DETAIL_ID");
+            if(return_detail!=null) {
+                OReturnOrderDetail returnOrderDetail = returnOrderDetailMapper.selectByPrimaryKey(return_detail+"");
+                AgentResult res = oLogisticsService.isInSnSegment(returnOrderDetail.getBeginSn(), returnOrderDetail.getEndSn(), beginSn, endSn);
+                if(!res.isOK()){
+                    throw new MessageException(res.getMsg());
+                }
+            }
+
         }else{
             throw new MessageException("排单信息未找到");
         }
-        if (beginSnCount.equals("") || endSnCount.equals("")){
+        if (StringUtils.isBlank(beginSnCount)|| StringUtils.isBlank(endSnCount)){
             beginSnCount="0";
             endSnCount="0";
         }

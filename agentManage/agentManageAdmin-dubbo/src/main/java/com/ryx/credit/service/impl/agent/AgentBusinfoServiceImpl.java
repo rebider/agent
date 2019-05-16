@@ -198,6 +198,11 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 			if(agent==null)throw new ProcessException("代理商信息不能为空");
 			Set<String> resultSet = new HashSet<>();
 			for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
+				if(agentBusInfoVo.getBusType().equals(BusType.ZQZF.key) || agentBusInfoVo.getBusType().equals(BusType.ZQBZF.key) || agentBusInfoVo.getBusType().equals(BusType.ZQ.key) ){
+					if(com.ryx.credit.commons.utils.StringUtils.isBlank(agentBusInfoVo.getBusParent()))
+						throw new ProcessException("直签上级不能为空");
+				}
+
 				PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfoVo.getBusPlatform());
 				resultSet.add(platForm.getPlatformType());
 				if (null!=agentBusInfoVo.getBusPlatform()){
@@ -333,7 +338,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 			}
 			if(!isPass && resultSet.size()>1){
-				throw new MessageException("不能同时提交pos和手刷平台");
+				throw new MessageException("不能同时提交大pos和智能pos平台");
 			}
 			return ResultVO.success(null);
 		} catch (Exception e) {
