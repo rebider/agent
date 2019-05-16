@@ -60,6 +60,8 @@ public interface IPosCheckService {
      */
     PosCheck getPosCheckById(String id);
 
+    Map<String,Object> getPosCheckInfoById(String id);
+
     /**
      * 根据ID 查询数据信息
      * @param id

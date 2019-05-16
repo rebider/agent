@@ -80,7 +80,10 @@
     select
     <include refid="Base_Column_List" />
     from P_POS_CHECK
-    where AGENT_ID = #{agentId,jdbcType=VARCHAR}
+    where AGENT_ID = #{agentId}
+    <if test="busNum != '' and busNum != null">
+      and BUS_NUM = #{busNum} and CHECK_STATUS in ('1','0')
+    </if>
   </select>
 
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PosCheckExample">
@@ -308,6 +311,24 @@
     <if test="busPlayform != '' and busPlayform != null ">
       and b.BUS_PLATFORM = #{busPlayform}
     </if>
+  </select>
 
+  <select id="selectById" parameterType="java.lang.String" resultType="java.util.Map">
+    select
+      pck.ID, pck.AGENT_ID, pck.AGENT_NAME, pck.CHECK_DATE_S,  pck.TOTAL_AMT, pck.POS_ORDERS,
+      pck.PROFIT_SCALE, pck.APP_DATE, pck.CHECK_STATUS, pck.BUS_NUM, ap.PLATFORM_NAME as PLAYFORM_CODE_NAME,
+      case pck.CHECK_TYPE
+        when  '0' then '付款分润比例'
+        when '1' then '出款分润比例'
+        when '2' then '2019新商户付款分润比例'
+        end  as CHECK_TYPE_POS,
+      case pck.CHECK_DATE_E
+        when '1' then '长期'
+        else pck.CHECK_DATE_E
+        end as CHECK_DATE_END
+    from P_POS_CHECK pck
+      left join A_AGENT_BUSINFO aab on pck.BUS_NUM = aab.BUS_NUM
+        left join A_PLATFORM ap on aab.BUS_PLATFORM = ap.PLATFORM_NUM
+    where pck.ID = #{id}
   </select>
 </mapper>
