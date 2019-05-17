@@ -123,4 +123,22 @@ public class OInternetCardImport {
     public void setImportType(String importType) {
         this.importType = importType == null ? null : importType.trim();
     }
+
+    @Override
+    public String toString() {
+        return "OInternetCardImport{" +
+                "id='" + id + '\'' +
+                ", importMsg='" + importMsg + '\'' +
+                ", importStatus=" + importStatus +
+                ", errorMsg='" + errorMsg + '\'' +
+                ", batchNum='" + batchNum + '\'' +
+                ", cTime=" + cTime +
+                ", uTime=" + uTime +
+                ", cUser='" + cUser + '\'' +
+                ", uUser='" + uUser + '\'' +
+                ", status=" + status +
+                ", version=" + version +
+                ", importType='" + importType + '\'' +
+                '}';
+    }
 }

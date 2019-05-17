@@ -401,4 +401,23 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="selectInternetCardExpireCount" parameterType="map" resultType="java.lang.Integer">
+    select count(*) from o_internet_Card c
+    <include refid="internetCardExpireSql" />
+  </select>
+
+  <update id="updateInternetCardExpire" parameterType="map" >
+    update o_internet_Card c set c.u_time = sysdate, c.renew = #{map.newRenew}
+    <include refid="internetCardExpireSql" />
+  </update>
+
+  <sql id="internetCardExpireSql" >
+    <where>
+      c.renew = #{map.renew}
+      and TO_CHAR(c.expire_time, 'YYYY-MM') = #{map.expireTime}
+      and Internet_card_status =  #{map.internetCardStatus}
+    </where>
+  </sql>
+
 </mapper>
