@@ -1,9 +1,10 @@
 package com.ryx.credit.pojo.admin.order;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class OInternetCardImport {
+public class OInternetCardImport implements Serializable{
     private String id;
 
     private String importMsg;
@@ -122,5 +123,23 @@ public class OInternetCardImport {
 
     public void setImportType(String importType) {
         this.importType = importType == null ? null : importType.trim();
+    }
+
+    @Override
+    public String toString() {
+        return "OInternetCardImport{" +
+                "id='" + id + '\'' +
+                ", importMsg='" + importMsg + '\'' +
+                ", importStatus=" + importStatus +
+                ", errorMsg='" + errorMsg + '\'' +
+                ", batchNum='" + batchNum + '\'' +
+                ", cTime=" + cTime +
+                ", uTime=" + uTime +
+                ", cUser='" + cUser + '\'' +
+                ", uUser='" + uUser + '\'' +
+                ", status=" + status +
+                ", version=" + version +
+                ", importType='" + importType + '\'' +
+                '}';
     }
 }

@@ -25,6 +25,7 @@ import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -48,8 +49,12 @@ public class DataHistoryInterceptor implements MethodInterceptor {
             //获取该方法的传参
             Object[] paramsArr = mi.getArguments();
             Object o = paramsArr[0];
-            Map<String, Object> objectMap = JsonUtil.objectToMap(o);
-
+            Map<String, Object> objectMap = new HashMap<>();
+            try {
+                objectMap = JsonUtil.objectToMap(o);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             String params = getParams(paramsArr);
             log.info("请求参数："+params);
             log.info("方法名："+method.getName());

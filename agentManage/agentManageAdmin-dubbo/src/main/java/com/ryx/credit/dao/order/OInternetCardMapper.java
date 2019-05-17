@@ -1,10 +1,11 @@
 package com.ryx.credit.dao.order;
 
-
 import com.ryx.credit.pojo.admin.order.OInternetCard;
 import com.ryx.credit.pojo.admin.order.OInternetCardExample;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface OInternetCardMapper {
     long countByExample(OInternetCardExample example);
@@ -22,4 +23,8 @@ public interface OInternetCardMapper {
     int updateByPrimaryKeySelective(OInternetCard record);
 
     int updateByPrimaryKey(OInternetCard record);
+
+    int selectInternetCardExpireCount(@Param("map")Map<String,Object> map);
+
+    int updateInternetCardExpire(@Param("map")Map<String,Object> map);
 }
