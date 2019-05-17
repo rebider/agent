@@ -71,6 +71,30 @@ public class InternetCardServiceImpl implements InternetCardService {
         OInternetCardExample oInternetCardExample = new OInternetCardExample();
         OInternetCardExample.Criteria criteria = oInternetCardExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
+        if(StringUtils.isNotBlank(internetCard.getBatchNum())){
+            criteria.andBatchNumEqualTo(internetCard.getBatchNum());
+        }
+        if(StringUtils.isNotBlank(internetCard.getIccidNum())){
+            criteria.andIccidNumEqualTo(internetCard.getIccidNum());
+        }
+        if(StringUtils.isNotBlank(internetCard.getSnNum())){
+            criteria.andSnNumEqualTo(internetCard.getSnNum());
+        }
+        if(StringUtils.isNotBlank(internetCard.getCardImportId())){
+            criteria.andCardImportIdEqualTo(internetCard.getCardImportId());
+        }
+        if(null!=internetCard.getRenew()){
+            criteria.andRenewEqualTo(internetCard.getRenew());
+        }
+        if(StringUtils.isNotBlank(internetCard.getAgentId())){
+            criteria.andAgentIdEqualTo(internetCard.getAgentId());
+        }
+        if(StringUtils.isNotBlank(internetCard.getAgentName())){
+            criteria.andAgentNameEqualTo(internetCard.getAgentName());
+        }
+        if(StringUtils.isNotBlank(internetCard.getOrderId())){
+            criteria.andOrderIdEqualTo(internetCard.getOrderId());
+        }
         oInternetCardExample.setPage(page);
         oInternetCardExample.setOrderByClause(" c_time desc ");
         List<OInternetCard> oInternetCards = internetCardMapper.selectByExample(oInternetCardExample);
@@ -82,6 +106,32 @@ public class InternetCardServiceImpl implements InternetCardService {
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(oInternetCards);
         pageInfo.setTotal((int)internetCardMapper.countByExample(oInternetCardExample));
+        return pageInfo;
+    }
+
+
+    @Override
+    public PageInfo internetCardImportList(OInternetCardImport internetCardImport, Page page){
+
+        OInternetCardImportExample internetCardImportExample = new OInternetCardImportExample();
+        OInternetCardImportExample.Criteria criteria = internetCardImportExample.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        if(null!=internetCardImport.getImportStatus()){
+            criteria.andImportStatusEqualTo(internetCardImport.getImportStatus());
+        }
+        if(StringUtils.isNotBlank(internetCardImport.getImportType())){
+            criteria.andImportTypeEqualTo(internetCardImport.getImportType());
+        }
+        if(StringUtils.isNotBlank(internetCardImport.getBatchNum())){
+            criteria.andBatchNumEqualTo(internetCardImport.getBatchNum());
+        }
+        internetCardImportExample.setPage(page);
+        internetCardImportExample.setOrderByClause(" c_time desc ");
+        List<OInternetCardImport> oInternetCards = internetCardImportMapper.selectByExample(internetCardImportExample);
+
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(oInternetCards);
+        pageInfo.setTotal((int)internetCardImportMapper.countByExample(internetCardImportExample));
         return pageInfo;
     }
 
