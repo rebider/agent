@@ -10,6 +10,7 @@ import com.ryx.credit.dao.order.OInternetCardImportMapper;
 import com.ryx.credit.dao.order.OInternetCardMapper;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentExample;
+import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.order.OInternetCard;
 import com.ryx.credit.pojo.admin.order.OInternetCardExample;
 import com.ryx.credit.pojo.admin.order.OInternetCardImport;
@@ -99,9 +100,9 @@ public class InternetCardServiceImpl implements InternetCardService {
         oInternetCardExample.setOrderByClause(" c_time desc ");
         List<OInternetCard> oInternetCards = internetCardMapper.selectByExample(oInternetCardExample);
         for (OInternetCard oInternetCard : oInternetCards) {
-//            Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),oInternetCard.getProCom());
-//            if(null!=dict)
-//            oInternetCard.setProCom(dict.getdItemname());
+            Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),oInternetCard.getManufacturer());
+            if(null!=dict)
+            oInternetCard.setManufacturer(dict.getdItemname());
         }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(oInternetCards);
@@ -165,7 +166,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                             if(StringUtils.isNotBlank(openAccountTime))
                             oInternetCard.setOpenAccountTime(DateUtils.parseDate(openAccountTime,dateFormat));
                         }else if(importType.equals(CardImportType.B.getValue())){
-                            String consigner = String.valueOf(object.get(0));//发货方
+                            String manufacturer = String.valueOf(object.get(0));//发货方/厂商
                             String deliverTime = String.valueOf(object.get(1));//发货日期
                             String orderId = String.valueOf(object.get(2));//订单号
                             String agentName = String.valueOf(object.get(3));//代理商名称
@@ -173,7 +174,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                             String iccidNum = String.valueOf(object.get(5));//iccid
                             String consignee = String.valueOf(object.get(6));//收货人
 
-                            oInternetCard.setConsigner(consigner);
+                            oInternetCard.setManufacturer(manufacturer);
                             if(StringUtils.isNotBlank(deliverTime))
                             oInternetCard.setDeliverTime(DateUtils.parseDate(deliverTime,dateFormat));
                             oInternetCard.setOrderId(orderId);
@@ -386,6 +387,17 @@ public class InternetCardServiceImpl implements InternetCardService {
                 internetCard.setAgentId(agent.getId());
             }
         }
+        if(StringUtils.isNotBlank(internetCard.getManufacturer())){
+            Dict dict = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),oInternetCard.getManufacturer());
+            if(null==dict){
+                oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
+                oInternetCardImport.setErrorMsg(oInternetCard.getManufacturer()+"厂商不存在");
+                //更新导入记录
+                updateInternetCardImport(oInternetCardImport);
+                return;
+            }
+            oInternetCard.setManufacturer(dict.getdItemvalue());
+        }
         if(oInternetCard==null){
             internetCard.setcUser(oInternetCardImport.getcUser());
             internetCard.setRenew(Status.STATUS_0.status); //否
@@ -424,6 +436,13 @@ public class InternetCardServiceImpl implements InternetCardService {
             oInternetCard.setAgentName(internetCard.getAgentName());
             oInternetCard.setManufacturer(internetCard.getManufacturer());
             oInternetCard.setDeliverTime(internetCard.getDeliverTime());
+            if(StringUtils.isNotBlank(internetCard.getManufacturer())){
+                Dict dict = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),oInternetCard.getManufacturer());
+                if(null==dict){
+                    throw new MessageException(snNum+"厂商不存在");
+                }
+                oInternetCard.setManufacturer(dict.getdItemvalue());
+            }
             updateInternetCard(oInternetCard);
             oInternetCardImport.setImportStatus(OInternetCardImportStatus.SUCCESS.getValue());
             updateInternetCardImport(oInternetCardImport);
