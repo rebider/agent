@@ -2597,6 +2597,76 @@ public class AgentBusInfoExample {
             addCriterion("DEBIT_APPEAR_RATE not between", value1, value2, "debitAppearRate");
             return (Criteria) this;
         }
+
+        public Criteria andTerminalsLowerIsNull() {
+            addCriterion("TERMINALS_LOWER is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalsLowerIsNotNull() {
+            addCriterion("TERMINALS_LOWER is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalsLowerEqualTo(String value) {
+            addCriterion("TERMINALS_LOWER =", value, "terminalsLower");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalsLowerNotEqualTo(String value) {
+            addCriterion("TERMINALS_LOWER <>", value, "terminalsLower");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalsLowerGreaterThan(String value) {
+            addCriterion("TERMINALS_LOWER >", value, "terminalsLower");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalsLowerGreaterThanOrEqualTo(String value) {
+            addCriterion("TERMINALS_LOWER >=", value, "terminalsLower");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalsLowerLessThan(String value) {
+            addCriterion("TERMINALS_LOWER <", value, "terminalsLower");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalsLowerLessThanOrEqualTo(String value) {
+            addCriterion("TERMINALS_LOWER <=", value, "terminalsLower");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalsLowerLike(String value) {
+            addCriterion("TERMINALS_LOWER like", value, "terminalsLower");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalsLowerNotLike(String value) {
+            addCriterion("TERMINALS_LOWER not like", value, "terminalsLower");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalsLowerIn(List<String> values) {
+            addCriterion("TERMINALS_LOWER in", values, "terminalsLower");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalsLowerNotIn(List<String> values) {
+            addCriterion("TERMINALS_LOWER not in", values, "terminalsLower");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalsLowerBetween(String value1, String value2) {
+            addCriterion("TERMINALS_LOWER between", value1, value2, "terminalsLower");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalsLowerNotBetween(String value1, String value2) {
+            addCriterion("TERMINALS_LOWER not between", value1, value2, "terminalsLower");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

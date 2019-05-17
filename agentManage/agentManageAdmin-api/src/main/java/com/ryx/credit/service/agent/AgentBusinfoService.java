@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
@@ -106,4 +107,8 @@ public interface AgentBusinfoService {
     AgentResult completAgentBusInfoCompany(String agentId)throws Exception;
 
     Map selectComp(String busId);
+
+    String queryAgentId(String busNum)throws MessageException;
+
+    void updateBusLoginNum(String oldBusLoginNum,String busLoginNum)throws MessageException;
 }

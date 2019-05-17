@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.order.OInternetCardMerchMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.OInternetCardMerch">
+    <id column="ICCID" jdbcType="VARCHAR" property="iccid" />
+    <result column="MERCH_ID" jdbcType="VARCHAR" property="merchId" />
+    <result column="MERCH_NAME" jdbcType="VARCHAR" property="merchName" />
+    <result column="INTERNET_CARD_NUM" jdbcType="VARCHAR" property="internetCardNum" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ICCID, MERCH_ID, MERCH_NAME, INTERNET_CARD_NUM
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardMerchExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from O_INTERNET_CARD_MERCH
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from O_INTERNET_CARD_MERCH
+    where ICCID = #{iccid,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardMerchExample">
+    delete from O_INTERNET_CARD_MERCH
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardMerch">
+    insert into O_INTERNET_CARD_MERCH (ICCID, MERCH_ID, MERCH_NAME, 
+      INTERNET_CARD_NUM)
+    values (#{iccid,jdbcType=VARCHAR}, #{merchId,jdbcType=VARCHAR}, #{merchName,jdbcType=VARCHAR}, 
+      #{internetCardNum,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardMerch">
+    insert into O_INTERNET_CARD_MERCH
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="iccid != null">
+        ICCID,
+      </if>
+      <if test="merchId != null">
+        MERCH_ID,
+      </if>
+      <if test="merchName != null">
+        MERCH_NAME,
+      </if>
+      <if test="internetCardNum != null">
+        INTERNET_CARD_NUM,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="iccid != null">
+        #{iccid,jdbcType=VARCHAR},
+      </if>
+      <if test="merchId != null">
+        #{merchId,jdbcType=VARCHAR},
+      </if>
+      <if test="merchName != null">
+        #{merchName,jdbcType=VARCHAR},
+      </if>
+      <if test="internetCardNum != null">
+        #{internetCardNum,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardMerchExample" resultType="java.lang.Long">
+    select count(*) from O_INTERNET_CARD_MERCH
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardMerch">
+    update O_INTERNET_CARD_MERCH
+    <set>
+      <if test="merchId != null">
+        MERCH_ID = #{merchId,jdbcType=VARCHAR},
+      </if>
+      <if test="merchName != null">
+        MERCH_NAME = #{merchName,jdbcType=VARCHAR},
+      </if>
+      <if test="internetCardNum != null">
+        INTERNET_CARD_NUM = #{internetCardNum,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ICCID = #{iccid,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardMerch">
+    update O_INTERNET_CARD_MERCH
+    set MERCH_ID = #{merchId,jdbcType=VARCHAR},
+      MERCH_NAME = #{merchName,jdbcType=VARCHAR},
+      INTERNET_CARD_NUM = #{internetCardNum,jdbcType=VARCHAR}
+    where ICCID = #{iccid,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

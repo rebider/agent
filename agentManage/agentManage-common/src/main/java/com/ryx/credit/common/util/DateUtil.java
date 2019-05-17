@@ -22,6 +22,8 @@ public class DateUtil {
     public final static String DATE_FORMAT_3 = "yyyyMMdd";
     public final static String DATE_FORMAT_4 = "yyyyMMddHHmmssss";
     public final static String DATE_FORMAT_yyyyMM = "yyyyMM";
+    public final static String DATE_FORMAT_yyyy_MM_dd = "yyyy-MM-dd";
+    public final static String DATE_FORMAT_yyyy_MM_dd2 = "yyyy/MM/dd";
 
 
     public final static SimpleDateFormat sdfDays = new SimpleDateFormat(
@@ -160,17 +162,6 @@ public class DateUtil {
 		   }
 		   return date;
 		}
-	public static void main(String[] args) {
-		/* SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
-		 String a=format.format(new Date());
-		 Date b= DateUtil.StrToDate("20170727");
-		 System.out.println(b);*/
-		String date = "201808";
-        String month = null;
-        month = sdfDays.format(addMonth(new Date() , -1));
-        month = month.substring(0,6);
-        System.out.println(convert(date));
-	}
 
     /**
      * 获取YYYYMM格式的上个月日期，也是YYYYMM
@@ -434,15 +425,18 @@ public class DateUtil {
         return dateStr;
     }
 
-   /* @Test
-    public void test(){
-        try {
-            System.out.println(compareDate_2(new Date(),new Date()));
-        } catch (ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }*/
+    /**
+     * 查询当前时间前一年
+     * @param date
+     * @return
+     */
+    public static Date aYearAgoDate(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.YEAR,+1);
+        Date yDate = calendar.getTime();
+        return yDate;
+    }
 
 
 }

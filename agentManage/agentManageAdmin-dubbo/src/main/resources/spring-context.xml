@@ -34,7 +34,7 @@
     </aop:config>
     <bean id="dataHistoryInterceptor" class="com.ryx.credit.event.DataHistoryInterceptor"></bean>
     <aop:config>
-        <aop:pointcut id="displayExecuteSql" expression="execution(public * com.ryx.credit.dao..*.*(..))"/>
+        <aop:pointcut id="displayExecuteSql" expression="execution(public * com.ryx.credit.dao.agent.*.*(..)) or execution(public * com.ryx.credit.dao.order.*.*(..))"/>
         <!--在该切入点使用自定义拦截器-->
         <aop:advisor pointcut-ref="displayExecuteSql" advice-ref="dataHistoryInterceptor"/>
     </aop:config>

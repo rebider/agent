@@ -16,6 +16,7 @@ public enum PlatformType {
     POS("POS","POS"),
     ZPOS("ZPOS","智能POS"),
     MPOS("MPOS","手刷"),
+    RDBPOS("RDBPOS","瑞大宝"),
     POSANDMPOS("POSANDMPOS","手刷+POS");
 
     public String code;

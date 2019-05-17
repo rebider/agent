@@ -89,4 +89,7 @@ public interface AgentBusInfoMapper {
     List<Map<String,Object>> selectDs();
 
     List<Map<String,Object>> selectComp(@Param("agentId")  String agentId);
+
+    int updateBusLoginNum(@Param("reqMap")Map<String, Object> reqMap);
+
 }

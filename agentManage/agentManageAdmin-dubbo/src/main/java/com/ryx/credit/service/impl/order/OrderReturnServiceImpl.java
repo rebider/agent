@@ -1998,7 +1998,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             throw new ProcessException("无此物流信息");
         }
         OLogistics ol = oLogistics.get(0);
-        if (!ol.getProCom().equals(CardImportType.LD.msg)) {
+        if (!ol.getProCom().equals("联迪")) {
             if (null == begins) {
                 throw new ProcessException("开始截取的位数为空");
             }
