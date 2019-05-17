@@ -391,12 +391,12 @@ public class InternetCardServiceImpl implements InternetCardService {
             Dict dict = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),internetCard.getManufacturer());
             if(null==dict){
                 oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
-                oInternetCardImport.setErrorMsg(oInternetCard.getManufacturer()+"厂商不存在");
+                oInternetCardImport.setErrorMsg(internetCard.getManufacturer()+"厂商不存在");
                 //更新导入记录
                 updateInternetCardImport(oInternetCardImport);
                 return;
             }
-            oInternetCard.setManufacturer(dict.getdItemvalue());
+            internetCard.setManufacturer(dict.getdItemvalue());
         }
         if(oInternetCard==null){
             internetCard.setcUser(oInternetCardImport.getcUser());
