@@ -13,8 +13,6 @@ public class OInternetCard implements Serializable{
 
     private String snNum;
 
-    private String consigner;
-
     private Date deliverTime;
 
     private String consignee;
@@ -117,14 +115,6 @@ public class OInternetCard implements Serializable{
 
     public void setSnNum(String snNum) {
         this.snNum = snNum == null ? null : snNum.trim();
-    }
-
-    public String getConsigner() {
-        return consigner;
-    }
-
-    public void setConsigner(String consigner) {
-        this.consigner = consigner == null ? null : consigner.trim();
     }
 
     public Date getDeliverTime() {
