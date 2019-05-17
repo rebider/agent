@@ -363,5 +363,9 @@ select distinct BUM_NAME,BUM_ID from P_SERVER_D
         </if>
     </select>
 
+  <delete id="clearServerAmtDetailData" parameterType="java.lang.String">
+    delete P_SERVER_AMT_DETAIL where SERVER_DATE ='${profitDate}'
+  </delete>
+
 
 </mapper>

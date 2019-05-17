@@ -3,7 +3,6 @@ package com.ryx.credit.profit.service;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.pojo.SetServerAmt;
 import com.ryx.credit.profit.pojo.SetServerAmtExample;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -26,4 +25,7 @@ public interface ISetServerAmtService {
     List<Map<String,Object>> queryD(String bumId);
     int insertSelective(SetServerAmt record);
     int updateByPrimaryKeySelective(SetServerAmt record);
+
+    int clearServerAmtDetailData(String profitDate);
+    void calculateServerAmt(String profitDate);
 }

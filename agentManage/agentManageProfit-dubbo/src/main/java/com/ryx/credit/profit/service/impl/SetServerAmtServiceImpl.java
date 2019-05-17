@@ -6,7 +6,9 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.dao.SetServerAmtMapper;
 import com.ryx.credit.profit.pojo.SetServerAmt;
 import com.ryx.credit.profit.pojo.SetServerAmtExample;
+import com.ryx.credit.profit.pojo.TransProfitDetail;
 import com.ryx.credit.profit.service.ISetServerAmtService;
+import com.ryx.credit.profit.service.TransProfitDetailService;
 import com.ryx.credit.service.dict.IdService;
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
@@ -30,6 +32,8 @@ public class SetServerAmtServiceImpl implements ISetServerAmtService {
     SetServerAmtMapper setServerAmtMapper;
     @Autowired
     IdService idService;
+    @Autowired
+    TransProfitDetailService transProfitDetailService;
 
     @Override
     public List<Map<String, Object>> queryBumCode() {
@@ -66,6 +70,36 @@ public class SetServerAmtServiceImpl implements ISetServerAmtService {
     @Override
     public int updateByPrimaryKeySelective(SetServerAmt record) {
         return setServerAmtMapper.updateByPrimaryKeySelective(record);
+    }
+
+    @Override
+    public int clearServerAmtDetailData(String profitDate) {
+        return setServerAmtMapper.clearServerAmtDetailData(profitDate);
+    }
+
+    @Override
+    public void calculateServerAmt(String profitDate) {
+        //获取现在正在生效的服务费设置代理商
+        logger.info("获取现在正在生效的服务费设置代理商{}"+profitDate);
+        SetServerAmtExample setServerAmtExample = new SetServerAmtExample();
+        SetServerAmtExample.Criteria criteria = setServerAmtExample.createCriteria();
+        criteria.andStatusEqualTo("00");
+        List<SetServerAmt> setServerAmts = setServerAmtMapper.selectByExample(setServerAmtExample);
+        for (SetServerAmt setServerAmt:setServerAmts) {
+            TransProfitDetail transProfitDetail = new TransProfitDetail();
+            transProfitDetail.setAgentId(setServerAmt.getAgentId());
+            transProfitDetail.setBusCode(setServerAmt.getBumId());
+            transProfitDetail.setProfitDate(profitDate);
+            List<TransProfitDetail> transProfitDetails = transProfitDetailService.getTransProfitDetailList(transProfitDetail);
+            if(transProfitDetails.size()!=1){
+                logger.info("获取平台月份润明细失败{}，{}"+setServerAmt.getAgentId()+ profitDate);
+                throw new RuntimeException("获取平台月份润明细失败{}，{}"+setServerAmt.getAgentId()+ profitDate);
+            }
+            logger.info("获取总交易量");
+
+
+        }
+
     }
 
 }
