@@ -38,4 +38,11 @@ public interface SetServerAmtMapper {
      Integer setServerAmtCount(Map<String,Object> param);
 
     List<Map<String,Object>> queryD(@Param("bumId")String bumId);
+
+    /**
+     * 按月份清楚服务费明细
+     * @param profitDate
+     * @return
+     */
+    int clearServerAmtDetailData(@Param("profitDate")String profitDate);
 }

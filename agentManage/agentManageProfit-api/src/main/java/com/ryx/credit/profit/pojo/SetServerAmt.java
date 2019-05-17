@@ -1,8 +1,9 @@
 package com.ryx.credit.profit.pojo;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class SetServerAmt {
+public class SetServerAmt implements Serializable {
     private String id;
 
     private String createDate;

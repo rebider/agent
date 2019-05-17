@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ryx.credit.profit.dao.PosRewardMapper">
+
   <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.PosReward">
     <id column="ID" jdbcType="VARCHAR" property="id" />
     <result column="AGENT_PID" jdbcType="VARCHAR" property="agentPid" />
@@ -12,8 +13,20 @@
     <result column="REWARD_SCALE" jdbcType="DECIMAL" property="rewardScale" />
     <result column="APPLY_STATUS" jdbcType="CHAR" property="applyStatus" />
     <result column="TOTAL_END_MONTH" jdbcType="VARCHAR" property="totalEndMonth" />
-    <result column="MACHINERY_NUM" jdbcType="NUMERIC" property="machineryNum" />
+    <result column="MACHINERY_NUM" jdbcType="DECIMAL" property="machineryNum" />
     <result column="CREATE_TM" jdbcType="VARCHAR" property="createTm" />
+    <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
+    <result column="BUS_PLATFORM" jdbcType="VARCHAR" property="busPlatform" />
+    <result column="APPRAISAL_CYCLE" jdbcType="VARCHAR" property="appraisalCycle" />
+    <result column="REWARD_TYPE" jdbcType="VARCHAR" property="rewardType" />
+    <result column="ISCONTAINOTHERPOS" jdbcType="CHAR" property="iscontainotherpos" />
+    <result column="ASSESS_WAY" jdbcType="CHAR" property="assessWay" />
+    <result column="ACCOUNTING_CYCLE" jdbcType="CHAR" property="accountingCycle" />
+    <result column="REV1" jdbcType="VARCHAR" property="rev1" />
+    <result column="REV2" jdbcType="VARCHAR" property="rev2" />
+    <result column="REV3" jdbcType="VARCHAR" property="rev3" />
+    <result column="REV4" jdbcType="VARCHAR" property="rev4" />
+    <result column="REV5" jdbcType="VARCHAR" property="rev5" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -45,8 +58,10 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, AGENT_PID, AGENT_ID, AGENT_NAME, TOTAL_CONS_MONTH, GROW_AMT, CREDIT_CONS_MONTH, 
-    REWARD_SCALE, APPLY_STATUS, TOTAL_END_MONTH ,MACHINERY_NUM ,CREATE_TM
+    ID, AGENT_PID, AGENT_ID, AGENT_NAME, TOTAL_CONS_MONTH, GROW_AMT, CREDIT_CONS_MONTH,
+    REWARD_SCALE, APPLY_STATUS, TOTAL_END_MONTH, MACHINERY_NUM, CREATE_TM, BUS_NUM, BUS_PLATFORM,
+    APPRAISAL_CYCLE, REWARD_TYPE, ISCONTAINOTHERPOS, ASSESS_WAY, ACCOUNTING_CYCLE, REV1,
+    REV2, REV3, REV4, REV5
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PosRewardExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -64,28 +79,8 @@
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
-
-  <!--selectByEndMonth 更新按照考核月查询pos奖励申请-->
-  <select id="selectByEndMonth" parameterType="com.ryx.credit.profit.pojo.PosRewardExample" resultMap="BaseResultMap">
-    <include refid="OracleDialectPrefix" />
-    select
-    <if test="distinct">
-      distinct
-    </if>
-    <include refid="Base_Column_List" />
-    from P_POS_REWARD
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-    <if test="orderByClause != null">
-      order by ${orderByClause}
-    </if>
-    <include refid="OracleDialectSuffix" />
-  </select>
-
-
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from P_POS_REWARD
     where ID = #{id,jdbcType=VARCHAR}
@@ -97,15 +92,22 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PosReward">
-    insert into P_POS_REWARD (ID, AGENT_PID, AGENT_ID, 
-      AGENT_NAME, TOTAL_CONS_MONTH, GROW_AMT, 
-      CREDIT_CONS_MONTH, REWARD_SCALE, APPLY_STATUS, TOTAL_END_MONTH,MACHINERY_NUM,CREATE_TM
-      )
-    values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
-      #{agentName,jdbcType=VARCHAR}, #{totalConsMonth,jdbcType=VARCHAR}, #{growAmt,jdbcType=DECIMAL}, 
+    insert into P_POS_REWARD (ID, AGENT_PID, AGENT_ID,
+      AGENT_NAME, TOTAL_CONS_MONTH, GROW_AMT,
+      CREDIT_CONS_MONTH, REWARD_SCALE, APPLY_STATUS,
+      TOTAL_END_MONTH, MACHINERY_NUM, CREATE_TM,
+      BUS_NUM, BUS_PLATFORM, APPRAISAL_CYCLE,
+      REWARD_TYPE, ISCONTAINOTHERPOS, ASSESS_WAY,
+      ACCOUNTING_CYCLE, REV1, REV2,
+      REV3, REV4, REV5)
+    values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
+      #{agentName,jdbcType=VARCHAR}, #{totalConsMonth,jdbcType=VARCHAR}, #{growAmt,jdbcType=DECIMAL},
       #{creditConsMonth,jdbcType=VARCHAR}, #{rewardScale,jdbcType=DECIMAL}, #{applyStatus,jdbcType=CHAR},
-      #{totalEndMonth,jdbcType=VARCHAR}, #{machineryNum,jdbcType=NUMERIC}, #{createTm,jdbcType=VARCHAR}
-      )
+      #{totalEndMonth,jdbcType=VARCHAR}, #{machineryNum,jdbcType=DECIMAL}, #{createTm,jdbcType=VARCHAR},
+      #{busNum,jdbcType=VARCHAR}, #{busPlatform,jdbcType=VARCHAR}, #{appraisalCycle,jdbcType=VARCHAR},
+      #{rewardType,jdbcType=VARCHAR}, #{iscontainotherpos,jdbcType=CHAR}, #{assessWay,jdbcType=CHAR},
+      #{accountingCycle,jdbcType=CHAR}, #{rev1,jdbcType=VARCHAR}, #{rev2,jdbcType=VARCHAR},
+      #{rev3,jdbcType=VARCHAR}, #{rev4,jdbcType=VARCHAR}, #{rev5,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PosReward">
     insert into P_POS_REWARD
@@ -146,6 +148,42 @@
       <if test="createTm != null">
         CREATE_TM,
       </if>
+      <if test="busNum != null">
+        BUS_NUM,
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM,
+      </if>
+      <if test="appraisalCycle != null">
+        APPRAISAL_CYCLE,
+      </if>
+      <if test="rewardType != null">
+        REWARD_TYPE,
+      </if>
+      <if test="iscontainotherpos != null">
+        ISCONTAINOTHERPOS,
+      </if>
+      <if test="assessWay != null">
+        ASSESS_WAY,
+      </if>
+      <if test="accountingCycle != null">
+        ACCOUNTING_CYCLE,
+      </if>
+      <if test="rev1 != null">
+        REV1,
+      </if>
+      <if test="rev2 != null">
+        REV2,
+      </if>
+      <if test="rev3 != null">
+        REV3,
+      </if>
+      <if test="rev4 != null">
+        REV4,
+      </if>
+      <if test="rev5 != null">
+        REV5,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -179,12 +217,47 @@
         #{totalEndMonth,jdbcType=VARCHAR},
       </if>
       <if test="machineryNum != null">
-        #{machineryNum,jdbcType=NUMERIC},
+        #{machineryNum,jdbcType=DECIMAL},
       </if>
       <if test="createTm != null">
-        #{createTm,jdbcType=VARCHAR}
+        #{createTm,jdbcType=VARCHAR},
       </if>
-
+      <if test="busNum != null">
+        #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="appraisalCycle != null">
+        #{appraisalCycle,jdbcType=VARCHAR},
+      </if>
+      <if test="rewardType != null">
+        #{rewardType,jdbcType=VARCHAR},
+      </if>
+      <if test="iscontainotherpos != null">
+        #{iscontainotherpos,jdbcType=CHAR},
+      </if>
+      <if test="assessWay != null">
+        #{assessWay,jdbcType=CHAR},
+      </if>
+      <if test="accountingCycle != null">
+        #{accountingCycle,jdbcType=CHAR},
+      </if>
+      <if test="rev1 != null">
+        #{rev1,jdbcType=VARCHAR},
+      </if>
+      <if test="rev2 != null">
+        #{rev2,jdbcType=VARCHAR},
+      </if>
+      <if test="rev3 != null">
+        #{rev3,jdbcType=VARCHAR},
+      </if>
+      <if test="rev4 != null">
+        #{rev4,jdbcType=VARCHAR},
+      </if>
+      <if test="rev5 != null">
+        #{rev5,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PosRewardExample" resultType="java.lang.Long">
@@ -224,10 +297,46 @@
         TOTAL_END_MONTH = #{totalEndMonth,jdbcType=VARCHAR},
       </if>
       <if test="machineryNum != null">
-        MACHINERY_NUM = #{machineryNum,jdbcType=NUMERIC},
+        MACHINERY_NUM = #{machineryNum,jdbcType=DECIMAL},
       </if>
       <if test="createTm != null">
-        CREATE_TM= #{createTm,jdbcType=VARCHAR},
+        CREATE_TM = #{createTm,jdbcType=VARCHAR},
+      </if>
+      <if test="busNum != null">
+        BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="appraisalCycle != null">
+        APPRAISAL_CYCLE = #{appraisalCycle,jdbcType=VARCHAR},
+      </if>
+      <if test="rewardType != null">
+        REWARD_TYPE = #{rewardType,jdbcType=VARCHAR},
+      </if>
+      <if test="iscontainotherpos != null">
+        ISCONTAINOTHERPOS = #{iscontainotherpos,jdbcType=CHAR},
+      </if>
+      <if test="assessWay != null">
+        ASSESS_WAY = #{assessWay,jdbcType=CHAR},
+      </if>
+      <if test="accountingCycle != null">
+        ACCOUNTING_CYCLE = #{accountingCycle,jdbcType=CHAR},
+      </if>
+      <if test="rev1 != null">
+        REV1 = #{rev1,jdbcType=VARCHAR},
+      </if>
+      <if test="rev2 != null">
+        REV2 = #{rev2,jdbcType=VARCHAR},
+      </if>
+      <if test="rev3 != null">
+        REV3 = #{rev3,jdbcType=VARCHAR},
+      </if>
+      <if test="rev4 != null">
+        REV4 = #{rev4,jdbcType=VARCHAR},
+      </if>
+      <if test="rev5 != null">
+        REV5 = #{rev5,jdbcType=VARCHAR},
       </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
@@ -242,14 +351,26 @@
       CREDIT_CONS_MONTH = #{creditConsMonth,jdbcType=VARCHAR},
       REWARD_SCALE = #{rewardScale,jdbcType=DECIMAL},
       APPLY_STATUS = #{applyStatus,jdbcType=CHAR},
-    TOTAL_END_MONTH = #{totalEndMonth,jdbcType=VARCHAR},
-    MACHINERY_NUM = #{machineryNum,jdbcType=NUMERIC},
-    CREATE_TM = #{createTm,jdbcType=VARCHAR},
+      TOTAL_END_MONTH = #{totalEndMonth,jdbcType=VARCHAR},
+      MACHINERY_NUM = #{machineryNum,jdbcType=DECIMAL},
+      CREATE_TM = #{createTm,jdbcType=VARCHAR},
+      BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      APPRAISAL_CYCLE = #{appraisalCycle,jdbcType=VARCHAR},
+      REWARD_TYPE = #{rewardType,jdbcType=VARCHAR},
+      ISCONTAINOTHERPOS = #{iscontainotherpos,jdbcType=CHAR},
+      ASSESS_WAY = #{assessWay,jdbcType=CHAR},
+      ACCOUNTING_CYCLE = #{accountingCycle,jdbcType=CHAR},
+      REV1 = #{rev1,jdbcType=VARCHAR},
+      REV2 = #{rev2,jdbcType=VARCHAR},
+      REV3 = #{rev3,jdbcType=VARCHAR},
+      REV4 = #{rev4,jdbcType=VARCHAR},
+      REV5 = #{rev5,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
@@ -257,7 +378,25 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+  <!-- ======================以上为自动生成代码，请务必把自己添加代码写到下面，防止被覆盖================================-->
 
+  <!--selectByEndMonth 更新按照考核月查询pos奖励申请-->
+  <select id="selectByEndMonth" parameterType="com.ryx.credit.profit.pojo.PosRewardExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_POS_REWARD
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
 
   <select id="huddlePos" parameterType="java.util.Map"  resultType="java.util.Map" >
    select pphr.ID,pphr.APPLY_STATUS,pphr.CREDIT_CONS_MONTH,pphr.TOTAL_CONS_MONTH, pphr.TOTAL_END_MONTH,phrd.POS_AGENT_ID,phrd.POS_AGENT_NAME   from P_POS_HUDDLE_REWARD pphr join POS_HUDDLE_REWARD_DETAIL phrd on pphr.HUDDLE_CODE = phrd.HUDDLE_CODE
@@ -272,7 +411,6 @@
 </choose>-->
 
   </select>
-
 
   <select id="selectByActiv" resultType="java.util.Map" parameterType="java.lang.String">
     select
@@ -291,7 +429,6 @@
     where ID_ = #{id,jdbcType=OTHER}
   </select>
 
-
   <select id="selectByTaskId" resultType="java.util.Map" parameterType="java.lang.String" >
     select GROUP_ID_,ID_,PROC_DEF_ID_,PROC_INST_ID_,REV_,TASK_ID_,TYPE_,USER_ID_ from  act_ru_identitylink where TASK_ID_ = #{taskId}
   </select>
@@ -308,7 +445,5 @@
       and TOTAL_CONS_MONTH &lt;= '${profitMonth}' and CREDIT_CONS_MONTH &gt;= '${profitMonth}'
     </if>
   </select>
-
-
 
 </mapper>

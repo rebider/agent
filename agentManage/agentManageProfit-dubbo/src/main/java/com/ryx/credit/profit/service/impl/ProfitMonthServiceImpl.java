@@ -108,6 +108,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     PToolSupplyMapper pToolSupplyMapper;
     @Autowired
     private IFreezeAgentSercice freezeAgentSercice;
+    @Autowired
+    private ISetServerAmtService setServerAmtService;
 
 
     public final static Map<String, Map<String, Object>> temp = new HashMap<>();
@@ -475,6 +477,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             profitDeducttionDetailService.clearComputData(profitDate,DeductionType.MACHINE.getType());
             LOG.info("清理机具扣款实扣、未扣足数据，{}月，{}", profitDate,DeductionType.MACHINE.getType());
             profitDeductionMapper.clearComputData(profitDate,DeductionType.MACHINE.getType());
+            LOG.info("清理服务费数据，{}月", profitDate);
+            setServerAmtService.clearServerAmtDetailData(profitDate);
 
             LOG.info("更新代理商打款公司");
             profitDetailMonthMapper.updateAgentPayCompany(profitDate);
@@ -560,6 +564,11 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
             // 补税点
             profitSupplyTaxService.taxSupplyComputer(params);
+
+
+            LOG.info("计算服务费开始");
+            //计算服务费开始
+
 
 
 
