@@ -388,7 +388,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             }
         }
         if(StringUtils.isNotBlank(internetCard.getManufacturer())){
-            Dict dict = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),oInternetCard.getManufacturer());
+            Dict dict = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),internetCard.getManufacturer());
             if(null==dict){
                 oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
                 oInternetCardImport.setErrorMsg(oInternetCard.getManufacturer()+"厂商不存在");
@@ -437,7 +437,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             oInternetCard.setManufacturer(internetCard.getManufacturer());
             oInternetCard.setDeliverTime(internetCard.getDeliverTime());
             if(StringUtils.isNotBlank(internetCard.getManufacturer())){
-                Dict dict = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),oInternetCard.getManufacturer());
+                Dict dict = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),internetCard.getManufacturer());
                 if(null==dict){
                     throw new MessageException(snNum+"厂商不存在");
                 }
