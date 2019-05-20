@@ -177,7 +177,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 }
             }
             if(resultSet.size()>1){
-                throw new ProcessException("不能同时提交大pos和智能pos平台");
+                throw new ProcessException("不同类型平台不能同时提交");
             }
             return ResultVO.success(agentVo);
         } catch (Exception e) {
