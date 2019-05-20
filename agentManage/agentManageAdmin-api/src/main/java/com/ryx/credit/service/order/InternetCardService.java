@@ -17,7 +17,7 @@ public interface InternetCardService {
 
     PageInfo internetCardImportList(OInternetCardImport internetCardImport, Page page);
 
-    void importInternetCard(List<List<String>> excelList, String importType, String userId,String batchNo)throws Exception;
+    void importInternetCard(String fileUrl, String importType, String userId,String batchNo)throws Exception;
 
     void disposeSn(List<String> snList,OInternetCard internetCard,OInternetCardImport oInternetCardImport)throws MessageException;
 
