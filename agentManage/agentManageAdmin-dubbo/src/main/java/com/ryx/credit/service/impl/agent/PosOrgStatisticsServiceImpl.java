@@ -59,7 +59,7 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
             AgentResult agentResult = httpForMpos(orgId,parentBusInfo.getBusNum(),termType);
             agentResult.setMsg(platformType);
             return agentResult;
-        }else if(PlatformType.POS.getValue().equals(platformType) || PlatformType.ZPOS.getValue().equals(platformType)){
+        }else if(PlatformType.whetherPOS(platformType)){
             AgentResult agentResult = httpForPos(orgId,parentBusInfo.getBusNum());
             agentResult.setMsg(platformType);
             return agentResult;
@@ -203,7 +203,7 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
             AgentResult agentResult = httpForMpos(orgId,parentBusNum,termType);
             agentResult.setMsg(platformType);
             return agentResult;
-        }else if(PlatformType.POS.getValue().equals(platformType) || PlatformType.ZPOS.getValue().equals(platformType)){
+        }else if(PlatformType.whetherPOS(platformType)){
             AgentResult agentResult = httpForPos(orgId,parentBusNum);
             agentResult.setMsg(platformType);
             return agentResult;

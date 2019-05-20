@@ -208,7 +208,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 				if (null!=agentBusInfoVo.getBusPlatform()){
 					PlatformType platformType = platFormService.byPlatformCode(agentBusInfoVo.getBusPlatform());
 					if (null!=platformType){
-						if(platformType.code.equals(PlatformType.POS.code) || platformType.code.equals(PlatformType.ZPOS.code)){
+						if(PlatformType.whetherPOS(platformType.code)){
 							if (StringUtils.isNotBlank(agentBusInfoVo.getBusNum())){
 								if (StringUtils.isBlank(agentBusInfoVo.getBusLoginNum())){
 									logger.info("请填写平台登录账号");
@@ -338,7 +338,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 			}
 			if(!isPass && resultSet.size()>1){
-				throw new MessageException("不能同时提交大pos和智能pos平台");
+				throw new MessageException("不同类型平台不能同时提交");
 			}
 			return ResultVO.success(null);
 		} catch (Exception e) {
