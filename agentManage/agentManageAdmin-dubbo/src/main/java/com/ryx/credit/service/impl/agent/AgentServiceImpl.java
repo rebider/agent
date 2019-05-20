@@ -574,6 +574,24 @@ public class AgentServiceImpl implements AgentService {
         return AgentResult.ok();
     }
 
+    @Override
+    public List<Agent> getListByORGAndId(Map<String,String> map){
+        AgentExample example = new AgentExample();
+        AgentExample.Criteria c = example.createCriteria();
+        if(StringUtils.isNotBlank(map.get("id"))){
+            c.andIdEqualTo(map.get("id"));
+        }
+        if(StringUtils.isNotBlank(map.get("orgId"))){   //所屬省區
+            c.andAgDocProEqualTo(map.get("orgId"));
+        }
+        if(StringUtils.isNotBlank(map.get("docDistrict"))){ //所屬大區
+            c.andAgDocDistrictEqualTo(map.get("docDistrict"));
+        }
+        c.andStatusEqualTo(Status.STATUS_1.status);
+        List<Agent> list = agentMapper.selectByExample(example);
+        return list;
+    }
+
 
 
 
@@ -662,23 +680,6 @@ public class AgentServiceImpl implements AgentService {
             logger.error("创建账户失败",e);
             return AgentResult.fail(e.getLocalizedMessage());
         }
-    }
-    @Override
-    public List<Agent> getListByORGAndId(Map<String,String> map){
-        AgentExample example = new AgentExample();
-        AgentExample.Criteria c = example.createCriteria();
-        if(StringUtils.isNotBlank(map.get("id"))){
-            c.andIdEqualTo(map.get("id"));
-        }
-        if(StringUtils.isNotBlank(map.get("orgId"))){   //所屬省區
-            c.andAgDocProEqualTo(map.get("orgId"));
-        }
-        if(StringUtils.isNotBlank(map.get("docDistrict"))){ //所屬大區
-            c.andAgDocDistrictEqualTo(map.get("docDistrict"));
-        }
-        c.andStatusEqualTo(Status.STATUS_1.status);
-        List<Agent> list = agentMapper.selectByExample(example);
-        return list;
     }
 
 }

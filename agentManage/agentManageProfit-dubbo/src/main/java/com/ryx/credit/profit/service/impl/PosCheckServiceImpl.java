@@ -16,6 +16,7 @@ import com.ryx.credit.profit.pojo.PosCheck;
 import com.ryx.credit.profit.pojo.PosCheckExample;
 import com.ryx.credit.profit.service.IPosCheckService;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.TaskApprovalService;
 import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
@@ -49,6 +50,8 @@ public class PosCheckServiceImpl implements IPosCheckService {
     private TaskApprovalService taskApprovalService;
     @Autowired
     private IdService idService;
+    @Autowired
+    private AgentEnterService agentEnterService;
 
     @Override
     public PageInfo posCheckList(Map<String, Object> param, PosCheck posCheck, Page page) {
@@ -75,7 +78,8 @@ public class PosCheckServiceImpl implements IPosCheckService {
             criteria.andAgentIdEqualTo(posCheck.getAgentId());
         }
         if (StringUtils.isNotBlank(posCheck.getAgentName())) {
-            criteria.andAgentNameEqualTo(posCheck.getAgentName());
+            criteria.andAgentNameLike("%"+posCheck.getAgentName()+"%");
+           // criteria.andAgentNameEqualTo(posCheck.getAgentName());
         }
         if (StringUtils.isNotBlank(posCheck.getCheckStatus())) {
             criteria.andCheckStatusEqualTo(posCheck.getCheckStatus());
@@ -91,6 +95,13 @@ public class PosCheckServiceImpl implements IPosCheckService {
         return posCheckExample;
     }
 
+    @Override
+    public List<Map<String,Object>> queryAgentBusPlayformInfo(Map<String,String> map){
+        return checkMapper.queryByAgentInfo(map);
+    }
+
+
+
     /**
      * @author: Lihl
      * @desc 分润比例考核申请，进行审批流
@@ -100,24 +111,33 @@ public class PosCheckServiceImpl implements IPosCheckService {
      */
     @Override
     public void applyPosCheck(PosCheck posCheck, String userId, String workId) throws ProcessException {
-        List<PosCheck> posCheckList = checkMapper.selectByAgentId(posCheck.getAgentId());
-        for(PosCheck check : posCheckList){
-            long startMonth = DateUtil.format(check.getCheckDateS(), "yyyy-MM").getTime();
-            long endMonth = DateUtil.format(check.getCheckDateE(), "yyyy-MM").getTime();
-            long nowMonth = DateUtil.format(posCheck.getCheckDateS(), "yyyy-MM").getTime();
-            if (nowMonth >= startMonth && nowMonth <= endMonth) {
-                logger.info("考核月份在区间内...更新已存在的数据状态值为无效");
-                check.setCheckStatus(RewardStatus.UN_PASS.getStatus());//UN_PASS 2:无效
+
+        List<PosCheck> posCheckList = checkMapper.selectByAgentId(posCheck.getAgentId(),posCheck.getBusNum());
+            for(PosCheck check : posCheckList){
+                if( "1".equals(posCheck.getCheckDateE())){
+                    if("1".equals(check.getCheckDateE()) || posCheck.getCheckDateS().compareTo(check.getCheckDateE())<= 0){
+                        check.setCheckStatus(RewardStatus.UN_PASS.getStatus());
+                    }
+                }else{//短期
+                   if("1".equals(check.getCheckDateE())||!(posCheck.getCheckDateS().compareTo(check.getCheckDateE())>0 || posCheck.getCheckDateE().compareTo(check.getCheckDateS())<0)){
+                       check.setCheckStatus(RewardStatus.UN_PASS.getStatus());
+                    }
+                }
                 checkMapper.updateByPrimaryKeySelective(check);
             }
-        }
+            //将新数据插入数据表保存
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         posCheck.setId((idService.genId(TabId.p_pos_check)));
         posCheck.setAppDate(df.format(new Date()));
         logger.info("序列ID......"+idService.genId(TabId.p_pos_check));
         checkMapper.insertSelective(posCheck);
         //启动审批流
-        String proceId = activityService.createDeloyFlow(null, workId, null, null, null);
+        Map startPar = agentEnterService.startPar(userId);
+        Map<String,Object> param = new HashMap<String,Object>();
+        if(startPar != null){
+            param.put("dept",startPar.get("party"));
+        }
+        String proceId = activityService.createDeloyFlow(null, workId, null, null, param);
         if (proceId == null) {
             PosCheckExample posCheckExample = new PosCheckExample();
             posCheckExample.createCriteria().andIdEqualTo(posCheck.getId());
@@ -151,13 +171,16 @@ public class PosCheckServiceImpl implements IPosCheckService {
         logger.info("审批对象：{}", JSONObject.toJSON(agentVo));
         AgentResult result = new AgentResult(500, "系统异常", "");
         Map<String, Object> reqMap = new HashMap<>();
-        if(StringUtils.isNotBlank(agentVo.getOrderAprDept())){
+        Map startPar = agentEnterService.startPar(userId);
+        if(startPar != null){
+            reqMap.put("dept",startPar.get("party"));
+        }else if(StringUtils.isNotBlank(agentVo.getOrderAprDept())){
             reqMap.put("dept", agentVo.getOrderAprDept());
         }
-        if(Objects.equals("pass",agentVo.getApprovalResult())
+       /* if(Objects.equals("pass",agentVo.getApprovalResult())
                 && StringUtils.isBlank(agentVo.getOrderAprDept())){
             reqMap.put("dept", "finish");
-        }
+        }*/
         reqMap.put("rs", agentVo.getApprovalResult());
         reqMap.put("approvalOpinion", agentVo.getApprovalOpinion());
         reqMap.put("approvalPerson", userId);
@@ -178,6 +201,9 @@ public class PosCheckServiceImpl implements IPosCheckService {
         return AgentResult.ok(resultMap);
     }
 
+    /**
+     * 审批流回调
+     */
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public void completeTaskEnterActivity(String insid, String status) {
@@ -187,7 +213,11 @@ public class PosCheckServiceImpl implements IPosCheckService {
             BusActRel rel =  taskApprovalService.queryBusActRel(busActRel);
             if (rel != null) {
                 PosCheck posCheck = checkMapper.selectByPrimaryKey(rel.getBusId());
-                posCheck.setCheckStatus(RewardStatus.PASS.getStatus());   // PASS 1:生效
+                if(!"2".equals(posCheck.getCheckStatus()) && "1".equals(status)){
+                    posCheck.setCheckStatus("3");
+                }else if(!"2".equals(posCheck.getCheckStatus()) && "2".equals(status)){
+                    posCheck.setCheckStatus(RewardStatus.PASS.getStatus());
+                }
                 checkMapper.updateByPrimaryKeySelective(posCheck);
                 logger.info("2更新审批流与业务对象");
                 rel.setActivStatus(AgStatus.Approved.name());
@@ -209,6 +239,15 @@ public class PosCheckServiceImpl implements IPosCheckService {
     }
 
     @Override
+    public Map<String, Object> getPosCheckInfoById(String id){
+        if (StringUtils.isNotBlank(id)) {
+            return checkMapper.selectById(id).get(0);
+        }else{
+            return null;
+        }
+    }
+
+    @Override
     public List<PosCheck> getPosCheckByDataId(String id) {
         if(StringUtils.isNotBlank(id)){
             PosCheckExample posCheckExample = new PosCheckExample();
@@ -221,7 +260,7 @@ public class PosCheckServiceImpl implements IPosCheckService {
 
     @Override
     public void editCheckRegect(PosCheck posCheck) throws Exception {
-        List<PosCheck> posCheckList = checkMapper.selectByAgentId(posCheck.getAgentId());
+       /* List<PosCheck> posCheckList = checkMapper.selectByAgentId(posCheck.getAgentId());
         for(PosCheck check : posCheckList){
             long startMonth = DateUtil.format(check.getCheckDateS(), "yyyy-MM").getTime();
             long endMonth = DateUtil.format(check.getCheckDateE(), "yyyy-MM").getTime();
@@ -237,7 +276,7 @@ public class PosCheckServiceImpl implements IPosCheckService {
         } catch (Exception e) {
             e.printStackTrace();
             throw new Exception();
-        }
+        }*/
     }
 
     @Override

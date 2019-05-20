@@ -41,11 +41,12 @@ public class PosCheckTaskExecutionListener  extends BaseTaskListener implements 
             IPosCheckService posCheckService = (IPosCheckService) MySpringContextHandler.applicationContext.getBean("iPosCheckService");
             //审批拒绝
             if ("reject_end".equals(activityName)) {
+                posCheckService.completeTaskEnterActivity(delegateExecution.getProcessInstanceId(), "1");
                 logger.info("=========RefundTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, "");
             }
             //审批同意更新数据库
-            if ("finish_end".equals(activityName)) {
-                posCheckService.completeTaskEnterActivity(delegateExecution.getProcessInstanceId(), activityName);
+            if ("end_finish".equals(activityName)) {
+                posCheckService.completeTaskEnterActivity(delegateExecution.getProcessInstanceId(), "2");
                 logger.info("=========RefundTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, "");
             }
         } else if ("take".equals(eventName)) {

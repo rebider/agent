@@ -101,8 +101,8 @@ public enum TabId {
     P_TOOL_SUPPLY("PTS%s%015d"),
     P_REMIT_INFO("PRI%s%015d"),
     P_FREEZE_OPERATION_RECORD("FOR%s%015d"),
-    P_FREEZE_AGENT("PFA%s%015d");
-
+    P_FREEZE_AGENT("PFA%s%015d"),
+    P_SERVER_AMT("PSA%s%015d");
 
     TabId(String thePatt){
            this.patt = thePatt;

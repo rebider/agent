@@ -122,7 +122,8 @@ public class PosProfitComputeServiceImpl implements DeductService {
 
             //pos奖励明细
             List<PosRewardDetail> detailList = new ArrayList<PosRewardDetail>(list.size());
-            list.parallelStream().forEach(transProfitDetail -> {
+            //list.parallelStream().forEach(transProfitDetail -> {
+            for(TransProfitDetail transProfitDetail:list){
                 if (transProfitDetail.getAgentId() == null) {
                     return;
                 }
@@ -199,7 +200,8 @@ public class PosProfitComputeServiceImpl implements DeductService {
                 }
                 posRewardSDetailService.insert(posrewardDetail);
                 detailList.add(posrewardDetail);
-            });
+            }
+            //);
 
             LOG.info("POS奖励明细基础数据导入、基础奖励金额计算结束");
 
@@ -207,7 +209,8 @@ public class PosProfitComputeServiceImpl implements DeductService {
             PosRewardDetail posDetatil = new PosRewardDetail();
             posDetatil.setProfitPosDate(currentDate);
             List<PosRewardDetail> jgList = detailList.parallelStream().filter(posRewardDetail -> Objects.equals(AGENT_TYPE_2, posRewardDetail.getPosMechanismType())).collect(Collectors.toList());
-            jgList.parallelStream().forEach(posRewardDetail -> {
+            //jgList.parallelStream().forEach(posRewardDetail -> {
+            for(PosRewardDetail posRewardDetail:jgList){
                 List childAgentList = JSONObject.parseObject(posRewardDetail.getChildAgentIdList(), List.class);
                 childAgentList.remove(posRewardDetail.getPosAgentId());//不包含自己
                 BigDecimal downReward = BigDecimal.ZERO;
@@ -232,7 +235,8 @@ public class PosProfitComputeServiceImpl implements DeductService {
                     }
                     posRewardSDetailService.updatePosRewardDetail(updateDetail);
                 }
-            });
+            }
+            //);
             LOG.info("扣减机构POS奖励结束");
 
             LOG.info("开始计算申请特殊奖励的代理商，考核奖励扣款部分");

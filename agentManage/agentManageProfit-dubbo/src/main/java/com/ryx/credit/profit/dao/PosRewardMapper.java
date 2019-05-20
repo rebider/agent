@@ -1,6 +1,5 @@
 package com.ryx.credit.profit.dao;
 
-import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.profit.pojo.PosReward;
 import com.ryx.credit.profit.pojo.PosRewardExample;
 
@@ -21,7 +20,6 @@ public interface PosRewardMapper {
     //更新按照考核月查询pos奖励申请
     List<PosReward> selectByEndMonth(PosRewardExample example);
 
-
     PosReward selectByPrimaryKey(String id);
 
     int updateByPrimaryKeySelective(PosReward record);
@@ -29,7 +27,6 @@ public interface PosRewardMapper {
     int updateByPrimaryKey(PosReward record);
 
     List<Map<String, Object>> huddlePos(Map<String, Object> param);
-
 
     Map<String, Object> selectById(String id);
 

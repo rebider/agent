@@ -13,6 +13,9 @@
     <result column="PROFIT_SCALE" jdbcType="DECIMAL" property="profitScale" />
     <result column="APP_DATE" jdbcType="VARCHAR" property="appDate" />
     <result column="CHECK_STATUS" jdbcType="CHAR" property="checkStatus" />
+    <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
+    <result column="PLAYFORM_CODE" jdbcType="VARCHAR" property="playformCode" />
+    <result column="CHECK_TYPE" jdbcType="CHAR" property="checkType" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -45,11 +48,11 @@
   </sql>
   <sql id="Base_Column_List">
     ID, AGENT_PID, AGENT_ID, AGENT_NAME, CHECK_DATE_S, CHECK_DATE_E, TOTAL_AMT, POS_ORDERS,
-    PROFIT_SCALE, APP_DATE, CHECK_STATUS
+    PROFIT_SCALE, APP_DATE, CHECK_STATUS, BUS_NUM, PLAYFORM_CODE, CHECK_TYPE
   </sql>
   <sql id="Base_Column_List_Two">
     N.ID, AGENT_PID, AGENT_ID, AGENT_NAME, CHECK_DATE_S, CHECK_DATE_E, TOTAL_AMT, POS_ORDERS,
-    PROFIT_SCALE, APP_DATE, CHECK_STATUS
+    PROFIT_SCALE, APP_DATE, CHECK_STATUS,BUS_NUM, PLAYFORM_CODE, CHECK_TYPE
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PosCheckExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -68,7 +71,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from P_POS_CHECK
     where ID = #{id,jdbcType=VARCHAR}
@@ -77,7 +80,10 @@
     select
     <include refid="Base_Column_List" />
     from P_POS_CHECK
-    where AGENT_ID = #{agentId,jdbcType=VARCHAR}
+    where AGENT_ID = #{agentId}
+    <if test="busNum != '' and busNum != null">
+      and BUS_NUM = #{busNum} and CHECK_STATUS in ('1','0')
+    </if>
   </select>
 
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PosCheckExample">
@@ -87,14 +93,16 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PosCheck">
-    insert into P_POS_CHECK (ID, AGENT_PID, AGENT_ID, 
-      AGENT_NAME, CHECK_DATE_S, CHECK_DATE_E, 
-      TOTAL_AMT, POS_ORDERS, PROFIT_SCALE, 
-      APP_DATE, CHECK_STATUS)
-    values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
-      #{agentName,jdbcType=VARCHAR}, #{checkDateS,jdbcType=VARCHAR}, #{checkDateE,jdbcType=VARCHAR}, 
-      #{totalAmt,jdbcType=DECIMAL}, #{posOrders,jdbcType=DECIMAL}, #{profitScale,jdbcType=DECIMAL}, 
-      #{appDate,jdbcType=VARCHAR}, #{checkStatus,jdbcType=CHAR})
+    insert into P_POS_CHECK (ID, AGENT_PID, AGENT_ID,
+      AGENT_NAME, CHECK_DATE_S, CHECK_DATE_E,
+      TOTAL_AMT, POS_ORDERS, PROFIT_SCALE,
+      APP_DATE, CHECK_STATUS, BUS_NUM,
+      PLAYFORM_CODE, CHECK_TYPE)
+    values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
+      #{agentName,jdbcType=VARCHAR}, #{checkDateS,jdbcType=VARCHAR}, #{checkDateE,jdbcType=VARCHAR},
+      #{totalAmt,jdbcType=DECIMAL}, #{posOrders,jdbcType=DECIMAL}, #{profitScale,jdbcType=DECIMAL},
+      #{appDate,jdbcType=VARCHAR}, #{checkStatus,jdbcType=CHAR}, #{busNum,jdbcType=VARCHAR},
+      #{playformCode,jdbcType=VARCHAR}, #{checkType,jdbcType=CHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PosCheck">
     insert into P_POS_CHECK
@@ -132,6 +140,15 @@
       <if test="checkStatus != null">
         CHECK_STATUS,
       </if>
+      <if test="busNum != null">
+        BUS_NUM,
+      </if>
+      <if test="playformCode != null">
+        PLAYFORM_CODE,
+      </if>
+      <if test="checkType != null">
+        CHECK_TYPE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -166,6 +183,15 @@
       </if>
       <if test="checkStatus != null">
         #{checkStatus,jdbcType=CHAR},
+      </if>
+      <if test="busNum != null">
+        #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="playformCode != null">
+        #{playformCode,jdbcType=VARCHAR},
+      </if>
+      <if test="checkType != null">
+        #{checkType,jdbcType=CHAR},
       </if>
     </trim>
   </insert>
@@ -208,6 +234,15 @@
       <if test="checkStatus != null">
         CHECK_STATUS = #{checkStatus,jdbcType=CHAR},
       </if>
+      <if test="busNum != null">
+        BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="playformCode != null">
+        PLAYFORM_CODE = #{playformCode,jdbcType=VARCHAR},
+      </if>
+      <if test="checkType != null">
+        CHECK_TYPE = #{checkType,jdbcType=CHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -222,12 +257,15 @@
       POS_ORDERS = #{posOrders,jdbcType=DECIMAL},
       PROFIT_SCALE = #{profitScale,jdbcType=DECIMAL},
       APP_DATE = #{appDate,jdbcType=VARCHAR},
-      CHECK_STATUS = #{checkStatus,jdbcType=CHAR}
+      CHECK_STATUS = #{checkStatus,jdbcType=CHAR},
+      BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      PLAYFORM_CODE = #{playformCode,jdbcType=VARCHAR},
+      CHECK_TYPE = #{checkType,jdbcType=CHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
@@ -235,6 +273,8 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <!-- ======================以上为自动生成代码，请务必把自己添加代码写到下面，防止被覆盖================================-->
 
   <select id="exportPosCheck" parameterType="com.ryx.credit.profit.pojo.PosCheck" resultMap="BaseResultMap">
     select
@@ -254,4 +294,41 @@
       <if test="checkDateE != null and checkDateE !=''"> and CHECK_DATE_E &lt;= #{checkDateE}</if>
     </where>
   </sql>
+
+  <select id="queryByAgentInfo" resultType="java.util.Map" parameterType="java.util.Map">
+   select a.ID,a.AG_NAME,b.BUS_NUM,b.BUS_PLATFORM
+    from A_AGENT a left join A_AGENT_BUSINFO b on a.ID = b.AGENT_ID
+    where 1=1 and b.STATUS = '1' and b.BUS_STATUS = '1' and a.STATUS='1'
+    <if test="agentId != '' and agentId != null ">
+      and a.id = #{agentId}
+    </if>
+    <if test="agentName != '' and agentName != null ">
+      and a.AG_NAME = #{agentName}
+    </if>
+    <if test="busNum != '' and busNum != null ">
+      and b.BUS_NUM = #{busNum}
+    </if>
+    <if test="busPlayform != '' and busPlayform != null ">
+      and b.BUS_PLATFORM = #{busPlayform}
+    </if>
+  </select>
+
+  <select id="selectById" parameterType="java.lang.String" resultType="java.util.Map">
+    select
+      pck.ID, pck.AGENT_ID, pck.AGENT_NAME, pck.CHECK_DATE_S,  pck.TOTAL_AMT, pck.POS_ORDERS,
+      pck.PROFIT_SCALE, pck.APP_DATE, pck.CHECK_STATUS, pck.BUS_NUM, ap.PLATFORM_NAME as PLAYFORM_CODE_NAME,
+      case pck.CHECK_TYPE
+        when  '0' then '付款分润比例'
+        when '1' then '出款分润比例'
+        when '2' then '2019新商户付款分润比例'
+        end  as CHECK_TYPE_POS,
+      case pck.CHECK_DATE_E
+        when '1' then '长期'
+        else pck.CHECK_DATE_E
+        end as CHECK_DATE_END
+    from P_POS_CHECK pck
+      left join A_AGENT_BUSINFO aab on pck.BUS_NUM = aab.BUS_NUM
+        left join A_PLATFORM ap on aab.BUS_PLATFORM = ap.PLATFORM_NUM
+    where pck.ID = #{id}
+  </select>
 </mapper>
