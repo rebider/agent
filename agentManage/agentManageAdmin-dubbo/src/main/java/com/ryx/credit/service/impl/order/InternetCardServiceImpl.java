@@ -139,19 +139,24 @@ public class InternetCardServiceImpl implements InternetCardService {
 
 
     @Override
-    public void importInternetCard(List<List<String>> excelList, String importType, String userId,String batchNo)throws Exception{
+    public void importInternetCard(String fileUrl, String importType, String userId,String batchNo)throws Exception{
 
         if(StringUtils.isBlank(CardImportType.getContentByValue(importType))){
              throw new MessageException("导入类型错误");
         }
-        if(null==excelList && excelList.size()==0){
-            throw new MessageException("excel列表为空");
-        }
-
         threadPoolTaskExecutor.execute(new Runnable() {
             @Override
             public void run() {
                 try {
+                    List<List<String>> excelList = BigDataExcelUtils.bigDataGetExcel(fileUrl);
+                    if(null==excelList){
+                        log.error("importInternetCard,导入文件为空,用户id:{},batchNo:{}",userId,batchNo);
+                        return;
+                    }
+                    if(excelList.size()==0){
+                        log.error("importInternetCard,导入文件为空,用户id:{},batchNo:{}",userId,batchNo);
+                        return;
+                    }
                     OInternetCard oInternetCard = new OInternetCard();
                     for (List<String> string : excelList) {
                         if(importType.equals(CardImportType.A.getValue())){
