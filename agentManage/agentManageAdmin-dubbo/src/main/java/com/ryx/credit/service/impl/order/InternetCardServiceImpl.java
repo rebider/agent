@@ -498,30 +498,41 @@ public class InternetCardServiceImpl implements InternetCardService {
      */
     @Override
     public void taskDisposeInternetCard(){
-
-        Map<String,Object> reqMap = new HashMap<>();
-        reqMap.put("renew",Status.STATUS_0.status);//否
-        reqMap.put("newRenew",Status.STATUS_1.status);
-        reqMap.put("internetCardStatus",InternetCardStatus.NORMAL.getValue());
-        reqMap.put("expireTime",DateUtil.format(new Date(),DateUtil.DATE_FORMAT_yyyy_MM));
-        int i = internetCardMapper.selectInternetCardExpireCount(reqMap);
-        if(i>0){
-            int updateCount = internetCardMapper.updateInternetCardExpire(reqMap);
-            log.info("taskDisposeInternetCard检测是否续费,本次更次了数据条数:{}",updateCount);
-        }
-        log.info("taskDisposeInternetCard检测是否续费,暂无更新数据:{}",i);
-        OInternetCardImportExample oInternetCardImportExample = new OInternetCardImportExample();
-        OInternetCardImportExample.Criteria criteria = oInternetCardImportExample.createCriteria();
-        criteria.andStatusEqualTo(Status.STATUS_1.status);
-        criteria.andImportStatusEqualTo(OInternetCardImportStatus.UNTREATED.getValue());
-        List<OInternetCardImport> oInternetCardImports = internetCardImportMapper.selectByExample(oInternetCardImportExample);
-        for (OInternetCardImport oInternetCardImport : oInternetCardImports) {
-            if(StringUtils.isBlank(oInternetCardImport.getBatchNum())){
-                log.info("taskDisposeInternetCard处理未处理的导入记录，批次号未空");
-                continue;
+        log.info("taskDisposeInternetCard定时任务,开始执行");
+        String retIdentifier = "";
+        try {
+            retIdentifier = redisService.lockWithTimeout(RedisCachKey.TASK_DISPOSEIN_TERNET_CARD.code, ACQUIRE_TIME_OUT, TIME_OUT);
+            if (StringUtils.isBlank(retIdentifier)) {
+                log.info("物联网卡定时任务处理中");
             }
-            log.info("taskDisposeInternetCard处理未处理的导入记录，批次号:{}",oInternetCardImport.getBatchNum());
-            analysisImport(oInternetCardImport.getBatchNum());
+            Map<String,Object> reqMap = new HashMap<>();
+            reqMap.put("renew",Status.STATUS_0.status);//否
+            reqMap.put("newRenew",Status.STATUS_1.status);
+            reqMap.put("internetCardStatus",InternetCardStatus.NORMAL.getValue());
+            reqMap.put("expireTime",DateUtil.format(new Date(),DateUtil.DATE_FORMAT_yyyy_MM));
+            int i = internetCardMapper.selectInternetCardExpireCount(reqMap);
+            if(i>0){
+                int updateCount = internetCardMapper.updateInternetCardExpire(reqMap);
+                log.info("taskDisposeInternetCard检测是否续费,本次更次了数据条数:{}",updateCount);
+            }
+            log.info("taskDisposeInternetCard检测是否续费,暂无更新数据:{}",i);
+            OInternetCardImportExample oInternetCardImportExample = new OInternetCardImportExample();
+            OInternetCardImportExample.Criteria criteria = oInternetCardImportExample.createCriteria();
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
+            criteria.andImportStatusEqualTo(OInternetCardImportStatus.UNTREATED.getValue());
+            List<OInternetCardImport> oInternetCardImports = internetCardImportMapper.selectByExample(oInternetCardImportExample);
+            for (OInternetCardImport oInternetCardImport : oInternetCardImports) {
+                if(StringUtils.isBlank(oInternetCardImport.getBatchNum())){
+                    log.info("taskDisposeInternetCard处理未处理的导入记录，批次号未空");
+                    continue;
+                }
+                log.info("taskDisposeInternetCard处理未处理的导入记录，批次号:{}",oInternetCardImport.getBatchNum());
+                analysisImport(oInternetCardImport.getBatchNum());
+            }
+        } finally {
+            if(StringUtils.isNotBlank(retIdentifier)){
+                redisService.releaseLock(RedisCachKey.TASK_DISPOSEIN_TERNET_CARD.code, retIdentifier);
+            }
         }
     }
 }
