@@ -856,7 +856,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             PlatForm platForm =platFormMapper.selectByPlatFormNum(order_platForm.getOrderPlatform());
             List<OLogisticsDetail> snList = initDetailFromRedis(stringList,oLogistics,receiptPlan,user);
             //进行机具调整操作
-            if (platForm.getPlatformType().equals(PlatformType.POS.code) || platForm.getPlatformType().equals(PlatformType.ZPOS.code)){
+            if (PlatformType.whetherPOS(platForm.getPlatformType())){
 
                 logger.info("======pos发货 更新库存记录:{}:{}",proType,stringList);
 

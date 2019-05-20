@@ -377,7 +377,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
         }
         PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
         //cxinfo posbusIType 从数据库中获取
-        if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
+        if(PlatformType.whetherPOS(platForm.getPlatformType())){
             agentNotifyVo.setBusiType(platForm.getPosbusitype());
         }
         //如果是直签 就传02：直签机构  否则就传递 01：普通机构
@@ -408,7 +408,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
             }
 
             //调用POST接口
-            if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
+            if(PlatformType.whetherPOS(platForm.getPlatformType())){
                 //智能POS代理商名加N区分 CXINFO pos平台的名称前缀从数据库中获取
                 if(org.apache.commons.lang.StringUtils.isNotEmpty(platForm.getPosanameprefix())){
                     agentNotifyVo.setOrgName(agentNotifyVo.getOrgName());
@@ -724,7 +724,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
 
         PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
         //cxinfo 业务类型使用数据库字段
-        if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
+        if(PlatformType.whetherPOS(platForm.getPlatformType())){
             agentNotifyVo.setBusiType(platForm.getPosbusitype());
         }
         Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
@@ -752,7 +752,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
             if(platForm==null){
                 log.info("入网开户修改操作: 通知pos手刷业务平台未知");
             }
-            if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
+            if(PlatformType.whetherPOS(platForm.getPlatformType())){
                 //智能POS代理商名加N区分 cxinfo pos商户名称使用数据库配置字段
                 if(org.apache.commons.lang.StringUtils.isNotEmpty(platForm.getPosanameprefix())){
                     agentNotifyVo.setOrgName(agentNotifyVo.getOrgName());
@@ -799,7 +799,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
             AgentBusInfo updateBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getId());
             JSONObject jsonObject = JSONObject.parseObject(String.valueOf(result.getData()));
             updateBusInfo.setBusNum(jsonObject.getString("orgId"));
-            if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
+            if(PlatformType.whetherPOS(platForm.getPlatformType())){
                 updateBusInfo.setBusLoginNum(jsonObject.getString("loginName"));
             }else if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
                 updateBusInfo.setBusLoginNum(jsonObject.getString("orgId"));

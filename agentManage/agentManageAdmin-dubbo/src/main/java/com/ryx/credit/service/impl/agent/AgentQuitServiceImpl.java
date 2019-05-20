@@ -1111,7 +1111,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         String platType = platForm.getPlatformType();
         AgentResult agentResult = AgentResult.fail();
         record.setPlatformCode(agentBusInfo.getBusPlatform());
-        if (platType.equals(PlatformType.POS.getValue())) {
+        if (PlatformType.whetherPOS(platType)) {
             AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
             agentNotifyVo.setOrgId(agentBusInfo.getBusNum());
             agentNotifyVo.setRemark("代理商退出");

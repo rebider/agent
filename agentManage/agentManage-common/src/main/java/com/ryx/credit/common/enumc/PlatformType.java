@@ -87,4 +87,16 @@ public enum PlatformType {
         return resultMap;
     }
 
+
+    /**
+     * 判断是否属于POS平台
+     * @param platformTypeCode
+     * @return
+     */
+    public static Boolean whetherPOS(String platformTypeCode){
+        if(platformTypeCode.equals(PlatformType.POS.code) || platformTypeCode.equals(PlatformType.ZPOS.code) || platformTypeCode.equals(PlatformType.ZHPOS.code)){
+            return true;
+        }
+        return false;
+    }
 }

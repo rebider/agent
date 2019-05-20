@@ -601,7 +601,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
             return true;
         }
 
-        if (platForm.getPlatformType().equals(PlatformType.POS.code) || platForm.getPlatformType().equals(PlatformType.ZPOS.code)) {
+        if (PlatformType.whetherPOS(platForm.getPlatformType())) {
             ImsTermWarehouseDetail imsTermWarehouseDetail = new ImsTermWarehouseDetail();
             if (null == order) {
                 throw new MessageException("查询订单数据失败！");

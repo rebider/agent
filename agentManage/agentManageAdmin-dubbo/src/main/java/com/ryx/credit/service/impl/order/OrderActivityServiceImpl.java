@@ -174,7 +174,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         String platFormType= platFormMapper.selectPlatType(activity.getPlatform());
 
         if (StringUtils.isNotBlank(platFormType)){
-            if (platFormType.equals(PlatformType.POS.code) || platFormType.equals(PlatformType.ZPOS.code)){
+            if (PlatformType.whetherPOS(platFormType)){
                 //如果是POS或者是智能POS  则需要清除终端批次和终端类型的id name
                 activity.setTermBatchcode(" ");
                 activity.setTermBatchname(" ");

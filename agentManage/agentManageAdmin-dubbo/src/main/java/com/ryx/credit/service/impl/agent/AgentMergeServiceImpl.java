@@ -1187,7 +1187,7 @@ public class AgentMergeServiceImpl  implements AgentMergeService {
                 continue;
             }
             //调用Pos
-            if(platType.equals(PlatformType.POS.getValue()) || platType.equals(PlatformType.ZPOS.getValue())){
+            if(PlatformType.whetherPOS(platType)){
 
                 String subAgentName = StringUtils.isNotBlank(platForm.getPosanameprefix()) ? platForm.getPosanameprefix()+agentMerge.getSubAgentName() : agentMerge.getSubAgentName();
                 String agentName = agentMerge.getMainAgentName()+"-"+subAgentName;
@@ -1207,7 +1207,7 @@ public class AgentMergeServiceImpl  implements AgentMergeService {
                 agentNotifyVo.setBusMessage(agentBusInfo);
                 agentNotifyVo.setHasS0(agentBusInfo.getDredgeS0().equals(new BigDecimal(1))?"0":"1");
                 agentNotifyVo.setLoginName(agentBusInfo.getBusLoginNum());
-                agentNotifyVo.setBusiType(platType.equals(PlatformType.POS.getValue())?"01":"02"); //cxinfo 新增瑞易送，瑞享送的等平台 pos结构 业务类型 变更
+                agentNotifyVo.setBusiType((platType.equals(PlatformType.POS.getValue()) || platType.equals(PlatformType.ZHPOS.getValue()))?"01":"02"); //cxinfo 新增瑞易送，瑞享送的等平台 pos结构 业务类型 变更
                 Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
                 agentNotifyVo.setOrgType(dictByValue.getdItemname().contains(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
                 //业务区域

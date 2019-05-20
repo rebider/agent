@@ -140,7 +140,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 if (null!=item.getBusPlatform()){
                     PlatformType platformType = platFormService.byPlatformCode(item.getBusPlatform());
                     if (null!=platformType){
-                        if(platformType.code.equals(PlatformType.POS.code) || platformType.code.equals(PlatformType.ZPOS.code)){
+                        if(PlatformType.whetherPOS(platformType.code)){
                             if (StringUtils.isNotBlank(item.getBusNum())){
                                 if (StringUtils.isBlank(item.getBusLoginNum())){
                                     logger.info("请填写平台登录账号");
@@ -349,7 +349,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
 
             AgentBusInfo agentBusInfo = aginfo.get(0);
             PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
-            record.setNetInBusType("ACTIVITY_"+platForm.getPlatformNum());
+            record.setNetInBusType("ACTIVITY_"+platForm.getPlatformType());
             if (1 != busActRelMapper.insertSelective(record)) {
                 logger.info("代理商审批，启动审批异常，添加审批关系失败{}:{}", agentId, proce);
             }
@@ -451,7 +451,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         record.setDataShiro(BusActRelBusType.Business.key);
 
         PlatForm platForm = platFormMapper.selectByPlatFormNum(abus.getBusPlatform());
-        record.setNetInBusType("ACTIVITY_"+platForm.getPlatformNum());
+        record.setNetInBusType("ACTIVITY_"+platForm.getPlatformType());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("代理商业务启动审批异常，添加审批关系失败{}:{}", record.getBusId(), proce);
         }

@@ -208,7 +208,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 				if (null!=agentBusInfoVo.getBusPlatform()){
 					PlatformType platformType = platFormService.byPlatformCode(agentBusInfoVo.getBusPlatform());
 					if (null!=platformType){
-						if(platformType.code.equals(PlatformType.POS.code) || platformType.code.equals(PlatformType.ZPOS.code)){
+						if(PlatformType.whetherPOS(platformType.code)){
 							if (StringUtils.isNotBlank(agentBusInfoVo.getBusNum())){
 								if (StringUtils.isBlank(agentBusInfoVo.getBusLoginNum())){
 									logger.info("请填写平台登录账号");

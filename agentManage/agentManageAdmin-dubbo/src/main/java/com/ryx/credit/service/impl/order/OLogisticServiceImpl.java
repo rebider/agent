@@ -432,7 +432,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 //首刷发货 更新库存记录
                 logger.info("首刷发货 更新库存记录:{}:{}",proType,stringList);
                 resultVO = updateLogisticsDetail(stringList, oLogistics.getId(), user, planVo.getId());
-            }else if (platForm.getPlatformType().equals(PlatformType.ZPOS.code) || platForm.getPlatformType().equals(PlatformType.POS.code)){
+            }else if (PlatformType.whetherPOS(platForm.getPlatformType())){
                 //POS发货生成物流明细
                 logger.info("POS发货生成物流明细:{},{},{}",proType,oLogistics.getSnBeginNum(),oLogistics.getSnEndNum());
                 resultVO = insertLogisticsDetail(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(),Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount), oLogistics.getId(), user, planVo.getId());
@@ -454,7 +454,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                         return AgentResult.ok("流量卡不进行下发操作");
                     }
                     //进行入库、机具划拨操作 POS下发业务系统
-                    if (platForm.getPlatformType().equals(PlatformType.POS.code) || platForm.getPlatformType().equals(PlatformType.ZPOS.code)){
+                    if (PlatformType.whetherPOS(platForm.getPlatformType())){
                         ImsTermWarehouseDetail imsTermWarehouseDetail = new ImsTermWarehouseDetail();
                         OOrder oOrder = oOrderMapper.selectByPrimaryKey(subOrderItem.getOrderId());
                         if (null==oOrder) {
