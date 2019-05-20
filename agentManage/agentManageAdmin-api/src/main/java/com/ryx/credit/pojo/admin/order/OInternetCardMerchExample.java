@@ -136,143 +136,143 @@ public class OInternetCardMerchExample {
             criteria.add(new Criterion(condition, value1, value2));
         }
 
-        public Criteria andIccidIsNull() {
-            addCriterion("ICCID is null");
+        public Criteria andChnTermposiIsNull() {
+            addCriterion("CHN_TERMPOSI is null");
             return (Criteria) this;
         }
 
-        public Criteria andIccidIsNotNull() {
-            addCriterion("ICCID is not null");
+        public Criteria andChnTermposiIsNotNull() {
+            addCriterion("CHN_TERMPOSI is not null");
             return (Criteria) this;
         }
 
-        public Criteria andIccidEqualTo(String value) {
-            addCriterion("ICCID =", value, "iccid");
+        public Criteria andChnTermposiEqualTo(String value) {
+            addCriterion("CHN_TERMPOSI =", value, "chnTermposi");
             return (Criteria) this;
         }
 
-        public Criteria andIccidNotEqualTo(String value) {
-            addCriterion("ICCID <>", value, "iccid");
+        public Criteria andChnTermposiNotEqualTo(String value) {
+            addCriterion("CHN_TERMPOSI <>", value, "chnTermposi");
             return (Criteria) this;
         }
 
-        public Criteria andIccidGreaterThan(String value) {
-            addCriterion("ICCID >", value, "iccid");
+        public Criteria andChnTermposiGreaterThan(String value) {
+            addCriterion("CHN_TERMPOSI >", value, "chnTermposi");
             return (Criteria) this;
         }
 
-        public Criteria andIccidGreaterThanOrEqualTo(String value) {
-            addCriterion("ICCID >=", value, "iccid");
+        public Criteria andChnTermposiGreaterThanOrEqualTo(String value) {
+            addCriterion("CHN_TERMPOSI >=", value, "chnTermposi");
             return (Criteria) this;
         }
 
-        public Criteria andIccidLessThan(String value) {
-            addCriterion("ICCID <", value, "iccid");
+        public Criteria andChnTermposiLessThan(String value) {
+            addCriterion("CHN_TERMPOSI <", value, "chnTermposi");
             return (Criteria) this;
         }
 
-        public Criteria andIccidLessThanOrEqualTo(String value) {
-            addCriterion("ICCID <=", value, "iccid");
+        public Criteria andChnTermposiLessThanOrEqualTo(String value) {
+            addCriterion("CHN_TERMPOSI <=", value, "chnTermposi");
             return (Criteria) this;
         }
 
-        public Criteria andIccidLike(String value) {
-            addCriterion("ICCID like", value, "iccid");
+        public Criteria andChnTermposiLike(String value) {
+            addCriterion("CHN_TERMPOSI like", value, "chnTermposi");
             return (Criteria) this;
         }
 
-        public Criteria andIccidNotLike(String value) {
-            addCriterion("ICCID not like", value, "iccid");
+        public Criteria andChnTermposiNotLike(String value) {
+            addCriterion("CHN_TERMPOSI not like", value, "chnTermposi");
             return (Criteria) this;
         }
 
-        public Criteria andIccidIn(List<String> values) {
-            addCriterion("ICCID in", values, "iccid");
+        public Criteria andChnTermposiIn(List<String> values) {
+            addCriterion("CHN_TERMPOSI in", values, "chnTermposi");
             return (Criteria) this;
         }
 
-        public Criteria andIccidNotIn(List<String> values) {
-            addCriterion("ICCID not in", values, "iccid");
+        public Criteria andChnTermposiNotIn(List<String> values) {
+            addCriterion("CHN_TERMPOSI not in", values, "chnTermposi");
             return (Criteria) this;
         }
 
-        public Criteria andIccidBetween(String value1, String value2) {
-            addCriterion("ICCID between", value1, value2, "iccid");
+        public Criteria andChnTermposiBetween(String value1, String value2) {
+            addCriterion("CHN_TERMPOSI between", value1, value2, "chnTermposi");
             return (Criteria) this;
         }
 
-        public Criteria andIccidNotBetween(String value1, String value2) {
-            addCriterion("ICCID not between", value1, value2, "iccid");
+        public Criteria andChnTermposiNotBetween(String value1, String value2) {
+            addCriterion("CHN_TERMPOSI not between", value1, value2, "chnTermposi");
             return (Criteria) this;
         }
 
-        public Criteria andMerchIdIsNull() {
-            addCriterion("MERCH_ID is null");
+        public Criteria andChnMerchIdIsNull() {
+            addCriterion("CHN_MERCH_ID is null");
             return (Criteria) this;
         }
 
-        public Criteria andMerchIdIsNotNull() {
-            addCriterion("MERCH_ID is not null");
+        public Criteria andChnMerchIdIsNotNull() {
+            addCriterion("CHN_MERCH_ID is not null");
             return (Criteria) this;
         }
 
-        public Criteria andMerchIdEqualTo(String value) {
-            addCriterion("MERCH_ID =", value, "merchId");
+        public Criteria andChnMerchIdEqualTo(String value) {
+            addCriterion("CHN_MERCH_ID =", value, "chnMerchId");
             return (Criteria) this;
         }
 
-        public Criteria andMerchIdNotEqualTo(String value) {
-            addCriterion("MERCH_ID <>", value, "merchId");
+        public Criteria andChnMerchIdNotEqualTo(String value) {
+            addCriterion("CHN_MERCH_ID <>", value, "chnMerchId");
             return (Criteria) this;
         }
 
-        public Criteria andMerchIdGreaterThan(String value) {
-            addCriterion("MERCH_ID >", value, "merchId");
+        public Criteria andChnMerchIdGreaterThan(String value) {
+            addCriterion("CHN_MERCH_ID >", value, "chnMerchId");
             return (Criteria) this;
         }
 
-        public Criteria andMerchIdGreaterThanOrEqualTo(String value) {
-            addCriterion("MERCH_ID >=", value, "merchId");
+        public Criteria andChnMerchIdGreaterThanOrEqualTo(String value) {
+            addCriterion("CHN_MERCH_ID >=", value, "chnMerchId");
             return (Criteria) this;
         }
 
-        public Criteria andMerchIdLessThan(String value) {
-            addCriterion("MERCH_ID <", value, "merchId");
+        public Criteria andChnMerchIdLessThan(String value) {
+            addCriterion("CHN_MERCH_ID <", value, "chnMerchId");
             return (Criteria) this;
         }
 
-        public Criteria andMerchIdLessThanOrEqualTo(String value) {
-            addCriterion("MERCH_ID <=", value, "merchId");
+        public Criteria andChnMerchIdLessThanOrEqualTo(String value) {
+            addCriterion("CHN_MERCH_ID <=", value, "chnMerchId");
             return (Criteria) this;
         }
 
-        public Criteria andMerchIdLike(String value) {
-            addCriterion("MERCH_ID like", value, "merchId");
+        public Criteria andChnMerchIdLike(String value) {
+            addCriterion("CHN_MERCH_ID like", value, "chnMerchId");
             return (Criteria) this;
         }
 
-        public Criteria andMerchIdNotLike(String value) {
-            addCriterion("MERCH_ID not like", value, "merchId");
+        public Criteria andChnMerchIdNotLike(String value) {
+            addCriterion("CHN_MERCH_ID not like", value, "chnMerchId");
             return (Criteria) this;
         }
 
-        public Criteria andMerchIdIn(List<String> values) {
-            addCriterion("MERCH_ID in", values, "merchId");
+        public Criteria andChnMerchIdIn(List<String> values) {
+            addCriterion("CHN_MERCH_ID in", values, "chnMerchId");
             return (Criteria) this;
         }
 
-        public Criteria andMerchIdNotIn(List<String> values) {
-            addCriterion("MERCH_ID not in", values, "merchId");
+        public Criteria andChnMerchIdNotIn(List<String> values) {
+            addCriterion("CHN_MERCH_ID not in", values, "chnMerchId");
             return (Criteria) this;
         }
 
-        public Criteria andMerchIdBetween(String value1, String value2) {
-            addCriterion("MERCH_ID between", value1, value2, "merchId");
+        public Criteria andChnMerchIdBetween(String value1, String value2) {
+            addCriterion("CHN_MERCH_ID between", value1, value2, "chnMerchId");
             return (Criteria) this;
         }
 
-        public Criteria andMerchIdNotBetween(String value1, String value2) {
-            addCriterion("MERCH_ID not between", value1, value2, "merchId");
+        public Criteria andChnMerchIdNotBetween(String value1, String value2) {
+            addCriterion("CHN_MERCH_ID not between", value1, value2, "chnMerchId");
             return (Criteria) this;
         }
 
@@ -346,73 +346,143 @@ public class OInternetCardMerchExample {
             return (Criteria) this;
         }
 
-        public Criteria andInternetCardNumIsNull() {
-            addCriterion("INTERNET_CARD_NUM is null");
+        public Criteria andTranDateIsNull() {
+            addCriterion("TRAN_DATE is null");
             return (Criteria) this;
         }
 
-        public Criteria andInternetCardNumIsNotNull() {
-            addCriterion("INTERNET_CARD_NUM is not null");
+        public Criteria andTranDateIsNotNull() {
+            addCriterion("TRAN_DATE is not null");
             return (Criteria) this;
         }
 
-        public Criteria andInternetCardNumEqualTo(String value) {
-            addCriterion("INTERNET_CARD_NUM =", value, "internetCardNum");
+        public Criteria andTranDateEqualTo(String value) {
+            addCriterion("TRAN_DATE =", value, "tranDate");
             return (Criteria) this;
         }
 
-        public Criteria andInternetCardNumNotEqualTo(String value) {
-            addCriterion("INTERNET_CARD_NUM <>", value, "internetCardNum");
+        public Criteria andTranDateNotEqualTo(String value) {
+            addCriterion("TRAN_DATE <>", value, "tranDate");
             return (Criteria) this;
         }
 
-        public Criteria andInternetCardNumGreaterThan(String value) {
-            addCriterion("INTERNET_CARD_NUM >", value, "internetCardNum");
+        public Criteria andTranDateGreaterThan(String value) {
+            addCriterion("TRAN_DATE >", value, "tranDate");
             return (Criteria) this;
         }
 
-        public Criteria andInternetCardNumGreaterThanOrEqualTo(String value) {
-            addCriterion("INTERNET_CARD_NUM >=", value, "internetCardNum");
+        public Criteria andTranDateGreaterThanOrEqualTo(String value) {
+            addCriterion("TRAN_DATE >=", value, "tranDate");
             return (Criteria) this;
         }
 
-        public Criteria andInternetCardNumLessThan(String value) {
-            addCriterion("INTERNET_CARD_NUM <", value, "internetCardNum");
+        public Criteria andTranDateLessThan(String value) {
+            addCriterion("TRAN_DATE <", value, "tranDate");
             return (Criteria) this;
         }
 
-        public Criteria andInternetCardNumLessThanOrEqualTo(String value) {
-            addCriterion("INTERNET_CARD_NUM <=", value, "internetCardNum");
+        public Criteria andTranDateLessThanOrEqualTo(String value) {
+            addCriterion("TRAN_DATE <=", value, "tranDate");
             return (Criteria) this;
         }
 
-        public Criteria andInternetCardNumLike(String value) {
-            addCriterion("INTERNET_CARD_NUM like", value, "internetCardNum");
+        public Criteria andTranDateLike(String value) {
+            addCriterion("TRAN_DATE like", value, "tranDate");
             return (Criteria) this;
         }
 
-        public Criteria andInternetCardNumNotLike(String value) {
-            addCriterion("INTERNET_CARD_NUM not like", value, "internetCardNum");
+        public Criteria andTranDateNotLike(String value) {
+            addCriterion("TRAN_DATE not like", value, "tranDate");
             return (Criteria) this;
         }
 
-        public Criteria andInternetCardNumIn(List<String> values) {
-            addCriterion("INTERNET_CARD_NUM in", values, "internetCardNum");
+        public Criteria andTranDateIn(List<String> values) {
+            addCriterion("TRAN_DATE in", values, "tranDate");
             return (Criteria) this;
         }
 
-        public Criteria andInternetCardNumNotIn(List<String> values) {
-            addCriterion("INTERNET_CARD_NUM not in", values, "internetCardNum");
+        public Criteria andTranDateNotIn(List<String> values) {
+            addCriterion("TRAN_DATE not in", values, "tranDate");
             return (Criteria) this;
         }
 
-        public Criteria andInternetCardNumBetween(String value1, String value2) {
-            addCriterion("INTERNET_CARD_NUM between", value1, value2, "internetCardNum");
+        public Criteria andTranDateBetween(String value1, String value2) {
+            addCriterion("TRAN_DATE between", value1, value2, "tranDate");
             return (Criteria) this;
         }
 
-        public Criteria andInternetCardNumNotBetween(String value1, String value2) {
-            addCriterion("INTERNET_CARD_NUM not between", value1, value2, "internetCardNum");
+        public Criteria andTranDateNotBetween(String value1, String value2) {
+            addCriterion("TRAN_DATE not between", value1, value2, "tranDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTimeIsNull() {
+            addCriterion("TRAN_TIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTimeIsNotNull() {
+            addCriterion("TRAN_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTimeEqualTo(String value) {
+            addCriterion("TRAN_TIME =", value, "tranTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTimeNotEqualTo(String value) {
+            addCriterion("TRAN_TIME <>", value, "tranTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTimeGreaterThan(String value) {
+            addCriterion("TRAN_TIME >", value, "tranTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTimeGreaterThanOrEqualTo(String value) {
+            addCriterion("TRAN_TIME >=", value, "tranTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTimeLessThan(String value) {
+            addCriterion("TRAN_TIME <", value, "tranTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTimeLessThanOrEqualTo(String value) {
+            addCriterion("TRAN_TIME <=", value, "tranTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTimeLike(String value) {
+            addCriterion("TRAN_TIME like", value, "tranTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTimeNotLike(String value) {
+            addCriterion("TRAN_TIME not like", value, "tranTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTimeIn(List<String> values) {
+            addCriterion("TRAN_TIME in", values, "tranTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTimeNotIn(List<String> values) {
+            addCriterion("TRAN_TIME not in", values, "tranTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTimeBetween(String value1, String value2) {
+            addCriterion("TRAN_TIME between", value1, value2, "tranTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTimeNotBetween(String value1, String value2) {
+            addCriterion("TRAN_TIME not between", value1, value2, "tranTime");
             return (Criteria) this;
         }
     }

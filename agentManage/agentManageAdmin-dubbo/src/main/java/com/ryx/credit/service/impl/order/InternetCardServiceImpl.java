@@ -8,13 +8,11 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.order.OInternetCardImportMapper;
 import com.ryx.credit.dao.order.OInternetCardMapper;
+import com.ryx.credit.dao.order.OInternetCardMerchMapper;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentExample;
 import com.ryx.credit.pojo.admin.agent.Dict;
-import com.ryx.credit.pojo.admin.order.OInternetCard;
-import com.ryx.credit.pojo.admin.order.OInternetCardExample;
-import com.ryx.credit.pojo.admin.order.OInternetCardImport;
-import com.ryx.credit.pojo.admin.order.OInternetCardImportExample;
+import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.impl.agent.PosOrgStatisticsServiceImpl;
@@ -45,6 +43,10 @@ public class InternetCardServiceImpl implements InternetCardService {
 
     private static final String[] dateFormat = new String[]{DateUtil.DATE_FORMAT_yyyy_MM_dd,DateUtil.DATE_FORMAT_yyyy_MM_dd2};
     private static Logger log = LoggerFactory.getLogger(InternetCardServiceImpl.class);
+
+    private static final long TIME_OUT = 60000*5;      //锁的超时时间
+    private static final long ACQUIRE_TIME_OUT = 5000;  //超时时间
+
     @Autowired
     private OInternetCardMapper internetCardMapper;
     @Autowired
@@ -63,8 +65,9 @@ public class InternetCardServiceImpl implements InternetCardService {
     private InternetCardService internetCardService;
     @Autowired
     private RedisService redisService;
-    private static final long TIME_OUT = 60000*5;      //锁的超时时间
-    private static final long ACQUIRE_TIME_OUT = 5000;  //超时时间
+    @Autowired
+    private OInternetCardMerchMapper internetCardMerchMapper;
+
 
     @Override
     public PageInfo internetCardList(OInternetCard internetCard, Page page){
@@ -402,6 +405,11 @@ public class InternetCardServiceImpl implements InternetCardService {
                 return;
             }
             internetCard.setManufacturer(dict.getdItemvalue());
+        }
+        OInternetCardMerch oInternetCardMerch = internetCardMerchMapper.selectChnTermposi(BigDataEncode.encode(internetCard.getIccidNum()));
+        if(null!=oInternetCardMerch){
+            internetCard.setMerId(oInternetCardMerch.getChnMerchId());
+            internetCard.setMerName(oInternetCardMerch.getMerchName());
         }
         if(oInternetCard==null){
             internetCard.setcUser(oInternetCardImport.getcUser());
