@@ -2,10 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ryx.credit.dao.order.OInternetCardMerchMapper">
   <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.OInternetCardMerch">
-    <id column="ICCID" jdbcType="VARCHAR" property="iccid" />
-    <result column="MERCH_ID" jdbcType="VARCHAR" property="merchId" />
+    <id column="CHN_TERMPOSI" jdbcType="VARCHAR" property="chnTermposi" />
+    <result column="CHN_MERCH_ID" jdbcType="VARCHAR" property="chnMerchId" />
     <result column="MERCH_NAME" jdbcType="VARCHAR" property="merchName" />
-    <result column="INTERNET_CARD_NUM" jdbcType="VARCHAR" property="internetCardNum" />
+    <result column="TRAN_DATE" jdbcType="VARCHAR" property="tranDate" />
+    <result column="TRAN_TIME" jdbcType="VARCHAR" property="tranTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -37,7 +38,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ICCID, MERCH_ID, MERCH_NAME, INTERNET_CARD_NUM
+    CHN_TERMPOSI, CHN_MERCH_ID, MERCH_NAME, TRAN_DATE, TRAN_TIME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardMerchExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -59,7 +60,7 @@
     select 
     <include refid="Base_Column_List" />
     from O_INTERNET_CARD_MERCH
-    where ICCID = #{iccid,jdbcType=VARCHAR}
+    where CHN_TERMPOSI = #{chnTermposi,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardMerchExample">
     delete from O_INTERNET_CARD_MERCH
@@ -68,39 +69,45 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardMerch">
-    insert into O_INTERNET_CARD_MERCH (ICCID, MERCH_ID, MERCH_NAME, 
-      INTERNET_CARD_NUM)
-    values (#{iccid,jdbcType=VARCHAR}, #{merchId,jdbcType=VARCHAR}, #{merchName,jdbcType=VARCHAR}, 
-      #{internetCardNum,jdbcType=VARCHAR})
+    insert into O_INTERNET_CARD_MERCH (CHN_TERMPOSI, CHN_MERCH_ID, MERCH_NAME, 
+      TRAN_DATE, TRAN_TIME)
+    values (#{chnTermposi,jdbcType=VARCHAR}, #{chnMerchId,jdbcType=VARCHAR}, #{merchName,jdbcType=VARCHAR}, 
+      #{tranDate,jdbcType=VARCHAR}, #{tranTime,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardMerch">
     insert into O_INTERNET_CARD_MERCH
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="iccid != null">
-        ICCID,
+      <if test="chnTermposi != null">
+        CHN_TERMPOSI,
       </if>
-      <if test="merchId != null">
-        MERCH_ID,
+      <if test="chnMerchId != null">
+        CHN_MERCH_ID,
       </if>
       <if test="merchName != null">
         MERCH_NAME,
       </if>
-      <if test="internetCardNum != null">
-        INTERNET_CARD_NUM,
+      <if test="tranDate != null">
+        TRAN_DATE,
+      </if>
+      <if test="tranTime != null">
+        TRAN_TIME,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="iccid != null">
-        #{iccid,jdbcType=VARCHAR},
+      <if test="chnTermposi != null">
+        #{chnTermposi,jdbcType=VARCHAR},
       </if>
-      <if test="merchId != null">
-        #{merchId,jdbcType=VARCHAR},
+      <if test="chnMerchId != null">
+        #{chnMerchId,jdbcType=VARCHAR},
       </if>
       <if test="merchName != null">
         #{merchName,jdbcType=VARCHAR},
       </if>
-      <if test="internetCardNum != null">
-        #{internetCardNum,jdbcType=VARCHAR},
+      <if test="tranDate != null">
+        #{tranDate,jdbcType=VARCHAR},
+      </if>
+      <if test="tranTime != null">
+        #{tranTime,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -113,24 +120,28 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardMerch">
     update O_INTERNET_CARD_MERCH
     <set>
-      <if test="merchId != null">
-        MERCH_ID = #{merchId,jdbcType=VARCHAR},
+      <if test="chnMerchId != null">
+        CHN_MERCH_ID = #{chnMerchId,jdbcType=VARCHAR},
       </if>
       <if test="merchName != null">
         MERCH_NAME = #{merchName,jdbcType=VARCHAR},
       </if>
-      <if test="internetCardNum != null">
-        INTERNET_CARD_NUM = #{internetCardNum,jdbcType=VARCHAR},
+      <if test="tranDate != null">
+        TRAN_DATE = #{tranDate,jdbcType=VARCHAR},
+      </if>
+      <if test="tranTime != null">
+        TRAN_TIME = #{tranTime,jdbcType=VARCHAR},
       </if>
     </set>
-    where ICCID = #{iccid,jdbcType=VARCHAR}
+    where CHN_TERMPOSI = #{chnTermposi,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardMerch">
     update O_INTERNET_CARD_MERCH
-    set MERCH_ID = #{merchId,jdbcType=VARCHAR},
+    set CHN_MERCH_ID = #{chnMerchId,jdbcType=VARCHAR},
       MERCH_NAME = #{merchName,jdbcType=VARCHAR},
-      INTERNET_CARD_NUM = #{internetCardNum,jdbcType=VARCHAR}
-    where ICCID = #{iccid,jdbcType=VARCHAR}
+      TRAN_DATE = #{tranDate,jdbcType=VARCHAR},
+      TRAN_TIME = #{tranTime,jdbcType=VARCHAR}
+    where CHN_TERMPOSI = #{chnTermposi,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
@@ -142,4 +153,13 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="selectChnTermposi" parameterType="java.lang.String" resultMap="BaseResultMap">
+      select CHN_MERCH_ID, MERCH_NAME from (
+          select  CHN_MERCH_ID, MERCH_NAME from o_internet_card_merch t
+          where
+          CHN_TERMPOSI LIKE CONCAT(CONCAT('%',#{chnTermposi}),'%')
+          order by t.tran_date,t.tran_time desc
+      )where rownum=1
+  </select>
 </mapper>

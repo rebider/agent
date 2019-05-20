@@ -3,28 +3,30 @@ package com.ryx.credit.pojo.admin.order;
 import java.io.Serializable;
 
 public class OInternetCardMerch implements Serializable{
-    private String iccid;
+    private String chnTermposi;
 
-    private String merchId;
+    private String chnMerchId;
 
     private String merchName;
 
-    private String internetCardNum;
+    private String tranDate;
 
-    public String getIccid() {
-        return iccid;
+    private String tranTime;
+
+    public String getChnTermposi() {
+        return chnTermposi;
     }
 
-    public void setIccid(String iccid) {
-        this.iccid = iccid == null ? null : iccid.trim();
+    public void setChnTermposi(String chnTermposi) {
+        this.chnTermposi = chnTermposi == null ? null : chnTermposi.trim();
     }
 
-    public String getMerchId() {
-        return merchId;
+    public String getChnMerchId() {
+        return chnMerchId;
     }
 
-    public void setMerchId(String merchId) {
-        this.merchId = merchId == null ? null : merchId.trim();
+    public void setChnMerchId(String chnMerchId) {
+        this.chnMerchId = chnMerchId == null ? null : chnMerchId.trim();
     }
 
     public String getMerchName() {
@@ -35,11 +37,19 @@ public class OInternetCardMerch implements Serializable{
         this.merchName = merchName == null ? null : merchName.trim();
     }
 
-    public String getInternetCardNum() {
-        return internetCardNum;
+    public String getTranDate() {
+        return tranDate;
     }
 
-    public void setInternetCardNum(String internetCardNum) {
-        this.internetCardNum = internetCardNum == null ? null : internetCardNum.trim();
+    public void setTranDate(String tranDate) {
+        this.tranDate = tranDate == null ? null : tranDate.trim();
+    }
+
+    public String getTranTime() {
+        return tranTime;
+    }
+
+    public void setTranTime(String tranTime) {
+        this.tranTime = tranTime == null ? null : tranTime.trim();
     }
 }

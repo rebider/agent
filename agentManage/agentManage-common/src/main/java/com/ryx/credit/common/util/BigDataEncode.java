@@ -2,7 +2,7 @@ package com.ryx.credit.common.util;
 
 import java.io.UnsupportedEncodingException;
 
-public class Test58_encode  
+public class BigDataEncode
 {  
     public static void main(String[] args) throws Exception {
     	String result = encode("89860404191740471183");
