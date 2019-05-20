@@ -139,7 +139,7 @@ public class InternetCardServiceImpl implements InternetCardService {
 
 
     @Override
-    public void importInternetCard(List<List<Object>> excelList, String importType, String userId,String batchNo)throws Exception{
+    public void importInternetCard(List<List<String>> excelList, String importType, String userId,String batchNo)throws Exception{
 
         if(StringUtils.isBlank(CardImportType.getContentByValue(importType))){
              throw new MessageException("导入类型错误");
@@ -153,12 +153,12 @@ public class InternetCardServiceImpl implements InternetCardService {
             public void run() {
                 try {
                     OInternetCard oInternetCard = new OInternetCard();
-                    for (List<Object> object : excelList) {
+                    for (List<String> string : excelList) {
                         if(importType.equals(CardImportType.A.getValue())){
-                            String issuer = String.valueOf(object.size()>=1?object.get(0):"");//发卡方
-                            String InternetCardNum = String.valueOf(object.size()>=2?object.get(1):"");//物联卡号
-                            String iccidNum = String.valueOf(object.size()>=3?object.get(2):"");//ICCID
-                            String openAccountTime = String.valueOf(object.size()>=4?object.get(3):"");//开户日期
+                            String issuer = String.valueOf(string.size()>=1?string.get(0):"");//发卡方
+                            String InternetCardNum = String.valueOf(string.size()>=2?string.get(1):"");//物联卡号
+                            String iccidNum = String.valueOf(string.size()>=3?string.get(2):"");//ICCID
+                            String openAccountTime = String.valueOf(string.size()>=4?string.get(3):"");//开户日期
 
                             oInternetCard.setIccidNum(iccidNum);
                             oInternetCard.setIssuer(issuer);
@@ -166,13 +166,13 @@ public class InternetCardServiceImpl implements InternetCardService {
                             if(StringUtils.isNotBlank(openAccountTime))
                             oInternetCard.setOpenAccountTime(DateUtils.parseDate(openAccountTime,dateFormat));
                         }else if(importType.equals(CardImportType.B.getValue())){
-                            String manufacturer = String.valueOf(object.size()>=1?object.get(0):"");//发货方/厂商
-                            String deliverTime = String.valueOf(object.size()>=2?object.get(1):"");//发货日期
-                            String orderId = String.valueOf(object.size()>=3?object.get(2):"");//订单号
-                            String agentName = String.valueOf(object.size()>=4?object.get(3):"");//代理商名称
-                            String snNum = String.valueOf(object.size()>=5?object.get(4):"");//机具SN
-                            String iccidNum = String.valueOf(object.size()>=6?object.get(5):"");//iccid
-                            String consignee = String.valueOf(object.size()>=7?object.get(6):"");//收货人
+                            String manufacturer = String.valueOf(string.size()>=1?string.get(0):"");//发货方/厂商
+                            String deliverTime = String.valueOf(string.size()>=2?string.get(1):"");//发货日期
+                            String orderId = String.valueOf(string.size()>=3?string.get(2):"");//订单号
+                            String agentName = String.valueOf(string.size()>=4?string.get(3):"");//代理商名称
+                            String snNum = String.valueOf(string.size()>=5?string.get(4):"");//机具SN
+                            String iccidNum = String.valueOf(string.size()>=6?string.get(5):"");//iccid
+                            String consignee = String.valueOf(string.size()>=7?string.get(6):"");//收货人
 
                             oInternetCard.setManufacturer(manufacturer);
                             if(StringUtils.isNotBlank(deliverTime))
@@ -183,12 +183,12 @@ public class InternetCardServiceImpl implements InternetCardService {
                             oInternetCard.setIccidNum(iccidNum);
                             oInternetCard.setConsignee(consignee);
                         }else if(importType.equals(CardImportType.C.getValue())){
-                            String orderId = String.valueOf(object.size()>=1?object.get(0):"");//订单编号
-                            String agentName = String.valueOf(object.size()>=2?object.get(1):"");//代理商名称
-                            String snCount = String.valueOf(object.size()>=3?object.get(2):"");//数量
-                            String deliverTime = String.valueOf(object.size()>=4?object.get(3):"");//发货日期
-                            String beginSn = String.valueOf(object.size()>=5?object.get(4):"");//iccid开始号段
-                            String endSn = String.valueOf(object.size()>=6?object.get(5):"");//iccid结束号段
+                            String orderId = String.valueOf(string.size()>=1?string.get(0):"");//订单编号
+                            String agentName = String.valueOf(string.size()>=2?string.get(1):"");//代理商名称
+                            String snCount = String.valueOf(string.size()>=3?string.get(2):"");//数量
+                            String deliverTime = String.valueOf(string.size()>=4?string.get(3):"");//发货日期
+                            String beginSn = String.valueOf(string.size()>=5?string.get(4):"");//iccid开始号段
+                            String endSn = String.valueOf(string.size()>=6?string.get(5):"");//iccid结束号段
 
                             oInternetCard.setOrderId(orderId);
                             oInternetCard.setAgentName(agentName);
@@ -198,13 +198,13 @@ public class InternetCardServiceImpl implements InternetCardService {
                             oInternetCard.setBeginSn(beginSn);
                             oInternetCard.setEndSn(endSn);
                         }else if(importType.equals(CardImportType.D.getValue())){
-                            String orderId = String.valueOf(object.size()>=1?object.get(0):"");//订单号
-                            String agentName = String.valueOf(object.size()>=2?object.get(1):"");//公司名称
-                            String manufacturer = String.valueOf(object.size()>=3?object.get(2):"");//厂家
-                            String beginSn = String.valueOf(object.size()>=4?object.get(3):"");//机具sn起始编号
-                            String endSn = String.valueOf(object.size()>=5?object.get(4):"");//机具sn终端编号
-                            String snCount = String.valueOf(object.size()>=6?object.get(5):"");//数量
-                            String deliverTime = String.valueOf(object.size()>=7?object.get(6):"");//发货日期
+                            String orderId = String.valueOf(string.size()>=1?string.get(0):"");//订单号
+                            String agentName = String.valueOf(string.size()>=2?string.get(1):"");//公司名称
+                            String manufacturer = String.valueOf(string.size()>=3?string.get(2):"");//厂家
+                            String beginSn = String.valueOf(string.size()>=4?string.get(3):"");//机具sn起始编号
+                            String endSn = String.valueOf(string.size()>=5?string.get(4):"");//机具sn终端编号
+                            String snCount = String.valueOf(string.size()>=6?string.get(5):"");//数量
+                            String deliverTime = String.valueOf(string.size()>=7?string.get(6):"");//发货日期
 
                             oInternetCard.setOrderId(orderId);
                             oInternetCard.setAgentName(agentName);
@@ -215,13 +215,13 @@ public class InternetCardServiceImpl implements InternetCardService {
                             if(StringUtils.isNotBlank(deliverTime))
                             oInternetCard.setDeliverTime(DateUtils.parseDate(deliverTime,dateFormat));
                         }else if(importType.equals(CardImportType.E.getValue())){
-                            String iccidNum = String.valueOf(object.size()>=1?object.get(0):"");//ICCID
-                            String internetCardStatus = String.valueOf(object.size()>=2?object.get(1):"");//物联卡状态
-                            String openAccountTime = String.valueOf(object.size()>=3?object.get(2):"");//开户日期
-                            String merId = String.valueOf(object.size()>=4?object.get(3):"");//商户编号
-                            String latelyPayTime = String.valueOf(object.size()>=5?object.get(4):"");//最近交易日期
-                            String merName = String.valueOf(object.size()>=6?object.get(5):"");//商户名称
-                            String agentName = String.valueOf(object.size()>=7?object.get(6):"");//代理商名称
+                            String iccidNum = String.valueOf(string.size()>=1?string.get(0):"");//ICCID
+                            String internetCardStatus = String.valueOf(string.size()>=2?string.get(1):"");//物联卡状态
+                            String openAccountTime = String.valueOf(string.size()>=3?string.get(2):"");//开户日期
+                            String merId = String.valueOf(string.size()>=4?string.get(3):"");//商户编号
+                            String latelyPayTime = String.valueOf(string.size()>=5?string.get(4):"");//最近交易日期
+                            String merName = String.valueOf(string.size()>=6?string.get(5):"");//商户名称
+                            String agentName = String.valueOf(string.size()>=7?string.get(6):"");//代理商名称
 
                             oInternetCard.setIccidNum(iccidNum);
                             BigDecimal contentByMsg = InternetCardStatus.getContentByMsg(internetCardStatus);
