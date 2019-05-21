@@ -445,7 +445,7 @@ public class AgentServiceImpl implements AgentService {
         userVo.setSalt(salt);
         userVo.setPassword(pwd);
         userVo.setName(agent.getAgName());
-        userVo.setLoginName(agent.getAgUniqNum());
+        userVo.setLoginName(agent.getId());
         userVo.setOrganizationId(Integer.valueOf(redisService.hGet("config", "org")));
         userVo.setRoleIds(redisService.hGet("config", "role"));
         userVo.setUserType(1);
@@ -612,7 +612,7 @@ public class AgentServiceImpl implements AgentService {
 
             for (Agent agent : agents) {
                 UserVo userVo_q = new UserVo();
-                userVo_q.setLoginName(agent.getAgUniqNum());
+                userVo_q.setLoginName(agent.getId());
                 List<CUser>  userVoSelect = iUserService.selectByLoginName(userVo_q);
                 if (userVoSelect != null && userVoSelect.size()>0) {
                     CUser cUser = userVoSelect.get(0);
@@ -654,7 +654,7 @@ public class AgentServiceImpl implements AgentService {
                 userVo.setSalt(salt);
                 userVo.setPassword(pwd);
                 userVo.setName(agent.getAgName());
-                userVo.setLoginName(agent.getAgUniqNum());
+                userVo.setLoginName(agent.getId());
                 userVo.setOrganizationId(Integer.valueOf(redisService.hGet("config", "org")));
                 userVo.setRoleIds(redisService.hGet("config", "role"));
                 userVo.setUserType(1);
