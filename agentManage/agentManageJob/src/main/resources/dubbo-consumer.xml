@@ -24,4 +24,5 @@
     <dubbo:reference interface="com.ryx.credit.service.agent.AgentColinfoService" id="agentColinfoService"  timeout="1200000" registry="myGroup" />
     <dubbo:reference interface="com.ryx.credit.service.order.OLogisticsDetailHService" id="oLogisticsDetailHService" timeout="1200000" registry="myGroup" />
     <dubbo:reference interface="com.ryx.credit.service.order.OsnOperateService" id="osnOperateService"  timeout="1200000" registry="myGroup" />
+    <dubbo:reference interface="com.ryx.credit.service.order.InternetCardService" id="internetCardService"  timeout="1200000" registry="myGroup" />
 </beans>

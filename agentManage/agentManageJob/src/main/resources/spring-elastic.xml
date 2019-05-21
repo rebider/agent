@@ -109,6 +109,15 @@
                 disabled="false"/>
 
 
+    <job:simple id="internetCard"
+                job-ref="internetCardJob"
+                registry-center-ref="regCenter"
+                cron="0 0/1 * * * ?"
+                overwrite="true"
+                description="处理未处理的物联网卡导入 5分钟执行一次"
+                sharding-total-count="1"
+                sharding-item-parameters="0=Server0"/>
+
 
     <!--&lt;!&ndash;configure job 样例配置 &ndash;&gt;-->
     <!--<job:simple id="mySimpleTask"-->

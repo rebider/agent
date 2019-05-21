@@ -37,10 +37,6 @@ public class ColinfoTaskServiceImpl implements ColinfoTaskService {
 
     private static final  String COLINFO_URL =  AppConfig.getProperty("colinfo_out_money");
 
-    private static final String INSERT_SYS_KEY = "synColinfoToPayment_lock";
-
-    private static final String QUERY_SYS_KEY = "synColinfoToQueryPayment_lock";
-
     private static final long TIME_OUT = 60000*5;      //锁的超时时间
 
     private static final long ACQUIRE_TIME_OUT = 5000;  //超时时间
@@ -72,7 +68,7 @@ public class ColinfoTaskServiceImpl implements ColinfoTaskService {
         String indentifier = null;
         String merchId = "";
         try {
-            indentifier = redisService.lockWithTimeout(INSERT_SYS_KEY,ACQUIRE_TIME_OUT,TIME_OUT);
+            indentifier = redisService.lockWithTimeout(RedisCachKey.INSERT_SYS_KEY.code,ACQUIRE_TIME_OUT,TIME_OUT);
             if(StringUtils.isBlank(indentifier)){
                 log.info("synColinfoToPayment,lock锁定中");
                 return;
@@ -138,7 +134,7 @@ public class ColinfoTaskServiceImpl implements ColinfoTaskService {
             e.printStackTrace();
         } finally {
             if(StringUtils.isNotBlank(indentifier)){
-                redisService.releaseLock(INSERT_SYS_KEY, indentifier);
+                redisService.releaseLock(RedisCachKey.INSERT_SYS_KEY.code, indentifier);
             }
         }
     }
@@ -174,7 +170,7 @@ public class ColinfoTaskServiceImpl implements ColinfoTaskService {
         String indentifier = null;
         try {
             log.info("synColinfoToQueryPayment定时查询启动:{}",new Date());
-            indentifier = redisService.lockWithTimeout(QUERY_SYS_KEY,ACQUIRE_TIME_OUT,TIME_OUT);
+            indentifier = redisService.lockWithTimeout(RedisCachKey.QUERY_SYS_KEY.code,ACQUIRE_TIME_OUT,TIME_OUT);
             if(StringUtils.isBlank(indentifier)){
                 log.info("synColinfoToQueryPayment,lock锁定中");
                 return;
@@ -257,7 +253,7 @@ public class ColinfoTaskServiceImpl implements ColinfoTaskService {
             e.printStackTrace();
         }finally {
             if(StringUtils.isNotBlank(indentifier)){
-                redisService.releaseLock(INSERT_SYS_KEY, indentifier);
+                redisService.releaseLock(RedisCachKey.INSERT_SYS_KEY.code, indentifier);
             }
             //通知业务平台修改数据
             agentNotifyService.asynNotifyPlatform();

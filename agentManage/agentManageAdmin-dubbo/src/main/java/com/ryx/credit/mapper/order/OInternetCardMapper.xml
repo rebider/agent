@@ -6,7 +6,6 @@
     <result column="CARD_IMPORT_ID" jdbcType="VARCHAR" property="cardImportId" />
     <result column="BATCH_NUM" jdbcType="VARCHAR" property="batchNum" />
     <result column="SN_NUM" jdbcType="VARCHAR" property="snNum" />
-    <result column="CONSIGNER" jdbcType="VARCHAR" property="consigner" />
     <result column="DELIVER_TIME" jdbcType="TIMESTAMP" property="deliverTime" />
     <result column="CONSIGNEE" jdbcType="VARCHAR" property="consignee" />
     <result column="ORDER_ID" jdbcType="VARCHAR" property="orderId" />
@@ -59,8 +58,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ICCID_NUM, CARD_IMPORT_ID, BATCH_NUM, SN_NUM, CONSIGNER, DELIVER_TIME, CONSIGNEE,
-    ORDER_ID, AGENT_ID, AGENT_NAME, INTERNET_CARD_NUM, ISSUER, OPEN_ACCOUNT_TIME, EXPIRE_TIME,
+    ICCID_NUM, CARD_IMPORT_ID, BATCH_NUM, SN_NUM, DELIVER_TIME, CONSIGNEE, ORDER_ID,
+    AGENT_ID, AGENT_NAME, INTERNET_CARD_NUM, ISSUER, OPEN_ACCOUNT_TIME, EXPIRE_TIME,
     INTERNET_CARD_STATUS, MER_ID, LATELY_PAY_TIME, MER_NAME, MANUFACTURER, RENEW, C_TIME,
     U_TIME, C_USER, U_USER, STATUS, VERSION
   </sql>
@@ -94,23 +93,23 @@
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OInternetCard">
     insert into O_INTERNET_CARD (ICCID_NUM, CARD_IMPORT_ID, BATCH_NUM,
-    SN_NUM, CONSIGNER, DELIVER_TIME,
-    CONSIGNEE, ORDER_ID, AGENT_ID,
-    AGENT_NAME, INTERNET_CARD_NUM, ISSUER,
-    OPEN_ACCOUNT_TIME, EXPIRE_TIME, INTERNET_CARD_STATUS,
-    MER_ID, LATELY_PAY_TIME, MER_NAME,
-    MANUFACTURER, RENEW, C_TIME,
-    U_TIME, C_USER, U_USER,
-    STATUS, VERSION)
+    SN_NUM, DELIVER_TIME, CONSIGNEE,
+    ORDER_ID, AGENT_ID, AGENT_NAME,
+    INTERNET_CARD_NUM, ISSUER, OPEN_ACCOUNT_TIME,
+    EXPIRE_TIME, INTERNET_CARD_STATUS, MER_ID,
+    LATELY_PAY_TIME, MER_NAME, MANUFACTURER,
+    RENEW, C_TIME, U_TIME,
+    C_USER, U_USER, STATUS,
+    VERSION)
     values (#{iccidNum,jdbcType=VARCHAR}, #{cardImportId,jdbcType=VARCHAR}, #{batchNum,jdbcType=VARCHAR},
-    #{snNum,jdbcType=VARCHAR}, #{consigner,jdbcType=VARCHAR}, #{deliverTime,jdbcType=TIMESTAMP},
-    #{consignee,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
-    #{agentName,jdbcType=VARCHAR}, #{internetCardNum,jdbcType=VARCHAR}, #{issuer,jdbcType=VARCHAR},
-    #{openAccountTime,jdbcType=TIMESTAMP}, #{expireTime,jdbcType=TIMESTAMP}, #{internetCardStatus,jdbcType=DECIMAL},
-    #{merId,jdbcType=VARCHAR}, #{latelyPayTime,jdbcType=VARCHAR}, #{merName,jdbcType=VARCHAR},
-    #{manufacturer,jdbcType=VARCHAR}, #{renew,jdbcType=DECIMAL}, #{cTime,jdbcType=TIMESTAMP},
-    #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR},
-    #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
+    #{snNum,jdbcType=VARCHAR}, #{deliverTime,jdbcType=TIMESTAMP}, #{consignee,jdbcType=VARCHAR},
+    #{orderId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR},
+    #{internetCardNum,jdbcType=VARCHAR}, #{issuer,jdbcType=VARCHAR}, #{openAccountTime,jdbcType=TIMESTAMP},
+    #{expireTime,jdbcType=TIMESTAMP}, #{internetCardStatus,jdbcType=DECIMAL}, #{merId,jdbcType=VARCHAR},
+    #{latelyPayTime,jdbcType=VARCHAR}, #{merName,jdbcType=VARCHAR}, #{manufacturer,jdbcType=VARCHAR},
+    #{renew,jdbcType=DECIMAL}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP},
+    #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
+    #{version,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OInternetCard">
     insert into O_INTERNET_CARD
@@ -126,9 +125,6 @@
       </if>
       <if test="snNum != null">
         SN_NUM,
-      </if>
-      <if test="consigner != null">
-        CONSIGNER,
       </if>
       <if test="deliverTime != null">
         DELIVER_TIME,
@@ -206,9 +202,6 @@
       </if>
       <if test="snNum != null">
         #{snNum,jdbcType=VARCHAR},
-      </if>
-      <if test="consigner != null">
-        #{consigner,jdbcType=VARCHAR},
       </if>
       <if test="deliverTime != null">
         #{deliverTime,jdbcType=TIMESTAMP},
@@ -293,9 +286,6 @@
       <if test="snNum != null">
         SN_NUM = #{snNum,jdbcType=VARCHAR},
       </if>
-      <if test="consigner != null">
-        CONSIGNER = #{consigner,jdbcType=VARCHAR},
-      </if>
       <if test="deliverTime != null">
         DELIVER_TIME = #{deliverTime,jdbcType=TIMESTAMP},
       </if>
@@ -365,30 +355,29 @@
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OInternetCard">
     update O_INTERNET_CARD
     set CARD_IMPORT_ID = #{cardImportId,jdbcType=VARCHAR},
-      BATCH_NUM = #{batchNum,jdbcType=VARCHAR},
-      SN_NUM = #{snNum,jdbcType=VARCHAR},
-      CONSIGNER = #{consigner,jdbcType=VARCHAR},
-      DELIVER_TIME = #{deliverTime,jdbcType=TIMESTAMP},
-      CONSIGNEE = #{consignee,jdbcType=VARCHAR},
-      ORDER_ID = #{orderId,jdbcType=VARCHAR},
-      AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
-      INTERNET_CARD_NUM = #{internetCardNum,jdbcType=VARCHAR},
-      ISSUER = #{issuer,jdbcType=VARCHAR},
-      OPEN_ACCOUNT_TIME = #{openAccountTime,jdbcType=TIMESTAMP},
-      EXPIRE_TIME = #{expireTime,jdbcType=TIMESTAMP},
-      INTERNET_CARD_STATUS = #{internetCardStatus,jdbcType=DECIMAL},
-      MER_ID = #{merId,jdbcType=VARCHAR},
-      LATELY_PAY_TIME = #{latelyPayTime,jdbcType=VARCHAR},
-      MER_NAME = #{merName,jdbcType=VARCHAR},
-      MANUFACTURER = #{manufacturer,jdbcType=VARCHAR},
-      RENEW = #{renew,jdbcType=DECIMAL},
-      C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      U_TIME = #{uTime,jdbcType=TIMESTAMP},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      U_USER = #{uUser,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL}
+    BATCH_NUM = #{batchNum,jdbcType=VARCHAR},
+    SN_NUM = #{snNum,jdbcType=VARCHAR},
+    DELIVER_TIME = #{deliverTime,jdbcType=TIMESTAMP},
+    CONSIGNEE = #{consignee,jdbcType=VARCHAR},
+    ORDER_ID = #{orderId,jdbcType=VARCHAR},
+    AGENT_ID = #{agentId,jdbcType=VARCHAR},
+    AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+    INTERNET_CARD_NUM = #{internetCardNum,jdbcType=VARCHAR},
+    ISSUER = #{issuer,jdbcType=VARCHAR},
+    OPEN_ACCOUNT_TIME = #{openAccountTime,jdbcType=TIMESTAMP},
+    EXPIRE_TIME = #{expireTime,jdbcType=TIMESTAMP},
+    INTERNET_CARD_STATUS = #{internetCardStatus,jdbcType=DECIMAL},
+    MER_ID = #{merId,jdbcType=VARCHAR},
+    LATELY_PAY_TIME = #{latelyPayTime,jdbcType=VARCHAR},
+    MER_NAME = #{merName,jdbcType=VARCHAR},
+    MANUFACTURER = #{manufacturer,jdbcType=VARCHAR},
+    RENEW = #{renew,jdbcType=DECIMAL},
+    C_TIME = #{cTime,jdbcType=TIMESTAMP},
+    U_TIME = #{uTime,jdbcType=TIMESTAMP},
+    C_USER = #{cUser,jdbcType=VARCHAR},
+    U_USER = #{uUser,jdbcType=VARCHAR},
+    STATUS = #{status,jdbcType=DECIMAL},
+    VERSION = #{version,jdbcType=DECIMAL}
     where ICCID_NUM = #{iccidNum,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -401,4 +390,23 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="selectInternetCardExpireCount" parameterType="map" resultType="java.lang.Integer">
+    select count(*) from o_internet_Card c
+    <include refid="internetCardExpireSql" />
+  </select>
+
+  <update id="updateInternetCardExpire" parameterType="map" >
+    update o_internet_Card c set c.u_time = sysdate, c.renew = #{map.newRenew}
+    <include refid="internetCardExpireSql" />
+  </update>
+
+  <sql id="internetCardExpireSql" >
+    <where>
+      c.renew = #{map.renew}
+      and TO_CHAR(c.expire_time, 'YYYY-MM') = #{map.expireTime}
+      and Internet_card_status =  #{map.internetCardStatus}
+    </where>
+  </sql>
+
 </mapper>

@@ -15,9 +15,9 @@ public enum PlatformType {
 
     POS("POS","POS"),
     ZPOS("ZPOS","智能POS"),
+    ZHPOS("ZHPOS","智慧POS"),
     MPOS("MPOS","手刷"),
-    RDBPOS("RDBPOS","瑞大宝"),
-    POSANDMPOS("POSANDMPOS","手刷+POS");
+    RDBPOS("RDBPOS","瑞大宝");
 
     public String code;
 
@@ -87,4 +87,16 @@ public enum PlatformType {
         return resultMap;
     }
 
+
+    /**
+     * 判断是否属于POS平台
+     * @param platformTypeCode
+     * @return
+     */
+    public static Boolean whetherPOS(String platformTypeCode){
+        if(platformTypeCode.equals(PlatformType.POS.code) || platformTypeCode.equals(PlatformType.ZPOS.code) || platformTypeCode.equals(PlatformType.ZHPOS.code)){
+            return true;
+        }
+        return false;
+    }
 }
