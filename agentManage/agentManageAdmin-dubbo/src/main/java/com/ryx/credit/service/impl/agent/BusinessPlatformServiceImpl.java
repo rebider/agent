@@ -13,13 +13,11 @@ import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.PayCompMapper;
 import com.ryx.credit.dao.agent.PlatFormMapper;
 import com.ryx.credit.pojo.admin.agent.*;
-import com.ryx.credit.pojo.admin.bank.DPosRegion;
 import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.bank.PosRegionService;
 import com.ryx.credit.service.dict.DictOptionsService;
-import com.ryx.credit.service.dict.RegionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +26,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.util.*;
 
@@ -63,8 +60,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     private PayCompMapper payCompMapper;
     @Autowired
     private AimportService aimportService;
-    @Autowired
-    private AgentNotifyService agentNotifyService;
+//    @Autowired
+//    private AgentNotifyService agentNotifyService;
     @Autowired
     private DictOptionsService dictOptionsService;
     @Autowired
@@ -437,7 +434,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
-                agentNotifyService.asynNotifyPlatform();
+//                agentNotifyService.asynNotifyPlatform();
             }
             busList.add(agentBus.getId());
         }
@@ -470,7 +467,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            agentNotifyService.asynNotifyPlatform();
+//            agentNotifyService.asynNotifyPlatform();
         }
         return i;
     }

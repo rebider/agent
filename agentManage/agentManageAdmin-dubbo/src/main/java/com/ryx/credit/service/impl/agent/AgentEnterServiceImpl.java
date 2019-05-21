@@ -16,6 +16,7 @@ import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
+import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,8 +60,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Autowired
     private AimportService aimportService;
     @Autowired
-    private AgentNotifyService agentNotifyService;
-    @Autowired
     private IUserService iUserService;
     @Autowired
     private DictOptionsService dictOptionsService;
@@ -78,6 +77,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private AgentBusInfoMapper agentBusInfoMapper;
     @Autowired
     private CapitalFlowService capitalFlowService;
+    @Autowired
+    private AgentNetInNotityService agentNetInNotityService;
 
 
     /**
@@ -634,7 +635,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            agentNotifyService.asynNotifyPlatform();
+//            agentNotifyService.asynNotifyPlatform();
         }
         return ResultVO.success(null);
     }
@@ -795,7 +796,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         } finally {
             //todo 生成后台用户
             agentService.createBackUserbyAgent(agent.getId());
-            agentNotifyService.asynNotifyPlatform();
+            agentNetInNotityService.asynNotifyPlatform(busId,NotifyType.NetInAdd.getValue());
         }
 
         return ResultVO.success(null);

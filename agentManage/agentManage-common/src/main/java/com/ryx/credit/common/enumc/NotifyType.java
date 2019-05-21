@@ -21,6 +21,7 @@ public enum NotifyType {
      * 数据库存Key
      */
     NetInAdd("netInAdd","新增入网"),
+    NetInAddBus("NetInAddBus","入网新增业务"),
     NetInEdit("netInEdit","入网修改"),
     NetInUpgrade("netInUpgrade","入网升级"),
     IdentityAuth("identityAuth","身份认证"),
