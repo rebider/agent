@@ -51,8 +51,8 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     private AgentEnterService agentEnterService;
     @Autowired
     private AimportService aimportService;
-    @Autowired
-    private AgentNotifyService agentNotifyService;
+//    @Autowired
+//    private AgentNotifyService agentNotifyService;
     @Autowired
     private AColinfoPaymentService colinfoPaymentService;
     @Autowired
@@ -257,7 +257,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                 e.printStackTrace();
                                 throw new ProcessException("更新賬戶数据申请失败");
                             } finally {
-                                agentNotifyService.asynNotifyPlatform();
+//                                agentNotifyService.asynNotifyPlatform();
                             }
 
                         }
@@ -342,7 +342,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             e.printStackTrace();
                             throw new ProcessException("更新数据申请失败");
                         } finally {
-                            agentNotifyService.asynNotifyPlatform();
+//                            agentNotifyService.asynNotifyPlatform();
                         }
 
                     }

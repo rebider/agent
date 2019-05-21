@@ -1,7 +1,6 @@
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.dao.order.OLogisticsDetailMapper;
 import com.ryx.credit.dao.order.ReceiptPlanMapper;
-import com.ryx.credit.service.agent.AgentNotifyService;
 import com.ryx.credit.service.order.OLogisticsService;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -18,8 +17,6 @@ import java.util.Map;
  */
 public class AgentServiceTest extends BaseSpringTest  {
     private Logger logger = LoggerFactory.getLogger(AgentServiceTest.class);
-    @Autowired
-    private AgentNotifyService agentNotifyService;
     @Autowired
     private OLogisticsDetailMapper oLogisticsDetailMapper;
     @Autowired

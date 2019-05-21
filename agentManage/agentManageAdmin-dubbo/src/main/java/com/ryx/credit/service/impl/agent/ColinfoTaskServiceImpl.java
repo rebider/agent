@@ -14,7 +14,7 @@ import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentColinfoMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.service.agent.AgentColinfoService;
-import com.ryx.credit.service.agent.AgentNotifyService;
+//import com.ryx.credit.service.agent.AgentNotifyService;
 import com.ryx.credit.service.agent.AimportService;
 import com.ryx.credit.service.agent.ColinfoTaskService;
 import org.slf4j.Logger;
@@ -53,8 +53,8 @@ public class ColinfoTaskServiceImpl implements ColinfoTaskService {
     private RedisService redisService;
     @Autowired
     private AimportService aimportService;
-    @Autowired
-    private AgentNotifyService agentNotifyService;
+//    @Autowired
+//    private AgentNotifyService agentNotifyService;
 
 
     /**
@@ -256,7 +256,7 @@ public class ColinfoTaskServiceImpl implements ColinfoTaskService {
                 redisService.releaseLock(RedisCachKey.INSERT_SYS_KEY.code, indentifier);
             }
             //通知业务平台修改数据
-            agentNotifyService.asynNotifyPlatform();
+//            agentNotifyService.asynNotifyPlatform();
         }
     }
 
