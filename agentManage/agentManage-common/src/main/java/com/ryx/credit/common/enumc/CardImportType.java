@@ -66,4 +66,22 @@ public enum CardImportType {
         return resultMap;
     }
 
+    public static String getContentCodeByValue(String value){
+        if(CardImportType.A.code.equals(value)){
+            return "InternetCardModel3";
+        }
+        if(CardImportType.B.code.equals(value)){
+            return "InternetCardModel1";
+        }
+        if(CardImportType.C.code.equals(value)){
+            return "InternetCardModel2";
+        }
+        if(CardImportType.D.code.equals(value)){
+            return "InternetCardModel5";
+        }
+        if(CardImportType.E.code.equals(value)){
+            return "InternetCardModel4";
+        }
+        return "";
+    }
 }
