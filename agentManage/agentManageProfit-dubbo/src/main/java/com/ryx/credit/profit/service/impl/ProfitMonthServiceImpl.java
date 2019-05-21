@@ -477,6 +477,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             profitDeducttionDetailService.clearComputData(profitDate,DeductionType.MACHINE.getType());
             LOG.info("清理机具扣款实扣、未扣足数据，{}月，{}", profitDate,DeductionType.MACHINE.getType());
             profitDeductionMapper.clearComputData(profitDate,DeductionType.MACHINE.getType());
+
+
             LOG.info("清理服务费数据，{}月", profitDate);
             setServerAmtService.clearServerAmtDetailData(profitDate);
 
@@ -568,7 +570,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
             LOG.info("计算服务费开始");
             //计算服务费开始
-
+            setServerAmtService.calculateServerAmt(profitDate);
+            LOG.info("计算服务费完成");
 
 
 

@@ -13,6 +13,7 @@ import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.pojo.admin.order.OPayment;
 import com.ryx.credit.profit.dao.*;
 import com.ryx.credit.profit.dao.ProfitDayMapper;
+import com.ryx.credit.profit.dao.TransProfitDetailMapper;
 import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.exceptions.DeductionException;
 import com.ryx.credit.profit.pojo.*;

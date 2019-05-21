@@ -28,4 +28,5 @@ public interface ISetServerAmtService {
 
     int clearServerAmtDetailData(String profitDate);
     void calculateServerAmt(String profitDate);
+    PageInfo queryDataDetail(Map<String, Object> param,PageInfo pageInfo);
 }
