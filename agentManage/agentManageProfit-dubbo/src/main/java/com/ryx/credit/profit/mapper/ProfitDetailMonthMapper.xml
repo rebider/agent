@@ -68,6 +68,7 @@
     <result column="TOOLS_RETURN_AMT" jdbcType="DECIMAL" property="toolsReturnAmt" />
     <result column="ZNPOS_PROFIT_AMT" jdbcType="DECIMAL" property="znposProfitAmt" />
     <result column="MPOS_TRAN_AMT" jdbcType="DECIMAL" property="mposTranAmt" />
+    <result column="SERVER_AMT_SUM" jdbcType="DECIMAL" property="serverAmtSum" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -111,7 +112,7 @@
     REAL_PROFIT_AMT, PROFIT_MONTH_AMT, ACCOUNT_ID, ACCOUNT_NAME, OPEN_BANK_NAME, EMAIL,
     BANK_CODE, PAY_STATUS, REMARK, ZHIFA_BUCKLE, ZHIFA_SUPPLY, TAX, BUS_PLATFORM, POS_REWARD_DEDUCTION_AMT,
     BASICS_PROFIT_AMT, PARENT_AGENT_ID, STATUS, UNLINE_AMT, PAY_COMPANY, SMAL_TAX_AMT,
-    TOOLS_RETURN_AMT, ZNPOS_PROFIT_AMT, MPOS_TRAN_AMT
+    TOOLS_RETURN_AMT, ZNPOS_PROFIT_AMT, MPOS_TRAN_AMT, SERVER_AMT_SUM
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonthExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -165,8 +166,8 @@
       TAX, BUS_PLATFORM, POS_REWARD_DEDUCTION_AMT,
       BASICS_PROFIT_AMT, PARENT_AGENT_ID, STATUS,
       UNLINE_AMT, PAY_COMPANY, SMAL_TAX_AMT,
-      TOOLS_RETURN_AMT, ZNPOS_PROFIT_AMT, MPOS_TRAN_AMT
-      )
+      TOOLS_RETURN_AMT, ZNPOS_PROFIT_AMT, MPOS_TRAN_AMT,
+      SERVER_AMT_SUM)
     values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
       #{agentName,jdbcType=VARCHAR}, #{profitId,jdbcType=VARCHAR}, #{profitDate,jdbcType=VARCHAR},
       #{tranAmt,jdbcType=DECIMAL}, #{payAmt,jdbcType=DECIMAL}, #{tranProfitScale,jdbcType=VARCHAR},
@@ -190,8 +191,8 @@
       #{tax,jdbcType=VARCHAR}, #{busPlatform,jdbcType=VARCHAR}, #{posRewardDeductionAmt,jdbcType=DECIMAL},
       #{basicsProfitAmt,jdbcType=DECIMAL}, #{parentAgentId,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},
       #{unlineAmt,jdbcType=DECIMAL}, #{payCompany,jdbcType=VARCHAR}, #{smalTaxAmt,jdbcType=DECIMAL},
-      #{toolsReturnAmt,jdbcType=DECIMAL}, #{znposProfitAmt,jdbcType=DECIMAL}, #{mposTranAmt,jdbcType=DECIMAL}
-      )
+      #{toolsReturnAmt,jdbcType=DECIMAL}, #{znposProfitAmt,jdbcType=DECIMAL}, #{mposTranAmt,jdbcType=DECIMAL},
+      #{serverAmtSum,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth">
     insert into P_PROFIT_DETAIL_M
@@ -394,6 +395,9 @@
       <if test="mposTranAmt != null">
         MPOS_TRAN_AMT,
       </if>
+      <if test="serverAmtSum != null">
+        SERVER_AMT_SUM,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -594,9 +598,12 @@
       <if test="mposTranAmt != null">
         #{mposTranAmt,jdbcType=DECIMAL},
       </if>
+      <if test="serverAmtSum != null">
+        #{serverAmtSum,jdbcType=DECIMAL},
+      </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonthExample" resultType="java.lang.Integer">
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonthExample" resultType="java.lang.Long">
     select count(*) from P_PROFIT_DETAIL_M
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -800,6 +807,9 @@
       <if test="mposTranAmt != null">
         MPOS_TRAN_AMT = #{mposTranAmt,jdbcType=DECIMAL},
       </if>
+      <if test="serverAmtSum != null">
+        SERVER_AMT_SUM = #{serverAmtSum,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -869,7 +879,8 @@
       SMAL_TAX_AMT = #{smalTaxAmt,jdbcType=DECIMAL},
       TOOLS_RETURN_AMT = #{toolsReturnAmt,jdbcType=DECIMAL},
       ZNPOS_PROFIT_AMT = #{znposProfitAmt,jdbcType=DECIMAL},
-      MPOS_TRAN_AMT = #{mposTranAmt,jdbcType=DECIMAL}
+      MPOS_TRAN_AMT = #{mposTranAmt,jdbcType=DECIMAL},
+      SERVER_AMT_SUM = #{serverAmtSum,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -898,7 +909,7 @@
     RHB_DG_REAL_DEDUCTION_AMT=0, POS_DG_MUST_DEDUCTION_AMT=0, POS_DG_REAL_DEDUCTION_AMT=0,
     ZPOS_DG_MUST_DEDUCTION_AMT=0, ZPOS_TD_REAL_DEDUCTION_AMT=0, POS_KH_DEDUCTION_AMT=0, MPOS_KH_DEDUCTION_AMT=0,
     BU_DEDUCTION_AMT=0, OTHER_DEDUCTION_AMT=0, DEDUCTION_TAX_MONTH_AGO_AMT=0, DEDUCTION_TAX_MONTH_AMT=0, SUPPLY_TAX_AMT=0,REAL_PROFIT_AMT=0, PROFIT_MONTH_AMT=0,
-    BASICS_PROFIT_AMT=0
+    BASICS_PROFIT_AMT=0,SERVER_AMT_SUM=0
     where PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
   </update>
   <select id="selectByDate" resultMap="BaseResultMap" parameterType="java.lang.String" >
@@ -1021,7 +1032,7 @@
     <include refid="paging_start" />
     select bb.* ,aa.ag_name as PARENT_AGENT_NAME from(select
     ppd.id, ppd.profit_date, ppd.agent_id, ppd.agent_name,ppd.PARENT_AGENT_ID,
-    ppd.profit_sum_amt,ppd.REAL_PROFIT_AMT,
+    ppd.profit_sum_amt,ppd.REAL_PROFIT_AMT,ppd.SERVER_AMT_SUM,
     nvl(ppd.tran_profit_amt,0)+nvl(ppd.pay_profit_amt,0) as SUM_POS,
     nvl(ppd.ryx_profit_amt,0)+ nvl(ppd.ryx_hd_profit_amt,0)
     +nvl(ppd.tp_profit_amt,0)+ nvl(ppd.rs_profit_amt,0)+nvl(ppd.rs_hd_profit_amt,0)
@@ -1035,7 +1046,7 @@
     +nvl(ppd.znpos_profit_amt,0)
     +nvl(ppd.rhb_dg_real_deduction_amt,0)+nvl(ppd.pos_dg_real_deduction_amt,0)+nvl(ppd.zpos_td_real_deduction_amt,0)
     +nvl(ppd.BU_DEDUCTION_AMT,0)
-    +nvl(ppd.other_deduction_amt,0)
+    +nvl(ppd.other_deduction_amt,0)+nvl(ppd.SERVER_AMT_SUM,0)
     as profitChargeSum,
     ppd.pos_td_real_deduction_amt, ppd.mpos_td_real_deduction_amt,
     nvl(ppd.pos_kh_deduction_amt,0)+nvl(ppd.mpos_kh_deduction_amt,0)+nvl(ppd.pos_reward_deduction_amt,0) as khDeductionAmt,
@@ -1102,7 +1113,7 @@
 <select id="queryProfitDetailLowerMonthList" parameterType="java.util.Map" resultType="java.util.Map">
   <include refid="paging_start" />
  select eee.* from (select zzz.* from (select bb.* ,aa.ag_name as PARENT_AGENT_NAME from(select
-  ppd.id, ppd.profit_date, ppd.agent_id, ppd.agent_name,ppd.PARENT_AGENT_ID,
+  ppd.id, ppd.profit_date, ppd.agent_id, ppd.agent_name,ppd.PARENT_AGENT_ID,ppd.SERVER_AMT_SUM,
   ppd.profit_sum_amt,ppd.REAL_PROFIT_AMT,ppd.BU_DEDUCTION_AMT,
   nvl(ppd.tran_profit_amt,0)+nvl(ppd.pay_profit_amt,0) as SUM_POS,
   nvl(ppd.ryx_profit_amt,0)+ nvl(ppd.ryx_hd_profit_amt,0)
@@ -1115,6 +1126,7 @@
   +ppd.mpos_td_real_deduction_amt
   +ppd.znpos_profit_amt
   +ppd.other_deduction_amt
+  +nvl(ppd.SERVER_AMT_SUM,0)
   +(ppd.rhb_dg_real_deduction_amt+ppd.pos_dg_real_deduction_amt+ppd.zpos_td_real_deduction_amt)),0) as profitChargeSum,
   ppd.pos_td_real_deduction_amt, ppd.mpos_td_real_deduction_amt,
   nvl((ppd.pos_kh_deduction_amt+ppd.mpos_kh_deduction_amt+ppd.pos_reward_deduction_amt),0) as khDeductionAmt,
