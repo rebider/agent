@@ -78,27 +78,27 @@ public class ExcelEventParser {
         sheetParser.parse(new InputSource(sheetInputStream));  
     }  
       
-    public static class SimpleSheetContentsHandler implements SheetContentsHandler{  
-        protected List<String> row = new LinkedList<>();  
-          
-        @Override  
-        public void startRow(int rowNum) {  
-            row.clear();  
-        }  
-  
-        @Override  
-        public void endRow(int rowNum) {  
-            System.err.println(rowNum + " : " + row);  
-        }  
-  
-        @Override  
-        public void cell(String cellReference, String formattedValue, XSSFComment comment) {  
-            row.add(formattedValue);  
-        }  
-  
-        @Override  
-        public void headerFooter(String text, boolean isHeader, String tagName) {  
-              
-        }  
-    }  
+    public static class SimpleSheetContentsHandler implements SheetContentsHandler{
+        protected List<String> row = null;
+
+        @Override
+        public void startRow(int rowNum) {
+            row = new LinkedList<>();
+        }
+
+        @Override
+        public void endRow(int rowNum) {
+            System.err.println(rowNum + " : " + row);
+        }
+
+        @Override
+        public void cell(String cellReference, String formattedValue, XSSFComment comment) {
+            row.add(formattedValue);
+        }
+
+        @Override
+        public void headerFooter(String text, boolean isHeader, String tagName) {
+
+        }
+    }
 }  

@@ -521,6 +521,10 @@ public class InternetCardServiceImpl implements InternetCardService {
             criteria.andStatusEqualTo(Status.STATUS_1.status);
             criteria.andImportStatusEqualTo(OInternetCardImportStatus.UNTREATED.getValue());
             List<OInternetCardImport> oInternetCardImports = internetCardImportMapper.selectByExample(oInternetCardImportExample);
+            if(oInternetCardImports.size()==0){
+                log.info("taskDisposeInternetCard暂无未处理,退出");
+                return;
+            }
             for (OInternetCardImport oInternetCardImport : oInternetCardImports) {
                 if(StringUtils.isBlank(oInternetCardImport.getBatchNum())){
                     log.info("taskDisposeInternetCard处理未处理的导入记录，批次号未空");
