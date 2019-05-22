@@ -39,35 +39,29 @@ public class TermMachineServiceImpl  implements TermMachineService {
 
     @Override
     public List<TermMachineVo> queryTermMachine(PlatformType platformType) throws Exception{
-        switch (platformType.name()){
-            case "POS":
-                return posTermMachineServiceImpl.queryTermMachine(platformType);
-            case "ZPOS":
-                return posTermMachineServiceImpl.queryTermMachine(platformType);
-            case "MPOS":
-                return mposTermMachineServiceImpl.queryTermMachine(platformType);
-            default:
-                return new ArrayList<>();
+        if(PlatformType.whetherPOS(platformType.code)){
+            return posTermMachineServiceImpl.queryTermMachine(platformType);
+        }else{
+            return mposTermMachineServiceImpl.queryTermMachine(platformType);
         }
     }
 
     @Override
     public List<MposTermBatchVo> queryMposTermBatch(PlatformType platformType) throws Exception{
-        switch (platformType.name()){
-            case "MPOS":
-                return mposTermMachineServiceImpl.queryMposTermBatch(platformType);
-            default:
-                return new ArrayList<>();
+        if(PlatformType.whetherPOS(platformType.code)){
+            return new ArrayList<>();
+        }else{
+            return mposTermMachineServiceImpl.queryMposTermBatch(platformType);
         }
     }
 
     @Override
     public List<MposTermTypeVo> queryMposTermType(PlatformType platformType) throws Exception{
-        switch (platformType.name()){
-            case "MPOS":
-                return mposTermMachineServiceImpl.queryMposTermType(platformType);
-            default:
-                return new ArrayList<>();
+
+        if(PlatformType.whetherPOS(platformType.code)){
+            return new ArrayList<>();
+        }else{
+            return mposTermMachineServiceImpl.queryMposTermType(platformType);
         }
     }
 
@@ -98,13 +92,14 @@ public class TermMachineServiceImpl  implements TermMachineService {
      */
     @Override
     public AgentResult changeActMachine(ChangeActMachineVo changeActMachine) throws Exception{
-        if(changeActMachine.getPlatformType().equals(PlatformType.MPOS.code)) {
-            AgentResult res =   mposTermMachineServiceImpl.changeActMachine(changeActMachine);
-            logger.info("mpos机具的互动变更接口:{}",res.getMsg());
-            return AgentResult.ok();
-        }else{
+
+        if(PlatformType.whetherPOS(changeActMachine.getPlatformType())){
             AgentResult res =   posTermMachineServiceImpl.changeActMachine(changeActMachine);
             logger.info("pos机具的互动变更接口:{}",res.getMsg());
+            return AgentResult.ok();
+        }else{
+            AgentResult res =   mposTermMachineServiceImpl.changeActMachine(changeActMachine);
+            logger.info("mpos机具的互动变更接口:{}",res.getMsg());
             return AgentResult.ok();
         }
     }
@@ -116,14 +111,10 @@ public class TermMachineServiceImpl  implements TermMachineService {
 
     @Override
     public AgentResult querySnMsg(PlatformType platformType,String snBegin,String snEnd)throws Exception{
-        switch (platformType.name()){
-            case "POS":
-                return posTermMachineServiceImpl.querySnMsg(platformType,snBegin,snEnd);
-            case "MPOS":
-                return mposTermMachineServiceImpl.querySnMsg(platformType,snBegin,snEnd);
-            default:
-                return AgentResult.fail();
+        if(PlatformType.whetherPOS(platformType.name())){
+            return posTermMachineServiceImpl.querySnMsg(platformType,snBegin,snEnd);
+        }else{
+            return mposTermMachineServiceImpl.querySnMsg(platformType,snBegin,snEnd);
         }
-
     }
 }
