@@ -618,6 +618,7 @@ public class AimportServiceImpl implements AimportService {
                             db_agentBusInfo.setBusRegion(busItem.getBusRegion());
                             db_agentBusInfo.setBusScope(busItem.getBusScope());
                             db_agentBusInfo.setBusUseOrgan(busItem.getBusUseOrgan());
+                            db_agentBusInfo.setBusType(busItem.getBusType());
                             agentBusinfoService.updateAgentBusInfo(db_agentBusInfo);
                             busItem.setId(db_agentBusInfo.getId());
                         }else{
@@ -1310,13 +1311,15 @@ public class AimportServiceImpl implements AimportService {
     public ResultVO importAgentBusInfoBusInfoFromExcel(String user, List<Object> list) throws Exception{
 
         logger.info("用户{}更新业务信息{}",user,list);
-        String busNum = list.get(0)+"",busRegion=list.get(1)+"",isS0=list.get(2)+"";
+        String busNum = list.get(0)+"",
+                busRegion=list.get(1)+"",
+                isS0=list.get(2)+"",
+                jglx=list.size()>3?(list.get(3))+"":"";
 
         if(StringUtils.isBlank(busNum))return ResultVO.fail("busNum为空");
         if(StringUtils.isBlank(isS0))return ResultVO.fail("isS0为空");
 
         List<String> arr = new ArrayList<>();
-
         if(busRegion!=null && StringUtils.isNotBlank(busRegion) && !"null".equals(busRegion)) {
             String[] regions = busRegion.split(",");
             DPosRegionExample dPosRegionExample = new DPosRegionExample();
@@ -1325,6 +1328,16 @@ public class AimportServiceImpl implements AimportService {
             List<DPosRegion> dPosRegions = dPosRegionMapper.selectByExample(dPosRegionExample);
             for (DPosRegion dPosRegion : dPosRegions) {
                 arr.add(dPosRegion.getCode());
+            }
+        }
+        String busType = null;
+        if(jglx!=null && StringUtils.isNotBlank(jglx) && !"null".equals(jglx)) {
+            List<Dict> bustype = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name());
+            for (Dict dict : bustype) {
+                if (dict.getdItemname().equals(jglx)){
+                    busType = dict.getdItemvalue();
+                }
+
             }
         }
 
@@ -1349,6 +1362,9 @@ public class AimportServiceImpl implements AimportService {
                     businfo.setDredgeS0(new BigDecimal(yesorno.indexOf(isS0)));
                     logger.info("用户{}修改前{}是否开通s0：1是，0否 {}", user, busNum, businfo.getDredgeS0());
                 }
+            }
+            if(StringUtils.isNotBlank(busType)){
+                businfo.setBusType(busType);
             }
             if(agentBusInfoMapper.updateByPrimaryKeySelective(businfo)==1){
                 logger.info("用户{}修改为{}",user,busNum);
