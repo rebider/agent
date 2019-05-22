@@ -69,7 +69,6 @@ public class AgentHttpMposServiceImpl implements AgentNetInHttpService {
         resultMap.put("baseMessage",agent);
         resultMap.put("busMessage",agentBusInfo);
 
-
         if(agent.getAgRegArea()!=null){
             List<String> regionList = agentNetInNotityService.getParent(agent.getAgRegArea());
             if(regionList!=null){
@@ -95,9 +94,7 @@ public class AgentHttpMposServiceImpl implements AgentNetInHttpService {
         }
         Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
         resultMap.put("orgType",dictByValue.getdItemname().contains(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
-
-
-        return null;
+        return resultMap;
     }
 
 

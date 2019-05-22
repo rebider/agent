@@ -16,6 +16,7 @@ import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
+import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.bank.PosRegionService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import org.slf4j.Logger;
@@ -65,15 +66,13 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     @Autowired
     private DictOptionsService dictOptionsService;
     @Autowired
-    private PosRegionService posRegionService;
-    @Autowired
-    private AgentService agentService;
-    @Autowired
     private IUserService iUserService;
     @Autowired
     private AgentQueryService agentQueryService;
     @Autowired
     private AgentEnterService agentEnterService;
+    @Autowired
+    private AgentNetInNotityService agentNetInNotityService;
 
 
 
@@ -418,24 +417,25 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 throw new MessageException("更新失败");
             }
 
-            try {
-                ImportAgent importAgent = new ImportAgent();
-                importAgent.setDataid(agentBus.getId());
-                importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
-                importAgent.setBatchcode(Calendar.getInstance().getTime().toString());
-                importAgent.setcUser(userid);
-                if (1 != aimportService.insertAgentImportData(importAgent)) {
-                    logger.info("代理商审批通过-添加开户任务失败");
-                } else {
-                    logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.BUSAPP.getValue(), agentBus.getId());
-                }
+//            try {
+//                ImportAgent importAgent = new ImportAgent();
+//                importAgent.setDataid(agentBus.getId());
+//                importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
+//                importAgent.setBatchcode(Calendar.getInstance().getTime().toString());
+//                importAgent.setcUser(userid);
+//                if (1 != aimportService.insertAgentImportData(importAgent)) {
+//                    logger.info("代理商审批通过-添加开户任务失败");
+//                } else {
+//                    logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.BUSAPP.getValue(), agentBus.getId());
+//                }
+//
+//                agentDataHistoryService.saveDataHistory(agentBus, DataHistoryType.BUSINESS.getValue());
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            } finally {
 
-                agentDataHistoryService.saveDataHistory(agentBus, DataHistoryType.BUSINESS.getValue());
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-//                agentNotifyService.asynNotifyPlatform();
-            }
+//            }
+            agentNetInNotityService.asynNotifyPlatform(agentBus.getId(),NotifyType.NetInEdit.getValue());
             busList.add(agentBus.getId());
         }
 
@@ -451,24 +451,24 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         AgentBusInfo agbus = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getId());
         agentBusInfo.setVersion(agbus.getVersion());
         int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
-        try {
-            ImportAgent importAgent = new ImportAgent();
-            importAgent.setDataid(agbus.getId());
-            importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
-            importAgent.setBatchcode(Calendar.getInstance().getTime().toString());
-            importAgent.setcUser(userId);
-            if (1 != aimportService.insertAgentImportData(importAgent)) {
-                logger.info("代理商审批通过-添加开户任务失败");
-            } else {
-                logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.BUSAPP.getValue(), agbus.getId());
-            }
-
-            agentDataHistoryService.saveDataHistory(agbus, DataHistoryType.BUSINESS.getValue());
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-//            agentNotifyService.asynNotifyPlatform();
-        }
+//        try {
+//            ImportAgent importAgent = new ImportAgent();
+//            importAgent.setDataid(agbus.getId());
+//            importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
+//            importAgent.setBatchcode(Calendar.getInstance().getTime().toString());
+//            importAgent.setcUser(userId);
+//            if (1 != aimportService.insertAgentImportData(importAgent)) {
+//                logger.info("代理商审批通过-添加开户任务失败");
+//            } else {
+//                logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.BUSAPP.getValue(), agbus.getId());
+//            }
+//
+//            agentDataHistoryService.saveDataHistory(agbus, DataHistoryType.BUSINESS.getValue());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
+        agentNetInNotityService.asynNotifyPlatform(agbus.getId(),NotifyType.NetInEdit.getValue());
+//        }
         return i;
     }
 

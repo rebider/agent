@@ -620,23 +620,23 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 throw new ProcessException("新增资金流水失败");
             }
         }
-        //入网程序调用
-        try {
-            ImportAgent importAgent = new ImportAgent();
-            importAgent.setDataid(busId);
-            importAgent.setDatatype(AgImportType.BUSAPP.name());
-            importAgent.setBatchcode(processingId);
-            importAgent.setcUser(rel.getcUser());
-            if (1 != aimportService.insertAgentImportData(importAgent)) {
-                logger.info("代理商审批通过-添加开户任务失败");
-            } else {
-                logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.BUSAPP.getValue(), busId);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-//            agentNotifyService.asynNotifyPlatform();
-        }
+//        入网程序调用
+//        try {
+//            ImportAgent importAgent = new ImportAgent();
+//            importAgent.setDataid(busId);
+//            importAgent.setDatatype(AgImportType.BUSAPP.name());
+//            importAgent.setBatchcode(processingId);
+//            importAgent.setcUser(rel.getcUser());
+//            if (1 != aimportService.insertAgentImportData(importAgent)) {
+//                logger.info("代理商审批通过-添加开户任务失败");
+//            } else {
+//                logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.BUSAPP.getValue(), busId);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
+        agentNetInNotityService.netIn(busId,NotifyType.NetInAddBus.getValue());
+//        }
         return ResultVO.success(null);
     }
 
@@ -780,24 +780,24 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
         }
         //入网程序调用
-        try {
-            ImportAgent importAgent = new ImportAgent();
-            importAgent.setDataid(busId);
-            importAgent.setDatatype(AgImportType.NETINAPP.name());
-            importAgent.setBatchcode(processingId);
-            importAgent.setcUser(rel.getcUser());
-            if (1 != aimportService.insertAgentImportData(importAgent)) {
-                logger.info("代理商审批通过-添加开户任务失败");
-            } else {
-                logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.NETINAPP.getValue(), busId);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
+//        try {
+//            ImportAgent importAgent = new ImportAgent();
+//            importAgent.setDataid(busId);
+//            importAgent.setDatatype(AgImportType.NETINAPP.name());
+//            importAgent.setBatchcode(processingId);
+//            importAgent.setcUser(rel.getcUser());
+//            if (1 != aimportService.insertAgentImportData(importAgent)) {
+//                logger.info("代理商审批通过-添加开户任务失败");
+//            } else {
+//                logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.NETINAPP.getValue(), busId);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
             //todo 生成后台用户
             agentService.createBackUserbyAgent(agent.getId());
             agentNetInNotityService.asynNotifyPlatform(busId,NotifyType.NetInAdd.getValue());
-        }
+//        }
 
         return ResultVO.success(null);
     }
