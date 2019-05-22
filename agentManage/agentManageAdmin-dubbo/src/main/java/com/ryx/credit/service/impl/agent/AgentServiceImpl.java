@@ -453,7 +453,7 @@ public class AgentServiceImpl implements AgentService {
         iUserService.insertByVo(userVo);
 
 
-        List<UserVo>  list_db = cUserMapper.selectListByLogin(agent.getAgUniqNum());
+        List<UserVo>  list_db = cUserMapper.selectListByLogin(agent.getId());
         UserVo cUser = new UserVo();
         if(list_db.size()>0){
             cUser = list_db.get(0);
@@ -660,7 +660,7 @@ public class AgentServiceImpl implements AgentService {
                 userVo.setUserType(1);
                 userVo.setPhone(agent.getId());
                 iUserService.insertByVo(userVo);
-                List<UserVo>  list_db = userMapper.selectListByLogin(agent.getAgUniqNum());
+                List<UserVo>  list_db = userMapper.selectListByLogin(agent.getId());
                 UserVo cUser = new UserVo();
                 if(list_db.size()>0){
                     cUser = list_db.get(0);

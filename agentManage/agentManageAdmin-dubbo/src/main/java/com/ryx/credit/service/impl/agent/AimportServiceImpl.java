@@ -618,6 +618,7 @@ public class AimportServiceImpl implements AimportService {
                             db_agentBusInfo.setBusRegion(busItem.getBusRegion());
                             db_agentBusInfo.setBusScope(busItem.getBusScope());
                             db_agentBusInfo.setBusUseOrgan(busItem.getBusUseOrgan());
+                            db_agentBusInfo.setBusType(busItem.getBusType());
                             agentBusinfoService.updateAgentBusInfo(db_agentBusInfo);
                             busItem.setId(db_agentBusInfo.getId());
                         }else{
