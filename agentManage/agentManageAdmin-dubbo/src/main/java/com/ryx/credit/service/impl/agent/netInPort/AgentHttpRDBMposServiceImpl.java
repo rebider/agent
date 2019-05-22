@@ -27,5 +27,16 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         return null;
     }
 
+    @Override
+    public Map agencyLevelUpdateChangeData(Map data) {
+        return null;
+    }
+
+
+    @Override
+    public AgentResult agencyLevelUpdateChange(Map data) throws Exception {
+        return null;
+    }
+
 
 }

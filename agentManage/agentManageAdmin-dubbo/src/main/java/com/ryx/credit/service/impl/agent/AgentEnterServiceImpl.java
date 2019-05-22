@@ -635,7 +635,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        } finally {
-        agentNetInNotityService.netIn(busId,NotifyType.NetInAddBus.getValue());
+        agentNetInNotityService.asynNotifyPlatform(busId,NotifyType.NetInAddBus.getValue());
 //        }
         return ResultVO.success(null);
     }

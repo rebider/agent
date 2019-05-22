@@ -2,7 +2,10 @@ package com.ryx.credit.service.impl.agent.netInPort;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.FastMap;
+import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.agent.*;
@@ -15,6 +18,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -53,10 +59,12 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
     private AgentPlatFormSynMapper agentPlatFormSynMapper;
     @Autowired
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+    @Autowired
+    private BusActRelMapper busActRelMapper;
 
 
     /**
-     * 新增入网、修改入口
+     * 通知业务平台 统一入口
      * @param busId
      * @param notifyType
      */
@@ -69,7 +77,16 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
             AgBusCriteria.andStatusEqualTo(Status.STATUS_1.status);
             List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(AgBusExample);
             for (AgentBusInfo agentBusInfo : agentBusInfos) {
-                netIn(agentBusInfo.getId(),notifyType);
+                //升级
+                if(StringUtils.isNotBlank(agentBusInfo.getBusNum())){
+                    try {
+                        upgrade(agentBusInfo.getId());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }else{
+                    netIn(agentBusInfo.getId(),notifyType);
+                }
             }
         }else if(notifyType.equals(NotifyType.NetInEdit.getValue())) {
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
@@ -80,10 +97,23 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
             }else{
                 netIn(busId,notifyType);
             }
+        }else if(notifyType.equals(NotifyType.NetInAddBus.getValue())) {
+            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
+            if(StringUtils.isNotBlank(agentBusInfo.getBusNum())){
+                try {
+                    upgrade(agentBusInfo.getId());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }else{
+                netIn(busId,notifyType);
+            }
         }
     }
+
+
     /**
-     * 新增业务、入网和业务手动通知入口
+     * 手动通知入口
      * @param busId
      * @param notifyType  NotifyType.NetInAdd.getValue()
      */
@@ -263,12 +293,124 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
     }
 
 
-    public void applyEdit(){
+    public void applyERBEdit(){
 
     }
 
-    public void upgrade(){
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    public void upgrade(String busId) throws Exception {
+        threadPoolTaskExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+
+                }
+                //业务平台
+                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
+                //直签不直发不通知
+                if(agentBusInfo.getBusType().equals("8")){
+                    log.info("直签不直发不通知：agentId:{},busId:{}",agentBusInfo.getAgentId(),agentBusInfo.getId());
+                    return;
+                }
+                PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+                AgentPlatFormSyn record = new AgentPlatFormSyn();
+                AgentResult res = null;
+                log.info("升级开户接口{}平台编号不为空走升级接口,获取请求参数",agentBusInfo.getBusNum());
+                FastMap fastMap = FastMap.fastSuccessMap()
+                        .putKeyV("agentBusinfoId", agentBusInfo.getId())
+                        .putKeyV("processingId", busId);
+                Map req_data = new HashMap<>();
+                if(PlatformType.whetherPOS(platForm.getPlatformType())){
+                    req_data = agentHttpPosServiceImpl.agencyLevelUpdateChangeData(fastMap);
+                }else if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
+                    req_data = agentHttpMposServiceImpl.agencyLevelUpdateChangeData(fastMap);
+                }else if(platForm.getPlatformType().equals(PlatformType.RDBPOS.getValue())){
+                    req_data = agentHttpRDBMposServiceImpl.agencyLevelUpdateChangeData(fastMap);
+                }
+                log.info("升级开户接口{}平台编号不为空走升级接口,请求参数{}",agentBusInfo.getBusNum(),req_data);
+                try {
+                    //发送请求
+                    if(PlatformType.whetherPOS(platForm.getPlatformType())){
+                        res = agentHttpPosServiceImpl.agencyLevelUpdateChange(req_data);
+                    }else if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
+                        res = agentHttpMposServiceImpl.agencyLevelUpdateChange(req_data);
+                    }else if(platForm.getPlatformType().equals(PlatformType.RDBPOS.getValue())){
+                        res = agentHttpRDBMposServiceImpl.agencyLevelUpdateChange(req_data);
+                    }
+                }catch (MessageException e) {
+                    e.printStackTrace();
+                    log.error(e.getMsg(),e);
+                    res=AgentResult.fail(e.getMsg());
+                }catch (Exception e) {
+                    e.printStackTrace();
+                    log.error(e.getMessage(),e);
+                    res=AgentResult.fail("接口调用异常");
+                }
+                log.info("升级开户接口{}平台编号不为空走升级接口,请求结果{}",agentBusInfo.getBusNum(),res.getMsg());
+                record.setId(idService.genId(TabId.a_agent_platformsyn));
+                String sendJson = JsonUtil.objectToJson(req_data);
+                record.setSendJson(sendJson);
+                record.setNotifyJson(res.getData().toString());
+                record.setNotifyTime(new Date());
+                record.setAgentId(agentBusInfo.getAgentId());
+                record.setBusId(agentBusInfo.getId());
+                record.setPlatformCode(agentBusInfo.getBusPlatform());
+                record.setVersion(Status.STATUS_1.status);
+                record.setcTime(new Date());
+                record.setNotifyStatus(Status.STATUS_0.status);
+                record.setNotifyCount(new BigDecimal(1));
+                record.setcUser(agentBusInfo.getcUser());
+                record.setNotifyType(NotifyType.NetInUpgrade.getValue());
+                log.info("升级开户接口{}平台编号不为空走升级接口,请求结果{},记录数据：{}",agentBusInfo.getBusNum(),res.getMsg(),JSONObject.toJSONString(record));
+                if(null!=res &&  res.isOK()){
+                    //更新入网状态
+                    Agent agent = agentService.getAgentById(agentBusInfo.getAgentId());
+                    //更新入网状态
+                    if(agent.getcIncomStatus()!=null && !agent.getcIncomStatus().equals(AgentInStatus.IN.status)) {
+                        Agent updateAgent = new Agent();
+                        updateAgent.setId(agent.getId());
+                        updateAgent.setVersion(agent.getVersion());
+                        updateAgent.setcIncomStatus(AgentInStatus.IN.status);
+                        Date nowDate = new Date();
+                        updateAgent.setcIncomTime(nowDate);
+                        updateAgent.setcUtime(nowDate);
+                        if(1!=agentMapper.updateByPrimaryKeySelective(updateAgent)){
+                            log.info("升级开户接口{}平台编号不为空走升级接口,更新的代理商{}",agentBusInfo.getBusNum(),"入网状态更新失败");
+                        }else{
+                            log.info("升级开户接口{}平台编号不为空走升级接口,更新的代理商{}",agentBusInfo.getBusNum(),"入网状态更新成功");
+                        }
+                    }
+                    agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
+                    if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)){
+                        log.info("升级开户接口{}平台编号不为空走升级接口,更新业务{}",agentBusInfo.getBusNum(),"入网成功状态更新失败");
+                    }else{
+                        log.info("升级开户接口{}平台编号不为空走升级接口,更新业务{}",agentBusInfo.getBusNum(),"入网成功状态更新成功");
+                    }
+                    record.setSuccesTime(new Date());
+                    record.setNotifyStatus(Status.STATUS_1.status);
+                    if(agentPlatFormSynMapper.insert(record)==1){
+                        log.info("升级开户接口{}添加记录成功,更新本地平台{}",agentBusInfo.getBusNum(),"入网成功");
+                    }
+                    //执行修改操作
+                    asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
+                }else{
+                    agentBusInfo.setBusStatus(BusinessStatus.pause.status);
+                    if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)){
+                        log.info("升级开户接口{}平台编号不为空走升级接口,更新业务{}",agentBusInfo.getBusNum(),"入网失败状态更新失败");
+                    }else{
+                        log.info("升级开户接口{}平台编号不为空走升级接口,更新业务{}",agentBusInfo.getBusNum(),"入网失败状态更新成功");
+                    }
+                    log.info("升级开户接口{}平台编号不为空走升级接口,请求结果{}",agentBusInfo.getBusNum(),res.getMsg());
+                    record.setSuccesTime(new Date());
+                    record.setNotifyStatus(Status.STATUS_0.status);
+                    if(agentPlatFormSynMapper.insert(record)==1){
+                        log.info("开平台{}平台编号不为空走升级接口,更新本地平台{}",agentBusInfo.getBusNum(),"入网成功");
+                    }
+                }
+            }
+        });
     }
-
 }

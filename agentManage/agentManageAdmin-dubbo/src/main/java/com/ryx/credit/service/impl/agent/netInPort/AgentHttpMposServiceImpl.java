@@ -4,12 +4,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.DictGroup;
 import com.ryx.credit.common.enumc.OrgType;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.AppConfig;
-import com.ryx.credit.common.util.HttpClientUtil;
-import com.ryx.credit.common.util.JsonUtil;
-import com.ryx.credit.common.util.MailUtil;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.ApaycompService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInHttpService;
@@ -46,6 +44,8 @@ public class AgentHttpMposServiceImpl implements AgentNetInHttpService {
     private AgentNetInNotityService agentNetInNotityService;
     @Autowired
     private DictOptionsService dictOptionsService;
+    @Autowired
+    private AgentBusinfoService agentBusinfoService;
 
     @Override
     public Map<String, Object> packageParam(Map<String, Object> param) {
@@ -148,4 +148,71 @@ public class AgentHttpMposServiceImpl implements AgentNetInHttpService {
             throw new Exception("http请求超时");
         }
     }
+
+    @Override
+    public Map agencyLevelUpdateChangeData(Map data) {
+        //待请求参数
+        FastMap fastMap = FastMap.fastMap("agencyLevelUpdateChangeData","agencyLevelUpdateChangeData");
+        try {
+            Object agentBusinfo = data.get("agentBusinfoId");
+            AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentBusinfo+"");
+            if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentBusInfo.getBusParent())) {
+                AgentBusInfo parent = agentBusinfoService.getById(agentBusInfo.getBusParent());
+                fastMap.putKeyV("newparentAgencyId",parent.getBusNum());
+            }
+            //查询代理商的上级代理
+            fastMap.putKeyV("agencyId",agentBusInfo.getBusNum());
+            fastMap.putKeyV("type","0");
+            fastMap.putKeyV("createName",data.get("processingId"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            fastMap.putKeyV("msg",e.getLocalizedMessage());
+        }
+        return fastMap;
+    }
+
+    @Override
+    public AgentResult agencyLevelUpdateChange(Map data) throws Exception {
+        log.info("通知手刷请求参数 代理商升级：{}",data);
+        try {
+
+            Map<String,Object> jsonParams = new HashMap<>();
+            jsonParams.put("agencyId",data.get("agencyId"));
+
+            if(null!=data.get("oldparentAgencyId"))
+                jsonParams.put("oldparentAgencyId",data.get("oldparentAgencyId")); //使用范围
+            jsonParams.put("newparentAgencyId",data.get("newparentAgencyId"));
+            jsonParams.put("type",data.get("type"));
+            jsonParams.put("createName",data.get("createName"));
+
+            JSONObject respXMLObj = request(jsonParams,AppConfig.getProperty("agencyChange_mpos_notify_url"));
+
+            String respCode = respXMLObj.getString("respCode");
+            String respMsg = respXMLObj.getString("respMsg");
+
+            if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(respCode) && respCode.equals("000000")){
+                JSONObject repdata =  respXMLObj.getJSONObject("data");
+                return AgentResult.ok(respXMLObj);
+            }else{
+                AppConfig.sendEmails(respXMLObj.toJSONString(), "升级通知手刷失败报警");
+                AgentResult ag = AgentResult.fail(respMsg);
+                ag.setData(respXMLObj);
+                return ag;
+            }
+        } catch (Exception e) {
+            log.info("http请求超时:{}",e.getMessage());
+            AppConfig.sendEmails("http请求超时:"+ MailUtil.printStackTrace(e), "升级通知手刷失败报警");
+            throw e;
+        }
+    }
+
+    public JSONObject request(Map data,String url) throws Exception {
+        String json = JsonUtil.objectToJson(data);
+        log.info("升级通知手刷请求参数：{}",json);
+        String httpResult = HttpClientUtil.doPostJson(url, json);
+        log.info("升级通知手刷返回参数：{}",httpResult);
+        JSONObject respXMLObj = JSONObject.parseObject(httpResult);
+        return respXMLObj;
+    }
+
 }
