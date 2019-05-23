@@ -21,5 +21,10 @@ public interface InternetCardService {
 
     void disposeSn(List<String> snList,OInternetCard internetCard,OInternetCardImport oInternetCardImport)throws MessageException;
 
+    List<OInternetCardImport>  exportErrorExcel(OInternetCardImport internetCardImport);
+
     void taskDisposeInternetCard();
+
+    void taskUpdateMech();
+
 }
