@@ -618,6 +618,7 @@ public class AimportServiceImpl implements AimportService {
                             db_agentBusInfo.setBusRegion(busItem.getBusRegion());
                             db_agentBusInfo.setBusScope(busItem.getBusScope());
                             db_agentBusInfo.setBusUseOrgan(busItem.getBusUseOrgan());
+                            db_agentBusInfo.setBusType(busItem.getBusType());
                             agentBusinfoService.updateAgentBusInfo(db_agentBusInfo);
                             busItem.setId(db_agentBusInfo.getId());
                         }else{
@@ -1310,13 +1311,21 @@ public class AimportServiceImpl implements AimportService {
     public ResultVO importAgentBusInfoBusInfoFromExcel(String user, List<Object> list) throws Exception{
 
         logger.info("用户{}更新业务信息{}",user,list);
-        String busNum = list.get(0)+"",busRegion=list.get(1)+"",isS0=list.get(2)+"";
+        String busNum = list.get(0)+"",
+                busRegion=list.get(1)+"",
+                isS0=list.get(2)+"",
+                jglx=list.size()>3?(list.get(3))+"":"",//机构类型
+                bus_sent_directly=list.size()>4?(list.get(4))+"":"",
+                bus_direct_cashback=list.size()>5?(list.get(5))+"":"",//是否直接返现
+                bus_Inde_ass=list.size()>6?(list.get(6))+"":"",
+                clo_receipt=list.size()>7?(list.get(7))+"":"",//是否要求收据
+                bus_login_num=list.size()>8?(list.get(8))+"":"";//业务系统登录账号
 
-        if(StringUtils.isBlank(busNum))return ResultVO.fail("busNum为空");
-        if(StringUtils.isBlank(isS0))return ResultVO.fail("isS0为空");
+
+//        if(StringUtils.isBlank(busNum))return ResultVO.fail("busNum为空");
+//        if(StringUtils.isBlank(isS0))return ResultVO.fail("isS0为空");
 
         List<String> arr = new ArrayList<>();
-
         if(busRegion!=null && StringUtils.isNotBlank(busRegion) && !"null".equals(busRegion)) {
             String[] regions = busRegion.split(",");
             DPosRegionExample dPosRegionExample = new DPosRegionExample();
@@ -1327,6 +1336,38 @@ public class AimportServiceImpl implements AimportService {
                 arr.add(dPosRegion.getCode());
             }
         }
+        String busType = null;
+        if(jglx!=null && StringUtils.isNotBlank(jglx) && !"null".equals(jglx)) {
+            List<Dict> bustype = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name());
+            for (Dict dict : bustype) {
+                if (dict.getdItemname().equals(jglx)){
+                    busType = dict.getdItemvalue();
+                }
+
+            }
+        }
+
+        int bus_sent_directly_index = -1;
+        if(bus_sent_directly!=null && StringUtils.isNotBlank(bus_sent_directly) && !"null".equals(bus_sent_directly)) {
+            bus_sent_directly_index = yesorno.indexOf(bus_sent_directly);
+        }
+
+        int bus_direct_cashback_index = -1;
+        if(bus_direct_cashback!=null && StringUtils.isNotBlank(bus_direct_cashback) && !"null".equals(bus_direct_cashback)) {
+            bus_direct_cashback_index = yesorno.indexOf(bus_direct_cashback);
+        }
+
+        int bus_Inde_ass_index = -1;
+        if(bus_Inde_ass!=null && StringUtils.isNotBlank(bus_Inde_ass) && !"null".equals(bus_Inde_ass)) {
+            bus_Inde_ass_index = yesorno.indexOf(bus_Inde_ass);
+        }
+
+        int clo_receipt_index = -1;
+        if(clo_receipt!=null && StringUtils.isNotBlank(clo_receipt) && !"null".equals(clo_receipt)) {
+            clo_receipt_index = yesorno.indexOf(clo_receipt);
+        }
+
+
 
         AgentBusInfoExample example = new AgentBusInfoExample();
         example.or().andStatusEqualTo(Status.STATUS_1.status).andBusNumEqualTo(String.valueOf(busNum));
@@ -1349,6 +1390,24 @@ public class AimportServiceImpl implements AimportService {
                     businfo.setDredgeS0(new BigDecimal(yesorno.indexOf(isS0)));
                     logger.info("用户{}修改前{}是否开通s0：1是，0否 {}", user, busNum, businfo.getDredgeS0());
                 }
+            }
+            if(StringUtils.isNotBlank(busType)){
+                businfo.setBusType(busType);
+            }
+            if(bus_sent_directly_index!=-1){
+                businfo.setBusSentDirectly(BigDecimal.valueOf(bus_sent_directly_index));
+            }
+            if(bus_direct_cashback_index!=-1){
+                businfo.setBusDirectCashback(BigDecimal.valueOf(bus_direct_cashback_index));
+            }
+            if(bus_Inde_ass_index!=-1){
+                businfo.setBusIndeAss(BigDecimal.valueOf(bus_Inde_ass_index));
+            }
+            if(clo_receipt_index!=-1){
+                businfo.setCloReceipt(BigDecimal.valueOf(clo_receipt_index));
+            }
+            if(StringUtils.isNotBlank(bus_login_num)){
+                businfo.setBusLoginNum(bus_login_num);
             }
             if(agentBusInfoMapper.updateByPrimaryKeySelective(businfo)==1){
                 logger.info("用户{}修改为{}",user,busNum);

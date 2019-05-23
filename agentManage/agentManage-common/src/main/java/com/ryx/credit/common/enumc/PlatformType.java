@@ -94,9 +94,6 @@ public enum PlatformType {
      * @return
      */
     public static Boolean whetherPOS(String platformTypeCode){
-        if(platformTypeCode.equals(PlatformType.POS.code) || platformTypeCode.equals(PlatformType.ZPOS.code) || platformTypeCode.equals(PlatformType.ZHPOS.code)){
-            return true;
-        }
-        return false;
+        return platformTypeCode.equals(PlatformType.POS.code) || platformTypeCode.equals(PlatformType.ZPOS.code) || platformTypeCode.equals(PlatformType.ZHPOS.code);
     }
 }

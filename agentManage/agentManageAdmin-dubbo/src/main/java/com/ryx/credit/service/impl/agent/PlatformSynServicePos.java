@@ -2,6 +2,8 @@ package com.ryx.credit.service.impl.agent;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.OrgType;
+import com.ryx.credit.common.enumc.Platform;
+import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
@@ -54,7 +56,7 @@ public class PlatformSynServicePos implements PlatformSynService {
             List<PlatForm> list = platFormMapper.selectByExample(example);
             if(list.size()>0){
                 PlatForm p = list.get(0);
-                if("POS".equals(p.getPlatformType()) || "ZPOS".equals(p.getPlatformType())){
+                if(PlatformType.whetherPOS(p.getPlatformType())){
                     return true;
                 }
             }
@@ -68,7 +70,7 @@ public class PlatformSynServicePos implements PlatformSynService {
         List<PlatForm> list = platFormMapper.selectByExample(example);
         if(list.size()>0){
             PlatForm p = list.get(0);
-            if("POS".equals(p.getPlatformType()) || "ZPOS".equals(p.getPlatformType())){
+            if(PlatformType.whetherPOS(p.getPlatformType())){
                 return true;
             }
         }
