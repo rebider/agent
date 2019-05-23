@@ -395,6 +395,20 @@ public class InternetCardServiceImpl implements InternetCardService {
                 internetCard.setAgentId(agent.getId());
             }
         }
+        if(StringUtils.isNotBlank(internetCard.getInternetCardNum())){
+            OInternetCardExample oInternetCardExample = new OInternetCardExample();
+            OInternetCardExample.Criteria criteria = oInternetCardExample.createCriteria();
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
+            criteria.andInternetCardNumEqualTo(internetCard.getInternetCardNum());
+            List<OInternetCard> oInternetCards = internetCardMapper.selectByExample(oInternetCardExample);
+            if(oInternetCards.size()!=0){
+                oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
+                oInternetCardImport.setErrorMsg("物联网卡卡号重复");
+                //更新导入记录
+                updateInternetCardImport(oInternetCardImport);
+                return;
+            }
+        }
         if(StringUtils.isNotBlank(internetCard.getManufacturer())){
             Dict dict = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),internetCard.getManufacturer());
             if(null==dict){
