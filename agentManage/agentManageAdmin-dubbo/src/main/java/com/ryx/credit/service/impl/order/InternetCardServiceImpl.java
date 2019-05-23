@@ -15,7 +15,6 @@ import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
-import com.ryx.credit.service.impl.agent.PosOrgStatisticsServiceImpl;
 import com.ryx.credit.service.order.InternetCardService;
 import com.ryx.credit.service.order.OLogisticsService;
 import org.apache.commons.lang.time.DateUtils;
@@ -506,6 +505,25 @@ public class InternetCardServiceImpl implements InternetCardService {
 
 
     /**
+     * 导出错误数据
+     * @param internetCardImport
+     * @return
+     * @throws MessageException
+     */
+    @Override
+    public List<OInternetCardImport>  exportErrorExcel(OInternetCardImport internetCardImport){
+        OInternetCardImportExample oInternetCardImportExample = new OInternetCardImportExample();
+        OInternetCardImportExample.Criteria criteria = oInternetCardImportExample.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andBatchNumEqualTo(internetCardImport.getBatchNum());
+        criteria.andImportTypeEqualTo(internetCardImport.getImportType());
+        criteria.andImportStatusEqualTo(OInternetCardImportStatus.FAIL.code);
+        List<OInternetCardImport> oInternetCardImports = internetCardImportMapper.selectByExample(oInternetCardImportExample);
+        return oInternetCardImports;
+    }
+
+
+    /**
      * 定时任务，
      * 1. 检测是否续费为否，状态为正常的，当月的，更新是否续费为是
      * 2.
@@ -597,10 +615,5 @@ public class InternetCardServiceImpl implements InternetCardService {
     }
 
 
-//    @Override
-    public void taskDisposeInternetCard2(){
-
-
-    }
 
 }
