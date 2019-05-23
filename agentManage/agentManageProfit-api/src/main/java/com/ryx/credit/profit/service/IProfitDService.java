@@ -38,6 +38,7 @@ public interface IProfitDService {
     int updateByPrimaryKey(ProfitDay record);
 
     PageInfo profitDList(Map<String,String> map, Page page);
+   PageInfo profitDayList(Map<String,Object> map, PageInfo pageInfo);
 
     public List<ProfitDay> exportProfitD(ProfitDay profitD);
 }

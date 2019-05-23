@@ -44,5 +44,9 @@ public interface ProfitDayMapper {
 
     void deleteByDay(@Param("frDate") String frDate);
 
-    List<Map<String,Object>> selectIncludePayComByExample(ProfitDayExample example);
+    List<Map<String, Object>> selectIncludePayComByExample(ProfitDayExample example);
+
+    Integer profitDayListCount(Map<String, Object> map);
+
+    List<Map<String, Object>> profitDayLList(Map<String, Object> map);
 }
