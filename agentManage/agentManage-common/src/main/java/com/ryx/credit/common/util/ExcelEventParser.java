@@ -3,10 +3,13 @@ package com.ryx.credit.common.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -68,30 +71,36 @@ public class ExcelEventParser {
             for (int i = currentCol; i < minColumns ; i++) {
                 curstr.add(null);
             }
+            Set set = new HashSet();
+            for (String strings : curstr) {
+                if(StringUtils.isNotBlank(strings))
+                set.add(strings.trim());
+            }
+            if(set.size()!=0)
             output.add(curstr);
         }
 
         @Override
         public void cell(String cellReference, String formattedValue,
                          XSSFComment comment) {
-            if (cellReference == null) {
-                cellReference = new CellAddress(currentRow, currentCol).formatAsString();
-            }
+            if(StringUtils.isNotBlank(formattedValue.trim())){
+                if (cellReference == null) {
+                    cellReference = new CellAddress(currentRow, currentCol).formatAsString();
+                }
 
-            int thisCol = (new CellReference(cellReference)).getCol();
-            int missedCols = thisCol - currentCol - 1;
-            for (int i = 0; i < missedCols; i++) {
-                curstr.add(null);
-            }
-            currentCol = thisCol;
+                int thisCol = (new CellReference(cellReference)).getCol();
+                int missedCols = thisCol - currentCol - 1;
+                for (int i = 0; i < missedCols; i++) {
+                    curstr.add(null);
+                }
+                currentCol = thisCol;
 
-            try {
-                Double.parseDouble(formattedValue);
-                curstr.add(formattedValue);
-            } catch (NumberFormatException e) {
-//                if(StringUtils.isNotBlank(formattedValue.trim())){
+                try {
+                    Double.parseDouble(formattedValue);
                     curstr.add(formattedValue);
-//                }
+                } catch (NumberFormatException e) {
+                    curstr.add(formattedValue);
+                }
             }
         }
 

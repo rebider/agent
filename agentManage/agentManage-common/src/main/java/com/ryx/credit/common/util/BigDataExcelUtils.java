@@ -31,4 +31,10 @@ public class BigDataExcelUtils {
         return table;
     }
 
+    public static void main(String[] args){
+
+        List<List<String>> lists = bigDataGetExcel("D://ddd.xlsx");
+        System.out.println(lists);
+
+    }
 }
