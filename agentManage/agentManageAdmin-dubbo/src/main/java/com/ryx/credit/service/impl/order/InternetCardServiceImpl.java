@@ -542,7 +542,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             reqMap.put("renew",Status.STATUS_0.status);//否
             reqMap.put("newRenew",Status.STATUS_1.status);
             reqMap.put("internetCardStatus",InternetCardStatus.NORMAL.getValue());
-            reqMap.put("expireTime",DateUtil.format(new Date(),DateUtil.DATE_FORMAT_yyyy_MM));
+            reqMap.put("expireTime",DateUtil.getPerFirstDayOfMonth());
             int i = internetCardMapper.selectInternetCardExpireCount(reqMap);
             if(i>0){
                 int updateCount = internetCardMapper.updateInternetCardExpire(reqMap);
@@ -614,7 +614,5 @@ public class InternetCardServiceImpl implements InternetCardService {
             e.printStackTrace();
         }
     }
-
-
 
 }
