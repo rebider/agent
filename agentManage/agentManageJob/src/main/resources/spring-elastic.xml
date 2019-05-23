@@ -12,6 +12,7 @@
                         ">
     <!--configure registry center -->
     <reg:zookeeper id="regCenter" server-lists="${zk.server}" namespace="agentManage-job" base-sleep-time-milliseconds="1000" max-sleep-time-milliseconds="3000" max-retries="3" />
+
     <!--代理商账户完善任务-->
     <job:simple id="agentLoginAccountCreate"
                 job-ref="agentLoginAccountCreateJob"
@@ -115,6 +116,16 @@
                 cron="0 0/1 * * * ?"
                 overwrite="true"
                 description="处理未处理的物联网卡导入 5分钟执行一次"
+                sharding-total-count="1"
+                sharding-item-parameters="0=Server0"/>
+
+
+    <job:simple id="internetCardUpdateMech"
+                job-ref="internetCardUpdateMechJob"
+                registry-center-ref="regCenter"
+                cron="0 0 5 * * ?"
+                overwrite="true"
+                description="物联网卡，每天更新一次商户信息"
                 sharding-total-count="1"
                 sharding-item-parameters="0=Server0"/>
 
