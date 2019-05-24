@@ -26,4 +26,9 @@ public interface InternetCardService {
     void taskDisposeInternetCard();
 
     void taskUpdateMech();
+
+    List<OInternetCard> queryInternetCardList(OInternetCard internetCard, Page page);
+
+    Integer queryInternetCardCount(OInternetCard internetCard);
+
 }

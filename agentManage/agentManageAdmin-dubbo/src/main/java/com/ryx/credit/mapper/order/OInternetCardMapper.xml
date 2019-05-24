@@ -421,5 +421,23 @@
       and c.status = 1
     </where>
   </select>
-
+  <sql id="InternetCard_Base_Column_List">
+    ICCID_NUM, CARD_IMPORT_ID, BATCH_NUM, SN_NUM, DELIVER_TIME, CONSIGNEE, ORDER_ID,
+    AGENT_ID, AGENT_NAME, INTERNET_CARD_NUM, ISSUER, OPEN_ACCOUNT_TIME, EXPIRE_TIME,
+    INTERNET_CARD_STATUS, MER_ID, LATELY_PAY_TIME, MER_NAME,d.D_ITEMNAME as MANUFACTURER, RENEW, C_TIME,
+    U_TIME, C_USER, U_USER, STATUS, VERSION
+  </sql>
+  <select id="queryInternetCardList" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <include refid="InternetCard_Base_Column_List" />
+    from O_INTERNET_CARD o LEFT JOIN d_dict d on d.d_itemvalue = o.MANUFACTURER AND d.d_group ='ORDER' AND d_artifact='MANUFACTURER'
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
 </mapper>
