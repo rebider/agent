@@ -260,7 +260,6 @@ public class InternetCardServiceImpl implements InternetCardService {
                         oInternetCardImport.setVersion(BigDecimal.ONE);
                         internetCardImportMapper.insert(oInternetCardImport);
                     }
-                    analysisImport(batchNo);
                 }catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -406,11 +405,6 @@ public class InternetCardServiceImpl implements InternetCardService {
             }
             internetCard.setManufacturer(dict.getdItemvalue());
         }
-        OInternetCardMerch oInternetCardMerch = internetCardMerchMapper.selectChnTermposi(BigDataEncode.encode(internetCard.getIccidNum()));
-        if(null!=oInternetCardMerch){
-            internetCard.setMerId(oInternetCardMerch.getChnMerchId());
-            internetCard.setMerName(oInternetCardMerch.getMerchName());
-        }
         if(oInternetCard==null){
             internetCard.setcUser(oInternetCardImport.getcUser());
             internetCard.setRenew(Status.STATUS_0.status); //否
@@ -513,7 +507,6 @@ public class InternetCardServiceImpl implements InternetCardService {
     /**
      * 定时任务，
      * 1. 检测是否续费为否，状态为正常的，当月的，更新是否续费为是
-     * 2.
      */
     @Override
     public void taskDisposeInternetCard(){
@@ -560,17 +553,39 @@ public class InternetCardServiceImpl implements InternetCardService {
     }
 
     /**
-     * 定时任务  更新已修改的商户信息
+     * 定时任务
+     * 1. 查询为空的商户信息更新
+     * 2. 更新已修改的商户信息（是续费，正常）
      */
     @Autowired
     public void taskUpdateMech(){
         try {
+            //1. 查询为空的商户信息更新
             OInternetCardExample oInternetCardExample = new OInternetCardExample();
             OInternetCardExample.Criteria criteria = oInternetCardExample.createCriteria();
             criteria.andStatusEqualTo(Status.STATUS_1.status);
-            criteria.andInternetCardStatusEqualTo(InternetCardStatus.NORMAL.getValue());
-            criteria.andRenewEqualTo(Status.STATUS_1.status);//是续费
-            List<OInternetCard> oInternetCards = internetCardMapper.selectByExample(oInternetCardExample);
+            criteria.andMerIdIsNull();
+            criteria.andMerNameIsNull();
+            List<OInternetCard> internetCards = internetCardMapper.selectByExample(oInternetCardExample);
+            for (OInternetCard internetCard : internetCards) {
+                OInternetCardMerch oInternetCardMerch = internetCardMerchMapper.selectChnTermposi(BigDataEncode.encode(internetCard.getIccidNum()));
+                if(null!=oInternetCardMerch){
+                    internetCard.setMerId(oInternetCardMerch.getChnMerchId());
+                    internetCard.setMerName(oInternetCardMerch.getMerchName());
+                    int i = internetCardMapper.updateByPrimaryKeySelective(internetCard);
+                    if(i!=1){
+                        log.error("为空定时任务更新商户信息失败:IccidNum:{},商户编号:{},商户名称:{}",internetCard.getIccidNum(),oInternetCardMerch.getChnMerchId(),oInternetCardMerch.getMerchName());
+                    }
+                }
+            }
+
+            //2. 更新已修改的商户信息（是续费，正常）
+            Map<String,Object> reqMap = new HashMap<>();
+            reqMap.put("renew",Status.STATUS_0.status);//否
+            reqMap.put("newRenew",Status.STATUS_1.status);//是续费
+            reqMap.put("internetCardStatus",InternetCardStatus.NORMAL.getValue());
+            reqMap.put("expireTime",DateUtil.getPerFirstDayOfMonth());
+            List<OInternetCard> oInternetCards = internetCardMapper.selectInternetCardRenew(reqMap);
             for (OInternetCard oInternetCard : oInternetCards) {
                 OInternetCardMerch oInternetCardMerch = internetCardMerchMapper.selectChnTermposi(BigDataEncode.encode(oInternetCard.getIccidNum()));
                 if(null!=oInternetCardMerch){

@@ -27,4 +27,11 @@ public interface OInternetCardMapper {
     int selectInternetCardExpireCount(@Param("map")Map<String,Object> map);
 
     int updateInternetCardExpire(@Param("map")Map<String,Object> map);
+
+    /**
+     * 查询要续费的数据
+     * @param map
+     * @return
+     */
+    List<OInternetCard> selectInternetCardRenew(@Param("map")Map<String,Object> map);
 }

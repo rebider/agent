@@ -405,8 +405,21 @@
     <where>
       c.renew = #{map.renew}
       and TO_CHAR(c.expire_time, 'YYYY-MM') = #{map.expireTime}
-      and Internet_card_status =  #{map.internetCardStatus}
+      and c.internet_card_status =  #{map.internetCardStatus}
+      and c.status = 1
     </where>
   </sql>
+
+  <select id="selectInternetCardRenew" parameterType="map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from o_internet_Card c
+    <where>
+      c.renew = #{map.renew}
+      and TO_CHAR(c.expire_time, 'YYYY-MM') = #{map.expireTime}
+      and Internet_card_status =  #{map.internetCardStatus}
+      and c.status = 1
+    </where>
+  </select>
 
 </mapper>
