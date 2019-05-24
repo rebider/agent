@@ -7,4 +7,15 @@
         id, name, url, description, icon, pid, seq, status, open_mode as openMode, opened, resource_type AS resourceType, create_time AS createTime
     </sql>
 
+    <select id="userHasPlatfromPerm" resultType="map">
+        select e.PLATFORM_NUM,e.PLATFORM_TYPE from A_PLATFORM e
+        inner join c_resource a on ('AGENT_LIST_PLATFORM_'||e.PLATFORM_NUM) = a.URL
+        left join c_role_resource b  on a.id=b.resource_id
+        left join c_role c on c.id=b.role_id
+        left join c_user_role d on d.role_id=c.id
+        <where>
+            <if test="userId!=null and userId!=''">and d.user_id =#{userId,jdbcType=DECIMAL} </if>
+        </where>
+    </select>
+
 </mapper>

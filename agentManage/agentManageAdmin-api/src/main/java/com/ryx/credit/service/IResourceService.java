@@ -6,6 +6,7 @@ import com.ryx.credit.commons.shiro.ShiroUser;
 import com.ryx.credit.pojo.admin.CResource;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -21,5 +22,7 @@ public interface IResourceService extends IService<CResource> {
     List<Tree> selectAllTree();
 
     List<Tree> selectTree(ShiroUser shiroUser);
+
+    List<Map> userHasPlatfromPerm(Long userId);
 
 }
