@@ -29,7 +29,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /***
  * @Author liudh
@@ -73,6 +76,45 @@ public class InternetCardServiceImpl implements InternetCardService {
     public PageInfo internetCardList(OInternetCard internetCard, Page page){
 
         OInternetCardExample oInternetCardExample = new OInternetCardExample();
+        oInternetCardExample= queryParam(internetCard, oInternetCardExample);
+        oInternetCardExample.setPage(page);
+        List<OInternetCard> oInternetCards = internetCardMapper.selectByExample(oInternetCardExample);
+        for (OInternetCard oInternetCard : oInternetCards) {
+            Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),oInternetCard.getManufacturer());
+            if(null!=dict)
+                oInternetCard.setManufacturer(dict.getdItemname());
+        }
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(oInternetCards);
+        pageInfo.setTotal((int)internetCardMapper.countByExample(oInternetCardExample));
+        return pageInfo;
+    }
+
+    @Override
+    public List<OInternetCard> queryInternetCardList(OInternetCard internetCard, Page page){
+        OInternetCardExample oInternetCardExample = new OInternetCardExample();
+        oInternetCardExample = queryParam(internetCard, oInternetCardExample);
+        oInternetCardExample.setPage(page);
+        List<OInternetCard> oInternetCards = internetCardMapper.queryInternetCardList(oInternetCardExample);
+        return oInternetCards;
+    }
+
+    @Override
+    public Integer queryInternetCardCount(OInternetCard internetCard){
+        OInternetCardExample oInternetCardExample = new OInternetCardExample();
+        oInternetCardExample = queryParam(internetCard, oInternetCardExample);
+        Integer count = Integer.valueOf((int)internetCardMapper.countByExample(oInternetCardExample));
+        return count;
+    }
+
+    /**
+     * 查询和导出的条件
+     * @param internetCard
+     * @param oInternetCardExample
+     * @return
+     */
+    private OInternetCardExample queryParam(OInternetCard internetCard, OInternetCardExample oInternetCardExample){
+
         OInternetCardExample.Criteria criteria = oInternetCardExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         if(StringUtils.isNotBlank(internetCard.getBatchNum())){
@@ -99,18 +141,10 @@ public class InternetCardServiceImpl implements InternetCardService {
         if(StringUtils.isNotBlank(internetCard.getOrderId())){
             criteria.andOrderIdEqualTo(internetCard.getOrderId());
         }
-        oInternetCardExample.setPage(page);
+
         oInternetCardExample.setOrderByClause(" c_time desc ");
-        List<OInternetCard> oInternetCards = internetCardMapper.selectByExample(oInternetCardExample);
-        for (OInternetCard oInternetCard : oInternetCards) {
-            Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),oInternetCard.getManufacturer());
-            if(null!=dict)
-            oInternetCard.setManufacturer(dict.getdItemname());
-        }
-        PageInfo pageInfo = new PageInfo();
-        pageInfo.setRows(oInternetCards);
-        pageInfo.setTotal((int)internetCardMapper.countByExample(oInternetCardExample));
-        return pageInfo;
+
+        return oInternetCardExample;
     }
 
 
@@ -557,7 +591,7 @@ public class InternetCardServiceImpl implements InternetCardService {
      * 1. 查询为空的商户信息更新
      * 2. 更新已修改的商户信息（是续费，正常）
      */
-    @Autowired
+    @Override
     public void taskUpdateMech(){
         try {
             //1. 查询为空的商户信息更新
@@ -615,5 +649,8 @@ public class InternetCardServiceImpl implements InternetCardService {
             e.printStackTrace();
         }
     }
+
+
+
 
 }

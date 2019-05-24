@@ -3,9 +3,11 @@ package com.ryx.credit.service.order;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.order.OInternetCard;
 import com.ryx.credit.pojo.admin.order.OInternetCardImport;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -26,5 +28,9 @@ public interface InternetCardService {
     void taskDisposeInternetCard();
 
     void taskUpdateMech();
+
+    List<OInternetCard> queryInternetCardList(OInternetCard internetCard, Page page);
+
+    Integer queryInternetCardCount(OInternetCard internetCard);
 
 }

@@ -34,4 +34,7 @@ public interface OInternetCardMapper {
      * @return
      */
     List<OInternetCard> selectInternetCardRenew(@Param("map")Map<String,Object> map);
+
+
+    List<OInternetCard> queryInternetCardList(OInternetCardExample example);
 }
