@@ -148,8 +148,10 @@ public class AgentServiceImpl implements AgentService {
             }
             Map<String, Object> stringObjectMap = orgCodeRes.get(0);
             String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+            String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
             map.put("orgId",orgId);
             map.put("userId",userId);
+            map.put("organizationCode",organizationCode);
         }
 
         if (null != map) {
