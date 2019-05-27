@@ -9,10 +9,12 @@ import com.ryx.credit.pojo.admin.CResource;
 import com.ryx.credit.service.IResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sun.util.resources.ga.LocaleNames_ga;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -146,4 +148,9 @@ public class ResourceServiceImpl extends ServiceImpl<CResourceMapper, CResource>
 		roleResourceMapper.deleteByResourceId(resourceId);
 		return super.deleteById(resourceId);
 	}
+
+
+	public List<Map> userHasPlatfromPerm(Long userId){
+        return resourceMapper.userHasPlatfromPerm(userId);
+    }
 }

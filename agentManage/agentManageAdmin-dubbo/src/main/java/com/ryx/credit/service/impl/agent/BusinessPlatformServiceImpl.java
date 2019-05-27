@@ -15,6 +15,7 @@ import com.ryx.credit.dao.agent.PlatFormMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.bank.DPosRegion;
 import com.ryx.credit.pojo.admin.vo.*;
+import com.ryx.credit.service.IResourceService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.bank.PosRegionService;
@@ -77,11 +78,13 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     private AgentQueryService agentQueryService;
     @Autowired
     private AgentEnterService agentEnterService;
+    @Autowired
+    private IResourceService iResourceService;
 
 
 
     @Override
-    public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,String flag,String isZpos) {
+    public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,Long userId) {
         Map<String, Object> reqMap = new HashMap<>();
 
         reqMap.put("agStatus", AgStatus.Approved.name());
@@ -106,19 +109,55 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         if (agentBusInfo.getBusType() != null) {
             reqMap.put("busType", agentBusInfo.getBusType());
         }
-        if (StringUtils.isNotBlank(flag) && flag.equals("1")){
-            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(agentBusInfo.getcUser()));
-            if(orgCodeRes==null && orgCodeRes.size()!=1){
-                return null;
-            }
-            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
-            String orgId = String.valueOf(stringObjectMap.get("ORGID"));
-            reqMap.put("orgId",orgId);
-            reqMap.put("userId",Long.valueOf(agentBusInfo.getcUser()));
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(agentBusInfo.getcUser()));
+        if(orgCodeRes==null && orgCodeRes.size()!=1){
+            return null;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        reqMap.put("orgId",orgId);
+        reqMap.put("userId",Long.valueOf(agentBusInfo.getcUser()));
+        reqMap.put("organizationCode", organizationCode);
+        reqMap.put("status", Status.STATUS_1.status);
+        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+        reqMap.put("platfromPerm",platfromPerm);
+        List<Map<String, Object>> agentBusInfoList = agentBusInfoMapper.queryBusinessPlatformList(reqMap, page);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(agentBusInfoList);
+        pageInfo.setTotal(agentBusInfoMapper.queryBusinessPlatformCount(reqMap));
+        return pageInfo;
+    }
+
+    @Override
+    public PageInfo queryBusinessPlatformListManager(AgentBusInfo agentBusInfo, Agent agent, Page page, Long userId) {
+        Map<String, Object> reqMap = new HashMap<>();
+
+        reqMap.put("agStatus", AgStatus.Approved.name());
+        if (!StringUtils.isBlank(agent.getId())) {
+            reqMap.put("id", agent.getId());
+        }
+        if (!StringUtils.isBlank(agent.getAgName())) {
+            reqMap.put("agName", agent.getAgName());
+        }
+        if (!StringUtils.isBlank(agent.getAgUniqNum())) {
+            reqMap.put("agUniqNum", agent.getAgUniqNum());
+        }
+        if (!StringUtils.isBlank(agentBusInfo.getBusNum())) {
+            reqMap.put("busNum", agentBusInfo.getBusNum());
+        }
+        if (!StringUtils.isBlank(agentBusInfo.getBusPlatform())) {
+            reqMap.put("busPlatform", agentBusInfo.getBusPlatform());
+        }
+        if (agentBusInfo.getCloReviewStatus() != null) {
+            reqMap.put("cloReviewStatus", agentBusInfo.getCloReviewStatus());
+        }
+        if (agentBusInfo.getBusType() != null) {
+            reqMap.put("busType", agentBusInfo.getBusType());
         }
         reqMap.put("status", Status.STATUS_1.status);
-        reqMap.put("isZpos",isZpos);
-        reqMap.put("platForm", Platform.ZPOS.getValue());
+        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+        reqMap.put("platfromPerm",platfromPerm);
         List<Map<String, Object>> agentBusInfoList = agentBusInfoMapper.queryBusinessPlatformList(reqMap, page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(agentBusInfoList);

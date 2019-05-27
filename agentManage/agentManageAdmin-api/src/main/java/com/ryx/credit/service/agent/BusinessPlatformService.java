@@ -25,7 +25,8 @@ import java.util.Map;
  */
 public interface BusinessPlatformService {
 
-    PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,String flag,String isZpos);
+    PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,Long userId);
+    PageInfo queryBusinessPlatformListManager(AgentBusInfo agentBusInfo, Agent agent, Page page,Long userId);
 
     AgentResult verifyAgent(String agUniqNum);
 

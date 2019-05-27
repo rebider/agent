@@ -16,6 +16,7 @@ import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.IResourceService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.dict.DictOptionsService;
@@ -100,6 +101,8 @@ public class OrderServiceImpl implements OrderService {
     private IUserService iUserService;
     @Autowired
     private CapitalService capitalService;
+    @Autowired
+    private IResourceService iResourceService;
 
     /**
      * 根据ID查询订单
@@ -143,6 +146,19 @@ public class OrderServiceImpl implements OrderService {
     public PageInfo orderList(Map par, Page page) {
         PageInfo pageInfo = new PageInfo();
         par.put("page", page);
+        if(null!=par.get("userId")) {
+            Long userId = (Long) par.get("userId");
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if (orgCodeRes == null && orgCodeRes.size() != 1) {
+                return null;
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+            par.put("organizationCode", organizationCode);
+
+            List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+            par.put("platfromPerm", platfromPerm);
+        }
         pageInfo.setTotal(orderMapper.queryOrderListViewCount(par));
         pageInfo.setRows(orderMapper.queryOrderListView(par));
         return pageInfo;
@@ -161,6 +177,11 @@ public class OrderServiceImpl implements OrderService {
     public PageInfo allOderList(Map par, Page page) {
         PageInfo pageInfo = new PageInfo();
         par.put("page", page);
+        if(null!=par.get("userId")) {
+            Long userId = (Long) par.get("userId");
+            List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+            par.put("platfromPerm", platfromPerm);
+        }
         pageInfo.setTotal(orderMapper.queryAllOrderListViewCount(par));
         pageInfo.setRows(orderMapper.queryAllOrderListView(par));
         return pageInfo;
