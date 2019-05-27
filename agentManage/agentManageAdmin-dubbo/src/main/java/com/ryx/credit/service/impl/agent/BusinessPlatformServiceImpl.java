@@ -247,6 +247,18 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
 
             for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
                 AgentBusInfo agbus = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                Dict debitRateLower = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfoVo.getBusPlatform(), "debitRateLower");//借记费率下限（%）
+                Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfoVo.getBusPlatform(), "debitCapping");//借记封顶额（元）
+                Dict debitAppearRate = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfoVo.getBusPlatform(), "debitAppearRate");//借记出款费率（%）
+                if(debitRateLower!=null){
+                    agentBusInfoVo.setDebitRateLower(debitRateLower.getdItemvalue());
+                }
+                if(debitCapping!=null){
+                    agentBusInfoVo.setDebitCapping(debitCapping.getdItemvalue());
+                }
+                if(debitAppearRate!=null){
+                    agentBusInfoVo.setDebitAppearRate(debitAppearRate.getdItemvalue());
+                }
                 agentBusInfoVo.setVersion(agbus.getVersion());
                 int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfoVo);
                 if (i!=1) {
