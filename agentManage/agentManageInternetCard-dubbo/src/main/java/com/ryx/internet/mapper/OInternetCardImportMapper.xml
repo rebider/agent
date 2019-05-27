@@ -238,7 +238,7 @@
     </if>
   </sql>
 
-  <select id="selectBatchNum" parameterType="java.lang.String" resultType="map">
+  <select id="selectBatchNum" parameterType="map" resultType="java.lang.String">
     <include refid="OracleDialectPrefix" />
         select batch_num from o_internet_card_import
         <where>
