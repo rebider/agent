@@ -14,6 +14,7 @@ import com.ryx.internet.dao.OInternetCardMerchMapper;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
+import com.ryx.internet.pojo.*;
 import com.ryx.internet.service.InternetCardService;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
@@ -71,13 +72,13 @@ public class InternetCardServiceImpl implements InternetCardService {
 
 
     @Override
-    public PageInfo internetCardList(com.ryx.internet.pojo.OInternetCard internetCard, Page page){
+    public PageInfo internetCardList(OInternetCard internetCard, Page page){
 
-        com.ryx.internet.pojo.OInternetCardExample oInternetCardExample = new com.ryx.internet.pojo.OInternetCardExample();
+        OInternetCardExample oInternetCardExample = new OInternetCardExample();
         oInternetCardExample= queryParam(internetCard, oInternetCardExample);
         oInternetCardExample.setPage(page);
-        List<com.ryx.internet.pojo.OInternetCard> oInternetCards = internetCardMapper.selectByExample(oInternetCardExample);
-        for (com.ryx.internet.pojo.OInternetCard oInternetCard : oInternetCards) {
+        List<OInternetCard> oInternetCards = internetCardMapper.selectByExample(oInternetCardExample);
+        for (OInternetCard oInternetCard : oInternetCards) {
             Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),oInternetCard.getManufacturer());
             if(null!=dict)
                 oInternetCard.setManufacturer(dict.getdItemname());
@@ -89,17 +90,17 @@ public class InternetCardServiceImpl implements InternetCardService {
     }
 
     @Override
-    public List<com.ryx.internet.pojo.OInternetCard> queryInternetCardList(com.ryx.internet.pojo.OInternetCard internetCard, Page page){
-        com.ryx.internet.pojo.OInternetCardExample oInternetCardExample = new com.ryx.internet.pojo.OInternetCardExample();
+    public List<OInternetCard> queryInternetCardList(OInternetCard internetCard, Page page){
+        OInternetCardExample oInternetCardExample = new OInternetCardExample();
         oInternetCardExample = queryParam(internetCard, oInternetCardExample);
         oInternetCardExample.setPage(page);
-        List<com.ryx.internet.pojo.OInternetCard> oInternetCards = internetCardMapper.queryInternetCardList(oInternetCardExample);
+        List<OInternetCard> oInternetCards = internetCardMapper.queryInternetCardList(oInternetCardExample);
         return oInternetCards;
     }
 
     @Override
-    public Integer queryInternetCardCount(com.ryx.internet.pojo.OInternetCard internetCard){
-        com.ryx.internet.pojo.OInternetCardExample oInternetCardExample = new com.ryx.internet.pojo.OInternetCardExample();
+    public Integer queryInternetCardCount(OInternetCard internetCard){
+        OInternetCardExample oInternetCardExample = new OInternetCardExample();
         oInternetCardExample = queryParam(internetCard, oInternetCardExample);
         Integer count = Integer.valueOf((int)internetCardMapper.countByExample(oInternetCardExample));
         return count;
@@ -111,9 +112,9 @@ public class InternetCardServiceImpl implements InternetCardService {
      * @param oInternetCardExample
      * @return
      */
-    private com.ryx.internet.pojo.OInternetCardExample queryParam(com.ryx.internet.pojo.OInternetCard internetCard, com.ryx.internet.pojo.OInternetCardExample oInternetCardExample){
+    private OInternetCardExample queryParam(OInternetCard internetCard, OInternetCardExample oInternetCardExample){
 
-        com.ryx.internet.pojo.OInternetCardExample.Criteria criteria = oInternetCardExample.createCriteria();
+        OInternetCardExample.Criteria criteria = oInternetCardExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         if(StringUtils.isNotBlank(internetCard.getBatchNum())){
             criteria.andBatchNumEqualTo(internetCard.getBatchNum());
@@ -147,10 +148,10 @@ public class InternetCardServiceImpl implements InternetCardService {
 
 
     @Override
-    public PageInfo internetCardImportList(com.ryx.internet.pojo.OInternetCardImport internetCardImport, Page page){
+    public PageInfo internetCardImportList(OInternetCardImport internetCardImport, Page page){
 
-        com.ryx.internet.pojo.OInternetCardImportExample internetCardImportExample = new com.ryx.internet.pojo.OInternetCardImportExample();
-        com.ryx.internet.pojo.OInternetCardImportExample.Criteria criteria = internetCardImportExample.createCriteria();
+        OInternetCardImportExample internetCardImportExample = new OInternetCardImportExample();
+        OInternetCardImportExample.Criteria criteria = internetCardImportExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         if(null!=internetCardImport.getImportStatus()){
             criteria.andImportStatusEqualTo(internetCardImport.getImportStatus());
@@ -163,7 +164,7 @@ public class InternetCardServiceImpl implements InternetCardService {
         }
         internetCardImportExample.setPage(page);
         internetCardImportExample.setOrderByClause(" c_time desc ");
-        List<com.ryx.internet.pojo.OInternetCardImport> oInternetCards = internetCardImportMapper.selectByExample(internetCardImportExample);
+        List<OInternetCardImport> oInternetCards = internetCardImportMapper.selectByExample(internetCardImportExample);
 
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(oInternetCards);
@@ -192,7 +193,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                         log.error("importInternetCard,导入文件为空,用户id:{},batchNo:{}",userId,batchNo);
                         return;
                     }
-                    com.ryx.internet.pojo.OInternetCard oInternetCard = new com.ryx.internet.pojo.OInternetCard();
+                    OInternetCard oInternetCard = new OInternetCard();
                     for (List<String> string : excelList) {
                         if(importType.equals(CardImportType.A.getValue())){
                             String issuer = String.valueOf(string.size()>=1?string.get(0):"");//发卡方
@@ -277,7 +278,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                             oInternetCard.setAgentName(agentName.equals("null")?"":agentName);
                         }
                         String jsonList = JsonUtil.objectToJson(oInternetCard);
-                        com.ryx.internet.pojo.OInternetCardImport oInternetCardImport = new com.ryx.internet.pojo.OInternetCardImport();
+                        OInternetCardImport oInternetCardImport = new OInternetCardImport();
                         oInternetCardImport.setId(idService.genId(TabId.O_INTERNET_CARD_IMPORT));
                         oInternetCardImport.setImportMsg(jsonList);
                         oInternetCardImport.setImportStatus(OInternetCardImportStatus.UNTREATED.getValue());
@@ -313,17 +314,18 @@ public class InternetCardServiceImpl implements InternetCardService {
                 log.info("处理导入表数据该批次处理中,batchNo:{}",batchNo);
             }
             log.info("analysisImport处理导入表处理开始,batchNo:{}",batchNo);
-            com.ryx.internet.pojo.OInternetCardImportExample oInternetCardImportExample = new com.ryx.internet.pojo.OInternetCardImportExample();
-            com.ryx.internet.pojo.OInternetCardImportExample.Criteria criteria = oInternetCardImportExample.createCriteria();
+            OInternetCardImportExample oInternetCardImportExample = new OInternetCardImportExample();
+            OInternetCardImportExample.Criteria criteria = oInternetCardImportExample.createCriteria();
             criteria.andStatusEqualTo(Status.STATUS_1.status);
             criteria.andBatchNumEqualTo(batchNo);
             criteria.andImportStatusEqualTo(OInternetCardImportStatus.UNTREATED.getValue());
-            List<com.ryx.internet.pojo.OInternetCardImport> oInternetCardImports = internetCardImportMapper.selectByExample(oInternetCardImportExample);
-            for (com.ryx.internet.pojo.OInternetCardImport oInternetCardImport : oInternetCardImports) {
+            oInternetCardImportExample.setPage(new Page(0,10000));
+            List<OInternetCardImport> oInternetCardImports = internetCardImportMapper.selectByExample(oInternetCardImportExample);
+            for (OInternetCardImport oInternetCardImport : oInternetCardImports) {
                 try {
                     log.info("analysisImport处理导入表数据,oInternetCardImport:{}",oInternetCardImport.toString());
                     String importType = oInternetCardImport.getImportType();
-                    com.ryx.internet.pojo.OInternetCard internetCard = JsonUtil.jsonToPojo(oInternetCardImport.getImportMsg(), com.ryx.internet.pojo.OInternetCard.class);
+                    OInternetCard internetCard = JsonUtil.jsonToPojo(oInternetCardImport.getImportMsg(), OInternetCard.class);
                     if(importType.equals(CardImportType.A.getValue()) || importType.equals(CardImportType.B.getValue()) || importType.equals(CardImportType.E.getValue())){
                         disposeInternetCard(oInternetCardImport,internetCard);
                     }else if(importType.equals(CardImportType.C.getValue())){
@@ -400,7 +402,7 @@ public class InternetCardServiceImpl implements InternetCardService {
      * @param internetCard
      * @throws Exception
      */
-    public void disposeInternetCard(com.ryx.internet.pojo.OInternetCardImport oInternetCardImport, com.ryx.internet.pojo.OInternetCard internetCard)throws Exception{
+    public void disposeInternetCard(OInternetCardImport oInternetCardImport, OInternetCard internetCard)throws Exception{
         if(StringUtils.isBlank(internetCard.getIccidNum())){
             oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
             oInternetCardImport.setErrorMsg("缺少iccid");
@@ -408,7 +410,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             updateInternetCardImport(oInternetCardImport);
             return;
         }
-        com.ryx.internet.pojo.OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(internetCard.getIccidNum());
+        OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(internetCard.getIccidNum());
         internetCard.setBatchNum(oInternetCardImport.getBatchNum());
         internetCard.setCardImportId(oInternetCardImport.getId());
         if(internetCard.getOpenAccountTime()!=null){
@@ -452,20 +454,20 @@ public class InternetCardServiceImpl implements InternetCardService {
      */
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
     @Override
-    public void disposeSn(List<String> snList, com.ryx.internet.pojo.OInternetCard internetCard, com.ryx.internet.pojo.OInternetCardImport oInternetCardImport)throws MessageException{
+    public void disposeSn(List<String> snList, OInternetCard internetCard, OInternetCardImport oInternetCardImport)throws MessageException{
         for (String snNum : snList) {
-            com.ryx.internet.pojo.OInternetCardExample oInternetCardExample = new com.ryx.internet.pojo.OInternetCardExample();
-            com.ryx.internet.pojo.OInternetCardExample.Criteria criteria = oInternetCardExample.createCriteria();
+            OInternetCardExample oInternetCardExample = new OInternetCardExample();
+            OInternetCardExample.Criteria criteria = oInternetCardExample.createCriteria();
             criteria.andStatusEqualTo(Status.STATUS_1.status);
             criteria.andSnNumEqualTo(snNum);
-            List<com.ryx.internet.pojo.OInternetCard> oInternetCards = internetCardMapper.selectByExample(oInternetCardExample);
+            List<OInternetCard> oInternetCards = internetCardMapper.selectByExample(oInternetCardExample);
             if(oInternetCards.size()==0){
                 throw new MessageException("sn:"+snNum+"不存在");
             }
             if(oInternetCards.size()!=1){
                 throw new MessageException("sn:"+snNum+"不唯一");
             }
-            com.ryx.internet.pojo.OInternetCard oInternetCard = oInternetCards.get(0);
+            OInternetCard oInternetCard = oInternetCards.get(0);
             oInternetCard.setOrderId(internetCard.getOrderId());
             oInternetCard.setAgentName(internetCard.getAgentName());
             oInternetCard.setManufacturer(internetCard.getManufacturer());
@@ -485,7 +487,7 @@ public class InternetCardServiceImpl implements InternetCardService {
 
 
 
-    public void insertInternetCard(com.ryx.internet.pojo.OInternetCard internetCard)throws Exception{
+    public void insertInternetCard(OInternetCard internetCard)throws Exception{
         internetCard.setuUser(internetCard.getcUser());
         Date date = new Date();
         internetCard.setcTime(date);
@@ -495,7 +497,7 @@ public class InternetCardServiceImpl implements InternetCardService {
         internetCardMapper.insert(internetCard);
     }
 
-    public void updateInternetCard(com.ryx.internet.pojo.OInternetCard internetCard)throws MessageException{
+    public void updateInternetCard(OInternetCard internetCard)throws MessageException{
         if(StringUtils.isBlank(internetCard.getIccidNum())){
             throw new MessageException("iccid为空");
         }
@@ -506,7 +508,7 @@ public class InternetCardServiceImpl implements InternetCardService {
         }
     }
 
-    public void updateInternetCardImport(com.ryx.internet.pojo.OInternetCardImport internetCardImport)throws MessageException{
+    public void updateInternetCardImport(OInternetCardImport internetCardImport)throws MessageException{
         internetCardImport.setuTime(new Date());
         internetCardImportMapper.updateByPrimaryKeySelective(internetCardImport);
     }
@@ -519,14 +521,14 @@ public class InternetCardServiceImpl implements InternetCardService {
      * @throws MessageException
      */
     @Override
-    public List<com.ryx.internet.pojo.OInternetCardImport>  exportErrorExcel(com.ryx.internet.pojo.OInternetCardImport internetCardImport){
-        com.ryx.internet.pojo.OInternetCardImportExample oInternetCardImportExample = new com.ryx.internet.pojo.OInternetCardImportExample();
-        com.ryx.internet.pojo.OInternetCardImportExample.Criteria criteria = oInternetCardImportExample.createCriteria();
+    public List<OInternetCardImport>  exportErrorExcel(OInternetCardImport internetCardImport){
+        OInternetCardImportExample oInternetCardImportExample = new OInternetCardImportExample();
+        OInternetCardImportExample.Criteria criteria = oInternetCardImportExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         criteria.andBatchNumEqualTo(internetCardImport.getBatchNum());
         criteria.andImportTypeEqualTo(internetCardImport.getImportType());
         criteria.andImportStatusEqualTo(OInternetCardImportStatus.FAIL.code);
-        List<com.ryx.internet.pojo.OInternetCardImport> oInternetCardImports = internetCardImportMapper.selectByExample(oInternetCardImportExample);
+        List<OInternetCardImport> oInternetCardImports = internetCardImportMapper.selectByExample(oInternetCardImportExample);
         return oInternetCardImports;
     }
 
@@ -553,25 +555,27 @@ public class InternetCardServiceImpl implements InternetCardService {
             if(i>0){
                 int updateCount = internetCardMapper.updateInternetCardExpire(reqMap);
                 log.info("taskDisposeInternetCard检测是否续费,本次更次了数据条数:{}",updateCount);
+            }else{
+                log.info("taskDisposeInternetCard检测是否续费,暂无更新数据:{}",i);
             }
-            log.info("taskDisposeInternetCard检测是否续费,暂无更新数据:{}",i);
-            com.ryx.internet.pojo.OInternetCardImportExample oInternetCardImportExample = new com.ryx.internet.pojo.OInternetCardImportExample();
-            com.ryx.internet.pojo.OInternetCardImportExample.Criteria criteria = oInternetCardImportExample.createCriteria();
-            criteria.andStatusEqualTo(Status.STATUS_1.status);
-            criteria.andImportStatusEqualTo(OInternetCardImportStatus.UNTREATED.getValue());
-            List<com.ryx.internet.pojo.OInternetCardImport> oInternetCardImports = internetCardImportMapper.selectByExample(oInternetCardImportExample);
-            if(oInternetCardImports.size()==0){
+            Map map = new HashMap<>();
+            map.put("importStatus",OInternetCardImportStatus.UNTREATED.getValue());
+            Page page = new Page(0, 10);
+            map.put("page",page);
+            List<String> batchNums = internetCardImportMapper.selectBatchNum(map);
+            if(batchNums.size()==0){
                 log.info("taskDisposeInternetCard暂无未处理,退出");
                 return;
             }
-            for (com.ryx.internet.pojo.OInternetCardImport oInternetCardImport : oInternetCardImports) {
-                if(StringUtils.isBlank(oInternetCardImport.getBatchNum())){
+            for (String batchNum : batchNums) {
+                if(StringUtils.isBlank(batchNum)){
                     log.info("taskDisposeInternetCard处理未处理的导入记录，批次号未空");
                     continue;
                 }
-                log.info("taskDisposeInternetCard处理未处理的导入记录，批次号:{}",oInternetCardImport.getBatchNum());
-                analysisImport(oInternetCardImport.getBatchNum());
+                log.info("taskDisposeInternetCard处理未处理的导入记录，批次号:{}",batchNum);
+                analysisImport(batchNum);
             }
+
         } finally {
             if(StringUtils.isNotBlank(retIdentifier)){
                 redisService.releaseLock(RedisCachKey.TASK_DISPOSEIN_TERNET_CARD.code, retIdentifier);
@@ -588,16 +592,16 @@ public class InternetCardServiceImpl implements InternetCardService {
     public void taskUpdateMech(){
         try {
             //1. 查询为空的商户信息更新
-            com.ryx.internet.pojo.OInternetCardExample oInternetCardExample = new com.ryx.internet.pojo.OInternetCardExample();
-            com.ryx.internet.pojo.OInternetCardExample.Criteria criteria = oInternetCardExample.createCriteria();
+            OInternetCardExample oInternetCardExample = new OInternetCardExample();
+            OInternetCardExample.Criteria criteria = oInternetCardExample.createCriteria();
             criteria.andStatusEqualTo(Status.STATUS_1.status);
             criteria.andMerIdIsNull();
             criteria.andMerNameIsNull();
-            List<com.ryx.internet.pojo.OInternetCard> internetCards = internetCardMapper.selectByExample(oInternetCardExample);
+            List<OInternetCard> internetCards = internetCardMapper.selectByExample(oInternetCardExample);
             log.info("查询为空的商户信息数量为:{}",internetCards.size());
             long t1 = System.currentTimeMillis();
-            for (com.ryx.internet.pojo.OInternetCard internetCard : internetCards) {
-                com.ryx.internet.pojo.OInternetCardMerch oInternetCardMerch = internetCardMerchMapper.selectChnTermposi(BigDataEncode.encode(internetCard.getIccidNum()));
+            for (OInternetCard internetCard : internetCards) {
+                OInternetCardMerch oInternetCardMerch = internetCardMerchMapper.selectChnTermposi(BigDataEncode.encode(internetCard.getIccidNum()));
                 if(null!=oInternetCardMerch){
                     internetCard.setMerId(oInternetCardMerch.getChnMerchId());
                     internetCard.setMerName(oInternetCardMerch.getMerchName());
@@ -616,9 +620,9 @@ public class InternetCardServiceImpl implements InternetCardService {
             reqMap.put("newRenew",Status.STATUS_1.status);//是续费
             reqMap.put("internetCardStatus",InternetCardStatus.NORMAL.getValue());
             reqMap.put("expireTime",DateUtil.getPerFirstDayOfMonth());
-            List<com.ryx.internet.pojo.OInternetCard> oInternetCards = internetCardMapper.selectInternetCardRenew(reqMap);
-            for (com.ryx.internet.pojo.OInternetCard oInternetCard : oInternetCards) {
-                com.ryx.internet.pojo.OInternetCardMerch oInternetCardMerch = internetCardMerchMapper.selectChnTermposi(BigDataEncode.encode(oInternetCard.getIccidNum()));
+            List<OInternetCard> oInternetCards = internetCardMapper.selectInternetCardRenew(reqMap);
+            for (OInternetCard oInternetCard : oInternetCards) {
+                OInternetCardMerch oInternetCardMerch = internetCardMerchMapper.selectChnTermposi(BigDataEncode.encode(oInternetCard.getIccidNum()));
                 if(null!=oInternetCardMerch){
                     //之前未获取当商户信息的直接更新
                     if(StringUtils.isBlank(oInternetCard.getMerId()) || StringUtils.isBlank(oInternetCard.getMerName())){
