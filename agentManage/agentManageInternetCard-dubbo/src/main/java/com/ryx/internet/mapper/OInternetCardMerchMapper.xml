@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ryx.credit.dao.order.OInternetCardMerchMapper">
-  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.OInternetCardMerch">
+<mapper namespace="com.ryx.internet.dao.OInternetCardMerchMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.internet.pojo.OInternetCardMerch">
     <result column="CHN_TERMPOSI" jdbcType="VARCHAR" property="chnTermposi" />
     <result column="CHN_MERCH_ID" jdbcType="VARCHAR" property="chnMerchId" />
     <result column="MERCH_NAME" jdbcType="VARCHAR" property="merchName" />
@@ -10,7 +10,7 @@
 
   <select id="selectChnTermposi" parameterType="java.lang.String" resultMap="BaseResultMap">
       select CHN_MERCH_ID, MERCH_NAME from (
-          select  CHN_MERCH_ID, MERCH_NAME from o_internet_card_merch t
+          select  CHN_MERCH_ID, MERCH_NAME from etl_oper.PFTMAN_O_INTERNET_CARD_MERCH t
           where
           t.CHN_TERMPOSI = #{chnTermposi}
           order by t.tran_date desc

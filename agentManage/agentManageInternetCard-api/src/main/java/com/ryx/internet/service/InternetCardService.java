@@ -1,13 +1,11 @@
-package com.ryx.credit.service.order;
+package com.ryx.internet.service;
 
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
-import com.ryx.credit.common.util.ResultVO;
-import com.ryx.credit.pojo.admin.order.OInternetCard;
-import com.ryx.credit.pojo.admin.order.OInternetCardImport;
+import com.ryx.internet.pojo.OInternetCard;
+import com.ryx.internet.pojo.OInternetCardImport;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**

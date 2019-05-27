@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ryx.credit.dao.order.OInternetCardMapper">
-  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.OInternetCard">
+<mapper namespace="com.ryx.internet.dao.OInternetCardMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.internet.pojo.OInternetCard">
     <id column="ICCID_NUM" jdbcType="VARCHAR" property="iccidNum" />
     <result column="CARD_IMPORT_ID" jdbcType="VARCHAR" property="cardImportId" />
     <result column="BATCH_NUM" jdbcType="VARCHAR" property="batchNum" />
@@ -63,7 +63,7 @@
     INTERNET_CARD_STATUS, MER_ID, LATELY_PAY_TIME, MER_NAME, MANUFACTURER, RENEW, C_TIME,
     U_TIME, C_USER, U_USER, STATUS, VERSION
   </sql>
-  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.ryx.internet.pojo.OInternetCardExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
     <if test="distinct">
@@ -85,13 +85,13 @@
     from O_INTERNET_CARD
     where ICCID_NUM = #{iccidNum,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardExample">
+  <delete id="deleteByExample" parameterType="com.ryx.internet.pojo.OInternetCardExample">
     delete from O_INTERNET_CARD
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OInternetCard">
+  <insert id="insert" parameterType="com.ryx.internet.pojo.OInternetCard">
     insert into O_INTERNET_CARD (ICCID_NUM, CARD_IMPORT_ID, BATCH_NUM,
     SN_NUM, DELIVER_TIME, CONSIGNEE,
     ORDER_ID, AGENT_ID, AGENT_NAME,
@@ -111,7 +111,7 @@
     #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
     #{version,jdbcType=DECIMAL})
   </insert>
-  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OInternetCard">
+  <insert id="insertSelective" parameterType="com.ryx.internet.pojo.OInternetCard">
     insert into O_INTERNET_CARD
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="iccidNum != null">
@@ -268,13 +268,13 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.ryx.internet.pojo.OInternetCardExample" resultType="java.lang.Long">
     select count(*) from O_INTERNET_CARD
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.OInternetCard">
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.internet.pojo.OInternetCard">
     update O_INTERNET_CARD
     <set>
       <if test="cardImportId != null">
@@ -352,7 +352,7 @@
     </set>
     where ICCID_NUM = #{iccidNum,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OInternetCard">
+  <update id="updateByPrimaryKey" parameterType="com.ryx.internet.pojo.OInternetCard">
     update O_INTERNET_CARD
     set CARD_IMPORT_ID = #{cardImportId,jdbcType=VARCHAR},
     BATCH_NUM = #{batchNum,jdbcType=VARCHAR},
@@ -427,7 +427,7 @@
     INTERNET_CARD_STATUS, MER_ID, LATELY_PAY_TIME, MER_NAME,d.D_ITEMNAME as MANUFACTURER, RENEW, C_TIME,
     U_TIME, C_USER, U_USER, STATUS, VERSION
   </sql>
-  <select id="queryInternetCardList" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardExample" resultMap="BaseResultMap">
+  <select id="queryInternetCardList" parameterType="com.ryx.internet.pojo.OInternetCardExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
     <include refid="InternetCard_Base_Column_List" />

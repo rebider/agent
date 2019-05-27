@@ -717,4 +717,17 @@ public class AgentServiceImpl implements AgentService {
         }
     }
 
+    @Override
+    public Agent getAgentByName(String name) {
+        AgentExample agentExample = new AgentExample();
+        AgentExample.Criteria criteria1 = agentExample.createCriteria();
+        criteria1.andStatusEqualTo(Status.STATUS_1.status);
+        criteria1.andAgNameEqualTo(name);
+        List<Agent> agents = agentMapper.selectByExample(agentExample);
+        if(agents.size()!=0) {
+            Agent agent = agents.get(0);
+            return agent;
+        }
+        return null;
+    }
 }

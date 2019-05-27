@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ryx.credit.dao.order.OInternetCardImportMapper">
-  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.OInternetCardImport">
+<mapper namespace="com.ryx.internet.dao.OInternetCardImportMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.internet.pojo.OInternetCardImport">
     <id column="ID" jdbcType="VARCHAR" property="id" />
     <result column="IMPORT_MSG" jdbcType="VARCHAR" property="importMsg" />
     <result column="IMPORT_STATUS" jdbcType="DECIMAL" property="importStatus" />
@@ -48,7 +48,7 @@
     ID, IMPORT_MSG, IMPORT_STATUS, ERROR_MSG, BATCH_NUM, C_TIME, U_TIME, C_USER, U_USER,
     STATUS, VERSION, IMPORT_TYPE
   </sql>
-  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardImportExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.ryx.internet.pojo.OInternetCardImportExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
     <if test="distinct">
@@ -70,13 +70,13 @@
     from O_INTERNET_CARD_IMPORT
     where ID = #{id,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardImportExample">
+  <delete id="deleteByExample" parameterType="com.ryx.internet.pojo.OInternetCardImportExample">
     delete from O_INTERNET_CARD_IMPORT
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardImport">
+  <insert id="insert" parameterType="com.ryx.internet.pojo.OInternetCardImport">
     insert into O_INTERNET_CARD_IMPORT (ID, IMPORT_MSG, IMPORT_STATUS,
     ERROR_MSG, BATCH_NUM, C_TIME,
     U_TIME, C_USER, U_USER,
@@ -88,7 +88,7 @@
     #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{importType,jdbcType=CHAR}
     )
   </insert>
-  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardImport">
+  <insert id="insertSelective" parameterType="com.ryx.internet.pojo.OInternetCardImport">
     insert into O_INTERNET_CARD_IMPORT
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -167,13 +167,13 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardImportExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.ryx.internet.pojo.OInternetCardImportExample" resultType="java.lang.Long">
     select count(*) from O_INTERNET_CARD_IMPORT
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardImport">
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.internet.pojo.OInternetCardImport">
     update O_INTERNET_CARD_IMPORT
     <set>
       <if test="importMsg != null">
@@ -212,7 +212,7 @@
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OInternetCardImport">
+  <update id="updateByPrimaryKey" parameterType="com.ryx.internet.pojo.OInternetCardImport">
     update O_INTERNET_CARD_IMPORT
     set IMPORT_MSG = #{importMsg,jdbcType=VARCHAR},
       IMPORT_STATUS = #{importStatus,jdbcType=DECIMAL},

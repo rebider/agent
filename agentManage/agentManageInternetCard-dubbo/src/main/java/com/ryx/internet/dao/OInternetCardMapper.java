@@ -1,7 +1,7 @@
-package com.ryx.credit.dao.order;
+package com.ryx.internet.dao;
 
-import com.ryx.credit.pojo.admin.order.OInternetCard;
-import com.ryx.credit.pojo.admin.order.OInternetCardExample;
+import com.ryx.internet.pojo.OInternetCard;
+import com.ryx.internet.pojo.OInternetCardExample;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

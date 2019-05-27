@@ -1,7 +1,7 @@
-package com.ryx.credit.dao.order;
+package com.ryx.internet.dao;
 
-import com.ryx.credit.pojo.admin.order.OInternetCardImport;
-import com.ryx.credit.pojo.admin.order.OInternetCardImportExample;
+import com.ryx.internet.pojo.OInternetCardImport;
+import com.ryx.internet.pojo.OInternetCardImportExample;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.ryx.credit.pojo.admin.order;
+package com.ryx.internet.pojo;
 
 import java.io.Serializable;
 
