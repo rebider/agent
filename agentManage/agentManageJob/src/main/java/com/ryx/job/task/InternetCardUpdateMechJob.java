@@ -2,7 +2,7 @@ package com.ryx.job.task;
 
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.dangdang.ddframe.job.api.simple.SimpleJob;
-import com.ryx.credit.service.order.InternetCardService;
+import com.ryx.internet.service.InternetCardService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
