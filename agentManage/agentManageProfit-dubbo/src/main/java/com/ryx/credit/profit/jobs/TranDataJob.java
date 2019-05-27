@@ -15,7 +15,6 @@ import com.ryx.credit.profit.service.ProfitOrganTranMonthService;
 import com.ryx.credit.profit.service.TransProfitDetailService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.profit.IPosProfitDataService;
-import org.junit.Test;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
