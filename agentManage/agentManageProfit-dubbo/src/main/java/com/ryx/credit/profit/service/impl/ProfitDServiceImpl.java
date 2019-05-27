@@ -87,7 +87,7 @@ public class ProfitDServiceImpl implements IProfitDService {
         return profitDMapper.updateByPrimaryKey(record);
     }
 
-    @Override
+   @Override
     public PageInfo profitDList(Map<String,String> map, Page page) {
         ProfitDayExample example = new ProfitDayExample();
         example.setPage(page);
@@ -114,6 +114,15 @@ public class ProfitDServiceImpl implements IProfitDService {
         pageInfo.setTotal(profitDMapper.countByExample(example));
         return pageInfo;
     }
+   @Override
+   public PageInfo profitDayList(Map<String, Object> map, PageInfo pageInfo) {
+       List<Map<String, Object>> mapList = profitDMapper.profitDayLList(map);
+       Integer count = profitDMapper.profitDayListCount(map);
+       pageInfo.setRows(mapList);
+       pageInfo.setTotal(count);
+
+       return pageInfo;
+   }
 
     @Override
     public List<ProfitDay> exportProfitD(ProfitDay profitD) {

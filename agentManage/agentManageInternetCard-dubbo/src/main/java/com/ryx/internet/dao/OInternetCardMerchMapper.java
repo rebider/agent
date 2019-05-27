@@ -1,11 +1,12 @@
-package com.ryx.credit.dao.order;
+package com.ryx.internet.dao;
 
-import com.ryx.credit.pojo.admin.order.OInternetCardMerch;
-import com.ryx.credit.pojo.admin.order.OInternetCardMerchExample;
+import com.ryx.internet.pojo.OInternetCardMerch;
+import com.ryx.internet.pojo.OInternetCardMerchExample;
 
 import java.util.List;
 
 public interface OInternetCardMerchMapper {
+
     long countByExample(OInternetCardMerchExample example);
 
     int deleteByExample(OInternetCardMerchExample example);
@@ -16,11 +17,6 @@ public interface OInternetCardMerchMapper {
 
     List<OInternetCardMerch> selectByExample(OInternetCardMerchExample example);
 
-    OInternetCardMerch selectByPrimaryKey(String chnTermposi);
-
-    int updateByPrimaryKeySelective(OInternetCardMerch record);
-
-    int updateByPrimaryKey(OInternetCardMerch record);
-
     OInternetCardMerch selectChnTermposi(String chnTermposi);
+
 }

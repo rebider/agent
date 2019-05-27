@@ -12,7 +12,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.util.SAXHelper;
@@ -22,7 +21,6 @@ import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
 import org.apache.poi.xssf.model.StylesTable;
 import org.apache.poi.xssf.usermodel.XSSFComment;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -74,10 +72,10 @@ public class ExcelEventParser {
             Set set = new HashSet();
             for (String strings : curstr) {
                 if(StringUtils.isNotBlank(strings))
-                set.add(strings.trim());
+                    set.add(strings.trim());
             }
             if(set.size()!=0)
-            output.add(curstr);
+                output.add(curstr);
         }
 
         @Override
@@ -132,11 +130,17 @@ public class ExcelEventParser {
     /**
      * Creates a new XLSX -> CSV converter
      */
+
     public ExcelEventParser(OPCPackage pkg, int minColumns) {
         this.xlsxPackage = pkg;
         this.minColumns = minColumns;
     }
+    private SheetContentsHandler handler;
 
+    public ExcelEventParser setHandler(SheetContentsHandler handler) {
+        this.handler = handler;
+        return this;
+    }
 
     /**
      * Parses and shows the content of one sheet
@@ -152,17 +156,14 @@ public class ExcelEventParser {
             SheetContentsHandler sheetHandler,
             InputStream sheetInputStream)
             throws IOException, ParserConfigurationException, SAXException {
-        DataFormatter formatter = new DataFormatter();
-        InputSource sheetSource = new InputSource(sheetInputStream);
-        try {
-            XMLReader sheetParser = SAXHelper.newXMLReader();
-            ContentHandler handler = new XSSFSheetXMLHandler(
-                    styles, null, strings, sheetHandler, formatter, false);
-            sheetParser.setContentHandler(handler);
-            sheetParser.parse(sheetSource);
-        } catch (ParserConfigurationException e) {
-            throw new RuntimeException("SAX parser appears to be broken - " + e.getMessage());
+        XMLReader sheetParser = SAXHelper.newXMLReader();
+
+        if(handler != null){
+            sheetParser.setContentHandler(new XSSFSheetXMLHandler(styles, strings, handler, false));
+        }else{
+            sheetParser.setContentHandler(new XSSFSheetXMLHandler(styles, strings, new ExcelEventParser.SheetToCSV(), false));
         }
+        sheetParser.parse(new InputSource(sheetInputStream));
     }
 
     /**

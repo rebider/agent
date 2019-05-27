@@ -307,16 +307,13 @@ select distinct BUM_NAME,BUM_ID from P_SERVER_D
   select count(*) from P_SERVER_AMT
   where 1=1
   <if test="agentName != null and agentName!='' ">
-    and AGENT_NAME = #{agentName,jdbcType=VARCHAR}
+    and AGENT_NAME CONCAT(CONCAT('%',#{agentName}),'%')
   </if>
   <if test="agentId != null and agentId!='' ">
     and AGENT_ID = #{agentId,jdbcType=VARCHAR}
   </if>
   <if test="bumId != null and bumId!='' ">
     and BUM_ID = #{bumId,jdbcType=VARCHAR}
-  </if>
-  <if test="bumCode != null and bumCode!='' ">
-    and BUM_CODE = #{bumCode,jdbcType=VARCHAR}
   </if>
   <if test="bumCode != null and bumCode!='' ">
     and BUM_CODE = #{bumCode,jdbcType=VARCHAR}
@@ -333,7 +330,7 @@ select distinct BUM_NAME,BUM_ID from P_SERVER_D
     from P_SERVER_AMT
     where 1=1
     <if test="agentName != null and agentName!='' ">
-      and AGENT_NAME = #{agentName,jdbcType=VARCHAR}
+      and AGENT_NAME CONCAT(CONCAT('%',#{agentName}),'%')
     </if>
     <if test="agentId != null and agentId!='' ">
       and AGENT_ID = #{agentId,jdbcType=VARCHAR}
@@ -344,9 +341,7 @@ select distinct BUM_NAME,BUM_ID from P_SERVER_D
     <if test="bumCode != null and bumCode!='' ">
       and BUM_CODE = #{bumCode,jdbcType=VARCHAR}
     </if>
-    <if test="bumCode != null and bumCode!='' ">
-      and BUM_CODE = #{bumCode,jdbcType=VARCHAR}
-    </if>
+
     <if test="status != null and status!='' ">
       and STATUS = #{status,jdbcType=VARCHAR}
     </if>
@@ -363,5 +358,51 @@ select distinct BUM_NAME,BUM_ID from P_SERVER_D
         </if>
     </select>
 
+  <delete id="clearServerAmtDetailData" parameterType="java.lang.String">
+    delete P_SERVER_AMT_DETAIL where SERVER_DATE ='${profitDate}'
+  </delete>
+<select id="serverAmtSum"  parameterType="java.lang.String" resultType="java.math.BigDecimal">
+
+select SUM(PROFIT_AMT) from (select * from TRANS_PROFIT_DETAIL where PROFIT_DATE = '${profitDate}')
+    start with  AGENT_ID = '${agentId}'and BUS_CODE='${busCode}'
+connect by prior  AGENT_ID = PARENT_AGENT_ID
+</select>
+  <select id="queryDataDetail" parameterType="java.util.Map" resultType="java.util.Map">
+
+    select aa.ID as
+    psa,aa.CREATE_DATE,aa.AGENT_ID,aa.AGENT_NAME,aa.BUM_CODE,aa.BUM_ID,aa.SERVER_TYPE,aa.CHARGE_PERIOD,aa.CHARGE_PROPORTION,
+    aa.CHARGE_TYPE,aa.CHARGE_BASE,aa.IS_NO_SON,aa.STATUS,bb.ID as psad, bb.SUM_AMT,bb.SERVER_AMT,bb.SERVER_DATE from
+    P_SERVER_AMT aa ,P_SERVER_AMT_DETAIL bb
+    where aa.id = bb.PSA_ID
+    <if test="AGENT_ID != null and AGENT_ID!='' ">
+      and aa.AGENT_ID = #{AGENT_ID,jdbcType=VARCHAR}
+    </if>
+    <if test="AGENT_NAME != null and AGENT_NAME!='' ">
+      and aa.AGENT_NAME CONCAT(CONCAT('%',#{AGENT_NAME}),'%')
+    </if>
+    <if test="BUM_CODE != null and BUM_CODE!='' ">
+      and aa.BUM_CODE= #{BUM_CODE,jdbcType=VARCHAR}
+    </if>
+  </select>
+
+
+  <select id="queryDataDetailCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+    select count(*) from (
+    select aa.ID as
+    psa,aa.CREATE_DATE,aa.AGENT_ID,aa.AGENT_NAME,aa.BUM_CODE,aa.BUM_ID,aa.SERVER_TYPE,aa.CHARGE_PERIOD,aa.CHARGE_PROPORTION,
+    aa.CHARGE_TYPE,aa.CHARGE_BASE,aa.IS_NO_SON,aa.STATUS,bb.ID as psad, bb.SUM_AMT,bb.SERVER_AMT,bb.SERVER_DATE from
+    P_SERVER_AMT aa ,P_SERVER_AMT_DETAIL bb
+    where aa.id = bb.PSA_ID
+    <if test="AGENT_ID != null and AGENT_ID!='' ">
+      and aa.AGENT_ID = #{AGENT_ID,jdbcType=VARCHAR}
+    </if>
+    <if test="AGENT_NAME != null and AGENT_NAME!='' ">
+      and aa.AGENT_NAME CONCAT(CONCAT('%',#{AGENT_NAME}),'%')
+    </if>
+    <if test="BUM_CODE != null and BUM_CODE!='' ">
+      and aa.BUM_CODE= #{BUM_CODE,jdbcType=VARCHAR}
+    </if>
+    )
+  </select>
 
 </mapper>

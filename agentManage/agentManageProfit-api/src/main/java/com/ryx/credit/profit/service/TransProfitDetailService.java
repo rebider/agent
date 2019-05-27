@@ -70,4 +70,6 @@ public interface TransProfitDetailService {
      */
     List<Map<String,Object>> queryBusNum(@Param("type") String type);
 
+    int updateByPrimaryKeySelective(TransProfitDetail record);
+
 }

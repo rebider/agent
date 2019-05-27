@@ -166,9 +166,9 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
            List<String> listm = new ArrayList<>();
            for (String str:listOne) {
                for (FreezeOperationRecord fo :freezeDay) {
-                   if (fo.getAgentId().equals(str)&&"01".equals(fo.getStatus())){
+                   if (fo.getAgentId().equals(str)&&"01".equals(fo.getFreezeType())){
                        listProfit.add(fo.getAgentId());
-                   }else if(fo.getAgentId().equals(str)&&"02".equals(fo.getStatus())){
+                   }else if(fo.getAgentId().equals(str)&&"02".equals(fo.getFreezeType())){
                        listProfit.add(fo.getAgentId());
                    }
 
@@ -195,7 +195,7 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
                logger.info("调用接口返回数据为:"+res);
                if (!JSONObject.parseObject(res).get("respCode").equals("000000")) {
                    logger.info("日分润冻结失败");
-                  /* throw new RuntimeException("冻结失败");*/
+                   /*throw new RuntimeException("冻结失败");*/
                }
 
            }
@@ -252,6 +252,7 @@ public class FreezeAgentSerciceImpl implements IFreezeAgentSercice {
 
 
                }
+
                //插入操作表新的数据
                try{
 

@@ -434,4 +434,63 @@
       A_PAY_COMP.COM_NAME as comName
   </sql>
 
+  <select id="profitDayLList" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="OracleDialectPrefix" />
+    select * from(
+    select
+    <include refid="BASE_COM_NAME_INCLUDE"/>
+    from P_PROFIT_D left join A_PAY_COMP on P_PROFIT_D.PAY_COMPANY = A_PAY_COMP.ID
+    where 1=1
+    <if test="agentName != null and agentName!='' ">
+      and P_PROFIT_D.AGENT_NAME = #{agentName,jdbcType=VARCHAR}
+    </if>
+    <if test="agentId != null and agentId!='' ">
+      and P_PROFIT_D.AGENT_ID = #{agentId,jdbcType=VARCHAR}
+    </if>
+    <if test="startDate != null and startDate!='' ">
+      and P_PROFIT_D.REMIT_DATE &gt;= #{startDate,jdbcType=VARCHAR}
+    </if>
+    <if test="startDate != null and startDate!='' ">
+      and P_PROFIT_D.REMIT_DATE &lt;= #{endDate,jdbcType=VARCHAR}
+    </if>
+    ) xxx join A_AGENT zzz on xxx.agentId = zzz.ID
+    where 1=1
+    <if test="orgId != null and  orgId !='' ">
+    and zzz.AG_DOC_PRO = #{orgId}
+  </if>
+    <if test="area != null and  area !='' ">
+      and zzz.AG_DOC_DISTRICT = #{area}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+
+  <select id="profitDayListCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+    select count(*) from(
+    select
+    <include refid="BASE_COM_NAME_INCLUDE"/>
+    from P_PROFIT_D left join A_PAY_COMP on P_PROFIT_D.PAY_COMPANY = A_PAY_COMP.ID
+    where 1=1
+    <if test="agentName != null and agentName!='' ">
+      and P_PROFIT_D.AGENT_NAME = #{agentName,jdbcType=VARCHAR}
+    </if>
+    <if test="agentId != null and agentId!='' ">
+      and P_PROFIT_D.AGENT_ID = #{agentId,jdbcType=VARCHAR}
+    </if>
+    <if test="startDate != null and startDate!='' ">
+      and P_PROFIT_D.REMIT_DATE &gt;= #{startDate,jdbcType=VARCHAR}
+    </if>
+    <if test="startDate != null and startDate!='' ">
+      and P_PROFIT_D.REMIT_DATE &lt;= #{endDate,jdbcType=VARCHAR}
+    </if>
+    ) xxx join A_AGENT zzz on xxx.agentId = zzz.ID
+    where 1=1
+    <if test="orgId != null and  orgId !='' ">
+      and zzz.AG_DOC_PRO = #{orgId}
+    </if>
+    <if test="area != null and  area !='' ">
+      and zzz.AG_DOC_DISTRICT = #{area}
+    </if>
+  </select>
+
 </mapper>

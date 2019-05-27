@@ -72,6 +72,16 @@ public class TransProfitDetail implements Serializable {
 
     private String remark;
 
+    private BigDecimal serverAmt;
+
+    public BigDecimal getServerAmt() {
+        return serverAmt;
+    }
+
+    public void setServerAmt(BigDecimal serverAmt) {
+        this.serverAmt = serverAmt;
+    }
+
     public String getId() {
         return id;
     }

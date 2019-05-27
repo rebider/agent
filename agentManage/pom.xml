@@ -10,6 +10,8 @@
     <packaging>pom</packaging>
     <version>${agentManage.version}</version>
     <modules>
+        <module>agentManageInternetCard-api</module>
+        <module>agentManageInternetCard-dubbo</module>
         <module>agentManageAccount-api</module>
         <module>agentManageAccount-dubbo</module>
         <module>agentManageAdmin-api</module>
