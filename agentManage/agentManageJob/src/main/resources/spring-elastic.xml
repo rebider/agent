@@ -120,6 +120,7 @@
                 sharding-item-parameters="0=Server0"/>
 
 
+
     <!--&lt;!&ndash;configure job 样例配置 &ndash;&gt;-->
     <!--<job:simple id="mySimpleTask"-->
                 <!--job-ref="mySimpleTask"-->
