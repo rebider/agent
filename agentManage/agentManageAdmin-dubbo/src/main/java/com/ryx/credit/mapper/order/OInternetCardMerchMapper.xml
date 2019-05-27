@@ -10,7 +10,7 @@
 
   <select id="selectChnTermposi" parameterType="java.lang.String" resultMap="BaseResultMap">
       select CHN_MERCH_ID, MERCH_NAME from (
-          select  CHN_MERCH_ID, MERCH_NAME from o_internet_card_merch t
+          select  CHN_MERCH_ID, MERCH_NAME from etl_oper.PFTMAN_O_INTERNET_CARD_MERCH t
           where
           t.CHN_TERMPOSI = #{chnTermposi}
           order by t.tran_date desc

@@ -601,6 +601,8 @@ public class InternetCardServiceImpl implements InternetCardService {
             criteria.andMerIdIsNull();
             criteria.andMerNameIsNull();
             List<OInternetCard> internetCards = internetCardMapper.selectByExample(oInternetCardExample);
+            log.info("查询为空的商户信息数量为:{}",internetCards.size());
+            long t1 = System.currentTimeMillis();
             for (OInternetCard internetCard : internetCards) {
                 OInternetCardMerch oInternetCardMerch = internetCardMerchMapper.selectChnTermposi(BigDataEncode.encode(internetCard.getIccidNum()));
                 if(null!=oInternetCardMerch){
@@ -612,6 +614,8 @@ public class InternetCardServiceImpl implements InternetCardService {
                     }
                 }
             }
+            long t2 = System.currentTimeMillis();
+            log.info("为空定时任务更新商户信息，处理时间:{} ms", (t2 - t1));
 
             //2. 更新已修改的商户信息（是续费，正常）
             Map<String,Object> reqMap = new HashMap<>();
