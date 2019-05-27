@@ -555,25 +555,27 @@ public class InternetCardServiceImpl implements InternetCardService {
             if(i>0){
                 int updateCount = internetCardMapper.updateInternetCardExpire(reqMap);
                 log.info("taskDisposeInternetCard检测是否续费,本次更次了数据条数:{}",updateCount);
+            }else{
+                log.info("taskDisposeInternetCard检测是否续费,暂无更新数据:{}",i);
             }
-            log.info("taskDisposeInternetCard检测是否续费,暂无更新数据:{}",i);
-            OInternetCardImportExample oInternetCardImportExample = new OInternetCardImportExample();
-            OInternetCardImportExample.Criteria criteria = oInternetCardImportExample.createCriteria();
-            criteria.andStatusEqualTo(Status.STATUS_1.status);
-            criteria.andImportStatusEqualTo(OInternetCardImportStatus.UNTREATED.getValue());
-            List<OInternetCardImport> oInternetCardImports = internetCardImportMapper.selectByExample(oInternetCardImportExample);
-            if(oInternetCardImports.size()==0){
+            Map map = new HashMap<>();
+            map.put("importStatus",OInternetCardImportStatus.UNTREATED.getValue());
+            Page page = new Page(0, 10);
+            map.put("page",page);
+            List<String> batchNums = internetCardImportMapper.selectBatchNum(map);
+            if(batchNums.size()==0){
                 log.info("taskDisposeInternetCard暂无未处理,退出");
                 return;
             }
-            for (OInternetCardImport oInternetCardImport : oInternetCardImports) {
-                if(StringUtils.isBlank(oInternetCardImport.getBatchNum())){
+            for (String batchNum : batchNums) {
+                if(StringUtils.isBlank(batchNum)){
                     log.info("taskDisposeInternetCard处理未处理的导入记录，批次号未空");
                     continue;
                 }
-                log.info("taskDisposeInternetCard处理未处理的导入记录，批次号:{}",oInternetCardImport.getBatchNum());
-                analysisImport(oInternetCardImport.getBatchNum());
+                log.info("taskDisposeInternetCard处理未处理的导入记录，批次号:{}",batchNum);
+                analysisImport(batchNum);
             }
+
         } finally {
             if(StringUtils.isNotBlank(retIdentifier)){
                 redisService.releaseLock(RedisCachKey.TASK_DISPOSEIN_TERNET_CARD.code, retIdentifier);

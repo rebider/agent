@@ -237,4 +237,16 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="selectBatchNum" parameterType="java.lang.String" resultType="map">
+    <include refid="OracleDialectPrefix" />
+        select batch_num from o_internet_card_import
+        <where>
+          IMPORT_STATUS = #{importStatus}
+          and STATUS = 1
+        </where>
+        group by batch_num
+    <include refid="OracleDialectSuffix" />
+  </select>
+
 </mapper>
