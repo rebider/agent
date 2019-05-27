@@ -19,6 +19,7 @@
     <dubbo:reference interface="com.ryx.credit.service.dict.IdService" id="idService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:reference interface="com.ryx.credit.service.agent.AgentService" id="agentService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:reference interface="com.ryx.credit.service.order.OLogisticsService" id="oLogisticService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:reference interface="com.ryx.credit.service.dict.DictOptionsService" id="dictOptionsService"  timeout="1200000" registry="${zk.group}"/>
 
     <dubbo:service interface="com.ryx.internet.service.InternetCardService" ref="internetCardService" timeout="1200000" registry="${zk.group}" />
 

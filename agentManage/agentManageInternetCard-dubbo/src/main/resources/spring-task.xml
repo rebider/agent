@@ -10,8 +10,6 @@
        http://www.springframework.org/schema/context
        http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <!-- 扫描 event包 -->
-    <context:component-scan base-package="com.ryx.credit.event;com.ryx.credit.task"/>
 
     <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
         <!-- 核心线程数 -->
