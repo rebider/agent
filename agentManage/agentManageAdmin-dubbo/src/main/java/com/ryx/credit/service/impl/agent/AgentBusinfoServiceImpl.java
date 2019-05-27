@@ -280,6 +280,18 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 							}
 						}
 					}
+					Dict debitRateLower = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitRateLower");//借记费率下限（%）
+					Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitCapping");//借记封顶额（元）
+					Dict debitAppearRate = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitAppearRate");//借记出款费率（%）
+					if(debitRateLower!=null){
+						db_AgentBusInfo.setDebitRateLower(debitRateLower.getdItemvalue());
+					}
+					if(debitCapping!=null){
+						db_AgentBusInfo.setDebitCapping(debitCapping.getdItemvalue());
+					}
+					if(debitAppearRate!=null){
+						db_AgentBusInfo.setDebitAppearRate(debitAppearRate.getdItemvalue());
+					}
 
 					if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(db_AgentBusInfo)){
 						throw new MessageException("更新业务信息失败");

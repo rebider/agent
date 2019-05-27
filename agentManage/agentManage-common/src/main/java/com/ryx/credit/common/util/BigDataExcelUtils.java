@@ -8,7 +8,7 @@ import java.util.List;
 
 /***
  * @Author liudh
- * @Description //TODO 
+ * @Description //TODO
  * @Date 2019/5/20 14:52
  * @Param
  * @return
@@ -33,7 +33,7 @@ public class BigDataExcelUtils {
 
     public static void main(String[] args){
 
-        List<List<String>> lists = bigDataGetExcel("D://ddd.xlsx");
+        List<List<String>> lists = bigDataGetExcel("D://dd.xlsx");
         System.out.println(lists);
 
     }

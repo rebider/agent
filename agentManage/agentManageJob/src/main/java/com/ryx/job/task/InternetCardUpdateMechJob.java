@@ -15,8 +15,8 @@ import org.springframework.stereotype.Service;
  * @Param
  * @return
  **/
-@Service("internetCardJob")
-public class InternetCardJob  implements SimpleJob {
+@Service("internetCardUpdateMechJob")
+public class InternetCardUpdateMechJob implements SimpleJob {
 
     private static Logger logger = LoggerFactory.getLogger(SynColinfoToPaymentJob.class);
 
@@ -26,12 +26,12 @@ public class InternetCardJob  implements SimpleJob {
     @Override
     public void execute(ShardingContext shardingContext) {
         try {
-            logger.info("======InternetCardJob:{}，开始",shardingContext.getJobName());
-            internetCardService.taskDisposeInternetCard();
-            logger.info("======InternetCardJob:{}，结束",shardingContext.getJobName());
+            logger.info("======InternetCardUpdateMechJob:{}，开始",shardingContext.getJobName());
+            internetCardService.taskUpdateMech();
+            logger.info("======InternetCardUpdateMechJob:{}，结束",shardingContext.getJobName());
         } catch (Exception e){
             e.printStackTrace();
-            logger.error("InternetCardJob:"+shardingContext.getJobName()+",出错",e);
+            logger.error("InternetCardUpdateMechJob:"+shardingContext.getJobName()+",出错",e);
         }
     }
 

@@ -77,4 +77,6 @@ public interface AgentService {
     List<Agent> getListByORGAndId(Map<String,String> map);
 
     AgentResult createAgentAccount();
+
+    Agent getAgentByName(String name);
 }

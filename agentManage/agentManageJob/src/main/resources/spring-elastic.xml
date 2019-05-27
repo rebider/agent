@@ -120,6 +120,16 @@
                 sharding-item-parameters="0=Server0"/>
 
 
+    <job:simple id="internetCardUpdateMech"
+                job-ref="internetCardUpdateMechJob"
+                registry-center-ref="regCenter"
+                cron="0 0 6 * * ?"
+                overwrite="true"
+                description="物联网卡，每天更新一次商户信息"
+                sharding-total-count="1"
+                sharding-item-parameters="0=Server0"/>
+
+
     <!--&lt;!&ndash;configure job 样例配置 &ndash;&gt;-->
     <!--<job:simple id="mySimpleTask"-->
                 <!--job-ref="mySimpleTask"-->
