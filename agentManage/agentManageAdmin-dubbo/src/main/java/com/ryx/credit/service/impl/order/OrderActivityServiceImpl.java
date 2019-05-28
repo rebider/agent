@@ -75,7 +75,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         List<OActivity> activitys = activityMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(activitys);
-        pageInfo.setTotal(activityMapper.countByExample(example));
+        pageInfo.setTotal((int)activityMapper.countByExample(example));
         return pageInfo;
     }
 
