@@ -11,14 +11,13 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.PlatFormMapper;
 import com.ryx.credit.dao.order.OActivityMapper;
+import com.ryx.credit.dao.order.OActivityVisibleMapper;
 import com.ryx.credit.dao.order.OProductMapper;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.TermMachineVo;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.Dict;
-import com.ryx.credit.pojo.admin.order.OActivity;
-import com.ryx.credit.pojo.admin.order.OActivityExample;
-import com.ryx.credit.pojo.admin.order.OProduct;
+import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.profit.service.ProfitMonthService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
@@ -57,6 +56,8 @@ public class OrderActivityServiceImpl implements OrderActivityService {
     private AgentBusInfoMapper agentBusInfoMapper;
     @Autowired
     private RedisService redisService;
+    @Autowired
+    private OActivityVisibleMapper activityVisibleMapper;
 
 
     @Override
@@ -570,5 +571,47 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         AgentResult agentResult = AgentResult.ok();
         agentResult.setMapData(res);
         return agentResult;
+    }
+
+    /**
+     * 设置活动可见权限
+     * @param activityId
+     * @param visible
+     * @param agentIds
+     * @param userId
+     * @throws MessageException
+     */
+    @Override
+    public void saveActivityVisible(String activityId,String visible,String[] agentIds,String userId)throws MessageException{
+
+        if(visible.equals(VisibleStatus.ONT.getValue()) || visible.equals(VisibleStatus.TWO.getValue())){
+            OActivity oActivity = activityMapper.selectByPrimaryKey(activityId);
+            if(oActivity==null){
+                throw new MessageException("活动不存在");
+            }
+            oActivity.setVisible(visible);
+            oActivity.setuTime(new Date());
+            oActivity.setuUser(userId);
+            int i = activityMapper.updateByPrimaryKey(oActivity);
+            if(i!=1){
+                throw new MessageException("设置失败");
+            }
+            if(visible.equals(VisibleStatus.TWO.getValue())){
+                OActivityVisibleExample oActivityVisibleExample = new OActivityVisibleExample();
+                OActivityVisibleExample.Criteria criteria = oActivityVisibleExample.createCriteria();
+                criteria.andActivityIdEqualTo(activityId);
+                activityVisibleMapper.deleteByExample(oActivityVisibleExample);
+                for(int j=0;j<agentIds.length;j++){
+                    OActivityVisible oActivityVisible = new OActivityVisible();
+                    oActivityVisible.setActivityId(activityId);
+                    oActivityVisible.setAgentId(agentIds[j]);
+                    oActivityVisible.setcTime(new Date());
+                    activityVisibleMapper.insert(oActivityVisible);
+                }
+            }
+        }else{
+            throw new MessageException("类型错误");
+        }
+
     }
 }
