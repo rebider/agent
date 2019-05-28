@@ -41,18 +41,20 @@ public class TermMachineServiceImpl  implements TermMachineService {
     public List<TermMachineVo> queryTermMachine(PlatformType platformType) throws Exception{
         if(PlatformType.whetherPOS(platformType.code)){
             return posTermMachineServiceImpl.queryTermMachine(platformType);
-        }else{
+        }else  if(PlatformType.MPOS.code.equals(platformType.code)){
             return mposTermMachineServiceImpl.queryTermMachine(platformType);
         }
+        return new ArrayList<>();
     }
 
     @Override
     public List<MposTermBatchVo> queryMposTermBatch(PlatformType platformType) throws Exception{
         if(PlatformType.whetherPOS(platformType.code)){
             return new ArrayList<>();
-        }else{
+        }else  if(PlatformType.MPOS.code.equals(platformType.code)){
             return mposTermMachineServiceImpl.queryMposTermBatch(platformType);
         }
+        return new ArrayList<>();
     }
 
     @Override
@@ -60,9 +62,10 @@ public class TermMachineServiceImpl  implements TermMachineService {
 
         if(PlatformType.whetherPOS(platformType.code)){
             return new ArrayList<>();
-        }else{
+        }else if(PlatformType.MPOS.code.equals(platformType.code)){
             return mposTermMachineServiceImpl.queryMposTermType(platformType);
         }
+        return new ArrayList<>();
     }
 
     /**
@@ -97,11 +100,12 @@ public class TermMachineServiceImpl  implements TermMachineService {
             AgentResult res =   posTermMachineServiceImpl.changeActMachine(changeActMachine);
             logger.info("pos机具的互动变更接口:{}",res.getMsg());
             return AgentResult.ok();
-        }else{
+        }else if(PlatformType.MPOS.code.equals(changeActMachine.getPlatformType())){
             AgentResult res =   mposTermMachineServiceImpl.changeActMachine(changeActMachine);
             logger.info("mpos机具的互动变更接口:{}",res.getMsg());
             return AgentResult.ok();
         }
+        return AgentResult.fail("未知业务平台");
     }
 
     @Override
@@ -113,8 +117,9 @@ public class TermMachineServiceImpl  implements TermMachineService {
     public AgentResult querySnMsg(PlatformType platformType,String snBegin,String snEnd)throws Exception{
         if(PlatformType.whetherPOS(platformType.name())){
             return posTermMachineServiceImpl.querySnMsg(platformType,snBegin,snEnd);
-        }else{
+        }else  if(PlatformType.MPOS.code.equals(platformType.name())){
             return mposTermMachineServiceImpl.querySnMsg(platformType,snBegin,snEnd);
         }
+        return AgentResult.fail("未知业务平台");
     }
 }
