@@ -61,7 +61,7 @@ public class IdServiceImpl implements IdService {
         String data = sdf.format(Calendar.getInstance().getTime());
         long seq_id  = dictMapper.sqlId(tablename.name());
         String rund = RandomCharUtil.getRandomNumberChar(2);
-        String numId = String.format("OD%s%02d%04d%02d",data,(userid%100),(seq_id%10000),Integer.valueOf(rund));
+        String numId = String.format("OD%s%02d%05d%02d",data,(userid%100),(seq_id%100000),Integer.valueOf(rund));
         return numId;
     }
 
@@ -71,7 +71,7 @@ public class IdServiceImpl implements IdService {
             String data = sdf_yyMM.format(Calendar.getInstance().getTime());
             long seq_id = dictMapper.sqlId(TabId.a_agent.name());
             String rund = RandomCharUtil.getRandomNumberChar(2);
-            String numId = String.format("AG%s%04d%02d", data, (seq_id % 10000), Integer.valueOf(rund));
+            String numId = String.format("AG%s%05d%02d", data, (seq_id % 100000), Integer.valueOf(rund));
             return numId;
         }
         return null;

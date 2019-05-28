@@ -488,6 +488,15 @@
         and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
       </if>
       <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus}</if>
+      <if test="platfromPerm!=null and platfromPerm.size>0">
+        and o.order_platform in
+        <foreach collection="platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
+          #{platfromPermItem.PLATFORM_NUM}
+        </foreach>
+      </if>
+      <if test="platfromPerm==null or platfromPerm.size==0">
+        and 1=-1
+      </if>
     </where>
     UNION
     select
@@ -542,8 +551,6 @@
     left join c_organization f on f.id= b.ag_doc_district
     left join c_organization g on g.id= b.ag_doc_pro
     <where>
-      <if test="doc==null"> and 1=2 </if>
-      <if test="doc!=null"> and (b.ag_doc_pro = #{doc,jdbcType=VARCHAR} or b.ag_doc_district=#{doc,jdbcType=VARCHAR}) and o.review_status != 1</if>
       <if test="1==1"> and  o.status = 1 </if>
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
       <if test="id!=null and id!=''"> and  o.id = #{id} </if>
@@ -570,6 +577,18 @@
         and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
       </if>
       <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus}</if>
+      <if test="organizationCode!=null and organizationCode !=''">
+        and   (f.CODE like concat(#{organizationCode},'%') or g.CODE like concat(#{organizationCode},'%') )
+      </if>
+      <if test="platfromPerm!=null and platfromPerm.size>0">
+        and o.order_platform in
+        <foreach collection="platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
+          #{platfromPermItem.PLATFORM_NUM}
+        </foreach>
+      </if>
+      <if test="platfromPerm==null or platfromPerm.size==0">
+        and 1=-1
+      </if>
     </where>
     )
     order by c_time desc
@@ -615,6 +634,15 @@
         and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
       </if>
       <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus}</if>
+      <if test="platfromPerm!=null and platfromPerm.size>0">
+        and o.order_platform in
+        <foreach collection="platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
+          #{platfromPermItem.PLATFORM_NUM}
+        </foreach>
+      </if>
+      <if test="platfromPerm==null or platfromPerm.size==0">
+        and 1=-1
+      </if>
     </where>
     UNION
     select
@@ -655,6 +683,18 @@
         and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
       </if>
       <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus}</if>
+      <if test="organizationCode!=null and organizationCode !=''">
+        and   (f.CODE like concat(#{organizationCode},'%') or g.CODE like concat(#{organizationCode},'%') )
+      </if>
+      <if test="platfromPerm!=null and platfromPerm.size>0">
+        and o.order_platform in
+        <foreach collection="platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
+          #{platfromPermItem.PLATFORM_NUM}
+        </foreach>
+      </if>
+      <if test="platfromPerm==null or platfromPerm.size==0">
+        and 1=-1
+      </if>
     </where>
     )
   </select>
@@ -747,6 +787,15 @@
        and (b.AG_DOC_PRO = #{agDocDistrict} or b.AG_DOC_DISTRICT = #{agDocDistrict})
       </if>
       <if test="agDocPro!=null and agDocPro!=''"> and b.AG_DOC_PRO like  #{agDocPro} </if>
+      <if test="platfromPerm!=null and platfromPerm.size>0">
+       and o.order_platform in
+       <foreach collection="platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
+         #{platfromPermItem.PLATFORM_NUM}
+       </foreach>
+      </if>
+     <if test="platfromPerm==null or platfromPerm.size==0">
+       and 1=-1
+     </if>
     </where>
     order by c_time desc
     <include refid="OracleDialectSuffix" />
@@ -792,6 +841,15 @@
         and (b.AG_DOC_PRO = #{agDocDistrict} or b.AG_DOC_DISTRICT = #{agDocDistrict})
       </if>
       <if test="agDocPro!=null and agDocPro!=''"> and b.AG_DOC_PRO like  #{agDocPro} </if>
+      <if test="platfromPerm!=null and platfromPerm.size>0">
+        and o.order_platform in
+        <foreach collection="platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
+          #{platfromPermItem.PLATFORM_NUM}
+        </foreach>
+      </if>
+      <if test="platfromPerm==null or platfromPerm.size==0">
+        and 1=-1
+      </if>
     </where>
     )
   </select>

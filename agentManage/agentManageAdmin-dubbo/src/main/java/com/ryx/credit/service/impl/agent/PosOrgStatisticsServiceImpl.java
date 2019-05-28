@@ -204,6 +204,11 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
             agentResult.setMsg(platformType);
             return agentResult;
         }else if(PlatformType.whetherPOS(platformType)){
+            if(StringUtils.isEmpty(orgId)){
+                if(StringUtils.isNotEmpty(parentBusNum)){
+                    orgId = parentBusNum;
+                }
+            }
             AgentResult agentResult = httpForPos(orgId,parentBusNum);
             agentResult.setMsg(platformType);
             return agentResult;

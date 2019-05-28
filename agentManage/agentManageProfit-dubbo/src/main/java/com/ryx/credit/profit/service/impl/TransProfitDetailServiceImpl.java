@@ -5,7 +5,6 @@ package com.ryx.credit.profit.service.impl;/**
  */
 
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.TransProfitDetailMapper;
@@ -72,6 +71,11 @@ public class TransProfitDetailServiceImpl implements TransProfitDetailService {
     @Override
     public List<Map<String, Object>> queryBusNum(String type) {
         return transProfitDetailMapper.queryBusNum(type);
+    }
+
+    @Override
+    public int updateByPrimaryKeySelective(TransProfitDetail record) {
+        return transProfitDetailMapper.updateByPrimaryKeySelective(record);
     }
 
     @Override

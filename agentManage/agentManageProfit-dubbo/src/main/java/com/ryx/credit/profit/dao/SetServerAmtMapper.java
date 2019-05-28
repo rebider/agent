@@ -4,6 +4,7 @@ import com.ryx.credit.profit.pojo.SetServerAmt;
 import com.ryx.credit.profit.pojo.SetServerAmtExample;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -38,4 +39,15 @@ public interface SetServerAmtMapper {
      Integer setServerAmtCount(Map<String,Object> param);
 
     List<Map<String,Object>> queryD(@Param("bumId")String bumId);
+
+    /**
+     * 按月份清楚服务费明细
+     * @param profitDate
+     * @return
+     */
+    int clearServerAmtDetailData(@Param("profitDate")String profitDate);
+
+    BigDecimal serverAmtSum(@Param("profitDate")String profitDate, @Param("agentId") String agentId, @Param("busCode") String busCode);
+    List<Map<String,Object>> queryDataDetail(Map<String,Object> param);
+    Integer queryDataDetailCount(Map<String,Object> param);
 }

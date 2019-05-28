@@ -17,10 +17,12 @@ import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.UserVo;
 import com.ryx.credit.service.ICuserAgentService;
+import com.ryx.credit.service.IResourceService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.DepartmentService;
+import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import org.apache.commons.collections.FastHashMap;
 import org.apache.commons.lang.StringUtils;
@@ -46,6 +48,8 @@ public class AgentServiceImpl implements AgentService {
     private static Logger logger = LoggerFactory.getLogger(AgentServiceImpl.class);
 
     private final String JURIS_DICTION = AppConfig.getProperty("region_jurisdiction");
+
+    private static final String permission_key="AGENT_LIST_PLATFORM_";
 
     @Autowired
     private AttachmentRelMapper attachmentRelMapper;
@@ -79,6 +83,8 @@ public class AgentServiceImpl implements AgentService {
     private CUserMapper userMapper;
     @Autowired
     private CUserRoleMapper cUserRoleMapper;
+    @Autowired
+    private IResourceService iResourceService;
 
 
     /**
@@ -139,19 +145,25 @@ public class AgentServiceImpl implements AgentService {
     @Autowired
     private COrganizationMapper organizationMapper;
 
+    /**
+     * 省区大区查询
+     * @param page
+     * @param map
+     * @param userId
+     * @return
+     */
     @Override
     public PageInfo queryAgentAll(Page page, Map map ,Long userId) {
-        if (String.valueOf(map.get("flag")).equals("1")){
-            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
-            if(orgCodeRes==null && orgCodeRes.size()!=1){
-                return null;
-            }
-            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
-            String orgId = String.valueOf(stringObjectMap.get("ORGID"));
-            map.put("orgId",orgId);
-            map.put("userId",userId);
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+        if (orgCodeRes == null && orgCodeRes.size() != 1) {
+            return null;
         }
-
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        map.put("orgId", orgId);
+        map.put("userId", userId);
+        map.put("organizationCode", organizationCode);
         if (null != map) {
             String time = String.valueOf(map.get("time"));
             if (StringUtils.isNotBlank(time)&&!time.equals("null")) {
@@ -159,16 +171,39 @@ public class AgentServiceImpl implements AgentService {
                 map.put("time", reltime);
             }
         }
-        String isZpos = String.valueOf(map.get("isZpos"));
-        map.put("isZpos", isZpos);
-        map.put("platForm", Platform.ZPOS.getValue());
+        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+        map.put("platfromPerm",platfromPerm);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(agentMapper.queryAgentListView(map,page));
+        pageInfo.setTotal(agentMapper.queryAgentListViewCount(map));
+        return pageInfo;
+    }
+
+
+    /**
+     * 管理人员管理查询，查询自己创建的，查询平台权限分配的
+     * @param page
+     * @param map
+     * @param userId
+     * @return
+     */
+    @Override
+    public PageInfo agentManageList(Page page, Map map, Long userId) {
+        if (null != map) {
+            String time = String.valueOf(map.get("time"));
+            if (StringUtils.isNotBlank(time)&&!time.equals("null")) {
+                String reltime = time.substring(0, 10);
+                map.put("time", reltime);
+            }
+        }
+        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+        map.put("platfromPerm",platfromPerm);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(agentMapper.queryAgentListView(map,page));
         pageInfo.setTotal(agentMapper.queryAgentListViewCount(map));
 
         return pageInfo;
     }
-
 
     /**
      * 代理商新曾
@@ -453,7 +488,7 @@ public class AgentServiceImpl implements AgentService {
         iUserService.insertByVo(userVo);
 
 
-        List<UserVo>  list_db = cUserMapper.selectListByLogin(agent.getAgUniqNum());
+        List<UserVo>  list_db = cUserMapper.selectListByLogin(agent.getId());
         UserVo cUser = new UserVo();
         if(list_db.size()>0){
             cUser = list_db.get(0);
@@ -660,7 +695,7 @@ public class AgentServiceImpl implements AgentService {
                 userVo.setUserType(1);
                 userVo.setPhone(agent.getId());
                 iUserService.insertByVo(userVo);
-                List<UserVo>  list_db = userMapper.selectListByLogin(agent.getAgUniqNum());
+                List<UserVo>  list_db = userMapper.selectListByLogin(agent.getId());
                 UserVo cUser = new UserVo();
                 if(list_db.size()>0){
                     cUser = list_db.get(0);
@@ -682,4 +717,17 @@ public class AgentServiceImpl implements AgentService {
         }
     }
 
+    @Override
+    public Agent getAgentByName(String name) {
+        AgentExample agentExample = new AgentExample();
+        AgentExample.Criteria criteria1 = agentExample.createCriteria();
+        criteria1.andStatusEqualTo(Status.STATUS_1.status);
+        criteria1.andAgNameEqualTo(name);
+        List<Agent> agents = agentMapper.selectByExample(agentExample);
+        if(agents.size()!=0) {
+            Agent agent = agents.get(0);
+            return agent;
+        }
+        return null;
+    }
 }

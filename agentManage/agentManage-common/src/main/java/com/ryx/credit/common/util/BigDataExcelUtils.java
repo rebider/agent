@@ -1,11 +1,14 @@
 package com.ryx.credit.common.util;
 
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.openxml4j.opc.PackageAccess;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /***
  * @Author liudh
- * @Description //TODO 
+ * @Description //TODO
  * @Date 2019/5/20 14:52
  * @Param
  * @return
@@ -13,24 +16,25 @@ import java.util.List;
 public class BigDataExcelUtils {
 
     public static List<List<String>>  bigDataGetExcel(String fileUrl){
-        long start = System.currentTimeMillis();
-        final List<List<String>> table = new ArrayList<>();
-        new ExcelEventParser(fileUrl).setHandler(new ExcelEventParser.SimpleSheetContentsHandler(){
-            private List<String> fields;
-            @Override
-            public void endRow(int rowNum) {
-                if(rowNum == 0){
-                    fields = row;
-                }else {
-                    // 数据
-                    table.add(row);
-                }
-            }
-        }).parse();
-        long end = System.currentTimeMillis();
-        System.err.println(table.size());
-        System.err.println(end - start);
+        List<List<String>> table = new ArrayList<>();
+        try {
+            OPCPackage p;
+            p = OPCPackage.open(fileUrl, PackageAccess.READ);
+            ExcelEventParser xlsx2csv = new ExcelEventParser(p, 20); // 20代表最大列数
+            xlsx2csv.process();
+            table = xlsx2csv.get_output();
+            p.close();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         return table;
     }
 
+    public static void main(String[] args){
+
+        List<List<String>> lists = bigDataGetExcel("D://dd.xlsx");
+        System.out.println(lists);
+
+    }
 }

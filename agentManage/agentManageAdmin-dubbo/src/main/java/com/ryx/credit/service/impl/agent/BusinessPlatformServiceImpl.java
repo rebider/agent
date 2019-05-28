@@ -13,12 +13,14 @@ import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.PayCompMapper;
 import com.ryx.credit.dao.agent.PlatFormMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.bank.DPosRegion;
 import com.ryx.credit.pojo.admin.vo.*;
+import com.ryx.credit.service.IResourceService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
-import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.bank.PosRegionService;
 import com.ryx.credit.service.dict.DictOptionsService;
+import com.ryx.credit.service.dict.RegionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.util.*;
 
@@ -61,10 +64,14 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     private PayCompMapper payCompMapper;
     @Autowired
     private AimportService aimportService;
-//    @Autowired
-//    private AgentNotifyService agentNotifyService;
+    @Autowired
+    private AgentNotifyService agentNotifyService;
     @Autowired
     private DictOptionsService dictOptionsService;
+    @Autowired
+    private PosRegionService posRegionService;
+    @Autowired
+    private AgentService agentService;
     @Autowired
     private IUserService iUserService;
     @Autowired
@@ -72,12 +79,12 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     @Autowired
     private AgentEnterService agentEnterService;
     @Autowired
-    private AgentNetInNotityService agentNetInNotityService;
+    private IResourceService iResourceService;
 
 
 
     @Override
-    public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,String flag,String isZpos) {
+    public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,Long userId) {
         Map<String, Object> reqMap = new HashMap<>();
 
         reqMap.put("agStatus", AgStatus.Approved.name());
@@ -102,19 +109,55 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         if (agentBusInfo.getBusType() != null) {
             reqMap.put("busType", agentBusInfo.getBusType());
         }
-        if (StringUtils.isNotBlank(flag) && flag.equals("1")){
-            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(agentBusInfo.getcUser()));
-            if(orgCodeRes==null && orgCodeRes.size()!=1){
-                return null;
-            }
-            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
-            String orgId = String.valueOf(stringObjectMap.get("ORGID"));
-            reqMap.put("orgId",orgId);
-            reqMap.put("userId",Long.valueOf(agentBusInfo.getcUser()));
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(agentBusInfo.getcUser()));
+        if(orgCodeRes==null && orgCodeRes.size()!=1){
+            return null;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        reqMap.put("orgId",orgId);
+        reqMap.put("userId",Long.valueOf(agentBusInfo.getcUser()));
+        reqMap.put("organizationCode", organizationCode);
+        reqMap.put("status", Status.STATUS_1.status);
+        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+        reqMap.put("platfromPerm",platfromPerm);
+        List<Map<String, Object>> agentBusInfoList = agentBusInfoMapper.queryBusinessPlatformList(reqMap, page);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(agentBusInfoList);
+        pageInfo.setTotal(agentBusInfoMapper.queryBusinessPlatformCount(reqMap));
+        return pageInfo;
+    }
+
+    @Override
+    public PageInfo queryBusinessPlatformListManager(AgentBusInfo agentBusInfo, Agent agent, Page page, Long userId) {
+        Map<String, Object> reqMap = new HashMap<>();
+
+        reqMap.put("agStatus", AgStatus.Approved.name());
+        if (!StringUtils.isBlank(agent.getId())) {
+            reqMap.put("id", agent.getId());
+        }
+        if (!StringUtils.isBlank(agent.getAgName())) {
+            reqMap.put("agName", agent.getAgName());
+        }
+        if (!StringUtils.isBlank(agent.getAgUniqNum())) {
+            reqMap.put("agUniqNum", agent.getAgUniqNum());
+        }
+        if (!StringUtils.isBlank(agentBusInfo.getBusNum())) {
+            reqMap.put("busNum", agentBusInfo.getBusNum());
+        }
+        if (!StringUtils.isBlank(agentBusInfo.getBusPlatform())) {
+            reqMap.put("busPlatform", agentBusInfo.getBusPlatform());
+        }
+        if (agentBusInfo.getCloReviewStatus() != null) {
+            reqMap.put("cloReviewStatus", agentBusInfo.getCloReviewStatus());
+        }
+        if (agentBusInfo.getBusType() != null) {
+            reqMap.put("busType", agentBusInfo.getBusType());
         }
         reqMap.put("status", Status.STATUS_1.status);
-        reqMap.put("isZpos",isZpos);
-        reqMap.put("platForm", Platform.ZPOS.getValue());
+        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+        reqMap.put("platfromPerm",platfromPerm);
         List<Map<String, Object>> agentBusInfoList = agentBusInfoMapper.queryBusinessPlatformList(reqMap, page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(agentBusInfoList);
@@ -243,6 +286,18 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
 
             for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
                 AgentBusInfo agbus = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                Dict debitRateLower = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfoVo.getBusPlatform(), "debitRateLower");//借记费率下限（%）
+                Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfoVo.getBusPlatform(), "debitCapping");//借记封顶额（元）
+                Dict debitAppearRate = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfoVo.getBusPlatform(), "debitAppearRate");//借记出款费率（%）
+                if(debitRateLower!=null){
+                    agentBusInfoVo.setDebitRateLower(debitRateLower.getdItemvalue());
+                }
+                if(debitCapping!=null){
+                    agentBusInfoVo.setDebitCapping(debitCapping.getdItemvalue());
+                }
+                if(debitAppearRate!=null){
+                    agentBusInfoVo.setDebitAppearRate(debitAppearRate.getdItemvalue());
+                }
                 agentBusInfoVo.setVersion(agbus.getVersion());
                 int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfoVo);
                 if (i!=1) {
@@ -417,25 +472,24 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 throw new MessageException("更新失败");
             }
 
-//            try {
-//                ImportAgent importAgent = new ImportAgent();
-//                importAgent.setDataid(agentBus.getId());
-//                importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
-//                importAgent.setBatchcode(Calendar.getInstance().getTime().toString());
-//                importAgent.setcUser(userid);
-//                if (1 != aimportService.insertAgentImportData(importAgent)) {
-//                    logger.info("代理商审批通过-添加开户任务失败");
-//                } else {
-//                    logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.BUSAPP.getValue(), agentBus.getId());
-//                }
-//
-//                agentDataHistoryService.saveDataHistory(agentBus, DataHistoryType.BUSINESS.getValue());
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            } finally {
+            try {
+                ImportAgent importAgent = new ImportAgent();
+                importAgent.setDataid(agentBus.getId());
+                importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
+                importAgent.setBatchcode(Calendar.getInstance().getTime().toString());
+                importAgent.setcUser(userid);
+                if (1 != aimportService.insertAgentImportData(importAgent)) {
+                    logger.info("代理商审批通过-添加开户任务失败");
+                } else {
+                    logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.BUSAPP.getValue(), agentBus.getId());
+                }
 
-//            }
-            agentNetInNotityService.asynNotifyPlatform(agentBus.getId(),NotifyType.NetInEdit.getValue());
+                agentDataHistoryService.saveDataHistory(agentBus, DataHistoryType.BUSINESS.getValue());
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                agentNotifyService.asynNotifyPlatform();
+            }
             busList.add(agentBus.getId());
         }
 
@@ -451,24 +505,24 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         AgentBusInfo agbus = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getId());
         agentBusInfo.setVersion(agbus.getVersion());
         int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
-//        try {
-//            ImportAgent importAgent = new ImportAgent();
-//            importAgent.setDataid(agbus.getId());
-//            importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
-//            importAgent.setBatchcode(Calendar.getInstance().getTime().toString());
-//            importAgent.setcUser(userId);
-//            if (1 != aimportService.insertAgentImportData(importAgent)) {
-//                logger.info("代理商审批通过-添加开户任务失败");
-//            } else {
-//                logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.BUSAPP.getValue(), agbus.getId());
-//            }
-//
-//            agentDataHistoryService.saveDataHistory(agbus, DataHistoryType.BUSINESS.getValue());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        } finally {
-        agentNetInNotityService.asynNotifyPlatform(agbus.getId(),NotifyType.NetInEdit.getValue());
-//        }
+        try {
+            ImportAgent importAgent = new ImportAgent();
+            importAgent.setDataid(agbus.getId());
+            importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
+            importAgent.setBatchcode(Calendar.getInstance().getTime().toString());
+            importAgent.setcUser(userId);
+            if (1 != aimportService.insertAgentImportData(importAgent)) {
+                logger.info("代理商审批通过-添加开户任务失败");
+            } else {
+                logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.BUSAPP.getValue(), agbus.getId());
+            }
+
+            agentDataHistoryService.saveDataHistory(agbus, DataHistoryType.BUSINESS.getValue());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            agentNotifyService.asynNotifyPlatform();
+        }
         return i;
     }
 

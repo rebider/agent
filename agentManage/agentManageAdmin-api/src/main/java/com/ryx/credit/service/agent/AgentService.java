@@ -22,6 +22,7 @@ public interface AgentService {
      */
     PageInfo queryAgentList(PageInfo page, Agent agent);
     PageInfo queryAgentAll(Page page, Map map,Long userId);
+    PageInfo agentManageList(Page page, Map map,Long userId);
 
     /**
      * 代理商新曾
@@ -76,4 +77,6 @@ public interface AgentService {
     List<Agent> getListByORGAndId(Map<String,String> map);
 
     AgentResult createAgentAccount();
+
+    Agent getAgentByName(String name);
 }

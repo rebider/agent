@@ -142,6 +142,15 @@ public class ProfitDetailMonth implements Serializable{
     private BigDecimal znposProfitAmt;
 
     private BigDecimal mposTranAmt;
+    private BigDecimal serverAmtSum;
+
+    public BigDecimal getServerAmtSum() {
+        return serverAmtSum;
+    }
+
+    public void setServerAmtSum(BigDecimal serverAmtSum) {
+        this.serverAmtSum = serverAmtSum;
+    }
 
     public static long getSerialVersionUID() {
         return serialVersionUID;

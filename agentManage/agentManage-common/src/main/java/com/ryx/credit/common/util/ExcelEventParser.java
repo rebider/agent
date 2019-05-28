@@ -1,7 +1,19 @@
 package com.ryx.credit.common.util;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.openxml4j.opc.PackageAccess;
+import org.apache.poi.ss.util.CellAddress;
+import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.util.SAXHelper;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
@@ -13,92 +25,172 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.LinkedList;
-import java.util.List;
+/***
+ * 大数据excel文件解析
+ * @Author liudh
+ * @Description //TODO
+ * @Date 2019/5/23 11:21
+ * @Param
+ * @return
+ **/
+public class ExcelEventParser {
+    /**
+     * Uses the XSSF Event SAX helpers to do most of the work
+     * of parsing the Sheet XML, and outputs the contents
+     * as a (basic) CSV.
+     */
+    private class SheetToCSV implements SheetContentsHandler {
+        private boolean firstCellOfRow = false;
+        private int currentRow = -1;
+        private int currentCol = -1;
 
-public class ExcelEventParser {  
-  
-    private String filename;  
-    private SheetContentsHandler handler;  
-      
-    public ExcelEventParser(String filename){  
-        this.filename = filename;  
-    }  
-      
-    public ExcelEventParser setHandler(SheetContentsHandler handler) {  
-        this.handler = handler;  
-        return this;  
-    }  
-  
-    public void parse(){  
-        OPCPackage pkg = null;  
-        InputStream sheetInputStream = null;  
-          
-        try {  
-            pkg = OPCPackage.open(filename, PackageAccess.READ);  
-            XSSFReader xssfReader = new XSSFReader(pkg);  
-              
-            StylesTable styles = xssfReader.getStylesTable();   
-            ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(pkg);  
-            sheetInputStream = xssfReader.getSheetsData().next();  
-              
-            processSheet(styles, strings, sheetInputStream);  
-        } catch (Exception e) {  
-            throw new RuntimeException(e.getMessage(), e);  
-        }finally {  
-            if(sheetInputStream != null){  
-                try {  
-                    sheetInputStream.close();  
-                } catch (IOException e) {  
-                    throw new RuntimeException(e.getMessage(), e);  
-                }  
-            }  
-            if(pkg != null){  
-                try {  
-                    pkg.close();  
-                } catch (IOException e) {  
-                    throw new RuntimeException(e.getMessage(), e);  
-                }  
-            }  
-        }  
-    }  
-      
-    private void processSheet(StylesTable styles, ReadOnlySharedStringsTable strings, InputStream sheetInputStream) throws SAXException, ParserConfigurationException, IOException{  
-        XMLReader sheetParser = SAXHelper.newXMLReader();   
-          
-        if(handler != null){  
-            sheetParser.setContentHandler(new XSSFSheetXMLHandler(styles, strings, handler, false));  
-        }else{  
-            sheetParser.setContentHandler(new XSSFSheetXMLHandler(styles, strings, new SimpleSheetContentsHandler(), false));  
-        }  
-          
-        sheetParser.parse(new InputSource(sheetInputStream));  
-    }  
-      
-    public static class SimpleSheetContentsHandler implements SheetContentsHandler{
-        protected List<String> row = null;
+        private void outputMissingRows(int number) {
+            for (int i = 0; i < number; i++) {
+                curstr = new ArrayList<String>();
+                for (int j = 0; j < minColumns; j++) {
+                    curstr.add(null);
+                }
+                output.add(curstr);
+            }
+        }
 
         @Override
         public void startRow(int rowNum) {
-            row = new LinkedList<>();
+            curstr = new ArrayList<String>();
+            outputMissingRows(rowNum - currentRow - 1);
+            firstCellOfRow = true;
+            currentRow = rowNum;
+            currentCol = -1;
         }
 
         @Override
         public void endRow(int rowNum) {
-            System.err.println(rowNum + " : " + row);
+            if(rowNum==0)return;
+            for (int i = currentCol; i < minColumns ; i++) {
+                curstr.add(null);
+            }
+            Set set = new HashSet();
+            for (String strings : curstr) {
+                if(StringUtils.isNotBlank(strings))
+                    set.add(strings.trim());
+            }
+            if(set.size()!=0)
+                output.add(curstr);
         }
 
         @Override
-        public void cell(String cellReference, String formattedValue, XSSFComment comment) {
-            row.add(formattedValue);
+        public void cell(String cellReference, String formattedValue,
+                         XSSFComment comment) {
+            if(StringUtils.isNotBlank(formattedValue.trim())){
+                if (cellReference == null) {
+                    cellReference = new CellAddress(currentRow, currentCol).formatAsString();
+                }
+
+                int thisCol = (new CellReference(cellReference)).getCol();
+                int missedCols = thisCol - currentCol - 1;
+                for (int i = 0; i < missedCols; i++) {
+                    curstr.add(null);
+                }
+                currentCol = thisCol;
+
+                try {
+                    Double.parseDouble(formattedValue);
+                    curstr.add(formattedValue);
+                } catch (NumberFormatException e) {
+                    curstr.add(formattedValue);
+                }
+            }
         }
 
         @Override
         public void headerFooter(String text, boolean isHeader, String tagName) {
-
+            // Skip, no headers or footers in CSV
         }
     }
-}  
+
+
+    private final OPCPackage xlsxPackage;
+
+    /**
+     * Number of columns to read starting with leftmost
+     */
+    private final int minColumns;
+
+    /**
+     * Destination for data
+     */
+
+    private List<List<String>> output;
+    private List<String> curstr;
+
+    public  List<List<String>> get_output(){
+        return output;
+    }
+
+    /**
+     * Creates a new XLSX -> CSV converter
+     */
+
+    public ExcelEventParser(OPCPackage pkg, int minColumns) {
+        this.xlsxPackage = pkg;
+        this.minColumns = minColumns;
+    }
+    private SheetContentsHandler handler;
+
+    public ExcelEventParser setHandler(SheetContentsHandler handler) {
+        this.handler = handler;
+        return this;
+    }
+
+    /**
+     * Parses and shows the content of one sheet
+     * using the specified styles and shared-strings tables.
+     *
+     * @param styles
+     * @param strings
+     * @param sheetInputStream
+     */
+    public void processSheet(
+            StylesTable styles,
+            ReadOnlySharedStringsTable strings,
+            SheetContentsHandler sheetHandler,
+            InputStream sheetInputStream)
+            throws IOException, ParserConfigurationException, SAXException {
+        XMLReader sheetParser = SAXHelper.newXMLReader();
+
+        if(handler != null){
+            sheetParser.setContentHandler(new XSSFSheetXMLHandler(styles, strings, handler, false));
+        }else{
+            sheetParser.setContentHandler(new XSSFSheetXMLHandler(styles, strings, new ExcelEventParser.SheetToCSV(), false));
+        }
+        sheetParser.parse(new InputSource(sheetInputStream));
+    }
+
+    /**
+     * Initiates the processing of the XLS workbook file to CSV.
+     *
+     * @throws IOException
+     * @throws OpenXML4JException
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     */
+    public void process()
+            throws IOException, OpenXML4JException, ParserConfigurationException, SAXException {
+        ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(this.xlsxPackage);
+        XSSFReader xssfReader = new XSSFReader(this.xlsxPackage);
+        StylesTable styles = xssfReader.getStylesTable();
+        XSSFReader.SheetIterator iter = (XSSFReader.SheetIterator) xssfReader.getSheetsData();
+        int index = 0;
+        while (iter.hasNext()) {
+            output = new ArrayList<>();
+            InputStream stream = iter.next();
+            String sheetName = iter.getSheetName();
+            System.out.println("正在读取sheet： "+sheetName + " [index=" + index + "]:");
+            processSheet(styles, strings, new SheetToCSV(), stream);
+            System.out.println("sheet 读取完成!");
+            stream.close();
+            ++index;
+        }
+    }
+
+}

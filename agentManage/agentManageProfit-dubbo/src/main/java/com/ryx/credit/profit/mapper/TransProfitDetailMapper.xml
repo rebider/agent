@@ -36,6 +36,7 @@
     <result column="QR_TRAN_FEE" jdbcType="DECIMAL" property="qrTranFee" />
     <result column="QR_PFT_AMT" jdbcType="DECIMAL" property="qrPftAmt" />
     <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="SERVER_AMT" jdbcType="DECIMAL" property="serverAmt" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -100,7 +101,8 @@
     IN_TRANS_AMT, OUT_TRANS_AMT, PROFIT_AMT, BUS_CODE, IN_PROFIT_SCALE, OUT_PROFIT_SCALE,
     IN_PROFIT_AMT, OUT_PROFIT_AMT, POS_CREDIT_AMT, IPOS_CREDIT_AMT, POS_REWARD_AMT, PAY_COMPANY,
     NOTAX_AMT, SUPPLY_AMT, TRANS_FEE, UNICODE, SOURCE_INFO, AGENT_TYPE, UNLINE_AMT, PARENT_AGENT_NAME,
-    POS_TRAN_AMT, POS_TRAN_FEE, POS_PFT_AMT, QR_TRAN_AMT, QR_TRAN_FEE, QR_PFT_AMT, REMARK
+    POS_TRAN_AMT, POS_TRAN_FEE, POS_PFT_AMT, QR_TRAN_AMT, QR_TRAN_FEE, QR_PFT_AMT, REMARK,
+    SERVER_AMT
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.TransProfitDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -136,7 +138,7 @@
       AGENT_TYPE, UNLINE_AMT, PARENT_AGENT_NAME,
       POS_TRAN_AMT, POS_TRAN_FEE, POS_PFT_AMT,
       QR_TRAN_AMT, QR_TRAN_FEE, QR_PFT_AMT,
-      REMARK)
+      REMARK, SERVER_AMT)
     values (#{id,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
       #{agentName,jdbcType=VARCHAR}, #{parentBusNum,jdbcType=VARCHAR}, #{parentAgentId,jdbcType=VARCHAR},
       #{profitDate,jdbcType=VARCHAR}, #{inTransAmt,jdbcType=DECIMAL}, #{outTransAmt,jdbcType=DECIMAL},
@@ -148,7 +150,7 @@
       #{agentType,jdbcType=VARCHAR}, #{unlineAmt,jdbcType=DECIMAL}, #{parentAgentName,jdbcType=VARCHAR},
       #{posTranAmt,jdbcType=DECIMAL}, #{posTranFee,jdbcType=DECIMAL}, #{posPftAmt,jdbcType=DECIMAL},
       #{qrTranAmt,jdbcType=DECIMAL}, #{qrTranFee,jdbcType=DECIMAL}, #{qrPftAmt,jdbcType=DECIMAL},
-      #{remark,jdbcType=VARCHAR})
+      #{remark,jdbcType=VARCHAR}, #{serverAmt,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail">
     insert into TRANS_PROFIT_DETAIL
@@ -255,6 +257,9 @@
       <if test="remark != null">
         REMARK,
       </if>
+      <if test="serverAmt != null">
+        SERVER_AMT,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -358,6 +363,9 @@
       </if>
       <if test="remark != null">
         #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="serverAmt != null">
+        #{serverAmt,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -472,6 +480,9 @@
       <if test="record.remark != null">
         REMARK = #{record.remark,jdbcType=VARCHAR},
       </if>
+      <if test="record.serverAmt != null">
+        SERVER_AMT = #{record.serverAmt,jdbcType=DECIMAL},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -512,7 +523,8 @@
     QR_TRAN_AMT = #{record.qrTranAmt,jdbcType=DECIMAL},
     QR_TRAN_FEE = #{record.qrTranFee,jdbcType=DECIMAL},
     QR_PFT_AMT = #{record.qrPftAmt,jdbcType=DECIMAL},
-    REMARK = #{record.remark,jdbcType=VARCHAR}
+    REMARK = #{record.remark,jdbcType=VARCHAR},
+    SERVER_AMT = #{record.serverAmt,jdbcType=DECIMAL}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -569,7 +581,7 @@
   IN_TRANS_AMT, OUT_TRANS_AMT, PROFIT_AMT, BUS_CODE,BUS_CODE as BUS_NAME, IN_PROFIT_SCALE, OUT_PROFIT_SCALE,
   IN_PROFIT_AMT, OUT_PROFIT_AMT, POS_CREDIT_AMT, IPOS_CREDIT_AMT, POS_REWARD_AMT, PAY_COMPANY,
   NOTAX_AMT, SUPPLY_AMT, TRANS_FEE, UNICODE, SOURCE_INFO, AGENT_TYPE, UNLINE_AMT,
-  POS_TRAN_AMT, POS_TRAN_FEE, POS_PFT_AMT, QR_TRAN_AMT, QR_TRAN_FEE, QR_PFT_AMT ,REMARK from TRANS_PROFIT_DETAIL
+  POS_TRAN_AMT, POS_TRAN_FEE, POS_PFT_AMT, QR_TRAN_AMT, QR_TRAN_FEE, QR_PFT_AMT,SERVER_AMT,REMARK from TRANS_PROFIT_DETAIL
   <if test="orgId != null and orgId != ''">
     inner join  A_AGENT AGENT ON AGENT_ID = AGENT.ID AND AGENT.AG_DOC_PRO= #{orgId}
   </if>
@@ -614,7 +626,7 @@ where
     IN_TRANS_AMT, OUT_TRANS_AMT, PROFIT_AMT, BUS_CODE,BUS_CODE as BUS_NAME, IN_PROFIT_SCALE, OUT_PROFIT_SCALE,
     IN_PROFIT_AMT, OUT_PROFIT_AMT, POS_CREDIT_AMT, IPOS_CREDIT_AMT, POS_REWARD_AMT, PAY_COMPANY,
     NOTAX_AMT, SUPPLY_AMT, TRANS_FEE, UNICODE, SOURCE_INFO, AGENT_TYPE, UNLINE_AMT,
-    POS_TRAN_AMT, POS_TRAN_FEE, POS_PFT_AMT, QR_TRAN_AMT, QR_TRAN_FEE, QR_PFT_AMT,REMARK from TRANS_PROFIT_DETAIL
+    POS_TRAN_AMT, POS_TRAN_FEE, POS_PFT_AMT, QR_TRAN_AMT, QR_TRAN_FEE, QR_PFT_AMT,SERVER_AMT,REMARK from TRANS_PROFIT_DETAIL
     <if test="orgId != null and orgId != ''">
       inner join  A_AGENT AGENT ON AGENT_ID = AGENT.ID AND AGENT.AG_DOC_PRO= #{orgId}
     </if>

@@ -1,9 +1,10 @@
-package com.ryx.credit.dao.order;
+package com.ryx.internet.dao;
 
-import com.ryx.credit.pojo.admin.order.OInternetCardImport;
-import com.ryx.credit.pojo.admin.order.OInternetCardImportExample;
+import com.ryx.internet.pojo.OInternetCardImport;
+import com.ryx.internet.pojo.OInternetCardImportExample;
 
 import java.util.List;
+import java.util.Map;
 
 public interface OInternetCardImportMapper {
     long countByExample(OInternetCardImportExample example);
@@ -21,4 +22,6 @@ public interface OInternetCardImportMapper {
     int updateByPrimaryKeySelective(OInternetCardImport record);
 
     int updateByPrimaryKey(OInternetCardImport record);
+
+    List<String> selectBatchNum(Map map);
 }

@@ -1,7 +1,7 @@
-package com.ryx.credit.dao.order;
+package com.ryx.internet.dao;
 
-import com.ryx.credit.pojo.admin.order.OInternetCard;
-import com.ryx.credit.pojo.admin.order.OInternetCardExample;
+import com.ryx.internet.pojo.OInternetCard;
+import com.ryx.internet.pojo.OInternetCardExample;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -27,4 +27,14 @@ public interface OInternetCardMapper {
     int selectInternetCardExpireCount(@Param("map")Map<String,Object> map);
 
     int updateInternetCardExpire(@Param("map")Map<String,Object> map);
+
+    /**
+     * 查询要续费的数据
+     * @param map
+     * @return
+     */
+    List<OInternetCard> selectInternetCardRenew(@Param("map")Map<String,Object> map);
+
+
+    List<OInternetCard> queryInternetCardList(OInternetCardExample example);
 }

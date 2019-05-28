@@ -45,10 +45,10 @@ public enum InternetCardStatus {
      * @param value
      * @return
      */
-    public static String getContentByValue(String value){
+    public static String getContentByValue(BigDecimal value){
         InternetCardStatus[] status = InternetCardStatus.values();
         for(InternetCardStatus cc : status){
-            if(cc.code.equals(value)){
+            if(cc.code.compareTo(value)==0){
                 return cc.msg;
             }
         }
