@@ -536,6 +536,7 @@ public class InternetCardServiceImpl implements InternetCardService {
     /**
      * 定时任务，
      * 1. 检测是否续费为否，状态为正常的，当月的，更新是否续费为是
+     * 2. 处理未处理的导入记录
      */
     @Override
     public void taskDisposeInternetCard(){
