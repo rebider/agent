@@ -585,35 +585,11 @@ public class InternetCardServiceImpl implements InternetCardService {
 
     /**
      * 定时任务
-     * 1. 查询为空的商户信息更新
-     * 2. 更新已修改的商户信息（是续费，正常）
+     * 1. 更新已修改的商户信息（是续费，正常）
      */
     @Override
     public void taskUpdateMech(){
         try {
-            //1. 查询为空的商户信息更新
-            OInternetCardExample oInternetCardExample = new OInternetCardExample();
-            OInternetCardExample.Criteria criteria = oInternetCardExample.createCriteria();
-            criteria.andStatusEqualTo(Status.STATUS_1.status);
-            criteria.andMerIdIsNull();
-            criteria.andMerNameIsNull();
-            List<OInternetCard> internetCards = internetCardMapper.selectByExample(oInternetCardExample);
-            log.info("查询为空的商户信息数量为:{}",internetCards.size());
-            long t1 = System.currentTimeMillis();
-            for (OInternetCard internetCard : internetCards) {
-                OInternetCardMerch oInternetCardMerch = internetCardMerchMapper.selectChnTermposi(BigDataEncode.encode(internetCard.getIccidNum()));
-                if(null!=oInternetCardMerch){
-                    internetCard.setMerId(oInternetCardMerch.getChnMerchId());
-                    internetCard.setMerName(oInternetCardMerch.getMerchName());
-                    int i = internetCardMapper.updateByPrimaryKeySelective(internetCard);
-                    if(i!=1){
-                        log.error("为空定时任务更新商户信息失败:IccidNum:{},商户编号:{},商户名称:{}",internetCard.getIccidNum(),oInternetCardMerch.getChnMerchId(),oInternetCardMerch.getMerchName());
-                    }
-                }
-            }
-            long t2 = System.currentTimeMillis();
-            log.info("为空定时任务更新商户信息，处理时间:{} ms", (t2 - t1));
-
             //2. 更新已修改的商户信息（是续费，正常）
             Map<String,Object> reqMap = new HashMap<>();
             reqMap.put("renew",Status.STATUS_0.status);//否
@@ -652,6 +628,43 @@ public class InternetCardServiceImpl implements InternetCardService {
     }
 
 
-
+    /**
+     * 1. 查询为空的商户信息更新
+     */
+    @Override
+    public void taskUpdateMechIsNull(){
+        threadPoolTaskExecutor.execute(new Runnable() {
+           @Override
+           public void run() {
+               try {
+                    log.info("查询为空的商户信息开始");
+                    OInternetCardExample oInternetCardExample = new OInternetCardExample();
+                    OInternetCardExample.Criteria criteria = oInternetCardExample.createCriteria();
+                    criteria.andStatusEqualTo(Status.STATUS_1.status);
+                    criteria.andMerIdIsNull();
+                    criteria.andMerNameIsNull();
+                    oInternetCardExample.setPage(new Page(0,200000));
+                    List<OInternetCard> internetCards = internetCardMapper.selectByExample(oInternetCardExample);
+                    log.info("查询为空的商户信息数量为:{}",internetCards.size());
+                    long t1 = System.currentTimeMillis();
+                    for (OInternetCard internetCard : internetCards) {
+                        OInternetCardMerch oInternetCardMerch = internetCardMerchMapper.selectChnTermposi(BigDataEncode.encode(internetCard.getIccidNum()));
+                        if(null!=oInternetCardMerch){
+                            internetCard.setMerId(oInternetCardMerch.getChnMerchId());
+                            internetCard.setMerName(oInternetCardMerch.getMerchName());
+                            int i = internetCardMapper.updateByPrimaryKeySelective(internetCard);
+                            if(i!=1){
+                                log.error("为空定时任务更新商户信息失败:IccidNum:{},商户编号:{},商户名称:{}",internetCard.getIccidNum(),oInternetCardMerch.getChnMerchId(),oInternetCardMerch.getMerchName());
+                            }
+                        }
+                    }
+                    long t2 = System.currentTimeMillis();
+                    log.info("为空定时任务更新商户信息，处理时间:{} ms", (t2 - t1));
+               } catch (Exception e) {
+                   e.printStackTrace();
+               }
+           }
+        });
+    }
 
 }
