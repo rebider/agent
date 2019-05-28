@@ -31,4 +31,9 @@ public interface InternetCardService {
 
     Integer queryInternetCardCount(OInternetCard internetCard);
 
+    void taskUpdateMechIsNull();
+
+    List<OInternetCard> fetchDataMechIsNull();
+
+    void processDataUpdateMechIsNull(OInternetCard internetCard);
 }
