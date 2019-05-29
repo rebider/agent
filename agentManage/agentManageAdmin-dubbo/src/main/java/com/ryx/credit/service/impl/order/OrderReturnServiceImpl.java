@@ -110,6 +110,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     @Autowired
     private OOrderMapper oOrderMapper;
     @Autowired
+    private PlatFormMapper platFormMapper;
+    @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
     @Autowired
     private ImsTermAdjustDetailService imsTermAdjustDetailService;
@@ -1749,13 +1751,13 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         log.info("导入物流数据,流量卡不进行下发操作，活动代码{}={}==========================================={}" ,oActivity.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
                         return AgentResult.ok("流量卡不进行下发操作");
                     }
-
+                    OOrder oOrder = oOrderMapper.selectByPrimaryKey(orderId);
+                    PlatForm platForm =platFormMapper.selectByPlatFormNum(oOrder.getOrderPlatform());
                     //===============================================================================
                     //进行机具调整操作
-                    if (!proType.equals(PlatformType.MPOS.msg) && !proType.equals(PlatformType.MPOS.code)){
+                    if (PlatformType.whetherPOS(platForm.getPlatformType())){
                         log.info("======pos发货 更新库存记录:{}:{}",proType,stringList);
                         List<OLogisticsDetail> snList = (List<OLogisticsDetail>)resultVO.getObj();
-                        OOrder oOrder = oOrderMapper.selectByPrimaryKey(orderId);
                         if(null==oOrder){
                             throw new MessageException("查询订单数据失败！");
                         }
@@ -1794,7 +1796,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         }
                         //===============================================================================
                         //cxinfo 机具退货调整首刷接口调用
-                    }else{
+                    }else if (PlatformType.MPOS.code.equals(platForm.getPlatformType())){
                         log.info("======首刷发货 更新库存记录:{}:{}",proType,stringList);
                         //起始sn
                         OLogisticsDetailExample exampleOLogisticsDetailExamplestart = new OLogisticsDetailExample();
