@@ -1,5 +1,6 @@
 package com.ryx.credit.service.agent;
 
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.ResultVO;
@@ -69,7 +70,7 @@ public interface AgentEnterService {
      * @param userId
      * @return
      */
-    public ResultVO updateAgentVo(AgentVo agent,String userId,Boolean isPass)throws Exception;
+    public ResultVO updateAgentVo(AgentVo agent,String userId,Boolean isPass)throws MessageException;
 
 
     public Map startPar(String cuserId);
