@@ -115,4 +115,12 @@
       on v.agent_id = a.id
       where v.activity_id = #{activityId}
   </select>
+
+  <select id="selectConfiguredReturnAgentId" parameterType="java.lang.String" resultType="java.lang.String">
+      select
+      agent_id
+      from O_ACTIVITY_VISIBLE
+      where activity_id = #{activityId}
+  </select>
+
 </mapper>

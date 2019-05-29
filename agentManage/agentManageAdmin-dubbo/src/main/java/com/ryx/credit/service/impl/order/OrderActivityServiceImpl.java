@@ -295,6 +295,16 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             oActivity.setPrice(new BigDecimal(stringObjectMap.get("PRICE") + ""));
             oActivity.setActCode(stringObjectMap.get("ACT_CODE") + "");
             oActivity.setOriginalPrice(new BigDecimal(stringObjectMap.get("ORIGINALPRICE") + ""));
+            OActivity activity = activityMapper.selectByPrimaryKey(oActivity.getId());
+            if(StringUtils.isBlank(activity.getVisible())){
+                continue;
+            }
+            if(activity.getVisible().equals(VisibleStatus.TWO.getValue())){
+                List<String> agentIdList = activityVisibleMapper.selectConfiguredReturnAgentId(oActivity.getId());
+                if(!agentIdList.contains(angetId)){
+                    continue;
+                }
+            }
             activitys.add(oActivity);
         }
 
@@ -321,6 +331,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
 //        }
         return activitys;
     }
+
 
     @Override
     public Map selectTermMachine(String platformNum) throws MessageException {

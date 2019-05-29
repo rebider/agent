@@ -19,4 +19,6 @@ public interface OActivityVisibleMapper {
     List<OActivityVisible> selectByExample(OActivityVisibleExample example);
 
     List<Map<String,String>> selectConfigured(String activityId);
+
+    List<String> selectConfiguredReturnAgentId(String activityId);
 }
