@@ -746,7 +746,7 @@
       where aa.platform = bb.BUS_PLATFORM and aa.agentid  = bb.AGENT_ID) cc left join A_AGENT_BUSINFO dd on cc.BUS_PARENT = dd.ID) ee
       left join A_AGENT ff on ee.AGENT_ID = ff.ID) gg left join A_AGENT hh on gg.GUARANTEE_AGENT= hh.ID
 
-      where  gg.sum_status = '1'
+      where  gg.sum_status = 'Deduction_for'
       <if test=" time!= null and time != '' ">
           and gg.sum_mouth &lt;= #{time}
       </if>
