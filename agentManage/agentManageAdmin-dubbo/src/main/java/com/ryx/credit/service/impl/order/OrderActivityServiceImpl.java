@@ -65,13 +65,16 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         OActivityExample example = new OActivityExample();
         OActivityExample.Criteria criteria = example.createCriteria();
         if (StringUtils.isNotBlank(activity.getActivityName())) {
-            criteria.andActivityNameEqualTo(activity.getActivityName());
+            criteria.andActivityNameLike("%"+activity.getActivityName()+"%");
         }
         if (StringUtils.isNotBlank(activity.getPlatform())) {
             criteria.andPlatformEqualTo(activity.getPlatform());
         }
+        if (StringUtils.isNotBlank(activity.getActCode())) {
+            criteria.andActCodeEqualTo(activity.getActCode());
+        }
         criteria.andStatusEqualTo(Status.STATUS_1.status);
-        example.setOrderByClause(" ACT_CODE desc");
+        example.setOrderByClause(" ACT_CODE,c_time desc");
         example.setPage(page);
         List<OActivity> activitys = activityMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
