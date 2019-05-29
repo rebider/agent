@@ -28,7 +28,7 @@ public interface BusinessPlatformService {
     PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,Long userId);
     PageInfo queryBusinessPlatformListManager(AgentBusInfo agentBusInfo, Agent agent, Page page,Long userId);
 
-    AgentResult verifyAgent(String agUniqNum);
+    AgentResult verifyAgent(String agUniqNum,List<String> agStatusList);
 
     AgentBusInfo findById(String id);
 

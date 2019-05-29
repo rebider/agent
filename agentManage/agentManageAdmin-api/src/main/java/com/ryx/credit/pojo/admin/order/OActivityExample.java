@@ -2397,6 +2397,76 @@ public class OActivityExample {
             addCriterion("BACK_TYPE not between", value1, value2, "backType");
             return (Criteria) this;
         }
+
+        public Criteria andVisibleIsNull() {
+            addCriterion("VISIBLE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleIsNotNull() {
+            addCriterion("VISIBLE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleEqualTo(String value) {
+            addCriterion("VISIBLE =", value, "visible");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleNotEqualTo(String value) {
+            addCriterion("VISIBLE <>", value, "visible");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleGreaterThan(String value) {
+            addCriterion("VISIBLE >", value, "visible");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleGreaterThanOrEqualTo(String value) {
+            addCriterion("VISIBLE >=", value, "visible");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleLessThan(String value) {
+            addCriterion("VISIBLE <", value, "visible");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleLessThanOrEqualTo(String value) {
+            addCriterion("VISIBLE <=", value, "visible");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleLike(String value) {
+            addCriterion("VISIBLE like", value, "visible");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleNotLike(String value) {
+            addCriterion("VISIBLE not like", value, "visible");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleIn(List<String> values) {
+            addCriterion("VISIBLE in", values, "visible");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleNotIn(List<String> values) {
+            addCriterion("VISIBLE not in", values, "visible");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleBetween(String value1, String value2) {
+            addCriterion("VISIBLE between", value1, value2, "visible");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleNotBetween(String value1, String value2) {
+            addCriterion("VISIBLE not between", value1, value2, "visible");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
