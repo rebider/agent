@@ -71,7 +71,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             criteria.andPlatformEqualTo(activity.getPlatform());
         }
         criteria.andStatusEqualTo(Status.STATUS_1.status);
-        example.setOrderByClause(" ACT_CODE desc");
+        example.setOrderByClause(" ACT_CODE,c_time desc");
         example.setPage(page);
         List<OActivity> activitys = activityMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
