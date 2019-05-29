@@ -77,6 +77,16 @@ public class OActivity implements Serializable{
 
     private String backType;
 
+    private String visible;
+
+    public String getVisible() {
+        return visible;
+    }
+
+    public void setVisible(String visible) {
+        this.visible = visible;
+    }
+
     public BigDecimal getStandAmt() {
         return standAmt;
     }
