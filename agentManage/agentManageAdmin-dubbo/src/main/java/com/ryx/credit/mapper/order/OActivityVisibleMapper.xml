@@ -107,4 +107,12 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="selectConfigured" parameterType="java.lang.String" resultType="map">
+      select
+          v.activity_id,v.agent_id,a.ag_name
+      from O_ACTIVITY_VISIBLE v left join a_agent a
+      on v.agent_id = a.id
+      where v.activity_id = #{activityId}
+  </select>
 </mapper>

@@ -45,4 +45,6 @@ public interface OrderActivityService {
     AgentResult querySnInfoFromBusSystem(String snStart,String snEnd,String count,String proModel)throws MessageException;
 
     void saveActivityVisible(String activityId,String visible,String[] agentIds,String userId)throws MessageException;
+
+    List<Map<String,String>> selectConfigured(String activityId);
 }
