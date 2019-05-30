@@ -112,6 +112,12 @@ public class OPayment implements Serializable{
 
     private String nuclearUser;
 
+    private String extendscode;
+
+    private String profitForm;
+
+    private String profitMouth;
+
     public String getId() {
         return id;
     }
@@ -374,5 +380,29 @@ public class OPayment implements Serializable{
 
     public void setNuclearUser(String nuclearUser) {
         this.nuclearUser = nuclearUser == null ? null : nuclearUser.trim();
+    }
+
+    public String getExtendscode() {
+        return extendscode;
+    }
+
+    public void setExtendscode(String extendscode) {
+        this.extendscode = extendscode == null ? null : extendscode.trim();
+    }
+
+    public String getProfitForm() {
+        return profitForm;
+    }
+
+    public void setProfitForm(String profitForm) {
+        this.profitForm = profitForm == null ? null : profitForm.trim();
+    }
+
+    public String getProfitMouth() {
+        return profitMouth;
+    }
+
+    public void setProfitMouth(String profitMouth) {
+        this.profitMouth = profitMouth == null ? null : profitMouth.trim();
     }
 }

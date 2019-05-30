@@ -103,6 +103,8 @@ public class OrderServiceImpl implements OrderService {
     private CapitalService capitalService;
     @Autowired
     private IResourceService iResourceService;
+    @Autowired
+    private PlatFormMapper platFormMapper;
 
     /**
      * 根据ID查询订单
@@ -1153,6 +1155,9 @@ public class OrderServiceImpl implements OrderService {
         Agent agent = agentMapper.selectByPrimaryKey(order.getAgentId());
         f.putKeyV("agent", agent);
 
+        String orderPlatform = order.getOrderPlatform();
+        PlatForm platForm = platFormMapper.selectByPlatFormNum(orderPlatform);
+        f.putKeyV("platForm", platForm);
         //商品信息
         OSubOrderExample osubOrderExample = new OSubOrderExample();
         osubOrderExample.or().andOrderIdEqualTo(order.getId()).andStatusEqualTo(Status.STATUS_1.status);
@@ -1196,6 +1201,10 @@ public class OrderServiceImpl implements OrderService {
         OPayment oPayment = oPaymentList.get(0);
         f.putKeyV("oPayment", oPayment);
 
+        //瑞大宝分润类型
+        if(StringUtils.isNotBlank(oPayment.getProfitForm())){
+            f.putKeyV("oPayment_ProfitForm", oPayment.getProfitForm().split(","));
+        }
         //实付打款分条明细
         List<OCashReceivables> listoCashReceivables = oCashReceivablesService.query(null,oPayment.getAgentId(),CashPayType.PAYMENT,oPayment.getId(),Arrays.asList(AgStatus.Create.status,AgStatus.Approving.status,AgStatus.Approved.status));
         f.putKeyV("oCashReceivables", listoCashReceivables);

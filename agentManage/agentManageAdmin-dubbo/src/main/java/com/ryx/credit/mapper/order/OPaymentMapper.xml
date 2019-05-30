@@ -35,6 +35,9 @@
     <result column="SETTLEMENT_PRICE_STR" jdbcType="VARCHAR" property="settlementPriceStr" />
     <result column="NUCLEAR_TIME" jdbcType="TIMESTAMP" property="nuclearTime" />
     <result column="NUCLEAR_USER" jdbcType="VARCHAR" property="nuclearUser" />
+    <result column="EXTENDSCODE" jdbcType="VARCHAR" property="extendscode" />
+    <result column="PROFIT_FORM" jdbcType="VARCHAR" property="profitForm" />
+    <result column="PROFIT_MOUTH" jdbcType="VARCHAR" property="profitMouth" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -70,7 +73,8 @@
     PAY_COMPLET_TIME, PAY_STATUS, PLAN_SUC_TIME, PAY_RULE, GUARANTEE_AGENT, SETTLEMENT_PRICE,
     SHARE_TEMPLET, IS_CLO_INVOICE, DEDUCTION_TYPE, DEDUCTION_AMOUNT, DOWN_PAYMENT, DOWN_PAYMENT_COUNT,
     DOWN_PAYMENT_DATE, COLLECT_COMPANY, REMARK, STATUS, VERSION, ACTUAL_RECEIPT, ACTUAL_RECEIPT_DATE,
-    PROFIT_TAX_AMT, DOWN_PAYMENT_USER, SETTLEMENT_PRICE_STR, NUCLEAR_TIME, NUCLEAR_USER
+    PROFIT_TAX_AMT, DOWN_PAYMENT_USER, SETTLEMENT_PRICE_STR, NUCLEAR_TIME, NUCLEAR_USER,
+    EXTENDSCODE, PROFIT_FORM, PROFIT_MOUTH
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OPaymentExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -102,27 +106,31 @@
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OPayment">
     insert into O_PAYMENT (ID, USER_ID, ORDER_ID,
-      AGENT_ID, PAY_METHOD, C_TIME,
-      PAY_AMOUNT, REAL_AMOUNT, OUTSTANDING_AMOUNT,
-      PAY_COMPLET_TIME, PAY_STATUS, PLAN_SUC_TIME,
-      PAY_RULE, GUARANTEE_AGENT, SETTLEMENT_PRICE,
-      SHARE_TEMPLET, IS_CLO_INVOICE, DEDUCTION_TYPE,
-      DEDUCTION_AMOUNT, DOWN_PAYMENT, DOWN_PAYMENT_COUNT,
-      DOWN_PAYMENT_DATE, COLLECT_COMPANY, REMARK,
-      STATUS, VERSION, ACTUAL_RECEIPT,
-      ACTUAL_RECEIPT_DATE, PROFIT_TAX_AMT, DOWN_PAYMENT_USER,
-      SETTLEMENT_PRICE_STR)
+    AGENT_ID, PAY_METHOD, C_TIME,
+    PAY_AMOUNT, REAL_AMOUNT, OUTSTANDING_AMOUNT,
+    PAY_COMPLET_TIME, PAY_STATUS, PLAN_SUC_TIME,
+    PAY_RULE, GUARANTEE_AGENT, SETTLEMENT_PRICE,
+    SHARE_TEMPLET, IS_CLO_INVOICE, DEDUCTION_TYPE,
+    DEDUCTION_AMOUNT, DOWN_PAYMENT, DOWN_PAYMENT_COUNT,
+    DOWN_PAYMENT_DATE, COLLECT_COMPANY, REMARK,
+    STATUS, VERSION, ACTUAL_RECEIPT,
+    ACTUAL_RECEIPT_DATE, PROFIT_TAX_AMT, DOWN_PAYMENT_USER,
+    SETTLEMENT_PRICE_STR, NUCLEAR_TIME, NUCLEAR_USER,
+    EXTENDSCODE, PROFIT_FORM, PROFIT_MOUTH
+    )
     values (#{id,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR},
-      #{agentId,jdbcType=VARCHAR}, #{payMethod,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP},
-      #{payAmount,jdbcType=DECIMAL}, #{realAmount,jdbcType=DECIMAL}, #{outstandingAmount,jdbcType=DECIMAL},
-      #{payCompletTime,jdbcType=TIMESTAMP}, #{payStatus,jdbcType=DECIMAL}, #{planSucTime,jdbcType=TIMESTAMP},
-      #{payRule,jdbcType=VARCHAR}, #{guaranteeAgent,jdbcType=VARCHAR}, #{settlementPrice,jdbcType=DECIMAL},
-      #{shareTemplet,jdbcType=VARCHAR}, #{isCloInvoice,jdbcType=DECIMAL}, #{deductionType,jdbcType=VARCHAR},
-      #{deductionAmount,jdbcType=DECIMAL}, #{downPayment,jdbcType=DECIMAL}, #{downPaymentCount,jdbcType=DECIMAL},
-      #{downPaymentDate,jdbcType=TIMESTAMP}, #{collectCompany,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR},
-      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{actualReceipt,jdbcType=DECIMAL},
-      #{actualReceiptDate,jdbcType=TIMESTAMP}, #{profitTaxAmt,jdbcType=DECIMAL}, #{downPaymentUser,jdbcType=VARCHAR},
-      #{settlementPriceStr,jdbcType=VARCHAR})
+    #{agentId,jdbcType=VARCHAR}, #{payMethod,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP},
+    #{payAmount,jdbcType=DECIMAL}, #{realAmount,jdbcType=DECIMAL}, #{outstandingAmount,jdbcType=DECIMAL},
+    #{payCompletTime,jdbcType=TIMESTAMP}, #{payStatus,jdbcType=DECIMAL}, #{planSucTime,jdbcType=TIMESTAMP},
+    #{payRule,jdbcType=VARCHAR}, #{guaranteeAgent,jdbcType=VARCHAR}, #{settlementPrice,jdbcType=DECIMAL},
+    #{shareTemplet,jdbcType=VARCHAR}, #{isCloInvoice,jdbcType=DECIMAL}, #{deductionType,jdbcType=VARCHAR},
+    #{deductionAmount,jdbcType=DECIMAL}, #{downPayment,jdbcType=DECIMAL}, #{downPaymentCount,jdbcType=DECIMAL},
+    #{downPaymentDate,jdbcType=TIMESTAMP}, #{collectCompany,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR},
+    #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{actualReceipt,jdbcType=DECIMAL},
+    #{actualReceiptDate,jdbcType=TIMESTAMP}, #{profitTaxAmt,jdbcType=DECIMAL}, #{downPaymentUser,jdbcType=VARCHAR},
+    #{settlementPriceStr,jdbcType=VARCHAR}, #{nuclearTime,jdbcType=TIMESTAMP}, #{nuclearUser,jdbcType=VARCHAR},
+    #{extendscode,jdbcType=VARCHAR}, #{profitForm,jdbcType=VARCHAR}, #{profitMouth,jdbcType=VARCHAR}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OPayment">
     insert into O_PAYMENT
@@ -226,6 +234,15 @@
       <if test="nuclearUser != null">
         NUCLEAR_USER,
       </if>
+      <if test="extendscode != null">
+        EXTENDSCODE,
+      </if>
+      <if test="profitForm != null">
+        PROFIT_FORM,
+      </if>
+      <if test="profitMouth != null">
+        PROFIT_MOUTH,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -326,6 +343,15 @@
       </if>
       <if test="nuclearUser != null">
         #{nuclearUser,jdbcType=VARCHAR},
+      </if>
+      <if test="extendscode != null">
+        #{extendscode,jdbcType=VARCHAR},
+      </if>
+      <if test="profitForm != null">
+        #{profitForm,jdbcType=VARCHAR},
+      </if>
+      <if test="profitMouth != null">
+        #{profitMouth,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -434,43 +460,55 @@
       <if test="nuclearUser != null">
         NUCLEAR_USER = #{nuclearUser,jdbcType=VARCHAR},
       </if>
+      <if test="extendscode != null">
+        EXTENDSCODE = #{extendscode,jdbcType=VARCHAR},
+      </if>
+      <if test="profitForm != null">
+        PROFIT_FORM = #{profitForm,jdbcType=VARCHAR},
+      </if>
+      <if test="profitMouth != null">
+        PROFIT_MOUTH = #{profitMouth,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OPayment">
     update O_PAYMENT
     set USER_ID = #{userId,jdbcType=VARCHAR},
-      ORDER_ID = #{orderId,jdbcType=VARCHAR},
-      AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      PAY_METHOD = #{payMethod,jdbcType=VARCHAR},
-      C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      PAY_AMOUNT = #{payAmount,jdbcType=DECIMAL},
-      REAL_AMOUNT = #{realAmount,jdbcType=DECIMAL},
-      OUTSTANDING_AMOUNT = #{outstandingAmount,jdbcType=DECIMAL},
-      PAY_COMPLET_TIME = #{payCompletTime,jdbcType=TIMESTAMP},
-      PAY_STATUS = #{payStatus,jdbcType=DECIMAL},
-      PLAN_SUC_TIME = #{planSucTime,jdbcType=TIMESTAMP},
-      PAY_RULE = #{payRule,jdbcType=VARCHAR},
-      GUARANTEE_AGENT = #{guaranteeAgent,jdbcType=VARCHAR},
-      SETTLEMENT_PRICE = #{settlementPrice,jdbcType=DECIMAL},
-      SHARE_TEMPLET = #{shareTemplet,jdbcType=VARCHAR},
-      IS_CLO_INVOICE = #{isCloInvoice,jdbcType=DECIMAL},
-      DEDUCTION_TYPE = #{deductionType,jdbcType=VARCHAR},
-      DEDUCTION_AMOUNT = #{deductionAmount,jdbcType=DECIMAL},
-      DOWN_PAYMENT = #{downPayment,jdbcType=DECIMAL},
-      DOWN_PAYMENT_COUNT = #{downPaymentCount,jdbcType=DECIMAL},
-      DOWN_PAYMENT_DATE = #{downPaymentDate,jdbcType=TIMESTAMP},
-      COLLECT_COMPANY = #{collectCompany,jdbcType=VARCHAR},
-      REMARK = #{remark,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL},
-      ACTUAL_RECEIPT = #{actualReceipt,jdbcType=DECIMAL},
-      ACTUAL_RECEIPT_DATE = #{actualReceiptDate,jdbcType=TIMESTAMP},
-      PROFIT_TAX_AMT = #{profitTaxAmt,jdbcType=DECIMAL},
-      DOWN_PAYMENT_USER = #{downPaymentUser,jdbcType=VARCHAR},
-      SETTLEMENT_PRICE_STR = #{settlementPriceStr,jdbcType=VARCHAR},
-      NUCLEAR_TIME = #{nuclearTime,jdbcType=TIMESTAMP},
-      NUCLEAR_USER = #{nuclearUser,jdbcType=VARCHAR}
+    ORDER_ID = #{orderId,jdbcType=VARCHAR},
+    AGENT_ID = #{agentId,jdbcType=VARCHAR},
+    PAY_METHOD = #{payMethod,jdbcType=VARCHAR},
+    C_TIME = #{cTime,jdbcType=TIMESTAMP},
+    PAY_AMOUNT = #{payAmount,jdbcType=DECIMAL},
+    REAL_AMOUNT = #{realAmount,jdbcType=DECIMAL},
+    OUTSTANDING_AMOUNT = #{outstandingAmount,jdbcType=DECIMAL},
+    PAY_COMPLET_TIME = #{payCompletTime,jdbcType=TIMESTAMP},
+    PAY_STATUS = #{payStatus,jdbcType=DECIMAL},
+    PLAN_SUC_TIME = #{planSucTime,jdbcType=TIMESTAMP},
+    PAY_RULE = #{payRule,jdbcType=VARCHAR},
+    GUARANTEE_AGENT = #{guaranteeAgent,jdbcType=VARCHAR},
+    SETTLEMENT_PRICE = #{settlementPrice,jdbcType=DECIMAL},
+    SHARE_TEMPLET = #{shareTemplet,jdbcType=VARCHAR},
+    IS_CLO_INVOICE = #{isCloInvoice,jdbcType=DECIMAL},
+    DEDUCTION_TYPE = #{deductionType,jdbcType=VARCHAR},
+    DEDUCTION_AMOUNT = #{deductionAmount,jdbcType=DECIMAL},
+    DOWN_PAYMENT = #{downPayment,jdbcType=DECIMAL},
+    DOWN_PAYMENT_COUNT = #{downPaymentCount,jdbcType=DECIMAL},
+    DOWN_PAYMENT_DATE = #{downPaymentDate,jdbcType=TIMESTAMP},
+    COLLECT_COMPANY = #{collectCompany,jdbcType=VARCHAR},
+    REMARK = #{remark,jdbcType=VARCHAR},
+    STATUS = #{status,jdbcType=DECIMAL},
+    VERSION = #{version,jdbcType=DECIMAL},
+    ACTUAL_RECEIPT = #{actualReceipt,jdbcType=DECIMAL},
+    ACTUAL_RECEIPT_DATE = #{actualReceiptDate,jdbcType=TIMESTAMP},
+    PROFIT_TAX_AMT = #{profitTaxAmt,jdbcType=DECIMAL},
+    DOWN_PAYMENT_USER = #{downPaymentUser,jdbcType=VARCHAR},
+    SETTLEMENT_PRICE_STR = #{settlementPriceStr,jdbcType=VARCHAR},
+    NUCLEAR_TIME = #{nuclearTime,jdbcType=TIMESTAMP},
+    NUCLEAR_USER = #{nuclearUser,jdbcType=VARCHAR},
+    EXTENDSCODE = #{extendscode,jdbcType=VARCHAR},
+    PROFIT_FORM = #{profitForm,jdbcType=VARCHAR},
+    PROFIT_MOUTH = #{profitMouth,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

@@ -437,7 +437,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             capital.setCloReviewStatus(AgStatus.Approving.status);
             if (1 != accountPaidItemService.update(capital)) {
                 logger.info("代理商审批，合同状态更新失败{}:{}", abus.getAgentId(), cuser);
-                throw new ProcessException("合同状态更新失败");
+                throw new ProcessException("缴款状态更新失败");
             }
         }
 
@@ -779,7 +779,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     AgentResult capitalFq = accountPaidItemService.capitalFq(capital);
                     if (!capitalFq.isOK()) {
                         logger.info("代理商审批，保证金{}:{}", processingId, capital.getId());
-                        throw new ProcessException("合同状态更新失败");
+                        throw new ProcessException("生成保证金等分期数据更新失败");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

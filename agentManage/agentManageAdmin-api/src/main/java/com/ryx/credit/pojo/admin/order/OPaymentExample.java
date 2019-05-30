@@ -2257,6 +2257,216 @@ public class OPaymentExample {
             addCriterion("NUCLEAR_USER not between", value1, value2, "nuclearUser");
             return (Criteria) this;
         }
+
+        public Criteria andExtendscodeIsNull() {
+            addCriterion("EXTENDSCODE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andExtendscodeIsNotNull() {
+            addCriterion("EXTENDSCODE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andExtendscodeEqualTo(String value) {
+            addCriterion("EXTENDSCODE =", value, "extendscode");
+            return (Criteria) this;
+        }
+
+        public Criteria andExtendscodeNotEqualTo(String value) {
+            addCriterion("EXTENDSCODE <>", value, "extendscode");
+            return (Criteria) this;
+        }
+
+        public Criteria andExtendscodeGreaterThan(String value) {
+            addCriterion("EXTENDSCODE >", value, "extendscode");
+            return (Criteria) this;
+        }
+
+        public Criteria andExtendscodeGreaterThanOrEqualTo(String value) {
+            addCriterion("EXTENDSCODE >=", value, "extendscode");
+            return (Criteria) this;
+        }
+
+        public Criteria andExtendscodeLessThan(String value) {
+            addCriterion("EXTENDSCODE <", value, "extendscode");
+            return (Criteria) this;
+        }
+
+        public Criteria andExtendscodeLessThanOrEqualTo(String value) {
+            addCriterion("EXTENDSCODE <=", value, "extendscode");
+            return (Criteria) this;
+        }
+
+        public Criteria andExtendscodeLike(String value) {
+            addCriterion("EXTENDSCODE like", value, "extendscode");
+            return (Criteria) this;
+        }
+
+        public Criteria andExtendscodeNotLike(String value) {
+            addCriterion("EXTENDSCODE not like", value, "extendscode");
+            return (Criteria) this;
+        }
+
+        public Criteria andExtendscodeIn(List<String> values) {
+            addCriterion("EXTENDSCODE in", values, "extendscode");
+            return (Criteria) this;
+        }
+
+        public Criteria andExtendscodeNotIn(List<String> values) {
+            addCriterion("EXTENDSCODE not in", values, "extendscode");
+            return (Criteria) this;
+        }
+
+        public Criteria andExtendscodeBetween(String value1, String value2) {
+            addCriterion("EXTENDSCODE between", value1, value2, "extendscode");
+            return (Criteria) this;
+        }
+
+        public Criteria andExtendscodeNotBetween(String value1, String value2) {
+            addCriterion("EXTENDSCODE not between", value1, value2, "extendscode");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFormIsNull() {
+            addCriterion("PROFIT_FORM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFormIsNotNull() {
+            addCriterion("PROFIT_FORM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFormEqualTo(String value) {
+            addCriterion("PROFIT_FORM =", value, "profitForm");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFormNotEqualTo(String value) {
+            addCriterion("PROFIT_FORM <>", value, "profitForm");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFormGreaterThan(String value) {
+            addCriterion("PROFIT_FORM >", value, "profitForm");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFormGreaterThanOrEqualTo(String value) {
+            addCriterion("PROFIT_FORM >=", value, "profitForm");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFormLessThan(String value) {
+            addCriterion("PROFIT_FORM <", value, "profitForm");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFormLessThanOrEqualTo(String value) {
+            addCriterion("PROFIT_FORM <=", value, "profitForm");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFormLike(String value) {
+            addCriterion("PROFIT_FORM like", value, "profitForm");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFormNotLike(String value) {
+            addCriterion("PROFIT_FORM not like", value, "profitForm");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFormIn(List<String> values) {
+            addCriterion("PROFIT_FORM in", values, "profitForm");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFormNotIn(List<String> values) {
+            addCriterion("PROFIT_FORM not in", values, "profitForm");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFormBetween(String value1, String value2) {
+            addCriterion("PROFIT_FORM between", value1, value2, "profitForm");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFormNotBetween(String value1, String value2) {
+            addCriterion("PROFIT_FORM not between", value1, value2, "profitForm");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMouthIsNull() {
+            addCriterion("PROFIT_MOUTH is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMouthIsNotNull() {
+            addCriterion("PROFIT_MOUTH is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMouthEqualTo(String value) {
+            addCriterion("PROFIT_MOUTH =", value, "profitMouth");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMouthNotEqualTo(String value) {
+            addCriterion("PROFIT_MOUTH <>", value, "profitMouth");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMouthGreaterThan(String value) {
+            addCriterion("PROFIT_MOUTH >", value, "profitMouth");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMouthGreaterThanOrEqualTo(String value) {
+            addCriterion("PROFIT_MOUTH >=", value, "profitMouth");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMouthLessThan(String value) {
+            addCriterion("PROFIT_MOUTH <", value, "profitMouth");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMouthLessThanOrEqualTo(String value) {
+            addCriterion("PROFIT_MOUTH <=", value, "profitMouth");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMouthLike(String value) {
+            addCriterion("PROFIT_MOUTH like", value, "profitMouth");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMouthNotLike(String value) {
+            addCriterion("PROFIT_MOUTH not like", value, "profitMouth");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMouthIn(List<String> values) {
+            addCriterion("PROFIT_MOUTH in", values, "profitMouth");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMouthNotIn(List<String> values) {
+            addCriterion("PROFIT_MOUTH not in", values, "profitMouth");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMouthBetween(String value1, String value2) {
+            addCriterion("PROFIT_MOUTH between", value1, value2, "profitMouth");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMouthNotBetween(String value1, String value2) {
+            addCriterion("PROFIT_MOUTH not between", value1, value2, "profitMouth");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
