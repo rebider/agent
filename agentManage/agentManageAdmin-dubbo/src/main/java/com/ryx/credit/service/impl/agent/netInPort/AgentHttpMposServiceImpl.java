@@ -140,12 +140,12 @@ public class AgentHttpMposServiceImpl implements AgentNetInHttpService {
             }else{
                 AppConfig.sendEmails(httpResult, "入网通知手刷失败报警");
                 log.info("http请求超时返回错误:{}",httpResult);
-                throw new Exception("http返回有误");
+                throw new Exception(httpResult);
             }
         } catch (Exception e) {
             AppConfig.sendEmails("通知手刷请求超时："+ MailUtil.printStackTrace(e), "入网通知手刷失败报警");
-            log.info("http请求超时:{}",e.getMessage());
-            throw new Exception("http请求超时");
+            log.info("http请求超时:{}",e.getLocalizedMessage());
+            throw new Exception("http请求超时"+e.getLocalizedMessage());
         }
     }
 

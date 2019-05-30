@@ -1,16 +1,23 @@
 package com.ryx.credit.service.impl.agent.netInPort;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.BusType;
 import com.ryx.credit.common.enumc.OrgType;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.common.util.MailUtil;
+import com.ryx.credit.dao.agent.AgentBusInfoMapper;
+import com.ryx.credit.pojo.admin.agent.Agent;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
+import com.ryx.credit.pojo.admin.agent.AgentColinfo;
+import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInHttpService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -28,9 +35,43 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
 
     private static Logger log = LoggerFactory.getLogger(AgentNetInNotityServiceImpl.class);
 
+    private static final String rdbReqUrl = AppConfig.getProperty("rdb_req_url");
+    @Autowired
+    private AgentColinfoService agentColinfoService;
+    @Autowired
+    private AgentBusInfoMapper agentBusInfoMapper;
+
     @Override
     public Map<String, Object> packageParam(Map<String, Object> param) {
-        return null;
+        Map<String, Object> resultMap = new HashMap<>();
+        AgentBusInfo agentBusInfo = (AgentBusInfo)param.get("agentBusInfo");
+        Agent agent = (Agent)param.get("agent");
+        AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());;
+
+        resultMap.put("mobileNo",agentBusInfo.getBusLoginNum());
+        resultMap.put("branchid",agentBusInfo.getBusPlatform());
+        resultMap.put("direct",direct(agentBusInfo.getBusType()));
+        resultMap.put("cardno",agentColinfo.getCloBankAccount());
+        resultMap.put("termCount",agentBusInfo.getTerminalsLower());
+        resultMap.put("bankbranchid",agentColinfo.getBranchLineNum());
+        resultMap.put("bankbranchname",agentColinfo.getCloBankBranch());
+        resultMap.put("customerPid",agent.getAgLegalCernum());
+        resultMap.put("address",agent.getAgRegAdd());
+        resultMap.put("companyNo",agent.getAgBusLic());
+        resultMap.put("userName",agent.getAgLegal());
+        resultMap.put("agencyName",agent.getAgName());
+        if(StringUtils.isNotBlank(agentBusInfo.getBusParent())){
+            //取出上级业务
+            AgentBusInfo agentParent = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
+            if(null!=agentParent){
+                resultMap.put("parentAgencyId",agentParent.getBusNum());
+            }else{
+                resultMap.put("parentAgencyId","");
+            }
+        }
+        resultMap.put("agCode",agent.getId());
+        resultMap.put("directLabel",directLabel(agentBusInfo.getBusType()));
+        return resultMap;
     }
 
     @Override
@@ -38,44 +79,68 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
 
         try {
             Map<String,Object> jsonParams = new HashMap<>();
-            jsonParams.put("mobileNo","");
-            jsonParams.put("organId","");
-            jsonParams.put("branchid","");
-            jsonParams.put("direct","");
-            jsonParams.put("cardno","");
-            jsonParams.put("termCount","");
-            jsonParams.put("bankbranchid","");
-            jsonParams.put("bankbranchname","");
-            jsonParams.put("customerPid","");
-            jsonParams.put("address","");
-            jsonParams.put("companyNo","");
-            jsonParams.put("userName","");
-            jsonParams.put("agencyName","");
-            jsonParams.put("parentAgencyId","");
-            jsonParams.put("agCode","");
-            jsonParams.put("directLabel","");
-
+            jsonParams.put("mobileNo",paramMap.get("mobileNo"));
+            jsonParams.put("branchid",paramMap.get("branchid"));
+            jsonParams.put("direct",paramMap.get("direct"));
+            jsonParams.put("cardno",paramMap.get("cardno"));
+            jsonParams.put("termCount",paramMap.get("termCount"));
+            jsonParams.put("bankbranchid",paramMap.get("bankbranchid"));
+            jsonParams.put("bankbranchname",paramMap.get("bankbranchname"));
+            jsonParams.put("customerPid",paramMap.get("customerPid"));
+            jsonParams.put("address",paramMap.get("address"));
+            jsonParams.put("companyNo",paramMap.get("companyNo"));
+            jsonParams.put("userName",paramMap.get("userName"));
+            jsonParams.put("agencyName",paramMap.get("agencyName"));
+            jsonParams.put("parentAgencyId",paramMap.get("parentAgencyId"));
+            jsonParams.put("agCode",paramMap.get("agCode"));
+            jsonParams.put("directLabel",paramMap.get("directLabel"));
             String json = JsonUtil.objectToJson(jsonParams);
-            log.info("通知手刷请求参数：{}",json);
-
+            log.info("通知瑞大宝入网请求参数：{}",json);
             //发送请求
-            String httpResult = HttpClientUtil.doPostJson("http://12.3.10.161:9093/agency/agencyNetIn", json);
-
-            log.info("通知手刷返回参数：{}",httpResult);
-            if (httpResult.contains("data") && httpResult.contains("orgId")){
-
-                return AgentResult.ok();
+            String httpResult = HttpClientUtil.doPostJson(rdbReqUrl+"agency/agencyNetIn", json);
+            JSONObject respXMLObj = JSONObject.parseObject(httpResult);
+            log.info("通知瑞大宝入网返回参数：{}",httpResult);
+            if (respXMLObj.getString("code").equals("0000")){
+                return AgentResult.ok(respXMLObj);
             }else{
-                AppConfig.sendEmails(httpResult, "入网通知手刷失败报警");
-                log.info("http请求超时返回错误:{}",httpResult);
-                throw new Exception("http返回有误");
+                AppConfig.sendEmails(httpResult, "入网通知瑞大宝失败报警");
+                throw new Exception(httpResult);
             }
         } catch (Exception e) {
-            AppConfig.sendEmails("通知手刷请求超时："+ MailUtil.printStackTrace(e), "入网通知手刷失败报警");
-            log.info("http请求超时:{}",e.getMessage());
-            throw new Exception("http请求超时");
+            AppConfig.sendEmails("通知手刷请求超时："+ MailUtil.printStackTrace(e), "入网通知瑞大宝失败报警");
+            log.info("http请求超时:{}",e.getLocalizedMessage());
+            throw new Exception("http请求超时:"+e.getLocalizedMessage());
         }
     }
+
+    /**
+     * direct 直签标识N String 二代直签--1，一代X--1，机构一代--1，其余--0
+     * @return
+     */
+    private String direct(String busType){
+        if(BusType.ZQZF.key.equals(busType) || BusType.YDX.key.equals(busType) || BusType.JGYD.key.equals(busType) )
+        return "1";
+        return "0";
+    }
+
+    /**
+     * 二代直签--1，一代X--2，机构一代--3  其余传空
+     * @param busType
+     * @return
+     */
+    private String directLabel(String busType){
+        if(BusType.ZQZF.key.equals(busType)){
+            return BusType.ZQZF.key;
+        }
+        if(BusType.YDX.key.equals(busType)){
+            return "2";
+        }
+        if(BusType.JGYD.key.equals(busType)){
+            return BusType.JGYD.key;
+        }
+        return "";
+    }
+
 
     @Override
     public Map agencyLevelUpdateChangeData(Map data) {
