@@ -114,10 +114,10 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             logger.info("商品原价格不能为空");
             throw new MessageException("商品原价格不能为空");
         }
-        if (activity.getBusProCode() == null) {
-            logger.info("BusProCode不能为空");
-            throw new MessageException("BusProCode不能为空");
-        }
+//        if (activity.getBusProCode() == null) {
+//            logger.info("BusProCode不能为空");
+//            throw new MessageException("BusProCode不能为空");
+//        }
         activity.setId(idService.genId(TabId.o_activity));
         Date nowDate = new Date();
         activity.setcTime(nowDate);
