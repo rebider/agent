@@ -290,8 +290,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 log.info("是否是下级,childLevelBusInfo:{}",JsonUtil.objectToJson(childLevelBusInfo));
                 if(childLevelBusInfo.getBusNum().equals(terminalTransferDetail.getGoalOrgId())){
                     isSub = true;
+                    break here;
                 }
-                break here;
             }
         }
         if(!isSub){
