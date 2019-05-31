@@ -152,7 +152,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         String busId = String.valueOf(data.get("agentBusinfoId"));
         AgentBusInfo agentBusInfo = agentBusinfoService.getById(busId);
         jsonParams.put("agencyId",agentBusInfo.getBusNum());
-        jsonParams.put("termCount","2");
+        jsonParams.put("termCount",agentBusInfo.getTerminalsLower());
 
         return jsonParams;
     }
