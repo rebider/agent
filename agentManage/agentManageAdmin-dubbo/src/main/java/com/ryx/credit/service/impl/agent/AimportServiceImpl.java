@@ -1301,7 +1301,7 @@ public class AimportServiceImpl implements AimportService {
 
 
     /**
-     * 更新业务信息单条
+     * 处理信息多样格式导入
      * @param user
      * @param list
      * @return
@@ -1309,6 +1309,20 @@ public class AimportServiceImpl implements AimportService {
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
     @Override
     public ResultVO importAgentBusInfoBusInfoFromExcel(String user, List<Object> list) throws Exception{
+
+        //更新业务信息
+        ResultVO resultVO =  updateBusInfo(user,list);
+
+
+
+
+
+        return ResultVO.success(null);
+
+    }
+
+
+    private ResultVO updateBusInfo(String user, List<Object> list){
 
         logger.info("用户{}更新业务信息{}",user,list);
         String  ag = list.get(0)+"",
@@ -1321,12 +1335,8 @@ public class AimportServiceImpl implements AimportService {
                 bus_direct_cashback=list.size()>7?(list.get(7))+"":"",//是否直接返现
                 bus_Inde_ass=list.size()>8?(list.get(8))+"":"",//是否独立考核
                 clo_receipt=list.size()>9?(list.get(9))+"":"",//是否要求收据
-                bus_login_num=list.size()>10?(list.get(10))+"":"",
+                bus_login_num=list.size()>10?(list.get(10))+"":"",//登录账号
                 update_busNum=list.size()>11?(list.get(11))+"":"";//要更新的业务编码
-
-
-//        if(StringUtils.isBlank(busNum))return ResultVO.fail("busNum为空");
-//        if(StringUtils.isBlank(isS0))return ResultVO.fail("isS0为空");
 
         List<String> arr = new ArrayList<>();
         if(busRegion!=null && StringUtils.isNotBlank(busRegion) && !"null".equals(busRegion)) {
@@ -1439,4 +1449,8 @@ public class AimportServiceImpl implements AimportService {
         }
         return ResultVO.success("");
     }
+
+
+
+
 }
