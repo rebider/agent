@@ -213,7 +213,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             jsonParams.put("companyNo",paramMap.get("companyNo"));
             jsonParams.put("userName",paramMap.get("userName"));
             jsonParams.put("agencyName",paramMap.get("agencyName"));
-            jsonParams.put("cardidx","0");
+            jsonParams.put("cardidx","1");
             String json = JsonUtil.objectToJson(jsonParams);
             log.info("通知瑞大宝入网修改请求参数：{}",json);
             //发送请求
