@@ -78,14 +78,20 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
         if(!isPass){
             if(PayType.YHHK.code.equals(capital.getcPayType())) {
                 capital.setcFqInAmount(capital.getcAmount());
-            }else{
+            }else if(PayType.FRDK.code.equals(capital.getcPayType())){
                 capital.setcFqInAmount(Status.STATUS_0.status);
+                if(null==capital.getcFqCount()){
+                    throw new ProcessException("分期期数不能为空");
+                }
             }
         }else{
             if(PayType.YHHK.code.equals(capital.getcPayType())) {
                 capital.setcFqInAmount(capital.getcInAmount());
-            }else{
+            }else if(PayType.FRDK.code.equals(capital.getcPayType())){
                 capital.setcFqInAmount(Status.STATUS_0.status);
+                if(null==capital.getcFqCount()){
+                    throw new ProcessException("分期期数不能为空");
+                }
             }
         }
 
