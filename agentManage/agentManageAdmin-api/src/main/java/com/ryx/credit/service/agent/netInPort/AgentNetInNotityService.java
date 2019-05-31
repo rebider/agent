@@ -16,4 +16,6 @@ public interface AgentNetInNotityService {
     List<String> getParent(String busRegion);
 
     void netIn(String busId,String notifyType);
+
+    void netInApplyEdit(String busId,String notifyType);
 }

@@ -215,4 +215,15 @@ public class AgentHttpMposServiceImpl implements AgentNetInHttpService {
         return respXMLObj;
     }
 
+    @Override
+    public Map<String, Object> packageParamUpdate(Map<String, Object> param) {
+        return packageParam(param);
+    }
+
+    @Override
+    public AgentResult httpRequestNetInUpdate(Map<String, Object> paramMap) throws Exception {
+        return httpRequestNetIn(paramMap);
+    }
+
+
 }

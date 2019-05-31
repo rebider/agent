@@ -12,6 +12,7 @@ import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
+import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInHttpService;
 import org.apache.commons.lang.StringUtils;
@@ -40,13 +41,16 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
     private AgentColinfoService agentColinfoService;
     @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
+    @Autowired
+    private AgentBusinfoService agentBusinfoService;
+
 
     @Override
     public Map<String, Object> packageParam(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
         AgentBusInfo agentBusInfo = (AgentBusInfo)param.get("agentBusInfo");
         Agent agent = (Agent)param.get("agent");
-        AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());;
+        AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
 
         resultMap.put("mobileNo",agentBusInfo.getBusLoginNum());
         resultMap.put("branchid",agentBusInfo.getBusPlatform());
@@ -107,7 +111,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
                 throw new Exception(httpResult);
             }
         } catch (Exception e) {
-            AppConfig.sendEmails("通知手刷请求超时："+ MailUtil.printStackTrace(e), "入网通知瑞大宝失败报警");
+            AppConfig.sendEmails("通知瑞大宝请求超时："+ MailUtil.printStackTrace(e), "入网通知瑞大宝失败报警");
             log.info("http请求超时:{}",e.getLocalizedMessage());
             throw new Exception("http请求超时:"+e.getLocalizedMessage());
         }
@@ -144,13 +148,90 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
 
     @Override
     public Map agencyLevelUpdateChangeData(Map data) {
-        return null;
+        Map<String,Object> jsonParams = new HashMap<>();
+        String busId = String.valueOf(data.get("agentBusinfoId"));
+        AgentBusInfo agentBusInfo = agentBusinfoService.getById(busId);
+        jsonParams.put("agencyId",agentBusInfo.getBusNum());
+        jsonParams.put("termCount",agentBusInfo.getTerminalsLower());
+        return jsonParams;
     }
 
 
     @Override
     public AgentResult agencyLevelUpdateChange(Map data) throws Exception {
-        return null;
+        try {
+            Map<String,Object> jsonParams = new HashMap<>();
+            jsonParams.put("agencyId",data.get("agencyId"));
+            jsonParams.put("termCount",data.get("termCount"));
+            String json = JsonUtil.objectToJson(jsonParams);
+            log.info("通知瑞大宝升级请求参数：{}",json);
+            //发送请求
+            String httpResult = HttpClientUtil.doPostJson(rdbReqUrl+"agency/setAgencyNetIn", json);
+            JSONObject respXMLObj = JSONObject.parseObject(httpResult);
+            log.info("通知瑞大宝升级返回参数：{}",httpResult);
+            if (respXMLObj.getString("code").equals("0000")){
+                return AgentResult.ok(respXMLObj);
+            }else{
+                AppConfig.sendEmails(httpResult, "升级通知瑞大宝失败报警");
+                throw new Exception(httpResult);
+            }
+        } catch (Exception e) {
+            AppConfig.sendEmails("升级通知瑞大宝请求超时："+ MailUtil.printStackTrace(e), "升级通知瑞大宝失败报警");
+            log.info("http请求超时:{}",e.getLocalizedMessage());
+            throw new Exception("http请求超时:"+e.getLocalizedMessage());
+        }
+    }
+
+    @Override
+    public Map<String, Object> packageParamUpdate(Map<String, Object> param) {
+        Map<String,Object> jsonParams = new HashMap<>();
+        AgentBusInfo agentBusInfo = (AgentBusInfo)param.get("agentBusInfo");
+        Agent agent = (Agent)param.get("agent");
+        AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
+        jsonParams.put("agencyId",agentBusInfo.getBusNum());
+        jsonParams.put("cardno",agentColinfo.getCloBankAccount());
+        jsonParams.put("bankbranchid",agentColinfo.getBranchLineNum());
+        jsonParams.put("bankbranchname",agentColinfo.getCloBankBranch());
+        jsonParams.put("customerPid",agent.getAgLegalCernum());
+        jsonParams.put("address",agent.getAgRegAdd());
+        jsonParams.put("companyNo",agent.getAgBusLic());
+        jsonParams.put("userName",agent.getAgLegal());
+        jsonParams.put("agencyName",agent.getAgName());
+        return jsonParams;
+    }
+
+    @Override
+    public AgentResult httpRequestNetInUpdate(Map<String, Object> paramMap) throws Exception {
+        try {
+            Map<String,Object> jsonParams = new HashMap<>();
+            jsonParams.put("agencyId",paramMap.get("agencyId"));
+            jsonParams.put("cardno",paramMap.get("cardno"));
+            jsonParams.put("bankbranchid",paramMap.get("bankbranchid"));
+            jsonParams.put("bankbranchname",paramMap.get("bankbranchname"));
+            jsonParams.put("customerPid",paramMap.get("customerPid"));
+            jsonParams.put("address",paramMap.get("address"));
+            jsonParams.put("companyNo",paramMap.get("companyNo"));
+            jsonParams.put("userName",paramMap.get("userName"));
+            jsonParams.put("agencyName",paramMap.get("agencyName"));
+            jsonParams.put("cardidx","0");
+            String json = JsonUtil.objectToJson(jsonParams);
+            log.info("通知瑞大宝入网修改请求参数：{}",json);
+            //发送请求
+            String httpResult = HttpClientUtil.doPostJson(rdbReqUrl+"agency/setAgencyNetIn", json);
+            JSONObject respXMLObj = JSONObject.parseObject(httpResult);
+            log.info("通知瑞大宝入网修改返回参数：{}",httpResult);
+            if (respXMLObj.getString("code").equals("0000")){
+                return AgentResult.ok(respXMLObj);
+            }else{
+                AppConfig.sendEmails(httpResult, "入网修改通知瑞大宝失败报警");
+                throw new Exception(httpResult);
+            }
+        } catch (Exception e) {
+            AppConfig.sendEmails("通知瑞大宝请求超时："+ MailUtil.printStackTrace(e), "入网修改通知瑞大宝失败报警");
+            log.info("http请求超时:{}",e.getLocalizedMessage());
+            throw new Exception("http请求超时:"+e.getLocalizedMessage());
+        }
+
     }
 
 
