@@ -152,7 +152,8 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         String busId = String.valueOf(data.get("agentBusinfoId"));
         AgentBusInfo agentBusInfo = agentBusinfoService.getById(busId);
         jsonParams.put("agencyId",agentBusInfo.getBusNum());
-        jsonParams.put("termCount",agentBusInfo.getTerminalsLower());
+        jsonParams.put("termCount","2");
+
         return jsonParams;
     }
 
@@ -234,5 +235,27 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
 
     }
 
-
+    @Override
+    public AgentResult queryTermCount(String agencyId)throws Exception{
+        try {
+            Map<String,Object> jsonParams = new HashMap<>();
+            jsonParams.put("agencyId",agencyId);
+            String json = JsonUtil.objectToJson(jsonParams);
+            log.info("查询终端下限数量请求参数：{}",json);
+            //发送请求
+            String httpResult = HttpClientUtil.doPostJson(rdbReqUrl+"agency/getTermCount", json);
+            JSONObject respXMLObj = JSONObject.parseObject(httpResult);
+            log.info("查询终端下限数量返回参数：{}",httpResult);
+            if (respXMLObj.getString("code").equals("0000")){
+                return AgentResult.ok(respXMLObj);
+            }else{
+                AppConfig.sendEmails(httpResult, "升级通知瑞大宝失败报警");
+                throw new Exception(httpResult);
+            }
+        } catch (Exception e) {
+            AppConfig.sendEmails("升级通知瑞大宝请求超时："+ MailUtil.printStackTrace(e), "升级通知瑞大宝失败报警");
+            log.info("http请求超时:{}",e.getLocalizedMessage());
+            throw new Exception("http请求超时:"+e.getLocalizedMessage());
+        }
+    }
 }

@@ -22,4 +22,6 @@ public interface AgentNetInHttpService {
     Map<String,Object> packageParamUpdate(Map<String,Object> param);
 
     AgentResult httpRequestNetInUpdate(Map<String,Object> paramMap)throws Exception;
+
+    AgentResult queryTermCount(String agencyId)throws Exception;
 }

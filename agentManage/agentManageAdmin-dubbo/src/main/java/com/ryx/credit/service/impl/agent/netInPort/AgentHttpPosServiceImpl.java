@@ -394,5 +394,10 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
         return httpRequestNetIn(paramMap);
     }
 
+    @Override
+    public AgentResult queryTermCount(String agencyId) throws Exception {
+        return null;
+    }
+
 }
 

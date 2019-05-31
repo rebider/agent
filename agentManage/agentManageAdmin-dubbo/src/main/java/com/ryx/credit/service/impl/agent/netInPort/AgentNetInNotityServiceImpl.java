@@ -462,10 +462,12 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                     e.printStackTrace();
                     log.error(e.getMsg(),e);
                     res=AgentResult.fail(e.getMsg());
+                    res.setData(e.getLocalizedMessage());
                 }catch (Exception e) {
                     e.printStackTrace();
                     log.error(e.getMessage(),e);
                     res=AgentResult.fail("接口调用异常");
+                    res.setData(e.getLocalizedMessage());
                 }
                 log.info("升级开户接口{}平台编号不为空走升级接口,请求结果{}",agentBusInfo.getBusNum(),res.getMsg());
                 record.setId(idService.genId(TabId.a_agent_platformsyn));
