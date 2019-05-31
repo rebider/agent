@@ -154,6 +154,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     if(StringUtils.isBlank(item.getBusLoginNum())){
                         throw new ProcessException("瑞大宝登陆账号不能为空");
                     }
+                    item.setBusLoginNum(item.getBusLoginNum().trim());
                     if(!RegexUtil.checkInt(item.getBusLoginNum())){
                         throw new ProcessException("瑞大宝登陆账号必须为数字");
                     }
