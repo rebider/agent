@@ -360,6 +360,15 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                         throw new ProcessException("瑞大宝登陆账号必须为数字");
                     }
                 }
+                if(PlatformType.RHPOS.code.equals(platformType.getValue())){
+                    //检查手机号是否填写
+                    if(StringUtils.isBlank(item.getBusLoginNum())){
+                        throw new ProcessException("瑞花宝登陆账号不能为空");
+                    }
+                    if(!RegexUtil.checkInt(item.getBusLoginNum())){
+                        throw new ProcessException("瑞花宝登陆账号必须为数字");
+                    }
+                }
             }
             List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByAgenId(agent.getId());
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
