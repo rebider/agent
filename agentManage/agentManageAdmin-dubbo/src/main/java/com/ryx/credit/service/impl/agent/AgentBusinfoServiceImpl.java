@@ -8,6 +8,7 @@ import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.FastMap;
+import com.ryx.credit.common.util.RegexUtil;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.agent.*;
@@ -214,6 +215,24 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 									logger.info("请填写平台登录账号");
 									throw new MessageException("请填写平台登录账号");
 								}
+							}
+						}
+						if(PlatformType.RDBPOS.code.equals(platformType.code)){
+							if (StringUtils.isEmpty(agentBusInfoVo.getBusLoginNum())){
+								logger.info("请填写平台登录账号");
+								throw new MessageException("请填写平台登录账号");
+							}
+							if(!RegexUtil.checkInt(agentBusInfoVo.getBusLoginNum())){
+								throw new ProcessException("平台登录账号必须是数字");
+							}
+						}
+						if(PlatformType.RHPOS.code.equals(platformType.code)){
+							if (StringUtils.isEmpty(agentBusInfoVo.getBusLoginNum())){
+								logger.info("请填写平台登录账号");
+								throw new MessageException("请填写平台登录账号");
+							}
+							if(!RegexUtil.checkInt(agentBusInfoVo.getBusLoginNum())){
+								throw new ProcessException("平台登录账号必须是数字");
 							}
 						}
 					}
