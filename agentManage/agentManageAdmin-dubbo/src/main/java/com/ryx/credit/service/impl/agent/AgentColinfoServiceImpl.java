@@ -341,7 +341,13 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                 }
             }
             return ResultVO.success(null);
-        } catch (Exception e) {
+        }catch (ProcessException e) {
+            e.printStackTrace();
+            throw e;
+        } catch (MessageException e) {
+            e.printStackTrace();
+            throw e;
+        }catch (Exception e) {
             e.printStackTrace();
             throw new Exception(e.getMessage());
         }

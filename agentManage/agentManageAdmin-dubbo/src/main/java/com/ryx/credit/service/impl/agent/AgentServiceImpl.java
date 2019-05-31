@@ -557,11 +557,22 @@ public class AgentServiceImpl implements AgentService {
         if(orgCodeRes==null && orgCodeRes.size()!=1){
             return null;
         }
+
+
         Map<String, Object> stringObjectMap = orgCodeRes.get(0);
         String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
         Map<String,Object> reqMap = new HashMap<>();
-        reqMap.put("orgId",orgId);
-        reqMap.put("userId",userId);
+        //省区大区查看自己的代理商 部门权限
+        if(StringUtils.isNotEmpty(organizationCode) &&
+                (organizationCode.contains("north") || organizationCode.contains("south") || organizationCode.contains("beijing")  || organizationCode.contains("city"))) {
+            reqMap.put("organizationCode", organizationCode);
+        }
+
+        //平台权限
+        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+        reqMap.put("platfromPerm",platfromPerm);
+
         reqMap.put("status",Status.STATUS_1.status);
         if(StringUtils.isNotBlank(agent.getAgStatus())){
             reqMap.put("agStatus",agent.getAgStatus());

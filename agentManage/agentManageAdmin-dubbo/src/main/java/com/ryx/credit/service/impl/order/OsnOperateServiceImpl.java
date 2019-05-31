@@ -409,11 +409,10 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
         oSubOrderActivityExample.or().andSubOrderIdEqualTo(oSubOrder.getId()).andProIdEqualTo(oSubOrder.getProId()).andStatusEqualTo(Status.STATUS_1.status);
         List<OSubOrderActivity>  OSubOrderActivitylist = oSubOrderActivityMapper.selectByExample(oSubOrderActivityExample);
         OOrder order = oOrderMapper.selectByPrimaryKey(oSubOrder.getOrderId());
-
-
+        PlatForm platForm =  platFormMapper.selectByPlatFormNum(order.getOrderPlatform());
 
         //手刷生成物流方式 根据机具类型确定机具明细的生成方式，首刷更新明细记录
-        if(logistics.getProType().equals(PlatformType.MPOS.msg) || logistics.getProType().equals(PlatformType.MPOS.code)){
+        if(PlatformType.MPOS.equals(platForm.getPlatformType())){
             logger.info("首刷发货 更新库存记录:{}:{}-{}",logistics.getProType(),logistics.getSnBeginNum(),logistics.getSnEndNum());
             //遍历sn进行逐个更新
             for (String idSn : ids) {
@@ -476,8 +475,8 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                     throw new MessageException("更新物流明细失败："+idSn);
                 }
             }
-        }else{
-        //POS生成物流方式 根据机具类型确定机具明细的生成方式,pos生成明细记录
+        }else if(PlatformType.whetherPOS(platForm.getPlatformType())){
+            //POS生成物流方式 根据机具类型确定机具明细的生成方式,pos生成明细记录
             for (String idSn : ids) {
                 OLogisticsDetail detail = new OLogisticsDetail();
                 //id，物流id，创建人，更新人，状态

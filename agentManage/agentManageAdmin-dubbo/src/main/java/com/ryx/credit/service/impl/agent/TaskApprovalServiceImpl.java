@@ -5,10 +5,7 @@ import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.dao.agent.AgentBusInfoMapper;
-import com.ryx.credit.dao.agent.AgentColinfoMapper;
-import com.ryx.credit.dao.agent.BusActRelMapper;
-import com.ryx.credit.dao.agent.CapitalMapper;
+import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
@@ -59,6 +56,8 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
      private CapitalMapper capitalMapper;
     @Autowired
     private IUserService iUserService;
+    @Autowired
+    private PlatFormMapper platFormMapper;
      @Override
      public List<Map<String,Object>> queryBusInfoAndRemit(AgentBusInfo agentBusInfo){
 
@@ -176,6 +175,7 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                 }
             }
 
+            //业务部输入借记费率
             if(orgCode.equals("business"))
             for (AgentBusInfoVo agentBusInfoVo : agentVo.getEditDebitList()) {
                 AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
@@ -185,6 +185,29 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                 int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfoVo);
                 if(i!=1){
                     throw new ProcessException("更新借记费率等信息失败");
+                }
+            }
+
+            //业务部输入瑞大宝终端数量下线
+            if(orgCode.equals("business"))
+            if(agentVo.getTerminalsLowerList()!=null && agentVo.getTerminalsLowerList().size()>0){
+                for (AgentBusInfoVo agentBusInfoVo : agentVo.getTerminalsLowerList()) {
+                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                    PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+                    if(PlatformType.RDBPOS.code.equals(platForm.getPlatformType())) {
+                        if(StringUtils.isBlank(agentBusInfoVo.getTerminalsLower())){
+                            throw new ProcessException("请填写终端数量下线");
+                        }
+                        if(new BigDecimal(agentBusInfoVo.getTerminalsLower()).compareTo(new BigDecimal(5000))>0){
+                            throw new ProcessException("终端数量下线最高为5000");
+                        }
+                        agentBusInfo.setcUtime(new Date());
+                        agentBusInfo.setTerminalsLower(agentBusInfoVo.getTerminalsLower());
+                        int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                        if (i != 1) {
+                            throw new ProcessException("更新终端数量下线失败");
+                        }
+                    }
                 }
             }
         }
