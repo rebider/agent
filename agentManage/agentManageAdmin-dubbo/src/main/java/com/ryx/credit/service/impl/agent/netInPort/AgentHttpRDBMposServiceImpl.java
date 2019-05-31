@@ -166,7 +166,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             String json = JsonUtil.objectToJson(jsonParams);
             log.info("通知瑞大宝升级请求参数：{}",json);
             //发送请求
-            String httpResult = HttpClientUtil.doPostJson(rdbReqUrl+"agency/setAgencyNetIn", json);
+            String httpResult = HttpClientUtil.doPostJson(rdbReqUrl+"agency/setRztAgencyDirect", json);
             JSONObject respXMLObj = JSONObject.parseObject(httpResult);
             log.info("通知瑞大宝升级返回参数：{}",httpResult);
             if (respXMLObj.getString("code").equals("0000")){

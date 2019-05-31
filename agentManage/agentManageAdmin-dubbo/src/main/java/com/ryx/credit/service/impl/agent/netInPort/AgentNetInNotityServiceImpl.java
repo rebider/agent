@@ -6,6 +6,8 @@ import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.JsonUtil;
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.agent.*;
@@ -60,6 +62,30 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
     @Autowired
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
+    /**
+     * 通知列表
+     * @param page
+     * @param agentPlatFormSyn
+     * @return
+     */
+    @Override
+    public PageInfo queryList(Page page, AgentPlatFormSyn agentPlatFormSyn) {
+        Map<String, Object> map = new HashMap<>();
+        if(null!=agentPlatFormSyn.getAgentId()){
+            map.put("agentId",agentPlatFormSyn.getAgentId());
+        }
+        if(StringUtils.isNotBlank(agentPlatFormSyn.getBusId())){
+            map.put("busId",agentPlatFormSyn.getBusId());
+        }
+        if(StringUtils.isNotBlank(agentPlatFormSyn.getNotifyType())){
+            map.put("notifyType",agentPlatFormSyn.getNotifyType());
+        }
+        List<AgentPlatFormSyn> list = agentPlatFormSynMapper.queryList(map, page);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(list);
+        pageInfo.setTotal(agentPlatFormSynMapper.queryCount(map));
+        return pageInfo;
+    }
 
     /**
      * 通知业务平台 统一入口
@@ -390,6 +416,7 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
 
 
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
     public void upgrade(String busId) throws Exception {
         threadPoolTaskExecutor.execute(new Runnable() {
             @Override

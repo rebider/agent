@@ -1,5 +1,9 @@
 package com.ryx.credit.service.agent.netInPort;
 
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn;
+
 import java.util.List;
 
 /***
@@ -11,6 +15,8 @@ import java.util.List;
  **/
 public interface AgentNetInNotityService {
 
+    PageInfo queryList(Page page, AgentPlatFormSyn agentPlatFormSyn);
+
     void asynNotifyPlatform(String busId,String notifyType);
 
     List<String> getParent(String busRegion);
@@ -18,4 +24,6 @@ public interface AgentNetInNotityService {
     void netIn(String busId,String notifyType);
 
     void netInApplyEdit(String busId,String notifyType);
+
+    void upgrade(String busId) throws Exception;
 }
