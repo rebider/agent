@@ -733,7 +733,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
 
         String id = idService.genId(TabId.a_agent_platformsyn);
         AgentPlatFormSyn record = new AgentPlatFormSyn();
-        AgentResult result = null;
+        AgentResult result = AgentResult.fail();
         try {
             record.setId(id);
             record.setNotifyTime(new Date());

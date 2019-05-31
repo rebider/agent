@@ -7,6 +7,7 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.RegexUtil;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
@@ -81,6 +82,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     private AgentEnterService agentEnterService;
     @Autowired
     private IResourceService iResourceService;
+    @Autowired
+    private PlatFormService platFormService;
 
 
 
@@ -349,6 +352,17 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 Boolean busPlatExist = findBusPlatExist(item);
                 if (busPlatExist) {
                     return new AgentResult(500, "业务已添加,请勿重复添加", "");
+                }
+                //瑞打包校验
+                PlatformType platformType = platFormService.byPlatformCode(item.getBusPlatform());
+                if(PlatformType.RDBPOS.code.equals(platformType.getValue())){
+                    //检查手机号是否填写
+                    if(StringUtils.isBlank(item.getBusLoginNum())){
+                        throw new ProcessException("瑞大宝登陆账号不能为空");
+                    }
+                    if(!RegexUtil.checkInt(item.getBusLoginNum())){
+                        throw new ProcessException("瑞大宝登陆账号必须为数字");
+                    }
                 }
             }
             List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByAgenId(agent.getId());

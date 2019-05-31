@@ -1311,15 +1311,18 @@ public class AimportServiceImpl implements AimportService {
     public ResultVO importAgentBusInfoBusInfoFromExcel(String user, List<Object> list) throws Exception{
 
         logger.info("用户{}更新业务信息{}",user,list);
-        String busNum = list.get(0)+"",
-                busRegion=list.get(1)+"",
-                isS0=list.get(2)+"",
-                jglx=list.size()>3?(list.get(3))+"":"",//机构类型
-                bus_sent_directly=list.size()>4?(list.get(4))+"":"",
-                bus_direct_cashback=list.size()>5?(list.get(5))+"":"",//是否直接返现
-                bus_Inde_ass=list.size()>6?(list.get(6))+"":"",
-                clo_receipt=list.size()>7?(list.get(7))+"":"",//是否要求收据
-                bus_login_num=list.size()>8?(list.get(8))+"":"";//业务系统登录账号
+        String  ag = list.get(0)+"",
+                busPlatform = list.get(1)+"",
+                busNum = list.size()>2?list.get(2)+"":"",
+                busRegion=list.size()>3?list.get(3)+"":"",
+                isS0=list.size()>4?list.get(4)+"":"",
+                jglx=list.size()>5?(list.get(5))+"":"",//机构类型
+                bus_sent_directly=list.size()>6?(list.get(6))+"":"",
+                bus_direct_cashback=list.size()>7?(list.get(7))+"":"",//是否直接返现
+                bus_Inde_ass=list.size()>8?(list.get(8))+"":"",//是否独立考核
+                clo_receipt=list.size()>9?(list.get(9))+"":"",//是否要求收据
+                bus_login_num=list.size()>10?(list.get(10))+"":"",
+                update_busNum=list.size()>11?(list.get(11))+"":"";//要更新的业务编码
 
 
 //        if(StringUtils.isBlank(busNum))return ResultVO.fail("busNum为空");
@@ -1370,12 +1373,21 @@ public class AimportServiceImpl implements AimportService {
 
 
         AgentBusInfoExample example = new AgentBusInfoExample();
-        example.or().andStatusEqualTo(Status.STATUS_1.status).andBusNumEqualTo(String.valueOf(busNum));
+        if(StringUtils.isNotBlank(busNum)) {
+            example.or().andStatusEqualTo(Status.STATUS_1.status).andBusNumEqualTo(String.valueOf(busNum));
+        }else{
+            example.or().andStatusEqualTo(Status.STATUS_1.status).andAgentIdEqualTo(ag).andBusPlatformEqualTo(busPlatform);
+        }
         List<AgentBusInfo> businfos = agentBusInfoMapper.selectByExample(example);
 
         if(businfos.size()==0){
             return ResultVO.fail("业务未找到");
         }
+
+        if(businfos.size()>1){
+            return ResultVO.fail("业务数量查出多个");
+        }
+
         for (AgentBusInfo businfo : businfos) {
 
             if(arr.size()>0) {
@@ -1407,7 +1419,16 @@ public class AimportServiceImpl implements AimportService {
                 businfo.setCloReceipt(BigDecimal.valueOf(clo_receipt_index));
             }
             if(StringUtils.isNotBlank(bus_login_num)){
+                logger.info("用户{}登录编号业务编号前:{}", user,businfo.getBusLoginNum());
                 businfo.setBusLoginNum(bus_login_num);
+                logger.info("用户{}登录编号业务编号后:{}", user,businfo.getBusLoginNum());
+            }
+            if(StringUtils.isBlank(busNum) || "null".equalsIgnoreCase(busNum)) {
+                if(StringUtils.isNotBlank(update_busNum) && !"null".equalsIgnoreCase(update_busNum.trim())) {
+                    logger.info("用户{}补全业务编号前:{}", user,businfo.getBusNum());
+                    businfo.setBusNum(update_busNum.trim());
+                    logger.info("用户{}补全业务编号后:{}", user,businfo.getBusNum());
+                }
             }
             if(agentBusInfoMapper.updateByPrimaryKeySelective(businfo)==1){
                 logger.info("用户{}修改为{}",user,busNum);

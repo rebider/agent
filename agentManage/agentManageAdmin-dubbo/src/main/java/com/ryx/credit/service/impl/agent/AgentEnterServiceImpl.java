@@ -5,10 +5,7 @@ import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.AppConfig;
-import com.ryx.credit.common.util.DateUtils;
-import com.ryx.credit.common.util.FastMap;
-import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.agent.*;
@@ -150,6 +147,18 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                         }
                     }
                 }
+                //检查业务平台数据
+                PlatformType platformType = platFormService.byPlatformCode(item.getBusPlatform());
+                if(PlatformType.RDBPOS.code.equals(platformType.getValue())){
+                    //检查手机号是否填写
+                    if(StringUtils.isBlank(item.getBusLoginNum())){
+                        throw new ProcessException("瑞大宝登陆账号不能为空");
+                    }
+                    item.setBusLoginNum(item.getBusLoginNum().trim());
+                    if(!RegexUtil.checkInt(item.getBusLoginNum())){
+                        throw new ProcessException("瑞大宝登陆账号必须为数字");
+                    }
+                }
             }
             Set<String> resultSet = new HashSet<>();
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
@@ -286,6 +295,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             //获取代理商有效的业务
             List<AgentBusInfo> aginfo = agentBusinfoService.agentBusInfoList(agent.getId());
             for (AgentBusInfo agentBusInfo : aginfo) {
+
+
+
                 agentBusInfo.setcUtime(Calendar.getInstance().getTime());
                 agentBusInfo.setCloReviewStatus(AgStatus.Approving.status);
                 if (agentBusinfoService.updateAgentBusInfo(agentBusInfo) != 1) {
@@ -365,6 +377,11 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             logger.info("代理商信息审批中,业务信息未找到{}:{}", busid, cuser);
             return ResultVO.fail("业务信息未找到");
         }
+
+        //检查业务平台数据
+        PlatForm platForm = platFormMapper.selectByPlatFormNum(abus.getBusPlatform());
+
+
         //检查是否有审批中的代理商新
         Agent agent = agentService.getAgentById(abus.getAgentId());
         if (agent.getAgStatus().equals(AgStatus.Approving.name())) {
@@ -421,7 +438,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             capital.setCloReviewStatus(AgStatus.Approving.status);
             if (1 != accountPaidItemService.update(capital)) {
                 logger.info("代理商审批，合同状态更新失败{}:{}", abus.getAgentId(), cuser);
-                throw new ProcessException("合同状态更新失败");
+                throw new ProcessException("缴款状态更新失败");
             }
         }
 
@@ -450,7 +467,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         record.setAgentName(agent.getAgName());
         record.setDataShiro(BusActRelBusType.Business.key);
 
-        PlatForm platForm = platFormMapper.selectByPlatFormNum(abus.getBusPlatform());
         record.setNetInBusType("ACTIVITY_"+platForm.getPlatformType());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("代理商业务启动审批异常，添加审批关系失败{}:{}", record.getBusId(), proce);
@@ -764,7 +780,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     AgentResult capitalFq = accountPaidItemService.capitalFq(capital);
                     if (!capitalFq.isOK()) {
                         logger.info("代理商审批，保证金{}:{}", processingId, capital.getId());
-                        throw new ProcessException("合同状态更新失败");
+                        throw new ProcessException("生成保证金等分期数据更新失败");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -875,7 +891,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public ResultVO updateAgentVo(AgentVo agent, String userId,Boolean isPass) throws Exception {
+    public ResultVO updateAgentVo(AgentVo agent, String userId,Boolean isPass) throws MessageException {
         try {
             verifyOrgAndBZYD(agent.getBusInfoVoList());
 //            verifyOther(agent.getBusInfoVoList());
@@ -910,7 +926,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             return ResultVO.success(ag);
         } catch (ProcessException e) {
             logger.error("修改代理商错误", e.getMsg());
-            throw new Exception(e.getMsg());
+            throw new MessageException(e.getMsg());
         } catch (MessageException e) {
             e.printStackTrace();
             logger.error("修改代理商错误", e);
@@ -918,7 +934,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("修改代理商错误", e);
-            throw new Exception("修改代理商错误");
+            throw new MessageException("修改代理商错误");
         }
     }
 

@@ -997,12 +997,22 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                         }
                     }
                 }else{
-                    logistics.setSendStatus(Status.STATUS_0.status);
+                    logistics.setSendStatus(LogisticsSendStatus.dt_send.code);
                     logistics.setSendMsg("不同平台不下发，手动调整");
                     if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
                         logger.info("机具退货调整首刷接口调用Exception更新数据库失败:{}",JSONObject.toJSONString(logistics));
                     }
                 }
+            }else{
+                OLogistics logistics_send =oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
+                logistics_send.setSendStatus(LogisticsSendStatus.dt_send.code);
+                logistics_send.setSendMsg("未实现的业务平台物流");
+                if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
+                    logger.info("手刷下发物流更新记录Exception失败{}",JSONObject.toJSONString(oLogistics));
+                }
+                AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",历史退货物流未调用业务系统，平台类型与编号:"+platForm.getPlatformType()+","+platForm.getPlatformNum(), "历史退货物流未调用业务系统"+platForm.getPlatformType()+","+platForm.getPlatformNum());
+                logger.info("beginSn:"+beginSn+",endSn:"+endSn+",历史退货物流未调用业务系统，平台类型与编号:"+platForm.getPlatformType()+","+platForm.getPlatformNum());
+                return AgentResult.ok();
             }
         }
         return AgentResult.ok();

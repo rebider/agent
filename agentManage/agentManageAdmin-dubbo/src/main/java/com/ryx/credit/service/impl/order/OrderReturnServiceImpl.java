@@ -110,6 +110,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     @Autowired
     private OOrderMapper oOrderMapper;
     @Autowired
+    private PlatFormMapper platFormMapper;
+    @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
     @Autowired
     private ImsTermAdjustDetailService imsTermAdjustDetailService;
@@ -1749,13 +1751,13 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         log.info("导入物流数据,流量卡不进行下发操作，活动代码{}={}==========================================={}" ,oActivity.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
                         return AgentResult.ok("流量卡不进行下发操作");
                     }
-
+                    OOrder oOrder = oOrderMapper.selectByPrimaryKey(orderId);
+                    PlatForm platForm =platFormMapper.selectByPlatFormNum(oOrder.getOrderPlatform());
                     //===============================================================================
                     //进行机具调整操作
-                    if (!proType.equals(PlatformType.MPOS.msg) && !proType.equals(PlatformType.MPOS.code)){
+                    if (PlatformType.whetherPOS(platForm.getPlatformType())){
                         log.info("======pos发货 更新库存记录:{}:{}",proType,stringList);
                         List<OLogisticsDetail> snList = (List<OLogisticsDetail>)resultVO.getObj();
-                        OOrder oOrder = oOrderMapper.selectByPrimaryKey(orderId);
                         if(null==oOrder){
                             throw new MessageException("查询订单数据失败！");
                         }
@@ -1794,7 +1796,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         }
                         //===============================================================================
                         //cxinfo 机具退货调整首刷接口调用
-                    }else{
+                    }else if (PlatformType.MPOS.code.equals(platForm.getPlatformType())){
                         log.info("======首刷发货 更新库存记录:{}:{}",proType,stringList);
                         //起始sn
                         OLogisticsDetailExample exampleOLogisticsDetailExamplestart = new OLogisticsDetailExample();
@@ -1893,12 +1895,21 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                                 }
                             }
                         }else{
-                            logistics.setSendStatus(Status.STATUS_0.status);
+                            logistics.setSendStatus(LogisticsSendStatus.dt_send.code);
                             logistics.setSendMsg("不同平台不下发，手动调整");
                             if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
                                 log.info("机具退货调整首刷接口调用Exception更新数据库失败:{}",JSONObject.toJSONString(logistics));
                             }
                         }
+                    }else{
+                        OLogistics logistics_send =oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
+                        logistics_send.setSendStatus(LogisticsSendStatus.dt_send.code);
+                        logistics_send.setSendMsg("未实现的业务平台物流");
+                        if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
+                            log.info("手刷下发物流更新记录Exception失败{}",JSONObject.toJSONString(oLogistics));
+                        }
+                        AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",历史退货物流未调用业务系统，平台类型与编号:"+platForm.getPlatformType()+","+platForm.getPlatformNum(), "历史退货物流未调用业务系统"+platForm.getPlatformType()+","+platForm.getPlatformNum());
+                        log.info("beginSn:"+beginSn+",endSn:"+endSn+",历史退货物流未调用业务系统，平台类型与编号:"+platForm.getPlatformType()+","+platForm.getPlatformNum());
                     }
                 }
             }else{
