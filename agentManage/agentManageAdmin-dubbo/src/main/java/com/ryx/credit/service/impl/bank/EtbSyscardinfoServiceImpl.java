@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.bank;
 
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.bank.EtbSysCardBinNoMapper;
 import com.ryx.credit.pojo.admin.bank.EtbSysCardBinNo;
 import com.ryx.credit.service.bank.EtbSyscardinfoService;
@@ -25,6 +26,12 @@ public class EtbSyscardinfoServiceImpl implements EtbSyscardinfoService {
     public EtbSysCardBinNo findCardBinByCardNo(String cardNo) throws ProcessorException {
         LOG.debug("BaseCardServiceImpl findByCardNo cardNo: " + cardNo);
         EtbSysCardBinNo etbSyscardbinno = null;
+        if(StringUtils.isBlank(cardNo)){
+            throw new ProcessorException("卡号不能为空");
+        }
+        if(cardNo.length()<10){
+            throw new ProcessorException("卡号位数不正确");
+        }
         String cardBinStr = cardNo.substring(0, 10);
         List<EtbSysCardBinNo> result = new ArrayList<EtbSysCardBinNo>();
         for (int i = cardBinStr.length(); i > 1; i--) {
