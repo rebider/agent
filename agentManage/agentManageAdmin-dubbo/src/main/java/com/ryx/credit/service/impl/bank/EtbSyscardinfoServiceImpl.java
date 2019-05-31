@@ -29,10 +29,8 @@ public class EtbSyscardinfoServiceImpl implements EtbSyscardinfoService {
         if(StringUtils.isBlank(cardNo)){
             throw new ProcessorException("卡号不能为空");
         }
-        if(cardNo.length()<10){
-            throw new ProcessorException("卡号位数不正确");
-        }
-        String cardBinStr = cardNo.substring(0, 10);
+//        String cardBinStr = cardNo.substring(0, 10);
+        String cardBinStr = cardNo;
         List<EtbSysCardBinNo> result = new ArrayList<EtbSysCardBinNo>();
         for (int i = cardBinStr.length(); i > 1; i--) {
             String cardBinTmp = cardBinStr.substring(0, i);
