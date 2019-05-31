@@ -92,8 +92,7 @@ public class AgentHttpMposServiceImpl implements AgentNetInHttpService {
         if(null!=agentParent){
             resultMap.put("supDorgId",agentParent.getBusNum());
         }
-        Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
-        resultMap.put("orgType",dictByValue.getdItemname().contains(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
+        resultMap.put("orgType",OrgType.zQ(agentBusInfo.getBusType())?OrgType.STR.getValue():OrgType.ORG.getValue());
         return resultMap;
     }
 

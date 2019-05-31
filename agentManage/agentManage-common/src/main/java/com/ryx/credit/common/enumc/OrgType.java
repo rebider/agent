@@ -52,4 +52,13 @@ public enum OrgType {
         return "";
     }
 
+    /**
+     * 是否是直签
+     * @param busType
+     * @return
+     */
+    public static Boolean zQ(String busType){
+        return !BusType.JG.key.equals(busType) && !BusType.BZYD.key.equals(busType);
+    }
+
 }
