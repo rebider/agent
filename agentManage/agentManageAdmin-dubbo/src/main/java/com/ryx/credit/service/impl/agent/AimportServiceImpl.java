@@ -1544,6 +1544,8 @@ public class AimportServiceImpl implements AimportService {
                 a.setcIncomStatus(Status.STATUS_1.status);
                 a.setFreestatus(Status.STATUS_1.status);
                 a.setAgStatus(AgStatus.Approved.name());
+                a.setCaStatus(Status.STATUS_0.status);
+                a.setAgLegal(null);
                 a.setcUtime(Calendar.getInstance().getTime());
                 a.setcTime(Calendar.getInstance().getTime());
                 if(1==agentMapper.insertSelective(a)){
