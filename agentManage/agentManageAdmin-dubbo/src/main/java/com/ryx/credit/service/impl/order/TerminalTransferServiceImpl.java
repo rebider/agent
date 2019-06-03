@@ -275,31 +275,31 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             throw new MessageException("目标机构ID和名称不匹配");
         }
         //查询目标机构是否是当前代理商下的
-        AgentBusInfoExample agentExample = new AgentBusInfoExample();
-        AgentBusInfoExample.Criteria agentCriteria = agentExample.createCriteria();
-        agentCriteria.andStatusEqualTo(Status.STATUS_1.status);
-        agentCriteria.andBusStatusIn(busStatusList);
-        agentCriteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
-        agentCriteria.andAgentIdEqualTo(agentId);
-        List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentExample);
-        Boolean isSub = false; //是否是下级
-        here:
-        for (AgentBusInfo busInfo : agentBusInfoList) {
-            List<AgentBusInfo> childLevelBusInfos = agentBusinfoService.queryChildLevelByBusNum(null, busInfo.getBusPlatform(), busInfo.getBusNum());
-            log.info("是否是下级,个数:{}",childLevelBusInfos.size());
-            for (AgentBusInfo childLevelBusInfo : childLevelBusInfos) {
-                log.info("是否是下级,childBusNum:{},GoalOrgId:{}",childLevelBusInfo.getBusNum(),terminalTransferDetail.getGoalOrgId());
-                if(childLevelBusInfo.getBusNum().equals(terminalTransferDetail.getGoalOrgId())){
-                    isSub = true;
-                    break here;
-                }
-            }
-        }
-        if(!isSub){
-            log.info("目标机构,goalOrgId:{}",terminalTransferDetail.getGoalOrgId());
-            log.info("目标机构不是当前代理商下级,agentId:{}",agentId);
-            throw new MessageException("目标机构不是当前代理商下级");
-        }
+//        AgentBusInfoExample agentExample = new AgentBusInfoExample();
+//        AgentBusInfoExample.Criteria agentCriteria = agentExample.createCriteria();
+//        agentCriteria.andStatusEqualTo(Status.STATUS_1.status);
+//        agentCriteria.andBusStatusIn(busStatusList);
+//        agentCriteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
+//        agentCriteria.andAgentIdEqualTo(agentId);
+//        List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentExample);
+//        Boolean isSub = false; //是否是下级
+//        here:
+//        for (AgentBusInfo busInfo : agentBusInfoList) {
+//            List<AgentBusInfo> childLevelBusInfos = agentBusinfoService.queryChildLevelByBusNum(null, busInfo.getBusPlatform(), busInfo.getBusNum());
+//            log.info("是否是下级,个数:{}",childLevelBusInfos.size());
+//            for (AgentBusInfo childLevelBusInfo : childLevelBusInfos) {
+//                log.info("是否是下级,childBusNum:{},GoalOrgId:{}",childLevelBusInfo.getBusNum(),terminalTransferDetail.getGoalOrgId());
+//                if(childLevelBusInfo.getBusNum().equals(terminalTransferDetail.getGoalOrgId())){
+//                    isSub = true;
+//                    break here;
+//                }
+//            }
+//        }
+//        if(!isSub){
+//            log.info("目标机构,goalOrgId:{}",terminalTransferDetail.getGoalOrgId());
+//            log.info("目标机构不是当前代理商下级,agentId:{}",agentId);
+//            throw new MessageException("目标机构不是当前代理商下级");
+//        }
 //        Map<String, Object> reqParam = new HashMap<>();
 //        reqParam.put("snBegin",terminalTransferDetail.getSnBeginNum());
 //        reqParam.put("snEnd",terminalTransferDetail.getSnEndNum());
@@ -341,7 +341,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         originalOrgCriteria.andBusStatusEqualTo(Status.STATUS_1.status);
         originalOrgCriteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
         originalOrgCriteria.andBusNumEqualTo(terminalTransferDetail.getOriginalOrgId());
-        List<AgentBusInfo> originalOrgBusInfoList = agentBusInfoMapper.selectByExample(agentExample);
+        List<AgentBusInfo> originalOrgBusInfoList = agentBusInfoMapper.selectByExample(originalOrgExample);
         if(originalOrgBusInfoList.size()==1){
             resultMap.put("originalBusId",originalOrgBusInfoList.get(0).getId());
         }
