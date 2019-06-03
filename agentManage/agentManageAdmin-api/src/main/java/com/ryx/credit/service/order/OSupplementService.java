@@ -78,4 +78,6 @@ public interface OSupplementService {
     public ResultVO updateAmount(AgentVo agentVo,Long userId) throws Exception;
 
     BigDecimal selectPayAmout(String srcid, String pkType);
+
+    OPaymentDetail selectPaymentDetailById(String id);
 }

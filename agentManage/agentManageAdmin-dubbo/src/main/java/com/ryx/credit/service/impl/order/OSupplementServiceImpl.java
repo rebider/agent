@@ -556,4 +556,12 @@ public class OSupplementServiceImpl implements OSupplementService {
          BigDecimal amount=(oPaymentDetail.getPayAmount().subtract((oPaymentDetail.getRealPayAmount()==null?new BigDecimal(0):oPaymentDetail.getRealPayAmount())).subtract(payAmout));
         return amount;
     }
+
+
+    @Override
+    public OPaymentDetail selectPaymentDetailById(String id){
+        OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectByPrimaryKey(id);
+        return oPaymentDetail;
+    }
+
 }

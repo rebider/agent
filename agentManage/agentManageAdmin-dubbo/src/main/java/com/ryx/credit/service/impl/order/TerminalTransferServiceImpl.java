@@ -225,8 +225,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 terminalTransferDetail.setAdjustStatus(AdjustStatus.WTZ.getValue());
                 terminalTransferDetail.setGoalBusId(resultMap.get("goalBusId"));
                 terminalTransferDetail.setOriginalBusId(resultMap.get("originalBusId"));
-                terminalTransferDetail.setProCom(resultMap.get("proCom"));
-                terminalTransferDetail.setProModel(resultMap.get("proModel"));
+//                terminalTransferDetail.setProCom(resultMap.get("proCom"));
+//                terminalTransferDetail.setProModel(resultMap.get("proModel"));
                 terminalTransferDetailMapper.insert(terminalTransferDetail);
             }
             if(saveFlag.equals(SaveFlag.TJSP.getValue())){
@@ -286,12 +286,13 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         here:
         for (AgentBusInfo busInfo : agentBusInfoList) {
             List<AgentBusInfo> childLevelBusInfos = agentBusinfoService.queryChildLevelByBusNum(null, busInfo.getBusPlatform(), busInfo.getBusNum());
+            log.info("是否是下级,个数:{}",childLevelBusInfos.size());
             for (AgentBusInfo childLevelBusInfo : childLevelBusInfos) {
-                log.info("是否是下级,childLevelBusInfo:{}",JsonUtil.objectToJson(childLevelBusInfo));
+                log.info("是否是下级,childBusNum:{},GoalOrgId:{}",childLevelBusInfo.getBusNum(),terminalTransferDetail.getGoalOrgId());
                 if(childLevelBusInfo.getBusNum().equals(terminalTransferDetail.getGoalOrgId())){
                     isSub = true;
+                    break here;
                 }
-                break here;
             }
         }
         if(!isSub){
@@ -299,41 +300,41 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             log.info("目标机构不是当前代理商下级,agentId:{}",agentId);
             throw new MessageException("目标机构不是当前代理商下级");
         }
-        Map<String, Object> reqParam = new HashMap<>();
-        reqParam.put("snBegin",terminalTransferDetail.getSnBeginNum());
-        reqParam.put("snEnd",terminalTransferDetail.getSnEndNum());
-        reqParam.put("status",OLogisticsDetailStatus.STATUS_FH.code);
-        ArrayList<Object> recordStatusList = new ArrayList<>();
-        recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
-        reqParam.put("recordStatusList",recordStatusList);
-        List<Map<String,Object>> logisticsDetailList = logisticsDetailMapper.queryCompensateLList(reqParam);
-        if(logisticsDetailList.size()==0){
-            throw new MessageException("sn号在审批中或已退货");
-        }
-        BigDecimal proNumSum = new BigDecimal(0);
-        for (Map<String, Object> stringObjectMap : logisticsDetailList) {
-            proNumSum = proNumSum.add(new BigDecimal(stringObjectMap.get("PRO_NUM").toString()));
-        }
-        if(proNumSum.compareTo(terminalTransferDetail.getSnCount())!=0){
-            throw new MessageException("sn号数量不匹配");
-        }
-        Set<String> proComSet = new HashSet<>();
-        Set<String> proModelSet = new HashSet<>();
-        for (Map<String, Object> logisticsDetail : logisticsDetailList) {
-            String activityId = String.valueOf(logisticsDetail.get("ACTIVITY_ID"));
-            OActivity oActivity = oActivityMapper.selectByPrimaryKey(activityId);
-            if(oActivity==null){
-                throw new MessageException("活动不存在");
-            }
-            proComSet.add(oActivity.getVender());
-            proModelSet.add(oActivity.getProModel());
-        }
-        if(proComSet.size()!=1){
-            throw new MessageException(terminalTransferDetail.getSnBeginNum()+"到"+terminalTransferDetail.getSnEndNum()+"不是同一厂商");
-        }
-        if(proModelSet.size()!=1){
-            throw new MessageException(terminalTransferDetail.getSnBeginNum()+"到"+terminalTransferDetail.getSnEndNum()+"不是同一型号");
-        }
+//        Map<String, Object> reqParam = new HashMap<>();
+//        reqParam.put("snBegin",terminalTransferDetail.getSnBeginNum());
+//        reqParam.put("snEnd",terminalTransferDetail.getSnEndNum());
+//        reqParam.put("status",OLogisticsDetailStatus.STATUS_FH.code);
+//        ArrayList<Object> recordStatusList = new ArrayList<>();
+//        recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+//        reqParam.put("recordStatusList",recordStatusList);
+//        List<Map<String,Object>> logisticsDetailList = logisticsDetailMapper.queryCompensateLList(reqParam);
+//        if(logisticsDetailList.size()==0){
+//            throw new MessageException("sn号在审批中或已退货");
+//        }
+//        BigDecimal proNumSum = new BigDecimal(0);
+//        for (Map<String, Object> stringObjectMap : logisticsDetailList) {
+//            proNumSum = proNumSum.add(new BigDecimal(stringObjectMap.get("PRO_NUM").toString()));
+//        }
+//        if(proNumSum.compareTo(terminalTransferDetail.getSnCount())!=0){
+//            throw new MessageException("sn号数量不匹配");
+//        }
+//        Set<String> proComSet = new HashSet<>();
+//        Set<String> proModelSet = new HashSet<>();
+//        for (Map<String, Object> logisticsDetail : logisticsDetailList) {
+//            String activityId = String.valueOf(logisticsDetail.get("ACTIVITY_ID"));
+//            OActivity oActivity = oActivityMapper.selectByPrimaryKey(activityId);
+//            if(oActivity==null){
+//                throw new MessageException("活动不存在");
+//            }
+//            proComSet.add(oActivity.getVender());
+//            proModelSet.add(oActivity.getProModel());
+//        }
+//        if(proComSet.size()!=1){
+//            throw new MessageException(terminalTransferDetail.getSnBeginNum()+"到"+terminalTransferDetail.getSnEndNum()+"不是同一厂商");
+//        }
+//        if(proModelSet.size()!=1){
+//            throw new MessageException(terminalTransferDetail.getSnBeginNum()+"到"+terminalTransferDetail.getSnEndNum()+"不是同一型号");
+//        }
         AgentBusInfoExample originalOrgExample = new AgentBusInfoExample();
         AgentBusInfoExample.Criteria originalOrgCriteria = originalOrgExample.createCriteria();
         originalOrgCriteria.andStatusEqualTo(Status.STATUS_1.status);
@@ -344,8 +345,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         if(originalOrgBusInfoList.size()==1){
             resultMap.put("originalBusId",originalOrgBusInfoList.get(0).getId());
         }
-        resultMap.put("proCom",proComSet.iterator().next());
-        resultMap.put("proModel",proModelSet.iterator().next());
+//        resultMap.put("proCom",proComSet.iterator().next());
+//        resultMap.put("proModel",proModelSet.iterator().next());
         resultMap.put("goalBusId",goalAgentBusInfo.getId());
         return resultMap;
     }
@@ -701,16 +702,16 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 terminalTransferDetail.setAdjustStatus(AdjustStatus.WTZ.getValue());
                 terminalTransferDetail.setGoalBusId(resultMap.get("goalBusId"));
                 terminalTransferDetail.setOriginalBusId(resultMap.get("originalBusId"));
-                terminalTransferDetail.setProCom(resultMap.get("proCom"));
-                terminalTransferDetail.setProModel(resultMap.get("proModel"));
+//                terminalTransferDetail.setProCom(resultMap.get("proCom"));
+//                terminalTransferDetail.setProModel(resultMap.get("proModel"));
                 terminalTransferDetailMapper.insert(terminalTransferDetail);
             }else{
                 terminalTransferDetail.setuUser(cuser);
                 terminalTransferDetail.setuTime(date);
                 terminalTransferDetail.setGoalBusId(resultMap.get("goalBusId"));
                 terminalTransferDetail.setOriginalBusId(resultMap.get("originalBusId"));
-                terminalTransferDetail.setProCom(resultMap.get("proCom"));
-                terminalTransferDetail.setProModel(resultMap.get("proModel"));
+//                terminalTransferDetail.setProCom(resultMap.get("proCom"));
+//                terminalTransferDetail.setProModel(resultMap.get("proModel"));
                 int j = terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
                 if(j!=1){
                     throw new MessageException("更新数据明细失败");

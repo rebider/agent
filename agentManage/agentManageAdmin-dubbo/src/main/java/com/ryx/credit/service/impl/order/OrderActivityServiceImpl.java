@@ -114,10 +114,10 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             logger.info("商品原价格不能为空");
             throw new MessageException("商品原价格不能为空");
         }
-        if (activity.getBusProCode() == null) {
-            logger.info("BusProCode不能为空");
-            throw new MessageException("BusProCode不能为空");
-        }
+//        if (activity.getBusProCode() == null) {
+//            logger.info("BusProCode不能为空");
+//            throw new MessageException("BusProCode不能为空");
+//        }
         activity.setId(idService.genId(TabId.o_activity));
         Date nowDate = new Date();
         activity.setcTime(nowDate);
@@ -303,7 +303,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 continue;
             }
             if(activity.getVisible().equals(VisibleStatus.TWO.getValue())){
-                List<String> agentIdList = activityVisibleMapper.selectConfiguredReturnAgentId(oActivity.getId());
+                List<String> agentIdList = activityVisibleMapper.selectConfiguredReturnAgentId(oActivity.getActCode());
                 if(!agentIdList.contains(angetId)){
                     continue;
                 }
@@ -605,15 +605,13 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             OActivityVisibleExample.Criteria criteria = oActivityVisibleExample.createCriteria();
             criteria.andActivityIdEqualTo(activityId);
             activityVisibleMapper.deleteByExample(oActivityVisibleExample);
-            OActivity oActivity = activityMapper.selectByPrimaryKey(activityId);
-            if (oActivity == null) {
-                throw new MessageException("活动不存在");
-            }
+            OActivity oActivity = new OActivity();
+            oActivity.setActCode(activityId);
             oActivity.setVisible(visible);
             oActivity.setuTime(new Date());
             oActivity.setuUser(userId);
-            int i = activityMapper.updateByPrimaryKey(oActivity);
-            if (i != 1) {
+            int i = activityMapper.updateByActCode(oActivity);
+            if (i == 0) {
                 throw new MessageException("设置失败");
             }
             if (visible.equals(VisibleStatus.TWO.getValue())) {
