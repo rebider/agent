@@ -154,7 +154,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             reqMap.put("orgId",String.valueOf(stringObjectMap.get("ORGID")));
         }
         List<Map<String,Object>> terminalTransferList = null;
-        if(page==null){
+        if(page!=null){
             terminalTransferList = terminalTransferDetailMapper.selectTerminalTransferDetailList(reqMap,page);
         }else{
             terminalTransferList = terminalTransferDetailMapper.exprotTerminalTransferDetails(reqMap);
