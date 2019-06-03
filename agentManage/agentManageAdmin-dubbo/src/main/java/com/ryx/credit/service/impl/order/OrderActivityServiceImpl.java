@@ -303,7 +303,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 continue;
             }
             if(activity.getVisible().equals(VisibleStatus.TWO.getValue())){
-                List<String> agentIdList = activityVisibleMapper.selectConfiguredReturnAgentId(oActivity.getId());
+                List<String> agentIdList = activityVisibleMapper.selectConfiguredReturnAgentId(oActivity.getActCode());
                 if(!agentIdList.contains(angetId)){
                     continue;
                 }
