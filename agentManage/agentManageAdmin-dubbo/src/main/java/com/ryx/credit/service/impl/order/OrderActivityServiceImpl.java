@@ -605,15 +605,13 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             OActivityVisibleExample.Criteria criteria = oActivityVisibleExample.createCriteria();
             criteria.andActivityIdEqualTo(activityId);
             activityVisibleMapper.deleteByExample(oActivityVisibleExample);
-            OActivity oActivity = activityMapper.selectByPrimaryKey(activityId);
-            if (oActivity == null) {
-                throw new MessageException("活动不存在");
-            }
+            OActivity oActivity = new OActivity();
+            oActivity.setActCode(activityId);
             oActivity.setVisible(visible);
             oActivity.setuTime(new Date());
             oActivity.setuUser(userId);
-            int i = activityMapper.updateByPrimaryKey(oActivity);
-            if (i != 1) {
+            int i = activityMapper.updateByActCode(oActivity);
+            if (i == 0) {
                 throw new MessageException("设置失败");
             }
             if (visible.equals(VisibleStatus.TWO.getValue())) {

@@ -547,4 +547,20 @@
       <if test="endTime!=null" > and a.end_time &gt;= #{endTime}</if>
     </where>
   </select>
+
+  <update id="updateByActCode" parameterType="com.ryx.credit.pojo.admin.order.OActivity">
+    update O_ACTIVITY
+    <set>
+      <if test="uTime != null">
+        U_TIME = #{uTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uUser != null">
+        U_USER = #{uUser,jdbcType=VARCHAR},
+      </if>
+      <if test="visible != null">
+        VISIBLE = #{visible,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ACT_CODE = #{actCode,jdbcType=VARCHAR}
+  </update>
 </mapper>

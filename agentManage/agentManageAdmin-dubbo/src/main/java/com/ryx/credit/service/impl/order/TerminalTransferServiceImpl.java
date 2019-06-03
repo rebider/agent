@@ -286,8 +286,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         here:
         for (AgentBusInfo busInfo : agentBusInfoList) {
             List<AgentBusInfo> childLevelBusInfos = agentBusinfoService.queryChildLevelByBusNum(null, busInfo.getBusPlatform(), busInfo.getBusNum());
+            log.info("是否是下级,个数:{}",childLevelBusInfos.size());
             for (AgentBusInfo childLevelBusInfo : childLevelBusInfos) {
-                log.info("是否是下级,childLevelBusInfo:{}",JsonUtil.objectToJson(childLevelBusInfo));
+                log.info("是否是下级,childBusNum:{},GoalOrgId:{}",childLevelBusInfo.getBusNum(),terminalTransferDetail.getGoalOrgId());
                 if(childLevelBusInfo.getBusNum().equals(terminalTransferDetail.getGoalOrgId())){
                     isSub = true;
                     break here;
