@@ -124,12 +124,13 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         }
 
         //不同的业务类型找到不同的启动流程
-        List<Dict> actlist = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.DATA_CACTIVITY_TYPE.name());
-        String workId = null;
-        for (Dict dict : actlist) {
-            if(dict.getdItemvalue().equals(dateChangeRequest.getDataType())){
-                workId = dict.getdItemname();
-            }
+        String workId;
+        if(dateChangeRequest.getDataType().equals(BusActRelBusType.DC_Agent.name())){
+            workId = dictOptionsService.getApproveVersion("business");
+        }else if(dateChangeRequest.getDataType().equals(BusActRelBusType.DC_Colinfo.name())){
+            workId = dictOptionsService.getApproveVersion("finance");
+        }else{
+            throw new MessageException("请求类型错误");
         }
 
         dateChangeRequest.setAppyStatus(AgStatus.Approving.status);

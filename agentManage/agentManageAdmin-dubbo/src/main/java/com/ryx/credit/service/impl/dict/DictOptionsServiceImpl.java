@@ -1,6 +1,9 @@
 package com.ryx.credit.service.impl.dict;
 
+import com.ryx.credit.common.enumc.DictGroup;
 import com.ryx.credit.common.enumc.Status;
+import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.dao.agent.DictMapper;
 import com.ryx.credit.pojo.admin.agent.Dict;
@@ -110,4 +113,17 @@ public class DictOptionsServiceImpl implements DictOptionsService {
         return dicts.get(0);
     }
 
+    /**
+     * 工作流获取名称版本
+     * @param approveName
+     * @return
+     */
+    @Override
+    public String getApproveVersion(String approveName)throws ProcessException{
+        Dict approveMode = findDictByValue(DictGroup.AGENT.name(), DictGroup.APPROVE_MODE.name(),approveName);
+        if(approveMode==null){
+            throw new ProcessException("审批流配置获取失败!");
+        }
+        return approveMode.getdItemvalue()+"_"+approveMode.getdItemname();
+    }
 }

@@ -349,8 +349,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 throw new ProcessException("启动部门参数为空!");
             }
             startPar.put("rs",ApprovalType.PASS.getValue());
+
             //启动审批
-            String proce = activityService.createDeloyFlow(null, AppConfig.getProperty("agent_net_in_activity"), null, null, startPar);
+            String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("net"), null, null, startPar);
             if (proce == null) {
                 logger.info("代理商审批，审批流启动失败{}:{}", agentId, cuser);
                 throw new ProcessException("审批流启动失败!");
@@ -459,7 +460,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         }
         startPar.put("rs",ApprovalType.PASS.getValue());
         //启动审批
-        String proce = activityService.createDeloyFlow(null, AppConfig.getProperty("agent_net_in_activity"), null, null, startPar);
+        String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("net"), null, null, startPar);
         if (proce == null) {
             logger.info("代理商业务启动审批异常，审批流启动失败{}:{}", busid, cuser);
             throw new ProcessException("审批流启动失败!");
