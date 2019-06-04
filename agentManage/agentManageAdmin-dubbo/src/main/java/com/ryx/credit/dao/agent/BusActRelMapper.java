@@ -25,4 +25,6 @@ public interface BusActRelMapper {
     int updateByPrimaryKey(BusActRel record);
 
     BusActRel findById(String activId);
+
+    BusActRel findByBusId(String busId);
 }
