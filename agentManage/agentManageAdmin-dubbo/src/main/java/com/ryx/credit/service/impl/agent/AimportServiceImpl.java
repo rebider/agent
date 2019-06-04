@@ -1600,7 +1600,7 @@ public class AimportServiceImpl implements AimportService {
         String  jiejichukuanfeilv = list.size()>26?list.get(26)+"":"";//借记出款费率
         String  shifoukaitongs0 = list.size()>27?list.get(27)+"":"";//是否开通s0
 
-
+        ag  = ag.trim();
         AgentExample agentExample = new AgentExample();
         agentExample.or().andAgUniqNumEqualTo(ag);
         List<Agent> agents = agentMapper.selectByExample(agentExample);
