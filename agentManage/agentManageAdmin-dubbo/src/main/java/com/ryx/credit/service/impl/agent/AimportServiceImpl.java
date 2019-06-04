@@ -1816,6 +1816,9 @@ public class AimportServiceImpl implements AimportService {
 
         if(StringUtils.isNotBlank(agentBusInfo.getId())){
             agentBusInfo.setcUtime(Calendar.getInstance().getTime());
+            if(StringUtils.isBlank(agentBusInfo.getBusRiskParent())){
+                agentBusInfo.setBusRiskParent(agentBusInfo.getId());
+            }
             if(agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)==1){
                 logger.info(prefix_importBusInfo+"更新业务码({}),{},{}，成功",busPlatform_num,user,list);
             }else{
@@ -1824,6 +1827,9 @@ public class AimportServiceImpl implements AimportService {
         }else{
             agentBusInfo.setcUtime(Calendar.getInstance().getTime());
             agentBusInfo.setId(idService.genId(TabId.a_agent_businfo));
+            if(StringUtils.isBlank(agentBusInfo.getBusRiskParent())){
+                agentBusInfo.setBusRiskParent(agentBusInfo.getId());
+            }
             if(agentBusInfoMapper.insertSelective(agentBusInfo)==1){
                 logger.info(prefix_importBusInfo+"添加业务码({}),{},{}，成功",busPlatform_num,user,list);
             }else{
