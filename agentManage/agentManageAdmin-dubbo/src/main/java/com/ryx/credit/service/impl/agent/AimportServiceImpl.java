@@ -1625,13 +1625,7 @@ public class AimportServiceImpl implements AimportService {
             agentBusInfo.setcTime(new Date());
             agentBusInfo.setcUtime(agentBusInfo.getcTime());
             agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
-            if(null==agentBusInfo.getCloReviewStatus()){
-                if(agent.getAgStatus().equals(AgStatus.Create.name())){
-                    agentBusInfo.setCloReviewStatus(AgStatus.Create.status);
-                }else{
-                    agentBusInfo.setCloReviewStatus(AgStatus.Approving.status);
-                }
-            }
+            agentBusInfo.setCloReviewStatus(AgStatus.Approving.status);
             agentBusInfo.setStatus(Status.STATUS_1.status);
             agentBusInfo.setVersion(Status.STATUS_1.status);
             agentBusInfo.setcUser(user);
@@ -1700,11 +1694,12 @@ public class AimportServiceImpl implements AimportService {
         }
         //业务区域
         List<String> arr = new ArrayList<>();
+        logger.info(prefix_importBusInfo+"业务码({})区域,{},{},{}",busPlatform_num,busRegion,user,list);
         if(busRegion!=null && StringUtils.isNotBlank(busRegion) && !"null".equals(busRegion)) {
+            busRegion = busRegion.trim();
             String[] regions = busRegion.split(",");
             DPosRegionExample dPosRegionExample = new DPosRegionExample();
-            dPosRegionExample.or().andCodeIn(Arrays.asList(regions)).andCodeLevelIn(Arrays.asList("2"));
-
+            dPosRegionExample.or().andNameIn(Arrays.asList(regions)).andCodeLevelIn(Arrays.asList("2","1"));
             List<DPosRegion> dPosRegions = dPosRegionMapper.selectByExample(dPosRegionExample);
             for (DPosRegion dPosRegion : dPosRegions) {
                 arr.add(dPosRegion.getCode());
