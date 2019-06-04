@@ -2,6 +2,7 @@ package com.ryx.credit.service.impl.order;
 
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.IDUtils;
@@ -9,9 +10,7 @@ import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.dao.agent.AgentBusInfoMapper;
-import com.ryx.credit.dao.agent.AgentMapper;
-import com.ryx.credit.dao.agent.BusActRelMapper;
+import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.*;
 import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.agent.*;
@@ -80,6 +79,10 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     private OActivityMapper oActivityMapper;
     @Autowired
     private DictOptionsService dictOptionsService;
+    @Autowired
+    private AttachmentRelMapper attachmentRelMapper;
+    @Autowired
+    private AttachmentMapper attachmentMapper;
 
     @Override
     public PageInfo terminalTransferList(TerminalTransfer terminalTransfer, Page page, String agName,String dataRole,Long userId) {
@@ -213,6 +216,25 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             }
             if(terminalTransferDetailList.size()==0){
                 throw new MessageException("请填写明细最少一条");
+            }
+            //添加新的附件
+            if(StringUtils.isNotBlank(terminalTransfer.getTerTranFile())){
+                String[] terTranFiles = terminalTransfer.getTerTranFile().split(",");
+                for (String terTranFile : terTranFiles) {
+                    AttachmentRel record = new AttachmentRel();
+                    record.setAttId(terTranFile);
+                    record.setSrcId(terminalTransferId);
+                    record.setcUser(cuser);
+                    record.setcTime(Calendar.getInstance().getTime());
+                    record.setStatus(Status.STATUS_1.status);
+                    record.setBusType(AttachmentRelType.terminalTransfer.name());
+                    record.setId(idService.genId(TabId.a_attachment_rel));
+                    int f = attachmentRelMapper.insertSelective(record);
+                    if (1 != f) {
+                        log.info("终端划拨保存附件关系失败");
+                        throw new ProcessException("保存附件失败");
+                    }
+                }
             }
             for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailList) {
                 Map<String, String> resultMap = saveOrEditVerify(terminalTransferDetail, agentId);
@@ -532,9 +554,12 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     terminalTransferDetail.setButtJointPerson(cUser.getName());
                 }
             }
-
         }
         terminalTransfer.setTerminalTransferDetailList(terminalTransferDetails);
+        //查询关联附件
+        List<Attachment> attachments = attachmentMapper.accessoryQuery(terminalTransferId, AttachmentRelType.terminalTransfer.name());
+        terminalTransfer.setAttachments(attachments);
+
         return terminalTransfer;
     }
 
@@ -688,6 +713,40 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         if(terminalTransferDetailList.size()==0){
             throw new MessageException("请填写明细最少一条");
         }
+        //附件修改
+        AttachmentRelExample attachmentRelExample = new AttachmentRelExample();
+        AttachmentRelExample.Criteria attCriteria = attachmentRelExample.createCriteria();
+        attCriteria.andSrcIdEqualTo(terminalTransfer.getId());
+        attCriteria.andStatusEqualTo(Status.STATUS_1.status);
+        attCriteria.andBusTypeEqualTo(AttachmentRelType.terminalTransfer.name());
+        List<AttachmentRel> attachmentRels = attachmentRelMapper.selectByExample(attachmentRelExample);
+        attachmentRels.forEach(row->{
+            row.setStatus(Status.STATUS_0.status);
+            int j = attachmentRelMapper.updateByPrimaryKeySelective(row);
+            if (1 != j) {
+                log.info("删除代理商退出附件关系失败");
+                throw new ProcessException("删除附件失败");
+            }
+        });
+        if(StringUtils.isNotBlank(terminalTransfer.getTerTranFile())){
+            String[] terTranFiles = terminalTransfer.getTerTranFile().split(",");
+            for (String terTranFile : terTranFiles) {
+                AttachmentRel record = new AttachmentRel();
+                record.setAttId(terTranFile);
+                record.setSrcId(terminalTransfer.getId());
+                record.setcUser(cuser);
+                record.setcTime(Calendar.getInstance().getTime());
+                record.setStatus(Status.STATUS_1.status);
+                record.setBusType(AttachmentRelType.terminalTransfer.name());
+                record.setId(idService.genId(TabId.a_attachment_rel));
+                int f = attachmentRelMapper.insertSelective(record);
+                if (1 != f) {
+                    log.info("终端划拨附件关系失败");
+                    throw new ProcessException("附件关系失败");
+                }
+            }
+        }
+
         int updateCount = 0;
         for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailList) {
             Map<String, String> resultMap = saveOrEditVerify(terminalTransferDetail, agentId);
