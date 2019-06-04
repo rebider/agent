@@ -278,27 +278,27 @@ public class OSupplementServiceImpl implements OSupplementService {
             logger.info("补款审批,禁止重复提交审批{}:{}", id, userId);
             throw new MessageException("补款审批中，禁止重复提交审批");
         }
-        List<Dict> actlist = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.ACT_RETURN_FINANCE.name());
-        String workId = null;
-        for (Dict dict : actlist) {
-            workId = dict.getdItemvalue();
-        }
+//        List<Dict> actlist = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.ACT_RETURN_FINANCE.name());
+//        String workId = null;
+//        for (Dict dict : actlist) {
+//            workId = dict.getdItemvalue();
+//        }
         oSupplement.setReviewStatus(AgStatus.Approving.status);
 
         if (1 != oSupplementMapper.updateByPrimaryKeySelective(oSupplement)) {
             logger.info("补款审批，启动审批异常，更新记录状态{}:{}", oSupplement.getId(), userId);
             throw new MessageException("更新记录状态异常");
         }
-        if (StringUtils.isEmpty(workId)) {
-            logger.info("========用户{}启动补款审批{}{}", id, userId, "审批流启动失败字典中未配置部署流程");
-            throw new MessageException("审批流启动失败字典中未配置部署流程!");
-        }
+//        if (StringUtils.isEmpty(workId)) {
+//            logger.info("========用户{}启动补款审批{}{}", id, userId, "审批流启动失败字典中未配置部署流程");
+//            throw new MessageException("审批流启动失败字典中未配置部署流程!");
+//        }
         Map startPar = agentEnterService.startPar(userId);
         if (null == startPar) {
             logger.info("========用户{}启动补款审批{}{}启动部门参数为空", id, userId, "审批流启动失败字典中未配置部署流程");
             throw new MessageException("启动部门参数为空!");
         }
-        String proce = activityService.createDeloyFlow(null, workId, null, null, startPar);
+        String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("returnFinance"), null, null, startPar);
         if (proce == null) {
             logger.info("========用户{}启动补款审批申请{}{}", id, userId, "补款审批，审批流启动失败");
             logger.info("补款审批，审批流启动失败{}:{}", id, userId);
