@@ -17,6 +17,7 @@ import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.AgentQuitRefundService;
+import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import oracle.jdbc.driver.DatabaseError;
 import org.junit.Test;
@@ -64,7 +65,8 @@ public class AgentQuitRefundServiceImpl implements AgentQuitRefundService {
     private AttachmentRelMapper attachmentRelMapper;
     @Autowired
     private AttachmentMapper attachmentMapper;
-
+    @Autowired
+    private DictOptionsService dictOptionsService;
 
     /**
      * 申请退款列表
@@ -234,7 +236,7 @@ public class AgentQuitRefundServiceImpl implements AgentQuitRefundService {
             if (null == startPar) {
                 throw new ProcessException("启动部门参数为空！");
             }
-            String proceId = activityService.createDeloyFlow(null, "quitCityRefund1.0", null, null, startPar);
+            String proceId = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("quitCityRefund"), null, null, startPar);
             if (proceId == null) {
                 logger.info("代理商退出-申请退款提交审批，审批流启动失败{}:{}", agentQuitRefund.getId(), cUser);
                 throw new MessageException("审批流启动失败！");

@@ -255,7 +255,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         //启动历史订单退货流程审批
         String processingId = null;
         try {
-            processingId = activityService.createDeloyFlow("","historyrefund","","",null);
+            processingId = activityService.createDeloyFlow("", dictOptionsService.getApproveVersion("historyrefund"),"","",null);
             if(StringUtils.isBlank(processingId)){
                 logger.info("审批流启动失败");
                 throw new MessageException("审批流启动失败");

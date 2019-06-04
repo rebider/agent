@@ -21,6 +21,7 @@ import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentEnterService;
+import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.TerminalTransferService;
 import org.slf4j.Logger;
@@ -77,6 +78,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     private IUserService iUserService;
     @Autowired
     private OActivityMapper oActivityMapper;
+    @Autowired
+    private DictOptionsService dictOptionsService;
 
     @Override
     public PageInfo terminalTransferList(TerminalTransfer terminalTransfer, Page page, String agName,String dataRole,Long userId) {
@@ -379,7 +382,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             }
         }
         //启动审批
-        String proce = activityService.createDeloyFlow(null, BusActRelBusType.agentTerminal.name(), null, null, null);
+        String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("agentTerminal"), null, null, null);
         if (proce == null) {
             log.info("终端划拨提交审批，审批流启动失败{}:{}", id, cuser);
             throw new MessageException("审批流启动失败!");

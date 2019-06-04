@@ -913,13 +913,13 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         }
 
         //不同的业务类型找到不同的启动流程
-        List<Dict> actlist = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.ACT_ORDER_RETURN.name());
-        String workId = null;
-        for (Dict dict : actlist) {
-            workId = dict.getdItemvalue();
-        }
+//        List<Dict> actlist = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.ACT_ORDER_RETURN.name());
+//        String workId = null;
+//        for (Dict dict : actlist) {
+//            workId = dict.getdItemvalue();
+//        }
         //启动审批
-        String proce = activityService.createDeloyFlow(null, workId, null, null, startPar);
+        String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("refund"), null, null, startPar);
         if (proce == null) {
             log.info("退货提交审批，审批流启动失败{}:{}", returnId, agentId);
             throw new ProcessException("退货审批流启动失败!");

@@ -22,6 +22,7 @@ import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.CapitalChangeApplyService;
 import com.ryx.credit.service.agent.CapitalService;
+import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.IPaymentDetailService;
 import com.ryx.credit.service.order.OCashReceivablesService;
@@ -79,6 +80,8 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
     private CapitalChangeApplyService capitalChangeApplyService;
     @Autowired
     private RedisService redisService;
+    @Autowired
+    private DictOptionsService dictOptionsService;
 
     private static final String CAPITAL_LOCK = "capital_lock_";
     private static final String CAPITAL_APP_LOCK = "capital_app_lock_";
@@ -364,7 +367,7 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
             startPar.put("operationType", capitalChangeApply.getOperationType());
 
             //启动审批
-            String proce = activityService.createDeloyFlow(null, "capitalChange1.0", null, null, startPar);
+            String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("capitalChange"), null, null, startPar);
             if (proce == null) {
                 logger.info("退补差价提交审批，审批流启动失败{}:{}", id, cUser);
                 throw new MessageException("审批流启动失败!");

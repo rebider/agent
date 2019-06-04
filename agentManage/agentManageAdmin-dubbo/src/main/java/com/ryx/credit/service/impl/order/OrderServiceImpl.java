@@ -1329,13 +1329,11 @@ public class OrderServiceImpl implements OrderService {
         }
         Object party = startPar.get("party");
         //不同的业务类型找到不同的启动流程
-        List<Dict> actlist = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.ACT_ORDER.name());
         String workId = null;
-        for (Dict dict : actlist) {
-            //根据不同的部门信息启动不同的流程
-            if(party.equals(dict.getdItemvalue())) {
-                workId = dict.getdItemname();
-            }
+        if(party.equals("beijing") || party.equals("north") || party.equals("south")) {
+            workId = dictOptionsService.getApproveVersion("orderCity");
+        }else{
+            workId = dictOptionsService.getApproveVersion("orderAgent");
         }
         //订单启动流程
         if(StringUtils.isBlank(workId)){
