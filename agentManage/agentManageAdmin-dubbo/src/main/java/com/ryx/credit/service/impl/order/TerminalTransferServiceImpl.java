@@ -189,8 +189,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     @Override
     public AgentResult saveTerminalTransfer(TerminalTransfer terminalTransfer,List<TerminalTransferDetail> terminalTransferDetailList, String cuser,String agentId,String saveFlag)throws Exception{
 
-        //|| StringUtils.isBlank(agentId)
-        if (StringUtils.isBlank(cuser)) {
+        if (StringUtils.isBlank(cuser) || StringUtils.isBlank(agentId)) {
             log.info("终端划拨提交审批,操作用户为空:{}", cuser);
             return AgentResult.fail("终端划拨，操作用户为空");
         }
@@ -701,9 +700,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         if(StringUtils.isBlank(terminalTransfer.getId())){
             throw new MessageException("数据ID为空");
         }
-//        if(StringUtils.isBlank(agentId)){
-//            throw new MessageException("缺少代理商编号");
-//        }
+        if(StringUtils.isBlank(agentId)){
+            throw new MessageException("缺少代理商编号");
+        }
         Date date = new Date();
         terminalTransfer.setuTime(date);
         terminalTransfer.setuUser(cuser);
