@@ -478,15 +478,13 @@ public class CompensateServiceImpl implements CompensateService {
             log.info("========用户{}{}启动部门参数为空", id, cuser);
             throw new MessageException("启动部门参数为空!");
         }
-        Object party = startPar.get("party");
-        //不同的业务类型找到不同的启动流程
-        List<Dict> actlist = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.ACT_COMPENSATE.name());
-        String workId = null;
-        for (Dict dict : actlist) {
-            //根据不同的部门信息启动不同的流程
-            if(party.equals(dict.getdItemvalue())) {
-                workId = dict.getdItemname();
-            }
+        String party = String.valueOf(startPar.get("party"));
+        String workId;
+        //根据不同的部门信息启动不同的流程
+        if(party.equals("beijing") || party.equals("north") || party.equals("south")) {
+            workId = dictOptionsService.getApproveVersion("compensation");
+        }else{
+            workId = dictOptionsService.getApproveVersion("agentCompensation");
         }
         //启动审批
         String proce = activityService.createDeloyFlow(null, workId, null, null, startPar);

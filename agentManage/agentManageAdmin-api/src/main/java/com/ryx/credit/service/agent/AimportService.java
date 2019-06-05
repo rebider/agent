@@ -30,5 +30,5 @@ public interface AimportService {
 
     public ResultVO parseParent()throws Exception;
 
-    public ResultVO importAgentBusInfoBusInfoFromExcel(String user,List<Object> list) throws Exception;
+    public ResultVO importAgentBusInfoBusInfoFromExcel(String type,String user,List<Object> list) throws Exception;
 }

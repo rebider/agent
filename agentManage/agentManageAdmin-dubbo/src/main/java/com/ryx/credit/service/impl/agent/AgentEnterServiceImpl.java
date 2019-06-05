@@ -153,10 +153,21 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 if(PlatformType.RDBPOS.code.equals(platformType.getValue())){
                     //检查手机号是否填写
                     if(StringUtils.isBlank(item.getBusLoginNum())){
-                        throw new ProcessException("瑞大宝登陆账号不能为空");
+                        throw new ProcessException("瑞大宝登录账号不能为空");
                     }
+                    item.setBusLoginNum(item.getBusLoginNum().trim());
                     if(!RegexUtil.checkInt(item.getBusLoginNum())){
-                        throw new ProcessException("瑞大宝登陆账号必须为数字");
+                        throw new ProcessException("瑞大宝登录账号必须为数字");
+                    }
+                }
+                if(PlatformType.RHPOS.code.equals(platformType.getValue())){
+                    //检查手机号是否填写
+                    if(StringUtils.isBlank(item.getBusLoginNum())){
+                        throw new ProcessException("瑞花宝登录账号不能为空");
+                    }
+                    item.setBusLoginNum(item.getBusLoginNum().trim());
+                    if(!RegexUtil.checkInt(item.getBusLoginNum())){
+                        throw new ProcessException("瑞花宝登录账号必须是数字");
                     }
                 }
             }
@@ -339,8 +350,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 throw new ProcessException("启动部门参数为空!");
             }
             startPar.put("rs",ApprovalType.PASS.getValue());
+
             //启动审批
-            String proce = activityService.createDeloyFlow(null, AppConfig.getProperty("agent_net_in_activity"), null, null, startPar);
+            String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("net"), null, null, startPar);
             if (proce == null) {
                 logger.info("代理商审批，审批流启动失败{}:{}", agentId, cuser);
                 throw new ProcessException("审批流启动失败!");
@@ -449,7 +461,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         }
         startPar.put("rs",ApprovalType.PASS.getValue());
         //启动审批
-        String proce = activityService.createDeloyFlow(null, AppConfig.getProperty("agent_net_in_activity"), null, null, startPar);
+        String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("net"), null, null, startPar);
         if (proce == null) {
             logger.info("代理商业务启动审批异常，审批流启动失败{}:{}", busid, cuser);
             throw new ProcessException("审批流启动失败!");

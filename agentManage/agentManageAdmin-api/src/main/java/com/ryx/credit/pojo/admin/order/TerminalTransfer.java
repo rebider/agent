@@ -1,5 +1,7 @@
 package com.ryx.credit.pojo.admin.order;
 
+import com.ryx.credit.pojo.admin.agent.Attachment;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -27,6 +29,26 @@ public class TerminalTransfer implements Serializable{
     private String agentId;
 
     private List<TerminalTransferDetail> terminalTransferDetailList;
+
+    private String terTranFile;
+
+    private List<Attachment> attachments;
+
+    public List<Attachment> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<Attachment> attachments) {
+        this.attachments = attachments;
+    }
+
+    public String getTerTranFile() {
+        return terTranFile;
+    }
+
+    public void setTerTranFile(String terTranFile) {
+        this.terTranFile = terTranFile;
+    }
 
     public String getId() {
         return id;

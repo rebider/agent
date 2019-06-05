@@ -43,8 +43,14 @@ public class TermMachineServiceImpl  implements TermMachineService {
             return posTermMachineServiceImpl.queryTermMachine(platformType);
         }else  if(PlatformType.MPOS.code.equals(platformType.code)){
             return mposTermMachineServiceImpl.queryTermMachine(platformType);
+        }else {
+            List<TermMachineVo> list = new ArrayList<>();
+            TermMachineVo vo = new TermMachineVo();
+            vo.setId("");
+            vo.setMechineName("无配置");
+            list.add(vo);
+            return list;
         }
-        return new ArrayList<>();
     }
 
     @Override

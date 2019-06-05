@@ -1066,10 +1066,10 @@ public class OLogisticServiceImpl implements OLogisticsService {
             return AgentResult.fail("SN号错误");
         }
         if(snStart.compareTo(isInStart)>0 || snEnd.compareTo(isInStart)<0){
-            return AgentResult.fail("SN号"+isInStart+"不在指定区间，请检查SN");
+            return AgentResult.fail("发货SN号["+isInStart+"]与退货SN["+snStart+":"+snEnd+"]不符，请检查SN");
         }
         if(snStart.compareTo(isInEnd)>0 || snEnd.compareTo(isInEnd)<0){
-            return AgentResult.fail("SN号"+isInEnd+"不在指定区间，请检查SN");
+            return AgentResult.fail("发货SN号["+isInEnd+"]与退货SN["+snStart+":"+snEnd+"]不符，请检查SN");
         }
         return AgentResult.ok();
     }

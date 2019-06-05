@@ -203,6 +203,11 @@ public class OrderServiceImpl implements OrderService {
         if (par == null) return pageInfo;
         if (par.get("agentId") == null) return pageInfo;
         if (StringUtils.isBlank(par.get("agentId").toString())) return pageInfo;
+        if(null!=par.get("userId")) {
+            Long userId = (Long) par.get("userId");
+            List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+            par.put("platfromPerm", platfromPerm);
+        }
         par.put("page", page);
         pageInfo.setTotal(orderMapper.queryAllOrderListViewCount(par));
         pageInfo.setRows(orderMapper.queryAllOrderListView(par));
@@ -333,11 +338,11 @@ public class OrderServiceImpl implements OrderService {
             return AgentResult.fail("分期日超出三个月");
         }
 
-        if (day > 5) {
-            if (current.compareTo(selDay) == 0) {
-                return AgentResult.fail("5号以后只能选择下月开始分期");
-            }
-        }
+//        if (day > 5) {
+//            if (current.compareTo(selDay) == 0) {
+//                return AgentResult.fail("5号以后只能选择下月开始分期");
+//            }
+//        }
         return AgentResult.ok();
     }
 
@@ -350,7 +355,13 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OPayment initPayment(OrderFormVo agentVo) throws MessageException {
         OPayment payment = agentVo.getoPayment();
-        Date dateFromStr = DateUtil.getDateFromStr(DateUtil.format(new Date(), "yyyy-MM-dd"), "yyyy-MM-dd");
+        Calendar c= Calendar.getInstance();
+        c.set(Calendar.DAY_OF_MONTH,c.getActualMinimum(Calendar.DAY_OF_MONTH));
+        c.set(Calendar.HOUR_OF_DAY,c.getActualMinimum(Calendar.HOUR_OF_DAY));
+        c.set(Calendar.MILLISECOND,c.getActualMinimum(Calendar.MILLISECOND));
+        c.set(Calendar.SECOND,c.getActualMinimum(Calendar.SECOND));
+        c.set(Calendar.MINUTE,c.getActualMinimum(Calendar.MINUTE));
+        Date dateFromStr = DateUtil.getDateFromStr(DateUtil.format(c.getTime(), "yyyy-MM-dd"), "yyyy-MM-dd");
         switch (payment.getPayMethod()) {
             case "SF1"://首付+分润分期
                 if (payment.getDownPayment() == null || payment.getDownPayment().compareTo(BigDecimal.ZERO) == 0) {
@@ -1332,13 +1343,11 @@ public class OrderServiceImpl implements OrderService {
         }
         Object party = startPar.get("party");
         //不同的业务类型找到不同的启动流程
-        List<Dict> actlist = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.ACT_ORDER.name());
         String workId = null;
-        for (Dict dict : actlist) {
-            //根据不同的部门信息启动不同的流程
-            if(party.equals(dict.getdItemvalue())) {
-                workId = dict.getdItemname();
-            }
+        if(party.equals("beijing") || party.equals("north") || party.equals("south")) {
+            workId = dictOptionsService.getApproveVersion("orderCity");
+        }else{
+            workId = dictOptionsService.getApproveVersion("orderAgent");
         }
         //订单启动流程
         if(StringUtils.isBlank(workId)){

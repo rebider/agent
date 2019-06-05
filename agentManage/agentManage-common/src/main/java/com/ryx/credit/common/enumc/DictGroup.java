@@ -74,7 +74,8 @@ public enum DictGroup {
 
     POS("POS审批"),
     POS_APR_BUSNISS("POS审批参数"),
-    ORDER_RETURN("订单退货业务选择下一级审批人参数");
+    ORDER_RETURN("订单退货业务选择下一级审批人参数"),
+    APPROVE_MODE("审批流程图当前节点");
 
     public String  msg;
 

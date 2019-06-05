@@ -538,13 +538,12 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         }
         Object party = startPar.get("party");
         //不同的业务类型找到不同的启动流程
-        List<Dict> actlist = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.AGENTQUIT.name());
-        String workId = null;
-        for (Dict dict : actlist) {
-            //根据不同的部门信息启动不同的流程
-            if(party.equals(dict.getdItemvalue())) {
-                workId = dict.getdItemname();
-            }
+        String workId;
+        //根据不同的部门信息启动不同的流程
+        if(party.equals("beijing") || party.equals("north") || party.equals("south")) {
+            workId = dictOptionsService.getApproveVersion("quitCity");
+        }else{
+            workId = dictOptionsService.getApproveVersion("quitAgent");
         }
         //启动审批
         String proce = activityService.createDeloyFlow(null, workId, null, null, startPar);
