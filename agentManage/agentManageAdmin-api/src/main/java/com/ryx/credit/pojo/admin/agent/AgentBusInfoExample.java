@@ -2667,6 +2667,76 @@ public class AgentBusInfoExample {
             addCriterion("TERMINALS_LOWER not between", value1, value2, "terminalsLower");
             return (Criteria) this;
         }
+
+        public Criteria andCreditRateFloorIsNull() {
+            addCriterion("CREDIT_RATE_FLOOR is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorIsNotNull() {
+            addCriterion("CREDIT_RATE_FLOOR is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorEqualTo(String value) {
+            addCriterion("CREDIT_RATE_FLOOR =", value, "creditRateFloor");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorNotEqualTo(String value) {
+            addCriterion("CREDIT_RATE_FLOOR <>", value, "creditRateFloor");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorGreaterThan(String value) {
+            addCriterion("CREDIT_RATE_FLOOR >", value, "creditRateFloor");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorGreaterThanOrEqualTo(String value) {
+            addCriterion("CREDIT_RATE_FLOOR >=", value, "creditRateFloor");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorLessThan(String value) {
+            addCriterion("CREDIT_RATE_FLOOR <", value, "creditRateFloor");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorLessThanOrEqualTo(String value) {
+            addCriterion("CREDIT_RATE_FLOOR <=", value, "creditRateFloor");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorLike(String value) {
+            addCriterion("CREDIT_RATE_FLOOR like", value, "creditRateFloor");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorNotLike(String value) {
+            addCriterion("CREDIT_RATE_FLOOR not like", value, "creditRateFloor");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorIn(List<String> values) {
+            addCriterion("CREDIT_RATE_FLOOR in", values, "creditRateFloor");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorNotIn(List<String> values) {
+            addCriterion("CREDIT_RATE_FLOOR not in", values, "creditRateFloor");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorBetween(String value1, String value2) {
+            addCriterion("CREDIT_RATE_FLOOR between", value1, value2, "creditRateFloor");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorNotBetween(String value1, String value2) {
+            addCriterion("CREDIT_RATE_FLOOR not between", value1, value2, "creditRateFloor");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
