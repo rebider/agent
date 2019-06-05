@@ -1601,12 +1601,14 @@ public class AimportServiceImpl implements AimportService {
         String  shifoukaitongs0 = list.size()>27?list.get(27)+"":"";//是否开通s0
 
         ag  = ag.trim();
+        busPlatform_num = busPlatform_num.trim();
         AgentExample agentExample = new AgentExample();
         agentExample.or().andAgUniqNumEqualTo(ag);
         List<Agent> agents = agentMapper.selectByExample(agentExample);
 
-        if(agents.size()!=0){
+        if(agents.size()==0){
             logger.info(prefix_importBusInfo+"唯一码未找到({}),{},{}",ag,user,list);
+            return ResultVO.fail("唯一码未找到["+ag+"]");
         }
         Agent agent = agents.get(0);
 
@@ -1630,7 +1632,6 @@ public class AimportServiceImpl implements AimportService {
             agentBusInfo.setVersion(Status.STATUS_1.status);
             agentBusInfo.setcUser(user);
         }
-
         agentBusInfo.setBusNum(busPlatform_num);
         agentBusInfo.setAgentId(agent.getId());
         //业务平台类型
@@ -1823,6 +1824,7 @@ public class AimportServiceImpl implements AimportService {
                 logger.info(prefix_importBusInfo+"更新业务码({}),{},{}，成功",busPlatform_num,user,list);
             }else{
                 logger.info(prefix_importBusInfo+"更新业务码({}),{},{}，失败",busPlatform_num,user,list);
+                return ResultVO.fail("更新业务失败");
             }
         }else{
             agentBusInfo.setcUtime(Calendar.getInstance().getTime());
@@ -1834,6 +1836,7 @@ public class AimportServiceImpl implements AimportService {
                 logger.info(prefix_importBusInfo+"添加业务码({}),{},{}，成功",busPlatform_num,user,list);
             }else{
                 logger.info(prefix_importBusInfo+"添加业务码({}),{},{}，失败",busPlatform_num,user,list);
+                return ResultVO.fail("添加业务失败");
             }
         }
         return ResultVO.success(null);
