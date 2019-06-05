@@ -165,6 +165,24 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
         }
     }
 
+    private static AgentResult httpForRDBpos(String agencyId)throws Exception{
+        try {
+            Map<String, String> map = new HashMap<>();
+            map.put("agencyId",agencyId);
+            String toJson = JsonUtil.objectToJson(map);
+            log.info("瑞大宝查询终端下限数量请求参数:{}",toJson);
+            String httpResult = HttpClientUtil.doPostJson(AppConfig.getProperty("rdb_req_url")+"agency/getTermCount", toJson);
+            log.info("瑞大宝查询终端下限数量返回参数:{}",httpResult);
+            JSONObject jsonObject = JSONObject.parseObject(httpResult);
+            JSONArray result = jsonObject.getJSONArray("result");
+            return AgentResult.ok(result);
+        } catch (Exception e) {
+            log.info("http请求超时:{}",e.getMessage());
+            e.printStackTrace();
+            throw new Exception(e);
+        }
+    }
+
     @Override
     public AgentResult posOrgStatistics(String orgId,String termType)throws Exception{
 
@@ -210,6 +228,15 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
                 }
             }
             AgentResult agentResult = httpForPos(orgId,parentBusNum);
+            agentResult.setMsg(platformType);
+            return agentResult;
+        }else if(PlatformType.RDBPOS.getValue().equals(platformType)){
+            if(StringUtils.isEmpty(orgId)){
+                if(StringUtils.isNotEmpty(parentBusNum)){
+                    orgId = parentBusNum;
+                }
+            }
+            AgentResult agentResult = httpForRDBpos(orgId);
             agentResult.setMsg(platformType);
             return agentResult;
         }
