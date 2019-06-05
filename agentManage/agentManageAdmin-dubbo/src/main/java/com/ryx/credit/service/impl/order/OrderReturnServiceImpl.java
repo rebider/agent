@@ -915,13 +915,13 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         }
 
         //不同的业务类型找到不同的启动流程
-        List<Dict> actlist = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.ACT_ORDER_RETURN.name());
-        String workId = null;
-        for (Dict dict : actlist) {
-            workId = dict.getdItemvalue();
-        }
+//        List<Dict> actlist = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.ACT_ORDER_RETURN.name());
+//        String workId = null;
+//        for (Dict dict : actlist) {
+//            workId = dict.getdItemvalue();
+//        }
         //启动审批
-        String proce = activityService.createDeloyFlow(null, workId, null, null, startPar);
+        String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("refund"), null, null, startPar);
         if (proce == null) {
             log.info("退货提交审批，审批流启动失败{}:{}", returnId, agentId);
             throw new ProcessException("退货审批流启动失败!");
@@ -1895,12 +1895,21 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                                 }
                             }
                         }else{
-                            logistics.setSendStatus(Status.STATUS_0.status);
+                            logistics.setSendStatus(LogisticsSendStatus.dt_send.code);
                             logistics.setSendMsg("不同平台不下发，手动调整");
                             if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
                                 log.info("机具退货调整首刷接口调用Exception更新数据库失败:{}",JSONObject.toJSONString(logistics));
                             }
                         }
+                    }else{
+                        OLogistics logistics_send =oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
+                        logistics_send.setSendStatus(LogisticsSendStatus.dt_send.code);
+                        logistics_send.setSendMsg("未实现的业务平台物流");
+                        if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
+                            log.info("手刷下发物流更新记录Exception失败{}",JSONObject.toJSONString(oLogistics));
+                        }
+                        AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",历史退货物流未调用业务系统，平台类型与编号:"+platForm.getPlatformType()+","+platForm.getPlatformNum(), "历史退货物流未调用业务系统"+platForm.getPlatformType()+","+platForm.getPlatformNum());
+                        log.info("beginSn:"+beginSn+",endSn:"+endSn+",历史退货物流未调用业务系统，平台类型与编号:"+platForm.getPlatformType()+","+platForm.getPlatformNum());
                     }
                 }
             }else{

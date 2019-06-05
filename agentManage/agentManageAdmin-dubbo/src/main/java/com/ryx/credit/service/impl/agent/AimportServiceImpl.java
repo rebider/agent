@@ -18,6 +18,7 @@ import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.dict.DepartmentService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
+import com.sun.org.apache.regexp.internal.RE;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1301,29 +1302,708 @@ public class AimportServiceImpl implements AimportService {
 
 
     /**
-     * 更新业务信息单条
+     * 处理信息多样格式导入
      * @param user
      * @param list
      * @return
      */
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
     @Override
-    public ResultVO importAgentBusInfoBusInfoFromExcel(String user, List<Object> list) throws Exception{
+    public ResultVO importAgentBusInfoBusInfoFromExcel(String type,String user, List<Object> list) throws Exception{
+        //更新业务信息
+        ResultVO resultVO = null;
+        switch (type) {
+            case "AGENT":
+                return importAgentInfo(user, list);
+            case "BUSINESS":
+                 return importBusInfo(user, list);
+            case"BANK":
+                 return importBankInfo(user, list);
+            case"CONTARCT":
+                 return importContractInfo(user, list);
+        }
+        return ResultVO.success(null);
+
+    }
+
+    private static String prefix_importContractInfo = "导入合同数据：";
+    private ResultVO importContractInfo(String user, List<Object> list){
+        logger.info(prefix_importContractInfo+"{},{}",user,list);
+        String  ag = list.get(0)+"";//唯一码
+        String agName = list.size()>1?list.get(1)+"":"";
+        String hetongbianhao = list.size()>2?list.get(2)+"":"";
+        String xieyileixing = list.size()>3?list.get(3)+"":"";
+        String qianyueshijian = list.size()>4?list.get(4)+"":"";
+        String hetongdaoqiri = list.size()>5?list.get(5)+"":"";
+        String beizhu = list.size()>6?list.get(6)+"":"";
+        AgentExample example = new AgentExample();
+        example.or().andAgUniqNumEqualTo(ag);
+        List<Agent> agents = agentMapper.selectByExample(example);
+        Agent agent = null;
+        if(agents.size()==1){
+            agent= agents.get(0);
+        }else{
+            logger.info(prefix_importContractInfo+"代理商信息未找到{},{}",user,list);
+            return ResultVO.fail("代理商信息未找到");
+        }
+
+        AgentContract agentContract = null;
+        AgentContractExample agentContractExample = new AgentContractExample();
+        agentContractExample.or().andAgentIdEqualTo(agent.getId()).andContNumEqualTo(hetongbianhao).andStatusEqualTo(Status.STATUS_1.status);
+        List<AgentContract> agentContracts = agentContractMapper.selectByExample(agentContractExample);
+        if(agentContracts.size()>0){
+            agentContract = agentContracts.get(0);
+        }else{
+            agentContract = new AgentContract();
+        }
+
+        if(StringUtils.isBlank(hetongbianhao) || !"null".equalsIgnoreCase(hetongbianhao))
+            agentContract.setContNum(hetongbianhao);
+        if(StringUtils.isBlank(xieyileixing) || !"null".equalsIgnoreCase(xieyileixing)) {
+            //便利查询合同类型
+            List<Dict>  CONTRACT_TYPE_list = dictOptionsService.dictList(DictGroup.AGENT.name(),DictGroup.CONTRACT_TYPE.name());
+            BigDecimal v = null;
+            for (Dict dict : CONTRACT_TYPE_list) {
+                if(dict.getdItemname().equals(xieyileixing)){
+                    v= new BigDecimal(dict.getdItemvalue());
+                }
+            }
+            if(null==v)
+                logger.info(prefix_importContractInfo+"协议类型为空,{},{},{},{}",ag,hetongbianhao,user,list);
+            agentContract.setContType(v==null?new BigDecimal(-1):v);
+        }
+        if(StringUtils.isBlank(qianyueshijian) || !"null".equalsIgnoreCase(qianyueshijian)) {
+            //便利查询合同类型
+            try {
+                agentContract.setContDate(org.apache.commons.lang.time.DateUtils.parseDate(qianyueshijian,new String[]{"yyyy/MM/dd"}));
+            } catch (ParseException e) {
+                try {
+                    agentContract.setContDate(org.apache.commons.lang.time.DateUtils.parseDate(qianyueshijian,new String[]{"yyyy-MM-dd"}));
+                } catch (ParseException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        }
+        if(StringUtils.isBlank(qianyueshijian) || !"null".equalsIgnoreCase(qianyueshijian)) {
+            //便利查询合同类型
+            try {
+                agentContract.setContEndDate(org.apache.commons.lang.time.DateUtils.parseDate(qianyueshijian,new String[]{"yyyy/MM/dd"}));
+            } catch (ParseException e) {
+                try {
+                    agentContract.setContEndDate(org.apache.commons.lang.time.DateUtils.parseDate(qianyueshijian,new String[]{"yyyy-MM-dd"}));
+                } catch (ParseException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        }
+        if(StringUtils.isBlank(beizhu) || !"null".equalsIgnoreCase(beizhu)) {
+            agentContract.setRemark(beizhu);
+        }
+
+        if(StringUtils.isBlank(agentContract.getId())){
+            agentContract.setAgentId(agent.getId());
+            agentContract.setcTime(Calendar.getInstance().getTime());
+            agentContract.setcUser(user);
+            agentContract.setCloReviewStatus(AgStatus.Approved.status);
+            agentContract.setStatus(Status.STATUS_1.status);
+            agentContract.setVersion(Status.STATUS_1.status);
+            agentContract.setAppendAgree(Status.STATUS_0.status);
+            agentContract.setId(idService.genId(TabId.a_agent_contract));
+            if(1==agentContractMapper.insertSelective(agentContract)){
+                logger.info(prefix_importContractInfo+"导入成功,{},{},{},{}",ag,hetongbianhao,user,list);
+            }else{
+                logger.info(prefix_importContractInfo+"导入失败,{},{},{},{}",ag,hetongbianhao,user,list);
+            }
+        }else{
+            if(1==agentContractMapper.updateByPrimaryKeySelective(agentContract)){
+                logger.info(prefix_importContractInfo+"修改成功,{},{},{},{}",ag,hetongbianhao,user,list);
+            }else{
+                logger.info(prefix_importContractInfo+"修改失败,{},{},{},{}",ag,hetongbianhao,user,list);
+            }
+        }
+        return ResultVO.success("");
+    }
+
+    private static String prefix_importAgentInfo = "导入代理商数据：";
+    private ResultVO importAgentInfo(String user, List<Object> list){
+        logger.info(prefix_importAgentInfo+"{},{}",user,list);
+        String  ag = list.get(0)+"";//唯一码
+        String agName = list.size()>1?list.get(1)+"":"";
+        String gongsixingzhi = list.size()>2?list.get(2)+"":"";
+        String zuceziben = list.size()>3?list.get(3)+"":"";
+        String yingyezhizhao = list.size()>4?list.get(4)+"":"";
+        String yingyezhizhaoqishishijian = list.size()>5?list.get(5)+"":"";
+        String yingyezhizhaojieshushijian = list.size()>6?list.get(6)+"":"";
+        String farenxingming = list.size()>7?list.get(7)+"":"";
+        String farenzhengjianleixing = list.size()>8?list.get(8)+"":"";
+        String farenshenfenzhenghao = list.size()>9?list.get(9)+"":"";
+        String farenlianxidianhua = list.size()>10?list.get(10)+"":"";
+        String fuzeren = list.size()>11?list.get(11)+"":"";
+        String fuzerendianhua = list.size()>12?list.get(12)+"":"";
+        String zhucedizhi = list.size()>13?list.get(13)+"":"";
+        String yingyefanwei = list.size()>14?list.get(14)+"":"";
+        String yewuduijieshengqu = list.size()>15?list.get(15)+"":"";
+        String yewuduijiedaqu = list.size()>16?list.get(16)+"":"";
+        String beizhu = list.size()>17?list.get(17)+"":"";
+        AgentExample example = new AgentExample();
+        example.or().andAgUniqNumEqualTo(ag);
+        List<Agent> agents = agentMapper.selectByExample(example);
+
+        try {
+            Agent a = new Agent();
+            if(agents.size()==1){
+                a = agents.get(0);
+            }else{
+                a = new Agent();
+            }
+            a.setAgUniqNum(ag);
+            if(StringUtils.isNotBlank(agName))
+                a.setAgName(agName);
+            if(StringUtils.isNotBlank(gongsixingzhi) && !"null".equalsIgnoreCase(gongsixingzhi)) {
+                a.setAgNature(AgNature.getAgNatureMsgString(gongsixingzhi));
+            }
+            if(StringUtils.isNotBlank(zuceziben) && !"null".equalsIgnoreCase(zuceziben))
+                a.setAgCapital(new BigDecimal(zuceziben));
+            if(StringUtils.isNotBlank(yingyezhizhao) && !"null".equalsIgnoreCase(yingyezhizhao))
+                a.setAgBusLic(yingyezhizhao);
+
+            if(StringUtils.isNotBlank(yingyezhizhaoqishishijian) && !"null".equalsIgnoreCase(yingyezhizhaoqishishijian)) {
+                try {
+                    a.setAgBusLicb(org.apache.commons.lang.time.DateUtils.parseDate(yingyezhizhaoqishishijian, new String[]{"yyyy-MM-dd"}));
+                } catch (ParseException e) {
+                    try {
+                        a.setAgBusLicb(org.apache.commons.lang.time.DateUtils.parseDate(yingyezhizhaoqishishijian, new String[]{"yyyy/MM/dd"}));
+                    } catch (ParseException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+            if(StringUtils.isNotBlank(yingyezhizhaojieshushijian) && !"null".equalsIgnoreCase(yingyezhizhaojieshushijian)) {
+                try {
+                    a.setAgBusLice(org.apache.commons.lang.time.DateUtils.parseDate(yingyezhizhaojieshushijian, new String[]{"yyyy-MM-dd"}));
+                } catch (ParseException e) {
+                    try {
+                        a.setAgBusLice(org.apache.commons.lang.time.DateUtils.parseDate(yingyezhizhaojieshushijian, new String[]{"yyyy/MM/dd"}));
+                    } catch (ParseException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+            if(StringUtils.isNotBlank(farenxingming) && !"null".equalsIgnoreCase(farenxingming))
+                a.setAgLegal(farenxingming);
+            if(StringUtils.isNotBlank(farenzhengjianleixing) && !"null".equalsIgnoreCase(farenzhengjianleixing))
+                a.setAgLegalCertype(AgCertType.getAgCertTypeMsgString(farenzhengjianleixing));
+            if(StringUtils.isNotBlank(farenshenfenzhenghao) && !"null".equalsIgnoreCase(farenshenfenzhenghao))
+                a.setAgLegalCernum(farenshenfenzhenghao);
+            if(StringUtils.isNotBlank(farenlianxidianhua) && !"null".equalsIgnoreCase(farenlianxidianhua))
+                a.setAgLegalMobile(farenlianxidianhua);
+            if(StringUtils.isNotBlank(fuzeren) && !"null".equalsIgnoreCase(fuzeren))
+                a.setAgHead(fuzeren);
+            if(StringUtils.isNotBlank(fuzerendianhua) && !"null".equalsIgnoreCase(fuzerendianhua))
+                a.setAgHeadMobile(fuzerendianhua);
+            if(StringUtils.isNotBlank(zhucedizhi) && !"null".equalsIgnoreCase(zhucedizhi))
+                a.setAgRegAdd(zhucedizhi);
+            if(StringUtils.isNotBlank(yingyefanwei) && !"null".equalsIgnoreCase(yingyefanwei))
+                a.setAgBusScope(yingyefanwei);
+            if(StringUtils.isNotBlank(yewuduijieshengqu) && !"null".equalsIgnoreCase(yewuduijieshengqu)) {
+                COrganization org = departmentService.getByName(yewuduijieshengqu);
+                if(org!=null) {
+                    a.setAgDocPro(org == null ? null : org.getId() + "");
+                }else{
+                    COrganization org_pro =  departmentService.getByUserName(yewuduijieshengqu);
+                    a.setAgDocPro(org_pro == null ? null : org_pro.getId() + "");
+                }
+            }
+            if(StringUtils.isNotBlank(yewuduijiedaqu) && !"null".equalsIgnoreCase(yewuduijiedaqu)){
+                String region =yewuduijiedaqu;
+                if("北方".equals(region)) {
+                    region = "北方大区";
+                }
+                if("南方".equals(region)) {
+                    region = "南方大区";
+                }
+                if("北京".equals(region)) {
+                    region = "北京市场部";
+                }
+                COrganization org = departmentService.getByName(region);
+                if (org != null) {
+                    a.setAgDocDistrict(org == null ? null : org.getId() + "");
+                } else {
+                    COrganization org_DocDistrict = departmentService.getByUserNameParent(region);
+                    a.setAgDocPro(org_DocDistrict == null ? null : org_DocDistrict.getId() + "");
+                }
+            }
+
+            if(StringUtils.isNotBlank(beizhu) && !"null".equalsIgnoreCase(beizhu))
+                a.setAgRemark(beizhu);
+
+            if(StringUtils.isBlank(a.getId())){
+                a.setId(idService.genId(TabId.a_agent));
+                a.setStatus(Status.STATUS_1.status);
+                a.setVersion(Status.STATUS_1.status);
+                a.setcIncomStatus(Status.STATUS_1.status);
+                a.setFreestatus(Status.STATUS_1.status);
+                a.setAgStatus(AgStatus.Approved.name());
+                a.setCaStatus(Status.STATUS_0.status);
+                a.setAgLegal(null);
+                a.setcUtime(Calendar.getInstance().getTime());
+                a.setcTime(Calendar.getInstance().getTime());
+                if(1==agentMapper.insertSelective(a)){
+                    logger.info(prefix_importAgentInfo+"导入成功 {},{},{}",a.getAgUniqNum(),user,list);
+                }else{
+                    logger.info(prefix_importAgentInfo+"导入失败 {},{},{}",a.getAgUniqNum(),user,list);
+                }
+            }else{
+                a.setcUtime(Calendar.getInstance().getTime());
+                if(1==agentMapper.updateByPrimaryKeySelective(a)){
+                    logger.info(prefix_importAgentInfo+"修改成功 {},{},{}",a.getAgUniqNum(),user,list);
+                }else{
+                    logger.info(prefix_importAgentInfo+"修改失败 {},{},{}",a.getAgUniqNum(),user,list);
+                }
+            }
+            return ResultVO.success(a);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info(prefix_importAgentInfo+"修改异常 {},{},{}",ag,user,list);
+            return ResultVO.fail("修改异常");
+        }
+    }
+    private static String prefix_importBusInfo = "导入业务数据：";
+    private ResultVO importBusInfo(String user, List<Object> list){
+        logger.info(prefix_importBusInfo+"{},{}",user,list);
+        String  ag = list.get(0)+"";//唯一码
+        String  agName = list.get(1)+"";//代理商名称
+        String  busPlatform_num = list.size()>2?list.get(2)+"":"";//业务平台唯一编号
+        String  busPlatform = list.size()>3?list.get(3)+"":"";//业务平台类型
+        String  busType = list.size()>4?list.get(4)+"":"";//所属类型(机构或二代直签直发等)
+        String  busRegion = list.size()>5?list.get(5)+"":"";//业务区域
+        String  shangjiAgName = list.size()>6?list.get(6)+"":"";//上级代理商名称
+        String  shangjiAg = list.size()>7?list.get(7)+"":"";//上级代理商唯一编号
+        String  fengxianAg = list.size()>8?list.get(8)+"":"";//风险承担所属代理商唯一编号
+        String  jihuofanxainAg = list.size()>9?list.get(9)+"":"";//激活及返现所属代理商唯一编号
+        String  shifouzhifa = list.size()>10?list.get(10)+"":"";//是否直发
+        String  shifouzhijiefanxian = list.size()>11?list.get(11)+"":"";//是否直接返现
+        String  shifoudulikaohe = list.size()>12?list.get(12)+"":"";//是否独立考核
+        String  yewulianxiren = list.size()>13?list.get(13)+"":"";//业务联系人
+        String  yewulianxidianhua = list.size()>14?list.get(14)+"":"";//业务联系电话
+        String  fenrunduijieyouxiang = list.size()>15?list.get(15)+"":"";//分润对接邮箱
+        String  yewuduijieren = list.size()>16?list.get(16)+"":"";//业务对接人
+        String  tousujifengxianfengkongduijieemail = list.size()>17?list.get(17)+"":"";//投诉及风险风控对接邮箱
+        String  shifouyaoqiushouju = list.size()>18?list.get(18)+"":"";//是否要求收据
+        String  dakuangongsi = list.size()>19?list.get(19)+"":"";//打款公司
+        String  shiyongfanwei = list.size()>20?list.get(20)+"":"";//使用范围(代理商、机构、自营、手刷)
+        String  yewufanwei = list.size()>21?list.get(21)+"":"";//业务范围(市代、省代，国代)
+        String  pingtaidengluhao = list.size()>22?list.get(22)+"":"";//平台登陆号
+        String  zhongduanshuliangxiaxian = list.size()>23?list.get(23)+"":"";//终端数量下限
+        String  jijifeilvxiaxian = list.size()>24?list.get(24)+"":"";//借记费率下限
+        String  jiejifengdinge = list.size()>25?list.get(25)+"":"";//借记封顶额
+        String  jiejichukuanfeilv = list.size()>26?list.get(26)+"":"";//借记出款费率
+        String  shifoukaitongs0 = list.size()>27?list.get(27)+"":"";//是否开通s0
+
+
+        AgentExample agentExample = new AgentExample();
+        agentExample.or().andAgUniqNumEqualTo(ag);
+        List<Agent> agents = agentMapper.selectByExample(agentExample);
+
+        if(agents.size()!=0){
+            logger.info(prefix_importBusInfo+"唯一码未找到({}),{},{}",ag,user,list);
+        }
+        Agent agent = agents.get(0);
+
+        AgentBusInfoExample example = new AgentBusInfoExample();
+        example.or().andStatusEqualTo(Status.STATUS_1.status).andBusNumEqualTo(String.valueOf(busPlatform_num));
+        List<AgentBusInfo> businfos = agentBusInfoMapper.selectByExample(example);
+        AgentBusInfo agentBusInfo = new AgentBusInfo();
+
+        if(businfos.size()==1){
+            logger.info(prefix_importBusInfo+"业务码,{},{}",user,list);
+            agentBusInfo=businfos.get(0);
+        }else if(businfos.size()>1){
+            logger.info(prefix_importBusInfo+"业务码({})数量不唯一,{},{}",busPlatform_num,user,list);
+            return ResultVO.fail("业务码数量不唯一");
+        }else if(businfos.size()<1){
+            agentBusInfo.setcTime(new Date());
+            agentBusInfo.setcUtime(agentBusInfo.getcTime());
+            agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
+            agentBusInfo.setCloReviewStatus(AgStatus.Approving.status);
+            agentBusInfo.setStatus(Status.STATUS_1.status);
+            agentBusInfo.setVersion(Status.STATUS_1.status);
+            agentBusInfo.setcUser(user);
+        }
+
+        agentBusInfo.setBusNum(busPlatform_num);
+        agentBusInfo.setAgentId(agent.getId());
+        //业务平台类型
+        if(StringUtils.isNotBlank(busPlatform)) {
+            busPlatform = busPlatform.trim();
+            if(busPlatform.contains("MPOS")){
+                busPlatform = busPlatform.replace("MPOS","手刷");
+            }
+            List<PlatForm>  platForms = businessPlatformService.queryAblePlatForm();
+            for (PlatForm platForm : platForms) {
+                if (platForm.getPlatformName().equals(busPlatform)) {
+                    agentBusInfo.setBusPlatform(platForm.getPlatformNum());
+                    break;
+                }
+            }
+        }
+        //机构类型
+        String busType_value = null;
+        if(busType!=null && StringUtils.isNotBlank(busType) && !"null".equals(busType)) {
+            List<Dict> bustype = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name());
+            for (Dict dict : bustype) {
+                if (dict.getdItemname().equals(busType)){
+                    busType_value = dict.getdItemvalue();
+                    agentBusInfo.setBusType(busType_value);
+                }
+
+            }
+        }
+        //所属上级代理(平台机构编号)
+        if(shangjiAg!=null && StringUtils.isNotBlank(shangjiAg) && !"null".equals(shangjiAg)) {
+            //上级代理
+            AgentBusInfoExample sahngji_ex = new AgentBusInfoExample();
+            sahngji_ex.or().andStatusEqualTo(Status.STATUS_1.status).andBusNumEqualTo(String.valueOf(shangjiAg));
+            List<AgentBusInfo>  list_shangji =  agentBusInfoMapper.selectByExample(sahngji_ex);
+            if(list_shangji!=null && list_shangji.size()>0){
+                AgentBusInfo agentBusInfo_sahngji = list_shangji.get(0);
+                agentBusInfo.setBusParent(agentBusInfo_sahngji.getId());
+            }
+        }
+        //风险承担所属代理商
+        if(fengxianAg!=null && StringUtils.isNotBlank(fengxianAg) && !"null".equals(fengxianAg)) {
+            //上级代理
+            AgentBusInfoExample sahngji_ex = new AgentBusInfoExample();
+            sahngji_ex.or().andStatusEqualTo(Status.STATUS_1.status).andBusNumEqualTo(String.valueOf(fengxianAg));
+            List<AgentBusInfo>  list_shangji =  agentBusInfoMapper.selectByExample(sahngji_ex);
+            if(list_shangji!=null && list_shangji.size()>0){
+                AgentBusInfo agentBusInfo_fengxianAg = list_shangji.get(0);
+                agentBusInfo.setBusRiskParent(agentBusInfo_fengxianAg.getId());
+            }
+        }
+        //激活返现
+        if(jihuofanxainAg!=null && StringUtils.isNotBlank(jihuofanxainAg) && !"null".equals(jihuofanxainAg)) {
+            //上级代理
+            AgentBusInfoExample sahngji_ex = new AgentBusInfoExample();
+            sahngji_ex.or().andStatusEqualTo(Status.STATUS_1.status).andBusNumEqualTo(String.valueOf(jihuofanxainAg));
+            List<AgentBusInfo>  list_shangji =  agentBusInfoMapper.selectByExample(sahngji_ex);
+            if(list_shangji!=null && list_shangji.size()>0){
+                AgentBusInfo agentBusInfo_jihuofanxainAg = list_shangji.get(0);
+                agentBusInfo.setBusActivationParent(agentBusInfo_jihuofanxainAg.getId());
+            }
+        }
+        //业务区域
+        List<String> arr = new ArrayList<>();
+        logger.info(prefix_importBusInfo+"业务码({})区域,{},{},{}",busPlatform_num,busRegion,user,list);
+        if(busRegion!=null && StringUtils.isNotBlank(busRegion) && !"null".equals(busRegion)) {
+            busRegion = busRegion.trim();
+            String[] regions = busRegion.split(",");
+            DPosRegionExample dPosRegionExample = new DPosRegionExample();
+            dPosRegionExample.or().andNameIn(Arrays.asList(regions)).andCodeLevelIn(Arrays.asList("2","1"));
+            List<DPosRegion> dPosRegions = dPosRegionMapper.selectByExample(dPosRegionExample);
+            for (DPosRegion dPosRegion : dPosRegions) {
+                arr.add(dPosRegion.getCode());
+            }
+            if(arr.size()>0) {
+                agentBusInfo.setBusRegion(String.join(",", arr));
+            }
+        }
+        //是否直发
+        int bus_sent_directly_index = -1;
+        if(shifouzhifa!=null && StringUtils.isNotBlank(shifouzhifa) && !"null".equals(shifouzhifa)) {
+            bus_sent_directly_index = yesorno.indexOf(shifouzhifa);
+            if(bus_sent_directly_index!=-1){
+                agentBusInfo.setBusSentDirectly(BigDecimal.valueOf(bus_sent_directly_index));
+            }
+        }
+
+        //是否直接返现
+        int bus_direct_cashback_index = -1;
+        if(shifouzhijiefanxian!=null && StringUtils.isNotBlank(shifouzhijiefanxian) && !"null".equals(shifouzhijiefanxian)) {
+            bus_direct_cashback_index = yesorno.indexOf(shifouzhijiefanxian);
+            if(bus_direct_cashback_index!=-1){
+                agentBusInfo.setBusDirectCashback(BigDecimal.valueOf(bus_direct_cashback_index));
+            }
+        }
+        //是否独立考核
+        int bus_Inde_ass_index = -1;
+        if(shifoudulikaohe!=null && StringUtils.isNotBlank(shifoudulikaohe) && !"null".equals(shifoudulikaohe)) {
+            bus_Inde_ass_index = yesorno.indexOf(shifoudulikaohe);
+            if(bus_Inde_ass_index!=-1){
+                agentBusInfo.setBusIndeAss(BigDecimal.valueOf(bus_Inde_ass_index));
+            }
+        }
+
+        //业务联系人
+        if(yewulianxiren!=null && StringUtils.isNotBlank(yewulianxiren) && !"null".equals(yewulianxiren)) {
+                agentBusInfo.setBusContact(yewulianxiren);
+        }
+        //业务联系电话
+        if(yewulianxidianhua!=null && StringUtils.isNotBlank(yewulianxidianhua) && !"null".equals(yewulianxidianhua)) {
+            agentBusInfo.setBusContactMobile(yewulianxidianhua);
+        }
+        //分润对接邮箱
+        if(fenrunduijieyouxiang!=null && StringUtils.isNotBlank(fenrunduijieyouxiang) && !"null".equals(fenrunduijieyouxiang)) {
+            agentBusInfo.setBusContactEmail(fenrunduijieyouxiang);
+        }
+        //业务对接人
+        if(yewuduijieren!=null && StringUtils.isNotBlank(yewuduijieren) && !"null".equals(yewuduijieren)) {
+            agentBusInfo.setBusContactPerson(yewuduijieren);
+        }
+        //投诉及风险风控对接邮箱
+        if(tousujifengxianfengkongduijieemail!=null && StringUtils.isNotBlank(tousujifengxianfengkongduijieemail) && !"null".equals(tousujifengxianfengkongduijieemail)) {
+            agentBusInfo.setBusRiskEmail(tousujifengxianfengkongduijieemail);
+        }
+        //是否要求收据
+        int clo_receipt_index = -1;
+        if(shifouyaoqiushouju!=null && StringUtils.isNotBlank(shifouyaoqiushouju) && !"null".equals(shifouyaoqiushouju)) {
+            clo_receipt_index = yesorno.indexOf(shifouyaoqiushouju);
+            if(clo_receipt_index!=-1){
+                agentBusInfo.setCloReceipt(BigDecimal.valueOf(clo_receipt_index));
+            }
+        }
+        //打款公司
+        if(dakuangongsi!=null && StringUtils.isNotBlank(dakuangongsi) && !"null".equals(dakuangongsi)) {
+            List<PayComp>  payCompList = apaycompService.compList();
+            for (PayComp payComp : payCompList) {
+                if(payComp.getComName().equals(dakuangongsi)) {
+                    agentBusInfo.setCloPayCompany(payComp.getId());
+                    break;
+                }
+            }
+        }
+        //使用范围
+        if(shiyongfanwei!=null && StringUtils.isNotBlank(shiyongfanwei) && !"null".equals(shiyongfanwei)) {
+            List<Dict>  bus_use_organ = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.USE_SCOPE.name());
+            for (Dict dict : bus_use_organ) {
+                if(dict.getdItemname().equals(shiyongfanwei)) {
+                    agentBusInfo.setBusUseOrgan(dict.getdItemvalue());
+                }
+            }
+        }
+        //业务范围 StringUtils.isNotBlank(yewufanwei)
+        if(yewufanwei!=null && StringUtils.isNotBlank(yewufanwei) && !"null".equals(yewufanwei)) {
+            agentBusInfo.setBusScope(BUS_SCOP.get(yewufanwei));
+        }
+        //是否开通s0：1是，0否 StringUtils.isNotBlank(shifoukaitongs0)
+        int shifoukaitongs0_index=-1;
+        if(shifoukaitongs0!=null && StringUtils.isNotBlank(shifoukaitongs0) && !"null".equals(shifoukaitongs0) ) {
+            shifoukaitongs0_index = yesorno.indexOf(shifoukaitongs0);
+            if(shifoukaitongs0_index!=-1){
+                agentBusInfo.setDredgeS0(BigDecimal.valueOf(shifoukaitongs0_index));
+            }
+        }
+        //业务系统登录账号
+        if(pingtaidengluhao!=null && StringUtils.isNotBlank(pingtaidengluhao) && !"null".equals(pingtaidengluhao) ) {
+            agentBusInfo.setBusLoginNum(pingtaidengluhao);
+        }
+        //借记费率下限（%）0.55
+        if(jijifeilvxiaxian!=null && StringUtils.isNotBlank(jijifeilvxiaxian) && !"null".equals(jijifeilvxiaxian) ) {
+            agentBusInfo.setDebitRateLower(jijifeilvxiaxian);
+        }
+        //借记封顶额（元）9999
+        if(jiejifengdinge!=null && StringUtils.isNotBlank(jiejifengdinge) && !"null".equals(jiejifengdinge) ) {
+            agentBusInfo.setDebitCapping(jiejifengdinge);
+        }
+        //借记出款费率（%）0
+        if(jiejichukuanfeilv!=null && StringUtils.isNotBlank(jiejichukuanfeilv) && !"null".equals(jiejichukuanfeilv) ) {
+            agentBusInfo.setDebitAppearRate(jiejichukuanfeilv);
+        }
+        //终端数量下限
+        if(zhongduanshuliangxiaxian!=null && StringUtils.isNotBlank(zhongduanshuliangxiaxian) && !"null".equals(zhongduanshuliangxiaxian) ) {
+            agentBusInfo.setTerminalsLower(zhongduanshuliangxiaxian);
+        }
+
+        if(StringUtils.isNotBlank(agentBusInfo.getId())){
+            agentBusInfo.setcUtime(Calendar.getInstance().getTime());
+            if(agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)==1){
+                logger.info(prefix_importBusInfo+"更新业务码({}),{},{}，成功",busPlatform_num,user,list);
+            }else{
+                logger.info(prefix_importBusInfo+"更新业务码({}),{},{}，失败",busPlatform_num,user,list);
+            }
+        }else{
+            agentBusInfo.setcUtime(Calendar.getInstance().getTime());
+            agentBusInfo.setId(idService.genId(TabId.a_agent_businfo));
+            if(agentBusInfoMapper.insertSelective(agentBusInfo)==1){
+                logger.info(prefix_importBusInfo+"添加业务码({}),{},{}，成功",busPlatform_num,user,list);
+            }else{
+                logger.info(prefix_importBusInfo+"添加业务码({}),{},{}，失败",busPlatform_num,user,list);
+            }
+        }
+        return ResultVO.success(null);
+    }
+
+
+    private static String prefix_importBankInfo= "导入收款账户：";
+    private ResultVO importBankInfo(String user, List<Object> list){
+        logger.info(prefix_importBankInfo+"{},{}",user,list);
+        String  ag = list.get(0)+"";//唯一码
+        String  agName = list.size()>1?list.get(1)+"":"";//代理商名称
+        String  zhanghuleixing = list.size()>2?list.get(2)+"":"";//账户类型(对公，对私)
+        String  shoukuanzhanghao = list.size()>3?list.get(3)+"":"";//收款账号
+        String  shoukuanzhanghuming = list.size()>4?list.get(4)+"":"";//收款账户名
+        String  shoukuankaihuhang = list.size()>5?list.get(5)+"":"";//收款开户行
+        String  zonghanglianhanghao = list.size()>6?list.get(6)+"":"";//总行联行号
+        String  shoukuankaihuhangzhihang = list.size()>7?list.get(7)+"":"";//收款开户行支行
+        String  zhihanglianhanghao = list.size()>8?list.get(8)+"":"";//支行联行号
+        String  shuidian = list.size()>9?list.get(9)+"":"";//税点
+        String  shifoukaijufenrunfapiao = list.size()>10?list.get(10)+"":"";//是否开具分润发票
+        String  kaihudiqu = list.size()>11?list.get(11)+"":"";//开户行地区
+        String  kaihuhanghanghao = list.size()>12?list.get(12)+"":"";//开户行行号
+        String  remark = list.size()>13?list.get(13)+"":"";//备注
+
+        try {
+            AgentExample agentExample = new AgentExample();
+            agentExample.or().andAgUniqNumEqualTo(ag).andStatusEqualTo(Status.STATUS_1.status);
+            List<Agent> agents = agentMapper.selectByExample(agentExample);
+            if(agents.size()!=0){
+                logger.info(prefix_importBankInfo+"唯一码未找到({}),{},{}",ag,user,list);
+            }
+            Agent agent = agents.get(0);
+            AgentColinfoExample agentColinfoExample = new AgentColinfoExample();
+            agentColinfoExample.or().andAgentIdEqualTo(agent.getId()).andStatusEqualTo(Status.STATUS_1.status);
+            List<AgentColinfo>  agentColinfos = agentColinfoMapper.selectByExample(agentColinfoExample);
+            AgentColinfo agentColinfo = null;
+            if(agentColinfos.size()==1){
+                 agentColinfo =  agentColinfos.get(0);
+            }else if(agentColinfos.size()>1){
+                logger.info(prefix_importBankInfo+"收款账户不唯一({}),{},{}",ag,user,list);
+                return ResultVO.fail("收款账户不唯一");
+            }else if(agentColinfos.size()<1){
+                 agentColinfo =  new AgentColinfo();
+            }
+            agentColinfo.setAgentId(agent.getId());
+            if(StringUtils.isNotBlank(zhanghuleixing) && !"null".equalsIgnoreCase(zhanghuleixing)) {
+                agentColinfo.setCloType(BigDecimal.valueOf(gs.indexOf(zhanghuleixing)));
+            }else{
+                agentColinfo.setCloType(null);
+            }
+            if(StringUtils.isNotBlank(shoukuanzhanghao) && !"null".equalsIgnoreCase(shoukuanzhanghao)) {
+                agentColinfo.setCloBankAccount(shoukuanzhanghao.trim());
+            }else{
+                agentColinfo.setCloBankAccount(null);
+            }
+            if(StringUtils.isNotBlank(shoukuanzhanghuming) && !"null".equalsIgnoreCase(shoukuanzhanghuming)) {
+                agentColinfo.setCloRealname(shoukuanzhanghuming.trim());
+            }else{
+                agentColinfo.setCloRealname(null);
+            }
+            if(StringUtils.isNotBlank(shoukuankaihuhang) && !"null".equalsIgnoreCase(shoukuankaihuhang)) {
+                agentColinfo.setCloBank(shoukuankaihuhang.trim());
+            }else{
+                agentColinfo.setCloBank(null);
+            }
+            if(StringUtils.isNotBlank(shoukuankaihuhangzhihang) && !"null".equalsIgnoreCase(shoukuankaihuhangzhihang)) {
+                agentColinfo.setCloBankBranch(shoukuankaihuhangzhihang);
+            }else{
+                agentColinfo.setCloBankBranch(null);
+            }
+            if(StringUtils.isNotBlank(remark) && !"null".equalsIgnoreCase(remark)) {
+                agentColinfo.setRemark(remark);
+            }else{
+                agentColinfo.setRemark(null);
+            }
+            if(StringUtils.isNotBlank(zhihanglianhanghao) && !"null".equalsIgnoreCase(zhihanglianhanghao)) {
+                agentColinfo.setBranchLineNum(zhihanglianhanghao);
+            }else{
+                agentColinfo.setBranchLineNum(null);
+            }
+            if(StringUtils.isNotBlank(zonghanglianhanghao) && !"null".equalsIgnoreCase(zonghanglianhanghao)) {
+                agentColinfo.setAllLineNum(zonghanglianhanghao);
+            }else{
+                agentColinfo.setAllLineNum(null);
+            }
+            if(StringUtils.isNotBlank(shuidian) && !"null".equalsIgnoreCase(shuidian)) {
+                agentColinfo.setCloTaxPoint(new BigDecimal(shuidian));
+            }else{
+                agentColinfo.setCloTaxPoint(null);
+            }
+            if(StringUtils.isNotBlank(kaihudiqu) && !"null".equalsIgnoreCase(kaihudiqu)) {
+                agentColinfo.setBankRegion(kaihudiqu);
+            }else{
+                agentColinfo.setBankRegion(null);
+            }
+            if(StringUtils.isNotBlank(kaihuhanghanghao) && !"null".equalsIgnoreCase(kaihuhanghanghao)) {
+                agentColinfo.setCloBankCode(kaihuhanghanghao);
+            }else{
+                agentColinfo.setCloBankCode(null);
+            }
+            agentColinfo.setPayStatus(ColinfoPayStatus.C.code);
+
+            if(StringUtils.isBlank(agentColinfo.getId())){
+                agentColinfo.setId(idService.genId(TabId.a_agent_colinfo));
+                agentColinfo.setStatus(Status.STATUS_1.status);
+                agentColinfo.setVarsion(Status.STATUS_0.status);
+                agentColinfo.setcTime(Calendar.getInstance().getTime());
+                agentColinfo.setcUtime(Calendar.getInstance().getTime());
+                agentColinfo.setCloReviewStatus(AgStatus.Approved.status);
+                if(agentColinfoMapper.insertSelective(agentColinfo)==1){
+                    logger.info(prefix_importBankInfo+"导入成功({}),{},{}",ag,user,list);
+                }else{
+                    logger.info(prefix_importBankInfo+"导入失败({}),{},{}",ag,user,list);
+                }
+            }else{
+                agentColinfo.setcUtime(Calendar.getInstance().getTime());
+                if(1==agentColinfoMapper.updateByPrimaryKey(agentColinfo)){
+                    logger.info(prefix_importBankInfo+"更新成功({}),{},{}",ag,user,list);
+                }else{
+                    logger.info(prefix_importBankInfo+"更新失败({}),{},{}",ag,user,list);
+                }
+            }
+            //代理商业务平台
+            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+            agentBusInfoExample.or().andAgentIdEqualTo(agent.getId()).andStatusEqualTo(Status.STATUS_1.status);
+            List<AgentBusInfo> listBusinfo = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+            for (AgentBusInfo agentBusInfo : listBusinfo) {
+                //收款账户关系匹配
+                AgentColinfoRelExample agentColinfoRelExample = new AgentColinfoRelExample();
+                agentColinfoRelExample.or().andAgentbusidEqualTo(agentBusInfo.getId()).andAgentidEqualTo(agentBusInfo.getAgentId())
+                       .andBusPlatformEqualTo(agentBusInfo.getBusPlatform()).andStatusEqualTo(Status.STATUS_1.status);
+                List<AgentColinfoRel>  listRel_db = agentColinfoRelMapper.selectByExample(agentColinfoRelExample);
+
+                //没有建立关系就建立关系
+                if(listRel_db.size()==0) {
+                    //添加收款账户关系
+                    AgentColinfoRel agentColinfoRel = new AgentColinfoRel();
+                    agentColinfoRel.setcUse(user);
+                    agentColinfoRel.setAgentid(agent.getId());
+                    agentColinfoRel.setAgentColinfoid(agentColinfo.getId());
+                    agentColinfoRel.setBusPlatform(agentBusInfo.getBusPlatform());
+                    agentColinfoRel.setAgentbusid(agentBusInfo.getId());
+                    AgentResult rel = agentColinfoService.saveAgentColinfoRel(agentColinfoRel, user);
+                    logger.info(prefix_importBankInfo+"添加平台收款账号关系{},{},{}",ag,user,agentBusInfo.getBusPlatform());
+                }else{
+                    logger.info("代理商导入收款账户业务关系已存在{},{}",agentBusInfo.getId(),listRel_db.get(0).getId());
+                    AgentColinfoRel agentColinfoRel = listRel_db.get(0);
+                    agentColinfoRel.setAgentColinfoid(agentColinfo.getId());
+                    if(1==agentColinfoRelMapper.updateByPrimaryKeySelective(agentColinfoRel)){
+                        logger.info(prefix_importBankInfo+"修改平台收款账号关系{},{},{}",ag,user,agentBusInfo.getBusPlatform());
+                    }
+                }
+            }
+            return ResultVO.success(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResultVO.success(null);
+        }
+    }
+
+
+    private ResultVO updateBusInfo(String user, List<Object> list){
 
         logger.info("用户{}更新业务信息{}",user,list);
-        String busNum = list.get(0)+"",
-                busRegion=list.get(1)+"",
-                isS0=list.get(2)+"",
-                jglx=list.size()>3?(list.get(3))+"":"",//机构类型
-                bus_sent_directly=list.size()>4?(list.get(4))+"":"",
-                bus_direct_cashback=list.size()>5?(list.get(5))+"":"",//是否直接返现
-                bus_Inde_ass=list.size()>6?(list.get(6))+"":"",
-                clo_receipt=list.size()>7?(list.get(7))+"":"",//是否要求收据
-                bus_login_num=list.size()>8?(list.get(8))+"":"";//业务系统登录账号
-
-
-//        if(StringUtils.isBlank(busNum))return ResultVO.fail("busNum为空");
-//        if(StringUtils.isBlank(isS0))return ResultVO.fail("isS0为空");
+        String  ag = list.get(0)+"",
+                busPlatform = list.get(1)+"",
+                busNum = list.size()>2?list.get(2)+"":"",
+                busRegion=list.size()>3?list.get(3)+"":"",
+                isS0=list.size()>4?list.get(4)+"":"",
+                jglx=list.size()>5?(list.get(5))+"":"",//机构类型
+                bus_sent_directly=list.size()>6?(list.get(6))+"":"",
+                bus_direct_cashback=list.size()>7?(list.get(7))+"":"",//是否直接返现
+                bus_Inde_ass=list.size()>8?(list.get(8))+"":"",//是否独立考核
+                clo_receipt=list.size()>9?(list.get(9))+"":"",//是否要求收据
+                bus_login_num=list.size()>10?(list.get(10))+"":"",//登录账号
+                update_busNum=list.size()>11?(list.get(11))+"":"";//要更新的业务编码
 
         List<String> arr = new ArrayList<>();
         if(busRegion!=null && StringUtils.isNotBlank(busRegion) && !"null".equals(busRegion)) {
@@ -1370,12 +2050,21 @@ public class AimportServiceImpl implements AimportService {
 
 
         AgentBusInfoExample example = new AgentBusInfoExample();
-        example.or().andStatusEqualTo(Status.STATUS_1.status).andBusNumEqualTo(String.valueOf(busNum));
+        if(StringUtils.isNotBlank(busNum)) {
+            example.or().andStatusEqualTo(Status.STATUS_1.status).andBusNumEqualTo(String.valueOf(busNum));
+        }else{
+            example.or().andStatusEqualTo(Status.STATUS_1.status).andAgentIdEqualTo(ag).andBusPlatformEqualTo(busPlatform);
+        }
         List<AgentBusInfo> businfos = agentBusInfoMapper.selectByExample(example);
 
         if(businfos.size()==0){
             return ResultVO.fail("业务未找到");
         }
+
+        if(businfos.size()>1){
+            return ResultVO.fail("业务数量查出多个");
+        }
+
         for (AgentBusInfo businfo : businfos) {
 
             if(arr.size()>0) {
@@ -1407,7 +2096,16 @@ public class AimportServiceImpl implements AimportService {
                 businfo.setCloReceipt(BigDecimal.valueOf(clo_receipt_index));
             }
             if(StringUtils.isNotBlank(bus_login_num)){
+                logger.info("用户{}登录编号业务编号前:{}", user,businfo.getBusLoginNum());
                 businfo.setBusLoginNum(bus_login_num);
+                logger.info("用户{}登录编号业务编号后:{}", user,businfo.getBusLoginNum());
+            }
+            if(StringUtils.isBlank(busNum) || "null".equalsIgnoreCase(busNum)) {
+                if(StringUtils.isNotBlank(update_busNum) && !"null".equalsIgnoreCase(update_busNum.trim())) {
+                    logger.info("用户{}补全业务编号前:{}", user,businfo.getBusNum());
+                    businfo.setBusNum(update_busNum.trim());
+                    logger.info("用户{}补全业务编号后:{}", user,businfo.getBusNum());
+                }
             }
             if(agentBusInfoMapper.updateByPrimaryKeySelective(businfo)==1){
                 logger.info("用户{}修改为{}",user,busNum);
@@ -1418,4 +2116,8 @@ public class AimportServiceImpl implements AimportService {
         }
         return ResultVO.success("");
     }
+
+
+
+
 }

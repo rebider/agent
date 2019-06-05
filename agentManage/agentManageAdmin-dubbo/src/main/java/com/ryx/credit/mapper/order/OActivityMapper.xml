@@ -36,6 +36,7 @@
     <result column="STAND_TIME" jdbcType="DECIMAL" property="standTime" />
     <result column="STAND_AMT" jdbcType="DECIMAL" property="standAmt" />
     <result column="BACK_TYPE" jdbcType="CHAR" property="backType" />
+    <result column="VISIBLE" jdbcType="VARCHAR" property="visible" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -71,7 +72,7 @@
     PRICE, BEGIN_TIME, END_TIME, VENDER, PRO_MODEL, C_TIME, U_TIME, C_USER, U_USER, STATUS,
     VERSION, G_TIME, ACTIVITY_CONDITION, BUS_PRO_CODE, BUS_PRO_NAME, TERM_BATCHCODE,
     TERM_BATCHNAME, TERMTYPE, TERMTYPENAME, ACT_CODE, ORIGINAL_PRICE, POS_SPE_PRICE,
-    POS_TYPE, STAND_TIME, STAND_AMT, BACK_TYPE
+    POS_TYPE, STAND_TIME, STAND_AMT, BACK_TYPE, VISIBLE
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OActivityExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -113,7 +114,7 @@
     TERM_BATCHNAME, TERMTYPE, TERMTYPENAME,
     ACT_CODE, ORIGINAL_PRICE, POS_SPE_PRICE,
     POS_TYPE, STAND_TIME, STAND_AMT,
-    BACK_TYPE)
+    BACK_TYPE, VISIBLE)
     values (#{id,jdbcType=VARCHAR}, #{productId,jdbcType=VARCHAR}, #{ruleId,jdbcType=VARCHAR},
     #{activityName,jdbcType=VARCHAR}, #{proType,jdbcType=VARCHAR}, #{activityWay,jdbcType=VARCHAR},
     #{activityRule,jdbcType=VARCHAR}, #{platform,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL},
@@ -125,7 +126,7 @@
     #{termBatchname,jdbcType=VARCHAR}, #{termtype,jdbcType=VARCHAR}, #{termtypename,jdbcType=VARCHAR},
     #{actCode,jdbcType=VARCHAR}, #{originalPrice,jdbcType=DECIMAL}, #{posSpePrice,jdbcType=DECIMAL},
     #{posType,jdbcType=VARCHAR}, #{standTime,jdbcType=DECIMAL}, #{standAmt,jdbcType=DECIMAL},
-    #{backType,jdbcType=CHAR})
+    #{backType,jdbcType=CHAR}, #{visible,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OActivity">
     insert into O_ACTIVITY
@@ -232,6 +233,9 @@
       <if test="backType != null">
         BACK_TYPE,
       </if>
+      <if test="visible != null">
+        VISIBLE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -336,9 +340,12 @@
       <if test="backType != null">
         #{backType,jdbcType=CHAR},
       </if>
+      <if test="visible != null">
+        #{visible,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OActivityExample" resultType="java.lang.Integer">
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OActivityExample" resultType="java.lang.Long">
     select count(*) from O_ACTIVITY
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -446,6 +453,9 @@
       <if test="backType != null">
         BACK_TYPE = #{backType,jdbcType=CHAR},
       </if>
+      <if test="visible != null">
+        VISIBLE = #{visible,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -483,7 +493,8 @@
     POS_TYPE = #{posType,jdbcType=VARCHAR},
     STAND_TIME = #{standTime,jdbcType=DECIMAL},
     STAND_AMT = #{standAmt,jdbcType=DECIMAL},
-    BACK_TYPE = #{backType,jdbcType=CHAR}
+    BACK_TYPE = #{backType,jdbcType=CHAR},
+    VISIBLE = #{visible,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -536,4 +547,20 @@
       <if test="endTime!=null" > and a.end_time &gt;= #{endTime}</if>
     </where>
   </select>
+
+  <update id="updateByActCode" parameterType="com.ryx.credit.pojo.admin.order.OActivity">
+    update O_ACTIVITY
+    <set>
+      <if test="uTime != null">
+        U_TIME = #{uTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uUser != null">
+        U_USER = #{uUser,jdbcType=VARCHAR},
+      </if>
+      <if test="visible != null">
+        VISIBLE = #{visible,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ACT_CODE = #{actCode,jdbcType=VARCHAR}
+  </update>
 </mapper>

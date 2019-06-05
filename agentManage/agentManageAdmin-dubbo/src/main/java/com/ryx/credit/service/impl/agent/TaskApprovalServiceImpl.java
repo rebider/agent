@@ -196,16 +196,16 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                     PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
                     if(PlatformType.RDBPOS.code.equals(platForm.getPlatformType())) {
                         if(StringUtils.isBlank(agentBusInfoVo.getTerminalsLower())){
-                            throw new ProcessException("请填写终端数量下线");
+                            throw new ProcessException("请填写终端数量下限");
                         }
                         if(new BigDecimal(agentBusInfoVo.getTerminalsLower()).compareTo(new BigDecimal(5000))>0){
-                            throw new ProcessException("终端数量下线最高为5000");
+                            throw new ProcessException("终端数量下限最高为5000");
                         }
                         agentBusInfo.setcUtime(new Date());
                         agentBusInfo.setTerminalsLower(agentBusInfoVo.getTerminalsLower());
                         int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
                         if (i != 1) {
-                            throw new ProcessException("更新终端数量下线失败");
+                            throw new ProcessException("更新终端数量下限失败");
                         }
                     }
                 }

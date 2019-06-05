@@ -707,7 +707,7 @@ public class AgentMergeServiceImpl  implements AgentMergeService {
         }
 
         //启动审批流
-        String proceId = activityService.createDeloyFlow(null, "mergeCity1.0", null, null, reqMap);
+        String proceId = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("mergeCity"), null, null, reqMap);
         if (proceId == null) {
             logger.info("代理商合并提交审批，审批流启动失败{}:{}", id, cUser);
             throw new MessageException("审批流启动失败！");

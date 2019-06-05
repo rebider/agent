@@ -1,5 +1,6 @@
 package com.ryx.credit.service.dict;
 
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.Dict;
 import org.apache.ibatis.annotations.Param;
@@ -26,4 +27,5 @@ public interface DictOptionsService {
 
     public Dict findDictByName(String group, String artifact,String itemName);
 
+    String getApproveVersion(String approveName)throws ProcessException;
 }

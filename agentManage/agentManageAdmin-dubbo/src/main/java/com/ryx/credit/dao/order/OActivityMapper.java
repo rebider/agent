@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface OActivityMapper {
-    int countByExample(OActivityExample example);
+    long countByExample(OActivityExample example);
 
     int deleteByExample(OActivityExample example);
 
@@ -26,4 +26,6 @@ public interface OActivityMapper {
     List<Map<String,Object>> productActivityOrderBuild(Map par);
 
     List<OActivity> planChoiseProComAndModel(Map par);
+
+    int updateByActCode(OActivity record);
 }

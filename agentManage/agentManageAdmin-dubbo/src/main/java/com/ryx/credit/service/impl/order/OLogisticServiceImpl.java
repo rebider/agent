@@ -592,9 +592,14 @@ public class OLogisticServiceImpl implements OLogisticsService {
                             }
                         }
                     }else{
-                        AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",错误信息:发物流类型错误", "手刷发物流错误报警");
-                        logger.info("发物流类型错误");
-                        throw new MessageException("发物流类型错误");
+                        OLogistics logistics_send =oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
+                        logistics_send.setSendStatus(LogisticsSendStatus.dt_send.code);
+                        logistics_send.setSendMsg("未实现的业务平台物流");
+                        if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
+                            logger.info("手刷下发物流更新记录Exception失败{}",JSONObject.toJSONString(oLogistics));
+                        }
+                        AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",物流未调用业务系统，平台类型与编号:"+platForm.getPlatformType()+","+platForm.getPlatformNum(), "物流未调用业务系统"+platForm.getPlatformType()+","+platForm.getPlatformNum());
+                        logger.info("beginSn:"+beginSn+",endSn:"+endSn+",物流未调用业务系统，平台类型与编号:"+platForm.getPlatformType()+","+platForm.getPlatformNum());
                     }
                 }
             }else{
@@ -1061,10 +1066,10 @@ public class OLogisticServiceImpl implements OLogisticsService {
             return AgentResult.fail("SN号错误");
         }
         if(snStart.compareTo(isInStart)>0 || snEnd.compareTo(isInStart)<0){
-            return AgentResult.fail("SN号"+isInStart+"不在指定区间，请检查SN");
+            return AgentResult.fail("发货SN号["+isInStart+"]与退货SN["+snStart+":"+snEnd+"]不符，请检查SN");
         }
         if(snStart.compareTo(isInEnd)>0 || snEnd.compareTo(isInEnd)<0){
-            return AgentResult.fail("SN号"+isInEnd+"不在指定区间，请检查SN");
+            return AgentResult.fail("发货SN号["+isInEnd+"]与退货SN["+snStart+":"+snEnd+"]不符，请检查SN");
         }
         return AgentResult.ok();
     }

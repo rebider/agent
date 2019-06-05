@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.*;
 
@@ -174,7 +175,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
      * @return
      */
     @Override
-    public AgentResult verifyAgent(String agUniqNum) {
+    public AgentResult verifyAgent(String agUniqNum,List<String> agStatusList) {
         AgentResult result = new AgentResult(500,"参数错误","");
         if (StringUtils.isBlank(agUniqNum)) {
             return result;
@@ -182,7 +183,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         AgentExample example = new AgentExample();
         AgentExample.Criteria criteria = example.createCriteria();
         criteria.andAgUniqNumEqualTo(agUniqNum);
-        criteria.andAgStatusEqualTo(AgStatus.Approved.name());
+        criteria.andAgStatusIn(agStatusList);
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         List<Agent> agents = agentMapper.selectByExample(example);
         if(agents.size()==1){
@@ -195,7 +196,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         AgentExample exampleName = new AgentExample();
         AgentExample.Criteria criteriaName = exampleName.createCriteria();
         criteriaName.andAgNameEqualTo(agUniqNum);
-        criteriaName.andAgStatusEqualTo(AgStatus.Approved.name());
+        criteriaName.andAgStatusIn(agStatusList);
         criteriaName.andStatusEqualTo(Status.STATUS_1.status);
         List<Agent> agentsName = agentMapper.selectByExample(exampleName);
         if(agentsName.size()==1){
@@ -208,7 +209,10 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
         AgentBusInfoExample.Criteria agentBusInfoCriteria = agentBusInfoExample.createCriteria();
         agentBusInfoCriteria.andBusNumEqualTo(agUniqNum);
-        agentBusInfoCriteria.andBusStatusEqualTo(Status.STATUS_1.status);
+        List<BigDecimal> busStatusList = new ArrayList<>();
+        busStatusList.add(BusinessStatus.Enabled.status);
+        busStatusList.add(BusinessStatus.inactive.status);
+        agentBusInfoCriteria.andBusStatusIn(busStatusList);
         agentBusInfoCriteria.andStatusEqualTo(Status.STATUS_1.status);
         List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
         if(agentBusInfos.size()==1){
@@ -220,7 +224,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             result.setMsg("代理商不唯一");
             return result;
         }
-        result.setMsg("代理商不存在或未通过审批");
+        result.setMsg("代理商不存在");
         return result;
     }
 
@@ -354,10 +358,19 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 if(PlatformType.RDBPOS.code.equals(platformType.getValue())){
                     //检查手机号是否填写
                     if(StringUtils.isBlank(item.getBusLoginNum())){
-                        throw new ProcessException("瑞大宝登陆账号不能为空");
+                        throw new ProcessException("瑞大宝登录账号不能为空");
                     }
                     if(!RegexUtil.checkInt(item.getBusLoginNum())){
-                        throw new ProcessException("瑞大宝登陆账号必须为数字");
+                        throw new ProcessException("瑞大宝登录账号必须为数字");
+                    }
+                }
+                if(PlatformType.RHPOS.code.equals(platformType.getValue())){
+                    //检查手机号是否填写
+                    if(StringUtils.isBlank(item.getBusLoginNum())){
+                        throw new ProcessException("瑞花宝登录账号不能为空");
+                    }
+                    if(!RegexUtil.checkInt(item.getBusLoginNum())){
+                        throw new ProcessException("瑞花宝登录账号必须是数字");
                     }
                 }
             }

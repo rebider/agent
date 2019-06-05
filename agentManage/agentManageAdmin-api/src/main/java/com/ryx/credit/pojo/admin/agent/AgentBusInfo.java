@@ -95,6 +95,16 @@ public class AgentBusInfo implements Serializable {
 
     private Map<String,Object> parentInfo;
 
+    private String codeTypes;
+
+    public String getCodeTypes() {
+        return codeTypes;
+    }
+
+    public void setCodeTypes(String codeTypes) {
+        this.codeTypes = codeTypes;
+    }
+
     public String getTerminalsLower() {
         return terminalsLower;
     }
