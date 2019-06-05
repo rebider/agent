@@ -752,7 +752,30 @@
       </if>
   </select>
 
+<!--   查询已结清的实际付款金额-->
 
+    <select id="selectRealAmount" resultType="java.math.BigDecimal" parameterType="String">
+        select sum(REAL_PAY_AMOUNT)as realPayAmount from O_PAYMENT_DETAIL
+         <where>
+             <if test=" orderId!= null and orderId != '' ">
+                 ORDER_ID=#{orderId}
+             </if>
+         </where>
+           AND PAYMENT_TYPE=#{paymentType} and Payment_status=${paymentStatus}
+        group by ''
+    </select>
 
+    <!--查询还剩几期的待付款-->
+    <select id="selectCount" resultMap="BaseResultMap" parameterType="String">
+        select
+        <include refid="Base_Column_List" />
+        from O_PAYMENT_DETAIL
+        <where>
+            <if test=" orderId!= null and orderId != '' ">
+                ORDER_ID=#{orderId}
+            </if>
+        </where>
+        AND PAYMENT_TYPE=#{paymentType} and Payment_status=${paymentStatus}
+    </select>
 
 </mapper>

@@ -68,4 +68,8 @@ public interface OPaymentDetailMapper {
 
     List<Map<String,Object>> SelectByMonthRefund(Map<String, Object> map);
 
+    BigDecimal selectRealAmount(@Param("orderId")String orderId, @Param("paymentType")String paymentType, @Param("paymentStatus")BigDecimal paymentStatus);
+
+    List<OPaymentDetail> selectCount(@Param("orderId")String orderId, @Param("paymentType")String paymentType, @Param("paymentStatus")BigDecimal paymentStatus);
+
 }
