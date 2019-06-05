@@ -210,20 +210,20 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                     }
                 }
             }
-
-            //业务部输入贷记费率下限
-            if(orgCode.equals("business"))
-            if(agentVo.getCreditRateFloorList()!=null && agentVo.getCreditRateFloorList().size()>0) {
-                for (AgentBusInfoVo agentBusInfoVo : agentVo.getCreditRateFloorList()) {
-                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
-                    agentBusInfo.setcUtime(new Date());
-                    agentBusInfo.setCreditRateFloor(agentBusInfoVo.getCreditRateFloor());
-                    int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
-                    if (i != 1) {
-                        throw new ProcessException("更新贷记费率下限失败");
-                    }
-                }
-            }
+//
+//            //业务部输入贷记费率下限
+//            if(orgCode.equals("business"))
+//            if(agentVo.getCreditRateFloorList()!=null && agentVo.getCreditRateFloorList().size()>0) {
+//                for (AgentBusInfoVo agentBusInfoVo : agentVo.getCreditRateFloorList()) {
+//                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+//                    agentBusInfo.setcUtime(new Date());
+//                    agentBusInfo.setCreditRateFloor(agentBusInfoVo.getCreditRateFloor());
+//                    int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+//                    if (i != 1) {
+//                        throw new ProcessException("更新贷记费率下限失败");
+//                    }
+//                }
+//            }
         }
         return AgentResult.ok();
     }
