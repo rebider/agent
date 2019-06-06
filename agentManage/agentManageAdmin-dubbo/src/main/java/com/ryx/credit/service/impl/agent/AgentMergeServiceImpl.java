@@ -683,11 +683,11 @@ public class AgentMergeServiceImpl  implements AgentMergeService {
         //判断省区是否相同
         if(mainAgent.getAgDocPro().equals(subAgent.getAgDocPro())){
             reqMap.put("city","1");
-            COrganization mainOrganization = organizationMapper.selectByPrimaryKey(mainAgent.getAgDocDistrict());
+            COrganization mainOrganization = organizationMapper.selectByPrimaryKey(Integer.valueOf(mainAgent.getAgDocDistrict()));
             if(null==mainOrganization){
                 throw new MessageException("主代理商部门信息错误");
             }
-            COrganization subOrganization = organizationMapper.selectByPrimaryKey(subAgent.getAgDocDistrict());
+            COrganization subOrganization = organizationMapper.selectByPrimaryKey(Integer.valueOf(subAgent.getAgDocDistrict()));
             if(null==subOrganization){
                 throw new MessageException("副代理商部门信息错误");
             }
@@ -770,11 +770,11 @@ public class AgentMergeServiceImpl  implements AgentMergeService {
                 if(agentVo.getSid().equals("sid-8BFF457F-18DB-4AF9-A1F9-90C19812BE67") || agentVo.getSid().equals("sid-5C0AE792-7539-46D2-86BA-243B6A42D9FE")){
                     Agent mainAgent = agentMapper.selectByPrimaryKey(agentMerge.getMainAgentId());
                     Agent subAgent = agentMapper.selectByPrimaryKey(agentMerge.getSubAgentId());
-                    COrganization mainOrganization = organizationMapper.selectByPrimaryKey(mainAgent.getAgDocDistrict());
+                    COrganization mainOrganization = organizationMapper.selectByPrimaryKey(Integer.valueOf(mainAgent.getAgDocDistrict()));
                     if(null==mainOrganization){
                         throw new MessageException("主代理商部门信息错误");
                     }
-                    COrganization subOrganization = organizationMapper.selectByPrimaryKey(subAgent.getAgDocDistrict());
+                    COrganization subOrganization = organizationMapper.selectByPrimaryKey(Integer.valueOf(subAgent.getAgDocDistrict()));
                     if(null==subOrganization){
                         throw new MessageException("副代理商部门信息错误");
                     }
