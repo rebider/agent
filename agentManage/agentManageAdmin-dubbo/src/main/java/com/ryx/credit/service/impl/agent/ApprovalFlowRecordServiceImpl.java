@@ -108,8 +108,8 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
         if(StringUtils.isNotBlank(approvalFlowRecord.getAgentName())){
             criteria.andAgentNameEqualTo(approvalFlowRecord.getAgentName());
         }
-        if(StringUtils.isNotBlank(approvalFlowRecord.getApprovalResult())){
-            criteria.andApprovalResultEqualTo(approvalFlowRecord.getApprovalResult());
+        if(StringUtils.isNotBlank(approvalFlowRecord.getAppResult())){
+            criteria.andApprovalResultEqualTo(approvalFlowRecord.getAppResult());
         }
         if(StringUtils.isNotBlank(approvalFlowRecord.getBusId())){
             criteria.andBusIdEqualTo(approvalFlowRecord.getBusId());
@@ -193,8 +193,8 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
         if (StringUtils.isNotBlank(approvalFlowRecord.getAgentName())) {
             criteria.andAgentNameEqualTo(approvalFlowRecord.getAgentName());
         }
-        if (StringUtils.isNotBlank(approvalFlowRecord.getApprovalResult())) {
-            criteria.andApprovalResultEqualTo(approvalFlowRecord.getApprovalResult());
+        if (StringUtils.isNotBlank(approvalFlowRecord.getAppResult())) {
+            criteria.andApprovalResultEqualTo(approvalFlowRecord.getAppResult());
         }
         if (StringUtils.isNotBlank(approvalFlowRecord.getBusId())) {
             criteria.andBusIdEqualTo(approvalFlowRecord.getBusId());
