@@ -18,7 +18,7 @@ public interface COrganizationMapper extends BaseMapper<COrganization> {
 
     List<COrganization> selectByOrgPid(String orgPid);
 
-    COrganization selectByPrimaryKey(String id);
+    COrganization selectByPrimaryKey(Integer id);
 
     COrganization selectByCode(String code);
 }
