@@ -15,4 +15,6 @@ public interface BankLineNumsMapper {
     int insertSelective(BankLineNums record);
 
     List<BankLineNums> selectByExample(BankLineNumsExample example);
+
+    BankLineNums selectByBankName(String bankName);
 }

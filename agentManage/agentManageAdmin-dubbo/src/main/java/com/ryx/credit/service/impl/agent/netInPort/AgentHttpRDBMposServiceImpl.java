@@ -9,9 +9,14 @@ import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.common.util.MailUtil;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
+import com.ryx.credit.dao.agent.RegionMapper;
+import com.ryx.credit.dao.bank.BankLineNumsMapper;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
+import com.ryx.credit.pojo.admin.agent.Region;
+import com.ryx.credit.pojo.admin.bank.BankLineNums;
+import com.ryx.credit.pojo.admin.bank.BankLineNumsExample;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInHttpService;
@@ -22,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /***
@@ -43,7 +49,10 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
     private AgentBusInfoMapper agentBusInfoMapper;
     @Autowired
     private AgentBusinfoService agentBusinfoService;
-
+    @Autowired
+    private RegionMapper regionMapper;
+    @Autowired
+    private BankLineNumsMapper bankLineNumsMapper;
 
     @Override
     public Map<String, Object> packageParam(Map<String, Object> param) {
@@ -75,6 +84,13 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         }
         resultMap.put("agCode",agent.getId());
         resultMap.put("directLabel",directLabel(agentBusInfo.getBusType()));
+        Region region = regionMapper.findByRcode(agentColinfo.getBankRegion());
+        resultMap.put("code",String.valueOf(region.gettType()));
+        resultMap.put("cityid",agentColinfo.getBankRegion());
+        resultMap.put("bankcity",region.getrName());
+        resultMap.put("bankname",agentColinfo.getCloBank());
+        BankLineNums bankLineNums = bankLineNumsMapper.selectByBankName(agentColinfo.getCloBank());
+        resultMap.put("bankid",bankLineNums.getBankid());
         return resultMap;
     }
 
@@ -98,6 +114,13 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             jsonParams.put("parentAgencyId",paramMap.get("parentAgencyId"));
             jsonParams.put("agCode",paramMap.get("agCode"));
             jsonParams.put("directLabel",paramMap.get("directLabel"));
+            jsonParams.put("directLabel",paramMap.get("directLabel"));
+            jsonParams.put("code",paramMap.get("code"));
+            jsonParams.put("cityid",paramMap.get("cityid"));
+            jsonParams.put("bankcity",paramMap.get("bankcity"));
+            jsonParams.put("bankid",paramMap.get("bankid"));
+            jsonParams.put("bankname",paramMap.get("bankname"));
+
             String json = JsonUtil.objectToJson(jsonParams);
             log.info("通知瑞大宝入网请求参数：{}",json);
             //发送请求
@@ -118,11 +141,11 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
     }
 
     /**
-     * direct 直签标识N String 二代直签--1，一代X--1，机构一代--1，其余--0
+     * direct 直签标识N String 二代直签--1，一代X--1，机构一代--1，直签 --1 其余--0
      * @return
      */
     private String direct(String busType){
-        if(BusType.ZQZF.key.equals(busType) || BusType.YDX.key.equals(busType) || BusType.JGYD.key.equals(busType) )
+        if(BusType.ZQZF.key.equals(busType) || BusType.YDX.key.equals(busType) || BusType.JGYD.key.equals(busType) || BusType.ZQ.key.equals(busType) )
         return "1";
         return "0";
     }
@@ -153,7 +176,6 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         AgentBusInfo agentBusInfo = agentBusinfoService.getById(busId);
         jsonParams.put("agencyId",agentBusInfo.getBusNum());
         jsonParams.put("termCount",agentBusInfo.getTerminalsLower());
-
         return jsonParams;
     }
 
@@ -198,6 +220,13 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         jsonParams.put("companyNo",agent.getAgBusLic());
         jsonParams.put("userName",agent.getAgLegal());
         jsonParams.put("agencyName",agent.getAgName());
+        Region region = regionMapper.findByRcode(agentColinfo.getBankRegion());
+        jsonParams.put("code",String.valueOf(region.gettType()));
+        jsonParams.put("cityid",agentColinfo.getBankRegion());
+        jsonParams.put("bankcity",region.getrName());
+        jsonParams.put("bankname",agentColinfo.getCloBank());
+        BankLineNums bankLineNums = bankLineNumsMapper.selectByBankName(agentColinfo.getCloBank());
+        jsonParams.put("bankid",bankLineNums.getBankid());
         return jsonParams;
     }
 
@@ -215,6 +244,11 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             jsonParams.put("userName",paramMap.get("userName"));
             jsonParams.put("agencyName",paramMap.get("agencyName"));
             jsonParams.put("cardidx","1");
+            jsonParams.put("code",paramMap.get("code"));
+            jsonParams.put("cityid",paramMap.get("cityid"));
+            jsonParams.put("bankcity",paramMap.get("bankcity"));
+            jsonParams.put("bankid",paramMap.get("bankid"));
+            jsonParams.put("bankname",paramMap.get("bankname"));
             String json = JsonUtil.objectToJson(jsonParams);
             log.info("通知瑞大宝入网修改请求参数：{}",json);
             //发送请求
