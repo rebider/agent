@@ -1622,7 +1622,14 @@ public class OrderServiceImpl implements OrderService {
             order.setOrderStatus(OrderStatus.ENABLE.status);
             order.setReviewStatus(AgStatus.Approved.status);
             order.setoInuretime(d.getTime());
-            Date orderTime = DateUtil.getDateFromStr(DateUtil.format(order.getcTime(), "yyyy-MM-dd"), "yyyy-MM-dd");
+            Calendar orderdate = Calendar.getInstance();
+            orderdate.setTime(order.getcTime());
+            orderdate.set(Calendar.DAY_OF_MONTH,orderdate.getActualMinimum(Calendar.DAY_OF_MONTH));
+            orderdate.set(Calendar.HOUR_OF_DAY,orderdate.getActualMinimum(Calendar.HOUR_OF_DAY));
+            orderdate.set(Calendar.MILLISECOND,orderdate.getActualMinimum(Calendar.MILLISECOND));
+            orderdate.set(Calendar.SECOND,orderdate.getActualMinimum(Calendar.SECOND));
+            orderdate.set(Calendar.MINUTE,orderdate.getActualMinimum(Calendar.MINUTE));
+            Date orderTime = DateUtil.getDateFromStr(DateUtil.format(orderdate.getTime(), "yyyy-MM-dd"), "yyyy-MM-dd");
             //付款单设置
             switch (order.getPaymentMethod()) {
                 case "FKFQ":
