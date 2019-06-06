@@ -128,7 +128,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     public COrganization getByUserName(String userName) {
         UserVo userVo = cUserMapper.selectbyName(userName);
         if(userVo!=null && userVo.getOrganizationId()!=null){
-            COrganization organization = cOrganizationMapper.selectByPrimaryKey(userVo.getOrganizationId()+"");
+            COrganization organization = cOrganizationMapper.selectByPrimaryKey(userVo.getOrganizationId());
             if(organization!=null){
                 return organization;
             }
@@ -140,9 +140,9 @@ public class DepartmentServiceImpl implements DepartmentService {
     public COrganization getByUserNameParent(String userName) {
         UserVo userVo = cUserMapper.selectbyName(userName);
         if(userVo!=null && userVo.getOrganizationId()!=null){
-            COrganization organization = cOrganizationMapper.selectByPrimaryKey(userVo.getOrganizationId()+"");
+            COrganization organization = cOrganizationMapper.selectByPrimaryKey(userVo.getOrganizationId());
             if(organization!=null){
-                COrganization organization_p = cOrganizationMapper.selectByPrimaryKey(organization.getPid()+"");
+                COrganization organization_p = cOrganizationMapper.selectByPrimaryKey(organization.getPid().intValue());
                 return organization_p;
             }
         }

@@ -238,10 +238,10 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
                 resultMap.put("subAgentName", agentMerge.getSubAgentName());
 
                 Agent agentMain = agentMapper.selectByPrimaryKey(agentMerge.getMainAgentId());
-                COrganization cOrganizationMain = cOrganizationMapper.selectByPrimaryKey(agentMain.getAgDocPro());
+                COrganization cOrganizationMain = cOrganizationMapper.selectByPrimaryKey(Integer.valueOf(agentMain.getAgDocPro()));
                 resultMap.put("agDocProMain", cOrganizationMain.getName());
                 Agent agentSub = agentMapper.selectByPrimaryKey(agentMerge.getSubAgentId());
-                COrganization cOrganizationSub = cOrganizationMapper.selectByPrimaryKey(agentSub.getAgDocPro());
+                COrganization cOrganizationSub = cOrganizationMapper.selectByPrimaryKey(Integer.valueOf(agentSub.getAgDocPro()));
                 resultMap.put("agDocProSub", cOrganizationSub.getName());
 
                 List<AgentBusInfo> agentBusInfosMain = agentBusInfoMapper.selectByAgenId(agentMain.getId());
@@ -294,12 +294,18 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
             for (ApprovalFlowRecord flowRecord : approvalFlowRecords) {
                 Map<String, Object> resultMap = new HashMap<>();
                 Agent agent = agentMapper.selectByPrimaryKey(flowRecord.getBusId());
-                resultMap.put("cUtime", DateUtil.format(agent.getcUtime()));
+                if(agent==null){
+                    continue;
+                }
+                resultMap.put("cUtime",agent.getcUtime()!=null?DateUtil.format(agent.getcUtime()):"");
                 resultMap.put("agentId", agent.getId());
                 resultMap.put("agentName", agent.getAgName());
 
-                COrganization cOrganization = cOrganizationMapper.selectByPrimaryKey(agent.getAgDocPro());
-                resultMap.put("agDocPro", cOrganization.getName());
+                if(StringUtils.isNotBlank(agent.getAgDocPro())){
+                    COrganization cOrganization = cOrganizationMapper.selectByPrimaryKey(Integer.valueOf(agent.getAgDocPro()));
+                    if(cOrganization!=null)
+                    resultMap.put("agDocPro", cOrganization.getName());
+                }
 
                 List<AgentBusInfo> agentBusInfosList = agentBusInfoMapper.selectByAgenId(agent.getId());
                 if (null != agentBusInfosList && agentBusInfosList.size() != 0) {
@@ -441,7 +447,7 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
             resultMap.put("agentId",dateChangeRequest.getDataId());
             Agent agent = agentMapper.selectByPrimaryKey(dateChangeRequest.getDataId());
             resultMap.put("agentName",agent.getAgName());
-            COrganization cOrganizationSub = cOrganizationMapper.selectByPrimaryKey(agent.getAgDocPro());
+            COrganization cOrganizationSub = cOrganizationMapper.selectByPrimaryKey(Integer.valueOf(agent.getAgDocPro()));
             resultMap.put("agDocPro",cOrganizationSub.getName());
         }
         return resultList;
