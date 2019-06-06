@@ -1544,7 +1544,7 @@ public class AimportServiceImpl implements AimportService {
                 a.setcIncomStatus(Status.STATUS_1.status);
                 a.setFreestatus(Status.STATUS_1.status);
                 a.setAgStatus(AgStatus.Approved.name());
-                a.setCaStatus(Status.STATUS_0.status);
+                a.setCaStatus(Status.STATUS_1.status);
                 a.setAgLegal(null);
                 a.setcUtime(Calendar.getInstance().getTime());
                 a.setcTime(Calendar.getInstance().getTime());
@@ -1627,7 +1627,7 @@ public class AimportServiceImpl implements AimportService {
             agentBusInfo.setcTime(new Date());
             agentBusInfo.setcUtime(agentBusInfo.getcTime());
             agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
-            agentBusInfo.setCloReviewStatus(AgStatus.Approving.status);
+            agentBusInfo.setCloReviewStatus(AgStatus.Approved.status);
             agentBusInfo.setStatus(Status.STATUS_1.status);
             agentBusInfo.setVersion(Status.STATUS_1.status);
             agentBusInfo.setcUser(user);
