@@ -439,6 +439,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                 if(dateChangeRequest.getDataType().equals(DataChangeApyType.DC_Agent.name())){
                     AgentVo vo = JSONObject.parseObject(dateChangeRequest.getDataContent(), AgentVo.class);
                     vo.setEditDebitList(agentVo.getEditDebitList());
+                    vo.setCreditRateFloorList(agentVo.getCreditRateFloorList()); //业务部输入贷记费率下限
                     String voJson = JSONObject.toJSONString(vo);
                     dateChangeRequest.setDataContent(voJson);
                     int i = dataChangeActivityService.updateByPrimaryKeySelective(dateChangeRequest);
