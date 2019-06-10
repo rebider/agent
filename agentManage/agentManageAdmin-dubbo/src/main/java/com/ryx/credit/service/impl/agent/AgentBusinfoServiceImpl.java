@@ -318,6 +318,12 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 						db_AgentBusInfo.setDebitAppearRate(debitAppearRate.getdItemvalue());
 					}
 
+					// 贷记费率下限（%）
+					Dict creditRateFloor = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "creditRateFloor");
+					if (creditRateFloor != null) {
+						db_AgentBusInfo.setCreditRateFloor(creditRateFloor.getdItemvalue());
+					}
+
 					if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(db_AgentBusInfo)){
 						throw new MessageException("更新业务信息失败");
 					}else{
