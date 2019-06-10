@@ -792,4 +792,15 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         }
         return AgentResult.ok();
     }
+
+
+//    @Autowired
+    public void appTerminalTransfer()throws Exception{
+        log.info("处理终端划拨开始");
+        List<String> activIds = terminalTransferMapper.appTerminalTransfer();
+        for (String activId : activIds) {
+            compressTerminalTransferActivity(activId,AgStatus.Approved.status);
+        }
+        log.info("处理终端划拨结束");
+    }
 }
