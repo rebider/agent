@@ -126,6 +126,12 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 				agentBusInfo.setDebitAppearRate(debitAppearRate.getdItemvalue());
 			}
 
+			// 贷记费率下限（%）
+		    Dict creditRateFloor = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "creditRateFloor");
+			if (creditRateFloor != null) {
+				agentBusInfo.setCreditRateFloor(creditRateFloor.getdItemvalue());
+			}
+
 			if(1!=agentBusInfoMapper.insert(agentBusInfo)){
         		throw new ProcessException("业务添加失败");
 			}
@@ -310,6 +316,12 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					}
 					if(debitAppearRate!=null){
 						db_AgentBusInfo.setDebitAppearRate(debitAppearRate.getdItemvalue());
+					}
+
+					// 贷记费率下限（%）
+					Dict creditRateFloor = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "creditRateFloor");
+					if (creditRateFloor != null) {
+						db_AgentBusInfo.setCreditRateFloor(creditRateFloor.getdItemvalue());
 					}
 
 					if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(db_AgentBusInfo)){

@@ -83,6 +83,8 @@ public class AgentBusInfo implements Serializable {
 
     private String terminalsLower;
 
+    private String creditRateFloor;
+
     private List<Attachment> attachmentList;
 
     private List<AgentColinfo> agentColinfoList;
@@ -111,6 +113,14 @@ public class AgentBusInfo implements Serializable {
 
     public void setTerminalsLower(String terminalsLower) {
         this.terminalsLower = terminalsLower;
+    }
+
+    public String getCreditRateFloor() {
+        return creditRateFloor;
+    }
+
+    public void setCreditRateFloor(String creditRateFloor) {
+        this.creditRateFloor = creditRateFloor;
     }
 
     public List<Attachment> getAttachmentList() {
