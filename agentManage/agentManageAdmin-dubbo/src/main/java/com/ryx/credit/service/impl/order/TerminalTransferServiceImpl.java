@@ -615,7 +615,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         for (List<Object> objects : excelList) {
             String id = String.valueOf(objects.get(0));
             String adjustStatusCon = String.valueOf(objects.get(12));
-            String remark = String.valueOf(objects.get(13));
+            String remark = objects.size()>=14?String.valueOf(objects.get(13)):"";
             BigDecimal adjustStatus = AdjustStatus.getValueByContent(adjustStatusCon);
             if(adjustStatus==null || adjustStatusCon.equals(AdjustStatus.TZZ.msg) || adjustStatusCon.equals(AdjustStatus.WTZ.msg) ){
                 throw new MessageException("第"+i+"个调整结果类型错误");
