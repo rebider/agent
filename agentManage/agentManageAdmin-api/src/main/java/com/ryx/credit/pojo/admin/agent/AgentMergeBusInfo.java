@@ -97,6 +97,7 @@ public class AgentMergeBusInfo implements Serializable {
 
     private String debitAppearRate;
 
+    private String creditRateFloor;
 
     public String getMergeStatusName() {
         return mergeStatusName;
@@ -464,5 +465,13 @@ public class AgentMergeBusInfo implements Serializable {
 
     public void setDebitAppearRate(String debitAppearRate) {
         this.debitAppearRate = debitAppearRate;
+    }
+
+    public String getCreditRateFloor() {
+        return creditRateFloor;
+    }
+
+    public void setCreditRateFloor(String creditRateFloor) {
+        this.creditRateFloor = creditRateFloor;
     }
 }
