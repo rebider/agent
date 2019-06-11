@@ -746,8 +746,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 }
             }
         }
-
-        int updateCount = 0;
+        terminalTransferDetailMapper.updateStatusByTerminalTransferId(terminalTransfer.getId());
         for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailList) {
             Map<String, String> resultMap = saveOrEditVerify(terminalTransferDetail, agentId);
             //新增
@@ -778,17 +777,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 if(j!=1){
                     throw new MessageException("更新数据明细失败");
                 }
-                updateCount++;
             }
-        }
-
-        TerminalTransferDetailExample terminalTransferDetailExample = new TerminalTransferDetailExample();
-        TerminalTransferDetailExample.Criteria criteria = terminalTransferDetailExample.createCriteria();
-        criteria.andStatusEqualTo(Status.STATUS_1.status);
-        criteria.andTerminalTransferIdEqualTo(terminalTransfer.getId());
-        int selectCount = (int)terminalTransferDetailMapper.countByExample(terminalTransferDetailExample);
-        if(updateCount!=selectCount){
-            throw new MessageException("数据存在异常,请联系管理员！");
         }
         return AgentResult.ok();
     }
