@@ -85,6 +85,12 @@ public class AgentBusInfo implements Serializable {
 
     private String creditRateFloor;
 
+    private String agDocDistrict;
+
+    private String agDocPro;
+
+    private String organName;
+
     private List<Attachment> attachmentList;
 
     private List<AgentColinfo> agentColinfoList;
@@ -121,6 +127,30 @@ public class AgentBusInfo implements Serializable {
 
     public void setCreditRateFloor(String creditRateFloor) {
         this.creditRateFloor = creditRateFloor;
+    }
+
+    public String getAgDocDistrict() {
+        return agDocDistrict;
+    }
+
+    public void setAgDocDistrict(String agDocDistrict) {
+        this.agDocDistrict = agDocDistrict;
+    }
+
+    public String getAgDocPro() {
+        return agDocPro;
+    }
+
+    public void setAgDocPro(String agDocPro) {
+        this.agDocPro = agDocPro;
+    }
+
+    public String getOrganName() {
+        return organName;
+    }
+
+    public void setOrganName(String organName) {
+        this.organName = organName;
     }
 
     public List<Attachment> getAttachmentList() {
