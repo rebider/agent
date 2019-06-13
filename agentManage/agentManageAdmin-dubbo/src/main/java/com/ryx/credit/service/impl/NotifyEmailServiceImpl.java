@@ -80,7 +80,7 @@ public class NotifyEmailServiceImpl implements NotifyEmailService {
                 if(groupId.equals("city")){
                     CUser cUser = cUserMapper.selectById(Long.valueOf(busActRel.getcUser()));
                     //判断是代理商发起还是省区发起的审批
-                    COrganization organization = organizationMapper.selectByPrimaryKey(String.valueOf(cUser.getOrganizationId()));
+                    COrganization organization = organizationMapper.selectByPrimaryKey(cUser.getOrganizationId());
                     if(organization.getCode().equals("agent")){
                         CuserAgentExample cuserAgentExample = new CuserAgentExample();
                         CuserAgentExample.Criteria criteria = cuserAgentExample.createCriteria();

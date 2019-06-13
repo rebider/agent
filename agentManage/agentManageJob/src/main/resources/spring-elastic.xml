@@ -42,7 +42,8 @@
                 overwrite="true"
                 description="分润抵扣机具欠款分期汇总"
                 sharding-total-count="1"
-                sharding-item-parameters="0=Server0"/>
+                sharding-item-parameters="0=Server0"
+                disabled="true"/>
 
     <job:simple id="synColinfoToPayment"
                 job-ref="synColinfoToPaymentJob"

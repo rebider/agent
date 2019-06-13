@@ -2,20 +2,21 @@ package com.ryx.credit.service.impl;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.commons.result.Tree;
 import com.ryx.credit.commons.shiro.ShiroUser;
 import com.ryx.credit.dao.*;
+import com.ryx.credit.dao.agent.PlatFormMapper;
 import com.ryx.credit.pojo.admin.CResource;
+import com.ryx.credit.pojo.admin.agent.PlatForm;
+import com.ryx.credit.pojo.admin.agent.PlatFormExample;
 import com.ryx.credit.service.IResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sun.util.resources.ga.LocaleNames_ga;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  *
@@ -152,5 +153,29 @@ public class ResourceServiceImpl extends ServiceImpl<CResourceMapper, CResource>
 
 	public List<Map> userHasPlatfromPerm(Long userId){
         return resourceMapper.userHasPlatfromPerm(userId);
+    }
+
+    @Autowired
+    private PlatFormMapper platFormMapper;
+
+//    @Autowired
+    public void insert(){
+        List<PlatForm> platForms = platFormMapper.selectByExample(new PlatFormExample());
+        int i = 0;
+        for (PlatForm platForm : platForms) {
+            CResource resource = new CResource();
+            resource.setName("入网待办任务_"+platForm.getPlatformName());
+            resource.setUrl("ACTIVITY_"+platForm.getPlatformNum());
+            resource.setOpenMode("ajax");
+            resource.setIcon("fi-folder");
+            resource.setPid(Long.valueOf(AppConfig.getProperty("netInUrls_pid")));
+            resource.setSeq(i);
+            resource.setStatus(0);
+            resource.setOpened(1);
+            resource.setResourceType(1);
+            resource.setCreateTime(new Date());
+            resourceMapper.insert(resource);
+            i++;
+        }
     }
 }
