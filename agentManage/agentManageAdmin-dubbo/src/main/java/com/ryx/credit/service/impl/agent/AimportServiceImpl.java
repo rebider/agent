@@ -1611,27 +1611,72 @@ public class AimportServiceImpl implements AimportService {
             return ResultVO.fail("唯一码未找到["+ag+"]");
         }
         Agent agent = agents.get(0);
-
-        AgentBusInfoExample example = new AgentBusInfoExample();
-        example.or().andStatusEqualTo(Status.STATUS_1.status).andBusNumEqualTo(String.valueOf(busPlatform_num));
-        List<AgentBusInfo> businfos = agentBusInfoMapper.selectByExample(example);
         AgentBusInfo agentBusInfo = new AgentBusInfo();
+        if(StringUtils.isNotBlank(busPlatform_num)){
+            AgentBusInfoExample example = new AgentBusInfoExample();
+            example.or().andStatusEqualTo(Status.STATUS_1.status).andBusNumEqualTo(String.valueOf(busPlatform_num));
+            List<AgentBusInfo> businfos = agentBusInfoMapper.selectByExample(example);
+            if(businfos.size()==1){
+                logger.info(prefix_importBusInfo+"业务码,{},{}",user,list);
+                agentBusInfo=businfos.get(0);
+            }else if(businfos.size()>1){
+                logger.info(prefix_importBusInfo+"业务码({})数量不唯一,{},{}",busPlatform_num,user,list);
+                return ResultVO.fail("业务码数量不唯一");
+            }else if(businfos.size()<1){
+                    //修补平台号操作
+                    if(StringUtils.isNotBlank(busPlatform)){
+                        List<PlatForm>  platForms = businessPlatformService.queryAblePlatForm();
+                        for (PlatForm platForm : platForms) {
+                            if (platForm.getPlatformName().equals(busPlatform)) {
+                                String platf = platForm.getPlatformNum();
+                                AgentBusInfoExample example_forupdateBusPFN = new AgentBusInfoExample();
+                                example_forupdateBusPFN.or().andStatusEqualTo(Status.STATUS_1.status).andBusPlatformEqualTo(platf);
+                                List<AgentBusInfo> businfos_example_forupdateBusPFN = agentBusInfoMapper.selectByExample(example_forupdateBusPFN);
+                                if(businfos_example_forupdateBusPFN.size()>0){
+                                    agentBusInfo =  businfos_example_forupdateBusPFN.get(0);
+                                }
+                                break;
+                            }
+                        }
+                    }
+                //不是设置平台号
+                if(StringUtils.isBlank(agentBusInfo.getId()))
+                    agentBusInfo.setcTime(new Date());
+                    agentBusInfo.setcUtime(agentBusInfo.getcTime());
+                    agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
+                    agentBusInfo.setCloReviewStatus(AgStatus.Approved.status);
+                    agentBusInfo.setStatus(Status.STATUS_1.status);
+                    agentBusInfo.setVersion(Status.STATUS_1.status);
+                    agentBusInfo.setcUser(user);
+                }
 
-        if(businfos.size()==1){
-            logger.info(prefix_importBusInfo+"业务码,{},{}",user,list);
-            agentBusInfo=businfos.get(0);
-        }else if(businfos.size()>1){
-            logger.info(prefix_importBusInfo+"业务码({})数量不唯一,{},{}",busPlatform_num,user,list);
-            return ResultVO.fail("业务码数量不唯一");
-        }else if(businfos.size()<1){
-            agentBusInfo.setcTime(new Date());
-            agentBusInfo.setcUtime(agentBusInfo.getcTime());
-            agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
-            agentBusInfo.setCloReviewStatus(AgStatus.Approved.status);
-            agentBusInfo.setStatus(Status.STATUS_1.status);
-            agentBusInfo.setVersion(Status.STATUS_1.status);
-            agentBusInfo.setcUser(user);
-        }
+        }else{
+            //业务编号无 根据平台类型进行设置
+            if(StringUtils.isNotBlank(busPlatform)){
+                List<PlatForm>  platForms = businessPlatformService.queryAblePlatForm();
+                for (PlatForm platForm : platForms) {
+                    if (platForm.getPlatformName().equals(busPlatform)) {
+                        String platf = platForm.getPlatformNum();
+                        AgentBusInfoExample example = new AgentBusInfoExample();
+                        example.or().andStatusEqualTo(Status.STATUS_1.status).andBusPlatformEqualTo(platf);
+                        List<AgentBusInfo> businfos = agentBusInfoMapper.selectByExample(example);
+                        if(businfos.size()>0){
+                            agentBusInfo =  businfos.get(0);
+                        }
+                        break;
+                    }
+                }
+            }
+            if(StringUtils.isBlank(agentBusInfo.getId())) {
+                agentBusInfo.setcTime(new Date());
+                agentBusInfo.setcUtime(agentBusInfo.getcTime());
+                agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
+                agentBusInfo.setCloReviewStatus(AgStatus.Approved.status);
+                agentBusInfo.setStatus(Status.STATUS_1.status);
+                agentBusInfo.setVersion(Status.STATUS_1.status);
+                agentBusInfo.setcUser(user);
+            }
+       }
         agentBusInfo.setBusNum(busPlatform_num);
         agentBusInfo.setAgentId(agent.getId());
         //业务平台类型
