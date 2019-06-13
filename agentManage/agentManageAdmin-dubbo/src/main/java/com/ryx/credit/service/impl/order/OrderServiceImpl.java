@@ -3148,6 +3148,12 @@ public class OrderServiceImpl implements OrderService {
                     if(null!=cUser)
                     orderoutVo.setNuclearUser(cUser.getName());
                 }
+                if (StringUtils.isNotBlank(orderoutVo.getReviewStatus()) && !orderoutVo.getReviewStatus().equals("null")) {
+                    String agStatusByValue = AgStatus.getMsg(new BigDecimal(orderoutVo.getReviewStatus()));
+                    if (null != agStatusByValue) {
+                        orderoutVo.setReviewStatus(agStatusByValue);
+                    }
+                }
             }
         }
         return orderoutList;

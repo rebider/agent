@@ -25,17 +25,17 @@ public class OrderoutVo implements Serializable{
     private BigDecimal xxAmount;//付款金额
     private Date actualReceiptDate;//收款日期
     private String actualTime;
-    private String oinuretime;
+    private String oinuretime;//审批时间
     private String deductionType;//抵扣类型
     private BigDecimal deductionAmount;//抵扣金额
     private String amount ;//保证金抵货款金额
     private BigDecimal money;//分期金额
     private BigDecimal planNum;//分期笔数
 
-    private String nuclearUser;
-    private Date nuclearTime;
+    private String nuclearUser;//核款人
+    private Date nuclearTime;//核款时间
     private String nuclearTimeString;
-    private String agDocPpro;
+    private String agDocPpro;//业务对接省区
 
     private String proType;//机具类型
     private String activityName;//活动名称
@@ -50,6 +50,11 @@ public class OrderoutVo implements Serializable{
     private BigDecimal frdkCount;//分期打款期数
     private BigDecimal sjdkAmt;//实际打款金额
     private BigDecimal syqkAmt;//剩余欠款
+
+    private String proRelPrice;//单价
+    private String model;//机具型号
+    private String reviewStatus;//审批状态
+    private String orgName;//顶级机构
 
     public String getProType() {
         return proType;
@@ -347,5 +352,37 @@ public class OrderoutVo implements Serializable{
 
     public void setXxAmount(BigDecimal xxAmount) {
         this.xxAmount = xxAmount;
+    }
+
+    public String getProRelPrice() {
+        return proRelPrice;
+    }
+
+    public void setProRelPrice(String proRelPrice) {
+        this.proRelPrice = proRelPrice;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public String getReviewStatus() {
+        return reviewStatus;
+    }
+
+    public void setReviewStatus(String reviewStatus) {
+        this.reviewStatus = reviewStatus;
+    }
+
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
     }
 }
