@@ -20,8 +20,6 @@ import java.util.Map;
 public class AgentServiceTest extends BaseSpringTest  {
     private Logger logger = LoggerFactory.getLogger(AgentServiceTest.class);
     @Autowired
-    private AgentNotifyService agentNotifyService;
-    @Autowired
     private OLogisticsDetailMapper oLogisticsDetailMapper;
     @Autowired
     private OLogisticsService oLogisticsService;

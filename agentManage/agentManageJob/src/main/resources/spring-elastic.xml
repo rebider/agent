@@ -134,11 +134,11 @@
     <job:dataflow id="internetCardUpdateMechIsNull"
                   job-ref="internetCardUpdateMechIsNullJob"
                   registry-center-ref="regCenter"
-                  cron="0 0 0/1 * * ? "
+                  cron="0 0/30 * * * ? *"
                   sharding-total-count="1"
                   sharding-item-parameters="0=C"
                   streaming-process="true"
-                  description="物联网卡，更新商户为空的数据,每小时执行一次"
+                  description="物联网卡，更新商户为空的数据,30分钟执行一次"
                   overwrite="true"
                   disabled="false"/>
 
