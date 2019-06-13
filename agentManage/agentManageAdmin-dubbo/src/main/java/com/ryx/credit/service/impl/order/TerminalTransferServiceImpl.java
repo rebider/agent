@@ -786,7 +786,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     }
 
 
-//    @Autowired
+    @Override
     public void appTerminalTransfer()throws Exception{
         log.info("处理终端划拨开始");
         List<String> activIds = terminalTransferMapper.appTerminalTransfer();
