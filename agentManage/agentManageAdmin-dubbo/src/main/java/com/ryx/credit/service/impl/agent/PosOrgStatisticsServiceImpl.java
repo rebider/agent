@@ -40,32 +40,32 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
     @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
 
-    @Override
-    public AgentResult posOrgStatistics(String busPlatform,String orgId,String busId,String termType)throws Exception{
-        PlatForm platForm = platFormMapper.selectByPlatFormNum(busPlatform);
-        String platformType = platForm.getPlatformType();
-        AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
-        if(StringUtils.isBlank(busId)){
-            throw new MessageException("业务ID不存在");
-        }
-        if(StringUtils.isBlank(agentBusInfo.getBusParent())){
-            throw new MessageException("上级不能为空");
-        }
-        AgentBusInfo parentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
-        if(parentBusInfo==null){
-            throw new MessageException("上级不能为空");
-        }
-        if(PlatformType.MPOS.getValue().equals(platformType)){
-            AgentResult agentResult = httpForMpos(orgId,parentBusInfo.getBusNum(),termType);
-            agentResult.setMsg(platformType);
-            return agentResult;
-        }else if(PlatformType.whetherPOS(platformType)){
-            AgentResult agentResult = httpForPos(orgId,parentBusInfo.getBusNum());
-            agentResult.setMsg(platformType);
-            return agentResult;
-        }
-        return AgentResult.fail();
-    }
+//    @Override
+//    public AgentResult posOrgStatistics(String busPlatform,String orgId,String busId,String termType)throws Exception{
+//        PlatForm platForm = platFormMapper.selectByPlatFormNum(busPlatform);
+//        String platformType = platForm.getPlatformType();
+//        AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
+//        if(StringUtils.isBlank(busId)){
+//            throw new MessageException("业务ID不存在");
+//        }
+//        if(StringUtils.isBlank(agentBusInfo.getBusParent())){
+//            throw new MessageException("上级不能为空");
+//        }
+//        AgentBusInfo parentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
+//        if(parentBusInfo==null){
+//            throw new MessageException("上级不能为空");
+//        }
+//        if(PlatformType.MPOS.getValue().equals(platformType)){
+//            AgentResult agentResult = httpForMpos(orgId,parentBusInfo.getBusNum(),termType);
+//            agentResult.setMsg(platformType);
+//            return agentResult;
+//        }else if(PlatformType.whetherPOS(platformType)){
+//            AgentResult agentResult = httpForPos(orgId,parentBusInfo.getBusNum());
+//            agentResult.setMsg(platformType);
+//            return agentResult;
+//        }
+//        return AgentResult.fail();
+//    }
 
     public static AgentResult httpForPos(String orgId,String supDorgId)throws Exception{
         try {
@@ -193,6 +193,10 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
         }else if(TerminalPlatformType.POS.getValue().compareTo(new BigDecimal(termType))==0){
             AgentResult agentResult = httpForPos(orgId,orgId);
             agentResult.setMsg(PlatformType.POS.getValue());
+            return agentResult;
+        }else if(TerminalPlatformType.RDBPOS.getValue().compareTo(new BigDecimal(termType))==0){
+            AgentResult agentResult = httpForRDBpos(orgId);
+            agentResult.setMsg(PlatformType.RDBPOS.getValue());
             return agentResult;
         }
         return AgentResult.fail();
