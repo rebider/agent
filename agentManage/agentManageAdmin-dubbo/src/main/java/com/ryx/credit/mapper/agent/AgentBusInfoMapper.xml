@@ -41,6 +41,9 @@
     <result column="DEBIT_APPEAR_RATE" jdbcType="VARCHAR" property="debitAppearRate" />
     <result column="TERMINALS_LOWER" jdbcType="VARCHAR" property="terminalsLower" />
     <result column="CREDIT_RATE_FLOOR" jdbcType="VARCHAR" property="creditRateFloor" />
+    <result column="AG_DOC_DISTRICT" jdbcType="VARCHAR" property="agDocDistrict" />
+    <result column="AG_DOC_PRO" jdbcType="VARCHAR" property="agDocPro" />
+    <result column="ORGAN_NAME" jdbcType="VARCHAR" property="organName" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -77,7 +80,8 @@
     BUS_CONTACT_EMAIL, BUS_CONTACT_PERSON, BUS_RISK_EMAIL, CLO_TAX_POINT, CLO_INVOICE,
     CLO_RECEIPT, CLO_PAY_COMPANY, CLO_AGENT_COLINFO, BUS_STATUS, CLO_REVIEW_STATUS, C_TIME,
     C_UTIME, C_USER, STATUS, VERSION, AG_ZBH, BUS_USE_ORGAN, BUS_SCOPE, DREDGE_S0, BUS_LOGIN_NUM,
-    DEBIT_RATE_LOWER, DEBIT_CAPPING, DEBIT_APPEAR_RATE, TERMINALS_LOWER, CREDIT_RATE_FLOOR
+    DEBIT_RATE_LOWER, DEBIT_CAPPING, DEBIT_APPEAR_RATE, TERMINALS_LOWER, CREDIT_RATE_FLOOR,
+    AG_DOC_DISTRICT, AG_DOC_PRO, ORGAN_NAME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -120,7 +124,8 @@
     STATUS, VERSION, AG_ZBH,
     BUS_USE_ORGAN, BUS_SCOPE, DREDGE_S0,
     BUS_LOGIN_NUM, DEBIT_RATE_LOWER, DEBIT_CAPPING,
-    DEBIT_APPEAR_RATE, TERMINALS_LOWER, CREDIT_RATE_FLOOR)
+    DEBIT_APPEAR_RATE, TERMINALS_LOWER, CREDIT_RATE_FLOOR,
+    AG_DOC_DISTRICT, AG_DOC_PRO, ORGAN_NAME)
     values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR},
     #{busPlatform,jdbcType=VARCHAR}, #{busType,jdbcType=VARCHAR}, #{busParent,jdbcType=VARCHAR},
     #{busRiskParent,jdbcType=VARCHAR}, #{busActivationParent,jdbcType=VARCHAR}, #{busRegion,jdbcType=VARCHAR},
@@ -133,7 +138,8 @@
     #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{agZbh,jdbcType=VARCHAR},
     #{busUseOrgan,jdbcType=VARCHAR}, #{busScope,jdbcType=VARCHAR}, #{dredgeS0,jdbcType=DECIMAL},
     #{busLoginNum,jdbcType=VARCHAR}, #{debitRateLower,jdbcType=VARCHAR}, #{debitCapping,jdbcType=VARCHAR},
-    #{debitAppearRate,jdbcType=VARCHAR}, #{terminalsLower,jdbcType=VARCHAR}, #{creditRateFloor,jdbcType=VARCHAR})
+    #{debitAppearRate,jdbcType=VARCHAR}, #{terminalsLower,jdbcType=VARCHAR}, #{creditRateFloor,jdbcType=VARCHAR},
+    #{agDocDistrict,jdbcType=VARCHAR}, #{agDocPro,jdbcType=VARCHAR}, #{organName,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfo">
     insert into A_AGENT_BUSINFO
@@ -255,6 +261,15 @@
       <if test="creditRateFloor != null">
         CREDIT_RATE_FLOOR,
       </if>
+      <if test="agDocDistrict != null">
+        AG_DOC_DISTRICT,
+      </if>
+      <if test="agDocPro != null">
+        AG_DOC_PRO,
+      </if>
+      <if test="organName != null">
+        ORGAN_NAME,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -373,6 +388,15 @@
       </if>
       <if test="creditRateFloor != null">
         #{creditRateFloor,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocDistrict != null">
+        #{agDocDistrict,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocPro != null">
+        #{agDocPro,jdbcType=VARCHAR},
+      </if>
+      <if test="organName != null">
+        #{organName,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -499,6 +523,15 @@
       <if test="creditRateFloor != null">
         CREDIT_RATE_FLOOR = #{creditRateFloor,jdbcType=VARCHAR},
       </if>
+      <if test="agDocDistrict != null">
+          AG_DOC_DISTRICT = #{agDocDistrict,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocPro != null">
+          AG_DOC_PRO = #{agDocPro,jdbcType=VARCHAR},
+      </if>
+      <if test="organName != null">
+          ORGAN_NAME = #{organName,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
@@ -541,7 +574,10 @@
     DEBIT_CAPPING = #{debitCapping,jdbcType=VARCHAR},
     DEBIT_APPEAR_RATE = #{debitAppearRate,jdbcType=VARCHAR},
     TERMINALS_LOWER = #{terminalsLower,jdbcType=VARCHAR},
-    CREDIT_RATE_FLOOR = #{creditRateFloor,jdbcType=VARCHAR}
+    CREDIT_RATE_FLOOR = #{creditRateFloor,jdbcType=VARCHAR},
+    AG_DOC_DISTRICT = #{agDocDistrict,jdbcType=VARCHAR},
+    AG_DOC_PRO = #{agDocPro,jdbcType=VARCHAR},
+    ORGAN_NAME = #{organName,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <sql id="OracleDialectPrefix">
