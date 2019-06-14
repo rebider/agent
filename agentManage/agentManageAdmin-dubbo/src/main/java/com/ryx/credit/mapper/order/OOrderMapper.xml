@@ -1086,7 +1086,7 @@
           and EXISTS(select * from o_sub_order os
           left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id and os.order_id=o.id where soa.VENDER=#{vender})
       </if>
-      <if test="activityName!=null and activityName !=''">
+      <if test="activityName!=null and activityName!=''">
           and EXISTS (select * from o_sub_order_activity soa
           left join o_sub_order os on soa.SUB_ORDER_ID=os.id and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
       </if>
@@ -1094,6 +1094,15 @@
       <if test="agDocDistrict!=null and agDocDistrict!=''"> and b.ag_doc_district = #{agDocDistrict} </if>
       <if test="agDocPro!=null and agDocPro!=''"> and b.ag_doc_pro = #{agDocPro} </if>
       <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
+      <if test="organizationCode!=null and organizationCode!=''">
+        and (orging.CODE like concat(#{organizationCode},'%') or org.CODE like concat(#{organizationCode},'%') )
+      </if>
+      <if test="platfromPerm!=null and platfromPerm.size>0">
+        and o.order_platform in
+        <foreach collection="platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
+          #{platfromPermItem.PLATFORM_NUM}
+        </foreach>
+      </if>
     </where>
     )
     order by c_time desc
