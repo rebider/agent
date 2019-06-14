@@ -297,6 +297,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					db_AgentBusInfo.setBusScope(agentBusInfoVo.getBusScope());
 					db_AgentBusInfo.setDredgeS0(agentBusInfoVo.getDredgeS0());
 					db_AgentBusInfo.setBusLoginNum(agentBusInfoVo.getBusLoginNum());
+					db_AgentBusInfo.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
+					db_AgentBusInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
 					if(StringUtils.isNotEmpty(db_AgentBusInfo.getBusParent())){
 						if(StringUtils.isNotEmpty(db_AgentBusInfo.getBusPlatform())){
 							AgentBusInfo busInfoParent = agentBusInfoMapper.selectByPrimaryKey(db_AgentBusInfo.getBusParent());
