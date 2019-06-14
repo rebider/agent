@@ -89,7 +89,7 @@ public class AgentBusInfo implements Serializable {
 
     private String agDocPro;
 
-    private String organName;
+    private String organNum;
 
     private List<Attachment> attachmentList;
 
@@ -145,12 +145,12 @@ public class AgentBusInfo implements Serializable {
         this.agDocPro = agDocPro;
     }
 
-    public String getOrganName() {
-        return organName;
+    public String getOrganNum() {
+        return organNum;
     }
 
-    public void setOrganName(String organName) {
-        this.organName = organName;
+    public void setOrganNum(String organNum) {
+        this.organNum = organNum;
     }
 
     public List<Attachment> getAttachmentList() {
