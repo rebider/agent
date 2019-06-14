@@ -103,6 +103,16 @@ public class AgentVo implements Serializable {
     private BigDecimal remitAmt;
     private List<AgentBusInfoVo> editDebitList;
     private List<AgentBusInfoVo> terminalsLowerList;
+    //机构
+    private List<OorganizationVo> oorganizationVoList;
+
+    public List<OorganizationVo> getOorganizationVoList() {
+        return oorganizationVoList;
+    }
+
+    public void setOorganizationVoList(List<OorganizationVo> oorganizationVoList) {
+        this.oorganizationVoList = oorganizationVoList;
+    }
 
     public String getOperationType() {
         return operationType;
