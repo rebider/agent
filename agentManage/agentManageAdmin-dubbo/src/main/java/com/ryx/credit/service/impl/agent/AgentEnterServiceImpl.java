@@ -371,8 +371,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             record.setDataShiro(BusActRelBusType.Agent.key);
 
             AgentBusInfo agentBusInfo = aginfo.get(0);
-            PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
-            record.setNetInBusType("ACTIVITY_"+platForm.getPlatformType());
+//            PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+            record.setNetInBusType("ACTIVITY_"+agentBusInfo.getBusPlatform());
             if (1 != busActRelMapper.insertSelective(record)) {
                 logger.info("代理商审批，启动审批异常，添加审批关系失败{}:{}", agentId, proce);
             }
@@ -478,7 +478,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         record.setAgentName(agent.getAgName());
         record.setDataShiro(BusActRelBusType.Business.key);
 
-        record.setNetInBusType("ACTIVITY_"+platForm.getPlatformType());
+        record.setNetInBusType("ACTIVITY_"+platForm.getPlatformNum());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("代理商业务启动审批异常，添加审批关系失败{}:{}", record.getBusId(), proce);
         }

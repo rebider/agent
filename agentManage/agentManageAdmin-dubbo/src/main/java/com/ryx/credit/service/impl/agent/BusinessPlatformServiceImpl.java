@@ -235,6 +235,10 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             return agentBusInfo;
         } else {
             agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(id);
+            PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
+            if(null!=platForm){
+                agentBusInfo.setBusPlatformType(platForm.getPlatformType());
+            }
         }
         return agentBusInfo;
     }

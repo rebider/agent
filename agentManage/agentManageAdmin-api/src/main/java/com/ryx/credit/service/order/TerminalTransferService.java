@@ -39,4 +39,5 @@ public interface TerminalTransferService {
 
     AgentResult editTerminalTransfer(TerminalTransfer terminalTransfer,List<TerminalTransferDetail> terminalTransferDetailList, String cuser,String agentId)throws Exception;
 
+    void appTerminalTransfer()throws Exception;
 }
