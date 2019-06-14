@@ -406,8 +406,9 @@ public class OLogisticServiceImpl implements OLogisticsService {
             //如果发货数量大于200-此处大量数据走任务
             if(oLogistics.getSendNum().compareTo(new BigDecimal(200))>0) {
                 //物流为未发送状态
+                if (PlatformType.whetherPOS(platForm.getPlatformType())) {
                 //如果是首刷进行sn检查库存中是否存在
-                if (platForm.getPlatformType().equals(PlatformType.MPOS.msg) || platForm.getPlatformType().equals(PlatformType.MPOS.code)){
+                }else if (platForm.getPlatformType().equals(PlatformType.MPOS.msg) || platForm.getPlatformType().equals(PlatformType.MPOS.code)){
                     for (String idSn : stringList) {
                         OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
                         oLogisticsDetailExample.or().andStatusEqualTo(Status.STATUS_0.status).andRecordStatusEqualTo(Status.STATUS_1.status).andSnNumEqualTo(idSn).andTerminalidTypeEqualTo(PlatformType.MPOS.code);
@@ -420,6 +421,15 @@ public class OLogisticServiceImpl implements OLogisticsService {
                             throw new MessageException("此SN库存数量有误："+idSn);
                         }
                     }
+                }else{
+                    OLogistics logistics_send =oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
+                    logistics_send.setSendStatus(LogisticsSendStatus.dt_send.code);
+                    logistics_send.setSendMsg("未实现的业务平台物流");
+                    if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
+                        logger.info("手刷下发物流更新记录Exception失败{}",JSONObject.toJSONString(oLogistics));
+                    }
+                    AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",物流未调用业务系统，平台类型与编号:"+platForm.getPlatformType()+","+platForm.getPlatformNum(), "物流未调用业务系统"+platForm.getPlatformType()+","+platForm.getPlatformNum());
+                    logger.info("beginSn:"+beginSn+",endSn:"+endSn+",物流未调用业务系统，平台类型与编号:"+platForm.getPlatformType()+","+platForm.getPlatformNum());
                 }
                 logger.info("物流机具数量大于200，采用任务来处理：物流-{}，数量-{}" ,oLogistics.getId(), oLogistics.getSendNum());
                 return AgentResult.ok();
