@@ -105,6 +105,26 @@ public class AgentBusInfo implements Serializable {
 
     private String codeTypes;
 
+    private String orgParent;
+
+    private String orgType;
+
+    public String getOrgType() {
+        return orgType;
+    }
+
+    public void setOrgType(String orgType) {
+        this.orgType = orgType;
+    }
+
+    public String getOrgParent() {
+        return orgParent;
+    }
+
+    public void setOrgParent(String orgParent) {
+        this.orgParent = orgParent;
+    }
+
     public String getCodeTypes() {
         return codeTypes;
     }

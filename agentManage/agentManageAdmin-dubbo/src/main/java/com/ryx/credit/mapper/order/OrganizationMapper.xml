@@ -270,4 +270,15 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="queryByOrganName" parameterType="map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from o_organization org
+    where 1=1 and org.status=1
+    <if test="platId!=null and platId!=''"> and org.plat_id=#{platId}</if>
+    <if test="orgParent!=null and orgParent!=''">and org.org_parent=#{orgParent}</if>
+    <if test="orgParent=null and orgParent=''">and org.org_parent is null or trim(org.org_parent)=''</if>
+    <if test="orgType!=null and orgType!=''">and org.org_type!=#{orgType}</if>
+  </select>
 </mapper>

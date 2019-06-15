@@ -11,7 +11,9 @@ import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.RegexUtil;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.dao.agent.*;
+import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.service.agent.AgentAssProtocolService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
@@ -62,6 +64,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	private DictOptionsService dictOptionsService;
 	@Autowired
 	private AgentBusinfoService agentBusinfoService;
+	@Autowired
+	private OrganizationMapper organizationMapper;
 
     /**
      * 代理商查询插件数据获取
@@ -241,6 +245,15 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 								throw new ProcessException("平台登录账号必须是数字");
 							}
 						}
+						//判断所选机构是否属于所选平台（业务平台&机构上级）
+						List<Organization> organList = organizationMapper.queryByOrganName(
+								FastMap.fastMap("platId", agentBusInfoVo.getBusPlatform())
+										.putKeyV("orgParent", agentBusInfoVo.getOrgParent()));
+						for (Organization organization : organList) {
+							if (!organization.getPlatId().equals(agentBusInfoVo.getBusPlatform())) {
+								throw new ProcessException("所选机构不属于该业务平台");
+							}
+						}
 					}
 				}
 				agentBusInfoVo.setcUser(agent.getcUser());
@@ -299,6 +312,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					db_AgentBusInfo.setBusLoginNum(agentBusInfoVo.getBusLoginNum());
 					db_AgentBusInfo.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
 					db_AgentBusInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
+					db_AgentBusInfo.setOrganNum(agentBusInfoVo.getOrganNum());
 					if(StringUtils.isNotEmpty(db_AgentBusInfo.getBusParent())){
 						if(StringUtils.isNotEmpty(db_AgentBusInfo.getBusPlatform())){
 							AgentBusInfo busInfoParent = agentBusInfoMapper.selectByPrimaryKey(db_AgentBusInfo.getBusParent());
