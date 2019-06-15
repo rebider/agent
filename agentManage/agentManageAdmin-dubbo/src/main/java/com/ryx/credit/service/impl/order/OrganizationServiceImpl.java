@@ -2,6 +2,7 @@ package com.ryx.credit.service.impl.order;
 
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
@@ -11,6 +12,7 @@ import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.agent.Attachment;
 import com.ryx.credit.pojo.admin.agent.AttachmentRel;
+import com.ryx.credit.pojo.admin.order.OOrder;
 import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
@@ -47,6 +49,17 @@ public class OrganizationServiceImpl implements OrganizationService{
     @Override
     public PageInfo organizationList(Page page, Organization organization) {
         HashMap<String, Object> map = new HashMap<>();
+        if (null!=organization){
+            if (StringUtils.isNotBlank(organization.getOrgId())){
+                map.put("orgId",organization.getOrgId());
+            }
+            if (StringUtils.isNotBlank(organization.getOrgName())){
+                map.put("orgName",organization.getOrgName());
+            }
+            if (StringUtils.isNotBlank(organization.getPlatId())){
+                map.put("platId",organization.getPlatId());
+            }
+        }
         List<Map<String, Object>> supplementList = organizationMapper.organizationList(map, page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(supplementList);
@@ -120,5 +133,19 @@ public class OrganizationServiceImpl implements OrganizationService{
 
         }
         return ResultVO.success(agentVo.getOorganizationVoList());
+    }
+
+    @Override
+    public AgentResult organizationDelete(String id, String user) {
+        if (null == user) return AgentResult.fail("操作用户不能为空");
+        if (StringUtils.isBlank(id)) return AgentResult.fail("ID不能为空");
+        Organization organization = new Organization();
+        organization.setOrgId(id);
+        organization.setuUser(user);
+        organization.setStatus(Status.STATUS_0.status);
+        if (1==organizationMapper.updateByPrimaryKeySelective(organization)){
+            return AgentResult.ok("成功");
+        }
+        return AgentResult.fail();
     }
 }

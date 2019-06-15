@@ -17,6 +17,10 @@ public interface OrganizationMapper {
 
     int insertSelective(Organization record);
 
+    int updateByPrimaryKeySelective(Organization record);
+
+    int updateByPrimaryKey(Organization record);
+
     List<Organization> selectByExample(OrganizationExample example);
 
     List<Map<String,Object>> organizationList(@Param("map") Map<String, Object> map, @Param("page") Page page);

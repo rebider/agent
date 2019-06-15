@@ -273,6 +273,109 @@
             <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
         </if>
     </sql>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.Organization">
+        update O_ORGANIZATION
+        <set>
+            <if test="orgNick != null">
+                ORG_NICK = #{orgNick,jdbcType=VARCHAR},
+            </if>
+            <if test="orgName != null">
+                ORG_NAME = #{orgName,jdbcType=VARCHAR},
+            </if>
+            <if test="orgLevel != null">
+                ORG_LEVEL = #{orgLevel,jdbcType=VARCHAR},
+            </if>
+            <if test="orgType != null">
+                ORG_TYPE = #{orgType,jdbcType=VARCHAR},
+            </if>
+            <if test="orgParent != null">
+                ORG_PARENT = #{orgParent,jdbcType=VARCHAR},
+            </if>
+            <if test="agentId != null">
+                AGENT_ID = #{agentId,jdbcType=VARCHAR},
+            </if>
+            <if test="platId != null">
+                PLAT_ID = #{platId,jdbcType=VARCHAR},
+            </if>
+            <if test="bankCard != null">
+                BANK_CARD = #{bankCard,jdbcType=VARCHAR},
+            </if>
+            <if test="cloRealname != null">
+                CLO_REALNAME = #{cloRealname,jdbcType=VARCHAR},
+            </if>
+            <if test="cloType != null">
+                CLO_TYPE = #{cloType,jdbcType=DECIMAL},
+            </if>
+            <if test="cloBank != null">
+                CLO_BANK = #{cloBank,jdbcType=VARCHAR},
+            </if>
+            <if test="cloBankBranch != null">
+                CLO_BANK_BRANCH = #{cloBankBranch,jdbcType=VARCHAR},
+            </if>
+            <if test="branchLineNum != null">
+                BRANCH_LINE_NUM = #{branchLineNum,jdbcType=VARCHAR},
+            </if>
+            <if test="allLineNum != null">
+                ALL_LINE_NUM = #{allLineNum,jdbcType=VARCHAR},
+            </if>
+            <if test="bankRegion != null">
+                BANK_REGION = #{bankRegion,jdbcType=VARCHAR},
+            </if>
+            <if test="cUser != null">
+                C_USER = #{cUser,jdbcType=VARCHAR},
+            </if>
+            <if test="uUser != null">
+                U_USER = #{uUser,jdbcType=VARCHAR},
+            </if>
+            <if test="cTime != null">
+                C_TIME = #{cTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="uTime != null">
+                U_TIME = #{uTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="result != null">
+                RESULT = #{result,jdbcType=DECIMAL},
+            </if>
+            <if test="remark != null">
+                REMARK = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                STATUS = #{status,jdbcType=DECIMAL},
+            </if>
+            <if test="version != null">
+                VERSION = #{version,jdbcType=DECIMAL},
+            </if>
+        </set>
+        where ORG_ID = #{orgId,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.Organization">
+        update O_ORGANIZATION
+        set ORG_NICK = #{orgNick,jdbcType=VARCHAR},
+        ORG_NAME = #{orgName,jdbcType=VARCHAR},
+        ORG_LEVEL = #{orgLevel,jdbcType=VARCHAR},
+        ORG_TYPE = #{orgType,jdbcType=VARCHAR},
+        ORG_PARENT = #{orgParent,jdbcType=VARCHAR},
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+        PLAT_ID = #{platId,jdbcType=VARCHAR},
+        BANK_CARD = #{bankCard,jdbcType=VARCHAR},
+        CLO_REALNAME = #{cloRealname,jdbcType=VARCHAR},
+        CLO_TYPE = #{cloType,jdbcType=DECIMAL},
+        CLO_BANK = #{cloBank,jdbcType=VARCHAR},
+        CLO_BANK_BRANCH = #{cloBankBranch,jdbcType=VARCHAR},
+        BRANCH_LINE_NUM = #{branchLineNum,jdbcType=VARCHAR},
+        ALL_LINE_NUM = #{allLineNum,jdbcType=VARCHAR},
+        BANK_REGION = #{bankRegion,jdbcType=VARCHAR},
+        C_USER = #{cUser,jdbcType=VARCHAR},
+        U_USER = #{uUser,jdbcType=VARCHAR},
+        C_TIME = #{cTime,jdbcType=TIMESTAMP},
+        U_TIME = #{uTime,jdbcType=TIMESTAMP},
+        RESULT = #{result,jdbcType=DECIMAL},
+        REMARK = #{remark,jdbcType=VARCHAR},
+        STATUS = #{status,jdbcType=DECIMAL},
+        VERSION = #{version,jdbcType=DECIMAL}
+        where ORG_ID = #{orgId,jdbcType=VARCHAR}
+    </update>
+
 
 
     <!--    开始写代码-->
@@ -281,6 +384,7 @@
         select
         <include refid="Base_Column_List"/>
         from O_ORGANIZATION
+        <include refid="organizationWhere" />
         <include refid="OracleDialectSuffix"/>
     </select>
 
@@ -288,6 +392,15 @@
         select
         count(*)
         from O_ORGANIZATION
+        <include refid="organizationWhere" />
     </select>
 
+    <sql id="organizationWhere">
+        <where>
+            1=1 AND status=1
+            <if test="map.orgId!=null and map.orgId!=''"> and ORG_ID=#{map.orgId} </if>
+            <if test="map.orgName!=null and map.orgName!=''"> and ORG_NAME=#{map.orgName}</if>
+            <if test="map.platId!=null and map.platId!=''"> and PLAT_ID LIKE CONCAT(CONCAT('%',#{map.platId}),'%')</if>
+        </where>
+    </sql>
 </mapper>
