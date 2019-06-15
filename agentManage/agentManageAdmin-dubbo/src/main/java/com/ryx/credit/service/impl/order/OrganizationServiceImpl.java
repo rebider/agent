@@ -14,6 +14,7 @@ import com.ryx.credit.pojo.admin.agent.Attachment;
 import com.ryx.credit.pojo.admin.agent.AttachmentRel;
 import com.ryx.credit.pojo.admin.order.OOrder;
 import com.ryx.credit.pojo.admin.order.Organization;
+import com.ryx.credit.pojo.admin.order.OrganizationExample;
 import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OorganizationVo;
@@ -73,12 +74,13 @@ public class OrganizationServiceImpl implements OrganizationService{
         for (OorganizationVo ac : agentVo.getOorganizationVoList()) {
             try {
                 ac.setcUser(agentVo.getSid());
+                ac.setPlatId(ac.getPlatId().substring(0,ac.getPlatId().length() - 1));
                 if(StringUtils.isEmpty(ac.getcUser())){
                     throw new ProcessException("操作人不能为空");
                 }
-                /*if(StringUtils.isEmpty(ac.getAgentId())){
+                if(StringUtils.isEmpty(ac.getAgentId())){
                     throw new ProcessException("代理商ID不能为空");
-                }*/
+                }
                 Date d = Calendar.getInstance().getTime();
                 ac.setcTime(d);
                 ac.setStatus(Status.STATUS_1.status);
@@ -147,5 +149,16 @@ public class OrganizationServiceImpl implements OrganizationService{
             return AgentResult.ok("成功");
         }
         return AgentResult.fail();
+    }
+
+    @Override
+    public List<Organization> selectTop() {
+        OrganizationExample organizationExample = new OrganizationExample();
+        OrganizationExample.Criteria criteria = organizationExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andOrgParentIsNull();
+        List<Organization> organizations = organizationMapper.selectByExample(organizationExample);
+        if (null==organizations || organizations.size()==0){
+            return null;
+        }
+        return organizations;
     }
 }

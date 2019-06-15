@@ -10,6 +10,8 @@ import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OorganizationVo;
 import com.ryx.credit.pojo.admin.vo.OsupplementVo;
 
+import java.util.List;
+
 /**
  * @Auther: lrr
  * @Date: 2019/6/12 17:56
@@ -22,5 +24,7 @@ public interface OrganizationService {
     ResultVO organizationAdd(AgentVo agentVo);
 
     AgentResult organizationDelete(String id, String user);
+
+    List<Organization> selectTop();
 
 }
