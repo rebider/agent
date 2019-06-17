@@ -14,6 +14,7 @@ import com.ryx.credit.dao.agent.RegionMapper;
 import com.ryx.credit.dao.bank.DPosRegionMapper;
 import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.ApaycompService;
@@ -133,10 +134,14 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
         if(null!=agentParent){
             resultMap.put("supDorgId",agentParent.getBusNum());
         }
+        //收款账户新
         AgentColinfo agentColinfo = agentColinfoService.selectByAgentId(agent.getId());
+        //机构信息
+        Organization organization = organizationMapper.selectByPrimaryKey(agentBusInfo.getOrganNum());
+        //组装参数
         resultMap.put("alwaysProfit","01");//该机构是否参与实时分润
-        resultMap.put("agentId",agentBusInfo.getOrganNum());//机构ID
-        resultMap.put("agentName","");//机构编号
+        resultMap.put("agentId",organization.getOrgId());//机构ID
+        resultMap.put("agentName",organization.getOrgName());//机构编号
         resultMap.put("credName",agent.getAgLegal());//法人姓名
         resultMap.put("credNo",agent.getAgLegalCernum());
         resultMap.put("bankCardName",agentColinfo.getCloRealname());//结算户名
@@ -145,6 +150,7 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
         resultMap.put("openBankChild",agentColinfo.getCloBankBranch());//收款开户支行
         resultMap.put("isBill",agentColinfo.getCloInvoice());//是否开具分润发票
         resultMap.put("taxPoint",agentColinfo.getCloTaxPoint());//税点
+        resultMap.put("agCode",agentBusInfo.getAgentId());//AG码
         return resultMap;
     }
 
@@ -190,7 +196,22 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
             data.put("orgType",paramMap.get("orgType"));
             if(paramMap.get("orgType").equals(OrgType.STR.getValue()))
                 data.put("supDorgId",paramMap.get("supDorgId"));
+            //组装参数
+            data.put("alwaysProfit","01");//该机构是否参与实时分润
+            data.put("agentId",paramMap.get("agentId"));//机构ID
+            data.put("agentName",paramMap.get("agentName"));//机构编号
+            data.put("credName",paramMap.get("credName"));//法人姓名
+            data.put("credNo",paramMap.get("credNo"));
+            data.put("bankCardName",paramMap.get("bankCardName"));//结算户名
+            data.put("bankCard",paramMap.get("bankCard"));//结算卡号
+            data.put("openBank",paramMap.get("openBank"));//收款开户总行
+            data.put("openBankChild",paramMap.get("openBankChild"));//收款开户支行
+            data.put("isBill",paramMap.get("isBill"));//是否开具分润发票
+            data.put("taxPoint",paramMap.get("taxPoint"));//税点
+            data.put("agCode",paramMap.get("agCode"));//AG码
 
+
+            log.info("通知pos请求参数:{}",data);
             jsonParams.put("data", data);
             String plainXML = jsonParams.toString();
             // 请求报文加密开始
@@ -200,8 +221,6 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
             String encryptData = new String(org.apache.commons.codec.binary.Base64.encodeBase64((AESUtil.encrypt(plainBytes, keyBytes, "AES", "AES/ECB/PKCS5Padding", null))), charset);
             String signData = new String(org.apache.commons.codec.binary.Base64.encodeBase64(RSAUtil.digitalSign(plainBytes, com.ryx.credit.util.Constants.privateKey, "SHA1WithRSA")), charset);
             String encrtptKey = new String(org.apache.commons.codec.binary.Base64.encodeBase64(RSAUtil.encrypt(keyBytes, com.ryx.credit.util.Constants.publicKey, 2048, 11, "RSA/ECB/PKCS1Padding")), charset);
-            // 请求报文加密结束
-
             Map<String, String> map = new HashMap<>();
             map.put("encryptData", encryptData);
             map.put("encryptKey", encrtptKey);
@@ -209,8 +228,8 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
             map.put("signData", signData);
             map.put("tranCode", tranCode);
             map.put("reqMsgId", reqMsgId);
-
-            log.info("通知pos请求参数:{}",data);
+            // 请求报文加密结束
+            log.info("通知pos请求参数 加密:{}",map);
             String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("agent_pos_notify_url"), map);
             JSONObject jsonObject = JSONObject.parseObject(httpResult);
             if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
