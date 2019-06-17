@@ -135,7 +135,7 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
             resultMap.put("supDorgId",agentParent.getBusNum());
         }
         //收款账户新
-        AgentColinfo agentColinfo = agentColinfoService.selectByAgentId(agent.getId());
+        AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
         //机构信息
         Organization organization = organizationMapper.selectByPrimaryKey(agentBusInfo.getOrganNum());
         //组装参数

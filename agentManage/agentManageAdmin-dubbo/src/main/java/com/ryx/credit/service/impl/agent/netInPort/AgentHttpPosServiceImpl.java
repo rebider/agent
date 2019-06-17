@@ -14,9 +14,12 @@ import com.ryx.credit.common.util.agentUtil.RSAUtil;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.RegionMapper;
 import com.ryx.credit.dao.bank.DPosRegionMapper;
+import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.service.agent.AgentBusinfoService;
+import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInHttpService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.bank.PosRegionService;
@@ -58,6 +61,10 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
     private AgentNetInNotityService agentNetInNotityService;
     @Autowired
     private AgentBusinfoService agentBusinfoService;
+    @Autowired
+    private OrganizationMapper organizationMapper;
+    @Autowired
+    private AgentColinfoService agentColinfoService;
 
     /**
      * 入网组装参数
@@ -129,19 +136,20 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
         if(null!=agentParent){
             resultMap.put("supDorgId",agentParent.getBusNum());
         }
-
         //新增传递参数
-        resultMap.put("alwaysProfit","00");
-        resultMap.put("agentId","");//机构ID
-        resultMap.put("agentName","");//机构编号
-        resultMap.put("credName","");//法人姓名
-        resultMap.put("credNo","");
-        resultMap.put("bankCardName","");//结算户名
-        resultMap.put("bankCard","");//结算卡号
-        resultMap.put("openBank","");//收款开户总行
-        resultMap.put("openBankChild","");//收款开户支行
-        resultMap.put("isBill","");//是否开具分润发票
-        resultMap.put("taxPoint","");//税点
+        AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
+        Organization organization = organizationMapper.selectByPrimaryKey(agentBusInfo.getOrganNum());
+        resultMap.put("alwaysProfit","00");//该机构是否参与实时分润
+        resultMap.put("agentId",organization.getOrgId());//机构ID
+        resultMap.put("agentName",organization.getOrgName());//机构编号
+        resultMap.put("credName",agent.getAgLegal());//法人姓名
+        resultMap.put("credNo",agent.getAgLegalCernum());
+        resultMap.put("bankCardName",agentColinfo.getCloRealname());//结算户名
+        resultMap.put("bankCard",agentColinfo.getCloBankAccount());//结算卡号
+        resultMap.put("openBank",agentColinfo.getCloBank());//收款开户总行
+        resultMap.put("openBankChild",agentColinfo.getCloBankBranch());//收款开户支行
+        resultMap.put("isBill",agentColinfo.getCloInvoice());//是否开具分润发票
+        resultMap.put("taxPoint",agentColinfo.getCloTaxPoint());//税点
         resultMap.put("agCode",agentBusInfo.getAgentId());//AG码
         return resultMap;
     }
@@ -189,19 +197,19 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
             if(paramMap.get("orgType").equals(OrgType.STR.getValue()))
                 data.put("supDorgId",paramMap.get("supDorgId"));
 
-
-
-            data.put("alwaysProfit","00");
-            data.put("agentId","");//机构ID
-            data.put("agentName","");//机构编号
-            data.put("credName","");//法人姓名
-            data.put("credNo","");
-            data.put("bankCardName","");//结算户名
-            data.put("bankCard","");//结算卡号
-            data.put("openBank","");//收款开户总行
-            data.put("openBankChild","");//收款开户支行
-            data.put("isBill","");//是否开具分润发票
-            data.put("taxPoint","");//税点
+            //组装参数
+            data.put("alwaysProfit","01");//该机构是否参与实时分润
+            data.put("agentId",paramMap.get("agentId"));//机构ID
+            data.put("agentName",paramMap.get("agentName"));//机构编号
+            data.put("credName",paramMap.get("credName"));//法人姓名
+            data.put("credNo",paramMap.get("credNo"));
+            data.put("bankCardName",paramMap.get("bankCardName"));//结算户名
+            data.put("bankCard",paramMap.get("bankCard"));//结算卡号
+            data.put("openBank",paramMap.get("openBank"));//收款开户总行
+            data.put("openBankChild",paramMap.get("openBankChild"));//收款开户支行
+            data.put("isBill",paramMap.get("isBill"));//是否开具分润发票
+            data.put("taxPoint",paramMap.get("taxPoint"));//税点
+            data.put("agCode",paramMap.get("agCode"));//AG码
 
             jsonParams.put("data", data);
             String plainXML = jsonParams.toString();
