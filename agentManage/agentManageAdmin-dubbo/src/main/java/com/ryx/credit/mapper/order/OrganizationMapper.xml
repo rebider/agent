@@ -390,6 +390,7 @@
         <include refid="Base_Column_List"/>
         from O_ORGANIZATION
         <include refid="organizationWhere" />
+        order by C_TIME desc
         <include refid="OracleDialectSuffix"/>
     </select>
 

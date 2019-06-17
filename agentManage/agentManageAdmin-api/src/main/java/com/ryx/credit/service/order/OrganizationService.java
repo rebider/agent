@@ -1,5 +1,6 @@
 package com.ryx.credit.service.order;
 
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -27,6 +28,6 @@ public interface OrganizationService {
 
     List<Organization> selectOrganization(String orgId);
 
-    ResultVO organizationEdit(AgentVo agentVo);
+    ResultVO organizationEdit(AgentVo agentVo) throws Exception;
 
 }

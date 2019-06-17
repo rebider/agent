@@ -1,6 +1,7 @@
 package com.ryx.credit.service.impl.order;
 
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
@@ -25,6 +26,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import sun.management.resources.agent;
+
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -33,7 +40,7 @@ import java.util.*;
  * @Description:
  */
 @Service("oorganizationService")
-public class OrganizationServiceImpl implements OrganizationService{
+public class OrganizationServiceImpl implements OrganizationService {
     private static Logger logger = LoggerFactory.getLogger(OrganizationServiceImpl.class);
     @Autowired
     private OrganizationMapper organizationMapper;
@@ -175,49 +182,43 @@ public class OrganizationServiceImpl implements OrganizationService{
         return organizationList;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public ResultVO organizationEdit(AgentVo agentVo) {
-       /* if (null != agentVo && null != agentVo.getOorganizationVoList()) {
-            for (OorganizationVo ac : agentVo.getOorganizationVoList()) {
-                if(org.apache.commons.lang.StringUtils.isEmpty(ac.getOrgId())) {
-                    //直接新曾
-                    ResultVO resultVO = organizationAdd(agentVo);
-                    logger.info("添加机构",resultVO);
-                }else{
-
-                    AgentColinfo db_AgentColinfo = organizationMapper.selectByPrimaryKey(organizationMapper.getId());
-                    db_AgentColinfo.setAgentId(agent.getId());
-                    db_AgentColinfo.setCloType(agentColinfoVo.getCloType());
-                    db_AgentColinfo.setCloRealname(agentColinfoVo.getCloRealname());
-                    db_AgentColinfo.setCloBank(agentColinfoVo.getCloBank());
-                    db_AgentColinfo.setCloBankBranch(agentColinfoVo.getCloBankBranch());
-                    db_AgentColinfo.setCloBankAccount(agentColinfoVo.getCloBankAccount());
-                    db_AgentColinfo.setRemark(agentColinfoVo.getRemark());
-                    db_AgentColinfo.setStatus(agentColinfoVo.getStatus());
-                    db_AgentColinfo.setBranchLineNum(agentColinfoVo.getBranchLineNum());
-                    db_AgentColinfo.setAllLineNum(agentColinfoVo.getAllLineNum());
-                    db_AgentColinfo.setBankRegion(agentColinfoVo.getBankRegion());
-                    db_AgentColinfo.setCloInvoice(agentColinfoVo.getCloInvoice());
-                    db_AgentColinfo.setCloTaxPoint(agentColinfoVo.getCloTaxPoint());
-                    db_AgentColinfo.setCloBankCode(agentColinfoVo.getCloBankCode());
-                    db_AgentColinfo.setPayStatus(ColinfoPayStatus.A.getValue());
-                    if(1!=agentColinfoMapper.updateByPrimaryKeySelective(db_AgentColinfo)){
-                        throw new MessageException("更新收款信息失败");
-                    }else{
-                        if(!agentDataHistoryService.saveDataHistory(db_AgentColinfo,db_AgentColinfo.getId(), DataHistoryType.GATHER.getValue(),userId,db_AgentColinfo.getVarsion()).isOK()){
-                            throw new MessageException("更新收款信息失败");
-                        }
+    public ResultVO organizationEdit(AgentVo agentVo) throws Exception {
+        if (null != agentVo && null != agentVo.getOorganizationVoList()) {
+            try {
+                for (OorganizationVo ac : agentVo.getOorganizationVoList()) {
+                    Organization organization = organizationMapper.selectByPrimaryKey(ac.getOrgId());
+                    organization.setOrgNick(ac.getOrgNick());
+                    organization.setOrgName(ac.getOrgName());
+                    organization.setBankCard(ac.getBankCard());
+                    organization.setOrgType(ac.getOrgType());
+                    organization.setOrgParent(ac.getOrgParent());
+                    organization.setAgentId(ac.getAgentId());
+                    organization.setCloType(ac.getCloType());
+                    organization.setCloRealname(ac.getCloRealname());
+                    organization.setCloBank(ac.getCloBank());
+                    organization.setCloBankBranch(ac.getCloBankBranch());
+                    organization.setRemark(ac.getRemark());
+                    organization.setuUser(agentVo.getSid());
+                    organization.setuTime(Calendar.getInstance().getTime());
+                    organization.setBranchLineNum(ac.getBranchLineNum());
+                    organization.setAllLineNum(ac.getAllLineNum());
+                    organization.setBankRegion(ac.getBankRegion());
+                    organization.setPlatId(ac.getPlatId().substring(0, ac.getPlatId().length() - 1));
+                    if (1 != organizationMapper.updateByPrimaryKeySelective(organization)) {
+                        throw new MessageException("更新机构信息失败");
                     }
                     //删除老的附件
                     AttachmentRelExample example = new AttachmentRelExample();
-                    example.or().andBusTypeEqualTo(AttachmentRelType.Proceeds.name()).andSrcIdEqualTo(db_AgentColinfo.getId()).andStatusEqualTo(Status.STATUS_1.status);
+                    example.or().andBusTypeEqualTo(AttachmentRelType.Organization.name()).andSrcIdEqualTo(organization.getOrgId()).andStatusEqualTo(Status.STATUS_1.status);
                     List<AttachmentRel> list = attachmentRelMapper.selectByExample(example);
                     for (AttachmentRel attachmentRel : list) {
                         attachmentRel.setStatus(Status.STATUS_0.status);
                         int i = attachmentRelMapper.updateByPrimaryKeySelective(attachmentRel);
                         if (1 != i) {
-                            logger.info("修改收款信息附件关系失败{}",attachmentRel.getId());
-                            throw new MessageException("更新收款信息信息失败");
+                            logger.info("修改机构附件关系失败{}", attachmentRel.getId());
+                            throw new MessageException("更新机构附件失败");
                         }
                     }
 
@@ -228,59 +229,50 @@ public class OrganizationServiceImpl implements OrganizationService{
                     //一般纳税人证明
                     boolean isHaveYBNSRZM = false;
                     //添加新的附件
-                    List<String> fileIdList = agentColinfoVo.getColinfoTableFile();
-                    if(fileIdList!=null) {
+                    List<String> fileIdList = ac.getOrganizationbleFile();
+                    if (fileIdList != null) {
                         for (String fileId : fileIdList) {
 
                             Attachment attachment = attachmentMapper.selectByPrimaryKey(fileId);
-                            if(attachment!=null){
-                                if(AttDataTypeStatic.YHKSMJ.code.equals(attachment.getAttDataType()+"")){
+                            if (attachment != null) {
+                                if (AttDataTypeStatic.YHKSMJ.code.equals(attachment.getAttDataType() + "")) {
                                     isHaveYHKSMJ = true;
                                 }
-                                if(AttDataTypeStatic.KHXUZ.code.equals(attachment.getAttDataType()+"")){
+                                if (AttDataTypeStatic.KHXUZ.code.equals(attachment.getAttDataType() + "")) {
                                     isHaveKHXUZ = true;
                                 }
-                                if(AttDataTypeStatic.YBNSRZM.code.equals(attachment.getAttDataType()+"")){
+                                if (AttDataTypeStatic.YBNSRZM.code.equals(attachment.getAttDataType() + "")) {
                                     isHaveYBNSRZM = true;
                                 }
                             }
 
                             AttachmentRel record = new AttachmentRel();
                             record.setAttId(fileId);
-                            record.setSrcId(db_AgentColinfo.getId());
-                            record.setcUser(db_AgentColinfo.getcUser());
+                            record.setSrcId(organization.getOrgId());
+                            record.setcUser(organization.getcUser());
                             record.setcTime(Calendar.getInstance().getTime());
                             record.setStatus(Status.STATUS_1.status);
-                            record.setBusType(AttachmentRelType.Proceeds.name());
+                            record.setBusType(AttachmentRelType.Organization.name());
                             record.setId(idService.genId(TabId.a_attachment_rel));
                             int i = attachmentRelMapper.insertSelective(record);
                             if (1 != i) {
-                                logger.info("收款信息附件关系失败");
-                                throw new ProcessException("更新收款信息失败");
+                                logger.info("机构信息附件关系失败");
+                                throw new ProcessException("更新机构信息失败");
                             }
                         }
                     }
-                    if(agentColinfoVo.getCloType().compareTo(new BigDecimal("1"))==0) {//对私
-                        if (!isHaveYHKSMJ) {
-                            throw new MessageException("请添加银行卡扫描件");
-                        }
-                    }
-                    if(agentColinfoVo.getCloType().compareTo(new BigDecimal("1"))==0) {//对公
-                        if (!isHaveKHXUZ) {
-                            throw new MessageException("请添加开户许可证");
-                        }
-                    }
-
-                    //对公并且税点等于0.06一般纳税人证明必填
-                    if(agentColinfoVo.getCloType().compareTo(new BigDecimal("1"))==0 && agentColinfoVo.getCloTaxPoint().compareTo(new BigDecimal("0.06"))==0) {
-                        if (!isHaveYBNSRZM) {
-                            throw new MessageException("请添加一般纳税人证明");
-                        }
-                    }
                 }
+            } catch (ProcessException e) {
+                e.printStackTrace();
+                throw e;
+            } catch (MessageException e) {
+                e.printStackTrace();
+                throw e;
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new Exception(e.getMessage());
             }
-
-        }*/
-        return null;
+        }
+        return ResultVO.success(null);
     }
 }
