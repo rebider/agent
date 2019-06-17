@@ -134,6 +134,7 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
             resultMap.put("supDorgId",agentParent.getBusNum());
         }
         AgentColinfo agentColinfo = agentColinfoService.selectByAgentId(agent.getId());
+
         resultMap.put("alwaysProfit","01");//该机构是否参与实时分润
         resultMap.put("agentId",agentBusInfo.getOrganNum());//机构ID
         resultMap.put("agentName","");//机构编号
