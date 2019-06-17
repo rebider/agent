@@ -807,7 +807,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
 		if (null!=agentBusInfo){
 			List<Map<String, Object>> maps = agentBusInfoMapper.selectComp(agentBusInfo.getAgentId());
-			if (null!=maps){
+			if (null!=maps && maps.size()>0){
 				return  maps.get(0);
 			}
 		}
