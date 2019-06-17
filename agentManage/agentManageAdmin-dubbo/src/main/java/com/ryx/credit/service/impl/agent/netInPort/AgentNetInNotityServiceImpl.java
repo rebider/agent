@@ -303,11 +303,6 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
         threadPoolTaskExecutor.execute(new Runnable() {
             @Override
             public void run() {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-
-                }
                 //业务平台
                 AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
                 //直签不直发不通知

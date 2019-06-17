@@ -5,24 +5,23 @@ import com.ryx.credit.common.enumc.DictGroup;
 import com.ryx.credit.common.enumc.OrgType;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.AppConfig;
-import com.ryx.credit.common.util.HttpClientUtil;
-import com.ryx.credit.common.util.JsonUtil;
-import com.ryx.credit.common.util.MailUtil;
+import com.ryx.credit.common.util.*;
+import com.ryx.credit.common.util.Constants;
 import com.ryx.credit.common.util.agentUtil.AESUtil;
 import com.ryx.credit.common.util.agentUtil.RSAUtil;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.RegionMapper;
 import com.ryx.credit.dao.bank.DPosRegionMapper;
 import com.ryx.credit.pojo.admin.agent.*;
-import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.service.agent.AgentBusinfoService;
+import com.ryx.credit.service.agent.AgentColinfoService;
+import com.ryx.credit.service.agent.ApaycompService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInHttpService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.bank.PosRegionService;
 import com.ryx.credit.service.dict.DictOptionsService;
-import com.ryx.credit.util.Constants;
-import org.apache.commons.codec.binary.Base64;
+import com.ryx.credit.util.*;
+import org.apache.commons.codec.binary.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
@@ -32,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.Base64;
 
 /***
  * @Author liudh
@@ -40,8 +40,8 @@ import java.util.*;
  * @Param
  * @return
  **/
-@Service("agentHttpPosServiceImpl")
-public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
+@Service("agentHttpSsPosServiceImpl")
+public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
 
     private static Logger log = LoggerFactory.getLogger(AgentHttpPosServiceImpl.class);
     @Autowired
@@ -66,7 +66,6 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
      */
     @Override
     public Map<String, Object> packageParam(Map<String, Object> param) {
-
         Map<String, Object> resultMap = new HashMap<>();
         AgentBusInfo agentBusInfo = (AgentBusInfo)param.get("agentBusInfo");
         Agent agent = (Agent)param.get("agent");
@@ -129,9 +128,7 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
         if(null!=agentParent){
             resultMap.put("supDorgId",agentParent.getBusNum());
         }
-
-        //新增传递参数
-        resultMap.put("alwaysProfit","00");
+        resultMap.put("alwaysProfit","01");//该机构是否参与实时分润
         resultMap.put("agentId","");//机构ID
         resultMap.put("agentName","");//机构编号
         resultMap.put("credName","");//法人姓名
@@ -142,7 +139,6 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
         resultMap.put("openBankChild","");//收款开户支行
         resultMap.put("isBill","");//是否开具分润发票
         resultMap.put("taxPoint","");//税点
-        resultMap.put("agCode",agentBusInfo.getAgentId());//AG码
         return resultMap;
     }
 
@@ -189,29 +185,15 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
             if(paramMap.get("orgType").equals(OrgType.STR.getValue()))
                 data.put("supDorgId",paramMap.get("supDorgId"));
 
-
-
-            data.put("alwaysProfit","00");
-            data.put("agentId","");//机构ID
-            data.put("agentName","");//机构编号
-            data.put("credName","");//法人姓名
-            data.put("credNo","");
-            data.put("bankCardName","");//结算户名
-            data.put("bankCard","");//结算卡号
-            data.put("openBank","");//收款开户总行
-            data.put("openBankChild","");//收款开户支行
-            data.put("isBill","");//是否开具分润发票
-            data.put("taxPoint","");//税点
-
             jsonParams.put("data", data);
             String plainXML = jsonParams.toString();
             // 请求报文加密开始
             String keyStr = AESUtil.getAESKey();
             byte[] plainBytes = plainXML.getBytes(charset);
             byte[] keyBytes = keyStr.getBytes(charset);
-            String encryptData = new String(Base64.encodeBase64((AESUtil.encrypt(plainBytes, keyBytes, "AES", "AES/ECB/PKCS5Padding", null))), charset);
-            String signData = new String(Base64.encodeBase64(RSAUtil.digitalSign(plainBytes, Constants.privateKey, "SHA1WithRSA")), charset);
-            String encrtptKey = new String(org.apache.commons.codec.binary.Base64.encodeBase64(RSAUtil.encrypt(keyBytes, Constants.publicKey, 2048, 11, "RSA/ECB/PKCS1Padding")), charset);
+            String encryptData = new String(org.apache.commons.codec.binary.Base64.encodeBase64((AESUtil.encrypt(plainBytes, keyBytes, "AES", "AES/ECB/PKCS5Padding", null))), charset);
+            String signData = new String(org.apache.commons.codec.binary.Base64.encodeBase64(RSAUtil.digitalSign(plainBytes, com.ryx.credit.util.Constants.privateKey, "SHA1WithRSA")), charset);
+            String encrtptKey = new String(org.apache.commons.codec.binary.Base64.encodeBase64(RSAUtil.encrypt(keyBytes, com.ryx.credit.util.Constants.publicKey, 2048, 11, "RSA/ECB/PKCS1Padding")), charset);
             // 请求报文加密结束
 
             Map<String, String> map = new HashMap<>();
@@ -232,17 +214,17 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
             } else {
                 String resEncryptData = jsonObject.getString("encryptData");
                 String resEncryptKey = jsonObject.getString("encryptKey");
-                byte[] decodeBase64KeyBytes = Base64.decodeBase64(resEncryptKey.getBytes(charset));
-                byte[] merchantAESKeyBytes = RSAUtil.decrypt(decodeBase64KeyBytes, Constants.privateKey, 2048, 11, "RSA/ECB/PKCS1Padding");
-                byte[] decodeBase64DataBytes = Base64.decodeBase64(resEncryptData.getBytes(charset));
+                byte[] decodeBase64KeyBytes = org.apache.commons.codec.binary.Base64.decodeBase64(resEncryptKey.getBytes(charset));
+                byte[] merchantAESKeyBytes = RSAUtil.decrypt(decodeBase64KeyBytes, com.ryx.credit.util.Constants.privateKey, 2048, 11, "RSA/ECB/PKCS1Padding");
+                byte[] decodeBase64DataBytes = org.apache.commons.codec.binary.Base64.decodeBase64(resEncryptData.getBytes(charset));
                 byte[] merchantXmlDataBytes = AESUtil.decrypt(decodeBase64DataBytes, merchantAESKeyBytes, "AES", "AES/ECB/PKCS5Padding", null);
                 String respXML = new String(merchantXmlDataBytes, charset);
                 log.info("通知pos返回参数：{}",respXML);
 
                 // 报文验签
                 String resSignData = jsonObject.getString("signData");
-                byte[] signBytes = Base64.decodeBase64(resSignData);
-                if (!RSAUtil.verifyDigitalSign(respXML.getBytes(charset), signBytes, Constants.publicKey, "SHA1WithRSA")) {
+                byte[] signBytes = org.apache.commons.codec.binary.Base64.decodeBase64(resSignData);
+                if (!RSAUtil.verifyDigitalSign(respXML.getBytes(charset), signBytes, com.ryx.credit.util.Constants.publicKey, "SHA1WithRSA")) {
                     log.info("签名验证失败");
                 } else {
                     log.info("签名验证成功");
@@ -366,9 +348,9 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
             String keyStr = AESUtil.getAESKey();
             byte[] plainBytes = plainXML.getBytes(charset);
             byte[] keyBytes = keyStr.getBytes(charset);
-            String encryptData = new String(Base64.encodeBase64((AESUtil.encrypt(plainBytes, keyBytes, "AES", "AES/ECB/PKCS5Padding", null))), charset);
-            String signData = new String(Base64.encodeBase64(RSAUtil.digitalSign(plainBytes, Constants.privateKey, "SHA1WithRSA")), charset);
-            String encrtptKey = new String(org.apache.commons.codec.binary.Base64.encodeBase64(RSAUtil.encrypt(keyBytes, Constants.publicKey, 2048, 11, "RSA/ECB/PKCS1Padding")), charset);
+            String encryptData = new String(org.apache.commons.codec.binary.Base64.encodeBase64((AESUtil.encrypt(plainBytes, keyBytes, "AES", "AES/ECB/PKCS5Padding", null))), charset);
+            String signData = new String(org.apache.commons.codec.binary.Base64.encodeBase64(RSAUtil.digitalSign(plainBytes, com.ryx.credit.util.Constants.privateKey, "SHA1WithRSA")), charset);
+            String encrtptKey = new String(org.apache.commons.codec.binary.Base64.encodeBase64(RSAUtil.encrypt(keyBytes, com.ryx.credit.util.Constants.publicKey, 2048, 11, "RSA/ECB/PKCS1Padding")), charset);
 
             // 请求报文加密结束
             Map<String, String> map = new HashMap<>();
@@ -387,17 +369,17 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
             } else {
                 String resEncryptData = jsonObject.getString("encryptData");
                 String resEncryptKey = jsonObject.getString("encryptKey");
-                byte[] decodeBase64KeyBytes = Base64.decodeBase64(resEncryptKey.getBytes(charset));
-                byte[] merchantAESKeyBytes = RSAUtil.decrypt(decodeBase64KeyBytes, Constants.privateKey, 2048, 11, "RSA/ECB/PKCS1Padding");
-                byte[] decodeBase64DataBytes = Base64.decodeBase64(resEncryptData.getBytes(charset));
+                byte[] decodeBase64KeyBytes = org.apache.commons.codec.binary.Base64.decodeBase64(resEncryptKey.getBytes(charset));
+                byte[] merchantAESKeyBytes = RSAUtil.decrypt(decodeBase64KeyBytes, com.ryx.credit.util.Constants.privateKey, 2048, 11, "RSA/ECB/PKCS1Padding");
+                byte[] decodeBase64DataBytes = org.apache.commons.codec.binary.Base64.decodeBase64(resEncryptData.getBytes(charset));
                 byte[] merchantXmlDataBytes = AESUtil.decrypt(decodeBase64DataBytes, merchantAESKeyBytes, "AES", "AES/ECB/PKCS5Padding", null);
                 String respXML = new String(merchantXmlDataBytes, charset);
                 log.info("通知pos返回参数：{}",respXML);
 
                 // 报文验签
                 String resSignData = jsonObject.getString("signData");
-                byte[] signBytes = Base64.decodeBase64(resSignData);
-                if (!RSAUtil.verifyDigitalSign(respXML.getBytes(charset), signBytes, Constants.publicKey, "SHA1WithRSA")) {
+                byte[] signBytes = org.apache.commons.codec.binary.Base64.decodeBase64(resSignData);
+                if (!RSAUtil.verifyDigitalSign(respXML.getBytes(charset), signBytes, com.ryx.credit.util.Constants.publicKey, "SHA1WithRSA")) {
                     log.info("签名验证失败");
                     throw new MessageException("签名验证失败");
                 } else {
@@ -411,4 +393,3 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
         }
     }
 }
-
