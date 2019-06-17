@@ -83,6 +83,14 @@ public class AgentBusInfo implements Serializable {
 
     private String terminalsLower;
 
+    private String creditRateFloor;
+
+    private String agDocDistrict;
+
+    private String agDocPro;
+
+    private String organNum;
+
     private List<Attachment> attachmentList;
 
     private List<AgentColinfo> agentColinfoList;
@@ -96,6 +104,26 @@ public class AgentBusInfo implements Serializable {
     private Map<String,Object> parentInfo;
 
     private String codeTypes;
+
+    private String orgParent;
+
+    private String orgType;
+
+    public String getOrgType() {
+        return orgType;
+    }
+
+    public void setOrgType(String orgType) {
+        this.orgType = orgType;
+    }
+
+    public String getOrgParent() {
+        return orgParent;
+    }
+
+    public void setOrgParent(String orgParent) {
+        this.orgParent = orgParent;
+    }
 
     public String getCodeTypes() {
         return codeTypes;
@@ -111,6 +139,38 @@ public class AgentBusInfo implements Serializable {
 
     public void setTerminalsLower(String terminalsLower) {
         this.terminalsLower = terminalsLower;
+    }
+
+    public String getCreditRateFloor() {
+        return creditRateFloor;
+    }
+
+    public void setCreditRateFloor(String creditRateFloor) {
+        this.creditRateFloor = creditRateFloor;
+    }
+
+    public String getAgDocDistrict() {
+        return agDocDistrict;
+    }
+
+    public void setAgDocDistrict(String agDocDistrict) {
+        this.agDocDistrict = agDocDistrict;
+    }
+
+    public String getAgDocPro() {
+        return agDocPro;
+    }
+
+    public void setAgDocPro(String agDocPro) {
+        this.agDocPro = agDocPro;
+    }
+
+    public String getOrganNum() {
+        return organNum;
+    }
+
+    public void setOrganNum(String organNum) {
+        this.organNum = organNum;
     }
 
     public List<Attachment> getAttachmentList() {

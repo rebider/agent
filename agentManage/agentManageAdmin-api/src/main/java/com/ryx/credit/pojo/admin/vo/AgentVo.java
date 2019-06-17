@@ -103,6 +103,17 @@ public class AgentVo implements Serializable {
     private BigDecimal remitAmt;
     private List<AgentBusInfoVo> editDebitList;
     private List<AgentBusInfoVo> terminalsLowerList;
+    //机构
+    private List<OorganizationVo> oorganizationVoList;
+
+    public List<OorganizationVo> getOorganizationVoList() {
+        return oorganizationVoList;
+    }
+
+    public void setOorganizationVoList(List<OorganizationVo> oorganizationVoList) {
+        this.oorganizationVoList = oorganizationVoList;
+    }
+    private List<AgentBusInfoVo> creditRateFloorList;
 
     public String getOperationType() {
         return operationType;
@@ -605,5 +616,13 @@ public class AgentVo implements Serializable {
 
     public void setTerminalsLowerList(List<AgentBusInfoVo> terminalsLowerList) {
         this.terminalsLowerList = terminalsLowerList;
+    }
+
+    public List<AgentBusInfoVo> getCreditRateFloorList() {
+        return creditRateFloorList;
+    }
+
+    public void setCreditRateFloorList(List<AgentBusInfoVo> creditRateFloorList) {
+        this.creditRateFloorList = creditRateFloorList;
     }
 }

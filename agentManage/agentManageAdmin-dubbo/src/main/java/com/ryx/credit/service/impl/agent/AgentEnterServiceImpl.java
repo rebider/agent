@@ -8,7 +8,9 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
+import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
@@ -76,6 +78,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private CapitalFlowService capitalFlowService;
     @Autowired
     private AgentNetInNotityService agentNetInNotityService;
+    @Autowired
+    private OrganizationMapper organizationMapper;
 
 
     /**
@@ -168,6 +172,15 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     item.setBusLoginNum(item.getBusLoginNum().trim());
                     if(!RegexUtil.checkInt(item.getBusLoginNum())){
                         throw new ProcessException("瑞花宝登录账号必须是数字");
+                    }
+                }
+                //判断所选机构是否属于所选平台（业务平台&机构上级）
+                List<Organization> organList = organizationMapper.queryByOrganName(
+                        FastMap.fastMap("platId", item.getBusPlatform())
+                                .putKeyV("orgParent", item.getOrgParent()));
+                for (Organization organization : organList) {
+                    if (!organization.getPlatId().equals(item.getBusPlatform())) {
+                        throw new ProcessException("所选机构不属于该业务平台");
                     }
                 }
             }
