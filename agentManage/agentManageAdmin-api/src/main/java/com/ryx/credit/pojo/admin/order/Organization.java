@@ -1,10 +1,13 @@
 package com.ryx.credit.pojo.admin.order;
 
+import com.ryx.credit.pojo.admin.agent.Attachment;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
-public class Organization implements Serializable{
+public class Organization implements Serializable {
     private String orgId;
 
     private String orgNick;
@@ -52,6 +55,16 @@ public class Organization implements Serializable{
     private BigDecimal status;
 
     private BigDecimal version;
+
+    private List<Attachment> attachmentList;
+
+    public List<Attachment> getAttachmentList() {
+        return attachmentList;
+    }
+
+    public void setAttachmentList(List<Attachment> attachmentList) {
+        this.attachmentList = attachmentList;
+    }
 
     public String getOrgId() {
         return orgId;
