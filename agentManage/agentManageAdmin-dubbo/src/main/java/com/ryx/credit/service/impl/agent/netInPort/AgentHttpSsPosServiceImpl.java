@@ -120,6 +120,7 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
         if(StringUtils.isNotBlank(platForm.getPosanameprefix())){
             resultMap.put("activityType",platForm.getPosanameprefix()); //前缀
         }
+
         resultMap.put("uniqueId",agentBusInfo.getId());
         resultMap.put("orgId",agentBusInfo.getBusNum());
         resultMap.put("busiType",platForm.getPosbusitype());
@@ -139,6 +140,7 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
         //机构信息
         Organization organization = organizationMapper.selectByPrimaryKey(agentBusInfo.getOrganNum());
         //组装参数
+        resultMap.put("brandName",platForm.getPlatformName());//平台名称
         resultMap.put("alwaysProfit","01");//该机构是否参与实时分润
         resultMap.put("agentId",organization.getOrgId());//机构ID
         resultMap.put("agentName",organization.getOrgName());//机构编号
@@ -197,6 +199,7 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
             if(paramMap.get("orgType").equals(OrgType.STR.getValue()))
                 data.put("supDorgId",paramMap.get("supDorgId"));
             //组装参数
+            data.put("brandName",paramMap.get("brandName"));//平台名称
             data.put("alwaysProfit","01");//该机构是否参与实时分润
             data.put("agentId",paramMap.get("agentId"));//机构ID
             data.put("agentName",paramMap.get("agentName"));//机构编号
