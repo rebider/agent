@@ -12,6 +12,7 @@ import com.ryx.credit.common.util.agentUtil.RSAUtil;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.RegionMapper;
 import com.ryx.credit.dao.bank.DPosRegionMapper;
+import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentColinfoService;
@@ -58,6 +59,10 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
     private AgentNetInNotityService agentNetInNotityService;
     @Autowired
     private AgentBusinfoService agentBusinfoService;
+    @Autowired
+    private OrganizationMapper organizationMapper;
+    @Autowired
+    private AgentColinfoService agentColinfoService;
 
     /**
      * 入网组装参数
@@ -128,17 +133,18 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
         if(null!=agentParent){
             resultMap.put("supDorgId",agentParent.getBusNum());
         }
+        AgentColinfo agentColinfo = agentColinfoService.selectByAgentId(agent.getId());
         resultMap.put("alwaysProfit","01");//该机构是否参与实时分润
-        resultMap.put("agentId","");//机构ID
+        resultMap.put("agentId",agentBusInfo.getOrganNum());//机构ID
         resultMap.put("agentName","");//机构编号
         resultMap.put("credName",agent.getAgLegal());//法人姓名
         resultMap.put("credNo",agent.getAgLegalCernum());
-        resultMap.put("bankCardName","");//结算户名
-        resultMap.put("bankCard","");//结算卡号
-        resultMap.put("openBank","");//收款开户总行
-        resultMap.put("openBankChild","");//收款开户支行
-        resultMap.put("isBill","");//是否开具分润发票
-        resultMap.put("taxPoint","");//税点
+        resultMap.put("bankCardName",agentColinfo.getCloRealname());//结算户名
+        resultMap.put("bankCard",agentColinfo.getCloBankAccount());//结算卡号
+        resultMap.put("openBank",agentColinfo.getCloBank());//收款开户总行
+        resultMap.put("openBankChild",agentColinfo.getCloBankBranch());//收款开户支行
+        resultMap.put("isBill",agentColinfo.getCloInvoice());//是否开具分润发票
+        resultMap.put("taxPoint",agentColinfo.getCloTaxPoint());//税点
         return resultMap;
     }
 
