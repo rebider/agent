@@ -21,6 +21,8 @@ public interface OrganizationMapper {
 
     int updateByPrimaryKey(Organization record);
 
+    Organization selectByPrimaryKey(String orgId);
+
     List<Organization> selectByExample(OrganizationExample example);
 
     List<Map<String,Object>> organizationList(@Param("map") Map<String, Object> map, @Param("page") Page page);

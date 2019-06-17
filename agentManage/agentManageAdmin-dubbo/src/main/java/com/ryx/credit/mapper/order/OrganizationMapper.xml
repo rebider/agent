@@ -375,7 +375,12 @@
         VERSION = #{version,jdbcType=DECIMAL}
         where ORG_ID = #{orgId,jdbcType=VARCHAR}
     </update>
-
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from O_ORGANIZATION
+        where ORG_ID = #{orgId,jdbcType=VARCHAR}
+    </select>
 
 
     <!--    开始写代码-->
