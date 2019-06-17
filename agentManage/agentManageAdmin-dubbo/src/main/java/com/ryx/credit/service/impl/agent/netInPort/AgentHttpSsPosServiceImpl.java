@@ -131,8 +131,8 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
         resultMap.put("alwaysProfit","01");//该机构是否参与实时分润
         resultMap.put("agentId","");//机构ID
         resultMap.put("agentName","");//机构编号
-        resultMap.put("credName","");//法人姓名
-        resultMap.put("credNo","");
+        resultMap.put("credName",agent.getAgLegal());//法人姓名
+        resultMap.put("credNo",agent.getAgLegalCernum());
         resultMap.put("bankCardName","");//结算户名
         resultMap.put("bankCard","");//结算卡号
         resultMap.put("openBank","");//收款开户总行
