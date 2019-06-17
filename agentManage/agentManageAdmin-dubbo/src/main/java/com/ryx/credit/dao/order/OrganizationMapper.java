@@ -27,4 +27,5 @@ public interface OrganizationMapper {
 
     int organizationCount(@Param("map")Map<String, Object> map);
 
+    List<Organization> selectOrganization(@Param("orgId")String orgId);
 }

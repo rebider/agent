@@ -12,22 +12,17 @@ import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.agent.Attachment;
 import com.ryx.credit.pojo.admin.agent.AttachmentRel;
-import com.ryx.credit.pojo.admin.order.OOrder;
 import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.order.OrganizationExample;
-import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OorganizationVo;
+import com.ryx.credit.service.agent.AgentQueryService;
 import com.ryx.credit.service.dict.IdService;
-import com.ryx.credit.service.impl.agent.AgentColinfoServiceImpl;
 import com.ryx.credit.service.order.OrganizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sun.management.resources.agent;
-
-import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -46,6 +41,8 @@ public class OrganizationServiceImpl implements OrganizationService{
     private IdService idService;
     @Autowired
     private AttachmentRelMapper attachmentRelMapper;
+    @Autowired
+    private AgentQueryService agentQueryService;
 
     @Override
     public PageInfo organizationList(Page page, Organization organization) {
@@ -157,8 +154,25 @@ public class OrganizationServiceImpl implements OrganizationService{
         OrganizationExample.Criteria criteria = organizationExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andOrgParentIsNull();
         List<Organization> organizations = organizationMapper.selectByExample(organizationExample);
         if (null==organizations || organizations.size()==0){
-            return null;
+            return new ArrayList<>();
         }
         return organizations;
+    }
+
+    @Override
+    public List<Organization> selectOrganization(String orgId) {
+        List<Organization> organizationList= organizationMapper.selectOrganization(orgId);
+        if (null != organizationList && organizationList.size() > 0) {
+            for (Organization organization : organizationList) {
+                organization.setAttachmentList(agentQueryService.accessoryQuery(organization.getOrgId(), AttachmentRelType.Organization.name()));
+
+            }
+        }
+        return organizationList;
+    }
+
+    @Override
+    public ResultVO organizationEdit(AgentVo agentVo) {
+        return null;
     }
 }

@@ -403,4 +403,17 @@
             <if test="map.platId!=null and map.platId!=''"> and PLAT_ID LIKE CONCAT(CONCAT('%',#{map.platId}),'%')</if>
         </where>
     </sql>
+
+
+    <select id="selectOrganization" parameterType="string" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from O_ORGANIZATION
+        <where>
+            1=1 and status=1
+            <if test="orgId != null and orgId != '' ">
+                and  ORG_ID=#{orgId}
+            </if>
+        </where>
+    </select>
 </mapper>
