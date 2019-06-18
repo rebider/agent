@@ -11,10 +11,7 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AttachmentMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.order.OrganizationMapper;
-import com.ryx.credit.pojo.admin.agent.AgentColinfo;
-import com.ryx.credit.pojo.admin.agent.Attachment;
-import com.ryx.credit.pojo.admin.agent.AttachmentRel;
-import com.ryx.credit.pojo.admin.agent.AttachmentRelExample;
+import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.order.OrganizationExample;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
@@ -93,30 +90,9 @@ public class OrganizationServiceImpl implements OrganizationService {
                     ac.setStatus(Status.STATUS_1.status);
                     ac.setVersion(Status.STATUS_1.status);
                     ac.setOrgId(idService.genId(TabId.O_ORGANIZATION));
-                    //银行卡扫描件
-                    boolean isHaveYHKSMJ = false;
-                    //开户许可证
-                    boolean isHaveKHXUZ = false;
-                    //一般纳税人证明
-                    boolean isHaveYBNSRZM = false;
                     List<String> att = ac.getOrganizationbleFile();
                     if (att != null) {
                         for (String s : att) {
-                            if (org.apache.commons.lang.StringUtils.isEmpty(s)) continue;
-
-                            Attachment attachment = attachmentMapper.selectByPrimaryKey(s);
-                            if (attachment != null) {
-                                if (AttDataTypeStatic.YHKSMJ.code.equals(attachment.getAttDataType() + "")) {
-                                    isHaveYHKSMJ = true;
-                                }
-                                if (AttDataTypeStatic.KHXUZ.code.equals(attachment.getAttDataType() + "")) {
-                                    isHaveKHXUZ = true;
-                                }
-                                if (AttDataTypeStatic.YBNSRZM.code.equals(attachment.getAttDataType() + "")) {
-                                    isHaveYBNSRZM = true;
-                                }
-                            }
-
                             AttachmentRel record = new AttachmentRel();
                             record.setAttId(s);
                             record.setSrcId(ac.getOrgId());
@@ -215,13 +191,6 @@ public class OrganizationServiceImpl implements OrganizationService {
                         throw new MessageException("更新机构信息失败");
                     }
 
-
-                    //银行卡扫描件
-                    boolean isHaveYHKSMJ = false;
-                    //开户许可证
-                    boolean isHaveKHXUZ = false;
-                    //一般纳税人证明
-                    boolean isHaveYBNSRZM = false;
                     //添加新的附件
                     List<String> fileIdList = ac.getOrganizationbleFile();
                     if (fileIdList != null) {
@@ -229,13 +198,22 @@ public class OrganizationServiceImpl implements OrganizationService {
                             Attachment attachment = attachmentMapper.selectByPrimaryKey(fileId);
                             if (attachment != null) {
                                 if (AttDataTypeStatic.YHKSMJ.code.equals(attachment.getAttDataType() + "")) {
-                                    deleteFile(organization,fileId);
+                                    String attId = queryFile(organization, AttDataTypeStatic.YHKSMJ.code);
+                                    if (StringUtils.isNotBlank(attId)){
+                                        deleteFile(organization,attId);
+                                    }
                                 }
                                 if (AttDataTypeStatic.KHXUZ.code.equals(attachment.getAttDataType() + "")) {
-                                    deleteFile(organization,fileId);
+                                    String attId = queryFile(organization, AttDataTypeStatic.KHXUZ.code);
+                                    if (StringUtils.isNotBlank(attId)){
+                                        deleteFile(organization,attId);
+                                    }
                                 }
                                 if (AttDataTypeStatic.YBNSRZM.code.equals(attachment.getAttDataType() + "")) {
-                                    deleteFile(organization,fileId);
+                                    String attId = queryFile(organization, AttDataTypeStatic.YBNSRZM.code);
+                                    if (StringUtils.isNotBlank(attId)){
+                                        deleteFile(organization,attId);
+                                    }
                                 }
                             }
                             addFile(organization,fileId);
@@ -256,6 +234,27 @@ public class OrganizationServiceImpl implements OrganizationService {
         return ResultVO.success(null);
     }
 
+    public String queryFile(Organization organization,String attDataType){
+        String fileId="";
+        //查询出附件id来进行删除
+        AttachmentRelExample example = new AttachmentRelExample();
+        AttachmentRelExample.Criteria criteria = example.createCriteria().andSrcIdEqualTo(organization.getOrgId()).andBusTypeEqualTo(AttachmentRelType.Organization.name()).andStatusEqualTo(Status.STATUS_1.status);
+        List<AttachmentRel> attachmentRels = attachmentRelMapper.selectByExample(example);
+        if (null==attachmentRels || attachmentRels.size()==0){
+           return fileId;
+        }
+        for (AttachmentRel attachmentRel : attachmentRels) {
+            AttachmentExample attachmentExample = new AttachmentExample();
+            AttachmentExample.Criteria criteria1 = attachmentExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andIdEqualTo(attachmentRel.getAttId()).andAttDataTypeEqualTo(attDataType);
+            List<Attachment> attachments = attachmentMapper.selectByExample(attachmentExample);
+            if (null==attachments || attachments.size()==0){
+                return fileId;
+            }
+            Attachment attachment = attachments.get(0);
+            return attachment.getId();
+        }
+        return fileId;
+    }
 
     private void deleteFile(Organization organization, String fileId) throws Exception {
         //删除老的附件
