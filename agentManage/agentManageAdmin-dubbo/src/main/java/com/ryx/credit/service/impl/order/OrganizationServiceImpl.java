@@ -190,6 +190,10 @@ public class OrganizationServiceImpl implements OrganizationService {
             try {
                 for (OorganizationVo ac : agentVo.getOorganizationVoList()) {
                     Organization organization = organizationMapper.selectByPrimaryKey(ac.getOrgId());
+                    organization.setBusinessNum(ac.getBusinessNum());
+                    organization.setAccountName(ac.getAccountName());
+                    organization.setAccountBank(ac.getAccountBank());
+                    organization.setAccountNum(ac.getAccountNum());
                     organization.setOrgNick(ac.getOrgName());
                     organization.setOrgName(ac.getOrgName());
                     organization.setBankCard(ac.getBankCard());
@@ -210,18 +214,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                     if (1 != organizationMapper.updateByPrimaryKeySelective(organization)) {
                         throw new MessageException("更新机构信息失败");
                     }
-                    //删除老的附件
-                    AttachmentRelExample example = new AttachmentRelExample();
-                    example.or().andBusTypeEqualTo(AttachmentRelType.Organization.name()).andSrcIdEqualTo(organization.getOrgId()).andStatusEqualTo(Status.STATUS_1.status);
-                    List<AttachmentRel> list = attachmentRelMapper.selectByExample(example);
-                    for (AttachmentRel attachmentRel : list) {
-                        attachmentRel.setStatus(Status.STATUS_0.status);
-                        int i = attachmentRelMapper.updateByPrimaryKeySelective(attachmentRel);
-                        if (1 != i) {
-                            logger.info("修改机构附件关系失败{}", attachmentRel.getId());
-                            throw new MessageException("更新机构附件失败");
-                        }
-                    }
+
 
                     //银行卡扫描件
                     boolean isHaveYHKSMJ = false;
@@ -233,33 +226,19 @@ public class OrganizationServiceImpl implements OrganizationService {
                     List<String> fileIdList = ac.getOrganizationbleFile();
                     if (fileIdList != null) {
                         for (String fileId : fileIdList) {
-
                             Attachment attachment = attachmentMapper.selectByPrimaryKey(fileId);
                             if (attachment != null) {
                                 if (AttDataTypeStatic.YHKSMJ.code.equals(attachment.getAttDataType() + "")) {
-                                    isHaveYHKSMJ = true;
+                                    deleteFile(organization,fileId);
                                 }
                                 if (AttDataTypeStatic.KHXUZ.code.equals(attachment.getAttDataType() + "")) {
-                                    isHaveKHXUZ = true;
+                                    deleteFile(organization,fileId);
                                 }
                                 if (AttDataTypeStatic.YBNSRZM.code.equals(attachment.getAttDataType() + "")) {
-                                    isHaveYBNSRZM = true;
+                                    deleteFile(organization,fileId);
                                 }
                             }
-
-                            AttachmentRel record = new AttachmentRel();
-                            record.setAttId(fileId);
-                            record.setSrcId(organization.getOrgId());
-                            record.setcUser(organization.getcUser());
-                            record.setcTime(Calendar.getInstance().getTime());
-                            record.setStatus(Status.STATUS_1.status);
-                            record.setBusType(AttachmentRelType.Organization.name());
-                            record.setId(idService.genId(TabId.a_attachment_rel));
-                            int i = attachmentRelMapper.insertSelective(record);
-                            if (1 != i) {
-                                logger.info("机构信息附件关系失败");
-                                throw new ProcessException("更新机构信息失败");
-                            }
+                            addFile(organization,fileId);
                         }
                     }
                 }
@@ -276,4 +255,38 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
         return ResultVO.success(null);
     }
+
+
+    private void deleteFile(Organization organization, String fileId) throws Exception {
+        //删除老的附件
+        AttachmentRelExample example = new AttachmentRelExample();
+        example.or().andBusTypeEqualTo(AttachmentRelType.Organization.name()).andSrcIdEqualTo(organization.getOrgId()).andStatusEqualTo(Status.STATUS_1.status).andAttIdEqualTo(fileId);
+        List<AttachmentRel> list = attachmentRelMapper.selectByExample(example);
+        for (AttachmentRel attachmentRel : list) {
+            attachmentRel.setStatus(Status.STATUS_0.status);
+            int i = attachmentRelMapper.updateByPrimaryKeySelective(attachmentRel);
+            if (1 != i) {
+                logger.info("修改机构附件关系失败{}", attachmentRel.getId());
+                throw new MessageException("更新机构附件失败");
+            }
+        }
+    }
+
+
+    private void addFile(Organization organization, String fileId) {
+        AttachmentRel record = new AttachmentRel();
+        record.setAttId(fileId);
+        record.setSrcId(organization.getOrgId());
+        record.setcUser(organization.getcUser());
+        record.setcTime(Calendar.getInstance().getTime());
+        record.setStatus(Status.STATUS_1.status);
+        record.setBusType(AttachmentRelType.Organization.name());
+        record.setId(idService.genId(TabId.a_attachment_rel));
+        int i = attachmentRelMapper.insertSelective(record);
+        if (1 != i) {
+            logger.info("机构信息附件关系失败");
+            throw new ProcessException("更新机构信息失败");
+        }
+    }
+
 }
