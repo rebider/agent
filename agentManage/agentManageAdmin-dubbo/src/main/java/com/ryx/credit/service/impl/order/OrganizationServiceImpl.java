@@ -79,6 +79,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         if (null != agentVo && null != agentVo.getOorganizationVoList()) {
             for (OorganizationVo ac : agentVo.getOorganizationVoList()) {
                 try {
+                    ac.setOrgNick(ac.getOrgName());
                     ac.setcUser(agentVo.getSid());
                     ac.setPlatId(ac.getPlatId().substring(0, ac.getPlatId().length() - 1));
                     if (StringUtils.isEmpty(ac.getcUser())) {
@@ -189,11 +190,11 @@ public class OrganizationServiceImpl implements OrganizationService {
             try {
                 for (OorganizationVo ac : agentVo.getOorganizationVoList()) {
                     Organization organization = organizationMapper.selectByPrimaryKey(ac.getOrgId());
-                    organization.setOrgNick(ac.getOrgNick());
+                    organization.setOrgNick(ac.getOrgName());
                     organization.setOrgName(ac.getOrgName());
                     organization.setBankCard(ac.getBankCard());
-                    organization.setOrgType(ac.getOrgType());
-                    organization.setOrgParent(ac.getOrgParent());
+//                    organization.setOrgType(ac.getOrgType());
+//                    organization.setOrgParent(ac.getOrgParent());
                     organization.setAgentId(ac.getAgentId());
                     organization.setCloType(ac.getCloType());
                     organization.setCloRealname(ac.getCloRealname());
