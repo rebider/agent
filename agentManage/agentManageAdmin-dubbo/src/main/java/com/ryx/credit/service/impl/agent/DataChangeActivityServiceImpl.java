@@ -288,6 +288,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                 }
                             }
                         }
+                        //更新财务出款机构
                         List<AgentBusInfoVo> orgTypeList = vo.getOrgTypeList();
                         for (AgentBusInfoVo agentBusInfoVo : orgTypeList) {
                             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
