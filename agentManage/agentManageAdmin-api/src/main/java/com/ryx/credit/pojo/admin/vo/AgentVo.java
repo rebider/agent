@@ -107,6 +107,15 @@ public class AgentVo implements Serializable {
     //机构
     private List<OorganizationVo> oorganizationVoList;
     private List<AgentBusInfoVo> orgTypeList;
+    private String finaceRemitOrgan;//财务出款机构
+
+    public String getFinaceRemitOrgan() {
+        return finaceRemitOrgan;
+    }
+
+    public void setFinaceRemitOrgan(String finaceRemitOrgan) {
+        this.finaceRemitOrgan = finaceRemitOrgan;
+    }
 
     public List<OorganizationVo> getOorganizationVoList() {
         return oorganizationVoList;

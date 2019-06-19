@@ -286,6 +286,15 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                 }
                             }
                         }
+                        List<AgentBusInfoVo> orgTypeList = vo.getOrgTypeList();
+                        for (AgentBusInfoVo agentBusInfoVo : orgTypeList) {
+                            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                            agentBusInfo.setFinaceRemitOrgan(agentBusInfoVo.getFinaceRemitOrgan());
+                            int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                            if ( i != 1) {
+                                throw new ProcessException("更新财务出款机构失败");
+                            }
+                        }
 
                         ResultVO res = agentEnterService.updateAgentVo(vo,rel.getcUser(),true);
                         for (AgentBusInfoVo agentBusInfoVo : vo.getEditDebitList()) {
@@ -333,12 +342,8 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                             logger.info("代理商修改审批通过-添加开户任务成功!{},{}", AgImportType.DATACHANGEAPP.getValue(), vo.getAgent().getId());
                                         }
                                     }
-
                                 }
-
                             }
-
-
                         } catch (Exception e) {
                             e.printStackTrace();
                             throw new ProcessException("更新数据申请失败");
@@ -426,6 +431,11 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                     vo.setOweTicket(agentVo.getOweTicket());
                     if(orgCode.equals("finance")){
                         vo.setCapitalVoList(agentVo.getCapitalVoList());
+                        //处理财务审批（财务出款机构）
+                        vo.setOrgTypeList(agentVo.getOrgTypeList());
+                        for (AgentBusInfoVo orgTypeList : agentVo.getOrgTypeList()) {
+                            vo.setFinaceRemitOrgan(orgTypeList.getFinaceRemitOrgan());
+                        }
                     }
                     String voJson = JSONObject.toJSONString(vo);
                     dateChangeRequest.setDataContent(voJson);
