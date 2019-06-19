@@ -259,6 +259,7 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                 updateBusInfo.setBusLoginNum(jsonObject.getString("orgId"));
             }else if(platForm.getPlatformType().equals(PlatformType.RDBPOS.getValue())){
                 JSONObject jsonResult = JSONObject.parseObject(jsonObject.getString("result"));
+                if(jsonResult!=null)
                 updateBusInfo.setBusNum(jsonResult.getString("agencyId"));
                 updateBusInfo.setBusLoginNum(agentBusInfo.getBusLoginNum());//传入的手机号
             }
@@ -504,6 +505,11 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                         }
                     }
                     agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
+                    if(platForm.getPlatformType().equals(PlatformType.RDBPOS.getValue())){
+                        //瑞大宝升级用户填手机号，成功后返回A码更新编码
+                        JSONObject jsonObject = (JSONObject)res.getData();
+                        agentBusInfo.setBusNum(jsonObject.getString("result"));
+                    }
                     if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)){
                         log.info("升级开户接口{}平台编号不为空走升级接口,更新业务{}",agentBusInfo.getBusNum(),"入网成功状态更新失败");
                     }else{

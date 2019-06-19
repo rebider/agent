@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +92,10 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         resultMap.put("bankname",agentColinfo.getCloBank());
         BankLineNums bankLineNums = bankLineNumsMapper.selectByBankName(agentColinfo.getCloBank());
         resultMap.put("bankid",bankLineNums.getBankid());
+        resultMap.put("cardName",agentColinfo.getCloRealname());
+        String accountType = agentColinfo.getCloType().compareTo(BigDecimal.ONE) == 0 ? "00" : "01";
+        resultMap.put("accountType",accountType);
+        resultMap.put("customerType",accountType);
         return resultMap;
     }
 
@@ -120,6 +125,9 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             jsonParams.put("bankcity",paramMap.get("bankcity"));
             jsonParams.put("bankid",paramMap.get("bankid"));
             jsonParams.put("bankname",paramMap.get("bankname"));
+            jsonParams.put("cardName",paramMap.get("cardName"));
+            jsonParams.put("accountType",paramMap.get("accountType"));
+            jsonParams.put("customerType",paramMap.get("customerType"));
 
             String json = JsonUtil.objectToJson(jsonParams);
             log.info("通知瑞大宝入网请求参数：{}",json);
@@ -174,7 +182,8 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         Map<String,Object> jsonParams = new HashMap<>();
         String busId = String.valueOf(data.get("agentBusinfoId"));
         AgentBusInfo agentBusInfo = agentBusinfoService.getById(busId);
-        jsonParams.put("agencyId",agentBusInfo.getBusNum());
+        jsonParams.put("mobile",agentBusInfo.getBusNum());
+        jsonParams.put("branchid",agentBusInfo.getBusPlatform().split("_")[0]);
         jsonParams.put("termCount",agentBusInfo.getTerminalsLower());
         return jsonParams;
     }
@@ -184,7 +193,8 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
     public AgentResult agencyLevelUpdateChange(Map data) throws Exception {
         try {
             Map<String,Object> jsonParams = new HashMap<>();
-            jsonParams.put("agencyId",data.get("agencyId"));
+            jsonParams.put("mobile",data.get("mobile"));
+            jsonParams.put("branchid",data.get("branchid"));
             jsonParams.put("termCount",data.get("termCount"));
             String json = JsonUtil.objectToJson(jsonParams);
             log.info("通知瑞大宝升级请求参数：{}",json);
@@ -220,6 +230,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         jsonParams.put("companyNo",agent.getAgBusLic());
         jsonParams.put("userName",agent.getAgLegal());
         jsonParams.put("agencyName",agent.getAgName());
+        jsonParams.put("cardidx","1");
         Region region = regionMapper.findByRcode(agentColinfo.getBankRegion());
         jsonParams.put("code",String.valueOf(region.gettType()));
         jsonParams.put("cityid",agentColinfo.getBankRegion());
@@ -227,6 +238,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         jsonParams.put("bankname",agentColinfo.getCloBank());
         BankLineNums bankLineNums = bankLineNumsMapper.selectByBankName(agentColinfo.getCloBank());
         jsonParams.put("bankid",bankLineNums.getBankid());
+        jsonParams.put("cardName",agentColinfo.getCloRealname());
         return jsonParams;
     }
 
@@ -243,12 +255,13 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             jsonParams.put("companyNo",paramMap.get("companyNo"));
             jsonParams.put("userName",paramMap.get("userName"));
             jsonParams.put("agencyName",paramMap.get("agencyName"));
-            jsonParams.put("cardidx","1");
+            jsonParams.put("cardidx",paramMap.get("cardidx"));
             jsonParams.put("code",paramMap.get("code"));
             jsonParams.put("cityid",paramMap.get("cityid"));
             jsonParams.put("bankcity",paramMap.get("bankcity"));
             jsonParams.put("bankid",paramMap.get("bankid"));
             jsonParams.put("bankname",paramMap.get("bankname"));
+            jsonParams.put("cardName",paramMap.get("cardName"));
             String json = JsonUtil.objectToJson(jsonParams);
             log.info("通知瑞大宝入网修改请求参数：{}",json);
             //发送请求
