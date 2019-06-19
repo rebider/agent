@@ -11,7 +11,9 @@ import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.RegexUtil;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.dao.agent.*;
+import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.service.agent.AgentAssProtocolService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
@@ -62,6 +64,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	private DictOptionsService dictOptionsService;
 	@Autowired
 	private AgentBusinfoService agentBusinfoService;
+	@Autowired
+	private OrganizationMapper organizationMapper;
 
     /**
      * 代理商查询插件数据获取
@@ -212,6 +216,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 				PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfoVo.getBusPlatform());
 				resultSet.add(platForm.getPlatformType());
+				List<Organization> organList = null;
 				if (null!=agentBusInfoVo.getBusPlatform()){
 					PlatformType platformType = platFormService.byPlatformCode(agentBusInfoVo.getBusPlatform());
 					if (null!=platformType){
@@ -241,6 +246,14 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 								throw new ProcessException("平台登录账号必须是数字");
 							}
 						}
+						//判断所选机构是否属于所选平台（机构编号&业务平台）
+						organList = organizationMapper.selectOrganization(agentBusInfoVo.getOrganNum());
+						for (Organization organization : organList) {
+							if (!organization.getPlatId().contains(agentBusInfoVo.getBusPlatform())) {
+								throw new ProcessException("所选机构不属于该业务平台");
+							}
+							agentBusInfoVo.setOrganNum(organization.getOrgId());
+						}
 					}
 				}
 				agentBusInfoVo.setcUser(agent.getcUser());
@@ -266,9 +279,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					}
 					logger.info("代理商业务添加:{}{}","添加代理商合同成功",agentBusInfoVo.getId());
 				}else{
-
 					AgentBusInfo db_AgentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
-
 					db_AgentBusInfo.setAgentId(agentBusInfoVo.getAgentId());
 					db_AgentBusInfo.setBusNum(agentBusInfoVo.getBusNum());
 					db_AgentBusInfo.setBusPlatform(agentBusInfoVo.getBusPlatform());
@@ -299,6 +310,9 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					db_AgentBusInfo.setBusLoginNum(agentBusInfoVo.getBusLoginNum());
 					db_AgentBusInfo.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
 					db_AgentBusInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
+					for (Organization organization : organList) {
+						db_AgentBusInfo.setOrganNum(organization.getOrgId());
+					}
 					if(StringUtils.isNotEmpty(db_AgentBusInfo.getBusParent())){
 						if(StringUtils.isNotEmpty(db_AgentBusInfo.getBusPlatform())){
 							AgentBusInfo busInfoParent = agentBusInfoMapper.selectByPrimaryKey(db_AgentBusInfo.getBusParent());

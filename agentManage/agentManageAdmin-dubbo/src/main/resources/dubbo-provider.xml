@@ -133,7 +133,7 @@
     <dubbo:service interface="com.ryx.credit.service.order.OsnOperateService" ref="osnOperateService"  timeout="1200000" registry="${zk.group}" />
     <dubbo:service interface="com.ryx.credit.service.order.SplitService" ref="splitService"  timeout="1200000" registry="${zk.group}" />
     <dubbo:service interface="com.ryx.credit.service.agent.netInPort.AgentNetInNotityService" ref="agentNetInNotityService"  timeout="1200000" registry="${zk.group}" />
-
+    <dubbo:service interface="com.ryx.credit.service.order.OrganizationService" ref="oorganizationService"  timeout="1200000" registry="${zk.group}" />
 
   <!--  <dubbo:service interface="com.ryx.credit.service.order.OldOrderReturnService" ref="oldOrderReturnService"  timeout="1200000" registry="${zk.group}" />
     <dubbo:service interface="com.ryx.credit.service.order.NewOrderImportService" ref="newOrderImportService" timeout="1200000" registry="${zk.group}" />-->

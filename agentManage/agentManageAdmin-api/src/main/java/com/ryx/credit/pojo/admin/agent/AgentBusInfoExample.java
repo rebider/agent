@@ -2947,6 +2947,76 @@ public class AgentBusInfoExample {
             addCriterion("ORGAN_NUM not between", value1, value2, "organNum");
             return (Criteria) this;
         }
+
+        public Criteria andFinaceRemitOrganIsNull() {
+            addCriterion("FINACE_REMIT_ORGAN is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganIsNotNull() {
+            addCriterion("FINACE_REMIT_ORGAN is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganEqualTo(String value) {
+            addCriterion("FINACE_REMIT_ORGAN =", value, "finaceRemitOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganNotEqualTo(String value) {
+            addCriterion("FINACE_REMIT_ORGAN <>", value, "finaceRemitOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganGreaterThan(String value) {
+            addCriterion("FINACE_REMIT_ORGAN >", value, "finaceRemitOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganGreaterThanOrEqualTo(String value) {
+            addCriterion("FINACE_REMIT_ORGAN >=", value, "finaceRemitOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganLessThan(String value) {
+            addCriterion("FINACE_REMIT_ORGAN <", value, "finaceRemitOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganLessThanOrEqualTo(String value) {
+            addCriterion("FINACE_REMIT_ORGAN <=", value, "finaceRemitOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganLike(String value) {
+            addCriterion("FINACE_REMIT_ORGAN like", value, "finaceRemitOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganNotLike(String value) {
+            addCriterion("FINACE_REMIT_ORGAN not like", value, "finaceRemitOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganIn(List<String> values) {
+            addCriterion("FINACE_REMIT_ORGAN in", values, "finaceRemitOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganNotIn(List<String> values) {
+            addCriterion("FINACE_REMIT_ORGAN not in", values, "finaceRemitOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganBetween(String value1, String value2) {
+            addCriterion("FINACE_REMIT_ORGAN between", value1, value2, "finaceRemitOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganNotBetween(String value1, String value2) {
+            addCriterion("FINACE_REMIT_ORGAN not between", value1, value2, "finaceRemitOrgan");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
