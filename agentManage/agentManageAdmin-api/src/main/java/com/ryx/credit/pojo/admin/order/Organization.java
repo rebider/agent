@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-public class Organization implements Serializable {
+public class Organization implements Serializable{
     private String orgId;
 
     private String orgNick;
@@ -55,6 +55,14 @@ public class Organization implements Serializable {
     private BigDecimal status;
 
     private BigDecimal version;
+
+    private String accountName;
+
+    private String accountNum;
+
+    private String accountBank;
+
+    private String businessNum;
 
     private List<Attachment> attachmentList;
 
@@ -256,5 +264,37 @@ public class Organization implements Serializable {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName == null ? null : accountName.trim();
+    }
+
+    public String getAccountNum() {
+        return accountNum;
+    }
+
+    public void setAccountNum(String accountNum) {
+        this.accountNum = accountNum == null ? null : accountNum.trim();
+    }
+
+    public String getAccountBank() {
+        return accountBank;
+    }
+
+    public void setAccountBank(String accountBank) {
+        this.accountBank = accountBank == null ? null : accountBank.trim();
+    }
+
+    public String getBusinessNum() {
+        return businessNum;
+    }
+
+    public void setBusinessNum(String businessNum) {
+        this.businessNum = businessNum == null ? null : businessNum.trim();
     }
 }
