@@ -16,6 +16,7 @@ import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.order.OrganizationExample;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OorganizationVo;
+import com.ryx.credit.pojo.admin.vo.OrganizationVo;
 import com.ryx.credit.service.agent.AgentQueryService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrganizationService;
@@ -76,13 +77,19 @@ public class OrganizationServiceImpl implements OrganizationService {
         if (null != agentVo && null != agentVo.getOorganizationVoList()) {
             for (OorganizationVo ac : agentVo.getOorganizationVoList()) {
                 try {
+                    if (StringUtils.isBlank(ac.getPlatId())){
+                        logger.info("请选择业务平台");
+                        throw new ProcessException("请选择业务平台");
+                    }
                     ac.setOrgNick(ac.getOrgName());
                     ac.setcUser(agentVo.getSid());
                     ac.setPlatId(ac.getPlatId().substring(0, ac.getPlatId().length() - 1));
                     if (StringUtils.isEmpty(ac.getcUser())) {
+                        logger.info("操作人不能为空");
                         throw new ProcessException("操作人不能为空");
                     }
                     if (StringUtils.isEmpty(ac.getAgentId())) {
+                        logger.info("代理商ID不能为空");
                         throw new ProcessException("代理商ID不能为空");
                     }
                     Date d = Calendar.getInstance().getTime();
@@ -161,11 +168,11 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public ResultVO organizationEdit(AgentVo agentVo) throws Exception {
-        if (null != agentVo && null != agentVo.getOorganizationVoList()) {
+    public ResultVO organizationEdit(OrganizationVo organizationVo) throws Exception {
+        if (null != organizationVo && null != organizationVo.getOrganization()) {
             try {
-                for (OorganizationVo ac : agentVo.getOorganizationVoList()) {
-                    Organization organization = organizationMapper.selectByPrimaryKey(ac.getOrgId());
+                Organization ac = organizationVo.getOrganization();
+                Organization organization = organizationMapper.selectByPrimaryKey(ac.getOrgId());
                     organization.setBusinessNum(ac.getBusinessNum());
                     organization.setAccountName(ac.getAccountName());
                     organization.setAccountBank(ac.getAccountBank());
@@ -181,18 +188,17 @@ public class OrganizationServiceImpl implements OrganizationService {
                     organization.setCloBank(ac.getCloBank());
                     organization.setCloBankBranch(ac.getCloBankBranch());
                     organization.setRemark(ac.getRemark());
-                    organization.setuUser(agentVo.getSid());
                     organization.setuTime(Calendar.getInstance().getTime());
                     organization.setBranchLineNum(ac.getBranchLineNum());
                     organization.setAllLineNum(ac.getAllLineNum());
                     organization.setBankRegion(ac.getBankRegion());
-                    organization.setPlatId(ac.getPlatId().substring(0, ac.getPlatId().length() - 1));
+                    organization.setPlatId(ac.getPlatId());
                     if (1 != organizationMapper.updateByPrimaryKeySelective(organization)) {
                         throw new MessageException("更新机构信息失败");
                     }
 
                     //添加新的附件
-                    List<String> fileIdList = ac.getOrganizationbleFile();
+                    List<String> fileIdList = organizationVo.getOrganizatioTableFile();
                     if (fileIdList != null) {
                         for (String fileId : fileIdList) {
                             Attachment attachment = attachmentMapper.selectByPrimaryKey(fileId);
@@ -219,7 +225,6 @@ public class OrganizationServiceImpl implements OrganizationService {
                             addFile(organization,fileId);
                         }
                     }
-                }
             } catch (ProcessException e) {
                 e.printStackTrace();
                 throw e;

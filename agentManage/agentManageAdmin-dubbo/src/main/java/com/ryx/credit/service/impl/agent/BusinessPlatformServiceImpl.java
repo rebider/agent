@@ -325,7 +325,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     public List<PlatForm> queryAblePlatForm() {
         PlatFormExample example = new PlatFormExample();
         example.or().andStatusEqualTo(Status.STATUS_1.status).andPlatformStatusEqualTo(Status.STATUS_1.status);
-        example.setOrderByClause(" c_time asc ");
+        example.setOrderByClause(" platform_type desc,c_time asc");
         return platFormMapper.selectByExample(example);
     }
 
