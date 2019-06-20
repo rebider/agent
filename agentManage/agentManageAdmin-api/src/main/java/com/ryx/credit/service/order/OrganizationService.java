@@ -21,7 +21,7 @@ public interface OrganizationService {
 
     PageInfo organizationList(Page page, Organization organization);
 
-    ResultVO organizationAdd(AgentVo agentVo);
+    ResultVO organizationAdd(AgentVo agentVo) throws Exception;
 
     AgentResult organizationDelete(String id, String user);
 

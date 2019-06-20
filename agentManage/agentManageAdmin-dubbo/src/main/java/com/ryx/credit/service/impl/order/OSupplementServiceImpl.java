@@ -137,11 +137,12 @@ public class OSupplementServiceImpl implements OSupplementService {
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
     public ResultVO supplementSave(OsupplementVo osupplementVo) throws Exception {
-        OSupplement oSupplement = osupplementVo.getSupplement();
-        if (oSupplement == null) {
+
+        if (null == osupplementVo.getSupplement()) {
             logger.info("补款添加:{}", "补款添加信息为空");
             return ResultVO.fail("补款添加信息为空");
         }
+        OSupplement oSupplement = osupplementVo.getSupplement();
         if (StringUtils.isEmpty(oSupplement.getcUser())) {
             logger.info("补款添加:{}", "操作用户不能为空");
             return ResultVO.fail("操作用户不能为空");
@@ -169,6 +170,14 @@ public class OSupplementServiceImpl implements OSupplementService {
         }
         if (sumAmount.compareTo(oSupplement.getPayAmount()) != 0) {
             throw new MessageException("打款金额必须与付款金额相同");
+        }
+        if (null != oSupplement.getAmount()) {
+            if (oSupplement.getPayAmount().compareTo(oSupplement.getAmount()) == 1) {
+                //如果实际付款金额大于总金额
+                logger.info("实际付款金额大于欠款金额金额,请重新添加补款金额");
+                throw new MessageException("实际付款金额大于欠款金额,请重新添加补款金额");
+            }
+
         }
         //去查询是否已经在审批
         String srcId = oSupplement.getSrcId();
@@ -464,12 +473,12 @@ public class OSupplementServiceImpl implements OSupplementService {
                 OPaymentExample.Criteria criteria = oPaymentExample.createCriteria();
                 criteria.andIdEqualTo(oPaymentDetail.getPaymentId());
                 criteria.andStatusEqualTo(Status.STATUS_1.status);
-                List<OPayment> oPayments = oPaymentMapper.selectByExample(oPaymentExample);
-                if (1 != oPayments.size()) {
+                OPayment oPayments = oPaymentMapper.selectByPrimaryKey(oPaymentDetail.getPaymentId());
+                if (null == oPayments) {
                     logger.info("无此数据");
                     throw new MessageException("无此数据!!!");
                 }
-                OPayment oPayment = oPayments.get(0);
+                OPayment oPayment = oPayments;
                 if (null == oPaymentDetail.getRealPayAmount()) {
                     oPaymentDetail.setRealPayAmount(new BigDecimal(0));
                 }
@@ -478,82 +487,107 @@ public class OSupplementServiceImpl implements OSupplementService {
                     logger.info("金额数据有误");
                     throw new MessageException("金额数据有误!!!");
                 }
-                oPayment.setOutstandingAmount(oPayment.getOutstandingAmount().subtract(oPaymentDetail.getRealPayAmount()));
-                if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
-                    logger.info("付款单修改失败");
-                    throw new MessageException("付款单修改失败");
-                }
-
 
                 //需要查询到总金额
-                OPayment oPayMent = oPaymentMapper.selectByPrimaryKey(oPaymentDetail.getPaymentId());
-                if (null == oPayMent) {
-                    return null;
-                }
-                BigDecimal payAmount = oPayMent.getPayAmount();
-                //  查询已结清的实际付款金额
-                BigDecimal realPayAmount = oPaymentDetailMapper.selectRealAmount(oPaymentDetail.getOrderId(), PamentIdType.ORDER_FKD.code);
-                //如果总金额大于实际已经付款金额  则还有未结清金额
-                BigDecimal residue = new BigDecimal(0);
-                //剩余未结清的金额
-                residue = payAmount.subtract(realPayAmount);
-                if (residue.compareTo(new BigDecimal(0)) == 0) {
-                    return ResultVO.success(null);
-                }
-                //去查询还剩几期待付款
+                OPayment oPayMent = oPayments;
                 List<OPaymentDetail> countMap = oPaymentDetailMapper.selectCount(oPaymentDetail.getOrderId(), PamentIdType.ORDER_FKD.code, PaymentStatus.DF.code);
-                BigDecimal count = new BigDecimal(countMap.size());
-                if (count.compareTo(new BigDecimal(0)) == 0) {
-                    //如果就剩本条待付款  则需全部结清
-                    BigDecimal amount = oPaymentDetail.getPayAmount();//这个是订单需补款金额
-                    if (supplement.getRealPayAmount().compareTo(amount) == -1 || supplement.getRealPayAmount().compareTo(amount) == 1) {
-                        logger.info("应补款金额为{}，请审批拒绝，重新补款", amount);
-                        throw new MessageException("应补款金额为" + amount + "，请审批拒绝，重新补款");
-                    } else if (supplement.getRealPayAmount().compareTo(amount) == 0) {
-                        //否则是相等的  则进行更新
-                        oPaymentDetail.setPayAmount(amount);
-                        if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
-                            logger.info("付款金额更新失败");
-                            throw new MessageException("付款金额更新失败");
-                        }
-                    }
-                } else {
-                    try {
-                        List<BigDecimal> divideList = new ArrayList<>();
-                        BigDecimal divide = new BigDecimal(0);
-                        for (int i = 1; i <= count.intValue(); i++) {
-                            divide = residue.divide(count);
-                            divideList.add(divide);
-                        }
-                        for (int j = 0; j < countMap.size(); j++) {
-                            OPaymentDetail paymentDetail = countMap.get(j);
-                            paymentDetail.setPayAmount(divideList.get(j));
+
+                //多加个判断  判断实际付款金额是否大于欠款金额
+                if (supplement.getRealPayAmount().compareTo(oPayMent.getOutstandingAmount()) == 1) {
+                    logger.info("实际付款金额大于欠款金额,请拒绝审批重新添加补款金额");
+                    throw new MessageException("实际付款金额大于欠款金额,请拒绝审批重新添加补款金额");
+                } else if (supplement.getRealPayAmount().compareTo(oPayMent.getOutstandingAmount()) == 0) {
+                    //实际付款金额是否等于欠款金额
+                    if (null != countMap || countMap.size() > 0) {
+                        for (OPaymentDetail paymentDetail : countMap) {
+                            paymentDetail.setPayAmount(new BigDecimal(0));
+                            paymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
                             if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail)) {
-                                logger.info("平均金额失败");
-                                throw new MessageException("平均金额失败");
+                                logger.info("实际付款金额等于欠款金额,更新失败");
+                                throw new MessageException("更新失败");
                             }
                         }
-                    } catch (Exception e) {
-                        List<BigDecimal> divideList = new ArrayList<>();
-                        BigDecimal divide = new BigDecimal(0);
-                        for (int i = 1; i <= count.intValue() - 1; i++) {
-                            divide = residue.divide(count, 2, BigDecimal.ROUND_HALF_DOWN);
-                            System.out.println(divide);
-                            divideList.add(divide);
+                    }
+                    oPayment.setOutstandingAmount(oPayment.getOutstandingAmount().subtract(oPaymentDetail.getRealPayAmount()));
+                    if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
+                        logger.info("付款单修改失败");
+                        throw new MessageException("付款单修改失败");
+                    }
+                }else{
+                    oPayment.setOutstandingAmount(oPayment.getOutstandingAmount().subtract(oPaymentDetail.getRealPayAmount()));
+                    if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
+                        logger.info("付款单修改失败");
+                        throw new MessageException("付款单修改失败");
+                    }
+                    BigDecimal payAmount = oPayMent.getPayAmount();
+                    //  查询已结清的实际付款金额
+                    BigDecimal realPayAmount = oPaymentDetailMapper.selectRealAmount(oPaymentDetail.getOrderId(), PamentIdType.ORDER_FKD.code);
+                    //如果总金额大于实际已经付款金额  则还有未结清金额
+                    BigDecimal residue = new BigDecimal(0);
+                    //剩余未结清的金额
+                    residue = payAmount.subtract(realPayAmount);
+                /*if (residue.compareTo(oPayMent.getOutstandingAmount()) == 0) {
+                    return ResultVO.success(null);
+                }*/
+                    List<OPaymentDetail> notCountMap = oPaymentDetailMapper.selectCount(oPaymentDetail.getOrderId(), PamentIdType.ORDER_FKD.code, PaymentStatus.DF.code);
+                    //去查询还剩几期待付款
+                    BigDecimal count = new BigDecimal(notCountMap.size());
+                    if (count.compareTo(new BigDecimal(0)) == 0) {
+                        //如果就剩本条待付款  则需全部结清
+                        BigDecimal amount = oPaymentDetail.getPayAmount();//这个是订单需补款金额
+                        if (supplement.getRealPayAmount().compareTo(amount) == -1 || supplement.getRealPayAmount().compareTo(amount) == 1) {
+                            logger.info("应补款金额为{}，请审批拒绝，重新补款", amount);
+                            throw new MessageException("应补款金额为" + amount + "，请审批拒绝，重新补款");
+                        } else if (supplement.getRealPayAmount().compareTo(amount) == 0) {
+                            //否则是相等的  则进行更新
+                            oPaymentDetail.setPayAmount(supplement.getRealPayAmount());
+                            if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
+                                logger.info("付款金额更新失败");
+                                throw new MessageException("付款金额更新失败");
+                            }
                         }
-                        BigDecimal big = new BigDecimal(0);
-                        big = residue.subtract(divide.multiply(count.subtract(new BigDecimal(1))));
-                        divideList.add(big);
-                        for (int j = 0; j < countMap.size(); j++) {
-                            OPaymentDetail paymentDetail = countMap.get(j);
-                            paymentDetail.setPayAmount(divideList.get(j));
-                            if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail)) {
-                                logger.info("平均金额失败");
-                                throw new MessageException("平均金额失败");
+                    } else {
+                        try {
+                            List<BigDecimal> divideList = new ArrayList<>();
+                            BigDecimal divide = new BigDecimal(0);
+                            for (int i = 1; i <= count.intValue(); i++) {
+                                divide = residue.divide(count);
+                                divideList.add(divide);
+                            }
+                            for (int j = 0; j < notCountMap.size(); j++) {
+                                OPaymentDetail paymentDetail = notCountMap.get(j);
+                                paymentDetail.setPayAmount(divideList.get(j));
+                                if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail)) {
+                                    logger.info("平均金额失败");
+                                    throw new MessageException("平均金额失败");
+                                }
+                            }
+                        } catch (Exception e) {
+                            List<BigDecimal> divideList = new ArrayList<>();
+                            BigDecimal divide = new BigDecimal(0);
+                            for (int i = 1; i <= count.intValue() - 1; i++) {
+                                divide = residue.divide(count, 2, BigDecimal.ROUND_HALF_DOWN);
+                                System.out.println(divide);
+                                divideList.add(divide);
+                            }
+                            BigDecimal big = new BigDecimal(0);
+                            big = residue.subtract(divide.multiply(count.subtract(new BigDecimal(1))));
+                            divideList.add(big);
+                            for (int j = 0; j < notCountMap.size(); j++) {
+                                OPaymentDetail paymentDetail = notCountMap.get(j);
+                                paymentDetail.setPayAmount(divideList.get(j));
+                                if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail)) {
+                                    logger.info("平均金额失败");
+                                    throw new MessageException("平均金额失败");
+                                }
                             }
                         }
                     }
                 }
+
+
+
+
             }
         }
         return ResultVO.success(null);
@@ -642,6 +676,17 @@ public class OSupplementServiceImpl implements OSupplementService {
     public OPaymentDetail selectPaymentDetailById(String id) {
         OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectByPrimaryKey(id);
         return oPaymentDetail;
+    }
+
+    @Override
+    public OPayment selectOpayment(String id) {
+        OPaymentExample oPaymentExample = new OPaymentExample();
+        OPaymentExample.Criteria criteria = oPaymentExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andIdEqualTo(id);
+        List<OPayment> oPayments = oPaymentMapper.selectByExample(oPaymentExample);
+        if (null == oPayments || oPayments.size() == 0) {
+            return new OPayment();
+        }
+        return oPayments.get(0);
     }
 
 }
