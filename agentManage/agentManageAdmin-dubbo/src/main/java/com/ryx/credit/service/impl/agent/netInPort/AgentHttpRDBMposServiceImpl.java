@@ -239,6 +239,9 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         BankLineNums bankLineNums = bankLineNumsMapper.selectByBankName(agentColinfo.getCloBank());
         jsonParams.put("bankid",bankLineNums.getBankid());
         jsonParams.put("cardName",agentColinfo.getCloRealname());
+        String accountType = agentColinfo.getCloType().compareTo(BigDecimal.ONE) == 0 ? "00" : "01";
+        jsonParams.put("accountType",accountType);
+        jsonParams.put("customerType",accountType);
         return jsonParams;
     }
 
@@ -262,6 +265,8 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             jsonParams.put("bankid",paramMap.get("bankid"));
             jsonParams.put("bankname",paramMap.get("bankname"));
             jsonParams.put("cardName",paramMap.get("cardName"));
+            jsonParams.put("accountType",paramMap.get("accountType"));
+            jsonParams.put("customerType",paramMap.get("customerType"));
             String json = JsonUtil.objectToJson(jsonParams);
             log.info("通知瑞大宝入网修改请求参数：{}",json);
             //发送请求
