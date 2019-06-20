@@ -91,6 +91,8 @@ public class AgentBusInfo implements Serializable {
 
     private String organNum;
 
+    private String finaceRemitOrgan;
+
     private List<Attachment> attachmentList;
 
     private List<AgentColinfo> agentColinfoList;
@@ -105,25 +107,35 @@ public class AgentBusInfo implements Serializable {
 
     private String codeTypes;
 
-    private String orgParent;
+    private String orgId;
 
-    private String orgType;
-
-    public String getOrgType() {
-        return orgType;
+    public String getOrgId() {
+        return orgId;
     }
 
-    public void setOrgType(String orgType) {
-        this.orgType = orgType;
+    public void setOrgId(String orgId) {
+        this.orgId = orgId;
     }
 
-    public String getOrgParent() {
-        return orgParent;
-    }
+    //    private String orgParent;
+//
+//    private String orgType;
 
-    public void setOrgParent(String orgParent) {
-        this.orgParent = orgParent;
-    }
+//    public String getOrgType() {
+//        return orgType;
+//    }
+//
+//    public void setOrgType(String orgType) {
+//        this.orgType = orgType;
+//    }
+//
+//    public String getOrgParent() {
+//        return orgParent;
+//    }
+//
+//    public void setOrgParent(String orgParent) {
+//        this.orgParent = orgParent;
+//    }
 
     public String getCodeTypes() {
         return codeTypes;
@@ -171,6 +183,14 @@ public class AgentBusInfo implements Serializable {
 
     public void setOrganNum(String organNum) {
         this.organNum = organNum;
+    }
+
+    public String getFinaceRemitOrgan() {
+        return finaceRemitOrgan;
+    }
+
+    public void setFinaceRemitOrgan(String finaceRemitOrgan) {
+        this.finaceRemitOrgan = finaceRemitOrgan;
     }
 
     public List<Attachment> getAttachmentList() {

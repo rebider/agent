@@ -133,8 +133,8 @@ public class PlatFormServiceImpl implements PlatFormService{
         logger.info("获取机构下参数：", platId, orgParent, orgType);
         List<Organization> organizationList = organizationMapper.queryByOrganName(
                 FastMap.fastMap("platId", platId)
-                        .putKeyV("orgParent", orgParent)
-                        .putKeyV("orgType", orgType)
+//                        .putKeyV("orgParent", orgParent)
+//                        .putKeyV("orgType", orgType)
                 );
         if (organizationList.size() > 0) {
             return organizationList;

@@ -1,6 +1,7 @@
 package com.ryx.credit.service.impl.order;
 
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
@@ -10,14 +11,12 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AttachmentMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.order.OrganizationMapper;
-import com.ryx.credit.pojo.admin.agent.AgentColinfo;
-import com.ryx.credit.pojo.admin.agent.Attachment;
-import com.ryx.credit.pojo.admin.agent.AttachmentRel;
-import com.ryx.credit.pojo.admin.agent.AttachmentRelExample;
+import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.order.OrganizationExample;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OorganizationVo;
+import com.ryx.credit.pojo.admin.vo.OrganizationVo;
 import com.ryx.credit.service.agent.AgentQueryService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrganizationService;
@@ -25,6 +24,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import sun.management.resources.agent;
+
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -33,7 +38,7 @@ import java.util.*;
  * @Description:
  */
 @Service("oorganizationService")
-public class OrganizationServiceImpl implements OrganizationService{
+public class OrganizationServiceImpl implements OrganizationService {
     private static Logger logger = LoggerFactory.getLogger(OrganizationServiceImpl.class);
     @Autowired
     private OrganizationMapper organizationMapper;
@@ -72,12 +77,19 @@ public class OrganizationServiceImpl implements OrganizationService{
         if (null != agentVo && null != agentVo.getOorganizationVoList()) {
             for (OorganizationVo ac : agentVo.getOorganizationVoList()) {
                 try {
+                    if (StringUtils.isBlank(ac.getPlatId())){
+                        logger.info("请选择业务平台");
+                        throw new ProcessException("请选择业务平台");
+                    }
+                    ac.setOrgNick(ac.getOrgName());
                     ac.setcUser(agentVo.getSid());
                     ac.setPlatId(ac.getPlatId().substring(0, ac.getPlatId().length() - 1));
                     if (StringUtils.isEmpty(ac.getcUser())) {
+                        logger.info("操作人不能为空");
                         throw new ProcessException("操作人不能为空");
                     }
                     if (StringUtils.isEmpty(ac.getAgentId())) {
+                        logger.info("代理商ID不能为空");
                         throw new ProcessException("代理商ID不能为空");
                     }
                     Date d = Calendar.getInstance().getTime();
@@ -85,30 +97,9 @@ public class OrganizationServiceImpl implements OrganizationService{
                     ac.setStatus(Status.STATUS_1.status);
                     ac.setVersion(Status.STATUS_1.status);
                     ac.setOrgId(idService.genId(TabId.O_ORGANIZATION));
-                    //银行卡扫描件
-                    boolean isHaveYHKSMJ = false;
-                    //开户许可证
-                    boolean isHaveKHXUZ = false;
-                    //一般纳税人证明
-                    boolean isHaveYBNSRZM = false;
                     List<String> att = ac.getOrganizationbleFile();
                     if (att != null) {
                         for (String s : att) {
-                            if (org.apache.commons.lang.StringUtils.isEmpty(s)) continue;
-
-                            Attachment attachment = attachmentMapper.selectByPrimaryKey(s);
-                            if (attachment != null) {
-                                if (AttDataTypeStatic.YHKSMJ.code.equals(attachment.getAttDataType() + "")) {
-                                    isHaveYHKSMJ = true;
-                                }
-                                if (AttDataTypeStatic.KHXUZ.code.equals(attachment.getAttDataType() + "")) {
-                                    isHaveKHXUZ = true;
-                                }
-                                if (AttDataTypeStatic.YBNSRZM.code.equals(attachment.getAttDataType() + "")) {
-                                    isHaveYBNSRZM = true;
-                                }
-                            }
-
                             AttachmentRel record = new AttachmentRel();
                             record.setAttId(s);
                             record.setSrcId(ac.getOrgId());
@@ -175,112 +166,131 @@ public class OrganizationServiceImpl implements OrganizationService{
         return organizationList;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public ResultVO organizationEdit(AgentVo agentVo) {
-       /* if (null != agentVo && null != agentVo.getOorganizationVoList()) {
-            for (OorganizationVo ac : agentVo.getOorganizationVoList()) {
-                if(org.apache.commons.lang.StringUtils.isEmpty(ac.getOrgId())) {
-                    //直接新曾
-                    ResultVO resultVO = organizationAdd(agentVo);
-                    logger.info("添加机构",resultVO);
-                }else{
-
-                    AgentColinfo db_AgentColinfo = organizationMapper.selectByPrimaryKey(organizationMapper.getId());
-                    db_AgentColinfo.setAgentId(agent.getId());
-                    db_AgentColinfo.setCloType(agentColinfoVo.getCloType());
-                    db_AgentColinfo.setCloRealname(agentColinfoVo.getCloRealname());
-                    db_AgentColinfo.setCloBank(agentColinfoVo.getCloBank());
-                    db_AgentColinfo.setCloBankBranch(agentColinfoVo.getCloBankBranch());
-                    db_AgentColinfo.setCloBankAccount(agentColinfoVo.getCloBankAccount());
-                    db_AgentColinfo.setRemark(agentColinfoVo.getRemark());
-                    db_AgentColinfo.setStatus(agentColinfoVo.getStatus());
-                    db_AgentColinfo.setBranchLineNum(agentColinfoVo.getBranchLineNum());
-                    db_AgentColinfo.setAllLineNum(agentColinfoVo.getAllLineNum());
-                    db_AgentColinfo.setBankRegion(agentColinfoVo.getBankRegion());
-                    db_AgentColinfo.setCloInvoice(agentColinfoVo.getCloInvoice());
-                    db_AgentColinfo.setCloTaxPoint(agentColinfoVo.getCloTaxPoint());
-                    db_AgentColinfo.setCloBankCode(agentColinfoVo.getCloBankCode());
-                    db_AgentColinfo.setPayStatus(ColinfoPayStatus.A.getValue());
-                    if(1!=agentColinfoMapper.updateByPrimaryKeySelective(db_AgentColinfo)){
-                        throw new MessageException("更新收款信息失败");
-                    }else{
-                        if(!agentDataHistoryService.saveDataHistory(db_AgentColinfo,db_AgentColinfo.getId(), DataHistoryType.GATHER.getValue(),userId,db_AgentColinfo.getVarsion()).isOK()){
-                            throw new MessageException("更新收款信息失败");
-                        }
-                    }
-                    //删除老的附件
-                    AttachmentRelExample example = new AttachmentRelExample();
-                    example.or().andBusTypeEqualTo(AttachmentRelType.Proceeds.name()).andSrcIdEqualTo(db_AgentColinfo.getId()).andStatusEqualTo(Status.STATUS_1.status);
-                    List<AttachmentRel> list = attachmentRelMapper.selectByExample(example);
-                    for (AttachmentRel attachmentRel : list) {
-                        attachmentRel.setStatus(Status.STATUS_0.status);
-                        int i = attachmentRelMapper.updateByPrimaryKeySelective(attachmentRel);
-                        if (1 != i) {
-                            logger.info("修改收款信息附件关系失败{}",attachmentRel.getId());
-                            throw new MessageException("更新收款信息信息失败");
-                        }
+    public ResultVO organizationEdit(OrganizationVo organizationVo) throws Exception {
+        if (null != organizationVo && null != organizationVo.getOrganization()) {
+            try {
+                Organization ac = organizationVo.getOrganization();
+                Organization organization = organizationMapper.selectByPrimaryKey(ac.getOrgId());
+                    organization.setBusinessNum(ac.getBusinessNum());
+                    organization.setAccountName(ac.getAccountName());
+                    organization.setAccountBank(ac.getAccountBank());
+                    organization.setAccountNum(ac.getAccountNum());
+                    organization.setOrgNick(ac.getOrgName());
+                    organization.setOrgName(ac.getOrgName());
+                    organization.setBankCard(ac.getBankCard());
+//                    organization.setOrgType(ac.getOrgType());
+//                    organization.setOrgParent(ac.getOrgParent());
+                    organization.setAgentId(ac.getAgentId());
+                    organization.setCloType(ac.getCloType());
+                    organization.setCloRealname(ac.getCloRealname());
+                    organization.setCloBank(ac.getCloBank());
+                    organization.setCloBankBranch(ac.getCloBankBranch());
+                    organization.setRemark(ac.getRemark());
+                    organization.setuTime(Calendar.getInstance().getTime());
+                    organization.setBranchLineNum(ac.getBranchLineNum());
+                    organization.setAllLineNum(ac.getAllLineNum());
+                    organization.setBankRegion(ac.getBankRegion());
+                    organization.setPlatId(ac.getPlatId());
+                    if (1 != organizationMapper.updateByPrimaryKeySelective(organization)) {
+                        throw new MessageException("更新机构信息失败");
                     }
 
-                    //银行卡扫描件
-                    boolean isHaveYHKSMJ = false;
-                    //开户许可证
-                    boolean isHaveKHXUZ = false;
-                    //一般纳税人证明
-                    boolean isHaveYBNSRZM = false;
                     //添加新的附件
-                    List<String> fileIdList = agentColinfoVo.getColinfoTableFile();
-                    if(fileIdList!=null) {
+                    List<String> fileIdList = organizationVo.getOrganizatioTableFile();
+                    if (fileIdList != null) {
                         for (String fileId : fileIdList) {
-
                             Attachment attachment = attachmentMapper.selectByPrimaryKey(fileId);
-                            if(attachment!=null){
-                                if(AttDataTypeStatic.YHKSMJ.code.equals(attachment.getAttDataType()+"")){
-                                    isHaveYHKSMJ = true;
+                            if (attachment != null) {
+                                if (AttDataTypeStatic.YHKSMJ.code.equals(attachment.getAttDataType() + "")) {
+                                    String attId = queryFile(organization, AttDataTypeStatic.YHKSMJ.code);
+                                    if (StringUtils.isNotBlank(attId)){
+                                        deleteFile(organization,attId);
+                                    }
                                 }
-                                if(AttDataTypeStatic.KHXUZ.code.equals(attachment.getAttDataType()+"")){
-                                    isHaveKHXUZ = true;
+                                if (AttDataTypeStatic.KHXUZ.code.equals(attachment.getAttDataType() + "")) {
+                                    String attId = queryFile(organization, AttDataTypeStatic.KHXUZ.code);
+                                    if (StringUtils.isNotBlank(attId)){
+                                        deleteFile(organization,attId);
+                                    }
                                 }
-                                if(AttDataTypeStatic.YBNSRZM.code.equals(attachment.getAttDataType()+"")){
-                                    isHaveYBNSRZM = true;
+                                if (AttDataTypeStatic.YBNSRZM.code.equals(attachment.getAttDataType() + "")) {
+                                    String attId = queryFile(organization, AttDataTypeStatic.YBNSRZM.code);
+                                    if (StringUtils.isNotBlank(attId)){
+                                        deleteFile(organization,attId);
+                                    }
                                 }
                             }
-
-                            AttachmentRel record = new AttachmentRel();
-                            record.setAttId(fileId);
-                            record.setSrcId(db_AgentColinfo.getId());
-                            record.setcUser(db_AgentColinfo.getcUser());
-                            record.setcTime(Calendar.getInstance().getTime());
-                            record.setStatus(Status.STATUS_1.status);
-                            record.setBusType(AttachmentRelType.Proceeds.name());
-                            record.setId(idService.genId(TabId.a_attachment_rel));
-                            int i = attachmentRelMapper.insertSelective(record);
-                            if (1 != i) {
-                                logger.info("收款信息附件关系失败");
-                                throw new ProcessException("更新收款信息失败");
-                            }
+                            addFile(organization,fileId);
                         }
                     }
-                    if(agentColinfoVo.getCloType().compareTo(new BigDecimal("1"))==0) {//对私
-                        if (!isHaveYHKSMJ) {
-                            throw new MessageException("请添加银行卡扫描件");
-                        }
-                    }
-                    if(agentColinfoVo.getCloType().compareTo(new BigDecimal("1"))==0) {//对公
-                        if (!isHaveKHXUZ) {
-                            throw new MessageException("请添加开户许可证");
-                        }
-                    }
-
-                    //对公并且税点等于0.06一般纳税人证明必填
-                    if(agentColinfoVo.getCloType().compareTo(new BigDecimal("1"))==0 && agentColinfoVo.getCloTaxPoint().compareTo(new BigDecimal("0.06"))==0) {
-                        if (!isHaveYBNSRZM) {
-                            throw new MessageException("请添加一般纳税人证明");
-                        }
-                    }
-                }
+            } catch (ProcessException e) {
+                e.printStackTrace();
+                throw e;
+            } catch (MessageException e) {
+                e.printStackTrace();
+                throw e;
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new Exception(e.getMessage());
             }
-
-        }*/
-        return null;
+        }
+        return ResultVO.success(null);
     }
+
+    public String queryFile(Organization organization,String attDataType){
+        String fileId="";
+        //查询出附件id来进行删除
+        AttachmentRelExample example = new AttachmentRelExample();
+        AttachmentRelExample.Criteria criteria = example.createCriteria().andSrcIdEqualTo(organization.getOrgId()).andBusTypeEqualTo(AttachmentRelType.Organization.name()).andStatusEqualTo(Status.STATUS_1.status);
+        List<AttachmentRel> attachmentRels = attachmentRelMapper.selectByExample(example);
+        if (null==attachmentRels || attachmentRels.size()==0){
+           return fileId;
+        }
+        for (AttachmentRel attachmentRel : attachmentRels) {
+            AttachmentExample attachmentExample = new AttachmentExample();
+            AttachmentExample.Criteria criteria1 = attachmentExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andIdEqualTo(attachmentRel.getAttId()).andAttDataTypeEqualTo(attDataType);
+            List<Attachment> attachments = attachmentMapper.selectByExample(attachmentExample);
+            if (null==attachments || attachments.size()==0){
+                return fileId;
+            }
+            Attachment attachment = attachments.get(0);
+            return attachment.getId();
+        }
+        return fileId;
+    }
+
+    private void deleteFile(Organization organization, String fileId) throws Exception {
+        //删除老的附件
+        AttachmentRelExample example = new AttachmentRelExample();
+        example.or().andBusTypeEqualTo(AttachmentRelType.Organization.name()).andSrcIdEqualTo(organization.getOrgId()).andStatusEqualTo(Status.STATUS_1.status).andAttIdEqualTo(fileId);
+        List<AttachmentRel> list = attachmentRelMapper.selectByExample(example);
+        for (AttachmentRel attachmentRel : list) {
+            attachmentRel.setStatus(Status.STATUS_0.status);
+            int i = attachmentRelMapper.updateByPrimaryKeySelective(attachmentRel);
+            if (1 != i) {
+                logger.info("修改机构附件关系失败{}", attachmentRel.getId());
+                throw new MessageException("更新机构附件失败");
+            }
+        }
+    }
+
+
+    private void addFile(Organization organization, String fileId) {
+        AttachmentRel record = new AttachmentRel();
+        record.setAttId(fileId);
+        record.setSrcId(organization.getOrgId());
+        record.setcUser(organization.getcUser());
+        record.setcTime(Calendar.getInstance().getTime());
+        record.setStatus(Status.STATUS_1.status);
+        record.setBusType(AttachmentRelType.Organization.name());
+        record.setId(idService.genId(TabId.a_attachment_rel));
+        int i = attachmentRelMapper.insertSelective(record);
+        if (1 != i) {
+            logger.info("机构信息附件关系失败");
+            throw new ProcessException("更新机构信息失败");
+        }
+    }
+
 }

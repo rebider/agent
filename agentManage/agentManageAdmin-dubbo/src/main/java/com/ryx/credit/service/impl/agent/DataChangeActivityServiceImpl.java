@@ -149,7 +149,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             logger.info("========用户{}启动数据修改申请{}{}启动部门参数为空",dataChangeId,userId,"审批流启动失败字典中未配置部署流程");
             throw new MessageException("启动部门参数为空!");
         }
-        startPar.put("rs","pass");
+
         String proce = activityService.createDeloyFlow(null,workId,null,null,startPar);
         if(proce==null){
             logger.info("========用户{}启动数据修改申请{}{}",dataChangeId,userId,"数据修改审批，审批流启动失败");
@@ -286,6 +286,15 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                         capitalFlowService.insertCapitalFlow(capitalVo, preCapitalVo.getcAmount(),dr.getId(),"代理商信息修改");
                                     }
                                 }
+                            }
+                        }
+                        List<AgentBusInfoVo> orgTypeList = vo.getOrgTypeList();
+                        for (AgentBusInfoVo agentBusInfoVo : orgTypeList) {
+                            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                            agentBusInfo.setFinaceRemitOrgan(agentBusInfoVo.getFinaceRemitOrgan());
+                            int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                            if ( i != 1) {
+                                throw new ProcessException("更新财务出款机构失败");
                             }
                         }
 
@@ -425,6 +434,11 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                     vo.setOweTicket(agentVo.getOweTicket());
                     if(orgCode.equals("finance")){
                         vo.setCapitalVoList(agentVo.getCapitalVoList());
+                        //处理财务审批（财务出款机构）
+                        vo.setOrgTypeList(agentVo.getOrgTypeList());
+                        for (AgentBusInfoVo orgTypeList : agentVo.getOrgTypeList()) {
+                            vo.setFinaceRemitOrgan(orgTypeList.getFinaceRemitOrgan());
+                        }
                     }
                     String voJson = JSONObject.toJSONString(vo);
                     dateChangeRequest.setDataContent(voJson);

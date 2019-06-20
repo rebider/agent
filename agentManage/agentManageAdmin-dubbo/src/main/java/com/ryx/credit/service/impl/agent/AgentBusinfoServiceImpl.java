@@ -216,6 +216,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 				PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfoVo.getBusPlatform());
 				resultSet.add(platForm.getPlatformType());
+				List<Organization> organList = null;
 				if (null!=agentBusInfoVo.getBusPlatform()){
 					PlatformType platformType = platFormService.byPlatformCode(agentBusInfoVo.getBusPlatform());
 					if (null!=platformType){
@@ -245,14 +246,13 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 								throw new ProcessException("平台登录账号必须是数字");
 							}
 						}
-						//判断所选机构是否属于所选平台（业务平台&机构上级）
-						List<Organization> organList = organizationMapper.queryByOrganName(
-								FastMap.fastMap("platId", agentBusInfoVo.getBusPlatform())
-										.putKeyV("orgParent", agentBusInfoVo.getOrgParent()));
+						//判断所选机构是否属于所选平台（机构编号&业务平台）
+						organList = organizationMapper.selectOrganization(agentBusInfoVo.getOrganNum());
 						for (Organization organization : organList) {
-							if (!organization.getPlatId().equals(agentBusInfoVo.getBusPlatform())) {
+							if (!organization.getPlatId().contains(agentBusInfoVo.getBusPlatform())) {
 								throw new ProcessException("所选机构不属于该业务平台");
 							}
+							agentBusInfoVo.setOrganNum(organization.getOrgId());
 						}
 					}
 				}
@@ -279,9 +279,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					}
 					logger.info("代理商业务添加:{}{}","添加代理商合同成功",agentBusInfoVo.getId());
 				}else{
-
 					AgentBusInfo db_AgentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
-
 					db_AgentBusInfo.setAgentId(agentBusInfoVo.getAgentId());
 					db_AgentBusInfo.setBusNum(agentBusInfoVo.getBusNum());
 					db_AgentBusInfo.setBusPlatform(agentBusInfoVo.getBusPlatform());
@@ -312,7 +310,9 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					db_AgentBusInfo.setBusLoginNum(agentBusInfoVo.getBusLoginNum());
 					db_AgentBusInfo.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
 					db_AgentBusInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
-					db_AgentBusInfo.setOrganNum(agentBusInfoVo.getOrganNum());
+					for (Organization organization : organList) {
+						db_AgentBusInfo.setOrganNum(organization.getOrgId());
+					}
 					if(StringUtils.isNotEmpty(db_AgentBusInfo.getBusParent())){
 						if(StringUtils.isNotEmpty(db_AgentBusInfo.getBusPlatform())){
 							AgentBusInfo busInfoParent = agentBusInfoMapper.selectByPrimaryKey(db_AgentBusInfo.getBusParent());
