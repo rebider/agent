@@ -421,7 +421,7 @@
       and br.agent_id = #{params.agentId}
     </if>
     <if test="params.agentName != null and params.agentName!='' " >
-      and br.agent_name = #{params.agentName}
+      and br.agent_name like concat(concat( '%', #{params.agentName}),'%')
     </if>
     <if test="params.subBegin != null and params.subBegin!='' " >
       and br.C_TIME <![CDATA[ >= ]]> to_date(#{params.subBegin}, 'yyyy-mm-dd hh24:mi:ss')

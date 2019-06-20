@@ -235,4 +235,10 @@
     from A_BUS_ACT_REL
     where bus_id = #{busId,jdbcType=VARCHAR}
   </select>
+
+  <update id="updateActivIdByActivId" parameterType="com.ryx.credit.pojo.admin.agent.BusActRel">
+    update A_BUS_ACT_REL
+    set ACTIV_ID = #{newActivId,jdbcType=VARCHAR}
+    where ACTIV_ID = #{activId,jdbcType=VARCHAR}
+  </update>
 </mapper>
