@@ -761,7 +761,7 @@
                  ORDER_ID=#{orderId}
              </if>
          </where>
-           AND PAYMENT_TYPE=#{paymentType} and Payment_status in(4,6)
+           AND PAYMENT_TYPE=#{paymentType} and Payment_status in(2,4,6)
         group by ''
     </select>
 
