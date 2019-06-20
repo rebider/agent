@@ -159,16 +159,7 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                     Map<String, Object> reqMap = new HashMap<>();
                     reqMap.put("agentBusInfo",agentBusInfo);
                     reqMap.put("agent",agent);
-                    if(PlatformType.whetherPOS(platForm.getPlatformType())){
-                        reqMap.put("platForm",platForm);
-                        paramMap = agentHttpPosServiceImpl.packageParam(reqMap);
-                    }else if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
-                        paramMap = agentHttpMposServiceImpl.packageParam(reqMap);
-                    }else if(platForm.getPlatformType().equals(PlatformType.RDBPOS.getValue())){
-                        paramMap = agentHttpRDBMposServiceImpl.packageParam(reqMap);
-                    }else if(platForm.getPlatformType().equals(PlatformType.SSPOS.getValue())){
-                        paramMap = agentHttpSsPosServiceImpl.packageParam(reqMap);
-                    }
+
                     record.setId(id);
                     record.setNotifyTime(new Date());
                     record.setAgentId(agentBusInfo.getAgentId());
@@ -180,6 +171,17 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                     record.setNotifyCount(Status.STATUS_1.status);
                     record.setcUser(agentBusInfo.getcUser());
                     record.setNotifyType(notifyType);
+                    reqMap.put("platForm",platForm);
+                    if(PlatformType.whetherPOS(platForm.getPlatformType())){
+                        paramMap = agentHttpPosServiceImpl.packageParam(reqMap);
+                    }else if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
+                        paramMap = agentHttpMposServiceImpl.packageParam(reqMap);
+                    }else if(platForm.getPlatformType().equals(PlatformType.RDBPOS.getValue())){
+                        paramMap = agentHttpRDBMposServiceImpl.packageParam(reqMap);
+                    }else if(platForm.getPlatformType().equals(PlatformType.SSPOS.getValue())){
+                        paramMap = agentHttpSsPosServiceImpl.packageParam(reqMap);
+                    }
+
                     record.setSendJson(JSONObject.toJSONString(paramMap));
 
                     if(PlatformType.whetherPOS(platForm.getPlatformType())){

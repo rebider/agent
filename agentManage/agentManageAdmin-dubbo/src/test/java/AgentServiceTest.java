@@ -1,8 +1,10 @@
+import com.ryx.credit.common.enumc.NotifyType;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.dao.order.OLogisticsDetailMapper;
 import com.ryx.credit.dao.order.ReceiptPlanMapper;
 import com.ryx.credit.service.agent.AgentNotifyService;
 import com.ryx.credit.service.agent.AgentService;
+import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.order.OLogisticsService;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -27,9 +29,20 @@ public class AgentServiceTest extends BaseSpringTest  {
     private ReceiptPlanMapper receiptPlanMapper;
     @Autowired
     private AgentService agentService;
+    @Autowired
+    private AgentNetInNotityService agentNetInNotityService;
 
     @Test
     public void testNotify(){
         agentService.createAgentAccount();
+    }
+    @Test
+    public void posss(){
+        try {
+            agentNetInNotityService.asynNotifyPlatform("AG19063479122", NotifyType.NetInAdd.getValue());
+            Thread.currentThread().sleep(100000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
