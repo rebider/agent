@@ -213,10 +213,12 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                     AgentBusInfo updateBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getId());
                     JSONObject jsonObject = JSONObject.parseObject(String.valueOf(result.getData()));
                     updateBusInfo.setBusNum(jsonObject.getString("orgId"));
-                    if(PlatformType.whetherPOS(platForm.getPlatformType()) || platForm.getPlatformType().equals(PlatformType.SSPOS.getValue())){
+                    if(PlatformType.whetherPOS(platForm.getPlatformType())){
                         updateBusInfo.setBusLoginNum(jsonObject.getString("loginName"));
                     }else if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
                         updateBusInfo.setBusLoginNum(jsonObject.getString("orgId"));
+                    }else if(platForm.getPlatformType().equals(PlatformType.SSPOS.getValue())){
+                        updateBusInfo.setBusLoginNum(jsonObject.getString("loginName"));
                     }
                     //代理商修改也会走这里
                     // cxinfo  如果有已有效的业务信息就为已入网，否则为已入网未激活 业务平台状态：1启用和0注销2开户未激活，注销是指代理商解除某项业务平台合作。

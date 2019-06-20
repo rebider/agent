@@ -39,7 +39,7 @@ public class AgentServiceTest extends BaseSpringTest  {
     @Test
     public void posss(){
         try {
-            agentNetInNotityService.asynNotifyPlatform("AG19063479122", NotifyType.NetInAdd.getValue());
+            agentNetInNotityService.asynNotifyPlatform("AB2019062v000000000020757", NotifyType.NetInEdit.getValue());
             Thread.currentThread().sleep(100000L);
         } catch (InterruptedException e) {
             e.printStackTrace();
