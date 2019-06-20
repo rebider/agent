@@ -471,7 +471,7 @@ public class AgentServiceImpl implements AgentService {
     public void createUser(String agentId)throws Exception{
         logger.info("生成后台代理商用户开始:agentId:{}",agentId);
         Agent agent = getAgentById(agentId);
-        List<UserVo>  userVoSelect = cUserMapper.selectListByLogin(agent.getAgUniqNum());
+        List<UserVo>  userVoSelect = cUserMapper.selectListByLogin(agent.getId());
         if (userVoSelect.size()>0) {
             return;
         }
