@@ -48,6 +48,8 @@ public class AgentColinfo implements Serializable {
 
     private BigDecimal payStatus;
 
+    private String agLegalCernum;//法人证件号
+
     private List<Attachment> attachmentList;
 
     private String accountId;//打款公司代码
@@ -230,6 +232,14 @@ public class AgentColinfo implements Serializable {
 
     public void setPayStatus(BigDecimal payStatus) {
         this.payStatus = payStatus;
+    }
+
+    public String getAgLegalCernum() {
+        return agLegalCernum;
+    }
+
+    public void setAgLegalCernum(String agLegalCernum) {
+        this.agLegalCernum = agLegalCernum == null ? null : agLegalCernum.trim();
     }
 
     public String getAccountId() {

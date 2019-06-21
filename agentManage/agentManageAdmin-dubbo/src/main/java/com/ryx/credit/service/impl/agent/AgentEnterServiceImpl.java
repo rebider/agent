@@ -17,6 +17,7 @@ import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.dict.DictOptionsService;
+import com.ryx.credit.service.pay.LivenessDetectionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +81,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private AgentNetInNotityService agentNetInNotityService;
     @Autowired
     private OrganizationMapper organizationMapper;
+    @Autowired
+    private LivenessDetectionService livenessDetectionService;
 
 
     /**
@@ -124,6 +127,33 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 item.setAgentId(agent.getId());
                 item.setcUser(agent.getcUser());
                 item.setCloReviewStatus(AgStatus.Create.status);
+                //收款账户对私时做校验
+                String agentName = agent.getAgName();
+                String agLegalName = agent.getAgLegal();
+                String trueName = item.getCloRealname();
+                String certNo = item.getAgLegalCernum();
+                if (item.getCloType().compareTo(new BigDecimal(2)) == 0) {
+                    //对私时 收款账户名与法人姓名一致时 把法人身份证号拷贝到户主身份证号并进行认证
+                    if (agLegalName.equals(trueName)) {
+                        item.setAgLegalCernum(agent.getAgLegalCernum());
+                    } else {
+                        if (StringUtils.isNotBlank(certNo)) {
+                            //校验收款账户身份认证
+                            AgentResult result = livenessDetectionService.livenessDetection(trueName, certNo, agent.getcUser());
+                            if (!result.isOK()) {
+                                throw new ProcessException("收款账户身份认证异常");
+                            }
+                        } else {
+                            throw new ProcessException("请输入收款账户名相对应的户主证件号");
+                        }
+                    }
+                }
+                //对公时 判断收款账户名是否与代理商名称一致 不一致则抛异常提示信息
+                if (item.getCloType().compareTo(new BigDecimal(1)) == 0) {
+                    if (!agentName.equals(trueName)) {
+                        throw new ProcessException("收款账户名与代理商名称不一致");
+                    }
+                }
                 agentColinfoService.agentColinfoInsert(item, item.getColinfoTableFile());
             }
             //判断平台是否重复
@@ -311,7 +341,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 return ResultVO.fail("代理商信息已失效");
             }
 
-
             //更新代理商审批中
             agent.setAgStatus(AgStatus.Approving.name());
             if (1 != agentService.updateAgent(agent)) {
@@ -322,9 +351,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             //获取代理商有效的业务
             List<AgentBusInfo> aginfo = agentBusinfoService.agentBusInfoList(agent.getId());
             for (AgentBusInfo agentBusInfo : aginfo) {
-
-
-
                 agentBusInfo.setcUtime(Calendar.getInstance().getTime());
                 agentBusInfo.setCloReviewStatus(AgStatus.Approving.status);
                 if (agentBusinfoService.updateAgentBusInfo(agentBusInfo) != 1) {
@@ -390,6 +416,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             AgentBusInfo agentBusInfo = aginfo.get(0);
 //            PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
             record.setNetInBusType("ACTIVITY_"+agentBusInfo.getBusPlatform());
+            record.setAgDocPro(agentBusInfo.getAgDocPro());
+            record.setAgDocDistrict(agentBusInfo.getAgDocDistrict());
             if (1 != busActRelMapper.insertSelective(record)) {
                 logger.info("代理商审批，启动审批异常，添加审批关系失败{}:{}", agentId, proce);
             }
@@ -439,7 +467,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             logger.info("代理商业务启动审批异常，更新业务本信息失败{}:{}", busid, cuser);
             throw new ProcessException("代理商业务启动审批异常，更新业务本信息失败");
         }
-
 
         //代理商有效新建的合同
         List<AgentContract> ag = agentContractService.queryAgentContract(abus.getAgentId(), null, AgStatus.Create.status);
@@ -494,7 +521,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         record.setAgentId(agent.getId());
         record.setAgentName(agent.getAgName());
         record.setDataShiro(BusActRelBusType.Business.key);
-
+        record.setAgDocPro(abus.getAgDocPro());
+        record.setAgDocDistrict(abus.getAgDocDistrict());
         record.setNetInBusType("ACTIVITY_"+platForm.getPlatformNum());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("代理商业务启动审批异常，添加审批关系失败{}:{}", record.getBusId(), proce);

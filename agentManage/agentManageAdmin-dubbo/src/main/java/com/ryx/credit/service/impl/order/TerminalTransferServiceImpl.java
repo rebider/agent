@@ -420,10 +420,13 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(agentId);
         record.setDataShiro(BusActRelBusType.agentTerminal.key);
-
         Agent agent = agentMapper.selectByPrimaryKey(agentId);
-        if(null!=agent)
+        if(null!=agent){
             record.setAgentName(agent.getAgName());
+            //暂时存基本信息里的，后期在改
+            record.setAgDocPro(agent.getAgDocPro());
+            record.setAgDocDistrict(agent.getAgDocDistrict());
+        }
         if (1 != busActRelMapper.insertSelective(record)) {
             log.info("订单提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
             throw new MessageException("审批流启动失败:添加审批关系失败");
