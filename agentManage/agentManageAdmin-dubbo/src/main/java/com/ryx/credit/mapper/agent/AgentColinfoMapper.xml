@@ -23,6 +23,7 @@
         <result column="CLO_INVOICE" jdbcType="DECIMAL" property="cloInvoice" />
         <result column="CLO_BANK_CODE" jdbcType="VARCHAR" property="cloBankCode" />
         <result column="PAY_STATUS" jdbcType="DECIMAL" property="payStatus" />
+        <result column="AG_LEGAL_CERNUM" jdbcType="VARCHAR" property="agLegalCernum" />
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
@@ -56,7 +57,7 @@
     <sql id="Base_Column_List">
         ID, AGENT_ID, CLO_TYPE, CLO_REALNAME, CLO_BANK, CLO_BANK_BRANCH, CLO_BANK_ACCOUNT,
         C_TIME, C_UTIME, REMARK, C_USER, CLO_REVIEW_STATUS, STATUS, VARSION, BRANCH_LINE_NUM,
-        ALL_LINE_NUM, BANK_REGION, CLO_TAX_POINT, CLO_INVOICE, CLO_BANK_CODE, PAY_STATUS
+        ALL_LINE_NUM, BANK_REGION, CLO_TAX_POINT, CLO_INVOICE, CLO_BANK_CODE, PAY_STATUS, AG_LEGAL_CERNUM
     </sql>
     <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentColinfoExample" resultMap="BaseResultMap">
         <include refid="OracleDialectPrefix" />
@@ -93,7 +94,7 @@
         REMARK, C_USER, CLO_REVIEW_STATUS,
         STATUS, VARSION, BRANCH_LINE_NUM,
         ALL_LINE_NUM, BANK_REGION, CLO_TAX_POINT,
-        CLO_INVOICE, CLO_BANK_CODE, PAY_STATUS
+        CLO_INVOICE, CLO_BANK_CODE, PAY_STATUS, AG_LEGAL_CERNUM
         )
         values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{cloType,jdbcType=DECIMAL},
         #{cloRealname,jdbcType=VARCHAR}, #{cloBank,jdbcType=VARCHAR}, #{cloBankBranch,jdbcType=VARCHAR},
@@ -101,7 +102,8 @@
         #{remark,jdbcType=VARCHAR}, #{cUser,jdbcType=VARCHAR}, #{cloReviewStatus,jdbcType=DECIMAL},
         #{status,jdbcType=DECIMAL}, #{varsion,jdbcType=DECIMAL}, #{branchLineNum,jdbcType=VARCHAR},
         #{allLineNum,jdbcType=VARCHAR}, #{bankRegion,jdbcType=VARCHAR}, #{cloTaxPoint,jdbcType=DECIMAL},
-        #{cloInvoice,jdbcType=DECIMAL}, #{cloBankCode,jdbcType=VARCHAR}, #{payStatus,jdbcType=DECIMAL}
+        #{cloInvoice,jdbcType=DECIMAL}, #{cloBankCode,jdbcType=VARCHAR}, #{payStatus,jdbcType=DECIMAL},
+        #{agLegalCernum,jdbcType=VARCHAR}
         )
     </insert>
     <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentColinfo">
@@ -170,6 +172,9 @@
             <if test="payStatus != null">
                 PAY_STATUS,
             </if>
+            <if test="agLegalCernum != null">
+                AG_LEGAL_CERNUM,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -234,6 +239,9 @@
             </if>
             <if test="payStatus != null">
                 #{payStatus,jdbcType=DECIMAL},
+            </if>
+            <if test="agLegalCernum != null">
+                #{agLegalCernum,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>
@@ -306,6 +314,9 @@
             <if test="payStatus != null">
                 PAY_STATUS = #{payStatus,jdbcType=DECIMAL},
             </if>
+            <if test="agLegalCernum != null">
+                AG_LEGAL_CERNUM = #{agLegalCernum,jdbcType=VARCHAR},
+            </if>
         </set>
         where ID = #{id,jdbcType=VARCHAR}
     </update>
@@ -330,7 +341,8 @@
         CLO_TAX_POINT = #{cloTaxPoint,jdbcType=DECIMAL},
         CLO_INVOICE = #{cloInvoice,jdbcType=DECIMAL},
         CLO_BANK_CODE = #{cloBankCode,jdbcType=VARCHAR},
-        PAY_STATUS = #{payStatus,jdbcType=DECIMAL}
+        PAY_STATUS = #{payStatus,jdbcType=DECIMAL},
+        AG_LEGAL_CERNUM = #{agLegalCernum,jdbcType=VARCHAR}
         where ID = #{id,jdbcType=VARCHAR}
     </update>
     <sql id="OracleDialectPrefix">
