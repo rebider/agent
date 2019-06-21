@@ -9,4 +9,5 @@ public interface CRoleService {
 
     Set<String> selectShiroUrl(Long userId,String pid,String url);
 
+    Set<String> findFinanceRole(Long userId);
 }
