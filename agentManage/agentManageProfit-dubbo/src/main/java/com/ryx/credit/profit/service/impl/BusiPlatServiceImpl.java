@@ -8,7 +8,7 @@ import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.profit.service.BusiPlatService;
-import com.ryx.credit.service.agent.AgentNotifyService;
+//import com.ryx.credit.service.agent.AgentNotifyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +26,8 @@ public class BusiPlatServiceImpl implements BusiPlatService {
 
     private static Logger log = LoggerFactory.getLogger(BusiPlatServiceImpl.class);
 
-    @Autowired
-    AgentNotifyService agentNotifyService;
+//    @Autowired
+//    AgentNotifyService agentNotifyService;
 
     @Override
     public boolean mPos_Frozen(List<String> agentIds) {

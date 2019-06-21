@@ -31,4 +31,7 @@ public interface RegionMapper {
     int findCountByPcode(@Param("map") Map<String, Object> map);
 
     List<Region> selectAll();
+
+    Region findByRcode(String rCode);
+
 }

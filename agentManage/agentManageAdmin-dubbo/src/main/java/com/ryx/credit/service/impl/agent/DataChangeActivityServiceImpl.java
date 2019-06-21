@@ -16,6 +16,7 @@ import com.ryx.credit.pojo.admin.vo.CapitalVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
+import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,8 +52,8 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     private AgentEnterService agentEnterService;
     @Autowired
     private AimportService aimportService;
-    @Autowired
-    private AgentNotifyService agentNotifyService;
+//    @Autowired
+//    private AgentNotifyService agentNotifyService;
     @Autowired
     private AColinfoPaymentService colinfoPaymentService;
     @Autowired
@@ -73,7 +74,8 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     private CapitalFlowService capitalFlowService;
     @Autowired
     private DataChangeActivityService dataChangeActivityService;
-
+    @Autowired
+    private AgentNetInNotityService agentNetInNotityService;
 
 
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
@@ -147,7 +149,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             logger.info("========用户{}启动数据修改申请{}{}启动部门参数为空",dataChangeId,userId,"审批流启动失败字典中未配置部署流程");
             throw new MessageException("启动部门参数为空!");
         }
-
+        startPar.put("rs","pass");
         String proce = activityService.createDeloyFlow(null,workId,null,null,startPar);
         if(proce==null){
             logger.info("========用户{}启动数据修改申请{}{}",dataChangeId,userId,"数据修改审批，审批流启动失败");
@@ -245,27 +247,27 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
 
                             //入网程序调用
-                            try {
+//                            try {
                                 for (AgentBusInfo agentBusInfo : agentBusInfoList) {
 
-                                    ImportAgent importAgent = new ImportAgent();
-                                    importAgent.setDataid(agentBusInfo.getId());
-                                    importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
-                                    importAgent.setBatchcode(proIns);
-                                    importAgent.setcUser(rel.getcUser());
-                                    if (1 != aimportService.insertAgentImportData(importAgent)) {
-                                        logger.info("代理商账户修改审批通过-添加修改任务失败");
-                                    } else {
-                                        logger.info("代理商账户修改审批通过-添加修改任务成功!{},{}", AgImportType.DATACHANGEAPP.getValue(), vo.getAgent().getId());
-                                    }
-
+//                                    ImportAgent importAgent = new ImportAgent();
+//                                    importAgent.setDataid(agentBusInfo.getId());
+//                                    importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
+//                                    importAgent.setBatchcode(proIns);
+//                                    importAgent.setcUser(rel.getcUser());
+//                                    if (1 != aimportService.insertAgentImportData(importAgent)) {
+//                                        logger.info("代理商账户修改审批通过-添加修改任务失败");
+//                                    } else {
+//                                        logger.info("代理商账户修改审批通过-添加修改任务成功!{},{}", AgImportType.DATACHANGEAPP.getValue(), vo.getAgent().getId());
+//                                    }
+                                    agentNetInNotityService.asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
                                 }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                throw new ProcessException("更新賬戶数据申请失败");
-                            } finally {
-                                agentNotifyService.asynNotifyPlatform();
-                            }
+//                            } catch (Exception e) {
+//                                e.printStackTrace();
+//                                throw new ProcessException("更新賬戶数据申请失败");
+//                            } finally {
+////
+//                            }
 
                         }
                     //代理商新修改
@@ -292,6 +294,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                 }
                             }
                         }
+                        //更新财务出款机构
                         List<AgentBusInfoVo> orgTypeList = vo.getOrgTypeList();
                         for (AgentBusInfoVo agentBusInfoVo : orgTypeList) {
                             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
@@ -332,30 +335,31 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                         }
 
                         //入网程序调用
-                        try {
+//                        try {
                             if(vo.getBusInfoVoList()!=null){
 
                                 for (AgentBusInfoVo agentBusInfoVo : vo.getBusInfoVoList()) {
-                                    if(StringUtils.isNotBlank(agentBusInfoVo.getId())) {
-                                        ImportAgent importAgent = new ImportAgent();
-                                        importAgent.setDataid(agentBusInfoVo.getId());
-                                        importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
-                                        importAgent.setBatchcode(proIns);
-                                        importAgent.setcUser(rel.getcUser());
-                                        if (1 != aimportService.insertAgentImportData(importAgent)) {
-                                            logger.info("代理商修改审批通过-添加开户任务失败");
-                                        } else {
-                                            logger.info("代理商修改审批通过-添加开户任务成功!{},{}", AgImportType.DATACHANGEAPP.getValue(), vo.getAgent().getId());
-                                        }
-                                    }
+//                                    if(StringUtils.isNotBlank(agentBusInfoVo.getId())) {
+//                                        ImportAgent importAgent = new ImportAgent();
+//                                        importAgent.setDataid(agentBusInfoVo.getId());
+//                                        importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
+//                                        importAgent.setBatchcode(proIns);
+//                                        importAgent.setcUser(rel.getcUser());
+//                                        if (1 != aimportService.insertAgentImportData(importAgent)) {
+//                                            logger.info("代理商修改审批通过-添加开户任务失败");
+//                                        } else {
+//                                            logger.info("代理商修改审批通过-添加开户任务成功!{},{}", AgImportType.DATACHANGEAPP.getValue(), vo.getAgent().getId());
+//                                        }
+//                                    }
+                                    agentNetInNotityService.asynNotifyPlatform(agentBusInfoVo.getId(),NotifyType.NetInEdit.getValue());
                                 }
                             }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            throw new ProcessException("更新数据申请失败");
-                        } finally {
-                            agentNotifyService.asynNotifyPlatform();
-                        }
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                            throw new ProcessException("更新数据申请失败");
+//                        } finally {
+//                            agentNotifyService.asynNotifyPlatform();
+//                        }
 
                     }
                 //拒绝更新数据状态

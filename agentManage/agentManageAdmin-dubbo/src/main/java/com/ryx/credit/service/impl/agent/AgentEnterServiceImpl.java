@@ -15,6 +15,7 @@ import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
+import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.pay.LivenessDetectionService;
 import org.slf4j.Logger;
@@ -59,8 +60,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Autowired
     private AimportService aimportService;
     @Autowired
-    private AgentNotifyService agentNotifyService;
-    @Autowired
     private IUserService iUserService;
     @Autowired
     private DictOptionsService dictOptionsService;
@@ -78,6 +77,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private AgentBusInfoMapper agentBusInfoMapper;
     @Autowired
     private CapitalFlowService capitalFlowService;
+    @Autowired
+    private AgentNetInNotityService agentNetInNotityService;
     @Autowired
     private OrganizationMapper organizationMapper;
     @Autowired
@@ -340,7 +341,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 return ResultVO.fail("代理商信息已失效");
             }
 
-
             //更新代理商审批中
             agent.setAgStatus(AgStatus.Approving.name());
             if (1 != agentService.updateAgent(agent)) {
@@ -351,9 +351,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             //获取代理商有效的业务
             List<AgentBusInfo> aginfo = agentBusinfoService.agentBusInfoList(agent.getId());
             for (AgentBusInfo agentBusInfo : aginfo) {
-
-
-
                 agentBusInfo.setcUtime(Calendar.getInstance().getTime());
                 agentBusInfo.setCloReviewStatus(AgStatus.Approving.status);
                 if (agentBusinfoService.updateAgentBusInfo(agentBusInfo) != 1) {
@@ -417,8 +414,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             record.setDataShiro(BusActRelBusType.Agent.key);
 
             AgentBusInfo agentBusInfo = aginfo.get(0);
-            PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
-            record.setNetInBusType("ACTIVITY_"+platForm.getPlatformType());
+//            PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+            record.setNetInBusType("ACTIVITY_"+agentBusInfo.getBusPlatform());
             record.setAgDocPro(agentBusInfo.getAgDocPro());
             record.setAgDocDistrict(agentBusInfo.getAgDocDistrict());
             if (1 != busActRelMapper.insertSelective(record)) {
@@ -470,7 +467,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             logger.info("代理商业务启动审批异常，更新业务本信息失败{}:{}", busid, cuser);
             throw new ProcessException("代理商业务启动审批异常，更新业务本信息失败");
         }
-
 
         //代理商有效新建的合同
         List<AgentContract> ag = agentContractService.queryAgentContract(abus.getAgentId(), null, AgStatus.Create.status);
@@ -525,9 +521,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         record.setAgentId(agent.getId());
         record.setAgentName(agent.getAgName());
         record.setDataShiro(BusActRelBusType.Business.key);
+        record.setNetInBusType("ACTIVITY_"+platForm.getPlatformType());
         record.setAgDocPro(abus.getAgDocPro());
         record.setAgDocDistrict(abus.getAgDocDistrict());
-        record.setNetInBusType("ACTIVITY_"+platForm.getPlatformType());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("代理商业务启动审批异常，添加审批关系失败{}:{}", record.getBusId(), proce);
         }
@@ -695,23 +691,23 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 throw new ProcessException("新增资金流水失败");
             }
         }
-        //入网程序调用
-        try {
-            ImportAgent importAgent = new ImportAgent();
-            importAgent.setDataid(busId);
-            importAgent.setDatatype(AgImportType.BUSAPP.name());
-            importAgent.setBatchcode(processingId);
-            importAgent.setcUser(rel.getcUser());
-            if (1 != aimportService.insertAgentImportData(importAgent)) {
-                logger.info("代理商审批通过-添加开户任务失败");
-            } else {
-                logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.BUSAPP.getValue(), busId);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            agentNotifyService.asynNotifyPlatform();
-        }
+//        入网程序调用
+//        try {
+//            ImportAgent importAgent = new ImportAgent();
+//            importAgent.setDataid(busId);
+//            importAgent.setDatatype(AgImportType.BUSAPP.name());
+//            importAgent.setBatchcode(processingId);
+//            importAgent.setcUser(rel.getcUser());
+//            if (1 != aimportService.insertAgentImportData(importAgent)) {
+//                logger.info("代理商审批通过-添加开户任务失败");
+//            } else {
+//                logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.BUSAPP.getValue(), busId);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
+        agentNetInNotityService.asynNotifyPlatform(busId,NotifyType.NetInAddBus.getValue());
+//        }
         return ResultVO.success(null);
     }
 
@@ -731,9 +727,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         AgentBusInfo bus = agentBusinfoService.getById(busId);
         bus.setcUtime(Calendar.getInstance().getTime());
         bus.setCloReviewStatus(AgStatus.Refuse.status);
-        if(StringUtils.isNotBlank(bus.getBusNum())){
+//        if(StringUtils.isNotBlank(bus.getBusNum())){
             bus.setBusStatus(BusinessStatus.pause.status);
-        }
+//        }
         if (agentBusinfoService.updateAgentBusInfo(bus) != 1) {
             logger.info("代理商审批拒绝，更新业务本信息失败{}:{}", processingId, bus.getId());
             throw new ProcessException("代理商审批通过，更新业务本信息失败");
@@ -855,24 +851,24 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
         }
         //入网程序调用
-        try {
-            ImportAgent importAgent = new ImportAgent();
-            importAgent.setDataid(busId);
-            importAgent.setDatatype(AgImportType.NETINAPP.name());
-            importAgent.setBatchcode(processingId);
-            importAgent.setcUser(rel.getcUser());
-            if (1 != aimportService.insertAgentImportData(importAgent)) {
-                logger.info("代理商审批通过-添加开户任务失败");
-            } else {
-                logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.NETINAPP.getValue(), busId);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
+//        try {
+//            ImportAgent importAgent = new ImportAgent();
+//            importAgent.setDataid(busId);
+//            importAgent.setDatatype(AgImportType.NETINAPP.name());
+//            importAgent.setBatchcode(processingId);
+//            importAgent.setcUser(rel.getcUser());
+//            if (1 != aimportService.insertAgentImportData(importAgent)) {
+//                logger.info("代理商审批通过-添加开户任务失败");
+//            } else {
+//                logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.NETINAPP.getValue(), busId);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
             //todo 生成后台用户
             agentService.createBackUserbyAgent(agent.getId());
-            agentNotifyService.asynNotifyPlatform();
-        }
+            agentNetInNotityService.asynNotifyPlatform(busId,NotifyType.NetInAdd.getValue());
+//        }
 
         return ResultVO.success(null);
     }
@@ -901,9 +897,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         for (AgentBusInfo agentBusInfo : aginfo) {
             agentBusInfo.setcUtime(Calendar.getInstance().getTime());
             agentBusInfo.setCloReviewStatus(AgStatus.Refuse.status);
-            if(StringUtils.isNotBlank(agentBusInfo.getBusNum())){
+//            if(StringUtils.isNotBlank(agentBusInfo.getBusNum())){
                 agentBusInfo.setBusStatus(BusinessStatus.pause.status);
-            }
+//            }
             if (agentBusinfoService.updateAgentBusInfo(agentBusInfo) != 1) {
                 logger.info("代理商审批拒绝，更新业务本信息失败{}:{}", processingId, agentBusInfo.getId());
                 throw new ProcessException("代理商审批通过，更新业务本信息失败");

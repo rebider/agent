@@ -15,7 +15,8 @@ import java.util.Map;
 public enum TerminalPlatformType {
 
     POS(new BigDecimal("1"),"POS"),
-    MPOS(new BigDecimal("2"),"手刷");
+    MPOS(new BigDecimal("2"),"手刷"),
+    RDBPOS(new BigDecimal("3"),"瑞大宝");
 
     public BigDecimal code;
 

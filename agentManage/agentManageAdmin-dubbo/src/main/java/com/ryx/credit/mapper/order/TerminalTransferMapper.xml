@@ -252,5 +252,15 @@
       </if>
     </where>
   </sql>
-
+  <select id="appTerminalTransfer" resultType="java.lang.String">
+      select activ_id from a_bus_act_rel where bus_id in
+       (
+        select t.id from o_terminal_transfer t where id in
+        (
+          select bus_id from a_approval_flow_record where bus_id like 'TT%' and approval_dep ='221'
+          and approval_result ='pass'
+        )
+        and t.review_status !='3'
+      )
+  </select>
 </mapper>

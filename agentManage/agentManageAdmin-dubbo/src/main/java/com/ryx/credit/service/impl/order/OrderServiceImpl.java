@@ -1622,7 +1622,14 @@ public class OrderServiceImpl implements OrderService {
             order.setOrderStatus(OrderStatus.ENABLE.status);
             order.setReviewStatus(AgStatus.Approved.status);
             order.setoInuretime(d.getTime());
-            Date orderTime = DateUtil.getDateFromStr(DateUtil.format(order.getcTime(), "yyyy-MM-dd"), "yyyy-MM-dd");
+            Calendar orderdate = Calendar.getInstance();
+            orderdate.setTime(order.getcTime());
+            orderdate.set(Calendar.DAY_OF_MONTH,orderdate.getActualMinimum(Calendar.DAY_OF_MONTH));
+            orderdate.set(Calendar.HOUR_OF_DAY,orderdate.getActualMinimum(Calendar.HOUR_OF_DAY));
+            orderdate.set(Calendar.MILLISECOND,orderdate.getActualMinimum(Calendar.MILLISECOND));
+            orderdate.set(Calendar.SECOND,orderdate.getActualMinimum(Calendar.SECOND));
+            orderdate.set(Calendar.MINUTE,orderdate.getActualMinimum(Calendar.MINUTE));
+            Date orderTime = DateUtil.getDateFromStr(DateUtil.format(orderdate.getTime(), "yyyy-MM-dd"), "yyyy-MM-dd");
             //付款单设置
             switch (order.getPaymentMethod()) {
                 case "FKFQ":
@@ -3116,6 +3123,18 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderoutVo> exportOrder(Map map) {
+        if(null != map.get("userId")) {
+            Long userId = (Long) map.get("userId");
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if (orgCodeRes == null && orgCodeRes.size() != 1) {
+                return null;
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+            map.put("organizationCode", organizationCode);
+            List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+            map.put("platfromPerm", platfromPerm);
+        }
         List<OrderoutVo> orderoutList = orderMapper.excelOrder(map);
         List<Dict> dictList = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.SETTLEMENT_TYPE.name());
         List<Dict> capitalType = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.CAPITAL_TYPE.name());
@@ -3147,6 +3166,12 @@ public class OrderServiceImpl implements OrderService {
                     CUser cUser = iUserService.selectById(orderoutVo.getNuclearUser());
                     if(null!=cUser)
                     orderoutVo.setNuclearUser(cUser.getName());
+                }
+                if (StringUtils.isNotBlank(orderoutVo.getReviewStatus()) && !orderoutVo.getReviewStatus().equals("null")) {
+                    String agStatusByValue = AgStatus.getMsg(new BigDecimal(orderoutVo.getReviewStatus()));
+                    if (null != agStatusByValue) {
+                        orderoutVo.setReviewStatus(agStatusByValue);
+                    }
                 }
             }
         }

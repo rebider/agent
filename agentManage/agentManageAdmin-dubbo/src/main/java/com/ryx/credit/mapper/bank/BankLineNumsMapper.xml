@@ -238,4 +238,12 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="selectByBankName" parameterType="java.lang.String" resultType="com.ryx.credit.pojo.admin.bank.BankLineNums">
+      select bankid from d_bank_line_nums t
+      where
+      bankname LIKE CONCAT(CONCAT('%',#{bankName}),'%')
+      and rownum=1
+  </select>
+
 </mapper>

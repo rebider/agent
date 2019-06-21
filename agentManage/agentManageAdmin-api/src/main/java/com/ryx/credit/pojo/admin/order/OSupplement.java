@@ -46,6 +46,17 @@ public class OSupplement implements Serializable {
     //实际打款金额--补款页面新增的字段
     private BigDecimal money;
 
+    //付款单的总金额
+    private BigDecimal amount;
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
     public BigDecimal getMoney() {
         return money;
     }

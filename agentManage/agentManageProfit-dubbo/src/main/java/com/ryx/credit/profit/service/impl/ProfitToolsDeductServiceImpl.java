@@ -1,22 +1,18 @@
 package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.PamentSrcType;
 import com.ryx.credit.common.enumc.PaySign;
-import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
-import com.ryx.credit.profit.enums.CitySupplyStatus;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.*;
+import com.ryx.credit.service.order.IOPdSumService;
 import com.ryx.credit.service.order.IPaymentDetailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import sun.rmi.runtime.Log;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -41,6 +37,8 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
     private ProfitDetailMonthService profitDetailMonthServiceImpl;
     @Autowired
     private IPaymentDetailService iPaymentDetailService;
+    @Autowired
+    private IOPdSumService OPdSumService;
 
     private static final String RHB = "5000";
     private static final String POS = "100003";
@@ -474,10 +472,11 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                 map.put("notDeductionAmt", notDeductionAmt.toString());
                 map.put("detailId", deduction.getSourceId());
                 map.put("srcId", deduction.getId());
+                map.put("srcType", PamentSrcType.FENRUN_DIKOU.code);
                 noticeList.add(map);
             }
-            LOG.info("系统已经终审，通知订单系统，机具款变更清算状态，通知数据：{}", JSONObject.toJSON(noticeList));
-            iPaymentDetailService.uploadStatus(noticeList, PaySign.JQ.code);
+            LOG.info("系统已经终审，通知订单系统，机具汇总款变更清算状态，通知数据：{}",JSONObject.toJSON(noticeList));
+            OPdSumService.uploadStatus(noticeList, PaySign.JQ.code);
         }
     }
 
