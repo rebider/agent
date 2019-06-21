@@ -425,7 +425,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             record.setAgentName(agent.getAgName());
             //暂时存基本信息里的，后期在改
             record.setAgDocPro(agent.getAgDocPro());
-            record.setAgDocDistrict(record.getAgDocDistrict());
+            record.setAgDocDistrict(agent.getAgDocDistrict());
         }
         if (1 != busActRelMapper.insertSelective(record)) {
             log.info("订单提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
