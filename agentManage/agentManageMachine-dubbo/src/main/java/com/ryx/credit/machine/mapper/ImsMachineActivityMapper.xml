@@ -1,0 +1,596 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.machine.dao.ImsMachineActivityMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.machine.entity.ImsMachineActivity">
+    <id column="ACTIVITY_ID" jdbcType="CHAR" property="activityId" />
+    <result column="ACTIVITY_NAME" jdbcType="VARCHAR" property="activityName" />
+    <result column="BRAND_CODE" jdbcType="VARCHAR" property="brandCode" />
+    <result column="BRAND_NAME" jdbcType="VARCHAR" property="brandName" />
+    <result column="ACTIVITY_START_TIME" jdbcType="VARCHAR" property="activityStartTime" />
+    <result column="ACTIVITY_END_TIME" jdbcType="VARCHAR" property="activityEndTime" />
+    <result column="ACTIVITY_TYPE" jdbcType="CHAR" property="activityType" />
+    <result column="ACTIVATE_TYPE" jdbcType="CHAR" property="activateType" />
+    <result column="DEPOSIT" jdbcType="DECIMAL" property="deposit" />
+    <result column="CHECK_TYPE" jdbcType="CHAR" property="checkType" />
+    <result column="STAND_TIME" jdbcType="DECIMAL" property="standTime" />
+    <result column="STAND_AMT" jdbcType="DECIMAL" property="standAmt" />
+    <result column="SETTLEMENT_TYPE" jdbcType="CHAR" property="settlementType" />
+    <result column="ACTIVE_RETURN_TYPE" jdbcType="CHAR" property="activeReturnType" />
+    <result column="STAND_RETURN_TYPE" jdbcType="CHAR" property="standReturnType" />
+    <result column="ACTIVE_RETURN_DEPOSIT" jdbcType="DECIMAL" property="activeReturnDeposit" />
+    <result column="ACTIVE_BACK_TYPE" jdbcType="CHAR" property="activeBackType" />
+    <result column="ACTIVE_RETURN_ORG" jdbcType="CHAR" property="activeReturnOrg" />
+    <result column="STAND_RETURN_DEPOSIT" jdbcType="DECIMAL" property="standReturnDeposit" />
+    <result column="STAND_BACK_TYPE" jdbcType="CHAR" property="standBackType" />
+    <result column="STAND_RETURN_ORG" jdbcType="CHAR" property="standReturnOrg" />
+    <result column="EXTRA_BONUS_TYPE" jdbcType="CHAR" property="extraBonusType" />
+    <result column="BONUS_NUM" jdbcType="DECIMAL" property="bonusNum" />
+    <result column="DAYS_PER_PERIOD" jdbcType="DECIMAL" property="daysPerPeriod" />
+    <result column="TRANSACTION_LIMIT" jdbcType="DECIMAL" property="transactionLimit" />
+    <result column="BONUS_RETURN_DEPOSIT" jdbcType="DECIMAL" property="bonusReturnDeposit" />
+    <result column="BONUS_BACK_TYPE" jdbcType="CHAR" property="bonusBackType" />
+    <result column="BONUS_RETURN_ORG" jdbcType="CHAR" property="bonusReturnOrg" />
+    <result column="ACTIVITY_END_TYPE" jdbcType="CHAR" property="activityEndType" />
+    <result column="ACTIVITY_END_LIMIT" jdbcType="DECIMAL" property="activityEndLimit" />
+    <result column="BACK_WAY" jdbcType="CHAR" property="backWay" />
+    <result column="BACK_TYPE" jdbcType="CHAR" property="backType" />
+    <result column="NO_STAND_FINE_TYPE_ONE" jdbcType="CHAR" property="noStandFineTypeOne" />
+    <result column="NO_STAND_FINE_TYPE_TWO" jdbcType="CHAR" property="noStandFineTypeTwo" />
+    <result column="NO_STAND_CHECK_TYPE" jdbcType="CHAR" property="noStandCheckType" />
+    <result column="NO_STAND_CHECK_DAYS" jdbcType="DECIMAL" property="noStandCheckDays" />
+    <result column="NO_STAND_FINE_DEPOSIT" jdbcType="DECIMAL" property="noStandFineDeposit" />
+    <result column="STATUS" jdbcType="CHAR" property="status" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="CREATE_USER" jdbcType="VARCHAR" property="createUser" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="UPDATE_USER" jdbcType="VARCHAR" property="updateUser" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ACTIVITY_ID, ACTIVITY_NAME, BRAND_CODE, BRAND_NAME, ACTIVITY_START_TIME, ACTIVITY_END_TIME, 
+    ACTIVITY_TYPE, ACTIVATE_TYPE, DEPOSIT, CHECK_TYPE, STAND_TIME, STAND_AMT, SETTLEMENT_TYPE, 
+    ACTIVE_RETURN_TYPE, STAND_RETURN_TYPE, ACTIVE_RETURN_DEPOSIT, ACTIVE_BACK_TYPE, ACTIVE_RETURN_ORG, 
+    STAND_RETURN_DEPOSIT, STAND_BACK_TYPE, STAND_RETURN_ORG, EXTRA_BONUS_TYPE, BONUS_NUM, 
+    DAYS_PER_PERIOD, TRANSACTION_LIMIT, BONUS_RETURN_DEPOSIT, BONUS_BACK_TYPE, BONUS_RETURN_ORG, 
+    ACTIVITY_END_TYPE, ACTIVITY_END_LIMIT, BACK_WAY, BACK_TYPE, NO_STAND_FINE_TYPE_ONE, 
+    NO_STAND_FINE_TYPE_TWO, NO_STAND_CHECK_TYPE, NO_STAND_CHECK_DAYS, NO_STAND_FINE_DEPOSIT, 
+    STATUS, CREATE_TIME, CREATE_USER, UPDATE_TIME, UPDATE_USER
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.machine.entity.ImsMachineActivityExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from IMS_MACHINE_ACTIVITY
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from IMS_MACHINE_ACTIVITY
+    where ACTIVITY_ID = #{activityId,jdbcType=CHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.machine.entity.ImsMachineActivityExample">
+    delete from IMS_MACHINE_ACTIVITY
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.machine.entity.ImsMachineActivity">
+    insert into IMS_MACHINE_ACTIVITY (ACTIVITY_ID, ACTIVITY_NAME, BRAND_CODE, 
+      BRAND_NAME, ACTIVITY_START_TIME, ACTIVITY_END_TIME, 
+      ACTIVITY_TYPE, ACTIVATE_TYPE, DEPOSIT, 
+      CHECK_TYPE, STAND_TIME, STAND_AMT, 
+      SETTLEMENT_TYPE, ACTIVE_RETURN_TYPE, STAND_RETURN_TYPE, 
+      ACTIVE_RETURN_DEPOSIT, ACTIVE_BACK_TYPE, ACTIVE_RETURN_ORG, 
+      STAND_RETURN_DEPOSIT, STAND_BACK_TYPE, STAND_RETURN_ORG, 
+      EXTRA_BONUS_TYPE, BONUS_NUM, DAYS_PER_PERIOD, 
+      TRANSACTION_LIMIT, BONUS_RETURN_DEPOSIT, BONUS_BACK_TYPE, 
+      BONUS_RETURN_ORG, ACTIVITY_END_TYPE, ACTIVITY_END_LIMIT, 
+      BACK_WAY, BACK_TYPE, NO_STAND_FINE_TYPE_ONE, 
+      NO_STAND_FINE_TYPE_TWO, NO_STAND_CHECK_TYPE, NO_STAND_CHECK_DAYS, 
+      NO_STAND_FINE_DEPOSIT, STATUS, CREATE_TIME, 
+      CREATE_USER, UPDATE_TIME, UPDATE_USER
+      )
+    values (#{activityId,jdbcType=CHAR}, #{activityName,jdbcType=VARCHAR}, #{brandCode,jdbcType=VARCHAR}, 
+      #{brandName,jdbcType=VARCHAR}, #{activityStartTime,jdbcType=VARCHAR}, #{activityEndTime,jdbcType=VARCHAR}, 
+      #{activityType,jdbcType=CHAR}, #{activateType,jdbcType=CHAR}, #{deposit,jdbcType=DECIMAL}, 
+      #{checkType,jdbcType=CHAR}, #{standTime,jdbcType=DECIMAL}, #{standAmt,jdbcType=DECIMAL}, 
+      #{settlementType,jdbcType=CHAR}, #{activeReturnType,jdbcType=CHAR}, #{standReturnType,jdbcType=CHAR}, 
+      #{activeReturnDeposit,jdbcType=DECIMAL}, #{activeBackType,jdbcType=CHAR}, #{activeReturnOrg,jdbcType=CHAR}, 
+      #{standReturnDeposit,jdbcType=DECIMAL}, #{standBackType,jdbcType=CHAR}, #{standReturnOrg,jdbcType=CHAR}, 
+      #{extraBonusType,jdbcType=CHAR}, #{bonusNum,jdbcType=DECIMAL}, #{daysPerPeriod,jdbcType=DECIMAL}, 
+      #{transactionLimit,jdbcType=DECIMAL}, #{bonusReturnDeposit,jdbcType=DECIMAL}, #{bonusBackType,jdbcType=CHAR}, 
+      #{bonusReturnOrg,jdbcType=CHAR}, #{activityEndType,jdbcType=CHAR}, #{activityEndLimit,jdbcType=DECIMAL}, 
+      #{backWay,jdbcType=CHAR}, #{backType,jdbcType=CHAR}, #{noStandFineTypeOne,jdbcType=CHAR}, 
+      #{noStandFineTypeTwo,jdbcType=CHAR}, #{noStandCheckType,jdbcType=CHAR}, #{noStandCheckDays,jdbcType=DECIMAL}, 
+      #{noStandFineDeposit,jdbcType=DECIMAL}, #{status,jdbcType=CHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{createUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.machine.entity.ImsMachineActivity">
+    insert into IMS_MACHINE_ACTIVITY
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="activityId != null">
+        ACTIVITY_ID,
+      </if>
+      <if test="activityName != null">
+        ACTIVITY_NAME,
+      </if>
+      <if test="brandCode != null">
+        BRAND_CODE,
+      </if>
+      <if test="brandName != null">
+        BRAND_NAME,
+      </if>
+      <if test="activityStartTime != null">
+        ACTIVITY_START_TIME,
+      </if>
+      <if test="activityEndTime != null">
+        ACTIVITY_END_TIME,
+      </if>
+      <if test="activityType != null">
+        ACTIVITY_TYPE,
+      </if>
+      <if test="activateType != null">
+        ACTIVATE_TYPE,
+      </if>
+      <if test="deposit != null">
+        DEPOSIT,
+      </if>
+      <if test="checkType != null">
+        CHECK_TYPE,
+      </if>
+      <if test="standTime != null">
+        STAND_TIME,
+      </if>
+      <if test="standAmt != null">
+        STAND_AMT,
+      </if>
+      <if test="settlementType != null">
+        SETTLEMENT_TYPE,
+      </if>
+      <if test="activeReturnType != null">
+        ACTIVE_RETURN_TYPE,
+      </if>
+      <if test="standReturnType != null">
+        STAND_RETURN_TYPE,
+      </if>
+      <if test="activeReturnDeposit != null">
+        ACTIVE_RETURN_DEPOSIT,
+      </if>
+      <if test="activeBackType != null">
+        ACTIVE_BACK_TYPE,
+      </if>
+      <if test="activeReturnOrg != null">
+        ACTIVE_RETURN_ORG,
+      </if>
+      <if test="standReturnDeposit != null">
+        STAND_RETURN_DEPOSIT,
+      </if>
+      <if test="standBackType != null">
+        STAND_BACK_TYPE,
+      </if>
+      <if test="standReturnOrg != null">
+        STAND_RETURN_ORG,
+      </if>
+      <if test="extraBonusType != null">
+        EXTRA_BONUS_TYPE,
+      </if>
+      <if test="bonusNum != null">
+        BONUS_NUM,
+      </if>
+      <if test="daysPerPeriod != null">
+        DAYS_PER_PERIOD,
+      </if>
+      <if test="transactionLimit != null">
+        TRANSACTION_LIMIT,
+      </if>
+      <if test="bonusReturnDeposit != null">
+        BONUS_RETURN_DEPOSIT,
+      </if>
+      <if test="bonusBackType != null">
+        BONUS_BACK_TYPE,
+      </if>
+      <if test="bonusReturnOrg != null">
+        BONUS_RETURN_ORG,
+      </if>
+      <if test="activityEndType != null">
+        ACTIVITY_END_TYPE,
+      </if>
+      <if test="activityEndLimit != null">
+        ACTIVITY_END_LIMIT,
+      </if>
+      <if test="backWay != null">
+        BACK_WAY,
+      </if>
+      <if test="backType != null">
+        BACK_TYPE,
+      </if>
+      <if test="noStandFineTypeOne != null">
+        NO_STAND_FINE_TYPE_ONE,
+      </if>
+      <if test="noStandFineTypeTwo != null">
+        NO_STAND_FINE_TYPE_TWO,
+      </if>
+      <if test="noStandCheckType != null">
+        NO_STAND_CHECK_TYPE,
+      </if>
+      <if test="noStandCheckDays != null">
+        NO_STAND_CHECK_DAYS,
+      </if>
+      <if test="noStandFineDeposit != null">
+        NO_STAND_FINE_DEPOSIT,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+      <if test="createUser != null">
+        CREATE_USER,
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME,
+      </if>
+      <if test="updateUser != null">
+        UPDATE_USER,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="activityId != null">
+        #{activityId,jdbcType=CHAR},
+      </if>
+      <if test="activityName != null">
+        #{activityName,jdbcType=VARCHAR},
+      </if>
+      <if test="brandCode != null">
+        #{brandCode,jdbcType=VARCHAR},
+      </if>
+      <if test="brandName != null">
+        #{brandName,jdbcType=VARCHAR},
+      </if>
+      <if test="activityStartTime != null">
+        #{activityStartTime,jdbcType=VARCHAR},
+      </if>
+      <if test="activityEndTime != null">
+        #{activityEndTime,jdbcType=VARCHAR},
+      </if>
+      <if test="activityType != null">
+        #{activityType,jdbcType=CHAR},
+      </if>
+      <if test="activateType != null">
+        #{activateType,jdbcType=CHAR},
+      </if>
+      <if test="deposit != null">
+        #{deposit,jdbcType=DECIMAL},
+      </if>
+      <if test="checkType != null">
+        #{checkType,jdbcType=CHAR},
+      </if>
+      <if test="standTime != null">
+        #{standTime,jdbcType=DECIMAL},
+      </if>
+      <if test="standAmt != null">
+        #{standAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="settlementType != null">
+        #{settlementType,jdbcType=CHAR},
+      </if>
+      <if test="activeReturnType != null">
+        #{activeReturnType,jdbcType=CHAR},
+      </if>
+      <if test="standReturnType != null">
+        #{standReturnType,jdbcType=CHAR},
+      </if>
+      <if test="activeReturnDeposit != null">
+        #{activeReturnDeposit,jdbcType=DECIMAL},
+      </if>
+      <if test="activeBackType != null">
+        #{activeBackType,jdbcType=CHAR},
+      </if>
+      <if test="activeReturnOrg != null">
+        #{activeReturnOrg,jdbcType=CHAR},
+      </if>
+      <if test="standReturnDeposit != null">
+        #{standReturnDeposit,jdbcType=DECIMAL},
+      </if>
+      <if test="standBackType != null">
+        #{standBackType,jdbcType=CHAR},
+      </if>
+      <if test="standReturnOrg != null">
+        #{standReturnOrg,jdbcType=CHAR},
+      </if>
+      <if test="extraBonusType != null">
+        #{extraBonusType,jdbcType=CHAR},
+      </if>
+      <if test="bonusNum != null">
+        #{bonusNum,jdbcType=DECIMAL},
+      </if>
+      <if test="daysPerPeriod != null">
+        #{daysPerPeriod,jdbcType=DECIMAL},
+      </if>
+      <if test="transactionLimit != null">
+        #{transactionLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="bonusReturnDeposit != null">
+        #{bonusReturnDeposit,jdbcType=DECIMAL},
+      </if>
+      <if test="bonusBackType != null">
+        #{bonusBackType,jdbcType=CHAR},
+      </if>
+      <if test="bonusReturnOrg != null">
+        #{bonusReturnOrg,jdbcType=CHAR},
+      </if>
+      <if test="activityEndType != null">
+        #{activityEndType,jdbcType=CHAR},
+      </if>
+      <if test="activityEndLimit != null">
+        #{activityEndLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="backWay != null">
+        #{backWay,jdbcType=CHAR},
+      </if>
+      <if test="backType != null">
+        #{backType,jdbcType=CHAR},
+      </if>
+      <if test="noStandFineTypeOne != null">
+        #{noStandFineTypeOne,jdbcType=CHAR},
+      </if>
+      <if test="noStandFineTypeTwo != null">
+        #{noStandFineTypeTwo,jdbcType=CHAR},
+      </if>
+      <if test="noStandCheckType != null">
+        #{noStandCheckType,jdbcType=CHAR},
+      </if>
+      <if test="noStandCheckDays != null">
+        #{noStandCheckDays,jdbcType=DECIMAL},
+      </if>
+      <if test="noStandFineDeposit != null">
+        #{noStandFineDeposit,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=CHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUser != null">
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        #{updateUser,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.machine.entity.ImsMachineActivityExample" resultType="java.lang.Long">
+    select count(*) from IMS_MACHINE_ACTIVITY
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.machine.entity.ImsMachineActivity">
+    update IMS_MACHINE_ACTIVITY
+    <set>
+      <if test="activityName != null">
+        ACTIVITY_NAME = #{activityName,jdbcType=VARCHAR},
+      </if>
+      <if test="brandCode != null">
+        BRAND_CODE = #{brandCode,jdbcType=VARCHAR},
+      </if>
+      <if test="brandName != null">
+        BRAND_NAME = #{brandName,jdbcType=VARCHAR},
+      </if>
+      <if test="activityStartTime != null">
+        ACTIVITY_START_TIME = #{activityStartTime,jdbcType=VARCHAR},
+      </if>
+      <if test="activityEndTime != null">
+        ACTIVITY_END_TIME = #{activityEndTime,jdbcType=VARCHAR},
+      </if>
+      <if test="activityType != null">
+        ACTIVITY_TYPE = #{activityType,jdbcType=CHAR},
+      </if>
+      <if test="activateType != null">
+        ACTIVATE_TYPE = #{activateType,jdbcType=CHAR},
+      </if>
+      <if test="deposit != null">
+        DEPOSIT = #{deposit,jdbcType=DECIMAL},
+      </if>
+      <if test="checkType != null">
+        CHECK_TYPE = #{checkType,jdbcType=CHAR},
+      </if>
+      <if test="standTime != null">
+        STAND_TIME = #{standTime,jdbcType=DECIMAL},
+      </if>
+      <if test="standAmt != null">
+        STAND_AMT = #{standAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="settlementType != null">
+        SETTLEMENT_TYPE = #{settlementType,jdbcType=CHAR},
+      </if>
+      <if test="activeReturnType != null">
+        ACTIVE_RETURN_TYPE = #{activeReturnType,jdbcType=CHAR},
+      </if>
+      <if test="standReturnType != null">
+        STAND_RETURN_TYPE = #{standReturnType,jdbcType=CHAR},
+      </if>
+      <if test="activeReturnDeposit != null">
+        ACTIVE_RETURN_DEPOSIT = #{activeReturnDeposit,jdbcType=DECIMAL},
+      </if>
+      <if test="activeBackType != null">
+        ACTIVE_BACK_TYPE = #{activeBackType,jdbcType=CHAR},
+      </if>
+      <if test="activeReturnOrg != null">
+        ACTIVE_RETURN_ORG = #{activeReturnOrg,jdbcType=CHAR},
+      </if>
+      <if test="standReturnDeposit != null">
+        STAND_RETURN_DEPOSIT = #{standReturnDeposit,jdbcType=DECIMAL},
+      </if>
+      <if test="standBackType != null">
+        STAND_BACK_TYPE = #{standBackType,jdbcType=CHAR},
+      </if>
+      <if test="standReturnOrg != null">
+        STAND_RETURN_ORG = #{standReturnOrg,jdbcType=CHAR},
+      </if>
+      <if test="extraBonusType != null">
+        EXTRA_BONUS_TYPE = #{extraBonusType,jdbcType=CHAR},
+      </if>
+      <if test="bonusNum != null">
+        BONUS_NUM = #{bonusNum,jdbcType=DECIMAL},
+      </if>
+      <if test="daysPerPeriod != null">
+        DAYS_PER_PERIOD = #{daysPerPeriod,jdbcType=DECIMAL},
+      </if>
+      <if test="transactionLimit != null">
+        TRANSACTION_LIMIT = #{transactionLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="bonusReturnDeposit != null">
+        BONUS_RETURN_DEPOSIT = #{bonusReturnDeposit,jdbcType=DECIMAL},
+      </if>
+      <if test="bonusBackType != null">
+        BONUS_BACK_TYPE = #{bonusBackType,jdbcType=CHAR},
+      </if>
+      <if test="bonusReturnOrg != null">
+        BONUS_RETURN_ORG = #{bonusReturnOrg,jdbcType=CHAR},
+      </if>
+      <if test="activityEndType != null">
+        ACTIVITY_END_TYPE = #{activityEndType,jdbcType=CHAR},
+      </if>
+      <if test="activityEndLimit != null">
+        ACTIVITY_END_LIMIT = #{activityEndLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="backWay != null">
+        BACK_WAY = #{backWay,jdbcType=CHAR},
+      </if>
+      <if test="backType != null">
+        BACK_TYPE = #{backType,jdbcType=CHAR},
+      </if>
+      <if test="noStandFineTypeOne != null">
+        NO_STAND_FINE_TYPE_ONE = #{noStandFineTypeOne,jdbcType=CHAR},
+      </if>
+      <if test="noStandFineTypeTwo != null">
+        NO_STAND_FINE_TYPE_TWO = #{noStandFineTypeTwo,jdbcType=CHAR},
+      </if>
+      <if test="noStandCheckType != null">
+        NO_STAND_CHECK_TYPE = #{noStandCheckType,jdbcType=CHAR},
+      </if>
+      <if test="noStandCheckDays != null">
+        NO_STAND_CHECK_DAYS = #{noStandCheckDays,jdbcType=DECIMAL},
+      </if>
+      <if test="noStandFineDeposit != null">
+        NO_STAND_FINE_DEPOSIT = #{noStandFineDeposit,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=CHAR},
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUser != null">
+        CREATE_USER = #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ACTIVITY_ID = #{activityId,jdbcType=CHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.machine.entity.ImsMachineActivity">
+    update IMS_MACHINE_ACTIVITY
+    set ACTIVITY_NAME = #{activityName,jdbcType=VARCHAR},
+      BRAND_CODE = #{brandCode,jdbcType=VARCHAR},
+      BRAND_NAME = #{brandName,jdbcType=VARCHAR},
+      ACTIVITY_START_TIME = #{activityStartTime,jdbcType=VARCHAR},
+      ACTIVITY_END_TIME = #{activityEndTime,jdbcType=VARCHAR},
+      ACTIVITY_TYPE = #{activityType,jdbcType=CHAR},
+      ACTIVATE_TYPE = #{activateType,jdbcType=CHAR},
+      DEPOSIT = #{deposit,jdbcType=DECIMAL},
+      CHECK_TYPE = #{checkType,jdbcType=CHAR},
+      STAND_TIME = #{standTime,jdbcType=DECIMAL},
+      STAND_AMT = #{standAmt,jdbcType=DECIMAL},
+      SETTLEMENT_TYPE = #{settlementType,jdbcType=CHAR},
+      ACTIVE_RETURN_TYPE = #{activeReturnType,jdbcType=CHAR},
+      STAND_RETURN_TYPE = #{standReturnType,jdbcType=CHAR},
+      ACTIVE_RETURN_DEPOSIT = #{activeReturnDeposit,jdbcType=DECIMAL},
+      ACTIVE_BACK_TYPE = #{activeBackType,jdbcType=CHAR},
+      ACTIVE_RETURN_ORG = #{activeReturnOrg,jdbcType=CHAR},
+      STAND_RETURN_DEPOSIT = #{standReturnDeposit,jdbcType=DECIMAL},
+      STAND_BACK_TYPE = #{standBackType,jdbcType=CHAR},
+      STAND_RETURN_ORG = #{standReturnOrg,jdbcType=CHAR},
+      EXTRA_BONUS_TYPE = #{extraBonusType,jdbcType=CHAR},
+      BONUS_NUM = #{bonusNum,jdbcType=DECIMAL},
+      DAYS_PER_PERIOD = #{daysPerPeriod,jdbcType=DECIMAL},
+      TRANSACTION_LIMIT = #{transactionLimit,jdbcType=DECIMAL},
+      BONUS_RETURN_DEPOSIT = #{bonusReturnDeposit,jdbcType=DECIMAL},
+      BONUS_BACK_TYPE = #{bonusBackType,jdbcType=CHAR},
+      BONUS_RETURN_ORG = #{bonusReturnOrg,jdbcType=CHAR},
+      ACTIVITY_END_TYPE = #{activityEndType,jdbcType=CHAR},
+      ACTIVITY_END_LIMIT = #{activityEndLimit,jdbcType=DECIMAL},
+      BACK_WAY = #{backWay,jdbcType=CHAR},
+      BACK_TYPE = #{backType,jdbcType=CHAR},
+      NO_STAND_FINE_TYPE_ONE = #{noStandFineTypeOne,jdbcType=CHAR},
+      NO_STAND_FINE_TYPE_TWO = #{noStandFineTypeTwo,jdbcType=CHAR},
+      NO_STAND_CHECK_TYPE = #{noStandCheckType,jdbcType=CHAR},
+      NO_STAND_CHECK_DAYS = #{noStandCheckDays,jdbcType=DECIMAL},
+      NO_STAND_FINE_DEPOSIT = #{noStandFineDeposit,jdbcType=DECIMAL},
+      STATUS = #{status,jdbcType=CHAR},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      CREATE_USER = #{createUser,jdbcType=VARCHAR},
+      UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      UPDATE_USER = #{updateUser,jdbcType=VARCHAR}
+    where ACTIVITY_ID = #{activityId,jdbcType=CHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

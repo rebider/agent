@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ryx.credit.machine.dao.ImsTermWarehouseDetailMapper">
+
   <resultMap id="BaseResultMap" type="com.ryx.credit.machine.entity.ImsTermWarehouseDetail">
     <id column="POS_SN" jdbcType="VARCHAR" property="posSn" />
     <result column="WD_ID" jdbcType="VARCHAR" property="wdId" />
@@ -19,6 +20,8 @@
     <result column="POS_SPE_PRICE" jdbcType="DECIMAL" property="posSpePrice" />
     <result column="DELIVERY_TIME" jdbcType="VARCHAR" property="deliveryTime" />
     <result column="STAND_TIME" jdbcType="DECIMAL" property="standTime" />
+    <result column="ACTIVITY_ID" jdbcType="CHAR" property="activityId" />
+    <result column="BRAND_CODE" jdbcType="VARCHAR" property="brandCode" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -52,7 +55,7 @@
   <sql id="Base_Column_List">
     POS_SN, WD_ID, MACHINE_ID, ORG_ID, MER_ID, TERM_ID, USE_STATUS, STATUS, CREATE_TIME, 
     CREATE_PERSON, UPDATE_TIME, POS_TYPE, PAY_STATUS, PAY_TIME, POS_SPE_PRICE, DELIVERY_TIME, 
-    STAND_TIME
+    STAND_TIME, ACTIVITY_ID, BRAND_CODE
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.machine.entity.ImsTermWarehouseDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -88,13 +91,15 @@
       USE_STATUS, STATUS, CREATE_TIME, 
       CREATE_PERSON, UPDATE_TIME, POS_TYPE, 
       PAY_STATUS, PAY_TIME, POS_SPE_PRICE, 
-      DELIVERY_TIME, STAND_TIME)
+      DELIVERY_TIME, STAND_TIME, ACTIVITY_ID, 
+      BRAND_CODE)
     values (#{posSn,jdbcType=VARCHAR}, #{wdId,jdbcType=VARCHAR}, #{machineId,jdbcType=VARCHAR}, 
       #{orgId,jdbcType=VARCHAR}, #{merId,jdbcType=VARCHAR}, #{termId,jdbcType=VARCHAR}, 
       #{useStatus,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{createTime,jdbcType=VARCHAR}, 
       #{createPerson,jdbcType=VARCHAR}, #{updateTime,jdbcType=VARCHAR}, #{posType,jdbcType=VARCHAR}, 
       #{payStatus,jdbcType=VARCHAR}, #{payTime,jdbcType=VARCHAR}, #{posSpePrice,jdbcType=DECIMAL}, 
-      #{deliveryTime,jdbcType=VARCHAR}, #{standTime,jdbcType=DECIMAL})
+      #{deliveryTime,jdbcType=VARCHAR}, #{standTime,jdbcType=DECIMAL}, #{activityId,jdbcType=CHAR}, 
+      #{brandCode,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.machine.entity.ImsTermWarehouseDetail">
     insert into IMS_TERM_WAREHOUSE_DETAIL
@@ -150,6 +155,12 @@
       <if test="standTime != null">
         STAND_TIME,
       </if>
+      <if test="activityId != null">
+        ACTIVITY_ID,
+      </if>
+      <if test="brandCode != null">
+        BRAND_CODE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="posSn != null">
@@ -202,6 +213,12 @@
       </if>
       <if test="standTime != null">
         #{standTime,jdbcType=DECIMAL},
+      </if>
+      <if test="activityId != null">
+        #{activityId,jdbcType=CHAR},
+      </if>
+      <if test="brandCode != null">
+        #{brandCode,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -262,6 +279,12 @@
       <if test="standTime != null">
         STAND_TIME = #{standTime,jdbcType=DECIMAL},
       </if>
+      <if test="activityId != null">
+        ACTIVITY_ID = #{activityId,jdbcType=CHAR},
+      </if>
+      <if test="brandCode != null">
+        BRAND_CODE = #{brandCode,jdbcType=VARCHAR},
+      </if>
     </set>
     where POS_SN = #{posSn,jdbcType=VARCHAR}
   </update>
@@ -282,7 +305,9 @@
       PAY_TIME = #{payTime,jdbcType=VARCHAR},
       POS_SPE_PRICE = #{posSpePrice,jdbcType=DECIMAL},
       DELIVERY_TIME = #{deliveryTime,jdbcType=VARCHAR},
-      STAND_TIME = #{standTime,jdbcType=DECIMAL}
+      STAND_TIME = #{standTime,jdbcType=DECIMAL},
+      ACTIVITY_ID = #{activityId,jdbcType=CHAR},
+      BRAND_CODE = #{brandCode,jdbcType=VARCHAR}
     where POS_SN = #{posSn,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
