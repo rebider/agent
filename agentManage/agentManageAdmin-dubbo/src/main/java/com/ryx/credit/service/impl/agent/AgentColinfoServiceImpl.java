@@ -13,6 +13,7 @@ import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
 import com.ryx.credit.service.dict.IdService;
+import com.ryx.credit.service.pay.LivenessDetectionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,11 +50,12 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
     private AttachmentMapper attachmentMapper;
     @Autowired
     private AColinfoPaymentMapper colinfoPaymentMapper;
+    @Autowired
+    private LivenessDetectionService livenessDetectionService;
 
 
     /**
      * 代理商入网添加代理商交款项
-     *
      * @param ac
      * @param att
      * @return
@@ -239,6 +241,34 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
 
                 checkColInfo(agentColinfoVo);
 
+                //收款账户对私时做校验
+                String agentName = agent.getAgName();
+                String agLegalName = agent.getAgLegal();
+                String trueName = agentColinfoVo.getCloRealname();
+                String certNo = agentColinfoVo.getAgLegalCernum();
+                if (agentColinfoVo.getCloType().compareTo(new BigDecimal(2)) == 0) {
+                    //对私时 收款账户名与法人姓名一致时 把法人身份证号拷贝到户主身份证号并进行认证
+                    if (agLegalName.equals(trueName)) {
+                        agentColinfoVo.setAgLegalCernum(agent.getAgLegalCernum());
+                    } else {
+                        if (StringUtils.isNotBlank(certNo)) {
+                            //校验收款账户身份认证
+                            AgentResult result = livenessDetectionService.livenessDetection(trueName, certNo, userId);
+                            if (!result.isOK()) {
+                                throw new ProcessException("收款账户身份认证异常");
+                            }
+                        } else {
+                            throw new ProcessException("请输入收款账户名相对应的户主证件号");
+                        }
+                    }
+                }
+                //对公时 判断收款账户名是否与代理商名称一致 不一致则抛异常提示信息
+                if (agentColinfoVo.getCloType().compareTo(new BigDecimal(1)) == 0) {
+                    if (!agentName.equals(trueName)) {
+                        throw new ProcessException("收款账户名与代理商名称不一致");
+                    }
+                }
+
                 agentColinfoVo.setcUser(agent.getcUser());
                 agentColinfoVo.setAgentId(agent.getId());
                 if (org.apache.commons.lang.StringUtils.isEmpty(agentColinfoVo.getId())) {
@@ -263,6 +293,11 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                     db_AgentColinfo.setCloTaxPoint(agentColinfoVo.getCloTaxPoint());
                     db_AgentColinfo.setCloBankCode(agentColinfoVo.getCloBankCode());
                     db_AgentColinfo.setPayStatus(ColinfoPayStatus.A.getValue());
+                    if (agLegalName.equals(trueName)) {
+                        db_AgentColinfo.setAgLegalCernum(agent.getAgLegalCernum());
+                    } else {
+                        db_AgentColinfo.setAgLegalCernum(agentColinfoVo.getAgLegalCernum());
+                    }
                     if (1 != agentColinfoMapper.updateByPrimaryKeySelective(db_AgentColinfo)) {
                         throw new MessageException("更新收款信息失败");
                     } else {
@@ -553,7 +588,6 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
 
     /**
      * 查询代理商是否有多个收款账户
-     *
      * @return
      */
     @Override
