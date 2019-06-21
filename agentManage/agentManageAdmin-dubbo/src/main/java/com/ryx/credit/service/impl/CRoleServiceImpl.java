@@ -25,4 +25,10 @@ public class CRoleServiceImpl implements CRoleService {
     public Set<String> selectShiroUrl(Long userId,String pid,String url){
         return roleMapper.selectShiroUrl(userId,pid,url);
     }
+
+    @Override
+    public Set<String> findFinanceRole(Long userId){
+        return roleMapper.findFinanceRole(userId);
+    }
+
 }

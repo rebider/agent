@@ -111,7 +111,9 @@ public class ActRuTaskServiceImpl implements ActRuTaskService {
         String netInUrlsPid = AppConfig.getProperty("netInUrls_pid");
         Set<String> dbUrls = roleService.selectShiroUrl((Long) param.get("userId"),dbUrlsPid,"/BusActRelBusType");
         Set<String> netInUrls = roleService.selectShiroUrl((Long) param.get("userId"),netInUrlsPid,"");
+        Set<String> roleNames = roleService.findFinanceRole((Long) param.get("userId"));
 
+        param.put("roleNames",roleNames);
         param.put("dbUrls",dbUrls);
         param.put("netInUrls",netInUrls);
         List<Map<String, Object>> taskList = actRuTaskMapper.queryMyTaskPage(param,page);
