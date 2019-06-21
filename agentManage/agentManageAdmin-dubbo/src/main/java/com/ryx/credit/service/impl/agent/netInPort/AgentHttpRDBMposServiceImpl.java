@@ -73,11 +73,11 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         String customerPid = ""; //身份证
         String userName = "";  //法人姓名
         if( agentColinfo.getCloType().compareTo(BigDecimal.ONE) == 0){ //对公
-            accountType = "00";
+            accountType = "01";
             customerPid = agent.getAgLegalCernum();
             userName = agent.getAgLegal();
         }else{
-            accountType = "01";
+            accountType = "00";
             customerPid = agentColinfo.getAgLegalCernum();
             userName = agentColinfo.getCloRealname();
         }
@@ -263,11 +263,11 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         String customerPid = ""; //身份证
         String userName = "";  //法人姓名
         if( agentColinfo.getCloType().compareTo(BigDecimal.ONE) == 0){ //对公
-            accountType = "00";
+            accountType = "01";
             customerPid = agent.getAgLegalCernum();
             userName = agent.getAgLegal();
         }else{
-            accountType = "01";
+            accountType = "00";
             customerPid = agentColinfo.getAgLegalCernum();
             userName = agentColinfo.getCloRealname();
         }
