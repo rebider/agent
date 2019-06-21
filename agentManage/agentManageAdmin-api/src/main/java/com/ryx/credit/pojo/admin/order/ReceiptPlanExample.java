@@ -1457,6 +1457,76 @@ public class ReceiptPlanExample {
             addCriterion("MODEL not between", value1, value2, "model");
             return (Criteria) this;
         }
+
+        public Criteria andActivityIdIsNull() {
+            addCriterion("ACTIVITY_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityIdIsNotNull() {
+            addCriterion("ACTIVITY_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityIdEqualTo(String value) {
+            addCriterion("ACTIVITY_ID =", value, "activityId");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityIdNotEqualTo(String value) {
+            addCriterion("ACTIVITY_ID <>", value, "activityId");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityIdGreaterThan(String value) {
+            addCriterion("ACTIVITY_ID >", value, "activityId");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityIdGreaterThanOrEqualTo(String value) {
+            addCriterion("ACTIVITY_ID >=", value, "activityId");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityIdLessThan(String value) {
+            addCriterion("ACTIVITY_ID <", value, "activityId");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityIdLessThanOrEqualTo(String value) {
+            addCriterion("ACTIVITY_ID <=", value, "activityId");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityIdLike(String value) {
+            addCriterion("ACTIVITY_ID like", value, "activityId");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityIdNotLike(String value) {
+            addCriterion("ACTIVITY_ID not like", value, "activityId");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityIdIn(List<String> values) {
+            addCriterion("ACTIVITY_ID in", values, "activityId");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityIdNotIn(List<String> values) {
+            addCriterion("ACTIVITY_ID not in", values, "activityId");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityIdBetween(String value1, String value2) {
+            addCriterion("ACTIVITY_ID between", value1, value2, "activityId");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityIdNotBetween(String value1, String value2) {
+            addCriterion("ACTIVITY_ID not between", value1, value2, "activityId");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

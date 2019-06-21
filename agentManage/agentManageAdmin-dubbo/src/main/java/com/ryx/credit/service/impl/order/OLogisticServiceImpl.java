@@ -175,6 +175,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
             String proType="";
             String planProNum="";
             String proComString="";
+            String isSend="1";
+
             List col = Arrays.asList(ReceiptPlanExportColum.ReceiptPlanExportColum_column.col);
             planNum = String.valueOf(objectList.get(col.indexOf("PLAN_NUM"))).trim();
             orderId = String.valueOf(objectList.get(col.indexOf("ORDER_ID"))).trim();
@@ -193,6 +195,13 @@ public class OLogisticServiceImpl implements OLogisticsService {
             proType = String.valueOf(objectList.get(col.indexOf("PRO_TYPE"))).trim();
             planProNum = String.valueOf(objectList.get(col.indexOf("PLAN_PRO_NUM"))).trim();
             proComString = String.valueOf(objectList.get(col.indexOf("PRO_COM_STRING"))).trim();
+            if(objectList.size()>col.indexOf("isSend")) {
+                try {
+                    isSend = String.valueOf(objectList.get(col.indexOf("isSend"))).trim();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
 
             if (StringUtils.isBlank(sendDate)) {
                 logger.info("发货日期不能为空");
@@ -294,6 +303,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
             OActivity oActivity = oActivityMapper.selectByPrimaryKey(oSubOrderActivity.getActivityId());
 
+
             //物流检查
             OLogisticsExample oLogisticsExample = new OLogisticsExample();
             OLogisticsExample.Criteria OLogisticsExample_criteria1 = oLogisticsExample.createCriteria();
@@ -324,6 +334,9 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     throw new MessageException("发货数量已大于排单数量");
                 }
             }
+           //排单的活动 下发到业务系统使用此活动
+           OActivity oActivity_plan = oActivityMapper.selectByPrimaryKey(planVo.getActivityId());
+
 
             //物流信息
             OLogistics oLogistics = new OLogistics();
@@ -475,10 +488,10 @@ public class OLogisticServiceImpl implements OLogisticsService {
                             throw new MessageException("查询业务数据失败！");
                         }
                         imsTermWarehouseDetail.setOrgId(agentBusInfo.getBusNum());
-                        imsTermWarehouseDetail.setMachineId(oSubOrderActivity.getBusProCode());
-                        imsTermWarehouseDetail.setPosSpePrice(oSubOrderActivity.getPosSpePrice());
-                        imsTermWarehouseDetail.setPosType(oSubOrderActivity.getPosType());
-                        imsTermWarehouseDetail.setStandTime(oSubOrderActivity.getStandTime());
+                        imsTermWarehouseDetail.setMachineId(oActivity_plan.getBusProCode());
+                        imsTermWarehouseDetail.setPosSpePrice(oActivity_plan.getPosSpePrice());
+                        imsTermWarehouseDetail.setPosType(oActivity_plan.getPosType());
+                        imsTermWarehouseDetail.setStandTime(oActivity_plan.getStandTime());
                         OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
                         try {
                             //机具下发接口
@@ -780,10 +793,15 @@ public class OLogisticServiceImpl implements OLogisticsService {
         if(oSubOrders.size()==0){
             throw new MessageException("商品价格未能锁定");
         }
+        //商品活动
         OSubOrder oSubOrder = oSubOrders.get(0);
         OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
         oSubOrderActivityExample.or().andSubOrderIdEqualTo(oSubOrder.getId()).andProIdEqualTo(oSubOrder.getProId()).andStatusEqualTo(Status.STATUS_1.status);
         List<OSubOrderActivity>  OSubOrderActivitylist = oSubOrderActivityMapper.selectByExample(oSubOrderActivityExample);
+
+        //排单活动
+        OActivity OActivity_plan = oActivityMapper.selectByPrimaryKey(planVo.getActivityId());
+
         OOrder order = oOrderMapper.selectByPrimaryKey(oSubOrder.getOrderId());
         //1.起始SN序列号  2.结束SN序列号  3.开始截取的位数   4.结束截取的位数
         if (StringUtils.isBlank(startSn)) {
@@ -830,21 +848,20 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 detail.setProId(oSubOrder.getProId());
                 detail.setProName(oSubOrder.getProName());
                 detail.setSettlementPrice(oSubOrder.getProRelPrice());
-                if(OSubOrderActivitylist.size()>0){
-                    OSubOrderActivity oSubOrderActivity = OSubOrderActivitylist.get(0);
-                    detail.setActivityId(oSubOrderActivity.getActivityId());
-                    detail.setActivityName(oSubOrderActivity.getActivityName());
-                    detail.setgTime(oSubOrderActivity.getgTime());
-                    detail.setBusProCode(oSubOrderActivity.getBusProCode());
-                    detail.setBusProName(oSubOrderActivity.getBusProName());
-                    detail.setTermBatchcode(oSubOrderActivity.getTermBatchcode());
-                    detail.setTermBatchname(oSubOrderActivity.getTermBatchname());
-                    detail.setTermtype(oSubOrderActivity.getTermtype());
-                    detail.setTermtypename(oSubOrderActivity.getTermtypename());
-                    detail.setSettlementPrice(oSubOrderActivity.getPrice());
-                    detail.setPosType(oSubOrderActivity.getPosType());
-                    detail.setPosSpePrice(oSubOrderActivity.getPosSpePrice());
-                    detail.setStandTime(oSubOrderActivity.getStandTime());
+                if(OActivity_plan!=null){
+                    detail.setActivityId(OActivity_plan.getId());
+                    detail.setActivityName(OActivity_plan.getActivityName());
+                    detail.setgTime(OActivity_plan.getgTime());
+                    detail.setBusProCode(OActivity_plan.getBusProCode());
+                    detail.setBusProName(OActivity_plan.getBusProName());
+                    detail.setTermBatchcode(OActivity_plan.getTermBatchcode());
+                    detail.setTermBatchname(OActivity_plan.getTermBatchname());
+                    detail.setTermtype(OActivity_plan.getTermtype());
+                    detail.setTermtypename(OActivity_plan.getTermtypename());
+                    detail.setSettlementPrice(OActivity_plan.getPrice());
+                    detail.setPosType(OActivity_plan.getPosType());
+                    detail.setPosSpePrice(OActivity_plan.getPosSpePrice());
+                    detail.setStandTime(OActivity_plan.getStandTime());
                 }
                 detail.setSnNum(idSn);
                 detail.setAgentId(order.getAgentId());
@@ -891,11 +908,15 @@ public class OLogisticServiceImpl implements OLogisticsService {
         if(oSubOrders.size()==0){
             throw new MessageException("商品价格未能锁定");
         }
+
         OSubOrder oSubOrder = oSubOrders.get(0);
         OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
         oSubOrderActivityExample.or().andSubOrderIdEqualTo(oSubOrder.getId()).andProIdEqualTo(oSubOrder.getProId()).andStatusEqualTo(Status.STATUS_1.status);
         List<OSubOrderActivity>  OSubOrderActivitylist = oSubOrderActivityMapper.selectByExample(oSubOrderActivityExample);
         OOrder order = oOrderMapper.selectByPrimaryKey(oSubOrder.getOrderId());
+
+        //排单活动
+        OActivity OActivity_plan = oActivityMapper.selectByPrimaryKey(planVo.getActivityId());
 
         List<OLogisticsDetail> resOLogisticsDetail = new ArrayList();
         if (null != idList && idList.size() > 0) {
@@ -927,21 +948,20 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 detail.setProId(oSubOrder.getProId());
                 detail.setProName(oSubOrder.getProName());
                 detail.setSettlementPrice(oSubOrder.getProRelPrice());
-                if(OSubOrderActivitylist.size()>0){
-                    OSubOrderActivity oSubOrderActivity = OSubOrderActivitylist.get(0);
-                    detail.setActivityId(oSubOrderActivity.getActivityId());
-                    detail.setActivityName(oSubOrderActivity.getActivityName());
-                    detail.setgTime(oSubOrderActivity.getgTime());
-                    detail.setBusProCode(oSubOrderActivity.getBusProCode());
-                    detail.setBusProName(oSubOrderActivity.getBusProName());
-                    detail.setTermBatchcode(oSubOrderActivity.getTermBatchcode());
-                    detail.setTermBatchname(oSubOrderActivity.getTermBatchname());
-                    detail.setTermtype(oSubOrderActivity.getTermtype());
-                    detail.setTermtypename(oSubOrderActivity.getTermtypename());
-                    detail.setSettlementPrice(oSubOrderActivity.getPrice());
-                    detail.setPosType(oSubOrderActivity.getPosType());
-                    detail.setPosSpePrice(oSubOrderActivity.getPosSpePrice());
-                    detail.setStandTime(oSubOrderActivity.getStandTime());
+                if(OActivity_plan!=null){
+                    detail.setActivityId(OActivity_plan.getId());
+                    detail.setActivityName(OActivity_plan.getActivityName());
+                    detail.setgTime(OActivity_plan.getgTime());
+                    detail.setBusProCode(OActivity_plan.getBusProCode());
+                    detail.setBusProName(OActivity_plan.getBusProName());
+                    detail.setTermBatchcode(OActivity_plan.getTermBatchcode());
+                    detail.setTermBatchname(OActivity_plan.getTermBatchname());
+                    detail.setTermtype(OActivity_plan.getTermtype());
+                    detail.setTermtypename(OActivity_plan.getTermtypename());
+                    detail.setSettlementPrice(OActivity_plan.getPrice());
+                    detail.setPosType(OActivity_plan.getPosType());
+                    detail.setPosSpePrice(OActivity_plan.getPosSpePrice());
+                    detail.setStandTime(OActivity_plan.getStandTime());
                 }
                 detail.setAgentId(order.getAgentId());
                 detail.setcUser(cUser);

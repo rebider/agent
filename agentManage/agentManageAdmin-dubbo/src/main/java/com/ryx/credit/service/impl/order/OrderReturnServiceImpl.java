@@ -1685,6 +1685,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 throw new MessageException("与退货的sn不符合");
             }
 
+            //排单的活动 下发到业务系统使用此活动
+            OActivity oActivity_plan = oActivityMapper.selectByPrimaryKey(planVo.getActivityId());
 
             //商品信息从排单表里查
             oLogistics.setProCom(planVo.getProCom());// 厂家
@@ -1767,7 +1769,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         }
                         ImsTermAdjustDetail imsTermAdjustDetail = new ImsTermAdjustDetail();
                         imsTermAdjustDetail.setnOrgId(agentBusInfo.getBusNum());
-                        imsTermAdjustDetail.setMachineId(oSubOrderActivity.getBusProCode());
+                        imsTermAdjustDetail.setMachineId(oActivity_plan.getBusProCode());
                         OLogistics logistics =  oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
                         log.info("退货上传物流下发到POS系统:{}:{}:{}",user,logistics.getId(),snList.toString());
                         try {
@@ -1830,7 +1832,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         vo.setOldBusNum(returnbusInfo.getBusNum());
                         vo.setPlatformNum(returnbusInfo.getBusPlatform());
                         //新活动
-                        vo.setNewAct(oSubOrderActivity.getBusProCode());
+                        vo.setNewAct(oActivity_plan.getBusProCode());
 
                         //老活动查询 老活动采用退货明细中的活动编号,如果没有活动编号从退货明细中查询订单里的活动，此处补差价后会出现问题，已添加actid进行修复，此处为兼容老的数据
                         if(oReturnOrderDetail.getActid()==null || StringUtils.isEmpty(oReturnOrderDetail.getActid())) {
@@ -1987,6 +1989,10 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
         oSubOrderActivityExample.or().andSubOrderIdEqualTo(oSubOrder.getId()).andProIdEqualTo(oSubOrder.getProId()).andStatusEqualTo(Status.STATUS_1.status);
         List<OSubOrderActivity>  OSubOrderActivitylist = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
+
+        //排单的活动 下发到业务系统使用此活动
+        OActivity oActivity_plan = oActivityMapper.selectByPrimaryKey(planVo.getActivityId());
+
         OOrder order = oOrderMapper.selectByPrimaryKey(oSubOrder.getOrderId());
         //1.起始SN序列号  2.结束SN序列号  3.开始截取的位数   4.结束截取的位数
         if (StringUtils.isBlank(startSn)) {
@@ -2056,21 +2062,20 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 detail.setProId(oSubOrder.getProId());
                 detail.setProName(oSubOrder.getProName());
                 detail.setSettlementPrice(oSubOrder.getProRelPrice());
-                if(OSubOrderActivitylist.size()>0){
-                    OSubOrderActivity oSubOrderActivity = OSubOrderActivitylist.get(0);
-                    detail.setActivityId(oSubOrderActivity.getActivityId());
-                    detail.setActivityName(oSubOrderActivity.getActivityName());
-                    detail.setgTime(oSubOrderActivity.getgTime());
-                    detail.setBusProCode(oSubOrderActivity.getBusProCode());
-                    detail.setBusProName(oSubOrderActivity.getBusProName());
-                    detail.setTermBatchcode(oSubOrderActivity.getTermBatchcode());
-                    detail.setTermBatchname(oSubOrderActivity.getTermBatchname());
-                    detail.setTermtype(oSubOrderActivity.getTermtype());
-                    detail.setTermtypename(oSubOrderActivity.getTermtypename());
-                    detail.setSettlementPrice(oSubOrderActivity.getPrice());
-                    detail.setPosType(oSubOrderActivity.getPosType());
-                    detail.setPosSpePrice(oSubOrderActivity.getPosSpePrice());
-                    detail.setStandTime(oSubOrderActivity.getStandTime());
+                if(oActivity_plan!=null){
+                    detail.setActivityId(oActivity_plan.getId());
+                    detail.setActivityName(oActivity_plan.getActivityName());
+                    detail.setgTime(oActivity_plan.getgTime());
+                    detail.setBusProCode(oActivity_plan.getBusProCode());
+                    detail.setBusProName(oActivity_plan.getBusProName());
+                    detail.setTermBatchcode(oActivity_plan.getTermBatchcode());
+                    detail.setTermBatchname(oActivity_plan.getTermBatchname());
+                    detail.setTermtype(oActivity_plan.getTermtype());
+                    detail.setTermtypename(oActivity_plan.getTermtypename());
+                    detail.setSettlementPrice(oActivity_plan.getPrice());
+                    detail.setPosType(oActivity_plan.getPosType());
+                    detail.setPosSpePrice(oActivity_plan.getPosSpePrice());
+                    detail.setStandTime(oActivity_plan.getStandTime());
                 }
                 detail.setSnNum(idSn);
                 detail.setAgentId(order.getAgentId());
