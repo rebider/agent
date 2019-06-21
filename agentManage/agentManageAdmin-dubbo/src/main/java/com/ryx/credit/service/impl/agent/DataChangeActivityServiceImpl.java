@@ -171,10 +171,16 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         Agent agent = agentMapper.selectByPrimaryKey(dateChangeRequest.getDataId());
         if(agent!=null)
         record.setAgentName(agent.getAgName());
-//        List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByAgenId(agent.getId());
-//        AgentBusInfo agentBusInfo = agentBusInfos.get(0);
-//        PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
-//        record.setNetInBusType("ACTIVITY_"+platForm.getPlatformType());
+        dateChangeRequest.getDataContent();
+        AgentVo agVo = JSONObject.parseObject(dateChangeRequest.getDataContent(), AgentVo.class);
+        if(agVo.getBusInfoVoList().size()==0){
+            throw  new MessageException("缺少业务信息");
+        }
+        AgentBusInfoVo agentBusInfoVo = agVo.getBusInfoVoList().get(0);
+        PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfoVo.getBusPlatform());
+        record.setNetInBusType("ACTIVITY_"+platForm.getPlatformNum());
+        record.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
+        record.setAgDocPro(agentBusInfoVo.getAgDocPro());
         if(1!=busActRelMapper.insertSelective(record)){
             logger.info("代理商审批，启动审批异常，添加审批关系失败{}:{}",dateChangeRequest.getId(),proce);
             throw  new MessageException("添加审批关系失败");
@@ -286,6 +292,15 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                         capitalFlowService.insertCapitalFlow(capitalVo, preCapitalVo.getcAmount(),dr.getId(),"代理商信息修改");
                                     }
                                 }
+                            }
+                        }
+                        List<AgentBusInfoVo> orgTypeList = vo.getOrgTypeList();
+                        for (AgentBusInfoVo agentBusInfoVo : orgTypeList) {
+                            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                            agentBusInfo.setFinaceRemitOrgan(agentBusInfoVo.getFinaceRemitOrgan());
+                            int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                            if ( i != 1) {
+                                throw new ProcessException("更新财务出款机构失败");
                             }
                         }
 
@@ -425,6 +440,11 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                     vo.setOweTicket(agentVo.getOweTicket());
                     if(orgCode.equals("finance")){
                         vo.setCapitalVoList(agentVo.getCapitalVoList());
+                        //处理财务审批（财务出款机构）
+                        vo.setOrgTypeList(agentVo.getOrgTypeList());
+                        for (AgentBusInfoVo orgTypeList : agentVo.getOrgTypeList()) {
+                            vo.setFinaceRemitOrgan(orgTypeList.getFinaceRemitOrgan());
+                        }
                     }
                     String voJson = JSONObject.toJSONString(vo);
                     dateChangeRequest.setDataContent(voJson);

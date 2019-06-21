@@ -887,6 +887,146 @@ public class BusActRelExample {
             addCriterion("DATA_SHIRO not between", value1, value2, "dataShiro");
             return (Criteria) this;
         }
+
+        public Criteria andAgDocProIsNull() {
+            addCriterion("AG_DOC_PRO is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProIsNotNull() {
+            addCriterion("AG_DOC_PRO is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProEqualTo(String value) {
+            addCriterion("AG_DOC_PRO =", value, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProNotEqualTo(String value) {
+            addCriterion("AG_DOC_PRO <>", value, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProGreaterThan(String value) {
+            addCriterion("AG_DOC_PRO >", value, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProGreaterThanOrEqualTo(String value) {
+            addCriterion("AG_DOC_PRO >=", value, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProLessThan(String value) {
+            addCriterion("AG_DOC_PRO <", value, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProLessThanOrEqualTo(String value) {
+            addCriterion("AG_DOC_PRO <=", value, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProLike(String value) {
+            addCriterion("AG_DOC_PRO like", value, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProNotLike(String value) {
+            addCriterion("AG_DOC_PRO not like", value, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProIn(List<String> values) {
+            addCriterion("AG_DOC_PRO in", values, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProNotIn(List<String> values) {
+            addCriterion("AG_DOC_PRO not in", values, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProBetween(String value1, String value2) {
+            addCriterion("AG_DOC_PRO between", value1, value2, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProNotBetween(String value1, String value2) {
+            addCriterion("AG_DOC_PRO not between", value1, value2, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictIsNull() {
+            addCriterion("AG_DOC_DISTRICT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictIsNotNull() {
+            addCriterion("AG_DOC_DISTRICT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictEqualTo(String value) {
+            addCriterion("AG_DOC_DISTRICT =", value, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictNotEqualTo(String value) {
+            addCriterion("AG_DOC_DISTRICT <>", value, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictGreaterThan(String value) {
+            addCriterion("AG_DOC_DISTRICT >", value, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictGreaterThanOrEqualTo(String value) {
+            addCriterion("AG_DOC_DISTRICT >=", value, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictLessThan(String value) {
+            addCriterion("AG_DOC_DISTRICT <", value, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictLessThanOrEqualTo(String value) {
+            addCriterion("AG_DOC_DISTRICT <=", value, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictLike(String value) {
+            addCriterion("AG_DOC_DISTRICT like", value, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictNotLike(String value) {
+            addCriterion("AG_DOC_DISTRICT not like", value, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictIn(List<String> values) {
+            addCriterion("AG_DOC_DISTRICT in", values, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictNotIn(List<String> values) {
+            addCriterion("AG_DOC_DISTRICT not in", values, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictBetween(String value1, String value2) {
+            addCriterion("AG_DOC_DISTRICT between", value1, value2, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictNotBetween(String value1, String value2) {
+            addCriterion("AG_DOC_DISTRICT not between", value1, value2, "agDocDistrict");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

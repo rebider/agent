@@ -8,7 +8,9 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
+import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
@@ -75,6 +77,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Autowired
     private CapitalFlowService capitalFlowService;
     @Autowired
+    private OrganizationMapper organizationMapper;
+    @Autowired
     private AgentNetInNotityService agentNetInNotityService;
 
 
@@ -124,6 +128,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
             //判断平台是否重复
             List hav = new ArrayList();
+            List<Organization> organList = null;
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
                 if(item.getBusType().equals(BusType.ZQZF.key) || item.getBusType().equals(BusType.ZQBZF.key) || item.getBusType().equals(BusType.ZQ.key) ){
                     if(StringUtils.isBlank(item.getBusParent()))
@@ -170,6 +175,14 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                         throw new ProcessException("瑞花宝登录账号必须是数字");
                     }
                 }
+                //判断所选机构是否属于所选平台（机构编号&业务平台）
+                organList = organizationMapper.selectOrganization(item.getOrganNum());
+                for (Organization organization : organList) {
+                    if (!organization.getPlatId().contains(item.getBusPlatform())) {
+                        throw new ProcessException("所选机构不属于该业务平台");
+                    }
+                    item.setOrganNum(organization.getOrgId());
+                }
             }
             Set<String> resultSet = new HashSet<>();
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
@@ -178,6 +191,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 item.setcUser(agent.getcUser());
                 item.setAgentId(agent.getId());
                 item.setCloReviewStatus(AgStatus.Create.status);
+                for (Organization organization : organList) {
+                    item.setOrganNum(organization.getOrgId());
+                }
                 AgentBusInfo db_AgentBusInfo = agentBusinfoService.agentBusInfoInsert(item);
                 if (StringUtils.isNotBlank(item.getAgentAssProtocol())) {
                     AssProtoColRel rel = new AssProtoColRel();
@@ -374,6 +390,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             AgentBusInfo agentBusInfo = aginfo.get(0);
             PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
             record.setNetInBusType("ACTIVITY_"+platForm.getPlatformType());
+            record.setAgDocPro(agentBusInfo.getAgDocPro());
+            record.setAgDocDistrict(agentBusInfo.getAgDocDistrict());
             if (1 != busActRelMapper.insertSelective(record)) {
                 logger.info("代理商审批，启动审批异常，添加审批关系失败{}:{}", agentId, proce);
             }
@@ -478,7 +496,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         record.setAgentId(agent.getId());
         record.setAgentName(agent.getAgName());
         record.setDataShiro(BusActRelBusType.Business.key);
-
+        record.setAgDocPro(abus.getAgDocPro());
+        record.setAgDocDistrict(abus.getAgDocDistrict());
         record.setNetInBusType("ACTIVITY_"+platForm.getPlatformType());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("代理商业务启动审批异常，添加审批关系失败{}:{}", record.getBusId(), proce);

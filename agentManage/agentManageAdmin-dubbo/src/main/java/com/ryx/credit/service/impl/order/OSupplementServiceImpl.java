@@ -72,7 +72,7 @@ public class OSupplementServiceImpl implements OSupplementService {
 
 
     @Override
-    public PageInfo selectAll(Page page, OSupplement oSupplement, String time, String userId,String supplementShrio) {
+    public PageInfo selectAll(Page page, OSupplement oSupplement, String time, String userId, String supplementShrio) {
         Map<String, Object> map = new HashMap<>();
         if (StringUtils.isNotBlank(oSupplement.getPkType())) {
             map.put("pkType", oSupplement.getPkType());
@@ -92,15 +92,15 @@ public class OSupplementServiceImpl implements OSupplementService {
             //说明有代理商
             Agent data = (Agent) result.getData();
             map.put("agentId", data.getId());
-        }else{
-            if(StringUtils.isBlank(supplementShrio)){
+        } else {
+            if (StringUtils.isBlank(supplementShrio)) {
                 List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(userId));
-                if(orgCodeRes==null && orgCodeRes.size()!=1){
+                if (orgCodeRes == null && orgCodeRes.size() != 1) {
                     return null;
                 }
                 Map<String, Object> objectMap = orgCodeRes.get(0);
                 String orgId = String.valueOf(objectMap.get("ORGID"));
-                map.put("orgId",orgId);
+                map.put("orgId", orgId);
             }
         }
 
@@ -137,7 +137,7 @@ public class OSupplementServiceImpl implements OSupplementService {
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
     public ResultVO supplementSave(OsupplementVo osupplementVo) throws Exception {
-       OSupplement oSupplement = osupplementVo.getSupplement();
+        OSupplement oSupplement = osupplementVo.getSupplement();
         if (oSupplement == null) {
             logger.info("补款添加:{}", "补款添加信息为空");
             return ResultVO.fail("补款添加信息为空");
@@ -155,11 +155,11 @@ public class OSupplementServiceImpl implements OSupplementService {
             return ResultVO.fail("源数据不能为空");
         }
         List<String> file = osupplementVo.getAgentTableFile();
-        if(file==null || file.size()==0){
+        if (file == null || file.size() == 0) {
             logger.info("补款添加:{}", "请上传打款截图");
             throw new MessageException("请上传打款截图");
         }
-        if(osupplementVo.getoCashReceivablesVos()==null || osupplementVo.getoCashReceivablesVos().size()==0){
+        if (osupplementVo.getoCashReceivablesVos() == null || osupplementVo.getoCashReceivablesVos().size() == 0) {
             throw new MessageException("必须上传打款记录");
         }
         List<OCashReceivablesVo> oCashReceivablesVos = osupplementVo.getoCashReceivablesVos();
@@ -167,7 +167,7 @@ public class OSupplementServiceImpl implements OSupplementService {
         for (OCashReceivablesVo oCashReceivablesVo : oCashReceivablesVos) {
             sumAmount = sumAmount.add(oCashReceivablesVo.getAmount());
         }
-        if(sumAmount.compareTo(oSupplement.getPayAmount())!=0){
+        if (sumAmount.compareTo(oSupplement.getPayAmount()) != 0) {
             throw new MessageException("打款金额必须与付款金额相同");
         }
         //去查询是否已经在审批
@@ -178,12 +178,12 @@ public class OSupplementServiceImpl implements OSupplementService {
         criteria.andSrcIdEqualTo(srcId);
         criteria.andPkTypeEqualTo(pkType);
         criteria.andStatusEqualTo(Status.STATUS_1.status);
-        criteria.andReviewStatusIn(Arrays.asList(AgStatus.Create.status ,AgStatus.Approving.status
-                ,AgStatus.Approved.status ,AgStatus.Reject.status));
+        criteria.andReviewStatusIn(Arrays.asList(AgStatus.Create.status, AgStatus.Approving.status
+                , AgStatus.Approved.status, AgStatus.Reject.status));
         List<OSupplement> oSupplements = oSupplementMapper.selectByExample(oSupplementExample);
-        if (null !=oSupplements && oSupplements.size()>0){
-                logger.info("补款添加:{}", "已在补款中");
-                return ResultVO.fail("已在补款中！！");
+        if (null != oSupplements && oSupplements.size() > 0) {
+            logger.info("补款添加:{}", "已在补款中");
+            return ResultVO.fail("已在补款中！！");
         }
 
 
@@ -195,10 +195,10 @@ public class OSupplementServiceImpl implements OSupplementService {
         oSupplement.setStatus(Status.STATUS_1.status);
         oSupplement.setVersion(Status.STATUS_1.status);
         AgentResult result = oCashReceivablesService.addOCashReceivables(osupplementVo.getoCashReceivablesVos(), String.valueOf(oSupplement.getcUser()), osupplementVo.getSupplement().getAgentId(), CashPayType.getContentEnum(CashPayType.SUPPLEMENT.code), osupplementVo.getSupplement().getId());
-        if(result.getMapData()!=null){
-            Map<String,Object> resMapCash = result.getMapData();
-            if(resMapCash.get("isYHHK")!=null && (Boolean)resMapCash.get("isYHHK")){
-                if(file==null || file.size()==0){
+        if (result.getMapData() != null) {
+            Map<String, Object> resMapCash = result.getMapData();
+            if (resMapCash.get("isYHHK") != null && (Boolean) resMapCash.get("isYHHK")) {
+                if (file == null || file.size() == 0) {
                     logger.info("补款添加:{}", "请上传打款截图");
                     throw new MessageException("请上传打款截图");
                 }
@@ -242,7 +242,7 @@ public class OSupplementServiceImpl implements OSupplementService {
             logger.info("补款审批,操作用户为空{}:{}", id, userId);
             throw new MessageException("补款审批中，操作用户为空");
         }
-        oCashReceivablesService.startProcing(CashPayType.getContentEnum(CashPayType.SUPPLEMENT.code),id,userId);
+        oCashReceivablesService.startProcing(CashPayType.getContentEnum(CashPayType.SUPPLEMENT.code), id, userId);
         OSupplement oSupplement = oSupplementMapper.selectByPrimaryKey(id);
 
 
@@ -314,10 +314,10 @@ public class OSupplementServiceImpl implements OSupplementService {
         record.setBusType(BusActRelBusType.PkType.name());//流程关系类型是数据申请类型
         record.setActivStatus(AgStatus.Approving.name());
         record.setDataShiro(BusActRelBusType.PkType.key);
-        if (null!=oSupplement.getAgentId()){
+        if (null != oSupplement.getAgentId()) {
             record.setAgentId(oSupplement.getAgentId());
             Agent agent = agentMapper.selectByPrimaryKey(oSupplement.getAgentId());
-            if (null!=agent){
+            if (null != agent) {
                 record.setAgentName(agent.getAgName());
             }
 
@@ -365,7 +365,7 @@ public class OSupplementServiceImpl implements OSupplementService {
         } catch (MessageException | ProcessException e) {
             e.printStackTrace();
             throw new MessageException(e.getLocalizedMessage());
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw new MessageException("catch工作流处理任务异常!");
         }
@@ -376,13 +376,17 @@ public class OSupplementServiceImpl implements OSupplementService {
     @Override
     public ResultVO updateByActivId(String id, String activityName) throws MessageException {
         BusActRel busActRel = selectByActivId(id);
+        if (null == busActRel) {
+            return null;
+        }
         OSupplement oSupplement = oSupplementMapper.selectByPrimaryKey(busActRel.getBusId());
         String srcId = "";
-        if (oSupplement==null) {
+        if (oSupplement == null) {
+            logger.info("补款记录未找到");
             throw new MessageException("补款记录未找到");
         }
         if ("reject_end".equals(activityName)) {//审批拒绝
-            logger.info("补款审批拒绝{}{}:", busActRel.getActivId(),oSupplement.getId());
+            logger.info("补款审批拒绝{}{}:", busActRel.getActivId(), oSupplement.getId());
             busActRel.setActivStatus(AgStatus.Refuse.name());
             if (1 != busActRelMapper.updateByPrimaryKeySelective(busActRel)) {
                 logger.info("业务流程状态修改失败{}:", busActRel.getActivId());
@@ -396,7 +400,7 @@ public class OSupplementServiceImpl implements OSupplementService {
             }
 
             try {
-                oCashReceivablesService.refuseProcing(CashPayType.getContentEnum(CashPayType.SUPPLEMENT.code),oSupplement.getId(),null);
+                oCashReceivablesService.refuseProcing(CashPayType.getContentEnum(CashPayType.SUPPLEMENT.code), oSupplement.getId(), null);
             } catch (Exception e) {
                 throw new MessageException("审批通过失败");
             }
@@ -408,12 +412,12 @@ public class OSupplementServiceImpl implements OSupplementService {
                     logger.info("订单付款状态修改失败{}:", busActRel.getActivId());
                     throw new MessageException("订单付款状态修改失败");
                 }
-                logger.info("补款审批拒绝更新记录为待付款状态成功{}{}:", busActRel.getActivId(),oSupplement.getId());
-            }else{
-                logger.info("补款审批拒绝pktype不匹配{}{}:", busActRel.getActivId(),oSupplement.getId());
+                logger.info("补款审批拒绝更新记录为待付款状态成功{}{}:", busActRel.getActivId(), oSupplement.getId());
+            } else {
+                logger.info("补款审批拒绝pktype不匹配{}{}:", busActRel.getActivId(), oSupplement.getId());
             }
         } else if ("finish_end".equals(activityName)) {//审批同意
-            logger.info("补款审批同意{}{}:", busActRel.getActivId(),oSupplement.getId());
+            logger.info("补款审批同意{}{}:", busActRel.getActivId(), oSupplement.getId());
             busActRel.setActivStatus(AgStatus.Approved.name());
             if (1 != busActRelMapper.updateByPrimaryKeySelective(busActRel)) {
                 logger.info("业务流程状态修改失败{}", busActRel.getActivId());
@@ -427,7 +431,7 @@ public class OSupplementServiceImpl implements OSupplementService {
             }
 
             try {
-                oCashReceivablesService.finishProcing(CashPayType.getContentEnum(CashPayType.SUPPLEMENT.code),oSupplement.getId(),null);
+                oCashReceivablesService.finishProcing(CashPayType.getContentEnum(CashPayType.SUPPLEMENT.code), oSupplement.getId(), null);
             } catch (Exception e) {
                 throw new MessageException("拒绝审批失败");
             }
@@ -437,15 +441,20 @@ public class OSupplementServiceImpl implements OSupplementService {
             OSupplement supplement = selectOSupplement(oSupplement.getId());
             if (supplement.getPkType().equals(PkType.FQBK.code)) {
                 OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectByPrimaryKey(supplement.getSrcId());
-                oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
+                if (oPaymentDetail.getPayAmount().compareTo(supplement.getRealPayAmount()) == 0 || oPaymentDetail.getPayAmount().compareTo(supplement.getRealPayAmount()) == -1) {
+                    //应付金额等于实付金额  或者  应付金额小于实付金额  则是已结清
+                    oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
+                } else {
+                    oPaymentDetail.setPaymentStatus(PaymentStatus.YF.code);
+                }
                 oPaymentDetail.setRealPayAmount(supplement.getRealPayAmount());
                 //审批通过还需要更新srcId,srcType,实际付款时间
                 oPaymentDetail.setSrcId(supplement.getId());
                 oPaymentDetail.setSrcType(PamentSrcType.XXBK.code);
                 if (null != supplement && null != supplement.getRemitTime())
-                oPaymentDetail.setPayTime(supplement.getRemitTime());
+                    oPaymentDetail.setPayTime(supplement.getRemitTime());
                 else
-                oPaymentDetail.setPayTime(Calendar.getInstance().getTime());
+                    oPaymentDetail.setPayTime(Calendar.getInstance().getTime());
                 if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
                     logger.info("订单付款状态修改失败{}:", busActRel.getActivId());
                     throw new MessageException("订单付款状态修改失败");
@@ -461,7 +470,7 @@ public class OSupplementServiceImpl implements OSupplementService {
                     throw new MessageException("无此数据!!!");
                 }
                 OPayment oPayment = oPayments.get(0);
-                if(null==oPaymentDetail.getRealPayAmount()){
+                if (null == oPaymentDetail.getRealPayAmount()) {
                     oPaymentDetail.setRealPayAmount(new BigDecimal(0));
                 }
                 oPayment.setRealAmount(oPayment.getRealAmount().add(oPaymentDetail.getRealPayAmount()));
@@ -473,6 +482,77 @@ public class OSupplementServiceImpl implements OSupplementService {
                 if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
                     logger.info("付款单修改失败");
                     throw new MessageException("付款单修改失败");
+                }
+
+
+                //需要查询到总金额
+                OPayment oPayMent = oPaymentMapper.selectByPrimaryKey(oPaymentDetail.getPaymentId());
+                if (null == oPayMent) {
+                    return null;
+                }
+                BigDecimal payAmount = oPayMent.getPayAmount();
+                //  查询已结清的实际付款金额
+                BigDecimal realPayAmount = oPaymentDetailMapper.selectRealAmount(oPaymentDetail.getOrderId(), PamentIdType.ORDER_FKD.code);
+                //如果总金额大于实际已经付款金额  则还有未结清金额
+                BigDecimal residue = new BigDecimal(0);
+                //剩余未结清的金额
+                residue = payAmount.subtract(realPayAmount);
+                if (residue.compareTo(new BigDecimal(0)) == 0) {
+                    return ResultVO.success(null);
+                }
+                //去查询还剩几期待付款
+                List<OPaymentDetail> countMap = oPaymentDetailMapper.selectCount(oPaymentDetail.getOrderId(), PamentIdType.ORDER_FKD.code, PaymentStatus.DF.code);
+                BigDecimal count = new BigDecimal(countMap.size());
+                if (count.compareTo(new BigDecimal(0)) == 0) {
+                    //如果就剩本条待付款  则需全部结清
+                    BigDecimal amount = oPaymentDetail.getPayAmount();//这个是订单需补款金额
+                    if (supplement.getRealPayAmount().compareTo(amount) == -1 || supplement.getRealPayAmount().compareTo(amount) == 1) {
+                        logger.info("应补款金额为{}，请审批拒绝，重新补款", amount);
+                        throw new MessageException("应补款金额为" + amount + "，请审批拒绝，重新补款");
+                    } else if (supplement.getRealPayAmount().compareTo(amount) == 0) {
+                        //否则是相等的  则进行更新
+                        oPaymentDetail.setPayAmount(amount);
+                        if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
+                            logger.info("付款金额更新失败");
+                            throw new MessageException("付款金额更新失败");
+                        }
+                    }
+                } else {
+                    try {
+                        List<BigDecimal> divideList = new ArrayList<>();
+                        BigDecimal divide = new BigDecimal(0);
+                        for (int i = 1; i <= count.intValue(); i++) {
+                            divide = residue.divide(count);
+                            divideList.add(divide);
+                        }
+                        for (int j = 0; j < countMap.size(); j++) {
+                            OPaymentDetail paymentDetail = countMap.get(j);
+                            paymentDetail.setPayAmount(divideList.get(j));
+                            if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail)) {
+                                logger.info("平均金额失败");
+                                throw new MessageException("平均金额失败");
+                            }
+                        }
+                    } catch (Exception e) {
+                        List<BigDecimal> divideList = new ArrayList<>();
+                        BigDecimal divide = new BigDecimal(0);
+                        for (int i = 1; i <= count.intValue() - 1; i++) {
+                            divide = residue.divide(count, 2, BigDecimal.ROUND_HALF_DOWN);
+                            System.out.println(divide);
+                            divideList.add(divide);
+                        }
+                        BigDecimal big = new BigDecimal(0);
+                        big = residue.subtract(divide.multiply(count.subtract(new BigDecimal(1))));
+                        divideList.add(big);
+                        for (int j = 0; j < countMap.size(); j++) {
+                            OPaymentDetail paymentDetail = countMap.get(j);
+                            paymentDetail.setPayAmount(divideList.get(j));
+                            if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail)) {
+                                logger.info("平均金额失败");
+                                throw new MessageException("平均金额失败");
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -521,45 +601,45 @@ public class OSupplementServiceImpl implements OSupplementService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public ResultVO updateAmount(AgentVo agentVo,Long userId) throws Exception {
+    public ResultVO updateAmount(AgentVo agentVo, Long userId) throws Exception {
 
-        if(null==userId){
+        if (null == userId) {
             logger.info("无法获取当前登录用户");
             throw new MessageException("无法获取当前登录用户");
         }
-        if (StringUtils.isBlank(agentVo.getSupplementId())){
+        if (StringUtils.isBlank(agentVo.getSupplementId())) {
             logger.info("补款id为空");
             throw new MessageException("补款id为空");
         }
-        if(null==agentVo.getCheckTime()){
+        if (null == agentVo.getCheckTime()) {
             logger.info("请填写核款时间");
             throw new MessageException("请填写核款时间");
         }
-            OSupplement oSupplement = new OSupplement();
-            oSupplement.setId(agentVo.getSupplementId());
-            oSupplement.setRealPayAmount(agentVo.getRealPayAmount());
-            oSupplement.setCheckTime(agentVo.getCheckTime());
-            oSupplement.setCheckPeople(String.valueOf(userId));
-            if (1 != oSupplementMapper.updateByPrimaryKeySelective(oSupplement)) {
-                logger.info("实际金额保存失败");
-                throw new MessageException("实际金额保存失败");
-            }
-         oCashReceivablesService.approveTashBusiness(CashPayType.getContentEnum(CashPayType.SUPPLEMENT.code),agentVo.getSupplementId(),String.valueOf(userId),agentVo.getCheckTime(),agentVo.getoCashReceivablesVoList());
+        OSupplement oSupplement = new OSupplement();
+        oSupplement.setId(agentVo.getSupplementId());
+        oSupplement.setRealPayAmount(agentVo.getRealPayAmount());
+        oSupplement.setCheckTime(agentVo.getCheckTime());
+        oSupplement.setCheckPeople(String.valueOf(userId));
+        if (1 != oSupplementMapper.updateByPrimaryKeySelective(oSupplement)) {
+            logger.info("实际金额保存失败");
+            throw new MessageException("实际金额保存失败");
+        }
+        oCashReceivablesService.approveTashBusiness(CashPayType.getContentEnum(CashPayType.SUPPLEMENT.code), agentVo.getSupplementId(), String.valueOf(userId), agentVo.getCheckTime(), agentVo.getoCashReceivablesVoList());
         logger.info("更新实际付款金额成功");
         return ResultVO.success("");
     }
 
     @Override
     public BigDecimal selectPayAmout(String srcid, String pkType) {
-         BigDecimal payAmout= oSupplementMapper.selectPayAmout(srcid, pkType);
-         OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectMoney(srcid);
-         BigDecimal amount=(oPaymentDetail.getPayAmount().subtract((oPaymentDetail.getRealPayAmount()==null?new BigDecimal(0):oPaymentDetail.getRealPayAmount())).subtract(payAmout));
+        BigDecimal payAmout = oSupplementMapper.selectPayAmout(srcid, pkType);
+        OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectMoney(srcid);
+        BigDecimal amount = (oPaymentDetail.getPayAmount().subtract((oPaymentDetail.getRealPayAmount() == null ? new BigDecimal(0) : oPaymentDetail.getRealPayAmount())).subtract(payAmout));
         return amount;
     }
 
 
     @Override
-    public OPaymentDetail selectPaymentDetailById(String id){
+    public OPaymentDetail selectPaymentDetailById(String id) {
         OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectByPrimaryKey(id);
         return oPaymentDetail;
     }
