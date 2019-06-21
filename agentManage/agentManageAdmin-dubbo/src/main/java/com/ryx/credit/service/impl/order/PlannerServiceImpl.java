@@ -138,7 +138,7 @@ public class PlannerServiceImpl implements PlannerService {
             receiptPlan.setStatus(Status.STATUS_1.status);
             receiptPlan.setVersion(Status.STATUS_1.status);
             receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.YesPlanner.getValue()));
-
+            receiptPlan.setActivityId(activityId);
             //采购单商品
             OSubOrderExample example = new OSubOrderExample();
             example.or().andOrderIdEqualTo(oReceiptPro.getOrderid()).andProIdEqualTo(oReceiptPro.getProId()).andStatusEqualTo(Status.STATUS_1.status);

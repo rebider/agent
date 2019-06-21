@@ -411,6 +411,10 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
         OOrder order = oOrderMapper.selectByPrimaryKey(oSubOrder.getOrderId());
         PlatForm platForm =  platFormMapper.selectByPlatFormNum(order.getOrderPlatform());
 
+
+        //排单的活动 下发到业务系统使用此活动
+        OActivity oActivity_plan = oActivityMapper.selectByPrimaryKey(planVo.getActivityId());
+
         //手刷生成物流方式 根据机具类型确定机具明细的生成方式，首刷更新明细记录
         if(PlatformType.MPOS.equals(platForm.getPlatformType())){
             logger.info("首刷发货 更新库存记录:{}:{}-{}",logistics.getProType(),logistics.getSnBeginNum(),logistics.getSnEndNum());
@@ -436,20 +440,19 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                 detail.setProName(oSubOrder.getProName());
                 detail.setSettlementPrice(oSubOrder.getProRelPrice());
                 if(OSubOrderActivitylist.size()>0){
-                    OSubOrderActivity oSubOrderActivity = OSubOrderActivitylist.get(0);
-                    detail.setActivityId(oSubOrderActivity.getActivityId());
-                    detail.setActivityName(oSubOrderActivity.getActivityName());
-                    detail.setgTime(oSubOrderActivity.getgTime());
-                    detail.setBusProCode(oSubOrderActivity.getBusProCode());
-                    detail.setBusProName(oSubOrderActivity.getBusProName());
-                    detail.setTermBatchcode(oSubOrderActivity.getTermBatchcode());
-                    detail.setTermBatchname(oSubOrderActivity.getTermBatchname());
-                    detail.setTermtype(oSubOrderActivity.getTermtype());
-                    detail.setTermtypename(oSubOrderActivity.getTermtypename());
-                    detail.setSettlementPrice(oSubOrderActivity.getPrice());
-                    detail.setPosType(oSubOrderActivity.getPosType());
-                    detail.setPosSpePrice(oSubOrderActivity.getPosSpePrice());
-                    detail.setStandTime(oSubOrderActivity.getStandTime());
+                    detail.setActivityId(oActivity_plan.getId());
+                    detail.setActivityName(oActivity_plan.getActivityName());
+                    detail.setgTime(oActivity_plan.getgTime());
+                    detail.setBusProCode(oActivity_plan.getBusProCode());
+                    detail.setBusProName(oActivity_plan.getBusProName());
+                    detail.setTermBatchcode(oActivity_plan.getTermBatchcode());
+                    detail.setTermBatchname(oActivity_plan.getTermBatchname());
+                    detail.setTermtype(oActivity_plan.getTermtype());
+                    detail.setTermtypename(oActivity_plan.getTermtypename());
+                    detail.setSettlementPrice(oActivity_plan.getPrice());
+                    detail.setPosType(oActivity_plan.getPosType());
+                    detail.setPosSpePrice(oActivity_plan.getPosSpePrice());
+                    detail.setStandTime(oActivity_plan.getStandTime());
                 }
                 detail.setAgentId(order.getAgentId());
                 detail.setcUser(logistics.getcUser());
@@ -488,20 +491,19 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                 detail.setProName(oSubOrder.getProName());
                 detail.setSettlementPrice(oSubOrder.getProRelPrice());
                 if(OSubOrderActivitylist.size()>0){
-                    OSubOrderActivity oSubOrderActivity = OSubOrderActivitylist.get(0);
-                    detail.setActivityId(oSubOrderActivity.getActivityId());
-                    detail.setActivityName(oSubOrderActivity.getActivityName());
-                    detail.setgTime(oSubOrderActivity.getgTime());
-                    detail.setBusProCode(oSubOrderActivity.getBusProCode());
-                    detail.setBusProName(oSubOrderActivity.getBusProName());
-                    detail.setTermBatchcode(oSubOrderActivity.getTermBatchcode());
-                    detail.setTermBatchname(oSubOrderActivity.getTermBatchname());
-                    detail.setTermtype(oSubOrderActivity.getTermtype());
-                    detail.setTermtypename(oSubOrderActivity.getTermtypename());
-                    detail.setSettlementPrice(oSubOrderActivity.getPrice());
-                    detail.setPosType(oSubOrderActivity.getPosType());
-                    detail.setPosSpePrice(oSubOrderActivity.getPosSpePrice());
-                    detail.setStandTime(oSubOrderActivity.getStandTime());
+                    detail.setActivityId(oActivity_plan.getId());
+                    detail.setActivityName(oActivity_plan.getActivityName());
+                    detail.setgTime(oActivity_plan.getgTime());
+                    detail.setBusProCode(oActivity_plan.getBusProCode());
+                    detail.setBusProName(oActivity_plan.getBusProName());
+                    detail.setTermBatchcode(oActivity_plan.getTermBatchcode());
+                    detail.setTermBatchname(oActivity_plan.getTermBatchname());
+                    detail.setTermtype(oActivity_plan.getTermtype());
+                    detail.setTermtypename(oActivity_plan.getTermtypename());
+                    detail.setSettlementPrice(oActivity_plan.getPrice());
+                    detail.setPosType(oActivity_plan.getPosType());
+                    detail.setPosSpePrice(oActivity_plan.getPosSpePrice());
+                    detail.setStandTime(oActivity_plan.getStandTime());
                 }
                 detail.setSnNum(idSn);
                 detail.setAgentId(order.getAgentId());
@@ -581,7 +583,8 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
         if (OSubOrderActivitylist.size() > 0) {
             oSubOrderActivity = OSubOrderActivitylist.get(0);
         }
-
+        //排单的活动 下发到业务系统使用此活动
+        OActivity oActivity_plan = oActivityMapper.selectByPrimaryKey(planVo.getActivityId());
         //订单信息
         OOrder order = oOrderMapper.selectByPrimaryKey(oSubOrder.getOrderId());
         PlatForm platForm = platFormMapper.selectByPlatFormNum(order.getOrderPlatform());
@@ -610,10 +613,10 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                 throw new MessageException("查询业务数据失败！");
             }
             imsTermWarehouseDetail.setOrgId(agentBusInfo.getBusNum());
-            imsTermWarehouseDetail.setMachineId(oActivity.getBusProCode());
-            imsTermWarehouseDetail.setPosSpePrice(oActivity.getPosSpePrice());
-            imsTermWarehouseDetail.setPosType(oActivity.getPosType());
-            imsTermWarehouseDetail.setStandTime(oActivity.getStandTime());
+            imsTermWarehouseDetail.setMachineId(oActivity_plan.getBusProCode());
+            imsTermWarehouseDetail.setPosSpePrice(oActivity_plan.getPosSpePrice());
+            imsTermWarehouseDetail.setPosType(oActivity_plan.getPosType());
+            imsTermWarehouseDetail.setStandTime(oActivity_plan.getStandTime());
             try {
                 //机具下发接口
                 logger.info("机具下发接口调用：logcId：{},batch：{},snList：{}",logcId,batch,snList.size());
