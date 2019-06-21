@@ -684,10 +684,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         bus.setcUtime(Calendar.getInstance().getTime());
         bus.setCloReviewStatus(AgStatus.Refuse.status);
         bus.setApproveTime(Calendar.getInstance().getTime());//审批通过时间
-        if(StringUtils.isNotBlank(bus.getBusNum())){
-//        if(StringUtils.isNotBlank(bus.getBusNum())){
-            bus.setBusStatus(BusinessStatus.pause.status);
-//        }
+        bus.setBusStatus(BusinessStatus.pause.status);
         if (agentBusinfoService.updateAgentBusInfo(bus) != 1) {
             logger.info("代理商审批拒绝，更新业务本信息失败{}:{}", processingId, bus.getId());
             throw new ProcessException("代理商审批通过，更新业务本信息失败");
