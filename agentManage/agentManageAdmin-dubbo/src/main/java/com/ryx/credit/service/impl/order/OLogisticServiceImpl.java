@@ -514,6 +514,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                         logger.info("导入物流数据,流量卡不进行下发操作，活动代码{}={}={}" ,oActivity.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
                         return AgentResult.ok("流量卡不进行下发操作");
                     }
+                    logger.info("上传物流接口调用，PlatformType：{},{}",platForm.getPlatformType(),JSONObject.toJSONString(oLogistics));
                     //进行入库、机具划拨操作 POS下发业务系统
                     if (PlatformType.whetherPOS(platForm.getPlatformType())){
                         ImsTermWarehouseDetail imsTermWarehouseDetail = new ImsTermWarehouseDetail();
