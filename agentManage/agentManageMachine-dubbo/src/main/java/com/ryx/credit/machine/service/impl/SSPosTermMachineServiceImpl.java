@@ -17,6 +17,7 @@ import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.*;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
+import com.ryx.credit.service.order.IOrderReturnService;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,9 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
     private ImsTermAdjustDetailMapper imsTermAdjustDetailMapper;
     @Autowired
     private ImsTermAdjustMapper imsTermAdjustMapper;
+    @Autowired
+    private IOrderReturnService orderReturnService;
+
 
     @Override
     public List<TermMachineVo> queryTermMachine(PlatformType platformType) throws Exception{
@@ -94,8 +98,7 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
 
     @Override
     public AgentResult lowerHairMachine(LowerHairMachineVo lowerHairMachineVo)throws Exception {
-        LowerHairMachineVo vo = lowerHairMachineVo;
-        ImsTermWarehouseDetail imsTermWarehouseDetail = vo.getImsTermWarehouseDetail();
+        ImsTermWarehouseDetail imsTermWarehouseDetail = lowerHairMachineVo.getImsTermWarehouseDetail();
         Map<String,String> posInfo = imsTermMachineMapper.queryIMS_POS_ACTIVITY(imsTermWarehouseDetail.getMachineId());
         String POS_ID =  posInfo.get("POS_ID");
         String ACTIVITY_ID =   posInfo.get("ACTIVITY_ID");
@@ -105,14 +108,14 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
         imsTermWarehouseDetail.setActivityId(activity.getActivityId());
         imsTermWarehouseDetail.setBrandCode(activity.getBrandCode());
 
-        if(null==vo.getSnList()){
+        if(null==lowerHairMachineVo.getSnList()){
             throw new Exception("sn列表异常");
         }
-        if(vo.getSnList().size()==0){
+        if(lowerHairMachineVo.getSnList().size()==0){
             throw new MessageException("sn数据有误");
         }
-        log.info("同步POS入库划拨数据开始:snList:{},请求参数:{}",vo.getSnList().size(),vo.getImsTermWarehouseDetail());
-        for (String sn : vo.getSnList()) {
+        log.info("同步POS入库划拨数据开始:snList:{},请求参数:{}",lowerHairMachineVo.getSnList().size(),lowerHairMachineVo.getImsTermWarehouseDetail());
+        for (String sn : lowerHairMachineVo.getSnList()) {
             ImsTermActive imsTermActive = imsTermActiveService.selectByPrimaryKey(sn);
             //有记录就表示已激活
             if(null!=imsTermActive){
@@ -132,7 +135,6 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
             imsTermWarehouseDetail.setUpdateTime(createTime);
             imsTermWarehouseDetail.setPayStatus("1");  //支付状态 0 已付 1 未付
             imsTermWarehouseDetail.setDeliveryTime(DateUtil.formatDay(new Date()));
-
             int i = imsTermWarehouseDetailMapper.insert(imsTermWarehouseDetail);
             log.info("同步POS入库返回结果:{}",i);
             if(i!=1){
@@ -184,6 +186,13 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
         if(logisticsDetailList.size()==0){
             throw new MessageException("sn数据有误");
         }
+
+        Map<String,String> posInfo = imsTermMachineMapper.queryIMS_POS_ACTIVITY(imsTermAdjustDetail.getMachineId());
+        String POS_ID =  posInfo.get("POS_ID");
+        String ACTIVITY_ID =   posInfo.get("ACTIVITY_ID");
+
+        ImsMachineActivity activity = imsMachineActivityMapper.selectByPrimaryKey(ACTIVITY_ID);
+
         log.info("同步POS调整数据开始:snList:{},请求参数:{}",logisticsDetailList.size(),imsTermAdjustDetail);
         for (OLogisticsDetail oLogisticsDetail : logisticsDetailList) {
             ImsTermActive imsTermActive = imsTermActiveService.selectByPrimaryKey(oLogisticsDetail.getSnNum());
@@ -207,7 +216,8 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
             imsTermAdjustDetail.setAdId(adjustId);
             imsTermAdjustDetail.setCreateTime(createTime);
             imsTermAdjustDetail.setCreatePerson(ZHYY_CREATE_PERSON);
-            imsTermAdjustDetail.setyOrgId(adjustmentMachineVo.getOldBusNum());
+            AgentBusInfo agentBusInfo = orderReturnService.queryBusInfoByLogDetail(oLogisticsDetail);
+            imsTermAdjustDetail.setyOrgId(imsTermAdjustDetail.getyOrgId());
             int j = imsTermAdjustDetailMapper.insert(imsTermAdjustDetail);
             log.info("同步POS调整返回结果:{}",j);
             if(j!=1){

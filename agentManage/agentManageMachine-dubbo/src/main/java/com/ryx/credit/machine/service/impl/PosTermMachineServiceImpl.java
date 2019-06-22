@@ -87,7 +87,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
     }
 
     @Override
-    public AgentResult adjustmentMachine(AdjustmentMachineVo adjustmentMachineVo) {
+    public AgentResult adjustmentMachine(AdjustmentMachineVo adjustmentMachineVo)throws Exception {
         return null;
     }
 
