@@ -98,8 +98,7 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
 
     @Override
     public AgentResult lowerHairMachine(LowerHairMachineVo lowerHairMachineVo)throws Exception {
-        LowerHairMachineVo vo = lowerHairMachineVo;
-        ImsTermWarehouseDetail imsTermWarehouseDetail = vo.getImsTermWarehouseDetail();
+        ImsTermWarehouseDetail imsTermWarehouseDetail = lowerHairMachineVo.getImsTermWarehouseDetail();
         Map<String,String> posInfo = imsTermMachineMapper.queryIMS_POS_ACTIVITY(imsTermWarehouseDetail.getMachineId());
         String POS_ID =  posInfo.get("POS_ID");
         String ACTIVITY_ID =   posInfo.get("ACTIVITY_ID");
@@ -109,14 +108,14 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
         imsTermWarehouseDetail.setActivityId(activity.getActivityId());
         imsTermWarehouseDetail.setBrandCode(activity.getBrandCode());
 
-        if(null==vo.getSnList()){
+        if(null==lowerHairMachineVo.getSnList()){
             throw new Exception("sn列表异常");
         }
-        if(vo.getSnList().size()==0){
+        if(lowerHairMachineVo.getSnList().size()==0){
             throw new MessageException("sn数据有误");
         }
-        log.info("同步POS入库划拨数据开始:snList:{},请求参数:{}",vo.getSnList().size(),vo.getImsTermWarehouseDetail());
-        for (String sn : vo.getSnList()) {
+        log.info("同步POS入库划拨数据开始:snList:{},请求参数:{}",lowerHairMachineVo.getSnList().size(),lowerHairMachineVo.getImsTermWarehouseDetail());
+        for (String sn : lowerHairMachineVo.getSnList()) {
             ImsTermActive imsTermActive = imsTermActiveService.selectByPrimaryKey(sn);
             //有记录就表示已激活
             if(null!=imsTermActive){
@@ -136,7 +135,6 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
             imsTermWarehouseDetail.setUpdateTime(createTime);
             imsTermWarehouseDetail.setPayStatus("1");  //支付状态 0 已付 1 未付
             imsTermWarehouseDetail.setDeliveryTime(DateUtil.formatDay(new Date()));
-
             int i = imsTermWarehouseDetailMapper.insert(imsTermWarehouseDetail);
             log.info("同步POS入库返回结果:{}",i);
             if(i!=1){
