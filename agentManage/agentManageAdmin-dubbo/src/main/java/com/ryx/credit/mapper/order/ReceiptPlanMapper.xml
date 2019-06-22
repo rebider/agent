@@ -22,6 +22,7 @@
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="MODEL" jdbcType="VARCHAR" property="model" />
+    <result column="ACTIVITY_ID" jdbcType="VARCHAR" property="activityId" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -55,7 +56,7 @@
   <sql id="Base_Column_List">
     ID, PLAN_NUM, ORDER_ID, RECEIPT_ID, USER_ID, PRO_ID, PRO_TYPE, PRO_COM, PLAN_PRO_NUM,
     SEND_PRO_NUM, SEND_DATE, REAL_SEND_DATE, RETURN_ORDER_DETAIL_ID, REMARK, C_USER,
-    C_DATE, PLAN_ORDER_STATUS, STATUS, VERSION, MODEL
+    C_DATE, PLAN_ORDER_STATUS, STATUS, VERSION, MODEL, ACTIVITY_ID
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.ReceiptPlanExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -87,19 +88,21 @@
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.ReceiptPlan">
     insert into O_RECEIPT_PLAN (ID, PLAN_NUM, ORDER_ID,
-      RECEIPT_ID, USER_ID, PRO_ID,
-      PRO_TYPE, PRO_COM, PLAN_PRO_NUM,
-      SEND_PRO_NUM, SEND_DATE, REAL_SEND_DATE,
-      RETURN_ORDER_DETAIL_ID, REMARK, C_USER,
-      C_DATE, PLAN_ORDER_STATUS, STATUS,
-      VERSION, MODEL)
+    RECEIPT_ID, USER_ID, PRO_ID,
+    PRO_TYPE, PRO_COM, PLAN_PRO_NUM,
+    SEND_PRO_NUM, SEND_DATE, REAL_SEND_DATE,
+    RETURN_ORDER_DETAIL_ID, REMARK, C_USER,
+    C_DATE, PLAN_ORDER_STATUS, STATUS,
+    VERSION, MODEL, ACTIVITY_ID
+    )
     values (#{id,jdbcType=VARCHAR}, #{planNum,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR},
-      #{receiptId,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{proId,jdbcType=VARCHAR},
-      #{proType,jdbcType=VARCHAR}, #{proCom,jdbcType=VARCHAR}, #{planProNum,jdbcType=DECIMAL},
-      #{sendProNum,jdbcType=DECIMAL}, #{sendDate,jdbcType=TIMESTAMP}, #{realSendDate,jdbcType=TIMESTAMP},
-      #{returnOrderDetailId,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{cUser,jdbcType=VARCHAR},
-      #{cDate,jdbcType=TIMESTAMP}, #{planOrderStatus,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL},
-      #{version,jdbcType=DECIMAL}, #{model,jdbcType=VARCHAR})
+    #{receiptId,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{proId,jdbcType=VARCHAR},
+    #{proType,jdbcType=VARCHAR}, #{proCom,jdbcType=VARCHAR}, #{planProNum,jdbcType=DECIMAL},
+    #{sendProNum,jdbcType=DECIMAL}, #{sendDate,jdbcType=TIMESTAMP}, #{realSendDate,jdbcType=TIMESTAMP},
+    #{returnOrderDetailId,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{cUser,jdbcType=VARCHAR},
+    #{cDate,jdbcType=TIMESTAMP}, #{planOrderStatus,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL},
+    #{version,jdbcType=DECIMAL}, #{model,jdbcType=VARCHAR}, #{activityId,jdbcType=VARCHAR}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.ReceiptPlan">
     insert into O_RECEIPT_PLAN
@@ -164,6 +167,9 @@
       <if test="model != null">
         MODEL,
       </if>
+      <if test="activityId != null">
+        ACTIVITY_ID,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -225,6 +231,9 @@
       </if>
       <if test="model != null">
         #{model,jdbcType=VARCHAR},
+      </if>
+      <if test="activityId != null">
+        #{activityId,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -294,30 +303,34 @@
       <if test="model != null">
         MODEL = #{model,jdbcType=VARCHAR},
       </if>
+      <if test="activityId != null">
+        ACTIVITY_ID = #{activityId,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.ReceiptPlan">
     update O_RECEIPT_PLAN
     set PLAN_NUM = #{planNum,jdbcType=VARCHAR},
-      ORDER_ID = #{orderId,jdbcType=VARCHAR},
-      RECEIPT_ID = #{receiptId,jdbcType=VARCHAR},
-      USER_ID = #{userId,jdbcType=VARCHAR},
-      PRO_ID = #{proId,jdbcType=VARCHAR},
-      PRO_TYPE = #{proType,jdbcType=VARCHAR},
-      PRO_COM = #{proCom,jdbcType=VARCHAR},
-      PLAN_PRO_NUM = #{planProNum,jdbcType=DECIMAL},
-      SEND_PRO_NUM = #{sendProNum,jdbcType=DECIMAL},
-      SEND_DATE = #{sendDate,jdbcType=TIMESTAMP},
-      REAL_SEND_DATE = #{realSendDate,jdbcType=TIMESTAMP},
-      RETURN_ORDER_DETAIL_ID = #{returnOrderDetailId,jdbcType=VARCHAR},
-      REMARK = #{remark,jdbcType=VARCHAR},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      C_DATE = #{cDate,jdbcType=TIMESTAMP},
-      PLAN_ORDER_STATUS = #{planOrderStatus,jdbcType=DECIMAL},
-      STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL},
-      MODEL = #{model,jdbcType=VARCHAR}
+    ORDER_ID = #{orderId,jdbcType=VARCHAR},
+    RECEIPT_ID = #{receiptId,jdbcType=VARCHAR},
+    USER_ID = #{userId,jdbcType=VARCHAR},
+    PRO_ID = #{proId,jdbcType=VARCHAR},
+    PRO_TYPE = #{proType,jdbcType=VARCHAR},
+    PRO_COM = #{proCom,jdbcType=VARCHAR},
+    PLAN_PRO_NUM = #{planProNum,jdbcType=DECIMAL},
+    SEND_PRO_NUM = #{sendProNum,jdbcType=DECIMAL},
+    SEND_DATE = #{sendDate,jdbcType=TIMESTAMP},
+    REAL_SEND_DATE = #{realSendDate,jdbcType=TIMESTAMP},
+    RETURN_ORDER_DETAIL_ID = #{returnOrderDetailId,jdbcType=VARCHAR},
+    REMARK = #{remark,jdbcType=VARCHAR},
+    C_USER = #{cUser,jdbcType=VARCHAR},
+    C_DATE = #{cDate,jdbcType=TIMESTAMP},
+    PLAN_ORDER_STATUS = #{planOrderStatus,jdbcType=DECIMAL},
+    STATUS = #{status,jdbcType=DECIMAL},
+    VERSION = #{version,jdbcType=DECIMAL},
+    MODEL = #{model,jdbcType=VARCHAR},
+    ACTIVITY_ID = #{activityId,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

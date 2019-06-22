@@ -4,6 +4,7 @@ package com.ryx.credit.dao.agent;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.agent.BusActRelExample;
 import com.ryx.credit.pojo.admin.agent.BusActRelKey;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -25,6 +26,8 @@ public interface BusActRelMapper {
     int updateByPrimaryKey(BusActRel record);
 
     BusActRel findById(String activId);
+
+    int updateActivIdByActivId(@Param("activId") String activId, @Param("newActivId") String newActivId);
 
     BusActRel findByBusId(String busId);
 }
