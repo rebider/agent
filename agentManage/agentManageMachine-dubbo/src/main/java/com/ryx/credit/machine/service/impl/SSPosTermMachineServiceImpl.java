@@ -98,23 +98,20 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
 
     @Override
     public AgentResult lowerHairMachine(LowerHairMachineVo lowerHairMachineVo)throws Exception {
+        log.info("同步POS入库划拨数据开始:snList:{},请求参数:{}",lowerHairMachineVo.getSnList().size(),JSONObject.toJSONString(lowerHairMachineVo.getImsTermWarehouseDetail()));
         ImsTermWarehouseDetail imsTermWarehouseDetail = lowerHairMachineVo.getImsTermWarehouseDetail();
         Map<String,String> posInfo = imsTermMachineMapper.queryIMS_POS_ACTIVITY(imsTermWarehouseDetail.getMachineId());
-        String POS_ID =  posInfo.get("POS_ID");
+        String POS_ID      =   posInfo.get("POS_ID");
         String ACTIVITY_ID =   posInfo.get("ACTIVITY_ID");
-
         ImsMachineActivity activity = imsMachineActivityMapper.selectByPrimaryKey(ACTIVITY_ID);
-        imsTermWarehouseDetail.setMachineId(POS_ID);
-        imsTermWarehouseDetail.setActivityId(activity.getActivityId());
-        imsTermWarehouseDetail.setBrandCode(activity.getBrandCode());
-
+        log.info("同步POS入库划拨:POS编号:{},活动编号:{},活动名称:{},sn：{}",POS_ID,ACTIVITY_ID,activity==null?"null":activity.getActivityName(),lowerHairMachineVo.getSnList());
         if(null==lowerHairMachineVo.getSnList()){
             throw new Exception("sn列表异常");
         }
         if(lowerHairMachineVo.getSnList().size()==0){
             throw new MessageException("sn数据有误");
         }
-        log.info("同步POS入库划拨数据开始:snList:{},请求参数:{}",lowerHairMachineVo.getSnList().size(),lowerHairMachineVo.getImsTermWarehouseDetail());
+
         for (String sn : lowerHairMachineVo.getSnList()) {
             ImsTermActive imsTermActive = imsTermActiveService.selectByPrimaryKey(sn);
             //有记录就表示已激活
@@ -126,6 +123,9 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
                 throw new MessageException("SN已存在,请检查sn");
             }
             String createTime = DateUtil.format(new Date());
+            imsTermWarehouseDetail.setMachineId(POS_ID);
+            imsTermWarehouseDetail.setActivityId(activity.getActivityId());
+            imsTermWarehouseDetail.setBrandCode(activity.getBrandCode());
             imsTermWarehouseDetail.setWdId(IDUtils.genImsTermId());
             imsTermWarehouseDetail.setPosSn(sn);
             imsTermWarehouseDetail.setUseStatus("1"); //未使用
@@ -134,7 +134,6 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
             imsTermWarehouseDetail.setCreatePerson(ZHYY_CREATE_PERSON);
             imsTermWarehouseDetail.setUpdateTime(createTime);
             imsTermWarehouseDetail.setPayStatus("1");  //支付状态 0 已付 1 未付
-            imsTermWarehouseDetail.setDeliveryTime(DateUtil.formatDay(new Date()));
             int i = imsTermWarehouseDetailMapper.insert(imsTermWarehouseDetail);
             log.info("同步POS入库返回结果:{}",i);
             if(i!=1){
