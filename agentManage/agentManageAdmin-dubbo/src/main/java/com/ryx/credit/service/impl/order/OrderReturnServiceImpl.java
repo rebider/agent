@@ -1822,7 +1822,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         OOrder order =  oOrderMapper.selectByPrimaryKey(oLogistics.getOrderId());
                         AgentBusInfo busInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
                         vo.setNewBusNum(busInfo.getBusNum());
-
+                        vo.setPlatformType(platForm.getPlatformType());
 
                         //退货订单的业务编号
                         OReturnOrderDetail oReturnOrderDetail = returnOrderDetailMapper.selectByPrimaryKey(receiptPlan.getReturnOrderDetailId());
@@ -1902,6 +1902,50 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                             if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
                                 log.info("机具退货调整首刷接口调用Exception更新数据库失败:{}",JSONObject.toJSONString(logistics));
                             }
+                        }
+                    }else  if (PlatformType.SSPOS.code.equals(platForm.getPlatformType())){
+                        log.info("======pos发货 更新库存记录:{}:{}",proType,stringList);
+                        List<OLogisticsDetail> snList = (List<OLogisticsDetail>)resultVO.getObj();
+                        if(null==oOrder){
+                            throw new MessageException("查询订单数据失败！");
+                        }
+                        AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oOrder.getBusId());
+                        if(null==agentBusInfo){
+                            throw new MessageException("查询订单业务数据失败！");
+                        }
+
+                        AdjustmentMachineVo vo = new AdjustmentMachineVo();
+                        vo.setPlatformType(platForm.getPlatformType());
+                            ImsTermAdjustDetail imsTermAdjustDetail = new ImsTermAdjustDetail();
+                            imsTermAdjustDetail.setnOrgId(agentBusInfo.getBusNum());
+                            imsTermAdjustDetail.setMachineId(oActivity_plan.getBusProCode());
+                        OLogistics logistics =  oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
+                        log.info("退货上传物流下发到POS系统:{}:{}:{}",user,logistics.getId(),snList.toString());
+                        try {
+                            vo.setImsTermAdjustDetail(imsTermAdjustDetail);
+                            vo.setLogisticsDetailList(snList);
+                            AgentResult ar = termMachineService.adjustmentMachine(vo);
+                            if(ar.isOK()){
+                                logistics.setSendStatus(Status.STATUS_1.status);
+                                logistics.setSendMsg(ar.getMsg());
+                                oLogisticsMapper.updateByPrimaryKeySelective(logistics);
+                            }else{
+                                logistics.setSendStatus(Status.STATUS_2.status);
+                                logistics.setSendMsg(ar.getMsg());
+                                oLogisticsMapper.updateByPrimaryKeySelective(logistics);
+                            }
+                        } catch (MessageException e) {
+                            e.printStackTrace();
+                            log.error("机具退货调整POS接口调用异常"+logistics.getId(),e);
+                            logistics.setSendStatus(Status.STATUS_2.status);
+                            logistics.setSendMsg(e.getMsg());
+                            oLogisticsMapper.updateByPrimaryKeySelective(logistics);
+                        }catch (Exception e) {
+                            e.printStackTrace();
+                            log.error("机具退货调整POS接口调用异常"+logistics.getId(),e);
+                            logistics.setSendStatus(Status.STATUS_2.status);
+                            logistics.setSendMsg(e.getLocalizedMessage());
+                            oLogisticsMapper.updateByPrimaryKeySelective(logistics);
                         }
                     }else{
                         OLogistics logistics_send =oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());

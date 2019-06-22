@@ -107,7 +107,7 @@ public class TermMachineServiceImpl  implements TermMachineService {
      * @return
      */
     @Override
-    public AgentResult adjustmentMachine(AdjustmentMachineVo adjustmentMachineVo) throws MessageException{
+    public AgentResult adjustmentMachine(AdjustmentMachineVo adjustmentMachineVo) throws Exception{
         if(PlatformType.whetherPOS(adjustmentMachineVo.getPlatformType())){
             return AgentResult.ok();
         }else if(PlatformType.MPOS.code.equals(adjustmentMachineVo.getPlatformType())){

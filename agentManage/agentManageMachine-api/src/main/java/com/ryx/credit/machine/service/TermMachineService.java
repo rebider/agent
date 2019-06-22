@@ -54,7 +54,7 @@ public interface TermMachineService {
      * @param adjustmentMachineVo
      * @return
      */
-    public AgentResult adjustmentMachine(AdjustmentMachineVo adjustmentMachineVo )throws MessageException;
+    public AgentResult adjustmentMachine(AdjustmentMachineVo adjustmentMachineVo )throws Exception;
 
 
     /**
