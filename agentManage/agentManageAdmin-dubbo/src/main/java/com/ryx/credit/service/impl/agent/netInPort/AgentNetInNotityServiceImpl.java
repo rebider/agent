@@ -190,7 +190,7 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                     }else if(platForm.getPlatformType().equals(PlatformType.SSPOS.getValue())){
                         paramMap = agentHttpSsPosServiceImpl.packageParam(reqMap);
                     }
-                    record.setSendJson(JSONObject.toJSONString(paramMap));
+                    record = agentPlatFormSynParam(record, agentBusInfo, notifyType, paramMap);
                     if(PlatformType.whetherPOS(platForm.getPlatformType())){
                         result = agentHttpPosServiceImpl.httpRequestNetIn(paramMap);
                     }else if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
@@ -200,7 +200,7 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                     }else if(platForm.getPlatformType().equals(PlatformType.SSPOS.getValue())){
                         result = agentHttpSsPosServiceImpl.httpRequestNetIn(paramMap);
                     }
-                    log.info("入网开户修改操作: ,业务id：{},返回结果:{}",busId,result);
+                    log.info("入网开户修改操作: ,业务id：{},返回结果:{}",busId,JSONObject.toJSONString(result));
                     record.setNotifyJson(String.valueOf(result.getData()));
                 } catch (Exception e) {
                     log.info("入网开户修改操作: 通知pos手刷http请求异常:{}",e.getMessage());
