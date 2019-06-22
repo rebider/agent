@@ -1,6 +1,8 @@
 package com.ryx.credit.machine.entity;
 
-public class ImsTermWarehouseLog {
+import java.io.Serializable;
+
+public class ImsTermWarehouseLog implements Serializable {
     private String wdId;
 
     private String machineId;
