@@ -151,7 +151,7 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
         resultMap.put("bankCard",agentColinfo.getCloBankAccount());//结算卡号
         resultMap.put("openBank",agentColinfo.getCloBankCode());//收款开户总行 银行代码
         resultMap.put("openBankChild",agentColinfo.getBranchLineNum());//收款开户支行 联号
-        resultMap.put("bankCardCredNo","");//收款开户支行 户主姓名
+        resultMap.put("bankCardCredNo",agentColinfo.getAgLegalCernum());//收款开户支行 户主姓名
 
         resultMap.put("openBankName",agentColinfo.getCloBank());//收款开户总行
         resultMap.put("openBankChildName",agentColinfo.getCloBankBranch());//收款开户支行
@@ -212,6 +212,7 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
             data.put("credName",paramMap.get("credName"));//法人姓名
             data.put("credNo",paramMap.get("credNo"));//法人身份证
             data.put("bankCardName",paramMap.get("bankCardName"));//结算户名
+            data.put("bankCardCredNo",paramMap.get("bankCardCredNo"));//收款开户支行 户主姓名
             data.put("bankCard",paramMap.get("bankCard"));//结算卡号
             data.put("openBank",paramMap.get("openBank"));//收款开户总行 行号
             data.put("openBankChild",paramMap.get("openBankChild"));//收款开户支行 联号
