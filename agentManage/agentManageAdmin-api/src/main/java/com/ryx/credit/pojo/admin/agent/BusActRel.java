@@ -23,13 +23,9 @@ public class BusActRel extends BusActRelKey implements Serializable{
 
     private String dataShiro;
 
-    public String getDataShiro() {
-        return dataShiro;
-    }
+    private String agDocPro;
 
-    public void setDataShiro(String dataShiro) {
-        this.dataShiro = dataShiro;
-    }
+    private String agDocDistrict;
 
     public String getBusType() {
         return busType;
@@ -93,5 +89,29 @@ public class BusActRel extends BusActRelKey implements Serializable{
 
     public void setNetInBusType(String netInBusType) {
         this.netInBusType = netInBusType == null ? null : netInBusType.trim();
+    }
+
+    public String getDataShiro() {
+        return dataShiro;
+    }
+
+    public void setDataShiro(String dataShiro) {
+        this.dataShiro = dataShiro == null ? null : dataShiro.trim();
+    }
+
+    public String getAgDocPro() {
+        return agDocPro;
+    }
+
+    public void setAgDocPro(String agDocPro) {
+        this.agDocPro = agDocPro == null ? null : agDocPro.trim();
+    }
+
+    public String getAgDocDistrict() {
+        return agDocDistrict;
+    }
+
+    public void setAgDocDistrict(String agDocDistrict) {
+        this.agDocDistrict = agDocDistrict == null ? null : agDocDistrict.trim();
     }
 }

@@ -18,4 +18,10 @@ public interface AgentNetInHttpService {
     Map agencyLevelUpdateChangeData(Map data);
 
     AgentResult agencyLevelUpdateChange(Map data) throws Exception;
+
+    Map<String,Object> packageParamUpdate(Map<String,Object> param);
+
+    AgentResult httpRequestNetInUpdate(Map<String,Object> paramMap)throws Exception;
+
+    AgentResult queryTermCount(String agencyId)throws Exception;
 }

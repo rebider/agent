@@ -125,8 +125,7 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
         resultMap.put("uniqueId",agentBusInfo.getId());
         resultMap.put("orgId",agentBusInfo.getBusNum());
         resultMap.put("busiType",platForm.getPosbusitype());
-        Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
-        resultMap.put("orgType",dictByValue.getdItemname().contains(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
+        resultMap.put("orgType",OrgType.zQ(agentBusInfo.getBusType())?OrgType.STR.getValue():OrgType.ORG.getValue());
         resultMap.put("loginName",agentBusInfo.getBusLoginNum());
         AgentBusInfo agentParent = null;
         if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentBusInfo.getBusParent())){
@@ -351,6 +350,7 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
         }
     }
 
+
     public JSONObject request(Map data,String url)throws Exception {
         try {
 
@@ -418,5 +418,21 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
             throw e;
         }
     }
+
+    @Override
+    public Map<String, Object> packageParamUpdate(Map<String, Object> param) {
+        return packageParam(param);
+    }
+
+    @Override
+    public AgentResult httpRequestNetInUpdate(Map<String, Object> paramMap) throws Exception {
+        return httpRequestNetIn(paramMap);
+    }
+
+    @Override
+    public AgentResult queryTermCount(String agencyId) throws Exception {
+        return null;
+    }
+
 }
 

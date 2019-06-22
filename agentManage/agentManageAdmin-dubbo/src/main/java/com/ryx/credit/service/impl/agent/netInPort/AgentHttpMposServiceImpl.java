@@ -97,12 +97,13 @@ public class AgentHttpMposServiceImpl implements AgentNetInHttpService {
             resultMap.put("supDorgId",agentParent.getBusNum());
         }
         Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
-        resultMap.put("orgType",dictByValue.getdItemname().contains(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
+        resultMap.put("orgType",OrgType.zQ(agentBusInfo.getBusType())?OrgType.STR.getValue():OrgType.ORG.getValue());
         //新增传递参数
         Organization organization = organizationMapper.selectByPrimaryKey(agentBusInfo.getOrganNum());
         resultMap.put("agentId",organization.getOrgId());//机构ID
         resultMap.put("agentName",organization.getOrgName());//机构编号
         resultMap.put("agCode",agentBusInfo.getAgentId());//AG码
+
 
 
         return resultMap;
@@ -151,12 +152,12 @@ public class AgentHttpMposServiceImpl implements AgentNetInHttpService {
             }else{
                 AppConfig.sendEmails(httpResult, "入网通知手刷失败报警");
                 log.info("http请求超时返回错误:{}",httpResult);
-                throw new Exception("http返回有误");
+                throw new Exception(httpResult);
             }
         } catch (Exception e) {
             AppConfig.sendEmails("通知手刷请求超时："+ MailUtil.printStackTrace(e), "入网通知手刷失败报警");
-            log.info("http请求超时:{}",e.getMessage());
-            throw new Exception("http请求超时");
+            log.info("http请求超时:{}",e.getLocalizedMessage());
+            throw new Exception("http请求超时"+e.getLocalizedMessage());
         }
     }
 
@@ -225,5 +226,21 @@ public class AgentHttpMposServiceImpl implements AgentNetInHttpService {
         JSONObject respXMLObj = JSONObject.parseObject(httpResult);
         return respXMLObj;
     }
+
+    @Override
+    public Map<String, Object> packageParamUpdate(Map<String, Object> param) {
+        return packageParam(param);
+    }
+
+    @Override
+    public AgentResult httpRequestNetInUpdate(Map<String, Object> paramMap) throws Exception {
+        return httpRequestNetIn(paramMap);
+    }
+
+    @Override
+    public AgentResult queryTermCount(String agencyId) throws Exception {
+        return null;
+    }
+
 
 }
