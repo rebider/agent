@@ -439,7 +439,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 }
                 //物流为未发送状态
                 if (PlatformType.whetherPOS(platForm.getPlatformType())) {
-                //如果是首刷进行sn检查库存中是否存在
+                    //如果是首刷进行sn检查库存中是否存在
                 }else if (platForm.getPlatformType().equals(PlatformType.MPOS.msg) || platForm.getPlatformType().equals(PlatformType.MPOS.code)){
                     for (String idSn : stringList) {
                         OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();

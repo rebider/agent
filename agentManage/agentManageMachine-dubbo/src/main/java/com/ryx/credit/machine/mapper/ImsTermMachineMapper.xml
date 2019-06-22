@@ -22,6 +22,9 @@
     <result column="STAND_AMT" jdbcType="DECIMAL" property="standAmt" />
     <result column="MACHINE_TYPE" jdbcType="VARCHAR" property="machineType" />
     <result column="BACK_TYPE" jdbcType="CHAR" property="backType" />
+    <result column="ACTIVITY_NAME" jdbcType="VARCHAR" property="activityName" />
+    <result column="RETURN_DEPOSIT" jdbcType="DECIMAL" property="returnDeposit" />
+    <result column="IS_NEW_MACHINE" jdbcType="CHAR" property="isNewMachine" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -55,7 +58,8 @@
   <sql id="Base_Column_List">
     MACHINE_ID, MODEL, PRICE, MIN_ORD_QTY, STATUS, REMARK, CREATE_TIME, CREATE_PERSON, 
     UPDATE_TIME, UPDATE_PERSON, TERM_TYPE, COMM_TYPE, MACHINE_MANUF, IS_OUTER_PINPAD, 
-    IS_NON_CONN, IS_ELECT_SIGN, DEPOSIT, STAND_AMT, MACHINE_TYPE, BACK_TYPE
+    IS_NON_CONN, IS_ELECT_SIGN, DEPOSIT, STAND_AMT, MACHINE_TYPE, BACK_TYPE, ACTIVITY_NAME, 
+    RETURN_DEPOSIT, IS_NEW_MACHINE
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.machine.entity.ImsTermMachineExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -92,16 +96,16 @@
       UPDATE_PERSON, TERM_TYPE, COMM_TYPE, 
       MACHINE_MANUF, IS_OUTER_PINPAD, IS_NON_CONN, 
       IS_ELECT_SIGN, DEPOSIT, STAND_AMT, 
-      MACHINE_TYPE, BACK_TYPE
-      )
+      MACHINE_TYPE, BACK_TYPE, ACTIVITY_NAME, 
+      RETURN_DEPOSIT, IS_NEW_MACHINE)
     values (#{machineId,jdbcType=VARCHAR}, #{model,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL}, 
       #{minOrdQty,jdbcType=DECIMAL}, #{status,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
       #{createTime,jdbcType=VARCHAR}, #{createPerson,jdbcType=VARCHAR}, #{updateTime,jdbcType=VARCHAR}, 
       #{updatePerson,jdbcType=VARCHAR}, #{termType,jdbcType=VARCHAR}, #{commType,jdbcType=VARCHAR}, 
       #{machineManuf,jdbcType=VARCHAR}, #{isOuterPinpad,jdbcType=VARCHAR}, #{isNonConn,jdbcType=VARCHAR}, 
       #{isElectSign,jdbcType=VARCHAR}, #{deposit,jdbcType=DECIMAL}, #{standAmt,jdbcType=DECIMAL}, 
-      #{machineType,jdbcType=VARCHAR}, #{backType,jdbcType=CHAR}
-      )
+      #{machineType,jdbcType=VARCHAR}, #{backType,jdbcType=CHAR}, #{activityName,jdbcType=VARCHAR}, 
+      #{returnDeposit,jdbcType=DECIMAL}, #{isNewMachine,jdbcType=CHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.machine.entity.ImsTermMachine">
     insert into IMS_TERM_MACHINE
@@ -166,6 +170,15 @@
       <if test="backType != null">
         BACK_TYPE,
       </if>
+      <if test="activityName != null">
+        ACTIVITY_NAME,
+      </if>
+      <if test="returnDeposit != null">
+        RETURN_DEPOSIT,
+      </if>
+      <if test="isNewMachine != null">
+        IS_NEW_MACHINE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="machineId != null">
@@ -227,6 +240,15 @@
       </if>
       <if test="backType != null">
         #{backType,jdbcType=CHAR},
+      </if>
+      <if test="activityName != null">
+        #{activityName,jdbcType=VARCHAR},
+      </if>
+      <if test="returnDeposit != null">
+        #{returnDeposit,jdbcType=DECIMAL},
+      </if>
+      <if test="isNewMachine != null">
+        #{isNewMachine,jdbcType=CHAR},
       </if>
     </trim>
   </insert>
@@ -296,6 +318,15 @@
       <if test="backType != null">
         BACK_TYPE = #{backType,jdbcType=CHAR},
       </if>
+      <if test="activityName != null">
+        ACTIVITY_NAME = #{activityName,jdbcType=VARCHAR},
+      </if>
+      <if test="returnDeposit != null">
+        RETURN_DEPOSIT = #{returnDeposit,jdbcType=DECIMAL},
+      </if>
+      <if test="isNewMachine != null">
+        IS_NEW_MACHINE = #{isNewMachine,jdbcType=CHAR},
+      </if>
     </set>
     where MACHINE_ID = #{machineId,jdbcType=VARCHAR}
   </update>
@@ -319,7 +350,10 @@
       DEPOSIT = #{deposit,jdbcType=DECIMAL},
       STAND_AMT = #{standAmt,jdbcType=DECIMAL},
       MACHINE_TYPE = #{machineType,jdbcType=VARCHAR},
-      BACK_TYPE = #{backType,jdbcType=CHAR}
+      BACK_TYPE = #{backType,jdbcType=CHAR},
+      ACTIVITY_NAME = #{activityName,jdbcType=VARCHAR},
+      RETURN_DEPOSIT = #{returnDeposit,jdbcType=DECIMAL},
+      IS_NEW_MACHINE = #{isNewMachine,jdbcType=CHAR}
     where MACHINE_ID = #{machineId,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -332,4 +366,39 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+
+  <select id="querySSIMS_TERM_MACHINE" resultType="map" >
+    select a.pos_activity_id AS ID,
+      (c.brand_name||'|活动编号:'||c.activity_id||'|活动名称:'||c.activity_name||'机型:'||IMS_POS.POS_MODEL||'|单价:'||b.price
+       ||'|最低订购量:'||b.MIN_ORD_QTY
+       || '|终端类型' ||b.term_type||'|通讯类型'|| b.COMM_TYPE
+       || '活动时间:' || c.activity_start_time || c.activity_end_time) AS NAME,
+       b.STAND_AMT,b.BACK_TYPE
+    from IMS_POS_ACTIVITY a
+      left join IMS_TERM_MACHINE b on a.pos_id=b.machine_id
+      left join IMS_MACHINE_ACTIVITY c on a.activity_id=c.activity_id
+      left join IMS_POS on IMS_POS.ID=b.Model
+    where b.status=1 and c.status='00'
+  </select>
+
+  <select id="querySSIMS_TERM_MACHINE" resultType="map" >
+    select a.pos_activity_id AS ID,
+    (c.brand_name||'|活动编号:'||c.activity_id||'|活动名称:'||c.activity_name||'机型:'||IMS_POS.POS_MODEL||'|单价:'||b.price
+    ||'|最低订购量:'||b.MIN_ORD_QTY
+    || '|终端类型' ||b.term_type||'|通讯类型'|| b.COMM_TYPE
+    || '活动时间:' || c.activity_start_time || c.activity_end_time) AS NAME,
+    b.STAND_AMT,b.BACK_TYPE
+    from IMS_POS_ACTIVITY a
+    left join IMS_TERM_MACHINE b on a.pos_id=b.machine_id
+    left join IMS_MACHINE_ACTIVITY c on a.activity_id=c.activity_id
+    left join IMS_POS on IMS_POS.ID=b.Model
+    where b.status=1 and c.status='00'
+  </select>
+
+  <select id="queryIMS_POS_ACTIVITY" resultType="map">
+    select IMS_POS_ACTIVITY.POS_ID,IMS_POS_ACTIVITY.ACTIVITY_ID
+    from IMS_POS_ACTIVITY
+    where IMS_POS_ACTIVITY.POS_ACTIVITY_ID=#{id,jdbcType=VARCHAR}
+  </select>
 </mapper>

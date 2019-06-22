@@ -45,6 +45,7 @@
     <result column="AG_DOC_PRO" jdbcType="VARCHAR" property="agDocPro" />
     <result column="ORGAN_NUM" jdbcType="VARCHAR" property="organNum" />
     <result column="FINACE_REMIT_ORGAN" jdbcType="VARCHAR" property="finaceRemitOrgan" />
+    <result column="APPROVE_TIME" jdbcType="TIMESTAMP" property="approveTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -82,7 +83,7 @@
     CLO_RECEIPT, CLO_PAY_COMPANY, CLO_AGENT_COLINFO, BUS_STATUS, CLO_REVIEW_STATUS, C_TIME,
     C_UTIME, C_USER, STATUS, VERSION, AG_ZBH, BUS_USE_ORGAN, BUS_SCOPE, DREDGE_S0, BUS_LOGIN_NUM,
     DEBIT_RATE_LOWER, DEBIT_CAPPING, DEBIT_APPEAR_RATE, TERMINALS_LOWER, CREDIT_RATE_FLOOR,
-    AG_DOC_DISTRICT, AG_DOC_PRO, ORGAN_NUM, FINACE_REMIT_ORGAN
+    AG_DOC_DISTRICT, AG_DOC_PRO, ORGAN_NUM, FINACE_REMIT_ORGAN, APPROVE_TIME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -126,7 +127,7 @@
     BUS_USE_ORGAN, BUS_SCOPE, DREDGE_S0,
     BUS_LOGIN_NUM, DEBIT_RATE_LOWER, DEBIT_CAPPING,
     DEBIT_APPEAR_RATE, TERMINALS_LOWER, CREDIT_RATE_FLOOR,
-    AG_DOC_DISTRICT, AG_DOC_PRO, ORGAN_NUM, FINACE_REMIT_ORGAN)
+    AG_DOC_DISTRICT, AG_DOC_PRO, ORGAN_NUM, FINACE_REMIT_ORGAN, APPROVE_TIME)
     values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR},
     #{busPlatform,jdbcType=VARCHAR}, #{busType,jdbcType=VARCHAR}, #{busParent,jdbcType=VARCHAR},
     #{busRiskParent,jdbcType=VARCHAR}, #{busActivationParent,jdbcType=VARCHAR}, #{busRegion,jdbcType=VARCHAR},
@@ -140,7 +141,7 @@
     #{busUseOrgan,jdbcType=VARCHAR}, #{busScope,jdbcType=VARCHAR}, #{dredgeS0,jdbcType=DECIMAL},
     #{busLoginNum,jdbcType=VARCHAR}, #{debitRateLower,jdbcType=VARCHAR}, #{debitCapping,jdbcType=VARCHAR},
     #{debitAppearRate,jdbcType=VARCHAR}, #{terminalsLower,jdbcType=VARCHAR}, #{creditRateFloor,jdbcType=VARCHAR},
-    #{agDocDistrict,jdbcType=VARCHAR}, #{agDocPro,jdbcType=VARCHAR}, #{organNum,jdbcType=VARCHAR}, #{finaceRemitOrgan,jdbcType=VARCHAR})
+    #{agDocDistrict,jdbcType=VARCHAR}, #{agDocPro,jdbcType=VARCHAR}, #{organNum,jdbcType=VARCHAR}, #{finaceRemitOrgan,jdbcType=VARCHAR}, #{approveTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfo">
     insert into A_AGENT_BUSINFO
@@ -274,6 +275,9 @@
       <if test="finaceRemitOrgan != null">
         FINACE_REMIT_ORGAN,
       </if>
+      <if test="approveTime != null">
+        APPROVE_TIME,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -404,6 +408,9 @@
       </if>
       <if test="finaceRemitOrgan != null">
         #{finaceRemitOrgan,jdbcType=VARCHAR},
+      </if>
+      <if test="approveTime != null">
+        #{approveTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -542,6 +549,9 @@
       <if test="finaceRemitOrgan != null">
         FINACE_REMIT_ORGAN = #{finaceRemitOrgan,jdbcType=VARCHAR},
       </if>
+      <if test="approveTime != null">
+        APPROVE_TIME = #{approveTime,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
@@ -589,6 +599,7 @@
     AG_DOC_PRO = #{agDocPro,jdbcType=VARCHAR},
     ORGAN_NUM = #{organNum,jdbcType=VARCHAR},
     FINACE_REMIT_ORGAN = #{finaceRemitOrgan,jdbcType=VARCHAR}
+    APPROVE_TIME = #{approveTime,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <sql id="OracleDialectPrefix">

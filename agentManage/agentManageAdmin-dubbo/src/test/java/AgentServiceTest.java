@@ -1,6 +1,10 @@
+import com.ryx.credit.common.enumc.NotifyType;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.dao.order.OLogisticsDetailMapper;
 import com.ryx.credit.dao.order.ReceiptPlanMapper;
+import com.ryx.credit.service.agent.AgentNotifyService;
+import com.ryx.credit.service.agent.AgentService;
+import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.order.OLogisticsService;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -23,6 +27,10 @@ public class AgentServiceTest extends BaseSpringTest  {
     private OLogisticsService oLogisticsService;
     @Autowired
     private ReceiptPlanMapper receiptPlanMapper;
+    @Autowired
+    private AgentService agentService;
+    @Autowired
+    private AgentNetInNotityService agentNetInNotityService;
 
     @Test
     public void testNotify(){
@@ -40,5 +48,14 @@ public class AgentServiceTest extends BaseSpringTest  {
 //        oLogisticsService.isInSnSegment("SNM123","SNM124","SNM121","SNj125");
         List<Map<String,Object>> data = receiptPlanMapper.getReceipPlanList(FastMap.fastMap("PLAN_NUM","ORP20181126000000000000843"));
         System.out.println(data);
+    }
+    @Test
+    public void posss(){
+        try {
+            agentNetInNotityService.asynNotifyPlatform("AB2019062v000000000020757", NotifyType.NetInEdit.getValue());
+            Thread.currentThread().sleep(100000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

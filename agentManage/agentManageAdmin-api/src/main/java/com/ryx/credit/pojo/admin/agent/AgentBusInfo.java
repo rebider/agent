@@ -83,6 +83,8 @@ public class AgentBusInfo implements Serializable {
 
     private String terminalsLower;
 
+    private Date approveTime;
+
     private String creditRateFloor;
 
     private String agDocDistrict;
@@ -151,6 +153,14 @@ public class AgentBusInfo implements Serializable {
 
     public void setTerminalsLower(String terminalsLower) {
         this.terminalsLower = terminalsLower;
+    }
+
+    public Date getApproveTime() {
+        return approveTime;
+    }
+
+    public void setApproveTime(Date approveTime) {
+        this.approveTime = approveTime;
     }
 
     public String getCreditRateFloor() {
