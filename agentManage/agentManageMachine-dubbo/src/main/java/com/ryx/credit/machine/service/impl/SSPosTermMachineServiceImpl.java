@@ -175,7 +175,7 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
     }
 
     @Override
-    public AgentResult adjustmentMachine(AdjustmentMachineVo adjustmentMachineVo)throws MessageException {
+    public AgentResult adjustmentMachine(AdjustmentMachineVo adjustmentMachineVo)throws Exception {
         List<OLogisticsDetail>  logisticsDetailList = adjustmentMachineVo.getLogisticsDetailList();
         ImsTermAdjustDetail imsTermAdjustDetail = adjustmentMachineVo.getImsTermAdjustDetail();
         if(null==logisticsDetailList){
