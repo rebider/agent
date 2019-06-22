@@ -428,4 +428,20 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
             throw e;
         }
     }
+
+
+    @Override
+    public Map<String, Object> packageParamUpdate(Map<String, Object> param) {
+        return packageParam(param);
+    }
+
+    @Override
+    public AgentResult httpRequestNetInUpdate(Map<String, Object> paramMap) throws Exception {
+        return httpRequestNetIn(paramMap);
+    }
+
+    @Override
+    public AgentResult queryTermCount(String agencyId) throws Exception {
+        return null;
+    }
 }
