@@ -667,6 +667,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                         imsTermWarehouseDetail.setPosSpePrice(oActivity_plan.getPosSpePrice());
                         imsTermWarehouseDetail.setPosType(oActivity_plan.getPosType());
                         imsTermWarehouseDetail.setStandTime(oActivity_plan.getStandTime());
+                        imsTermWarehouseDetail.setDeliveryTime(DateUtil.format(oLogistics.getSendDate(),"yyyyMMdd"));
                         OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
                         try {
                             LowerHairMachineVo lowerHairMachineVo = new LowerHairMachineVo();

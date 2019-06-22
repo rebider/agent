@@ -1,8 +1,9 @@
 package com.ryx.credit.machine.entity;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class ImsTermWarehouseDetail {
+public class ImsTermWarehouseDetail implements Serializable {
     private String posSn;
 
     private String wdId;

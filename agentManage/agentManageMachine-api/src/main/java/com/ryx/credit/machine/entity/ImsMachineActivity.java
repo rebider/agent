@@ -1,9 +1,10 @@
 package com.ryx.credit.machine.entity;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class ImsMachineActivity {
+public class ImsMachineActivity implements Serializable {
     private String activityId;
 
     private String activityName;
