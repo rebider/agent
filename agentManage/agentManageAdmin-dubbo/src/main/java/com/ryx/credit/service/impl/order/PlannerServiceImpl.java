@@ -157,24 +157,11 @@ public class PlannerServiceImpl implements PlannerService {
             }
             //新订单活动
             OSubOrderActivity OSubOrderActivityItem = oSubOrderActivities.get(0);
-            OActivity current_activity = oActivityMapper.selectByPrimaryKey(OSubOrderActivityItem.getActivityId());
             //排单活动
             OActivity sure_activity = oActivityMapper.selectByPrimaryKey(activityId);
-            //根据厂商和型号进行活动调整确认
-            OActivityExample new_OActivityExample = new OActivityExample();
-            new_OActivityExample.or()
-                    .andActCodeEqualTo(current_activity.getActCode())
-                    .andStatusEqualTo(Status.STATUS_1.status)
-                    .andVenderEqualTo(sure_activity.getVender())
-                    .andProductIdEqualTo(sure_activity.getProductId())
-                    .andProModelEqualTo(sure_activity.getProModel());
-            List<OActivity> venderModeActivity =oActivityMapper.selectByExample(new_OActivityExample);
-            if(venderModeActivity.size()!=1){
-                throw new MessageException(sure_activity.getVender()+"厂商和"+sure_activity.getProModel()+"活动确定不了具体的活动");
-            }
             //cxinfo  保存排单 确定具体活动 价格计算采用活动中的价格 xx
             //确定活动
-            OActivity real_activity = venderModeActivity.get(0);
+            OActivity real_activity = sure_activity;
             OSubOrderActivityItem.setActivityId(real_activity.getId());
             OSubOrderActivityItem.setActivityName(real_activity.getActivityName());
             OSubOrderActivityItem.setActivityWay(real_activity.getActivityWay());
