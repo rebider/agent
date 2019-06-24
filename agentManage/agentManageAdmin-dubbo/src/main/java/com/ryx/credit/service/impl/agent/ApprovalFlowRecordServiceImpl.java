@@ -118,11 +118,11 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
             criteria.andBusTypeEqualTo(approvalFlowRecord.getBusType());
         }
         if(StringUtils.isNotBlank(approvalFlowRecord.getBeginTime())){
-            Date beginTime = DateUtil.format(approvalFlowRecord.getBeginTime());
+            Date beginTime = DateUtil.format(approvalFlowRecord.getBeginTime(),"yyyy-MM-dd");
             criteria.andApprovalTimeGreaterThanOrEqualTo(beginTime);
         }
         if(StringUtils.isNotBlank(approvalFlowRecord.getEndTime())){
-            Date endTime = DateUtil.format(approvalFlowRecord.getEndTime());
+            Date endTime = DateUtil.format(approvalFlowRecord.getEndTime(),"yyyy-MM-dd");
             criteria.andApprovalTimeLessThanOrEqualTo(endTime);
         }
         if(StringUtils.isNotBlank(approvalFlowRecord.getBeginTime()) && StringUtils.isNotBlank(approvalFlowRecord.getEndTime())){
