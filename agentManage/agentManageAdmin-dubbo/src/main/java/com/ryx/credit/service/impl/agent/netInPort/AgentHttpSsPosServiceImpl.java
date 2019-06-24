@@ -142,6 +142,8 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
         //组装参数
         resultMap.put("brandName",platForm.getPlatformName());//平台名称
         resultMap.put("alwaysProfit","01");//该机构是否参与实时分润
+
+        resultMap.put("finaceRemitOrgan",agentBusInfo.getFinaceRemitOrgan());//财务出款机构
         resultMap.put("agentId",organization.getOrgId());//机构ID
         resultMap.put("agentName",organization.getOrgName());//机构编号
         resultMap.put("credName",agent.getAgLegal());//法人姓名
