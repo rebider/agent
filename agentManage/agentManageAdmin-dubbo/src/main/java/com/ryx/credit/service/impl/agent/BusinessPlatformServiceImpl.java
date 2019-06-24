@@ -324,6 +324,42 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         }
     }
 
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    public void updateBusinfoData(List<AgentBusInfoVo> busInfoVoList) throws Exception {
+        if (busInfoVoList==null) {
+            throw new MessageException("信息错误");
+        }
+        if (busInfoVoList.size()==0) {
+            throw new MessageException("信息错误");
+        }
+        try{
+            for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
+                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                agentBusInfo.setBusType(agentBusInfoVo.getBusType());
+                agentBusInfo.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
+                agentBusInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
+                agentBusInfo.setBusContact(agentBusInfoVo.getBusContact());
+                agentBusInfo.setBusContactMobile(agentBusInfoVo.getBusContactMobile());
+                agentBusInfo.setBusContactEmail(agentBusInfoVo.getBusContactEmail());
+                agentBusInfo.setBusContactPerson(agentBusInfoVo.getBusContactPerson());
+                agentBusInfo.setBusLoginNum(agentBusInfoVo.getBusLoginNum());
+                agentBusInfo.setBusStatus(agentBusInfoVo.getBusStatus());
+                agentBusInfo.setVersion(agentBusInfo.getVersion());
+                int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                if (i != 1) {
+                    throw new MessageException("更新失败");
+                }
+            }
+        } catch (MessageException e) {
+            e.printStackTrace();
+            throw new MessageException(e.getMsg());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        }
+    }
+
 
     @Override
     public List<PlatForm> queryAblePlatForm() {
