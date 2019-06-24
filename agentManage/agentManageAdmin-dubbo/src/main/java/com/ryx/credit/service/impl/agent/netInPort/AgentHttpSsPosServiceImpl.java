@@ -143,6 +143,7 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
         resultMap.put("brandName",platForm.getPlatformName());//平台名称
         resultMap.put("alwaysProfit","01");//该机构是否参与实时分润
         resultMap.put("agentId",organization.getOrgId());//机构ID
+        resultMap.put("finaceRemitOrgan",agentBusInfo.getFinaceRemitOrgan());//财务出款机构
         resultMap.put("agentName",organization.getOrgName());//机构编号
         resultMap.put("credName",agent.getAgLegal());//法人姓名
         resultMap.put("credNo",agent.getAgLegalCernum());//法人身份证
@@ -207,6 +208,7 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
             //组装参数
             data.put("brandName",paramMap.get("brandName"));//平台名称
             data.put("alwaysProfit","01");//该机构是否参与实时分润
+            data.put("finaceRemitOrgan",paramMap.get("finaceRemitOrgan"));//财务出款机构
             data.put("agentId",paramMap.get("agentId"));//机构ID
             data.put("agentName",paramMap.get("agentName"));//机构编号
             data.put("credName",paramMap.get("credName"));//法人姓名
