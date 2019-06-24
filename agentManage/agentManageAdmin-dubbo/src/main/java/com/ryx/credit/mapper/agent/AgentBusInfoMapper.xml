@@ -651,115 +651,26 @@
 
   <select id="queryBusinessPlatformList" parameterType="map" resultType="map">
     <include refid="OracleDialectPrefix" />
-    (
-    select
-    b.id,b.agent_id,b.bus_num,b.bus_platform,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
-    a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time,b.clo_pay_company,b.bus_Inde_ass,d.ag_name as risk_parent,e.name as ag_doc_pro
-    from A_agent_businfo b
-    left join A_agent a on b.agent_id = a.id
-    left join A_agent_businfo c on c.id = b.bus_risk_parent
-    left join A_agent d on d.id = c.agent_id
-    left join c_organization e on e.id = a.ag_doc_pro
-    left join C_ORGANIZATION g on g.ID=a.AG_DOC_DISTRICT
-    where a.id=b.agent_id
-    and a.ag_status = #{reqMap.agStatus}
-    <if test="reqMap.agName != null and reqMap.agName != '' " >
-      and a.ag_name  like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
-    </if>
-    <if test="reqMap.agUniqNum != null and reqMap.agUniqNum != '' " >
-      and a.ag_uniq_num = #{reqMap.agUniqNum}
-    </if>
-    <if test="reqMap.busNum != null and reqMap.busNum != '' " >
-      and b.bus_num = #{reqMap.busNum}
-    </if>
-    <if test="reqMap.busPlatform != null and reqMap.busPlatform != '' " >
-      and b.bus_platform = #{reqMap.busPlatform}
-    </if>
-    <if test="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >
-      and b.clo_review_status = #{reqMap.cloReviewStatus}
-    </if>
-    <if test="reqMap.id != null and reqMap.id != '' " >
-      and b.id = #{reqMap.id}
-    </if>
-    <if test="reqMap.busType != null and reqMap.busType != '' " >
-      and b.bus_type = #{reqMap.busType}
-    </if>
-    <if test="reqMap.organizationCode!=null and reqMap.organizationCode!=''">
-      and (e.CODE like concat(#{reqMap.organizationCode},'%') or g.CODE like concat(#{reqMap.organizationCode},'%') )
-    </if>
-    <if test="reqMap.platfromPerm!=null and reqMap.platfromPerm.size>0">
-      and b.BUS_PLATFORM in
-      <foreach collection="reqMap.platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
-        #{platfromPermItem.PLATFORM_NUM}
-      </foreach>
-    </if>
-    <if test="reqMap.platfromPerm==null or reqMap.platfromPerm.size==0">
-      and 1=-1
-    </if>
-    and b.status = #{reqMap.status}
-    UNION
-    select
-    b.id,b.agent_id,b.bus_num,b.bus_platform,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
-    a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time,b.clo_pay_company,b.bus_Inde_ass,d.ag_name as risk_parent,e.name as ag_doc_pro
-    from A_agent_businfo b
-    left join A_agent a on b.agent_id = a.id
-    left join A_agent_businfo c on c.id = b.bus_risk_parent
-    left join A_agent d on d.id = c.agent_id
-    left join c_organization e on e.id = a.ag_doc_pro
-    left join C_ORGANIZATION g on g.ID=a.AG_DOC_DISTRICT
-    <where> a.id=b.agent_id
-    and a.ag_status = #{reqMap.agStatus}
-    <if test="reqMap.agName != null and reqMap.agName != '' " >
-      and a.ag_name  like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
-    </if>
-    <if test="reqMap.agUniqNum != null and reqMap.agUniqNum != '' " >
-      and a.ag_uniq_num = #{reqMap.agUniqNum}
-    </if>
-    <if test="reqMap.busNum != null and reqMap.busNum != '' " >
-      and b.bus_num = #{reqMap.busNum}
-    </if>
-    <if test="reqMap.busPlatform != null and reqMap.busPlatform != '' " >
-      and b.bus_platform = #{reqMap.busPlatform}
-    </if>
-    <if test="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >
-      and b.clo_review_status = #{reqMap.cloReviewStatus}
-    </if>
-    <if test="reqMap.id != null and reqMap.id != '' " >
-      and b.id = #{reqMap.id}
-    </if>
-      <if test="reqMap.busType != null and reqMap.busType != '' " >
-        and b.bus_type = #{reqMap.busType}
-      </if>
-    <if test="reqMap.userId!=null and reqMap.userId!=''">
-      and a.C_USER = #{reqMap.userId}
-    </if>
-    <if test="reqMap.platfromPerm!=null and reqMap.platfromPerm.size>0">
-      and b.BUS_PLATFORM in
-      <foreach collection="reqMap.platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
-        #{platfromPermItem.PLATFORM_NUM}
-      </foreach>
-    </if>
-    <if test="reqMap.platfromPerm==null or reqMap.platfromPerm.size==0">
-      and 1=-1
-    </if>
-    and b.status = #{reqMap.status}
-    </where>
-    )
-    order by c_time desc
+    <include refid="queryBusinessPlatformSql" />
     <include refid="OracleDialectSuffix" />
   </select>
 
-
   <select id="queryBusinessPlatformCount" parameterType="map" resultType="int">
     select count(*) from(
+      <include refid="queryBusinessPlatformSql" />
+    )
+  </select>
+
+  <sql id="queryBusinessPlatformSql">
     select
-    b.id
+    b.id,b.agent_id,b.bus_num,b.bus_platform,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
+    a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time,b.clo_pay_company,b.bus_Inde_ass,d.ag_name as risk_parent,e.name as ag_doc_pro
     from A_agent_businfo b
     left join A_agent a on b.agent_id = a.id
     left join A_agent_businfo c on c.id = b.bus_risk_parent
     left join A_agent d on d.id = c.agent_id
-    left join c_organization e on e.id = a.ag_doc_pro
-    left join C_ORGANIZATION g on g.ID=a.AG_DOC_DISTRICT
+    left join C_ORGANIZATION e on e.ID = b.AG_DOC_PRO
+    left join C_ORGANIZATION g on g.ID=b.AG_DOC_DISTRICT
     where a.id=b.agent_id
     and a.ag_status = #{reqMap.agStatus}
     <if test="reqMap.agName != null and reqMap.agName != '' " >
@@ -798,13 +709,14 @@
     and b.status = #{reqMap.status}
     UNION
     select
-    b.id
+    b.id,b.agent_id,b.bus_num,b.bus_platform,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
+    a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time,b.clo_pay_company,b.bus_Inde_ass,d.ag_name as risk_parent,e.name as ag_doc_pro
     from A_agent_businfo b
     left join A_agent a on b.agent_id = a.id
     left join A_agent_businfo c on c.id = b.bus_risk_parent
     left join A_agent d on d.id = c.agent_id
-    left join c_organization e on e.id = a.ag_doc_pro
-    left join C_ORGANIZATION g on g.ID=a.AG_DOC_DISTRICT
+    left join C_ORGANIZATION e on e.ID = b.AG_DOC_PRO
+    left join C_ORGANIZATION g on g.ID=b.AG_DOC_DISTRICT
     <where> a.id=b.agent_id
       and a.ag_status = #{reqMap.agStatus}
       <if test="reqMap.agName != null and reqMap.agName != '' " >
@@ -842,9 +754,8 @@
       </if>
       and b.status = #{reqMap.status}
     </where>
-    )
-  </select>
-
+    order by c_time desc
+  </sql>
 
   <select id="businessQuery" parameterType="string" resultMap="BaseResultMap">
     select
@@ -1172,4 +1083,36 @@ union
     where BUS_LOGIN_NUM = #{reqMap.oldBusLoginNum,jdbcType=VARCHAR}
     and  bus_platform in (select platform_num from a_platform where platform_type=#{reqMap.platformType,jdbcType=VARCHAR})
   </update>
+
+  <select id="selectBusInfo" resultMap="BaseResultMap" parameterType="map">
+      select
+      ab.*
+      from A_AGENT_BUSINFO ab
+      left join C_ORGANIZATION oa on oa.id=ab.AG_DOC_PRO
+      left join C_ORGANIZATION ob on ob.id=ab.AG_DOC_DISTRICT
+      <where>
+        ab.status = #{reqMap.status}
+        <if test="reqMap.agentId != null and reqMap.agentId != '' " >
+            and ab.agent_id = #{reqMap.agentId}
+        </if>
+        <if test="reqMap.isZpos == null and reqMap.agentId == '' " >
+          and ab.BUS_PLATFORM != #{reqMap.busPlatform}
+        </if>
+        <if test="reqMap.agentId == 'true' " >
+          and ab.BUS_PLATFORM = #{reqMap.busPlatform}
+        </if>
+        <if test="reqMap.organizationCode!=null and reqMap.organizationCode!=''">
+          and (oa.CODE like concat(#{reqMap.organizationCode},'%') or ob.CODE like concat(#{reqMap.organizationCode},'%') )
+        </if>
+        <if test="reqMap.platfromPerm!=null and reqMap.platfromPerm.size>0">
+          and ab.BUS_PLATFORM in
+          <foreach collection="reqMap.platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
+            #{platfromPermItem.PLATFORM_NUM}
+          </foreach>
+        </if>
+        <if test="reqMap.platfromPerm==null or reqMap.platfromPerm.size==0">
+          and  1=-1
+        </if>
+      </where>
+  </select>
 </mapper>
