@@ -6,7 +6,9 @@ import com.ryx.credit.common.enumc.OrgType;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
+import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.ApaycompService;
@@ -46,6 +48,8 @@ public class AgentHttpMposServiceImpl implements AgentNetInHttpService {
     private DictOptionsService dictOptionsService;
     @Autowired
     private AgentBusinfoService agentBusinfoService;
+    @Autowired
+    private OrganizationMapper organizationMapper;
 
     @Override
     public Map<String, Object> packageParam(Map<String, Object> param) {
@@ -92,7 +96,16 @@ public class AgentHttpMposServiceImpl implements AgentNetInHttpService {
         if(null!=agentParent){
             resultMap.put("supDorgId",agentParent.getBusNum());
         }
+        Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
         resultMap.put("orgType",OrgType.zQ(agentBusInfo.getBusType())?OrgType.STR.getValue():OrgType.ORG.getValue());
+        //新增传递参数
+        Organization organization = organizationMapper.selectByPrimaryKey(agentBusInfo.getOrganNum());
+        resultMap.put("agentId",organization.getOrgId());//机构ID
+        resultMap.put("agentName",organization.getOrgName());//机构编号
+        resultMap.put("agCode",agentBusInfo.getAgentId());//AG码
+
+
+
         return resultMap;
     }
 

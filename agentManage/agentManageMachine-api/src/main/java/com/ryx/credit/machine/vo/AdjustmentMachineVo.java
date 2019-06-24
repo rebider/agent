@@ -1,6 +1,10 @@
 package com.ryx.credit.machine.vo;
 
+import com.ryx.credit.machine.entity.ImsTermAdjustDetail;
+import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
+
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 作者：cx
@@ -45,6 +49,11 @@ public class AdjustmentMachineVo implements Serializable{
      *下发人。
      */
     public String optUser;
+
+    private String  PlatformType;
+
+    List<OLogisticsDetail> logisticsDetailList;
+    ImsTermAdjustDetail imsTermAdjustDetail;
 
 
     public String getOldBusNum() {
@@ -117,5 +126,30 @@ public class AdjustmentMachineVo implements Serializable{
 
     public void setNewAct(String newAct) {
         this.newAct = newAct;
+    }
+
+    public String getPlatformType() {
+        return PlatformType;
+    }
+
+    public void setPlatformType(String platformType) {
+        PlatformType = platformType;
+    }
+
+
+    public List<OLogisticsDetail> getLogisticsDetailList() {
+        return logisticsDetailList;
+    }
+
+    public void setLogisticsDetailList(List<OLogisticsDetail> logisticsDetailList) {
+        this.logisticsDetailList = logisticsDetailList;
+    }
+
+    public ImsTermAdjustDetail getImsTermAdjustDetail() {
+        return imsTermAdjustDetail;
+    }
+
+    public void setImsTermAdjustDetail(ImsTermAdjustDetail imsTermAdjustDetail) {
+        this.imsTermAdjustDetail = imsTermAdjustDetail;
     }
 }

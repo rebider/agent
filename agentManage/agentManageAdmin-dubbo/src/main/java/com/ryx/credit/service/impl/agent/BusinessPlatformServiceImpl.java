@@ -377,7 +377,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public AgentResult saveBusinessPlatform(AgentVo agentVo) throws Exception {
+    public AgentResult saveBusinessPlatform(AgentVo agentVo) throws MessageException {
         try {
 
             Agent agent = agentVo.getAgent();
@@ -466,10 +466,10 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             return AgentResult.ok(agentBusInfoList);
         } catch (MessageException e) {
             e.printStackTrace();
-            throw new ProcessException(e.getMsg());
+            throw new MessageException(e.getMsg());
         } catch (Exception e) {
             e.printStackTrace();
-            throw new Exception(e.getLocalizedMessage());
+            throw new MessageException(e.getLocalizedMessage());
         }
     }
 

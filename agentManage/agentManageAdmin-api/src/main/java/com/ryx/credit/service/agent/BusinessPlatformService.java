@@ -42,7 +42,7 @@ public interface BusinessPlatformService {
 
     List<PlatForm> queryAblePlatForm();
 
-    AgentResult saveBusinessPlatform(AgentVo agentVo) throws Exception;
+    AgentResult saveBusinessPlatform(AgentVo agentVo) throws MessageException;
 
     /**
      * 导入业务信息

@@ -8,15 +8,16 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.common.util.agentUtil.AESUtil;
 import com.ryx.credit.common.util.agentUtil.RSAUtil;
-import com.ryx.credit.machine.dao.ImsPosMapper;
-import com.ryx.credit.machine.dao.ImsTermWarehouseDetailMapper;
-import com.ryx.credit.machine.dao.ImsTermWarehouseLogMapper;
+import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.machine.dao.*;
 import com.ryx.credit.machine.entity.*;
 import com.ryx.credit.machine.service.ImsTermActiveService;
 import com.ryx.credit.machine.service.ImsTermMachineService;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.*;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
+import com.ryx.credit.service.order.IOrderReturnService;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.*;
@@ -31,14 +33,15 @@ import java.util.*;
 /**
  * 作者：cx
  * 时间：2018/10/10
- * 描述：POS极具相关接口
+ * 描述：实时分润极具相关接口
  */
-@Service("posTermMachineServiceImpl")
-public class PosTermMachineServiceImpl  implements TermMachineService {
+@Service("sPosTermMachineServiceImpl")
+public class SSPosTermMachineServiceImpl implements TermMachineService {
 
-    private static Logger log = LoggerFactory.getLogger(PosTermMachineServiceImpl.class);
+    private static Logger log = LoggerFactory.getLogger(SSPosTermMachineServiceImpl.class);
 
     private final static String ZHYY_CREATE_PERSON = AppConfig.getProperty("zhyy_create_person");
+    private final static String ZHYY_ROOT_ORG_ID = AppConfig.getProperty("zhyy_root_org_id");
 
     @Resource(name = "imsTermMachineService")
     private ImsTermMachineService imsTermMachineService;
@@ -50,22 +53,34 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
     private ImsTermWarehouseLogMapper imsTermWarehouseLogMapper;
     @Autowired
     private ImsPosMapper imsPosMapper;
+    @Autowired
+    private ImsTermMachineMapper imsTermMachineMapper;
+    @Autowired
+    private ImsMachineActivityMapper imsMachineActivityMapper;
+    @Autowired
+    private ImsTermTransferMapper imsTermTransferMapper;
+    @Autowired
+    private ImsTermTransferDetailMapper imsTermTransferDetailMapper;
+    @Autowired
+    private ImsTermAdjustDetailMapper imsTermAdjustDetailMapper;
+    @Autowired
+    private ImsTermAdjustMapper imsTermAdjustMapper;
+    @Autowired
+    private IOrderReturnService orderReturnService;
 
 
     @Override
     public List<TermMachineVo> queryTermMachine(PlatformType platformType) throws Exception{
-        List<ImsTermMachine> list =  imsTermMachineService.selectByExample();
+        List<Map> list =  imsTermMachineMapper.querySSIMS_TERM_MACHINE();
         List<TermMachineVo> termMachineVoList = new ArrayList<>();
-        for (ImsTermMachine imsTermMachine : list) {
+        for (Map imsTermMachine : list) {
             TermMachineVo newvo = new TermMachineVo();
-            newvo.setId(imsTermMachine.getMachineId());
-            String model = imsTermMachine.getModel();
-            ImsPos imsPos = imsPosMapper.selectByPrimaryKey(model);
-            newvo.setMechineName("型号代码:"+model+"|厂商型号:"+imsPos.getPosModel()+"|价格:"+imsTermMachine.getPrice()
-                    +"|达标金额:" +imsTermMachine.getStandAmt()+"|返还类型:"+ BackType.getContentByValue(imsTermMachine.getBackType())
-                    +"|备注:" +imsTermMachine.getRemark());
-            newvo.setStandAmt(String.valueOf(imsTermMachine.getStandAmt()));
-            newvo.setBackType(imsTermMachine.getBackType());
+            newvo.setId(imsTermMachine.get("ID")+"");
+            newvo.setMechineName(imsTermMachine.get("NAME")+"");
+            Object STAND_AMT = imsTermMachine.get("STAND_AMT");
+            Object BACK_TYPE = imsTermMachine.get("BACK_TYPE");
+            newvo.setStandAmt(STAND_AMT==null?null:(STAND_AMT+""));
+            newvo.setBackType(BACK_TYPE==null?null:(BACK_TYPE+""));
             termMachineVoList.add(newvo);
         }
         return termMachineVoList;
@@ -82,13 +97,141 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
     }
 
     @Override
-    public AgentResult lowerHairMachine(LowerHairMachineVo lowerHairMachineVo) {
-        return null;
+    public AgentResult lowerHairMachine(LowerHairMachineVo lowerHairMachineVo)throws Exception {
+        log.info("同步POS入库划拨数据开始:snList:{},请求参数:{}",lowerHairMachineVo.getSnList().size(),JSONObject.toJSONString(lowerHairMachineVo.getImsTermWarehouseDetail()));
+        ImsTermWarehouseDetail imsTermWarehouseDetail = lowerHairMachineVo.getImsTermWarehouseDetail();
+        Map<String,String> posInfo = imsTermMachineMapper.queryIMS_POS_ACTIVITY(imsTermWarehouseDetail.getMachineId());
+        String POS_ID      =   posInfo.get("POS_ID");
+        String ACTIVITY_ID =   posInfo.get("ACTIVITY_ID");
+        ImsMachineActivity activity = imsMachineActivityMapper.selectByPrimaryKey(ACTIVITY_ID);
+        log.info("同步POS入库划拨:POS编号:{},活动编号:{},活动名称:{},sn：{}",POS_ID,ACTIVITY_ID,activity==null?"null":activity.getActivityName(),lowerHairMachineVo.getSnList());
+        if(null==lowerHairMachineVo.getSnList()){
+            throw new Exception("sn列表异常");
+        }
+        if(lowerHairMachineVo.getSnList().size()==0){
+            throw new MessageException("sn数据有误");
+        }
+
+        for (String sn : lowerHairMachineVo.getSnList()) {
+            ImsTermActive imsTermActive = imsTermActiveService.selectByPrimaryKey(sn);
+            //有记录就表示已激活
+            if(null!=imsTermActive){
+                throw new MessageException("Sn机具已激活");
+            }
+            ImsTermWarehouseDetail updateTermWarehouseDetail = imsTermWarehouseDetailMapper.selectByPrimaryKey(sn);
+            if(updateTermWarehouseDetail!=null){
+                throw new MessageException("SN已存在,请检查sn");
+            }
+            String createTime = DateUtil.format(new Date());
+            imsTermWarehouseDetail.setMachineId(POS_ID);
+            imsTermWarehouseDetail.setActivityId(activity.getActivityId());
+            imsTermWarehouseDetail.setBrandCode(activity.getBrandCode());
+            imsTermWarehouseDetail.setWdId(IDUtils.genImsTermId());
+            imsTermWarehouseDetail.setPosSn(sn);
+            imsTermWarehouseDetail.setUseStatus("1"); //未使用
+            imsTermWarehouseDetail.setStatus("0");  //正常
+            imsTermWarehouseDetail.setCreateTime(createTime);
+            imsTermWarehouseDetail.setCreatePerson(ZHYY_CREATE_PERSON);
+            imsTermWarehouseDetail.setUpdateTime(createTime);
+            imsTermWarehouseDetail.setPayStatus("1");  //支付状态 0 已付 1 未付
+            int i = imsTermWarehouseDetailMapper.insert(imsTermWarehouseDetail);
+            log.info("同步POS入库返回结果:{}",i);
+            if(i!=1){
+                throw new MessageException("SN库存插入失败");
+            }
+            String transferId = IDUtils.genImsTermId();
+            ImsTermTransfer imsTermTransfer = new ImsTermTransfer();
+            imsTermTransfer.setTransferId(transferId);
+            imsTermTransfer.setStatus("0");  //0：处理完成
+            imsTermTransfer.setOrgId(ZHYY_ROOT_ORG_ID);
+            imsTermTransfer.setCreateTime(createTime);
+            imsTermTransfer.setCreatePerson(ZHYY_CREATE_PERSON);
+            imsTermTransfer.setUpdateTime(createTime);
+            imsTermTransfer.setUpdatePerson(ZHYY_CREATE_PERSON);
+            imsTermTransfer.setTransferType("0");   //0:划拨
+
+            int j = imsTermTransferMapper.insert(imsTermTransfer);
+            log.info("同步POS划拨返回结果:{}",j);
+            if(j!=1){
+                throw new MessageException("SN划拨插入失败");
+            }
+            ImsTermTransferDetail imsTermTransferDetail = new ImsTermTransferDetail();
+            imsTermTransferDetail.setId(IDUtils.genImsTermId());
+            imsTermTransferDetail.setMachineId(imsTermWarehouseDetail.getMachineId());
+            imsTermTransferDetail.setPosSn(sn);
+            imsTermTransferDetail.setyOrgId(ZHYY_ROOT_ORG_ID);
+            imsTermTransferDetail.setnOrgId(imsTermWarehouseDetail.getOrgId());
+            imsTermTransferDetail.setCreateTime(createTime);
+            imsTermTransferDetail.setCreatePerson(ZHYY_CREATE_PERSON);
+            imsTermTransferDetail.setOperOrgId(imsTermWarehouseDetail.getOrgId());
+            imsTermTransferDetail.setTransferId(transferId);
+
+            int k = imsTermTransferDetailMapper.insert(imsTermTransferDetail);
+            log.info("同步POS划拨明细返回结果:{}",k);
+            if(k!=1){
+                throw new MessageException("SN划拨明细插入失败");
+            }
+        }
+        return AgentResult.ok();
     }
 
     @Override
     public AgentResult adjustmentMachine(AdjustmentMachineVo adjustmentMachineVo)throws Exception {
-        return null;
+        List<OLogisticsDetail>  logisticsDetailList = adjustmentMachineVo.getLogisticsDetailList();
+        ImsTermAdjustDetail imsTermAdjustDetail = adjustmentMachineVo.getImsTermAdjustDetail();
+        if(null==logisticsDetailList){
+            throw new MessageException("sn列表异常");
+        }
+        if(logisticsDetailList.size()==0){
+            throw new MessageException("sn数据有误");
+        }
+
+        Map<String,String> posInfo = imsTermMachineMapper.queryIMS_POS_ACTIVITY(imsTermAdjustDetail.getMachineId());
+        String POS_ID =  posInfo.get("POS_ID");
+        String ACTIVITY_ID =   posInfo.get("ACTIVITY_ID");
+
+        ImsMachineActivity activity = imsMachineActivityMapper.selectByPrimaryKey(ACTIVITY_ID);
+
+        log.info("同步POS调整数据开始:snList:{},请求参数:{}",logisticsDetailList.size(),imsTermAdjustDetail);
+        for (OLogisticsDetail oLogisticsDetail : logisticsDetailList) {
+            ImsTermActive imsTermActive = imsTermActiveService.selectByPrimaryKey(oLogisticsDetail.getSnNum());
+            //有记录就表示已激活
+            if(null!=imsTermActive){
+                throw new MessageException("Sn机具已激活");
+            }
+            String createTime = DateUtil.format(new Date());
+            String adjustId = IDUtils.genImsTermId();
+            ImsTermAdjust imsTermAdjust = new ImsTermAdjust();
+            imsTermAdjust.setId(adjustId);
+            imsTermAdjust.setCreateTime(createTime);
+            imsTermAdjust.setCreatePerson(ZHYY_CREATE_PERSON);
+            int i = imsTermAdjustMapper.insert(imsTermAdjust);
+            log.info("同步POS调整返回结果:{}",i);
+            if(i!=1){
+                throw new MessageException("SN调整失败");
+            }
+            imsTermAdjustDetail.setId(IDUtils.genImsTermId());
+            imsTermAdjustDetail.setPosSn(oLogisticsDetail.getSnNum());
+            imsTermAdjustDetail.setAdId(adjustId);
+            imsTermAdjustDetail.setCreateTime(createTime);
+            imsTermAdjustDetail.setCreatePerson(ZHYY_CREATE_PERSON);
+            AgentBusInfo agentBusInfo = orderReturnService.queryBusInfoByLogDetail(oLogisticsDetail);
+            imsTermAdjustDetail.setyOrgId(imsTermAdjustDetail.getyOrgId());
+            int j = imsTermAdjustDetailMapper.insert(imsTermAdjustDetail);
+            log.info("同步POS调整返回结果:{}",j);
+            if(j!=1){
+                throw new MessageException("SN调整失败");
+            }
+            ImsTermWarehouseDetail imsTermWarehouseDetail = new ImsTermWarehouseDetail();
+            imsTermWarehouseDetail.setPosSn(oLogisticsDetail.getSnNum());
+            imsTermWarehouseDetail.setOrgId(imsTermAdjustDetail.getnOrgId());
+            int k = imsTermWarehouseDetailMapper.updateByPrimaryKeySelective(imsTermWarehouseDetail);
+            log.info("同步POS调整更新库存明细返回结果:{}",k);
+            if(k!=1){
+                throw new MessageException("SN调整失败");
+            }
+        }
+        return AgentResult.ok();
     }
 
     @Override
@@ -102,10 +245,18 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
             log.info("updateWarehouse请求参数错误2");
             throw new MessageException("请求参数错误");
         }
+
+        Map<String,String> posInfo = imsTermMachineMapper.queryIMS_POS_ACTIVITY(changeActMachine.getNewAct());
+        String POS_ID =  posInfo.get("POS_ID");
+        String ACTIVITY_ID =   posInfo.get("ACTIVITY_ID");
+        ImsMachineActivity activity = imsMachineActivityMapper.selectByPrimaryKey(ACTIVITY_ID);
+
         for (OLogisticsDetail oLogisticsDetail : logisticsDetailList) {
             ImsTermWarehouseDetail imsTermWarehouseDetail = new ImsTermWarehouseDetail();
             imsTermWarehouseDetail.setPosSn(oLogisticsDetail.getSnNum());
-            imsTermWarehouseDetail.setMachineId(oLogisticsDetail.getBusProCode());
+            imsTermWarehouseDetail.setMachineId(POS_ID);
+            imsTermWarehouseDetail.setActivityId(activity.getActivityId());
+            imsTermWarehouseDetail.setBrandCode(activity.getBrandCode());
             ImsTermActive imsTermActive = imsTermActiveService.selectByPrimaryKey(imsTermWarehouseDetail.getPosSn());
             //有记录就表示已激活
             if(null!=imsTermActive){
@@ -119,6 +270,8 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
             if(!queryImsTerm.getUseStatus().equals("1")){
                 throw new MessageException("Sn机具已使用");
             }
+
+
             int i = imsTermWarehouseDetailMapper.updateByPrimaryKeySelective(imsTermWarehouseDetail);
             if(i!=1){
                 throw new MessageException("SN机具变更更新失败");

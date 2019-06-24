@@ -197,7 +197,9 @@ public class OLogisticServiceImpl implements OLogisticsService {
             proComString = String.valueOf(objectList.get(col.indexOf("PRO_COM_STRING"))).trim();
             if(objectList.size()>col.indexOf("isSend")) {
                 try {
-                    isSend = String.valueOf(objectList.get(col.indexOf("isSend"))).trim();
+                    if(null!=objectList.get(col.indexOf("isSend"))) {
+                        isSend = String.valueOf(objectList.get(col.indexOf("isSend"))).trim();
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -416,10 +418,29 @@ public class OLogisticServiceImpl implements OLogisticsService {
             }else{
                 logger.info("导入物流数据,活动代码{}={}==========================================={}" ,oActivity.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
             }
+
+
+
             //如果发货数量大于200-此处大量数据走任务
             if(oLogistics.getSendNum().compareTo(new BigDecimal(200))>0) {
+                //是否发送物流，不发送直接更新物流状态
+                if("0".equals(isSend)){
+                    logger.info("导入物流数据,文件配置物流不发放，物流ID:{}" ,oActivity.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
+                    OLogistics logistics_send =oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
+                    logistics_send.setSendStatus(LogisticsSendStatus.dt_send.code);
+                    logistics_send.setSendMsg("导入物流数据,文件配置物流不发放");
+                    if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
+                        logger.info("手刷下发物流更新记录Exception失败{}",JSONObject.toJSONString(oLogistics));
+                    }
+                    AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",物流未调用业务系统，平台类型与编号:"+platForm.getPlatformType()+","+platForm.getPlatformNum(), "物流未调用业务系统"+platForm.getPlatformType()+","+platForm.getPlatformNum());
+                    logger.info("beginSn:"+beginSn+",endSn:"+endSn+",物流未调用业务系统，平台类型与编号:"+platForm.getPlatformType()+","+platForm.getPlatformNum());
+
+                    return AgentResult.ok("上传文档不进行物流发送");
+                }
                 //物流为未发送状态
                 if (PlatformType.whetherPOS(platForm.getPlatformType())) {
+                //如果是POS进行sn检查库存中是否存在
+                }else if (PlatformType.SSPOS.code.equals(platForm.getPlatformType())) {
                 //如果是首刷进行sn检查库存中是否存在
                 }else if (platForm.getPlatformType().equals(PlatformType.MPOS.msg) || platForm.getPlatformType().equals(PlatformType.MPOS.code)){
                     for (String idSn : stringList) {
@@ -459,6 +480,10 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 //POS发货生成物流明细
                 logger.info("POS发货生成物流明细:{},{},{}",proType,oLogistics.getSnBeginNum(),oLogistics.getSnEndNum());
                 resultVO = insertLogisticsDetail(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(),Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount), oLogistics.getId(), user, planVo.getId());
+            }else if (PlatformType.SSPOS.code.equals(platForm.getPlatformType())){
+                //POS发货生成物流明细
+                logger.info("SSPOS发货生成物流明细:{},{},{}",proType,oLogistics.getSnBeginNum(),oLogistics.getSnEndNum());
+                resultVO = insertLogisticsDetail(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(),Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount), oLogistics.getId(), user, planVo.getId());
             }else{
                 //POS发货生成物流明细
                 logger.info("POS发货生成物流明细:{},{},{}",proType,oLogistics.getSnBeginNum(),oLogistics.getSnEndNum());
@@ -467,6 +492,19 @@ public class OLogisticServiceImpl implements OLogisticsService {
 
             //插入成功更新排单信息
             if (resultVO.isSuccess()) {
+                if("0".equals(isSend)){
+                    logger.info("导入物流数据,文件配置物流不发放，物流ID:{}" ,oActivity.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
+                    OLogistics logistics_send =oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
+                    logistics_send.setSendStatus(LogisticsSendStatus.dt_send.code);
+                    logistics_send.setSendMsg("导入物流数据,文件配置物流不发放");
+                    if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
+                        logger.info("手刷下发物流更新记录Exception失败{}",JSONObject.toJSONString(oLogistics));
+                    }
+                    AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",物流未调用业务系统，平台类型与编号:"+platForm.getPlatformType()+","+platForm.getPlatformNum(), "物流未调用业务系统"+platForm.getPlatformType()+","+platForm.getPlatformNum());
+                    logger.info("beginSn:"+beginSn+",endSn:"+endSn+",物流未调用业务系统，平台类型与编号:"+platForm.getPlatformType()+","+platForm.getPlatformNum());
+
+                    return AgentResult.ok("上传文档不进行物流发送");
+                }
                 String id =  oLogistics.getReceiptPlanId();   // 排单编号
                 if (null == id) {
                     throw new MessageException("排单ID查询失败！");
@@ -476,6 +514,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                         logger.info("导入物流数据,流量卡不进行下发操作，活动代码{}={}={}" ,oActivity.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
                         return AgentResult.ok("流量卡不进行下发操作");
                     }
+                    logger.info("上传物流接口调用，PlatformType：{},{}",platForm.getPlatformType(),JSONObject.toJSONString(oLogistics));
                     //进行入库、机具划拨操作 POS下发业务系统
                     if (PlatformType.whetherPOS(platForm.getPlatformType())){
                         ImsTermWarehouseDetail imsTermWarehouseDetail = new ImsTermWarehouseDetail();
@@ -530,7 +569,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
                         }
                         //首刷下发业务系统
                     }else if(platForm.getPlatformType().equals(PlatformType.MPOS.code) || platForm.getPlatformType().equals(PlatformType.MPOS.msg)){
-
                         List<OLogisticsDetail> forsendSns = (List<OLogisticsDetail>)resultVO.getObj();
                         logger.info("物流下发发货数量sn查询获取数据：{}", JSONObject.toJSONString(forsendSns));
 
@@ -577,6 +615,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                         lowerHairMachineVo.setListSn(listSn);
                         lowerHairMachineVo.setActCode(sBusProCode);
                         lowerHairMachineVo.setPlatFormNum(agentBusInfo.getBusPlatform());
+                        lowerHairMachineVo.setPlatformType(platForm.getPlatformType());
                         //机具下发接口
                         OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(lowerHairMachineVo.getoLogisticsId());
                         try {
@@ -612,6 +651,64 @@ public class OLogisticServiceImpl implements OLogisticsService {
                             logistics_send.setSendMsg("下发异常");
                             if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
                                 logger.info("手刷下发物流更新记录Exception失败{}",JSONObject.toJSONString(oLogistics));
+                            }
+                        }
+                    }else if(PlatformType.SSPOS.code.equals(platForm.getPlatformType())){
+                        ImsTermWarehouseDetail imsTermWarehouseDetail = new ImsTermWarehouseDetail();
+                        OOrder oOrder = oOrderMapper.selectByPrimaryKey(subOrderItem.getOrderId());
+                        if (null==oOrder) {
+                            throw new MessageException("查询订单数据失败！");
+                        }
+                        AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oOrder.getBusId());
+                        if (null==agentBusInfo) {
+                            throw new MessageException("查询业务数据失败！");
+                        }
+                        imsTermWarehouseDetail.setOrgId(agentBusInfo.getBusNum());
+                        imsTermWarehouseDetail.setMachineId(oActivity_plan.getBusProCode());
+                        imsTermWarehouseDetail.setPosSpePrice(oActivity_plan.getPosSpePrice());
+                        imsTermWarehouseDetail.setPosType(oActivity_plan.getPosType());
+                        imsTermWarehouseDetail.setStandTime(oActivity_plan.getStandTime());
+                        imsTermWarehouseDetail.setDeliveryTime(DateUtil.format(oLogistics.getSendDate(),"yyyyMMdd"));
+                        OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
+                        try {
+                            LowerHairMachineVo lowerHairMachineVo = new LowerHairMachineVo();
+                            lowerHairMachineVo.setPlatformType(platForm.getPlatformType());
+                            lowerHairMachineVo.setSnList(stringList);
+                            lowerHairMachineVo.setImsTermWarehouseDetail(imsTermWarehouseDetail);
+                            //机具下发接口
+                            logger.info("导入物流：下发到实时分润平台请求参数:{}",JSONObject.toJSONString(lowerHairMachineVo));
+                            AgentResult posSendRes = termMachineService.lowerHairMachine(lowerHairMachineVo);
+                            logger.info("导入物流：下发到首刷平台结果:{}",posSendRes.getMsg());
+                            if(posSendRes.isOK()){
+                                logistics_send.setSendMsg(posSendRes.getMsg());
+                                logistics_send.setSendStatus(Status.STATUS_1.status);
+                                if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
+                                    logger.info("pos下发物流更新失败STATUS_1成功{}",JSONObject.toJSONString(oLogistics));
+                                }
+                            }else{
+                                AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",错误信息:"+posSendRes.getMsg(), "POS发物流错误报警");
+                                logistics_send.setSendMsg(posSendRes.getMsg());
+                                logistics_send.setSendStatus(Status.STATUS_2.status);
+                                if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
+                                    logger.info("pos下发物流更新失败STATUS_2失败{}",JSONObject.toJSONString(oLogistics));
+                                }
+                            }
+
+                        } catch (MessageException e) {
+                            AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",错误信息:"+MailUtil.printStackTrace(e), "POS发物流错误报警");
+                            e.printStackTrace();
+                            logistics_send.setSendMsg(e.getMsg());
+                            logistics_send.setSendStatus(Status.STATUS_2.status);
+                            if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
+                                logger.info("pos下发物流更新失败MessageException{}",JSONObject.toJSONString(oLogistics));
+                            }
+                        }catch (Exception e){
+                            AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",错误信息:"+MailUtil.printStackTrace(e), "POS发物流错误报警");
+                            e.printStackTrace();
+                            logistics_send.setSendMsg("下发异常");
+                            logistics_send.setSendStatus(Status.STATUS_2.status);
+                            if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
+                                logger.info("pos下发物流更新失败Exception{}",JSONObject.toJSONString(oLogistics));
                             }
                         }
                     }else{

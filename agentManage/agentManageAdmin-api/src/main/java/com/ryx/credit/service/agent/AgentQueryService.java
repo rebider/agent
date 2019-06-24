@@ -92,7 +92,10 @@ public interface AgentQueryService {
     public void loadCach();
 
 
-    List<AgentBusInfo> businessQuery(String agentId,String isZpos);
+    List<AgentBusInfo> businessQuery(String agentId,String isZpos,Long userId);
+
+
+    List<AgentBusInfo> businessQueryCity(String agentId,String isZpos,Long userId);
 
     /**
      * 查询用户收款账户

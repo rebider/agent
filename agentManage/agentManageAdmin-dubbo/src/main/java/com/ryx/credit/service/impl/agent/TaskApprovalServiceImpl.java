@@ -155,6 +155,16 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                         throw new ProcessException("实际到账金额填写失败");
                     }
                 }
+
+                //处理财务审批（财务出款机构）
+                for (AgentBusInfoVo agentBusInfoVo : agentVo.getOrgTypeList()) {
+                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                    agentBusInfo.setFinaceRemitOrgan(agentBusInfoVo.getFinaceRemitOrgan());
+                    int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                    if (i != 1) {
+                        throw new ProcessException("更新财务出款机构异常");
+                    }
+                }
             }
 
             //处理财务修改
