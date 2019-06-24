@@ -146,13 +146,13 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
         resultMap.put("agentName",organization.getOrgName());//机构编号
         resultMap.put("credName",agent.getAgLegal());//法人姓名
         resultMap.put("credNo",agent.getAgLegalCernum());//法人身份证
+        resultMap.put("credPhone",agent.getAgLegalMobile());//法人手机号
 
         resultMap.put("bankCardName",agentColinfo.getCloRealname());//结算户名
+        resultMap.put("bankCardCredNo",agentColinfo.getAgLegalCernum());//结算卡户主身份证
         resultMap.put("bankCard",agentColinfo.getCloBankAccount());//结算卡号
         resultMap.put("openBank",agentColinfo.getCloBankCode());//收款开户总行 银行代码
         resultMap.put("openBankChild",agentColinfo.getBranchLineNum());//收款开户支行 联号
-        resultMap.put("bankCardCredNo",agentColinfo.getAgLegalCernum());//收款开户支行 户主姓名
-
         resultMap.put("openBankName",agentColinfo.getCloBank());//收款开户总行
         resultMap.put("openBankChildName",agentColinfo.getCloBankBranch());//收款开户支行
 
@@ -211,6 +211,8 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
             data.put("agentName",paramMap.get("agentName"));//机构编号
             data.put("credName",paramMap.get("credName"));//法人姓名
             data.put("credNo",paramMap.get("credNo"));//法人身份证
+            data.put("credPhone",paramMap.get("credPhone"));//法人手机号
+
             data.put("bankCardName",paramMap.get("bankCardName"));//结算户名
             data.put("bankCardCredNo",paramMap.get("bankCardCredNo"));//收款开户支行 户主姓名
             data.put("bankCard",paramMap.get("bankCard"));//结算卡号
@@ -218,6 +220,7 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
             data.put("openBankChild",paramMap.get("openBankChild"));//收款开户支行 联号
             data.put("openBankName",paramMap.get("openBankName"));//收款开户总行 名称
             data.put("openBankChildName",paramMap.get("openBankChildName"));//收款开户支行 名称
+
             data.put("isBill",paramMap.get("isBill"));//是否开具分润发票
             data.put("taxPoint",paramMap.get("taxPoint"));//税点
             data.put("agCode",paramMap.get("agCode"));//AG码
