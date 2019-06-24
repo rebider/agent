@@ -145,7 +145,6 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
 
         resultMap.put("finaceRemitOrgan",agentBusInfo.getFinaceRemitOrgan());//财务出款机构
         resultMap.put("agentId",organization.getOrgId());//机构ID
-        resultMap.put("finaceRemitOrgan",agentBusInfo.getFinaceRemitOrgan());//财务出款机构
         resultMap.put("agentName",organization.getOrgName());//机构编号
         resultMap.put("credName",agent.getAgLegal());//法人姓名
         resultMap.put("credNo",agent.getAgLegalCernum());//法人身份证
