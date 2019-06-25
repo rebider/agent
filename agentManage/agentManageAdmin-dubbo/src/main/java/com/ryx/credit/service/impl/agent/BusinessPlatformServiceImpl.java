@@ -364,6 +364,10 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     if(StringUtils.isBlank(item.getBusLoginNum())){
                         throw new ProcessException("瑞大宝登录账号不能为空");
                     }
+                    Boolean exist = selectByBusLoginNumExist(item.getBusLoginNum(), agent.getId());
+                    if(!exist){
+                        throw new ProcessException("瑞大宝登录账号已入网,请勿重复入网");
+                    }
                     if(!RegexUtil.checkInt(item.getBusLoginNum())){
                         throw new ProcessException("瑞大宝登录账号必须为数字");
                     }
@@ -779,4 +783,25 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         return result;
     }
 
+    /**
+     * 根据登陆账号查询是否存在，存在查询跟agentid是否相符
+     * @param busLoginNum
+     * @param agentId
+     * @return
+     */
+    @Override
+    public Boolean selectByBusLoginNumExist(String busLoginNum,String agentId){
+        AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+        AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andBusLoginNumEqualTo(busLoginNum);
+        List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+        if(agentBusInfos!=null && agentBusInfos.size()>0){
+            String sAgentId = agentBusInfos.get(0).getAgentId();
+            if(!sAgentId.equals(agentId)){
+                return false;
+            }
+        }
+        return true;
+    }
 }

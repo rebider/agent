@@ -79,4 +79,6 @@ public interface BusinessPlatformService {
 
     AgentResult selectByAgentApproved(String id);
 
+
+    Boolean selectByBusLoginNumExist(String busLoginNum,String agentId);
 }
