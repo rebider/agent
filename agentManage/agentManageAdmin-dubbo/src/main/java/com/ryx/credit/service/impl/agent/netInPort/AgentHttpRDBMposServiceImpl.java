@@ -9,6 +9,7 @@ import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.common.util.MailUtil;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
+import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.RegionMapper;
 import com.ryx.credit.dao.bank.BankLineNumsMapper;
 import com.ryx.credit.pojo.admin.agent.Agent;
@@ -54,6 +55,8 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
     private RegionMapper regionMapper;
     @Autowired
     private BankLineNumsMapper bankLineNumsMapper;
+    @Autowired
+    private AgentMapper agentMapper;
 
     @Override
     public Map<String, Object> packageParam(Map<String, Object> param) {
@@ -192,7 +195,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         Map<String,Object> jsonParams = new HashMap<>();
         String busId = String.valueOf(data.get("agentBusinfoId"));
         AgentBusInfo agentBusInfo = agentBusinfoService.getById(busId);
-        Agent agent = (Agent)data.get("agent");
+        Agent agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
         AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
         jsonParams.put("mobile",agentBusInfo.getBusNum());
         jsonParams.put("branchid",agentBusInfo.getBusPlatform().split("_")[0]);
