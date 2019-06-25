@@ -451,7 +451,7 @@
         <where>
             1=1 AND status=1
             <if test="map.orgId!=null and map.orgId!=''"> and ORG_ID=#{map.orgId} </if>
-            <if test="map.orgName!=null and map.orgName!=''"> and ORG_NAME=#{map.orgName}</if>
+            <if test="map.orgName!=null and map.orgName!=''"> and ORG_NAME LIKE CONCAT(CONCAT('%',#{map.orgName}),'%')</if>
             <if test="map.platId!=null and map.platId!=''"> and PLAT_ID LIKE CONCAT(CONCAT('%',#{map.platId}),'%')</if>
         </where>
     </sql>
