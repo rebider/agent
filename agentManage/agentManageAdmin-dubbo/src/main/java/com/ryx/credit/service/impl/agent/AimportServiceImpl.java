@@ -1639,6 +1639,7 @@ public class AimportServiceImpl implements AimportService {
         }
         agentBusInfo.setBusNum(busPlatform_num);
         agentBusInfo.setAgentId(agent.getId());
+        agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
         //业务平台类型
         if(StringUtils.isNotBlank(busPlatform)) {
             busPlatform = busPlatform.trim();
