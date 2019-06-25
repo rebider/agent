@@ -81,4 +81,6 @@ public interface BusinessPlatformService {
 
     AgentResult selectByAgentApproved(String id);
 
+
+    List<AgentBusInfo> selectByAgentId(String agentId);
 }
