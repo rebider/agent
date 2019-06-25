@@ -167,11 +167,10 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(dateChangeRequest.getDataId());
         record.setDataShiro(BusActRelBusType.DC_Agent.key);
+        Agent agent = agentMapper.selectByPrimaryKey(dateChangeRequest.getDataId());
+        if(agent!=null)
+        record.setAgentName(agent.getAgName());
         if(dateChangeRequest.getDataType().equals(BusActRelBusType.DC_Agent.name())){
-            Agent agent = agentMapper.selectByPrimaryKey(dateChangeRequest.getDataId());
-            if(agent!=null)
-            record.setAgentName(agent.getAgName());
-
             AgentVo agVo = JSONObject.parseObject(dateChangeRequest.getDataContent(), AgentVo.class);
             if(agVo.getBusInfoVoList().size()==0){
                 throw  new MessageException("缺少业务信息");
