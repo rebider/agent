@@ -458,8 +458,8 @@
     left join a_agent_businfo e on o.bus_id = e.id
     left join a_platform c on c.platform_num = o.order_platform
     left join o_payment d on d.order_id = o.id
-    left join c_organization f on f.id= b.ag_doc_district
-    left join c_organization g on g.id= b.ag_doc_pro
+    left join c_organization f on f.id= e.ag_doc_district
+    left join c_organization g on g.id= e.ag_doc_pro
     <where>
       o.user_id=#{userId}
       <if test="1==1"> and  o.status = 1 </if>
@@ -548,8 +548,8 @@
     left join a_agent_businfo e on o.bus_id = e.id
     left join a_platform c on c.platform_num = o.order_platform
     left join o_payment d on d.order_id = o.id
-    left join c_organization f on f.id= b.ag_doc_district
-    left join c_organization g on g.id= b.ag_doc_pro
+    left join c_organization f on f.id= e.ag_doc_district
+    left join c_organization g on g.id= e.ag_doc_pro
     <where>
       <if test="1==1"> and  o.status = 1 </if>
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>

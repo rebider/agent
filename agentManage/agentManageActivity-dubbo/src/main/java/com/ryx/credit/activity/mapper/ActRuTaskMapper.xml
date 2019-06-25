@@ -419,7 +419,7 @@
       )
     </if>
     <if test="params.group == 'city' " >
-      and (a.ag_doc_pro = #{params.orgId} or a.ag_doc_district = #{params.orgId})
+      and (br.ag_doc_pro = #{params.orgId} or br.ag_doc_district = #{params.orgId})
     </if>
     <if test="params.busActRelBusType != null and params.busActRelBusType!='' " >
       and br.BUS_TYPE = #{params.busActRelBusType}
