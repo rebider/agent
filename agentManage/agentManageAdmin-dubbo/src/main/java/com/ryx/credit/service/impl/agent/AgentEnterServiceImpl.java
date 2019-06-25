@@ -78,9 +78,11 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Autowired
     private CapitalFlowService capitalFlowService;
     @Autowired
+    private OrganizationMapper organizationMapper;
+    @Autowired
     private AgentNetInNotityService agentNetInNotityService;
     @Autowired
-    private OrganizationMapper organizationMapper;
+    private BusinessPlatformService businessPlatformService;
     @Autowired
     private LivenessDetectionService livenessDetectionService;
 
@@ -189,6 +191,10 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     //检查手机号是否填写
                     if(StringUtils.isBlank(item.getBusLoginNum())){
                         throw new ProcessException("瑞大宝登录账号不能为空");
+                    }
+                    Boolean exist = businessPlatformService.selectByBusLoginNumExist(item.getBusLoginNum(), agent.getId());
+                    if(!exist){
+                        throw new ProcessException("瑞大宝登录账号已入网,请勿重复入网");
                     }
                     item.setBusLoginNum(item.getBusLoginNum().trim());
                     if(!RegexUtil.checkInt(item.getBusLoginNum())){
@@ -521,9 +527,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         record.setAgentId(agent.getId());
         record.setAgentName(agent.getAgName());
         record.setDataShiro(BusActRelBusType.Business.key);
-        record.setNetInBusType("ACTIVITY_"+platForm.getPlatformType());
         record.setAgDocPro(abus.getAgDocPro());
         record.setAgDocDistrict(abus.getAgDocDistrict());
+        record.setNetInBusType("ACTIVITY_"+platForm.getPlatformNum());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("代理商业务启动审批异常，添加审批关系失败{}:{}", record.getBusId(), proce);
         }
@@ -1012,7 +1018,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         return res;
     }
 
-    public static BusinessPlatformService businessPlatformService;
 
     @Override
     public List<AgentoutVo> exportAgent(Map map,Long userId) throws ParseException {
