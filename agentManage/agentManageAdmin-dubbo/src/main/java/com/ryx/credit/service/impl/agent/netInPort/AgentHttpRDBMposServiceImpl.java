@@ -130,7 +130,6 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             jsonParams.put("parentAgencyId",paramMap.get("parentAgencyId"));
             jsonParams.put("agCode",paramMap.get("agCode"));
             jsonParams.put("directLabel",paramMap.get("directLabel"));
-            jsonParams.put("directLabel",paramMap.get("directLabel"));
             jsonParams.put("code",paramMap.get("code"));
             jsonParams.put("cityid",paramMap.get("cityid"));
             jsonParams.put("bankcity",paramMap.get("bankcity"));
