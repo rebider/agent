@@ -80,6 +80,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private OrganizationMapper organizationMapper;
     @Autowired
     private AgentNetInNotityService agentNetInNotityService;
+    @Autowired
+    private BusinessPlatformService businessPlatformService;
 
 
     /**
@@ -993,7 +995,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         return res;
     }
 
-    public static BusinessPlatformService businessPlatformService;
 
     @Override
     public List<AgentoutVo> exportAgent(Map map,Long userId) throws ParseException {
