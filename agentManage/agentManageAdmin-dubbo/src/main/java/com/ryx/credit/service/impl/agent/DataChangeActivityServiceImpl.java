@@ -180,6 +180,9 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             record.setNetInBusType("ACTIVITY_"+platForm.getPlatformNum());
             record.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
             record.setAgDocPro(agentBusInfoVo.getAgDocPro());
+        }else{
+            record.setAgDocDistrict(agent.getAgDocDistrict());
+            record.setAgDocPro(agent.getAgDocPro());
         }
         if(1!=busActRelMapper.insertSelective(record)){
             logger.info("代理商审批，启动审批异常，添加审批关系失败{}:{}",dateChangeRequest.getId(),proce);
@@ -231,7 +234,12 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
 
                             //首刷平台
                             PlatFormExample platFormExample = new PlatFormExample();
-                            platFormExample.or().andStatusEqualTo(Status.STATUS_1.status).andPlatformTypeEqualTo(PlatformType.MPOS.code);
+                            List<String> list = new ArrayList<>();
+                            list.add(PlatformType.MPOS.code);
+                            list.add(PlatformType.RDBPOS.code);
+                            platFormExample.or()
+                            .andStatusEqualTo(Status.STATUS_1.status)
+                            .andPlatformTypeIn(list);
                             List<PlatForm>  platForms = platFormMapper.selectByExample(platFormExample);
                             List<String> pltcode = new ArrayList<>();
                             pltcode.add("aaaa");
