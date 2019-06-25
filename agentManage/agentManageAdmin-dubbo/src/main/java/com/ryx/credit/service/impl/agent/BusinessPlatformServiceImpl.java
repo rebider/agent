@@ -779,4 +779,19 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         return result;
     }
 
+
+    @Override
+    public List<AgentBusInfo> selectByAgentId(String agentId) {
+        if (StringUtils.isBlank(agentId)) {
+            return null;
+        } else {
+            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+            AgentBusInfoExample.Criteria criteria =  agentBusInfoExample.createCriteria();
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
+            criteria.andAgentIdEqualTo(agentId);
+            List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+            return agentBusInfos;
+        }
+    }
+
 }
