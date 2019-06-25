@@ -38,6 +38,8 @@ public interface BusinessPlatformService {
 
     void updateBusInfoList(List<AgentBusInfoVo> busInfoVoList)throws Exception;
 
+    void updateBusinfoData(List<AgentBusInfoVo> busInfoVoList) throws Exception;
+
     List<PlatForm> queryAblePlatForm();
 
     AgentResult saveBusinessPlatform(AgentVo agentVo) throws MessageException;
