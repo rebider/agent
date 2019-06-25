@@ -31,5 +31,5 @@ public interface TerminalTransferDetailMapper {
 
     int selectTerminalTransferDetailCount(@Param("map") Map<String, Object> map);
 
-    int updateStatusByTerminalTransferId(String terminalTransferId);
+    int updateStatusByTerminalTransferId(@Param("map") Map<String, Object> map);
 }
