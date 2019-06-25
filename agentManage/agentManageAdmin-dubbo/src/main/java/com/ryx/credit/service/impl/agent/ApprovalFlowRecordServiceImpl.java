@@ -117,20 +117,20 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
         if(StringUtils.isNotBlank(approvalFlowRecord.getBusType())){
             criteria.andBusTypeEqualTo(approvalFlowRecord.getBusType());
         }
-        if(StringUtils.isNotBlank(approvalFlowRecord.getBeginTime())){
-            Date beginTime = DateUtil.format(approvalFlowRecord.getBeginTime(),"yyyy-MM-dd");
-            criteria.andApprovalTimeGreaterThanOrEqualTo(beginTime);
-        }
-        if(StringUtils.isNotBlank(approvalFlowRecord.getEndTime())){
-            Date endTime = DateUtil.format(approvalFlowRecord.getEndTime(),"yyyy-MM-dd");
-            criteria.andApprovalTimeLessThanOrEqualTo(endTime);
-        }
         if(StringUtils.isNotBlank(approvalFlowRecord.getBeginTime()) && StringUtils.isNotBlank(approvalFlowRecord.getEndTime())){
-            Date beginTime = DateUtil.format(approvalFlowRecord.getBeginTime());
-            Date endTime = DateUtil.format(approvalFlowRecord.getEndTime());
+            Date beginTime = DateUtil.format(approvalFlowRecord.getBeginTime(),"yyyy-MM-dd");
+            Date endTime = DateUtil.format(approvalFlowRecord.getEndTime(),"yyyy-MM-dd");
             criteria.andApprovalTimeBetween(beginTime,endTime);
+        }else{
+            if(StringUtils.isNotBlank(approvalFlowRecord.getBeginTime())){
+                Date beginTime = DateUtil.format(approvalFlowRecord.getBeginTime(),"yyyy-MM-dd");
+                criteria.andApprovalTimeGreaterThanOrEqualTo(beginTime);
+            }
+            if(StringUtils.isNotBlank(approvalFlowRecord.getEndTime())){
+                Date endTime = DateUtil.format(approvalFlowRecord.getEndTime(),"yyyy-MM-dd");
+                criteria.andApprovalTimeLessThanOrEqualTo(endTime);
+            }
         }
-
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         example.setPage(page);
         example.setOrderByClause("A_APPROVAL_FLOW_RECORD.APPROVAL_TIME desc");
@@ -173,8 +173,8 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
 
         ApprovalFlowRecordExample approvalFlowRecordExample = new ApprovalFlowRecordExample();
         ApprovalFlowRecordExample.Criteria criteria = approvalFlowRecordExample.createCriteria();
-        Date beginTime = DateUtil.format(approvalFlowRecord.getBeginTime());
-        Date endTime = DateUtil.format(approvalFlowRecord.getEndTime());
+        Date beginTime = DateUtil.format(approvalFlowRecord.getBeginTime(),"yyyy-MM-dd");
+        Date endTime = DateUtil.format(approvalFlowRecord.getEndTime(),"yyyy-MM-dd");
 
         if (StringUtils.isNotBlank(approvalFlowRecord.getApprovalPerson())) {
             String[] split = approvalFlowRecord.getApprovalPerson().split(",");
@@ -202,14 +202,15 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
         if (StringUtils.isNotBlank(approvalFlowRecord.getBusType())) {
             criteria.andBusTypeEqualTo(approvalFlowRecord.getBusType());
         }
-        if (StringUtils.isNotBlank(approvalFlowRecord.getBeginTime())) {
-            criteria.andApprovalTimeGreaterThanOrEqualTo(beginTime);
-        }
-        if (StringUtils.isNotBlank(approvalFlowRecord.getEndTime())) {
-            criteria.andApprovalTimeLessThanOrEqualTo(endTime);
-        }
         if (StringUtils.isNotBlank(approvalFlowRecord.getBeginTime()) && StringUtils.isNotBlank(approvalFlowRecord.getEndTime())) {
             criteria.andApprovalTimeBetween(beginTime, endTime);
+        }else{
+            if (StringUtils.isNotBlank(approvalFlowRecord.getBeginTime())) {
+                criteria.andApprovalTimeGreaterThanOrEqualTo(beginTime);
+            }
+            if (StringUtils.isNotBlank(approvalFlowRecord.getEndTime())) {
+                criteria.andApprovalTimeLessThanOrEqualTo(endTime);
+            }
         }
         criteria.andStatusEqualTo(Status.STATUS_1.status);
 
