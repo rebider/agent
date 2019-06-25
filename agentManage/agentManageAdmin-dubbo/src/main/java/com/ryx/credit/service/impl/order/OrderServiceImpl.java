@@ -741,8 +741,8 @@ public class OrderServiceImpl implements OrderService {
         orderFormVo.setPayAmo(forRealPayAmount);//订单应付金额
 
         //订单首付金额不能大于订单金额
-        if (oPayment.getDownPayment() != null && orderFormVo.getPayAmo()!=null && oPayment.getDownPayment().compareTo(orderFormVo.getPayAmo()) >= 0) {
-            throw new MessageException("首付+分期支付方式，首付不能大于等于订单金额");
+        if (oPayment.getDownPayment() != null && orderFormVo.getPayAmo()!=null && oPayment.getDownPayment().compareTo(orderFormVo.getPayAmo()) > 0) {
+            throw new MessageException("首付不能大于等于订单金额");
         }
         //检查抵扣金额
         if(StringUtils.isNotBlank(oPayment.getDeductionType())){
@@ -1057,8 +1057,8 @@ public class OrderServiceImpl implements OrderService {
         order_db.setoAmo(forPayAmount);//订单总金额
         order_db.setPayAmo(forRealPayAmount);//订单应付金额
         //订单首付金额不能大于订单金额
-        if (oPayment_db.getDownPayment() != null && order_db.getPayAmo()!=null && oPayment_db.getDownPayment().compareTo(order_db.getPayAmo()) >= 0) {
-            throw new MessageException("首付+分期支付方式，首付不能大于等于订单金额");
+        if (oPayment_db.getDownPayment() != null && order_db.getPayAmo()!=null && oPayment_db.getDownPayment().compareTo(order_db.getPayAmo()) > 0) {
+            throw new MessageException("首付不能大于订单金额");
         }
 
         //检查抵扣金额
