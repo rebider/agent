@@ -200,4 +200,11 @@
     <include refid="Base_Column_List" />
     from D_REGION
   </select>
+
+  <select id="findByRcode" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from D_REGION
+    where R_CODE = #{rCode,jdbcType=VARCHAR}
+  </select>
 </mapper>

@@ -8,11 +8,14 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
+import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
+import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,8 +59,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Autowired
     private AimportService aimportService;
     @Autowired
-    private AgentNotifyService agentNotifyService;
-    @Autowired
     private IUserService iUserService;
     @Autowired
     private DictOptionsService dictOptionsService;
@@ -75,6 +76,10 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private AgentBusInfoMapper agentBusInfoMapper;
     @Autowired
     private CapitalFlowService capitalFlowService;
+    @Autowired
+    private AgentNetInNotityService agentNetInNotityService;
+    @Autowired
+    private OrganizationMapper organizationMapper;
 
 
     /**
@@ -123,6 +128,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
             //判断平台是否重复
             List hav = new ArrayList();
+            List<Organization> organList = null;
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
                 if(item.getBusType().equals(BusType.ZQZF.key) || item.getBusType().equals(BusType.ZQBZF.key) || item.getBusType().equals(BusType.ZQ.key) ){
                     if(StringUtils.isBlank(item.getBusParent()))
@@ -169,6 +175,14 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                         throw new ProcessException("瑞花宝登录账号必须是数字");
                     }
                 }
+                //判断所选机构是否属于所选平台（机构编号&业务平台）
+                organList = organizationMapper.selectOrganization(item.getOrganNum());
+                for (Organization organization : organList) {
+                    if (!organization.getPlatId().contains(item.getBusPlatform())) {
+                        throw new ProcessException("所选机构不属于该业务平台");
+                    }
+                    item.setOrganNum(organization.getOrgId());
+                }
             }
             Set<String> resultSet = new HashSet<>();
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
@@ -177,6 +191,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 item.setcUser(agent.getcUser());
                 item.setAgentId(agent.getId());
                 item.setCloReviewStatus(AgStatus.Create.status);
+                for (Organization organization : organList) {
+                    item.setOrganNum(organization.getOrgId());
+                }
                 AgentBusInfo db_AgentBusInfo = agentBusinfoService.agentBusInfoInsert(item);
                 if (StringUtils.isNotBlank(item.getAgentAssProtocol())) {
                     AssProtoColRel rel = new AssProtoColRel();
@@ -647,23 +664,23 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 throw new ProcessException("新增资金流水失败");
             }
         }
-        //入网程序调用
-        try {
-            ImportAgent importAgent = new ImportAgent();
-            importAgent.setDataid(busId);
-            importAgent.setDatatype(AgImportType.BUSAPP.name());
-            importAgent.setBatchcode(processingId);
-            importAgent.setcUser(rel.getcUser());
-            if (1 != aimportService.insertAgentImportData(importAgent)) {
-                logger.info("代理商审批通过-添加开户任务失败");
-            } else {
-                logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.BUSAPP.getValue(), busId);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            agentNotifyService.asynNotifyPlatform();
-        }
+//        入网程序调用
+//        try {
+//            ImportAgent importAgent = new ImportAgent();
+//            importAgent.setDataid(busId);
+//            importAgent.setDatatype(AgImportType.BUSAPP.name());
+//            importAgent.setBatchcode(processingId);
+//            importAgent.setcUser(rel.getcUser());
+//            if (1 != aimportService.insertAgentImportData(importAgent)) {
+//                logger.info("代理商审批通过-添加开户任务失败");
+//            } else {
+//                logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.BUSAPP.getValue(), busId);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
+        agentNetInNotityService.asynNotifyPlatform(busId,NotifyType.NetInAddBus.getValue());
+//        }
         return ResultVO.success(null);
     }
 
@@ -805,24 +822,24 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
         }
         //入网程序调用
-        try {
-            ImportAgent importAgent = new ImportAgent();
-            importAgent.setDataid(busId);
-            importAgent.setDatatype(AgImportType.NETINAPP.name());
-            importAgent.setBatchcode(processingId);
-            importAgent.setcUser(rel.getcUser());
-            if (1 != aimportService.insertAgentImportData(importAgent)) {
-                logger.info("代理商审批通过-添加开户任务失败");
-            } else {
-                logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.NETINAPP.getValue(), busId);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
+//        try {
+//            ImportAgent importAgent = new ImportAgent();
+//            importAgent.setDataid(busId);
+//            importAgent.setDatatype(AgImportType.NETINAPP.name());
+//            importAgent.setBatchcode(processingId);
+//            importAgent.setcUser(rel.getcUser());
+//            if (1 != aimportService.insertAgentImportData(importAgent)) {
+//                logger.info("代理商审批通过-添加开户任务失败");
+//            } else {
+//                logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.NETINAPP.getValue(), busId);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
             //todo 生成后台用户
             agentService.createBackUserbyAgent(agent.getId());
-            agentNotifyService.asynNotifyPlatform();
-        }
+            agentNetInNotityService.asynNotifyPlatform(busId,NotifyType.NetInAdd.getValue());
+//        }
 
         return ResultVO.success(null);
     }

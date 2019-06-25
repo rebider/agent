@@ -14,9 +14,9 @@ import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentColinfoMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.service.agent.AgentColinfoService;
-import com.ryx.credit.service.agent.AgentNotifyService;
 import com.ryx.credit.service.agent.AimportService;
 import com.ryx.credit.service.agent.ColinfoTaskService;
+import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +54,7 @@ public class ColinfoTaskServiceImpl implements ColinfoTaskService {
     @Autowired
     private AimportService aimportService;
     @Autowired
-    private AgentNotifyService agentNotifyService;
+    private AgentNetInNotityService agentNetInNotityService;
 
 
     /**
@@ -226,21 +226,23 @@ public class ColinfoTaskServiceImpl implements ColinfoTaskService {
                         criteria1.andStatusEqualTo(Status.STATUS_1.status);
                         List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
                         for (AgentBusInfo agentBusInfo : agentBusInfos) {
-                            try {
-                                ImportAgent importAgent = new ImportAgent();
-                                //代理商ID
-                                importAgent.setDataid(agentBusInfo.getId());
-                                importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
-                                importAgent.setBatchcode(DateUtil.format(new Date()));
-                                importAgent.setcUser(aColinfoPayment.getcUser());
-                                if (1 != aimportService.insertAgentImportData(importAgent)) {
-                                    log.info("synColinfoToQueryPayment代理商账户修改同步业务平台失败");
-                                } else {
-                                    log.info("synColinfoToQueryPayment代理商账户修改同步业务平台!");
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+//                            try {
+//                                ImportAgent importAgent = new ImportAgent();
+//                                //代理商ID
+//                                importAgent.setDataid(agentBusInfo.getId());
+//                                importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
+//                                importAgent.setBatchcode(DateUtil.format(new Date()));
+//                                importAgent.setcUser(aColinfoPayment.getcUser());
+//                                if (1 != aimportService.insertAgentImportData(importAgent)) {
+//                                    log.info("synColinfoToQueryPayment代理商账户修改同步业务平台失败");
+//                                } else {
+//                                    log.info("synColinfoToQueryPayment代理商账户修改同步业务平台!");
+//                                }
+//                            } catch (Exception e) {
+//                                e.printStackTrace();
+//                            }
+                            //通知业务平台修改数据
+                            agentNetInNotityService.asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
                         }
                     }
                 }else{
@@ -255,8 +257,6 @@ public class ColinfoTaskServiceImpl implements ColinfoTaskService {
             if(StringUtils.isNotBlank(indentifier)){
                 redisService.releaseLock(RedisCachKey.INSERT_SYS_KEY.code, indentifier);
             }
-            //通知业务平台修改数据
-            agentNotifyService.asynNotifyPlatform();
         }
     }
 

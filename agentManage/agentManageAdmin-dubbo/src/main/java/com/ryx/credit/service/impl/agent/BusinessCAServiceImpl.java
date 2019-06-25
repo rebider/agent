@@ -12,7 +12,6 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentExample;
-import com.ryx.credit.service.agent.AgentNotifyService;
 import com.ryx.credit.service.agent.BusinessCAService;
 import com.ryx.credit.util.Constants;
 import org.apache.commons.codec.binary.Base64;
@@ -35,8 +34,6 @@ import java.util.*;
 public class BusinessCAServiceImpl implements BusinessCAService{
 
     private static Logger logger = LoggerFactory.getLogger(BusinessCAServiceImpl.class);
-	@Autowired
-	private AgentNotifyService agentNotifyService;
 	@Autowired
 	private BusinessCAService businessCAService;
 	@Autowired

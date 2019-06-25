@@ -746,13 +746,36 @@
       where aa.platform = bb.BUS_PLATFORM and aa.agentid  = bb.AGENT_ID) cc left join A_AGENT_BUSINFO dd on cc.BUS_PARENT = dd.ID) ee
       left join A_AGENT ff on ee.AGENT_ID = ff.ID) gg left join A_AGENT hh on gg.GUARANTEE_AGENT= hh.ID
 
-      where  gg.sum_status = '1'
+      where  gg.sum_status = 'Deduction_for'
       <if test=" time!= null and time != '' ">
           and gg.sum_mouth &lt;= #{time}
       </if>
   </select>
 
+<!--   查询已结清的实际付款金额-->
 
+    <select id="selectRealAmount" resultType="java.math.BigDecimal" parameterType="String">
+        select sum(REAL_PAY_AMOUNT)as realPayAmount from O_PAYMENT_DETAIL
+         <where>
+             <if test=" orderId!= null and orderId != '' ">
+                 ORDER_ID=#{orderId}
+             </if>
+         </where>
+           AND PAYMENT_TYPE=#{paymentType} and Payment_status in(2,4,6)
+        group by ''
+    </select>
 
+    <!--查询还剩几期的待付款-->
+    <select id="selectCount" resultMap="BaseResultMap" parameterType="String">
+        select
+        <include refid="Base_Column_List" />
+        from O_PAYMENT_DETAIL
+        <where>
+            <if test=" orderId!= null and orderId != '' ">
+                ORDER_ID=#{orderId}
+            </if>
+        </where>
+        AND PAYMENT_TYPE=#{paymentType} and Payment_status=${paymentStatus}
+    </select>
 
 </mapper>

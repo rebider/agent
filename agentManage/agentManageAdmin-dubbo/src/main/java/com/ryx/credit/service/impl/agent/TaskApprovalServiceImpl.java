@@ -5,9 +5,12 @@ import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
+import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.CapitalVo;
@@ -24,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import sun.management.resources.agent;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -66,6 +68,10 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
     private DictOptionsService dictOptionsService;
     @Autowired
     private AgentMapper agentMapper;
+    @Autowired
+    private OrganizationMapper organizationMapper;
+
+
      @Override
      public List<Map<String,Object>> queryBusInfoAndRemit(AgentBusInfo agentBusInfo){
 
@@ -147,6 +153,16 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                     if (i != 1) {
                         logger.info("实际到账金额填写失败");
                         throw new ProcessException("实际到账金额填写失败");
+                    }
+                }
+
+                //处理财务审批（财务出款机构）
+                for (AgentBusInfoVo agentBusInfoVo : agentVo.getOrgTypeList()) {
+                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                    agentBusInfo.setFinaceRemitOrgan(agentBusInfoVo.getFinaceRemitOrgan());
+                    int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                    if (i != 1) {
+                        throw new ProcessException("更新财务出款机构异常");
                     }
                 }
             }

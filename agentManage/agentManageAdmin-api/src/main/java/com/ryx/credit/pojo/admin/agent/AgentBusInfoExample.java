@@ -2737,6 +2737,356 @@ public class AgentBusInfoExample {
             addCriterion("APPROVE_TIME not between", value1, value2, "approveTime");
             return (Criteria) this;
         }
+
+        public Criteria andCreditRateFloorIsNull() {
+            addCriterion("CREDIT_RATE_FLOOR is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorIsNotNull() {
+            addCriterion("CREDIT_RATE_FLOOR is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorEqualTo(String value) {
+            addCriterion("CREDIT_RATE_FLOOR =", value, "creditRateFloor");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorNotEqualTo(String value) {
+            addCriterion("CREDIT_RATE_FLOOR <>", value, "creditRateFloor");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorGreaterThan(String value) {
+            addCriterion("CREDIT_RATE_FLOOR >", value, "creditRateFloor");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorGreaterThanOrEqualTo(String value) {
+            addCriterion("CREDIT_RATE_FLOOR >=", value, "creditRateFloor");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorLessThan(String value) {
+            addCriterion("CREDIT_RATE_FLOOR <", value, "creditRateFloor");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorLessThanOrEqualTo(String value) {
+            addCriterion("CREDIT_RATE_FLOOR <=", value, "creditRateFloor");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorLike(String value) {
+            addCriterion("CREDIT_RATE_FLOOR like", value, "creditRateFloor");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorNotLike(String value) {
+            addCriterion("CREDIT_RATE_FLOOR not like", value, "creditRateFloor");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorIn(List<String> values) {
+            addCriterion("CREDIT_RATE_FLOOR in", values, "creditRateFloor");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorNotIn(List<String> values) {
+            addCriterion("CREDIT_RATE_FLOOR not in", values, "creditRateFloor");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorBetween(String value1, String value2) {
+            addCriterion("CREDIT_RATE_FLOOR between", value1, value2, "creditRateFloor");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditRateFloorNotBetween(String value1, String value2) {
+            addCriterion("CREDIT_RATE_FLOOR not between", value1, value2, "creditRateFloor");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictIsNull() {
+            addCriterion("AG_DOC_DISTRICT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictIsNotNull() {
+            addCriterion("AG_DOC_DISTRICT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictEqualTo(String value) {
+            addCriterion("AG_DOC_DISTRICT =", value, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictNotEqualTo(String value) {
+            addCriterion("AG_DOC_DISTRICT <>", value, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictGreaterThan(String value) {
+            addCriterion("AG_DOC_DISTRICT >", value, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictGreaterThanOrEqualTo(String value) {
+            addCriterion("AG_DOC_DISTRICT >=", value, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictLessThan(String value) {
+            addCriterion("AG_DOC_DISTRICT <", value, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictLessThanOrEqualTo(String value) {
+            addCriterion("AG_DOC_DISTRICT <=", value, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictLike(String value) {
+            addCriterion("AG_DOC_DISTRICT like", value, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictNotLike(String value) {
+            addCriterion("AG_DOC_DISTRICT not like", value, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictIn(List<String> values) {
+            addCriterion("AG_DOC_DISTRICT in", values, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictNotIn(List<String> values) {
+            addCriterion("AG_DOC_DISTRICT not in", values, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictBetween(String value1, String value2) {
+            addCriterion("AG_DOC_DISTRICT between", value1, value2, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictNotBetween(String value1, String value2) {
+            addCriterion("AG_DOC_DISTRICT not between", value1, value2, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProIsNull() {
+            addCriterion("AG_DOC_PRO is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProIsNotNull() {
+            addCriterion("AG_DOC_PRO is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProEqualTo(String value) {
+            addCriterion("AG_DOC_PRO =", value, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProNotEqualTo(String value) {
+            addCriterion("AG_DOC_PRO <>", value, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProGreaterThan(String value) {
+            addCriterion("AG_DOC_PRO >", value, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProGreaterThanOrEqualTo(String value) {
+            addCriterion("AG_DOC_PRO >=", value, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProLessThan(String value) {
+            addCriterion("AG_DOC_PRO <", value, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProLessThanOrEqualTo(String value) {
+            addCriterion("AG_DOC_PRO <=", value, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProLike(String value) {
+            addCriterion("AG_DOC_PRO like", value, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProNotLike(String value) {
+            addCriterion("AG_DOC_PRO not like", value, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProIn(List<String> values) {
+            addCriterion("AG_DOC_PRO in", values, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProNotIn(List<String> values) {
+            addCriterion("AG_DOC_PRO not in", values, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProBetween(String value1, String value2) {
+            addCriterion("AG_DOC_PRO between", value1, value2, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProNotBetween(String value1, String value2) {
+            addCriterion("AG_DOC_PRO not between", value1, value2, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrganNumIsNull() {
+            addCriterion("ORGAN_NUM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrganNumIsNotNull() {
+            addCriterion("ORGAN_NUM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrganNumEqualTo(String value) {
+            addCriterion("ORGAN_NUM =", value, "organNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrganNumNotEqualTo(String value) {
+            addCriterion("ORGAN_NUM <>", value, "organNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrganNumGreaterThan(String value) {
+            addCriterion("ORGAN_NUM >", value, "organNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrganNumGreaterThanOrEqualTo(String value) {
+            addCriterion("ORGAN_NUM >=", value, "organNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrganNumLessThan(String value) {
+            addCriterion("ORGAN_NUM <", value, "organNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrganNumLessThanOrEqualTo(String value) {
+            addCriterion("ORGAN_NUM <=", value, "organNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrganNumLike(String value) {
+            addCriterion("ORGAN_NUM like", value, "organNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrganNumNotLike(String value) {
+            addCriterion("ORGAN_NUM not like", value, "organNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrganNumIn(List<String> values) {
+            addCriterion("ORGAN_NUM in", values, "organNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrganNumNotIn(List<String> values) {
+            addCriterion("ORGAN_NUM not in", values, "organNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrganNumBetween(String value1, String value2) {
+            addCriterion("ORGAN_NUM between", value1, value2, "organNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrganNumNotBetween(String value1, String value2) {
+            addCriterion("ORGAN_NUM not between", value1, value2, "organNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganIsNull() {
+            addCriterion("FINACE_REMIT_ORGAN is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganIsNotNull() {
+            addCriterion("FINACE_REMIT_ORGAN is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganEqualTo(String value) {
+            addCriterion("FINACE_REMIT_ORGAN =", value, "finaceRemitOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganNotEqualTo(String value) {
+            addCriterion("FINACE_REMIT_ORGAN <>", value, "finaceRemitOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganGreaterThan(String value) {
+            addCriterion("FINACE_REMIT_ORGAN >", value, "finaceRemitOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganGreaterThanOrEqualTo(String value) {
+            addCriterion("FINACE_REMIT_ORGAN >=", value, "finaceRemitOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganLessThan(String value) {
+            addCriterion("FINACE_REMIT_ORGAN <", value, "finaceRemitOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganLessThanOrEqualTo(String value) {
+            addCriterion("FINACE_REMIT_ORGAN <=", value, "finaceRemitOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganLike(String value) {
+            addCriterion("FINACE_REMIT_ORGAN like", value, "finaceRemitOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganNotLike(String value) {
+            addCriterion("FINACE_REMIT_ORGAN not like", value, "finaceRemitOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganIn(List<String> values) {
+            addCriterion("FINACE_REMIT_ORGAN in", values, "finaceRemitOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganNotIn(List<String> values) {
+            addCriterion("FINACE_REMIT_ORGAN not in", values, "finaceRemitOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganBetween(String value1, String value2) {
+            addCriterion("FINACE_REMIT_ORGAN between", value1, value2, "finaceRemitOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andFinaceRemitOrganNotBetween(String value1, String value2) {
+            addCriterion("FINACE_REMIT_ORGAN not between", value1, value2, "finaceRemitOrgan");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

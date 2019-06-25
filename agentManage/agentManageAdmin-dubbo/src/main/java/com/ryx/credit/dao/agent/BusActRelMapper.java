@@ -28,4 +28,6 @@ public interface BusActRelMapper {
     BusActRel findById(String activId);
 
     int updateActivIdByActivId(@Param("activId") String activId, @Param("newActivId") String newActivId);
+
+    BusActRel findByBusId(String busId);
 }

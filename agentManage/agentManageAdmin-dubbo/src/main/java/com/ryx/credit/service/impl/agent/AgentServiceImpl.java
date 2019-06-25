@@ -469,6 +469,7 @@ public class AgentServiceImpl implements AgentService {
     @Override
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     public void createUser(String agentId)throws Exception{
+        logger.info("生成后台代理商用户开始:agentId:{}",agentId);
         Agent agent = getAgentById(agentId);
         List<UserVo>  userVoSelect = cUserMapper.selectListByLogin(agent.getAgUniqNum());
         if (userVoSelect.size()>0) {
@@ -486,7 +487,7 @@ public class AgentServiceImpl implements AgentService {
         userVo.setUserType(1);
         userVo.setPhone(agent.getId());
         iUserService.insertByVo(userVo);
-
+        logger.info("生成后台代理商用户成功",agent.getId());
 
         List<UserVo>  list_db = cUserMapper.selectListByLogin(agent.getId());
         UserVo cUser = new UserVo();
@@ -502,6 +503,7 @@ public class AgentServiceImpl implements AgentService {
         cuserAgent.setVersion(BigDecimal.ONE);
         iCuserAgentService.insert(cuserAgent);
         redisService.hSet("agent", String.valueOf(cUser.getId()), agent.getId());
+        logger.info("生成后台代理商用户结束");
     }
 
 

@@ -3108,6 +3108,18 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderoutVo> exportOrder(Map map) {
+        if(null != map.get("userId")) {
+            Long userId = (Long) map.get("userId");
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if (orgCodeRes == null && orgCodeRes.size() != 1) {
+                return null;
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+            map.put("organizationCode", organizationCode);
+            List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+            map.put("platfromPerm", platfromPerm);
+        }
         List<OrderoutVo> orderoutList = orderMapper.excelOrder(map);
         List<Dict> dictList = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.SETTLEMENT_TYPE.name());
         List<Dict> capitalType = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.CAPITAL_TYPE.name());
@@ -3139,6 +3151,12 @@ public class OrderServiceImpl implements OrderService {
                     CUser cUser = iUserService.selectById(orderoutVo.getNuclearUser());
                     if(null!=cUser)
                     orderoutVo.setNuclearUser(cUser.getName());
+                }
+                if (StringUtils.isNotBlank(orderoutVo.getReviewStatus()) && !orderoutVo.getReviewStatus().equals("null")) {
+                    String agStatusByValue = AgStatus.getMsg(new BigDecimal(orderoutVo.getReviewStatus()));
+                    if (null != agStatusByValue) {
+                        orderoutVo.setReviewStatus(agStatusByValue);
+                    }
                 }
             }
         }
