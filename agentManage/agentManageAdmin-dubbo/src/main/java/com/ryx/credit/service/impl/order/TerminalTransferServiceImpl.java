@@ -672,6 +672,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             throw new MessageException("数据ID为空");
         }
         TerminalTransfer terminalTransfer = terminalTransferMapper.selectByPrimaryKey(terminalTransferId);
+        if(null==terminalTransfer){
+            throw new MessageException("数据不存在");
+        }
         terminalTransfer.setStatus(Status.STATUS_0.status);
         Date date = new Date();
         terminalTransfer.setuTime(date);
@@ -683,6 +686,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         TerminalTransferDetailExample terminalTransferDetailExample = new TerminalTransferDetailExample();
         TerminalTransferDetailExample.Criteria criteria = terminalTransferDetailExample.createCriteria();
         criteria.andTerminalTransferIdEqualTo(terminalTransferId);
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
         List<TerminalTransferDetail> terminalTransferDetails = terminalTransferDetailMapper.selectByExample(terminalTransferDetailExample);
         for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetails) {
             terminalTransferDetail.setStatus(Status.STATUS_0.status);
@@ -749,11 +753,16 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 }
             }
         }
-        terminalTransferDetailMapper.updateStatusByTerminalTransferId(terminalTransfer.getId());
+        Map<String, Object> reqMap = new HashMap<>();
+        reqMap.put("terminalTransferId",terminalTransfer.getId());
+        int j = terminalTransferDetailMapper.updateStatusByTerminalTransferId(reqMap);
+        if(j==0){
+            throw new ProcessException("更新失败");
+        }
         for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailList) {
             Map<String, String> resultMap = saveOrEditVerify(terminalTransferDetail, agentId);
             //新增
-            if(StringUtils.isBlank(terminalTransferDetail.getId())){
+//            if(StringUtils.isBlank(terminalTransferDetail.getId())){
                 terminalTransferDetail.setId(idService.genId(TabId.O_TERMINAL_TRANSFER_DE));
                 terminalTransferDetail.setTerminalTransferId(terminalTransfer.getId());
                 terminalTransferDetail.setcUser(cuser);
@@ -769,18 +778,19 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
 //                terminalTransferDetail.setProCom(resultMap.get("proCom"));
 //                terminalTransferDetail.setProModel(resultMap.get("proModel"));
                 terminalTransferDetailMapper.insert(terminalTransferDetail);
-            }else{
-                terminalTransferDetail.setuUser(cuser);
-                terminalTransferDetail.setuTime(date);
-                terminalTransferDetail.setGoalBusId(resultMap.get("goalBusId"));
-                terminalTransferDetail.setOriginalBusId(resultMap.get("originalBusId"));
-//                terminalTransferDetail.setProCom(resultMap.get("proCom"));
-//                terminalTransferDetail.setProModel(resultMap.get("proModel"));
-                int j = terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
-                if(j!=1){
-                    throw new MessageException("更新数据明细失败");
-                }
-            }
+//            }
+//            else{
+//                terminalTransferDetail.setuUser(cuser);
+//                terminalTransferDetail.setuTime(date);
+//                terminalTransferDetail.setGoalBusId(resultMap.get("goalBusId"));
+//                terminalTransferDetail.setOriginalBusId(resultMap.get("originalBusId"));
+////                terminalTransferDetail.setProCom(resultMap.get("proCom"));
+////                terminalTransferDetail.setProModel(resultMap.get("proModel"));
+//                int j = terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
+//                if(j!=1){
+//                    throw new MessageException("更新数据明细失败");
+//                }
+//            }
         }
         return AgentResult.ok();
     }

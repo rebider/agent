@@ -409,7 +409,14 @@
       and br.c_user = #{params.cUser}
     </if>
     <if test="params.group != null and params.group!='' " >
-      and ri.group_id_ = #{params.group}
+      and (ri.group_id_ = #{params.group}
+      <if test="params.roleNames != null and params.roleNames.size>0 " >
+        or ri.group_id_ in
+        <foreach collection="params.roleNames" separator="," item="roleName" index="index" open="(" close=")">
+            #{roleName}
+        </foreach>
+      </if>
+      )
     </if>
     <if test="params.group == 'city' " >
       and (a.ag_doc_pro = #{params.orgId} or a.ag_doc_district = #{params.orgId})
