@@ -83,4 +83,6 @@ public interface BusinessPlatformService {
 
 
     Boolean selectByBusLoginNumExist(String busLoginNum,String agentId);
+
+    List<AgentBusInfo> selectByAgentId(String agentId);
 }

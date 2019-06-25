@@ -149,7 +149,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             logger.info("========用户{}启动数据修改申请{}{}启动部门参数为空",dataChangeId,userId,"审批流启动失败字典中未配置部署流程");
             throw new MessageException("启动部门参数为空!");
         }
-
+        startPar.put("rs","pass");
         String proce = activityService.createDeloyFlow(null,workId,null,null,startPar);
         if(proce==null){
             logger.info("========用户{}启动数据修改申请{}{}",dataChangeId,userId,"数据修改审批，审批流启动失败");
@@ -180,6 +180,9 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             record.setNetInBusType("ACTIVITY_"+platForm.getPlatformNum());
             record.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
             record.setAgDocPro(agentBusInfoVo.getAgDocPro());
+        }else{
+            record.setAgDocDistrict(agent.getAgDocDistrict());
+            record.setAgDocPro(agent.getAgDocPro());
         }
         if(1!=busActRelMapper.insertSelective(record)){
             logger.info("代理商审批，启动审批异常，添加审批关系失败{}:{}",dateChangeRequest.getId(),proce);
