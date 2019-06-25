@@ -234,7 +234,12 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
 
                             //首刷平台
                             PlatFormExample platFormExample = new PlatFormExample();
-                            platFormExample.or().andStatusEqualTo(Status.STATUS_1.status).andPlatformTypeEqualTo(PlatformType.MPOS.code);
+                            List<String> list = new ArrayList<>();
+                            list.add(PlatformType.MPOS.code);
+                            list.add(PlatformType.RDBPOS.code);
+                            platFormExample.or()
+                            .andStatusEqualTo(Status.STATUS_1.status)
+                            .andPlatformTypeIn(list);
                             List<PlatForm>  platForms = platFormMapper.selectByExample(platFormExample);
                             List<String> pltcode = new ArrayList<>();
                             pltcode.add("aaaa");
