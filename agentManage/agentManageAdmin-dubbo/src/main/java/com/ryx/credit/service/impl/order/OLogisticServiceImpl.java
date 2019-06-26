@@ -510,8 +510,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     throw new MessageException("排单ID查询失败！");
                 } else {
                     //流量卡不进行下发操作
-                    if(oActivity!=null && StringUtils.isNotBlank(oActivity.getActCode()) && "2204".equals(oActivity.getActCode())){
-                        logger.info("导入物流数据,流量卡不进行下发操作，活动代码{}={}={}" ,oActivity.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
+                    if(oActivity_plan!=null && StringUtils.isNotBlank(oActivity_plan.getActCode()) && ("2204".equals(oActivity_plan.getActCode()) || "2004".equals(oActivity_plan.getActCode()) )){
+                        logger.info("导入物流数据,流量卡不进行下发操作，活动代码{}={}={}" ,oActivity_plan.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
                         return AgentResult.ok("流量卡不进行下发操作");
                     }
                     logger.info("上传物流接口调用，PlatformType：{},{}",platForm.getPlatformType(),JSONObject.toJSONString(oLogistics));
