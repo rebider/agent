@@ -937,7 +937,6 @@
     o.order_platform,
     o.payment_method,
     o.o_amo,
-    o.pay_amo,
     d.pay_amount,
     d.real_amount,
     d.outstanding_amount,
@@ -969,14 +968,12 @@
     -
     nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)
     )as dpd,
-    nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0) pro_num,
     c.platform_name,
     d.nuclear_user,
     d.nuclear_time,
     NVL2(d.nuclear_time,to_char(d.nuclear_time,'YYYY-MM-DD'),'')as nuclear_user_string,
     org.name as AGDOCPPRO,
     cr.amount as xxAmount,
-    dict.d_itemname as pro_type,
     oso.activity_name,
 
     nvl(d.pay_amount,0) as dd_amt,
@@ -1010,7 +1007,8 @@
     and o_payment_detail.status = 1 and (o_payment_detail.pay_type='DKFQ' or o_payment_detail.pay_type='SF')
     ),0) as sjdk_amt,
     nvl(d.outstanding_amount,0) as syqk_amt,
-    os.pro_rel_price, os.model, oan.org_name,
+    nvl(os.pro_rel_price*os.pro_num,0) as pay_amo,
+    os.pro_num, os.pro_rel_price, os.model, os.pro_type, oan.org_name,
     cr.pay_user,
     to_char(cr.real_rec_time,'YYYY-MM-DD') as realRecTime,
     to_char(cr.check_date,'YYYY-MM-DD') as checkDate,
