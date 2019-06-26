@@ -136,7 +136,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     }
 
     @Override
-    public PageInfo queryBusinessPlatformListManager(AgentBusInfo agentBusInfo, Agent agent, Page page, Long userId) {
+    public PageInfo queryBusinessPlatformListManager(AgentBusInfo agentBusInfo, Agent agent, Page page, Long userId,String approveTimeStart,String approveTimeEnd) {
         Map<String, Object> reqMap = new HashMap<>();
 
         reqMap.put("agStatus", AgStatus.Approved.name());
@@ -160,6 +160,12 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         }
         if (agentBusInfo.getBusType() != null) {
             reqMap.put("busType", agentBusInfo.getBusType());
+        }
+        if ( StringUtils.isNotBlank(approveTimeStart)) {
+            reqMap.put("approveTimeStart", approveTimeStart);
+        }
+        if ( StringUtils.isNotBlank(approveTimeEnd)) {
+            reqMap.put("approveTimeEnd", approveTimeEnd);
         }
         reqMap.put("status", Status.STATUS_1.status);
         List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);

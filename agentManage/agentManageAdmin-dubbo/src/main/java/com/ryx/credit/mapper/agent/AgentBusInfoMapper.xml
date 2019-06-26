@@ -664,7 +664,7 @@
   <sql id="queryBusinessPlatformSql">
     select
     b.id,b.agent_id,b.bus_num,b.bus_platform,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
-    a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time,b.clo_pay_company,b.bus_Inde_ass,d.ag_name as risk_parent,e.name as ag_doc_pro
+    a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time,b.clo_pay_company,b.bus_Inde_ass,d.ag_name as risk_parent,e.name as ag_doc_pro,to_char(b.approve_time,'yyyy-MM-dd HH:mm:dd') as approve_time
     from A_agent_businfo b
     left join A_agent a on b.agent_id = a.id
     left join A_agent_businfo c on c.id = b.bus_risk_parent
@@ -706,11 +706,17 @@
     <if test="reqMap.platfromPerm==null or reqMap.platfromPerm.size==0">
       and 1=-1
     </if>
+    <if test="reqMap.approveTimeStart != null and reqMap.approveTimeStart != '' " >
+      and to_char(b.approve_time,'yyyy-MM-dd') &gt;= #{reqMap.approveTimeStart}
+    </if>
+    <if test="reqMap.approveTimeEnd != null and reqMap.approveTimeEnd != '' " >
+      and to_char(b.approve_time,'yyyy-MM-dd') &lt;= #{reqMap.approveTimeEnd}
+    </if>
     and b.status = #{reqMap.status}
     UNION
     select
     b.id,b.agent_id,b.bus_num,b.bus_platform,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
-    a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time,b.clo_pay_company,b.bus_Inde_ass,d.ag_name as risk_parent,e.name as ag_doc_pro
+    a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time,b.clo_pay_company,b.bus_Inde_ass,d.ag_name as risk_parent,e.name as ag_doc_pro,to_char(b.approve_time,'yyyy-MM-dd HH:mm:dd') as approve_time
     from A_agent_businfo b
     left join A_agent a on b.agent_id = a.id
     left join A_agent_businfo c on c.id = b.bus_risk_parent
@@ -751,6 +757,12 @@
       </if>
       <if test="reqMap.platfromPerm==null or reqMap.platfromPerm.size==0">
         and 1=-1
+      </if>
+      <if test="reqMap.approveTimeStart != null and reqMap.approveTimeStart != '' " >
+        and to_char(b.approve_time,'yyyy-MM-dd') &gt;= #{reqMap.approveTimeStart}
+      </if>
+      <if test="reqMap.approveTimeEnd != null and reqMap.approveTimeEnd != '' " >
+        and to_char(b.approve_time,'yyyy-MM-dd') &lt;= #{reqMap.approveTimeEnd}
       </if>
       and b.status = #{reqMap.status}
     </where>
