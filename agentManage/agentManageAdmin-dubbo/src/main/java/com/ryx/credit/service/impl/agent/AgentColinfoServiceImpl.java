@@ -255,7 +255,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                             //校验收款账户身份认证
                             AgentResult result = livenessDetectionService.livenessDetection(trueName, certNo, userId);
                             if (!result.isOK()) {
-                                throw new ProcessException("收款账户身份认证异常");
+                                throw new ProcessException("收款账户身份认证失败");
                             }
                         } else {
                             throw new ProcessException("请输入收款账户名相对应的户主证件号");
