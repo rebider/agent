@@ -28,11 +28,21 @@ public class TerminalTransfer implements Serializable{
 
     private String agentId;
 
+    private String platformType;
+
     private List<TerminalTransferDetail> terminalTransferDetailList;
 
     private String terTranFile;
 
     private List<Attachment> attachments;
+
+    public String getPlatformType() {
+        return platformType;
+    }
+
+    public void setPlatformType(String platformType) {
+        this.platformType = platformType;
+    }
 
     public List<Attachment> getAttachments() {
         return attachments;

@@ -520,8 +520,11 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                     if(agentPlatFormSynMapper.insert(record)==1){
                         log.info("升级开户接口{}添加记录成功,更新本地平台{}",agentBusInfo.getBusNum(),"入网成功");
                     }
-                    //执行修改操作
-                    asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
+                    //瑞大宝升级直接修改不需要在走修改接口
+                    if(!platForm.getPlatformType().equals(PlatformType.RDBPOS.getValue())){
+                        //执行修改操作
+                        asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
+                    }
                 }else{
                     agentBusInfo.setBusStatus(BusinessStatus.pause.status);
                     if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)){
