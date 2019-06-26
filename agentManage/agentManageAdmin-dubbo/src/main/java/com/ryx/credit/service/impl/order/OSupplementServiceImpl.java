@@ -550,7 +550,7 @@ public class OSupplementServiceImpl implements OSupplementService {
                         try {
                             List<BigDecimal> divideList = new ArrayList<>();
                             BigDecimal divide = new BigDecimal(0);
-                            for (int i = 1; i <= count.intValue(); i++) {
+                            for (int i = 0; i < count.intValue(); i++) {
                                 BigDecimal money = oPaymentDetail.getPayAmount().subtract(supplement.getRealPayAmount());
                                 divide = money.divide(count);
                                 divideList.add(divide);
@@ -566,14 +566,14 @@ public class OSupplementServiceImpl implements OSupplementService {
                         } catch (Exception e) {
                             List<BigDecimal> divideList = new ArrayList<>();
                             BigDecimal divide = new BigDecimal(0);
-                            for (int i = 1; i <= count.intValue() - 1; i++) {
+                            for (int i = 0; i < count.intValue(); i++) {
                                 BigDecimal money = oPaymentDetail.getPayAmount().subtract(supplement.getRealPayAmount());
                                 divide = money.divide(count, 2, BigDecimal.ROUND_HALF_DOWN);
                                 divideList.add(divide);
                             }
-                            BigDecimal big = new BigDecimal(0);
+                           /* BigDecimal big = new BigDecimal(0);
                             big = residue.subtract(divide.multiply(count.subtract(new BigDecimal(1))));
-                            divideList.add(big);
+                            divideList.add(big);*/
                             for (int j = 0; j < notCountMap.size(); j++) {
                                 OPaymentDetail paymentDetail = notCountMap.get(j);
                                 paymentDetail.setPayAmount(paymentDetail.getPayAmount().add(divideList.get(j)));
