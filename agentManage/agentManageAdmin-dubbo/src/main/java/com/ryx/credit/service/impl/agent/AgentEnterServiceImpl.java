@@ -797,6 +797,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         Agent agent = agentService.getAgentById(busId);
         agent.setAgStatus(AgStatus.Approved.name());
         agent.setAgUniqNum(agent.getId());
+        agent.setcIncomTime(Calendar.getInstance().getTime());
         if (1 != agentService.updateAgent(agent)) {
             logger.info("代理商审批通过，代理商信息失败{}:{}", processingId, agent.getId());
         }
