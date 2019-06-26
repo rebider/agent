@@ -11,6 +11,8 @@ import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.bank.DPosRegion;
 import com.ryx.credit.pojo.admin.bank.DPosRegionExample;
 import com.ryx.credit.pojo.admin.order.*;
+import com.ryx.credit.service.IResourceService;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentQueryService;
 import com.ryx.credit.service.agent.PlatFormService;
 import org.slf4j.Logger;
@@ -64,6 +66,10 @@ public class AgentQueryServiceImpl implements AgentQueryService {
     private AssProtoColMapper assProtoColMapper;
     @Autowired
     private TerminalTransferMapper terminalTransferMapper;
+    @Autowired
+    private IUserService iUserService;
+    @Autowired
+    private IResourceService iResourceService;
 
 
     @Override
@@ -182,7 +188,7 @@ public class AgentQueryServiceImpl implements AgentQueryService {
     }
 
     @Override
-    public List<AgentBusInfo> businessQuery(String agentId,String isZpos) {
+    public List<AgentBusInfo> businessQuery(String agentId,String isZpos,Long userId) {
 
         AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
         AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
@@ -193,7 +199,54 @@ public class AgentQueryServiceImpl implements AgentQueryService {
         }else if(isZpos.equals("true")){
             criteria.andBusPlatformEqualTo(Platform.ZPOS.getValue());
         }
+        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+        List<String> busPlatformList = new ArrayList<>();
+        for (Map map : platfromPerm) {
+            busPlatformList.add(String.valueOf(map.get("PLATFORM_NUM")));
+        }
+        criteria.andBusPlatformIn(busPlatformList);
         List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+        for (AgentBusInfo agentBusInfo : agentBusInfos) {
+            PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
+            if(null!=platForm){
+                agentBusInfo.setBusPlatformType(platForm.getPlatformType());
+            }
+            agentBusInfo.setAgentColinfoList(agentColinfoMapper.queryBusConinfoList(agentBusInfo.getId()));
+            List<Map<String, Object>> maps = assProtoColMapper.selectByBusInfoId(agentBusInfo.getId());
+            Map<String,Object> parentInfo = agentBusInfoMapper.queryBusInfoParent(FastMap.fastMap("id",agentBusInfo.getId()));
+            agentBusInfo.setParentInfo(parentInfo);
+            if(null==maps){
+                continue;
+            }else if(maps.size()==0){
+                continue;
+            }else{
+                agentBusInfo.setAssProtocolMap(maps.get(0));
+            }
+
+        }
+        return agentBusInfos;
+    }
+
+    @Override
+    public List<AgentBusInfo> businessQueryCity(String agentId,String isZpos,Long userId) {
+
+        Map<String, Object> reqMap = new HashMap<>();
+        reqMap.put("agentId",agentId);
+        reqMap.put("status",Status.STATUS_1.status);
+        reqMap.put("isZpos",isZpos);
+        reqMap.put("busPlatform",Platform.ZPOS.getValue());
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+        if (orgCodeRes == null && orgCodeRes.size() != 1) {
+            return null;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        reqMap.put("organizationCode", organizationCode);
+        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+        reqMap.put("platfromPerm",platfromPerm);
+
+        List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectBusInfo(reqMap);
+
         for (AgentBusInfo agentBusInfo : agentBusInfos) {
             PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
             if(null!=platForm){
