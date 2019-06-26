@@ -395,7 +395,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 if (busPlatExist) {
                     return new AgentResult(500, "业务已添加,请勿重复添加", "");
                 }
-                //瑞打包校验
+                //瑞大包校验
                 PlatformType platformType = platFormService.byPlatformCode(item.getBusPlatform());
                 if(PlatformType.RDBPOS.code.equals(platformType.getValue())){
                     //检查手机号是否填写
@@ -490,6 +490,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         AgentBusInfoExample.Criteria criteria = example.createCriteria();
         criteria.andAgentIdEqualTo(agentBusInfo.getAgentId());
         criteria.andBusPlatformEqualTo(agentBusInfo.getBusPlatform());
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andCloReviewStatusIn(Arrays.asList(AgStatus.Approved.status,AgStatus.Approving.status));
         List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(example);
         if (null == agentBusInfos) {
             return true;

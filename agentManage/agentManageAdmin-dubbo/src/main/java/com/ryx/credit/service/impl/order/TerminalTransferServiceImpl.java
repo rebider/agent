@@ -389,12 +389,11 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public AgentResult startTerminalTransferActivity(String id, String cuser, String agentId,Boolean isSave) throws Exception {
-
+        TerminalTransfer terminalTransfer = terminalTransferMapper.selectByPrimaryKey(id);
+        if(terminalTransfer==null){
+            throw new MessageException("提交审批信息有误");
+        }
         if(!isSave){
-            TerminalTransfer terminalTransfer = terminalTransferMapper.selectByPrimaryKey(id);
-            if(terminalTransfer==null){
-                throw new MessageException("提交审批信息有误");
-            }
             terminalTransfer.setuUser(cuser);
             terminalTransfer.setuTime(new Date());
             terminalTransfer.setReviewStatus(AgStatus.Approving.status);
@@ -423,9 +422,12 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         Agent agent = agentMapper.selectByPrimaryKey(agentId);
         if(null!=agent){
             record.setAgentName(agent.getAgName());
-            //暂时存基本信息里的，后期在改
-            record.setAgDocPro(agent.getAgDocPro());
-            record.setAgDocDistrict(agent.getAgDocDistrict());
+            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(terminalTransfer.getPlatformType());
+            if(agentBusInfo==null){
+                throw new MessageException("审批流启动失败:业务信息不存在");
+            }
+            record.setAgDocPro(agentBusInfo.getAgDocPro());
+            record.setAgDocDistrict(agentBusInfo.getAgDocDistrict());
         }
         if (1 != busActRelMapper.insertSelective(record)) {
             log.info("订单提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
