@@ -219,12 +219,14 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     }
                 }
                 //判断所选机构是否属于所选平台（机构编号&业务平台）
-                organList = organizationMapper.selectOrganization(item.getOrganNum());
-                for (Organization organization : organList) {
-                    if (!organization.getPlatId().contains(item.getBusPlatform())) {
-                        throw new ProcessException("所选机构不属于该业务平台");
+                if (StringUtils.isNotBlank(item.getOrganNum())) {
+                    organList = organizationMapper.selectOrganization(item.getOrganNum());
+                    for (Organization organization : organList) {
+                        if (organization.getPlatId().contains(item.getBusPlatform())) {
+                            throw new ProcessException("所选机构不属于该业务平台");
+                        }
+                        item.setOrganNum(organization.getOrgId());
                     }
-                    item.setOrganNum(organization.getOrgId());
                 }
             }
             Set<String> resultSet = new HashSet<>();
