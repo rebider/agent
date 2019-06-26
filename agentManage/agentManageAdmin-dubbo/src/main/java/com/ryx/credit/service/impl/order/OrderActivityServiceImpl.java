@@ -106,6 +106,12 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             logger.info("活动代码不能为空");
             throw new MessageException("活动代码不能为空");
         }
+        if (StringUtils.isNotBlank(activity.getActCode())) {
+           if("2004".equals(activity.getActCode()) || "2204".equals(activity.getActCode())){
+               logger.info("2004和2204活动代码禁止使用");
+               throw new MessageException("2004和2204活动代码禁止使用");
+           }
+        }
         if (activity.getPrice() == null) {
             logger.info("活动价格不能为空");
             throw new MessageException("活动价格不能为空");
@@ -175,6 +181,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         if (activity.getPrice() == null) {
             return new AgentResult(500, "活动价格不能为空", "");
         }
+
         String platFormType = platFormMapper.selectPlatType(activity.getPlatform());
 
         if (StringUtils.isNotBlank(platFormType)) {
@@ -213,7 +220,13 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 return AgentResult.fail("相同活动代码价格必须相同");
             }
         }
-
+        OActivity db_activity = activityMapper.selectByPrimaryKey(activity.getId());
+        if (StringUtils.isNotBlank(activity.getActCode())) {
+            if(("2004".equals(db_activity.getActCode()) || "2204".equals(db_activity.getActCode()) && (!"2004".equals(activity.getActCode()) && !"2204".equals(activity.getActCode())))){
+                logger.info("2004和2204活动代码禁止使用");
+                return AgentResult.fail("2004和2204活动代码禁止使用");
+            }
+        }
         int update = activityMapper.updateByPrimaryKeySelective(activity);
         if (update == 1) {
             return AgentResult.ok();
