@@ -130,17 +130,12 @@ public class PlatFormServiceImpl implements PlatFormService{
      */
     @Override
     public List<Organization> queryByOrganName(String platId, String orgParent, String orgType) {
-        logger.info("获取机构下参数：", platId, orgParent, orgType);
+        logger.info("获取业务所对应的机构：", platId, orgParent, orgType);
         List<Organization> organizationList = organizationMapper.queryByOrganName(
                 FastMap.fastMap("platId", platId)
-//                        .putKeyV("orgParent", orgParent)
-//                        .putKeyV("orgType", orgType)
                 );
-        if (organizationList.size() > 0) {
-            return organizationList;
-        }
         logger.info("queryByOrganName().organizationList：", organizationList);
-        return null;
+        return organizationList;
     }
 
 }
