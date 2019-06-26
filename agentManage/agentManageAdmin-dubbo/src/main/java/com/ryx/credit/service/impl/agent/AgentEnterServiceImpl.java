@@ -99,6 +99,13 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         try {
             verifyOrgAndBZYD(agentVo.getBusInfoVoList());
 //            verifyOther(agentVo.getBusInfoVoList());
+            //根据营业执照号进行检查是否存在
+            if(agentVo.getAgent()!=null && StringUtils.isNotBlank(agentVo.getAgent().getAgBusLic())) {
+                AgentResult agentResult =  agentService.checkAgBusLicIsEst(agentVo.getAgent().getAgName(),agentVo.getAgent().getAgBusLic());
+                if(agentResult.isOK()){
+                    return ResultVO.fail(agentVo.getAgent().getAgBusLic()+"已存在,编号为："+agentResult.getData());
+                }
+            }
             Agent agent = agentService.insertAgent(agentVo.getAgent(), agentVo.getAgentTableFile(),agentVo.getAgent().getcUser());
             agentVo.setAgent(agent);
             for (AgentContractVo item : agentVo.getContractVoList()) {
@@ -954,8 +961,16 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     public ResultVO updateAgentVo(AgentVo agent, String userId,Boolean isPass) throws MessageException {
         try {
             verifyOrgAndBZYD(agent.getBusInfoVoList());
-//            verifyOther(agent.getBusInfoVoList());
             logger.info("用户{}{}修改代理商信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent));
+            //根据工商编号验证是否已经存在，禁止重复提交代理商
+            if(agent.getAgent()!=null && StringUtils.isNotBlank(agent.getAgent().getAgBusLic())) {
+                AgentResult agentResult =  agentService.checkAgBusLicIsEst(agent.getAgent().getAgName(),agent.getAgent().getAgBusLic());
+                if(agentResult.isOK()){
+                    if(agent.getAgent()!=null && StringUtils.isNotBlank(agent.getAgent().getId()) && !agent.getAgent().getId().equals(agentResult.getData())) {
+                        return ResultVO.fail(agent.getAgent().getAgBusLic()+"已存在，编号为："+agentResult.getData());
+                    }
+                }
+            }
             Agent ag = null;
             if (StringUtils.isNotBlank(agent.getAgent().getAgName())) {
                 ag = agentService.updateAgentVo(agent.getAgent(), agent.getAgentTableFile(),userId);

@@ -79,4 +79,12 @@ public interface AgentService {
     AgentResult createAgentAccount();
 
     Agent getAgentByName(String name);
+
+
+    /**
+     * 检查营业执照号是否存在
+     * @param lic
+     * @return
+     */
+    AgentResult checkAgBusLicIsEst(String agName,String lic);
 }
