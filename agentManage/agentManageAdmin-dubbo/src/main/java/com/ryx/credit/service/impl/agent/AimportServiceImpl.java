@@ -1951,7 +1951,8 @@ public class AimportServiceImpl implements AimportService {
         String  shifoukaijufenrunfapiao = list.size()>10?list.get(10)+"":"";//是否开具分润发票
         String  kaihudiqu = list.size()>11?list.get(11)+"":"";//开户行地区
         String  kaihuhanghanghao = list.size()>12?list.get(12)+"":"";//开户行行号
-        String  remark = list.size()>13?list.get(13)+"":"";//备注
+        String  shoukuanzhanghuming_shenfz = list.size()>13?list.get(13)+"":"";//收款账户名 身份证
+        String  remark = list.size()>14?list.get(14)+"":"";//备注
 
         try {
             AgentExample agentExample = new AgentExample();
