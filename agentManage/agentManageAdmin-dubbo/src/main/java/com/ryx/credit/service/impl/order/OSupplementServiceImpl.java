@@ -202,7 +202,7 @@ public class OSupplementServiceImpl implements OSupplementService {
             OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
             OPaymentDetailExample.Criteria criteria1 = oPaymentDetailExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andPaymentIdEqualTo(oPaymentDetail.getPaymentId()).andPaymentStatusEqualTo(PaymentStatus.FKING.code);
             List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
-            if (null != oPaymentDetails || oPaymentDetails.size() > 0) {
+            if (null != oPaymentDetails && oPaymentDetails.size() > 0) {
                 logger.info("补款添加:{}", "当前有正在审批中的补款申请 请在该审批结束后再次提交补款 ");
                 throw new MessageException("当前有正在审批中的补款申请 请在该审批结束后再次提交补款 ！！");
             }
