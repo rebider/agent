@@ -472,11 +472,7 @@
       </where>
   </sql>
 
-  <update id="updateStatusByTerminalTransferId" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetail">
-    update O_TERMINAL_TRANSFER_DETAIL
-    <set>
-        STATUS = 0
-    </set>
-    where TERMINAL_TRANSFER_ID = #{terminalTransferId,jdbcType=VARCHAR}
+  <update id="updateStatusByTerminalTransferId" parameterType="java.lang.String">
+    update O_TERMINAL_TRANSFER_DETAIL set STATUS = 0  where TERMINAL_TRANSFER_ID = #{map.terminalTransferId}
   </update>
 </mapper>
