@@ -1029,7 +1029,7 @@
     left join o_sub_order os on os.order_id = o.id and os.status=1
     left join o_sub_order_activity oso on oso.sub_order_id = os.id and oso.status=1
     left join d_dict dict on dict.d_group='ORDER' and dict.d_artifact='MODEL_TYPE' and dict.d_status=1 and dict.d_itemname = os.pro_type
-    left join o_organization oan on oan.plat_id = c.id and oan.status=1
+    left join o_organization oan on oan.agent_id = b.id and oan.status=1
     left join a_agent_businfo e on o.bus_id = e.id and e.status=1
     <where>
       <if test="1==1"> and o.status = 1 </if>
