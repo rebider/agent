@@ -196,6 +196,19 @@ public class OSupplementServiceImpl implements OSupplementService {
         }
 
 
+        //查询一个订单中是否还存在付款中的
+        OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectById(srcId);
+        if (null != oPaymentDetail) {
+            OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
+            OPaymentDetailExample.Criteria criteria1 = oPaymentDetailExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andPaymentIdEqualTo(oPaymentDetail.getPaymentId()).andPaymentStatusEqualTo(PaymentStatus.FKING.code);
+            List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
+            if (null != oPaymentDetails || oPaymentDetails.size() > 0) {
+                logger.info("补款添加:{}", "当前有正在审批中的补款申请 请在该审批结束后再次提交补款 ");
+                throw new MessageException("当前有正在审批中的补款申请 请在该审批结束后再次提交补款 ！！");
+            }
+        }
+
+
         Date date = Calendar.getInstance().getTime();
         oSupplement.setId(idService.genId(TabId.o_Supplement));
         oSupplement.setcTime(date);
@@ -513,7 +526,7 @@ public class OSupplementServiceImpl implements OSupplementService {
                         logger.info("付款单修改失败");
                         throw new MessageException("付款单修改失败");
                     }
-                }else{
+                } else {
                     oPayment.setOutstandingAmount(oPayment.getOutstandingAmount().subtract(oPaymentDetail.getRealPayAmount()));
                     if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
                         logger.info("付款单修改失败");
