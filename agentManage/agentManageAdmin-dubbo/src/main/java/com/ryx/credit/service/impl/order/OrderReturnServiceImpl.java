@@ -940,9 +940,11 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         record.setDataShiro(BusActRelBusType.refund.key);
 
         Agent agent = agentMapper.selectByPrimaryKey(agentId);
-        if(agent!=null)
-        record.setAgentName(agent.getAgName());
-
+        if(agent!=null) {
+            record.setAgentName(agent.getAgName());
+        }
+        record.setAgDocDistrict(agent.getAgDocDistrict());
+        record.setAgDocPro(agent.getAgDocPro());
         if (1 != busActRelMapper.insertSelective(record)) {
             log.info("退货提交审批，启动审批异常，添加审批关系失败{}:{}", returnId, proce);
             throw new ProcessException("退货审批流启动失败:添加审批关系失败");
