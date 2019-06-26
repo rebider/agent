@@ -850,7 +850,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             OActivity oActivity_plan = oActivityMapper.selectByPrimaryKey(planVo.getActivityId());
 
             //流量卡不进行下发操作
-            if(oActivity!=null && StringUtils.isNotBlank(oActivity.getActCode()) && "2204".equals(oActivity.getActCode())){
+            if(oActivity!=null && StringUtils.isNotBlank(oActivity.getActCode()) && ("2204".equals(oActivity.getActCode()) || "2004".equals(oActivity.getActCode()))  ){
                 logger.info("导入物流数据,流量卡不进行下发操作，活动代码{}={}==========================================={}" ,oActivity.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
                 return AgentResult.ok("流量卡不进行下发操作");
             }

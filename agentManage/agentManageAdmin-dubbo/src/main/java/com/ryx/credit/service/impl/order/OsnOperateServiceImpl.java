@@ -592,7 +592,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
         OActivity oActivity = oActivityMapper.selectByPrimaryKey(oSubOrderActivity.getActivityId());
 
         //流量卡不进行下发操作
-        if(oActivity!=null && com.ryx.credit.commons.utils.StringUtils.isNotBlank(oActivity.getActCode()) && "2204".equals(oActivity.getActCode())){
+        if(oActivity!=null && com.ryx.credit.commons.utils.StringUtils.isNotBlank(oActivity.getActCode()) && ("2204".equals(oActivity.getActCode()) || "2004".equals(oActivity.getActCode())) ){
             logger.info("导入物流数据,流量卡不进行下发操作，活动代码{}={}={}" ,oActivity.getActCode(),logcId, JSONObject.toJSON(logistics));
             listOLogisticsDetailSn.forEach(detail -> {
                 detail.setSendStatus(LogisticsDetailSendStatus.send_success.code);
