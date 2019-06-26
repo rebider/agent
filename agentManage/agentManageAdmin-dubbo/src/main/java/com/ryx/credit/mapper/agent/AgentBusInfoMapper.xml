@@ -141,7 +141,7 @@
     #{busUseOrgan,jdbcType=VARCHAR}, #{busScope,jdbcType=VARCHAR}, #{dredgeS0,jdbcType=DECIMAL},
     #{busLoginNum,jdbcType=VARCHAR}, #{debitRateLower,jdbcType=VARCHAR}, #{debitCapping,jdbcType=VARCHAR},
     #{debitAppearRate,jdbcType=VARCHAR}, #{terminalsLower,jdbcType=VARCHAR}, #{creditRateFloor,jdbcType=VARCHAR},
-    #{agDocDistrict,jdbcType=VARCHAR}, #{agDocPro,jdbcType=VARCHAR}, #{organNum,jdbcType=VARCHAR}, #{finaceRemitOrgan,jdbcType=VARCHAR},#{approveTime,jdbcType=TIMESTAMP}, #{approveTime,jdbcType=TIMESTAMP})
+    #{agDocDistrict,jdbcType=VARCHAR}, #{agDocPro,jdbcType=VARCHAR}, #{organNum,jdbcType=VARCHAR}, #{finaceRemitOrgan,jdbcType=VARCHAR},#{approveTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfo">
     insert into A_AGENT_BUSINFO
