@@ -31,4 +31,6 @@ public interface OrganizationService {
 
     ResultVO organizationEdit(OrganizationVo organizationVo) throws Exception;
 
+    List<Organization> queryAllOrgan();
+
 }

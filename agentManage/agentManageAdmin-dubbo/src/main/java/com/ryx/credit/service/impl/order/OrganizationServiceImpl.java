@@ -242,6 +242,16 @@ public class OrganizationServiceImpl implements OrganizationService {
         return ResultVO.success(null);
     }
 
+    @Override
+    public List<Organization> queryAllOrgan() {
+        logger.info("获取有效状态的所有机构数据~");
+        OrganizationExample organizationExample = new OrganizationExample();
+        organizationExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status);
+        List<Organization> organizationList = organizationMapper.selectByExample(organizationExample);
+        logger.info("queryAllOrgan().organizationList：", organizationList);
+        return organizationList;
+    }
+
     public String queryFile(Organization organization, String attDataType) {
         String fileId = "";
         //查询出附件id来进行删除
