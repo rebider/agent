@@ -1,6 +1,7 @@
 package com.ryx.credit.service.agent;
 
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -42,7 +43,7 @@ public interface BusinessPlatformService {
 
     List<PlatForm> queryAblePlatForm();
 
-    AgentResult saveBusinessPlatform(AgentVo agentVo) throws MessageException;
+    AgentResult saveBusinessPlatform(AgentVo agentVo) throws ProcessException;
 
     /**
      * 导入业务信息
