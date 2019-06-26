@@ -12,6 +12,7 @@
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="PLATFORM_TYPE" jdbcType="VARCHAR" property="platformType" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -43,7 +44,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, REMARK, REVIEW_STATUS, C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION, AGENT_ID
+    ID, REMARK, REVIEW_STATUS, C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION, AGENT_ID,
+    PLATFORM_TYPE
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -77,11 +79,11 @@
     insert into O_TERMINAL_TRANSFER (ID, REMARK, REVIEW_STATUS,
     C_TIME, U_TIME, C_USER,
     U_USER, STATUS, VERSION,
-    AGENT_ID)
+    AGENT_ID, PLATFORM_TYPE)
     values (#{id,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{reviewStatus,jdbcType=DECIMAL},
     #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
     #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL},
-    #{agentId,jdbcType=VARCHAR})
+    #{agentId,jdbcType=VARCHAR}, #{platformType,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransfer">
     insert into O_TERMINAL_TRANSFER
@@ -116,6 +118,9 @@
       <if test="agentId != null">
         AGENT_ID,
       </if>
+      <if test="platformType != null">
+        PLATFORM_TYPE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -147,6 +152,9 @@
       </if>
       <if test="agentId != null">
         #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="platformType != null">
+        #{platformType,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -186,20 +194,24 @@
       <if test="agentId != null">
         AGENT_ID = #{agentId,jdbcType=VARCHAR},
       </if>
+      <if test="platformType != null">
+        PLATFORM_TYPE = #{platformType,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransfer">
     update O_TERMINAL_TRANSFER
     set REMARK = #{remark,jdbcType=VARCHAR},
-      REVIEW_STATUS = #{reviewStatus,jdbcType=DECIMAL},
-      C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      U_TIME = #{uTime,jdbcType=TIMESTAMP},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      U_USER = #{uUser,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL},
-      AGENT_ID = #{agentId,jdbcType=VARCHAR}
+    REVIEW_STATUS = #{reviewStatus,jdbcType=DECIMAL},
+    C_TIME = #{cTime,jdbcType=TIMESTAMP},
+    U_TIME = #{uTime,jdbcType=TIMESTAMP},
+    C_USER = #{cUser,jdbcType=VARCHAR},
+    U_USER = #{uUser,jdbcType=VARCHAR},
+    STATUS = #{status,jdbcType=DECIMAL},
+    VERSION = #{version,jdbcType=DECIMAL},
+    AGENT_ID = #{agentId,jdbcType=VARCHAR},
+    PLATFORM_TYPE = #{platformType,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
