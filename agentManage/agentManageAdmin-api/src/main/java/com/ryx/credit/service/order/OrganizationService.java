@@ -5,8 +5,10 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.pojo.admin.order.OrgPlatform;
 import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.pojo.admin.vo.OrganizationSerchVo;
 import com.ryx.credit.pojo.admin.vo.OrganizationVo;
 
 import java.util.List;
@@ -30,5 +32,9 @@ public interface OrganizationService {
     List<Organization> selectOrganization(String orgId);
 
     ResultVO organizationEdit(OrganizationVo organizationVo) throws Exception;
+
+    List<OrganizationSerchVo> queryOrganization(String orgId);
+
+    List<OrgPlatform> queryOrgPlatform(String orgId);
 
 }
