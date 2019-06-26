@@ -9,10 +9,12 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.RegexUtil;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.PayCompMapper;
 import com.ryx.credit.dao.agent.PlatFormMapper;
+import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.bank.DPosRegion;
 import com.ryx.credit.pojo.admin.vo.*;
@@ -819,6 +821,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         return result;
     }
 
+    @Autowired
+    private COrganizationMapper organizationMapper;
 
     @Override
     public List<AgentBusInfo> selectByAgentId(String agentId) {
@@ -830,6 +834,23 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             criteria.andStatusEqualTo(Status.STATUS_1.status);
             criteria.andAgentIdEqualTo(agentId);
             List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+            for (AgentBusInfo agentBusInfo : agentBusInfos) {
+                if(StringUtils.isNotBlank(agentBusInfo.getAgDocPro())){
+                    COrganization cOrganization = organizationMapper.selectByPrimaryKey(Integer.parseInt(agentBusInfo.getAgDocPro()));
+                    if(cOrganization!=null)
+                    agentBusInfo.setAgDocPro(cOrganization.getName());
+                }
+                if(StringUtils.isNotBlank(agentBusInfo.getAgDocDistrict())){
+                    COrganization cOrganization = organizationMapper.selectByPrimaryKey(Integer.parseInt(agentBusInfo.getAgDocDistrict()));
+                    if(cOrganization!=null)
+                    agentBusInfo.setAgDocDistrict(cOrganization.getName());
+                }
+                if(StringUtils.isNotBlank(agentBusInfo.getBusPlatform())){
+                    PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
+                    if(platForm!=null)
+                    agentBusInfo.setBusPlatform(platForm.getPlatformName());
+                }
+            }
             return agentBusInfos;
         }
     }
