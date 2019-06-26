@@ -155,14 +155,6 @@ public class AgentBusInfo implements Serializable {
         this.terminalsLower = terminalsLower;
     }
 
-    public Date getApproveTime() {
-        return approveTime;
-    }
-
-    public void setApproveTime(Date approveTime) {
-        this.approveTime = approveTime;
-    }
-
     public String getCreditRateFloor() {
         return creditRateFloor;
     }
@@ -201,6 +193,14 @@ public class AgentBusInfo implements Serializable {
 
     public void setFinaceRemitOrgan(String finaceRemitOrgan) {
         this.finaceRemitOrgan = finaceRemitOrgan;
+    }
+
+    public Date getApproveTime() {
+        return approveTime;
+    }
+
+    public void setApproveTime(Date approveTime) {
+        this.approveTime = approveTime;
     }
 
     public List<Attachment> getAttachmentList() {

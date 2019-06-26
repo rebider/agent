@@ -723,6 +723,21 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         if(terminalTransferDetailList.size()==0){
             throw new MessageException("请填写明细最少一条");
         }
+        TerminalTransfer qTerminalTransfer = terminalTransferMapper.selectByPrimaryKey(terminalTransfer.getId());
+        if(qTerminalTransfer.getReviewStatus().compareTo(AgStatus.Approving.getValue())==0){
+            BusActRel busActRel = busActRelMapper.findByBusId(qTerminalTransfer.getId());
+            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(qTerminalTransfer.getPlatformType());
+            if(agentBusInfo==null){
+                throw new MessageException("业务信息不存在");
+            }
+            busActRel.setAgDocDistrict(agentBusInfo.getAgDocDistrict());
+            busActRel.setAgDocPro(agentBusInfo.getAgDocPro());
+            int j = busActRelMapper.updateByPrimaryKeySelective(busActRel);
+            if(j!=1){
+                throw new MessageException("修改终端信息失败");
+            }
+        }
+
         //附件修改
         AttachmentRelExample attachmentRelExample = new AttachmentRelExample();
         AttachmentRelExample.Criteria attCriteria = attachmentRelExample.createCriteria();

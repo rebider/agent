@@ -2668,6 +2668,76 @@ public class AgentBusInfoExample {
             return (Criteria) this;
         }
 
+        public Criteria andApproveTimeIsNull() {
+            addCriterion("APPROVE_TIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andApproveTimeIsNotNull() {
+            addCriterion("APPROVE_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andApproveTimeEqualTo(String value) {
+            addCriterion("APPROVE_TIME =", value, "approveTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andApproveTimeNotEqualTo(String value) {
+            addCriterion("APPROVE_TIME <>", value, "approveTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andApproveTimeGreaterThan(String value) {
+            addCriterion("APPROVE_TIME >", value, "approveTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andApproveTimeGreaterThanOrEqualTo(String value) {
+            addCriterion("APPROVE_TIME >=", value, "approveTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andApproveTimeLessThan(String value) {
+            addCriterion("APPROVE_TIME <", value, "approveTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andApproveTimeLessThanOrEqualTo(String value) {
+            addCriterion("APPROVE_TIME <=", value, "approveTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andApproveTimeLike(String value) {
+            addCriterion("APPROVE_TIME like", value, "approveTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andApproveTimeNotLike(String value) {
+            addCriterion("APPROVE_TIME not like", value, "approveTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andApproveTimeIn(List<String> values) {
+            addCriterion("APPROVE_TIME in", values, "approveTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andApproveTimeNotIn(List<String> values) {
+            addCriterion("APPROVE_TIME not in", values, "approveTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andApproveTimeBetween(String value1, String value2) {
+            addCriterion("APPROVE_TIME between", value1, value2, "approveTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andApproveTimeNotBetween(String value1, String value2) {
+            addCriterion("APPROVE_TIME not between", value1, value2, "approveTime");
+            return (Criteria) this;
+        }
+
         public Criteria andCreditRateFloorIsNull() {
             addCriterion("CREDIT_RATE_FLOOR is null");
             return (Criteria) this;
@@ -3015,76 +3085,6 @@ public class AgentBusInfoExample {
 
         public Criteria andFinaceRemitOrganNotBetween(String value1, String value2) {
             addCriterion("FINACE_REMIT_ORGAN not between", value1, value2, "finaceRemitOrgan");
-            return (Criteria) this;
-        }
-
-        public Criteria andApproveTimeIsNull() {
-            addCriterion("APPROVE_TIME is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andApproveTimeIsNotNull() {
-            addCriterion("APPROVE_TIME is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andApproveTimeEqualTo(String value) {
-            addCriterion("APPROVE_TIME =", value, "approveTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andApproveTimeNotEqualTo(String value) {
-            addCriterion("APPROVE_TIME <>", value, "approveTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andApproveTimeGreaterThan(String value) {
-            addCriterion("APPROVE_TIME >", value, "approveTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andApproveTimeGreaterThanOrEqualTo(String value) {
-            addCriterion("APPROVE_TIME >=", value, "approveTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andApproveTimeLessThan(String value) {
-            addCriterion("APPROVE_TIME <", value, "approveTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andApproveTimeLessThanOrEqualTo(String value) {
-            addCriterion("APPROVE_TIME <=", value, "approveTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andApproveTimeLike(String value) {
-            addCriterion("APPROVE_TIME like", value, "approveTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andApproveTimeNotLike(String value) {
-            addCriterion("APPROVE_TIME not like", value, "approveTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andApproveTimeIn(List<String> values) {
-            addCriterion("APPROVE_TIME in", values, "approveTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andApproveTimeNotIn(List<String> values) {
-            addCriterion("APPROVE_TIME not in", values, "approveTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andApproveTimeBetween(String value1, String value2) {
-            addCriterion("APPROVE_TIME between", value1, value2, "approveTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andApproveTimeNotBetween(String value1, String value2) {
-            addCriterion("APPROVE_TIME not between", value1, value2, "approveTime");
             return (Criteria) this;
         }
     }

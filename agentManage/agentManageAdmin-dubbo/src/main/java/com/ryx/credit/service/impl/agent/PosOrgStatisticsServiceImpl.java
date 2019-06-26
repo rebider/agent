@@ -14,7 +14,9 @@ import com.ryx.credit.common.util.agentUtil.RSAUtil;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.PlatFormMapper;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
+import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.pojo.admin.agent.PlatForm;
+import com.ryx.credit.service.agent.BusinessPlatformService;
 import com.ryx.credit.service.agent.PosOrgStatisticsService;
 import com.ryx.credit.util.Constants;
 import org.apache.commons.codec.binary.Base64;
@@ -39,6 +41,8 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
     private PlatFormMapper platFormMapper;
     @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
+    @Autowired
+    private BusinessPlatformService businessPlatformService;
 
 //    @Override
 //    public AgentResult posOrgStatistics(String busPlatform,String orgId,String busId,String termType)throws Exception{
@@ -165,9 +169,11 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
         }
     }
 
-    private static AgentResult httpForRDBpos(String agencyId)throws Exception{
+    private AgentResult httpForRDBpos(String agencyId)throws Exception{
         try {
             Map<String, String> map = new HashMap<>();
+            List<Map<String, Object>> list = businessPlatformService.queryByBusNum(agencyId);
+            map.put("branchid",String.valueOf(list.get(0).get("BUS_PLATFORM")).split("_")[0]);
             map.put("agencyId",agencyId);
             String toJson = JsonUtil.objectToJson(map);
             log.info("瑞大宝查询终端下限数量请求参数:{}",toJson);
