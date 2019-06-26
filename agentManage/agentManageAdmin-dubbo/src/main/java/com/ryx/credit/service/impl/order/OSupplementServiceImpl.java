@@ -196,6 +196,19 @@ public class OSupplementServiceImpl implements OSupplementService {
         }
 
 
+        //查询一个订单中是否还存在付款中的
+        OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectById(srcId);
+        if (null != oPaymentDetail) {
+            OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
+            OPaymentDetailExample.Criteria criteria1 = oPaymentDetailExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andPaymentIdEqualTo(oPaymentDetail.getPaymentId()).andPaymentStatusEqualTo(PaymentStatus.FKING.code);
+            List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
+            if (null != oPaymentDetails && oPaymentDetails.size() > 0) {
+                logger.info("补款添加:{}", "当前有正在审批中的补款申请 请在该审批结束后再次提交补款 ");
+                throw new MessageException("当前有正在审批中的补款申请 请在该审批结束后再次提交补款 ！！");
+            }
+        }
+
+
         Date date = Calendar.getInstance().getTime();
         oSupplement.setId(idService.genId(TabId.o_Supplement));
         oSupplement.setcTime(date);
@@ -513,7 +526,7 @@ public class OSupplementServiceImpl implements OSupplementService {
                         logger.info("付款单修改失败");
                         throw new MessageException("付款单修改失败");
                     }
-                }else{
+                } else {
                     oPayment.setOutstandingAmount(oPayment.getOutstandingAmount().subtract(oPaymentDetail.getRealPayAmount()));
                     if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
                         logger.info("付款单修改失败");
@@ -550,7 +563,7 @@ public class OSupplementServiceImpl implements OSupplementService {
                         try {
                             List<BigDecimal> divideList = new ArrayList<>();
                             BigDecimal divide = new BigDecimal(0);
-                            for (int i = 1; i <= count.intValue(); i++) {
+                            for (int i = 0; i < count.intValue(); i++) {
                                 BigDecimal money = oPaymentDetail.getPayAmount().subtract(supplement.getRealPayAmount());
                                 divide = money.divide(count);
                                 divideList.add(divide);
@@ -566,14 +579,14 @@ public class OSupplementServiceImpl implements OSupplementService {
                         } catch (Exception e) {
                             List<BigDecimal> divideList = new ArrayList<>();
                             BigDecimal divide = new BigDecimal(0);
-                            for (int i = 1; i <= count.intValue() - 1; i++) {
+                            for (int i = 0; i < count.intValue(); i++) {
                                 BigDecimal money = oPaymentDetail.getPayAmount().subtract(supplement.getRealPayAmount());
                                 divide = money.divide(count, 2, BigDecimal.ROUND_HALF_DOWN);
                                 divideList.add(divide);
                             }
-                            BigDecimal big = new BigDecimal(0);
+                           /* BigDecimal big = new BigDecimal(0);
                             big = residue.subtract(divide.multiply(count.subtract(new BigDecimal(1))));
-                            divideList.add(big);
+                            divideList.add(big);*/
                             for (int j = 0; j < notCountMap.size(); j++) {
                                 OPaymentDetail paymentDetail = notCountMap.get(j);
                                 paymentDetail.setPayAmount(paymentDetail.getPayAmount().add(divideList.get(j)));
