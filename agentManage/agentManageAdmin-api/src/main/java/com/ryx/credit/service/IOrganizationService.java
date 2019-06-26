@@ -17,4 +17,5 @@ public interface IOrganizationService extends IService<COrganization> {
 
     List<COrganization> selectTreeGrid();
 
+    COrganization selectByPrimaryKey(Integer id);
 }

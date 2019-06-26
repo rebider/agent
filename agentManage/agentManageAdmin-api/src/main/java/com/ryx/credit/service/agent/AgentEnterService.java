@@ -43,7 +43,7 @@ public interface AgentEnterService {
      * @return
      * @throws ProcessException
      */
-    public ResultVO startAgentBusiEnterActivity(String agentId,String cuser)throws ProcessException;
+    public ResultVO startAgentBusiEnterActivity(String agentId,String cuser)throws MessageException;
 
 
     /**

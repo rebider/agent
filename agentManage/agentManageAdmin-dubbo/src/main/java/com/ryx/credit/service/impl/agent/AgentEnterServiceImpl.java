@@ -440,37 +440,39 @@ public class AgentEnterServiceImpl implements AgentEnterService {
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public ResultVO startAgentBusiEnterActivity(String busid, String cuser) throws ProcessException {
+    public ResultVO startAgentBusiEnterActivity(String busid, String cuser) throws MessageException {
         AgentBusInfo abus = agentBusinfoService.getById(busid);
         if (abus == null) {
             logger.info("代理商信息审批中,业务信息未找到{}:{}", busid, cuser);
-            return ResultVO.fail("业务信息未找到");
+            throw new MessageException("业务信息未找到");
         }
 
         //检查业务平台数据
         PlatForm platForm = platFormMapper.selectByPlatFormNum(abus.getBusPlatform());
-
+        if(platForm==null){
+            throw new MessageException("业务平台不存在");
+        }
 
         //检查是否有审批中的代理商新
         Agent agent = agentService.getAgentById(abus.getAgentId());
         if (agent.getAgStatus().equals(AgStatus.Approving.name())) {
             logger.info("代理商信息审批中,禁止启动业务审批{}:{}", busid, cuser);
-            return ResultVO.fail("代理商信息审批中,禁止启动业务审批");
+            throw new MessageException("代理商信息审批中,禁止启动业务审批");
         }
         if (!agent.getAgStatus().equals(AgStatus.Approved.name())) {
             logger.info("代理商信息未审批完成,禁止启动业务审批{}:{}", busid, cuser);
-            return ResultVO.fail("代理商信息未审批完成,禁止启动业务审批");
+            throw new MessageException("代理商信息未审批完成,禁止启动业务审批");
         }
         if (!agent.getStatus().equals(Status.STATUS_1.status)) {
             logger.info("代理商信息已失效{}:{}", busid, cuser);
-            return ResultVO.fail("代理商信息已失效");
+            throw new MessageException("代理商信息已失效");
         }
 
         BusActRelExample example = new BusActRelExample();
         example.or().andBusIdEqualTo(abus.getId()).andBusTypeEqualTo(BusActRelBusType.Business.name()).andActivStatusEqualTo(AgStatus.Approving.name()).andStatusEqualTo(Status.STATUS_1.status);
         if (busActRelMapper.selectByExample(example).size() > 0) {
             logger.info("代理商审批中，禁止重复提交审批{}:{}", busid, cuser);
-            return ResultVO.fail("代理商审批中，禁止重复提交审批");
+            throw new MessageException("代理商审批中，禁止重复提交审批");
         }
 
         //获取代理商有效的业务
@@ -478,7 +480,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         abus.setCloReviewStatus(AgStatus.Approving.status);
         if (agentBusinfoService.updateAgentBusInfo(abus) != 1) {
             logger.info("代理商业务启动审批异常，更新业务本信息失败{}:{}", busid, cuser);
-            throw new ProcessException("代理商业务启动审批异常，更新业务本信息失败");
+            throw new MessageException("代理商业务启动审批异常，更新业务本信息失败");
         }
 
         //代理商有效新建的合同
@@ -487,7 +489,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             contract.setCloReviewStatus(AgStatus.Approving.status);
             if (1 != agentContractService.update(contract)) {
                 logger.info("代理商业务启动审批异常，合同状态更新失败{}:{}", busid, cuser);
-                throw new ProcessException("合同状态更新失败");
+                throw new MessageException("合同状态更新失败");
             }
         }
 
@@ -497,7 +499,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             agentColinfo.setCloReviewStatus(AgStatus.Approving.status);
             if (1 != agentColinfoService.update(agentColinfo)) {
                 logger.info("代理商业务启动审批异常，收款账户状态更新失败{}:{}", busid, cuser);
-                throw new ProcessException("收款账户状态更新失败");
+                throw new MessageException("收款账户状态更新失败");
             }
         }
 
@@ -506,21 +508,21 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             capital.setCloReviewStatus(AgStatus.Approving.status);
             if (1 != accountPaidItemService.update(capital)) {
                 logger.info("代理商审批，合同状态更新失败{}:{}", abus.getAgentId(), cuser);
-                throw new ProcessException("缴款状态更新失败");
+                throw new MessageException("缴款状态更新失败");
             }
         }
 
         Map startPar = startPar(cuser);
         if (null == startPar) {
             logger.info("========用户{}{}启动部门参数为空", busid, cuser);
-            throw new ProcessException("启动部门参数为空!");
+            throw new MessageException("启动部门参数为空!");
         }
         startPar.put("rs",ApprovalType.PASS.getValue());
         //启动审批
         String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("net"), null, null, startPar);
         if (proce == null) {
             logger.info("代理商业务启动审批异常，审批流启动失败{}:{}", busid, cuser);
-            throw new ProcessException("审批流启动失败!");
+            throw new MessageException("审批流启动失败!");
         }
         //代理商业务视频关系
         BusActRel record = new BusActRel();
@@ -539,6 +541,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         record.setNetInBusType("ACTIVITY_"+platForm.getPlatformNum());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("代理商业务启动审批异常，添加审批关系失败{}:{}", record.getBusId(), proce);
+            throw new MessageException("添加审批关系失败!");
         }
         return ResultVO.success(null);
     }
@@ -797,6 +800,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         Agent agent = agentService.getAgentById(busId);
         agent.setAgStatus(AgStatus.Approved.name());
         agent.setAgUniqNum(agent.getId());
+        agent.setcIncomTime(Calendar.getInstance().getTime());
         if (1 != agentService.updateAgent(agent)) {
             logger.info("代理商审批通过，代理商信息失败{}:{}", processingId, agent.getId());
         }
