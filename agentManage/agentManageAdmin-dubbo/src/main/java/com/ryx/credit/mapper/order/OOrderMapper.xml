@@ -990,48 +990,6 @@
     to_char(d.down_payment_date,'YYYY-MM') as down_payment_date,
     d.down_payment_count,
     d.down_payment,
-    (case d.pay_method
-      when 'SF1' then
-        ROUND(
-          nvl((
-            case d.pay_method
-              when 'SF1' then d.pay_amount-d.down_payment
-              when 'FRFQ' then d.pay_amount
-              else 0
-            end
-        ),0)/nvl(d.down_payment_count,1)
-    ,2)
-      when 'FRFQ' then
-        ROUND(
-          nvl((
-            case d.pay_method
-              when 'SF1' then d.pay_amount-d.down_payment
-              when 'FRFQ' then d.pay_amount
-            else 0
-          end
-      ),0)/nvl(d.down_payment_count,1)
-    ,2)
-    when 'SF2' then
-      ROUND(
-        nvl((
-          case d.pay_method
-            when 'SF2' then d.pay_amount-d.down_payment
-            when 'FKFQ' then d.pay_amount
-          else 0
-        end
-      ),0)/nvl(d.down_payment_count,1)
-    ,2)
-    when 'FKFQ' then
-      ROUND(
-        nvl((
-          case d.pay_method
-            when 'SF2' then d.pay_amount-d.down_payment
-            when 'FKFQ' then d.pay_amount
-          else 0
-        end
-      ),0)/nvl(d.down_payment_count,1)
-    ,2)
-    else 0 end) as mqyk_amt,
     nvl(
     (select sum(o_payment_detail.real_pay_amount)
     from o_payment_detail
@@ -1052,7 +1010,15 @@
     and o_payment_detail.status = 1 and (o_payment_detail.pay_type='DKFQ' or o_payment_detail.pay_type='SF')
     ),0) as sjdk_amt,
     nvl(d.outstanding_amount,0) as syqk_amt,
-    os.pro_rel_price, os.model, oan.org_name
+    os.pro_rel_price, os.model, oan.org_name,
+    cr.pay_user,
+    to_char(cr.real_rec_time,'YYYY-MM-DD') as realRecTime,
+    to_char(cr.check_date,'YYYY-MM-DD') as checkDate,
+    nvl((select max(o_payment_detail.pay_amount) from o_payment_detail
+    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id
+    and o_payment_detail.status = 1 and o_payment_detail.payment_status='1'
+    and (o_payment_detail.pay_type='FRFQ' or o_payment_detail.pay_type='DKFQ')
+    <if test="id!=null and id!=''"> and o.id = #{id} </if>),0) as mqyk_amt
 
     from o_order o
     left join a_agent b on o.agent_id = b.id
@@ -1152,5 +1118,10 @@
     <result column="review_status" property="reviewStatus" jdbcType="VARCHAR"/>
     <result column="o_inuretime" property="oinuretime" jdbcType="VARCHAR"/>
     <result column="org_name" property="orgName" jdbcType="VARCHAR"/>
+
+    <result column="pay_user" property="payUser" jdbcType="VARCHAR"/>
+    <result column="real_rec_time" property="realRecTime" jdbcType="TIMESTAMP"/>
+    <result column="check_user" property="checkUser" jdbcType="VARCHAR"/>
+    <result column="check_date" property="checkDate" jdbcType="TIMESTAMP"/>
   </resultMap>
 </mapper>
