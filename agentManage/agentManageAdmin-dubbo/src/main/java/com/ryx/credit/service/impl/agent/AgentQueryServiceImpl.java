@@ -200,7 +200,7 @@ public class AgentQueryServiceImpl implements AgentQueryService {
             criteria.andBusPlatformEqualTo(Platform.ZPOS.getValue());
         }
         List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
-        if(platfromPerm.size()==0){
+        if(platfromPerm.size()>0){
             List<String> busPlatformList = new ArrayList<>();
             for (Map map : platfromPerm) {
                 busPlatformList.add(String.valueOf(map.get("PLATFORM_NUM")));
