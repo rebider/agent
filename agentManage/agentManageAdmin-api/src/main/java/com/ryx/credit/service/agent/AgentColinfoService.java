@@ -3,10 +3,7 @@ package com.ryx.credit.service.agent;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.ResultVO;
-import com.ryx.credit.pojo.admin.agent.AColinfoPayment;
-import com.ryx.credit.pojo.admin.agent.Agent;
-import com.ryx.credit.pojo.admin.agent.AgentColinfo;
-import com.ryx.credit.pojo.admin.agent.AgentColinfoRel;
+import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
 
 import java.math.BigDecimal;
@@ -56,4 +53,7 @@ public interface AgentColinfoService {
     AgentResult saveAgentColinfo(AgentColinfo agentColinfo);
 
     AgentResult checkAgentColinfo();
+
+
+    Attachment selectAttachment(String id);
 }

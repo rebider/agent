@@ -255,7 +255,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                             //校验收款账户身份认证
                             AgentResult result = livenessDetectionService.livenessDetection(trueName, certNo, userId);
                             if (!result.isOK()) {
-                                throw new ProcessException("收款账户身份认证异常");
+                                throw new ProcessException("收款账户身份认证失败");
                             }
                         } else {
                             throw new ProcessException("请输入收款账户名相对应的户主证件号");
@@ -357,7 +357,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                             }
                         }
                     }
-                    if (agentColinfoVo.getCloType().compareTo(new BigDecimal("1")) == 0) {//对私
+                    if (agentColinfoVo.getCloType().compareTo(new BigDecimal("2")) == 0) {//对私
                         if (!isHaveYHKSMJ) {
                             throw new MessageException("请添加银行卡扫描件");
                         }
@@ -600,6 +600,14 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
             logger.info("checkAgentColinfo: " + sb.toString());
         }
         return AgentResult.ok();
+    }
+
+    @Override
+    public Attachment selectAttachment(String id) {
+        if (null!=attachmentMapper.selectByPrimaryKey(id)){
+            return attachmentMapper.selectByPrimaryKey(id);
+        }
+        return new Attachment();
     }
 
 }
