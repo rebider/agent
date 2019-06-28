@@ -502,7 +502,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             throw new MessageException("iccid为空");
         }
         internetCard.setuTime(new Date());
-        int i = internetCardMapper.updateByPrimaryKeySelective(internetCard);
+        int i = internetCardMapper.updateByPrimaryKeySelectiveNotNull(internetCard);
         if(i!=1){
             throw new MessageException("更新失败");
         }
@@ -550,7 +550,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             Map<String,Object> reqMap = new HashMap<>();
             reqMap.put("renew",Status.STATUS_0.status);//否
             reqMap.put("newRenew",Status.STATUS_1.status);
-            reqMap.put("internetCardStatus",InternetCardStatus.NORMAL.getValue());
+//            reqMap.put("internetCardStatus",InternetCardStatus.NORMAL.getValue());
             reqMap.put("expireTime",DateUtil.getPerFirstDayOfMonth());
             int i = internetCardMapper.selectInternetCardExpireCount(reqMap);
             if(i>0){
@@ -597,7 +597,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             Map<String,Object> reqMap = new HashMap<>();
             reqMap.put("renew",Status.STATUS_0.status);//否
             reqMap.put("newRenew",Status.STATUS_1.status);//是续费
-            reqMap.put("internetCardStatus",InternetCardStatus.NORMAL.getValue());
+//            reqMap.put("internetCardStatus",InternetCardStatus.NORMAL.getValue());
             reqMap.put("expireTime",DateUtil.getPerFirstDayOfMonth());
             List<OInternetCard> oInternetCards = internetCardMapper.selectInternetCardRenew(reqMap);
             for (OInternetCard oInternetCard : oInternetCards) {
@@ -607,7 +607,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                     if(StringUtils.isBlank(oInternetCard.getMerId()) || StringUtils.isBlank(oInternetCard.getMerName())){
                         oInternetCard.setMerId(oInternetCardMerch.getChnMerchId());
                         oInternetCard.setMerName(oInternetCardMerch.getMerchName());
-                        int i = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
+                        int i = internetCardMapper.updateByPrimaryKeySelectiveNotNull(oInternetCard);
                         if(i!=1){
                             log.error("1定时任务更新商户信息失败:IccidNum:{},商户编号:{},商户名称:{}",oInternetCard.getIccidNum(),oInternetCardMerch.getChnMerchId(),oInternetCardMerch.getMerchName());
                         }
@@ -617,7 +617,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                     if(!oInternetCardMerch.getChnMerchId().equals(oInternetCard.getMerId()) || !oInternetCardMerch.getMerchName().equals(oInternetCard.getMerName())){
                         oInternetCard.setMerId(oInternetCardMerch.getChnMerchId());
                         oInternetCard.setMerName(oInternetCardMerch.getMerchName());
-                        int i = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
+                        int i = internetCardMapper.updateByPrimaryKeySelectiveNotNull(oInternetCard);
                         if(i!=1){
                             log.error("2定时任务更新商户信息失败:IccidNum:{},商户编号:{},商户名称:{}",oInternetCard.getIccidNum(),oInternetCardMerch.getChnMerchId(),oInternetCardMerch.getMerchName());
                         }
@@ -683,7 +683,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                 internetCard.setMerId("无");
                 internetCard.setMerName("无");
             }
-            int i = internetCardMapper.updateByPrimaryKeySelective(internetCard);
+            int i = internetCardMapper.updateByPrimaryKeySelectiveNotNull(internetCard);
             if(i!=1){
                 log.error("为空定时任务更新商户信息失败:IccidNum:{},商户编号:{},商户名称:{}",internetCard.getIccidNum(),oInternetCardMerch.getChnMerchId(),oInternetCardMerch.getMerchName());
             }

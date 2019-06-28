@@ -37,4 +37,8 @@ public interface OInternetCardMapper {
 
 
     List<OInternetCard> queryInternetCardList(OInternetCardExample example);
+
+
+    int updateByPrimaryKeySelectiveNotNull(OInternetCard record);
+
 }

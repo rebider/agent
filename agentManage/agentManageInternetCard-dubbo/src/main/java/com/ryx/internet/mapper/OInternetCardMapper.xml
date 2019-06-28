@@ -405,7 +405,6 @@
     <where>
       c.renew = #{map.renew}
       and TO_CHAR(c.expire_time, 'YYYY-MM') = #{map.expireTime}
-      and c.internet_card_status =  #{map.internetCardStatus}
       and c.status = 1
     </where>
   </sql>
@@ -417,7 +416,6 @@
     <where>
       c.renew = #{map.renew}
       and TO_CHAR(c.expire_time, 'YYYY-MM') = #{map.expireTime}
-      and Internet_card_status =  #{map.internetCardStatus}
       and c.status = 1
     </where>
   </select>
@@ -440,4 +438,83 @@
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
+
+  <update id="updateByPrimaryKeySelectiveNotNull" parameterType="com.ryx.internet.pojo.OInternetCard">
+    update O_INTERNET_CARD
+    <set>
+      <if test="cardImportId != null and cardImportId != ''">
+        CARD_IMPORT_ID = #{cardImportId,jdbcType=VARCHAR},
+      </if>
+      <if test="batchNum != null and batchNum != ''">
+        BATCH_NUM = #{batchNum,jdbcType=VARCHAR},
+      </if>
+      <if test="snNum != null and snNum != ''">
+        SN_NUM = #{snNum,jdbcType=VARCHAR},
+      </if>
+      <if test="deliverTime != null and deliverTime != ''">
+        DELIVER_TIME = #{deliverTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="consignee != null and consignee != ''">
+        CONSIGNEE = #{consignee,jdbcType=VARCHAR},
+      </if>
+      <if test="orderId != null and orderId != ''">
+        ORDER_ID = #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null and agentId != ''">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null and agentName != ''">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="internetCardNum != null and internetCardNum != ''">
+        INTERNET_CARD_NUM = #{internetCardNum,jdbcType=VARCHAR},
+      </if>
+      <if test="issuer != null and issuer != ''">
+        ISSUER = #{issuer,jdbcType=VARCHAR},
+      </if>
+      <if test="openAccountTime != null and openAccountTime != ''">
+        OPEN_ACCOUNT_TIME = #{openAccountTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="expireTime != null and expireTime != ''">
+        EXPIRE_TIME = #{expireTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="internetCardStatus != null and internetCardStatus != ''">
+        INTERNET_CARD_STATUS = #{internetCardStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="merId != null and merId != ''">
+        MER_ID = #{merId,jdbcType=VARCHAR},
+      </if>
+      <if test="latelyPayTime != null and latelyPayTime != ''">
+        LATELY_PAY_TIME = #{latelyPayTime,jdbcType=VARCHAR},
+      </if>
+      <if test="merName != null and merName != ''">
+        MER_NAME = #{merName,jdbcType=VARCHAR},
+      </if>
+      <if test="manufacturer != null and manufacturer != ''">
+        MANUFACTURER = #{manufacturer,jdbcType=VARCHAR},
+      </if>
+      <if test="renew != null and renew != ''">
+        RENEW = #{renew,jdbcType=DECIMAL},
+      </if>
+      <if test="cTime != null">
+        C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uTime != null">
+        U_TIME = #{uTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUser != null">
+        C_USER = #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="uUser != null">
+        U_USER = #{uUser,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        VERSION = #{version,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ICCID_NUM = #{iccidNum,jdbcType=VARCHAR}
+  </update>
 </mapper>
