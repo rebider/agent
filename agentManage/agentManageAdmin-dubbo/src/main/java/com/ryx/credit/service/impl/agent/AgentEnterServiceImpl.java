@@ -222,11 +222,17 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 if (StringUtils.isNotBlank(item.getOrganNum())) {
                     organList = organizationMapper.selectOrganization(item.getOrganNum());
                     for (Organization organization : organList) {
-                        if (!organization.getPlatId().contains(item.getBusPlatform())) {
-                            throw new ProcessException("所选机构不属于该业务平台");
+                        if(StringUtils.isNotBlank(organization.getPlatId())) {
+                            if (!organization.getPlatId().contains(item.getBusPlatform())) {
+                                throw new ProcessException("所选机构不属于该业务平台");
+                            }
+                            item.setOrganNum(organization.getOrgId());
+                        }else{
+                            item.setOrganNum(organization.getOrgId());
                         }
-                        item.setOrganNum(organization.getOrgId());
                     }
+                }else{
+                    throw new ProcessException("请选择顶级机构");
                 }
             }
             Set<String> resultSet = new HashSet<>();
@@ -236,9 +242,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 item.setcUser(agent.getcUser());
                 item.setAgentId(agent.getId());
                 item.setCloReviewStatus(AgStatus.Create.status);
-                for (Organization organization : organList) {
-                    item.setOrganNum(organization.getOrgId());
-                }
                 AgentBusInfo db_AgentBusInfo = agentBusinfoService.agentBusInfoInsert(item);
                 if (StringUtils.isNotBlank(item.getAgentAssProtocol())) {
                     AssProtoColRel rel = new AssProtoColRel();
@@ -261,9 +264,12 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 throw new ProcessException("不同类型平台不能同时提交");
             }
             return ResultVO.success(agentVo);
-        } catch (Exception e) {
+        } catch (ProcessException e) {
             e.printStackTrace();
-            throw new ProcessException(e.getMessage());
+            throw e;
+        }catch (Exception e) {
+            e.printStackTrace();
+            throw new ProcessException("商户入网保存失败:"+e.getMessage());
         }
     }
 
