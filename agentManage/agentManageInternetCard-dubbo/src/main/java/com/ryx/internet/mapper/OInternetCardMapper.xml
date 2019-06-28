@@ -439,7 +439,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
 
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.internet.pojo.OInternetCard">
+  <update id="updateByPrimaryKeySelectiveNotNull" parameterType="com.ryx.internet.pojo.OInternetCard">
     update O_INTERNET_CARD
     <set>
       <if test="cardImportId != null and cardImportId != ''">
