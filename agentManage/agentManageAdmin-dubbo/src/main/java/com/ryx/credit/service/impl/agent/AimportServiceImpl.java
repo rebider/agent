@@ -1462,7 +1462,7 @@ public class AimportServiceImpl implements AimportService {
             if(StringUtils.isNotBlank(gongsixingzhi) && !"null".equalsIgnoreCase(gongsixingzhi)) {
                 a.setAgNature(AgNature.getAgNatureMsgString(gongsixingzhi));
             }
-            if(StringUtils.isNotBlank(zuceziben) && !"null".equalsIgnoreCase(zuceziben))
+            if(StringUtils.isNotBlank(zuceziben) && !"null".equalsIgnoreCase(zuceziben) && RegexUtil.checkNum(zuceziben))
                 a.setAgCapital(new BigDecimal(zuceziben));
             if(StringUtils.isNotBlank(yingyezhizhao) && !"null".equalsIgnoreCase(yingyezhizhao))
                 a.setAgBusLic(yingyezhizhao);
@@ -1645,14 +1645,15 @@ public class AimportServiceImpl implements AimportService {
                         }
                     }
                 //不是设置平台号
-                if(StringUtils.isBlank(agentBusInfo.getId()))
-                    agentBusInfo.setcTime(new Date());
-                    agentBusInfo.setcUtime(agentBusInfo.getcTime());
-                    agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
-                    agentBusInfo.setCloReviewStatus(AgStatus.Approved.status);
-                    agentBusInfo.setStatus(Status.STATUS_1.status);
-                    agentBusInfo.setVersion(Status.STATUS_1.status);
-                    agentBusInfo.setcUser(user);
+                    if(StringUtils.isEmpty(agentBusInfo.getId()) && null==agentBusInfo.getVersion()) {
+                        agentBusInfo.setcTime(new Date());
+                        agentBusInfo.setcUtime(agentBusInfo.getcTime());
+                        agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
+                        agentBusInfo.setCloReviewStatus(AgStatus.Approved.status);
+                        agentBusInfo.setStatus(Status.STATUS_1.status);
+                        agentBusInfo.setVersion(Status.STATUS_1.status);
+                        agentBusInfo.setcUser(user);
+                    }
                 }
 
         }else{
@@ -1672,7 +1673,7 @@ public class AimportServiceImpl implements AimportService {
                     }
                 }
             }
-            if(StringUtils.isBlank(agentBusInfo.getId())) {
+            if(StringUtils.isEmpty(agentBusInfo.getId()) && null==agentBusInfo.getVersion()) {
                 agentBusInfo.setcTime(new Date());
                 agentBusInfo.setcUtime(agentBusInfo.getcTime());
                 agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);

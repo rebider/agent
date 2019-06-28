@@ -473,12 +473,16 @@
         select
         <include refid="Base_Column_List" />
         from o_organization
-        where
-        #{platId} in (
-        SELECT REGEXP_SUBSTR(o_organization.plat_id, '[^,]+', 1, LEVEL, 'i') AS STR
-        FROM DUAL
-        CONNECT BY LEVEL &lt;=
-        LENGTH(o_organization.plat_id) - LENGTH(REGEXP_REPLACE(o_organization.plat_id, ',', ''))+1
-        ) and o_organization.status=1
+        <where>
+            <if test="platId!=null and platId!=''">
+                #{platId,jdbcType=VARCHAR} in (
+                SELECT REGEXP_SUBSTR(o_organization.plat_id, '[^,]+', 1, LEVEL, 'i') AS STR
+                FROM DUAL
+                CONNECT BY LEVEL &lt;=
+                LENGTH(o_organization.plat_id) - LENGTH(REGEXP_REPLACE(o_organization.plat_id, ',', ''))+1
+                ) and o_organization.status=1
+            </if>
+        </where>
+
     </select>
 </mapper>
