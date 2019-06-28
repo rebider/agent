@@ -1004,7 +1004,8 @@
     nvl((select sum(o_payment_detail.real_pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id
-    and o_payment_detail.status = 1 and (o_payment_detail.pay_type='DKFQ' or o_payment_detail.pay_type='SF')
+    and o_payment_detail.status = 1 and o_payment_detail.payment_status = 4
+    and (o_payment_detail.pay_type='DKFQ' or o_payment_detail.pay_type='FRFQ')
     ),0) as sjdk_amt,
     nvl(d.outstanding_amount,0) as syqk_amt,
     nvl(os.pro_rel_price*os.pro_num,0) as pay_amo,
@@ -1013,10 +1014,9 @@
     to_char(cr.real_rec_time,'YYYY-MM-DD') as realRecTime,
     to_char(cr.check_date,'YYYY-MM-DD') as checkDate,
     nvl((select max(o_payment_detail.pay_amount) from o_payment_detail
-    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id
-    and o_payment_detail.status = 1 and o_payment_detail.payment_status='1'
+    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.status = 1
     and (o_payment_detail.pay_type='FRFQ' or o_payment_detail.pay_type='DKFQ')
-    <if test="id!=null and id!=''"> and o.id = #{id} </if>),0) as mqyk_amt
+    ),0) as mqyk_amt
 
     from o_order o
     left join a_agent b on o.agent_id = b.id
@@ -1029,7 +1029,7 @@
     left join o_sub_order os on os.order_id = o.id and os.status=1
     left join o_sub_order_activity oso on oso.sub_order_id = os.id and oso.status=1
     left join d_dict dict on dict.d_group='ORDER' and dict.d_artifact='MODEL_TYPE' and dict.d_status=1 and dict.d_itemname = os.pro_type
-    left join a_agent_businfo aab on aab.agent_id = b.id and aab.status=1
+    left join a_agent_businfo aab on aab.agent_id = o.id and aab.status=1
     left join o_organization oan on oan.org_id = aab.organ_num and oan.status=1
     <where>
       <if test="1==1"> and o.status = 1 </if>
