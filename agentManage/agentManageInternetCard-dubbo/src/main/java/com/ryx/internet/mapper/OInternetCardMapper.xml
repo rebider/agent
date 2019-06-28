@@ -405,7 +405,6 @@
     <where>
       c.renew = #{map.renew}
       and TO_CHAR(c.expire_time, 'YYYY-MM') = #{map.expireTime}
-      and c.internet_card_status =  #{map.internetCardStatus}
       and c.status = 1
     </where>
   </sql>
@@ -417,7 +416,6 @@
     <where>
       c.renew = #{map.renew}
       and TO_CHAR(c.expire_time, 'YYYY-MM') = #{map.expireTime}
-      and Internet_card_status =  #{map.internetCardStatus}
       and c.status = 1
     </where>
   </select>
