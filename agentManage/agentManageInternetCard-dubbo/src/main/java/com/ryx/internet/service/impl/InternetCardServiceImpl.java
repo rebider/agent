@@ -550,7 +550,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             Map<String,Object> reqMap = new HashMap<>();
             reqMap.put("renew",Status.STATUS_0.status);//否
             reqMap.put("newRenew",Status.STATUS_1.status);
-            reqMap.put("internetCardStatus",InternetCardStatus.NORMAL.getValue());
+//            reqMap.put("internetCardStatus",InternetCardStatus.NORMAL.getValue());
             reqMap.put("expireTime",DateUtil.getPerFirstDayOfMonth());
             int i = internetCardMapper.selectInternetCardExpireCount(reqMap);
             if(i>0){
@@ -597,7 +597,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             Map<String,Object> reqMap = new HashMap<>();
             reqMap.put("renew",Status.STATUS_0.status);//否
             reqMap.put("newRenew",Status.STATUS_1.status);//是续费
-            reqMap.put("internetCardStatus",InternetCardStatus.NORMAL.getValue());
+//            reqMap.put("internetCardStatus",InternetCardStatus.NORMAL.getValue());
             reqMap.put("expireTime",DateUtil.getPerFirstDayOfMonth());
             List<OInternetCard> oInternetCards = internetCardMapper.selectInternetCardRenew(reqMap);
             for (OInternetCard oInternetCard : oInternetCards) {
