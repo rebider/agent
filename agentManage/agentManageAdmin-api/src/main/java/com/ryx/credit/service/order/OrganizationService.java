@@ -31,7 +31,7 @@ public interface OrganizationService {
 
     List<Organization> selectOrganization(String orgId);
 
-    ResultVO organizationEdit(OrganizationVo organizationVo) throws Exception;
+    ResultVO organizationEdit(AgentVo agentVo) throws Exception;
 
     List<OrganizationSerchVo> queryOrganization(String orgId);
 

@@ -297,4 +297,5 @@ public class Organization implements Serializable{
     public void setBusinessNum(String businessNum) {
         this.businessNum = businessNum == null ? null : businessNum.trim();
     }
+
 }
