@@ -1119,7 +1119,6 @@
 
     <result column="pay_user" property="payUser" jdbcType="VARCHAR"/>
     <result column="real_rec_time" property="realRecTime" jdbcType="TIMESTAMP"/>
-    <result column="check_user" property="checkUser" jdbcType="VARCHAR"/>
     <result column="check_date" property="checkDate" jdbcType="TIMESTAMP"/>
   </resultMap>
 </mapper>
