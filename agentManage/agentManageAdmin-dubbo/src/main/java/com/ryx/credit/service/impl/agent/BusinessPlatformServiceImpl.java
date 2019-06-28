@@ -9,10 +9,12 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.RegexUtil;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.PayCompMapper;
 import com.ryx.credit.dao.agent.PlatFormMapper;
+import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.bank.DPosRegion;
 import com.ryx.credit.pojo.admin.vo.*;
@@ -134,7 +136,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     }
 
     @Override
-    public PageInfo queryBusinessPlatformListManager(AgentBusInfo agentBusInfo, Agent agent, Page page, Long userId) {
+    public PageInfo queryBusinessPlatformListManager(AgentBusInfo agentBusInfo, Agent agent, Page page, Long userId,String approveTimeStart,String approveTimeEnd) {
         Map<String, Object> reqMap = new HashMap<>();
 
         reqMap.put("agStatus", AgStatus.Approved.name());
@@ -158,6 +160,12 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         }
         if (agentBusInfo.getBusType() != null) {
             reqMap.put("busType", agentBusInfo.getBusType());
+        }
+        if ( StringUtils.isNotBlank(approveTimeStart)) {
+            reqMap.put("approveTimeStart", approveTimeStart);
+        }
+        if ( StringUtils.isNotBlank(approveTimeEnd)) {
+            reqMap.put("approveTimeEnd", approveTimeEnd);
         }
         reqMap.put("status", Status.STATUS_1.status);
         List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
@@ -235,6 +243,10 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             return agentBusInfo;
         } else {
             agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(id);
+            PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
+            if(null!=platForm){
+                agentBusInfo.setBusPlatformType(platForm.getPlatformType());
+            }
         }
         return agentBusInfo;
     }
@@ -320,12 +332,48 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         }
     }
 
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    public void updateBusinfoData(List<AgentBusInfoVo> busInfoVoList) throws Exception {
+        if (busInfoVoList==null) {
+            throw new MessageException("信息错误");
+        }
+        if (busInfoVoList.size()==0) {
+            throw new MessageException("信息错误");
+        }
+        try{
+            for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
+                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                agentBusInfo.setBusType(agentBusInfoVo.getBusType());
+                agentBusInfo.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
+                agentBusInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
+                agentBusInfo.setBusContact(agentBusInfoVo.getBusContact());
+                agentBusInfo.setBusContactMobile(agentBusInfoVo.getBusContactMobile());
+                agentBusInfo.setBusContactEmail(agentBusInfoVo.getBusContactEmail());
+                agentBusInfo.setBusContactPerson(agentBusInfoVo.getBusContactPerson());
+                agentBusInfo.setBusLoginNum(agentBusInfoVo.getBusLoginNum());
+                agentBusInfo.setBusStatus(agentBusInfoVo.getBusStatus());
+                agentBusInfo.setVersion(agentBusInfo.getVersion());
+                int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                if (i != 1) {
+                    throw new MessageException("更新失败");
+                }
+            }
+        } catch (MessageException e) {
+            e.printStackTrace();
+            throw new MessageException(e.getMsg());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        }
+    }
+
 
     @Override
     public List<PlatForm> queryAblePlatForm() {
         PlatFormExample example = new PlatFormExample();
         example.or().andStatusEqualTo(Status.STATUS_1.status).andPlatformStatusEqualTo(Status.STATUS_1.status);
-        example.setOrderByClause(" c_time asc ");
+        example.setOrderByClause(" platform_type desc,c_time asc");
         return platFormMapper.selectByExample(example);
     }
 
@@ -337,7 +385,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public AgentResult saveBusinessPlatform(AgentVo agentVo) throws Exception {
+    public AgentResult saveBusinessPlatform(AgentVo agentVo) throws ProcessException {
         try {
 
             Agent agent = agentVo.getAgent();
@@ -353,12 +401,16 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 if (busPlatExist) {
                     return new AgentResult(500, "业务已添加,请勿重复添加", "");
                 }
-                //瑞打包校验
+                //瑞大包校验
                 PlatformType platformType = platFormService.byPlatformCode(item.getBusPlatform());
                 if(PlatformType.RDBPOS.code.equals(platformType.getValue())){
                     //检查手机号是否填写
                     if(StringUtils.isBlank(item.getBusLoginNum())){
                         throw new ProcessException("瑞大宝登录账号不能为空");
+                    }
+                    Boolean exist = selectByBusLoginNumExist(item.getBusLoginNum(), agent.getId());
+                    if(!exist){
+                        throw new ProcessException("瑞大宝登录账号已入网,请勿重复入网");
                     }
                     if(!RegexUtil.checkInt(item.getBusLoginNum())){
                         throw new ProcessException("瑞大宝登录账号必须为数字");
@@ -429,7 +481,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             throw new ProcessException(e.getMsg());
         } catch (Exception e) {
             e.printStackTrace();
-            throw new Exception(e.getLocalizedMessage());
+            throw new ProcessException(e.getLocalizedMessage());
         }
     }
 
@@ -444,6 +496,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         AgentBusInfoExample.Criteria criteria = example.createCriteria();
         criteria.andAgentIdEqualTo(agentBusInfo.getAgentId());
         criteria.andBusPlatformEqualTo(agentBusInfo.getBusPlatform());
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andCloReviewStatusIn(Arrays.asList(AgStatus.Approved.status,AgStatus.Approving.status));
         List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(example);
         if (null == agentBusInfos) {
             return true;
@@ -775,4 +829,59 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         return result;
     }
 
+    @Autowired
+    private COrganizationMapper organizationMapper;
+
+    @Override
+    public List<AgentBusInfo> selectByAgentId(String agentId) {
+        if (StringUtils.isBlank(agentId)) {
+            return null;
+        } else {
+            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+            AgentBusInfoExample.Criteria criteria =  agentBusInfoExample.createCriteria();
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
+            criteria.andAgentIdEqualTo(agentId);
+            List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+            for (AgentBusInfo agentBusInfo : agentBusInfos) {
+                if(StringUtils.isNotBlank(agentBusInfo.getAgDocPro())){
+                    COrganization cOrganization = organizationMapper.selectByPrimaryKey(Integer.parseInt(agentBusInfo.getAgDocPro()));
+                    if(cOrganization!=null)
+                    agentBusInfo.setAgDocPro(cOrganization.getName());
+                }
+                if(StringUtils.isNotBlank(agentBusInfo.getAgDocDistrict())){
+                    COrganization cOrganization = organizationMapper.selectByPrimaryKey(Integer.parseInt(agentBusInfo.getAgDocDistrict()));
+                    if(cOrganization!=null)
+                    agentBusInfo.setAgDocDistrict(cOrganization.getName());
+                }
+                if(StringUtils.isNotBlank(agentBusInfo.getBusPlatform())){
+                    PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
+                    if(platForm!=null)
+                    agentBusInfo.setBusPlatform(platForm.getPlatformName());
+                }
+            }
+            return agentBusInfos;
+        }
+    }
+
+    /**
+     * 根据登陆账号查询是否存在，存在查询跟agentid是否相符
+     * @param busLoginNum
+     * @param agentId
+     * @return
+     */
+    @Override
+    public Boolean selectByBusLoginNumExist(String busLoginNum,String agentId){
+        AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+        AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andBusLoginNumEqualTo(busLoginNum);
+        List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+        if(agentBusInfos!=null && agentBusInfos.size()>0){
+            String sAgentId = agentBusInfos.get(0).getAgentId();
+            if(!sAgentId.equals(agentId)){
+                return false;
+            }
+        }
+        return true;
+    }
 }

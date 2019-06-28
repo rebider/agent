@@ -16,6 +16,7 @@ import com.ryx.credit.pojo.admin.vo.CapitalVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
+import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,8 +52,8 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     private AgentEnterService agentEnterService;
     @Autowired
     private AimportService aimportService;
-    @Autowired
-    private AgentNotifyService agentNotifyService;
+//    @Autowired
+//    private AgentNotifyService agentNotifyService;
     @Autowired
     private AColinfoPaymentService colinfoPaymentService;
     @Autowired
@@ -73,7 +74,8 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     private CapitalFlowService capitalFlowService;
     @Autowired
     private DataChangeActivityService dataChangeActivityService;
-
+    @Autowired
+    private AgentNetInNotityService agentNetInNotityService;
 
 
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
@@ -147,7 +149,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             logger.info("========用户{}启动数据修改申请{}{}启动部门参数为空",dataChangeId,userId,"审批流启动失败字典中未配置部署流程");
             throw new MessageException("启动部门参数为空!");
         }
-
+        startPar.put("rs","pass");
         String proce = activityService.createDeloyFlow(null,workId,null,null,startPar);
         if(proce==null){
             logger.info("========用户{}启动数据修改申请{}{}",dataChangeId,userId,"数据修改审批，审批流启动失败");
@@ -165,14 +167,23 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(dateChangeRequest.getDataId());
         record.setDataShiro(BusActRelBusType.DC_Agent.key);
-
         Agent agent = agentMapper.selectByPrimaryKey(dateChangeRequest.getDataId());
         if(agent!=null)
         record.setAgentName(agent.getAgName());
-//        List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByAgenId(agent.getId());
-//        AgentBusInfo agentBusInfo = agentBusInfos.get(0);
-//        PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
-//        record.setNetInBusType("ACTIVITY_"+platForm.getPlatformType());
+        if(dateChangeRequest.getDataType().equals(BusActRelBusType.DC_Agent.name())){
+            AgentVo agVo = JSONObject.parseObject(dateChangeRequest.getDataContent(), AgentVo.class);
+            if(agVo.getBusInfoVoList().size()==0){
+                throw  new MessageException("缺少业务信息");
+            }
+            AgentBusInfoVo agentBusInfoVo = agVo.getBusInfoVoList().get(0);
+            PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfoVo.getBusPlatform());
+            record.setNetInBusType("ACTIVITY_"+platForm.getPlatformNum());
+            record.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
+            record.setAgDocPro(agentBusInfoVo.getAgDocPro());
+        }else{
+            record.setAgDocDistrict(agent.getAgDocDistrict());
+            record.setAgDocPro(agent.getAgDocPro());
+        }
         if(1!=busActRelMapper.insertSelective(record)){
             logger.info("代理商审批，启动审批异常，添加审批关系失败{}:{}",dateChangeRequest.getId(),proce);
             throw  new MessageException("添加审批关系失败");
@@ -223,7 +234,12 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
 
                             //首刷平台
                             PlatFormExample platFormExample = new PlatFormExample();
-                            platFormExample.or().andStatusEqualTo(Status.STATUS_1.status).andPlatformTypeEqualTo(PlatformType.MPOS.code);
+                            List<String> list = new ArrayList<>();
+                            list.add(PlatformType.MPOS.code);
+                            list.add(PlatformType.RDBPOS.code);
+                            platFormExample.or()
+                            .andStatusEqualTo(Status.STATUS_1.status)
+                            .andPlatformTypeIn(list);
                             List<PlatForm>  platForms = platFormMapper.selectByExample(platFormExample);
                             List<String> pltcode = new ArrayList<>();
                             pltcode.add("aaaa");
@@ -239,27 +255,27 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
 
                             //入网程序调用
-                            try {
+//                            try {
                                 for (AgentBusInfo agentBusInfo : agentBusInfoList) {
 
-                                    ImportAgent importAgent = new ImportAgent();
-                                    importAgent.setDataid(agentBusInfo.getId());
-                                    importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
-                                    importAgent.setBatchcode(proIns);
-                                    importAgent.setcUser(rel.getcUser());
-                                    if (1 != aimportService.insertAgentImportData(importAgent)) {
-                                        logger.info("代理商账户修改审批通过-添加修改任务失败");
-                                    } else {
-                                        logger.info("代理商账户修改审批通过-添加修改任务成功!{},{}", AgImportType.DATACHANGEAPP.getValue(), vo.getAgent().getId());
-                                    }
-
+//                                    ImportAgent importAgent = new ImportAgent();
+//                                    importAgent.setDataid(agentBusInfo.getId());
+//                                    importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
+//                                    importAgent.setBatchcode(proIns);
+//                                    importAgent.setcUser(rel.getcUser());
+//                                    if (1 != aimportService.insertAgentImportData(importAgent)) {
+//                                        logger.info("代理商账户修改审批通过-添加修改任务失败");
+//                                    } else {
+//                                        logger.info("代理商账户修改审批通过-添加修改任务成功!{},{}", AgImportType.DATACHANGEAPP.getValue(), vo.getAgent().getId());
+//                                    }
+                                    agentNetInNotityService.asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
                                 }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                throw new ProcessException("更新賬戶数据申请失败");
-                            } finally {
-                                agentNotifyService.asynNotifyPlatform();
-                            }
+//                            } catch (Exception e) {
+//                                e.printStackTrace();
+//                                throw new ProcessException("更新賬戶数据申请失败");
+//                            } finally {
+////
+//                            }
 
                         }
                     //代理商新修改
@@ -284,6 +300,16 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                         capitalFlowService.insertCapitalFlow(capitalVo, preCapitalVo.getcAmount(),dr.getId(),"代理商信息修改");
                                     }
                                 }
+                            }
+                        }
+                        //更新财务出款机构
+                        List<AgentBusInfoVo> orgTypeList = vo.getOrgTypeList();
+                        for (AgentBusInfoVo agentBusInfoVo : orgTypeList) {
+                            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                            agentBusInfo.setFinaceRemitOrgan(agentBusInfoVo.getFinaceRemitOrgan());
+                            int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                            if ( i != 1) {
+                                throw new ProcessException("更新财务出款机构失败");
                             }
                         }
 
@@ -317,34 +343,31 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                         }
 
                         //入网程序调用
-                        try {
+//                        try {
                             if(vo.getBusInfoVoList()!=null){
 
                                 for (AgentBusInfoVo agentBusInfoVo : vo.getBusInfoVoList()) {
-                                    if(StringUtils.isNotBlank(agentBusInfoVo.getId())) {
-                                        ImportAgent importAgent = new ImportAgent();
-                                        importAgent.setDataid(agentBusInfoVo.getId());
-                                        importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
-                                        importAgent.setBatchcode(proIns);
-                                        importAgent.setcUser(rel.getcUser());
-                                        if (1 != aimportService.insertAgentImportData(importAgent)) {
-                                            logger.info("代理商修改审批通过-添加开户任务失败");
-                                        } else {
-                                            logger.info("代理商修改审批通过-添加开户任务成功!{},{}", AgImportType.DATACHANGEAPP.getValue(), vo.getAgent().getId());
-                                        }
-                                    }
-
+//                                    if(StringUtils.isNotBlank(agentBusInfoVo.getId())) {
+//                                        ImportAgent importAgent = new ImportAgent();
+//                                        importAgent.setDataid(agentBusInfoVo.getId());
+//                                        importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
+//                                        importAgent.setBatchcode(proIns);
+//                                        importAgent.setcUser(rel.getcUser());
+//                                        if (1 != aimportService.insertAgentImportData(importAgent)) {
+//                                            logger.info("代理商修改审批通过-添加开户任务失败");
+//                                        } else {
+//                                            logger.info("代理商修改审批通过-添加开户任务成功!{},{}", AgImportType.DATACHANGEAPP.getValue(), vo.getAgent().getId());
+//                                        }
+//                                    }
+                                    agentNetInNotityService.asynNotifyPlatform(agentBusInfoVo.getId(),NotifyType.NetInEdit.getValue());
                                 }
-
                             }
-
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            throw new ProcessException("更新数据申请失败");
-                        } finally {
-                            agentNotifyService.asynNotifyPlatform();
-                        }
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                            throw new ProcessException("更新数据申请失败");
+//                        } finally {
+//                            agentNotifyService.asynNotifyPlatform();
+//                        }
 
                     }
                 //拒绝更新数据状态
@@ -426,6 +449,11 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                     vo.setOweTicket(agentVo.getOweTicket());
                     if(orgCode.equals("finance")){
                         vo.setCapitalVoList(agentVo.getCapitalVoList());
+                        //处理财务审批（财务出款机构）
+                        vo.setOrgTypeList(agentVo.getOrgTypeList());
+                        for (AgentBusInfoVo orgTypeList : agentVo.getOrgTypeList()) {
+                            vo.setFinaceRemitOrgan(orgTypeList.getFinaceRemitOrgan());
+                        }
                     }
                     String voJson = JSONObject.toJSONString(vo);
                     dateChangeRequest.setDataContent(voJson);

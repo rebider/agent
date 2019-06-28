@@ -3,10 +3,14 @@ package com.ryx.credit.service.impl.agent;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
+import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.CapitalVo;
@@ -15,6 +19,7 @@ import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.TaskApprovalService;
+import com.ryx.credit.service.dict.DictOptionsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import sun.management.resources.agent;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -58,6 +62,16 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
     private IUserService iUserService;
     @Autowired
     private PlatFormMapper platFormMapper;
+    @Autowired
+    private RedisService redisService;
+    @Autowired
+    private DictOptionsService dictOptionsService;
+    @Autowired
+    private AgentMapper agentMapper;
+    @Autowired
+    private OrganizationMapper organizationMapper;
+
+
      @Override
      public List<Map<String,Object>> queryBusInfoAndRemit(AgentBusInfo agentBusInfo){
 
@@ -139,6 +153,16 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                     if (i != 1) {
                         logger.info("实际到账金额填写失败");
                         throw new ProcessException("实际到账金额填写失败");
+                    }
+                }
+
+                //处理财务审批（财务出款机构）
+                for (AgentBusInfoVo agentBusInfoVo : agentVo.getOrgTypeList()) {
+                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                    agentBusInfo.setFinaceRemitOrgan(agentBusInfoVo.getFinaceRemitOrgan());
+                    int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                    if (i != 1) {
+                        throw new ProcessException("更新财务出款机构异常");
                     }
                 }
             }
@@ -329,6 +353,31 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
         for (BusActRel busActRel : busActRels) {
             busActRel.setDataShiro(BusActRelBusType.getNameByKey(busActRel.getBusType()));
             busActRelMapper.updateByPrimaryKeySelective(busActRel);
+        }
+    }
+
+    /**
+     * 更新流程id修复程序
+     */
+    @Override
+    public void updateActivId(){
+        String activIds = redisService.hGet("actRepairConfig", "activIds");
+        if(StringUtils.isBlank(activIds)){
+            return;
+        }
+        String approveName = redisService.hGet("actRepairConfig", "approveName");
+        if(StringUtils.isBlank(approveName)){
+            return;
+        }
+        String[] activIdArr = activIds.split(",");
+        for (String activId : activIdArr) {
+            BusActRel busActRel = busActRelMapper.findById(activId);
+            String workId = dictOptionsService.getApproveVersion(approveName);
+            Map startPar = agentEnterService.startPar(busActRel.getcUser());
+            if(null==startPar)continue;
+            startPar.put("rs","pass");
+            String proce = activityService.createDeloyFlow(null,workId,null,null,startPar);
+            busActRelMapper.updateActivIdByActivId(busActRel.getActivId(),proce);
         }
     }
 }

@@ -2,11 +2,16 @@ package com.ryx.credit.service.impl.agent;
 
 import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.common.enumc.Status;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.dao.agent.PlatFormMapper;
+import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.agent.PlatForm;
 import com.ryx.credit.pojo.admin.agent.PlatFormExample;
+import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.service.agent.PlatFormService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -26,10 +31,13 @@ import java.util.Map;
 @Service("platformService")
 public class PlatFormServiceImpl implements PlatFormService{
 
+    private static Logger logger = LoggerFactory.getLogger(PlatFormServiceImpl.class);
     public final static SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-
     @Autowired
     private PlatFormMapper platFormMapper;
+    @Autowired
+    private OrganizationMapper organizationMapper;
+
 
     /*
      * 分页查询
@@ -99,6 +107,7 @@ public class PlatFormServiceImpl implements PlatFormService{
     public PlatForm selectByPlatformNum(String platformNum){
         return platFormMapper.selectByPlatFormNum(platformNum);
     }
+
     @Override
     public PlatformType byPlatformCode(String platformCode) {
         PlatFormExample example = new PlatFormExample();
@@ -110,4 +119,23 @@ public class PlatFormServiceImpl implements PlatFormService{
         }
         return null;
     }
+
+
+    /**
+     * 获取机构下拉数据
+     * @param platId 业务平台id
+     * @param orgParent 机构上级（机构上级为空的就是顶级机构）
+     * @param orgType 机构类型（不等于虚拟机构）
+     * @return
+     */
+    @Override
+    public List<Organization> queryByOrganName(String platId, String orgParent, String orgType) {
+        logger.info("获取业务所对应的机构：", platId, orgParent, orgType);
+        List<Organization> organizationList = organizationMapper.queryByOrganName(
+                FastMap.fastMap("platId", platId)
+                );
+        logger.info("queryByOrganName().organizationList：", organizationList);
+        return organizationList;
+    }
+
 }

@@ -1517,6 +1517,76 @@ public class AgentColinfoExample {
             addCriterion("PAY_STATUS not between", value1, value2, "payStatus");
             return (Criteria) this;
         }
+
+        public Criteria andAgLegalCernumIsNull() {
+            addCriterion("AG_LEGAL_CERNUM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgLegalCernumIsNotNull() {
+            addCriterion("AG_LEGAL_CERNUM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgLegalCernumEqualTo(String value) {
+            addCriterion("AG_LEGAL_CERNUM =", value, "agLegalCernum");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgLegalCernumNotEqualTo(String value) {
+            addCriterion("AG_LEGAL_CERNUM <>", value, "agLegalCernum");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgLegalCernumGreaterThan(String value) {
+            addCriterion("AG_LEGAL_CERNUM >", value, "agLegalCernum");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgLegalCernumGreaterThanOrEqualTo(String value) {
+            addCriterion("AG_LEGAL_CERNUM >=", value, "agLegalCernum");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgLegalCernumLessThan(String value) {
+            addCriterion("AG_LEGAL_CERNUM <", value, "agLegalCernum");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgLegalCernumLessThanOrEqualTo(String value) {
+            addCriterion("AG_LEGAL_CERNUM <=", value, "agLegalCernum");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgLegalCernumLike(String value) {
+            addCriterion("AG_LEGAL_CERNUM like", value, "agLegalCernum");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgLegalCernumNotLike(String value) {
+            addCriterion("AG_LEGAL_CERNUM not like", value, "agLegalCernum");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgLegalCernumIn(List<String> values) {
+            addCriterion("AG_LEGAL_CERNUM in", values, "agLegalCernum");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgLegalCernumNotIn(List<String> values) {
+            addCriterion("AG_LEGAL_CERNUM not in", values, "agLegalCernum");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgLegalCernumBetween(String value1, String value2) {
+            addCriterion("AG_LEGAL_CERNUM between", value1, value2, "agLegalCernum");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgLegalCernumNotBetween(String value1, String value2) {
+            addCriterion("AG_LEGAL_CERNUM not between", value1, value2, "agLegalCernum");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

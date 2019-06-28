@@ -13,6 +13,8 @@
     <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
     <result column="NET_IN_BUS_TYPE" jdbcType="VARCHAR" property="netInBusType" />
     <result column="DATA_SHIRO" jdbcType="VARCHAR" property="dataShiro" />
+    <result column="AG_DOC_PRO" jdbcType="VARCHAR" property="agDocPro" />
+    <result column="AG_DOC_DISTRICT" jdbcType="VARCHAR" property="agDocDistrict" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -45,7 +47,7 @@
   </sql>
   <sql id="Base_Column_List">
     ACTIV_ID, BUS_ID, BUS_TYPE, C_TIME, C_USER, ACTIV_STATUS, STATUS, AGENT_ID, AGENT_NAME,
-    NET_IN_BUS_TYPE, DATA_SHIRO
+    NET_IN_BUS_TYPE, DATA_SHIRO, AG_DOC_PRO, AG_DOC_DISTRICT
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.BusActRelExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -80,11 +82,13 @@
     insert into A_BUS_ACT_REL (ACTIV_ID, BUS_ID, BUS_TYPE,
     C_TIME, C_USER, ACTIV_STATUS,
     STATUS, AGENT_ID, AGENT_NAME,
-    NET_IN_BUS_TYPE, DATA_SHIRO)
+    NET_IN_BUS_TYPE, DATA_SHIRO, AG_DOC_PRO,
+    AG_DOC_DISTRICT)
     values (#{activId,jdbcType=VARCHAR}, #{busId,jdbcType=VARCHAR}, #{busType,jdbcType=VARCHAR},
     #{cTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{activStatus,jdbcType=VARCHAR},
     #{status,jdbcType=DECIMAL}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR},
-    #{netInBusType,jdbcType=VARCHAR}, #{dataShiro,jdbcType=VARCHAR})
+    #{netInBusType,jdbcType=VARCHAR}, #{dataShiro,jdbcType=VARCHAR}, #{agDocPro,jdbcType=VARCHAR},
+    #{agDocDistrict,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.BusActRel">
     insert into A_BUS_ACT_REL
@@ -122,6 +126,12 @@
       <if test="dataShiro != null">
         DATA_SHIRO,
       </if>
+      <if test="agDocPro != null">
+        AG_DOC_PRO,
+      </if>
+      <if test="agDocDistrict != null">
+        AG_DOC_DISTRICT,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="activId != null">
@@ -156,6 +166,12 @@
       </if>
       <if test="dataShiro != null">
         #{dataShiro,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocPro != null">
+        #{agDocPro,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocDistrict != null">
+        #{agDocDistrict,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -195,6 +211,12 @@
       <if test="dataShiro != null">
         DATA_SHIRO = #{dataShiro,jdbcType=VARCHAR},
       </if>
+      <if test="agDocPro != null">
+        AG_DOC_PRO = #{agDocPro,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocDistrict != null">
+        AG_DOC_DISTRICT = #{agDocDistrict,jdbcType=VARCHAR},
+      </if>
     </set>
     where ACTIV_ID = #{activId,jdbcType=VARCHAR}
     and BUS_ID = #{busId,jdbcType=VARCHAR}
@@ -209,7 +231,9 @@
     AGENT_ID = #{agentId,jdbcType=VARCHAR},
     AGENT_NAME = #{agentName,jdbcType=VARCHAR},
     NET_IN_BUS_TYPE = #{netInBusType,jdbcType=VARCHAR},
-    DATA_SHIRO = #{dataShiro,jdbcType=VARCHAR}
+    DATA_SHIRO = #{dataShiro,jdbcType=VARCHAR},
+    AG_DOC_PRO = #{agDocPro,jdbcType=VARCHAR},
+    AG_DOC_DISTRICT = #{agDocDistrict,jdbcType=VARCHAR}
     where ACTIV_ID = #{activId,jdbcType=VARCHAR}
     and BUS_ID = #{busId,jdbcType=VARCHAR}
   </update>
@@ -229,4 +253,16 @@
     from A_BUS_ACT_REL
     where ACTIV_ID = #{activId,jdbcType=VARCHAR}
   </select>
+  <select id="findByBusId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from A_BUS_ACT_REL
+    where bus_id = #{busId,jdbcType=VARCHAR}
+  </select>
+
+  <update id="updateActivIdByActivId" parameterType="com.ryx.credit.pojo.admin.agent.BusActRel">
+    update A_BUS_ACT_REL
+    set ACTIV_ID = #{newActivId,jdbcType=VARCHAR}
+    where ACTIV_ID = #{activId,jdbcType=VARCHAR}
+  </update>
 </mapper>

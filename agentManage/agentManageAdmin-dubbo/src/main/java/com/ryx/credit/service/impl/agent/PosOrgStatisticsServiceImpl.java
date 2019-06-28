@@ -14,7 +14,9 @@ import com.ryx.credit.common.util.agentUtil.RSAUtil;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.PlatFormMapper;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
+import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.pojo.admin.agent.PlatForm;
+import com.ryx.credit.service.agent.BusinessPlatformService;
 import com.ryx.credit.service.agent.PosOrgStatisticsService;
 import com.ryx.credit.util.Constants;
 import org.apache.commons.codec.binary.Base64;
@@ -39,33 +41,35 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
     private PlatFormMapper platFormMapper;
     @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
+    @Autowired
+    private BusinessPlatformService businessPlatformService;
 
-    @Override
-    public AgentResult posOrgStatistics(String busPlatform,String orgId,String busId,String termType)throws Exception{
-        PlatForm platForm = platFormMapper.selectByPlatFormNum(busPlatform);
-        String platformType = platForm.getPlatformType();
-        AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
-        if(StringUtils.isBlank(busId)){
-            throw new MessageException("业务ID不存在");
-        }
-        if(StringUtils.isBlank(agentBusInfo.getBusParent())){
-            throw new MessageException("上级不能为空");
-        }
-        AgentBusInfo parentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
-        if(parentBusInfo==null){
-            throw new MessageException("上级不能为空");
-        }
-        if(PlatformType.MPOS.getValue().equals(platformType)){
-            AgentResult agentResult = httpForMpos(orgId,parentBusInfo.getBusNum(),termType);
-            agentResult.setMsg(platformType);
-            return agentResult;
-        }else if(PlatformType.whetherPOS(platformType)){
-            AgentResult agentResult = httpForPos(orgId,parentBusInfo.getBusNum());
-            agentResult.setMsg(platformType);
-            return agentResult;
-        }
-        return AgentResult.fail();
-    }
+//    @Override
+//    public AgentResult posOrgStatistics(String busPlatform,String orgId,String busId,String termType)throws Exception{
+//        PlatForm platForm = platFormMapper.selectByPlatFormNum(busPlatform);
+//        String platformType = platForm.getPlatformType();
+//        AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
+//        if(StringUtils.isBlank(busId)){
+//            throw new MessageException("业务ID不存在");
+//        }
+//        if(StringUtils.isBlank(agentBusInfo.getBusParent())){
+//            throw new MessageException("上级不能为空");
+//        }
+//        AgentBusInfo parentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
+//        if(parentBusInfo==null){
+//            throw new MessageException("上级不能为空");
+//        }
+//        if(PlatformType.MPOS.getValue().equals(platformType)){
+//            AgentResult agentResult = httpForMpos(orgId,parentBusInfo.getBusNum(),termType);
+//            agentResult.setMsg(platformType);
+//            return agentResult;
+//        }else if(PlatformType.whetherPOS(platformType)){
+//            AgentResult agentResult = httpForPos(orgId,parentBusInfo.getBusNum());
+//            agentResult.setMsg(platformType);
+//            return agentResult;
+//        }
+//        return AgentResult.fail();
+//    }
 
     public static AgentResult httpForPos(String orgId,String supDorgId)throws Exception{
         try {
@@ -165,6 +169,26 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
         }
     }
 
+    private AgentResult httpForRDBpos(String agencyId)throws Exception{
+        try {
+            Map<String, String> map = new HashMap<>();
+            List<Map<String, Object>> list = businessPlatformService.queryByBusNum(agencyId);
+            map.put("branchid",String.valueOf(list.get(0).get("BUS_PLATFORM")).split("_")[0]);
+            map.put("agencyId",agencyId);
+            String toJson = JsonUtil.objectToJson(map);
+            log.info("瑞大宝查询终端下限数量请求参数:{}",toJson);
+            String httpResult = HttpClientUtil.doPostJson(AppConfig.getProperty("rdb_req_url")+"agency/getTermCount", toJson);
+            log.info("瑞大宝查询终端下限数量返回参数:{}",httpResult);
+            JSONObject jsonObject = JSONObject.parseObject(httpResult);
+            JSONArray result = jsonObject.getJSONArray("result");
+            return AgentResult.ok(result);
+        } catch (Exception e) {
+            log.info("http请求超时:{}",e.getMessage());
+            e.printStackTrace();
+            throw new Exception(e);
+        }
+    }
+
     @Override
     public AgentResult posOrgStatistics(String orgId,String termType)throws Exception{
 
@@ -175,6 +199,10 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
         }else if(TerminalPlatformType.POS.getValue().compareTo(new BigDecimal(termType))==0){
             AgentResult agentResult = httpForPos(orgId,orgId);
             agentResult.setMsg(PlatformType.POS.getValue());
+            return agentResult;
+        }else if(TerminalPlatformType.RDBPOS.getValue().compareTo(new BigDecimal(termType))==0){
+            AgentResult agentResult = httpForRDBpos(orgId);
+            agentResult.setMsg(PlatformType.RDBPOS.getValue());
             return agentResult;
         }
         return AgentResult.fail();
@@ -210,6 +238,15 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
                 }
             }
             AgentResult agentResult = httpForPos(orgId,parentBusNum);
+            agentResult.setMsg(platformType);
+            return agentResult;
+        }else if(PlatformType.RDBPOS.getValue().equals(platformType)){
+            if(StringUtils.isEmpty(orgId)){
+                if(StringUtils.isNotEmpty(parentBusNum)){
+                    orgId = parentBusNum;
+                }
+            }
+            AgentResult agentResult = httpForRDBpos(orgId);
             agentResult.setMsg(platformType);
             return agentResult;
         }

@@ -96,7 +96,6 @@ public class AgentServiceImpl implements AgentService {
      */
     @Override
     public PageInfo queryAgentList(PageInfo page, Agent agent) {
-
         AgentExample example = new AgentExample();
         AgentExample.Criteria c = example.or();
         if (agent != null && StringUtils.isNotEmpty(agent.getAgUniqNum())) {
@@ -117,26 +116,14 @@ public class AgentServiceImpl implements AgentService {
         if (agent != null && StringUtils.isNotEmpty(agent.getAgZbh())) {
             c.andAgZbhLike("%" + agent.getAgZbh() + "%");
         }
-//        c.andCUserEqualTo(agent.getcUser());
+        if (agent != null && StringUtils.isNotEmpty(agent.getAgBusLic())) {
+            c.andAgBusLicEqualTo(agent.getAgBusLic());
+        }
         c.andStatusEqualTo(Status.STATUS_1.status);
         int count = agentMapper.countByExample(example);
         example.setOrderByClause(" c_utime desc ");
         example.setPage(new Page(page.getFrom(), page.getPagesize()));
         List<Agent> list = agentMapper.selectByExample(example);
-//        for (Agent agent1 : list) {
-//            if(StringUtils.isNotEmpty(agent1.getAgDocPro())) {
-//                COrganization organization = departmentService.getById(agent1.getAgDocPro());
-//                if(null!=organization) {
-//                    agent1.setAgDocProTemp(organization.getName());
-//                }
-//            }
-//            if(StringUtils.isNotEmpty(agent1.getAgDocDistrict())) {
-//                COrganization organization = departmentService.getById(agent1.getAgDocDistrict());
-//                if(null!=organization) {
-//                    agent1.setAgDocDistrictTemp(organization.getName());
-//                }
-//            }
-//        }
         page.setRows(list);
         page.setTotal(count);
         return page;
@@ -469,8 +456,9 @@ public class AgentServiceImpl implements AgentService {
     @Override
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     public void createUser(String agentId)throws Exception{
+        logger.info("生成后台代理商用户开始:agentId:{}",agentId);
         Agent agent = getAgentById(agentId);
-        List<UserVo>  userVoSelect = cUserMapper.selectListByLogin(agent.getAgUniqNum());
+        List<UserVo>  userVoSelect = cUserMapper.selectListByLogin(agent.getId());
         if (userVoSelect.size()>0) {
             return;
         }
@@ -486,7 +474,7 @@ public class AgentServiceImpl implements AgentService {
         userVo.setUserType(1);
         userVo.setPhone(agent.getId());
         iUserService.insertByVo(userVo);
-
+        logger.info("生成后台代理商用户成功",agent.getId());
 
         List<UserVo>  list_db = cUserMapper.selectListByLogin(agent.getId());
         UserVo cUser = new UserVo();
@@ -502,6 +490,7 @@ public class AgentServiceImpl implements AgentService {
         cuserAgent.setVersion(BigDecimal.ONE);
         iCuserAgentService.insert(cuserAgent);
         redisService.hSet("agent", String.valueOf(cUser.getId()), agent.getId());
+        logger.info("生成后台代理商用户结束");
     }
 
 
@@ -740,5 +729,24 @@ public class AgentServiceImpl implements AgentService {
             return agent;
         }
         return null;
+    }
+
+    /**
+     * 存在返回ok,不存在返回false
+     * @param agName
+     * @param lic
+     * @return
+     */
+    @Override
+    public AgentResult checkAgBusLicIsEst(String agName, String lic) {
+        AgentExample agentExample = new AgentExample();
+        AgentExample.Criteria criteria1 = agentExample.createCriteria();
+        criteria1.andStatusEqualTo(Status.STATUS_1.status);
+        criteria1.andAgBusLicEqualTo(lic);
+        List<Agent> agents = agentMapper.selectByExample(agentExample);
+        if(agents.size()!=0) {
+            return AgentResult.ok(agents.get(0).getId());
+        }
+        return AgentResult.fail();
     }
 }

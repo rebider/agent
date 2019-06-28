@@ -12,7 +12,7 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentExample;
-import com.ryx.credit.service.agent.AgentNotifyService;
+import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.agent.BusinessCAService;
 import com.ryx.credit.util.Constants;
 import org.apache.commons.codec.binary.Base64;
@@ -36,13 +36,13 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 
     private static Logger logger = LoggerFactory.getLogger(BusinessCAServiceImpl.class);
 	@Autowired
-	private AgentNotifyService agentNotifyService;
-	@Autowired
 	private BusinessCAService businessCAService;
 	@Autowired
 	private AgentMapper agentMapper;
 	@Resource(name = "taskExecutor")
 	private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+	@Autowired
+	private AgentService agentService;
 
 	@Override
 	public AgentResult agentBusinessCA(String agentBusinfoName) {
@@ -64,6 +64,12 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 			if(respType.equals("E")){
 				return new AgentResult(404,String.valueOf(jsonObject.get("respMsg")),"");
 			}else{
+				if(StringUtils.isNotBlank(dataMap.getString("creditCode"))){
+					AgentResult agentResult = agentService.checkAgBusLicIsEst(null,dataMap.getString("creditCode"));
+					if(agentResult.isOK()){
+						return new AgentResult(405,"营业执照号已存在："+dataMap.getString("creditCode")+"代理商编号为："+agentResult.getData(),"");
+					}
+				}
 				return AgentResult.ok(dataMap);
 			}
 		} catch (Exception e) {

@@ -561,26 +561,6 @@ public class OrderServiceImpl implements OrderService {
                 throw new MessageException("商品数量错误");
             }
             int proNum = oSubOrder.getProNum().intValue();
-//            if (product.getProType().equals(PlatformType.POS.code)){
-////                POS必须是10的倍数
-//                if(proNum%10!=0  && proNum!=0){
-//                    logger.info("POS的商品数量必须是10的倍数");
-//                    throw new MessageException("POS的商品数量必须是10的倍数");
-//                }
-//
-//            }else if(product.getProType().equals(PlatformType.MPOS.code)){
-////                手刷必须是100的倍数
-//                if(proNum%100!=0 && proNum!=0){
-//                    logger.info("手刷的商品数量必须是100的倍数");
-//                    throw new MessageException("手刷的商品数量必须是100的倍数");
-//                }
-//            }else if(null!=product.getProCode() && product.getProCode().equals("206")){
-////                 流量卡必须100张起订
-//                if(proNum<100){
-//                    logger.info("流量卡的商品数量必须100张起订");
-//                    throw new MessageException("流量卡的商品数量必须100张起订");
-//                }
-//            }
             oSubOrder.setOrderId(orderFormVo.getId());
             oSubOrder.setProCode(product.getProCode());
             oSubOrder.setProName(product.getProName());
@@ -600,7 +580,7 @@ public class OrderServiceImpl implements OrderService {
             String oActivity = oSubOrder.getActivity();
             if (StringUtils.isNotBlank(oActivity)) {
                 OActivity activity = oActivityMapper.selectByPrimaryKey(oActivity);
-                if (activity != null && activity.getPrice() != null && activity.getPrice().compareTo(BigDecimal.ZERO) > 0) {
+                if (activity != null && activity.getPrice() != null && activity.getPrice().compareTo(BigDecimal.ZERO) >= 0) {
 
                     if (activity.getOriginalPrice()==null || activity.getOriginalPrice().compareTo(BigDecimal.ZERO) < 0) {
                         logger.info("下订单:{}", "活动原价不能小于0");
@@ -761,8 +741,8 @@ public class OrderServiceImpl implements OrderService {
         orderFormVo.setPayAmo(forRealPayAmount);//订单应付金额
 
         //订单首付金额不能大于订单金额
-        if (oPayment.getDownPayment() != null && orderFormVo.getPayAmo()!=null && oPayment.getDownPayment().compareTo(orderFormVo.getPayAmo()) >= 0) {
-            throw new MessageException("首付+分期支付方式，首付不能大于等于订单金额");
+        if (oPayment.getDownPayment() != null && orderFormVo.getPayAmo()!=null && oPayment.getDownPayment().compareTo(orderFormVo.getPayAmo()) > 0) {
+            throw new MessageException("首付不能大于等于订单金额");
         }
         //检查抵扣金额
         if(StringUtils.isNotBlank(oPayment.getDeductionType())){
@@ -1077,8 +1057,8 @@ public class OrderServiceImpl implements OrderService {
         order_db.setoAmo(forPayAmount);//订单总金额
         order_db.setPayAmo(forRealPayAmount);//订单应付金额
         //订单首付金额不能大于订单金额
-        if (oPayment_db.getDownPayment() != null && order_db.getPayAmo()!=null && oPayment_db.getDownPayment().compareTo(order_db.getPayAmo()) >= 0) {
-            throw new MessageException("首付+分期支付方式，首付不能大于等于订单金额");
+        if (oPayment_db.getDownPayment() != null && order_db.getPayAmo()!=null && oPayment_db.getDownPayment().compareTo(order_db.getPayAmo()) > 0) {
+            throw new MessageException("首付不能大于订单金额");
         }
 
         //检查抵扣金额
@@ -1374,7 +1354,9 @@ public class OrderServiceImpl implements OrderService {
         record.setAgentId(order.getAgentId());
         record.setAgentName(agent.getAgName());
         record.setDataShiro(BusActRelBusType.ORDER.key);
-
+        AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
+        record.setAgDocPro(agentBusInfo.getAgDocPro());
+        record.setAgDocDistrict(record.getAgDocDistrict());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("订单提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
             throw new MessageException("审批流启动失败:添加审批关系失败");
@@ -1622,7 +1604,14 @@ public class OrderServiceImpl implements OrderService {
             order.setOrderStatus(OrderStatus.ENABLE.status);
             order.setReviewStatus(AgStatus.Approved.status);
             order.setoInuretime(d.getTime());
-            Date orderTime = DateUtil.getDateFromStr(DateUtil.format(order.getcTime(), "yyyy-MM-dd"), "yyyy-MM-dd");
+            Calendar orderdate = Calendar.getInstance();
+            orderdate.setTime(order.getcTime());
+            orderdate.set(Calendar.DAY_OF_MONTH,orderdate.getActualMinimum(Calendar.DAY_OF_MONTH));
+            orderdate.set(Calendar.HOUR_OF_DAY,orderdate.getActualMinimum(Calendar.HOUR_OF_DAY));
+            orderdate.set(Calendar.MILLISECOND,orderdate.getActualMinimum(Calendar.MILLISECOND));
+            orderdate.set(Calendar.SECOND,orderdate.getActualMinimum(Calendar.SECOND));
+            orderdate.set(Calendar.MINUTE,orderdate.getActualMinimum(Calendar.MINUTE));
+            Date orderTime = DateUtil.getDateFromStr(DateUtil.format(orderdate.getTime(), "yyyy-MM-dd"), "yyyy-MM-dd");
             //付款单设置
             switch (order.getPaymentMethod()) {
                 case "FKFQ":
@@ -2136,35 +2125,40 @@ public class OrderServiceImpl implements OrderService {
                     logger.info("代理商订单审批完成处理明细完成{}:{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
                     break;
                 case "QT"://抵扣金额必须等于待付金额
-                    //抵扣金额判断
-                    if (oPayment.getDeductionAmount() == null || oPayment.getDeductionAmount().compareTo(BigDecimal.ZERO) <= 0) {
-                        logger.info("代理商订单审批完成QT抵扣不可为空{}:{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
-                        throw new MessageException("代理商订单审批完成QT抵扣不可为空");
-                    }
-                    if (oPayment.getDeductionType() == null || StringUtils.isBlank(oPayment.getDeductionType())) {
-                        logger.info("代理商订单审批完成QT抵扣类型不可为空{}:{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
-                        throw new MessageException("抵扣类型不可为空");
-                    }
-                    //抵扣操作
-                    AgentResult dealOrderDeductionRes =  dealOrderDeduction(oPayment);
-                    if(dealOrderDeductionRes.isOK()){
-                        List<OPaymentDetail> details =  (List<OPaymentDetail>)dealOrderDeductionRes.getData();
-                        for (OPaymentDetail detail : details) {
-                            if(1!=oPaymentDetailMapper.insertSelective(detail)){
-                                logger.info("代理商订单审批完成:抵扣款项插入失败:{},{},{},{}", order.getId(), oPayment.getPayMethod(), oPayment.getDeductionType(), oPayment.getDeductionAmount());
-                                throw new MessageException("抵扣操作失败");
-                            }else{
-                                logger.info("代理商订单审批完成:抵扣款项插入成功:{},{},{},{},{}", order.getId(), oPayment.getPayMethod(), oPayment.getDeductionType(), oPayment.getDeductionAmount(),detail.getPayAmount());
+                    //如果存在抵扣 进行抵扣处理
+                    if(StringUtils.isNotBlank(oPayment.getDeductionType()) && oPayment.getDeductionAmount()!=null && oPayment.getDeductionAmount().compareTo(BigDecimal.ZERO) >0) {
+                        //抵扣金额判断
+                        if (oPayment.getDeductionAmount() == null || oPayment.getDeductionAmount().compareTo(BigDecimal.ZERO) <= 0) {
+                            logger.info("代理商订单审批完成QT抵扣不可为空{}:{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
+                            throw new MessageException("代理商订单审批完成QT抵扣不可为空");
+                        }
+                        if (oPayment.getDeductionType() == null || StringUtils.isBlank(oPayment.getDeductionType())) {
+                            logger.info("代理商订单审批完成QT抵扣类型不可为空{}:{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
+                            throw new MessageException("抵扣类型不可为空");
+                        }
+                        //抵扣操作
+                        AgentResult dealOrderDeductionRes = dealOrderDeduction(oPayment);
+                        if (dealOrderDeductionRes.isOK()) {
+                            List<OPaymentDetail> details = (List<OPaymentDetail>) dealOrderDeductionRes.getData();
+                            for (OPaymentDetail detail : details) {
+                                if (1 != oPaymentDetailMapper.insertSelective(detail)) {
+                                    logger.info("代理商订单审批完成:抵扣款项插入失败:{},{},{},{}", order.getId(), oPayment.getPayMethod(), oPayment.getDeductionType(), oPayment.getDeductionAmount());
+                                    throw new MessageException("抵扣操作失败");
+                                } else {
+                                    logger.info("代理商订单审批完成:抵扣款项插入成功:{},{},{},{},{}", order.getId(), oPayment.getPayMethod(), oPayment.getDeductionType(), oPayment.getDeductionAmount(), detail.getPayAmount());
+                                }
                             }
+                        } else {
+                            logger.info("代理商订单审批完成:抵扣操作失败:{},{},{},{}",
+                                    order.getId(),
+                                    oPayment.getPayMethod(),
+                                    oPayment.getDeductionType(),
+                                    oPayment.getDeductionAmount());
+                            throw new MessageException("抵扣操作失败");
+
                         }
                     }else{
-                        logger.info("代理商订单审批完成:抵扣操作失败:{},{},{},{}",
-                                order.getId(),
-                                oPayment.getPayMethod(),
-                                oPayment.getDeductionType(),
-                                oPayment.getDeductionAmount());
-                        throw new MessageException("抵扣操作失败");
-
+                        oPayment.setDeductionAmount(BigDecimal.ZERO);
                     }
                     //设置待付和已付
                     logger.info("代理商订单审批完成处理明细完成数据成功{}:{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());

@@ -472,4 +472,7 @@
       </where>
   </sql>
 
+  <update id="updateStatusByTerminalTransferId" parameterType="java.lang.String">
+    update O_TERMINAL_TRANSFER_DETAIL set STATUS = 0  where TERMINAL_TRANSFER_ID = #{map.terminalTransferId}
+  </update>
 </mapper>

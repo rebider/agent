@@ -53,4 +53,6 @@ public interface TaskApprovalService {
     List<Map<String, Object>> queryById(AgentBusInfo agentBusInfo);
 
     void updateShrioBusActRel();
+
+    void updateActivId();
 }

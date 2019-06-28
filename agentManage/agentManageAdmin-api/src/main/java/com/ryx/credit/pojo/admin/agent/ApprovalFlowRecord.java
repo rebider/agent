@@ -50,6 +50,16 @@ public class ApprovalFlowRecord implements Serializable{
     private String subMitDateSta;//审批流程提交開始
     private String subMitDateEnd;//审批流程提交结束
 
+    private String appResult;
+
+    public String getAppResult() {
+        return appResult;
+    }
+
+    public void setAppResult(String appResult) {
+        this.appResult = appResult;
+    }
+
     public String getId() {
         return id;
     }

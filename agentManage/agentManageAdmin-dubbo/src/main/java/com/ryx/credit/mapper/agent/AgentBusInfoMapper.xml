@@ -40,6 +40,12 @@
     <result column="DEBIT_CAPPING" jdbcType="VARCHAR" property="debitCapping" />
     <result column="DEBIT_APPEAR_RATE" jdbcType="VARCHAR" property="debitAppearRate" />
     <result column="TERMINALS_LOWER" jdbcType="VARCHAR" property="terminalsLower" />
+    <result column="CREDIT_RATE_FLOOR" jdbcType="VARCHAR" property="creditRateFloor" />
+    <result column="AG_DOC_DISTRICT" jdbcType="VARCHAR" property="agDocDistrict" />
+    <result column="AG_DOC_PRO" jdbcType="VARCHAR" property="agDocPro" />
+    <result column="ORGAN_NUM" jdbcType="VARCHAR" property="organNum" />
+    <result column="FINACE_REMIT_ORGAN" jdbcType="VARCHAR" property="finaceRemitOrgan" />
+    <result column="APPROVE_TIME" jdbcType="TIMESTAMP" property="approveTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -76,7 +82,8 @@
     BUS_CONTACT_EMAIL, BUS_CONTACT_PERSON, BUS_RISK_EMAIL, CLO_TAX_POINT, CLO_INVOICE,
     CLO_RECEIPT, CLO_PAY_COMPANY, CLO_AGENT_COLINFO, BUS_STATUS, CLO_REVIEW_STATUS, C_TIME,
     C_UTIME, C_USER, STATUS, VERSION, AG_ZBH, BUS_USE_ORGAN, BUS_SCOPE, DREDGE_S0, BUS_LOGIN_NUM,
-    DEBIT_RATE_LOWER, DEBIT_CAPPING, DEBIT_APPEAR_RATE, TERMINALS_LOWER
+    DEBIT_RATE_LOWER, DEBIT_CAPPING, DEBIT_APPEAR_RATE, TERMINALS_LOWER, CREDIT_RATE_FLOOR,
+    AG_DOC_DISTRICT, AG_DOC_PRO, ORGAN_NUM, FINACE_REMIT_ORGAN, APPROVE_TIME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -119,7 +126,8 @@
     STATUS, VERSION, AG_ZBH,
     BUS_USE_ORGAN, BUS_SCOPE, DREDGE_S0,
     BUS_LOGIN_NUM, DEBIT_RATE_LOWER, DEBIT_CAPPING,
-    DEBIT_APPEAR_RATE, TERMINALS_LOWER)
+    DEBIT_APPEAR_RATE, TERMINALS_LOWER, CREDIT_RATE_FLOOR,
+    AG_DOC_DISTRICT, AG_DOC_PRO, ORGAN_NUM, FINACE_REMIT_ORGAN, APPROVE_TIME)
     values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR},
     #{busPlatform,jdbcType=VARCHAR}, #{busType,jdbcType=VARCHAR}, #{busParent,jdbcType=VARCHAR},
     #{busRiskParent,jdbcType=VARCHAR}, #{busActivationParent,jdbcType=VARCHAR}, #{busRegion,jdbcType=VARCHAR},
@@ -132,7 +140,8 @@
     #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{agZbh,jdbcType=VARCHAR},
     #{busUseOrgan,jdbcType=VARCHAR}, #{busScope,jdbcType=VARCHAR}, #{dredgeS0,jdbcType=DECIMAL},
     #{busLoginNum,jdbcType=VARCHAR}, #{debitRateLower,jdbcType=VARCHAR}, #{debitCapping,jdbcType=VARCHAR},
-    #{debitAppearRate,jdbcType=VARCHAR}, #{terminalsLower,jdbcType=VARCHAR})
+    #{debitAppearRate,jdbcType=VARCHAR}, #{terminalsLower,jdbcType=VARCHAR}, #{creditRateFloor,jdbcType=VARCHAR},
+    #{agDocDistrict,jdbcType=VARCHAR}, #{agDocPro,jdbcType=VARCHAR}, #{organNum,jdbcType=VARCHAR}, #{finaceRemitOrgan,jdbcType=VARCHAR},#{approveTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfo">
     insert into A_AGENT_BUSINFO
@@ -251,6 +260,24 @@
       <if test="terminalsLower != null">
         TERMINALS_LOWER,
       </if>
+      <if test="creditRateFloor != null">
+        CREDIT_RATE_FLOOR,
+      </if>
+      <if test="agDocDistrict != null">
+        AG_DOC_DISTRICT,
+      </if>
+      <if test="agDocPro != null">
+        AG_DOC_PRO,
+      </if>
+      <if test="organNum != null">
+        ORGAN_NUM,
+      </if>
+      <if test="finaceRemitOrgan != null">
+        FINACE_REMIT_ORGAN,
+      </if>
+      <if test="approveTime != null">
+        APPROVE_TIME,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -366,6 +393,24 @@
       </if>
       <if test="terminalsLower != null">
         #{terminalsLower,jdbcType=VARCHAR},
+      </if>
+      <if test="creditRateFloor != null">
+        #{creditRateFloor,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocDistrict != null">
+        #{agDocDistrict,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocPro != null">
+        #{agDocPro,jdbcType=VARCHAR},
+      </if>
+      <if test="organNum != null">
+        #{organNum,jdbcType=VARCHAR},
+      </if>
+      <if test="finaceRemitOrgan != null">
+        #{finaceRemitOrgan,jdbcType=VARCHAR},
+      </if>
+      <if test="approveTime != null">
+        #{approveTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -489,6 +534,24 @@
       <if test="terminalsLower != null">
         TERMINALS_LOWER = #{terminalsLower,jdbcType=VARCHAR},
       </if>
+      <if test="creditRateFloor != null">
+        CREDIT_RATE_FLOOR = #{creditRateFloor,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocDistrict != null">
+          AG_DOC_DISTRICT = #{agDocDistrict,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocPro != null">
+          AG_DOC_PRO = #{agDocPro,jdbcType=VARCHAR},
+      </if>
+      <if test="organNum != null">
+        ORGAN_NUM = #{organNum,jdbcType=VARCHAR},
+      </if>
+      <if test="finaceRemitOrgan != null">
+        FINACE_REMIT_ORGAN = #{finaceRemitOrgan,jdbcType=VARCHAR},
+      </if>
+      <if test="approveTime != null">
+        APPROVE_TIME = #{approveTime,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
@@ -530,7 +593,13 @@
     DEBIT_RATE_LOWER = #{debitRateLower,jdbcType=VARCHAR},
     DEBIT_CAPPING = #{debitCapping,jdbcType=VARCHAR},
     DEBIT_APPEAR_RATE = #{debitAppearRate,jdbcType=VARCHAR},
-    TERMINALS_LOWER = #{terminalsLower,jdbcType=VARCHAR}
+    TERMINALS_LOWER = #{terminalsLower,jdbcType=VARCHAR},
+    CREDIT_RATE_FLOOR = #{creditRateFloor,jdbcType=VARCHAR},
+    AG_DOC_DISTRICT = #{agDocDistrict,jdbcType=VARCHAR},
+    AG_DOC_PRO = #{agDocPro,jdbcType=VARCHAR},
+    ORGAN_NUM = #{organNum,jdbcType=VARCHAR},
+    FINACE_REMIT_ORGAN = #{finaceRemitOrgan,jdbcType=VARCHAR},
+    APPROVE_TIME = #{approveTime,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <sql id="OracleDialectPrefix">
@@ -582,115 +651,26 @@
 
   <select id="queryBusinessPlatformList" parameterType="map" resultType="map">
     <include refid="OracleDialectPrefix" />
-    (
-    select
-    b.id,b.agent_id,b.bus_num,b.bus_platform,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
-    a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time,b.clo_pay_company,b.bus_Inde_ass,d.ag_name as risk_parent,e.name as ag_doc_pro
-    from A_agent_businfo b
-    left join A_agent a on b.agent_id = a.id
-    left join A_agent_businfo c on c.id = b.bus_risk_parent
-    left join A_agent d on d.id = c.agent_id
-    left join c_organization e on e.id = a.ag_doc_pro
-    left join C_ORGANIZATION g on g.ID=a.AG_DOC_DISTRICT
-    where a.id=b.agent_id
-    and a.ag_status = #{reqMap.agStatus}
-    <if test="reqMap.agName != null and reqMap.agName != '' " >
-      and a.ag_name  like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
-    </if>
-    <if test="reqMap.agUniqNum != null and reqMap.agUniqNum != '' " >
-      and a.ag_uniq_num = #{reqMap.agUniqNum}
-    </if>
-    <if test="reqMap.busNum != null and reqMap.busNum != '' " >
-      and b.bus_num = #{reqMap.busNum}
-    </if>
-    <if test="reqMap.busPlatform != null and reqMap.busPlatform != '' " >
-      and b.bus_platform = #{reqMap.busPlatform}
-    </if>
-    <if test="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >
-      and b.clo_review_status = #{reqMap.cloReviewStatus}
-    </if>
-    <if test="reqMap.id != null and reqMap.id != '' " >
-      and b.id = #{reqMap.id}
-    </if>
-    <if test="reqMap.busType != null and reqMap.busType != '' " >
-      and b.bus_type = #{reqMap.busType}
-    </if>
-    <if test="reqMap.organizationCode!=null and reqMap.organizationCode!=''">
-      and (e.CODE like concat(#{reqMap.organizationCode},'%') or g.CODE like concat(#{reqMap.organizationCode},'%') )
-    </if>
-    <if test="reqMap.platfromPerm!=null and reqMap.platfromPerm.size>0">
-      and b.BUS_PLATFORM in
-      <foreach collection="reqMap.platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
-        #{platfromPermItem.PLATFORM_NUM}
-      </foreach>
-    </if>
-    <if test="reqMap.platfromPerm==null or reqMap.platfromPerm.size==0">
-      and 1=-1
-    </if>
-    and b.status = #{reqMap.status}
-    UNION
-    select
-    b.id,b.agent_id,b.bus_num,b.bus_platform,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
-    a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time,b.clo_pay_company,b.bus_Inde_ass,d.ag_name as risk_parent,e.name as ag_doc_pro
-    from A_agent_businfo b
-    left join A_agent a on b.agent_id = a.id
-    left join A_agent_businfo c on c.id = b.bus_risk_parent
-    left join A_agent d on d.id = c.agent_id
-    left join c_organization e on e.id = a.ag_doc_pro
-    left join C_ORGANIZATION g on g.ID=a.AG_DOC_DISTRICT
-    <where> a.id=b.agent_id
-    and a.ag_status = #{reqMap.agStatus}
-    <if test="reqMap.agName != null and reqMap.agName != '' " >
-      and a.ag_name  like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
-    </if>
-    <if test="reqMap.agUniqNum != null and reqMap.agUniqNum != '' " >
-      and a.ag_uniq_num = #{reqMap.agUniqNum}
-    </if>
-    <if test="reqMap.busNum != null and reqMap.busNum != '' " >
-      and b.bus_num = #{reqMap.busNum}
-    </if>
-    <if test="reqMap.busPlatform != null and reqMap.busPlatform != '' " >
-      and b.bus_platform = #{reqMap.busPlatform}
-    </if>
-    <if test="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >
-      and b.clo_review_status = #{reqMap.cloReviewStatus}
-    </if>
-    <if test="reqMap.id != null and reqMap.id != '' " >
-      and b.id = #{reqMap.id}
-    </if>
-      <if test="reqMap.busType != null and reqMap.busType != '' " >
-        and b.bus_type = #{reqMap.busType}
-      </if>
-    <if test="reqMap.userId!=null and reqMap.userId!=''">
-      and a.C_USER = #{reqMap.userId}
-    </if>
-    <if test="reqMap.platfromPerm!=null and reqMap.platfromPerm.size>0">
-      and b.BUS_PLATFORM in
-      <foreach collection="reqMap.platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
-        #{platfromPermItem.PLATFORM_NUM}
-      </foreach>
-    </if>
-    <if test="reqMap.platfromPerm==null or reqMap.platfromPerm.size==0">
-      and 1=-1
-    </if>
-    and b.status = #{reqMap.status}
-    </where>
-    )
-    order by c_time desc
+    <include refid="queryBusinessPlatformSql" />
     <include refid="OracleDialectSuffix" />
   </select>
 
-
   <select id="queryBusinessPlatformCount" parameterType="map" resultType="int">
     select count(*) from(
+      <include refid="queryBusinessPlatformSql" />
+    )
+  </select>
+
+  <sql id="queryBusinessPlatformSql">
     select
-    b.id
+    b.id,b.agent_id,b.bus_num,b.bus_platform,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
+    a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time,b.clo_pay_company,b.bus_Inde_ass,d.ag_name as risk_parent,e.name as ag_doc_pro,to_char(b.approve_time,'yyyy-MM-dd HH:mm:dd') as approve_time
     from A_agent_businfo b
     left join A_agent a on b.agent_id = a.id
     left join A_agent_businfo c on c.id = b.bus_risk_parent
     left join A_agent d on d.id = c.agent_id
-    left join c_organization e on e.id = a.ag_doc_pro
-    left join C_ORGANIZATION g on g.ID=a.AG_DOC_DISTRICT
+    left join C_ORGANIZATION e on e.ID = b.AG_DOC_PRO
+    left join C_ORGANIZATION g on g.ID=b.AG_DOC_DISTRICT
     where a.id=b.agent_id
     and a.ag_status = #{reqMap.agStatus}
     <if test="reqMap.agName != null and reqMap.agName != '' " >
@@ -726,16 +706,23 @@
     <if test="reqMap.platfromPerm==null or reqMap.platfromPerm.size==0">
       and 1=-1
     </if>
+    <if test="reqMap.approveTimeStart != null and reqMap.approveTimeStart != '' " >
+      and to_char(b.approve_time,'yyyy-MM-dd') &gt;= #{reqMap.approveTimeStart}
+    </if>
+    <if test="reqMap.approveTimeEnd != null and reqMap.approveTimeEnd != '' " >
+      and to_char(b.approve_time,'yyyy-MM-dd') &lt;= #{reqMap.approveTimeEnd}
+    </if>
     and b.status = #{reqMap.status}
     UNION
     select
-    b.id
+    b.id,b.agent_id,b.bus_num,b.bus_platform,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
+    a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time,b.clo_pay_company,b.bus_Inde_ass,d.ag_name as risk_parent,e.name as ag_doc_pro,to_char(b.approve_time,'yyyy-MM-dd HH:mm:dd') as approve_time
     from A_agent_businfo b
     left join A_agent a on b.agent_id = a.id
     left join A_agent_businfo c on c.id = b.bus_risk_parent
     left join A_agent d on d.id = c.agent_id
-    left join c_organization e on e.id = a.ag_doc_pro
-    left join C_ORGANIZATION g on g.ID=a.AG_DOC_DISTRICT
+    left join C_ORGANIZATION e on e.ID = b.AG_DOC_PRO
+    left join C_ORGANIZATION g on g.ID=b.AG_DOC_DISTRICT
     <where> a.id=b.agent_id
       and a.ag_status = #{reqMap.agStatus}
       <if test="reqMap.agName != null and reqMap.agName != '' " >
@@ -771,11 +758,16 @@
       <if test="reqMap.platfromPerm==null or reqMap.platfromPerm.size==0">
         and 1=-1
       </if>
+      <if test="reqMap.approveTimeStart != null and reqMap.approveTimeStart != '' " >
+        and to_char(b.approve_time,'yyyy-MM-dd') &gt;= #{reqMap.approveTimeStart}
+      </if>
+      <if test="reqMap.approveTimeEnd != null and reqMap.approveTimeEnd != '' " >
+        and to_char(b.approve_time,'yyyy-MM-dd') &lt;= #{reqMap.approveTimeEnd}
+      </if>
       and b.status = #{reqMap.status}
     </where>
-    )
-  </select>
-
+    order by c_time desc
+  </sql>
 
   <select id="businessQuery" parameterType="string" resultMap="BaseResultMap">
     select
@@ -1103,4 +1095,36 @@ union
     where BUS_LOGIN_NUM = #{reqMap.oldBusLoginNum,jdbcType=VARCHAR}
     and  bus_platform in (select platform_num from a_platform where platform_type=#{reqMap.platformType,jdbcType=VARCHAR})
   </update>
+
+  <select id="selectBusInfo" resultMap="BaseResultMap" parameterType="map">
+      select
+      ab.*
+      from A_AGENT_BUSINFO ab
+      left join C_ORGANIZATION oa on oa.id=ab.AG_DOC_PRO
+      left join C_ORGANIZATION ob on ob.id=ab.AG_DOC_DISTRICT
+      <where>
+        ab.status = #{reqMap.status}
+        <if test="reqMap.agentId != null and reqMap.agentId != '' " >
+            and ab.agent_id = #{reqMap.agentId}
+        </if>
+        <if test="reqMap.isZpos == null and reqMap.agentId == '' " >
+          and ab.BUS_PLATFORM != #{reqMap.busPlatform}
+        </if>
+        <if test="reqMap.agentId == 'true' " >
+          and ab.BUS_PLATFORM = #{reqMap.busPlatform}
+        </if>
+        <if test="reqMap.organizationCode!=null and reqMap.organizationCode!=''">
+          and (oa.CODE like concat(#{reqMap.organizationCode},'%') or ob.CODE like concat(#{reqMap.organizationCode},'%') )
+        </if>
+        <if test="reqMap.platfromPerm!=null and reqMap.platfromPerm.size>0">
+          and ab.BUS_PLATFORM in
+          <foreach collection="reqMap.platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
+            #{platfromPermItem.PLATFORM_NUM}
+          </foreach>
+        </if>
+        <if test="reqMap.platfromPerm==null or reqMap.platfromPerm.size==0">
+          and  1=-1
+        </if>
+      </where>
+  </select>
 </mapper>

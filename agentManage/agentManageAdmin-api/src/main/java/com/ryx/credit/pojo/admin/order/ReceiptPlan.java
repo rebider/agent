@@ -217,6 +217,6 @@ public class ReceiptPlan implements Serializable{
     }
 
     public void setActivityId(String activityId) {
-        this.activityId = activityId;
+        this.activityId = activityId == null ? null : activityId.trim();
     }
 }

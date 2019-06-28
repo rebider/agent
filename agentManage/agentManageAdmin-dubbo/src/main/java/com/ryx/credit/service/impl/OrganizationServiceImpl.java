@@ -48,5 +48,8 @@ public class OrganizationServiceImpl extends ServiceImpl<COrganizationMapper, CO
         return organizationMapper.selectList(wrapper);
     }
 
-
+    @Override
+    public COrganization selectByPrimaryKey(Integer id) {
+        return organizationMapper.selectByPrimaryKey(id);
+    }
 }

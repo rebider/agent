@@ -83,6 +83,18 @@ public class AgentBusInfo implements Serializable {
 
     private String terminalsLower;
 
+    private Date approveTime;
+
+    private String creditRateFloor;
+
+    private String agDocDistrict;
+
+    private String agDocPro;
+
+    private String organNum;
+
+    private String finaceRemitOrgan;
+
     private List<Attachment> attachmentList;
 
     private List<AgentColinfo> agentColinfoList;
@@ -96,6 +108,36 @@ public class AgentBusInfo implements Serializable {
     private Map<String,Object> parentInfo;
 
     private String codeTypes;
+
+    private String orgId;
+
+    public String getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(String orgId) {
+        this.orgId = orgId;
+    }
+
+    //    private String orgParent;
+//
+//    private String orgType;
+
+//    public String getOrgType() {
+//        return orgType;
+//    }
+//
+//    public void setOrgType(String orgType) {
+//        this.orgType = orgType;
+//    }
+//
+//    public String getOrgParent() {
+//        return orgParent;
+//    }
+//
+//    public void setOrgParent(String orgParent) {
+//        this.orgParent = orgParent;
+//    }
 
     public String getCodeTypes() {
         return codeTypes;
@@ -111,6 +153,54 @@ public class AgentBusInfo implements Serializable {
 
     public void setTerminalsLower(String terminalsLower) {
         this.terminalsLower = terminalsLower;
+    }
+
+    public String getCreditRateFloor() {
+        return creditRateFloor;
+    }
+
+    public void setCreditRateFloor(String creditRateFloor) {
+        this.creditRateFloor = creditRateFloor;
+    }
+
+    public String getAgDocDistrict() {
+        return agDocDistrict;
+    }
+
+    public void setAgDocDistrict(String agDocDistrict) {
+        this.agDocDistrict = agDocDistrict;
+    }
+
+    public String getAgDocPro() {
+        return agDocPro;
+    }
+
+    public void setAgDocPro(String agDocPro) {
+        this.agDocPro = agDocPro;
+    }
+
+    public String getOrganNum() {
+        return organNum;
+    }
+
+    public void setOrganNum(String organNum) {
+        this.organNum = organNum;
+    }
+
+    public String getFinaceRemitOrgan() {
+        return finaceRemitOrgan;
+    }
+
+    public void setFinaceRemitOrgan(String finaceRemitOrgan) {
+        this.finaceRemitOrgan = finaceRemitOrgan;
+    }
+
+    public Date getApproveTime() {
+        return approveTime;
+    }
+
+    public void setApproveTime(Date approveTime) {
+        this.approveTime = approveTime;
     }
 
     public List<Attachment> getAttachmentList() {
