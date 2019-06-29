@@ -306,4 +306,10 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
     }
 
+    @Override
+    public Organization selectById(String id) {
+        if(StringUtils.isNotBlank(id))
+        return organizationMapper.selectByPrimaryKey(id);
+        return null;
+    }
 }
