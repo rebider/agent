@@ -1828,6 +1828,10 @@ public class AimportServiceImpl implements AimportService {
         if(zhongduanshuliangxiaxian!=null && StringUtils.isNotBlank(zhongduanshuliangxiaxian) && !"null".equals(zhongduanshuliangxiaxian) ) {
             agentBusInfo.setTerminalsLower(zhongduanshuliangxiaxian);
         }
+        //贷记费率下限
+        if(credit_rate_floor!=null && StringUtils.isNotBlank(credit_rate_floor) && !"null".equals(credit_rate_floor) ) {
+            agentBusInfo.setCreditRateFloor(credit_rate_floor);
+        }
         //省区
         if(StringUtils.isNotBlank(shengqu) && !"null".equalsIgnoreCase(shengqu)) {
             COrganization org = departmentService.getByName(shengqu);
@@ -1876,10 +1880,6 @@ public class AimportServiceImpl implements AimportService {
                 agentBusInfo.setFinaceRemitOrgan(listOrganization.get(0).getOrgId());
             }
 
-        }
-        //贷记费率下限
-        if(credit_rate_floor!=null && StringUtils.isNotBlank(credit_rate_floor) && !"null".equals(credit_rate_floor) ) {
-            agentBusInfo.setCreditRateFloor(credit_rate_floor);
         }
         if(StringUtils.isNotBlank(agentBusInfo.getId())){
             agentBusInfo.setcUtime(Calendar.getInstance().getTime());

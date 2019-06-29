@@ -120,6 +120,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 			Dict debitRateLower = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitRateLower");//借记费率下限（%）
 			Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitCapping");//借记封顶额（元）
 			Dict debitAppearRate = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitAppearRate");//借记出款费率（%）
+			Dict creditRateFloor = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "creditRateFloor");//贷记费率下限（%）
 			if(debitRateLower!=null){
 				agentBusInfo.setDebitRateLower(debitRateLower.getdItemvalue());
 			}
@@ -129,11 +130,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 			if(debitAppearRate!=null){
 				agentBusInfo.setDebitAppearRate(debitAppearRate.getdItemvalue());
 			}
-
-			// 贷记费率下限（%）
-		    Dict creditRateFloor = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "creditRateFloor");
 			if (creditRateFloor != null) {
-				agentBusInfo.setCreditRateFloor(creditRateFloor.getdItemvalue());
+				agentBusInfo.setCreditRateFloor(creditRateFloor.getdItemname());
 			}
 
 			if(1!=agentBusInfoMapper.insert(agentBusInfo)){
@@ -324,6 +322,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					Dict debitRateLower = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitRateLower");//借记费率下限（%）
 					Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitCapping");//借记封顶额（元）
 					Dict debitAppearRate = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitAppearRate");//借记出款费率（%）
+					Dict creditRateFloor = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "creditRateFloor");//贷记费率下限（%）
 					if(debitRateLower!=null){
 						db_AgentBusInfo.setDebitRateLower(debitRateLower.getdItemvalue());
 					}
@@ -333,11 +332,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					if(debitAppearRate!=null){
 						db_AgentBusInfo.setDebitAppearRate(debitAppearRate.getdItemvalue());
 					}
-
-					// 贷记费率下限（%）
-					Dict creditRateFloor = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "creditRateFloor");
 					if (creditRateFloor != null) {
-						db_AgentBusInfo.setCreditRateFloor(creditRateFloor.getdItemvalue());
+						db_AgentBusInfo.setCreditRateFloor(creditRateFloor.getdItemname());
 					}
 
 					if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(db_AgentBusInfo)){
