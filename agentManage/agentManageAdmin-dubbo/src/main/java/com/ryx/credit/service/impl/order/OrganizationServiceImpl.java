@@ -10,12 +10,16 @@ import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AttachmentMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
+import com.ryx.credit.dao.order.OrgPlatformMapper;
 import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.order.OrgPlatform;
+import com.ryx.credit.pojo.admin.order.OrgPlatformExample;
 import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.order.OrganizationExample;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OorganizationVo;
+import com.ryx.credit.pojo.admin.vo.OrganizationSerchVo;
 import com.ryx.credit.pojo.admin.vo.OrganizationVo;
 import com.ryx.credit.service.agent.AgentQueryService;
 import com.ryx.credit.service.dict.IdService;
@@ -50,6 +54,8 @@ public class OrganizationServiceImpl implements OrganizationService {
     private AttachmentRelMapper attachmentRelMapper;
     @Autowired
     private AgentQueryService agentQueryService;
+    @Autowired
+    private OrgPlatformMapper orgPlatformMapper;
 
     @Override
     public PageInfo organizationList(Page page, Organization organization) {
@@ -82,22 +88,26 @@ public class OrganizationServiceImpl implements OrganizationService {
                         logger.info("请选择业务平台");
                         throw new MessageException("请选择业务平台");
                     }
-                    ac.setOrgNick(ac.getOrgName());
-                    ac.setcUser(agentVo.getSid());
-                    ac.setPlatId(ac.getPlatId().substring(0, ac.getPlatId().length() - 1));
-                    if (StringUtils.isEmpty(ac.getcUser())) {
+                    if (StringUtils.isBlank(agentVo.getSid())) {
                         logger.info("操作人不能为空");
                         throw new MessageException("操作人不能为空");
                     }
-                    if (StringUtils.isEmpty(ac.getAgentId())) {
+                    if (StringUtils.isBlank(ac.getAgentId())) {
                         logger.info("代理商ID不能为空");
                         throw new MessageException("代理商ID不能为空");
                     }
                     Date d = Calendar.getInstance().getTime();
+                    ac.setOrgNick(ac.getOrgName());
+
+                    ac.setPlatId(ac.getPlatId().substring(0, ac.getPlatId().length() - 1));
+                    if (StringUtils.isNotBlank(ac.getBusinessNum())){
+                        ac.setBusinessNum(ac.getBusinessNum().substring(0, ac.getBusinessNum().length() - 1));
+                    }
                     ac.setcTime(d);
                     ac.setStatus(Status.STATUS_1.status);
                     ac.setVersion(Status.STATUS_1.status);
                     ac.setOrgId(idService.genId(TabId.O_ORGANIZATION));
+                    ac.setcUser(agentVo.getSid());
                     List<String> att = ac.getOrganizationbleFile();
                     if (att != null) {
                         for (String s : att) {
@@ -111,13 +121,39 @@ public class OrganizationServiceImpl implements OrganizationService {
                             record.setId(idService.genId(TabId.a_attachment_rel));
                             if (1 != attachmentRelMapper.insertSelective(record)) {
                                 logger.info("添加机构:{}", "机构添加附件关系失败");
-                                throw new ProcessException("机构添加附件关系失败");
+                                throw new MessageException("机构添加附件关系失败");
                             }
                         }
                     }
                     if (1 != organizationMapper.insertSelective(ac)) {
                         logger.info("添加机构失败");
-                        throw new ProcessException("添加机构失败");
+                        throw new MessageException("添加机构失败");
+                    }
+                    //机构平台关系表的添加
+                    if (null != ac.getOrgPlatform() || ac.getOrgPlatform().size() > 0) {
+                        List<OrgPlatform> orgPlatform = ac.getOrgPlatform();
+                        for (OrgPlatform platform : orgPlatform) {
+                            String[] platCode = platform.getPlatCode().split(",");
+                            String[] platNum = platform.getPlatNum().split(",");
+                            if (platCode.length != platNum.length) {
+                                logger.info("请检查业务平台和业务编码填写有误！");
+                                throw new MessageException("请检查业务平台和业务编码填写有误！");
+                            }
+                            for (int i = 0; i < platCode.length; i++) {
+                                OrgPlatform orgPlat = new OrgPlatform();
+                                orgPlat.setPlatCode(platCode[i]);
+                                orgPlat.setPlatNum(platNum[i]);
+                                orgPlat.setId(idService.genId(TabId.ORG_PLATFORM));
+                                orgPlat.setOrgId(ac.getOrgId());
+                                orgPlat.setcTime(d);
+                                orgPlat.setcUser(agentVo.getSid());
+                                if (1 != orgPlatformMapper.insertSelective(orgPlat)) {
+                                    logger.info("添加机构平台关系表:{}", "添加机构平台关系表失败");
+                                    throw new MessageException("添加机构平台关系表失败");
+                                }
+                            }
+                        }
+
                     }
                 } catch (ProcessException e) {
                     e.printStackTrace();
@@ -134,6 +170,19 @@ public class OrganizationServiceImpl implements OrganizationService {
     public AgentResult organizationDelete(String id, String user) {
         if (null == user) return AgentResult.fail("操作用户不能为空");
         if (StringUtils.isBlank(id)) return AgentResult.fail("ID不能为空");
+        //删除原有机构的业务平台
+        OrgPlatformExample orgPlatformExample = new OrgPlatformExample();
+        OrgPlatformExample.Criteria criteria = orgPlatformExample.createCriteria().andOrgIdEqualTo(id);
+        List<OrgPlatform> orgPlatforms = orgPlatformMapper.selectByExample(orgPlatformExample);
+        if (null != orgPlatforms || orgPlatforms.size() > 0) {
+            for (OrgPlatform orgPlatform : orgPlatforms) {
+                if (1!=orgPlatformMapper.deleteOrgPlatform(orgPlatform.getId())){
+                    logger.info("机构关系表删除失败");
+                    return  AgentResult.fail("机构关系表删除失败");
+                }
+            }
+
+        }
         Organization organization = new Organization();
         organization.setOrgId(id);
         organization.setuUser(user);
@@ -169,77 +218,152 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public ResultVO organizationEdit(OrganizationVo organizationVo) throws Exception {
-        if (null != organizationVo && null != organizationVo.getOrganization()) {
-            try {
-                Organization ac = organizationVo.getOrganization();
-                Organization organization = organizationMapper.selectByPrimaryKey(ac.getOrgId());
-                if (StringUtils.isNotBlank(ac.getBusinessNum())) {
-                    organization.setBusinessNum(ac.getBusinessNum());
-                }
-                organization.setAccountName(ac.getAccountName());
-                organization.setAccountBank(ac.getAccountBank());
-                organization.setAccountNum(ac.getAccountNum());
-                organization.setOrgNick(ac.getOrgName());
-                organization.setOrgName(ac.getOrgName());
-                organization.setBankCard(ac.getBankCard());
-//                    organization.setOrgType(ac.getOrgType());
-//                    organization.setOrgParent(ac.getOrgParent());
-                organization.setAgentId(ac.getAgentId());
-                organization.setCloType(ac.getCloType());
-                organization.setCloRealname(ac.getCloRealname());
-                organization.setCloBank(ac.getCloBank());
-                organization.setCloBankBranch(ac.getCloBankBranch());
-                organization.setRemark(ac.getRemark());
-                organization.setuTime(Calendar.getInstance().getTime());
-                organization.setBranchLineNum(ac.getBranchLineNum());
-                organization.setAllLineNum(ac.getAllLineNum());
-                organization.setBankRegion(ac.getBankRegion());
-                organization.setPlatId(ac.getPlatId());
-                if (1 != organizationMapper.updateByPrimaryKeySelective(organization)) {
-                    throw new MessageException("更新机构信息失败");
-                }
+    public ResultVO organizationEdit(AgentVo agentVo) throws Exception {
+            if (null != agentVo && null != agentVo.getOorganizationVoList()) {
+                for (OorganizationVo ac : agentVo.getOorganizationVoList()) {
+                    try {
+                        if (StringUtils.isBlank(ac.getPlatId())) {
+                            logger.info("请选择业务平台");
+                            throw new MessageException("请选择业务平台");
+                        }
+                        if (StringUtils.isBlank(agentVo.getSid())) {
+                            logger.info("操作人不能为空");
+                            throw new MessageException("操作人不能为空");
+                        }
+                        if (StringUtils.isBlank(ac.getAgentId())) {
+                            logger.info("代理商ID不能为空");
+                            throw new MessageException("代理商ID不能为空");
+                        }
+                        Organization organization = organizationMapper.selectByPrimaryKey(ac.getOrgId());
+                        if (StringUtils.isNotBlank(ac.getBusinessNum())){
+                            organization.setBusinessNum(ac.getBusinessNum().substring(0, ac.getBusinessNum().length() - 1));
+                        }
+                        organization.setcUser(agentVo.getSid());
+                        organization.setAccountName(ac.getAccountName());
+                        organization.setAccountBank(ac.getAccountBank());
+                        organization.setAccountNum(ac.getAccountNum());
+                        organization.setOrgNick(ac.getOrgName());
+                        organization.setOrgName(ac.getOrgName());
+                        organization.setBankCard(ac.getBankCard());
+                        organization.setAgentId(ac.getAgentId());
+                        organization.setCloType(ac.getCloType());
+                        organization.setCloRealname(ac.getCloRealname());
+                        organization.setCloBank(ac.getCloBank());
+                        organization.setCloBankBranch(ac.getCloBankBranch());
+                        organization.setRemark(ac.getRemark());
+                        organization.setuTime(Calendar.getInstance().getTime());
+                        organization.setBranchLineNum(ac.getBranchLineNum());
+                        organization.setAllLineNum(ac.getAllLineNum());
+                        organization.setBankRegion(ac.getBankRegion());
+                        organization.setPlatId(ac.getPlatId());
+                        if (1 != organizationMapper.updateByPrimaryKeySelective(organization)) {
+                            throw new MessageException("更新机构信息失败");
+                        }
 
-                //添加新的附件
-                List<String> fileIdList = organizationVo.getOrganizatioTableFile();
-                if (fileIdList != null) {
-                    for (String fileId : fileIdList) {
-                        Attachment attachment = attachmentMapper.selectByPrimaryKey(fileId);
-                        if (attachment != null) {
-                            if (AttDataTypeStatic.YHKSMJ.code.equals(attachment.getAttDataType() + "")) {
-                                String attId = queryFile(organization, AttDataTypeStatic.YHKSMJ.code);
-                                if (StringUtils.isNotBlank(attId)) {
-                                    deleteFile(organization, attId);
+                        //删除原有机构的业务平台
+                        OrgPlatformExample orgPlatformExample = new OrgPlatformExample();
+                        OrgPlatformExample.Criteria criteria = orgPlatformExample.createCriteria().andOrgIdEqualTo(ac.getOrgId());
+                        List<OrgPlatform> orgPlatforms = orgPlatformMapper.selectByExample(orgPlatformExample);
+                        if (null != orgPlatforms || orgPlatforms.size() > 0) {
+                            for (OrgPlatform orgPlatform : orgPlatforms) {
+                                if (1 != orgPlatformMapper.deleteOrgPlatform(orgPlatform.getId())) {
+                                    logger.info("机构关系表删除失败");
+                                    throw new MessageException("机构关系表删除失败");
                                 }
                             }
-                            if (AttDataTypeStatic.KHXUZ.code.equals(attachment.getAttDataType() + "")) {
-                                String attId = queryFile(organization, AttDataTypeStatic.KHXUZ.code);
-                                if (StringUtils.isNotBlank(attId)) {
-                                    deleteFile(organization, attId);
-                                }
-                            }
-                            if (AttDataTypeStatic.YBNSRZM.code.equals(attachment.getAttDataType() + "")) {
-                                String attId = queryFile(organization, AttDataTypeStatic.YBNSRZM.code);
-                                if (StringUtils.isNotBlank(attId)) {
-                                    deleteFile(organization, attId);
-                                }
+
+                        }
+
+                        //机构平台关系表的添加
+                if (null != ac.getOrgPlatform() || ac.getOrgPlatform().size() > 0) {
+                    List<OrgPlatform> orgPlatform = ac.getOrgPlatform();
+                    for (OrgPlatform platform : orgPlatform) {
+                        String[] platCode = platform.getPlatCode().split(",");
+                        String[] platNum = platform.getPlatNum().split(",");
+                        if (platCode.length != platNum.length) {
+                            logger.info("请检查业务平台和业务编码填写有误！");
+                            throw new MessageException("请检查业务平台和业务编码填写有误！");
+                        }
+                        Date d = Calendar.getInstance().getTime();
+                        for (int i = 0; i < platCode.length; i++) {
+                            OrgPlatform orgPlat = new OrgPlatform();
+                            orgPlat.setPlatCode(platCode[i]);
+                            orgPlat.setPlatNum(platNum[i]);
+                            orgPlat.setId(idService.genId(TabId.ORG_PLATFORM));
+                            orgPlat.setOrgId(ac.getOrgId());
+                            orgPlat.setcTime(d);
+                            orgPlat.setcUser(agentVo.getSid());
+                            if (1 != orgPlatformMapper.insertSelective(orgPlat)) {
+                                logger.info("添加机构平台关系表:{}", "添加机构平台关系表失败");
+                                throw new MessageException("添加机构平台关系表失败");
                             }
                         }
-                        addFile(organization, fileId);
+                    }
+
+                }
+                        //添加新的附件
+                        List<String> fileIdList = ac.getOrganizationbleFile();
+                        if (fileIdList != null) {
+                            for (String fileId : fileIdList) {
+                                Attachment attachment = attachmentMapper.selectByPrimaryKey(fileId);
+                                if (attachment != null) {
+                                    if (AttDataTypeStatic.YHKSMJ.code.equals(attachment.getAttDataType() + "")) {
+                                        String attId = queryFile(organization, AttDataTypeStatic.YHKSMJ.code);
+                                        if (StringUtils.isNotBlank(attId)) {
+                                            deleteFile(organization, attId);
+                                        }
+                                    }
+                                    if (AttDataTypeStatic.KHXUZ.code.equals(attachment.getAttDataType() + "")) {
+                                        String attId = queryFile(organization, AttDataTypeStatic.KHXUZ.code);
+                                        if (StringUtils.isNotBlank(attId)) {
+                                            deleteFile(organization, attId);
+                                        }
+                                    }
+                                    if (AttDataTypeStatic.YBNSRZM.code.equals(attachment.getAttDataType() + "")) {
+                                        String attId = queryFile(organization, AttDataTypeStatic.YBNSRZM.code);
+                                        if (StringUtils.isNotBlank(attId)) {
+                                            deleteFile(organization, attId);
+                                        }
+                                    }
+                                }
+                                addFile(organization, fileId);
+                            }
+                        }
+                    } catch (ProcessException e) {
+                        e.printStackTrace();
+                        throw e;
+                    } catch (MessageException e) {
+                        e.printStackTrace();
+                        throw e;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        throw new Exception(e.getMessage());
                     }
                 }
-            } catch (ProcessException e) {
-                e.printStackTrace();
-                throw e;
-            } catch (MessageException e) {
-                e.printStackTrace();
-                throw e;
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new Exception(e.getMessage());
+            }
+        return ResultVO.success(null);
+    }
+
+    @Override
+    public List<OrganizationSerchVo> queryOrganization(String orgId) {
+        List<OrganizationSerchVo> organizationList = organizationMapper.queryOrganization(orgId);
+        if (null != organizationList && organizationList.size() > 0) {
+            for (OrganizationSerchVo organization : organizationList) {
+                organization.setAttachmentList(agentQueryService.accessoryQuery(organization.getOrgId(), AttachmentRelType.Organization.name()));
             }
         }
-        return ResultVO.success(null);
+        return organizationList;
+    }
+
+    @Override
+    public List<OrgPlatform> queryOrgPlatform(String orgId) {
+        OrgPlatformExample orgPlatformExample = new OrgPlatformExample();
+        OrgPlatformExample.Criteria criteria = orgPlatformExample.createCriteria().andOrgIdEqualTo(orgId);
+        List<OrgPlatform> orgPlatforms = orgPlatformMapper.selectByExample(orgPlatformExample);
+        if (null==orgPlatforms || orgPlatforms.size()==0){
+            return new ArrayList<>();
+        }
+        return orgPlatforms;
     }
 
     @Override

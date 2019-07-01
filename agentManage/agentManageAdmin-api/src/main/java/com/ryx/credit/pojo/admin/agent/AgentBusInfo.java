@@ -95,6 +95,8 @@ public class AgentBusInfo implements Serializable {
 
     private String finaceRemitOrgan;
 
+    private String creditRateCeiling;
+
     private List<Attachment> attachmentList;
 
     private List<AgentColinfo> agentColinfoList;
@@ -145,6 +147,14 @@ public class AgentBusInfo implements Serializable {
 
     public void setCodeTypes(String codeTypes) {
         this.codeTypes = codeTypes;
+    }
+
+    public String getCreditRateCeiling() {
+        return creditRateCeiling;
+    }
+
+    public void setCreditRateCeiling(String creditRateCeiling) {
+        this.creditRateCeiling = creditRateCeiling;
     }
 
     public String getTerminalsLower() {

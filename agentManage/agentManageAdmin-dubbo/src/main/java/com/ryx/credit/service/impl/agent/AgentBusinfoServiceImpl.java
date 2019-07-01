@@ -121,6 +121,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 			Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitCapping");//借记封顶额（元）
 			Dict debitAppearRate = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitAppearRate");//借记出款费率（%）
 			Dict creditRateFloor = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "creditRateFloor");//贷记费率下限（%）
+			Dict creditRateCeiling = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "creditRateCeiling");//贷记费率上限（%）
 			if(debitRateLower!=null){
 				agentBusInfo.setDebitRateLower(debitRateLower.getdItemvalue());
 			}
@@ -132,6 +133,9 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 			}
 			if (creditRateFloor != null) {
 				agentBusInfo.setCreditRateFloor(creditRateFloor.getdItemname());
+			}
+			if (creditRateCeiling != null) {
+				agentBusInfo.setCreditRateCeiling(creditRateCeiling.getdItemname());
 			}
 
 			if(1!=agentBusInfoMapper.insert(agentBusInfo)){
@@ -323,6 +327,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitCapping");//借记封顶额（元）
 					Dict debitAppearRate = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitAppearRate");//借记出款费率（%）
 					Dict creditRateFloor = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "creditRateFloor");//贷记费率下限（%）
+					Dict creditRateCeiling = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "creditRateCeiling");//贷记费率上限（%）
 					if(debitRateLower!=null){
 						db_AgentBusInfo.setDebitRateLower(debitRateLower.getdItemvalue());
 					}
@@ -334,6 +339,9 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					}
 					if (creditRateFloor != null) {
 						db_AgentBusInfo.setCreditRateFloor(creditRateFloor.getdItemname());
+					}
+					if (creditRateCeiling != null) {
+						db_AgentBusInfo.setCreditRateCeiling(creditRateCeiling.getdItemname());
 					}
 
 					if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(db_AgentBusInfo)){
