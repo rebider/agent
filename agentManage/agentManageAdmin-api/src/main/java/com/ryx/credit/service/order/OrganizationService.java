@@ -33,4 +33,6 @@ public interface OrganizationService {
 
     List<Organization> queryAllOrgan();
 
+    Organization selectById(String id);
+
 }

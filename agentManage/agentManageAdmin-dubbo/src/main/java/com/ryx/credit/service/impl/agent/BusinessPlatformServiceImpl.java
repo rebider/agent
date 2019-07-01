@@ -353,6 +353,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 agentBusInfo.setBusContactPerson(agentBusInfoVo.getBusContactPerson());
                 agentBusInfo.setBusLoginNum(agentBusInfoVo.getBusLoginNum());
                 agentBusInfo.setBusStatus(agentBusInfoVo.getBusStatus());
+                if(StringUtils.isNotBlank(agentBusInfoVo.getOrganNum()))
+                 agentBusInfo.setOrganNum(agentBusInfoVo.getOrganNum());
                 agentBusInfo.setVersion(agentBusInfo.getVersion());
                 int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
                 if (i != 1) {

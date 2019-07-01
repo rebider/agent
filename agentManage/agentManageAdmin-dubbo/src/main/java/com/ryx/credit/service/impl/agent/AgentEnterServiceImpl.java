@@ -220,22 +220,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                         throw new ProcessException("瑞花宝登录账号必须是数字");
                     }
                 }
-                //判断所选机构是否属于所选平台（机构编号&业务平台）
-                if (StringUtils.isNotBlank(item.getOrganNum())) {
-                    organList = organizationMapper.selectOrganization(item.getOrganNum());
-                    for (Organization organization : organList) {
-                        if(StringUtils.isNotBlank(organization.getPlatId())) {
-                            if (!organization.getPlatId().contains(item.getBusPlatform())) {
-                                throw new ProcessException("所选机构不属于该业务平台");
-                            }
-                            item.setOrganNum(organization.getOrgId());
-                        }else{
-                            item.setOrganNum(organization.getOrgId());
-                        }
-                    }
-                }else{
-                    throw new ProcessException("请选择顶级机构");
-                }
             }
             Set<String> resultSet = new HashSet<>();
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
