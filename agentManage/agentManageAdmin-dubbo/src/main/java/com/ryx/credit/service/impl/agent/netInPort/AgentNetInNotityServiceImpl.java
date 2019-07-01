@@ -418,7 +418,7 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                     }else if(platForm.getPlatformType().equals(PlatformType.RDBPOS.getValue())){
                         result = agentHttpRDBMposServiceImpl.httpRequestNetInUpdate(paramMap);
                     }else if(platForm.getPlatformType().equals(PlatformType.SSPOS.getValue())){
-                        result = agentHttpMposServiceImpl.httpRequestNetInUpdate(paramMap);
+                        result = agentHttpSsPosServiceImpl.httpRequestNetInUpdate(paramMap);
                     }
                     log.info("入网开户修改操作: ,业务id：{},返回结果:{}",busId,result);
                     record.setNotifyJson(String.valueOf(result.getData()));
