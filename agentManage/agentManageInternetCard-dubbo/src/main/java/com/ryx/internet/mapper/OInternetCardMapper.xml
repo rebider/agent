@@ -27,6 +27,9 @@
     <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="STOP" jdbcType="DECIMAL" property="stop" />
+    <result column="RENEW_STATUS" jdbcType="VARCHAR" property="renewStatus" />
+    <result column="STOP_REASON" jdbcType="VARCHAR" property="stopReason" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -61,7 +64,7 @@
     ICCID_NUM, CARD_IMPORT_ID, BATCH_NUM, SN_NUM, DELIVER_TIME, CONSIGNEE, ORDER_ID,
     AGENT_ID, AGENT_NAME, INTERNET_CARD_NUM, ISSUER, OPEN_ACCOUNT_TIME, EXPIRE_TIME,
     INTERNET_CARD_STATUS, MER_ID, LATELY_PAY_TIME, MER_NAME, MANUFACTURER, RENEW, C_TIME,
-    U_TIME, C_USER, U_USER, STATUS, VERSION
+    U_TIME, C_USER, U_USER, STATUS, VERSION, STOP, RENEW_STATUS, STOP_REASON
   </sql>
   <select id="selectByExample" parameterType="com.ryx.internet.pojo.OInternetCardExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -100,7 +103,8 @@
     LATELY_PAY_TIME, MER_NAME, MANUFACTURER,
     RENEW, C_TIME, U_TIME,
     C_USER, U_USER, STATUS,
-    VERSION)
+    VERSION, STOP, RENEW_STATUS,
+    STOP_REASON)
     values (#{iccidNum,jdbcType=VARCHAR}, #{cardImportId,jdbcType=VARCHAR}, #{batchNum,jdbcType=VARCHAR},
     #{snNum,jdbcType=VARCHAR}, #{deliverTime,jdbcType=TIMESTAMP}, #{consignee,jdbcType=VARCHAR},
     #{orderId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR},
@@ -109,7 +113,8 @@
     #{latelyPayTime,jdbcType=VARCHAR}, #{merName,jdbcType=VARCHAR}, #{manufacturer,jdbcType=VARCHAR},
     #{renew,jdbcType=DECIMAL}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP},
     #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
-    #{version,jdbcType=DECIMAL})
+    #{version,jdbcType=DECIMAL}, #{stop,jdbcType=DECIMAL}, #{renewStatus,jdbcType=VARCHAR},
+    #{stopReason,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.internet.pojo.OInternetCard">
     insert into O_INTERNET_CARD
@@ -189,6 +194,15 @@
       <if test="version != null">
         VERSION,
       </if>
+      <if test="stop != null">
+        STOP,
+      </if>
+      <if test="renewStatus != null">
+        RENEW_STATUS,
+      </if>
+      <if test="stopReason != null">
+        STOP_REASON,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="iccidNum != null">
@@ -265,6 +279,15 @@
       </if>
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="stop != null">
+        #{stop,jdbcType=DECIMAL},
+      </if>
+      <if test="renewStatus != null">
+        #{renewStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="stopReason != null">
+        #{stopReason,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -349,6 +372,15 @@
       <if test="version != null">
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
+      <if test="stop != null">
+        STOP = #{stop,jdbcType=DECIMAL},
+      </if>
+      <if test="renewStatus != null">
+        RENEW_STATUS = #{renewStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="stopReason != null">
+        STOP_REASON = #{stopReason,jdbcType=VARCHAR},
+      </if>
     </set>
     where ICCID_NUM = #{iccidNum,jdbcType=VARCHAR}
   </update>
@@ -377,7 +409,10 @@
     C_USER = #{cUser,jdbcType=VARCHAR},
     U_USER = #{uUser,jdbcType=VARCHAR},
     STATUS = #{status,jdbcType=DECIMAL},
-    VERSION = #{version,jdbcType=DECIMAL}
+    VERSION = #{version,jdbcType=DECIMAL},
+    STOP = #{stop,jdbcType=DECIMAL},
+    RENEW_STATUS = #{renewStatus,jdbcType=VARCHAR},
+    STOP_REASON = #{stopReason,jdbcType=VARCHAR}
     where ICCID_NUM = #{iccidNum,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

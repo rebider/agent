@@ -55,11 +55,41 @@ public class OInternetCard implements Serializable{
 
     private BigDecimal version;
 
+    private BigDecimal stop;
+
+    private String renewStatus;
+
+    private String stopReason;
+
     private String snCount;
 
     private String beginSn;
 
     private String endSn;
+
+    public BigDecimal getStop() {
+        return stop;
+    }
+
+    public void setStop(BigDecimal stop) {
+        this.stop = stop;
+    }
+
+    public String getRenewStatus() {
+        return renewStatus;
+    }
+
+    public void setRenewStatus(String renewStatus) {
+        this.renewStatus = renewStatus;
+    }
+
+    public String getStopReason() {
+        return stopReason;
+    }
+
+    public void setStopReason(String stopReason) {
+        this.stopReason = stopReason;
+    }
 
     public String getBeginSn() {
         return beginSn;
