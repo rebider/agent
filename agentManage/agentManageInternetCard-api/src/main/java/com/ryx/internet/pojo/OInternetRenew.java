@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class OInternetRenew implements Serializable {
+public class OInternetRenew implements Serializable{
     private String id;
 
     private String renewWay;
@@ -15,7 +15,7 @@ public class OInternetRenew implements Serializable {
 
     private BigDecimal suppAmt;
 
-    private Date reviewStatus;
+    private BigDecimal reviewStatus;
 
     private Date reviewPassTime;
 
@@ -73,11 +73,11 @@ public class OInternetRenew implements Serializable {
         this.suppAmt = suppAmt;
     }
 
-    public Date getReviewStatus() {
+    public BigDecimal getReviewStatus() {
         return reviewStatus;
     }
 
-    public void setReviewStatus(Date reviewStatus) {
+    public void setReviewStatus(BigDecimal reviewStatus) {
         this.reviewStatus = reviewStatus;
     }
 

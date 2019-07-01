@@ -7,7 +7,7 @@
     <result column="RENEW_CARD_COUNT" jdbcType="DECIMAL" property="renewCardCount" />
     <result column="SUM_OFFSET_AMT" jdbcType="DECIMAL" property="sumOffsetAmt" />
     <result column="SUPP_AMT" jdbcType="DECIMAL" property="suppAmt" />
-    <result column="REVIEW_STATUS" jdbcType="TIMESTAMP" property="reviewStatus" />
+    <result column="REVIEW_STATUS" jdbcType="DECIMAL" property="reviewStatus" />
     <result column="REVIEW_PASS_TIME" jdbcType="TIMESTAMP" property="reviewPassTime" />
     <result column="APPLY_REMARK" jdbcType="VARCHAR" property="applyRemark" />
     <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
@@ -47,7 +47,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, RENEW_WAY, RENEW_CARD_COUNT, SUM_OFFSET_AMT, SUPP_AMT, REVIEW_STATUS, REVIEW_PASS_TIME, 
+    ID, RENEW_WAY, RENEW_CARD_COUNT, SUM_OFFSET_AMT, SUPP_AMT, REVIEW_STATUS, REVIEW_PASS_TIME,
     APPLY_REMARK, C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION
   </sql>
   <select id="selectByExample" parameterType="com.ryx.internet.pojo.OInternetRenewExample" resultMap="BaseResultMap">
@@ -67,7 +67,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from O_INTERNET_RENEW
     where ID = #{id,jdbcType=VARCHAR}
@@ -79,16 +79,16 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.internet.pojo.OInternetRenew">
-    insert into O_INTERNET_RENEW (ID, RENEW_WAY, RENEW_CARD_COUNT, 
-      SUM_OFFSET_AMT, SUPP_AMT, REVIEW_STATUS, 
-      REVIEW_PASS_TIME, APPLY_REMARK, C_TIME, 
-      U_TIME, C_USER, U_USER, 
-      STATUS, VERSION)
-    values (#{id,jdbcType=VARCHAR}, #{renewWay,jdbcType=VARCHAR}, #{renewCardCount,jdbcType=DECIMAL}, 
-      #{sumOffsetAmt,jdbcType=DECIMAL}, #{suppAmt,jdbcType=DECIMAL}, #{reviewStatus,jdbcType=TIMESTAMP}, 
-      #{reviewPassTime,jdbcType=TIMESTAMP}, #{applyRemark,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, 
-      #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, 
-      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
+    insert into O_INTERNET_RENEW (ID, RENEW_WAY, RENEW_CARD_COUNT,
+    SUM_OFFSET_AMT, SUPP_AMT, REVIEW_STATUS,
+    REVIEW_PASS_TIME, APPLY_REMARK, C_TIME,
+    U_TIME, C_USER, U_USER,
+    STATUS, VERSION)
+    values (#{id,jdbcType=VARCHAR}, #{renewWay,jdbcType=VARCHAR}, #{renewCardCount,jdbcType=DECIMAL},
+    #{sumOffsetAmt,jdbcType=DECIMAL}, #{suppAmt,jdbcType=DECIMAL}, #{reviewStatus,jdbcType=DECIMAL},
+    #{reviewPassTime,jdbcType=TIMESTAMP}, #{applyRemark,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP},
+    #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR},
+    #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.internet.pojo.OInternetRenew">
     insert into O_INTERNET_RENEW
@@ -153,7 +153,7 @@
         #{suppAmt,jdbcType=DECIMAL},
       </if>
       <if test="reviewStatus != null">
-        #{reviewStatus,jdbcType=TIMESTAMP},
+        #{reviewStatus,jdbcType=DECIMAL},
       </if>
       <if test="reviewPassTime != null">
         #{reviewPassTime,jdbcType=TIMESTAMP},
@@ -203,7 +203,7 @@
         SUPP_AMT = #{suppAmt,jdbcType=DECIMAL},
       </if>
       <if test="reviewStatus != null">
-        REVIEW_STATUS = #{reviewStatus,jdbcType=TIMESTAMP},
+        REVIEW_STATUS = #{reviewStatus,jdbcType=DECIMAL},
       </if>
       <if test="reviewPassTime != null">
         REVIEW_PASS_TIME = #{reviewPassTime,jdbcType=TIMESTAMP},
@@ -238,7 +238,7 @@
       RENEW_CARD_COUNT = #{renewCardCount,jdbcType=DECIMAL},
       SUM_OFFSET_AMT = #{sumOffsetAmt,jdbcType=DECIMAL},
       SUPP_AMT = #{suppAmt,jdbcType=DECIMAL},
-      REVIEW_STATUS = #{reviewStatus,jdbcType=TIMESTAMP},
+      REVIEW_STATUS = #{reviewStatus,jdbcType=DECIMAL},
       REVIEW_PASS_TIME = #{reviewPassTime,jdbcType=TIMESTAMP},
       APPLY_REMARK = #{applyRemark,jdbcType=VARCHAR},
       C_TIME = #{cTime,jdbcType=TIMESTAMP},
@@ -251,7 +251,7 @@
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">

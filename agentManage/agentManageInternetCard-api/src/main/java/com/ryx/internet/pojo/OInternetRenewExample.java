@@ -468,52 +468,52 @@ public class OInternetRenewExample {
             return (Criteria) this;
         }
 
-        public Criteria andReviewStatusEqualTo(Date value) {
+        public Criteria andReviewStatusEqualTo(BigDecimal value) {
             addCriterion("REVIEW_STATUS =", value, "reviewStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReviewStatusNotEqualTo(Date value) {
+        public Criteria andReviewStatusNotEqualTo(BigDecimal value) {
             addCriterion("REVIEW_STATUS <>", value, "reviewStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReviewStatusGreaterThan(Date value) {
+        public Criteria andReviewStatusGreaterThan(BigDecimal value) {
             addCriterion("REVIEW_STATUS >", value, "reviewStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReviewStatusGreaterThanOrEqualTo(Date value) {
+        public Criteria andReviewStatusGreaterThanOrEqualTo(BigDecimal value) {
             addCriterion("REVIEW_STATUS >=", value, "reviewStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReviewStatusLessThan(Date value) {
+        public Criteria andReviewStatusLessThan(BigDecimal value) {
             addCriterion("REVIEW_STATUS <", value, "reviewStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReviewStatusLessThanOrEqualTo(Date value) {
+        public Criteria andReviewStatusLessThanOrEqualTo(BigDecimal value) {
             addCriterion("REVIEW_STATUS <=", value, "reviewStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReviewStatusIn(List<Date> values) {
+        public Criteria andReviewStatusIn(List<BigDecimal> values) {
             addCriterion("REVIEW_STATUS in", values, "reviewStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReviewStatusNotIn(List<Date> values) {
+        public Criteria andReviewStatusNotIn(List<BigDecimal> values) {
             addCriterion("REVIEW_STATUS not in", values, "reviewStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReviewStatusBetween(Date value1, Date value2) {
+        public Criteria andReviewStatusBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("REVIEW_STATUS between", value1, value2, "reviewStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReviewStatusNotBetween(Date value1, Date value2) {
+        public Criteria andReviewStatusNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("REVIEW_STATUS not between", value1, value2, "reviewStatus");
             return (Criteria) this;
         }
