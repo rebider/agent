@@ -113,6 +113,16 @@ public class AgentBusInfo implements Serializable {
 
     private String orgId;
 
+    private String platformUrl;
+
+    public String getPlatformUrl() {
+        return platformUrl;
+    }
+
+    public void setPlatformUrl(String platformUrl) {
+        this.platformUrl = platformUrl;
+    }
+
     public String getOrgId() {
         return orgId;
     }
