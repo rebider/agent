@@ -35,4 +35,11 @@ public interface PlatFormService {
      * @return
      */
     List<Organization> queryByOrganName(String platId, String orgParent, String orgType);
+
+    /**
+     * 获取业务平台路径
+     * @param platId
+     * @return
+     */
+    PlatForm queryByPlatId(String platId);
 }

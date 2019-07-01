@@ -14,6 +14,8 @@
     <result column="PLATFORM_TYPE" jdbcType="VARCHAR" property="platformType" />
     <result column="POSANAMEPREFIX" jdbcType="VARCHAR" property="posanameprefix" />
     <result column="POSBUSITYPE" jdbcType="VARCHAR" property="posbusitype" />
+    <result column="BUSPLATFORM" jdbcType="VARCHAR" property="busplatform" />
+    <result column="PLATFORM_URL" jdbcType="VARCHAR" property="platformUrl" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -46,7 +48,7 @@
   </sql>
   <sql id="Base_Column_List">
     ID, PLATFORM_NUM, PLATFORM_NAME, C_TIME, C_UTIME, C_USER, PLATFORM_STATUS, STATUS,
-    VERSION, PLATFORM_TYPE, POSANAMEPREFIX, POSBUSITYPE
+    VERSION, PLATFORM_TYPE, POSANAMEPREFIX, POSBUSITYPE, BUSPLATFORM, PLATFORM_URL
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.PlatFormExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -74,12 +76,13 @@
     insert into A_PLATFORM (ID, PLATFORM_NUM, PLATFORM_NAME,
     C_TIME, C_UTIME, C_USER,
     PLATFORM_STATUS, STATUS, VERSION,
-    PLATFORM_TYPE, POSANAMEPREFIX, POSBUSITYPE
+    PLATFORM_TYPE, POSANAMEPREFIX, POSBUSITYPE, BUSPLATFORM, PLATFORM_URL
     )
     values (#{id,jdbcType=VARCHAR}, #{platformNum,jdbcType=VARCHAR}, #{platformName,jdbcType=VARCHAR},
     #{cTime,jdbcType=TIMESTAMP}, #{cUtime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
     #{platformStatus,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL},
-    #{platformType,jdbcType=VARCHAR}, #{posanameprefix,jdbcType=VARCHAR}, #{posbusitype,jdbcType=VARCHAR}
+    #{platformType,jdbcType=VARCHAR}, #{posanameprefix,jdbcType=VARCHAR}, #{posbusitype,jdbcType=VARCHAR},
+    #{busplatform,jdbcType=VARCHAR}, #{platformUrl,jdbcType=VARCHAR}
     )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.PlatForm">
@@ -121,6 +124,12 @@
       <if test="posbusitype != null">
         POSBUSITYPE,
       </if>
+      <if test="busplatform != null">
+        BUSPLATFORM,
+      </if>
+      <if test="platformUrl != null">
+        PLATFORM_URL,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -159,6 +168,12 @@
       <if test="posbusitype != null">
         #{posbusitype,jdbcType=VARCHAR},
       </if>
+      <if test="busplatform != null">
+        #{busplatform,jdbcType=VARCHAR},
+      </if>
+      <if test="platformUrl != null">
+        #{platformUrl,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.PlatFormExample" resultType="java.lang.Long">
@@ -186,48 +201,7 @@
   </select>
 
   <select id="countPlatForm" parameterType="map" resultType="Integer">
-    select count(ID)
-    from
-    A_PLATFORM
-    <where>
-      <if test="id != null and  ''!=id" >
-        and ID=#{id}
-      </if>
-      <if test="platformNum != null and  ''!=platformNum">
-        and PLATFORM_NUM=#{platformNum}
-      </if>
-      <if test="platformName != null and  ''!=platformName">
-        and PLATFORM_NAME=#{platformName}
-      </if>
-      <if test="cTime != null and  ''!=cTime">
-        and C_TIME=#{cTime}
-      </if>
-      <if test="cUtime != null and  ''!=cUtime">
-        and C_UTIME=#{cUtime}
-      </if>
-      <if test="cUser != null and  ''!=cUser">
-        and C_USER=#{cUser}
-      </if>
-      <if test="platformStatus != null and  ''!=platformStatus">
-        and PLATFORM_STATUS=#{platformStatus}
-      </if>
-      <if test="status != null and  ''!=status">
-        and STATUS=#{status}
-      </if>
-      <if test="version != null and  ''!=version">
-        and VERSION=#{version}
-      </if>
-      <if test="platformType != null and  ''!=platformType">
-        and PLATFORM_TYPE=#{platformType}
-      </if>
-      <if test="posanameprefix != null and  ''!=posanameprefix">
-        and POSANAMEPREFIX=#{posanameprefix}
-      </if>
-      <if test="posbusitype != null and  ''!=posbusitype">
-        and POSBUSITYPE=#{posbusitype}
-      </if>
-    </where>
-    order by C_TIME desc
+    select count(ID) from A_PLATFORM where status=1 order by C_TIME desc
   </select>
 
   <!--查询-->
@@ -238,47 +212,8 @@
     (
     select A.* ,ROWNUM rn from (select
     <include refid="Base_Column_List" />
-    from
-    A_PLATFORM
-    <where>
-      <if test="id != null and  ''!=id" >
-        and ID=#{id}
-      </if>
-      <if test="platformNum != null and  ''!=platformNum">
-        and PLATFORM_NUM=#{platformNum}
-      </if>
-      <if test="platformName != null and  ''!=platformName">
-        and PLATFORM_NAME=#{platformName}
-      </if>
-      <if test="cTime != null and  ''!=cTime">
-        and C_TIME=#{cTime}
-      </if>
-      <if test="cUtime != null and  ''!=cUtime">
-        and C_UTIME=#{cUtime}
-      </if>
-      <if test="cUser != null and  ''!=cUser">
-        and C_USER=#{cUser}
-      </if>
-      <if test="platformStatus != null and  ''!=platformStatus">
-        and PLATFORM_STATUS=#{platformStatus}
-      </if>
-      <if test="status != null and  ''!=status">
-        and STATUS=#{status}
-      </if>
-      <if test="version != null and  ''!=version">
-        and VERSION=#{version}
-      </if>
-      <if test="platformType != null and  ''!=platformType">
-        and PLATFORM_TYPE=#{platformType}
-      </if>
-      <if test="posanameprefix != null and  ''!=posanameprefix">
-        and POSANAMEPREFIX=#{posanameprefix}
-      </if>
-      <if test="posbusitype != null and  ''!=posbusitype">
-        and POSBUSITYPE=#{posbusitype}
-      </if>
-    </where>
-    order by C_TIME desc
+    from A_PLATFORM
+    where status=1 order by C_TIME desc
     )A
     <if test='pageNumStop != null and pageNumStop!=""'>
       <![CDATA[where ROWNUM <=#{pageNumStop}]]>
@@ -331,10 +266,16 @@
         PLATFORM_TYPE = #{platformType,jdbcType=VARCHAR},
       </if>
       <if test="posanameprefix != null" >
-          POSANAMEPREFIX = #{posanameprefix,jdbcType=VARCHAR},
+        POSANAMEPREFIX = #{posanameprefix,jdbcType=VARCHAR},
       </if>
-      <if test="POSBUSITYPE != null" >
-          POSBUSITYPE = #{posbusitype,jdbcType=VARCHAR},
+      <if test="posbusitype != null" >
+        POSBUSITYPE = #{posbusitype,jdbcType=VARCHAR},
+      </if>
+      <if test="busplatform != null" >
+        BUSPLATFORM = #{busplatform,jdbcType=VARCHAR},
+      </if>
+      <if test="platformUrl != null" >
+        PLATFORM_URL = #{platformUrl,jdbcType=VARCHAR},
       </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
@@ -342,10 +283,6 @@
 
   <!--id自增-->
   <select id="seqId" resultType="long">SELECT A_PLATFORM_SEQ.Nextval FROM dual </select>
-
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
-    delete from A_PLATFORM where ID = #{id}
-  </delete>
 
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.PlatForm" >
     update A_PLATFORM
@@ -385,6 +322,12 @@
       </if>
       <if test="posbusitype != null" >
         POSBUSITYPE = #{posbusitype,jdbcType=VARCHAR},
+      </if>
+      <if test="busplatform != null" >
+        BUSPLATFORM = #{busplatform,jdbcType=VARCHAR},
+      </if>
+      <if test="platformUrl != null" >
+        PLATFORM_URL = #{platformUrl,jdbcType=VARCHAR},
       </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}

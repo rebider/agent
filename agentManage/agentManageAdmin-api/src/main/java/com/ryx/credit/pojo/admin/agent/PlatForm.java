@@ -29,6 +29,10 @@ public class  PlatForm implements Serializable{
 
     private String posbusitype;
 
+    private String busplatform;
+
+    private String platformUrl;
+
     public String getId() {
         return id;
     }
@@ -123,5 +127,21 @@ public class  PlatForm implements Serializable{
 
     public void setPosbusitype(String posbusitype) {
         this.posbusitype = posbusitype == null ? null : posbusitype.trim();
+    }
+
+    public String getBusplatform() {
+        return busplatform;
+    }
+
+    public void setBusplatform(String busplatform) {
+        this.busplatform = busplatform;
+    }
+
+    public String getPlatformUrl() {
+        return platformUrl;
+    }
+
+    public void setPlatformUrl(String platformUrl) {
+        this.platformUrl = platformUrl;
     }
 }
