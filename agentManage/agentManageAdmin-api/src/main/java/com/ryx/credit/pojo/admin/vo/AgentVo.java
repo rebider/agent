@@ -106,8 +106,10 @@ public class AgentVo implements Serializable {
     private List<AgentBusInfoVo> creditRateFloorList;
     //机构
     private List<OorganizationVo> oorganizationVoList;
-    private List<AgentBusInfoVo> orgTypeList;
+    private List<AgentBusInfoVo> orgTypeList;//财务出款机构审批数据
     private String finaceRemitOrgan;//财务出款机构
+    private List<AgentBusInfoVo> marketToporgTableIdForm;//市场部顶级机构
+
 
     public String getFinaceRemitOrgan() {
         return finaceRemitOrgan;
@@ -642,5 +644,13 @@ public class AgentVo implements Serializable {
 
     public void setOrgTypeList(List<AgentBusInfoVo> orgTypeList) {
         this.orgTypeList = orgTypeList;
+    }
+
+    public List<AgentBusInfoVo> getMarketToporgTableIdForm() {
+        return marketToporgTableIdForm;
+    }
+
+    public void setMarketToporgTableIdForm(List<AgentBusInfoVo> marketToporgTableIdForm) {
+        this.marketToporgTableIdForm = marketToporgTableIdForm;
     }
 }

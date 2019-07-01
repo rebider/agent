@@ -194,11 +194,6 @@ public class AgentQueryServiceImpl implements AgentQueryService {
         AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
         criteria.andAgentIdEqualTo(agentId);
         criteria.andStatusEqualTo(Status.STATUS_1.status);
-        if(StringUtils.isBlank(isZpos)){
-            criteria.andBusPlatformNotEqualTo(Platform.ZPOS.getValue());
-        }else if(isZpos.equals("true")){
-            criteria.andBusPlatformEqualTo(Platform.ZPOS.getValue());
-        }
         List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
         if(platfromPerm.size()>0){
             List<String> busPlatformList = new ArrayList<>();
