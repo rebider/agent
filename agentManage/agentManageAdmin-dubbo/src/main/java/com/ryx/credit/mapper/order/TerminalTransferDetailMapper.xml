@@ -416,18 +416,19 @@
   </sql>
 
   <select id="exprotTerminalTransferDetails" parameterType="map" resultType="map">
-      select
-      t.*,a.ag_name,u.name as BUTT_JOINT_PERSON_NAME,cu.name as C_USER_NAME,uu.name as U_USER_NAME
-      from o_terminal_transfer_detail t
-      left join a_agent a on t.agent_id = a.id
-      left join c_user u on t.butt_joint_person = u.id
-      left join c_user cu on t.c_user = cu.id
-      left join c_user uu on t.u_user = uu.id
-      <include refid="TerminalTransferListWhere" />
-      order by t.c_time desc
+      <include refid="TerminalTransferListSql" />
   </select>
   <select id="selectTerminalTransferDetailList" parameterType="map" resultType="map">
     <include refid="OracleDialectPrefix" />
+    <include refid="TerminalTransferListSql" />
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectTerminalTransferDetailCount" parameterType="map" resultType="java.lang.Integer">
+    select count(*) from(
+      <include refid="TerminalTransferListSql" />
+    )
+  </select>
+  <sql id="TerminalTransferListSql">
       select
       t.*,a.ag_name,u.name as BUTT_JOINT_PERSON_NAME,cu.name as C_USER_NAME,uu.name as U_USER_NAME
       from o_terminal_transfer_detail t
@@ -435,18 +436,9 @@
       left join c_user u on t.butt_joint_person = u.id
       left join c_user cu on t.c_user = cu.id
       left join c_user uu on t.u_user = uu.id
-      <include refid="TerminalTransferListWhere" />
-      order by t.c_time desc
-    <include refid="OracleDialectSuffix" />
-  </select>
-  <select id="selectTerminalTransferDetailCount" parameterType="map" resultType="java.lang.Integer">
-      select
-      count(*)
-      from o_terminal_transfer_detail t
-      left join a_agent a on t.agent_id = a.id
-    <include refid="TerminalTransferListWhere" />
-  </select>
-  <sql id="TerminalTransferListWhere">
+      left join a_agent_businfo b on t.bus_id = b.id
+      left join C_ORGANIZATION oa on oa.id=b.ag_doc_pro
+      left join C_ORGANIZATION ob on ob.id=b.AG_DOC_DISTRICT
       <where>
           t.status = #{map.status} and a.status = #{map.status}
           <if test="map.terminalTransferId != null">
@@ -479,10 +471,11 @@
           <if test="map.originalOrgName != null">
             and t.original_Org_Name = #{map.originalOrgName}
           </if>
-          <if test="map.orgId!=null and map.orgId!=''">
-            and (a.AG_DOC_PRO = #{map.orgId} or a.AG_DOC_DISTRICT = #{map.orgId})
+          <if test="map.orgCode!=null and map.orgCode!=''">
+            and (oa.CODE like concat(#{map.orgCode},'%') or ob.CODE like concat(#{map.orgCode},'%') )
           </if>
       </where>
+      order by t.c_time desc
   </sql>
 
   <update id="updateStatusByTerminalTransferId" parameterType="java.lang.String">
