@@ -6,8 +6,11 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.Agent;
+import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
+import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.agent.TaskApprovalService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OCashReceivablesService;
@@ -24,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -52,7 +56,10 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     private IdService idService;
     @Autowired
     private DictOptionsService dictOptionsService;
-
+    @Autowired
+    private ActivityService activityService;
+    @Autowired
+    private TaskApprovalService taskApprovalService;
 
     public AgentResult saveAndApprove(OInternetRenew internetRenew,List<String> iccids, String cUser,
                                       List<OCashReceivablesVo> oCashReceivablesVoList)throws MessageException{
@@ -127,6 +134,35 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             oInternetRenewDetail.setuTime(new Date());
             oInternetRenewDetail.setVersion(BigDecimal.ONE);
             internetRenewDetailMapper.insert(oInternetRenewDetail);
+        }
+
+        String workId = dictOptionsService.getApproveVersion("agentCompensation");
+        //启动审批
+        String proce = activityService.createDeloyFlow(null, workId, null, null,null);
+        if (proce == null) {
+            throw new MessageException("审批流启动失败!");
+        }
+        //代理商业务视频关系
+        BusActRel record = new BusActRel();
+        record.setBusId(internetRenewId);
+        record.setActivId(proce);
+        record.setcTime(Calendar.getInstance().getTime());
+        record.setcUser(cUser);
+        record.setStatus(Status.STATUS_1.status);
+        record.setBusType(BusActRelBusType.COMPENSATE.name());
+        record.setActivStatus(AgStatus.Approving.name());
+//        record.setAgentId(oRefundPriceDiff.getAgentId());
+//        record.setDataShiro(BusActRelBusType.COMPENSATE.key);
+//        Agent agent = agentMapper.selectByPrimaryKey(oRefundPriceDiff.getAgentId());
+//        if(null!=agent)
+//        record.setAgentName(agent.getAgName());
+        try {
+            taskApprovalService.addABusActRel(record);
+            log.info("物联网卡续费审批流启动成功");
+        } catch (Exception e) {
+            e.getStackTrace();
+            log.error("物联网卡续费审批流启动失败{}");
+            throw new MessageException("物联网卡续费审批流启动失败!:{}",e.getMessage());
         }
         try {
             AgentResult agentResult = cashReceivablesService.addOCashReceivables(oCashReceivablesVoList,cUser,null, CashPayType.INTERNETRENEW,internetRenewId);
