@@ -5,7 +5,6 @@ import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
@@ -61,6 +60,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     @Autowired
     private TaskApprovalService taskApprovalService;
 
+    @Override
     public AgentResult saveAndApprove(OInternetRenew internetRenew,List<String> iccids, String cUser,
                                       List<OCashReceivablesVo> oCashReceivablesVoList)throws MessageException{
 
@@ -136,7 +136,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             internetRenewDetailMapper.insert(oInternetRenewDetail);
         }
 
-        String workId = dictOptionsService.getApproveVersion("agentCompensation");
+        String workId = dictOptionsService.getApproveVersion("cardRenew");
         //启动审批
         String proce = activityService.createDeloyFlow(null, workId, null, null,null);
         if (proce == null) {
@@ -151,11 +151,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         record.setStatus(Status.STATUS_1.status);
         record.setBusType(BusActRelBusType.COMPENSATE.name());
         record.setActivStatus(AgStatus.Approving.name());
-//        record.setAgentId(oRefundPriceDiff.getAgentId());
-//        record.setDataShiro(BusActRelBusType.COMPENSATE.key);
-//        Agent agent = agentMapper.selectByPrimaryKey(oRefundPriceDiff.getAgentId());
-//        if(null!=agent)
-//        record.setAgentName(agent.getAgName());
+        record.setDataShiro(BusActRelBusType.cardRenew.key);
         try {
             taskApprovalService.addABusActRel(record);
             log.info("物联网卡续费审批流启动成功");

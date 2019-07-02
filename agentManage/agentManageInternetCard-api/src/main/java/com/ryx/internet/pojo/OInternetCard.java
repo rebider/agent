@@ -67,6 +67,17 @@ public class OInternetCard implements Serializable{
 
     private String endSn;
 
+    private String iccidNumId;
+
+
+    public String getIccidNumId() {
+        return iccidNumId;
+    }
+
+    public void setIccidNumId(String iccidNumId) {
+        this.iccidNumId = iccidNumId;
+    }
+
     public BigDecimal getStop() {
         return stop;
     }

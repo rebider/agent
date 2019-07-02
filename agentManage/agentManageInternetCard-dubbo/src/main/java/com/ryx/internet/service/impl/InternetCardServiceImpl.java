@@ -82,6 +82,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),oInternetCard.getManufacturer());
             if(null!=dict)
                 oInternetCard.setManufacturer(dict.getdItemname());
+            oInternetCard.setIccidNumId(oInternetCard.getIccidNum());
         }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(oInternetCards);
