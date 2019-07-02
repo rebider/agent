@@ -106,7 +106,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 return null;
             }
             Map<String, Object> stringObjectMap = orgCodeRes.get(0);
-            reqMap.put("orgId",String.valueOf(stringObjectMap.get("ORGID")));
+//            reqMap.put("orgId",String.valueOf(stringObjectMap.get("ORGID")));
+            reqMap.put("orgCode",String.valueOf(stringObjectMap.get("ORGANIZATIONCODE")));
         }
         List<Map<String,Object>> terminalTransferList = terminalTransferMapper.selectTerminalTransferList(reqMap,page);
         PageInfo pageInfo = new PageInfo();
@@ -156,7 +157,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 return null;
             }
             Map<String, Object> stringObjectMap = orgCodeRes.get(0);
-            reqMap.put("orgId",String.valueOf(stringObjectMap.get("ORGID")));
+//            reqMap.put("orgId",String.valueOf(stringObjectMap.get("ORGID")));
+            reqMap.put("orgCode",String.valueOf(stringObjectMap.get("ORGANIZATIONCODE")));
         }
         List<Map<String,Object>> terminalTransferList = null;
         if(page!=null){

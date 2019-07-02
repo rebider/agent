@@ -419,7 +419,8 @@
       )
     </if>
     <if test="params.group == 'city' " >
-      and (br.ag_doc_pro = #{params.orgId} or br.ag_doc_district = #{params.orgId})
+      and (br.ag_doc_pro like concat(concat( '%', #{params.orgCode} ),'%') or
+      br.ag_doc_district like concat(concat( '%', #{params.orgCode} ),'%'))
     </if>
     <if test="params.busActRelBusType != null and params.busActRelBusType!='' " >
       and br.BUS_TYPE = #{params.busActRelBusType}

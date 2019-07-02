@@ -242,6 +242,7 @@
     count(*)
     from o_terminal_transfer t
     left join a_agent a on t.agent_id = a.id
+    left join a_agent_businfo b on t. = b.agent_id
     <include refid="TerminalTransferListWhere" />
   </select>
   <sql id="TerminalTransferListWhere">
@@ -259,8 +260,13 @@
       <if test="map.reviewStatus != null">
         and t.review_status = #{map.reviewStatus}
       </if>
-      <if test="map.orgId!=null and map.orgId!=''">
-        and (a.AG_DOC_PRO = #{map.orgId} or a.AG_DOC_DISTRICT = #{map.orgId})
+      <if test="map.orgCode!=null and map.orgCode!=''">
+        and EXISTS(
+          select A_AGENT_BUSINFO.ID from A_AGENT_BUSINFO b
+          where a.id = b.AGENT_ID
+          and (b.AG_DOC_PRO = like concat(concat( '%', #{map.orgCode} ),'%')
+          or b.AG_DOC_DISTRICT like concat(concat( '%', #{params.orgCode} ),'%'))
+        )
       </if>
     </where>
   </sql>
