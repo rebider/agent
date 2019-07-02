@@ -1356,7 +1356,7 @@ public class OrderServiceImpl implements OrderService {
         record.setDataShiro(BusActRelBusType.ORDER.key);
         AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
         record.setAgDocPro(agentBusInfo.getAgDocPro());
-        record.setAgDocDistrict(record.getAgDocDistrict());
+        record.setAgDocDistrict(agentBusInfo.getAgDocDistrict());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("订单提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
             throw new MessageException("审批流启动失败:添加审批关系失败");
