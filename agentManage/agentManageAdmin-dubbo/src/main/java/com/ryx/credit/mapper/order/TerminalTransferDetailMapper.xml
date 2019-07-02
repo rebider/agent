@@ -28,6 +28,7 @@
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="PLATFORM_TYPE" jdbcType="DECIMAL" property="platformType" />
+    <result column="BUS_ID" jdbcType="VARCHAR" property="busId" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -62,7 +63,7 @@
     ID, TERMINAL_TRANSFER_ID, SN_BEGIN_NUM, SN_END_NUM, PRO_COM, PRO_MODEL, ORIGINAL_ORG_ID,
     ORIGINAL_ORG_NAME, ORIGINAL_BUS_ID, GOAL_ORG_ID, GOAL_ORG_NAME, GOAL_BUS_ID, ADJUST_TIME,
     SN_COUNT, BUTT_JOINT_PERSON, ADJUST_STATUS, REMARK, BATCH_NUM, AGENT_ID, C_TIME,
-    U_TIME, C_USER, U_USER, STATUS, VERSION, PLATFORM_TYPE
+    U_TIME, C_USER, U_USER, STATUS, VERSION, PLATFORM_TYPE, BUS_ID
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -101,7 +102,8 @@
     ADJUST_STATUS, REMARK, BATCH_NUM,
     AGENT_ID, C_TIME, U_TIME,
     C_USER, U_USER, STATUS,
-    VERSION, PLATFORM_TYPE)
+    VERSION, PLATFORM_TYPE, BUS_ID
+    )
     values (#{id,jdbcType=VARCHAR}, #{terminalTransferId,jdbcType=VARCHAR}, #{snBeginNum,jdbcType=VARCHAR},
     #{snEndNum,jdbcType=VARCHAR}, #{proCom,jdbcType=VARCHAR}, #{proModel,jdbcType=VARCHAR},
     #{originalOrgId,jdbcType=VARCHAR}, #{originalOrgName,jdbcType=VARCHAR}, #{originalBusId,jdbcType=VARCHAR},
@@ -110,7 +112,8 @@
     #{adjustStatus,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, #{batchNum,jdbcType=VARCHAR},
     #{agentId,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP},
     #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
-    #{version,jdbcType=DECIMAL}, #{platformType,jdbcType=DECIMAL})
+    #{version,jdbcType=DECIMAL}, #{platformType,jdbcType=DECIMAL}, #{busId,jdbcType=VARCHAR}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetail">
     insert into O_TERMINAL_TRANSFER_DETAIL
@@ -193,6 +196,9 @@
       <if test="platformType != null">
         PLATFORM_TYPE,
       </if>
+      <if test="busId != null">
+        BUS_ID,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -272,6 +278,9 @@
       </if>
       <if test="platformType != null">
         #{platformType,jdbcType=DECIMAL},
+      </if>
+      <if test="busId != null">
+        #{busId,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -359,6 +368,9 @@
       <if test="platformType != null">
         PLATFORM_TYPE = #{platformType,jdbcType=DECIMAL},
       </if>
+      <if test="busId != null">
+        BUS_ID = #{busId,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -388,7 +400,8 @@
     U_USER = #{uUser,jdbcType=VARCHAR},
     STATUS = #{status,jdbcType=DECIMAL},
     VERSION = #{version,jdbcType=DECIMAL},
-    PLATFORM_TYPE = #{platformType,jdbcType=DECIMAL}
+    PLATFORM_TYPE = #{platformType,jdbcType=DECIMAL},
+    BUS_ID = #{busId,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

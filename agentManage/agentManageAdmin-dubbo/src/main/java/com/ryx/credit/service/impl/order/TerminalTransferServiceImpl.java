@@ -256,6 +256,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 terminalTransferDetail.setAdjustStatus(AdjustStatus.WTZ.getValue());
                 terminalTransferDetail.setGoalBusId(resultMap.get("goalBusId"));
                 terminalTransferDetail.setOriginalBusId(resultMap.get("originalBusId"));
+                terminalTransferDetail.setBusId(terminalTransfer.getPlatformType());
 //                terminalTransferDetail.setProCom(resultMap.get("proCom"));
 //                terminalTransferDetail.setProModel(resultMap.get("proModel"));
                 terminalTransferDetailMapper.insert(terminalTransferDetail);
@@ -807,6 +808,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             terminalTransferDetail.setAdjustStatus(AdjustStatus.WTZ.getValue());
             terminalTransferDetail.setGoalBusId(resultMap.get("goalBusId"));
             terminalTransferDetail.setOriginalBusId(resultMap.get("originalBusId"));
+            terminalTransferDetail.setBusId(terminalTransfer.getPlatformType());
 //                terminalTransferDetail.setProCom(resultMap.get("proCom"));
 //                terminalTransferDetail.setProModel(resultMap.get("proModel"));
             terminalTransferDetailMapper.insert(terminalTransferDetail);
