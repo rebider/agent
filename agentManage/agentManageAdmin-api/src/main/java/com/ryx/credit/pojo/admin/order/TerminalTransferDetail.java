@@ -59,6 +59,16 @@ public class TerminalTransferDetail implements Serializable{
 
     private String adjustMsg;
 
+    private String busId;
+
+    public String getBusId() {
+        return busId;
+    }
+
+    public void setBusId(String busId) {
+        this.busId = busId;
+    }
+
     public String getId() {
         return id;
     }
