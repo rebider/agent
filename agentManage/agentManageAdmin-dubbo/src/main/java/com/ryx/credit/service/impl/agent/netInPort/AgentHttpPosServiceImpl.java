@@ -135,18 +135,28 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
         if(null!=agentParent){
             resultMap.put("supDorgId",agentParent.getBusNum());
         }
-        //新增传递参数
+        //收款账户新
         AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
+        //机构信息
         Organization organization = organizationMapper.selectByPrimaryKey(agentBusInfo.getOrganNum());
+        //组装参数
+        resultMap.put("brandName",platForm.getPlatformName());//平台名称
         resultMap.put("alwaysProfit","00");//该机构是否参与实时分润
         resultMap.put("agentId",organization.getOrgId());//机构ID
+        resultMap.put("finaceRemitOrgan",agentBusInfo.getFinaceRemitOrgan());//财务出款机构
         resultMap.put("agentName",organization.getOrgName());//机构编号
         resultMap.put("credName",agent.getAgLegal());//法人姓名
-        resultMap.put("credNo",agent.getAgLegalCernum());
+        resultMap.put("credNo",agent.getAgLegalCernum());//法人身份证
+        resultMap.put("credPhone",agent.getAgLegalMobile());//法人手机号
+
         resultMap.put("bankCardName",agentColinfo.getCloRealname());//结算户名
+        resultMap.put("bankCardCredNo",agentColinfo.getAgLegalCernum());//结算卡户主身份证
         resultMap.put("bankCard",agentColinfo.getCloBankAccount());//结算卡号
-        resultMap.put("openBank",agentColinfo.getCloBank());//收款开户总行
-        resultMap.put("openBankChild",agentColinfo.getCloBankBranch());//收款开户支行
+        resultMap.put("openBank",agentColinfo.getCloBankCode());//收款开户总行 银行代码
+        resultMap.put("openBankChild",agentColinfo.getBranchLineNum());//收款开户支行 联号
+        resultMap.put("openBankName",agentColinfo.getCloBank());//收款开户总行
+        resultMap.put("openBankChildName",agentColinfo.getCloBankBranch());//收款开户支行
+
         resultMap.put("isBill",agentColinfo.getCloInvoice());//是否开具分润发票
         resultMap.put("taxPoint",agentColinfo.getCloTaxPoint());//税点
         resultMap.put("agCode",agentBusInfo.getAgentId());//AG码
@@ -197,15 +207,23 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
                 data.put("supDorgId",paramMap.get("supDorgId"));
 
             //组装参数
-            data.put("alwaysProfit","01");//该机构是否参与实时分润
+            data.put("brandName",paramMap.get("brandName"));//平台名称
+            data.put("alwaysProfit",paramMap.get("alwaysProfit"));//该机构是否参与实时分润
+            data.put("finaceRemitOrgan",paramMap.get("finaceRemitOrgan"));//财务出款机构
             data.put("agentId",paramMap.get("agentId"));//机构ID
             data.put("agentName",paramMap.get("agentName"));//机构编号
             data.put("credName",paramMap.get("credName"));//法人姓名
-            data.put("credNo",paramMap.get("credNo"));
+            data.put("credNo",paramMap.get("credNo"));//法人身份证
+            data.put("credPhone",paramMap.get("credPhone"));//法人手机号
+
             data.put("bankCardName",paramMap.get("bankCardName"));//结算户名
+            data.put("bankCardCredNo",paramMap.get("bankCardCredNo"));//收款开户支行 户主姓名
             data.put("bankCard",paramMap.get("bankCard"));//结算卡号
-            data.put("openBank",paramMap.get("openBank"));//收款开户总行
-            data.put("openBankChild",paramMap.get("openBankChild"));//收款开户支行
+            data.put("openBank",paramMap.get("openBank"));//收款开户总行 行号
+            data.put("openBankChild",paramMap.get("openBankChild"));//收款开户支行 联号
+            data.put("openBankName",paramMap.get("openBankName"));//收款开户总行 名称
+            data.put("openBankChildName",paramMap.get("openBankChildName"));//收款开户支行 名称
+
             data.put("isBill",paramMap.get("isBill"));//是否开具分润发票
             data.put("taxPoint",paramMap.get("taxPoint"));//税点
             data.put("agCode",paramMap.get("agCode"));//AG码
