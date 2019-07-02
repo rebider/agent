@@ -260,6 +260,64 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         return result;
     }
 
+    /**
+     * 活动复制
+     * @param activityId
+     * @return
+     */
+    @Override
+    public AgentResult activityCopy(String activityId) {
+        AgentResult result = new AgentResult(500, "参数错误", "");
+        if (StringUtils.isBlank(activityId)) {
+            return result;
+        }
+        //活动复制 id生成 内容一致
+        OActivity oActivity = activityMapper.selectByPrimaryKey(activityId);
+        OActivity oActivityCopy = new OActivity();
+        oActivityCopy.setId(idService.genId(TabId.o_activity));
+        oActivityCopy.setcTime(new Date());
+        oActivityCopy.setuTime(new Date());
+        oActivityCopy.setStatus(Status.STATUS_1.status);
+        oActivityCopy.setVersion(Status.STATUS_1.status);
+        oActivityCopy.setProductId(oActivity.getProductId());
+        oActivityCopy.setRuleId(oActivity.getRuleId());
+        oActivityCopy.setActivityName(oActivity.getActivityName());
+        oActivityCopy.setProType(oActivity.getProType());
+        oActivityCopy.setActivityWay(oActivity.getActivityWay());
+        oActivityCopy.setActivityRule(oActivity.getActivityRule());
+        oActivityCopy.setPlatform(oActivity.getPlatform());
+        oActivityCopy.setPrice(oActivity.getPrice());
+        oActivityCopy.setBeginTime(oActivity.getBeginTime());
+        oActivityCopy.setEndTime(oActivity.getEndTime());
+        oActivityCopy.setVender(oActivity.getVender());
+        oActivityCopy.setProModel(oActivity.getProModel());
+        oActivityCopy.setcUser(oActivity.getcUser());
+        oActivityCopy.setuUser(oActivity.getuUser());
+        oActivityCopy.setgTime(oActivity.getgTime());
+        oActivityCopy.setActivityCondition(oActivity.getActivityCondition());
+        oActivityCopy.setBusProCode(oActivity.getBusProCode());
+        oActivityCopy.setBusProName(oActivity.getBusProName());
+        oActivityCopy.setTermBatchcode(oActivity.getTermBatchcode());
+        oActivityCopy.setTermBatchname(oActivity.getTermBatchname());
+        oActivityCopy.setTermtype(oActivity.getTermtype());
+        oActivityCopy.setTermtypename(oActivity.getTermtypename());
+        oActivityCopy.setActCode(oActivity.getActCode());
+        oActivityCopy.setOriginalPrice(oActivity.getOriginalPrice());
+        oActivityCopy.setProTypeName(oActivity.getProTypeName());
+        oActivityCopy.setPosSpePrice(oActivity.getPosSpePrice());
+        oActivityCopy.setPosType(oActivity.getPosType());
+        oActivityCopy.setStandTime(oActivity.getStandTime());
+        oActivityCopy.setVenderName(oActivity.getVenderName());
+        oActivityCopy.setStandAmt(oActivity.getStandAmt());
+        oActivityCopy.setBackType(oActivity.getBackType());
+        oActivityCopy.setVisible(oActivity.getVisible());
+        int add_copy = activityMapper.insertSelective(oActivityCopy);
+        if (add_copy == 1) {
+            return AgentResult.ok();
+        }
+        return result;
+    }
+
     @Override
     public List<OActivity> allActivity() {
         OActivityExample example = new OActivityExample();

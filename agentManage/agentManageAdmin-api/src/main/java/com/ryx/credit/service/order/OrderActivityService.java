@@ -26,6 +26,13 @@ public interface OrderActivityService {
 
     AgentResult deleteById(String id);
 
+    /**
+     * 活动复制
+     * @param activityId
+     * @return
+     */
+    AgentResult activityCopy(String activityId);
+
     List<OActivity> allActivity();
 
     List<OActivity> productActivity(String product,String angetId,String orderAgentBusifo,String oldActivityId);
