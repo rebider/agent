@@ -7,10 +7,12 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.data.AttachmentService;
 import com.ryx.credit.service.dict.DictOptionsService;
@@ -73,7 +75,8 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     private OInternetRenewService internetRenewService;
     @Autowired
     private BusActRelService busActRelService;
-
+    @Autowired
+    private IUserService iUserService;
 
     @Override
     public PageInfo internetRenewList(OInternetRenew internetRenew, Page page){
@@ -81,6 +84,12 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         OInternetRenewExample internetRenewExample = new OInternetRenewExample();
         internetRenewExample.setPage(page);
         List<OInternetRenew> internetRenews = internetRenewMapper.selectByExample(internetRenewExample);
+        for (OInternetRenew renew : internetRenews) {
+            renew.setRenewWay(InternetRenewWay.getContentByValue(renew.getRenewWay()));
+            CUser cUser = iUserService.selectById(renew.getcUser());
+            if(null!=cUser)
+            renew.setcUser(cUser.getName());
+        }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(internetRenews);
         pageInfo.setTotal((int)internetRenewMapper.countByExample(internetRenewExample));
