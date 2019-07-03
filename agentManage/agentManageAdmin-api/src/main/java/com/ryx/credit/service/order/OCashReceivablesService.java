@@ -104,4 +104,7 @@ public interface OCashReceivablesService {
      */
     public List<OCashReceivables> query(String id,String agentId, CashPayType cpt, String srcId, List<BigDecimal> reviewStatus);
 
+
+    public AgentResult addOCashReceivablesAndStartProcing(List<OCashReceivablesVo> oCashReceivablesList, String user, String agentId, CashPayType cpt, String srcId)throws Exception;
+
 }

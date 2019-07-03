@@ -231,7 +231,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             throw new MessageException("物联网卡续费审批流启动失败!:{}",e.getMessage());
         }
         try {
-            AgentResult agentResult = cashReceivablesService.addOCashReceivables(oCashReceivablesVoList,cUser,agentId, CashPayType.INTERNETRENEW,internetRenewId);
+            AgentResult agentResult = cashReceivablesService.addOCashReceivablesAndStartProcing(oCashReceivablesVoList,cUser,agentId, CashPayType.INTERNETRENEW,internetRenewId);
             if(!agentResult.isOK()){
                 throw new ProcessException("保存打款记录失败");
             }
