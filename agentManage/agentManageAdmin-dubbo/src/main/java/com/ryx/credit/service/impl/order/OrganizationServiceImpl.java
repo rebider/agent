@@ -135,10 +135,10 @@ public class OrganizationServiceImpl implements OrganizationService {
                         for (OrgPlatform platform : orgPlatform) {
                             String[] platCode = platform.getPlatCode().split(",");
                             String[] platNum = platform.getPlatNum().split(",");
-                            if (platCode.length != platNum.length) {
+                            /*if (platCode.length != platNum.length) {
                                 logger.info("请检查业务平台和业务编码填写有误！");
                                 throw new MessageException("请检查业务平台和业务编码填写有误！");
-                            }
+                            }*/
                             for (int i = 0; i < platCode.length; i++) {
                                 OrgPlatform orgPlat = new OrgPlatform();
                                 orgPlat.setPlatCode(platCode[i]);
@@ -280,10 +280,10 @@ public class OrganizationServiceImpl implements OrganizationService {
                     for (OrgPlatform platform : orgPlatform) {
                         String[] platCode = platform.getPlatCode().split(",");
                         String[] platNum = platform.getPlatNum().split(",");
-                        if (platCode.length != platNum.length) {
+                       /* if (platCode.length != platNum.length) {
                             logger.info("请检查业务平台和业务编码填写有误！");
                             throw new MessageException("请检查业务平台和业务编码填写有误！");
-                        }
+                        }*/
                         Date d = Calendar.getInstance().getTime();
                         for (int i = 0; i < platCode.length; i++) {
                             OrgPlatform orgPlat = new OrgPlatform();

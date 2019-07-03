@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class AgentContract implements Serializable {
     private String id;
@@ -50,6 +51,16 @@ public class AgentContract implements Serializable {
     private BigDecimal appendAgree;
 
     private List<Attachment> attachmentList;
+
+    private Map<String, Object> assProtocolMap;
+
+    public Map<String, Object> getAssProtocolMap() {
+        return assProtocolMap;
+    }
+
+    public void setAssProtocolMap(Map<String, Object> assProtocolMap) {
+        this.assProtocolMap = assProtocolMap;
+    }
 
     public List<Attachment> getAttachmentList() {
         return attachmentList;

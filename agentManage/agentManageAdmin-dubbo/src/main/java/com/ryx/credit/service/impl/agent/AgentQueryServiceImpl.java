@@ -152,6 +152,14 @@ public class AgentQueryServiceImpl implements AgentQueryService {
         if (null != agentContracts && agentContracts.size() > 0) {
             for (AgentContract agentContract : agentContracts) {
                 agentContract.setAttachmentList(accessoryQuery(agentContract.getId(), AttachmentRelType.Contract.name()));
+                List<Map<String, Object>> maps = assProtoColMapper.selectByBusInfoId(agentContract.getId());
+                if(null==maps){
+                    continue;
+                }else if(maps.size()==0){
+                    continue;
+                }else{
+                    agentContract.setAssProtocolMap(maps.get(0));
+                }
             }
         }
         return agentContracts;

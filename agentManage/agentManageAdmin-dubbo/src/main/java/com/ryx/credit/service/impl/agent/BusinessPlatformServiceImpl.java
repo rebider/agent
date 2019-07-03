@@ -10,10 +10,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.RegexUtil;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.COrganizationMapper;
-import com.ryx.credit.dao.agent.AgentBusInfoMapper;
-import com.ryx.credit.dao.agent.AgentMapper;
-import com.ryx.credit.dao.agent.PayCompMapper;
-import com.ryx.credit.dao.agent.PlatFormMapper;
+import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.bank.DPosRegion;
@@ -86,6 +83,10 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     private IResourceService iResourceService;
     @Autowired
     private PlatFormService platFormService;
+    @Autowired
+    private AssProtoColMapper assProtoColMapper;
+    @Autowired
+    private AgentAssProtocolService agentAssProtocolService;
 
 
 
@@ -292,6 +293,10 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busInfoVoList.get(0).getId());
             List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByAgenId(agentBusInfo.getAgentId());
             for (AgentBusInfoVo item : busInfoVoList) {
+                if (StringUtils.isBlank(item.getBusPlatform())){
+                    logger.info("请选择业务平台");
+                    throw new ProcessException("请选择业务平台");
+                }
                 if(item.getBusType().equals(BusType.ZQZF.key) || item.getBusType().equals(BusType.ZQBZF.key) || item.getBusType().equals(BusType.ZQ.key) ){
                     if(StringUtils.isBlank(item.getBusParent()))
                         throw new ProcessException("直签上级不能为空");
@@ -441,7 +446,24 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 if (StringUtils.isNotBlank(agent.getcUser()) && StringUtils.isNotBlank(agent.getId())) {
                     item.setcUser(agent.getcUser());
                     item.setAgentId(agent.getId());
-                    agentContractService.insertAgentContract(item, item.getContractTableFile(),agent.getcUser());
+                    AgentContract agentContract = agentContractService.insertAgentContract(item, item.getContractTableFile(), agent.getcUser());
+                    //添加分管协议
+                    if (StringUtils.isNotBlank(item.getAgentAssProtocol())) {
+                        AssProtoColRel rel = new AssProtoColRel();
+                        rel.setAgentBusinfoId(agentContract.getId());
+                        rel.setAssProtocolId(item.getAgentAssProtocol());
+                        AssProtoCol assProtoCol = assProtoColMapper.selectByPrimaryKey(item.getAgentAssProtocol());
+                        if(org.apache.commons.lang.StringUtils.isNotBlank(item.getProtocolRuleValue())){
+                            String ruleReplace = assProtoCol.getProtocolRule().replace("{}", item.getProtocolRuleValue());
+                            rel.setProtocolRule(ruleReplace);
+                        }else{
+                            rel.setProtocolRule(assProtoCol.getProtocolRule());
+                        }
+                        rel.setProtocolRuleValue(item.getProtocolRuleValue());
+                        if (1 != agentAssProtocolService.addProtocolRel(rel, agent.getcUser())) {
+                            throw new ProcessException("业务分管协议添加失败");
+                        }
+                    }
                 }
             }
             for (CapitalVo item : agentVo.getCapitalVoList()) {
