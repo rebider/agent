@@ -5,10 +5,12 @@ import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.agent.AttachmentRel;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.agent.AttachmentRelService;
 import com.ryx.credit.service.agent.TaskApprovalService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
@@ -24,6 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
@@ -59,8 +64,11 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     private ActivityService activityService;
     @Autowired
     private TaskApprovalService taskApprovalService;
+    @Autowired
+    private AttachmentRelService attachmentRelService;
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     public AgentResult saveAndApprove(OInternetRenew internetRenew,List<String> iccids, String cUser,
                                       List<OCashReceivablesVo> oCashReceivablesVoList)throws MessageException{
 
@@ -96,6 +104,25 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             internetRenew.setSumOffsetAmt(internetRenew.getRenewCardCount().multiply(new BigDecimal(offsetAmt.getdItemvalue())));
         }
         internetRenewMapper.insert(internetRenew);
+
+        //添加新的附件
+        if (StringUtils.isNotBlank(internetRenew.getFiles())) {
+            String[] files = internetRenew.getFiles().split(",");
+            for (int i=0;i<files.length;i++){
+                AttachmentRel record = new AttachmentRel();
+                record.setAttId(files[i]);
+                record.setSrcId(internetRenewId);
+                record.setcUser(cUser);
+                record.setcTime(Calendar.getInstance().getTime());
+                record.setStatus(Status.STATUS_1.status);
+                record.setBusType(AttachmentRelType.internetRenew.name());
+                record.setId(idService.genId(TabId.a_attachment_rel));
+                int j = attachmentRelService.insertSelective(record);
+                if (1 != j) {
+                    throw new ProcessException("保存附件失败");
+                }
+            }
+        }
 
         int i = 1;
         for (String iccid : iccids) {

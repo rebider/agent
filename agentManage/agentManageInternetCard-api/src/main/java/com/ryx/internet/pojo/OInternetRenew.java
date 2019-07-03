@@ -3,6 +3,7 @@ package com.ryx.internet.pojo;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class OInternetRenew implements Serializable{
     private String id;
@@ -32,6 +33,26 @@ public class OInternetRenew implements Serializable{
     private BigDecimal status;
 
     private BigDecimal version;
+
+    private String files;
+
+    private String iccidNumIds;
+
+    public String getIccidNumIds() {
+        return iccidNumIds;
+    }
+
+    public void setIccidNumIds(String iccidNumIds) {
+        this.iccidNumIds = iccidNumIds;
+    }
+
+    public String getFiles() {
+        return files;
+    }
+
+    public void setFiles(String files) {
+        this.files = files;
+    }
 
     public String getId() {
         return id;
