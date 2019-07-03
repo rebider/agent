@@ -7,15 +7,13 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.pojo.admin.agent.Agent;
-import com.ryx.credit.pojo.admin.agent.AttachmentRel;
-import com.ryx.credit.pojo.admin.agent.BusActRel;
-import com.ryx.credit.pojo.admin.agent.Dict;
+import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.agent.AttachmentRelService;
 import com.ryx.credit.service.agent.TaskApprovalService;
+import com.ryx.credit.service.data.AttachmentService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OCashReceivablesService;
@@ -68,6 +66,10 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     private AttachmentRelService attachmentRelService;
     @Autowired
     private AgentService agentService;
+    @Autowired
+    private AttachmentService attachmentService;
+
+
 
     @Override
     public PageInfo internetRenewList(OInternetRenew internetRenew, Page page){
@@ -237,5 +239,14 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             throw new MessageException(e.getMessage());
         }
         return AgentResult.ok();
+    }
+
+    @Override
+    public OInternetRenew selectByPrimaryKey(String id){
+        OInternetRenew oInternetRenew = internetRenewMapper.selectByPrimaryKey(id);
+        //查询关联附件
+        List<Attachment> attachments = attachmentService.accessoryQuery(id, AttachmentRelType.internetRenew.name());
+        oInternetRenew.setAttachmentList(attachments);
+        return oInternetRenew;
     }
 }

@@ -24,6 +24,7 @@
     <dubbo:reference interface="com.ryx.credit.service.ActivityService" id="activityService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.agent.TaskApprovalService" id="taskApprovalService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.agent.AttachmentRelService" id="attachmentRelService"  timeout="1200000" registry="${zk.group}" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.data.AttachmentService" id="attachmentService"  timeout="1200000" registry="${zk.group}" check="false"/>
 
     <dubbo:service interface="com.ryx.internet.service.InternetCardService" ref="internetCardService" timeout="1200000" registry="${zk.group}" />
     <dubbo:service interface="com.ryx.internet.service.OInternetRenewService" ref="internetRenewService" timeout="1200000" registry="${zk.group}" />

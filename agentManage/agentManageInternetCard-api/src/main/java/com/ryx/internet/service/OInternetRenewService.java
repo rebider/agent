@@ -25,4 +25,6 @@ public interface OInternetRenewService {
 
     AgentResult saveAndApprove(OInternetRenew internetRenew, List<String> iccids, String cUser,
                                List<OCashReceivablesVo> oCashReceivablesVoList)throws MessageException;
+
+    OInternetRenew selectByPrimaryKey(String id);
 }
