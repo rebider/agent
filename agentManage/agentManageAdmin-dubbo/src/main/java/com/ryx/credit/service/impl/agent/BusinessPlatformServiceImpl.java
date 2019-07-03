@@ -293,6 +293,10 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busInfoVoList.get(0).getId());
             List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByAgenId(agentBusInfo.getAgentId());
             for (AgentBusInfoVo item : busInfoVoList) {
+                if (StringUtils.isBlank(item.getBusPlatform())){
+                    logger.info("请选择业务平台");
+                    throw new ProcessException("请选择业务平台");
+                }
                 if(item.getBusType().equals(BusType.ZQZF.key) || item.getBusType().equals(BusType.ZQBZF.key) || item.getBusType().equals(BusType.ZQ.key) ){
                     if(StringUtils.isBlank(item.getBusParent()))
                         throw new ProcessException("直签上级不能为空");
