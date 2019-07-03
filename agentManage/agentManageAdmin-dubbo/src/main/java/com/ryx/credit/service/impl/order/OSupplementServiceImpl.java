@@ -209,6 +209,19 @@ public class OSupplementServiceImpl implements OSupplementService {
         }
 
 
+        //再查询是否是最后一期的补款 不可多补或者少补
+        List<OPaymentDetail> notCountMap = oPaymentDetailMapper.selectCount(oPaymentDetail.getOrderId(), PamentIdType.ORDER_FKD.code, PaymentStatus.DF.code);
+        //去查询还剩几期待付款
+        BigDecimal count = new BigDecimal(notCountMap.size());
+        if (count.compareTo(new BigDecimal(1)) == 0) {
+            //如果就剩本条待付款  则需全部结清
+            BigDecimal amount = oPaymentDetail.getPayAmount();//这个是订单需补款金额
+            if (oSupplement.getPayAmount().compareTo(amount) == -1 || oSupplement.getPayAmount().compareTo(amount) == 1) {
+                logger.info("应补款金额为{}，请重新补款", amount);
+                throw new MessageException("应补款金额为" + amount + "，请重新补款");
+            }
+        }
+
         Date date = Calendar.getInstance().getTime();
         oSupplement.setId(idService.genId(TabId.o_Supplement));
         oSupplement.setcTime(date);

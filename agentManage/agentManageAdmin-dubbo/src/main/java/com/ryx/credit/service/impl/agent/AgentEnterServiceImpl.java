@@ -112,7 +112,24 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 item.setcUser(agent.getcUser());
                 item.setAgentId(agent.getId());
                 item.setCloReviewStatus(AgStatus.Create.status);
-                agentContractService.insertAgentContract(item, item.getContractTableFile(),agent.getcUser());
+                AgentContract agentContract = agentContractService.insertAgentContract(item, item.getContractTableFile(), agent.getcUser());
+                //添加分管协议
+                if (StringUtils.isNotBlank(item.getAgentAssProtocol())) {
+                    AssProtoColRel rel = new AssProtoColRel();
+                    rel.setAgentBusinfoId(agentContract.getId());
+                    rel.setAssProtocolId(item.getAgentAssProtocol());
+                    AssProtoCol assProtoCol = assProtoColMapper.selectByPrimaryKey(item.getAgentAssProtocol());
+                    if(org.apache.commons.lang.StringUtils.isNotBlank(item.getProtocolRuleValue())){
+                        String ruleReplace = assProtoCol.getProtocolRule().replace("{}", item.getProtocolRuleValue());
+                        rel.setProtocolRule(ruleReplace);
+                    }else{
+                        rel.setProtocolRule(assProtoCol.getProtocolRule());
+                    }
+                    rel.setProtocolRuleValue(item.getProtocolRuleValue());
+                    if (1 != agentAssProtocolService.addProtocolRel(rel, agent.getcUser())) {
+                        throw new ProcessException("业务分管协议添加失败");
+                    }
+                }
 
             }
             for (CapitalVo item : agentVo.getCapitalVoList()) {
