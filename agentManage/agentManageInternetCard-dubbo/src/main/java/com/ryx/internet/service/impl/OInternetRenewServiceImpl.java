@@ -4,12 +4,16 @@ import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AttachmentRel;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.agent.AttachmentRelService;
 import com.ryx.credit.service.agent.TaskApprovalService;
 import com.ryx.credit.service.dict.DictOptionsService;
@@ -18,9 +22,7 @@ import com.ryx.credit.service.order.OCashReceivablesService;
 import com.ryx.internet.dao.OInternetCardMapper;
 import com.ryx.internet.dao.OInternetRenewDetailMapper;
 import com.ryx.internet.dao.OInternetRenewMapper;
-import com.ryx.internet.pojo.OInternetCard;
-import com.ryx.internet.pojo.OInternetRenew;
-import com.ryx.internet.pojo.OInternetRenewDetail;
+import com.ryx.internet.pojo.*;
 import com.ryx.internet.service.OInternetRenewService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,9 +33,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /***
  * 物联网卡续费
@@ -66,6 +66,33 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     private TaskApprovalService taskApprovalService;
     @Autowired
     private AttachmentRelService attachmentRelService;
+    @Autowired
+    private AgentService agentService;
+
+    @Override
+    public PageInfo internetRenewList(OInternetRenew internetRenew, Page page){
+
+        OInternetRenewExample internetRenewExample = new OInternetRenewExample();
+        internetRenewExample.setPage(page);
+        List<OInternetRenew> internetRenews = internetRenewMapper.selectByExample(internetRenewExample);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(internetRenews);
+        pageInfo.setTotal((int)internetRenewMapper.countByExample(internetRenewExample));
+        return pageInfo;
+    }
+
+    @Override
+    public PageInfo internetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page){
+
+        OInternetRenewDetailExample internetRenewDetailExample = new OInternetRenewDetailExample();
+        internetRenewDetailExample.setPage(page);
+        List<OInternetRenewDetail> internetRenewDetails = internetRenewDetailMapper.selectByExample(internetRenewDetailExample);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(internetRenewDetails);
+        pageInfo.setTotal((int)internetRenewDetailMapper.countByExample(internetRenewDetailExample));
+        return pageInfo;
+    }
+
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
@@ -125,6 +152,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }
 
         int i = 1;
+        Set<String> agentIdSet = new HashSet<>();
         for (String iccid : iccids) {
             OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(iccid);
             if(oInternetCard==null){
@@ -141,7 +169,13 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             oInternetRenewDetail.setExpireTime(oInternetCard.getExpireTime());
             oInternetRenewDetail.setMerId(oInternetCard.getMerId());
             oInternetRenewDetail.setMerName(oInternetCard.getMerName());
+            if(StringUtils.isBlank(oInternetCard.getAgentId())){
+                throw new MessageException("第"+i+"个代理商编号为空");
+            }
             oInternetRenewDetail.setAgentId(oInternetCard.getAgentId());
+            if(StringUtils.isBlank(oInternetCard.getAgentName())){
+                throw new MessageException("第"+i+"个代理商名称为空");
+            }
             oInternetRenewDetail.setAgentName(oInternetCard.getAgentName());
             oInternetRenewDetail.setRenewWay(internetRenew.getRenewWay());
             oInternetRenewDetail.setOffsetAmt(new BigDecimal(offsetAmt.getdItemvalue()));
@@ -161,8 +195,12 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             oInternetRenewDetail.setuTime(new Date());
             oInternetRenewDetail.setVersion(BigDecimal.ONE);
             internetRenewDetailMapper.insert(oInternetRenewDetail);
+            agentIdSet.add(oInternetCard.getAgentId());
         }
-
+        if(agentIdSet.size()!=1){
+            throw new MessageException("不同代理商请分开申请");
+        }
+        String agentId = agentIdSet.iterator().next();
         String workId = dictOptionsService.getApproveVersion("cardRenew");
         //启动审批
         String proce = activityService.createDeloyFlow(null, workId, null, null,null);
@@ -176,9 +214,12 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         record.setcTime(Calendar.getInstance().getTime());
         record.setcUser(cUser);
         record.setStatus(Status.STATUS_1.status);
-        record.setBusType(BusActRelBusType.COMPENSATE.name());
+        record.setBusType(BusActRelBusType.cardRenew.name());
         record.setActivStatus(AgStatus.Approving.name());
         record.setDataShiro(BusActRelBusType.cardRenew.key);
+        record.setAgentId(agentId);
+        Agent agent = agentService.getAgentById(agentId);
+        if(null!=agent)record.setAgentName(agent.getAgName());
         try {
             taskApprovalService.addABusActRel(record);
             log.info("物联网卡续费审批流启动成功");
@@ -188,9 +229,8 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             throw new MessageException("物联网卡续费审批流启动失败!:{}",e.getMessage());
         }
         try {
-            AgentResult agentResult = cashReceivablesService.addOCashReceivables(oCashReceivablesVoList,cUser,null, CashPayType.INTERNETRENEW,internetRenewId);
+            AgentResult agentResult = cashReceivablesService.addOCashReceivables(oCashReceivablesVoList,cUser,agentId, CashPayType.INTERNETRENEW,internetRenewId);
             if(!agentResult.isOK()){
-                log.info("退补差价保存打款记录失败1");
                 throw new ProcessException("保存打款记录失败");
             }
         } catch (Exception e) {
