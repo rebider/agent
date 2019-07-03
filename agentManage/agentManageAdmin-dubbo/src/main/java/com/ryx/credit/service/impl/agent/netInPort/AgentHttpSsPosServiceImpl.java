@@ -137,8 +137,14 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
         }
         //收款账户新
         AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
+        if(agentColinfo==null){
+            log.info("收款账户为空:{},{}",agent.getId(), agentBusInfo.getId());
+        }
         //机构信息
         Organization organization = organizationMapper.selectByPrimaryKey(agentBusInfo.getOrganNum());
+        if(organization==null){
+            log.info("机构信息为空:{},{}",agent.getId(), agentBusInfo.getId());
+        }
         //组装参数
         resultMap.put("brandName",platForm.getPlatformName());//平台名称
         resultMap.put("alwaysProfit","01");//该机构是否参与实时分润
