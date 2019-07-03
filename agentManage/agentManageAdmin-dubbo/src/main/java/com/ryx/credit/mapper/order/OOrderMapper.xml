@@ -977,13 +977,7 @@
     oso.activity_name,
 
     nvl(d.pay_amount,0) as dd_amt,
-    nvl((
-      case d.pay_method
-        when 'SF1' then d.pay_amount-d.down_payment
-        when 'FRFQ' then d.pay_amount
-        else 0
-      end
-    ),0) as ykfr_amt,
+    nvl((d.outstanding_amount),0) as ykfr_amt,
     to_char(d.down_payment_date,'YYYY-MM') as down_payment_date,
     d.down_payment_count,
     d.down_payment,
@@ -1003,8 +997,8 @@
     d.down_payment_count as frdk_count,
     nvl((select sum(o_payment_detail.real_pay_amount)
     from o_payment_detail
-    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id
-    and o_payment_detail.status = 1 and o_payment_detail.payment_status = 4
+    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.status = 1
+    and (o_payment_detail.payment_status = 4 or o_payment_detail.payment_status = 6)
     and (o_payment_detail.pay_type='DKFQ' or o_payment_detail.pay_type='FRFQ')
     ),0) as sjdk_amt,
     nvl(d.outstanding_amount,0) as syqk_amt,
@@ -1014,7 +1008,8 @@
     to_char(cr.real_rec_time,'YYYY-MM-DD') as realRecTime,
     to_char(cr.check_date,'YYYY-MM-DD') as checkDate,
     nvl((select max(o_payment_detail.pay_amount) from o_payment_detail
-    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.status = 1
+    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id
+    and o_payment_detail.status = 1 and o_payment_detail.payment_status = 4
     and (o_payment_detail.pay_type='FRFQ' or o_payment_detail.pay_type='DKFQ')
     ),0) as mqyk_amt
 
@@ -1029,7 +1024,7 @@
     left join o_sub_order os on os.order_id = o.id and os.status=1
     left join o_sub_order_activity oso on oso.sub_order_id = os.id and oso.status=1
     left join d_dict dict on dict.d_group='ORDER' and dict.d_artifact='MODEL_TYPE' and dict.d_status=1 and dict.d_itemname = os.pro_type
-    left join a_agent_businfo aab on aab.agent_id = o.agent_id and aab.status=1
+    left join a_agent_businfo aab on aab.agent_id = o.agent_id and aab.id = o.bus_idand aab.status=1
     left join o_organization oan on oan.org_id = aab.organ_num and oan.status=1
     <where>
       <if test="1==1"> and o.status = 1 </if>
