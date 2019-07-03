@@ -8,11 +8,10 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 import com.ryx.credit.service.ActivityService;
-import com.ryx.credit.service.agent.AgentService;
-import com.ryx.credit.service.agent.AttachmentRelService;
-import com.ryx.credit.service.agent.TaskApprovalService;
+import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.data.AttachmentService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
@@ -68,7 +67,12 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     private AgentService agentService;
     @Autowired
     private AttachmentService attachmentService;
-
+    @Autowired
+    private AgentEnterService agentEnterService;
+    @Autowired
+    private OInternetRenewService internetRenewService;
+    @Autowired
+    private BusActRelService busActRelService;
 
 
     @Override
@@ -249,4 +253,90 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         oInternetRenew.setAttachmentList(attachments);
         return oInternetRenew;
     }
+
+    /**
+     * 处理任务
+     * @return
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception {
+        try {
+            if (agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())) {
+                //开启独立事务，审批通过需处理
+                internetRenewService.approveTashBusiness(agentVo,userId);
+            }
+            AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
+            if(!result.isOK()){
+                log.error(result.getMsg());
+                throw new MessageException("工作流处理任务异常");
+            }
+        } catch (MessageException e) {
+            e.printStackTrace();
+            throw new MessageException(e.getMsg());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new MessageException(e.getLocalizedMessage());
+        }
+        return AgentResult.ok();
+    }
+
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public void approveTashBusiness(AgentVo agentVo, String userId) throws Exception {
+        //目前只有财务节点直接处理，后续加判断
+        AgentResult cashAgentResult = cashReceivablesService.approveTashBusiness(CashPayType.INTERNETRENEW,agentVo.getAgentBusId(),userId,new Date(),agentVo.getoCashReceivablesVoList());
+        if(!cashAgentResult.isOK()){
+            throw new MessageException("更新收款信息失败");
+        }
+    }
+
+
+    /**
+     * 完成处理
+     * @param proIns
+     * @param agStatus
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult compressCompensateActivity(String proIns, BigDecimal agStatus)throws Exception{
+
+        BusActRel busActRel = busActRelService.findByProIns(proIns);
+        if (busActRel==null) {
+            log.info("审批任务结束{}{}，未找到审批中的审批和数据关系", proIns, agStatus);
+            throw new MessageException("查询关系表失败");
+        }
+        busActRel.setActivStatus(AgStatus.getAgStatusString(agStatus));
+        int z = busActRelService.updateByPrimaryKey(busActRel);
+        if(z!=1) {
+            throw new MessageException("物联网卡更新关系表失败");
+        }
+        OInternetRenew oInternetRenew = internetRenewMapper.selectByPrimaryKey(busActRel.getBusId());
+        if(oInternetRenew==null){
+            throw new MessageException("查询续费记录失败");
+        }
+        oInternetRenew.setReviewStatus(agStatus);
+        int i = internetRenewMapper.updateByPrimaryKeySelective(oInternetRenew);
+        if(i!=1){
+            throw new MessageException("更新续费记录失败");
+        }
+
+
+        AgentResult agentResult = AgentResult.fail();
+        if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
+            agentResult = cashReceivablesService.refuseProcing(CashPayType.INTERNETRENEW,busActRel.getBusId(),busActRel.getcUser());
+        }
+        if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
+            agentResult = cashReceivablesService.finishProcing(CashPayType.INTERNETRENEW,busActRel.getBusId(),busActRel.getcUser());
+        }
+        if(!agentResult.isOK()){
+            throw new ProcessException("更新打款记录失败");
+        }
+
+        return AgentResult.ok();
+    }
+
 }
+

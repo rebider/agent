@@ -1,9 +1,9 @@
 package com.ryx.credit.activity.task;
 
 import com.ryx.credit.common.enumc.AgStatus;
-import com.ryx.credit.common.util.ResultVO;
-import com.ryx.credit.service.agent.DataChangeActivityService;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.spring.MySpringContextHandler;
+import com.ryx.internet.service.OInternetRenewService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.DelegateTask;
 import org.activiti.engine.delegate.ExecutionListener;
@@ -12,47 +12,40 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * FinanceTaskExecutionListener
+ * CompensationTaskExecutionListener
  * Created by IntelliJ IDEA.
- *
- * @Author Wang Qi
- * @Date 2018/5/21
- * @Time: 17:24
- * @description: FinanceTaskExecutionListener
+ *  物联网卡续费
+ * @author liudh
+ * @version 1.0 2019/7/3 11:15
+ * @see CompensationTaskExecutionListener
  * To change this template use File | Settings | File Templates.
  */
 
-public class InternetRenewTaskExecutionListener extends BaseTaskListener implements TaskListener,ExecutionListener{
-
-    private static final Logger logger = LoggerFactory.getLogger(InternetRenewTaskExecutionListener.class);
-
+public class InternetRenewTaskExecutionListener extends BaseTaskListener implements TaskListener, ExecutionListener {
+    private static final Logger logger = LoggerFactory.getLogger(CompensationTaskExecutionListener.class);
 
 
     @Override
     public void notify(DelegateExecution delegateExecution) throws Exception {
         String eventName = delegateExecution.getEventName();
         if ("start".equals(eventName)) {
-            logger.info("start========="+"ActivityId:"+delegateExecution.getCurrentActivityId()+"  ProcessInstanceId:"+delegateExecution.getProcessInstanceId()+"  Execution:"+delegateExecution.getId());
-        }else if ("end".equals(eventName)) {
-
-            logger.info("=========FinanceTaskExecutionListener 流程结束 {}",eventName);
-
+            logger.info("start=========" + "ActivityId:" + delegateExecution.getCurrentActivityId() + "  ProcessInstanceId:" + delegateExecution.getProcessInstanceId() + "  Execution:" + delegateExecution.getId());
+        } else if ("end".equals(eventName)) {
             String activityName = delegateExecution.getCurrentActivityName();
-
             //数据变更服务类
-            DataChangeActivityService aes = (DataChangeActivityService)MySpringContextHandler.applicationContext.getBean("dataChangeActivityService");
+            OInternetRenewService internetRenewService = (OInternetRenewService) MySpringContextHandler.applicationContext.getBean("internetRenewService");
             //审批拒绝
-            if("reject_end".equals(activityName)){
-               ResultVO res = aes.compressColInfoDataChangeActivity(delegateExecution.getProcessInstanceId(),AgStatus.Refuse.name());
-               logger.info("=========FinanceTaskExecutionListener 流程{}eventName{}res{}",delegateExecution.getProcessInstanceId(),eventName,res.getResInfo());
+            if ("reject_end".equals(activityName)) {
+                AgentResult res = internetRenewService.compressCompensateActivity(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.status);
+                logger.info("=========InternetRenewTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
             }
             //审批同意更新数据库
-            if("finish_end".equals(activityName)){
-                ResultVO res = aes.compressColInfoDataChangeActivity(delegateExecution.getProcessInstanceId(),AgStatus.Approved.name());
-                logger.info("=========FinanceTaskExecutionListener 流程{}eventName{}res{}",delegateExecution.getProcessInstanceId(),eventName,res.getResInfo());
+            if ("finish_end".equals(activityName)) {
+                AgentResult res = internetRenewService.compressCompensateActivity(delegateExecution.getProcessInstanceId(), AgStatus.Approved.status);
+                logger.info("=========InternetRenewTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
             }
-        }else if ("take".equals(eventName)) {
-            logger.info("take========="+"ActivityId:"+delegateExecution.getCurrentActivityId()+"  ProcessInstanceId:"+delegateExecution.getProcessInstanceId()+"  Execution:"+delegateExecution.getId());
+        } else if ("take".equals(eventName)) {
+            logger.info("take=========" + "ActivityId:" + delegateExecution.getCurrentActivityId() + "  ProcessInstanceId:" + delegateExecution.getProcessInstanceId() + "  Execution:" + delegateExecution.getId());
         }
     }
 

@@ -46,4 +46,9 @@ public class BusActRelServiceImpl implements BusActRelService {
         BusActRel rel = list.get(0);
         return rel;
     }
+
+    @Override
+    public int updateByPrimaryKey(BusActRel busActRel){
+       return busActRelMapper.updateByPrimaryKey(busActRel);
+    }
 }
