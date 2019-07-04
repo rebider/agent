@@ -549,6 +549,15 @@
       <if test="version != null">
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
+      <if test="stop != null and stop != ''">
+        STOP = #{stop,jdbcType=DECIMAL},
+      </if>
+      <if test="renewStatus != null and renewStatus != ''">
+        RENEW_STATUS = #{renewStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="stopReason != null and stopReason != ''">
+        STOP_REASON = #{stopReason,jdbcType=VARCHAR},
+      </if>
     </set>
     where ICCID_NUM = #{iccidNum,jdbcType=VARCHAR}
   </update>
@@ -565,7 +574,8 @@
 
   <sql id="internetCardStopSql" >
     <where>
-      c.renew_status = #{map.renewStatus,jdbcType=VARCHAR}
+      and c.stop = #{map.oldStop}
+      and c.renew_status = #{map.renewStatus,jdbcType=VARCHAR}
       and TO_CHAR(c.expire_time, 'YYYY-MM-DD') >= #{map.expireTime}
       and c.status = 1
     </where>

@@ -147,6 +147,9 @@ public class InternetCardServiceImpl implements InternetCardService {
         if(StringUtils.isNotBlank(internetCard.getRenewStatus())){
             criteria.andRenewStatusEqualTo(internetCard.getRenewStatus());
         }
+        if(null!=internetCard.getInternetCardStatus()){
+            criteria.andInternetCardStatusEqualTo(internetCard.getInternetCardStatus());
+        }
         if(StringUtils.isNotBlank(internetCard.getOpenAccountTimeBeginStr())){
             Date format = DateUtil.format(internetCard.getOpenAccountTimeBeginStr(), DateUtil.DATE_FORMAT_yyyy_MM_dd);
             criteria.andOpenAccountTimeGreaterThanOrEqualTo(format);
@@ -238,7 +241,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                             String consignee = String.valueOf(string.size()>=7?string.get(6):"");//收货人
 
                             oInternetCard.setManufacturer(manufacturer.equals("null")?"":manufacturer);
-                            if(StringUtils.isNotBlank(deliverTime))
+                            if(StringUtils.isNotBlank(deliverTime) && !deliverTime.equals("null"))
                             oInternetCard.setDeliverTime(DateUtils.parseDate(deliverTime,dateFormat));
                             oInternetCard.setOrderId(orderId.equals("null")?"":orderId);
                             oInternetCard.setAgentName(agentName.equals("null")?"":agentName);
@@ -256,7 +259,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                             oInternetCard.setOrderId(orderId.equals("null")?"":orderId);
                             oInternetCard.setAgentName(agentName.equals("null")?"":agentName);
                             oInternetCard.setSnCount(snCount.equals("null")?"":snCount);
-                            if(StringUtils.isNotBlank(deliverTime))
+                            if(StringUtils.isNotBlank(deliverTime) && !deliverTime.equals("null"))
                             oInternetCard.setDeliverTime(DateUtils.parseDate(deliverTime,dateFormat));
                             oInternetCard.setBeginSn(beginSn.equals("null")?"":beginSn);
                             oInternetCard.setEndSn(endSn.equals("null")?"":endSn);
@@ -275,7 +278,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                             oInternetCard.setBeginSn(beginSn.equals("null")?"":beginSn);
                             oInternetCard.setEndSn(endSn.equals("null")?"":endSn);
                             oInternetCard.setSnCount(snCount.equals("null")?"":snCount);
-                            if(StringUtils.isNotBlank(deliverTime))
+                            if(StringUtils.isNotBlank(deliverTime)  && !deliverTime.equals("null"))
                             oInternetCard.setDeliverTime(DateUtils.parseDate(deliverTime,dateFormat));
                         }else if(importType.equals(CardImportType.E.getValue())){
                             String iccidNum = String.valueOf(string.size()>=1?string.get(0):"");//ICCID
@@ -285,6 +288,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                             String latelyPayTime = String.valueOf(string.size()>=5?string.get(4):"");//最近交易日期
                             String merName = String.valueOf(string.size()>=6?string.get(5):"");//商户名称
                             String agentName = String.valueOf(string.size()>=7?string.get(6):"");//代理商名称
+                            String stopReason = String.valueOf(string.size()>=8?string.get(7):"");//关停原因
 
                             oInternetCard.setIccidNum(iccidNum.equals("null")?"":iccidNum);
                             BigDecimal contentByMsg = InternetCardStatus.getContentByMsg(internetCardStatus);
@@ -293,11 +297,12 @@ public class InternetCardServiceImpl implements InternetCardService {
                             }
                             oInternetCard.setInternetCardStatus(contentByMsg);
                             oInternetCard.setLatelyPayTime(latelyPayTime.equals("null")?"":latelyPayTime);
-                            if(StringUtils.isNotBlank(openAccountTime))
+                            if(StringUtils.isNotBlank(openAccountTime) && !openAccountTime.equals("null"))
                             oInternetCard.setOpenAccountTime(DateUtils.parseDate(openAccountTime,dateFormat));
                             oInternetCard.setMerId(merId.equals("null")?"":merId);
                             oInternetCard.setMerName(merName.equals("null")?"":merName);
                             oInternetCard.setAgentName(agentName.equals("null")?"":agentName);
+                            oInternetCard.setStopReason(stopReason.equals("null")?"":stopReason);
                         }
                         String jsonList = JsonUtil.objectToJson(oInternetCard);
                         OInternetCardImport oInternetCardImport = new OInternetCardImport();
@@ -563,8 +568,7 @@ public class InternetCardServiceImpl implements InternetCardService {
      * 2. 到期日减去5天  还未续费的 更新“是否需关停”为是
      * 3. 处理未处理的导入记录
      */
-//    @Override
-    @Autowired
+    @Override
     public void taskDisposeInternetCard(){
         log.info("taskDisposeInternetCard定时任务,开始执行");
         String retIdentifier = "";
@@ -590,6 +594,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             reqRenewMap.put("renewStatus",InternetRenewStatus.WXF.getValue());
             reqRenewMap.put("expireTime",DateUtil.getDateAfter(new Date(),-5));
             reqRenewMap.put("stop",Status.STATUS_1.status);
+            reqRenewMap.put("oldStop",Status.STATUS_0.status);
             int j = internetCardMapper.selectInternetCardStopCount(reqRenewMap);
             if(j>0){
                 int updateCount = internetCardMapper.updateInternetCardStop(reqRenewMap);
