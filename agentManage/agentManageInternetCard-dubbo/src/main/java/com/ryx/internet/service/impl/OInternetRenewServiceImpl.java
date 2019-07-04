@@ -117,12 +117,22 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         if(StringUtils.isBlank(InternetRenewWay.getContentByValue(internetRenew.getRenewWay()))){
             throw new MessageException("续费方式错误");
         }
-        if(null==internetRenew.getRenewCardCount()){
-            throw new MessageException("请填写卡数量");
+        if(iccids==null){
+            throw new MessageException("请选择要续费的卡");
         }
+        if(iccids.size()==0){
+            throw new MessageException("请选择要续费的卡");
+        }
+        if(internetRenew.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.XXBK.getValue())) {
+            if (oCashReceivablesVoList.size() == 0) {
+                throw new MessageException("线下打款必须填写打款记录");
+            }
+        }
+        BigDecimal renewCardCount = new BigDecimal(iccids.size());
         String internetRenewId = idService.genId(TabId.O_INTERNET_RENEW);
         internetRenew.setId(internetRenewId);
         internetRenew.setReviewStatus(AgStatus.Approving.status);
+        internetRenew.setRenewCardCount(renewCardCount);
         internetRenew.setcTime(new Date());
         internetRenew.setuTime(new Date());
         internetRenew.setcUser(cUser);
@@ -133,7 +143,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         if(cardAmt==null){
             throw new MessageException("缺少参数配置");
         }
-        internetRenew.setSuppAmt(internetRenew.getRenewCardCount().multiply(new BigDecimal(cardAmt.getdItemvalue())));
+        internetRenew.setSuppAmt(renewCardCount.multiply(new BigDecimal(cardAmt.getdItemvalue())));
 
         Dict offsetAmt = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.INTERNET_RENEW.name(), DictGroup.OFFSET_AMT.name());
         //没有轧差直接设置为0
@@ -143,7 +153,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             if(offsetAmt==null){
                 throw new MessageException("缺少参数配置");
             }
-            internetRenew.setSumOffsetAmt(internetRenew.getRenewCardCount().multiply(new BigDecimal(offsetAmt.getdItemvalue())));
+            internetRenew.setSumOffsetAmt(renewCardCount.multiply(new BigDecimal(offsetAmt.getdItemvalue())));
         }
         internetRenewMapper.insert(internetRenew);
 
@@ -172,6 +182,11 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(iccid);
             if(oInternetCard==null){
                 throw new MessageException("第"+i+"个iccid不存在");
+            }
+            oInternetCard.setRenewStatus(InternetRenewStatus.XFZ.getValue());
+            int j = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
+            if(j!=1){
+                throw new MessageException("更新物联网卡信息失败");
             }
             OInternetRenewDetail oInternetRenewDetail = new OInternetRenewDetail();
             oInternetRenewDetail.setId(idService.genId((TabId.O_INTERNET_RENEW_DETAIL)));
@@ -202,7 +217,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             }else{
                 oInternetRenewDetail.setRealityAmt(BigDecimal.ZERO);
             }
-            oInternetRenewDetail.setRenewStatus(InternetRenewStatus.WXF.getValue());
+            oInternetRenewDetail.setRenewStatus(InternetRenewStatus.XFZ.getValue());
             oInternetRenewDetail.setStatus(Status.STATUS_1.status);
             oInternetRenewDetail.setcUser(cUser);
             oInternetRenewDetail.setuUser(cUser);
@@ -327,6 +342,9 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             throw new MessageException("查询续费记录失败");
         }
         oInternetRenew.setReviewStatus(agStatus);
+        if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
+            oInternetRenew.setReviewPassTime(new Date());
+        }
         int i = internetRenewMapper.updateByPrimaryKeySelective(oInternetRenew);
         if(i!=1){
             throw new MessageException("更新续费记录失败");

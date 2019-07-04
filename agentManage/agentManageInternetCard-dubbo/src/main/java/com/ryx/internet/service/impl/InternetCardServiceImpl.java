@@ -495,6 +495,8 @@ public class InternetCardServiceImpl implements InternetCardService {
         internetCard.setuTime(date);
         internetCard.setStatus(Status.STATUS_1.status);
         internetCard.setVersion(BigDecimal.ONE);
+        internetCard.setStop(Status.STATUS_0.status);
+        internetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
         internetCardMapper.insert(internetCard);
     }
 
