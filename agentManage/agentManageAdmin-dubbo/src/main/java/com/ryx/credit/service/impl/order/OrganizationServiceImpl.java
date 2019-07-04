@@ -390,7 +390,7 @@ public class OrganizationServiceImpl implements OrganizationService {
             AttachmentExample.Criteria criteria1 = attachmentExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andIdEqualTo(attachmentRel.getAttId()).andAttDataTypeEqualTo(attDataType);
             List<Attachment> attachments = attachmentMapper.selectByExample(attachmentExample);
             if (null == attachments || attachments.size() == 0) {
-                return fileId;
+               continue;
             }
             Attachment attachment = attachments.get(0);
             return attachment.getId();
