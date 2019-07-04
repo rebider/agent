@@ -102,6 +102,12 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         OInternetRenewDetailExample internetRenewDetailExample = new OInternetRenewDetailExample();
         internetRenewDetailExample.setPage(page);
         List<OInternetRenewDetail> internetRenewDetails = internetRenewDetailMapper.selectByExample(internetRenewDetailExample);
+        for (OInternetRenewDetail renewDetail : internetRenewDetails) {
+            renewDetail.setRenewWay(InternetRenewWay.getContentByValue(renewDetail.getRenewWay()));
+            CUser cUser = iUserService.selectById(renewDetail.getcUser());
+            if(null!=cUser)
+            renewDetail.setcUser(cUser.getName());
+        }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(internetRenewDetails);
         pageInfo.setTotal((int)internetRenewDetailMapper.countByExample(internetRenewDetailExample));
