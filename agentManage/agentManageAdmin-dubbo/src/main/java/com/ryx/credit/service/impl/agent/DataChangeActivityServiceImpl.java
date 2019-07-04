@@ -167,20 +167,23 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(dateChangeRequest.getDataId());
         record.setDataShiro(BusActRelBusType.DC_Agent.key);
-
         Agent agent = agentMapper.selectByPrimaryKey(dateChangeRequest.getDataId());
         if(agent!=null)
         record.setAgentName(agent.getAgName());
-        dateChangeRequest.getDataContent();
-        AgentVo agVo = JSONObject.parseObject(dateChangeRequest.getDataContent(), AgentVo.class);
-        if(agVo.getBusInfoVoList().size()==0){
-            throw  new MessageException("缺少业务信息");
+        if(dateChangeRequest.getDataType().equals(BusActRelBusType.DC_Agent.name())){
+            AgentVo agVo = JSONObject.parseObject(dateChangeRequest.getDataContent(), AgentVo.class);
+            if(agVo.getBusInfoVoList().size()==0){
+                throw  new MessageException("缺少业务信息");
+            }
+            AgentBusInfoVo agentBusInfoVo = agVo.getBusInfoVoList().get(0);
+            PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfoVo.getBusPlatform());
+            record.setNetInBusType("ACTIVITY_"+platForm.getPlatformNum());
+            record.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
+            record.setAgDocPro(agentBusInfoVo.getAgDocPro());
+        }else{
+            record.setAgDocDistrict(agent.getAgDocDistrict());
+            record.setAgDocPro(agent.getAgDocPro());
         }
-        AgentBusInfoVo agentBusInfoVo = agVo.getBusInfoVoList().get(0);
-        PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfoVo.getBusPlatform());
-        record.setNetInBusType("ACTIVITY_"+platForm.getPlatformNum());
-        record.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
-        record.setAgDocPro(agentBusInfoVo.getAgDocPro());
         if(1!=busActRelMapper.insertSelective(record)){
             logger.info("代理商审批，启动审批异常，添加审批关系失败{}:{}",dateChangeRequest.getId(),proce);
             throw  new MessageException("添加审批关系失败");
@@ -231,7 +234,12 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
 
                             //首刷平台
                             PlatFormExample platFormExample = new PlatFormExample();
-                            platFormExample.or().andStatusEqualTo(Status.STATUS_1.status).andPlatformTypeEqualTo(PlatformType.MPOS.code);
+                            List<String> list = new ArrayList<>();
+                            list.add(PlatformType.MPOS.code);
+                            list.add(PlatformType.RDBPOS.code);
+                            platFormExample.or()
+                            .andStatusEqualTo(Status.STATUS_1.status)
+                            .andPlatformTypeIn(list);
                             List<PlatForm>  platForms = platFormMapper.selectByExample(platFormExample);
                             List<String> pltcode = new ArrayList<>();
                             pltcode.add("aaaa");
@@ -294,6 +302,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                 }
                             }
                         }
+                        //更新财务出款机构
                         List<AgentBusInfoVo> orgTypeList = vo.getOrgTypeList();
                         for (AgentBusInfoVo agentBusInfoVo : orgTypeList) {
                             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());

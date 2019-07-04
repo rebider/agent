@@ -63,15 +63,15 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
     @Autowired
     private PlatFormMapper platFormMapper;
     @Autowired
-    private OrganizationMapper organizationMapper;
-
-
-    @Autowired
     private RedisService redisService;
     @Autowired
     private DictOptionsService dictOptionsService;
     @Autowired
     private AgentMapper agentMapper;
+    @Autowired
+    private OrganizationMapper organizationMapper;
+
+
      @Override
      public List<Map<String,Object>> queryBusInfoAndRemit(AgentBusInfo agentBusInfo){
 
@@ -124,6 +124,48 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
             }
             Map<String, Object> stringObjectMap = orgCodeRes.get(0);
             String orgCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+            //市场审批
+            if(orgCode.equals("market")){
+                //处理财务审批（财务出款机构）
+                for (AgentBusInfoVo agentBusInfoVo : agentVo.getMarketToporgTableIdForm()) {
+                    //必须选择业务顶级机构
+                    if(StringUtils.isBlank(agentBusInfoVo.getOrganNum())){
+                        throw new ProcessException("请选择业务顶级机构");
+                    }
+                    //上级机构和本级机构判断
+                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                    //上级机构判断
+                    if(agentBusInfo!=null){
+                        //上级存在
+                        if(StringUtils.isNotBlank(agentBusInfo.getBusParent())){
+                            AgentBusInfo parent = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
+                            //上级必须有机构，如果没有机构需要提示补全
+                            if(parent!=null){
+                                //上级机构为空，提示必须填写，上级机构不为空判断与本级是否一致
+                                if(StringUtils.isNotBlank(parent.getOrganNum())){
+                                    //上级机构不为空判断与本级是否一致
+                                    if(!parent.getOrganNum().equals(agentBusInfoVo.getOrganNum())){
+                                        //提示上级机构是什么
+                                        Organization organization = organizationMapper.selectByPrimaryKey(parent.getOrganNum());
+                                        if(organization==null){
+                                            throw new ProcessException("审批失败:顶级机构和上级的顶级机构不同，上级顶级机构未找到");
+                                        }else{
+                                            throw new ProcessException("审批失败:顶级机构和上级的顶级机构不同，上级顶级机构为:"+organization.getOrgName());
+                                        }
+                                    }
+                                }else{
+                                    throw new ProcessException("审批失败:上级的顶级机构为空，请联系业务进行补全");
+                                }
+                            }
+
+                        }
+                        agentBusInfo.setOrganNum(agentBusInfoVo.getOrganNum());
+                        if(agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)!=1){
+                            throw new ProcessException("审批失败:业务顶级机构更新异常");
+                        }
+                    }
+                }
+            }
             //财务审批
             if(orgCode.equals("finance")){
                 for (CapitalVo capitalVo : agentVo.getCapitalVoList()) {
@@ -166,7 +208,6 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                     }
                 }
             }
-
             //处理财务修改
             for (AgentColinfoRel agentColinfoRel : agentVo.getAgentColinfoRelList()) {
                 AgentResult result = agentColinfoService.saveAgentColinfoRel(agentColinfoRel, userId);
@@ -174,7 +215,6 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                     throw new ProcessException("保存收款关系异常");
                 }
             }
-
             Set<String> dkgs = new HashSet<String>();
             for (AgentBusInfoVo agentBusInfoVo : agentVo.getBusInfoVoList()) {
                 AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
@@ -200,37 +240,38 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                 }
             }
 
-            //业务部输入借记费率
-            if(orgCode.equals("business"))
-            for (AgentBusInfoVo agentBusInfoVo : agentVo.getEditDebitList()) {
-                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
-                agentBusInfoVo.setId(agentBusInfoVo.getId());
-                agentBusInfoVo.setVersion(agentBusInfo.getVersion());
-                agentBusInfoVo.setcUtime(new Date());
-                int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfoVo);
-                if(i!=1){
-                    throw new ProcessException("更新借记费率等信息失败");
-                }
-            }
 
-            //业务部输入瑞大宝终端数量下线
-            if(orgCode.equals("business"))
-            if(agentVo.getTerminalsLowerList()!=null && agentVo.getTerminalsLowerList().size()>0){
-                for (AgentBusInfoVo agentBusInfoVo : agentVo.getTerminalsLowerList()) {
+            //业务部门审批
+            if(orgCode.equals("business")) {
+                //业务部输入借记费率
+                for (AgentBusInfoVo agentBusInfoVo : agentVo.getEditDebitList()) {
                     AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
-                    PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
-                    if(PlatformType.RDBPOS.code.equals(platForm.getPlatformType())) {
-                        if(StringUtils.isBlank(agentBusInfoVo.getTerminalsLower())){
-                            throw new ProcessException("请填写终端数量下限");
-                        }
-                        if(new BigDecimal(agentBusInfoVo.getTerminalsLower()).compareTo(new BigDecimal(5000))>0){
-                            throw new ProcessException("终端数量下限最高为5000");
-                        }
-                        agentBusInfo.setcUtime(new Date());
-                        agentBusInfo.setTerminalsLower(agentBusInfoVo.getTerminalsLower());
-                        int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
-                        if (i != 1) {
-                            throw new ProcessException("更新终端数量下限失败");
+                    agentBusInfoVo.setId(agentBusInfoVo.getId());
+                    agentBusInfoVo.setVersion(agentBusInfo.getVersion());
+                    agentBusInfoVo.setcUtime(new Date());
+                    int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfoVo);
+                    if (i != 1) {
+                        throw new ProcessException("更新借记费率等信息失败");
+                    }
+                }
+                //业务部输入瑞大宝终端数量下线
+                if (agentVo.getTerminalsLowerList() != null && agentVo.getTerminalsLowerList().size() > 0) {
+                    for (AgentBusInfoVo agentBusInfoVo : agentVo.getTerminalsLowerList()) {
+                        AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                        PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+                        if (PlatformType.RDBPOS.code.equals(platForm.getPlatformType())) {
+                            if (StringUtils.isBlank(agentBusInfoVo.getTerminalsLower())) {
+                                throw new ProcessException("请填写终端数量下限");
+                            }
+                            if (new BigDecimal(agentBusInfoVo.getTerminalsLower()).compareTo(new BigDecimal(5000)) > 0) {
+                                throw new ProcessException("终端数量下限最高为5000");
+                            }
+                            agentBusInfo.setcUtime(new Date());
+                            agentBusInfo.setTerminalsLower(agentBusInfoVo.getTerminalsLower());
+                            int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                            if (i != 1) {
+                                throw new ProcessException("更新终端数量下限失败");
+                            }
                         }
                     }
                 }

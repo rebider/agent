@@ -21,7 +21,7 @@ public interface OrganizationService {
 
     PageInfo organizationList(Page page, Organization organization);
 
-    ResultVO organizationAdd(AgentVo agentVo);
+    ResultVO organizationAdd(AgentVo agentVo) throws Exception;
 
     AgentResult organizationDelete(String id, String user);
 
@@ -30,5 +30,9 @@ public interface OrganizationService {
     List<Organization> selectOrganization(String orgId);
 
     ResultVO organizationEdit(OrganizationVo organizationVo) throws Exception;
+
+    List<Organization> queryAllOrgan();
+
+    Organization selectById(String id);
 
 }

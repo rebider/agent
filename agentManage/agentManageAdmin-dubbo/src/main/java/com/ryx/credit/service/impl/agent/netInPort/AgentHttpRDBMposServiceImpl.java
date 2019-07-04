@@ -9,6 +9,7 @@ import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.common.util.MailUtil;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
+import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.RegionMapper;
 import com.ryx.credit.dao.bank.BankLineNumsMapper;
 import com.ryx.credit.pojo.admin.agent.Agent;
@@ -54,59 +55,67 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
     private RegionMapper regionMapper;
     @Autowired
     private BankLineNumsMapper bankLineNumsMapper;
+    @Autowired
+    private AgentMapper agentMapper;
 
     @Override
     public Map<String, Object> packageParam(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
-        AgentBusInfo agentBusInfo = (AgentBusInfo)param.get("agentBusInfo");
-        Agent agent = (Agent)param.get("agent");
-        AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
+        try {
+            AgentBusInfo agentBusInfo = (AgentBusInfo)param.get("agentBusInfo");
+            Agent agent = (Agent)param.get("agent");
+            AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
 
-        resultMap.put("mobileNo",agentBusInfo.getBusLoginNum());
-        resultMap.put("branchid",agentBusInfo.getBusPlatform());
-        resultMap.put("direct",direct(agentBusInfo.getBusType()));
-        resultMap.put("cardno",agentColinfo.getCloBankAccount());
-        resultMap.put("termCount",agentBusInfo.getTerminalsLower());
-        resultMap.put("bankbranchid",agentColinfo.getBranchLineNum());
-        resultMap.put("bankbranchname",agentColinfo.getCloBankBranch());
-        String accountType = "";
-        String customerPid = ""; //身份证
-        String userName = "";  //法人姓名
-        if( agentColinfo.getCloType().compareTo(BigDecimal.ONE) == 0){ //对公
-            accountType = "01";
-            customerPid = agent.getAgLegalCernum();
-            userName = agent.getAgLegal();
-        }else{
-            accountType = "00";
-            customerPid = agentColinfo.getAgLegalCernum();
-            userName = agentColinfo.getCloRealname();
-        }
-        resultMap.put("accountType",accountType);
-        resultMap.put("customerType",accountType);
-        resultMap.put("customerPid",customerPid);
-        resultMap.put("userName",userName);
-        resultMap.put("address",agent.getAgRegAdd());
-        resultMap.put("companyNo",agent.getAgBusLic());
-        resultMap.put("agencyName",agent.getAgName());
-        if(StringUtils.isNotBlank(agentBusInfo.getBusParent())){
-            //取出上级业务
-            AgentBusInfo agentParent = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
-            if(null!=agentParent){
-                resultMap.put("parentAgencyId",agentParent.getBusNum());
+            resultMap.put("mobileNo",agentBusInfo.getBusLoginNum());
+            resultMap.put("branchid",agentBusInfo.getBusPlatform());
+            resultMap.put("direct",direct(agentBusInfo.getBusType()));
+            resultMap.put("cardno",agentColinfo.getCloBankAccount());
+            resultMap.put("termCount",agentBusInfo.getTerminalsLower());
+            resultMap.put("bankbranchid",agentColinfo.getBranchLineNum());
+            resultMap.put("bankbranchname",agentColinfo.getCloBankBranch());
+            String accountType = "";
+            String customerPid = ""; //身份证
+            String userName = "";  //法人姓名
+            if( agentColinfo.getCloType().compareTo(BigDecimal.ONE) == 0){ //对公
+                accountType = "01";
+                customerPid = agent.getAgLegalCernum();
+                userName = agent.getAgLegal();
             }else{
-                resultMap.put("parentAgencyId","");
+                accountType = "00";
+                customerPid = agentColinfo.getAgLegalCernum();
+                userName = agentColinfo.getCloRealname();
             }
+            resultMap.put("accountType",accountType);
+            resultMap.put("customerType",accountType);
+            resultMap.put("customerPid",customerPid);
+            resultMap.put("userName",userName);
+            resultMap.put("address",agent.getAgRegAdd());
+            resultMap.put("companyNo",agent.getAgBusLic());
+            resultMap.put("agencyName",agent.getAgName());
+            if(StringUtils.isNotBlank(agentBusInfo.getBusParent())){
+                //取出上级业务
+                AgentBusInfo agentParent = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
+                if(null!=agentParent){
+                    resultMap.put("parentAgencyId",agentParent.getBusNum());
+                }else{
+                    resultMap.put("parentAgencyId","");
+                }
+            }
+            resultMap.put("agCode",agent.getId());
+            resultMap.put("directLabel",directLabel(agentBusInfo.getBusType()));
+            Region region = regionMapper.findByRcode(agentColinfo.getBankRegion());
+            resultMap.put("code",String.valueOf(region.gettType()));
+            resultMap.put("cityid",agentColinfo.getBankRegion());
+            resultMap.put("bankcity",region.getrName());
+            resultMap.put("bankname",agentColinfo.getCloBank());
+            BankLineNums bankLineNums = bankLineNumsMapper.selectByBankName(agentColinfo.getCloBank());
+            resultMap.put("bankid",bankLineNums.getBankid());
+            resultMap.put("cardName",agentColinfo.getCloRealname());
+        } catch (Exception e) {
+            log.info("入网组装参数为空，"+e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
-        resultMap.put("agCode",agent.getId());
-        resultMap.put("directLabel",directLabel(agentBusInfo.getBusType()));
-        Region region = regionMapper.findByRcode(agentColinfo.getBankRegion());
-        resultMap.put("code",String.valueOf(region.gettType()));
-        resultMap.put("cityid",agentColinfo.getBankRegion());
-        resultMap.put("bankcity",region.getrName());
-        resultMap.put("bankname",agentColinfo.getCloBank());
-        BankLineNums bankLineNums = bankLineNumsMapper.selectByBankName(agentColinfo.getCloBank());
-        resultMap.put("bankid",bankLineNums.getBankid());
-        resultMap.put("cardName",agentColinfo.getCloRealname());
         return resultMap;
     }
 
@@ -129,7 +138,6 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             jsonParams.put("agencyName",paramMap.get("agencyName"));
             jsonParams.put("parentAgencyId",paramMap.get("parentAgencyId"));
             jsonParams.put("agCode",paramMap.get("agCode"));
-            jsonParams.put("directLabel",paramMap.get("directLabel"));
             jsonParams.put("directLabel",paramMap.get("directLabel"));
             jsonParams.put("code",paramMap.get("code"));
             jsonParams.put("cityid",paramMap.get("cityid"));
@@ -193,7 +201,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         Map<String,Object> jsonParams = new HashMap<>();
         String busId = String.valueOf(data.get("agentBusinfoId"));
         AgentBusInfo agentBusInfo = agentBusinfoService.getById(busId);
-        Agent agent = (Agent)data.get("agent");
+        Agent agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
         AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
         jsonParams.put("mobile",agentBusInfo.getBusNum());
         jsonParams.put("branchid",agentBusInfo.getBusPlatform().split("_")[0]);
@@ -343,27 +351,4 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
 
     }
 
-    @Override
-    public AgentResult queryTermCount(String agencyId)throws Exception{
-        try {
-            Map<String,Object> jsonParams = new HashMap<>();
-            jsonParams.put("agencyId",agencyId);
-            String json = JsonUtil.objectToJson(jsonParams);
-            log.info("查询终端下限数量请求参数：{}",json);
-            //发送请求
-            String httpResult = HttpClientUtil.doPostJson(rdbReqUrl+"agency/getTermCount", json);
-            JSONObject respXMLObj = JSONObject.parseObject(httpResult);
-            log.info("查询终端下限数量返回参数：{}",httpResult);
-            if (respXMLObj.getString("code").equals("0000")){
-                return AgentResult.ok(respXMLObj);
-            }else{
-                AppConfig.sendEmails(httpResult, "升级通知瑞大宝失败报警");
-                throw new Exception(httpResult);
-            }
-        } catch (Exception e) {
-            AppConfig.sendEmails("升级通知瑞大宝请求超时："+ MailUtil.printStackTrace(e), "升级通知瑞大宝失败报警");
-            log.info("http请求超时:{}",e.getLocalizedMessage());
-            throw new Exception("http请求超时:"+e.getLocalizedMessage());
-        }
-    }
 }

@@ -14,6 +14,8 @@ import java.util.Map;
 public enum InternetCardStatus {
 
     NORMAL(new BigDecimal("1"),"正常"),
+    NOACTIVATE(new BigDecimal("2"),"待激活"),
+    STOP(new BigDecimal("3"),"停用"),
     UNKNOWN(new BigDecimal("0"),"未知");
 
     public BigDecimal code;

@@ -940,9 +940,11 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         record.setDataShiro(BusActRelBusType.refund.key);
 
         Agent agent = agentMapper.selectByPrimaryKey(agentId);
-        if(agent!=null)
-        record.setAgentName(agent.getAgName());
-
+        if(agent!=null) {
+            record.setAgentName(agent.getAgName());
+        }
+        record.setAgDocDistrict(agent.getAgDocDistrict());
+        record.setAgDocPro(agent.getAgDocPro());
         if (1 != busActRelMapper.insertSelective(record)) {
             log.info("退货提交审批，启动审批异常，添加审批关系失败{}:{}", returnId, proce);
             throw new ProcessException("退货审批流启动失败:添加审批关系失败");
@@ -1749,8 +1751,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                     }
 
                     //流量卡不进行下发操作
-                    if(oActivity!=null && com.ryx.credit.commons.utils.StringUtils.isNotBlank(oActivity.getActCode()) && "2204".equals(oActivity.getActCode())){
-                        log.info("导入物流数据,流量卡不进行下发操作，活动代码{}={}==========================================={}" ,oActivity.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
+                    if(oActivity!=null && com.ryx.credit.commons.utils.StringUtils.isNotBlank(oActivity_plan.getActCode()) && ("2204".equals(oActivity_plan.getActCode()) || "2004".equals(oActivity_plan.getActCode()) )  ){
+                        log.info("导入物流数据,流量卡不进行下发操作，活动代码{}={}==========================================={}" ,oActivity_plan.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
                         return AgentResult.ok("流量卡不进行下发操作");
                     }
                     OOrder oOrder = oOrderMapper.selectByPrimaryKey(orderId);

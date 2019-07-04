@@ -92,4 +92,5 @@ public interface AgentBusInfoMapper {
 
     int updateBusLoginNum(@Param("reqMap")Map<String, Object> reqMap);
 
+    List<AgentBusInfo> selectBusInfo(@Param("reqMap")Map<String, Object> reqMap);
 }

@@ -458,8 +458,8 @@
     left join a_agent_businfo e on o.bus_id = e.id
     left join a_platform c on c.platform_num = o.order_platform
     left join o_payment d on d.order_id = o.id
-    left join c_organization f on f.id= b.ag_doc_district
-    left join c_organization g on g.id= b.ag_doc_pro
+    left join c_organization f on f.id= e.ag_doc_district
+    left join c_organization g on g.id= e.ag_doc_pro
     <where>
       o.user_id=#{userId}
       <if test="1==1"> and  o.status = 1 </if>
@@ -548,8 +548,8 @@
     left join a_agent_businfo e on o.bus_id = e.id
     left join a_platform c on c.platform_num = o.order_platform
     left join o_payment d on d.order_id = o.id
-    left join c_organization f on f.id= b.ag_doc_district
-    left join c_organization g on g.id= b.ag_doc_pro
+    left join c_organization f on f.id= e.ag_doc_district
+    left join c_organization g on g.id= e.ag_doc_pro
     <where>
       <if test="1==1"> and  o.status = 1 </if>
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
@@ -1051,40 +1051,57 @@
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id
     and o_payment_detail.status = 1 and (o_payment_detail.pay_type='DKFQ' or o_payment_detail.pay_type='SF')
     ),0) as sjdk_amt,
-    nvl(d.outstanding_amount,0) as syqk_amt
+    nvl(d.outstanding_amount,0) as syqk_amt,
+    os.pro_rel_price, os.model, oan.org_name
 
     from o_order o
     left join a_agent b on o.agent_id = b.id
     left join a_platform c on c.platform_num = o.order_platform
     left join o_payment d on d.order_id = o.id
     left join o_cash_receivables cr on d.id = cr.src_id and cr.cashpay_type='PAYMENT' and cr.status=1
-    left join a_pay_comp comp on comp.id=cr.COLLECT_COMPANY
+    left join a_pay_comp comp on comp.id = cr.COLLECT_COMPANY
     left join c_organization org on org.id = b.ag_doc_pro
+    left join c_organization orging on orging.id = b.ag_doc_district
     left join o_sub_order os on os.order_id = o.id and os.status=1
     left join o_sub_order_activity oso on oso.sub_order_id = os.id and oso.status=1
-    left join d_dict dict on dict.d_group='ORDER' and dict.d_artifact='MODEL_TYPE' and dict.d_status=1 and dict.d_itemname=os.pro_type
+    left join d_dict dict on dict.d_group='ORDER' and dict.d_artifact='MODEL_TYPE' and dict.d_status=1 and dict.d_itemname = os.pro_type
+    left join o_organization oan on oan.plat_id = c.id and oan.status=1
+    left join a_agent_businfo e on o.bus_id = e.id and e.status=1
     <where>
-      <if test="1==1"> and  o.status = 1 </if>
-      <if test="nuclearUser!=null and nuclearUser!=''"> and  d.nuclear_user = #{nuclearUser} </if>
-      <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
-      <if test="id!=null and id!=''"> and  o.id = #{id} </if>
-      <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
+      <if test="1==1"> and o.status = 1 </if>
+      <if test="nuclearUser!=null and nuclearUser!=''"> and d.nuclear_user = #{nuclearUser} </if>
+      <if test="oNum!=null and oNum!=''"> and o.o_num = #{oNum} </if>
+      <if test="id!=null and id!=''"> and o.id = #{id} </if>
+      <if test="agentId!=null and agentId!=''"> and o.agent_id = #{agentId} </if>
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.AG_UNIQ_NUM=#{agUniqNum} </if>
-      <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
-        and PRO_TYPE=#{proType} and o.id=ORDER_ID) </if>
-      <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
-        and model=#{model} and o.id=ORDER_ID) </if>
+      <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1 and PRO_TYPE=#{proType} and o.id=ORDER_ID) </if>
+      <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1 and model=#{model} and o.id=ORDER_ID) </if>
       <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
-      <if test="vender!=null and vender!=''"> and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id
-        and os.order_id=o.id where soa.VENDER=#{vender})</if>
-      <if test="activityName!=null and activityName !=''">
-        and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on  soa.SUB_ORDER_ID=os.id
-        and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
+      <if test="vender!=null and vender!=''">
+          and EXISTS(select * from o_sub_order os
+          left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id and os.order_id=o.id where soa.VENDER=#{vender})
+      </if>
+      <if test="activityName!=null and activityName!=''">
+          and EXISTS (select * from o_sub_order_activity soa
+          left join o_sub_order os on soa.SUB_ORDER_ID=os.id and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
+      </if>
+      <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus} </if>
+      <if test="agDocDistrict!=null and agDocDistrict!=''"> and b.ag_doc_district = #{agDocDistrict} </if>
+      <if test="agDocPro!=null and agDocPro!=''"> and b.ag_doc_pro = #{agDocPro} </if>
+      <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
+      <if test="organizationCode!=null and organizationCode!=''">
+        and (orging.CODE like concat(#{organizationCode},'%') or org.CODE like concat(#{organizationCode},'%') )
+      </if>
+      <if test="platfromPerm!=null and platfromPerm.size>0">
+        and o.order_platform in
+        <foreach collection="platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
+          #{platfromPermItem.PLATFORM_NUM}
+        </foreach>
       </if>
     </where>
     )
@@ -1129,5 +1146,11 @@
     <result column="frdk_count" property="frdkCount" jdbcType="DECIMAL"/>
     <result column="sjdk_amt" property="sjdkAmt" jdbcType="DECIMAL"/>
     <result column="syqk_amt" property="syqkAmt" jdbcType="DECIMAL"/>
+
+    <result column="pro_rel_price" property="proRelPrice" jdbcType="VARCHAR"/>
+    <result column="model" property="model" jdbcType="VARCHAR"/>
+    <result column="review_status" property="reviewStatus" jdbcType="VARCHAR"/>
+    <result column="o_inuretime" property="oinuretime" jdbcType="VARCHAR"/>
+    <result column="org_name" property="orgName" jdbcType="VARCHAR"/>
   </resultMap>
 </mapper>

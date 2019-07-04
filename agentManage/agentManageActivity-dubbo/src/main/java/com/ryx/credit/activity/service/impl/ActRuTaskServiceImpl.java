@@ -6,8 +6,11 @@ import com.ryx.credit.activity.entity.ActRuTaskExample;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.service.ActRuTaskService;
 import com.ryx.credit.service.CRoleService;
+import com.ryx.credit.service.IOrganizationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +33,8 @@ public class ActRuTaskServiceImpl implements ActRuTaskService {
     private ActRuTaskMapper  actRuTaskMapper;
     @Autowired
     private CRoleService roleService;
+    @Autowired
+    private IOrganizationService organizationService;
 
     @Override
     public int insert(ActRuTask record) {
@@ -111,10 +116,30 @@ public class ActRuTaskServiceImpl implements ActRuTaskService {
         String netInUrlsPid = AppConfig.getProperty("netInUrls_pid");
         Set<String> dbUrls = roleService.selectShiroUrl((Long) param.get("userId"),dbUrlsPid,"/BusActRelBusType");
         Set<String> netInUrls = roleService.selectShiroUrl((Long) param.get("userId"),netInUrlsPid,"");
+        Set<String> roleNames = roleService.findFinanceRole((Long) param.get("userId"));
 
+        param.put("roleNames",roleNames);
         param.put("dbUrls",dbUrls);
         param.put("netInUrls",netInUrls);
         List<Map<String, Object>> taskList = actRuTaskMapper.queryMyTaskPage(param,page);
+        for (Map<String, Object> resultMap : taskList) {
+            String agDocPro = String.valueOf(resultMap.get("AG_DOC_PRO"));
+            String agDocDistrict = String.valueOf(resultMap.get("AG_DOC_DISTRICT"));
+            if(!agDocPro.equals("null")){
+                COrganization proOrganization = organizationService.selectByPrimaryKey(Integer.parseInt(agDocPro));
+                if(proOrganization!=null)
+                resultMap.put("AG_DOC_PRO_NAME",proOrganization.getName());
+            }else{
+                resultMap.put("AG_DOC_PRO_NAME","");
+            }
+            if(!agDocDistrict.equals("null")){
+                COrganization districtOrganization = organizationService.selectByPrimaryKey(Integer.parseInt(agDocDistrict));
+                if(districtOrganization!=null)
+                resultMap.put("AG_DOC_DISTRICT_NAME",districtOrganization.getName());
+            }else{
+                resultMap.put("AG_DOC_DISTRICT_NAME","");
+            }
+        }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(taskList);
         pageInfo.setTotal(actRuTaskMapper.queryMyTaskCount(param));

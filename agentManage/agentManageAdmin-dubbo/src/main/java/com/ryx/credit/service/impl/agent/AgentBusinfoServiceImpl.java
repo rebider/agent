@@ -247,12 +247,14 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 							}
 						}
 						//判断所选机构是否属于所选平台（机构编号&业务平台）
-						organList = organizationMapper.selectOrganization(agentBusInfoVo.getOrganNum());
-						for (Organization organization : organList) {
-							if (!organization.getPlatId().contains(agentBusInfoVo.getBusPlatform())) {
-								throw new ProcessException("所选机构不属于该业务平台");
+						if (StringUtils.isNotBlank(agentBusInfoVo.getOrganNum())) {
+							organList = organizationMapper.selectOrganization(agentBusInfoVo.getOrganNum());
+							for (Organization organization : organList) {
+								if (!organization.getPlatId().contains(agentBusInfoVo.getBusPlatform())) {
+									throw new ProcessException("所选机构不属于该业务平台");
+								}
+								agentBusInfoVo.setOrganNum(organization.getOrgId());
 							}
-							agentBusInfoVo.setOrganNum(organization.getOrgId());
 						}
 					}
 				}
@@ -310,9 +312,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					db_AgentBusInfo.setBusLoginNum(agentBusInfoVo.getBusLoginNum());
 					db_AgentBusInfo.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
 					db_AgentBusInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
-					for (Organization organization : organList) {
-						db_AgentBusInfo.setOrganNum(organization.getOrgId());
-					}
+					db_AgentBusInfo.setOrganNum(agentBusInfoVo.getOrganNum());
 					if(StringUtils.isNotEmpty(db_AgentBusInfo.getBusParent())){
 						if(StringUtils.isNotEmpty(db_AgentBusInfo.getBusPlatform())){
 							AgentBusInfo busInfoParent = agentBusInfoMapper.selectByPrimaryKey(db_AgentBusInfo.getBusParent());

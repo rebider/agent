@@ -8,6 +8,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
+import com.ryx.credit.pojo.admin.order.OPayment;
 import com.ryx.credit.pojo.admin.order.OPaymentDetail;
 import com.ryx.credit.pojo.admin.order.OSupplement;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
@@ -80,4 +81,6 @@ public interface OSupplementService {
     BigDecimal selectPayAmout(String srcid, String pkType);
 
     OPaymentDetail selectPaymentDetailById(String id);
+
+    OPayment selectOpayment(String id);
 }

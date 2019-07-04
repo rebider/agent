@@ -10,10 +10,13 @@ import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.bank.DPosRegionMapper;
+import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.bank.DPosRegion;
 import com.ryx.credit.pojo.admin.bank.DPosRegionExample;
+import com.ryx.credit.pojo.admin.order.Organization;
+import com.ryx.credit.pojo.admin.order.OrganizationExample;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.dict.DepartmentService;
 import com.ryx.credit.service.dict.DictOptionsService;
@@ -82,7 +85,8 @@ public class AimportServiceImpl implements AimportService {
     private CapitalMapper capitalMapper;
     @Autowired
     private DPosRegionMapper dPosRegionMapper;
-
+    @Autowired
+    private OrganizationMapper organizationMapper;
 
 
 
@@ -1462,7 +1466,7 @@ public class AimportServiceImpl implements AimportService {
             if(StringUtils.isNotBlank(gongsixingzhi) && !"null".equalsIgnoreCase(gongsixingzhi)) {
                 a.setAgNature(AgNature.getAgNatureMsgString(gongsixingzhi));
             }
-            if(StringUtils.isNotBlank(zuceziben) && !"null".equalsIgnoreCase(zuceziben))
+            if(StringUtils.isNotBlank(zuceziben) && !"null".equalsIgnoreCase(zuceziben) && RegexUtil.checkNum(zuceziben))
                 a.setAgCapital(new BigDecimal(zuceziben));
             if(StringUtils.isNotBlank(yingyezhizhao) && !"null".equalsIgnoreCase(yingyezhizhao))
                 a.setAgBusLic(yingyezhizhao);
@@ -1599,6 +1603,11 @@ public class AimportServiceImpl implements AimportService {
         String  jiejifengdinge = list.size()>25?list.get(25)+"":"";//借记封顶额
         String  jiejichukuanfeilv = list.size()>26?list.get(26)+"":"";//借记出款费率
         String  shifoukaitongs0 = list.size()>27?list.get(27)+"":"";//是否开通s0
+        String  shengqu = list.size()>28?list.get(28)+"":"";//省区
+        String  daqu = list.size()>29?list.get(29)+"":"";//大区
+        String  yewujigou = list.size()>30?list.get(30)+"":"";//业务机构
+        String  chukuanjigou = list.size()>31?list.get(31)+"":"";//出款机构
+        String  credit_rate_floor = list.size()>32?list.get(32)+"":"";//贷记费率下线
 
         ag  = ag.trim();
         busPlatform_num = busPlatform_num.trim();
@@ -1626,52 +1635,7 @@ public class AimportServiceImpl implements AimportService {
             }else if(businfos.size()>1){
                 logger.info(prefix_importBusInfo+"业务码({})数量不唯一,{},{}",busPlatform_num,user,list);
                 return ResultVO.fail("业务码数量不唯一");
-            }else if(businfos.size()<1){
-                    //修补平台号操作
-                    if(StringUtils.isNotBlank(busPlatform)){
-                        List<PlatForm>  platForms = businessPlatformService.queryAblePlatForm();
-                        for (PlatForm platForm : platForms) {
-                            if (platForm.getPlatformName().equals(busPlatform)) {
-                                String platf = platForm.getPlatformNum();
-                                AgentBusInfoExample example_forupdateBusPFN = new AgentBusInfoExample();
-                                example_forupdateBusPFN.or().andStatusEqualTo(Status.STATUS_1.status).andBusPlatformEqualTo(platf);
-                                List<AgentBusInfo> businfos_example_forupdateBusPFN = agentBusInfoMapper.selectByExample(example_forupdateBusPFN);
-                                if(businfos_example_forupdateBusPFN.size()>0){
-                                    agentBusInfo =  businfos_example_forupdateBusPFN.get(0);
-                                }
-                                break;
-                            }
-                        }
-                    }
-                //不是设置平台号
-                if(StringUtils.isBlank(agentBusInfo.getId()))
-                    agentBusInfo.setcTime(new Date());
-                    agentBusInfo.setcUtime(agentBusInfo.getcTime());
-                    agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
-                    agentBusInfo.setCloReviewStatus(AgStatus.Approved.status);
-                    agentBusInfo.setStatus(Status.STATUS_1.status);
-                    agentBusInfo.setVersion(Status.STATUS_1.status);
-                    agentBusInfo.setcUser(user);
-                }
-
-        }else{
-            //业务编号无 根据平台类型进行设置
-            if(StringUtils.isNotBlank(busPlatform)){
-                List<PlatForm>  platForms = businessPlatformService.queryAblePlatForm();
-                for (PlatForm platForm : platForms) {
-                    if (platForm.getPlatformName().equals(busPlatform)) {
-                        String platf = platForm.getPlatformNum();
-                        AgentBusInfoExample example = new AgentBusInfoExample();
-                        example.or().andStatusEqualTo(Status.STATUS_1.status).andBusPlatformEqualTo(platf);
-                        List<AgentBusInfo> businfos = agentBusInfoMapper.selectByExample(example);
-                        if(businfos.size()>0){
-                            agentBusInfo =  businfos.get(0);
-                        }
-                        break;
-                    }
-                }
-            }
-            if(StringUtils.isBlank(agentBusInfo.getId())) {
+            }else{
                 agentBusInfo.setcTime(new Date());
                 agentBusInfo.setcUtime(agentBusInfo.getcTime());
                 agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
@@ -1679,10 +1643,14 @@ public class AimportServiceImpl implements AimportService {
                 agentBusInfo.setStatus(Status.STATUS_1.status);
                 agentBusInfo.setVersion(Status.STATUS_1.status);
                 agentBusInfo.setcUser(user);
+                agentBusInfo.setApproveTime(Calendar.getInstance().getTime());
             }
-       }
+        }else{
+            return ResultVO.fail("业务编码不能为空["+ag+"]");
+        }
         agentBusInfo.setBusNum(busPlatform_num);
         agentBusInfo.setAgentId(agent.getId());
+        agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
         //业务平台类型
         if(StringUtils.isNotBlank(busPlatform)) {
             busPlatform = busPlatform.trim();
@@ -1863,7 +1831,59 @@ public class AimportServiceImpl implements AimportService {
         if(zhongduanshuliangxiaxian!=null && StringUtils.isNotBlank(zhongduanshuliangxiaxian) && !"null".equals(zhongduanshuliangxiaxian) ) {
             agentBusInfo.setTerminalsLower(zhongduanshuliangxiaxian);
         }
+        //省区
+        if(StringUtils.isNotBlank(shengqu) && !"null".equalsIgnoreCase(shengqu)) {
+            COrganization org = departmentService.getByName(shengqu);
+            if(org!=null) {
+                agentBusInfo.setAgDocPro(org == null ? null : org.getId() + "");
+            }else{
+                COrganization org_pro =  departmentService.getByUserName(shengqu);
+                agentBusInfo.setAgDocPro(org_pro == null ? null : org_pro.getId() + "");
+            }
+        }
+        //大区
+        if(StringUtils.isNotBlank(daqu) && !"null".equalsIgnoreCase(daqu)){
+            String region =daqu;
+            if("北方".equals(region)) {
+                region = "北方大区";
+            }
+            if("南方".equals(region)) {
+                region = "南方大区";
+            }
+            if("北京".equals(region)) {
+                region = "北京市场部";
+            }
+            COrganization org = departmentService.getByName(region);
+            if (org != null) {
+                agentBusInfo.setAgDocDistrict(org == null ? null : org.getId() + "");
+            } else {
+                COrganization org_DocDistrict = departmentService.getByUserNameParent(region);
+                agentBusInfo.setAgDocPro(org_DocDistrict == null ? null : org_DocDistrict.getId() + "");
+            }
+        }
+        //业务机构
+        if(yewujigou!=null && StringUtils.isNotBlank(yewujigou) && !"null".equals(yewujigou) ) {
+            OrganizationExample example = new OrganizationExample();
+            example.or().andOrgNameEqualTo(yewujigou).andStatusEqualTo(Status.STATUS_1.status);
+            List<Organization> listOrganization = organizationMapper.selectByExample(example);
+            if(listOrganization.size()>0) {
+                agentBusInfo.setOrganNum(listOrganization.get(0).getOrgId());
+            }
+        }
+        //出款机构
+        if(chukuanjigou!=null && StringUtils.isNotBlank(chukuanjigou) && !"null".equals(chukuanjigou) ) {
+            OrganizationExample example = new OrganizationExample();
+            example.or().andOrgNameEqualTo(yewujigou).andStatusEqualTo(Status.STATUS_1.status);
+            List<Organization> listOrganization = organizationMapper.selectByExample(example);
+            if(listOrganization.size()>0) {
+                agentBusInfo.setFinaceRemitOrgan(listOrganization.get(0).getOrgId());
+            }
 
+        }
+        //贷记费率下限
+        if(credit_rate_floor!=null && StringUtils.isNotBlank(credit_rate_floor) && !"null".equals(credit_rate_floor) ) {
+            agentBusInfo.setCreditRateFloor(credit_rate_floor);
+        }
         if(StringUtils.isNotBlank(agentBusInfo.getId())){
             agentBusInfo.setcUtime(Calendar.getInstance().getTime());
             if(StringUtils.isBlank(agentBusInfo.getBusRiskParent())){
@@ -1908,7 +1928,8 @@ public class AimportServiceImpl implements AimportService {
         String  shifoukaijufenrunfapiao = list.size()>10?list.get(10)+"":"";//是否开具分润发票
         String  kaihudiqu = list.size()>11?list.get(11)+"":"";//开户行地区
         String  kaihuhanghanghao = list.size()>12?list.get(12)+"":"";//开户行行号
-        String  remark = list.size()>13?list.get(13)+"":"";//备注
+        String  shoukuanzhanghuming_shenfz = list.size()>13?list.get(13)+"":"";//收款账户名 身份证
+        String  remark = list.size()>14?list.get(14)+"":"";//备注
 
         try {
             AgentExample agentExample = new AgentExample();
@@ -1985,6 +2006,9 @@ public class AimportServiceImpl implements AimportService {
                 agentColinfo.setCloBankCode(kaihuhanghanghao);
             }else{
                 agentColinfo.setCloBankCode(null);
+            }
+            if(StringUtils.isNotBlank(shoukuanzhanghuming_shenfz) && !"null".equalsIgnoreCase(shoukuanzhanghuming_shenfz)) {
+                agentColinfo.setAgLegalCernum(shoukuanzhanghuming_shenfz);
             }
             agentColinfo.setPayStatus(ColinfoPayStatus.C.code);
 

@@ -28,6 +28,7 @@
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="PLATFORM_TYPE" jdbcType="DECIMAL" property="platformType" />
+    <result column="BUS_ID" jdbcType="VARCHAR" property="busId" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -62,7 +63,7 @@
     ID, TERMINAL_TRANSFER_ID, SN_BEGIN_NUM, SN_END_NUM, PRO_COM, PRO_MODEL, ORIGINAL_ORG_ID,
     ORIGINAL_ORG_NAME, ORIGINAL_BUS_ID, GOAL_ORG_ID, GOAL_ORG_NAME, GOAL_BUS_ID, ADJUST_TIME,
     SN_COUNT, BUTT_JOINT_PERSON, ADJUST_STATUS, REMARK, BATCH_NUM, AGENT_ID, C_TIME,
-    U_TIME, C_USER, U_USER, STATUS, VERSION, PLATFORM_TYPE
+    U_TIME, C_USER, U_USER, STATUS, VERSION, PLATFORM_TYPE, BUS_ID
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -101,7 +102,8 @@
     ADJUST_STATUS, REMARK, BATCH_NUM,
     AGENT_ID, C_TIME, U_TIME,
     C_USER, U_USER, STATUS,
-    VERSION, PLATFORM_TYPE)
+    VERSION, PLATFORM_TYPE, BUS_ID
+    )
     values (#{id,jdbcType=VARCHAR}, #{terminalTransferId,jdbcType=VARCHAR}, #{snBeginNum,jdbcType=VARCHAR},
     #{snEndNum,jdbcType=VARCHAR}, #{proCom,jdbcType=VARCHAR}, #{proModel,jdbcType=VARCHAR},
     #{originalOrgId,jdbcType=VARCHAR}, #{originalOrgName,jdbcType=VARCHAR}, #{originalBusId,jdbcType=VARCHAR},
@@ -110,7 +112,8 @@
     #{adjustStatus,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, #{batchNum,jdbcType=VARCHAR},
     #{agentId,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP},
     #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
-    #{version,jdbcType=DECIMAL}, #{platformType,jdbcType=DECIMAL})
+    #{version,jdbcType=DECIMAL}, #{platformType,jdbcType=DECIMAL}, #{busId,jdbcType=VARCHAR}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetail">
     insert into O_TERMINAL_TRANSFER_DETAIL
@@ -193,6 +196,9 @@
       <if test="platformType != null">
         PLATFORM_TYPE,
       </if>
+      <if test="busId != null">
+        BUS_ID,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -272,6 +278,9 @@
       </if>
       <if test="platformType != null">
         #{platformType,jdbcType=DECIMAL},
+      </if>
+      <if test="busId != null">
+        #{busId,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -359,6 +368,9 @@
       <if test="platformType != null">
         PLATFORM_TYPE = #{platformType,jdbcType=DECIMAL},
       </if>
+      <if test="busId != null">
+        BUS_ID = #{busId,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -388,7 +400,8 @@
     U_USER = #{uUser,jdbcType=VARCHAR},
     STATUS = #{status,jdbcType=DECIMAL},
     VERSION = #{version,jdbcType=DECIMAL},
-    PLATFORM_TYPE = #{platformType,jdbcType=DECIMAL}
+    PLATFORM_TYPE = #{platformType,jdbcType=DECIMAL},
+    BUS_ID = #{busId,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -403,18 +416,19 @@
   </sql>
 
   <select id="exprotTerminalTransferDetails" parameterType="map" resultType="map">
-      select
-      t.*,a.ag_name,u.name as BUTT_JOINT_PERSON_NAME,cu.name as C_USER_NAME,uu.name as U_USER_NAME
-      from o_terminal_transfer_detail t
-      left join a_agent a on t.agent_id = a.id
-      left join c_user u on t.butt_joint_person = u.id
-      left join c_user cu on t.c_user = cu.id
-      left join c_user uu on t.u_user = uu.id
-      <include refid="TerminalTransferListWhere" />
-      order by t.c_time desc
+      <include refid="TerminalTransferListSql" />
   </select>
   <select id="selectTerminalTransferDetailList" parameterType="map" resultType="map">
     <include refid="OracleDialectPrefix" />
+    <include refid="TerminalTransferListSql" />
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectTerminalTransferDetailCount" parameterType="map" resultType="java.lang.Integer">
+    select count(*) from(
+      <include refid="TerminalTransferListSql" />
+    )
+  </select>
+  <sql id="TerminalTransferListSql">
       select
       t.*,a.ag_name,u.name as BUTT_JOINT_PERSON_NAME,cu.name as C_USER_NAME,uu.name as U_USER_NAME
       from o_terminal_transfer_detail t
@@ -422,18 +436,9 @@
       left join c_user u on t.butt_joint_person = u.id
       left join c_user cu on t.c_user = cu.id
       left join c_user uu on t.u_user = uu.id
-      <include refid="TerminalTransferListWhere" />
-      order by t.c_time desc
-    <include refid="OracleDialectSuffix" />
-  </select>
-  <select id="selectTerminalTransferDetailCount" parameterType="map" resultType="java.lang.Integer">
-      select
-      count(*)
-      from o_terminal_transfer_detail t
-      left join a_agent a on t.agent_id = a.id
-    <include refid="TerminalTransferListWhere" />
-  </select>
-  <sql id="TerminalTransferListWhere">
+      left join a_agent_businfo b on t.bus_id = b.id
+      left join C_ORGANIZATION oa on oa.id=b.ag_doc_pro
+      left join C_ORGANIZATION ob on ob.id=b.AG_DOC_DISTRICT
       <where>
           t.status = #{map.status} and a.status = #{map.status}
           <if test="map.terminalTransferId != null">
@@ -466,17 +471,14 @@
           <if test="map.originalOrgName != null">
             and t.original_Org_Name = #{map.originalOrgName}
           </if>
-          <if test="map.orgId!=null and map.orgId!=''">
-            and (a.AG_DOC_PRO = #{map.orgId} or a.AG_DOC_DISTRICT = #{map.orgId})
+          <if test="map.orgCode!=null and map.orgCode!=''">
+            and (oa.CODE like concat(#{map.orgCode},'%') or ob.CODE like concat(#{map.orgCode},'%') )
           </if>
       </where>
+      order by t.c_time desc
   </sql>
 
-  <update id="updateStatusByTerminalTransferId" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetail">
-    update O_TERMINAL_TRANSFER_DETAIL
-    <set>
-        STATUS = 0
-    </set>
-    where TERMINAL_TRANSFER_ID = #{terminalTransferId,jdbcType=VARCHAR}
+  <update id="updateStatusByTerminalTransferId" parameterType="java.lang.String">
+    update O_TERMINAL_TRANSFER_DETAIL set STATUS = 0  where TERMINAL_TRANSFER_ID = #{map.terminalTransferId}
   </update>
 </mapper>

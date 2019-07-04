@@ -361,27 +361,33 @@
 
   <sql id="queryMyTaskField" >
       rt.ID_,rt.NAME_,br.ACTIV_ID, br.BUS_ID, br.BUS_TYPE, to_char(br.C_TIME, 'yyyy-mm-dd hh24:mi:ss') C_TIME,
-      br.C_USER,br.ACTIV_STATUS, br.STATUS,ri.group_id_, br.agent_id,br.agent_name,br.net_in_bus_type, rt.create_time_ as create_time
+      br.C_USER,br.ACTIV_STATUS, br.STATUS,ri.group_id_, br.agent_id,br.agent_name,br.net_in_bus_type, rt.create_time_ as create_time,br.ag_doc_pro,br.ag_doc_district
   </sql>
   <sql id="queryMyTaskSql">
       (select
       <include refid="queryMyTaskField"/>
-      from ACT_RU_TASK rt, A_bus_act_rel br,act_ru_identitylink ri,a_agent a
+      from ACT_RU_TASK rt, A_bus_act_rel br,act_ru_identitylink ri,a_agent a,
+      C_ORGANIZATION oa,C_ORGANIZATION ob
       <where>
         rt.EXECUTION_ID_ = br.activ_id
         and ri.task_id_ = rt.id_
         and br.agent_id = a.id
+        and oa.id=br.ag_doc_pro
+        and ob.id=br.ag_doc_district
         <include refid="queryMyTaskWhere"/>
         and NET_IN_BUS_TYPE is null
       </where>
       UNION
       select
       <include refid="queryMyTaskField"/>
-      from ACT_RU_TASK rt, A_bus_act_rel br,act_ru_identitylink ri,a_agent a
+      from ACT_RU_TASK rt, A_bus_act_rel br,act_ru_identitylink ri,a_agent a,
+      C_ORGANIZATION oa,C_ORGANIZATION ob
       <where>
         rt.EXECUTION_ID_ = br.activ_id
         and ri.task_id_ = rt.id_
         and br.agent_id = a.id
+        and oa.id=br.ag_doc_pro
+        and ob.id=br.ag_doc_district
         <include refid="queryMyTaskWhere"/>
         and NET_IN_BUS_TYPE is not null
         <if test="params.netInUrls != null and params.netInUrls.size>0">
@@ -409,10 +415,17 @@
       and br.c_user = #{params.cUser}
     </if>
     <if test="params.group != null and params.group!='' " >
-      and ri.group_id_ = #{params.group}
+      and (ri.group_id_ = #{params.group}
+      <if test="params.roleNames != null and params.roleNames.size>0 " >
+        or ri.group_id_ in
+        <foreach collection="params.roleNames" separator="," item="roleName" index="index" open="(" close=")">
+            #{roleName}
+        </foreach>
+      </if>
+      )
     </if>
     <if test="params.group == 'city' " >
-      and (br.ag_doc_pro = #{params.orgId} or br.ag_doc_district = #{params.orgId})
+      and (oa.CODE like concat(#{params.orgCode},'%') or ob.CODE like concat(#{params.orgCode},'%') )
     </if>
     <if test="params.busActRelBusType != null and params.busActRelBusType!='' " >
       and br.BUS_TYPE = #{params.busActRelBusType}

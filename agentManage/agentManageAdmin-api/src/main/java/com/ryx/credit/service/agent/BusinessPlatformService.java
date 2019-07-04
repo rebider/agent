@@ -1,6 +1,7 @@
 package com.ryx.credit.service.agent;
 
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -26,7 +27,7 @@ import java.util.Map;
 public interface BusinessPlatformService {
 
     PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,Long userId);
-    PageInfo queryBusinessPlatformListManager(AgentBusInfo agentBusInfo, Agent agent, Page page,Long userId);
+    PageInfo queryBusinessPlatformListManager(AgentBusInfo agentBusInfo, Agent agent, Page page,Long userId,String approveTimeStart,String approveTimeEnd);
 
     AgentResult verifyAgent(String agUniqNum,List<String> agStatusList);
 
@@ -38,9 +39,11 @@ public interface BusinessPlatformService {
 
     void updateBusInfoList(List<AgentBusInfoVo> busInfoVoList)throws Exception;
 
+    void updateBusinfoData(List<AgentBusInfoVo> busInfoVoList) throws Exception;
+
     List<PlatForm> queryAblePlatForm();
 
-    AgentResult saveBusinessPlatform(AgentVo agentVo) throws MessageException;
+    AgentResult saveBusinessPlatform(AgentVo agentVo) throws ProcessException;
 
     /**
      * 导入业务信息
@@ -79,4 +82,8 @@ public interface BusinessPlatformService {
 
     AgentResult selectByAgentApproved(String id);
 
+
+    Boolean selectByBusLoginNumExist(String busLoginNum,String agentId);
+
+    List<AgentBusInfo> selectByAgentId(String agentId);
 }

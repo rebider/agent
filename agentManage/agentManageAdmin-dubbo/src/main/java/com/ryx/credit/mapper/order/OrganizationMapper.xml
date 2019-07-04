@@ -451,7 +451,7 @@
         <where>
             1=1 AND status=1
             <if test="map.orgId!=null and map.orgId!=''"> and ORG_ID=#{map.orgId} </if>
-            <if test="map.orgName!=null and map.orgName!=''"> and ORG_NAME=#{map.orgName}</if>
+            <if test="map.orgName!=null and map.orgName!=''"> and ORG_NAME LIKE CONCAT(CONCAT('%',#{map.orgName}),'%')</if>
             <if test="map.platId!=null and map.platId!=''"> and PLAT_ID LIKE CONCAT(CONCAT('%',#{map.platId}),'%')</if>
         </where>
     </sql>
@@ -472,11 +472,17 @@
     <select id="queryByOrganName" parameterType="map" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />
-        from o_organization org
-        where 1=1 and org.status=1
-        <if test="platId!=null and platId!=''"> and org.plat_id like concat(concat('%',#{platId}),'%') </if>
-        <!--<if test="orgParent!=null and orgParent!=''">and org.org_parent=#{orgParent} </if>-->
-        <!--<if test="orgParent==null">and org.org_parent is null or trim(org.org_parent)='' </if>-->
-        <!--<if test="orgType!=null and orgType!=''">and org.org_type!=#{orgType} </if>-->
+        from o_organization
+        <where>
+            <if test="platId!=null and platId!=''">
+                #{platId,jdbcType=VARCHAR} in (
+                SELECT REGEXP_SUBSTR(o_organization.plat_id, '[^,]+', 1, LEVEL, 'i') AS STR
+                FROM DUAL
+                CONNECT BY LEVEL &lt;=
+                LENGTH(o_organization.plat_id) - LENGTH(REGEXP_REPLACE(o_organization.plat_id, ',', ''))+1
+                ) and o_organization.status=1
+            </if>
+        </where>
+
     </select>
 </mapper>
