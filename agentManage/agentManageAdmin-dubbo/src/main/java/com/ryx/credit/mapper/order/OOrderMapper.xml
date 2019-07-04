@@ -975,11 +975,11 @@
     org.name as AGDOCPPRO,
     cr.amount as xxAmount,
     oso.activity_name,
-
     nvl(d.pay_amount,0) as dd_amt,
     nvl((d.outstanding_amount),0) as ykfr_amt,
     to_char(d.down_payment_date,'YYYY-MM') as down_payment_date,
-    d.down_payment_count,
+    nvl(( case d.pay_method when 'SF1' then d.down_payment_count
+    when 'FRFQ' then d.down_payment_count else 0 end ),0) as down_payment_count,
     d.down_payment,
     nvl(
     (select sum(o_payment_detail.real_pay_amount)
@@ -994,7 +994,8 @@
         else 0
       end
     ),0) as fqdk_amt,
-    d.down_payment_count as frdk_count,
+    nvl(( case d.pay_method when 'SF2' then d.down_payment_count
+    when 'FKFQ' then d.down_payment_count else 0 end ),0) as frdk_count,
     nvl((select sum(o_payment_detail.real_pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.status = 1
@@ -1010,8 +1011,8 @@
     nvl((select max(o_payment_detail.pay_amount) from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.status = 1
     and (o_payment_detail.pay_type='FRFQ' or o_payment_detail.pay_type='DKFQ')
-    ),0) as mqyk_amt
-
+    ),0) as mqyk_amt,
+    o.remark
     from o_order o
     left join a_agent b on o.agent_id = b.id
     left join a_platform c on c.platform_num = o.order_platform
@@ -1114,5 +1115,6 @@
     <result column="pay_user" property="payUser" jdbcType="VARCHAR"/>
     <result column="real_rec_time" property="realRecTime" jdbcType="TIMESTAMP"/>
     <result column="check_date" property="checkDate" jdbcType="TIMESTAMP"/>
+    <result column="remark" property="remark" jdbcType="VARCHAR"/>
   </resultMap>
 </mapper>
