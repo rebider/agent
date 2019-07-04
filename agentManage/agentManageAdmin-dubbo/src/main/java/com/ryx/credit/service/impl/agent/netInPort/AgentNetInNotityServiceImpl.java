@@ -180,8 +180,8 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                     Map<String, Object> reqMap = new HashMap<>();
                     reqMap.put("agentBusInfo",agentBusInfo);
                     reqMap.put("agent",agent);
-                    record = agentPlatFormSynParam(record, agentBusInfo, notifyType);
                     reqMap.put("platForm",platForm);
+                    record = agentPlatFormSynParam(record, agentBusInfo, notifyType);
                     if(PlatformType.whetherPOS(platForm.getPlatformType())){
                         paramMap = agentHttpPosServiceImpl.packageParam(reqMap);
                     }else if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
