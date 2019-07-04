@@ -14,6 +14,7 @@ import com.ryx.internet.dao.OInternetCardMerchMapper;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
+import com.ryx.internet.dao.OInternetRenewDetailMapper;
 import com.ryx.internet.pojo.*;
 import com.ryx.internet.service.InternetCardService;
 import org.apache.commons.lang.time.DateUtils;
@@ -69,7 +70,8 @@ public class InternetCardServiceImpl implements InternetCardService {
     private RedisService redisService;
     @Autowired
     private OInternetCardMerchMapper internetCardMerchMapper;
-
+    @Autowired
+    private OInternetRenewDetailMapper internetRenewDetailMapper;
 
     @Override
     public PageInfo internetCardList(OInternetCard internetCard, Page page){
@@ -218,8 +220,9 @@ public class InternetCardServiceImpl implements InternetCardService {
                         log.error("importInternetCard,导入文件为空,用户id:{},batchNo:{}",userId,batchNo);
                         return;
                     }
-                    OInternetCard oInternetCard = new OInternetCard();
                     for (List<String> string : excelList) {
+                        OInternetCard oInternetCard = new OInternetCard();
+                        String jsonList = "";
                         if(importType.equals(CardImportType.A.getValue())){
                             String issuer = String.valueOf(string.size()>=1?string.get(0):"");//发卡方
                             String InternetCardNum = String.valueOf(string.size()>=2?string.get(1):"");//物联卡号
@@ -231,6 +234,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                             oInternetCard.setInternetCardNum(InternetCardNum.equals("null")?"":InternetCardNum);
                             if(StringUtils.isNotBlank(openAccountTime.equals("null")?"":openAccountTime))
                             oInternetCard.setOpenAccountTime(DateUtils.parseDate(openAccountTime,dateFormat));
+                            jsonList = JsonUtil.objectToJson(oInternetCard);
                         }else if(importType.equals(CardImportType.B.getValue())){
                             String manufacturer = String.valueOf(string.size()>=1?string.get(0):"");//发货方/厂商
                             String deliverTime = String.valueOf(string.size()>=2?string.get(1):"");//发货日期
@@ -248,6 +252,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                             oInternetCard.setSnNum(snNum.equals("null")?"":snNum);
                             oInternetCard.setIccidNum(iccidNum.equals("null")?"":iccidNum);
                             oInternetCard.setConsignee(consignee.equals("null")?"":consignee);
+                            jsonList = JsonUtil.objectToJson(oInternetCard);
                         }else if(importType.equals(CardImportType.C.getValue())){
                             String orderId = String.valueOf(string.size()>=1?string.get(0):"");//订单编号
                             String agentName = String.valueOf(string.size()>=2?string.get(1):"");//代理商名称
@@ -263,6 +268,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                             oInternetCard.setDeliverTime(DateUtils.parseDate(deliverTime,dateFormat));
                             oInternetCard.setBeginSn(beginSn.equals("null")?"":beginSn);
                             oInternetCard.setEndSn(endSn.equals("null")?"":endSn);
+                            jsonList = JsonUtil.objectToJson(oInternetCard);
                         }else if(importType.equals(CardImportType.D.getValue())){
                             String orderId = String.valueOf(string.size()>=1?string.get(0):"");//订单号
                             String agentName = String.valueOf(string.size()>=2?string.get(1):"");//公司名称
@@ -280,6 +286,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                             oInternetCard.setSnCount(snCount.equals("null")?"":snCount);
                             if(StringUtils.isNotBlank(deliverTime)  && !deliverTime.equals("null"))
                             oInternetCard.setDeliverTime(DateUtils.parseDate(deliverTime,dateFormat));
+                            jsonList = JsonUtil.objectToJson(oInternetCard);
                         }else if(importType.equals(CardImportType.E.getValue())){
                             String iccidNum = String.valueOf(string.size()>=1?string.get(0):"");//ICCID
                             String internetCardStatus = String.valueOf(string.size()>=2?string.get(1):"");//物联卡状态
@@ -303,8 +310,15 @@ public class InternetCardServiceImpl implements InternetCardService {
                             oInternetCard.setMerName(merName.equals("null")?"":merName);
                             oInternetCard.setAgentName(agentName.equals("null")?"":agentName);
                             oInternetCard.setStopReason(stopReason.equals("null")?"":stopReason);
+                            jsonList = JsonUtil.objectToJson(oInternetCard);
+                        }else if(importType.equals(CardImportType.F.getValue())){
+                            OInternetRenewDetail oInternetRenewDetail = new OInternetRenewDetail();
+                            String id = String.valueOf(string.size()>=1?string.get(0):"");//ID
+                            String realityAmt = String.valueOf(string.size()>=2?string.get(1):"");//实扣金额
+                            oInternetRenewDetail.setRealityAmt(StringUtils.isBlank(realityAmt)?null:new BigDecimal(realityAmt));
+                            oInternetRenewDetail.setId(id);
+                            jsonList = JsonUtil.objectToJson(oInternetRenewDetail);
                         }
-                        String jsonList = JsonUtil.objectToJson(oInternetCard);
                         OInternetCardImport oInternetCardImport = new OInternetCardImport();
                         oInternetCardImport.setId(idService.genId(TabId.O_INTERNET_CARD_IMPORT));
                         oInternetCardImport.setImportMsg(jsonList);
@@ -352,10 +366,12 @@ public class InternetCardServiceImpl implements InternetCardService {
                 try {
                     log.info("analysisImport处理导入表数据,oInternetCardImport:{}",oInternetCardImport.toString());
                     String importType = oInternetCardImport.getImportType();
-                    OInternetCard internetCard = JsonUtil.jsonToPojo(oInternetCardImport.getImportMsg(), OInternetCard.class);
+
                     if(importType.equals(CardImportType.A.getValue()) || importType.equals(CardImportType.B.getValue()) || importType.equals(CardImportType.E.getValue())){
+                        OInternetCard internetCard = JsonUtil.jsonToPojo(oInternetCardImport.getImportMsg(), OInternetCard.class);
                         disposeInternetCard(oInternetCardImport,internetCard);
                     }else if(importType.equals(CardImportType.C.getValue())){
+                        OInternetCard internetCard = JsonUtil.jsonToPojo(oInternetCardImport.getImportMsg(), OInternetCard.class);
                         if(StringUtils.isBlank(internetCard.getBeginSn()) || StringUtils.isBlank(internetCard.getSnCount())){
                             oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
                             oInternetCardImport.setErrorMsg("缺少iccid开始号段或总数量");
@@ -376,6 +392,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                             disposeInternetCard(oInternetCardImport,internetCard);
                         }
                     }else if(importType.equals(CardImportType.D.getValue())){
+                        OInternetCard internetCard = JsonUtil.jsonToPojo(oInternetCardImport.getImportMsg(), OInternetCard.class);
                         if(StringUtils.isBlank(internetCard.getBeginSn()) || StringUtils.isBlank(internetCard.getSnCount())){
                             oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
                             oInternetCardImport.setErrorMsg("缺少SN开始号段或总数量");
@@ -392,6 +409,27 @@ public class InternetCardServiceImpl implements InternetCardService {
                             continue;
                         }
                         internetCardService.disposeSn(snList,internetCard,oInternetCardImport);
+                    }else if(importType.equals(CardImportType.F.getValue())){
+                        OInternetRenewDetail internetRenewDetail = JsonUtil.jsonToPojo(oInternetCardImport.getImportMsg(), OInternetRenewDetail.class);
+                        if(null==internetRenewDetail.getRealityAmt()){
+                            oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
+                            oInternetCardImport.setErrorMsg("实际付款金额为空");
+                            //更新导入记录
+                            updateInternetCardImport(oInternetCardImport);
+                            continue;
+                        }
+                        Boolean regOperationAmt = RegExpression.regAmount(internetRenewDetail.getRealityAmt());
+                        if(!regOperationAmt){
+                            oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
+                            oInternetCardImport.setErrorMsg("操作金额不正确,保留小数点后两位");
+                            //更新导入记录
+                            updateInternetCardImport(oInternetCardImport);
+                            continue;
+                        }
+                        int i = internetRenewDetailMapper.updateByPrimaryKey(internetRenewDetail);
+                        if(i!=1){
+                            throw new MessageException("更新续费明细失败");
+                        }
                     }
                 } catch (MessageException e) {
                     log.info("analysisImport处理导入表数据,MessageException:{}",e.getLocalizedMessage());

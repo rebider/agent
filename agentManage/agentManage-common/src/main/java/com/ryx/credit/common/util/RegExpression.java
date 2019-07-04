@@ -36,7 +36,7 @@ public class RegExpression {
 	//数字
 	public static final String NUMBER="^[0-9]+$";
 	//金额
-	public static final String Amount="^[0-9]+(.[0-9]{1,2})?$";
+	public static final String Amount = "([1-9]\\d*|0)(\\.\\d{1,2})?";;
 	public static final String one2FourPointAmount="^[0-9]+(.[0-9]{1,4})?$";
 
 	//[\u4E00-\u9FA5]{2,5}(?:·[\u4E00-\u9FA5]{2,5})*
@@ -101,8 +101,9 @@ public class RegExpression {
 		    }
 		}
 		return flag;
-
 	}
+
+
 	//金额校验  大于0的整数或者小数 小数点后1-4位
 	public static Boolean regOne2FourPointAmount(String amount){
 		if(StringUtils.isBlank(amount)){
