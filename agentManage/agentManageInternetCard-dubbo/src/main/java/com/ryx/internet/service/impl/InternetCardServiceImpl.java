@@ -589,9 +589,10 @@ public class InternetCardServiceImpl implements InternetCardService {
             Map<String,Object> reqRenewMap = new HashMap<>();
             reqRenewMap.put("renewStatus",InternetRenewStatus.WXF.getValue());
             reqRenewMap.put("expireTime",DateUtil.getDateAfter(new Date(),-5));
-            int j = internetCardMapper.selectInternetCardStopCount(reqMap);
+            reqRenewMap.put("stop",Status.STATUS_1.status);
+            int j = internetCardMapper.selectInternetCardStopCount(reqRenewMap);
             if(j>0){
-                int updateCount = internetCardMapper.updateInternetCardStop(reqMap);
+                int updateCount = internetCardMapper.updateInternetCardStop(reqRenewMap);
                 log.info("taskDisposeInternetCard到期日减去5天还未续费的,本次更次了数据条数:{}",updateCount);
             }else{
                 log.info("taskDisposeInternetCard到期日减去5天还未续费的,暂无更新数据:{}",i);
