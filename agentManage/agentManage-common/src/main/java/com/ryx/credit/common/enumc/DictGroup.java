@@ -70,14 +70,14 @@ public enum DictGroup {
     QUIT_MARKET_DEADLINE("代理商退出审批选择期限"),
     QUIT_MIGR_PLATFORM("代理商退出手刷迁移平台"),
     CAPITAL_MIARKET("保证金变更市场部审批参数"),
-
-
     POS("POS审批"),
     POS_APR_BUSNISS("POS审批参数"),
     ORDER_RETURN("订单退货业务选择下一级审批人参数"),
     APPROVE_MODE("审批流程图当前节点"),
-
-    ORG_TYPE("机构类型");
+    ORG_TYPE("机构类型"),
+    INTERNET_RENEW("流量卡续费配置"),
+    CARD_AMT("流量卡每张金额"),
+    OFFSET_AMT("轧差每张金额");
 
     public String  msg;
 

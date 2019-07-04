@@ -16,6 +16,11 @@
             <artifactId>agentManage-common</artifactId>
             <version>${agentManage.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.ryx.ry</groupId>
+            <artifactId>agentManageAdmin-api</artifactId>
+            <version>${agentManage.version}</version>
+        </dependency>
         <!-- Mybatis-Plus -->
         <dependency>
             <groupId>com.baomidou</groupId>

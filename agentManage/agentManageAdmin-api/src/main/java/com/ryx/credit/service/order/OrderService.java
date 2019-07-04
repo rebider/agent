@@ -206,9 +206,16 @@ public interface OrderService {
     AgentResult updateProfitTaxAmt(List<OPayment> taxAmtList)throws Exception;
 
     /**
-     * 订单发货的导出
+     * 订单管理导出
      */
-    public List<OrderoutVo> exportOrder(Map map)  ;
+    public List<OrderoutVo> exportOrder(Map map);
+
+    /**
+     * 所有订单导出
+     * @param map
+     * @return
+     */
+    public List<OrderoutVo> exportOrderAll(Map map);
 
     public BigDecimal queryAgentDebt(String agentId);
 

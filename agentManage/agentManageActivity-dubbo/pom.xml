@@ -39,6 +39,11 @@
             <version>${agentManage.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.ryx.ry</groupId>
+            <artifactId>agentManageInternetCard-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>org.activiti</groupId>
             <artifactId>activiti-engine</artifactId>
             <version>5.22.0</version>

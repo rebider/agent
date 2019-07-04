@@ -59,6 +59,15 @@ public class OrderoutVo implements Serializable{
     private String payUser;//打款人
     private String realRecTime;//打款时间
     private String checkDate;//核款日期
+    private String remark;//备注
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
 
     public String getPayUser() {
         return payUser;

@@ -183,7 +183,6 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                     reqMap.put("platForm",platForm);
                     record = agentPlatFormSynParam(record, agentBusInfo, notifyType);
                     if(PlatformType.whetherPOS(platForm.getPlatformType())){
-                        reqMap.put("platForm",platForm);
                         paramMap = agentHttpPosServiceImpl.packageParam(reqMap);
                     }else if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
                         paramMap = agentHttpMposServiceImpl.packageParam(reqMap);

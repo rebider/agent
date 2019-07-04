@@ -1,14 +1,17 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.dao.agent.AgentContractMapper;
+import com.ryx.credit.dao.agent.AssProtoColMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentContractVo;
 import com.ryx.credit.pojo.admin.vo.CapitalVo;
+import com.ryx.credit.service.agent.AgentAssProtocolService;
 import com.ryx.credit.service.agent.AgentContractService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
 import com.ryx.credit.service.dict.DictOptionsService;
@@ -23,6 +26,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -49,6 +53,13 @@ public class AgentContractServiceImpl implements AgentContractService {
 
     @Autowired
     private AgentDataHistoryService agentDataHistoryService;
+
+    @Autowired
+    private AssProtoColMapper assProtoColMapper;
+
+    @Autowired
+    private AgentAssProtocolService agentAssProtocolService;
+
 
     /**
      * 获取合同类型
@@ -176,6 +187,22 @@ public class AgentContractServiceImpl implements AgentContractService {
                     //直接新曾
 
                     AgentContract result = insertAgentContract(agentContractVo, agentContractVo.getContractTableFile(),userId);
+                    if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentContractVo.getAgentAssProtocol())){
+                        AssProtoColRel rel = new AssProtoColRel();
+                        rel.setAgentBusinfoId(result.getId());
+                        rel.setAssProtocolId(agentContractVo.getAgentAssProtocol());
+                        AssProtoCol assProtoCol = assProtoColMapper.selectByPrimaryKey(agentContractVo.getAgentAssProtocol());
+                        if(StringUtils.isNotBlank(agentContractVo.getProtocolRuleValue())){
+                            String ruleReplace = assProtoCol.getProtocolRule().replace("{}", agentContractVo.getProtocolRuleValue());
+                            rel.setProtocolRule(ruleReplace);
+                        }else{
+                            rel.setProtocolRule(assProtoCol.getProtocolRule());
+                        }
+                        rel.setProtocolRuleValue(agentContractVo.getProtocolRuleValue());
+                        if(1!=agentAssProtocolService.addProtocolRel(rel,agent.getcUser())){
+                            throw new ProcessException("合同分管协议添加失败");
+                        }
+                    }
                     logger.info("代理商合同添加:{}{}", "添加代理商合同成功", result.getId());
                 } else {
 
@@ -191,14 +218,61 @@ public class AgentContractServiceImpl implements AgentContractService {
                     db_AgentContract.setStatus(agentContractVo.getStatus());
                     db_AgentContract.setAppendAgree(agentContractVo.getAppendAgree());
                     if (1 != agentContractMapper.updateByPrimaryKeySelective(db_AgentContract)) {
-                        throw new ProcessException("更新收款信息失败");
+                        throw new ProcessException("更新代理商合同失败");
                     }else{
                         //记录历史
                         if(!agentDataHistoryService.saveDataHistory(db_AgentContract,db_AgentContract.getId(), DataHistoryType.CONTRACT.getValue(),userId,db_AgentContract.getVersion()).isOK()){
-                            throw new ProcessException("更新收款信息失败");
+                            throw new ProcessException("更新代理商合同失败");
                         }
                     }
 
+                    //是否已经存在
+                    boolean is_in = false;
+                    //更新分管协议
+                    if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentContractVo.getAgentAssProtocol())){
+                        List<AssProtoCol> assProtoCol_list = agentAssProtocolService.queryProtoColByBusId(db_AgentContract.getId());
+                        for (AssProtoCol assProtoCol : assProtoCol_list) {
+                            if(assProtoCol.getId().equals(agentContractVo.getAgentAssProtocol())){
+                                is_in = true;
+                                break;
+                            }
+                        }
+                        //如果存在就处理下一个业务
+                        if(is_in)continue;
+
+                        List<AssProtoColRel>  rels =agentAssProtocolService.queryProtoColByBusIds(Arrays.asList(db_AgentContract.getId()));
+                        for (AssProtoColRel rel : rels) {
+                            rel.setStatus(Status.STATUS_0.status);
+                            if(1!=agentAssProtocolService.updateAssProtoColRel(rel)){
+                                throw new ProcessException("业务分管协议更新失败");
+                            }
+                        }
+
+                        AssProtoColRel rel = new AssProtoColRel();
+                        rel.setAgentBusinfoId(db_AgentContract.getId());
+                        rel.setAssProtocolId(agentContractVo.getAgentAssProtocol());
+                        AssProtoCol assProtoCol = assProtoColMapper.selectByPrimaryKey(agentContractVo.getAgentAssProtocol());
+                        if(StringUtils.isNotBlank(agentContractVo.getProtocolRuleValue())){
+                            String ruleReplace = assProtoCol.getProtocolRule().replace("{}", agentContractVo.getProtocolRuleValue());
+                            rel.setProtocolRule(ruleReplace);
+                        }else{
+                            rel.setProtocolRule(assProtoCol.getProtocolRule());
+                        }
+                        rel.setProtocolRuleValue(agentContractVo.getProtocolRuleValue());
+                        if(1!=agentAssProtocolService.addProtocolRel(rel,agent.getcUser())){
+                            throw new ProcessException("业务分管协议添加失败");
+                        }
+                        //删除分管协议
+                    }else{
+                        List<AssProtoColRel>  rels =agentAssProtocolService.queryProtoColByBusIds(Arrays.asList(db_AgentContract.getId()));
+                        for (AssProtoColRel rel : rels) {
+                            rel.setStatus(Status.STATUS_0.status);
+                            if(1!=agentAssProtocolService.updateAssProtoColRel(rel)){
+                                throw new ProcessException("业务分管协议更新失败");
+                            }
+                        }
+
+                    }
                     //删除老的附件
                     AttachmentRelExample example = new AttachmentRelExample();
                     example.or().andBusTypeEqualTo(AttachmentRelType.Contract.name()).andSrcIdEqualTo(db_AgentContract.getId()).andStatusEqualTo(Status.STATUS_1.status);
