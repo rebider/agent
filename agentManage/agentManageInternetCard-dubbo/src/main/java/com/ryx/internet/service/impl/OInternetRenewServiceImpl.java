@@ -288,7 +288,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
      * 处理任务
      * @return
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception {
         try {
@@ -338,11 +338,6 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             log.info("审批任务结束{}{}，未找到审批中的审批和数据关系", proIns, agStatus);
             throw new MessageException("查询关系表失败");
         }
-        busActRel.setActivStatus(AgStatus.getAgStatusString(agStatus));
-        int z = busActRelService.updateByPrimaryKey(busActRel);
-        if(z!=1) {
-            throw new MessageException("物联网卡更新关系表失败");
-        }
         OInternetRenew oInternetRenew = internetRenewMapper.selectByPrimaryKey(busActRel.getBusId());
         if(oInternetRenew==null){
             throw new MessageException("查询续费记录失败");
@@ -355,7 +350,39 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         if(i!=1){
             throw new MessageException("更新续费记录失败");
         }
-
+        OInternetRenewDetailExample oInternetRenewDetailExample = new OInternetRenewDetailExample();
+        OInternetRenewDetailExample.Criteria criteria = oInternetRenewDetailExample.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andRenewIdEqualTo(oInternetRenew.getId());
+        List<OInternetRenewDetail> oInternetRenewDetails = internetRenewDetailMapper.selectByExample(oInternetRenewDetailExample);
+        for (OInternetRenewDetail oInternetRenewDetail : oInternetRenewDetails) {
+            OInternetCard oInternetCard = new OInternetCard();
+            oInternetCard.setIccidNum(oInternetRenewDetail.getIccidNum());
+            //拒绝全部失效
+            if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
+                oInternetRenewDetail.setRenewStatus(InternetRenewStatus.SX.getValue());
+                oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
+            }
+            if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
+                //如果线下补款,审批通过直接已付款,否则部分付款
+                if(oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.XXBK.getValue())){
+                    oInternetRenewDetail.setRenewStatus(InternetRenewStatus.YXF.getValue());
+                    oInternetCard.setRenewStatus(InternetRenewStatus.YXF.getValue());
+                }else{
+                    oInternetRenewDetail.setRenewStatus(InternetRenewStatus.BFXF.getValue());
+                    oInternetCard.setRenewStatus(InternetRenewStatus.BFXF.getValue());
+                }
+            }
+            int j = internetRenewDetailMapper.updateByPrimaryKeySelective(oInternetRenewDetail);
+            if(j!=1){
+                throw new MessageException("更新续费明细失败");
+            }
+            oInternetCard.setuTime(new Date());
+            int k = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
+            if(k!=1){
+                throw new MessageException("更新物联网卡信息失败");
+            }
+        }
 
         AgentResult agentResult = AgentResult.fail();
         if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
@@ -365,7 +392,12 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             agentResult = cashReceivablesService.finishProcing(CashPayType.INTERNETRENEW,busActRel.getBusId(),busActRel.getcUser());
         }
         if(!agentResult.isOK()){
-            throw new ProcessException("更新打款记录失败");
+            throw new MessageException("更新打款记录失败");
+        }
+        busActRel.setActivStatus(AgStatus.getAgStatusString(agStatus));
+        int z = busActRelService.updateByPrimaryKey(busActRel);
+        if(z!=1) {
+            throw new MessageException("物联网卡更新关系表失败");
         }
 
         return AgentResult.ok();
