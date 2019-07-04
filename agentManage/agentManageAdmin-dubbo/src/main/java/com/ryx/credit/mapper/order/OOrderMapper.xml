@@ -1014,7 +1014,7 @@
     ),0) as mqyk_amt,
     o.remark
     from o_order o
-    left join a_agent b on o.agent_id = b.id
+    left join a_agent b on o.agent_id = b.id and b.status=1
     left join a_platform c on c.platform_num = o.order_platform
     left join o_payment d on d.order_id = o.id
     left join o_cash_receivables cr on d.id = cr.src_id and cr.cashpay_type='PAYMENT' and cr.status=1
