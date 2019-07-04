@@ -204,7 +204,7 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
         if(EnvironmentUtil.isProduction()){
             result = HttpPostUtil.postForJSON(LIVENESS_DETECTION_URL, paramsJson);
         }else{
-            result = "{'ExecMsg':'认证成功','ValidateStatus':'00'}";
+            result = "{'ResultMsg':'认证成功','Result':'00'}";
         }
         log.info("--------三要素认证返回参数:{}------", result);
         Map resultMap = JsonUtils.parseJSON2Map(result);
