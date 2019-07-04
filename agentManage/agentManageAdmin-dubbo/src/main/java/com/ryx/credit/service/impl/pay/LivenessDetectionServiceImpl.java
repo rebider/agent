@@ -164,7 +164,7 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
         map.put("CertNo", certNo);
         map.put("ReturnPic", "1");
         String paramsJson = JSONObject.toJSONString(map);
-        log.info("--------身份证认证请求参数:{}------",paramsJson);
+        log.info("--------身份证认证,url:{}请求参数:{}------",LIVENESS_DETECTION_URL,paramsJson);
         String result = "";
         if(EnvironmentUtil.isProduction()){
             result = HttpPostUtil.postForJSON(LIVENESS_DETECTION_URL, paramsJson);
@@ -199,13 +199,13 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
         map.put("StartTime", DateKit.getCompactTimeString(now));
         map.put("isDirect", "0");
         String paramsJson = JSONObject.toJSONString(map);
-        log.info("--------三要素认证请求参数:{}------",paramsJson);
+        log.info("--------三要素认证,url:{}请求参数:{}------",LIVENESS_DETECTION_URL,paramsJson);
         String result = "";
-//        if(EnvironmentUtil.isProduction()){
+        if(EnvironmentUtil.isProduction()){
             result = HttpPostUtil.postForJSON(LIVENESS_DETECTION_URL, paramsJson);
-//        }else{
-//            result = "{'ExecMsg':'认证成功','ValidateStatus':'00'}";
-//        }
+        }else{
+            result = "{'ExecMsg':'认证成功','ValidateStatus':'00'}";
+        }
         log.info("--------三要素认证返回参数:{}------", result);
         Map resultMap = JsonUtils.parseJSON2Map(result);
         return resultMap;
