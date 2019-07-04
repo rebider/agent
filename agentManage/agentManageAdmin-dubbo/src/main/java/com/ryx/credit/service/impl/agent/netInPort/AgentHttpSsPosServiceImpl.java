@@ -139,11 +139,15 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
         AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
         if(agentColinfo==null){
             log.info("收款账户为空:{},{}",agent.getId(), agentBusInfo.getId());
+        }else{
+            agentColinfo=new AgentColinfo();
         }
         //机构信息
         Organization organization = organizationMapper.selectByPrimaryKey(agentBusInfo.getOrganNum());
         if(organization==null){
             log.info("机构信息为空:{},{}",agent.getId(), agentBusInfo.getId());
+        }else{
+            organization=new Organization();
         }
         //组装参数
         resultMap.put("brandName",platForm.getPlatformName());//平台名称
@@ -452,8 +456,5 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
         return httpRequestNetIn(paramMap);
     }
 
-    @Override
-    public AgentResult queryTermCount(String agencyId) throws Exception {
-        return null;
-    }
+
 }

@@ -6,6 +6,7 @@ import com.ryx.credit.service.agent.AgentNotifyService;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.order.OLogisticsService;
+import com.ryx.credit.service.pay.LivenessDetectionService;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,5 +58,13 @@ public class AgentServiceTest extends BaseSpringTest  {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    @Autowired
+    private LivenessDetectionService livenessDetectionService;
+
+    @Test
+    public void testThree(){
+        livenessDetectionService.threeElementsCertificationDetection("陈肖翔","410223198801194051","123","6225980167399568");
     }
 }

@@ -84,6 +84,7 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
                 record.setNotifyJson("resultMap is null");
             }
         } catch (Exception e) {
+            e.printStackTrace();
             log.info("身份认证异常:{}",e.getMessage());
             record.setNotifyJson(e.getMessage());
         }
@@ -92,6 +93,64 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
     }
 
 
+    @Override
+    public AgentResult threeElementsCertificationDetection(String trueName, String certNo, String userId,String bankNo) {
+        AgentResult result = new AgentResult(500,"参数错误","");
+        if(StringUtils.isBlank(trueName)){
+            return result;
+        }
+        if(StringUtils.isBlank(certNo)){
+            return result;
+        }
+        if(StringUtils.isBlank(userId)){
+            return result;
+        }
+        if(StringUtils.isBlank(bankNo)){
+            return result;
+        }
+        AgentPlatFormSyn record = new AgentPlatFormSyn();
+        record.setId(idService.genId(TabId.a_agent_platformsyn));
+        record.setNotifyTime(new Date());
+        record.setVersion(Status.STATUS_1.status);
+        record.setcTime(new Date());
+        record.setNotifyStatus(Status.STATUS_0.status);
+        record.setNotifyCount(new BigDecimal(1));
+        record.setNotifyType(NotifyType.ThreeElements.getValue());
+        try {
+            record.setcUser(userId);
+            record.setSendJson("trueName:"+trueName+",certNo:"+certNo+",bankNo:"+bankNo);
+            Map<String, Object> resultMap = threeElementsCertification(record.getId(),trueName, certNo,bankNo);
+            if(null!=resultMap){
+                record.setNotifyJson(resultMap.toString());
+                result.setMsg(String.valueOf(resultMap.get("ResultMsg")));
+                String validateStatus = String.valueOf(resultMap.get("Result"));
+                if(validateStatus.equals("00")){
+                    record.setNotifyStatus(Status.STATUS_1.status);
+                    record.setSuccesTime(new Date());
+                    result.setStatus(200);
+                }else{
+                    result.setStatus(400);
+                }
+            }else{
+                record.setNotifyJson("resultMap is null");
+            }
+        } catch (Exception e) {
+            log.info("身份认证异常:{}",e.getMessage());
+            e.printStackTrace();
+            record.setNotifyJson(e.getMessage());
+        }
+        agentPlatFormSynMapper.insertSelective(record);
+        return result;
+    }
+
+    /**
+     * 身份认证
+     * @param serialNo
+     * @param trueName
+     * @param certNo
+     * @return
+     * @throws Exception
+     */
     private Map<String, Object> requestForLiveness(String serialNo,String trueName,String certNo)throws Exception{
         Map<String, Object> map = new HashMap<>();
         map.put("Transcode", "000020");
@@ -113,6 +172,41 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
             result = "{'ExecMsg':'认证成功','ValidateStatus':'00'}";
         }
         log.info("--------身份证认证返回参数:{}------", result);
+        Map resultMap = JsonUtils.parseJSON2Map(result);
+        return resultMap;
+    }
+
+
+    /**
+     * 三要素认证
+     * @param serialNo
+     * @param trueName
+     * @param certNo
+     * @return
+     * @throws Exception
+     */
+    private Map<String, Object> threeElementsCertification(String serialNo,String trueName,String certNo,String bankNo)throws Exception{
+        Map<String, Object> map = new HashMap<>();
+        map.put("Transcode", "000010");
+        map.put("SytermId", LIVENESS_DETECTION_SYTERMID);
+        map.put("Serial", serialNo);
+        map.put("BankNo", bankNo);
+        map.put("UserName", trueName);
+        map.put("IdentityType", "ZR01");
+        map.put("IdentityId", certNo);
+        Date now = DateKit.getNow(true);
+        map.put("StartDate", DateKit.getCompactDateString(now));
+        map.put("StartTime", DateKit.getCompactTimeString(now));
+        map.put("isDirect", "0");
+        String paramsJson = JSONObject.toJSONString(map);
+        log.info("--------三要素认证请求参数:{}------",paramsJson);
+        String result = "";
+//        if(EnvironmentUtil.isProduction()){
+            result = HttpPostUtil.postForJSON(LIVENESS_DETECTION_URL, paramsJson);
+//        }else{
+//            result = "{'ExecMsg':'认证成功','ValidateStatus':'00'}";
+//        }
+        log.info("--------三要素认证返回参数:{}------", result);
         Map resultMap = JsonUtils.parseJSON2Map(result);
         return resultMap;
     }
