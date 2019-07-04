@@ -61,55 +61,61 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
     @Override
     public Map<String, Object> packageParam(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
-        AgentBusInfo agentBusInfo = (AgentBusInfo)param.get("agentBusInfo");
-        Agent agent = (Agent)param.get("agent");
-        AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
+        try {
+            AgentBusInfo agentBusInfo = (AgentBusInfo)param.get("agentBusInfo");
+            Agent agent = (Agent)param.get("agent");
+            AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
 
-        resultMap.put("mobileNo",agentBusInfo.getBusLoginNum());
-        resultMap.put("branchid",agentBusInfo.getBusPlatform());
-        resultMap.put("direct",direct(agentBusInfo.getBusType()));
-        resultMap.put("cardno",agentColinfo.getCloBankAccount());
-        resultMap.put("termCount",agentBusInfo.getTerminalsLower());
-        resultMap.put("bankbranchid",agentColinfo.getBranchLineNum());
-        resultMap.put("bankbranchname",agentColinfo.getCloBankBranch());
-        String accountType = "";
-        String customerPid = ""; //身份证
-        String userName = "";  //法人姓名
-        if( agentColinfo.getCloType().compareTo(BigDecimal.ONE) == 0){ //对公
-            accountType = "01";
-            customerPid = agent.getAgLegalCernum();
-            userName = agent.getAgLegal();
-        }else{
-            accountType = "00";
-            customerPid = agentColinfo.getAgLegalCernum();
-            userName = agentColinfo.getCloRealname();
-        }
-        resultMap.put("accountType",accountType);
-        resultMap.put("customerType",accountType);
-        resultMap.put("customerPid",customerPid);
-        resultMap.put("userName",userName);
-        resultMap.put("address",agent.getAgRegAdd());
-        resultMap.put("companyNo",agent.getAgBusLic());
-        resultMap.put("agencyName",agent.getAgName());
-        if(StringUtils.isNotBlank(agentBusInfo.getBusParent())){
-            //取出上级业务
-            AgentBusInfo agentParent = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
-            if(null!=agentParent){
-                resultMap.put("parentAgencyId",agentParent.getBusNum());
+            resultMap.put("mobileNo",agentBusInfo.getBusLoginNum());
+            resultMap.put("branchid",agentBusInfo.getBusPlatform());
+            resultMap.put("direct",direct(agentBusInfo.getBusType()));
+            resultMap.put("cardno",agentColinfo.getCloBankAccount());
+            resultMap.put("termCount",agentBusInfo.getTerminalsLower());
+            resultMap.put("bankbranchid",agentColinfo.getBranchLineNum());
+            resultMap.put("bankbranchname",agentColinfo.getCloBankBranch());
+            String accountType = "";
+            String customerPid = ""; //身份证
+            String userName = "";  //法人姓名
+            if( agentColinfo.getCloType().compareTo(BigDecimal.ONE) == 0){ //对公
+                accountType = "01";
+                customerPid = agent.getAgLegalCernum();
+                userName = agent.getAgLegal();
             }else{
-                resultMap.put("parentAgencyId","");
+                accountType = "00";
+                customerPid = agentColinfo.getAgLegalCernum();
+                userName = agentColinfo.getCloRealname();
             }
+            resultMap.put("accountType",accountType);
+            resultMap.put("customerType",accountType);
+            resultMap.put("customerPid",customerPid);
+            resultMap.put("userName",userName);
+            resultMap.put("address",agent.getAgRegAdd());
+            resultMap.put("companyNo",agent.getAgBusLic());
+            resultMap.put("agencyName",agent.getAgName());
+            if(StringUtils.isNotBlank(agentBusInfo.getBusParent())){
+                //取出上级业务
+                AgentBusInfo agentParent = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
+                if(null!=agentParent){
+                    resultMap.put("parentAgencyId",agentParent.getBusNum());
+                }else{
+                    resultMap.put("parentAgencyId","");
+                }
+            }
+            resultMap.put("agCode",agent.getId());
+            resultMap.put("directLabel",directLabel(agentBusInfo.getBusType()));
+            Region region = regionMapper.findByRcode(agentColinfo.getBankRegion());
+            resultMap.put("code",String.valueOf(region.gettType()));
+            resultMap.put("cityid",agentColinfo.getBankRegion());
+            resultMap.put("bankcity",region.getrName());
+            resultMap.put("bankname",agentColinfo.getCloBank());
+            BankLineNums bankLineNums = bankLineNumsMapper.selectByBankName(agentColinfo.getCloBank());
+            resultMap.put("bankid",bankLineNums.getBankid());
+            resultMap.put("cardName",agentColinfo.getCloRealname());
+        } catch (Exception e) {
+            log.info("入网组装参数为空，"+e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
-        resultMap.put("agCode",agent.getId());
-        resultMap.put("directLabel",directLabel(agentBusInfo.getBusType()));
-        Region region = regionMapper.findByRcode(agentColinfo.getBankRegion());
-        resultMap.put("code",String.valueOf(region.gettType()));
-        resultMap.put("cityid",agentColinfo.getBankRegion());
-        resultMap.put("bankcity",region.getrName());
-        resultMap.put("bankname",agentColinfo.getCloBank());
-        BankLineNums bankLineNums = bankLineNumsMapper.selectByBankName(agentColinfo.getCloBank());
-        resultMap.put("bankid",bankLineNums.getBankid());
-        resultMap.put("cardName",agentColinfo.getCloRealname());
         return resultMap;
     }
 
