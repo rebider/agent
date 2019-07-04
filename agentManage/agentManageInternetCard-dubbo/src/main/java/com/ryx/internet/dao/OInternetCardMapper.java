@@ -41,4 +41,10 @@ public interface OInternetCardMapper {
 
     int updateByPrimaryKeySelectiveNotNull(OInternetCard record);
 
+
+    int selectInternetCardStopCount(@Param("map")Map<String,Object> map);
+
+
+    int updateInternetCardStop(@Param("map")Map<String,Object> map);
+
 }

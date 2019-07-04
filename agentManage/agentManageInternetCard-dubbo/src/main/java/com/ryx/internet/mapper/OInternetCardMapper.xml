@@ -552,4 +552,22 @@
     </set>
     where ICCID_NUM = #{iccidNum,jdbcType=VARCHAR}
   </update>
+
+  <select id="selectInternetCardStopCount" parameterType="map" resultType="java.lang.Integer">
+    select count(*) from o_internet_Card c
+    <include refid="internetCardStopSql" />
+  </select>
+
+  <update id="updateInternetCardStop" parameterType="map" >
+    update o_internet_Card c set c.u_time = sysdate, c.renew = #{map.newRenew}
+    <include refid="internetCardStopSql" />
+  </update>
+
+  <sql id="internetCardStopSql" >
+    <where>
+      c.renew_Status = #{map.renew,jdbcType=VARCHAR}
+      and TO_CHAR(c.expire_time, 'YYYY-MM') &lt;= #{map.expireTime}
+      and c.status = 1
+    </where>
+  </sql>
 </mapper>

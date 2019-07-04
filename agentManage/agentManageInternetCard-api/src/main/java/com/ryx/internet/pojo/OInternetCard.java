@@ -69,6 +69,46 @@ public class OInternetCard implements Serializable{
 
     private String iccidNumId;
 
+    private String openAccountTimeBeginStr;
+
+    private String openAccountTimeEndStr;
+
+    private String expireTimeBeginStr;
+
+    private String expireTimeEndStr;
+
+
+    public String getOpenAccountTimeBeginStr() {
+        return openAccountTimeBeginStr;
+    }
+
+    public void setOpenAccountTimeBeginStr(String openAccountTimeBeginStr) {
+        this.openAccountTimeBeginStr = openAccountTimeBeginStr;
+    }
+
+    public String getOpenAccountTimeEndStr() {
+        return openAccountTimeEndStr;
+    }
+
+    public void setOpenAccountTimeEndStr(String openAccountTimeEndStr) {
+        this.openAccountTimeEndStr = openAccountTimeEndStr;
+    }
+
+    public String getExpireTimeBeginStr() {
+        return expireTimeBeginStr;
+    }
+
+    public void setExpireTimeBeginStr(String expireTimeBeginStr) {
+        this.expireTimeBeginStr = expireTimeBeginStr;
+    }
+
+    public String getExpireTimeEndStr() {
+        return expireTimeEndStr;
+    }
+
+    public void setExpireTimeEndStr(String expireTimeEndStr) {
+        this.expireTimeEndStr = expireTimeEndStr;
+    }
 
     public String getIccidNumId() {
         return iccidNumId;

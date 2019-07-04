@@ -141,7 +141,28 @@ public class InternetCardServiceImpl implements InternetCardService {
         if(StringUtils.isNotBlank(internetCard.getOrderId())){
             criteria.andOrderIdEqualTo(internetCard.getOrderId());
         }
-
+        if(null!=internetCard.getStop()){
+            criteria.andStopEqualTo(internetCard.getStop());
+        }
+        if(StringUtils.isNotBlank(internetCard.getRenewStatus())){
+            criteria.andRenewStatusEqualTo(internetCard.getRenewStatus());
+        }
+        if(StringUtils.isNotBlank(internetCard.getOpenAccountTimeBeginStr())){
+            Date format = DateUtil.format(internetCard.getOpenAccountTimeBeginStr(), DateUtil.DATE_FORMAT_yyyy_MM_dd);
+            criteria.andOpenAccountTimeGreaterThanOrEqualTo(format);
+        }
+        if(StringUtils.isNotBlank(internetCard.getOpenAccountTimeEndStr())){
+            Date format = DateUtil.format(internetCard.getOpenAccountTimeEndStr(), DateUtil.DATE_FORMAT_yyyy_MM_dd);
+            criteria.andOpenAccountTimeLessThanOrEqualTo(format);
+        }
+        if(StringUtils.isNotBlank(internetCard.getExpireTimeBeginStr())){
+            Date format = DateUtil.format(internetCard.getExpireTimeBeginStr(), DateUtil.DATE_FORMAT_yyyy_MM_dd);
+            criteria.andExpireTimeGreaterThanOrEqualTo(format);
+        }
+        if(StringUtils.isNotBlank(internetCard.getExpireTimeEndStr())){
+            Date format = DateUtil.format(internetCard.getExpireTimeEndStr(), DateUtil.DATE_FORMAT_yyyy_MM_dd);
+            criteria.andExpireTimeLessThanOrEqualTo(format);
+        }
         oInternetCardExample.setOrderByClause(" c_time desc ");
 
         return oInternetCardExample;
@@ -538,10 +559,12 @@ public class InternetCardServiceImpl implements InternetCardService {
 
     /**
      * 定时任务，
-     * 1. 检测是否续费为否，状态为正常的，当月的，更新是否续费为是
-     * 2. 处理未处理的导入记录
+     * 1. 检测是否续费为否，状态为正常的，当月的，更新“是否需续费”为是
+     * 2. 到期日减去5天  还未续费的 更新“是否需关停”为是
+     * 3. 处理未处理的导入记录
      */
-    @Override
+//    @Override
+    @Autowired
     public void taskDisposeInternetCard(){
         log.info("taskDisposeInternetCard定时任务,开始执行");
         String retIdentifier = "";
@@ -550,10 +573,10 @@ public class InternetCardServiceImpl implements InternetCardService {
             if (StringUtils.isBlank(retIdentifier)) {
                 log.info("物联网卡定时任务处理中");
             }
+           // 1. 检测是否续费为否，状态为正常的，当月的，更新“是否需续费”为是
             Map<String,Object> reqMap = new HashMap<>();
             reqMap.put("renew",Status.STATUS_0.status);//否
             reqMap.put("newRenew",Status.STATUS_1.status);
-//            reqMap.put("internetCardStatus",InternetCardStatus.NORMAL.getValue());
             reqMap.put("expireTime",DateUtil.getPerFirstDayOfMonth());
             int i = internetCardMapper.selectInternetCardExpireCount(reqMap);
             if(i>0){
@@ -562,6 +585,19 @@ public class InternetCardServiceImpl implements InternetCardService {
             }else{
                 log.info("taskDisposeInternetCard检测是否续费,暂无更新数据:{}",i);
             }
+            //2. 到期日减去5天  还未续费的 更新“是否需关停”为是
+            Map<String,Object> reqRenewMap = new HashMap<>();
+            reqRenewMap.put("renewStatus",InternetRenewStatus.WXF.getValue());
+            reqRenewMap.put("expireTime",DateUtil.getDateAfter(new Date(),-5));
+            int j = internetCardMapper.selectInternetCardStopCount(reqMap);
+            if(j>0){
+                int updateCount = internetCardMapper.updateInternetCardStop(reqMap);
+                log.info("taskDisposeInternetCard到期日减去5天还未续费的,本次更次了数据条数:{}",updateCount);
+            }else{
+                log.info("taskDisposeInternetCard到期日减去5天还未续费的,暂无更新数据:{}",i);
+            }
+
+            //3.处理未处理的导入记录
             Map map = new HashMap<>();
             map.put("importStatus",OInternetCardImportStatus.UNTREATED.getValue());
             Page page = new Page(0, 10);
