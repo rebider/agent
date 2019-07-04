@@ -3108,6 +3108,11 @@ public class OrderServiceImpl implements OrderService {
         return AgentResult.ok("批量更新成功");
     }
 
+    /**
+     * 订单管理导出
+     * @param map
+     * @return
+     */
     @Override
     public List<OrderoutVo> exportOrder(Map map) {
         if(null != map.get("userId")) {
@@ -3122,6 +3127,7 @@ public class OrderServiceImpl implements OrderService {
             List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
             map.put("platfromPerm", platfromPerm);
         }
+
         List<OrderoutVo> orderoutList = orderMapper.excelOrder(map);
         List<Dict> dictList = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.SETTLEMENT_TYPE.name());
         List<Dict> capitalType = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.CAPITAL_TYPE.name());
@@ -3153,6 +3159,62 @@ public class OrderServiceImpl implements OrderService {
                     CUser cUser = iUserService.selectById(orderoutVo.getNuclearUser());
                     if(null!=cUser)
                     orderoutVo.setNuclearUser(cUser.getName());
+                }
+                if (StringUtils.isNotBlank(orderoutVo.getReviewStatus()) && !orderoutVo.getReviewStatus().equals("null")) {
+                    String agStatusByValue = AgStatus.getMsg(new BigDecimal(orderoutVo.getReviewStatus()));
+                    if (null != agStatusByValue) {
+                        orderoutVo.setReviewStatus(agStatusByValue);
+                    }
+                }
+            }
+        }
+        return orderoutList;
+    }
+
+    /**
+     * 所有订单导出
+     * @param map
+     * @return
+     */
+    @Override
+    public List<OrderoutVo> exportOrderAll(Map map) {
+        if(null != map.get("userId")) {
+            Long userId = (Long) map.get("userId");
+            List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+            map.put("platfromPerm", platfromPerm);
+        }
+
+        List<OrderoutVo> orderoutList = orderMapper.excelOrder(map);
+        List<Dict> dictList = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.SETTLEMENT_TYPE.name());
+        List<Dict> capitalType = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.CAPITAL_TYPE.name());
+
+        if (null!=orderoutList  && orderoutList.size()>0){
+            for (OrderoutVo orderoutVo : orderoutList) {
+                if (StringUtils.isNotBlank(orderoutVo.getPayMethod()) && !orderoutVo.getPayMethod().equals("null")) {
+                    for (Dict dict : dictList) {
+                        if (null!=dict  &&  orderoutVo.getPayMethod().equals(dict.getdItemvalue())){
+                            orderoutVo.setPayMethod(dict.getdItemname());
+                            break;
+                        }
+                    }
+                }
+                if (StringUtils.isNotBlank(orderoutVo.getDeductionType()) && !orderoutVo.getDeductionType().equals("null")){
+                    for (Dict dict : capitalType) {
+                        if (null!=dict  &&  orderoutVo.getDeductionType().equals(dict.getdItemvalue())){
+                            orderoutVo.setDeductionType(dict.getdItemname());
+                            BigDecimal deductionAmount=new BigDecimal(0);
+                            if (null!=orderoutVo.getDeductionAmount()){
+                                deductionAmount= orderoutVo.getDeductionAmount();
+                            }
+                            orderoutVo.setAmount(orderoutVo.getDeductionType()+":"+orderoutVo.getDeductionAmount());
+                            break;
+                        }
+                    }
+                }
+                if(StringUtils.isNotBlank(orderoutVo.getNuclearUser())){
+                    CUser cUser = iUserService.selectById(orderoutVo.getNuclearUser());
+                    if(null!=cUser)
+                        orderoutVo.setNuclearUser(cUser.getName());
                 }
                 if (StringUtils.isNotBlank(orderoutVo.getReviewStatus()) && !orderoutVo.getReviewStatus().equals("null")) {
                     String agStatusByValue = AgStatus.getMsg(new BigDecimal(orderoutVo.getReviewStatus()));
