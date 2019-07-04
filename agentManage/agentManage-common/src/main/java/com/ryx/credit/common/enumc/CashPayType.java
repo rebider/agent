@@ -12,7 +12,8 @@ public enum CashPayType {
     REFUNDPRICEDIFF("REFUNDPRICEDIFF","补差价"),
     AGENTMERGE("AGENTMERGE","代理商合并"),
     AGENTQUIT("AGENTQUIT","代理商退出"),
-    CAPITALCHANGE("CAPITALCHANGE","保证金变更申请");
+    CAPITALCHANGE("CAPITALCHANGE","保证金变更申请"),
+    INTERNETRENEW("INTERNETRENEW","物联网网卡续费申请");
 
 
     public String code;

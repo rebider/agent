@@ -55,11 +55,92 @@ public class OInternetCard implements Serializable{
 
     private BigDecimal version;
 
+    private BigDecimal stop;
+
+    private String renewStatus;
+
+    private String stopReason;
+
     private String snCount;
 
     private String beginSn;
 
     private String endSn;
+
+    private String iccidNumId;
+
+    private String openAccountTimeBeginStr;
+
+    private String openAccountTimeEndStr;
+
+    private String expireTimeBeginStr;
+
+    private String expireTimeEndStr;
+
+
+    public String getOpenAccountTimeBeginStr() {
+        return openAccountTimeBeginStr;
+    }
+
+    public void setOpenAccountTimeBeginStr(String openAccountTimeBeginStr) {
+        this.openAccountTimeBeginStr = openAccountTimeBeginStr;
+    }
+
+    public String getOpenAccountTimeEndStr() {
+        return openAccountTimeEndStr;
+    }
+
+    public void setOpenAccountTimeEndStr(String openAccountTimeEndStr) {
+        this.openAccountTimeEndStr = openAccountTimeEndStr;
+    }
+
+    public String getExpireTimeBeginStr() {
+        return expireTimeBeginStr;
+    }
+
+    public void setExpireTimeBeginStr(String expireTimeBeginStr) {
+        this.expireTimeBeginStr = expireTimeBeginStr;
+    }
+
+    public String getExpireTimeEndStr() {
+        return expireTimeEndStr;
+    }
+
+    public void setExpireTimeEndStr(String expireTimeEndStr) {
+        this.expireTimeEndStr = expireTimeEndStr;
+    }
+
+    public String getIccidNumId() {
+        return iccidNumId;
+    }
+
+    public void setIccidNumId(String iccidNumId) {
+        this.iccidNumId = iccidNumId;
+    }
+
+    public BigDecimal getStop() {
+        return stop;
+    }
+
+    public void setStop(BigDecimal stop) {
+        this.stop = stop;
+    }
+
+    public String getRenewStatus() {
+        return renewStatus;
+    }
+
+    public void setRenewStatus(String renewStatus) {
+        this.renewStatus = renewStatus;
+    }
+
+    public String getStopReason() {
+        return stopReason;
+    }
+
+    public void setStopReason(String stopReason) {
+        this.stopReason = stopReason;
+    }
 
     public String getBeginSn() {
         return beginSn;
