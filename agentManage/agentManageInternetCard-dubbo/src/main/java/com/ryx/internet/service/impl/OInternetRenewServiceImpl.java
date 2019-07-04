@@ -100,7 +100,32 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     public PageInfo internetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page){
 
         OInternetRenewDetailExample internetRenewDetailExample = new OInternetRenewDetailExample();
+        OInternetRenewDetailExample.Criteria criteria = internetRenewDetailExample.createCriteria();
         internetRenewDetailExample.setPage(page);
+        if(StringUtils.isNotBlank(internetRenewDetail.getAgentId())){
+            criteria.andAgentIdEqualTo(internetRenewDetail.getAgentId());
+        }
+        if(StringUtils.isNotBlank(internetRenewDetail.getAgentName())){
+            criteria.andAgentNameEqualTo(internetRenewDetail.getAgentName());
+        }
+        if(StringUtils.isNotBlank(internetRenewDetail.getIccidNum())){
+            criteria.andIccidNumEqualTo(internetRenewDetail.getIccidNum());
+        }
+        if(StringUtils.isNotBlank(internetRenewDetail.getRenewId())){
+            criteria.andRenewIdEqualTo(internetRenewDetail.getRenewId());
+        }
+        if(StringUtils.isNotBlank(internetRenewDetail.getId())){
+            criteria.andIdEqualTo(internetRenewDetail.getId());
+        }
+        if(StringUtils.isNotBlank(internetRenewDetail.getSnNum())){
+            criteria.andSnNumEqualTo(internetRenewDetail.getSnNum());
+        }
+        if(StringUtils.isNotBlank(internetRenewDetail.getRenewWay())){
+            criteria.andRenewWayEqualTo(internetRenewDetail.getRenewWay());
+        }
+        if(StringUtils.isNotBlank(internetRenewDetail.getRenewStatus())){
+            criteria.andRenewStatusEqualTo(internetRenewDetail.getRenewStatus());
+        }
         List<OInternetRenewDetail> internetRenewDetails = internetRenewDetailMapper.selectByExample(internetRenewDetailExample);
         for (OInternetRenewDetail renewDetail : internetRenewDetails) {
             renewDetail.setRenewWay(InternetRenewWay.getContentByValue(renewDetail.getRenewWay()));
