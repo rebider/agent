@@ -937,7 +937,6 @@
     o.order_platform,
     o.payment_method,
     o.o_amo,
-    o.pay_amo,
     d.pay_amount,
     d.real_amount,
     d.outstanding_amount,
@@ -969,69 +968,19 @@
     -
     nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)
     )as dpd,
-    nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0) pro_num,
     c.platform_name,
     d.nuclear_user,
     d.nuclear_time,
     NVL2(d.nuclear_time,to_char(d.nuclear_time,'YYYY-MM-DD'),'')as nuclear_user_string,
     org.name as AGDOCPPRO,
     cr.amount as xxAmount,
-    dict.d_itemname as pro_type,
     oso.activity_name,
-
     nvl(d.pay_amount,0) as dd_amt,
-    nvl((
-      case d.pay_method
-        when 'SF1' then d.pay_amount-d.down_payment
-        when 'FRFQ' then d.pay_amount
-        else 0
-      end
-    ),0) as ykfr_amt,
+    nvl((d.outstanding_amount),0) as ykfr_amt,
     to_char(d.down_payment_date,'YYYY-MM') as down_payment_date,
-    d.down_payment_count,
+    nvl(( case d.pay_method when 'SF1' then d.down_payment_count
+    when 'FRFQ' then d.down_payment_count else 0 end ),0) as down_payment_count,
     d.down_payment,
-    (case d.pay_method
-      when 'SF1' then
-        ROUND(
-          nvl((
-            case d.pay_method
-              when 'SF1' then d.pay_amount-d.down_payment
-              when 'FRFQ' then d.pay_amount
-              else 0
-            end
-        ),0)/nvl(d.down_payment_count,1)
-    ,2)
-      when 'FRFQ' then
-        ROUND(
-          nvl((
-            case d.pay_method
-              when 'SF1' then d.pay_amount-d.down_payment
-              when 'FRFQ' then d.pay_amount
-            else 0
-          end
-      ),0)/nvl(d.down_payment_count,1)
-    ,2)
-    when 'SF2' then
-      ROUND(
-        nvl((
-          case d.pay_method
-            when 'SF2' then d.pay_amount-d.down_payment
-            when 'FKFQ' then d.pay_amount
-          else 0
-        end
-      ),0)/nvl(d.down_payment_count,1)
-    ,2)
-    when 'FKFQ' then
-      ROUND(
-        nvl((
-          case d.pay_method
-            when 'SF2' then d.pay_amount-d.down_payment
-            when 'FKFQ' then d.pay_amount
-          else 0
-        end
-      ),0)/nvl(d.down_payment_count,1)
-    ,2)
-    else 0 end) as mqyk_amt,
     nvl(
     (select sum(o_payment_detail.real_pay_amount)
     from o_payment_detail
@@ -1045,17 +994,27 @@
         else 0
       end
     ),0) as fqdk_amt,
-    d.down_payment_count as frdk_count,
+    nvl(( case d.pay_method when 'SF2' then d.down_payment_count
+    when 'FKFQ' then d.down_payment_count else 0 end ),0) as frdk_count,
     nvl((select sum(o_payment_detail.real_pay_amount)
     from o_payment_detail
-    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id
-    and o_payment_detail.status = 1 and (o_payment_detail.pay_type='DKFQ' or o_payment_detail.pay_type='SF')
+    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.status = 1
+    and (o_payment_detail.payment_status = 4 or o_payment_detail.payment_status = 6)
+    and (o_payment_detail.pay_type='DKFQ' or o_payment_detail.pay_type='FRFQ')
     ),0) as sjdk_amt,
     nvl(d.outstanding_amount,0) as syqk_amt,
-    os.pro_rel_price, os.model, oan.org_name
-
+    nvl(os.pro_rel_price*os.pro_num,0) as pay_amo,
+    os.pro_num, os.pro_rel_price, os.model, os.pro_type, oan.org_name,
+    cr.pay_user,
+    to_char(cr.real_rec_time,'YYYY-MM-DD') as realRecTime,
+    to_char(cr.check_date,'YYYY-MM-DD') as checkDate,
+    nvl((select max(o_payment_detail.pay_amount) from o_payment_detail
+    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.status = 1
+    and (o_payment_detail.pay_type='FRFQ' or o_payment_detail.pay_type='DKFQ')
+    ),0) as mqyk_amt,
+    o.remark
     from o_order o
-    left join a_agent b on o.agent_id = b.id
+    left join a_agent b on o.agent_id = b.id and b.status=1
     left join a_platform c on c.platform_num = o.order_platform
     left join o_payment d on d.order_id = o.id
     left join o_cash_receivables cr on d.id = cr.src_id and cr.cashpay_type='PAYMENT' and cr.status=1
@@ -1065,8 +1024,8 @@
     left join o_sub_order os on os.order_id = o.id and os.status=1
     left join o_sub_order_activity oso on oso.sub_order_id = os.id and oso.status=1
     left join d_dict dict on dict.d_group='ORDER' and dict.d_artifact='MODEL_TYPE' and dict.d_status=1 and dict.d_itemname = os.pro_type
-    left join o_organization oan on oan.plat_id = c.id and oan.status=1
-    left join a_agent_businfo e on o.bus_id = e.id and e.status=1
+    left join a_agent_businfo aab on aab.agent_id = o.agent_id and aab.id = o.bus_id and aab.status=1
+    left join o_organization oan on oan.org_id = aab.organ_num and oan.status=1
     <where>
       <if test="1==1"> and o.status = 1 </if>
       <if test="nuclearUser!=null and nuclearUser!=''"> and d.nuclear_user = #{nuclearUser} </if>
@@ -1152,5 +1111,10 @@
     <result column="review_status" property="reviewStatus" jdbcType="VARCHAR"/>
     <result column="o_inuretime" property="oinuretime" jdbcType="VARCHAR"/>
     <result column="org_name" property="orgName" jdbcType="VARCHAR"/>
+
+    <result column="pay_user" property="payUser" jdbcType="VARCHAR"/>
+    <result column="real_rec_time" property="realRecTime" jdbcType="TIMESTAMP"/>
+    <result column="check_date" property="checkDate" jdbcType="TIMESTAMP"/>
+    <result column="remark" property="remark" jdbcType="VARCHAR"/>
   </resultMap>
 </mapper>

@@ -33,7 +33,7 @@ public class OrderoutVo implements Serializable{
     private BigDecimal planNum;//分期笔数
 
     private String nuclearUser;//核款人
-    private Date nuclearTime;//核款时间
+    private Date nuclearTime;
     private String nuclearTimeString;
     private String agDocPpro;//业务对接省区
 
@@ -55,6 +55,43 @@ public class OrderoutVo implements Serializable{
     private String model;//机具型号
     private String reviewStatus;//审批状态
     private String orgName;//顶级机构
+
+    private String payUser;//打款人
+    private String realRecTime;//打款时间
+    private String checkDate;//核款日期
+    private String remark;//备注
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public String getPayUser() {
+        return payUser;
+    }
+
+    public void setPayUser(String payUser) {
+        this.payUser = payUser;
+    }
+
+    public String getRealRecTime() {
+        return realRecTime;
+    }
+
+    public void setRealRecTime(String realRecTime) {
+        this.realRecTime = realRecTime;
+    }
+
+    public String getCheckDate() {
+        return checkDate;
+    }
+
+    public void setCheckDate(String checkDate) {
+        this.checkDate = checkDate;
+    }
 
     public String getProType() {
         return proType;
