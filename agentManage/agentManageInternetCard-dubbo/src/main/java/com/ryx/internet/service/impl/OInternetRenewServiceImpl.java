@@ -99,9 +99,47 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     @Override
     public PageInfo internetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page){
 
+        OInternetRenewDetailExample internetRenewDetailExample = queryParam(internetRenewDetail);
+        internetRenewDetailExample.setPage(page);
+        List<OInternetRenewDetail> internetRenewDetails = internetRenewDetailMapper.selectByExample(internetRenewDetailExample);
+        for (OInternetRenewDetail renewDetail : internetRenewDetails) {
+            renewDetail.setRenewWay(InternetRenewWay.getContentByValue(renewDetail.getRenewWay()));
+            CUser cUser = iUserService.selectById(renewDetail.getcUser());
+            if(null!=cUser)
+            renewDetail.setcUser(cUser.getName());
+        }
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(internetRenewDetails);
+        pageInfo.setTotal((int)internetRenewDetailMapper.countByExample(internetRenewDetailExample));
+        return pageInfo;
+    }
+
+
+    @Override
+    public List<OInternetRenewDetail> queryInternetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page){
+        OInternetRenewDetailExample oInternetRenewDetailExample = queryParam(internetRenewDetail);
+        oInternetRenewDetailExample.setPage(page);
+        List<OInternetRenewDetail> internetRenewDetailList = internetRenewDetailMapper.selectByExample(oInternetRenewDetailExample);
+        return internetRenewDetailList;
+    }
+
+
+    @Override
+    public Integer queryInternetRenewDetailCount(OInternetRenewDetail internetRenewDetail){
+        OInternetRenewDetailExample oInternetRenewDetailExample = queryParam(internetRenewDetail);
+        Integer count = Integer.valueOf((int)internetRenewDetailMapper.countByExample(oInternetRenewDetailExample));
+        return count;
+    }
+
+    /**
+     * 查询和导出的条件
+     * @param internetRenewDetail
+     * @return
+     */
+    private OInternetRenewDetailExample queryParam(OInternetRenewDetail internetRenewDetail){
+
         OInternetRenewDetailExample internetRenewDetailExample = new OInternetRenewDetailExample();
         OInternetRenewDetailExample.Criteria criteria = internetRenewDetailExample.createCriteria();
-        internetRenewDetailExample.setPage(page);
         if(StringUtils.isNotBlank(internetRenewDetail.getAgentId())){
             criteria.andAgentIdEqualTo(internetRenewDetail.getAgentId());
         }
@@ -126,19 +164,9 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         if(StringUtils.isNotBlank(internetRenewDetail.getRenewStatus())){
             criteria.andRenewStatusEqualTo(internetRenewDetail.getRenewStatus());
         }
-        List<OInternetRenewDetail> internetRenewDetails = internetRenewDetailMapper.selectByExample(internetRenewDetailExample);
-        for (OInternetRenewDetail renewDetail : internetRenewDetails) {
-            renewDetail.setRenewWay(InternetRenewWay.getContentByValue(renewDetail.getRenewWay()));
-            CUser cUser = iUserService.selectById(renewDetail.getcUser());
-            if(null!=cUser)
-            renewDetail.setcUser(cUser.getName());
-        }
-        PageInfo pageInfo = new PageInfo();
-        pageInfo.setRows(internetRenewDetails);
-        pageInfo.setTotal((int)internetRenewDetailMapper.countByExample(internetRenewDetailExample));
-        return pageInfo;
+        internetRenewDetailExample.setOrderByClause(" c_time desc ");
+        return internetRenewDetailExample;
     }
-
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
