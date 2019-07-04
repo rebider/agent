@@ -65,6 +65,7 @@ public class AgentServiceTest extends BaseSpringTest  {
 
     @Test
     public void testThree(){
+        livenessDetectionService.livenessDetection("陈肖翔","410223198801194051","123");
         livenessDetectionService.threeElementsCertificationDetection("陈肖翔","410223198801194051","123","6225980167399568");
     }
 }
