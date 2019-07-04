@@ -1008,8 +1008,7 @@
     to_char(cr.real_rec_time,'YYYY-MM-DD') as realRecTime,
     to_char(cr.check_date,'YYYY-MM-DD') as checkDate,
     nvl((select max(o_payment_detail.pay_amount) from o_payment_detail
-    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id
-    and o_payment_detail.status = 1 and o_payment_detail.payment_status = 4
+    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.status = 1
     and (o_payment_detail.pay_type='FRFQ' or o_payment_detail.pay_type='DKFQ')
     ),0) as mqyk_amt
 
