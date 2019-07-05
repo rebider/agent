@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface InternetCardService {
 
-    PageInfo internetCardList(OInternetCard internetCard, Page page);
+    PageInfo internetCardList(OInternetCard internetCard, Page page,String agentId);
 
     PageInfo internetCardImportList(OInternetCardImport internetCardImport, Page page);
 
@@ -27,9 +27,9 @@ public interface InternetCardService {
 
     void taskUpdateMech();
 
-    List<OInternetCard> queryInternetCardList(OInternetCard internetCard, Page page);
+    List<OInternetCard> queryInternetCardList(OInternetCard internetCard, Page page,String agentId);
 
-    Integer queryInternetCardCount(OInternetCard internetCard);
+    Integer queryInternetCardCount(OInternetCard internetCard,String agentId);
 
     void taskUpdateMechIsNull();
 

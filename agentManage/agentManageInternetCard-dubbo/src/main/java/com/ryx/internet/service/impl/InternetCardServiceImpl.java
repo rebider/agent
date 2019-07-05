@@ -74,10 +74,10 @@ public class InternetCardServiceImpl implements InternetCardService {
     private OInternetRenewDetailMapper internetRenewDetailMapper;
 
     @Override
-    public PageInfo internetCardList(OInternetCard internetCard, Page page){
+    public PageInfo internetCardList(OInternetCard internetCard, Page page,String agentId){
 
         OInternetCardExample oInternetCardExample = new OInternetCardExample();
-        oInternetCardExample= queryParam(internetCard, oInternetCardExample);
+        oInternetCardExample= queryParam(internetCard, oInternetCardExample,agentId);
         oInternetCardExample.setPage(page);
         List<OInternetCard> oInternetCards = internetCardMapper.selectByExample(oInternetCardExample);
         for (OInternetCard oInternetCard : oInternetCards) {
@@ -93,18 +93,18 @@ public class InternetCardServiceImpl implements InternetCardService {
     }
 
     @Override
-    public List<OInternetCard> queryInternetCardList(OInternetCard internetCard, Page page){
+    public List<OInternetCard> queryInternetCardList(OInternetCard internetCard, Page page,String agentId){
         OInternetCardExample oInternetCardExample = new OInternetCardExample();
-        oInternetCardExample = queryParam(internetCard, oInternetCardExample);
+        oInternetCardExample = queryParam(internetCard, oInternetCardExample,agentId);
         oInternetCardExample.setPage(page);
         List<OInternetCard> oInternetCards = internetCardMapper.queryInternetCardList(oInternetCardExample);
         return oInternetCards;
     }
 
     @Override
-    public Integer queryInternetCardCount(OInternetCard internetCard){
+    public Integer queryInternetCardCount(OInternetCard internetCard,String agentId){
         OInternetCardExample oInternetCardExample = new OInternetCardExample();
-        oInternetCardExample = queryParam(internetCard, oInternetCardExample);
+        oInternetCardExample = queryParam(internetCard, oInternetCardExample,agentId);
         Integer count = Integer.valueOf((int)internetCardMapper.countByExample(oInternetCardExample));
         return count;
     }
@@ -115,7 +115,7 @@ public class InternetCardServiceImpl implements InternetCardService {
      * @param oInternetCardExample
      * @return
      */
-    private OInternetCardExample queryParam(OInternetCard internetCard, OInternetCardExample oInternetCardExample){
+    private OInternetCardExample queryParam(OInternetCard internetCard, OInternetCardExample oInternetCardExample,String agentId){
 
         OInternetCardExample.Criteria criteria = oInternetCardExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
@@ -134,7 +134,10 @@ public class InternetCardServiceImpl implements InternetCardService {
         if(null!=internetCard.getRenew()){
             criteria.andRenewEqualTo(internetCard.getRenew());
         }
-        if(StringUtils.isNotBlank(internetCard.getAgentId())){
+        //如果代理商登陆执行此查询条件
+        if(StringUtils.isNotBlank(agentId)){
+            criteria.andAgentIdEqualTo(agentId);
+        }else if(StringUtils.isNotBlank(internetCard.getAgentId())){
             criteria.andAgentIdEqualTo(internetCard.getAgentId());
         }
         if(StringUtils.isNotBlank(internetCard.getAgentName())){
