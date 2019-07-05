@@ -16,6 +16,8 @@
     <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -48,7 +50,7 @@
   </sql>
   <sql id="Base_Column_List">
     ID, RENEW_WAY, RENEW_CARD_COUNT, SUM_OFFSET_AMT, SUPP_AMT, REVIEW_STATUS, REVIEW_PASS_TIME,
-    APPLY_REMARK, C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION
+    APPLY_REMARK, C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION, AGENT_ID, AGENT_NAME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.internet.pojo.OInternetRenewExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -83,12 +85,14 @@
     SUM_OFFSET_AMT, SUPP_AMT, REVIEW_STATUS,
     REVIEW_PASS_TIME, APPLY_REMARK, C_TIME,
     U_TIME, C_USER, U_USER,
-    STATUS, VERSION)
+    STATUS, VERSION, AGENT_ID,
+    AGENT_NAME)
     values (#{id,jdbcType=VARCHAR}, #{renewWay,jdbcType=VARCHAR}, #{renewCardCount,jdbcType=DECIMAL},
     #{sumOffsetAmt,jdbcType=DECIMAL}, #{suppAmt,jdbcType=DECIMAL}, #{reviewStatus,jdbcType=DECIMAL},
     #{reviewPassTime,jdbcType=TIMESTAMP}, #{applyRemark,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP},
     #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR},
-    #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
+    #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{agentId,jdbcType=VARCHAR},
+    #{agentName,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.internet.pojo.OInternetRenew">
     insert into O_INTERNET_RENEW
@@ -135,6 +139,12 @@
       <if test="version != null">
         VERSION,
       </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -178,6 +188,12 @@
       </if>
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -229,24 +245,32 @@
       <if test="version != null">
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.internet.pojo.OInternetRenew">
     update O_INTERNET_RENEW
     set RENEW_WAY = #{renewWay,jdbcType=VARCHAR},
-      RENEW_CARD_COUNT = #{renewCardCount,jdbcType=DECIMAL},
-      SUM_OFFSET_AMT = #{sumOffsetAmt,jdbcType=DECIMAL},
-      SUPP_AMT = #{suppAmt,jdbcType=DECIMAL},
-      REVIEW_STATUS = #{reviewStatus,jdbcType=DECIMAL},
-      REVIEW_PASS_TIME = #{reviewPassTime,jdbcType=TIMESTAMP},
-      APPLY_REMARK = #{applyRemark,jdbcType=VARCHAR},
-      C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      U_TIME = #{uTime,jdbcType=TIMESTAMP},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      U_USER = #{uUser,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL}
+    RENEW_CARD_COUNT = #{renewCardCount,jdbcType=DECIMAL},
+    SUM_OFFSET_AMT = #{sumOffsetAmt,jdbcType=DECIMAL},
+    SUPP_AMT = #{suppAmt,jdbcType=DECIMAL},
+    REVIEW_STATUS = #{reviewStatus,jdbcType=DECIMAL},
+    REVIEW_PASS_TIME = #{reviewPassTime,jdbcType=TIMESTAMP},
+    APPLY_REMARK = #{applyRemark,jdbcType=VARCHAR},
+    C_TIME = #{cTime,jdbcType=TIMESTAMP},
+    U_TIME = #{uTime,jdbcType=TIMESTAMP},
+    C_USER = #{cUser,jdbcType=VARCHAR},
+    U_USER = #{uUser,jdbcType=VARCHAR},
+    STATUS = #{status,jdbcType=DECIMAL},
+    VERSION = #{version,jdbcType=DECIMAL},
+    AGENT_ID = #{agentId,jdbcType=VARCHAR},
+    AGENT_NAME = #{agentName,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

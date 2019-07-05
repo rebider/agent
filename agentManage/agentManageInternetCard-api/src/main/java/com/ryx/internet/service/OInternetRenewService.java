@@ -21,12 +21,12 @@ import java.util.List;
  **/
 public interface OInternetRenewService {
 
-    PageInfo internetRenewList(OInternetRenew internetRenew, Page page);
+    PageInfo internetRenewList(OInternetRenew internetRenew, Page page,String agentId);
 
-    PageInfo internetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page);
+    PageInfo internetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page,String agentId);
 
     AgentResult saveAndApprove(OInternetRenew internetRenew, List<String> iccids, String cUser,
-                               List<OCashReceivablesVo> oCashReceivablesVoList)throws MessageException;
+                               List<OCashReceivablesVo> oCashReceivablesVoList,String agentId)throws MessageException;
 
     OInternetRenew selectByPrimaryKey(String id);
 
@@ -36,7 +36,7 @@ public interface OInternetRenewService {
 
     AgentResult compressCompensateActivity(String proIns, BigDecimal agStatus)throws Exception;
 
-    List<OInternetRenewDetail> queryInternetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page);
+    List<OInternetRenewDetail> queryInternetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page,String agentId);
 
-    Integer queryInternetRenewDetailCount(OInternetRenewDetail internetRenewDetail);
+    Integer queryInternetRenewDetailCount(OInternetRenewDetail internetRenewDetail,String agentId);
 }

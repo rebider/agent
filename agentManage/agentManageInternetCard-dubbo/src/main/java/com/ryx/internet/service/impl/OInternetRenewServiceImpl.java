@@ -79,7 +79,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     private IUserService iUserService;
 
     @Override
-    public PageInfo internetRenewList(OInternetRenew internetRenew, Page page){
+    public PageInfo internetRenewList(OInternetRenew internetRenew, Page page,String agentId){
 
         OInternetRenewExample internetRenewExample = new OInternetRenewExample();
         OInternetRenewExample.Criteria criteria = internetRenewExample.createCriteria();
@@ -91,6 +91,10 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }
         if(null!=internetRenew.getReviewStatus()){
             criteria.andReviewStatusEqualTo(internetRenew.getReviewStatus());
+        }
+        //代理商只查询自己的
+        if(StringUtils.isNotBlank(agentId)){
+            criteria.andAgentIdEqualTo(agentId);
         }
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         internetRenewExample.setPage(page);
@@ -109,9 +113,9 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     }
 
     @Override
-    public PageInfo internetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page){
+    public PageInfo internetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page,String agentId){
 
-        OInternetRenewDetailExample internetRenewDetailExample = queryParam(internetRenewDetail);
+        OInternetRenewDetailExample internetRenewDetailExample = queryParam(internetRenewDetail,agentId);
         internetRenewDetailExample.setPage(page);
         List<OInternetRenewDetail> internetRenewDetails = internetRenewDetailMapper.selectByExample(internetRenewDetailExample);
         for (OInternetRenewDetail renewDetail : internetRenewDetails) {
@@ -128,8 +132,8 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
 
 
     @Override
-    public List<OInternetRenewDetail> queryInternetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page){
-        OInternetRenewDetailExample oInternetRenewDetailExample = queryParam(internetRenewDetail);
+    public List<OInternetRenewDetail> queryInternetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page,String agentId){
+        OInternetRenewDetailExample oInternetRenewDetailExample = queryParam(internetRenewDetail,agentId);
         oInternetRenewDetailExample.setPage(page);
         List<OInternetRenewDetail> internetRenewDetailList = internetRenewDetailMapper.selectByExample(oInternetRenewDetailExample);
         return internetRenewDetailList;
@@ -137,8 +141,8 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
 
 
     @Override
-    public Integer queryInternetRenewDetailCount(OInternetRenewDetail internetRenewDetail){
-        OInternetRenewDetailExample oInternetRenewDetailExample = queryParam(internetRenewDetail);
+    public Integer queryInternetRenewDetailCount(OInternetRenewDetail internetRenewDetail,String agentId){
+        OInternetRenewDetailExample oInternetRenewDetailExample = queryParam(internetRenewDetail,agentId);
         Integer count = Integer.valueOf((int)internetRenewDetailMapper.countByExample(oInternetRenewDetailExample));
         return count;
     }
@@ -148,12 +152,16 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
      * @param internetRenewDetail
      * @return
      */
-    private OInternetRenewDetailExample queryParam(OInternetRenewDetail internetRenewDetail){
+    private OInternetRenewDetailExample queryParam(OInternetRenewDetail internetRenewDetail,String agentId){
 
         OInternetRenewDetailExample internetRenewDetailExample = new OInternetRenewDetailExample();
         OInternetRenewDetailExample.Criteria criteria = internetRenewDetailExample.createCriteria();
         if(StringUtils.isNotBlank(internetRenewDetail.getAgentId())){
             criteria.andAgentIdEqualTo(internetRenewDetail.getAgentId());
+        }
+        //如果代理商登陆执行此查询条件会覆盖上面
+        if(StringUtils.isNotBlank(agentId)){
+            criteria.andAgentIdEqualTo(agentId);
         }
         if(StringUtils.isNotBlank(internetRenewDetail.getAgentName())){
             criteria.andAgentNameEqualTo(internetRenewDetail.getAgentName());
@@ -184,7 +192,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     public AgentResult saveAndApprove(OInternetRenew internetRenew,List<String> iccids, String cUser,
-                                      List<OCashReceivablesVo> oCashReceivablesVoList)throws MessageException{
+                                      List<OCashReceivablesVo> oCashReceivablesVoList,String agentId)throws MessageException{
 
         if(StringUtils.isBlank(InternetRenewWay.getContentByValue(internetRenew.getRenewWay()))){
             throw new MessageException("续费方式错误");
@@ -200,11 +208,18 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 throw new MessageException("线下打款必须填写打款记录");
             }
         }
+        Agent agent = agentService.getAgentById(agentId);
+        String agName = "";
+        if(null!=agent){
+            agName = agent.getAgName();
+        }
         BigDecimal renewCardCount = new BigDecimal(iccids.size());
         String internetRenewId = idService.genId(TabId.O_INTERNET_RENEW);
         internetRenew.setId(internetRenewId);
         internetRenew.setReviewStatus(AgStatus.Approving.status);
         internetRenew.setRenewCardCount(renewCardCount);
+        internetRenew.setAgentId(agentId);
+        internetRenew.setAgentName(agName);
         internetRenew.setcTime(new Date());
         internetRenew.setuTime(new Date());
         internetRenew.setcUser(cUser);
@@ -255,6 +270,15 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             if(oInternetCard==null){
                 throw new MessageException("第"+i+"个iccid不存在");
             }
+            OInternetRenewDetailExample oInternetRenewDetailExample = new OInternetRenewDetailExample();
+            OInternetRenewDetailExample.Criteria criteria = oInternetRenewDetailExample.createCriteria();
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
+            criteria.andIccidNumEqualTo(iccid);
+            criteria.andRenewStatusEqualTo(InternetRenewStatus.XFZ.getValue());
+            List<OInternetRenewDetail> oInternetRenewDetails = internetRenewDetailMapper.selectByExample(oInternetRenewDetailExample);
+            if(oInternetRenewDetails.size()!=0){
+                throw new MessageException("iccid:"+iccid+"续费中,请勿重复发起");
+            }
             oInternetCard.setRenewStatus(InternetRenewStatus.XFZ.getValue());
             int j = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
             if(j!=1){
@@ -302,7 +326,6 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         if(agentIdSet.size()!=1){
             throw new MessageException("不同代理商请分开申请");
         }
-        String agentId = agentIdSet.iterator().next();
         String workId = dictOptionsService.getApproveVersion("cardRenew");
         //启动审批
         String proce = activityService.createDeloyFlow(null, workId, null, null,null);
@@ -320,8 +343,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         record.setActivStatus(AgStatus.Approving.name());
         record.setDataShiro(BusActRelBusType.cardRenew.key);
         record.setAgentId(agentId);
-        Agent agent = agentService.getAgentById(agentId);
-        if(null!=agent)record.setAgentName(agent.getAgName());
+        record.setAgentName(agName);
         try {
             taskApprovalService.addABusActRel(record);
             log.info("物联网卡续费审批流启动成功");
