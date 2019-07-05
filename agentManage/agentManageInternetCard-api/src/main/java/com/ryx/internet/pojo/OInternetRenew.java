@@ -36,11 +36,31 @@ public class OInternetRenew implements Serializable{
 
     private BigDecimal version;
 
+    private String agentId;
+
+    private String agentName;
+
     private String files;
 
     private String iccidNumIds;
 
     private List<Attachment> attachmentList;
+
+    public String getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(String agentId) {
+        this.agentId = agentId;
+    }
+
+    public String getAgentName() {
+        return agentName;
+    }
+
+    public void setAgentName(String agentName) {
+        this.agentName = agentName;
+    }
 
     public List<Attachment> getAttachmentList() {
         return attachmentList;
