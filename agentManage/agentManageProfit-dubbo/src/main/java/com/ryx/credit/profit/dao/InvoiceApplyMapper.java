@@ -1,6 +1,7 @@
 package com.ryx.credit.profit.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.ryx.credit.profit.pojo.InvoiceApply;
 import com.ryx.credit.profit.pojo.InvoiceApplyExample;
@@ -28,4 +29,6 @@ public interface InvoiceApplyMapper {
     int updateByPrimaryKey(InvoiceApply record);
 
     void  deleteById(String id);
+
+    List<String> getAgentIdByPayCompany(String payCompany);
 }

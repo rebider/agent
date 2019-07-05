@@ -118,7 +118,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
     }
 
     @Override
-    public void saveInvoiceApply(List<Map<String,Object>> list, String agentId){
+    public void saveInvoiceApply(List<Map<String,Object>> list, String agentId) throws MessageException{
         try {
             Agent agent = agentService.getAgentById(agentId);
             Map<String,Object> map1 = getAccessTocken();
@@ -146,8 +146,11 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                         }
                     }
                     if("1".equals(invoiceApply.getYsResult())){ // 初审通过
-                        // todo 根据打款公司判断该发票是否属于该代理商
-                        // todo 根据打款公司获取AG码，如果不相符，则设置初审结果为0
+                        List<String> stringList = invoiceApplyMapper.getAgentIdByPayCompany(invoiceApply.getInvoiceCompany());
+                        if(!(stringList.size() == 1  && stringList.get(0).equals(agentId))){
+                            invoiceApply.setYsResult("0");
+                            invoiceApply.setRev1("开票公司和该代理商不符！");
+                        }
                     }
                     invoiceApply.setId(idService.genId(TabId.P_INVOICE_APPLY));
                     invoiceApply.setAgentId(agentId);
@@ -172,7 +175,8 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                 // 未获得tocken授权，请重新提交
             }
         }catch (Exception e){
-            e.printStackTrace();
+           e.printStackTrace();
+           throw  new MessageException("保存失败");
         }
 
     }
@@ -181,7 +185,6 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
     public List<Map<String,String>> finalCheckInvoice(List<Map<String,Object>> list){
         List<Map<String,String>> maps = new ArrayList<Map<String,String>>();
         for (Map<String,Object> map:list) {
-            // 根据发票代码 找到对应发票号
             InvoiceApply invoiceApply = new InvoiceApply();
             invoiceApply.setSerialNo(map.get("serialNo").toString());
             invoiceApply.setInvoiceCode(map.get("invoiceCode").toString());
@@ -196,6 +199,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                 mmm.put("AGENT_ID",invoiceApply1.getAgentId());
                 mmm.put("PROFIT_MONTH",new SimpleDateFormat("yyyyMM").format(curr.getTime()));
                 mmm.put("INVOICE_AMT",invoiceApply1.getSumAmt());
+                mmm.put("INVOICE_COMPANY",invoiceApply1.getInvoiceCompany());
                 Map<String,Object> ma = invoiceSumService.getInvoiceFinalData(mmm);
                 if(!"9999".equals(ma.get("Good").toString()) ){
                     Map<String,String> mm = new HashMap<String,String>();
@@ -207,6 +211,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                     invoiceApply1.setEsResult("1");
                     invoiceApply1.setStatus("1");
                 }
+                invoiceApply1.setProfitMonth(new SimpleDateFormat("yyyyMM").format(curr.getTime()));
                 invoiceApplyMapper.updateByPrimaryKeySelective(invoiceApply1);
             }else{
                 Map<String,String> mm = new HashMap<String,String>();

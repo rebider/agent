@@ -789,4 +789,9 @@
   <delete id="deleteById" parameterType="java.lang.String">
     delete from P_INVOICE_APPLY where ID = #{id,jdbcType=VARCHAR}
   </delete>
+
+  <select id="getAgentIdByPayCompany" resultType="java.lang.String">
+    select AGENT_ID from A_agent_colinfo where CLO_REALNAME= #{payCompany}
+  </select>
+
 </mapper>
