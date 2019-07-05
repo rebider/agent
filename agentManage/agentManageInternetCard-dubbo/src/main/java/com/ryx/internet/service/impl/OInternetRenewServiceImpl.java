@@ -82,7 +82,19 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     public PageInfo internetRenewList(OInternetRenew internetRenew, Page page){
 
         OInternetRenewExample internetRenewExample = new OInternetRenewExample();
+        OInternetRenewExample.Criteria criteria = internetRenewExample.createCriteria();
+        if(StringUtils.isNotBlank(internetRenew.getId())){
+            criteria.andIdEqualTo(internetRenew.getId());
+        }
+        if(StringUtils.isNotBlank(internetRenew.getRenewWay())){
+            criteria.andRenewWayEqualTo(internetRenew.getRenewWay());
+        }
+        if(null!=internetRenew.getReviewStatus()){
+            criteria.andReviewStatusEqualTo(internetRenew.getReviewStatus());
+        }
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
         internetRenewExample.setPage(page);
+        internetRenewExample.setOrderByClause(" c_time desc");
         List<OInternetRenew> internetRenews = internetRenewMapper.selectByExample(internetRenewExample);
         for (OInternetRenew renew : internetRenews) {
             renew.setRenewWay(InternetRenewWay.getContentByValue(renew.getRenewWay()));
@@ -164,6 +176,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         if(StringUtils.isNotBlank(internetRenewDetail.getRenewStatus())){
             criteria.andRenewStatusEqualTo(internetRenewDetail.getRenewStatus());
         }
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
         internetRenewDetailExample.setOrderByClause(" c_time desc ");
         return internetRenewDetailExample;
     }
