@@ -178,6 +178,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		if(null!=platForm){
 			agentBusInfo.setBusPlatformType(platForm.getPlatformType());
 		}
+		Map<String,Object> parentInfo = agentBusInfoMapper.queryBusInfoParent(FastMap.fastMap("id",agentBusInfo.getId()));
+		agentBusInfo.setParentInfo(parentInfo);
 		if(agentBusInfo!=null)
 		//查询业务关联账户
 		agentBusInfo.setAgentColinfoList(agentColinfoMapper.queryBusConinfoList(agentBusInfo.getId()));
