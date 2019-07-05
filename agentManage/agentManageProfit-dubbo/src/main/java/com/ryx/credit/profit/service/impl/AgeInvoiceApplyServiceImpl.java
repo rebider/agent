@@ -1,32 +1,37 @@
 package com.ryx.credit.profit.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.MessageException;
-import com.ryx.credit.common.redis.RedisService;
+import com.ryx.credit.common.util.AppConfig;
+import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.profit.dao.InvoiceApplyMapper;
-import com.ryx.credit.profit.dao.InvoiceDetailMapper;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.IAgeInvoiceApplyService;
-import com.ryx.credit.profit.service.IOwnInvoiceService;
-import com.ryx.credit.service.ActivityService;
-import com.ryx.credit.service.agent.AgentEnterService;
-import com.ryx.credit.service.agent.TaskApprovalService;
+import com.ryx.credit.profit.service.IInvoiceSumService;
+import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.IdService;
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * 代理商发票线上维护实现类
- * @Author chenqiutian
+ * 代理商发票明细 维护类
+ * @Author CQT
  * @Date 2019/2/18
  */
 @Service("ageInvoiceApplyService")
@@ -34,73 +39,77 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
 
     Logger logger = LoggerFactory.getLogger(AgeInvoiceApplyServiceImpl.class);
 
+    private String ACCESS_TOCKEN = "";
+    private final static String CLIENT_ID = AppConfig.getProperty("jindie.clientId");// client_ID
+    private final static String BASE_URL = AppConfig.getProperty("jindie.baseUrl");//baseUrl
+    private final static String CLIENT_SECRET = AppConfig.getProperty("jindie.clientSecret"); // client_secret
+    private final static String ACCESS_TOCKEN_URL = AppConfig.getProperty("jd.accessTocken");  // 获取tockenurl
+    private final static String PASSWORD = AppConfig.getProperty("encrypt.key"); // 加密key
+    private final static String TICKET_INFO_URL = AppConfig.getProperty("jd.ticketInfo")+"?access_token="; // 获取发票信息url
+
+    private String tocken = "";
+
+
+
     @Autowired
     private InvoiceApplyMapper invoiceApplyMapper;
     @Autowired
     private IdService idService;
-    @Autowired
-    private AgentEnterService agentEnterService;
-    @Autowired
-    private ActivityService activityService;
-    @Autowired
-    private TaskApprovalService taskApprovalService;
-    @Autowired
-    InvoiceDetailMapper invoiceDetailMapper;
-    @Autowired
-    IOwnInvoiceService ownInvoiceService;
-    @Autowired
-    private RedisService p_redisService;
+   @Autowired
+   private AgentService agentService;
+   @Autowired
+   private IInvoiceSumService invoiceSumService;
 
-    /**
-     * 代理商获取发票申请明细
-     */
+
     @Override
-    public PageInfo agentGetInvoiceApplyList(InvoiceApply invoiceApply, Page page) {
+    public PageInfo queryInvoiceDetail(InvoiceApply invoiceApply, Page page,Map<String, Object> department) {
         InvoiceApplyExample example = new InvoiceApplyExample();
         example.setPage(page);
         InvoiceApplyExample.Criteria criteria = example.createCriteria();
-
         if(StringUtils.isNotBlank(invoiceApply.getInvoiceCompany())){
-            criteria.andInvoiceCompanyEqualTo(invoiceApply.getInvoiceCompany());
+            criteria.andInvoiceCompanyLike(invoiceApply.getInvoiceCompany());
         }
         if(StringUtils.isNotBlank(invoiceApply.getInvoiceNumber())){
             criteria.andInvoiceNumberEqualTo(invoiceApply.getInvoiceNumber());
         }
-        if(StringUtils.isNotBlank(invoiceApply.getExpressNumber())){
-            criteria.andExpressNumberEqualTo(invoiceApply.getExpressNumber());
+        if(StringUtils.isNotBlank(invoiceApply.getInvoiceCode())){
+            criteria.andInvoiceCodeEqualTo(invoiceApply.getInvoiceCode());
         }
-        if(StringUtils.isNotBlank(invoiceApply.getExpressDate())){
-            criteria.andExpressDateEqualTo(invoiceApply.getExpressDate());
+        if(StringUtils.isNotBlank(invoiceApply.getEsResult())){
+            criteria.andEsResultEqualTo(invoiceApply.getEsResult());
         }
         if(StringUtils.isNotBlank(invoiceApply.getAgentId())){
             criteria.andAgentIdEqualTo(invoiceApply.getAgentId());
         }
-        if(StringUtils.isNotBlank(invoiceApply.getAgentName())){
-            criteria.andAgentNameEqualTo(invoiceApply.getAgentName());
+        if(StringUtils.isNotBlank(invoiceApply.getYsResult())){
+            criteria.andYsResultEqualTo(invoiceApply.getYsResult());
         }
-        if("'1','2'".equals(invoiceApply.getShResult())){
-            List<String> list = new ArrayList<String>();
-            list.add("1");
-            list.add("2");
-            criteria.andShResultIn(list);
-        }else if(StringUtils.isNotBlank(invoiceApply.getShResult())){
-            criteria.andShResultEqualTo(invoiceApply.getShResult());
+        if (StringUtils.isNotBlank(invoiceApply.getAgentName())){
+            criteria.andAgentNameLike(invoiceApply.getAgentName());
         }
-        example.setOrderByClause("CREATE_DATE  desc");
-        PageInfo pageInfo = new PageInfo();
+        if(department != null){
+            example.setInnerJoinDepartment(department.get("ORGANIZATIONCODE").toString(), department.get("ORGID").toString());
+        }
+        example.setOrderByClause("CREATE_DATE DESC ");
         List<InvoiceApply> list = invoiceApplyMapper.selectByExample(example);
-        Long count = invoiceApplyMapper.countByExample(example);
-        pageInfo.setTotal(Integer.parseInt(count.toString()));
+        PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(list);
+        pageInfo.setTotal((int)invoiceApplyMapper.countByExample(example));
+
         return pageInfo;
     }
 
     @Override
-    public void insertInvoiceApplyInfo(InvoiceApply invoiceApply) {
-        invoiceApply.setId(idService.genId(TabId.P_INVOICE_APPLY));
-        invoiceApply.setCreateDate(new SimpleDateFormat("yyyy-MM-dd HH:ss:mm").format(new Date()));
-        invoiceApply.setShResult("0");  //申请中
-        invoiceApplyMapper.insertSelective(invoiceApply);
+    public void deleteById(String id) {
+        InvoiceApply invoiceApply = invoiceApplyMapper.selectByPrimaryKey(id);
+        if(invoiceApply != null){
+            invoiceApplyMapper.deleteById(id);
+        }
+    }
+
+    @Override
+    public void updateExpressInfo(InvoiceApply invoiceApply) {
+        invoiceApplyMapper.updateByPrimaryKeySelective(invoiceApply);
     }
 
     @Override
@@ -109,179 +118,185 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
     }
 
     @Override
-    public void volumeImportData(List<List<Object>> lists,String agentId,String agentName) throws MessageException{
-        if(lists.size()<=0){
-            throw new MessageException("导入数据为空");
-        }
-        //检查数据格式
-        for (List<Object> list:lists) {
-            if(list.size()>0 && list!= null){
-
-                //开票日期的格式  yyyy-MM-dd
-                if(StringUtils.isBlank(list.get(1).toString())){
-                    throw new MessageException("开票日期不能为空");
-                } else{
-                    String pattern = "^[0-9]\\d{3}-[0-1]{1}\\d-[0-3][0-9]$";
-                    Boolean flag = list.get(1).toString().matches(pattern);
-                    if(!flag){
-                        throw new MessageException("开票日期的格式应为,例如：2019-08-01");
+    public void saveInvoiceApply(List<Map<String,Object>> list, String agentId){
+        try {
+            Agent agent = agentService.getAgentById(agentId);
+            Map<String,Object> map1 = getAccessTocken();
+            if("0000".equals(map1.get("errcode"))){
+                tocken = map1.get("access_token").toString();
+                for (Map<String,Object> map:list) {
+                    InvoiceApply invoiceApply = new InvoiceApply();
+                    Map<String,Object> result = getTicketInfo(map.get("invoiceCode").toString(),tocken);
+                    if(result == null){//未在发票云找到该发票信息，将此信息返回
+                        invoiceApply.setYsResult("0");
+                        invoiceApply.setInvoiceCompany(map.get("sallerName").toString());
+                        invoiceApply.setRemark("发票云库中未找到该发票信息");
+                    }else{
+                        invoiceApply.setYsResult("1");
+                        if("1".equals(result.get("proxyMark").toString())){ // 代开
+                            String remark = result.get("remark").toString();  // 获取代开公司
+                            int flag = remark.indexOf("代开企业名称:");
+                            if(flag != -1){
+                                invoiceApply.setInvoiceCompany(remark.substring(flag+7));
+                                invoiceApply.setSallerName(map.get("sallerName").toString());
+                                invoiceApply.setRemark(remark);
+                            }
+                        }else {
+                            invoiceApply.setInvoiceCompany(map.get("sallerName").toString());
+                        }
                     }
-                }
-                //寄出时间的格式不能为空 yyyy-MM-dd
-                if(StringUtils.isBlank(list.get(11).toString())){
-                    throw new MessageException("寄出时间不能为空");
-                } else{
-                    String pattern = "^[0-9]\\d{3}-[0-1]{1}\\d-[0-3][0-9]$";
-                    Boolean flag = list.get(11).toString().matches(pattern);
-                    if(!flag){
-                        throw new MessageException("寄出日期的格式应为,例如：2019-08-01");
+                    if("1".equals(invoiceApply.getYsResult())){ // 初审通过
+                        // todo 根据打款公司判断该发票是否属于该代理商
+                        // todo 根据打款公司获取AG码，如果不相符，则设置初审结果为0
                     }
-                }
-
-                //发票号不能有字母
-                if(StringUtils.isBlank(list.get(2).toString())){
-                    throw new MessageException("发票号不能为空");
-                } else{
-                    String pattern = "^[0-9]+$";  //yyyy-MM-dd
-                   String str = null;
-                   if(list.get(2).toString().indexOf(".") != -1){
-                       str = list.get(2).toString().substring(0,list.get(2).toString().indexOf("."));
-                   }else{
-                       str = list.get(2).toString();
-                   }
-                    Boolean flag = str.matches(pattern);
-                    if(!flag){
-                        throw new MessageException("发票号只能包含数字");
+                    invoiceApply.setId(idService.genId(TabId.P_INVOICE_APPLY));
+                    invoiceApply.setAgentId(agentId);
+                    if(agent != null){
+                        invoiceApply.setAgentName(agent.getAgName());
                     }
+                    invoiceApply.setSerialNo(map.get("serialNo").toString());
+                    invoiceApply.setInvoiceCode(map.get("invoiceCode").toString());
+                    invoiceApply.setInvoiceNumber(map.get("invoiceNo").toString());
+                    invoiceApply.setAmountTax(new BigDecimal(map.get("taxAmount").toString()));
+                    invoiceApply.setSumAmt(new BigDecimal(map.get("totalAmount").toString()));
+                    invoiceApply.setAmount(new BigDecimal(map.get("amount").toString()));
+                    invoiceApply.setSallerNo(map.get("sallerTaxNo").toString());
+                    invoiceApply.setInvoiceDate(map.get("invoiceDate").toString());
+                    invoiceApply.setInvoiceType(map.get("invoiceType").toString());
+                    invoiceApply.setExpenseStatus(map.get("expenseStatus").toString());
+                    invoiceApply.setYsDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+                    invoiceApply.setStatus("0");
+                    invoiceApplyMapper.insertSelective(invoiceApply);
                 }
-
-            }
-        }
-        try{
-            for (List<Object> list:lists) {
-                if(list.size()>0 && list!= null){
-                    insertInvoiceApply(list,agentId,agentName);
-                }
+            }else{
+                // 未获得tocken授权，请重新提交
             }
         }catch (Exception e){
             e.printStackTrace();
-            throw new MessageException("部分导入数据格式不正确");
         }
-    }
 
-    private void insertInvoiceApply(List<Object> list,String agentId,String agentName){
-        InvoiceApply invoiceApply = new InvoiceApply();
-        invoiceApply.setId(idService.genId(TabId.P_INVOICE_APPLY));
-        invoiceApply.setInvoiceCompany(list.get(0).toString());
-        invoiceApply.setInvoiceDate(list.get(1).toString());
-        String str = list.get(2).toString();
-        if(str.indexOf(".") != -1){
-            str = str.substring(0,str.indexOf("."));
-        }
-        invoiceApply.setInvoiceNumber(str);
-        String str1 = list.get(3).toString();
-        if(str1.indexOf(".") != -1){
-            str1= str1.substring(0,str1.indexOf("."));
-        }
-        invoiceApply.setInvoiceCode(str1);
-        invoiceApply.setInvoiceItem(list.get(4).toString());
-        invoiceApply.setUnitPrice(new BigDecimal(list.get(5).toString()));
-        String str2 = list.get(6).toString().trim();
-        invoiceApply.setNumberSl(Long.valueOf(str2.substring(0,str2.indexOf("."))));
-        invoiceApply.setAmountBeforeTax(new BigDecimal(list.get(7).toString()));
-        invoiceApply.setTax(new BigDecimal(list.get(8).toString()));
-        invoiceApply.setAmountTax(new BigDecimal(list.get(9).toString()));
-        invoiceApply.setSumAmt(new BigDecimal(list.get(10).toString()));
-        invoiceApply.setExpressDate(list.get(11).toString());
-        invoiceApply.setExpressCompany(list.get(12).toString());
-        String str3 = list.get(13).toString();
-        if(str3.indexOf(".") != -1){
-            str3 = str3.substring(0,str3.indexOf("."));
-        }
-        invoiceApply.setExpressNumber(str3);
-        invoiceApply.setShResult("0"); //申请中
-        invoiceApply.setCreateDate(new SimpleDateFormat("yyyy-MM-dd HH:SS:mm").format(new Date()));
-        invoiceApply.setAgentName(agentName);
-        invoiceApply.setAgentId(agentId);
-        invoiceApplyMapper.insertSelective(invoiceApply);
-    }
-
-
-    @Override
-    public InvoiceApply getInvoiceApplyByInvoiceNumber(String invoiceNumber,String agentId) {
-        InvoiceApplyExample example = new InvoiceApplyExample();
-        InvoiceApplyExample.Criteria criteria = example.createCriteria();
-        criteria.andInvoiceNumberEqualTo(invoiceNumber);
-        criteria.andAgentIdEqualTo(agentId);
-        List<InvoiceApply> list = invoiceApplyMapper.selectByExample(example);
-        if(list.size() > 0){
-            return  list.get(0);
-        }
-        return null;
     }
 
     @Override
-    public void insertInvoiceApply(InvoiceApply invoiceApply) {
-        invoiceApplyMapper.updateByPrimaryKeySelective(invoiceApply);
-    }
-
-    @Override
-    public PageInfo getList(Page page, InvoiceApply invoiceApply) {
-        InvoiceApplyExample example = new InvoiceApplyExample();
-        example.setPage(page);
-        InvoiceApplyExample.Criteria criteria = example.createCriteria();
-
-        if(StringUtils.isNotBlank(invoiceApply.getAgentName())){
-            criteria.andAgentNameEqualTo(invoiceApply.getAgentName());
-        }
-        if(StringUtils.isNotBlank(invoiceApply.getAgentId())){
-            criteria.andAgentIdEqualTo(invoiceApply.getAgentId());
-        }
-        if(StringUtils.isNotBlank(invoiceApply.getExpressNumber())){
-            criteria.andExpressNumberEqualTo(invoiceApply.getExpressNumber());
-        }
-        if(StringUtils.isNotBlank(invoiceApply.getExpressDate())){
-            criteria.andExpressDateEqualTo(invoiceApply.getExpressDate());
-        }
-        if("0".equals(invoiceApply.getShResult())){
-            criteria.andShResultEqualTo(invoiceApply.getShResult());
-            criteria.andFilenameIsNotNull();
-        }
-
-        List<InvoiceApply> list = invoiceApplyMapper.selectByExample(example);
-        Long count = invoiceApplyMapper.countByExample(example);
-        PageInfo pageInfo = new PageInfo();
-        pageInfo.setRows(list);
-        pageInfo.setTotal(Integer.valueOf(count.toString()));
-        return pageInfo;
-    }
-
-    @Override
-    public void commitSHResult(InvoiceApply invoiceApply) throws MessageException {
-        //获取终审状态
-        String finalStatus = p_redisService.getValue("commitFinal");
-        if("1".equals(finalStatus)){//终审状态
-            String profit_Month = new SimpleDateFormat("yyyyMM").format(new Date());
-            invoiceApply.setProfitMonth(profit_Month);
-        }else{//非终审状态
-            Calendar curr = Calendar.getInstance();
-            curr.setTime(new Date(System.currentTimeMillis()));
-            curr.add(Calendar.MONTH, -1);
-            SimpleDateFormat simpleDateFormatMonth = new SimpleDateFormat("yyyyMM");
-            String profitMonth = simpleDateFormatMonth.format(curr.getTime());
-            invoiceApply.setProfitMonth(profitMonth);
-        }
-        invoiceApply.setShDate(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
-        invoiceApplyMapper.updateByPrimaryKeySelective(invoiceApply);
-        if("1".equals(invoiceApply.getShResult())){
-            //根据id获得数据
-            InvoiceApply invoiceApply1 = invoiceApplyMapper.selectByPrimaryKey(invoiceApply.getId());
-            try{
-                ownInvoiceService.invoiceApplyComputer(invoiceApply1);
-            }catch (Exception e){
-                throw new MessageException("欠票汇总失败");
-
+    public List<Map<String,String>> finalCheckInvoice(List<Map<String,Object>> list){
+        List<Map<String,String>> maps = new ArrayList<Map<String,String>>();
+        for (Map<String,Object> map:list) {
+            // 根据发票代码 找到对应发票号
+            InvoiceApply invoiceApply = new InvoiceApply();
+            invoiceApply.setSerialNo(map.get("serialNo").toString());
+            invoiceApply.setInvoiceCode(map.get("invoiceCode").toString());
+            invoiceApply.setStatus("0");
+            List<InvoiceApply> invoiceApplies =  getListByExample(invoiceApply);
+            if(invoiceApplies.size() >= 1){
+                InvoiceApply invoiceApply1 = invoiceApplies.get(0);
+                Calendar curr = Calendar.getInstance();
+                curr.setTime(new Date(System.currentTimeMillis()));
+                curr.add(Calendar.MONTH, -1);
+                Map<String,Object> mmm = new HashMap<String,Object>();
+                mmm.put("AGENT_ID",invoiceApply1.getAgentId());
+                mmm.put("PROFIT_MONTH",new SimpleDateFormat("yyyyMM").format(curr.getTime()));
+                mmm.put("INVOICE_AMT",invoiceApply1.getSumAmt());
+                Map<String,Object> ma = invoiceSumService.getInvoiceFinalData(mmm);
+                if(!"9999".equals(ma.get("Good").toString()) ){
+                    Map<String,String> mm = new HashMap<String,String>();
+                    mm.put("invoiceCode",invoiceApply.getInvoiceCode());
+                    mm.put("errorInfo","汇总失败");
+                    maps.add(mm);
+                    invoiceApply1.setEsResult("0");
+                }else{
+                    invoiceApply1.setEsResult("1");
+                    invoiceApply1.setStatus("1");
+                }
+                invoiceApplyMapper.updateByPrimaryKeySelective(invoiceApply1);
+            }else{
+                Map<String,String> mm = new HashMap<String,String>();
+                mm.put("invoiceCode",invoiceApply.getInvoiceCode());
+                mm.put("errorInfo","未找到该发票符合信息");
+                maps.add(mm);
             }
         }
+        return  maps;
     }
+
+    private  List<InvoiceApply> getListByExample(InvoiceApply invoiceApply){
+        InvoiceApplyExample example = new InvoiceApplyExample();
+        InvoiceApplyExample.Criteria criteria = example.createCriteria();
+        if(StringUtils.isNotBlank(invoiceApply.getSerialNo())){
+            criteria.andSerialNoEqualTo(invoiceApply.getSerialNo());
+        }
+        if(StringUtils.isNotBlank(invoiceApply.getInvoiceCode())){
+            criteria.andInvoiceCodeEqualTo(invoiceApply.getInvoiceCode());
+        }
+        if(StringUtils.isNotBlank(invoiceApply.getId())){
+            criteria.andIdEqualTo(invoiceApply.getId());
+        }
+        if(StringUtils.isNotBlank(invoiceApply.getStatus())){
+            criteria.andStatusEqualTo(invoiceApply.getStatus());
+        }
+       return  invoiceApplyMapper.selectByExample(example);
+    }
+
+    /**根据发票代码获取发票全部信息*/
+    private Map<String,Object> getTicketInfo(String invoiceCode,String tocken)throws Exception{
+           JSONObject param = new JSONObject();
+           param.put("invoiceCode", invoiceCode);
+           String result = HttpClientUtil.doPostJson(TICKET_INFO_URL+tocken,encrypt1(param.toJSONString()));
+           Map<String,Object> rr = JSONObject.parseObject(result);
+           if("0000".equals(rr.get("errcode"))){
+               List<Map<String,Object>> list = (List<Map<String,Object>>)rr.get("data");
+               return list.get(0);
+           }
+           return null;
+    }
+
+    /**获取金蝶授权AccessTocken*/
+    public  Map<String, Object> getAccessTocken() throws Exception{
+        long timestamp = System.currentTimeMillis();
+        JSONObject param = new JSONObject();
+        param.put("client_id", CLIENT_ID);
+        param.put("sign",getSign(timestamp));
+        param.put("timestamp",timestamp);
+        String result = HttpClientUtil.doPostJson(ACCESS_TOCKEN_URL, param.toJSONString());
+        return JSONObject.parseObject(result);
+    }
+
+    //获取MD5加密sign
+    private String getSign(long timestamp)throws Exception{
+        String str = CLIENT_ID+CLIENT_SECRET+timestamp;
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        md.update(str.getBytes());
+        return new BigInteger(1, md.digest()).toString(16);
+    }
+
+    /**
+     * 使用ASE128进行加密
+     */
+    public static String encrypt1(String content) throws Exception {
+        byte[] raw = PASSWORD.getBytes("utf-8");
+        SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
+        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");//
+        cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
+        byte[] encrypted = cipher.doFinal(content.getBytes("utf-8"));
+        return new org.apache.commons.codec.binary.Base64().encodeToString(encrypted);
+    }
+
+    /**
+     * 使用ASE128进行解密
+     */
+    public static String decrypt1(String content) throws Exception {
+        try {
+            byte[] raw = PASSWORD.getBytes("utf-8");
+            SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, skeySpec);
+            byte[] encrypted1 = new Base64().decode(content);//先用base64解密
+            byte[] original = cipher.doFinal(encrypted1);
+            String originalString = new String(original,"utf-8");
+            return originalString;
+        } catch (Exception ex) {
+            return "";
+        }
+    }
+
+
 }

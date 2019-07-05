@@ -1,8 +1,9 @@
 package com.ryx.credit.profit.dao;
 
+import java.util.List;
+
 import com.ryx.credit.profit.pojo.InvoiceApply;
 import com.ryx.credit.profit.pojo.InvoiceApplyExample;
-import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 public interface InvoiceApplyMapper {
@@ -25,4 +26,6 @@ public interface InvoiceApplyMapper {
     int updateByPrimaryKeySelective(InvoiceApply record);
 
     int updateByPrimaryKey(InvoiceApply record);
+
+    void  deleteById(String id);
 }
