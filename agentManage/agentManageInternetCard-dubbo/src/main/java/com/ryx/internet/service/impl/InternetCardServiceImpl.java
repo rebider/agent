@@ -314,8 +314,13 @@ public class InternetCardServiceImpl implements InternetCardService {
                         }else if(importType.equals(CardImportType.F.getValue())){
                             OInternetRenewDetail oInternetRenewDetail = new OInternetRenewDetail();
                             String id = String.valueOf(string.size()>=1?string.get(0):"");//ID
-                            String realityAmt = String.valueOf(string.size()>=2?string.get(1):"");//实扣金额
-                            oInternetRenewDetail.setRealityAmt(StringUtils.isBlank(realityAmt)?null:new BigDecimal(realityAmt));
+                            String realityAmt = String.valueOf(string.size()>=20?string.get(19):"");//实扣金额
+                            Boolean regOperationAmt = realityAmt.matches(RegExpression.Amount);
+                            if(!regOperationAmt){
+                                oInternetRenewDetail.setRealityAmt(null);
+                            }else{
+                                oInternetRenewDetail.setRealityAmt(StringUtils.isBlank(realityAmt)?null:new BigDecimal(realityAmt));
+                            }
                             oInternetRenewDetail.setId(id);
                             jsonList = JsonUtil.objectToJson(oInternetRenewDetail);
                         }
@@ -373,19 +378,11 @@ public class InternetCardServiceImpl implements InternetCardService {
                     }else if(importType.equals(CardImportType.C.getValue())){
                         OInternetCard internetCard = JsonUtil.jsonToPojo(oInternetCardImport.getImportMsg(), OInternetCard.class);
                         if(StringUtils.isBlank(internetCard.getBeginSn()) || StringUtils.isBlank(internetCard.getSnCount())){
-                            oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
-                            oInternetCardImport.setErrorMsg("缺少iccid开始号段或总数量");
-                            //更新导入记录
-                            updateInternetCardImport(oInternetCardImport);
-                            continue;
+                            throw new MessageException("缺少iccid开始号段或总数量");
                         }
                         List<String> iccidList = logisticsService.idList(internetCard.getBeginSn(), StringUtils.isBlank(internetCard.getEndSn())?internetCard.getBeginSn():internetCard.getEndSn());
                         if(iccidList.size()!=Integer.parseInt(RegexUtil.rvZeroAndDot(internetCard.getSnCount()))){
-                            oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
-                            oInternetCardImport.setErrorMsg("iccid号段与数量不匹配");
-                            //更新导入记录
-                            updateInternetCardImport(oInternetCardImport);
-                            continue;
+                            throw new MessageException("iccid号段与数量不匹配");
                         }
                         for (String iccId : iccidList) {
                             internetCard.setIccidNum(iccId);
@@ -394,42 +391,47 @@ public class InternetCardServiceImpl implements InternetCardService {
                     }else if(importType.equals(CardImportType.D.getValue())){
                         OInternetCard internetCard = JsonUtil.jsonToPojo(oInternetCardImport.getImportMsg(), OInternetCard.class);
                         if(StringUtils.isBlank(internetCard.getBeginSn()) || StringUtils.isBlank(internetCard.getSnCount())){
-                            oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
-                            oInternetCardImport.setErrorMsg("缺少SN开始号段或总数量");
-                            //更新导入记录
-                            updateInternetCardImport(oInternetCardImport);
-                            continue;
+                            throw new MessageException("缺少SN开始号段或总数量");
                         }
                         List<String> snList = logisticsService.idList(internetCard.getBeginSn(), StringUtils.isBlank(internetCard.getEndSn())?internetCard.getBeginSn():internetCard.getEndSn());
                         if(snList.size()!=Integer.parseInt(RegexUtil.rvZeroAndDot(internetCard.getSnCount()))){
-                            oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
-                            oInternetCardImport.setErrorMsg("SN号段与数量不匹配");
-                            //更新导入记录
-                            updateInternetCardImport(oInternetCardImport);
-                            continue;
+                            throw new MessageException("SN号段与数量不匹配");
                         }
                         internetCardService.disposeSn(snList,internetCard,oInternetCardImport);
                     }else if(importType.equals(CardImportType.F.getValue())){
                         OInternetRenewDetail internetRenewDetail = JsonUtil.jsonToPojo(oInternetCardImport.getImportMsg(), OInternetRenewDetail.class);
                         if(null==internetRenewDetail.getRealityAmt()){
-                            oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
-                            oInternetCardImport.setErrorMsg("实际付款金额为空");
-                            //更新导入记录
-                            updateInternetCardImport(oInternetCardImport);
-                            continue;
+                            throw new MessageException("实际付款金额为空或格式不正确");
+                        }
+                        if(null==internetRenewDetail.getId()){
+                            throw new MessageException("明细编号为空");
                         }
                         Boolean regOperationAmt = RegExpression.regAmount(internetRenewDetail.getRealityAmt());
                         if(!regOperationAmt){
-                            oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
-                            oInternetCardImport.setErrorMsg("操作金额不正确,保留小数点后两位");
-                            //更新导入记录
-                            updateInternetCardImport(oInternetCardImport);
-                            continue;
+                            throw new MessageException("操作金额不正确,保留小数点后两位");
                         }
-                        int i = internetRenewDetailMapper.updateByPrimaryKey(internetRenewDetail);
+                        OInternetRenewDetail qInternetRenewDetail = internetRenewDetailMapper.selectByPrimaryKey(internetRenewDetail.getId());
+                        if(null==qInternetRenewDetail){
+                            throw new MessageException("明细不存在");
+                        }
+                        if(!qInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDK.getValue()) && !qInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())){
+                            throw new MessageException("只能导入分润抵扣的数据");
+                        }
+                        BigDecimal realityAmt = internetRenewDetail.getRealityAmt().add(qInternetRenewDetail.getRealityAmt());
+                        if(realityAmt.compareTo(qInternetRenewDetail.getOughtAmt())==1){
+                            throw new MessageException("实扣金额不能大于应扣金额");
+                        }
+                        //等于更新状态已续费
+                        if(realityAmt.compareTo(qInternetRenewDetail.getOughtAmt())==0){
+                            qInternetRenewDetail.setRenewStatus(InternetRenewStatus.YXF.getValue());
+                        }
+                        qInternetRenewDetail.setRealityAmt(realityAmt);
+                        int i = internetRenewDetailMapper.updateByPrimaryKeySelective(qInternetRenewDetail);
                         if(i!=1){
                             throw new MessageException("更新续费明细失败");
                         }
+                        oInternetCardImport.setImportStatus(OInternetCardImportStatus.SUCCESS.getValue());
+                        updateInternetCardImport(oInternetCardImport);
                     }
                 } catch (MessageException e) {
                     log.info("analysisImport处理导入表数据,MessageException:{}",e.getLocalizedMessage());
