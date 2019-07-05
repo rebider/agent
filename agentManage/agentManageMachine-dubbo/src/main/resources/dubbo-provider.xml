@@ -26,6 +26,7 @@
     <dubbo:service interface="com.ryx.credit.machine.service.ImsTermWarehouseDetailService" ref="imsTermWarehouseDetailService"  timeout="1200000" registry="myGroup" />
 
 
+    <dubbo:reference interface="com.ryx.credit.service.agent.PlatFormService" id="platFormService"  timeout="1200000" registry="myGroup" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.order.IOrderReturnService" id="orderReturnService"  timeout="1200000" registry="myGroup" check="false"/>
 
 </beans>

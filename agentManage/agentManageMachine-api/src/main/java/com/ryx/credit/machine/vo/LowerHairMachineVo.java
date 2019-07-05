@@ -1,5 +1,8 @@
 package com.ryx.credit.machine.vo;
 
+import com.ryx.credit.common.enumc.PlatformType;
+import com.ryx.credit.machine.entity.ImsTermWarehouseDetail;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +25,8 @@ public class LowerHairMachineVo  implements Serializable {
 
     private String platFormNum;
 
+    private String  PlatformType;
+
     private String actCode;
 
 
@@ -29,6 +34,11 @@ public class LowerHairMachineVo  implements Serializable {
      * 物流id
      */
     private String oLogisticsId;
+
+
+    ImsTermWarehouseDetail imsTermWarehouseDetail;
+
+    List<String> snList;
 
 
     public String getBusNum() {
@@ -93,5 +103,30 @@ public class LowerHairMachineVo  implements Serializable {
 
     public void setActCode(String actCode) {
         this.actCode = actCode;
+    }
+
+
+    public String getPlatformType() {
+        return PlatformType;
+    }
+
+    public void setPlatformType(String platformType) {
+        PlatformType = platformType;
+    }
+
+    public ImsTermWarehouseDetail getImsTermWarehouseDetail() {
+        return imsTermWarehouseDetail;
+    }
+
+    public void setImsTermWarehouseDetail(ImsTermWarehouseDetail imsTermWarehouseDetail) {
+        this.imsTermWarehouseDetail = imsTermWarehouseDetail;
+    }
+
+    public List<String> getSnList() {
+        return snList;
+    }
+
+    public void setSnList(List<String> snList) {
+        this.snList = snList;
     }
 }

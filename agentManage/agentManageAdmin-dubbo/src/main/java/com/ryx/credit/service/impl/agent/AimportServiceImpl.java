@@ -1622,9 +1622,12 @@ public class AimportServiceImpl implements AimportService {
         Agent agent = agents.get(0);
         AgentBusInfo agentBusInfo = new AgentBusInfo();
         if(StringUtils.isNotBlank(busPlatform_num)){
+
             AgentBusInfoExample example = new AgentBusInfoExample();
-            example.or().andStatusEqualTo(Status.STATUS_1.status)
-                    .andBusNumEqualTo(String.valueOf(busPlatform_num));
+            example.or()
+                    .andStatusEqualTo(Status.STATUS_1.status)
+                    .andBusNumEqualTo(String.valueOf(busPlatform_num))
+                    .andAgentIdEqualTo(agent.getId());
             List<AgentBusInfo> businfos = agentBusInfoMapper.selectByExample(example);
             if(businfos.size()==1){
                 logger.info(prefix_importBusInfo+"业务码,{},{}",user,list);
@@ -2006,8 +2009,6 @@ public class AimportServiceImpl implements AimportService {
             }
             if(StringUtils.isNotBlank(shoukuanzhanghuming_shenfz) && !"null".equalsIgnoreCase(shoukuanzhanghuming_shenfz)) {
                 agentColinfo.setAgLegalCernum(shoukuanzhanghuming_shenfz);
-            }else{
-                agentColinfo.setCloBankCode(null);
             }
             agentColinfo.setPayStatus(ColinfoPayStatus.C.code);
 

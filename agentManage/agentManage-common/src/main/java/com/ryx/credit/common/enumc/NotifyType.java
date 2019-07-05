@@ -25,6 +25,7 @@ public enum NotifyType {
     NetInEdit("netInEdit","入网修改"),
     NetInUpgrade("netInUpgrade","入网升级"),
     IdentityAuth("identityAuth","身份认证"),
+    ThreeElements("ThreeElements","三要素认证"),
     AgentMerge("agentMerge","代理商合并"),
     AgentQuit("agentQuit","代理商退出");
 

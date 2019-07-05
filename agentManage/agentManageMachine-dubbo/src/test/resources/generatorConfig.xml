@@ -33,18 +33,24 @@
 			<property name="enableSubPackages" value="true" />
 		</javaClientGenerator>
 		 <!--要生成那些表(更改tableName和domainObjectName就可以)-->
-		<table tableName="IMS_TERM_ACTIVE" domainObjectName="ImsTermActive" enableUpdateByExample="false"
-			   enableDeleteByPrimaryKey="false"/>
+		<!--<table tableName="IMS_TERM_ACTIVE" domainObjectName="ImsTermActive" enableUpdateByExample="false"-->
+			   <!--enableDeleteByPrimaryKey="false"/>-->
 		<table tableName="IMS_TERM_WAREHOUSE_DETAIL" domainObjectName="ImsTermWarehouseDetail" enableUpdateByExample="false"
 			   enableDeleteByPrimaryKey="false"/>
-		<table tableName="IMS_TERM_ADJUST" domainObjectName="ImsTermAdjust" enableUpdateByExample="false"
+		<!--<table tableName="IMS_TERM_ADJUST" domainObjectName="ImsTermAdjust" enableUpdateByExample="false"-->
+			   <!--enableDeleteByPrimaryKey="false"/>-->
+		<!--<table tableName="IMS_TERM_ADJUST_DETAIL" domainObjectName="ImsTermAdjustDetail" enableUpdateByExample="false"-->
+			   <!--enableDeleteByPrimaryKey="false"/>-->
+		<!--<table tableName="IMS_TERM_TRANSFER" domainObjectName="ImsTermTransfer" enableUpdateByExample="false"-->
+			   <!--enableDeleteByPrimaryKey="false"/>-->
+		<!--<table tableName="IMS_TERM_TRANSFER_DETAIL" domainObjectName="ImsTermTransferDetail" enableUpdateByExample="false"-->
+			   <!--enableDeleteByPrimaryKey="false"/>-->
+
+		<table tableName="IMS_TERM_MACHINE" domainObjectName="ImsTermMachine" enableUpdateByExample="false"
 			   enableDeleteByPrimaryKey="false"/>
-		<table tableName="IMS_TERM_ADJUST_DETAIL" domainObjectName="ImsTermAdjustDetail" enableUpdateByExample="false"
+		<table tableName="IMS_MACHINE_ACTIVITY" domainObjectName="ImsMachineActivity" enableUpdateByExample="false"
 			   enableDeleteByPrimaryKey="false"/>
-		<table tableName="IMS_TERM_TRANSFER" domainObjectName="ImsTermTransfer" enableUpdateByExample="false"
-			   enableDeleteByPrimaryKey="false"/>
-		<table tableName="IMS_TERM_TRANSFER_DETAIL" domainObjectName="ImsTermTransferDetail" enableUpdateByExample="false"
-			   enableDeleteByPrimaryKey="false"/>
+
 
 	</context>
 </generatorConfiguration>
