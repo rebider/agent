@@ -4,10 +4,7 @@ import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.JsonUtil;
-import com.ryx.credit.common.util.Page;
-import com.ryx.credit.common.util.PageInfo;
-import com.ryx.credit.common.util.RegexUtil;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
@@ -247,6 +244,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             if(null!=platForm){
                 agentBusInfo.setBusPlatformType(platForm.getPlatformType());
             }
+            Map<String,Object> parentInfo = agentBusInfoMapper.queryBusInfoParent(FastMap.fastMap("id",agentBusInfo.getId()));
+            agentBusInfo.setParentInfo(parentInfo);
         }
         return agentBusInfo;
     }
@@ -631,21 +630,11 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
 
     @Override
     public List<BusinessOutVo> exportAgent(Map map, Long userId) throws ParseException {
-        if (String.valueOf(map.get("flag")).equals("1")){
-            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
-            if(orgCodeRes==null && orgCodeRes.size()!=1){
-                return null;
-            }
-            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
-            String orgId = String.valueOf(stringObjectMap.get("ORGID"));
-            map.put("orgId",orgId);
-            map.put("userId",userId);
-        }
 
-        map.put("agStatus", AgStatus.Approved.name());
+        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+        map.put("platfromPerm",platfromPerm);
         map.put("status", Status.STATUS_1.status);
-        map.put("isZpos",String.valueOf(map.get("isZpos")));
-        map.put("platForm", Platform.ZPOS.getValue());
+
         List<BusinessOutVo> agentoutVos = agentBusInfoMapper.excelAgent(map);
         List<Dict> BUS_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name());
         List<Dict> BUS_SCOPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name());
