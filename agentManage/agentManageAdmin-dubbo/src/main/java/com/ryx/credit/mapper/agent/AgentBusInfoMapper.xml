@@ -855,10 +855,12 @@
     left join A_AGENT busRiskParentbusAgent on busRiskParentbusAgent.id = busRiskParentbus.AGENT_ID
     left join A_agent_businfo busActivationParentbus on bus.BUS_ACTIVATION_PARENT = busActivationParentbus.id
     left join A_AGENT busActivationParentbusAgent on busActivationParentbusAgent.id = busActivationParentbus.AGENT_ID
-    where 1=1 and agent.ag_status = #{reqMap.agStatus}
-    <if test="reqMap.agName != null and reqMap.agName != '' ">and agent.ag_name like
-      CONCAT(CONCAT('%',#{reqMap.agName}),'%')
-    </if>
+    left join C_ORGANIZATION e on e.ID = bus.AG_DOC_PRO
+    left join C_ORGANIZATION g on g.ID=bus.AG_DOC_DISTRICT
+    where 1=1
+      <if test="reqMap.agName != null and reqMap.agName != '' ">and agent.ag_name like
+        CONCAT(CONCAT('%',#{reqMap.agName}),'%')
+      </if>
       <if test="reqMap.agUniqNum != null and reqMap.agUniqNum != '' ">and agent.ag_uniq_num = #{reqMap.agUniqNum}
       </if>
       <if test="reqMap.busNum != null and reqMap.busNum != '' " >and bus.bus_num = #{reqMap.busNum}
@@ -871,14 +873,23 @@
       </if>
       <if test="reqMap.id != null and reqMap.id != '' " >and bus.id = #{reqMap.id}
       </if>
-      <if test="reqMap.orgId!=null and reqMap.orgId!=''">
-      and (agent.AG_DOC_PRO = #{reqMap.orgId} or agent.AG_DOC_DISTRICT = #{reqMap.orgId})
+      <if test="reqMap.organizationCode!=null and reqMap.organizationCode!=''">
+        and (e.CODE like concat(#{reqMap.organizationCode},'%') or g.CODE like concat(#{reqMap.organizationCode},'%') )
       </if>
-      <if test="reqMap.isZpos != 'null'" >
-        and bus.bus_platform = #{reqMap.platForm}
+      <if test="reqMap.platfromPerm!=null and reqMap.platfromPerm.size>0">
+        and bus.BUS_PLATFORM in
+        <foreach collection="reqMap.platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
+          #{platfromPermItem.PLATFORM_NUM}
+        </foreach>
       </if>
-      <if test="reqMap.isZpos == 'null'" >
-        and bus.bus_platform != #{reqMap.platForm}
+      <if test="reqMap.platfromPerm==null or reqMap.platfromPerm.size==0">
+        and 1=-1
+      </if>
+      <if test="reqMap.approveTimeStart != null and reqMap.approveTimeStart != '' " >
+        and to_char(bus.approve_time,'yyyy-MM-dd') &gt;= #{reqMap.approveTimeStart}
+      </if>
+      <if test="reqMap.approveTimeEnd != null and reqMap.approveTimeEnd != '' " >
+        and to_char(bus.approve_time,'yyyy-MM-dd') &lt;= #{reqMap.approveTimeEnd}
       </if>
     and bus.status = #{reqMap.status}
     UNION
@@ -897,7 +908,9 @@
     left join A_AGENT busRiskParentbusAgent on busRiskParentbusAgent.id = busRiskParentbus.AGENT_ID
     left join A_agent_businfo busActivationParentbus on bus.BUS_ACTIVATION_PARENT = busActivationParentbus.id
     left join A_AGENT busActivationParentbusAgent on busActivationParentbusAgent.id = busActivationParentbus.AGENT_ID
-    where 1=1 and agent.ag_status = #{reqMap.agStatus}
+    left join C_ORGANIZATION e on e.ID = bus.AG_DOC_PRO
+    left join C_ORGANIZATION g on g.ID=bus.AG_DOC_DISTRICT
+    where 1=1
     <if test="reqMap.agName != null and reqMap.agName != '' " >
       and agent.ag_name like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
     </if>
@@ -916,14 +929,23 @@
     <if test="reqMap.id != null and reqMap.id != '' " >
       and bus.id = #{reqMap.id}
     </if>
-    <if test="reqMap.userId!=null and reqMap.userId!=''">
-      and agent.C_USER = #{reqMap.userId}
+    <if test="reqMap.organizationCode!=null and reqMap.organizationCode!=''">
+      and (e.CODE like concat(#{reqMap.organizationCode},'%') or g.CODE like concat(#{reqMap.organizationCode},'%') )
     </if>
-    <if test="reqMap.isZpos != 'null'" >
-      and bus.bus_platform = #{reqMap.platForm}
+    <if test="reqMap.platfromPerm!=null and reqMap.platfromPerm.size>0">
+      and bus.BUS_PLATFORM in
+      <foreach collection="reqMap.platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
+        #{platfromPermItem.PLATFORM_NUM}
+      </foreach>
     </if>
-    <if test="reqMap.isZpos == 'null'" >
-      and bus.bus_platform != #{reqMap.platForm}
+    <if test="reqMap.platfromPerm==null or reqMap.platfromPerm.size==0">
+      and 1=-1
+    </if>
+    <if test="reqMap.approveTimeStart != null and reqMap.approveTimeStart != '' " >
+      and to_char(bus.approve_time,'yyyy-MM-dd') &gt;= #{reqMap.approveTimeStart}
+    </if>
+    <if test="reqMap.approveTimeEnd != null and reqMap.approveTimeEnd != '' " >
+      and to_char(bus.approve_time,'yyyy-MM-dd') &lt;= #{reqMap.approveTimeEnd}
     </if>
     and bus.status = #{reqMap.status}
    )

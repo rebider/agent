@@ -366,28 +366,28 @@
   <sql id="queryMyTaskSql">
       (select
       <include refid="queryMyTaskField"/>
-      from ACT_RU_TASK rt, A_bus_act_rel br,act_ru_identitylink ri,a_agent a,
-      C_ORGANIZATION oa,C_ORGANIZATION ob
+      from ACT_RU_TASK rt
+      left join A_bus_act_rel br on  rt.EXECUTION_ID_ = br.activ_id
+      left join act_ru_identitylink ri on ri.task_id_ = rt.id_
+      left join a_agent a on br.agent_id = a.id
+      left join C_ORGANIZATION oa on oa.id=br.ag_doc_pro
+      left join C_ORGANIZATION ob on ob.id=br.ag_doc_district
       <where>
-        rt.EXECUTION_ID_ = br.activ_id
-        and ri.task_id_ = rt.id_
-        and br.agent_id = a.id
-        and oa.id=br.ag_doc_pro
-        and ob.id=br.ag_doc_district
+        1=1
         <include refid="queryMyTaskWhere"/>
         and NET_IN_BUS_TYPE is null
       </where>
       UNION
       select
       <include refid="queryMyTaskField"/>
-      from ACT_RU_TASK rt, A_bus_act_rel br,act_ru_identitylink ri,a_agent a,
-      C_ORGANIZATION oa,C_ORGANIZATION ob
+      from ACT_RU_TASK rt
+      left join A_bus_act_rel br on  rt.EXECUTION_ID_ = br.activ_id
+      left join act_ru_identitylink ri on ri.task_id_ = rt.id_
+      left join a_agent a on br.agent_id = a.id
+      left join C_ORGANIZATION oa on oa.id=br.ag_doc_pro
+      left join C_ORGANIZATION ob on ob.id=br.ag_doc_district
       <where>
-        rt.EXECUTION_ID_ = br.activ_id
-        and ri.task_id_ = rt.id_
-        and br.agent_id = a.id
-        and oa.id=br.ag_doc_pro
-        and ob.id=br.ag_doc_district
+        1=1
         <include refid="queryMyTaskWhere"/>
         and NET_IN_BUS_TYPE is not null
         <if test="params.netInUrls != null and params.netInUrls.size>0">
