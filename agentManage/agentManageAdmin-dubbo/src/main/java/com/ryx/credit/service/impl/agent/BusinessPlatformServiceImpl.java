@@ -4,10 +4,7 @@ import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.JsonUtil;
-import com.ryx.credit.common.util.Page;
-import com.ryx.credit.common.util.PageInfo;
-import com.ryx.credit.common.util.RegexUtil;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
@@ -247,6 +244,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             if(null!=platForm){
                 agentBusInfo.setBusPlatformType(platForm.getPlatformType());
             }
+            Map<String,Object> parentInfo = agentBusInfoMapper.queryBusInfoParent(FastMap.fastMap("id",agentBusInfo.getId()));
+            agentBusInfo.setParentInfo(parentInfo);
         }
         return agentBusInfo;
     }
