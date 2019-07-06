@@ -31,6 +31,7 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
     private static final Logger log = LoggerFactory.getLogger(LivenessDetectionServiceImpl.class);
 
     private static final String LIVENESS_DETECTION_URL = AppConfig.getProperty("liveness_detection_url");
+    private static final String THREEELEMENT_DETECTION_URL = AppConfig.getProperty("threeElement_detection_url");
     private static final String LIVENESS_DETECTION_SYTERMID = AppConfig.getProperty("liveness_detection_sytermId");
 
     @Autowired
@@ -116,30 +117,44 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
         record.setNotifyStatus(Status.STATUS_0.status);
         record.setNotifyCount(new BigDecimal(1));
         record.setNotifyType(NotifyType.ThreeElements.getValue());
+        record.setcUser(userId);
+        record.setSendJson("trueName:"+trueName+",certNo:"+certNo+",bankNo:"+bankNo);
         try {
-            record.setcUser(userId);
-            record.setSendJson("trueName:"+trueName+",certNo:"+certNo+",bankNo:"+bankNo);
             Map<String, Object> resultMap = threeElementsCertification(record.getId(),trueName, certNo,bankNo);
-            if(null!=resultMap){
-                record.setNotifyJson(resultMap.toString());
-                result.setMsg(String.valueOf(resultMap.get("ResultMsg")));
-                String validateStatus = String.valueOf(resultMap.get("Result"));
-                if(validateStatus.equals("00")){
-                    record.setNotifyStatus(Status.STATUS_1.status);
-                    record.setSuccesTime(new Date());
-                    result.setStatus(200);
+            record.setNotifyJson(resultMap.toString());
+            if(null!=resultMap ){
+                if("00".equals(resultMap.get("ResponseCode"))) {
+                    result.setMsg(String.valueOf(resultMap.get("ResultMsg")));
+                    String validateStatus = String.valueOf(resultMap.get("Result"));
+                    if (validateStatus.equals("00")) {
+                        record.setNotifyStatus(Status.STATUS_1.status);
+                        record.setSuccesTime(new Date());
+                        result.setMsg("认证成功");
+                        result.setStatus(200);
+                    } else {
+                        record.setNotifyStatus(Status.STATUS_2.status);
+                        result.setMsg(resultMap.get("ResultMsg")+"");
+                        result.setStatus(400);
+                    }
                 }else{
+                    record.setNotifyStatus(Status.STATUS_2.status);
+                    result.setMsg("银行卡三要素认证失败");
                     result.setStatus(400);
                 }
             }else{
+                record.setNotifyStatus(Status.STATUS_2.status);
+                result.setMsg("银行卡三要素认证失败");
                 record.setNotifyJson("resultMap is null");
             }
         } catch (Exception e) {
             log.info("身份认证异常:{}",e.getMessage());
             e.printStackTrace();
             record.setNotifyJson(e.getMessage());
+            record.setNotifyStatus(Status.STATUS_2.status);
+            result.setMsg("银行卡三要素认证失败");
+        }finally {
+            agentPlatFormSynMapper.insertSelective(record);
         }
-        agentPlatFormSynMapper.insertSelective(record);
         return result;
     }
 
@@ -187,24 +202,25 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
      */
     private Map<String, Object> threeElementsCertification(String serialNo,String trueName,String certNo,String bankNo)throws Exception{
         Map<String, Object> map = new HashMap<>();
+        Date now = DateKit.getNow(true);
         map.put("Transcode", "000010");
-        map.put("SytermId", LIVENESS_DETECTION_SYTERMID);
         map.put("Serial", serialNo);
+        map.put("SytermId", LIVENESS_DETECTION_SYTERMID);
         map.put("BankNo", bankNo);
         map.put("UserName", trueName);
         map.put("IdentityType", "ZR01");
         map.put("IdentityId", certNo);
-        Date now = DateKit.getNow(true);
         map.put("StartDate", DateKit.getCompactDateString(now));
         map.put("StartTime", DateKit.getCompactTimeString(now));
         map.put("isDirect", "0");
+
         String paramsJson = JSONObject.toJSONString(map);
-        log.info("--------三要素认证,url:{}请求参数:{}------",LIVENESS_DETECTION_URL,paramsJson);
+        log.info("--------三要素认证,url:{}请求参数:{}------",THREEELEMENT_DETECTION_URL,paramsJson);
         String result = "";
         if(EnvironmentUtil.isProduction()){
-            result = HttpPostUtil.postForJSON(LIVENESS_DETECTION_URL, paramsJson);
+            result = HttpPostUtil.postForJSON(THREEELEMENT_DETECTION_URL, paramsJson);
         }else{
-            result = "{'ResultMsg':'认证成功','Result':'00'}";
+            result = FastMap.fastMap("ResultMsg","认证成功").putKeyV("Result","00").toString();
         }
         log.info("--------三要素认证返回参数:{}------", result);
         Map resultMap = JsonUtils.parseJSON2Map(result);

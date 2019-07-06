@@ -9,6 +9,6 @@ public class EnvironmentUtil {
     public static String environment = AppConfig.getProperty("environment");
 
     public static Boolean isProduction(){
-        return environment.equals("production");
+        return environment.equals("production") || environment.equals("production") ;
     }
 }
