@@ -150,7 +150,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                             //校验收款账户身份认证
                             AgentResult result = livenessDetectionService.livenessDetection(trueName, certNo, agent.getcUser());
                             if (!result.isOK()) {
-                                throw new ProcessException("收款账户身份认证异常");
+                                throw new ProcessException("收款账户身份认证失败");
                             }
                         } else {
                             throw new ProcessException("请输入收款账户名相对应的户主证件号");
@@ -272,7 +272,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             if(busType.equals(BusType.JG.key) || busType.equals(BusType.BZYD.key)){
                 for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
                     if(!agentBusInfoVo.getBusType().equals(BusType.JG.key) && !agentBusInfoVo.getBusType().equals(BusType.BZYD.key)){
-                        throw new ProcessException("业务平台类型为机构与标准一代时不能选择其他,为其他类型时不能选择机构与标准一代");
+//                        throw new ProcessException("业务平台类型为机构与标准一代时不能选择其他,为其他类型时不能选择机构与标准一代");
                     }
                 }
             }
