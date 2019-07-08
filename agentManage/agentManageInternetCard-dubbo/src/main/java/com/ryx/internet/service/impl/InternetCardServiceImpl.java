@@ -7,6 +7,7 @@ import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.Dict;
+import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
 import com.ryx.credit.service.order.OLogisticsService;
 import com.ryx.internet.dao.OInternetCardImportMapper;
 import com.ryx.internet.dao.OInternetCardMapper;
@@ -782,22 +783,37 @@ public class InternetCardServiceImpl implements InternetCardService {
 
     /**
      * 订单发货 如果是流量卡插入信息表
-     * @param oInternetCard
+     * @param logisticsDetailList
      * @throws Exception
      */
+    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     @Override
-    public void orderInsertInternetCard(OInternetCard oInternetCard)throws Exception{
-        oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
-        oInternetCard.setStop(Status.STATUS_0.status);
-        oInternetCard.setRenew(Status.STATUS_0.status);
-        oInternetCard.setInternetCardStatus(InternetCardStatus.NOACTIVATE.code);
-        Date date = new Date();
-        oInternetCard.setcTime(date);
-        oInternetCard.setuTime(date);
-        oInternetCard.setuUser(oInternetCard.getcUser());
-        oInternetCard.setStatus(Status.STATUS_1.status);
-        oInternetCard.setVersion(BigDecimal.ONE);
-        internetCardMapper.insert(oInternetCard);
+    public void orderInsertInternetCard(List<OLogisticsDetail> logisticsDetailList,String manuFacturer)throws Exception{
+
+        String batchNo = IDUtils.getBatchNo();
+        for (OLogisticsDetail oLogisticsDetail : logisticsDetailList) {
+            OInternetCard oInternetCard = new OInternetCard();
+            oInternetCard.setIccidNum(oLogisticsDetail.getSnNum());
+            oInternetCard.setBatchNum(batchNo);
+            oInternetCard.setOrderId(oLogisticsDetail.getOrderId());
+            oInternetCard.setDeliverTime(oLogisticsDetail.getcTime());
+            oInternetCard.setAgentId(oLogisticsDetail.getAgentId());
+            Agent agent = agentService.getAgentById(oLogisticsDetail.getAgentId());
+            if(agent!=null)
+            oInternetCard.setAgentName(agent.getAgName());
+            oInternetCard.setManufacturer(manuFacturer);
+            oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
+            oInternetCard.setStop(Status.STATUS_0.status);
+            oInternetCard.setRenew(Status.STATUS_0.status);
+            oInternetCard.setInternetCardStatus(InternetCardStatus.NOACTIVATE.code);
+            Date date = new Date();
+            oInternetCard.setcTime(date);
+            oInternetCard.setuTime(date);
+            oInternetCard.setuUser(oInternetCard.getcUser());
+            oInternetCard.setStatus(Status.STATUS_1.status);
+            oInternetCard.setVersion(BigDecimal.ONE);
+            internetCardMapper.insert(oInternetCard);
+        }
     }
 
 }

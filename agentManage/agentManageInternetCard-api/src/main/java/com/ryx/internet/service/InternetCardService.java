@@ -3,6 +3,7 @@ package com.ryx.internet.service;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
 import com.ryx.internet.pojo.OInternetCard;
 import com.ryx.internet.pojo.OInternetCardImport;
 
@@ -37,5 +38,5 @@ public interface InternetCardService {
 
     void processDataUpdateMechIsNull(OInternetCard internetCard);
 
-    void orderInsertInternetCard(OInternetCard oInternetCard)throws Exception;
+    void orderInsertInternetCard(List<OLogisticsDetail> logisticsDetailList,String manuFacturer)throws Exception;
 }
