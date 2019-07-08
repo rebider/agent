@@ -2022,8 +2022,6 @@ public class AimportServiceImpl implements AimportService {
             }
             if(StringUtils.isNotBlank(shoukuanzhanghuming_shenfz) && !"null".equalsIgnoreCase(shoukuanzhanghuming_shenfz)) {
                 agentColinfo.setAgLegalCernum(shoukuanzhanghuming_shenfz);
-            }else{
-                agentColinfo.setCloBankCode(null);
             }
             agentColinfo.setPayStatus(ColinfoPayStatus.C.code);
 
