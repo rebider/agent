@@ -28,10 +28,12 @@ public interface OrderActivityService {
 
     /**
      * 活动复制
-     * @param activityId
+     * @param activity
      * @return
      */
-    AgentResult activityCopy(String activityId);
+    AgentResult activityCopy(OActivity activity);
+
+    OActivity toActivityCopy(OActivity activity);
 
     List<OActivity> allActivity();
 

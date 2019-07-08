@@ -262,60 +262,85 @@ public class OrderActivityServiceImpl implements OrderActivityService {
 
     /**
      * 活动复制
-     * @param activityId
+     * @param activity
      * @return
      */
     @Override
-    public AgentResult activityCopy(String activityId) {
+    public AgentResult activityCopy(OActivity activity) {
         AgentResult result = new AgentResult(500, "参数错误", "");
-        if (StringUtils.isBlank(activityId)) {
+        if (activity == null) {
             return result;
         }
-        //活动复制 id生成 内容一致
-        OActivity oActivity = activityMapper.selectByPrimaryKey(activityId);
-        OActivity oActivityCopy = new OActivity();
-        oActivityCopy.setId(idService.genId(TabId.o_activity));
-        oActivityCopy.setcTime(new Date());
-        oActivityCopy.setuTime(new Date());
-        oActivityCopy.setStatus(Status.STATUS_1.status);
-        oActivityCopy.setVersion(Status.STATUS_1.status);
-        oActivityCopy.setProductId(oActivity.getProductId());
-        oActivityCopy.setRuleId(oActivity.getRuleId());
-        oActivityCopy.setActivityName(oActivity.getActivityName());
-        oActivityCopy.setProType(oActivity.getProType());
-        oActivityCopy.setActivityWay(oActivity.getActivityWay());
-        oActivityCopy.setActivityRule(oActivity.getActivityRule());
-        oActivityCopy.setPlatform(oActivity.getPlatform());
-        oActivityCopy.setPrice(oActivity.getPrice());
-        oActivityCopy.setBeginTime(oActivity.getBeginTime());
-        oActivityCopy.setEndTime(oActivity.getEndTime());
-        oActivityCopy.setVender(oActivity.getVender());
-        oActivityCopy.setProModel(oActivity.getProModel());
-        oActivityCopy.setcUser(oActivity.getcUser());
-        oActivityCopy.setuUser(oActivity.getuUser());
-        oActivityCopy.setgTime(oActivity.getgTime());
-        oActivityCopy.setActivityCondition(oActivity.getActivityCondition());
-        oActivityCopy.setBusProCode(oActivity.getBusProCode());
-        oActivityCopy.setBusProName(oActivity.getBusProName());
-        oActivityCopy.setTermBatchcode(oActivity.getTermBatchcode());
-        oActivityCopy.setTermBatchname(oActivity.getTermBatchname());
-        oActivityCopy.setTermtype(oActivity.getTermtype());
-        oActivityCopy.setTermtypename(oActivity.getTermtypename());
-        oActivityCopy.setActCode(oActivity.getActCode());
-        oActivityCopy.setOriginalPrice(oActivity.getOriginalPrice());
-        oActivityCopy.setProTypeName(oActivity.getProTypeName());
-        oActivityCopy.setPosSpePrice(oActivity.getPosSpePrice());
-        oActivityCopy.setPosType(oActivity.getPosType());
-        oActivityCopy.setStandTime(oActivity.getStandTime());
-        oActivityCopy.setVenderName(oActivity.getVenderName());
-        oActivityCopy.setStandAmt(oActivity.getStandAmt());
-        oActivityCopy.setBackType(oActivity.getBackType());
-        oActivityCopy.setVisible(oActivity.getVisible());
-        int add_copy = activityMapper.insertSelective(oActivityCopy);
+        if (StringUtils.isBlank(activity.getId())) {
+            return result;
+        }
+        if (activity.getOriginalPrice() == null) {
+            return new AgentResult(500, "商品原价不能为空", "");
+        }
+        if (activity.getPrice() == null) {
+            return new AgentResult(500, "活动价格不能为空", "");
+        }
+
+        String platFormType = platFormMapper.selectPlatType(activity.getPlatform());
+        if (StringUtils.isNotBlank(platFormType)) {
+            if (PlatformType.whetherPOS(platFormType)) {
+                //如果是POS或者是智能POS  则需要清除终端批次和终端类型的id name
+                activity.setTermBatchcode(" ");
+                activity.setTermBatchname(" ");
+                activity.setTermtype(" ");
+                activity.setTermtypename(" ");
+            }
+        }
+        activity.setcTime(new Date());
+        activity.setuTime(new Date());
+
+        if (StringUtils.isNotBlank(platFormType)) {
+            try {
+                List<TermMachineVo> termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType));
+                for (TermMachineVo termMachineVo : termMachineVos) {
+                    if (activity.getBusProCode().equals(termMachineVo.getId())) {
+                        activity.setStandAmt(BigDecimal.valueOf(Integer.valueOf(termMachineVo.getStandAmt())));
+                        activity.setBackType(termMachineVo.getBackType());
+                    }
+                }
+            } catch (Exception e) {
+                logger.info(e.getMessage());
+                e.printStackTrace();
+            }
+        }
+
+        OActivityExample oActivityExample = new OActivityExample();
+        oActivityExample.or().andActCodeEqualTo(activity.getActCode()).andStatusEqualTo(Status.STATUS_1.status).andIdNotEqualTo(activity.getId());
+        oActivityExample.setOrderByClause(" c_time desc ");
+        List<OActivity> list = activityMapper.selectByExample(oActivityExample);
+
+        for (OActivity oActivity : list) {
+            if (oActivity.getPrice() != null && oActivity.getPrice().compareTo(activity.getPrice()) != 0) {
+                return AgentResult.fail("相同活动代码价格必须相同");
+            }
+        }
+
+        if (StringUtils.isNotBlank(activity.getActCode())) {
+            if (StringUtils.isNotBlank(activity.getActCode())) {
+                if("2004".equals(activity.getActCode()) || "2204".equals(activity.getActCode())){
+                    logger.info("2004和2204活动代码禁止使用");
+                    return AgentResult.fail("2004和2204活动代码禁止使用");
+                }
+            }
+        }
+
+        int add_copy = activityMapper.insertSelective(activity);
         if (add_copy == 1) {
             return AgentResult.ok();
         }
         return result;
+    }
+
+    @Override
+    public OActivity toActivityCopy(OActivity activity) {
+        OActivity oActivity = new OActivity();
+        oActivity.setId(idService.genId(TabId.o_activity));
+        return oActivity;
     }
 
     @Override
