@@ -36,4 +36,6 @@ public interface InternetCardService {
     List<OInternetCard> fetchDataMechIsNull();
 
     void processDataUpdateMechIsNull(OInternetCard internetCard);
+
+    void orderInsertInternetCard(OInternetCard oInternetCard)throws Exception;
 }

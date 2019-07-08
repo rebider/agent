@@ -779,4 +779,25 @@ public class InternetCardServiceImpl implements InternetCardService {
             e.printStackTrace();
         }
     }
+
+    /**
+     * 订单发货 如果是流量卡插入信息表
+     * @param oInternetCard
+     * @throws Exception
+     */
+    @Override
+    public void orderInsertInternetCard(OInternetCard oInternetCard)throws Exception{
+        oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
+        oInternetCard.setStop(Status.STATUS_0.status);
+        oInternetCard.setRenew(Status.STATUS_0.status);
+        oInternetCard.setInternetCardStatus(InternetCardStatus.NOACTIVATE.code);
+        Date date = new Date();
+        oInternetCard.setcTime(date);
+        oInternetCard.setuTime(date);
+        oInternetCard.setuUser(oInternetCard.getcUser());
+        oInternetCard.setStatus(Status.STATUS_1.status);
+        oInternetCard.setVersion(BigDecimal.ONE);
+        internetCardMapper.insert(oInternetCard);
+    }
+
 }

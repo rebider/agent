@@ -40,6 +40,11 @@
         </dependency>
         <dependency>
             <groupId>com.ryx.ry</groupId>
+            <artifactId>agentManageInternetCard-api</artifactId>
+            <version>${agentManage.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ryx.ry</groupId>
             <artifactId>agentManageMachine-api</artifactId>
             <version>${agentManage.version}</version>
         </dependency>
