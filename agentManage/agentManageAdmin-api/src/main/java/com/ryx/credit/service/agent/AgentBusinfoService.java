@@ -41,7 +41,8 @@ public interface AgentBusinfoService {
 
     public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent,String userId,Boolean isPass)throws Exception;
 
-    public List<Map> agentBus(String agentId);
+    public List<Map> agentBus(String agentId,Long userId);
+
     public List<Map> agentBusChild(String platformCode,String angetId);
 
     public List<Map> agentBusChild(String busId);

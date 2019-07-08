@@ -829,12 +829,17 @@
     left join a_agent b on a.agent_id=b.id
     left join a_platform c on c.platform_num = a.bus_platform
     left join d_dict d on d.d_group='AGENT' AND d.d_artifact = 'BUS_TYPE' and d.d_itemvalue = a.bus_type
+    left join C_ORGANIZATION oa on oa.id=a.ag_doc_pro
+    left join C_ORGANIZATION ob on ob.id=a.AG_DOC_DISTRICT
       <where>
          a.status=1 and b.status=1 and (a.bus_status=1 or a.bus_status=2 <if test="busStatus!=null and busStatus!=''">  or a.bus_status=0 </if> )
         <if test="id!=null and id!=''"> and a.id=#{id}</if>
         <if test="busPlatform!=null and busPlatform!=''">and a.bus_platform =#{busPlatform}</if>
         <if test="agentId!=null and agentId!=''">and a.agent_id = #{agentId}</if>
         <if test="busParent!=null and busParent!=''">and a.bus_parent= #{busParent}</if>
+        <if test="organizationCode!=null and organizationCode!=''">
+          and (oa.CODE like concat(#{organizationCode},'%') or ob.CODE like concat(#{organizationCode},'%') )
+        </if>
       </where>
   </select>
 
