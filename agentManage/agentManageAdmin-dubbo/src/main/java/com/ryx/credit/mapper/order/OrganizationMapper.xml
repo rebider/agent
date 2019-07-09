@@ -469,6 +469,19 @@
         </where>
     </select>
 
+    <select id="queryOrganization" parameterType="string" resultMap="OrgVoMap">
+        select
+        org.*,opf.PLAT_NUM,opf.PLAT_CODE
+        from O_ORGANIZATION org
+        left join ORG_PLATFORM opf on org.org_id=opf.org_id
+        <where>
+            1=1 and org.status=1
+            <if test="orgId != null and orgId != '' ">
+                and org.ORG_ID=#{orgId}
+            </if>
+        </where>
+    </select>
+
     <select id="queryByOrganName" parameterType="map" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />

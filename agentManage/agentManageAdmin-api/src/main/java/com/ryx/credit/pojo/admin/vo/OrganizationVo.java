@@ -1,5 +1,6 @@
 package com.ryx.credit.pojo.admin.vo;
 
+import com.ryx.credit.pojo.admin.order.OrgPlatform;
 import com.ryx.credit.pojo.admin.order.Organization;
 
 import java.io.Serializable;
@@ -14,7 +15,7 @@ public class OrganizationVo implements Serializable{
 
     private Organization organization;
     private List<String> organizatioTableFile;
-
+    private List<OrgPlatform> orgPlatform;
     public Organization getOrganization() {
         return organization;
     }
@@ -29,5 +30,13 @@ public class OrganizationVo implements Serializable{
 
     public void setOrganizatioTableFile(List<String> organizatioTableFile) {
         this.organizatioTableFile = organizatioTableFile;
+    }
+
+    public List<OrgPlatform> getOrgPlatform() {
+        return orgPlatform;
+    }
+
+    public void setOrgPlatform(List<OrgPlatform> orgPlatform) {
+        this.orgPlatform = orgPlatform;
     }
 }
