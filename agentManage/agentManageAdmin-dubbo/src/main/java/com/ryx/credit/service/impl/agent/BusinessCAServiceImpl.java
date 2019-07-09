@@ -173,7 +173,7 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 			JSONObject dataObj = (JSONObject)agentResult.getData();
 
 			if(StringUtils.isNotBlank(dataObj.getString("regCap")))
-			agent.setAgCapital(new BigDecimal(dataObj.getString("regCap")));
+			 agent.setAgCapital(new BigDecimal(dataObj.getString("regCap").trim()));
 
 			if(StringUtils.isNotBlank(dataObj.getString("openFrom")))
 			agent.setAgBusLicb(DateUtil.format(dataObj.getString("openFrom"),"yyyy-MM-dd"));
