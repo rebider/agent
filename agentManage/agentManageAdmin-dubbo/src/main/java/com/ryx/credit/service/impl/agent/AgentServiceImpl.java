@@ -749,4 +749,23 @@ public class AgentServiceImpl implements AgentService {
         }
         return AgentResult.fail();
     }
+
+    @Override
+    public int reportEdit(Agent agent, String userId) throws MessageException {
+        int i=0;
+        AgentExample agentExample = new AgentExample();
+        AgentExample.Criteria criteria = agentExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andIdEqualTo(agent.getId());
+        List<Agent> agentList= agentMapper.selectByExample(agentExample);
+        if (null!=agentList &&agentList.size()>0 ){
+            Agent a_agent = agentList.get(0);
+            a_agent.setReportStatus(agent.getReportStatus());
+            a_agent.setReportTime(agent.getReportTime());
+            a_agent.setcUser(userId);
+            a_agent.setcUtime(Calendar.getInstance().getTime());
+            i = agentMapper.updateByPrimaryKeySelective(a_agent);
+            agentDataHistoryService.saveDataHistory(a_agent, DataHistoryType.BASICS.getValue());
+        }
+        return i;
+
+    }
 }
