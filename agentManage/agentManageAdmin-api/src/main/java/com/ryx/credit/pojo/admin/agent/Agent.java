@@ -87,29 +87,9 @@ public class Agent extends AgentExtends implements Serializable {
 
     private BigDecimal freestatus;
 
-    private String busRiskEmail;
+    private String busRiskEmail ;
 
     private String busContactEmail;
-
-    private BigDecimal reportStatus;
-
-    private Date reportTime;
-
-    public BigDecimal getReportStatus() {
-        return reportStatus;
-    }
-
-    public void setReportStatus(BigDecimal reportStatus) {
-        this.reportStatus = reportStatus;
-    }
-
-    public Date getReportTime() {
-        return reportTime;
-    }
-
-    public void setReportTime(Date reportTime) {
-        this.reportTime = reportTime;
-    }
 
     public String getId() {
         return id;
@@ -390,6 +370,4 @@ public class Agent extends AgentExtends implements Serializable {
     public void setBusContactEmail(String busContactEmail) {
         this.busContactEmail = busContactEmail;
     }
-
-
 }
