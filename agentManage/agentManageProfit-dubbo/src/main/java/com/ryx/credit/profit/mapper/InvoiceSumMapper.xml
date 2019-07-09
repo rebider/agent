@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.InvoiceSumMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.InvoiceSum">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="PROFIT_MONTH" jdbcType="VARCHAR" property="profitMonth" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="INVOICE_COMPANY" jdbcType="VARCHAR" property="invoiceCompany" />
+    <result column="PRE_LEFT_AMT" jdbcType="DECIMAL" property="preLeftAmt" />
+    <result column="DAY_PROFIT_AMT" jdbcType="DECIMAL" property="dayProfitAmt" />
+    <result column="DAY_BACK_AMT" jdbcType="DECIMAL" property="dayBackAmt" />
+    <result column="PRE_PROFIT_MONTH_AMT" jdbcType="DECIMAL" property="preProfitMonthAmt" />
+    <result column="ADD_INVOICE_AMT" jdbcType="DECIMAL" property="addInvoiceAmt" />
+    <result column="OWN_INVOICE" jdbcType="DECIMAL" property="ownInvoice" />
+    <result column="ADJUST_AMT" jdbcType="DECIMAL" property="adjustAmt" />
+    <result column="ADJUST_ACCOUNT" jdbcType="VARCHAR" property="adjustAccount" />
+    <result column="ADJUST_RESON" jdbcType="VARCHAR" property="adjustReson" />
+    <result column="ADJUST_TIME" jdbcType="VARCHAR" property="adjustTime" />
+    <result column="TOP_ORG_ID" jdbcType="VARCHAR" property="topOrgId" />
+    <result column="TOP_ORG_NAME" jdbcType="VARCHAR" property="topOrgName" />
+    <result column="INVOICE_STATUS" jdbcType="CHAR" property="invoiceStatus" />
+    <result column="SUB_ADD_INVOICE_AMT" jdbcType="DECIMAL" property="subAddInvoiceAmt" />
+    <result column="REV1" jdbcType="VARCHAR" property="rev1" />
+    <result column="REV2" jdbcType="VARCHAR" property="rev2" />
+    <result column="REV3" jdbcType="VARCHAR" property="rev3" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, PROFIT_MONTH, AGENT_NAME, AGENT_ID, INVOICE_COMPANY, PRE_LEFT_AMT, DAY_PROFIT_AMT, 
+    DAY_BACK_AMT, PRE_PROFIT_MONTH_AMT, ADD_INVOICE_AMT, OWN_INVOICE, ADJUST_AMT, ADJUST_ACCOUNT, 
+    ADJUST_RESON, ADJUST_TIME, TOP_ORG_ID, TOP_ORG_NAME, INVOICE_STATUS, SUB_ADD_INVOICE_AMT, 
+    REV1, REV2, REV3
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.InvoiceSumExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_INVOICE_SUM
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from P_INVOICE_SUM
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.InvoiceSumExample">
+    delete from P_INVOICE_SUM
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.InvoiceSum">
+    insert into P_INVOICE_SUM (ID, PROFIT_MONTH, AGENT_NAME, 
+      AGENT_ID, INVOICE_COMPANY, PRE_LEFT_AMT, 
+      DAY_PROFIT_AMT, DAY_BACK_AMT, PRE_PROFIT_MONTH_AMT, 
+      ADD_INVOICE_AMT, OWN_INVOICE, ADJUST_AMT, 
+      ADJUST_ACCOUNT, ADJUST_RESON, ADJUST_TIME, 
+      TOP_ORG_ID, TOP_ORG_NAME, INVOICE_STATUS, 
+      SUB_ADD_INVOICE_AMT, REV1, REV2, 
+      REV3)
+    values (#{id,jdbcType=VARCHAR}, #{profitMonth,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR}, 
+      #{agentId,jdbcType=VARCHAR}, #{invoiceCompany,jdbcType=VARCHAR}, #{preLeftAmt,jdbcType=DECIMAL}, 
+      #{dayProfitAmt,jdbcType=DECIMAL}, #{dayBackAmt,jdbcType=DECIMAL}, #{preProfitMonthAmt,jdbcType=DECIMAL}, 
+      #{addInvoiceAmt,jdbcType=DECIMAL}, #{ownInvoice,jdbcType=DECIMAL}, #{adjustAmt,jdbcType=DECIMAL}, 
+      #{adjustAccount,jdbcType=VARCHAR}, #{adjustReson,jdbcType=VARCHAR}, #{adjustTime,jdbcType=VARCHAR}, 
+      #{topOrgId,jdbcType=VARCHAR}, #{topOrgName,jdbcType=VARCHAR}, #{invoiceStatus,jdbcType=CHAR}, 
+      #{subAddInvoiceAmt,jdbcType=DECIMAL}, #{rev1,jdbcType=VARCHAR}, #{rev2,jdbcType=VARCHAR}, 
+      #{rev3,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.InvoiceSum">
+    insert into P_INVOICE_SUM
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="profitMonth != null">
+        PROFIT_MONTH,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="invoiceCompany != null">
+        INVOICE_COMPANY,
+      </if>
+      <if test="preLeftAmt != null">
+        PRE_LEFT_AMT,
+      </if>
+      <if test="dayProfitAmt != null">
+        DAY_PROFIT_AMT,
+      </if>
+      <if test="dayBackAmt != null">
+        DAY_BACK_AMT,
+      </if>
+      <if test="preProfitMonthAmt != null">
+        PRE_PROFIT_MONTH_AMT,
+      </if>
+      <if test="addInvoiceAmt != null">
+        ADD_INVOICE_AMT,
+      </if>
+      <if test="ownInvoice != null">
+        OWN_INVOICE,
+      </if>
+      <if test="adjustAmt != null">
+        ADJUST_AMT,
+      </if>
+      <if test="adjustAccount != null">
+        ADJUST_ACCOUNT,
+      </if>
+      <if test="adjustReson != null">
+        ADJUST_RESON,
+      </if>
+      <if test="adjustTime != null">
+        ADJUST_TIME,
+      </if>
+      <if test="topOrgId != null">
+        TOP_ORG_ID,
+      </if>
+      <if test="topOrgName != null">
+        TOP_ORG_NAME,
+      </if>
+      <if test="invoiceStatus != null">
+        INVOICE_STATUS,
+      </if>
+      <if test="subAddInvoiceAmt != null">
+        SUB_ADD_INVOICE_AMT,
+      </if>
+      <if test="rev1 != null">
+        REV1,
+      </if>
+      <if test="rev2 != null">
+        REV2,
+      </if>
+      <if test="rev3 != null">
+        REV3,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="profitMonth != null">
+        #{profitMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="invoiceCompany != null">
+        #{invoiceCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="preLeftAmt != null">
+        #{preLeftAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="dayProfitAmt != null">
+        #{dayProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="dayBackAmt != null">
+        #{dayBackAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="preProfitMonthAmt != null">
+        #{preProfitMonthAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="addInvoiceAmt != null">
+        #{addInvoiceAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="ownInvoice != null">
+        #{ownInvoice,jdbcType=DECIMAL},
+      </if>
+      <if test="adjustAmt != null">
+        #{adjustAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="adjustAccount != null">
+        #{adjustAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustReson != null">
+        #{adjustReson,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustTime != null">
+        #{adjustTime,jdbcType=VARCHAR},
+      </if>
+      <if test="topOrgId != null">
+        #{topOrgId,jdbcType=VARCHAR},
+      </if>
+      <if test="topOrgName != null">
+        #{topOrgName,jdbcType=VARCHAR},
+      </if>
+      <if test="invoiceStatus != null">
+        #{invoiceStatus,jdbcType=CHAR},
+      </if>
+      <if test="subAddInvoiceAmt != null">
+        #{subAddInvoiceAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="rev1 != null">
+        #{rev1,jdbcType=VARCHAR},
+      </if>
+      <if test="rev2 != null">
+        #{rev2,jdbcType=VARCHAR},
+      </if>
+      <if test="rev3 != null">
+        #{rev3,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.InvoiceSumExample" resultType="java.lang.Long">
+    select count(*) from P_INVOICE_SUM
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.InvoiceSum">
+    update P_INVOICE_SUM
+    <set>
+      <if test="profitMonth != null">
+        PROFIT_MONTH = #{profitMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="invoiceCompany != null">
+        INVOICE_COMPANY = #{invoiceCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="preLeftAmt != null">
+        PRE_LEFT_AMT = #{preLeftAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="dayProfitAmt != null">
+        DAY_PROFIT_AMT = #{dayProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="dayBackAmt != null">
+        DAY_BACK_AMT = #{dayBackAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="preProfitMonthAmt != null">
+        PRE_PROFIT_MONTH_AMT = #{preProfitMonthAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="addInvoiceAmt != null">
+        ADD_INVOICE_AMT = #{addInvoiceAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="ownInvoice != null">
+        OWN_INVOICE = #{ownInvoice,jdbcType=DECIMAL},
+      </if>
+      <if test="adjustAmt != null">
+        ADJUST_AMT = #{adjustAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="adjustAccount != null">
+        ADJUST_ACCOUNT = #{adjustAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustReson != null">
+        ADJUST_RESON = #{adjustReson,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustTime != null">
+        ADJUST_TIME = #{adjustTime,jdbcType=VARCHAR},
+      </if>
+      <if test="topOrgId != null">
+        TOP_ORG_ID = #{topOrgId,jdbcType=VARCHAR},
+      </if>
+      <if test="topOrgName != null">
+        TOP_ORG_NAME = #{topOrgName,jdbcType=VARCHAR},
+      </if>
+      <if test="invoiceStatus != null">
+        INVOICE_STATUS = #{invoiceStatus,jdbcType=CHAR},
+      </if>
+      <if test="subAddInvoiceAmt != null">
+        SUB_ADD_INVOICE_AMT = #{subAddInvoiceAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="rev1 != null">
+        REV1 = #{rev1,jdbcType=VARCHAR},
+      </if>
+      <if test="rev2 != null">
+        REV2 = #{rev2,jdbcType=VARCHAR},
+      </if>
+      <if test="rev3 != null">
+        REV3 = #{rev3,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.InvoiceSum">
+    update P_INVOICE_SUM
+    set PROFIT_MONTH = #{profitMonth,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      INVOICE_COMPANY = #{invoiceCompany,jdbcType=VARCHAR},
+      PRE_LEFT_AMT = #{preLeftAmt,jdbcType=DECIMAL},
+      DAY_PROFIT_AMT = #{dayProfitAmt,jdbcType=DECIMAL},
+      DAY_BACK_AMT = #{dayBackAmt,jdbcType=DECIMAL},
+      PRE_PROFIT_MONTH_AMT = #{preProfitMonthAmt,jdbcType=DECIMAL},
+      ADD_INVOICE_AMT = #{addInvoiceAmt,jdbcType=DECIMAL},
+      OWN_INVOICE = #{ownInvoice,jdbcType=DECIMAL},
+      ADJUST_AMT = #{adjustAmt,jdbcType=DECIMAL},
+      ADJUST_ACCOUNT = #{adjustAccount,jdbcType=VARCHAR},
+      ADJUST_RESON = #{adjustReson,jdbcType=VARCHAR},
+      ADJUST_TIME = #{adjustTime,jdbcType=VARCHAR},
+      TOP_ORG_ID = #{topOrgId,jdbcType=VARCHAR},
+      TOP_ORG_NAME = #{topOrgName,jdbcType=VARCHAR},
+      INVOICE_STATUS = #{invoiceStatus,jdbcType=CHAR},
+      SUB_ADD_INVOICE_AMT = #{subAddInvoiceAmt,jdbcType=DECIMAL},
+      REV1 = #{rev1,jdbcType=VARCHAR},
+      REV2 = #{rev2,jdbcType=VARCHAR},
+      REV3 = #{rev3,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

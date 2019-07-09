@@ -15,23 +15,34 @@
     <result column="EXPRESS_COMPANY" jdbcType="VARCHAR" property="expressCompany" />
     <result column="EXPRESS_NUMBER" jdbcType="VARCHAR" property="expressNumber" />
     <result column="EXPRESS_DATE" jdbcType="VARCHAR" property="expressDate" />
-    <result column="ATTACHMENT" jdbcType="VARCHAR" property="attachment" />
-    <result column="SH_DATE" jdbcType="VARCHAR" property="shDate" />
-    <result column="SH_NAME" jdbcType="VARCHAR" property="shName" />
-    <result column="CURRENT_INVOICE" jdbcType="DECIMAL" property="currentInvoice" />
-    <result column="SH_RESULT" jdbcType="CHAR" property="shResult" />
+    <result column="EXPRESS_REMARK" jdbcType="VARCHAR" property="expressRemark" />
+    <result column="YS_DATE" jdbcType="VARCHAR" property="ysDate" />
+    <result column="ES_DATE" jdbcType="VARCHAR" property="esDate" />
+    <result column="YS_RESULT" jdbcType="CHAR" property="ysResult" />
     <result column="RETURN_REASON" jdbcType="VARCHAR" property="returnReason" />
     <result column="RETURN_DATE" jdbcType="VARCHAR" property="returnDate" />
     <result column="RETURN_EXPRESS_NUMBER" jdbcType="VARCHAR" property="returnExpressNumber" />
     <result column="RETURN_EXPRESS_COMPANY" jdbcType="VARCHAR" property="returnExpressCompany" />
     <result column="CREATE_DATE" jdbcType="VARCHAR" property="createDate" />
     <result column="CREATE_NAME" jdbcType="VARCHAR" property="createName" />
-    <result column="FILENAME" jdbcType="VARCHAR" property="filename" />
     <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
     <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
-    <result column="PROFIT_MONTH" jdbcType="VARCHAR" property="profitMonth" />
-    <result column="AMOUNT_BEFORE_TAX" jdbcType="DECIMAL" property="amountBeforeTax" />
+    <result column="INVOICE_AMT_MONTH" jdbcType="VARCHAR" property="invoiceAmtMonth" />
+    <result column="ES_RESULT" jdbcType="CHAR" property="esResult" />
     <result column="AMOUNT_TAX" jdbcType="DECIMAL" property="amountTax" />
+    <result column="STATUS" jdbcType="CHAR" property="status" />
+    <result column="SERIAL_NO" jdbcType="VARCHAR" property="serialNo" />
+    <result column="AMOUNT" jdbcType="DECIMAL" property="amount" />
+    <result column="EXPENSE_STATUS" jdbcType="VARCHAR" property="expenseStatus" />
+    <result column="INVOICE_TYPE" jdbcType="VARCHAR" property="invoiceType" />
+    <result column="SALLER_NAME" jdbcType="VARCHAR" property="sallerName" />
+    <result column="SALLER_NO" jdbcType="VARCHAR" property="sallerNo" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="PROFIT_MONTH" jdbcType="VARCHAR" property="profitMonth" />
+    <result column="REV1" jdbcType="VARCHAR" property="rev1" />
+    <result column="REV2" jdbcType="VARCHAR" property="rev2" />
+    <result column="REV3" jdbcType="VARCHAR" property="rev3" />
+    <result column="REV4" jdbcType="VARCHAR" property="rev4" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -93,10 +104,11 @@
   </sql>
   <sql id="Base_Column_List">
     ID, INVOICE_COMPANY, INVOICE_DATE, INVOICE_NUMBER, INVOICE_CODE, INVOICE_ITEM, UNIT_PRICE,
-    NUMBER_SL, SUM_AMT, TAX, EXPRESS_COMPANY, EXPRESS_NUMBER, EXPRESS_DATE, ATTACHMENT,
-    SH_DATE, SH_NAME, CURRENT_INVOICE, SH_RESULT, RETURN_REASON, RETURN_DATE, RETURN_EXPRESS_NUMBER,
-    RETURN_EXPRESS_COMPANY, CREATE_DATE, CREATE_NAME, FILENAME, AGENT_ID, AGENT_NAME,
-    PROFIT_MONTH, AMOUNT_BEFORE_TAX, AMOUNT_TAX
+    NUMBER_SL, SUM_AMT, TAX, EXPRESS_COMPANY, EXPRESS_NUMBER, EXPRESS_DATE, EXPRESS_REMARK,
+    YS_DATE, ES_DATE, YS_RESULT, RETURN_REASON, RETURN_DATE, RETURN_EXPRESS_NUMBER, RETURN_EXPRESS_COMPANY,
+    CREATE_DATE, CREATE_NAME, AGENT_ID, AGENT_NAME, INVOICE_AMT_MONTH, ES_RESULT, AMOUNT_TAX,
+    STATUS, SERIAL_NO, AMOUNT, EXPENSE_STATUS, INVOICE_TYPE, SALLER_NAME, SALLER_NO,
+    REMARK, PROFIT_MONTH, REV1, REV2, REV3, REV4
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.InvoiceApplyExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -105,7 +117,7 @@
       distinct
     </if>
     <include refid="Base_Column_List" />
-    from P_INVOICE_APPLY
+    from P_INVOICE_APPLY N ${innerJoinDepartment}
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -131,24 +143,30 @@
       INVOICE_NUMBER, INVOICE_CODE, INVOICE_ITEM,
       UNIT_PRICE, NUMBER_SL, SUM_AMT,
       TAX, EXPRESS_COMPANY, EXPRESS_NUMBER,
-      EXPRESS_DATE, ATTACHMENT, SH_DATE,
-      SH_NAME, CURRENT_INVOICE, SH_RESULT,
-      RETURN_REASON, RETURN_DATE, RETURN_EXPRESS_NUMBER,
-      RETURN_EXPRESS_COMPANY, CREATE_DATE, CREATE_NAME,
-      FILENAME, AGENT_ID, AGENT_NAME,
-      PROFIT_MONTH, AMOUNT_BEFORE_TAX, AMOUNT_TAX
-      )
+      EXPRESS_DATE, EXPRESS_REMARK, YS_DATE,
+      ES_DATE, YS_RESULT, RETURN_REASON,
+      RETURN_DATE, RETURN_EXPRESS_NUMBER, RETURN_EXPRESS_COMPANY,
+      CREATE_DATE, CREATE_NAME, AGENT_ID,
+      AGENT_NAME, INVOICE_AMT_MONTH, ES_RESULT,
+      AMOUNT_TAX, STATUS, SERIAL_NO,
+      AMOUNT, EXPENSE_STATUS, INVOICE_TYPE,
+      SALLER_NAME, SALLER_NO, REMARK,
+      PROFIT_MONTH, REV1, REV2,
+      REV3, REV4)
     values (#{id,jdbcType=VARCHAR}, #{invoiceCompany,jdbcType=VARCHAR}, #{invoiceDate,jdbcType=VARCHAR},
       #{invoiceNumber,jdbcType=VARCHAR}, #{invoiceCode,jdbcType=VARCHAR}, #{invoiceItem,jdbcType=VARCHAR},
       #{unitPrice,jdbcType=DECIMAL}, #{numberSl,jdbcType=DECIMAL}, #{sumAmt,jdbcType=DECIMAL},
       #{tax,jdbcType=DECIMAL}, #{expressCompany,jdbcType=VARCHAR}, #{expressNumber,jdbcType=VARCHAR},
-      #{expressDate,jdbcType=VARCHAR}, #{attachment,jdbcType=VARCHAR}, #{shDate,jdbcType=VARCHAR},
-      #{shName,jdbcType=VARCHAR}, #{currentInvoice,jdbcType=DECIMAL}, #{shResult,jdbcType=CHAR},
-      #{returnReason,jdbcType=VARCHAR}, #{returnDate,jdbcType=VARCHAR}, #{returnExpressNumber,jdbcType=VARCHAR},
-      #{returnExpressCompany,jdbcType=VARCHAR}, #{createDate,jdbcType=VARCHAR}, #{createName,jdbcType=VARCHAR},
-      #{filename,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR},
-      #{profitMonth,jdbcType=VARCHAR}, #{amountBeforeTax,jdbcType=DECIMAL}, #{amountTax,jdbcType=DECIMAL}
-      )
+      #{expressDate,jdbcType=VARCHAR}, #{expressRemark,jdbcType=VARCHAR}, #{ysDate,jdbcType=VARCHAR},
+      #{esDate,jdbcType=VARCHAR}, #{ysResult,jdbcType=CHAR}, #{returnReason,jdbcType=VARCHAR},
+      #{returnDate,jdbcType=VARCHAR}, #{returnExpressNumber,jdbcType=VARCHAR}, #{returnExpressCompany,jdbcType=VARCHAR},
+      #{createDate,jdbcType=VARCHAR}, #{createName,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
+      #{agentName,jdbcType=VARCHAR}, #{invoiceAmtMonth,jdbcType=VARCHAR}, #{esResult,jdbcType=CHAR},
+      #{amountTax,jdbcType=DECIMAL}, #{status,jdbcType=CHAR}, #{serialNo,jdbcType=VARCHAR},
+      #{amount,jdbcType=DECIMAL}, #{expenseStatus,jdbcType=VARCHAR}, #{invoiceType,jdbcType=VARCHAR},
+      #{sallerName,jdbcType=VARCHAR}, #{sallerNo,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR},
+      #{profitMonth,jdbcType=VARCHAR}, #{rev1,jdbcType=VARCHAR}, #{rev2,jdbcType=VARCHAR},
+      #{rev3,jdbcType=VARCHAR}, #{rev4,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.InvoiceApply">
     insert into P_INVOICE_APPLY
@@ -192,20 +210,17 @@
       <if test="expressDate != null">
         EXPRESS_DATE,
       </if>
-      <if test="attachment != null">
-        ATTACHMENT,
+      <if test="expressRemark != null">
+        EXPRESS_REMARK,
       </if>
-      <if test="shDate != null">
-        SH_DATE,
+      <if test="ysDate != null">
+        YS_DATE,
       </if>
-      <if test="shName != null">
-        SH_NAME,
+      <if test="esDate != null">
+        ES_DATE,
       </if>
-      <if test="currentInvoice != null">
-        CURRENT_INVOICE,
-      </if>
-      <if test="shResult != null">
-        SH_RESULT,
+      <if test="ysResult != null">
+        YS_RESULT,
       </if>
       <if test="returnReason != null">
         RETURN_REASON,
@@ -225,23 +240,59 @@
       <if test="createName != null">
         CREATE_NAME,
       </if>
-      <if test="filename != null">
-        FILENAME,
-      </if>
       <if test="agentId != null">
         AGENT_ID,
       </if>
       <if test="agentName != null">
         AGENT_NAME,
       </if>
-      <if test="profitMonth != null">
-        PROFIT_MONTH,
+      <if test="invoiceAmtMonth != null">
+        INVOICE_AMT_MONTH,
       </if>
-      <if test="amountBeforeTax != null">
-        AMOUNT_BEFORE_TAX,
+      <if test="esResult != null">
+        ES_RESULT,
       </if>
       <if test="amountTax != null">
         AMOUNT_TAX,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="serialNo != null">
+        SERIAL_NO,
+      </if>
+      <if test="amount != null">
+        AMOUNT,
+      </if>
+      <if test="expenseStatus != null">
+        EXPENSE_STATUS,
+      </if>
+      <if test="invoiceType != null">
+        INVOICE_TYPE,
+      </if>
+      <if test="sallerName != null">
+        SALLER_NAME,
+      </if>
+      <if test="sallerNo != null">
+        SALLER_NO,
+      </if>
+      <if test="remark != null">
+        REMARK,
+      </if>
+      <if test="profitMonth != null">
+        PROFIT_MONTH,
+      </if>
+      <if test="rev1 != null">
+        REV1,
+      </if>
+      <if test="rev2 != null">
+        REV2,
+      </if>
+      <if test="rev3 != null">
+        REV3,
+      </if>
+      <if test="rev4 != null">
+        REV4,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -284,20 +335,17 @@
       <if test="expressDate != null">
         #{expressDate,jdbcType=VARCHAR},
       </if>
-      <if test="attachment != null">
-        #{attachment,jdbcType=VARCHAR},
+      <if test="expressRemark != null">
+        #{expressRemark,jdbcType=VARCHAR},
       </if>
-      <if test="shDate != null">
-        #{shDate,jdbcType=VARCHAR},
+      <if test="ysDate != null">
+        #{ysDate,jdbcType=VARCHAR},
       </if>
-      <if test="shName != null">
-        #{shName,jdbcType=VARCHAR},
+      <if test="esDate != null">
+        #{esDate,jdbcType=VARCHAR},
       </if>
-      <if test="currentInvoice != null">
-        #{currentInvoice,jdbcType=DECIMAL},
-      </if>
-      <if test="shResult != null">
-        #{shResult,jdbcType=CHAR},
+      <if test="ysResult != null">
+        #{ysResult,jdbcType=CHAR},
       </if>
       <if test="returnReason != null">
         #{returnReason,jdbcType=VARCHAR},
@@ -317,28 +365,64 @@
       <if test="createName != null">
         #{createName,jdbcType=VARCHAR},
       </if>
-      <if test="filename != null">
-        #{filename,jdbcType=VARCHAR},
-      </if>
       <if test="agentId != null">
         #{agentId,jdbcType=VARCHAR},
       </if>
       <if test="agentName != null">
         #{agentName,jdbcType=VARCHAR},
       </if>
-      <if test="profitMonth != null">
-        #{profitMonth,jdbcType=VARCHAR},
+      <if test="invoiceAmtMonth != null">
+        #{invoiceAmtMonth,jdbcType=VARCHAR},
       </if>
-      <if test="amountBeforeTax != null">
-        #{amountBeforeTax,jdbcType=DECIMAL},
+      <if test="esResult != null">
+        #{esResult,jdbcType=CHAR},
       </if>
       <if test="amountTax != null">
         #{amountTax,jdbcType=DECIMAL},
       </if>
+      <if test="status != null">
+        #{status,jdbcType=CHAR},
+      </if>
+      <if test="serialNo != null">
+        #{serialNo,jdbcType=VARCHAR},
+      </if>
+      <if test="amount != null">
+        #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="expenseStatus != null">
+        #{expenseStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="invoiceType != null">
+        #{invoiceType,jdbcType=VARCHAR},
+      </if>
+      <if test="sallerName != null">
+        #{sallerName,jdbcType=VARCHAR},
+      </if>
+      <if test="sallerNo != null">
+        #{sallerNo,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="profitMonth != null">
+        #{profitMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="rev1 != null">
+        #{rev1,jdbcType=VARCHAR},
+      </if>
+      <if test="rev2 != null">
+        #{rev2,jdbcType=VARCHAR},
+      </if>
+      <if test="rev3 != null">
+        #{rev3,jdbcType=VARCHAR},
+      </if>
+      <if test="rev4 != null">
+        #{rev4,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.InvoiceApplyExample" resultType="java.lang.Long">
-    select count(*) from P_INVOICE_APPLY
+    select count(*) from P_INVOICE_APPLY N ${innerJoinDepartment}
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -385,20 +469,17 @@
       <if test="record.expressDate != null">
         EXPRESS_DATE = #{record.expressDate,jdbcType=VARCHAR},
       </if>
-      <if test="record.attachment != null">
-        ATTACHMENT = #{record.attachment,jdbcType=VARCHAR},
+      <if test="record.expressRemark != null">
+        EXPRESS_REMARK = #{record.expressRemark,jdbcType=VARCHAR},
       </if>
-      <if test="record.shDate != null">
-        SH_DATE = #{record.shDate,jdbcType=VARCHAR},
+      <if test="record.ysDate != null">
+        YS_DATE = #{record.ysDate,jdbcType=VARCHAR},
       </if>
-      <if test="record.shName != null">
-        SH_NAME = #{record.shName,jdbcType=VARCHAR},
+      <if test="record.esDate != null">
+        ES_DATE = #{record.esDate,jdbcType=VARCHAR},
       </if>
-      <if test="record.currentInvoice != null">
-        CURRENT_INVOICE = #{record.currentInvoice,jdbcType=DECIMAL},
-      </if>
-      <if test="record.shResult != null">
-        SH_RESULT = #{record.shResult,jdbcType=CHAR},
+      <if test="record.ysResult != null">
+        YS_RESULT = #{record.ysResult,jdbcType=CHAR},
       </if>
       <if test="record.returnReason != null">
         RETURN_REASON = #{record.returnReason,jdbcType=VARCHAR},
@@ -418,23 +499,59 @@
       <if test="record.createName != null">
         CREATE_NAME = #{record.createName,jdbcType=VARCHAR},
       </if>
-      <if test="record.filename != null">
-        FILENAME = #{record.filename,jdbcType=VARCHAR},
-      </if>
       <if test="record.agentId != null">
         AGENT_ID = #{record.agentId,jdbcType=VARCHAR},
       </if>
       <if test="record.agentName != null">
         AGENT_NAME = #{record.agentName,jdbcType=VARCHAR},
       </if>
-      <if test="record.profitMonth != null">
-        PROFIT_MONTH = #{record.profitMonth,jdbcType=VARCHAR},
+      <if test="record.invoiceAmtMonth != null">
+        INVOICE_AMT_MONTH = #{record.invoiceAmtMonth,jdbcType=VARCHAR},
       </if>
-      <if test="record.amountBeforeTax != null">
-        AMOUNT_BEFORE_TAX = #{record.amountBeforeTax,jdbcType=DECIMAL},
+      <if test="record.esResult != null">
+        ES_RESULT = #{record.esResult,jdbcType=CHAR},
       </if>
       <if test="record.amountTax != null">
         AMOUNT_TAX = #{record.amountTax,jdbcType=DECIMAL},
+      </if>
+      <if test="record.status != null">
+        STATUS = #{record.status,jdbcType=CHAR},
+      </if>
+      <if test="record.serialNo != null">
+        SERIAL_NO = #{record.serialNo,jdbcType=VARCHAR},
+      </if>
+      <if test="record.amount != null">
+        AMOUNT = #{record.amount,jdbcType=DECIMAL},
+      </if>
+      <if test="record.expenseStatus != null">
+        EXPENSE_STATUS = #{record.expenseStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="record.invoiceType != null">
+        INVOICE_TYPE = #{record.invoiceType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sallerName != null">
+        SALLER_NAME = #{record.sallerName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sallerNo != null">
+        SALLER_NO = #{record.sallerNo,jdbcType=VARCHAR},
+      </if>
+      <if test="record.remark != null">
+        REMARK = #{record.remark,jdbcType=VARCHAR},
+      </if>
+      <if test="record.profitMonth != null">
+        PROFIT_MONTH = #{record.profitMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="record.rev1 != null">
+        REV1 = #{record.rev1,jdbcType=VARCHAR},
+      </if>
+      <if test="record.rev2 != null">
+        REV2 = #{record.rev2,jdbcType=VARCHAR},
+      </if>
+      <if test="record.rev3 != null">
+        REV3 = #{record.rev3,jdbcType=VARCHAR},
+      </if>
+      <if test="record.rev4 != null">
+        REV4 = #{record.rev4,jdbcType=VARCHAR},
       </if>
     </set>
     <if test="_parameter != null">
@@ -456,23 +573,34 @@
     EXPRESS_COMPANY = #{record.expressCompany,jdbcType=VARCHAR},
     EXPRESS_NUMBER = #{record.expressNumber,jdbcType=VARCHAR},
     EXPRESS_DATE = #{record.expressDate,jdbcType=VARCHAR},
-    ATTACHMENT = #{record.attachment,jdbcType=VARCHAR},
-    SH_DATE = #{record.shDate,jdbcType=VARCHAR},
-    SH_NAME = #{record.shName,jdbcType=VARCHAR},
-    CURRENT_INVOICE = #{record.currentInvoice,jdbcType=DECIMAL},
-    SH_RESULT = #{record.shResult,jdbcType=CHAR},
+    EXPRESS_REMARK = #{record.expressRemark,jdbcType=VARCHAR},
+    YS_DATE = #{record.ysDate,jdbcType=VARCHAR},
+    ES_DATE = #{record.esDate,jdbcType=VARCHAR},
+    YS_RESULT = #{record.ysResult,jdbcType=CHAR},
     RETURN_REASON = #{record.returnReason,jdbcType=VARCHAR},
     RETURN_DATE = #{record.returnDate,jdbcType=VARCHAR},
     RETURN_EXPRESS_NUMBER = #{record.returnExpressNumber,jdbcType=VARCHAR},
     RETURN_EXPRESS_COMPANY = #{record.returnExpressCompany,jdbcType=VARCHAR},
     CREATE_DATE = #{record.createDate,jdbcType=VARCHAR},
     CREATE_NAME = #{record.createName,jdbcType=VARCHAR},
-    FILENAME = #{record.filename,jdbcType=VARCHAR},
     AGENT_ID = #{record.agentId,jdbcType=VARCHAR},
     AGENT_NAME = #{record.agentName,jdbcType=VARCHAR},
+    INVOICE_AMT_MONTH = #{record.invoiceAmtMonth,jdbcType=VARCHAR},
+    ES_RESULT = #{record.esResult,jdbcType=CHAR},
+    AMOUNT_TAX = #{record.amountTax,jdbcType=DECIMAL},
+    STATUS = #{record.status,jdbcType=CHAR},
+    SERIAL_NO = #{record.serialNo,jdbcType=VARCHAR},
+    AMOUNT = #{record.amount,jdbcType=DECIMAL},
+    EXPENSE_STATUS = #{record.expenseStatus,jdbcType=VARCHAR},
+    INVOICE_TYPE = #{record.invoiceType,jdbcType=VARCHAR},
+    SALLER_NAME = #{record.sallerName,jdbcType=VARCHAR},
+    SALLER_NO = #{record.sallerNo,jdbcType=VARCHAR},
+    REMARK = #{record.remark,jdbcType=VARCHAR},
     PROFIT_MONTH = #{record.profitMonth,jdbcType=VARCHAR},
-    AMOUNT_BEFORE_TAX = #{record.amountBeforeTax,jdbcType=DECIMAL},
-    AMOUNT_TAX = #{record.amountTax,jdbcType=DECIMAL}
+    REV1 = #{record.rev1,jdbcType=VARCHAR},
+    REV2 = #{record.rev2,jdbcType=VARCHAR},
+    REV3 = #{record.rev3,jdbcType=VARCHAR},
+    REV4 = #{record.rev4,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -516,20 +644,17 @@
       <if test="expressDate != null">
         EXPRESS_DATE = #{expressDate,jdbcType=VARCHAR},
       </if>
-      <if test="attachment != null">
-        ATTACHMENT = #{attachment,jdbcType=VARCHAR},
+      <if test="expressRemark != null">
+        EXPRESS_REMARK = #{expressRemark,jdbcType=VARCHAR},
       </if>
-      <if test="shDate != null">
-        SH_DATE = #{shDate,jdbcType=VARCHAR},
+      <if test="ysDate != null">
+        YS_DATE = #{ysDate,jdbcType=VARCHAR},
       </if>
-      <if test="shName != null">
-        SH_NAME = #{shName,jdbcType=VARCHAR},
+      <if test="esDate != null">
+        ES_DATE = #{esDate,jdbcType=VARCHAR},
       </if>
-      <if test="currentInvoice != null">
-        CURRENT_INVOICE = #{currentInvoice,jdbcType=DECIMAL},
-      </if>
-      <if test="shResult != null">
-        SH_RESULT = #{shResult,jdbcType=CHAR},
+      <if test="ysResult != null">
+        YS_RESULT = #{ysResult,jdbcType=CHAR},
       </if>
       <if test="returnReason != null">
         RETURN_REASON = #{returnReason,jdbcType=VARCHAR},
@@ -549,23 +674,59 @@
       <if test="createName != null">
         CREATE_NAME = #{createName,jdbcType=VARCHAR},
       </if>
-      <if test="filename != null">
-        FILENAME = #{filename,jdbcType=VARCHAR},
-      </if>
       <if test="agentId != null">
         AGENT_ID = #{agentId,jdbcType=VARCHAR},
       </if>
       <if test="agentName != null">
         AGENT_NAME = #{agentName,jdbcType=VARCHAR},
       </if>
-      <if test="profitMonth != null">
-        PROFIT_MONTH = #{profitMonth,jdbcType=VARCHAR},
+      <if test="invoiceAmtMonth != null">
+        INVOICE_AMT_MONTH = #{invoiceAmtMonth,jdbcType=VARCHAR},
       </if>
-      <if test="amountBeforeTax != null">
-        AMOUNT_BEFORE_TAX = #{amountBeforeTax,jdbcType=DECIMAL},
+      <if test="esResult != null">
+        ES_RESULT = #{esResult,jdbcType=CHAR},
       </if>
       <if test="amountTax != null">
         AMOUNT_TAX = #{amountTax,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=CHAR},
+      </if>
+      <if test="serialNo != null">
+        SERIAL_NO = #{serialNo,jdbcType=VARCHAR},
+      </if>
+      <if test="amount != null">
+        AMOUNT = #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="expenseStatus != null">
+        EXPENSE_STATUS = #{expenseStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="invoiceType != null">
+        INVOICE_TYPE = #{invoiceType,jdbcType=VARCHAR},
+      </if>
+      <if test="sallerName != null">
+        SALLER_NAME = #{sallerName,jdbcType=VARCHAR},
+      </if>
+      <if test="sallerNo != null">
+        SALLER_NO = #{sallerNo,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="profitMonth != null">
+        PROFIT_MONTH = #{profitMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="rev1 != null">
+        REV1 = #{rev1,jdbcType=VARCHAR},
+      </if>
+      <if test="rev2 != null">
+        REV2 = #{rev2,jdbcType=VARCHAR},
+      </if>
+      <if test="rev3 != null">
+        REV3 = #{rev3,jdbcType=VARCHAR},
+      </if>
+      <if test="rev4 != null">
+        REV4 = #{rev4,jdbcType=VARCHAR},
       </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
@@ -584,23 +745,34 @@
       EXPRESS_COMPANY = #{expressCompany,jdbcType=VARCHAR},
       EXPRESS_NUMBER = #{expressNumber,jdbcType=VARCHAR},
       EXPRESS_DATE = #{expressDate,jdbcType=VARCHAR},
-      ATTACHMENT = #{attachment,jdbcType=VARCHAR},
-      SH_DATE = #{shDate,jdbcType=VARCHAR},
-      SH_NAME = #{shName,jdbcType=VARCHAR},
-      CURRENT_INVOICE = #{currentInvoice,jdbcType=DECIMAL},
-      SH_RESULT = #{shResult,jdbcType=CHAR},
+      EXPRESS_REMARK = #{expressRemark,jdbcType=VARCHAR},
+      YS_DATE = #{ysDate,jdbcType=VARCHAR},
+      ES_DATE = #{esDate,jdbcType=VARCHAR},
+      YS_RESULT = #{ysResult,jdbcType=CHAR},
       RETURN_REASON = #{returnReason,jdbcType=VARCHAR},
       RETURN_DATE = #{returnDate,jdbcType=VARCHAR},
       RETURN_EXPRESS_NUMBER = #{returnExpressNumber,jdbcType=VARCHAR},
       RETURN_EXPRESS_COMPANY = #{returnExpressCompany,jdbcType=VARCHAR},
       CREATE_DATE = #{createDate,jdbcType=VARCHAR},
       CREATE_NAME = #{createName,jdbcType=VARCHAR},
-      FILENAME = #{filename,jdbcType=VARCHAR},
       AGENT_ID = #{agentId,jdbcType=VARCHAR},
       AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      INVOICE_AMT_MONTH = #{invoiceAmtMonth,jdbcType=VARCHAR},
+      ES_RESULT = #{esResult,jdbcType=CHAR},
+      AMOUNT_TAX = #{amountTax,jdbcType=DECIMAL},
+      STATUS = #{status,jdbcType=CHAR},
+      SERIAL_NO = #{serialNo,jdbcType=VARCHAR},
+      AMOUNT = #{amount,jdbcType=DECIMAL},
+      EXPENSE_STATUS = #{expenseStatus,jdbcType=VARCHAR},
+      INVOICE_TYPE = #{invoiceType,jdbcType=VARCHAR},
+      SALLER_NAME = #{sallerName,jdbcType=VARCHAR},
+      SALLER_NO = #{sallerNo,jdbcType=VARCHAR},
+      REMARK = #{remark,jdbcType=VARCHAR},
       PROFIT_MONTH = #{profitMonth,jdbcType=VARCHAR},
-      AMOUNT_BEFORE_TAX = #{amountBeforeTax,jdbcType=DECIMAL},
-      AMOUNT_TAX = #{amountTax,jdbcType=DECIMAL}
+      REV1 = #{rev1,jdbcType=VARCHAR},
+      REV2 = #{rev2,jdbcType=VARCHAR},
+      REV3 = #{rev3,jdbcType=VARCHAR},
+      REV4 = #{rev4,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -613,4 +785,13 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <delete id="deleteById" parameterType="java.lang.String">
+    delete from P_INVOICE_APPLY where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+
+  <select id="getAgentIdByPayCompany" resultType="java.lang.String">
+    select AGENT_ID from A_agent_colinfo where CLO_REALNAME= #{payCompany}
+  </select>
+
 </mapper>

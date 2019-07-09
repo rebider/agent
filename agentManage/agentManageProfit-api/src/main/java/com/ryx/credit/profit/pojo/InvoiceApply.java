@@ -30,15 +30,13 @@ public class InvoiceApply implements Serializable {
 
     private String expressDate;
 
-    private String attachment;
+    private String expressRemark;
 
-    private String shDate;
+    private String ysDate;
 
-    private String shName;
+    private String esDate;
 
-    private BigDecimal currentInvoice;
-
-    private String shResult;
+    private String ysResult;
 
     private String returnReason;
 
@@ -52,17 +50,41 @@ public class InvoiceApply implements Serializable {
 
     private String createName;
 
-    private String filename;
-
     private String agentId;
 
     private String agentName;
 
-    private String profitMonth;
+    private String invoiceAmtMonth;
 
-    private BigDecimal amountBeforeTax;
+    private String esResult;
 
     private BigDecimal amountTax;
+
+    private String status;
+
+    private String serialNo;
+
+    private BigDecimal amount;
+
+    private String expenseStatus;
+
+    private String invoiceType;
+
+    private String sallerName;
+
+    private String sallerNo;
+
+    private String remark;
+
+    private String profitMonth;
+
+    private String rev1;
+
+    private String rev2;
+
+    private String rev3;
+
+    private String rev4;
 
     public String getId() {
         return id;
@@ -168,44 +190,36 @@ public class InvoiceApply implements Serializable {
         this.expressDate = expressDate == null ? null : expressDate.trim();
     }
 
-    public String getAttachment() {
-        return attachment;
+    public String getExpressRemark() {
+        return expressRemark;
     }
 
-    public void setAttachment(String attachment) {
-        this.attachment = attachment == null ? null : attachment.trim();
+    public void setExpressRemark(String expressRemark) {
+        this.expressRemark = expressRemark == null ? null : expressRemark.trim();
     }
 
-    public String getShDate() {
-        return shDate;
+    public String getYsDate() {
+        return ysDate;
     }
 
-    public void setShDate(String shDate) {
-        this.shDate = shDate == null ? null : shDate.trim();
+    public void setYsDate(String ysDate) {
+        this.ysDate = ysDate == null ? null : ysDate.trim();
     }
 
-    public String getShName() {
-        return shName;
+    public String getEsDate() {
+        return esDate;
     }
 
-    public void setShName(String shName) {
-        this.shName = shName == null ? null : shName.trim();
+    public void setEsDate(String esDate) {
+        this.esDate = esDate == null ? null : esDate.trim();
     }
 
-    public BigDecimal getCurrentInvoice() {
-        return currentInvoice;
+    public String getYsResult() {
+        return ysResult;
     }
 
-    public void setCurrentInvoice(BigDecimal currentInvoice) {
-        this.currentInvoice = currentInvoice;
-    }
-
-    public String getShResult() {
-        return shResult;
-    }
-
-    public void setShResult(String shResult) {
-        this.shResult = shResult == null ? null : shResult.trim();
+    public void setYsResult(String ysResult) {
+        this.ysResult = ysResult == null ? null : ysResult.trim();
     }
 
     public String getReturnReason() {
@@ -256,14 +270,6 @@ public class InvoiceApply implements Serializable {
         this.createName = createName == null ? null : createName.trim();
     }
 
-    public String getFilename() {
-        return filename;
-    }
-
-    public void setFilename(String filename) {
-        this.filename = filename == null ? null : filename.trim();
-    }
-
     public String getAgentId() {
         return agentId;
     }
@@ -280,20 +286,20 @@ public class InvoiceApply implements Serializable {
         this.agentName = agentName == null ? null : agentName.trim();
     }
 
-    public String getProfitMonth() {
-        return profitMonth;
+    public String getInvoiceAmtMonth() {
+        return invoiceAmtMonth;
     }
 
-    public void setProfitMonth(String profitMonth) {
-        this.profitMonth = profitMonth == null ? null : profitMonth.trim();
+    public void setInvoiceAmtMonth(String invoiceAmtMonth) {
+        this.invoiceAmtMonth = invoiceAmtMonth == null ? null : invoiceAmtMonth.trim();
     }
 
-    public BigDecimal getAmountBeforeTax() {
-        return amountBeforeTax;
+    public String getEsResult() {
+        return esResult;
     }
 
-    public void setAmountBeforeTax(BigDecimal amountBeforeTax) {
-        this.amountBeforeTax = amountBeforeTax;
+    public void setEsResult(String esResult) {
+        this.esResult = esResult == null ? null : esResult.trim();
     }
 
     public BigDecimal getAmountTax() {
@@ -304,4 +310,107 @@ public class InvoiceApply implements Serializable {
         this.amountTax = amountTax;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status == null ? null : status.trim();
+    }
+
+    public String getSerialNo() {
+        return serialNo;
+    }
+
+    public void setSerialNo(String serialNo) {
+        this.serialNo = serialNo == null ? null : serialNo.trim();
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public String getExpenseStatus() {
+        return expenseStatus;
+    }
+
+    public void setExpenseStatus(String expenseStatus) {
+        this.expenseStatus = expenseStatus == null ? null : expenseStatus.trim();
+    }
+
+    public String getInvoiceType() {
+        return invoiceType;
+    }
+
+    public void setInvoiceType(String invoiceType) {
+        this.invoiceType = invoiceType == null ? null : invoiceType.trim();
+    }
+
+    public String getSallerName() {
+        return sallerName;
+    }
+
+    public void setSallerName(String sallerName) {
+        this.sallerName = sallerName == null ? null : sallerName.trim();
+    }
+
+    public String getSallerNo() {
+        return sallerNo;
+    }
+
+    public void setSallerNo(String sallerNo) {
+        this.sallerNo = sallerNo == null ? null : sallerNo.trim();
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark == null ? null : remark.trim();
+    }
+
+    public String getProfitMonth() {
+        return profitMonth;
+    }
+
+    public void setProfitMonth(String profitMonth) {
+        this.profitMonth = profitMonth == null ? null : profitMonth.trim();
+    }
+
+    public String getRev1() {
+        return rev1;
+    }
+
+    public void setRev1(String rev1) {
+        this.rev1 = rev1 == null ? null : rev1.trim();
+    }
+
+    public String getRev2() {
+        return rev2;
+    }
+
+    public void setRev2(String rev2) {
+        this.rev2 = rev2 == null ? null : rev2.trim();
+    }
+
+    public String getRev3() {
+        return rev3;
+    }
+
+    public void setRev3(String rev3) {
+        this.rev3 = rev3 == null ? null : rev3.trim();
+    }
+
+    public String getRev4() {
+        return rev4;
+    }
+
+    public void setRev4(String rev4) {
+        this.rev4 = rev4 == null ? null : rev4.trim();
+    }
 }
