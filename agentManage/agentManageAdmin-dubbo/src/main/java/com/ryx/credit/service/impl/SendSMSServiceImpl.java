@@ -82,7 +82,7 @@ public class SendSMSServiceImpl implements ISendSMSService {
 					mapMQ.put("params", messageInfo);
 
 					String req_json = JSONObject.toJSONString(mapMQ);
-					// 生产：http://10.3.30.48:30200/sms/sendSMS
+					// 生产：http://10.3.30.192:30200/sms/sendSMS
 					// 测试：http://10.3.30.52:30200/sms/sendSMS
 
 					logger.info("内容服务平台短信发送上送参数：" + req_json);

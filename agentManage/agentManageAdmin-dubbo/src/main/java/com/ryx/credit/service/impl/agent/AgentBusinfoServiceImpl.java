@@ -15,6 +15,7 @@ import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentAssProtocolService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
 import com.ryx.credit.service.agent.PlatFormService;
@@ -66,6 +67,9 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	private AgentBusinfoService agentBusinfoService;
 	@Autowired
 	private OrganizationMapper organizationMapper;
+	@Autowired
+	private IUserService iUserService;
+
 
     /**
      * 代理商查询插件数据获取
@@ -413,8 +417,17 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	}
 
 	@Override
-	public List<Map> agentBus(String agentId) {
-		List<Map> data = agentBusInfoMapper.queryTreeByBusInfo(FastMap.fastMap("agentId",agentId));
+	public List<Map> agentBus(String agentId,Long userId) {
+		List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+		if (orgCodeRes == null && orgCodeRes.size() != 1) {
+			return null;
+		}
+		Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+		String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+		FastMap reqMap = FastMap.fastMap("agentId", agentId);
+		if(organizationCode.contains("city"))
+		reqMap.putKeyV("organizationCode", organizationCode);
+		List<Map> data = agentBusInfoMapper.queryTreeByBusInfo(reqMap);
 		for (Map datum : data) {
 			datum.put("BUS_TYPE_NAME",BusType.getContentByValue(String.valueOf(datum.get("BUS_TYPE"))));
 		}
@@ -463,6 +476,9 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	@Override
 	public List<Map> getParentListFromBusInfo(List<Map> list, String busId) {
 		if(list==null)list=new ArrayList<Map>();
+		if(list.size()>=10){
+			return list;
+		}
 		FastMap par = FastMap.fastMap("id", busId)
 				.putKeyV("busStatus", 2);
 		List<Map>  map = agentBusInfoMapper.queryTreeByBusInfo(par);
