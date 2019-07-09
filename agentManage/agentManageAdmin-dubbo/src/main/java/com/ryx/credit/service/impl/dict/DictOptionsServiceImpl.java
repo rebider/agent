@@ -47,6 +47,7 @@ public class DictOptionsServiceImpl implements DictOptionsService {
         criteria.andDGroupEqualTo(group);
         criteria.andDItemvalueEqualTo(itemValue==null?"":itemValue);
         criteria.andDArtifactEqualTo(artifact);
+        criteria.andDStatusEqualTo(Status.STATUS_1.status);
         List<Dict> dicts = dictMapper.selectByExample(example);
         if (null == dicts || dicts.size() != 1) {
             return null;
@@ -106,6 +107,7 @@ public class DictOptionsServiceImpl implements DictOptionsService {
         criteria.andDGroupEqualTo(group);
         criteria.andDItemnameEqualTo(itemName);
         criteria.andDArtifactEqualTo(artifact);
+        criteria.andDStatusEqualTo(Status.STATUS_1.status);
         List<Dict> dicts = dictMapper.selectByExample(example);
         if (null == dicts || dicts.size() != 1) {
             return null;
