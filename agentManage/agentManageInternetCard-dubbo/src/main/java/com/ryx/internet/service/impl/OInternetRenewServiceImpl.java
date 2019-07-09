@@ -156,12 +156,11 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
 
         OInternetRenewDetailExample internetRenewDetailExample = new OInternetRenewDetailExample();
         OInternetRenewDetailExample.Criteria criteria = internetRenewDetailExample.createCriteria();
-        if(StringUtils.isNotBlank(internetRenewDetail.getAgentId())){
-            criteria.andAgentIdEqualTo(internetRenewDetail.getAgentId());
-        }
-        //如果代理商登陆执行此查询条件会覆盖上面
+        //如果代理商登陆执行此查询条件
         if(StringUtils.isNotBlank(agentId)){
             criteria.andAgentIdEqualTo(agentId);
+        }else if(StringUtils.isNotBlank(internetRenewDetail.getAgentId())){
+            criteria.andAgentIdEqualTo(internetRenewDetail.getAgentId());
         }
         if(StringUtils.isNotBlank(internetRenewDetail.getAgentName())){
             criteria.andAgentNameEqualTo(internetRenewDetail.getAgentName());

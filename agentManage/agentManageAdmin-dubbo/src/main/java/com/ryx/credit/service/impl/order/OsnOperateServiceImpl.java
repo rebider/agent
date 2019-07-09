@@ -23,6 +23,7 @@ import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OLogisticsService;
 import com.ryx.credit.service.order.OsnOperateService;
+import com.ryx.internet.service.InternetCardService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
@@ -85,6 +86,8 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
     private IdService idService;
     @Resource(name = "osnOperateService")
     private OsnOperateService osnOperateService;
+    @Autowired
+    private InternetCardService internetCardService;
 
     /**
      * 根据物流联动状态查询物流id
@@ -653,6 +656,8 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                 detail.setuTime(date);
                 oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
             });
+            //存储到流量卡表
+            internetCardService.orderInsertInternetCard(listOLogisticsDetailSn,planVo.getProCom());
             return true;
         }
 

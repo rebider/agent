@@ -7,6 +7,7 @@ import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.Dict;
+import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
 import com.ryx.credit.service.order.OLogisticsService;
 import com.ryx.internet.dao.OInternetCardImportMapper;
 import com.ryx.internet.dao.OInternetCardMapper;
@@ -74,10 +75,10 @@ public class InternetCardServiceImpl implements InternetCardService {
     private OInternetRenewDetailMapper internetRenewDetailMapper;
 
     @Override
-    public PageInfo internetCardList(OInternetCard internetCard, Page page){
+    public PageInfo internetCardList(OInternetCard internetCard, Page page,String agentId){
 
         OInternetCardExample oInternetCardExample = new OInternetCardExample();
-        oInternetCardExample= queryParam(internetCard, oInternetCardExample);
+        oInternetCardExample= queryParam(internetCard, oInternetCardExample,agentId);
         oInternetCardExample.setPage(page);
         List<OInternetCard> oInternetCards = internetCardMapper.selectByExample(oInternetCardExample);
         for (OInternetCard oInternetCard : oInternetCards) {
@@ -93,18 +94,18 @@ public class InternetCardServiceImpl implements InternetCardService {
     }
 
     @Override
-    public List<OInternetCard> queryInternetCardList(OInternetCard internetCard, Page page){
+    public List<OInternetCard> queryInternetCardList(OInternetCard internetCard, Page page,String agentId){
         OInternetCardExample oInternetCardExample = new OInternetCardExample();
-        oInternetCardExample = queryParam(internetCard, oInternetCardExample);
+        oInternetCardExample = queryParam(internetCard, oInternetCardExample,agentId);
         oInternetCardExample.setPage(page);
         List<OInternetCard> oInternetCards = internetCardMapper.queryInternetCardList(oInternetCardExample);
         return oInternetCards;
     }
 
     @Override
-    public Integer queryInternetCardCount(OInternetCard internetCard){
+    public Integer queryInternetCardCount(OInternetCard internetCard,String agentId){
         OInternetCardExample oInternetCardExample = new OInternetCardExample();
-        oInternetCardExample = queryParam(internetCard, oInternetCardExample);
+        oInternetCardExample = queryParam(internetCard, oInternetCardExample,agentId);
         Integer count = Integer.valueOf((int)internetCardMapper.countByExample(oInternetCardExample));
         return count;
     }
@@ -115,7 +116,7 @@ public class InternetCardServiceImpl implements InternetCardService {
      * @param oInternetCardExample
      * @return
      */
-    private OInternetCardExample queryParam(OInternetCard internetCard, OInternetCardExample oInternetCardExample){
+    private OInternetCardExample queryParam(OInternetCard internetCard, OInternetCardExample oInternetCardExample,String agentId){
 
         OInternetCardExample.Criteria criteria = oInternetCardExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
@@ -134,7 +135,10 @@ public class InternetCardServiceImpl implements InternetCardService {
         if(null!=internetCard.getRenew()){
             criteria.andRenewEqualTo(internetCard.getRenew());
         }
-        if(StringUtils.isNotBlank(internetCard.getAgentId())){
+        //如果代理商登陆执行此查询条件
+        if(StringUtils.isNotBlank(agentId)){
+            criteria.andAgentIdEqualTo(agentId);
+        }else if(StringUtils.isNotBlank(internetCard.getAgentId())){
             criteria.andAgentIdEqualTo(internetCard.getAgentId());
         }
         if(StringUtils.isNotBlank(internetCard.getAgentName())){
@@ -776,4 +780,40 @@ public class InternetCardServiceImpl implements InternetCardService {
             e.printStackTrace();
         }
     }
+
+    /**
+     * 订单发货 如果是流量卡插入信息表
+     * @param logisticsDetailList
+     * @throws Exception
+     */
+    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
+    @Override
+    public void orderInsertInternetCard(List<OLogisticsDetail> logisticsDetailList,String manuFacturer)throws Exception{
+
+        String batchNo = IDUtils.getBatchNo();
+        for (OLogisticsDetail oLogisticsDetail : logisticsDetailList) {
+            OInternetCard oInternetCard = new OInternetCard();
+            oInternetCard.setIccidNum(oLogisticsDetail.getSnNum());
+            oInternetCard.setBatchNum(batchNo);
+            oInternetCard.setOrderId(oLogisticsDetail.getOrderId());
+            oInternetCard.setDeliverTime(oLogisticsDetail.getcTime());
+            oInternetCard.setAgentId(oLogisticsDetail.getAgentId());
+            Agent agent = agentService.getAgentById(oLogisticsDetail.getAgentId());
+            if(agent!=null)
+            oInternetCard.setAgentName(agent.getAgName());
+            oInternetCard.setManufacturer(manuFacturer);
+            oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
+            oInternetCard.setStop(Status.STATUS_0.status);
+            oInternetCard.setRenew(Status.STATUS_0.status);
+            oInternetCard.setInternetCardStatus(InternetCardStatus.NOACTIVATE.code);
+            Date date = new Date();
+            oInternetCard.setcTime(date);
+            oInternetCard.setuTime(date);
+            oInternetCard.setuUser(oInternetCard.getcUser());
+            oInternetCard.setStatus(Status.STATUS_1.status);
+            oInternetCard.setVersion(BigDecimal.ONE);
+            internetCardMapper.insert(oInternetCard);
+        }
+    }
+
 }

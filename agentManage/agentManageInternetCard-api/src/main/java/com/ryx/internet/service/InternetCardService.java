@@ -3,6 +3,7 @@ package com.ryx.internet.service;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
 import com.ryx.internet.pojo.OInternetCard;
 import com.ryx.internet.pojo.OInternetCardImport;
 
@@ -13,7 +14,7 @@ import java.util.List;
  */
 public interface InternetCardService {
 
-    PageInfo internetCardList(OInternetCard internetCard, Page page);
+    PageInfo internetCardList(OInternetCard internetCard, Page page,String agentId);
 
     PageInfo internetCardImportList(OInternetCardImport internetCardImport, Page page);
 
@@ -27,13 +28,15 @@ public interface InternetCardService {
 
     void taskUpdateMech();
 
-    List<OInternetCard> queryInternetCardList(OInternetCard internetCard, Page page);
+    List<OInternetCard> queryInternetCardList(OInternetCard internetCard, Page page,String agentId);
 
-    Integer queryInternetCardCount(OInternetCard internetCard);
+    Integer queryInternetCardCount(OInternetCard internetCard,String agentId);
 
     void taskUpdateMechIsNull();
 
     List<OInternetCard> fetchDataMechIsNull();
 
     void processDataUpdateMechIsNull(OInternetCard internetCard);
+
+    void orderInsertInternetCard(List<OLogisticsDetail> logisticsDetailList,String manuFacturer)throws Exception;
 }
