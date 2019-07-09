@@ -151,8 +151,8 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             jsonParams.put("accountType",paramMap.get("accountType"));
             jsonParams.put("customerType",paramMap.get("customerType"));
             jsonParams.put("channelTopId",paramMap.get("channelTopId"));
-            jsonParams.put("invoice",paramMap.get("invoice"));
-            jsonParams.put("tax",paramMap.get("tax"));
+            jsonParams.put("invoice",String.valueOf(paramMap.get("invoice")));
+            jsonParams.put("tax",String.valueOf(paramMap.get("tax")));
 
             String json = JsonUtil.objectToJson(jsonParams);
             log.info("通知瑞大宝入网请求参数：{}",json);
@@ -243,8 +243,8 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             jsonParams.put("accountType",data.get("accountType"));
             jsonParams.put("customerType",data.get("customerType"));
             jsonParams.put("channelTopId",data.get("channelTopId"));
-            jsonParams.put("invoice",data.get("invoice"));
-            jsonParams.put("tax",data.get("tax"));
+            jsonParams.put("invoice",String.valueOf(data.get("invoice")));
+            jsonParams.put("tax",String.valueOf(data.get("tax")));
 
             String json = JsonUtil.objectToJson(jsonParams);
             log.info("通知瑞大宝升级请求参数：{}",json);
@@ -344,8 +344,8 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             jsonParams.put("accountType",paramMap.get("accountType"));
             jsonParams.put("customerType",paramMap.get("customerType"));
             jsonParams.put("channelTopId",paramMap.get("channelTopId"));
-            jsonParams.put("invoice",paramMap.get("invoice"));
-            jsonParams.put("tax",paramMap.get("tax"));
+            jsonParams.put("invoice",String.valueOf(paramMap.get("invoice")));
+            jsonParams.put("tax",String.valueOf(paramMap.get("tax")));
 
             String json = JsonUtil.objectToJson(jsonParams);
             log.info("通知瑞大宝入网修改请求参数：{}",json);
