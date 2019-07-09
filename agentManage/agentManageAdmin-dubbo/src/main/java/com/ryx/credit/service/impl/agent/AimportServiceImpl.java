@@ -1607,7 +1607,8 @@ public class AimportServiceImpl implements AimportService {
         String  daqu = list.size()>29?list.get(29)+"":"";//大区
         String  yewujigou = list.size()>30?list.get(30)+"":"";//业务机构
         String  chukuanjigou = list.size()>31?list.get(31)+"":"";//出款机构
-        String  credit_rate_floor = list.size()>32?list.get(32)+"":"";//贷记费率下线
+        String  credit_rate_floor = list.size()>32?list.get(32)+"":"";//贷记费率下限
+        String  credit_rate_ceiling = list.size()>33?list.get(33)+"":"";//贷记费率上限
 
         ag  = ag.trim();
         busPlatform_num = busPlatform_num.trim();
@@ -1844,6 +1845,14 @@ public class AimportServiceImpl implements AimportService {
         if(zhongduanshuliangxiaxian!=null && StringUtils.isNotBlank(zhongduanshuliangxiaxian) && !"null".equals(zhongduanshuliangxiaxian) ) {
             agentBusInfo.setTerminalsLower(zhongduanshuliangxiaxian);
         }
+        //贷记费率下限
+        if(credit_rate_floor!=null && StringUtils.isNotBlank(credit_rate_floor) && !"null".equals(credit_rate_floor) ) {
+            agentBusInfo.setCreditRateFloor(credit_rate_floor);
+        }
+        //贷记费率上限
+        if(credit_rate_ceiling!=null && StringUtils.isNotBlank(credit_rate_ceiling) && !"null".equals(credit_rate_ceiling)) {
+            agentBusInfo.setCreditRateCeiling(credit_rate_ceiling);
+        }
         //省区
         if(StringUtils.isNotBlank(shengqu) && !"null".equalsIgnoreCase(shengqu)) {
             COrganization org = departmentService.getByName(shengqu);
@@ -1892,10 +1901,6 @@ public class AimportServiceImpl implements AimportService {
                 agentBusInfo.setFinaceRemitOrgan(listOrganization.get(0).getOrgId());
             }
 
-        }
-        //贷记费率下限
-        if(credit_rate_floor!=null && StringUtils.isNotBlank(credit_rate_floor) && !"null".equals(credit_rate_floor) ) {
-            agentBusInfo.setCreditRateFloor(credit_rate_floor);
         }
         if(StringUtils.isNotBlank(agentBusInfo.getId())){
             agentBusInfo.setcUtime(Calendar.getInstance().getTime());

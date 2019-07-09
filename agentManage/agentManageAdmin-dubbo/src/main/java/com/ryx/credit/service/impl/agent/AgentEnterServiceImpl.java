@@ -190,7 +190,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 }
                 //对公时 判断收款账户名是否与代理商名称一致 不一致则抛异常提示信息
                 if (item.getCloType().compareTo(new BigDecimal(1)) == 0) {
-                    if (!agentName.equals(trueName)) {
+                    if (agentName.equals(trueName)) {
+                        item.setAgLegalCernum(agent.getAgLegalCernum());
+                    } else if (!agentName.equals(trueName)) {
                         throw new ProcessException("收款账户名与代理商名称不一致");
                     }
                 }
