@@ -117,9 +117,7 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
         resultMap.put("hasS0",agentBusInfo.getDredgeS0().equals(new BigDecimal(1))?"0":"1");
         resultMap.put("orgName",agent.getAgName());
         resultMap.put("useOrgan",agentBusInfo.getBusUseOrgan()); //使用范围
-        if(StringUtils.isNotBlank(platForm.getPosanameprefix())){
-            resultMap.put("activityType",platForm.getPosanameprefix()); //前缀
-        }
+        resultMap.put("activityType",platForm.getPosanameprefix()); //前缀
 
         resultMap.put("uniqueId",agentBusInfo.getId());
         resultMap.put("orgId",agentBusInfo.getBusNum());
@@ -139,14 +137,12 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
         AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
         if(agentColinfo==null){
             log.info("收款账户为空:{},{}",agent.getId(), agentBusInfo.getId());
-        }else{
             agentColinfo=new AgentColinfo();
         }
         //机构信息
         Organization organization = organizationMapper.selectByPrimaryKey(agentBusInfo.getOrganNum());
         if(organization==null){
             log.info("机构信息为空:{},{}",agent.getId(), agentBusInfo.getId());
-        }else{
             organization=new Organization();
         }
         //组装参数
