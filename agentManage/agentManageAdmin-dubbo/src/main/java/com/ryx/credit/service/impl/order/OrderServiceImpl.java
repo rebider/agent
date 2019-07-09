@@ -915,7 +915,7 @@ public class OrderServiceImpl implements OrderService {
                 //查询活动
                 OActivity activity = oActivityMapper.selectByPrimaryKey(oActivity);
                 //活动存在
-                if (activity != null && activity.getPrice() != null && activity.getPrice().compareTo(BigDecimal.ZERO) > 0) {
+                if (activity != null && activity.getPrice() != null && activity.getPrice().compareTo(BigDecimal.ZERO) >= 0) {
                     //设置商品实际单价
                     oSubOrder.setProPrice(activity.getOriginalPrice());
                     oSubOrder.setProRelPrice(activity.getPrice());
