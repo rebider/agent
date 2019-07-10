@@ -232,4 +232,9 @@ public interface OrderService {
     public void CashSummaryMouth();
 
     void testRepeatableRead();
+
+    /**
+     * 订单撤销
+     */
+    AgentResult revocationOrder(String id, String user);
 }
