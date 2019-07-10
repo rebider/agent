@@ -87,6 +87,10 @@ public class Agent extends AgentExtends implements Serializable {
 
     private BigDecimal freestatus;
 
+    private String busRiskEmail ;
+
+    private String busContactEmail;
+
     public String getId() {
         return id;
     }
@@ -349,5 +353,21 @@ public class Agent extends AgentExtends implements Serializable {
 
     public void setFreestatus(BigDecimal freestatus) {
         this.freestatus = freestatus;
+    }
+
+    public String getBusRiskEmail() {
+        return busRiskEmail;
+    }
+
+    public void setBusRiskEmail(String busRiskEmail) {
+        this.busRiskEmail = busRiskEmail;
+    }
+
+    public String getBusContactEmail() {
+        return busContactEmail;
+    }
+
+    public void setBusContactEmail(String busContactEmail) {
+        this.busContactEmail = busContactEmail;
     }
 }
