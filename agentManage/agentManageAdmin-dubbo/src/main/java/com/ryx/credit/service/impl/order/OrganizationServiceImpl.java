@@ -106,8 +106,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                     ac.setcTime(d);
                     ac.setStatus(Status.STATUS_1.status);
                     ac.setVersion(Status.STATUS_1.status);
-                    ac.setOrgId(idService.genId(TabId.O_ORGANIZATION));
-                    ac.setcUser(agentVo.getSid());
+                    ac.setOrgId(idService.genOrganizationId(TabId.O_ORGANIZATION, Integer.valueOf(agentVo.getSid())));
                     List<String> att = ac.getOrganizationbleFile();
                     if (att != null) {
                         for (String s : att) {
