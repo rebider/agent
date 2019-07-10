@@ -16,8 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +30,6 @@ import java.util.Map;
 public class PlatFormServiceImpl implements PlatFormService{
 
     private static Logger logger = LoggerFactory.getLogger(PlatFormServiceImpl.class);
-    public final static SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
     @Autowired
     private PlatFormMapper platFormMapper;
     @Autowired
@@ -90,7 +87,7 @@ public class PlatFormServiceImpl implements PlatFormService{
      */
     @Override
     public int updateByPrimaryKeySelective(PlatForm record) {
-        record.setStatus(new BigDecimal(String.valueOf(Status.STATUS_0.status)));
+        record.setStatus(Status.STATUS_0.status);
         return platFormMapper.updateByPrimaryKeySelective(record);
     }
 
@@ -136,6 +133,23 @@ public class PlatFormServiceImpl implements PlatFormService{
                 );
         logger.info("queryByOrganName().organizationList：", organizationList);
         return organizationList;
+    }
+
+    /**
+     * 获取业务平台路径
+     * @param platId
+     * @return
+     */
+    @Override
+    public PlatForm queryByPlatId(String platId) {
+        logger.info("获取业务平台路径：", platId);
+        PlatFormExample platFormExample = new PlatFormExample();
+        platFormExample.createCriteria()
+                .andStatusEqualTo(Status.STATUS_1.status)
+                .andPlatformNumEqualTo(platId);
+        List<PlatForm> platFormList = platFormMapper.selectByExample(platFormExample);
+        logger.info("queryByPlatId().platFormList：", platFormList);
+        return platFormList.get(0);
     }
 
 }

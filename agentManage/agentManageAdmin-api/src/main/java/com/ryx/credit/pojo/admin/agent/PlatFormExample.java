@@ -927,6 +927,146 @@ public class PlatFormExample {
             addCriterion("POSBUSITYPE not between", value1, value2, "posbusitype");
             return (Criteria) this;
         }
+
+        public Criteria andBusplatformIsNull() {
+            addCriterion("BUSPLATFORM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusplatformIsNotNull() {
+            addCriterion("BUSPLATFORM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusplatformEqualTo(String value) {
+            addCriterion("BUSPLATFORM =", value, "busplatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusplatformNotEqualTo(String value) {
+            addCriterion("BUSPLATFORM <>", value, "busplatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusplatformGreaterThan(String value) {
+            addCriterion("BUSPLATFORM >", value, "busplatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusplatformGreaterThanOrEqualTo(String value) {
+            addCriterion("BUSPLATFORM >=", value, "busplatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusplatformLessThan(String value) {
+            addCriterion("BUSPLATFORM <", value, "busplatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusplatformLessThanOrEqualTo(String value) {
+            addCriterion("BUSPLATFORM <=", value, "busplatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusplatformLike(String value) {
+            addCriterion("BUSPLATFORM like", value, "busplatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusplatformNotLike(String value) {
+            addCriterion("BUSPLATFORM not like", value, "busplatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusplatformIn(List<String> values) {
+            addCriterion("BUSPLATFORM in", values, "busplatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusplatformNotIn(List<String> values) {
+            addCriterion("BUSPLATFORM not in", values, "busplatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusplatformBetween(String value1, String value2) {
+            addCriterion("BUSPLATFORM between", value1, value2, "busplatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusplatformNotBetween(String value1, String value2) {
+            addCriterion("BUSPLATFORM not between", value1, value2, "busplatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformUrlIsNull() {
+            addCriterion("PLATFORM_URL is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformUrlIsNotNull() {
+            addCriterion("PLATFORM_URL is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformUrlEqualTo(String value) {
+            addCriterion("PLATFORM_URL =", value, "platformUrl");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformUrlNotEqualTo(String value) {
+            addCriterion("PLATFORM_URL <>", value, "platformUrl");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformUrlGreaterThan(String value) {
+            addCriterion("PLATFORM_URL >", value, "platformUrl");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformUrlGreaterThanOrEqualTo(String value) {
+            addCriterion("PLATFORM_URL >=", value, "platformUrl");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformUrlLessThan(String value) {
+            addCriterion("PLATFORM_URL <", value, "platformUrl");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformUrlLessThanOrEqualTo(String value) {
+            addCriterion("PLATFORM_URL <=", value, "platformUrl");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformUrlLike(String value) {
+            addCriterion("PLATFORM_URL like", value, "platformUrl");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformUrlNotLike(String value) {
+            addCriterion("PLATFORM_URL not like", value, "platformUrl");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformUrlIn(List<String> values) {
+            addCriterion("PLATFORM_URL in", values, "platformUrl");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformUrlNotIn(List<String> values) {
+            addCriterion("PLATFORM_URL not in", values, "platformUrl");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformUrlBetween(String value1, String value2) {
+            addCriterion("PLATFORM_URL between", value1, value2, "platformUrl");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformUrlNotBetween(String value1, String value2) {
+            addCriterion("PLATFORM_URL not between", value1, value2, "platformUrl");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
