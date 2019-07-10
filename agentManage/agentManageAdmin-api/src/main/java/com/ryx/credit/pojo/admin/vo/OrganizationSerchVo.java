@@ -1,4 +1,4 @@
-package com.ryx.credit.pojo.admin.order;
+package com.ryx.credit.pojo.admin.vo;
 
 import com.ryx.credit.pojo.admin.agent.Attachment;
 
@@ -7,7 +7,12 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-public class Organization implements Serializable{
+/**
+ * @Auther: lrr
+ * @Date: 2019/6/26 15:34
+ * @Description:
+ */
+public class OrganizationSerchVo implements Serializable{
     private String orgId;
 
     private String orgNick;
@@ -65,6 +70,26 @@ public class Organization implements Serializable{
     private String businessNum;
 
     private List<Attachment> attachmentList;
+
+    private String platNum;
+
+    private String platCode;
+
+    public String getPlatNum() {
+        return platNum;
+    }
+
+    public void setPlatNum(String platNum) {
+        this.platNum = platNum;
+    }
+
+    public String getPlatCode() {
+        return platCode;
+    }
+
+    public void setPlatCode(String platCode) {
+        this.platCode = platCode;
+    }
 
     public List<Attachment> getAttachmentList() {
         return attachmentList;
@@ -297,5 +322,4 @@ public class Organization implements Serializable{
     public void setBusinessNum(String businessNum) {
         this.businessNum = businessNum == null ? null : businessNum.trim();
     }
-
 }
