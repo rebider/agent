@@ -18,6 +18,7 @@ import com.ryx.credit.service.data.AttachmentService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OCashReceivablesService;
+import com.ryx.internet.dao.InternetRenewOffsetMapper;
 import com.ryx.internet.dao.OInternetCardMapper;
 import com.ryx.internet.dao.OInternetRenewDetailMapper;
 import com.ryx.internet.dao.OInternetRenewMapper;
@@ -77,6 +78,8 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     private BusActRelService busActRelService;
     @Autowired
     private IUserService iUserService;
+    @Autowired
+    private InternetRenewOffsetMapper internetRenewOffsetMapper;
 
     @Override
     public PageInfo internetRenewList(OInternetRenew internetRenew, Page page,String agentId){
@@ -458,6 +461,29 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 }else{
                     oInternetRenewDetail.setRenewStatus(InternetRenewStatus.BFXF.getValue());
                     oInternetCard.setRenewStatus(InternetRenewStatus.BFXF.getValue());
+                }
+                oInternetCard.setStop(Status.STATUS_0.status);
+                oInternetCard.setRenew(Status.STATUS_0.status);
+                //生成轧差明细，同步清结算
+                if(oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())){
+                    InternetRenewOffset internetRenewOffset = new InternetRenewOffset();
+                    internetRenewOffset.setFlowId(idService.genInternetOffset());
+                    internetRenewOffset.setRenewId(oInternetRenew.getId());
+                    internetRenewOffset.setRenewDetailId(oInternetRenewDetail.getId());
+                    internetRenewOffset.setIccidNum(oInternetRenewDetail.getIccidNum());
+                    internetRenewOffset.setAgentId(oInternetRenewDetail.getAgentId());
+                    internetRenewOffset.setAgentName(oInternetRenewDetail.getAgentName());
+                    internetRenewOffset.setMerId(oInternetRenewDetail.getMerId());
+                    internetRenewOffset.setMerName(oInternetRenewDetail.getMerName());
+                    internetRenewOffset.setOffsetAmt(oInternetRenewDetail.getOffsetAmt());
+                    internetRenewOffset.setAlreadyOffsetAmt(BigDecimal.ZERO);
+                    internetRenewOffset.setProcessTime(new Date());
+                    internetRenewOffset.setcTime(new Date());
+                    internetRenewOffset.setcUser(oInternetRenewDetail.getcUser());
+                    internetRenewOffset.setuUser(oInternetRenewDetail.getuUser());
+                    internetRenewOffset.setStatus(Status.STATUS_1.status);
+                    internetRenewOffset.setVersion(BigDecimal.ONE);
+                    internetRenewOffsetMapper.insert(internetRenewOffset);
                 }
             }
             int j = internetRenewDetailMapper.updateByPrimaryKeySelective(oInternetRenewDetail);

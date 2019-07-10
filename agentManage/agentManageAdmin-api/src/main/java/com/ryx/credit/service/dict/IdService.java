@@ -18,5 +18,5 @@ public interface IdService {
 
     public String genAgId(TabId tablename);
 
-
+    String genInternetOffset();
 }
