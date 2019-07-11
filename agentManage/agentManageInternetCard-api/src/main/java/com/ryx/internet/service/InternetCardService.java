@@ -39,4 +39,9 @@ public interface InternetCardService {
     void processDataUpdateMechIsNull(OInternetCard internetCard);
 
     void orderInsertInternetCard(List<OLogisticsDetail> logisticsDetailList,String manuFacturer)throws Exception;
+
+    List<OInternetCardImport> queryMigrationHistory();
+
+    void migrationHistory(OInternetCardImport oInternetCardImport)throws MessageException;
+
 }
