@@ -341,6 +341,11 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             oInternetRenewDetail.setInternetCardNum(oInternetCard.getInternetCardNum());
             oInternetRenewDetail.setOpenAccountTime(oInternetCard.getOpenAccountTime());
             oInternetRenewDetail.setExpireTime(oInternetCard.getExpireTime());
+            if(internetRenew.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())){
+                if(StringUtils.isBlank(oInternetCard.getMerId()) || StringUtils.isBlank(oInternetCard.getMerName())  ){
+                    throw new MessageException("第"+i+"个商户信息不全,轧差商户方式必须包含商户信息");
+                }
+            }
             oInternetRenewDetail.setMerId(oInternetCard.getMerId());
             oInternetRenewDetail.setMerName(oInternetCard.getMerName());
             if(StringUtils.isBlank(oInternetCard.getAgentId())){
