@@ -452,6 +452,9 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                         //处理财务审批（财务出款机构）
                         vo.setOrgTypeList(agentVo.getOrgTypeList());
                         for (AgentBusInfoVo orgTypeList : agentVo.getOrgTypeList()) {
+                            if (StringUtils.isBlank(orgTypeList.getFinaceRemitOrgan())) {
+                                throw new ProcessException("请选择财务出款机构");
+                            }
                             vo.setFinaceRemitOrgan(orgTypeList.getFinaceRemitOrgan());
                         }
                     }
