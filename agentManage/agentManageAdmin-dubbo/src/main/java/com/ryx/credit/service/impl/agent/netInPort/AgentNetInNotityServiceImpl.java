@@ -45,6 +45,8 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
     private  AgentNetInHttpService  agentHttpMposServiceImpl;
     @Resource(name="agentHttpRDBMposServiceImpl")
     private  AgentNetInHttpService  agentHttpRDBMposServiceImpl;
+    @Resource(name="agentHttpRJPosServiceImpl")
+    private AgentNetInHttpService agentHttpRJPosServiceImpl;
     @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
     @Autowired
@@ -61,6 +63,7 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
     private AgentPlatFormSynMapper agentPlatFormSynMapper;
     @Autowired
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+
 
     /**
      * 通知列表
@@ -184,6 +187,9 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                         paramMap = agentHttpMposServiceImpl.packageParam(reqMap);
                     }else if(platForm.getPlatformType().equals(PlatformType.RDBPOS.getValue())){
                         paramMap = agentHttpRDBMposServiceImpl.packageParam(reqMap);
+                    }else if(platForm.getPlatformType().equals(PlatformType.RJPOS.getValue())){
+                        reqMap.put("platForm",platForm);
+                        paramMap = agentHttpRJPosServiceImpl.packageParam(reqMap);
                     }
                     record.setSendJson(JSONObject.toJSONString(paramMap));
                     if(PlatformType.whetherPOS(platForm.getPlatformType())){
@@ -192,6 +198,8 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                         result = agentHttpMposServiceImpl.httpRequestNetIn(paramMap);
                     }else if(platForm.getPlatformType().equals(PlatformType.RDBPOS.getValue())){
                         result = agentHttpRDBMposServiceImpl.httpRequestNetIn(paramMap);
+                    }else if(platForm.getPlatformType().equals(PlatformType.RJPOS.getValue())){
+                        result = agentHttpRJPosServiceImpl.httpRequestNetIn(paramMap);
                     }
                     log.info("入网开户修改操作: ,业务id：{},返回结果:{}",busId,result);
                     record.setNotifyJson(String.valueOf(result.getData()));
@@ -255,16 +263,16 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
             //更新业务编号
             AgentBusInfo updateBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getId());
             JSONObject jsonObject = JSONObject.parseObject(String.valueOf(result.getData()));
-            if(PlatformType.whetherPOS(platForm.getPlatformType())){
+            if(PlatformType.whetherPOS(platForm.getPlatformType()) || platForm.getPlatformType().equals(PlatformType.RJPOS.getValue())){
                 updateBusInfo.setBusNum(jsonObject.getString("orgId"));
                 updateBusInfo.setBusLoginNum(jsonObject.getString("loginName"));
             }else if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
                 updateBusInfo.setBusNum(jsonObject.getString("orgId"));
                 updateBusInfo.setBusLoginNum(jsonObject.getString("orgId"));
-            }else if(platForm.getPlatformType().equals(PlatformType.RDBPOS.getValue())){
+            }else if(platForm.getPlatformType().equals(PlatformType.RDBPOS.getValue())) {
                 JSONObject jsonResult = JSONObject.parseObject(jsonObject.getString("result"));
-                if(jsonResult!=null)
-                updateBusInfo.setBusNum(jsonResult.getString("agencyId"));
+                if (jsonResult != null)
+                    updateBusInfo.setBusNum(jsonResult.getString("agencyId"));
                 updateBusInfo.setBusLoginNum(agentBusInfo.getBusLoginNum());//传入的手机号
             }
 
@@ -396,6 +404,8 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                         paramMap = agentHttpMposServiceImpl.packageParamUpdate(reqMap);
                     }else if(platForm.getPlatformType().equals(PlatformType.RDBPOS.getValue())){
                         paramMap = agentHttpRDBMposServiceImpl.packageParamUpdate(reqMap);
+                    }else if(platForm.getPlatformType().equals(PlatformType.RJPOS.getValue())){
+                        paramMap = agentHttpRJPosServiceImpl.packageParamUpdate(reqMap);
                     }
                     record.setSendJson(JSONObject.toJSONString(paramMap));
                     if(PlatformType.whetherPOS(platForm.getPlatformType())){
@@ -404,6 +414,8 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                         result = agentHttpMposServiceImpl.httpRequestNetInUpdate(paramMap);
                     }else if(platForm.getPlatformType().equals(PlatformType.RDBPOS.getValue())){
                         result = agentHttpRDBMposServiceImpl.httpRequestNetInUpdate(paramMap);
+                    }else if(platForm.getPlatformType().equals(PlatformType.RJPOS.getValue())){
+                        result = agentHttpRJPosServiceImpl.httpRequestNetInUpdate(paramMap);
                     }
                     log.info("入网开户修改操作: ,业务id：{},返回结果:{}",busId,result);
                     record.setNotifyJson(String.valueOf(result.getData()));
@@ -457,6 +469,8 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                         req_data = agentHttpMposServiceImpl.agencyLevelUpdateChangeData(fastMap);
                     }else if(platForm.getPlatformType().equals(PlatformType.RDBPOS.getValue())){
                         req_data = agentHttpRDBMposServiceImpl.agencyLevelUpdateChangeData(fastMap);
+                    }else if(platForm.getPlatformType().equals(PlatformType.RJPOS.getValue())){
+                        req_data = agentHttpRJPosServiceImpl.agencyLevelUpdateChangeData(fastMap);
                     }
                     log.info("升级开户接口{}平台编号不为空走升级接口,请求参数{}",agentBusInfo.getBusNum(),req_data);
                     //发送请求
@@ -466,6 +480,8 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                         res = agentHttpMposServiceImpl.agencyLevelUpdateChange(req_data);
                     }else if(platForm.getPlatformType().equals(PlatformType.RDBPOS.getValue())){
                         res = agentHttpRDBMposServiceImpl.agencyLevelUpdateChange(req_data);
+                    }else if(platForm.getPlatformType().equals(PlatformType.RJPOS.getValue())){
+                        res = agentHttpRJPosServiceImpl.agencyLevelUpdateChange(req_data);
                     }
                 }catch (MessageException e) {
                     e.printStackTrace();
