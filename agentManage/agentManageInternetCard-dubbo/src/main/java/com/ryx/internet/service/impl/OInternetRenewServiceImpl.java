@@ -18,6 +18,7 @@ import com.ryx.credit.service.data.AttachmentService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OCashReceivablesService;
+import com.ryx.internet.dao.InternetRenewOffsetMapper;
 import com.ryx.internet.dao.OInternetCardMapper;
 import com.ryx.internet.dao.OInternetRenewDetailMapper;
 import com.ryx.internet.dao.OInternetRenewMapper;
@@ -77,6 +78,8 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     private BusActRelService busActRelService;
     @Autowired
     private IUserService iUserService;
+    @Autowired
+    private InternetRenewOffsetMapper internetRenewOffsetMapper;
 
     @Override
     public PageInfo internetRenewList(OInternetRenew internetRenew, Page page,String agentId){
@@ -101,7 +104,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         internetRenewExample.setOrderByClause(" c_time desc");
         List<OInternetRenew> internetRenews = internetRenewMapper.selectByExample(internetRenewExample);
         for (OInternetRenew renew : internetRenews) {
-            renew.setRenewWay(InternetRenewWay.getContentByValue(renew.getRenewWay()));
+            renew.setRenewWayName(InternetRenewWay.getContentByValue(renew.getRenewWay()));
             CUser cUser = iUserService.selectById(renew.getcUser());
             if(null!=cUser)
             renew.setcUser(cUser.getName());
@@ -119,7 +122,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         internetRenewDetailExample.setPage(page);
         List<OInternetRenewDetail> internetRenewDetails = internetRenewDetailMapper.selectByExample(internetRenewDetailExample);
         for (OInternetRenewDetail renewDetail : internetRenewDetails) {
-            renewDetail.setRenewWay(InternetRenewWay.getContentByValue(renewDetail.getRenewWay()));
+            renewDetail.setRenewWayName(InternetRenewWay.getContentByValue(renewDetail.getRenewWay()));
             CUser cUser = iUserService.selectById(renewDetail.getcUser());
             if(null!=cUser)
             renewDetail.setcUser(cUser.getName());
@@ -187,6 +190,52 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         internetRenewDetailExample.setOrderByClause(" c_time desc ");
         return internetRenewDetailExample;
     }
+
+
+    @Override
+    public PageInfo internetRenewOffsetList(InternetRenewOffset internetRenewOffset, Page page,String agentId){
+
+        InternetRenewOffsetExample internetRenewOffsetExample = new InternetRenewOffsetExample();
+        InternetRenewOffsetExample.Criteria criteria = internetRenewOffsetExample.createCriteria();
+        //代理商只查询自己的
+        if(StringUtils.isNotBlank(agentId)){
+            criteria.andAgentIdEqualTo(agentId);
+        }else if(StringUtils.isNotBlank(internetRenewOffset.getAgentId())){
+            criteria.andAgentIdEqualTo(internetRenewOffset.getAgentId());
+        }
+        if(StringUtils.isNotBlank(internetRenewOffset.getAgentName())){
+            criteria.andAgentNameEqualTo(internetRenewOffset.getAgentName());
+        }
+        if(StringUtils.isNotBlank(internetRenewOffset.getRenewId())){
+            criteria.andRenewIdEqualTo(internetRenewOffset.getRenewId());
+        }
+        if(StringUtils.isNotBlank(internetRenewOffset.getRenewDetailId())){
+            criteria.andRenewDetailIdEqualTo(internetRenewOffset.getRenewDetailId());
+        }
+        if(StringUtils.isNotBlank(internetRenewOffset.getMerId())){
+            criteria.andMerIdEqualTo(internetRenewOffset.getMerId());
+        }
+        if(StringUtils.isNotBlank(internetRenewOffset.getMerName())){
+            criteria.andMerNameEqualTo(internetRenewOffset.getMerName());
+        }
+        if(StringUtils.isNotBlank(internetRenewOffset.getIccidNum())){
+            criteria.andIccidNumEqualTo(internetRenewOffset.getIccidNum());
+        }
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        internetRenewOffsetExample.setPage(page);
+        internetRenewOffsetExample.setOrderByClause(" c_time desc");
+        List<InternetRenewOffset> internetRenewOffsets = internetRenewOffsetMapper.selectByExample(internetRenewOffsetExample);
+        for (InternetRenewOffset offset : internetRenewOffsets) {
+            CUser cUser = iUserService.selectById(offset.getcUser());
+            if(null!=cUser)
+            offset.setcUser(cUser.getName());
+        }
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(internetRenewOffsets);
+        pageInfo.setTotal((int)internetRenewOffsetMapper.countByExample(internetRenewOffsetExample));
+        return pageInfo;
+    }
+
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
@@ -292,6 +341,11 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             oInternetRenewDetail.setInternetCardNum(oInternetCard.getInternetCardNum());
             oInternetRenewDetail.setOpenAccountTime(oInternetCard.getOpenAccountTime());
             oInternetRenewDetail.setExpireTime(oInternetCard.getExpireTime());
+            if(internetRenew.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())){
+                if(StringUtils.isBlank(oInternetCard.getMerId()) || StringUtils.isBlank(oInternetCard.getMerName())  ){
+                    throw new MessageException("第"+i+"个商户信息不全,轧差商户方式必须包含商户信息");
+                }
+            }
             oInternetRenewDetail.setMerId(oInternetCard.getMerId());
             oInternetRenewDetail.setMerName(oInternetCard.getMerName());
             if(StringUtils.isBlank(oInternetCard.getAgentId())){
@@ -458,6 +512,29 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 }else{
                     oInternetRenewDetail.setRenewStatus(InternetRenewStatus.BFXF.getValue());
                     oInternetCard.setRenewStatus(InternetRenewStatus.BFXF.getValue());
+                }
+                oInternetCard.setStop(Status.STATUS_0.status);
+                oInternetCard.setRenew(Status.STATUS_0.status);
+                //生成轧差明细，同步清结算
+                if(oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())){
+                    InternetRenewOffset internetRenewOffset = new InternetRenewOffset();
+                    internetRenewOffset.setFlowId(idService.genInternetOffset());
+                    internetRenewOffset.setRenewId(oInternetRenew.getId());
+                    internetRenewOffset.setRenewDetailId(oInternetRenewDetail.getId());
+                    internetRenewOffset.setIccidNum(oInternetRenewDetail.getIccidNum());
+                    internetRenewOffset.setAgentId(oInternetRenewDetail.getAgentId());
+                    internetRenewOffset.setAgentName(oInternetRenewDetail.getAgentName());
+                    internetRenewOffset.setMerId(oInternetRenewDetail.getMerId());
+                    internetRenewOffset.setMerName(oInternetRenewDetail.getMerName());
+                    internetRenewOffset.setOffsetAmt(oInternetRenewDetail.getOffsetAmt());
+                    internetRenewOffset.setAlreadyOffsetAmt(BigDecimal.ZERO);
+                    internetRenewOffset.setProcessTime(new Date());
+                    internetRenewOffset.setcTime(new Date());
+                    internetRenewOffset.setcUser(oInternetRenewDetail.getcUser());
+                    internetRenewOffset.setuUser(oInternetRenewDetail.getuUser());
+                    internetRenewOffset.setStatus(Status.STATUS_1.status);
+                    internetRenewOffset.setVersion(BigDecimal.ONE);
+                    internetRenewOffsetMapper.insert(internetRenewOffset);
                 }
             }
             int j = internetRenewDetailMapper.updateByPrimaryKeySelective(oInternetRenewDetail);

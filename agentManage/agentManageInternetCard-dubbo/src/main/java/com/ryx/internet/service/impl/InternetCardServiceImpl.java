@@ -29,10 +29,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /***
  *
@@ -86,12 +84,36 @@ public class InternetCardServiceImpl implements InternetCardService {
             if(null!=dict)
                 oInternetCard.setManufacturer(dict.getdItemname());
             oInternetCard.setIccidNumId(oInternetCard.getIccidNum());
+            if((oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NORMAL.getValue())==0 || oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NOACTIVATE.getValue())==0 )
+                    && !oInternetCard.getRenewStatus().equals(InternetRenewStatus.XFZ.getValue())){
+                if(null==oInternetCard.getExpireTime()){
+                    oInternetCard.setRenewButton("0");
+                    continue;
+                }
+                Date date = stepMonth(new Date(), 3);
+                if(oInternetCard.getExpireTime().getTime()<date.getTime()){
+                    oInternetCard.setRenewButton("1");
+                }else{
+                    oInternetCard.setRenewButton("0");
+                }
+            }else{
+                oInternetCard.setRenewButton("0");
+            }
         }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(oInternetCards);
         pageInfo.setTotal((int)internetCardMapper.countByExample(oInternetCardExample));
         return pageInfo;
     }
+
+
+    public static Date stepMonth(Date sourceDate, int month) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(sourceDate);
+        c.add(Calendar.MONTH, month);
+        return c.getTime();
+    }
+
 
     @Override
     public List<OInternetCard> queryInternetCardList(OInternetCard internetCard, Page page,String agentId){

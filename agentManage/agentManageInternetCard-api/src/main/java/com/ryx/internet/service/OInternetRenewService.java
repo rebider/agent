@@ -6,6 +6,7 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
+import com.ryx.internet.pojo.InternetRenewOffset;
 import com.ryx.internet.pojo.OInternetRenew;
 import com.ryx.internet.pojo.OInternetRenewDetail;
 
@@ -24,6 +25,8 @@ public interface OInternetRenewService {
     PageInfo internetRenewList(OInternetRenew internetRenew, Page page,String agentId);
 
     PageInfo internetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page,String agentId);
+
+    PageInfo internetRenewOffsetList(InternetRenewOffset internetRenewOffset, Page page, String agentId);
 
     AgentResult saveAndApprove(OInternetRenew internetRenew, List<String> iccids, String cUser,
                                List<OCashReceivablesVo> oCashReceivablesVoList,String agentId)throws MessageException;

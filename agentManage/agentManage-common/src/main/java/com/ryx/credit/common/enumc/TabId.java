@@ -83,6 +83,7 @@ public enum TabId {
     O_INTERNET_RENEW("IR%s%015d"),
     O_INTERNET_RENEW_DETAIL("IRD%s%015d"),
     O_INTERNET_CARD_IMPORT_HISTORY("ICIH%s%015d"),
+    O_INTERNET_RENEW_OFFSET("I%s%015d"),
     O_TERMINAL_TRANSFER("TT%s%015d"),
     O_TERMINAL_TRANSFER_DE("TTD%s%015d"),
     P_TAX_DEDUCTION_DETAIL("TAXDD%s%015d"),
@@ -108,6 +109,7 @@ public enum TabId {
     P_SERVER_AMT("PSA%s%015d"),
     O_ORGANIZATION("ORG%s%015d"),
     ORG_PLATFORM("OPF%s%015d");
+
 
     TabId(String thePatt){
            this.patt = thePatt;

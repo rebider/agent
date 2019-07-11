@@ -44,7 +44,17 @@ public class OInternetRenew implements Serializable{
 
     private String iccidNumIds;
 
+    private String renewWayName;
+
     private List<Attachment> attachmentList;
+
+    public String getRenewWayName() {
+        return renewWayName;
+    }
+
+    public void setRenewWayName(String renewWayName) {
+        this.renewWayName = renewWayName;
+    }
 
     public String getAgentId() {
         return agentId;

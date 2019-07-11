@@ -77,6 +77,15 @@ public class OInternetCard implements Serializable{
 
     private String expireTimeEndStr;
 
+    private String renewButton;  //是否展示续费按钮   1 展示  0 不展示
+
+    public String getRenewButton() {
+        return renewButton;
+    }
+
+    public void setRenewButton(String renewButton) {
+        this.renewButton = renewButton;
+    }
 
     public String getOpenAccountTimeBeginStr() {
         return openAccountTimeBeginStr;
