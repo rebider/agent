@@ -518,6 +518,7 @@ public class OSupplementServiceImpl implements OSupplementService {
                     logger.info("订单付款状态修改失败{}:", busActRel.getActivId());
                     throw new MessageException("订单付款状态修改失败");
                 }
+                oPaymentDetail= oPaymentDetailMapper.selectByPrimaryKey(oPaymentDetail.getId());
                 //更新付款单的已付款和未付款
                 OPaymentExample oPaymentExample = new OPaymentExample();
                 OPaymentExample.Criteria criteria = oPaymentExample.createCriteria();
@@ -558,6 +559,7 @@ public class OSupplementServiceImpl implements OSupplementService {
                             }
                         }
                     }
+
                     oPayment.setOutstandingAmount(oPayment.getOutstandingAmount().subtract(oPaymentDetail.getRealPayAmount()));
                     if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
                         logger.info("付款单修改失败");
@@ -599,12 +601,20 @@ public class OSupplementServiceImpl implements OSupplementService {
                     } else {
                         try {
                             List<BigDecimal> divideList = new ArrayList<>();
-                            BigDecimal divide = new BigDecimal(0);
+                            BigDecimal money = oPaymentDetail.getPayAmount().subtract(supplement.getRealPayAmount());
+                            BigDecimal stage = money.divide(count,2,BigDecimal.ROUND_HALF_UP);
+                            BigDecimal tt = BigDecimal.ZERO;
                             for (int i = 0; i < count.intValue(); i++) {
-                                BigDecimal money = oPaymentDetail.getPayAmount().subtract(supplement.getRealPayAmount());
-                                divide = money.divide(count);
-                                divideList.add(divide);
+                                //补充除不尽余额
+                                if(i==count.intValue()-1){
+                                    if(0!=money.subtract(tt).compareTo(stage)){
+                                        stage =   money.subtract(tt);
+                                    }
+                                }
+                                tt=tt.add(stage);
+                                divideList.add(stage);
                             }
+
                             for (int j = 0; j < notCountMap.size(); j++) {
                                 OPaymentDetail paymentDetail = notCountMap.get(j);
                                 paymentDetail.setPayAmount(paymentDetail.getPayAmount().add(divideList.get(j)));
@@ -614,24 +624,7 @@ public class OSupplementServiceImpl implements OSupplementService {
                                 }
                             }
                         } catch (Exception e) {
-                            List<BigDecimal> divideList = new ArrayList<>();
-                            BigDecimal divide = new BigDecimal(0);
-                            for (int i = 0; i < count.intValue(); i++) {
-                                BigDecimal money = oPaymentDetail.getPayAmount().subtract(supplement.getRealPayAmount());
-                                divide = money.divide(count, 2, BigDecimal.ROUND_HALF_DOWN);
-                                divideList.add(divide);
-                            }
-                           /* BigDecimal big = new BigDecimal(0);
-                            big = residue.subtract(divide.multiply(count.subtract(new BigDecimal(1))));
-                            divideList.add(big);*/
-                            for (int j = 0; j < notCountMap.size(); j++) {
-                                OPaymentDetail paymentDetail = notCountMap.get(j);
-                                paymentDetail.setPayAmount(paymentDetail.getPayAmount().add(divideList.get(j)));
-                                if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail)) {
-                                    logger.info("平均金额失败");
-                                    throw new MessageException("平均金额失败");
-                                }
-                            }
+                            e.printStackTrace();
                         }
                     }
                 }
