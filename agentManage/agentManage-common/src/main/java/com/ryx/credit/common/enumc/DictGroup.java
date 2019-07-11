@@ -74,10 +74,12 @@ public enum DictGroup {
     POS_APR_BUSNISS("POS审批参数"),
     ORDER_RETURN("订单退货业务选择下一级审批人参数"),
     APPROVE_MODE("审批流程图当前节点"),
-    ORG_TYPE("机构类型"),
     INTERNET_RENEW("流量卡续费配置"),
     CARD_AMT("流量卡每张金额"),
-    OFFSET_AMT("轧差每张金额");
+    OFFSET_AMT("轧差每张金额"),
+
+    ORG_TYPE("机构类型"),
+    REPORT_STATUS("报备状态");
 
     public String  msg;
 

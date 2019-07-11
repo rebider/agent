@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -660,8 +661,12 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         List<BusinessOutVo> agentoutVos = agentBusInfoMapper.excelAgent(map);
         List<Dict> BUS_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name());
         List<Dict> BUS_SCOPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name());
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         if (null != agentoutVos && agentoutVos.size() > 0)
             for (BusinessOutVo agentoutVo : agentoutVos) {//类型
+                if(null!=agentoutVo.getApproveTime()){
+                    agentoutVo.setTime(df.format(agentoutVo.getApproveTime()));
+                }
                 if (StringUtils.isNotBlank(agentoutVo.getBusType()) && !agentoutVo.getBusType().equals("null")) {
                     for (Dict dict : BUS_TYPE) {
                         if (null!=dict  &&  agentoutVo.getBusType().equals(dict.getdItemvalue())){
