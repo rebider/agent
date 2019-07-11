@@ -53,6 +53,16 @@ public class OInternetRenewDetail implements Serializable {
 
     private BigDecimal version;
 
+    private String renewWayName;
+
+    public String getRenewWayName() {
+        return renewWayName;
+    }
+
+    public void setRenewWayName(String renewWayName) {
+        this.renewWayName = renewWayName;
+    }
+
     public String getId() {
         return id;
     }

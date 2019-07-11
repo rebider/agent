@@ -104,7 +104,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         internetRenewExample.setOrderByClause(" c_time desc");
         List<OInternetRenew> internetRenews = internetRenewMapper.selectByExample(internetRenewExample);
         for (OInternetRenew renew : internetRenews) {
-            renew.setRenewWay(InternetRenewWay.getContentByValue(renew.getRenewWay()));
+            renew.setRenewWayName(InternetRenewWay.getContentByValue(renew.getRenewWay()));
             CUser cUser = iUserService.selectById(renew.getcUser());
             if(null!=cUser)
             renew.setcUser(cUser.getName());
@@ -122,7 +122,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         internetRenewDetailExample.setPage(page);
         List<OInternetRenewDetail> internetRenewDetails = internetRenewDetailMapper.selectByExample(internetRenewDetailExample);
         for (OInternetRenewDetail renewDetail : internetRenewDetails) {
-            renewDetail.setRenewWay(InternetRenewWay.getContentByValue(renewDetail.getRenewWay()));
+            renewDetail.setRenewWayName(InternetRenewWay.getContentByValue(renewDetail.getRenewWay()));
             CUser cUser = iUserService.selectById(renewDetail.getcUser());
             if(null!=cUser)
             renewDetail.setcUser(cUser.getName());
@@ -190,6 +190,52 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         internetRenewDetailExample.setOrderByClause(" c_time desc ");
         return internetRenewDetailExample;
     }
+
+
+    @Override
+    public PageInfo internetRenewOffsetList(InternetRenewOffset internetRenewOffset, Page page,String agentId){
+
+        InternetRenewOffsetExample internetRenewOffsetExample = new InternetRenewOffsetExample();
+        InternetRenewOffsetExample.Criteria criteria = internetRenewOffsetExample.createCriteria();
+        //代理商只查询自己的
+        if(StringUtils.isNotBlank(agentId)){
+            criteria.andAgentIdEqualTo(agentId);
+        }else if(StringUtils.isNotBlank(internetRenewOffset.getAgentId())){
+            criteria.andAgentIdEqualTo(internetRenewOffset.getAgentId());
+        }
+        if(StringUtils.isNotBlank(internetRenewOffset.getAgentName())){
+            criteria.andAgentNameEqualTo(internetRenewOffset.getAgentName());
+        }
+        if(StringUtils.isNotBlank(internetRenewOffset.getRenewId())){
+            criteria.andRenewIdEqualTo(internetRenewOffset.getRenewId());
+        }
+        if(StringUtils.isNotBlank(internetRenewOffset.getRenewDetailId())){
+            criteria.andRenewDetailIdEqualTo(internetRenewOffset.getRenewDetailId());
+        }
+        if(StringUtils.isNotBlank(internetRenewOffset.getMerId())){
+            criteria.andMerIdEqualTo(internetRenewOffset.getMerId());
+        }
+        if(StringUtils.isNotBlank(internetRenewOffset.getMerName())){
+            criteria.andMerNameEqualTo(internetRenewOffset.getMerName());
+        }
+        if(StringUtils.isNotBlank(internetRenewOffset.getIccidNum())){
+            criteria.andIccidNumEqualTo(internetRenewOffset.getIccidNum());
+        }
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        internetRenewOffsetExample.setPage(page);
+        internetRenewOffsetExample.setOrderByClause(" c_time desc");
+        List<InternetRenewOffset> internetRenewOffsets = internetRenewOffsetMapper.selectByExample(internetRenewOffsetExample);
+        for (InternetRenewOffset offset : internetRenewOffsets) {
+            CUser cUser = iUserService.selectById(offset.getcUser());
+            if(null!=cUser)
+            offset.setcUser(cUser.getName());
+        }
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(internetRenewOffsets);
+        pageInfo.setTotal((int)internetRenewOffsetMapper.countByExample(internetRenewOffsetExample));
+        return pageInfo;
+    }
+
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
