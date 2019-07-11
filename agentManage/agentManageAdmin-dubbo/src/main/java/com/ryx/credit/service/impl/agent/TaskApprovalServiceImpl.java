@@ -5,7 +5,6 @@ import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.OrganizationMapper;
@@ -157,7 +156,6 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                                     throw new ProcessException("审批失败:上级的顶级机构为空，请联系业务进行补全");
                                 }
                             }
-
                         }
                         agentBusInfo.setOrganNum(agentBusInfoVo.getOrganNum());
                         if(agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)!=1){
@@ -200,6 +198,9 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
 
                 //处理财务审批（财务出款机构）
                 for (AgentBusInfoVo agentBusInfoVo : agentVo.getOrgTypeList()) {
+                    if (StringUtils.isBlank(agentBusInfoVo.getOrganNum())) {
+                        throw new ProcessException("请选择财务出款机构");
+                    }
                     AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
                     agentBusInfo.setFinaceRemitOrgan(agentBusInfoVo.getFinaceRemitOrgan());
                     int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);

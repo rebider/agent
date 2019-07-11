@@ -3328,4 +3328,23 @@ public class OrderServiceImpl implements OrderService {
         logger.info("==2===="+order1.getoNum());
         logger.info("==3====");
     }
+
+    @Override
+    public AgentResult revocationOrder(String id, String user) {
+        if (null == user) {
+            return AgentResult.fail("操作用户不能为空");
+        }
+        if (StringUtils.isBlank(id)) {
+            return AgentResult.fail("订单ID不能为空");
+        }
+        OOrder oOrder = orderMapper.selectByPrimaryKey(id);
+        oOrder.setuUser(user);
+        oOrder.setOrderStatus(OrderStatus.REVOKE.status);
+        int update = orderMapper.updateByPrimaryKeySelective(oOrder);
+        if (1 != update){
+            return AgentResult.fail("撤销失败");
+        }
+        return AgentResult.ok("撤销成功");
+    }
+
 }
