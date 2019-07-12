@@ -949,8 +949,8 @@
     <if test="reqMap.id != null and reqMap.id != '' " >
       and bus.id = #{reqMap.id}
     </if>
-    <if test="reqMap.organizationCode!=null and reqMap.organizationCode!=''">
-      and (e.CODE like concat(#{reqMap.organizationCode},'%') or g.CODE like concat(#{reqMap.organizationCode},'%') )
+    <if test="reqMap.userId!=null and reqMap.userId!=''">
+      and agent.C_USER = #{reqMap.userId}
     </if>
     <if test="reqMap.platfromPerm!=null and reqMap.platfromPerm.size>0">
       and bus.BUS_PLATFORM in
