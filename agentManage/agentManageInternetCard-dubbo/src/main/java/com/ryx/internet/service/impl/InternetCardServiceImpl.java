@@ -216,7 +216,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                             String consignee = String.valueOf(string.size()>=7?string.get(6):"");//收货人
 
                             oInternetCard.setManufacturer(manufacturer.equals("null")?"":manufacturer);
-                            if(StringUtils.isNotBlank(deliverTime))
+                            if(StringUtils.isNotBlank(deliverTime) && !deliverTime.equals("null"))
                             oInternetCard.setDeliverTime(DateUtils.parseDate(deliverTime,dateFormat));
                             oInternetCard.setOrderId(orderId.equals("null")?"":orderId);
                             oInternetCard.setAgentName(agentName.equals("null")?"":agentName);
@@ -234,7 +234,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                             oInternetCard.setOrderId(orderId.equals("null")?"":orderId);
                             oInternetCard.setAgentName(agentName.equals("null")?"":agentName);
                             oInternetCard.setSnCount(snCount.equals("null")?"":snCount);
-                            if(StringUtils.isNotBlank(deliverTime))
+                            if(StringUtils.isNotBlank(deliverTime) && !deliverTime.equals("null"))
                             oInternetCard.setDeliverTime(DateUtils.parseDate(deliverTime,dateFormat));
                             oInternetCard.setBeginSn(beginSn.equals("null")?"":beginSn);
                             oInternetCard.setEndSn(endSn.equals("null")?"":endSn);
@@ -253,7 +253,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                             oInternetCard.setBeginSn(beginSn.equals("null")?"":beginSn);
                             oInternetCard.setEndSn(endSn.equals("null")?"":endSn);
                             oInternetCard.setSnCount(snCount.equals("null")?"":snCount);
-                            if(StringUtils.isNotBlank(deliverTime))
+                            if(StringUtils.isNotBlank(deliverTime)  && !deliverTime.equals("null"))
                             oInternetCard.setDeliverTime(DateUtils.parseDate(deliverTime,dateFormat));
                         }else if(importType.equals(CardImportType.E.getValue())){
                             String iccidNum = String.valueOf(string.size()>=1?string.get(0):"");//ICCID
@@ -271,7 +271,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                             }
                             oInternetCard.setInternetCardStatus(contentByMsg);
                             oInternetCard.setLatelyPayTime(latelyPayTime.equals("null")?"":latelyPayTime);
-                            if(StringUtils.isNotBlank(openAccountTime))
+                            if(StringUtils.isNotBlank(openAccountTime) && !openAccountTime.equals("null"))
                             oInternetCard.setOpenAccountTime(DateUtils.parseDate(openAccountTime,dateFormat));
                             oInternetCard.setMerId(merId.equals("null")?"":merId);
                             oInternetCard.setMerName(merName.equals("null")?"":merName);

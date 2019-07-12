@@ -344,6 +344,16 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
+    public List<Organization> queryAllOrgan() {
+        logger.info("获取有效状态的所有机构数据~");
+        OrganizationExample organizationExample = new OrganizationExample();
+        organizationExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status);
+        List<Organization> organizationList = organizationMapper.selectByExample(organizationExample);
+        logger.info("queryAllOrgan().organizationList：", organizationList);
+        return organizationList;
+    }
+
+    @Override
     public List<OrganizationSerchVo> queryOrganization(String orgId) {
         List<OrganizationSerchVo> organizationList = organizationMapper.queryOrganization(orgId);
         if (null != organizationList && organizationList.size() > 0) {
@@ -363,16 +373,6 @@ public class OrganizationServiceImpl implements OrganizationService {
             return new ArrayList<>();
         }
         return orgPlatforms;
-    }
-
-    @Override
-    public List<Organization> queryAllOrgan() {
-        logger.info("获取有效状态的所有机构数据~");
-        OrganizationExample organizationExample = new OrganizationExample();
-        organizationExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status);
-        List<Organization> organizationList = organizationMapper.selectByExample(organizationExample);
-        logger.info("queryAllOrgan().organizationList：", organizationList);
-        return organizationList;
     }
 
     public String queryFile(Organization organization, String attDataType) {

@@ -111,6 +111,9 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             BankLineNums bankLineNums = bankLineNumsMapper.selectByBankName(agentColinfo.getCloBank());
             resultMap.put("bankid",bankLineNums.getBankid());
             resultMap.put("cardName",agentColinfo.getCloRealname());
+            resultMap.put("channelTopId",agentBusInfo.getFinaceRemitOrgan());
+            resultMap.put("invoice",agentColinfo.getCloInvoice());
+            resultMap.put("tax",agentColinfo.getCloTaxPoint());
         } catch (Exception e) {
             log.info("入网组装参数为空，"+e.getMessage());
             e.printStackTrace();
@@ -147,6 +150,9 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             jsonParams.put("cardName",paramMap.get("cardName"));
             jsonParams.put("accountType",paramMap.get("accountType"));
             jsonParams.put("customerType",paramMap.get("customerType"));
+            jsonParams.put("channelTopId",paramMap.get("channelTopId"));
+            jsonParams.put("invoice",String.valueOf(paramMap.get("invoice")));
+            jsonParams.put("tax",String.valueOf(paramMap.get("tax")));
 
             String json = JsonUtil.objectToJson(jsonParams);
             log.info("通知瑞大宝入网请求参数：{}",json);
@@ -206,7 +212,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         jsonParams.put("mobile",agentBusInfo.getBusNum());
         jsonParams.put("branchid",agentBusInfo.getBusPlatform().split("_")[0]);
         jsonParams.put("termCount",agentBusInfo.getTerminalsLower());
-        jsonParams = commonParam(jsonParams, agentColinfo, agent);
+        jsonParams = commonParam(jsonParams, agentColinfo, agent, agentBusInfo);
         return jsonParams;
     }
 
@@ -236,6 +242,9 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             jsonParams.put("cardName",data.get("cardName"));
             jsonParams.put("accountType",data.get("accountType"));
             jsonParams.put("customerType",data.get("customerType"));
+            jsonParams.put("channelTopId",data.get("channelTopId"));
+            jsonParams.put("invoice",String.valueOf(data.get("invoice")));
+            jsonParams.put("tax",String.valueOf(data.get("tax")));
 
             String json = JsonUtil.objectToJson(jsonParams);
             log.info("通知瑞大宝升级请求参数：{}",json);
@@ -263,7 +272,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
      * @param agent
      * @return
      */
-    private Map<String,Object> commonParam(Map<String,Object> jsonParams,AgentColinfo agentColinfo,Agent agent){
+    private Map<String,Object> commonParam(Map<String,Object> jsonParams,AgentColinfo agentColinfo,Agent agent,AgentBusInfo agentBusInfo){
         jsonParams.put("cardno",agentColinfo.getCloBankAccount());
         jsonParams.put("bankbranchid",agentColinfo.getBranchLineNum());
         jsonParams.put("bankbranchname",agentColinfo.getCloBankBranch());
@@ -295,6 +304,9 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         BankLineNums bankLineNums = bankLineNumsMapper.selectByBankName(agentColinfo.getCloBank());
         jsonParams.put("bankid",bankLineNums.getBankid());
         jsonParams.put("cardName",agentColinfo.getCloRealname());
+        jsonParams.put("channelTopId",agentBusInfo.getFinaceRemitOrgan());
+        jsonParams.put("invoice",agentColinfo.getCloInvoice());
+        jsonParams.put("tax",agentColinfo.getCloTaxPoint());
         return jsonParams;
     }
 
@@ -305,7 +317,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         Agent agent = (Agent)param.get("agent");
         AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
         jsonParams.put("agencyId",agentBusInfo.getBusNum());
-        jsonParams = commonParam(jsonParams, agentColinfo, agent);
+        jsonParams = commonParam(jsonParams, agentColinfo, agent, agentBusInfo);
         return jsonParams;
     }
 
@@ -331,6 +343,10 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             jsonParams.put("cardName",paramMap.get("cardName"));
             jsonParams.put("accountType",paramMap.get("accountType"));
             jsonParams.put("customerType",paramMap.get("customerType"));
+            jsonParams.put("channelTopId",paramMap.get("channelTopId"));
+            jsonParams.put("invoice",String.valueOf(paramMap.get("invoice")));
+            jsonParams.put("tax",String.valueOf(paramMap.get("tax")));
+
             String json = JsonUtil.objectToJson(jsonParams);
             log.info("通知瑞大宝入网修改请求参数：{}",json);
             //发送请求
