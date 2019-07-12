@@ -875,7 +875,7 @@
     left join A_AGENT busActivationParentbusAgent on busActivationParentbusAgent.id = busActivationParentbus.AGENT_ID
     left join C_ORGANIZATION e on e.ID = bus.AG_DOC_PRO
     left join C_ORGANIZATION g on g.ID=bus.AG_DOC_DISTRICT
-    where 1=1
+    where 1=1   and agent.ag_status = #{reqMap.agStatus}
       <if test="reqMap.agName != null and reqMap.agName != '' ">and agent.ag_name like
         CONCAT(CONCAT('%',#{reqMap.agName}),'%')
       </if>
@@ -930,7 +930,7 @@
     left join A_AGENT busActivationParentbusAgent on busActivationParentbusAgent.id = busActivationParentbus.AGENT_ID
     left join C_ORGANIZATION e on e.ID = bus.AG_DOC_PRO
     left join C_ORGANIZATION g on g.ID=bus.AG_DOC_DISTRICT
-    where 1=1
+    where 1=1  and agent.ag_status = #{reqMap.agStatus}
     <if test="reqMap.agName != null and reqMap.agName != '' " >
       and agent.ag_name like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
     </if>

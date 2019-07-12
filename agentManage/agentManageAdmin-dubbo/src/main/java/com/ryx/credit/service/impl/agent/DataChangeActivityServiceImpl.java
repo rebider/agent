@@ -52,7 +52,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     private AgentEnterService agentEnterService;
     @Autowired
     private AimportService aimportService;
-//    @Autowired
+    //    @Autowired
 //    private AgentNotifyService agentNotifyService;
     @Autowired
     private AColinfoPaymentService colinfoPaymentService;
@@ -169,7 +169,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         record.setDataShiro(BusActRelBusType.DC_Agent.key);
         Agent agent = agentMapper.selectByPrimaryKey(dateChangeRequest.getDataId());
         if(agent!=null)
-        record.setAgentName(agent.getAgName());
+            record.setAgentName(agent.getAgName());
         if(dateChangeRequest.getDataType().equals(BusActRelBusType.DC_Agent.name())){
             AgentVo agVo = JSONObject.parseObject(dateChangeRequest.getDataContent(), AgentVo.class);
             if(agVo.getBusInfoVoList().size()==0){
@@ -238,8 +238,8 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             list.add(PlatformType.MPOS.code);
                             list.add(PlatformType.RDBPOS.code);
                             platFormExample.or()
-                            .andStatusEqualTo(Status.STATUS_1.status)
-                            .andPlatformTypeIn(list);
+                                    .andStatusEqualTo(Status.STATUS_1.status)
+                                    .andPlatformTypeIn(list);
                             List<PlatForm>  platForms = platFormMapper.selectByExample(platFormExample);
                             List<String> pltcode = new ArrayList<>();
                             pltcode.add("aaaa");
@@ -256,7 +256,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
 
                             //入网程序调用
 //                            try {
-                                for (AgentBusInfo agentBusInfo : agentBusInfoList) {
+                            for (AgentBusInfo agentBusInfo : agentBusInfoList) {
 
 //                                    ImportAgent importAgent = new ImportAgent();
 //                                    importAgent.setDataid(agentBusInfo.getId());
@@ -268,8 +268,8 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
 //                                    } else {
 //                                        logger.info("代理商账户修改审批通过-添加修改任务成功!{},{}", AgImportType.DATACHANGEAPP.getValue(), vo.getAgent().getId());
 //                                    }
-                                    agentNetInNotityService.asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
-                                }
+                                agentNetInNotityService.asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
+                            }
 //                            } catch (Exception e) {
 //                                e.printStackTrace();
 //                                throw new ProcessException("更新賬戶数据申请失败");
@@ -278,7 +278,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
 //                            }
 
                         }
-                    //代理商新修改
+                        //代理商新修改
                     }else if(DataChangeApyType.DC_Agent.name().equals(dr.getDataType())){
 
                         //更新入库
@@ -288,19 +288,8 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                         for (CapitalVo capitalVo : capitalVoList) {
                             capitalVo.setcAgentId(vo.getAgent().getId());
                             capitalVo.setcUser(rel.getcUser());
-                            if(StringUtils.isBlank(capitalVo.getId())){
-                                capitalFlowService.insertCapitalFlow(capitalVo, BigDecimal.ZERO,dr.getId(),"代理商信息修改");
-                            }
-                            List<CapitalVo> preCapitalVoList = preVo.getCapitalVoList();
-                            for (CapitalVo preCapitalVo : preCapitalVoList) {
-                                preCapitalVo.setcAgentId(vo.getAgent().getId());
-                                preCapitalVo.setcUser(rel.getcUser());
-                                if(capitalVo.getId().equals(preCapitalVo.getId())){
-                                    if(preCapitalVo.getcAmount().compareTo(capitalVo.getcAmount())!=0){
-                                        capitalFlowService.insertCapitalFlow(capitalVo, preCapitalVo.getcAmount(),dr.getId(),"代理商信息修改");
-                                    }
-                                }
-                            }
+                            capitalVo.setSrcId(dr.getId());
+                            capitalVo.setSrcRemark("代理商信息修改");
                         }
                         //更新财务出款机构
                         List<AgentBusInfoVo> orgTypeList = vo.getOrgTypeList();
@@ -344,9 +333,9 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
 
                         //入网程序调用
 //                        try {
-                            if(vo.getBusInfoVoList()!=null){
+                        if(vo.getBusInfoVoList()!=null){
 
-                                for (AgentBusInfoVo agentBusInfoVo : vo.getBusInfoVoList()) {
+                            for (AgentBusInfoVo agentBusInfoVo : vo.getBusInfoVoList()) {
 //                                    if(StringUtils.isNotBlank(agentBusInfoVo.getId())) {
 //                                        ImportAgent importAgent = new ImportAgent();
 //                                        importAgent.setDataid(agentBusInfoVo.getId());
@@ -359,9 +348,9 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
 //                                            logger.info("代理商修改审批通过-添加开户任务成功!{},{}", AgImportType.DATACHANGEAPP.getValue(), vo.getAgent().getId());
 //                                        }
 //                                    }
-                                    agentNetInNotityService.asynNotifyPlatform(agentBusInfoVo.getId(),NotifyType.NetInEdit.getValue());
-                                }
+                                agentNetInNotityService.asynNotifyPlatform(agentBusInfoVo.getId(),NotifyType.NetInEdit.getValue());
                             }
+                        }
 //                        } catch (Exception e) {
 //                            e.printStackTrace();
 //                            throw new ProcessException("更新数据申请失败");
@@ -370,7 +359,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
 //                        }
 
                     }
-                //拒绝更新数据状态
+                    //拒绝更新数据状态
                 }else if(AgStatus.Refuse.name().equals(agStatus)){
                     dr.setAppyStatus(AgStatus.Refuse.status);
                     dr.setcUpdate(Calendar.getInstance().getTime());
@@ -385,7 +374,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                 }
             } catch (ProcessException e) {
                 e.printStackTrace();
-               throw e;
+                throw e;
             }
 
             try {
