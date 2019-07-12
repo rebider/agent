@@ -4,6 +4,7 @@ import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -340,6 +341,9 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             oInternetRenewDetail.setSnNum(oInternetCard.getSnNum());
             oInternetRenewDetail.setInternetCardNum(oInternetCard.getInternetCardNum());
             oInternetRenewDetail.setOpenAccountTime(oInternetCard.getOpenAccountTime());
+            if(oInternetCard.getExpireTime()==null){
+                throw new MessageException("第"+i+"个缺少到期时间");
+            }
             oInternetRenewDetail.setExpireTime(oInternetCard.getExpireTime());
             if(internetRenew.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())){
                 if(StringUtils.isBlank(oInternetCard.getMerId()) || StringUtils.isBlank(oInternetCard.getMerName())  ){
@@ -497,8 +501,10 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         criteria.andRenewIdEqualTo(oInternetRenew.getId());
         List<OInternetRenewDetail> oInternetRenewDetails = internetRenewDetailMapper.selectByExample(oInternetRenewDetailExample);
         for (OInternetRenewDetail oInternetRenewDetail : oInternetRenewDetails) {
-            OInternetCard oInternetCard = new OInternetCard();
-            oInternetCard.setIccidNum(oInternetRenewDetail.getIccidNum());
+            OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(oInternetRenewDetail.getIccidNum());
+            if(oInternetCard==null){
+                throw new MessageException("查询流量卡信息失败");
+            }
             //拒绝全部失效
             if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
                 oInternetRenewDetail.setRenewStatus(InternetRenewStatus.SX.getValue());
@@ -515,6 +521,8 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 }
                 oInternetCard.setStop(Status.STATUS_0.status);
                 oInternetCard.setRenew(Status.STATUS_0.status);
+                //续费成功到期时间加一年
+                oInternetCard.setExpireTime(DateUtil.getOneYearLater(oInternetCard.getExpireTime()));
                 //生成轧差明细，同步清结算
                 if(oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())){
                     InternetRenewOffset internetRenewOffset = new InternetRenewOffset();

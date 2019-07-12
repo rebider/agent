@@ -4,18 +4,16 @@ import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.util.*;
+import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
 import com.ryx.credit.service.order.OLogisticsService;
-import com.ryx.internet.dao.OInternetCardImportMapper;
-import com.ryx.internet.dao.OInternetCardMapper;
-import com.ryx.internet.dao.OInternetCardMerchMapper;
+import com.ryx.internet.dao.*;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
-import com.ryx.internet.dao.OInternetRenewDetailMapper;
 import com.ryx.internet.pojo.*;
 import com.ryx.internet.service.InternetCardService;
 import org.apache.commons.lang.time.DateUtils;
@@ -53,6 +51,8 @@ public class InternetCardServiceImpl implements InternetCardService {
     private OInternetCardMapper internetCardMapper;
     @Autowired
     private OInternetCardImportMapper internetCardImportMapper;
+    @Autowired
+    private InternetCardImportHistoryMapper internetCardImportHistoryMapper;
     @Autowired
     private IdService idService;
     @Autowired
@@ -772,7 +772,7 @@ public class InternetCardServiceImpl implements InternetCardService {
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         criteria.andMerIdIsNull();
         criteria.andMerNameIsNull();
-        oInternetCardExample.setPage(new Page(0,200000));
+        oInternetCardExample.setPage(new Page(0,100));
         List<OInternetCard> internetCards = internetCardMapper.selectByExample(oInternetCardExample);
         log.info("查询为空的商户信息数量为:{}",internetCards.size());
         return internetCards;
@@ -838,4 +838,39 @@ public class InternetCardServiceImpl implements InternetCardService {
         }
     }
 
+
+    /**
+     * 查询要迁移的数据
+     * @return
+     */
+    @Override
+    public List<OInternetCardImport> queryMigrationHistory(){
+        OInternetCardImportExample oInternetCardImportExample = new OInternetCardImportExample();
+        OInternetCardImportExample.Criteria criteria = oInternetCardImportExample.createCriteria();
+        Date dateAfter = DateUtil.getDateAfterReturnDate(new Date(), -5);
+        criteria.andCTimeLessThanOrEqualTo(dateAfter);
+        oInternetCardImportExample.setPage(new Page(0,100));
+        return internetCardImportMapper.selectByExample(oInternetCardImportExample);
+    }
+
+
+    /**
+     * 导入迁移到历史表
+     * @param oInternetCardImport
+     * @throws MessageException
+     */
+    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
+    @Override
+    public void migrationHistory(OInternetCardImport oInternetCardImport)throws MessageException{
+        InternetCardImportHistory internetCardImportHistory = new InternetCardImportHistory();
+        BeanUtils.copyProperties(oInternetCardImport,internetCardImportHistory);
+        internetCardImportHistoryMapper.insert(internetCardImportHistory);
+        OInternetCardImportExample internetCardImportExample = new OInternetCardImportExample();
+        OInternetCardImportExample.Criteria criteria = internetCardImportExample.createCriteria();
+        criteria.andIdEqualTo(oInternetCardImport.getId());
+        int i = internetCardImportMapper.deleteByExample(internetCardImportExample);
+        if(i!=1){
+            throw new MessageException("删除失败");
+        }
+    }
 }

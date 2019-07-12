@@ -875,7 +875,7 @@
     left join A_AGENT busActivationParentbusAgent on busActivationParentbusAgent.id = busActivationParentbus.AGENT_ID
     left join C_ORGANIZATION e on e.ID = bus.AG_DOC_PRO
     left join C_ORGANIZATION g on g.ID=bus.AG_DOC_DISTRICT
-    where 1=1
+    where 1=1   and agent.ag_status = #{reqMap.agStatus}
       <if test="reqMap.agName != null and reqMap.agName != '' ">and agent.ag_name like
         CONCAT(CONCAT('%',#{reqMap.agName}),'%')
       </if>
@@ -930,7 +930,7 @@
     left join A_AGENT busActivationParentbusAgent on busActivationParentbusAgent.id = busActivationParentbus.AGENT_ID
     left join C_ORGANIZATION e on e.ID = bus.AG_DOC_PRO
     left join C_ORGANIZATION g on g.ID=bus.AG_DOC_DISTRICT
-    where 1=1
+    where 1=1  and agent.ag_status = #{reqMap.agStatus}
     <if test="reqMap.agName != null and reqMap.agName != '' " >
       and agent.ag_name like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
     </if>
@@ -949,8 +949,8 @@
     <if test="reqMap.id != null and reqMap.id != '' " >
       and bus.id = #{reqMap.id}
     </if>
-    <if test="reqMap.organizationCode!=null and reqMap.organizationCode!=''">
-      and (e.CODE like concat(#{reqMap.organizationCode},'%') or g.CODE like concat(#{reqMap.organizationCode},'%') )
+    <if test="reqMap.userId!=null and reqMap.userId!=''">
+      and agent.C_USER = #{reqMap.userId}
     </if>
     <if test="reqMap.platfromPerm!=null and reqMap.platfromPerm.size>0">
       and bus.BUS_PLATFORM in
