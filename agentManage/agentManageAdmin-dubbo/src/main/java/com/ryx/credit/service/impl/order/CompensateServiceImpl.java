@@ -503,6 +503,12 @@ public class CompensateServiceImpl implements CompensateService {
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(oRefundPriceDiff.getAgentId());
         record.setDataShiro(BusActRelBusType.COMPENSATE.key);
+        List<Map<String, Object>> maps = iUserService.orgCode(Long.valueOf(cuser));
+        if(maps!=null){
+            Map<String, Object> stringObjectMap = maps.get(0);
+            record.setAgDocPro(stringObjectMap.get("ORGID")+"");
+            record.setAgDocDistrict(stringObjectMap.get("ORGPID")+"");
+        }
         Agent agent = agentMapper.selectByPrimaryKey(oRefundPriceDiff.getAgentId());
         if(null!=agent)
         record.setAgentName(agent.getAgName());
