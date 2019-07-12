@@ -198,7 +198,7 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
 
                 //处理财务审批（财务出款机构）
                 for (AgentBusInfoVo agentBusInfoVo : agentVo.getOrgTypeList()) {
-                    if (StringUtils.isBlank(agentBusInfoVo.getOrganNum())) {
+                    if (StringUtils.isBlank(agentBusInfoVo.getFinaceRemitOrgan())) {
                         throw new ProcessException("请选择财务出款机构");
                     }
                     AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
