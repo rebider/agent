@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -300,6 +301,26 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     if(StringUtils.isBlank(item.getBusParent()))
                         throw new ProcessException("直签上级不能为空");
                 }
+                //代理商选择上级代理商时添加限制 不能选择同级别代理商为上级
+                if (StringUtils.isNotBlank(item.getBusParent())) {
+                    //获取上级代理商类型
+                    AgentBusInfo busInfo = agentBusinfoService.getById(item.getBusParent());
+                    if (item.getBusType().equals(BusType.ZQ.key) || item.getBusType().equals(BusType.ZQBZF.key) || item.getBusType().equals(BusType.ZQZF.key)) {
+                        if (busInfo.getBusType().equals(BusType.ZQ.key) || busInfo.getBusType().equals(BusType.ZQZF.key) || busInfo.getBusType().equals(BusType.ZQBZF.key)) {
+                            throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                        }
+                    }
+                    if (item.getBusType().equals(BusType.YDX.key)) {
+                        if (!busInfo.getBusType().equals(BusType.JG.key) || !busInfo.getBusType().equals(BusType.BZYD.key) || !busInfo.getBusType().equals(BusType.JGYD.key)) {
+                            throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                        }
+                    }
+                    if (item.getBusType().equals(BusType.JGYD.key)) {
+                        if (!busInfo.getBusType().equals(BusType.JG.key)) {
+                            throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                        }
+                    }
+                }
                 agentBusInfos.add(item);
             }
             String json = JsonUtil.objectToJson(agentBusInfos);
@@ -401,6 +422,26 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 if(item.getBusType().equals(BusType.ZQZF.key) || item.getBusType().equals(BusType.ZQBZF.key) || item.getBusType().equals(BusType.ZQ.key) ){
                     if(StringUtils.isBlank(item.getBusParent()))
                         throw new ProcessException("直签上级不能为空");
+                }
+                //代理商选择上级代理商时添加限制 不能选择同级别代理商为上级
+                if (StringUtils.isNotBlank(item.getBusParent())) {
+                    //获取上级代理商类型
+                    AgentBusInfo busInfo = agentBusinfoService.getById(item.getBusParent());
+                    if (item.getBusType().equals(BusType.ZQ.key) || item.getBusType().equals(BusType.ZQBZF.key) || item.getBusType().equals(BusType.ZQZF.key)) {
+                        if (busInfo.getBusType().equals(BusType.ZQ.key) || busInfo.getBusType().equals(BusType.ZQZF.key) || busInfo.getBusType().equals(BusType.ZQBZF.key)) {
+                            throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                        }
+                    }
+                    if (item.getBusType().equals(BusType.YDX.key)) {
+                        if (!busInfo.getBusType().equals(BusType.JG.key) || !busInfo.getBusType().equals(BusType.BZYD.key) || !busInfo.getBusType().equals(BusType.JGYD.key)) {
+                            throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                        }
+                    }
+                    if (item.getBusType().equals(BusType.JGYD.key)) {
+                        if (!busInfo.getBusType().equals(BusType.JG.key)) {
+                            throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                        }
+                    }
                 }
                 item.setAgentId(agent.getId());
                 Boolean busPlatExist = findBusPlatExist(item);
@@ -660,8 +701,12 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         List<BusinessOutVo> agentoutVos = agentBusInfoMapper.excelAgent(map);
         List<Dict> BUS_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name());
         List<Dict> BUS_SCOPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name());
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         if (null != agentoutVos && agentoutVos.size() > 0)
             for (BusinessOutVo agentoutVo : agentoutVos) {//类型
+                if(null!=agentoutVo.getApproveTime()){
+                    agentoutVo.setTime(df.format(agentoutVo.getApproveTime()));
+                }
                 if (StringUtils.isNotBlank(agentoutVo.getBusType()) && !agentoutVo.getBusType().equals("null")) {
                     for (Dict dict : BUS_TYPE) {
                         if (null!=dict  &&  agentoutVo.getBusType().equals(dict.getdItemvalue())){

@@ -2,6 +2,7 @@ package com.ryx.credit.pojo.admin.vo;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 
 public class AgentoutVo extends AgentExtends implements Serializable {
     private String id;
@@ -71,6 +72,56 @@ public class AgentoutVo extends AgentExtends implements Serializable {
     private String cloString;
 
     private String point;
+
+    private String busRiskEmail;
+
+    private BigDecimal reportStatus;
+
+    private String reportString;
+
+    private Date reportTime;
+
+    private String time;
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getReportString() {
+        return reportString;
+    }
+
+    public void setReportString(String reportString) {
+        this.reportString = reportString;
+    }
+
+    public BigDecimal getReportStatus() {
+        return reportStatus;
+    }
+
+    public void setReportStatus(BigDecimal reportStatus) {
+        this.reportStatus = reportStatus;
+    }
+
+    public Date getReportTime() {
+        return reportTime;
+    }
+
+    public void setReportTime(Date reportTime) {
+        this.reportTime = reportTime;
+    }
+
+    public String getBusRiskEmail() {
+        return busRiskEmail;
+    }
+
+    public void setBusRiskEmail(String busRiskEmail) {
+        this.busRiskEmail = busRiskEmail;
+    }
 
     public String getId() {
         return id;

@@ -121,6 +121,26 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					}
 				}
 			}
+            //代理商选择上级代理商时添加限制 不能选择同级别代理商为上级
+            if (StringUtils.isNotBlank(agentBusInfo.getBusParent())) {
+                //获取上级代理商类型
+                AgentBusInfo busInfo = getById(agentBusInfo.getBusParent());
+                if (agentBusInfo.getBusType().equals(BusType.ZQ.key) || agentBusInfo.getBusType().equals(BusType.ZQBZF.key) || agentBusInfo.getBusType().equals(BusType.ZQZF.key)) {
+                    if (busInfo.getBusType().equals(BusType.ZQ.key) || busInfo.getBusType().equals(BusType.ZQZF.key) || busInfo.getBusType().equals(BusType.ZQBZF.key)) {
+                        throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                    }
+                }
+                if (agentBusInfo.getBusType().equals(BusType.YDX.key)) {
+                    if (!busInfo.getBusType().equals(BusType.JG.key) || !busInfo.getBusType().equals(BusType.BZYD.key) || !busInfo.getBusType().equals(BusType.JGYD.key)) {
+                        throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                    }
+                }
+                if (agentBusInfo.getBusType().equals(BusType.JGYD.key)) {
+                    if (!busInfo.getBusType().equals(BusType.JG.key)) {
+                        throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                    }
+                }
+            }
 			Dict debitRateLower = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitRateLower");//借记费率下限（%）
 			Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitCapping");//借记封顶额（元）
 			Dict debitAppearRate = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitAppearRate");//借记出款费率（%）
@@ -220,6 +240,27 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 				if(agentBusInfoVo.getBusType().equals(BusType.ZQZF.key) || agentBusInfoVo.getBusType().equals(BusType.ZQBZF.key) || agentBusInfoVo.getBusType().equals(BusType.ZQ.key) ){
 					if(com.ryx.credit.commons.utils.StringUtils.isBlank(agentBusInfoVo.getBusParent()))
 						throw new ProcessException("直签上级不能为空");
+				}
+
+				//代理商选择上级代理商时添加限制 不能选择同级别代理商为上级
+				if (StringUtils.isNotBlank(agentBusInfoVo.getBusParent())) {
+					//获取上级代理商类型
+					AgentBusInfo busInfo = getById(agentBusInfoVo.getBusParent());
+					if (agentBusInfoVo.getBusType().equals(BusType.ZQ.key) || agentBusInfoVo.getBusType().equals(BusType.ZQBZF.key) || agentBusInfoVo.getBusType().equals(BusType.ZQZF.key)) {
+						if (busInfo.getBusType().equals(BusType.ZQ.key) || busInfo.getBusType().equals(BusType.ZQZF.key) || busInfo.getBusType().equals(BusType.ZQBZF.key)) {
+							throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+						}
+					}
+					if (agentBusInfoVo.getBusType().equals(BusType.YDX.key)) {
+						if (!busInfo.getBusType().equals(BusType.JG.key) || !busInfo.getBusType().equals(BusType.BZYD.key) || !busInfo.getBusType().equals(BusType.JGYD.key)) {
+							throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+						}
+					}
+					if (agentBusInfoVo.getBusType().equals(BusType.JGYD.key)) {
+						if (!busInfo.getBusType().equals(BusType.JG.key)) {
+							throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+						}
+					}
 				}
 
 				PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfoVo.getBusPlatform());

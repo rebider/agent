@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -1095,6 +1096,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         List<Dict> BUS_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name());
         List<Dict> BUS_SCOPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name());
         List<Dict> COLINFO_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.COLINFO_TYPE.name());
+        List<Dict> REPORT_STATUS = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.REPORT_STATUS.name());
 
 
         if (null != agentoutVos && agentoutVos.size() > 0)
@@ -1131,6 +1133,20 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                             break;
                         }
                     }
+                }
+
+                if (null!=agentoutVo.getReportStatus()){
+                    for (Dict dict : REPORT_STATUS) {
+                        if (null!=dict  &&  agentoutVo.getReportStatus().toString().equals(dict.getdItemvalue())){
+                            agentoutVo.setReportString(dict.getdItemname());
+                            break;
+                        }
+                    }
+                }
+
+                if (null!=agentoutVo.getReportTime()){
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    agentoutVo.setTime(simpleDateFormat.format(agentoutVo.getReportTime()));
                 }
 
                 if (null != agentoutVo.getCloTaxPoint()) {
