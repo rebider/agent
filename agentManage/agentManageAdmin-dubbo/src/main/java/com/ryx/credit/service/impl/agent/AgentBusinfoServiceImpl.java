@@ -19,6 +19,7 @@ import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentAssProtocolService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
 import com.ryx.credit.service.agent.PlatFormService;
+import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.dict.DictOptionsService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -69,6 +70,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	private OrganizationMapper organizationMapper;
 	@Autowired
 	private IUserService iUserService;
+	@Autowired
+	private AgentService agentService;
 
 
     /**
@@ -121,6 +124,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					}
 				}
 			}
+
             //代理商选择上级代理商时添加限制 不能选择同级别代理商为上级
             if (StringUtils.isNotBlank(agentBusInfo.getBusParent())) {
                 //获取上级代理商类型
