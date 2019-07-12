@@ -297,16 +297,16 @@ public class AgentEnterServiceImpl implements AgentEnterService {
      * @throws Exception
      */
     @Override
-    public void verifyOrgAndBZYD(List<AgentBusInfoVo> busInfoVoList)throws Exception {
+    public void verifyOrgAndBZYD(List<AgentBusInfoVo> busInfoVoList) throws Exception {
         Set<String> BusTypeSet = new HashSet<>();
         for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
             BusTypeSet.add(agentBusInfoVo.getBusType());
         }
         for (String busType : BusTypeSet) {
-            if(busType.equals(BusType.JG.key) || busType.equals(BusType.BZYD.key)){
+            if (busType.equals(BusType.JG.key) || busType.equals(BusType.BZYD.key)) {
                 for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
                     if(!agentBusInfoVo.getBusType().equals(BusType.JG.key) && !agentBusInfoVo.getBusType().equals(BusType.BZYD.key)){
-//                        throw new ProcessException("业务平台类型为机构与标准一代时不能选择其他,为其他类型时不能选择机构与标准一代");
+                        throw new ProcessException("当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台");
                     }
                 }
             }
