@@ -151,6 +151,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         if(StringUtils.isNotBlank(terminalTransferDetail.getOriginalOrgName())){
             reqMap.put("originalOrgName",terminalTransferDetail.getOriginalOrgName());
         }
+        if (StringUtils.isNotBlank(terminalTransferDetail.getButtJointPersonName())){
+            reqMap.put("buttJointPersonName",terminalTransferDetail.getButtJointPersonName());
+        }
         if(StringUtils.isBlank(dataRole)  && StringUtils.isBlank(terminalTransferDetail.getAgentId())){
             List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
             if(orgCodeRes==null && orgCodeRes.size()!=1){
