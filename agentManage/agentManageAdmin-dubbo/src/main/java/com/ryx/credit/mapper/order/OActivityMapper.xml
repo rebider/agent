@@ -511,8 +511,9 @@
     select ACT_CODE,max(o_activity.id)as ID,
     max(o_activity.activity_name)as ACTIVITYNAME,
     max(o_activity.price) as PRICE ,
-    max(o_activity.original_price) as ORIGINALPRICE
-    from o_activity
+    max(o_activity.original_price) as ORIGINALPRICE,
+    O_product.pro_name
+    from o_activity left JOIN O_product ON o_activity.product_id = O_product.id
     <where>
       o_activity.status=1
       <if test="notEqActcode!=null and notEqActcode!=''" > and o_activity.act_code!=#{notEqActcode} </if>
@@ -523,7 +524,7 @@
       <if test="beginTime!=null" > and o_activity.begin_time &lt;= #{beginTime} </if>
       <if test="endTime!=null" > and o_activity.end_time &gt;= #{endTime}</if>
     </where>
-    group by act_code
+    group by act_code,O_product.pro_name
     order by act_code desc
   </select>
 
