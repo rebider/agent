@@ -263,17 +263,22 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
             //更新业务编号
             AgentBusInfo updateBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getId());
             JSONObject jsonObject = JSONObject.parseObject(String.valueOf(result.getData()));
-            if(PlatformType.whetherPOS(platForm.getPlatformType()) || platForm.getPlatformType().equals(PlatformType.RJPOS.getValue())){
-                updateBusInfo.setBusNum(jsonObject.getString("orgId"));
-                updateBusInfo.setBusLoginNum(jsonObject.getString("loginName"));
+            if(PlatformType.whetherPOS(platForm.getPlatformType())){
+                JSONObject dataObj = JSONObject.parseObject(jsonObject.get("data").toString());
+                updateBusInfo.setBusNum(dataObj.getString("orgId"));
+                updateBusInfo.setBusLoginNum(dataObj.getString("loginName"));
             }else if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
-                updateBusInfo.setBusNum(jsonObject.getString("orgId"));
+            updateBusInfo.setBusNum(jsonObject.getString("orgId"));
                 updateBusInfo.setBusLoginNum(jsonObject.getString("orgId"));
             }else if(platForm.getPlatformType().equals(PlatformType.RDBPOS.getValue())) {
                 JSONObject jsonResult = JSONObject.parseObject(jsonObject.getString("result"));
                 if (jsonResult != null)
                     updateBusInfo.setBusNum(jsonResult.getString("agencyId"));
                 updateBusInfo.setBusLoginNum(agentBusInfo.getBusLoginNum());//传入的手机号
+            }else if(platForm.getPlatformType().equals(PlatformType.RJPOS.getValue())){
+                JSONObject dataObj = JSONObject.parseObject(jsonObject.get("data").toString());
+                updateBusInfo.setBusNum(dataObj.getString("orgId"));
+                updateBusInfo.setBusLoginNum(dataObj.getString("loginName"));
             }
 
             //代理商修改也会走这里
