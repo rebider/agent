@@ -229,7 +229,6 @@ public class AgentServiceImpl implements AgentService {
         agent.setId(idService.genId(TabId.a_agent));
         //默认设置无报备
         agent.setReportStatus(Status.STATUS_0.status);
-        agent.setReportTime(date);
 
         boolean isHaveYYZZ = false;
         boolean isHaveFRSFZ = false;
