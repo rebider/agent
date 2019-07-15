@@ -892,6 +892,9 @@
       <if test="reqMap.approveTimeEnd != null and reqMap.approveTimeEnd != '' " >
         and to_char(bus.approve_time,'yyyy-MM-dd') &lt;= #{reqMap.approveTimeEnd}
       </if>
+      <if test="reqMap.busType != null and reqMap.busType != '' " >
+      and bus.bus_type = #{reqMap.busType}
+      </if>
     and bus.status = #{reqMap.status}
     UNION
     select agent.AG_UNIQ_NUM, agent.AG_NAME, agent.AG_HEAD,
@@ -949,6 +952,9 @@
     </if>
     <if test="reqMap.approveTimeEnd != null and reqMap.approveTimeEnd != '' " >
       and to_char(bus.approve_time,'yyyy-MM-dd') &lt;= #{reqMap.approveTimeEnd}
+    </if>
+    <if test="reqMap.busType != null and reqMap.busType != '' " >
+      and bus.bus_type = #{reqMap.busType}
     </if>
     and bus.status = #{reqMap.status}
    )
