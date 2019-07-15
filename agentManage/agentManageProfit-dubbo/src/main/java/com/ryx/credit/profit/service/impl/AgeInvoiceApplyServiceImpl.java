@@ -44,6 +44,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
     private final static String BASE_URL = AppConfig.getProperty("jindie.baseUrl");//baseUrl
     private final static String CLIENT_SECRET = AppConfig.getProperty("jindie.clientSecret"); // client_secret
     private final static String ACCESS_TOCKEN_URL = AppConfig.getProperty("jd.accessTocken");  // 获取tockenurl
+
     private final static String PASSWORD = AppConfig.getProperty("encrypt.key"); // 加密key
     private final static String TICKET_INFO_URL = AppConfig.getProperty("jd.ticketInfo")+"?access_token="; // 获取发票信息url
 
@@ -246,6 +247,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
            JSONObject param = new JSONObject();
            param.put("invoiceCode", invoiceCode);
            String result = HttpClientUtil.doPostJson(TICKET_INFO_URL+tocken,encrypt1(param.toJSONString()));
+           logger.info("======获取========"+result+"===============");
            Map<String,Object> rr = JSONObject.parseObject(result);
            if("0000".equals(rr.get("errcode"))){
                List<Map<String,Object>> list = (List<Map<String,Object>>)rr.get("data");
@@ -262,6 +264,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         param.put("sign",getSign(timestamp));
         param.put("timestamp",timestamp);
         String result = HttpClientUtil.doPostJson(ACCESS_TOCKEN_URL, param.toJSONString());
+        logger.info("=====获取金蝶授权：tocken======"+result+"=======");
         return JSONObject.parseObject(result);
     }
 
