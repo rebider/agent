@@ -201,7 +201,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                 mmm.put("INVOICE_AMT",invoiceApply1.getSumAmt());
                 mmm.put("INVOICE_COMPANY",invoiceApply1.getInvoiceCompany());
                 Map<String,Object> ma = invoiceSumService.getInvoiceFinalData(mmm);
-                if(!"9999".equals(ma.get("Good").toString()) ){
+                if(!"9999".equals(ma.get("returnCode").toString()) ){
                     Map<String,String> mm = new HashMap<String,String>();
                     mm.put("invoiceCode",invoiceApply.getInvoiceCode());
                     mm.put("errorInfo","汇总失败");
