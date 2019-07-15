@@ -1146,6 +1146,9 @@ public class OrderServiceImpl implements OrderService {
         Agent agent = agentMapper.selectByPrimaryKey(order.getAgentId());
         f.putKeyV("agent", agent);
 
+        Map<String,Object> parentInfo = agentBusInfoMapper.queryBusInfoParent(FastMap.fastMap("id",order.getBusId()));
+        f.putKeyV("parentInfo", parentInfo);
+
         String orderPlatform = order.getOrderPlatform();
         PlatForm platForm = platFormMapper.selectByPlatFormNum(orderPlatform);
         f.putKeyV("platForm", platForm);
