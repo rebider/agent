@@ -20,9 +20,9 @@ import java.util.List;
  * @return
  **/
 @Service("internetCardUpdateMechIsNullJob")
-public class internetCardUpdateMechIsNullJob implements DataflowJob<OInternetCard> {
+public class InternetCardUpdateMechIsNullJob implements DataflowJob<OInternetCard> {
 
-    private static Logger log = LoggerFactory.getLogger(internetCardUpdateMechIsNullJob.class);
+    private static Logger log = LoggerFactory.getLogger(InternetCardUpdateMechIsNullJob.class);
 
     @Autowired
     private InternetCardService internetCardService;

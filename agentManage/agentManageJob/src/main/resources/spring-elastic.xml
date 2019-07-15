@@ -121,7 +121,7 @@
                 sharding-item-parameters="0=Server0"/>
 
 
-    <job:simple id="internetCardUpdateMech"
+    <job:simple id="internetCardUpdateMechJob"
                 job-ref="internetCardUpdateMechJob"
                 registry-center-ref="regCenter"
                 cron="0 0 6 * * ?"
@@ -139,6 +139,18 @@
                   sharding-item-parameters="0=C"
                   streaming-process="true"
                   description="物联网卡，更新商户为空的数据,30分钟执行一次"
+                  overwrite="true"
+                  disabled="false"/>
+
+
+    <job:dataflow id="internetCardMigrationHistory"
+                  job-ref="internetCardMigrationHistoryJob"
+                  registry-center-ref="regCenter"
+                  cron="0 0 1 * * ?"
+                  sharding-total-count="1"
+                  sharding-item-parameters="0=C"
+                  streaming-process="true"
+                  description="物联网卡，迁移到历史表,每天凌晨一天执行一次"
                   overwrite="true"
                   disabled="false"/>
 

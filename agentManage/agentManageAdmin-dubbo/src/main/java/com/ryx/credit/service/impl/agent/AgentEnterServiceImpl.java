@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -230,25 +231,25 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 if(PlatformType.RDBPOS.code.equals(platformType.getValue())){
                     //检查手机号是否填写
                     if(StringUtils.isBlank(item.getBusLoginNum())){
-                        throw new ProcessException("瑞大宝登录账号不能为空");
+                        throw new ProcessException("瑞大宝平台登录账号不能为空");
                     }
                     Boolean exist = businessPlatformService.selectByBusLoginNumExist(item.getBusLoginNum(), agent.getId());
                     if(!exist){
-                        throw new ProcessException("瑞大宝登录账号已入网,请勿重复入网");
+                        throw new ProcessException("瑞大宝平台登录账号已入网,请勿重复入网");
                     }
                     item.setBusLoginNum(item.getBusLoginNum().trim());
                     if(!RegexUtil.checkInt(item.getBusLoginNum())){
-                        throw new ProcessException("瑞大宝登录账号必须为数字");
+                        throw new ProcessException("瑞大宝平台登录账号必须为数字");
                     }
                 }
                 if(PlatformType.RHPOS.code.equals(platformType.getValue())){
                     //检查手机号是否填写
                     if(StringUtils.isBlank(item.getBusLoginNum())){
-                        throw new ProcessException("瑞花宝登录账号不能为空");
+                        throw new ProcessException("瑞花宝平台登录账号不能为空");
                     }
                     item.setBusLoginNum(item.getBusLoginNum().trim());
                     if(!RegexUtil.checkInt(item.getBusLoginNum())){
-                        throw new ProcessException("瑞花宝登录账号必须是数字");
+                        throw new ProcessException("瑞花宝平台登录账号必须是数字");
                     }
                 }
             }
@@ -296,16 +297,16 @@ public class AgentEnterServiceImpl implements AgentEnterService {
      * @throws Exception
      */
     @Override
-    public void verifyOrgAndBZYD(List<AgentBusInfoVo> busInfoVoList)throws Exception {
+    public void verifyOrgAndBZYD(List<AgentBusInfoVo> busInfoVoList) throws Exception {
         Set<String> BusTypeSet = new HashSet<>();
         for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
             BusTypeSet.add(agentBusInfoVo.getBusType());
         }
         for (String busType : BusTypeSet) {
-            if(busType.equals(BusType.JG.key) || busType.equals(BusType.BZYD.key)){
+            if (busType.equals(BusType.JG.key) || busType.equals(BusType.BZYD.key)) {
                 for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
                     if(!agentBusInfoVo.getBusType().equals(BusType.JG.key) && !agentBusInfoVo.getBusType().equals(BusType.BZYD.key)){
-//                        throw new ProcessException("业务平台类型为机构与标准一代时不能选择其他,为其他类型时不能选择机构与标准一代");
+                        throw new ProcessException("当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台");
                     }
                 }
             }
@@ -1095,6 +1096,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         List<Dict> BUS_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name());
         List<Dict> BUS_SCOPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name());
         List<Dict> COLINFO_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.COLINFO_TYPE.name());
+        List<Dict> REPORT_STATUS = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.REPORT_STATUS.name());
 
 
         if (null != agentoutVos && agentoutVos.size() > 0)
@@ -1131,6 +1133,20 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                             break;
                         }
                     }
+                }
+
+                if (null!=agentoutVo.getReportStatus()){
+                    for (Dict dict : REPORT_STATUS) {
+                        if (null!=dict  &&  agentoutVo.getReportStatus().toString().equals(dict.getdItemvalue())){
+                            agentoutVo.setReportString(dict.getdItemname());
+                            break;
+                        }
+                    }
+                }
+
+                if (null!=agentoutVo.getReportTime()){
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    agentoutVo.setTime(simpleDateFormat.format(agentoutVo.getReportTime()));
                 }
 
                 if (null != agentoutVo.getCloTaxPoint()) {

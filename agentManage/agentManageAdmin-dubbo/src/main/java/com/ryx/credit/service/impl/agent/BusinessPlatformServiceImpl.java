@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -300,12 +301,42 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     if(StringUtils.isBlank(item.getBusParent()))
                         throw new ProcessException("直签上级不能为空");
                 }
+                //代理商业务平台类型限制 当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台
+                if (StringUtils.isNotBlank(agentBusInfo.getAgentId())) {
+                    List<AgentBusInfo> agentBusInfoList = agentBusinfoService.selectByAgenId(agentBusInfo.getAgentId());
+                    for (AgentBusInfo busInfo : agentBusInfoList) {
+                        if (item.getBusType().equals(BusType.BZYD.key) || item.getBusType().equals(BusType.JG.key)) {
+                            if (!busInfo.getBusType().equals(BusType.BZYD.key) || !busInfo.getBusType().equals(BusType.JG.key)) {
+                                throw new ProcessException("当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台");
+                            }
+                        }
+                    }
+                }
+                //代理商选择上级代理商时添加限制 不能选择同级别代理商为上级
+                if (StringUtils.isNotBlank(item.getBusParent())) {
+                    //获取上级代理商类型
+                    AgentBusInfo busInfo = agentBusinfoService.getById(item.getBusParent());
+                    if (item.getBusType().equals(BusType.ZQ.key) || item.getBusType().equals(BusType.ZQBZF.key) || item.getBusType().equals(BusType.ZQZF.key)) {
+                        if (busInfo.getBusType().equals(BusType.ZQ.key) || busInfo.getBusType().equals(BusType.ZQZF.key) || busInfo.getBusType().equals(BusType.ZQBZF.key)) {
+                            throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                        }
+                    }
+                    if (item.getBusType().equals(BusType.YDX.key)) {
+                        if (!busInfo.getBusType().equals(BusType.JG.key) || !busInfo.getBusType().equals(BusType.BZYD.key) || !busInfo.getBusType().equals(BusType.JGYD.key)) {
+                            throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                        }
+                    }
+                    if (item.getBusType().equals(BusType.JGYD.key)) {
+                        if (!busInfo.getBusType().equals(BusType.JG.key)) {
+                            throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                        }
+                    }
+                }
                 agentBusInfos.add(item);
             }
             String json = JsonUtil.objectToJson(agentBusInfos);
             List<AgentBusInfoVo> agentBusInfoVos = JsonUtil.jsonToList(json, AgentBusInfoVo.class);
             agentEnterService.verifyOrgAndBZYD(agentBusInfoVos);
-//            agentEnterService.verifyOther(agentBusInfoVos);
 
             for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
                 AgentBusInfo agbus = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
@@ -393,7 +424,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     @Override
     public AgentResult saveBusinessPlatform(AgentVo agentVo) throws ProcessException {
         try {
-
             Agent agent = agentVo.getAgent();
             agent.setId(agentVo.getAgentId());
             //先查询业务是否已添加 有个添加过 全部返回
@@ -401,6 +431,37 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 if(item.getBusType().equals(BusType.ZQZF.key) || item.getBusType().equals(BusType.ZQBZF.key) || item.getBusType().equals(BusType.ZQ.key) ){
                     if(StringUtils.isBlank(item.getBusParent()))
                         throw new ProcessException("直签上级不能为空");
+                }
+                //代理商业务平台类型限制 当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台
+                if (StringUtils.isNotBlank(agent.getId())) {
+                    List<AgentBusInfo> agentBusInfoList = agentBusinfoService.selectByAgenId(agent.getId());
+                    for (AgentBusInfo agentBusInfos : agentBusInfoList) {
+                        if (agentBusInfos.getBusType().equals(BusType.BZYD.key) || agentBusInfos.getBusType().equals(BusType.JG.key)) {
+                            if (!item.getBusType().equals(BusType.BZYD.key) || !item.getBusType().equals(BusType.JG.key)) {
+                                throw new ProcessException("当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台");
+                            }
+                        }
+                    }
+                }
+                //代理商选择上级代理商时添加限制 不能选择同级别代理商为上级
+                if (StringUtils.isNotBlank(item.getBusParent())) {
+                    //获取上级代理商类型
+                    AgentBusInfo busInfo = agentBusinfoService.getById(item.getBusParent());
+                    if (item.getBusType().equals(BusType.ZQ.key) || item.getBusType().equals(BusType.ZQBZF.key) || item.getBusType().equals(BusType.ZQZF.key)) {
+                        if (busInfo.getBusType().equals(BusType.ZQ.key) || busInfo.getBusType().equals(BusType.ZQZF.key) || busInfo.getBusType().equals(BusType.ZQBZF.key)) {
+                            throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                        }
+                    }
+                    if (item.getBusType().equals(BusType.YDX.key)) {
+                        if (!busInfo.getBusType().equals(BusType.JG.key) || !busInfo.getBusType().equals(BusType.BZYD.key) || !busInfo.getBusType().equals(BusType.JGYD.key)) {
+                            throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                        }
+                    }
+                    if (item.getBusType().equals(BusType.JGYD.key)) {
+                        if (!busInfo.getBusType().equals(BusType.JG.key)) {
+                            throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                        }
+                    }
                 }
                 item.setAgentId(agent.getId());
                 Boolean busPlatExist = findBusPlatExist(item);
@@ -412,23 +473,23 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 if(PlatformType.RDBPOS.code.equals(platformType.getValue())){
                     //检查手机号是否填写
                     if(StringUtils.isBlank(item.getBusLoginNum())){
-                        throw new ProcessException("瑞大宝登录账号不能为空");
+                        throw new ProcessException("瑞大宝平台登录账号不能为空");
                     }
                     Boolean exist = selectByBusLoginNumExist(item.getBusLoginNum(), agent.getId());
                     if(!exist){
-                        throw new ProcessException("瑞大宝登录账号已入网,请勿重复入网");
+                        throw new ProcessException("瑞大宝平台登录账号已入网,请勿重复入网");
                     }
                     if(!RegexUtil.checkInt(item.getBusLoginNum())){
-                        throw new ProcessException("瑞大宝登录账号必须为数字");
+                        throw new ProcessException("瑞大宝平台登录账号必须为数字");
                     }
                 }
                 if(PlatformType.RHPOS.code.equals(platformType.getValue())){
                     //检查手机号是否填写
                     if(StringUtils.isBlank(item.getBusLoginNum())){
-                        throw new ProcessException("瑞花宝登录账号不能为空");
+                        throw new ProcessException("瑞花宝平台登录账号不能为空");
                     }
                     if(!RegexUtil.checkInt(item.getBusLoginNum())){
-                        throw new ProcessException("瑞花宝登录账号必须是数字");
+                        throw new ProcessException("瑞花宝平台登录账号必须是数字");
                     }
                 }
             }
@@ -439,7 +500,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             String json = JsonUtil.objectToJson(agentBusInfos);
             List<AgentBusInfoVo> agentBusInfoVos = JsonUtil.jsonToList(json, AgentBusInfoVo.class);
             agentEnterService.verifyOrgAndBZYD(agentBusInfoVos);
-//            agentEnterService.verifyOther(agentBusInfoVos);
 
             for (AgentContractVo item : agentVo.getContractVoList()) {
                 if (StringUtils.isNotBlank(agent.getcUser()) && StringUtils.isNotBlank(agent.getId())) {
@@ -652,16 +712,30 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
 
     @Override
     public List<BusinessOutVo> exportAgent(Map map, Long userId) throws ParseException {
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(userId));
+        if(orgCodeRes==null && orgCodeRes.size()!=1){
+            return null;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        map.put("orgId",orgId);
+        map.put("userId",Long.valueOf(userId));
+        map.put("organizationCode", organizationCode);
 
         List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
         map.put("platfromPerm",platfromPerm);
         map.put("status", Status.STATUS_1.status);
-
+        map.put("agStatus", AgStatus.Approved.name());
         List<BusinessOutVo> agentoutVos = agentBusInfoMapper.excelAgent(map);
         List<Dict> BUS_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name());
         List<Dict> BUS_SCOPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name());
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         if (null != agentoutVos && agentoutVos.size() > 0)
             for (BusinessOutVo agentoutVo : agentoutVos) {//类型
+                if(null!=agentoutVo.getApproveTime()){
+                    agentoutVo.setTime(df.format(agentoutVo.getApproveTime()));
+                }
                 if (StringUtils.isNotBlank(agentoutVo.getBusType()) && !agentoutVo.getBusType().equals("null")) {
                     for (Dict dict : BUS_TYPE) {
                         if (null!=dict  &&  agentoutVo.getBusType().equals(dict.getdItemvalue())){
