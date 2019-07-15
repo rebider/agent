@@ -89,31 +89,31 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
             invoiceSumExampleCriteria.andAgentIdEqualTo(param.get("AGENT_ID").toString());
         } else {
             logger.info("获取代理商唯一码失败");
-            resultMap.put("Error", 0000);
-            resultMap.put("Fail", "失败");
+            resultMap.put("returnCode", 0000);
+            resultMap.put("returnInfo", "失败");
             return resultMap;
         }
         if (param.get("PROFIT_MONTH") != null && param.get("PROFIT_MONTH") != "") {
             invoiceSumExampleCriteria.andProfitMonthEqualTo(param.get("PROFIT_MONTH").toString());
         } else {
             logger.info("获取月份失败");
-            resultMap.put("Error", 0000);
-            resultMap.put("Fail", "失败");
+            resultMap.put("returnCode", 0000);
+            resultMap.put("returnInfo", "失败");
             return resultMap;
         }
         if (param.get("INVOICE_COMPANY") != null && param.get("INVOICE_COMPANY") != "") {
             invoiceSumExampleCriteria.andInvoiceCompanyEqualTo(param.get("INVOICE_COMPANY").toString());
         } else {
             logger.info("获取打款公司失败");
-            resultMap.put("Error", 0000);
-            resultMap.put("Fail", "失败");
+            resultMap.put("returnCode", 0000);
+            resultMap.put("returnInfo", "失败");
             return resultMap;
         }
         List<InvoiceSum> invoiceSums = invoiceSumMapper.selectByExample(invoiceSumExample);
         if (invoiceSums.size() != 1) {
             logger.info("查询本月代理商有误");
-            resultMap.put("Error", 0000);
-            resultMap.put("Fail", "失败");
+            resultMap.put("returnCode", 0000);
+            resultMap.put("returnInfo", "失败");
             return resultMap;
         }
         InvoiceSum invoiceSum = invoiceSums.get(0);
@@ -126,8 +126,8 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("冻结和解冻代理商失败");
-            resultMap.put("Error", 0000);
-            resultMap.put("Fail", "失败");
+            resultMap.put("returnCode", 0000);
+            resultMap.put("returnInfo", "失败");
             return resultMap;
         }
 
@@ -139,12 +139,12 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("修改发票汇总金额失败");
-            resultMap.put("Error", 0000);
-            resultMap.put("Fail", "失败");
+            resultMap.put("returnCode", 0000);
+            resultMap.put("returnInfo", "失败");
             return resultMap;
         }
-        resultMap.put("Good", 9999);
-        resultMap.put("Success", "成功");
+        resultMap.put("returnCode", 9999);
+        resultMap.put("returnInfo", "成功");
         return resultMap;
 
 
