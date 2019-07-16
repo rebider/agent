@@ -425,6 +425,9 @@ public class CompensateServiceImpl implements CompensateService {
                 refundPriceDiffDetail.setVersion(Status.STATUS_0.status);
                 refundPriceDiffDetail.setOrderType(OrderType.NEW.getValue());
                 refundPriceDiffDetail.setSendStatus(Status.STATUS_0.status);
+                OActivity frontActivity = activityMapper.selectByPrimaryKey(refundPriceDiffDetail.getActivityFrontId());
+                refundPriceDiffDetail.setFrontProName(frontActivity.getProductName());
+                refundPriceDiffDetail.setFrontProId(frontActivity.getProductId());
                 int priceDiffDetailInsert = refundPriceDiffDetailMapper.insert(refundPriceDiffDetail);
                 if(priceDiffDetailInsert!=1){
                     log.info("插入补退差价详情表异常");

@@ -67,11 +67,31 @@ public class ORefundPriceDiffDetail  implements Serializable {
 
     private BigDecimal orderType;
 
+    private String frontProId;
+
+    private String frontProName;
+
     private OActivity activityFront;
 
     private List<OActivity> oActivities;
 
     private List<Map> proMaps;
+
+    public String getFrontProId() {
+        return frontProId;
+    }
+
+    public void setFrontProId(String frontProId) {
+        this.frontProId = frontProId;
+    }
+
+    public String getFrontProName() {
+        return frontProName;
+    }
+
+    public void setFrontProName(String frontProName) {
+        this.frontProName = frontProName;
+    }
 
     public List<Map> getProMaps() {
         return proMaps;
