@@ -324,13 +324,6 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                     boolean isHaveKHXUZ = false;
                     //一般纳税人证明
                     boolean isHaveYBNSRZM = false;
-                    //账户变更表
-                    boolean isHaveZHBGB = false;
-                    //结算人身份证
-                    boolean isHaveJSRSFZ = false;
-                    //非法人授权书
-                    boolean isHaveFFRSQS = false;
-
                     //添加新的附件
                     List<String> fileIdList = agentColinfoVo.getColinfoTableFile();
                     if (fileIdList != null) {
@@ -346,15 +339,6 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                                 }
                                 if (AttDataTypeStatic.YBNSRZM.code.equals(attachment.getAttDataType() + "")) {
                                     isHaveYBNSRZM = true;
-                                }
-                                if (AttDataTypeStatic.ZHBGB.code.equals(attachment.getAttDataType() + "")) {
-                                    isHaveZHBGB = true;
-                                }
-                                if (AttDataTypeStatic.JSRSFZ.code.equals(attachment.getAttDataType() + "")) {
-                                    isHaveJSRSFZ = true;
-                                }
-                                if (AttDataTypeStatic.FFRSQS.code.equals(attachment.getAttDataType() + "")) {
-                                    isHaveFFRSQS = true;
                                 }
                             }
 
@@ -390,29 +374,6 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                             throw new MessageException("请添加一般纳税人证明");
                         }
                     }
-                    if (agentColinfoVo.getCloType().compareTo(new BigDecimal(2)) == 0) {
-                        //对私 收款账户名与法人姓名一致时      提示上传法人身份证    变更表
-                        if (agLegalName.equals(trueName)) {
-                            if (!isHaveZHBGB) {
-                                throw new MessageException("请添加账户变更表");
-                            }
-                            if (!isHaveJSRSFZ) {
-                                throw new MessageException("请添加结算人身份证");
-                            }
-                        }else{
-                            //  收款账户名与法人姓名不一致时：提示上传变更表、非法人授权书   结算人身份证
-                            if (!isHaveZHBGB) {
-                                throw new MessageException("请添加账户变更表");
-                            }
-                            if (!isHaveFFRSQS) {
-                                throw new MessageException("请添加非法人授权书");
-                            }
-                            if (!isHaveJSRSFZ) {
-                                throw new MessageException("请添加结算人身份证");
-                            }
-                        }
-                    }
-
                 }
             }
             return ResultVO.success(null);
