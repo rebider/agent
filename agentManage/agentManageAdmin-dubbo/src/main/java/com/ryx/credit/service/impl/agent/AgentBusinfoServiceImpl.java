@@ -134,11 +134,12 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
                         throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
                     }
                 }
-                if (agentBusInfo.getBusType().equals(BusType.YDX.key)) {
-                    if (!busInfo.getBusType().equals(BusType.JG.key) || !busInfo.getBusType().equals(BusType.BZYD.key) || !busInfo.getBusType().equals(BusType.JGYD.key)) {
-                        throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
-                    }
-                }
+				if (agentBusInfo.getBusType().equals(BusType.YDX.key)) {
+					if (busInfo.getBusType().equals(BusType.ZQ.key) || busInfo.getBusType().equals(BusType.YDX.key)
+							|| busInfo.getBusType().equals(BusType.ZQZF.key) || busInfo.getBusType().equals(BusType.ZQBZF.key)) {
+						throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+					}
+				}
                 if (agentBusInfo.getBusType().equals(BusType.JGYD.key)) {
                     if (!busInfo.getBusType().equals(BusType.JG.key)) {
                         throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
@@ -256,7 +257,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 						}
 					}
 					if (agentBusInfoVo.getBusType().equals(BusType.YDX.key)) {
-						if (!busInfo.getBusType().equals(BusType.JG.key) || !busInfo.getBusType().equals(BusType.BZYD.key) || !busInfo.getBusType().equals(BusType.JGYD.key)) {
+						if (busInfo.getBusType().equals(BusType.ZQ.key) || busInfo.getBusType().equals(BusType.YDX.key)
+								|| busInfo.getBusType().equals(BusType.ZQZF.key) || busInfo.getBusType().equals(BusType.ZQBZF.key)) {
 							throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
 						}
 					}
