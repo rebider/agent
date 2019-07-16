@@ -1068,16 +1068,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
 
     @Override
     public List<AgentoutVo> exportAgent(Map map,Long userId) throws ParseException {
-        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
-        if (orgCodeRes == null && orgCodeRes.size() != 1) {
-            return null;
-        }
-        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
-        String orgId = String.valueOf(stringObjectMap.get("ORGID"));
-        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
-        map.put("orgId", orgId);
-        map.put("userId", userId);
-        map.put("organizationCode", organizationCode);
+        //加载缓存
         if (null != map) {
             String time = String.valueOf(map.get("time"));
             if (org.apache.commons.lang.StringUtils.isNotBlank(time)&&!time.equals("null")) {
