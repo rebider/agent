@@ -290,7 +290,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         for (String busType : BusTypeSet) {
             if (busType.equals(BusType.JG.key) || busType.equals(BusType.BZYD.key)) {
                 for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
-                    if(!agentBusInfoVo.getBusType().equals(BusType.JG.key) && !agentBusInfoVo.getBusType().equals(BusType.BZYD.key)){
+                    if (agentBusInfoVo.getBusType().equals(BusType.ZQZF.key) || agentBusInfoVo.getBusType().equals(BusType.ZQ.key)
+                            || agentBusInfoVo.getBusType().equals(BusType.YDX.key) || agentBusInfoVo.getBusType().equals(BusType.ZQBZF.key)
+                            || agentBusInfoVo.getBusType().equals(BusType.JGYD.key)) {
                         throw new ProcessException("当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台");
                     }
                 }
