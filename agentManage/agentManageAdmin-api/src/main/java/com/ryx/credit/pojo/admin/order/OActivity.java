@@ -79,6 +79,16 @@ public class OActivity implements Serializable{
 
     private String visible;
 
+    private String productName;
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
     public String getVisible() {
         return visible;
     }
