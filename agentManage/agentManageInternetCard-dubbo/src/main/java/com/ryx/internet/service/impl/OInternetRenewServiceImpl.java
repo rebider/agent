@@ -230,6 +230,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             CUser cUser = iUserService.selectById(offset.getcUser());
             if(null!=cUser)
             offset.setcUser(cUser.getName());
+            offset.setCleanStatus(InternetCleanStatus.getContentByValue(offset.getCleanStatus()));
         }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(internetRenewOffsets);
