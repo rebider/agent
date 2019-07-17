@@ -12,12 +12,14 @@
     <result column="MER_NAME" jdbcType="VARCHAR" property="merName" />
     <result column="OFFSET_AMT" jdbcType="DECIMAL" property="offsetAmt" />
     <result column="ALREADY_OFFSET_AMT" jdbcType="DECIMAL" property="alreadyOffsetAmt" />
-    <result column="PROCESS_TIME" jdbcType="TIMESTAMP" property="processTime" />
     <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
     <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
     <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="CLEAN_STATUS" jdbcType="VARCHAR" property="cleanStatus" />
+    <result column="PROCESS_DATE" jdbcType="VARCHAR" property="processDate" />
+    <result column="PROCESS_TIME" jdbcType="VARCHAR" property="processTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -49,8 +51,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    FLOW_ID, RENEW_ID, RENEW_DETAIL_ID, ICCID_NUM, AGENT_ID, AGENT_NAME, MER_ID, MER_NAME, 
-    OFFSET_AMT, ALREADY_OFFSET_AMT, PROCESS_TIME, C_TIME, C_USER, U_USER, STATUS, VERSION
+    FLOW_ID, RENEW_ID, RENEW_DETAIL_ID, ICCID_NUM, AGENT_ID, AGENT_NAME, MER_ID, MER_NAME,
+    OFFSET_AMT, ALREADY_OFFSET_AMT, C_TIME, C_USER, U_USER, STATUS, VERSION, CLEAN_STATUS,
+    PROCESS_DATE, PROCESS_TIME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.internet.pojo.InternetRenewOffsetExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -69,7 +72,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from O_INTERNET_RENEW_OFFSET
     where FLOW_ID = #{flowId,jdbcType=VARCHAR}
@@ -81,18 +84,20 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.internet.pojo.InternetRenewOffset">
-    insert into O_INTERNET_RENEW_OFFSET (FLOW_ID, RENEW_ID, RENEW_DETAIL_ID, 
-      ICCID_NUM, AGENT_ID, AGENT_NAME, 
-      MER_ID, MER_NAME, OFFSET_AMT, 
-      ALREADY_OFFSET_AMT, PROCESS_TIME, C_TIME, 
-      C_USER, U_USER, STATUS, 
-      VERSION)
-    values (#{flowId,jdbcType=VARCHAR}, #{renewId,jdbcType=VARCHAR}, #{renewDetailId,jdbcType=VARCHAR}, 
-      #{iccidNum,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR}, 
-      #{merId,jdbcType=VARCHAR}, #{merName,jdbcType=VARCHAR}, #{offsetAmt,jdbcType=DECIMAL}, 
-      #{alreadyOffsetAmt,jdbcType=DECIMAL}, #{processTime,jdbcType=TIMESTAMP}, #{cTime,jdbcType=TIMESTAMP}, 
-      #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, 
-      #{version,jdbcType=DECIMAL})
+    insert into O_INTERNET_RENEW_OFFSET (FLOW_ID, RENEW_ID, RENEW_DETAIL_ID,
+    ICCID_NUM, AGENT_ID, AGENT_NAME,
+    MER_ID, MER_NAME, OFFSET_AMT,
+    ALREADY_OFFSET_AMT, C_TIME, C_USER,
+    U_USER, STATUS, VERSION,
+    CLEAN_STATUS, PROCESS_DATE, PROCESS_TIME
+    )
+    values (#{flowId,jdbcType=VARCHAR}, #{renewId,jdbcType=VARCHAR}, #{renewDetailId,jdbcType=VARCHAR},
+    #{iccidNum,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR},
+    #{merId,jdbcType=VARCHAR}, #{merName,jdbcType=VARCHAR}, #{offsetAmt,jdbcType=DECIMAL},
+    #{alreadyOffsetAmt,jdbcType=DECIMAL}, #{cTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
+    #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL},
+    #{cleanStatus,jdbcType=VARCHAR}, #{processDate,jdbcType=VARCHAR}, #{processTime,jdbcType=VARCHAR}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.internet.pojo.InternetRenewOffset">
     insert into O_INTERNET_RENEW_OFFSET
@@ -127,9 +132,6 @@
       <if test="alreadyOffsetAmt != null">
         ALREADY_OFFSET_AMT,
       </if>
-      <if test="processTime != null">
-        PROCESS_TIME,
-      </if>
       <if test="cTime != null">
         C_TIME,
       </if>
@@ -144,6 +146,15 @@
       </if>
       <if test="version != null">
         VERSION,
+      </if>
+      <if test="cleanStatus != null">
+        CLEAN_STATUS,
+      </if>
+      <if test="processDate != null">
+        PROCESS_DATE,
+      </if>
+      <if test="processTime != null">
+        PROCESS_TIME,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -177,9 +188,6 @@
       <if test="alreadyOffsetAmt != null">
         #{alreadyOffsetAmt,jdbcType=DECIMAL},
       </if>
-      <if test="processTime != null">
-        #{processTime,jdbcType=TIMESTAMP},
-      </if>
       <if test="cTime != null">
         #{cTime,jdbcType=TIMESTAMP},
       </if>
@@ -194,6 +202,15 @@
       </if>
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="cleanStatus != null">
+        #{cleanStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="processDate != null">
+        #{processDate,jdbcType=VARCHAR},
+      </if>
+      <if test="processTime != null">
+        #{processTime,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -233,9 +250,6 @@
       <if test="alreadyOffsetAmt != null">
         ALREADY_OFFSET_AMT = #{alreadyOffsetAmt,jdbcType=DECIMAL},
       </if>
-      <if test="processTime != null">
-        PROCESS_TIME = #{processTime,jdbcType=TIMESTAMP},
-      </if>
       <if test="cTime != null">
         C_TIME = #{cTime,jdbcType=TIMESTAMP},
       </if>
@@ -251,6 +265,15 @@
       <if test="version != null">
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
+      <if test="cleanStatus != null">
+        CLEAN_STATUS = #{cleanStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="processDate != null">
+        PROCESS_DATE = #{processDate,jdbcType=VARCHAR},
+      </if>
+      <if test="processTime != null">
+        PROCESS_TIME = #{processTime,jdbcType=VARCHAR},
+      </if>
     </set>
     where FLOW_ID = #{flowId,jdbcType=VARCHAR}
   </update>
@@ -265,17 +288,19 @@
       MER_NAME = #{merName,jdbcType=VARCHAR},
       OFFSET_AMT = #{offsetAmt,jdbcType=DECIMAL},
       ALREADY_OFFSET_AMT = #{alreadyOffsetAmt,jdbcType=DECIMAL},
-      PROCESS_TIME = #{processTime,jdbcType=TIMESTAMP},
       C_TIME = #{cTime,jdbcType=TIMESTAMP},
       C_USER = #{cUser,jdbcType=VARCHAR},
       U_USER = #{uUser,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL}
+      VERSION = #{version,jdbcType=DECIMAL},
+      CLEAN_STATUS = #{cleanStatus,jdbcType=VARCHAR},
+      PROCESS_DATE = #{processDate,jdbcType=VARCHAR},
+      PROCESS_TIME = #{processTime,jdbcType=VARCHAR}
     where FLOW_ID = #{flowId,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
