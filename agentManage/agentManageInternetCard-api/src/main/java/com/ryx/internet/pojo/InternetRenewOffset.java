@@ -2,7 +2,6 @@ package com.ryx.internet.pojo;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
 
 public class InternetRenewOffset implements Serializable{
     private String flowId;
@@ -25,7 +24,7 @@ public class InternetRenewOffset implements Serializable{
 
     private BigDecimal alreadyOffsetAmt;
 
-    private Date cTime;
+    private String cTime;
 
     private String cUser;
 
@@ -121,12 +120,12 @@ public class InternetRenewOffset implements Serializable{
         this.alreadyOffsetAmt = alreadyOffsetAmt;
     }
 
-    public Date getcTime() {
+    public String getcTime() {
         return cTime;
     }
 
-    public void setcTime(Date cTime) {
-        this.cTime = cTime;
+    public void setcTime(String cTime) {
+        this.cTime = cTime == null ? null : cTime.trim();
     }
 
     public String getcUser() {

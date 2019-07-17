@@ -537,7 +537,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                     internetRenewOffset.setMerName(oInternetRenewDetail.getMerName());
                     internetRenewOffset.setOffsetAmt(oInternetRenewDetail.getOffsetAmt());
                     internetRenewOffset.setAlreadyOffsetAmt(BigDecimal.ZERO);
-                    internetRenewOffset.setcTime(new Date());
+                    internetRenewOffset.setcTime(DateUtil.format(new Date(),DateUtil.DATE_FORMAT_3));
                     internetRenewOffset.setcUser(oInternetRenewDetail.getcUser());
                     internetRenewOffset.setuUser(oInternetRenewDetail.getuUser());
                     internetRenewOffset.setStatus(Status.STATUS_1.status);

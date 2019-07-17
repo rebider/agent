@@ -4,7 +4,6 @@ import com.ryx.credit.common.util.Page;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class InternetRenewOffsetExample {
@@ -828,52 +827,62 @@ public class InternetRenewOffsetExample {
             return (Criteria) this;
         }
 
-        public Criteria andCTimeEqualTo(Date value) {
+        public Criteria andCTimeEqualTo(String value) {
             addCriterion("C_TIME =", value, "cTime");
             return (Criteria) this;
         }
 
-        public Criteria andCTimeNotEqualTo(Date value) {
+        public Criteria andCTimeNotEqualTo(String value) {
             addCriterion("C_TIME <>", value, "cTime");
             return (Criteria) this;
         }
 
-        public Criteria andCTimeGreaterThan(Date value) {
+        public Criteria andCTimeGreaterThan(String value) {
             addCriterion("C_TIME >", value, "cTime");
             return (Criteria) this;
         }
 
-        public Criteria andCTimeGreaterThanOrEqualTo(Date value) {
+        public Criteria andCTimeGreaterThanOrEqualTo(String value) {
             addCriterion("C_TIME >=", value, "cTime");
             return (Criteria) this;
         }
 
-        public Criteria andCTimeLessThan(Date value) {
+        public Criteria andCTimeLessThan(String value) {
             addCriterion("C_TIME <", value, "cTime");
             return (Criteria) this;
         }
 
-        public Criteria andCTimeLessThanOrEqualTo(Date value) {
+        public Criteria andCTimeLessThanOrEqualTo(String value) {
             addCriterion("C_TIME <=", value, "cTime");
             return (Criteria) this;
         }
 
-        public Criteria andCTimeIn(List<Date> values) {
+        public Criteria andCTimeLike(String value) {
+            addCriterion("C_TIME like", value, "cTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeNotLike(String value) {
+            addCriterion("C_TIME not like", value, "cTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeIn(List<String> values) {
             addCriterion("C_TIME in", values, "cTime");
             return (Criteria) this;
         }
 
-        public Criteria andCTimeNotIn(List<Date> values) {
+        public Criteria andCTimeNotIn(List<String> values) {
             addCriterion("C_TIME not in", values, "cTime");
             return (Criteria) this;
         }
 
-        public Criteria andCTimeBetween(Date value1, Date value2) {
+        public Criteria andCTimeBetween(String value1, String value2) {
             addCriterion("C_TIME between", value1, value2, "cTime");
             return (Criteria) this;
         }
 
-        public Criteria andCTimeNotBetween(Date value1, Date value2) {
+        public Criteria andCTimeNotBetween(String value1, String value2) {
             addCriterion("C_TIME not between", value1, value2, "cTime");
             return (Criteria) this;
         }
