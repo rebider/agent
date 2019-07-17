@@ -25,8 +25,6 @@ public class InternetRenewOffset implements Serializable{
 
     private BigDecimal alreadyOffsetAmt;
 
-    private Date processTime;
-
     private Date cTime;
 
     private String cUser;
@@ -36,6 +34,12 @@ public class InternetRenewOffset implements Serializable{
     private BigDecimal status;
 
     private BigDecimal version;
+
+    private String cleanStatus;
+
+    private String processDate;
+
+    private String processTime;
 
     public String getFlowId() {
         return flowId;
@@ -117,14 +121,6 @@ public class InternetRenewOffset implements Serializable{
         this.alreadyOffsetAmt = alreadyOffsetAmt;
     }
 
-    public Date getProcessTime() {
-        return processTime;
-    }
-
-    public void setProcessTime(Date processTime) {
-        this.processTime = processTime;
-    }
-
     public Date getcTime() {
         return cTime;
     }
@@ -163,5 +159,29 @@ public class InternetRenewOffset implements Serializable{
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public String getCleanStatus() {
+        return cleanStatus;
+    }
+
+    public void setCleanStatus(String cleanStatus) {
+        this.cleanStatus = cleanStatus == null ? null : cleanStatus.trim();
+    }
+
+    public String getProcessDate() {
+        return processDate;
+    }
+
+    public void setProcessDate(String processDate) {
+        this.processDate = processDate == null ? null : processDate.trim();
+    }
+
+    public String getProcessTime() {
+        return processTime;
+    }
+
+    public void setProcessTime(String processTime) {
+        this.processTime = processTime == null ? null : processTime.trim();
     }
 }
