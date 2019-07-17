@@ -225,7 +225,7 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
             map.put("tranCode", tranCode);
             map.put("reqMsgId", reqMsgId);
 
-            log.info("POS机构统计信息查询请求参数:{}",map);
+            log.info("RJPOS机构统计信息查询请求参数:{}",map);
             String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("agent_rjpos_notify_url"), map);
             JSONObject jsonObject = JSONObject.parseObject(httpResult);
             if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
@@ -239,7 +239,7 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
                 byte[] decodeBase64DataBytes = Base64.decodeBase64(resEncryptData.getBytes(charset));
                 byte[] merchantXmlDataBytes = AESUtil.decrypt(decodeBase64DataBytes, merchantAESKeyBytes, "AES", "AES/ECB/PKCS5Padding", null);
                 String respXML = new String(merchantXmlDataBytes, charset);
-                log.info("POS机构统计信息查询返回参数：{}",respXML);
+                log.info("RJPOS机构统计信息查询返回参数：{}",respXML);
 
                 // 报文验签
                 String resSignData = jsonObject.getString("signData");
