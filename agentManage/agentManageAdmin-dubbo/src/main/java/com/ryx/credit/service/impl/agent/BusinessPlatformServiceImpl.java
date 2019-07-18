@@ -242,12 +242,14 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             return agentBusInfo;
         } else {
             agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(id);
-            PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
-            if(null!=platForm){
-                agentBusInfo.setBusPlatformType(platForm.getPlatformType());
+            if(null!=agentBusInfo){
+                PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
+                if(null!=platForm){
+                    agentBusInfo.setBusPlatformType(platForm.getPlatformType());
+                }
+                Map<String,Object> parentInfo = agentBusInfoMapper.queryBusInfoParent(FastMap.fastMap("id",agentBusInfo.getId()));
+                agentBusInfo.setParentInfo(parentInfo);
             }
-            Map<String,Object> parentInfo = agentBusInfoMapper.queryBusInfoParent(FastMap.fastMap("id",agentBusInfo.getId()));
-            agentBusInfo.setParentInfo(parentInfo);
         }
         return agentBusInfo;
     }
