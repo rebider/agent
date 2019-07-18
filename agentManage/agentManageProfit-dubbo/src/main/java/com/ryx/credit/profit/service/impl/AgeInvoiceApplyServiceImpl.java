@@ -131,7 +131,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                     if(result == null){//未在发票云找到该发票信息，将此信息返回
                         invoiceApply.setYsResult("0");
                         invoiceApply.setInvoiceCompany(map.get("sallerName").toString());
-                        invoiceApply.setRemark("发票云库中未找到该发票信息");
+                        invoiceApply.setRev1("发票云库中未找到该发票信息");
                     }else{
                         invoiceApply.setYsResult("1");
                         if("1".equals(result.get("proxyMark").toString())){ // 代开
@@ -141,6 +141,10 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                                 invoiceApply.setInvoiceCompany(remark.substring(flag+7));
                                 invoiceApply.setSallerName(map.get("sallerName").toString());
                                 invoiceApply.setRemark(remark);
+                            }else{
+                                invoiceApply.setYsResult("0");
+                                invoiceApply.setInvoiceCompany(map.get("sallerName").toString());
+                                invoiceApply.setRev1("未获取到代开公司数据");
                             }
                         }else {
                             invoiceApply.setInvoiceCompany(map.get("sallerName").toString());
@@ -172,9 +176,11 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                     invoiceApply.setStatus("0");
                     invoiceApplyMapper.insertSelective(invoiceApply);
                 }
-            }else{
-                // 未获得tocken授权，请重新提交
             }
+        }catch (MessageException e){
+            e.printStackTrace();
+            logger.info(e.getMsg());
+            throw  new MessageException(e.getMsg());
         }catch (Exception e){
            e.printStackTrace();
            throw  new MessageException("保存失败");
@@ -189,6 +195,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
             InvoiceApply invoiceApply = new InvoiceApply();
             invoiceApply.setSerialNo(map.get("serialNo").toString());
             invoiceApply.setInvoiceCode(map.get("invoiceCode").toString());
+            invoiceApply.setYsResult("1");
             invoiceApply.setStatus("0");
             List<InvoiceApply> invoiceApplies =  getListByExample(invoiceApply);
             if(invoiceApplies.size() >= 1){
@@ -212,6 +219,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                     invoiceApply1.setEsResult("1");
                     invoiceApply1.setStatus("1");
                 }
+                invoiceApply1.setEsDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
                 invoiceApply1.setProfitMonth(new SimpleDateFormat("yyyyMM").format(curr.getTime()));
                 invoiceApplyMapper.updateByPrimaryKeySelective(invoiceApply1);
             }else{
@@ -239,6 +247,9 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         if(StringUtils.isNotBlank(invoiceApply.getStatus())){
             criteria.andStatusEqualTo(invoiceApply.getStatus());
         }
+        if(StringUtils.isNotBlank(invoiceApply.getYsResult())){
+            criteria.andYsResultEqualTo(invoiceApply.getYsResult());
+        }
        return  invoiceApplyMapper.selectByExample(example);
     }
 
@@ -257,18 +268,24 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
     }
 
     /**获取金蝶授权AccessTocken*/
-    public  Map<String, Object> getAccessTocken() throws Exception{
-        long timestamp = System.currentTimeMillis();
-        JSONObject param = new JSONObject();
-        param.put("client_id", CLIENT_ID);
-        param.put("sign",getSign(timestamp));
-        param.put("timestamp",timestamp);
-        String result = HttpClientUtil.doPostJson(ACCESS_TOCKEN_URL, param.toJSONString());
-        logger.info("=====获取金蝶授权：tocken======"+result+"=======");
-        return JSONObject.parseObject(result);
+    public  Map<String, Object> getAccessTocken() throws MessageException{
+       try {
+           long timestamp = System.currentTimeMillis();
+           JSONObject param = new JSONObject();
+           param.put("client_id", CLIENT_ID);
+           param.put("sign",getSign(timestamp));
+           param.put("timestamp",timestamp);
+           logger.info("ACCESS_TOCKEN_URL:-"+ACCESS_TOCKEN_URL+"-----param:"+param.toJSONString());
+           String result = HttpClientUtil.doPostJson(ACCESS_TOCKEN_URL, param.toJSONString());
+           logger.info("=====获取金蝶授权：tocken======"+result+"=======");
+           return JSONObject.parseObject(result);
+       }catch (Exception e){
+           e.printStackTrace();
+           throw new MessageException("获取金蝶tocken授权失败,请重试！");
+       }
     }
 
-    //获取MD5加密sign
+    /***获取MD5加密sign*/
     private String getSign(long timestamp)throws Exception{
         String str = CLIENT_ID+CLIENT_SECRET+timestamp;
         MessageDigest md = MessageDigest.getInstance("MD5");
@@ -276,9 +293,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         return new BigInteger(1, md.digest()).toString(16);
     }
 
-    /**
-     * 使用ASE128进行加密
-     */
+    /**使用ASE128进行加密*/
     public static String encrypt1(String content) throws Exception {
         byte[] raw = PASSWORD.getBytes("utf-8");
         SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
@@ -288,9 +303,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         return new org.apache.commons.codec.binary.Base64().encodeToString(encrypted);
     }
 
-    /**
-     * 使用ASE128进行解密
-     */
+    /*** 使用ASE128进行解密*/
     public static String decrypt1(String content) throws Exception {
         try {
             byte[] raw = PASSWORD.getBytes("utf-8");
