@@ -468,6 +468,7 @@
       <if test="model!=null and model!=''"> and R.MODEL=#{model} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(R.c_date,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
       <if test="agentId!=null and agentId!=''"> and agent.id = #{agentId}</if>
+      <if test="isDeliver!=null and isDeliver!='' and isDeliver=='yes'"> and r.return_order_detail_id is null</if>
   </sql>
 
   <sql id='SORTING'>
