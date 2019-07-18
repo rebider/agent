@@ -718,17 +718,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
 
     @Override
     public List<BusinessOutVo> exportAgent(Map map, Long userId) throws ParseException {
-        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(userId));
-        if(orgCodeRes==null && orgCodeRes.size()!=1){
-            return null;
-        }
-        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
-        String orgId = String.valueOf(stringObjectMap.get("ORGID"));
-        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
-        map.put("orgId",orgId);
-        map.put("userId",Long.valueOf(userId));
-        map.put("organizationCode", organizationCode);
-
         List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
         map.put("platfromPerm",platfromPerm);
         map.put("status", Status.STATUS_1.status);
