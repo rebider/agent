@@ -355,35 +355,25 @@ public class OrderActivityServiceImpl implements OrderActivityService {
 
     @Override
     public List<OActivity> productActivity(String product, String angetId, String orderAgentBusifo, String oldActivityId) {
-        //TODO 检查代理商销售额
-//        BigDecimal transAmt = profitMonthService.getTranByAgentId(angetId);
-//        BigDecimal transAmt = new BigDecimal(800000000);
-        OProduct productObj = oProductMapper.selectByPrimaryKey(product);
-//        OActivityExample example = new OActivityExample();
-//        example.or().andProductIdEqualTo(productObj.getId())
-//                .andBeginTimeLessThanOrEqualTo(new Date())
-//                .andEndTimeGreaterThanOrEqualTo(new Date());
-//        List<OActivity> activitys = activityMapper.selectByExample(example);
-        //如果传递老的活动就排除老的活动
 
         //查询条件
         Date date = new Date();
-        FastMap par = FastMap.fastMap("productId", productObj.getId())
-                .putKeyV("beginTime", date)
-                .putKeyV("endTime", date);
+        FastMap par = FastMap.fastMap("beginTime", date)
+                             .putKeyV("endTime", date);
 
-        OActivity oldActivity = null;
         if (StringUtils.isNotBlank(oldActivityId)) {
             //如果变更活动传递老活动，排除老的活动代码并匹配 相同的厂商和型号。
-            oldActivity = activityMapper.selectByPrimaryKey(oldActivityId);
+            OActivity oldActivity = activityMapper.selectByPrimaryKey(oldActivityId);
             par.putKeyV("notEqActcode", oldActivity.getActCode()).putKeyV("vender", oldActivity.getVender()).putKeyV("proModel", oldActivity.getProModel());
+        }else{
+            OProduct productObj = oProductMapper.selectByPrimaryKey(product);
+            par.putKeyV("productId", productObj.getId());
         }
         if (StringUtils.isNotBlank(orderAgentBusifo) && !"null".equals(orderAgentBusifo)) {
             //查询平台活动
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(orderAgentBusifo);
             par.putKeyV("platform", agentBusInfo.getBusPlatform());
         }
-
 
         List<Map<String, Object>> actList = activityMapper.productActivityOrderBuild(par);
         List<OActivity> activitys = new ArrayList<OActivity>();
@@ -394,6 +384,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             oActivity.setPrice(new BigDecimal(stringObjectMap.get("PRICE") + ""));
             oActivity.setActCode(stringObjectMap.get("ACT_CODE") + "");
             oActivity.setOriginalPrice(new BigDecimal(stringObjectMap.get("ORIGINALPRICE") + ""));
+            oActivity.setProductName(stringObjectMap.get("PRO_NAME")+"");
             OActivity activity = activityMapper.selectByPrimaryKey(oActivity.getId());
             if(StringUtils.isBlank(activity.getVisible())){
                 continue;
@@ -407,27 +398,6 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             activitys.add(oActivity);
         }
 
-//        List<OActivity> newActivitys = new ArrayList<>();
-//        for (OActivity activity : activitys) {
-//            BigDecimal activityRule = new BigDecimal(activity.getActivityRule());
-//            if(activity.getActivityCondition().equals(">")){
-//                if(transAmt.compareTo(activityRule) > 0) {
-//                    newActivitys.add(activity);
-//                }
-//            }else if(activity.getActivityCondition().equals(">=")){
-//                if(transAmt.compareTo(activityRule) >= 0) {
-//                    newActivitys.add(activity);
-//                }
-//            }else if(activity.getActivityCondition().equals("<=")){
-//                if(transAmt.compareTo(activityRule) <= 0) {
-//                    newActivitys.add(activity);
-//                }
-//            }else if(activity.getActivityCondition().equals("<")){
-//                if(transAmt.compareTo(activityRule) < 0) {
-//                    newActivitys.add(activity);
-//                }
-//            }
-//        }
         return activitys;
     }
 

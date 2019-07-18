@@ -14,6 +14,7 @@ import java.util.Map;
 public enum PlatformType {
 
     POS("POS","POS"),
+    SSPOS("SSPOS","POS实时分润"),
     ZPOS("ZPOS","智能POS"),
     ZHPOS("ZHPOS","智慧POS"),
     MPOS("MPOS","手刷"),
