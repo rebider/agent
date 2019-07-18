@@ -11,7 +11,8 @@ public enum BusinessStatus {
     pause(0,"注销"),
     Enabled(1,"启用"),
     inactive(2,"未激活"),
-    lock(3,"锁定");
+    lock(3,"锁定"),
+    quit(4,"退出");
 
     public BigDecimal status;
 

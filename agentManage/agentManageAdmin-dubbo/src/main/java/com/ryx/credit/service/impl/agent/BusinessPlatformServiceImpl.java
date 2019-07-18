@@ -306,7 +306,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     List<AgentBusInfo> agentBusInfoList = agentBusinfoService.selectByAgenId(agentBusInfo.getAgentId());
                     for (AgentBusInfo busInfo : agentBusInfoList) {
                         if (item.getBusType().equals(BusType.BZYD.key) || item.getBusType().equals(BusType.JG.key)) {
-                            if (!busInfo.getBusType().equals(BusType.BZYD.key) || !busInfo.getBusType().equals(BusType.JG.key)) {
+                            if (busInfo.getBusType().equals(BusType.ZQZF.key) || busInfo.getBusType().equals(BusType.ZQ.key)
+                                    || busInfo.getBusType().equals(BusType.YDX.key) || busInfo.getBusType().equals(BusType.ZQBZF.key)
+                                    || busInfo.getBusType().equals(BusType.JGYD.key)) {
                                 throw new ProcessException("当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台");
                             }
                         }
@@ -322,7 +324,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                         }
                     }
                     if (item.getBusType().equals(BusType.YDX.key)) {
-                        if (!busInfo.getBusType().equals(BusType.JG.key) || !busInfo.getBusType().equals(BusType.BZYD.key) || !busInfo.getBusType().equals(BusType.JGYD.key)) {
+                        if (busInfo.getBusType().equals(BusType.ZQ.key) || busInfo.getBusType().equals(BusType.YDX.key)
+                                || busInfo.getBusType().equals(BusType.ZQZF.key) || busInfo.getBusType().equals(BusType.ZQBZF.key)) {
                             throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
                         }
                     }
@@ -437,7 +440,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     List<AgentBusInfo> agentBusInfoList = agentBusinfoService.selectByAgenId(agent.getId());
                     for (AgentBusInfo agentBusInfos : agentBusInfoList) {
                         if (agentBusInfos.getBusType().equals(BusType.BZYD.key) || agentBusInfos.getBusType().equals(BusType.JG.key)) {
-                            if (!item.getBusType().equals(BusType.BZYD.key) || !item.getBusType().equals(BusType.JG.key)) {
+                            if (item.getBusType().equals(BusType.ZQZF.key) || item.getBusType().equals(BusType.ZQ.key)
+                                    || item.getBusType().equals(BusType.YDX.key) || item.getBusType().equals(BusType.ZQBZF.key)
+                                    || item.getBusType().equals(BusType.JGYD.key)) {
                                 throw new ProcessException("当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台");
                             }
                         }
@@ -453,7 +458,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                         }
                     }
                     if (item.getBusType().equals(BusType.YDX.key)) {
-                        if (!busInfo.getBusType().equals(BusType.JG.key) || !busInfo.getBusType().equals(BusType.BZYD.key) || !busInfo.getBusType().equals(BusType.JGYD.key)) {
+                        if (busInfo.getBusType().equals(BusType.ZQ.key) || busInfo.getBusType().equals(BusType.YDX.key)
+                                || busInfo.getBusType().equals(BusType.ZQZF.key) || busInfo.getBusType().equals(BusType.ZQBZF.key)) {
                             throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
                         }
                     }
@@ -712,17 +718,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
 
     @Override
     public List<BusinessOutVo> exportAgent(Map map, Long userId) throws ParseException {
-        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(userId));
-        if(orgCodeRes==null && orgCodeRes.size()!=1){
-            return null;
-        }
-        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
-        String orgId = String.valueOf(stringObjectMap.get("ORGID"));
-        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
-        map.put("orgId",orgId);
-        map.put("userId",Long.valueOf(userId));
-        map.put("organizationCode", organizationCode);
-
         List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
         map.put("platfromPerm",platfromPerm);
         map.put("status", Status.STATUS_1.status);

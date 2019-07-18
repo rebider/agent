@@ -4,7 +4,6 @@ import com.ryx.credit.common.util.Page;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class InternetRenewOffsetExample {
@@ -818,66 +817,6 @@ public class InternetRenewOffsetExample {
             return (Criteria) this;
         }
 
-        public Criteria andProcessTimeIsNull() {
-            addCriterion("PROCESS_TIME is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andProcessTimeIsNotNull() {
-            addCriterion("PROCESS_TIME is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andProcessTimeEqualTo(Date value) {
-            addCriterion("PROCESS_TIME =", value, "processTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andProcessTimeNotEqualTo(Date value) {
-            addCriterion("PROCESS_TIME <>", value, "processTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andProcessTimeGreaterThan(Date value) {
-            addCriterion("PROCESS_TIME >", value, "processTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andProcessTimeGreaterThanOrEqualTo(Date value) {
-            addCriterion("PROCESS_TIME >=", value, "processTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andProcessTimeLessThan(Date value) {
-            addCriterion("PROCESS_TIME <", value, "processTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andProcessTimeLessThanOrEqualTo(Date value) {
-            addCriterion("PROCESS_TIME <=", value, "processTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andProcessTimeIn(List<Date> values) {
-            addCriterion("PROCESS_TIME in", values, "processTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andProcessTimeNotIn(List<Date> values) {
-            addCriterion("PROCESS_TIME not in", values, "processTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andProcessTimeBetween(Date value1, Date value2) {
-            addCriterion("PROCESS_TIME between", value1, value2, "processTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andProcessTimeNotBetween(Date value1, Date value2) {
-            addCriterion("PROCESS_TIME not between", value1, value2, "processTime");
-            return (Criteria) this;
-        }
-
         public Criteria andCTimeIsNull() {
             addCriterion("C_TIME is null");
             return (Criteria) this;
@@ -888,52 +827,62 @@ public class InternetRenewOffsetExample {
             return (Criteria) this;
         }
 
-        public Criteria andCTimeEqualTo(Date value) {
+        public Criteria andCTimeEqualTo(String value) {
             addCriterion("C_TIME =", value, "cTime");
             return (Criteria) this;
         }
 
-        public Criteria andCTimeNotEqualTo(Date value) {
+        public Criteria andCTimeNotEqualTo(String value) {
             addCriterion("C_TIME <>", value, "cTime");
             return (Criteria) this;
         }
 
-        public Criteria andCTimeGreaterThan(Date value) {
+        public Criteria andCTimeGreaterThan(String value) {
             addCriterion("C_TIME >", value, "cTime");
             return (Criteria) this;
         }
 
-        public Criteria andCTimeGreaterThanOrEqualTo(Date value) {
+        public Criteria andCTimeGreaterThanOrEqualTo(String value) {
             addCriterion("C_TIME >=", value, "cTime");
             return (Criteria) this;
         }
 
-        public Criteria andCTimeLessThan(Date value) {
+        public Criteria andCTimeLessThan(String value) {
             addCriterion("C_TIME <", value, "cTime");
             return (Criteria) this;
         }
 
-        public Criteria andCTimeLessThanOrEqualTo(Date value) {
+        public Criteria andCTimeLessThanOrEqualTo(String value) {
             addCriterion("C_TIME <=", value, "cTime");
             return (Criteria) this;
         }
 
-        public Criteria andCTimeIn(List<Date> values) {
+        public Criteria andCTimeLike(String value) {
+            addCriterion("C_TIME like", value, "cTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeNotLike(String value) {
+            addCriterion("C_TIME not like", value, "cTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeIn(List<String> values) {
             addCriterion("C_TIME in", values, "cTime");
             return (Criteria) this;
         }
 
-        public Criteria andCTimeNotIn(List<Date> values) {
+        public Criteria andCTimeNotIn(List<String> values) {
             addCriterion("C_TIME not in", values, "cTime");
             return (Criteria) this;
         }
 
-        public Criteria andCTimeBetween(Date value1, Date value2) {
+        public Criteria andCTimeBetween(String value1, String value2) {
             addCriterion("C_TIME between", value1, value2, "cTime");
             return (Criteria) this;
         }
 
-        public Criteria andCTimeNotBetween(Date value1, Date value2) {
+        public Criteria andCTimeNotBetween(String value1, String value2) {
             addCriterion("C_TIME not between", value1, value2, "cTime");
             return (Criteria) this;
         }
@@ -1195,6 +1144,216 @@ public class InternetRenewOffsetExample {
 
         public Criteria andVersionNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("VERSION not between", value1, value2, "version");
+            return (Criteria) this;
+        }
+
+        public Criteria andCleanStatusIsNull() {
+            addCriterion("CLEAN_STATUS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCleanStatusIsNotNull() {
+            addCriterion("CLEAN_STATUS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCleanStatusEqualTo(String value) {
+            addCriterion("CLEAN_STATUS =", value, "cleanStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCleanStatusNotEqualTo(String value) {
+            addCriterion("CLEAN_STATUS <>", value, "cleanStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCleanStatusGreaterThan(String value) {
+            addCriterion("CLEAN_STATUS >", value, "cleanStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCleanStatusGreaterThanOrEqualTo(String value) {
+            addCriterion("CLEAN_STATUS >=", value, "cleanStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCleanStatusLessThan(String value) {
+            addCriterion("CLEAN_STATUS <", value, "cleanStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCleanStatusLessThanOrEqualTo(String value) {
+            addCriterion("CLEAN_STATUS <=", value, "cleanStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCleanStatusLike(String value) {
+            addCriterion("CLEAN_STATUS like", value, "cleanStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCleanStatusNotLike(String value) {
+            addCriterion("CLEAN_STATUS not like", value, "cleanStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCleanStatusIn(List<String> values) {
+            addCriterion("CLEAN_STATUS in", values, "cleanStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCleanStatusNotIn(List<String> values) {
+            addCriterion("CLEAN_STATUS not in", values, "cleanStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCleanStatusBetween(String value1, String value2) {
+            addCriterion("CLEAN_STATUS between", value1, value2, "cleanStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCleanStatusNotBetween(String value1, String value2) {
+            addCriterion("CLEAN_STATUS not between", value1, value2, "cleanStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessDateIsNull() {
+            addCriterion("PROCESS_DATE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessDateIsNotNull() {
+            addCriterion("PROCESS_DATE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessDateEqualTo(String value) {
+            addCriterion("PROCESS_DATE =", value, "processDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessDateNotEqualTo(String value) {
+            addCriterion("PROCESS_DATE <>", value, "processDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessDateGreaterThan(String value) {
+            addCriterion("PROCESS_DATE >", value, "processDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessDateGreaterThanOrEqualTo(String value) {
+            addCriterion("PROCESS_DATE >=", value, "processDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessDateLessThan(String value) {
+            addCriterion("PROCESS_DATE <", value, "processDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessDateLessThanOrEqualTo(String value) {
+            addCriterion("PROCESS_DATE <=", value, "processDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessDateLike(String value) {
+            addCriterion("PROCESS_DATE like", value, "processDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessDateNotLike(String value) {
+            addCriterion("PROCESS_DATE not like", value, "processDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessDateIn(List<String> values) {
+            addCriterion("PROCESS_DATE in", values, "processDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessDateNotIn(List<String> values) {
+            addCriterion("PROCESS_DATE not in", values, "processDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessDateBetween(String value1, String value2) {
+            addCriterion("PROCESS_DATE between", value1, value2, "processDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessDateNotBetween(String value1, String value2) {
+            addCriterion("PROCESS_DATE not between", value1, value2, "processDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessTimeIsNull() {
+            addCriterion("PROCESS_TIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessTimeIsNotNull() {
+            addCriterion("PROCESS_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessTimeEqualTo(String value) {
+            addCriterion("PROCESS_TIME =", value, "processTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessTimeNotEqualTo(String value) {
+            addCriterion("PROCESS_TIME <>", value, "processTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessTimeGreaterThan(String value) {
+            addCriterion("PROCESS_TIME >", value, "processTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessTimeGreaterThanOrEqualTo(String value) {
+            addCriterion("PROCESS_TIME >=", value, "processTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessTimeLessThan(String value) {
+            addCriterion("PROCESS_TIME <", value, "processTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessTimeLessThanOrEqualTo(String value) {
+            addCriterion("PROCESS_TIME <=", value, "processTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessTimeLike(String value) {
+            addCriterion("PROCESS_TIME like", value, "processTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessTimeNotLike(String value) {
+            addCriterion("PROCESS_TIME not like", value, "processTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessTimeIn(List<String> values) {
+            addCriterion("PROCESS_TIME in", values, "processTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessTimeNotIn(List<String> values) {
+            addCriterion("PROCESS_TIME not in", values, "processTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessTimeBetween(String value1, String value2) {
+            addCriterion("PROCESS_TIME between", value1, value2, "processTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessTimeNotBetween(String value1, String value2) {
+            addCriterion("PROCESS_TIME not between", value1, value2, "processTime");
             return (Criteria) this;
         }
     }

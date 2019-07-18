@@ -230,6 +230,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             CUser cUser = iUserService.selectById(offset.getcUser());
             if(null!=cUser)
             offset.setcUser(cUser.getName());
+            offset.setCleanStatus(InternetCleanStatus.getContentByValue(offset.getCleanStatus()));
         }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(internetRenewOffsets);
@@ -536,12 +537,12 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                     internetRenewOffset.setMerName(oInternetRenewDetail.getMerName());
                     internetRenewOffset.setOffsetAmt(oInternetRenewDetail.getOffsetAmt());
                     internetRenewOffset.setAlreadyOffsetAmt(BigDecimal.ZERO);
-                    internetRenewOffset.setProcessTime(new Date());
-                    internetRenewOffset.setcTime(new Date());
+                    internetRenewOffset.setcTime(DateUtil.format(new Date(),DateUtil.DATE_FORMAT_3));
                     internetRenewOffset.setcUser(oInternetRenewDetail.getcUser());
                     internetRenewOffset.setuUser(oInternetRenewDetail.getuUser());
                     internetRenewOffset.setStatus(Status.STATUS_1.status);
                     internetRenewOffset.setVersion(BigDecimal.ONE);
+                    internetRenewOffset.setCleanStatus(InternetCleanStatus.ZERO.getValue());
                     internetRenewOffsetMapper.insert(internetRenewOffset);
                 }
             }

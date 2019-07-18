@@ -46,9 +46,19 @@ public class ReceiptPlanServiceImpl implements ReceiptPlanService {
         return result;
     }
 
+    /**
+     * 获取排单列表
+     * @param param
+     * @param pageInfo
+     * @param isPlan   true 排单  flase 退货排单
+     * @return
+     */
     @Override
-    public PageInfo getReceiptPlanList(Map<String, Object> param, PageInfo pageInfo) {
+    public PageInfo getReceiptPlanList(Map<String, Object> param, PageInfo pageInfo, Boolean isPlan) {
 //        param.put("planOrderStatus", PlannerStatus.YesPlanner.getValue());
+        if(param.get("begin")== null && param.get("end")==null && isPlan){
+            param.put("isDeliver","yes");//只有导出排单才加此条件，过滤退货
+        }
         Long count = receiptPlanMapper.getReceipPlanCount(param);
         List<Map<String, Object>> list = receiptPlanMapper.getReceipPlanList(param);
         for (Map<String, Object> maps : list) {
