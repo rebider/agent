@@ -300,19 +300,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     if(StringUtils.isBlank(item.getBusParent()))
                         throw new ProcessException("直签上级不能为空");
                 }
-                //代理商业务平台类型限制 当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台
-                if (StringUtils.isNotBlank(agentBusInfo.getAgentId())) {
-                    List<AgentBusInfo> agentBusInfoList = agentBusinfoService.selectByAgenId(agentBusInfo.getAgentId());
-                    for (AgentBusInfo busInfo : agentBusInfoList) {
-                        if (item.getBusType().equals(BusType.BZYD.key) || item.getBusType().equals(BusType.JG.key)) {
-                            if (busInfo.getBusType().equals(BusType.ZQZF.key) || busInfo.getBusType().equals(BusType.ZQ.key)
-                                    || busInfo.getBusType().equals(BusType.YDX.key) || busInfo.getBusType().equals(BusType.ZQBZF.key)
-                                    || busInfo.getBusType().equals(BusType.JGYD.key)) {
-                                throw new ProcessException("当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台");
-                            }
-                        }
-                    }
-                }
                 //代理商选择上级代理商时添加限制 不能选择同级别代理商为上级
                 if (StringUtils.isNotBlank(item.getBusParent())) {
                     //获取上级代理商类型
@@ -433,19 +420,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 if(item.getBusType().equals(BusType.ZQZF.key) || item.getBusType().equals(BusType.ZQBZF.key) || item.getBusType().equals(BusType.ZQ.key) ){
                     if(StringUtils.isBlank(item.getBusParent()))
                         throw new ProcessException("直签上级不能为空");
-                }
-                //代理商业务平台类型限制 当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台
-                if (StringUtils.isNotBlank(agent.getId())) {
-                    List<AgentBusInfo> agentBusInfoList = agentBusinfoService.selectByAgenId(agent.getId());
-                    for (AgentBusInfo agentBusInfos : agentBusInfoList) {
-                        if (agentBusInfos.getBusType().equals(BusType.BZYD.key) || agentBusInfos.getBusType().equals(BusType.JG.key)) {
-                            if (item.getBusType().equals(BusType.ZQZF.key) || item.getBusType().equals(BusType.ZQ.key)
-                                    || item.getBusType().equals(BusType.YDX.key) || item.getBusType().equals(BusType.ZQBZF.key)
-                                    || item.getBusType().equals(BusType.JGYD.key)) {
-                                throw new ProcessException("当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台");
-                            }
-                        }
-                    }
                 }
                 //代理商选择上级代理商时添加限制 不能选择同级别代理商为上级
                 if (StringUtils.isNotBlank(item.getBusParent())) {
