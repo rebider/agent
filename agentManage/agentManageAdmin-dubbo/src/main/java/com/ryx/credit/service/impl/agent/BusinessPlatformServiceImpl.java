@@ -419,6 +419,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             agent.setId(agentVo.getAgentId());
             //先查询业务是否已添加 有个添加过 全部返回
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
+                if (StringUtils.isBlank(item.getBusPlatform())) {
+                    throw new ProcessException("业务平台不能为空");
+                }
                 if(item.getBusType().equals(BusType.ZQZF.key) || item.getBusType().equals(BusType.ZQBZF.key) || item.getBusType().equals(BusType.ZQ.key) ){
                     if(StringUtils.isBlank(item.getBusParent()))
                         throw new ProcessException("直签上级不能为空");
