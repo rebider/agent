@@ -233,10 +233,10 @@ public class AddressServiceImpl implements AddressService {
                 logger.info("市为空:{}", String.valueOf(objectList.get(3)));
                 throw new MessageException("请填写第"+j+"行数据的地址---市");
             }
-            if (StringUtils.isBlank(String.valueOf(objectList.get(4)))) {
-                logger.info("区为空:{}", String.valueOf(objectList.get(4)));
-                throw new MessageException("请填写第"+j+"行数据的地址---区");
-            }
+//            if (StringUtils.isBlank(String.valueOf(objectList.get(4)))) {
+//                logger.info("区为空:{}", String.valueOf(objectList.get(4)));
+//                throw new MessageException("请填写第"+j+"行数据的地址---区");
+//            }
             if (StringUtils.isBlank(String.valueOf(objectList.get(5)))) {
                 logger.info("详细地址为空:{}", String.valueOf(objectList.get(5)));
                 throw new MessageException("请填写第"+j+"行数据的详细地址");
@@ -294,19 +294,26 @@ public class AddressServiceImpl implements AddressService {
             Region regionCity = regionsCity.get(0);
             oAddress.setAddrCity(regionCity.getrCode());
 
-            //匹配区
-            RegionExample regionExa = new RegionExample();
-            RegionExample.Criteria criteriaDis = regionExa.createCriteria();
-            criteriaDis.andStatusEqualTo(Status.STATUS_1.status);
-            criteriaDis.andRNameEqualTo(String.valueOf(objectList.get(4)));
-            criteriaDis.andPCodeEqualTo(regionCity.getrCode());
-            List<Region> regionsDis = regionMapper.selectByExample(regionExa);
-            if (1 != regionsDis.size()) {
-                logger.info("第"+j+"行数据没有该区");
-                throw new MessageException("第"+j+"行数据没有该区");
+            String rCode = "";
+            if(StringUtils.isNotBlank(String.valueOf(objectList.get(4)))){
+                //匹配区
+                RegionExample regionExa = new RegionExample();
+                RegionExample.Criteria criteriaDis = regionExa.createCriteria();
+                criteriaDis.andStatusEqualTo(Status.STATUS_1.status);
+                criteriaDis.andRNameEqualTo(String.valueOf(objectList.get(4)));
+                criteriaDis.andPCodeEqualTo(regionCity.getrCode());
+                List<Region> regionsDis = regionMapper.selectByExample(regionExa);
+                if (1 != regionsDis.size()) {
+                    logger.info("第"+j+"行数据没有该区");
+                    throw new MessageException("第"+j+"行数据没有该区");
+                }
+                Region regionDis = regionsDis.get(0);
+                rCode = regionDis.getrCode();
+            }else{
+                rCode = "";
             }
-            Region regionDis = regionsDis.get(0);
-            oAddress.setAddrDistrict(regionDis.getrCode());
+            oAddress.setAddrDistrict(rCode);
+
             //进行添加
             if (1 != oAddressMapper.insertSelective(oAddress)) {
                 logger.info("插入失败!");
