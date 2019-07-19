@@ -157,7 +157,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         if (agentBusInfo.getCloReviewStatus() != null) {
             reqMap.put("cloReviewStatus", agentBusInfo.getCloReviewStatus());
         }
-        if (agentBusInfo.getBusType() != null) {
+        if (StringUtils.isNotBlank(agentBusInfo.getBusType())) {
             reqMap.put("busType", agentBusInfo.getBusType());
         }
         if ( StringUtils.isNotBlank(approveTimeStart)) {
