@@ -384,6 +384,14 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         if(agentIdSet.size()!=1){
             throw new MessageException("不同代理商请分开申请");
         }
+        try {
+            AgentResult agentResult = cashReceivablesService.addOCashReceivablesAndStartProcing(oCashReceivablesVoList,cUser,agentId, CashPayType.INTERNETRENEW,internetRenewId);
+            if(!agentResult.isOK()){
+                throw new ProcessException("保存打款记录失败");
+            }
+        } catch (Exception e) {
+            throw new MessageException(e.getMessage());
+        }
         String workId = dictOptionsService.getApproveVersion("cardRenew");
         //启动审批
         String proce = activityService.createDeloyFlow(null, workId, null, null,null);
@@ -409,14 +417,6 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             e.getStackTrace();
             log.error("物联网卡续费审批流启动失败{}");
             throw new MessageException("物联网卡续费审批流启动失败!:{}",e.getMessage());
-        }
-        try {
-            AgentResult agentResult = cashReceivablesService.addOCashReceivablesAndStartProcing(oCashReceivablesVoList,cUser,agentId, CashPayType.INTERNETRENEW,internetRenewId);
-            if(!agentResult.isOK()){
-                throw new ProcessException("保存打款记录失败");
-            }
-        } catch (Exception e) {
-            throw new MessageException(e.getMessage());
         }
         return AgentResult.ok();
     }
