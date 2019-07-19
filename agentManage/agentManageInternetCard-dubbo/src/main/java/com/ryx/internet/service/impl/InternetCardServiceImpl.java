@@ -84,6 +84,10 @@ public class InternetCardServiceImpl implements InternetCardService {
             if(null!=dict)
                 oInternetCard.setManufacturer(dict.getdItemname());
             oInternetCard.setIccidNumId(oInternetCard.getIccidNum());
+            if(null==oInternetCard.getInternetCardStatus()){
+                oInternetCard.setRenewButton("0");
+                continue;
+            }
             if((oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NORMAL.getValue())==0 || oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NOACTIVATE.getValue())==0 )
                     && !oInternetCard.getRenewStatus().equals(InternetRenewStatus.XFZ.getValue())){
                 if(null==oInternetCard.getExpireTime()){

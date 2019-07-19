@@ -100,7 +100,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Override
     public ResultVO agentEnterIn(AgentVo agentVo) throws ProcessException {
         try {
-            verifyOrgAndBZYD(agentVo.getBusInfoVoList());
+//            verifyOrgAndBZYD(agentVo.getBusInfoVoList());
 //            verifyOther(agentVo.getBusInfoVoList());
             //根据营业执照号进行检查是否存在
             if(agentVo.getAgent()!=null && StringUtils.isNotBlank(agentVo.getAgent().getAgBusLic())) {
@@ -299,19 +299,17 @@ public class AgentEnterServiceImpl implements AgentEnterService {
      * @throws Exception
      */
     @Override
-    public void verifyOrgAndBZYD(List<AgentBusInfoVo> busInfoVoList) throws Exception {
-        Set<String> BusTypeSet = new HashSet<>();
-        for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
-            BusTypeSet.add(agentBusInfoVo.getBusType());
+    public void verifyOrgAndBZYD(List<AgentBusInfoVo> agentBusInfoVoList, List<AgentBusInfoVo> busInfoVoList) throws Exception {
+        Boolean busInfo = false;
+        for (AgentBusInfoVo agentBusInfoVo : agentBusInfoVoList) {
+            if (agentBusInfoVo.getBusType().equals(BusType.JG.key) || agentBusInfoVo.getBusType().equals(BusType.BZYD.key)) {
+                busInfo = true;
+            }
         }
-        for (String busType : BusTypeSet) {
-            if (busType.equals(BusType.JG.key) || busType.equals(BusType.BZYD.key)) {
-                for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
-                    if (agentBusInfoVo.getBusType().equals(BusType.ZQZF.key) || agentBusInfoVo.getBusType().equals(BusType.ZQ.key)
-                            || agentBusInfoVo.getBusType().equals(BusType.YDX.key) || agentBusInfoVo.getBusType().equals(BusType.ZQBZF.key)
-                            || agentBusInfoVo.getBusType().equals(BusType.JGYD.key)) {
-                        throw new ProcessException("当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台");
-                    }
+        if (busInfo) {
+            for (AgentBusInfoVo busInfoVo : busInfoVoList) {
+                if (!busInfoVo.getBusType().equals(BusType.JG.key) && !busInfoVo.getBusType().equals(BusType.BZYD.key)) {
+                    throw new ProcessException("当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台");
                 }
             }
         }
@@ -994,7 +992,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Override
     public ResultVO updateAgentVo(AgentVo agent, String userId,Boolean isPass) throws MessageException {
         try {
-            verifyOrgAndBZYD(agent.getBusInfoVoList());
+//            verifyOrgAndBZYD(agent.getBusInfoVoList());
             logger.info("用户{}{}修改代理商信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent));
             //根据工商编号验证是否已经存在，禁止重复提交代理商
             if(agent.getAgent()!=null && StringUtils.isNotBlank(agent.getAgent().getAgBusLic())) {

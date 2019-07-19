@@ -242,12 +242,14 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             return agentBusInfo;
         } else {
             agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(id);
-            PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
-            if(null!=platForm){
-                agentBusInfo.setBusPlatformType(platForm.getPlatformType());
+            if(null!=agentBusInfo){
+                PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
+                if(null!=platForm){
+                    agentBusInfo.setBusPlatformType(platForm.getPlatformType());
+                }
+                Map<String,Object> parentInfo = agentBusInfoMapper.queryBusInfoParent(FastMap.fastMap("id",agentBusInfo.getId()));
+                agentBusInfo.setParentInfo(parentInfo);
             }
-            Map<String,Object> parentInfo = agentBusInfoMapper.queryBusInfoParent(FastMap.fastMap("id",agentBusInfo.getId()));
-            agentBusInfo.setParentInfo(parentInfo);
         }
         return agentBusInfo;
     }
@@ -301,19 +303,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     if(StringUtils.isBlank(item.getBusParent()))
                         throw new ProcessException("直签上级不能为空");
                 }
-                //代理商业务平台类型限制 当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台
-                if (StringUtils.isNotBlank(agentBusInfo.getAgentId())) {
-                    List<AgentBusInfo> agentBusInfoList = agentBusinfoService.selectByAgenId(agentBusInfo.getAgentId());
-                    for (AgentBusInfo busInfo : agentBusInfoList) {
-                        if (item.getBusType().equals(BusType.BZYD.key) || item.getBusType().equals(BusType.JG.key)) {
-                            if (busInfo.getBusType().equals(BusType.ZQZF.key) || busInfo.getBusType().equals(BusType.ZQ.key)
-                                    || busInfo.getBusType().equals(BusType.YDX.key) || busInfo.getBusType().equals(BusType.ZQBZF.key)
-                                    || busInfo.getBusType().equals(BusType.JGYD.key)) {
-                                throw new ProcessException("当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台");
-                            }
-                        }
-                    }
-                }
                 //代理商选择上级代理商时添加限制 不能选择同级别代理商为上级
                 if (StringUtils.isNotBlank(item.getBusParent())) {
                     //获取上级代理商类型
@@ -335,11 +324,10 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                         }
                     }
                 }
-                agentBusInfos.add(item);
             }
             String json = JsonUtil.objectToJson(agentBusInfos);
             List<AgentBusInfoVo> agentBusInfoVos = JsonUtil.jsonToList(json, AgentBusInfoVo.class);
-            agentEnterService.verifyOrgAndBZYD(agentBusInfoVos);
+            agentEnterService.verifyOrgAndBZYD(agentBusInfoVos, busInfoVoList);
 
             for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
                 AgentBusInfo agbus = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
@@ -431,22 +419,12 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             agent.setId(agentVo.getAgentId());
             //先查询业务是否已添加 有个添加过 全部返回
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
+                if (StringUtils.isBlank(item.getBusPlatform())) {
+                    throw new ProcessException("业务平台不能为空");
+                }
                 if(item.getBusType().equals(BusType.ZQZF.key) || item.getBusType().equals(BusType.ZQBZF.key) || item.getBusType().equals(BusType.ZQ.key) ){
                     if(StringUtils.isBlank(item.getBusParent()))
                         throw new ProcessException("直签上级不能为空");
-                }
-                //代理商业务平台类型限制 当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台
-                if (StringUtils.isNotBlank(agent.getId())) {
-                    List<AgentBusInfo> agentBusInfoList = agentBusinfoService.selectByAgenId(agent.getId());
-                    for (AgentBusInfo agentBusInfos : agentBusInfoList) {
-                        if (agentBusInfos.getBusType().equals(BusType.BZYD.key) || agentBusInfos.getBusType().equals(BusType.JG.key)) {
-                            if (item.getBusType().equals(BusType.ZQZF.key) || item.getBusType().equals(BusType.ZQ.key)
-                                    || item.getBusType().equals(BusType.YDX.key) || item.getBusType().equals(BusType.ZQBZF.key)
-                                    || item.getBusType().equals(BusType.JGYD.key)) {
-                                throw new ProcessException("当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台");
-                            }
-                        }
-                    }
                 }
                 //代理商选择上级代理商时添加限制 不能选择同级别代理商为上级
                 if (StringUtils.isNotBlank(item.getBusParent())) {
@@ -500,12 +478,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 }
             }
             List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByAgenId(agent.getId());
-            for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
-                agentBusInfos.add(item);
-            }
             String json = JsonUtil.objectToJson(agentBusInfos);
             List<AgentBusInfoVo> agentBusInfoVos = JsonUtil.jsonToList(json, AgentBusInfoVo.class);
-            agentEnterService.verifyOrgAndBZYD(agentBusInfoVos);
+            agentEnterService.verifyOrgAndBZYD(agentBusInfoVos, agentVo.getBusInfoVoList());
 
             for (AgentContractVo item : agentVo.getContractVoList()) {
                 if (StringUtils.isNotBlank(agent.getcUser()) && StringUtils.isNotBlank(agent.getId())) {
