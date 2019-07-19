@@ -82,7 +82,7 @@ public interface AgentEnterService {
     public List<AgentoutVo> exportAgent(Map map,Long userId) throws ParseException;
 
 
-    void verifyOrgAndBZYD(List<AgentBusInfoVo> busInfoVoList)throws Exception;
+    void verifyOrgAndBZYD(List<AgentBusInfoVo> agentBusInfoVoList, List<AgentBusInfoVo> busInfoVoList) throws Exception;
 
 //    void verifyOther(List<AgentBusInfoVo> busInfoVoList)throws Exception;
 
