@@ -435,6 +435,7 @@
     b.ag_doc_district,
     b.AG_UNIQ_NUM,
     e.bus_num,
+    e.bus_contact_person,
     f.name as ag_doc_district_name ,
     g.name as ag_doc_pro_name ,
     o.user_id as user_id,
@@ -454,8 +455,8 @@
     nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0) pro_num,
     c.platform_name
     from o_order o
-    left join a_agent b on o.agent_id = b.id
-    left join a_agent_businfo e on o.bus_id = e.id
+    left join a_agent b on o.agent_id = b.id and b.status = 1
+    left join a_agent_businfo e on e.agent_id = o.agent_id and o.bus_id = e.id and e.status = 1
     left join a_platform c on c.platform_num = o.order_platform
     left join o_payment d on d.order_id = o.id
     left join c_organization f on f.id= e.ag_doc_district
@@ -525,6 +526,7 @@
     b.ag_doc_district,
     b.AG_UNIQ_NUM,
     e.bus_num,
+    e.bus_contact_person,
     f.name as ag_doc_district_name ,
     g.name as ag_doc_pro_name ,
     o.user_id as user_id,
@@ -544,8 +546,8 @@
     nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0) pro_num,
     c.platform_name
     from  o_order o
-    left join a_agent b on o.agent_id = b.id
-    left join a_agent_businfo e on o.bus_id = e.id
+    left join a_agent b on o.agent_id = b.id and b.status = 1
+    left join a_agent_businfo e on e.agent_id = o.agent_id and o.bus_id = e.id and e.status = 1
     left join a_platform c on c.platform_num = o.order_platform
     left join o_payment d on d.order_id = o.id
     left join c_organization f on f.id= e.ag_doc_district
@@ -623,6 +625,7 @@
     b.ag_doc_district,
     b.AG_UNIQ_NUM,
     e.bus_num,
+    e.bus_contact_person,
     f.name as ag_doc_district_name ,
     g.name as ag_doc_pro_name ,
     o.user_id as user_id,
@@ -642,8 +645,8 @@
     nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0) pro_num,
     c.platform_name
     from o_order o
-    left join a_agent b on o.agent_id = b.id
-    left join a_agent_businfo e on o.bus_id = e.id
+    left join a_agent b on o.agent_id = b.id and b.status = 1
+    left join a_agent_businfo e on e.agent_id = o.agent_id and o.bus_id = e.id and e.status = 1
     left join a_platform c on c.platform_num = o.order_platform
     left join o_payment d on d.order_id = o.id
     left join c_organization f on f.id= e.ag_doc_district
@@ -713,6 +716,7 @@
     b.ag_doc_district,
     b.AG_UNIQ_NUM,
     e.bus_num,
+    e.bus_contact_person,
     f.name as ag_doc_district_name ,
     g.name as ag_doc_pro_name ,
     o.user_id as user_id,
@@ -732,8 +736,8 @@
     nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0) pro_num,
     c.platform_name
     from  o_order o
-    left join a_agent b on o.agent_id = b.id
-    left join a_agent_businfo e on o.bus_id = e.id
+    left join a_agent b on o.agent_id = b.id and b.status = 1
+    left join a_agent_businfo e on e.agent_id = o.agent_id and o.bus_id = e.id and e.status = 1
     left join a_platform c on c.platform_num = o.order_platform
     left join o_payment d on d.order_id = o.id
     left join c_organization f on f.id= e.ag_doc_district
@@ -811,6 +815,7 @@
     b.ag_doc_district,
     b.AG_UNIQ_NUM,
     e.bus_num,
+    e.bus_contact_person,
     o.user_id as user_id,
     f.name as ag_doc_district_name,
     g.name as ag_doc_pro_name,
@@ -912,6 +917,7 @@
     b.ag_doc_district,
     b.AG_UNIQ_NUM,
     e.bus_num,
+    e.bus_contact_person,
     o.user_id as user_id,
     f.name as ag_doc_district_name,
     g.name as ag_doc_pro_name,
