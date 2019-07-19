@@ -15,20 +15,20 @@
     <!-- 用dubbo协议在22880端口暴露服务 -->
     <dubbo:protocol name="dubbo" port="${zk.port}"/>
     <dubbo:annotation package="com.ryx.credit.service.*" />
-    <dubbo:reference interface="com.ryx.credit.service.dict.IdService" id="idService"  timeout="1200000" registry="${zk.group}"/>
-    <dubbo:reference interface="com.ryx.credit.service.agent.AgentService" id="agentService"  timeout="1200000" registry="${zk.group}"/>
-    <dubbo:reference interface="com.ryx.credit.service.order.OLogisticsService" id="oLogisticService"  timeout="1200000" registry="${zk.group}"/>
-    <dubbo:reference interface="com.ryx.credit.service.dict.DictOptionsService" id="dictOptionsService"  timeout="1200000" registry="${zk.group}"/>
-    <dubbo:reference interface="com.ryx.credit.service.order.OCashReceivablesService" id="oCashReceivablesService"  timeout="1200000" registry="${zk.group}"/>
-    <dubbo:reference interface="com.ryx.credit.service.ActivityService" id="activityService"  timeout="1200000" registry="${zk.group}" check="false"/>
-    <dubbo:reference interface="com.ryx.credit.service.agent.TaskApprovalService" id="taskApprovalService"  timeout="1200000" registry="${zk.group}" check="false"/>
-    <dubbo:reference interface="com.ryx.credit.service.agent.AttachmentRelService" id="attachmentRelService"  timeout="1200000" registry="${zk.group}" check="false"/>
-    <dubbo:reference interface="com.ryx.credit.service.data.AttachmentService" id="attachmentService"  timeout="1200000" registry="${zk.group}" check="false"/>
-    <dubbo:reference interface="com.ryx.credit.service.agent.AgentEnterService" id="agentEnterService"  timeout="1200000" registry="${zk.group}" check="false"/>
-    <dubbo:reference interface="com.ryx.credit.service.agent.BusActRelService" id="busActRelService"  timeout="1200000" registry="${zk.group}" check="false"/>
-    <dubbo:reference interface="com.ryx.credit.service.IUserService" id="iUserService"  timeout="1200000" registry="${zk.group}" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.dict.IdService" id="idService"  timeout="1200000" registry="myGroup"/>
+    <dubbo:reference interface="com.ryx.credit.service.agent.AgentService" id="agentService"  timeout="1200000" registry="myGroup"/>
+    <dubbo:reference interface="com.ryx.credit.service.order.OLogisticsService" id="oLogisticService"  timeout="1200000" registry="myGroup"/>
+    <dubbo:reference interface="com.ryx.credit.service.dict.DictOptionsService" id="dictOptionsService"  timeout="1200000" registry="myGroup"/>
+    <dubbo:reference interface="com.ryx.credit.service.order.OCashReceivablesService" id="oCashReceivablesService"  timeout="1200000" registry="myGroup"/>
+    <dubbo:reference interface="com.ryx.credit.service.ActivityService" id="activityService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.agent.TaskApprovalService" id="taskApprovalService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.agent.AttachmentRelService" id="attachmentRelService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.data.AttachmentService" id="attachmentService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.agent.AgentEnterService" id="agentEnterService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.agent.BusActRelService" id="busActRelService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.IUserService" id="iUserService"  timeout="1200000" registry="myGroup" check="false"/>
 
     <dubbo:service interface="com.ryx.internet.service.InternetCardService" ref="internetCardService" timeout="1200000" registry="myGroup" />
-    <dubbo:service interface="com.ryx.internet.service.OInternetRenewService" ref="internetRenewService" timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.internet.service.OInternetRenewService" ref="internetRenewService" timeout="1200000" registry="myGroup" />
 
 </beans>
