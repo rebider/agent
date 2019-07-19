@@ -41,7 +41,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
     private IdService idService;
 
     @Override
-    public PageInfo selectByMap(PageInfo pageInfo, Map<String, String> param) {
+    public PageInfo selectByMap(PageInfo pageInfo, Map<String, String> param,Map<String,Object> map) {
 
         InvoiceSumExample invoiceSumExample = new InvoiceSumExample();
         InvoiceSumExample.Criteria criteria = invoiceSumExample.createCriteria();
@@ -65,6 +65,9 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
         }
         if (param.get("invoiceCompany") != null && !param.get("invoiceCompany").equals("")) {
             criteria.andInvoiceCompanyEqualTo(param.get("invoiceCompany"));
+        }
+        if(map != null){
+            invoiceSumExample.setInnerJoinDepartment(map.get("ORGANIZATIONCODE").toString(), map.get("ORGID").toString());
         }
 
         List<InvoiceSum> invoiceSums = invoiceSumMapper.selectByExample(invoiceSumExample);
@@ -90,7 +93,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
         } else {
             logger.info("获取代理商唯一码失败");
             resultMap.put("returnCode", 0000);
-            resultMap.put("returnInfo", "失败");
+            resultMap.put("returnInfo", "获取代理商唯一码失败");
             return resultMap;
         }
         if (param.get("PROFIT_MONTH") != null && param.get("PROFIT_MONTH") != "") {
@@ -98,7 +101,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
         } else {
             logger.info("获取月份失败");
             resultMap.put("returnCode", 0000);
-            resultMap.put("returnInfo", "失败");
+            resultMap.put("returnInfo", "获取月份失败");
             return resultMap;
         }
         if (param.get("INVOICE_COMPANY") != null && param.get("INVOICE_COMPANY") != "") {
@@ -106,19 +109,25 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
         } else {
             logger.info("获取打款公司失败");
             resultMap.put("returnCode", 0000);
-            resultMap.put("returnInfo", "失败");
+            resultMap.put("returnInfo", "获取打款公司失败");
             return resultMap;
         }
         List<InvoiceSum> invoiceSums = invoiceSumMapper.selectByExample(invoiceSumExample);
         if (invoiceSums.size() != 1) {
             logger.info("查询本月代理商有误");
             resultMap.put("returnCode", 0000);
-            resultMap.put("returnInfo", "失败");
+            resultMap.put("returnInfo", "查询本月代理商有误");
             return resultMap;
         }
         InvoiceSum invoiceSum = invoiceSums.get(0);
         BigDecimal surplusAmt = invoiceSum.getOwnInvoice().subtract((BigDecimal) param.get("INVOICE_AMT"));
         try {
+            if(surplusAmt.compareTo(BigDecimal.ZERO) < 0){
+                logger.info("发票金额大于本月欠票数");
+                resultMap.put("returnCode", 0000);
+                resultMap.put("returnInfo", "发票金额大于本月欠票数");
+                return resultMap;
+            }
             if (surplusAmt.compareTo(BigDecimal.ZERO) != 1) {
                 AdjustFreeze(param);
                 invoiceSum.setInvoiceStatus("99");

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface IInvoiceSumService {
-    PageInfo selectByMap(PageInfo pageInfo, Map<String, String> param);
+    PageInfo selectByMap(PageInfo pageInfo, Map<String, String> param,Map<String,Object> map);
 
     InvoiceSum selectByPrimaryKey(String id);
 
