@@ -291,8 +291,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         }
         if (busInfo) {
             for (AgentBusInfoVo busInfoVo : busInfoVoList) {
-                if (!busInfoVo.getBusType().equals(BusType.JG.key) || !busInfoVo.getBusType().equals(BusType.BZYD.key)) {
-                        throw new ProcessException("当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台");
+                if (!busInfoVo.getBusType().equals(BusType.JG.key) && !busInfoVo.getBusType().equals(BusType.BZYD.key)) {
+                    throw new ProcessException("当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台");
                 }
             }
         }
