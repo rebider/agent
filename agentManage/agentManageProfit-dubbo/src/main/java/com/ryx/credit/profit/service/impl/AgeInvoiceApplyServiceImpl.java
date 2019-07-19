@@ -127,7 +127,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                 tocken = map1.get("access_token").toString();
                 for (Map<String,Object> map:list) {
                     InvoiceApply invoiceApply = new InvoiceApply();
-                    Map<String,Object> result = getTicketInfo(map.get("invoiceCode").toString(),tocken);
+                    Map<String,Object> result = getTicketInfo(map.get("invoiceCode").toString(),map.get("invoiceNo").toString(),tocken);
                     if(result == null){//未在发票云找到该发票信息，将此信息返回
                         invoiceApply.setYsResult("0");
                         invoiceApply.setInvoiceCompany(map.get("sallerName").toString());
@@ -135,10 +135,21 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                     }else{
                         invoiceApply.setYsResult("1");
                         if("1".equals(result.get("proxyMark").toString())){ // 代开
-                            String remark = result.get("remark").toString();  // 获取代开公司
-                            int flag = remark.indexOf("代开企业名称:");
+                            String remark = result.get("remark").toString();  // 获取发票备注
+                            int flag = remark.indexOf("代开企业名称:");// 截取代开企业名称
+                            int kBank = remark.indexOf("开户银行:",flag);
+                            int index = remark.indexOf(" ", flag);
                             if(flag != -1){
-                                invoiceApply.setInvoiceCompany(remark.substring(flag+7));
+                                if (kBank > flag) {
+                                    invoiceApply.setInvoiceCompany(remark.substring(flag+7,kBank));
+                                    System.out.println(remark.substring(flag + 7, kBank));
+                                } else if(index > flag){
+                                    invoiceApply.setInvoiceCompany(remark.substring(flag+7,index));
+                                    System.out.println(remark.substring(flag + 7, index));
+                                }else{
+                                    System.out.println(remark.substring(flag + 7));
+                                    invoiceApply.setInvoiceCompany(remark.substring(flag+7));
+                                }
                                 invoiceApply.setSallerName(map.get("sallerName").toString());
                                 invoiceApply.setRemark(remark);
                             }else{
@@ -212,7 +223,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                 if(!"9999".equals(ma.get("returnCode").toString()) ){
                     Map<String,String> mm = new HashMap<String,String>();
                     mm.put("invoiceCode",invoiceApply.getInvoiceCode());
-                    mm.put("errorInfo","汇总失败");
+                    mm.put("errorInfo","汇总失败："+ma.get("returnInfo").toString());
                     maps.add(mm);
                     invoiceApply1.setEsResult("0");
                 }else{
@@ -254,17 +265,18 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
     }
 
     /**根据发票代码获取发票全部信息*/
-    private Map<String,Object> getTicketInfo(String invoiceCode,String tocken)throws Exception{
-           JSONObject param = new JSONObject();
-           param.put("invoiceCode", invoiceCode);
-           String result = HttpClientUtil.doPostJson(TICKET_INFO_URL+tocken,encrypt1(param.toJSONString()));
-           logger.info("======获取========"+result+"===============");
-           Map<String,Object> rr = JSONObject.parseObject(result);
-           if("0000".equals(rr.get("errcode"))){
-               List<Map<String,Object>> list = (List<Map<String,Object>>)rr.get("data");
-               return list.get(0);
-           }
-           return null;
+    private Map<String,Object> getTicketInfo(String invoiceCode,String invoiceNo,String tocken)throws Exception{
+        JSONObject param = new JSONObject();
+        param.put("invoiceCode", invoiceCode);
+        param.put("invoiceNo",invoiceNo);
+        String result = HttpClientUtil.doPostJson(TICKET_INFO_URL+tocken,encrypt1(param.toJSONString()));
+        logger.info("======获取========"+result+"===============");
+        Map<String,Object> rr = JSONObject.parseObject(result);
+        if("0000".equals(rr.get("errcode"))){
+            List<Map<String,Object>> list = (List<Map<String,Object>>)rr.get("data");
+            return list.get(0);
+        }
+        return null;
     }
 
     /**获取金蝶授权AccessTocken*/

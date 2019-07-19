@@ -67,7 +67,7 @@
       distinct
     </if>
     <include refid="Base_Column_List" />
-    from P_INVOICE_SUM
+    from P_INVOICE_SUM  N ${innerJoinDepartment}
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -246,7 +246,7 @@
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.InvoiceSumExample" resultType="java.lang.Long">
-    select count(*) from P_INVOICE_SUM
+    select count(*) from P_INVOICE_SUM  N ${innerJoinDepartment}
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
