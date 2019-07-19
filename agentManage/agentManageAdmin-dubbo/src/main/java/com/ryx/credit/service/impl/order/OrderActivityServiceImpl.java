@@ -73,6 +73,15 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         if (StringUtils.isNotBlank(activity.getActCode())) {
             criteria.andActCodeEqualTo(activity.getActCode());
         }
+        if (StringUtils.isNotBlank(activity.getVender())) {
+            Dict vender = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),activity.getVender());
+            if(vender!=null) {
+                criteria.andVenderEqualTo(vender.getdItemvalue());
+            }
+        }
+        if (StringUtils.isNotBlank(activity.getProModel())) {
+            criteria.andProModelEqualTo(activity.getProModel());
+        }
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         example.setOrderByClause(" ACT_CODE,c_time desc");
         example.setPage(page);
