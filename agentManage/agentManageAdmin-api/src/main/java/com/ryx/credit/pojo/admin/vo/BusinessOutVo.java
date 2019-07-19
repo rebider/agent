@@ -1,6 +1,7 @@
 package com.ryx.credit.pojo.admin.vo;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
 
@@ -44,6 +45,45 @@ public class BusinessOutVo extends AgentExtends implements Serializable {
 
     private String busScope;
 
+    private Date approveTime;
+
+    private String busContactPerson;
+
+    private String agDocPro;
+
+    private String time;
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public Date getApproveTime() {
+        return approveTime;
+    }
+
+    public void setApproveTime(Date approveTime) {
+        this.approveTime = approveTime;
+    }
+
+    public String getBusContactPerson() {
+        return busContactPerson;
+    }
+
+    public void setBusContactPerson(String busContactPerson) {
+        this.busContactPerson = busContactPerson;
+    }
+
+    public String getAgDocPro() {
+        return agDocPro;
+    }
+
+    public void setAgDocPro(String agDocPro) {
+        this.agDocPro = agDocPro;
+    }
 
     public String getId() {
         return id;
