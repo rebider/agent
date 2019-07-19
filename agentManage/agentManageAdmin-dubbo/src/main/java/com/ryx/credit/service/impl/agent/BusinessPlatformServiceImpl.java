@@ -321,11 +321,10 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                         }
                     }
                 }
-                agentBusInfos.add(item);
             }
             String json = JsonUtil.objectToJson(agentBusInfos);
             List<AgentBusInfoVo> agentBusInfoVos = JsonUtil.jsonToList(json, AgentBusInfoVo.class);
-            agentEnterService.verifyOrgAndBZYD(agentBusInfoVos);
+            agentEnterService.verifyOrgAndBZYD(agentBusInfoVos, busInfoVoList);
 
             for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
                 AgentBusInfo agbus = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
@@ -473,12 +472,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 }
             }
             List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByAgenId(agent.getId());
-            for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
-                agentBusInfos.add(item);
-            }
             String json = JsonUtil.objectToJson(agentBusInfos);
             List<AgentBusInfoVo> agentBusInfoVos = JsonUtil.jsonToList(json, AgentBusInfoVo.class);
-            agentEnterService.verifyOrgAndBZYD(agentBusInfoVos);
+            agentEnterService.verifyOrgAndBZYD(agentBusInfoVos, agentVo.getBusInfoVoList());
 
             for (AgentContractVo item : agentVo.getContractVoList()) {
                 if (StringUtils.isNotBlank(agent.getcUser()) && StringUtils.isNotBlank(agent.getId())) {
