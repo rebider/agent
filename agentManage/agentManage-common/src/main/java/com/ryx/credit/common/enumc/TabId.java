@@ -101,6 +101,7 @@ public enum TabId {
     P_REMIT_INFO("PRI%s%015d"),
     P_FREEZE_OPERATION_RECORD("FOR%s%015d"),
     P_FREEZE_AGENT("PFA%s%015d"),
+    P_INVOICE_SUM("PIS%s%015d"),
     P_SERVER_AMT("PSA%s%015d");
 
     TabId(String thePatt){
