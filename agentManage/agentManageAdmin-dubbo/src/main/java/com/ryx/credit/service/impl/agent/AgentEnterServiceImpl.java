@@ -184,7 +184,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                         //三要素认证
                         AgentResult result = livenessDetectionService.threeElementsCertificationDetection(trueName, item.getAgLegalCernum(), agent.getcUser(),item.getCloBankAccount());
                         if (!result.isOK()) {
-                            throw new ProcessException("收款账户身份认证异常");
+                            throw new ProcessException(result.getMsg());
                         }
                     } else {
                         throw new ProcessException("请输入收款账户名相对应的户主证件号");

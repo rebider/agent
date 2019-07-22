@@ -443,6 +443,7 @@ public class CompensateServiceImpl implements CompensateService {
             });
             return AgentResult.ok(priceDiffId);
         } catch (Exception e) {
+            e.getStackTrace();
             log.info("退补差价保存失败");
             throw new ProcessException("退补差价保存失败");
         }
