@@ -12,12 +12,12 @@ import java.util.Date;
  */
 public class OrderoutVo implements Serializable{
     private String num;//单号
-    private BigDecimal payAmo;//总金额
+    private String payAmo;//总金额
     private Date inuretime;//订单日期
     private String agUniqNum;//唯一码
     private String agName;//代理商名称
     private String platformName;//平台
-    private BigDecimal proNum;//数量
+    private String proNum;//数量
     private String payMethod;//结算方式
     private String downPaymentUser;//付款人
     private String comName;//收款地方
@@ -60,6 +60,43 @@ public class OrderoutVo implements Serializable{
     private String realRecTime;//打款时间
     private String checkDate;//核款日期
     private String remark;//备注
+
+    private String busNum;//业务平台编码
+    private String mqydkAmt;//每期应打款金额
+    private String profitMouth;//是否扣存量
+    private String profitForm;//分润形式
+
+    public String getBusNum() {
+        return busNum;
+    }
+
+    public void setBusNum(String busNum) {
+        this.busNum = busNum;
+    }
+
+    public String getMqydkAmt() {
+        return mqydkAmt;
+    }
+
+    public void setMqydkAmt(String mqydkAmt) {
+        this.mqydkAmt = mqydkAmt;
+    }
+
+    public String getProfitMouth() {
+        return profitMouth;
+    }
+
+    public void setProfitMouth(String profitMouth) {
+        this.profitMouth = profitMouth;
+    }
+
+    public String getProfitForm() {
+        return profitForm;
+    }
+
+    public void setProfitForm(String profitForm) {
+        this.profitForm = profitForm;
+    }
 
     public String getRemark() {
         return remark;
@@ -254,11 +291,11 @@ public class OrderoutVo implements Serializable{
         this.actualTime = actualTime;
     }
 
-    public BigDecimal getPayAmo() {
+    public String getPayAmo() {
         return payAmo;
     }
 
-    public void setPayAmo(BigDecimal payAmo) {
+    public void setPayAmo(String payAmo) {
         this.payAmo = payAmo;
     }
 
@@ -287,11 +324,11 @@ public class OrderoutVo implements Serializable{
         this.platformName = platformName;
     }
 
-    public BigDecimal getProNum() {
+    public String getProNum() {
         return proNum;
     }
 
-    public void setProNum(BigDecimal proNum) {
+    public void setProNum(String proNum) {
         this.proNum = proNum;
     }
 
