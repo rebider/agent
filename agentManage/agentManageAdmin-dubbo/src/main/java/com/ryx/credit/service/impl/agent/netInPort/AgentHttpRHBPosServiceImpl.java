@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,14 +99,15 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
         }else{
             agentColinfo = new AgentColinfo();
         }
-        resultMap.put("acctType","");//00:对公账户，01：对私账户
+        //00:对公账户，01：对私账户
+        resultMap.put("acctType",agentColinfo.getCloType().compareTo(BigDecimal.ONE)==0?"00":"01");
         resultMap.put("credName",agent.getAgLegal());//法人姓名
         resultMap.put("credNo",agent.getAgLegalCernum());//法人身份证
         resultMap.put("credPhone",agent.getAgLegalMobile());//法人手机号
         resultMap.put("dutyName",agent.getAgHead());//负责人
         resultMap.put("dutyPhone",agent.getAgHeadMobile());//负责人手机号
         resultMap.put("businesslicense",agent.getAgBusLic());//营业执照
-        resultMap.put("companyNature","");//公司性质
+        resultMap.put("companyNature",agent.getAgNature());//公司性质
         resultMap.put("bankCardName",agentColinfo.getCloRealname());//结算户名
         resultMap.put("bankCard",agentColinfo.getCloBankAccount());//结算卡号
         resultMap.put("bankCardCredNo",agentColinfo.getAgLegalCernum());//结算卡户主身份证
@@ -115,7 +117,6 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
         resultMap.put("isBill",agentColinfo.getCloInvoice());//是否开具分润发票
         resultMap.put("taxPoint",agentColinfo.getCloTaxPoint());//税点
         resultMap.put("agencyMobileNo",agentBusInfo.getBusLoginNum());//代理商登录管理app手机号
-
         return resultMap;
     }
 
@@ -147,6 +148,8 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
     public Map agencyLevelUpdateChangeData(Map data) {
         Map data_res = new HashMap();
         try {
+
+
 
         } catch (Exception e) {
             e.printStackTrace();
