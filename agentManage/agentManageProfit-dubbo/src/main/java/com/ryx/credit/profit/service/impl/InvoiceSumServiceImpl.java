@@ -45,10 +45,11 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
         InvoiceSumExample invoiceSumExample = new InvoiceSumExample();
         InvoiceSumExample.Criteria criteria = invoiceSumExample.createCriteria();
         if (param.get("agentName") != null && !param.get("agentName").equals("")) {
-            criteria.andAgentIdEqualTo(param.get("agentName"));
+            criteria.andAgentNameEqualTo(param.get("agentName"));
         }
         if (param.get("agentId") != null && !param.get("agentId").equals("")) {
-            criteria.andAgentNameEqualTo(param.get("agentId"));
+            criteria.andAgentIdEqualTo(param.get("agentId"));
+
         }
         if (param.get("topOrgName") != null && !param.get("topOrgName").equals("")) {
             criteria.andTopOrgNameEqualTo(param.get("topOrgName"));
