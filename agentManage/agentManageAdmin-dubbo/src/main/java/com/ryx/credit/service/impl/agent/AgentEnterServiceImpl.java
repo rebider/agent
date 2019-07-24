@@ -164,18 +164,32 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 if (item.getCloType().compareTo(new BigDecimal(2)) == 0) {
                     //对私时 收款账户名与法人姓名一致时 把法人身份证号拷贝到户主身份证号并进行认证
                     if (agLegalName.equals(trueName)) {
-                        item.setAgLegalCernum(agent.getAgLegalCernum());
-                    } else {
-                        if (StringUtils.isNotBlank(certNo)) {
-                            //校验收款账户身份认证
-                            AgentResult result = livenessDetectionService.livenessDetection(trueName, certNo, agent.getcUser());
-                            if (!result.isOK()) {
-                                throw new ProcessException("收款账户身份认证失败");
+                        //法人身份证未空，必须输入结算卡户主身份证
+                        if(StringUtils.isBlank(agent.getAgLegalCernum())){
+                            if(StringUtils.isBlank(certNo)){
+                                throw new ProcessException("法人身份证未获取到，请输入结算卡户主身份证号");
                             }
-                        } else {
-                            throw new ProcessException("请输入收款账户名相对应的户主证件号");
+                        }
+                        if(StringUtils.isBlank(agent.getAgLegalCernum()) && StringUtils.isBlank(certNo))
+                            throw new ProcessException("请输入结算卡户主身份证");
+                        if(StringUtils.isNotBlank(certNo)) {
+                            item.setAgLegalCernum(certNo);
+                        }
+                        if(StringUtils.isBlank(item.getAgLegalCernum())){
+                            item.setAgLegalCernum(agent.getAgLegalCernum());
                         }
                     }
+                    //三要素认证
+                    if (StringUtils.isNotBlank(item.getAgLegalCernum())) {
+                        //三要素认证
+                        AgentResult result = livenessDetectionService.threeElementsCertificationDetection(trueName, item.getAgLegalCernum(), agent.getcUser(),item.getCloBankAccount());
+                        if (!result.isOK()) {
+                            throw new ProcessException(result.getMsg());
+                        }
+                    } else {
+                        throw new ProcessException("请输入收款账户名相对应的户主证件号");
+                    }
+
                 }
                 //对公时 判断收款账户名是否与代理商名称一致 不一致则抛异常提示信息
                 if (item.getCloType().compareTo(new BigDecimal(1)) == 0) {
