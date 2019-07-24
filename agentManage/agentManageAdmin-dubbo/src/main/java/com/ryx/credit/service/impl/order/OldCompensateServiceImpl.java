@@ -134,10 +134,10 @@ public class OldCompensateServiceImpl implements OldCompensateService {
             OActivityExample.Criteria activityCriteria = oActivityExample.createCriteria();
             activityCriteria.andStatusEqualTo(Status.STATUS_1.status);
             activityCriteria.andActCodeNotEqualTo(oActivity.getActCode());
-            activityCriteria.andVenderEqualTo(oActivity.getVender());
-            activityCriteria.andProModelEqualTo(oActivity.getProModel());
-            activityCriteria.andPlatformEqualTo(oActivity.getPlatform());
-            activityCriteria.andProTypeEqualTo(oActivity.getProType());
+            activityCriteria.andVenderEqualTo(oActivity.getVender());//厂商
+            activityCriteria.andProModelEqualTo(oActivity.getProModel());//型号
+            activityCriteria.andPlatformEqualTo(oActivity.getPlatform());//平台
+            activityCriteria.andProTypeEqualTo(oActivity.getProType());//机具类型
             Date date = new Date();
             activityCriteria.andBeginTimeLessThanOrEqualTo(date);
             activityCriteria.andEndTimeGreaterThanOrEqualTo(date);
