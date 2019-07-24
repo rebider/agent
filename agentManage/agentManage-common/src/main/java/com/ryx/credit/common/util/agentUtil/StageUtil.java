@@ -25,7 +25,8 @@ public class StageUtil {
         }
         List<Map> data = new ArrayList<>();
         Calendar c = Calendar.getInstance();
-        c.setTime(date);
+        Date subMonth = subMonth(date);
+        c.setTime(subMonth);
         c.set(Calendar.DAY_OF_MONTH,day);
         for (int i=1;i<= count;i++){
             //第一个月
@@ -39,4 +40,13 @@ public class StageUtil {
         }
         return data;
     }
+
+    public static Date subMonth(Date date) {
+        Calendar rightNow = Calendar.getInstance();
+        rightNow.setTime(date);
+        rightNow.add(Calendar.MONTH, 1);
+        Date planDate = rightNow.getTime();
+        return planDate;
+    }
+
 }
