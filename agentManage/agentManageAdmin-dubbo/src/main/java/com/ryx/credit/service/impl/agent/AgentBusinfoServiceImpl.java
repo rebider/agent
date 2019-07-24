@@ -942,9 +942,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	 * @throws MessageException
 	 */
 	@Override
-	public String queryAgentId(String busNum)throws MessageException{
-		AgentBusInfo agentBusInfo = queryBusInfo(busNum);
-		return agentBusInfo.getAgentId();
+	public AgentBusInfo queryAgentBusInfo(String busNum)throws MessageException{
+		return queryBusInfo(busNum);
 	}
 
 	/**

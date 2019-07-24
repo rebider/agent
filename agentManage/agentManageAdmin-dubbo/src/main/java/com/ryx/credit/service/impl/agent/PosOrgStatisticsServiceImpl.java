@@ -268,6 +268,27 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
     }
 
 
+
+    private AgentResult httpForRHpos(String agencyId)throws Exception{
+        try {
+            Map<String, String> map = new HashMap<>();
+            map.put("agentId",agencyId);
+            String toJson = JsonUtil.objectToJson(map);
+            log.info("瑞花宝查询终端数量请求参数:{}",toJson);
+//            String httpResult = HttpClientUtil.doPostJson("", toJson);
+            String httpResult ="{\"MSG_CODE\": \"0000\", \"MSG_TEXT\": \"描述\", \"RESULT\": [{\"agentId\": \"RHB00020000\", \"agentName\": \"测试机构\", \"upAgentId\": \"\", \"creatTime\": \"2019-07-22 13:00:00\", \"totalCount\": \"1233\", \"activationCount\": \"1000\"},{\"agentId\":\"RHB00020001\",\"agentName\":\"测试二级机构\",\"upAgentId\": \"RHB00020000\", \"creatTime\": \"2019-07-22 13:00:00\", \"totalCount\": \"1033\",\"activationCount\": \"1000\"}]}";
+            log.info("瑞花宝查询终端数量返回参数:{}",httpResult);
+            JSONObject jsonObject = JSONObject.parseObject(httpResult);
+            JSONArray result = jsonObject.getJSONArray("RESULT");
+            return AgentResult.ok(result);
+        } catch (Exception e) {
+            log.info("http请求超时:{}",e.getMessage());
+            e.printStackTrace();
+            throw new Exception(e);
+        }
+    }
+
+
     @Override
     public AgentResult posOrgStatistics(String orgId,String termType)throws Exception{
 
@@ -335,6 +356,15 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
                 }
             }
             AgentResult agentResult = httpForRJPos(orgId,parentBusNum);
+            agentResult.setMsg(platformType);
+            return agentResult;
+        }else if(PlatformType.RHPOS.getValue().equals(platformType)){
+            if(StringUtils.isEmpty(orgId)){
+                if(StringUtils.isNotEmpty(parentBusNum)){
+                    orgId = parentBusNum;
+                }
+            }
+            AgentResult agentResult = httpForRHpos(orgId);
             agentResult.setMsg(platformType);
             return agentResult;
         }
