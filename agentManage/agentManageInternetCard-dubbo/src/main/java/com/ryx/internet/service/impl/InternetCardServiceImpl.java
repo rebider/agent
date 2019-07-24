@@ -97,8 +97,9 @@ public class InternetCardServiceImpl implements InternetCardService {
                 continue;
             }
             //是否需续费为是,才展示按钮
-            if(oInternetCard.getRenew().compareTo(BigDecimal.ONE)==0){
-                oInternetCard.setRenewButton("1");
+            if(oInternetCard.getRenew().compareTo(BigDecimal.ZERO)==0){
+                oInternetCard.setRenewButton("0");
+                continue;
             }
             if((oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NORMAL.getValue())==0 || oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NOACTIVATE.getValue())==0 )
                     && !oInternetCard.getRenewStatus().equals(InternetRenewStatus.XFZ.getValue())){
