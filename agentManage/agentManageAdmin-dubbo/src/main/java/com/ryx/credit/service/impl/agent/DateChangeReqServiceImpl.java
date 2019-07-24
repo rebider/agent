@@ -120,6 +120,7 @@ public class DateChangeReqServiceImpl implements DateChangeReqService{
                             }
                                 Agent agent = vo.getAgent();
                                 resultMap.put("after","");
+                                resultMap.put("id",agent.getId());
                                 resultMap.put("agUniqNum",agent.getAgUniqNum());
                                 resultMap.put("agName",agent.getAgName());
 
