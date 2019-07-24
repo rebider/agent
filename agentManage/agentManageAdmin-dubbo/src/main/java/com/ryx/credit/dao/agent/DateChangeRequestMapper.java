@@ -28,4 +28,6 @@ public interface DateChangeRequestMapper {
     List<Map<String,Object>> queryData(@Param("map") Map<String, Object> map,@Param("page") Page page);
 
     int queryDataCount(@Param("map")Map<String, Object> map);
+
+    List<Map<String,Object>> exportDcColinfo(@Param("map") Map map);
 }
