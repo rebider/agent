@@ -9,7 +9,8 @@ public enum OrderStatus {
     CREATE("1","新建"),
     ENABLE("2","生效"),
     LOCK("3","锁定状态"),
-    UNENABLE("4","失效");
+    UNENABLE("4","失效"),
+    REVOKE("5","已撤销");
 
     public String code;
 

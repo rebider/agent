@@ -19,5 +19,5 @@ public interface ReceiptPlanService {
      * 已排单查询
      * @return
      */
-    PageInfo getReceiptPlanList(Map<String, Object> param, PageInfo pageInfo);
+    PageInfo getReceiptPlanList(Map<String, Object> param, PageInfo pageInfo, Boolean isPlan);
 }

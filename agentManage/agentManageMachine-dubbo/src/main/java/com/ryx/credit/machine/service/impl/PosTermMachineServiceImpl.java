@@ -106,6 +106,8 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
             ImsTermWarehouseDetail imsTermWarehouseDetail = new ImsTermWarehouseDetail();
             imsTermWarehouseDetail.setPosSn(oLogisticsDetail.getSnNum());
             imsTermWarehouseDetail.setMachineId(oLogisticsDetail.getBusProCode());
+            imsTermWarehouseDetail.setStandTime(oLogisticsDetail.getStandTime());
+            imsTermWarehouseDetail.setPosSpePrice(oLogisticsDetail.getPosSpePrice());
             ImsTermActive imsTermActive = imsTermActiveService.selectByPrimaryKey(imsTermWarehouseDetail.getPosSn());
             //有记录就表示已激活
             if(null!=imsTermActive){

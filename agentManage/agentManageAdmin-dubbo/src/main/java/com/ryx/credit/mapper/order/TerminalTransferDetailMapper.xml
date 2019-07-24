@@ -474,6 +474,9 @@
           <if test="map.orgCode!=null and map.orgCode!=''">
             and (oa.CODE like concat(#{map.orgCode},'%') or ob.CODE like concat(#{map.orgCode},'%') )
           </if>
+          <if test="map.buttJointPersonName != null and map.buttJointPersonName!=''">
+          and u.name LIKE CONCAT(CONCAT('%',#{map.buttJointPersonName}),'%')
+         </if>
       </where>
       order by t.c_time desc
   </sql>
