@@ -187,7 +187,43 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
             result = "{'ExecMsg':'认证成功','ValidateStatus':'00'}";
         }
         log.info("--------身份证认证返回参数:{}------", result);
-        Map resultMap = JsonUtils.parseJSON2Map(result);
+        Map resultMap = JSONObject.parseObject(result);
+        return resultMap;
+    }
+
+
+    /**
+     * 三要素认证
+     * @param serialNo
+     * @param trueName
+     * @param certNo
+     * @return
+     * @throws Exception
+     */
+    private Map<String, Object> threeElementsCertification(String serialNo,String trueName,String certNo,String bankNo)throws Exception{
+        Map<String, Object> map = new HashMap<>();
+        Date now = DateKit.getNow(true);
+        map.put("Transcode", "000010");
+        map.put("Serial", serialNo);
+        map.put("SytermId", LIVENESS_DETECTION_SYTERMID);
+        map.put("BankNo", bankNo);
+        map.put("UserName", trueName);
+        map.put("IdentityType", "ZR01");
+        map.put("IdentityId", certNo);
+        map.put("StartDate", DateKit.getCompactDateString(now));
+        map.put("StartTime", DateKit.getCompactTimeString(now));
+        map.put("isDirect", "0");
+
+        String paramsJson = JSONObject.toJSONString(map);
+        log.info("--------三要素认证,url:{}请求参数:{}------",THREEELEMENT_DETECTION_URL,paramsJson);
+        String result = "";
+        if(EnvironmentUtil.isProduction()){
+            result = HttpPostUtil.postForJSON(THREEELEMENT_DETECTION_URL, paramsJson);
+        }else{
+            result = JSONObject.toJSONString(FastMap.fastMap("ResultMsg","认证成功").putKeyV("ResponseCode","00").putKeyV("Result","00"));
+        }
+        log.info("--------三要素认证返回参数:{}------", result);
+        Map resultMap = JSONObject.parseObject(result);
         return resultMap;
     }
 

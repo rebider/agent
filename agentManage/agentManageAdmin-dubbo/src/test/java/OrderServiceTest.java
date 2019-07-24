@@ -1,5 +1,6 @@
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.service.order.OLogisticsService;
+import com.ryx.credit.service.order.OrderRepairService;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,13 +21,26 @@ public class OrderServiceTest  extends BaseSpringTest  {
 
     @Autowired
     private OLogisticsService oLogisticsService;
+    @Autowired
+    private OrderRepairService orderRepairService;
 
     @Test
     public void testIdSn(){
         try {
-            List<String> data =  oLogisticsService.idList("1955AA9Mghj00a09","1955AA9Mghj00a01");
-            logger.info(data.toString());
+            List<String> data =  oLogisticsService.idList("00000402G2100385700","00000402G2100385759");
+            for (String datum : data) {
+                logger.info("sn:{}",datum);
+            }
+
         } catch (MessageException e) {
+            e.printStackTrace();
+        }
+    }
+    @Test
+    public void repairDumpOrderLogic(){
+        try {
+            orderRepairService.repairDumpOrderLogic(1,"OO20190215000000000002487");
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

@@ -28,4 +28,6 @@ public interface OLogisticsDetailHMapper {
     List<Map<String,Object>> getOLogDetailHistoryList(@Param("map") Map<String, Object> map, @Param("page") Page page);
 
     int getOLogDetailHistoryCount(@Param("map") Map<String, Object> map);
+
+    List<Map<String,Object>>  queryMultipleOrderLogicInfo();
 }

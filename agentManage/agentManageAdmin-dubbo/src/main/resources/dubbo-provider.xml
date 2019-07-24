@@ -96,7 +96,7 @@
     <dubbo:service interface="com.ryx.credit.service.order.OCashReceivablesService" ref="oCashReceivablesService"  timeout="1200000" registry="myGroup"/>
     <dubbo:service interface="com.ryx.credit.service.order.IOPdSumService" ref="OPdSumService"  timeout="1200000" registry="myGroup"/>
     <dubbo:service interface="com.ryx.credit.service.order.OLogisticsDetailHService" ref="oLogisticsDetailHService" timeout="1200000" registry="myGroup"/>
-
+    <dubbo:service interface="com.ryx.credit.service.order.OrderRepairService" ref="orderRepairService" timeout="1200000" registry="myGroup"/>
     <!-- 基础资源维护-->
     <dubbo:service interface="com.ryx.credit.service.dict.PayCompService" ref="payCompService" timeout="1200000" registry="myGroup"></dubbo:service>
     <dubbo:service interface="com.ryx.credit.service.dict.TemplateAgreementService" ref="templateAgreementService" timeout="1200000" registry="myGroup"></dubbo:service>
