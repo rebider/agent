@@ -348,6 +348,10 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             oInternetRenewDetail.setOrderId(oInternetCard.getOrderId());
             oInternetRenewDetail.setSnNum(oInternetCard.getSnNum());
             oInternetRenewDetail.setInternetCardNum(oInternetCard.getInternetCardNum());
+            Date earlyDate = DateUtil.format("1900-01-01 00:00:00");
+            if(oInternetCard.getOpenAccountTime().getTime()<earlyDate.getTime()){
+                throw new MessageException("第"+i+"个开户日期不正确请联系相关部门");
+            }
             oInternetRenewDetail.setOpenAccountTime(oInternetCard.getOpenAccountTime());
             if(oInternetCard.getExpireTime()==null){
                 throw new MessageException("第"+i+"个缺少到期时间");
