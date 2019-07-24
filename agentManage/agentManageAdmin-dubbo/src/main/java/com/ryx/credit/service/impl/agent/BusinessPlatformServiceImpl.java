@@ -303,12 +303,31 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     if(StringUtils.isBlank(item.getBusParent()))
                         throw new ProcessException("直签上级不能为空");
                 }
-                agentBusInfos.add(item);
+                //代理商选择上级代理商时添加限制 不能选择同级别代理商为上级
+                if (StringUtils.isNotBlank(item.getBusParent())) {
+                    //获取上级代理商类型
+                    AgentBusInfo busInfo = agentBusinfoService.getById(item.getBusParent());
+                    if (item.getBusType().equals(BusType.ZQ.key) || item.getBusType().equals(BusType.ZQBZF.key) || item.getBusType().equals(BusType.ZQZF.key)) {
+                        if (busInfo.getBusType().equals(BusType.ZQ.key) || busInfo.getBusType().equals(BusType.ZQZF.key) || busInfo.getBusType().equals(BusType.ZQBZF.key)) {
+                            throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                        }
+                    }
+                    if (item.getBusType().equals(BusType.YDX.key)) {
+                        if (busInfo.getBusType().equals(BusType.ZQ.key) || busInfo.getBusType().equals(BusType.YDX.key)
+                                || busInfo.getBusType().equals(BusType.ZQZF.key) || busInfo.getBusType().equals(BusType.ZQBZF.key)) {
+                            throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                        }
+                    }
+                    if (item.getBusType().equals(BusType.JGYD.key)) {
+                        if (!busInfo.getBusType().equals(BusType.JG.key)) {
+                            throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                        }
+                    }
+                }
             }
             String json = JsonUtil.objectToJson(agentBusInfos);
             List<AgentBusInfoVo> agentBusInfoVos = JsonUtil.jsonToList(json, AgentBusInfoVo.class);
-            agentEnterService.verifyOrgAndBZYD(agentBusInfoVos);
-//            agentEnterService.verifyOther(agentBusInfoVos);
+            agentEnterService.verifyOrgAndBZYD(agentBusInfoVos, busInfoVoList);
 
             for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
                 AgentBusInfo agbus = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
@@ -396,14 +415,37 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     @Override
     public AgentResult saveBusinessPlatform(AgentVo agentVo) throws ProcessException {
         try {
-
             Agent agent = agentVo.getAgent();
             agent.setId(agentVo.getAgentId());
             //先查询业务是否已添加 有个添加过 全部返回
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
+                if (StringUtils.isBlank(item.getBusPlatform())) {
+                    throw new ProcessException("业务平台不能为空");
+                }
                 if(item.getBusType().equals(BusType.ZQZF.key) || item.getBusType().equals(BusType.ZQBZF.key) || item.getBusType().equals(BusType.ZQ.key) ){
                     if(StringUtils.isBlank(item.getBusParent()))
                         throw new ProcessException("直签上级不能为空");
+                }
+                //代理商选择上级代理商时添加限制 不能选择同级别代理商为上级
+                if (StringUtils.isNotBlank(item.getBusParent())) {
+                    //获取上级代理商类型
+                    AgentBusInfo busInfo = agentBusinfoService.getById(item.getBusParent());
+                    if (item.getBusType().equals(BusType.ZQ.key) || item.getBusType().equals(BusType.ZQBZF.key) || item.getBusType().equals(BusType.ZQZF.key)) {
+                        if (busInfo.getBusType().equals(BusType.ZQ.key) || busInfo.getBusType().equals(BusType.ZQZF.key) || busInfo.getBusType().equals(BusType.ZQBZF.key)) {
+                            throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                        }
+                    }
+                    if (item.getBusType().equals(BusType.YDX.key)) {
+                        if (busInfo.getBusType().equals(BusType.ZQ.key) || busInfo.getBusType().equals(BusType.YDX.key)
+                                || busInfo.getBusType().equals(BusType.ZQZF.key) || busInfo.getBusType().equals(BusType.ZQBZF.key)) {
+                            throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                        }
+                    }
+                    if (item.getBusType().equals(BusType.JGYD.key)) {
+                        if (!busInfo.getBusType().equals(BusType.JG.key)) {
+                            throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                        }
+                    }
                 }
                 item.setAgentId(agent.getId());
                 Boolean busPlatExist = findBusPlatExist(item);
@@ -415,34 +457,30 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 if(PlatformType.RDBPOS.code.equals(platformType.getValue())){
                     //检查手机号是否填写
                     if(StringUtils.isBlank(item.getBusLoginNum())){
-                        throw new ProcessException("瑞大宝登录账号不能为空");
+                        throw new ProcessException("瑞大宝平台登录账号不能为空");
                     }
                     Boolean exist = selectByBusLoginNumExist(item.getBusLoginNum(), agent.getId());
                     if(!exist){
-                        throw new ProcessException("瑞大宝登录账号已入网,请勿重复入网");
+                        throw new ProcessException("瑞大宝平台登录账号已入网,请勿重复入网");
                     }
                     if(!RegexUtil.checkInt(item.getBusLoginNum())){
-                        throw new ProcessException("瑞大宝登录账号必须为数字");
+                        throw new ProcessException("瑞大宝平台登录账号必须为数字");
                     }
                 }
                 if(PlatformType.RHPOS.code.equals(platformType.getValue())){
                     //检查手机号是否填写
                     if(StringUtils.isBlank(item.getBusLoginNum())){
-                        throw new ProcessException("瑞花宝登录账号不能为空");
+                        throw new ProcessException("瑞花宝平台登录账号不能为空");
                     }
                     if(!RegexUtil.checkInt(item.getBusLoginNum())){
-                        throw new ProcessException("瑞花宝登录账号必须是数字");
+                        throw new ProcessException("瑞花宝平台登录账号必须是数字");
                     }
                 }
             }
             List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByAgenId(agent.getId());
-            for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
-                agentBusInfos.add(item);
-            }
             String json = JsonUtil.objectToJson(agentBusInfos);
             List<AgentBusInfoVo> agentBusInfoVos = JsonUtil.jsonToList(json, AgentBusInfoVo.class);
-            agentEnterService.verifyOrgAndBZYD(agentBusInfoVos);
-//            agentEnterService.verifyOther(agentBusInfoVos);
+            agentEnterService.verifyOrgAndBZYD(agentBusInfoVos, agentVo.getBusInfoVoList());
 
             for (AgentContractVo item : agentVo.getContractVoList()) {
                 if (StringUtils.isNotBlank(agent.getcUser()) && StringUtils.isNotBlank(agent.getId())) {
