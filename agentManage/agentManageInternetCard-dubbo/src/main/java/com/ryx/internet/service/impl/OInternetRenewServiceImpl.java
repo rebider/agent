@@ -253,11 +253,6 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         if(iccids.size()==0){
             throw new MessageException("请选择要续费的卡");
         }
-        if(internetRenew.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.XXBK.getValue())) {
-            if (oCashReceivablesVoList.size() == 0) {
-                throw new MessageException("线下打款必须填写打款记录");
-            }
-        }
         Agent agent = agentService.getAgentById(agentId);
         String agName = "";
         if(null!=agent){
@@ -291,6 +286,18 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 throw new MessageException("缺少参数配置");
             }
             internetRenew.setSumOffsetAmt(renewCardCount.multiply(new BigDecimal(offsetAmt.getdItemvalue())));
+        }
+        if(internetRenew.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.XXBK.getValue())) {
+            if (oCashReceivablesVoList.size() == 0) {
+                throw new MessageException("线下打款必须填写打款记录");
+            }
+            BigDecimal xxdkAmount = BigDecimal.ZERO; //总打款金额
+            for (OCashReceivablesVo oCashReceivablesVo : oCashReceivablesVoList) {
+                xxdkAmount = xxdkAmount.add(oCashReceivablesVo.getAmount());
+            }
+            if(xxdkAmount.compareTo(internetRenew.getSuppAmt())<0){
+                throw new MessageException("线下打款必须大于应补款金额");
+            }
         }
         internetRenewMapper.insert(internetRenew);
 
@@ -341,6 +348,10 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             oInternetRenewDetail.setOrderId(oInternetCard.getOrderId());
             oInternetRenewDetail.setSnNum(oInternetCard.getSnNum());
             oInternetRenewDetail.setInternetCardNum(oInternetCard.getInternetCardNum());
+            Date earlyDate = DateUtil.format("1900-01-01 00:00:00");
+            if(oInternetCard.getOpenAccountTime().getTime()<earlyDate.getTime()){
+                throw new MessageException("第"+i+"个开户日期不正确请联系相关部门");
+            }
             oInternetRenewDetail.setOpenAccountTime(oInternetCard.getOpenAccountTime());
             if(oInternetCard.getExpireTime()==null){
                 throw new MessageException("第"+i+"个缺少到期时间");
@@ -392,9 +403,8 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         } catch (Exception e) {
             throw new MessageException(e.getMessage());
         }
-        String workId = dictOptionsService.getApproveVersion("cardRenew");
         //启动审批
-        String proce = activityService.createDeloyFlow(null, workId, null, null,null);
+        String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("cardRenew"), null, null,null);
         if (proce == null) {
             throw new MessageException("审批流启动失败!");
         }
