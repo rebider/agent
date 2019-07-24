@@ -526,6 +526,8 @@ public class InternetCardServiceImpl implements InternetCardService {
         if(internetCard.getOpenAccountTime()!=null){
             Date date = DateUtil.aYearAgoDate(internetCard.getOpenAccountTime());
             internetCard.setExpireTime(date);
+            internetCard.setRenew(BigDecimal.ZERO);
+            internetCard.setStop(BigDecimal.ZERO);
         }
         if(StringUtils.isNotBlank(internetCard.getAgentName())){
             Agent agent = agentService.getAgentByName(internetCard.getAgentName());
