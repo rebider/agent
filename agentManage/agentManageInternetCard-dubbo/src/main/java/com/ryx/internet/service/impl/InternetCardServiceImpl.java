@@ -663,7 +663,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             if (StringUtils.isBlank(retIdentifier)) {
                 log.info("物联网卡定时任务处理中");
             }
-           // 1. 检测是否续费为否，状态为正常的，当月的，更新“是否需续费”为是
+           // 1. 检测是否续费为否，状态为正常的，下个月的，更新“是否需续费”为是
             Map<String,Object> reqMap = new HashMap<>();
             reqMap.put("renew",Status.STATUS_0.status);//否
             reqMap.put("newRenew",Status.STATUS_1.status);
@@ -679,6 +679,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             Map<String,Object> reqRenewMap = new HashMap<>();
             reqRenewMap.put("renewStatus",InternetRenewStatus.WXF.getValue());
             reqRenewMap.put("expireTime",DateUtil.getDateAfter(new Date(),-5));
+            reqRenewMap.put("nowTime",DateUtil.format(new Date(),"yyyy-MM-dd"));
             reqRenewMap.put("stop",Status.STATUS_1.status);
             reqRenewMap.put("oldStop",Status.STATUS_0.status);
             int j = internetCardMapper.selectInternetCardStopCount(reqRenewMap);
