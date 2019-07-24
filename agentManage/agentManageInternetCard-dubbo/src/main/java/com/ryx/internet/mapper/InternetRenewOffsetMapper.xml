@@ -308,4 +308,15 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="selectOffsetFinish" parameterType="map" resultMap="BaseResultMap">
+    select * from O_INTERNET_RENEW_OFFSET i
+    <where>
+        i.status=1
+        and i.OFFSET_AMT = i.ALREADY_OFFSET_AMT
+        and clean_status = #{map.cleanStatus,jdbcType=VARCHAR}
+        and process_date = #{map.processDate,jdbcType=VARCHAR}
+    </where>
+  </select>
+
 </mapper>
