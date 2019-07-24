@@ -77,7 +77,8 @@ public enum DictGroup {
     ORDER_RETURN("订单退货业务选择下一级审批人参数"),
     APPROVE_MODE("审批流程图当前节点"),
 
-    ORG_TYPE("机构类型");
+    ORG_TYPE("机构类型"),
+    REPORT_STATUS("报备状态");
 
     public String  msg;
 

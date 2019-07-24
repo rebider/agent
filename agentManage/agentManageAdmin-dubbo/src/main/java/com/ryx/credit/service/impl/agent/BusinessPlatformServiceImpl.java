@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -156,7 +157,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         if (agentBusInfo.getCloReviewStatus() != null) {
             reqMap.put("cloReviewStatus", agentBusInfo.getCloReviewStatus());
         }
-        if (agentBusInfo.getBusType() != null) {
+        if (StringUtils.isNotBlank(agentBusInfo.getBusType())) {
             reqMap.put("busType", agentBusInfo.getBusType());
         }
         if ( StringUtils.isNotBlank(approveTimeStart)) {
@@ -241,12 +242,14 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             return agentBusInfo;
         } else {
             agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(id);
-            PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
-            if(null!=platForm){
-                agentBusInfo.setBusPlatformType(platForm.getPlatformType());
+            if(null!=agentBusInfo){
+                PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
+                if(null!=platForm){
+                    agentBusInfo.setBusPlatformType(platForm.getPlatformType());
+                }
+                Map<String,Object> parentInfo = agentBusInfoMapper.queryBusInfoParent(FastMap.fastMap("id",agentBusInfo.getId()));
+                agentBusInfo.setParentInfo(parentInfo);
             }
-            Map<String,Object> parentInfo = agentBusInfoMapper.queryBusInfoParent(FastMap.fastMap("id",agentBusInfo.getId()));
-            agentBusInfo.setParentInfo(parentInfo);
         }
         return agentBusInfo;
     }
@@ -652,16 +655,19 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
 
     @Override
     public List<BusinessOutVo> exportAgent(Map map, Long userId) throws ParseException {
-
         List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
         map.put("platfromPerm",platfromPerm);
         map.put("status", Status.STATUS_1.status);
-
+        map.put("agStatus", AgStatus.Approved.name());
         List<BusinessOutVo> agentoutVos = agentBusInfoMapper.excelAgent(map);
         List<Dict> BUS_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name());
         List<Dict> BUS_SCOPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name());
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         if (null != agentoutVos && agentoutVos.size() > 0)
             for (BusinessOutVo agentoutVo : agentoutVos) {//类型
+                if(null!=agentoutVo.getApproveTime()){
+                    agentoutVo.setTime(df.format(agentoutVo.getApproveTime()));
+                }
                 if (StringUtils.isNotBlank(agentoutVo.getBusType()) && !agentoutVo.getBusType().equals("null")) {
                     for (Dict dict : BUS_TYPE) {
                         if (null!=dict  &&  agentoutVo.getBusType().equals(dict.getdItemvalue())){

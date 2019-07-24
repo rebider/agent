@@ -61,6 +61,16 @@ public class TerminalTransferDetail implements Serializable{
 
     private String busId;
 
+    private String buttJointPersonName;
+
+    public String getButtJointPersonName() {
+        return buttJointPersonName;
+    }
+
+    public void setButtJointPersonName(String buttJointPersonName) {
+        this.buttJointPersonName = buttJointPersonName;
+    }
+
     public String getBusId() {
         return busId;
     }
