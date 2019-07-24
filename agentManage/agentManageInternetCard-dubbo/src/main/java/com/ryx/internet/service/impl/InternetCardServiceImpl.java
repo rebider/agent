@@ -71,6 +71,10 @@ public class InternetCardServiceImpl implements InternetCardService {
     private OInternetCardMerchMapper internetCardMerchMapper;
     @Autowired
     private OInternetRenewDetailMapper internetRenewDetailMapper;
+    @Autowired
+    private InternetRenewOffsetMapper internetRenewOffsetMapper;
+
+
 
     @Override
     public PageInfo internetCardList(OInternetCard internetCard, Page page,String agentId){
@@ -82,11 +86,19 @@ public class InternetCardServiceImpl implements InternetCardService {
         for (OInternetCard oInternetCard : oInternetCards) {
             Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),oInternetCard.getManufacturer());
             if(null!=dict)
-                oInternetCard.setManufacturer(dict.getdItemname());
+            oInternetCard.setManufacturer(dict.getdItemname());
             oInternetCard.setIccidNumId(oInternetCard.getIccidNum());
             if(null==oInternetCard.getInternetCardStatus()){
                 oInternetCard.setRenewButton("0");
                 continue;
+            }
+            if(null==oInternetCard.getRenew()){
+                oInternetCard.setRenewButton("0");
+                continue;
+            }
+            //是否需续费为是,才展示按钮
+            if(oInternetCard.getRenew().compareTo(BigDecimal.ONE)==0){
+                oInternetCard.setRenewButton("1");
             }
             if((oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NORMAL.getValue())==0 || oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NOACTIVATE.getValue())==0 )
                     && !oInternetCard.getRenewStatus().equals(InternetRenewStatus.XFZ.getValue())){
@@ -636,7 +648,8 @@ public class InternetCardServiceImpl implements InternetCardService {
      * 定时任务，
      * 1. 检测是否续费为否，状态为正常的，当月的，更新“是否需续费”为是
      * 2. 到期日减去5天  还未续费的 更新“是否需关停”为是
-     * 3. 处理未处理的导入记录
+     * 3. 预轧差金额等于已轧差金额 清算状态等于2（轧差完毕） 更新续费明细表续费状态等于YXF（已续费）
+     * 4. 处理未处理的导入记录
      */
     @Override
     public void taskDisposeInternetCard(){
@@ -655,9 +668,9 @@ public class InternetCardServiceImpl implements InternetCardService {
             int i = internetCardMapper.selectInternetCardExpireCount(reqMap);
             if(i>0){
                 int updateCount = internetCardMapper.updateInternetCardExpire(reqMap);
-                log.info("taskDisposeInternetCard检测是否续费,本次更次了数据条数:{}",updateCount);
+                log.info("taskDisposeInternetCard：1检测是否续费,本次更次了数据条数:{}",updateCount);
             }else{
-                log.info("taskDisposeInternetCard检测是否续费,暂无更新数据:{}",i);
+                log.info("taskDisposeInternetCard：1检测是否续费,暂无更新数据:{}",i);
             }
             //2. 到期日减去5天  还未续费的 更新“是否需关停”为是
             Map<String,Object> reqRenewMap = new HashMap<>();
@@ -668,12 +681,31 @@ public class InternetCardServiceImpl implements InternetCardService {
             int j = internetCardMapper.selectInternetCardStopCount(reqRenewMap);
             if(j>0){
                 int updateCount = internetCardMapper.updateInternetCardStop(reqRenewMap);
-                log.info("taskDisposeInternetCard到期日减去5天还未续费的,本次更次了数据条数:{}",updateCount);
+                log.info("taskDisposeInternetCard：2到期日减去5天还未续费的,本次更次了数据条数:{}",updateCount);
             }else{
-                log.info("taskDisposeInternetCard到期日减去5天还未续费的,暂无更新数据:{}",i);
+                log.info("taskDisposeInternetCard：2到期日减去5天还未续费的,暂无更新数据:{}",i);
             }
-
-            //3.处理未处理的导入记录
+            //3. 预轧差金额等于已轧差金额 清算状态等于2（轧差完毕） 更新续费明细表续费状态等于YXF（已续费）
+            Map<String,Object> offsetreqMap = new HashMap<>();
+            offsetreqMap.put("cleanStatus",InternetCleanStatus.TWO.getValue());
+            offsetreqMap.put("processDate",DateUtil.format(new Date(), DateUtil.DATE_FORMAT_3));//处理时间为今天的
+            List<InternetRenewOffset> internetRenewOffsets = internetRenewOffsetMapper.selectOffsetFinish(offsetreqMap);
+            if(internetRenewOffsets!=null && internetRenewOffsets.size()!=0){
+                for (InternetRenewOffset internetRenewOffset : internetRenewOffsets) {
+                    OInternetRenewDetail oInternetRenewDetail1 = internetRenewDetailMapper.selectByPrimaryKey(internetRenewOffset.getRenewDetailId());
+                    if(oInternetRenewDetail1.getRenewStatus().equals(InternetRenewStatus.YXF.getValue())){
+                        log.info("taskDisposeInternetCard:3.已是续费状态,退出");
+                        continue;
+                    }
+                    OInternetRenewDetail oInternetRenewDetail = new OInternetRenewDetail();
+                    oInternetRenewDetail.setId(internetRenewOffset.getRenewDetailId());
+                    oInternetRenewDetail.setRenewStatus(InternetRenewStatus.YXF.getValue());
+                    internetRenewDetailMapper.updateByPrimaryKeySelective(oInternetRenewDetail);
+                }
+            }else{
+                log.info("taskDisposeInternetCard:3.没有轧差数据,退出");
+            }
+            //4.处理未处理的导入记录
             Map map = new HashMap<>();
             map.put("importStatus",OInternetCardImportStatus.UNTREATED.getValue());
             Page page = new Page(0, 10);
