@@ -678,7 +678,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             //2. 到期日减去5天  还未续费的 更新“是否需关停”为是
             Map<String,Object> reqRenewMap = new HashMap<>();
             reqRenewMap.put("renewStatus",InternetRenewStatus.WXF.getValue());
-            reqRenewMap.put("expireTime",DateUtil.getDateAfter(new Date(),-5));
+            reqRenewMap.put("expireTime",DateUtil.getDateAfter(new Date(),+5));
             reqRenewMap.put("nowTime",DateUtil.format(new Date(),"yyyy-MM-dd"));
             reqRenewMap.put("stop",Status.STATUS_1.status);
             reqRenewMap.put("oldStop",Status.STATUS_0.status);
