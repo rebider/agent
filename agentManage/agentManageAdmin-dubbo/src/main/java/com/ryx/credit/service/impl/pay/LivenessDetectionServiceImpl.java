@@ -187,7 +187,7 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
             result = "{'ExecMsg':'认证成功','ValidateStatus':'00'}";
         }
         log.info("--------身份证认证返回参数:{}------", result);
-        Map resultMap = JsonUtils.parseJSON2Map(result);
+        Map resultMap = JSONObject.parseObject(result);
         return resultMap;
     }
 
@@ -220,10 +220,10 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
         if(EnvironmentUtil.isProduction()){
             result = HttpPostUtil.postForJSON(THREEELEMENT_DETECTION_URL, paramsJson);
         }else{
-            result = FastMap.fastMap("ResultMsg","认证成功").putKeyV("Result","00").toString();
+            result = JSONObject.toJSONString(FastMap.fastMap("ResultMsg","认证成功").putKeyV("ResponseCode","00").putKeyV("Result","00"));
         }
         log.info("--------三要素认证返回参数:{}------", result);
-        Map resultMap = JsonUtils.parseJSON2Map(result);
+        Map resultMap = JSONObject.parseObject(result);
         return resultMap;
     }
 
