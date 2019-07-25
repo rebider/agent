@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.agent.netInPort;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.OrgType;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
@@ -36,7 +37,9 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
     private static Logger log = LoggerFactory.getLogger(AgentHttpRHBPosServiceImpl.class);
 
     private static final String rhbReqUrl = AppConfig.getProperty("rhb_req_url");
-    private static final String rhbKey = "4SF6BJ3D8TDOT8NOCZ8T7P1K";
+    private static final String rhbKey = "QIANTUO2019DIRECTSIGNATURE";
+    private static final String iv = "QIANTUO1";
+
     @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
     @Autowired
@@ -96,11 +99,10 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
         AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
         if(agentColinfo==null){
             log.info("收款账户为空:{},{}",agent.getId(), agentBusInfo.getId());
-        }else{
             agentColinfo = new AgentColinfo();
         }
         //00:对公账户，01：对私账户
-        resultMap.put("acctType",agentColinfo.getCloType().compareTo(BigDecimal.ONE)==0?"00":"01");
+        resultMap.put("acctType",agentColinfo.getCloType()==null?"":agentColinfo.getCloType().compareTo(BigDecimal.ONE)==0?"00":"01");
         resultMap.put("credName",agent.getAgLegal());//法人姓名
         resultMap.put("credNo",agent.getAgLegalCernum());//法人身份证
         resultMap.put("credPhone",agent.getAgLegalMobile());//法人手机号
@@ -125,16 +127,26 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
     @Override
     public AgentResult httpRequestNetIn(Map<String,Object> paramMap)throws Exception{
         try {
+
             String json = JsonUtil.objectToJson(paramMap);
-            String iv = "13002542";
-            String encode = DES3.encode(json, rhbKey, iv);
-            String httpResult = HttpClientUtil.doPostJson(rhbReqUrl, json);
-
-
+            String reqParamEncrypt = Des3Util.Encrypt(json, rhbKey, iv.getBytes());
+            log.info("通知瑞花宝入网请求参数：{}",json);
+            log.info("通知瑞花宝入网请求参数加密：{}",reqParamEncrypt);
+            String httpResult = HttpClientUtil.sendHttpPost(rhbReqUrl, reqParamEncrypt);
+            String reqParamDecrypt = Des3Util.Decrypt(httpResult, rhbKey, iv.getBytes());
+            log.info("通知瑞大宝入网返回参数：{}",reqParamDecrypt);
+            JSONObject respXMLObj = JSONObject.parseObject(reqParamDecrypt);
+            if (respXMLObj.getString("MSG_CODE").equals("0000")){
+                return AgentResult.ok(respXMLObj);
+            }else{
+                AppConfig.sendEmails(httpResult, "入网通知瑞花宝失败报警");
+                throw new Exception(reqParamDecrypt);
+            }
         }catch (Exception e){
-            e.getStackTrace();
+            AppConfig.sendEmails("通知瑞花宝请求超时："+ MailUtil.printStackTrace(e), "入网通知瑞花宝失败报警");
+            log.info("http请求超时:{}",e.getLocalizedMessage());
+            throw new Exception("http请求超时:"+e.getLocalizedMessage());
         }
-        return AgentResult.ok();
     }
 
 
@@ -216,15 +228,26 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
 
     @Override
     public AgentResult agencyLevelUpdateChange(Map data) throws Exception {
-        try{
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            AppConfig.sendEmails("http请求超时:"+ MailUtil.printStackTrace(e), "升级通知POS失败报警");
-            throw new Exception("http请求超时");
+        try {
+            String json = JsonUtil.objectToJson(data);
+            String reqParamEncrypt = Des3Util.Encrypt(json, rhbKey, iv.getBytes());
+            log.info("通知瑞花宝入网修改请求参数：{}",json);
+            log.info("通知瑞花宝入网修改请求参数加密：{}",reqParamEncrypt);
+            String httpResult = HttpClientUtil.sendHttpPost(rhbReqUrl, reqParamEncrypt);
+            String reqParamDecrypt = Des3Util.Decrypt(httpResult, rhbKey, iv.getBytes());
+            log.info("通知瑞大宝入网修改返回参数：{}",reqParamDecrypt);
+            JSONObject respXMLObj = JSONObject.parseObject(reqParamDecrypt);
+            if (respXMLObj.getString("MSG_CODE").equals("0000")){
+                return AgentResult.ok(respXMLObj);
+            }else{
+                AppConfig.sendEmails(httpResult, "入网修改通知瑞花宝失败报警");
+                throw new Exception(reqParamDecrypt);
+            }
+        }catch (Exception e){
+            AppConfig.sendEmails("通知瑞花宝请求超时："+ MailUtil.printStackTrace(e), "入网修改通知瑞花宝失败报警");
+            log.info("http请求超时:{}",e.getLocalizedMessage());
+            throw new Exception("http请求超时:"+e.getLocalizedMessage());
         }
-        return null;
     }
 
 
@@ -299,8 +322,26 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
     @Override
     public AgentResult httpRequestNetInUpdate(Map<String, Object> paramMap) throws Exception {
 
-
-        return null;
+        try {
+            String json = JsonUtil.objectToJson(paramMap);
+            String reqParamEncrypt = Des3Util.Encrypt(json, rhbKey, iv.getBytes());
+            log.info("通知瑞花宝入网升级请求参数：{}",json);
+            log.info("通知瑞花宝入网升级请求参数加密：{}",reqParamEncrypt);
+            String httpResult = HttpClientUtil.sendHttpPost(rhbReqUrl, reqParamEncrypt);
+            String reqParamDecrypt = Des3Util.Decrypt(httpResult, rhbKey, iv.getBytes());
+            log.info("通知瑞大宝入网升级返回参数：{}",reqParamDecrypt);
+            JSONObject respXMLObj = JSONObject.parseObject(reqParamDecrypt);
+            if (respXMLObj.getString("MSG_CODE").equals("0000")){
+                return AgentResult.ok(respXMLObj);
+            }else{
+                AppConfig.sendEmails(httpResult, "入网升级通知瑞花宝失败报警");
+                throw new Exception(reqParamDecrypt);
+            }
+        }catch (Exception e){
+            AppConfig.sendEmails("通知瑞花宝请求超时："+ MailUtil.printStackTrace(e), "入网升级通知瑞花宝失败报警");
+            log.info("http请求超时:{}",e.getLocalizedMessage());
+            throw new Exception("http请求超时:"+e.getLocalizedMessage());
+        }
     }
 
 
