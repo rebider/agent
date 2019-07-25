@@ -443,8 +443,8 @@
       <if test="proName!=null and proName!=''"> and os.pro_name like concat(concat( '%', #{proName}),'%')</if>
       <if test="sendStatus!=null and sendStatus!=''"> and L.SEND_STATUS=#{sendStatus}</if>
       <if test="fhBeginTime!=null and fhBeginTime!='' and fhEndTime!='' and fhEndTime!=null"> and (to_char(L.SEND_DATE,'YYYY-MM-DD') between #{fhBeginTime} and #{fhEndTime}) </if>
-      <if test="snNum!=null and snNum!=''"> and (L.SN_BEGIN_NUM like concat(concat( '%', #{snNum} ),'%')
-        or L.SN_END_NUM like concat(concat( '%', #{snNum} ),'%')) </if>
+      <if test="snNum!=null and snNum!=''">  and (L.SN_BEGIN_NUM &lt;=#{snNum} and L.SN_END_NUM &gt;= #{snNum})
+      </if>
     </where>
   </sql>
 
