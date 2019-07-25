@@ -210,6 +210,85 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
     }
 
 
+
+    public static AgentResult httpForRJPos(String orgId,String supDorgId)throws Exception{
+        try {
+            String cooperator = com.ryx.credit.util.Constants.cooperator;
+            String charset = "UTF-8"; // 字符集
+            String tranCode = "ORG011"; // 交易码
+            String reqMsgId = UUID.randomUUID().toString().replace("-", ""); // 请求流水
+            String reqDate = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"); // 请求时间
+
+            JSONObject jsonParams = new JSONObject();
+            JSONObject data = new JSONObject();
+            jsonParams.put("version", "1.0.0");
+            jsonParams.put("msgType", "01");
+            jsonParams.put("reqDate", reqDate);
+            data.put("orgId",orgId);
+            data.put("supDorgId",supDorgId);
+
+            jsonParams.put("data", data);
+            String plainXML = jsonParams.toString();
+            // 请求报文加密开始
+            String keyStr = AESUtil.getAESKey();
+            byte[] plainBytes = plainXML.getBytes(charset);
+            byte[] keyBytes = keyStr.getBytes(charset);
+            String encryptData = new String(Base64.encodeBase64((AESUtil.encrypt(plainBytes, keyBytes, "AES", "AES/ECB/PKCS5Padding", null))), charset);
+            String signData = new String(Base64.encodeBase64(RSAUtil.digitalSign(plainBytes, Constants.privateKey, "SHA1WithRSA")), charset);
+            String encrtptKey = new String(org.apache.commons.codec.binary.Base64.encodeBase64(RSAUtil.encrypt(keyBytes, Constants.publicKey, 2048, 11, "RSA/ECB/PKCS1Padding")), charset);
+            // 请求报文加密结束
+
+            Map<String, String> map = new HashMap<>();
+            map.put("encryptData", encryptData);
+            map.put("encryptKey", encrtptKey);
+            map.put("cooperator", cooperator);
+            map.put("signData", signData);
+            map.put("tranCode", tranCode);
+            map.put("reqMsgId", reqMsgId);
+
+            log.info("RJPOS机构统计信息查询请求参数:{}",map);
+            String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("agent_rjpos_notify_url"), map);
+            JSONObject jsonObject = JSONObject.parseObject(httpResult);
+            if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
+                System.out.println("请求异常======" + httpResult);
+                throw new Exception("http请求异常");
+            } else {
+                String resEncryptData = jsonObject.getString("encryptData");
+                String resEncryptKey = jsonObject.getString("encryptKey");
+                byte[] decodeBase64KeyBytes = Base64.decodeBase64(resEncryptKey.getBytes(charset));
+                byte[] merchantAESKeyBytes = RSAUtil.decrypt(decodeBase64KeyBytes, Constants.privateKey, 2048, 11, "RSA/ECB/PKCS1Padding");
+                byte[] decodeBase64DataBytes = Base64.decodeBase64(resEncryptData.getBytes(charset));
+                byte[] merchantXmlDataBytes = AESUtil.decrypt(decodeBase64DataBytes, merchantAESKeyBytes, "AES", "AES/ECB/PKCS5Padding", null);
+                String respXML = new String(merchantXmlDataBytes, charset);
+                log.info("RJPOS机构统计信息查询返回参数：{}",respXML);
+
+                // 报文验签
+                String resSignData = jsonObject.getString("signData");
+                byte[] signBytes = Base64.decodeBase64(resSignData);
+                if (!RSAUtil.verifyDigitalSign(respXML.getBytes(charset), signBytes, Constants.publicKey, "SHA1WithRSA")) {
+                    System.out.println("签名验证失败");
+                } else {
+                    System.out.println("签名验证成功");
+                    Map<String, Object> respXMLMap = JsonUtil.jsonToMap(respXML);
+                    String respType = String.valueOf(respXMLMap.get("respType"));
+                    Map<String, Object> resultMap = new HashMap<>();
+                    if(respType.equals("S")){
+                        resultMap = JSONArray.parseObject(String.valueOf(respXMLMap.get("data")));
+                    }else{
+                        return AgentResult.failObj(String.valueOf(respXMLMap.get("respMsg")));
+                    }
+                    return AgentResult.ok(resultMap);
+                }
+                return new AgentResult(500,"http请求异常","");
+            }
+        } catch (Exception e) {
+            log.info("http请求超时:{}",e.getMessage());
+            e.printStackTrace();
+            throw new Exception(e);
+        }
+    }
+
+
     @Override
     public AgentResult posOrgStatistics(String orgId,String termType)throws Exception{
 
@@ -268,6 +347,15 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
                 }
             }
             AgentResult agentResult = httpForRDBpos(orgId);
+            agentResult.setMsg(platformType);
+            return agentResult;
+        }else if(PlatformType.RJPOS.getValue().equals(platformType)){
+            if(StringUtils.isEmpty(orgId)){
+                if(StringUtils.isNotEmpty(parentBusNum)){
+                    orgId = parentBusNum;
+                }
+            }
+            AgentResult agentResult = httpForRJPos(orgId,parentBusNum);
             agentResult.setMsg(platformType);
             return agentResult;
         }else if(PlatformType.RHPOS.getValue().equals(platformType)){
