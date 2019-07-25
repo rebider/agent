@@ -592,4 +592,13 @@
       <if test="map.snNum != null"> and history.sn_num = #{map.snNum} </if>
     </where>
   </sql>
+
+  <!--查询订单物流重复的订单信息-->
+  <select id="queryMultipleOrderLogicInfo" resultType="map">
+    select a.order_id,a.receipt_plan_id, a.w_number ,a.sn_begin_num,a.sn_end_num ,count(a.sn_begin_num)
+    from o_logistics a
+    group by a.order_id, a.receipt_plan_id,a.w_number ,a.sn_begin_num,a.sn_end_num having count(a.sn_begin_num)>1
+    order by a.order_id,a.receipt_plan_id,a.w_number ,a.sn_begin_num,a.sn_end_num
+  </select>
+
 </mapper>

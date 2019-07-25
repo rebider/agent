@@ -10,9 +10,9 @@
 
     <!-- 提供方应用信息，用于计算依赖关系 -->
     <dubbo:application name="pms-dubbo-server"/>
-    <dubbo:provider id="payload" payload="888888888" />
+    <dubbo:provider id="payload" payload="888888888"/>
 
-    <dubbo:registry protocol="zookeeper" address="${zk.server}" group="${zk.group}"  id="myGroup"/>
+    <dubbo:registry protocol="zookeeper" address="${zk.server}" group="${zk.group}" id="myGroup"/>
     <!-- 用dubbo协议在22880端口暴露服务 -->
     <dubbo:protocol name="dubbo" port="${zk.port}"/>
     <dubbo:annotation package="com.ryx.credit.service.*" />
@@ -96,6 +96,7 @@
     <dubbo:service interface="com.ryx.credit.service.order.OCashReceivablesService" ref="oCashReceivablesService"  timeout="1200000" registry="myGroup"/>
     <dubbo:service interface="com.ryx.credit.service.order.IOPdSumService" ref="OPdSumService"  timeout="1200000" registry="myGroup"/>
     <dubbo:service interface="com.ryx.credit.service.order.OLogisticsDetailHService" ref="oLogisticsDetailHService" timeout="1200000" registry="myGroup"/>
+    <dubbo:service interface="com.ryx.credit.service.order.OrderRepairService" ref="orderRepairService" timeout="1200000" registry="${zk.group}"/>
 
     <!-- 基础资源维护-->
     <dubbo:service interface="com.ryx.credit.service.dict.PayCompService" ref="payCompService" timeout="1200000" registry="myGroup"></dubbo:service>
