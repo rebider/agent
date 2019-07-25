@@ -295,8 +295,8 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             for (OCashReceivablesVo oCashReceivablesVo : oCashReceivablesVoList) {
                 xxdkAmount = xxdkAmount.add(oCashReceivablesVo.getAmount());
             }
-            if(xxdkAmount.compareTo(internetRenew.getSuppAmt())<0){
-                throw new MessageException("线下打款必须大于应补款金额");
+            if(xxdkAmount.compareTo(internetRenew.getSuppAmt())!=0){
+                throw new MessageException("线下打款必须等于应补款金额");
             }
         }
         internetRenewMapper.insert(internetRenew);

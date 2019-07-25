@@ -576,12 +576,7 @@
     <where>
       and c.stop = #{map.oldStop}
       and c.renew_status = #{map.renewStatus,jdbcType=VARCHAR}
-      and
-      (
-        TO_CHAR(c.expire_time, 'YYYY-MM-DD') &lt;= #{map.expireTime}
-        or
-        TO_CHAR(c.expire_time, 'YYYY-MM-DD') &lt;= #{map.nowTime}
-      )
+      and TO_CHAR(c.expire_time, 'YYYY-MM-DD') between  #{map.expireTime} and #{map.nowTime}
       and c.status = 1
     </where>
   </sql>
