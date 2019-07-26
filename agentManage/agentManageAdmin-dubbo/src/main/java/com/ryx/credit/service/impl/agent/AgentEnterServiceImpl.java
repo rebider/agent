@@ -91,6 +91,91 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private IResourceService iResourceService;
 
     /**
+     * 代理商入网信息保存
+     * @param agentVo
+     * @return
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    @Override
+    public ResultVO saveAgentInfo(AgentVo agentVo) throws ProcessException{
+
+        try {
+            if (agentVo.getAgent() != null && StringUtils.isNotBlank(agentVo.getAgent().getAgBusLic())) {
+                AgentResult agentResult = agentService.checkAgBusLicIsEst(agentVo.getAgent().getAgName(), agentVo.getAgent().getAgBusLic());
+                if (agentResult.isOK()) {
+                    return ResultVO.fail(agentVo.getAgent().getAgBusLic() + "已存在,编号为：" + agentResult.getData());
+                }
+            }
+            // 保存代理商基础信息
+            Agent agent = agentService.insertAgent(agentVo.getAgent(), agentVo.getAgentTableFile(), agentVo.getAgent().getcUser(), "1");
+            agentVo.setAgent(agent);
+            // 保存缴纳款项信息
+            for (CapitalVo item : agentVo.getCapitalVoList()) {
+                item.setcAgentId(agent.getId());
+                item.setcUser(agent.getcUser());
+                AgentResult res = accountPaidItemService.insertAccountPaid(item, item.getCapitalTableFile(), agentVo.getAgent().getcUser(), false, "1");
+                if (!res.isOK()) {
+                    throw new ProcessException("添加交款项异常");
+                }
+            }
+            // 保存合同信息
+            for (AgentContractVo item : agentVo.getContractVoList()) {
+                item.setcUser(agent.getcUser());
+                item.setAgentId(agent.getId());
+                item.setCloReviewStatus(AgStatus.Create.status);
+                AgentContract agentContract = agentContractService.insertAgentContract(item, item.getContractTableFile(), agent.getcUser(), "1");
+                //添加分管协议
+                if (StringUtils.isNotBlank(item.getAgentAssProtocol())) {
+                    AssProtoColRel rel = new AssProtoColRel();
+                    rel.setAgentBusinfoId(agentContract.getId());
+                    rel.setAssProtocolId(item.getAgentAssProtocol());
+                    AssProtoCol assProtoCol = assProtoColMapper.selectByPrimaryKey(item.getAgentAssProtocol());
+                    if (org.apache.commons.lang.StringUtils.isNotBlank(item.getProtocolRuleValue())) {
+                        String ruleReplace = assProtoCol.getProtocolRule().replace("{}", item.getProtocolRuleValue());
+                        rel.setProtocolRule(ruleReplace);
+                    } else {
+                        rel.setProtocolRule(assProtoCol.getProtocolRule());
+                    }
+                    rel.setProtocolRuleValue(item.getProtocolRuleValue());
+                    if (1 != agentAssProtocolService.addProtocolRel(rel, agent.getcUser())) {
+                        throw new ProcessException("业务分管协议添加失败");
+                    }
+                }
+
+            }
+            //收款账户
+            for (AgentColinfoVo item : agentVo.getColinfoVoList()) {
+                item.setAgentId(agent.getId());
+                item.setcUser(agent.getcUser());
+                item.setCloReviewStatus(AgStatus.Create.status);
+                String agentName = agent.getAgName();
+                String trueName = item.getCloRealname();
+                //对公时 判断收款账户名是否与代理商名称一致 不一致则抛异常提示信息
+                if (item.getCloType().compareTo(new BigDecimal(1)) == 0) {
+                    if (agentName.equals(trueName)) {
+                        item.setAgLegalCernum(agent.getAgLegalCernum());
+                    }
+                }
+                agentColinfoService.agentColinfoInsert(item, item.getColinfoTableFile(), "1");
+            }
+            // 保存业务信息
+            for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
+                item.setcUser(agent.getcUser());
+                item.setAgentId(agent.getId());
+                item.setCloReviewStatus(AgStatus.Create.status);
+                AgentBusInfo db_AgentBusInfo = agentBusinfoService.agentBusInfoInsert(item);
+            }
+        } catch (ProcessException e) {
+            e.printStackTrace();
+            throw e;
+        }catch (Exception e) {
+            e.printStackTrace();
+            throw new ProcessException("商户入网保存失败:"+e.getMessage());
+        }
+        return ResultVO.success("保存成功");
+    }
+
+    /**
      * 商户入网
      *
      * @param agentVo
@@ -109,13 +194,13 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     return ResultVO.fail(agentVo.getAgent().getAgBusLic()+"已存在,编号为："+agentResult.getData());
                 }
             }
-            Agent agent = agentService.insertAgent(agentVo.getAgent(), agentVo.getAgentTableFile(),agentVo.getAgent().getcUser());
+            Agent agent = agentService.insertAgent(agentVo.getAgent(), agentVo.getAgentTableFile(),agentVo.getAgent().getcUser(),null);
             agentVo.setAgent(agent);
             for (AgentContractVo item : agentVo.getContractVoList()) {
                 item.setcUser(agent.getcUser());
                 item.setAgentId(agent.getId());
                 item.setCloReviewStatus(AgStatus.Create.status);
-                AgentContract agentContract = agentContractService.insertAgentContract(item, item.getContractTableFile(), agent.getcUser());
+                AgentContract agentContract = agentContractService.insertAgentContract(item, item.getContractTableFile(), agent.getcUser(),null);
                 //添加分管协议
                 if (StringUtils.isNotBlank(item.getAgentAssProtocol())) {
                     AssProtoColRel rel = new AssProtoColRel();
@@ -146,7 +231,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 }
                 item.setcAgentId(agent.getId());
                 item.setcUser(agent.getcUser());
-                AgentResult res = accountPaidItemService.insertAccountPaid(item, item.getCapitalTableFile(), agentVo.getAgent().getcUser(),false);
+                AgentResult res = accountPaidItemService.insertAccountPaid(item, item.getCapitalTableFile(), agentVo.getAgent().getcUser(),false,null);
                 if (!res.isOK()) {
                     throw new ProcessException("添加交款项异常");
                 }
@@ -199,7 +284,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                         throw new ProcessException("收款账户名与代理商名称不一致");
                     }
                 }
-                agentColinfoService.agentColinfoInsert(item, item.getColinfoTableFile());
+                agentColinfoService.agentColinfoInsert(item, item.getColinfoTableFile(),null);
             }
             //判断平台是否重复
             List hav = new ArrayList();
