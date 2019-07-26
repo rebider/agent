@@ -412,9 +412,9 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                     Map<String, Object> reqMap = new HashMap<>();
                     reqMap.put("agentBusInfo",agentBusInfo);
                     reqMap.put("agent",agent);
+                    reqMap.put("platForm",platForm);
                     record = agentPlatFormSynParam(record, agentBusInfo, notifyType);
                     if(PlatformType.whetherPOS(platForm.getPlatformType())){
-                        reqMap.put("platForm",platForm);
                         paramMap = agentHttpPosServiceImpl.packageParamUpdate(reqMap);
                     }else if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
                         paramMap = agentHttpMposServiceImpl.packageParamUpdate(reqMap);
@@ -482,7 +482,8 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                     log.info("升级开户接口{}平台编号不为空走升级接口,获取请求参数",agentBusInfo.getBusNum());
                     FastMap fastMap = FastMap.fastSuccessMap()
                             .putKeyV("agentBusinfoId", agentBusInfo.getId())
-                            .putKeyV("processingId", busId);
+                            .putKeyV("processingId", busId)
+                            .putKeyV("platForm", platForm);
                     if(PlatformType.whetherPOS(platForm.getPlatformType())){
                         req_data = agentHttpPosServiceImpl.agencyLevelUpdateChangeData(fastMap);
                     }else if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
