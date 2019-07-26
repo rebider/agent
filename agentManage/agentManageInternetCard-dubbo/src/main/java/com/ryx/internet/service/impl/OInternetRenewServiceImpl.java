@@ -295,8 +295,11 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             for (OCashReceivablesVo oCashReceivablesVo : oCashReceivablesVoList) {
                 xxdkAmount = xxdkAmount.add(oCashReceivablesVo.getAmount());
             }
-            if(xxdkAmount.compareTo(internetRenew.getSuppAmt())<0){
-                throw new MessageException("线下打款必须大于应补款金额");
+            if(xxdkAmount.compareTo(internetRenew.getSuppAmt())!=0){
+                throw new MessageException("线下打款必须等于应补款金额");
+            }
+            if (StringUtils.isBlank(internetRenew.getFiles())) {
+                throw new MessageException("线下打款必须上传附件");
             }
         }
         internetRenewMapper.insert(internetRenew);
@@ -522,13 +525,13 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
             }
             if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
-                //如果线下补款,审批通过直接已付款,否则部分付款
-                if(oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.XXBK.getValue())){
+                //如果线下补款,审批通过直接已付款,否则未续费
+                if(oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.XXBK.getValue()) || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue())){
                     oInternetRenewDetail.setRenewStatus(InternetRenewStatus.YXF.getValue());
                     oInternetCard.setRenewStatus(InternetRenewStatus.YXF.getValue());
                 }else{
-                    oInternetRenewDetail.setRenewStatus(InternetRenewStatus.BFXF.getValue());
-                    oInternetCard.setRenewStatus(InternetRenewStatus.BFXF.getValue());
+                    oInternetRenewDetail.setRenewStatus(InternetRenewStatus.WXF.getValue());
+                    oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
                 }
                 oInternetCard.setStop(Status.STATUS_0.status);
                 oInternetCard.setRenew(Status.STATUS_0.status);
