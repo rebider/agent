@@ -2923,7 +2923,7 @@ public class OrderServiceImpl implements OrderService {
 
         if (oReceiptPro_db.getReceiptProStatus().compareTo(OReceiptStatus.DISPATCHED_ORDER.code) == 0) {
             logger.info("用户{}修改{},{},更新发货商品失败请重试", oReceiptPro.getuUser(), oReceiptPro.getId(), oReceiptPro.getProNum());
-            return AgentResult.fail("发货商品已排单禁止修改");
+            return AgentResult.fail("该条信息已经排单");
         }
 
         if (null != oReceiptPro.getProNum()) {
@@ -3422,7 +3422,7 @@ public class OrderServiceImpl implements OrderService {
         oReceiptPro.setStatus(Status.STATUS_0.status);
         if (oReceiptPro_db.getReceiptProStatus().compareTo(OReceiptStatus.DISPATCHED_ORDER.code) == 0) {
             logger.info("用户{}删除{},{},删除发货商品失败请重试", oReceiptPro.getuUser(), oReceiptPro.getId(), oReceiptPro.getProNum());
-            return AgentResult.fail("发货商品已排单禁止删除");
+            return AgentResult.fail("该条信息已经排单");
         }
 
         if (1 != oReceiptProMapper.updateByPrimaryKeySelective(oReceiptPro)) {

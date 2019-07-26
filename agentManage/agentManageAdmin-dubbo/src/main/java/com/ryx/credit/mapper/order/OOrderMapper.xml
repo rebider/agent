@@ -453,7 +453,8 @@
     nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)
     )as dpd,
     nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0) pro_num,
-    c.platform_name
+    c.platform_name,
+    nvl((select sum(PLAN_PRO_NUM) from O_RECEIPT_PLAN plan where plan.order_id=o.id and plan.status=1),0)as total
     from o_order o
     left join a_agent b on o.agent_id = b.id and b.status = 1
     left join a_agent_businfo e on e.agent_id = o.agent_id and o.bus_id = e.id and e.status = 1
@@ -544,7 +545,8 @@
     nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)
     )as dpd,
     nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0) pro_num,
-    c.platform_name
+    c.platform_name,
+    nvl((select sum(PLAN_PRO_NUM) from O_RECEIPT_PLAN plan where plan.order_id=o.id and plan.status=1),0)as total
     from  o_order o
     left join a_agent b on o.agent_id = b.id and b.status = 1
     left join a_agent_businfo e on e.agent_id = o.agent_id and o.bus_id = e.id and e.status = 1
@@ -643,7 +645,8 @@
     nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)
     )as dpd,
     nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0) pro_num,
-    c.platform_name
+    c.platform_name,
+    nvl((select sum(PLAN_PRO_NUM) from O_RECEIPT_PLAN plan where plan.order_id=o.id and plan.status=1),0)as total
     from o_order o
     left join a_agent b on o.agent_id = b.id and b.status = 1
     left join a_agent_businfo e on e.agent_id = o.agent_id and o.bus_id = e.id and e.status = 1
@@ -734,7 +737,8 @@
     nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)
     )as dpd,
     nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0) pro_num,
-    c.platform_name
+    c.platform_name,
+    nvl((select sum(PLAN_PRO_NUM) from O_RECEIPT_PLAN plan where plan.order_id=o.id and plan.status=1),0)as total
     from  o_order o
     left join a_agent b on o.agent_id = b.id and b.status = 1
     left join a_agent_businfo e on e.agent_id = o.agent_id and o.bus_id = e.id and e.status = 1
@@ -841,7 +845,8 @@
     (select LISTAGG(o_sub_order_activity.activity_name,',') WITHIN GROUP( ORDER BY o_sub_order.order_id) from o_sub_order_activity
     left join o_sub_order on o_sub_order_activity.sub_order_id = o_sub_order.id and o_sub_order.status=1 and o_sub_order_activity.status=1
     where o_sub_order.status=1 and o_sub_order_activity.status=1 and o_sub_order.order_id = o.id
-    ) as activity_name
+    ) as activity_name,
+    nvl((select sum(PLAN_PRO_NUM) from O_RECEIPT_PLAN plan where plan.order_id=o.id and plan.status=1),0)as total
     from o_order o
     left join a_agent b on o.agent_id = b.id
     left join a_agent_businfo e on o.bus_id = e.id
@@ -943,7 +948,8 @@
     (select LISTAGG(o_sub_order_activity.activity_name,',') WITHIN GROUP( ORDER BY o_sub_order.order_id) from o_sub_order_activity
     left join o_sub_order on o_sub_order_activity.sub_order_id = o_sub_order.id and o_sub_order.status=1 and o_sub_order_activity.status=1
     where o_sub_order.status=1 and o_sub_order_activity.status=1 and o_sub_order.order_id = o.id
-    ) as activity_name
+    ) as activity_name,
+    nvl((select sum(PLAN_PRO_NUM) from O_RECEIPT_PLAN plan where plan.order_id=o.id and plan.status=1),0)as total
     from o_order o
     left join a_agent b on o.agent_id = b.id
     left join a_agent_businfo e on o.bus_id = e.id
