@@ -499,7 +499,8 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                     log.info("升级开户接口{}平台编号不为空走升级接口,获取请求参数",agentBusInfo.getBusNum());
                     FastMap fastMap = FastMap.fastSuccessMap()
                             .putKeyV("agentBusinfoId", agentBusInfo.getId())
-                            .putKeyV("processingId", busId);
+                            .putKeyV("processingId", busId)
+                            .putKeyV("platForm", platForm);
                     if(PlatformType.whetherPOS(platForm.getPlatformType())){
                         req_data = agentHttpPosServiceImpl.agencyLevelUpdateChangeData(fastMap);
                     }else if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
