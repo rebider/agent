@@ -298,6 +298,9 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             if(xxdkAmount.compareTo(internetRenew.getSuppAmt())!=0){
                 throw new MessageException("线下打款必须等于应补款金额");
             }
+            if (StringUtils.isBlank(internetRenew.getFiles())) {
+                throw new MessageException("线下打款必须上传附件");
+            }
         }
         internetRenewMapper.insert(internetRenew);
 
