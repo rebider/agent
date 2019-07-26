@@ -303,6 +303,7 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
         criteria.andBusIdEqualTo(busId);
         criteria.andBusTypeEqualTo(busType);
         criteria.andStatusEqualTo(Status.STATUS_1.status);
+        if (StringUtils.isNotBlank(activStatus))
         criteria.andActivStatusEqualTo(activStatus);
         List<BusActRel> busActRels = busActRelMapper.selectByExample(example);
         if(busActRels.size()!=1){
