@@ -669,11 +669,14 @@ public class InternetCardServiceImpl implements InternetCardService {
             if (StringUtils.isBlank(retIdentifier)) {
                 log.info("物联网卡定时任务处理中");
             }
-           // 1. 检测是否续费为否，状态为正常的，下个月的，更新“是否需续费”为是
+           // 1. 检测是否续费为否，状态为正常或待激活的，下个月的，更新“是否需续费”为是
             Map<String,Object> reqMap = new HashMap<>();
             reqMap.put("renew",Status.STATUS_0.status);//否
             reqMap.put("newRenew",Status.STATUS_1.status);
             reqMap.put("expireTime",DateUtil.getPerFirstDayOfMonth());
+            //待激活和正常
+            reqMap.put("cardStaus1",InternetCardStatus.NORMAL.getValue());
+            reqMap.put("cardStaus2",InternetCardStatus.NOACTIVATE.getValue());
             int i = internetCardMapper.selectInternetCardExpireCount(reqMap);
             if(i>0){
                 int updateCount = internetCardMapper.updateInternetCardExpire(reqMap);

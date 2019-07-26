@@ -42,4 +42,6 @@ public interface OInternetRenewService {
     List<OInternetRenewDetail> queryInternetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page,String agentId);
 
     Integer queryInternetRenewDetailCount(OInternetRenewDetail internetRenewDetail,String agentId);
+
+    void renewVerify(String iccidNumIds)throws MessageException;
 }

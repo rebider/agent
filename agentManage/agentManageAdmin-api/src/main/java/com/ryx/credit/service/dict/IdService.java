@@ -15,12 +15,10 @@ public interface IdService {
 
     public String genOrderId(TabId tablename,Integer userid);
 
-
     public String genAgId(TabId tablename);
-
-    String genInternetOffset();
 
     public String genOrganizationId(TabId tablename,Integer userid);
 
+    String genInternetOffset();
 
 }
