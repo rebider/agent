@@ -441,6 +441,7 @@
       c.renew = #{map.renew}
       and TO_CHAR(c.expire_time, 'YYYY-MM') = #{map.expireTime}
       and c.status = 1
+      and (c.INTERNET_CARD_STATUS = #{map.cardStaus1} or c.INTERNET_CARD_STATUS = #{map.cardStaus2})
     </where>
   </sql>
 
