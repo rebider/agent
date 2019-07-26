@@ -589,5 +589,44 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         return AgentResult.ok();
     }
 
+    @Override
+    public void renewVerify(String iccidNumIds)throws MessageException{
+
+        String[] iccidNumIdsStr = iccidNumIds.split(",");
+        for (String iccidNumId : iccidNumIdsStr) {
+            OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(iccidNumId);
+            if(null==oInternetCard.getInternetCardStatus()){
+                throw new MessageException("物联网卡信息不存在,请联系相关部门");
+            }
+            if(null==oInternetCard.getRenew()){
+                throw new MessageException("物联网卡续费状态不存在,请联系相关部门");
+            }
+            //是否需续费为是,才展示按钮
+            if(oInternetCard.getRenew().compareTo(BigDecimal.ZERO)==0){
+                throw new MessageException("是否需续费否,不允许续费");
+            }
+            if((oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NORMAL.getValue())==0 || oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NOACTIVATE.getValue())==0 )
+                    && !oInternetCard.getRenewStatus().equals(InternetRenewStatus.XFZ.getValue())){
+                if(null==oInternetCard.getExpireTime()){
+                    throw new MessageException("到期时间为空,不允许续费");
+                }
+                Date date = stepMonth(new Date(), 3);
+                if(oInternetCard.getExpireTime().getTime()>date.getTime()){
+                    throw new MessageException("到期时间超过3个月,不允许续费");
+                }
+            }else{
+                throw new MessageException("状态不正确,不允许续费");
+            }
+        }
+    }
+
+
+    public static Date stepMonth(Date sourceDate, int month) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(sourceDate);
+        c.add(Calendar.MONTH, month);
+        return c.getTime();
+    }
+
 }
 
