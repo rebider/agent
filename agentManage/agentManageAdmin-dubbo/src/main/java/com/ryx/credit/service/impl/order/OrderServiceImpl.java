@@ -915,7 +915,7 @@ public class OrderServiceImpl implements OrderService {
                 //查询活动
                 OActivity activity = oActivityMapper.selectByPrimaryKey(oActivity);
                 //活动存在
-                if (activity != null && activity.getPrice() != null && activity.getPrice().compareTo(BigDecimal.ZERO) > 0) {
+                if (activity != null && activity.getPrice() != null && activity.getPrice().compareTo(BigDecimal.ZERO) >= 0) {
                     //设置商品实际单价
                     oSubOrder.setProPrice(activity.getOriginalPrice());
                     oSubOrder.setProRelPrice(activity.getPrice());
@@ -1146,6 +1146,9 @@ public class OrderServiceImpl implements OrderService {
         Agent agent = agentMapper.selectByPrimaryKey(order.getAgentId());
         f.putKeyV("agent", agent);
 
+        Map<String,Object> parentInfo = agentBusInfoMapper.queryBusInfoParent(FastMap.fastMap("id",order.getBusId()));
+        f.putKeyV("parentInfo", parentInfo);
+
         String orderPlatform = order.getOrderPlatform();
         PlatForm platForm = platFormMapper.selectByPlatFormNum(orderPlatform);
         f.putKeyV("platForm", platForm);
@@ -1357,6 +1360,7 @@ public class OrderServiceImpl implements OrderService {
         AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
         record.setAgDocPro(agentBusInfo.getAgDocPro());
         record.setAgDocDistrict(agentBusInfo.getAgDocDistrict());
+        record.setNetInBusType("ACTIVITY_"+order.getOrderPlatform());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("订单提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
             throw new MessageException("审批流启动失败:添加审批关系失败");
@@ -3327,4 +3331,23 @@ public class OrderServiceImpl implements OrderService {
         logger.info("==2===="+order1.getoNum());
         logger.info("==3====");
     }
+
+    @Override
+    public AgentResult revocationOrder(String id, String user) {
+        if (null == user) {
+            return AgentResult.fail("操作用户不能为空");
+        }
+        if (StringUtils.isBlank(id)) {
+            return AgentResult.fail("订单ID不能为空");
+        }
+        OOrder oOrder = orderMapper.selectByPrimaryKey(id);
+        oOrder.setuUser(user);
+        oOrder.setOrderStatus(OrderStatus.REVOKE.status);
+        int update = orderMapper.updateByPrimaryKeySelective(oOrder);
+        if (1 != update){
+            return AgentResult.fail("撤销失败");
+        }
+        return AgentResult.ok("撤销成功");
+    }
+
 }

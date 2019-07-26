@@ -227,6 +227,8 @@ public class AgentServiceImpl implements AgentService {
         agent.setcTime(date);
         agent.setcUtime(date);
         agent.setId(idService.genId(TabId.a_agent));
+        //默认设置无报备
+        agent.setReportStatus(Status.STATUS_0.status);
 
         boolean isHaveYYZZ = false;
         boolean isHaveFRSFZ = false;
@@ -354,6 +356,8 @@ public class AgentServiceImpl implements AgentService {
         db_agent.setAgRemark(agent.getAgRemark());
         db_agent.setStatus(agent.getStatus());
         db_agent.setAgRegArea(agent.getAgRegArea());
+        db_agent.setBusRiskEmail(agent.getBusRiskEmail());
+        db_agent.setBusContactEmail(agent.getBusContactEmail());
         if (1 != agentMapper.updateByPrimaryKeySelective(db_agent)) {
             throw new ProcessException("代理商信息更新失败");
         }else{
@@ -751,5 +755,24 @@ public class AgentServiceImpl implements AgentService {
             return AgentResult.ok(agents.get(0).getId());
         }
         return AgentResult.fail();
+    }
+
+    @Override
+    public int reportEdit(Agent agent, String userId) throws MessageException {
+        int i=0;
+        AgentExample agentExample = new AgentExample();
+        AgentExample.Criteria criteria = agentExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andIdEqualTo(agent.getId());
+        List<Agent> agentList= agentMapper.selectByExample(agentExample);
+        if (null!=agentList &&agentList.size()>0 ){
+            Agent a_agent = agentList.get(0);
+            a_agent.setReportStatus(agent.getReportStatus());
+            a_agent.setReportTime(agent.getReportTime());
+            a_agent.setcUser(userId);
+            a_agent.setcUtime(Calendar.getInstance().getTime());
+            i = agentMapper.updateByPrimaryKeySelective(a_agent);
+            agentDataHistoryService.saveDataHistory(a_agent, DataHistoryType.BASICS.getValue());
+        }
+        return i;
+
     }
 }

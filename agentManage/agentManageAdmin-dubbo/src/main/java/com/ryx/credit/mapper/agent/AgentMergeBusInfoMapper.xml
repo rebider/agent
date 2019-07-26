@@ -44,6 +44,7 @@
     <result column="DEBIT_CAPPING" jdbcType="VARCHAR" property="debitCapping" />
     <result column="DEBIT_APPEAR_RATE" jdbcType="VARCHAR" property="debitAppearRate" />
     <result column="CREDIT_RATE_FLOOR" jdbcType="VARCHAR" property="creditRateFloor" />
+    <result column="CREDIT_RATE_CEILING" jdbcType="VARCHAR" property="creditRateCeiling" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -81,7 +82,7 @@
     BUS_CONTACT_PERSON, BUS_RISK_EMAIL, CLO_TAX_POINT, CLO_INVOICE, CLO_RECEIPT, CLO_PAY_COMPANY,
     CLO_AGENT_COLINFO, AG_ZBH, BUS_STATUS, BUS_USE_ORGAN, CLO_REVIEW_STATUS, C_TIME,
     C_UTIME, C_USER, MERGE_STATUS, STATUS, VERSION, BUS_SCOPE, DREDGE_S0, BUS_LOGIN_NUM,
-    DEBIT_RATE_LOWER, DEBIT_CAPPING, DEBIT_APPEAR_RATE, CREDIT_RATE_FLOOR
+    DEBIT_RATE_LOWER, DEBIT_CAPPING, DEBIT_APPEAR_RATE, CREDIT_RATE_FLOOR, CREDIT_RATE_CEILING
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentMergeBusInfoExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -125,7 +126,7 @@
     C_UTIME, C_USER, MERGE_STATUS,
     STATUS, VERSION, BUS_SCOPE,
     DREDGE_S0, BUS_LOGIN_NUM, DEBIT_RATE_LOWER,
-    DEBIT_CAPPING, DEBIT_APPEAR_RATE, CREDIT_RATE_FLOOR)
+    DEBIT_CAPPING, DEBIT_APPEAR_RATE, CREDIT_RATE_FLOOR, CREDIT_RATE_CEILING)
     values (#{id,jdbcType=VARCHAR}, #{agentMargeId,jdbcType=VARCHAR}, #{busId,jdbcType=VARCHAR},
     #{mainAgentId,jdbcType=VARCHAR}, #{subAgentId,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR},
     #{busPlatform,jdbcType=VARCHAR}, #{busType,jdbcType=VARCHAR}, #{busParent,jdbcType=VARCHAR},
@@ -139,7 +140,8 @@
     #{cUtime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{mergeStatus,jdbcType=DECIMAL},
     #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{busScope,jdbcType=VARCHAR},
     #{dredgeS0,jdbcType=DECIMAL}, #{busLoginNum,jdbcType=VARCHAR}, #{debitRateLower,jdbcType=VARCHAR},
-    #{debitCapping,jdbcType=VARCHAR}, #{debitAppearRate,jdbcType=VARCHAR}, #{creditRateFloor,jdbcType=VARCHAR})
+    #{debitCapping,jdbcType=VARCHAR}, #{debitAppearRate,jdbcType=VARCHAR}, #{creditRateFloor,jdbcType=VARCHAR},
+    #{creditRateCeiling,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentMergeBusInfo">
     insert into A_AGENT_MERGE_BUSINFO
@@ -270,6 +272,9 @@
       <if test="creditRateFloor != null">
         CREDIT_RATE_FLOOR,
       </if>
+      <if test="creditRateCeiling != null">
+        CREDIT_RATE_CEILING,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -397,6 +402,9 @@
       </if>
       <if test="creditRateFloor != null">
         #{creditRateFloor,jdbcType=VARCHAR},
+      </if>
+      <if test="creditRateCeiling != null">
+        #{creditRateCeiling,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -532,6 +540,9 @@
       <if test="creditRateFloor != null">
         CREDIT_RATE_FLOOR = #{creditRateFloor,jdbcType=VARCHAR},
       </if>
+      <if test="creditRateCeiling != null">
+        CREDIT_RATE_CEILING = #{creditRateCeiling,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -577,7 +588,8 @@
     DEBIT_RATE_LOWER = #{debitRateLower,jdbcType=VARCHAR},
     DEBIT_CAPPING = #{debitCapping,jdbcType=VARCHAR},
     DEBIT_APPEAR_RATE = #{debitAppearRate,jdbcType=VARCHAR},
-    CREDIT_RATE_FLOOR = #{creditRateFloor,jdbcType=VARCHAR}
+    CREDIT_RATE_FLOOR = #{creditRateFloor,jdbcType=VARCHAR},
+    CREDIT_RATE_CEILING = #{creditRateCeiling,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

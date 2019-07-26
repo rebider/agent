@@ -9,9 +9,11 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
+import com.ryx.credit.dao.order.OOrderMapper;
 import com.ryx.credit.dao.order.OPaymentDetailMapper;
 import com.ryx.credit.dao.order.OPaymentMapper;
 import com.ryx.credit.dao.order.OSupplementMapper;
@@ -69,6 +71,10 @@ public class OSupplementServiceImpl implements OSupplementService {
     private OCashReceivablesService oCashReceivablesService;
     @Autowired
     private IUserService iUserService;
+    @Autowired
+    private OOrderMapper oOrderMapper;
+    @Autowired
+    private AgentBusInfoMapper agentBusInfoMapper;
 
 
     @Override
@@ -209,6 +215,19 @@ public class OSupplementServiceImpl implements OSupplementService {
         }
 
 
+        //再查询是否是最后一期的补款 不可多补或者少补
+        List<OPaymentDetail> notCountMap = oPaymentDetailMapper.selectCount(oPaymentDetail.getOrderId(), PamentIdType.ORDER_FKD.code, PaymentStatus.DF.code);
+        //去查询还剩几期待付款
+        BigDecimal count = new BigDecimal(notCountMap.size());
+        if (count.compareTo(new BigDecimal(1)) == 0) {
+            //如果就剩本条待付款  则需全部结清
+            BigDecimal amount = oPaymentDetail.getPayAmount();//这个是订单需补款金额
+            if (oSupplement.getPayAmount().compareTo(amount) == -1 || oSupplement.getPayAmount().compareTo(amount) == 1) {
+                logger.info("应补款金额为{}，请重新补款", amount);
+                throw new MessageException("应补款金额为" + amount + "，请重新补款");
+            }
+        }
+
         Date date = Calendar.getInstance().getTime();
         oSupplement.setId(idService.genId(TabId.o_Supplement));
         oSupplement.setcTime(date);
@@ -267,7 +286,7 @@ public class OSupplementServiceImpl implements OSupplementService {
         oCashReceivablesService.startProcing(CashPayType.getContentEnum(CashPayType.SUPPLEMENT.code), id, userId);
         OSupplement oSupplement = oSupplementMapper.selectByPrimaryKey(id);
 
-
+        String orderId = "";
         if (oSupplement.getPkType().equals(PkType.FQBK.code)) {
             //获取资源id
             OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
@@ -279,6 +298,8 @@ public class OSupplementServiceImpl implements OSupplementService {
                 return ResultVO.fail("明细为空");
             }
             OPaymentDetail oPaymentDetail = oPaymentDetails.get(0);
+            orderId = oPaymentDetail.getOrderId();
+
             BigDecimal paymentStatus = oPaymentDetail.getPaymentStatus();
             if (!paymentStatus.equals(PaymentStatus.DF.code)) {
                 logger.info("补款信息状态异常{}:{}", id, userId);
@@ -344,6 +365,22 @@ public class OSupplementServiceImpl implements OSupplementService {
             }
 
         }
+
+        OOrderExample oOrderExample = new OOrderExample();
+        OOrderExample.Criteria criteria = oOrderExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andIdEqualTo(orderId);
+        List<OOrder> oOrderList = oOrderMapper.selectByExample(oOrderExample);
+        if (null!=oOrderList && oOrderList.size()>0){
+            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+            AgentBusInfoExample.Criteria criteria1 = agentBusInfoExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andIdEqualTo(oOrderList.get(0).getBusId());
+            List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+            if (null!=agentBusInfos && agentBusInfos.size()>0 ){
+                record.setAgDocDistrict(agentBusInfos.get(0).getAgDocDistrict());
+                record.setAgDocPro(agentBusInfos.get(0).getAgDocPro());
+            }
+
+        }
+
+
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("补款审批审批，启动审批异常，添加审批关系失败{}:{}", oSupplement.getId(), proce);
             throw new MessageException("添加审批关系失败");
@@ -481,6 +518,7 @@ public class OSupplementServiceImpl implements OSupplementService {
                     logger.info("订单付款状态修改失败{}:", busActRel.getActivId());
                     throw new MessageException("订单付款状态修改失败");
                 }
+                oPaymentDetail= oPaymentDetailMapper.selectByPrimaryKey(oPaymentDetail.getId());
                 //更新付款单的已付款和未付款
                 OPaymentExample oPaymentExample = new OPaymentExample();
                 OPaymentExample.Criteria criteria = oPaymentExample.createCriteria();
@@ -521,6 +559,7 @@ public class OSupplementServiceImpl implements OSupplementService {
                             }
                         }
                     }
+
                     oPayment.setOutstandingAmount(oPayment.getOutstandingAmount().subtract(oPaymentDetail.getRealPayAmount()));
                     if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
                         logger.info("付款单修改失败");
@@ -562,12 +601,20 @@ public class OSupplementServiceImpl implements OSupplementService {
                     } else {
                         try {
                             List<BigDecimal> divideList = new ArrayList<>();
-                            BigDecimal divide = new BigDecimal(0);
+                            BigDecimal money = oPaymentDetail.getPayAmount().subtract(supplement.getRealPayAmount());
+                            BigDecimal stage = money.divide(count,2,BigDecimal.ROUND_HALF_UP);
+                            BigDecimal tt = BigDecimal.ZERO;
                             for (int i = 0; i < count.intValue(); i++) {
-                                BigDecimal money = oPaymentDetail.getPayAmount().subtract(supplement.getRealPayAmount());
-                                divide = money.divide(count);
-                                divideList.add(divide);
+                                //补充除不尽余额
+                                if(i==count.intValue()-1){
+                                    if(0!=money.subtract(tt).compareTo(stage)){
+                                        stage =   money.subtract(tt);
+                                    }
+                                }
+                                tt=tt.add(stage);
+                                divideList.add(stage);
                             }
+
                             for (int j = 0; j < notCountMap.size(); j++) {
                                 OPaymentDetail paymentDetail = notCountMap.get(j);
                                 paymentDetail.setPayAmount(paymentDetail.getPayAmount().add(divideList.get(j)));
@@ -577,24 +624,7 @@ public class OSupplementServiceImpl implements OSupplementService {
                                 }
                             }
                         } catch (Exception e) {
-                            List<BigDecimal> divideList = new ArrayList<>();
-                            BigDecimal divide = new BigDecimal(0);
-                            for (int i = 0; i < count.intValue(); i++) {
-                                BigDecimal money = oPaymentDetail.getPayAmount().subtract(supplement.getRealPayAmount());
-                                divide = money.divide(count, 2, BigDecimal.ROUND_HALF_DOWN);
-                                divideList.add(divide);
-                            }
-                           /* BigDecimal big = new BigDecimal(0);
-                            big = residue.subtract(divide.multiply(count.subtract(new BigDecimal(1))));
-                            divideList.add(big);*/
-                            for (int j = 0; j < notCountMap.size(); j++) {
-                                OPaymentDetail paymentDetail = notCountMap.get(j);
-                                paymentDetail.setPayAmount(paymentDetail.getPayAmount().add(divideList.get(j)));
-                                if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail)) {
-                                    logger.info("平均金额失败");
-                                    throw new MessageException("平均金额失败");
-                                }
-                            }
+                            e.printStackTrace();
                         }
                     }
                 }

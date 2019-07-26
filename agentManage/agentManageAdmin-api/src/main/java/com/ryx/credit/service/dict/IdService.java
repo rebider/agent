@@ -18,5 +18,9 @@ public interface IdService {
 
     public String genAgId(TabId tablename);
 
+
+    public String genOrganizationId(TabId tablename,Integer userid);
+
+
     String genInternetOffset();
 }

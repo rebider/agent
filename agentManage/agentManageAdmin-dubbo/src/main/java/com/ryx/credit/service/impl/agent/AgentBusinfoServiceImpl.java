@@ -19,6 +19,7 @@ import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentAssProtocolService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
 import com.ryx.credit.service.agent.PlatFormService;
+import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.dict.DictOptionsService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -69,6 +70,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	private OrganizationMapper organizationMapper;
 	@Autowired
 	private IUserService iUserService;
+	@Autowired
+	private AgentService agentService;
 
 
     /**
@@ -121,9 +124,33 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					}
 				}
 			}
+
+            //代理商选择上级代理商时添加限制 不能选择同级别代理商为上级
+            if (StringUtils.isNotBlank(agentBusInfo.getBusParent())) {
+                //获取上级代理商类型
+                AgentBusInfo busInfo = getById(agentBusInfo.getBusParent());
+                if (agentBusInfo.getBusType().equals(BusType.ZQ.key) || agentBusInfo.getBusType().equals(BusType.ZQBZF.key) || agentBusInfo.getBusType().equals(BusType.ZQZF.key)) {
+                    if (busInfo.getBusType().equals(BusType.ZQ.key) || busInfo.getBusType().equals(BusType.ZQZF.key) || busInfo.getBusType().equals(BusType.ZQBZF.key)) {
+                        throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                    }
+                }
+				if (agentBusInfo.getBusType().equals(BusType.YDX.key)) {
+					if (busInfo.getBusType().equals(BusType.ZQ.key) || busInfo.getBusType().equals(BusType.YDX.key)
+							|| busInfo.getBusType().equals(BusType.ZQZF.key) || busInfo.getBusType().equals(BusType.ZQBZF.key)) {
+						throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+					}
+				}
+                if (agentBusInfo.getBusType().equals(BusType.JGYD.key)) {
+                    if (!busInfo.getBusType().equals(BusType.JG.key)) {
+                        throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                    }
+                }
+            }
 			Dict debitRateLower = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitRateLower");//借记费率下限（%）
 			Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitCapping");//借记封顶额（元）
 			Dict debitAppearRate = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitAppearRate");//借记出款费率（%）
+			Dict creditRateFloor = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "creditRateFloor");//贷记费率下限（%）
+			Dict creditRateCeiling = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "creditRateCeiling");//贷记费率上限（%）
 			if(debitRateLower!=null){
 				agentBusInfo.setDebitRateLower(debitRateLower.getdItemvalue());
 			}
@@ -133,11 +160,11 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 			if(debitAppearRate!=null){
 				agentBusInfo.setDebitAppearRate(debitAppearRate.getdItemvalue());
 			}
-
-			// 贷记费率下限（%）
-		    Dict creditRateFloor = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "creditRateFloor");
 			if (creditRateFloor != null) {
-				agentBusInfo.setCreditRateFloor(creditRateFloor.getdItemvalue());
+				agentBusInfo.setCreditRateFloor(creditRateFloor.getdItemname());
+			}
+			if (creditRateCeiling != null) {
+				agentBusInfo.setCreditRateCeiling(creditRateCeiling.getdItemname());
 			}
 
 			if(1!=agentBusInfoMapper.insert(agentBusInfo)){
@@ -218,6 +245,28 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 				if(agentBusInfoVo.getBusType().equals(BusType.ZQZF.key) || agentBusInfoVo.getBusType().equals(BusType.ZQBZF.key) || agentBusInfoVo.getBusType().equals(BusType.ZQ.key) ){
 					if(com.ryx.credit.commons.utils.StringUtils.isBlank(agentBusInfoVo.getBusParent()))
 						throw new ProcessException("直签上级不能为空");
+				}
+
+				//代理商选择上级代理商时添加限制 不能选择同级别代理商为上级
+				if (StringUtils.isNotBlank(agentBusInfoVo.getBusParent())) {
+					//获取上级代理商类型
+					AgentBusInfo busInfo = getById(agentBusInfoVo.getBusParent());
+					if (agentBusInfoVo.getBusType().equals(BusType.ZQ.key) || agentBusInfoVo.getBusType().equals(BusType.ZQBZF.key) || agentBusInfoVo.getBusType().equals(BusType.ZQZF.key)) {
+						if (busInfo.getBusType().equals(BusType.ZQ.key) || busInfo.getBusType().equals(BusType.ZQZF.key) || busInfo.getBusType().equals(BusType.ZQBZF.key)) {
+							throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+						}
+					}
+					if (agentBusInfoVo.getBusType().equals(BusType.YDX.key)) {
+						if (busInfo.getBusType().equals(BusType.ZQ.key) || busInfo.getBusType().equals(BusType.YDX.key)
+								|| busInfo.getBusType().equals(BusType.ZQZF.key) || busInfo.getBusType().equals(BusType.ZQBZF.key)) {
+							throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+						}
+					}
+					if (agentBusInfoVo.getBusType().equals(BusType.JGYD.key)) {
+						if (!busInfo.getBusType().equals(BusType.JG.key)) {
+							throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+						}
+					}
 				}
 
 				PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfoVo.getBusPlatform());
@@ -330,6 +379,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					Dict debitRateLower = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitRateLower");//借记费率下限（%）
 					Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitCapping");//借记封顶额（元）
 					Dict debitAppearRate = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitAppearRate");//借记出款费率（%）
+					Dict creditRateFloor = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "creditRateFloor");//贷记费率下限（%）
+					Dict creditRateCeiling = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "creditRateCeiling");//贷记费率上限（%）
 					if(debitRateLower!=null){
 						db_AgentBusInfo.setDebitRateLower(debitRateLower.getdItemvalue());
 					}
@@ -339,11 +390,11 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					if(debitAppearRate!=null){
 						db_AgentBusInfo.setDebitAppearRate(debitAppearRate.getdItemvalue());
 					}
-
-					// 贷记费率下限（%）
-					Dict creditRateFloor = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "creditRateFloor");
 					if (creditRateFloor != null) {
-						db_AgentBusInfo.setCreditRateFloor(creditRateFloor.getdItemvalue());
+						db_AgentBusInfo.setCreditRateFloor(creditRateFloor.getdItemname());
+					}
+					if (creditRateCeiling != null) {
+						db_AgentBusInfo.setCreditRateCeiling(creditRateCeiling.getdItemname());
 					}
 
 					if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(db_AgentBusInfo)){
@@ -472,6 +523,9 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	@Override
 	public List<Map> getParentListFromBusInfo(List<Map> list, String busId) {
 		if(list==null)list=new ArrayList<Map>();
+		if(list.size()>=10){
+			return list;
+		}
 		FastMap par = FastMap.fastMap("id", busId)
 				.putKeyV("busStatus", 2);
 		List<Map>  map = agentBusInfoMapper.queryTreeByBusInfo(par);

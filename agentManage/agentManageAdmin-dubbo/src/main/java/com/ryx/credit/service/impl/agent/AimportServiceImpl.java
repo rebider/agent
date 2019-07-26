@@ -1607,7 +1607,8 @@ public class AimportServiceImpl implements AimportService {
         String  daqu = list.size()>29?list.get(29)+"":"";//大区
         String  yewujigou = list.size()>30?list.get(30)+"":"";//业务机构
         String  chukuanjigou = list.size()>31?list.get(31)+"":"";//出款机构
-        String  credit_rate_floor = list.size()>32?list.get(32)+"":"";//贷记费率下线
+        String  credit_rate_floor = list.size()>32?list.get(32)+"":"";//贷记费率下限
+        String  credit_rate_ceiling = list.size()>33?list.get(33)+"":"";//贷记费率上限
 
         ag  = ag.trim();
         busPlatform_num = busPlatform_num.trim();
@@ -1620,11 +1621,39 @@ public class AimportServiceImpl implements AimportService {
             return ResultVO.fail("唯一码未找到["+ag+"]");
         }
         Agent agent = agents.get(0);
+
+        String PlatformNum = null;
+
+        if(StringUtils.isNotBlank(busPlatform)) {
+            busPlatform = busPlatform.trim();
+            if(busPlatform.contains("MPOS")){
+                busPlatform = busPlatform.replace("MPOS","手刷");
+            }
+            if(busPlatform.contains("瑞+平台")){
+                busPlatform = busPlatform.replace("瑞+平台","瑞+");
+            }
+            List<PlatForm>  platForms = businessPlatformService.queryAblePlatForm();
+            for (PlatForm platForm : platForms) {
+                if (platForm.getPlatformName().equals(busPlatform)) {
+                    PlatformNum = platForm.getPlatformNum();
+                    break;
+                }
+            }
+        }
+
+        //平台不能为空
+        if(StringUtils.isBlank(PlatformNum)){
+            return ResultVO.fail("业务平台未找到："+busPlatform);
+        }
+
         AgentBusInfo agentBusInfo = new AgentBusInfo();
         if(StringUtils.isNotBlank(busPlatform_num)){
             AgentBusInfoExample example = new AgentBusInfoExample();
-            example.or().andStatusEqualTo(Status.STATUS_1.status)
-                    .andBusNumEqualTo(String.valueOf(busPlatform_num));
+            example.or()
+                    .andStatusEqualTo(Status.STATUS_1.status)
+                    .andBusNumEqualTo(String.valueOf(busPlatform_num))
+                    .andBusPlatformEqualTo(PlatformNum)
+                    .andAgentIdEqualTo(agent.getId());
             List<AgentBusInfo> businfos = agentBusInfoMapper.selectByExample(example);
             if(businfos.size()==1){
                 logger.info(prefix_importBusInfo+"业务码,{},{}",user,list);
@@ -1649,19 +1678,7 @@ public class AimportServiceImpl implements AimportService {
         agentBusInfo.setAgentId(agent.getId());
         agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
         //业务平台类型
-        if(StringUtils.isNotBlank(busPlatform)) {
-            busPlatform = busPlatform.trim();
-            if(busPlatform.contains("MPOS")){
-                busPlatform = busPlatform.replace("MPOS","手刷");
-            }
-            List<PlatForm>  platForms = businessPlatformService.queryAblePlatForm();
-            for (PlatForm platForm : platForms) {
-                if (platForm.getPlatformName().equals(busPlatform)) {
-                    agentBusInfo.setBusPlatform(platForm.getPlatformNum());
-                    break;
-                }
-            }
-        }
+        agentBusInfo.setBusPlatform(PlatformNum);
         //机构类型
         String busType_value = null;
         if(busType!=null && StringUtils.isNotBlank(busType) && !"null".equals(busType)) {
@@ -1828,6 +1845,14 @@ public class AimportServiceImpl implements AimportService {
         if(zhongduanshuliangxiaxian!=null && StringUtils.isNotBlank(zhongduanshuliangxiaxian) && !"null".equals(zhongduanshuliangxiaxian) ) {
             agentBusInfo.setTerminalsLower(zhongduanshuliangxiaxian);
         }
+        //贷记费率下限
+        if(credit_rate_floor!=null && StringUtils.isNotBlank(credit_rate_floor) && !"null".equals(credit_rate_floor) ) {
+            agentBusInfo.setCreditRateFloor(credit_rate_floor);
+        }
+        //贷记费率上限
+        if(credit_rate_ceiling!=null && StringUtils.isNotBlank(credit_rate_ceiling) && !"null".equals(credit_rate_ceiling)) {
+            agentBusInfo.setCreditRateCeiling(credit_rate_ceiling);
+        }
         //省区
         if(StringUtils.isNotBlank(shengqu) && !"null".equalsIgnoreCase(shengqu)) {
             COrganization org = departmentService.getByName(shengqu);
@@ -1876,10 +1901,6 @@ public class AimportServiceImpl implements AimportService {
                 agentBusInfo.setFinaceRemitOrgan(listOrganization.get(0).getOrgId());
             }
 
-        }
-        //贷记费率下限
-        if(credit_rate_floor!=null && StringUtils.isNotBlank(credit_rate_floor) && !"null".equals(credit_rate_floor) ) {
-            agentBusInfo.setCreditRateFloor(credit_rate_floor);
         }
         if(StringUtils.isNotBlank(agentBusInfo.getId())){
             agentBusInfo.setcUtime(Calendar.getInstance().getTime());
@@ -2006,8 +2027,6 @@ public class AimportServiceImpl implements AimportService {
             }
             if(StringUtils.isNotBlank(shoukuanzhanghuming_shenfz) && !"null".equalsIgnoreCase(shoukuanzhanghuming_shenfz)) {
                 agentColinfo.setAgLegalCernum(shoukuanzhanghuming_shenfz);
-            }else{
-                agentColinfo.setCloBankCode(null);
             }
             agentColinfo.setPayStatus(ColinfoPayStatus.C.code);
 

@@ -373,6 +373,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
         agentNotifyVo.setCkDebitRate(agentBusInfo.getDebitAppearRate());//借记出款费率（%）
         agentNotifyVo.setLowDebitRate(agentBusInfo.getDebitRateLower());//借记费率下限（%）
         agentNotifyVo.setCreditRateLower(agentBusInfo.getCreditRateFloor());//贷记费率下限（%）
+        agentNotifyVo.setCreditRateCeiling(agentBusInfo.getCreditRateCeiling());//贷记费率上限（%）
         if(StringUtils.isNotBlank(agentBusInfo.getBusLoginNum())){
             agentNotifyVo.setLoginName(agentBusInfo.getBusLoginNum());
         }
@@ -719,6 +720,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
         agentNotifyVo.setCkDebitRate(agentBusInfo.getDebitAppearRate());//借记出款费率（%）
         agentNotifyVo.setLowDebitRate(agentBusInfo.getDebitRateLower());//借记费率下限（%）
         agentNotifyVo.setCreditRateLower(agentBusInfo.getCreditRateFloor());//贷记费率下限（%）
+        agentNotifyVo.setCreditRateCeiling(agentBusInfo.getCreditRateCeiling());//贷记费率上限（%）
         if(StringUtils.isNotBlank(agentBusInfo.getBusLoginNum())){
             agentNotifyVo.setLoginName(agentBusInfo.getBusLoginNum());
         }

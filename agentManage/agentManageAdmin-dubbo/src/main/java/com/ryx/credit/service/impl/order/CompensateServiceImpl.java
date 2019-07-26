@@ -425,6 +425,16 @@ public class CompensateServiceImpl implements CompensateService {
                 refundPriceDiffDetail.setVersion(Status.STATUS_0.status);
                 refundPriceDiffDetail.setOrderType(OrderType.NEW.getValue());
                 refundPriceDiffDetail.setSendStatus(Status.STATUS_0.status);
+                OActivity frontActivity = activityMapper.selectByPrimaryKey(refundPriceDiffDetail.getActivityRealId());
+                if(frontActivity==null){
+                    throw new ProcessException("查询新活动失败");
+                }
+                refundPriceDiffDetail.setFrontProId(frontActivity.getProductId());
+                OProduct oProduct = productService.findById(frontActivity.getProductId());
+                if(oProduct==null){
+                    throw new ProcessException("查询新活动商品失败");
+                }
+                refundPriceDiffDetail.setFrontProName(oProduct.getProName());
                 int priceDiffDetailInsert = refundPriceDiffDetailMapper.insert(refundPriceDiffDetail);
                 if(priceDiffDetailInsert!=1){
                     log.info("插入补退差价详情表异常");
@@ -503,6 +513,12 @@ public class CompensateServiceImpl implements CompensateService {
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(oRefundPriceDiff.getAgentId());
         record.setDataShiro(BusActRelBusType.COMPENSATE.key);
+        List<Map<String, Object>> maps = iUserService.orgCode(Long.valueOf(cuser));
+        if(maps!=null){
+            Map<String, Object> stringObjectMap = maps.get(0);
+            record.setAgDocPro(stringObjectMap.get("ORGID")+"");
+            record.setAgDocDistrict(stringObjectMap.get("ORGPID")+"");
+        }
         Agent agent = agentMapper.selectByPrimaryKey(oRefundPriceDiff.getAgentId());
         if(null!=agent)
         record.setAgentName(agent.getAgName());
@@ -1070,6 +1086,16 @@ public class CompensateServiceImpl implements CompensateService {
                 oRefundPriceDiffDetail.setActivityWay(oActivity.getActivityWay());
                 oRefundPriceDiffDetail.setActivityRule(oActivity.getActivityRule());
                 oRefundPriceDiffDetail.setPrice(oActivity.getPrice());
+                OActivity frontActivity = activityMapper.selectByPrimaryKey(row.getActivityRealId());
+                if(frontActivity==null){
+                    throw new ProcessException("查询新活动失败");
+                }
+                row.setFrontProId(frontActivity.getProductId());
+                OProduct oProduct = productService.findById(frontActivity.getProductId());
+                if(oProduct==null){
+                    throw new ProcessException("查询新活动商品失败");
+                }
+                row.setFrontProName(oProduct.getProName());
                 int i = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(oRefundPriceDiffDetail);
                 if(i!=1){
                     throw new ProcessException("修改退补差价数据失败");

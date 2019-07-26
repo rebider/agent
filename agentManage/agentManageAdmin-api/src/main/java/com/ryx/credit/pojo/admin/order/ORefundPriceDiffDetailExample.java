@@ -2067,6 +2067,146 @@ public class ORefundPriceDiffDetailExample {
             addCriterion("ORDER_TYPE not between", value1, value2, "orderType");
             return (Criteria) this;
         }
+
+        public Criteria andFrontProIdIsNull() {
+            addCriterion("FRONT_PRO_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProIdIsNotNull() {
+            addCriterion("FRONT_PRO_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProIdEqualTo(String value) {
+            addCriterion("FRONT_PRO_ID =", value, "frontProId");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProIdNotEqualTo(String value) {
+            addCriterion("FRONT_PRO_ID <>", value, "frontProId");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProIdGreaterThan(String value) {
+            addCriterion("FRONT_PRO_ID >", value, "frontProId");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProIdGreaterThanOrEqualTo(String value) {
+            addCriterion("FRONT_PRO_ID >=", value, "frontProId");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProIdLessThan(String value) {
+            addCriterion("FRONT_PRO_ID <", value, "frontProId");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProIdLessThanOrEqualTo(String value) {
+            addCriterion("FRONT_PRO_ID <=", value, "frontProId");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProIdLike(String value) {
+            addCriterion("FRONT_PRO_ID like", value, "frontProId");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProIdNotLike(String value) {
+            addCriterion("FRONT_PRO_ID not like", value, "frontProId");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProIdIn(List<String> values) {
+            addCriterion("FRONT_PRO_ID in", values, "frontProId");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProIdNotIn(List<String> values) {
+            addCriterion("FRONT_PRO_ID not in", values, "frontProId");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProIdBetween(String value1, String value2) {
+            addCriterion("FRONT_PRO_ID between", value1, value2, "frontProId");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProIdNotBetween(String value1, String value2) {
+            addCriterion("FRONT_PRO_ID not between", value1, value2, "frontProId");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProNameIsNull() {
+            addCriterion("FRONT_PRO_NAME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProNameIsNotNull() {
+            addCriterion("FRONT_PRO_NAME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProNameEqualTo(String value) {
+            addCriterion("FRONT_PRO_NAME =", value, "frontProName");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProNameNotEqualTo(String value) {
+            addCriterion("FRONT_PRO_NAME <>", value, "frontProName");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProNameGreaterThan(String value) {
+            addCriterion("FRONT_PRO_NAME >", value, "frontProName");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProNameGreaterThanOrEqualTo(String value) {
+            addCriterion("FRONT_PRO_NAME >=", value, "frontProName");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProNameLessThan(String value) {
+            addCriterion("FRONT_PRO_NAME <", value, "frontProName");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProNameLessThanOrEqualTo(String value) {
+            addCriterion("FRONT_PRO_NAME <=", value, "frontProName");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProNameLike(String value) {
+            addCriterion("FRONT_PRO_NAME like", value, "frontProName");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProNameNotLike(String value) {
+            addCriterion("FRONT_PRO_NAME not like", value, "frontProName");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProNameIn(List<String> values) {
+            addCriterion("FRONT_PRO_NAME in", values, "frontProName");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProNameNotIn(List<String> values) {
+            addCriterion("FRONT_PRO_NAME not in", values, "frontProName");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProNameBetween(String value1, String value2) {
+            addCriterion("FRONT_PRO_NAME between", value1, value2, "frontProName");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontProNameNotBetween(String value1, String value2) {
+            addCriterion("FRONT_PRO_NAME not between", value1, value2, "frontProName");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

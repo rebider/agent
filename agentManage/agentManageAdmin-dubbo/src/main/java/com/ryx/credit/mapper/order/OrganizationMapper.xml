@@ -2,34 +2,34 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ryx.credit.dao.order.OrganizationMapper">
     <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.Organization">
-        <id column="ORG_ID" jdbcType="VARCHAR" property="orgId" />
-        <result column="ORG_NICK" jdbcType="VARCHAR" property="orgNick" />
-        <result column="ORG_NAME" jdbcType="VARCHAR" property="orgName" />
-        <result column="ORG_LEVEL" jdbcType="VARCHAR" property="orgLevel" />
-        <result column="ORG_TYPE" jdbcType="VARCHAR" property="orgType" />
-        <result column="ORG_PARENT" jdbcType="VARCHAR" property="orgParent" />
-        <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
-        <result column="PLAT_ID" jdbcType="VARCHAR" property="platId" />
-        <result column="BANK_CARD" jdbcType="VARCHAR" property="bankCard" />
-        <result column="CLO_REALNAME" jdbcType="VARCHAR" property="cloRealname" />
-        <result column="CLO_TYPE" jdbcType="DECIMAL" property="cloType" />
-        <result column="CLO_BANK" jdbcType="VARCHAR" property="cloBank" />
-        <result column="CLO_BANK_BRANCH" jdbcType="VARCHAR" property="cloBankBranch" />
-        <result column="BRANCH_LINE_NUM" jdbcType="VARCHAR" property="branchLineNum" />
-        <result column="ALL_LINE_NUM" jdbcType="VARCHAR" property="allLineNum" />
-        <result column="BANK_REGION" jdbcType="VARCHAR" property="bankRegion" />
-        <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
-        <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
-        <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
-        <result column="U_TIME" jdbcType="TIMESTAMP" property="uTime" />
-        <result column="RESULT" jdbcType="DECIMAL" property="result" />
-        <result column="REMARK" jdbcType="VARCHAR" property="remark" />
-        <result column="STATUS" jdbcType="DECIMAL" property="status" />
-        <result column="VERSION" jdbcType="DECIMAL" property="version" />
-        <result column="ACCOUNT_NAME" jdbcType="VARCHAR" property="accountName" />
-        <result column="ACCOUNT_NUM" jdbcType="VARCHAR" property="accountNum" />
-        <result column="ACCOUNT_BANK" jdbcType="VARCHAR" property="accountBank" />
-        <result column="BUSINESS_NUM" jdbcType="VARCHAR" property="businessNum" />
+        <id column="ORG_ID" jdbcType="VARCHAR" property="orgId"/>
+        <result column="ORG_NICK" jdbcType="VARCHAR" property="orgNick"/>
+        <result column="ORG_NAME" jdbcType="VARCHAR" property="orgName"/>
+        <result column="ORG_LEVEL" jdbcType="VARCHAR" property="orgLevel"/>
+        <result column="ORG_TYPE" jdbcType="VARCHAR" property="orgType"/>
+        <result column="ORG_PARENT" jdbcType="VARCHAR" property="orgParent"/>
+        <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId"/>
+        <result column="PLAT_ID" jdbcType="VARCHAR" property="platId"/>
+        <result column="BANK_CARD" jdbcType="VARCHAR" property="bankCard"/>
+        <result column="CLO_REALNAME" jdbcType="VARCHAR" property="cloRealname"/>
+        <result column="CLO_TYPE" jdbcType="DECIMAL" property="cloType"/>
+        <result column="CLO_BANK" jdbcType="VARCHAR" property="cloBank"/>
+        <result column="CLO_BANK_BRANCH" jdbcType="VARCHAR" property="cloBankBranch"/>
+        <result column="BRANCH_LINE_NUM" jdbcType="VARCHAR" property="branchLineNum"/>
+        <result column="ALL_LINE_NUM" jdbcType="VARCHAR" property="allLineNum"/>
+        <result column="BANK_REGION" jdbcType="VARCHAR" property="bankRegion"/>
+        <result column="C_USER" jdbcType="VARCHAR" property="cUser"/>
+        <result column="U_USER" jdbcType="VARCHAR" property="uUser"/>
+        <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime"/>
+        <result column="U_TIME" jdbcType="TIMESTAMP" property="uTime"/>
+        <result column="RESULT" jdbcType="DECIMAL" property="result"/>
+        <result column="REMARK" jdbcType="VARCHAR" property="remark"/>
+        <result column="STATUS" jdbcType="DECIMAL" property="status"/>
+        <result column="VERSION" jdbcType="DECIMAL" property="version"/>
+        <result column="ACCOUNT_NAME" jdbcType="VARCHAR" property="accountName"/>
+        <result column="ACCOUNT_NUM" jdbcType="VARCHAR" property="accountNum"/>
+        <result column="ACCOUNT_BANK" jdbcType="VARCHAR" property="accountBank"/>
+        <result column="BUSINESS_NUM" jdbcType="VARCHAR" property="businessNum"/>
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
@@ -49,7 +49,8 @@
                                 </when>
                                 <when test="criterion.listValue">
                                     and ${criterion.condition}
-                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="("
+                                             separator=",">
                                         #{listItem}
                                     </foreach>
                                 </when>
@@ -66,32 +67,33 @@
         BANK_REGION, C_USER, U_USER, C_TIME, U_TIME, RESULT, REMARK, STATUS, VERSION, ACCOUNT_NAME,
         ACCOUNT_NUM, ACCOUNT_BANK, BUSINESS_NUM
     </sql>
-    <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OrganizationExample" resultMap="BaseResultMap">
-        <include refid="OracleDialectPrefix" />
+    <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OrganizationExample"
+            resultMap="BaseResultMap">
+        <include refid="OracleDialectPrefix"/>
         select
         <if test="distinct">
             distinct
         </if>
-        <include refid="Base_Column_List" />
+        <include refid="Base_Column_List"/>
         from O_ORGANIZATION
         <if test="_parameter != null">
-            <include refid="Example_Where_Clause" />
+            <include refid="Example_Where_Clause"/>
         </if>
         <if test="orderByClause != null">
             order by ${orderByClause}
         </if>
-        <include refid="OracleDialectSuffix" />
+        <include refid="OracleDialectSuffix"/>
     </select>
     <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
         select
-        <include refid="Base_Column_List" />
+        <include refid="Base_Column_List"/>
         from O_ORGANIZATION
         where ORG_ID = #{orgId,jdbcType=VARCHAR}
     </select>
     <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.OrganizationExample">
         delete from O_ORGANIZATION
         <if test="_parameter != null">
-            <include refid="Example_Where_Clause" />
+            <include refid="Example_Where_Clause"/>
         </if>
     </delete>
     <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.Organization">
@@ -291,10 +293,11 @@
             </if>
         </trim>
     </insert>
-    <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OrganizationExample" resultType="java.lang.Long">
+    <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OrganizationExample"
+            resultType="java.lang.Long">
         select count(*) from O_ORGANIZATION
         <if test="_parameter != null">
-            <include refid="Example_Where_Clause" />
+            <include refid="Example_Where_Clause"/>
         </if>
     </select>
     <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.Organization">
@@ -427,15 +430,13 @@
     </sql>
 
 
-
-
     <!--    开始写代码-->
     <select id="organizationList" parameterType="map" resultType="map">
         <include refid="OracleDialectPrefix"/>
         select
         <include refid="Base_Column_List"/>
         from O_ORGANIZATION
-        <include refid="organizationWhere" />
+        <include refid="organizationWhere"/>
         order by C_TIME desc
         <include refid="OracleDialectSuffix"/>
     </select>
@@ -444,15 +445,16 @@
         select
         count(*)
         from O_ORGANIZATION
-        <include refid="organizationWhere" />
+        <include refid="organizationWhere"/>
     </select>
 
     <sql id="organizationWhere">
         <where>
             1=1 AND status=1
-            <if test="map.orgId!=null and map.orgId!=''"> and ORG_ID=#{map.orgId} </if>
-            <if test="map.orgName!=null and map.orgName!=''"> and ORG_NAME LIKE CONCAT(CONCAT('%',#{map.orgName}),'%')</if>
-            <if test="map.platId!=null and map.platId!=''"> and PLAT_ID LIKE CONCAT(CONCAT('%',#{map.platId}),'%')</if>
+            <if test="map.orgId!=null and map.orgId!=''">and ORG_ID=#{map.orgId}</if>
+            <if test="map.orgName!=null and map.orgName!=''">and ORG_NAME LIKE CONCAT(CONCAT('%',#{map.orgName}),'%')
+            </if>
+            <if test="map.platId!=null and map.platId!=''">and PLAT_ID LIKE CONCAT(CONCAT('%',#{map.platId}),'%')</if>
         </where>
     </sql>
 
@@ -465,6 +467,19 @@
             1=1 and status=1
             <if test="orgId != null and orgId != '' ">
                 and  ORG_ID=#{orgId}
+            </if>
+        </where>
+    </select>
+
+    <select id="queryOrganization" parameterType="string" resultMap="OrgVoMap">
+        select
+        org.*,opf.PLAT_NUM,opf.PLAT_CODE
+        from O_ORGANIZATION org
+        left join ORG_PLATFORM opf on org.org_id=opf.org_id
+        <where>
+            1=1 and org.status=1
+            <if test="orgId != null and orgId != '' ">
+                and org.ORG_ID=#{orgId}
             </if>
         </where>
     </select>
@@ -485,4 +500,41 @@
         </where>
 
     </select>
+
+
+    <resultMap id="OrgVoMap" type="com.ryx.credit.pojo.admin.vo.OrganizationSerchVo">
+        <id column="ORG_ID" jdbcType="VARCHAR" property="orgId"/>
+        <result column="ORG_NICK" jdbcType="VARCHAR" property="orgNick"/>
+        <result column="ORG_NAME" jdbcType="VARCHAR" property="orgName"/>
+        <result column="ORG_LEVEL" jdbcType="VARCHAR" property="orgLevel"/>
+        <result column="ORG_TYPE" jdbcType="VARCHAR" property="orgType"/>
+        <result column="ORG_PARENT" jdbcType="VARCHAR" property="orgParent"/>
+        <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId"/>
+        <result column="PLAT_ID" jdbcType="VARCHAR" property="platId"/>
+        <result column="BANK_CARD" jdbcType="VARCHAR" property="bankCard"/>
+        <result column="CLO_REALNAME" jdbcType="VARCHAR" property="cloRealname"/>
+        <result column="CLO_TYPE" jdbcType="DECIMAL" property="cloType"/>
+        <result column="CLO_BANK" jdbcType="VARCHAR" property="cloBank"/>
+        <result column="CLO_BANK_BRANCH" jdbcType="VARCHAR" property="cloBankBranch"/>
+        <result column="BRANCH_LINE_NUM" jdbcType="VARCHAR" property="branchLineNum"/>
+        <result column="ALL_LINE_NUM" jdbcType="VARCHAR" property="allLineNum"/>
+        <result column="BANK_REGION" jdbcType="VARCHAR" property="bankRegion"/>
+        <result column="C_USER" jdbcType="VARCHAR" property="cUser"/>
+        <result column="U_USER" jdbcType="VARCHAR" property="uUser"/>
+        <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime"/>
+        <result column="U_TIME" jdbcType="TIMESTAMP" property="uTime"/>
+        <result column="RESULT" jdbcType="DECIMAL" property="result"/>
+        <result column="REMARK" jdbcType="VARCHAR" property="remark"/>
+        <result column="STATUS" jdbcType="DECIMAL" property="status"/>
+        <result column="VERSION" jdbcType="DECIMAL" property="version"/>
+        <result column="ACCOUNT_NAME" jdbcType="VARCHAR" property="accountName"/>
+        <result column="ACCOUNT_NUM" jdbcType="VARCHAR" property="accountNum"/>
+        <result column="ACCOUNT_BANK" jdbcType="VARCHAR" property="accountBank"/>
+        <result column="BUSINESS_NUM" jdbcType="VARCHAR" property="businessNum"/>
+        <result column="PLAT_NUM" jdbcType="VARCHAR" property="platNum"/>
+        <result column="PLAT_CODE" jdbcType="VARCHAR" property="platCode"/>
+
+
+    </resultMap>
+
 </mapper>

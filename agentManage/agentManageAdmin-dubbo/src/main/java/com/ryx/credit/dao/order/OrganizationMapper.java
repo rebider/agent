@@ -3,6 +3,7 @@ package com.ryx.credit.dao.order;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.order.OrganizationExample;
+import com.ryx.credit.pojo.admin.vo.OrganizationSerchVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -32,4 +33,6 @@ public interface OrganizationMapper {
     List<Organization> selectOrganization(@Param("orgId")String orgId);
 
     List<Organization> queryByOrganName(Map map);
+
+    List<OrganizationSerchVo> queryOrganization(@Param("orgId")String orgId);
 }

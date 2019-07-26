@@ -78,6 +78,15 @@ public class IdServiceImpl implements IdService {
         return null;
     }
 
+    @Override
+    public String genOrganizationId(TabId tablename, Integer userid) {
+        String data = sdf.format(Calendar.getInstance().getTime());
+        long seq_id  = dictMapper.sqlId(tablename.name());
+        String rund = RandomCharUtil.getRandomNumberChar(2);
+        String numId = String.format("ORG%s%02d%05d%02d",data,(userid%100),(seq_id%100000),Integer.valueOf(rund));
+        return numId;
+    }
+
 
     @Override
     public String genInternetOffset(){

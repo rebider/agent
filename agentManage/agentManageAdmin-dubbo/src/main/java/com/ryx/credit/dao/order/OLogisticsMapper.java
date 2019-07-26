@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-public interface OLogisticsMapper {
+    public interface OLogisticsMapper {
     long countByExample(OLogisticsExample example);
 
     int deleteByExample(OLogisticsExample example);

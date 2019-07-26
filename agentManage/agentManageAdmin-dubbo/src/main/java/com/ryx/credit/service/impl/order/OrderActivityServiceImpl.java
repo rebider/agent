@@ -73,6 +73,15 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         if (StringUtils.isNotBlank(activity.getActCode())) {
             criteria.andActCodeEqualTo(activity.getActCode());
         }
+        if (StringUtils.isNotBlank(activity.getVender())) {
+            Dict vender = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),activity.getVender());
+            if(vender!=null) {
+                criteria.andVenderEqualTo(vender.getdItemvalue());
+            }
+        }
+        if (StringUtils.isNotBlank(activity.getProModel())) {
+            criteria.andProModelEqualTo(activity.getProModel());
+        }
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         example.setOrderByClause(" ACT_CODE,c_time desc");
         example.setPage(page);
@@ -260,6 +269,89 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         return result;
     }
 
+    /**
+     * 活动复制
+     * @param activity
+     * @return
+     */
+    @Override
+    public AgentResult activityCopy(OActivity activity) {
+        AgentResult result = new AgentResult(500, "参数错误", "");
+        if (activity == null) {
+            return result;
+        }
+        if (StringUtils.isBlank(activity.getId())) {
+            return result;
+        }
+        if (activity.getOriginalPrice() == null) {
+            return new AgentResult(500, "商品原价不能为空", "");
+        }
+        if (activity.getPrice() == null) {
+            return new AgentResult(500, "活动价格不能为空", "");
+        }
+
+        String platFormType = platFormMapper.selectPlatType(activity.getPlatform());
+        if (StringUtils.isNotBlank(platFormType)) {
+            if (PlatformType.whetherPOS(platFormType)) {
+                //如果是POS或者是智能POS  则需要清除终端批次和终端类型的id name
+                activity.setTermBatchcode(" ");
+                activity.setTermBatchname(" ");
+                activity.setTermtype(" ");
+                activity.setTermtypename(" ");
+            }
+        }
+        activity.setcTime(new Date());
+        activity.setuTime(new Date());
+
+        if (StringUtils.isNotBlank(platFormType)) {
+            try {
+                List<TermMachineVo> termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType));
+                for (TermMachineVo termMachineVo : termMachineVos) {
+                    if (activity.getBusProCode().equals(termMachineVo.getId())) {
+                        activity.setStandAmt(BigDecimal.valueOf(Integer.valueOf(termMachineVo.getStandAmt())));
+                        activity.setBackType(termMachineVo.getBackType());
+                    }
+                }
+            } catch (Exception e) {
+                logger.info(e.getMessage());
+                e.printStackTrace();
+            }
+        }
+
+        OActivityExample oActivityExample = new OActivityExample();
+        oActivityExample.or().andActCodeEqualTo(activity.getActCode()).andStatusEqualTo(Status.STATUS_1.status).andIdNotEqualTo(activity.getId());
+        oActivityExample.setOrderByClause(" c_time desc ");
+        List<OActivity> list = activityMapper.selectByExample(oActivityExample);
+
+        for (OActivity oActivity : list) {
+            if (oActivity.getPrice() != null && oActivity.getPrice().compareTo(activity.getPrice()) != 0) {
+                return AgentResult.fail("相同活动代码价格必须相同");
+            }
+        }
+
+        if (StringUtils.isNotBlank(activity.getActCode())) {
+            if (StringUtils.isNotBlank(activity.getActCode())) {
+                if("2004".equals(activity.getActCode()) || "2204".equals(activity.getActCode())){
+                    logger.info("2004和2204活动代码禁止使用");
+                    return AgentResult.fail("2004和2204活动代码禁止使用");
+                }
+            }
+        }
+
+        int add_copy = activityMapper.insertSelective(activity);
+        if (add_copy == 1) {
+            return AgentResult.ok();
+        }
+        return result;
+    }
+
+    @Override
+    public OActivity toActivityCopy(OActivity activity) {
+        OActivity oActivity = new OActivity();
+        oActivity.setId(idService.genId(TabId.o_activity));
+        return oActivity;
+    }
+
     @Override
     public List<OActivity> allActivity() {
         OActivityExample example = new OActivityExample();
@@ -272,35 +364,25 @@ public class OrderActivityServiceImpl implements OrderActivityService {
 
     @Override
     public List<OActivity> productActivity(String product, String angetId, String orderAgentBusifo, String oldActivityId) {
-        //TODO 检查代理商销售额
-//        BigDecimal transAmt = profitMonthService.getTranByAgentId(angetId);
-//        BigDecimal transAmt = new BigDecimal(800000000);
-        OProduct productObj = oProductMapper.selectByPrimaryKey(product);
-//        OActivityExample example = new OActivityExample();
-//        example.or().andProductIdEqualTo(productObj.getId())
-//                .andBeginTimeLessThanOrEqualTo(new Date())
-//                .andEndTimeGreaterThanOrEqualTo(new Date());
-//        List<OActivity> activitys = activityMapper.selectByExample(example);
-        //如果传递老的活动就排除老的活动
 
         //查询条件
         Date date = new Date();
-        FastMap par = FastMap.fastMap("productId", productObj.getId())
-                .putKeyV("beginTime", date)
-                .putKeyV("endTime", date);
+        FastMap par = FastMap.fastMap("beginTime", date)
+                             .putKeyV("endTime", date);
 
-        OActivity oldActivity = null;
         if (StringUtils.isNotBlank(oldActivityId)) {
             //如果变更活动传递老活动，排除老的活动代码并匹配 相同的厂商和型号。
-            oldActivity = activityMapper.selectByPrimaryKey(oldActivityId);
+            OActivity oldActivity = activityMapper.selectByPrimaryKey(oldActivityId);
             par.putKeyV("notEqActcode", oldActivity.getActCode()).putKeyV("vender", oldActivity.getVender()).putKeyV("proModel", oldActivity.getProModel());
+        }else{
+            OProduct productObj = oProductMapper.selectByPrimaryKey(product);
+            par.putKeyV("productId", productObj.getId());
         }
         if (StringUtils.isNotBlank(orderAgentBusifo) && !"null".equals(orderAgentBusifo)) {
             //查询平台活动
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(orderAgentBusifo);
             par.putKeyV("platform", agentBusInfo.getBusPlatform());
         }
-
 
         List<Map<String, Object>> actList = activityMapper.productActivityOrderBuild(par);
         List<OActivity> activitys = new ArrayList<OActivity>();
@@ -311,6 +393,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             oActivity.setPrice(new BigDecimal(stringObjectMap.get("PRICE") + ""));
             oActivity.setActCode(stringObjectMap.get("ACT_CODE") + "");
             oActivity.setOriginalPrice(new BigDecimal(stringObjectMap.get("ORIGINALPRICE") + ""));
+            oActivity.setProductName(stringObjectMap.get("PRO_NAME")+"");
             OActivity activity = activityMapper.selectByPrimaryKey(oActivity.getId());
             if(StringUtils.isBlank(activity.getVisible())){
                 continue;
@@ -324,27 +407,6 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             activitys.add(oActivity);
         }
 
-//        List<OActivity> newActivitys = new ArrayList<>();
-//        for (OActivity activity : activitys) {
-//            BigDecimal activityRule = new BigDecimal(activity.getActivityRule());
-//            if(activity.getActivityCondition().equals(">")){
-//                if(transAmt.compareTo(activityRule) > 0) {
-//                    newActivitys.add(activity);
-//                }
-//            }else if(activity.getActivityCondition().equals(">=")){
-//                if(transAmt.compareTo(activityRule) >= 0) {
-//                    newActivitys.add(activity);
-//                }
-//            }else if(activity.getActivityCondition().equals("<=")){
-//                if(transAmt.compareTo(activityRule) <= 0) {
-//                    newActivitys.add(activity);
-//                }
-//            }else if(activity.getActivityCondition().equals("<")){
-//                if(transAmt.compareTo(activityRule) < 0) {
-//                    newActivitys.add(activity);
-//                }
-//            }
-//        }
         return activitys;
     }
 

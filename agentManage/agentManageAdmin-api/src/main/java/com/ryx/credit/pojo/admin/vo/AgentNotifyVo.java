@@ -40,6 +40,7 @@ public class AgentNotifyVo implements Serializable{
     private String lowDebitRate;
     private String activityType;
     private String creditRateLower;
+    private String creditRateCeiling;
 
     public String getUniqueId() {
         return uniqueId;
@@ -239,5 +240,13 @@ public class AgentNotifyVo implements Serializable{
 
     public void setCreditRateLower(String creditRateLower) {
         this.creditRateLower = creditRateLower;
+    }
+
+    public String getCreditRateCeiling() {
+        return creditRateCeiling;
+    }
+
+    public void setCreditRateCeiling(String creditRateCeiling) {
+        this.creditRateCeiling = creditRateCeiling;
     }
 }
