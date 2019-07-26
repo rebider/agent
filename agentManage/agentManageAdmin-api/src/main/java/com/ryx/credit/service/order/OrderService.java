@@ -244,4 +244,9 @@ public interface OrderService {
      * 订单撤销
      */
     AgentResult revocationOrder(String id, String user);
+
+    /**
+     * 刪除配货商品
+     */
+    public AgentResult deletePeihuoAction(OReceiptPro oReceiptPro)throws Exception;
 }

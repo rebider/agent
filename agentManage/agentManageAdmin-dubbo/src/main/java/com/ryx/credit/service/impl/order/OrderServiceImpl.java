@@ -3017,7 +3017,7 @@ public class OrderServiceImpl implements OrderService {
             throw new MessageException("更新发货订单失败请重试");
 
         }
-        return AgentResult.ok();
+        return AgentResult.ok("此条配货信息已变更  请点击查询按钮以获取数据 ");
     }
 
     /**
@@ -3410,6 +3410,28 @@ public class OrderServiceImpl implements OrderService {
             return AgentResult.fail("撤销失败");
         }
         return AgentResult.ok("撤销成功");
+    }
+
+    @Override
+    public AgentResult deletePeihuoAction(OReceiptPro oReceiptPro) throws Exception {
+        logger.info("配货{}删除{}", oReceiptPro.getuUser(), JSONObject.toJSONString(oReceiptPro));
+
+        //数据库配货地址商品
+        OReceiptPro oReceiptPro_db = oReceiptProMapper.selectByPrimaryKey(oReceiptPro.getId());
+        oReceiptPro.setuTime(Calendar.getInstance().getTime());
+        oReceiptPro.setStatus(Status.STATUS_0.status);
+        if (oReceiptPro_db.getReceiptProStatus().compareTo(OReceiptStatus.DISPATCHED_ORDER.code) == 0) {
+            logger.info("用户{}删除{},{},删除发货商品失败请重试", oReceiptPro.getuUser(), oReceiptPro.getId(), oReceiptPro.getProNum());
+            return AgentResult.fail("发货商品已排单禁止删除");
+        }
+
+        if (1 != oReceiptProMapper.updateByPrimaryKeySelective(oReceiptPro)) {
+            logger.info("用户{}删除{},{},删除发货商品失败请重试", oReceiptPro.getuUser(), oReceiptPro.getId(), oReceiptPro.getProNum());
+            throw new MessageException("删除发货商品失败请重试");
+        }
+        //数据库配货地址同步
+        AgentResult sysn = sysnReceiptOrderPorNum(oReceiptPro_db.getReceiptId());
+        return sysn;
     }
 
 }
