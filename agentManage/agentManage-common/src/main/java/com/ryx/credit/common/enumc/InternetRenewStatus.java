@@ -15,7 +15,7 @@ public enum InternetRenewStatus {
 
     WXF("1","未续费"),
     YXF("2","已续费"),
-    BFXF("3","部分续费"),
+    BFXF("3","未扣足"),
     XFZ("4","续费中"),
     SX("5","失效");
 

@@ -525,13 +525,13 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
             }
             if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
-                //如果线下补款,审批通过直接已付款,否则部分付款
-                if(oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.XXBK.getValue())){
+                //如果线下补款,审批通过直接已付款,否则未续费
+                if(oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.XXBK.getValue()) || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue())){
                     oInternetRenewDetail.setRenewStatus(InternetRenewStatus.YXF.getValue());
                     oInternetCard.setRenewStatus(InternetRenewStatus.YXF.getValue());
                 }else{
-                    oInternetRenewDetail.setRenewStatus(InternetRenewStatus.BFXF.getValue());
-                    oInternetCard.setRenewStatus(InternetRenewStatus.BFXF.getValue());
+                    oInternetRenewDetail.setRenewStatus(InternetRenewStatus.WXF.getValue());
+                    oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
                 }
                 oInternetCard.setStop(Status.STATUS_0.status);
                 oInternetCard.setRenew(Status.STATUS_0.status);

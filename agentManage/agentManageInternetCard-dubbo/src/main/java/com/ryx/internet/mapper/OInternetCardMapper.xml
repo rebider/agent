@@ -578,6 +578,7 @@
       and c.renew_status = #{map.renewStatus,jdbcType=VARCHAR}
       and TO_CHAR(c.expire_time, 'YYYY-MM-DD') between  #{map.nowTime} and #{map.expireTime}
       and c.status = 1
+      and (c.INTERNET_CARD_STATUS = #{map.cardStaus1} or c.INTERNET_CARD_STATUS = #{map.cardStaus2})
     </where>
   </sql>
 </mapper>
