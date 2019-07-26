@@ -14,6 +14,7 @@ public enum ApprovalType {
 
     PASS("pass","通过"),
     REJECT("reject","拒绝"),
+    CANCEL("cancel","撤销"),
     BACK("back","退回");
 
     public String code;
