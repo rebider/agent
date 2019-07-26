@@ -451,7 +451,7 @@
       <if test="snNum != null and snNum != ''">
         SN_NUM = #{snNum,jdbcType=VARCHAR},
       </if>
-      <if test="deliverTime != null and deliverTime != ''">
+      <if test="deliverTime != null">
         DELIVER_TIME = #{deliverTime,jdbcType=TIMESTAMP},
       </if>
       <if test="consignee != null and consignee != ''">
@@ -472,10 +472,10 @@
       <if test="issuer != null and issuer != ''">
         ISSUER = #{issuer,jdbcType=VARCHAR},
       </if>
-      <if test="openAccountTime != null and openAccountTime != ''">
+      <if test="openAccountTime != null">
         OPEN_ACCOUNT_TIME = #{openAccountTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="expireTime != null and expireTime != ''">
+      <if test="expireTime != null">
         EXPIRE_TIME = #{expireTime,jdbcType=TIMESTAMP},
       </if>
       <if test="internetCardStatus != null and internetCardStatus != ''">
@@ -493,7 +493,7 @@
       <if test="manufacturer != null and manufacturer != ''">
         MANUFACTURER = #{manufacturer,jdbcType=VARCHAR},
       </if>
-      <if test="renew != null and renew != ''">
+      <if test="renew != null">
         RENEW = #{renew,jdbcType=DECIMAL},
       </if>
       <if test="cTime != null">
