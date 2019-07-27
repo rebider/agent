@@ -2,8 +2,10 @@ package com.ryx.credit.service.impl.pay;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.NotifyType;
+import com.ryx.credit.common.enumc.RedisCachKey;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -38,6 +40,8 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
     private IdService idService;
     @Autowired
     private AgentPlatFormSynMapper agentPlatFormSynMapper;
+    @Autowired
+    private RedisService redisService;
 
 
     /**
@@ -109,6 +113,19 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
         if(StringUtils.isBlank(bankNo)){
             return result;
         }
+        try{
+            String stringSet = redisService.hGet(bankNo,RedisCachKey.AGENT_BANK.code);
+            if(StringUtils.isNotBlank(stringSet)){ // 表示已经存在
+                if((trueName+""+certNo).equals(stringSet)){
+                    result.setMsg("认证成功");
+                    result.setStatus(200);
+                    return  result;
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            result.setMsg("查询缓存失败!");
+        }
         AgentPlatFormSyn record = new AgentPlatFormSyn();
         record.setId(idService.genId(TabId.a_agent_platformsyn));
         record.setNotifyTime(new Date());
@@ -129,6 +146,7 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
                     if (validateStatus.equals("00")) {
                         record.setNotifyStatus(Status.STATUS_1.status);
                         record.setSuccesTime(new Date());
+                        redisService.hSet(RedisCachKey.AGENT_BANK.code, FastMap.fastMap(bankNo,trueName+""+certNo));
                         result.setMsg("认证成功");
                         result.setStatus(200);
                     } else {

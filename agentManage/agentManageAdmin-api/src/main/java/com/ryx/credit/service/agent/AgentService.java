@@ -45,7 +45,7 @@ public interface AgentService {
 
     int updateAgent(Agent agent);
 
-    Agent updateAgentVo(Agent agent,List<String> attrs,String userId)throws Exception;
+    Agent updateAgentVo(Agent agent,List<String> attrs,String userId,String saveStatus)throws Exception;
 
     Agent findAgentByActivId(String activId);
 

@@ -331,7 +331,7 @@ public class AgentServiceImpl implements AgentService {
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public Agent updateAgentVo(Agent agent, List<String> attrs,String userId) throws Exception {
+    public Agent updateAgentVo(Agent agent, List<String> attrs,String userId,String saveStatus) throws Exception {
         if (null == agent || StringUtils.isEmpty(agent.getId())) {
             throw new ProcessException("代理商信息错误");
         }
@@ -411,10 +411,10 @@ public class AgentServiceImpl implements AgentService {
                 }
             }
         }
-        if(!isHaveYYZZ){
+        if(!isHaveYYZZ && !"1".equals(saveStatus)){
             throw new ProcessException("请添加营业执照附件");
         }
-        if(!isHaveFRSFZ){
+        if(!isHaveFRSFZ && !"1".equals(saveStatus)){
             throw new ProcessException("请添加法人身份证附件");
         }
         return db_agent;
