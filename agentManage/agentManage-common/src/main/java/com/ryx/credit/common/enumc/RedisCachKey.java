@@ -6,6 +6,7 @@ package com.ryx.credit.common.enumc;
 public enum RedisCachKey {
     USER_NAMES("USER_NAMES", "用戶信息"),
     AGENT_BUSINFO("AGENT_BUSINFO:", "代理商业务信息"),
+    AGENT_BANK("AGENT_BANK:", "三要素认证信息"),
     AGENTINFO("AGENTINFO:", "代理商信息"),
     DREGIONS("DREGIONS:", "区域信息"),
     DPOSREGION("DPosRegion:", "POS区域信息"),

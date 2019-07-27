@@ -1075,7 +1075,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public ResultVO updateAgentVo(AgentVo agent, String userId,Boolean isPass) throws MessageException {
+    public ResultVO updateAgentVo(AgentVo agent, String userId,Boolean isPass,String saveStatus) throws MessageException {
         try {
 //            verifyOrgAndBZYD(agent.getBusInfoVoList());
             logger.info("用户{}{}修改代理商信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent));
@@ -1090,7 +1090,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
             Agent ag = null;
             if (StringUtils.isNotBlank(agent.getAgent().getAgName())) {
-                ag = agentService.updateAgentVo(agent.getAgent(), agent.getAgentTableFile(),userId);
+                ag = agentService.updateAgentVo(agent.getAgent(), agent.getAgentTableFile(),userId,saveStatus);
             }
             logger.info("用户{}{}修改代理商信息结果{}", userId, agent.getAgent().getId(), "成功");
 
@@ -1106,12 +1106,12 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
             if (agent.getColinfoVoList() != null && agent.getColinfoVoList().size() > 0) {
                 logger.info("用户{}{}修改代理商收款信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent.getColinfoVoList()));
-                ResultVO updateAgentColinfoVoRes = agentColinfoService.updateAgentColinfoVo(agent.getColinfoVoList(), agent.getAgent(),userId);
+                ResultVO updateAgentColinfoVoRes = agentColinfoService.updateAgentColinfoVo(agent.getColinfoVoList(), agent.getAgent(),userId,saveStatus);
                 logger.info("用户{}{}修改代理商收款信息结果{}", userId, agent.getAgent().getId(), updateAgentColinfoVoRes.getResInfo());
             }
             if (agent.getBusInfoVoList() != null && agent.getBusInfoVoList().size() > 0) {
                 logger.info("用户{}{}修改代理商业务信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent.getBusInfoVoList()));
-                ResultVO updateAgentBusInfoVoRes = agentBusinfoService.updateAgentBusInfoVo(agent.getBusInfoVoList(), agent.getAgent(),userId,isPass);
+                ResultVO updateAgentBusInfoVoRes = agentBusinfoService.updateAgentBusInfoVo(agent.getBusInfoVoList(), agent.getAgent(),userId,isPass,saveStatus);
                 logger.info("用户{}{}修改代理商业务信息结果{}", userId, agent.getAgent().getId(), updateAgentBusInfoVoRes.getResInfo());
             }
 
