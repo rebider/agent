@@ -351,7 +351,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                 invoiceSum.setAddInvoiceAmt(BigDecimal.ZERO);
                 invoiceSum.setAdjustAmt(BigDecimal.ZERO);
                 invoiceSum.setInvoiceStatus("00");
-                invoiceSum.setOwnInvoice(invoiceSum.getPreLeftAmt().add(invoiceSum.getDayBackAmt()).add(invoiceSum.getDayProfitAmt()).add(invoiceSum.getPreProfitMonthAmt()).subtract(invoiceSum.getAddInvoiceAmt()).add(invoiceSum.getAdjustAmt()));
+                invoiceSum.setOwnInvoice(invoiceSum.getPreLeftAmt().add(invoiceSum.getDayBackAmt()).add(invoiceSum.getDayProfitAmt()).add(invoiceSum.getPreProfitMonthAmt()).add(invoiceSum.getSubAddInvoiceAmt()).subtract(invoiceSum.getAddInvoiceAmt()).add(invoiceSum.getAdjustAmt()));
                 invoiceSumMapper.insertSelective(invoiceSum);
             }
         }
