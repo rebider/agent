@@ -105,6 +105,8 @@ public class OrderServiceImpl implements OrderService {
     private IResourceService iResourceService;
     @Autowired
     private PlatFormMapper platFormMapper;
+    @Autowired
+    private ReceiptPlanMapper receiptPlanMapper;
 
     /**
      * 根据ID查询订单
@@ -2952,6 +2954,25 @@ public class OrderServiceImpl implements OrderService {
             throw new MessageException("商品"+oReceiptPro_db.getProName()+"修改失败,订单商品总数"+sum+"超出"+count.subtract(sum)+"件");
         }
 
+        //还得判断已排单和订货数量
+        ReceiptPlanExample receiptPlanExample = new ReceiptPlanExample();
+        ReceiptPlanExample.Criteria criteria2 = receiptPlanExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andReceiptIdEqualTo(oReceiptPro_db.getReceiptId()).andProIdEqualTo(oReceiptPro_db.getId());
+        List<ReceiptPlan> receiptPlans = receiptPlanMapper.selectByExample(receiptPlanExample);
+        BigDecimal planCount = new BigDecimal(0);
+        if (null!=receiptPlans && receiptPlans.size()>0){
+            for (ReceiptPlan receiptPlan : receiptPlans) {
+                planCount=planCount.add(receiptPlan.getPlanProNum());
+            }
+            BigDecimal residue=new BigDecimal(0);
+            residue  = oReceiptPro_db.getProNum().subtract(oReceiptPro_db.getSendNum());
+            //说明已经有排单的
+            if(planCount.compareTo(residue)==1){
+                logger.info("商品{}修改失败,已排单{},剩余{}件", oReceiptPro_db.getProName(),planCount, residue);
+                throw new MessageException("商品"+oReceiptPro_db.getProName()+"修改失败,已排单"+planCount+"剩余"+residue+"件");
+            }
+        }
+
+
 
         if (null != oReceiptPro.getProNum()) {
             oReceiptPro_db.setProNum(oReceiptPro.getProNum());
@@ -3389,6 +3410,17 @@ public class OrderServiceImpl implements OrderService {
             logger.info("用户{}删除{},{},删除发货商品失败请重试", oReceiptPro.getuUser(), oReceiptPro.getId(), oReceiptPro.getProNum());
             return AgentResult.fail("该条信息已经排单");
         }
+        //还得判断已排单和订货数量
+        ReceiptPlanExample receiptPlanExample = new ReceiptPlanExample();
+        ReceiptPlanExample.Criteria criteria2 = receiptPlanExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andReceiptIdEqualTo(oReceiptPro_db.getReceiptId()).andProIdEqualTo(oReceiptPro_db.getId());
+        List<ReceiptPlan> receiptPlans = receiptPlanMapper.selectByExample(receiptPlanExample);
+        BigDecimal planCount = new BigDecimal(0);
+        if (null!=receiptPlans && receiptPlans.size()>0){
+            logger.info("已排单,不可删除");
+            throw new MessageException("已排单,不可删除");
+
+        }
+
         //检查数量
         OReceiptProExample oReceiptProExample = new OReceiptProExample();
         OReceiptProExample.Criteria criteria = oReceiptProExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andProIdEqualTo(oReceiptPro_db.getProId()).andOrderidEqualTo(oReceiptPro_db.getOrderid()).andIdNotEqualTo(oReceiptPro_db.getId());
@@ -3414,6 +3446,7 @@ public class OrderServiceImpl implements OrderService {
             logger.info("商品{}修改失败,订单商品总数{},超出{}件", oReceiptPro_db.getProName(),sum, count.subtract(sum));
             throw new MessageException("商品"+oReceiptPro_db.getProName()+"修改失败,订单商品总数"+sum+"超出"+count.subtract(sum)+"件");
         }
+
 
         if (1 != oReceiptProMapper.updateByPrimaryKeySelective(oReceiptPro)) {
             logger.info("用户{}删除{},{},删除发货商品失败请重试", oReceiptPro.getuUser(), oReceiptPro.getId(), oReceiptPro.getProNum());
