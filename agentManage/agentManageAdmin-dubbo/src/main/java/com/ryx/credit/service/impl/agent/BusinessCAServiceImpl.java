@@ -5,6 +5,7 @@ import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtil;
+import com.ryx.credit.common.util.EnvironmentUtil;
 import com.ryx.credit.common.util.agentUtil.AESUtil;
 import com.ryx.credit.common.util.agentUtil.HttpUtil;
 import com.ryx.credit.common.util.agentUtil.RSAUtil;
@@ -54,13 +55,24 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 		}
 		try {
 			result.setMsg("服务器异常");
-			String httpResult = industryAuthRequest(agentBusinfoName);
+			String httpResult = null;
+
+			if(EnvironmentUtil.isProduction()){
+				httpResult = industryAuthRequest(agentBusinfoName);
+			}else{	//测试环境不作工商认证
+				httpResult = "{'respType':'TEST','data':{'isTest':'1'}}";
+			}
+
 			if(StringUtils.isBlank(httpResult)){
 				return result;
 			}
 			JSONObject jsonObject = JSONObject.parseObject(httpResult);
 			JSONObject dataMap = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
 			String respType = (String)jsonObject.get("respType");
+			if ("TEST".equals(respType)){
+				logger.info("-------------测试环境不作工商认证-----------");
+				return AgentResult.ok(dataMap);
+			}
 			if(respType.equals("E")){
 				return new AgentResult(404,String.valueOf(jsonObject.get("respMsg")),"");
 			}else{
