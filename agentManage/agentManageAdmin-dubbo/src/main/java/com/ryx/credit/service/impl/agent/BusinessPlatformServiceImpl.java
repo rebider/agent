@@ -486,7 +486,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 if (StringUtils.isNotBlank(agent.getcUser()) && StringUtils.isNotBlank(agent.getId())) {
                     item.setcUser(agent.getcUser());
                     item.setAgentId(agent.getId());
-                    AgentContract agentContract = agentContractService.insertAgentContract(item, item.getContractTableFile(), agent.getcUser());
+                    AgentContract agentContract = agentContractService.insertAgentContract(item, item.getContractTableFile(), agent.getcUser(),null);
                     //添加分管协议
                     if (StringUtils.isNotBlank(item.getAgentAssProtocol())) {
                         AssProtoColRel rel = new AssProtoColRel();
@@ -518,7 +518,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 if (StringUtils.isNotBlank(agent.getcUser()) && StringUtils.isNotBlank(agent.getId())) {
                     item.setcAgentId(agent.getId());
                     item.setcUser(agent.getcUser());
-                    AgentResult result = accountPaidItemService.insertAccountPaid(item, item.getCapitalTableFile(), agentVo.getAgent().getcUser(),false);
+                    AgentResult result = accountPaidItemService.insertAccountPaid(item, item.getCapitalTableFile(), agentVo.getAgent().getcUser(),false,null);
                     if (!result.isOK()) {
                         throw new ProcessException("缴纳款项信息录入失败");
                     }
@@ -528,7 +528,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 for (AgentColinfoVo item : agentVo.getColinfoVoList()) {
                     item.setAgentId(agent.getId());
                     item.setcUser(agent.getcUser());
-                    agentColinfoService.agentColinfoInsert(item, item.getColinfoTableFile());
+                    agentColinfoService.agentColinfoInsert(item, item.getColinfoTableFile(),null);
                 }
             }
             List<AgentBusInfo> agentBusInfoList = new ArrayList<>();

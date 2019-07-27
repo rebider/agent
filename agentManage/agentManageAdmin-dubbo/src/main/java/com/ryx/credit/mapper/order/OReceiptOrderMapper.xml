@@ -78,7 +78,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select 
+    select
     <include refid="Base_Column_List" />
     from O_RECEIPT_ORDER
     where ID = #{id,jdbcType=VARCHAR}
@@ -90,22 +90,22 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OReceiptOrder" >
-    insert into O_RECEIPT_ORDER (ID, ORDER_ID, RECEIPT_NUM, 
-      ADDRESS_ID, ADDR_REALNAME, ADDR_MOBILE, 
-      ADDR_PROVINCE, ADDR_CITY, ADDR_DISTRICT, 
-      ADDR_DETAIL, REMARK, ZIP_CODE, 
-      PRO_NUM, EXPRESS_REMARK, EXPRESS_SUC_DATE, 
-      C_TIME, C_USER, U_TIME, 
-      RECEIPT_STATUS, U_USER, STATUS, 
-      VERSION, AGENT_ID)
-    values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{receiptNum,jdbcType=VARCHAR}, 
-      #{addressId,jdbcType=VARCHAR}, #{addrRealname,jdbcType=VARCHAR}, #{addrMobile,jdbcType=VARCHAR}, 
-      #{addrProvince,jdbcType=VARCHAR}, #{addrCity,jdbcType=VARCHAR}, #{addrDistrict,jdbcType=VARCHAR}, 
-      #{addrDetail,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{zipCode,jdbcType=VARCHAR}, 
-      #{proNum,jdbcType=DECIMAL}, #{expressRemark,jdbcType=VARCHAR}, #{expressSucDate,jdbcType=TIMESTAMP}, 
-      #{cTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{uTime,jdbcType=TIMESTAMP}, 
-      #{receiptStatus,jdbcType=DECIMAL}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, 
-      #{version,jdbcType=DECIMAL}, #{agentId,jdbcType=VARCHAR})
+    insert into O_RECEIPT_ORDER (ID, ORDER_ID, RECEIPT_NUM,
+    ADDRESS_ID, ADDR_REALNAME, ADDR_MOBILE,
+    ADDR_PROVINCE, ADDR_CITY, ADDR_DISTRICT,
+    ADDR_DETAIL, REMARK, ZIP_CODE,
+    PRO_NUM, EXPRESS_REMARK, EXPRESS_SUC_DATE,
+    C_TIME, C_USER, U_TIME,
+    RECEIPT_STATUS, U_USER, STATUS,
+    VERSION, AGENT_ID)
+    values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{receiptNum,jdbcType=VARCHAR},
+    #{addressId,jdbcType=VARCHAR}, #{addrRealname,jdbcType=VARCHAR}, #{addrMobile,jdbcType=VARCHAR},
+    #{addrProvince,jdbcType=VARCHAR}, #{addrCity,jdbcType=VARCHAR}, #{addrDistrict,jdbcType=VARCHAR},
+    #{addrDetail,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{zipCode,jdbcType=VARCHAR},
+    #{proNum,jdbcType=DECIMAL}, #{expressRemark,jdbcType=VARCHAR}, #{expressSucDate,jdbcType=TIMESTAMP},
+    #{cTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{uTime,jdbcType=TIMESTAMP},
+    #{receiptStatus,jdbcType=DECIMAL}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
+    #{version,jdbcType=DECIMAL}, #{agentId,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OReceiptOrder" >
     insert into O_RECEIPT_ORDER
@@ -333,32 +333,32 @@
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OReceiptOrder" >
     update O_RECEIPT_ORDER
     set ORDER_ID = #{orderId,jdbcType=VARCHAR},
-      RECEIPT_NUM = #{receiptNum,jdbcType=VARCHAR},
-      ADDRESS_ID = #{addressId,jdbcType=VARCHAR},
-      ADDR_REALNAME = #{addrRealname,jdbcType=VARCHAR},
-      ADDR_MOBILE = #{addrMobile,jdbcType=VARCHAR},
-      ADDR_PROVINCE = #{addrProvince,jdbcType=VARCHAR},
-      ADDR_CITY = #{addrCity,jdbcType=VARCHAR},
-      ADDR_DISTRICT = #{addrDistrict,jdbcType=VARCHAR},
-      ADDR_DETAIL = #{addrDetail,jdbcType=VARCHAR},
-      REMARK = #{remark,jdbcType=VARCHAR},
-      ZIP_CODE = #{zipCode,jdbcType=VARCHAR},
-      PRO_NUM = #{proNum,jdbcType=DECIMAL},
-      EXPRESS_REMARK = #{expressRemark,jdbcType=VARCHAR},
-      EXPRESS_SUC_DATE = #{expressSucDate,jdbcType=TIMESTAMP},
-      C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      U_TIME = #{uTime,jdbcType=TIMESTAMP},
-      RECEIPT_STATUS = #{receiptStatus,jdbcType=DECIMAL},
-      U_USER = #{uUser,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL},
-      AGENT_ID = #{agentId,jdbcType=VARCHAR}
+    RECEIPT_NUM = #{receiptNum,jdbcType=VARCHAR},
+    ADDRESS_ID = #{addressId,jdbcType=VARCHAR},
+    ADDR_REALNAME = #{addrRealname,jdbcType=VARCHAR},
+    ADDR_MOBILE = #{addrMobile,jdbcType=VARCHAR},
+    ADDR_PROVINCE = #{addrProvince,jdbcType=VARCHAR},
+    ADDR_CITY = #{addrCity,jdbcType=VARCHAR},
+    ADDR_DISTRICT = #{addrDistrict,jdbcType=VARCHAR},
+    ADDR_DETAIL = #{addrDetail,jdbcType=VARCHAR},
+    REMARK = #{remark,jdbcType=VARCHAR},
+    ZIP_CODE = #{zipCode,jdbcType=VARCHAR},
+    PRO_NUM = #{proNum,jdbcType=DECIMAL},
+    EXPRESS_REMARK = #{expressRemark,jdbcType=VARCHAR},
+    EXPRESS_SUC_DATE = #{expressSucDate,jdbcType=TIMESTAMP},
+    C_TIME = #{cTime,jdbcType=TIMESTAMP},
+    C_USER = #{cUser,jdbcType=VARCHAR},
+    U_TIME = #{uTime,jdbcType=TIMESTAMP},
+    RECEIPT_STATUS = #{receiptStatus,jdbcType=DECIMAL},
+    U_USER = #{uUser,jdbcType=VARCHAR},
+    STATUS = #{status,jdbcType=DECIMAL},
+    VERSION = #{version,jdbcType=DECIMAL},
+    AGENT_ID = #{agentId,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix" >
     <if test="page != null" >
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix" >
@@ -369,29 +369,29 @@
 
   <select id="queryPlannerList" parameterType="map" resultType="map">
     <include refid="OracleDialectPrefix" />
-      select
-        ro.ID, ro.ORDER_ID, ro.RECEIPT_NUM, ro.ADDRESS_ID, ro.ADDR_REALNAME, ro.ADDR_MOBILE, ro.ADDR_PROVINCE,
-        ro.ADDR_CITY, ro.ADDR_DISTRICT, ro.ADDR_DETAIL, ro.REMARK, ro.ZIP_CODE, ro.PRO_NUM as PRO_NUM_SUM, ro.EXPRESS_REMARK,
-        ro.EXPRESS_SUC_DATE, ro.C_TIME, ro.C_USER, ro.U_TIME, ro.RECEIPT_STATUS, ro.U_USER, ro.STATUS, ro.VERSION,
-        ro.AGENT_ID, rp.ORDERID, rp.RECEIPT_ID, rp.PRO_ID, rp.PRO_CODE, rp.PRO_NAME, rp.PRO_NUM,rp.SEND_NUM,rp.id as receipt_Pro_Id
-      from O_Receipt_order ro,o_Receipt_pro rp
-      where ro.id = rp.receipt_id
-      <if test="par.receiptStatus != null and par.receiptStatus!=''" >
-        and receipt_status = #{par.receiptStatus}
-      </if>
-      <if test="par.receiptProStatus != null and par.receiptProStatus!=''" >
-        and receipt_pro_status = #{par.receiptProStatus}
-      </if>
-      <if test="par.orderId != null and par.orderId!=''" >
-        and ro.ORDER_ID = #{par.orderId}
-      </if>
-      <if test="par.receiptNum != null and par.receiptNum!=''" >
-        and ro.RECEIPT_NUM = #{par.receiptNum}
-      </if>
-      <if test="par.addrRealname != null and par.addrRealname!=''" >
-        and ro.ADDR_REALNAME = #{par.addrRealname}
-      </if>
-      order by suborder.c_time desc
+    select
+    ro.ID, ro.ORDER_ID, ro.RECEIPT_NUM, ro.ADDRESS_ID, ro.ADDR_REALNAME, ro.ADDR_MOBILE, ro.ADDR_PROVINCE,
+    ro.ADDR_CITY, ro.ADDR_DISTRICT, ro.ADDR_DETAIL, ro.REMARK, ro.ZIP_CODE, ro.PRO_NUM as PRO_NUM_SUM, ro.EXPRESS_REMARK,
+    ro.EXPRESS_SUC_DATE, ro.C_TIME, ro.C_USER, ro.U_TIME, ro.RECEIPT_STATUS, ro.U_USER, ro.STATUS, ro.VERSION,
+    ro.AGENT_ID, rp.ORDERID, rp.RECEIPT_ID, rp.PRO_ID, rp.PRO_CODE, rp.PRO_NAME, rp.PRO_NUM,rp.SEND_NUM,rp.id as receipt_Pro_Id
+    from O_Receipt_order ro,o_Receipt_pro rp
+    where ro.id = rp.receipt_id
+    <if test="par.receiptStatus != null and par.receiptStatus!=''" >
+      and receipt_status = #{par.receiptStatus}
+    </if>
+    <if test="par.receiptProStatus != null and par.receiptProStatus!=''" >
+      and receipt_pro_status = #{par.receiptProStatus}
+    </if>
+    <if test="par.orderId != null and par.orderId!=''" >
+      and ro.ORDER_ID = #{par.orderId}
+    </if>
+    <if test="par.receiptNum != null and par.receiptNum!=''" >
+      and ro.RECEIPT_NUM = #{par.receiptNum}
+    </if>
+    <if test="par.addrRealname != null and par.addrRealname!=''" >
+      and ro.ADDR_REALNAME = #{par.addrRealname}
+    </if>
+    order by suborder.c_time desc
 
     <include refid="OracleDialectSuffix" />
 
@@ -482,9 +482,9 @@
     <where>
       and ro.status=1 and ag.status=1
       and ab.status = '1' and ab.clo_review_status=#{par.cloReviewStatus} and ab.bus_num is not null
-    <if test="par.proType != null and par.proType!=''" >
+      <if test="par.proType != null and par.proType!=''" >
         and suborder.pro_type=#{par.proType}
-    </if>
+      </if>
       <if test="par.agentName != null and par.agentName!=''" >
         and ag.AG_NAME like '${par.agentName}'
       </if>
@@ -494,41 +494,41 @@
       <if test="par.proName != null and par.proName!=''" >
         and suborder.pro_name like '${par.proName}'
       </if>
-    <if test="par.vender != null and par.vender!=''" >
+      <if test="par.vender != null and par.vender!=''" >
         and
-         exists(
-           select in_oa.id
-           from o_activity in_oa
-           where in_oa.pro_type=suborder.pro_type
-            and in_oa.act_code =oa.act_code
-            and in_oa.vender=#{par.vender}
-            and in_oa.pro_model=#{par.proModel}
-            and in_oa.status=1
-         )
-    </if>
-    <if test="par.actCode != null and par.actCode!=''" >
-      and oa.act_code=#{par.actCode}
-    </if>
-    <if test="par.proId != null and par.proId!=''" >
-     and ac.pro_id=#{par.proId}
-    </if>
-    <if test="par.receiptStatus != null and par.receiptStatus!=''" >
-      and receipt_status = #{par.receiptStatus}
-    </if>
-    <if test="par.receiptProStatus != null and par.receiptProStatus!=''" >
-      and receipt_pro_status = #{par.receiptProStatus}
-    </if>
-    <if test="par.orderId != null and par.orderId!=''" >
-      and ro.ORDER_ID = #{par.orderId}
-    </if>
-    <if test="par.receiptNum != null and par.receiptNum!=''" >
-      and ro.RECEIPT_NUM = #{par.receiptNum}
-    </if>
-    <if test="par.addrRealname != null and par.addrRealname!=''" >
-      and ro.ADDR_REALNAME = #{par.addrRealname}
-    </if>
+        exists(
+        select in_oa.id
+        from o_activity in_oa
+        where in_oa.pro_type=suborder.pro_type
+        and in_oa.act_code =oa.act_code
+        and in_oa.vender=#{par.vender}
+        and in_oa.pro_model=#{par.proModel}
+        and in_oa.status=1
+        )
+      </if>
+      <if test="par.actCode != null and par.actCode!=''" >
+        and oa.act_code=#{par.actCode}
+      </if>
+      <if test="par.proId != null and par.proId!=''" >
+        and ac.pro_id=#{par.proId}
+      </if>
+      <if test="par.receiptStatus != null and par.receiptStatus!=''" >
+        and receipt_status = #{par.receiptStatus}
+      </if>
+      <if test="par.receiptProStatus != null and par.receiptProStatus!=''" >
+        and receipt_pro_status = #{par.receiptProStatus}
+      </if>
+      <if test="par.orderId != null and par.orderId!=''" >
+        and ro.ORDER_ID = #{par.orderId}
+      </if>
+      <if test="par.receiptNum != null and par.receiptNum!=''" >
+        and ro.RECEIPT_NUM = #{par.receiptNum}
+      </if>
+      <if test="par.addrRealname != null and par.addrRealname!=''" >
+        and ro.ADDR_REALNAME = #{par.addrRealname}
+      </if>
     </where>
-     order by suborder.c_time desc
+    order by suborder.c_time desc
 
     <include refid="OracleDialectSuffix" />
 

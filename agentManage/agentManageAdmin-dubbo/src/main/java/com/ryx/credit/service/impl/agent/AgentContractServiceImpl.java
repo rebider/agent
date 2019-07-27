@@ -73,7 +73,7 @@ public class AgentContractServiceImpl implements AgentContractService {
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public AgentContract insertAgentContract(AgentContract contract, List<String> attr,String userId) throws ProcessException {
+    public AgentContract insertAgentContract(AgentContract contract, List<String> attr,String userId,String saveType) throws ProcessException {
         if (contract == null) {
             logger.info("代理商合同添加:{}", "合同信息为空");
             throw new ProcessException("合同信息为空");
@@ -86,7 +86,7 @@ public class AgentContractServiceImpl implements AgentContractService {
 //            logger.info("代理商合同添加:{}", "合同编号不能为空");
 //            throw new ProcessException("合同编号不能为空");
 //        }
-        if (null == contract.getContType()) {
+        if (null == contract.getContType() && !"1".equals(saveType)) {
             logger.info("代理商合同添加:{}", "合同类型不能为空");
             throw new ProcessException("合同类型不能为空");
         }
@@ -186,7 +186,7 @@ public class AgentContractServiceImpl implements AgentContractService {
                 if (StringUtils.isEmpty(agentContractVo.getId())) {
                     //直接新曾
 
-                    AgentContract result = insertAgentContract(agentContractVo, agentContractVo.getContractTableFile(),userId);
+                    AgentContract result = insertAgentContract(agentContractVo, agentContractVo.getContractTableFile(),userId,null);
                     if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentContractVo.getAgentAssProtocol())){
                         AssProtoColRel rel = new AssProtoColRel();
                         rel.setAgentBusinfoId(result.getId());

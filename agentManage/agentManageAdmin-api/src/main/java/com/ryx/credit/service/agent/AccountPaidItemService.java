@@ -18,7 +18,7 @@ import java.util.List;
  */
 public interface AccountPaidItemService {
 
-    AgentResult insertAccountPaid(Capital capital, List<String> fileIdList, String cUser,Boolean isPass)throws Exception;
+    AgentResult insertAccountPaid(Capital capital, List<String> fileIdList, String cUser,Boolean isPass,String saveType)throws Exception;
 
     int removeAccountPaid(String id);
 
