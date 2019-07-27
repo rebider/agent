@@ -162,10 +162,15 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                         }
                     }
                     if("1".equals(invoiceApply.getYsResult())){ // 初审通过
-                        List<String> stringList = invoiceApplyMapper.getAgentIdByPayCompany(invoiceApply.getInvoiceCompany());
-                        if(!(stringList.size() == 1  && stringList.get(0).equals(agentId))){
+                        List<String> stringList = invoiceApplyMapper.getPayCompanyById(agentId);
+                        if(stringList.size()<= 0){
                             invoiceApply.setYsResult("0");
                             invoiceApply.setRev1("开票公司和该代理商不符！");
+                        }else{
+                            if(!stringList.contains(invoiceApply.getInvoiceCompany())){
+                                invoiceApply.setYsResult("0");
+                                invoiceApply.setRev1("开票公司和该代理商不符！");
+                            }
                         }
                     }
                     invoiceApply.setId(idService.genId(TabId.P_INVOICE_APPLY));
