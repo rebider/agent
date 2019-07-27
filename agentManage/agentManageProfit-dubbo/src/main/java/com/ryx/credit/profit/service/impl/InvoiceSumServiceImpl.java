@@ -222,7 +222,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
-    public void invoicePreLeftAmt(List<List<Object>> param,String profitMonth) throws Exception{
+    public void invoicePreLeftAmt(List<List<Object>> param,String profitMonth) throws MessageException{
         if (null == param && param.size() == 0) {
             logger.info("导入数据为空");
             throw new MessageException("导入数据为空");
@@ -309,8 +309,9 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                     }
                 }
 
+            }else{
+                throw new MessageException("excel中存在不合理数据！");
             }
-
         }
 
         for (List<Object> invoiceSumList : param) {
