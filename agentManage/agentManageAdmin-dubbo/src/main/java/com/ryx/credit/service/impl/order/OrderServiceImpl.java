@@ -2926,6 +2926,33 @@ public class OrderServiceImpl implements OrderService {
             return AgentResult.fail("该条信息已经排单");
         }
 
+        //检查数量
+        OReceiptProExample oReceiptProExample = new OReceiptProExample();
+        OReceiptProExample.Criteria criteria = oReceiptProExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andProIdEqualTo(oReceiptPro_db.getProId()).andOrderidEqualTo(oReceiptPro_db.getOrderid()).andIdNotEqualTo(oReceiptPro_db.getId());
+        List<OReceiptPro> oReceiptPros = oReceiptProMapper.selectByExample(oReceiptProExample);
+        BigDecimal count = new BigDecimal(0);
+        if (null!=oReceiptPros){
+            for (OReceiptPro receiptPro : oReceiptPros) {
+                count=receiptPro.getProNum().add(count);
+            }
+        }
+       count=count.add(oReceiptPro.getProNum());
+        BigDecimal sum = new BigDecimal(0);
+        OSubOrderExample oSubOrderExample = new OSubOrderExample();
+        OSubOrderExample.Criteria criteria1 = oSubOrderExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andOrderIdEqualTo(oReceiptPro_db.getOrderid()).andProIdEqualTo(oReceiptPro_db.getProId());
+        List<OSubOrder> oSubOrders = oSubOrderMapper.selectByExample(oSubOrderExample);
+        if (null!=oSubOrders){
+            for (OSubOrder oSubOrder : oSubOrders) {
+                sum=oSubOrder.getProNum().add(sum);
+            }
+        }
+        //进行判断
+        if (count.compareTo(sum)==1){
+            logger.info("商品{}修改失败,订单商品总数{},超出{}件", oReceiptPro_db.getProName(),sum, count.subtract(sum));
+            throw new MessageException("商品"+oReceiptPro_db.getProName()+"修改失败,订单商品总数"+sum+"超出"+count.subtract(sum)+"件");
+        }
+
+
         if (null != oReceiptPro.getProNum()) {
             oReceiptPro_db.setProNum(oReceiptPro.getProNum());
             if (oReceiptPro_db.getProNum().compareTo(BigDecimal.ZERO) <= 0) {
@@ -3423,6 +3450,31 @@ public class OrderServiceImpl implements OrderService {
         if (oReceiptPro_db.getReceiptProStatus().compareTo(OReceiptStatus.DISPATCHED_ORDER.code) == 0) {
             logger.info("用户{}删除{},{},删除发货商品失败请重试", oReceiptPro.getuUser(), oReceiptPro.getId(), oReceiptPro.getProNum());
             return AgentResult.fail("该条信息已经排单");
+        }
+        //检查数量
+        OReceiptProExample oReceiptProExample = new OReceiptProExample();
+        OReceiptProExample.Criteria criteria = oReceiptProExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andProIdEqualTo(oReceiptPro_db.getProId()).andOrderidEqualTo(oReceiptPro_db.getOrderid()).andIdNotEqualTo(oReceiptPro_db.getId());
+        List<OReceiptPro> oReceiptPros = oReceiptProMapper.selectByExample(oReceiptProExample);
+        BigDecimal count = new BigDecimal(0);
+        if (null!=oReceiptPros){
+            for (OReceiptPro receiptPro : oReceiptPros) {
+                count=receiptPro.getProNum().add(count);
+            }
+        }
+        count=count.add(oReceiptPro.getProNum());
+        BigDecimal sum = new BigDecimal(0);
+        OSubOrderExample oSubOrderExample = new OSubOrderExample();
+        OSubOrderExample.Criteria criteria1 = oSubOrderExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andOrderIdEqualTo(oReceiptPro_db.getOrderid()).andProIdEqualTo(oReceiptPro_db.getProId());
+        List<OSubOrder> oSubOrders = oSubOrderMapper.selectByExample(oSubOrderExample);
+        if (null!=oSubOrders){
+            for (OSubOrder oSubOrder : oSubOrders) {
+                sum=oSubOrder.getProNum().add(sum);
+            }
+        }
+        //进行判断
+        if (count.compareTo(sum)==1){
+            logger.info("商品{}修改失败,订单商品总数{},超出{}件", oReceiptPro_db.getProName(),sum, count.subtract(sum));
+            throw new MessageException("商品"+oReceiptPro_db.getProName()+"修改失败,订单商品总数"+sum+"超出"+count.subtract(sum)+"件");
         }
 
         if (1 != oReceiptProMapper.updateByPrimaryKeySelective(oReceiptPro)) {
