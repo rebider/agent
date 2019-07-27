@@ -18,6 +18,13 @@ import java.util.Map;
  * Created by cx on 2018/5/28.
  */
 public interface AgentEnterService {
+
+    /**
+     * 商户入网信息保存
+     * @param agentVo
+     * @return
+     */
+    public ResultVO saveAgentInfo(AgentVo agentVo)throws ProcessException;
     /**
      * 商户入网
      * @param agentVo

@@ -57,14 +57,14 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
     private CapitalFlowService capitalFlowService;
     @Override
     @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
-    public AgentResult insertAccountPaid(Capital capital,List<String> fileIdList,String cUser,Boolean isPass)throws Exception{
+    public AgentResult insertAccountPaid(Capital capital,List<String> fileIdList,String cUser,Boolean isPass,String saveType)throws Exception{
 
         AgentResult result = new AgentResult(500,"参数错误","");
         if(StringUtils.isBlank(cUser)){
             return result;
         }
 
-        if(StringUtils.isBlank(capital.getcType())){
+        if(StringUtils.isBlank(capital.getcType()) && !"1".equals(saveType)){
             return result;
         }
         capital.setcIsin(Status.STATUS_0.status);
@@ -78,9 +78,9 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
         capital.setcInAmount(capital.getcInAmount()==null?Status.STATUS_0.status:capital.getcInAmount());
         capital.setFreezeAmt(Status.STATUS_0.status);
         if(!isPass){
-            if(PayType.YHHK.code.equals(capital.getcPayType())) {
+            if(PayType.YHHK.code.equals(capital.getcPayType()) && StringUtils.isNotBlank(capital.getcAmount().toString())) {
                 capital.setcFqInAmount(capital.getcAmount());
-            }else if(PayType.FRDK.code.equals(capital.getcPayType())){
+            }else if(PayType.FRDK.code.equals(capital.getcPayType())  && StringUtils.isNotBlank(capital.getcAmount().toString())){
                 capital.setcFqInAmount(Status.STATUS_0.status);
                 if(null==capital.getcFqCount()){
                     throw new ProcessException("分期期数不能为空");
@@ -165,7 +165,7 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
                 capitalVo.setcAgentId(agent.getId());
                 if(StringUtils.isEmpty(capitalVo.getId())) {
                     //直接新曾
-                    AgentResult result =   insertAccountPaid(capitalVo, capitalVo.getCapitalTableFile(), userId,isPass);
+                    AgentResult result =   insertAccountPaid(capitalVo, capitalVo.getCapitalTableFile(), userId,isPass,null);
                     //加入流水
                     capitalFlowService.insertCapitalFlow(capitalVo, BigDecimal.ZERO,capitalVo.getSrcId(),capitalVo.getSrcRemark());
                     if(!result.isOK())throw new ProcessException("新增收款信息失败");

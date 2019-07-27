@@ -33,7 +33,7 @@ public interface AgentService {
      * @return
      * @throws ProcessException
      */
-    Agent insertAgent(Agent agent, List<String> attrId,String userId) throws ProcessException;
+    Agent insertAgent(Agent agent, List<String> attrId,String userId,String saveType) throws ProcessException;
 
     Agent getAgentById(String id);
 

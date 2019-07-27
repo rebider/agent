@@ -202,7 +202,7 @@ public class AgentServiceImpl implements AgentService {
      */
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public Agent insertAgent(Agent agent, List<String> attrId,String userId) throws ProcessException {
+    public Agent insertAgent(Agent agent, List<String> attrId,String userId,String saveType) throws ProcessException {
         if (agent == null) {
             logger.info("代理商添加:{}", "代理商信息为空");
             throw new ProcessException("代理商信息为空");
@@ -262,7 +262,7 @@ public class AgentServiceImpl implements AgentService {
                 }
 
             }
-            if(!agent.isImport()) {
+            if(!agent.isImport() && !"1".equals(saveType)) {
                 if (!isHaveYYZZ) {
                     throw new ProcessException("请添加营业执照附件");
                 }
