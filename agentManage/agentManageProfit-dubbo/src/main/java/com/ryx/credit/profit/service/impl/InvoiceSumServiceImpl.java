@@ -3,11 +3,13 @@ package com.ryx.credit.profit.service.impl;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.profit.dao.FreezeAgentMapper;
 import com.ryx.credit.profit.dao.FreezeOperationRecordMapper;
 import com.ryx.credit.profit.dao.InvoiceSumMapper;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.IInvoiceSumService;
+import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +40,19 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
 
     @Autowired
     private IdService idService;
+    @Autowired
+    private AgentService agentService;
 
+    /**
+     * select
+     *         <include refid="Base_Column_List" />
+     *         from A_AGENT
+     *         where ID = #{id,jdbcType=VARCHAR}
+     * @param pageInfo
+     * @param param
+     * @param map
+     * @return
+     */
     @Override
     public PageInfo selectByMap(PageInfo pageInfo, Map<String, String> param,Map<String,Object> map) {
 
@@ -241,6 +255,11 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                 if( null==invoiceSum.get(2) || "".equals(invoiceSum.get(2))){
                     logger.info("代理商唯一码导入有误，请检查");
                     throw new MessageException("代理商唯一码导入有误，请检查");
+                }else{ //检验唯一码是否准确
+                    Agent agent = agentService.getAgentById(invoiceSum.get(2).toString());
+                    if(agent == null){
+                        throw new MessageException("代理商唯一码:"+invoiceSum.get(2).toString()+"错误，请检查");
+                    }
                 }
                 if( null==invoiceSum.get(3) || "".equals(invoiceSum.get(3))){
                     logger.info("代理商名称导入有误，请检查");
