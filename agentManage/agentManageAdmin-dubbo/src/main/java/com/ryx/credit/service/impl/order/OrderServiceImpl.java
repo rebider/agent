@@ -2960,16 +2960,8 @@ public class OrderServiceImpl implements OrderService {
         List<ReceiptPlan> receiptPlans = receiptPlanMapper.selectByExample(receiptPlanExample);
         BigDecimal planCount = new BigDecimal(0);
         if (null!=receiptPlans && receiptPlans.size()>0){
-            for (ReceiptPlan receiptPlan : receiptPlans) {
-                planCount=planCount.add(receiptPlan.getPlanProNum());
-            }
-            BigDecimal residue=new BigDecimal(0);
-            residue  = oReceiptPro_db.getProNum().subtract(oReceiptPro_db.getSendNum());
-            //说明已经有排单的
-            if(planCount.compareTo(residue)==1){
-                logger.info("商品{}修改失败,已排单{},剩余{}件", oReceiptPro_db.getProName(),planCount, residue);
-                throw new MessageException("商品"+oReceiptPro_db.getProName()+"修改失败,已排单"+planCount+"剩余"+residue+"件");
-            }
+            logger.info("已排单,不可修改,如需要请去排单撤销");
+            throw new MessageException("已排单,不可修改,如需要请去排单撤销");
         }
 
 
