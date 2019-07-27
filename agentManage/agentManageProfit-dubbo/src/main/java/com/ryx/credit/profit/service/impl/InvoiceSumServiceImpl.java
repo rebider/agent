@@ -256,7 +256,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                     logger.info("代理商唯一码导入有误，请检查");
                     throw new MessageException("代理商唯一码导入有误，请检查");
                 }else{ //检验唯一码是否准确
-                    Agent agent = agentService.getAgentById(invoiceSum.get(2).toString());
+                    Agent agent = agentService.getAgentById(invoiceSum.get(2).toString().trim());
                     if(agent == null){
                         throw new MessageException("代理商唯一码:"+invoiceSum.get(2).toString()+"错误，请检查");
                     }
@@ -277,7 +277,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                     try {
                         new BigDecimal(String.valueOf(invoiceSum.get(5)));
                     }catch (Exception e){
-                        logger.info("导入上月欠票基数格式不正确，请检查");
+                        logger.info("导入上月剩余欠票基数格式不正确，请检查");
                         throw new MessageException("导入上月欠票基数不正确，请检查");
                     }
                 }
@@ -338,11 +338,11 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                 InvoiceSum invoiceSum = new InvoiceSum();
                 invoiceSum.setId(idService.genId(TabId.P_INVOICE_SUM));
                 invoiceSum.setProfitMonth(profitMonth);
-                invoiceSum.setTopOrgId(invoiceSumList.get(0).toString());
-                invoiceSum.setTopOrgName(invoiceSumList.get(1).toString());
-                invoiceSum.setAgentId(invoiceSumList.get(2).toString());
-                invoiceSum.setAgentName(invoiceSumList.get(3).toString());
-                invoiceSum.setInvoiceCompany(invoiceSumList.get(4).toString());
+                invoiceSum.setTopOrgId(invoiceSumList.get(0).toString().trim());
+                invoiceSum.setTopOrgName(invoiceSumList.get(1).toString().trim());
+                invoiceSum.setAgentId(invoiceSumList.get(2).toString().trim());
+                invoiceSum.setAgentName(invoiceSumList.get(3).toString().trim());
+                invoiceSum.setInvoiceCompany(invoiceSumList.get(4).toString().trim());
                 invoiceSum.setPreLeftAmt(new BigDecimal(invoiceSumList.get(5).toString()));
                 invoiceSum.setDayBackAmt(new BigDecimal(invoiceSumList.get(6).toString()));
                 invoiceSum.setDayProfitAmt(new BigDecimal(invoiceSumList.get(7).toString()));
