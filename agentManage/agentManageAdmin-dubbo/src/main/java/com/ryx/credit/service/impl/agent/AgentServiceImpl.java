@@ -219,6 +219,12 @@ public class AgentServiceImpl implements AgentService {
 //            logger.info("代理商添加:{}","营业执照不能为空");
 //            throw new ProcessException("营业执照不能为空");
 //        }
+        Map<String,String> stringMap = new HashMap<String, String>();
+        stringMap.put("agName",agent.getAgName());
+        List<Agent> agentList = getListByORGAndId(stringMap);
+        if(agentList.size() != 0){
+            throw new ProcessException("代理商名称重复");
+        }
         Date date = Calendar.getInstance().getTime();
         agent.setStatus(Status.STATUS_1.status);
         agent.setVersion(Status.STATUS_1.status);
@@ -331,6 +337,15 @@ public class AgentServiceImpl implements AgentService {
     public Agent updateAgentVo(Agent agent, List<String> attrs,String userId,String saveStatus) throws Exception {
         if (null == agent || StringUtils.isEmpty(agent.getId())) {
             throw new ProcessException("代理商信息错误");
+        }
+        if(StringUtils.isNotBlank(agent.getAgName())){
+            throw new ProcessException("代理商名称不能为空");
+        }
+        Map<String,String> stringMap = new HashMap<String, String>();
+        stringMap.put("agName",agent.getAgName());
+        List<Agent> agentList = getListByORGAndId(stringMap);
+        if(agentList.size() != 0){
+            throw new ProcessException("代理商名称重复");
         }
         Agent db_agent = getAgentById(agent.getId());
         db_agent.setAgName(agent.getAgName());
@@ -625,6 +640,9 @@ public class AgentServiceImpl implements AgentService {
         }
         if(StringUtils.isNotBlank(map.get("docDistrict"))){ //所屬大區
             c.andAgDocDistrictEqualTo(map.get("docDistrict"));
+        }
+        if(StringUtils.isNotBlank(map.get("agName"))){
+            c.andAgNameEqualTo(map.get("agName"));
         }
         c.andStatusEqualTo(Status.STATUS_1.status);
         List<Agent> list = agentMapper.selectByExample(example);
