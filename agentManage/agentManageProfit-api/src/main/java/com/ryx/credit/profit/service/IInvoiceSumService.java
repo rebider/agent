@@ -1,7 +1,9 @@
 package com.ryx.credit.profit.service;
 
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.pojo.InvoiceSum;
+import org.springframework.mail.MailException;
 
 import java.util.List;
 import java.util.Map;
@@ -19,5 +21,5 @@ public interface IInvoiceSumService {
 
     int updateByPrimaryKeySelective(InvoiceSum record);
 
-  void invoicePreLeftAmt(List<List<Object>> param,String profitMonth)throws Exception;
+  void invoicePreLeftAmt(List<List<Object>> param,String profitMonth)throws MessageException;
 }

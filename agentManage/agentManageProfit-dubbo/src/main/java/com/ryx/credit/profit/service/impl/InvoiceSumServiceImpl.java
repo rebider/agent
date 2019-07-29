@@ -3,11 +3,13 @@ package com.ryx.credit.profit.service.impl;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.profit.dao.FreezeAgentMapper;
 import com.ryx.credit.profit.dao.FreezeOperationRecordMapper;
 import com.ryx.credit.profit.dao.InvoiceSumMapper;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.IInvoiceSumService;
+import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +40,8 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
 
     @Autowired
     private IdService idService;
+    @Autowired
+    private AgentService agentService;
 
     @Override
     public PageInfo selectByMap(PageInfo pageInfo, Map<String, String> param,Map<String,Object> map) {
@@ -222,7 +226,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
-    public void invoicePreLeftAmt(List<List<Object>> param,String profitMonth) throws Exception{
+    public void invoicePreLeftAmt(List<List<Object>> param,String profitMonth) throws MessageException{
         if (null == param && param.size() == 0) {
             logger.info("导入数据为空");
             throw new MessageException("导入数据为空");
@@ -241,6 +245,11 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                 if( null==invoiceSum.get(2) || "".equals(invoiceSum.get(2))){
                     logger.info("代理商唯一码导入有误，请检查");
                     throw new MessageException("代理商唯一码导入有误，请检查");
+                }else{ //检验唯一码是否准确
+                    Agent agent = agentService.getAgentById(invoiceSum.get(2).toString().trim());
+                    if(agent == null){
+                        throw new MessageException("代理商唯一码:"+invoiceSum.get(2).toString()+"错误，请检查");
+                    }
                 }
                 if( null==invoiceSum.get(3) || "".equals(invoiceSum.get(3))){
                     logger.info("代理商名称导入有误，请检查");
@@ -258,7 +267,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                     try {
                         new BigDecimal(String.valueOf(invoiceSum.get(5)));
                     }catch (Exception e){
-                        logger.info("导入上月欠票基数格式不正确，请检查");
+                        logger.info("导入上月剩余欠票基数格式不正确，请检查");
                         throw new MessageException("导入上月欠票基数不正确，请检查");
                     }
                 }
@@ -309,8 +318,9 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                     }
                 }
 
+            }else{
+                throw new MessageException("excel中存在不合理数据！");
             }
-
         }
 
         for (List<Object> invoiceSumList : param) {
@@ -318,11 +328,11 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                 InvoiceSum invoiceSum = new InvoiceSum();
                 invoiceSum.setId(idService.genId(TabId.P_INVOICE_SUM));
                 invoiceSum.setProfitMonth(profitMonth);
-                invoiceSum.setTopOrgId(invoiceSumList.get(0).toString());
-                invoiceSum.setTopOrgName(invoiceSumList.get(1).toString());
-                invoiceSum.setAgentId(invoiceSumList.get(2).toString());
-                invoiceSum.setAgentName(invoiceSumList.get(3).toString());
-                invoiceSum.setInvoiceCompany(invoiceSumList.get(4).toString());
+                invoiceSum.setTopOrgId(invoiceSumList.get(0).toString().trim());
+                invoiceSum.setTopOrgName(invoiceSumList.get(1).toString().trim());
+                invoiceSum.setAgentId(invoiceSumList.get(2).toString().trim());
+                invoiceSum.setAgentName(invoiceSumList.get(3).toString().trim());
+                invoiceSum.setInvoiceCompany(invoiceSumList.get(4).toString().trim());
                 invoiceSum.setPreLeftAmt(new BigDecimal(invoiceSumList.get(5).toString()));
                 invoiceSum.setDayBackAmt(new BigDecimal(invoiceSumList.get(6).toString()));
                 invoiceSum.setDayProfitAmt(new BigDecimal(invoiceSumList.get(7).toString()));
