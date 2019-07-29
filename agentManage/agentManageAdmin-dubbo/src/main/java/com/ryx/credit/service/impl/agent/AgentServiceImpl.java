@@ -348,7 +348,7 @@ public class AgentServiceImpl implements AgentService {
             if(!agent.getId().equals(agentList.get(0).getId())){
                 throw new ProcessException("代理商名称重复");
             }
-        }else{
+        }else if(agentList.size() > 1){
             throw new ProcessException("代理商名称重复");
         }
         Agent db_agent = getAgentById(agent.getId());
