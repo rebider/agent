@@ -341,13 +341,17 @@ public class AgentServiceImpl implements AgentService {
         if (null == agent || StringUtils.isEmpty(agent.getId())) {
             throw new ProcessException("代理商信息错误");
         }
-        if(StringUtils.isNotBlank(agent.getAgName())){
+        if(StringUtils.isBlank(agent.getAgName())){
             throw new ProcessException("代理商名称不能为空");
         }
         Map<String,String> stringMap = new HashMap<String, String>();
         stringMap.put("agName",agent.getAgName());
         List<Agent> agentList = getListByORGAndId(stringMap);
-        if(agentList.size() != 0){
+        if(agentList.size() == 1){
+            if(!agent.getId().equals(agentList.get(0).getId())){
+                throw new ProcessException("代理商名称重复");
+            }
+        }else{
             throw new ProcessException("代理商名称重复");
         }
         Agent db_agent = getAgentById(agent.getId());
