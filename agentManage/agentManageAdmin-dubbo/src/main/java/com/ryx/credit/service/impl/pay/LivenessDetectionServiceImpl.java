@@ -147,6 +147,7 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
                         record.setNotifyStatus(Status.STATUS_1.status);
                         record.setSuccesTime(new Date());
                         redisService.hSet(RedisCachKey.AGENT_BANK.code, FastMap.fastMap(bankNo,trueName+""+certNo));
+                        redisService.expire(bankNo,60*60*24);
                         result.setMsg("认证成功");
                         result.setStatus(200);
                     } else {
