@@ -65,7 +65,9 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             AgentBusInfo agentBusInfo = (AgentBusInfo)param.get("agentBusInfo");
             Agent agent = (Agent)param.get("agent");
             AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
-
+            if(agentColinfo==null){
+                agentColinfo = new AgentColinfo();
+            }
             resultMap.put("mobileNo",agentBusInfo.getBusLoginNum());
             resultMap.put("branchid",agentBusInfo.getBusPlatform());
             resultMap.put("direct",direct(agentBusInfo.getBusType()));
@@ -109,6 +111,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             resultMap.put("bankcity",region.getrName());
             resultMap.put("bankname",agentColinfo.getCloBank());
             BankLineNums bankLineNums = bankLineNumsMapper.selectByBankName(agentColinfo.getCloBank());
+            if(bankLineNums!=null)
             resultMap.put("bankid",bankLineNums.getBankid());
             resultMap.put("cardName",agentColinfo.getCloRealname());
             resultMap.put("channelTopId",agentBusInfo.getFinaceRemitOrgan());
@@ -209,6 +212,9 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         AgentBusInfo agentBusInfo = agentBusinfoService.getById(busId);
         Agent agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
         AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
+        if(agentColinfo==null){
+            agentColinfo = new AgentColinfo();
+        }
         jsonParams.put("mobile",agentBusInfo.getBusNum());
         jsonParams.put("branchid",agentBusInfo.getBusPlatform().split("_")[0]);
         jsonParams.put("termCount",agentBusInfo.getTerminalsLower());
@@ -302,6 +308,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         jsonParams.put("bankcity",region.getrName());
         jsonParams.put("bankname",agentColinfo.getCloBank());
         BankLineNums bankLineNums = bankLineNumsMapper.selectByBankName(agentColinfo.getCloBank());
+        if(bankLineNums!=null)
         jsonParams.put("bankid",bankLineNums.getBankid());
         jsonParams.put("cardName",agentColinfo.getCloRealname());
         jsonParams.put("channelTopId",agentBusInfo.getFinaceRemitOrgan());
@@ -316,6 +323,9 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         AgentBusInfo agentBusInfo = (AgentBusInfo)param.get("agentBusInfo");
         Agent agent = (Agent)param.get("agent");
         AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
+        if(agentColinfo==null){
+            agentColinfo = new AgentColinfo();
+        }
         jsonParams.put("agencyId",agentBusInfo.getBusNum());
         jsonParams = commonParam(jsonParams, agentColinfo, agent, agentBusInfo);
         return jsonParams;

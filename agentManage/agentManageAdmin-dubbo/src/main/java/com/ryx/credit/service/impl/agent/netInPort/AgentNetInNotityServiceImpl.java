@@ -197,7 +197,7 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                     record.setNotifyJson(String.valueOf(result.getData()));
                 } catch (Exception e) {
                     log.info("入网开户修改操作: 通知pos手刷http请求异常:{}",e.getMessage());
-                    e.getStackTrace();
+                    e.printStackTrace();
                     record.setNotifyCount(new BigDecimal(1));
                     record.setNotifyJson(e.getLocalizedMessage());
                     result = AgentResult.fail(e.getLocalizedMessage());
@@ -409,7 +409,7 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                     record.setNotifyJson(String.valueOf(result.getData()));
                 } catch (Exception e) {
                     log.info("入网开户修改操作: 通知pos手刷http请求异常:{}",e.getMessage());
-                    e.getStackTrace();
+                    e.printStackTrace();
                     record.setNotifyCount(new BigDecimal(1));
                     record.setNotifyJson(e.getLocalizedMessage());
                     result = AgentResult.fail(e.getLocalizedMessage());
