@@ -85,7 +85,7 @@ public class AddressServiceImpl implements AddressService {
             c.andIsdefaultEqualTo(oAddress.getIsdefault());
         }
         int count = oAddressMapper.countByExample(oAddressExample);
-        oAddressExample.setOrderByClause(" u_time desc ");
+        oAddressExample.setOrderByClause(" isdefault desc,u_time desc ");
         oAddressExample.setPage(new Page(page.getFrom(), page.getPagesize()));
         List<OAddress> list = oAddressMapper.selectByExample(oAddressExample);
         List<OAddressVo> oAddressVolist = new ArrayList<>();
