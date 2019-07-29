@@ -1,16 +1,16 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.ryx.credit.common.enumc.*;
-import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
-import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.dao.agent.AgentContractMapper;
 import com.ryx.credit.dao.agent.AssProtoColMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentContractVo;
-import com.ryx.credit.pojo.admin.vo.CapitalVo;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentAssProtocolService;
 import com.ryx.credit.service.agent.AgentContractService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
@@ -26,10 +26,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by cx on 2018/5/22.
@@ -59,6 +56,9 @@ public class AgentContractServiceImpl implements AgentContractService {
 
     @Autowired
     private AgentAssProtocolService agentAssProtocolService;
+
+    @Autowired
+    private IUserService iUserService;
 
 
     /**
@@ -315,4 +315,23 @@ public class AgentContractServiceImpl implements AgentContractService {
             throw e;
         }
     }
+
+    @Override
+    public PageInfo getAgentContractList(Page page, Map map, Long userId) {
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+        if (orgCodeRes==null && orgCodeRes.size()!=1) {
+            return null;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        map.put("orgId", orgId);
+        map.put("userId", userId);
+        map.put("organizationCode", organizationCode);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(agentContractMapper.getAgentContractList(map, page));
+        pageInfo.setTotal(agentContractMapper.getAgentContractCount(map));
+        return pageInfo;
+    }
+
 }
