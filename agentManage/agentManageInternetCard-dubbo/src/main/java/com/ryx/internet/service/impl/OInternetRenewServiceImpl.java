@@ -610,8 +610,8 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 if(null==oInternetCard.getExpireTime()){
                     throw new MessageException("到期时间为空,不允许续费");
                 }
-                Date date = stepMonth(new Date(), 3);
-                if(oInternetCard.getExpireTime().getTime()>date.getTime()){
+                Date date = stepMonth(oInternetCard.getExpireTime(), 3);
+                if(Calendar.getInstance().getTime().getTime()>date.getTime()){
                     throw new MessageException("到期时间超过3个月,不允许续费");
                 }
             }else{

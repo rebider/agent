@@ -107,8 +107,10 @@ public class InternetCardServiceImpl implements InternetCardService {
                     oInternetCard.setRenewButton("0");
                     continue;
                 }
-                Date date = stepMonth(new Date(), 3);
-                if(oInternetCard.getExpireTime().getTime()<date.getTime()){
+                Date date = stepMonth(oInternetCard.getExpireTime(), 3);
+                System.out.println("到期时间："+ DateUtil.format(oInternetCard.getExpireTime()));
+                System.out.println("DATE："+ DateUtil.format(date));
+                if(Calendar.getInstance().getTime().getTime()<date.getTime()){
                     oInternetCard.setRenewButton("1");
                 }else{
                     oInternetCard.setRenewButton("0");
