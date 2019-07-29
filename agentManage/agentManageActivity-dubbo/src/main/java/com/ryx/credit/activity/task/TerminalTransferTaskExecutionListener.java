@@ -48,6 +48,7 @@ public class TerminalTransferTaskExecutionListener  extends BaseTaskListener imp
             }
             //审批同意更新数据库
             if ("finish_end".equals(activityName)) {
+
                 AgentResult res = terminalTransferService.compressTerminalTransferActivity(delegateExecution.getProcessInstanceId(), AgStatus.Approved.status);
                 logger.info("=========TerminalTransferTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
             }
