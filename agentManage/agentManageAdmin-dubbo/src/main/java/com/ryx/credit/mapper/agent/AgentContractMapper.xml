@@ -282,6 +282,8 @@
     ac.cont_type, ac.cont_num, ac.cont_date, ac.cont_end_date, ac.append_agree, ac.remark
     from a_agent_contract ac
     left join a_agent aa on ac.agent_id = aa.id
+    left join c_organization org on org.id = aa.ag_doc_pro
+    left join c_organization orging on orging.id = aa.ag_doc_district
     <include refid="queryAgentContractWhere"/>
     order by ac.c_time desc
   </sql>
@@ -289,8 +291,14 @@
   <sql id="queryAgentContractWhere">
     <where>
       ac.status = 1 and aa.status = 1
+      <if test="map.organizationCode=='south_13_city' and map.organizationCode=='south_13_city'">
+        and (org.code like concat(#{map.organizationCode},'%') or orging.code like concat(#{map.organizationCode},'%'))
+      </if>
+      <if test="map.organizationCode=='north_18_city' and map.organizationCode=='north_18_city'">
+        and (org.code like concat(#{map.organizationCode},'%') or orging.code like concat(#{map.organizationCode},'%'))
+      </if>
       <if test="map.agentId!=null and map.agentId!=''"> and ac.agent_id = #{map.agentId} </if>
-      <if test="map.agName!=null and map.agName!=''"> and aa.ag_name LIKE CONCAT(CONCAT('%',#{map.agName}),'%') </if>
+      <if test="map.agName!=null and map.agName!=''"> and aa.ag_name like concat(concat('%',#{map.agName}),'%') </if>
       <if test="map.agStatus!=null and map.agStatus!=''"> and aa.ag_status = #{map.agStatus} </if>
       <if test="map.contType!=null and map.contType!=''"> and ac.cont_type = #{map.contType} </if>
       <if test="map.contNum!=null and map.contNum!=''"> and ac.cont_num = #{map.contNum} </if>
