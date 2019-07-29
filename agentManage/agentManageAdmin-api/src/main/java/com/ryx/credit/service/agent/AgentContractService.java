@@ -1,6 +1,8 @@
 package com.ryx.credit.service.agent;
 
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentContract;
@@ -8,6 +10,7 @@ import com.ryx.credit.pojo.admin.vo.AgentContractVo;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 代理商合同信息
@@ -49,5 +52,5 @@ public interface AgentContractService {
 
     public ResultVO updateAgentContractVo(List<AgentContractVo> list, Agent agent,String userId);
 
-
+    PageInfo getAgentContractList(Page page, Map map, Long userId);
 }
