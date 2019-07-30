@@ -33,6 +33,7 @@ import java.util.*;
 @Service("invoiceSumService")
 public class InvoiceSumServiceImpl implements IInvoiceSumService {
 
+
     Logger logger = LoggerFactory.getLogger(InvoiceSumServiceImpl.class);
     @Autowired
     InvoiceSumMapper invoiceSumMapper;
@@ -45,6 +46,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
     private IdService idService;
     @Autowired
     private AgentService agentService;
+
 
     @Override
     public PageInfo selectByMap(PageInfo pageInfo, Map<String, String> param,Map<String,Object> map) {
@@ -230,13 +232,15 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     public void invoicePreLeftAmt(List<List<Object>> param,String profitMonth) throws MessageException{
-        if (null == param && param.size() == 0) {
+
+        if (null == param ||param.size() == 0) {
             logger.info("导入数据为空");
             throw new MessageException("导入数据为空");
         }
-        for (List<Object> invoiceSum : param) {
-            if (invoiceSum.size() ==10){
 
+        for (List<Object> invoiceSum : param) {
+
+            if (invoiceSum.size() ==10){
                 if( null==invoiceSum.get(0) || "".equals(invoiceSum.get(0))){
                     logger.info("机构编码导入有误，请检查");
                     throw new MessageException("机构编码导入有误，请检查");
@@ -248,12 +252,12 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                 if( null==invoiceSum.get(2) || "".equals(invoiceSum.get(2))){
                     logger.info("代理商唯一码导入有误，请检查");
                     throw new MessageException("代理商唯一码导入有误，请检查");
-                }else{ //检验唯一码是否准确
+                }/*else{ //检验唯一码是否准确
                     Agent agent = agentService.getAgentById(invoiceSum.get(2).toString().trim());
                     if(agent == null){
                         throw new MessageException("代理商唯一码:"+invoiceSum.get(2).toString()+"错误，请检查");
                     }
-                }
+                }*/
                 if( null==invoiceSum.get(3) || "".equals(invoiceSum.get(3))){
                     logger.info("代理商名称导入有误，请检查");
                     throw new MessageException("代理商名称导入有误，请检查");
@@ -318,6 +322,29 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                     }
                 }
 
+
+                Agent agent = agentService.getAgentById(invoiceSum.get(2).toString());
+                if (agent == null) {
+                    logger.info("代理商ID" + param.get(2).toString() + "不存在");
+                    throw new MessageException("代下级开票格式不正确，请检查");
+                }
+                if (!agent.getAgName().equals(invoiceSum.get(3).toString())) {
+                    logger.info("代理商名称" + param.get(3).toString() + "与ID不匹配");
+                    throw new MessageException("代理商名称" + param.get(3).toString() + "与ID不匹配");
+                }
+                int number =0;
+                for (List<Object> invoiceSum1 : param) {
+                    if (invoiceSum.get(1).toString().equals(invoiceSum1.get(1).toString())) {
+                        if (invoiceSum.get(4).toString().equals(invoiceSum1.get(4).toString())) {
+                            number++;
+                        }
+                    }
+                    if (number > 1) {
+                        throw new MessageException("本次导入开票公司名称"+invoiceSum1.get(4).toString() +"重复，导入失败");
+                    }
+                }
+
+
             }else{
                 throw new MessageException("excel中存在不合理数据！");
             }
@@ -326,15 +353,24 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
         for (List<Object> invoiceSumList : param) {
             if (invoiceSumList.size() == 10) {
                 InvoiceSum invoiceSum = new InvoiceSum();
+                //判断本月是否再次传入，表中数据。
+                invoiceSum.setAgentId(invoiceSumList.get(2).toString().trim());
+                invoiceSum.setAgentName(invoiceSumList.get(3).toString().trim());
+                invoiceSum.setInvoiceCompany(invoiceSumList.get(4).toString().trim());
                 invoiceSum.setProfitMonth(profitMonth);
-                invoiceSum.setTopOrgId(invoiceSumList.get(0).toString());
-                invoiceSum.setTopOrgName(invoiceSumList.get(1).toString());
-                invoiceSum.setAgentId(invoiceSumList.get(2).toString());
-                invoiceSum.setAgentName(invoiceSumList.get(3).toString());
-                invoiceSum.setInvoiceCompany(invoiceSumList.get(4).toString());
-                if (null != invoiceSumList.get(5) && !"".equals(invoiceSumList.get(5))) {
-                    invoiceSum.setPreLeftAmt(new BigDecimal(invoiceSumList.get(5).toString()));
-                }
+                List<InvoiceSum> invoiceSum2 = getSumInvoice(invoiceSum);
+               /* //判断是否上次导入中已经导入数据
+                InvoiceSum invoiceSumA = new InvoiceSum();
+                invoiceSumA.setInvoiceCompany(invoiceSumList.get(2).toString().trim());
+                invoiceSum.setProfitMonth(profitMonth);
+                List<InvoiceSum> invoiceSumA1 = getSumInvoice(invoiceSum);
+                for (InvoiceSum invoice:invoiceSumA1) {
+                    invoice.
+                }*/
+                //第一次导入
+                if(null==invoiceSum2 || invoiceSum2.size()==0){
+                    invoiceSum.setTopOrgId(invoiceSumList.get(0).toString().trim());
+                invoiceSum.setTopOrgName(invoiceSumList.get(1).toString().trim());
                 invoiceSum.setDayBackAmt(new BigDecimal(invoiceSumList.get(6).toString()));
                 invoiceSum.setDayProfitAmt(new BigDecimal(invoiceSumList.get(7).toString()));
                 invoiceSum.setPreProfitMonthAmt(new BigDecimal(invoiceSumList.get(8).toString()));
@@ -342,32 +378,45 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                 invoiceSum.setAddInvoiceAmt(BigDecimal.ZERO);
                 invoiceSum.setAdjustAmt(BigDecimal.ZERO);
                 invoiceSum.setInvoiceStatus("00");
-                String lastSettleMonth = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
+                String lastSettleMonth = LocalDate.now().plusMonths(-2).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
                 InvoiceSumExample invoiceSumExample = new InvoiceSumExample();
                 InvoiceSumExample.Criteria criteria = invoiceSumExample.createCriteria();
                 criteria.andProfitMonthEqualTo(lastSettleMonth);
                 criteria.andInvoiceCompanyEqualTo(invoiceSum.getInvoiceCompany());
                 criteria.andAgentIdEqualTo(invoiceSum.getAgentId());
                 criteria.andTopOrgNameEqualTo(invoiceSum.getTopOrgName());
+                    List<InvoiceSum> invoiceSums = invoiceSumMapper.selectByExample(invoiceSumExample);
 
-                List<InvoiceSum> invoiceSums = invoiceSumMapper.selectByExample(invoiceSumExample);
-                InvoiceSum invoiceSum1 = new InvoiceSum();
+                    InvoiceSum invoiceSum1=new InvoiceSum();
                 if(null!=invoiceSums && invoiceSums.size() ==1){
                    invoiceSum1 = invoiceSums.get(0);
+                }else if(invoiceSums.size() > 1){
+                    throw new MessageException("同一代理商同一打款公司下同一月份含有相同代理商！");
                 }
                 if (null == invoiceSumList.get(5) || "".equals(invoiceSumList.get(5))) {
                     invoiceSum.setPreLeftAmt(invoiceSum1.getPreLeftAmt());
+                }else if (null != invoiceSumList.get(5) && !"".equals(invoiceSumList.get(5))) {
+                    invoiceSum.setPreLeftAmt(new BigDecimal(invoiceSumList.get(5).toString()));
+                }
+                invoiceSum.setOwnInvoice((invoiceSum.getPreLeftAmt()==null?BigDecimal.ZERO:invoiceSum.getPreLeftAmt()).add(invoiceSum.getDayBackAmt()).add(invoiceSum.getDayProfitAmt()).add(invoiceSum.getPreProfitMonthAmt()).subtract(invoiceSum.getAddInvoiceAmt()==null?BigDecimal.ZERO:invoiceSum.getAddInvoiceAmt()).add(invoiceSum.getAdjustAmt()==null?BigDecimal.ZERO:invoiceSum.getAdjustAmt()));
+                invoiceSum.setId(idService.genId(TabId.P_INVOICE_SUM));
+
+                invoiceSumMapper.insertSelective(invoiceSum);
+                 //重复导入
+                }else{
+                    invoiceSum2.get(0).setTopOrgId(invoiceSumList.get(0).toString().trim());
+                    invoiceSum2.get(0).setTopOrgName(invoiceSumList.get(1).toString().trim());
+                    invoiceSum2.get(0).setPreLeftAmt(new BigDecimal(invoiceSumList.get(5).toString()));
+                    invoiceSum2.get(0).setDayBackAmt(new BigDecimal(invoiceSumList.get(6).toString()));
+                    invoiceSum2.get(0).setDayProfitAmt(new BigDecimal(invoiceSumList.get(7).toString()));
+                    invoiceSum2.get(0).setPreProfitMonthAmt(new BigDecimal(invoiceSumList.get(8).toString()));
+                    invoiceSum2.get(0).setSubAddInvoiceAmt(new BigDecimal(invoiceSumList.get(9).toString()));
+                    invoiceSum2.get(0).setOwnInvoice(invoiceSum.getPreLeftAmt().add(invoiceSum.getDayBackAmt()).add(invoiceSum.getDayProfitAmt()).add(invoiceSum.getPreProfitMonthAmt()).subtract(invoiceSum.getAddInvoiceAmt()==null?BigDecimal.ZERO:invoiceSum.getAddInvoiceAmt()).add(invoiceSum.getAdjustAmt()==null?BigDecimal.ZERO:invoiceSum.getAdjustAmt()));
+                    invoiceSumMapper.updateByPrimaryKeySelective(invoiceSum2.get(0));
                 }
 
-                invoiceSum.setOwnInvoice(invoiceSum.getPreLeftAmt().add(invoiceSum.getDayBackAmt()).add(invoiceSum.getDayProfitAmt()).add(invoiceSum.getPreProfitMonthAmt()).subtract(invoiceSum.getAddInvoiceAmt()==null?BigDecimal.ZERO:invoiceSum.getAddInvoiceAmt()).add(invoiceSum.getAdjustAmt()==null?BigDecimal.ZERO:invoiceSum.getAdjustAmt()));
-                invoiceSumMapper.insertSelective(invoiceSum);
             }
-                invoiceSum.setAgentId(invoiceSumList.get(2).toString().trim());
-                invoiceSum.setAgentName(invoiceSumList.get(3).toString().trim());
-                invoiceSum.setInvoiceCompany(invoiceSumList.get(4).toString().trim());
-                invoiceSum.setTopOrgId(invoiceSumList.get(0).toString().trim());
-                invoiceSum.setTopOrgName(invoiceSumList.get(1).toString().trim());
-                InvoiceSum invoiceSum2 = getSumInvoice(invoiceSum);
+          /*
                 if(invoiceSum2 == null){
                     invoiceSum.setId(idService.genId(TabId.P_INVOICE_SUM));
                     invoiceSum.setPreLeftAmt(new BigDecimal(invoiceSumList.get(5).toString()));
@@ -389,11 +438,11 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                     invoiceSum2.setInvoiceStatus("00");
                     invoiceSum2.setOwnInvoice(invoiceSum2.getPreLeftAmt().add(invoiceSum2.getDayBackAmt()).add(invoiceSum2.getDayProfitAmt()).add(invoiceSum2.getPreProfitMonthAmt()).add(invoiceSum2.getSubAddInvoiceAmt()).subtract(invoiceSum2.getAddInvoiceAmt()).add(invoiceSum2.getAdjustAmt()));
                     invoiceSumMapper.updateByPrimaryKeySelective(invoiceSum2);
-                }
+                }*/
         }
     }
 
-    private InvoiceSum getSumInvoice(InvoiceSum invoiceSum){
+    private List<InvoiceSum> getSumInvoice(InvoiceSum invoiceSum){
         InvoiceSumExample example = new InvoiceSumExample();
         InvoiceSumExample.Criteria criteria = example.createCriteria();
         if(StringUtils.isNotBlank(invoiceSum.getProfitMonth())){
@@ -408,20 +457,13 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
         if(StringUtils.isNotBlank(invoiceSum.getInvoiceCompany())){
             criteria.andInvoiceCompanyEqualTo(invoiceSum.getInvoiceCompany());
         }
-        /*if(StringUtils.isNotBlank(invoiceSum.getTopOrgId())){
-            criteria.andTopOrgIdEqualTo(invoiceSum.getTopOrgId());
+        if(StringUtils.isNotBlank(invoiceSum.getProfitMonth())){
+            criteria.andInvoiceCompanyEqualTo(invoiceSum.getProfitMonth());
         }
-        if(StringUtils.isNotBlank(invoiceSum.getTopOrgName())){
-            criteria.andTopOrgNameEqualTo(invoiceSum.getTopOrgName());
-        }*/
 
-        List<InvoiceSum> list = invoiceSumMapper.selectByExample(example);
-        if(list.size() == 1){
-            return list.get(0);
-        }else if(list.size() > 1){
-          //  throw  new MessageException("开票公司对应本月对应数据有多条！");
-        }
-            return null;
+
+       return  invoiceSumMapper.selectByExample(example);
+
     }
 
 }
