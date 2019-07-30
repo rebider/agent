@@ -183,7 +183,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             criteria.andAgentIdEqualTo(internetCard.getAgentId());
         }
         if(StringUtils.isNotBlank(internetCard.getAgentName())){
-            criteria.andAgentNameEqualTo(internetCard.getAgentName());
+            criteria.andAgentNameLike("%"+internetCard.getAgentName()+"%");
         }
         if(StringUtils.isNotBlank(internetCard.getOrderId())){
             criteria.andOrderIdEqualTo(internetCard.getOrderId());
