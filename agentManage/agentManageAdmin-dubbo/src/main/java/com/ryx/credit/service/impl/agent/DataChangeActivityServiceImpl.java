@@ -254,28 +254,71 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                     .andAgentIdEqualTo(vo.getAgent().getId());
                             List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
 
-                            //入网程序调用
-//                            try {
-                            for (AgentBusInfo agentBusInfo : agentBusInfoList) {
+                            //是否需要同步至业务系统、进行一分钱验证
+                            AgentVo preVo = JSONObject.parseObject(dr.getDataPreContent(), AgentVo.class);
+                            //收款账户信息
+                            List<AgentColinfoVo> voColinfoVoList = vo.getColinfoVoList();
+                            List<AgentColinfoVo> preVoColinfoVoList = preVo.getColinfoVoList();
+                            Agent voAgent = vo.getAgent();
+                            Agent preVoAgent = preVo.getAgent();
 
-//                                    ImportAgent importAgent = new ImportAgent();
-//                                    importAgent.setDataid(agentBusInfo.getId());
-//                                    importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
-//                                    importAgent.setBatchcode(proIns);
-//                                    importAgent.setcUser(rel.getcUser());
-//                                    if (1 != aimportService.insertAgentImportData(importAgent)) {
-//                                        logger.info("代理商账户修改审批通过-添加修改任务失败");
-//                                    } else {
-//                                        logger.info("代理商账户修改审批通过-添加修改任务成功!{},{}", AgImportType.DATACHANGEAPP.getValue(), vo.getAgent().getId());
-//                                    }
-                                agentNetInNotityService.asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
+                            if (voColinfoVoList.size()>0){
+                                if (voColinfoVoList.size() != preVoColinfoVoList.size()){
+                                    //一分钱验证、同步至业务系统
+
+                                    logger.info("========================一分钱验证状态修改开始");
+                                    for (AgentColinfo agentColinfo:voColinfoVoList){
+                                        agentColinfo.setPayStatus(ColinfoPayStatus.A.getValue());
+                                    }
+                                    agentColinfoService.updateAgentColinfoVo(voColinfoVoList, vo.getAgent(),rel.getcUser());
+                                    logger.info("========================一分钱验证状态修改完成");
+
+                                    logger.info("========================同步至业务系统开始");
+                                    for (AgentBusInfo agentBusInfo : agentBusInfoList) {
+                                        agentNetInNotityService.asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
+                                    }
+                                    logger.info("========================同步至业务系统完成");
+
+                                }else{
+                                    boolean synTemp=true;
+                                    boolean checkTemp=true;
+                                    for (AgentColinfoVo newColinfo:voColinfoVoList){
+                                        for (AgentColinfoVo oldColinfo:preVoColinfoVoList){
+                                            if (newColinfo.getId().equals(oldColinfo.getId())){
+                                                checkTemp = checkNewAccount(newColinfo,oldColinfo);
+
+                                                synTemp=isMustSyn(newColinfo,oldColinfo,voAgent,preVoAgent);
+                                            }
+                                        }
+                                        if (!checkTemp){
+                                            //一分钱验证、同步至业务系统
+                                            logger.info("========================一分钱验证状态修改开始");
+                                            for (AgentColinfo agentColinfo:voColinfoVoList){
+                                                agentColinfo.setPayStatus(ColinfoPayStatus.A.getValue());
+                                            }
+                                            agentColinfoService.updateAgentColinfoVo(voColinfoVoList, vo.getAgent(),rel.getcUser());
+                                            logger.info("========================一分钱验证状态修改完成");
+
+                                            logger.info("========================同步至业务系统开始");
+                                            for (AgentBusInfo agentBusInfo : agentBusInfoList) {
+                                                agentNetInNotityService.asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
+                                            }
+                                            logger.info("========================同步至业务系统完成");
+                                            break;
+                                        }else if (!synTemp){
+                                            //同步至业务系统
+                                            for (AgentBusInfo agentBusInfo : agentBusInfoList) {
+                                                agentNetInNotityService.asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }
                             }
-//                            } catch (Exception e) {
-//                                e.printStackTrace();
-//                                throw new ProcessException("更新賬戶数据申请失败");
-//                            } finally {
-////
-//                            }
+
+
+
+
 
                         }
                         //代理商新修改
@@ -389,6 +432,40 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             throw e;
         }
     }
+
+
+    /**
+     * 一分钱验证判断
+     */
+    public boolean checkNewAccount(AgentColinfoVo newColinfo,AgentColinfoVo oldColinfo){
+        return (newColinfo.getCloRealname().equals(oldColinfo.getCloRealname())) &&    //收款账户名
+                    (newColinfo.getCloBankAccount().equals(oldColinfo.getCloBankAccount())) &&  //收款账号
+                        (newColinfo.getCloBankCode().equals(oldColinfo.getCloBankCode())) &&    //收款开户总行
+                            (newColinfo.getBankRegion().equals(oldColinfo.getBankRegion())) &&  //开户行地区
+                                (newColinfo.getCloBankBranch().equals(oldColinfo.getCloBankBranch())) &&    //收款开户支行
+                                    (newColinfo.getAllLineNum().equals(oldColinfo.getAllLineNum())) &&  //总行联行号
+                                        (newColinfo.getBranchLineNum().equals(oldColinfo.getBranchLineNum())) &&    //支行联行号
+                                          (newColinfo.getAgLegalCernum().equals(oldColinfo.getAgLegalCernum()));  //户主证件号
+    }
+
+    /**
+     * 通知业务系统判断
+     *
+     *
+     */
+    public boolean isMustSyn(AgentColinfoVo newColinfo,AgentColinfoVo oldColinfo,Agent agent,Agent preagent){
+        return checkNewAccount(newColinfo,oldColinfo) && (newColinfo.getCloType().equals(oldColinfo.getCloType())) &&  //收款账户类型
+                    (newColinfo.getCloTaxPoint().equals(oldColinfo.getCloTaxPoint())) &&    //税点
+                        (newColinfo.getCloInvoice().equals(oldColinfo.getCloInvoice())) &&  //是否开具分润发票
+                          (newColinfo.getStatus().equals(oldColinfo.getStatus())) &&  //是否有
+                            agent.getAgName().equals(preagent.getAgName()) && //代理商名称
+                                agent.getAgBusLic().equals(preagent.getAgBusLic()) &&   //代理商营业执照
+                                    agent.getAgLegalCernum().equals(preagent.getAgLegalCernum()) && //法人证件号
+                                        agent.getAgLegal().equals(preagent.getAgLegal()) && //法人姓名
+                                            agent.getAgRegArea().equals(preagent.getAgRegArea()) && // 注册地区
+                                                agent.getAgRegAdd().equals(preagent.getAgRegAdd()); //注册地址
+    }
+
 
     /**
      * 处理任务
