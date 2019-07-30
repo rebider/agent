@@ -258,11 +258,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     if (map3.get("sb").toString().equals(map4.get("sb").toString())) {
                         if ((Integer.parseInt(map4.get("snBeginNum1").toString()) >= Integer.parseInt(map3.get("snBeginNum1").toString()) && Integer.parseInt(map4.get("snBeginNum1").toString()) <= Integer.parseInt(map3.get("snEndNum1").toString()))
                                 ||(Integer.parseInt(map4.get("snEndNum1").toString()) >= Integer.parseInt(map3.get("snBeginNum1").toString()) && Integer.parseInt(map4.get("snEndNum1").toString()) <= Integer.parseInt(map3.get("snEndNum1").toString()))){
-                                log.info("本次提交的SN号存在区间重复:"+snBeginNum+"----"+snEndNum);
-                                throw new MessageException("本次提交的SN号存在区间重复:"+snBeginNum+"----"+snEndNum);
+                                log.info("在区间:"+snBeginNum+"----"+snEndNum+"已经提交过划拨申请");
+                                throw new MessageException("在区间:"+snBeginNum+"----"+snEndNum+"已经提交过划拨申请");
                             }
-
-
                     }
                 }
             }
@@ -365,8 +363,11 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                            throw new MessageException("经查询不符合划拨标准");
                        }
                    }else{
-                       log.info("未连通查询接口");
-                       throw new MessageException("未连通查询接口");
+                       JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
+                       JSONObject data = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
+                       String result_msg = String.valueOf(data.get("result_msg"));
+                       log.info("未连通查询接口"+result_msg);
+                       throw new MessageException(result_msg);
                    }
                 }
                 if(terminalTransferDetailListsMpos!=null && terminalTransferDetailListsMpos.size()>0){
