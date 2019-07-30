@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -251,10 +253,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                     throw new MessageException("开票公司导入有误，请检查");
                 }
 
-                if( null==invoiceSum.get(5) || "".equals(invoiceSum.get(5))){
-                    logger.info("导入上月欠票基数有误，请检查");
-                    throw new MessageException("导入上月欠票基数有误，请检查");
-                }else{
+                if( null!=invoiceSum.get(5) && !"".equals(invoiceSum.get(5))){
                     try {
                         new BigDecimal(String.valueOf(invoiceSum.get(5)));
                     }catch (Exception e){
@@ -314,7 +313,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
         }
 
         for (List<Object> invoiceSumList : param) {
-                if (invoiceSumList.size() == 10){
+            if (invoiceSumList.size() == 10) {
                 InvoiceSum invoiceSum = new InvoiceSum();
                 invoiceSum.setId(idService.genId(TabId.P_INVOICE_SUM));
                 invoiceSum.setProfitMonth(profitMonth);
@@ -323,7 +322,9 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                 invoiceSum.setAgentId(invoiceSumList.get(2).toString());
                 invoiceSum.setAgentName(invoiceSumList.get(3).toString());
                 invoiceSum.setInvoiceCompany(invoiceSumList.get(4).toString());
-                invoiceSum.setPreLeftAmt(new BigDecimal(invoiceSumList.get(5).toString()));
+                if (null != invoiceSumList.get(5) && !"".equals(invoiceSumList.get(5))) {
+                    invoiceSum.setPreLeftAmt(new BigDecimal(invoiceSumList.get(5).toString()));
+                }
                 invoiceSum.setDayBackAmt(new BigDecimal(invoiceSumList.get(6).toString()));
                 invoiceSum.setDayProfitAmt(new BigDecimal(invoiceSumList.get(7).toString()));
                 invoiceSum.setPreProfitMonthAmt(new BigDecimal(invoiceSumList.get(8).toString()));
@@ -331,7 +332,24 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                 invoiceSum.setAddInvoiceAmt(BigDecimal.ZERO);
                 invoiceSum.setAdjustAmt(BigDecimal.ZERO);
                 invoiceSum.setInvoiceStatus("00");
-                invoiceSum.setOwnInvoice(invoiceSum.getPreLeftAmt().add(invoiceSum.getDayBackAmt()).add(invoiceSum.getDayProfitAmt()).add(invoiceSum.getPreProfitMonthAmt()).subtract(invoiceSum.getAddInvoiceAmt()).add(invoiceSum.getAdjustAmt()));
+                String lastSettleMonth = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
+                InvoiceSumExample invoiceSumExample = new InvoiceSumExample();
+                InvoiceSumExample.Criteria criteria = invoiceSumExample.createCriteria();
+                criteria.andProfitMonthEqualTo(lastSettleMonth);
+                criteria.andInvoiceCompanyEqualTo(invoiceSum.getInvoiceCompany());
+                criteria.andAgentIdEqualTo(invoiceSum.getAgentId());
+                criteria.andTopOrgNameEqualTo(invoiceSum.getTopOrgName());
+
+                List<InvoiceSum> invoiceSums = invoiceSumMapper.selectByExample(invoiceSumExample);
+                InvoiceSum invoiceSum1 = new InvoiceSum();
+                if(null!=invoiceSums && invoiceSums.size() ==1){
+                   invoiceSum1 = invoiceSums.get(0);
+                }
+                if (null == invoiceSumList.get(5) || "".equals(invoiceSumList.get(5))) {
+                    invoiceSum.setPreLeftAmt(invoiceSum1.getPreLeftAmt());
+                }
+
+                invoiceSum.setOwnInvoice(invoiceSum.getPreLeftAmt().add(invoiceSum.getDayBackAmt()).add(invoiceSum.getDayProfitAmt()).add(invoiceSum.getPreProfitMonthAmt()).subtract(invoiceSum.getAddInvoiceAmt()==null?BigDecimal.ZERO:invoiceSum.getAddInvoiceAmt()).add(invoiceSum.getAdjustAmt()==null?BigDecimal.ZERO:invoiceSum.getAdjustAmt()));
                 invoiceSumMapper.insertSelective(invoiceSum);
             }
         }
