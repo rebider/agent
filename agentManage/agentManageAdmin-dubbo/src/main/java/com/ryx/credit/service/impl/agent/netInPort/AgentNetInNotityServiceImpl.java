@@ -289,8 +289,8 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                 updateBusInfo.setBusNum(dataObj.getString("orgId"));
                 updateBusInfo.setBusLoginNum(dataObj.getString("loginName"));
             }else if(platForm.getPlatformType().equals(PlatformType.RHPOS.getValue())){
-                updateBusInfo.setBusNum(jsonObject.getString(""));
-                updateBusInfo.setBrandNum(jsonObject.getString("agencyId"));
+                updateBusInfo.setBusNum(jsonObject.getString("agencyId"));
+                updateBusInfo.setBrandNum(jsonObject.getString("brandId"));
             }
 
             //代理商修改也会走这里
