@@ -411,7 +411,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             }
             //财务审批
             if(orgCode.equals("finance")){
-//                财务填写实际到账金额
+/*//                财务填写实际到账金额
                 for (CapitalVo  capitalVo:agentVo.getCapitalVoList()){
                     if (capitalVo.getcPayType().equals(PayType.YHHK.code)){
                         if (null==capitalVo.getcInAmount() || capitalVo.getcInAmount().equals("")){
@@ -427,7 +427,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             capitalVo.setcFqInAmount(capitalVo.getcInAmount());
                         }
                     }
-                }
+                }*/
                 //数据修改
                 if(dateChangeRequest.getDataType().equals(DataChangeApyType.DC_Agent.name())){
                     AgentVo vo = JSONObject.parseObject(dateChangeRequest.getDataContent(), AgentVo.class);
