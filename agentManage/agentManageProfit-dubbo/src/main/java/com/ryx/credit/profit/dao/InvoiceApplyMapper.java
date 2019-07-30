@@ -30,5 +30,5 @@ public interface InvoiceApplyMapper {
 
     void  deleteById(String id);
 
-    List<String> getAgentIdByPayCompany(String payCompany);
+    List<String> getPayCompanyById(String id);
 }
