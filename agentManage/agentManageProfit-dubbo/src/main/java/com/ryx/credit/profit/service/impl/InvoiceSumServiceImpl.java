@@ -3,6 +3,7 @@ package com.ryx.credit.profit.service.impl;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.profit.dao.FreezeAgentMapper;
 import com.ryx.credit.profit.dao.FreezeOperationRecordMapper;
@@ -325,7 +326,6 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
         for (List<Object> invoiceSumList : param) {
             if (invoiceSumList.size() == 10) {
                 InvoiceSum invoiceSum = new InvoiceSum();
-                invoiceSum.setId(idService.genId(TabId.P_INVOICE_SUM));
                 invoiceSum.setProfitMonth(profitMonth);
                 invoiceSum.setTopOrgId(invoiceSumList.get(0).toString());
                 invoiceSum.setTopOrgName(invoiceSumList.get(1).toString());
@@ -362,7 +362,66 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                 invoiceSum.setOwnInvoice(invoiceSum.getPreLeftAmt().add(invoiceSum.getDayBackAmt()).add(invoiceSum.getDayProfitAmt()).add(invoiceSum.getPreProfitMonthAmt()).subtract(invoiceSum.getAddInvoiceAmt()==null?BigDecimal.ZERO:invoiceSum.getAddInvoiceAmt()).add(invoiceSum.getAdjustAmt()==null?BigDecimal.ZERO:invoiceSum.getAdjustAmt()));
                 invoiceSumMapper.insertSelective(invoiceSum);
             }
+                invoiceSum.setAgentId(invoiceSumList.get(2).toString().trim());
+                invoiceSum.setAgentName(invoiceSumList.get(3).toString().trim());
+                invoiceSum.setInvoiceCompany(invoiceSumList.get(4).toString().trim());
+                invoiceSum.setTopOrgId(invoiceSumList.get(0).toString().trim());
+                invoiceSum.setTopOrgName(invoiceSumList.get(1).toString().trim());
+                InvoiceSum invoiceSum2 = getSumInvoice(invoiceSum);
+                if(invoiceSum2 == null){
+                    invoiceSum.setId(idService.genId(TabId.P_INVOICE_SUM));
+                    invoiceSum.setPreLeftAmt(new BigDecimal(invoiceSumList.get(5).toString()));
+                    invoiceSum.setDayBackAmt(new BigDecimal(invoiceSumList.get(6).toString()));
+                    invoiceSum.setDayProfitAmt(new BigDecimal(invoiceSumList.get(7).toString()));
+                    invoiceSum.setPreProfitMonthAmt(new BigDecimal(invoiceSumList.get(8).toString()));
+                    invoiceSum.setSubAddInvoiceAmt(new BigDecimal(invoiceSumList.get(9).toString()));
+                    invoiceSum.setAddInvoiceAmt(BigDecimal.ZERO);
+                    invoiceSum.setAdjustAmt(BigDecimal.ZERO);
+                    invoiceSum.setInvoiceStatus("00");
+                    invoiceSum.setOwnInvoice(invoiceSum.getPreLeftAmt().add(invoiceSum.getDayBackAmt()).add(invoiceSum.getDayProfitAmt()).add(invoiceSum.getPreProfitMonthAmt()).add(invoiceSum.getSubAddInvoiceAmt()).subtract(invoiceSum.getAddInvoiceAmt()).add(invoiceSum.getAdjustAmt()));
+                    invoiceSumMapper.insertSelective(invoiceSum);
+                }else{
+                    invoiceSum2.setPreLeftAmt(new BigDecimal(invoiceSumList.get(5).toString()));
+                    invoiceSum2.setDayBackAmt(new BigDecimal(invoiceSumList.get(6).toString()));
+                    invoiceSum2.setDayProfitAmt(new BigDecimal(invoiceSumList.get(7).toString()));
+                    invoiceSum2.setPreProfitMonthAmt(new BigDecimal(invoiceSumList.get(8).toString()));
+                    invoiceSum2.setSubAddInvoiceAmt(new BigDecimal(invoiceSumList.get(9).toString()));
+                    invoiceSum2.setInvoiceStatus("00");
+                    invoiceSum2.setOwnInvoice(invoiceSum2.getPreLeftAmt().add(invoiceSum2.getDayBackAmt()).add(invoiceSum2.getDayProfitAmt()).add(invoiceSum2.getPreProfitMonthAmt()).add(invoiceSum2.getSubAddInvoiceAmt()).subtract(invoiceSum2.getAddInvoiceAmt()).add(invoiceSum2.getAdjustAmt()));
+                    invoiceSumMapper.updateByPrimaryKeySelective(invoiceSum2);
+                }
         }
+    }
+
+    private InvoiceSum getSumInvoice(InvoiceSum invoiceSum){
+        InvoiceSumExample example = new InvoiceSumExample();
+        InvoiceSumExample.Criteria criteria = example.createCriteria();
+        if(StringUtils.isNotBlank(invoiceSum.getProfitMonth())){
+            criteria.andProfitMonthEqualTo(invoiceSum.getProfitMonth());
+        }
+        if(StringUtils.isNotBlank(invoiceSum.getAgentId())){
+            criteria.andAgentIdEqualTo(invoiceSum.getAgentId());
+        }
+        if(StringUtils.isNotBlank(invoiceSum.getAgentName())){
+            criteria.andAgentNameEqualTo(invoiceSum.getAgentName());
+        }
+        if(StringUtils.isNotBlank(invoiceSum.getInvoiceCompany())){
+            criteria.andInvoiceCompanyEqualTo(invoiceSum.getInvoiceCompany());
+        }
+        /*if(StringUtils.isNotBlank(invoiceSum.getTopOrgId())){
+            criteria.andTopOrgIdEqualTo(invoiceSum.getTopOrgId());
+        }
+        if(StringUtils.isNotBlank(invoiceSum.getTopOrgName())){
+            criteria.andTopOrgNameEqualTo(invoiceSum.getTopOrgName());
+        }*/
+
+        List<InvoiceSum> list = invoiceSumMapper.selectByExample(example);
+        if(list.size() == 1){
+            return list.get(0);
+        }else if(list.size() > 1){
+          //  throw  new MessageException("开票公司对应本月对应数据有多条！");
+        }
+            return null;
     }
 
 }
