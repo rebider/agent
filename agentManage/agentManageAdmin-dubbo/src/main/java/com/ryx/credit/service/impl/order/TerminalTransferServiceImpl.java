@@ -224,8 +224,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                         Map<String, Object> map2 = disposeSN(snBeginNum, snEndNum);
 
                         if (map1.get("sb").toString().equals(map2.get("sb").toString())) {
-                            if ((Integer.parseInt(map2.get("snBeginNum1").toString()) >= Integer.parseInt(map1.get("snBeginNum1").toString()) && Integer.parseInt(map2.get("snBeginNum1").toString()) <= Integer.parseInt(map1.get("snEndNum1").toString()))
-                            ||(Integer.parseInt(map2.get("snEndNum1").toString()) >= Integer.parseInt(map1.get("snBeginNum1").toString()) && Integer.parseInt(map2.get("snEndNum1").toString()) <= Integer.parseInt(map1.get("snEndNum1").toString()))){
+                            if (!(Integer.parseInt(map1.get("snEndNum1").toString())< Integer.parseInt(map2.get("snBeginNum1").toString()) || Integer.parseInt(map1.get("snBeginNum1").toString()) > Integer.parseInt(map2.get("snEndNum1").toString()))){
 
                                     log.info("本次提交的SN号存在区间重复，请重新提交");
                                     throw new MessageException("本次提交的SN号存在区间重复，请重新提交");
@@ -256,8 +255,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     Map<String, Object> map4 = disposeSN(snBeginNumMap, snEndNumMap);
 
                     if (map3.get("sb").toString().equals(map4.get("sb").toString())) {
-                        if ((Integer.parseInt(map4.get("snBeginNum1").toString()) >= Integer.parseInt(map3.get("snBeginNum1").toString()) && Integer.parseInt(map4.get("snBeginNum1").toString()) <= Integer.parseInt(map3.get("snEndNum1").toString()))
-                                ||(Integer.parseInt(map4.get("snEndNum1").toString()) >= Integer.parseInt(map3.get("snBeginNum1").toString()) && Integer.parseInt(map4.get("snEndNum1").toString()) <= Integer.parseInt(map3.get("snEndNum1").toString()))){
+                        if (!(Integer.parseInt(map4.get("snEndNum1").toString())< Integer.parseInt(map3.get("snBeginNum1").toString()) || Integer.parseInt(map4.get("snBeginNum1").toString()) > Integer.parseInt(map3.get("snEndNum1").toString()))){
                                 log.info("在区间:"+snBeginNum+"----"+snEndNum+"已经提交过划拨申请");
                                 throw new MessageException("在区间:"+snBeginNum+"----"+snEndNum+"已经提交过划拨申请");
                             }
@@ -428,13 +426,30 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             }
 
         }
+        String endsb = panduan(sb.toString());
 
         String snEndNum1 = snEndNum.replace(sb, "");
-        map.put("sb", sb);
+        map.put("sb", endsb);
         map.put("snBeginNum1", "".equals(snBeginNum1)?"0":snBeginNum1);
         map.put("snEndNum1", "".equals(snEndNum1)?"0":snEndNum1);
         return map;
 
+    }
+    public String panduan (String str){
+        String[] strs = str.split("");
+       for(int i= strs.length-1;i>0; i--){
+           if("0".equals(strs[i])){
+               strs[i]="";
+           } else {
+               break;
+           }
+       }
+        StringBuffer sb = new StringBuffer();
+        for (String ss:strs) {
+            sb.append(ss);
+        }
+
+        return sb.toString().trim();
     }
 
     /**

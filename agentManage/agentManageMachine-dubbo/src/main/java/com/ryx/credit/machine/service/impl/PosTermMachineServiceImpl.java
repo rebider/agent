@@ -250,6 +250,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
             listDetail.add(mapDetail);
         }
         jsonObject.put("snList", listDetail);
+        log.info("\n\n请求参数:{}"+listDetail.toString());
         return  request("ORG014", jsonObject);
     }
 
