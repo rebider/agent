@@ -9,6 +9,7 @@ import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.*;
+import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
 import org.apache.commons.collections.FastHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -209,6 +210,17 @@ public class MposTermMachineServiceImpl implements TermMachineService {
         }else{
             throw new MessageException(res.getString("respMsg"));
         }
+    }
+
+    @Override
+    public AgentResult queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailList, String operation) throws Exception {
+
+        return AgentResult.fail("未联动");
+    }
+
+    @Override
+    public AgentResult queryTerminalTransferResult(String serialNumber,String type) throws Exception {
+        return  AgentResult.fail("未联动");
     }
 
 }

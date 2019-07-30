@@ -5,6 +5,7 @@ import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.machine.vo.*;
+import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
 
 import java.util.List;
 import java.util.Map;
@@ -76,5 +77,23 @@ public interface TermMachineService {
 
 
      AgentResult querySnMsg(PlatformType platformType,String snBegin,String snEnd)throws Exception;
+
+    /**
+     * 划拨调整查询
+     *chenliang
+     * @param terminalTransferDetailList
+     * @return
+     */
+   AgentResult  queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailList,String operation)throws Exception;
+
+    /**
+     * 查询划拨结果
+     * chenliang
+     * @param serialNumber
+     * @return
+     * @throws Exception
+     */
+
+    AgentResult queryTerminalTransferResult(String serialNumber,String type) throws Exception;
 
 }

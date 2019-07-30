@@ -9,6 +9,7 @@ import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.*;
 import com.ryx.credit.service.agent.PlatFormService;
+import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -155,5 +156,33 @@ public class TermMachineServiceImpl  implements TermMachineService {
             return mposTermMachineServiceImpl.querySnMsg(platformType,snBegin,snEnd);
         }
         return AgentResult.fail("未知业务平台");
+    }
+
+    @Override
+    public AgentResult queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailLists, String operation) throws Exception {
+       String type = terminalTransferDetailLists.get(0).getPlatformType().toString();
+      if("1".equals(type)){
+            return   posTermMachineServiceImpl.queryTerminalTransfer(terminalTransferDetailLists,operation);
+        }else if("2".equals(type)){
+            return   mposTermMachineServiceImpl.queryTerminalTransfer(terminalTransferDetailLists,operation);
+        }else if("3".equals(type)){
+            return   AgentResult.fail("未联动");
+        }
+
+        return AgentResult.fail("未知业务平台");
+
+    }
+
+    @Override
+    public AgentResult queryTerminalTransferResult(String serialNumber,String type) throws Exception {
+        AgentResult agentResult=null;
+        if("1".equals(type)){
+         agentResult =  posTermMachineServiceImpl.queryTerminalTransferResult(serialNumber,type);
+        }else if("2".equals(type)){
+
+        }else if("3".equals(type)){
+
+        }
+        return agentResult;
     }
 }
