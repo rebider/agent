@@ -17,6 +17,7 @@ import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.*;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
+import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
 import com.ryx.credit.service.order.IOrderReturnService;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
@@ -307,6 +308,16 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
         data.put("posSnStart",snBegin);
         data.put("posSnEnd",snEnd);
         return request("ORG009", data);
+    }
+
+    @Override
+    public AgentResult queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailList, String operation) throws Exception {
+        return null;
+    }
+
+    @Override
+    public AgentResult queryTerminalTransferResult(String serialNumber, String type) throws Exception {
+        return null;
     }
 
 
