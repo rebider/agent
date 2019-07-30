@@ -1,6 +1,5 @@
 package com.ryx.credit.service.impl.dict;
 
-import com.ryx.credit.common.enumc.ApprovalType;
 import com.ryx.credit.common.enumc.DictGroup;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.exception.MessageException;
@@ -38,14 +37,6 @@ public class DictOptionsServiceImpl implements DictOptionsService {
                 .andDArtifactEqualTo(artifact)
                 .andDStatusEqualTo(Status.STATUS_1.status);
         example.setOrderByClause(" D_sort desc");
-        if (DictGroup.AGENT_AUDIT.name().equals(group) && DictGroup.APPROVAL_TYPE.name().equals(artifact)){ //查询审批结果时做限制
-            example = new DictExample();
-            example.or().andDGroupEqualTo(group)
-                    .andDArtifactEqualTo(artifact)
-                    .andDStatusEqualTo(Status.STATUS_1.status)
-                    .andDItemvalueNotEqualTo(ApprovalType.CANCEL.getValue());
-        }
-
         return dictMapper.selectByExample(example);
     }
 
