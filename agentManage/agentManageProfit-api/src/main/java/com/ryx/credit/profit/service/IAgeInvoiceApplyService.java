@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public interface IAgeInvoiceApplyService {
 
-    PageInfo queryInvoiceDetail(InvoiceApply invoiceApply, Page page,Map<String, Object> department);
+    PageInfo queryInvoiceDetail(InvoiceApply invoiceApply, Page page,Map<String, Object> department,boolean flag);
 
     void deleteById(String id);
 
