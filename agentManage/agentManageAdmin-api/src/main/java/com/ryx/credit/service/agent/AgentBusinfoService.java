@@ -109,7 +109,9 @@ public interface AgentBusinfoService {
 
     Map selectComp(String busId);
 
-    String queryAgentId(String busNum)throws MessageException;
+    AgentBusInfo queryAgentBusInfo(String busNum)throws MessageException;
 
     void updateBusLoginNum(String oldBusLoginNum,String busLoginNum)throws MessageException;
+
+    Map<String,String> queryBusInfoByBrandNum(String brandNum)throws MessageException;
 }

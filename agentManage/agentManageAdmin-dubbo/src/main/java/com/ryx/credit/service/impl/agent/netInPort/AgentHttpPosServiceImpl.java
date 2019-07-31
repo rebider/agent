@@ -223,12 +223,13 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
                     log.info("签名验证成功");
                     if (respXML.contains("data") && respXML.contains("orgId")){
                         JSONObject respXMLObj = JSONObject.parseObject(respXML);
-                        JSONObject dataObj = JSONObject.parseObject(respXMLObj.get("data").toString());
                         if(com.ryx.credit.commons.utils.StringUtils.isBlank(String.valueOf(respXMLObj.get("data"))) || "null".equals(String.valueOf(respXMLObj.get("data")))){
                             AppConfig.sendEmails(respXML, "入网通知POS失败报警");
+                            AgentResult ag = AgentResult.fail(respXML);
+                            ag.setData(respXMLObj);
+                            return ag;
                         }
-                        log.info(dataObj.toJSONString());
-                        return AgentResult.ok(dataObj);
+                        return AgentResult.ok(respXMLObj);
                     }else if (respXML.contains("respMsg")){
                         JSONObject respXMLObj = JSONObject.parseObject(respXML);
                         AppConfig.sendEmails(respXML, "入网通知POS失败报警:"+respXMLObj.get("respMsg"));

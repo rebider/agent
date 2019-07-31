@@ -1,20 +1,18 @@
 package com.ryx.credit.service.impl.order;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.PlatFormMapper;
 import com.ryx.credit.dao.order.*;
-import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.machine.entity.ImsTermWarehouseDetail;
 import com.ryx.credit.machine.service.ImsTermWarehouseDetailService;
 import com.ryx.credit.machine.service.TermMachineService;
-import com.ryx.credit.machine.vo.AdjustmentMachineVo;
 import com.ryx.credit.machine.vo.LowerHairMachineVo;
 import com.ryx.credit.machine.vo.MposSnVo;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
@@ -25,8 +23,7 @@ import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.IOrderReturnService;
 import com.ryx.credit.service.order.OLogisticsService;
-import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.zookeeper.data.Stat;
+import com.ryx.internet.service.InternetCardService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.regex.Pattern;
 
 import static com.ryx.credit.common.util.Conver10ToConver33Utils.getBetweenValues;
 
@@ -91,6 +87,9 @@ public class OLogisticServiceImpl implements OLogisticsService {
     private PlatFormMapper platFormMapper;
     @Autowired
     private OReturnOrderDetailMapper oReturnOrderDetailMapper;
+    @Autowired
+    private InternetCardService internetCardService;
+
 
     /**
      * 物流信息:
@@ -506,6 +505,9 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     //流量卡不进行下发操作
                     if(oActivity_plan!=null && StringUtils.isNotBlank(oActivity_plan.getActCode()) && ("2204".equals(oActivity_plan.getActCode()) || "2004".equals(oActivity_plan.getActCode()) )){
                         logger.info("导入物流数据,流量卡不进行下发操作，活动代码{}={}={}" ,oActivity_plan.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
+                        //存储到流量卡表
+                        List<OLogisticsDetail> logisticsDetailList = (List<OLogisticsDetail> )resultVO.getObj();
+                        internetCardService.orderInsertInternetCard(logisticsDetailList,oLogistics.getProCom());
                         return AgentResult.ok("流量卡不进行下发操作");
                     }
                     //进行入库、机具划拨操作 POS下发业务系统

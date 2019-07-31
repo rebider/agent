@@ -451,4 +451,38 @@ public class DateUtil {
         return dft.format(calendar.getTime());
     }
 
+    /**
+     * 得到几天后的时间
+     * @param d
+     * @param day
+     * @return
+     */
+    public static String getDateAfter(Date d, int day) {
+        SimpleDateFormat dft = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar now = Calendar.getInstance();
+        now.setTime(d);
+        now.set(Calendar.DATE, now.get(Calendar.DATE) + day);//+后 -前
+        return dft.format(now.getTime());
+    }
+
+    public static Date getDateAfterReturnDate(Date d, int day) {
+        Calendar now = Calendar.getInstance();
+        now.setTime(d);
+        now.set(Calendar.DATE, now.get(Calendar.DATE) + day);//+后 -前
+        return now.getTime();
+    }
+
+    /**
+     * 获取一年以后
+     * @param d
+     * @return
+     */
+    public static Date getOneYearLater(Date d) {
+        Calendar now = Calendar.getInstance();
+        now.setTime(d);
+        now.set(Calendar.YEAR, now.get(Calendar.YEAR)+1);//+后 -前
+        return now.getTime();
+    }
+
+
 }

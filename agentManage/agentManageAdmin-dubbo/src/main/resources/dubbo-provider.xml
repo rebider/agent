@@ -135,11 +135,13 @@
     <dubbo:service interface="com.ryx.credit.service.order.SplitService" ref="splitService"  timeout="1200000" registry="${zk.group}" />
     <dubbo:service interface="com.ryx.credit.service.agent.netInPort.AgentNetInNotityService" ref="agentNetInNotityService"  timeout="1200000" registry="${zk.group}" />
     <dubbo:service interface="com.ryx.credit.service.order.OrganizationService" ref="oorganizationService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.credit.service.agent.AttachmentRelService" ref="attachmentRelService"  timeout="1200000" registry="${zk.group}" />
 
 
   <!--  <dubbo:service interface="com.ryx.credit.service.order.OldOrderReturnService" ref="oldOrderReturnService"  timeout="1200000" registry="${zk.group}" />
     <dubbo:service interface="com.ryx.credit.service.order.NewOrderImportService" ref="newOrderImportService" timeout="1200000" registry="${zk.group}" />-->
     <dubbo:service interface="com.ryx.credit.service.profit.IPosProfitDataService" ref="posProfitDataService"  timeout="1200000" registry="${zk.group}" />
     <dubbo:reference interface="com.ryx.credit.profit.service.BusiPlatService" id="busiPlatService"  timeout="1200000" registry="${zk.group}" check="false" />
+    <dubbo:reference interface="com.ryx.internet.service.InternetCardService" id="internetCardService"  timeout="1200000" registry="${zk.group}" check="false" />
 
 </beans>

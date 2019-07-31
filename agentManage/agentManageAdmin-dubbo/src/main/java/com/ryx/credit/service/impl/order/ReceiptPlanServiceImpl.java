@@ -1,17 +1,21 @@
 package com.ryx.credit.service.impl.order;
 
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.PageInfo;
-import com.ryx.credit.dao.order.ReceiptPlanMapper;
+import com.ryx.credit.dao.order.*;
 import com.ryx.credit.pojo.admin.agent.Dict;
-import com.ryx.credit.pojo.admin.order.ReceiptPlan;
+import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.ReceiptPlanService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -23,12 +27,15 @@ import java.util.Map;
 @Service("receiptPlanService")
 public class ReceiptPlanServiceImpl implements ReceiptPlanService {
 
+    private static Logger logger = LoggerFactory.getLogger(ReceiptPlanServiceImpl.class);
     @Autowired
     private ReceiptPlanMapper receiptPlanMapper;
     @Autowired
     private IdService idService;
     @Autowired
     private DictOptionsService dictOptionsService;
+    @Autowired
+    private OReceiptProMapper oReceiptProMapper;
 
 
     @Override
@@ -73,4 +80,50 @@ public class ReceiptPlanServiceImpl implements ReceiptPlanService {
         pageInfo.setRows(list);
         return pageInfo;
     }
+
+    @Override
+    public AgentResult revocationPlanner(String planNum, String orderId, String user) throws Exception {
+        AgentResult result = new AgentResult(500, "系统异常", "");
+        try {
+            if (null == user) {
+                return AgentResult.fail("操作用户不能为空");
+            }
+            ReceiptPlanExample receiptPlanExample = new ReceiptPlanExample();
+            receiptPlanExample.or()
+                    .andStatusEqualTo(Status.STATUS_1.status)
+                    .andPlanOrderStatusEqualTo(new BigDecimal(PlannerStatus.YesPlanner.getValue()))
+                    .andPlanNumEqualTo(planNum)
+                    .andOrderIdEqualTo(orderId);
+            List<ReceiptPlan> receiptPlanList = receiptPlanMapper.selectByExample(receiptPlanExample);
+            ReceiptPlan receiptPlan = receiptPlanList.get(0);
+            //收货单商品
+            OReceiptPro oReceiptPro = oReceiptProMapper.selectByPrimaryKey(receiptPlan.getProId());
+            BigDecimal sendNum = BigDecimal.ZERO;
+            sendNum = oReceiptPro.getSendNum().subtract(receiptPlan.getPlanProNum());
+            oReceiptPro.setSendNum(sendNum);
+            oReceiptPro.setReceiptProStatus(OReceiptStatus.WAITING_LIST.code);
+            oReceiptPro.setuUser(user);
+            oReceiptPro.setuTime(new Date());
+            int updateByOReceiptPro = oReceiptProMapper.updateByPrimaryKeySelective(oReceiptPro);
+            if (updateByOReceiptPro != 1) {
+                logger.info("撤回排单异常-更新收货单商品失败");
+                throw new MessageException("撤回排单异常!");
+            }
+            //排单数据
+            receiptPlan.setStatus(Status.STATUS_0.status);
+            receiptPlan.setPlanProNum(BigDecimal.ZERO);
+            int updateByReceiptPlan = receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan);
+            if (updateByReceiptPlan != 1) {
+                logger.info("撤回排单异常-更新排单数据失败");
+                throw new MessageException("撤回排单异常!");
+            }
+            result.setStatus(200);
+            result.setMsg("处理成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new MessageException("撤回排单异常!");
+        }
+        return result;
+    }
+
 }
