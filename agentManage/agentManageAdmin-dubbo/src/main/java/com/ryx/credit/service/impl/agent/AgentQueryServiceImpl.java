@@ -235,6 +235,45 @@ public class AgentQueryServiceImpl implements AgentQueryService {
     }
 
     @Override
+    public List<AgentBusInfo> businessQuery(String agentId, String bussinessId, String isZpos, Long userId) {
+        AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+        AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+        criteria.andAgentIdEqualTo(agentId);
+        criteria.andIdEqualTo(bussinessId);
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+        if(platfromPerm.size()>0){
+            List<String> busPlatformList = new ArrayList<>();
+            for (Map map : platfromPerm) {
+                busPlatformList.add(String.valueOf(map.get("PLATFORM_NUM")));
+            }
+            criteria.andBusPlatformIn(busPlatformList);
+        }else{
+            criteria.andBusPlatformEqualTo("-1");
+        }
+        List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+        for (AgentBusInfo agentBusInfo : agentBusInfos) {
+            PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
+            if(null!=platForm){
+                agentBusInfo.setBusPlatformType(platForm.getPlatformType());
+            }
+            agentBusInfo.setAgentColinfoList(agentColinfoMapper.queryBusConinfoList(agentBusInfo.getId()));
+            List<Map<String, Object>> maps = assProtoColMapper.selectByBusInfoId(agentBusInfo.getId());
+            Map<String,Object> parentInfo = agentBusInfoMapper.queryBusInfoParent(FastMap.fastMap("id",agentBusInfo.getId()));
+            agentBusInfo.setParentInfo(parentInfo);
+            if(null==maps){
+                continue;
+            }else if(maps.size()==0){
+                continue;
+            }else{
+                agentBusInfo.setAssProtocolMap(maps.get(0));
+            }
+
+        }
+        return agentBusInfos;
+    }
+
+    @Override
     public List<AgentBusInfo> businessQueryCity(String agentId,String isZpos,Long userId) {
 
         Map<String, Object> reqMap = new HashMap<>();
