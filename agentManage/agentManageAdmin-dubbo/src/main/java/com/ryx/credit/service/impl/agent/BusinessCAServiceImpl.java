@@ -67,7 +67,7 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 				if(StringUtils.isNotBlank(dataMap.getString("creditCode"))){
 					AgentResult agentResult = agentService.checkAgBusLicIsEst(null,dataMap.getString("creditCode"));
 					if(agentResult.isOK()){
-						return new AgentResult(405,"营业执照号已存在："+dataMap.getString("creditCode")+"代理商编号为："+agentResult.getData(),"");
+						return new AgentResult(405,"营业执照号已存在："+dataMap.getString("creditCode")+"代理商编号为："+agentResult.getData(),dataMap);
 					}
 				}
 				return AgentResult.ok(dataMap);
