@@ -2,6 +2,7 @@ package com.ryx.credit.profit.service.impl;
 
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.Agent;
@@ -49,10 +50,11 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
 
 
     @Override
-    public PageInfo selectByMap(PageInfo pageInfo, Map<String, String> param,Map<String,Object> map) {
+    public PageInfo selectByMap(Page page, Map<String, String> param, Map<String,Object> map) {
 
         InvoiceSumExample invoiceSumExample = new InvoiceSumExample();
         InvoiceSumExample.Criteria criteria = invoiceSumExample.createCriteria();
+        invoiceSumExample.setPage(page);
         if (param.get("agentName") != null && !param.get("agentName").equals("")) {
             criteria.andAgentNameEqualTo(param.get("agentName"));
         }
@@ -81,6 +83,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
 
         List<InvoiceSum> invoiceSums = invoiceSumMapper.selectByExample(invoiceSumExample);
         int count = (int) invoiceSumMapper.countByExample(invoiceSumExample);
+        PageInfo pageInfo = new PageInfo();
         pageInfo.setTotal(count);
         pageInfo.setRows(invoiceSums);
         return pageInfo;
