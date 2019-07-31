@@ -312,12 +312,12 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
 
     @Override
     public AgentResult queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailList, String operation) throws Exception {
-        return null;
+        return AgentResult.fail("未联动接口");
     }
 
     @Override
     public AgentResult queryTerminalTransferResult(String serialNumber, String type) throws Exception {
-        return null;
+        return AgentResult.fail("未联动接口");
     }
 
 
