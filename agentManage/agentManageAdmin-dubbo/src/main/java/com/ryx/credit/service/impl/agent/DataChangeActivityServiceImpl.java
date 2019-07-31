@@ -76,6 +76,8 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     private DataChangeActivityService dataChangeActivityService;
     @Autowired
     private AgentNetInNotityService agentNetInNotityService;
+    @Autowired
+    private AgentDataHistoryService agentDataHistoryService;
 
 
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
@@ -260,10 +262,51 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             List<AgentColinfoVo> voColinfoVoList = vo.getColinfoVoList();
                             List<AgentColinfoVo> preVoColinfoVoList = preVo.getColinfoVoList();
                             Agent voAgent = vo.getAgent();
+                            logger.info("===============================更新代理商基础信息开始");
+                            Agent db_agent = agentMapper.selectByPrimaryKey(voAgent.getId());
+                            db_agent.setAgName(voAgent.getAgName());
+                            db_agent.setAgNature(voAgent.getAgNature());
+                            db_agent.setAgCapital(voAgent.getAgCapital());
+                            db_agent.setAgBusLic(voAgent.getAgBusLic());
+                            db_agent.setAgBusLicb(voAgent.getAgBusLicb());
+                            db_agent.setAgBusLice(voAgent.getAgBusLice());
+                            db_agent.setAgLegal(voAgent.getAgLegal());
+                            db_agent.setAgLegalCertype(voAgent.getAgLegalCertype());
+                            db_agent.setAgLegalCernum(voAgent.getAgLegalCernum());
+                            db_agent.setAgLegalMobile(voAgent.getAgLegalMobile());
+                            db_agent.setAgHead(voAgent.getAgHead());
+                            db_agent.setAgHeadMobile(voAgent.getAgHeadMobile());
+                            db_agent.setAgRegAdd(voAgent.getAgRegAdd());
+                            db_agent.setAgBusScope(voAgent.getAgBusScope());
+                            db_agent.setCloTaxPoint(voAgent.getCloTaxPoint());
+                            db_agent.setAgDocPro(voAgent.getAgDocPro());
+                            db_agent.setAgDocDistrict(voAgent.getAgDocDistrict());
+                            db_agent.setAgRemark(voAgent.getAgRemark());
+                            db_agent.setStatus(voAgent.getStatus());
+                            db_agent.setAgRegArea(voAgent.getAgRegArea());
+                            db_agent.setBusRiskEmail(voAgent.getBusRiskEmail());
+                            db_agent.setBusContactEmail(voAgent.getBusContactEmail());
+                            if (1 != agentMapper.updateByPrimaryKeySelective(db_agent)) {
+                                throw new ProcessException("代理商信息更新失败");
+                            }else{
+                                //保存数据历史
+                                if(!agentDataHistoryService.saveDataHistory(db_agent,db_agent.getId(), DataHistoryType.BASICS.code,rel.getcUser(),voAgent.getVersion()).isOK()){
+                                    throw new ProcessException("代理商信息更新失败！请重试");
+                                }
+                            }
+                            logger.info("===============================更新代理商基础信息成功");
+
+
                             Agent preVoAgent = preVo.getAgent();
 
                             if (voColinfoVoList.size()>0){
                                 if (voColinfoVoList.size() != preVoColinfoVoList.size()){
+
+                                    //有新增收款账户
+
+
+
+
                                     //一分钱验证、同步至业务系统
 
                                     logger.info("========================一分钱验证状态修改开始");
@@ -315,11 +358,6 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                     }
                                 }
                             }
-
-
-
-
-
                         }
                         //代理商新修改
                     }else if(DataChangeApyType.DC_Agent.name().equals(dr.getDataType())){
