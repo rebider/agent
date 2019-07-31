@@ -136,6 +136,7 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
             log.info("通知瑞花宝入网请求参数：{}",json);
             log.info("通知瑞花宝入网请求参数加密：{}",reqParamEncrypt);
             String httpResult = HttpClientUtil.sendHttpPost(rhbReqUrl, reqParamEncrypt);
+            log.info("通知瑞大宝入网返回参数1：{}",httpResult);
             String reqParamDecrypt = Des3Util.Decrypt(httpResult, rhb3desKey, rhb3desIv.getBytes());
             log.info("通知瑞大宝入网返回参数：{}",reqParamDecrypt);
             JSONObject respXMLObj = JSONObject.parseObject(reqParamDecrypt);
@@ -146,6 +147,7 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
                 throw new Exception(reqParamDecrypt);
             }
         }catch (Exception e){
+            e.printStackTrace();
             AppConfig.sendEmails("通知瑞花宝请求超时："+ MailUtil.printStackTrace(e), "入网通知瑞花宝失败报警");
             log.info("http请求超时:{}",e.getLocalizedMessage());
             throw new Exception("http请求超时:"+e.getLocalizedMessage());
@@ -238,6 +240,7 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
             log.info("通知瑞花宝入网升级请求参数：{}",json);
             log.info("通知瑞花宝入网升级请求参数加密：{}",reqParamEncrypt);
             String httpResult = HttpClientUtil.sendHttpPost(rhbReqUrl, reqParamEncrypt);
+            log.info("通知瑞大宝入网升级返回参数1：{}",httpResult);
             String reqParamDecrypt = Des3Util.Decrypt(httpResult, rhb3desKey, rhb3desIv.getBytes());
             log.info("通知瑞大宝入网升级返回参数：{}",reqParamDecrypt);
             JSONObject respXMLObj = JSONObject.parseObject(reqParamDecrypt);
@@ -248,6 +251,7 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
                 throw new Exception(reqParamDecrypt);
             }
         }catch (Exception e){
+            e.printStackTrace();
             AppConfig.sendEmails("通知瑞花宝请求超时："+ MailUtil.printStackTrace(e), "入网升级通知瑞花宝失败报警");
             log.info("http请求超时:{}",e.getLocalizedMessage());
             throw new Exception("http请求超时:"+e.getLocalizedMessage());
@@ -332,6 +336,7 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
             log.info("通知瑞花宝入网修改请求参数：{}",json);
             log.info("通知瑞花宝入网修改请求参数加密：{}",reqParamEncrypt);
             String httpResult = HttpClientUtil.sendHttpPost(rhbReqUrl, reqParamEncrypt);
+            log.info("通知瑞大宝入网修改返回参数1：{}",httpResult);
             String reqParamDecrypt = Des3Util.Decrypt(httpResult, rhb3desKey, rhb3desIv.getBytes());
             log.info("通知瑞大宝入网修改返回参数：{}",reqParamDecrypt);
             JSONObject respXMLObj = JSONObject.parseObject(reqParamDecrypt);
@@ -342,6 +347,7 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
                 throw new Exception(reqParamDecrypt);
             }
         }catch (Exception e){
+            e.printStackTrace();
             AppConfig.sendEmails("通知瑞花宝请求超时："+ MailUtil.printStackTrace(e), "入网修改通知瑞花宝失败报警");
             log.info("http请求超时:{}",e.getLocalizedMessage());
             throw new Exception("http请求超时:"+e.getLocalizedMessage());
