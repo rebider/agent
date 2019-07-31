@@ -76,6 +76,8 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     private DataChangeActivityService dataChangeActivityService;
     @Autowired
     private AgentNetInNotityService agentNetInNotityService;
+    @Autowired
+    private AgentDataHistoryService agentDataHistoryService;
 
 
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
@@ -260,10 +262,51 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             List<AgentColinfoVo> voColinfoVoList = vo.getColinfoVoList();
                             List<AgentColinfoVo> preVoColinfoVoList = preVo.getColinfoVoList();
                             Agent voAgent = vo.getAgent();
+                            logger.info("===============================更新代理商基础信息开始");
+                            Agent db_agent = agentMapper.selectByPrimaryKey(voAgent.getId());
+                            db_agent.setAgName(voAgent.getAgName());
+                            db_agent.setAgNature(voAgent.getAgNature());
+                            db_agent.setAgCapital(voAgent.getAgCapital());
+                            db_agent.setAgBusLic(voAgent.getAgBusLic());
+                            db_agent.setAgBusLicb(voAgent.getAgBusLicb());
+                            db_agent.setAgBusLice(voAgent.getAgBusLice());
+                            db_agent.setAgLegal(voAgent.getAgLegal());
+                            db_agent.setAgLegalCertype(voAgent.getAgLegalCertype());
+                            db_agent.setAgLegalCernum(voAgent.getAgLegalCernum());
+                            db_agent.setAgLegalMobile(voAgent.getAgLegalMobile());
+                            db_agent.setAgHead(voAgent.getAgHead());
+                            db_agent.setAgHeadMobile(voAgent.getAgHeadMobile());
+                            db_agent.setAgRegAdd(voAgent.getAgRegAdd());
+                            db_agent.setAgBusScope(voAgent.getAgBusScope());
+                            db_agent.setCloTaxPoint(voAgent.getCloTaxPoint());
+                            db_agent.setAgDocPro(voAgent.getAgDocPro());
+                            db_agent.setAgDocDistrict(voAgent.getAgDocDistrict());
+                            db_agent.setAgRemark(voAgent.getAgRemark());
+                            db_agent.setStatus(voAgent.getStatus());
+                            db_agent.setAgRegArea(voAgent.getAgRegArea());
+                            db_agent.setBusRiskEmail(voAgent.getBusRiskEmail());
+                            db_agent.setBusContactEmail(voAgent.getBusContactEmail());
+                            if (1 != agentMapper.updateByPrimaryKeySelective(db_agent)) {
+                                throw new ProcessException("代理商信息更新失败");
+                            }else{
+                                //保存数据历史
+                                if(!agentDataHistoryService.saveDataHistory(db_agent,db_agent.getId(), DataHistoryType.BASICS.code,rel.getcUser(),voAgent.getVersion()).isOK()){
+                                    throw new ProcessException("代理商信息更新失败！请重试");
+                                }
+                            }
+                            logger.info("===============================更新代理商基础信息成功");
+
+
                             Agent preVoAgent = preVo.getAgent();
 
                             if (voColinfoVoList.size()>0){
                                 if (voColinfoVoList.size() != preVoColinfoVoList.size()){
+
+                                    //有新增收款账户
+
+
+
+
                                     //一分钱验证、同步至业务系统
 
                                     logger.info("========================一分钱验证状态修改开始");
@@ -315,11 +358,6 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                     }
                                 }
                             }
-
-
-
-
-
                         }
                         //代理商新修改
                     }else if(DataChangeApyType.DC_Agent.name().equals(dr.getDataType())){
@@ -328,11 +366,13 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                         AgentVo vo = JSONObject.parseObject(dr.getDataContent(), AgentVo.class);
                         AgentVo preVo = JSONObject.parseObject(dr.getDataPreContent(), AgentVo.class);
                         List<CapitalVo> capitalVoList = vo.getCapitalVoList();
-                        for (CapitalVo capitalVo : capitalVoList) {
-                            capitalVo.setcAgentId(vo.getAgent().getId());
-                            capitalVo.setcUser(rel.getcUser());
-                            capitalVo.setSrcId(dr.getId());
-                            capitalVo.setSrcRemark("代理商信息修改");
+                        if(null!=capitalVoList && capitalVoList.size()>0){
+                            for (CapitalVo capitalVo : capitalVoList) {
+                                capitalVo.setcAgentId(vo.getAgent().getId());
+                                capitalVo.setcUser(rel.getcUser());
+                                capitalVo.setSrcId(dr.getId());
+                                capitalVo.setSrcRemark("代理商信息修改");
+                            }
                         }
                         //更新财务出款机构
                         List<AgentBusInfoVo> orgTypeList = vo.getOrgTypeList();
@@ -365,13 +405,16 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             if(1!=dateChangeRequestMapper.updateByPrimaryKeySelective(dr)){
                                 throw new ProcessException("更新数据申请失败");
                             }
-                            for (Capital capital : vo.getCapitalVoList()) {
-                                capital.setCloReviewStatus(AgStatus.Approved.getValue());
-                                int i = capitalMapper.updateByPrimaryKeySelective(capital);
-                                if(1!=i){
-                                    throw new ProcessException("更新缴纳款审批通过失败");
+                            if(null!=vo.getCapitalVoList() && vo.getCapitalVoList().size()>0){
+                                for (Capital capital : vo.getCapitalVoList()) {
+                                    capital.setCloReviewStatus(AgStatus.Approved.getValue());
+                                    int i = capitalMapper.updateByPrimaryKeySelective(capital);
+                                    if(1!=i){
+                                        throw new ProcessException("更新缴纳款审批通过失败");
+                                    }
                                 }
                             }
+
                         }
 
                         //入网程序调用
