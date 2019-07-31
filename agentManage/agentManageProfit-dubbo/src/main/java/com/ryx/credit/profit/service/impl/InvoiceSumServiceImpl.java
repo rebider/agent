@@ -412,11 +412,14 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                         criteria.andInvoiceCompanyEqualTo(invoiceSum.getInvoiceCompany());
                         criteria.andAgentIdEqualTo(invoiceSum.getAgentId());
                         List<InvoiceSum> invoiceSums = invoiceSumMapper.selectByExample(invoiceSumExample);
+
                         InvoiceSum invoiceSum1=new InvoiceSum();
                         if(null!=invoiceSums && invoiceSums.size() ==1){
                             invoiceSum1 = invoiceSums.get(0);
                         }else if(invoiceSums.size() > 1){
                             throw new MessageException("同一代理商同一打款公司下同一月份含有相同代理商！");
+                        }else if(invoiceSums.size()==0){
+                            invoiceSum2.get(0).setOwnInvoice(BigDecimal.ZERO);
                         }
                         if (null == invoiceSumList.get(5) || "".equals(invoiceSumList.get(5))) {
                             invoiceSum2.get(0).setPreLeftAmt(invoiceSum1.getOwnInvoice());
@@ -427,7 +430,10 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                         invoiceSum2.get(0).setDayProfitAmt(new BigDecimal(invoiceSumList.get(7).toString().trim()));
                         invoiceSum2.get(0).setPreProfitMonthAmt(new BigDecimal(invoiceSumList.get(8).toString().trim()));
                         invoiceSum2.get(0).setSubAddInvoiceAmt(new BigDecimal(invoiceSumList.get(9).toString().trim()));
-                        invoiceSum2.get(0).setOwnInvoice(invoiceSum2.get(0).getPreLeftAmt().add(invoiceSum2.get(0).getDayBackAmt()).add(invoiceSum2.get(0).getDayProfitAmt()).add(invoiceSum2.get(0).getPreProfitMonthAmt()).subtract(invoiceSum2.get(0).getAddInvoiceAmt()==null?BigDecimal.ZERO:invoiceSum2.get(0).getAddInvoiceAmt()).add(invoiceSum2.get(0).getAdjustAmt()==null?BigDecimal.ZERO:invoiceSum2.get(0).getAdjustAmt()));
+                        if(invoiceSums.size()!=0){
+                            invoiceSum2.get(0).setOwnInvoice(invoiceSum2.get(0).getPreLeftAmt().add(invoiceSum2.get(0).getDayBackAmt()).add(invoiceSum2.get(0).getDayProfitAmt()).add(invoiceSum2.get(0).getPreProfitMonthAmt()).subtract(invoiceSum2.get(0).getAddInvoiceAmt()==null?BigDecimal.ZERO:invoiceSum2.get(0).getAddInvoiceAmt()).add(invoiceSum2.get(0).getAdjustAmt()==null?BigDecimal.ZERO:invoiceSum2.get(0).getAdjustAmt()));
+                        }
+
                         invoiceSumMapper.updateByPrimaryKeySelective(invoiceSum2.get(0));
                     }
 
