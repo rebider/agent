@@ -390,13 +390,30 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                             invoiceSum1 = invoiceSums.get(0);
                         }else if(invoiceSums.size() > 1){
                             throw new MessageException("同一代理商同一打款公司下同一月份含有相同代理商！");
+                        }else if(invoiceSums.size()==0){
+                            InvoiceSum invoiceSum3 = new InvoiceSum();
+                            invoiceSum3.setPreLeftAmt(BigDecimal.ZERO);
+                            invoiceSum3.setDayBackAmt(new BigDecimal(invoiceSumList.get(6).toString().trim()));
+                            invoiceSum3.setDayProfitAmt(new BigDecimal(invoiceSumList.get(7).toString().trim()));
+                            invoiceSum3.setPreProfitMonthAmt(new BigDecimal(invoiceSumList.get(8).toString().trim()));
+                            invoiceSum3.setSubAddInvoiceAmt(new BigDecimal(invoiceSumList.get(9).toString().trim()));
+                            invoiceSum3.setTopOrgId(invoiceSumList.get(0).toString().trim());
+                            invoiceSum3.setTopOrgName(invoiceSumList.get(1).toString().trim());
+                            invoiceSum3.setAgentId(invoiceSumList.get(2).toString().trim());
+                            invoiceSum3.setAgentName(invoiceSumList.get(3).toString().trim());
+                            invoiceSum3.setInvoiceCompany(invoiceSumList.get(4).toString().trim());
+                            invoiceSum3.setId(idService.genId(TabId.P_INVOICE_SUM));
+                            invoiceSum3.setProfitMonth(profitMonth);
+                            //invoiceSum.setOwnInvoice((invoiceSum2.get(0).getPreLeftAmt()).add(new BigDecimal(invoiceSumList.get(6).toString())).add(invoiceSum.getDayBackAmt()).add(invoiceSum.getDayProfitAmt()).add(invoiceSum.getPreProfitMonthAmt()).subtract(invoiceSum.getAddInvoiceAmt()==null?BigDecimal.ZERO:invoiceSum.getAddInvoiceAmt()).add(invoiceSum.getAdjustAmt()==null?BigDecimal.ZERO:invoiceSum.getAdjustAmt()));
+                            invoiceSumMapper.insertSelective(invoiceSum3);
+                           continue;
                         }
                         if (null == invoiceSumList.get(5) || "".equals(invoiceSumList.get(5))) {
                             invoiceSum.setPreLeftAmt(invoiceSum1.getOwnInvoice());
                         }else if (null != invoiceSumList.get(5) && !"".equals(invoiceSumList.get(5))) {
                             invoiceSum.setPreLeftAmt(new BigDecimal(invoiceSumList.get(5).toString()));
                         }
-                        invoiceSum.setOwnInvoice((invoiceSum.getPreLeftAmt()==null?BigDecimal.ZERO:invoiceSum.getPreLeftAmt()).add(invoiceSum.getDayBackAmt()).add(invoiceSum.getDayProfitAmt()).add(invoiceSum.getPreProfitMonthAmt()).subtract(invoiceSum.getAddInvoiceAmt()==null?BigDecimal.ZERO:invoiceSum.getAddInvoiceAmt()).add(invoiceSum.getAdjustAmt()==null?BigDecimal.ZERO:invoiceSum.getAdjustAmt()));
+                        invoiceSum.setOwnInvoice((invoiceSum.getPreLeftAmt()==null?BigDecimal.ZERO:invoiceSum.getPreLeftAmt()).add(invoiceSum.getSubAddInvoiceAmt()).add(invoiceSum.getDayBackAmt()).add(invoiceSum.getDayProfitAmt()).add(invoiceSum.getPreProfitMonthAmt()).subtract(invoiceSum.getAddInvoiceAmt()==null?BigDecimal.ZERO:invoiceSum.getAddInvoiceAmt()).add(invoiceSum.getAdjustAmt()==null?BigDecimal.ZERO:invoiceSum.getAdjustAmt()));
                         invoiceSum.setId(idService.genId(TabId.P_INVOICE_SUM));
 
                         invoiceSumMapper.insertSelective(invoiceSum);
@@ -412,11 +429,29 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                         criteria.andInvoiceCompanyEqualTo(invoiceSum.getInvoiceCompany());
                         criteria.andAgentIdEqualTo(invoiceSum.getAgentId());
                         List<InvoiceSum> invoiceSums = invoiceSumMapper.selectByExample(invoiceSumExample);
+
                         InvoiceSum invoiceSum1=new InvoiceSum();
                         if(null!=invoiceSums && invoiceSums.size() ==1){
                             invoiceSum1 = invoiceSums.get(0);
                         }else if(invoiceSums.size() > 1){
                             throw new MessageException("同一代理商同一打款公司下同一月份含有相同代理商！");
+                        }else if(invoiceSums.size()==0){
+                            InvoiceSum invoiceSum3 = new InvoiceSum();
+                            invoiceSum3.setPreLeftAmt(BigDecimal.ZERO);
+                            invoiceSum3.setDayBackAmt(new BigDecimal(invoiceSumList.get(6).toString().trim()));
+                            invoiceSum3.setDayProfitAmt(new BigDecimal(invoiceSumList.get(7).toString().trim()));
+                            invoiceSum3.setPreProfitMonthAmt(new BigDecimal(invoiceSumList.get(8).toString().trim()));
+                            invoiceSum3.setSubAddInvoiceAmt(new BigDecimal(invoiceSumList.get(9).toString().trim()));
+                            invoiceSum3.setTopOrgId(invoiceSumList.get(0).toString().trim());
+                            invoiceSum3.setTopOrgName(invoiceSumList.get(1).toString().trim());
+                            invoiceSum3.setAgentId(invoiceSumList.get(2).toString().trim());
+                            invoiceSum3.setAgentName(invoiceSumList.get(3).toString().trim());
+                            invoiceSum3.setInvoiceCompany(invoiceSumList.get(4).toString().trim());
+                            invoiceSum3.setId(invoiceSum2.get(0).getId());
+                            invoiceSum3.setProfitMonth(profitMonth);
+                            //invoiceSum.setOwnInvoice((invoiceSum2.get(0).getPreLeftAmt()).add(new BigDecimal(invoiceSumList.get(6).toString())).add(invoiceSum.getDayBackAmt()).add(invoiceSum.getDayProfitAmt()).add(invoiceSum.getPreProfitMonthAmt()).subtract(invoiceSum.getAddInvoiceAmt()==null?BigDecimal.ZERO:invoiceSum.getAddInvoiceAmt()).add(invoiceSum.getAdjustAmt()==null?BigDecimal.ZERO:invoiceSum.getAdjustAmt()));
+                            invoiceSumMapper.updateByPrimaryKeySelective(invoiceSum3);
+                            continue;
                         }
                         if (null == invoiceSumList.get(5) || "".equals(invoiceSumList.get(5))) {
                             invoiceSum2.get(0).setPreLeftAmt(invoiceSum1.getOwnInvoice());
@@ -427,7 +462,10 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                         invoiceSum2.get(0).setDayProfitAmt(new BigDecimal(invoiceSumList.get(7).toString().trim()));
                         invoiceSum2.get(0).setPreProfitMonthAmt(new BigDecimal(invoiceSumList.get(8).toString().trim()));
                         invoiceSum2.get(0).setSubAddInvoiceAmt(new BigDecimal(invoiceSumList.get(9).toString().trim()));
-                        invoiceSum2.get(0).setOwnInvoice(invoiceSum2.get(0).getPreLeftAmt().add(invoiceSum2.get(0).getDayBackAmt()).add(invoiceSum2.get(0).getDayProfitAmt()).add(invoiceSum2.get(0).getPreProfitMonthAmt()).subtract(invoiceSum2.get(0).getAddInvoiceAmt()==null?BigDecimal.ZERO:invoiceSum2.get(0).getAddInvoiceAmt()).add(invoiceSum2.get(0).getAdjustAmt()==null?BigDecimal.ZERO:invoiceSum2.get(0).getAdjustAmt()));
+                        if(invoiceSums.size()!=0){
+                            invoiceSum2.get(0).setOwnInvoice(invoiceSum2.get(0).getPreLeftAmt().add(invoiceSum2.get(0).getSubAddInvoiceAmt()).add(invoiceSum2.get(0).getDayBackAmt()).add(invoiceSum2.get(0).getDayProfitAmt()).add(invoiceSum2.get(0).getPreProfitMonthAmt()).subtract(invoiceSum2.get(0).getAddInvoiceAmt()==null?BigDecimal.ZERO:invoiceSum2.get(0).getAddInvoiceAmt()).add(invoiceSum2.get(0).getAdjustAmt()==null?BigDecimal.ZERO:invoiceSum2.get(0).getAdjustAmt()));
+                        }
+
                         invoiceSumMapper.updateByPrimaryKeySelective(invoiceSum2.get(0));
                     }
 
