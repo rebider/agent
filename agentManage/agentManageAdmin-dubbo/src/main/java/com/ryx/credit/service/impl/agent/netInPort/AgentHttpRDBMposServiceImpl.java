@@ -111,8 +111,11 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             resultMap.put("bankcity",region.getrName());
             resultMap.put("bankname",agentColinfo.getCloBank());
             BankLineNums bankLineNums = bankLineNumsMapper.selectByBankName(agentColinfo.getCloBank());
-            if(bankLineNums!=null)
-            resultMap.put("bankid",bankLineNums.getBankid());
+            if(bankLineNums!=null){
+                resultMap.put("bankid",bankLineNums.getBankid());
+            }else{
+                resultMap.put("bankid","999");
+            }
             resultMap.put("cardName",agentColinfo.getCloRealname());
             resultMap.put("channelTopId",agentBusInfo.getFinaceRemitOrgan());
             resultMap.put("invoice",String.valueOf(agentColinfo.getCloInvoice()));
@@ -308,8 +311,11 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         jsonParams.put("bankcity",region.getrName());
         jsonParams.put("bankname",agentColinfo.getCloBank());
         BankLineNums bankLineNums = bankLineNumsMapper.selectByBankName(agentColinfo.getCloBank());
-        if(bankLineNums!=null)
-        jsonParams.put("bankid",bankLineNums.getBankid());
+        if(bankLineNums!=null){
+            jsonParams.put("bankid",bankLineNums.getBankid());
+        }else{
+            jsonParams.put("bankid","999");
+        }
         jsonParams.put("cardName",agentColinfo.getCloRealname());
         jsonParams.put("channelTopId",agentBusInfo.getFinaceRemitOrgan());
         jsonParams.put("invoice",String.valueOf(agentColinfo.getCloInvoice()));
