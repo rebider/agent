@@ -184,8 +184,7 @@ public class AgentContractServiceImpl implements AgentContractService {
                 agentContractVo.setcUser(agent.getcUser());
                 agentContractVo.setAgentId(agent.getId());
                 if (StringUtils.isEmpty(agentContractVo.getId())) {
-                    //直接新曾
-
+                    //直接新增
                     AgentContract result = insertAgentContract(agentContractVo, agentContractVo.getContractTableFile(),userId,null);
                     if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentContractVo.getAgentAssProtocol())){
                         AssProtoColRel rel = new AssProtoColRel();
@@ -205,9 +204,7 @@ public class AgentContractServiceImpl implements AgentContractService {
                     }
                     logger.info("代理商合同添加:{}{}", "添加代理商合同成功", result.getId());
                 } else {
-
                     AgentContract db_AgentContract = agentContractMapper.selectByPrimaryKey(agentContractVo.getId());
-
                     db_AgentContract.setAgentId(agent.getId());
                     db_AgentContract.setContNum(agentContractVo.getContNum());
                     db_AgentContract.setContType(agentContractVo.getContType());
@@ -226,20 +223,8 @@ public class AgentContractServiceImpl implements AgentContractService {
                         }
                     }
 
-                    //是否已经存在
-                    boolean is_in = false;
                     //更新分管协议
-                    if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentContractVo.getAgentAssProtocol())){
-                        List<AssProtoCol> assProtoCol_list = agentAssProtocolService.queryProtoColByBusId(db_AgentContract.getId());
-                        for (AssProtoCol assProtoCol : assProtoCol_list) {
-                            if(assProtoCol.getId().equals(agentContractVo.getAgentAssProtocol())){
-                                is_in = true;
-                                break;
-                            }
-                        }
-                        //如果存在就处理下一个业务
-                        if(is_in)continue;
-
+                    if(StringUtils.isNotBlank(agentContractVo.getAgentAssProtocol())){
                         List<AssProtoColRel>  rels =agentAssProtocolService.queryProtoColByBusIds(Arrays.asList(db_AgentContract.getId()));
                         for (AssProtoColRel rel : rels) {
                             rel.setStatus(Status.STATUS_0.status);
@@ -247,7 +232,6 @@ public class AgentContractServiceImpl implements AgentContractService {
                                 throw new ProcessException("业务分管协议更新失败");
                             }
                         }
-
                         AssProtoColRel rel = new AssProtoColRel();
                         rel.setAgentBusinfoId(db_AgentContract.getId());
                         rel.setAssProtocolId(agentContractVo.getAgentAssProtocol());
@@ -262,16 +246,15 @@ public class AgentContractServiceImpl implements AgentContractService {
                         if(1!=agentAssProtocolService.addProtocolRel(rel,agent.getcUser())){
                             throw new ProcessException("业务分管协议添加失败");
                         }
-                        //删除分管协议
                     }else{
-                        List<AssProtoColRel>  rels =agentAssProtocolService.queryProtoColByBusIds(Arrays.asList(db_AgentContract.getId()));
+                        //删除分管协议
+                        List<AssProtoColRel>  rels = agentAssProtocolService.queryProtoColByBusIds(Arrays.asList(db_AgentContract.getId()));
                         for (AssProtoColRel rel : rels) {
                             rel.setStatus(Status.STATUS_0.status);
                             if(1!=agentAssProtocolService.updateAssProtoColRel(rel)){
                                 throw new ProcessException("业务分管协议更新失败");
                             }
                         }
-
                     }
                     //删除老的附件
                     AttachmentRelExample example = new AttachmentRelExample();
@@ -305,9 +288,7 @@ public class AgentContractServiceImpl implements AgentContractService {
                             }
                         }
                     }
-
                 }
-
             }
             return ResultVO.success(null);
         } catch (Exception e) {
