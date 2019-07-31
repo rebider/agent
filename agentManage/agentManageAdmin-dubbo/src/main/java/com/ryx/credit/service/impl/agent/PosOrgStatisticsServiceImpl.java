@@ -7,6 +7,7 @@ import com.ryx.credit.common.enumc.TerminalPlatformType;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
+import com.ryx.credit.common.util.Des3Util;
 import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.common.util.agentUtil.AESUtil;
@@ -37,6 +38,10 @@ import java.util.*;
 public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
 
     private static Logger log = LoggerFactory.getLogger(PosOrgStatisticsServiceImpl.class);
+
+    private static final String rhbReqUrl = AppConfig.getProperty("rhb_req_url");
+    private static final String rhb3desKey = AppConfig.getProperty("rhb_3des_Key");
+    private static final String rhb3desIv = AppConfig.getProperty("rhb_3des_iv");
     @Autowired
     private PlatFormMapper platFormMapper;
     @Autowired
@@ -190,6 +195,33 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
     }
 
 
+    private AgentResult httpForRHpos(String agencyId)throws Exception{
+        try {
+            Map<String, String> map = new HashMap<>();
+            map.put("application","AgencyTerminalCount");
+            map.put("agentId",agencyId);
+            String json = JsonUtil.objectToJson(map);
+            String reqParamEncrypt = Des3Util.Encrypt(json, rhb3desKey, rhb3desIv.getBytes());
+            log.info("瑞花宝查询终端数量参数：{}",json);
+            log.info("瑞花宝查询终端数量参数加密：{}",reqParamEncrypt);
+            String httpResult = HttpClientUtil.sendHttpPost(rhbReqUrl, reqParamEncrypt);
+            String reqParamDecrypt = Des3Util.Decrypt(httpResult, rhb3desKey, rhb3desIv.getBytes());
+            log.info("瑞花宝查询终端数量返回参数：{}",reqParamDecrypt);
+            JSONObject respXMLObj = JSONObject.parseObject(reqParamDecrypt);
+            if (respXMLObj.getString("MSG_CODE").equals("0000")){
+                JSONArray result = respXMLObj.getJSONArray("RESULT");
+                return AgentResult.ok(result);
+            }
+            return AgentResult.fail();
+        } catch (Exception e) {
+            log.info("http请求超时:{}",e.getMessage());
+            e.printStackTrace();
+            throw new Exception(e);
+        }
+    }
+
+
+
     public static AgentResult httpForRJPos(String orgId,String supDorgId)throws Exception{
         try {
             String cooperator = com.ryx.credit.util.Constants.cooperator;
@@ -335,6 +367,15 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
                 }
             }
             AgentResult agentResult = httpForRJPos(orgId,parentBusNum);
+            agentResult.setMsg(platformType);
+            return agentResult;
+        }else if(PlatformType.RHPOS.getValue().equals(platformType)){
+            if(StringUtils.isEmpty(orgId)){
+                if(StringUtils.isNotEmpty(parentBusNum)){
+                    orgId = parentBusNum;
+                }
+            }
+            AgentResult agentResult = httpForRHpos(orgId);
             agentResult.setMsg(platformType);
             return agentResult;
         }

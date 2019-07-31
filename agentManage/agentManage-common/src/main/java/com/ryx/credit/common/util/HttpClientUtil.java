@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.codec.Charsets;
+import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -154,4 +156,20 @@ public class HttpClientUtil {
 		}
 		return resultString;
 	}
+
+	public static String sendHttpPost(String url, String body) throws Exception {
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		HttpPost httpPost = new HttpPost(url);
+		httpPost.addHeader("Content-Type", "application/json;charset=UTF-8");
+		httpPost.setHeader("Accept", "application/json");
+		httpPost.setEntity(new StringEntity(body, Charsets.UTF_8));
+		CloseableHttpResponse response = httpClient.execute(httpPost);
+		System.out.println(response.getStatusLine().getStatusCode() + "\n");
+		HttpEntity entity = response.getEntity();
+		String responseContent = EntityUtils.toString(entity, "UTF-8");
+		response.close();
+		httpClient.close();
+		return responseContent;
+	}
+
 }

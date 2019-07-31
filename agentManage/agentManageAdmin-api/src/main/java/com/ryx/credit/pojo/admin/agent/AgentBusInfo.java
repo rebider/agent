@@ -115,6 +115,16 @@ public class AgentBusInfo implements Serializable {
 
     private String platformUrl;
 
+    private String brandNum;
+
+    public String getBrandNum() {
+        return brandNum;
+    }
+
+    public void setBrandNum(String brandNum) {
+        this.brandNum = brandNum;
+    }
+
     public String getPlatformUrl() {
         return platformUrl;
     }
