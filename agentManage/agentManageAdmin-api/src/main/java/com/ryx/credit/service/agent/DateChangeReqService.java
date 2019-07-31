@@ -3,8 +3,10 @@ package com.ryx.credit.service.agent;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.pojo.admin.agent.ApprovalFlowRecord;
 import com.ryx.credit.pojo.admin.agent.DateChangeRequest;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,4 +29,12 @@ public interface DateChangeReqService {
      * 数据变更的查询
      */
     public PageInfo queryData( Page page,Map map);
+
+    /**
+     * 代理商账户修改申请
+     * @param map
+     * @return
+     * @throws Exception
+     */
+    List<Map<String, Object>> exportDcColinfo(Map map ) throws Exception;
 }
