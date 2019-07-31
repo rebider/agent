@@ -221,7 +221,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                     if(DataChangeApyType.DC_Colinfo.name().equals(dr.getDataType())) {
                         //更新入库
                         AgentVo vo = JSONObject.parseObject(dr.getDataContent(), AgentVo.class);
-                        ResultVO res = agentColinfoService.updateAgentColinfoVo(vo.getColinfoVoList(), vo.getAgent(),rel.getcUser());
+                        ResultVO res = agentColinfoService.updateAgentColinfoVo(vo.getColinfoVoList(), vo.getAgent(),rel.getcUser(),null);
                         logger.info("========审批流完成{}业务{}状态{},结果{}", proIns, rel.getBusType(), agStatus, res.getResInfo());
                         //更新数据状态为审批成功
                         if(res.isSuccess()){
@@ -302,7 +302,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             }
                         }
 
-                        ResultVO res = agentEnterService.updateAgentVo(vo,rel.getcUser(),true);
+                        ResultVO res = agentEnterService.updateAgentVo(vo,rel.getcUser(),true,null);
                         for (AgentBusInfoVo agentBusInfoVo : vo.getEditDebitList()) {
                             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
                             agentBusInfoVo.setId(agentBusInfoVo.getId());

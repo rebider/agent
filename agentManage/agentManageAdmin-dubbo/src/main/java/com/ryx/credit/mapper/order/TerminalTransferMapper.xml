@@ -276,4 +276,17 @@
         and t.review_status !='3'
       )
   </select>
+
+  <select id="getAgentType" parameterType="java.lang.String" resultType="java.lang.String">
+    select  BUS_TYPE from a_agent_businfo
+    <where>
+    bus_num = #{busNum}  and ROWNUM = 1
+    </where>
+  </select>
+<select id="getSN"  resultType="java.util.Map">
+  select SN_BEGIN_NUM,SN_END_NUM from O_TERMINAL_TRANSFER_DETAIL where TERMINAL_TRANSFER_ID in(
+  select ID from O_TERMINAL_TRANSFER where REVIEW_STATUS ='02' )
+</select>
+
+
 </mapper>

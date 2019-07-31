@@ -237,18 +237,20 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	 */
 	@Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
 	@Override
-	public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent,String userId,Boolean isPass)throws Exception {
+	public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent,String userId,Boolean isPass,String saveStatus)throws Exception {
 		try {
 			if(agent==null)throw new ProcessException("代理商信息不能为空");
 			Set<String> resultSet = new HashSet<>();
 			for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
-				if(agentBusInfoVo.getBusType().equals(BusType.ZQZF.key) || agentBusInfoVo.getBusType().equals(BusType.ZQBZF.key) || agentBusInfoVo.getBusType().equals(BusType.ZQ.key) ){
-					if(com.ryx.credit.commons.utils.StringUtils.isBlank(agentBusInfoVo.getBusParent()))
-						throw new ProcessException("直签上级不能为空");
+				if(!"1".equals(saveStatus)){
+					if(agentBusInfoVo.getBusType().equals(BusType.ZQZF.key) || agentBusInfoVo.getBusType().equals(BusType.ZQBZF.key) || agentBusInfoVo.getBusType().equals(BusType.ZQ.key) ){
+						if(com.ryx.credit.commons.utils.StringUtils.isBlank(agentBusInfoVo.getBusParent()))
+							throw new ProcessException("直签上级不能为空");
+					}
 				}
 
 				//代理商选择上级代理商时添加限制 不能选择同级别代理商为上级
-				if (StringUtils.isNotBlank(agentBusInfoVo.getBusParent())) {
+				if (StringUtils.isNotBlank(agentBusInfoVo.getBusParent()) && !"1".equals(saveStatus)) {
 					//获取上级代理商类型
 					AgentBusInfo busInfo = getById(agentBusInfoVo.getBusParent());
 					if (agentBusInfoVo.getBusType().equals(BusType.ZQ.key) || agentBusInfoVo.getBusType().equals(BusType.ZQBZF.key) || agentBusInfoVo.getBusType().equals(BusType.ZQZF.key)) {
@@ -274,7 +276,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 				List<Organization> organList = null;
 				if (null!=agentBusInfoVo.getBusPlatform()){
 					PlatformType platformType = platFormService.byPlatformCode(agentBusInfoVo.getBusPlatform());
-					if (null!=platformType){
+					if (null!=platformType && !"1".equals(saveStatus)){
 						if(PlatformType.whetherPOS(platformType.code)){
 							if (StringUtils.isNotBlank(agentBusInfoVo.getBusNum())){
 								if (StringUtils.isBlank(agentBusInfoVo.getBusLoginNum())){
