@@ -39,7 +39,7 @@ public interface AgentBusinfoService {
 
     public AgentBusInfo getByBusidAndCode(String platformCode,String busid);
 
-    public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent,String userId,Boolean isPass)throws Exception;
+    public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent,String userId,Boolean isPass,String saveStatus)throws Exception;
 
     public List<Map> agentBus(String agentId,Long userId);
 
@@ -109,7 +109,9 @@ public interface AgentBusinfoService {
 
     Map selectComp(String busId);
 
-    String queryAgentId(String busNum)throws MessageException;
+    AgentBusInfo queryAgentBusInfo(String busNum)throws MessageException;
 
     void updateBusLoginNum(String oldBusLoginNum,String busLoginNum)throws MessageException;
+
+    Map<String,String> queryBusInfoByBrandNum(String brandNum)throws MessageException;
 }

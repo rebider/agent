@@ -62,7 +62,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
      * @throws ProcessException
      */
     @Override
-    public AgentColinfo agentColinfoInsert(AgentColinfo ac, List<String> att) throws ProcessException {
+    public AgentColinfo agentColinfoInsert(AgentColinfo ac, List<String> att,String saveType) throws ProcessException {
         try {
             if (StringUtils.isEmpty(ac.getcUser())) {
                 throw new ProcessException("操作人不能为空");
@@ -74,8 +74,10 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                 throw new ProcessException("税点不能大于1");
             }
 
-            //检查属性
-            checkColInfo(ac);
+            if(!"1".equals(saveType)){
+                //检查属性
+                checkColInfo(ac);
+            }
 
             Date d = Calendar.getInstance().getTime();
             ac.setcTime(d);
@@ -128,14 +130,14 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                 }
             }
 
-            if (!ac.isImport())
+            if (!ac.isImport() && !"1".equals(saveType))
                 if (ac.getCloType().compareTo(new BigDecimal("2")) == 0) {//对私
                     if (!isHaveYHKSMJ) {
                         throw new ProcessException("请添加银行卡扫描件");
                     }
                 }
 
-            if (!ac.isImport())
+            if (!ac.isImport() && !"1".equals(saveType))
                 if (ac.getCloType().compareTo(new BigDecimal("1")) == 0) {//对公
                     if (!isHaveKHXUZ) {
                         throw new ProcessException("请添加开户许可证");
@@ -143,7 +145,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                 }
 
             //对公并且税点等于0.06一般纳税人证明必填
-            if (!ac.isImport())
+            if (!ac.isImport() && !"1".equals(saveType))
                 if (ac.getCloType().compareTo(new BigDecimal("1")) == 0 && ac.getCloTaxPoint().compareTo(new BigDecimal("0.06")) == 0) {
                     if (!isHaveYBNSRZM) {
                         throw new ProcessException("请添加一般纳税人证明");
@@ -231,7 +233,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public ResultVO updateAgentColinfoVo(List<AgentColinfoVo> colinfoVoList, Agent agent, String userId) throws Exception {
+    public ResultVO updateAgentColinfoVo(List<AgentColinfoVo> colinfoVoList, Agent agent, String userId,String saveStatus) throws Exception {
         try {
             if (agent == null) throw new MessageException("代理商信息不能为空");
             for (AgentColinfoVo agentColinfoVo : colinfoVoList) {
@@ -251,19 +253,19 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                     if (agLegalName.equals(trueName)) {
                         agentColinfoVo.setAgLegalCernum(agent.getAgLegalCernum());
                     } else {
-                        if (StringUtils.isNotBlank(certNo)) {
+                        if (StringUtils.isNotBlank(certNo) && !"1".equals(saveStatus) ) {
                             //校验收款账户身份认证
                             AgentResult result = livenessDetectionService.livenessDetection(trueName, certNo, userId);
                             if (!result.isOK()) {
                                 throw new ProcessException("收款账户身份认证失败");
                             }
-                        } else {
+                        } else if(!"1".equals(saveStatus)) {
                             throw new ProcessException("请输入收款账户名相对应的户主证件号");
                         }
                     }
                 }
                 //对公时 判断收款账户名是否与代理商名称一致 不一致则抛异常提示信息
-                if (agentColinfoVo.getCloType().compareTo(new BigDecimal(1)) == 0) {
+                if (agentColinfoVo.getCloType().compareTo(new BigDecimal(1)) == 0 && !"1".equals(saveStatus)) {
                     if (agentName.equals(trueName)) {
                         agentColinfoVo.setAgLegalCernum(agent.getAgLegalCernum());
                     } else if (!agentName.equals(trueName)) {
@@ -275,7 +277,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                 agentColinfoVo.setAgentId(agent.getId());
                 if (org.apache.commons.lang.StringUtils.isEmpty(agentColinfoVo.getId())) {
                     //直接新曾
-                    AgentColinfo result = agentColinfoInsert(agentColinfoVo, agentColinfoVo.getColinfoTableFile());
+                    AgentColinfo result = agentColinfoInsert(agentColinfoVo, agentColinfoVo.getColinfoTableFile(),null);
                     logger.info("代理商收款账户添加:{}{}", "添加代理商收款账户成功", result.getId());
                 } else {
 
@@ -360,19 +362,19 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                         }
                     }
                     if (agentColinfoVo.getCloType().compareTo(new BigDecimal("2")) == 0) {//对私
-                        if (!isHaveYHKSMJ) {
+                        if (!isHaveYHKSMJ  && !"1".equals(saveStatus)) {
                             throw new MessageException("请添加银行卡扫描件");
                         }
                     }
                     if (agentColinfoVo.getCloType().compareTo(new BigDecimal("1")) == 0) {//对公
-                        if (!isHaveKHXUZ) {
+                        if (!isHaveKHXUZ  && !"1".equals(saveStatus)) {
                             throw new MessageException("请添加开户许可证");
                         }
                     }
 
                     //对公并且税点等于0.06一般纳税人证明必填
                     if (agentColinfoVo.getCloType().compareTo(new BigDecimal("1")) == 0 && agentColinfoVo.getCloTaxPoint().compareTo(new BigDecimal("0.06")) == 0) {
-                        if (!isHaveYBNSRZM) {
+                        if (!isHaveYBNSRZM  && !"1".equals(saveStatus)) {
                             throw new MessageException("请添加一般纳税人证明");
                         }
                     }

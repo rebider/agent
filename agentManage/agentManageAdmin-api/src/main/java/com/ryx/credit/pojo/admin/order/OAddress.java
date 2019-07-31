@@ -41,6 +41,16 @@ public class OAddress implements Serializable {
 
     private BigDecimal version;
 
+    private BigDecimal flag;
+
+    public BigDecimal getFlag() {
+        return flag;
+    }
+
+    public void setFlag(BigDecimal flag) {
+        this.flag = flag;
+    }
+
     public String getId() {
         return id;
     }
