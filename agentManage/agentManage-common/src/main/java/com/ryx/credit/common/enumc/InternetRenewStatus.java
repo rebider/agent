@@ -68,7 +68,20 @@ public enum InternetRenewStatus {
         return map;
     }
 
-    public static void main(String[] args){
-        System.out.println(getContentMap());
+    /**
+     * 根据内容获取值
+     * @param content
+     * @return
+     */
+    public static String getValueByContent(String content){
+        InternetRenewStatus[] fundType = InternetRenewStatus.values();
+        for(InternetRenewStatus cc : fundType){
+            if(cc.getContent().equals(content)){
+                return cc.code;
+            }
+        }
+        return "";
     }
+
+
 }
