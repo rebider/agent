@@ -270,7 +270,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                     for (AgentColinfo agentColinfo:voColinfoVoList){
                                         agentColinfo.setPayStatus(ColinfoPayStatus.A.getValue());
                                     }
-                                    agentColinfoService.updateAgentColinfoVo(voColinfoVoList, vo.getAgent(),rel.getcUser());
+                                    agentColinfoService.updateAgentColinfoVo(voColinfoVoList, vo.getAgent(),rel.getcUser(),null);
                                     logger.info("========================一分钱验证状态修改完成");
 
                                     logger.info("========================同步至业务系统开始");
@@ -296,7 +296,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                             for (AgentColinfo agentColinfo:voColinfoVoList){
                                                 agentColinfo.setPayStatus(ColinfoPayStatus.A.getValue());
                                             }
-                                            agentColinfoService.updateAgentColinfoVo(voColinfoVoList, vo.getAgent(),rel.getcUser());
+                                            agentColinfoService.updateAgentColinfoVo(voColinfoVoList, vo.getAgent(),rel.getcUser(),null);
                                             logger.info("========================一分钱验证状态修改完成");
 
                                             logger.info("========================同步至业务系统开始");
