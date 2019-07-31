@@ -67,7 +67,19 @@ public enum InternetRenewWay {
         return map;
     }
 
-    public static void main(String[] args){
-        System.out.println(getContentMap());
+    /**
+     * 根据内容获取值
+     * @param content
+     * @return
+     */
+    public static String getValueByContent(String content){
+        InternetRenewWay[] fundType = InternetRenewWay.values();
+        for(InternetRenewWay cc : fundType){
+            if(cc.getContent().equals(content)){
+                return cc.code;
+            }
+        }
+        return "";
     }
+
 }
