@@ -108,8 +108,6 @@ public class InternetCardServiceImpl implements InternetCardService {
                     continue;
                 }
                 Date date = stepMonth(oInternetCard.getExpireTime(), 3);
-                System.out.println("到期时间："+ DateUtil.format(oInternetCard.getExpireTime()));
-                System.out.println("DATE："+ DateUtil.format(date));
                 if(Calendar.getInstance().getTime().getTime()<date.getTime()){
                     oInternetCard.setRenewButton("1");
                 }else{
@@ -183,7 +181,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             criteria.andAgentIdEqualTo(internetCard.getAgentId());
         }
         if(StringUtils.isNotBlank(internetCard.getAgentName())){
-            criteria.andAgentNameEqualTo(internetCard.getAgentName());
+            criteria.andAgentNameLike("%"+internetCard.getAgentName()+"%");
         }
         if(StringUtils.isNotBlank(internetCard.getOrderId())){
             criteria.andOrderIdEqualTo(internetCard.getOrderId());
@@ -359,14 +357,38 @@ public class InternetCardServiceImpl implements InternetCardService {
                         }else if(importType.equals(CardImportType.F.getValue())){
                             OInternetRenewDetail oInternetRenewDetail = new OInternetRenewDetail();
                             String id = String.valueOf(string.size()>=1?string.get(0):"");//ID
-                            String realityAmt = String.valueOf(string.size()>=20?string.get(19):"");//实扣金额
-                            Boolean regOperationAmt = realityAmt.matches(RegExpression.Amount);
+                            String theRealityAmt = String.valueOf(string.size()>=20?string.get(19):"");//实扣金额
+                            Boolean regOperationAmt = theRealityAmt.matches(RegExpression.Amount);
                             if(!regOperationAmt){
-                                oInternetRenewDetail.setRealityAmt(null);
+                                oInternetRenewDetail.setTheRealityAmt(null);
                             }else{
-                                oInternetRenewDetail.setRealityAmt(StringUtils.isBlank(realityAmt)?null:new BigDecimal(realityAmt));
+                                oInternetRenewDetail.setTheRealityAmt(StringUtils.isBlank(theRealityAmt)?null:new BigDecimal(theRealityAmt));
                             }
                             oInternetRenewDetail.setId(id);
+                            oInternetRenewDetail.setRenewId(String.valueOf(string.size()>=2?string.get(1):""));
+                            oInternetRenewDetail.setIccidNum(String.valueOf(string.size()>=3?string.get(2):""));
+                            oInternetRenewDetail.setOrderId(String.valueOf(string.size()>=4?string.get(3):""));
+                            oInternetRenewDetail.setSnNum(String.valueOf(string.size()>=5?string.get(4):""));
+                            oInternetRenewDetail.setAgentId(String.valueOf(string.size()>=6?string.get(5):""));
+                            oInternetRenewDetail.setAgentName(String.valueOf(string.size()>=7?string.get(6):""));
+                            oInternetRenewDetail.setMerName(String.valueOf(string.size()>=8?string.get(7):""));
+                            oInternetRenewDetail.setMerId(String.valueOf(string.size()>=9?string.get(8):""));
+                            oInternetRenewDetail.setInternetCardNum(String.valueOf(string.size()>=10?string.get(9):""));
+                            String openAccountTime = String.valueOf(string.size() >= 11 ? string.get(10) : "");
+                            if(StringUtils.isNotBlank(openAccountTime) && !openAccountTime.equals("null"))
+                            oInternetRenewDetail.setOpenAccountTime(DateUtils.parseDate(openAccountTime,dateFormat));
+                            String expireTime = String.valueOf(string.size() >= 12 ? string.get(11) : "");
+                            if(StringUtils.isNotBlank(expireTime) && !expireTime.equals("null"))
+                            oInternetRenewDetail.setExpireTime(DateUtils.parseDate(expireTime,dateFormat));
+                            oInternetRenewDetail.setRenewWay(InternetRenewWay.getValueByContent(String.valueOf(string.size()>=13?string.get(12):"")));
+                            oInternetRenewDetail.setOffsetAmt(string.size()>=14?new BigDecimal(string.get(13)):null);
+                            oInternetRenewDetail.setRenewAmt(string.size()>=15?new BigDecimal(string.get(14)):null);
+                            oInternetRenewDetail.setOughtAmt(string.size()>=16?new BigDecimal(string.get(15)):null);
+                            oInternetRenewDetail.setRealityAmt(string.size()>=17?new BigDecimal(string.get(16)):null);
+                            oInternetRenewDetail.setRenewStatus(InternetRenewStatus.getValueByContent(String.valueOf(string.size()>=18?string.get(17):"")));
+                            String cTime = String.valueOf(string.size() >= 19 ? string.get(18) : "");
+                            if(StringUtils.isNotBlank(cTime) && !cTime.equals("null"))
+                            oInternetRenewDetail.setcTime(DateUtils.parseDate(cTime,dateFormat));
                             jsonList = JsonUtil.objectToJson(oInternetRenewDetail);
                         }
                         OInternetCardImport oInternetCardImport = new OInternetCardImport();
@@ -445,15 +467,18 @@ public class InternetCardServiceImpl implements InternetCardService {
                         internetCardService.disposeSn(snList,internetCard,oInternetCardImport);
                     }else if(importType.equals(CardImportType.F.getValue())){
                         OInternetRenewDetail internetRenewDetail = JsonUtil.jsonToPojo(oInternetCardImport.getImportMsg(), OInternetRenewDetail.class);
-                        if(null==internetRenewDetail.getRealityAmt()){
-                            throw new MessageException("实际付款金额为空或格式不正确");
+                        if(null==internetRenewDetail.getTheRealityAmt()){
+                            throw new MessageException("本次抵扣金额为空或格式不正确");
                         }
                         if(null==internetRenewDetail.getId()){
                             throw new MessageException("明细编号为空");
                         }
-                        Boolean regOperationAmt = RegExpression.regAmount(internetRenewDetail.getRealityAmt());
+                        Boolean regOperationAmt = RegExpression.regAmount(internetRenewDetail.getTheRealityAmt());
                         if(!regOperationAmt){
                             throw new MessageException("操作金额不正确,保留小数点后两位");
+                        }
+                        if(internetRenewDetail.getTheRealityAmt().compareTo(BigDecimal.ZERO)==0 || internetRenewDetail.getTheRealityAmt().compareTo(new BigDecimal("0.00"))==0){
+                            throw new MessageException("操作金额不正确,不能为0");
                         }
                         OInternetRenewDetail qInternetRenewDetail = internetRenewDetailMapper.selectByPrimaryKey(internetRenewDetail.getId());
                         if(null==qInternetRenewDetail){
@@ -462,20 +487,31 @@ public class InternetCardServiceImpl implements InternetCardService {
                         if(!qInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDK.getValue()) && !qInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())){
                             throw new MessageException("只能导入分润抵扣的数据");
                         }
-                        BigDecimal realityAmt = internetRenewDetail.getRealityAmt().add(qInternetRenewDetail.getRealityAmt());
+                        BigDecimal realityAmt = internetRenewDetail.getTheRealityAmt().add(qInternetRenewDetail.getRealityAmt());
                         if(realityAmt.compareTo(qInternetRenewDetail.getOughtAmt())==1){
                             throw new MessageException("实扣金额不能大于应扣金额");
                         }
+                        OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(qInternetRenewDetail.getIccidNum());
                         //等于更新状态已续费
                         if(realityAmt.compareTo(qInternetRenewDetail.getOughtAmt())==0){
                             qInternetRenewDetail.setRenewStatus(InternetRenewStatus.YXF.getValue());
+                            oInternetCard.setRenewStatus(InternetRenewStatus.YXF.getValue());
+                            //扣足到期时间加一年
+                            oInternetCard.setExpireTime(DateUtil.getOneYearLater(oInternetCard.getExpireTime()));
                         }else{
                             qInternetRenewDetail.setRenewStatus(InternetRenewStatus.BFXF.getValue());
+                            oInternetCard.setRenewStatus(InternetRenewStatus.BFXF.getValue());
                         }
                         qInternetRenewDetail.setRealityAmt(realityAmt);
+                        qInternetRenewDetail.setuTime(new Date());
                         int i = internetRenewDetailMapper.updateByPrimaryKeySelective(qInternetRenewDetail);
                         if(i!=1){
                             throw new MessageException("更新续费明细失败");
+                        }
+                        oInternetCard.setuTime(new Date());
+                        int k = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
+                        if(k!=1){
+                            throw new MessageException("更新物联网卡信息失败");
                         }
                         oInternetCardImport.setImportStatus(OInternetCardImportStatus.SUCCESS.getValue());
                         updateInternetCardImport(oInternetCardImport);
