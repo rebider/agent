@@ -262,4 +262,50 @@
   <select id="compactQuery" parameterType="string" resultMap="BaseResultMap">
     select <include refid="Base_Column_List" /> from A_AGENT_CONTRACT where AGENT_ID=#{id} and STATUS = 1
   </select>
+
+
+  <select id="getAgentContractList" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix"/>
+    <include refid="queryAgentContract"/>
+    <include refid="OracleDialectSuffix"/>
+  </select>
+
+  <select id="getAgentContractCount" parameterType="map" resultType="int">
+    select count(*) from(
+      <include refid="queryAgentContract"/>
+    )
+  </select>
+
+  <sql id="queryAgentContract">
+    select
+    ac.agent_id, aa.ag_name, aa.ag_status,
+    ac.cont_type, ac.cont_num, ac.cont_date, ac.cont_end_date, ac.append_agree, ac.remark
+    from a_agent_contract ac
+    left join a_agent aa on ac.agent_id = aa.id
+    left join c_organization org on org.id = aa.ag_doc_pro
+    left join c_organization orging on orging.id = aa.ag_doc_district
+    <include refid="queryAgentContractWhere"/>
+    order by ac.c_time desc
+  </sql>
+
+  <sql id="queryAgentContractWhere">
+    <where>
+      ac.status = 1 and aa.status = 1
+      <if test="map.organizationCode=='south_13_city' and map.organizationCode=='south_13_city'">
+        and (org.code like concat(#{map.organizationCode},'%') or orging.code like concat(#{map.organizationCode},'%'))
+      </if>
+      <if test="map.organizationCode=='north_18_city' and map.organizationCode=='north_18_city'">
+        and (org.code like concat(#{map.organizationCode},'%') or orging.code like concat(#{map.organizationCode},'%'))
+      </if>
+      <if test="map.agentId!=null and map.agentId!=''"> and ac.agent_id = #{map.agentId} </if>
+      <if test="map.agName!=null and map.agName!=''"> and aa.ag_name like concat(concat('%',#{map.agName}),'%') </if>
+      <if test="map.agStatus!=null and map.agStatus!=''"> and aa.ag_status = #{map.agStatus} </if>
+      <if test="map.contType!=null and map.contType!=''"> and ac.cont_type = #{map.contType} </if>
+      <if test="map.contNum!=null and map.contNum!=''"> and ac.cont_num = #{map.contNum} </if>
+      <if test="map.contDateStart!=null and map.contDateStart!=''"> and to_char(ac.cont_date,'YYYY-MM-dd') &gt;= #{map.contDateStart} </if>
+      <if test="map.contDateEnd!=null and map.contDateEnd!=''"> and to_char(ac.cont_date,'YYYY-MM-dd') &lt;= #{map.contDateEnd} </if>
+      <if test="map.contEndDateStart!=null and map.contEndDateStart!=''"> and to_char(ac.cont_end_date,'YYYY-MM-dd') &gt;= #{map.contEndDateStart} </if>
+      <if test="map.contEndDateEnd!=null and map.contEndDateEnd!=''"> and to_char(ac.cont_end_date,'YYYY-MM-dd') &lt;= #{map.contEndDateEnd} </if>
+    </where>
+  </sql>
 </mapper>
