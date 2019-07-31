@@ -383,7 +383,6 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                         criteria.andProfitMonthEqualTo(lastSettleMonth);
                         criteria.andInvoiceCompanyEqualTo(invoiceSum.getInvoiceCompany());
                         criteria.andAgentIdEqualTo(invoiceSum.getAgentId());
-                        criteria.andTopOrgNameEqualTo(invoiceSum.getTopOrgName());
                         List<InvoiceSum> invoiceSums = invoiceSumMapper.selectByExample(invoiceSumExample);
 
                         InvoiceSum invoiceSum1=new InvoiceSum();
@@ -405,12 +404,30 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                     }else{
                         invoiceSum2.get(0).setTopOrgId(invoiceSumList.get(0).toString().trim());
                         invoiceSum2.get(0).setTopOrgName(invoiceSumList.get(1).toString().trim());
-                        invoiceSum2.get(0).setPreLeftAmt(new BigDecimal(invoiceSumList.get(5).toString().trim()));
+                        //查上月剩余欠票基数
+                        String lastSettleMonth = LocalDate.now().plusMonths(-2).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
+                        InvoiceSumExample invoiceSumExample = new InvoiceSumExample();
+                        InvoiceSumExample.Criteria criteria = invoiceSumExample.createCriteria();
+                        criteria.andProfitMonthEqualTo(lastSettleMonth);
+                        criteria.andInvoiceCompanyEqualTo(invoiceSum.getInvoiceCompany());
+                        criteria.andAgentIdEqualTo(invoiceSum.getAgentId());
+                        List<InvoiceSum> invoiceSums = invoiceSumMapper.selectByExample(invoiceSumExample);
+                        InvoiceSum invoiceSum1=new InvoiceSum();
+                        if(null!=invoiceSums && invoiceSums.size() ==1){
+                            invoiceSum1 = invoiceSums.get(0);
+                        }else if(invoiceSums.size() > 1){
+                            throw new MessageException("同一代理商同一打款公司下同一月份含有相同代理商！");
+                        }
+                        if (null == invoiceSumList.get(5) || "".equals(invoiceSumList.get(5))) {
+                            invoiceSum2.get(0).setPreLeftAmt(invoiceSum1.getOwnInvoice());
+                        }else if (null != invoiceSumList.get(5) && !"".equals(invoiceSumList.get(5))) {
+                            invoiceSum2.get(0).setPreLeftAmt(new BigDecimal(invoiceSumList.get(5).toString()));
+                        }
                         invoiceSum2.get(0).setDayBackAmt(new BigDecimal(invoiceSumList.get(6).toString().trim()));
                         invoiceSum2.get(0).setDayProfitAmt(new BigDecimal(invoiceSumList.get(7).toString().trim()));
                         invoiceSum2.get(0).setPreProfitMonthAmt(new BigDecimal(invoiceSumList.get(8).toString().trim()));
                         invoiceSum2.get(0).setSubAddInvoiceAmt(new BigDecimal(invoiceSumList.get(9).toString().trim()));
-                        invoiceSum2.get(0).setOwnInvoice(invoiceSum.getPreLeftAmt().add(invoiceSum.getDayBackAmt()).add(invoiceSum.getDayProfitAmt()).add(invoiceSum.getPreProfitMonthAmt()).subtract(invoiceSum.getAddInvoiceAmt()==null?BigDecimal.ZERO:invoiceSum.getAddInvoiceAmt()).add(invoiceSum.getAdjustAmt()==null?BigDecimal.ZERO:invoiceSum.getAdjustAmt()));
+                        invoiceSum2.get(0).setOwnInvoice(invoiceSum2.get(0).getPreLeftAmt().add(invoiceSum2.get(0).getDayBackAmt()).add(invoiceSum2.get(0).getDayProfitAmt()).add(invoiceSum2.get(0).getPreProfitMonthAmt()).subtract(invoiceSum2.get(0).getAddInvoiceAmt()==null?BigDecimal.ZERO:invoiceSum2.get(0).getAddInvoiceAmt()).add(invoiceSum2.get(0).getAdjustAmt()==null?BigDecimal.ZERO:invoiceSum2.get(0).getAdjustAmt()));
                         invoiceSumMapper.updateByPrimaryKeySelective(invoiceSum2.get(0));
                     }
 
@@ -464,7 +481,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
             criteria.andInvoiceCompanyEqualTo(invoiceSum.getInvoiceCompany());
         }
         if(StringUtils.isNotBlank(invoiceSum.getProfitMonth())){
-            criteria.andInvoiceCompanyEqualTo(invoiceSum.getProfitMonth());
+            criteria.andProfitMonthEqualTo(invoiceSum.getProfitMonth());
         }
 
 
