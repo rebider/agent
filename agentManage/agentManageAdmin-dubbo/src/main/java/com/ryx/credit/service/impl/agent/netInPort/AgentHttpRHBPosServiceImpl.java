@@ -116,6 +116,7 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
         resultMap.put("bankCard",agentColinfo.getCloBankAccount());//结算卡号
         resultMap.put("bankCardCredNo",agentColinfo.getAgLegalCernum());//结算卡户主身份证
         resultMap.put("openBank",agentColinfo.getCloBankCode());//收款开户总行 银行代码
+        resultMap.put("openBankName",agentColinfo.getCloBank());//收款开户总行 银行名称
         resultMap.put("openBankChild",agentColinfo.getBranchLineNum());//收款开户支行 联号
         resultMap.put("openBankChildName",agentColinfo.getCloBankBranch());//收款开户支行
         resultMap.put("isBill",agentColinfo.getCloInvoice());//是否开具分润发票
@@ -219,6 +220,7 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
         resultMap.put("bankCard",agentColinfo.getCloBankAccount());//结算卡号
         resultMap.put("bankCardCredNo",agentColinfo.getAgLegalCernum());//结算卡户主身份证
         resultMap.put("openBank",agentColinfo.getCloBankCode());//收款开户总行 银行代码
+        resultMap.put("openBankName",agentColinfo.getCloBank());//收款开户总行 银行名称
         resultMap.put("openBankChild",agentColinfo.getBranchLineNum());//收款开户支行 联号
         resultMap.put("openBankChildName",agentColinfo.getCloBankBranch());//收款开户支行
         resultMap.put("isBill",agentColinfo.getCloInvoice());//是否开具分润发票
@@ -312,6 +314,7 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
         resultMap.put("bankCard",agentColinfo.getCloBankAccount());//结算卡号
         resultMap.put("bankCardCredNo",agentColinfo.getAgLegalCernum());//结算卡户主身份证
         resultMap.put("openBank",agentColinfo.getCloBankCode());//收款开户总行 银行代码
+        resultMap.put("openBankName",agentColinfo.getCloBank());//收款开户总行 银行名称
         resultMap.put("openBankChild",agentColinfo.getBranchLineNum());//收款开户支行 联号
         resultMap.put("openBankChildName",agentColinfo.getCloBankBranch());//收款开户支行
         resultMap.put("isBill",agentColinfo.getCloInvoice());//是否开具分润发票
