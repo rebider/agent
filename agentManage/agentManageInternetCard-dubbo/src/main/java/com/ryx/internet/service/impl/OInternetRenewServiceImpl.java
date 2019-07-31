@@ -537,14 +537,14 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 if(oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.XXBK.getValue()) || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue())){
                     oInternetRenewDetail.setRenewStatus(InternetRenewStatus.YXF.getValue());
                     oInternetCard.setRenewStatus(InternetRenewStatus.YXF.getValue());
+                    //续费成功到期时间加一年
+                    oInternetCard.setExpireTime(DateUtil.getOneYearLater(oInternetCard.getExpireTime()));
                 }else{
                     oInternetRenewDetail.setRenewStatus(InternetRenewStatus.WXF.getValue());
                     oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
                 }
                 oInternetCard.setStop(Status.STATUS_0.status);
                 oInternetCard.setRenew(Status.STATUS_0.status);
-                //续费成功到期时间加一年
-                oInternetCard.setExpireTime(DateUtil.getOneYearLater(oInternetCard.getExpireTime()));
                 //生成轧差明细，同步清结算
                 if(oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())){
                     InternetRenewOffset internetRenewOffset = new InternetRenewOffset();
