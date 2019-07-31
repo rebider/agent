@@ -531,6 +531,59 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                     throw new MessageException("物流明细添加失败:"+logistics.getId()+":"+idSn);
                 }
             }
+        }else if(PlatformType.SSPOS.equals(platForm.getPlatformType())){
+            //POS生成物流方式 根据机具类型确定机具明细的生成方式,pos生成明细记录
+            for (String idSn : ids) {
+                OLogisticsDetail detail = new OLogisticsDetail();
+                //id，物流id，创建人，更新人，状态
+                detail.setId(idService.genId(TabId.o_logistics_detail));
+                detail.setOrderId(oSubOrder.getOrderId());
+                detail.setOrderNum(order.getoNum());
+                detail.setLogisticsId(logistics.getId());
+                detail.setProId(oSubOrder.getProId());
+                detail.setProName(oSubOrder.getProName());
+                detail.setSettlementPrice(oSubOrder.getProRelPrice());
+                if(OSubOrderActivitylist.size()>0){
+                    detail.setActivityId(oActivity_plan.getId());
+                    detail.setActivityName(oActivity_plan.getActivityName());
+                    detail.setgTime(oActivity_plan.getgTime());
+                    detail.setBusProCode(oActivity_plan.getBusProCode());
+                    detail.setBusProName(oActivity_plan.getBusProName());
+                    detail.setTermBatchcode(oActivity_plan.getTermBatchcode());
+                    detail.setTermBatchname(oActivity_plan.getTermBatchname());
+                    detail.setTermtype(oActivity_plan.getTermtype());
+                    detail.setTermtypename(oActivity_plan.getTermtypename());
+                    detail.setSettlementPrice(oActivity_plan.getPrice());
+                    detail.setPosType(oActivity_plan.getPosType());
+                    detail.setPosSpePrice(oActivity_plan.getPosSpePrice());
+                    detail.setStandTime(oActivity_plan.getStandTime());
+                }
+                detail.setSnNum(idSn);
+                detail.setAgentId(order.getAgentId());
+                detail.setcUser(logistics.getcUser());
+                detail.setuUser(logistics.getcUser());
+                detail.setcTime(Calendar.getInstance().getTime());
+                detail.setuTime(Calendar.getInstance().getTime());
+                detail.setOptType(OLogisticsDetailOptType.ORDER.code);
+                detail.setOptId(orderId);
+                OOrder oOrder = oOrderMapper.selectByPrimaryKey(orderId);
+                detail.setBusId(oOrder.getBusId());
+                if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(planVo.getReturnOrderDetailId())) {
+                    OReturnOrderDetail detail1 = oReturnOrderDetailMapper.selectByPrimaryKey(planVo.getReturnOrderDetailId());
+                    detail.setReturnOrderId(detail1.getReturnId());
+                    detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
+                    detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_LOC.code);
+                }else{
+                    detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
+                    detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+                }
+                detail.setSendStatus(LogisticsDetailSendStatus.none_send.code);
+                detail.setVersion(Status.STATUS_1.status);
+                if (1 != oLogisticsDetailMapper.insertSelective(detail)) {
+                    logger.info("物流明细添加失败:{},{}",logistics.getId(),idSn);
+                    throw new MessageException("物流明细添加失败:"+logistics.getId()+":"+idSn);
+                }
+            }
         }
         return true;
     }
@@ -725,6 +778,64 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                 logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage());
                 throw e;
                 //机具下发失败，更新物流明细为下发失败，更新物流信息未下发失败，禁止再次发送，人工介入
+            } catch (Exception e) {
+                AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                e.printStackTrace();
+                logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage());
+                throw e;
+            }
+        }else if(PlatformType.SSPOS.code.equals(platForm.getPlatformType())){
+            ImsTermWarehouseDetail imsTermWarehouseDetail = new ImsTermWarehouseDetail();
+            if (null == order) {
+                throw new MessageException("查询订单数据失败！");
+            }
+            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
+            if (null == agentBusInfo) {
+                throw new MessageException("查询业务数据失败！");
+            }
+            OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(logistics.getId());
+            imsTermWarehouseDetail.setOrgId(agentBusInfo.getBusNum());
+            imsTermWarehouseDetail.setMachineId(oActivity_plan.getBusProCode());
+            imsTermWarehouseDetail.setPosSpePrice(oActivity_plan.getPosSpePrice());
+            imsTermWarehouseDetail.setPosType(oActivity_plan.getPosType());
+            imsTermWarehouseDetail.setStandTime(oActivity_plan.getStandTime());
+            imsTermWarehouseDetail.setDeliveryTime(DateUtil.format(logistics.getSendDate(),"yyyyMMdd"));
+            try {
+                LowerHairMachineVo lowerHairMachineVo = new LowerHairMachineVo();
+                lowerHairMachineVo.setPlatformType(platForm.getPlatformType());
+                lowerHairMachineVo.setSnList(snList);
+                lowerHairMachineVo.setImsTermWarehouseDetail(imsTermWarehouseDetail);
+                //机具下发接口
+                logger.info("导入物流：下发到实时分润平台请求参数:{}",JSONObject.toJSONString(lowerHairMachineVo));
+                AgentResult posSendRes = termMachineService.lowerHairMachine(lowerHairMachineVo);
+                logger.info("导入物流：下发到首刷平台结果:{}",posSendRes.getMsg());
+                if(posSendRes.isOK()){
+                    listOLogisticsDetailSn.forEach(detail -> {
+                        detail.setSendStatus(LogisticsDetailSendStatus.send_success.code);
+                        detail.setSbusMsg(posSendRes.getMsg());
+                        detail.setuTime(date);
+                        oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
+                    });
+                    return true;
+
+                }else{
+                    AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+LogisticsDetailSendStatus.send_fail.msg, "任务生成物流明细错误报警OsnOperateServiceImpl");
+                    logger.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), posSendRes.getMsg());
+                    listOLogisticsDetailSn.forEach(detail -> {
+                        detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
+                        detail.setSbusMsg(posSendRes.getMsg());
+                        detail.setuTime(date);
+                        oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
+                    });
+                    return false;
+                }
+
+            } catch (MessageException e) {
+                AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                e.printStackTrace();
+                logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage());
+                throw e;
+                //机具下发失败，更新物流明细为下发失败，并更新物流为发送失败 ，禁止继续发送,人工介入
             } catch (Exception e) {
                 AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                 e.printStackTrace();

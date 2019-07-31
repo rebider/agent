@@ -375,6 +375,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         return orgPlatforms;
     }
 
+
     public String queryFile(Organization organization, String attDataType) {
         String fileId = "";
         //查询出附件id来进行删除
