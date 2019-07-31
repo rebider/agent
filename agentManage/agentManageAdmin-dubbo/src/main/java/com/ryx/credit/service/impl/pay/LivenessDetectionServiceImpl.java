@@ -156,9 +156,16 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
                         result.setStatus(400);
                     }
                 }else{
-                    record.setNotifyStatus(Status.STATUS_2.status);
-                    result.setMsg("银行卡三要素认证失败");
-                    result.setStatus(400);
+                    if(null!=resultMap.get("ResponseMsg")){
+                        record.setNotifyStatus(Status.STATUS_2.status);
+                        result.setMsg(resultMap.get("ResponseMsg")+"");
+                        result.setStatus(400);
+                    }else {
+                        // {"ResponseCode":"99","ResponseMsg":"请求次数过多","StartTime":"","channel":"","SystemId":"","Result":"","platSerial":"","StartDate":"","Serial":"","BankNo":"","ResultMsg":"","http":"200","Transcode":""}
+                        record.setNotifyStatus(Status.STATUS_2.status);
+                        result.setMsg("银行卡三要素认证失败");
+                        result.setStatus(400);
+                    }
                 }
             }else{
                 record.setNotifyStatus(Status.STATUS_2.status);
