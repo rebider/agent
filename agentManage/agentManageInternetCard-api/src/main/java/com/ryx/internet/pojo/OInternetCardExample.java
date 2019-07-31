@@ -1797,6 +1797,206 @@ public class OInternetCardExample {
             addCriterion("VERSION not between", value1, value2, "version");
             return (Criteria) this;
         }
+
+        public Criteria andStopIsNull() {
+            addCriterion("STOP is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopIsNotNull() {
+            addCriterion("STOP is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopEqualTo(BigDecimal value) {
+            addCriterion("STOP =", value, "stop");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopNotEqualTo(BigDecimal value) {
+            addCriterion("STOP <>", value, "stop");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopGreaterThan(BigDecimal value) {
+            addCriterion("STOP >", value, "stop");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("STOP >=", value, "stop");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopLessThan(BigDecimal value) {
+            addCriterion("STOP <", value, "stop");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("STOP <=", value, "stop");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopIn(List<BigDecimal> values) {
+            addCriterion("STOP in", values, "stop");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopNotIn(List<BigDecimal> values) {
+            addCriterion("STOP not in", values, "stop");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("STOP between", value1, value2, "stop");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("STOP not between", value1, value2, "stop");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenewStatusIsNull() {
+            addCriterion("RENEW_STATUS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenewStatusIsNotNull() {
+            addCriterion("RENEW_STATUS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenewStatusEqualTo(String value) {
+            addCriterion("RENEW_STATUS =", value, "renewStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenewStatusNotEqualTo(String value) {
+            addCriterion("RENEW_STATUS <>", value, "renewStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenewStatusGreaterThan(String value) {
+            addCriterion("RENEW_STATUS >", value, "renewStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenewStatusGreaterThanOrEqualTo(String value) {
+            addCriterion("RENEW_STATUS >=", value, "renewStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenewStatusLessThan(String value) {
+            addCriterion("RENEW_STATUS <", value, "renewStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenewStatusLessThanOrEqualTo(String value) {
+            addCriterion("RENEW_STATUS <=", value, "renewStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenewStatusLike(String value) {
+            addCriterion("RENEW_STATUS like", value, "renewStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenewStatusNotLike(String value) {
+            addCriterion("RENEW_STATUS not like", value, "renewStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenewStatusIn(List<String> values) {
+            addCriterion("RENEW_STATUS in", values, "renewStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenewStatusNotIn(List<String> values) {
+            addCriterion("RENEW_STATUS not in", values, "renewStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenewStatusBetween(String value1, String value2) {
+            addCriterion("RENEW_STATUS between", value1, value2, "renewStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenewStatusNotBetween(String value1, String value2) {
+            addCriterion("RENEW_STATUS not between", value1, value2, "renewStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopReasonIsNull() {
+            addCriterion("STOP_REASON is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopReasonIsNotNull() {
+            addCriterion("STOP_REASON is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopReasonEqualTo(String value) {
+            addCriterion("STOP_REASON =", value, "stopReason");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopReasonNotEqualTo(String value) {
+            addCriterion("STOP_REASON <>", value, "stopReason");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopReasonGreaterThan(String value) {
+            addCriterion("STOP_REASON >", value, "stopReason");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopReasonGreaterThanOrEqualTo(String value) {
+            addCriterion("STOP_REASON >=", value, "stopReason");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopReasonLessThan(String value) {
+            addCriterion("STOP_REASON <", value, "stopReason");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopReasonLessThanOrEqualTo(String value) {
+            addCriterion("STOP_REASON <=", value, "stopReason");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopReasonLike(String value) {
+            addCriterion("STOP_REASON like", value, "stopReason");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopReasonNotLike(String value) {
+            addCriterion("STOP_REASON not like", value, "stopReason");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopReasonIn(List<String> values) {
+            addCriterion("STOP_REASON in", values, "stopReason");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopReasonNotIn(List<String> values) {
+            addCriterion("STOP_REASON not in", values, "stopReason");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopReasonBetween(String value1, String value2) {
+            addCriterion("STOP_REASON between", value1, value2, "stopReason");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopReasonNotBetween(String value1, String value2) {
+            addCriterion("STOP_REASON not between", value1, value2, "stopReason");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

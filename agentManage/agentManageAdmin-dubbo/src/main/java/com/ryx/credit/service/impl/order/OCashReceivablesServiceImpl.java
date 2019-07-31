@@ -448,4 +448,30 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
             c.andReviewStatusIn(reviewStatus);
         return oCashReceivablesMapper.selectByExample(example);
     }
+
+
+    /**
+     * 保存直接提交审批
+     * @param oCashReceivablesList
+     * @param user
+     * @param agentId
+     * @param cpt
+     * @param srcId
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public AgentResult addOCashReceivablesAndStartProcing(List<OCashReceivablesVo> oCashReceivablesList, String user, String agentId, CashPayType cpt, String srcId) throws Exception {
+        AgentResult agentResult = addOCashReceivables(oCashReceivablesList, user, agentId, cpt, srcId);
+        if(agentResult.isOK()){
+            AgentResult startAgentResult = startProcing(cpt, srcId, user);
+            if(!startAgentResult.isOK()){
+                throw new MessageException("打款记录保存失败");
+            }
+        }else{
+            throw new MessageException("打款记录保存失败");
+        }
+        return AgentResult.ok();
+    }
+
 }
