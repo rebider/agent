@@ -539,9 +539,6 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                     oInternetCard.setRenewStatus(InternetRenewStatus.YXF.getValue());
                     //续费成功到期时间加一年
                     oInternetCard.setExpireTime(DateUtil.getOneYearLater(oInternetCard.getExpireTime()));
-                }else{
-                    oInternetRenewDetail.setRenewStatus(InternetRenewStatus.WXF.getValue());
-                    oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
                 }
                 oInternetCard.setStop(Status.STATUS_0.status);
                 oInternetCard.setRenew(Status.STATUS_0.status);
@@ -614,7 +611,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 throw new MessageException("是否需续费否,不允许续费");
             }
             if((oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NORMAL.getValue())==0 || oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NOACTIVATE.getValue())==0 )
-                    && !oInternetCard.getRenewStatus().equals(InternetRenewStatus.XFZ.getValue())){
+                    && oInternetCard.getRenewStatus().equals(InternetRenewStatus.WXF.getValue())){
                 if(null==oInternetCard.getExpireTime()){
                     throw new MessageException("到期时间为空,不允许续费");
                 }
