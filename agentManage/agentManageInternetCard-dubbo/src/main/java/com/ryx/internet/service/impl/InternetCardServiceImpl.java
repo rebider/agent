@@ -108,8 +108,6 @@ public class InternetCardServiceImpl implements InternetCardService {
                     continue;
                 }
                 Date date = stepMonth(oInternetCard.getExpireTime(), 3);
-                System.out.println("到期时间："+ DateUtil.format(oInternetCard.getExpireTime()));
-                System.out.println("DATE："+ DateUtil.format(date));
                 if(Calendar.getInstance().getTime().getTime()<date.getTime()){
                     oInternetCard.setRenewButton("1");
                 }else{
@@ -479,6 +477,9 @@ public class InternetCardServiceImpl implements InternetCardService {
                         if(!regOperationAmt){
                             throw new MessageException("操作金额不正确,保留小数点后两位");
                         }
+                        if(internetRenewDetail.getTheRealityAmt().compareTo(BigDecimal.ZERO)==0 || internetRenewDetail.getTheRealityAmt().compareTo(new BigDecimal("0.00"))==0){
+                            throw new MessageException("操作金额不正确,不能为0");
+                        }
                         OInternetRenewDetail qInternetRenewDetail = internetRenewDetailMapper.selectByPrimaryKey(internetRenewDetail.getId());
                         if(null==qInternetRenewDetail){
                             throw new MessageException("明细不存在");
@@ -490,16 +491,27 @@ public class InternetCardServiceImpl implements InternetCardService {
                         if(realityAmt.compareTo(qInternetRenewDetail.getOughtAmt())==1){
                             throw new MessageException("实扣金额不能大于应扣金额");
                         }
+                        OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(qInternetRenewDetail.getIccidNum());
                         //等于更新状态已续费
                         if(realityAmt.compareTo(qInternetRenewDetail.getOughtAmt())==0){
                             qInternetRenewDetail.setRenewStatus(InternetRenewStatus.YXF.getValue());
+                            oInternetCard.setRenewStatus(InternetRenewStatus.YXF.getValue());
+                            //扣足到期时间加一年
+                            oInternetCard.setExpireTime(DateUtil.getOneYearLater(oInternetCard.getExpireTime()));
                         }else{
                             qInternetRenewDetail.setRenewStatus(InternetRenewStatus.BFXF.getValue());
+                            oInternetCard.setRenewStatus(InternetRenewStatus.BFXF.getValue());
                         }
                         qInternetRenewDetail.setRealityAmt(realityAmt);
+                        qInternetRenewDetail.setuTime(new Date());
                         int i = internetRenewDetailMapper.updateByPrimaryKeySelective(qInternetRenewDetail);
                         if(i!=1){
                             throw new MessageException("更新续费明细失败");
+                        }
+                        oInternetCard.setuTime(new Date());
+                        int k = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
+                        if(k!=1){
+                            throw new MessageException("更新物联网卡信息失败");
                         }
                         oInternetCardImport.setImportStatus(OInternetCardImportStatus.SUCCESS.getValue());
                         updateInternetCardImport(oInternetCardImport);
