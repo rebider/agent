@@ -63,7 +63,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
 
 
     @Override
-    public PageInfo queryInvoiceDetail(InvoiceApply invoiceApply, Page page,Map<String, Object> department) {
+    public PageInfo queryInvoiceDetail(InvoiceApply invoiceApply, Page page,Map<String, Object> department,boolean flag) {
         InvoiceApplyExample example = new InvoiceApplyExample();
         example.setPage(page);
         InvoiceApplyExample.Criteria criteria = example.createCriteria();
@@ -87,6 +87,11 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         }
         if (StringUtils.isNotBlank(invoiceApply.getAgentName())){
             criteria.andAgentNameLike(invoiceApply.getAgentName());
+        }
+        if(flag){
+            criteria.andExpressCompanyIsNotNull();
+            criteria.andExpressDateIsNotNull();
+            criteria.andExpressNumberIsNotNull();
         }
         if(department != null){
             example.setInnerJoinDepartment(department.get("ORGANIZATIONCODE").toString(), department.get("ORGID").toString());
@@ -172,6 +177,15 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                                 invoiceApply.setRev1("开票公司和该代理商不符！");
                             }
                         }
+                    }
+                    InvoiceApply invoiceApply1 = new InvoiceApply();
+                    invoiceApply1.setInvoiceCode(map.get("invoiceCode").toString());
+                    invoiceApply1.setInvoiceNumber(map.get("invoiceNo").toString());
+                    invoiceApply1.setYsResult("1");
+                    List<InvoiceApply> list1 = getListByExample(invoiceApply1);
+                    if(list1.size() >= 1){
+                        invoiceApply.setYsResult("0");
+                        invoiceApply.setRev1("该发票重复导入！");
                     }
                     invoiceApply.setId(idService.genId(TabId.P_INVOICE_APPLY));
                     invoiceApply.setAgentId(agentId);
