@@ -310,7 +310,8 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
                 return new AgentResult(500,"http请求异常",respXML);
             }
         } catch (Exception e) {
-            AppConfig.sendEmails("http请求超时:"+ MailUtil.printStackTrace(e), "入网通知POS失败报警");
+            e.printStackTrace();
+            AppConfig.sendEmails("http请求超时:"+ MailUtil.printStackTrace(e)+":"+paramMap, "入网通知POS失败报警");
             log.info("http请求超时:{}",e.getMessage());
             throw e;
         }
