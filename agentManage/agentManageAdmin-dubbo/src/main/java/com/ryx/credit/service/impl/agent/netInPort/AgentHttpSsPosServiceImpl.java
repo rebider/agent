@@ -114,6 +114,10 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
         resultMap.put("debitTop",agentBusInfo.getDebitCapping());
         resultMap.put("ckDebitRate",agentBusInfo.getDebitAppearRate());
         resultMap.put("lowDebitRate",agentBusInfo.getDebitRateLower());
+
+        resultMap.put("lowCreditRate",agentBusInfo.getCreditRateFloor());
+        resultMap.put("ceilingCreditRate",agentBusInfo.getCreditRateCeiling());
+
         resultMap.put("hasS0",agentBusInfo.getDredgeS0().equals(new BigDecimal(1))?"0":"1");
         resultMap.put("orgName",agent.getAgName());
         resultMap.put("useOrgan",agentBusInfo.getBusUseOrgan()); //使用范围
@@ -196,6 +200,10 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
             data.put("debitTop",paramMap.get("debitTop"));
             data.put("ckDebitRate",paramMap.get("ckDebitRate"));
             data.put("lowDebitRate",paramMap.get("lowDebitRate"));
+
+            data.put("lowCreditRate",paramMap.get("lowCreditRate"));
+            data.put("ceilingCreditRate",paramMap.get("ceilingCreditRate"));
+
             if(StringUtils.isNotBlank(String.valueOf(paramMap.get("orgId")))){
                 data.put("orgId",paramMap.get("orgId"));
             }
