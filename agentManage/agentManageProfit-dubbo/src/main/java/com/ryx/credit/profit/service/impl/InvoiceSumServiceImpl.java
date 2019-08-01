@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -377,10 +378,24 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                         invoiceSum.setInvoiceStatus("00");
 
                         //查上月剩余欠票基数
-                        String lastSettleMonth = LocalDate.now().plusMonths(-2).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
+
+
+                        String nextProMonth="";
+                        try {
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");
+                            Date date = sdf.parse(profitMonth);
+                            Calendar cal = Calendar.getInstance();
+                            cal.setTime(date);
+                            cal.add(Calendar.MONTH, -1);
+                            nextProMonth=sdf.format(cal.getTime());
+                        } catch (ParseException e) {
+                            throw new MessageException("月份输入不合理");
+                        }
+
+                       /* String lastSettleMonth = LocalDate.now().plusMonths(-2).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);*/
                         InvoiceSumExample invoiceSumExample = new InvoiceSumExample();
                         InvoiceSumExample.Criteria criteria = invoiceSumExample.createCriteria();
-                        criteria.andProfitMonthEqualTo(lastSettleMonth);
+                        criteria.andProfitMonthEqualTo(nextProMonth);
                         criteria.andInvoiceCompanyEqualTo(invoiceSum.getInvoiceCompany());
                         criteria.andAgentIdEqualTo(invoiceSum.getAgentId());
                         List<InvoiceSum> invoiceSums = invoiceSumMapper.selectByExample(invoiceSumExample);
@@ -426,10 +441,21 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                         invoiceSum2.get(0).setTopOrgId(invoiceSumList.get(0).toString().trim());
                         invoiceSum2.get(0).setTopOrgName(invoiceSumList.get(1).toString().trim());
                         //查上月剩余欠票基数
-                        String lastSettleMonth = LocalDate.now().plusMonths(-2).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
+                        String nextProMonth="";
+                        try {
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");
+                            Date date = sdf.parse(profitMonth);
+                            Calendar cal = Calendar.getInstance();
+                            cal.setTime(date);
+                            cal.add(Calendar.MONTH, -1);
+                            nextProMonth=sdf.format(cal.getTime());
+                        } catch (ParseException e) {
+                            throw new MessageException("月份输入不合理");
+                        }
+                       /* String lastSettleMonth = LocalDate.now().plusMonths(-2).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);*/
                         InvoiceSumExample invoiceSumExample = new InvoiceSumExample();
                         InvoiceSumExample.Criteria criteria = invoiceSumExample.createCriteria();
-                        criteria.andProfitMonthEqualTo(lastSettleMonth);
+                        criteria.andProfitMonthEqualTo(nextProMonth);
                         criteria.andInvoiceCompanyEqualTo(invoiceSum.getInvoiceCompany());
                         criteria.andAgentIdEqualTo(invoiceSum.getAgentId());
                         List<InvoiceSum> invoiceSums = invoiceSumMapper.selectByExample(invoiceSumExample);
