@@ -149,8 +149,8 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
         }catch (Exception e){
             e.printStackTrace();
             AppConfig.sendEmails("通知瑞花宝请求超时："+ MailUtil.printStackTrace(e), "入网通知瑞花宝失败报警");
-            log.info("http请求超时:{}",e.getLocalizedMessage());
-            throw new Exception("http请求超时:"+e.getLocalizedMessage());
+            log.info("通知失败:{}",e.getLocalizedMessage());
+            throw new Exception("通知失败:"+e.getLocalizedMessage());
         }
     }
 
@@ -253,8 +253,8 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
         }catch (Exception e){
             e.printStackTrace();
             AppConfig.sendEmails("通知瑞花宝请求超时："+ MailUtil.printStackTrace(e), "入网升级通知瑞花宝失败报警");
-            log.info("http请求超时:{}",e.getLocalizedMessage());
-            throw new Exception("http请求超时:"+e.getLocalizedMessage());
+            log.info("通知失败:{}",e.getLocalizedMessage());
+            throw new Exception("通知失败:"+e.getLocalizedMessage());
         }
     }
 
@@ -349,8 +349,8 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
         }catch (Exception e){
             e.printStackTrace();
             AppConfig.sendEmails("通知瑞花宝请求超时："+ MailUtil.printStackTrace(e), "入网修改通知瑞花宝失败报警");
-            log.info("http请求超时:{}",e.getLocalizedMessage());
-            throw new Exception("http请求超时:"+e.getLocalizedMessage());
+            log.info("通知失败:{}",e.getLocalizedMessage());
+            throw new Exception("通知失败:"+e.getLocalizedMessage());
         }
     }
 
