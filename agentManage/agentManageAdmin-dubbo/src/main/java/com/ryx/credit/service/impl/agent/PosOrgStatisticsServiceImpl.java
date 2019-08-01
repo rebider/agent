@@ -147,7 +147,7 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
                 return new AgentResult(500,"http请求异常","");
             }
         } catch (Exception e) {
-            log.info("http请求超时:{}",e.getMessage());
+            log.info("通知失败:{}",e.getMessage());
             e.printStackTrace();
             throw new Exception(e);
         }
@@ -168,7 +168,7 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
             List<Map> dataMap = JsonUtil.jsonToList(data, Map.class);
             return AgentResult.ok(dataMap);
         } catch (Exception e) {
-            log.info("http请求超时:{}",e.getMessage());
+            log.info("通知失败:{}",e.getMessage());
             e.printStackTrace();
             throw new Exception(e);
         }
@@ -188,7 +188,7 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
             JSONArray result = jsonObject.getJSONArray("result");
             return AgentResult.ok(result);
         } catch (Exception e) {
-            log.info("http请求超时:{}",e.getMessage());
+            log.info("通知失败:{}",e.getMessage());
             e.printStackTrace();
             throw new Exception(e);
         }
@@ -214,7 +214,7 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
             }
             return AgentResult.fail();
         } catch (Exception e) {
-            log.info("http请求超时:{}",e.getMessage());
+            log.info("通知失败:{}",e.getMessage());
             e.printStackTrace();
             throw new Exception(e);
         }
@@ -293,7 +293,7 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
                 return new AgentResult(500,"http请求异常","");
             }
         } catch (Exception e) {
-            log.info("http请求超时:{}",e.getMessage());
+            log.info("通知失败:{}",e.getMessage());
             e.printStackTrace();
             throw new Exception(e);
         }
