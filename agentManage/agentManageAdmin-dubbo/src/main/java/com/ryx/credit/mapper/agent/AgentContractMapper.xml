@@ -291,10 +291,7 @@
   <sql id="queryAgentContractWhere">
     <where>
       ac.status = 1 and aa.status = 1
-      <if test="map.organizationCode=='south_13_city' and map.organizationCode=='south_13_city'">
-        and (org.code like concat(#{map.organizationCode},'%') or orging.code like concat(#{map.organizationCode},'%'))
-      </if>
-      <if test="map.organizationCode=='north_18_city' and map.organizationCode=='north_18_city'">
+      <if test="map.all!='' and map.all=='true'">
         and (org.code like concat(#{map.organizationCode},'%') or orging.code like concat(#{map.organizationCode},'%'))
       </if>
       <if test="map.agentId!=null and map.agentId!=''"> and ac.agent_id = #{map.agentId} </if>

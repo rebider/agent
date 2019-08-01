@@ -14,6 +14,7 @@ import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentAssProtocolService;
 import com.ryx.credit.service.agent.AgentContractService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
+import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import org.apache.commons.lang.StringUtils;
@@ -59,7 +60,8 @@ public class AgentContractServiceImpl implements AgentContractService {
 
     @Autowired
     private IUserService iUserService;
-
+    @Autowired
+    private AgentEnterService agentEnterService;
 
     /**
      * 获取合同类型
@@ -309,6 +311,10 @@ public class AgentContractServiceImpl implements AgentContractService {
         map.put("orgId", orgId);
         map.put("userId", userId);
         map.put("organizationCode", organizationCode);
+        Map startPar = agentEnterService.startPar(String.valueOf(userId));
+        if (startPar != null) {
+            map.put("all", "true");
+        }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(agentContractMapper.getAgentContractList(map, page));
         pageInfo.setTotal(agentContractMapper.getAgentContractCount(map));
