@@ -136,8 +136,8 @@ public class PlatformSynServiceMpos implements PlatformSynService {
                 return ag;
             }
         } catch (Exception e) {
-            log.info("http请求超时:{}",e.getMessage());
-            AppConfig.sendEmails("http请求超时:"+ MailUtil.printStackTrace(e), "升级通知手刷失败报警");
+            log.info("通知失败:{}",e.getMessage());
+            AppConfig.sendEmails("通知失败:"+ MailUtil.printStackTrace(e), "升级通知手刷失败报警");
             throw e;
         }
     }
@@ -189,8 +189,8 @@ public class PlatformSynServiceMpos implements PlatformSynService {
             }
         } catch (Exception e) {
             AppConfig.sendEmails("通知手刷请求超时："+ MailUtil.printStackTrace(e), "入网通知手刷失败报警");
-            log.info("http请求超时:{}",e.getMessage());
-            throw new Exception("http请求超时");
+            log.info("通知失败:{}",e.getMessage());
+            throw new Exception("通知失败");
         }
     }
 }
