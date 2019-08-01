@@ -144,9 +144,9 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                     }
                 }
 
-            //对公并且税点等于0.06一般纳税人证明必填
+            //对公并且税点等于0.08一般纳税人证明必填
             if (!ac.isImport() && !"1".equals(saveType))
-                if (ac.getCloType().compareTo(new BigDecimal("1")) == 0 && ac.getCloTaxPoint().compareTo(new BigDecimal("0.06")) == 0) {
+                if (ac.getCloType().compareTo(new BigDecimal("1")) == 0 && ac.getCloTaxPoint().compareTo(new BigDecimal("0.08")) == 0) {
                     if (!isHaveYBNSRZM) {
                         throw new ProcessException("请添加一般纳税人证明");
                     }
@@ -372,8 +372,8 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                         }
                     }
 
-                    //对公并且税点等于0.06一般纳税人证明必填
-                    if (agentColinfoVo.getCloType().compareTo(new BigDecimal("1")) == 0 && agentColinfoVo.getCloTaxPoint().compareTo(new BigDecimal("0.06")) == 0) {
+                    //对公并且税点等于0.08一般纳税人证明必填
+                    if (agentColinfoVo.getCloType().compareTo(new BigDecimal("1")) == 0 && agentColinfoVo.getCloTaxPoint().compareTo(new BigDecimal("0.08")) == 0) {
                         if (!isHaveYBNSRZM  && !"1".equals(saveStatus)) {
                             throw new MessageException("请添加一般纳税人证明");
                         }
@@ -435,8 +435,8 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
              */
             if (agentColinfo.getCloType().compareTo(new BigDecimal(2)) == 0) { //对私
                 //税点检查
-                if (agentColinfo.getCloTaxPoint() == null || !"0.07".equals(agentColinfo.getCloTaxPoint().toString())) { //对私
-                    throw new ProcessException("对私户进行打款，那么扣税点在代理商填写时默认为0.07且不可修改");
+                if (agentColinfo.getCloTaxPoint() == null || !"0.08".equals(agentColinfo.getCloTaxPoint().toString())) { //对私
+                    throw new ProcessException("对私户进行打款，那么扣税点在代理商填写时默认为0.08且不可修改");
                 }
                 //是否开票检查
                 if (agentColinfo.getCloInvoice().compareTo(new BigDecimal(0)) != 0) { //对私
@@ -446,8 +446,8 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                 //是否开票检查
                 if (agentColinfo.getCloInvoice().compareTo(new BigDecimal(1)) == 0) { //开票
                     //税点检查
-                    if (!"0.06".equals(agentColinfo.getCloTaxPoint().toString()) && !"0.03".equals(agentColinfo.getCloTaxPoint().toString())) { //对私
-                        throw new ProcessException("对公户进行打款，且代理商是否开票为是，那么扣税点在代理商填写时只能选择0.06或0.03");
+                    if (!"0.08".equals(agentColinfo.getCloTaxPoint().toString()) && !"0.03".equals(agentColinfo.getCloTaxPoint().toString())) { //对私
+                        throw new ProcessException("对公户进行打款，且代理商是否开票为是，那么扣税点在代理商填写时只能选择0.08或0.03");
                     }
                 } else if (agentColinfo.getCloInvoice().compareTo(new BigDecimal(0)) == 0) { //不开票
 //                        对公   是否开发票 则对应为是  不可修改
