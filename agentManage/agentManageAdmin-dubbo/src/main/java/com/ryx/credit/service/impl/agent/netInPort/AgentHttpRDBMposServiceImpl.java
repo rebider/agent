@@ -174,8 +174,8 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             }
         } catch (Exception e) {
             AppConfig.sendEmails("通知瑞大宝请求超时："+ MailUtil.printStackTrace(e), "入网通知瑞大宝失败报警");
-            log.info("http请求超时:{}",e.getLocalizedMessage());
-            throw new Exception("http请求超时:"+e.getLocalizedMessage());
+            log.info("通知失败:{}",e.getLocalizedMessage());
+            throw new Exception("通知失败:"+e.getLocalizedMessage());
         }
     }
 
@@ -269,8 +269,8 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             }
         } catch (Exception e) {
             AppConfig.sendEmails("升级通知瑞大宝请求超时："+ MailUtil.printStackTrace(e), "升级通知瑞大宝失败报警");
-            log.info("http请求超时:{}",e.getLocalizedMessage());
-            throw new Exception("http请求超时:"+e.getLocalizedMessage());
+            log.info("通知失败:{}",e.getLocalizedMessage());
+            throw new Exception("通知失败:"+e.getLocalizedMessage());
         }
     }
 
@@ -377,8 +377,8 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             }
         } catch (Exception e) {
             AppConfig.sendEmails("通知瑞大宝请求超时："+ MailUtil.printStackTrace(e), "入网修改通知瑞大宝失败报警");
-            log.info("http请求超时:{}",e.getLocalizedMessage());
-            throw new Exception("http请求超时:"+e.getLocalizedMessage());
+            log.info("通知失败:{}",e.getLocalizedMessage());
+            throw new Exception("通知失败:"+e.getLocalizedMessage());
         }
 
     }

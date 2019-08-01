@@ -228,7 +228,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
                 return new AgentResult(500, "http请求异常", respXML);
             }
         } catch (Exception e) {
-            log.info("http请求超时:{}", e.getMessage());
+            log.info("通知失败:{}", e.getMessage());
             throw e;
         }
     }

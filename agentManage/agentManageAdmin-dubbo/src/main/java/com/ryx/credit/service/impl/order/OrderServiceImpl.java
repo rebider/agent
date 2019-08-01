@@ -2960,8 +2960,8 @@ public class OrderServiceImpl implements OrderService {
         List<ReceiptPlan> receiptPlans = receiptPlanMapper.selectByExample(receiptPlanExample);
         BigDecimal planCount = new BigDecimal(0);
         if (null!=receiptPlans && receiptPlans.size()>0){
-            logger.info("已排单,不可修改,如需要请去排单撤销");
-            throw new MessageException("已排单,不可修改,如需要请去排单撤销");
+            logger.info("已排单,不可修改,如需要请联系业务部撤销排单");
+            throw new MessageException("已排单,不可修改,如需要请联系业务部撤销排单");
         }
 
 

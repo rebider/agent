@@ -102,7 +102,8 @@ public class InternetCardServiceImpl implements InternetCardService {
                 continue;
             }
             if((oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NORMAL.getValue())==0 || oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NOACTIVATE.getValue())==0 )
-                    && !oInternetCard.getRenewStatus().equals(InternetRenewStatus.XFZ.getValue())){
+                    && oInternetCard.getRenewStatus().equals(InternetRenewStatus.WXF.getValue())){
+                oInternetCard.setRenewButton("1");
                 if(null==oInternetCard.getExpireTime()){
                     oInternetCard.setRenewButton("0");
                     continue;
