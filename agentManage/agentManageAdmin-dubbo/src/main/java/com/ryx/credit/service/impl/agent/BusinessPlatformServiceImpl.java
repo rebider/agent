@@ -85,8 +85,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     private AssProtoColMapper assProtoColMapper;
     @Autowired
     private AgentAssProtocolService agentAssProtocolService;
-
-
+    @Autowired
+    private COrganizationMapper organizationMapper;
 
     @Override
     public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,Long userId) {
@@ -299,7 +299,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     logger.info("请选择业务平台");
                     throw new ProcessException("请选择业务平台");
                 }
-                if(item.getBusType().equals(BusType.ZQZF.key) || item.getBusType().equals(BusType.ZQBZF.key) || item.getBusType().equals(BusType.ZQ.key) ){
+                if(OrgType.zQ(item.getBusType())){
                     if(StringUtils.isBlank(item.getBusParent()))
                         throw new ProcessException("直签上级不能为空");
                 }
@@ -396,7 +396,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         }
     }
 
-
     @Override
     public List<PlatForm> queryAblePlatForm() {
         PlatFormExample example = new PlatFormExample();
@@ -422,7 +421,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 if (StringUtils.isBlank(item.getBusPlatform())) {
                     throw new ProcessException("业务平台不能为空");
                 }
-                if(item.getBusType().equals(BusType.ZQZF.key) || item.getBusType().equals(BusType.ZQBZF.key) || item.getBusType().equals(BusType.ZQ.key) ){
+                if(OrgType.zQ(item.getBusType())){
                     if(StringUtils.isBlank(item.getBusParent()))
                         throw new ProcessException("直签上级不能为空");
                 }
@@ -486,7 +485,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 if (StringUtils.isNotBlank(agent.getcUser()) && StringUtils.isNotBlank(agent.getId())) {
                     item.setcUser(agent.getcUser());
                     item.setAgentId(agent.getId());
-                    AgentContract agentContract = agentContractService.insertAgentContract(item, item.getContractTableFile(), agent.getcUser());
+                    AgentContract agentContract = agentContractService.insertAgentContract(item, item.getContractTableFile(), agent.getcUser(),null);
                     //添加分管协议
                     if (StringUtils.isNotBlank(item.getAgentAssProtocol())) {
                         AssProtoColRel rel = new AssProtoColRel();
@@ -518,7 +517,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 if (StringUtils.isNotBlank(agent.getcUser()) && StringUtils.isNotBlank(agent.getId())) {
                     item.setcAgentId(agent.getId());
                     item.setcUser(agent.getcUser());
-                    AgentResult result = accountPaidItemService.insertAccountPaid(item, item.getCapitalTableFile(), agentVo.getAgent().getcUser(),false);
+                    AgentResult result = accountPaidItemService.insertAccountPaid(item, item.getCapitalTableFile(), agentVo.getAgent().getcUser(),false,null);
                     if (!result.isOK()) {
                         throw new ProcessException("缴纳款项信息录入失败");
                     }
@@ -528,7 +527,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 for (AgentColinfoVo item : agentVo.getColinfoVoList()) {
                     item.setAgentId(agent.getId());
                     item.setcUser(agent.getcUser());
-                    agentColinfoService.agentColinfoInsert(item, item.getColinfoTableFile());
+                    agentColinfoService.agentColinfoInsert(item, item.getColinfoTableFile(),null);
                 }
             }
             List<AgentBusInfo> agentBusInfoList = new ArrayList<>();
@@ -641,7 +640,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         return busList;
     }
 
-
     @Override
     public int updateBusPlatDkgsBySelective(AgentBusInfo agentBusInfo,String userId) {
         if (StringUtils.isBlank(agentBusInfo.getId())) {
@@ -743,7 +741,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         return agentoutVos;
     }
 
-
     @Override
     public List<Map<String, Object>> queryByBusNum(String busNum){
         if(StringUtils.isBlank(busNum)){
@@ -751,7 +748,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         }
         return agentBusInfoMapper.queryByBusNum(busNum);
     }
-
 
     /**
      * 查询代理商是否有标准一代的
@@ -863,7 +859,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         return resultList;
     }
 
-
     @Override
     public AgentResult selectByAgentApproved(String id) {
         AgentResult result = new AgentResult(500,"参数错误","");
@@ -885,9 +880,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         }
         return result;
     }
-
-    @Autowired
-    private COrganizationMapper organizationMapper;
 
     @Override
     public List<AgentBusInfo> selectByAgentId(String agentId) {

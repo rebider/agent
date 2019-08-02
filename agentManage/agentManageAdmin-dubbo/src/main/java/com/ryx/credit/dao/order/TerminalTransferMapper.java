@@ -30,4 +30,10 @@ public interface TerminalTransferMapper {
     int selectTerminalTransferCount(@Param("map") Map<String, Object> map);
 
     List<String> appTerminalTransfer();
+
+    String getAgentType(String busNum);
+
+    List<Map<String,Object>> getSN();
+
+    List<Map<String,Object>> querySubBusNum(String AGENT_ID);
 }

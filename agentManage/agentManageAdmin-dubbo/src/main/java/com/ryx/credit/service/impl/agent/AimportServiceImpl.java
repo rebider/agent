@@ -334,7 +334,7 @@ public class AimportServiceImpl implements AimportService {
                         ag.setImport(true);
                         ag.setAgRemark("(老数据导入)");
                         ag.setCaStatus(Status.STATUS_0.status);
-                        Agent ag_db = agentService.insertAgent(ag, Arrays.asList(),userid);
+                        Agent ag_db = agentService.insertAgent(ag, Arrays.asList(),userid,null);
                         try {
                             //todo 生成后台用户
                             agentService.createBackUserbyAgent(ag_db.getId());
@@ -416,11 +416,11 @@ public class AimportServiceImpl implements AimportService {
                             c.setVersion(capital.getVersion());
                             capitalMapper.updateByPrimaryKeySelective(c);
                         }else{
-                            AgentResult result = accountPaidItemService.insertAccountPaid(capital,Arrays.asList(),userid,false);
+                            AgentResult result = accountPaidItemService.insertAccountPaid(capital,Arrays.asList(),userid,false,null);
                             if(null==result || !result.isOK())throw new ProcessException("代理商交款导入失败"+result.getMsg());
                         }
                     }else{
-                        AgentResult result = accountPaidItemService.insertAccountPaid(capital,Arrays.asList(),userid,false);
+                        AgentResult result = accountPaidItemService.insertAccountPaid(capital,Arrays.asList(),userid,false,null);
                         if(null==result || !result.isOK())throw new ProcessException("代理商交款导入失败"+result.getMsg());
                     }
                     ImportAgent payment =  importAgentMapper.selectByPrimaryKey(datum.getId());
@@ -504,7 +504,7 @@ public class AimportServiceImpl implements AimportService {
 
                     if(agentContractDb.size()==0){
                         logger.info("导入代理商合同信息{}",datum.getId());
-                        AgentContract ac =  agentContractService.insertAgentContract(agentContract,Arrays.asList(),userid);
+                        AgentContract ac =  agentContractService.insertAgentContract(agentContract,Arrays.asList(),userid,null);
                         logger.info("导入代理商合同信息{}成功",ac.getId());
                         con.setDealmsg("添加成功");
                     }else{
@@ -665,7 +665,7 @@ public class AimportServiceImpl implements AimportService {
                                     if(colinfodb.size()==0){
                                         //添加收款账户
                                         colinfo.setImport(true);
-                                        ac =  agentColinfoService.agentColinfoInsert(colinfo,Arrays.asList());
+                                        ac =  agentColinfoService.agentColinfoInsert(colinfo,Arrays.asList(),null);
                                     }else{
                                         ac = colinfodb.get(0);
                                         ac.setCloTaxPoint(colinfo.getCloTaxPoint());

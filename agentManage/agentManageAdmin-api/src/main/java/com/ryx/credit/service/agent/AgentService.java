@@ -33,7 +33,7 @@ public interface AgentService {
      * @return
      * @throws ProcessException
      */
-    Agent insertAgent(Agent agent, List<String> attrId,String userId) throws ProcessException;
+    Agent insertAgent(Agent agent, List<String> attrId,String userId,String saveType) throws ProcessException;
 
     Agent getAgentById(String id);
 
@@ -45,7 +45,7 @@ public interface AgentService {
 
     int updateAgent(Agent agent);
 
-    Agent updateAgentVo(Agent agent,List<String> attrs,String userId)throws Exception;
+    Agent updateAgentVo(Agent agent,List<String> attrs,String userId,String saveStatus)throws Exception;
 
     Agent findAgentByActivId(String activId);
 

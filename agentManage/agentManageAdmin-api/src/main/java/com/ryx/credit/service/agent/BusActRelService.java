@@ -13,4 +13,5 @@ public interface BusActRelService {
 
     BusActRel findByProIns(String proIns);
 
+    int updateByPrimaryKey(BusActRel busActRel);
 }

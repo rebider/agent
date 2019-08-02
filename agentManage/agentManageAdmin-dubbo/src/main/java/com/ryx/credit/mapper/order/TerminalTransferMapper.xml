@@ -276,4 +276,28 @@
         and t.review_status !='3'
       )
   </select>
+
+  <select id="getAgentType" parameterType="java.lang.String" resultType="java.lang.String">
+    select  BUS_TYPE from a_agent_businfo
+    <where>
+    bus_num = #{busNum}  and ROWNUM = 1
+    </where>
+  </select>
+<select id="getSN"  resultType="java.util.Map">
+  select SN_BEGIN_NUM,SN_END_NUM from O_TERMINAL_TRANSFER_DETAIL where TERMINAL_TRANSFER_ID in(
+  select ID from O_TERMINAL_TRANSFER where REVIEW_STATUS ='02' )
+</select>
+  <select id="querySubBusNum" parameterType="java.lang.String" resultType="java.util.Map">
+select distinct  * from (select distinct nvl(BUS_NUM, '-') BUS_NUM
+               from A_AGENT_BUSINFO
+               start with AGENT_ID = #{AGENT_ID}
+               CONNECT BY PRIOR ID = BUS_PARENT
+               union all
+               select distinct nvl(BUS_NUM, '-') BUS_NUM
+               from A_AGENT_BUSINFO
+               start with AGENT_ID = #{AGENT_ID}
+               CONNECT BY PRIOR BUS_PARENT = id)
+
+</select>
+
 </mapper>

@@ -26,6 +26,7 @@ public class OAddressVo extends OAddress {
         this.setcUser(address.getcUser());
         this.setuUser(address.getuUser());
         this.setVersion(address.getVersion());
+        this.setFlag(address.getFlag());
         return this;
     }
 
