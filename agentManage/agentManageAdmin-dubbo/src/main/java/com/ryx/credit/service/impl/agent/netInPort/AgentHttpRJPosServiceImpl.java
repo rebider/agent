@@ -260,8 +260,9 @@ public class AgentHttpRJPosServiceImpl implements AgentNetInHttpService {
             map.put("tranCode", tranCode);
             map.put("reqMsgId", reqMsgId);
 
-            log.info("通知瑞+请求参数:{}",data);
+            log.info("通知瑞+请求参数"+AppConfig.getProperty("agent_rjpos_notify_url")+":{}",data);
             String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("agent_rjpos_notify_url"), map);
+            log.info("通知瑞+返回："+httpResult);
             JSONObject jsonObject = JSONObject.parseObject(httpResult);
             if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
                 log.info("请求异常======" + httpResult);
