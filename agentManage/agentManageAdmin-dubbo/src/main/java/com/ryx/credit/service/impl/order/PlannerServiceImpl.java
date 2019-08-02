@@ -121,14 +121,12 @@ public class PlannerServiceImpl implements PlannerService {
     @Override
     public AgentResult savePlanner(ReceiptPlan receiptPlan, String receiptProId,String activityId) throws Exception {
         AgentResult result = new AgentResult(500, "系统异常", "");
-        try {
-
             OReceiptPro oReceiptPro = receiptProMapper.selectByPrimaryKey(receiptProId);
             if (oReceiptPro == null) {
                 throw new MessageException("收货单商品未找到!");
             }
             if(receiptPlan.getPlanProNum().compareTo(oReceiptPro.getProNum().subtract(oReceiptPro.getSendNum()))>0){
-                throw new MessageException("排单数量不能大于订货量!");
+                throw new MessageException("此条配货信息已变更  请点击查询按钮以获取数据!!");
             }
             String planId = idService.genId(TabId.o_receipt_plan);
             receiptPlan.setId(planId);
@@ -220,10 +218,6 @@ public class PlannerServiceImpl implements PlannerService {
             }
             result.setStatus(200);
             result.setMsg("处理成功");
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new MessageException("保存排单异常!");
-        }
         return result;
     }
 

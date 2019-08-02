@@ -9,6 +9,7 @@ import com.ryx.credit.pojo.admin.vo.AgentVo;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by RYX on 2018/12/20.
@@ -31,7 +32,7 @@ public interface TerminalTransferService {
 
     List<TerminalTransferDetail> queryDetailByTerminalId(String terminalTransferId);
 
-    AgentResult importTerminal(List<List<Object>> excelList,String cUser,String busId)throws Exception;
+  /*  AgentResult importTerminal(List<List<Object>> excelList,String cUser,String busId)throws Exception;*/
 
     List<TerminalTransferDetail> queryImprotMsgList(String terminalTransferId);
 
@@ -40,4 +41,10 @@ public interface TerminalTransferService {
     AgentResult editTerminalTransfer(TerminalTransfer terminalTransfer,List<TerminalTransferDetail> terminalTransferDetailList, String cuser,String agentId)throws Exception;
 
     void appTerminalTransfer()throws Exception;
+
+    String getAgentType(String orgId);
+
+    void  queryTerminalTransferResult() throws Exception;
+
+
 }

@@ -47,6 +47,7 @@
     <result column="FINACE_REMIT_ORGAN" jdbcType="VARCHAR" property="finaceRemitOrgan" />
     <result column="APPROVE_TIME" jdbcType="TIMESTAMP" property="approveTime" />
     <result column="CREDIT_RATE_CEILING" jdbcType="VARCHAR" property="creditRateCeiling" />
+    <result column="BRAND_NUM" jdbcType="VARCHAR" property="brandNum" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -84,7 +85,8 @@
     CLO_RECEIPT, CLO_PAY_COMPANY, CLO_AGENT_COLINFO, BUS_STATUS, CLO_REVIEW_STATUS, C_TIME,
     C_UTIME, C_USER, STATUS, VERSION, AG_ZBH, BUS_USE_ORGAN, BUS_SCOPE, DREDGE_S0, BUS_LOGIN_NUM,
     DEBIT_RATE_LOWER, DEBIT_CAPPING, DEBIT_APPEAR_RATE, TERMINALS_LOWER, CREDIT_RATE_FLOOR,
-    AG_DOC_DISTRICT, AG_DOC_PRO, ORGAN_NUM, FINACE_REMIT_ORGAN, APPROVE_TIME, CREDIT_RATE_CEILING
+    AG_DOC_DISTRICT, AG_DOC_PRO, ORGAN_NUM, FINACE_REMIT_ORGAN, APPROVE_TIME, CREDIT_RATE_CEILING,
+    BRAND_NUM
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -128,7 +130,9 @@
     BUS_USE_ORGAN, BUS_SCOPE, DREDGE_S0,
     BUS_LOGIN_NUM, DEBIT_RATE_LOWER, DEBIT_CAPPING,
     DEBIT_APPEAR_RATE, TERMINALS_LOWER, CREDIT_RATE_FLOOR,
-    AG_DOC_DISTRICT, AG_DOC_PRO, ORGAN_NUM, FINACE_REMIT_ORGAN, APPROVE_TIME, CREDIT_RATE_CEILING)
+    AG_DOC_DISTRICT, AG_DOC_PRO, ORGAN_NUM,
+    FINACE_REMIT_ORGAN, APPROVE_TIME, CREDIT_RATE_CEILING,
+    BRAND_NUM)
     values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR},
     #{busPlatform,jdbcType=VARCHAR}, #{busType,jdbcType=VARCHAR}, #{busParent,jdbcType=VARCHAR},
     #{busRiskParent,jdbcType=VARCHAR}, #{busActivationParent,jdbcType=VARCHAR}, #{busRegion,jdbcType=VARCHAR},
@@ -143,7 +147,8 @@
     #{busLoginNum,jdbcType=VARCHAR}, #{debitRateLower,jdbcType=VARCHAR}, #{debitCapping,jdbcType=VARCHAR},
     #{debitAppearRate,jdbcType=VARCHAR}, #{terminalsLower,jdbcType=VARCHAR}, #{creditRateFloor,jdbcType=VARCHAR},
     #{agDocDistrict,jdbcType=VARCHAR}, #{agDocPro,jdbcType=VARCHAR}, #{organNum,jdbcType=VARCHAR},
-    #{finaceRemitOrgan,jdbcType=VARCHAR},#{approveTime,jdbcType=TIMESTAMP}, #{creditRateCeiling,jdbcType=VARCHAR})
+    #{finaceRemitOrgan,jdbcType=VARCHAR}, #{approveTime,jdbcType=TIMESTAMP}, #{creditRateCeiling,jdbcType=VARCHAR},
+    #{brandNum,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfo">
     insert into A_AGENT_BUSINFO
@@ -283,6 +288,9 @@
       <if test="creditRateCeiling != null">
         CREDIT_RATE_CEILING,
       </if>
+      <if test="brandNum != null">
+        BRAND_NUM,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -420,6 +428,9 @@
       <if test="creditRateCeiling != null">
         #{creditRateCeiling,jdbcType=VARCHAR},
       </if>
+      <if test="brandNum != null">
+        #{brandNum,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample" resultType="java.lang.Long">
@@ -546,10 +557,10 @@
         CREDIT_RATE_FLOOR = #{creditRateFloor,jdbcType=VARCHAR},
       </if>
       <if test="agDocDistrict != null">
-          AG_DOC_DISTRICT = #{agDocDistrict,jdbcType=VARCHAR},
+        AG_DOC_DISTRICT = #{agDocDistrict,jdbcType=VARCHAR},
       </if>
       <if test="agDocPro != null">
-          AG_DOC_PRO = #{agDocPro,jdbcType=VARCHAR},
+        AG_DOC_PRO = #{agDocPro,jdbcType=VARCHAR},
       </if>
       <if test="organNum != null">
         ORGAN_NUM = #{organNum,jdbcType=VARCHAR},
@@ -558,10 +569,13 @@
         FINACE_REMIT_ORGAN = #{finaceRemitOrgan,jdbcType=VARCHAR},
       </if>
       <if test="approveTime != null">
-        APPROVE_TIME = #{approveTime,jdbcType=VARCHAR},
+        APPROVE_TIME = #{approveTime,jdbcType=TIMESTAMP},
       </if>
       <if test="creditRateCeiling != null">
         CREDIT_RATE_CEILING = #{creditRateCeiling,jdbcType=VARCHAR},
+      </if>
+      <if test="brandNum != null">
+        BRAND_NUM = #{brandNum,jdbcType=VARCHAR},
       </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
@@ -610,8 +624,9 @@
     AG_DOC_PRO = #{agDocPro,jdbcType=VARCHAR},
     ORGAN_NUM = #{organNum,jdbcType=VARCHAR},
     FINACE_REMIT_ORGAN = #{finaceRemitOrgan,jdbcType=VARCHAR},
-    APPROVE_TIME = #{approveTime,jdbcType=VARCHAR},
-    CREDIT_RATE_CEILING = #{creditRateCeiling,jdbcType=VARCHAR}
+    APPROVE_TIME = #{approveTime,jdbcType=TIMESTAMP},
+    CREDIT_RATE_CEILING = #{creditRateCeiling,jdbcType=VARCHAR},
+    BRAND_NUM = #{brandNum,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <sql id="OracleDialectPrefix">

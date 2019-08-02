@@ -283,12 +283,13 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
                     log.info("签名验证成功");
                     if (respXML.contains("data") && respXML.contains("orgId")){
                         JSONObject respXMLObj = JSONObject.parseObject(respXML);
-                        JSONObject dataObj = JSONObject.parseObject(respXMLObj.get("data").toString());
                         if(com.ryx.credit.commons.utils.StringUtils.isBlank(String.valueOf(respXMLObj.get("data"))) || "null".equals(String.valueOf(respXMLObj.get("data")))){
                             AppConfig.sendEmails(respXML, "入网通知POS失败报警");
+                            AgentResult ag = AgentResult.fail(respXML);
+                            ag.setData(respXMLObj);
+                            return ag;
                         }
-                        log.info(dataObj.toJSONString());
-                        return AgentResult.ok(dataObj);
+                        return AgentResult.ok(respXMLObj);
                     }else if (respXML.contains("respMsg")){
                         JSONObject respXMLObj = JSONObject.parseObject(respXML);
                         AppConfig.sendEmails(respXML, "入网通知POS失败报警:"+respXMLObj.get("respMsg"));
@@ -307,8 +308,8 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
                 return new AgentResult(500,"http请求异常",respXML);
             }
         } catch (Exception e) {
-            AppConfig.sendEmails("http请求超时:"+ MailUtil.printStackTrace(e), "入网通知POS失败报警");
-            log.info("http请求超时:{}",e.getMessage());
+            AppConfig.sendEmails("通知失败:"+ MailUtil.printStackTrace(e), "入网通知POS失败报警");
+            log.info("通知失败:{}",e.getMessage());
             throw e;
         }
     }
@@ -372,9 +373,9 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage(),e);
-            log.info("http请求超时:{}",e.getMessage());
-            AppConfig.sendEmails("http请求超时:"+ MailUtil.printStackTrace(e), "升级通知POS失败报警");
-            throw new Exception("http请求超时");
+            log.info("通知失败:{}",e.getMessage());
+            AppConfig.sendEmails("通知失败:"+ MailUtil.printStackTrace(e), "升级通知POS失败报警");
+            throw new Exception("通知失败");
         }
     }
 

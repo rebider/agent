@@ -8,6 +8,7 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.dao.agent.AttachmentMapper;
 import com.ryx.credit.pojo.admin.agent.Attachment;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,5 +45,11 @@ public class AttachmentServiceImpl implements AttachmentService {
            return attachmentMapper.selectByPrimaryKey(id);
         }
         return null;
+    }
+
+
+    @Override
+    public List<Attachment>  accessoryQuery(String id,String busType){
+       return attachmentMapper.accessoryQuery(id,busType);
     }
 }

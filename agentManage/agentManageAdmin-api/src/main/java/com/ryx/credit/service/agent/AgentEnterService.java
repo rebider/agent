@@ -18,6 +18,13 @@ import java.util.Map;
  * Created by cx on 2018/5/28.
  */
 public interface AgentEnterService {
+
+    /**
+     * 商户入网信息保存
+     * @param agentVo
+     * @return
+     */
+    public ResultVO saveAgentInfo(AgentVo agentVo)throws ProcessException;
     /**
      * 商户入网
      * @param agentVo
@@ -70,7 +77,7 @@ public interface AgentEnterService {
      * @param userId
      * @return
      */
-    public ResultVO updateAgentVo(AgentVo agent,String userId,Boolean isPass)throws MessageException;
+    public ResultVO updateAgentVo(AgentVo agent,String userId,Boolean isPass,String saveStatus)throws MessageException;
 
 
     public Map startPar(String cuserId);

@@ -237,18 +237,20 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	 */
 	@Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
 	@Override
-	public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent,String userId,Boolean isPass)throws Exception {
+	public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent,String userId,Boolean isPass,String saveStatus)throws Exception {
 		try {
 			if(agent==null)throw new ProcessException("代理商信息不能为空");
 			Set<String> resultSet = new HashSet<>();
 			for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
-				if(agentBusInfoVo.getBusType().equals(BusType.ZQZF.key) || agentBusInfoVo.getBusType().equals(BusType.ZQBZF.key) || agentBusInfoVo.getBusType().equals(BusType.ZQ.key) ){
-					if(com.ryx.credit.commons.utils.StringUtils.isBlank(agentBusInfoVo.getBusParent()))
-						throw new ProcessException("直签上级不能为空");
+				if(!"1".equals(saveStatus)){
+					if(OrgType.zQ(agentBusInfoVo.getBusType())){
+						if(com.ryx.credit.commons.utils.StringUtils.isBlank(agentBusInfoVo.getBusParent()))
+							throw new ProcessException("直签上级不能为空");
+					}
 				}
 
 				//代理商选择上级代理商时添加限制 不能选择同级别代理商为上级
-				if (StringUtils.isNotBlank(agentBusInfoVo.getBusParent())) {
+				if (StringUtils.isNotBlank(agentBusInfoVo.getBusParent()) && !"1".equals(saveStatus)) {
 					//获取上级代理商类型
 					AgentBusInfo busInfo = getById(agentBusInfoVo.getBusParent());
 					if (agentBusInfoVo.getBusType().equals(BusType.ZQ.key) || agentBusInfoVo.getBusType().equals(BusType.ZQBZF.key) || agentBusInfoVo.getBusType().equals(BusType.ZQZF.key)) {
@@ -274,7 +276,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 				List<Organization> organList = null;
 				if (null!=agentBusInfoVo.getBusPlatform()){
 					PlatformType platformType = platFormService.byPlatformCode(agentBusInfoVo.getBusPlatform());
-					if (null!=platformType){
+					if (null!=platformType && !"1".equals(saveStatus)){
 						if(PlatformType.whetherPOS(platformType.code)){
 							if (StringUtils.isNotBlank(agentBusInfoVo.getBusNum())){
 								if (StringUtils.isBlank(agentBusInfoVo.getBusLoginNum())){
@@ -942,9 +944,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	 * @throws MessageException
 	 */
 	@Override
-	public String queryAgentId(String busNum)throws MessageException{
-		AgentBusInfo agentBusInfo = queryBusInfo(busNum);
-		return agentBusInfo.getAgentId();
+	public AgentBusInfo queryAgentBusInfo(String busNum)throws MessageException{
+		return queryBusInfo(busNum);
 	}
 
 	/**
@@ -965,6 +966,37 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		if(i==0){
 			throw new MessageException("更新失败");
 		}
+	}
+
+	/**
+	 * 瑞花宝 — 根据品牌号查询对应关系
+	 * @param brandNum
+	 * @return
+	 * @throws MessageException
+	 */
+	@Override
+	public Map<String,String> queryBusInfoByBrandNum(String brandNum)throws MessageException{
+		if(StringUtils.isBlank(brandNum)){
+			throw new MessageException("品牌编号不能为空");
+		}
+		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+		AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+		criteria.andStatusEqualTo(Status.STATUS_1.status);
+		criteria.andBusStatusNotEqualTo(BusinessStatus.pause.status);
+		criteria.andBrandNumEqualTo(brandNum);
+		List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+		if(agentBusInfos==null){
+			throw new MessageException("业务不存在");
+		}
+		if(agentBusInfos.size()==0){
+			throw new MessageException("业务不存在");
+		}
+		Map<String,String> map = new HashMap<>();
+		for (AgentBusInfo agentBusInfo : agentBusInfos) {
+			map.put(agentBusInfo.getBusNum(),agentBusInfo.getId());
+		}
+		map.put("agentId",agentBusInfos.get(0).getAgentId());
+		return map;
 	}
 
 }
