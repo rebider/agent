@@ -407,7 +407,17 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                             throw new MessageException("同一代理商同一打款公司下同一月份含有相同代理商！");
                         }else if(invoiceSums.size()==0){
                             InvoiceSum invoiceSum3 = new InvoiceSum();
-                            invoiceSum3.setPreLeftAmt(BigDecimal.ZERO);
+                            if( null!=invoiceSumList.get(5) && !"".equals(invoiceSumList.get(5))){
+                                try {
+                                    new BigDecimal(String.valueOf(invoiceSumList.get(5)));
+                                }catch (Exception e){
+                                    logger.info("导入上月欠票基数格式不正确，请检查");
+                                    throw new MessageException("导入上月欠票基数不正确，请检查");
+                                }
+                                invoiceSum3.setPreLeftAmt( new BigDecimal(String.valueOf(invoiceSumList.get(5))));
+                            }else{
+                                invoiceSum3.setPreLeftAmt(BigDecimal.ZERO);
+                            }
                             invoiceSum3.setDayBackAmt(new BigDecimal(invoiceSumList.get(6).toString().trim()));
                             invoiceSum3.setDayProfitAmt(new BigDecimal(invoiceSumList.get(7).toString().trim()));
                             invoiceSum3.setPreProfitMonthAmt(new BigDecimal(invoiceSumList.get(8).toString().trim()));
@@ -467,7 +477,17 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                             throw new MessageException("同一代理商同一打款公司下同一月份含有相同代理商！");
                         }else if(invoiceSums.size()==0){
                             InvoiceSum invoiceSum3 = new InvoiceSum();
-                            invoiceSum3.setPreLeftAmt(BigDecimal.ZERO);
+                            if( null!=invoiceSumList.get(5) && !"".equals(invoiceSumList.get(5))){
+                                try {
+                                    new BigDecimal(String.valueOf(invoiceSumList.get(5)));
+                                }catch (Exception e){
+                                    logger.info("导入上月欠票基数格式不正确，请检查");
+                                    throw new MessageException("导入上月欠票基数不正确，请检查");
+                                }
+                                invoiceSum3.setPreLeftAmt( new BigDecimal(String.valueOf(invoiceSumList.get(5))));
+                            }else{
+                                invoiceSum3.setPreLeftAmt(BigDecimal.ZERO);
+                            }
                             invoiceSum3.setDayBackAmt(new BigDecimal(invoiceSumList.get(6).toString().trim()));
                             invoiceSum3.setDayProfitAmt(new BigDecimal(invoiceSumList.get(7).toString().trim()));
                             invoiceSum3.setPreProfitMonthAmt(new BigDecimal(invoiceSumList.get(8).toString().trim()));
