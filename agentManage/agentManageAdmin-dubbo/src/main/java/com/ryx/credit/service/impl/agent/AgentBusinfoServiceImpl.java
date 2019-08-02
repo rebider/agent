@@ -243,7 +243,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 			Set<String> resultSet = new HashSet<>();
 			for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
 				if(!"1".equals(saveStatus)){
-					if(agentBusInfoVo.getBusType().equals(BusType.ZQZF.key) || agentBusInfoVo.getBusType().equals(BusType.ZQBZF.key) || agentBusInfoVo.getBusType().equals(BusType.ZQ.key) ){
+					if(OrgType.zQ(agentBusInfoVo.getBusType())){
 						if(com.ryx.credit.commons.utils.StringUtils.isBlank(agentBusInfoVo.getBusParent()))
 							throw new ProcessException("直签上级不能为空");
 					}
@@ -944,9 +944,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	 * @throws MessageException
 	 */
 	@Override
-	public String queryAgentId(String busNum)throws MessageException{
-		AgentBusInfo agentBusInfo = queryBusInfo(busNum);
-		return agentBusInfo.getAgentId();
+	public AgentBusInfo queryAgentBusInfo(String busNum)throws MessageException{
+		return queryBusInfo(busNum);
 	}
 
 	/**
@@ -967,6 +966,37 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		if(i==0){
 			throw new MessageException("更新失败");
 		}
+	}
+
+	/**
+	 * 瑞花宝 — 根据品牌号查询对应关系
+	 * @param brandNum
+	 * @return
+	 * @throws MessageException
+	 */
+	@Override
+	public Map<String,String> queryBusInfoByBrandNum(String brandNum)throws MessageException{
+		if(StringUtils.isBlank(brandNum)){
+			throw new MessageException("品牌编号不能为空");
+		}
+		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+		AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+		criteria.andStatusEqualTo(Status.STATUS_1.status);
+		criteria.andBusStatusNotEqualTo(BusinessStatus.pause.status);
+		criteria.andBrandNumEqualTo(brandNum);
+		List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+		if(agentBusInfos==null){
+			throw new MessageException("业务不存在");
+		}
+		if(agentBusInfos.size()==0){
+			throw new MessageException("业务不存在");
+		}
+		Map<String,String> map = new HashMap<>();
+		for (AgentBusInfo agentBusInfo : agentBusInfos) {
+			map.put(agentBusInfo.getBusNum(),agentBusInfo.getId());
+		}
+		map.put("agentId",agentBusInfos.get(0).getAgentId());
+		return map;
 	}
 
 }

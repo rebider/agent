@@ -10,7 +10,7 @@ import java.math.BigDecimal;
  */
 public enum AgStatus {
 
-    Create(1,"新建"),Approving(2,"审批中"),Approved(3,"审批通过"),Refuse(4,"审批拒绝"),Reject(5,"驳回");
+    Create(1,"新建"),Approving(2,"审批中"),Approved(3,"审批通过"),Refuse(4,"审批拒绝"),Reject(5,"驳回"),Cancel(6,"撤销");
 
     public BigDecimal status;
 

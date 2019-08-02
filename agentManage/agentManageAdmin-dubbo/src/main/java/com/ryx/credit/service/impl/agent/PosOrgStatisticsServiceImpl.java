@@ -7,6 +7,7 @@ import com.ryx.credit.common.enumc.TerminalPlatformType;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
+import com.ryx.credit.common.util.Des3Util;
 import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.common.util.agentUtil.AESUtil;
@@ -37,6 +38,10 @@ import java.util.*;
 public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
 
     private static Logger log = LoggerFactory.getLogger(PosOrgStatisticsServiceImpl.class);
+
+    private static final String rhbReqUrl = AppConfig.getProperty("rhb_req_url");
+    private static final String rhb3desKey = AppConfig.getProperty("rhb_3des_Key");
+    private static final String rhb3desIv = AppConfig.getProperty("rhb_3des_iv");
     @Autowired
     private PlatFormMapper platFormMapper;
     @Autowired
@@ -142,7 +147,7 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
                 return new AgentResult(500,"http请求异常","");
             }
         } catch (Exception e) {
-            log.info("http请求超时:{}",e.getMessage());
+            log.info("通知失败:{}",e.getMessage());
             e.printStackTrace();
             throw new Exception(e);
         }
@@ -163,7 +168,7 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
             List<Map> dataMap = JsonUtil.jsonToList(data, Map.class);
             return AgentResult.ok(dataMap);
         } catch (Exception e) {
-            log.info("http请求超时:{}",e.getMessage());
+            log.info("通知失败:{}",e.getMessage());
             e.printStackTrace();
             throw new Exception(e);
         }
@@ -183,11 +188,117 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
             JSONArray result = jsonObject.getJSONArray("result");
             return AgentResult.ok(result);
         } catch (Exception e) {
-            log.info("http请求超时:{}",e.getMessage());
+            log.info("通知失败:{}",e.getMessage());
             e.printStackTrace();
             throw new Exception(e);
         }
     }
+
+
+    private AgentResult httpForRHpos(String agencyId)throws Exception{
+        try {
+            Map<String, String> map = new HashMap<>();
+            map.put("application","AgencyTerminalCount");
+            map.put("agentId",agencyId);
+            String json = JsonUtil.objectToJson(map);
+            String reqParamEncrypt = Des3Util.Encrypt(json, rhb3desKey, rhb3desIv.getBytes());
+            log.info("瑞花宝查询终端数量参数：{}",json);
+            log.info("瑞花宝查询终端数量参数加密：{}",reqParamEncrypt);
+            String httpResult = HttpClientUtil.sendHttpPost(rhbReqUrl, reqParamEncrypt);
+            String reqParamDecrypt = Des3Util.Decrypt(httpResult, rhb3desKey, rhb3desIv.getBytes());
+            log.info("瑞花宝查询终端数量返回参数：{}",reqParamDecrypt);
+            JSONObject respXMLObj = JSONObject.parseObject(reqParamDecrypt);
+            if (respXMLObj.getString("MSG_CODE").equals("0000")){
+                JSONArray result = respXMLObj.getJSONArray("RESULT");
+                return AgentResult.ok(result);
+            }
+            return AgentResult.fail();
+        } catch (Exception e) {
+            log.info("通知失败:{}",e.getMessage());
+            e.printStackTrace();
+            throw new Exception(e);
+        }
+    }
+
+
+
+    public static AgentResult httpForRJPos(String orgId,String supDorgId)throws Exception{
+        try {
+            String cooperator = com.ryx.credit.util.Constants.cooperator;
+            String charset = "UTF-8"; // 字符集
+            String tranCode = "ORG011"; // 交易码
+            String reqMsgId = UUID.randomUUID().toString().replace("-", ""); // 请求流水
+            String reqDate = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"); // 请求时间
+
+            JSONObject jsonParams = new JSONObject();
+            JSONObject data = new JSONObject();
+            jsonParams.put("version", "1.0.0");
+            jsonParams.put("msgType", "01");
+            jsonParams.put("reqDate", reqDate);
+            data.put("orgId",orgId);
+            data.put("supDorgId",supDorgId);
+
+            jsonParams.put("data", data);
+            String plainXML = jsonParams.toString();
+            // 请求报文加密开始
+            String keyStr = AESUtil.getAESKey();
+            byte[] plainBytes = plainXML.getBytes(charset);
+            byte[] keyBytes = keyStr.getBytes(charset);
+            String encryptData = new String(Base64.encodeBase64((AESUtil.encrypt(plainBytes, keyBytes, "AES", "AES/ECB/PKCS5Padding", null))), charset);
+            String signData = new String(Base64.encodeBase64(RSAUtil.digitalSign(plainBytes, Constants.privateKey, "SHA1WithRSA")), charset);
+            String encrtptKey = new String(org.apache.commons.codec.binary.Base64.encodeBase64(RSAUtil.encrypt(keyBytes, Constants.publicKey, 2048, 11, "RSA/ECB/PKCS1Padding")), charset);
+            // 请求报文加密结束
+
+            Map<String, String> map = new HashMap<>();
+            map.put("encryptData", encryptData);
+            map.put("encryptKey", encrtptKey);
+            map.put("cooperator", cooperator);
+            map.put("signData", signData);
+            map.put("tranCode", tranCode);
+            map.put("reqMsgId", reqMsgId);
+
+            log.info("RJPOS机构统计信息查询请求参数:{}",map);
+            String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("agent_rjpos_notify_url"), map);
+            JSONObject jsonObject = JSONObject.parseObject(httpResult);
+            if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
+                System.out.println("请求异常======" + httpResult);
+                throw new Exception("http请求异常");
+            } else {
+                String resEncryptData = jsonObject.getString("encryptData");
+                String resEncryptKey = jsonObject.getString("encryptKey");
+                byte[] decodeBase64KeyBytes = Base64.decodeBase64(resEncryptKey.getBytes(charset));
+                byte[] merchantAESKeyBytes = RSAUtil.decrypt(decodeBase64KeyBytes, Constants.privateKey, 2048, 11, "RSA/ECB/PKCS1Padding");
+                byte[] decodeBase64DataBytes = Base64.decodeBase64(resEncryptData.getBytes(charset));
+                byte[] merchantXmlDataBytes = AESUtil.decrypt(decodeBase64DataBytes, merchantAESKeyBytes, "AES", "AES/ECB/PKCS5Padding", null);
+                String respXML = new String(merchantXmlDataBytes, charset);
+                log.info("RJPOS机构统计信息查询返回参数：{}",respXML);
+
+                // 报文验签
+                String resSignData = jsonObject.getString("signData");
+                byte[] signBytes = Base64.decodeBase64(resSignData);
+                if (!RSAUtil.verifyDigitalSign(respXML.getBytes(charset), signBytes, Constants.publicKey, "SHA1WithRSA")) {
+                    System.out.println("签名验证失败");
+                } else {
+                    System.out.println("签名验证成功");
+                    Map<String, Object> respXMLMap = JsonUtil.jsonToMap(respXML);
+                    String respType = String.valueOf(respXMLMap.get("respType"));
+                    Map<String, Object> resultMap = new HashMap<>();
+                    if(respType.equals("S")){
+                        resultMap = JSONArray.parseObject(String.valueOf(respXMLMap.get("data")));
+                    }else{
+                        return AgentResult.failObj(String.valueOf(respXMLMap.get("respMsg")));
+                    }
+                    return AgentResult.ok(resultMap);
+                }
+                return new AgentResult(500,"http请求异常","");
+            }
+        } catch (Exception e) {
+            log.info("通知失败:{}",e.getMessage());
+            e.printStackTrace();
+            throw new Exception(e);
+        }
+    }
+
 
     @Override
     public AgentResult posOrgStatistics(String orgId,String termType)throws Exception{
@@ -247,6 +358,24 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
                 }
             }
             AgentResult agentResult = httpForRDBpos(orgId);
+            agentResult.setMsg(platformType);
+            return agentResult;
+        }else if(PlatformType.RJPOS.getValue().equals(platformType)){
+            if(StringUtils.isEmpty(orgId)){
+                if(StringUtils.isNotEmpty(parentBusNum)){
+                    orgId = parentBusNum;
+                }
+            }
+            AgentResult agentResult = httpForRJPos(orgId,parentBusNum);
+            agentResult.setMsg(platformType);
+            return agentResult;
+        }else if(PlatformType.RHPOS.getValue().equals(platformType)){
+            if(StringUtils.isEmpty(orgId)){
+                if(StringUtils.isNotEmpty(parentBusNum)){
+                    orgId = parentBusNum;
+                }
+            }
+            AgentResult agentResult = httpForRHpos(orgId);
             agentResult.setMsg(platformType);
             return agentResult;
         }
