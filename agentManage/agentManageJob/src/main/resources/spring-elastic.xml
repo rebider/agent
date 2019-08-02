@@ -129,6 +129,14 @@
                 description="物联网卡，更新已修改的商户信息（是续费，正常）"
                 sharding-total-count="1"
                 sharding-item-parameters="0=Server0"/>
+    <job:simple id="terminalTransferJob"
+                job-ref="terminalTransferJob"
+                registry-center-ref="regCenter"
+                cron="0 */1 * * * ?"
+                overwrite="true"
+                description="终端划拨出查询调整结果"
+                sharding-total-count="1"
+                sharding-item-parameters="0=Server0"/>
 
 
     <job:dataflow id="internetCardUpdateMechIsNull"

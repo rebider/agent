@@ -97,6 +97,26 @@
     <dubbo:service interface="com.ryx.credit.service.order.IOPdSumService" ref="OPdSumService"  timeout="1200000" registry="myGroup"/>
     <dubbo:service interface="com.ryx.credit.service.order.OLogisticsDetailHService" ref="oLogisticsDetailHService" timeout="1200000" registry="myGroup"/>
     <dubbo:service interface="com.ryx.credit.service.order.OrderRepairService" ref="orderRepairService" timeout="1200000" registry="myGroup"/>
+    <dubbo:service interface="com.ryx.credit.service.order.ProductService" ref="productService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.order.OrderService" ref="orderService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.order.AddressService" ref="addressService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.order.OrderActivityService" ref="orderActivityService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.bank.BankRegionService" ref="bankRegionService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.bank.BankLineNumService" ref="bankLineNumService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.agent.AgentDataHistoryService" ref="agentDataHistoryService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.data.AttachmentService" ref="attachmentService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.order.CompensateService" ref="compensateService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.order.OLogisticsService" ref="oLogisticService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.order.OLogisticsDetailService" ref="oLogisticsDetailService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.order.IOrderReturnService" ref="orderReturnService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.order.IAccountAdjustService" ref="accountAdjustService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.bank.PosRegionService" ref="posRegionService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.pay.LivenessDetectionService" ref="livenessDetectionService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.order.OCashReceivablesService" ref="oCashReceivablesService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.order.IOPdSumService" ref="OPdSumService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.order.OLogisticsDetailHService" ref="oLogisticsDetailHService" timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.order.OrderRepairService" ref="orderRepairService" timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.order.TerminalTransferService" ref="terminalTransferService" timeout="1200000" registry="${zk.group}"/>
 
     <!-- 基础资源维护-->
     <dubbo:service interface="com.ryx.credit.service.dict.PayCompService" ref="payCompService" timeout="1200000" registry="myGroup"></dubbo:service>

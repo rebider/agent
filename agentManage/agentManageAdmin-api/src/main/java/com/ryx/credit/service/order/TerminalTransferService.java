@@ -44,5 +44,7 @@ public interface TerminalTransferService {
 
     String getAgentType(String orgId);
 
+    void  queryTerminalTransferResult() throws Exception;
+
 
 }

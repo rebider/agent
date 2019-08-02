@@ -447,6 +447,9 @@
           <if test="map.agentId != null">
             and t.agent_Id = #{map.agentId}
           </if>
+          <if test="map.id != null and map.id!=''">
+          and t.id = #{map.id}
+         </if>
           <if test="map.snBeginNum != null">
             and t.sn_Begin_Num = #{map.snBeginNum}
           </if>
@@ -484,4 +487,12 @@
   <update id="updateStatusByTerminalTransferId" parameterType="java.lang.String">
     update O_TERMINAL_TRANSFER_DETAIL set STATUS = 0  where TERMINAL_TRANSFER_ID = #{map.terminalTransferId}
   </update>
+
+  <select id="queryTerminalTransferDetail" resultMap="BaseResultMap">
+   select bb.*  from O_TERMINAL_TRANSFER aa  left join
+  O_TERMINAL_TRANSFER_DETAIL bb on aa.ID = bb.TERMINAL_TRANSFER_ID where bb.PLATFORM_TYPE ='1'
+  and bb.ADJUST_STATUS='1'and aa.REVIEW_STATUS='3'and aa.STATUS='1'and bb.STATUS='1'
+</select>
+
+
 </mapper>
