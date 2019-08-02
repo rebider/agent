@@ -290,7 +290,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             List hav = new ArrayList();
             List<Organization> organList = null;
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
-                if(item.getBusType().equals(BusType.ZQZF.key) || item.getBusType().equals(BusType.ZQBZF.key) || item.getBusType().equals(BusType.ZQ.key) ){
+                if(OrgType.zQ(item.getBusType())){
                     if(StringUtils.isBlank(item.getBusParent()))
                         throw new ProcessException("直签上级不能为空");
                 }
