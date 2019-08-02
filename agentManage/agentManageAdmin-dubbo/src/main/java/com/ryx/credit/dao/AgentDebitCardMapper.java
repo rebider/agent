@@ -12,11 +12,15 @@ public interface AgentDebitCardMapper {
 
     int countQuery(@Param("map") Map<String,String> map);
 
-    List<Map<String,String>> exports(@Param("map") Map<String,String> map);
+    List<Map<String,Object>> exports(@Param("map") Map<String,String> map);
 
     List<Map<String,String>> getBusInfoById(String id);
 
     void updateSuggestStatusById(@Param("id") String id,@Param("statu") String statu);
+
+    List<Map<String,String>> getNoticeList(@Param("orgId") String orgId,@Param("page") Page page);
+
+    int getNoticeCount(String orgId);
 
 
 }

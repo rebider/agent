@@ -3,6 +3,7 @@ package com.ryx.credit.service.impl.agent;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentDebitCardMapper;
 import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
 import com.ryx.credit.service.agent.AgentDebitCardService;
@@ -33,7 +34,7 @@ public class AgentDebitCardServiceImpl implements AgentDebitCardService {
     }
 
     @Override
-    public List<Map<String,String>> exports(Map<String,String> map){
+    public List<Map<String,Object>> exports(Map<String,String> map){
         return  agentDebitCardMapper.exports(map);
     }
 
@@ -57,6 +58,15 @@ public class AgentDebitCardServiceImpl implements AgentDebitCardService {
         }catch (Exception e){
             throw new MessageException("修改失败");
         }
+    }
+
+    @Override
+    public PageInfo getNoticeList(String orgId,Page page){
+        PageInfo pageInfo = new PageInfo();
+        List<Map<String,String>> list = agentDebitCardMapper.getNoticeList(orgId,page);
+        pageInfo.setRows(list);
+        pageInfo.setTotal(agentDebitCardMapper.getNoticeCount(orgId));
+        return pageInfo;
     }
 
 

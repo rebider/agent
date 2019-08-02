@@ -17,13 +17,15 @@ public interface AgentDebitCardService {
 
     PageInfo getDebitCardList(Map<String,String> map, Page page);
 
-    List<Map<String,String>> exports(Map<String,String> map);
+    List<Map<String,Object>> exports(Map<String,String> map);
 
     List<Map<String,String>> getBusInfoById(String id);
 
     Map<String,String> getColAndAgentById(String id);
 
     void updateSuggestStatusById(String id,String statu) throws MessageException;
+
+    PageInfo getNoticeList(String orgId,Page page);
 
 
 }
