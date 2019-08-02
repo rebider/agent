@@ -223,7 +223,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         List<Map<String,String>> maps = new ArrayList<Map<String,String>>();
         for (Map<String,Object> map:list) {
             InvoiceApply invoiceApply = new InvoiceApply();
-            invoiceApply.setSerialNo(map.get("serialNo").toString());
+            invoiceApply.setInvoiceNumber(map.get("invoiceNo").toString());
             invoiceApply.setInvoiceCode(map.get("invoiceCode").toString());
             invoiceApply.setYsResult("1");
             invoiceApply.setStatus("0");
@@ -279,6 +279,9 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         }
         if(StringUtils.isNotBlank(invoiceApply.getYsResult())){
             criteria.andYsResultEqualTo(invoiceApply.getYsResult());
+        }
+        if(StringUtils.isNotBlank(invoiceApply.getInvoiceNumber())){
+            criteria.andInvoiceNumberEqualTo(invoiceApply.getInvoiceNumber());
         }
        return  invoiceApplyMapper.selectByExample(example);
     }
