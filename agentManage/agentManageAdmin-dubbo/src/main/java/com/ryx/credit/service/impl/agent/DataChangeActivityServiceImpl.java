@@ -270,7 +270,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                     for (AgentColinfo agentColinfo:voColinfoVoList){
                                         agentColinfo.setPayStatus(ColinfoPayStatus.A.getValue());
                                     }
-                                    agentColinfoService.updateAgentColinfoVo(voColinfoVoList, vo.getAgent(),rel.getcUser());
+                                    agentColinfoService.updateAgentColinfoVo(voColinfoVoList, vo.getAgent(),rel.getcUser(),null);
                                     logger.info("========================一分钱验证状态修改完成");
 
                                     logger.info("========================同步至业务系统开始");
@@ -296,7 +296,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                             for (AgentColinfo agentColinfo:voColinfoVoList){
                                                 agentColinfo.setPayStatus(ColinfoPayStatus.A.getValue());
                                             }
-                                            agentColinfoService.updateAgentColinfoVo(voColinfoVoList, vo.getAgent(),rel.getcUser());
+                                            agentColinfoService.updateAgentColinfoVo(voColinfoVoList, vo.getAgent(),rel.getcUser(),null);
                                             logger.info("========================一分钱验证状态修改完成");
 
                                             logger.info("========================同步至业务系统开始");
@@ -328,11 +328,13 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                         AgentVo vo = JSONObject.parseObject(dr.getDataContent(), AgentVo.class);
                         AgentVo preVo = JSONObject.parseObject(dr.getDataPreContent(), AgentVo.class);
                         List<CapitalVo> capitalVoList = vo.getCapitalVoList();
-                        for (CapitalVo capitalVo : capitalVoList) {
-                            capitalVo.setcAgentId(vo.getAgent().getId());
-                            capitalVo.setcUser(rel.getcUser());
-                            capitalVo.setSrcId(dr.getId());
-                            capitalVo.setSrcRemark("代理商信息修改");
+                        if(null!=capitalVoList && capitalVoList.size()>0){
+                            for (CapitalVo capitalVo : capitalVoList) {
+                                capitalVo.setcAgentId(vo.getAgent().getId());
+                                capitalVo.setcUser(rel.getcUser());
+                                capitalVo.setSrcId(dr.getId());
+                                capitalVo.setSrcRemark("代理商信息修改");
+                            }
                         }
                         //更新财务出款机构
                         List<AgentBusInfoVo> orgTypeList = vo.getOrgTypeList();
@@ -365,13 +367,16 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             if(1!=dateChangeRequestMapper.updateByPrimaryKeySelective(dr)){
                                 throw new ProcessException("更新数据申请失败");
                             }
-                            for (Capital capital : vo.getCapitalVoList()) {
-                                capital.setCloReviewStatus(AgStatus.Approved.getValue());
-                                int i = capitalMapper.updateByPrimaryKeySelective(capital);
-                                if(1!=i){
-                                    throw new ProcessException("更新缴纳款审批通过失败");
+                            if(null!=vo.getCapitalVoList() && vo.getCapitalVoList().size()>0){
+                                for (Capital capital : vo.getCapitalVoList()) {
+                                    capital.setCloReviewStatus(AgStatus.Approved.getValue());
+                                    int i = capitalMapper.updateByPrimaryKeySelective(capital);
+                                    if(1!=i){
+                                        throw new ProcessException("更新缴纳款审批通过失败");
+                                    }
                                 }
                             }
+
                         }
 
                         //入网程序调用
