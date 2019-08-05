@@ -794,7 +794,13 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             if(StringUtils.isNotBlank(res) && "1".equals(res)) {
                 termMachineService.queryTerminalTransfer(terminalTransferDetailListsPos, "adjust");
             }else{
-                return;
+                for (TerminalTransferDetail terminalTransferDetail :terminalTransferDetailListsPos) {
+                    terminalTransferDetail.setAdjustTime(new Date());
+                    terminalTransferDetail.setuTime(new Date());
+                    terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());
+                    terminalTransferDetail.setRemark("需线下调整");
+                    terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
+                }
             }
         }
 
@@ -833,6 +839,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                            }
 
                    }else{
+                       log.info("---------------------------------未打开开关--------------------------------------");
                        continue;
                    }
 
@@ -853,17 +860,20 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                    if ("000000".equals(result_code)) {
                        String transferStatus = String.valueOf(data.get("transferStatus"));
                        if ("00".equals(transferStatus)) {
-                           log.info("划拨成功");
+                           log.info("划拨成功请求参数：{}",JSONObject.toJSON(terminalTransferDetail));
+                           log.info("划拨成功请求结果：{}",JSONObject.toJSON(agentResult));
                            terminalTransferDetail.setAdjustStatus(new BigDecimal(2));
                            terminalTransferDetail.setAdjustTime(new Date());
                            terminalTransferDetail.setuTime(new Date());
                            terminalTransferDetail.setRemark(resMsg);
                            terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
                        } else if ("01".equals(transferStatus)) {
-                           log.info("划拨中");
+                           log.info("划拨中请求参数：{}",JSONObject.toJSON(terminalTransferDetail));
+                           log.info("划拨中请求结果：{}",JSONObject.toJSON(agentResult));
                            break;
                        } else if ("02".equals(transferStatus)) {
-                           log.info("划拨失败");
+                           log.info("划拨失败请求参数：{}",JSONObject.toJSON(terminalTransferDetail));
+                           log.info("划拨失败请求结果：{}",JSONObject.toJSON(agentResult));
                            terminalTransferDetail.setRemark(resMsg);
                            terminalTransferDetail.setAdjustTime(new Date());
                            terminalTransferDetail.setuTime(new Date());
@@ -871,7 +881,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                            terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
                        }
                    } else {
-                       log.info("未查到划拨结果");
+                       log.info("未查到划拨结果请求参数：{}",JSONObject.toJSON(terminalTransferDetail));
+                       log.info("未查到划拨结果请求结果：{}",JSONObject.toJSON(agentResult));
                        terminalTransferDetail.setRemark(resMsg);
                        terminalTransferDetail.setAdjustTime(new Date());
                        terminalTransferDetail.setuTime(new Date());
@@ -880,7 +891,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                    }
 
                } else {
-                   log.info("未连通查询");
+                   log.info("未连通查询请求参数：{}",JSONObject.toJSON(terminalTransferDetail));
+                   log.info("未连通查询请求结果：{}",JSONObject.toJSON(agentResult));
                    terminalTransferDetail.setRemark(resMsg);
                    terminalTransferDetail.setAdjustTime(new Date());
                    terminalTransferDetail.setuTime(new Date());
