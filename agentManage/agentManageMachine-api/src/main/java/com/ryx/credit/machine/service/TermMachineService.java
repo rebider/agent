@@ -2,6 +2,7 @@ package com.ryx.credit.machine.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.PlatformType;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.machine.vo.*;
 import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
@@ -43,8 +44,7 @@ public interface TermMachineService {
 
     /**
      * 机具的下发
-     * @param snList
-     * @param data
+     * @param lowerHairMachineVo
      * @return
      */
     public AgentResult lowerHairMachine(LowerHairMachineVo lowerHairMachineVo)throws Exception;

@@ -65,7 +65,9 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             AgentBusInfo agentBusInfo = (AgentBusInfo)param.get("agentBusInfo");
             Agent agent = (Agent)param.get("agent");
             AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
-
+            if(agentColinfo==null){
+                agentColinfo = new AgentColinfo();
+            }
             resultMap.put("mobileNo",agentBusInfo.getBusLoginNum());
             resultMap.put("branchid",agentBusInfo.getBusPlatform());
             resultMap.put("direct",direct(agentBusInfo.getBusType()));
@@ -109,11 +111,15 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             resultMap.put("bankcity",region.getrName());
             resultMap.put("bankname",agentColinfo.getCloBank());
             BankLineNums bankLineNums = bankLineNumsMapper.selectByBankName(agentColinfo.getCloBank());
-            resultMap.put("bankid",bankLineNums.getBankid());
+            if(bankLineNums!=null){
+                resultMap.put("bankid",bankLineNums.getBankid());
+            }else{
+                resultMap.put("bankid","999");
+            }
             resultMap.put("cardName",agentColinfo.getCloRealname());
             resultMap.put("channelTopId",agentBusInfo.getFinaceRemitOrgan());
-            resultMap.put("invoice",agentColinfo.getCloInvoice());
-            resultMap.put("tax",agentColinfo.getCloTaxPoint());
+            resultMap.put("invoice",String.valueOf(agentColinfo.getCloInvoice()));
+            resultMap.put("tax",String.valueOf(agentColinfo.getCloTaxPoint()));
         } catch (Exception e) {
             log.info("入网组装参数为空，"+e.getMessage());
             e.printStackTrace();
@@ -151,10 +157,10 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             jsonParams.put("accountType",paramMap.get("accountType"));
             jsonParams.put("customerType",paramMap.get("customerType"));
             jsonParams.put("channelTopId",paramMap.get("channelTopId"));
-            jsonParams.put("invoice",String.valueOf(paramMap.get("invoice")));
-            jsonParams.put("tax",String.valueOf(paramMap.get("tax")));
+            jsonParams.put("invoice",paramMap.get("invoice"));
+            jsonParams.put("tax",paramMap.get("tax"));
 
-            String json = JsonUtil.objectToJson(jsonParams);
+            String json = JSONObject.toJSONString(jsonParams);
             log.info("通知瑞大宝入网请求参数：{}",json);
             //发送请求
             String httpResult = HttpClientUtil.doPostJson(rdbReqUrl+"agency/agencyNetIn", json);
@@ -168,8 +174,8 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             }
         } catch (Exception e) {
             AppConfig.sendEmails("通知瑞大宝请求超时："+ MailUtil.printStackTrace(e), "入网通知瑞大宝失败报警");
-            log.info("http请求超时:{}",e.getLocalizedMessage());
-            throw new Exception("http请求超时:"+e.getLocalizedMessage());
+            log.info("通知失败:{}",e.getLocalizedMessage());
+            throw new Exception("通知失败:"+e.getLocalizedMessage());
         }
     }
 
@@ -209,6 +215,9 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         AgentBusInfo agentBusInfo = agentBusinfoService.getById(busId);
         Agent agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
         AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
+        if(agentColinfo==null){
+            agentColinfo = new AgentColinfo();
+        }
         jsonParams.put("mobile",agentBusInfo.getBusNum());
         jsonParams.put("branchid",agentBusInfo.getBusPlatform().split("_")[0]);
         jsonParams.put("termCount",agentBusInfo.getTerminalsLower());
@@ -243,10 +252,10 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             jsonParams.put("accountType",data.get("accountType"));
             jsonParams.put("customerType",data.get("customerType"));
             jsonParams.put("channelTopId",data.get("channelTopId"));
-            jsonParams.put("invoice",String.valueOf(data.get("invoice")));
-            jsonParams.put("tax",String.valueOf(data.get("tax")));
+            jsonParams.put("invoice",data.get("invoice"));
+            jsonParams.put("tax",data.get("tax"));
 
-            String json = JsonUtil.objectToJson(jsonParams);
+            String json = JSONObject.toJSONString(jsonParams);
             log.info("通知瑞大宝升级请求参数：{}",json);
             //发送请求
             String httpResult = HttpClientUtil.doPostJson(rdbReqUrl+"agency/setRztAgencyDirect", json);
@@ -260,8 +269,8 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             }
         } catch (Exception e) {
             AppConfig.sendEmails("升级通知瑞大宝请求超时："+ MailUtil.printStackTrace(e), "升级通知瑞大宝失败报警");
-            log.info("http请求超时:{}",e.getLocalizedMessage());
-            throw new Exception("http请求超时:"+e.getLocalizedMessage());
+            log.info("通知失败:{}",e.getLocalizedMessage());
+            throw new Exception("通知失败:"+e.getLocalizedMessage());
         }
     }
 
@@ -302,11 +311,15 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         jsonParams.put("bankcity",region.getrName());
         jsonParams.put("bankname",agentColinfo.getCloBank());
         BankLineNums bankLineNums = bankLineNumsMapper.selectByBankName(agentColinfo.getCloBank());
-        jsonParams.put("bankid",bankLineNums.getBankid());
+        if(bankLineNums!=null){
+            jsonParams.put("bankid",bankLineNums.getBankid());
+        }else{
+            jsonParams.put("bankid","999");
+        }
         jsonParams.put("cardName",agentColinfo.getCloRealname());
         jsonParams.put("channelTopId",agentBusInfo.getFinaceRemitOrgan());
-        jsonParams.put("invoice",agentColinfo.getCloInvoice());
-        jsonParams.put("tax",agentColinfo.getCloTaxPoint());
+        jsonParams.put("invoice",String.valueOf(agentColinfo.getCloInvoice()));
+        jsonParams.put("tax",String.valueOf(agentColinfo.getCloTaxPoint()));
         return jsonParams;
     }
 
@@ -316,6 +329,9 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         AgentBusInfo agentBusInfo = (AgentBusInfo)param.get("agentBusInfo");
         Agent agent = (Agent)param.get("agent");
         AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
+        if(agentColinfo==null){
+            agentColinfo = new AgentColinfo();
+        }
         jsonParams.put("agencyId",agentBusInfo.getBusNum());
         jsonParams = commonParam(jsonParams, agentColinfo, agent, agentBusInfo);
         return jsonParams;
@@ -344,10 +360,10 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             jsonParams.put("accountType",paramMap.get("accountType"));
             jsonParams.put("customerType",paramMap.get("customerType"));
             jsonParams.put("channelTopId",paramMap.get("channelTopId"));
-            jsonParams.put("invoice",String.valueOf(paramMap.get("invoice")));
-            jsonParams.put("tax",String.valueOf(paramMap.get("tax")));
+            jsonParams.put("invoice",paramMap.get("invoice"));
+            jsonParams.put("tax",paramMap.get("tax"));
 
-            String json = JsonUtil.objectToJson(jsonParams);
+            String json = JSONObject.toJSONString(jsonParams);
             log.info("通知瑞大宝入网修改请求参数：{}",json);
             //发送请求
             String httpResult = HttpClientUtil.doPostJson(rdbReqUrl+"agency/setAgencyNetIn", json);
@@ -361,8 +377,8 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             }
         } catch (Exception e) {
             AppConfig.sendEmails("通知瑞大宝请求超时："+ MailUtil.printStackTrace(e), "入网修改通知瑞大宝失败报警");
-            log.info("http请求超时:{}",e.getLocalizedMessage());
-            throw new Exception("http请求超时:"+e.getLocalizedMessage());
+            log.info("通知失败:{}",e.getLocalizedMessage());
+            throw new Exception("通知失败:"+e.getLocalizedMessage());
         }
 
     }

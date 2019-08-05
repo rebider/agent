@@ -228,9 +228,9 @@ public class PlatformSynServicePos implements PlatformSynService {
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage(),e);
-            log.info("http请求超时:{}",e.getMessage());
-            AppConfig.sendEmails("http请求超时:"+ MailUtil.printStackTrace(e), "升级通知POS失败报警");
-            throw new Exception("http请求超时");
+            log.info("通知失败:{}",e.getMessage());
+            AppConfig.sendEmails("通知失败:"+ MailUtil.printStackTrace(e), "升级通知POS失败报警");
+            throw new Exception("通知失败");
         }
     }
 
@@ -344,8 +344,8 @@ public class PlatformSynServicePos implements PlatformSynService {
                 return new AgentResult(500,"http请求异常",respXML);
             }
         } catch (Exception e) {
-            AppConfig.sendEmails("http请求超时:"+MailUtil.printStackTrace(e), "入网通知POS失败报警");
-            log.info("http请求超时:{}",e.getMessage());
+            AppConfig.sendEmails("通知失败:"+MailUtil.printStackTrace(e), "入网通知POS失败报警");
+            log.info("通知失败:{}",e.getMessage());
             throw e;
         }
     }

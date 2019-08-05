@@ -8,6 +8,7 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.*;
+import com.ryx.credit.service.agent.PlatFormService;
 import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,9 @@ public class TermMachineServiceImpl  implements TermMachineService {
 
     @Resource(name = "mposTermMachineServiceImpl")
     private TermMachineService mposTermMachineServiceImpl;
+    @Resource(name = "sPosTermMachineServiceImpl")
+    private TermMachineService sPosTermMachineServiceImpl;
+
 
 
 
@@ -44,6 +48,8 @@ public class TermMachineServiceImpl  implements TermMachineService {
             return posTermMachineServiceImpl.queryTermMachine(platformType);
         }else  if(PlatformType.MPOS.code.equals(platformType.code)){
             return mposTermMachineServiceImpl.queryTermMachine(platformType);
+        }else  if(PlatformType.SSPOS.code.equals(platformType.code)){
+            return sPosTermMachineServiceImpl.queryTermMachine(platformType);
         }else {
             List<TermMachineVo> list = new ArrayList<>();
             TermMachineVo vo = new TermMachineVo();
@@ -60,6 +66,8 @@ public class TermMachineServiceImpl  implements TermMachineService {
             return new ArrayList<>();
         }else  if(PlatformType.MPOS.code.equals(platformType.code)){
             return mposTermMachineServiceImpl.queryMposTermBatch(platformType);
+        }else  if(PlatformType.SSPOS.code.equals(platformType.code)){
+            return sPosTermMachineServiceImpl.queryMposTermBatch(platformType);
         }
         return new ArrayList<>();
     }
@@ -71,6 +79,8 @@ public class TermMachineServiceImpl  implements TermMachineService {
             return new ArrayList<>();
         }else if(PlatformType.MPOS.code.equals(platformType.code)){
             return mposTermMachineServiceImpl.queryMposTermType(platformType);
+        }else if(PlatformType.SSPOS.code.equals(platformType.code)){
+            return sPosTermMachineServiceImpl.queryMposTermType(platformType);
         }
         return new ArrayList<>();
     }
@@ -82,7 +92,14 @@ public class TermMachineServiceImpl  implements TermMachineService {
      */
     @Override
     public AgentResult lowerHairMachine(LowerHairMachineVo lowerHairMachineVo) throws Exception{
-        return mposTermMachineServiceImpl.lowerHairMachine(lowerHairMachineVo);
+        if(PlatformType.whetherPOS(lowerHairMachineVo.getPlatformType())){
+            return AgentResult.ok();
+        }else if(PlatformType.MPOS.code.equals(lowerHairMachineVo.getPlatformType())){
+            return mposTermMachineServiceImpl.lowerHairMachine(lowerHairMachineVo);
+        }else if(PlatformType.SSPOS.code.equals(lowerHairMachineVo.getPlatformType())){
+            return sPosTermMachineServiceImpl.lowerHairMachine(lowerHairMachineVo);
+        }
+        return AgentResult.fail("未实现的业务");
     }
 
     /**
@@ -92,7 +109,14 @@ public class TermMachineServiceImpl  implements TermMachineService {
      */
     @Override
     public AgentResult adjustmentMachine(AdjustmentMachineVo adjustmentMachineVo) throws Exception{
-        return mposTermMachineServiceImpl.adjustmentMachine(adjustmentMachineVo);
+        if(PlatformType.whetherPOS(adjustmentMachineVo.getPlatformType())){
+            return AgentResult.ok();
+        }else if(PlatformType.MPOS.code.equals(adjustmentMachineVo.getPlatformType())){
+            return mposTermMachineServiceImpl.adjustmentMachine(adjustmentMachineVo);
+        }else if(PlatformType.SSPOS.code.equals(adjustmentMachineVo.getPlatformType())){
+            return sPosTermMachineServiceImpl.adjustmentMachine(adjustmentMachineVo);
+        }
+        return AgentResult.fail("未实现的业务");
     }
 
     /**
@@ -106,11 +130,15 @@ public class TermMachineServiceImpl  implements TermMachineService {
         if(PlatformType.whetherPOS(changeActMachine.getPlatformType())){
             AgentResult res =   posTermMachineServiceImpl.changeActMachine(changeActMachine);
             logger.info("pos机具的互动变更接口:{}",res.getMsg());
-            return AgentResult.ok();
+            return res;
         }else if(PlatformType.MPOS.code.equals(changeActMachine.getPlatformType())){
             AgentResult res =   mposTermMachineServiceImpl.changeActMachine(changeActMachine);
             logger.info("mpos机具的互动变更接口:{}",res.getMsg());
-            return AgentResult.ok();
+            return res;
+        }else if(PlatformType.SSPOS.code.equals(changeActMachine.getPlatformType())){
+            AgentResult res =   sPosTermMachineServiceImpl.changeActMachine(changeActMachine);
+            logger.info("mpos机具的互动变更接口:{}",res.getMsg());
+            return res;
         }
         return AgentResult.fail("未知业务平台");
     }

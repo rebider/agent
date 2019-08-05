@@ -149,7 +149,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             logger.info("========用户{}启动数据修改申请{}{}启动部门参数为空",dataChangeId,userId,"审批流启动失败字典中未配置部署流程");
             throw new MessageException("启动部门参数为空!");
         }
-        startPar.put("rs","pass");
+
         String proce = activityService.createDeloyFlow(null,workId,null,null,startPar);
         if(proce==null){
             logger.info("========用户{}启动数据修改申请{}{}",dataChangeId,userId,"数据修改审批，审批流启动失败");
@@ -234,12 +234,12 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
 
                             //首刷平台
                             PlatFormExample platFormExample = new PlatFormExample();
-                            List<String> list = new ArrayList<>();
-                            list.add(PlatformType.MPOS.code);
-                            list.add(PlatformType.RDBPOS.code);
+//                            List<String> list = new ArrayList<>();
+//                            list.add(PlatformType.MPOS.code);
+//                            list.add(PlatformType.RHPOS.code);
                             platFormExample.or()
-                                    .andStatusEqualTo(Status.STATUS_1.status)
-                                    .andPlatformTypeIn(list);
+                            .andStatusEqualTo(Status.STATUS_1.status);
+//                            .andPlatformTypeIn(list);
                             List<PlatForm>  platForms = platFormMapper.selectByExample(platFormExample);
                             List<String> pltcode = new ArrayList<>();
                             pltcode.add("aaaa");

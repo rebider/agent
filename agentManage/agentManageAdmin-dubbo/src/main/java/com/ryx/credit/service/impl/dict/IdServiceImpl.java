@@ -27,6 +27,7 @@ public class IdServiceImpl implements IdService {
 
     private static final SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
     private static final SimpleDateFormat sdf_yyMM=new SimpleDateFormat("yyMM");
+    private static final SimpleDateFormat sdf_MMDD=new SimpleDateFormat("MMdd");
 
     @PostConstruct
     public void init(){
@@ -83,6 +84,16 @@ public class IdServiceImpl implements IdService {
         long seq_id  = dictMapper.sqlId(tablename.name());
         String rund = RandomCharUtil.getRandomNumberChar(2);
         String numId = String.format("ORG%s%02d%05d%02d",data,(userid%100),(seq_id%100000),Integer.valueOf(rund));
+        return numId;
+    }
+
+
+    @Override
+    public String genInternetOffset(){
+        String data = sdf_MMDD.format(Calendar.getInstance().getTime());
+        long seq_id = dictMapper.sqlId(TabId.O_INTERNET_RENEW_OFFSET.name());
+        String rund = RandomCharUtil.getRandomNumberChar(2);
+        String numId = String.format("I%s%05d%02d", data, (seq_id % 100000), Integer.valueOf(rund));
         return numId;
     }
 

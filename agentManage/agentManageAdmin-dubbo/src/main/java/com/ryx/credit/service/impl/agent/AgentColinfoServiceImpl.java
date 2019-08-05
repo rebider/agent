@@ -435,8 +435,8 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
              */
             if (agentColinfo.getCloType().compareTo(new BigDecimal(2)) == 0) { //对私
                 //税点检查
-                if (agentColinfo.getCloTaxPoint() == null || !"0.07".equals(agentColinfo.getCloTaxPoint().toString())) { //对私
-                    throw new ProcessException("对私户进行打款，那么扣税点在代理商填写时默认为0.07且不可修改");
+                if (agentColinfo.getCloTaxPoint() == null || !"0.08".equals(agentColinfo.getCloTaxPoint().toString())) { //对私
+                    throw new ProcessException("对私户进行打款，那么扣税点在代理商填写时默认为0.08且不可修改");
                 }
                 //是否开票检查
                 if (agentColinfo.getCloInvoice().compareTo(new BigDecimal(0)) != 0) { //对私

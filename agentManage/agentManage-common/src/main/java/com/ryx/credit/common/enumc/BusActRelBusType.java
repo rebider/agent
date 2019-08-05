@@ -37,7 +37,8 @@ public enum BusActRelBusType {
     INVOICEAPPLY("/BusActRelBusType/invoiceApply","代理商发票审批"),
     CityApplySupply("/BusActRelBusType/CityApplySupply","省区其他补款申请"),
     thawAgentByCity("/BusActRelBusType/thawAgentByCity","代理商月分润解冻省区申请"),
-    thawAgentByBusiness("/BusActRelBusType/thawAgentByBusiness","代理商月分润解冻业务申请");
+    thawAgentByBusiness("/BusActRelBusType/thawAgentByBusiness","代理商月分润解冻业务申请"),
+    cardRenew("/BusActRelBusType/cardRenew","物联网卡续费申请");
 
 
     public String key;
