@@ -1591,6 +1591,10 @@ public class OrderServiceImpl implements OrderService {
         String batchCode = d.getTime().getTime() + "";
         if (actname.equals("finish_end")) {
             logger.info("代理商订单审批完,审批通过{}",rel.getBusId());
+            rel.setActivStatus(AgStatus.Approved.name());
+            if(busActRelService.updateByPrimaryKey(rel)!=1){
+                throw new MessageException("请重新提交");
+            }
             //订单信息
             OOrder order = orderMapper.selectByPrimaryKey(rel.getBusId());
             if(order.getReviewStatus().compareTo(AgStatus.Approved.status)==0){
@@ -2277,6 +2281,10 @@ public class OrderServiceImpl implements OrderService {
 
         } else if (actname.equals("reject_end")) {
             logger.info("代理商订单审批完审批拒绝{}",rel.getBusId());
+            rel.setActivStatus(AgStatus.Refuse.name());
+            if(busActRelService.updateByPrimaryKey(rel)!=1){
+                throw new MessageException("请重新提交");
+            }
             //订单信息
             OOrder order = orderMapper.selectByPrimaryKey(rel.getBusId());
             OPaymentExample example = new OPaymentExample();
