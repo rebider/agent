@@ -1591,6 +1591,10 @@ public class OrderServiceImpl implements OrderService {
         String batchCode = d.getTime().getTime() + "";
         if (actname.equals("finish_end")) {
             logger.info("代理商订单审批完,审批通过{}",rel.getBusId());
+            rel.setActivStatus(AgStatus.Approved.name());
+            if(busActRelService.updateByPrimaryKey(rel)!=1){
+                throw new MessageException("请重新提交");
+            }
             //订单信息
             OOrder order = orderMapper.selectByPrimaryKey(rel.getBusId());
             if(order.getReviewStatus().compareTo(AgStatus.Approved.status)==0){
@@ -2277,6 +2281,10 @@ public class OrderServiceImpl implements OrderService {
 
         } else if (actname.equals("reject_end")) {
             logger.info("代理商订单审批完审批拒绝{}",rel.getBusId());
+            rel.setActivStatus(AgStatus.Refuse.name());
+            if(busActRelService.updateByPrimaryKey(rel)!=1){
+                throw new MessageException("请重新提交");
+            }
             //订单信息
             OOrder order = orderMapper.selectByPrimaryKey(rel.getBusId());
             OPaymentExample example = new OPaymentExample();
@@ -3176,32 +3184,63 @@ public class OrderServiceImpl implements OrderService {
         List<Dict> dictList = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.SETTLEMENT_TYPE.name());
         List<Dict> capitalType = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.CAPITAL_TYPE.name());
 
-        if (null!=orderoutList  && orderoutList.size()>0){
+        if (null!=orderoutList && orderoutList.size()>0){
             for (OrderoutVo orderoutVo : orderoutList) {
                 if (StringUtils.isNotBlank(orderoutVo.getPayMethod()) && !orderoutVo.getPayMethod().equals("null")) {
                     for (Dict dict : dictList) {
-                        if (null!=dict  &&  orderoutVo.getPayMethod().equals(dict.getdItemvalue())){
+                        if (null!=dict && orderoutVo.getPayMethod().equals(dict.getdItemvalue())) {
                             orderoutVo.setPayMethod(dict.getdItemname());
                             break;
                         }
                     }
                 }
-                if (StringUtils.isNotBlank(orderoutVo.getDeductionType()) && !orderoutVo.getDeductionType().equals("null")){
+                if (StringUtils.isNotBlank(orderoutVo.getDeductionType()) && !orderoutVo.getDeductionType().equals("null")) {
                     for (Dict dict : capitalType) {
-                        if (null!=dict  &&  orderoutVo.getDeductionType().equals(dict.getdItemvalue())){
+                        if (null!=dict && orderoutVo.getDeductionType().equals(dict.getdItemvalue())) {
                             orderoutVo.setDeductionType(dict.getdItemname());
-                            BigDecimal deductionAmount=new BigDecimal(0);
-                            if (null!=orderoutVo.getDeductionAmount()){
-                                deductionAmount= orderoutVo.getDeductionAmount();
+                            BigDecimal deductionAmount = new BigDecimal(0);
+                            if (null!=orderoutVo.getDeductionAmount()) {
+                                deductionAmount = orderoutVo.getDeductionAmount();
                             }
                             orderoutVo.setAmount(orderoutVo.getDeductionType()+":"+orderoutVo.getDeductionAmount());
                             break;
                         }
                     }
                 }
-                if(StringUtils.isNotBlank(orderoutVo.getNuclearUser())){
+                if (StringUtils.isNotBlank(orderoutVo.getMqydkAmt()) && !orderoutVo.getMqydkAmt().equals("null")) {
+                    if (orderoutVo.getPayMethod().equals("首付+分润分期") || orderoutVo.getPayMethod().equals("分润分期")) {
+                        orderoutVo.setMqydkAmt(String.valueOf(BigDecimal.ZERO));
+                    } else if (orderoutVo.getPayMethod().equals("首付+打款分期") || orderoutVo.getPayMethod().equals("付款分期")) {
+                        orderoutVo.setMqykAmt(BigDecimal.ZERO);
+                    }
+                }
+                if (StringUtils.isNotBlank(orderoutVo.getProfitMouth()) && !orderoutVo.getProfitMouth().equals("null")) {
+                    if (orderoutVo.getProfitMouth().equals("1")) {
+                        orderoutVo.setProfitMouth("是");
+                    } else if (orderoutVo.getProfitMouth().equals("0")) {
+                        orderoutVo.setProfitMouth("否");
+                    }
+                }
+                if (StringUtils.isNotBlank(orderoutVo.getProfitForm()) && !orderoutVo.getProfitForm().equals("null")) {
+                    String valueProfit = "";
+                    String[] profitForm = orderoutVo.getProfitForm().split(",");
+                    for (String item : profitForm) {
+                        String profitFormValue = ProfitForm.getContentByValue(new BigDecimal(item));
+                        StringBuffer buffer = new StringBuffer();
+                        StringBuffer appendStr = buffer.append(profitFormValue);
+                        if (null != appendStr) {
+                            if ("".equals(valueProfit)) {
+                                valueProfit = String.valueOf(appendStr);
+                            } else {
+                                valueProfit += "," + appendStr;
+                            }
+                            orderoutVo.setProfitForm(String.valueOf(valueProfit));
+                        }
+                    }
+                }
+                if (StringUtils.isNotBlank(orderoutVo.getNuclearUser())) {
                     CUser cUser = iUserService.selectById(orderoutVo.getNuclearUser());
-                    if(null!=cUser)
+                    if(null != cUser)
                     orderoutVo.setNuclearUser(cUser.getName());
                 }
                 if (StringUtils.isNotBlank(orderoutVo.getReviewStatus()) && !orderoutVo.getReviewStatus().equals("null")) {
@@ -3252,6 +3291,37 @@ public class OrderServiceImpl implements OrderService {
                             }
                             orderoutVo.setAmount(orderoutVo.getDeductionType()+":"+orderoutVo.getDeductionAmount());
                             break;
+                        }
+                    }
+                }
+                if (StringUtils.isNotBlank(orderoutVo.getMqydkAmt()) && !orderoutVo.getMqydkAmt().equals("null")) {
+                    if (orderoutVo.getPayMethod().equals("首付+分润分期") || orderoutVo.getPayMethod().equals("分润分期")) {
+                        orderoutVo.setMqydkAmt(String.valueOf(BigDecimal.ZERO));
+                    } else if (orderoutVo.getPayMethod().equals("首付+打款分期") || orderoutVo.getPayMethod().equals("付款分期")) {
+                        orderoutVo.setMqykAmt(BigDecimal.ZERO);
+                    }
+                }
+                if (StringUtils.isNotBlank(orderoutVo.getProfitMouth()) && !orderoutVo.getProfitMouth().equals("null")) {
+                    if (orderoutVo.getProfitMouth().equals("1")) {
+                        orderoutVo.setProfitMouth("是");
+                    } else if (orderoutVo.getProfitMouth().equals("0")) {
+                        orderoutVo.setProfitMouth("否");
+                    }
+                }
+                if (StringUtils.isNotBlank(orderoutVo.getProfitForm()) && !orderoutVo.getProfitForm().equals("null")) {
+                    String valueProfit = "";
+                    String[] profitForm = orderoutVo.getProfitForm().split(",");
+                    for (String item : profitForm) {
+                        String profitFormValue = ProfitForm.getContentByValue(new BigDecimal(item));
+                        StringBuffer buffer = new StringBuffer();
+                        StringBuffer appendStr = buffer.append(profitFormValue);
+                        if (null != appendStr) {
+                            if ("".equals(valueProfit)) {
+                                valueProfit = String.valueOf(appendStr);
+                            } else {
+                                valueProfit += "," + appendStr;
+                            }
+                            orderoutVo.setProfitForm(String.valueOf(valueProfit));
                         }
                     }
                 }

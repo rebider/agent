@@ -266,4 +266,25 @@
     </if>
     order by data.c_time desc
   </select>
+
+  <!--   导出-->
+  <select id="exportDcColinfo" parameterType="map" resultType="map">
+    select data.ID,data.DATA_ID,data.DATA_TYPE,
+    data.C_TIME,data.C_UPDATE,data.APPY_STATUS,data.C_USER,
+    agent.ag_name from DATA_CHANGE_REQUEST data , A_AGENT agent
+    where data.DATA_ID=agent.id and data.status=1 and agent.status=1
+    <if test="map.appyStatus != null and map.appyStatus != '' " >
+      and data.APPY_STATUS = #{map.appyStatus}
+    </if>
+    <if test="map.dataType != null and map.dataType != '' " >
+      and data.DATA_TYPE = #{map.dataType}
+    </if>
+    <if test="map.agName != null and map.agName != '' " >
+      and agent.AG_NAME = #{map.agName}
+    </if>
+    <if test="map.cUser != null and map.cUser != '' " >
+      and data.c_user  = #{map.cUser}
+    </if>
+    order by data.c_time desc
+  </select>
 </mapper>

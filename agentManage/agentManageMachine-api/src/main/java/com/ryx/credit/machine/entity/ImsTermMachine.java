@@ -44,6 +44,13 @@ public class ImsTermMachine implements Serializable{
 
     private String backType;
 
+    private String activityName;
+
+    private BigDecimal returnDeposit;
+
+    private String isNewMachine;
+
+
     public String getMachineId() {
         return machineId;
     }
@@ -193,7 +200,7 @@ public class ImsTermMachine implements Serializable{
     }
 
     public void setMachineType(String machineType) {
-        this.machineType = machineType;
+        this.machineType = machineType == null ? null : machineType.trim();
     }
 
     public String getBackType() {
@@ -201,6 +208,30 @@ public class ImsTermMachine implements Serializable{
     }
 
     public void setBackType(String backType) {
-        this.backType = backType;
+        this.backType = backType == null ? null : backType.trim();
+    }
+
+    public String getActivityName() {
+        return activityName;
+    }
+
+    public void setActivityName(String activityName) {
+        this.activityName = activityName;
+    }
+
+    public BigDecimal getReturnDeposit() {
+        return returnDeposit;
+    }
+
+    public void setReturnDeposit(BigDecimal returnDeposit) {
+        this.returnDeposit = returnDeposit;
+    }
+
+    public String getIsNewMachine() {
+        return isNewMachine;
+    }
+
+    public void setIsNewMachine(String isNewMachine) {
+        this.isNewMachine = isNewMachine;
     }
 }
