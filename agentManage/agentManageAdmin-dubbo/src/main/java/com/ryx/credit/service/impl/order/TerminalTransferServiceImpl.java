@@ -388,6 +388,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     if(StringUtils.isNotBlank(res) && "1".equals(res)) {
                       agentResult =  termMachineService.queryTerminalTransfer(terminalTransferDetailListsPos,"check");
                     }else{
+                        startTerminalTransferActivity(terminalTransferId, cuser, agentId, true);
                         return AgentResult.ok();
                     }
                    if(agentResult.isOK()){
