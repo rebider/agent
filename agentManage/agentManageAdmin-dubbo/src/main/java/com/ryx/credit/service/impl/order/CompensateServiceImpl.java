@@ -497,6 +497,9 @@ public class CompensateServiceImpl implements CompensateService {
         }else{
             workId = dictOptionsService.getApproveVersion("compensation");
         }
+        if(startPar.get("party").toString().equals("beijing")) {
+            startPar.put("rs", ApprovalType.PASS.getValue());
+        }
         //启动审批
         String proce = activityService.createDeloyFlow(null, workId, null, null, startPar);
         if (proce == null) {

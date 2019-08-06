@@ -1333,7 +1333,9 @@ public class OrderServiceImpl implements OrderService {
         }else {
             workId = dictOptionsService.getApproveVersion("orderCity");
         }
-
+        if(startPar.get("party").toString().equals("beijing")) {
+            startPar.put("rs", ApprovalType.PASS.getValue());
+        }
         //订单启动流程
         if(StringUtils.isBlank(workId)){
             logger.info("========用户{}{}订单启动流程未找到", cuser, workId);
