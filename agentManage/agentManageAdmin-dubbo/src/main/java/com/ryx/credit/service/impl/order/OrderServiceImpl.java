@@ -1221,6 +1221,16 @@ public class OrderServiceImpl implements OrderService {
         List<PayComp> comp = apaycompService.recCompList();
         f.putKeyV("comp", comp);
 
+        //根据商品id、实际单价查询可变更的活动数据
+        OSubOrder oSubOrder = oSubOrders.get(0);
+        OActivityExample oActivityExample = new OActivityExample();
+        oActivityExample.or()
+                .andStatusEqualTo(Status.STATUS_1.status)
+                .andProductIdEqualTo(oSubOrder.getProId())
+                .andPriceEqualTo(oSubOrder.getProRelPrice());
+        List<OActivity> oActivityList = oActivityMapper.selectByExample(oActivityExample);
+        f.putKeyV("oActivityList", oActivityList);
+
         return AgentResult.ok(f);
     }
 
@@ -3517,6 +3527,102 @@ public class OrderServiceImpl implements OrderService {
         //数据库配货地址同步
         AgentResult sysn = sysnReceiptOrderPorNum(oReceiptPro_db.getReceiptId());
         return sysn;
+    }
+
+    @Override
+    public AgentResult orderChangeActivity(String oNum, String subOrderId, String activityId, String userId) throws Exception {
+        logger.info("用户[{}]变更活动[{}]", userId, JSONObject.toJSONString(oNum));
+        if (StringUtils.isBlank(activityId)) {
+            return AgentResult.fail("请选择变更活动");
+        }
+
+        //查询此订单是否有已发货数据
+        ReceiptPlanExample receiptPlanExample = new ReceiptPlanExample();
+        receiptPlanExample.or()
+                .andStatusEqualTo(Status.STATUS_1.status)
+                .andPlanOrderStatusEqualTo(new BigDecimal(PlannerStatus.YesDeliver.getValue()))
+                .andOrderIdEqualTo(oNum);
+        List<ReceiptPlan> receiptPlanList = receiptPlanMapper.selectByExample(receiptPlanExample);
+        if (receiptPlanList.size()!=0 && receiptPlanList!=null) {
+            logger.info("用户{}变更活动{}，已有正在发货的商品，不允许变更活动", userId, oNum);
+            return AgentResult.fail("已有正在发货的商品，不允许变更活动");
+        }
+
+        //变更活动，更新采购单、采购活动数据
+        if (StringUtils.isNotBlank(subOrderId)) {
+            //商品活动数据
+            OActivityExample oActivityExample = new OActivityExample();
+            oActivityExample.createCriteria()
+                    .andStatusEqualTo(Status.STATUS_1.status)
+                    .andIdEqualTo(activityId);
+            List<OActivity> oActivityList = oActivityMapper.selectByExample(oActivityExample);
+            OActivity oActivity = oActivityList.get(0);
+            //判断条件限制
+            OSubOrderExample oSubOrderExample = new OSubOrderExample();
+            oSubOrderExample.createCriteria()
+                    .andStatusEqualTo(Status.STATUS_1.status)
+                    .andIdEqualTo(subOrderId);
+            List<OSubOrder> oSubOrderList = oSubOrderMapper.selectByExample(oSubOrderExample);
+            OSubOrder subOrder = oSubOrderList.get(0);
+            if (subOrder != null) {
+                if (!subOrder.getProId().equals(oActivity.getProductId())) {
+                    logger.info("用户{}变更活动{}，变更活动商品ID与原活动商品ID不一致", userId, oNum);
+                    return AgentResult.fail("活动变更失败，变更活动商品ID与原活动商品ID不一致");
+                }
+                if (!subOrder.getProRelPrice().equals(oActivity.getPrice())) {
+                    logger.info("用户{}变更活动{}，变更活动商品价格与原活动商品价格不一致", userId, oNum);
+                    return AgentResult.fail("活动变更失败，变更活动商品价格与原活动商品价格不一致");
+                }
+                OProduct product = oProductMapper.selectByPrimaryKey(subOrder.getProId());
+                //采购单数据
+                subOrder.setProCode(product.getProCode());
+                subOrder.setProName(product.getProName());
+                subOrder.setProType(product.getProType());
+                subOrder.setModel(product.getProModel());
+                subOrder.setuUser(userId);
+                subOrder.setuTime(new Date());
+                int updateOSubOrder = oSubOrderMapper.updateByPrimaryKeySelective(subOrder);
+                if (updateOSubOrder != 1) {
+                    logger.info("活动变更:{}", "OSubOrder-更新失败");
+                    throw new MessageException("活动变更失败");
+                }
+
+                //采购活动数据
+                OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
+                oSubOrderActivityExample.createCriteria()
+                        .andStatusEqualTo(Status.STATUS_1.status)
+                        .andSubOrderIdEqualTo(subOrderId);
+                List<OSubOrderActivity> oSubOrderActivityList = oSubOrderActivityMapper.selectByExample(oSubOrderActivityExample);
+                OSubOrderActivity subOrderActivity = oSubOrderActivityList.get(0);
+                subOrderActivity.setActivityId(oActivity.getId());
+                subOrderActivity.setActivityName(oActivity.getActivityName());
+                subOrderActivity.setRuleId(oActivity.getRuleId());
+                subOrderActivity.setProName(subOrder.getProName());
+                subOrderActivity.setActivityRule(oActivity.getActivityRule());
+                subOrderActivity.setActivityWay(oActivity.getActivityWay());
+                subOrderActivity.setProModel(oActivity.getProModel());
+                subOrderActivity.setVender(oActivity.getVender());
+                subOrderActivity.setPlatform(oActivity.getPlatform());
+                subOrderActivity.setBusProCode(oActivity.getBusProCode());
+                subOrderActivity.setBusProName(oActivity.getBusProName());
+                subOrderActivity.setTermBatchcode(oActivity.getTermBatchcode());
+                subOrderActivity.setTermBatchname(oActivity.getTermBatchname());
+                subOrderActivity.setTermtype(oActivity.getTermtype());
+                subOrderActivity.setPosSpePrice(oActivity.getPosSpePrice());
+                subOrderActivity.setPosType(oActivity.getPosType());
+                subOrderActivity.setStandTime(oActivity.getStandTime());
+                subOrderActivity.setStandAmt(oActivity.getStandAmt());
+                subOrderActivity.setBackType(oActivity.getBackType());
+                subOrderActivity.setuUser(userId);
+                subOrderActivity.setuTime(new Date());
+                int updateOSubOrderActivity = oSubOrderActivityMapper.updateByPrimaryKeySelective(subOrderActivity);
+                if (updateOSubOrderActivity != 1) {
+                    logger.info("活动变更:{}", "OSubOrderActivity-更新失败");
+                    throw new MessageException("活动变更失败");
+                }
+            }
+        }
+        return AgentResult.ok(oNum);
     }
 
 }
