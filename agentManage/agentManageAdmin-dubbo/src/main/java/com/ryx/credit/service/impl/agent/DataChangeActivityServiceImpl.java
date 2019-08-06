@@ -63,6 +63,8 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     @Autowired
     private AgentMapper agentMapper;
     @Autowired
+    private AgentColinfoMapper agentColinfoMapper;
+    @Autowired
     private AgentQueryService agentQueryService;
     @Autowired
     private IUserService iUserService;
@@ -76,6 +78,8 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     private DataChangeActivityService dataChangeActivityService;
     @Autowired
     private AgentNetInNotityService agentNetInNotityService;
+    @Autowired
+    private AgentDataHistoryService agentDataHistoryService;
 
 
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
@@ -221,6 +225,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                     if(DataChangeApyType.DC_Colinfo.name().equals(dr.getDataType())) {
                         //更新入库
                         AgentVo vo = JSONObject.parseObject(dr.getDataContent(), AgentVo.class);
+                        vo.getAgent().setcUser(rel.getcUser());     //直接新增收款账户时 此字段不可为空
                         ResultVO res = agentColinfoService.updateAgentColinfoVo(vo.getColinfoVoList(), vo.getAgent(),rel.getcUser(),null);
                         logger.info("========审批流完成{}业务{}状态{},结果{}", proIns, rel.getBusType(), agStatus, res.getResInfo());
                         //更新数据状态为审批成功
@@ -251,6 +256,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             agentBusInfoExample.or()
                                     .andStatusEqualTo(Status.STATUS_1.status)
                                     .andBusPlatformIn(pltcode)
+                                    .andCloReviewStatusEqualTo(AgStatus.Approved.status)
                                     .andAgentIdEqualTo(vo.getAgent().getId());
                             List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
 
@@ -260,24 +266,74 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             List<AgentColinfoVo> voColinfoVoList = vo.getColinfoVoList();
                             List<AgentColinfoVo> preVoColinfoVoList = preVo.getColinfoVoList();
                             Agent voAgent = vo.getAgent();
+                            logger.info("===============================更新代理商基础信息开始");
+                            Agent db_agent = agentMapper.selectByPrimaryKey(voAgent.getId());
+                            db_agent.setAgName(voAgent.getAgName());
+                            db_agent.setAgNature(voAgent.getAgNature());
+                            db_agent.setAgCapital(voAgent.getAgCapital());
+                            db_agent.setAgBusLic(voAgent.getAgBusLic());
+                            db_agent.setAgBusLicb(voAgent.getAgBusLicb());
+                            db_agent.setAgBusLice(voAgent.getAgBusLice());
+                            db_agent.setAgLegal(voAgent.getAgLegal());
+                            db_agent.setAgLegalCertype(voAgent.getAgLegalCertype());
+                            db_agent.setAgLegalCernum(voAgent.getAgLegalCernum());
+                            db_agent.setAgLegalMobile(voAgent.getAgLegalMobile());
+                            db_agent.setAgHead(voAgent.getAgHead());
+                            db_agent.setAgHeadMobile(voAgent.getAgHeadMobile());
+                            db_agent.setAgRegAdd(voAgent.getAgRegAdd());
+                            db_agent.setAgBusScope(voAgent.getAgBusScope());
+                            db_agent.setCloTaxPoint(voAgent.getCloTaxPoint());
+                            db_agent.setAgDocPro(voAgent.getAgDocPro());
+                            db_agent.setAgDocDistrict(voAgent.getAgDocDistrict());
+                            db_agent.setAgRemark(voAgent.getAgRemark());
+                            db_agent.setStatus(voAgent.getStatus());
+                            db_agent.setAgRegArea(voAgent.getAgRegArea());
+                            db_agent.setBusRiskEmail(voAgent.getBusRiskEmail());
+                            db_agent.setBusContactEmail(voAgent.getBusContactEmail());
+                            if (1 != agentMapper.updateByPrimaryKeySelective(db_agent)) {
+                                throw new ProcessException("代理商信息更新失败");
+                            }else{
+                                //保存数据历史
+                                if(!agentDataHistoryService.saveDataHistory(db_agent,db_agent.getId(), DataHistoryType.BASICS.code,rel.getcUser(),voAgent.getVersion()).isOK()){
+                                    throw new ProcessException("代理商信息更新失败！请重试");
+                                }
+                            }
+                            logger.info("===============================更新代理商基础信息成功");
+
+
                             Agent preVoAgent = preVo.getAgent();
 
                             if (voColinfoVoList.size()>0){
-                                if (voColinfoVoList.size() != preVoColinfoVoList.size()){
+                                if (voColinfoVoList.size() != preVoColinfoVoList.size()){       //新增收款账户
                                     //一分钱验证、同步至业务系统
 
                                     logger.info("========================一分钱验证状态修改开始");
-                                    for (AgentColinfo agentColinfo:voColinfoVoList){
+                                    for (AgentColinfoVo agentColinfo:voColinfoVoList){
                                         agentColinfo.setPayStatus(ColinfoPayStatus.A.getValue());
                                     }
                                     agentColinfoService.updateAgentColinfoVo(voColinfoVoList, vo.getAgent(),rel.getcUser(),null);
                                     logger.info("========================一分钱验证状态修改完成");
 
-                                    logger.info("========================同步至业务系统开始");
+                                    /*logger.info("========================同步至业务系统开始");
                                     for (AgentBusInfo agentBusInfo : agentBusInfoList) {
                                         agentNetInNotityService.asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
                                     }
-                                    logger.info("========================同步至业务系统完成");
+                                    logger.info("========================同步至业务系统完成");*/
+
+                                    //建立收款账户和平台码的关系
+                                    AgentColinfo agentColinfoVo=voColinfoVoList.get(0);
+
+
+                                    for (AgentBusInfo agentBusInfo : agentBusInfoList) {        //为业务平台建立练习
+                                        AgentColinfoRel agentColinfoRel = new AgentColinfoRel();
+                                        agentColinfoRel.setcUse(rel.getcUser());
+                                        agentColinfoRel.setAgentid(voAgent.getId());
+                                        agentColinfoRel.setAgentColinfoid(agentColinfoVo.getId());
+                                        agentColinfoRel.setBusPlatform(agentBusInfo.getBusPlatform());
+                                        agentColinfoRel.setAgentbusid(agentBusInfo.getId());
+
+                                        agentColinfoService.saveAgentColinfoRel(agentColinfoRel, rel.getcUser());
+                                    }
 
                                 }else{
                                     boolean synTemp=true;
@@ -293,33 +349,27 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                         if (!checkTemp){
                                             //一分钱验证、同步至业务系统
                                             logger.info("========================一分钱验证状态修改开始");
-                                            for (AgentColinfo agentColinfo:voColinfoVoList){
+                                            for (AgentColinfoVo agentColinfo:voColinfoVoList){
                                                 agentColinfo.setPayStatus(ColinfoPayStatus.A.getValue());
                                             }
                                             agentColinfoService.updateAgentColinfoVo(voColinfoVoList, vo.getAgent(),rel.getcUser(),null);
                                             logger.info("========================一分钱验证状态修改完成");
 
-                                            logger.info("========================同步至业务系统开始");
+                                            break;
+                                            /*logger.info("========================同步至业务系统开始");
                                             for (AgentBusInfo agentBusInfo : agentBusInfoList) {
                                                 agentNetInNotityService.asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
                                             }
-                                            logger.info("========================同步至业务系统完成");
-                                            break;
-                                        }else if (!synTemp){
-                                            //同步至业务系统
+                                            logger.info("========================同步至业务系统完成");*/
+                                        }/*else if (!synTemp){//同步至业务系统
                                             for (AgentBusInfo agentBusInfo : agentBusInfoList) {
                                                 agentNetInNotityService.asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
                                             }
                                             break;
-                                        }
+                                        }*/
                                     }
                                 }
                             }
-
-
-
-
-
                         }
                         //代理商新修改
                     }else if(DataChangeApyType.DC_Agent.name().equals(dr.getDataType())){
