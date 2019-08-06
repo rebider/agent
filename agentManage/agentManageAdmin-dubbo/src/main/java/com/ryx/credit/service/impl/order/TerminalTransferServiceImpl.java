@@ -216,8 +216,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         if (null != terminalTransferDetail.getAdjustStatus()) {
             reqMap.put("adjustStatus", terminalTransferDetail.getAdjustStatus());
         }
-        if (null != terminalTransferDetail.getAgName()) {
-            reqMap.put("getAgName", terminalTransferDetail.getAgName());
+        if (StringUtils.isNotBlank(terminalTransferDetail.getAgName())) {
+            reqMap.put("agName", terminalTransferDetail.getAgName());
         }
 
         if (StringUtils.isNotBlank(terminalTransferDetail.getGoalOrgId())) {
@@ -886,6 +886,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                            if(StringUtils.isNotBlank(res) && "1".equals(res)) {
                                agentResult = termMachineService.queryTerminalTransferResult(terminalTransferDetail.getId(), terminalTransferDetail.getPlatformType().toString());
                            }else{
+                               log.info("---------------------------------未打开开关--------------------------------------");
                                agentResult = AgentResult.fail();
                                agentResult.setMsg(JSONObject.toJSONString(FastMap.fastMap("data",
                                        FastMap.fastMap("result_code","000000"))
@@ -895,7 +896,6 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                            }
 
                    }else{
-                       log.info("---------------------------------未打开开关--------------------------------------");
                        continue;
                    }
 
