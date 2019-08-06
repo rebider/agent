@@ -1187,6 +1187,7 @@ public class OrderServiceImpl implements OrderService {
                     }
                 }
             }
+            List<Object> oActivityLists = new ArrayList<>();
             for (OSubOrder oSubOrder : oSubOrders) {
                 //根据商品id、实际单价查询可变更的活动数据
                 OActivityExample oActivityExample = new OActivityExample();
@@ -1195,8 +1196,9 @@ public class OrderServiceImpl implements OrderService {
                         .andProductIdEqualTo(oSubOrder.getProId())
                         .andPriceEqualTo(oSubOrder.getProRelPrice());
                 List<OActivity> oActivityList = oActivityMapper.selectByExample(oActivityExample);
-                f.putKeyV("oActivityList", oActivityList);
+                oActivityLists.add(oActivityList);
             }
+            f.putKeyV("oActivityLists", oActivityLists);
         }
         //配货信息
         OReceiptOrderExample oReceiptOrderExample = new OReceiptOrderExample();
