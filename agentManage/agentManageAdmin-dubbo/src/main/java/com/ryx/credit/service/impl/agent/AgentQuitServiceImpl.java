@@ -101,6 +101,8 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
     private BusiPlatService busiPlatService;
     @Autowired
     private AgentQueryService agentQueryService;
+    @Autowired
+    private AgentService agentService;
 
     /**
      * 退出列表
@@ -540,10 +542,10 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         //不同的业务类型找到不同的启动流程
         String workId;
         //根据不同的部门信息启动不同的流程
-        if(party.equals("beijing") || party.equals("north") || party.equals("south")) {
-            workId = dictOptionsService.getApproveVersion("quitCity");
-        }else{
+        if(agentService.isAgent(cUser).isOK()){
             workId = dictOptionsService.getApproveVersion("quitAgent");
+        }else{
+            workId = dictOptionsService.getApproveVersion("quitCity");
         }
         //启动审批
         String proce = activityService.createDeloyFlow(null, workId, null, null, startPar);
