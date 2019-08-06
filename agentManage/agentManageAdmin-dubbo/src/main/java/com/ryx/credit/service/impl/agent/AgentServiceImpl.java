@@ -45,12 +45,9 @@ import java.util.regex.Pattern;
 @Service("agentService")
 public class AgentServiceImpl implements AgentService {
 
-    private static Logger logger = LoggerFactory.getLogger(AgentServiceImpl.class);
-
-    private final String JURIS_DICTION = AppConfig.getProperty("region_jurisdiction");
-
     private static final String permission_key="AGENT_LIST_PLATFORM_";
-
+    private static Logger logger = LoggerFactory.getLogger(AgentServiceImpl.class);
+    private final String JURIS_DICTION = AppConfig.getProperty("region_jurisdiction");
     @Autowired
     private AttachmentRelMapper attachmentRelMapper;
     @Autowired
@@ -85,7 +82,8 @@ public class AgentServiceImpl implements AgentService {
     private CUserRoleMapper cUserRoleMapper;
     @Autowired
     private IResourceService iResourceService;
-
+    @Autowired
+    private COrganizationMapper organizationMapper;
 
     /**
      * 查询代理商信息
@@ -128,9 +126,6 @@ public class AgentServiceImpl implements AgentService {
         page.setTotal(count);
         return page;
     }
-
-    @Autowired
-    private COrganizationMapper organizationMapper;
 
     /**
      * 省区大区查询
@@ -579,8 +574,7 @@ public class AgentServiceImpl implements AgentService {
         String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
         Map<String,Object> reqMap = new HashMap<>();
         //省区大区查看自己的代理商 部门权限
-        if(StringUtils.isNotEmpty(organizationCode) &&
-                (organizationCode.contains("north") || organizationCode.contains("south") || organizationCode.contains("beijing")  || organizationCode.contains("city"))) {
+        if(StringUtils.isNotEmpty(organizationCode) && organizationCode.contains("region")) {
             reqMap.put("organizationCode", organizationCode);
         }
 

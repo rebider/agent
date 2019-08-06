@@ -517,8 +517,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             logger.info("========用户{}{}启动部门参数为空", agentId, cuser);
             throw new ProcessException("启动部门参数为空!");
         }
-        startPar.put("rs",ApprovalType.PASS.getValue());
-
+        if(startPar.get("party").toString().equals("beijing")) {
+            startPar.put("rs", ApprovalType.PASS.getValue());
+        }
         //启动审批
         String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("net"), null, null, startPar);
         if (proce == null) {
@@ -630,7 +631,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             logger.info("========用户{}{}启动部门参数为空", busid, cuser);
             throw new MessageException("启动部门参数为空!");
         }
-        startPar.put("rs",ApprovalType.PASS.getValue());
+        if(startPar.get("party").toString().equals("beijing")) {
+            startPar.put("rs", ApprovalType.PASS.getValue());
+        }
         //启动审批
         String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("net"), null, null, startPar);
         if (proce == null) {
