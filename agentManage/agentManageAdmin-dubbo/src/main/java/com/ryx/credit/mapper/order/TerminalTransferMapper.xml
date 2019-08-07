@@ -277,10 +277,10 @@
       )
   </select>
 
-  <select id="getAgentType" parameterType="java.lang.String" resultType="java.lang.String">
-    select  BUS_TYPE from a_agent_businfo
+  <select id="getAgentType" parameterType="java.lang.String" resultType="java.util.Map">
+    select  * from a_agent_businfo
     <where>
-    bus_num = #{busNum}  and ROWNUM = 1
+    bus_num = #{busNum} and  STATUS=1  and ROWNUM = 1
     </where>
   </select>
 <select id="getSN"  resultType="java.util.Map">
@@ -299,5 +299,20 @@ select distinct nvl(BUS_NUM, '-') BUS_NUM
               (select COUNT(*) from A_AGENT_BUSINFO  start with AGENT_ID = #{AGENT_ID} CONNECT BY PRIOR BUS_PARENT= id))
                CONNECT BY PRIOR ID = BUS_PARENT
 </select>
+
+  <select id="querySubBusNumTopAgent" resultType="java.util.Map" parameterType="java.lang.String">
+     select * from (
+     select * from A_AGENT_BUSINFO a  start with a.bus_num=#{bus_num}  CONNECT BY PRIOR BUS_PARENT = ID )
+      where Bus_PARENT is null
+
+  </select>
+  <select id="querySubBusNumTopAgentAll" resultType="java.util.Map" parameterType="java.lang.String">
+     select * from A_AGENT_BUSINFO a  start with a.bus_num=#{bus_num}  CONNECT BY PRIOR BUS_PARENT = ID
+  </select>
+
+  <select id="querySubBusNumAgent" resultType="java.util.Map" parameterType="java.lang.String">
+     select * from A_AGENT_BUSINFO a  where a.bus_num=#{bus_num}
+  </select>
+
 
 </mapper>
