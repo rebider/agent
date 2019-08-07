@@ -794,4 +794,20 @@
     select CLO_REALNAME from A_agent_colinfo where AGENT_ID= #{id}
   </select>
 
+  <select id="getSumInvoice" resultType="java.math.BigDecimal">
+    select sum(SUM_AMT) from P_INVOICE_APPLY
+      where  YS_RESULT = '1' and STATUS = '0'
+             and INVOICE_COMPANY = #{invoiceCompany} and AGENT_ID = #{agentId}
+             and substr(YS_DATE,0,7) = #{month}
+  </select>
+
+  <select id="getOwnInvoice" resultType="java.math.BigDecimal">
+    select OWN_INVOICE from P_INVOICE_SUM
+     where PROFIT_MONTH = #{month} and AGENT_ID = #{agentId} and INVOICE_COMPANY = #{invoiceCompany}
+  </select>
+
+  <select id="getAgentTaxByAgentId" parameterType="java.lang.String" resultType="java.math.BigDecimal">
+    select CLO_TAX_POINT from A_AGENT_COLINFO where STATUS = 1 and AGENT_ID = #{agentId}
+  </select>
+
 </mapper>
