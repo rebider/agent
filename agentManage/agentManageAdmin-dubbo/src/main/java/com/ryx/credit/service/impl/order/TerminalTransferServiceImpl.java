@@ -275,14 +275,33 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             }
             List<Map<String,Object>> stringList = terminalTransferMapper.querySubBusNum(agentId);
             for (TerminalTransferDetail terminalTransferDetail:terminalTransferDetailList) {
+
+                /*Map<String,Object> querySubBusNumTopAgent1 = terminalTransferMapper.querySubBusNumTopAgent(terminalTransferDetail.getOriginalOrgId());
+                Map<String,Object> querySubBusNumTopAgent2 = terminalTransferMapper.querySubBusNumTopAgent(terminalTransferDetail.getGoalOrgId());
+                if(!querySubBusNumTopAgent1.get("AGENT_ID").toString().equals(querySubBusNumTopAgent2.get("AGENT_ID").toString())){
+                    log.info("您本次提交的代理商没有共同上级");
+                    throw new MessageException("您本次提交的代理商没有共同上级");
+                }
+                Map<String,Object> querySubBusNumTopAgent3 = terminalTransferMapper.querySubBusNumAgent(terminalTransferDetail.getOriginalOrgId());
+                if(querySubBusNumTopAgent3.get("AGENT_ID").toString().equals(agentId)){
+                    continue;
+                }else{
+                    if(querySubBusNumTopAgent3.get("AGENT_ID").toString().equals(querySubBusNumTopAgent1.get("AGENT_ID").toString())){
+                        continue;
+                    }
+
+
+                }*/
+                List<Map<String,Object>>  maps=terminalTransferMapper.querySubBusNumTopAgentAll(terminalTransferDetail.getOriginalOrgId());
                 int number =0;
-                String goalOrgId= terminalTransferDetail.getGoalOrgId();
-                String originalOrgId=terminalTransferDetail.getOriginalOrgId();
-                for (Map<String,Object> map:stringList) {
-                    if(goalOrgId.equals(map.get("BUS_NUM").toString())){
+                for (Map<String,Object> map:maps) {
+                    if(map.get("AGENT_ID").toString().equals(agentId)){
                         number++;
                     }
-                    if(originalOrgId.equals(map.get("BUS_NUM").toString())){
+                }
+                List<Map<String,Object>>  maps2=terminalTransferMapper.querySubBusNumTopAgentAll(terminalTransferDetail.getGoalOrgId());
+                for (Map<String,Object> map:maps2) {
+                    if(map.get("AGENT_ID").toString().equals(agentId)){
                         number++;
                     }
                 }
@@ -463,6 +482,21 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                    }
                 }
                 if(terminalTransferDetailListsMpos!=null && terminalTransferDetailListsMpos.size()>0){
+                    for (TerminalTransferDetail terminalTransferDetail:terminalTransferDetailListsMpos) {
+                        String originalOrgId=terminalTransferDetail.getOriginalOrgId();
+                        String goalOrgId= terminalTransferDetail.getGoalOrgId();
+                        Map<String,Object> map1 = getAgentType(originalOrgId);
+                        Map<String,Object> map2 = getAgentType(goalOrgId);
+                       /* if(!(map1.get("BUS_PLATFORM").toString()).equals(map2.get("BUS_PLATFORM").toString())){
+                            log.info("不能跨平台划拨：原："+originalOrgId+"目标："+goalOrgId);
+                            throw new MessageException("不能跨平台划拨：原："+originalOrgId+"目标："+goalOrgId);
+                        }*/
+
+
+
+                    }
+
+
                    AgentResult agentResult =  termMachineService.queryTerminalTransfer(terminalTransferDetailListsMpos,"check");
                     if(agentResult.isOK()){
                     }else{
@@ -1259,7 +1293,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
      * @Author: chen_Liang
      * @Date: 2019/7/25
      */
-    public String getAgentType(String orgId) {
+    public Map<String, Object>  getAgentType(String orgId) {
 
         return terminalTransferMapper.getAgentType(orgId);
 
