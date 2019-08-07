@@ -497,7 +497,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
      * @return
      */
 
-    private Map<String, Object> disposeSN(String snBeginNum, String snEndNum) {
+    public Map<String, Object> disposeSN(String snBeginNum, String snEndNum) {
         Map<String, Object> map = new HashMap<>();
         String[] snBeginNumChar = snBeginNum.split("");
         String[] snEndNumChar = snEndNum.split("");
