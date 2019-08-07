@@ -203,16 +203,19 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 	public AgentBusInfo getById(String id){
 		AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(id);
-		PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
-		if(null!=platForm){
-			agentBusInfo.setBusPlatformType(platForm.getPlatformType());
+		if (null!=agentBusInfo){
+			PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
+			if(null!=platForm){
+				agentBusInfo.setBusPlatformType(platForm.getPlatformType());
+			}
+			Map<String,Object> parentInfo = agentBusInfoMapper.queryBusInfoParent(FastMap.fastMap("id",agentBusInfo.getId()));
+			agentBusInfo.setParentInfo(parentInfo);
+			if(agentBusInfo!=null)
+				//查询业务关联账户
+				agentBusInfo.setAgentColinfoList(agentColinfoMapper.queryBusConinfoList(agentBusInfo.getId()));
+			return agentBusInfo;
 		}
-		Map<String,Object> parentInfo = agentBusInfoMapper.queryBusInfoParent(FastMap.fastMap("id",agentBusInfo.getId()));
-		agentBusInfo.setParentInfo(parentInfo);
-		if(agentBusInfo!=null)
-		//查询业务关联账户
-		agentBusInfo.setAgentColinfoList(agentColinfoMapper.queryBusConinfoList(agentBusInfo.getId()));
-		return agentBusInfo;
+		return new AgentBusInfo();
 	}
 
 	@Override
