@@ -63,6 +63,36 @@ public class TerminalTransferDetail implements Serializable{
 
     private String buttJointPersonName;
 
+    private BigDecimal comSnNum;
+
+    private String goalType;
+
+    private String originalType;
+
+    public BigDecimal getComSnNum() {
+        return comSnNum;
+    }
+
+    public void setComSnNum(BigDecimal comSnNum) {
+        this.comSnNum = comSnNum;
+    }
+
+    public String getGoalType() {
+        return goalType;
+    }
+
+    public void setGoalType(String goalType) {
+        this.goalType = goalType;
+    }
+
+    public String getOriginalType() {
+        return originalType;
+    }
+
+    public void setOriginalType(String originalType) {
+        this.originalType = originalType;
+    }
+
     public String getButtJointPersonName() {
         return buttJointPersonName;
     }
