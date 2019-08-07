@@ -288,7 +288,16 @@
   select ID from O_TERMINAL_TRANSFER where REVIEW_STATUS ='02' )
 </select>
   <select id="querySubBusNum" parameterType="java.lang.String" resultType="java.util.Map">
-    select  distinct nvl(BUS_NUM ,'-') BUS_NUM from A_AGENT_BUSINFO start with AGENT_ID=#{AGENT_ID} CONNECT BY PRIOR  ID = BUS_PARENT
-  </select>
+
+select distinct nvl(BUS_NUM, '-') BUS_NUM
+               from A_AGENT_BUSINFO
+               start with AGENT_ID = (select AGENT_ID from (
+                 SELECT AGENT_ID,ROWNUM as num from (select AGENT_ID
+               from A_AGENT_BUSINFO
+               start with AGENT_ID = #{AGENT_ID}
+               CONNECT BY PRIOR BUS_PARENT = id )) where num =
+              (select COUNT(*) from A_AGENT_BUSINFO  start with AGENT_ID = #{AGENT_ID} CONNECT BY PRIOR BUS_PARENT= id))
+               CONNECT BY PRIOR ID = BUS_PARENT
+</select>
 
 </mapper>

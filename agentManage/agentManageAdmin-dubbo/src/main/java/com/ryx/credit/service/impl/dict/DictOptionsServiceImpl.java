@@ -124,11 +124,11 @@ public class DictOptionsServiceImpl implements DictOptionsService {
     @Override
     public String getApproveVersion(String approveName)throws ProcessException{
         if(EnvironmentUtil.isPreProduction()) {
-            Dict approveMode = findDictByValue(DictGroup.AGENT.name(), DictGroup.APPROVE_MODE.name(), approveName);
+            Dict approveMode = findDictByValue(DictGroup.AGENT.name(), DictGroup.PRE_APPROVE_MODE.name(), approveName);
             if (approveMode == null) {
                 throw new ProcessException("审批流配置获取失败!");
             }
-            return "pre_"+approveMode.getdItemvalue() + "_" + approveMode.getdItemname();
+            return approveMode.getdItemvalue() + "_" + approveMode.getdItemname();
         }else{
             Dict approveMode = findDictByValue(DictGroup.AGENT.name(), DictGroup.APPROVE_MODE.name(), approveName);
             if (approveMode == null) {
