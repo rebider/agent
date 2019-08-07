@@ -94,6 +94,8 @@ public interface AgentQueryService {
 
     List<AgentBusInfo> businessQuery(String agentId,String isZpos,Long userId);
 
+    List<AgentBusInfo> businessQuery(String agentId,String bussinessId,String isZpos,Long userId);
+
 
     List<AgentBusInfo> businessQueryCity(String agentId,String isZpos,Long userId);
 
