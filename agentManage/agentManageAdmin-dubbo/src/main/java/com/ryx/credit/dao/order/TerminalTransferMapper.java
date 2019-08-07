@@ -34,4 +34,6 @@ public interface TerminalTransferMapper {
     String getAgentType(String busNum);
 
     List<Map<String,Object>> getSN();
+
+    List<Map<String,Object>> querySubBusNum(String AGENT_ID);
 }
