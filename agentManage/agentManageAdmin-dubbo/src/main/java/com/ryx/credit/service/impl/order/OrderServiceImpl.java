@@ -1197,6 +1197,22 @@ public class OrderServiceImpl implements OrderService {
                         .andProductIdEqualTo(oSubOrder.getProId())
                         .andPriceEqualTo(oSubOrder.getProRelPrice());
                 List<OActivity> oActivityList = oActivityMapper.selectByExample(oActivityExample);
+                //厂商、机具型号、pos类型
+                for (OActivity oActivity : oActivityList) {
+                    if (null != oActivity.getVender()) {
+                        Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), oActivity.getVender());
+                        if (null != dictByValue)
+                            oActivity.setVender(dictByValue.getdItemname());
+                    }
+                    if (null != oActivity.getProModel()) {
+                        Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.PROMODE.name(), oActivity.getProModel());
+                        if (null != dictByValue)
+                            oActivity.setProModel(dictByValue.getdItemname());
+                    }
+                    if (null != oActivity.getPosType()) {
+                        oActivity.setPosType(PosType.getContentByValue(oActivity.getPosType()));
+                    }
+                }
                 oActivityLists.add(oActivityList);
             }
             f.putKeyV("oActivityLists", oActivityLists);
