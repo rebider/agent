@@ -3652,8 +3652,45 @@ public class OrderServiceImpl implements OrderService {
                     logger.info("活动变更:{}", "OSubOrderActivity-更新失败");
                     throw new MessageException("活动变更失败");
                 }
+
+                //收货单商品
+                OReceiptProExample oReceiptProExample = new OReceiptProExample();
+                oReceiptProExample.createCriteria()
+                        .andStatusEqualTo(Status.STATUS_1.status)
+                        .andOrderidEqualTo(oNum)
+                        .andProIdEqualTo(product.getId())
+                        .andProNameEqualTo(product.getProName());
+                List<OReceiptPro> oReceiptProList = oReceiptProMapper.selectByExample(oReceiptProExample);
+                OReceiptPro oReceiptPro = oReceiptProList.get(0);
+//                oReceiptPro.setProCode(product.getProCode());
+//                oReceiptPro.setProName(product.getProName());
+//                oReceiptPro.setuUser(userId);
+//                oReceiptPro.setuTime(new Date());
+//                int updateOReceiptPro = oReceiptProMapper.updateByPrimaryKeySelective(oReceiptPro);
+//                if (updateOReceiptPro != 1) {
+//                    logger.info("活动变更:{}", "OReceiptPro-更新失败");
+//                    throw new MessageException("活动变更失败");
+//                }
+
+                //排单数据
+                ReceiptPlanExample oReceiptPlanExample = new ReceiptPlanExample();
+                oReceiptPlanExample.or()
+                        .andStatusEqualTo(Status.STATUS_1.status)
+                        .andOrderIdEqualTo(oNum)
+                        .andProIdEqualTo(oReceiptPro.getId());
+                List<ReceiptPlan> oReceiptPlanList = receiptPlanMapper.selectByExample(oReceiptPlanExample);
+                ReceiptPlan receiptPlan = oReceiptPlanList.get(0);
+                receiptPlan.setProCom(oActivity.getVender());
+                receiptPlan.setProType(oActivity.getProType());
+                receiptPlan.setModel(oActivity.getProModel());
+                int updateReceiptPlan = receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan);
+                if (updateReceiptPlan != 1) {
+                    logger.info("活动变更:{}", "ReceiptPlan-更新失败");
+                    throw new MessageException("活动变更失败");
+                }
             }
         }
+
         return AgentResult.ok(oNum);
     }
 
