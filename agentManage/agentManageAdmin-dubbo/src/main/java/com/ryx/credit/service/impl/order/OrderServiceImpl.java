@@ -1172,7 +1172,49 @@ public class OrderServiceImpl implements OrderService {
                 List<OSubOrderActivity> sSubOrderActivitys = oSubOrderActivityMapper.selectByExample(oSubOrderActivityExample);
                 f.putKeyV("sSubOrderActivitys", sSubOrderActivitys);
                 f.putKeyV("sSubOrderActivitysJson", JSONArray.toJSONString(sSubOrderActivitys));
+
+                //活动代码
+                for (OSubOrderActivity sSubOrderActivity : sSubOrderActivitys) {
+                    OActivityExample oActivityExample = new OActivityExample();
+                    oActivityExample.createCriteria()
+                            .andStatusEqualTo(Status.STATUS_1.status)
+                            .andIdEqualTo(sSubOrderActivity.getActivityId());
+                    List<OActivity> oActivityList = oActivityMapper.selectByExample(oActivityExample);
+                    if (oActivityList.size() > 0) {
+                        for (OActivity oActivity : oActivityList) {
+                            sSubOrderActivity.setActivityName(sSubOrderActivity.getActivityName()+"-"+oActivity.getActCode());
+                        }
+                    }
+                }
             }
+            List<Object> oActivityLists = new ArrayList<>();
+            for (OSubOrder oSubOrder : oSubOrders) {
+                //根据商品id、实际单价查询可变更的活动数据
+                OActivityExample oActivityExample = new OActivityExample();
+                oActivityExample.or()
+                        .andStatusEqualTo(Status.STATUS_1.status)
+                        .andProductIdEqualTo(oSubOrder.getProId())
+                        .andPriceEqualTo(oSubOrder.getProRelPrice());
+                List<OActivity> oActivityList = oActivityMapper.selectByExample(oActivityExample);
+                //厂商、机具型号、pos类型
+                for (OActivity oActivity : oActivityList) {
+                    if (null != oActivity.getVender()) {
+                        Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), oActivity.getVender());
+                        if (null != dictByValue)
+                            oActivity.setVender(dictByValue.getdItemname());
+                    }
+                    if (null != oActivity.getProModel()) {
+                        Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.PROMODE.name(), oActivity.getProModel());
+                        if (null != dictByValue)
+                            oActivity.setProModel(dictByValue.getdItemname());
+                    }
+                    if (null != oActivity.getPosType()) {
+                        oActivity.setPosType(PosType.getContentByValue(oActivity.getPosType()));
+                    }
+                }
+                oActivityLists.add(oActivityList);
+            }
+            f.putKeyV("oActivityLists", oActivityLists);
         }
         //配货信息
         OReceiptOrderExample oReceiptOrderExample = new OReceiptOrderExample();
@@ -1219,16 +1261,6 @@ public class OrderServiceImpl implements OrderService {
         //收款公司
         List<PayComp> comp = apaycompService.recCompList();
         f.putKeyV("comp", comp);
-
-        //根据商品id、实际单价查询可变更的活动数据
-        OSubOrder oSubOrder = oSubOrders.get(0);
-        OActivityExample oActivityExample = new OActivityExample();
-        oActivityExample.or()
-                .andStatusEqualTo(Status.STATUS_1.status)
-                .andProductIdEqualTo(oSubOrder.getProId())
-                .andPriceEqualTo(oSubOrder.getProRelPrice());
-        List<OActivity> oActivityList = oActivityMapper.selectByExample(oActivityExample);
-        f.putKeyV("oActivityList", oActivityList);
 
         return AgentResult.ok(f);
     }
