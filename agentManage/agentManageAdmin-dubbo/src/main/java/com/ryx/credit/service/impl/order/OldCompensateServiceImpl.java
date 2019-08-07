@@ -19,6 +19,7 @@ import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.agent.PlatFormService;
@@ -90,6 +91,10 @@ public class OldCompensateServiceImpl implements OldCompensateService {
     private RedisService redisService;
     @Autowired
     private AgentService agentService;
+    @Autowired
+    private IUserService iUserService;
+
+
 
     @Override
     public List<Map<String,Object>> getOrderMsgByExcel(List<List<Object>> excelList)throws MessageException{
@@ -350,7 +355,12 @@ public class OldCompensateServiceImpl implements OldCompensateService {
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(oRefundPriceDiff.getAgentId());
         record.setDataShiro(BusActRelBusType.COMPENSATE.key);
-
+        List<Map<String, Object>> maps = iUserService.orgCode(Long.valueOf(cuser));
+        if(maps!=null){
+            Map<String, Object> stringObjectMap = maps.get(0);
+            record.setAgDocPro(stringObjectMap.get("ORGID")+"");
+            record.setAgDocDistrict(stringObjectMap.get("ORGPID")+"");
+        }
         Agent agent = agentMapper.selectByPrimaryKey(oRefundPriceDiff.getAgentId());
         if(null!=agent)
             record.setAgentName(agent.getAgName());
