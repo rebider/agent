@@ -230,6 +230,32 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                         logger.info("========审批流完成{}业务{}状态{},结果{}", proIns, rel.getBusType(), agStatus, res.getResInfo());
                         //更新数据状态为审批成功
                         if(res.isSuccess()){
+                           //调整出款机构
+                           if(vo!=null && vo.getColinfoVoList()!=null && vo.getColinfoVoList().size()>0 && vo.getAgent()!=null && vo.getAgent().getId()!=null){
+                               //查询业务调整出款机构
+                               AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+                               agentBusInfoExample.or()
+                                       .andStatusEqualTo(Status.STATUS_1.status)
+                                       .andCloReviewStatusEqualTo(AgStatus.Approved.status)
+                                       .andAgentIdEqualTo(vo.getAgent().getId());
+                               List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+
+                               for (AgentColinfoVo agentColinfoVo : vo.getColinfoVoList()) {
+                                   for (AgentBusInfo agentBusInfo : agentBusInfoList) {
+                                       //如果对公就调整出款公司为瑞银信
+                                       if(agentColinfoVo.getCloType()!= null && BigDecimal.valueOf(1).compareTo(agentColinfoVo.getCloType())==0){
+                                               agentBusInfo.setFinaceRemitOrgan("ORG20190625000000000000048");
+                                       //对私为湶致
+                                       }else  if(agentColinfoVo.getCloType()!= null && BigDecimal.valueOf(2).compareTo(agentColinfoVo.getCloType())==0){
+                                               agentBusInfo.setFinaceRemitOrgan("ORG20190627000000000000000");
+                                       }
+                                       agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                                   }
+
+                                }
+                            }
+
+
                             dr.setAppyStatus(AgStatus.Approved.status);
                             dr.setcUpdate(Calendar.getInstance().getTime());
                             logger.info("========审批流完成{}业务{}状态{},结果{}",proIns,rel.getBusType(),agStatus,"更新数据申请成功");
