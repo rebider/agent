@@ -29,4 +29,5 @@ public interface IAgeInvoiceApplyService {
     //返回所有终审失败的发票信息
     List<Map<String,String>> finalCheckInvoice(List<Map<String,Object>> list);
 
+    List<Map<String,Object>> exports(InvoiceApply invoiceApply);
 }
