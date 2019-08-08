@@ -149,7 +149,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
             e.printStackTrace();
             logger.info("冻结和解冻代理商失败");
             resultMap.put("returnCode", 0000);
-            resultMap.put("returnInfo", "失败");
+            resultMap.put("returnInfo", "冻结和解冻代理商失败");
             return resultMap;
         }
 
@@ -162,7 +162,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
             e.printStackTrace();
             logger.info("修改发票汇总金额失败");
             resultMap.put("returnCode", 0000);
-            resultMap.put("returnInfo", "失败");
+            resultMap.put("returnInfo", "修改发票汇总金额失败");
             return resultMap;
         }
         resultMap.put("returnCode", 9999);

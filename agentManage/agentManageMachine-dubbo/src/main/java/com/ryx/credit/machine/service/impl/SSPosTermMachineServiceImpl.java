@@ -39,11 +39,9 @@ import java.util.*;
 @Service("sPosTermMachineServiceImpl")
 public class SSPosTermMachineServiceImpl implements TermMachineService {
 
-    private static Logger log = LoggerFactory.getLogger(SSPosTermMachineServiceImpl.class);
-
     private final static String ZHYY_CREATE_PERSON = AppConfig.getProperty("zhyy_create_person");
     private final static String ZHYY_ROOT_ORG_ID = AppConfig.getProperty("zhyy_root_org_id");
-
+    private static Logger log = LoggerFactory.getLogger(SSPosTermMachineServiceImpl.class);
     @Resource(name = "imsTermMachineService")
     private ImsTermMachineService imsTermMachineService;
     @Autowired
@@ -312,12 +310,12 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
 
     @Override
     public AgentResult queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailList, String operation) throws Exception {
-        return null;
+        return AgentResult.fail("未联动");
     }
 
     @Override
     public AgentResult queryTerminalTransferResult(String serialNumber, String type) throws Exception {
-        return null;
+        return AgentResult.fail("未联动");
     }
 
 
