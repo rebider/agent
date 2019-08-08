@@ -243,6 +243,14 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 			Set<String> resultSet = new HashSet<>();
 			for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
 				if(!"1".equals(saveStatus)){
+					if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentBusInfoVo.getBusNum())) {
+						if (!OrgType.zQ(agentBusInfoVo.getBusType())) {
+							throw new ProcessException("升级类型必须是直签");
+						}
+						if (com.ryx.credit.commons.utils.StringUtils.isBlank(agentBusInfoVo.getBusParent())){
+							throw new ProcessException("升级直签上级不能为空");
+						}
+					}
 					if(OrgType.zQ(agentBusInfoVo.getBusType())){
 						if(com.ryx.credit.commons.utils.StringUtils.isBlank(agentBusInfoVo.getBusParent()))
 							throw new ProcessException("直签上级不能为空");

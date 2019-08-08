@@ -579,6 +579,10 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                         //瑞大宝升级用户填手机号，成功后返回A码更新编码
                         JSONObject jsonObject = (JSONObject)res.getData();
                         agentBusInfo.setBusNum(jsonObject.getString("result"));
+                    }if(platForm.getPlatformType().equals(PlatformType.RHPOS.getValue())){
+                        //瑞花宝升级用户填机构号，成功后返回品牌码更新编码
+                        JSONObject jsonObject = (JSONObject)res.getData();
+                        agentBusInfo.setBrandNum(jsonObject.getString("brandId"));
                     }
                     if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)){
                         log.info("升级开户接口{}平台编号不为空走升级接口,更新业务{}",agentBusInfo.getBusNum(),"入网成功状态更新失败");

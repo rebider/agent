@@ -299,6 +299,14 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     logger.info("请选择业务平台");
                     throw new ProcessException("请选择业务平台");
                 }
+                if(StringUtils.isNotBlank(item.getBusNum())) {
+                    if (!OrgType.zQ(item.getBusType())) {
+                        throw new ProcessException("升级类型必须是直签");
+                    }
+                    if (StringUtils.isBlank(item.getBusParent())){
+                        throw new ProcessException("升级直签上级不能为空");
+                    }
+                }
                 if(OrgType.zQ(item.getBusType())){
                     if(StringUtils.isBlank(item.getBusParent()))
                         throw new ProcessException("直签上级不能为空");
@@ -420,6 +428,14 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
                 if (StringUtils.isBlank(item.getBusPlatform())) {
                     throw new ProcessException("业务平台不能为空");
+                }
+                if(StringUtils.isNotBlank(item.getBusNum())) {
+                    if (!OrgType.zQ(item.getBusType())) {
+                        throw new ProcessException("升级类型必须是直签");
+                    }
+                    if (StringUtils.isBlank(item.getBusParent())){
+                        throw new ProcessException("升级直签上级不能为空");
+                    }
                 }
                 if(OrgType.zQ(item.getBusType())){
                     if(StringUtils.isBlank(item.getBusParent()))
