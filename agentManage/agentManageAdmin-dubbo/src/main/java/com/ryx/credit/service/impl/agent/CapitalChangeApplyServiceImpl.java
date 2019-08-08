@@ -45,6 +45,10 @@ import java.util.*;
 @Service("capitalChangeApplyService")
 public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService {
 
+    private static final String CAPITAL_LOCK = "capital_lock_";
+    private static final String CAPITAL_APP_LOCK = "capital_app_lock_";
+    private static final long TIME_OUT = 60000*5;       //锁的超时时间
+    private static final long ACQUIRE_TIME_OUT = 5000;  //超时时间
     private static Logger logger = LoggerFactory.getLogger(CapitalChangeApplyServiceImpl.class);
     @Autowired
     private CapitalChangeApplyMapper capitalChangeApplyMapper;
@@ -82,11 +86,6 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
     private RedisService redisService;
     @Autowired
     private DictOptionsService dictOptionsService;
-
-    private static final String CAPITAL_LOCK = "capital_lock_";
-    private static final String CAPITAL_APP_LOCK = "capital_app_lock_";
-    private static final long TIME_OUT = 60000*5;       //锁的超时时间
-    private static final long ACQUIRE_TIME_OUT = 5000;  //超时时间
 
     /**
      * 保证金列表
@@ -363,7 +362,9 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
                 logger.info("========用户{}{}启动部门参数为空", id, cUser);
                 throw new MessageException("启动部门参数为空!");
             }
-            startPar.put("rs","pass");
+            if(startPar.get("party").toString().equals("beijing")) {
+                startPar.put("rs", ApprovalType.PASS.getValue());
+            }
             startPar.put("operationType", capitalChangeApply.getOperationType());
 
             //启动审批

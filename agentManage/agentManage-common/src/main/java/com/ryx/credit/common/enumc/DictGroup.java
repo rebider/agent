@@ -75,6 +75,7 @@ public enum DictGroup {
     POS_APR_BUSNISS("POS审批参数"),
     ORDER_RETURN("订单退货业务选择下一级审批人参数"),
     APPROVE_MODE("审批流程图当前节点"),
+    PRE_APPROVE_MODE("准生产环境审批流程图当前节点"),
 
     ORG_TYPE("机构类型"),
     REPORT_STATUS("报备状态"),

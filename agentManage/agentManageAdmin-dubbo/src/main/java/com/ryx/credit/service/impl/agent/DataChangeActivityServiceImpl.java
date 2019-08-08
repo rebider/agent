@@ -153,7 +153,9 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             logger.info("========用户{}启动数据修改申请{}{}启动部门参数为空",dataChangeId,userId,"审批流启动失败字典中未配置部署流程");
             throw new MessageException("启动部门参数为空!");
         }
-        startPar.put("rs","pass");
+        if(startPar.get("party").toString().equals("beijing")){
+            startPar.put("rs",ApprovalType.PASS.getValue());
+        }
         String proce = activityService.createDeloyFlow(null,workId,null,null,startPar);
         if(proce==null){
             logger.info("========用户{}启动数据修改申请{}{}",dataChangeId,userId,"数据修改审批，审批流启动失败");

@@ -492,10 +492,13 @@ public class CompensateServiceImpl implements CompensateService {
         String party = String.valueOf(startPar.get("party"));
         String workId;
         //根据不同的部门信息启动不同的流程
-        if(party.equals("beijing") || party.equals("north") || party.equals("south")) {
-            workId = dictOptionsService.getApproveVersion("compensation");
-        }else{
+        if(agentService.isAgent(cuser).isOK()){
             workId = dictOptionsService.getApproveVersion("agentCompensation");
+        }else{
+            workId = dictOptionsService.getApproveVersion("compensation");
+        }
+        if(startPar.get("party").toString().equals("beijing")) {
+            startPar.put("rs", ApprovalType.PASS.getValue());
         }
         //启动审批
         String proce = activityService.createDeloyFlow(null, workId, null, null, startPar);
