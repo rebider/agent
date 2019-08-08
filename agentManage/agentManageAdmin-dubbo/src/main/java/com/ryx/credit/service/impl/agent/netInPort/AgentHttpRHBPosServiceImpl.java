@@ -95,6 +95,7 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
         }
         resultMap.put("alwaysProfit","00");//该机构是否参与实时分润
         resultMap.put("brandName",platForm.getPlatformName());//平台名称
+        resultMap.put("brandCode",platForm.getPlatformNum());//平台Code
         //收款账户新
         AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
         if(agentColinfo==null){
@@ -191,6 +192,7 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
         resultMap.put("orgType",OrgType.STR.getValue());
         resultMap.put("alwaysProfit","00");//该机构是否参与实时分润
         resultMap.put("brandName",platForm.getPlatformName());//平台名称
+        resultMap.put("brandCode",platForm.getPlatformNum());//平台Code
         //收款账户新
         AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
         if(agentColinfo==null){
@@ -295,6 +297,7 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
         }
         resultMap.put("alwaysProfit","00");//该机构是否参与实时分润
         resultMap.put("brandName",platForm.getPlatformName());//平台名称
+        resultMap.put("brandCode",platForm.getPlatformNum());//平台Code
         //收款账户新
         AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
         if(agentColinfo==null){
