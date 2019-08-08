@@ -290,6 +290,14 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             List hav = new ArrayList();
             List<Organization> organList = null;
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
+                if(StringUtils.isNotBlank(item.getBusNum())) {
+                    if (!OrgType.zQ(item.getBusType())) {
+                        throw new ProcessException("升级类型必须是直签");
+                    }
+                    if (StringUtils.isBlank(item.getBusParent())){
+                        throw new ProcessException("升级直签上级不能为空");
+                    }
+                }
                 if(OrgType.zQ(item.getBusType())){
                     if(StringUtils.isBlank(item.getBusParent()))
                         throw new ProcessException("直签上级不能为空");
