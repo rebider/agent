@@ -810,4 +810,35 @@
     select CLO_TAX_POINT from A_AGENT_COLINFO where STATUS = 1 and AGENT_ID = #{agentId}
   </select>
 
+  <select id="exports" resultType="java.util.Map" parameterType="com.ryx.credit.profit.pojo.InvoiceApply">
+    select AGENT_ID AGENTID,AGENT_NAME AGENTNAME,INVOICE_COMPANY INVOICECOMPANY,INVOICE_DATE INVOICEDATE,INVOICE_ITEM INVOICEITEM,INVOICE_NUMBER INVOICENUMBER,
+          INVOICE_CODE  INVOICECODE,AMOUNT_TAX AMOUNTTAX,AMOUNT,SUM_AMT SUMAMT,TAX,ES_DATE ESDATE,EXPRESS_NUMBER EXPRESSNUMBER,
+          case when ES_RESULT = '1' then '通过' when ES_RESULT = '0' then '未通过' else '未审核' end as ESRESULT
+    from P_INVOICE_APPLY
+    where
+        EXPRESS_NUMBER is not null
+        and EXPRESS_COMPANY is not null
+        and EXPRESS_DATE is not null
+        and YS_RESULT = '1'
+        <if test="agentId != null and agentId != '' ">
+          and AGENT_ID = #{agentId}
+        </if>
+        <if test="agentName != null and agentName != '' ">
+          and AGENT_NAME like CONCAT(CONCAT('%',#{agentName}),'%')
+        </if>
+        <if test="invoiceCompany != null and invoiceCompany != '' ">
+          and INVOICE_COMPANY = #{invoiceCompany}
+        </if>
+        <if test="invoiceNumber != null and invoiceNumber != '' ">
+          and INVOICE_NUMBER = #{invoiceNumber}
+        </if>
+        <if test="invoiceCode != null and invoiceCode != '' ">
+          and INVOICE_CODE = #{invoiceCode}
+        </if>
+        <if test="esResult != null and esResult != '' ">
+          and ES_RESULT = #{esResult}
+        </if>
+        order by CREATE_DATE DESC
+  </select>
+
 </mapper>

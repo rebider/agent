@@ -92,7 +92,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
             criteria.andYsResultEqualTo(invoiceApply.getYsResult());
         }
         if (StringUtils.isNotBlank(invoiceApply.getAgentName())){
-            criteria.andAgentNameLike(invoiceApply.getAgentName());
+            criteria.andAgentNameLike("%"+invoiceApply.getAgentName()+"%");
         }
         if(flag){
             criteria.andExpressCompanyIsNotNull();
@@ -464,5 +464,8 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         }
     }
 
-
+    @Override
+    public List<Map<String, Object>> exports(InvoiceApply invoiceApply) {
+        return invoiceApplyMapper.exports(invoiceApply);
+    }
 }

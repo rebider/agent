@@ -39,4 +39,6 @@ public interface InvoiceApplyMapper {
 
     BigDecimal getAgentTaxByAgentId(String agentId);
 
+    List<Map<String,Object>> exports(InvoiceApply invoiceApply);
+
 }
