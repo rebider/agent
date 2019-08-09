@@ -3670,14 +3670,16 @@ public class OrderServiceImpl implements OrderService {
                             .andOrderIdEqualTo(oNum)
                             .andProIdEqualTo(oReceiptPro.getId());
                     List<ReceiptPlan> oReceiptPlanList = receiptPlanMapper.selectByExample(oReceiptPlanExample);
-                    ReceiptPlan receiptPlan = oReceiptPlanList.get(0);
-                    receiptPlan.setProCom(oActivity.getVender());
-                    receiptPlan.setProType(oActivity.getProType());
-                    receiptPlan.setModel(oActivity.getProModel());
-                    int updateReceiptPlan = receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan);
-                    if (updateReceiptPlan != 1) {
-                        logger.info("活动变更:{}", "ReceiptPlan-更新失败");
-                        throw new MessageException("活动变更失败");
+                    if (oReceiptPlanList.size()!=0 && oReceiptPlanList!=null) {
+                        ReceiptPlan receiptPlan = oReceiptPlanList.get(0);
+                        receiptPlan.setProCom(oActivity.getVender());
+                        receiptPlan.setProType(oActivity.getProType());
+                        receiptPlan.setModel(oActivity.getProModel());
+                        int updateReceiptPlan = receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan);
+                        if (updateReceiptPlan != 1) {
+                            logger.info("活动变更:{}", "ReceiptPlan-更新失败");
+                            throw new MessageException("活动变更失败");
+                        }
                     }
                 }
             }
