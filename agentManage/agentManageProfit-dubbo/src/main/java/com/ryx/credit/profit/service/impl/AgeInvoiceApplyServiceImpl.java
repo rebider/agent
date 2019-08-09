@@ -226,7 +226,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                             }
                             if(!flag){
                                 invoiceApply.setYsResult("0");
-                                invoiceApply.setRev1("货物或应税劳务、服务名称不符！");
+                                invoiceApply.setRev1("商品名称不符！");
                             }
                         }else{
                             invoiceApply.setYsResult("0");
