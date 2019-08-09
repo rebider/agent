@@ -136,7 +136,7 @@ public class DateChangeReqServiceImpl implements DateChangeReqService{
                                    }
                                     resultMap.put("cloRealname", agentColinfoVo.getCloRealname());
                                     resultMap.put("cloBankAccount", agentColinfoVo.getCloBankAccount());
-                                    resultMap.put("cloBank", agentColinfoVo.getCloBank());
+                                    resultMap.put("cloBankBranch", agentColinfoVo.getCloBankBranch());
                                     resultMap.put("branchLineNum", agentColinfoVo.getBranchLineNum());
                                     if(null!=agentColinfoVo.getCloInvoice()){
                                         if (agentColinfoVo.getCloInvoice().compareTo(new BigDecimal(0))==0){
@@ -171,7 +171,7 @@ public class DateChangeReqServiceImpl implements DateChangeReqService{
                                     }
                                     resultMap.put("cloRealnamePre", agentColinfoVo.getCloRealname());
                                     resultMap.put("cloBankAccountPre", agentColinfoVo.getCloBankAccount());
-                                    resultMap.put("cloBankPre", agentColinfoVo.getCloBank());
+                                    resultMap.put("cloBankBranchPre", agentColinfoVo.getCloBankBranch());
                                     resultMap.put("branchLineNumPre", agentColinfoVo.getBranchLineNum());
                                     if(null!=agentColinfoVo.getCloInvoice()){
                                         if (agentColinfoVo.getCloInvoice().compareTo(new BigDecimal(0))==0){
