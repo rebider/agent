@@ -283,6 +283,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                     .andStatusEqualTo(Status.STATUS_1.status)
                                     .andBusPlatformIn(pltcode)
                                     .andCloReviewStatusEqualTo(AgStatus.Approved.status)
+                                    .andBusStatusEqualTo(BusinessStatus.Enabled.status)
                                     .andAgentIdEqualTo(vo.getAgent().getId());
                             List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
 
@@ -340,11 +341,11 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                     agentColinfoService.updateAgentColinfoVo(voColinfoVoList, vo.getAgent(),rel.getcUser(),null);
                                     logger.info("========================一分钱验证状态修改完成");
 
-                                    /*logger.info("========================同步至业务系统开始");
+                                    logger.info("========================同步至业务系统开始");
                                     for (AgentBusInfo agentBusInfo : agentBusInfoList) {
                                         agentNetInNotityService.asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
                                     }
-                                    logger.info("========================同步至业务系统完成");*/
+                                    logger.info("========================同步至业务系统完成");
 
                                     //建立收款账户和平台码的关系
                                     AgentColinfo agentColinfoVo=voColinfoVoList.get(0);
@@ -381,18 +382,18 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                             agentColinfoService.updateAgentColinfoVo(voColinfoVoList, vo.getAgent(),rel.getcUser(),null);
                                             logger.info("========================一分钱验证状态修改完成");
 
-                                            break;
-                                            /*logger.info("========================同步至业务系统开始");
+                                            logger.info("========================同步至业务系统开始");
                                             for (AgentBusInfo agentBusInfo : agentBusInfoList) {
                                                 agentNetInNotityService.asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
                                             }
-                                            logger.info("========================同步至业务系统完成");*/
-                                        }/*else if (!synTemp){//同步至业务系统
+                                            logger.info("========================同步至业务系统完成");
+                                            break;
+                                        }else if (!synTemp){//同步至业务系统
                                             for (AgentBusInfo agentBusInfo : agentBusInfoList) {
                                                 agentNetInNotityService.asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
                                             }
                                             break;
-                                        }*/
+                                        }
                                     }
                                 }
                             }
