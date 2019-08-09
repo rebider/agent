@@ -614,4 +614,194 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         return new Attachment();
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    @Override
+    public ResultVO updateAgentColinfoVoNow(List<AgentColinfoVo> colinfoVoList, Agent agent, String userId,String saveStatus) throws MessageException {
+        try {
+            if (agent == null) throw new MessageException("代理商信息不能为空");
+            for (AgentColinfoVo agentColinfoVo : colinfoVoList) {
+                if (null != agentColinfoVo.getCloTaxPoint() && agentColinfoVo.getCloTaxPoint().compareTo(new BigDecimal(1)) >= 0) {
+                    throw new MessageException("税点不能大于1");
+                }
+                checkColInfoNow(agentColinfoVo);
+                //收款账户对私时做校验
+                String agentName = agent.getAgName();
+                String agLegalName = agent.getAgLegal();
+                String trueName = agentColinfoVo.getCloRealname();
+                String certNo = agentColinfoVo.getAgLegalCernum();
+                if (agentColinfoVo.getCloType().compareTo(new BigDecimal(2)) == 0) {
+                    //对私时 收款账户名与法人姓名一致时 把法人身份证号拷贝到户主身份证号并进行认证
+                    if (agLegalName.equals(trueName)) {
+                        agentColinfoVo.setAgLegalCernum(agent.getAgLegalCernum());
+                    } else {
+                        if (StringUtils.isNotBlank(certNo) && !"1".equals(saveStatus) ) {
+                            //校验收款账户身份认证
+                            AgentResult result = livenessDetectionService.livenessDetection(trueName, certNo, userId);
+                            if (!result.isOK()) {
+                                throw new MessageException("收款账户身份认证失败");
+                            }
+                        } else if(!"1".equals(saveStatus)) {
+                            throw new MessageException("请输入收款账户名相对应的户主证件号");
+                        }
+                    }
+                }
+                //对公时 判断收款账户名是否与代理商名称一致 不一致则抛异常提示信息
+                if (agentColinfoVo.getCloType().compareTo(new BigDecimal(1)) == 0 && !"1".equals(saveStatus)) {
+                    if (agentName.equals(trueName)) {
+                        agentColinfoVo.setAgLegalCernum(agent.getAgLegalCernum());
+                    } else if (!agentName.equals(trueName)) {
+                        throw new MessageException("收款账户名与代理商名称不一致");
+                    }
+                }
+
+                agentColinfoVo.setcUser(agent.getcUser());
+                agentColinfoVo.setAgentId(agent.getId());
+                if (org.apache.commons.lang.StringUtils.isEmpty(agentColinfoVo.getId())) {
+                    //直接新曾
+                    AgentColinfo result = agentColinfoInsert(agentColinfoVo, agentColinfoVo.getColinfoTableFile(),null);
+                    logger.info("代理商收款账户添加:{}{}", "添加代理商收款账户成功", result.getId());
+                } else {
+
+                    AgentColinfo db_AgentColinfo = agentColinfoMapper.selectByPrimaryKey(agentColinfoVo.getId());
+                    db_AgentColinfo.setAgentId(agent.getId());
+                    db_AgentColinfo.setCloType(agentColinfoVo.getCloType());
+                    db_AgentColinfo.setCloRealname(agentColinfoVo.getCloRealname());
+                    db_AgentColinfo.setCloBank(agentColinfoVo.getCloBank());
+                    db_AgentColinfo.setCloBankBranch(agentColinfoVo.getCloBankBranch());
+                    db_AgentColinfo.setCloBankAccount(agentColinfoVo.getCloBankAccount());
+                    db_AgentColinfo.setRemark(agentColinfoVo.getRemark());
+                    db_AgentColinfo.setStatus(agentColinfoVo.getStatus());
+                    db_AgentColinfo.setBranchLineNum(agentColinfoVo.getBranchLineNum());
+                    db_AgentColinfo.setAllLineNum(agentColinfoVo.getAllLineNum());
+                    db_AgentColinfo.setBankRegion(agentColinfoVo.getBankRegion());
+                    db_AgentColinfo.setCloInvoice(agentColinfoVo.getCloInvoice());
+                    db_AgentColinfo.setCloTaxPoint(agentColinfoVo.getCloTaxPoint());
+                    db_AgentColinfo.setCloBankCode(agentColinfoVo.getCloBankCode());
+                    db_AgentColinfo.setPayStatus(ColinfoPayStatus.A.getValue());
+                    if (agLegalName.equals(trueName)) {
+                        db_AgentColinfo.setAgLegalCernum(agent.getAgLegalCernum());
+                    } else {
+                        db_AgentColinfo.setAgLegalCernum(agentColinfoVo.getAgLegalCernum());
+                    }
+                    if (1 != agentColinfoMapper.updateByPrimaryKeySelective(db_AgentColinfo)) {
+                        throw new MessageException("更新收款信息失败");
+                    } else {
+                        if (!agentDataHistoryService.saveDataHistory(db_AgentColinfo, db_AgentColinfo.getId(), DataHistoryType.GATHER.getValue(), userId, db_AgentColinfo.getVarsion()).isOK()) {
+                            throw new MessageException("更新收款信息失败");
+                        }
+                    }
+                    //删除老的附件
+                    AttachmentRelExample example = new AttachmentRelExample();
+                    example.or().andBusTypeEqualTo(AttachmentRelType.Proceeds.name()).andSrcIdEqualTo(db_AgentColinfo.getId()).andStatusEqualTo(Status.STATUS_1.status);
+                    List<AttachmentRel> list = attachmentRelMapper.selectByExample(example);
+                    for (AttachmentRel attachmentRel : list) {
+                        attachmentRel.setStatus(Status.STATUS_0.status);
+                        int i = attachmentRelMapper.updateByPrimaryKeySelective(attachmentRel);
+                        if (1 != i) {
+                            logger.info("修改收款信息附件关系失败{}", attachmentRel.getId());
+                            throw new MessageException("更新收款信息信息失败");
+                        }
+                    }
+
+                    //银行卡扫描件
+                    boolean isHaveYHKSMJ = false;
+                    //开户许可证
+                    boolean isHaveKHXUZ = false;
+                    //一般纳税人证明
+                    boolean isHaveYBNSRZM = false;
+                    //添加新的附件
+                    List<String> fileIdList = agentColinfoVo.getColinfoTableFile();
+                    if (fileIdList != null) {
+                        for (String fileId : fileIdList) {
+
+                            Attachment attachment = attachmentMapper.selectByPrimaryKey(fileId);
+                            if (attachment != null) {
+                                if (AttDataTypeStatic.YHKSMJ.code.equals(attachment.getAttDataType() + "")) {
+                                    isHaveYHKSMJ = true;
+                                }
+                                if (AttDataTypeStatic.KHXUZ.code.equals(attachment.getAttDataType() + "")) {
+                                    isHaveKHXUZ = true;
+                                }
+                                if (AttDataTypeStatic.YBNSRZM.code.equals(attachment.getAttDataType() + "")) {
+                                    isHaveYBNSRZM = true;
+                                }
+                            }
+
+                            AttachmentRel record = new AttachmentRel();
+                            record.setAttId(fileId);
+                            record.setSrcId(db_AgentColinfo.getId());
+                            record.setcUser(db_AgentColinfo.getcUser());
+                            record.setcTime(Calendar.getInstance().getTime());
+                            record.setStatus(Status.STATUS_1.status);
+                            record.setBusType(AttachmentRelType.Proceeds.name());
+                            record.setId(idService.genId(TabId.a_attachment_rel));
+                            int i = attachmentRelMapper.insertSelective(record);
+                            if (1 != i) {
+                                logger.info("收款信息附件关系失败");
+                                throw new MessageException("更新收款信息失败");
+                            }
+                        }
+                    }
+                    if (agentColinfoVo.getCloType().compareTo(new BigDecimal("2")) == 0) {//对私
+                        if (!isHaveYHKSMJ  && !"1".equals(saveStatus)) {
+                            throw new MessageException("请添加银行卡扫描件");
+                        }
+                    }
+                    if (agentColinfoVo.getCloType().compareTo(new BigDecimal("1")) == 0) {//对公
+                        if (!isHaveKHXUZ  && !"1".equals(saveStatus)) {
+                            throw new MessageException("请添加开户许可证");
+                        }
+                    }
+                    //对公并且税点等于0.06一般纳税人证明必填
+                    if (agentColinfoVo.getCloType().compareTo(new BigDecimal("1")) == 0 && agentColinfoVo.getCloTaxPoint().compareTo(new BigDecimal("0.06")) == 0) {
+                        if (!isHaveYBNSRZM  && !"1".equals(saveStatus)) {
+                            throw new MessageException("请添加一般纳税人证明");
+                        }
+                    }
+                }
+            }
+            return ResultVO.success(null);
+        } catch (ProcessException e) {
+            e.printStackTrace();
+            throw new MessageException(e.getMsg());
+        } catch (MessageException e) {
+            e.printStackTrace();
+            throw new MessageException(e.getMsg());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new MessageException(e.getMessage());
+        }
+    }
+
+    private  AgentResult checkColInfoNow(AgentColinfo agentColinfo) throws ProcessException {
+        try {
+            if (agentColinfo.isImport()) return AgentResult.ok();
+            if (agentColinfo.getCloType().compareTo(new BigDecimal(2)) == 0) { //对私
+                //税点检查
+                if (agentColinfo.getCloTaxPoint() == null || !"0.08".equals(agentColinfo.getCloTaxPoint().toString())) {
+                    throw new ProcessException("对私户进行打款，那么扣税点在代理商填写时默认为0.08且不可修改");
+                }
+                //是否开票检查
+                if (agentColinfo.getCloInvoice().compareTo(new BigDecimal(0)) != 0) { //对私
+                    throw new ProcessException("对私户进行打款，那么是否开票默认为否且不可修改");
+                }
+            } else if (agentColinfo.getCloType().compareTo(new BigDecimal(1)) == 0) {//对公
+                //是否开票检查
+                if (agentColinfo.getCloInvoice().compareTo(new BigDecimal(1)) == 0) { //开票
+                    //税点检查
+                    if (!"0.06".equals(agentColinfo.getCloTaxPoint().toString()) && !"0.03".equals(agentColinfo.getCloTaxPoint().toString())) { //对私
+                        throw new ProcessException("对公户进行打款，且代理商是否开票为是，那么扣税点在代理商填写时只能选择0.06或0.03");
+                    }
+                } else if (agentColinfo.getCloInvoice().compareTo(new BigDecimal(0)) == 0) { //不开票
+//                        对公   是否开发票 则对应为是  不可修改
+                    throw new ProcessException("对公户进行打款，那么是否开票默认为是且不可修改");
+                }
+            }
+        } catch (ProcessException e) {
+            e.printStackTrace();
+            throw new ProcessException(e.getMsg());
+        }
+        return AgentResult.ok();
+    }
+
 }

@@ -35,12 +35,10 @@ import java.util.Map;
 @Service("agentHttpRHBPosServiceImpl")
 public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
 
-    private static Logger log = LoggerFactory.getLogger(AgentHttpRHBPosServiceImpl.class);
-
     private static final String rhbReqUrl = AppConfig.getProperty("rhb_req_url");
     private static final String rhb3desKey = AppConfig.getProperty("rhb_3des_Key");
     private static final String rhb3desIv = AppConfig.getProperty("rhb_3des_iv");
-
+    private static Logger log = LoggerFactory.getLogger(AgentHttpRHBPosServiceImpl.class);
     @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
     @Autowired
@@ -97,6 +95,7 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
         }
         resultMap.put("alwaysProfit","00");//该机构是否参与实时分润
         resultMap.put("brandName",platForm.getPlatformName());//平台名称
+        resultMap.put("brandCode",platForm.getPlatformNum());//平台Code
         //收款账户新
         AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
         if(agentColinfo==null){
@@ -190,24 +189,25 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
                 }
             }
         }
-        resultMap.put("orgType",OrgType.zQ(agentBusInfo.getBusType())?OrgType.STR.getValue():OrgType.ORG.getValue());
-        AgentBusInfo agentParent = null;
-        if(StringUtils.isNotBlank(agentBusInfo.getBusParent())){
-            //取出上级业务
-            agentParent = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
-        }
-        if(null!=agentParent){
-            resultMap.put("supDorgId",agentParent.getBusNum());
-        }
+        resultMap.put("orgType",OrgType.STR.getValue());
         resultMap.put("alwaysProfit","00");//该机构是否参与实时分润
         resultMap.put("brandName",platForm.getPlatformName());//平台名称
+        resultMap.put("brandCode",platForm.getPlatformNum());//平台Code
         //收款账户新
         AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
         if(agentColinfo==null){
             log.info("收款账户为空:{},{}",agent.getId(), agentBusInfo.getId());
             agentColinfo = new AgentColinfo();
         }
-        resultMap.put("agentId",agentBusInfo.getBusNum());//业务平台编号RHB
+        resultMap.put("agentId",agentBusInfo.getBusNum());//业务平台编号RHB机构号
+        AgentBusInfo agentParent = null;
+        if(StringUtils.isNotBlank(agentBusInfo.getBusParent())){
+            //取出上级业务
+            agentParent = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
+        }
+        if(null!=agentParent){
+            resultMap.put("upAgentId",agentParent.getBrandNum());//上级品牌号
+        }
 
         //00:对公账户，01：对私账户
         resultMap.put("acctType",agentColinfo.getCloType().compareTo(BigDecimal.ONE)==0?"00":"01");
@@ -297,6 +297,7 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
         }
         resultMap.put("alwaysProfit","00");//该机构是否参与实时分润
         resultMap.put("brandName",platForm.getPlatformName());//平台名称
+        resultMap.put("brandCode",platForm.getPlatformNum());//平台Code
         //收款账户新
         AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
         if(agentColinfo==null){
