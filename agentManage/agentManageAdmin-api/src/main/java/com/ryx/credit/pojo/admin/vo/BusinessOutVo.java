@@ -53,6 +53,16 @@ public class BusinessOutVo extends AgentExtends implements Serializable {
 
     private String time;
 
+    private String busLoginNum;
+
+    public String getBusLoginNum() {
+        return busLoginNum;
+    }
+
+    public void setBusLoginNum(String busLoginNum) {
+        this.busLoginNum = busLoginNum;
+    }
+
     public String getTime() {
         return time;
     }
