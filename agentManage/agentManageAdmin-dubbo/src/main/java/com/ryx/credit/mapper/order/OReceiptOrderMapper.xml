@@ -529,6 +529,9 @@
       <if test="par.avtivityName != null and par.avtivityName!=''" >
         and ac.pro_name like '${par.avtivityName}'
       </if>
+      <if test="par.oInuretime != null and par.oInuretime != '' " >
+        and to_char(o.O_INURETIME,'YYYY-MM-DD') = #{par.oInuretime}
+      </if>
     </where>
     order by suborder.c_time desc
     <include refid="OracleDialectSuffix" />
@@ -543,10 +546,10 @@
     ro.EXPRESS_SUC_DATE, ro.C_TIME, ro.C_USER, ro.U_TIME, ro.RECEIPT_STATUS, ro.U_USER, ro.STATUS, ro.VERSION,
     ro.AGENT_ID, rp.ORDERID, rp.RECEIPT_ID, rp.PRO_ID, rp.PRO_CODE, rp.PRO_NAME, rp.PRO_NUM, rp.SEND_NUM, rp.id as receipt_Pro_Id,
     ag.AG_NAME, o.REMARK as ORDER_REMARK,
-    to_char(o.o_inuretime,'YYYY-MM-DD') as oInuretime,
+    to_char(o.O_INURETIME,'YYYY-MM-DD') as oinuretime,
     nvl(ro.PRO_NUM-rp.SEND_NUM,0) FOR_SEND_NUM
-    from O_Receipt_order ro
-    left join o_Receipt_pro rp on ro.id = rp.receipt_id and rp.status=1
+    from o_receipt_order ro
+    left join o_receipt_pro rp on ro.id = rp.receipt_id and rp.status=1
     left join o_sub_order suborder on rp.pro_id=suborder.pro_id and rp.orderId=suborder.order_id and suborder.status=1
     left join o_sub_order_activity ac on ac.sub_order_id=suborder.id and ac.status=1
     left join o_activity oa on ac.activity_id = oa.id
@@ -561,7 +564,7 @@
         and ro.ORDER_ID = #{orderId}
       </if>
       <if test="oInuretime != null and oInuretime != '' " >
-        and to_char(o.o_inuretime,'YYYY-MM-DD') = #{oInuretime}
+        and to_char(o.O_INURETIME,'YYYY-MM-DD') = #{oInuretime}
       </if>
       <if test="receiptNum != null and receiptNum!=''" >
         and ro.RECEIPT_NUM = #{receiptNum}
@@ -573,10 +576,10 @@
         and ag.AG_NAME like '${agentName}'
       </if>
       <if test="proName != null and proName!=''" >
-        and suborder.pro_name like '${proName}'
+        and suborder.PRO_NAME like '${proName}'
       </if>
       <if test="avtivityName != null and avtivityName!=''" >
-        and ac.pro_name like '${avtivityName}'
+        and ac.PRO_NAME like '${avtivityName}'
       </if>
     </where>
     )
@@ -585,7 +588,7 @@
   <resultMap id="ReceiptOrderVo" type="com.ryx.credit.pojo.admin.vo.ReceiptOrderVo">
     <result column="ORDER_ID" property="orderId" jdbcType="VARCHAR"/>
     <result column="RECEIPT_NUM" property="receiptNum" jdbcType="VARCHAR"/>
-    <result column="O_INURETIME" property="oInuretime" jdbcType="TIMESTAMP"/>
+    <result column="O_INURETIME" property="oinuretime" jdbcType="VARCHAR"/>
     <result column="AGENT_ID" property="agentId" jdbcType="VARCHAR"/>
     <result column="AG_NAME" property="agName" jdbcType="VARCHAR"/>
     <result column="ADDR_REALNAME" property="addrRealname" jdbcType="VARCHAR"/>

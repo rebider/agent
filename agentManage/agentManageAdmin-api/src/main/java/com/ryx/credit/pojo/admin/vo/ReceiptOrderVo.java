@@ -14,7 +14,7 @@ public class ReceiptOrderVo implements Serializable {
 
     private String receiptNum;//子订单编号
 
-    private String oInuretime;//订单时间
+    private String oinuretime;//订单时间
 
     private String agentId;//代理商唯一编码
 
@@ -69,12 +69,12 @@ public class ReceiptOrderVo implements Serializable {
         this.receiptNum = receiptNum;
     }
 
-    public String getoInuretime() {
-        return oInuretime;
+    public String getOinuretime() {
+        return oinuretime;
     }
 
-    public void setoInuretime(String oInuretime) {
-        this.oInuretime = oInuretime;
+    public void setOinuretime(String oinuretime) {
+        this.oinuretime = oinuretime;
     }
 
     public String getAgentId() {
