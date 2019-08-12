@@ -139,12 +139,15 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
             return Arrays.asList();
         }
         for (Map<String, Object> stringObjectMap : cUserOrgCodelist) {
-            //针对多级省区优化
-            boolean isRegion = Pattern.matches("region_[a-zA-Z]{1,5}", stringObjectMap.get("PIDORGCODE").toString());
-            if(isRegion){
-                stringObjectMap.put("isRegion",true);
-            }else {
-                stringObjectMap.put("isRegion",false);
+            String pidorgcode = String.valueOf(stringObjectMap.get("PIDORGCODE"));
+            if(StringUtils.isNotBlank(pidorgcode) && !pidorgcode.equals("null")){
+                //针对多级省区优化
+                boolean isRegion = Pattern.matches("region_[a-zA-Z]{1,5}", pidorgcode);
+                if(isRegion){
+                    stringObjectMap.put("isRegion",true);
+                }else {
+                    stringObjectMap.put("isRegion",false);
+                }
             }
         }
         return cUserOrgCodelist;
