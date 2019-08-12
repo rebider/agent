@@ -401,4 +401,18 @@ public class CapitalServiceImpl implements CapitalService {
         return capitalFlows;
     }
 
+    @Override
+    public List<Capital> queryCapitalPro(String proIns) {
+        if (org.apache.commons.lang.StringUtils.isBlank(proIns)){
+            new ArrayList<AgentContract>();
+        }
+        CapitalExample capitalExample = new CapitalExample();
+        CapitalExample.Criteria criteria = capitalExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andActivIdEqualTo(proIns);
+        List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
+        if (null!=capitals && capitals.size()>0){
+            return capitals;
+        }
+        return   new ArrayList<Capital>();
+    }
+
 }

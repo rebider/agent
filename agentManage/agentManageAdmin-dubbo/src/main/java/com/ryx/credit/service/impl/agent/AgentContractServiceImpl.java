@@ -321,4 +321,19 @@ public class AgentContractServiceImpl implements AgentContractService {
         return pageInfo;
     }
 
+    @Override
+    public List<AgentContract> queryContract(String proIns) {
+        if (StringUtils.isBlank(proIns)){
+            new ArrayList<AgentContract>();
+        }
+        AgentContractExample agentContractExample = new AgentContractExample();
+        AgentContractExample.Criteria criteria = agentContractExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andActivIdEqualTo(proIns);
+        List<AgentContract> agentContracts = agentContractMapper.selectByExample(agentContractExample);
+        if (null!=agentContracts && agentContracts.size()>0){
+            return agentContracts;
+        }
+
+        return new ArrayList<AgentContract>();
+    }
+
 }

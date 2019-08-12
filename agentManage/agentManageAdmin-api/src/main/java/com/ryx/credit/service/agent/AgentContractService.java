@@ -53,4 +53,9 @@ public interface AgentContractService {
     public ResultVO updateAgentContractVo(List<AgentContractVo> list, Agent agent,String userId);
 
     PageInfo getAgentContractList(Page page, Map map, Long userId);
+
+    /**
+     * 根据工作流id查询合同信息
+     */
+    public List<AgentContract> queryContract(String proIns);
 }
