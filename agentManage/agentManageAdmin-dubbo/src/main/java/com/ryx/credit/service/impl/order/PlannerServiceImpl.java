@@ -319,7 +319,6 @@ public class PlannerServiceImpl implements PlannerService {
                     );
                 }
                 receiptOrderVo.setPlanProNum(null);
-                System.out.println(receiptOrderVo.getOinuretime());
             }
         }
 
