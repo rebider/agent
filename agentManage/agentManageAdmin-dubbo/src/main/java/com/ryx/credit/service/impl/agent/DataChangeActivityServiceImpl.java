@@ -351,7 +351,8 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                     AgentColinfo agentColinfoVo=voColinfoVoList.get(0);
 
 
-                                    for (AgentBusInfo agentBusInfo : agentBusInfoList) {        //为业务平台建立练习
+                                    for (AgentBusInfo agentBusInfo : agentBusInfoList) {        //为业务平台建立结算卡关系
+
                                         AgentColinfoRel agentColinfoRel = new AgentColinfoRel();
                                         agentColinfoRel.setcUse(rel.getcUser());
                                         agentColinfoRel.setAgentid(voAgent.getId());
@@ -382,6 +383,21 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                             agentColinfoService.updateAgentColinfoVo(voColinfoVoList, vo.getAgent(),rel.getcUser(),null);
                                             logger.info("========================一分钱验证状态修改完成");
 
+                                            logger.info("========================修复业务结算卡关系");
+                                            AgentColinfo agentColinfo_db = agentColinfoService.selectByAgentId(vo.getAgent().getId());
+                                            if(agentColinfo_db!=null && StringUtils.isNotBlank(agentColinfo_db.getId())){
+                                                for (AgentBusInfo agentBusInfo : agentBusInfoList) {
+                                                    AgentColinfoRel agentColinfoRel = new AgentColinfoRel();
+                                                    agentColinfoRel.setcUse(rel.getcUser());
+                                                    agentColinfoRel.setAgentid(voAgent.getId());
+                                                    agentColinfoRel.setAgentColinfoid(agentColinfo_db.getId());
+                                                    agentColinfoRel.setBusPlatform(agentBusInfo.getBusPlatform());
+                                                    agentColinfoRel.setAgentbusid(agentBusInfo.getId());
+                                                    agentColinfoService.saveAgentColinfoRel(agentColinfoRel, rel.getcUser());
+                                                }
+                                            }
+                                            logger.info("========================修复业务结算卡关系");
+
                                             logger.info("========================同步至业务系统开始");
                                             for (AgentBusInfo agentBusInfo : agentBusInfoList) {
                                                 agentNetInNotityService.asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
@@ -389,6 +405,22 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                             logger.info("========================同步至业务系统完成");
                                             break;
                                         }else if (!synTemp){//同步至业务系统
+
+                                            logger.info("========================修复业务结算卡关系");
+                                            AgentColinfo agentColinfo_db = agentColinfoService.selectByAgentId(vo.getAgent().getId());
+                                            if(agentColinfo_db!=null && StringUtils.isNotBlank(agentColinfo_db.getId())){
+                                                for (AgentBusInfo agentBusInfo : agentBusInfoList) {
+                                                    AgentColinfoRel agentColinfoRel = new AgentColinfoRel();
+                                                    agentColinfoRel.setcUse(rel.getcUser());
+                                                    agentColinfoRel.setAgentid(voAgent.getId());
+                                                    agentColinfoRel.setAgentColinfoid(agentColinfo_db.getId());
+                                                    agentColinfoRel.setBusPlatform(agentBusInfo.getBusPlatform());
+                                                    agentColinfoRel.setAgentbusid(agentBusInfo.getId());
+                                                    agentColinfoService.saveAgentColinfoRel(agentColinfoRel, rel.getcUser());
+                                                }
+                                            }
+                                            logger.info("========================修复业务结算卡关系");
+
                                             for (AgentBusInfo agentBusInfo : agentBusInfoList) {
                                                 agentNetInNotityService.asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
                                             }
