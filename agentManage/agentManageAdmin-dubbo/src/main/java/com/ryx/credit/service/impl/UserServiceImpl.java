@@ -146,7 +146,11 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
                 if(isRegion){
                     stringObjectMap.put("isRegion",true);
                 }else {
-                    stringObjectMap.put("isRegion",false);
+                    if("beijing".equals(pidorgcode)){
+                        stringObjectMap.put("isRegion",true);
+                    }else{
+                        stringObjectMap.put("isRegion",false);
+                    }
                 }
             }
         }
