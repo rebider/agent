@@ -50,7 +50,7 @@
         <if test="pCode == null">
           pid is null
         </if>
-        and (code like 'region_%' or code ='beijing')
+        and (code like 'region_%' or code like 'beijing%')
     </select>
 
 </mapper>
