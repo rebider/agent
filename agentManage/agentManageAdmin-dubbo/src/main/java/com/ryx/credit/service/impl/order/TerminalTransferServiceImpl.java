@@ -28,6 +28,7 @@ import com.ryx.credit.service.agent.BusinessPlatformService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.TerminalTransferService;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1286,8 +1287,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
      * @Date: 2019/7/25
      */
     public Map<String, Object>  getAgentType(String orgId) {
-
-        return terminalTransferMapper.getAgentType(orgId);
+        Map<String, Object>  data =  terminalTransferMapper.getAgentType(orgId);
+        if(data==null)return new HashMap<>();
+        return data;
 
     }
 
