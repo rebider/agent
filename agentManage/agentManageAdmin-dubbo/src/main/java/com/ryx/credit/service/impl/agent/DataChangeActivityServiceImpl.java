@@ -456,7 +456,10 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             }
                         }
 
+                        //======================================更新业务信息
                         ResultVO res = agentEnterService.updateAgentVo(vo,rel.getcUser(),true,null);
+
+                        //======================================更新费率信息
                         for (AgentBusInfoVo agentBusInfoVo : vo.getEditDebitList()) {
                             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
                             agentBusInfoVo.setId(agentBusInfoVo.getId());
@@ -467,6 +470,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                 throw new ProcessException("更新借记费率等信息失败");
                             }
                         }
+
                         logger.info("========审批流完成{}业务{}状态{},结果{}", proIns, rel.getBusType(), agStatus, res.getResInfo());
                         //更新数据状态为审批成功
                         if(res.isSuccess()){
