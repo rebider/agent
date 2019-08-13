@@ -960,7 +960,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                        } else if ("01".equals(transferStatus)) {
                            log.info("划拨中请求参数：{}",JSONObject.toJSON(terminalTransferDetail));
                            log.info("划拨中请求结果：{}",JSONObject.toJSON(agentResult));
-                           break;
+                          continue;
                        } else if ("02".equals(transferStatus)) {
                            log.info("划拨失败请求参数：{}",JSONObject.toJSON(terminalTransferDetail));
                            log.info("划拨失败请求结果：{}",JSONObject.toJSON(agentResult));

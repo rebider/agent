@@ -51,7 +51,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
     private final static String PASSWORD = AppConfig.getProperty("encrypt.key"); // 加密key
     private final static String TICKET_INFO_URL = AppConfig.getProperty("jd.ticketInfo")+"?access_token="; // 获取发票信息url
 
-    private final static String[] ARRAY = {"研发和技术服务","研发服务","信息技术服务","软件服务","信息系统服务","其他现代服务费","技术服务","信息技术服务","咨询服务"};
+    private final static String[] ARRAY = {"研发和技术服务","研发服务","信息技术服务","软件服务","信息系统服务","现代服务","技术服务","信息技术服务","咨询服务"};
 
 
     private String tocken = "";
@@ -226,7 +226,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                             }
                             if(!flag){
                                 invoiceApply.setYsResult("0");
-                                invoiceApply.setRev1("货物或应税劳务、服务名称不符！");
+                                invoiceApply.setRev1("商品名称不符！");
                             }
                         }else{
                             invoiceApply.setYsResult("0");

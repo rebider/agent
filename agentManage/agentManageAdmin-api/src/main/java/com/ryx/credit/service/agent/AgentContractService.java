@@ -6,6 +6,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentContract;
+import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentContractVo;
 
 import java.math.BigDecimal;
@@ -53,4 +54,12 @@ public interface AgentContractService {
     public ResultVO updateAgentContractVo(List<AgentContractVo> list, Agent agent,String userId);
 
     PageInfo getAgentContractList(Page page, Map map, Long userId);
+
+    /**
+     * 根据工作流id查询合同信息
+     */
+    public List<AgentContract> queryContract(String proIns);
+
+    void updateContractList(List<AgentContractVo> agentContractVoList)throws Exception;
+
 }
