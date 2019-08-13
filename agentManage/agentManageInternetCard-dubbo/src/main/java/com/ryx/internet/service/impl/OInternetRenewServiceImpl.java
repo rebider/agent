@@ -82,6 +82,13 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     @Autowired
     private InternetRenewOffsetMapper internetRenewOffsetMapper;
 
+    public static Date stepMonth(Date sourceDate, int month) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(sourceDate);
+        c.add(Calendar.MONTH, month);
+        return c.getTime();
+    }
+
     @Override
     public PageInfo internetRenewList(OInternetRenew internetRenew, Page page,String agentId){
 
@@ -139,7 +146,6 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         return pageInfo;
     }
 
-
     @Override
     public List<OInternetRenewDetail> queryInternetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page,String agentId){
         OInternetRenewDetailExample oInternetRenewDetailExample = queryParam(internetRenewDetail,agentId);
@@ -147,7 +153,6 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         List<OInternetRenewDetail> internetRenewDetailList = internetRenewDetailMapper.selectByExample(oInternetRenewDetailExample);
         return internetRenewDetailList;
     }
-
 
     @Override
     public Integer queryInternetRenewDetailCount(OInternetRenewDetail internetRenewDetail,String agentId){
@@ -197,7 +202,6 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         return internetRenewDetailExample;
     }
 
-
     @Override
     public PageInfo internetRenewOffsetList(InternetRenewOffset internetRenewOffset, Page page,String agentId){
 
@@ -245,7 +249,6 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         pageInfo.setTotal((int)internetRenewOffsetMapper.countByExample(internetRenewOffsetExample));
         return pageInfo;
     }
-
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
@@ -372,6 +375,9 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 if(StringUtils.isBlank(oInternetCard.getMerId()) || StringUtils.isBlank(oInternetCard.getMerName())  ){
                     throw new MessageException("第"+i+"个商户信息不全,轧差商户方式必须包含商户信息");
                 }
+                if(oInternetCard.getMerId().equals("无") || oInternetCard.getMerName().equals("无")){
+                    throw new MessageException("第"+i+"个商户信息不全,轧差商户方式必须包含商户信息");
+                }
             }
             oInternetRenewDetail.setMerId(oInternetCard.getMerId());
             oInternetRenewDetail.setMerName(oInternetCard.getMerName());
@@ -478,7 +484,6 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         return AgentResult.ok();
     }
 
-
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public void approveTashBusiness(AgentVo agentVo, String userId) throws Exception {
@@ -488,7 +493,6 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             throw new MessageException("更新收款信息失败");
         }
     }
-
 
     /**
      * 完成处理
@@ -623,14 +627,6 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 throw new MessageException("状态不正确,不允许续费");
             }
         }
-    }
-
-
-    public static Date stepMonth(Date sourceDate, int month) {
-        Calendar c = Calendar.getInstance();
-        c.setTime(sourceDate);
-        c.add(Calendar.MONTH, month);
-        return c.getTime();
     }
 
 }
