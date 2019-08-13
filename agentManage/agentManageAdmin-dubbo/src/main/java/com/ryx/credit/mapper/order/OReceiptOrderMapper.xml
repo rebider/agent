@@ -527,7 +527,7 @@
         and ro.ADDR_REALNAME = #{par.addrRealname}
       </if>
       <if test="par.avtivityName != null and par.avtivityName!=''" >
-        and ac.pro_name like '${par.avtivityName}'
+        and ac.ACTIVITY_NAME like '${par.avtivityName}'
       </if>
       <if test="par.oInuretime != null and par.oInuretime != '' " >
         and to_char(o.O_INURETIME,'YYYY-MM-DD') = #{par.oInuretime}
