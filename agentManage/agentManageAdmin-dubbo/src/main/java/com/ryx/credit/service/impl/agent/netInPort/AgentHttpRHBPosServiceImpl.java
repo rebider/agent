@@ -138,9 +138,9 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
             log.info("通知瑞花宝入网请求参数：{}",json);
             log.info("通知瑞花宝入网请求参数加密：{}",reqParamEncrypt);
             String httpResult = HttpClientUtil.sendHttpPost(rhbReqUrl, reqParamEncrypt);
-            log.info("通知瑞大宝入网返回参数1：{}",httpResult);
+            log.info("通知瑞花宝入网返回参数1：{}",httpResult);
             String reqParamDecrypt = Des3Util.Decrypt(httpResult, rhb3desKey, rhb3desIv.getBytes());
-            log.info("通知瑞大宝入网返回参数：{}",reqParamDecrypt);
+            log.info("通知瑞花宝入网返回参数：{}",reqParamDecrypt);
             JSONObject respXMLObj = JSONObject.parseObject(reqParamDecrypt);
             if (respXMLObj.getString("MSG_CODE").equals("0000")){
                 return AgentResult.ok(respXMLObj);
@@ -243,9 +243,9 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
             log.info("通知瑞花宝入网升级请求参数：{}",json);
             log.info("通知瑞花宝入网升级请求参数加密：{}",reqParamEncrypt);
             String httpResult = HttpClientUtil.sendHttpPost(rhbReqUrl, reqParamEncrypt);
-            log.info("通知瑞大宝入网升级返回参数1：{}",httpResult);
+            log.info("通知瑞花宝入网升级返回参数1：{}",httpResult);
             String reqParamDecrypt = Des3Util.Decrypt(httpResult, rhb3desKey, rhb3desIv.getBytes());
-            log.info("通知瑞大宝入网升级返回参数：{}",reqParamDecrypt);
+            log.info("通知瑞花宝入网升级返回参数：{}",reqParamDecrypt);
             JSONObject respXMLObj = JSONObject.parseObject(reqParamDecrypt);
             if (respXMLObj.getString("MSG_CODE").equals("0000")){
                 return AgentResult.ok(respXMLObj);
@@ -340,9 +340,9 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
             log.info("通知瑞花宝入网修改请求参数：{}",json);
             log.info("通知瑞花宝入网修改请求参数加密：{}",reqParamEncrypt);
             String httpResult = HttpClientUtil.sendHttpPost(rhbReqUrl, reqParamEncrypt);
-            log.info("通知瑞大宝入网修改返回参数1：{}",httpResult);
+            log.info("通知瑞花宝入网修改返回参数1：{}",httpResult);
             String reqParamDecrypt = Des3Util.Decrypt(httpResult, rhb3desKey, rhb3desIv.getBytes());
-            log.info("通知瑞大宝入网修改返回参数：{}",reqParamDecrypt);
+            log.info("通知瑞花宝入网修改返回参数：{}",reqParamDecrypt);
             JSONObject respXMLObj = JSONObject.parseObject(reqParamDecrypt);
             if (respXMLObj.getString("MSG_CODE").equals("0000")){
                 return AgentResult.ok(respXMLObj);
@@ -379,9 +379,9 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
         log.info("通知瑞花宝升级验证请求参数：{}",json);
         log.info("通知瑞花宝升级验证请求参数加密：{}",reqParamEncrypt);
         String httpResult = HttpClientUtil.sendHttpPost(rhbReqUrl, reqParamEncrypt);
-        log.info("通知瑞大宝升级验证返回参数1：{}",httpResult);
+        log.info("通知瑞花宝升级验证返回参数1：{}",httpResult);
         String reqParamDecrypt = Des3Util.Decrypt(httpResult, rhb3desKey, rhb3desIv.getBytes());
-        log.info("通知瑞大宝升级验证返回参数：{}",reqParamDecrypt);
+        log.info("通知瑞花宝升级验证返回参数：{}",reqParamDecrypt);
         JSONObject respXMLObj = JSONObject.parseObject(reqParamDecrypt);
         if (respXMLObj.getString("MSG_CODE").equals("0000")){
             return AgentResult.ok(respXMLObj);
