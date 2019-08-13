@@ -459,7 +459,7 @@
     ICCID_NUM, CARD_IMPORT_ID, BATCH_NUM, SN_NUM, DELIVER_TIME, CONSIGNEE, ORDER_ID,
     AGENT_ID, AGENT_NAME, INTERNET_CARD_NUM, ISSUER, OPEN_ACCOUNT_TIME, EXPIRE_TIME,
     INTERNET_CARD_STATUS, MER_ID, LATELY_PAY_TIME, MER_NAME,d.D_ITEMNAME as MANUFACTURER, RENEW, C_TIME,
-    U_TIME, C_USER, U_USER, STATUS, VERSION
+    U_TIME, C_USER, U_USER, STATUS, VERSION ,STOP, RENEW_STATUS, STOP_REASON
   </sql>
   <select id="queryInternetCardList" parameterType="com.ryx.internet.pojo.OInternetCardExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />

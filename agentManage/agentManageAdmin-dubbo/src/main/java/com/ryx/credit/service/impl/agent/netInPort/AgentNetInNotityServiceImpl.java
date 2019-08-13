@@ -340,7 +340,6 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                 updateAgent.setcIncomStatus(AgentInStatus.NO_ACT.status);//入网未激活
             }
             Date nowDate = new Date();
-            updateAgent.setcIncomTime(nowDate);
             updateAgent.setcUtime(nowDate);
             int upResult1 = agentMapper.updateByPrimaryKeySelective(updateAgent);
             log.info("入网开户修改操作: 接收入网更新入网状态,业务id：{},upResult1:{}",upResult1);
@@ -568,7 +567,6 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                         updateAgent.setVersion(agent.getVersion());
                         updateAgent.setcIncomStatus(AgentInStatus.IN.status);
                         Date nowDate = new Date();
-                        updateAgent.setcIncomTime(nowDate);
                         updateAgent.setcUtime(nowDate);
                         if(1!=agentMapper.updateByPrimaryKeySelective(updateAgent)){
                             log.info("升级开户接口{}平台编号不为空走升级接口,更新的代理商{}",agentBusInfo.getBusNum(),"入网状态更新失败");
