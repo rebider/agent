@@ -6,6 +6,7 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
+import com.ryx.credit.dao.agent.PlatFormMapper;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
@@ -49,6 +50,8 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
     private AgentColinfoService agentColinfoService;
     @Autowired
     private AgentMapper agentMapper;
+    @Autowired
+    private PlatFormMapper platFormMapper;
 
     /**
      * 入网组装参数
@@ -135,9 +138,9 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
             log.info("通知瑞花宝入网请求参数：{}",json);
             log.info("通知瑞花宝入网请求参数加密：{}",reqParamEncrypt);
             String httpResult = HttpClientUtil.sendHttpPost(rhbReqUrl, reqParamEncrypt);
-            log.info("通知瑞大宝入网返回参数1：{}",httpResult);
+            log.info("通知瑞花宝入网返回参数1：{}",httpResult);
             String reqParamDecrypt = Des3Util.Decrypt(httpResult, rhb3desKey, rhb3desIv.getBytes());
-            log.info("通知瑞大宝入网返回参数：{}",reqParamDecrypt);
+            log.info("通知瑞花宝入网返回参数：{}",reqParamDecrypt);
             JSONObject respXMLObj = JSONObject.parseObject(reqParamDecrypt);
             if (respXMLObj.getString("MSG_CODE").equals("0000")){
                 return AgentResult.ok(respXMLObj);
@@ -240,9 +243,9 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
             log.info("通知瑞花宝入网升级请求参数：{}",json);
             log.info("通知瑞花宝入网升级请求参数加密：{}",reqParamEncrypt);
             String httpResult = HttpClientUtil.sendHttpPost(rhbReqUrl, reqParamEncrypt);
-            log.info("通知瑞大宝入网升级返回参数1：{}",httpResult);
+            log.info("通知瑞花宝入网升级返回参数1：{}",httpResult);
             String reqParamDecrypt = Des3Util.Decrypt(httpResult, rhb3desKey, rhb3desIv.getBytes());
-            log.info("通知瑞大宝入网升级返回参数：{}",reqParamDecrypt);
+            log.info("通知瑞花宝入网升级返回参数：{}",reqParamDecrypt);
             JSONObject respXMLObj = JSONObject.parseObject(reqParamDecrypt);
             if (respXMLObj.getString("MSG_CODE").equals("0000")){
                 return AgentResult.ok(respXMLObj);
@@ -337,9 +340,9 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
             log.info("通知瑞花宝入网修改请求参数：{}",json);
             log.info("通知瑞花宝入网修改请求参数加密：{}",reqParamEncrypt);
             String httpResult = HttpClientUtil.sendHttpPost(rhbReqUrl, reqParamEncrypt);
-            log.info("通知瑞大宝入网修改返回参数1：{}",httpResult);
+            log.info("通知瑞花宝入网修改返回参数1：{}",httpResult);
             String reqParamDecrypt = Des3Util.Decrypt(httpResult, rhb3desKey, rhb3desIv.getBytes());
-            log.info("通知瑞大宝入网修改返回参数：{}",reqParamDecrypt);
+            log.info("通知瑞花宝入网修改返回参数：{}",reqParamDecrypt);
             JSONObject respXMLObj = JSONObject.parseObject(reqParamDecrypt);
             if (respXMLObj.getString("MSG_CODE").equals("0000")){
                 return AgentResult.ok(respXMLObj);
@@ -356,5 +359,35 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
     }
 
 
+    @Override
+    public AgentResult agencyLevelCheck(Map<String, Object> paramMap)throws Exception{
+
+        Map<Object, Object> reqMap = new HashMap<>();
+        reqMap.put("application","CheckPromotionAgency");
+        reqMap.put("brandCode",paramMap.get("brandCode"));
+        reqMap.put("agentId",paramMap.get("agentId"));
+        String directAgentId = String.valueOf(paramMap.get("directAgentId"));
+        AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(directAgentId);
+        if(agentBusInfo==null){
+            throw new Exception("上级信息有误");
+        }
+        reqMap.put("directAgentId",agentBusInfo.getBusNum());
+        reqMap.put("upAgentId",agentBusInfo.getBrandNum());
+
+        String json = JsonUtil.objectToJson(reqMap);
+        String reqParamEncrypt = Des3Util.Encrypt(json, rhb3desKey, rhb3desIv.getBytes());
+        log.info("通知瑞花宝升级验证请求参数：{}",json);
+        log.info("通知瑞花宝升级验证请求参数加密：{}",reqParamEncrypt);
+        String httpResult = HttpClientUtil.sendHttpPost(rhbReqUrl, reqParamEncrypt);
+        log.info("通知瑞花宝升级验证返回参数1：{}",httpResult);
+        String reqParamDecrypt = Des3Util.Decrypt(httpResult, rhb3desKey, rhb3desIv.getBytes());
+        log.info("通知瑞花宝升级验证返回参数：{}",reqParamDecrypt);
+        JSONObject respXMLObj = JSONObject.parseObject(reqParamDecrypt);
+        if (respXMLObj.getString("MSG_CODE").equals("0000")){
+            return AgentResult.ok(respXMLObj);
+        }else{
+            throw new Exception(respXMLObj.getString("MSG_TEXT"));
+        }
+    }
 }
 

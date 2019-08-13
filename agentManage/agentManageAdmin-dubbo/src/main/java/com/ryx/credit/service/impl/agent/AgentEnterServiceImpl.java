@@ -16,6 +16,7 @@ import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IResourceService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
+import com.ryx.credit.service.agent.netInPort.AgentNetInHttpService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.pay.LivenessDetectionService;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -89,6 +91,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private LivenessDetectionService livenessDetectionService;
     @Autowired
     private IResourceService iResourceService;
+
+
 
     /**
      * 代理商入网信息保存
@@ -296,6 +300,12 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     }
                     if (StringUtils.isBlank(item.getBusParent())){
                         throw new ProcessException("升级直签上级不能为空");
+                    }
+                    Map<String, Object> reqMap = new HashMap<>();
+                    reqMap.put("busInfo",item);
+                    AgentResult agentResult = agentNetInNotityService.agencyLevelCheck(reqMap);
+                    if(!agentResult.isOK()){
+                        throw new ProcessException(agentResult.getMsg());
                     }
                 }
                 if(OrgType.zQ(item.getBusType())){
