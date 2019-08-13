@@ -280,7 +280,7 @@
   <select id="getAgentType" parameterType="java.lang.String" resultType="java.util.Map">
     select  * from a_agent_businfo
     <where>
-    bus_num = #{busNum} and  STATUS=1  and ROWNUM = 1
+    bus_num = #{busNum} and  STATUS=1  and ROWNUM = 1 and BUS_STATUS=1
     </where>
   </select>
 <select id="getSN"  resultType="java.util.Map">
