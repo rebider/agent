@@ -797,6 +797,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     @Override
     public AgentResult compressTerminalTransferActivity(String proIns, BigDecimal agStatus) throws Exception {
 
+        //查询审批流程记录
         BusActRelExample example = new BusActRelExample();
         example.or().andActivIdEqualTo(proIns).andStatusEqualTo(Status.STATUS_1.status).andActivStatusEqualTo(AgStatus.Approving.name());
         List<BusActRel> list = busActRelMapper.selectByExample(example);
@@ -804,11 +805,11 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             log.info("审批任务结束{}{}，未找到审批中的审批和数据关系", proIns, agStatus);
             throw new MessageException("审批和数据关系有误");
         }
+
+
         BusActRel busActRel = list.get(0);
+        //更新划拨申请审批状态
         TerminalTransfer terminalTransfer = terminalTransferMapper.selectByPrimaryKey(busActRel.getBusId());
-
-
-
         terminalTransfer.setReviewStatus(agStatus);
         terminalTransfer.setuTime(new Date());
         int i = terminalTransferMapper.updateByPrimaryKeySelective(terminalTransfer);
@@ -816,43 +817,34 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             log.info("审批任务结束{}{}，终端划拨更新失败1", proIns, agStatus);
             throw new MessageException("终端划拨更新失败");
         }
-        TerminalTransferDetailExample terminalTransferDetailExample = new TerminalTransferDetailExample();
-        TerminalTransferDetailExample.Criteria criteria = terminalTransferDetailExample.createCriteria();
-        criteria.andStatusEqualTo(Status.STATUS_1.status);
-        criteria.andTerminalTransferIdEqualTo(terminalTransfer.getId());
-        List<TerminalTransferDetail> terminalTransferDetails = terminalTransferDetailMapper.selectByExample(terminalTransferDetailExample);
-        if (terminalTransferDetails.size() == 0) {
-            throw new MessageException("终端划拨更新失败");
-        }
-        /*for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetails) {
-            try {
-                //从redis取出导入的数据更新到DB
-                String terminalTransferJson = redisService.hGet(RedisCachKey.TERMINAL_TRANSFER.code, terminalTransferDetail.getId());
-                TerminalTransferDetail terminal = JsonUtil.jsonToPojo(terminalTransferJson, TerminalTransferDetail.class);
-                TerminalTransferDetail upTerminal = new TerminalTransferDetail();
-                upTerminal.setId(terminalTransferDetail.getId());
-                upTerminal.setAdjustStatus(terminal.getAdjustStatus());
-                upTerminal.setRemark(terminal.getRemark());
-                upTerminal.setAdjustTime(terminal.getAdjustTime());
-                upTerminal.setBatchNum(terminal.getBatchNum());
-                int j = terminalTransferDetailMapper.updateByPrimaryKeySelective(upTerminal);
-                if (j != 1) {
-                    throw new MessageException("终端划拨明细更新到DB失败");
-                }
-                redisService.hDel(RedisCachKey.TERMINAL_TRANSFER.code, terminalTransferDetail.getId());
-            } catch (Exception e) {
-                e.getStackTrace();
-                throw new MessageException("终端划拨明细更新到DB失败");
-            }
-        }*/
+        //更新审批流程状态
         busActRel.setActivStatus(AgStatus.getAgStatusString(agStatus));
         int j = busActRelMapper.updateByPrimaryKey(busActRel);
         if (j != 1) {
             log.info("审批任务结束{}{}，终端划拨更新失败2", proIns, agStatus);
             throw new MessageException("终端划拨更新失败");
         }
-        //将通过的结果再次返回给业务平台通知他们开始划拨
-        startTransfer(terminalTransfer);
+        //审批通过通知业务系统
+        if(AgStatus.Approved.status.compareTo(agStatus)==0) {
+            //将通过的结果再次返回给业务平台通知他们开始划拨
+            log.info("审批任务结束{}{}，开始进行调整", proIns, agStatus);
+            startTransfer(terminalTransfer);
+        //审批拒绝更新明细为局拒绝调整
+        }else if(AgStatus.Refuse.status.compareTo(agStatus)==0 || AgStatus.Cancel.status.compareTo(agStatus)==0 || AgStatus.Reject.status.compareTo(agStatus)==0){
+            TerminalTransferDetailExample terminalTransferDetailExample = new TerminalTransferDetailExample();
+            TerminalTransferDetailExample.Criteria criteria = terminalTransferDetailExample.createCriteria();
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
+            criteria.andTerminalTransferIdEqualTo(terminalTransfer.getId());
+            List<TerminalTransferDetail> terminalTransferDetails = terminalTransferDetailMapper.selectByExample(terminalTransferDetailExample);
+            for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetails) {
+                terminalTransferDetail.setAdjustStatus(AdjustStatus.JJTZ.getValue());
+                terminalTransferDetail.setAdjustMsg(AdjustStatus.JJTZ.msg);
+                terminalTransferDetail.setuTime(Calendar.getInstance().getTime());
+                if(1!=terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail)){
+                    throw new MessageException("终端划拨更新失败");
+                }
+            }
+        }
         return AgentResult.ok();
     }
 
