@@ -1173,7 +1173,49 @@ public class OrderServiceImpl implements OrderService {
                 List<OSubOrderActivity> sSubOrderActivitys = oSubOrderActivityMapper.selectByExample(oSubOrderActivityExample);
                 f.putKeyV("sSubOrderActivitys", sSubOrderActivitys);
                 f.putKeyV("sSubOrderActivitysJson", JSONArray.toJSONString(sSubOrderActivitys));
+
+                //活动代码
+                for (OSubOrderActivity sSubOrderActivity : sSubOrderActivitys) {
+                    OActivityExample oActivityExample = new OActivityExample();
+                    oActivityExample.createCriteria()
+                            .andStatusEqualTo(Status.STATUS_1.status)
+                            .andIdEqualTo(sSubOrderActivity.getActivityId());
+                    List<OActivity> oActivityList = oActivityMapper.selectByExample(oActivityExample);
+                    if (oActivityList.size() > 0) {
+                        for (OActivity oActivity : oActivityList) {
+                            sSubOrderActivity.setActivityName(sSubOrderActivity.getActivityName()+"-"+oActivity.getActCode());
+                        }
+                    }
+                }
             }
+            List<Object> oActivityLists = new ArrayList<>();
+            for (OSubOrder oSubOrder : oSubOrders) {
+                //根据商品id、实际单价查询可变更的活动数据
+                OActivityExample oActivityExample = new OActivityExample();
+                oActivityExample.or()
+                        .andStatusEqualTo(Status.STATUS_1.status)
+                        .andProductIdEqualTo(oSubOrder.getProId())
+                        .andPriceEqualTo(oSubOrder.getProRelPrice());
+                List<OActivity> oActivityList = oActivityMapper.selectByExample(oActivityExample);
+                //厂商、机具型号、pos类型
+                for (OActivity oActivity : oActivityList) {
+                    if (null != oActivity.getVender()) {
+                        Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), oActivity.getVender());
+                        if (null != dictByValue)
+                            oActivity.setVender(dictByValue.getdItemname());
+                    }
+                    if (null != oActivity.getProModel()) {
+                        Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.PROMODE.name(), oActivity.getProModel());
+                        if (null != dictByValue)
+                            oActivity.setProModel(dictByValue.getdItemname());
+                    }
+                    if (null != oActivity.getPosType()) {
+                        oActivity.setPosType(PosType.getContentByValue(oActivity.getPosType()));
+                    }
+                }
+                oActivityLists.add(oActivityList);
+            }
+            f.putKeyV("oActivityLists", oActivityLists);
         }
         //配货信息
         OReceiptOrderExample oReceiptOrderExample = new OReceiptOrderExample();
@@ -3517,6 +3559,133 @@ public class OrderServiceImpl implements OrderService {
         //数据库配货地址同步
         AgentResult sysn = sysnReceiptOrderPorNum(oReceiptPro_db.getReceiptId());
         return sysn;
+    }
+
+    @Override
+    public AgentResult orderChangeActivity(String oNum, String subOrderId, String activityId, String userId) throws Exception {
+        logger.info("用户[{}]变更活动[{}]", userId, JSONObject.toJSONString(oNum));
+        if (StringUtils.isBlank(activityId)) {
+            return AgentResult.fail("请选择变更活动");
+        }
+
+        //查询此订单是否有已发货数据
+        ReceiptPlanExample receiptPlanExample = new ReceiptPlanExample();
+        receiptPlanExample.or()
+                .andStatusEqualTo(Status.STATUS_1.status)
+                .andPlanOrderStatusEqualTo(new BigDecimal(PlannerStatus.YesDeliver.getValue()))
+                .andOrderIdEqualTo(oNum);
+        List<ReceiptPlan> receiptPlanList = receiptPlanMapper.selectByExample(receiptPlanExample);
+        if (receiptPlanList.size()!=0 && receiptPlanList!=null) {
+            logger.info("用户{}变更活动{}，已有正在发货的商品，不允许变更活动", userId, oNum);
+            return AgentResult.fail("已有正在发货的商品，不支持变更活动");
+        }
+
+        //变更活动，更新采购单、采购活动数据
+        if (StringUtils.isNotBlank(subOrderId)) {
+            //商品活动数据
+            OActivityExample oActivityExample = new OActivityExample();
+            oActivityExample.createCriteria()
+                    .andStatusEqualTo(Status.STATUS_1.status)
+                    .andIdEqualTo(activityId);
+            List<OActivity> oActivityList = oActivityMapper.selectByExample(oActivityExample);
+            OActivity oActivity = oActivityList.get(0);
+            //判断条件限制
+            OSubOrderExample oSubOrderExample = new OSubOrderExample();
+            oSubOrderExample.createCriteria()
+                    .andStatusEqualTo(Status.STATUS_1.status)
+                    .andIdEqualTo(subOrderId);
+            List<OSubOrder> oSubOrderList = oSubOrderMapper.selectByExample(oSubOrderExample);
+            OSubOrder subOrder = oSubOrderList.get(0);
+            if (subOrder != null) {
+                if (!subOrder.getProId().equals(oActivity.getProductId())) {
+                    logger.info("用户{}变更活动{}，变更活动商品ID与原活动商品ID不一致", userId, oNum);
+                    return AgentResult.fail("活动变更失败，变更活动商品ID与原活动商品ID不一致");
+                }
+                if (!subOrder.getProRelPrice().equals(oActivity.getPrice())) {
+                    logger.info("用户{}变更活动{}，变更活动商品价格与原活动商品价格不一致", userId, oNum);
+                    return AgentResult.fail("活动变更失败，变更活动商品价格与原活动商品价格不一致");
+                }
+                OProduct product = oProductMapper.selectByPrimaryKey(subOrder.getProId());
+                //采购单数据
+                subOrder.setProCode(product.getProCode());
+                subOrder.setProName(product.getProName());
+                subOrder.setProType(product.getProType());
+                subOrder.setModel(product.getProModel());
+                subOrder.setuUser(userId);
+                subOrder.setuTime(new Date());
+                int updateOSubOrder = oSubOrderMapper.updateByPrimaryKeySelective(subOrder);
+                if (updateOSubOrder != 1) {
+                    logger.info("活动变更:{}", "OSubOrder-更新失败");
+                    throw new MessageException("活动变更失败");
+                }
+
+                //采购活动数据
+                OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
+                oSubOrderActivityExample.createCriteria()
+                        .andStatusEqualTo(Status.STATUS_1.status)
+                        .andSubOrderIdEqualTo(subOrderId);
+                List<OSubOrderActivity> oSubOrderActivityList = oSubOrderActivityMapper.selectByExample(oSubOrderActivityExample);
+                OSubOrderActivity subOrderActivity = oSubOrderActivityList.get(0);
+                subOrderActivity.setActivityId(oActivity.getId());
+                subOrderActivity.setActivityName(oActivity.getActivityName());
+                subOrderActivity.setRuleId(oActivity.getRuleId());
+                subOrderActivity.setProName(subOrder.getProName());
+                subOrderActivity.setActivityRule(oActivity.getActivityRule());
+                subOrderActivity.setActivityWay(oActivity.getActivityWay());
+                subOrderActivity.setProModel(oActivity.getProModel());
+                subOrderActivity.setVender(oActivity.getVender());
+                subOrderActivity.setPlatform(oActivity.getPlatform());
+                subOrderActivity.setBusProCode(oActivity.getBusProCode());
+                subOrderActivity.setBusProName(oActivity.getBusProName());
+                subOrderActivity.setTermBatchcode(oActivity.getTermBatchcode());
+                subOrderActivity.setTermBatchname(oActivity.getTermBatchname());
+                subOrderActivity.setTermtype(oActivity.getTermtype());
+                subOrderActivity.setPosSpePrice(oActivity.getPosSpePrice());
+                subOrderActivity.setPosType(oActivity.getPosType());
+                subOrderActivity.setStandTime(oActivity.getStandTime());
+                subOrderActivity.setStandAmt(oActivity.getStandAmt());
+                subOrderActivity.setBackType(oActivity.getBackType());
+                subOrderActivity.setuUser(userId);
+                subOrderActivity.setuTime(new Date());
+                int updateOSubOrderActivity = oSubOrderActivityMapper.updateByPrimaryKeySelective(subOrderActivity);
+                if (updateOSubOrderActivity != 1) {
+                    logger.info("活动变更:{}", "OSubOrderActivity-更新失败");
+                    throw new MessageException("活动变更失败");
+                }
+
+                //收货单商品
+                OReceiptProExample oReceiptProExample = new OReceiptProExample();
+                oReceiptProExample.createCriteria()
+                        .andStatusEqualTo(Status.STATUS_1.status)
+                        .andOrderidEqualTo(oNum)
+                        .andProIdEqualTo(product.getId())
+                        .andProNameEqualTo(product.getProName());
+                List<OReceiptPro> oReceiptProList = oReceiptProMapper.selectByExample(oReceiptProExample);
+                if (oReceiptProList.size()!=0 && oReceiptProList!=null) {
+                    OReceiptPro oReceiptPro = oReceiptProList.get(0);
+                    //排单数据
+                    ReceiptPlanExample oReceiptPlanExample = new ReceiptPlanExample();
+                    oReceiptPlanExample.or()
+                            .andStatusEqualTo(Status.STATUS_1.status)
+                            .andOrderIdEqualTo(oNum)
+                            .andProIdEqualTo(oReceiptPro.getId());
+                    List<ReceiptPlan> oReceiptPlanList = receiptPlanMapper.selectByExample(oReceiptPlanExample);
+                    if (oReceiptPlanList.size()!=0 && oReceiptPlanList!=null) {
+                        ReceiptPlan receiptPlan = oReceiptPlanList.get(0);
+                        receiptPlan.setProCom(oActivity.getVender());
+                        receiptPlan.setProType(oActivity.getProType());
+                        receiptPlan.setModel(oActivity.getProModel());
+                        int updateReceiptPlan = receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan);
+                        if (updateReceiptPlan != 1) {
+                            logger.info("活动变更:{}", "ReceiptPlan-更新失败");
+                            throw new MessageException("活动变更失败");
+                        }
+                    }
+                }
+            }
+        }
+
+        return AgentResult.ok(oNum);
     }
 
 }
