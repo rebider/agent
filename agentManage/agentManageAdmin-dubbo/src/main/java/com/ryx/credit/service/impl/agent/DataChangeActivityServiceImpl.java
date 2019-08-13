@@ -27,7 +27,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -646,4 +645,22 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         int i = dateChangeRequestMapper.updateByPrimaryKeySelective(dateChangeRequest);
         return i;
     }
+
+
+    @Override
+    public ResultVO deleteDataChange(String dataChangeId, String userId) throws Exception {
+        logger.info("========用户{}删除数据修改申请{}", userId, dataChangeId);
+
+        DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(dataChangeId);
+        dateChangeRequest.setStatus(Status.STATUS_0.status);
+        dateChangeRequest.setcUpdate(new Date());
+        int updateDateChange = dateChangeRequestMapper.updateByPrimaryKeySelective(dateChangeRequest);
+        if (updateDateChange != 1) {
+            logger.info("删除数据修改申请:{}", "数据删除失败");
+            throw new MessageException("数据删除失败！");
+        }
+
+        return ResultVO.success(null);
+    }
+
 }
