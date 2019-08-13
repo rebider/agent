@@ -34,4 +34,7 @@ public interface AccountPaidItemService {
      * @return
      */
     public AgentResult capitalFq(Capital capital)throws Exception;
+
+    public void updateListCapitalVo(List<CapitalVo> capitalVoList)throws Exception;
+
 }

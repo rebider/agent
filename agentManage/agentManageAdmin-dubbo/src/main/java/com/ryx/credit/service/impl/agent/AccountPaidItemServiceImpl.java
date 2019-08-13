@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import sun.management.resources.agent;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
@@ -300,5 +301,121 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
         }
 
         return AgentResult.ok();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    public void updateListCapitalVo(List<CapitalVo> capitalVoList) throws Exception {
+        try {
+            for (CapitalVo capitalVo : capitalVoList) {
+                String agentId="";
+                String  actid="";
+                String cUser="";
+                boolean isPass=false;
+                CapitalExample capitalExample = new CapitalExample();
+                CapitalExample.Criteria criteria = capitalExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andIdEqualTo(capitalVo.getId());
+                List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
+                if(null!=capitals && capitals.size()>0){
+                    for (Capital capital : capitals) {
+                        if (null==capital.getcAgentId()){
+                            agentId=capital.getcAgentId();
+                        }
+                        if(StringUtils.isNotBlank(capital.getActivId())){
+                            actid=capital.getActivId();
+                        }
+                        if (StringUtils.isNotBlank(capital.getcUser())){
+                            cUser=capital.getcUser();
+                        }
+                    }
+                }
+
+
+                capitalVo.setcUser(cUser);
+                capitalVo.setcAgentId(agentId);
+                capitalVo.setActivId(actid);
+                if(StringUtils.isEmpty(capitalVo.getId())) {
+                    //直接新曾
+                    AgentResult result =   insertAccountPaid(capitalVo, capitalVo.getCapitalTableFile(), cUser,isPass,null);
+                    //加入流水
+                    capitalFlowService.insertCapitalFlow(capitalVo, BigDecimal.ZERO,capitalVo.getSrcId(),capitalVo.getSrcRemark());
+                    if(!result.isOK())throw new MessageException("新增缴纳款项信息失败");
+                }else{
+
+                    Capital db_capital = capitalMapper.selectByPrimaryKey(capitalVo.getId());
+                    db_capital.setcAgentId(cUser);
+                    db_capital.setcType(capitalVo.getcType());
+                    db_capital.setcAmount(capitalVo.getcAmount());
+                    db_capital.setcSrc(capitalVo.getcSrc());
+                    db_capital.setcPaytime(capitalVo.getcPaytime());
+                    db_capital.setcUser(capitalVo.getcUser());
+                    db_capital.setRemark(capitalVo.getRemark());
+                    db_capital.setStatus(capitalVo.getStatus());
+
+                    db_capital.setcFqCount(capitalVo.getcFqCount());
+                    db_capital.setcPayuser(capitalVo.getcPayuser());
+                    db_capital.setcPaytime(capitalVo.getcPaytime());
+                    db_capital.setcInCom(capitalVo.getcInCom());
+                    db_capital.setcPayType(capitalVo.getcPayType());
+
+                    if(!isPass){
+                        if(PayType.YHHK.code.equals(db_capital.getcPayType())) {
+                            db_capital.setcFqInAmount(db_capital.getcAmount());
+                        }else{
+                            db_capital.setcFqInAmount(Status.STATUS_0.status);
+                        }
+                    }else{
+                        if(PayType.YHHK.code.equals(db_capital.getcPayType())) {
+                            db_capital.setcFqInAmount(db_capital.getcInAmount());
+                        }
+                    }
+
+                    if(1!=capitalMapper.updateByPrimaryKeySelective(db_capital)){
+                        throw new MessageException("更新缴纳款项信息失败");
+                    }else{
+                        if(!agentDataHistoryService.saveDataHistory(db_capital,db_capital.getId(), DataHistoryType.PAYMENT.getValue(),cUser,db_capital.getVersion()).isOK()){
+                            throw new MessageException("更新缴纳款项信息失败");
+                        }
+                    }
+
+                    //删除老的附件
+                    AttachmentRelExample example = new AttachmentRelExample();
+                    example.or().andBusTypeEqualTo(AttachmentRelType.Capital.name()).andSrcIdEqualTo(db_capital.getId()).andStatusEqualTo(Status.STATUS_1.status);
+                    List<AttachmentRel> list = attachmentRelMapper.selectByExample(example);
+                    for (AttachmentRel attachmentRel : list) {
+                        attachmentRel.setStatus(Status.STATUS_0.status);
+                        int i = attachmentRelMapper.updateByPrimaryKeySelective(attachmentRel);
+                        if (1 != i) {
+                            log.info("修改缴纳款项附件关系失败");
+                            throw new MessageException("更新缴纳款项信息失败");
+                        }
+                    }
+
+                    //添加新的附件
+                    List<String> fileIdList = capitalVo.getCapitalTableFile();
+                    if(fileIdList!=null) {
+                        for (String fileId : fileIdList) {
+                            AttachmentRel record = new AttachmentRel();
+                            record.setAttId(fileId);
+                            record.setSrcId(db_capital.getId());
+                            record.setcUser(db_capital.getcUser());
+                            record.setcTime(Calendar.getInstance().getTime());
+                            record.setStatus(Status.STATUS_1.status);
+                            record.setBusType(AttachmentRelType.Capital.name());
+                            record.setId(idService.genId(TabId.a_attachment_rel));
+                            int i = attachmentRelMapper.insertSelective(record);
+                            if (1 != i) {
+                                log.info("修改缴纳款项附件关系失败");
+                                throw new MessageException("更新缴纳款项信息失败");
+                            }
+                        }
+                    }
+
+                }
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 }
