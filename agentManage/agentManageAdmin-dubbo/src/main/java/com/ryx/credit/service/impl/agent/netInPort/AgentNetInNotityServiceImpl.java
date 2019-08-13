@@ -3,6 +3,7 @@ package com.ryx.credit.service.impl.agent.netInPort;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.JsonUtil;
@@ -11,6 +12,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInHttpService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
@@ -615,5 +617,47 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                 }
             }
         });
+    }
+
+    /**
+     * 升级校验
+     * @param reqMap
+     * @return
+     */
+    @Override
+    public AgentResult agencyLevelCheck(Map<String, Object> reqMap){
+
+        AgentResult result = AgentResult.fail();
+        try {
+            AgentBusInfoVo agentBusInfoVo = (AgentBusInfoVo)reqMap.get("busInfo");
+            String busPlatform = agentBusInfoVo.getBusPlatform();
+            if(StringUtils.isBlank(busPlatform) || busPlatform.equals("null")){
+                throw new ProcessException("业务平台码为空");
+            }
+            PlatForm platForm = platFormMapper.selectByPlatFormNum(busPlatform);
+            if(platForm==null){
+                throw new ProcessException("业务平台不存在");
+            }
+            if(PlatformType.whetherPOS(platForm.getPlatformType())){
+                result = agentHttpPosServiceImpl.agencyLevelCheck(reqMap);
+            }else if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
+                result = agentHttpMposServiceImpl.agencyLevelCheck(reqMap);
+            }else if(platForm.getPlatformType().equals(PlatformType.RDBPOS.getValue())){
+                result = agentHttpRDBMposServiceImpl.agencyLevelCheck(reqMap);
+            }else if(platForm.getPlatformType().equals(PlatformType.RJPOS.getValue())){
+                result = agentHttpRJPosServiceImpl.agencyLevelCheck(reqMap);
+            }else if(platForm.getPlatformType().equals(PlatformType.RHPOS.getValue())){
+                reqMap.put("brandCode",platForm.getBusplatform());
+                reqMap.put("agentId",agentBusInfoVo.getBusNum());
+                reqMap.put("directAgentId",agentBusInfoVo.getBusParent());
+                result = agentHttpRHBPosServiceImpl.agencyLevelCheck(reqMap);
+            }else if(platForm.getPlatformType().equals(PlatformType.SSPOS.getValue())){
+                result = agentHttpSsPosServiceImpl.agencyLevelCheck(reqMap);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return AgentResult.fail(e.getMessage());
+        }
+        return result;
     }
 }

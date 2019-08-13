@@ -15,6 +15,7 @@ import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.IResourceService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
+import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.bank.PosRegionService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.RegionService;
@@ -87,6 +88,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     private AgentAssProtocolService agentAssProtocolService;
     @Autowired
     private COrganizationMapper organizationMapper;
+    @Autowired
+    private AgentNetInNotityService agentNetInNotityService;
+
 
     @Override
     public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,Long userId) {
@@ -306,6 +310,12 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     if (StringUtils.isBlank(item.getBusParent())){
                         throw new ProcessException("升级直签上级不能为空");
                     }
+                    Map<String, Object> reqMap = new HashMap<>();
+                    reqMap.put("busInfo",item);
+                    AgentResult agentResult = agentNetInNotityService.agencyLevelCheck(reqMap);
+                    if(!agentResult.isOK()){
+                        throw new ProcessException(agentResult.getMsg());
+                    }
                 }
                 if(OrgType.zQ(item.getBusType())){
                     if(StringUtils.isBlank(item.getBusParent()))
@@ -435,6 +445,12 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     }
                     if (StringUtils.isBlank(item.getBusParent())){
                         throw new ProcessException("升级直签上级不能为空");
+                    }
+                    Map<String, Object> reqMap = new HashMap<>();
+                    reqMap.put("busInfo",item);
+                    AgentResult agentResult = agentNetInNotityService.agencyLevelCheck(reqMap);
+                    if(!agentResult.isOK()){
+                        throw new ProcessException(agentResult.getMsg());
                     }
                 }
                 if(OrgType.zQ(item.getBusType())){
