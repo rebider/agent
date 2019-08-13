@@ -80,6 +80,8 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     private AgentNetInNotityService agentNetInNotityService;
     @Autowired
     private AgentDataHistoryService agentDataHistoryService;
+    @Autowired
+    private AgentBusinfoService agentBusinfoService;
 
 
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
@@ -457,8 +459,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                         }
 
                         //======================================更新业务信息
-                        ResultVO res = agentEnterService.updateAgentVo(vo,rel.getcUser(),true,null);
-
+                        ResultVO res =  agentBusinfoService.updateBussiness(vo.getBusInfoVoList(),rel.getcUser());
                         //======================================更新费率信息
                         for (AgentBusInfoVo agentBusInfoVo : vo.getEditDebitList()) {
                             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
@@ -479,15 +480,6 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             logger.info("========审批流完成{}业务{}状态{},结果{}",proIns,rel.getBusType(),agStatus,"更新数据申请成功");
                             if(1!=dateChangeRequestMapper.updateByPrimaryKeySelective(dr)){
                                 throw new ProcessException("更新数据申请失败");
-                            }
-                            if(null!=vo.getCapitalVoList() && vo.getCapitalVoList().size()>0){
-                                for (Capital capital : vo.getCapitalVoList()) {
-                                    capital.setCloReviewStatus(AgStatus.Approved.getValue());
-                                    int i = capitalMapper.updateByPrimaryKeySelective(capital);
-                                    if(1!=i){
-                                        throw new ProcessException("更新缴纳款审批通过失败");
-                                    }
-                                }
                             }
 
                         }
