@@ -5,6 +5,7 @@ import com.ryx.credit.common.enumc.SrcType;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.pojo.admin.agent.AgentContract;
 import com.ryx.credit.pojo.admin.agent.Capital;
 import com.ryx.credit.pojo.admin.agent.CapitalFlow;
 
@@ -39,4 +40,6 @@ public interface CapitalService {
     List<CapitalFlow> approvedDeduct(String srcId, SrcType srcType, String uUser)throws Exception;
 
     List<CapitalFlow> refuseUnfreeze(String srcId,SrcType srcType,String uUser)throws Exception;
+
+    public List<Capital> queryCapitalPro(String proIns);
 }

@@ -76,6 +76,8 @@ public class Capital implements Serializable{
     //新增时间
     private String time;
 
+    private String activId;
+
     public String getTime() {
         return time;
     }
@@ -329,5 +331,13 @@ public class Capital implements Serializable{
 
     public void setCloReviewStatus(BigDecimal cloReviewStatus) {
         this.cloReviewStatus = cloReviewStatus;
+    }
+
+    public String getActivId() {
+        return activId;
+    }
+
+    public void setActivId(String activId) {
+        this.activId = activId;
     }
 }
