@@ -390,6 +390,12 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
                 logger.info("代理商退出提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
                 throw new MessageException("审批流启动失败：添加审批关系失败！");
             }
+            List<Map<String, Object>> maps = iUserService.orgCode(Long.valueOf(cUser));
+            if(maps!=null){
+                Map<String, Object> stringObjectMap = maps.get(0);
+                record.setAgDocPro(stringObjectMap.get("ORGID")+"");
+                record.setAgDocDistrict(stringObjectMap.get("ORGPID")+"");
+            }
         } catch (MessageException e) {
             e.printStackTrace();
             throw new MessageException(e.getMsg());
