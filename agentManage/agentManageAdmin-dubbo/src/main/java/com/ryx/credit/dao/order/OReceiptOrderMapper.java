@@ -4,6 +4,7 @@ package com.ryx.credit.dao.order;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.pojo.admin.order.OReceiptOrder;
 import com.ryx.credit.pojo.admin.order.OReceiptOrderExample;
+import com.ryx.credit.pojo.admin.vo.ReceiptOrderVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -31,4 +32,6 @@ public interface OReceiptOrderMapper {
     int queryPlannerCount(@Param("par") Map<String,Object> par);
 
     List<Map<String,Object>> queryPlannerAll(@Param("par")Map<String, Object> reqMap, @Param("page")Page page);
+
+    List<ReceiptOrderVo> exportPlanner(Map map);
 }

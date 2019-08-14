@@ -7,6 +7,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.order.OReceiptOrder;
 import com.ryx.credit.pojo.admin.order.OReceiptPro;
 import com.ryx.credit.pojo.admin.order.ReceiptPlan;
+import com.ryx.credit.pojo.admin.vo.ReceiptOrderVo;
 
 import java.util.List;
 import java.util.Map;
@@ -23,4 +24,6 @@ public interface PlannerService {
     List<Map<String, Object>> queryOrderReceiptPlanInfo(Map<String, String> params) throws ProcessException;
 
     AgentResult batchPlanner(List<ReceiptPlan> receiptPlanList,String userId) throws Exception;
+
+    List<ReceiptOrderVo> exportPlanner(Map map);
 }
