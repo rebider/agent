@@ -113,10 +113,12 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
         if(StringUtils.isBlank(bankNo)){
             return result;
         }
+        String v = trueName+":"+certNo;
         try{
-            String stringSet = redisService.hGet(bankNo,RedisCachKey.AGENT_BANK.code);
+            String stringSet = redisService.hGet(RedisCachKey.AGENT_BANK.code,bankNo);
             if(StringUtils.isNotBlank(stringSet)){ // 表示已经存在
-                if((trueName+""+certNo).equals(stringSet)){
+                log.info("redis中取出认证结果：{}，{}",bankNo,stringSet);
+                if(v.equals(stringSet)){
                     result.setMsg("认证成功");
                     result.setStatus(200);
                     return  result;
@@ -146,29 +148,30 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
                     if (validateStatus.equals("00")) {
                         record.setNotifyStatus(Status.STATUS_1.status);
                         record.setSuccesTime(new Date());
-                        redisService.hSet(RedisCachKey.AGENT_BANK.code, FastMap.fastMap(bankNo,trueName+""+certNo));
+                        log.info("存入redis认证结果：{}，{}",bankNo,v);
+                        redisService.hSet(RedisCachKey.AGENT_BANK.code, FastMap.fastMap(bankNo,v));
                         redisService.expire(bankNo,60*60*24);
                         result.setMsg("认证成功");
                         result.setStatus(200);
                     } else {
-                        record.setNotifyStatus(Status.STATUS_2.status);
+                        record.setNotifyStatus(Status.STATUS_0.status);
                         result.setMsg(resultMap.get("ResultMsg")+"");
                         result.setStatus(400);
                     }
                 }else{
                     if(null!=resultMap.get("ResponseMsg")){
-                        record.setNotifyStatus(Status.STATUS_2.status);
+                        record.setNotifyStatus(Status.STATUS_0.status);
                         result.setMsg(resultMap.get("ResponseMsg")+"");
                         result.setStatus(400);
                     }else {
                         // {"ResponseCode":"99","ResponseMsg":"请求次数过多","StartTime":"","channel":"","SystemId":"","Result":"","platSerial":"","StartDate":"","Serial":"","BankNo":"","ResultMsg":"","http":"200","Transcode":""}
-                        record.setNotifyStatus(Status.STATUS_2.status);
+                        record.setNotifyStatus(Status.STATUS_0.status);
                         result.setMsg("银行卡三要素认证失败");
                         result.setStatus(400);
                     }
                 }
             }else{
-                record.setNotifyStatus(Status.STATUS_2.status);
+                record.setNotifyStatus(Status.STATUS_0.status);
                 result.setMsg("银行卡三要素认证失败");
                 record.setNotifyJson("resultMap is null");
             }
@@ -176,7 +179,7 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
             log.info("身份认证异常:{}",e.getMessage());
             e.printStackTrace();
             record.setNotifyJson(e.getMessage());
-            record.setNotifyStatus(Status.STATUS_2.status);
+            record.setNotifyStatus(Status.STATUS_0.status);
             result.setMsg("银行卡三要素认证失败");
         }finally {
             agentPlatFormSynMapper.insertSelective(record);
