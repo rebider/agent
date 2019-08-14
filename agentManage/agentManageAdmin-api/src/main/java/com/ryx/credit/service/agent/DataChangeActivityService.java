@@ -5,7 +5,6 @@ import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.agent.DateChangeRequest;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 
-import java.math.BigDecimal;
 
 /**
  * Created by cx on 2018/6/6.
@@ -33,4 +32,7 @@ public interface DataChangeActivityService {
 
 
     int updateByPrimaryKeySelective(DateChangeRequest dateChangeRequest);
+
+
+    ResultVO deleteDataChange(String dataChangeId, String userId) throws Exception;
 }

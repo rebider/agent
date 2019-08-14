@@ -13,7 +13,8 @@ public enum RedisCachKey {
     TERMINAL_TRANSFER("TERMINAL_TRANSFER:", "终端划拨"),
     APP_SPLIT("APP_SPLIT:", "补差价退货申请拆分"),
     INTERNET_CARD("INTERNET_CARD:", "物联网卡批处理"),
-    TASK_DISPOSEIN_TERNET_CARD("TASK_DISPOSEIN_TERNET_CARD:", "物联网卡定时任务锁"),
+    TASK_DISPOSEIN_TERNET_CARD("TASK_DISPOSEIN_TERNET_CARD", "物联网卡定时任务锁"),
+    RENEW_CARD("RENEW_CARD:", "物联网卡续费"),
     INSERT_SYS_KEY("synColinfoToPayment_lock:", "打款账户同步清结算"),
     QUERY_SYS_KEY("synColinfoToQueryPayment_lock:", "打款账户同步清结算查询");
 

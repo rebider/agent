@@ -8,7 +8,12 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.order.*;
+import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.order.*;
+import com.ryx.credit.pojo.admin.vo.ReceiptOrderVo;
+import com.ryx.credit.service.IResourceService;
+import com.ryx.credit.service.IUserService;
+import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.PlannerService;
 import org.slf4j.Logger;
@@ -47,6 +52,13 @@ public class PlannerServiceImpl implements PlannerService {
     private OSubOrderActivityMapper oSubOrderActivityMapper;
     @Autowired
     private OActivityMapper oActivityMapper;
+    @Autowired
+    private IUserService iUserService;
+    @Autowired
+    private IResourceService iResourceService;
+    @Autowired
+    private DictOptionsService dictOptionsService;
+
 
     @Override
     public PageInfo queryPlannerList(OReceiptOrder receiptOrder, OReceiptPro receiptPro, Page page,Map map) {
@@ -89,6 +101,9 @@ public class PlannerServiceImpl implements PlannerService {
         }
         if (null!=map.get("oInuretime") && StringUtils.isNotBlank(map.get("oInuretime")+"")){
             reqMap.put("oInuretime", map.get("oInuretime"));
+        }
+        if (null!=map.get("par_avtivityName") && StringUtils.isNotBlank(map.get("par_avtivityName")+"")){
+            reqMap.put("avtivityName", "%"+map.get("par_avtivityName")+"%");
         }
         reqMap.put("agStatus", AgStatus.Approved.name());
         reqMap.put("cIncomStatus", AgentInStatus.NO.status);
@@ -252,4 +267,62 @@ public class PlannerServiceImpl implements PlannerService {
         }
         return result;
     }
+
+
+    @Override
+    public List<ReceiptOrderVo> exportPlanner(Map map) {
+        if(null != map.get("userId")) {
+            Long userId = (Long) map.get("userId");
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if (orgCodeRes == null && orgCodeRes.size() != 1) {
+                return null;
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+            map.put("organizationCode", organizationCode);
+            List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+            map.put("platfromPerm", platfromPerm);
+        }
+        if (null!=map.get("orderId") && StringUtils.isNotBlank(map.get("orderId")+"")){
+            map.put("orderId", map.get("orderId"));
+        }
+        if (null!=map.get("oInuretime") && StringUtils.isNotBlank(map.get("oInuretime")+"")){
+            map.put("oInuretime", map.get("oInuretime"));
+        }
+        if (null!=map.get("receiptNum") && StringUtils.isNotBlank(map.get("receiptNum")+"")){
+            map.put("receiptNum", map.get("receiptNum"));
+        }
+        if (null!=map.get("addrRealname") && StringUtils.isNotBlank(map.get("addrRealname")+"")){
+            map.put("addrRealname", map.get("addrRealname"));
+        }
+        if (null!=map.get("agentName") && StringUtils.isNotBlank(map.get("agentName")+"")) {
+            map.put("agentName", "%"+map.get("agentName")+"%");
+        }
+        if (null!=map.get("proName") && StringUtils.isNotBlank(map.get("proName")+"")) {
+            map.put("proName", "%"+map.get("proName")+"%");
+        }
+        if (null!=map.get("avtivityName") && StringUtils.isNotBlank(map.get("avtivityName")+"")) {
+            map.put("avtivityName", "%"+map.get("avtivityName")+"%");
+        }
+
+        List<ReceiptOrderVo> receiptOrderVoList = receiptOrderMapper.exportPlanner(map);
+        if (receiptOrderVoList.size()>0 && receiptOrderVoList!=null) {
+            for (ReceiptOrderVo receiptOrderVo : receiptOrderVoList) {
+                Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), receiptOrderVo.getProCom());
+                if (dict != null) {
+                    receiptOrderVo.setProCom(
+                            dict.getdItemname()+"/"+receiptOrderVo.getModel()+"/"+receiptOrderVo.getBusProName()+"/"+receiptOrderVo.getBackType()+"/"+receiptOrderVo.getStandTime()+"/"+receiptOrderVo.getStandAmt()
+                    );
+                } else {
+                    receiptOrderVo.setProCom(
+                            "系统未配置该厂商信息"+"/"+receiptOrderVo.getModel()+"/"+receiptOrderVo.getBusProName()+"/"+receiptOrderVo.getBackType()+"/"+receiptOrderVo.getStandTime()+"/"+receiptOrderVo.getStandAmt()
+                    );
+                }
+                receiptOrderVo.setPlanProNum(null);
+            }
+        }
+
+        return receiptOrderVoList;
+    }
+
 }

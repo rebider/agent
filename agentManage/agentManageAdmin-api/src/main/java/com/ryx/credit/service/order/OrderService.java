@@ -249,4 +249,7 @@ public interface OrderService {
      * 刪除配货商品
      */
     public AgentResult deletePeihuoAction(OReceiptPro oReceiptPro)throws Exception;
+
+
+    AgentResult orderChangeActivity(String oNum, String subOrderId, String activityId, String userId) throws Exception;
 }

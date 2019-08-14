@@ -20,6 +20,7 @@ import com.ryx.credit.service.agent.AgentAssProtocolService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
 import com.ryx.credit.service.agent.PlatFormService;
 import com.ryx.credit.service.agent.*;
+import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -72,7 +73,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	private IUserService iUserService;
 	@Autowired
 	private AgentService agentService;
-
+	@Autowired
+	private AgentNetInNotityService agentNetInNotityService;
 
     /**
      * 代理商查询插件数据获取
@@ -246,6 +248,20 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 			Set<String> resultSet = new HashSet<>();
 			for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
 				if(!"1".equals(saveStatus)){
+					if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentBusInfoVo.getBusNum())) {
+						if (!OrgType.zQ(agentBusInfoVo.getBusType())) {
+							throw new ProcessException("升级类型必须是直签");
+						}
+						if (com.ryx.credit.commons.utils.StringUtils.isBlank(agentBusInfoVo.getBusParent())){
+							throw new ProcessException("升级直签上级不能为空");
+						}
+						Map<String, Object> reqMap = new HashMap<>();
+						reqMap.put("busInfo",agentBusInfoVo);
+						AgentResult agentResult = agentNetInNotityService.agencyLevelCheck(reqMap);
+						if(!agentResult.isOK()){
+							throw new ProcessException(agentResult.getMsg());
+						}
+					}
 					if(OrgType.zQ(agentBusInfoVo.getBusType())){
 						if(com.ryx.credit.commons.utils.StringUtils.isBlank(agentBusInfoVo.getBusParent()))
 							throw new ProcessException("直签上级不能为空");
@@ -466,6 +482,68 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 			e.printStackTrace();
 			throw e;
 		}
+	}
+
+	@Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+	@Override
+	public ResultVO updateBussiness(List<AgentBusInfoVo> busInfoVoList,String userId)throws Exception {
+	try {
+		if (null!=busInfoVoList && busInfoVoList.size()>0){
+			for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
+				AgentBusInfo db_AgentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+				db_AgentBusInfo.setAgentId(agentBusInfoVo.getAgentId());
+				db_AgentBusInfo.setBusNum(agentBusInfoVo.getBusNum());
+				db_AgentBusInfo.setBusPlatform(agentBusInfoVo.getBusPlatform());
+				db_AgentBusInfo.setBusType(agentBusInfoVo.getBusType());
+				db_AgentBusInfo.setBusParent(agentBusInfoVo.getBusParent());
+				db_AgentBusInfo.setBusRiskParent(agentBusInfoVo.getBusRiskParent());
+				db_AgentBusInfo.setBusActivationParent(agentBusInfoVo.getBusActivationParent());
+				db_AgentBusInfo.setBusRegion(agentBusInfoVo.getBusRegion());
+				db_AgentBusInfo.setBusSentDirectly(agentBusInfoVo.getBusSentDirectly());
+				db_AgentBusInfo.setBusDirectCashback(agentBusInfoVo.getBusDirectCashback());
+				db_AgentBusInfo.setBusIndeAss(agentBusInfoVo.getBusIndeAss());
+				db_AgentBusInfo.setBusContact(agentBusInfoVo.getBusContact());
+				db_AgentBusInfo.setBusContactMobile(agentBusInfoVo.getBusContactMobile());
+				db_AgentBusInfo.setBusContactEmail(agentBusInfoVo.getBusContactEmail());
+				db_AgentBusInfo.setBusContactPerson(agentBusInfoVo.getBusContactPerson());
+				db_AgentBusInfo.setBusRiskEmail(agentBusInfoVo.getBusRiskEmail());
+				db_AgentBusInfo.setCloTaxPoint(agentBusInfoVo.getCloTaxPoint());
+				db_AgentBusInfo.setCloInvoice(agentBusInfoVo.getCloInvoice());
+				db_AgentBusInfo.setCloReceipt(agentBusInfoVo.getCloReceipt());
+				db_AgentBusInfo.setCloPayCompany(agentBusInfoVo.getCloPayCompany());
+				db_AgentBusInfo.setCloAgentColinfo(agentBusInfoVo.getCloAgentColinfo());
+				db_AgentBusInfo.setAgZbh(agentBusInfoVo.getAgZbh());
+				db_AgentBusInfo.setBusStatus(agentBusInfoVo.getBusStatus());
+				db_AgentBusInfo.setStatus(agentBusInfoVo.getStatus());
+				db_AgentBusInfo.setBusUseOrgan(agentBusInfoVo.getBusUseOrgan());
+				db_AgentBusInfo.setBusScope(agentBusInfoVo.getBusScope());
+				db_AgentBusInfo.setDredgeS0(agentBusInfoVo.getDredgeS0());
+				db_AgentBusInfo.setBusLoginNum(agentBusInfoVo.getBusLoginNum());
+				db_AgentBusInfo.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
+				db_AgentBusInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
+				db_AgentBusInfo.setOrganNum(agentBusInfoVo.getOrganNum());
+				if(StringUtils.isNotEmpty(db_AgentBusInfo.getBusParent())){
+					if(StringUtils.isNotEmpty(db_AgentBusInfo.getBusPlatform())){
+						AgentBusInfo busInfoParent = agentBusInfoMapper.selectByPrimaryKey(db_AgentBusInfo.getBusParent());
+						if(!busInfoParent.getBusPlatform().equals(db_AgentBusInfo.getBusPlatform())){
+							throw new MessageException("代理商上级平台和本业务平台不匹配");
+						}
+					}
+				}
+
+				if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(db_AgentBusInfo)){
+					throw new MessageException("更新业务信息失败");
+				}else{
+					agentDataHistoryService.saveDataHistory(db_AgentBusInfo,db_AgentBusInfo.getId(), DataHistoryType.BUSINESS.getValue(),userId,db_AgentBusInfo.getVersion());
+				}
+			}
+		 }
+		return ResultVO.success(null);
+		}catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+
 	}
 
 	@Override
