@@ -1246,10 +1246,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 }
 
                 if (null != agentoutVo.getCloTaxPoint()) {
-                    NumberFormat numberFormat = NumberFormat.getPercentInstance();
-                    Number parse = numberFormat.parse(agentoutVo.getCloTaxPoint().toString() + "%");
-                    String point = numberFormat.format(parse);
-                    agentoutVo.setPoint(point);
+                    agentoutVo.setPoint(String.valueOf(agentoutVo.getCloTaxPoint()) + "%");
                 }
 
                 //业务区域
