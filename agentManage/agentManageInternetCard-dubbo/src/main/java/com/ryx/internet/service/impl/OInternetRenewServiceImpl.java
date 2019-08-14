@@ -456,7 +456,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             return AgentResult.ok();
         }finally {
             if(StringUtils.isNotBlank(retIdentifier)){
-                redisService.releaseLock(RedisCachKey.RENEW_CARD.code+":"+cUser, retIdentifier);
+                redisService.releaseLock(RedisCachKey.RENEW_CARD.code+cUser, retIdentifier);
             }
         }
     }
