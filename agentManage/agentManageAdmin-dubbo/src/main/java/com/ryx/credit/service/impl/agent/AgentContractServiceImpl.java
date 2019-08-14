@@ -8,6 +8,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.dao.agent.AgentContractMapper;
 import com.ryx.credit.dao.agent.AssProtoColMapper;
+import com.ryx.credit.dao.agent.AttachmentMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentContractVo;
@@ -64,6 +65,9 @@ public class AgentContractServiceImpl implements AgentContractService {
     private IUserService iUserService;
     @Autowired
     private AgentEnterService agentEnterService;
+
+    @Autowired
+    private AttachmentMapper attachmentMapper;
 
     /**
      * 获取合同类型
@@ -332,10 +336,19 @@ public class AgentContractServiceImpl implements AgentContractService {
         AgentContractExample.Criteria criteria = agentContractExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andActivIdEqualTo(proIns);
         List<AgentContract> agentContracts = agentContractMapper.selectByExample(agentContractExample);
         if (null!=agentContracts && agentContracts.size()>0){
-            return agentContracts;
+            for (AgentContract agentContract : agentContracts) {
+                agentContract.setAttachmentList(attachmentMapper.accessoryQuery(agentContract.getId(), AttachmentRelType.Contract.name()));
+                List<Map<String, Object>> maps = assProtoColMapper.selectByBusInfoId(agentContract.getId());
+                if(null==maps){
+                    continue;
+                }else if(maps.size()==0){
+                    continue;
+                }else{
+                    agentContract.setAssProtocolMap(maps.get(0));
+                }
+            }
         }
-
-        return new ArrayList<AgentContract>();
+        return agentContracts;
     }
 
     @Override
