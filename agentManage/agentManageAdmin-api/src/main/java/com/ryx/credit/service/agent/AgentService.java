@@ -94,4 +94,6 @@ public interface AgentService {
      * 修改报备
      */
     int reportEdit(Agent agent, String userId) throws MessageException;
+
+    Agent updateAgentInfo(Agent agent,String userId)throws MessageException;
 }

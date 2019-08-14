@@ -11,7 +11,8 @@ public enum PlannerStatus {
 
     YesPlanner("1","已排单"),
     YesDeliver("2","已发货"),
-    NoDeliver("3","未发货");
+    NoDeliver("3","未发货"),
+    InTheDeliver("4","发货中");
 
     public String code;
 

@@ -125,10 +125,13 @@
         user_type,
         s.id as orgid,
         s.pid as orgpid,
+        o.pid as orgppid,
+        o.code as pidOrgCode,
         s.code as organizationCode
         FROM
         C_USER t
         LEFT JOIN c_organization s ON s.id = t.organization_id
+        LEFT JOIN c_organization o ON s.pid = o.id
         <where>
             t.id = #{id}
         </where>

@@ -20,6 +20,7 @@ import com.ryx.credit.service.agent.AgentAssProtocolService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
 import com.ryx.credit.service.agent.PlatFormService;
 import com.ryx.credit.service.agent.*;
+import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -72,7 +73,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	private IUserService iUserService;
 	@Autowired
 	private AgentService agentService;
-
+	@Autowired
+	private AgentNetInNotityService agentNetInNotityService;
 
     /**
      * 代理商查询插件数据获取
@@ -246,6 +248,20 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 			Set<String> resultSet = new HashSet<>();
 			for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
 				if(!"1".equals(saveStatus)){
+					if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentBusInfoVo.getBusNum())) {
+						if (!OrgType.zQ(agentBusInfoVo.getBusType())) {
+							throw new ProcessException("升级类型必须是直签");
+						}
+						if (com.ryx.credit.commons.utils.StringUtils.isBlank(agentBusInfoVo.getBusParent())){
+							throw new ProcessException("升级直签上级不能为空");
+						}
+						Map<String, Object> reqMap = new HashMap<>();
+						reqMap.put("busInfo",agentBusInfoVo);
+						AgentResult agentResult = agentNetInNotityService.agencyLevelCheck(reqMap);
+						if(!agentResult.isOK()){
+							throw new ProcessException(agentResult.getMsg());
+						}
+					}
 					if(OrgType.zQ(agentBusInfoVo.getBusType())){
 						if(com.ryx.credit.commons.utils.StringUtils.isBlank(agentBusInfoVo.getBusParent()))
 							throw new ProcessException("直签上级不能为空");

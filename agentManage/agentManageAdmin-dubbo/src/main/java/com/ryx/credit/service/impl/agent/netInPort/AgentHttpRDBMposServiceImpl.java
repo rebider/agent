@@ -42,9 +42,8 @@ import java.util.Map;
 @Service("agentHttpRDBMposServiceImpl")
 public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
 
-    private static Logger log = LoggerFactory.getLogger(AgentNetInNotityServiceImpl.class);
-
     private static final String rdbReqUrl = AppConfig.getProperty("rdb_req_url");
+    private static Logger log = LoggerFactory.getLogger(AgentNetInNotityServiceImpl.class);
     @Autowired
     private AgentColinfoService agentColinfoService;
     @Autowired
@@ -383,4 +382,11 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
 
     }
 
+
+    @Override
+    public AgentResult agencyLevelCheck(Map<String, Object> paramMap)throws Exception{
+
+
+        return AgentResult.ok();
+    }
 }
