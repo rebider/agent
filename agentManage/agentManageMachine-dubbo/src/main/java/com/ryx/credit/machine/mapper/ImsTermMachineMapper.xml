@@ -370,11 +370,11 @@
 
   <select id="querySSIMS_TERM_MACHINE" resultType="map" >
     select a.pos_activity_id AS ID,
-      (c.brand_name||'|活动编号:'||c.activity_id||'|活动名称:'||c.activity_name||'机型:'||IMS_POS.POS_MODEL||'|单价:'||b.price
-       ||'|最低订购量:'||b.MIN_ORD_QTY
-       || '|终端类型' ||b.term_type||'|通讯类型'|| b.COMM_TYPE
-       || '活动时间:' || c.activity_start_time || c.activity_end_time) AS NAME,
-       b.STAND_AMT,b.BACK_TYPE
+           (c.brand_name||'|机具活动关系编号:'||a.pos_activity_id||'|活动编号:'||c.activity_id||'|活动名称:'||c.activity_name||'|机具编号'||b.machine_id||'机型:'||IMS_POS.POS_MODEL||'|单价:'||b.price
+            ||'|最低订购量:'||b.MIN_ORD_QTY
+            || '|终端类型' ||b.term_type||'|通讯类型'|| b.COMM_TYPE
+            || '活动时间:' || c.activity_start_time || c.activity_end_time) AS NAME,
+      b.STAND_AMT,b.BACK_TYPE
     from IMS_POS_ACTIVITY a
       left join IMS_TERM_MACHINE b on a.pos_id=b.machine_id
       left join IMS_MACHINE_ACTIVITY c on a.activity_id=c.activity_id
@@ -382,19 +382,7 @@
     where b.status=1 and c.status='00'
   </select>
 
-  <select id="querySSIMS_TERM_MACHINE" resultType="map" >
-    select a.pos_activity_id AS ID,
-    (c.brand_name||'|活动编号:'||c.activity_id||'|活动名称:'||c.activity_name||'机型:'||IMS_POS.POS_MODEL||'|单价:'||b.price
-    ||'|最低订购量:'||b.MIN_ORD_QTY
-    || '|终端类型' ||b.term_type||'|通讯类型'|| b.COMM_TYPE
-    || '活动时间:' || c.activity_start_time || c.activity_end_time) AS NAME,
-    b.STAND_AMT,b.BACK_TYPE
-    from IMS_POS_ACTIVITY a
-    left join IMS_TERM_MACHINE b on a.pos_id=b.machine_id
-    left join IMS_MACHINE_ACTIVITY c on a.activity_id=c.activity_id
-    left join IMS_POS on IMS_POS.ID=b.Model
-    where b.status=1 and c.status='00'
-  </select>
+
 
   <select id="queryIMS_POS_ACTIVITY" resultType="map">
     select IMS_POS_ACTIVITY.POS_ID,IMS_POS_ACTIVITY.ACTIVITY_ID
