@@ -16,6 +16,7 @@ import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IResourceService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
+import com.ryx.credit.service.agent.netInPort.AgentNetInHttpService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.pay.LivenessDetectionService;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -89,6 +91,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private LivenessDetectionService livenessDetectionService;
     @Autowired
     private IResourceService iResourceService;
+
+
 
     /**
      * 代理商入网信息保存
@@ -290,6 +294,20 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             List hav = new ArrayList();
             List<Organization> organList = null;
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
+                if(StringUtils.isNotBlank(item.getBusNum())) {
+                    if (!OrgType.zQ(item.getBusType())) {
+                        throw new ProcessException("升级类型必须是直签");
+                    }
+                    if (StringUtils.isBlank(item.getBusParent())){
+                        throw new ProcessException("升级直签上级不能为空");
+                    }
+                    Map<String, Object> reqMap = new HashMap<>();
+                    reqMap.put("busInfo",item);
+                    AgentResult agentResult = agentNetInNotityService.agencyLevelCheck(reqMap);
+                    if(!agentResult.isOK()){
+                        throw new ProcessException(agentResult.getMsg());
+                    }
+                }
                 if(OrgType.zQ(item.getBusType())){
                     if(StringUtils.isBlank(item.getBusParent()))
                         throw new ProcessException("直签上级不能为空");
@@ -517,8 +535,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             logger.info("========用户{}{}启动部门参数为空", agentId, cuser);
             throw new ProcessException("启动部门参数为空!");
         }
-        startPar.put("rs",ApprovalType.PASS.getValue());
-
+        if(startPar.get("party").toString().equals("beijing")) {
+            startPar.put("rs", ApprovalType.PASS.getValue());
+        }
         //启动审批
         String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("net"), null, null, startPar);
         if (proce == null) {
@@ -630,7 +649,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             logger.info("========用户{}{}启动部门参数为空", busid, cuser);
             throw new MessageException("启动部门参数为空!");
         }
-        startPar.put("rs",ApprovalType.PASS.getValue());
+        if(startPar.get("party").toString().equals("beijing")) {
+            startPar.put("rs", ApprovalType.PASS.getValue());
+        }
         //启动审批
         String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("net"), null, null, startPar);
         if (proce == null) {

@@ -107,16 +107,10 @@ public class OrderServiceImpl implements OrderService {
     private PlatFormMapper platFormMapper;
     @Autowired
     private ReceiptPlanMapper receiptPlanMapper;
-
-    /**
-     * 根据ID查询订单
-     * @param orderId
-     * @return
-     */
-    @Override
-    public OOrder getById(String orderId) {
-        return orderMapper.selectByPrimaryKey(orderId);
-    }
+    @Autowired
+    private AgentService agentService;
+    @Autowired
+    private CashSummaryMouthMapper cashSummaryMouthMapper;
 
     /**
      * 分页查询订单列表
@@ -138,6 +132,16 @@ public class OrderServiceImpl implements OrderService {
 //        pageInfo.setTotal(orderMapper.countByExample(example));
 //        return pageInfo;
 //    }
+
+    /**
+     * 根据ID查询订单
+     * @param orderId
+     * @return
+     */
+    @Override
+    public OOrder getById(String orderId) {
+        return orderMapper.selectByPrimaryKey(orderId);
+    }
 
     /**
      * 分页查询订单列表
@@ -168,7 +172,6 @@ public class OrderServiceImpl implements OrderService {
         return pageInfo;
     }
 
-
     /**
      * 查询所有订单
      * 查看所有订单
@@ -190,7 +193,6 @@ public class OrderServiceImpl implements OrderService {
         pageInfo.setRows(orderMapper.queryAllOrderListView(par));
         return pageInfo;
     }
-
 
     /**
      * 查询代理商订单
@@ -301,7 +303,6 @@ public class OrderServiceImpl implements OrderService {
         agentDataHistoryService.saveDataHistory(orderFormVo, DataHistoryType.ORDER.getValue());
         return AgentResult.ok(orderFormVo.getId());
     }
-
 
     @Override
     public AgentResult checkDownPaymentDate(Date date) {
@@ -799,7 +800,6 @@ public class OrderServiceImpl implements OrderService {
         return orderFormVo;
     }
 
-
     private OrderFormVo updateOrderFormValue(OrderFormVo orderFormVo, String userId) throws Exception {
 
         logger.info("下订单:{}{}", userId, orderFormVo.getAgentId());
@@ -1131,7 +1131,6 @@ public class OrderServiceImpl implements OrderService {
         return orderFormVo;
     }
 
-
     /**
      * 加载订单数据
      *
@@ -1371,10 +1370,13 @@ public class OrderServiceImpl implements OrderService {
         Object party = startPar.get("party");
         //不同的业务类型找到不同的启动流程
         String workId = null;
-        if(party.equals("beijing") || party.equals("north") || party.equals("south")) {
-            workId = dictOptionsService.getApproveVersion("orderCity");
-        }else{
+        if(agentService.isAgent(cuser).isOK()){
             workId = dictOptionsService.getApproveVersion("orderAgent");
+        }else {
+            workId = dictOptionsService.getApproveVersion("orderCity");
+        }
+        if(startPar.get("party").toString().equals("beijing")) {
+            startPar.put("rs", ApprovalType.PASS.getValue());
         }
         //订单启动流程
         if(StringUtils.isBlank(workId)){
@@ -1469,7 +1471,6 @@ public class OrderServiceImpl implements OrderService {
             throw e;
         }
     }
-
 
     @Transactional( isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW,rollbackFor = Exception.class)
     @Override
@@ -2719,7 +2720,6 @@ public class OrderServiceImpl implements OrderService {
         return pageInfo;
     }
 
-
     /**
      * 根据给定的类型查询用户的缴款项金额和可用余额
      *
@@ -2769,7 +2769,6 @@ public class OrderServiceImpl implements OrderService {
         return AgentResult.ok(f);
     }
 
-
     /**
      * 查询订单付款
      *
@@ -2793,7 +2792,6 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
-
     /**
      * 查询订单的订购单信息
      *
@@ -2805,7 +2803,6 @@ public class OrderServiceImpl implements OrderService {
     public List<Map<String, Object>> querySubOrderInfoList(String agentId, String orderId) {
         return orderMapper.queryOrderSubOrderProduct(orderId, agentId);
     }
-
 
     /**
      * 查询已派单信息
@@ -2819,7 +2816,6 @@ public class OrderServiceImpl implements OrderService {
     public List<Map<String, Object>> queryHavePeiHuoProduct(String agentId, String orderId) {
         return orderMapper.queryHavePeiHuoProduct(orderId, agentId);
     }
-
 
     /**
      * 配货操作
@@ -3036,7 +3032,6 @@ public class OrderServiceImpl implements OrderService {
         AgentResult sysn = sysnReceiptOrderPorNum(oReceiptPro_db.getReceiptId());
         return sysn;
     }
-
 
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
@@ -3404,9 +3399,6 @@ public class OrderServiceImpl implements OrderService {
         return AgentResult.fail();
     }
 
-
-    @Autowired
-    private CashSummaryMouthMapper cashSummaryMouthMapper;
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public AgentResult insertSelectiveCashSummaryMouth(CashSummaryMouth cashSummaryMouth) {

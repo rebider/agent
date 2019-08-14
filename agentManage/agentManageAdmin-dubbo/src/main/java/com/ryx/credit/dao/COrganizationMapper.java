@@ -21,4 +21,6 @@ public interface COrganizationMapper extends BaseMapper<COrganization> {
     COrganization selectByPrimaryKey(Integer id);
 
     COrganization selectByCode(String code);
+
+    List<COrganization> selectRegion(@Param("pCode") Integer pCode);
 }
