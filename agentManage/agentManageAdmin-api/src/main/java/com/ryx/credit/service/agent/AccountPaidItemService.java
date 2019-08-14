@@ -9,6 +9,7 @@ import com.ryx.credit.pojo.admin.vo.CapitalVo;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @version V1.0
@@ -35,6 +36,6 @@ public interface AccountPaidItemService {
      */
     public AgentResult capitalFq(Capital capital)throws Exception;
 
-    public void updateListCapitalVo(List<CapitalVo> capitalVoList)throws Exception;
+    public void updateListCapitalVo(List<CapitalVo> capitalVoList,Map map)throws Exception;
 
 }

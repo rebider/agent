@@ -305,44 +305,31 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
-    public void updateListCapitalVo(List<CapitalVo> capitalVoList) throws Exception {
+    public void updateListCapitalVo(List<CapitalVo> capitalVoList,Map map) throws Exception {
         try {
+            String userId ="";
+            String agentId ="";
+            String sid ="";
+            boolean isPass=false;
+            if (null!=map){
+                 userId = String.valueOf(map.get("userId"));
+                 agentId = String.valueOf(map.get("agentId"));
+                 sid = String.valueOf(map.get("sid"));
+            }
             for (CapitalVo capitalVo : capitalVoList) {
-                String agentId="";
-                String  actid="";
-                String cUser="";
-                boolean isPass=false;
-                CapitalExample capitalExample = new CapitalExample();
-                CapitalExample.Criteria criteria = capitalExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andIdEqualTo(capitalVo.getId());
-                List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
-                if(null!=capitals && capitals.size()>0){
-                    for (Capital capital : capitals) {
-                        if (null==capital.getcAgentId()){
-                            agentId=capital.getcAgentId();
-                        }
-                        if(StringUtils.isNotBlank(capital.getActivId())){
-                            actid=capital.getActivId();
-                        }
-                        if (StringUtils.isNotBlank(capital.getcUser())){
-                            cUser=capital.getcUser();
-                        }
-                    }
-                }
-
-
-                capitalVo.setcUser(cUser);
+                capitalVo.setcUser(userId);
                 capitalVo.setcAgentId(agentId);
-                capitalVo.setActivId(actid);
+                capitalVo.setActivId(sid);
                 if(StringUtils.isEmpty(capitalVo.getId())) {
                     //直接新曾
-                    AgentResult result =   insertAccountPaid(capitalVo, capitalVo.getCapitalTableFile(), cUser,isPass,null);
+                    AgentResult result =   insertAccountPaid(capitalVo, capitalVo.getCapitalTableFile(), userId,isPass,null);
                     //加入流水
                     capitalFlowService.insertCapitalFlow(capitalVo, BigDecimal.ZERO,capitalVo.getSrcId(),capitalVo.getSrcRemark());
                     if(!result.isOK())throw new MessageException("新增缴纳款项信息失败");
                 }else{
 
                     Capital db_capital = capitalMapper.selectByPrimaryKey(capitalVo.getId());
-                    db_capital.setcAgentId(cUser);
+                    db_capital.setcAgentId(userId);
                     db_capital.setcType(capitalVo.getcType());
                     db_capital.setcAmount(capitalVo.getcAmount());
                     db_capital.setcSrc(capitalVo.getcSrc());
@@ -372,7 +359,7 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
                     if(1!=capitalMapper.updateByPrimaryKeySelective(db_capital)){
                         throw new MessageException("更新缴纳款项信息失败");
                     }else{
-                        if(!agentDataHistoryService.saveDataHistory(db_capital,db_capital.getId(), DataHistoryType.PAYMENT.getValue(),cUser,db_capital.getVersion()).isOK()){
+                        if(!agentDataHistoryService.saveDataHistory(db_capital,db_capital.getId(), DataHistoryType.PAYMENT.getValue(),userId,db_capital.getVersion()).isOK()){
                             throw new MessageException("更新缴纳款项信息失败");
                         }
                     }

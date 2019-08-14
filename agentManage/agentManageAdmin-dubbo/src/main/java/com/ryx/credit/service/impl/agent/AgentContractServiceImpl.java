@@ -340,36 +340,24 @@ public class AgentContractServiceImpl implements AgentContractService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
-    public void updateContractList(List<AgentContractVo> volist) throws Exception {
+    public void updateContractList(List<AgentContractVo> volist,Map map) throws Exception {
         try {
 
-            String  actid="";
-            String cUser="";
-            String agentId="";
+            String userId ="";
+            String agentId ="";
+            String  sid="";
+            if (null!=map){
+                userId = String.valueOf(map.get("userId"));
+                agentId = String.valueOf(map.get("agentId"));
+                sid = String.valueOf(map.get("sid"));
+            }
             for (AgentContractVo agentContractVo : volist) {
-                //查询代理商id和工作流的id
-                AgentContractExample agentContractExample = new AgentContractExample();
-                AgentContractExample.Criteria criteria = agentContractExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andIdEqualTo(agentContractVo.getId());
-                List<AgentContract> agentContracts = agentContractMapper.selectByExample(agentContractExample);
-                if (null!=agentContracts && agentContracts.size()>0){
-                    for (AgentContract agentContract : agentContracts) {
-                        if (null==agentContractVo.getAgentId()){
-                            agentId=agentContract.getAgentId();
-                        }
-                        if(StringUtils.isNotBlank(agentContract.getActivId())){
-                            actid=agentContract.getActivId();
-                        }
-                        if (StringUtils.isNotBlank(agentContract.getcUser())){
-                            cUser=agentContract.getcUser();
-                        }
-                    }
-                }
-                agentContractVo.setActivId(actid);
+                agentContractVo.setActivId(sid);
                 agentContractVo.setAgentId(agentId);
-                agentContractVo.setcUser(cUser);
+                agentContractVo.setcUser(userId);
                 if (StringUtils.isEmpty(agentContractVo.getId())) {
                     //直接新增
-                    AgentContract result = insertAgentContract(agentContractVo, agentContractVo.getContractTableFile(),cUser,null);
+                    AgentContract result = insertAgentContract(agentContractVo, agentContractVo.getContractTableFile(),userId,null);
                     if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentContractVo.getAgentAssProtocol())){
                         AssProtoColRel rel = new AssProtoColRel();
                         rel.setAgentBusinfoId(result.getId());
@@ -382,7 +370,7 @@ public class AgentContractServiceImpl implements AgentContractService {
                             rel.setProtocolRule(assProtoCol.getProtocolRule());
                         }
                         rel.setProtocolRuleValue(agentContractVo.getProtocolRuleValue());
-                        if(1!=agentAssProtocolService.addProtocolRel(rel,cUser)){
+                        if(1!=agentAssProtocolService.addProtocolRel(rel,userId)){
                             throw new MessageException("合同分管协议添加失败");
                         }
                     }
@@ -402,7 +390,7 @@ public class AgentContractServiceImpl implements AgentContractService {
                         throw new MessageException("更新代理商合同失败");
                     }else{
                         //记录历史
-                        if(!agentDataHistoryService.saveDataHistory(db_AgentContract,db_AgentContract.getId(), DataHistoryType.CONTRACT.getValue(),cUser,db_AgentContract.getVersion()).isOK()){
+                        if(!agentDataHistoryService.saveDataHistory(db_AgentContract,db_AgentContract.getId(), DataHistoryType.CONTRACT.getValue(),userId,db_AgentContract.getVersion()).isOK()){
                             throw new MessageException("更新代理商合同失败");
                         }
                     }
@@ -427,7 +415,7 @@ public class AgentContractServiceImpl implements AgentContractService {
                             rel.setProtocolRule(assProtoCol.getProtocolRule());
                         }
                         rel.setProtocolRuleValue(agentContractVo.getProtocolRuleValue());
-                        if(1!=agentAssProtocolService.addProtocolRel(rel,cUser)){
+                        if(1!=agentAssProtocolService.addProtocolRel(rel,userId)){
                             throw new MessageException("业务分管协议添加失败");
                         }
                     }else{
