@@ -60,6 +60,10 @@ public class AgentHttpMposServiceImpl implements AgentNetInHttpService {
 
         PayComp payComp = apaycompService.selectById(agentBusInfo.getCloPayCompany());
         AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
+        if(agentColinfo==null){
+            log.info("收款账户为空:{},{}",agent.getId(), agentBusInfo.getId());
+            agentColinfo = new AgentColinfo();
+        }
         agentColinfo.setAccountId(agentBusInfo.getCloPayCompany());
         agentColinfo.setAccountName(payComp.getComName());
 
@@ -100,12 +104,13 @@ public class AgentHttpMposServiceImpl implements AgentNetInHttpService {
         resultMap.put("orgType",OrgType.zQ(agentBusInfo.getBusType())?OrgType.STR.getValue():OrgType.ORG.getValue());
         //新增传递参数
         Organization organization = organizationMapper.selectByPrimaryKey(agentBusInfo.getOrganNum());
+        if(organization==null){
+            log.info("机构信息为空:{},{}",agent.getId(), agentBusInfo.getId());
+            organization = new Organization();
+        }
         resultMap.put("agentId",organization.getOrgId());//机构ID
         resultMap.put("agentName",organization.getOrgName());//机构编号
         resultMap.put("agCode",agentBusInfo.getAgentId());//AG码
-
-
-
         return resultMap;
     }
 
