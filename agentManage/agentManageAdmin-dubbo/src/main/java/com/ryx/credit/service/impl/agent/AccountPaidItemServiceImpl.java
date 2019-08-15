@@ -329,7 +329,7 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
                 }else{
 
                     Capital db_capital = capitalMapper.selectByPrimaryKey(capitalVo.getId());
-                    db_capital.setcAgentId(userId);
+                    db_capital.setcAgentId(agentId);
                     db_capital.setcType(capitalVo.getcType());
                     db_capital.setcAmount(capitalVo.getcAmount());
                     db_capital.setcSrc(capitalVo.getcSrc());
