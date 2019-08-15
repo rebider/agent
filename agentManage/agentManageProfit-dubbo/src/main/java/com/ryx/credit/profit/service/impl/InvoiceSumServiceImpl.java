@@ -49,8 +49,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
     @Autowired
     private AgentService agentService;
 
-
-    @Override
+    /*@Override
     public PageInfo selectByMap(Page page, Map<String, String> param, Map<String,Object> map) {
 
         InvoiceSumExample invoiceSumExample = new InvoiceSumExample();
@@ -87,6 +86,30 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
         PageInfo pageInfo = new PageInfo();
         pageInfo.setTotal(count);
         pageInfo.setRows(invoiceSums);
+        return pageInfo;
+    }*/
+
+    /**
+     * 获取数据列表
+     * @param page
+     * @param param
+     * @param map
+     * @return
+     */
+    @Override
+    public PageInfo selectByMap(Page page, Map<String, String> param, Map<String,Object> map) {
+        if(map != null){
+            if (Objects.equals("south", map.get("ORGANIZATIONCODE").toString() )|| Objects.equals("north", map.get("ORGANIZATIONCODE").toString())) {
+                param.put("docDis",map.get("ORGID").toString());
+            } else if (map.get("ORGANIZATIONCODE").toString().contains("south") || map.get("ORGANIZATIONCODE").toString().contains("north")) {
+                param.put("docPro",map.get("ORGID").toString());
+            }
+        }
+        PageInfo pageInfo = new PageInfo();
+        List<Map<String,Object>> list = invoiceSumMapper.getListByMap(page,param);
+        int count = invoiceSumMapper.getCountByMap(param);
+        pageInfo.setTotal(count);
+        pageInfo.setRows(list);
         return pageInfo;
     }
 
@@ -149,7 +172,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
             e.printStackTrace();
             logger.info("冻结和解冻代理商失败");
             resultMap.put("returnCode", 0000);
-            resultMap.put("returnInfo", "失败");
+            resultMap.put("returnInfo", "冻结和解冻代理商失败");
             return resultMap;
         }
 
@@ -162,7 +185,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
             e.printStackTrace();
             logger.info("修改发票汇总金额失败");
             resultMap.put("returnCode", 0000);
-            resultMap.put("returnInfo", "失败");
+            resultMap.put("returnInfo", "修改发票汇总金额失败");
             return resultMap;
         }
         resultMap.put("returnCode", 9999);

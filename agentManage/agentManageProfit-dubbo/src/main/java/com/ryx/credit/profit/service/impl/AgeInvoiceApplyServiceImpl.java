@@ -20,6 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -47,6 +50,9 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
 
     private final static String PASSWORD = AppConfig.getProperty("encrypt.key"); // 加密key
     private final static String TICKET_INFO_URL = AppConfig.getProperty("jd.ticketInfo")+"?access_token="; // 获取发票信息url
+
+    private final static String[] ARRAY = {"研发和技术服务","研发服务","信息技术服务","软件服务","信息系统服务","现代服务","技术服务","信息技术服务","咨询服务"};
+
 
     private String tocken = "";
 
@@ -86,7 +92,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
             criteria.andYsResultEqualTo(invoiceApply.getYsResult());
         }
         if (StringUtils.isNotBlank(invoiceApply.getAgentName())){
-            criteria.andAgentNameLike(invoiceApply.getAgentName());
+            criteria.andAgentNameLike("%"+invoiceApply.getAgentName()+"%");
         }
         if(flag){
             criteria.andExpressCompanyIsNotNull();
@@ -123,54 +129,117 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         return invoiceApplyMapper.selectByPrimaryKey(id);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
     public void saveInvoiceApply(List<Map<String,Object>> list, String agentId) throws MessageException{
         try {
             Agent agent = agentService.getAgentById(agentId);
+
+            if(agent == null){
+                throw new MessageException("未获取到该代理商的信息！");
+            }
+
+            List<InvoiceApply> invoiceApplyList = new ArrayList<InvoiceApply>();
+            Map<String,BigDecimal> mapInvoice = new HashMap<String,BigDecimal>();
             Map<String,Object> map1 = getAccessTocken();
+
             if("0000".equals(map1.get("errcode"))){
+                // 获取金蝶token授权
                 tocken = map1.get("access_token").toString();
                 for (Map<String,Object> map:list) {
+
                     InvoiceApply invoiceApply = new InvoiceApply();
+
+                    //获取发票全部信息
                     Map<String,Object> result = getTicketInfo(map.get("invoiceCode").toString(),map.get("invoiceNo").toString(),tocken);
-                    if(result == null){//未在发票云找到该发票信息，将此信息返回
+                    if(result == null){
                         invoiceApply.setYsResult("0");
                         invoiceApply.setInvoiceCompany(map.get("sallerName").toString());
                         invoiceApply.setRev1("发票云库中未找到该发票信息");
-                    }else{
+                    }else {
                         invoiceApply.setYsResult("1");
-                        if("1".equals(result.get("proxyMark").toString())){ // 代开
+                        if ("1".equals(result.get("proxyMark").toString())) { // 代开
                             String remark = result.get("remark").toString();  // 获取发票备注
                             int flag = remark.indexOf("代开企业名称:");// 截取代开企业名称
-                            int kBank = remark.indexOf("开户银行:",flag);
+                            int kBank = remark.indexOf("开户银行:", flag);
                             int index = remark.indexOf(" ", flag);
-                            if(flag != -1){
+                            if (flag != -1) {
                                 if (kBank > flag) {
-                                    invoiceApply.setInvoiceCompany(remark.substring(flag+7,kBank));
-                                    System.out.println(remark.substring(flag + 7, kBank));
-                                } else if(index > flag){
-                                    invoiceApply.setInvoiceCompany(remark.substring(flag+7,index));
-                                    System.out.println(remark.substring(flag + 7, index));
-                                }else{
-                                    System.out.println(remark.substring(flag + 7));
-                                    invoiceApply.setInvoiceCompany(remark.substring(flag+7));
+                                    invoiceApply.setInvoiceCompany(remark.substring(flag + 7, kBank));
+                                } else if (index > flag) {
+                                    invoiceApply.setInvoiceCompany(remark.substring(flag + 7, index));
+                                } else {
+                                    invoiceApply.setInvoiceCompany(remark.substring(flag + 7));
                                 }
                                 invoiceApply.setSallerName(map.get("sallerName").toString());
                                 invoiceApply.setRemark(remark);
-                            }else{
+                            } else {
                                 invoiceApply.setYsResult("0");
                                 invoiceApply.setInvoiceCompany(map.get("sallerName").toString());
                                 invoiceApply.setRev1("未获取到代开公司数据");
                             }
-                        }else {
+                        } else {
                             invoiceApply.setInvoiceCompany(map.get("sallerName").toString());
                         }
+
+                        //获取该发票税率及商品名称
+                            List<Map<String,Object>> items = (List<Map<String, Object>>) result.get("items");
+                            if(items.size() > 0){
+                                invoiceApply.setTax(new BigDecimal(items.get(0).get("taxRate").toString()));
+                                invoiceApply.setInvoiceItem(items.get(0).get("goodsName").toString());
+                            }
                     }
-                    if("1".equals(invoiceApply.getYsResult())){ // 初审通过
+
+                    //判断发票类型
+                    if("1".equals(invoiceApply.getYsResult())){
+                        if("4".equals(map.get("invoiceType").toString())){
+                            invoiceApply.setYsResult("1");
+                        }else{
+                            invoiceApply.setYsResult("0");
+                            invoiceApply.setRev1("该发票类型不是'专用纸质发票'类型！");
+                        }
+                    }
+
+                    // 判断发票是否重复导入
+                    if("1".equals(invoiceApply.getYsResult())){
+                        InvoiceApply invoiceApply1 = new InvoiceApply();
+                        invoiceApply1.setInvoiceCode(map.get("invoiceCode").toString());
+                        invoiceApply1.setInvoiceNumber(map.get("invoiceNo").toString());
+                        invoiceApply1.setYsResult("1");
+                        List<InvoiceApply> list1 = getListByExample(invoiceApply1);
+                        if(list1.size() >= 1){
+                            invoiceApply.setYsResult("0");
+                            invoiceApply.setRev1("该发票重复导入！");
+                        }
+                    }
+
+                    // 判断商品名称是否符合要求
+                    if("1".equals(invoiceApply.getYsResult())){
+                        Boolean flag = false;
+                        if(StringUtils.isNotBlank(invoiceApply.getInvoiceItem())){
+                            for (int i = 0;i < ARRAY.length ; i++) {
+                                String str = ARRAY[i];
+                                if(invoiceApply.getInvoiceItem().indexOf(str) != -1){
+                                    flag = true;
+                                    break;
+                                }
+                            }
+                            if(!flag){
+                                invoiceApply.setYsResult("0");
+                                invoiceApply.setRev1("商品名称不符！");
+                            }
+                        }else{
+                            invoiceApply.setYsResult("0");
+                            invoiceApply.setRev1("未获取到该发票对应商品名称！");
+                        }
+                    }
+
+                    //判断开票公司是否符合
+                    if("1".equals(invoiceApply.getYsResult())){
                         List<String> stringList = invoiceApplyMapper.getPayCompanyById(agentId);
                         if(stringList.size()<= 0){
                             invoiceApply.setYsResult("0");
-                            invoiceApply.setRev1("开票公司和该代理商不符！");
+                            invoiceApply.setRev1("未找到该代理商开票公司！");
                         }else{
                             if(!stringList.contains(invoiceApply.getInvoiceCompany())){
                                 invoiceApply.setYsResult("0");
@@ -178,19 +247,29 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                             }
                         }
                     }
-                    InvoiceApply invoiceApply1 = new InvoiceApply();
-                    invoiceApply1.setInvoiceCode(map.get("invoiceCode").toString());
-                    invoiceApply1.setInvoiceNumber(map.get("invoiceNo").toString());
-                    invoiceApply1.setYsResult("1");
-                    List<InvoiceApply> list1 = getListByExample(invoiceApply1);
-                    if(list1.size() >= 1){
-                        invoiceApply.setYsResult("0");
-                        invoiceApply.setRev1("该发票重复导入！");
+
+                    //判断税率
+                    if("1".equals(invoiceApply.getYsResult())){
+                       // 先获取代理商税率
+                        BigDecimal invoiceTax = invoiceApply.getTax();
+                        if(invoiceTax != null){
+                            BigDecimal agentTax = invoiceApplyMapper.getAgentTaxByAgentId(agentId);
+                            if(invoiceTax.compareTo(agentTax) != 0){
+                                invoiceApply.setYsResult("0");
+                                invoiceApply.setRev1("该发票税点和代理商税点不相同");
+                            }
+                        }else {
+                            invoiceApply.setYsResult("0");
+                            invoiceApply.setRev1("获取发票税点错误！");
+                        }
                     }
+
                     invoiceApply.setId(idService.genId(TabId.P_INVOICE_APPLY));
                     invoiceApply.setAgentId(agentId);
-                    if(agent != null){
+                    if(StringUtils.isNotBlank(agent.getAgName())){
                         invoiceApply.setAgentName(agent.getAgName());
+                    }else {
+                        throw new MessageException("该代理商的名称为空，请检查！");
                     }
                     invoiceApply.setSerialNo(map.get("serialNo").toString());
                     invoiceApply.setInvoiceCode(map.get("invoiceCode").toString());
@@ -204,8 +283,35 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                     invoiceApply.setExpenseStatus(map.get("expenseStatus").toString());
                     invoiceApply.setYsDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
                     invoiceApply.setStatus("0");
-                    invoiceApplyMapper.insertSelective(invoiceApply);
+
+                    // 对发票金额进行判断，若通过初审金额大于欠票金额 则不能导入
+                    if("1".equals(invoiceApply.getYsResult())){
+                        //本月已初审的票
+                        BigDecimal bg = invoiceApplyMapper.getSumInvoice(invoiceApply.getAgentId(),invoiceApply.getInvoiceCompany(),new SimpleDateFormat("yyyy-MM").format(new Date()));
+                        bg = bg == null ? BigDecimal.ZERO : bg;
+                        BigDecimal mg = mapInvoice.get(invoiceApply.getInvoiceCompany()) == null ? BigDecimal.ZERO : mapInvoice.get(invoiceApply.getInvoiceCompany());
+                        mg = mg.add(invoiceApply.getSumAmt());
+                        // 获取本月该欠票公司的欠票金额
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");
+                        Calendar cal = Calendar.getInstance();
+                        cal.setTime(new Date());
+                        cal.add(Calendar.MONTH, -1);
+                        String month = sdf.format(cal.getTime());
+                        BigDecimal ownInvoice = invoiceApplyMapper.getOwnInvoice(invoiceApply.getAgentId(),invoiceApply.getInvoiceCompany(),month);
+                        if(null == ownInvoice){
+                            throw new MessageException("开票公司是：（"+invoiceApply.getInvoiceCompany()+"）未获取到欠票数据！");
+                        }
+                        if(bg.add(mg).compareTo(ownInvoice) > 0){ // 表示本月到票大于本月欠票
+                            throw new MessageException("开票公司：("+invoiceApply.getInvoiceCompany()+")所开发票金额总计已大于本月欠票,不符合条件，请重新导入");
+                        }else{
+                            mapInvoice.put(invoiceApply.getInvoiceCompany(),mg);
+                        }
+                    }
+                    invoiceApplyList.add(invoiceApply);
                 }
+
+                //将通过的初审，或者初审出现错误的数据保存
+                insertList(invoiceApplyList);
             }
         }catch (MessageException e){
             e.printStackTrace();
@@ -213,9 +319,14 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
             throw  new MessageException(e.getMsg());
         }catch (Exception e){
            e.printStackTrace();
-           throw  new MessageException("保存失败");
+           throw  new MessageException("保存失败!");
         }
+    }
 
+    private void insertList(List<InvoiceApply> list){
+        for (InvoiceApply invoiceApply:list) {
+            invoiceApplyMapper.insertSelective(invoiceApply);
+        }
     }
 
     @Override
@@ -223,7 +334,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         List<Map<String,String>> maps = new ArrayList<Map<String,String>>();
         for (Map<String,Object> map:list) {
             InvoiceApply invoiceApply = new InvoiceApply();
-            invoiceApply.setSerialNo(map.get("serialNo").toString());
+            invoiceApply.setInvoiceNumber(map.get("invoiceNo").toString());
             invoiceApply.setInvoiceCode(map.get("invoiceCode").toString());
             invoiceApply.setYsResult("1");
             invoiceApply.setStatus("0");
@@ -241,7 +352,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                 Map<String,Object> ma = invoiceSumService.getInvoiceFinalData(mmm);
                 if(!"9999".equals(ma.get("returnCode").toString()) ){
                     Map<String,String> mm = new HashMap<String,String>();
-                    mm.put("invoiceCode",invoiceApply.getInvoiceCode());
+                    mm.put("invoiceCode",invoiceApply.getInvoiceCode()+"（发票代码："+invoiceApply.getInvoiceNumber()+")");
                     mm.put("errorInfo","汇总失败："+ma.get("returnInfo").toString());
                     maps.add(mm);
                     invoiceApply1.setEsResult("0");
@@ -279,6 +390,9 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         }
         if(StringUtils.isNotBlank(invoiceApply.getYsResult())){
             criteria.andYsResultEqualTo(invoiceApply.getYsResult());
+        }
+        if(StringUtils.isNotBlank(invoiceApply.getInvoiceNumber())){
+            criteria.andInvoiceNumberEqualTo(invoiceApply.getInvoiceNumber());
         }
        return  invoiceApplyMapper.selectByExample(example);
     }
@@ -350,5 +464,8 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         }
     }
 
-
+    @Override
+    public List<Map<String, Object>> exports(InvoiceApply invoiceApply) {
+        return invoiceApplyMapper.exports(invoiceApply);
+    }
 }
