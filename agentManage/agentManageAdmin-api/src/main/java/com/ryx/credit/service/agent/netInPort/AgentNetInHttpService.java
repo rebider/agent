@@ -23,4 +23,5 @@ public interface AgentNetInHttpService {
 
     AgentResult httpRequestNetInUpdate(Map<String,Object> paramMap)throws Exception;
 
+    AgentResult agencyLevelCheck(Map<String, Object> paramMap)throws Exception;
 }

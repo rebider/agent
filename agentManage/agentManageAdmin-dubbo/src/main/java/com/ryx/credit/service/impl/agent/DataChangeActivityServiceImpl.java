@@ -27,7 +27,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -155,7 +154,9 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             logger.info("========用户{}启动数据修改申请{}{}启动部门参数为空",dataChangeId,userId,"审批流启动失败字典中未配置部署流程");
             throw new MessageException("启动部门参数为空!");
         }
-        startPar.put("rs",ApprovalType.PASS.getValue());
+        if(startPar.get("party").toString().equals("beijing")){
+            startPar.put("rs",ApprovalType.PASS.getValue());
+        }
         String proce = activityService.createDeloyFlow(null,workId,null,null,startPar);
         if(proce==null){
             logger.info("========用户{}启动数据修改申请{}{}",dataChangeId,userId,"数据修改审批，审批流启动失败");
@@ -673,4 +674,22 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         int i = dateChangeRequestMapper.updateByPrimaryKeySelective(dateChangeRequest);
         return i;
     }
+
+
+    @Override
+    public ResultVO deleteDataChange(String dataChangeId, String userId) throws Exception {
+        logger.info("========用户{}删除数据修改申请{}", userId, dataChangeId);
+
+        DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(dataChangeId);
+        dateChangeRequest.setStatus(Status.STATUS_0.status);
+        dateChangeRequest.setcUpdate(new Date());
+        int updateDateChange = dateChangeRequestMapper.updateByPrimaryKeySelective(dateChangeRequest);
+        if (updateDateChange != 1) {
+            logger.info("删除数据修改申请:{}", "数据删除失败");
+            throw new MessageException("数据删除失败！");
+        }
+
+        return ResultVO.success(null);
+    }
+
 }
