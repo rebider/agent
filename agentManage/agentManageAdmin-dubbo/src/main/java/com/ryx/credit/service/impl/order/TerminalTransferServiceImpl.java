@@ -321,7 +321,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 }
                 if (number != 2) {
                     log.info("您本次申请的目标代理商与原代理商存在不是你的下级或您本级，请修改提交");
-                   /* throw new MessageException("您本次申请的目标代理商与原代理商存在不是你的下级或您本级，请修改提交");*/
+                    throw new MessageException("您本次申请的目标代理商与原代理商存在不是你的下级或您本级，请修改提交");
                 }
             }
             //本次提交是否有重复SN
@@ -480,9 +480,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                             throw new MessageException("您的机构码不属于pos平台请选择：原：" + originalOrgId + "目标：" + goalOrgId);
                         }
                     }
-                    String res = redisService.getValue("TerminalTransfer:ISOPEN_RES_trans");
+//                    String res = redisService.getValue("TerminalTransfer:ISOPEN_RES_trans");
                     AgentResult agentResult = null;
-                    if (StringUtils.isNotBlank(res) && "1".equals(res)) {
+//                    if (StringUtils.isNotBlank(res) && "1".equals(res)) {
                         try {
                             agentResult = termMachineService.queryTerminalTransfer(terminalTransferDetailListsPos, "check");
                         }catch ( Exception e ){
@@ -490,10 +490,10 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                             throw new MessageException("未获得查询结果");
                         }
 
-                    } else {
+                   /* } else {
                         startTerminalTransferActivity(terminalTransferId, cuser, agentId, true);
                         return AgentResult.ok();
-                    }
+                    }*/
                     if (agentResult.isOK()) {
                         JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
                         JSONObject data = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
@@ -960,8 +960,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         }
 
         if (terminalTransferDetailListsPos != null && terminalTransferDetailListsPos.size() > 0) {
-            String res = redisService.getValue("TerminalTransfer:ISOPEN_RES_trans");
-            if (StringUtils.isNotBlank(res) && "1".equals(res)) {
+//            String res = redisService.getValue("TerminalTransfer:ISOPEN_RES_trans");
+//            if (StringUtils.isNotBlank(res) && "1".equals(res)) {
                 try{
                     termMachineService.queryTerminalTransfer(terminalTransferDetailListsPos, "adjust");
                 }catch (Exception e){
@@ -971,20 +971,20 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     terminalTransferDetail.setuTime(Calendar.getInstance().getTime());
                     terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
                 }
-            } else {
-                for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailListsPos) {
-                    terminalTransferDetail.setAdjustTime(new Date());
-                    terminalTransferDetail.setuTime(new Date());
-                    terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());
-                    terminalTransferDetail.setRemark("需线下调整");
-                    terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
-                }
-            }
+//            } else {
+//                for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailListsPos) {
+//                    terminalTransferDetail.setAdjustTime(new Date());
+//                    terminalTransferDetail.setuTime(new Date());
+//                    terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());
+//                    terminalTransferDetail.setRemark("需线下调整");
+//                    terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
+//                }
+//            }
         }
 
         if (terminalTransferDetailListsMpos != null && terminalTransferDetailListsMpos.size() > 0) {
-            String res = redisService.getValue("TerminalTransfer:ISOPEN_RES_trans");
-            if (StringUtils.isNotBlank(res) && "1".equals(res)) {
+//            String res = redisService.getValue("TerminalTransfer:ISOPEN_RES_trans");
+//            if (StringUtils.isNotBlank(res) && "1".equals(res)) {
                 try{
                   termMachineService.queryTerminalTransfer(terminalTransferDetailListsMpos, "hb");
                 }catch (Exception e){
@@ -995,15 +995,15 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     terminalTransferDetail.setuTime(Calendar.getInstance().getTime());
                     terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
                 }
-            } else {
-                for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailListsPos) {
-                    terminalTransferDetail.setAdjustTime(new Date());
-                    terminalTransferDetail.setuTime(new Date());
-                    terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());
-                    terminalTransferDetail.setRemark("开关未打开需线下调整");
-                    terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
-                }
-            }
+//            } else {
+//                for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailListsPos) {
+//                    terminalTransferDetail.setAdjustTime(new Date());
+//                    terminalTransferDetail.setuTime(new Date());
+//                    terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());
+//                    terminalTransferDetail.setRemark("开关未打开需线下调整");
+//                    terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
+//                }
+//            }
 
         }
         if (terminalTransferDetailListsRDBPOS != null && terminalTransferDetailListsRDBPOS.size() > 0) {
