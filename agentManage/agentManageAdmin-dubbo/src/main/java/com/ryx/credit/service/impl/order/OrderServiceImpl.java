@@ -3667,6 +3667,7 @@ public class OrderServiceImpl implements OrderService {
                         receiptPlan.setProCom(oActivity.getVender());
                         receiptPlan.setProType(oActivity.getProType());
                         receiptPlan.setModel(oActivity.getProModel());
+                        receiptPlan.setActivityId(oActivity.getId());
                         int updateReceiptPlan = receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan);
                         if (updateReceiptPlan != 1) {
                             logger.info("活动变更:{}", "ReceiptPlan-更新失败");
