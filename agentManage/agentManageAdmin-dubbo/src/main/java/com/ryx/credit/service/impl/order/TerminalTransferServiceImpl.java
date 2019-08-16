@@ -542,8 +542,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                         return AgentResult.ok();
                     }*/
                     if (agentResult.isOK()) {
-                        JSONObject data = (JSONObject) agentResult.getData();
-                        List<Map<String, Object>> mapList = (List<Map<String, Object>>) data.get("result");
+                        List<Map<String, Object>> mapList =  (List<Map<String, Object>>) agentResult.getData();
                         if (mapList == null || mapList.size() == 0) {
                             log.info("手刷划拨未获得结果");
                             throw new MessageException("手刷划拨未获得结果");
@@ -552,8 +551,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                             if ("code6".equals(map.get("code").toString())) {
                                 continue;
                             } else {
-                                log.info(map.get("startTerm").toString() + "-------" + map.get("endTerm").toString()+":"+ map.get("message"));
-                                throw new MessageException(map.get("startTerm").toString() + "-------" + map.get("endTerm").toString() + map.get("message"));
+                                log.info(map.get("startTerm").toString() + "-------" + map.get("endTerm").toString()+":"+ map.get("msg"));
+                                throw new MessageException(map.get("startTerm").toString() + "-------" + map.get("endTerm").toString() + map.get("msg"));
                             }
 
                         }
@@ -561,7 +560,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     } else {
                         String resultMsg = agentResult.getMsg();
                         log.info("未连通查询接口" + resultMsg);
-                        throw new MessageException(resultMsg);
+                        throw new MessageException("未连通查询接口" + resultMsg);
                     }
                 }
                 if (terminalTransferDetailListsRDBPOS != null && terminalTransferDetailListsRDBPOS.size() > 0) {
@@ -676,6 +675,24 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         Agent agent = agentMapper.selectByPrimaryKey(goalAgentBusInfo.getAgentId());
         if (!agent.getAgName().equals(terminalTransferDetail.getGoalOrgName())) {
             throw new MessageException("目标机构ID和名称不匹配");
+        }
+        //验证目标代理商是否存在
+        AgentBusInfoExample agentBusInfoExample1 = new AgentBusInfoExample();
+        AgentBusInfoExample.Criteria agentBusInfoCriteria1 = agentBusInfoExample1.createCriteria();
+        agentBusInfoCriteria1.andStatusEqualTo(Status.STATUS_1.status);
+        List<BigDecimal> busStatusList1 = new ArrayList<>();
+        busStatusList1.add(BusinessStatus.Enabled.status);
+        busStatusList1.add(BusinessStatus.inactive.status);
+        agentBusInfoCriteria1.andBusStatusIn(busStatusList);
+        agentBusInfoCriteria1.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
+        agentBusInfoCriteria1.andBusNumEqualTo(terminalTransferDetail.getOriginalOrgId());
+        List<AgentBusInfo> agentBusInfos1 = agentBusInfoMapper.selectByExample(agentBusInfoExample1);
+        if (agentBusInfos1.size() != 1) {
+            throw new MessageException("原机构机构ID(不存在或存在多个或审批未通过)");
+        }
+        Agent agent2 = agentMapper.selectByPrimaryKey(agentBusInfos1.get(0).getAgentId());
+        if (!agent2.getAgName().equals(terminalTransferDetail.getOriginalOrgName())) {
+            throw new MessageException("原机构ID和名称不匹配");
         }
         //查询目标机构是否是当前代理商下的
 //        AgentBusInfoExample agentExample = new AgentBusInfoExample();

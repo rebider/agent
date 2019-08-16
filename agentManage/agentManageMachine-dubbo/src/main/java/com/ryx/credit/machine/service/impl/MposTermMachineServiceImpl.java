@@ -224,8 +224,8 @@ public class MposTermMachineServiceImpl implements TermMachineService {
             map.put("endTerm",terminalTransferDetail.getSnEndNum());
             map.put("oldAgencyId",terminalTransferDetail.getOriginalOrgId());
             map.put("newAgencyId",terminalTransferDetail.getGoalOrgId());
-            map.put("num",terminalTransferDetail.getComSnNum());
-            map.put("limitNum",terminalTransferDetail.getSnCount());
+            map.put("num",terminalTransferDetail.getComSnNum().stripTrailingZeros().toString());
+            map.put("limitNum",terminalTransferDetail.getSnCount().stripTrailingZeros().toString());
             map.put("batchId",terminalTransferDetail.getId());
             mapList.add(map);
         }
@@ -242,7 +242,7 @@ public class MposTermMachineServiceImpl implements TermMachineService {
 
         if(null!=res && MPOS_SUCESS_respCode.equals(res.getString("respCode")) && MPOS_SUCESS_respType.equals(res.getString("respType"))){
             logger.info("机具终端划拨通知查询成功:{}{}{}",AppConfig.getProperty("mpos.termMachine"),res.getString("respMsg"),res.toJSONString());
-            JSONObject codeType = JSONObject.parseObject(String.valueOf(res.get("data")));
+            List<Map<String,Object>> codeType =(List<Map<String,Object>>) JSONArray.parse(String.valueOf(res.get("data")));
             return AgentResult.ok(codeType);
         }else{
             logger.info("机具终端划拨通知查询失败:{}{}{}",AppConfig.getProperty("mpos.termMachine"),res.getString("respMsg"),res.toJSONString());
