@@ -321,7 +321,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 }
                 if (number != 2) {
                     log.info("您本次申请的目标代理商与原代理商存在不是你的下级或您本级，请修改提交");
-                   /* throw new MessageException("您本次申请的目标代理商与原代理商存在不是你的下级或您本级，请修改提交");*/
+                    throw new MessageException("您本次申请的目标代理商与原代理商存在不是你的下级或您本级，请修改提交");
                 }
             }
             //本次提交是否有重复SN
@@ -542,8 +542,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                         return AgentResult.ok();
                     }*/
                     if (agentResult.isOK()) {
-                        JSONObject data = (JSONObject) agentResult.getData();
-                        List<Map<String, Object>> mapList = (List<Map<String, Object>>) data.get("result");
+                        List<Map<String, Object>> mapList =  (List<Map<String, Object>>) agentResult.getData();
                         if (mapList == null || mapList.size() == 0) {
                             log.info("手刷划拨未获得结果");
                             throw new MessageException("手刷划拨未获得结果");
@@ -552,8 +551,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                             if ("code6".equals(map.get("code").toString())) {
                                 continue;
                             } else {
-                                log.info(map.get("startTerm").toString() + "-------" + map.get("endTerm").toString()+":"+ map.get("message"));
-                                throw new MessageException(map.get("startTerm").toString() + "-------" + map.get("endTerm").toString() + map.get("message"));
+                                log.info(map.get("startTerm").toString() + "-------" + map.get("endTerm").toString()+":"+ map.get("msg"));
+                                throw new MessageException(map.get("startTerm").toString() + "-------" + map.get("endTerm").toString() + map.get("msg"));
                             }
 
                         }
@@ -561,7 +560,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     } else {
                         String resultMsg = agentResult.getMsg();
                         log.info("未连通查询接口" + resultMsg);
-                        throw new MessageException(resultMsg);
+                        throw new MessageException("未连通查询接口" + resultMsg);
                     }
                 }
                 if (terminalTransferDetailListsRDBPOS != null && terminalTransferDetailListsRDBPOS.size() > 0) {
