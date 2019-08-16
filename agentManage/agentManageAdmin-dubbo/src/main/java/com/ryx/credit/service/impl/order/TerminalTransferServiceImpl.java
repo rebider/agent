@@ -321,7 +321,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 }
                 if (number != 2) {
                     log.info("您本次申请的目标代理商与原代理商存在不是你的下级或您本级，请修改提交");
-                    throw new MessageException("您本次申请的目标代理商与原代理商存在不是你的下级或您本级，请修改提交");
+                   /* throw new MessageException("您本次申请的目标代理商与原代理商存在不是你的下级或您本级，请修改提交");*/
                 }
             }
             //本次提交是否有重复SN
@@ -675,6 +675,24 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         Agent agent = agentMapper.selectByPrimaryKey(goalAgentBusInfo.getAgentId());
         if (!agent.getAgName().equals(terminalTransferDetail.getGoalOrgName())) {
             throw new MessageException("目标机构ID和名称不匹配");
+        }
+        //验证目标代理商是否存在
+        AgentBusInfoExample agentBusInfoExample1 = new AgentBusInfoExample();
+        AgentBusInfoExample.Criteria agentBusInfoCriteria1 = agentBusInfoExample1.createCriteria();
+        agentBusInfoCriteria1.andStatusEqualTo(Status.STATUS_1.status);
+        List<BigDecimal> busStatusList1 = new ArrayList<>();
+        busStatusList1.add(BusinessStatus.Enabled.status);
+        busStatusList1.add(BusinessStatus.inactive.status);
+        agentBusInfoCriteria1.andBusStatusIn(busStatusList);
+        agentBusInfoCriteria1.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
+        agentBusInfoCriteria1.andBusNumEqualTo(terminalTransferDetail.getOriginalOrgId());
+        List<AgentBusInfo> agentBusInfos1 = agentBusInfoMapper.selectByExample(agentBusInfoExample1);
+        if (agentBusInfos1.size() != 1) {
+            throw new MessageException("原机构机构ID(不存在或存在多个或审批未通过)");
+        }
+        Agent agent2 = agentMapper.selectByPrimaryKey(agentBusInfos1.get(0).getAgentId());
+        if (!agent2.getAgName().equals(terminalTransferDetail.getOriginalOrgName())) {
+            throw new MessageException("原机构ID和名称不匹配");
         }
         //查询目标机构是否是当前代理商下的
 //        AgentBusInfoExample agentExample = new AgentBusInfoExample();
