@@ -414,7 +414,7 @@
     <if test="params.cUser != null and params.cUser!='' " >
       and br.c_user = #{params.cUser}
     </if>
-    <if test="params.group != null and params.group!='' " >
+    <if test="params.group != null and params.group!='' and params.group != 'region'" >
       and (ri.group_id_ = #{params.group}
       <if test="params.roleNames != null and params.roleNames.size>0 " >
         or ri.group_id_ in
