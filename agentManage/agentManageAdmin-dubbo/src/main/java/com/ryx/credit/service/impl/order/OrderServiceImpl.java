@@ -2,6 +2,7 @@ package com.ryx.credit.service.impl.order;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.activity.entity.ActRuTask;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
@@ -15,6 +16,7 @@ import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.*;
+import com.ryx.credit.service.ActRuTaskService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IResourceService;
 import com.ryx.credit.service.IUserService;
@@ -111,6 +113,9 @@ public class OrderServiceImpl implements OrderService {
     private AgentService agentService;
     @Autowired
     private CashSummaryMouthMapper cashSummaryMouthMapper;
+    @Autowired
+    private ActRuTaskService actRuTaskService;
+
 
     /**
      * 分页查询订单列表
@@ -1408,8 +1413,28 @@ public class OrderServiceImpl implements OrderService {
             //传递部门信息
             Map startPar = agentEnterService.startPar(userId);
             if (null != startPar) {
-                if(!agentVo.getApprovalResult().equals("back"))
-                reqMap.put("party", startPar.get("party"));
+                if(!agentVo.getApprovalResult().equals("back")){
+                    ActRuTask actRuTask = actRuTaskService.selectByPrimaryKey(agentVo.getTaskId());
+                    if(actRuTask==null){
+                        return result;
+                    }
+                    String[] procDefId = String.valueOf(actRuTask.getProcDefId()).split(":");
+                    if(procDefId==null){
+                        return result;
+                    }
+                    String taskView = procDefId[0];
+                    String[] taskViewVersion = taskView.split("_");
+                    if(taskViewVersion.length>=2){
+                        BigDecimal version = new BigDecimal(taskViewVersion[1]);
+                        if(version.compareTo(new BigDecimal("3.0"))>=0){
+                            reqMap.put("party", startPar.get("party"));
+                        }else{
+                            reqMap.put("party", "north");
+                        }
+                    }else{
+                        reqMap.put("party", "north");
+                    }
+                }
             }
             //完成任务
             Map resultMap = activityService.completeTask(agentVo.getTaskId(), reqMap);
