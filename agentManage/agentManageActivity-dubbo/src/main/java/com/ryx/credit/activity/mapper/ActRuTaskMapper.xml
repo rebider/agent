@@ -429,7 +429,7 @@
     </if>
     <if test="params.group == 'region' " >
       and (br.AG_DOC_DISTRICT = #{params.orgId}
-      or ri.group_id_ = ('south','north'))
+      or ri.group_id_ in ('south','north'))
     </if>
     <if test="params.busActRelBusType != null and params.busActRelBusType!='' " >
       and br.BUS_TYPE = #{params.busActRelBusType}
