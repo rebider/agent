@@ -16,6 +16,7 @@ import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IResourceService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
+import com.ryx.credit.service.agent.netInPort.AgentNetInHttpService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.pay.LivenessDetectionService;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -89,6 +91,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private LivenessDetectionService livenessDetectionService;
     @Autowired
     private IResourceService iResourceService;
+
+
 
     /**
      * 代理商入网信息保存
@@ -290,6 +294,20 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             List hav = new ArrayList();
             List<Organization> organList = null;
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
+                if(StringUtils.isNotBlank(item.getBusNum())) {
+                    if (!OrgType.zQ(item.getBusType())) {
+                        throw new ProcessException("升级类型必须是直签");
+                    }
+                    if (StringUtils.isBlank(item.getBusParent())){
+                        throw new ProcessException("升级直签上级不能为空");
+                    }
+                    Map<String, Object> reqMap = new HashMap<>();
+                    reqMap.put("busInfo",item);
+                    AgentResult agentResult = agentNetInNotityService.agencyLevelCheck(reqMap);
+                    if(!agentResult.isOK()){
+                        throw new ProcessException(agentResult.getMsg());
+                    }
+                }
                 if(OrgType.zQ(item.getBusType())){
                     if(StringUtils.isBlank(item.getBusParent()))
                         throw new ProcessException("直签上级不能为空");
@@ -597,15 +615,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             throw new MessageException("代理商业务启动审批异常，更新业务本信息失败");
         }
 
-        //代理商有效新建的合同
-        List<AgentContract> ag = agentContractService.queryAgentContract(abus.getAgentId(), null, AgStatus.Create.status);
-        for (AgentContract contract : ag) {
-            contract.setCloReviewStatus(AgStatus.Approving.status);
-            if (1 != agentContractService.update(contract)) {
-                logger.info("代理商业务启动审批异常，合同状态更新失败{}:{}", busid, cuser);
-                throw new MessageException("合同状态更新失败");
-            }
-        }
+
 
         //代理商有效的新建的收款账户
         List<AgentColinfo> clolist = agentColinfoService.queryAgentColinfoService(abus.getAgentId(), null, AgStatus.Create.status);
@@ -614,15 +624,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             if (1 != agentColinfoService.update(agentColinfo)) {
                 logger.info("代理商业务启动审批异常，收款账户状态更新失败{}:{}", busid, cuser);
                 throw new MessageException("收款账户状态更新失败");
-            }
-        }
-
-        List<Capital> capitals = accountPaidItemService.queryCap(abus.getAgentId(), null, null, AgStatus.Create.status);
-        for (Capital capital : capitals) {
-            capital.setCloReviewStatus(AgStatus.Approving.status);
-            if (1 != accountPaidItemService.update(capital)) {
-                logger.info("代理商审批，合同状态更新失败{}:{}", abus.getAgentId(), cuser);
-                throw new MessageException("缴款状态更新失败");
             }
         }
 
@@ -639,6 +640,25 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         if (proce == null) {
             logger.info("代理商业务启动审批异常，审批流启动失败{}:{}", busid, cuser);
             throw new MessageException("审批流启动失败!");
+        }
+        //代理商有效新建的合同
+        List<AgentContract> ag = agentContractService.queryAgentContract(abus.getAgentId(), null, AgStatus.Create.status);
+        for (AgentContract contract : ag) {
+            contract.setActivId(proce);
+            contract.setCloReviewStatus(AgStatus.Approving.status);
+            if (1 != agentContractService.update(contract)) {
+                logger.info("代理商业务启动审批异常，合同状态更新失败{}:{}", busid, cuser);
+                throw new MessageException("合同状态更新失败");
+            }
+        }
+        List<Capital> capitals = accountPaidItemService.queryCap(abus.getAgentId(), null, null, AgStatus.Create.status);
+        for (Capital capital : capitals) {
+            capital.setActivId(proce);
+            capital.setCloReviewStatus(AgStatus.Approving.status);
+            if (1 != accountPaidItemService.update(capital)) {
+                logger.info("代理商审批，缴款状态更新失败{}:{}", abus.getAgentId(), cuser);
+                throw new MessageException("缴款状态更新失败");
+            }
         }
         //代理商业务视频关系
         BusActRel record = new BusActRel();
@@ -1226,10 +1246,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 }
 
                 if (null != agentoutVo.getCloTaxPoint()) {
-                    NumberFormat numberFormat = NumberFormat.getPercentInstance();
-                    Number parse = numberFormat.parse(agentoutVo.getCloTaxPoint().toString() + "%");
-                    String point = numberFormat.format(parse);
-                    agentoutVo.setPoint(point);
+                    agentoutVo.setPoint(String.valueOf(agentoutVo.getCloTaxPoint()) + "%");
                 }
 
                 //业务区域

@@ -39,4 +39,18 @@
         <include refid="Base_Column_List" />
         from C_ORGANIZATION where code = #{code}
     </select>
-</mapper> 
+
+    <select id="selectRegion" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+        select
+        <include refid="Base_Column_List" />
+        from c_organization where
+        <if test="pCode != null">
+          pid = #{pCode,jdbcType=INTEGER}
+        </if>
+        <if test="pCode == null">
+          pid is null
+        </if>
+        and (code like 'region_%' or code like 'beijing%')
+    </select>
+
+</mapper>

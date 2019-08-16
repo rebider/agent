@@ -455,12 +455,11 @@
       <if test="par.addrRealname != null and par.addrRealname!=''" >
         and ro.ADDR_REALNAME = #{par.addrRealname}
       </if>
+      <if test="par.avtivityName != null and par.avtivityName!=''" >
+        and ac.pro_name like '${par.avtivityName}'
+      </if>
     </where>
   </select>
-
-
-
-
 
   <select id="queryPlannerAll" parameterType="map" resultType="map">
     <include refid="OracleDialectPrefix" />
@@ -527,10 +526,86 @@
       <if test="par.addrRealname != null and par.addrRealname!=''" >
         and ro.ADDR_REALNAME = #{par.addrRealname}
       </if>
+      <if test="par.avtivityName != null and par.avtivityName!=''" >
+        and ac.ACTIVITY_NAME like '${par.avtivityName}'
+      </if>
+      <if test="par.oInuretime != null and par.oInuretime != '' " >
+        and to_char(o.O_INURETIME,'YYYY-MM-DD') = #{par.oInuretime}
+      </if>
     </where>
     order by suborder.c_time desc
-
     <include refid="OracleDialectSuffix" />
-
   </select>
+
+
+  <select id="exportPlanner" parameterType="map" resultMap="ReceiptOrderVo">
+    (select
+    ac.vender as "proCom", ac.pro_model as "model", ac.BUS_PRO_NAME, ac.BACK_TYPE, ac.STAND_TIME, ac.STAND_AMT, ac.ACTIVITY_NAME,
+    ro.ID, ro.ORDER_ID, ro.RECEIPT_NUM, ro.ADDRESS_ID, ro.ADDR_REALNAME, ro.ADDR_MOBILE, ro.ADDR_PROVINCE,
+    ro.ADDR_CITY, ro.ADDR_DISTRICT, ro.ADDR_DETAIL, ro.REMARK, ro.ZIP_CODE, ro.PRO_NUM as PRO_NUM_SUM, ro.EXPRESS_REMARK,
+    ro.EXPRESS_SUC_DATE, ro.C_TIME, ro.C_USER, ro.U_TIME, ro.RECEIPT_STATUS, ro.U_USER, ro.STATUS, ro.VERSION,
+    ro.AGENT_ID, rp.ORDERID, rp.RECEIPT_ID, rp.PRO_ID, rp.PRO_CODE, rp.PRO_NAME, rp.PRO_NUM, rp.SEND_NUM, rp.id as receipt_Pro_Id,
+    ag.AG_NAME, o.REMARK as ORDER_REMARK,
+    to_char(o.O_INURETIME,'YYYY-MM-DD') as oinuretime,
+    nvl(rp.PRO_NUM-rp.SEND_NUM,0) FOR_SEND_NUM
+    from o_receipt_order ro
+    left join o_receipt_pro rp on ro.id = rp.receipt_id and rp.status=1
+    left join o_sub_order suborder on rp.pro_id=suborder.pro_id and rp.orderId=suborder.order_id and suborder.status=1
+    left join o_sub_order_activity ac on ac.sub_order_id=suborder.id and ac.status=1
+    left join o_activity oa on ac.activity_id = oa.id
+    left join a_agent ag on ag.id = ro.agent_id and ag.ag_status='Approved' and c_incom_status!='0'
+    left join o_order o on o.id = ro.order_id
+    left join a_agent_businfo ab on ab.id = o.bus_id
+    <where>
+      and ro.status=1 and ag.status=1
+      and ab.status='1' and ab.clo_review_status='3' and ab.bus_num is not null
+      and receipt_pro_status = '1'
+      <if test="orderId != null and orderId!=''" >
+        and ro.ORDER_ID = #{orderId}
+      </if>
+      <if test="oInuretime != null and oInuretime != '' " >
+        and to_char(o.O_INURETIME,'YYYY-MM-DD') = #{oInuretime}
+      </if>
+      <if test="receiptNum != null and receiptNum!=''" >
+        and ro.RECEIPT_NUM = #{receiptNum}
+      </if>
+      <if test="addrRealname != null and addrRealname!=''" >
+        and ro.ADDR_REALNAME = #{addrRealname}
+      </if>
+      <if test="agentName != null and agentName!=''" >
+        and ag.AG_NAME like '${agentName}'
+      </if>
+      <if test="proName != null and proName!=''" >
+        and suborder.PRO_NAME like '${proName}'
+      </if>
+      <if test="avtivityName != null and avtivityName!=''" >
+        and ac.PRO_NAME like '${avtivityName}'
+      </if>
+    </where>
+    )
+    order by suborder.c_time desc
+  </select>
+  <resultMap id="ReceiptOrderVo" type="com.ryx.credit.pojo.admin.vo.ReceiptOrderVo">
+    <result column="ORDER_ID" property="orderId" jdbcType="VARCHAR"/>
+    <result column="RECEIPT_NUM" property="receiptNum" jdbcType="VARCHAR"/>
+    <result column="O_INURETIME" property="oinuretime" jdbcType="VARCHAR"/>
+    <result column="AGENT_ID" property="agentId" jdbcType="VARCHAR"/>
+    <result column="AG_NAME" property="agName" jdbcType="VARCHAR"/>
+    <result column="ADDR_REALNAME" property="addrRealname" jdbcType="VARCHAR"/>
+    <result column="ACTIVITY_NAME" property="activityName" jdbcType="VARCHAR"/>
+    <result column="PRO_ID" property="proId" jdbcType="VARCHAR"/>
+    <result column="PRO_CODE" property="proCode" jdbcType="VARCHAR"/>
+    <result column="PRO_NAME" property="proName" jdbcType="VARCHAR"/>
+    <result column="PRO_NUM" property="proNum" jdbcType="DECIMAL"/>
+    <result column="SEND_NUM" property="sendNum" jdbcType="DECIMAL"/>
+    <result column="FOR_SEND_NUM" property="forSendNum" jdbcType="DECIMAL"/>
+    <result column="proCom" property="proCom" jdbcType="VARCHAR"/>
+    <result column="model" property="model" jdbcType="VARCHAR"/>
+    <result column="BUS_PRO_NAME" property="busProName" jdbcType="VARCHAR"/>
+    <result column="BACK_TYPE" property="backType" jdbcType="CHAR"/>
+    <result column="STAND_TIME" property="standTime" jdbcType="DECIMAL"/>
+    <result column="STAND_AMT" property="standAmt" jdbcType="DECIMAL"/>
+    <!--<result column="plan_pro_num" property="planProNum" jdbcType="DECIMAL"/>-->
+    <result column="ORDER_REMARK" property="orderRemark" jdbcType="VARCHAR"/>
+  </resultMap>
 </mapper>

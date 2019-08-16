@@ -253,7 +253,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
                     updateAgent.setVersion(agent.getVersion());
                     updateAgent.setcIncomStatus(AgentInStatus.IN.status);
                     Date nowDate = new Date();
-                    updateAgent.setcIncomTime(nowDate);
                     updateAgent.setcUtime(nowDate);
                     if(agentMapper.updateByPrimaryKeySelective(updateAgent)==1){
                         log.info("开平台升级接口请求发起用户{}开平台{}平台编号不为空走升级接口,更新本地代理商{},更新成功",userid,updateAgent.getId(),"入网成功");
@@ -471,7 +470,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
             }else {
                 updateAgent.setcIncomStatus(AgentInStatus.IN.status);
                 Date nowDate = new Date();
-                updateAgent.setcIncomTime(nowDate);
                 updateAgent.setcUtime(nowDate);
                 if(1==agentMapper.updateByPrimaryKeySelective(updateAgent)) {
                     log.info("已有编号进行入网修改：更新入网状态成功,id:{},业务ID:{},返回结果:{}", record.getId(), busId, result.getMsg());
@@ -588,7 +586,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
                             updateAgent.setVersion(agent.getVersion());
                             updateAgent.setcIncomStatus(AgentInStatus.IN.status);
                             Date nowDate = new Date();
-                            updateAgent.setcIncomTime(nowDate);
                             updateAgent.setcUtime(nowDate);
                             if(1!=agentMapper.updateByPrimaryKeySelective(updateAgent)){
                                 log.info("升级开户接口{}平台编号不为空走升级接口,更新的代理商{}",agentBusInfo.getBusNum(),"入网状态更新失败");
@@ -840,7 +837,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
                 updateAgent.setcIncomStatus(AgentInStatus.NO_ACT.status);//入网未激活
             }
             Date nowDate = new Date();
-            updateAgent.setcIncomTime(nowDate);
             updateAgent.setcUtime(nowDate);
             int upResult1 = agentMapper.updateByPrimaryKeySelective(updateAgent);
             log.info("入网开户修改操作: 接收入网更新入网状态,业务id：{},upResult1:{}",upResult1);

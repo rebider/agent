@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -136,6 +137,22 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
         List<Map<String, Object>> cUserOrgCodelist = userMapper.selectOrganizationCodeById(userID);
         if(cUserOrgCodelist.size()==0){
             return Arrays.asList();
+        }
+        for (Map<String, Object> stringObjectMap : cUserOrgCodelist) {
+            String pidorgcode = String.valueOf(stringObjectMap.get("PIDORGCODE"));
+            if(StringUtils.isNotBlank(pidorgcode) && !pidorgcode.equals("null")){
+                //针对多级省区优化
+                boolean isRegion = Pattern.matches("region_[a-zA-Z]{1,5}", pidorgcode);
+                if(isRegion){
+                    stringObjectMap.put("isRegion",true);
+                }else {
+                    if("beijing".equals(pidorgcode)){
+                        stringObjectMap.put("isRegion",true);
+                    }else{
+                        stringObjectMap.put("isRegion",false);
+                    }
+                }
+            }
         }
         return cUserOrgCodelist;
     }

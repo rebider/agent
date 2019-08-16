@@ -458,6 +458,9 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
         return httpRequestNetIn(paramMap);
     }
 
-
+    @Override
+    public AgentResult agencyLevelCheck(Map<String, Object> paramMap)throws Exception{
+        return AgentResult.ok();
+    }
 }
 

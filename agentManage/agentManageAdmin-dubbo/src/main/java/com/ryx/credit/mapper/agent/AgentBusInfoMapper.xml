@@ -798,7 +798,7 @@
   <select id="queryTreeByBusInfo" parameterType="map" resultType="map">
     select
     A.ID,A.AGENT_ID,A.BUS_NUM,A.BUS_PLATFORM,A.BUS_TYPE,A.BUS_PARENT,
-    B.AG_UNIQ_NUM,B.AG_NAME,C.PLATFORM_NAME,D.D_ITEMNAME,(C.PLATFORM_NAME) as FIELDSHOW,c.PLATFORM_TYPE
+    B.AG_UNIQ_NUM,B.AG_NAME,C.PLATFORM_NAME,D.D_ITEMNAME,(C.PLATFORM_NAME||'-'||A.BUS_NUM||'-'||D.D_ITEMNAME) as FIELDSHOW,c.PLATFORM_TYPE
     from
     a_agent_businfo a
     left join a_agent b on a.agent_id=b.id
@@ -826,7 +826,8 @@
     bus.bus_scope,bus.bus_region,bus.bus_risk_email,e.name as ag_doc_pro,bus.bus_contact_person,
     bus.approve_time,platform.PLATFORM_NAME,
     a1.AG_NAME||businfo_1.id as busParent,
-    busRiskParentbusAgent.ag_name as busRiskParent,busActivationParentbusAgent.ag_name as busActivationParent
+    busRiskParentbusAgent.ag_name as busRiskParent,busActivationParentbusAgent.ag_name as busActivationParent,
+    bus.bus_login_num
     from a_agent_businfo bus
     LEFT JOIN  a_agent agent ON agent.id = bus.agent_id
     LEFT JOIN a_agent_businfo busriskparentbus ON bus.bus_risk_parent = busriskparentbus.id
@@ -900,6 +901,7 @@
     <result column="BUS_CONTACT_PERSON"  property="busContactPerson" jdbcType="VARCHAR"/>
     <result column="APPROVE_TIME"  property="approveTime" jdbcType="TIMESTAMP"/>
     <result column="AG_DOC_PRO"  property="agDocPro" jdbcType="VARCHAR"/>
+    <result column="BUS_LOGIN_NUM" property="busLoginNum" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!--查询业务编号和代理商信息-->
