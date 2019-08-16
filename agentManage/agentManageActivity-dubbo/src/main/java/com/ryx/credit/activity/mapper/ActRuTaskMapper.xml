@@ -415,7 +415,7 @@
       and br.c_user = #{params.cUser}
     </if>
     <if test="params.group != null and params.group!='' " >
-      and (ri.group_id_ in (#{params.group},'south','north')
+      and (ri.group_id_ = #{params.group}
       <if test="params.roleNames != null and params.roleNames.size>0 " >
         or ri.group_id_ in
         <foreach collection="params.roleNames" separator="," item="roleName" index="index" open="(" close=")">
@@ -428,7 +428,8 @@
       and (oa.CODE like concat(#{params.orgCode},'%') or ob.CODE like concat(#{params.orgCode},'%') )
     </if>
     <if test="params.group == 'region' " >
-      and br.AG_DOC_DISTRICT = #{params.orgId}
+      and (br.AG_DOC_DISTRICT = #{params.orgId}
+      or ri.group_id_ = ('south','north'))
     </if>
     <if test="params.busActRelBusType != null and params.busActRelBusType!='' " >
       and br.BUS_TYPE = #{params.busActRelBusType}
