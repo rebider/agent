@@ -99,9 +99,9 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
             criteria.andExpressDateIsNotNull();
             criteria.andExpressNumberIsNotNull();
         }
-        if(department != null){
+        /*if(department != null){
             example.setInnerJoinDepartment(department.get("ORGANIZATIONCODE").toString(), department.get("ORGID").toString());
-        }
+        }*/
         example.setOrderByClause("CREATE_DATE DESC ");
         List<InvoiceApply> list = invoiceApplyMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
