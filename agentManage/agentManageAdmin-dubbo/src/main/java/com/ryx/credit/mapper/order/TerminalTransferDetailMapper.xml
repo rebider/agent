@@ -517,7 +517,7 @@
           and u.name LIKE CONCAT(CONCAT('%',#{map.buttJointPersonName}),'%')
          </if>
       </where>
-      order by t.c_time desc
+     order by t.ADJUST_TIME desc nulls last
   </sql>
 
   <update id="updateStatusByTerminalTransferId" parameterType="java.lang.String">

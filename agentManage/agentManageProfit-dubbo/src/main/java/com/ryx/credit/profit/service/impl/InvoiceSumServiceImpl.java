@@ -398,7 +398,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                         invoiceSum.setSubAddInvoiceAmt(new BigDecimal(invoiceSumList.get(9).toString().trim()));
                         invoiceSum.setAddInvoiceAmt(BigDecimal.ZERO);
                         invoiceSum.setAdjustAmt(BigDecimal.ZERO);
-                        invoiceSum.setInvoiceStatus("00");
+                        /*invoiceSum.setInvoiceStatus("00");*/
 
                         //查上月剩余欠票基数
 
@@ -452,11 +452,16 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                             invoiceSum3.setInvoiceCompany(invoiceSumList.get(4).toString().trim());
                             invoiceSum3.setId(idService.genId(TabId.P_INVOICE_SUM));
                             invoiceSum3.setProfitMonth(profitMonth);
-                            invoiceSum3.setInvoiceStatus("00");
+
                             invoiceSum3.setAddInvoiceAmt(BigDecimal.ZERO);
                             invoiceSum3.setAdjustAmt(BigDecimal.ZERO);
                             //invoiceSum.setOwnInvoice((invoiceSum2.get(0).getPreLeftAmt()).add(new BigDecimal(invoiceSumList.get(6).toString())).add(invoiceSum.getDayBackAmt()).add(invoiceSum.getDayProfitAmt()).add(invoiceSum.getPreProfitMonthAmt()).subtract(invoiceSum.getAddInvoiceAmt()==null?BigDecimal.ZERO:invoiceSum.getAddInvoiceAmt()).add(invoiceSum.getAdjustAmt()==null?BigDecimal.ZERO:invoiceSum.getAdjustAmt()));
                             invoiceSum3.setOwnInvoice((invoiceSum3.getPreLeftAmt()==null?BigDecimal.ZERO:invoiceSum3.getPreLeftAmt()).add(invoiceSum3.getSubAddInvoiceAmt()).add(invoiceSum3.getDayBackAmt()).add(invoiceSum3.getDayProfitAmt()).add(invoiceSum3.getPreProfitMonthAmt()).subtract(invoiceSum3.getAddInvoiceAmt()==null?BigDecimal.ZERO:invoiceSum3.getAddInvoiceAmt()).add(invoiceSum3.getAdjustAmt()==null?BigDecimal.ZERO:invoiceSum3.getAdjustAmt()));
+                            if(invoiceSum3.getOwnInvoice().compareTo(BigDecimal.ZERO)==1){
+                                invoiceSum3.setInvoiceStatus("00");
+                            }else{
+                                invoiceSum3.setInvoiceStatus("99");
+                            }
                             invoiceSumMapper.insertSelective(invoiceSum3);
                            continue;
                         }
@@ -466,6 +471,11 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                             invoiceSum.setPreLeftAmt(new BigDecimal(invoiceSumList.get(5).toString()));
                         }
                         invoiceSum.setOwnInvoice((invoiceSum.getPreLeftAmt()==null?BigDecimal.ZERO:invoiceSum.getPreLeftAmt()).add(invoiceSum.getSubAddInvoiceAmt()).add(invoiceSum.getDayBackAmt()).add(invoiceSum.getDayProfitAmt()).add(invoiceSum.getPreProfitMonthAmt()).subtract(invoiceSum.getAddInvoiceAmt()==null?BigDecimal.ZERO:invoiceSum.getAddInvoiceAmt()).add(invoiceSum.getAdjustAmt()==null?BigDecimal.ZERO:invoiceSum.getAdjustAmt()));
+                        if(invoiceSum.getOwnInvoice().compareTo(BigDecimal.ZERO)==1){
+                            invoiceSum.setInvoiceStatus("00");
+                        }else{
+                            invoiceSum.setInvoiceStatus("99");
+                        }
                         invoiceSum.setId(idService.genId(TabId.P_INVOICE_SUM));
 
                         invoiceSumMapper.insertSelective(invoiceSum);
@@ -522,11 +532,16 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                             invoiceSum3.setInvoiceCompany(invoiceSumList.get(4).toString().trim());
                             invoiceSum3.setId(invoiceSum2.get(0).getId());
                             invoiceSum3.setProfitMonth(profitMonth);
-                            invoiceSum3.setInvoiceStatus("00");
+                           /* invoiceSum3.setInvoiceStatus("00");*/
                             invoiceSum3.setAddInvoiceAmt(BigDecimal.ZERO);
                             invoiceSum3.setAdjustAmt(BigDecimal.ZERO);
                             invoiceSum3.setOwnInvoice((invoiceSum3.getPreLeftAmt()==null?BigDecimal.ZERO:invoiceSum3.getPreLeftAmt()).add(invoiceSum3.getSubAddInvoiceAmt()).add(invoiceSum3.getDayBackAmt()).add(invoiceSum3.getDayProfitAmt()).add(invoiceSum3.getPreProfitMonthAmt()).subtract(invoiceSum3.getAddInvoiceAmt()==null?BigDecimal.ZERO:invoiceSum3.getAddInvoiceAmt()).add(invoiceSum3.getAdjustAmt()==null?BigDecimal.ZERO:invoiceSum3.getAdjustAmt()));
                             //invoiceSum.setOwnInvoice((invoiceSum2.get(0).getPreLeftAmt()).add(new BigDecimal(invoiceSumList.get(6).toString())).add(invoiceSum.getDayBackAmt()).add(invoiceSum.getDayProfitAmt()).add(invoiceSum.getPreProfitMonthAmt()).subtract(invoiceSum.getAddInvoiceAmt()==null?BigDecimal.ZERO:invoiceSum.getAddInvoiceAmt()).add(invoiceSum.getAdjustAmt()==null?BigDecimal.ZERO:invoiceSum.getAdjustAmt()));
+                            if(invoiceSum3.getOwnInvoice().compareTo(BigDecimal.ZERO)==1){
+                                invoiceSum3.setInvoiceStatus("00");
+                            }else{
+                                invoiceSum3.setInvoiceStatus("99");
+                            }
                             invoiceSumMapper.updateByPrimaryKeySelective(invoiceSum3);
                             continue;
                         }
@@ -542,6 +557,11 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
 
                         if(invoiceSums.size()!=0){
                             invoiceSum2.get(0).setOwnInvoice(invoiceSum2.get(0).getPreLeftAmt().add(invoiceSum2.get(0).getSubAddInvoiceAmt()).add(invoiceSum2.get(0).getDayBackAmt()).add(invoiceSum2.get(0).getDayProfitAmt()).add(invoiceSum2.get(0).getPreProfitMonthAmt()).subtract(invoiceSum2.get(0).getAddInvoiceAmt()==null?BigDecimal.ZERO:invoiceSum2.get(0).getAddInvoiceAmt()).add(invoiceSum2.get(0).getAdjustAmt()==null?BigDecimal.ZERO:invoiceSum2.get(0).getAdjustAmt()));
+                        }
+                        if(invoiceSum2.get(0).getOwnInvoice().compareTo(BigDecimal.ZERO)==1){
+                            invoiceSum2.get(0).setInvoiceStatus("00");
+                        }else{
+                            invoiceSum2.get(0).setInvoiceStatus("99");
                         }
 
                         invoiceSumMapper.updateByPrimaryKeySelective(invoiceSum2.get(0));

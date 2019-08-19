@@ -593,6 +593,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         criteria.andBusPlatformEqualTo(agentBusInfo.getBusPlatform());
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         criteria.andCloReviewStatusIn(Arrays.asList(AgStatus.Approved.status,AgStatus.Approving.status));
+        criteria.andBusStatusIn(Arrays.asList(BusStatus.WQY.status,BusStatus.QY.status,BusStatus.WJH.status,BusStatus.SD.status));
         List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(example);
         if (null == agentBusInfos) {
             return true;

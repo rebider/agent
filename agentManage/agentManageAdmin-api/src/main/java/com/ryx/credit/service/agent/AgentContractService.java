@@ -60,6 +60,6 @@ public interface AgentContractService {
      */
     public List<AgentContract> queryContract(String proIns);
 
-    void updateContractList(List<AgentContractVo> agentContractVoList)throws Exception;
+    void updateContractList(List<AgentContractVo> agentContractVoList,Map map)throws Exception;
 
 }
