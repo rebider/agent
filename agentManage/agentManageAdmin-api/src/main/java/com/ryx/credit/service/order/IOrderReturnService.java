@@ -8,7 +8,7 @@ import com.ryx.credit.pojo.admin.order.OInvoice;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
 import com.ryx.credit.pojo.admin.order.OReturnOrder;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
-import org.apache.ibatis.ognl.enhance.OrderedReturn;
+import com.ryx.credit.pojo.admin.vo.ReturnOrderVo;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -82,4 +82,7 @@ public interface IOrderReturnService {
 
 
     BigDecimal selectOrderDetails(String orderId);
+
+
+    List<ReturnOrderVo> exportRetForDetail(Map map);
 }
