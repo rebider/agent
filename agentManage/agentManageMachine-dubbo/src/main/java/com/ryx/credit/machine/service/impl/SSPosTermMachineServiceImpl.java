@@ -69,7 +69,7 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
 
 
     @Override
-    public List<TermMachineVo> queryTermMachine(PlatformType platformType) throws Exception{
+    public List<TermMachineVo> queryTermMachine(PlatformType platformType, Map map) throws Exception{
         List<Map> list =  imsTermMachineMapper.querySSIMS_TERM_MACHINE();
         List<TermMachineVo> termMachineVoList = new ArrayList<>();
         for (Map imsTermMachine : list) {
