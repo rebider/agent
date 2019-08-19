@@ -2484,8 +2484,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 returnOrderVo.setReceiveActivityName(receive_activity_name==null?"":receive_activity_name);
                 returnOrderVo.setAddrDetail(receive_addr_detail==null?"":receive_addr_detail);
                 returnOrderVo.setWnumber(receive_w_number==null?"":receive_w_number);
-                returnOrderVo.setAgDocDistrict(departmentService.getById(receive_agent.getAgDocDistrict()).getName());
-                returnOrderVo.setAgDocPro(departmentService.getById(receive_agent.getAgDocPro()).getName());
+//                returnOrderVo.setAgDocDistrict(departmentService.getById(receive_agent.getAgDocDistrict()).getName());
+//                returnOrderVo.setAgDocPro(departmentService.getById(receive_agent.getAgDocPro()).getName());
             }
         }
         log.info("导出退转发明细数据：", receiptOrderVoList);
