@@ -119,7 +119,7 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
             if(StringUtils.isNotBlank(stringSet)){ // 表示已经存在
                 log.info("redis中取出认证结果：{}，{}",bankNo,stringSet);
                 if(v.equals(stringSet)){
-                    result.setMsg("认证成功");
+                    result.setMsg("结算卡三要素认证成功");
                     result.setStatus(200);
                     return  result;
                 }
@@ -155,13 +155,13 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
                         result.setStatus(200);
                     } else {
                         record.setNotifyStatus(Status.STATUS_0.status);
-                        result.setMsg(resultMap.get("ResultMsg")+"");
+                        result.setMsg("结算卡三要素认证失败:"+resultMap.get("ResultMsg")+"");
                         result.setStatus(400);
                     }
                 }else{
                     if(null!=resultMap.get("ResponseMsg")){
                         record.setNotifyStatus(Status.STATUS_0.status);
-                        result.setMsg(resultMap.get("ResponseMsg")+"");
+                        result.setMsg("结算卡三要素认证失败:"+resultMap.get("ResponseMsg")+"");
                         result.setStatus(400);
                     }else {
                         // {"ResponseCode":"99","ResponseMsg":"请求次数过多","StartTime":"","channel":"","SystemId":"","Result":"","platSerial":"","StartDate":"","Serial":"","BankNo":"","ResultMsg":"","http":"200","Transcode":""}
