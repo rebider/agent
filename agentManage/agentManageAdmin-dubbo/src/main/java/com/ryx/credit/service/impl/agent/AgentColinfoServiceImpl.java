@@ -248,21 +248,23 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                 String agLegalName = agent.getAgLegal();
                 String trueName = agentColinfoVo.getCloRealname();
                 String certNo = agentColinfoVo.getAgLegalCernum();
+                String cloBankAccount = agentColinfoVo.getCloBankAccount();
                 if (agentColinfoVo.getCloType().compareTo(new BigDecimal(2)) == 0) {
                     //对私时 收款账户名与法人姓名一致时 把法人身份证号拷贝到户主身份证号并进行认证
-                    if (agLegalName.equals(trueName)) {
-                        agentColinfoVo.setAgLegalCernum(agent.getAgLegalCernum());
-                    } else {
-                        if (StringUtils.isNotBlank(certNo) && !"1".equals(saveStatus) ) {
-                            //校验收款账户身份认证
-                            AgentResult result = livenessDetectionService.livenessDetection(trueName, certNo, userId);
-                            if (!result.isOK()) {
-                                throw new ProcessException("收款账户身份认证失败");
-                            }
-                        } else if(!"1".equals(saveStatus)) {
-                            throw new ProcessException("请输入收款账户名相对应的户主证件号");
-                        }
+                    if(StringUtils.isBlank(trueName)){
+                        throw new MessageException("请输入结算卡收款账户名");
                     }
+                    if(StringUtils.isBlank(certNo)){
+                        throw new MessageException("请输入结算卡户主身份证");
+                    }
+                    if(StringUtils.isBlank(agentColinfoVo.getCloBankAccount())){
+                        throw new MessageException("请输入结算卡卡号");
+                    }
+                    AgentResult result = livenessDetectionService.threeElementsCertificationDetection(trueName, certNo, userId,cloBankAccount);
+                    if (!result.isOK()) {
+                        throw new ProcessException("收款账户身份认证失败");
+                    }
+
                 }
                 //对公时 判断收款账户名是否与代理商名称一致 不一致则抛异常提示信息
                 if (agentColinfoVo.getCloType().compareTo(new BigDecimal(1)) == 0 && !"1".equals(saveStatus)) {

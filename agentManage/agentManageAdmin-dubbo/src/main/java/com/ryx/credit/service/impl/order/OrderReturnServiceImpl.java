@@ -13,23 +13,24 @@ import com.ryx.credit.machine.entity.ImsTermAdjustDetail;
 import com.ryx.credit.machine.service.ImsTermAdjustDetailService;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.AdjustmentMachineVo;
+import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.pojo.admin.vo.ReturnOrderVo;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.IResourceService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.BusActRelService;
-import com.ryx.credit.service.agent.PlatFormService;
+import com.ryx.credit.service.dict.DepartmentService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.IOrderReturnService;
 import com.ryx.credit.service.order.OLogisticsDetailService;
 import com.ryx.credit.service.order.OLogisticsService;
 import com.ryx.credit.service.order.PlannerService;
-import com.sun.org.apache.bcel.internal.generic.RETURN;
 import org.apache.commons.lang.StringUtils;
-import org.apache.ibatis.ognl.enhance.OrderedReturn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import javax.print.attribute.standard.MediaSize;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -135,7 +135,10 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     private OInvoiceMapper invoiceMapper;
     @Autowired
     private AttachmentMapper attachmentMapper;
-
+    @Autowired
+    private IResourceService iResourceService;
+    @Autowired
+    private DepartmentService departmentService;
 
 
     /**
@@ -179,6 +182,16 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             throw new ProcessException("退货单不存在");
         }
 
+        //接收代理商唯一码
+        String receive_agent_id = null;
+        //查询已排单列表
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("returnId", returnId);
+        List<Map<String, Object>>  receiptPlans = plannerService.queryOrderReceiptPlanInfo(params);
+        for (Map<String, Object> receiptPlan : receiptPlans) {
+            receive_agent_id = String.valueOf(receiptPlan.get("AGENT_ID"));
+        }
+
         //查询退货明细
         OReturnOrderDetailExample example = new OReturnOrderDetailExample();
         example.or().andReturnIdEqualTo(returnId);
@@ -190,17 +203,14 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             Dict modelTypeDict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MODEL_TYPE.name(),returnDetail.getProType());
             if(null!=modelTypeDict)
             returnDetail.setProType(modelTypeDict.getdItemname());
+            Agent agent = agentMapper.selectByPrimaryKey(receive_agent_id);
+            returnDetail.setAgent(agent);
         }
 
         //查询扣款款项
         ODeductCapitalExample deductCapitalExample = new ODeductCapitalExample();
         deductCapitalExample.or().andSourceIdEqualTo(returnId);
         List<ODeductCapital> deductCapitals = deductCapitalMapper.selectByExample(deductCapitalExample);
-
-        //查询已排单列表
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("returnId", returnId);
-        List<Map<String, Object>> receiptPlans = plannerService.queryOrderReceiptPlanInfo(params);
 
         map.put("returnOrder", returnOrder);
         map.put("returnDetails", returnDetails);
@@ -967,7 +977,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         }
         return amt;
     }
-
 
     /**
      * @Author: Zhang Lei
@@ -2353,4 +2362,134 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     public OReturnOrder selectById(String id) {
         return returnOrderMapper.selectByPrimaryKey(id);
     }
+
+    /**
+     * 导出-退转发明细
+     * @param map
+     * @return
+     */
+    @Override
+    public List<ReturnOrderVo> exportRetForDetail(Map map) {
+        if(null != map.get("userId")) {
+            Long userId = (Long) map.get("userId");
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if (orgCodeRes == null && orgCodeRes.size() != 1) {
+                return null;
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+            map.put("organizationCode", organizationCode);
+            List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+            map.put("platfromPerm", platfromPerm);
+        }
+        if (null!=map.get("agName") && StringUtils.isNotBlank(map.get("agName")+"")) {
+            map.put("agName", "%"+map.get("agName")+"%");
+        }
+        if (null!=map.get("id") && StringUtils.isNotBlank(map.get("id")+"")) {
+            map.put("id", map.get("id"));
+        }
+        if (null!=map.get("activityName") && StringUtils.isNotBlank(map.get("activityName")+"")) {
+            map.put("activityName", map.get("activityName"));
+        }
+        if (null!=map.get("platform") && StringUtils.isNotBlank(map.get("platform")+"")) {
+            map.put("platform", map.get("platform"));
+        }
+        if (null!=map.get("proModel") && StringUtils.isNotBlank(map.get("proModel")+"")) {
+            map.put("proModel", map.get("proModel"));
+        }
+        if (null!=map.get("agUniqNum") && StringUtils.isNotBlank(map.get("agUniqNum")+"")) {
+            map.put("agUniqNum", map.get("agUniqNum"));
+        }
+        if (null!=map.get("proType") && StringUtils.isNotBlank(map.get("proType")+"")) {
+            map.put("proType", map.get("proType"));
+        }
+        if (null!=map.get("vender") && StringUtils.isNotBlank(map.get("vender")+"")) {
+            map.put("vender", map.get("vender"));
+        }
+        if (null!=map.get("payMethod") && StringUtils.isNotBlank(map.get("payMethod")+"")) {
+            map.put("payMethod", map.get("payMethod"));
+        }
+        if (null!=map.get("retSchedule") && StringUtils.isNotBlank(map.get("retSchedule")+"")) {
+            map.put("retSchedule", map.get("retSchedule"));
+        }
+        if (null!=map.get("beginTime") && StringUtils.isNotBlank(map.get("beginTime")+"")) {
+            map.put("beginTime", map.get("beginTime"));
+        }
+        if (null!=map.get("endTime") && StringUtils.isNotBlank(map.get("endTime")+"")) {
+            map.put("endTime", map.get("endTime"));
+        }
+
+        List<ReturnOrderVo> receiptOrderVoList = returnOrderMapper.exportRetForDetail(map);
+        for (ReturnOrderVo returnOrderVo : receiptOrderVoList) {
+            Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), returnOrderVo.getVender());
+            if (dict != null) {
+                returnOrderVo.setVender(dict.getdItemname());
+            }
+            //退货单ID
+            String return_order_id = returnOrderVo.getReturnOrderId();
+            //排单ID
+            String receive_receipt_plan_id = null;
+            //接收订单编号
+            String receive_order_id = null;
+            //接收代理商唯一码
+            String receive_agent_id = null;
+            //接收活动类型
+            String receive_activity_name = null;
+            //接收地址
+            String receive_addr_detail = null;
+            //接收物流单号
+            String receive_w_number = null;
+
+            //查询已排单列表
+            Map<String, String> params_plan = new HashMap<String, String>();
+            params_plan.put("returnId", return_order_id);
+            List<Map<String, Object>> receiptPlans = plannerService.queryOrderReceiptPlanInfo(params_plan);
+            if (receiptPlans.size()!=0 && receiptPlans!=null) {
+                for (Map<String, Object> receiptPlan : receiptPlans) {
+                    receive_order_id = String.valueOf(receiptPlan.get("ORDER_ID"));
+                    receive_agent_id = String.valueOf(receiptPlan.get("AGENT_ID"));
+                    receive_addr_detail = String.valueOf(receiptPlan.get("ADDR_DETAIL"));
+                    receive_receipt_plan_id = String.valueOf(receiptPlan.get("PLAN_ID"));
+                }
+
+                //查询接收活动类型
+                Map<String, String> params_activity = new HashMap<String, String>();
+                params_activity.put("receiveOrderId", receive_order_id);
+                params_activity.put("receiveAgentId", receive_agent_id);
+                List<Map<String, Object>> subOrderActivitys = returnOrderMapper.queryReceiveOrderActivity(params_activity);
+                if (subOrderActivitys.size()!=0 && subOrderActivitys!=null) {
+                    for (Map<String, Object> subOrderActivity : subOrderActivitys) {
+                        receive_activity_name = String.valueOf(subOrderActivity.get("ACTIVITY_NAME"));
+                    }
+                }
+
+                //查询接收物流单号
+                Map<String, String> params_logistics = new HashMap<String, String>();
+                params_logistics.put("receiveOrderId", receive_order_id);
+                params_logistics.put("receiveReceiptPlanId", receive_receipt_plan_id);
+                List<Map<String, Object>> orderLogistics = receiptPlanMapper.queryReceiveOrderLogistics(params_logistics);
+                if (orderLogistics.size()!=0 && orderLogistics!=null) {
+                    for (Map<String, Object> orderLogistic : orderLogistics) {
+                        receive_w_number = String.valueOf(orderLogistic.get("W_NUMBER"));
+                    }
+                }
+            }
+
+            //查询接收代理商信息
+            Agent receive_agent = agentMapper.selectByPrimaryKey(receive_agent_id);
+            if (receive_agent != null) {
+                returnOrderVo.setReceiveOrderId(receive_order_id==null?"":receive_order_id);
+                returnOrderVo.setReceiveAgentId(receive_agent.getId()==null?"":receive_agent.getId());
+                returnOrderVo.setReceiveAgentName(receive_agent.getAgName()==null?"":receive_agent.getAgName());
+                returnOrderVo.setReceiveActivityName(receive_activity_name==null?"":receive_activity_name);
+                returnOrderVo.setAddrDetail(receive_addr_detail==null?"":receive_addr_detail);
+                returnOrderVo.setWnumber(receive_w_number==null?"":receive_w_number);
+                returnOrderVo.setAgDocDistrict(departmentService.getById(receive_agent.getAgDocDistrict()).getName());
+                returnOrderVo.setAgDocPro(departmentService.getById(receive_agent.getAgDocPro()).getName());
+            }
+        }
+        log.info("导出退转发明细数据：", receiptOrderVoList);
+        return receiptOrderVoList;
+    }
+
 }

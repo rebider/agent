@@ -92,8 +92,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Autowired
     private IResourceService iResourceService;
 
-
-
     /**
      * 代理商入网信息保存
      * @param agentVo
@@ -1246,10 +1244,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 }
 
                 if (null != agentoutVo.getCloTaxPoint()) {
-                    NumberFormat numberFormat = NumberFormat.getPercentInstance();
-                    Number parse = numberFormat.parse(agentoutVo.getCloTaxPoint().toString() + "%");
-                    String point = numberFormat.format(parse);
-                    agentoutVo.setPoint(point);
+                    agentoutVo.setPoint(String.valueOf(agentoutVo.getCloTaxPoint()) + "%");
                 }
 
                 //业务区域

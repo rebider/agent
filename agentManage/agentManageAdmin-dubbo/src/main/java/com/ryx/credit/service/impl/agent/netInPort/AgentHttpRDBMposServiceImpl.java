@@ -105,6 +105,9 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             resultMap.put("agCode",agent.getId());
             resultMap.put("directLabel",directLabel(agentBusInfo.getBusType()));
             Region region = regionMapper.findByRcode(agentColinfo.getBankRegion());
+            if(region==null){
+                region = new Region();
+            }
             resultMap.put("code",String.valueOf(region.gettType()));
             resultMap.put("cityid",agentColinfo.getBankRegion());
             resultMap.put("bankcity",region.getrName());
