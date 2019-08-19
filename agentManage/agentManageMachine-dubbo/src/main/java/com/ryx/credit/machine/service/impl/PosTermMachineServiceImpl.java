@@ -54,7 +54,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
 
 
     @Override
-    public List<TermMachineVo> queryTermMachine(PlatformType platformType) throws Exception {
+    public List<TermMachineVo> queryTermMachine(PlatformType platformType, Map map) throws Exception {
         List<ImsTermMachine> list = imsTermMachineService.selectByExample();
         List<TermMachineVo> termMachineVoList = new ArrayList<>();
         for (ImsTermMachine imsTermMachine : list) {
