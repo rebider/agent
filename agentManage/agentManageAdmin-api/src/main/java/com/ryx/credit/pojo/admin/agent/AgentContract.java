@@ -54,6 +54,8 @@ public class AgentContract implements Serializable {
 
     private Map<String, Object> assProtocolMap;
 
+    private String activId;
+
     public Map<String, Object> getAssProtocolMap() {
         return assProtocolMap;
     }
@@ -180,5 +182,13 @@ public class AgentContract implements Serializable {
 
     public void setAppendAgree(BigDecimal appendAgree) {
         this.appendAgree = appendAgree;
+    }
+
+    public String getActivId() {
+        return activId;
+    }
+
+    public void setActivId(String activId) {
+        this.activId = activId;
     }
 }

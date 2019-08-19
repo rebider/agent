@@ -83,6 +83,7 @@ public enum DictGroup {
     CARD_AMT("流量卡每张金额"),
     OFFSET_AMT("轧差每张金额");
 
+
     public String  msg;
 
     DictGroup(String s){

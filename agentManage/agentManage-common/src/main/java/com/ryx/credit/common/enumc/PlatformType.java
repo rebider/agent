@@ -22,6 +22,7 @@ public enum PlatformType {
     RHPOS("RHPOS","瑞花宝"),
     RDBPOS("RDBPOS","瑞大宝");
 
+
     public String code;
 
     public String msg;

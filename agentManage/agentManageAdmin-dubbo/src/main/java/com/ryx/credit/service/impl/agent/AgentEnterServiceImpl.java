@@ -613,15 +613,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             throw new MessageException("代理商业务启动审批异常，更新业务本信息失败");
         }
 
-        //代理商有效新建的合同
-        List<AgentContract> ag = agentContractService.queryAgentContract(abus.getAgentId(), null, AgStatus.Create.status);
-        for (AgentContract contract : ag) {
-            contract.setCloReviewStatus(AgStatus.Approving.status);
-            if (1 != agentContractService.update(contract)) {
-                logger.info("代理商业务启动审批异常，合同状态更新失败{}:{}", busid, cuser);
-                throw new MessageException("合同状态更新失败");
-            }
-        }
+
 
         //代理商有效的新建的收款账户
         List<AgentColinfo> clolist = agentColinfoService.queryAgentColinfoService(abus.getAgentId(), null, AgStatus.Create.status);
@@ -630,15 +622,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             if (1 != agentColinfoService.update(agentColinfo)) {
                 logger.info("代理商业务启动审批异常，收款账户状态更新失败{}:{}", busid, cuser);
                 throw new MessageException("收款账户状态更新失败");
-            }
-        }
-
-        List<Capital> capitals = accountPaidItemService.queryCap(abus.getAgentId(), null, null, AgStatus.Create.status);
-        for (Capital capital : capitals) {
-            capital.setCloReviewStatus(AgStatus.Approving.status);
-            if (1 != accountPaidItemService.update(capital)) {
-                logger.info("代理商审批，合同状态更新失败{}:{}", abus.getAgentId(), cuser);
-                throw new MessageException("缴款状态更新失败");
             }
         }
 
@@ -655,6 +638,25 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         if (proce == null) {
             logger.info("代理商业务启动审批异常，审批流启动失败{}:{}", busid, cuser);
             throw new MessageException("审批流启动失败!");
+        }
+        //代理商有效新建的合同
+        List<AgentContract> ag = agentContractService.queryAgentContract(abus.getAgentId(), null, AgStatus.Create.status);
+        for (AgentContract contract : ag) {
+            contract.setActivId(proce);
+            contract.setCloReviewStatus(AgStatus.Approving.status);
+            if (1 != agentContractService.update(contract)) {
+                logger.info("代理商业务启动审批异常，合同状态更新失败{}:{}", busid, cuser);
+                throw new MessageException("合同状态更新失败");
+            }
+        }
+        List<Capital> capitals = accountPaidItemService.queryCap(abus.getAgentId(), null, null, AgStatus.Create.status);
+        for (Capital capital : capitals) {
+            capital.setActivId(proce);
+            capital.setCloReviewStatus(AgStatus.Approving.status);
+            if (1 != accountPaidItemService.update(capital)) {
+                logger.info("代理商审批，缴款状态更新失败{}:{}", abus.getAgentId(), cuser);
+                throw new MessageException("缴款状态更新失败");
+            }
         }
         //代理商业务视频关系
         BusActRel record = new BusActRel();
