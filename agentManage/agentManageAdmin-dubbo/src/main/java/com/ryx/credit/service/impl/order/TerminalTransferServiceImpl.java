@@ -528,19 +528,19 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                         terminalTransferDetail.setPlatFrom(map1.get("BUS_PLATFORM").toString());
                     }
 
-                    /*    String res = redisService.getValue("TerminalTransfer:ISOPEN_RES_trans");*/
+                        String res = redisService.getValue("TerminalTransfer:ISOPEN_RES_trans");
                     AgentResult agentResult = null;
-                    /* if(StringUtils.isNotBlank(res) && "1".equals(res)) {*/
+                     if(StringUtils.isNotBlank(res) && "1".equals(res)) {
                     try {
                         agentResult = termMachineService.queryTerminalTransfer(terminalTransferDetailListsMpos, "cx");
                     }catch ( Exception e ){
                         log.info("未获得查询结果");
                         throw new MessageException("未获得查询结果");
                     }
-                   /* }else{
+                    }else{
                         startTerminalTransferActivity(terminalTransferId, cuser, agentId, true);
                         return AgentResult.ok();
-                    }*/
+                    }
                     if (agentResult.isOK()) {
                         List<Map<String, Object>> mapList =  (List<Map<String, Object>>) agentResult.getData();
                         if (mapList == null || mapList.size() == 0) {
@@ -1052,10 +1052,10 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 log.info("pos划拨开始查询");
                 try {
                     if ("1".equals(terminalTransferDetail.getStatus().toString())) {
-                    /*    String res = redisService.getValue("TerminalTransfer:ISOPEN_RES_QUERY");
-                        if (StringUtils.isNotBlank(res) && "1".equals(res)) {*/
+                        String res = redisService.getValue("TerminalTransfer:ISOPEN_RES_QUERY");
+                        if (StringUtils.isNotBlank(res) && "1".equals(res)) {
                             agentResult = termMachineService.queryTerminalTransferResult(terminalTransferDetail.getId(), terminalTransferDetail.getPlatformType().toString());
-                       /* } else {
+                        } else {
                         log.info("---------------------------------未打开开关--------------------------------------");
                             agentResult = AgentResult.fail();
                             agentResult.setMsg(JSONObject.toJSONString(FastMap.fastMap("data",
@@ -1063,7 +1063,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                                     .putKeyV("transferStatus", "01")
                                     .putKeyV("resMsg", "未联动")
                             ));
-                        }*/
+                        }
 
                     } else {
                         continue;
@@ -1137,10 +1137,10 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             if (terminalTransferDetail.getPlatformType().toString().equals("2")) {
                 log.info("手刷划拨开始查询");
                 try {
-                       /* String res = redisService.getValue("TerminalTransfer:ISOPEN_RES_QUERY");
-                           if(StringUtils.isNotBlank(res) && "1".equals(res)) {*/
+                        String res = redisService.getValue("TerminalTransfer:ISOPEN_RES_QUERY");
+                           if(StringUtils.isNotBlank(res) && "1".equals(res)) {
                     agentResult = termMachineService.queryTerminalTransferResult(terminalTransferDetail.getId(), terminalTransferDetail.getPlatformType().toString());
-                          /* }else{
+                           }else{
                                log.info("---------------------------------未打开开关----------------------------");
                                agentResult = AgentResult.fail();
                                agentResult.setMsg(JSONObject.toJSONString(FastMap.fastMap("data",
@@ -1148,7 +1148,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                                        .putKeyV("transferStatus","01")
                                        .putKeyV("resMsg","未联动")
                                ));
-                           }*/
+                           }
                 } catch (Exception e) {
                     e.printStackTrace();
                     agentResult = AgentResult.fail();
