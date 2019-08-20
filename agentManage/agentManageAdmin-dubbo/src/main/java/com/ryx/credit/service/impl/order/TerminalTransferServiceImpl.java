@@ -933,9 +933,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         }
 
 
-        if(agStatus.compareTo(AgStatus.Refuse.status)==1){
+        if(agStatus.compareTo(AgStatus.Refuse.status)==0){
             RefuseTransfer(terminalTransfer);
-        }else if(agStatus.compareTo(AgStatus.Approved.status)==1){
+        }else if(agStatus.compareTo(AgStatus.Approved.status)==0){
             //将通过的结果再次返回给业务平台通知他们开始划拨
             startTransfer(terminalTransfer);
         }
