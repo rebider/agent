@@ -16,7 +16,8 @@ public enum CardStatus {
     WZ(new BigDecimal("1"),"未知"),
     ZC(new BigDecimal("2"),"正常"),
     YJ(new BigDecimal("3"),"预警"),
-    TJ(new BigDecimal("4"),"停机");
+    TJ(new BigDecimal("4"),"停机"),  //停机可以启用
+    ZX(new BigDecimal("5"),"注销");  //注销不能在开机
 
     public BigDecimal code;
 
@@ -25,21 +26,6 @@ public enum CardStatus {
     CardStatus(BigDecimal c, String m){
         this.code=c;
         this.msg =m;
-    }
-
-    /**
-     * 取得枚举对象值
-     * @return 枚举对象值
-     */
-    public BigDecimal getValue() {
-        return this.code;
-    }
-    /**
-     * 取得缓存内容
-     * @return 缓存内容
-     */
-    public String getContent() {
-        return this.msg;
     }
 
     /**
@@ -64,6 +50,22 @@ public enum CardStatus {
             resultMap.put(cc.code,cc.msg);
         }
         return resultMap;
+    }
+
+    /**
+     * 取得枚举对象值
+     * @return 枚举对象值
+     */
+    public BigDecimal getValue() {
+        return this.code;
+    }
+
+    /**
+     * 取得缓存内容
+     * @return 缓存内容
+     */
+    public String getContent() {
+        return this.msg;
     }
 
 }
