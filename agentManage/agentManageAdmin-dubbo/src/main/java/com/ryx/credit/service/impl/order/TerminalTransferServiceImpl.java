@@ -931,11 +931,35 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             log.info("审批任务结束{}{}，终端划拨更新失败2", proIns, agStatus);
             throw new MessageException("终端划拨更新失败");
         }
-        //将通过的结果再次返回给业务平台通知他们开始划拨
-        startTransfer(terminalTransfer);
+
+
+        if(agStatus.compareTo(AgStatus.Refuse.status)==1){
+            RefuseTransfer(terminalTransfer);
+        }else if(agStatus.compareTo(AgStatus.Approved.status)==1){
+            //将通过的结果再次返回给业务平台通知他们开始划拨
+            startTransfer(terminalTransfer);
+        }
+
         return AgentResult.ok();
     }
 
+
+//代理商拒绝更新明细
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRES_NEW)
+    public void RefuseTransfer(TerminalTransfer terminalTransfer) throws Exception {
+        TerminalTransferDetailExample terminalTransferDetailExample = new TerminalTransferDetailExample();
+        TerminalTransferDetailExample.Criteria criteria = terminalTransferDetailExample.createCriteria();
+        criteria.andTerminalTransferIdEqualTo(terminalTransfer.getId());
+        criteria.andStatusEqualTo(new BigDecimal("1"));
+        List<TerminalTransferDetail> terminalTransferDetails = terminalTransferDetailMapper.selectByExample(terminalTransferDetailExample);
+        for (TerminalTransferDetail terminalTransferDetail:terminalTransferDetails) {
+            terminalTransferDetail.setAdjustStatus(AdjustStatus.JJTZ.getValue());
+            terminalTransferDetail.setAdjustTime(new Date());
+            terminalTransferDetail.setuTime(new Date());
+            terminalTransferDetail.setRemark("代理商已经拒绝");
+            terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
+        }
+    }
 
     //审批通过后再一次将调整信息发送，并告知调整
     //此方法单独开启一个事物
