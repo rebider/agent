@@ -27,7 +27,6 @@ import java.util.Map;
 @Service("termMachineService")
 public class TermMachineServiceImpl  implements TermMachineService {
 
-
     private Logger logger = LoggerFactory.getLogger(TermMachineServiceImpl.class);
 
     @Resource(name = "posTermMachineServiceImpl")
@@ -41,10 +40,6 @@ public class TermMachineServiceImpl  implements TermMachineService {
 
     @Resource(name = "rdbTermMachineServiceImpl")
     private TermMachineService rdbTermMachineServiceImpl;
-
-
-
-
 
     @Override
     public List<TermMachineVo> queryTermMachine(PlatformType platformType, Map map) throws Exception{

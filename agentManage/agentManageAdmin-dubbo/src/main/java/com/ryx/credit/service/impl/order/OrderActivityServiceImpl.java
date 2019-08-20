@@ -22,6 +22,7 @@ import com.ryx.credit.profit.service.ProfitMonthService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrderActivityService;
+import org.apache.poi.hssf.usermodel.HSSFAnchor;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -158,7 +159,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         String platFormType = platFormMapper.selectPlatType(activity.getPlatform());
         if (StringUtils.isNotBlank(platFormType)) {
             try {
-                List<TermMachineVo> termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType), new HashMap());
+                List<TermMachineVo> termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType), new HashMap()); // 新增map（以后需要请改成全局变量）
                 for (TermMachineVo termMachineVo : termMachineVos) {
                     if (activity.getBusProCode().equals(termMachineVo.getId())) {
                         activity.setStandAmt(BigDecimal.valueOf(Integer.valueOf(termMachineVo.getStandAmt())));
@@ -221,7 +222,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
 
         if (StringUtils.isNotBlank(platFormType)) {
             try {
-                List<TermMachineVo> termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType), new HashMap());
+                List<TermMachineVo> termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType), new HashMap()); // 新增map，（若需要后期维护，可将map设为全局变量）
                 for (TermMachineVo termMachineVo : termMachineVos) {
                     if (activity.getBusProCode().equals(termMachineVo.getId())) {
                         activity.setStandAmt(BigDecimal.valueOf(Integer.valueOf(termMachineVo.getStandAmt())));
@@ -320,7 +321,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
 
         if (StringUtils.isNotBlank(platFormType)) {
             try {
-                List<TermMachineVo> termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType), new HashMap());
+                List<TermMachineVo> termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType), new HashMap()); // 新增参数，（后期需要可设置为全局变量）
                 for (TermMachineVo termMachineVo : termMachineVos) {
                     if (activity.getBusProCode().equals(termMachineVo.getId())) {
                         activity.setStandAmt(BigDecimal.valueOf(Integer.valueOf(termMachineVo.getStandAmt())));
@@ -431,14 +432,21 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         if (StringUtils.isBlank(platformNum)) {
             throw new MessageException("平台类型为空");
         }
+
+        // 查询平台编码,类型
         String platFormType = platFormMapper.selectPlatType(platformNum);
+        String busPlatForm = platFormMapper.selectBusPlatFormByPlatformNum(platformNum);
+
+        Map<String, Object> reqMap = new HashMap<>();
+        reqMap.put("busPlatForm", busPlatForm);
+
         List termMachineVos = null;
         List mposTermBatchVos = null;
         List mposTermTypeVos = null;
         HashMap<Object, Object> map = new HashMap<>();
         if (StringUtils.isNotBlank(platFormType)) {
             try {
-                termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType), new HashMap());
+                termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType), reqMap);
 
                 mposTermBatchVos = termMachineService.queryMposTermBatch(PlatformType.getContentEnum(platFormType));
 
