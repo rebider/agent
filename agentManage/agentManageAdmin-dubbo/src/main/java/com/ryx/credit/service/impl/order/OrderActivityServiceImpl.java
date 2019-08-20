@@ -158,7 +158,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         String platFormType = platFormMapper.selectPlatType(activity.getPlatform());
         if (StringUtils.isNotBlank(platFormType)) {
             try {
-                List<TermMachineVo> termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType));
+                List<TermMachineVo> termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType), new HashMap());
                 for (TermMachineVo termMachineVo : termMachineVos) {
                     if (activity.getBusProCode().equals(termMachineVo.getId())) {
                         activity.setStandAmt(BigDecimal.valueOf(Integer.valueOf(termMachineVo.getStandAmt())));
@@ -221,7 +221,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
 
         if (StringUtils.isNotBlank(platFormType)) {
             try {
-                List<TermMachineVo> termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType));
+                List<TermMachineVo> termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType), new HashMap());
                 for (TermMachineVo termMachineVo : termMachineVos) {
                     if (activity.getBusProCode().equals(termMachineVo.getId())) {
                         activity.setStandAmt(BigDecimal.valueOf(Integer.valueOf(termMachineVo.getStandAmt())));
@@ -320,7 +320,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
 
         if (StringUtils.isNotBlank(platFormType)) {
             try {
-                List<TermMachineVo> termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType));
+                List<TermMachineVo> termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType), new HashMap());
                 for (TermMachineVo termMachineVo : termMachineVos) {
                     if (activity.getBusProCode().equals(termMachineVo.getId())) {
                         activity.setStandAmt(BigDecimal.valueOf(Integer.valueOf(termMachineVo.getStandAmt())));
@@ -438,7 +438,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         HashMap<Object, Object> map = new HashMap<>();
         if (StringUtils.isNotBlank(platFormType)) {
             try {
-                termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType));
+                termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType), new HashMap());
 
                 mposTermBatchVos = termMachineService.queryMposTermBatch(PlatformType.getContentEnum(platFormType));
 
