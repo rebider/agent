@@ -117,6 +117,16 @@ public class AgentBusInfo implements Serializable {
 
     private String brandNum;
 
+    private BigDecimal dredgeD1;
+
+    public BigDecimal getDredgeD1() {
+        return dredgeD1;
+    }
+
+    public void setDredgeD1(BigDecimal dredgeD1) {
+        this.dredgeD1 = dredgeD1;
+    }
+
     public String getBrandNum() {
         return brandNum;
     }

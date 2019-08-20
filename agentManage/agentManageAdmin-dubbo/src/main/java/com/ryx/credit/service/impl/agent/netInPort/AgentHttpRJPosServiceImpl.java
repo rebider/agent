@@ -120,6 +120,7 @@ public class AgentHttpRJPosServiceImpl implements AgentNetInHttpService {
         resultMap.put("lowCreditRate",agentBusInfo.getCreditRateFloor());
         resultMap.put("ceilingCreditRate",agentBusInfo.getCreditRateCeiling());
         resultMap.put("hasS0",agentBusInfo.getDredgeS0().equals(new BigDecimal(1))?"0":"1");
+        resultMap.put("hasD1",agentBusInfo.getDredgeD1().equals(new BigDecimal(1))?"0":"1");
         resultMap.put("orgName",agent.getAgName());
         resultMap.put("useOrgan",agentBusInfo.getBusUseOrgan()); //使用范围
         if(StringUtils.isNotBlank(platForm.getPosanameprefix())){
@@ -197,6 +198,7 @@ public class AgentHttpRJPosServiceImpl implements AgentNetInHttpService {
             data.put("orgName",paramMap.get("orgName"));
             data.put("busiAreas",paramMap.get("busiAreas"));
             data.put("hasS0",paramMap.get("hasS0"));
+            data.put("hasD1",paramMap.get("hasD1"));
             data.put("busiType",paramMap.get("busiType"));
             data.put("debitTop",paramMap.get("debitTop"));
             data.put("ckDebitRate",paramMap.get("ckDebitRate"));
