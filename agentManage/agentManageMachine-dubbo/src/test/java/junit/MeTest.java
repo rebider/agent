@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -29,7 +30,7 @@ public class MeTest extends BaseSpringTest {
     @Test
     public void testqueryTermMachine(){
         try {
-            List<TermMachineVo> list =  termMachineService.queryTermMachine(PlatformType.MPOS);
+            List<TermMachineVo> list =  termMachineService.queryTermMachine(PlatformType.MPOS, new HashMap());
             logger.debug(JSONArray.toJSONString(list));
         } catch (Exception e) {
             e.printStackTrace();
