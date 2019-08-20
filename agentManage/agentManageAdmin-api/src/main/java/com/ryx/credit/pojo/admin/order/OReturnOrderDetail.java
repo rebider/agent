@@ -1,5 +1,6 @@
 package com.ryx.credit.pojo.admin.order;
 
+import com.ryx.credit.pojo.admin.agent.Agent;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -65,6 +66,17 @@ public class OReturnOrderDetail implements Serializable{
 
     //活动id
     private OActivity act;
+
+    //代理商信息
+    private Agent agent;
+
+    public Agent getAgent() {
+        return agent;
+    }
+
+    public void setAgent(Agent agent) {
+        this.agent = agent;
+    }
 
     public String getId() {
         return id;

@@ -336,4 +336,8 @@
   <select id="selectPlatType" parameterType="string" resultType="string">
     select PLATFORM_TYPE from a_platform where status=1 and PLATFORM_NUM=#{platformNum}
   </select>
+
+  <select id="selectBusPlatFormByPlatformNum" parameterType="string" resultType="string">
+    SELECT BUSPLATFORM FROM A_PLATFORM WHERE status=1 AND PLATFORM_NUM=#{platformNum}
+  </select>
 </mapper>

@@ -48,6 +48,7 @@
     <result column="APPROVE_TIME" jdbcType="TIMESTAMP" property="approveTime" />
     <result column="CREDIT_RATE_CEILING" jdbcType="VARCHAR" property="creditRateCeiling" />
     <result column="BRAND_NUM" jdbcType="VARCHAR" property="brandNum" />
+    <result column="DREDGE_D1" jdbcType="DECIMAL" property="dredgeD1" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -86,7 +87,7 @@
     C_UTIME, C_USER, STATUS, VERSION, AG_ZBH, BUS_USE_ORGAN, BUS_SCOPE, DREDGE_S0, BUS_LOGIN_NUM,
     DEBIT_RATE_LOWER, DEBIT_CAPPING, DEBIT_APPEAR_RATE, TERMINALS_LOWER, CREDIT_RATE_FLOOR,
     AG_DOC_DISTRICT, AG_DOC_PRO, ORGAN_NUM, FINACE_REMIT_ORGAN, APPROVE_TIME, CREDIT_RATE_CEILING,
-    BRAND_NUM
+    BRAND_NUM, DREDGE_D1
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -132,7 +133,7 @@
     DEBIT_APPEAR_RATE, TERMINALS_LOWER, CREDIT_RATE_FLOOR,
     AG_DOC_DISTRICT, AG_DOC_PRO, ORGAN_NUM,
     FINACE_REMIT_ORGAN, APPROVE_TIME, CREDIT_RATE_CEILING,
-    BRAND_NUM)
+    BRAND_NUM, DREDGE_D1)
     values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR},
     #{busPlatform,jdbcType=VARCHAR}, #{busType,jdbcType=VARCHAR}, #{busParent,jdbcType=VARCHAR},
     #{busRiskParent,jdbcType=VARCHAR}, #{busActivationParent,jdbcType=VARCHAR}, #{busRegion,jdbcType=VARCHAR},
@@ -148,7 +149,7 @@
     #{debitAppearRate,jdbcType=VARCHAR}, #{terminalsLower,jdbcType=VARCHAR}, #{creditRateFloor,jdbcType=VARCHAR},
     #{agDocDistrict,jdbcType=VARCHAR}, #{agDocPro,jdbcType=VARCHAR}, #{organNum,jdbcType=VARCHAR},
     #{finaceRemitOrgan,jdbcType=VARCHAR}, #{approveTime,jdbcType=TIMESTAMP}, #{creditRateCeiling,jdbcType=VARCHAR},
-    #{brandNum,jdbcType=VARCHAR})
+    #{brandNum,jdbcType=VARCHAR}, #{dredgeD1,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfo">
     insert into A_AGENT_BUSINFO
@@ -291,6 +292,9 @@
       <if test="brandNum != null">
         BRAND_NUM,
       </if>
+      <if test="dredgeD1 != null">
+        DREDGE_D1,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -431,9 +435,12 @@
       <if test="brandNum != null">
         #{brandNum,jdbcType=VARCHAR},
       </if>
+      <if test="dredgeD1 != null">
+        #{dredgeD1,jdbcType=DECIMAL},
+      </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample" resultType="java.lang.Integer">
     select count(*) from A_AGENT_BUSINFO
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -577,6 +584,9 @@
       <if test="brandNum != null">
         BRAND_NUM = #{brandNum,jdbcType=VARCHAR},
       </if>
+      <if test="dredgeD1 != null">
+        DREDGE_D1 = #{dredgeD1,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
@@ -626,7 +636,8 @@
     FINACE_REMIT_ORGAN = #{finaceRemitOrgan,jdbcType=VARCHAR},
     APPROVE_TIME = #{approveTime,jdbcType=TIMESTAMP},
     CREDIT_RATE_CEILING = #{creditRateCeiling,jdbcType=VARCHAR},
-    BRAND_NUM = #{brandNum,jdbcType=VARCHAR}
+    BRAND_NUM = #{brandNum,jdbcType=VARCHAR},
+    DREDGE_D1 = #{dredgeD1,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <sql id="OracleDialectPrefix">
@@ -691,7 +702,7 @@
   <sql id="queryBusinessPlatformSql">
     select
     b.id,b.agent_id,b.bus_num,b.bus_platform,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
-    a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time,b.clo_pay_company,b.bus_Inde_ass,d.ag_name as risk_parent,e.name as ag_doc_pro,to_char(b.approve_time,'yyyy-MM-dd HH:mm:dd') as approve_time
+    a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time,b.clo_pay_company,b.bus_Inde_ass,d.ag_name as risk_parent,e.name as ag_doc_pro,to_char(b.approve_time,'yyyy-MM-dd hh24:mi:ss') as approve_time
     from A_agent_businfo b
     left join A_agent a on b.agent_id = a.id
     left join A_agent_businfo c on c.id = b.bus_risk_parent
@@ -1081,5 +1092,22 @@ union
           and  1=-1
         </if>
       </where>
+  </select>
+
+  <select id="selectByConditionForPage" parameterType="map" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix"/>
+    select
+    <include refid="Base_Column_List"/>
+    from A_AGENT_BUSINFO
+    <where>
+      <if test="agentBusInfo.agentId != null and agentBusInfo.agentId != ''">
+        and id=#{agentBusInfo.agentId}
+      </if>
+      <if test="agentBusInfo.busNum != null and agentBusInfo.busNum != ''">
+        and id=#{agentBusInfo.busNum}
+      </if>
+    </where>
+    order by c_time desc
+    <include refid="OracleDialectSuffix"/>
   </select>
 </mapper>

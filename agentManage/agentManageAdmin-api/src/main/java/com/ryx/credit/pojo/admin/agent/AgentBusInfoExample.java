@@ -24,20 +24,20 @@ public class AgentBusInfoExample {
         oredCriteria = new ArrayList<Criteria>();
     }
 
-    public void setOrderByClause(String orderByClause) {
-        this.orderByClause = orderByClause;
-    }
-
     public String getOrderByClause() {
         return orderByClause;
     }
 
-    public void setDistinct(boolean distinct) {
-        this.distinct = distinct;
+    public void setOrderByClause(String orderByClause) {
+        this.orderByClause = orderByClause;
     }
 
     public boolean isDistinct() {
         return distinct;
+    }
+
+    public void setDistinct(boolean distinct) {
+        this.distinct = distinct;
     }
 
     public List<Criteria> getOredCriteria() {
@@ -73,28 +73,28 @@ public class AgentBusInfoExample {
         distinct = false;
     }
 
-    public void setPage(Page page) {
-        this.page=page;
-    }
-
     public Page getPage() {
         return page;
     }
 
-    public void setLimitStart(Integer limitStart) {
-        this.limitStart=limitStart;
+    public void setPage(Page page) {
+        this.page=page;
     }
 
     public Integer getLimitStart() {
         return limitStart;
     }
 
-    public void setLimitEnd(Integer limitEnd) {
-        this.limitEnd=limitEnd;
+    public void setLimitStart(Integer limitStart) {
+        this.limitStart=limitStart;
     }
 
     public Integer getLimitEnd() {
         return limitEnd;
+    }
+
+    public void setLimitEnd(Integer limitEnd) {
+        this.limitEnd=limitEnd;
     }
 
     protected abstract static class GeneratedCriteria {
@@ -3217,6 +3217,66 @@ public class AgentBusInfoExample {
             addCriterion("BRAND_NUM not between", value1, value2, "brandNum");
             return (Criteria) this;
         }
+
+        public Criteria andDredgeD1IsNull() {
+            addCriterion("DREDGE_D1 is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeD1IsNotNull() {
+            addCriterion("DREDGE_D1 is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeD1EqualTo(BigDecimal value) {
+            addCriterion("DREDGE_D1 =", value, "dredgeD1");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeD1NotEqualTo(BigDecimal value) {
+            addCriterion("DREDGE_D1 <>", value, "dredgeD1");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeD1GreaterThan(BigDecimal value) {
+            addCriterion("DREDGE_D1 >", value, "dredgeD1");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeD1GreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("DREDGE_D1 >=", value, "dredgeD1");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeD1LessThan(BigDecimal value) {
+            addCriterion("DREDGE_D1 <", value, "dredgeD1");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeD1LessThanOrEqualTo(BigDecimal value) {
+            addCriterion("DREDGE_D1 <=", value, "dredgeD1");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeD1In(List<BigDecimal> values) {
+            addCriterion("DREDGE_D1 in", values, "dredgeD1");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeD1NotIn(List<BigDecimal> values) {
+            addCriterion("DREDGE_D1 not in", values, "dredgeD1");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeD1Between(BigDecimal value1, BigDecimal value2) {
+            addCriterion("DREDGE_D1 between", value1, value2, "dredgeD1");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeD1NotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("DREDGE_D1 not between", value1, value2, "dredgeD1");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
@@ -3242,38 +3302,6 @@ public class AgentBusInfoExample {
         private boolean listValue;
 
         private String typeHandler;
-
-        public String getCondition() {
-            return condition;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-
-        public Object getSecondValue() {
-            return secondValue;
-        }
-
-        public boolean isNoValue() {
-            return noValue;
-        }
-
-        public boolean isSingleValue() {
-            return singleValue;
-        }
-
-        public boolean isBetweenValue() {
-            return betweenValue;
-        }
-
-        public boolean isListValue() {
-            return listValue;
-        }
-
-        public String getTypeHandler() {
-            return typeHandler;
-        }
 
         protected Criterion(String condition) {
             super();
@@ -3309,6 +3337,38 @@ public class AgentBusInfoExample {
 
         protected Criterion(String condition, Object value, Object secondValue) {
             this(condition, value, secondValue, null);
+        }
+
+        public String getCondition() {
+            return condition;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public Object getSecondValue() {
+            return secondValue;
+        }
+
+        public boolean isNoValue() {
+            return noValue;
+        }
+
+        public boolean isSingleValue() {
+            return singleValue;
+        }
+
+        public boolean isBetweenValue() {
+            return betweenValue;
+        }
+
+        public boolean isListValue() {
+            return listValue;
+        }
+
+        public String getTypeHandler() {
+            return typeHandler;
         }
     }
 }

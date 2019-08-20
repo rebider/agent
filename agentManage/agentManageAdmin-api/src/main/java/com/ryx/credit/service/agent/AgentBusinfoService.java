@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.agent.Agent;
@@ -116,4 +117,14 @@ public interface AgentBusinfoService {
     void updateBusLoginNum(String oldBusLoginNum,String busLoginNum)throws MessageException;
 
     Map<String,String> queryBusInfoByBrandNum(String brandNum)throws MessageException;
+
+    /**
+     * 分页查询代理商业务信息
+     */
+    PageInfo queryAgentBusInfoForPage(Page page, AgentBusInfo agentBusInfo, String time);
+
+    /**
+     * 代理商业务信息查询
+     */
+    AgentBusInfo queryAgentBusInfoById(String id);
 }
