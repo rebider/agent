@@ -161,11 +161,12 @@ public class TermMachineServiceImpl  implements TermMachineService {
     @Override
     public AgentResult queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailLists, String operation) throws Exception {
        String type = terminalTransferDetailLists.get(0).getPlatformType().toString();
-      if("1".equals(type)){
+        logger.info("本次联动请求类型为:{}",type);
+      if("1".equals(type)){//pos
             return   posTermMachineServiceImpl.queryTerminalTransfer(terminalTransferDetailLists,operation);
-        }else if("2".equals(type)){
+        }else if("2".equals(type)){//手刷
             return   mposTermMachineServiceImpl.queryTerminalTransfer(terminalTransferDetailLists,operation);
-        }else if("3".equals(type)){
+        }else if("3".equals(type)){//瑞大宝
             return   AgentResult.fail("未联动");
         }
 
@@ -176,11 +177,12 @@ public class TermMachineServiceImpl  implements TermMachineService {
     @Override
     public AgentResult queryTerminalTransferResult(String serialNumber,String type) throws Exception {
         AgentResult agentResult=null;
-        if("1".equals(type)){
+        logger.info("本次联动查询结果类型为:{}",type);
+        if("1".equals(type)){//pos
          agentResult =  posTermMachineServiceImpl.queryTerminalTransferResult(serialNumber,type);
-        }else if("2".equals(type)){
-
-        }else if("3".equals(type)){
+        }else if("2".equals(type)){//手刷
+            agentResult =  mposTermMachineServiceImpl.queryTerminalTransferResult(serialNumber,type);
+        }else if("3".equals(type)){//瑞大宝
 
         }
         return agentResult;
