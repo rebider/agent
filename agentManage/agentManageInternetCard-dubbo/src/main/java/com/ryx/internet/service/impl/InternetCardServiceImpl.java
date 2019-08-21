@@ -980,6 +980,13 @@ public class InternetCardServiceImpl implements InternetCardService {
         }else {
             oInternetCard.setSumPostponeTime(internetCardPostpone.getPostponeTime().add(sumPostponeTime));
         }
+        //如果是停用状态延期后设置正常
+        if(oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.STOP.getValue())==0){
+            oInternetCard.setInternetCardStatus(InternetCardStatus.NORMAL.getValue());
+        }
+        oInternetCard.setStop(Status.STATUS_0.status);
+        oInternetCard.setLogout(Status.STATUS_0.status);
+        oInternetCard.setRenew(Status.STATUS_0.status);
         oInternetCard.setExpireTime(mondayLater);
         int i = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
         if(i!=1){
