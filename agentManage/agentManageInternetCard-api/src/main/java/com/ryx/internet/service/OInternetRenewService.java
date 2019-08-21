@@ -30,7 +30,7 @@ public interface OInternetRenewService {
     PageInfo internetRenewOffsetList(InternetRenewOffset internetRenewOffset, Page page, String agentId);
 
     AgentResult saveAndApprove(OInternetRenew internetRenew, List<String> iccids, String cUser,
-                               List<OCashReceivablesVo> oCashReceivablesVoList,String agentId)throws MessageException;
+                               List<OCashReceivablesVo> oCashReceivablesVoList)throws MessageException;
 
     OInternetRenew selectByPrimaryKey(String id);
 

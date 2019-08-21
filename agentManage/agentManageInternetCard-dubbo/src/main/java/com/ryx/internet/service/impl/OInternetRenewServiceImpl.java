@@ -262,7 +262,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     public AgentResult saveAndApprove(OInternetRenew internetRenew,List<String> iccids, String cUser,
-                                      List<OCashReceivablesVo> oCashReceivablesVoList,String agentId)throws MessageException{
+                                      List<OCashReceivablesVo> oCashReceivablesVoList)throws MessageException{
 
         String retIdentifier = "";
         try {
@@ -280,6 +280,22 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             if(iccids.size()==0){
                 throw new MessageException("请选择要续费的卡");
             }
+
+            int z = 1;
+            Set<String> agentIdSet = new HashSet<>();
+            String agentId = "";
+            for (String iccid : iccids) {
+                OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(iccid);
+                if (oInternetCard == null) {
+                    throw new MessageException("第" + z + "个iccid不存在");
+                }
+                agentIdSet.add(oInternetCard.getAgentId());
+                agentId = oInternetCard.getAgentId();
+            }
+            if(agentIdSet.size()!=1){
+                throw new MessageException("不同代理商请分开申请");
+            }
+
             Agent agent = agentService.getAgentById(agentId);
             String agName = "";
             if(null!=agent){
@@ -351,12 +367,8 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             }
 
             int i = 1;
-            Set<String> agentIdSet = new HashSet<>();
             for (String iccid : iccids) {
                 OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(iccid);
-                if(oInternetCard==null){
-                    throw new MessageException("第"+i+"个iccid不存在");
-                }
                 OInternetRenewDetailExample oInternetRenewDetailExample = new OInternetRenewDetailExample();
                 OInternetRenewDetailExample.Criteria criteria = oInternetRenewDetailExample.createCriteria();
                 criteria.andStatusEqualTo(Status.STATUS_1.status);
@@ -421,10 +433,6 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 oInternetRenewDetail.setuTime(new Date());
                 oInternetRenewDetail.setVersion(BigDecimal.ONE);
                 internetRenewDetailMapper.insert(oInternetRenewDetail);
-                agentIdSet.add(oInternetCard.getAgentId());
-            }
-            if(agentIdSet.size()!=1){
-                throw new MessageException("不同代理商请分开申请");
             }
             try {
                 AgentResult agentResult = cashReceivablesService.addOCashReceivablesAndStartProcing(oCashReceivablesVoList,cUser,agentId, CashPayType.INTERNETRENEW,internetRenewId);
