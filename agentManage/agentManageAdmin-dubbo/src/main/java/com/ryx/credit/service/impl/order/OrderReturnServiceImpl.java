@@ -182,15 +182,10 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             throw new ProcessException("退货单不存在");
         }
 
-        //接收代理商唯一码
-        String receive_agent_id = null;
         //查询已排单列表
         Map<String, String> params = new HashMap<String, String>();
         params.put("returnId", returnId);
         List<Map<String, Object>>  receiptPlans = plannerService.queryOrderReceiptPlanInfo(params);
-        for (Map<String, Object> receiptPlan : receiptPlans) {
-            receive_agent_id = String.valueOf(receiptPlan.get("AGENT_ID"));
-        }
 
         //查询退货明细
         OReturnOrderDetailExample example = new OReturnOrderDetailExample();
@@ -203,8 +198,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             Dict modelTypeDict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MODEL_TYPE.name(),returnDetail.getProType());
             if(null!=modelTypeDict)
             returnDetail.setProType(modelTypeDict.getdItemname());
-            Agent agent = agentMapper.selectByPrimaryKey(receive_agent_id);
-            returnDetail.setAgent(agent);
         }
 
         //查询扣款款项
@@ -2424,68 +2417,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), returnOrderVo.getVender());
             if (dict != null) {
                 returnOrderVo.setVender(dict.getdItemname());
-            }
-            //退货单ID
-            String return_order_id = returnOrderVo.getReturnOrderId();
-            //排单ID
-            String receive_receipt_plan_id = null;
-            //接收订单编号
-            String receive_order_id = null;
-            //接收代理商唯一码
-            String receive_agent_id = null;
-            //接收活动类型
-            String receive_activity_name = null;
-            //接收地址
-            String receive_addr_detail = null;
-            //接收物流单号
-            String receive_w_number = null;
-
-            //查询已排单列表
-            Map<String, String> params_plan = new HashMap<String, String>();
-            params_plan.put("returnId", return_order_id);
-            List<Map<String, Object>> receiptPlans = plannerService.queryOrderReceiptPlanInfo(params_plan);
-            if (receiptPlans.size()!=0 && receiptPlans!=null) {
-                for (Map<String, Object> receiptPlan : receiptPlans) {
-                    receive_order_id = String.valueOf(receiptPlan.get("ORDER_ID"));
-                    receive_agent_id = String.valueOf(receiptPlan.get("AGENT_ID"));
-                    receive_addr_detail = String.valueOf(receiptPlan.get("ADDR_DETAIL"));
-                    receive_receipt_plan_id = String.valueOf(receiptPlan.get("PLAN_ID"));
-                }
-
-                //查询接收活动类型
-                Map<String, String> params_activity = new HashMap<String, String>();
-                params_activity.put("receiveOrderId", receive_order_id);
-                params_activity.put("receiveAgentId", receive_agent_id);
-                List<Map<String, Object>> subOrderActivitys = returnOrderMapper.queryReceiveOrderActivity(params_activity);
-                if (subOrderActivitys.size()!=0 && subOrderActivitys!=null) {
-                    for (Map<String, Object> subOrderActivity : subOrderActivitys) {
-                        receive_activity_name = String.valueOf(subOrderActivity.get("ACTIVITY_NAME"));
-                    }
-                }
-
-                //查询接收物流单号
-                Map<String, String> params_logistics = new HashMap<String, String>();
-                params_logistics.put("receiveOrderId", receive_order_id);
-                params_logistics.put("receiveReceiptPlanId", receive_receipt_plan_id);
-                List<Map<String, Object>> orderLogistics = receiptPlanMapper.queryReceiveOrderLogistics(params_logistics);
-                if (orderLogistics.size()!=0 && orderLogistics!=null) {
-                    for (Map<String, Object> orderLogistic : orderLogistics) {
-                        receive_w_number = String.valueOf(orderLogistic.get("W_NUMBER"));
-                    }
-                }
-            }
-
-            //查询接收代理商信息
-            Agent receive_agent = agentMapper.selectByPrimaryKey(receive_agent_id);
-            if (receive_agent != null) {
-                returnOrderVo.setReceiveOrderId(receive_order_id==null?"":receive_order_id);
-                returnOrderVo.setReceiveAgentId(receive_agent.getId()==null?"":receive_agent.getId());
-                returnOrderVo.setReceiveAgentName(receive_agent.getAgName()==null?"":receive_agent.getAgName());
-                returnOrderVo.setReceiveActivityName(receive_activity_name==null?"":receive_activity_name);
-                returnOrderVo.setAddrDetail(receive_addr_detail==null?"":receive_addr_detail);
-                returnOrderVo.setWnumber(receive_w_number==null?"":receive_w_number);
-//                returnOrderVo.setAgDocDistrict(departmentService.getById(receive_agent.getAgDocDistrict()).getName());
-//                returnOrderVo.setAgDocPro(departmentService.getById(receive_agent.getAgDocPro()).getName());
             }
         }
         log.info("导出退转发明细数据：", receiptOrderVoList);

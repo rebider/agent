@@ -512,27 +512,26 @@
   </select>
 
   <select id="exportRetForDetail" parameterType="map" resultMap="ReturnOrderVo">
-    (select
-      ro.id as return_order_id,
-      bus.bus_num,
-      aagent.ag_uniq_num,
-      aagent.ag_name,
-      oso.vender,
-      oso.pro_model,
-      odetail.return_count,
-      odetail.order_price as order_price,
-      oso.activity_name,
-      nvl(ro.cut_amo * (odetail.return_count * odetail.return_price / ro.goods_return_amo),0) as cut_amo
+    select
+    ro.id as return_order_id, bus.bus_num,
+    aagent.ag_uniq_num, aagent.ag_name,
+    oso.vender, oso.pro_model, odetail.return_count,
+    odetail.order_price as order_price, oso.activity_name,
+    nvl(ro.cut_amo * (odetail.return_count * odetail.return_price / ro.goods_return_amo),0) as cut_amo,
+    rp.plan_num, rp.order_id as receive_order_id, agents.ag_uniq_num as receive_agent_id, agents.ag_name as receive_agent_name,
+    oro.addr_detail, ol.w_number
     from o_return_order ro
     right join o_return_order_detail odetail on odetail.return_id = ro.id
-    left join o_sub_order os on os.pro_id = odetail.pro_id and os.order_id = odetail.order_id and os.status = 1
-    left join o_sub_order_activity oso on oso.sub_order_id = os.id and oso.status = 1
-    left join o_order oorder on oorder.id = odetail.order_id and oorder.status = 1
-    left join a_platform c on c.platform_num = oorder.order_platform and c.status = 1
-    left join o_payment d on d.order_id = odetail.order_id and d.status = 1
-    left join a_agent aagent on aagent.id = ro.agent_id and aagent.status = 1
+    left join o_sub_order os on os.pro_id = odetail.pro_id and os.order_id = odetail.order_id and os.status=1
+    left join o_sub_order_activity oso on oso.sub_order_id = os.id and oso.status=1
+    left join o_order oorder on oorder.id = odetail.order_id and oorder.status=1
+    left join a_agent aagent on aagent.id = ro.agent_id and aagent.status=1
     left join o_refund_agent refund on ro.id = refund.src_id and refund.refund_type = 'TKTH'
-    left join a_agent_businfo bus on bus.agent_id = oorder.agent_id and bus.id = oorder.bus_id and bus.status = 1
+    left join a_agent_businfo bus on bus.agent_id = oorder.agent_id and bus.id = oorder.bus_id and bus.status=1
+    left join o_receipt_plan rp on rp.return_order_detail_id = odetail.id and rp.status=1
+    left join o_logistics ol on rp.id = ol.receipt_plan_id and ol.status=1
+    left join o_receipt_order oro on rp.receipt_id = oro.id and oro.status=1 and rp.status=1
+    left join a_agent agents on agents.id = oro.agent_id and agents.status=1
     <where>
       1=1 and ro.status = 1 and odetail.status = 1
       <if test="agName !=null and agName !='' "> and aagent.ag_name like concat(concat('%', #{agName}),'%') </if>
@@ -548,7 +547,6 @@
       <if test="beginTime!=null and endTime!=''"> and (to_char(odetail.return_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
       <if test="orgId !=null and orgId !='' ">and (ag.ag_doc_pro = #{orgId} or ag.ag_doc_district = #{orgId}) </if>
     </where>
-    )
     order by ro.c_time desc
   </select>
 
