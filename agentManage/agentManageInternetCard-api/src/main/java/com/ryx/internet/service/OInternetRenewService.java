@@ -12,6 +12,7 @@ import com.ryx.internet.pojo.OInternetRenewDetail;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /***
  * @Author liudh
@@ -44,4 +45,6 @@ public interface OInternetRenewService {
     Integer queryInternetRenewDetailCount(OInternetRenewDetail internetRenewDetail,String agentId);
 
     void renewVerify(String iccidNumIds)throws MessageException;
+
+    Map<Object, Object> getInternetRenewWay(Long cUser);
 }

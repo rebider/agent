@@ -9,6 +9,7 @@ import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
@@ -17,6 +18,7 @@ import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.data.AttachmentService;
+import com.ryx.credit.service.dict.DepartmentService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OCashReceivablesService;
@@ -85,6 +87,9 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     private InternetRenewOffsetMapper internetRenewOffsetMapper;
     @Autowired
     private RedisService redisService;
+    @Autowired
+    private DepartmentService departmentService;
+
 
     public static Date stepMonth(Date sourceDate, int month) {
         Calendar c = Calendar.getInstance();
@@ -382,7 +387,8 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                     throw new MessageException("第"+i+"个缺少到期时间");
                 }
                 oInternetRenewDetail.setExpireTime(oInternetCard.getExpireTime());
-                if(internetRenew.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())){
+                if(internetRenew.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())
+                 || internetRenew.getRenewWay().equals(InternetRenewWay.GSCDGC.getValue())){
                     if(StringUtils.isBlank(oInternetCard.getMerId()) || StringUtils.isBlank(oInternetCard.getMerName())  ){
                         throw new MessageException("第"+i+"个商户信息不全,轧差商户方式必须包含商户信息");
                     }
@@ -559,8 +565,10 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 }
                 oInternetCard.setStop(Status.STATUS_0.status);
                 oInternetCard.setRenew(Status.STATUS_0.status);
+                oInternetCard.setLogout(Status.STATUS_0.status);
                 //生成轧差明细，同步清结算
-                if(oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())){
+                if(oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())
+                    || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.GSCDGC.getValue())){
                     InternetRenewOffset internetRenewOffset = new InternetRenewOffset();
                     internetRenewOffset.setFlowId(idService.genInternetOffset());
                     internetRenewOffset.setRenewId(oInternetRenew.getId());
@@ -642,5 +650,21 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }
     }
 
+    /**
+     * 根据当前用户判断续费类型
+     * @param cUser
+     * @return
+     */
+    @Override
+    public Map<Object, Object> getInternetRenewWay(Long cUser){
+        Map<Object, Object> contentMap;
+        List<COrganization> cOrganizations = departmentService.selectCityRegion(cUser);
+        if(cOrganizations.size()==0){
+            contentMap = InternetRenewWay.getContentMap();
+        }else{
+            contentMap = InternetRenewWay.getContentMapForAgent();
+        }
+        return contentMap;
+    }
 }
 
