@@ -47,4 +47,5 @@ public interface InternetCardService {
 
     void internetCardPostpone(OInternetCardPostpone internetCardPostpone, String cUser)throws MessageException;
 
+    PageInfo queryInternetCardPostponeList(OInternetCardPostpone internetCardPostpone,Page page);
 }

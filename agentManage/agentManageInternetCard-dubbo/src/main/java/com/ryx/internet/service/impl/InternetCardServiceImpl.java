@@ -6,9 +6,11 @@ import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.order.OLogisticsService;
 import com.ryx.internet.dao.*;
 import com.ryx.credit.service.agent.AgentService;
@@ -71,6 +73,9 @@ public class InternetCardServiceImpl implements InternetCardService {
     private OInternetRenewDetailMapper internetRenewDetailMapper;
     @Autowired
     private OInternetCardPostponeMapper internetCardPostponeMapper;
+    @Autowired
+    private IUserService iUserService;
+
 
 
     public static Date stepMonth(Date sourceDate, int month) {
@@ -981,4 +986,31 @@ public class InternetCardServiceImpl implements InternetCardService {
             throw new MessageException("处理延期月份失败");
         }
     }
+
+    /**
+     * 延期记录
+     * @param internetCardPostpone
+     * @return
+     */
+    @Override
+    public PageInfo queryInternetCardPostponeList(OInternetCardPostpone internetCardPostpone,Page page){
+        OInternetCardPostponeExample internetCardPostponeExample = new OInternetCardPostponeExample();
+        OInternetCardPostponeExample.Criteria criteria = internetCardPostponeExample.createCriteria();
+        internetCardPostponeExample.setPage(page);
+        internetCardPostponeExample.setOrderByClause(" c_time desc ");
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        if(StringUtils.isNotBlank(internetCardPostpone.getIccid())){
+            criteria.andIccidEqualTo(internetCardPostpone.getIccid());
+        }
+        List<OInternetCardPostpone> internetCardPostpones = internetCardPostponeMapper.selectByExample(internetCardPostponeExample);
+        for (OInternetCardPostpone cardPostpone : internetCardPostpones) {
+            CUser cUser = iUserService.selectById(cardPostpone.getcUser());
+            if(null!=cUser)cardPostpone.setcUser(cUser.getName());
+        }
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(internetCardPostpones);
+        pageInfo.setTotal((int)internetCardPostponeMapper.countByExample(internetCardPostponeExample));
+        return pageInfo;
+    }
+
 }
