@@ -565,7 +565,8 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             }
             if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
                 //如果线下补款,审批通过直接已付款,否则未续费
-                if(oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.XXBK.getValue()) || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue())){
+                if(oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.XXBK.getValue()) || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue())
+                    || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.GSCD.getValue()) || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.GSCDGC.getValue())){
                     oInternetRenewDetail.setRenewStatus(InternetRenewStatus.YXF.getValue());
                     oInternetCard.setRenewStatus(InternetRenewStatus.YXF.getValue());
                     //续费成功到期时间加一年
