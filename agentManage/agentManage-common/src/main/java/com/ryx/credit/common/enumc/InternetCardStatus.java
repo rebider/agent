@@ -15,7 +15,8 @@ public enum InternetCardStatus {
 
     NORMAL(new BigDecimal("1"),"正常"),
     NOACTIVATE(new BigDecimal("2"),"待激活"),
-    STOP(new BigDecimal("3"),"停用"),
+    STOP(new BigDecimal("3"),"停用"),  //停机可以启用
+    LOGOUT(new BigDecimal("4"),"注销"),  //注销不能在开机
     UNKNOWN(new BigDecimal("0"),"未知");
 
     public BigDecimal code;
@@ -25,21 +26,6 @@ public enum InternetCardStatus {
     InternetCardStatus(BigDecimal c, String m){
         this.code=c;
         this.msg =m;
-    }
-
-    /**
-     * 取得枚举对象值
-     * @return 枚举对象值
-     */
-    public BigDecimal getValue() {
-        return this.code;
-    }
-    /**
-     * 取得缓存内容
-     * @return 缓存内容
-     */
-    public String getContent() {
-        return this.msg;
     }
 
     /**
@@ -78,5 +64,21 @@ public enum InternetCardStatus {
 
     public static void main(String[] args){
         System.out.println(getContentByMsg("正常"));
+    }
+
+    /**
+     * 取得枚举对象值
+     * @return 枚举对象值
+     */
+    public BigDecimal getValue() {
+        return this.code;
+    }
+
+    /**
+     * 取得缓存内容
+     * @return 缓存内容
+     */
+    public String getContent() {
+        return this.msg;
     }
 }

@@ -30,6 +30,8 @@
     <result column="STOP" jdbcType="DECIMAL" property="stop" />
     <result column="RENEW_STATUS" jdbcType="VARCHAR" property="renewStatus" />
     <result column="STOP_REASON" jdbcType="VARCHAR" property="stopReason" />
+    <result column="LOGOUT" jdbcType="DECIMAL" property="logout" />
+    <result column="SUM_POSTPONE_TIME" jdbcType="DECIMAL" property="sumPostponeTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -64,7 +66,8 @@
     ICCID_NUM, CARD_IMPORT_ID, BATCH_NUM, SN_NUM, DELIVER_TIME, CONSIGNEE, ORDER_ID,
     AGENT_ID, AGENT_NAME, INTERNET_CARD_NUM, ISSUER, OPEN_ACCOUNT_TIME, EXPIRE_TIME,
     INTERNET_CARD_STATUS, MER_ID, LATELY_PAY_TIME, MER_NAME, MANUFACTURER, RENEW, C_TIME,
-    U_TIME, C_USER, U_USER, STATUS, VERSION, STOP, RENEW_STATUS, STOP_REASON
+    U_TIME, C_USER, U_USER, STATUS, VERSION, STOP, RENEW_STATUS, STOP_REASON, LOGOUT,
+    SUM_POSTPONE_TIME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.internet.pojo.OInternetCardExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -104,7 +107,8 @@
     RENEW, C_TIME, U_TIME,
     C_USER, U_USER, STATUS,
     VERSION, STOP, RENEW_STATUS,
-    STOP_REASON)
+    STOP_REASON, LOGOUT, SUM_POSTPONE_TIME
+    )
     values (#{iccidNum,jdbcType=VARCHAR}, #{cardImportId,jdbcType=VARCHAR}, #{batchNum,jdbcType=VARCHAR},
     #{snNum,jdbcType=VARCHAR}, #{deliverTime,jdbcType=TIMESTAMP}, #{consignee,jdbcType=VARCHAR},
     #{orderId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR},
@@ -114,7 +118,8 @@
     #{renew,jdbcType=DECIMAL}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP},
     #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
     #{version,jdbcType=DECIMAL}, #{stop,jdbcType=DECIMAL}, #{renewStatus,jdbcType=VARCHAR},
-    #{stopReason,jdbcType=VARCHAR})
+    #{stopReason,jdbcType=VARCHAR}, #{logout,jdbcType=DECIMAL}, #{sumPostponeTime,jdbcType=DECIMAL}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.internet.pojo.OInternetCard">
     insert into O_INTERNET_CARD
@@ -203,6 +208,12 @@
       <if test="stopReason != null">
         STOP_REASON,
       </if>
+      <if test="logout != null">
+        LOGOUT,
+      </if>
+      <if test="sumPostponeTime != null">
+        SUM_POSTPONE_TIME,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="iccidNum != null">
@@ -288,6 +299,12 @@
       </if>
       <if test="stopReason != null">
         #{stopReason,jdbcType=VARCHAR},
+      </if>
+      <if test="logout != null">
+        #{logout,jdbcType=DECIMAL},
+      </if>
+      <if test="sumPostponeTime != null">
+        #{sumPostponeTime,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -381,6 +398,12 @@
       <if test="stopReason != null">
         STOP_REASON = #{stopReason,jdbcType=VARCHAR},
       </if>
+      <if test="logout != null">
+        LOGOUT = #{logout,jdbcType=DECIMAL},
+      </if>
+      <if test="sumPostponeTime != null">
+        SUM_POSTPONE_TIME = #{sumPostponeTime,jdbcType=DECIMAL},
+      </if>
     </set>
     where ICCID_NUM = #{iccidNum,jdbcType=VARCHAR}
   </update>
@@ -412,7 +435,9 @@
     VERSION = #{version,jdbcType=DECIMAL},
     STOP = #{stop,jdbcType=DECIMAL},
     RENEW_STATUS = #{renewStatus,jdbcType=VARCHAR},
-    STOP_REASON = #{stopReason,jdbcType=VARCHAR}
+    STOP_REASON = #{stopReason,jdbcType=VARCHAR},
+    LOGOUT = #{logout,jdbcType=DECIMAL},
+    SUM_POSTPONE_TIME = #{sumPostponeTime,jdbcType=DECIMAL}
     where ICCID_NUM = #{iccidNum,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -459,7 +484,8 @@
     ICCID_NUM, CARD_IMPORT_ID, BATCH_NUM, SN_NUM, DELIVER_TIME, CONSIGNEE, ORDER_ID,
     AGENT_ID, AGENT_NAME, INTERNET_CARD_NUM, ISSUER, OPEN_ACCOUNT_TIME, EXPIRE_TIME,
     INTERNET_CARD_STATUS, MER_ID, LATELY_PAY_TIME, MER_NAME,d.D_ITEMNAME as MANUFACTURER, RENEW, C_TIME,
-    U_TIME, C_USER, U_USER, STATUS, VERSION ,STOP, RENEW_STATUS, STOP_REASON
+    U_TIME, C_USER, U_USER, STATUS, VERSION ,STOP, RENEW_STATUS, STOP_REASON,LOGOUT,
+    SUM_POSTPONE_TIME
   </sql>
   <select id="queryInternetCardList" parameterType="com.ryx.internet.pojo.OInternetCardExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -558,6 +584,12 @@
       </if>
       <if test="stopReason != null and stopReason != ''">
         STOP_REASON = #{stopReason,jdbcType=VARCHAR},
+      </if>
+      <if test="logout != null">
+        LOGOUT = #{logout,jdbcType=DECIMAL},
+      </if>
+      <if test="sumPostponeTime != null">
+        SUM_POSTPONE_TIME = #{sumPostponeTime,jdbcType=DECIMAL},
       </if>
     </set>
     where ICCID_NUM = #{iccidNum,jdbcType=VARCHAR}
