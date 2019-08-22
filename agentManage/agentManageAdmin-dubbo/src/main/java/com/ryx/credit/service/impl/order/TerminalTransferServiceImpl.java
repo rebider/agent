@@ -1008,8 +1008,18 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
 
         if (terminalTransferDetailListsMpos != null && terminalTransferDetailListsMpos.size() > 0) {
             String res = redisService.getValue("TerminalTransfer:ISOPEN_RES_trans");
-            if (StringUtils.isNotBlank(res) && "1".equals(res)) {
+
+            for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailListsMpos) {
+                String originalOrgId = terminalTransferDetail.getOriginalOrgId();
+                String goalOrgId = terminalTransferDetail.getGoalOrgId();
+                Map<String, Object> map1 = getAgentType(originalOrgId);
+                terminalTransferDetail.setPlatFrom(map1.get("BUS_PLATFORM").toString());
+            }
+
+/*
+            if (StringUtils.isNotBlank(res) && "1".equals(res)) {*/
                 try{
+
                   termMachineService.queryTerminalTransfer(terminalTransferDetailListsMpos, "hb");
                 }catch (Exception e){
                     log.info("调用开始划拨接口时报错参数为 {}",JSONObject.toJSON(terminalTransferDetailListsMpos));
@@ -1019,7 +1029,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     terminalTransferDetail.setuTime(Calendar.getInstance().getTime());
                     terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
                 }
-            } else {
+          /*  } else {
                 for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailListsPos) {
                     terminalTransferDetail.setAdjustTime(new Date());
                     terminalTransferDetail.setuTime(new Date());
@@ -1027,7 +1037,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     terminalTransferDetail.setRemark("开关未打开需线下调整");
                     terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
                 }
-            }
+            }*/
 
         }
         if (terminalTransferDetailListsRDBPOS != null && terminalTransferDetailListsRDBPOS.size() > 0) {
