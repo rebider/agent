@@ -1007,9 +1007,21 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         }
 
         if (terminalTransferDetailListsMpos != null && terminalTransferDetailListsMpos.size() > 0) {
+            String res = redisService.getValue("TerminalTransfer:ISOPEN_RES_trans");
+
+            for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailListsMpos) {
+                String originalOrgId = terminalTransferDetail.getOriginalOrgId();
+                String goalOrgId = terminalTransferDetail.getGoalOrgId();
+                Map<String, Object> map1 = getAgentType(originalOrgId);
+                terminalTransferDetail.setPlatFrom(map1.get("BUS_PLATFORM").toString());
+            }
+
+/*
+            if (StringUtils.isNotBlank(res) && "1".equals(res)) {*/
 //            String res = redisService.getValue("TerminalTransfer:ISOPEN_RES_trans");
 //            if (StringUtils.isNotBlank(res) && "1".equals(res)) {
                 try{
+
                   termMachineService.queryTerminalTransfer(terminalTransferDetailListsMpos, "hb");
                 }catch (Exception e){
                     log.info("调用开始划拨接口时报错参数为 {}",JSONObject.toJSON(terminalTransferDetailListsMpos));
@@ -1465,9 +1477,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         if (j == 0) {
             throw new MessageException("更新失败");
         }
-        Set<BigDecimal> platformTypeSet = new HashSet<>();
+      /*  Set<BigDecimal> platformTypeSet = new HashSet<>();*/
         for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailList) {
-            platformTypeSet.add(terminalTransferDetail.getPlatformType());
+          /*  platformTypeSet.add(terminalTransferDetail.getPlatformType());*/
             Map<String, String> resultMap = saveOrEditVerify(terminalTransferDetail, agentId);
             terminalTransferDetail.setId(idService.genId(TabId.O_TERMINAL_TRANSFER_DE));
             terminalTransferDetail.setTerminalTransferId(terminalTransfer.getId());
@@ -1482,13 +1494,14 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             terminalTransferDetail.setGoalBusId(resultMap.get("goalBusId"));
             terminalTransferDetail.setOriginalBusId(resultMap.get("originalBusId"));
             terminalTransferDetail.setBusId(terminalTransfer.getPlatformType());
+
 //                terminalTransferDetail.setProCom(resultMap.get("proCom"));
 //                terminalTransferDetail.setProModel(resultMap.get("proModel"));
             terminalTransferDetailMapper.insert(terminalTransferDetail);
         }
-        if (platformTypeSet.size() != 1) {
+      /*  if (platformTypeSet.size() != 1) {
             throw new MessageException("不能平台类型,请分开提交");
-        }
+        }*/
         return AgentResult.ok();
     }
 
