@@ -6,9 +6,11 @@ import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.order.OLogisticsService;
 import com.ryx.internet.dao.*;
 import com.ryx.credit.service.agent.AgentService;
@@ -70,7 +72,11 @@ public class InternetCardServiceImpl implements InternetCardService {
     @Autowired
     private OInternetRenewDetailMapper internetRenewDetailMapper;
     @Autowired
-    private InternetRenewOffsetMapper internetRenewOffsetMapper;
+    private OInternetCardPostponeMapper internetCardPostponeMapper;
+    @Autowired
+    private IUserService iUserService;
+
+
 
     public static Date stepMonth(Date sourceDate, int month) {
         Calendar c = Calendar.getInstance();
@@ -927,4 +933,91 @@ public class InternetCardServiceImpl implements InternetCardService {
             throw new MessageException("删除失败");
         }
     }
+
+
+    /**
+     * 延期
+     * @param internetCardPostpone
+     * @param cUser
+     * @throws MessageException
+     */
+    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
+    @Override
+    public void internetCardPostpone(OInternetCardPostpone internetCardPostpone,String cUser)throws MessageException{
+
+        if(internetCardPostpone.getPostponeTime()==null){
+            throw new MessageException("请填写延期月份");
+        }
+        if(internetCardPostpone.getIccid()==null){
+            throw new MessageException("请选择要延期的数据");
+        }
+        OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(internetCardPostpone.getIccid());
+        if(oInternetCard==null){
+            throw new MessageException("请选择要延期的数据");
+        }
+        internetCardPostpone.setId(idService.genId(TabId.O_INTERNET_CARD_POSTPONE));
+        internetCardPostpone.setAgentId(oInternetCard.getAgentId());
+        internetCardPostpone.setAgentName(oInternetCard.getAgentName());
+        internetCardPostpone.setMerId(oInternetCard.getMerId());
+        internetCardPostpone.setMerName(oInternetCard.getMerName());
+        internetCardPostpone.setOrderId(oInternetCard.getOrderId());
+        internetCardPostpone.setOpenAccountTime(oInternetCard.getOpenAccountTime());
+        internetCardPostpone.setExpireTime(oInternetCard.getExpireTime());
+        Date mondayLater = DateUtil.getMondayLater(oInternetCard.getExpireTime(), internetCardPostpone.getPostponeTime().intValue());
+        internetCardPostpone.setPostponeExpireTime(mondayLater);
+        internetCardPostpone.setcUser(cUser);
+        internetCardPostpone.setuUser(cUser);
+        Date date = new Date();
+        internetCardPostpone.setcTime(date);
+        internetCardPostpone.setuTime(date);
+        internetCardPostpone.setStatus(Status.STATUS_1.status);
+        internetCardPostpone.setVersion(BigDecimal.ONE);
+        internetCardPostponeMapper.insert(internetCardPostpone);
+
+        BigDecimal sumPostponeTime = oInternetCard.getSumPostponeTime();
+        if(sumPostponeTime==null){
+            oInternetCard.setSumPostponeTime(internetCardPostpone.getPostponeTime());
+        }else {
+            oInternetCard.setSumPostponeTime(internetCardPostpone.getPostponeTime().add(sumPostponeTime));
+        }
+        //如果是停用状态延期后设置正常
+        if(oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.STOP.getValue())==0){
+            oInternetCard.setInternetCardStatus(InternetCardStatus.NORMAL.getValue());
+        }
+        oInternetCard.setStop(Status.STATUS_0.status);
+        oInternetCard.setLogout(Status.STATUS_0.status);
+        oInternetCard.setRenew(Status.STATUS_0.status);
+        oInternetCard.setExpireTime(mondayLater);
+        int i = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
+        if(i!=1){
+            throw new MessageException("处理延期月份失败");
+        }
+    }
+
+    /**
+     * 延期记录
+     * @param internetCardPostpone
+     * @return
+     */
+    @Override
+    public PageInfo queryInternetCardPostponeList(OInternetCardPostpone internetCardPostpone,Page page){
+        OInternetCardPostponeExample internetCardPostponeExample = new OInternetCardPostponeExample();
+        OInternetCardPostponeExample.Criteria criteria = internetCardPostponeExample.createCriteria();
+        internetCardPostponeExample.setPage(page);
+        internetCardPostponeExample.setOrderByClause(" c_time desc ");
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        if(StringUtils.isNotBlank(internetCardPostpone.getIccid())){
+            criteria.andIccidEqualTo(internetCardPostpone.getIccid());
+        }
+        List<OInternetCardPostpone> internetCardPostpones = internetCardPostponeMapper.selectByExample(internetCardPostponeExample);
+        for (OInternetCardPostpone cardPostpone : internetCardPostpones) {
+            CUser cUser = iUserService.selectById(cardPostpone.getcUser());
+            if(null!=cUser)cardPostpone.setcUser(cUser.getName());
+        }
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(internetCardPostpones);
+        pageInfo.setTotal((int)internetCardPostponeMapper.countByExample(internetCardPostponeExample));
+        return pageInfo;
+    }
+
 }

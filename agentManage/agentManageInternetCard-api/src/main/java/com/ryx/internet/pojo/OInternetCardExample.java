@@ -24,20 +24,20 @@ public class OInternetCardExample {
         oredCriteria = new ArrayList<Criteria>();
     }
 
-    public void setOrderByClause(String orderByClause) {
-        this.orderByClause = orderByClause;
-    }
-
     public String getOrderByClause() {
         return orderByClause;
     }
 
-    public void setDistinct(boolean distinct) {
-        this.distinct = distinct;
+    public void setOrderByClause(String orderByClause) {
+        this.orderByClause = orderByClause;
     }
 
     public boolean isDistinct() {
         return distinct;
+    }
+
+    public void setDistinct(boolean distinct) {
+        this.distinct = distinct;
     }
 
     public List<Criteria> getOredCriteria() {
@@ -73,28 +73,28 @@ public class OInternetCardExample {
         distinct = false;
     }
 
-    public void setPage(Page page) {
-        this.page=page;
-    }
-
     public Page getPage() {
         return page;
     }
 
-    public void setLimitStart(Integer limitStart) {
-        this.limitStart=limitStart;
+    public void setPage(Page page) {
+        this.page=page;
     }
 
     public Integer getLimitStart() {
         return limitStart;
     }
 
-    public void setLimitEnd(Integer limitEnd) {
-        this.limitEnd=limitEnd;
+    public void setLimitStart(Integer limitStart) {
+        this.limitStart=limitStart;
     }
 
     public Integer getLimitEnd() {
         return limitEnd;
+    }
+
+    public void setLimitEnd(Integer limitEnd) {
+        this.limitEnd=limitEnd;
     }
 
     protected abstract static class GeneratedCriteria {
@@ -1997,6 +1997,126 @@ public class OInternetCardExample {
             addCriterion("STOP_REASON not between", value1, value2, "stopReason");
             return (Criteria) this;
         }
+
+        public Criteria andLogoutIsNull() {
+            addCriterion("LOGOUT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogoutIsNotNull() {
+            addCriterion("LOGOUT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogoutEqualTo(BigDecimal value) {
+            addCriterion("LOGOUT =", value, "logout");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogoutNotEqualTo(BigDecimal value) {
+            addCriterion("LOGOUT <>", value, "logout");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogoutGreaterThan(BigDecimal value) {
+            addCriterion("LOGOUT >", value, "logout");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogoutGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("LOGOUT >=", value, "logout");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogoutLessThan(BigDecimal value) {
+            addCriterion("LOGOUT <", value, "logout");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogoutLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("LOGOUT <=", value, "logout");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogoutIn(List<BigDecimal> values) {
+            addCriterion("LOGOUT in", values, "logout");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogoutNotIn(List<BigDecimal> values) {
+            addCriterion("LOGOUT not in", values, "logout");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogoutBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("LOGOUT between", value1, value2, "logout");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogoutNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("LOGOUT not between", value1, value2, "logout");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumPostponeTimeIsNull() {
+            addCriterion("SUM_POSTPONE_TIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumPostponeTimeIsNotNull() {
+            addCriterion("SUM_POSTPONE_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumPostponeTimeEqualTo(BigDecimal value) {
+            addCriterion("SUM_POSTPONE_TIME =", value, "sumPostponeTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumPostponeTimeNotEqualTo(BigDecimal value) {
+            addCriterion("SUM_POSTPONE_TIME <>", value, "sumPostponeTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumPostponeTimeGreaterThan(BigDecimal value) {
+            addCriterion("SUM_POSTPONE_TIME >", value, "sumPostponeTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumPostponeTimeGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("SUM_POSTPONE_TIME >=", value, "sumPostponeTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumPostponeTimeLessThan(BigDecimal value) {
+            addCriterion("SUM_POSTPONE_TIME <", value, "sumPostponeTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumPostponeTimeLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("SUM_POSTPONE_TIME <=", value, "sumPostponeTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumPostponeTimeIn(List<BigDecimal> values) {
+            addCriterion("SUM_POSTPONE_TIME in", values, "sumPostponeTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumPostponeTimeNotIn(List<BigDecimal> values) {
+            addCriterion("SUM_POSTPONE_TIME not in", values, "sumPostponeTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumPostponeTimeBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SUM_POSTPONE_TIME between", value1, value2, "sumPostponeTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumPostponeTimeNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SUM_POSTPONE_TIME not between", value1, value2, "sumPostponeTime");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
@@ -2022,38 +2142,6 @@ public class OInternetCardExample {
         private boolean listValue;
 
         private String typeHandler;
-
-        public String getCondition() {
-            return condition;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-
-        public Object getSecondValue() {
-            return secondValue;
-        }
-
-        public boolean isNoValue() {
-            return noValue;
-        }
-
-        public boolean isSingleValue() {
-            return singleValue;
-        }
-
-        public boolean isBetweenValue() {
-            return betweenValue;
-        }
-
-        public boolean isListValue() {
-            return listValue;
-        }
-
-        public String getTypeHandler() {
-            return typeHandler;
-        }
 
         protected Criterion(String condition) {
             super();
@@ -2089,6 +2177,38 @@ public class OInternetCardExample {
 
         protected Criterion(String condition, Object value, Object secondValue) {
             this(condition, value, secondValue, null);
+        }
+
+        public String getCondition() {
+            return condition;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public Object getSecondValue() {
+            return secondValue;
+        }
+
+        public boolean isNoValue() {
+            return noValue;
+        }
+
+        public boolean isSingleValue() {
+            return singleValue;
+        }
+
+        public boolean isBetweenValue() {
+            return betweenValue;
+        }
+
+        public boolean isListValue() {
+            return listValue;
+        }
+
+        public String getTypeHandler() {
+            return typeHandler;
         }
     }
 }

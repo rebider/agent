@@ -473,7 +473,7 @@ public class DateUtil {
     }
 
     /**
-     * 获取一年以后
+     * 获取一年以后减一天
      * @param d
      * @return
      */
@@ -481,6 +481,20 @@ public class DateUtil {
         Calendar now = Calendar.getInstance();
         now.setTime(d);
         now.set(Calendar.YEAR, now.get(Calendar.YEAR)+1);//+后 -前
+        now.set(Calendar.DATE, now.get(Calendar.DATE)-1);
+        return now.getTime();
+    }
+
+    /**
+     * 获取几个月后，减一天
+     * @param d
+     * @return
+     */
+    public static Date getMondayLater(Date d, int monday) {
+        Calendar now = Calendar.getInstance();
+        now.setTime(d);
+        now.set(Calendar.MONDAY, now.get(Calendar.MONDAY)+monday);
+        now.set(Calendar.DATE, now.get(Calendar.DATE)-1);
         return now.getTime();
     }
 
