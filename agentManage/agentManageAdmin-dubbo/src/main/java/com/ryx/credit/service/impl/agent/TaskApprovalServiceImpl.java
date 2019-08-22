@@ -260,7 +260,7 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                     for (AgentBusInfoVo agentBusInfoVo : agentVo.getTerminalsLowerList()) {
                         AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
                         PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
-                        if (PlatformType.RDBPOS.code.equals(platForm.getPlatformType())) {
+                        if (PlatformType.RDBPOS.code.equals(platForm.getPlatformType()) || PlatformType.RHPOS.code.equals(platForm.getPlatformType())) {
                             if (StringUtils.isBlank(agentBusInfoVo.getTerminalsLower())) {
                                 throw new ProcessException("请填写终端数量下限");
                             }
