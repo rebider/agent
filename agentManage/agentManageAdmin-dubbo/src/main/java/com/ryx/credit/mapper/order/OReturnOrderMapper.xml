@@ -519,7 +519,7 @@
     odetail.order_price as order_price, oso.activity_name,
     nvl(ro.cut_amo * (odetail.return_count * odetail.return_price / ro.goods_return_amo),0) as cut_amo,
     rp.plan_num, rp.order_id as receive_order_id, agents.ag_uniq_num as receive_agent_id, agents.ag_name as receive_agent_name,
-    oro.addr_detail, ol.w_number,
+    province.r_name as addr_province, city.r_name as addr_city, district.r_name as addr_district, oro.addr_detail, ol.w_number,
     (select ag_doc_district from a_agent_businfo businfo
     left join o_order orders on rp.order_id = orders.id and orders.status=1
     where businfo.agent_id = orders.agent_id and businfo.id = orders.bus_id and businfo.status = 1)
@@ -540,6 +540,9 @@
     left join o_logistics ol on rp.id = ol.receipt_plan_id and ol.status=1
     left join o_receipt_order oro on rp.receipt_id = oro.id and oro.status=1 and rp.status=1
     left join a_agent agents on agents.id = oro.agent_id and agents.status=1
+    left join d_region province on oro.addr_province = province.r_code
+    left join d_region city on oro.addr_city = city.r_code
+    left join d_region district on oro.addr_district = district.r_code
     <where>
       1=1 and ro.status = 1 and odetail.status = 1
       <if test="agName !=null and agName !='' "> and aagent.ag_name like concat(concat('%', #{agName}),'%') </if>
@@ -573,6 +576,9 @@
     <result column="receive_agent_name" property="receiveAgentName" jdbcType="VARCHAR"/>
     <result column="receive_activity_name" property="receiveActivityName" jdbcType="VARCHAR"/>
     <result column="cut_amo" property="cutAmo" jdbcType="DECIMAL"/>
+    <result column="addr_province" property="addrProvince" jdbcType="VARCHAR"/>
+    <result column="addr_city" property="addrCity" jdbcType="VARCHAR"/>
+    <result column="addr_district" property="addrDistrict" jdbcType="VARCHAR"/>
     <result column="addr_detail" property="addrDetail" jdbcType="VARCHAR"/>
     <result column="w_number" property="wnumber" jdbcType="VARCHAR"/>
     <result column="ag_doc_district" property="agDocDistrict" jdbcType="VARCHAR"/>
