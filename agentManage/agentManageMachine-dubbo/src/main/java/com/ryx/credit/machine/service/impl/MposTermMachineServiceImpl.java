@@ -224,8 +224,8 @@ public class MposTermMachineServiceImpl implements TermMachineService {
             map.put("endTerm",terminalTransferDetail.getSnEndNum());
             map.put("oldAgencyId",terminalTransferDetail.getOriginalOrgId());
             map.put("newAgencyId",terminalTransferDetail.getGoalOrgId());
-            map.put("num",terminalTransferDetail.getComSnNum().stripTrailingZeros().toString());
-            map.put("limitNum",terminalTransferDetail.getSnCount().stripTrailingZeros().toString());
+            map.put("num", String.valueOf(terminalTransferDetail.getComSnNum().intValue()));
+            map.put("limitNum", String.valueOf(terminalTransferDetail.getSnCount().intValue()));
             map.put("batchId",terminalTransferDetail.getId());
             mapList.add(map);
         }
