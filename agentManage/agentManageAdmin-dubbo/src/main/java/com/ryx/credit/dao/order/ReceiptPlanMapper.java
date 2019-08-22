@@ -31,4 +31,6 @@ public interface ReceiptPlanMapper {
     List<Map<String,Object>> queryOrderReceiptPlanInfo(@Param("params") Map<String,String> params);
 
     List<Map<String, Object>> queryReceiveOrderLogistics(@Param("params") Map<String, String> params);
+
+    List<Map<String,Object>> queryReveiveAgentData(Map <String, Object> param);
 }
