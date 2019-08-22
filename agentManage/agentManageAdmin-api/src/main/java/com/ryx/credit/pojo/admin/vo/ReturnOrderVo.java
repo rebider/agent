@@ -37,6 +37,12 @@ public class ReturnOrderVo implements Serializable {
 
     private BigDecimal cutAmo;
 
+    private String addrProvince;
+
+    private String addrCity;
+
+    private String addrDistrict;
+
     private String addrDetail;
 
     private String wnumber;
@@ -155,6 +161,30 @@ public class ReturnOrderVo implements Serializable {
 
     public void setCutAmo(BigDecimal cutAmo) {
         this.cutAmo = cutAmo;
+    }
+
+    public String getAddrProvince() {
+        return addrProvince;
+    }
+
+    public void setAddrProvince(String addrProvince) {
+        this.addrProvince = addrProvince;
+    }
+
+    public String getAddrCity() {
+        return addrCity;
+    }
+
+    public void setAddrCity(String addrCity) {
+        this.addrCity = addrCity;
+    }
+
+    public String getAddrDistrict() {
+        return addrDistrict;
+    }
+
+    public void setAddrDistrict(String addrDistrict) {
+        this.addrDistrict = addrDistrict;
     }
 
     public String getAddrDetail() {
