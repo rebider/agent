@@ -526,8 +526,7 @@
 
   <select id="queryTerminalTransferDetail" resultMap="BaseResultMap">
    select bb.*  from O_TERMINAL_TRANSFER aa  left join
-  O_TERMINAL_TRANSFER_DETAIL bb on aa.ID = bb.TERMINAL_TRANSFER_ID where bb.PLATFORM_TYPE ='1'
-  and bb.ADJUST_STATUS='1'and aa.REVIEW_STATUS='3'and aa.STATUS='1'and bb.STATUS='1'
+  O_TERMINAL_TRANSFER_DETAIL bb on aa.ID = bb.TERMINAL_TRANSFER_ID where bb.ADJUST_STATUS='1'and aa.REVIEW_STATUS='3'and aa.STATUS='1'and bb.STATUS='1'
 </select>
 
 
