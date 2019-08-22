@@ -518,7 +518,7 @@
     oso.vender, oso.pro_model, odetail.return_count,
     odetail.order_price as order_price, oso.activity_name,
     nvl(ro.cut_amo * (odetail.return_count * odetail.return_price / ro.goods_return_amo),0) as cut_amo,
-    rp.plan_num, rp.order_id as receive_order_id, agents.ag_uniq_num as receive_agent_id, agents.ag_name as receive_agent_name,
+    rp.plan_num, rp.plan_pro_num as receive_send_num, rp.order_id as receive_order_id, agents.ag_uniq_num as receive_agent_id, agents.ag_name as receive_agent_name,
     province.r_name as addr_province, city.r_name as addr_city, district.r_name as addr_district, oro.addr_detail, ol.w_number,
     (select ag_doc_district from a_agent_businfo businfo
     left join o_order orders on rp.order_id = orders.id and orders.status=1
@@ -571,6 +571,7 @@
     <result column="return_count" property="returnCount" jdbcType="DECIMAL"/>
     <result column="order_price" property="orderPrice" jdbcType="DECIMAL"/>
     <result column="activity_name" property="activityName" jdbcType="VARCHAR"/>
+    <result column="receive_send_num" property="receiveSendNum" jdbcType="DECIMAL"/>
     <result column="receive_order_id" property="receiveOrderId" jdbcType="VARCHAR"/>
     <result column="receive_agent_id" property="receiveAgentId" jdbcType="VARCHAR"/>
     <result column="receive_agent_name" property="receiveAgentName" jdbcType="VARCHAR"/>
