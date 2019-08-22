@@ -519,7 +519,15 @@
     odetail.order_price as order_price, oso.activity_name,
     nvl(ro.cut_amo * (odetail.return_count * odetail.return_price / ro.goods_return_amo),0) as cut_amo,
     rp.plan_num, rp.order_id as receive_order_id, agents.ag_uniq_num as receive_agent_id, agents.ag_name as receive_agent_name,
-    oro.addr_detail, ol.w_number
+    oro.addr_detail, ol.w_number,
+    (select ag_doc_district from a_agent_businfo businfo
+    left join o_order orders on rp.order_id = orders.id and orders.status=1
+    where businfo.agent_id = orders.agent_id and businfo.id = orders.bus_id and businfo.status = 1)
+    as ag_doc_district,
+    (select ag_doc_pro from a_agent_businfo businfo
+    left join o_order orders on rp.order_id = orders.id and orders.status=1
+    where businfo.agent_id = orders.agent_id and businfo.id = orders.bus_id and businfo.status = 1)
+    as ag_doc_pro
     from o_return_order ro
     right join o_return_order_detail odetail on odetail.return_id = ro.id
     left join o_sub_order os on os.pro_id = odetail.pro_id and os.order_id = odetail.order_id and os.status=1

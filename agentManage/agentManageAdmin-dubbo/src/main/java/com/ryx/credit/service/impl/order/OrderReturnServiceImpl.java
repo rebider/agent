@@ -2418,6 +2418,29 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             if (dict != null) {
                 returnOrderVo.setVender(dict.getdItemname());
             }
+            String return_order_id = returnOrderVo.getReturnOrderId();//退货单编号
+            String receive_ag_doc_district = returnOrderVo.getAgDocDistrict();//接收方所属大区
+            String receive_ag_doc_pro = returnOrderVo.getAgDocPro();//接收方所属省区
+            if(receive_ag_doc_district==null || receive_ag_doc_district=="" || receive_ag_doc_district=="null"){
+                returnOrderVo.setAgDocDistrict(receive_ag_doc_district==null?"":receive_ag_doc_district);
+            }else{
+                returnOrderVo.setAgDocDistrict(departmentService.getById(receive_ag_doc_district).getName()==null?"":departmentService.getById(receive_ag_doc_district).getName());
+            }
+            if(receive_ag_doc_pro==null || receive_ag_doc_pro=="" || receive_ag_doc_pro=="null"){
+                returnOrderVo.setAgDocPro(receive_ag_doc_pro==null?"":receive_ag_doc_pro);
+            }else{
+                returnOrderVo.setAgDocPro(departmentService.getById(receive_ag_doc_pro).getName()==null?"":departmentService.getById(receive_ag_doc_pro).getName());
+            }
+
+            Map<String, Object> params_plan = new HashMap<String, Object>();
+            params_plan.put("returnId", return_order_id);
+            List<Map<String, Object>> receiptPlans = receiptPlanMapper.queryReveiveAgentData(params_plan);
+            if (receiptPlans.size()!=0 && receiptPlans!=null) {
+                for (Map<String, Object> receiptPlan : receiptPlans) {
+                    String receive_activity_name = String.valueOf(receiptPlan.get("ACTIVITY_NAME"));//接收方活动类型
+                    returnOrderVo.setReceiveActivityName(receive_activity_name==null?"":receive_activity_name);
+                }
+            }
         }
         log.info("导出退转发明细数据：", receiptOrderVoList);
         return receiptOrderVoList;
