@@ -123,6 +123,9 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     public void saveAndApply(Map<String, String> map1, JSONObject map2) throws MessageException {
         //将数据传送至业务平台
         String result = HttpClientUtil.doPostJson(TEMPLATE_APPLY, map2.toJSONString());
+        if(result == ""){
+            throw new MessageException("传送至业务平台数据失败！");
+        }
         Map<String,Object> resultMap = JSONObject.parseObject(result);
         if(!(boolean)resultMap.get("result")){
             throw new MessageException(resultMap.get("msg").toString());
