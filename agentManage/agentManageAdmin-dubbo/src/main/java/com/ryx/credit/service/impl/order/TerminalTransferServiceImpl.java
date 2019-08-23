@@ -1170,31 +1170,41 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 }
 
                 try {
-                    JSONObject jsonObject = JSONObject.parseObject(agentResult.getData().toString());
-                    List<Map<String, Object>> result = (List<Map<String, Object>>) jsonObject.get("result");
-                    if (result == null || result.size() == 0) {
-                        continue;
-                    }
-                    for (Map map : result) {
-                        if ("code6".equals(map.get("code").toString())) {
-                            log.info("划拨成功请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
-                            log.info("划拨成功请求结果：{}", JSONObject.toJSON(agentResult));
-                            terminalTransferDetail.setAdjustStatus(AdjustStatus.YTZ.getValue());
-                            terminalTransferDetail.setAdjustTime(new Date());
-                            terminalTransferDetail.setuTime(new Date());
-                            terminalTransferDetail.setRemark(map.get("message").toString());
-                            terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
-                        } else {
-                            log.info("划拨失败请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
-                            log.info("划拨失败请求结果：{}", JSONObject.toJSON(agentResult));
-                            terminalTransferDetail.setRemark(map.get("message").toString());
-                            terminalTransferDetail.setAdjustTime(new Date());
-                            terminalTransferDetail.setuTime(new Date());
-                            terminalTransferDetail.setAdjustStatus(AdjustStatus.TZSB.getValue());
-                            terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
+                    if(agentResult.isOK()) {
+                        JSONObject jsonObject = JSONObject.parseObject(agentResult.getData().toString());
+                        List<Map<String, Object>> result = (List<Map<String, Object>>) jsonObject.get("result");
+                        if (result == null || result.size() == 0) {
+                            continue;
                         }
-                    }
+                        for (Map map : result) {
+                            if ("code6".equals(map.get("code").toString())) {
+                                log.info("划拨成功请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
+                                log.info("划拨成功请求结果：{}", JSONObject.toJSON(agentResult));
+                                terminalTransferDetail.setAdjustStatus(AdjustStatus.YTZ.getValue());
+                                terminalTransferDetail.setAdjustTime(new Date());
+                                terminalTransferDetail.setuTime(new Date());
+                                terminalTransferDetail.setRemark(map.get("message").toString());
+                                terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
+                            } else {
+                                log.info("划拨失败请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
+                                log.info("划拨失败请求结果：{}", JSONObject.toJSON(agentResult));
+                                terminalTransferDetail.setRemark(map.get("message").toString());
+                                terminalTransferDetail.setAdjustTime(new Date());
+                                terminalTransferDetail.setuTime(new Date());
+                                terminalTransferDetail.setAdjustStatus(AdjustStatus.TZSB.getValue());
+                                terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
+                            }
+                        }
 
+                    }else{
+                        log.info("手刷划拨未联动请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
+                        log.info("手刷划拨未联动返回参数：{}", JSONObject.toJSON(agentResult));
+                        terminalTransferDetail.setRemark("未联动手刷查询接口");
+                        terminalTransferDetail.setAdjustTime(new Date());
+                        terminalTransferDetail.setuTime(new Date());
+                        terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());
+                        terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
+                    }
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1216,7 +1226,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 terminalTransferDetail.setRemark("划拨超时失败");
                 terminalTransferDetail.setAdjustTime(new Date());
                 terminalTransferDetail.setuTime(new Date());
-                terminalTransferDetail.setAdjustStatus(new BigDecimal(4));
+                terminalTransferDetail.setAdjustStatus(AdjustStatus.WCDJG.getValue());
                 terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
             }
         }
