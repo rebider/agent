@@ -27,6 +27,8 @@ public class ReturnOrderVo implements Serializable {
 
     private String activityName;
 
+    private BigDecimal receiveSendNum;
+
     private String receiveOrderId;
 
     private String receiveAgentId;
@@ -121,6 +123,14 @@ public class ReturnOrderVo implements Serializable {
 
     public void setActivityName(String activityName) {
         this.activityName = activityName;
+    }
+
+    public BigDecimal getReceiveSendNum() {
+        return receiveSendNum;
+    }
+
+    public void setReceiveSendNum(BigDecimal receiveSendNum) {
+        this.receiveSendNum = receiveSendNum;
     }
 
     public String getReceiveOrderId() {
