@@ -1201,7 +1201,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     }else{
                         log.info("手刷划拨未联动请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
                         log.info("手刷划拨未联动返回参数：{}", JSONObject.toJSON(agentResult));
-                        terminalTransferDetail.setRemark("未联动手刷查询接口");
+                        terminalTransferDetail.setRemark(agentResult.getMsg());
                         terminalTransferDetail.setAdjustTime(new Date());
                         terminalTransferDetail.setuTime(new Date());
                         terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());
