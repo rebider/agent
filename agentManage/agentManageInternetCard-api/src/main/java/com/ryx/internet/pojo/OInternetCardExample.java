@@ -1998,66 +1998,6 @@ public class OInternetCardExample {
             return (Criteria) this;
         }
 
-        public Criteria andLogoutIsNull() {
-            addCriterion("LOGOUT is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andLogoutIsNotNull() {
-            addCriterion("LOGOUT is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andLogoutEqualTo(BigDecimal value) {
-            addCriterion("LOGOUT =", value, "logout");
-            return (Criteria) this;
-        }
-
-        public Criteria andLogoutNotEqualTo(BigDecimal value) {
-            addCriterion("LOGOUT <>", value, "logout");
-            return (Criteria) this;
-        }
-
-        public Criteria andLogoutGreaterThan(BigDecimal value) {
-            addCriterion("LOGOUT >", value, "logout");
-            return (Criteria) this;
-        }
-
-        public Criteria andLogoutGreaterThanOrEqualTo(BigDecimal value) {
-            addCriterion("LOGOUT >=", value, "logout");
-            return (Criteria) this;
-        }
-
-        public Criteria andLogoutLessThan(BigDecimal value) {
-            addCriterion("LOGOUT <", value, "logout");
-            return (Criteria) this;
-        }
-
-        public Criteria andLogoutLessThanOrEqualTo(BigDecimal value) {
-            addCriterion("LOGOUT <=", value, "logout");
-            return (Criteria) this;
-        }
-
-        public Criteria andLogoutIn(List<BigDecimal> values) {
-            addCriterion("LOGOUT in", values, "logout");
-            return (Criteria) this;
-        }
-
-        public Criteria andLogoutNotIn(List<BigDecimal> values) {
-            addCriterion("LOGOUT not in", values, "logout");
-            return (Criteria) this;
-        }
-
-        public Criteria andLogoutBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("LOGOUT between", value1, value2, "logout");
-            return (Criteria) this;
-        }
-
-        public Criteria andLogoutNotBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("LOGOUT not between", value1, value2, "logout");
-            return (Criteria) this;
-        }
-
         public Criteria andSumPostponeTimeIsNull() {
             addCriterion("SUM_POSTPONE_TIME is null");
             return (Criteria) this;
