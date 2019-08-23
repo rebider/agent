@@ -702,7 +702,11 @@ public class InternetCardServiceImpl implements InternetCardService {
             Map<String,Object> reqMap = new HashMap<>();
             reqMap.put("renew",Status.STATUS_0.status);//否
             reqMap.put("newRenew",Status.STATUS_1.status);
-            reqMap.put("expireTime",DateUtil.getPerFirstDayOfMonth());
+            List<String> expireTimeList = new ArrayList<>();
+            expireTimeList.add( DateUtil.getPerDayOfMonth(1));
+            expireTimeList.add( DateUtil.getPerDayOfMonth(2));
+            expireTimeList.add( DateUtil.getPerDayOfMonth(3));
+            reqMap.put("expireTimeList",expireTimeList);
             //待激活和正常
             reqMap.put("cardStaus1",InternetCardStatus.NORMAL.getValue());
             reqMap.put("cardStaus2",InternetCardStatus.NOACTIVATE.getValue());
@@ -770,7 +774,12 @@ public class InternetCardServiceImpl implements InternetCardService {
             reqMap.put("renew",Status.STATUS_0.status);//否
             reqMap.put("newRenew",Status.STATUS_1.status);//是续费
 //            reqMap.put("internetCardStatus",InternetCardStatus.NORMAL.getValue());
-            reqMap.put("expireTime",DateUtil.getPerFirstDayOfMonth());
+
+            List<String> expireTimeList = new ArrayList<>();
+            expireTimeList.add( DateUtil.getPerDayOfMonth(1));
+            expireTimeList.add( DateUtil.getPerDayOfMonth(2));
+            expireTimeList.add( DateUtil.getPerDayOfMonth(3));
+            reqMap.put("expireTimeList",expireTimeList);
             List<OInternetCard> oInternetCards = internetCardMapper.selectInternetCardRenew(reqMap);
             for (OInternetCard oInternetCard : oInternetCards) {
                 OInternetCardMerch oInternetCardMerch = internetCardMerchMapper.selectChnTermposi(BigDataEncode.encode(oInternetCard.getIccidNum()));
