@@ -880,27 +880,41 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     }
     @Transactional(propagation= Propagation.REQUIRES_NEW)
     public void  updateIsNoPay(List<TerminalTransferDetail> terminalTransferDetails,List<String> detailIds) throws MessageException {
-
-        for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetails) {
-            if(terminalTransferDetail.getPlatformType().compareTo(new BigDecimal(1))==0){
-            for (String str :detailIds) {
-                    if(terminalTransferDetail.getId().equals(str)){
-                        terminalTransferDetail.setIsNoPay("1");
-                        break;
-                    }else{
-                        terminalTransferDetail.setIsNoPay("0");
+        if(detailIds==null||detailIds.size()==0){
+            for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetails) {
+                if(terminalTransferDetail.getPlatformType().compareTo(new BigDecimal(1))==0){
+                    terminalTransferDetail.setIsNoPay("0");
+                    int i = terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
+                    if (i != 1) {
+                        throw new MessageException("更新是否支付失败");
                     }
+                }
 
-                }
-                int i = terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
-                if (i != 1) {
-                    throw new MessageException("更新是否支付失败");
-                }
-            }else{
-                continue;
             }
+        }else{
+            for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetails) {
+                if(terminalTransferDetail.getPlatformType().compareTo(new BigDecimal(1))==0){
+                    for (String str :detailIds) {
+                        if(terminalTransferDetail.getId().equals(str)){
+                            terminalTransferDetail.setIsNoPay("1");
+                            break;
+                        }else{
+                            terminalTransferDetail.setIsNoPay("0");
+                        }
 
+                    }
+                    int i = terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
+                    if (i != 1) {
+                        throw new MessageException("更新是否支付失败");
+                    }
+                }else{
+                    continue;
+                }
+
+            }
         }
+
+
 
     }
 
