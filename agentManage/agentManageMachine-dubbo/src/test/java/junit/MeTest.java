@@ -26,15 +26,15 @@ public class MeTest extends BaseSpringTest {
     @Resource(name = "termMachineService")
     private TermMachineService termMachineService;
 
-    @Test
-    public void testqueryTermMachine(){
-        try {
-            List<TermMachineVo> list =  termMachineService.queryTermMachine(PlatformType.MPOS);
-            logger.debug(JSONArray.toJSONString(list));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    @Test
+//    public void testqueryTermMachine(){
+//        try {
+//            List<TermMachineVo> list =  termMachineService.queryTermMachine(PlatformType.MPOS);
+//            logger.debug(JSONArray.toJSONString(list));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     @Test
     public void testqueryMposTermBatch(){
