@@ -989,7 +989,6 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
 
 
 //代理商拒绝更新明细
-    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRES_NEW)
     public void RefuseTransfer(TerminalTransfer terminalTransfer) throws Exception {
         TerminalTransferDetailExample terminalTransferDetailExample = new TerminalTransferDetailExample();
         TerminalTransferDetailExample.Criteria criteria = terminalTransferDetailExample.createCriteria();
