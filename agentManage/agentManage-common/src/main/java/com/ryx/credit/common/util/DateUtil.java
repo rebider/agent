@@ -443,13 +443,13 @@ public class DateUtil {
      * 获取下个月
      * @return
      */
-    public static String getPerFirstDayOfMonth() {
+    public static String getPerDayOfMonth(int i) {
         SimpleDateFormat dft = new SimpleDateFormat("yyyy-MM");
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MONTH, 1);
-        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMinimum(Calendar.DAY_OF_MONTH));
+        calendar.add(Calendar.MONTH, i);
         return dft.format(calendar.getTime());
     }
+
 
     /**
      * 得到几天后的时间
