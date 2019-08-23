@@ -1,5 +1,6 @@
 package com.ryx.credit.service.order;
 
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -48,5 +49,7 @@ public interface TerminalTransferService {
     void  queryTerminalTransferResult() throws Exception;
     PageInfo terminalTransferDetailListExport(AgentVoTerminalTransferDetail terminalTransferDetail);
 
-    public Map<String, Object> disposeSN(String snBeginNum, String snEndNum);
+     Map<String, Object> disposeSN(String snBeginNum, String snEndNum);
+
+     void  updateIsNoPay(List<TerminalTransferDetail> terminalTransferDetails,List<String> detailIds) throws MessageException;
 }

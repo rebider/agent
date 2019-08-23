@@ -93,6 +93,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     private BusinessPlatformService businessPlatformService;
     @Autowired
     private TermMachineService termMachineService;
+    @Autowired
+    private TerminalTransferService terminalTransferService;
 
     private String QUERY_SWITCH = "TerminalTransfer:ISOPEN_RES_QUERY";
     private String TRANS_SWITCH = "TerminalTransfer:ISOPEN_RES_trans";
@@ -856,6 +858,10 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     }
 
                 }
+                List<String> detailIds = agentVo.getTerminalTransferDetailID();
+                //更新是否支付，为不影响审批流运行单独开启一个事务
+                terminalTransferService.updateIsNoPay(terminalTransferDetails,detailIds);
+
                 /*   }*/
             }
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo, userId);
@@ -872,7 +878,31 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         }
         return AgentResult.ok();
     }
+    @Transactional(propagation= Propagation.REQUIRES_NEW)
+    public void  updateIsNoPay(List<TerminalTransferDetail> terminalTransferDetails,List<String> detailIds) throws MessageException {
 
+        for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetails) {
+            if(terminalTransferDetail.getPlatformType().compareTo(new BigDecimal(1))==0){
+            for (String str :detailIds) {
+                    if(terminalTransferDetail.getId().equals(str)){
+                        terminalTransferDetail.setIsNoPay("1");
+                        break;
+                    }else{
+                        terminalTransferDetail.setIsNoPay("0");
+                    }
+
+                }
+                int i = terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
+                if (i != 1) {
+                    throw new MessageException("更新是否支付失败");
+                }
+            }else{
+                continue;
+            }
+
+        }
+
+    }
 
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
@@ -984,8 +1014,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         }
 
         if (terminalTransferDetailListsPos != null && terminalTransferDetailListsPos.size() > 0) {
-            String res = redisService.getValue("TerminalTransfer:ISOPEN_RES_trans");
-            if (StringUtils.isNotBlank(res) && "1".equals(res)) {
+        /*    String res = redisService.getValue("TerminalTransfer:ISOPEN_RES_trans");
+            if (StringUtils.isNotBlank(res) && "1".equals(res)) {*/
                 try{
                     termMachineService.queryTerminalTransfer(terminalTransferDetailListsPos, "adjust");
                 }catch (Exception e){
@@ -995,7 +1025,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     terminalTransferDetail.setuTime(Calendar.getInstance().getTime());
                     terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
                 }
-            } else {
+           /* } else {
                 for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailListsPos) {
                     terminalTransferDetail.setAdjustTime(new Date());
                     terminalTransferDetail.setuTime(new Date());
@@ -1003,7 +1033,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     terminalTransferDetail.setRemark("需线下调整");
                     terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
                 }
-            }
+            }*/
         }
 
         if (terminalTransferDetailListsMpos != null && terminalTransferDetailListsMpos.size() > 0) {
