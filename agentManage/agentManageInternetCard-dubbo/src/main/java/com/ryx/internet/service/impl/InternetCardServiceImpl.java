@@ -164,7 +164,19 @@ public class InternetCardServiceImpl implements InternetCardService {
             criteria.andBatchNumEqualTo(internetCard.getBatchNum());
         }
         if(StringUtils.isNotBlank(internetCard.getIccidNum())){
-            criteria.andIccidNumEqualTo(internetCard.getIccidNum());
+            boolean contains = internetCard.getIccidNum().contains(",");
+            if(contains){
+                String[] iccidNumStr = internetCard.getIccidNum().split(",");
+                List<String> iccidNumList = new ArrayList<>();
+                for (String iccidNum : iccidNumStr) {
+                    iccidNumList.add(iccidNum);
+                }
+                criteria.andIccidNumIn(iccidNumList);
+            }else{
+                criteria.andIccidNumLike(internetCard.getIccidNum()+"%");
+            }
+        }else if(StringUtils.isNotBlank(internetCard.getIccidNumBegin()) && StringUtils.isNotBlank(internetCard.getIccidNumEnd())){
+            criteria.andIccidNumBetween(internetCard.getIccidNumBegin(),internetCard.getIccidNumEnd());
         }
         if(StringUtils.isNotBlank(internetCard.getSnNum())){
             criteria.andSnNumEqualTo(internetCard.getSnNum());
@@ -192,6 +204,9 @@ public class InternetCardServiceImpl implements InternetCardService {
         }
         if(StringUtils.isNotBlank(internetCard.getRenewStatus())){
             criteria.andRenewStatusEqualTo(internetCard.getRenewStatus());
+        }
+        if(StringUtils.isNotBlank(internetCard.getInternetCardNum())){
+            criteria.andInternetCardNumLike(internetCard.getInternetCardNum()+"%");
         }
         if(null!=internetCard.getInternetCardStatus()){
             criteria.andInternetCardStatusEqualTo(internetCard.getInternetCardStatus());
