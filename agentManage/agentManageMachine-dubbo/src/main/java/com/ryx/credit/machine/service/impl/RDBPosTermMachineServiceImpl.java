@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * 作者：zyd
  * 时间：2019/8/13
- * 描述：瑞+ 相关接口
+ * 描述：瑞大宝 接口
  */
 @Service("rdbTermMachineServiceImpl")
 public class RDBPosTermMachineServiceImpl implements TermMachineService {
@@ -36,21 +36,23 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
     @Override
     public List<TermMachineVo> queryTermMachine(PlatformType platformType, Map map) throws Exception {
 
-        // 测试参数
-        map.put("branchId", map.get("busPlatForm"));
+        // 封装参数
+        if (null != map.get("busPlatForm")) {
+            map.put("branchId", map.get("busPlatForm"));
+        } else {
+            throw new MessageException("瑞大宝活动缺少必要参数");
+        }
 
         JSONObject res = request(map, AppConfig.getProperty("rdbpos.queryTermActive"));
         if(null!=res && RDB_SUCESS_RESPCODE.equals(res.getString("code"))){
 
             JSONArray data = res.getJSONObject("result").getJSONArray("termPolicyList");
-
             List<TermMachineVo> resData = new ArrayList<TermMachineVo>();
-            for (int i = 0; i < data.size(); i++) {
 
+            for (int i = 0; i < data.size(); i++) {
                 JSONObject item =  data.getJSONObject(i);
                 String name = item.getString("terminalPolicyName");
                 String id = item.getString("terminalPolicyId");
-
                 TermMachineVo machineVo =  new TermMachineVo();
                 machineVo.setId(id);
                 machineVo.setMechineName(name);
@@ -64,7 +66,7 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
     }
 
     /**
-     * 调用瑞＋ 接口获取活动相关数据
+     * 调用瑞大宝 接口获取活动相关数据
      * @param data
      * @param url
      * @return
@@ -79,12 +81,12 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
                 JSONObject respXMLObj = JSONObject.parseObject(httpResult);
                 return respXMLObj;
             }else{
-                AppConfig.sendEmails("错误信息："+httpResult, "瑞＋接口异常");
+                AppConfig.sendEmails("错误信息："+httpResult, "瑞大宝接口异常");
                 throw new Exception("请求出错");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            AppConfig.sendEmails("首刷发送请求失败："+ MailUtil.printStackTrace(e), "瑞＋接口异常");
+            AppConfig.sendEmails("首刷发送请求失败："+ MailUtil.printStackTrace(e), "瑞大宝接口异常");
             throw e;
         }
     }
