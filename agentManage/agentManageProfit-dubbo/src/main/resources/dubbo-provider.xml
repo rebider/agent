@@ -56,7 +56,7 @@
     <dubbo:reference interface="com.ryx.credit.service.agent.AgentEnterService" id="agentEnterService"   timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.agent.AgentNotifyService" id="agentNotifyService"   timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.order.IOPdSumService" id="OPdSumService"   timeout="1200000" registry="${zk.group}" check="false"/>
-     <dubbo:service interface="com.ryx.credit.profit.service.PAdjustMService" ref="pAdjustMService"  timeout="1200000" registry="${zk.group}"  />
+    <dubbo:service interface="com.ryx.credit.profit.service.PAdjustMService" ref="pAdjustMService"  timeout="1200000" registry="${zk.group}"  />
     <dubbo:service interface="com.ryx.credit.profit.service.ProfitSupplyTaxService" ref="profitSupplyTaxService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.profit.service.ProfitDeducttionDetailService" ref="profitDeducttionDetailService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.profit.service.ITaxDeductionDetailService" ref="taxDeductionDetailService"  timeout="1200000" registry="${zk.group}"/>
@@ -64,9 +64,13 @@
     <dubbo:service interface="com.ryx.credit.profit.service.IAgentRelateService" ref="agentRelateService"  timeout="1200000" registry="${zk.group}"/>
 
     <dubbo:service interface="com.ryx.credit.profit.service.IProfitCityApplicationService" ref="profitCityApplicationService"  timeout="1200000" registry="${zk.group}"/>
-   <dubbo:service interface="com.ryx.credit.profit.service.IAgeInvoiceApplyService" ref="ageInvoiceApplyService"  timeout="1200000" registry="${zk.group}"/>
- <dubbo:service interface="com.ryx.credit.profit.service.TransProfitDetailService" ref="transProfitDetailServiceImpl"  timeout="1200000" registry="${zk.group}"/>
- <dubbo:service interface="com.ryx.credit.profit.service.IFreezeAgentSercice" ref="freezeAgentSercice"  timeout="1200000" registry="${zk.group}"/>
- <dubbo:service interface="com.ryx.credit.profit.service.ISetServerAmtService" ref="setServerAmtService"  timeout="1200000" registry="${zk.group}"/>
- <dubbo:service interface="com.ryx.credit.profit.service.IInvoiceSumService" ref="invoiceSumService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.profit.service.IAgeInvoiceApplyService" ref="ageInvoiceApplyService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.profit.service.TransProfitDetailService" ref="transProfitDetailServiceImpl"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.profit.service.IFreezeAgentSercice" ref="freezeAgentSercice"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.profit.service.ISetServerAmtService" ref="setServerAmtService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.profit.service.IInvoiceSumService" ref="invoiceSumService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.profit.service.ITemplateRecodeService" ref="templateRecordService" timeout="1200000" registry="${zk.group}"/>
+
+
+
 </beans>
