@@ -323,7 +323,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 }
                 if (number != 2) {
                     log.info("您本次申请的目标代理商与原代理商存在不是你的下级或您本级，请修改提交");
-                   /* throw new MessageException("您本次申请的目标代理商与原代理商存在不是你的下级或您本级，请修改提交");*/
+                    throw new MessageException("您本次申请的目标代理商与原代理商存在不是你的下级或您本级，请修改提交");
                 }
             }
             //本次提交是否有重复SN
