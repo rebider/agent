@@ -464,7 +464,10 @@
   <sql id="internetCardExpireSql" >
     <where>
       c.renew = #{map.renew}
-      and TO_CHAR(c.expire_time, 'YYYY-MM') = #{map.expireTime}
+      and TO_CHAR(c.expire_time, 'YYYY-MM')
+      <foreach collection="map.expireTimeList" item="expireTime" open=" in(" close=")" separator=",">
+        #{expireTime}
+      </foreach>
       and c.status = 1
       and (c.INTERNET_CARD_STATUS = #{map.cardStaus1} or c.INTERNET_CARD_STATUS = #{map.cardStaus2})
     </where>
@@ -476,7 +479,10 @@
     from o_internet_Card c
     <where>
       c.renew = #{map.renew}
-      and TO_CHAR(c.expire_time, 'YYYY-MM') = #{map.expireTime}
+      and TO_CHAR(c.expire_time, 'YYYY-MM')
+      <foreach collection="map.expireTimeList" item="expireTime" open=" in(" close=")" separator=",">
+        #{expireTime}
+      </foreach>
       and c.status = 1
     </where>
   </select>

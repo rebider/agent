@@ -168,4 +168,9 @@ public class DepartmentServiceImpl implements DepartmentService {
         return rootTree;
     }
 
+    @Override
+    public List<COrganization> selectCityRegion(Long cUser) {
+        return cOrganizationMapper.selectCityRegion(cUser);
+    }
+
 }

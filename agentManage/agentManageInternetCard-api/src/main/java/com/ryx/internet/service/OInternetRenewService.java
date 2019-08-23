@@ -12,6 +12,7 @@ import com.ryx.internet.pojo.OInternetRenewDetail;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /***
  * @Author liudh
@@ -29,7 +30,7 @@ public interface OInternetRenewService {
     PageInfo internetRenewOffsetList(InternetRenewOffset internetRenewOffset, Page page, String agentId);
 
     AgentResult saveAndApprove(OInternetRenew internetRenew, List<String> iccids, String cUser,
-                               List<OCashReceivablesVo> oCashReceivablesVoList,String agentId)throws MessageException;
+                               List<OCashReceivablesVo> oCashReceivablesVoList)throws MessageException;
 
     OInternetRenew selectByPrimaryKey(String id);
 
@@ -44,4 +45,6 @@ public interface OInternetRenewService {
     Integer queryInternetRenewDetailCount(OInternetRenewDetail internetRenewDetail,String agentId);
 
     void renewVerify(String iccidNumIds)throws MessageException;
+
+    Map<Object, Object> getInternetRenewWay(Long cUser);
 }

@@ -164,7 +164,19 @@ public class InternetCardServiceImpl implements InternetCardService {
             criteria.andBatchNumEqualTo(internetCard.getBatchNum());
         }
         if(StringUtils.isNotBlank(internetCard.getIccidNum())){
-            criteria.andIccidNumEqualTo(internetCard.getIccidNum());
+            boolean contains = internetCard.getIccidNum().contains(",");
+            if(contains){
+                String[] iccidNumStr = internetCard.getIccidNum().split(",");
+                List<String> iccidNumList = new ArrayList<>();
+                for (String iccidNum : iccidNumStr) {
+                    iccidNumList.add(iccidNum);
+                }
+                criteria.andIccidNumIn(iccidNumList);
+            }else{
+                criteria.andIccidNumLike(internetCard.getIccidNum()+"%");
+            }
+        }else if(StringUtils.isNotBlank(internetCard.getIccidNumBegin()) && StringUtils.isNotBlank(internetCard.getIccidNumEnd())){
+            criteria.andIccidNumBetween(internetCard.getIccidNumBegin(),internetCard.getIccidNumEnd());
         }
         if(StringUtils.isNotBlank(internetCard.getSnNum())){
             criteria.andSnNumEqualTo(internetCard.getSnNum());
@@ -192,6 +204,9 @@ public class InternetCardServiceImpl implements InternetCardService {
         }
         if(StringUtils.isNotBlank(internetCard.getRenewStatus())){
             criteria.andRenewStatusEqualTo(internetCard.getRenewStatus());
+        }
+        if(StringUtils.isNotBlank(internetCard.getInternetCardNum())){
+            criteria.andInternetCardNumLike(internetCard.getInternetCardNum()+"%");
         }
         if(null!=internetCard.getInternetCardStatus()){
             criteria.andInternetCardStatusEqualTo(internetCard.getInternetCardStatus());
@@ -582,7 +597,6 @@ public class InternetCardServiceImpl implements InternetCardService {
         }
         if(oInternetCard==null){
             internetCard.setcUser(oInternetCardImport.getcUser());
-            internetCard.setRenew(Status.STATUS_0.status); //否
             insertInternetCard(internetCard);
         }else{
             updateInternetCard(internetCard);
@@ -640,7 +654,9 @@ public class InternetCardServiceImpl implements InternetCardService {
         internetCard.setuTime(date);
         internetCard.setStatus(Status.STATUS_1.status);
         internetCard.setVersion(BigDecimal.ONE);
+        internetCard.setRenew(Status.STATUS_0.status); //否
         internetCard.setStop(Status.STATUS_0.status);
+        internetCard.setLogout(Status.STATUS_0.status);
         internetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
         internetCardMapper.insert(internetCard);
     }
@@ -701,7 +717,11 @@ public class InternetCardServiceImpl implements InternetCardService {
             Map<String,Object> reqMap = new HashMap<>();
             reqMap.put("renew",Status.STATUS_0.status);//否
             reqMap.put("newRenew",Status.STATUS_1.status);
-            reqMap.put("expireTime",DateUtil.getPerFirstDayOfMonth());
+            List<String> expireTimeList = new ArrayList<>();
+            expireTimeList.add( DateUtil.getPerDayOfMonth(1));
+            expireTimeList.add( DateUtil.getPerDayOfMonth(2));
+            expireTimeList.add( DateUtil.getPerDayOfMonth(3));
+            reqMap.put("expireTimeList",expireTimeList);
             //待激活和正常
             reqMap.put("cardStaus1",InternetCardStatus.NORMAL.getValue());
             reqMap.put("cardStaus2",InternetCardStatus.NOACTIVATE.getValue());
@@ -769,7 +789,12 @@ public class InternetCardServiceImpl implements InternetCardService {
             reqMap.put("renew",Status.STATUS_0.status);//否
             reqMap.put("newRenew",Status.STATUS_1.status);//是续费
 //            reqMap.put("internetCardStatus",InternetCardStatus.NORMAL.getValue());
-            reqMap.put("expireTime",DateUtil.getPerFirstDayOfMonth());
+
+            List<String> expireTimeList = new ArrayList<>();
+            expireTimeList.add( DateUtil.getPerDayOfMonth(1));
+            expireTimeList.add( DateUtil.getPerDayOfMonth(2));
+            expireTimeList.add( DateUtil.getPerDayOfMonth(3));
+            reqMap.put("expireTimeList",expireTimeList);
             List<OInternetCard> oInternetCards = internetCardMapper.selectInternetCardRenew(reqMap);
             for (OInternetCard oInternetCard : oInternetCards) {
                 OInternetCardMerch oInternetCardMerch = internetCardMerchMapper.selectChnTermposi(BigDataEncode.encode(oInternetCard.getIccidNum()));
@@ -887,6 +912,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
             oInternetCard.setStop(Status.STATUS_0.status);
             oInternetCard.setRenew(Status.STATUS_0.status);
+            oInternetCard.setLogout(Status.STATUS_0.status);
             oInternetCard.setInternetCardStatus(InternetCardStatus.NOACTIVATE.code);
             Date date = new Date();
             oInternetCard.setcTime(date);
@@ -979,10 +1005,6 @@ public class InternetCardServiceImpl implements InternetCardService {
             oInternetCard.setSumPostponeTime(internetCardPostpone.getPostponeTime());
         }else {
             oInternetCard.setSumPostponeTime(internetCardPostpone.getPostponeTime().add(sumPostponeTime));
-        }
-        //如果是停用状态延期后设置正常
-        if(oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.STOP.getValue())==0){
-            oInternetCard.setInternetCardStatus(InternetCardStatus.NORMAL.getValue());
         }
         oInternetCard.setStop(Status.STATUS_0.status);
         oInternetCard.setLogout(Status.STATUS_0.status);
