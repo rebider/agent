@@ -574,7 +574,6 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 }
                 oInternetCard.setStop(Status.STATUS_0.status);
                 oInternetCard.setRenew(Status.STATUS_0.status);
-                oInternetCard.setLogout(Status.STATUS_0.status);
                 //生成轧差明细，同步清结算
                 if(oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())
                     || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.GSCDGC.getValue())){

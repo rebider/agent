@@ -656,7 +656,6 @@ public class InternetCardServiceImpl implements InternetCardService {
         internetCard.setVersion(BigDecimal.ONE);
         internetCard.setRenew(Status.STATUS_0.status); //否
         internetCard.setStop(Status.STATUS_0.status);
-        internetCard.setLogout(Status.STATUS_0.status);
         internetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
         internetCardMapper.insert(internetCard);
     }
@@ -912,7 +911,6 @@ public class InternetCardServiceImpl implements InternetCardService {
             oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
             oInternetCard.setStop(Status.STATUS_0.status);
             oInternetCard.setRenew(Status.STATUS_0.status);
-            oInternetCard.setLogout(Status.STATUS_0.status);
             oInternetCard.setInternetCardStatus(InternetCardStatus.NOACTIVATE.code);
             Date date = new Date();
             oInternetCard.setcTime(date);
@@ -1007,7 +1005,6 @@ public class InternetCardServiceImpl implements InternetCardService {
             oInternetCard.setSumPostponeTime(internetCardPostpone.getPostponeTime().add(sumPostponeTime));
         }
         oInternetCard.setStop(Status.STATUS_0.status);
-        oInternetCard.setLogout(Status.STATUS_0.status);
         oInternetCard.setRenew(Status.STATUS_0.status);
         oInternetCard.setExpireTime(mondayLater);
         int i = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
