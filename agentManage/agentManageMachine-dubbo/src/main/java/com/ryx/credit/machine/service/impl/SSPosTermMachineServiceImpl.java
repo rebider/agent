@@ -69,7 +69,7 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
 
 
     @Override
-    public List<TermMachineVo> queryTermMachine(PlatformType platformType) throws Exception{
+    public List<TermMachineVo> queryTermMachine(PlatformType platformType,Map<String,String> par) throws Exception{
         List<Map> list =  imsTermMachineMapper.querySSIMS_TERM_MACHINE();
         List<TermMachineVo> termMachineVoList = new ArrayList<>();
         for (Map imsTermMachine : list) {
@@ -80,6 +80,20 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
             Object BACK_TYPE = imsTermMachine.get("BACK_TYPE");
             newvo.setStandAmt(STAND_AMT==null?null:(STAND_AMT+""));
             newvo.setBackType(BACK_TYPE==null?null:(BACK_TYPE+""));
+            Object TMS_MODEL = imsTermMachine.get("TMS_MODEL");
+            Object MANUFACTOR = imsTermMachine.get("MANUFACTOR");
+            newvo.setModel(TMS_MODEL==null?null:TMS_MODEL+"");
+            newvo.setManufactor(MANUFACTOR==null?null:MANUFACTOR+"");
+
+            Object STAND_TIME = imsTermMachine.get("STAND_TIME");
+            Object ACTIVITY_START_TIME = imsTermMachine.get("ACTIVITY_START_TIME");
+            Object ACTIVITY_END_TIME = imsTermMachine.get("ACTIVITY_END_TIME");
+            Object PRICE = imsTermMachine.get("PRICE");
+            newvo.setStandTime(STAND_TIME==null?null:STAND_TIME+"");
+            newvo.setActivityStartTime(ACTIVITY_START_TIME==null?null:ACTIVITY_START_TIME+"");
+            newvo.setActivityEndTime(ACTIVITY_END_TIME==null?null:ACTIVITY_END_TIME+"");
+            newvo.setPrice(PRICE==null?null:PRICE+"");
+
             termMachineVoList.add(newvo);
         }
         return termMachineVoList;

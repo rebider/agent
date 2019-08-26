@@ -34,7 +34,7 @@ public class MposTermMachineServiceImpl implements TermMachineService {
     public static final String MPOS_SUCESS_respType = "S";//S-成功，E-报错，R-重复请求
 
     @Override
-    public List<TermMachineVo> queryTermMachine(PlatformType platformType) throws Exception{
+    public List<TermMachineVo> queryTermMachine(PlatformType platformType,Map<String,String> par) throws Exception{
         JSONObject res = request(FastMap.fastSuccessMap(), AppConfig.getProperty("mpos.queryTermActive"));
         if(null!=res && MPOS_SUCESS_respCode.equals(res.getString("respCode")) && MPOS_SUCESS_respType.equals(res.getString("respType"))){
             JSONArray data =  res.getJSONArray("data");
