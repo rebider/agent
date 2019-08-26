@@ -261,6 +261,28 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     @Override
     public PageInfo internetRenewOffsetDetailList(InternetRenewOffsetDetail internetRenewOffsetDetail, Page page,String agentId){
 
+        InternetRenewOffsetDetailExample internetRenewOffsetDetailExample = queryOffsetDetailParam(internetRenewOffsetDetail, agentId);
+        internetRenewOffsetDetailExample.setPage(page);
+        List<InternetRenewOffsetDetail> internetRenewOffsetDetails = internetRenewOffsetDetailMapper.selectByExample(internetRenewOffsetDetailExample);
+        for (InternetRenewOffsetDetail offsetDetail : internetRenewOffsetDetails) {
+            CUser cUser = iUserService.selectById(offsetDetail.getcUser());
+            if(null!=cUser)
+            offsetDetail.setcUser(cUser.getName());
+            offsetDetail.setCleanStatus(InternetCleanStatus.getContentByValue(offsetDetail.getCleanStatus()));
+        }
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(internetRenewOffsetDetails);
+        pageInfo.setTotal((int)internetRenewOffsetDetailMapper.countByExample(internetRenewOffsetDetailExample));
+        return pageInfo;
+    }
+
+    /**
+     * 每日轧差汇总 查询和导出公共
+     * @param internetRenewOffsetDetail
+     * @param agentId
+     * @return
+     */
+    private InternetRenewOffsetDetailExample queryOffsetDetailParam(InternetRenewOffsetDetail internetRenewOffsetDetail,String agentId){
         InternetRenewOffsetDetailExample internetRenewOffsetDetailExample = new InternetRenewOffsetDetailExample();
         InternetRenewOffsetDetailExample.Criteria criteria = internetRenewOffsetDetailExample.createCriteria();
         //代理商只查询自己的
@@ -303,19 +325,24 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }
 
         criteria.andStatusEqualTo(Status.STATUS_1.status);
-        internetRenewOffsetDetailExample.setPage(page);
         internetRenewOffsetDetailExample.setOrderByClause(" c_time desc");
-        List<InternetRenewOffsetDetail> internetRenewOffsetDetails = internetRenewOffsetDetailMapper.selectByExample(internetRenewOffsetDetailExample);
-        for (InternetRenewOffsetDetail offsetDetail : internetRenewOffsetDetails) {
-            CUser cUser = iUserService.selectById(offsetDetail.getcUser());
-            if(null!=cUser)
-            offsetDetail.setcUser(cUser.getName());
-            offsetDetail.setCleanStatus(InternetCleanStatus.getContentByValue(offsetDetail.getCleanStatus()));
-        }
-        PageInfo pageInfo = new PageInfo();
-        pageInfo.setRows(internetRenewOffsetDetails);
-        pageInfo.setTotal((int)internetRenewOffsetDetailMapper.countByExample(internetRenewOffsetDetailExample));
-        return pageInfo;
+        return internetRenewOffsetDetailExample;
+    }
+
+
+    @Override
+    public List<InternetRenewOffsetDetail> queryInternetRenewOffsetDetailList(InternetRenewOffsetDetail internetRenewOffsetDetail, Page page,String agentId){
+        InternetRenewOffsetDetailExample internetRenewOffsetDetailExample = queryOffsetDetailParam(internetRenewOffsetDetail, agentId);
+        internetRenewOffsetDetailExample.setPage(page);
+        List<InternetRenewOffsetDetail> internetRenewOffsetDetailList = internetRenewOffsetDetailMapper.selectByExample(internetRenewOffsetDetailExample);
+        return internetRenewOffsetDetailList;
+    }
+
+    @Override
+    public Integer queryInternetRenewOffsetDetailCount(InternetRenewOffsetDetail internetRenewOffsetDetail,String agentId){
+        InternetRenewOffsetDetailExample internetRenewOffsetDetailExample = queryOffsetDetailParam(internetRenewOffsetDetail,agentId);
+        Integer count = Integer.valueOf((int)internetRenewOffsetDetailMapper.countByExample(internetRenewOffsetDetailExample));
+        return count;
     }
 
 
