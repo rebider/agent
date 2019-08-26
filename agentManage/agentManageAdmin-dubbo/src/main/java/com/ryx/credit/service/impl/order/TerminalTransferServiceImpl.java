@@ -27,6 +27,7 @@ import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.BusinessPlatformService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
+import com.ryx.credit.service.order.TerminalTransferDetail2;
 import com.ryx.credit.service.order.TerminalTransferService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,7 +95,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     @Autowired
     private TermMachineService termMachineService;
     @Autowired
-    private TerminalTransferService terminalTransferService;
+    private TerminalTransferDetail2 terminalTransferDetail2;
 
     private String QUERY_SWITCH = "TerminalTransfer:ISOPEN_RES_QUERY";
     private String TRANS_SWITCH = "TerminalTransfer:ISOPEN_RES_trans";
@@ -847,22 +848,11 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                   *//*      throw new MessageException("请导入信息后在提交审批");*//*
                     }
                 } else {*/
-                //目前就省区一个节点直接else
-                for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetails) {
-                    if ("".equals(terminalTransferDetail.getButtJointPerson()) || null == terminalTransferDetail.getButtJointPerson()) {
-                        terminalTransferDetail.setButtJointPerson(userId);
-                        int i = terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
-                        if (i != 1) {
-                            throw new MessageException("更新审批失败");
-                        }
-                    }
 
-                }
                 List<String> detailIds = agentVo.getTerminalTransferDetailID();
                 //更新是否支付，为不影响审批流运行单独开启一个事务
-                terminalTransferService.updateIsNoPay(terminalTransferDetails,detailIds);
+                terminalTransferDetail2.updateIsNoPay(terminalTransferDetails,detailIds,userId);
 
-                /*   }*/
             }
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo, userId);
             if (!result.isOK()) {
@@ -878,45 +868,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         }
         return AgentResult.ok();
     }
-    @Transactional(propagation= Propagation.REQUIRES_NEW)
-    public void  updateIsNoPay(List<TerminalTransferDetail> terminalTransferDetails,List<String> detailIds) throws MessageException {
-        if(detailIds==null||detailIds.size()==0){
-            for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetails) {
-                if(terminalTransferDetail.getPlatformType().compareTo(new BigDecimal(1))==0){
-                    terminalTransferDetail.setIsNoPay("0");
-                    int i = terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
-                    if (i != 1) {
-                        throw new MessageException("更新是否支付失败");
-                    }
-                }
 
-            }
-        }else{
-            for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetails) {
-                if(terminalTransferDetail.getPlatformType().compareTo(new BigDecimal(1))==0){
-                    for (String str :detailIds) {
-                        if(terminalTransferDetail.getId().equals(str)){
-                            terminalTransferDetail.setIsNoPay("1");
-                            break;
-                        }else{
-                            terminalTransferDetail.setIsNoPay("0");
-                        }
-
-                    }
-                    int i = terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
-                    if (i != 1) {
-                        throw new MessageException("更新是否支付失败");
-                    }
-                }else{
-                    continue;
-                }
-
-            }
-        }
-
-
-
-    }
 
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override

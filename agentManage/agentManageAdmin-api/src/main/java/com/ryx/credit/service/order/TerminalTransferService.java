@@ -51,5 +51,4 @@ public interface TerminalTransferService {
 
      Map<String, Object> disposeSN(String snBeginNum, String snEndNum);
 
-     void  updateIsNoPay(List<TerminalTransferDetail> terminalTransferDetails,List<String> detailIds) throws MessageException;
 }
