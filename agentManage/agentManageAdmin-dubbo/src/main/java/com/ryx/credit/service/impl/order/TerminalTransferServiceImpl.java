@@ -568,6 +568,18 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 }
                 if (terminalTransferDetailListsRDBPOS != null && terminalTransferDetailListsRDBPOS.size() > 0) {
                     AgentResult agentResult = termMachineService.queryTerminalTransfer(terminalTransferDetailListsRDBPOS, "check");
+                    for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailListsMpos) {
+                        String originalOrgId = terminalTransferDetail.getOriginalOrgId();
+                        String goalOrgId = terminalTransferDetail.getGoalOrgId();
+                        Map<String, Object> map1 = getAgentType(originalOrgId);
+                        Map<String, Object> platFromMap = terminalTransferMapper.queryPlatFrom(map1.get("BUS_PLATFORM").toString());
+                        if (!platFromMap.get("PLATFORM_TYPE").toString().equals("RDBPOS")) {
+                            log.info("您的机构码不属于瑞大宝平台请选择：原：" + originalOrgId + "目标：" + goalOrgId);
+                            throw new MessageException("您的机构码不属于瑞大宝平台请选择：原：" + originalOrgId + "目标：" + goalOrgId);
+                        }
+                        terminalTransferDetail.setPlatFrom(map1.get("BUS_PLATFORM").toString());
+                    }
+
                     if (agentResult.isOK()) {
                     } else {
                         log.info("未连通查询接口");
@@ -575,8 +587,11 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 }
 
                 startTerminalTransferActivity(terminalTransferId, cuser, agentId, true);
+                return AgentResult.ok("提交成功");
+            }else {
+                return AgentResult.ok("保存成功");
             }
-            return AgentResult.ok();
+
         } catch (MessageException e) {
             e.printStackTrace();
             throw new MessageException(e.getMsg());
@@ -1093,7 +1108,6 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                             String transferStatus = String.valueOf(data.get("transferStatus"));
                             if ("00".equals(transferStatus)) {
                                 log.info("划拨成功请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
-                                log.info("划拨成功请求结果：{}", JSONObject.toJSON(agentResult));
                                 terminalTransferDetail.setAdjustStatus(new BigDecimal(2));
                                 terminalTransferDetail.setAdjustTime(new Date());
                                 terminalTransferDetail.setuTime(new Date());
