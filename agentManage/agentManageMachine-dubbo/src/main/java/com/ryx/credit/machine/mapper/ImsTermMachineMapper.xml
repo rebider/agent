@@ -372,7 +372,7 @@
     select a.pos_activity_id AS ID,
            (c.brand_name||'|机具活动关系编号:'||a.pos_activity_id
             ||'|活动名称:'||c.activity_name
-            ||'|机具编号'||b.machine_id||'机型:'||IMS_POS.POS_MODEL||'|单价:'||b.price
+            ||'机型:'||IMS_POS.POS_MODEL||'|单价:'||b.price
             || '活动时间:' || c.activity_start_time ||'/'|| c.activity_end_time) AS NAME,b.BACK_TYPE,
       replace(IMS_POS.POS_MODEL,IMS_POS.TMS_MODEL,'')as manufactor,
       IMS_POS.TMS_MODEL,
