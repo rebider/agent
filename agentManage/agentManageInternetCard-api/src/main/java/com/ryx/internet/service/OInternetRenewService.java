@@ -47,4 +47,6 @@ public interface OInternetRenewService {
     void renewVerify(String iccidNumIds)throws MessageException;
 
     Map<Object, Object> getInternetRenewWay(Long cUser);
+
+    void processDataInternetCardOffset();
 }

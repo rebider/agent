@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:reg="http://www.dangdang.com/schema/ddframe/reg"
        xmlns:job="http://www.dangdang.com/schema/ddframe/job"
+       xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                         http://www.springframework.org/schema/beans/spring-beans.xsd
                         http://www.dangdang.com/schema/ddframe/reg
@@ -159,6 +159,17 @@
                   sharding-item-parameters="0=C"
                   streaming-process="true"
                   description="物联网卡，迁移到历史表,每天凌晨一天执行一次"
+                  overwrite="true"
+                  disabled="false"/>
+
+    <job:dataflow id="internetCardOffsetDetail"
+                  job-ref="internetCardOffsetDetailJob"
+                  registry-center-ref="regCenter"
+                  cron="0 0/1 * * * ?"
+                  sharding-total-count="1"
+                  sharding-item-parameters="0=C"
+                  streaming-process="true"
+                  description="物联网卡,生产轧差明细每日汇总"
                   overwrite="true"
                   disabled="false"/>
 

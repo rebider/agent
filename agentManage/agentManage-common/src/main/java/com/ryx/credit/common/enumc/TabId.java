@@ -110,7 +110,8 @@ public enum TabId {
     P_SERVER_AMT("PSA%s%015d"),
     O_ORGANIZATION("ORG%s%015d"),
     ORG_PLATFORM("OPF%s%015d"),
-    O_INTERNET_CARD_POSTPONE("OICP%s%015d");
+    O_INTERNET_CARD_POSTPONE("OICP%s%015d"),
+    O_INTERNET_RENEW_OFF_D("OIROD%s%015d");
 
 
     public String patt;
