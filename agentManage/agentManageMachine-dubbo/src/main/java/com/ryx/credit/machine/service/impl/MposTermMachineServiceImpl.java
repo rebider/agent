@@ -266,7 +266,7 @@ public class MposTermMachineServiceImpl implements TermMachineService {
             JSONObject codeType = JSONObject.parseObject(String.valueOf(res.get("data")));
             return AgentResult.ok(codeType);
         }else{
-            logger.info("机具终端划拨结果查询成功:{}{}{}",AppConfig.getProperty("mpos.termMachineResult"),res.getString("respMsg"),res.toJSONString());
+            logger.info("机具终端划拨结果查询失败:{}{}{}",AppConfig.getProperty("mpos.termMachineResult"),res.getString("respMsg"),res.toJSONString());
             return AgentResult.fail(res.getString("respMsg"));
         }
     }
