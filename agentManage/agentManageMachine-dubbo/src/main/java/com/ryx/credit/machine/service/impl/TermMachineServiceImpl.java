@@ -185,7 +185,7 @@ public class TermMachineServiceImpl  implements TermMachineService {
         if("1".equals(type)){
          agentResult =  posTermMachineServiceImpl.queryTerminalTransferResult(serialNumber,type);
         }else if("2".equals(type)){
-
+            agentResult =  mposTermMachineServiceImpl.queryTerminalTransferResult(serialNumber,type);
         }else if("3".equals(type)){
 
         }
