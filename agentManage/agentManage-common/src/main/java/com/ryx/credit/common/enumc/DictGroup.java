@@ -70,7 +70,7 @@ public enum DictGroup {
     QUIT_MARKET_DEADLINE("代理商退出审批选择期限"),
     QUIT_MIGR_PLATFORM("代理商退出手刷迁移平台"),
     CAPITAL_MIARKET("保证金变更市场部审批参数"),
-
+    PROFIT_TEMPLATE_APPLY("分润模板线上审批审批流名称"),
 
     POS("POS审批"),
     POS_APR_BUSNISS("POS审批参数"),

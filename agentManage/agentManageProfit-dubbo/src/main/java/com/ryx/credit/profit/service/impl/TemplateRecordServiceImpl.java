@@ -3,6 +3,7 @@ package com.ryx.credit.profit.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.enumc.BusActRelBusType;
+import com.ryx.credit.common.enumc.DictGroup;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
@@ -10,16 +11,16 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
+import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.dao.TemplateRecodeMapper;
-import com.ryx.credit.profit.pojo.PCityApplicationDetail;
-import com.ryx.credit.profit.pojo.PCityApplicationDetailExample;
 import com.ryx.credit.profit.pojo.TemplateRecode;
 import com.ryx.credit.profit.pojo.TemplateRecodeExample;
 import com.ryx.credit.profit.service.ITemplateRecodeService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.TaskApprovalService;
+import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,8 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     private ActivityService activityService;
     @Autowired
     private TaskApprovalService taskApprovalService;
+    @Autowired
+    private DictOptionsService dictOptionsService;
 
     private static final String TEMPLATE_NOW = AppConfig.getProperty("template.now");
     private static final String TEMPLATE_APPLY = AppConfig.getProperty("template.apply");
@@ -147,7 +150,19 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
 
         Map startPar = agentEnterService.startPar(map1.get("userId"));
         String proceId = null;
-        String workId = "agent_zg_template_2.0";
+        //String workId = "agent_zg_template_2.0";
+
+        List<Dict> actlist = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.PROFIT_TEMPLATE_APPLY.name());
+        String workId = null;
+        for (Dict dict : actlist) {
+            workId = dict.getdItemvalue();
+        }
+
+        if(StringUtils.isEmpty(workId)) {
+            logger.info("========用户{}启动数据修改申请{}{}","审批流启动失败字典中未配置部署流程");
+            throw new MessageException("审批流启动失败字典中未配置部署流程!");
+        }
+
         try{
             proceId = activityService.createDeloyFlow(null, workId, null, null, startPar);
             if (proceId == null) {
