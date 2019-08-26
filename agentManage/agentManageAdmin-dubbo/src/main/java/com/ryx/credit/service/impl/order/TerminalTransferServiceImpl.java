@@ -1118,7 +1118,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                             terminalTransferDetail.setRemark(resMsg);
                             terminalTransferDetail.setAdjustTime(new Date());
                             terminalTransferDetail.setuTime(new Date());
-                            terminalTransferDetail.setAdjustStatus(new BigDecimal(5));
+                            terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());
                             terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
                         }
 
@@ -1128,7 +1128,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                         terminalTransferDetail.setRemark(resMsg);
                         terminalTransferDetail.setAdjustTime(new Date());
                         terminalTransferDetail.setuTime(new Date());
-                        terminalTransferDetail.setAdjustStatus(new BigDecimal(5));
+                        terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());
                         terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
                     }
                 } catch (Exception e) {
@@ -1194,7 +1194,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     }else{
                         log.info("手刷划拨未联动请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
                         log.info("手刷划拨未联动返回参数：{}", JSONObject.toJSON(agentResult));
-                        terminalTransferDetail.setRemark(agentResult.getMsg());
+                        terminalTransferDetail.setRemark("未联动调整需线下处理");
                         terminalTransferDetail.setAdjustTime(new Date());
                         terminalTransferDetail.setuTime(new Date());
                         terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());
