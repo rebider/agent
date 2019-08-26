@@ -227,7 +227,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             Date format = DateUtil.format(internetCard.getExpireTimeEndStr(), DateUtil.DATE_FORMAT_yyyy_MM_dd);
             criteria.andExpireTimeLessThanOrEqualTo(format);
         }
-        oInternetCardExample.setOrderByClause(" c_time desc ");
+        oInternetCardExample.setOrderByClause(" c_time,expire_time desc ");
 
         return oInternetCardExample;
     }

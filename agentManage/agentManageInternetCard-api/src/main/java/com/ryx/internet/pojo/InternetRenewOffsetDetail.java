@@ -44,6 +44,27 @@ public class InternetRenewOffsetDetail implements Serializable{
 
     private BigDecimal version;
 
+    private String processDateBegin;
+
+    private String processDateEnd;
+
+
+    public String getProcessDateBegin() {
+        return processDateBegin;
+    }
+
+    public void setProcessDateBegin(String processDateBegin) {
+        this.processDateBegin = processDateBegin;
+    }
+
+    public String getProcessDateEnd() {
+        return processDateEnd;
+    }
+
+    public void setProcessDateEnd(String processDateEnd) {
+        this.processDateEnd = processDateEnd;
+    }
+
     public String getId() {
         return id;
     }

@@ -259,6 +259,67 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     }
 
     @Override
+    public PageInfo internetRenewOffsetDetailList(InternetRenewOffsetDetail internetRenewOffsetDetail, Page page,String agentId){
+
+        InternetRenewOffsetDetailExample internetRenewOffsetDetailExample = new InternetRenewOffsetDetailExample();
+        InternetRenewOffsetDetailExample.Criteria criteria = internetRenewOffsetDetailExample.createCriteria();
+        //代理商只查询自己的
+        if(StringUtils.isNotBlank(agentId)){
+            criteria.andAgentIdEqualTo(agentId);
+        }else if(StringUtils.isNotBlank(internetRenewOffsetDetail.getAgentId())){
+            criteria.andAgentIdEqualTo(internetRenewOffsetDetail.getAgentId());
+        }
+        if(StringUtils.isNotBlank(internetRenewOffsetDetail.getAgentName())){
+            criteria.andAgentNameLike("%"+internetRenewOffsetDetail.getAgentName()+"%");
+        }
+        if(StringUtils.isNotBlank(internetRenewOffsetDetail.getRenewId())){
+            criteria.andRenewIdEqualTo(internetRenewOffsetDetail.getRenewId());
+        }
+        if(StringUtils.isNotBlank(internetRenewOffsetDetail.getRenewDetailId())){
+            criteria.andRenewDetailIdEqualTo(internetRenewOffsetDetail.getRenewDetailId());
+        }
+        if(StringUtils.isNotBlank(internetRenewOffsetDetail.getMerId())){
+            criteria.andMerIdEqualTo(internetRenewOffsetDetail.getMerId());
+        }
+        if(StringUtils.isNotBlank(internetRenewOffsetDetail.getMerName())){
+            criteria.andMerNameEqualTo(internetRenewOffsetDetail.getMerName());
+        }
+        if(StringUtils.isNotBlank(internetRenewOffsetDetail.getIccidNum())){
+            criteria.andIccidNumEqualTo(internetRenewOffsetDetail.getIccidNum());
+        }
+        if(StringUtils.isNotBlank(internetRenewOffsetDetail.getFlowId())){
+            criteria.andFlowIdEqualTo(internetRenewOffsetDetail.getFlowId());
+        }
+        if(StringUtils.isNotBlank(internetRenewOffsetDetail.getId())){
+            criteria.andIdEqualTo(internetRenewOffsetDetail.getId());
+        }
+        if(StringUtils.isNotBlank(internetRenewOffsetDetail.getProcessDateBegin())){
+            String dateBegin = DateUtil.dateConvertion(internetRenewOffsetDetail.getProcessDateBegin(), DateUtil.DATE_FORMAT_yyyy_MM_dd, DateUtil.DATE_FORMAT_3);
+            criteria.andProcessDateGreaterThanOrEqualTo(dateBegin);
+        }
+        if(StringUtils.isNotBlank(internetRenewOffsetDetail.getProcessDateEnd())){
+            String dateEnd = DateUtil.dateConvertion(internetRenewOffsetDetail.getProcessDateEnd(), DateUtil.DATE_FORMAT_yyyy_MM_dd, DateUtil.DATE_FORMAT_3);
+            criteria.andProcessDateLessThanOrEqualTo(dateEnd);
+        }
+
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        internetRenewOffsetDetailExample.setPage(page);
+        internetRenewOffsetDetailExample.setOrderByClause(" c_time desc");
+        List<InternetRenewOffsetDetail> internetRenewOffsetDetails = internetRenewOffsetDetailMapper.selectByExample(internetRenewOffsetDetailExample);
+        for (InternetRenewOffsetDetail offsetDetail : internetRenewOffsetDetails) {
+            CUser cUser = iUserService.selectById(offsetDetail.getcUser());
+            if(null!=cUser)
+            offsetDetail.setcUser(cUser.getName());
+            offsetDetail.setCleanStatus(InternetCleanStatus.getContentByValue(offsetDetail.getCleanStatus()));
+        }
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(internetRenewOffsetDetails);
+        pageInfo.setTotal((int)internetRenewOffsetDetailMapper.countByExample(internetRenewOffsetDetailExample));
+        return pageInfo;
+    }
+
+
+    @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     public AgentResult saveAndApprove(OInternetRenew internetRenew,List<String> iccids, String cUser,
                                       List<OCashReceivablesVo> oCashReceivablesVoList)throws MessageException{
