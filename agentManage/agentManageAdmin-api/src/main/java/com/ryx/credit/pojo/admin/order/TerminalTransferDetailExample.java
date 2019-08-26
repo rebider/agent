@@ -2147,6 +2147,76 @@ public class TerminalTransferDetailExample {
             addCriterion("ORIGINAL_TYPE not between", value1, value2, "originalType");
             return (Criteria) this;
         }
+
+        public Criteria andIsNoPayIsNull() {
+            addCriterion("IS_NO_PAY is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsNoPayIsNotNull() {
+            addCriterion("IS_NO_PAY is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsNoPayEqualTo(String value) {
+            addCriterion("IS_NO_PAY =", value, "isNoPay");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsNoPayNotEqualTo(String value) {
+            addCriterion("IS_NO_PAY <>", value, "isNoPay");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsNoPayGreaterThan(String value) {
+            addCriterion("IS_NO_PAY >", value, "isNoPay");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsNoPayGreaterThanOrEqualTo(String value) {
+            addCriterion("IS_NO_PAY >=", value, "isNoPay");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsNoPayLessThan(String value) {
+            addCriterion("IS_NO_PAY <", value, "isNoPay");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsNoPayLessThanOrEqualTo(String value) {
+            addCriterion("IS_NO_PAY <=", value, "isNoPay");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsNoPayLike(String value) {
+            addCriterion("IS_NO_PAY like", value, "isNoPay");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsNoPayNotLike(String value) {
+            addCriterion("IS_NO_PAY not like", value, "isNoPay");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsNoPayIn(List<String> values) {
+            addCriterion("IS_NO_PAY in", values, "isNoPay");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsNoPayNotIn(List<String> values) {
+            addCriterion("IS_NO_PAY not in", values, "isNoPay");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsNoPayBetween(String value1, String value2) {
+            addCriterion("IS_NO_PAY between", value1, value2, "isNoPay");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsNoPayNotBetween(String value1, String value2) {
+            addCriterion("IS_NO_PAY not between", value1, value2, "isNoPay");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

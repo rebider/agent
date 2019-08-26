@@ -27,6 +27,7 @@ import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.BusinessPlatformService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
+import com.ryx.credit.service.order.TerminalTransferDetail2;
 import com.ryx.credit.service.order.TerminalTransferService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,6 +94,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     private BusinessPlatformService businessPlatformService;
     @Autowired
     private TermMachineService termMachineService;
+    @Autowired
+    private TerminalTransferDetail2 terminalTransferDetail2;
 
     private String QUERY_SWITCH = "TerminalTransfer:ISOPEN_RES_QUERY";
     private String TRANS_SWITCH = "TerminalTransfer:ISOPEN_RES_trans";
@@ -321,7 +324,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 }
                 if (number != 2) {
                     log.info("您本次申请的目标代理商与原代理商存在不是你的下级或您本级，请修改提交");
-                   /* throw new MessageException("您本次申请的目标代理商与原代理商存在不是你的下级或您本级，请修改提交");*/
+                    throw new MessageException("您本次申请的目标代理商与原代理商存在不是你的下级或您本级，请修改提交");
                 }
             }
             //本次提交是否有重复SN
@@ -845,18 +848,11 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                   *//*      throw new MessageException("请导入信息后在提交审批");*//*
                     }
                 } else {*/
-                //目前就省区一个节点直接else
-                for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetails) {
-                    if ("".equals(terminalTransferDetail.getButtJointPerson()) || null == terminalTransferDetail.getButtJointPerson()) {
-                        terminalTransferDetail.setButtJointPerson(userId);
-                        int i = terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
-                        if (i != 1) {
-                            throw new MessageException("更新审批失败");
-                        }
-                    }
 
-                }
-                /*   }*/
+                List<String> detailIds = agentVo.getTerminalTransferDetailID();
+                //更新是否支付，为不影响审批流运行单独开启一个事务
+                terminalTransferDetail2.updateIsNoPay(terminalTransferDetails,detailIds,userId);
+
             }
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo, userId);
             if (!result.isOK()) {
@@ -945,7 +941,6 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
 
 
 //代理商拒绝更新明细
-    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRES_NEW)
     public void RefuseTransfer(TerminalTransfer terminalTransfer) throws Exception {
         TerminalTransferDetailExample terminalTransferDetailExample = new TerminalTransferDetailExample();
         TerminalTransferDetailExample.Criteria criteria = terminalTransferDetailExample.createCriteria();
@@ -984,8 +979,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         }
 
         if (terminalTransferDetailListsPos != null && terminalTransferDetailListsPos.size() > 0) {
-            String res = redisService.getValue("TerminalTransfer:ISOPEN_RES_trans");
-            if (StringUtils.isNotBlank(res) && "1".equals(res)) {
+        /*    String res = redisService.getValue("TerminalTransfer:ISOPEN_RES_trans");
+            if (StringUtils.isNotBlank(res) && "1".equals(res)) {*/
                 try{
                     termMachineService.queryTerminalTransfer(terminalTransferDetailListsPos, "adjust");
                 }catch (Exception e){
@@ -995,7 +990,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     terminalTransferDetail.setuTime(Calendar.getInstance().getTime());
                     terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
                 }
-            } else {
+           /* } else {
                 for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailListsPos) {
                     terminalTransferDetail.setAdjustTime(new Date());
                     terminalTransferDetail.setuTime(new Date());
@@ -1003,13 +998,23 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     terminalTransferDetail.setRemark("需线下调整");
                     terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
                 }
-            }
+            }*/
         }
 
         if (terminalTransferDetailListsMpos != null && terminalTransferDetailListsMpos.size() > 0) {
             String res = redisService.getValue("TerminalTransfer:ISOPEN_RES_trans");
-            if (StringUtils.isNotBlank(res) && "1".equals(res)) {
+
+            for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailListsMpos) {
+                String originalOrgId = terminalTransferDetail.getOriginalOrgId();
+                String goalOrgId = terminalTransferDetail.getGoalOrgId();
+                Map<String, Object> map1 = getAgentType(originalOrgId);
+                terminalTransferDetail.setPlatFrom(map1.get("BUS_PLATFORM").toString());
+            }
+
+/*
+            if (StringUtils.isNotBlank(res) && "1".equals(res)) {*/
                 try{
+
                   termMachineService.queryTerminalTransfer(terminalTransferDetailListsMpos, "hb");
                 }catch (Exception e){
                     log.info("调用开始划拨接口时报错参数为 {}",JSONObject.toJSON(terminalTransferDetailListsMpos));
@@ -1019,7 +1024,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     terminalTransferDetail.setuTime(Calendar.getInstance().getTime());
                     terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
                 }
-            } else {
+          /*  } else {
                 for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailListsPos) {
                     terminalTransferDetail.setAdjustTime(new Date());
                     terminalTransferDetail.setuTime(new Date());
@@ -1027,7 +1032,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     terminalTransferDetail.setRemark("开关未打开需线下调整");
                     terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
                 }
-            }
+            }*/
 
         }
         if (terminalTransferDetailListsRDBPOS != null && terminalTransferDetailListsRDBPOS.size() > 0) {
@@ -1113,7 +1118,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                             terminalTransferDetail.setRemark(resMsg);
                             terminalTransferDetail.setAdjustTime(new Date());
                             terminalTransferDetail.setuTime(new Date());
-                            terminalTransferDetail.setAdjustStatus(new BigDecimal(5));
+                            terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());
                             terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
                         }
 
@@ -1123,7 +1128,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                         terminalTransferDetail.setRemark(resMsg);
                         terminalTransferDetail.setAdjustTime(new Date());
                         terminalTransferDetail.setuTime(new Date());
-                        terminalTransferDetail.setAdjustStatus(new BigDecimal(5));
+                        terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());
                         terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
                     }
                 } catch (Exception e) {
@@ -1160,31 +1165,41 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 }
 
                 try {
-                    JSONObject jsonObject = JSONObject.parseObject(agentResult.getData().toString());
-                    List<Map<String, Object>> result = (List<Map<String, Object>>) jsonObject.get("result");
-                    if (result == null || result.size() == 0) {
-                        continue;
-                    }
-                    for (Map map : result) {
-                        if ("code6".equals(map.get("code").toString())) {
-                            log.info("划拨成功请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
-                            log.info("划拨成功请求结果：{}", JSONObject.toJSON(agentResult));
-                            terminalTransferDetail.setAdjustStatus(AdjustStatus.YTZ.getValue());
-                            terminalTransferDetail.setAdjustTime(new Date());
-                            terminalTransferDetail.setuTime(new Date());
-                            terminalTransferDetail.setRemark(map.get("message").toString());
-                            terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
-                        } else {
-                            log.info("划拨失败请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
-                            log.info("划拨失败请求结果：{}", JSONObject.toJSON(agentResult));
-                            terminalTransferDetail.setRemark(map.get("message").toString());
-                            terminalTransferDetail.setAdjustTime(new Date());
-                            terminalTransferDetail.setuTime(new Date());
-                            terminalTransferDetail.setAdjustStatus(AdjustStatus.TZSB.getValue());
-                            terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
+                    if(agentResult.isOK()) {
+                        JSONObject jsonObject = JSONObject.parseObject(agentResult.getData().toString());
+                        List<Map<String, Object>> result = (List<Map<String, Object>>) jsonObject.get("result");
+                        if (result == null || result.size() == 0) {
+                            continue;
                         }
-                    }
+                        for (Map map : result) {
+                            if ("code6".equals(map.get("code").toString())) {
+                                log.info("划拨成功请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
+                                log.info("划拨成功请求结果：{}", JSONObject.toJSON(agentResult));
+                                terminalTransferDetail.setAdjustStatus(AdjustStatus.YTZ.getValue());
+                                terminalTransferDetail.setAdjustTime(new Date());
+                                terminalTransferDetail.setuTime(new Date());
+                                terminalTransferDetail.setRemark(map.get("message").toString());
+                                terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
+                            } else {
+                                log.info("划拨失败请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
+                                log.info("划拨失败请求结果：{}", JSONObject.toJSON(agentResult));
+                                terminalTransferDetail.setRemark(map.get("message").toString());
+                                terminalTransferDetail.setAdjustTime(new Date());
+                                terminalTransferDetail.setuTime(new Date());
+                                terminalTransferDetail.setAdjustStatus(AdjustStatus.TZSB.getValue());
+                                terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
+                            }
+                        }
 
+                    }else{
+                        log.info("手刷划拨未联动请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
+                        log.info("手刷划拨未联动返回参数：{}", JSONObject.toJSON(agentResult));
+                        terminalTransferDetail.setRemark("未联动调整需线下处理");
+                        terminalTransferDetail.setAdjustTime(new Date());
+                        terminalTransferDetail.setuTime(new Date());
+                        terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());
+                        terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
+                    }
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1206,7 +1221,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 terminalTransferDetail.setRemark("划拨超时失败");
                 terminalTransferDetail.setAdjustTime(new Date());
                 terminalTransferDetail.setuTime(new Date());
-                terminalTransferDetail.setAdjustStatus(new BigDecimal(4));
+                terminalTransferDetail.setAdjustStatus(AdjustStatus.WCDJG.getValue());
                 terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
             }
         }
@@ -1465,9 +1480,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         if (j == 0) {
             throw new MessageException("更新失败");
         }
-        Set<BigDecimal> platformTypeSet = new HashSet<>();
+      /*  Set<BigDecimal> platformTypeSet = new HashSet<>();*/
         for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailList) {
-            platformTypeSet.add(terminalTransferDetail.getPlatformType());
+          /*  platformTypeSet.add(terminalTransferDetail.getPlatformType());*/
             Map<String, String> resultMap = saveOrEditVerify(terminalTransferDetail, agentId);
             terminalTransferDetail.setId(idService.genId(TabId.O_TERMINAL_TRANSFER_DE));
             terminalTransferDetail.setTerminalTransferId(terminalTransfer.getId());
@@ -1482,13 +1497,14 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             terminalTransferDetail.setGoalBusId(resultMap.get("goalBusId"));
             terminalTransferDetail.setOriginalBusId(resultMap.get("originalBusId"));
             terminalTransferDetail.setBusId(terminalTransfer.getPlatformType());
+
 //                terminalTransferDetail.setProCom(resultMap.get("proCom"));
 //                terminalTransferDetail.setProModel(resultMap.get("proModel"));
             terminalTransferDetailMapper.insert(terminalTransferDetail);
         }
-        if (platformTypeSet.size() != 1) {
+      /*  if (platformTypeSet.size() != 1) {
             throw new MessageException("不能平台类型,请分开提交");
-        }
+        }*/
         return AgentResult.ok();
     }
 
