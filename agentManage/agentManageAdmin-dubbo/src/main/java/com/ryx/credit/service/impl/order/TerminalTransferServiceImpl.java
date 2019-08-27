@@ -326,7 +326,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         //本次提交是否有重复SN
         List<TerminalTransferDetail> terminalTransferDetailListA = new ArrayList<>();
         terminalTransferDetailListA.addAll(terminalTransferDetailList);
-        if (terminalTransferDetailList.size() != 0) {
+        if (terminalTransferDetailList.size() > 0) {
             for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailListA) {
                 String snBeginNum1 = terminalTransferDetail.getSnBeginNum();
                 String snEndNum1 = terminalTransferDetail.getSnEndNum();
@@ -551,11 +551,10 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             if (StringUtils.isBlank(terminalTransfer.getPlatformType())) {
                 throw new MessageException("终端划拨，平台类型不能为空");
             }
-            //判断上下级
-            judgeSubSup(terminalTransferDetailList,agentId);
-            //判断sn
-            repetitionSN(terminalTransferDetailList);
-
+                //判断上下级
+                judgeSubSup(terminalTransferDetailList,agentId);
+                //判断sn
+                repetitionSN(terminalTransferDetailList);
 
 
             if (saveFlag.equals(SaveFlag.TJSP.getValue())) {
@@ -710,29 +709,6 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         return map;
 
     }
-/*
-    *//**
-     * chenliang
-     * @param str
-     * @return
-     *//*
-    //将共同部分末尾是0的全部剔除
-    public String panduan(String str) {
-        String[] strs = str.split("");
-        for (int i = strs.length - 1; i > 0; i--) {
-            if ("0".equals(strs[i])) {
-                strs[i] = "";
-            } else {
-                break;
-            }
-        }
-        StringBuffer sb = new StringBuffer();
-        for (String ss : strs) {
-            sb.append(ss);
-        }
-
-        return sb.toString().trim();
-    }*/
 
     /**
      * 保存修改校验
@@ -882,11 +858,6 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         criteria.andTerminalTransferIdEqualTo(terminalTransfer.getId());
         criteria.andStatusEqualTo(new BigDecimal("1"));
         List<TerminalTransferDetail> terminalTransferDetails = terminalTransferDetailMapper.selectByExample(terminalTransferDetailExample);
-        //判断提交sn
-        repetitionSN(terminalTransferDetails);
-        //判断是否属于一个平台
-        judgeSubSup(terminalTransferDetails,agentId);
-        //判断是否是一个大平台
         platformSame(terminalTransferDetails,SaveFlag.TJSP.getValue());
         if (terminalTransfer == null) {
             throw new MessageException("提交审批信息有误");
@@ -1518,8 +1489,6 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         repetitionSN(terminalTransferDetailList);
         //判断是否属于一个平台
         judgeSubSup(terminalTransferDetailList,agentId);
-        //判断是否是一个大平台
-        platformSame(terminalTransferDetailList,"");
 
         Date date = new Date();
         terminalTransfer.setuTime(date);
