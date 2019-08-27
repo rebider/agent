@@ -49,6 +49,6 @@ public interface TerminalTransferService {
     void  queryTerminalTransferResult() throws Exception;
     PageInfo terminalTransferDetailListExport(AgentVoTerminalTransferDetail terminalTransferDetail);
 
-     Map<String, Object> disposeSN(String snBeginNum, String snEndNum);
+     Map<String, Object> disposeSN(String snBeginNum, String snEndNum) throws MessageException;
 
 }
