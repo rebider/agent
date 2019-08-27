@@ -905,20 +905,16 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
             }
         } else if (PlatformType.RDBPOS.code.equals(platForm.getPlatformType())) {
 
-            if (null == order.getOrderPlatform()) {
-                throw new Exception("订单信息中平台异常");
-            }
-
+            //瑞大宝机具下发，调用接口
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
-            if (null == agentBusInfo) {
-                throw new MessageException("查询业务数据失败！");
+            if (null == agentBusInfo || null == oActivity_plan || null == order.getOrderPlatform()) {
+                throw new MessageException("查询业务数据失败！或订单信息中平台异常！或活动异常！");
             }
 
             String orderPlatForm = order.getOrderPlatform();
             String branchId = orderPlatForm.substring(0, orderPlatForm.indexOf("_"));
             String oldAgencyId = orderPlatForm.substring(orderPlatForm.indexOf("_") + 1);
 
-            //瑞大宝机具下发，调用接口
             Map<String, Object> reqMap = new HashMap<>();
             reqMap.put("taskId", logistics.getwNumber());//批次号（唯一值,主键,我们用物流运单号）
             reqMap.put("termBegin", logistics.getSnBeginNum());//起始SN
