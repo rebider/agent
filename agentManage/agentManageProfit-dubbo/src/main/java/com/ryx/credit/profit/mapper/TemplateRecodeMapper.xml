@@ -297,8 +297,8 @@
   </select>
 
 
-  <select id="checkAgentDoc" resultType="java.lang.String">
-    select AGENT_ID
+  <select id="checkAgentDoc" resultType="java.util.Map">
+    select AGENT_ID,BUS_PLATFORM,AG_DOC_PRO,AG_DOC_DISTRICT
     from A_AGENT_BUSINFO
     where BUS_NUM = #{busNum}
     and AG_DOC_PRO = #{docDic}
