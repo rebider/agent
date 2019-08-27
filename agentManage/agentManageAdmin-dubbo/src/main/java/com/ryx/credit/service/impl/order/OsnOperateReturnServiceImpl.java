@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 作者：cx
@@ -180,7 +181,7 @@ public class OsnOperateReturnServiceImpl extends OsnOperateServiceImpl {
     }
 
     @Override
-    public boolean sendInfoToBusinessSystem(List<OLogisticsDetail> datas, String logcId, BigDecimal batch) throws Exception {
-        return false;
+    public Map<String, Object> sendInfoToBusinessSystem(List<OLogisticsDetail> datas, String logcId, BigDecimal batch) throws Exception {
+        return null;
     }
 }

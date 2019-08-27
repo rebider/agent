@@ -262,7 +262,11 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                             //在一个独立事物中进行数据更新批次信息及状态信息
                             List<OLogisticsDetail> list = osnOperateService.updateDetailBatch(logisticsDetails, new BigDecimal(batch));
                             //发送到业务系统，根据批次号
-                            if (list.size() > 0 && osnOperateService.sendInfoToBusinessSystem(list, id, new BigDecimal(batch))) {
+                            Map<String, Object> retMap = osnOperateService.sendInfoToBusinessSystem(list, id, new BigDecimal(batch));
+                            if(null != retMap.get("code") && PlatformType.RDBPOS.code.equals(retMap.get("code"))){
+                                // 瑞大宝用的业务平台接口，不能及时返回结果，跳出循环
+                                break;
+                            }else if (list.size() > 0 && null != retMap.get("result") && (boolean) retMap.get("result")) {
                                 //处理成功，不做物流更新待处理完成所有进行状态更新
                                 logger.info("物流明细发送业务系统处理成功,{},{}", id, batch);
                             } else {
@@ -656,8 +660,12 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
      */
     @Override
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
-    public boolean sendInfoToBusinessSystem(List<OLogisticsDetail>  datas,String logcId,BigDecimal batch)throws Exception {
-        if(datas==null && datas.size()==0)return true;
+    public Map<String, Object> sendInfoToBusinessSystem(List<OLogisticsDetail>  datas,String logcId,BigDecimal batch)throws Exception {
+        Map<String, Object> retMap = new Hashtable<String, Object>();
+        if(datas==null && datas.size()==0){
+            retMap.put("result", true);
+            return retMap;
+        }
         OLogistics logistics = oLogisticsMapper.selectByPrimaryKey(logcId);
         //查询要发送的sn，根据sn进行排序
         OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
@@ -714,7 +722,8 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
             });
             //存储到流量卡表
             internetCardService.orderInsertInternetCard(listOLogisticsDetailSn,planVo.getProCom());
-            return true;
+            retMap.put("result", true);
+            return retMap;
         }
 
         if (PlatformType.whetherPOS(platForm.getPlatformType())) {
@@ -744,7 +753,8 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    return true;
+                    retMap.put("result", true);
+                    return retMap;
                     //机具下发失败，更新物流明细为下发失败，并更新物流为发送失败
                 } else {
                     AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+LogisticsDetailSendStatus.send_fail.msg, "任务生成物流明细错误报警OsnOperateServiceImpl");
@@ -755,7 +765,8 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    return false;
+                    retMap.put("result", false);
+                    return retMap;
                 }
                 //机具下发失败，更新物流明细为下发失败，并更新物流为发送失败，禁止继续发送 ,人工介入
             } catch (MessageException e) {
@@ -819,7 +830,8 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    return true;
+                    retMap.put("result", true);
+                    return retMap;
                     //机具下发失败，更新物流明细为下发失败，更新物流信息未下发失败，禁止再次发送，人工介入
                 } else {
                     AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum(), "任务生成物流明细错误报警OsnOperateServiceImpl");
@@ -830,7 +842,8 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    return false;
+                    retMap.put("result", false);
+                    return retMap;
                 }
                 //机具下发失败，更新物流明细为下发失败，更新物流信息未下发失败，禁止再次发送，人工介入
             } catch (MessageException e) {
@@ -877,7 +890,8 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    return true;
+                    retMap.put("result", true);
+                    return retMap;
 
                 }else{
                     AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+LogisticsDetailSendStatus.send_fail.msg, "任务生成物流明细错误报警OsnOperateServiceImpl");
@@ -888,7 +902,8 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    return false;
+                    retMap.put("result", false);
+                    return retMap;
                 }
 
             } catch (MessageException e) {
@@ -905,8 +920,13 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
             }
         } else if (PlatformType.RDBPOS.code.equals(platForm.getPlatformType())) {
 
-            if (null == order.getOrderPlatform()) {
-                throw new Exception("订单信息中平台异常");
+            //瑞大宝机具下发，调用接口
+            if(null == oActivity_plan){
+                throw new MessageException("活动信息异常！");
+            }
+
+            if(null == order.getOrderPlatform()){
+                throw new MessageException("订单信息中平台异常！");
             }
 
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
@@ -918,7 +938,6 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
             String branchId = orderPlatForm.substring(0, orderPlatForm.indexOf("_"));
             String oldAgencyId = orderPlatForm.substring(orderPlatForm.indexOf("_") + 1);
 
-            //瑞大宝机具下发，调用接口
             Map<String, Object> reqMap = new HashMap<>();
             reqMap.put("taskId", logistics.getwNumber());//批次号（唯一值,主键,我们用物流运单号）
             reqMap.put("termBegin", logistics.getSnBeginNum());//起始SN
@@ -965,7 +984,8 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                             detail.setuTime(date);
                             oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                         });
-                        return true;
+                        retMap.put("result", true);
+                        return retMap;
                     } else if (null != resJson.getString("code") && resJson.getString("code").equals("9999") && null != resJson.getBoolean("success") && !resJson.getBoolean("success")) {
                         //机具,下发失败，更新物流明细为下发失败，更新物流信息未下发失败，禁止再次发送，人工介入
                         AppConfig.sendEmails("SN开始：" + logistics.getSnBeginNum() + ",SN结束：" + logistics.getSnEndNum(), "任务生成物流明细错误报警OsnOperateServiceImpl");
@@ -976,7 +996,8 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                             detail.setuTime(date);
                             oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                         });
-                        return false;
+                        retMap.put("result", false);
+                        return retMap;
                     } else if (null != resJson.getString("code") && resJson.getString("code").equals("2001") && null != resJson.getBoolean("success") && !resJson.getBoolean("success")) {
                         //订单处理中，返回到明细处理，明细继续循环处理，一直到业务系统处理完成
                         listOLogisticsDetailSn.forEach(detail -> {
@@ -985,7 +1006,9 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                             detail.setuTime(date);
                             oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                         });
-                        return true;
+                        retMap.put("code", "RDBPOS");
+                        retMap.put("result", false);
+                        return retMap;
                     } else {
                         throw new Exception("瑞大宝，查询下发接口，返回值不符合要求，请联系管理员！");
                     }
@@ -1000,7 +1023,8 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                 throw e;
             }
         } else {
-            return false;
+            retMap.put("result", false);
+            return retMap;
         }
     }
 }
