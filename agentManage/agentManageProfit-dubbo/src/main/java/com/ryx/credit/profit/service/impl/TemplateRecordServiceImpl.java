@@ -124,6 +124,13 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
     public void saveAndApply(Map<String, String> map1, JSONObject map2) throws MessageException {
+
+        List<String> stringList = recodeMapper.checkAgentDoc(map1.get("orgId"),map1.get("docDic"));
+        if(stringList.size() > 1){
+            throw new MessageException("业务平台编码有误！");
+        }else if(stringList.size() < 1){
+            throw new MessageException("该业务平台编码不属于该省区！");
+        }
         //将数据传送至业务平台
         String result = HttpClientUtil.doPostJson(TEMPLATE_APPLY, map2.toJSONString());
         if(result == ""){
