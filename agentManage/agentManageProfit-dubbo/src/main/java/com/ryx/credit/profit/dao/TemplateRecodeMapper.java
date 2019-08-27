@@ -26,5 +26,5 @@ public interface TemplateRecodeMapper {
 
     List<Map<String,String>> getAgentInfoByBusNum(String busNum);
 
-    List<String> checkAgentDoc(@Param("busNum") String busNum, @Param("docDic") String docDic);
+    List<Map<String,String>> checkAgentDoc(@Param("busNum") String busNum, @Param("docDic") String docDic);
 }
