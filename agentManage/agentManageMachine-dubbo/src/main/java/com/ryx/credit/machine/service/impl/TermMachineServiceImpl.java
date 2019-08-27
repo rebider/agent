@@ -43,13 +43,13 @@ public class TermMachineServiceImpl  implements TermMachineService {
 
 
     @Override
-    public List<TermMachineVo> queryTermMachine(PlatformType platformType) throws Exception{
+    public List<TermMachineVo> queryTermMachine(PlatformType platformType,Map<String,String> par) throws Exception{
         if(PlatformType.whetherPOS(platformType.code)){
-            return posTermMachineServiceImpl.queryTermMachine(platformType);
+            return posTermMachineServiceImpl.queryTermMachine(platformType,par);
         }else  if(PlatformType.MPOS.code.equals(platformType.code)){
-            return mposTermMachineServiceImpl.queryTermMachine(platformType);
+            return mposTermMachineServiceImpl.queryTermMachine(platformType,par);
         }else  if(PlatformType.SSPOS.code.equals(platformType.code)){
-            return sPosTermMachineServiceImpl.queryTermMachine(platformType);
+            return sPosTermMachineServiceImpl.queryTermMachine(platformType,par);
         }else {
             List<TermMachineVo> list = new ArrayList<>();
             TermMachineVo vo = new TermMachineVo();

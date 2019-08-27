@@ -804,7 +804,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
             imsTermWarehouseDetail.setPosSpePrice(oActivity_plan.getPosSpePrice());
             imsTermWarehouseDetail.setPosType(oActivity_plan.getPosType());
             imsTermWarehouseDetail.setStandTime(oActivity_plan.getStandTime());
-            imsTermWarehouseDetail.setDeliveryTime(DateUtil.format(logistics.getSendDate(),"yyyyMMdd"));
+            imsTermWarehouseDetail.setDeliveryTime(DateUtil.format(logistics.getSendDate(),"yyyy-MM-dd"));
             try {
                 LowerHairMachineVo lowerHairMachineVo = new LowerHairMachineVo();
                 lowerHairMachineVo.setPlatformType(platForm.getPlatformType());

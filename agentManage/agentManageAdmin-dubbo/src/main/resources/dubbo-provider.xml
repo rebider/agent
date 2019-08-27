@@ -142,6 +142,7 @@
     <dubbo:service interface="com.ryx.credit.service.profit.IPosProfitDataService" ref="posProfitDataService"  timeout="1200000" registry="myGroup" />
     <dubbo:reference interface="com.ryx.credit.profit.service.BusiPlatService" id="busiPlatService"  timeout="1200000" registry="myGroup" check="false" />
     <dubbo:reference interface="com.ryx.internet.service.InternetCardService" id="internetCardService"  timeout="1200000" registry="myGroup" check="false" />
+    <dubbo:reference interface="com.ryx.credit.service.ActRuTaskService" id="actRuTaskService"  timeout="1200000" registry="myGroup" check="false" />
 
     <dubbo:service interface="com.ryx.credit.service.agent.AgentDebitCardService" ref="agentDebitCardService"  timeout="1200000" registry="myGroup"/>
 

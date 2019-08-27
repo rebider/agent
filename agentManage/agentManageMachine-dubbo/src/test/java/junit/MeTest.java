@@ -28,12 +28,12 @@ public class MeTest extends BaseSpringTest {
 
     @Test
     public void testqueryTermMachine(){
-        try {
-            List<TermMachineVo> list =  termMachineService.queryTermMachine(PlatformType.MPOS);
-            logger.debug(JSONArray.toJSONString(list));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            List<TermMachineVo> list =  termMachineService.queryTermMachine(PlatformType.MPOS);
+//            logger.debug(JSONArray.toJSONString(list));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Test
