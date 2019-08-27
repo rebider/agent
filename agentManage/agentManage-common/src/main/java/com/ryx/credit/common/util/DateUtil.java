@@ -498,5 +498,25 @@ public class DateUtil {
         return now.getTime();
     }
 
+    /**
+     * 字符串类型格式转换
+     * @param str
+     * @return
+     */
+    public static String dateConvertion(String str,String srcType,String goalType) {
+        Date parse = null;
+        String dateString = "";
+        try {
+        parse = new SimpleDateFormat("yyyy-MM-dd").parse(str);
+        dateString = new SimpleDateFormat("yyyyMMdd").format(parse);
+        } catch (ParseException e) {
+        dateString=null;
+        }
+        return dateString;
+    }
+
+    public static void main(String[] args){
+        System.out.println(DateUtil.dateConvertion("2019-08-27",DateUtil.DATE_FORMAT_yyyy_MM_dd,DateUtil.DATE_FORMAT_3));
+    }
 
 }

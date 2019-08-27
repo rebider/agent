@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+               xmlns="http://www.springframework.org/schema/beans"
                xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
        http://code.alibabatech.com/schema/dubbo
@@ -26,4 +26,6 @@
     <dubbo:reference interface="com.ryx.credit.service.order.OsnOperateService" id="osnOperateService"  timeout="1200000" registry="myGroup" />
     <dubbo:reference interface="com.ryx.internet.service.InternetCardService" id="internetCardService"  timeout="1200000" registry="myGroup" />
     <dubbo:reference interface="com.ryx.credit.service.order.TerminalTransferService" id="terminalTransferService"  timeout="1200000" registry="myGroup" />
+    <dubbo:reference interface="com.ryx.internet.service.OInternetRenewService" id="internetRenewService"  timeout="1200000" registry="myGroup" check="false"/>
+
 </beans>

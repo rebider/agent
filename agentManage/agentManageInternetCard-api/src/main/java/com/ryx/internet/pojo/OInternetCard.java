@@ -61,8 +61,6 @@ public class OInternetCard implements Serializable{
 
     private String stopReason;
 
-    private BigDecimal logout;
-
     private BigDecimal sumPostponeTime;
 
     private String snCount;
@@ -101,14 +99,6 @@ public class OInternetCard implements Serializable{
 
     public void setIccidNumEnd(String iccidNumEnd) {
         this.iccidNumEnd = iccidNumEnd;
-    }
-
-    public BigDecimal getLogout() {
-        return logout;
-    }
-
-    public void setLogout(BigDecimal logout) {
-        this.logout = logout;
     }
 
     public BigDecimal getSumPostponeTime() {
