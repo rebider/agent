@@ -285,7 +285,7 @@
   </select>
 <select id="getSN"  resultType="java.util.Map">
   select SN_BEGIN_NUM,SN_END_NUM from O_TERMINAL_TRANSFER_DETAIL where TERMINAL_TRANSFER_ID in(
-  select ID from O_TERMINAL_TRANSFER where REVIEW_STATUS ='02' )
+  select ID from O_TERMINAL_TRANSFER where REVIEW_STATUS ='02' )  and STATUS ='1'
 </select>
   <select id="querySubBusNum" parameterType="java.lang.String" resultType="java.util.Map">
 
