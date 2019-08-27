@@ -2,6 +2,7 @@ package com.ryx.credit.profit.dao;
 
 import com.ryx.credit.profit.pojo.TemplateRecode;
 import com.ryx.credit.profit.pojo.TemplateRecodeExample;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -24,4 +25,6 @@ public interface TemplateRecodeMapper {
     int updateByPrimaryKey(TemplateRecode record);
 
     List<Map<String,String>> getAgentInfoByBusNum(String busNum);
+
+    List<Map<String,String>> checkAgentDoc(@Param("busNum") String busNum, @Param("docDic") String docDic);
 }

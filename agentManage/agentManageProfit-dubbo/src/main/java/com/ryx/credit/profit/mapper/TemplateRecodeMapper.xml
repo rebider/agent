@@ -296,4 +296,12 @@
     where ab.BUS_NUM = #{busNum}
   </select>
 
+
+  <select id="checkAgentDoc" resultType="java.util.Map">
+    select AGENT_ID,BUS_PLATFORM,AG_DOC_PRO,AG_DOC_DISTRICT
+    from A_AGENT_BUSINFO
+    where BUS_NUM = #{busNum}
+    and AG_DOC_PRO = #{docDic}
+    and STATUS = '1'
+  </select>
 </mapper>

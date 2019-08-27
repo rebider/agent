@@ -10,6 +10,7 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
@@ -124,6 +125,13 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
     public void saveAndApply(Map<String, String> map1, JSONObject map2) throws MessageException {
+
+        List<Map<String,String>> stringList = recodeMapper.checkAgentDoc(map1.get("orgId"),map1.get("docDic"));
+        if(stringList.size() > 1){
+            throw new MessageException("业务平台编码有误！");
+        }else if(stringList.size() < 1){
+            throw new MessageException("该业务平台编码不属于该省区！");
+        }
         //将数据传送至业务平台
         String result = HttpClientUtil.doPostJson(TEMPLATE_APPLY, map2.toJSONString());
         if(result == ""){
@@ -185,8 +193,14 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         record.setcUser(map1.get("userId"));
         record.setAgentId(templateRecode.getAgentId());
         record.setAgentName(templateRecode.getAgentName());
+        record.setActivStatus(AgStatus.Approving.name());
         record.setBusType(BusActRelBusType.profitTempalteApply.name());
-        record.setDataShiro(BusActRelBusType.profitTempalteApply.key);
+        record.setDataShiro(BusActRelBusType.profitTempalteApply.key);  //
+
+        Map<String,String> reMap = stringList.get(0);
+        record.setNetInBusType("ACTIVITY_"+reMap.get("BUS_PLATFORM"));
+        record.setAgDocPro(reMap.get("AG_DOC_PRO"));
+        record.setAgDocDistrict(reMap.get("AG_DOC_DISTRICT"));
         try{
             taskApprovalService.addABusActRel(record);
             logger.info("分润模板线上申请审批流启动成功");
