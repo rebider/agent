@@ -264,7 +264,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                             //发送到业务系统，根据批次号
                             Map<String, Object> retMap = osnOperateService.sendInfoToBusinessSystem(list, id, new BigDecimal(batch));
                             if(null != retMap.get("code") && PlatformType.RDBPOS.code.equals(retMap.get("code"))){
-                                // 瑞大宝用的业务平台接口，不能及时返回结果，跳出循环
+                                //瑞大宝业务平台接口，处理数据量大时，不能及时返回处理结果，跳出循环，防止线程阻塞
                                 break;
                             }else if (list.size() > 0 && null != retMap.get("result") && (boolean) retMap.get("result")) {
                                 //处理成功，不做物流更新待处理完成所有进行状态更新
@@ -595,7 +595,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
             }
         } else if (PlatformType.RDBPOS.code.equals(platForm.getPlatformType())) {
             // RDB生成物流方式 根据机具类型确定机具明细的生成方式,pos生成明细记录
-            System.out.println("瑞大宝明细生成-->>");
+            logger.info("------------------------------->>>瑞大宝明细生成");
             for (int i = 0; i < ids.size(); i++){
                 OLogisticsDetail detail = new OLogisticsDetail();
                 //id，物流id，创建人，更新人，状态
@@ -949,7 +949,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
 
             try {
                 String json = JsonUtil.objectToJson(reqMap);
-                System.out.println("------------------------------------------>>>" + json);
+                logger.info("------------------------------------------>>>请求RDB下发数据:" + json);
                 String respResult = HttpClientUtil.doPostJsonWithException(AppConfig.getProperty("rdbpos.requestTransfer"), json);
 
                 if (!StringUtils.isNotBlank(respResult)) {
@@ -958,7 +958,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
 
                 JSONObject respJson = JSONObject.parseObject(respResult);
                 if (!(null != respJson.getString("code") && null != respJson.getString("success") && respJson.getString("code").equals("0000") && respJson.getBoolean("success"))) {
-                    System.out.println("------------------------------------------>>>" + respResult);
+                    logger.info("------------------------------------------>>>RDB下发返回异常:" + respResult);
                     throw new Exception(null != respJson.getString("msg") ? respJson.getString("msg") : "瑞大宝，下发接口，返回值异常，请联系管理员!");
                 }
 
@@ -973,8 +973,8 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                     }
 
                     JSONObject resJson = JSONObject.parseObject(retString);
-                    System.out.println("------------------------------------------>>>" + respResult);
-                    System.out.println("------------------------------------------>>>" + listOLogisticsDetailSn);
+                    logger.info("------------------------------------------>>>RDB下发查询接口返回值:" + retString);
+                    logger.info("------------------------------------------>>>要修改的明细具体信息:" + JsonUtil.objectToJson(listOLogisticsDetailSn));
                     if (null != resJson.getString("code") && resJson.getString("code").equals("0000") && null != resJson.getBoolean("success") && resJson.getBoolean("success")) {
                         //机具,下发成功，更新物流明细为下发成功
                         logger.info("下发物流接口调用成功：物流编号:{},批次编号:{},时间:{},信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), resJson.getString("msg"));
