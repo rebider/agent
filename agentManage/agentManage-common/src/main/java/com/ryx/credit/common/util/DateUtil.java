@@ -515,8 +515,22 @@ public class DateUtil {
         return dateString;
     }
 
+    /**
+     * 获取当前月某一天
+     * @param date
+     * @return
+     */
+    public static Date dateDay(Date date,String day) {
+        String format = DateUtil.format(date, DateUtil.DATE_FORMAT_yyyyMM);
+        String nowDate = format + day;
+        Date format1 = DateUtil.format(nowDate, DateUtil.DATE_FORMAT_3);
+        return format1;
+    }
+
+
     public static void main(String[] args){
-        System.out.println(DateUtil.dateConvertion("2019-08-27",DateUtil.DATE_FORMAT_yyyy_MM_dd,DateUtil.DATE_FORMAT_3));
+        Date date = DateUtil.dateDay(new Date(), "22");
+        System.out.println(date);
     }
 
 }

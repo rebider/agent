@@ -352,7 +352,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                 throw new MessageException(resultMap.get("msg").toString());
             }else{//分配成功
                 Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
-                templateRecode.setTemplateId(objectMap.get("templateId").toString());
+                templateRecode.setRev1(objectMap.get("templateId").toString());
                 templateRecode.setTemplateName(objectMap.get("templateName").toString());
                 templateRecode.setAssignResult("0");// 分配成功
                 recodeMapper.updateByPrimaryKeySelective(templateRecode);

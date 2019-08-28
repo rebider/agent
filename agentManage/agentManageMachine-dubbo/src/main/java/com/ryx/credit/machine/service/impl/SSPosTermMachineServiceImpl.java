@@ -69,8 +69,8 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
 
 
     @Override
-    public List<TermMachineVo> queryTermMachine(PlatformType platformType, Map map) throws Exception{
-        List<Map> list =  imsTermMachineMapper.querySSIMS_TERM_MACHINE();
+    public List<TermMachineVo> queryTermMachine(PlatformType platformType,Map<String,String> par) throws Exception{
+        List<Map> list =  imsTermMachineMapper.querySSIMS_TERM_MACHINE(par);
         List<TermMachineVo> termMachineVoList = new ArrayList<>();
         for (Map imsTermMachine : list) {
             TermMachineVo newvo = new TermMachineVo();
@@ -80,6 +80,20 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
             Object BACK_TYPE = imsTermMachine.get("BACK_TYPE");
             newvo.setStandAmt(STAND_AMT==null?null:(STAND_AMT+""));
             newvo.setBackType(BACK_TYPE==null?null:(BACK_TYPE+""));
+            Object TMS_MODEL = imsTermMachine.get("TMS_MODEL");
+            Object MANUFACTOR = imsTermMachine.get("MANUFACTOR");
+            newvo.setModel(TMS_MODEL==null?null:TMS_MODEL+"");
+            newvo.setManufactor(MANUFACTOR==null?null:MANUFACTOR+"");
+
+            Object STAND_TIME = imsTermMachine.get("STAND_TIME");
+            Object ACTIVITY_START_TIME = imsTermMachine.get("ACTIVITY_START_TIME");
+            Object ACTIVITY_END_TIME = imsTermMachine.get("ACTIVITY_END_TIME");
+            Object PRICE = imsTermMachine.get("PRICE");
+            newvo.setStandTime(STAND_TIME==null?null:STAND_TIME+"");
+            newvo.setActivityStartTime(ACTIVITY_START_TIME==null?null:ACTIVITY_START_TIME+"");
+            newvo.setActivityEndTime(ACTIVITY_END_TIME==null?null:ACTIVITY_END_TIME+"");
+            newvo.setPrice(PRICE==null?null:PRICE+"");
+
             termMachineVoList.add(newvo);
         }
         return termMachineVoList;
@@ -123,12 +137,17 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
             }
             String createTime = DateUtil.format(new Date());
             imsTermWarehouseDetail.setMachineId(POS_ID);
+            imsTermWarehouseDetail.setOrgId(imsTermWarehouseDetail.getOrgId());
             imsTermWarehouseDetail.setActivityId(activity.getActivityId());
             imsTermWarehouseDetail.setBrandCode(activity.getBrandCode());
             imsTermWarehouseDetail.setWdId(IDUtils.genImsTermId());
             imsTermWarehouseDetail.setPosSn(sn);
             imsTermWarehouseDetail.setUseStatus("1"); //未使用
             imsTermWarehouseDetail.setStatus("0");  //正常
+            imsTermWarehouseDetail.setPosType(imsTermWarehouseDetail.getPosType());//根据押金 POS_TYPE IS 'pos类型 0普通级，1：特价机，2特价机无押金';
+            imsTermWarehouseDetail.setPayStatus("1");//
+            imsTermWarehouseDetail.setDeliveryTime(imsTermWarehouseDetail.getDeliveryTime());//发货时间
+            imsTermWarehouseDetail.setStandTime(imsTermWarehouseDetail.getStandTime()==null?activity.getStandTime():imsTermWarehouseDetail.getStandTime());//达标时间
             imsTermWarehouseDetail.setCreateTime(createTime);
             imsTermWarehouseDetail.setCreatePerson(ZHYY_CREATE_PERSON);
             imsTermWarehouseDetail.setUpdateTime(createTime);

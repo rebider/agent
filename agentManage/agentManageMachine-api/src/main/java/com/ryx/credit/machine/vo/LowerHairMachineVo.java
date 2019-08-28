@@ -4,6 +4,7 @@ import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.machine.entity.ImsTermWarehouseDetail;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +29,9 @@ public class LowerHairMachineVo  implements Serializable {
     private String  PlatformType;
 
     private String actCode;
+
+
+
 
 
     /**
@@ -129,4 +133,6 @@ public class LowerHairMachineVo  implements Serializable {
     public void setSnList(List<String> snList) {
         this.snList = snList;
     }
+
+
 }
