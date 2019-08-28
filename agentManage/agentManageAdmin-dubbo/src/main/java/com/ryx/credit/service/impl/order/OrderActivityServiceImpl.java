@@ -24,6 +24,7 @@ import com.ryx.credit.profit.service.ProfitMonthService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrderActivityService;
+import org.apache.poi.hssf.usermodel.HSSFAnchor;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -450,7 +451,10 @@ public class OrderActivityServiceImpl implements OrderActivityService {
 
         //查询参数
         Map<String,String> par = new HashMap<>();
+        //num
         par.put("busplatform",platForm.getBusplatform());
+        //type
+        par.put("busPlatForm",platFormType);
         if (StringUtils.isNotBlank(platFormType)) {
             try {
                 termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType),par);

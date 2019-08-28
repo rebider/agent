@@ -27,7 +27,6 @@ import java.util.Map;
 @Service("termMachineService")
 public class TermMachineServiceImpl  implements TermMachineService {
 
-
     private Logger logger = LoggerFactory.getLogger(TermMachineServiceImpl.class);
 
     @Resource(name = "posTermMachineServiceImpl")
@@ -35,12 +34,12 @@ public class TermMachineServiceImpl  implements TermMachineService {
 
     @Resource(name = "mposTermMachineServiceImpl")
     private TermMachineService mposTermMachineServiceImpl;
+
     @Resource(name = "sPosTermMachineServiceImpl")
     private TermMachineService sPosTermMachineServiceImpl;
 
-
-
-
+    @Resource(name = "rdbTermMachineServiceImpl")
+    private TermMachineService rdbTermMachineServiceImpl;
 
     @Override
     public List<TermMachineVo> queryTermMachine(PlatformType platformType,Map<String,String> par) throws Exception{
@@ -50,6 +49,8 @@ public class TermMachineServiceImpl  implements TermMachineService {
             return mposTermMachineServiceImpl.queryTermMachine(platformType,par);
         }else  if(PlatformType.SSPOS.code.equals(platformType.code)){
             return sPosTermMachineServiceImpl.queryTermMachine(platformType,par);
+        }else  if(PlatformType.RDBPOS.code.equals(platformType.code)){
+            return rdbTermMachineServiceImpl.queryTermMachine(platformType, par);
         }else {
             List<TermMachineVo> list = new ArrayList<>();
             TermMachineVo vo = new TermMachineVo();
