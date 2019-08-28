@@ -269,7 +269,8 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                                 OLogistics oLogistics = oLogisticsMapper.selectByPrimaryKey(id);
                                 oLogistics.setSendStatus(LogisticsSendStatus.gen_detail_sucess.code);
                                 if(oLogisticsMapper.updateByPrimaryKeySelective(oLogistics) != 1){
-                                    logger.info("更新物流失败" + id);
+                                    logger.info("----------------------------------瑞大宝下发-正在处理中-更新物流信息失败.ID" + id);
+                                    throw new MessageException("瑞大宝下发-正在处理中-更新物流信息失败.ID:" + id);
                                 }
                                 break;
                             }else if (list.size() > 0 && null != retMap.get("result") && (boolean) retMap.get("result")) {
