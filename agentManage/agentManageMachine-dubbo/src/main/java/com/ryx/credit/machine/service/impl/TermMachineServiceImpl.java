@@ -42,15 +42,15 @@ public class TermMachineServiceImpl  implements TermMachineService {
     private TermMachineService rdbTermMachineServiceImpl;
 
     @Override
-    public List<TermMachineVo> queryTermMachine(PlatformType platformType, Map map) throws Exception{
+    public List<TermMachineVo> queryTermMachine(PlatformType platformType,Map<String,String> par) throws Exception{
         if(PlatformType.whetherPOS(platformType.code)){
-            return posTermMachineServiceImpl.queryTermMachine(platformType, map);
+            return posTermMachineServiceImpl.queryTermMachine(platformType,par);
         }else  if(PlatformType.MPOS.code.equals(platformType.code)){
-            return mposTermMachineServiceImpl.queryTermMachine(platformType, map);
+            return mposTermMachineServiceImpl.queryTermMachine(platformType,par);
         }else  if(PlatformType.SSPOS.code.equals(platformType.code)){
-            return sPosTermMachineServiceImpl.queryTermMachine(platformType, map);
+            return sPosTermMachineServiceImpl.queryTermMachine(platformType,par);
         }else  if(PlatformType.RDBPOS.code.equals(platformType.code)){
-            return rdbTermMachineServiceImpl.queryTermMachine(platformType, map);
+            return rdbTermMachineServiceImpl.queryTermMachine(platformType, par);
         }else {
             List<TermMachineVo> list = new ArrayList<>();
             TermMachineVo vo = new TermMachineVo();
