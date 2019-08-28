@@ -63,35 +63,22 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     private static final String TEMPLATE_APPLY_PASS = AppConfig.getProperty("template.apply.pass");
 
     @Override
-    public PageInfo getApplyList(Page page, TemplateRecode templateRecode) {
-        TemplateRecodeExample example = new TemplateRecodeExample();
-        example.setPage(page);
-        TemplateRecodeExample.Criteria criteria = example.createCriteria();
-        if(StringUtils.isNotBlank(templateRecode.getAgentId())){
-            criteria.andAgentIdEqualTo(templateRecode.getAgentId());
+    public PageInfo getApplyList(Page page, TemplateRecode templateRecode,Map<String,Object> map) {
+        Map<String,String> map1 = new HashMap<String,String>();
+        if(map != null){
+            String str = map.get("ORGANIZATIONCODE").toString();
+            if(str.indexOf("city") != -1 && str.indexOf("region") != -1){
+                String agDoc = map.get("ORGID").toString();  //省区
+                map1.put("agDoc",agDoc);
+            }else if(str.indexOf("region") != -1 && str.indexOf("city") == -1){
+                String agDis = map.get("ORGID").toString(); //大区
+                map1.put("agDis",agDis);
+            }
         }
-        if(StringUtils.isNotBlank(templateRecode.getAgentName())){
-            criteria.andAgentNameEqualTo(templateRecode.getAgentName());
-        }
-        if(StringUtils.isNotBlank(templateRecode.getBusPlatform())){
-            criteria.andBusPlatformEqualTo(templateRecode.getBusPlatform());
-        }
-        if(StringUtils.isNotBlank(templateRecode.getBusNum())){
-            criteria.andBusNumEqualTo(templateRecode.getBusNum());
-        }
-        if(StringUtils.isNotBlank(templateRecode.getTemplateName())){
-            criteria.andTemplateNameEqualTo(templateRecode.getTemplateName());
-        }
-        if(StringUtils.isNotBlank(templateRecode.getApplyResult())){
-            criteria.andApplyResultEqualTo(templateRecode.getApplyResult());
-        }
-        if(StringUtils.isNotBlank(templateRecode.getCreateUser())){
-            criteria.andCreateUserEqualTo(templateRecode.getCreateUser());
-        }
-        example.setOrderByClause("CREATE_DATE DESC");
+
         PageInfo pageInfo = new PageInfo();
-        pageInfo.setRows(recodeMapper.selectByExample(example));
-        pageInfo.setTotal((int)recodeMapper.countByExample(example));
+        pageInfo.setRows(recodeMapper.getListByTem(page,templateRecode,map1));
+        pageInfo.setTotal(recodeMapper.getCountByTem(templateRecode,map1));
         return pageInfo;
     }
 
@@ -319,20 +306,20 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                 TemplateRecode templateRecode = recodeMapper.selectByPrimaryKey(rel.getBusId());
                 if("1".equals(status)){ //通过
                     templateRecode.setApplyResult("4"); // 通过
-                    JSONObject map2 = new JSONObject();
-                    map2.put("applyId",templateRecode.getTemplateId());
-                    String result = HttpClientUtil.doPostJson(TEMPLATE_APPLY_PASS, map2.toJSONString());
-                    Map<String,Object> resultMap = JSONObject.parseObject(result);
-                    if(!(boolean)resultMap.get("result")){
-                        logger.info("***********分配失败，***********");
-                        templateRecode.setAssignResult("1");// 分配失败
-                        templateRecode.setAssignReason(resultMap.get("msg").toString());
-                    }else{
-                        Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
-                        templateRecode.setRev1(objectMap.get("templateId").toString());
-                        templateRecode.setRev2(objectMap.get("templateName").toString());
-                        templateRecode.setAssignResult("0");// 分配成功
-                    }
+                    //JSONObject map2 = new JSONObject();
+                    //map2.put("applyId",templateRecode.getTemplateId());
+                    //String result = HttpClientUtil.doPostJson(TEMPLATE_APPLY_PASS, map2.toJSONString());
+                    //Map<String,Object> resultMap = JSONObject.parseObject(result);
+                    //if(!(boolean)resultMap.get("result")){
+                    //    logger.info("***********分配失败，***********");
+                     //   templateRecode.setAssignResult("1");// 分配失败
+                     //   templateRecode.setAssignReason(resultMap.get("msg").toString());
+                    //}else{
+                    //    Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
+                     //   templateRecode.setRev1(objectMap.get("templateId").toString());
+                    //    templateRecode.setRev2(objectMap.get("templateName").toString());
+                    //    templateRecode.setAssignResult("0");// 分配成功
+                   // }
                 }else{
                     templateRecode.setApplyResult("3"); // 撤销
                 }
@@ -346,5 +333,25 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             e.printStackTrace();
             logger.error("其他扣款申请审批流回调异常，activId：{}"+insid);
         }
+    }
+
+
+    @Override
+    public Map<String,Object> checkAngAsign(String id) throws MessageException{
+        TemplateRecode templateRecode = recodeMapper.selectByPrimaryKey(id);
+        if(templateRecode == null){
+            throw new MessageException("查询该模板申请信息失败，请联系管理员");
+        }
+        JSONObject map2 = new JSONObject();
+        map2.put("applyId",templateRecode.getTemplateId());
+        try{
+            String result = HttpClientUtil.doPostJson(TEMPLATE_APPLY_PASS, map2.toJSONString());
+            Map<String,Object> resultMap = JSONObject.parseObject(result);
+            return resultMap;
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new MessageException("校验模板信息失败，请重试！");
+        }
+
     }
 }

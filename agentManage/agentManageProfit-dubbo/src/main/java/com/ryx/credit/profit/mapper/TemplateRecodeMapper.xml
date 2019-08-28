@@ -304,4 +304,74 @@
     and AG_DOC_PRO = #{docDic}
     and STATUS = '1'
   </select>
+
+  <select id="getListByTem" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    ap.ID, ap.AGENT_ID, ap.AGENT_NAME, ap.BUS_NUM, ap.BUS_PLATFORM, ap.CREATE_DATE, ap.APPLY_RESULT, ap.TEMPLATE_NAME,
+    ap.TEMPLATE_ID, ap.CREATE_USER, ap.ASSIGN_RESULT, ap.ASSIGN_REASON, ap.CRE_TYPE, ap.TEM_TYPE, ap.REV1,
+    ap.REV2
+    from P_TEMPLATE_APPLY_RECORD ap
+    inner join  A_AGENT_BUSINFO  ab
+    on ap.BUS_NUM = ab.BUS_NUM
+    where 1 = 1
+    <if test="map.agDoc != '' and map.agDoc != null">
+      and ab.AG_DOC_PRO = #{map.agDoc}
+    </if>
+    <if test="map.agDis != '' and map.agDis != null">
+      and ab.AG_DOC_DISTRICT = #{map.agDis}
+    </if>
+    <if test="record.agentId != '' and record.agentId != null">
+      and ap.AGENT_ID = #{record.agentId}
+    </if>
+    <if test="record.agentName != '' and record.agentName != null">
+      and ap.AGENT_NAME = #{record.agentName}
+    </if>
+    <if test="record.busPlatform != '' and record.busPlatform != null">
+      and ap.BUS_PLATFORM = #{record.busPlatform}
+    </if>
+    <if test="record.busNum != '' and record.busNum != null">
+      and ap.BUS_NUM = #{record.busNum}
+    </if>
+    <if test="record.templateName != '' and record.templateName != null">
+      and ap.TEMPLATE_NAME = #{record.templateName}
+    </if>
+    <if test="record.applyResult != '' and record.applyResult != null">
+      and ap.APPLY_RESULT = #{record.applyResult}
+    </if>
+    order by ap.CREATE_DATE desc
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="getCountByTem" resultType="java.lang.Integer">
+    select count(1)
+    from P_TEMPLATE_APPLY_RECORD ap
+    inner join  A_AGENT_BUSINFO  ab
+    on ap.BUS_NUM = ab.BUS_NUM
+    where 1 = 1
+    <if test="map.agDoc != '' and map.agDoc != null">
+      and ab.AG_DOC_PRO = #{map.agDoc}
+    </if>
+    <if test="map.agDis != '' and map.agDis != null">
+      and ab.AG_DOC_DISTRICT = #{map.agDis}
+    </if>
+    <if test="record.agentId != '' and record.agentId != null">
+      and ap.AGENT_ID = #{record.agentId}
+    </if>
+    <if test="record.agentName != '' and record.agentName != null">
+      and ap.AGENT_NAME = #{record.agentName}
+    </if>
+    <if test="record.busPlatform != '' and record.busPlatform != null">
+      and ap.BUS_PLATFORM = #{record.busPlatform}
+    </if>
+    <if test="record.busNum != '' and record.busNum != null">
+      and ap.BUS_NUM = #{record.busNum}
+    </if>
+    <if test="record.templateName != '' and record.templateName != null">
+      and ap.TEMPLATE_NAME = #{record.templateName}
+    </if>
+    <if test="record.applyResult != '' and record.applyResult != null">
+      and ap.APPLY_RESULT = #{record.applyResult}
+    </if>
+  </select>
 </mapper>
