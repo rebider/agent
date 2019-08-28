@@ -1,7 +1,6 @@
 package com.ryx.credit.pojo.admin.agent;
 
 import com.ryx.credit.common.util.Page;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1725,6 +1724,76 @@ public class CapitalExample {
 
         public Criteria andFreezeAmtNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("FREEZE_AMT not between", value1, value2, "freezeAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivIdIsNull() {
+            addCriterion("ACTIV_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivIdIsNotNull() {
+            addCriterion("ACTIV_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivIdEqualTo(String value) {
+            addCriterion("ACTIV_ID =", value, "activId");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivIdNotEqualTo(String value) {
+            addCriterion("ACTIV_ID <>", value, "activId");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivIdGreaterThan(String value) {
+            addCriterion("ACTIV_ID >", value, "activId");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivIdGreaterThanOrEqualTo(String value) {
+            addCriterion("ACTIV_ID >=", value, "activId");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivIdLessThan(String value) {
+            addCriterion("ACTIV_ID <", value, "activId");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivIdLessThanOrEqualTo(String value) {
+            addCriterion("ACTIV_ID <=", value, "activId");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivIdLike(String value) {
+            addCriterion("ACTIV_ID like", value, "activId");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivIdNotLike(String value) {
+            addCriterion("ACTIV_ID not like", value, "activId");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivIdIn(List<String> values) {
+            addCriterion("ACTIV_ID in", values, "activId");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivIdNotIn(List<String> values) {
+            addCriterion("ACTIV_ID not in", values, "activId");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivIdBetween(String value1, String value2) {
+            addCriterion("ACTIV_ID between", value1, value2, "activId");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivIdNotBetween(String value1, String value2) {
+            addCriterion("ACTIV_ID not between", value1, value2, "activId");
             return (Criteria) this;
         }
     }

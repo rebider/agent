@@ -6,6 +6,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
 import com.ryx.internet.pojo.OInternetCard;
 import com.ryx.internet.pojo.OInternetCardImport;
+import com.ryx.internet.pojo.OInternetCardPostpone;
 
 import java.util.List;
 
@@ -44,4 +45,7 @@ public interface InternetCardService {
 
     void migrationHistory(OInternetCardImport oInternetCardImport)throws MessageException;
 
+    void internetCardPostpone(OInternetCardPostpone internetCardPostpone, String cUser)throws MessageException;
+
+    PageInfo queryInternetCardPostponeList(OInternetCardPostpone internetCardPostpone,Page page);
 }

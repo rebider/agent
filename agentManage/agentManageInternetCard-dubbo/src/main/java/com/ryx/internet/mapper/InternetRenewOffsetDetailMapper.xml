@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ryx.internet.dao.InternetRenewOffsetMapper">
-  <resultMap id="BaseResultMap" type="com.ryx.internet.pojo.InternetRenewOffset">
-    <id column="FLOW_ID" jdbcType="VARCHAR" property="flowId" />
+<mapper namespace="com.ryx.internet.dao.InternetRenewOffsetDetailMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.internet.pojo.InternetRenewOffsetDetail">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="FLOW_ID" jdbcType="VARCHAR" property="flowId" />
     <result column="RENEW_ID" jdbcType="VARCHAR" property="renewId" />
     <result column="RENEW_DETAIL_ID" jdbcType="VARCHAR" property="renewDetailId" />
     <result column="ICCID_NUM" jdbcType="VARCHAR" property="iccidNum" />
@@ -12,14 +13,15 @@
     <result column="MER_NAME" jdbcType="VARCHAR" property="merName" />
     <result column="OFFSET_AMT" jdbcType="DECIMAL" property="offsetAmt" />
     <result column="ALREADY_OFFSET_AMT" jdbcType="DECIMAL" property="alreadyOffsetAmt" />
+    <result column="TODAY_OFFSET_AMT" jdbcType="DECIMAL" property="todayOffsetAmt" />
     <result column="C_TIME" jdbcType="VARCHAR" property="cTime" />
-    <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
-    <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
-    <result column="STATUS" jdbcType="DECIMAL" property="status" />
-    <result column="VERSION" jdbcType="DECIMAL" property="version" />
-    <result column="CLEAN_STATUS" jdbcType="VARCHAR" property="cleanStatus" />
     <result column="PROCESS_DATE" jdbcType="VARCHAR" property="processDate" />
     <result column="PROCESS_TIME" jdbcType="VARCHAR" property="processTime" />
+    <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
+    <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
+    <result column="CLEAN_STATUS" jdbcType="VARCHAR" property="cleanStatus" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="VERSION" jdbcType="DECIMAL" property="version" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -51,18 +53,18 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    FLOW_ID, RENEW_ID, RENEW_DETAIL_ID, ICCID_NUM, AGENT_ID, AGENT_NAME, MER_ID, MER_NAME,
-    OFFSET_AMT, ALREADY_OFFSET_AMT, C_TIME, C_USER, U_USER, STATUS, VERSION, CLEAN_STATUS,
-    PROCESS_DATE, PROCESS_TIME
+    ID, FLOW_ID, RENEW_ID, RENEW_DETAIL_ID, ICCID_NUM, AGENT_ID, AGENT_NAME, MER_ID, 
+    MER_NAME, OFFSET_AMT, ALREADY_OFFSET_AMT, TODAY_OFFSET_AMT, C_TIME, PROCESS_DATE, 
+    PROCESS_TIME, C_USER, U_USER, CLEAN_STATUS, STATUS, VERSION
   </sql>
-  <select id="selectByExample" parameterType="com.ryx.internet.pojo.InternetRenewOffsetExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.ryx.internet.pojo.InternetRenewOffsetDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
     <if test="distinct">
       distinct
     </if>
     <include refid="Base_Column_List" />
-    from O_INTERNET_RENEW_OFFSET
+    from O_INTERNET_RENEW_OFFSET_DETAIL
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -72,36 +74,39 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select
+    select 
     <include refid="Base_Column_List" />
-    from O_INTERNET_RENEW_OFFSET
-    where FLOW_ID = #{flowId,jdbcType=VARCHAR}
+    from O_INTERNET_RENEW_OFFSET_DETAIL
+    where ID = #{id,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByExample" parameterType="com.ryx.internet.pojo.InternetRenewOffsetExample">
-    delete from O_INTERNET_RENEW_OFFSET
+  <delete id="deleteByExample" parameterType="com.ryx.internet.pojo.InternetRenewOffsetDetailExample">
+    delete from O_INTERNET_RENEW_OFFSET_DETAIL
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.ryx.internet.pojo.InternetRenewOffset">
-    insert into O_INTERNET_RENEW_OFFSET (FLOW_ID, RENEW_ID, RENEW_DETAIL_ID,
-    ICCID_NUM, AGENT_ID, AGENT_NAME,
-    MER_ID, MER_NAME, OFFSET_AMT,
-    ALREADY_OFFSET_AMT, C_TIME, C_USER,
-    U_USER, STATUS, VERSION,
-    CLEAN_STATUS, PROCESS_DATE, PROCESS_TIME
-    )
-    values (#{flowId,jdbcType=VARCHAR}, #{renewId,jdbcType=VARCHAR}, #{renewDetailId,jdbcType=VARCHAR},
-    #{iccidNum,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR},
-    #{merId,jdbcType=VARCHAR}, #{merName,jdbcType=VARCHAR}, #{offsetAmt,jdbcType=DECIMAL},
-    #{alreadyOffsetAmt,jdbcType=DECIMAL}, #{cTime,jdbcType=VARCHAR}, #{cUser,jdbcType=VARCHAR},
-    #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL},
-    #{cleanStatus,jdbcType=VARCHAR}, #{processDate,jdbcType=VARCHAR}, #{processTime,jdbcType=VARCHAR}
-    )
+  <insert id="insert" parameterType="com.ryx.internet.pojo.InternetRenewOffsetDetail">
+    insert into O_INTERNET_RENEW_OFFSET_DETAIL (ID, FLOW_ID, RENEW_ID, 
+      RENEW_DETAIL_ID, ICCID_NUM, AGENT_ID, 
+      AGENT_NAME, MER_ID, MER_NAME, 
+      OFFSET_AMT, ALREADY_OFFSET_AMT, TODAY_OFFSET_AMT, 
+      C_TIME, PROCESS_DATE, PROCESS_TIME, 
+      C_USER, U_USER, CLEAN_STATUS, 
+      STATUS, VERSION)
+    values (#{id,jdbcType=VARCHAR}, #{flowId,jdbcType=VARCHAR}, #{renewId,jdbcType=VARCHAR}, 
+      #{renewDetailId,jdbcType=VARCHAR}, #{iccidNum,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
+      #{agentName,jdbcType=VARCHAR}, #{merId,jdbcType=VARCHAR}, #{merName,jdbcType=VARCHAR}, 
+      #{offsetAmt,jdbcType=DECIMAL}, #{alreadyOffsetAmt,jdbcType=DECIMAL}, #{todayOffsetAmt,jdbcType=DECIMAL}, 
+      #{cTime,jdbcType=VARCHAR}, #{processDate,jdbcType=VARCHAR}, #{processTime,jdbcType=VARCHAR}, 
+      #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{cleanStatus,jdbcType=VARCHAR}, 
+      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
   </insert>
-  <insert id="insertSelective" parameterType="com.ryx.internet.pojo.InternetRenewOffset">
-    insert into O_INTERNET_RENEW_OFFSET
+  <insert id="insertSelective" parameterType="com.ryx.internet.pojo.InternetRenewOffsetDetail">
+    insert into O_INTERNET_RENEW_OFFSET_DETAIL
     <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
       <if test="flowId != null">
         FLOW_ID,
       </if>
@@ -132,23 +137,11 @@
       <if test="alreadyOffsetAmt != null">
         ALREADY_OFFSET_AMT,
       </if>
+      <if test="todayOffsetAmt != null">
+        TODAY_OFFSET_AMT,
+      </if>
       <if test="cTime != null">
         C_TIME,
-      </if>
-      <if test="cUser != null">
-        C_USER,
-      </if>
-      <if test="uUser != null">
-        U_USER,
-      </if>
-      <if test="status != null">
-        STATUS,
-      </if>
-      <if test="version != null">
-        VERSION,
-      </if>
-      <if test="cleanStatus != null">
-        CLEAN_STATUS,
       </if>
       <if test="processDate != null">
         PROCESS_DATE,
@@ -156,8 +149,26 @@
       <if test="processTime != null">
         PROCESS_TIME,
       </if>
+      <if test="cUser != null">
+        C_USER,
+      </if>
+      <if test="uUser != null">
+        U_USER,
+      </if>
+      <if test="cleanStatus != null">
+        CLEAN_STATUS,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="version != null">
+        VERSION,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
       <if test="flowId != null">
         #{flowId,jdbcType=VARCHAR},
       </if>
@@ -188,23 +199,11 @@
       <if test="alreadyOffsetAmt != null">
         #{alreadyOffsetAmt,jdbcType=DECIMAL},
       </if>
+      <if test="todayOffsetAmt != null">
+        #{todayOffsetAmt,jdbcType=DECIMAL},
+      </if>
       <if test="cTime != null">
         #{cTime,jdbcType=VARCHAR},
-      </if>
-      <if test="cUser != null">
-        #{cUser,jdbcType=VARCHAR},
-      </if>
-      <if test="uUser != null">
-        #{uUser,jdbcType=VARCHAR},
-      </if>
-      <if test="status != null">
-        #{status,jdbcType=DECIMAL},
-      </if>
-      <if test="version != null">
-        #{version,jdbcType=DECIMAL},
-      </if>
-      <if test="cleanStatus != null">
-        #{cleanStatus,jdbcType=VARCHAR},
       </if>
       <if test="processDate != null">
         #{processDate,jdbcType=VARCHAR},
@@ -212,17 +211,35 @@
       <if test="processTime != null">
         #{processTime,jdbcType=VARCHAR},
       </if>
+      <if test="cUser != null">
+        #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="uUser != null">
+        #{uUser,jdbcType=VARCHAR},
+      </if>
+      <if test="cleanStatus != null">
+        #{cleanStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=DECIMAL},
+      </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.internet.pojo.InternetRenewOffsetExample" resultType="java.lang.Long">
-    select count(*) from O_INTERNET_RENEW_OFFSET
+  <select id="countByExample" parameterType="com.ryx.internet.pojo.InternetRenewOffsetDetailExample" resultType="java.lang.Long">
+    select count(*) from O_INTERNET_RENEW_OFFSET_DETAIL
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.internet.pojo.InternetRenewOffset">
-    update O_INTERNET_RENEW_OFFSET
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.internet.pojo.InternetRenewOffsetDetail">
+    update O_INTERNET_RENEW_OFFSET_DETAIL
     <set>
+      <if test="flowId != null">
+        FLOW_ID = #{flowId,jdbcType=VARCHAR},
+      </if>
       <if test="renewId != null">
         RENEW_ID = #{renewId,jdbcType=VARCHAR},
       </if>
@@ -250,23 +267,11 @@
       <if test="alreadyOffsetAmt != null">
         ALREADY_OFFSET_AMT = #{alreadyOffsetAmt,jdbcType=DECIMAL},
       </if>
+      <if test="todayOffsetAmt != null">
+        TODAY_OFFSET_AMT = #{todayOffsetAmt,jdbcType=DECIMAL},
+      </if>
       <if test="cTime != null">
         C_TIME = #{cTime,jdbcType=VARCHAR},
-      </if>
-      <if test="cUser != null">
-        C_USER = #{cUser,jdbcType=VARCHAR},
-      </if>
-      <if test="uUser != null">
-        U_USER = #{uUser,jdbcType=VARCHAR},
-      </if>
-      <if test="status != null">
-        STATUS = #{status,jdbcType=DECIMAL},
-      </if>
-      <if test="version != null">
-        VERSION = #{version,jdbcType=DECIMAL},
-      </if>
-      <if test="cleanStatus != null">
-        CLEAN_STATUS = #{cleanStatus,jdbcType=VARCHAR},
       </if>
       <if test="processDate != null">
         PROCESS_DATE = #{processDate,jdbcType=VARCHAR},
@@ -274,33 +279,50 @@
       <if test="processTime != null">
         PROCESS_TIME = #{processTime,jdbcType=VARCHAR},
       </if>
+      <if test="cUser != null">
+        C_USER = #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="uUser != null">
+        U_USER = #{uUser,jdbcType=VARCHAR},
+      </if>
+      <if test="cleanStatus != null">
+        CLEAN_STATUS = #{cleanStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        VERSION = #{version,jdbcType=DECIMAL},
+      </if>
     </set>
-    where FLOW_ID = #{flowId,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.ryx.internet.pojo.InternetRenewOffset">
-    update O_INTERNET_RENEW_OFFSET
-    set RENEW_ID = #{renewId,jdbcType=VARCHAR},
-    RENEW_DETAIL_ID = #{renewDetailId,jdbcType=VARCHAR},
-    ICCID_NUM = #{iccidNum,jdbcType=VARCHAR},
-    AGENT_ID = #{agentId,jdbcType=VARCHAR},
-    AGENT_NAME = #{agentName,jdbcType=VARCHAR},
-    MER_ID = #{merId,jdbcType=VARCHAR},
-    MER_NAME = #{merName,jdbcType=VARCHAR},
-    OFFSET_AMT = #{offsetAmt,jdbcType=DECIMAL},
-    ALREADY_OFFSET_AMT = #{alreadyOffsetAmt,jdbcType=DECIMAL},
-    C_TIME = #{cTime,jdbcType=VARCHAR},
-    C_USER = #{cUser,jdbcType=VARCHAR},
-    U_USER = #{uUser,jdbcType=VARCHAR},
-    STATUS = #{status,jdbcType=DECIMAL},
-    VERSION = #{version,jdbcType=DECIMAL},
-    CLEAN_STATUS = #{cleanStatus,jdbcType=VARCHAR},
-    PROCESS_DATE = #{processDate,jdbcType=VARCHAR},
-    PROCESS_TIME = #{processTime,jdbcType=VARCHAR}
-    where FLOW_ID = #{flowId,jdbcType=VARCHAR}
+  <update id="updateByPrimaryKey" parameterType="com.ryx.internet.pojo.InternetRenewOffsetDetail">
+    update O_INTERNET_RENEW_OFFSET_DETAIL
+    set FLOW_ID = #{flowId,jdbcType=VARCHAR},
+      RENEW_ID = #{renewId,jdbcType=VARCHAR},
+      RENEW_DETAIL_ID = #{renewDetailId,jdbcType=VARCHAR},
+      ICCID_NUM = #{iccidNum,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      MER_ID = #{merId,jdbcType=VARCHAR},
+      MER_NAME = #{merName,jdbcType=VARCHAR},
+      OFFSET_AMT = #{offsetAmt,jdbcType=DECIMAL},
+      ALREADY_OFFSET_AMT = #{alreadyOffsetAmt,jdbcType=DECIMAL},
+      TODAY_OFFSET_AMT = #{todayOffsetAmt,jdbcType=DECIMAL},
+      C_TIME = #{cTime,jdbcType=VARCHAR},
+      PROCESS_DATE = #{processDate,jdbcType=VARCHAR},
+      PROCESS_TIME = #{processTime,jdbcType=VARCHAR},
+      C_USER = #{cUser,jdbcType=VARCHAR},
+      U_USER = #{uUser,jdbcType=VARCHAR},
+      CLEAN_STATUS = #{cleanStatus,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL},
+      VERSION = #{version,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from (
+      select * from ( select row_.*, rownum rownum_ from ( 
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
@@ -308,23 +330,4 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
-
-  <select id="selectOffsetFinish" parameterType="map" resultMap="BaseResultMap">
-    select * from O_INTERNET_RENEW_OFFSET i
-    <where>
-        i.status=1
-        and i.OFFSET_AMT = i.ALREADY_OFFSET_AMT
-        and clean_status = #{map.cleanStatus,jdbcType=VARCHAR}
-        and process_date = #{map.processDate,jdbcType=VARCHAR}
-    </where>
-  </select>
-
-  <select id="selectInternetCardOffset" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List" />
-    from o_internet_renew_offset
-    where
-    process_date = trunc(to_char(sysdate,'YYYYMMDD')-1)
-    and status =1 and already_offset_amt!=0
-  </select>
 </mapper>
