@@ -347,6 +347,16 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         try{
             String result = HttpClientUtil.doPostJson(TEMPLATE_APPLY_PASS, map2.toJSONString());
             Map<String,Object> resultMap = JSONObject.parseObject(result);
+            if(!(boolean)resultMap.get("result")) {
+                logger.info("***********分配失败，***********");
+                throw new MessageException(resultMap.get("msg").toString());
+            }else{//分配成功
+                Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
+                templateRecode.setTemplateId(objectMap.get("templateId").toString());
+                templateRecode.setTemplateName(objectMap.get("templateName").toString());
+                templateRecode.setAssignResult("0");// 分配成功
+                recodeMapper.updateByPrimaryKeySelective(templateRecode);
+            }
             return resultMap;
         }catch (Exception e){
             e.printStackTrace();
