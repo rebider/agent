@@ -380,6 +380,10 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
 
     }
 
+@Override
+   public  Map<String, Object>  queryPlatFrom(String plat){
+       return  terminalTransferMapper.queryPlatFrom(plat);
+   }
     /**
      * 判断平台是否属于提交平台
      * chenliang
@@ -1669,6 +1673,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
      * @Author: chen_Liang
      * @Date: 2019/7/25
      */
+    @Override
     public Map<String, Object> getAgentType(String orgId) {
 
         return terminalTransferMapper.getAgentType(orgId);
