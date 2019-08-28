@@ -76,15 +76,6 @@ public class InternetCardServiceImpl implements InternetCardService {
     @Autowired
     private IUserService iUserService;
 
-
-
-    public static Date stepMonth(Date sourceDate, int month) {
-        Calendar c = Calendar.getInstance();
-        c.setTime(sourceDate);
-        c.add(Calendar.MONTH, month);
-        return c.getTime();
-    }
-
     @Override
     public PageInfo internetCardList(OInternetCard internetCard, Page page,String agentId){
 
@@ -117,7 +108,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                     oInternetCard.setRenewButton("0");
                     continue;
                 }
-                Date date = stepMonth(oInternetCard.getExpireTime(), 3);
+                Date date = DateUtil.dateDay(oInternetCard.getExpireTime(), "22");
                 if(Calendar.getInstance().getTime().getTime()<date.getTime()){
                     oInternetCard.setRenewButton("1");
                 }else{
@@ -717,9 +708,10 @@ public class InternetCardServiceImpl implements InternetCardService {
             reqMap.put("renew",Status.STATUS_0.status);//否
             reqMap.put("newRenew",Status.STATUS_1.status);
             List<String> expireTimeList = new ArrayList<>();
-            expireTimeList.add( DateUtil.getPerDayOfMonth(1));
-            expireTimeList.add( DateUtil.getPerDayOfMonth(2));
-            expireTimeList.add( DateUtil.getPerDayOfMonth(3));
+            expireTimeList.add(DateUtil.getPerDayOfMonth(0));
+            expireTimeList.add(DateUtil.getPerDayOfMonth(1));
+            expireTimeList.add(DateUtil.getPerDayOfMonth(2));
+            expireTimeList.add(DateUtil.getPerDayOfMonth(3));
             reqMap.put("expireTimeList",expireTimeList);
             //待激活和正常
             reqMap.put("cardStaus1",InternetCardStatus.NORMAL.getValue());
@@ -790,9 +782,10 @@ public class InternetCardServiceImpl implements InternetCardService {
 //            reqMap.put("internetCardStatus",InternetCardStatus.NORMAL.getValue());
 
             List<String> expireTimeList = new ArrayList<>();
-            expireTimeList.add( DateUtil.getPerDayOfMonth(1));
-            expireTimeList.add( DateUtil.getPerDayOfMonth(2));
-            expireTimeList.add( DateUtil.getPerDayOfMonth(3));
+            expireTimeList.add(DateUtil.getPerDayOfMonth(0));
+            expireTimeList.add(DateUtil.getPerDayOfMonth(1));
+            expireTimeList.add(DateUtil.getPerDayOfMonth(2));
+            expireTimeList.add(DateUtil.getPerDayOfMonth(3));
             reqMap.put("expireTimeList",expireTimeList);
             List<OInternetCard> oInternetCards = internetCardMapper.selectInternetCardRenew(reqMap);
             for (OInternetCard oInternetCard : oInternetCards) {

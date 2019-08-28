@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.BusType;
 import com.ryx.credit.common.enumc.OrgType;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.AppConfig;
-import com.ryx.credit.common.util.HttpClientUtil;
-import com.ryx.credit.common.util.JsonUtil;
-import com.ryx.credit.common.util.MailUtil;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.RegionMapper;
@@ -18,6 +15,7 @@ import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.pojo.admin.agent.Region;
 import com.ryx.credit.pojo.admin.bank.BankLineNums;
 import com.ryx.credit.pojo.admin.bank.BankLineNumsExample;
+import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInHttpService;
@@ -43,6 +41,11 @@ import java.util.Map;
 public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
 
     private static final String rdbReqUrl = AppConfig.getProperty("rdb_req_url");
+    // --------------
+    private static final String rdbParamCheckUrl = AppConfig.getProperty("rdb_param_check_url");
+    private static final String rdb3desKey = AppConfig.getProperty("rdb_3des_Key");
+    private static final String rdb3desIv = AppConfig.getProperty("rdb_3des_iv");
+    // --------------
     private static Logger log = LoggerFactory.getLogger(AgentNetInNotityServiceImpl.class);
     @Autowired
     private AgentColinfoService agentColinfoService;
@@ -67,7 +70,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             if(agentColinfo==null){
                 agentColinfo = new AgentColinfo();
             }
-            resultMap.put("mobileNo",agentBusInfo.getBusLoginNum().trim());
+            resultMap.put("mobileNo",agentBusInfo.getBusLoginNum());
             resultMap.put("branchid",agentBusInfo.getBusPlatform());
             resultMap.put("direct",direct(agentBusInfo.getBusType()));
             resultMap.put("cardno",agentColinfo.getCloBankAccount());
@@ -388,8 +391,40 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
 
     @Override
     public AgentResult agencyLevelCheck(Map<String, Object> paramMap)throws Exception{
+        // 瑞大宝，代理商升级直签校验参数，
+        //1.手机号是否存在
+        //2.手机号与平台号是否匹配
+        //3.本次升级的平台与原平台是否一致
+        //4.本次升级的上级与原上级是否一致
+        AgentBusInfoVo agentBusInfoVo = (AgentBusInfoVo)paramMap.get("busInfo");
 
+        System.out.println(JsonUtil.objectToJson(agentBusInfoVo));
 
-        return AgentResult.ok();
+        Map<String, Object> reqMap = new HashMap<>();
+        reqMap.put("application","CheckPromotionAgency");
+        reqMap.put("brandCode",paramMap.get("brandCode"));
+        reqMap.put("agentId",paramMap.get("agentId"));
+        String directAgentId = String.valueOf(paramMap.get("directAgentId"));
+        AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(directAgentId);
+        if(agentBusInfo==null){
+            throw new Exception("上级信息有误");
+        }
+        reqMap.put("directAgentId",agentBusInfo.getBusNum());
+        reqMap.put("upAgentId",agentBusInfo.getBrandNum());
+
+        String json = JsonUtil.objectToJson(reqMap);
+        String reqParamEncrypt = Des3Util.Encrypt(json, rdb3desKey, rdb3desIv.getBytes());
+        log.info("通知瑞大宝升级验证请求参数：{}",json);
+        log.info("通知瑞大宝升级验证请求参数加密：{}",reqParamEncrypt);
+        String httpResult = HttpClientUtil.sendHttpPost(rdbParamCheckUrl, reqParamEncrypt);
+        log.info("通知瑞大宝升级验证返回参数1：{}",httpResult);
+        String reqParamDecrypt = Des3Util.Decrypt(httpResult, rdb3desKey, rdb3desIv.getBytes());
+        log.info("通知瑞大宝升级验证返回参数：{}",reqParamDecrypt);
+        JSONObject respXMLObj = JSONObject.parseObject(reqParamDecrypt);
+        if (respXMLObj.getString("MSG_CODE").equals("0000")){
+            return AgentResult.ok(respXMLObj);
+        }else{
+            throw new Exception(respXMLObj.getString("MSG_TEXT"));
+        }
     }
 }
