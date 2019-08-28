@@ -90,13 +90,6 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     private InternetRenewOffsetDetailMapper internetRenewOffsetDetailMapper;
 
 
-    public static Date stepMonth(Date sourceDate, int month) {
-        Calendar c = Calendar.getInstance();
-        c.setTime(sourceDate);
-        c.add(Calendar.MONTH, month);
-        return c.getTime();
-    }
-
     @Override
     public PageInfo internetRenewList(OInternetRenew internetRenew, Page page,String agentId){
 
@@ -735,9 +728,9 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 if(null==oInternetCard.getExpireTime()){
                     throw new MessageException("到期时间为空,不允许续费");
                 }
-                Date date = stepMonth(oInternetCard.getExpireTime(), 3);
+                Date date = DateUtil.dateDay(oInternetCard.getExpireTime(), "22");
                 if(Calendar.getInstance().getTime().getTime()>date.getTime()){
-                    throw new MessageException("到期时间超过3个月,不允许续费");
+                    throw new MessageException("到期时间超过22号,不允许续费");
                 }
             }else{
                 throw new MessageException("状态不正确,不允许续费");

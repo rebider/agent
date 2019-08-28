@@ -76,15 +76,6 @@ public class InternetCardServiceImpl implements InternetCardService {
     @Autowired
     private IUserService iUserService;
 
-
-
-    public static Date stepMonth(Date sourceDate, int month) {
-        Calendar c = Calendar.getInstance();
-        c.setTime(sourceDate);
-        c.add(Calendar.MONTH, month);
-        return c.getTime();
-    }
-
     @Override
     public PageInfo internetCardList(OInternetCard internetCard, Page page,String agentId){
 
@@ -117,7 +108,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                     oInternetCard.setRenewButton("0");
                     continue;
                 }
-                Date date = stepMonth(oInternetCard.getExpireTime(), 3);
+                Date date = DateUtil.dateDay(oInternetCard.getExpireTime(), "22");
                 if(Calendar.getInstance().getTime().getTime()<date.getTime()){
                     oInternetCard.setRenewButton("1");
                 }else{
