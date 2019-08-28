@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public interface ITemplateRecodeService {
 
-    PageInfo getApplyList(Page page, TemplateRecode templateRecode);
+    PageInfo getApplyList(Page page, TemplateRecode templateRecode,Map<String,Object> map);
 
     Map<String,Object> getTemplateNow(String orgId)throws MessageException;
 
@@ -36,5 +36,8 @@ public interface ITemplateRecodeService {
 
     //审批流回调方法
     void completeTaskEnterActivity(String insid, String status);
+
+    Map<String,Object> checkAngAsign(String id)throws MessageException;
+
 
 }
