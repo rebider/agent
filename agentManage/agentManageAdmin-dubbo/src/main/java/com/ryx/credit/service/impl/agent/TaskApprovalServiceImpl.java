@@ -158,6 +158,8 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                             }
                         }
                         agentBusInfo.setOrganNum(agentBusInfoVo.getOrganNum());
+                        agentBusInfo.setBusPlatform(agentBusInfoVo.getBusPlatform());
+                        agentBusInfo.setBusParent(agentBusInfoVo.getBusParent());
                         if(agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)!=1){
                             throw new ProcessException("审批失败:业务顶级机构更新异常");
                         }
