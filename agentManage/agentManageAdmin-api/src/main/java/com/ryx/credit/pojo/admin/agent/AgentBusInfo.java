@@ -117,6 +117,16 @@ public class AgentBusInfo implements Serializable {
 
     private String brandNum;
 
+    private String flag;//标记
+
+    public void setFlag(String flag) {
+        this.flag = flag;
+    }
+
+    public String getFlag() {
+        return flag;
+    }
+
     public String getBrandNum() {
         return brandNum;
     }

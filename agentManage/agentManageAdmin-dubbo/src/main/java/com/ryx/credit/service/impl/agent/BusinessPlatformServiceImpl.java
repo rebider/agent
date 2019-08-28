@@ -944,6 +944,19 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         }
     }
 
+    @Override
+    public List<PlatForm> queryAblePlatFormPro() {
+       String ryx_pro = AppConfig.getProperty("ryx_pro");
+       String ryx_pro1 = AppConfig.getProperty("ryx_pro1");
+        ArrayList<String> platList = new ArrayList<>();
+        platList.add(ryx_pro);
+        platList.add(ryx_pro1);
+        PlatFormExample example = new PlatFormExample();
+        example.or().andStatusEqualTo(Status.STATUS_1.status).andPlatformStatusEqualTo(Status.STATUS_1.status).andPlatformNumIn(platList);
+        example.setOrderByClause(" platform_type desc,c_time asc");
+        return platFormMapper.selectByExample(example);
+    }
+
     /**
      * 根据登陆账号查询是否存在，存在查询跟agentid是否相符
      * @param busLoginNum
