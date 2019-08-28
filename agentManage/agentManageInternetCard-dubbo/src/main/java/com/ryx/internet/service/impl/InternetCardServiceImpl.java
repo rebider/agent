@@ -6,9 +6,11 @@ import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.order.OLogisticsService;
 import com.ryx.internet.dao.*;
 import com.ryx.credit.service.agent.AgentService;
@@ -70,14 +72,9 @@ public class InternetCardServiceImpl implements InternetCardService {
     @Autowired
     private OInternetRenewDetailMapper internetRenewDetailMapper;
     @Autowired
-    private InternetRenewOffsetMapper internetRenewOffsetMapper;
-
-    public static Date stepMonth(Date sourceDate, int month) {
-        Calendar c = Calendar.getInstance();
-        c.setTime(sourceDate);
-        c.add(Calendar.MONTH, month);
-        return c.getTime();
-    }
+    private OInternetCardPostponeMapper internetCardPostponeMapper;
+    @Autowired
+    private IUserService iUserService;
 
     @Override
     public PageInfo internetCardList(OInternetCard internetCard, Page page,String agentId){
@@ -111,7 +108,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                     oInternetCard.setRenewButton("0");
                     continue;
                 }
-                Date date = stepMonth(oInternetCard.getExpireTime(), 3);
+                Date date = DateUtil.dateDay(oInternetCard.getExpireTime(), "22");
                 if(Calendar.getInstance().getTime().getTime()<date.getTime()){
                     oInternetCard.setRenewButton("1");
                 }else{
@@ -158,7 +155,19 @@ public class InternetCardServiceImpl implements InternetCardService {
             criteria.andBatchNumEqualTo(internetCard.getBatchNum());
         }
         if(StringUtils.isNotBlank(internetCard.getIccidNum())){
-            criteria.andIccidNumEqualTo(internetCard.getIccidNum());
+            boolean contains = internetCard.getIccidNum().contains(",");
+            if(contains){
+                String[] iccidNumStr = internetCard.getIccidNum().split(",");
+                List<String> iccidNumList = new ArrayList<>();
+                for (String iccidNum : iccidNumStr) {
+                    iccidNumList.add(iccidNum);
+                }
+                criteria.andIccidNumIn(iccidNumList);
+            }else{
+                criteria.andIccidNumLike(internetCard.getIccidNum()+"%");
+            }
+        }else if(StringUtils.isNotBlank(internetCard.getIccidNumBegin()) && StringUtils.isNotBlank(internetCard.getIccidNumEnd())){
+            criteria.andIccidNumBetween(internetCard.getIccidNumBegin(),internetCard.getIccidNumEnd());
         }
         if(StringUtils.isNotBlank(internetCard.getSnNum())){
             criteria.andSnNumEqualTo(internetCard.getSnNum());
@@ -187,6 +196,9 @@ public class InternetCardServiceImpl implements InternetCardService {
         if(StringUtils.isNotBlank(internetCard.getRenewStatus())){
             criteria.andRenewStatusEqualTo(internetCard.getRenewStatus());
         }
+        if(StringUtils.isNotBlank(internetCard.getInternetCardNum())){
+            criteria.andInternetCardNumLike(internetCard.getInternetCardNum()+"%");
+        }
         if(null!=internetCard.getInternetCardStatus()){
             criteria.andInternetCardStatusEqualTo(internetCard.getInternetCardStatus());
         }
@@ -206,7 +218,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             Date format = DateUtil.format(internetCard.getExpireTimeEndStr(), DateUtil.DATE_FORMAT_yyyy_MM_dd);
             criteria.andExpireTimeLessThanOrEqualTo(format);
         }
-        oInternetCardExample.setOrderByClause(" c_time desc ");
+        oInternetCardExample.setOrderByClause(" c_time,expire_time desc ");
 
         return oInternetCardExample;
     }
@@ -576,7 +588,6 @@ public class InternetCardServiceImpl implements InternetCardService {
         }
         if(oInternetCard==null){
             internetCard.setcUser(oInternetCardImport.getcUser());
-            internetCard.setRenew(Status.STATUS_0.status); //否
             insertInternetCard(internetCard);
         }else{
             updateInternetCard(internetCard);
@@ -634,6 +645,7 @@ public class InternetCardServiceImpl implements InternetCardService {
         internetCard.setuTime(date);
         internetCard.setStatus(Status.STATUS_1.status);
         internetCard.setVersion(BigDecimal.ONE);
+        internetCard.setRenew(Status.STATUS_0.status); //否
         internetCard.setStop(Status.STATUS_0.status);
         internetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
         internetCardMapper.insert(internetCard);
@@ -695,7 +707,12 @@ public class InternetCardServiceImpl implements InternetCardService {
             Map<String,Object> reqMap = new HashMap<>();
             reqMap.put("renew",Status.STATUS_0.status);//否
             reqMap.put("newRenew",Status.STATUS_1.status);
-            reqMap.put("expireTime",DateUtil.getPerFirstDayOfMonth());
+            List<String> expireTimeList = new ArrayList<>();
+            expireTimeList.add(DateUtil.getPerDayOfMonth(0));
+            expireTimeList.add(DateUtil.getPerDayOfMonth(1));
+            expireTimeList.add(DateUtil.getPerDayOfMonth(2));
+            expireTimeList.add(DateUtil.getPerDayOfMonth(3));
+            reqMap.put("expireTimeList",expireTimeList);
             //待激活和正常
             reqMap.put("cardStaus1",InternetCardStatus.NORMAL.getValue());
             reqMap.put("cardStaus2",InternetCardStatus.NOACTIVATE.getValue());
@@ -763,7 +780,13 @@ public class InternetCardServiceImpl implements InternetCardService {
             reqMap.put("renew",Status.STATUS_0.status);//否
             reqMap.put("newRenew",Status.STATUS_1.status);//是续费
 //            reqMap.put("internetCardStatus",InternetCardStatus.NORMAL.getValue());
-            reqMap.put("expireTime",DateUtil.getPerFirstDayOfMonth());
+
+            List<String> expireTimeList = new ArrayList<>();
+            expireTimeList.add(DateUtil.getPerDayOfMonth(0));
+            expireTimeList.add(DateUtil.getPerDayOfMonth(1));
+            expireTimeList.add(DateUtil.getPerDayOfMonth(2));
+            expireTimeList.add(DateUtil.getPerDayOfMonth(3));
+            reqMap.put("expireTimeList",expireTimeList);
             List<OInternetCard> oInternetCards = internetCardMapper.selectInternetCardRenew(reqMap);
             for (OInternetCard oInternetCard : oInternetCards) {
                 OInternetCardMerch oInternetCardMerch = internetCardMerchMapper.selectChnTermposi(BigDataEncode.encode(oInternetCard.getIccidNum()));
@@ -927,4 +950,86 @@ public class InternetCardServiceImpl implements InternetCardService {
             throw new MessageException("删除失败");
         }
     }
+
+
+    /**
+     * 延期
+     * @param internetCardPostpone
+     * @param cUser
+     * @throws MessageException
+     */
+    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
+    @Override
+    public void internetCardPostpone(OInternetCardPostpone internetCardPostpone,String cUser)throws MessageException{
+
+        if(internetCardPostpone.getPostponeTime()==null){
+            throw new MessageException("请填写延期月份");
+        }
+        if(internetCardPostpone.getIccid()==null){
+            throw new MessageException("请选择要延期的数据");
+        }
+        OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(internetCardPostpone.getIccid());
+        if(oInternetCard==null){
+            throw new MessageException("请选择要延期的数据");
+        }
+        internetCardPostpone.setId(idService.genId(TabId.O_INTERNET_CARD_POSTPONE));
+        internetCardPostpone.setAgentId(oInternetCard.getAgentId());
+        internetCardPostpone.setAgentName(oInternetCard.getAgentName());
+        internetCardPostpone.setMerId(oInternetCard.getMerId());
+        internetCardPostpone.setMerName(oInternetCard.getMerName());
+        internetCardPostpone.setOrderId(oInternetCard.getOrderId());
+        internetCardPostpone.setOpenAccountTime(oInternetCard.getOpenAccountTime());
+        internetCardPostpone.setExpireTime(oInternetCard.getExpireTime());
+        Date mondayLater = DateUtil.getMondayLater(oInternetCard.getExpireTime(), internetCardPostpone.getPostponeTime().intValue());
+        internetCardPostpone.setPostponeExpireTime(mondayLater);
+        internetCardPostpone.setcUser(cUser);
+        internetCardPostpone.setuUser(cUser);
+        Date date = new Date();
+        internetCardPostpone.setcTime(date);
+        internetCardPostpone.setuTime(date);
+        internetCardPostpone.setStatus(Status.STATUS_1.status);
+        internetCardPostpone.setVersion(BigDecimal.ONE);
+        internetCardPostponeMapper.insert(internetCardPostpone);
+
+        BigDecimal sumPostponeTime = oInternetCard.getSumPostponeTime();
+        if(sumPostponeTime==null){
+            oInternetCard.setSumPostponeTime(internetCardPostpone.getPostponeTime());
+        }else {
+            oInternetCard.setSumPostponeTime(internetCardPostpone.getPostponeTime().add(sumPostponeTime));
+        }
+        oInternetCard.setStop(Status.STATUS_0.status);
+        oInternetCard.setRenew(Status.STATUS_0.status);
+        oInternetCard.setExpireTime(mondayLater);
+        int i = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
+        if(i!=1){
+            throw new MessageException("处理延期月份失败");
+        }
+    }
+
+    /**
+     * 延期记录
+     * @param internetCardPostpone
+     * @return
+     */
+    @Override
+    public PageInfo queryInternetCardPostponeList(OInternetCardPostpone internetCardPostpone,Page page){
+        OInternetCardPostponeExample internetCardPostponeExample = new OInternetCardPostponeExample();
+        OInternetCardPostponeExample.Criteria criteria = internetCardPostponeExample.createCriteria();
+        internetCardPostponeExample.setPage(page);
+        internetCardPostponeExample.setOrderByClause(" c_time desc ");
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        if(StringUtils.isNotBlank(internetCardPostpone.getIccid())){
+            criteria.andIccidEqualTo(internetCardPostpone.getIccid());
+        }
+        List<OInternetCardPostpone> internetCardPostpones = internetCardPostponeMapper.selectByExample(internetCardPostponeExample);
+        for (OInternetCardPostpone cardPostpone : internetCardPostpones) {
+            CUser cUser = iUserService.selectById(cardPostpone.getcUser());
+            if(null!=cUser)cardPostpone.setcUser(cUser.getName());
+        }
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(internetCardPostpones);
+        pageInfo.setTotal((int)internetCardPostponeMapper.countByExample(internetCardPostponeExample));
+        return pageInfo;
+    }
+
 }
