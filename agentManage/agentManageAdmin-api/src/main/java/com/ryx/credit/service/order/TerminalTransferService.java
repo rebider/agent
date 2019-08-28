@@ -51,4 +51,6 @@ public interface TerminalTransferService {
 
      Map<String, Object> disposeSN(String snBeginNum, String snEndNum) throws MessageException;
 
+    public  Map<String, Object>  queryPlatFrom(String plat);
+
 }
