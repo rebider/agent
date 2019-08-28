@@ -380,7 +380,13 @@
       c.ACTIVITY_END_TIME,
       c.STAND_TIME,
       c.STAND_AMT,
-      b.PRICE
+      b.PRICE,
+    (
+        case c.ACTIVITY_TYPE
+          when '01' then '0' --    01：普通活动 普通机0
+          when '00' then (case c.activate_type  when '00' then '1' when '01' then '2' end )--   00：返现活动  ACTIVATE_TYPE 激活方式 00：首笔交易缴纳押金(特价机 1)，01：预装激活(特价机（无押金）2)
+        end
+    ) as POSTYPE
     from IMS_POS_ACTIVITY a
       left join IMS_TERM_MACHINE b on a.pos_id=b.machine_id
       left join IMS_MACHINE_ACTIVITY c on a.activity_id=c.activity_id
