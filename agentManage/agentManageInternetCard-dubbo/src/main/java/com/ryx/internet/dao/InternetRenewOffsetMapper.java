@@ -25,4 +25,6 @@ public interface InternetRenewOffsetMapper {
     int updateByPrimaryKey(InternetRenewOffset record);
 
     List<InternetRenewOffset> selectOffsetFinish(@Param("map")Map<String,Object> map);
+
+    List<InternetRenewOffset> selectInternetCardOffset();
 }

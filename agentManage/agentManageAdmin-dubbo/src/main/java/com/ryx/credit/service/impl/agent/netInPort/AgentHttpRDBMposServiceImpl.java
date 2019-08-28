@@ -67,7 +67,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             if(agentColinfo==null){
                 agentColinfo = new AgentColinfo();
             }
-            resultMap.put("mobileNo",agentBusInfo.getBusLoginNum());
+            resultMap.put("mobileNo",agentBusInfo.getBusLoginNum().trim());
             resultMap.put("branchid",agentBusInfo.getBusPlatform());
             resultMap.put("direct",direct(agentBusInfo.getBusType()));
             resultMap.put("cardno",agentColinfo.getCloBankAccount());

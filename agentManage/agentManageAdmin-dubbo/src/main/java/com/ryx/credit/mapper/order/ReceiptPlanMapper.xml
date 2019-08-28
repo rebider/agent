@@ -382,7 +382,9 @@
         E.R_NAME as DISTRICT,
         R.ID,
         to_char(orders.O_INURETIME, 'YYYY-MM-DD') as TIME,
-        businfo.bus_num
+        businfo.bus_num,
+        businfo.ag_doc_district,
+        businfo.ag_doc_pro
       FROM O_RECEIPT_PLAN R
       LEFT JOIN O_RECEIPT_ORDER O ON R.RECEIPT_ID = O.ID and o.status=1 and R.status=1
       LEFT JOIN D_REGION D ON O.ADDR_PROVINCE = D.R_CODE
@@ -490,10 +492,11 @@
     ro.AGENT_ID, rp.ORDERID, rp.RECEIPT_ID, rp.PRO_ID, rp.PRO_CODE, rp.PRO_NAME, rp.PRO_NUM,rp.SEND_NUM,rp.id as receipt_Pro_Id,
     plan.ID  as plan_id, plan.PLAN_NUM,  plan.PRO_TYPE, plan.PRO_COM, plan.PLAN_PRO_NUM,
     plan.SEND_PRO_NUM, plan.SEND_DATE, plan.REAL_SEND_DATE, plan.RETURN_ORDER_DETAIL_ID,
-    plan.C_DATE, plan.PLAN_ORDER_STATUS,plan.MODEL
+    plan.C_DATE, plan.PLAN_ORDER_STATUS,plan.MODEL, ro.addr_detail
     from O_Receipt_order ro,o_Receipt_pro rp,O_Receipt_plan plan
     where ro.id = rp.receipt_id
     and ro.id = plan.Receipt_id
+    and ro.status=1 and rp.status=1 and plan.status=1
     <if test="params.orderId != null and params.orderId!=''" >
       and plan.order_id = #{params.orderId}
     </if>
@@ -511,5 +514,32 @@
     <!--<include refid="OracleDialectSuffix" />-->
   </select>
 
+  <select id="queryReceiveOrderLogistics" parameterType="map" resultType="map">
+    select
+      logs.w_number, logs.order_id, logs.receipt_plan_id
+    from o_logistics logs, o_receipt_plan plans
+    where logs.receipt_plan_id = plans.id and logs.status=1 and logs.receipt_plan_id in
+    (select id from o_receipt_plan where status=1 and order_id = #{params.receiveOrderId} and receipt_plan_id = #{params.receiveReceiptPlanId})
+  </select>
 
+
+  <select id="queryReveiveAgentData" parameterType="java.util.Map" resultType="java.util.Map">
+    select
+    r.plan_num, r.order_id, agents.ag_uniq_num, agents.ag_name, oso.activity_name,
+    o.addr_detail, l.w_number, businfo.ag_doc_district, businfo.ag_doc_pro
+    from o_receipt_plan r
+    left join o_logistics l on r.id = l.receipt_plan_id and l.status=1
+    left join o_receipt_order o on r.receipt_id = o.id and o.status=1 and r.status=1
+    left join o_return_order_detail odetail on odetail.return_id = o.id
+    left join o_return_order ro on ro.id = odetail.return_id and ro.status=1
+    left join o_order orders on r.order_id = orders.id and orders.status=1
+    left join o_receipt_pro p on r.pro_id = p.id and p.status=1
+    left join o_sub_order os on os.order_id = orders.id and os.status = 1 and os.pro_id = p.pro_id
+    left join o_sub_order_activity oso on oso.sub_order_id = os.id and oso.status = 1
+    left join a_agent agents on agents.id = orders.agent_id and agents.status=1
+    left join a_agent_businfo businfo on businfo.agent_id = orders.agent_id and businfo.id = orders.bus_id and businfo.status = 1
+    where 1=1 and r.status=1 and r.return_order_detail_id in
+    (select id from o_return_order_detail where return_id = #{returnId})
+    order by r.c_date desc
+  </select>
 </mapper>

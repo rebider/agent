@@ -443,13 +443,13 @@ public class DateUtil {
      * 获取下个月
      * @return
      */
-    public static String getPerFirstDayOfMonth() {
+    public static String getPerDayOfMonth(int i) {
         SimpleDateFormat dft = new SimpleDateFormat("yyyy-MM");
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MONTH, 1);
-        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMinimum(Calendar.DAY_OF_MONTH));
+        calendar.add(Calendar.MONTH, i);
         return dft.format(calendar.getTime());
     }
+
 
     /**
      * 得到几天后的时间
@@ -473,7 +473,7 @@ public class DateUtil {
     }
 
     /**
-     * 获取一年以后
+     * 获取一年以后减一天
      * @param d
      * @return
      */
@@ -481,8 +481,56 @@ public class DateUtil {
         Calendar now = Calendar.getInstance();
         now.setTime(d);
         now.set(Calendar.YEAR, now.get(Calendar.YEAR)+1);//+后 -前
+        now.set(Calendar.DATE, now.get(Calendar.DATE)-1);
         return now.getTime();
     }
 
+    /**
+     * 获取几个月后，减一天
+     * @param d
+     * @return
+     */
+    public static Date getMondayLater(Date d, int monday) {
+        Calendar now = Calendar.getInstance();
+        now.setTime(d);
+        now.set(Calendar.MONDAY, now.get(Calendar.MONDAY)+monday);
+        now.set(Calendar.DATE, now.get(Calendar.DATE)-1);
+        return now.getTime();
+    }
+
+    /**
+     * 字符串类型格式转换
+     * @param str
+     * @return
+     */
+    public static String dateConvertion(String str,String srcType,String goalType) {
+        Date parse = null;
+        String dateString = "";
+        try {
+        parse = new SimpleDateFormat("yyyy-MM-dd").parse(str);
+        dateString = new SimpleDateFormat("yyyyMMdd").format(parse);
+        } catch (ParseException e) {
+        dateString=null;
+        }
+        return dateString;
+    }
+
+    /**
+     * 获取当前月某一天
+     * @param date
+     * @return
+     */
+    public static Date dateDay(Date date,String day) {
+        String format = DateUtil.format(date, DateUtil.DATE_FORMAT_yyyyMM);
+        String nowDate = format + day;
+        Date format1 = DateUtil.format(nowDate, DateUtil.DATE_FORMAT_3);
+        return format1;
+    }
+
+
+    public static void main(String[] args){
+        Date date = DateUtil.dateDay(new Date(), "22");
+        System.out.println(date);
+    }
 
 }

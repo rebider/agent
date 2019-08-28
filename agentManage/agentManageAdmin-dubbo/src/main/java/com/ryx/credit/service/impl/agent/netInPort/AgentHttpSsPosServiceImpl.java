@@ -170,6 +170,11 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
         resultMap.put("isBill",agentColinfo.getCloInvoice());//是否开具分润发票
         resultMap.put("taxPoint",agentColinfo.getCloTaxPoint());//税点
         resultMap.put("agCode",agentBusInfo.getAgentId());//AG码
+        if (StringUtils.isNotBlank(agentBusInfo.getBusActivationParent())){
+            AgentBusInfo actBudinfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusActivationParent());
+            resultMap.put("actBusId",agentBusInfo.getBusActivationParent());
+            resultMap.put("actBusNum",actBudinfo.getBusNum());
+        }
         return resultMap;
     }
 
@@ -240,7 +245,8 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
             data.put("isBill",paramMap.get("isBill"));//是否开具分润发票
             data.put("taxPoint",paramMap.get("taxPoint"));//税点
             data.put("agCode",paramMap.get("agCode"));//AG码
-
+            data.put("actBusId",paramMap.get("actBusId"));//激活返现的业务id
+            data.put("actBusNum",paramMap.get("actBusNum"));//激活返现的编码
 
             log.info("通知pos请求参数:{}",data);
             jsonParams.put("data", data);
