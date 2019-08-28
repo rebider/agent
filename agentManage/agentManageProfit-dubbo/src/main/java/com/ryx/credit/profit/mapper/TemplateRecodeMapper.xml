@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.TemplateRecodeMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.TemplateRecode">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
+    <result column="BUS_PLATFORM" jdbcType="VARCHAR" property="busPlatform" />
+    <result column="CREATE_DATE" jdbcType="VARCHAR" property="createDate" />
+    <result column="APPLY_RESULT" jdbcType="VARCHAR" property="applyResult" />
+    <result column="TEMPLATE_NAME" jdbcType="VARCHAR" property="templateName" />
+    <result column="TEMPLATE_ID" jdbcType="VARCHAR" property="templateId" />
+    <result column="CREATE_USER" jdbcType="VARCHAR" property="createUser" />
+    <result column="ASSIGN_RESULT" jdbcType="VARCHAR" property="assignResult" />
+    <result column="ASSIGN_REASON" jdbcType="VARCHAR" property="assignReason" />
+    <result column="CRE_TYPE" jdbcType="VARCHAR" property="creType" />
+    <result column="TEM_TYPE" jdbcType="VARCHAR" property="temType" />
+    <result column="REV1" jdbcType="VARCHAR" property="rev1" />
+    <result column="REV2" jdbcType="VARCHAR" property="rev2" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, AGENT_ID, AGENT_NAME, BUS_NUM, BUS_PLATFORM, CREATE_DATE, APPLY_RESULT, TEMPLATE_NAME,
+    TEMPLATE_ID, CREATE_USER, ASSIGN_RESULT, ASSIGN_REASON, CRE_TYPE, TEM_TYPE, REV1,
+    REV2
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.TemplateRecodeExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_TEMPLATE_APPLY_RECORD
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from P_TEMPLATE_APPLY_RECORD
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.TemplateRecodeExample">
+    delete from P_TEMPLATE_APPLY_RECORD
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.TemplateRecode">
+    insert into P_TEMPLATE_APPLY_RECORD (ID, AGENT_ID, AGENT_NAME,
+      BUS_NUM, BUS_PLATFORM, CREATE_DATE,
+      APPLY_RESULT, TEMPLATE_NAME, TEMPLATE_ID,
+      CREATE_USER, ASSIGN_RESULT, ASSIGN_REASON,
+      CRE_TYPE, TEM_TYPE, REV1,
+      REV2)
+    values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR},
+      #{busNum,jdbcType=VARCHAR}, #{busPlatform,jdbcType=VARCHAR}, #{createDate,jdbcType=VARCHAR},
+      #{applyResult,jdbcType=VARCHAR}, #{templateName,jdbcType=VARCHAR}, #{templateId,jdbcType=VARCHAR},
+      #{createUser,jdbcType=VARCHAR}, #{assignResult,jdbcType=VARCHAR}, #{assignReason,jdbcType=VARCHAR},
+      #{creType,jdbcType=VARCHAR}, #{temType,jdbcType=VARCHAR}, #{rev1,jdbcType=VARCHAR},
+      #{rev2,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.TemplateRecode">
+    insert into P_TEMPLATE_APPLY_RECORD
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
+      <if test="busNum != null">
+        BUS_NUM,
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM,
+      </if>
+      <if test="createDate != null">
+        CREATE_DATE,
+      </if>
+      <if test="applyResult != null">
+        APPLY_RESULT,
+      </if>
+      <if test="templateName != null">
+        TEMPLATE_NAME,
+      </if>
+      <if test="templateId != null">
+        TEMPLATE_ID,
+      </if>
+      <if test="createUser != null">
+        CREATE_USER,
+      </if>
+      <if test="assignResult != null">
+        ASSIGN_RESULT,
+      </if>
+      <if test="assignReason != null">
+        ASSIGN_REASON,
+      </if>
+      <if test="creType != null">
+        CRE_TYPE,
+      </if>
+      <if test="temType != null">
+        TEM_TYPE,
+      </if>
+      <if test="rev1 != null">
+        REV1,
+      </if>
+      <if test="rev2 != null">
+        REV2,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="busNum != null">
+        #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=VARCHAR},
+      </if>
+      <if test="applyResult != null">
+        #{applyResult,jdbcType=VARCHAR},
+      </if>
+      <if test="templateName != null">
+        #{templateName,jdbcType=VARCHAR},
+      </if>
+      <if test="templateId != null">
+        #{templateId,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="assignResult != null">
+        #{assignResult,jdbcType=VARCHAR},
+      </if>
+      <if test="assignReason != null">
+        #{assignReason,jdbcType=VARCHAR},
+      </if>
+      <if test="creType != null">
+        #{creType,jdbcType=VARCHAR},
+      </if>
+      <if test="temType != null">
+        #{temType,jdbcType=VARCHAR},
+      </if>
+      <if test="rev1 != null">
+        #{rev1,jdbcType=VARCHAR},
+      </if>
+      <if test="rev2 != null">
+        #{rev2,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.TemplateRecodeExample" resultType="java.lang.Long">
+    select count(*) from P_TEMPLATE_APPLY_RECORD
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.TemplateRecode">
+    update P_TEMPLATE_APPLY_RECORD
+    <set>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="busNum != null">
+        BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        CREATE_DATE = #{createDate,jdbcType=VARCHAR},
+      </if>
+      <if test="applyResult != null">
+        APPLY_RESULT = #{applyResult,jdbcType=VARCHAR},
+      </if>
+      <if test="templateName != null">
+        TEMPLATE_NAME = #{templateName,jdbcType=VARCHAR},
+      </if>
+      <if test="templateId != null">
+        TEMPLATE_ID = #{templateId,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        CREATE_USER = #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="assignResult != null">
+        ASSIGN_RESULT = #{assignResult,jdbcType=VARCHAR},
+      </if>
+      <if test="assignReason != null">
+        ASSIGN_REASON = #{assignReason,jdbcType=VARCHAR},
+      </if>
+      <if test="creType != null">
+        CRE_TYPE = #{creType,jdbcType=VARCHAR},
+      </if>
+      <if test="temType != null">
+        TEM_TYPE = #{temType,jdbcType=VARCHAR},
+      </if>
+      <if test="rev1 != null">
+        REV1 = #{rev1,jdbcType=VARCHAR},
+      </if>
+      <if test="rev2 != null">
+        REV2 = #{rev2,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.TemplateRecode">
+    update P_TEMPLATE_APPLY_RECORD
+    set AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      CREATE_DATE = #{createDate,jdbcType=VARCHAR},
+      APPLY_RESULT = #{applyResult,jdbcType=VARCHAR},
+      TEMPLATE_NAME = #{templateName,jdbcType=VARCHAR},
+      TEMPLATE_ID = #{templateId,jdbcType=VARCHAR},
+      CREATE_USER = #{createUser,jdbcType=VARCHAR},
+      ASSIGN_RESULT = #{assignResult,jdbcType=VARCHAR},
+      ASSIGN_REASON = #{assignReason,jdbcType=VARCHAR},
+      CRE_TYPE = #{creType,jdbcType=VARCHAR},
+      TEM_TYPE = #{temType,jdbcType=VARCHAR},
+      REV1 = #{rev1,jdbcType=VARCHAR},
+      REV2 = #{rev2,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from (
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+
+
+
+  <select id="getAgentInfoByBusNum" resultType="java.util.Map" parameterType="java.lang.String">
+    select ab.AGENT_ID,aa.AG_NAME,ab.BUS_PLATFORM,ap.PLATFORM_NAME
+    from A_AGENT_BUSINFO ab
+    left join A_AGENT aa on ab.AGENT_ID = aa.ID
+    left join A_PLATFORM ap on ab.BUS_PLATFORM = ap.PLATFORM_NUM
+    where ab.BUS_NUM = #{busNum}
+  </select>
+
+
+  <select id="checkAgentDoc" resultType="java.util.Map">
+    select AGENT_ID,BUS_PLATFORM,AG_DOC_PRO,AG_DOC_DISTRICT
+    from A_AGENT_BUSINFO
+    where BUS_NUM = #{busNum}
+    and AG_DOC_PRO = #{docDic}
+    and STATUS = '1'
+  </select>
+
+  <select id="getListByTem" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    ap.ID, ap.AGENT_ID, ap.AGENT_NAME, ap.BUS_NUM, ap.BUS_PLATFORM, ap.CREATE_DATE, ap.APPLY_RESULT, ap.TEMPLATE_NAME,
+    ap.TEMPLATE_ID, ap.CREATE_USER, ap.ASSIGN_RESULT, ap.ASSIGN_REASON, ap.CRE_TYPE, ap.TEM_TYPE, ap.REV1,
+    ap.REV2
+    from P_TEMPLATE_APPLY_RECORD ap
+    inner join  A_AGENT_BUSINFO  ab
+    on ap.BUS_NUM = ab.BUS_NUM
+    where 1 = 1
+    <if test="map.agDoc != '' and map.agDoc != null">
+      and ab.AG_DOC_PRO = #{map.agDoc}
+    </if>
+    <if test="map.agDis != '' and map.agDis != null">
+      and ab.AG_DOC_DISTRICT = #{map.agDis}
+    </if>
+    <if test="record.agentId != '' and record.agentId != null">
+      and ap.AGENT_ID = #{record.agentId}
+    </if>
+    <if test="record.agentName != '' and record.agentName != null">
+      and ap.AGENT_NAME = #{record.agentName}
+    </if>
+    <if test="record.busPlatform != '' and record.busPlatform != null">
+      and ap.BUS_PLATFORM = #{record.busPlatform}
+    </if>
+    <if test="record.busNum != '' and record.busNum != null">
+      and ap.BUS_NUM = #{record.busNum}
+    </if>
+    <if test="record.templateName != '' and record.templateName != null">
+      and ap.TEMPLATE_NAME = #{record.templateName}
+    </if>
+    <if test="record.applyResult != '' and record.applyResult != null">
+      and ap.APPLY_RESULT = #{record.applyResult}
+    </if>
+    order by ap.CREATE_DATE desc
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="getCountByTem" resultType="java.lang.Integer">
+    select count(1)
+    from P_TEMPLATE_APPLY_RECORD ap
+    inner join  A_AGENT_BUSINFO  ab
+    on ap.BUS_NUM = ab.BUS_NUM
+    where 1 = 1
+    <if test="map.agDoc != '' and map.agDoc != null">
+      and ab.AG_DOC_PRO = #{map.agDoc}
+    </if>
+    <if test="map.agDis != '' and map.agDis != null">
+      and ab.AG_DOC_DISTRICT = #{map.agDis}
+    </if>
+    <if test="record.agentId != '' and record.agentId != null">
+      and ap.AGENT_ID = #{record.agentId}
+    </if>
+    <if test="record.agentName != '' and record.agentName != null">
+      and ap.AGENT_NAME = #{record.agentName}
+    </if>
+    <if test="record.busPlatform != '' and record.busPlatform != null">
+      and ap.BUS_PLATFORM = #{record.busPlatform}
+    </if>
+    <if test="record.busNum != '' and record.busNum != null">
+      and ap.BUS_NUM = #{record.busNum}
+    </if>
+    <if test="record.templateName != '' and record.templateName != null">
+      and ap.TEMPLATE_NAME = #{record.templateName}
+    </if>
+    <if test="record.applyResult != '' and record.applyResult != null">
+      and ap.APPLY_RESULT = #{record.applyResult}
+    </if>
+  </select>
+</mapper>

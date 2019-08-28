@@ -265,6 +265,13 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                             Map<String, Object> retMap = osnOperateService.sendInfoToBusinessSystem(list, id, new BigDecimal(batch));
                             if(null != retMap.get("code") && PlatformType.RDBPOS.code.equals(retMap.get("code"))){
                                 //瑞大宝业务平台接口，处理数据量大时，不能及时返回处理结果，跳出循环，防止线程阻塞
+                                //更新物流为下发处理中，任务更新状态，下次再次查询
+                                OLogistics oLogistics = oLogisticsMapper.selectByPrimaryKey(id);
+                                oLogistics.setSendStatus(LogisticsSendStatus.gen_detail_sucess.code);
+                                if(oLogisticsMapper.updateByPrimaryKeySelective(oLogistics) != 1){
+                                    logger.info("----------------------------------瑞大宝下发-正在处理中-更新物流信息失败.ID" + id);
+                                    throw new MessageException("瑞大宝下发-正在处理中-更新物流信息失败.ID:" + id);
+                                }
                                 break;
                             }else if (list.size() > 0 && null != retMap.get("result") && (boolean) retMap.get("result")) {
                                 //处理成功，不做物流更新待处理完成所有进行状态更新
