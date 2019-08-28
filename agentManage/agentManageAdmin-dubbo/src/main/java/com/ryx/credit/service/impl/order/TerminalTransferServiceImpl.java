@@ -916,6 +916,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             if (agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())) {
 
                 List<TerminalTransferDetail> terminalTransferDetails = queryDetailByTerminalId(busId);
+
+                platformSame(terminalTransferDetails,SaveFlag.TJSP.getValue());
               /*  if (agentVo.getSid().equals("cw")) {
                     List<TerminalTransferDetail> terminalTransferDetailsRedis = queryImprotMsgList(busId);
                     if (terminalTransferDetails.size() != terminalTransferDetailsRedis.size()) {
