@@ -1001,7 +1001,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                     } else if (null != resJson.getString("code") && resJson.getString("code").equals("2001") && null != resJson.getBoolean("success") && !resJson.getBoolean("success")) {
                         //订单处理中，返回到明细处理，明细继续循环处理，一直到业务系统处理完成
                         listOLogisticsDetailSn.forEach(detail -> {
-                            detail.setSendStatus(LogisticsDetailSendStatus.send_ing.code);
+                            detail.setSendStatus(LogisticsDetailSendStatus.none_send.code);
                             detail.setSbusMsg(resJson.getString("msg"));
                             detail.setuTime(date);
                             oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
