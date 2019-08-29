@@ -27,7 +27,6 @@ import java.util.Map;
 @Service("termMachineService")
 public class TermMachineServiceImpl  implements TermMachineService {
 
-
     private Logger logger = LoggerFactory.getLogger(TermMachineServiceImpl.class);
 
     @Resource(name = "posTermMachineServiceImpl")
@@ -35,21 +34,23 @@ public class TermMachineServiceImpl  implements TermMachineService {
 
     @Resource(name = "mposTermMachineServiceImpl")
     private TermMachineService mposTermMachineServiceImpl;
+
     @Resource(name = "sPosTermMachineServiceImpl")
     private TermMachineService sPosTermMachineServiceImpl;
 
-
-
-
+    @Resource(name = "rdbTermMachineServiceImpl")
+    private TermMachineService rdbTermMachineServiceImpl;
 
     @Override
-    public List<TermMachineVo> queryTermMachine(PlatformType platformType) throws Exception{
+    public List<TermMachineVo> queryTermMachine(PlatformType platformType,Map<String,String> par) throws Exception{
         if(PlatformType.whetherPOS(platformType.code)){
-            return posTermMachineServiceImpl.queryTermMachine(platformType);
+            return posTermMachineServiceImpl.queryTermMachine(platformType,par);
         }else  if(PlatformType.MPOS.code.equals(platformType.code)){
-            return mposTermMachineServiceImpl.queryTermMachine(platformType);
+            return mposTermMachineServiceImpl.queryTermMachine(platformType,par);
         }else  if(PlatformType.SSPOS.code.equals(platformType.code)){
-            return sPosTermMachineServiceImpl.queryTermMachine(platformType);
+            return sPosTermMachineServiceImpl.queryTermMachine(platformType,par);
+        }else  if(PlatformType.RDBPOS.code.equals(platformType.code)){
+            return rdbTermMachineServiceImpl.queryTermMachine(platformType, par);
         }else {
             List<TermMachineVo> list = new ArrayList<>();
             TermMachineVo vo = new TermMachineVo();
@@ -161,11 +162,12 @@ public class TermMachineServiceImpl  implements TermMachineService {
     @Override
     public AgentResult queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailLists, String operation) throws Exception {
        String type = terminalTransferDetailLists.get(0).getPlatformType().toString();
-      if("1".equals(type)){
+        logger.info("本次联动请求类型为:{}",type);
+      if("1".equals(type)){//pos
             return   posTermMachineServiceImpl.queryTerminalTransfer(terminalTransferDetailLists,operation);
-        }else if("2".equals(type)){
+        }else if("2".equals(type)){//手刷
             return   mposTermMachineServiceImpl.queryTerminalTransfer(terminalTransferDetailLists,operation);
-        }else if("3".equals(type)){
+        }else if("3".equals(type)){//瑞大宝
             return   AgentResult.fail("未联动");
         }
 
@@ -176,11 +178,12 @@ public class TermMachineServiceImpl  implements TermMachineService {
     @Override
     public AgentResult queryTerminalTransferResult(String serialNumber,String type) throws Exception {
         AgentResult agentResult=null;
-        if("1".equals(type)){
+        logger.info("本次联动查询结果类型为:{}",type);
+        if("1".equals(type)){//pos
          agentResult =  posTermMachineServiceImpl.queryTerminalTransferResult(serialNumber,type);
-        }else if("2".equals(type)){
-
-        }else if("3".equals(type)){
+        }else if("2".equals(type)){//手刷
+            agentResult =  mposTermMachineServiceImpl.queryTerminalTransferResult(serialNumber,type);
+        }else if("3".equals(type)){//瑞大宝
 
         }
         return agentResult;

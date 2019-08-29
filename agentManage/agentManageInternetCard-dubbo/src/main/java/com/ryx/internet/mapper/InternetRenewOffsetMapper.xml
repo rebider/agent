@@ -319,4 +319,12 @@
     </where>
   </select>
 
+  <select id="selectInternetCardOffset" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from o_internet_renew_offset
+    where
+    process_date = trunc(to_char(sysdate,'YYYYMMDD')-1)
+    and status =1 and already_offset_amt!=0
+  </select>
 </mapper>

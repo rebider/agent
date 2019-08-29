@@ -243,6 +243,9 @@
     <if test="map.cUser != null and map.cUser != '' " >
       and data.c_user  = #{map.cUser}
     </if>
+    <if test="map.finishTime != null and map.finishTime != '' " >
+      and to_char(data.C_UPDATE,'YYYY-MM-dd') = #{map.finishTime}
+    </if>
     order by data.c_time desc
     <include refid="OracleDialectSuffix" />
   </select>
@@ -263,6 +266,9 @@
     </if>
     <if test="map.cUser != null and map.cUser != '' " >
       and data.c_user  = #{map.cUser}
+    </if>
+    <if test="map.finishTime != null and map.finishTime != '' " >
+      and to_char(data.C_UPDATE,'YYYY-MM-dd') = #{map.finishTime}
     </if>
     order by data.c_time desc
   </select>
@@ -285,6 +291,9 @@
     <if test="map.cUser != null and map.cUser != '' " >
       and data.c_user  = #{map.cUser}
     </if>
-    order by data.c_time desc
+    <if test="map.finishTime != null and map.finishTime != '' " >
+      and to_char(data.C_UPDATE,'YYYY-MM-dd') = #{map.finishTime}
+    </if>
+    order by data.C_UPDATE desc
   </select>
 </mapper>

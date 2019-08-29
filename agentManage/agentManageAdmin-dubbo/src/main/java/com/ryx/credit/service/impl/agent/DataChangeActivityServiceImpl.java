@@ -173,7 +173,13 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         record.setBusType(dateChangeRequest.getDataType());//流程关系类型是数据申请类型
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(dateChangeRequest.getDataId());
-        record.setDataShiro(BusActRelBusType.DC_Agent.key);
+        if(dateChangeRequest.getDataType().equals(BusActRelBusType.DC_Agent.name())){
+            record.setDataShiro(BusActRelBusType.DC_Agent.key);
+        }else if(dateChangeRequest.getDataType().equals(BusActRelBusType.DC_Colinfo.name())){
+            record.setDataShiro(BusActRelBusType.DC_Colinfo.key);
+        }else{
+            record.setDataShiro(BusActRelBusType.DC_Agent.key);
+        }
         Agent agent = agentMapper.selectByPrimaryKey(dateChangeRequest.getDataId());
         if(agent!=null)
             record.setAgentName(agent.getAgName());

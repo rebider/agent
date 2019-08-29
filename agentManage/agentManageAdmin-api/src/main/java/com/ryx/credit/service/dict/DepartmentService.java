@@ -35,4 +35,7 @@ public interface DepartmentService {
 
 
     List<Tree> selectRegion(String pCode);
+
+
+    List<COrganization> selectCityRegion(Long cUser);
 }
