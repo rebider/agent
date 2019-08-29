@@ -494,9 +494,10 @@ public class DateUtil {
     public static Date getMondayLater(Date d, int monday) {
         Calendar now = Calendar.getInstance();
         now.setTime(d);
-        now.set(Calendar.MONDAY, now.get(Calendar.MONDAY)+monday);
+        now.add(Calendar.MONTH,monday);
         return now.getTime();
     }
+
 
     /**
      * 字符串类型格式转换
