@@ -11,8 +11,10 @@ import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.*;
 import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,16 +35,18 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
      * @throws Exception
      */
     @Override
-    public List<TermMachineVo> queryTermMachine(PlatformType platformType, Map map) throws Exception {
+    public List<TermMachineVo> queryTermMachine(PlatformType platformType, Map<String, String> map) throws Exception {
+
+        Map<String, String> reqMap = new HashMap<String, String>();
 
         // 封装参数
-        if (null != map.get("busPlatForm")) {
-            map.put("branchId", map.get("busPlatForm"));
+        if (null != map.get("busplatform")) {
+            reqMap.put("branchId", map.get("busplatform"));
         } else {
             throw new MessageException("瑞大宝活动缺少必要参数");
         }
 
-        JSONObject res = request(map, AppConfig.getProperty("rdbpos.queryTermActive"));
+        JSONObject res = request(reqMap, AppConfig.getProperty("rdbpos.queryTermActive"));
         if(null!=res && RDB_SUCESS_RESPCODE.equals(res.getString("code"))){
 
             JSONArray data = res.getJSONObject("result").getJSONArray("termPolicyList");
