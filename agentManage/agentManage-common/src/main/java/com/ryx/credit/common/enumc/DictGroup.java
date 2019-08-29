@@ -81,7 +81,8 @@ public enum DictGroup {
     REPORT_STATUS("报备状态"),
     INTERNET_RENEW("流量卡续费配置"),
     CARD_AMT("流量卡每张金额"),
-    OFFSET_AMT("轧差每张金额");
+    OFFSET_AMT("轧差每张金额"),
+    COMPENSATE_MODEL_TYPE("补差价可扩展机具类型");
 
     public String  msg;
 
