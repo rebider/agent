@@ -560,7 +560,7 @@ public class InternetCardServiceImpl implements InternetCardService {
         internetCard.setBatchNum(oInternetCardImport.getBatchNum());
         internetCard.setCardImportId(oInternetCardImport.getId());
         if(internetCard.getOpenAccountTime()!=null){
-            Date date = DateUtil.aYearAgoDate(internetCard.getOpenAccountTime());
+            Date date = DateUtil.getOneYearLater(internetCard.getOpenAccountTime());
             internetCard.setExpireTime(date);
             internetCard.setRenew(BigDecimal.ZERO);
             internetCard.setStop(BigDecimal.ZERO);
