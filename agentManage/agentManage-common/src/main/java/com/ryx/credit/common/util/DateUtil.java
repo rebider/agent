@@ -473,7 +473,7 @@ public class DateUtil {
     }
 
     /**
-     * 获取一年以后减一天
+     * 获取一年以后前一个月最后一天
      * @param d
      * @return
      */
@@ -481,12 +481,13 @@ public class DateUtil {
         Calendar now = Calendar.getInstance();
         now.setTime(d);
         now.set(Calendar.YEAR, now.get(Calendar.YEAR)+1);//+后 -前
-        now.set(Calendar.DATE, now.get(Calendar.DATE)-1);
+        now.set(Calendar.DAY_OF_MONTH,0);
         return now.getTime();
     }
 
+
     /**
-     * 获取几个月后，减一天
+     * 获取几个月后
      * @param d
      * @return
      */
@@ -494,7 +495,6 @@ public class DateUtil {
         Calendar now = Calendar.getInstance();
         now.setTime(d);
         now.set(Calendar.MONDAY, now.get(Calendar.MONDAY)+monday);
-        now.set(Calendar.DATE, now.get(Calendar.DATE)-1);
         return now.getTime();
     }
 
@@ -527,10 +527,5 @@ public class DateUtil {
         return format1;
     }
 
-
-    public static void main(String[] args){
-        Date date = DateUtil.dateDay(new Date(), "22");
-        System.out.println(date);
-    }
 
 }
