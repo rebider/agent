@@ -317,6 +317,7 @@
     where 1 = 1
     <if test="map.agDoc != '' and map.agDoc != null">
       and ab.AG_DOC_PRO = #{map.agDoc}
+      and ap.CREATE_USER = #{record.createUser}
     </if>
     <if test="map.agDis != '' and map.agDis != null">
       and ab.AG_DOC_DISTRICT = #{map.agDis}
@@ -351,6 +352,7 @@
     where 1 = 1
     <if test="map.agDoc != '' and map.agDoc != null">
       and ab.AG_DOC_PRO = #{map.agDoc}
+      and ap.CREATE_USER = #{record.createUser}
     </if>
     <if test="map.agDis != '' and map.agDis != null">
       and ab.AG_DOC_DISTRICT = #{map.agDis}
