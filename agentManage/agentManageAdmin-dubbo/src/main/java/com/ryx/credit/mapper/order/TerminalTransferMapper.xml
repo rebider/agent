@@ -307,11 +307,16 @@ select distinct nvl(BUS_NUM, '-') BUS_NUM
 
   </select>
   <select id="querySubBusNumTopAgentAll" resultType="java.util.Map" parameterType="java.lang.String">
-     select * from A_AGENT_BUSINFO a  start with a.bus_num=#{bus_num}  CONNECT BY PRIOR BUS_PARENT = ID
+     select * from A_AGENT_BUSINFO a  start with  a.bus_num=#{bus_num}
+  and a.status ='1'and a.bus_status='1' CONNECT BY PRIOR BUS_PARENT = ID
   </select>
 
   <select id="querySubBusNumAgent" resultType="java.util.Map" parameterType="java.lang.String">
      select * from A_AGENT_BUSINFO a  where a.bus_num=#{bus_num}
+  </select>
+
+  <select id="queryPlatFrom" resultType="java.util.Map" parameterType="java.lang.String">
+     select * from A_PLATFORM a  where a.PLATFORM_NUM=#{PLATFORM_NUM}
   </select>
 
 

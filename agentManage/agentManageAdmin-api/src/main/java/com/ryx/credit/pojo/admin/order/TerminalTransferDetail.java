@@ -69,6 +69,16 @@ public class TerminalTransferDetail implements Serializable{
 
     private String originalType;
 
+    public String getPlatFrom() {
+        return platFrom;
+    }
+
+    public void setPlatFrom(String platFrom) {
+        this.platFrom = platFrom;
+    }
+
+    private String platFrom;
+
     public BigDecimal getComSnNum() {
         return comSnNum;
     }
