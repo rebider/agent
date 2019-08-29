@@ -494,10 +494,14 @@ public class DateUtil {
     public static Date getMondayLater(Date d, int monday) {
         Calendar now = Calendar.getInstance();
         now.setTime(d);
+        now.set(Calendar.DAY_OF_MONTH, now.getActualMaximum(Calendar.DAY_OF_MONTH));
         now.add(Calendar.MONTH,monday);
         return now.getTime();
     }
 
+    public static void main(String[] args){
+        System.out.println(getMondayLater(new Date(),6));
+    }
 
     /**
      * 字符串类型格式转换
