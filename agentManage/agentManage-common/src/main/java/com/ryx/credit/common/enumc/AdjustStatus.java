@@ -17,7 +17,7 @@ public enum AdjustStatus {
     JLBCZ(new BigDecimal("5"),"记录不存在"),
     WLDTZ(new BigDecimal("6"),"未联动调整"),
     WCDJG(new BigDecimal("7"),"未查到结果"),
-    JJTZ(new BigDecimal("8"),"拒绝调整");
+    JJTZ(new BigDecimal("8"),"调整拒绝");
 
     public BigDecimal key;
     public String msg;

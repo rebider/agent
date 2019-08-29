@@ -247,10 +247,11 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
             mapDetail.put("posSnBegin", terminalTransferDetail.getSnBeginNum());
             mapDetail.put("posSnEnd", terminalTransferDetail.getSnEndNum());
             mapDetail.put("serialNumber", terminalTransferDetail.getId());
+            mapDetail.put("checkPayStatus", terminalTransferDetail.getIsNoPay());
             listDetail.add(mapDetail);
         }
         jsonObject.put("snList", listDetail);
-        log.info("\n\n请求参数:{}"+listDetail.toString());
+        log.info("pos的请求参数==请求参数:{}",JSONObject.toJSON(jsonObject));
         return  request("ORG014", jsonObject);
     }
 

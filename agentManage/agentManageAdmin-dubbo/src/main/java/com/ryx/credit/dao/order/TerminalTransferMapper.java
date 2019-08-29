@@ -43,6 +43,8 @@ public interface TerminalTransferMapper {
 
     List<Map<String, Object>> querySubBusNum(String AGENT_ID);
 
+    Map<String, Object> queryPlatFrom(String PLATFORM_NUM);
+
 
 
 }
