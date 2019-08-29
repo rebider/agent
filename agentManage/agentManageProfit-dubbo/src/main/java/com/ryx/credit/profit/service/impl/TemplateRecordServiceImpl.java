@@ -67,13 +67,20 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         Map<String,String> map1 = new HashMap<String,String>();
         if(map != null){
             String str = map.get("ORGANIZATIONCODE").toString();
-            if(str.indexOf("city") != -1 && str.indexOf("region") != -1){
+            if(str.startsWith("region") && !str.endsWith("city")){
+                String agDis = map.get("ORGID").toString();
+                map1.put("agDis",agDis);
+            }else if(str.endsWith("city")){
+                String agDoc = map.get("ORGID").toString();  //省区
+                map1.put("agDoc",agDoc);
+            }
+            /*if(str.indexOf("city") != -1 && str.indexOf("region") != -1){
                 String agDoc = map.get("ORGID").toString();  //省区
                 map1.put("agDoc",agDoc);
             }else if(str.indexOf("region") != -1 && str.indexOf("city") == -1){
                 String agDis = map.get("ORGID").toString(); //大区
                 map1.put("agDis",agDis);
-            }
+            }*/
         }
 
         PageInfo pageInfo = new PageInfo();
