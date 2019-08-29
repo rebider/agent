@@ -18,6 +18,7 @@ import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.dict.DictOptionsService;
+import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import sun.management.resources.agent;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -81,6 +83,14 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     private AgentDataHistoryService agentDataHistoryService;
     @Autowired
     private AgentBusinfoService agentBusinfoService;
+    @Autowired
+    private AttachmentMapper attachmentMapper;
+    @Autowired
+    private IdService idService;
+    @Autowired
+    private AttachmentRelMapper attachmentRelMapper;
+    @Autowired
+    private AgentContractService agentContractService;
 
 
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
@@ -328,7 +338,55 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                     throw new ProcessException("代理商信息更新失败！请重试");
                                 }
                             }
+                            boolean isHaveYYZZ = false;
+                            boolean isHaveFRSFZ = false;
+                            //添加营业执照等附件
+                            List<String> attrs = vo.getAgentTableFile();
+                            if (attrs != null) {
+                                AttachmentRelExample att_example = new AttachmentRelExample();
+                                att_example.or().andBusTypeEqualTo(AttachmentRelType.Agent.name()).andSrcIdEqualTo(db_agent.getId()).andStatusEqualTo(Status.STATUS_1.status);
+                                List<AttachmentRel> list = attachmentRelMapper.selectByExample(att_example);
+                                for (AttachmentRel attachmentRel : list) {
+                                    attachmentRel.setStatus(Status.STATUS_0.status);
+                                    int i = attachmentRelMapper.updateByPrimaryKeySelective(attachmentRel);
+                                    if (1 != i) {
+                                        logger.info("修改代理商附件关系失败");
+                                        throw new ProcessException("更新修改代理商失败");
+                                    }
+                                }
+
+                                for (String fileId : attrs) {
+
+                                    Attachment attachment = attachmentMapper.selectByPrimaryKey(fileId);
+                                    if(attachment!=null){
+                                        if(AttDataTypeStatic.YYZZ.code.equals(attachment.getAttDataType()+"")){
+                                            isHaveYYZZ = true;
+                                        }
+                                        if(AttDataTypeStatic.SFZZM.code.equals(attachment.getAttDataType()+"")){
+                                            isHaveFRSFZ = true;
+                                        }
+                                    }
+
+                                    AttachmentRel record = new AttachmentRel();
+                                    record.setAttId(fileId);
+                                    record.setSrcId(db_agent.getId());
+                                    record.setcUser(voAgent.getcUser());
+                                    record.setcTime(Calendar.getInstance().getTime());
+                                    record.setStatus(Status.STATUS_1.status);
+                                    record.setBusType(AttachmentRelType.Agent.name());
+                                    record.setId(idService.genId(TabId.a_attachment_rel));
+                                    int i = attachmentRelMapper.insertSelective(record);
+                                    if (1 != i) {
+                                        logger.info("修改代理商附件关系失败");
+                                        throw new ProcessException("更新修改代理商失败");
+                                    }
+                                }
+                            }
+
                             logger.info("===============================更新代理商基础信息成功");
+                            logger.info("===============================更新合同信息开始");
+                            ResultVO updateAgentContractVoRes = agentContractService.updateAgentContractVo(vo.getContractVoList(), vo.getAgent(),vo.getAgent().getcUser());
+                            logger.info("===============================更新合同信息结束");
 
 
                             Agent preVoAgent = preVo.getAgent();
