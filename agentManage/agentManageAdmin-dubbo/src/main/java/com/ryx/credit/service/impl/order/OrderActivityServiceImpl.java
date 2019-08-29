@@ -385,14 +385,16 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         FastMap par = FastMap.fastMap("beginTime", date)
                              .putKeyV("endTime", date);
 
+        OProduct productObj = oProductMapper.selectByPrimaryKey(product);
+        ArrayList<Object> productIdList = new ArrayList<>();
+        productIdList.add(productObj.getId());
         if (StringUtils.isNotBlank(oldActivityId)) {
             //如果变更活动传递老活动，排除老的活动代码并匹配 相同的厂商和型号。
             OActivity oldActivity = activityMapper.selectByPrimaryKey(oldActivityId);
             par.putKeyV("notEqActcode", oldActivity.getActCode()).putKeyV("vender", oldActivity.getVender()).putKeyV("proModel", oldActivity.getProModel());
-        }else{
-            OProduct productObj = oProductMapper.selectByPrimaryKey(product);
-            par.putKeyV("productId", productObj.getId());
+
         }
+        par.putKeyV("productIdList", productIdList);
         if (StringUtils.isNotBlank(orderAgentBusifo) && !"null".equals(orderAgentBusifo)) {
             //查询平台活动
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(orderAgentBusifo);

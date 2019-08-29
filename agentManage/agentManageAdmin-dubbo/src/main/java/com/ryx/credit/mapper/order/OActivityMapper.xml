@@ -520,7 +520,13 @@
       <!--<if test="platform!=null and platform!=''" > and o_activity.platform= (case when o_activity.platform is not null and o_activity.platform &lt;&gt; ''  then  ''||${platform} else o_activity.platform end)  </if>-->
       <if test="vender!=null and vender!=''" > and o_activity.vender=#{vender} </if>
       <if test="proModel!=null and proModel!=''" > and o_activity.pro_model=#{proModel} </if>
-      <if test="productId!=null and productId!=''" > and o_activity.product_id=#{productId} </if>
+      <if test="productIdList!=null and productIdList!=''" >
+        and o_activity.product_id
+        <foreach collection="productIdList" separator="," item="productId" index="index" open=" in ("
+                 close=")">
+          #{productId}
+        </foreach>
+      </if>
       <if test="beginTime!=null" > and o_activity.begin_time &lt;= #{beginTime} </if>
       <if test="endTime!=null" > and o_activity.end_time &gt;= #{endTime}</if>
     </where>
