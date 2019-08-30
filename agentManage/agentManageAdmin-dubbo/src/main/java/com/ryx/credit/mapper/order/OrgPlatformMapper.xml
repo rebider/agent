@@ -201,4 +201,14 @@
   <delete id="deleteOrgPlatform" parameterType="string">
      delete from ORG_PLATFORM where id=#{id}
   </delete>
+
+  <select id="queryOrg" parameterType="string" resultType="map">
+  select org.org_nick,org.org_id from ORG_PLATFORM plat left join
+   o_organization org on org.org_id=plat.org_id
+   where
+   <if test="platForm!='' and platForm != null">
+      plat_num=#{platForm}
+   </if>
+
+  </select>
 </mapper>
