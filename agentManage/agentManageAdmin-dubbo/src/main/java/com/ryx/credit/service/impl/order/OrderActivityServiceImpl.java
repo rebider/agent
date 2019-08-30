@@ -17,11 +17,14 @@ import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.TermMachineVo;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.Dict;
+import com.ryx.credit.pojo.admin.agent.PlatForm;
+import com.ryx.credit.pojo.admin.agent.PlatFormExample;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.profit.service.ProfitMonthService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrderActivityService;
+import org.apache.poi.hssf.usermodel.HSSFAnchor;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -158,7 +161,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         String platFormType = platFormMapper.selectPlatType(activity.getPlatform());
         if (StringUtils.isNotBlank(platFormType)) {
             try {
-                List<TermMachineVo> termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType));
+                List<TermMachineVo> termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType),FastMap.fastSuccessMap());
                 for (TermMachineVo termMachineVo : termMachineVos) {
                     if (activity.getBusProCode().equals(termMachineVo.getId())) {
                         activity.setStandAmt(BigDecimal.valueOf(Integer.valueOf(termMachineVo.getStandAmt())));
@@ -221,7 +224,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
 
         if (StringUtils.isNotBlank(platFormType)) {
             try {
-                List<TermMachineVo> termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType));
+                List<TermMachineVo> termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType),FastMap.fastSuccessMap());
                 for (TermMachineVo termMachineVo : termMachineVos) {
                     if (activity.getBusProCode().equals(termMachineVo.getId())) {
                         activity.setStandAmt(BigDecimal.valueOf(Integer.valueOf(termMachineVo.getStandAmt())));
@@ -320,7 +323,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
 
         if (StringUtils.isNotBlank(platFormType)) {
             try {
-                List<TermMachineVo> termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType));
+                List<TermMachineVo> termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType),FastMap.fastSuccessMap());
                 for (TermMachineVo termMachineVo : termMachineVos) {
                     if (activity.getBusProCode().equals(termMachineVo.getId())) {
                         activity.setStandAmt(BigDecimal.valueOf(Integer.valueOf(termMachineVo.getStandAmt())));
@@ -446,14 +449,30 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         if (StringUtils.isBlank(platformNum)) {
             throw new MessageException("平台类型为空");
         }
-        String platFormType = platFormMapper.selectPlatType(platformNum);
+        HashMap<Object, Object> map = new HashMap<>();
+
+        //查询平台
+        PlatFormExample example = new PlatFormExample();
+        example.or().andPlatformNumEqualTo(platformNum).andStatusEqualTo(Status.STATUS_1.status).andPlatformStatusEqualTo(Status.STATUS_1.status);
+        List<PlatForm>  platFormList = platFormMapper.selectByExample(example);
+        if(platFormList.size()==0){
+            return map;
+        }
+        PlatForm  platForm  = platFormList.get(0);
+        String platFormType = platForm.getPlatformType();
         List termMachineVos = null;
         List mposTermBatchVos = null;
         List mposTermTypeVos = null;
-        HashMap<Object, Object> map = new HashMap<>();
+
+        //查询参数
+        Map<String,String> par = new HashMap<>();
+        //num
+        par.put("busplatform",platForm.getBusplatform());
+        //type
+        par.put("busPlatForm",platFormType);
         if (StringUtils.isNotBlank(platFormType)) {
             try {
-                termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType));
+                termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType),par);
 
                 mposTermBatchVos = termMachineService.queryMposTermBatch(PlatformType.getContentEnum(platFormType));
 
@@ -464,10 +483,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-
         }
-
         return map;
     }
 

@@ -1,41 +1,42 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.ryx.credit.dao.agent.AgentContractMapper" >
-  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.AgentContract" >
-    <id column="ID" property="id" jdbcType="VARCHAR" />
-    <result column="AGENT_ID" property="agentId" jdbcType="VARCHAR" />
-    <result column="CONT_NUM" property="contNum" jdbcType="VARCHAR" />
-    <result column="CONT_TYPE" property="contType" jdbcType="DECIMAL" />
-    <result column="CONT_DATE" property="contDate" jdbcType="TIMESTAMP" />
-    <result column="CONT_END_DATE" property="contEndDate" jdbcType="TIMESTAMP" />
-    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
-    <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP" />
-    <result column="C_USER" property="cUser" jdbcType="VARCHAR" />
-    <result column="C_UTIME" property="cUtime" jdbcType="TIMESTAMP" />
-    <result column="CLO_REVIEW_STATUS" property="cloReviewStatus" jdbcType="DECIMAL" />
-    <result column="STATUS" property="status" jdbcType="DECIMAL" />
-    <result column="VERSION" property="version" jdbcType="DECIMAL" />
-    <result column="APPEND_AGREE" property="appendAgree" jdbcType="DECIMAL" />
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.agent.AgentContractMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.AgentContract">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="CONT_NUM" jdbcType="VARCHAR" property="contNum" />
+    <result column="CONT_TYPE" jdbcType="DECIMAL" property="contType" />
+    <result column="CONT_DATE" jdbcType="TIMESTAMP" property="contDate" />
+    <result column="CONT_END_DATE" jdbcType="TIMESTAMP" property="contEndDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
+    <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
+    <result column="C_UTIME" jdbcType="TIMESTAMP" property="cUtime" />
+    <result column="CLO_REVIEW_STATUS" jdbcType="DECIMAL" property="cloReviewStatus" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="APPEND_AGREE" jdbcType="DECIMAL" property="appendAgree" />
+    <result column="ACTIV_ID" jdbcType="VARCHAR" property="activId" />
   </resultMap>
-  <sql id="Example_Where_Clause" >
-    <where >
-      <foreach collection="oredCriteria" item="criteria" separator="or" >
-        <if test="criteria.valid" >
-          <trim prefix="(" suffix=")" prefixOverrides="and" >
-            <foreach collection="criteria.criteria" item="criterion" >
-              <choose >
-                <when test="criterion.noValue" >
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
                   and ${criterion.condition}
                 </when>
-                <when test="criterion.singleValue" >
+                <when test="criterion.singleValue">
                   and ${criterion.condition} #{criterion.value}
                 </when>
-                <when test="criterion.betweenValue" >
+                <when test="criterion.betweenValue">
                   and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
                 </when>
-                <when test="criterion.listValue" >
+                <when test="criterion.listValue">
                   and ${criterion.condition}
-                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
                     #{listItem}
                   </foreach>
                 </when>
@@ -46,193 +47,204 @@
       </foreach>
     </where>
   </sql>
-  <sql id="Base_Column_List" >
+  <sql id="Base_Column_List">
     ID, AGENT_ID, CONT_NUM, CONT_TYPE, CONT_DATE, CONT_END_DATE, REMARK, C_TIME, C_USER,
-    C_UTIME, CLO_REVIEW_STATUS, STATUS, VERSION, APPEND_AGREE
+    C_UTIME, CLO_REVIEW_STATUS, STATUS, VERSION, APPEND_AGREE, ACTIV_ID
   </sql>
-  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.AgentContractExample" >
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentContractExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
-    <if test="distinct" >
+    <if test="distinct">
       distinct
     </if>
     <include refid="Base_Column_List" />
     from A_AGENT_CONTRACT
-    <if test="_parameter != null" >
+    <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
-    <if test="orderByClause != null" >
+    <if test="orderByClause != null">
       order by ${orderByClause}
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
     from A_AGENT_CONTRACT
     where ID = #{id,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentContractExample" >
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentContractExample">
     delete from A_AGENT_CONTRACT
-    <if test="_parameter != null" >
+    <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AgentContract" >
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AgentContract">
     insert into A_AGENT_CONTRACT (ID, AGENT_ID, CONT_NUM,
     CONT_TYPE, CONT_DATE, CONT_END_DATE,
     REMARK, C_TIME, C_USER,
     C_UTIME, CLO_REVIEW_STATUS, STATUS,
-    VERSION, APPEND_AGREE)
+    VERSION, APPEND_AGREE, ACTIV_ID
+    )
     values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{contNum,jdbcType=VARCHAR},
     #{contType,jdbcType=DECIMAL}, #{contDate,jdbcType=TIMESTAMP}, #{contEndDate,jdbcType=TIMESTAMP},
     #{remark,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
     #{cUtime,jdbcType=TIMESTAMP}, #{cloReviewStatus,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL},
-    #{version,jdbcType=DECIMAL}, #{appendAgree,jdbcType=DECIMAL})
+    #{version,jdbcType=DECIMAL}, #{appendAgree,jdbcType=DECIMAL}, #{activId,jdbcType=VARCHAR}
+    )
   </insert>
-  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentContract" >
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentContract">
     insert into A_AGENT_CONTRACT
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
         ID,
       </if>
-      <if test="agentId != null" >
+      <if test="agentId != null">
         AGENT_ID,
       </if>
-      <if test="contNum != null" >
+      <if test="contNum != null">
         CONT_NUM,
       </if>
-      <if test="contType != null" >
+      <if test="contType != null">
         CONT_TYPE,
       </if>
-      <if test="contDate != null" >
+      <if test="contDate != null">
         CONT_DATE,
       </if>
-      <if test="contEndDate != null" >
+      <if test="contEndDate != null">
         CONT_END_DATE,
       </if>
-      <if test="remark != null" >
+      <if test="remark != null">
         REMARK,
       </if>
-      <if test="cTime != null" >
+      <if test="cTime != null">
         C_TIME,
       </if>
-      <if test="cUser != null" >
+      <if test="cUser != null">
         C_USER,
       </if>
-      <if test="cUtime != null" >
+      <if test="cUtime != null">
         C_UTIME,
       </if>
-      <if test="cloReviewStatus != null" >
+      <if test="cloReviewStatus != null">
         CLO_REVIEW_STATUS,
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         STATUS,
       </if>
-      <if test="version != null" >
+      <if test="version != null">
         VERSION,
       </if>
-      <if test="appendAgree != null" >
+      <if test="appendAgree != null">
         APPEND_AGREE,
       </if>
+      <if test="activId != null">
+        ACTIV_ID,
+      </if>
     </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
         #{id,jdbcType=VARCHAR},
       </if>
-      <if test="agentId != null" >
+      <if test="agentId != null">
         #{agentId,jdbcType=VARCHAR},
       </if>
-      <if test="contNum != null" >
+      <if test="contNum != null">
         #{contNum,jdbcType=VARCHAR},
       </if>
-      <if test="contType != null" >
+      <if test="contType != null">
         #{contType,jdbcType=DECIMAL},
       </if>
-      <if test="contDate != null" >
+      <if test="contDate != null">
         #{contDate,jdbcType=TIMESTAMP},
       </if>
-      <if test="contEndDate != null" >
+      <if test="contEndDate != null">
         #{contEndDate,jdbcType=TIMESTAMP},
       </if>
-      <if test="remark != null" >
+      <if test="remark != null">
         #{remark,jdbcType=VARCHAR},
       </if>
-      <if test="cTime != null" >
+      <if test="cTime != null">
         #{cTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="cUser != null" >
+      <if test="cUser != null">
         #{cUser,jdbcType=VARCHAR},
       </if>
-      <if test="cUtime != null" >
+      <if test="cUtime != null">
         #{cUtime,jdbcType=TIMESTAMP},
       </if>
-      <if test="cloReviewStatus != null" >
+      <if test="cloReviewStatus != null">
         #{cloReviewStatus,jdbcType=DECIMAL},
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         #{status,jdbcType=DECIMAL},
       </if>
-      <if test="version != null" >
+      <if test="version != null">
         #{version,jdbcType=DECIMAL},
       </if>
-      <if test="appendAgree != null" >
+      <if test="appendAgree != null">
         #{appendAgree,jdbcType=DECIMAL},
+      </if>
+      <if test="activId != null">
+        #{activId,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentContractExample" resultType="java.lang.Integer" >
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentContractExample" resultType="java.lang.Long">
     select count(*) from A_AGENT_CONTRACT
-    <if test="_parameter != null" >
+    <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentContract" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentContract">
     update A_AGENT_CONTRACT
-    <set >
-      <if test="agentId != null" >
+    <set>
+      <if test="agentId != null">
         AGENT_ID = #{agentId,jdbcType=VARCHAR},
       </if>
-      <if test="contNum != null" >
+      <if test="contNum != null">
         CONT_NUM = #{contNum,jdbcType=VARCHAR},
       </if>
-      <if test="contType != null" >
+      <if test="contType != null">
         CONT_TYPE = #{contType,jdbcType=DECIMAL},
       </if>
-      <if test="contDate != null" >
+      <if test="contDate != null">
         CONT_DATE = #{contDate,jdbcType=TIMESTAMP},
       </if>
-      <if test="contEndDate != null" >
+      <if test="contEndDate != null">
         CONT_END_DATE = #{contEndDate,jdbcType=TIMESTAMP},
       </if>
-      <if test="remark != null" >
+      <if test="remark != null">
         REMARK = #{remark,jdbcType=VARCHAR},
       </if>
-      <if test="cTime != null" >
+      <if test="cTime != null">
         C_TIME = #{cTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="cUser != null" >
+      <if test="cUser != null">
         C_USER = #{cUser,jdbcType=VARCHAR},
       </if>
-      <if test="cUtime != null" >
+      <if test="cUtime != null">
         C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
       </if>
-      <if test="cloReviewStatus != null" >
+      <if test="cloReviewStatus != null">
         CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL},
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         STATUS = #{status,jdbcType=DECIMAL},
       </if>
-      <if test="version != null" >
+      <if test="version != null">
         VERSION = VERSION + 1,
       </if>
-      <if test="appendAgree != null" >
+      <if test="appendAgree != null">
         APPEND_AGREE = #{appendAgree,jdbcType=DECIMAL},
+      </if>
+      <if test="activId != null">
+        ACTIV_ID = #{activId,jdbcType=VARCHAR},
       </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AgentContract" >
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AgentContract">
     update A_AGENT_CONTRACT
     set AGENT_ID = #{agentId,jdbcType=VARCHAR},
     CONT_NUM = #{contNum,jdbcType=VARCHAR},
@@ -245,17 +257,18 @@
     C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
     CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL},
     STATUS = #{status,jdbcType=DECIMAL},
-    VERSION = VERSION + 1,
-    APPEND_AGREE = #{appendAgree,jdbcType=DECIMAL}
+     VERSION = VERSION + 1,
+    APPEND_AGREE = #{appendAgree,jdbcType=DECIMAL},
+    ACTIV_ID = #{activId,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
-  <sql id="OracleDialectPrefix" >
-    <if test="page != null" >
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
       select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
-  <sql id="OracleDialectSuffix" >
-    <if test="page != null" >
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>

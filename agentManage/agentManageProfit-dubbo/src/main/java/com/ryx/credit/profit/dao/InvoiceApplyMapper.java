@@ -1,5 +1,6 @@
 package com.ryx.credit.profit.dao;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -31,4 +32,13 @@ public interface InvoiceApplyMapper {
     void  deleteById(String id);
 
     List<String> getPayCompanyById(String id);
+
+    BigDecimal getSumInvoice(@Param("agentId") String agentId,@Param("invoiceCompany")String invoiceCompany,@Param("month")String month);
+
+    BigDecimal getOwnInvoice(@Param("agentId") String agentId,@Param("invoiceCompany")String invoiceCompany,@Param("month")String month);
+
+    BigDecimal getAgentTaxByAgentId(String agentId);
+
+    List<Map<String,Object>> exports(InvoiceApply invoiceApply);
+
 }

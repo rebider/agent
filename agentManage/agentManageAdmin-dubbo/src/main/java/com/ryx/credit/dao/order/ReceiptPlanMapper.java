@@ -29,4 +29,8 @@ public interface ReceiptPlanMapper {
     Long getReceipPlanCount(Map <String, Object> param);
 
     List<Map<String,Object>> queryOrderReceiptPlanInfo(@Param("params") Map<String,String> params);
+
+    List<Map<String, Object>> queryReceiveOrderLogistics(@Param("params") Map<String, String> params);
+
+    List<Map<String,Object>> queryReveiveAgentData(Map <String, Object> param);
 }

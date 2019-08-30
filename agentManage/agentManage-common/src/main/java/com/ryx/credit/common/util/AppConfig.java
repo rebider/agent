@@ -73,7 +73,7 @@ public class AppConfig extends Thread {
     }
 
     public void run() {
-        while (!appConfig.getProperty("ServerStop").equals("0")) {
+        while (appConfig.getProperty("ServerStop")!=null && !appConfig.getProperty("ServerStop").equals("0")) {
         try {
             sleep(300000);//隔5分钟重读配置文件
         } catch (Exception ex1) {

@@ -355,4 +355,57 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+
+  <select id="getListByMap" resultType="java.util.Map">
+    <include refid="OracleDialectPrefix" />
+    <include refid="queryDetail" />
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="getCountByMap" resultType="java.lang.Integer">
+    select count(1) from (
+      <include refid="queryDetail" />
+    )
+  </select>
+
+  <sql id="queryDetail">
+    select ps.ID id, ps.PROFIT_MONTH profitMonth , ps.AGENT_NAME agentName, ps.AGENT_ID agentId,
+          ps.INVOICE_COMPANY invoiceCompany, ps.PRE_LEFT_AMT preLeftAmt, ps.DAY_PROFIT_AMT dayProfitAmt,
+           ps.DAY_BACK_AMT dayBackAmt, ps.PRE_PROFIT_MONTH_AMT preProfitMonthAmt,ps.ADD_INVOICE_AMT addInvoiceAmt,
+           ps.OWN_INVOICE ownInvoice, ps.ADJUST_AMT adjustAmt, ps.ADJUST_ACCOUNT adjustAccount,
+            ps.ADJUST_RESON adjustReson, ps.ADJUST_TIME adjustTime, ps.TOP_ORG_ID topOrgId, ps.TOP_ORG_NAME topOrgName,
+            ps.INVOICE_STATUS invoiceStatus,ps.SUB_ADD_INVOICE_AMT subAddInvoiceAmt, ps.REV1 rev1,
+            ps.REV2 rev2, ps.REV3 rev3, ac.CLO_TAX_POINT tax
+    from P_INVOICE_SUM ps
+    left join A_AGENT aa on ps.AGENT_ID = aa.ID
+    left join A_AGENT_COLINFO ac on ps.AGENT_ID = ac.AGENT_ID
+    where 1 = 1
+      <if test="map.agentName != null and map.agentName != '' ">
+        and ps.AGENT_NAME = #{map.agentName}
+      </if>
+      <if test="map.agentId != null and map.agentId != '' ">
+        and ps.AGENT_ID = #{map.agentId}
+      </if>
+      <if test="map.topOrgName != null and map.topOrgName != '' ">
+        and ps.TOP_ORG_NAME = #{map.topOrgName}
+      </if>
+      <if test="map.topOrgId != null and map.topOrgId != '' ">
+        and ps.TOP_ORG_ID = #{map.topOrgId}
+      </if>
+      <if test="map.invoiceStatus != null and map.invoiceStatus != '' ">
+        and ps.INVOICE_STATUS = #{map.invoiceStatus}
+      </if>
+      <if test="map.profitMonth != null and map.profitMonth != '' ">
+        and ps.PROFIT_MONTH = #{map.profitMonth}
+      </if>
+      <if test="map.invoiceCompany != null and map.invoiceCompany != '' ">
+        and ps.INVOICE_COMPANY = #{map.invoiceCompany}
+      </if>
+      <if test="map.docPro != null and map.docPro != '' ">
+        and aa.AG_DOC_PRO = #{map.docPro}
+      </if>
+      <if test="map.docDis != null and map.docDis != '' ">
+        and aa.AG_DOC_DISTRICT = #{map.docDis}
+      </if>
+  </sql>
 </mapper>

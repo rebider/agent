@@ -124,6 +124,7 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
         resultMap.put("isBill",agentColinfo.getCloInvoice());//是否开具分润发票
         resultMap.put("taxPoint",agentColinfo.getCloTaxPoint());//税点
         resultMap.put("agencyMobileNo",agentBusInfo.getBusLoginNum());//代理商登录管理app手机号
+        resultMap.put("terminalsLower",agentBusInfo.getTerminalsLower());//终端数量下限
         return resultMap;
     }
 
@@ -231,6 +232,7 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
         resultMap.put("isBill",agentColinfo.getCloInvoice());//是否开具分润发票
         resultMap.put("taxPoint",agentColinfo.getCloTaxPoint());//税点
         resultMap.put("agencyMobileNo",agentBusInfo.getBusLoginNum());//代理商登录管理app手机号
+        resultMap.put("terminalsLower",agentBusInfo.getTerminalsLower());//终端数量下限
         return resultMap;
     }
 
@@ -328,6 +330,7 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
         resultMap.put("isBill",agentColinfo.getCloInvoice());//是否开具分润发票
         resultMap.put("taxPoint",agentColinfo.getCloTaxPoint());//税点
         resultMap.put("agencyMobileNo",agentBusInfo.getBusLoginNum());//代理商登录管理app手机号
+        resultMap.put("terminalsLower",agentBusInfo.getTerminalsLower());//终端数量下限
         return resultMap;
     }
 

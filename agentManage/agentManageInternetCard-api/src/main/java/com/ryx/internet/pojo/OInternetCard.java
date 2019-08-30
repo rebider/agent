@@ -61,6 +61,8 @@ public class OInternetCard implements Serializable{
 
     private String stopReason;
 
+    private BigDecimal sumPostponeTime;
+
     private String snCount;
 
     private String beginSn;
@@ -78,6 +80,34 @@ public class OInternetCard implements Serializable{
     private String expireTimeEndStr;
 
     private String renewButton;  //是否展示续费按钮   1 展示  0 不展示
+
+    private String iccidNumBegin;
+
+    private String iccidNumEnd;
+
+    public String getIccidNumBegin() {
+        return iccidNumBegin;
+    }
+
+    public void setIccidNumBegin(String iccidNumBegin) {
+        this.iccidNumBegin = iccidNumBegin;
+    }
+
+    public String getIccidNumEnd() {
+        return iccidNumEnd;
+    }
+
+    public void setIccidNumEnd(String iccidNumEnd) {
+        this.iccidNumEnd = iccidNumEnd;
+    }
+
+    public BigDecimal getSumPostponeTime() {
+        return sumPostponeTime;
+    }
+
+    public void setSumPostponeTime(BigDecimal sumPostponeTime) {
+        this.sumPostponeTime = sumPostponeTime;
+    }
 
     public String getRenewButton() {
         return renewButton;
