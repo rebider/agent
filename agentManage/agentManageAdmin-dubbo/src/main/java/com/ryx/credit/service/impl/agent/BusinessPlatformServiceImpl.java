@@ -401,6 +401,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 if(StringUtils.isNotBlank(agentBusInfoVo.getOrganNum()))
                  agentBusInfo.setOrganNum(agentBusInfoVo.getOrganNum());
                 agentBusInfo.setVersion(agentBusInfo.getVersion());
+                agentBusInfo.setBusUseOrgan(agentBusInfoVo.getBusUseOrgan());
+                agentBusInfo.setBusScope(agentBusInfoVo.getBusScope());
                 int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
                 if (i != 1) {
                     throw new MessageException("更新失败");
