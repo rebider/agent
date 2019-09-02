@@ -27,7 +27,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -80,6 +79,8 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     private AgentNetInNotityService agentNetInNotityService;
     @Autowired
     private AgentDataHistoryService agentDataHistoryService;
+    @Autowired
+    private AgentBusinfoService agentBusinfoService;
 
 
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
@@ -153,7 +154,9 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             logger.info("========用户{}启动数据修改申请{}{}启动部门参数为空",dataChangeId,userId,"审批流启动失败字典中未配置部署流程");
             throw new MessageException("启动部门参数为空!");
         }
-
+        if(startPar.get("party").toString().equals("beijing")){
+            startPar.put("rs",ApprovalType.PASS.getValue());
+        }
         String proce = activityService.createDeloyFlow(null,workId,null,null,startPar);
         if(proce==null){
             logger.info("========用户{}启动数据修改申请{}{}",dataChangeId,userId,"数据修改审批，审批流启动失败");
@@ -170,7 +173,13 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         record.setBusType(dateChangeRequest.getDataType());//流程关系类型是数据申请类型
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(dateChangeRequest.getDataId());
-        record.setDataShiro(BusActRelBusType.DC_Agent.key);
+        if(dateChangeRequest.getDataType().equals(BusActRelBusType.DC_Agent.name())){
+            record.setDataShiro(BusActRelBusType.DC_Agent.key);
+        }else if(dateChangeRequest.getDataType().equals(BusActRelBusType.DC_Colinfo.name())){
+            record.setDataShiro(BusActRelBusType.DC_Colinfo.key);
+        }else{
+            record.setDataShiro(BusActRelBusType.DC_Agent.key);
+        }
         Agent agent = agentMapper.selectByPrimaryKey(dateChangeRequest.getDataId());
         if(agent!=null)
             record.setAgentName(agent.getAgName());
@@ -457,8 +466,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                         }
 
                         //======================================更新业务信息
-                        ResultVO res = agentEnterService.updateAgentVo(vo,rel.getcUser(),true,null);
-
+                        ResultVO res =  agentBusinfoService.updateBussiness(vo.getBusInfoVoList(),rel.getcUser());
                         //======================================更新费率信息
                         for (AgentBusInfoVo agentBusInfoVo : vo.getEditDebitList()) {
                             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
@@ -479,15 +487,6 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             logger.info("========审批流完成{}业务{}状态{},结果{}",proIns,rel.getBusType(),agStatus,"更新数据申请成功");
                             if(1!=dateChangeRequestMapper.updateByPrimaryKeySelective(dr)){
                                 throw new ProcessException("更新数据申请失败");
-                            }
-                            if(null!=vo.getCapitalVoList() && vo.getCapitalVoList().size()>0){
-                                for (Capital capital : vo.getCapitalVoList()) {
-                                    capital.setCloReviewStatus(AgStatus.Approved.getValue());
-                                    int i = capitalMapper.updateByPrimaryKeySelective(capital);
-                                    if(1!=i){
-                                        throw new ProcessException("更新缴纳款审批通过失败");
-                                    }
-                                }
                             }
 
                         }
@@ -681,4 +680,22 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         int i = dateChangeRequestMapper.updateByPrimaryKeySelective(dateChangeRequest);
         return i;
     }
+
+
+    @Override
+    public ResultVO deleteDataChange(String dataChangeId, String userId) throws Exception {
+        logger.info("========用户{}删除数据修改申请{}", userId, dataChangeId);
+
+        DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(dataChangeId);
+        dateChangeRequest.setStatus(Status.STATUS_0.status);
+        dateChangeRequest.setcUpdate(new Date());
+        int updateDateChange = dateChangeRequestMapper.updateByPrimaryKeySelective(dateChangeRequest);
+        if (updateDateChange != 1) {
+            logger.info("删除数据修改申请:{}", "数据删除失败");
+            throw new MessageException("数据删除失败！");
+        }
+
+        return ResultVO.success(null);
+    }
+
 }

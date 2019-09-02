@@ -6,6 +6,7 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
+import com.ryx.credit.dao.agent.PlatFormMapper;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
@@ -35,12 +36,10 @@ import java.util.Map;
 @Service("agentHttpRHBPosServiceImpl")
 public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
 
-    private static Logger log = LoggerFactory.getLogger(AgentHttpRHBPosServiceImpl.class);
-
     private static final String rhbReqUrl = AppConfig.getProperty("rhb_req_url");
     private static final String rhb3desKey = AppConfig.getProperty("rhb_3des_Key");
     private static final String rhb3desIv = AppConfig.getProperty("rhb_3des_iv");
-
+    private static Logger log = LoggerFactory.getLogger(AgentHttpRHBPosServiceImpl.class);
     @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
     @Autowired
@@ -51,6 +50,8 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
     private AgentColinfoService agentColinfoService;
     @Autowired
     private AgentMapper agentMapper;
+    @Autowired
+    private PlatFormMapper platFormMapper;
 
     /**
      * 入网组装参数
@@ -97,6 +98,7 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
         }
         resultMap.put("alwaysProfit","00");//该机构是否参与实时分润
         resultMap.put("brandName",platForm.getPlatformName());//平台名称
+        resultMap.put("brandCode",platForm.getBusplatform());//平台Code
         //收款账户新
         AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
         if(agentColinfo==null){
@@ -122,6 +124,7 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
         resultMap.put("isBill",agentColinfo.getCloInvoice());//是否开具分润发票
         resultMap.put("taxPoint",agentColinfo.getCloTaxPoint());//税点
         resultMap.put("agencyMobileNo",agentBusInfo.getBusLoginNum());//代理商登录管理app手机号
+        resultMap.put("terminalsLower",agentBusInfo.getTerminalsLower());//终端数量下限
         return resultMap;
     }
 
@@ -136,9 +139,9 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
             log.info("通知瑞花宝入网请求参数：{}",json);
             log.info("通知瑞花宝入网请求参数加密：{}",reqParamEncrypt);
             String httpResult = HttpClientUtil.sendHttpPost(rhbReqUrl, reqParamEncrypt);
-            log.info("通知瑞大宝入网返回参数1：{}",httpResult);
+            log.info("通知瑞花宝入网返回参数1：{}",httpResult);
             String reqParamDecrypt = Des3Util.Decrypt(httpResult, rhb3desKey, rhb3desIv.getBytes());
-            log.info("通知瑞大宝入网返回参数：{}",reqParamDecrypt);
+            log.info("通知瑞花宝入网返回参数：{}",reqParamDecrypt);
             JSONObject respXMLObj = JSONObject.parseObject(reqParamDecrypt);
             if (respXMLObj.getString("MSG_CODE").equals("0000")){
                 return AgentResult.ok(respXMLObj);
@@ -190,24 +193,25 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
                 }
             }
         }
-        resultMap.put("orgType",OrgType.zQ(agentBusInfo.getBusType())?OrgType.STR.getValue():OrgType.ORG.getValue());
-        AgentBusInfo agentParent = null;
-        if(StringUtils.isNotBlank(agentBusInfo.getBusParent())){
-            //取出上级业务
-            agentParent = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
-        }
-        if(null!=agentParent){
-            resultMap.put("supDorgId",agentParent.getBusNum());
-        }
+        resultMap.put("orgType",OrgType.STR.getValue());
         resultMap.put("alwaysProfit","00");//该机构是否参与实时分润
         resultMap.put("brandName",platForm.getPlatformName());//平台名称
+        resultMap.put("brandCode",platForm.getBusplatform());//平台Code
         //收款账户新
         AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
         if(agentColinfo==null){
             log.info("收款账户为空:{},{}",agent.getId(), agentBusInfo.getId());
             agentColinfo = new AgentColinfo();
         }
-        resultMap.put("agentId",agentBusInfo.getBusNum());//业务平台编号RHB
+        resultMap.put("agentId",agentBusInfo.getBusNum());//业务平台编号RHB机构号
+        AgentBusInfo agentParent = null;
+        if(StringUtils.isNotBlank(agentBusInfo.getBusParent())){
+            //取出上级业务
+            agentParent = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
+        }
+        if(null!=agentParent){
+            resultMap.put("upAgentId",agentParent.getBrandNum());//上级品牌号
+        }
 
         //00:对公账户，01：对私账户
         resultMap.put("acctType",agentColinfo.getCloType().compareTo(BigDecimal.ONE)==0?"00":"01");
@@ -228,6 +232,7 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
         resultMap.put("isBill",agentColinfo.getCloInvoice());//是否开具分润发票
         resultMap.put("taxPoint",agentColinfo.getCloTaxPoint());//税点
         resultMap.put("agencyMobileNo",agentBusInfo.getBusLoginNum());//代理商登录管理app手机号
+        resultMap.put("terminalsLower",agentBusInfo.getTerminalsLower());//终端数量下限
         return resultMap;
     }
 
@@ -240,9 +245,9 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
             log.info("通知瑞花宝入网升级请求参数：{}",json);
             log.info("通知瑞花宝入网升级请求参数加密：{}",reqParamEncrypt);
             String httpResult = HttpClientUtil.sendHttpPost(rhbReqUrl, reqParamEncrypt);
-            log.info("通知瑞大宝入网升级返回参数1：{}",httpResult);
+            log.info("通知瑞花宝入网升级返回参数1：{}",httpResult);
             String reqParamDecrypt = Des3Util.Decrypt(httpResult, rhb3desKey, rhb3desIv.getBytes());
-            log.info("通知瑞大宝入网升级返回参数：{}",reqParamDecrypt);
+            log.info("通知瑞花宝入网升级返回参数：{}",reqParamDecrypt);
             JSONObject respXMLObj = JSONObject.parseObject(reqParamDecrypt);
             if (respXMLObj.getString("MSG_CODE").equals("0000")){
                 return AgentResult.ok(respXMLObj);
@@ -297,6 +302,7 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
         }
         resultMap.put("alwaysProfit","00");//该机构是否参与实时分润
         resultMap.put("brandName",platForm.getPlatformName());//平台名称
+        resultMap.put("brandCode",platForm.getBusplatform());//平台Code
         //收款账户新
         AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
         if(agentColinfo==null){
@@ -324,6 +330,7 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
         resultMap.put("isBill",agentColinfo.getCloInvoice());//是否开具分润发票
         resultMap.put("taxPoint",agentColinfo.getCloTaxPoint());//税点
         resultMap.put("agencyMobileNo",agentBusInfo.getBusLoginNum());//代理商登录管理app手机号
+        resultMap.put("terminalsLower",agentBusInfo.getTerminalsLower());//终端数量下限
         return resultMap;
     }
 
@@ -336,9 +343,9 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
             log.info("通知瑞花宝入网修改请求参数：{}",json);
             log.info("通知瑞花宝入网修改请求参数加密：{}",reqParamEncrypt);
             String httpResult = HttpClientUtil.sendHttpPost(rhbReqUrl, reqParamEncrypt);
-            log.info("通知瑞大宝入网修改返回参数1：{}",httpResult);
+            log.info("通知瑞花宝入网修改返回参数1：{}",httpResult);
             String reqParamDecrypt = Des3Util.Decrypt(httpResult, rhb3desKey, rhb3desIv.getBytes());
-            log.info("通知瑞大宝入网修改返回参数：{}",reqParamDecrypt);
+            log.info("通知瑞花宝入网修改返回参数：{}",reqParamDecrypt);
             JSONObject respXMLObj = JSONObject.parseObject(reqParamDecrypt);
             if (respXMLObj.getString("MSG_CODE").equals("0000")){
                 return AgentResult.ok(respXMLObj);
@@ -355,5 +362,35 @@ public class AgentHttpRHBPosServiceImpl implements AgentNetInHttpService {
     }
 
 
+    @Override
+    public AgentResult agencyLevelCheck(Map<String, Object> paramMap)throws Exception{
+
+        Map<Object, Object> reqMap = new HashMap<>();
+        reqMap.put("application","CheckPromotionAgency");
+        reqMap.put("brandCode",paramMap.get("brandCode"));
+        reqMap.put("agentId",paramMap.get("agentId"));
+        String directAgentId = String.valueOf(paramMap.get("directAgentId"));
+        AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(directAgentId);
+        if(agentBusInfo==null){
+            throw new Exception("上级信息有误");
+        }
+        reqMap.put("directAgentId",agentBusInfo.getBusNum());
+        reqMap.put("upAgentId",agentBusInfo.getBrandNum());
+
+        String json = JsonUtil.objectToJson(reqMap);
+        String reqParamEncrypt = Des3Util.Encrypt(json, rhb3desKey, rhb3desIv.getBytes());
+        log.info("通知瑞花宝升级验证请求参数：{}",json);
+        log.info("通知瑞花宝升级验证请求参数加密：{}",reqParamEncrypt);
+        String httpResult = HttpClientUtil.sendHttpPost(rhbReqUrl, reqParamEncrypt);
+        log.info("通知瑞花宝升级验证返回参数1：{}",httpResult);
+        String reqParamDecrypt = Des3Util.Decrypt(httpResult, rhb3desKey, rhb3desIv.getBytes());
+        log.info("通知瑞花宝升级验证返回参数：{}",reqParamDecrypt);
+        JSONObject respXMLObj = JSONObject.parseObject(reqParamDecrypt);
+        if (respXMLObj.getString("MSG_CODE").equals("0000")){
+            return AgentResult.ok(respXMLObj);
+        }else{
+            throw new Exception(respXMLObj.getString("MSG_TEXT"));
+        }
+    }
 }
 

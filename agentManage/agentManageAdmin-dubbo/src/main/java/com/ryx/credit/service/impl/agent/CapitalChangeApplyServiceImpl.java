@@ -45,6 +45,10 @@ import java.util.*;
 @Service("capitalChangeApplyService")
 public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService {
 
+    private static final String CAPITAL_LOCK = "capital_lock_";
+    private static final String CAPITAL_APP_LOCK = "capital_app_lock_";
+    private static final long TIME_OUT = 60000*5;       //锁的超时时间
+    private static final long ACQUIRE_TIME_OUT = 5000;  //超时时间
     private static Logger logger = LoggerFactory.getLogger(CapitalChangeApplyServiceImpl.class);
     @Autowired
     private CapitalChangeApplyMapper capitalChangeApplyMapper;
@@ -82,11 +86,6 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
     private RedisService redisService;
     @Autowired
     private DictOptionsService dictOptionsService;
-
-    private static final String CAPITAL_LOCK = "capital_lock_";
-    private static final String CAPITAL_APP_LOCK = "capital_app_lock_";
-    private static final long TIME_OUT = 60000*5;       //锁的超时时间
-    private static final long ACQUIRE_TIME_OUT = 5000;  //超时时间
 
     /**
      * 保证金列表
@@ -363,7 +362,9 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
                 logger.info("========用户{}{}启动部门参数为空", id, cUser);
                 throw new MessageException("启动部门参数为空!");
             }
-            startPar.put("rs","pass");
+            if(startPar.get("party").toString().equals("beijing")) {
+                startPar.put("rs", ApprovalType.PASS.getValue());
+            }
             startPar.put("operationType", capitalChangeApply.getOperationType());
 
             //启动审批
@@ -385,6 +386,12 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
             record.setAgentId(capitalChangeApply.getAgentId());
             record.setAgentName(capitalChangeApply.getAgentName());
             record.setDataShiro(BusActRelBusType.capitalChange.key);
+            List<Map<String, Object>> maps = iUserService.orgCode(Long.valueOf(cUser));
+            if(maps!=null){
+                Map<String, Object> stringObjectMap = maps.get(0);
+                record.setAgDocPro(stringObjectMap.get("ORGID")+"");
+                record.setAgDocDistrict(stringObjectMap.get("ORGPID")+"");
+            }
             if (1 != busActRelMapper.insertSelective(record)) {
                 logger.info("代理商退出提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
                 throw new MessageException("审批流启动失败：添加审批关系失败！");

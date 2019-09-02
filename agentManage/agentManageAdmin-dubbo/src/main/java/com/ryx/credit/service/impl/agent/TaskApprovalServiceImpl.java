@@ -260,7 +260,7 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                     for (AgentBusInfoVo agentBusInfoVo : agentVo.getTerminalsLowerList()) {
                         AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
                         PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
-                        if (PlatformType.RDBPOS.code.equals(platForm.getPlatformType())) {
+                        if (PlatformType.RDBPOS.code.equals(platForm.getPlatformType()) || PlatformType.RHPOS.code.equals(platForm.getPlatformType())) {
                             if (StringUtils.isBlank(agentBusInfoVo.getTerminalsLower())) {
                                 throw new ProcessException("请填写终端数量下限");
                             }
@@ -340,6 +340,9 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
         record.setAgentName(busActRel.getAgentName());
         record.setActivStatus(AgStatus.Approving.name());
         record.setDataShiro(busActRel.getDataShiro());
+        record.setAgDocPro(busActRel.getAgDocPro());
+        record.setAgDocDistrict(busActRel.getAgDocDistrict());
+        record.setNetInBusType(busActRel.getNetInBusType());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("启动审批异常，添加审批关系失败{}:{}:{}", busActRel.getActivId(), busActRel.getBusId(),busActRel.getBusType());
         }

@@ -120,6 +120,7 @@ public class AgentHttpRJPosServiceImpl implements AgentNetInHttpService {
         resultMap.put("lowCreditRate",agentBusInfo.getCreditRateFloor());
         resultMap.put("ceilingCreditRate",agentBusInfo.getCreditRateCeiling());
         resultMap.put("hasS0",agentBusInfo.getDredgeS0().equals(new BigDecimal(1))?"0":"1");
+        resultMap.put("hasD1",agentBusInfo.getDredgeD1().equals(new BigDecimal(1))?"0":"1");
         resultMap.put("orgName",agent.getAgName());
         resultMap.put("useOrgan",agentBusInfo.getBusUseOrgan()); //使用范围
         if(StringUtils.isNotBlank(platForm.getPosanameprefix())){
@@ -171,6 +172,11 @@ public class AgentHttpRJPosServiceImpl implements AgentNetInHttpService {
         resultMap.put("isBill",agentColinfo.getCloInvoice());//是否开具分润发票
         resultMap.put("taxPoint",agentColinfo.getCloTaxPoint());//税点
         resultMap.put("agCode",agentBusInfo.getAgentId());//AG码
+        if (StringUtils.isNotBlank(agentBusInfo.getBusActivationParent())){
+            AgentBusInfo actBudinfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusActivationParent());
+            resultMap.put("actBusId",agentBusInfo.getBusActivationParent());
+            resultMap.put("actBusNum",actBudinfo.getBusNum());
+        }
         return resultMap;
     }
 
@@ -197,6 +203,7 @@ public class AgentHttpRJPosServiceImpl implements AgentNetInHttpService {
             data.put("orgName",paramMap.get("orgName"));
             data.put("busiAreas",paramMap.get("busiAreas"));
             data.put("hasS0",paramMap.get("hasS0"));
+            data.put("hasD1",paramMap.get("hasD1"));
             data.put("busiType",paramMap.get("busiType"));
             data.put("debitTop",paramMap.get("debitTop"));
             data.put("ckDebitRate",paramMap.get("ckDebitRate"));
@@ -240,6 +247,8 @@ public class AgentHttpRJPosServiceImpl implements AgentNetInHttpService {
             data.put("isBill",paramMap.get("isBill"));//是否开具分润发票
             data.put("taxPoint",paramMap.get("taxPoint"));//税点
             data.put("agCode",paramMap.get("agCode"));//AG码
+            data.put("actBusId",paramMap.get("actBusId"));//激活返现的业务id
+            data.put("actBusNum",paramMap.get("actBusNum"));//激活返现的编码
 
             jsonParams.put("data", data);
             String plainXML = jsonParams.toString();
@@ -462,6 +471,9 @@ public class AgentHttpRJPosServiceImpl implements AgentNetInHttpService {
         return httpRequestNetIn(paramMap);
     }
 
-
+    @Override
+    public AgentResult agencyLevelCheck(Map<String, Object> paramMap)throws Exception{
+        return AgentResult.ok();
+    }
 }
 

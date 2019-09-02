@@ -24,7 +24,7 @@ public interface TermMachineService {
      * @param platformType
      * @return
      */
-    public List<TermMachineVo> queryTermMachine(PlatformType platformType)throws Exception;
+    public List<TermMachineVo> queryTermMachine(PlatformType platformType,Map<String,String> par)throws Exception;
 
 
     /**

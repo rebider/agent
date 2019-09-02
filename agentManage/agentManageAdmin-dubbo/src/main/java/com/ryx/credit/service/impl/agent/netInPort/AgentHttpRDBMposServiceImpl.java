@@ -42,9 +42,8 @@ import java.util.Map;
 @Service("agentHttpRDBMposServiceImpl")
 public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
 
-    private static Logger log = LoggerFactory.getLogger(AgentNetInNotityServiceImpl.class);
-
     private static final String rdbReqUrl = AppConfig.getProperty("rdb_req_url");
+    private static Logger log = LoggerFactory.getLogger(AgentNetInNotityServiceImpl.class);
     @Autowired
     private AgentColinfoService agentColinfoService;
     @Autowired
@@ -68,7 +67,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             if(agentColinfo==null){
                 agentColinfo = new AgentColinfo();
             }
-            resultMap.put("mobileNo",agentBusInfo.getBusLoginNum());
+            resultMap.put("mobileNo",agentBusInfo.getBusLoginNum().trim());
             resultMap.put("branchid",agentBusInfo.getBusPlatform());
             resultMap.put("direct",direct(agentBusInfo.getBusType()));
             resultMap.put("cardno",agentColinfo.getCloBankAccount());
@@ -106,6 +105,9 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             resultMap.put("agCode",agent.getId());
             resultMap.put("directLabel",directLabel(agentBusInfo.getBusType()));
             Region region = regionMapper.findByRcode(agentColinfo.getBankRegion());
+            if(region==null){
+                region = new Region();
+            }
             resultMap.put("code",String.valueOf(region.gettType()));
             resultMap.put("cityid",agentColinfo.getBankRegion());
             resultMap.put("bankcity",region.getrName());
@@ -383,4 +385,11 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
 
     }
 
+
+    @Override
+    public AgentResult agencyLevelCheck(Map<String, Object> paramMap)throws Exception{
+
+
+        return AgentResult.ok();
+    }
 }

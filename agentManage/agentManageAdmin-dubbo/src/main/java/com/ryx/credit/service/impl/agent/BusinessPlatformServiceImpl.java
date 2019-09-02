@@ -15,6 +15,7 @@ import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.IResourceService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
+import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.bank.PosRegionService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.RegionService;
@@ -87,6 +88,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     private AgentAssProtocolService agentAssProtocolService;
     @Autowired
     private COrganizationMapper organizationMapper;
+    @Autowired
+    private AgentNetInNotityService agentNetInNotityService;
+
 
     @Override
     public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,Long userId) {
@@ -299,6 +303,20 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     logger.info("请选择业务平台");
                     throw new ProcessException("请选择业务平台");
                 }
+                if(StringUtils.isNotBlank(item.getBusNum())) {
+                    if (!OrgType.zQ(item.getBusType())) {
+                        throw new ProcessException("升级类型必须是直签");
+                    }
+                    if (StringUtils.isBlank(item.getBusParent())){
+                        throw new ProcessException("升级直签上级不能为空");
+                    }
+                    Map<String, Object> reqMap = new HashMap<>();
+                    reqMap.put("busInfo",item);
+                    AgentResult agentResult = agentNetInNotityService.agencyLevelCheck(reqMap);
+                    if(!agentResult.isOK()){
+                        throw new ProcessException(agentResult.getMsg());
+                    }
+                }
                 if(OrgType.zQ(item.getBusType())){
                     if(StringUtils.isBlank(item.getBusParent()))
                         throw new ProcessException("直签上级不能为空");
@@ -420,6 +438,20 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
                 if (StringUtils.isBlank(item.getBusPlatform())) {
                     throw new ProcessException("业务平台不能为空");
+                }
+                if(StringUtils.isNotBlank(item.getBusNum())) {
+                    if (!OrgType.zQ(item.getBusType())) {
+                        throw new ProcessException("升级类型必须是直签");
+                    }
+                    if (StringUtils.isBlank(item.getBusParent())){
+                        throw new ProcessException("升级直签上级不能为空");
+                    }
+                    Map<String, Object> reqMap = new HashMap<>();
+                    reqMap.put("busInfo",item);
+                    AgentResult agentResult = agentNetInNotityService.agencyLevelCheck(reqMap);
+                    if(!agentResult.isOK()){
+                        throw new ProcessException(agentResult.getMsg());
+                    }
                 }
                 if(OrgType.zQ(item.getBusType())){
                     if(StringUtils.isBlank(item.getBusParent()))
@@ -561,6 +593,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         criteria.andBusPlatformEqualTo(agentBusInfo.getBusPlatform());
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         criteria.andCloReviewStatusIn(Arrays.asList(AgStatus.Approved.status,AgStatus.Approving.status));
+        criteria.andBusStatusIn(Arrays.asList(BusStatus.WQY.status,BusStatus.QY.status,BusStatus.WJH.status,BusStatus.SD.status));
         List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(example);
         if (null == agentBusInfos) {
             return true;

@@ -148,4 +148,29 @@ public class DepartmentServiceImpl implements DepartmentService {
         }
         return null;
     }
+
+
+    /**
+     * 大区
+     * @return
+     */
+    @Override
+    public List<Tree> selectRegion(String pCode) {
+        List<Tree> rootTree = new ArrayList<>();
+        Integer pid = null;
+        if(StringUtils.isNotBlank(pCode)){
+            pid = Integer.valueOf(pCode);
+        }
+        List<COrganization> cOrganizationList = cOrganizationMapper.selectRegion(pid);
+        for (COrganization cOrganization : cOrganizationList) {
+            rootTree.add(departmentToTree(cOrganization));
+        }
+        return rootTree;
+    }
+
+    @Override
+    public List<COrganization> selectCityRegion(Long cUser) {
+        return cOrganizationMapper.selectCityRegion(cUser);
+    }
+
 }

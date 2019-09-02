@@ -19,27 +19,8 @@ import static com.ryx.credit.common.util.Conver10ToConver33Utils.getBetweenValue
 public class TestMain {
 
     public static void main(String[] args) {
-        BigDecimal count = new BigDecimal(4);
-        try {
-            List<BigDecimal> divideList = new ArrayList<>();
-            BigDecimal money = new BigDecimal(1800).subtract(new BigDecimal(850));
-            BigDecimal stage = money.divide(count,2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal tt = BigDecimal.ZERO;
-            for (int i = 0; i < count.intValue(); i++) {
 
-                if(i==count.intValue()-1){
-                    if(0!=money.subtract(tt).compareTo(stage)){
-                        stage =   money.subtract(tt);
-                    }
-                }
-                tt=tt.add(stage);
-                divideList.add(stage);
-            }
-            System.out.println(divideList);
-        } catch (Exception e) {
-
-
-        }
+        System.out.println(Long.valueOf("000024026311890023316094"));
     }
 
 

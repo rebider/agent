@@ -68,6 +68,25 @@ public class TerminalTransferDetail implements Serializable{
     private String goalType;
 
     private String originalType;
+    private String isNoPay;
+
+    public String getIsNoPay() {
+        return isNoPay;
+    }
+
+    public void setIsNoPay(String isNoPay) {
+        this.isNoPay = isNoPay;
+    }
+
+    public String getPlatFrom() {
+        return platFrom;
+    }
+
+    public void setPlatFrom(String platFrom) {
+        this.platFrom = platFrom;
+    }
+
+    private String platFrom;
 
     public BigDecimal getComSnNum() {
         return comSnNum;

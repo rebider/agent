@@ -56,4 +56,8 @@ public interface AgentColinfoService {
 
 
     Attachment selectAttachment(String id);
+
+    public ResultVO updateAgentColinfoVoNow(List<AgentColinfoVo> colinfoVoList, Agent agent,String userId,String saveStatus)throws Exception;
+
+
 }
