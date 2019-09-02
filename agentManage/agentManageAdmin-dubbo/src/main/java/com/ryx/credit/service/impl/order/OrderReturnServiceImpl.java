@@ -52,10 +52,9 @@ import java.util.*;
 @Service("orderReturnService")
 public class OrderReturnServiceImpl implements IOrderReturnService {
 
-    private static Logger log = LoggerFactory.getLogger(OrderReturnServiceImpl.class);
     public final static SimpleDateFormat sdfyyyyMMdd = new SimpleDateFormat("yyyy-MM-dd");
     public final static SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-
+    private static Logger log = LoggerFactory.getLogger(OrderReturnServiceImpl.class);
     private static String refund_agent_modify_id = AppConfig.getProperty("refund_agent_modify_id");
     private static String refund_business1_id = AppConfig.getProperty("refund_business1_id");
     private static String refund_finc1_id = AppConfig.getProperty("refund_finc1_id");
@@ -807,69 +806,73 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         }
 
         BigDecimal invoiceAmt = BigDecimal.ZERO;
-        if(oInvoices!=null)
-        for (OInvoice oInvoice : oInvoices) {
-            if(StringUtils.isBlank(oInvoice.getInvoiceCompany())){
-                throw new ProcessException("开票公司不能为空");
-            }
-            if(StringUtils.isBlank(oInvoice.getInvoiceProject())){
-                throw new ProcessException("开票项目不能为空");
-            }
-            if(null==oInvoice.getInvoiceAmt()){
-                throw new ProcessException("金额不能为空");
-            }
-            if(StringUtils.isBlank(oInvoice.getInvoiceNum())){
-                throw new ProcessException("发票号不能为空");
-            }
-            if(StringUtils.isBlank(oInvoice.getInvoiceCode())){
-                throw new ProcessException("发票代码不能为空");
-            }
-            if(StringUtils.isBlank(oInvoice.getExpressNum())){
-                throw new ProcessException("快递单号不能为空");
-            }
-            if(StringUtils.isBlank(oInvoice.getExpressComp())){
-                throw new ProcessException("快递公司不能为空");
-            }
-            if(null==oInvoice.getSendTime()){
-                throw new ProcessException("寄出时间不能为空");
-            }
-            String oInvoiceId = idService.genId(TabId.O_INVOICE);
-            oInvoice.setId(oInvoiceId);
-            oInvoice.setSrcType(OInvoiceSrcType.RETURNORDER.code);
-            oInvoice.setSrcId(returnId);
-            oInvoice.setAgentId(returnOrder.getAgentId());
-            oInvoice.setcTime(new Date());
-            oInvoice.setuTime(new Date());
-            oInvoice.setcUser(userid);
-            oInvoice.setuUser(userid);
-            oInvoice.setStatus(Status.STATUS_1.status);
-            oInvoice.setVersion(Status.STATUS_1.status);
-            invoiceMapper.insert(oInvoice);
-
-            List<String> invoiceTableFiles = oInvoice.getInvoiceTableFile();
-            //添加新的附件
-            if (invoiceTableFiles != null && invoiceTableFiles.size()!=0) {
-                for (String invoiceTableFile : invoiceTableFiles) {
-                    AttachmentRel record = new AttachmentRel();
-                    record.setAttId(invoiceTableFile);
-                    record.setSrcId(oInvoiceId);
-                    record.setcUser(userid);
-                    record.setcTime(Calendar.getInstance().getTime());
-                    record.setStatus(Status.STATUS_1.status);
-                    record.setBusType(AttachmentRelType.returnOrderInvoice.name());
-                    record.setId(idService.genId(TabId.a_attachment_rel));
-                    int f = attachmentRelMapper.insertSelective(record);
-                    if (1 != f) {
-                        log.info("退货上传发票信息保存附件关系失败");
-                        throw new ProcessException("保存附件失败");
+        if(Status.STATUS_1.status.compareTo(returnOrder.getRetInvoice())==0) {
+            if (oInvoices != null && oInvoices.size() > 0) {
+                for (OInvoice oInvoice : oInvoices) {
+                    if (StringUtils.isBlank(oInvoice.getInvoiceCompany())) {
+                        throw new ProcessException("开票公司不能为空");
                     }
-                }
-            }
-            invoiceAmt = invoiceAmt.add(oInvoice.getInvoiceAmt());
-        }
+                    if (StringUtils.isBlank(oInvoice.getInvoiceProject())) {
+                        throw new ProcessException("开票项目不能为空");
+                    }
+                    if (null == oInvoice.getInvoiceAmt()) {
+                        throw new ProcessException("金额不能为空");
+                    }
+                    if (StringUtils.isBlank(oInvoice.getInvoiceNum())) {
+                        throw new ProcessException("发票号不能为空");
+                    }
+                    if (StringUtils.isBlank(oInvoice.getInvoiceCode())) {
+                        throw new ProcessException("发票代码不能为空");
+                    }
+                    if (StringUtils.isBlank(oInvoice.getExpressNum())) {
+                        throw new ProcessException("快递单号不能为空");
+                    }
+                    if (StringUtils.isBlank(oInvoice.getExpressComp())) {
+                        throw new ProcessException("快递公司不能为空");
+                    }
+                    if (null == oInvoice.getSendTime()) {
+                        throw new ProcessException("寄出时间不能为空");
+                    }
+                    String oInvoiceId = idService.genId(TabId.O_INVOICE);
+                    oInvoice.setId(oInvoiceId);
+                    oInvoice.setSrcType(OInvoiceSrcType.RETURNORDER.code);
+                    oInvoice.setSrcId(returnId);
+                    oInvoice.setAgentId(returnOrder.getAgentId());
+                    oInvoice.setcTime(new Date());
+                    oInvoice.setuTime(new Date());
+                    oInvoice.setcUser(userid);
+                    oInvoice.setuUser(userid);
+                    oInvoice.setStatus(Status.STATUS_1.status);
+                    oInvoice.setVersion(Status.STATUS_1.status);
+                    invoiceMapper.insert(oInvoice);
 
-        if(invoiceAmt.compareTo(totalAmt)==-1){
-            throw new ProcessException("发票金额必须大于退货金额");
+                    List<String> invoiceTableFiles = oInvoice.getInvoiceTableFile();
+                    //添加新的附件
+                    if (invoiceTableFiles != null && invoiceTableFiles.size() != 0) {
+                        for (String invoiceTableFile : invoiceTableFiles) {
+                            AttachmentRel record = new AttachmentRel();
+                            record.setAttId(invoiceTableFile);
+                            record.setSrcId(oInvoiceId);
+                            record.setcUser(userid);
+                            record.setcTime(Calendar.getInstance().getTime());
+                            record.setStatus(Status.STATUS_1.status);
+                            record.setBusType(AttachmentRelType.returnOrderInvoice.name());
+                            record.setId(idService.genId(TabId.a_attachment_rel));
+                            int f = attachmentRelMapper.insertSelective(record);
+                            if (1 != f) {
+                                log.info("退货上传发票信息保存附件关系失败");
+                                throw new ProcessException("保存附件失败");
+                            }
+                        }
+                    }
+                    invoiceAmt = invoiceAmt.add(oInvoice.getInvoiceAmt());
+                }
+                if (invoiceAmt.compareTo(totalAmt) == -1) {
+                    throw new ProcessException("发票金额必须大于退货金额");
+                }
+            }else{
+                throw new ProcessException("请填写发票信息");
+            }
         }
 
         //生成退货和订单关系
