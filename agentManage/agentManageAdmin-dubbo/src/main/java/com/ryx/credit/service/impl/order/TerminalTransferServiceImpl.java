@@ -256,6 +256,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     }
 
 
+
     /**
      * chenliang
      *  判断上下级和平台
@@ -961,6 +962,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             log.info("审批任务结束{}{}，未找到审批中的审批和数据关系", proIns, agStatus);
             throw new MessageException("审批和数据关系有误");
         }
+
+
         BusActRel busActRel = list.get(0);
         TerminalTransfer terminalTransfer = terminalTransferMapper.selectByPrimaryKey(busActRel.getBusId());
 
@@ -1305,6 +1308,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             }
         }
     }
+
+
 
 
     /**

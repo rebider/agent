@@ -520,14 +520,8 @@
     nvl(ro.cut_amo * (odetail.return_count * odetail.return_price / ro.goods_return_amo),0) as cut_amo,
     rp.plan_num, rp.plan_pro_num as receive_send_num, rp.order_id as receive_order_id, agents.ag_uniq_num as receive_agent_id, agents.ag_name as receive_agent_name,
     province.r_name as addr_province, city.r_name as addr_city, district.r_name as addr_district, oro.addr_detail, ol.w_number,
-    (select ag_doc_district from a_agent_businfo businfo
-    left join o_order orders on rp.order_id = orders.id and orders.status=1
-    where businfo.agent_id = orders.agent_id and businfo.id = orders.bus_id and businfo.status = 1)
-    as ag_doc_district,
-    (select ag_doc_pro from a_agent_businfo businfo
-    left join o_order orders on rp.order_id = orders.id and orders.status=1
-    where businfo.agent_id = orders.agent_id and businfo.id = orders.bus_id and businfo.status = 1)
-    as ag_doc_pro
+    ab.ag_doc_pro,
+    ab.ag_doc_district
     from o_return_order ro
     right join o_return_order_detail odetail on odetail.return_id = ro.id
     left join o_sub_order os on os.pro_id = odetail.pro_id and os.order_id = odetail.order_id and os.status=1
@@ -539,6 +533,8 @@
     left join o_receipt_plan rp on rp.return_order_detail_id = odetail.id and rp.status=1
     left join o_logistics ol on rp.id = ol.receipt_plan_id and ol.status=1
     left join o_receipt_order oro on rp.receipt_id = oro.id and oro.status=1 and rp.status=1
+    left join o_order porder on porder.id = rp.order_id
+    left join a_agent_businfo ab on ab.id = porder.bus_id
     left join a_agent agents on agents.id = oro.agent_id and agents.status=1
     left join d_region province on oro.addr_province = province.r_code
     left join d_region city on oro.addr_city = city.r_code
