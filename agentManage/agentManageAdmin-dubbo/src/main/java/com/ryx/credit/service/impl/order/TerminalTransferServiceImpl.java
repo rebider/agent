@@ -37,6 +37,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -342,7 +343,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     Map<String, Object> map2 = disposeSN(snBeginNum, snEndNum);
                     if (snBeginNum1.length() == snBeginNum.length()) {
                         if (map1.get("sb").toString().equals(map2.get("sb").toString())) {
-                            if (!(Long.parseLong(map1.get("snEndNum1").toString()) < Long.parseLong(map2.get("snBeginNum1").toString()) || Long.parseLong(map1.get("snBeginNum1").toString()) > Long.parseLong(map2.get("snEndNum1").toString()))) {
+                            if (!((new BigInteger(map1.get("snEndNum1").toString()).compareTo(new BigInteger(map2.get("snBeginNum1").toString()))==-1) || (new BigInteger(map1.get("snBeginNum1").toString()).compareTo(new BigInteger(map2.get("snEndNum1").toString()))==1))) {
                                 number++;
                             }
                         }
@@ -369,7 +370,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 Map<String, Object> map4 = disposeSN(snBeginNumMap, snEndNumMap);
                 if (snBeginNum.length() == snBeginNumMap.length()) {
                     if (map3.get("sb").toString().equals(map4.get("sb").toString())) {
-                        if (!(Long.parseLong(map4.get("snEndNum1").toString()) < Long.parseLong(map3.get("snBeginNum1").toString()) || Long.parseLong(map4.get("snBeginNum1").toString()) > Long.parseLong(map3.get("snEndNum1").toString()))) {
+                        if (!((new BigInteger(map4.get("snEndNum1").toString()).compareTo(new BigInteger(map3.get("snBeginNum1").toString()))==-1) || (new BigInteger(map4.get("snBeginNum1").toString()).compareTo(new BigInteger(map3.get("snEndNum1").toString()))==1))) {
                             log.info("在区间:" + snBeginNum + "----" + snEndNum + "已经提交过划拨申请");
                             throw new MessageException("在区间:" + snBeginNum + "----" + snEndNum + "已经提交过划拨申请");
                         }
@@ -911,13 +912,16 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public AgentResult approvalTerminalTransferTask(AgentVo agentVo, String userId, String busId) throws Exception {
+    public AgentResult approvalTerminalTransferTask(AgentVo agentVo, String userId, String busId,boolean tf) throws Exception {
         try {
             if (agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())) {
 
                 List<TerminalTransferDetail> terminalTransferDetails = queryDetailByTerminalId(busId);
+                if(tf){
+                    platformSame(terminalTransferDetails,SaveFlag.TJSP.getValue());
+                }
 
-                platformSame(terminalTransferDetails,SaveFlag.TJSP.getValue());
+
               /*  if (agentVo.getSid().equals("cw")) {
                     List<TerminalTransferDetail> terminalTransferDetailsRedis = queryImprotMsgList(busId);
                     if (terminalTransferDetails.size() != terminalTransferDetailsRedis.size()) {
@@ -1506,7 +1510,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     Map<String, Object> map2 = disposeSN(snBeginNum, snEndNum);
                     if (snBeginNum1.length() == snBeginNum.length()) {
                         if (map1.get("sb").toString().equals(map2.get("sb").toString())) {
-                            if (!(Long.parseLong(map1.get("snEndNum1").toString()) < Long.parseLong(map2.get("snBeginNum1").toString()) || Long.parseLong(map1.get("snBeginNum1").toString()) > Long.parseLong(map2.get("snEndNum1").toString()))) {
+                            if (!((new BigInteger(map1.get("snEndNum1").toString()).compareTo(new BigInteger(map2.get("snBeginNum1").toString()))==-1) || (new BigInteger(map1.get("snBeginNum1").toString()).compareTo(new BigInteger(map2.get("snEndNum1").toString()))==1))) {
                                 number++;
                             }
                         }
@@ -1533,7 +1537,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 Map<String, Object> map4 = disposeSN(snBeginNumMap, snEndNumMap);
                 if (snBeginNum.length() == snBeginNumMap.length()) {
                     if (map3.get("sb").toString().equals(map4.get("sb").toString())) {
-                        if (!(Long.parseLong(map4.get("snEndNum1").toString()) < Long.parseLong(map3.get("snBeginNum1").toString()) || Long.parseLong(map4.get("snBeginNum1").toString()) > Long.parseLong(map3.get("snEndNum1").toString()))) {
+                        if (!((new BigInteger(map4.get("snEndNum1").toString()).compareTo(new BigInteger(map3.get("snBeginNum1").toString()))==-1) || (new BigInteger(map4.get("snBeginNum1").toString()).compareTo(new BigInteger(map3.get("snEndNum1").toString()))==1))) {
                             num++;
                             if(num>1){
                                 log.info("在区间:" + snBeginNum + "----" + snEndNum + "已经提交过划拨申请");
