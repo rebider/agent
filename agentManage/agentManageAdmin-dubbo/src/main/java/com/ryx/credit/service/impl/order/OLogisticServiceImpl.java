@@ -1152,7 +1152,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
 
     @Override
     public List<String> idList(String startSn, String endSn, Integer begins, Integer finish,String proCom) throws MessageException {
-        //1.startSn  2.endSn  3.开始截取的位数   4.结束截取的位数
+        return idList(startSn,endSn);
+       /* //1.startSn  2.endSn  3.开始截取的位数   4.结束截取的位数
         List<String> list = new ArrayList<>();
         if (StringUtils.isBlank(proCom)){
             logger.info("厂家为空");
@@ -1188,7 +1189,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 list.add(startSn);
             }
         }
-        return list;
+        return list;*/
     }
 
 
