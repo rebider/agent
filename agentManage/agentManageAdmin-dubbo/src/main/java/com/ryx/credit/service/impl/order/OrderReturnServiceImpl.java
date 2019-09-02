@@ -52,10 +52,9 @@ import java.util.*;
 @Service("orderReturnService")
 public class OrderReturnServiceImpl implements IOrderReturnService {
 
-    private static Logger log = LoggerFactory.getLogger(OrderReturnServiceImpl.class);
     public final static SimpleDateFormat sdfyyyyMMdd = new SimpleDateFormat("yyyy-MM-dd");
     public final static SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-
+    private static Logger log = LoggerFactory.getLogger(OrderReturnServiceImpl.class);
     private static String refund_agent_modify_id = AppConfig.getProperty("refund_agent_modify_id");
     private static String refund_business1_id = AppConfig.getProperty("refund_business1_id");
     private static String refund_finc1_id = AppConfig.getProperty("refund_finc1_id");
@@ -874,9 +873,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             }else{
                 throw new ProcessException("请填写发票信息");
             }
-        }else{
-            throw new ProcessException("请填写发票信息");
         }
+
         //生成退货和订单关系
         for (String realId : relSet) {
             try {
