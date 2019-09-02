@@ -93,7 +93,8 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
             newvo.setActivityStartTime(ACTIVITY_START_TIME==null?null:ACTIVITY_START_TIME+"");
             newvo.setActivityEndTime(ACTIVITY_END_TIME==null?null:ACTIVITY_END_TIME+"");
             newvo.setPrice(PRICE==null?null:PRICE+"");
-
+            Object POSTYPE = imsTermMachine.get("POSTYPE");
+            newvo.setPosType(POSTYPE==null?null:POSTYPE+"");
             termMachineVoList.add(newvo);
         }
         return termMachineVoList;

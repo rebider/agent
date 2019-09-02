@@ -255,6 +255,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     }
 
 
+
     /**
      * chenliang
      *  判断上下级和平台
@@ -1301,6 +1302,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             }
         }
     }
+
+
 
 
     /**

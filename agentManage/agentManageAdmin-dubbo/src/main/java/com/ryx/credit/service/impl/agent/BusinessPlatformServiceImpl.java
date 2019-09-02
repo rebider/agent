@@ -393,8 +393,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 agentBusInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
                 agentBusInfo.setBusContact(agentBusInfoVo.getBusContact());
                 agentBusInfo.setBusContactMobile(agentBusInfoVo.getBusContactMobile());
-                agentBusInfo.setBusContactEmail(agentBusInfoVo.getBusContactEmail());
+//                agentBusInfo.setBusContactEmail(agentBusInfoVo.getBusContactEmail());
                 agentBusInfo.setBusContactPerson(agentBusInfoVo.getBusContactPerson());
+                agentBusInfo.setBusNum(agentBusInfoVo.getBusNum());
                 agentBusInfo.setBusLoginNum(agentBusInfoVo.getBusLoginNum());
                 agentBusInfo.setBusStatus(agentBusInfoVo.getBusStatus());
                 agentBusInfo.setBusParent(agentBusInfoVo.getBusParent());
