@@ -17,7 +17,8 @@ public enum CardImportType {
     C("3","历史北京总部发卡"),
     D("4","退货转发数据"),
     E("5","流量卡状态"),
-    F("6","物联网卡续费信息");
+    F("6","物联网卡续费信息"),
+    G("7","批量延期");
 
     public String code;
 
@@ -26,21 +27,6 @@ public enum CardImportType {
     CardImportType(String c, String m){
         this.code=c;
         this.msg =m;
-    }
-
-    /**
-     * 取得枚举对象值
-     * @return 枚举对象值
-     */
-    public String getValue() {
-        return this.code;
-    }
-    /**
-     * 取得缓存内容
-     * @return 缓存内容
-     */
-    public String getContent() {
-        return this.msg;
     }
 
     /**
@@ -84,5 +70,21 @@ public enum CardImportType {
             return "InternetCardModel4";
         }
         return "";
+    }
+
+    /**
+     * 取得枚举对象值
+     * @return 枚举对象值
+     */
+    public String getValue() {
+        return this.code;
+    }
+
+    /**
+     * 取得缓存内容
+     * @return 缓存内容
+     */
+    public String getContent() {
+        return this.msg;
     }
 }

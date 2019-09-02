@@ -397,6 +397,12 @@ public class InternetCardServiceImpl implements InternetCardService {
                             if(StringUtils.isNotBlank(cTime) && !cTime.equals("null"))
                             oInternetRenewDetail.setcTime(DateUtils.parseDate(cTime,dateFormat));
                             jsonList = JsonUtil.objectToJson(oInternetRenewDetail);
+                        }else if(importType.equals(CardImportType.G.getValue())){
+                            String iccid = String.valueOf(string.size()>=1?string.get(0):"");//iccid
+                            String postponeTime = String.valueOf(string.size()>=2?string.get(1):"");//延期月份
+                            oInternetCard.setIccidNum(iccid);
+                            oInternetCard.setPostponeTime(postponeTime);
+                            jsonList = JsonUtil.objectToJson(oInternetCard);
                         }
                         OInternetCardImport oInternetCardImport = new OInternetCardImport();
                         oInternetCardImport.setId(idService.genId(TabId.O_INTERNET_CARD_IMPORT));
@@ -516,6 +522,31 @@ public class InternetCardServiceImpl implements InternetCardService {
                     }
                     oInternetCardImport.setImportStatus(OInternetCardImportStatus.SUCCESS.getValue());
                     updateInternetCardImport(oInternetCardImport);
+                }else if(importType.equals(CardImportType.G.getValue())){
+                    OInternetCard internetCard = JsonUtil.jsonToPojo(oInternetCardImport.getImportMsg(), OInternetCard.class);
+                    if(null==internetCard){
+                        throw new MessageException("导入信息不存在");
+                    }
+                    if(StringUtils.isBlank(internetCard.getIccidNum()) || StringUtils.isBlank(internetCard.getPostponeTime())){
+                        throw new MessageException("缺少ICCID或延期月份");
+                    }
+                    BigDecimal postponeTime = null;
+                    try {
+                        postponeTime = new BigDecimal(internetCard.getPostponeTime());
+                    }catch (Exception e){
+                        throw new MessageException("延期月份有误.");
+                    }
+                    if(postponeTime==null){
+                        throw new MessageException("延期月份有误");
+                    }
+                    OInternetCardPostpone internetCardPostpone = new OInternetCardPostpone();
+                    internetCardPostpone.setIccid(internetCard.getIccidNum());
+                    internetCardPostpone.setPostponeTime(postponeTime);
+                    //延期
+                    internetCardPostpone(internetCardPostpone,oInternetCardImport.getcUser(),oInternetCardImport.getId());
+                    //更新导入
+                    oInternetCardImport.setImportStatus(OInternetCardImportStatus.SUCCESS.getValue());
+                    updateInternetCardImport(oInternetCardImport);
                 }
             } catch (MessageException e) {
                 log.info("analysisImport处理导入表数据,MessageException:{}",e.getLocalizedMessage());
@@ -541,6 +572,8 @@ public class InternetCardServiceImpl implements InternetCardService {
             }
         }
     }
+
+
 
     /**
      * 处理业务逻辑
@@ -960,7 +993,7 @@ public class InternetCardServiceImpl implements InternetCardService {
      */
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     @Override
-    public void internetCardPostpone(OInternetCardPostpone internetCardPostpone,String cUser)throws MessageException{
+    public void internetCardPostpone(OInternetCardPostpone internetCardPostpone,String cUser,String importId)throws MessageException{
 
         if(internetCardPostpone.getPostponeTime()==null){
             throw new MessageException("请填写延期月份");
@@ -968,6 +1001,11 @@ public class InternetCardServiceImpl implements InternetCardService {
         if(internetCardPostpone.getIccid()==null){
             throw new MessageException("请选择要延期的数据");
         }
+        boolean checkInt = RegexUtil.checkInt(String.valueOf(internetCardPostpone.getPostponeTime()));
+        if(!checkInt){
+            throw new MessageException("延期月份必须为数字");
+        }
+
         OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(internetCardPostpone.getIccid());
         if(oInternetCard==null){
             throw new MessageException("请选择要延期的数据");
@@ -1000,6 +1038,9 @@ public class InternetCardServiceImpl implements InternetCardService {
         oInternetCard.setStop(Status.STATUS_0.status);
         oInternetCard.setRenew(Status.STATUS_0.status);
         oInternetCard.setExpireTime(mondayLater);
+        if(StringUtils.isNotBlank(importId)){
+            oInternetCard.setCardImportId(importId);
+        }
         int i = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
         if(i!=1){
             throw new MessageException("处理延期月份失败");
