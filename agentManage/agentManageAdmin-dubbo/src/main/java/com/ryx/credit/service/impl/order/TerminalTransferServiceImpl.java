@@ -859,6 +859,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     @Override
     public AgentResult startTerminalTransferActivity(String id, String cuser, String agentId, Boolean isSave) throws Exception {
         TerminalTransfer terminalTransfer = terminalTransferMapper.selectByPrimaryKey(id);
+        if(terminalTransfer.getStatus().compareTo(new BigDecimal("1"))!=0){
+            throw new MessageException("本次提交审批信息已经删除");
+        }
         TerminalTransferDetailExample terminalTransferDetailExample = new TerminalTransferDetailExample();
         TerminalTransferDetailExample.Criteria criteria = terminalTransferDetailExample.createCriteria();
         criteria.andTerminalTransferIdEqualTo(terminalTransfer.getId());
