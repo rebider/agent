@@ -69,6 +69,9 @@ public enum CardImportType {
         if(CardImportType.E.code.equals(value)){
             return "InternetCardModel4";
         }
+        if(CardImportType.G.code.equals(value)){
+            return "InternetCardModel6";
+        }
         return "";
     }
 
