@@ -1010,6 +1010,9 @@ public class InternetCardServiceImpl implements InternetCardService {
         if(oInternetCard==null){
             throw new MessageException("请选择要延期的数据");
         }
+        if(oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.LOGOUT.getValue())==0){
+            throw new MessageException("注销不可以设置延期");
+        }
         internetCardPostpone.setId(idService.genId(TabId.O_INTERNET_CARD_POSTPONE));
         internetCardPostpone.setAgentId(oInternetCard.getAgentId());
         internetCardPostpone.setAgentName(oInternetCard.getAgentName());
