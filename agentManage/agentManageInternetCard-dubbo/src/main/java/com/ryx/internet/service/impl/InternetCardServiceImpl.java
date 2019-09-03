@@ -542,11 +542,11 @@ public class InternetCardServiceImpl implements InternetCardService {
                     OInternetCardPostpone internetCardPostpone = new OInternetCardPostpone();
                     internetCardPostpone.setIccid(internetCard.getIccidNum());
                     internetCardPostpone.setPostponeTime(postponeTime);
-                    //延期
-                    internetCardPostpone(internetCardPostpone,oInternetCardImport.getcUser(),oInternetCardImport.getId());
                     //更新导入
                     oInternetCardImport.setImportStatus(OInternetCardImportStatus.SUCCESS.getValue());
                     updateInternetCardImport(oInternetCardImport);
+                    //延期
+                    internetCardService.internetCardPostpone(internetCardPostpone,oInternetCardImport.getcUser(),oInternetCardImport.getId(),oInternetCardImport.getBatchNum());
                 }
             } catch (MessageException e) {
                 log.info("analysisImport处理导入表数据,MessageException:{}",e.getLocalizedMessage());
@@ -695,12 +695,6 @@ public class InternetCardServiceImpl implements InternetCardService {
         }
     }
 
-    public void updateInternetCardImport(OInternetCardImport internetCardImport)throws MessageException{
-        internetCardImport.setuTime(new Date());
-        internetCardImportMapper.updateByPrimaryKeySelective(internetCardImport);
-    }
-
-
     /**
      * 导出错误数据
      * @param internetCardImport
@@ -717,6 +711,12 @@ public class InternetCardServiceImpl implements InternetCardService {
         criteria.andImportStatusEqualTo(OInternetCardImportStatus.FAIL.code);
         List<OInternetCardImport> oInternetCardImports = internetCardImportMapper.selectByExample(oInternetCardImportExample);
         return oInternetCardImports;
+    }
+
+
+    public void updateInternetCardImport(OInternetCardImport internetCardImport)throws MessageException{
+        internetCardImport.setuTime(new Date());
+        internetCardImportMapper.updateByPrimaryKeySelective(internetCardImport);
     }
 
 
@@ -986,6 +986,32 @@ public class InternetCardServiceImpl implements InternetCardService {
 
 
     /**
+     * 延期记录
+     * @param internetCardPostpone
+     * @return
+     */
+    @Override
+    public PageInfo queryInternetCardPostponeList(OInternetCardPostpone internetCardPostpone,Page page){
+        OInternetCardPostponeExample internetCardPostponeExample = new OInternetCardPostponeExample();
+        OInternetCardPostponeExample.Criteria criteria = internetCardPostponeExample.createCriteria();
+        internetCardPostponeExample.setPage(page);
+        internetCardPostponeExample.setOrderByClause(" c_time desc ");
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        if(StringUtils.isNotBlank(internetCardPostpone.getIccid())){
+            criteria.andIccidEqualTo(internetCardPostpone.getIccid());
+        }
+        List<OInternetCardPostpone> internetCardPostpones = internetCardPostponeMapper.selectByExample(internetCardPostponeExample);
+        for (OInternetCardPostpone cardPostpone : internetCardPostpones) {
+            CUser cUser = iUserService.selectById(cardPostpone.getcUser());
+            if(null!=cUser)cardPostpone.setcUser(cUser.getName());
+        }
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(internetCardPostpones);
+        pageInfo.setTotal((int)internetCardPostponeMapper.countByExample(internetCardPostponeExample));
+        return pageInfo;
+    }
+
+    /**
      * 延期
      * @param internetCardPostpone
      * @param cUser
@@ -993,7 +1019,7 @@ public class InternetCardServiceImpl implements InternetCardService {
      */
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     @Override
-    public void internetCardPostpone(OInternetCardPostpone internetCardPostpone,String cUser,String importId)throws MessageException{
+    public void internetCardPostpone(OInternetCardPostpone internetCardPostpone,String cUser,String importId,String batchNum)throws MessageException{
 
         if(internetCardPostpone.getPostponeTime()==null){
             throw new MessageException("请填写延期月份");
@@ -1009,6 +1035,9 @@ public class InternetCardServiceImpl implements InternetCardService {
         OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(internetCardPostpone.getIccid());
         if(oInternetCard==null){
             throw new MessageException("请选择要延期的数据");
+        }
+        if(oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.LOGOUT.getValue())==0){
+            throw new MessageException("注销不可以设置延期");
         }
         internetCardPostpone.setId(idService.genId(TabId.O_INTERNET_CARD_POSTPONE));
         internetCardPostpone.setAgentId(oInternetCard.getAgentId());
@@ -1041,36 +1070,13 @@ public class InternetCardServiceImpl implements InternetCardService {
         if(StringUtils.isNotBlank(importId)){
             oInternetCard.setCardImportId(importId);
         }
+        if(StringUtils.isNotBlank(batchNum)){
+            oInternetCard.setBatchNum(batchNum);
+        }
         int i = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
         if(i!=1){
             throw new MessageException("处理延期月份失败");
         }
-    }
-
-    /**
-     * 延期记录
-     * @param internetCardPostpone
-     * @return
-     */
-    @Override
-    public PageInfo queryInternetCardPostponeList(OInternetCardPostpone internetCardPostpone,Page page){
-        OInternetCardPostponeExample internetCardPostponeExample = new OInternetCardPostponeExample();
-        OInternetCardPostponeExample.Criteria criteria = internetCardPostponeExample.createCriteria();
-        internetCardPostponeExample.setPage(page);
-        internetCardPostponeExample.setOrderByClause(" c_time desc ");
-        criteria.andStatusEqualTo(Status.STATUS_1.status);
-        if(StringUtils.isNotBlank(internetCardPostpone.getIccid())){
-            criteria.andIccidEqualTo(internetCardPostpone.getIccid());
-        }
-        List<OInternetCardPostpone> internetCardPostpones = internetCardPostponeMapper.selectByExample(internetCardPostponeExample);
-        for (OInternetCardPostpone cardPostpone : internetCardPostpones) {
-            CUser cUser = iUserService.selectById(cardPostpone.getcUser());
-            if(null!=cUser)cardPostpone.setcUser(cUser.getName());
-        }
-        PageInfo pageInfo = new PageInfo();
-        pageInfo.setRows(internetCardPostpones);
-        pageInfo.setTotal((int)internetCardPostponeMapper.countByExample(internetCardPostponeExample));
-        return pageInfo;
     }
 
 }
