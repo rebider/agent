@@ -386,17 +386,20 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             throw new MessageException("信息错误");
         }
         try{
+            AgentBusInfo agentBusInfo = null;
             for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
-                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
                 //校验业务编码是否存在
-                if (!agentBusInfo.getBusNum().equals(agentBusInfoVo.getBusNum())) {
-                    AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
-                    agentBusInfoExample.createCriteria()
-                            .andStatusEqualTo(Status.STATUS_1.status)
-                            .andBusNumEqualTo(agentBusInfoVo.getBusNum());
-                    List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
-                    if (agentBusInfoList.size() > 0) {
-                        throw new MessageException("业务平台编码已存在！");
+                if (StringUtils.isNotBlank(agentBusInfoVo.getBusNum())) {
+                    if (!agentBusInfo.getBusNum().equals(agentBusInfoVo.getBusNum())) {
+                        AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+                        agentBusInfoExample.createCriteria()
+                                .andStatusEqualTo(Status.STATUS_1.status)
+                                .andBusNumEqualTo(agentBusInfoVo.getBusNum());
+                        List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+                        if (agentBusInfoList.size() > 0) {
+                            throw new MessageException("业务平台编码已存在！");
+                        }
                     }
                 }
                 //更新值
@@ -415,9 +418,21 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 agentBusInfo.setVersion(agentBusInfo.getVersion());
                 agentBusInfo.setBusUseOrgan(agentBusInfoVo.getBusUseOrgan());
                 agentBusInfo.setBusScope(agentBusInfoVo.getBusScope());
-                int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
-                if (i != 1) {
+                int updateAgentBusinfo = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                if (updateAgentBusinfo != 1) {
+                    logger.info("业务数据-更新失败");
                     throw new MessageException("更新失败");
+                } else {
+                    if (StringUtils.isNotBlank(agentBusInfoVo.getBusNum())) {
+                        Agent agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
+                        agent.setAgStatus(String.valueOf(AgStatus.Approved.status));
+                        agent.setcTime(new Date());
+                        int updateAgent = agentMapper.updateByPrimaryKeySelective(agent);
+                        if (updateAgent != 1) {
+                            logger.info("代理商数据-更新失败");
+                            throw new MessageException("更新失败");
+                        }
+                    }
                 }
             }
         } catch (MessageException e) {
