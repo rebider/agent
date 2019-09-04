@@ -645,9 +645,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             }*/
           // * 判断平台是否属于提交平台
            String result =  platformSame(terminalTransferDetailList,saveFlag);
-
-            startTerminalTransferActivity(terminalTransferId, cuser, agentId, false);
-
+            if (saveFlag.equals(SaveFlag.TJSP.getValue())) {
+               startTerminalTransferActivity(terminalTransferId, cuser, agentId, false);
+           }
             return AgentResult.ok(result);
 
         } catch (MessageException e) {
