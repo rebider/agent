@@ -2,6 +2,7 @@ package com.ryx.credit.service.impl.agent.netInPort;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.BusType;
+import com.ryx.credit.common.enumc.DictGroup;
 import com.ryx.credit.common.enumc.OrgType;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
@@ -9,16 +10,15 @@ import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.RegionMapper;
 import com.ryx.credit.dao.bank.BankLineNumsMapper;
-import com.ryx.credit.pojo.admin.agent.Agent;
-import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
-import com.ryx.credit.pojo.admin.agent.AgentColinfo;
-import com.ryx.credit.pojo.admin.agent.Region;
+import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.bank.BankLineNums;
 import com.ryx.credit.pojo.admin.bank.BankLineNumsExample;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInHttpService;
+import com.ryx.credit.service.dict.DictOptionsService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +59,8 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
     private BankLineNumsMapper bankLineNumsMapper;
     @Autowired
     private AgentMapper agentMapper;
+    @Autowired
+    private DictOptionsService dictOptionsService;
 
     @Override
     public Map<String, Object> packageParam(Map<String, Object> param) {
@@ -389,42 +391,80 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
     }
 
 
+    /**
+     * RDB升级直签
+     * @param paramMap
+     * @return
+     * @throws Exception
+     */
     @Override
     public AgentResult agencyLevelCheck(Map<String, Object> paramMap)throws Exception{
-        // 瑞大宝，代理商升级直签校验参数，
-        //1.手机号是否存在
-        //2.手机号与平台号是否匹配
-        //3.本次升级的平台与原平台是否一致
-        //4.本次升级的上级与原上级是否一致
-        AgentBusInfoVo agentBusInfoVo = (AgentBusInfoVo)paramMap.get("busInfo");
 
-        System.out.println(JsonUtil.objectToJson(agentBusInfoVo));
+        AgentVo agentVo = (AgentVo) paramMap.get("agentVo");
+        String rdbUpSingUrl =  AppConfig.getProperty("rdbpos_up_sing_url");
 
-        Map<String, Object> reqMap = new HashMap<>();
-        reqMap.put("application","CheckPromotionAgency");
-        reqMap.put("brandCode",paramMap.get("brandCode"));
-        reqMap.put("agentId",paramMap.get("agentId"));
-        String directAgentId = String.valueOf(paramMap.get("directAgentId"));
-        AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(directAgentId);
-        if(agentBusInfo==null){
-            throw new Exception("上级信息有误");
-        }
-        reqMap.put("directAgentId",agentBusInfo.getBusNum());
-        reqMap.put("upAgentId",agentBusInfo.getBrandNum());
+        Agent agent = agentVo.getAgent();
+        AgentBusInfo agentBusInfo = agentVo.getBusInfoVoList().get(0);
+        AgentColinfo agentColinfo = agentVo.getColinfoVoList().get(0);
+        Map<String,Object> jsonParams = new HashMap<String, Object>();
+        jsonParams = commonParam(jsonParams, agentColinfo, agent, agentBusInfo);
 
-        String json = JsonUtil.objectToJson(reqMap);
-        String reqParamEncrypt = Des3Util.Encrypt(json, rdb3desKey, rdb3desIv.getBytes());
-        log.info("通知瑞大宝升级验证请求参数：{}",json);
-        log.info("通知瑞大宝升级验证请求参数加密：{}",reqParamEncrypt);
-        String httpResult = HttpClientUtil.sendHttpPost(rdbParamCheckUrl, reqParamEncrypt);
-        log.info("通知瑞大宝升级验证返回参数1：{}",httpResult);
-        String reqParamDecrypt = Des3Util.Decrypt(httpResult, rdb3desKey, rdb3desIv.getBytes());
-        log.info("通知瑞大宝升级验证返回参数：{}",reqParamDecrypt);
-        JSONObject respXMLObj = JSONObject.parseObject(reqParamDecrypt);
-        if (respXMLObj.getString("MSG_CODE").equals("0000")){
-            return AgentResult.ok(respXMLObj);
+        AgentBusInfo agentParent = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
+        Map<String, Object> requMap = new HashMap<String, Object>();
+        if(null!=agentParent){
+            requMap.put("parentAgencyId",agentParent.getBusNum());
         }else{
-            throw new Exception(respXMLObj.getString("MSG_TEXT"));
+            requMap.put("parentAgencyId","");
+        }
+        Dict dict = dictOptionsService.findDictByName(DictGroup.RDBPOS.name(), DictGroup.RDB_POS_LOWER.name(), agentBusInfo.getBusType());//直签终端下限数
+        requMap.put("termCount",dict.getdItemvalue());//直签终端下限数
+        requMap.put("channelTopId",agentBusInfo.getBusNum());
+        requMap.put("mobile",agentBusInfo.getBusLoginNum().trim());
+        requMap.put("branchid",agentBusInfo.getBusPlatform().split("_")[0]);
+        requMap.put("cardno",jsonParams.get("cardno"));
+        requMap.put("bankbranchid",jsonParams.get("bankbranchid"));
+        requMap.put("bankbranchname",jsonParams.get("bankbranchname"));
+        requMap.put("customerPid",jsonParams.get("customerPid"));
+        requMap.put("address",jsonParams.get("address"));
+        requMap.put("companyNo",jsonParams.get("companyNo"));
+        requMap.put("userName",jsonParams.get("userName"));
+        requMap.put("agencyName",jsonParams.get("agencyName"));
+        requMap.put("cardidx",jsonParams.get("cardidx"));
+        requMap.put("code",jsonParams.get("code"));
+        requMap.put("bankid",jsonParams.get("bankid"));
+        requMap.put("bankname",jsonParams.get("bankname"));
+        requMap.put("cityid",jsonParams.get("cityid"));
+        requMap.put("bankcity",jsonParams.get("bankcity"));
+        requMap.put("cardName",jsonParams.get("cardName"));
+        requMap.put("accountType",jsonParams.get("accountType"));
+        requMap.put("customerType",jsonParams.get("customerType"));
+        requMap.put("invoice",jsonParams.get("invoice"));
+        requMap.put("tax",jsonParams.get("tax"));
+        requMap.put("parentAgencyId",jsonParams.get("parentAgencyId"));
+
+        // 封装参数，发送请求，解析参数，返回结果。
+        try {
+            String json = JsonUtil.objectToJson(requMap);
+            log.info("------------------------------------请求瑞大宝升级直签参数"+json);
+            String httpResult = HttpClientUtil.doPostJsonWithException(rdbUpSingUrl, json);
+            log.info("------------------------------------瑞大宝升级直签返回参数"+httpResult);
+            if(StringUtils.isNotBlank(httpResult)) {
+                JSONObject respJson = JSONObject.parseObject(httpResult);
+                if (null != respJson.getString("code") && "0000".equals(respJson.getString("code")) && null != respJson.getBoolean("success") && respJson.getBoolean("success")) {
+                    //升级直签成功
+                    return AgentResult.ok(respJson.getString("msg"));
+                } else if (null != respJson.getString("code") && "9999".equals(respJson.getString("code")) && null != respJson.getBoolean("success") && !respJson.getBoolean("success")) {
+                    //升级直签失败，返回相应数据
+                    return AgentResult.fail(respJson.getString("msg"));
+                } else {
+                    throw new Exception("请求瑞大宝升级直签接口成功，返回值异常！");
+                }
+            }else{
+                throw new Exception("请求瑞大宝升级直签接口失败！");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e);
         }
     }
 }
