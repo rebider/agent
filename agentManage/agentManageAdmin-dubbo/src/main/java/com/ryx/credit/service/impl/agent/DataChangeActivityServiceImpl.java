@@ -348,7 +348,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             boolean isHaveFRSFZ = false;
                             //添加营业执照等附件
                             List<String> attrs = vo.getAgentTableFile();
-                            if (attrs != null) {
+                            if (attrs != null && attrs.size()>0) {
                                 AttachmentRelExample att_example = new AttachmentRelExample();
                                 att_example.or().andBusTypeEqualTo(AttachmentRelType.Agent.name()).andSrcIdEqualTo(db_agent.getId()).andStatusEqualTo(Status.STATUS_1.status);
                                 List<AttachmentRel> list = attachmentRelMapper.selectByExample(att_example);
