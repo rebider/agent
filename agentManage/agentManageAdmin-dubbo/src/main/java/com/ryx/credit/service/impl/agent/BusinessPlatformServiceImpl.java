@@ -388,6 +388,18 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         try{
             for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
                 AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                //校验业务编码是否存在
+                if (!agentBusInfo.getBusNum().equals(agentBusInfoVo.getBusNum())) {
+                    AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+                    agentBusInfoExample.createCriteria()
+                            .andStatusEqualTo(Status.STATUS_1.status)
+                            .andBusNumEqualTo(agentBusInfoVo.getBusNum());
+                    List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+                    if (agentBusInfoList.size() > 0) {
+                        throw new MessageException("业务平台编码已存在！");
+                    }
+                }
+                //更新值
                 agentBusInfo.setBusType(agentBusInfoVo.getBusType());
                 agentBusInfo.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
                 agentBusInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
