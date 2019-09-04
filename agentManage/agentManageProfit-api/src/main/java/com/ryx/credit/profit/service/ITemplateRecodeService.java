@@ -41,4 +41,6 @@ public interface ITemplateRecodeService {
 
     void updateApplyStatus(String status,String id);
 
+    Map<String,Object> checkTEmplateName(String applyId) throws MessageException;
+
 }
