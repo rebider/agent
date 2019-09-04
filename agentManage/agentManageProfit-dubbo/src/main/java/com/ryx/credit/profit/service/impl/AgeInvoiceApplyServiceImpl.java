@@ -51,7 +51,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
     private final static String PASSWORD = AppConfig.getProperty("encrypt.key"); // 加密key
     private final static String TICKET_INFO_URL = AppConfig.getProperty("jd.ticketInfo")+"?access_token="; // 获取发票信息url
 
-    private final static String[] ARRAY = {"研发和技术服务","研发服务","信息技术服务","软件服务","信息系统服务","现代服务","技术服务","信息技术服务","咨询服务"};
+    private final static String[] ARRAY_INVOICE = {"研发和技术服务","研发服务","信息技术服务","软件服务","信息系统服务","现代服务","技术服务","信息技术服务","咨询服务","服务费"};
 
 
     private String tocken = "";
@@ -217,8 +217,8 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                     if("1".equals(invoiceApply.getYsResult())){
                         Boolean flag = false;
                         if(StringUtils.isNotBlank(invoiceApply.getInvoiceItem())){
-                            for (int i = 0;i < ARRAY.length ; i++) {
-                                String str = ARRAY[i];
+                            for (int i = 0;i < ARRAY_INVOICE.length ; i++) {
+                                String str = ARRAY_INVOICE[i];
                                 if(invoiceApply.getInvoiceItem().indexOf(str) != -1){
                                     flag = true;
                                     break;

@@ -24,8 +24,6 @@ public interface TerminalTransferService {
 
     AgentResult startTerminalTransferActivity(String id, String cuser, String agentId, Boolean isSave) throws Exception;
 
-    AgentResult approvalTerminalTransferTask(AgentVo agentVo, String userId, String busId) throws Exception;
-
     AgentResult compressTerminalTransferActivity(String proIns, BigDecimal agStatus)throws Exception;
 
     AgentResult saveTerminalTransfer(TerminalTransfer terminalTransfer, List<TerminalTransferDetail> terminalTransferDetailList, String cuser, String agentId, String saveFlag)throws Exception;
@@ -52,5 +50,6 @@ public interface TerminalTransferService {
      Map<String, Object> disposeSN(String snBeginNum, String snEndNum) throws MessageException;
 
     public  Map<String, Object>  queryPlatFrom(String plat);
+    public AgentResult approvalTerminalTransferTask(AgentVo agentVo, String userId, String busId,boolean tf) throws Exception;
 
 }
