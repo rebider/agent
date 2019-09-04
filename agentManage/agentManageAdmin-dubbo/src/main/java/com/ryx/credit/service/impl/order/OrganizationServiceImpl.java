@@ -436,4 +436,10 @@ public class OrganizationServiceImpl implements OrganizationService {
         return organizationMapper.selectByPrimaryKey(id);
         return null;
     }
+
+    @Override
+    public List<Map> queryOrg(String platForm) {
+
+        return orgPlatformMapper.queryOrg(platForm);
+    }
 }

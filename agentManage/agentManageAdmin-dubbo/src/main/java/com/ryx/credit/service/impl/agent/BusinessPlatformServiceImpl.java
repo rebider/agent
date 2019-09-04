@@ -388,18 +388,34 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         try{
             for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
                 AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                //校验业务编码是否存在
+                if (!agentBusInfo.getBusNum().equals(agentBusInfoVo.getBusNum())) {
+                    AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+                    agentBusInfoExample.createCriteria()
+                            .andStatusEqualTo(Status.STATUS_1.status)
+                            .andBusNumEqualTo(agentBusInfoVo.getBusNum());
+                    List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+                    if (agentBusInfoList.size() > 0) {
+                        throw new MessageException("业务平台编码已存在！");
+                    }
+                }
+                //更新值
                 agentBusInfo.setBusType(agentBusInfoVo.getBusType());
                 agentBusInfo.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
                 agentBusInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
                 agentBusInfo.setBusContact(agentBusInfoVo.getBusContact());
                 agentBusInfo.setBusContactMobile(agentBusInfoVo.getBusContactMobile());
-                agentBusInfo.setBusContactEmail(agentBusInfoVo.getBusContactEmail());
+//                agentBusInfo.setBusContactEmail(agentBusInfoVo.getBusContactEmail());
                 agentBusInfo.setBusContactPerson(agentBusInfoVo.getBusContactPerson());
+                agentBusInfo.setBusNum(agentBusInfoVo.getBusNum());
                 agentBusInfo.setBusLoginNum(agentBusInfoVo.getBusLoginNum());
                 agentBusInfo.setBusStatus(agentBusInfoVo.getBusStatus());
+                agentBusInfo.setBusParent(agentBusInfoVo.getBusParent());
                 if(StringUtils.isNotBlank(agentBusInfoVo.getOrganNum()))
                  agentBusInfo.setOrganNum(agentBusInfoVo.getOrganNum());
                 agentBusInfo.setVersion(agentBusInfo.getVersion());
+                agentBusInfo.setBusUseOrgan(agentBusInfoVo.getBusUseOrgan());
+                agentBusInfo.setBusScope(agentBusInfoVo.getBusScope());
                 int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
                 if (i != 1) {
                     throw new MessageException("更新失败");
@@ -943,6 +959,19 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             }
             return agentBusInfos;
         }
+    }
+
+    @Override
+    public List<PlatForm> queryAblePlatFormPro() {
+       String ryx_pro = AppConfig.getProperty("ryx_pro");
+       String ryx_pro1 = AppConfig.getProperty("ryx_pro1");
+        ArrayList<String> platList = new ArrayList<>();
+        platList.add(ryx_pro);
+        platList.add(ryx_pro1);
+        PlatFormExample example = new PlatFormExample();
+        example.or().andStatusEqualTo(Status.STATUS_1.status).andPlatformStatusEqualTo(Status.STATUS_1.status).andPlatformNumIn(platList);
+        example.setOrderByClause(" platform_type desc,c_time asc");
+        return platFormMapper.selectByExample(example);
     }
 
     /**

@@ -13,6 +13,7 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInHttpService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
@@ -626,6 +627,7 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
     public AgentResult agencyLevelCheck(Map<String, Object> reqMap){
 
         AgentResult result = AgentResult.fail();
+        AgentVo agentVo = (AgentVo) reqMap.get("agentVo");
         try {
             AgentBusInfoVo agentBusInfoVo = (AgentBusInfoVo)reqMap.get("busInfo");
             String busPlatform = agentBusInfoVo.getBusPlatform();
@@ -641,6 +643,7 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
             }else if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
                 result = agentHttpMposServiceImpl.agencyLevelCheck(reqMap);
             }else if(platForm.getPlatformType().equals(PlatformType.RDBPOS.getValue())){
+                reqMap.put("agentVo",agentVo);
                 result = agentHttpRDBMposServiceImpl.agencyLevelCheck(reqMap);
             }else if(platForm.getPlatformType().equals(PlatformType.RJPOS.getValue())){
                 result = agentHttpRJPosServiceImpl.agencyLevelCheck(reqMap);

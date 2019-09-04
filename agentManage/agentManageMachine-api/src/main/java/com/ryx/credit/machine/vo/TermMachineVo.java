@@ -29,6 +29,8 @@ public class TermMachineVo implements Serializable{
 
     private String price;
 
+    private String posType;
+
 
 
     public String getId() {
@@ -109,5 +111,13 @@ public class TermMachineVo implements Serializable{
 
     public void setPrice(String price) {
         this.price = price;
+    }
+
+    public String getPosType() {
+        return posType;
+    }
+
+    public void setPosType(String posType) {
+        this.posType = posType;
     }
 }

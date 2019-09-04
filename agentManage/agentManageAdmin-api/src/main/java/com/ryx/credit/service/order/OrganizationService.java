@@ -41,4 +41,9 @@ public interface OrganizationService {
 
     Organization selectById(String id);
 
+    /**
+     * 根据业务平台查询机构
+     */
+    List<Map> queryOrg(String platForm);
+
 }
