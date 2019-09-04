@@ -85,6 +85,17 @@ public class OInternetCard implements Serializable{
 
     private String iccidNumEnd;
 
+    private String postponeTime;
+
+
+    public String getPostponeTime() {
+        return postponeTime;
+    }
+
+    public void setPostponeTime(String postponeTime) {
+        this.postponeTime = postponeTime;
+    }
+
     public String getIccidNumBegin() {
         return iccidNumBegin;
     }
