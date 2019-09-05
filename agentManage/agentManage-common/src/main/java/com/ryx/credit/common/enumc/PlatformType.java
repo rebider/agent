@@ -20,7 +20,8 @@ public enum PlatformType {
     MPOS("MPOS","手刷"),
     RJPOS("RJPOS","瑞+"),
     RHPOS("RHPOS","瑞花宝"),
-    RDBPOS("RDBPOS","瑞大宝");
+    RDBPOS("RDBPOS","瑞大宝"),
+    RJQZ("RJQZ","瑞+（条码前置）");
 
     public String code;
 
@@ -29,21 +30,6 @@ public enum PlatformType {
     PlatformType(String c, String m){
         this.code=c;
         this.msg =m;
-    }
-
-    /**
-     * 取得枚举对象值
-     * @return 枚举对象值
-     */
-    public String getValue() {
-        return this.code;
-    }
-    /**
-     * 取得缓存内容
-     * @return 缓存内容
-     */
-    public String getContent() {
-        return this.msg;
     }
 
     /**
@@ -60,7 +46,6 @@ public enum PlatformType {
         }
         return "";
     }
-
 
     public static PlatformType getContentEnum(String value){
         PlatformType[] fundType = PlatformType.values();
@@ -90,7 +75,6 @@ public enum PlatformType {
         return resultMap;
     }
 
-
     /**
      * 判断是否属于POS平台
      * @param platformTypeCode
@@ -98,5 +82,21 @@ public enum PlatformType {
      */
     public static Boolean whetherPOS(String platformTypeCode){
         return platformTypeCode.equals(PlatformType.POS.code) || platformTypeCode.equals(PlatformType.ZPOS.code) || platformTypeCode.equals(PlatformType.ZHPOS.code);
+    }
+
+    /**
+     * 取得枚举对象值
+     * @return 枚举对象值
+     */
+    public String getValue() {
+        return this.code;
+    }
+
+    /**
+     * 取得缓存内容
+     * @return 缓存内容
+     */
+    public String getContent() {
+        return this.msg;
     }
 }
