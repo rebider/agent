@@ -61,6 +61,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     private static final String TEMPLATE_APPLY_DETAIL = AppConfig.getProperty("template.apply.detail");
     private static final String TEMPLATE_APPLY_PASS = AppConfig.getProperty("template.apply.pass");
     private static final String TEMPLATE_APPLY_CHECK = AppConfig.getProperty("template.apply.check");
+    private static final String TEMPLATE_APPLY_CHECKNAME = AppConfig.getProperty("template.apply.checkName");
 
     @Override
     public PageInfo getApplyList(Page page, TemplateRecode templateRecode,Map<String,Object> map) {
@@ -421,16 +422,48 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     }
 
     @Override
-    public Map<String,Object> checkTEmplateName(String applyId)throws MessageException{
+    public Map<String,Object> checkTemplate(String applyId)throws MessageException{
         try{
             JSONObject map2 = new JSONObject();
             map2.put("applyId",applyId);
             String result = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, map2.toJSONString());
             Map<String,Object> resultMap = JSONObject.parseObject(result);
+            if(!(boolean)resultMap.get("result")){
+                throw new MessageException("校验模板信息失败，请重试！");
+            }
+            Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
+            return objectMap;
+        }catch (MessageException e){
+            e.printStackTrace();
+            throw new MessageException(e.getMsg());
         }catch (Exception e){
             e.printStackTrace();
             throw new MessageException("校验模板信息失败，请重试！");
         }
-        return  null;
+    }
+
+    @Override
+    public Object checkTempalteName(String applyId)throws MessageException{
+        if(StringUtils.isBlank(applyId)){
+            throw new MessageException("模板申请id为空！");
+        }
+        try{
+            JSONObject map2 = new JSONObject();
+            map2.put("applyId",applyId);
+                String result = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECKNAME, map2.toJSONString());
+                Map<String,Object> resultMap = JSONObject.parseObject(result);
+                if(!(boolean)resultMap.get("result")) {
+                    logger.info("***********验证模板名称失败，***********");
+                    throw new MessageException(resultMap.get("msg").toString());
+                }else{
+                    return true;
+                }
+        }catch (MessageException e){
+            e.printStackTrace();
+            throw new MessageException(e.getMsg());
+        }catch(Exception e){
+            e.printStackTrace();
+            throw new MessageException("验证模板名称失败！");
+        }
     }
 }
