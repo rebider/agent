@@ -663,21 +663,19 @@ public class CompensateServiceImpl implements CompensateService {
             if(oRefundPriceDiff.getOrderType().compareTo(OrderType.OLD.getValue())==0){
                 List<ORefundPriceDiffDetail> refundPriceDiffDetailList = agentVo.getRefundPriceDiffDetailList();
                 for (ORefundPriceDiffDetail oRefundPriceDiffDetail : refundPriceDiffDetailList) {
-                    if(StringUtils.isBlank(oRefundPriceDiffDetail.getOrderId())){
-                        throw new ProcessException("请填写订单号");
-                    }
-                    if(StringUtils.isBlank(oRefundPriceDiffDetail.getSubOrderId())){
-                        throw new ProcessException("请选择商品");
-                    }
                     ORefundPriceDiffDetail upPriceDiffDetail = refundPriceDiffDetailMapper.selectByPrimaryKey(oRefundPriceDiffDetail.getId());
-                    upPriceDiffDetail.setSubOrderId(oRefundPriceDiffDetail.getSubOrderId());
-                    OSubOrder oSubOrder = subOrderMapper.selectByPrimaryKey(oRefundPriceDiffDetail.getSubOrderId());
-                    if(null==oSubOrder){
-                        throw new ProcessException("商品不存在");
+                    if(StringUtils.isNotBlank(oRefundPriceDiffDetail.getSubOrderId())){
+                        upPriceDiffDetail.setSubOrderId(oRefundPriceDiffDetail.getSubOrderId());
+                        OSubOrder oSubOrder = subOrderMapper.selectByPrimaryKey(oRefundPriceDiffDetail.getSubOrderId());
+                        if(null==oSubOrder){
+                            throw new ProcessException("商品不存在");
+                        }
+                        upPriceDiffDetail.setProId(oSubOrder.getProId());
+                        upPriceDiffDetail.setProName(oSubOrder.getProName());
                     }
-                    upPriceDiffDetail.setProId(oSubOrder.getProId());
-                    upPriceDiffDetail.setProName(oSubOrder.getProName());
-                    upPriceDiffDetail.setOrderId(oRefundPriceDiffDetail.getOrderId());
+                    if(StringUtils.isNotBlank(oRefundPriceDiffDetail.getOrderId())){
+                        upPriceDiffDetail.setOrderId(oRefundPriceDiffDetail.getOrderId());
+                    }
                     int i = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(upPriceDiffDetail);
                     if(i!=1){
                         throw new ProcessException("更新明细失败");
