@@ -391,14 +391,16 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
                 //校验业务编码是否存在
                 if (StringUtils.isNotBlank(agentBusInfoVo.getBusNum())) {
-                    if (!agentBusInfo.getBusNum().equals(agentBusInfoVo.getBusNum())) {
-                        AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
-                        agentBusInfoExample.createCriteria()
-                                .andStatusEqualTo(Status.STATUS_1.status)
-                                .andBusNumEqualTo(agentBusInfoVo.getBusNum());
-                        List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
-                        if (agentBusInfoList.size() > 0) {
-                            throw new MessageException("业务平台编码已存在！");
+                    if (StringUtils.isNotBlank(agentBusInfo.getBusNum())) {
+                        if (!agentBusInfo.getBusNum().equals(agentBusInfoVo.getBusNum())) {
+                            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+                            agentBusInfoExample.createCriteria()
+                                    .andStatusEqualTo(Status.STATUS_1.status)
+                                    .andBusNumEqualTo(agentBusInfoVo.getBusNum());
+                            List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+                            if (agentBusInfoList.size() > 0) {
+                                throw new MessageException("业务平台编码已存在！");
+                            }
                         }
                     }
                 }
@@ -425,8 +427,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 } else {
                     if (StringUtils.isNotBlank(agentBusInfoVo.getBusNum())) {
                         Agent agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
-                        agent.setAgStatus(String.valueOf(AgStatus.Approved.status));
-                        agent.setcTime(new Date());
+                        agent.setcIncomStatus(AgentInStatus.IN.status);
+                        agent.setcUtime(new Date());
                         int updateAgent = agentMapper.updateByPrimaryKeySelective(agent);
                         if (updateAgent != 1) {
                             logger.info("代理商数据-更新失败");
@@ -568,7 +570,18 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 }
             }
             for (CapitalVo item : agentVo.getCapitalVoList()) {
+                if(agentVo.getCapitalVoList().size()!=0){
+                    if(StringUtils.isBlank(item.getcPayType())){
+                        throw new ProcessException("请选择打款方式");
+                    }
+                }
                 if(item.getcPayType().equals(PayType.YHHK.getValue())){
+                    if(StringUtils.isBlank(item.getcPayuser())){
+                        throw new ProcessException("请选择打款人");
+                    }
+                    if(item.getcPaytime()==null){
+                        throw new ProcessException("请选择打款时间");
+                    }
                     if(item.getCapitalTableFile()==null){
                         throw new ProcessException("银行汇款方式必须上传打款凭据");
                     }
