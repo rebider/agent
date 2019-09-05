@@ -45,7 +45,7 @@ public interface InternetCardService {
 
     void migrationHistory(OInternetCardImport oInternetCardImport)throws MessageException;
 
-    void internetCardPostpone(OInternetCardPostpone internetCardPostpone, String cUser)throws MessageException;
+    void internetCardPostpone(OInternetCardPostpone internetCardPostpone, String cUser,String importId,String batchNum)throws MessageException;
 
     PageInfo queryInternetCardPostponeList(OInternetCardPostpone internetCardPostpone,Page page);
 }
