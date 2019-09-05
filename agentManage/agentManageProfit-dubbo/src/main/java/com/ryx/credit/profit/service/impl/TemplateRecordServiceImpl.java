@@ -60,6 +60,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     private static final String TEMPLATE_APPLY = AppConfig.getProperty("template.apply");
     private static final String TEMPLATE_APPLY_DETAIL = AppConfig.getProperty("template.apply.detail");
     private static final String TEMPLATE_APPLY_PASS = AppConfig.getProperty("template.apply.pass");
+    private static final String TEMPLATE_APPLY_CHECK = AppConfig.getProperty("template.apply.check");
 
     @Override
     public PageInfo getApplyList(Page page, TemplateRecode templateRecode,Map<String,Object> map) {
@@ -417,5 +418,19 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         TemplateRecode templateRecode = recodeMapper.selectByPrimaryKey(id);
         templateRecode.setApplyResult(status);
         recodeMapper.updateByPrimaryKeySelective(templateRecode);
+    }
+
+    @Override
+    public Map<String,Object> checkTEmplateName(String applyId)throws MessageException{
+        try{
+            JSONObject map2 = new JSONObject();
+            map2.put("applyId",applyId);
+            String result = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, map2.toJSONString());
+            Map<String,Object> resultMap = JSONObject.parseObject(result);
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new MessageException("校验模板信息失败，请重试！");
+        }
+        return  null;
     }
 }
