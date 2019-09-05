@@ -5,6 +5,7 @@ import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.OrganizationMapper;
@@ -128,8 +129,18 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
             String orgCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
             //市场审批
             if(orgCode.equals("market")){
+                //业务平台除pro类型 都赋值空
+                String ryx_pro = AppConfig.getProperty("ryx_pro");
+                String ryx_pro1 = AppConfig.getProperty("ryx_pro1");
+
                 //处理财务审批（财务出款机构）
                 for (AgentBusInfoVo agentBusInfoVo : agentVo.getMarketToporgTableIdForm()) {
+                    if(StringUtils.isNotBlank(agentBusInfoVo.getBusPlatform())){
+                        if (!agentBusInfoVo.getBusPlatform().equals(ryx_pro) || !agentBusInfoVo.getBusPlatform().equals(ryx_pro1)){
+                            agentBusInfoVo.setBusPlatform(" ");
+                        }
+
+                    }
                     //必须选择业务顶级机构
                     if(StringUtils.isBlank(agentBusInfoVo.getOrganNum())){
                         throw new ProcessException("请选择业务顶级机构");
