@@ -41,6 +41,8 @@ public interface ITemplateRecodeService {
 
     void updateApplyStatus(String status,String id);
 
-    Map<String,Object> checkTEmplateName(String applyId) throws MessageException;
+    Map<String,Object> checkTemplate(String applyId) throws MessageException;
+
+    Object checkTempalteName(String applyId)throws MessageException;
 
 }

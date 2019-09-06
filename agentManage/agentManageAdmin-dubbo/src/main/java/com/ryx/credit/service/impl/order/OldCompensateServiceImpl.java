@@ -144,8 +144,17 @@ public class OldCompensateServiceImpl implements OldCompensateService {
             activityCriteria.andActCodeNotEqualTo(oActivity.getActCode());
             activityCriteria.andVenderEqualTo(oActivity.getVender());//厂商
             activityCriteria.andProModelEqualTo(oActivity.getProModel());//型号
-            activityCriteria.andPlatformEqualTo(oActivity.getPlatform());//平台
-            activityCriteria.andProTypeEqualTo(oActivity.getProType());//机具类型
+//            activityCriteria.andPlatformEqualTo(oActivity.getPlatform());//平台
+            List<String> proTypeList = new ArrayList<>();
+            proTypeList.add(oActivity.getProType());
+            //查询可扩展的机具类型
+            List<Dict> changeType = dictOptionsService.findDictListByName(DictGroup.ORDER.name(), DictGroup.COMPENSATE_MODEL_TYPE.name(),oActivity.getProType());
+            if(changeType!=null){
+                for (Dict dict : changeType) {
+                    proTypeList.add(dict.getdItemvalue());
+                }
+            }
+            activityCriteria.andProTypeIn(proTypeList);//机具类型
             Date date = new Date();
             activityCriteria.andBeginTimeLessThanOrEqualTo(date);
             activityCriteria.andEndTimeGreaterThanOrEqualTo(date);
@@ -560,14 +569,14 @@ public class OldCompensateServiceImpl implements OldCompensateService {
 
 
                     //待调整集合 cxinfo 机具的调整  调货明细
-                    OOrder oo = orderMapper.selectByPrimaryKey(row.getOrderId());
-                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oo.getBusId());
-                    PlatformType platformType = platFormService.byPlatformCode(agentBusInfo.getBusPlatform());
+//                    OOrder oo = orderMapper.selectByPrimaryKey(row.getOrderId());
+//                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oo.getBusId());
+//                    PlatformType platformType = platFormService.byPlatformCode(agentBusInfo.getBusPlatform());
 
                     OActivity activity = orderActivityService.findById(row.getActivityRealId());
                     OActivity activity_old = orderActivityService.findById(row.getActivityFrontId());
                     ChangeActMachineVo cav = new ChangeActMachineVo();
-                    cav.setBusNum(agentBusInfo.getBusNum());
+//                    cav.setBusNum(agentBusInfo.getBusNum());
                     cav.setNewAct(activity.getBusProCode());
                     cav.setOldAct(activity_old.getBusProCode());
                     cav.setOptUser(row.getcUser());
@@ -580,7 +589,7 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                     cav.setSnStart(row.getBeginSn()+(StringUtils.isBlank(String.valueOf(snBeginMap.get("termCheck")))?"":String.valueOf(snBeginMap.get("termCheck"))));
                     cav.setSnEnd(row.getEndSn()+(StringUtils.isBlank(String.valueOf(snEndMap.get("termCheck")))?"":String.valueOf(snEndMap.get("termCheck"))));
 
-                    cav.setPlatformType(platformType.code);
+                    cav.setPlatformType("POS");
                     cav.setoRefundPriceDiffDetailId(row.getId());
                     List<OLogisticsDetail> logisticsDetailList = new ArrayList<>();
                     Set<String> snSet = redisService.hGet(row.getBeginSn() + "," + row.getEndSn());

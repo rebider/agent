@@ -301,8 +301,9 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                         if(null == ownInvoice){
                             throw new MessageException("开票公司是：（"+invoiceApply.getInvoiceCompany()+"）未获取到欠票数据！");
                         }
-                        if(bg.add(mg).compareTo(ownInvoice) > 0){ // 表示本月到票大于本月欠票
-                            throw new MessageException("开票公司：("+invoiceApply.getInvoiceCompany()+")所开发票金额总计已大于本月欠票,不符合条件，请重新导入");
+                        BigDecimal subtra = bg.add(mg).subtract(ownInvoice);  //到票金额-欠票金额
+                        if(subtra.compareTo(new BigDecimal(10)) > 0 ){ //到票金额-欠票金额 大于 10元时
+                            throw new MessageException("开票公司：("+invoiceApply.getInvoiceCompany()+")所开发票金额总计超过本月欠票"+subtra+"元，不符合条件，请重新导入");
                         }else{
                             mapInvoice.put(invoiceApply.getInvoiceCompany(),mg);
                         }

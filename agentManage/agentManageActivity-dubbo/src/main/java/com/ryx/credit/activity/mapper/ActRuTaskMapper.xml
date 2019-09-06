@@ -362,6 +362,7 @@
   <sql id="queryMyTaskField" >
       rt.ID_,rt.NAME_,br.ACTIV_ID, br.BUS_ID, br.BUS_TYPE, to_char(br.C_TIME, 'yyyy-mm-dd hh24:mi:ss') C_TIME,
       br.C_USER,br.ACTIV_STATUS, br.STATUS,ri.group_id_, br.agent_id,br.agent_name,br.net_in_bus_type, rt.create_time_ as create_time,br.ag_doc_pro,br.ag_doc_district
+      ,nvl(plat.PLATFORM_NAME,0) PLATFORM_NAME,c.NAME AS C_NAME,br.EXPLAIN
   </sql>
   <sql id="queryMyTaskSql">
       (select
@@ -372,7 +373,9 @@
       left join a_agent a on br.agent_id = a.id
       left join C_ORGANIZATION oa on oa.id=br.ag_doc_pro
       left join C_ORGANIZATION ob on ob.id=br.ag_doc_district
-      <where>
+      left join a_platform plat on  plat.PLATFORM_NUM =replace(br.NET_IN_BUS_TYPE,'ACTIVITY_','')
+      left join c_user c on br.c_user=c.ID
+    <where>
         1=1
         <include refid="queryMyTaskWhere"/>
         and NET_IN_BUS_TYPE is null
@@ -386,6 +389,8 @@
       left join a_agent a on br.agent_id = a.id
       left join C_ORGANIZATION oa on oa.id=br.ag_doc_pro
       left join C_ORGANIZATION ob on ob.id=br.ag_doc_district
+      left join a_platform plat on  plat.PLATFORM_NUM =replace(br.NET_IN_BUS_TYPE,'ACTIVITY_','')
+      left join c_user c on br.c_user=c.ID
       <where>
         1=1
         <include refid="queryMyTaskWhere"/>
@@ -451,6 +456,9 @@
       <foreach collection="params.dbUrls" separator="," item="dbUrl" index="index" open=" DATA_SHIRO in (" close=")">
         #{dbUrl}
       </foreach>
+    </if>
+    <if test="params.busPlatform != null and params.busPlatform!='' " >
+      and  plat.PLATFORM_NUM=#{params.busPlatform}
     </if>
   </sql>
 
