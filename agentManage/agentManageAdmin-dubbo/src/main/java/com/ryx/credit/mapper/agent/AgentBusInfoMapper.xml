@@ -750,8 +750,10 @@
     <if test="reqMap.approveTimeEnd != null and reqMap.approveTimeEnd != '' " >
       and to_char(b.approve_time,'yyyy-MM-dd') &lt;= #{reqMap.approveTimeEnd}
     </if>
+    <if test="reqMap.busStatus != null" >
+      and b.bus_status = #{reqMap.busStatus}
+    </if>
     and b.status = #{reqMap.status}
-
     order by c_time desc
   </sql>
 

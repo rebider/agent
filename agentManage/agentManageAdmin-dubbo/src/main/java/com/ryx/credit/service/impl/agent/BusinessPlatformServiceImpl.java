@@ -170,6 +170,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         if ( StringUtils.isNotBlank(approveTimeEnd)) {
             reqMap.put("approveTimeEnd", approveTimeEnd);
         }
+        if (agentBusInfo.getBusStatus() != null) {
+            reqMap.put("busStatus", agentBusInfo.getBusStatus());
+        }
         reqMap.put("status", Status.STATUS_1.status);
         List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
         reqMap.put("platfromPerm",platfromPerm);
