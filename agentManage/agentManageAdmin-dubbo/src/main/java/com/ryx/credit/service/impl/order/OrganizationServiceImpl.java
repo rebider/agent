@@ -235,7 +235,17 @@ public class OrganizationServiceImpl implements OrganizationService {
                         }
                         Organization organization = organizationMapper.selectByPrimaryKey(ac.getOrgId());
                         if (StringUtils.isNotBlank(ac.getBusinessNum())){
-                            organization.setBusinessNum(ac.getBusinessNum().substring(0, ac.getBusinessNum().length() - 1));
+                            String[] splitBus = ac.getBusinessNum().split(",");
+                            String num="";
+                            for (String bus : splitBus) {
+                                if (bus.equals("#")){
+                                    num+=""+",";
+                                }else{
+                                    num+=bus;
+                                }
+
+                            }
+                            organization.setBusinessNum(num.substring(0, num.length()));
                         }
                         organization.setcUser(agentVo.getSid());
                         organization.setAccountName(ac.getAccountName());
@@ -263,7 +273,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                         OrgPlatformExample orgPlatformExample = new OrgPlatformExample();
                         OrgPlatformExample.Criteria criteria = orgPlatformExample.createCriteria().andOrgIdEqualTo(ac.getOrgId());
                         List<OrgPlatform> orgPlatforms = orgPlatformMapper.selectByExample(orgPlatformExample);
-                        if (null != orgPlatforms || orgPlatforms.size() > 0) {
+                        if (null != orgPlatforms && orgPlatforms.size() > 0) {
                             for (OrgPlatform orgPlatform : orgPlatforms) {
                                 if (1 != orgPlatformMapper.deleteOrgPlatform(orgPlatform.getId())) {
                                     logger.info("机构关系表删除失败");
@@ -279,13 +289,14 @@ public class OrganizationServiceImpl implements OrganizationService {
                     for (OrgPlatform platform : orgPlatform) {
                         String[] platCode = platform.getPlatCode().split(",");
                         String[] platNum = platform.getPlatNum().split(",");
-                       /* if (platCode.length != platNum.length) {
-                            logger.info("请检查业务平台和业务编码填写有误！");
-                            throw new MessageException("请检查业务平台和业务编码填写有误！");
-                        }*/
                         Date d = Calendar.getInstance().getTime();
-                        for (int i = 0; i < platCode.length; i++) {
+                        for (int i = 0; i < platNum.length; i++) {
                             OrgPlatform orgPlat = new OrgPlatform();
+                            if (platCode[i].equals("#")){
+                                orgPlat.setPlatCode("");
+                            }else{
+                                orgPlat.setPlatCode(platCode[i]);
+                            }
                             orgPlat.setPlatCode(platCode[i]);
                             orgPlat.setPlatNum(platNum[i]);
                             orgPlat.setId(idService.genId(TabId.ORG_PLATFORM));
