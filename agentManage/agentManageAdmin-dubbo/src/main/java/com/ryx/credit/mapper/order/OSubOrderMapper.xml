@@ -370,7 +370,7 @@
 
   <select id="selectProNumByBusNum" parameterType="string" resultType="long">
     select
-        count(so.pro_num)
+        sum(so.pro_num)
     from
         o_sub_order so
     left join o_order o
