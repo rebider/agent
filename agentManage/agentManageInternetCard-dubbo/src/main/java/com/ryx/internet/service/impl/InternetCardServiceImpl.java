@@ -997,8 +997,38 @@ public class InternetCardServiceImpl implements InternetCardService {
         internetCardPostponeExample.setPage(page);
         internetCardPostponeExample.setOrderByClause(" c_time desc ");
         criteria.andStatusEqualTo(Status.STATUS_1.status);
+        if(StringUtils.isNotBlank(internetCardPostpone.getOrderId())){
+            criteria.andOrderIdEqualTo(internetCardPostpone.getOrderId());
+        }
+        if(StringUtils.isNotBlank(internetCardPostpone.getBatchNum())){
+            criteria.andBatchNumEqualTo(internetCardPostpone.getBatchNum());
+        }
+        if(StringUtils.isNotBlank(internetCardPostpone.getAgentId())){
+            criteria.andAgentIdEqualTo(internetCardPostpone.getAgentId());
+        }
+        if(StringUtils.isNotBlank(internetCardPostpone.getAgentName())){
+            criteria.andAgentNameEqualTo(internetCardPostpone.getAgentName());
+        }
+        if(StringUtils.isNotBlank(internetCardPostpone.getMerId())){
+            criteria.andMerIdEqualTo(internetCardPostpone.getMerId());
+        }
+        if(StringUtils.isNotBlank(internetCardPostpone.getMerName())){
+            criteria.andMerNameEqualTo(internetCardPostpone.getMerName());
+        }
         if(StringUtils.isNotBlank(internetCardPostpone.getIccid())){
             criteria.andIccidEqualTo(internetCardPostpone.getIccid());
+        }else if(StringUtils.isNotBlank(internetCardPostpone.getIccidNum())){
+            boolean contains = internetCardPostpone.getIccidNum().contains(",");
+            if(contains){
+                String[] iccidNumStr = internetCardPostpone.getIccidNum().split(",");
+                List<String> iccidNumList = new ArrayList<>();
+                for (String iccidNum : iccidNumStr) {
+                    iccidNumList.add(iccidNum);
+                }
+                criteria.andIccidIn(iccidNumList);
+            }else{
+                criteria.andIccidLike(internetCardPostpone.getIccidNum()+"%");
+            }
         }
         List<OInternetCardPostpone> internetCardPostpones = internetCardPostponeMapper.selectByExample(internetCardPostponeExample);
         for (OInternetCardPostpone cardPostpone : internetCardPostpones) {
@@ -1056,6 +1086,8 @@ public class InternetCardServiceImpl implements InternetCardService {
         internetCardPostpone.setuTime(date);
         internetCardPostpone.setStatus(Status.STATUS_1.status);
         internetCardPostpone.setVersion(BigDecimal.ONE);
+        if(StringUtils.isNotBlank(batchNum))
+        internetCardPostpone.setBatchNum(batchNum);
         internetCardPostponeMapper.insert(internetCardPostpone);
 
         BigDecimal sumPostponeTime = oInternetCard.getSumPostponeTime();

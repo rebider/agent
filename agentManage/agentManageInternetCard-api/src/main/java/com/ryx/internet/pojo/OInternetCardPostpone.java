@@ -39,6 +39,18 @@ public class OInternetCardPostpone implements Serializable{
 
     private BigDecimal version;
 
+    private String batchNum;
+
+    private String iccidNum;
+
+    public String getIccidNum() {
+        return iccidNum;
+    }
+
+    public void setIccidNum(String iccidNum) {
+        this.iccidNum = iccidNum;
+    }
+
     public String getId() {
         return id;
     }
@@ -173,5 +185,13 @@ public class OInternetCardPostpone implements Serializable{
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public String getBatchNum() {
+        return batchNum;
+    }
+
+    public void setBatchNum(String batchNum) {
+        this.batchNum = batchNum == null ? null : batchNum.trim();
     }
 }
