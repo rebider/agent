@@ -63,6 +63,21 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     private static final String TEMPLATE_APPLY_CHECK = AppConfig.getProperty("template.apply.check");
     private static final String TEMPLATE_APPLY_CHECKNAME = AppConfig.getProperty("template.apply.checkName");
 
+    private static final String RJ_TEMPLATE_NOW = AppConfig.getProperty("rj.template.now");
+    private static final String RJ_TEMPLATE_APPLY = AppConfig.getProperty("rj.template.apply");
+    private static final String RJ_TEMPLATE_APPLY_DETAIL = AppConfig.getProperty("rj.template.apply.detail");
+    private static final String RJ_TEMPLATE_APPLY_PASS = AppConfig.getProperty("rj.template.apply.pass");
+    private static final String RJ_TEMPLATE_APPLY_CHECK = AppConfig.getProperty("rj.template.apply.check");
+    private static final String RJ_TEMPLATE_APPLY_CHECKNAME = AppConfig.getProperty("rj.template.apply.checkName");
+
+
+    /**
+     * 获取数据列表
+     * @param page
+     * @param templateRecode
+     * @param map
+     * @return
+     */
     @Override
     public PageInfo getApplyList(Page page, TemplateRecode templateRecode,Map<String,Object> map) {
         Map<String,String> map1 = new HashMap<String,String>();
@@ -83,29 +98,41 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         return pageInfo;
     }
 
-    /**获取代理商当前url*/
+    /**
+     * 根据业务平台编码获取对应分润模板
+     * @param orgId
+     * @return
+     * @throws MessageException
+     */
     @Override
     public Map<String,Object> getTemplateNow(String orgId) throws MessageException {
         if(StringUtils.isBlank(orgId)){
             throw new MessageException("平台编码不能为空");
         }
-        JSONObject param = new JSONObject();
-        param.put("orgId", orgId);
-        String result = null;
         try{
-            result = HttpClientUtil.doPostJson(TEMPLATE_NOW, param.toJSONString());
+            JSONObject param = new JSONObject();
+            param.put("orgId", orgId);
+            String  result = HttpClientUtil.doPostJson(TEMPLATE_NOW, param.toJSONString());
+            Map<String,Object> resultMap = JSONObject.parseObject(result);
+            if(!(boolean)resultMap.get("result")){
+                throw new MessageException(resultMap.get("msg").toString());
+            }
+            Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
+            return objectMap;
+        }catch (MessageException e){
+            e.printStackTrace();
+            throw new MessageException(e.getMsg());
         }catch (Exception e){
             e.printStackTrace();
             throw new MessageException("获取该业务平台模板信息失败，请重试！");
         }
-        Map<String,Object> resultMap = JSONObject.parseObject(result);
-        if(!(boolean)resultMap.get("result")){
-            throw new MessageException(resultMap.get("msg").toString());
-        }
-        Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
-        return objectMap;
     }
 
+    /**
+     * 根据业务平台编码获取对应业务平台信息，代理商信息
+     * @param busNum
+     * @return
+     */
     @Override
     public Map<String, String> getAgentInfo(String busNum) {
         List<Map<String,String>> list = recodeMapper.getAgentInfoByBusNum(busNum);
@@ -115,7 +142,12 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         return null;
     }
 
-    /***保存信息，并发起审批***/
+    /**
+     * 保存模板信息并发起审批
+     * @param map1
+     * @param map2
+     * @throws MessageException
+     */
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
     public void saveAndApply(Map<String, String> map1, JSONObject map2) throws MessageException {
@@ -133,7 +165,16 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         //将数据传送至业务平台
         String result = null;
         try {
-            result = HttpClientUtil.doPostJson(TEMPLATE_APPLY, map2.toJSONString());
+            String busPlatform = map1.get("busPlatform");
+            if("100030".equals(busPlatform)){ // 瑞+前置
+                throw new MessageException("该平台不能进行分润模板线上申请！");
+            }else if("100014".equals(busPlatform)){  // 瑞+申请
+                result = HttpClientUtil.doPostJson(RJ_TEMPLATE_APPLY, map2.toJSONString());
+            }else{  // 老综管申请
+                result = HttpClientUtil.doPostJson(TEMPLATE_APPLY, map2.toJSONString());
+            }
+        }catch (MessageException e){
+            throw new MessageException(e.getMsg());
         }catch (Exception e){
             e.printStackTrace();
             throw new MessageException("保存分润模板失败，请重试");
@@ -220,6 +261,11 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         recodeMapper.updateByPrimaryKeySelective(templateRecode);
     }
 
+    /**
+     * 根据业务平台编码获取审批中以及退回的申请记录，用于重复申请判断
+     * @param orgId
+     * @return
+     */
     private List<TemplateRecode> checkRepeatRecode(String orgId){
         TemplateRecodeExample example = new TemplateRecodeExample();
         TemplateRecodeExample.Criteria criteria = example.createCriteria();
@@ -233,13 +279,22 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         return recodeMapper.selectByExample(example);
     }
 
-
-
+    /**
+     * 根据id获取申请记录信息
+     * @param id
+     * @return
+     */
     @Override
     public TemplateRecode getTemplateRecodeById(String id) {
         return recodeMapper.selectByPrimaryKey(id);
     }
 
+    /**
+     * 根据申请id获取老综管模板详细信息
+     * @param recordId
+     * @return
+     * @throws MessageException
+     */
     @Override
     public Map<String, Object> getTemplateApplyDetail(String recordId) throws MessageException{
         JSONObject map = new JSONObject();
@@ -256,6 +311,13 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     }
 
 
+    /**
+     * 审批流任务处理
+     * @param agentVo
+     * @param userId
+     * @return
+     * @throws ProcessException
+     */
     @Override
     public AgentResult approvalTask(AgentVo agentVo, String userId) throws ProcessException {
         logger.info("审批对象：{}", JSONObject.toJSON(agentVo));
@@ -310,7 +372,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     }
 
     /**
-     * 修改信息，并保存
+     * 老综管模板修改信息，并保存
      * @param map1
      * @param map2
      * @throws MessageException
@@ -338,6 +400,11 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         recodeMapper.updateByPrimaryKeySelective(templateRecode);
     }
 
+    /**
+     * 审批流回调
+     * @param insid
+     * @param status
+     */
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public void completeTaskEnterActivity(String insid, String status) {
@@ -379,6 +446,12 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     }
 
 
+    /**
+     * 联动老综管模板信息验证及模板分配
+     * @param id
+     * @return
+     * @throws MessageException
+     */
     @Override
     public Map<String,Object> checkAngAsign(String id) throws MessageException{
         TemplateRecode templateRecode = recodeMapper.selectByPrimaryKey(id);
@@ -414,6 +487,11 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
 
     }
 
+    /**
+     * 更新申请记录的状态
+     * @param status 状态
+     * @param id  id
+     */
     @Override
     public void updateApplyStatus(String status,String id){
         TemplateRecode templateRecode = recodeMapper.selectByPrimaryKey(id);
@@ -421,6 +499,12 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         recodeMapper.updateByPrimaryKeySelective(templateRecode);
     }
 
+    /**
+     * 联动老综管验证模板数据是否存在
+     * @param applyId 申请id
+     * @return
+     * @throws MessageException
+     */
     @Override
     public Map<String,Object> checkTemplate(String applyId)throws MessageException{
         try{
@@ -442,6 +526,12 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         }
     }
 
+    /**
+     * 联动老综管校验模板名称是否重复
+     * @param applyId  申请id
+     * @return
+     * @throws MessageException
+     */
     @Override
     public Object checkTempalteName(String applyId)throws MessageException{
         if(StringUtils.isBlank(applyId)){
@@ -464,6 +554,36 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         }catch(Exception e){
             e.printStackTrace();
             throw new MessageException("验证模板名称失败！");
+        }
+    }
+
+    /**
+     * 获取瑞+分润模板
+     * @param orgId
+     * @return
+     * @throws MessageException
+     */
+    @Override
+    public Map<String,Object> getRJTemplateNow(String orgId)throws MessageException{
+        if (StringUtils.isBlank(orgId)){
+            throw new MessageException("业务平台编码不能为空！");
+        }
+        try{
+            JSONObject param = new JSONObject();
+            param.put("orgId", orgId);
+            String result = HttpClientUtil.doPostJson(RJ_TEMPLATE_NOW, param.toJSONString());
+            Map<String,Object> resultMap = JSONObject.parseObject(result);
+            if(!(boolean)resultMap.get("result")){
+                throw new MessageException(resultMap.get("msg").toString());
+            }
+            Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
+            return objectMap;
+        }catch (MessageException e){
+            e.printStackTrace();
+            throw new MessageException(e.getMsg());
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new MessageException("联动业务平台获取分润模板数据失败！");
         }
     }
 }
