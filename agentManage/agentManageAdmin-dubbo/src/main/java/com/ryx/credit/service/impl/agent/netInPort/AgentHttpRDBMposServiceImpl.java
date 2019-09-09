@@ -228,6 +228,15 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         jsonParams.put("mobile",agentBusInfo.getBusNum());
         jsonParams.put("branchid",agentBusInfo.getBusPlatform().split("_")[0]);
         jsonParams.put("termCount",agentBusInfo.getTerminalsLower());
+        if(StringUtils.isNotBlank(agentBusInfo.getBusParent())){
+            //取出上级业务
+            AgentBusInfo agentParent = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
+            if(null!=agentParent){
+                jsonParams.put("parentAgencyId",agentParent.getBusNum());
+            }else{
+                jsonParams.put("parentAgencyId","");
+            }
+        }
         jsonParams = commonParam(jsonParams, agentColinfo, agent, agentBusInfo);
         return jsonParams;
     }
@@ -261,6 +270,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             jsonParams.put("channelTopId",data.get("channelTopId"));
             jsonParams.put("invoice",data.get("invoice"));
             jsonParams.put("tax",data.get("tax"));
+            jsonParams.put("parentAgencyId",data.get("parentAgencyId"));
 
             String json = JSONObject.toJSONString(jsonParams);
             log.info("通知瑞大宝升级请求参数：{}",json);
