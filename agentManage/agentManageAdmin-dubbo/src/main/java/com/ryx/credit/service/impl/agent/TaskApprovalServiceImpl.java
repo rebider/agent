@@ -16,10 +16,7 @@ import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.CapitalVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
-import com.ryx.credit.service.agent.AgentColinfoService;
-import com.ryx.credit.service.agent.AgentEnterService;
-import com.ryx.credit.service.agent.PlatFormService;
-import com.ryx.credit.service.agent.TaskApprovalService;
+import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.dict.DictOptionsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +70,8 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
     private OrganizationMapper organizationMapper;
     @Autowired
     private PlatFormService platFormService;
+    @Autowired
+    private AgentBusinfoService agentBusinfoService;
 
 
      @Override
@@ -154,6 +153,25 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                     if(agentBusInfo!=null){
                         //上级存在
                         if (StringUtils.isNotBlank(agentBusInfoVo.getBusParent())){
+                                //获取上级代理商类型
+                                AgentBusInfo busInfo = agentBusinfoService.getById(agentBusInfoVo.getBusParent());
+                                if (agentBusInfoVo.getBusType().equals(BusType.ZQ.key) || agentBusInfoVo.getBusType().equals(BusType.ZQBZF.key) || agentBusInfoVo.getBusType().equals(BusType.ZQZF.key)) {
+                                    if (busInfo.getBusType().equals(BusType.ZQ.key) || busInfo.getBusType().equals(BusType.ZQZF.key) || busInfo.getBusType().equals(BusType.ZQBZF.key)) {
+                                        throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                                    }
+                                }
+                                if (agentBusInfoVo.getBusType().equals(BusType.YDX.key)) {
+                                    if (busInfo.getBusType().equals(BusType.ZQ.key) || busInfo.getBusType().equals(BusType.YDX.key)
+                                            || busInfo.getBusType().equals(BusType.ZQZF.key) || busInfo.getBusType().equals(BusType.ZQBZF.key)) {
+                                        throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                                    }
+                                }
+                                if (agentBusInfoVo.getBusType().equals(BusType.JGYD.key)) {
+                                    if (!busInfo.getBusType().equals(BusType.JG.key)) {
+                                        throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                                    }
+                                }
+
                             //上级不为空  说明选择了上级---校验业务平台
                             AgentBusInfo parent = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getBusParent());
                             PlatForm platForm = platFormService.selectByPlatformNum(parent.getBusPlatform());
