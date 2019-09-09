@@ -460,6 +460,9 @@
     <if test="params.busPlatform != null and params.busPlatform!='' " >
       and  plat.PLATFORM_NUM=#{params.busPlatform}
     </if>
+    <if test="params.explain != null and params.explain!='' " >
+      and  br.EXPLAIN=#{params.explain}
+    </if>
   </sql>
 
   <select id="queryMyTaskCount" parameterType="map" resultType="int">
