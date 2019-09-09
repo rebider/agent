@@ -1,5 +1,6 @@
 package com.ryx.credit.service.order;
 
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
@@ -31,7 +32,7 @@ public interface CompensateService {
 
     BigDecimal calculatePriceDiff(String beginSn,String endSn,String oldActivityId,String activityId,BigDecimal proNum,ORefundPriceDiff oRefundPriceDiff);
 
-    AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,List<String> refundPriceDiffFile, String cUser ,List<OCashReceivablesVo> oCashReceivablesVoList);
+    AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,List<String> refundPriceDiffFile, String cUser ,List<OCashReceivablesVo> oCashReceivablesVoList)throws ProcessException;
 
     AgentResult startCompensateActiviy(String id, String cuser) throws Exception;
 

@@ -319,7 +319,7 @@ public class CompensateServiceImpl implements CompensateService {
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,
-                                         List<String> refundPriceDiffFile, String cUser,List<OCashReceivablesVo> oCashReceivablesVoList){
+                                         List<String> refundPriceDiffFile, String cUser,List<OCashReceivablesVo> oCashReceivablesVoList)throws ProcessException{
 
         try {
             if(PriceDiffType.DETAIN_AMT.code.equals(oRefundPriceDiff.getApplyCompType())){
@@ -409,6 +409,15 @@ public class CompensateServiceImpl implements CompensateService {
                     }
                     logisticsDetail = oLogisticsDetails.get(0);
                 }
+                if(StringUtils.isBlank(refundPriceDiffDetail.getActivityRealId())){
+                    throw new ProcessException("请选择活动");
+                }
+                if(StringUtils.isBlank(refundPriceDiffDetail.getOldOrgId())){
+                    throw new ProcessException("请填写目标机构编码");
+                }
+                if(StringUtils.isBlank(refundPriceDiffDetail.getNewOrgId())){
+                    throw new ProcessException("请填写原机构编码");
+                }
                 //变更后活动实体
                 OActivity oActivity = activityMapper.selectByPrimaryKey(refundPriceDiffDetail.getActivityRealId());
                 if(null==oActivity){
@@ -450,6 +459,10 @@ public class CompensateServiceImpl implements CompensateService {
                 }
             });
             return AgentResult.ok(priceDiffId);
+        }catch (ProcessException e) {
+            e.getStackTrace();
+            log.info("退补差价保存失败");
+            throw new ProcessException(e.getMessage());
         } catch (Exception e) {
             e.getStackTrace();
             log.info("退补差价保存失败");
@@ -739,7 +752,9 @@ public class CompensateServiceImpl implements CompensateService {
             return null;
         }
         oRefundPriceDiff.setReviewStatus(agStatus);
-        oRefundPriceDiff.setuTime(new Date());
+        Date nowDate = new Date();
+        oRefundPriceDiff.setuTime(nowDate);
+        oRefundPriceDiff.setAppTime(nowDate);
         int i = refundPriceDiffMapper.updateByPrimaryKeySelective(oRefundPriceDiff);
         if(i!=1){
             throw new ProcessException("更新退补差价数据申请失败");
