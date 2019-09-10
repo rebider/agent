@@ -203,6 +203,9 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             record.setNetInBusType("ACTIVITY_"+platForm.getPlatformNum());
             record.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
             record.setAgDocPro(agentBusInfoVo.getAgDocPro());
+            if (StringUtils.isNotBlank(agentBusInfoVo.getBusNum())){
+                record.setExplain(agentBusInfoVo.getBusNum());
+            }
         }else{
             record.setAgDocDistrict(agent.getAgDocDistrict());
             record.setAgDocPro(agent.getAgDocPro());
