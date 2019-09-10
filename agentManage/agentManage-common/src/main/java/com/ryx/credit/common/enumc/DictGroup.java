@@ -85,7 +85,10 @@ public enum DictGroup {
     OFFSET_AMT("轧差每张金额"),
 
     RDBPOS("瑞大宝模块"),
-    RDB_POS_LOWER("瑞大宝之前终端下限");
+    RDB_POS_LOWER("瑞大宝直签终端下限"),
+
+    AGENT_CODE_FILTER("代理商过滤代码");//过滤无效代理商用
+
 
     public String  msg;
 
