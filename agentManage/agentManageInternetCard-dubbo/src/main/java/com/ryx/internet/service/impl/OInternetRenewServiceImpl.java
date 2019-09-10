@@ -500,7 +500,8 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 oInternetRenewDetail.setRenewAmt(new BigDecimal(cardAmt.getdItemvalue()));
                 oInternetRenewDetail.setOughtAmt(new BigDecimal(cardAmt.getdItemvalue()));
                 //线下打款直接是实际扣款金额
-                if(internetRenew.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.XXBK.getValue())){
+                if(internetRenew.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.XXBK.getValue()) ||
+                    internetRenew.getRenewWay().equals(InternetRenewWay.GSCDGC.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.GSCD.getValue())){
                     oInternetRenewDetail.setRealityAmt(new BigDecimal(cardAmt.getdItemvalue()));
                 }else{
                     oInternetRenewDetail.setRealityAmt(BigDecimal.ZERO);
