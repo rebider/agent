@@ -402,7 +402,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
 
 
     /**
-     * RDB升级直签
+     * RDB升级直签校验
      * @param paramMap
      * @return
      * @throws Exception
@@ -450,14 +450,15 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         requMap.put("customerType",jsonParams.get("customerType"));
         requMap.put("invoice",jsonParams.get("invoice"));
         requMap.put("tax",jsonParams.get("tax"));
-        requMap.put("parentAgencyId",jsonParams.get("parentAgencyId"));
 
         // 封装参数，发送请求，解析参数，返回结果。
         try {
             String json = JsonUtil.objectToJson(requMap);
             log.info("------------------------------------请求瑞大宝升级直签参数"+json);
+            System.out.println("------------------------------------瑞大宝升级直签返回参数"+json);
             String httpResult = HttpClientUtil.doPostJsonWithException(rdbUpSingUrl, json);
             log.info("------------------------------------瑞大宝升级直签返回参数"+httpResult);
+            System.out.println("------------------------------------瑞大宝升级直签返回参数"+httpResult);
             if(StringUtils.isNotBlank(httpResult)) {
                 JSONObject respJson = JSONObject.parseObject(httpResult);
                 if (null != respJson.getString("code") && "0000".equals(respJson.getString("code")) && null != respJson.getBoolean("success") && respJson.getBoolean("success")) {
@@ -467,6 +468,9 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
                     //升级直签失败，返回相应数据
                     return AgentResult.fail(respJson.getString("msg"));
                 } else {
+                    if(null != respJson.getString("msg")) {
+                        throw new Exception(respJson.getString("msg"));
+                    }
                     throw new Exception("请求瑞大宝升级直签接口成功，返回值异常！");
                 }
             }else{
