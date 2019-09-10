@@ -783,7 +783,9 @@ public class CompensateServiceImpl implements CompensateService {
         oRefundPriceDiff.setReviewStatus(agStatus);
         Date nowDate = new Date();
         oRefundPriceDiff.setuTime(nowDate);
-        oRefundPriceDiff.setAppTime(nowDate);
+        if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
+            oRefundPriceDiff.setAppTime(nowDate);
+        }
         int i = refundPriceDiffMapper.updateByPrimaryKeySelective(oRefundPriceDiff);
         if(i!=1){
             throw new ProcessException("更新退补差价数据申请失败");
@@ -883,7 +885,12 @@ public class CompensateServiceImpl implements CompensateService {
                         }
 
                     });
-                    sendBusinessSystem(row,oLogisticsDetails,activity,activityOld);
+                    row.setAppTime(new Date());
+                    int j = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(row);
+                    if(j!=1){
+                        throw new ProcessException("退补差价更新失败");
+                    }
+//                    sendBusinessSystem(row,oLogisticsDetails,activity,activityOld);
 
                 }catch (ProcessException e) {
                     e.printStackTrace();
