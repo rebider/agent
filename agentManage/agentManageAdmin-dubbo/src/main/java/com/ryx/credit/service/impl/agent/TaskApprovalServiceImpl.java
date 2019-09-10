@@ -135,7 +135,7 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                 //处理财务审批（财务出款机构）
                 for (AgentBusInfoVo agentBusInfoVo : agentVo.getMarketToporgTableIdForm()) {
                     if(StringUtils.isNotBlank(agentBusInfoVo.getBusPlatform())){
-                        if (!agentBusInfoVo.getBusPlatform().equals(ryx_pro) || !agentBusInfoVo.getBusPlatform().equals(ryx_pro1)){
+                        if (!agentBusInfoVo.getBusPlatform().equals(ryx_pro) && !agentBusInfoVo.getBusPlatform().equals(ryx_pro1)){
                             agentBusInfoVo.setBusPlatform(" ");
                         }
 

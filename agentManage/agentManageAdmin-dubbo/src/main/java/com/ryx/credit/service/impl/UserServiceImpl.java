@@ -6,12 +6,17 @@ import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.BeanUtils;
+import com.ryx.credit.commons.utils.JsonUtils;
 import com.ryx.credit.commons.utils.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.CUserMapper;
 import com.ryx.credit.dao.CUserRoleMapper;
+import com.ryx.credit.dao.agent.AgentMapper;
+import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.CUserRole;
+import com.ryx.credit.pojo.admin.agent.Agent;
+import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.vo.UserVo;
 import com.ryx.credit.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +37,8 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
     private CUserMapper userMapper;
     @Autowired
     private CUserRoleMapper userRoleMapper;
+    @Autowired
+    private AgentMapper agentMapper;
     
     @Override
     public List<CUser> selectByLoginName(UserVo userVo) {
@@ -157,4 +164,8 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
         return cUserOrgCodelist;
     }
 
+    @Override
+    public Map<String, Object> selectAgentByOrgId(Map<String, Object> map) {
+        return agentMapper.selectAgentByOrgId(map);
+    }
 }
