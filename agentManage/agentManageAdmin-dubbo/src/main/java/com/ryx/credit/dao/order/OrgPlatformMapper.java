@@ -5,6 +5,7 @@ import com.ryx.credit.pojo.admin.order.OrgPlatformExample;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface OrgPlatformMapper {
     long countByExample(OrgPlatformExample example);
@@ -24,4 +25,7 @@ public interface OrgPlatformMapper {
     int updateByPrimaryKey(OrgPlatform record);
 
     int deleteOrgPlatform(@Param("id") String id);
+
+    List<Map> queryOrg(@Param("platForm")String platForm);
+
 }

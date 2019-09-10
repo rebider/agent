@@ -566,6 +566,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         record.setNetInBusType("ACTIVITY_"+agentBusInfo.getBusPlatform());
         record.setAgDocPro(agentBusInfo.getAgDocPro());
         record.setAgDocDistrict(agentBusInfo.getAgDocDistrict());
+        if (StringUtils.isNotBlank(agentBusInfo.getBusNum())){
+            record.setExplain(agentBusInfo.getBusNum());
+        }
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("代理商审批，启动审批异常，添加审批关系失败{}:{}", agentId, proce);
         }
@@ -678,6 +681,10 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         record.setAgDocPro(abus.getAgDocPro());
         record.setAgDocDistrict(abus.getAgDocDistrict());
         record.setNetInBusType("ACTIVITY_"+platForm.getPlatformNum());
+
+        if (StringUtils.isNotBlank(abus.getBusNum())){
+            record.setExplain(abus.getBusNum());
+        }
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("代理商业务启动审批异常，添加审批关系失败{}:{}", record.getBusId(), proce);
             throw new MessageException("添加审批关系失败!");
