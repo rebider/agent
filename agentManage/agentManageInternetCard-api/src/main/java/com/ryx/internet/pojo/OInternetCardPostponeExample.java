@@ -1247,6 +1247,76 @@ public class OInternetCardPostponeExample {
             addCriterion("VERSION not between", value1, value2, "version");
             return (Criteria) this;
         }
+
+        public Criteria andBatchNumIsNull() {
+            addCriterion("BATCH_NUM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumIsNotNull() {
+            addCriterion("BATCH_NUM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumEqualTo(String value) {
+            addCriterion("BATCH_NUM =", value, "batchNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumNotEqualTo(String value) {
+            addCriterion("BATCH_NUM <>", value, "batchNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumGreaterThan(String value) {
+            addCriterion("BATCH_NUM >", value, "batchNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumGreaterThanOrEqualTo(String value) {
+            addCriterion("BATCH_NUM >=", value, "batchNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumLessThan(String value) {
+            addCriterion("BATCH_NUM <", value, "batchNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumLessThanOrEqualTo(String value) {
+            addCriterion("BATCH_NUM <=", value, "batchNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumLike(String value) {
+            addCriterion("BATCH_NUM like", value, "batchNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumNotLike(String value) {
+            addCriterion("BATCH_NUM not like", value, "batchNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumIn(List<String> values) {
+            addCriterion("BATCH_NUM in", values, "batchNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumNotIn(List<String> values) {
+            addCriterion("BATCH_NUM not in", values, "batchNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumBetween(String value1, String value2) {
+            addCriterion("BATCH_NUM between", value1, value2, "batchNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNumNotBetween(String value1, String value2) {
+            addCriterion("BATCH_NUM not between", value1, value2, "batchNum");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

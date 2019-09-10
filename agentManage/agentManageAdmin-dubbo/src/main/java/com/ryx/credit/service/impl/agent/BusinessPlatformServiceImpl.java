@@ -170,6 +170,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         if ( StringUtils.isNotBlank(approveTimeEnd)) {
             reqMap.put("approveTimeEnd", approveTimeEnd);
         }
+        if (agentBusInfo.getBusStatus() != null) {
+            reqMap.put("busStatus", agentBusInfo.getBusStatus());
+        }
         reqMap.put("status", Status.STATUS_1.status);
         List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
         reqMap.put("platfromPerm",platfromPerm);
@@ -415,6 +418,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 agentBusInfo.setBusNum(agentBusInfoVo.getBusNum());
                 agentBusInfo.setBusLoginNum(agentBusInfoVo.getBusLoginNum());
                 agentBusInfo.setBusStatus(agentBusInfoVo.getBusStatus());
+                agentBusInfo.setBusParent(agentBusInfoVo.getBusParent());
                 if(StringUtils.isNotBlank(agentBusInfoVo.getOrganNum()))
                  agentBusInfo.setOrganNum(agentBusInfoVo.getOrganNum());
                 agentBusInfo.setVersion(agentBusInfo.getVersion());
@@ -986,6 +990,19 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             }
             return agentBusInfos;
         }
+    }
+
+    @Override
+    public List<PlatForm> queryAblePlatFormPro() {
+       String ryx_pro = AppConfig.getProperty("ryx_pro");
+       String ryx_pro1 = AppConfig.getProperty("ryx_pro1");
+        ArrayList<String> platList = new ArrayList<>();
+        platList.add(ryx_pro);
+        platList.add(ryx_pro1);
+        PlatFormExample example = new PlatFormExample();
+        example.or().andStatusEqualTo(Status.STATUS_1.status).andPlatformStatusEqualTo(Status.STATUS_1.status).andPlatformNumIn(platList);
+        example.setOrderByClause(" platform_type desc,c_time asc");
+        return platFormMapper.selectByExample(example);
     }
 
     /**

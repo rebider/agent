@@ -24,4 +24,6 @@ public interface ReceiptPlanService {
     AgentResult revocationPlanner(String planNum, String orderId, String user) throws Exception;
 
     AgentResult startShipping(String planNum, String orderId, String user) throws Exception;
+
+    AgentResult revocationShipping(String planNum, String orderId, String user) throws Exception;
 }
