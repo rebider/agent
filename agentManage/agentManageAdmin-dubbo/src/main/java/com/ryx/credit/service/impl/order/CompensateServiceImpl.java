@@ -169,14 +169,19 @@ public class CompensateServiceImpl implements CompensateService {
         String snBegin = "";
         String snEnd = "";
         String count = "";
+        String platformType = "";
         try {
             snBegin =  String.valueOf(excelList.get(0)).trim();
             snEnd =  String.valueOf(excelList.get(1)).trim();
             count =  String.valueOf(excelList.get(2)).trim();
+            platformType =  String.valueOf(excelList.get(3)).trim();
         } catch (Exception e) {
             throw new ProcessException("导入解析文件失败");
         }
-
+        String platformTypeCode = PlatformType.getValueByContent(platformType);
+        if(StringUtils.isBlank(platformTypeCode)){
+            throw new ProcessException("平台信息填写有误");
+        }
         Map<String, Object> reqParam = new HashMap<>();
         reqParam.put("snBegin",snBegin);
         reqParam.put("snEnd",snEnd);
@@ -194,6 +199,9 @@ public class CompensateServiceImpl implements CompensateService {
         BigDecimal proNumSum = new BigDecimal(0);
         for (Map<String, Object> stringObjectMap : compensateLList) {
             proNumSum = proNumSum.add(new BigDecimal(stringObjectMap.get("PRO_NUM").toString()));
+            if(String.valueOf(stringObjectMap.get("MIN_SN")).equals(snBegin)){
+                stringObjectMap.put("PLATFORM_TYPE",platformTypeCode);
+            }
         }
         if(!String.valueOf(proNumSum).equals(count)){
             throw new ProcessException("sn号数量不匹配");
@@ -319,7 +327,7 @@ public class CompensateServiceImpl implements CompensateService {
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,
-                                         List<String> refundPriceDiffFile, String cUser,List<OCashReceivablesVo> oCashReceivablesVoList)throws ProcessException{
+                                         List<String> refundPriceDiffFile, String cUser,List<OCashReceivablesVo> oCashReceivablesVoList,AgentVo agentVo)throws ProcessException{
 
         try {
             if(PriceDiffType.DETAIN_AMT.code.equals(oRefundPriceDiff.getApplyCompType())){
@@ -458,13 +466,16 @@ public class CompensateServiceImpl implements CompensateService {
                     throw new ProcessException("保存失败");
                 }
             });
+            if(agentVo.getFlag().equals("2")){
+                startCompensateActiviy(priceDiffId,cUser);
+            }
             return AgentResult.ok(priceDiffId);
         }catch (ProcessException e) {
-            e.getStackTrace();
+            e.printStackTrace();
             log.info("退补差价保存失败");
             throw new ProcessException(e.getMessage());
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             log.info("退补差价保存失败");
             throw new ProcessException("退补差价保存失败");
         }
