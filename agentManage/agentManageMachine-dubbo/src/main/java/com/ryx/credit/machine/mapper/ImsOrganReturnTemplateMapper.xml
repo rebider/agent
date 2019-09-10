@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.machine.dao.ImsOrganReturnTemplateMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.machine.entity.ImsOrganReturnTemplate">
+    <id column="TEMPLATE_ID" jdbcType="CHAR" property="templateId" />
+    <result column="ORG_ID" jdbcType="VARCHAR" property="orgId" />
+    <result column="ACTIVITY_ID" jdbcType="CHAR" property="activityId" />
+    <result column="ACTIVE_TEMPLATE_TYPE" jdbcType="CHAR" property="activeTemplateType" />
+    <result column="ACTIVE_BACK_AMOUNT" jdbcType="DECIMAL" property="activeBackAmount" />
+    <result column="ACTIVE_BACK_PERCENTAGE" jdbcType="DECIMAL" property="activeBackPercentage" />
+    <result column="STAND_TEMPLATE_TYPE" jdbcType="CHAR" property="standTemplateType" />
+    <result column="STAND_BACK_AMOUNT" jdbcType="DECIMAL" property="standBackAmount" />
+    <result column="STAND_BACK_PERCENTAGE" jdbcType="DECIMAL" property="standBackPercentage" />
+    <result column="BONUS_TEMPLATE_TYPE" jdbcType="CHAR" property="bonusTemplateType" />
+    <result column="BONUS_BACK_AMOUNT" jdbcType="DECIMAL" property="bonusBackAmount" />
+    <result column="BONUS_BACK_PERCENTAGE" jdbcType="DECIMAL" property="bonusBackPercentage" />
+    <result column="STATUS" jdbcType="CHAR" property="status" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="CREATE_USER" jdbcType="VARCHAR" property="createUser" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="UPDATE_USER" jdbcType="VARCHAR" property="updateUser" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    TEMPLATE_ID, ORG_ID, ACTIVITY_ID, ACTIVE_TEMPLATE_TYPE, ACTIVE_BACK_AMOUNT, ACTIVE_BACK_PERCENTAGE, 
+    STAND_TEMPLATE_TYPE, STAND_BACK_AMOUNT, STAND_BACK_PERCENTAGE, BONUS_TEMPLATE_TYPE, 
+    BONUS_BACK_AMOUNT, BONUS_BACK_PERCENTAGE, STATUS, REMARK, CREATE_TIME, CREATE_USER, 
+    UPDATE_TIME, UPDATE_USER
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.machine.entity.ImsOrganReturnTemplateExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from IMS_ORGAN_RETURN_TEMPLATE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from IMS_ORGAN_RETURN_TEMPLATE
+    where TEMPLATE_ID = #{templateId,jdbcType=CHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.machine.entity.ImsOrganReturnTemplateExample">
+    delete from IMS_ORGAN_RETURN_TEMPLATE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.machine.entity.ImsOrganReturnTemplate">
+    insert into IMS_ORGAN_RETURN_TEMPLATE (TEMPLATE_ID, ORG_ID, ACTIVITY_ID, 
+      ACTIVE_TEMPLATE_TYPE, ACTIVE_BACK_AMOUNT, ACTIVE_BACK_PERCENTAGE, 
+      STAND_TEMPLATE_TYPE, STAND_BACK_AMOUNT, STAND_BACK_PERCENTAGE, 
+      BONUS_TEMPLATE_TYPE, BONUS_BACK_AMOUNT, BONUS_BACK_PERCENTAGE, 
+      STATUS, REMARK, CREATE_TIME, 
+      CREATE_USER, UPDATE_TIME, UPDATE_USER
+      )
+    values (#{templateId,jdbcType=CHAR}, #{orgId,jdbcType=VARCHAR}, #{activityId,jdbcType=CHAR}, 
+      #{activeTemplateType,jdbcType=CHAR}, #{activeBackAmount,jdbcType=DECIMAL}, #{activeBackPercentage,jdbcType=DECIMAL}, 
+      #{standTemplateType,jdbcType=CHAR}, #{standBackAmount,jdbcType=DECIMAL}, #{standBackPercentage,jdbcType=DECIMAL}, 
+      #{bonusTemplateType,jdbcType=CHAR}, #{bonusBackAmount,jdbcType=DECIMAL}, #{bonusBackPercentage,jdbcType=DECIMAL}, 
+      #{status,jdbcType=CHAR}, #{remark,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{createUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.machine.entity.ImsOrganReturnTemplate">
+    insert into IMS_ORGAN_RETURN_TEMPLATE
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="templateId != null">
+        TEMPLATE_ID,
+      </if>
+      <if test="orgId != null">
+        ORG_ID,
+      </if>
+      <if test="activityId != null">
+        ACTIVITY_ID,
+      </if>
+      <if test="activeTemplateType != null">
+        ACTIVE_TEMPLATE_TYPE,
+      </if>
+      <if test="activeBackAmount != null">
+        ACTIVE_BACK_AMOUNT,
+      </if>
+      <if test="activeBackPercentage != null">
+        ACTIVE_BACK_PERCENTAGE,
+      </if>
+      <if test="standTemplateType != null">
+        STAND_TEMPLATE_TYPE,
+      </if>
+      <if test="standBackAmount != null">
+        STAND_BACK_AMOUNT,
+      </if>
+      <if test="standBackPercentage != null">
+        STAND_BACK_PERCENTAGE,
+      </if>
+      <if test="bonusTemplateType != null">
+        BONUS_TEMPLATE_TYPE,
+      </if>
+      <if test="bonusBackAmount != null">
+        BONUS_BACK_AMOUNT,
+      </if>
+      <if test="bonusBackPercentage != null">
+        BONUS_BACK_PERCENTAGE,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="remark != null">
+        REMARK,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+      <if test="createUser != null">
+        CREATE_USER,
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME,
+      </if>
+      <if test="updateUser != null">
+        UPDATE_USER,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="templateId != null">
+        #{templateId,jdbcType=CHAR},
+      </if>
+      <if test="orgId != null">
+        #{orgId,jdbcType=VARCHAR},
+      </if>
+      <if test="activityId != null">
+        #{activityId,jdbcType=CHAR},
+      </if>
+      <if test="activeTemplateType != null">
+        #{activeTemplateType,jdbcType=CHAR},
+      </if>
+      <if test="activeBackAmount != null">
+        #{activeBackAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="activeBackPercentage != null">
+        #{activeBackPercentage,jdbcType=DECIMAL},
+      </if>
+      <if test="standTemplateType != null">
+        #{standTemplateType,jdbcType=CHAR},
+      </if>
+      <if test="standBackAmount != null">
+        #{standBackAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="standBackPercentage != null">
+        #{standBackPercentage,jdbcType=DECIMAL},
+      </if>
+      <if test="bonusTemplateType != null">
+        #{bonusTemplateType,jdbcType=CHAR},
+      </if>
+      <if test="bonusBackAmount != null">
+        #{bonusBackAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="bonusBackPercentage != null">
+        #{bonusBackPercentage,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUser != null">
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        #{updateUser,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.machine.entity.ImsOrganReturnTemplateExample" resultType="java.lang.Long">
+    select count(*) from IMS_ORGAN_RETURN_TEMPLATE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.machine.entity.ImsOrganReturnTemplate">
+    update IMS_ORGAN_RETURN_TEMPLATE
+    <set>
+      <if test="orgId != null">
+        ORG_ID = #{orgId,jdbcType=VARCHAR},
+      </if>
+      <if test="activityId != null">
+        ACTIVITY_ID = #{activityId,jdbcType=CHAR},
+      </if>
+      <if test="activeTemplateType != null">
+        ACTIVE_TEMPLATE_TYPE = #{activeTemplateType,jdbcType=CHAR},
+      </if>
+      <if test="activeBackAmount != null">
+        ACTIVE_BACK_AMOUNT = #{activeBackAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="activeBackPercentage != null">
+        ACTIVE_BACK_PERCENTAGE = #{activeBackPercentage,jdbcType=DECIMAL},
+      </if>
+      <if test="standTemplateType != null">
+        STAND_TEMPLATE_TYPE = #{standTemplateType,jdbcType=CHAR},
+      </if>
+      <if test="standBackAmount != null">
+        STAND_BACK_AMOUNT = #{standBackAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="standBackPercentage != null">
+        STAND_BACK_PERCENTAGE = #{standBackPercentage,jdbcType=DECIMAL},
+      </if>
+      <if test="bonusTemplateType != null">
+        BONUS_TEMPLATE_TYPE = #{bonusTemplateType,jdbcType=CHAR},
+      </if>
+      <if test="bonusBackAmount != null">
+        BONUS_BACK_AMOUNT = #{bonusBackAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="bonusBackPercentage != null">
+        BONUS_BACK_PERCENTAGE = #{bonusBackPercentage,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUser != null">
+        CREATE_USER = #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where TEMPLATE_ID = #{templateId,jdbcType=CHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.machine.entity.ImsOrganReturnTemplate">
+    update IMS_ORGAN_RETURN_TEMPLATE
+    set ORG_ID = #{orgId,jdbcType=VARCHAR},
+      ACTIVITY_ID = #{activityId,jdbcType=CHAR},
+      ACTIVE_TEMPLATE_TYPE = #{activeTemplateType,jdbcType=CHAR},
+      ACTIVE_BACK_AMOUNT = #{activeBackAmount,jdbcType=DECIMAL},
+      ACTIVE_BACK_PERCENTAGE = #{activeBackPercentage,jdbcType=DECIMAL},
+      STAND_TEMPLATE_TYPE = #{standTemplateType,jdbcType=CHAR},
+      STAND_BACK_AMOUNT = #{standBackAmount,jdbcType=DECIMAL},
+      STAND_BACK_PERCENTAGE = #{standBackPercentage,jdbcType=DECIMAL},
+      BONUS_TEMPLATE_TYPE = #{bonusTemplateType,jdbcType=CHAR},
+      BONUS_BACK_AMOUNT = #{bonusBackAmount,jdbcType=DECIMAL},
+      BONUS_BACK_PERCENTAGE = #{bonusBackPercentage,jdbcType=DECIMAL},
+      STATUS = #{status,jdbcType=CHAR},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      CREATE_USER = #{createUser,jdbcType=VARCHAR},
+      UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      UPDATE_USER = #{updateUser,jdbcType=VARCHAR}
+    where TEMPLATE_ID = #{templateId,jdbcType=CHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

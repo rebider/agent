@@ -386,23 +386,55 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             throw new MessageException("信息错误");
         }
         try{
+            AgentBusInfo agentBusInfo = null;
             for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
-                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                //校验业务编码是否存在
+                if (StringUtils.isNotBlank(agentBusInfoVo.getBusNum())) {
+                    if (StringUtils.isNotBlank(agentBusInfo.getBusNum())) {
+                        if (!agentBusInfo.getBusNum().equals(agentBusInfoVo.getBusNum())) {
+                            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+                            agentBusInfoExample.createCriteria()
+                                    .andStatusEqualTo(Status.STATUS_1.status)
+                                    .andBusNumEqualTo(agentBusInfoVo.getBusNum());
+                            List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+                            if (agentBusInfoList.size() > 0) {
+                                throw new MessageException("业务平台编码已存在！");
+                            }
+                        }
+                    }
+                }
+                //更新值
                 agentBusInfo.setBusType(agentBusInfoVo.getBusType());
                 agentBusInfo.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
                 agentBusInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
                 agentBusInfo.setBusContact(agentBusInfoVo.getBusContact());
                 agentBusInfo.setBusContactMobile(agentBusInfoVo.getBusContactMobile());
-                agentBusInfo.setBusContactEmail(agentBusInfoVo.getBusContactEmail());
+//                agentBusInfo.setBusContactEmail(agentBusInfoVo.getBusContactEmail());
                 agentBusInfo.setBusContactPerson(agentBusInfoVo.getBusContactPerson());
+                agentBusInfo.setBusNum(agentBusInfoVo.getBusNum());
                 agentBusInfo.setBusLoginNum(agentBusInfoVo.getBusLoginNum());
                 agentBusInfo.setBusStatus(agentBusInfoVo.getBusStatus());
                 if(StringUtils.isNotBlank(agentBusInfoVo.getOrganNum()))
                  agentBusInfo.setOrganNum(agentBusInfoVo.getOrganNum());
                 agentBusInfo.setVersion(agentBusInfo.getVersion());
-                int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
-                if (i != 1) {
+                agentBusInfo.setBusUseOrgan(agentBusInfoVo.getBusUseOrgan());
+                agentBusInfo.setBusScope(agentBusInfoVo.getBusScope());
+                int updateAgentBusinfo = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                if (updateAgentBusinfo != 1) {
+                    logger.info("业务数据-更新失败");
                     throw new MessageException("更新失败");
+                } else {
+                    if (StringUtils.isNotBlank(agentBusInfoVo.getBusNum())) {
+                        Agent agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
+                        agent.setcIncomStatus(AgentInStatus.IN.status);
+                        agent.setcUtime(new Date());
+                        int updateAgent = agentMapper.updateByPrimaryKeySelective(agent);
+                        if (updateAgent != 1) {
+                            logger.info("代理商数据-更新失败");
+                            throw new MessageException("更新失败");
+                        }
+                    }
                 }
             }
         } catch (MessageException e) {
@@ -538,7 +570,18 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 }
             }
             for (CapitalVo item : agentVo.getCapitalVoList()) {
+                if(agentVo.getCapitalVoList().size()!=0){
+                    if(StringUtils.isBlank(item.getcPayType())){
+                        throw new ProcessException("请选择打款方式");
+                    }
+                }
                 if(item.getcPayType().equals(PayType.YHHK.getValue())){
+                    if(StringUtils.isBlank(item.getcPayuser())){
+                        throw new ProcessException("请选择打款人");
+                    }
+                    if(item.getcPaytime()==null){
+                        throw new ProcessException("请选择打款时间");
+                    }
                     if(item.getCapitalTableFile()==null){
                         throw new ProcessException("银行汇款方式必须上传打款凭据");
                     }
