@@ -284,8 +284,8 @@
     </where>
   </select>
 <select id="getSN"  resultType="java.util.Map">
-  select SN_BEGIN_NUM,SN_END_NUM from O_TERMINAL_TRANSFER_DETAIL where TERMINAL_TRANSFER_ID in(
-  select ID from O_TERMINAL_TRANSFER where REVIEW_STATUS ='02' )  and STATUS ='1'
+    select SN_BEGIN_NUM,SN_END_NUM from O_TERMINAL_TRANSFER_DETAIL aaa left join A_AGENT bbb on aaa.AGENT_ID = bbb.id  where  aaa.TERMINAL_TRANSFER_ID in(
+  select ID from O_TERMINAL_TRANSFER where REVIEW_STATUS ='02' and STATUS ='1')  and aaa.STATUS ='1' and aaa.adjust_status = '1' and bbb.STATUS=1
 </select>
   <select id="querySubBusNum" parameterType="java.lang.String" resultType="java.util.Map">
 
