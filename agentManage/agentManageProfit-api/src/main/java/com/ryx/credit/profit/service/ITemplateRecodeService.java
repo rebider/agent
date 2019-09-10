@@ -30,7 +30,7 @@ public interface ITemplateRecodeService {
 
     TemplateRecode getTemplateRecodeById(String id);
 
-    Map<String,Object> getTemplateApplyDetail(String recordId);
+    Map<String,Object> getTemplateApplyDetail(String recordId) throws MessageException;
 
     void editInfo(Map<String,String> map1, JSONObject map2) throws MessageException;
 
@@ -39,5 +39,10 @@ public interface ITemplateRecodeService {
 
     Map<String,Object> checkAngAsign(String id)throws MessageException;
 
+    void updateApplyStatus(String status,String id);
+
+    Map<String,Object> checkTemplate(String applyId) throws MessageException;
+
+    Object checkTempalteName(String applyId)throws MessageException;
 
 }

@@ -3,6 +3,7 @@ package com.ryx.credit.machine.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.BackType;
 import com.ryx.credit.common.enumc.PlatformType;
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
@@ -66,6 +67,8 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
     private ImsTermAdjustMapper imsTermAdjustMapper;
     @Autowired
     private IOrderReturnService orderReturnService;
+    @Autowired
+    private ImsOrganReturnTemplateMapper imsOrganReturnTemplateMapper;
 
 
     @Override
@@ -110,14 +113,31 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
         return new ArrayList<>();
     }
 
+
+
+    /**
+     * IMS_ORGAN_RETURN_TEMPLATE
+     * ORG_ID 和 ACTIVITY_ID 这个去找对应的模板
+     * @param lowerHairMachineVo
+     * @return
+     * @throws Exception
+     */
     @Override
     public AgentResult lowerHairMachine(LowerHairMachineVo lowerHairMachineVo)throws Exception {
-        log.info("同步POS入库划拨数据开始:snList:{},请求参数:{}",lowerHairMachineVo.getSnList().size(),JSONObject.toJSONString(lowerHairMachineVo.getImsTermWarehouseDetail()));
+        log.info("同步SSPOS入库划拨数据开始:snList:{},请求参数:{}",lowerHairMachineVo.getSnList().size(),JSONObject.toJSONString(lowerHairMachineVo.getImsTermWarehouseDetail()));
         ImsTermWarehouseDetail imsTermWarehouseDetail = lowerHairMachineVo.getImsTermWarehouseDetail();
         Map<String,String> posInfo = imsTermMachineMapper.queryIMS_POS_ACTIVITY(imsTermWarehouseDetail.getMachineId());
         String POS_ID      =   posInfo.get("POS_ID");
         String ACTIVITY_ID =   posInfo.get("ACTIVITY_ID");
         ImsMachineActivity activity = imsMachineActivityMapper.selectByPrimaryKey(ACTIVITY_ID);
+        //判断是否设置返现模板
+        ImsOrganReturnTemplateExample imsOrganReturnTemplateCheck = new ImsOrganReturnTemplateExample();
+        imsOrganReturnTemplateCheck.or().andOrgIdEqualTo(imsTermWarehouseDetail.getOrgId()).andActivityIdEqualTo(ACTIVITY_ID);
+        if(imsOrganReturnTemplateMapper.countByExample(imsOrganReturnTemplateCheck)<=0){
+            log.info("同步SSPOS入库划拨数据异常:snList:{},请求参数:{},错误消息:{}",lowerHairMachineVo.getSnList().size(),JSONObject.toJSONString(lowerHairMachineVo.getImsTermWarehouseDetail()),"没有设置返现模板");
+            return AgentResult.fail("没有设置返现模板么["+imsTermWarehouseDetail.getOrgId()+"]");
+        }
+        //检查商户是否有分润模板
         log.info("同步POS入库划拨:POS编号:{},活动编号:{},活动名称:{},sn：{}",POS_ID,ACTIVITY_ID,activity==null?"null":activity.getActivityName(),lowerHairMachineVo.getSnList());
         if(null==lowerHairMachineVo.getSnList()){
             throw new Exception("sn列表异常");

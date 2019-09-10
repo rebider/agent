@@ -51,7 +51,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
     private final static String PASSWORD = AppConfig.getProperty("encrypt.key"); // 加密key
     private final static String TICKET_INFO_URL = AppConfig.getProperty("jd.ticketInfo")+"?access_token="; // 获取发票信息url
 
-    private final static String[] ARRAY = {"研发和技术服务","研发服务","信息技术服务","软件服务","信息系统服务","现代服务","技术服务","信息技术服务","咨询服务"};
+    private final static String[] ARRAY_INVOICE = {"研发和技术服务","研发服务","信息技术服务","软件服务","信息系统服务","现代服务","技术服务","信息技术服务","咨询服务","服务费"};
 
 
     private String tocken = "";
@@ -217,8 +217,8 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                     if("1".equals(invoiceApply.getYsResult())){
                         Boolean flag = false;
                         if(StringUtils.isNotBlank(invoiceApply.getInvoiceItem())){
-                            for (int i = 0;i < ARRAY.length ; i++) {
-                                String str = ARRAY[i];
+                            for (int i = 0;i < ARRAY_INVOICE.length ; i++) {
+                                String str = ARRAY_INVOICE[i];
                                 if(invoiceApply.getInvoiceItem().indexOf(str) != -1){
                                     flag = true;
                                     break;
@@ -301,8 +301,9 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                         if(null == ownInvoice){
                             throw new MessageException("开票公司是：（"+invoiceApply.getInvoiceCompany()+"）未获取到欠票数据！");
                         }
-                        if(bg.add(mg).compareTo(ownInvoice) > 0){ // 表示本月到票大于本月欠票
-                            throw new MessageException("开票公司：("+invoiceApply.getInvoiceCompany()+")所开发票金额总计已大于本月欠票,不符合条件，请重新导入");
+                        BigDecimal subtra = bg.add(mg).subtract(ownInvoice);  //到票金额-欠票金额
+                        if(subtra.compareTo(new BigDecimal(10)) > 0 ){ //到票金额-欠票金额 大于 10元时
+                            throw new MessageException("开票公司：("+invoiceApply.getInvoiceCompany()+")所开发票金额总计超过本月欠票"+subtra+"元，不符合条件，请重新导入");
                         }else{
                             mapInvoice.put(invoiceApply.getInvoiceCompany(),mg);
                         }
