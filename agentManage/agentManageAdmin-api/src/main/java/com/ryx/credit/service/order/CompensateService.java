@@ -36,7 +36,7 @@ public interface CompensateService {
 
     AgentResult startCompensateActiviy(String id, String cuser) throws Exception;
 
-    AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception;
+    AgentResult approvalTask(AgentVo agentVo, String userId) throws ProcessException;
 
     AgentResult compressCompensateActivity(String proIns,BigDecimal agStatus)throws Exception;
 

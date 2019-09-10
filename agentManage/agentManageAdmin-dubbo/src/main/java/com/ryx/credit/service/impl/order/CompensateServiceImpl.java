@@ -600,7 +600,7 @@ public class CompensateServiceImpl implements CompensateService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception{
+    public AgentResult approvalTask(AgentVo agentVo, String userId) throws ProcessException{
         try {
             if(agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())){
                 BigDecimal deductAmt = new BigDecimal(0);
@@ -662,6 +662,9 @@ public class CompensateServiceImpl implements CompensateService {
             }
         } catch (ProcessException e) {
             e.printStackTrace();
+            throw new ProcessException(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
             throw new ProcessException("catch工作流处理任务异常!");
         }
         return AgentResult.ok();
@@ -704,6 +707,21 @@ public class CompensateServiceImpl implements CompensateService {
                     if(i!=1){
                         throw new ProcessException("更新明细失败");
                     }
+                }
+            }
+            if(StringUtils.isBlank(agentVo.getDeliveryTime())){
+                throw new ProcessException("请填写发货时间");
+            }
+            ORefundPriceDiffDetailExample oRefundPriceDiffDetailExample = new ORefundPriceDiffDetailExample();
+            ORefundPriceDiffDetailExample.Criteria criteria = oRefundPriceDiffDetailExample.createCriteria();
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
+            criteria.andRefundPriceDiffIdEqualTo(oRefundPriceDiff.getId());
+            List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(oRefundPriceDiffDetailExample);
+            for (ORefundPriceDiffDetail oRefundPriceDiffDetail : oRefundPriceDiffDetails) {
+                oRefundPriceDiffDetail.setDeliveryTime(agentVo.getDeliveryTime());
+                int i = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(oRefundPriceDiffDetail);
+                if(i==0){
+                    throw new ProcessException("更新发货时间失败");
                 }
             }
         }
