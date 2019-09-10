@@ -532,7 +532,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             }
             Map<String,Object> resultMap = JSONObject.parseObject(result);
             if(!(boolean)resultMap.get("result")){
-                throw new MessageException("校验模板信息失败，请重试！");
+                throw new MessageException(resultMap.get("msg").toString());
             }
             Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
             return objectMap;
