@@ -403,6 +403,11 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         Agent agent = agentVo.getAgent();
         AgentBusInfo agentBusInfo = agentVo.getBusInfoVoList().get(0);
         AgentColinfo agentColinfo = agentVo.getColinfoVoList().get(0);
+
+        if (agentBusInfo.getBusNum().equals(agentBusInfo.getBusLoginNum())) {
+            return AgentResult.fail("业务平台编号和平台登陆账号必须一致！");
+        }
+
         Map<String,Object> jsonParams = new HashMap<String, Object>();
         jsonParams = commonParam(jsonParams, agentColinfo, agent, agentBusInfo);
 
