@@ -2,6 +2,7 @@ package com.ryx.credit.service.order;
 
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.order.OInvoice;
@@ -50,13 +51,21 @@ public interface IOrderReturnService {
     void approvalFinish(String processInstanceId, String activityName)throws Exception;
 
     /**
-     * 退货列表及导出
+     * 查询退货所有数据&查询代理商退货数据
      * @param param
      * @param pageInfo
      * @return
      */
     PageInfo orderReturnList(Map<String, Object> param, PageInfo pageInfo);
 
+    /**
+     * 查询省区退货数据
+     * @param page
+     * @param map
+     * @param userId
+     * @return
+     */
+    PageInfo queryOrderReturnList(Page page, Map map, Long userId);
 
     List<String> addList(List<List<Object>> data, String user) throws Exception;
     AgentResult addListItem(List<Object> objectList, String user) throws Exception;
