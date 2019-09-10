@@ -296,7 +296,10 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             //判断平台是否重复
             List hav = new ArrayList();
             List<Organization> organList = null;
+            Map<String, Object> reqMap = new HashMap<>();
+            reqMap.put("agentVo",agentVo);
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
+                //如果业务平台编号不位空，说明是一个升级业务的操作，进行升级条件检查
                 if(StringUtils.isNotBlank(item.getBusNum())) {
                     if (!OrgType.zQ(item.getBusType())) {
                         throw new ProcessException("升级类型必须是直签");
@@ -304,7 +307,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     if (StringUtils.isBlank(item.getBusParent())){
                         throw new ProcessException("升级直签上级不能为空");
                     }
-                    Map<String, Object> reqMap = new HashMap<>();
                     reqMap.put("busInfo",item);
                     AgentResult agentResult = agentNetInNotityService.agencyLevelCheck(reqMap);
                     if(!agentResult.isOK()){
