@@ -459,12 +459,12 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
                     return AgentResult.fail(respJson.getString("msg"));
                 } else {
                     if(null != respJson.getString("msg")) {
-                        throw new Exception(respJson.getString("msg"));
+                        return AgentResult.fail(respJson.getString("msg"));
                     }
-                    throw new Exception("请求瑞大宝升级直签接口成功，返回值异常！");
+                    return AgentResult.fail("请求瑞大宝升级直签接口成功，返回值异常！");
                 }
             }else{
-                throw new Exception("请求瑞大宝升级直签接口失败！");
+                return AgentResult.fail("请求瑞大宝升级直签接口失败！");
             }
         } catch (Exception e) {
             e.printStackTrace();
