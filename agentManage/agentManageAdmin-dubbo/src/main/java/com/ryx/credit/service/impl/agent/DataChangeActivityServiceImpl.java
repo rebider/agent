@@ -5,10 +5,14 @@ import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.agent.*;
+import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
@@ -91,6 +95,10 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     private AttachmentRelMapper attachmentRelMapper;
     @Autowired
     private AgentContractService agentContractService;
+    @Autowired
+    private OrganizationMapper organizationMapper;
+    @Autowired
+    private PlatFormService platFormService;
 
 
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
@@ -715,6 +723,133 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                         throw new ProcessException("处理任务：更新失败");
                     }
                 }
+            }else if(orgCode.equals("market")){
+                //业务平台除pro类型 都赋值空
+                String ryx_pro = AppConfig.getProperty("ryx_pro");
+                String ryx_pro1 = AppConfig.getProperty("ryx_pro1");
+
+                //处理财务审批（财务出款机构）
+                for (AgentBusInfoVo agentBusInfoVo : agentVo.getMarketToporgTableIdForm()) {
+                    //上级机构和本级机构判断
+                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                    if(StringUtils.isNotBlank(agentBusInfoVo.getBusPlatform())){
+                        if (!agentBusInfoVo.getBusPlatform().equals(ryx_pro) && !agentBusInfoVo.getBusPlatform().equals(ryx_pro1)){
+                            agentBusInfoVo.setBusPlatform(" ");
+                        }else{
+                            //说明是pro类型的数据
+                            if(!agentBusInfoVo.getBusPlatform().equals(agentBusInfo.getBusPlatform())){
+                                Boolean busPlatExist = findBusPlatExist(agentBusInfo);
+                                if (busPlatExist){
+                                    throw new ProcessException("业务平台重复,请检查后再修改");
+                                }
+                            }
+
+                        }
+
+                    }
+                    //必须选择业务顶级机构
+                    if(StringUtils.isBlank(agentBusInfoVo.getOrganNum())){
+                        throw new ProcessException("请选择业务顶级机构");
+                    }
+
+                    if (StringUtils.isNotBlank(agentBusInfoVo.getBusPlatform())){
+                        agentBusInfo.setBusPlatform(agentBusInfoVo.getBusPlatform());
+                    }
+                    //上级机构判断
+                    if(agentBusInfo!=null){
+                        //上级存在
+                        if (StringUtils.isNotBlank(agentBusInfoVo.getBusParent())){
+                            //获取上级代理商类型
+                            AgentBusInfo busInfo = agentBusinfoService.getById(agentBusInfoVo.getBusParent());
+                            if (agentBusInfoVo.getBusType().equals(BusType.ZQ.key) || agentBusInfoVo.getBusType().equals(BusType.ZQBZF.key) || agentBusInfoVo.getBusType().equals(BusType.ZQZF.key)) {
+                                if (busInfo.getBusType().equals(BusType.ZQ.key) || busInfo.getBusType().equals(BusType.ZQZF.key) || busInfo.getBusType().equals(BusType.ZQBZF.key)) {
+                                    throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                                }
+                            }
+                            if (agentBusInfoVo.getBusType().equals(BusType.YDX.key)) {
+                                if (busInfo.getBusType().equals(BusType.ZQ.key) || busInfo.getBusType().equals(BusType.YDX.key)
+                                        || busInfo.getBusType().equals(BusType.ZQZF.key) || busInfo.getBusType().equals(BusType.ZQBZF.key)) {
+                                    throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                                }
+                            }
+                            if (agentBusInfoVo.getBusType().equals(BusType.JGYD.key)) {
+                                if (!busInfo.getBusType().equals(BusType.JG.key)) {
+                                    throw new ProcessException("不能选择同级别的代理商为上级，请重新选择");
+                                }
+                            }
+
+                            //上级不为空  说明选择了上级---校验业务平台
+                            AgentBusInfo parent = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getBusParent());
+                            PlatForm platForm = platFormService.selectByPlatformNum(parent.getBusPlatform());
+                            if (null!=parent){
+                                if (StringUtils.isNotBlank(agentBusInfoVo.getBusPlatform())){
+                                    if (!agentBusInfoVo.getBusPlatform().equals(parent.getBusPlatform())){
+                                        throw new ProcessException("审批失败:业务平台类型和上级代理商业务平台类型不同，上级代理商业务平台类型为:"+platForm.getPlatformName());
+                                    }
+                                }else{
+                                    //业务平台为空  说明不是pro类型的(前端没有传值进来) 需查询业务平台类型
+                                    if (!agentBusInfo.getBusPlatform().equals(parent.getBusPlatform())){
+                                        throw new ProcessException("审批失败:业务平台类型和上级代理商业务平台类型不同，上级代理商业务平台类型为:"+platForm.getPlatformName());
+                                    }
+                                }
+                                //校验顶级机构
+                                if(StringUtils.isNotBlank(parent.getOrganNum())){
+                                    //上级机构不为空判断与本级是否一致
+                                    if(!parent.getOrganNum().equals(agentBusInfoVo.getOrganNum())){
+                                        //提示上级机构是什么
+                                        Organization organization = organizationMapper.selectByPrimaryKey(parent.getOrganNum());
+                                        if(organization==null){
+                                            throw new ProcessException("审批失败:顶级机构和上级的顶级机构不同，上级顶级机构未找到");
+                                        }else{
+                                            throw new ProcessException("审批失败:顶级机构和上级的顶级机构不同，上级顶级机构为:"+organization.getOrgName());
+                                        }
+                                    }
+                                }else{
+                                    throw new ProcessException("审批失败:上级的顶级机构为空，请联系业务进行补全");
+                                }
+
+                            }
+
+
+
+                            agentBusInfo.setBusParent(agentBusInfoVo.getBusParent());
+                        }
+                        if(StringUtils.isNotBlank(agentBusInfo.getBusParent())){
+                            AgentBusInfo parent = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
+                            //上级必须有机构，如果没有机构需要提示补全
+                            if(parent!=null){
+                                //上级机构为空，提示必须填写，上级机构不为空判断与本级是否一致
+                                if(StringUtils.isNotBlank(parent.getOrganNum())){
+                                    //上级机构不为空判断与本级是否一致
+                                    if(!parent.getOrganNum().equals(agentBusInfoVo.getOrganNum())){
+                                        //提示上级机构是什么
+                                        Organization organization = organizationMapper.selectByPrimaryKey(parent.getOrganNum());
+                                        if(organization==null){
+                                            throw new ProcessException("审批失败:顶级机构和上级的顶级机构不同，上级顶级机构未找到");
+                                        }else{
+                                            throw new ProcessException("审批失败:顶级机构和上级的顶级机构不同，上级顶级机构为:"+organization.getOrgName());
+                                        }
+                                    }
+                                }else{
+                                    throw new ProcessException("审批失败:上级的顶级机构为空，请联系业务进行补全");
+                                }
+                            }
+                        }
+                        agentBusInfo.setOrganNum(agentBusInfoVo.getOrganNum());
+
+                        if(agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)!=1){
+                            throw new ProcessException("审批失败:业务顶级机构更新异常");
+                        }
+                        //修改业务审批关系表
+                        if (StringUtils.isNotBlank(agentVo.getSid()) && StringUtils.isNotBlank(agentBusInfoVo.getBusPlatform())){
+                            BusActRel byActivId = busActRelMapper.findByActivId(agentVo.getSid());
+                            byActivId.setNetInBusType("ACTIVITY_"+agentBusInfoVo.getBusPlatform());
+                            if(busActRelMapper.updateByPrimaryKeySelective(byActivId)!=1){
+                                throw new ProcessException("业务审批关系表更新异常");
+                            }
+                        }
+                    }
+                }
             }
 
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
@@ -752,5 +887,20 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
 
         return ResultVO.success(null);
     }
-
+    private Boolean findBusPlatExist(AgentBusInfo agentBusInfo) {
+        AgentBusInfoExample example = new AgentBusInfoExample();
+        AgentBusInfoExample.Criteria criteria = example.createCriteria();
+        criteria.andAgentIdEqualTo(agentBusInfo.getAgentId());
+        criteria.andBusPlatformEqualTo(agentBusInfo.getBusPlatform());
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andCloReviewStatusIn(Arrays.asList(AgStatus.Approved.status,AgStatus.Approving.status));
+        List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(example);
+        if (null == agentBusInfos) {
+            return true;
+        }
+        if (agentBusInfos.size() == 0) {
+            return false;
+        }
+        return true;
+    }
 }
