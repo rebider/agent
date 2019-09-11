@@ -9,6 +9,7 @@ import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.*;
+import com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail;
 import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -132,5 +133,15 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
     @Override
     public AgentResult queryTerminalTransferResult(String serialNumber, String type) throws Exception {
         return null;
+    }
+
+    @Override
+    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws Exception {
+        return  AgentResult.ok("未联动");
+    }
+
+    @Override
+    public AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception {
+        return AgentResult.ok("未联动");
     }
 }

@@ -17,6 +17,7 @@ import com.ryx.credit.machine.service.ImsTermMachineService;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.*;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
+import com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail;
 import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
@@ -37,10 +38,8 @@ import java.util.*;
 @Service("posTermMachineServiceImpl")
 public class PosTermMachineServiceImpl  implements TermMachineService {
 
-    private static Logger log = LoggerFactory.getLogger(PosTermMachineServiceImpl.class);
-
     private final static String ZHYY_CREATE_PERSON = AppConfig.getProperty("zhyy_create_person");
-
+    private static Logger log = LoggerFactory.getLogger(PosTermMachineServiceImpl.class);
     @Resource(name = "imsTermMachineService")
     private ImsTermMachineService imsTermMachineService;
     @Autowired
@@ -198,7 +197,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
             JSONObject jsonObject = JSONObject.parseObject(httpResult);
             if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
                 log.info("请求异常======" + httpResult);
-                throw new Exception("http请求异常");
+                return AgentResult.fail("接口调用失败");
             } else {
                 String resEncryptData = jsonObject.getString("encryptData");
                 String resEncryptKey = jsonObject.getString("encryptKey");
@@ -262,4 +261,38 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
         data.put("serialNumber", serialNumber);
         return request("ORG015", data);
     }
+
+
+    @Override
+    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws Exception {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("operation", operation);
+        List<Map<String, Object>> listDetail = new ArrayList<>();
+        for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {
+            Map<String, Object> mapDetail = new HashMap<>();
+            mapDetail.put("serialNumber", refundPriceDiffDetail.getId());
+            mapDetail.put("newOrgId", refundPriceDiffDetail.getNewOrgId());
+            mapDetail.put("oldOrgId", refundPriceDiffDetail.getOldOrgId());
+            mapDetail.put("posSnBegin", refundPriceDiffDetail.getBeginSn());
+            mapDetail.put("posSnEnd", refundPriceDiffDetail.getEndSn());
+            mapDetail.put("reqPayStatus", "1");
+            mapDetail.put("deliveryTime", refundPriceDiffDetail.getDeliveryTime());
+            mapDetail.put("newMachineId", refundPriceDiffDetail.getNewMachineId());
+            mapDetail.put("oldMachineId", refundPriceDiffDetail.getOldMachineId());
+            listDetail.add(mapDetail);
+        }
+        jsonObject.put("snList", listDetail);
+        log.info("活动调整POS请求参数:{}",JSONObject.toJSON(jsonObject));
+        return  request("ORG016", jsonObject);
+    }
+
+
+    @Override
+    public AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception{
+        JSONObject data = new JSONObject();
+        data.put("serialNumber", serialNumber);
+        return request("ORG017", data);
+    }
+
+
 }

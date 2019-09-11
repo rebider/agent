@@ -87,6 +87,27 @@ public class ORefundPriceDiffDetail  implements Serializable {
 
     private List<Map> proMaps;
 
+    private String newMachineId;
+
+    private String oldMachineId;
+
+
+    public String getNewMachineId() {
+        return newMachineId;
+    }
+
+    public void setNewMachineId(String newMachineId) {
+        this.newMachineId = newMachineId;
+    }
+
+    public String getOldMachineId() {
+        return oldMachineId;
+    }
+
+    public void setOldMachineId(String oldMachineId) {
+        this.oldMachineId = oldMachineId;
+    }
+
     public String getPlatformType() {
         return platformType;
     }
