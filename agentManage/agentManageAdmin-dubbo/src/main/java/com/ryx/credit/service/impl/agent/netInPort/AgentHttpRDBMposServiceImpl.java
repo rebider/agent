@@ -408,6 +408,10 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             return AgentResult.fail("业务平台编号和平台登陆账号必须一致！");
         }
 
+        if (null == agentBusInfo.getBusNum() || null == agentBusInfo.getBusLoginNum()) {
+            return AgentResult.fail("业务平台编号和平台登录账号不能为空！");
+        }
+
         Map<String,Object> jsonParams = new HashMap<String, Object>();
         jsonParams = commonParam(jsonParams, agentColinfo, agent, agentBusInfo);
 
