@@ -234,6 +234,14 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                         if(agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)!=1){
                             throw new ProcessException("审批失败:业务顶级机构更新异常");
                         }
+                        //修改业务审批关系表
+                        if (StringUtils.isNotBlank(agentVo.getSid())){
+                            BusActRel byActivId = busActRelMapper.findByActivId(agentVo.getSid());
+                            byActivId.setNetInBusType("ACTIVITY_"+agentBusInfoVo.getBusPlatform());
+                            if(busActRelMapper.updateByPrimaryKeySelective(byActivId)!=1){
+                                throw new ProcessException("业务审批关系表更新异常");
+                            }
+                        }
                     }
                 }
             }
