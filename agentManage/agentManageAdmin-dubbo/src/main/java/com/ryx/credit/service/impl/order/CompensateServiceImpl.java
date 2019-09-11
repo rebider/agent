@@ -456,7 +456,7 @@ public class CompensateServiceImpl implements CompensateService {
                 refundPriceDiffDetail.setStatus(Status.STATUS_1.status);
                 refundPriceDiffDetail.setVersion(Status.STATUS_0.status);
                 refundPriceDiffDetail.setOrderType(OrderType.NEW.getValue());
-                refundPriceDiffDetail.setSendStatus(Status.STATUS_0.status);
+                refundPriceDiffDetail.setSendStatus(LogisticsSendStatus.none_send.code);
                 OActivity frontActivity = activityMapper.selectByPrimaryKey(refundPriceDiffDetail.getActivityRealId());
                 if(frontActivity==null){
                     throw new ProcessException("查询新活动失败");
@@ -922,7 +922,7 @@ public class CompensateServiceImpl implements CompensateService {
 
                     });
                     row.setAppTime(new Date());
-
+                    row.setSendStatus(LogisticsSendStatus.send_ing.code);
                     int j = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(row);
                     if(j!=1){
                         throw new ProcessException("退补差价更新失败");
@@ -1327,5 +1327,7 @@ public class CompensateServiceImpl implements CompensateService {
         pageInfo.setTotal((int)refundPriceDiffDetailMapper.countByExample(refundPriceDiffDetailExample));
         return pageInfo;
     }
+
+
 
 }
