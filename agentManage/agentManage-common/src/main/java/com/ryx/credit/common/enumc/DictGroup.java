@@ -89,8 +89,10 @@ public enum DictGroup {
     RDBPOS("瑞大宝模块"),
     RDB_POS_LOWER("瑞大宝直签终端下限"),
 
-    AGENT_CODE_FILTER("代理商过滤代码");//过滤无效代理商用
+    AGENT_CODE_FILTER("代理商过滤代码"),
 
+    EMAIL("邮件模块"),
+    LOGISTICS_FAIL_EMAIL("物流失败邮件");
 
     public String  msg;
 
