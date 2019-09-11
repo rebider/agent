@@ -1124,6 +1124,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
     public ResultVO updateAgentVo(AgentVo agent, String userId,Boolean isPass,String saveStatus) throws MessageException {
+
+        AgentVo agentVo = agent;
         try {
 //            verifyOrgAndBZYD(agent.getBusInfoVoList());
             logger.info("用户{}{}修改代理商信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent));
@@ -1159,7 +1161,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
             if (agent.getBusInfoVoList() != null && agent.getBusInfoVoList().size() > 0) {
                 logger.info("用户{}{}修改代理商业务信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent.getBusInfoVoList()));
-                ResultVO updateAgentBusInfoVoRes = agentBusinfoService.updateAgentBusInfoVo(agent.getBusInfoVoList(), agent.getAgent(),userId,isPass,saveStatus);
+                ResultVO updateAgentBusInfoVoRes = agentBusinfoService.updateAgentBusInfoVo(agentVo, agent.getBusInfoVoList(), agent.getAgent(),userId,isPass,saveStatus);
                 logger.info("用户{}{}修改代理商业务信息结果{}", userId, agent.getAgent().getId(), updateAgentBusInfoVoRes.getResInfo());
             }
 
