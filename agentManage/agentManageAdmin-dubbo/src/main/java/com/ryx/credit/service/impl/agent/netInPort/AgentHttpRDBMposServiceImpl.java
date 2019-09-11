@@ -418,6 +418,10 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             return AgentResult.fail("业务平台编号和平台登陆账号必须一致！");
         }
 
+        if (null == agentBusInfo.getBusNum() || null == agentBusInfo.getBusLoginNum()) {
+            return AgentResult.fail("业务平台编号和平台登录账号不能为空！");
+        }
+
         Map<String,Object> jsonParams = new HashMap<String, Object>();
         jsonParams = commonParam(jsonParams, agentColinfo, agent, agentBusInfo);
 
@@ -469,12 +473,12 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
                     return AgentResult.fail(respJson.getString("msg"));
                 } else {
                     if(null != respJson.getString("msg")) {
-                        throw new Exception(respJson.getString("msg"));
+                        return AgentResult.fail(respJson.getString("msg"));
                     }
-                    throw new Exception("请求瑞大宝升级直签接口成功，返回值异常！");
+                    return AgentResult.fail("请求瑞大宝升级直签接口成功，返回值异常！");
                 }
             }else{
-                throw new Exception("请求瑞大宝升级直签接口失败！");
+                return AgentResult.fail("请求瑞大宝升级直签接口失败！");
             }
         } catch (Exception e) {
             e.printStackTrace();
