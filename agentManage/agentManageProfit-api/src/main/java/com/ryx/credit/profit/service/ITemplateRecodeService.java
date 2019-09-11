@@ -45,4 +45,8 @@ public interface ITemplateRecodeService {
 
     Object checkTempalteName(String applyId)throws MessageException;
 
+    Map<String,Object> getRJTemplateNow(String orgId)throws MessageException;
+
+    Map<String,Object> getRJTemplateDetail(String applyId) throws MessageException;
+
 }

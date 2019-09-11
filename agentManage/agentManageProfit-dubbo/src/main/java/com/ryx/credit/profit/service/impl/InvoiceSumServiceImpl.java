@@ -159,10 +159,12 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
         BigDecimal surplusAmt = invoiceSum.getOwnInvoice().subtract((BigDecimal) param.get("INVOICE_AMT"));
         try {
             if(surplusAmt.compareTo(BigDecimal.ZERO) < 0){
-                logger.info("发票金额大于本月欠票数");
-                resultMap.put("returnCode", 0000);
-                resultMap.put("returnInfo", "发票金额大于本月欠票数");
-                return resultMap;
+                if( surplusAmt.add(new BigDecimal(10)).compareTo(BigDecimal.ZERO) < 0){
+                    logger.info("发票金额大于本月欠票数超过10元");
+                    resultMap.put("returnCode", 0000);
+                    resultMap.put("returnInfo", "发票金额超过本月欠票数多于10元");
+                    return resultMap;
+                }
             }
             if (surplusAmt.compareTo(BigDecimal.ZERO) == 0) {
                 AdjustFreeze(param);
