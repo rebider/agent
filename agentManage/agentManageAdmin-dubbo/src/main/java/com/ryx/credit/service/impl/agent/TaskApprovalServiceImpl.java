@@ -142,7 +142,8 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                         }else{
                             //说明是pro类型的数据
                             if(!agentBusInfoVo.getBusPlatform().equals(agentBusInfo.getBusPlatform())){
-                                Boolean busPlatExist = findBusPlatExist(agentBusInfo);
+                                agentBusInfoVo.setAgentId(agentBusInfo.getAgentId());
+                                Boolean busPlatExist = findBusPlatExist(agentBusInfoVo);
                                 if (busPlatExist){
                                     throw new ProcessException("业务平台重复,请检查后再修改");
                                 }
