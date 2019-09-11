@@ -134,9 +134,17 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
 
                 //处理财务审批（财务出款机构）
                 for (AgentBusInfoVo agentBusInfoVo : agentVo.getMarketToporgTableIdForm()) {
+                    //上级机构和本级机构判断
+                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
                     if(StringUtils.isNotBlank(agentBusInfoVo.getBusPlatform())){
                         if (!agentBusInfoVo.getBusPlatform().equals(ryx_pro) && !agentBusInfoVo.getBusPlatform().equals(ryx_pro1)){
                             agentBusInfoVo.setBusPlatform(" ");
+                        }else{
+                            //说明是pro类型的数据
+                            Boolean busPlatExist = findBusPlatExist(agentBusInfo);
+                            if (busPlatExist){
+                                throw new ProcessException("业务平台重复,请检查后再修改");
+                            }
                         }
 
                     }
@@ -144,8 +152,7 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                     if(StringUtils.isBlank(agentBusInfoVo.getOrganNum())){
                         throw new ProcessException("请选择业务顶级机构");
                     }
-                    //上级机构和本级机构判断
-                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+
                     if (StringUtils.isNotBlank(agentBusInfoVo.getBusPlatform())){
                         agentBusInfo.setBusPlatform(agentBusInfoVo.getBusPlatform());
                     }
@@ -504,5 +511,22 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
             String proce = activityService.createDeloyFlow(null,workId,null,null,startPar);
             busActRelMapper.updateActivIdByActivId(busActRel.getActivId(),proce);
         }
+    }
+
+    private Boolean findBusPlatExist(AgentBusInfo agentBusInfo) {
+        AgentBusInfoExample example = new AgentBusInfoExample();
+        AgentBusInfoExample.Criteria criteria = example.createCriteria();
+        criteria.andAgentIdEqualTo(agentBusInfo.getAgentId());
+        criteria.andBusPlatformEqualTo(agentBusInfo.getBusPlatform());
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andCloReviewStatusIn(Arrays.asList(AgStatus.Approved.status,AgStatus.Approving.status));
+        List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(example);
+        if (null == agentBusInfos) {
+            return true;
+        }
+        if (agentBusInfos.size() == 0) {
+            return false;
+        }
+        return true;
     }
 }
