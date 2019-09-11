@@ -191,7 +191,13 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         record.setBusType(dateChangeRequest.getDataType());//流程关系类型是数据申请类型
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(dateChangeRequest.getDataId());
-        record.setDataShiro(BusActRelBusType.DC_Agent.key);
+        if(dateChangeRequest.getDataType().equals(BusActRelBusType.DC_Agent.name())){
+            record.setDataShiro(BusActRelBusType.DC_Agent.key);
+        }else if(dateChangeRequest.getDataType().equals(BusActRelBusType.DC_Colinfo.name())){
+            record.setDataShiro(BusActRelBusType.DC_Colinfo.key);
+        }else{
+            record.setDataShiro(BusActRelBusType.DC_Agent.key);
+        }
         Agent agent = agentMapper.selectByPrimaryKey(dateChangeRequest.getDataId());
         if(agent!=null)
             record.setAgentName(agent.getAgName());
@@ -254,27 +260,27 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                         logger.info("========审批流完成{}业务{}状态{},结果{}", proIns, rel.getBusType(), agStatus, res.getResInfo());
                         //更新数据状态为审批成功
                         if(res.isSuccess()){
-                           //调整出款机构
-                           if(vo!=null && vo.getColinfoVoList()!=null && vo.getColinfoVoList().size()>0 && vo.getAgent()!=null && vo.getAgent().getId()!=null){
-                               //查询业务调整出款机构
-                               AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
-                               agentBusInfoExample.or()
-                                       .andStatusEqualTo(Status.STATUS_1.status)
-                                       .andCloReviewStatusEqualTo(AgStatus.Approved.status)
-                                       .andAgentIdEqualTo(vo.getAgent().getId());
-                               List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+                            //调整出款机构
+                            if(vo!=null && vo.getColinfoVoList()!=null && vo.getColinfoVoList().size()>0 && vo.getAgent()!=null && vo.getAgent().getId()!=null){
+                                //查询业务调整出款机构
+                                AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+                                agentBusInfoExample.or()
+                                        .andStatusEqualTo(Status.STATUS_1.status)
+                                        .andCloReviewStatusEqualTo(AgStatus.Approved.status)
+                                        .andAgentIdEqualTo(vo.getAgent().getId());
+                                List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
 
-                               for (AgentColinfoVo agentColinfoVo : vo.getColinfoVoList()) {
-                                   for (AgentBusInfo agentBusInfo : agentBusInfoList) {
-                                       //如果对公就调整出款公司为瑞银信
-                                       if(agentColinfoVo.getCloType()!= null && BigDecimal.valueOf(1).compareTo(agentColinfoVo.getCloType())==0){
-                                               agentBusInfo.setFinaceRemitOrgan("ORG20190625000000000000048");
-                                       //对私为湶致
-                                       }else  if(agentColinfoVo.getCloType()!= null && BigDecimal.valueOf(2).compareTo(agentColinfoVo.getCloType())==0){
-                                               agentBusInfo.setFinaceRemitOrgan("ORG20190627000000000000000");
-                                       }
-                                       agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
-                                   }
+                                for (AgentColinfoVo agentColinfoVo : vo.getColinfoVoList()) {
+                                    for (AgentBusInfo agentBusInfo : agentBusInfoList) {
+                                        //如果对公就调整出款公司为瑞银信
+                                        if(agentColinfoVo.getCloType()!= null && BigDecimal.valueOf(1).compareTo(agentColinfoVo.getCloType())==0){
+                                            agentBusInfo.setFinaceRemitOrgan("ORG20190625000000000000048");
+                                            //对私为湶致
+                                        }else  if(agentColinfoVo.getCloType()!= null && BigDecimal.valueOf(2).compareTo(agentColinfoVo.getCloType())==0){
+                                            agentBusInfo.setFinaceRemitOrgan("ORG20190627000000000000000");
+                                        }
+                                        agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                                    }
 
                                 }
                             }
@@ -293,7 +299,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
 //                            list.add(PlatformType.MPOS.code);
 //                            list.add(PlatformType.RHPOS.code);
                             platFormExample.or()
-                            .andStatusEqualTo(Status.STATUS_1.status);
+                                    .andStatusEqualTo(Status.STATUS_1.status);
 //                            .andPlatformTypeIn(list);
                             List<PlatForm>  platForms = platFormMapper.selectByExample(platFormExample);
                             List<String> pltcode = new ArrayList<>();
@@ -619,13 +625,13 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
      */
     public boolean checkNewAccount(AgentColinfoVo newColinfo,AgentColinfoVo oldColinfo){
         return (newColinfo.getCloRealname().equals(oldColinfo.getCloRealname())) &&    //收款账户名
-                    (newColinfo.getCloBankAccount().equals(oldColinfo.getCloBankAccount())) &&  //收款账号
-                        (newColinfo.getCloBankCode().equals(oldColinfo.getCloBankCode())) &&    //收款开户总行
-                            (newColinfo.getBankRegion().equals(oldColinfo.getBankRegion())) &&  //开户行地区
-                                (newColinfo.getCloBankBranch().equals(oldColinfo.getCloBankBranch())) &&    //收款开户支行
-                                    (newColinfo.getAllLineNum().equals(oldColinfo.getAllLineNum())) &&  //总行联行号
-                                        (newColinfo.getBranchLineNum().equals(oldColinfo.getBranchLineNum())) &&    //支行联行号
-                                          (newColinfo.getAgLegalCernum().equals(oldColinfo.getAgLegalCernum()));  //户主证件号
+                (newColinfo.getCloBankAccount().equals(oldColinfo.getCloBankAccount())) &&  //收款账号
+                (newColinfo.getCloBankCode().equals(oldColinfo.getCloBankCode())) &&    //收款开户总行
+                (newColinfo.getBankRegion().equals(oldColinfo.getBankRegion())) &&  //开户行地区
+                (newColinfo.getCloBankBranch().equals(oldColinfo.getCloBankBranch())) &&    //收款开户支行
+                (newColinfo.getAllLineNum().equals(oldColinfo.getAllLineNum())) &&  //总行联行号
+                (newColinfo.getBranchLineNum().equals(oldColinfo.getBranchLineNum())) &&    //支行联行号
+                (newColinfo.getAgLegalCernum().equals(oldColinfo.getAgLegalCernum()));  //户主证件号
     }
 
     /**
@@ -635,15 +641,15 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
      */
     public boolean isMustSyn(AgentColinfoVo newColinfo,AgentColinfoVo oldColinfo,Agent agent,Agent preagent){
         return checkNewAccount(newColinfo,oldColinfo) && (newColinfo.getCloType().equals(oldColinfo.getCloType())) &&  //收款账户类型
-                    (newColinfo.getCloTaxPoint().equals(oldColinfo.getCloTaxPoint())) &&    //税点
-                        (newColinfo.getCloInvoice().equals(oldColinfo.getCloInvoice())) &&  //是否开具分润发票
-                          (newColinfo.getStatus().equals(oldColinfo.getStatus())) &&  //是否有
-                            agent.getAgName().equals(preagent.getAgName()) && //代理商名称
-                                agent.getAgBusLic().equals(preagent.getAgBusLic()) &&   //代理商营业执照
-                                    agent.getAgLegalCernum().equals(preagent.getAgLegalCernum()) && //法人证件号
-                                        agent.getAgLegal().equals(preagent.getAgLegal()) && //法人姓名
-                                            agent.getAgRegArea().equals(preagent.getAgRegArea()) && // 注册地区
-                                                agent.getAgRegAdd().equals(preagent.getAgRegAdd()); //注册地址
+                (newColinfo.getCloTaxPoint().equals(oldColinfo.getCloTaxPoint())) &&    //税点
+                (newColinfo.getCloInvoice().equals(oldColinfo.getCloInvoice())) &&  //是否开具分润发票
+                (newColinfo.getStatus().equals(oldColinfo.getStatus())) &&  //是否有
+                agent.getAgName().equals(preagent.getAgName()) && //代理商名称
+                agent.getAgBusLic().equals(preagent.getAgBusLic()) &&   //代理商营业执照
+                agent.getAgLegalCernum().equals(preagent.getAgLegalCernum()) && //法人证件号
+                agent.getAgLegal().equals(preagent.getAgLegal()) && //法人姓名
+                agent.getAgRegArea().equals(preagent.getAgRegArea()) && // 注册地区
+                agent.getAgRegAdd().equals(preagent.getAgRegAdd()); //注册地址
     }
 
 
@@ -753,9 +759,6 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                         throw new ProcessException("请选择业务顶级机构");
                     }
 
-                    if (StringUtils.isNotBlank(agentBusInfoVo.getBusPlatform())){
-                        agentBusInfo.setBusPlatform(agentBusInfoVo.getBusPlatform());
-                    }
                     //上级机构判断
                     if(agentBusInfo!=null){
                         //上级存在
@@ -811,9 +814,6 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
 
                             }
 
-
-
-                            agentBusInfo.setBusParent(agentBusInfoVo.getBusParent());
                         }
                         if(StringUtils.isNotBlank(agentBusInfo.getBusParent())){
                             AgentBusInfo parent = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
@@ -836,11 +836,27 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                 }
                             }
                         }
-                        agentBusInfo.setOrganNum(agentBusInfoVo.getOrganNum());
-
-                        if(agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)!=1){
-                            throw new ProcessException("审批失败:业务顶级机构更新异常");
+//
+                        AgentVo vo = JSONObject.parseObject(dateChangeRequest.getDataContent(), AgentVo.class);
+                        List<AgentBusInfoVo> busInfoVoList = vo.getBusInfoVoList();
+                        for (AgentBusInfoVo busInfoVo : busInfoVoList) {
+                            if(busInfoVo.getId().equals(agentBusInfo.getId())){
+                                busInfoVo.setOrganNum(agentBusInfoVo.getOrganNum());
+                                if (StringUtils.isNotBlank(agentBusInfoVo.getBusPlatform())){
+                                    busInfoVo.setBusPlatform(agentBusInfoVo.getBusPlatform());
+                                }
+                                if (StringUtils.isNotBlank(agentBusInfoVo.getBusParent())){
+                                    busInfoVo.setBusParent(agentBusInfoVo.getBusParent());
+                                }
+                            }
                         }
+                        String voJson = JSONObject.toJSONString(vo);
+                        dateChangeRequest.setDataContent(voJson);
+                        int i = dataChangeActivityService.updateByPrimaryKeySelective(dateChangeRequest);
+                        if(i!=1){
+                            throw new ProcessException("处理任务：更新失败");
+                        }
+
                         //修改业务审批关系表
                         if (StringUtils.isNotBlank(agentVo.getSid()) && StringUtils.isNotBlank(agentBusInfoVo.getBusPlatform())){
                             BusActRel byActivId = busActRelMapper.findByActivId(agentVo.getSid());
