@@ -310,7 +310,7 @@ public class AgentServiceImpl implements AgentService {
             if (StringUtils.isNotEmpty(ca.getAgentid())) {
                 Agent agent = agentMapper.selectByPrimaryKey(ca.getAgentid());
                 if (agent != null){
-                    if(agent.getStatus().compareTo(Status.STATUS_1.status)==0)
+//                    if(agent.getStatus().compareTo(Status.STATUS_1.status)==0)
                     return agent;
                 }
             }

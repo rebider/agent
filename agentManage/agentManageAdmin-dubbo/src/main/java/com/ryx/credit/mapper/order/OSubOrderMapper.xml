@@ -367,4 +367,17 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="selectProNumByBusNum" parameterType="string" resultType="long">
+    select
+        sum(so.pro_num)
+    from
+        o_sub_order so
+    left join o_order o
+        on so.order_id = o.id
+    left join a_agent_businfo ab
+        on o.bus_id = ab.id
+    where o.review_status = 3 and o.re ab.bus_num = #{busNum}
+  </select>
+
 </mapper>

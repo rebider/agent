@@ -1217,7 +1217,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 throw new MessageException("请输入正确的起始和结束SN号位数");
             }
             //检查不一样的字符串是否是联迪sn 位数是是否是12位 变更为是否是字符开头 否则按照普通规则进行匹配
-            if(start.length()==12 && (sSub.matches("^[A-Za-z]+\\d{4}") || eSub.matches("^[A-Za-z]+\\d{4}"))){
+            if(sSub.matches("^[A-Za-z]+\\d{4}") || eSub.matches("^[A-Za-z]+\\d{4}")){
                 list= getBetweenValues(startSn, endSn);
                 logger.info("sn：{}，{}，使用联迪方式解析",start,end);
                 return list;
