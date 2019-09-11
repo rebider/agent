@@ -291,8 +291,8 @@
   <select id="getAgentInfoByBusNum" resultType="java.util.Map" parameterType="java.lang.String">
     select ab.AGENT_ID,aa.AG_NAME,ab.BUS_PLATFORM,ap.PLATFORM_NAME
     from A_AGENT_BUSINFO ab
-    left join A_AGENT aa on ab.AGENT_ID = aa.ID
-    left join A_PLATFORM ap on ab.BUS_PLATFORM = ap.PLATFORM_NUM
+    inner join A_AGENT aa on ab.AGENT_ID = aa.ID
+    inner join A_PLATFORM ap on ab.BUS_PLATFORM = ap.PLATFORM_NUM
     where ab.BUS_NUM = #{busNum}
   </select>
 

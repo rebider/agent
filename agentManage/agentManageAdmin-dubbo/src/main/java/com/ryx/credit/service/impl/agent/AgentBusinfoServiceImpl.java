@@ -13,6 +13,7 @@ import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentAssProtocolService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
@@ -239,7 +240,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	 */
 	@Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
 	@Override
-	public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent,String userId,Boolean isPass,String saveStatus)throws Exception {
+	public ResultVO updateAgentBusInfoVo(AgentVo agentVo, List<AgentBusInfoVo> busInfoVoList, Agent agent, String userId, Boolean isPass, String saveStatus)throws Exception {
 		try {
 			if(agent==null)throw new ProcessException("代理商信息不能为空");
 			Set<String> resultSet = new HashSet<>();
@@ -254,6 +255,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 						}
 						Map<String, Object> reqMap = new HashMap<>();
 						reqMap.put("busInfo",agentBusInfoVo);
+						reqMap.put("agentVo",agentVo);
 						AgentResult agentResult = agentNetInNotityService.agencyLevelCheck(reqMap);
 						if(!agentResult.isOK()){
 							throw new ProcessException(agentResult.getMsg());

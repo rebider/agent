@@ -416,6 +416,15 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         Agent agent = agentVo.getAgent();
         AgentBusInfo agentBusInfo = agentVo.getBusInfoVoList().get(0);
         AgentColinfo agentColinfo = agentVo.getColinfoVoList().get(0);
+
+        if (!agentBusInfo.getBusNum().equals(agentBusInfo.getBusLoginNum())) {
+            return AgentResult.fail("业务平台编号和平台登陆账号必须一致！");
+        }
+
+        if (null == agentBusInfo.getBusNum() || null == agentBusInfo.getBusLoginNum()) {
+            return AgentResult.fail("业务平台编号和平台登录账号不能为空！");
+        }
+
         Map<String,Object> jsonParams = new HashMap<String, Object>();
         jsonParams = commonParam(jsonParams, agentColinfo, agent, agentBusInfo);
 
@@ -428,8 +437,8 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         }
         Dict dict = dictOptionsService.findDictByName(DictGroup.RDBPOS.name(), DictGroup.RDB_POS_LOWER.name(), agentBusInfo.getBusType());//直签终端下限数
         requMap.put("termCount",dict.getdItemvalue());//直签终端下限数
-        requMap.put("channelTopId",agentBusInfo.getBusNum());
-        requMap.put("mobile",agentBusInfo.getBusLoginNum().trim());
+        requMap.put("channelTopId",agentBusInfo.getFinaceRemitOrgan());
+        requMap.put("mobile",agentBusInfo.getBusNum().trim());
         requMap.put("branchid",agentBusInfo.getBusPlatform().split("_")[0]);
         requMap.put("cardno",jsonParams.get("cardno"));
         requMap.put("bankbranchid",jsonParams.get("bankbranchid"));
@@ -467,12 +476,12 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
                     return AgentResult.fail(respJson.getString("msg"));
                 } else {
                     if(null != respJson.getString("msg")) {
-                        throw new Exception(respJson.getString("msg"));
+                        return AgentResult.fail(respJson.getString("msg"));
                     }
-                    throw new Exception("请求瑞大宝升级直签接口成功，返回值异常！");
+                    return AgentResult.fail("请求瑞大宝升级直签接口成功，返回值异常！");
                 }
             }else{
-                throw new Exception("请求瑞大宝升级直签接口失败！");
+                return AgentResult.fail("请求瑞大宝升级直签接口失败！");
             }
         } catch (Exception e) {
             e.printStackTrace();
