@@ -32,6 +32,7 @@ import com.ryx.credit.service.order.CompensateService;
 import com.ryx.credit.service.order.OCashReceivablesService;
 import com.ryx.credit.service.order.OrderActivityService;
 import com.ryx.credit.service.order.ProductService;
+import com.ryx.internet.pojo.OInternetCardImport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1328,6 +1329,29 @@ public class CompensateServiceImpl implements CompensateService {
         return pageInfo;
     }
 
+
+
+
+//    @Override
+    public List<ORefundPriceDiffDetail> queryPriceDiffDetail(){
+
+        ORefundPriceDiffDetailExample oRefundPriceDiffDetailExample = new ORefundPriceDiffDetailExample();
+        ORefundPriceDiffDetailExample.Criteria criteria = oRefundPriceDiffDetailExample.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+
+
+        List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(oRefundPriceDiffDetailExample);
+
+        return oRefundPriceDiffDetails;
+    }
+
+
+    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
+//    @Override
+    public void disposePriceDiffDetail(ORefundPriceDiffDetail refundPriceDiffDetail)throws MessageException{
+
+
+    }
 
 
 }
