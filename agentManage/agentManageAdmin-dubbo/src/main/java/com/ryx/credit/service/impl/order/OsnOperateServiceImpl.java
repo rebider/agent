@@ -18,8 +18,10 @@ import com.ryx.credit.machine.vo.LowerHairMachineVo;
 import com.ryx.credit.machine.vo.MposSnVo;
 import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
+import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.agent.PlatForm;
 import com.ryx.credit.pojo.admin.order.*;
+import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OLogisticsService;
 import com.ryx.credit.service.order.OsnOperateService;
@@ -88,6 +90,8 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
     private OsnOperateService osnOperateService;
     @Autowired
     private InternetCardService internetCardService;
+    @Autowired
+    private DictOptionsService dictOptionsService;
 
     /**
      * 根据物流联动状态查询物流id
@@ -161,7 +165,13 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                                 logger.info("非退货物流处理 物流生成明细异常，更新数据库成功:{},{},{},{}",logistics.getId(),logistics.getSnBeginNum(),logistics.getSnEndNum(),e.getLocalizedMessage());
                             }
                             e.printStackTrace();
-                            AppConfig.sendEmails("logisticId:"+id+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                            List<Dict> dicts = dictOptionsService.dictList(DictGroup.EMAIL.name(), DictGroup.LOGISTICS_FAIL_EMAIL.name());
+                            String[] emailArr = new String[dicts.size()];
+                            for (int i = 0; i < dicts.size(); i++) {
+                                emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
+                            }
+                            AppConfig.sendEmail(emailArr, "瑞大宝，查询下发接口，发送请求失败：" + MailUtil.printStackTrace(e), "瑞大宝接口异常");
+                            //AppConfig.sendEmails("logisticId:"+id+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                         } catch (Exception e) {
                             logger.error("生成物流明细任务异常：", e);
                             logistics = oLogisticsMapper.selectByPrimaryKey(id);
@@ -173,7 +183,13 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                                 logger.info("非退货物流处理 物流生成明细异常，更新数据库成功:{},{},{},{}",logistics.getId(),logistics.getSnBeginNum(),logistics.getSnEndNum(),e.getLocalizedMessage());
                             }
                             e.printStackTrace();
-                            AppConfig.sendEmails("logisticId:"+id+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                            //从字典中取出相应的邮件人
+                            List<Dict> dicts = dictOptionsService.dictList(DictGroup.EMAIL.name(), DictGroup.LOGISTICS_FAIL_EMAIL.name());
+                            String[] emailArr = new String[dicts.size()];
+                            for (int i = 0; i < dicts.size(); i++) {
+                                emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
+                            }
+                            AppConfig.sendEmail(emailArr, "logisticId:"+id+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                         }
                     }
                 }
@@ -288,7 +304,13 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                                 //处理失败就停止
                             }
                         } catch (MessageException | ProcessException e) {
-                            AppConfig.sendEmails("logisticId:"+id+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                            List<Dict> dicts = dictOptionsService.dictList(DictGroup.EMAIL.name(), DictGroup.LOGISTICS_FAIL_EMAIL.name());
+                            String[] emailArr = new String[dicts.size()];
+                            for (int i = 0; i < dicts.size(); i++) {
+                                emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
+                            }
+                            AppConfig.sendEmail(emailArr, "logisticId:"+id+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                            //AppConfig.sendEmails("logisticId:"+id+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                             e.printStackTrace();
                             logisticsDetails.forEach(det -> {
                                 OLogisticsDetail detail = oLogisticsDetailMapper.selectByPrimaryKey(det.getId());
@@ -306,7 +328,13 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                             //处理失败就停止
 
                         } catch (Exception e) {
-                            AppConfig.sendEmails("logisticId:"+id+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                            List<Dict> dicts = dictOptionsService.dictList(DictGroup.EMAIL.name(), DictGroup.LOGISTICS_FAIL_EMAIL.name());
+                            String[] emailArr = new String[dicts.size()];
+                            for (int i = 0; i < dicts.size(); i++) {
+                                emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
+                            }
+                            AppConfig.sendEmail(emailArr, "logisticId:"+id+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                            //AppConfig.sendEmails("logisticId:"+id+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                             e.printStackTrace();
                             logisticsDetails.forEach(det -> {
                                 OLogisticsDetail detail = oLogisticsDetailMapper.selectByPrimaryKey(det.getId());
@@ -347,12 +375,18 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                     if (StringUtils.isNotEmpty(logistics.getcUser())) {
                         CUser cUser = cUserMapper.selectById(logistics.getcUser());
                         if (cUser != null && StringUtils.isNotEmpty(cUser.getUserEmail())) {
+                            //从字典中取出相应的邮件人
+                            List<Dict> dicts = dictOptionsService.dictList(DictGroup.EMAIL.name(), DictGroup.LOGISTICS_FAIL_EMAIL.name());
+                            String[] emailArr = new String[dicts.size()];
+                            for (int i = 0; i < dicts.size(); i++) {
+                                emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
+                            }
                             if (LogisticsSendStatus.send_fail.equals(logistics.getSendStatus()) || LogisticsSendStatus.send_part_fail.equals(logistics.getSendStatus())) {
                                 //发送异常邮件
-                                AppConfig.sendEmail(new String[]{cUser.getUserEmail()}, "物流发送失败，号码段:" + logistics.getSnBeginNum() + "-" + logistics.getSnBeginNum() + "(" + logistics.getSendMsg() + ")", "物流发送失败，号码段:" + logistics.getSnBeginNum());
+                                AppConfig.sendEmail(emailArr, "物流发送失败，号码段:" + logistics.getSnBeginNum() + "-" + logistics.getSnBeginNum() + "(" + logistics.getSendMsg() + ")", "物流发送失败，号码段:" + logistics.getSnBeginNum());
                             } else if (LogisticsSendStatus.send_success.equals(logistics.getSendStatus())) {
                                 //发送成功邮件
-                                AppConfig.sendEmail(new String[]{cUser.getUserEmail()}, "物流发送成功，号码段:" + logistics.getSnBeginNum() + "-" + logistics.getSnEndNum() + "(" + logistics.getSendMsg() + ")", "物流发送成功,号码段:" + logistics.getSnBeginNum());
+                                AppConfig.sendEmail(emailArr, "物流发送成功，号码段:" + logistics.getSnBeginNum() + "-" + logistics.getSnEndNum() + "(" + logistics.getSendMsg() + ")", "物流发送成功,号码段:" + logistics.getSnBeginNum());
                             }
                         }
                     }
@@ -403,7 +437,13 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                 throw new MessageException("物流明细列表生成为空列表");
             }
         } catch (MessageException e) {
-            AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+            List<Dict> dicts = dictOptionsService.dictList(DictGroup.EMAIL.name(), DictGroup.LOGISTICS_FAIL_EMAIL.name());
+            String[] emailArr = new String[dicts.size()];
+            for (int i = 0; i < dicts.size(); i++) {
+                emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
+            }
+            AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e),"任务生成物流明细错误报警OsnOperateServiceImpl");
+            //AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
             e.printStackTrace();
             logger.info("sn生成异常{},{},{}",logistics.getSnBeginNum(),logistics.getSnEndNum(),e.getLocalizedMessage());
             logger.error("sn生成异常",e);
@@ -764,7 +804,13 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                     return retMap;
                     //机具下发失败，更新物流明细为下发失败，并更新物流为发送失败
                 } else {
-                    AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+LogisticsDetailSendStatus.send_fail.msg, "任务生成物流明细错误报警OsnOperateServiceImpl");
+                    List<Dict> dicts = dictOptionsService.dictList(DictGroup.EMAIL.name(), DictGroup.LOGISTICS_FAIL_EMAIL.name());
+                    String[] emailArr = new String[dicts.size()];
+                    for (int i = 0; i < dicts.size(); i++) {
+                        emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
+                    }
+                    AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+LogisticsDetailSendStatus.send_fail.msg, "任务生成物流明细错误报警OsnOperateServiceImpl");
+                    //AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+LogisticsDetailSendStatus.send_fail.msg, "任务生成物流明细错误报警OsnOperateServiceImpl");
                     logger.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), posSendRes.getMsg());
                     listOLogisticsDetailSn.forEach(detail -> {
                         detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
@@ -777,13 +823,25 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                 }
                 //机具下发失败，更新物流明细为下发失败，并更新物流为发送失败，禁止继续发送 ,人工介入
             } catch (MessageException e) {
-                AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                List<Dict> dicts = dictOptionsService.dictList(DictGroup.EMAIL.name(), DictGroup.LOGISTICS_FAIL_EMAIL.name());
+                String[] emailArr = new String[dicts.size()];
+                for (int i = 0; i < dicts.size(); i++) {
+                    emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
+                }
+                AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                //AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                 e.printStackTrace();
                 logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage());
                 throw e;
                 //机具下发失败，更新物流明细为下发失败，并更新物流为发送失败 ，禁止继续发送,人工介入
             } catch (Exception e) {
-                AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                List<Dict> dicts = dictOptionsService.dictList(DictGroup.EMAIL.name(), DictGroup.LOGISTICS_FAIL_EMAIL.name());
+                String[] emailArr = new String[dicts.size()];
+                for (int i = 0; i < dicts.size(); i++) {
+                    emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
+                }
+                AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                //AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                 e.printStackTrace();
                 logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage());
                throw e;
@@ -841,7 +899,13 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                     return retMap;
                     //机具下发失败，更新物流明细为下发失败，更新物流信息未下发失败，禁止再次发送，人工介入
                 } else {
-                    AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum(), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                    List<Dict> dicts = dictOptionsService.dictList(DictGroup.EMAIL.name(), DictGroup.LOGISTICS_FAIL_EMAIL.name());
+                    String[] emailArr = new String[dicts.size()];
+                    for (int i = 0; i < dicts.size(); i++) {
+                        emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
+                    }
+                    AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum(), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                    //AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum(), "任务生成物流明细错误报警OsnOperateServiceImpl");
                     logger.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), lowerHairMachineRes.getMsg());
                     listOLogisticsDetailSn.forEach(detail -> {
                         detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
@@ -860,7 +924,13 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                 throw e;
                 //机具下发失败，更新物流明细为下发失败，更新物流信息未下发失败，禁止再次发送，人工介入
             } catch (Exception e) {
-                AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                List<Dict> dicts = dictOptionsService.dictList(DictGroup.EMAIL.name(), DictGroup.LOGISTICS_FAIL_EMAIL.name());
+                String[] emailArr = new String[dicts.size()];
+                for (int i = 0; i < dicts.size(); i++) {
+                    emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
+                }
+                AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                //AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                 e.printStackTrace();
                 logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage());
                 throw e;
@@ -901,7 +971,13 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                     return retMap;
 
                 }else{
-                    AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+LogisticsDetailSendStatus.send_fail.msg, "任务生成物流明细错误报警OsnOperateServiceImpl");
+                    List<Dict> dicts = dictOptionsService.dictList(DictGroup.EMAIL.name(), DictGroup.LOGISTICS_FAIL_EMAIL.name());
+                    String[] emailArr = new String[dicts.size()];
+                    for (int i = 0; i < dicts.size(); i++) {
+                        emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
+                    }
+                    AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+LogisticsDetailSendStatus.send_fail.msg, "任务生成物流明细错误报警OsnOperateServiceImpl");
+                    //AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+LogisticsDetailSendStatus.send_fail.msg, "任务生成物流明细错误报警OsnOperateServiceImpl");
                     logger.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), posSendRes.getMsg());
                     listOLogisticsDetailSn.forEach(detail -> {
                         detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
@@ -914,13 +990,25 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                 }
 
             } catch (MessageException e) {
-                AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                List<Dict> dicts = dictOptionsService.dictList(DictGroup.EMAIL.name(), DictGroup.LOGISTICS_FAIL_EMAIL.name());
+                String[] emailArr = new String[dicts.size()];
+                for (int i = 0; i < dicts.size(); i++) {
+                    emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
+                }
+                AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                //AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                 e.printStackTrace();
                 logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage());
                 throw e;
                 //机具下发失败，更新物流明细为下发失败，并更新物流为发送失败 ，禁止继续发送,人工介入
             } catch (Exception e) {
-                AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                List<Dict> dicts = dictOptionsService.dictList(DictGroup.EMAIL.name(), DictGroup.LOGISTICS_FAIL_EMAIL.name());
+                String[] emailArr = new String[dicts.size()];
+                for (int i = 0; i < dicts.size(); i++) {
+                    emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
+                }
+                AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                //AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                 e.printStackTrace();
                 logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage());
                 throw e;
@@ -995,7 +1083,13 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                         return retMap;
                     } else if (null != resJson.getString("code") && resJson.getString("code").equals("9999") && null != resJson.getBoolean("success") && !resJson.getBoolean("success")) {
                         //机具,下发失败，更新物流明细为下发失败，更新物流信息未下发失败，禁止再次发送，人工介入
-                        AppConfig.sendEmails("SN开始：" + logistics.getSnBeginNum() + ",SN结束：" + logistics.getSnEndNum(), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                        List<Dict> dicts = dictOptionsService.dictList(DictGroup.EMAIL.name(), DictGroup.LOGISTICS_FAIL_EMAIL.name());
+                        String[] emailArr = new String[dicts.size()];
+                        for (int i = 0; i < dicts.size(); i++) {
+                            emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
+                        }
+                        AppConfig.sendEmail(emailArr, "SN开始：" + logistics.getSnBeginNum() + ",SN结束：" + logistics.getSnEndNum(), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                        //AppConfig.sendEmails("SN开始：" + logistics.getSnBeginNum() + ",SN结束：" + logistics.getSnEndNum(), "任务生成物流明细错误报警OsnOperateServiceImpl");
                         logger.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), resJson.getString("msg"));
                         listOLogisticsDetailSn.forEach(detail -> {
                             detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
@@ -1021,12 +1115,17 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    AppConfig.sendEmails("瑞大宝，查询下发接口，发送请求失败：" + MailUtil.printStackTrace(e), "瑞大宝接口异常");
                     throw e;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                AppConfig.sendEmails("瑞大宝，下发接口，发送请求失败：" + MailUtil.printStackTrace(e), "瑞大宝接口异常");
+                //发送异常邮件
+                List<Dict> dicts = dictOptionsService.dictList(DictGroup.EMAIL.name(), DictGroup.LOGISTICS_FAIL_EMAIL.name());
+                String[] emailArr = new String[dicts.size()];
+                for (int i = 0; i < dicts.size(); i++) {
+                    emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
+                }
+                AppConfig.sendEmail(emailArr, "瑞大宝，查询下发接口，发送请求失败：" + MailUtil.printStackTrace(e), "瑞大宝接口异常");
                 throw e;
             }
         } else {
