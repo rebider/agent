@@ -296,7 +296,10 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             //判断平台是否重复
             List hav = new ArrayList();
             List<Organization> organList = null;
+            Map<String, Object> reqMap = new HashMap<>();
+            reqMap.put("agentVo",agentVo);
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
+                //如果业务平台编号不位空，说明是一个升级业务的操作，进行升级条件检查
                 if(StringUtils.isNotBlank(item.getBusNum())) {
                     if (!OrgType.zQ(item.getBusType())) {
                         throw new ProcessException("升级类型必须是直签");
@@ -304,7 +307,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     if (StringUtils.isBlank(item.getBusParent())){
                         throw new ProcessException("升级直签上级不能为空");
                     }
-                    Map<String, Object> reqMap = new HashMap<>();
                     reqMap.put("busInfo",item);
                     AgentResult agentResult = agentNetInNotityService.agencyLevelCheck(reqMap);
                     if(!agentResult.isOK()){
@@ -566,6 +568,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         record.setNetInBusType("ACTIVITY_"+agentBusInfo.getBusPlatform());
         record.setAgDocPro(agentBusInfo.getAgDocPro());
         record.setAgDocDistrict(agentBusInfo.getAgDocDistrict());
+        if (StringUtils.isNotBlank(agentBusInfo.getBusNum())){
+            record.setExplain(agentBusInfo.getBusNum());
+        }
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("代理商审批，启动审批异常，添加审批关系失败{}:{}", agentId, proce);
         }
@@ -678,6 +683,10 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         record.setAgDocPro(abus.getAgDocPro());
         record.setAgDocDistrict(abus.getAgDocDistrict());
         record.setNetInBusType("ACTIVITY_"+platForm.getPlatformNum());
+
+        if (StringUtils.isNotBlank(abus.getBusNum())){
+            record.setExplain(abus.getBusNum());
+        }
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("代理商业务启动审批异常，添加审批关系失败{}:{}", record.getBusId(), proce);
             throw new MessageException("添加审批关系失败!");
@@ -1122,6 +1131,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
     public ResultVO updateAgentVo(AgentVo agent, String userId,Boolean isPass,String saveStatus) throws MessageException {
+
+        AgentVo agentVo = agent;
         try {
 //            verifyOrgAndBZYD(agent.getBusInfoVoList());
             logger.info("用户{}{}修改代理商信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent));
@@ -1157,7 +1168,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
             if (agent.getBusInfoVoList() != null && agent.getBusInfoVoList().size() > 0) {
                 logger.info("用户{}{}修改代理商业务信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent.getBusInfoVoList()));
-                ResultVO updateAgentBusInfoVoRes = agentBusinfoService.updateAgentBusInfoVo(agent.getBusInfoVoList(), agent.getAgent(),userId,isPass,saveStatus);
+                ResultVO updateAgentBusInfoVoRes = agentBusinfoService.updateAgentBusInfoVo(agentVo, agent.getBusInfoVoList(), agent.getAgent(),userId,isPass,saveStatus);
                 logger.info("用户{}{}修改代理商业务信息结果{}", userId, agent.getAgent().getId(), updateAgentBusInfoVoRes.getResInfo());
             }
 

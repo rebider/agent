@@ -22,4 +22,6 @@ public interface OSubOrderMapper {
     int updateByPrimaryKeySelective(OSubOrder record);
 
     int updateByPrimaryKey(OSubOrder record);
+
+    Long selectProNumByBusNum(String busNum);
 }

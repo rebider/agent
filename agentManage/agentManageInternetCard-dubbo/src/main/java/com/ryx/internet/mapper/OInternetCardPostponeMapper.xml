@@ -19,6 +19,7 @@
     <result column="U_TIME" jdbcType="TIMESTAMP" property="uTime" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="BATCH_NUM" jdbcType="VARCHAR" property="batchNum" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -50,8 +51,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, ICCID, AGENT_ID, AGENT_NAME, MER_ID, MER_NAME, ORDER_ID, OPEN_ACCOUNT_TIME, POSTPONE_TIME, 
-    EXPIRE_TIME, POSTPONE_EXPIRE_TIME, C_USER, U_USER, C_TIME, U_TIME, STATUS, VERSION
+    ID, ICCID, AGENT_ID, AGENT_NAME, MER_ID, MER_NAME, ORDER_ID, OPEN_ACCOUNT_TIME, POSTPONE_TIME,
+    EXPIRE_TIME, POSTPONE_EXPIRE_TIME, C_USER, U_USER, C_TIME, U_TIME, STATUS, VERSION,
+    BATCH_NUM
   </sql>
   <select id="selectByExample" parameterType="com.ryx.internet.pojo.OInternetCardPostponeExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -70,7 +72,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from O_INTERNET_CARD_POSTPONE
     where ID = #{id,jdbcType=VARCHAR}
@@ -82,18 +84,20 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.internet.pojo.OInternetCardPostpone">
-    insert into O_INTERNET_CARD_POSTPONE (ID, ICCID, AGENT_ID, 
-      AGENT_NAME, MER_ID, MER_NAME, 
-      ORDER_ID, OPEN_ACCOUNT_TIME, POSTPONE_TIME, 
-      EXPIRE_TIME, POSTPONE_EXPIRE_TIME, C_USER, 
-      U_USER, C_TIME, U_TIME, 
-      STATUS, VERSION)
-    values (#{id,jdbcType=VARCHAR}, #{iccid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
-      #{agentName,jdbcType=VARCHAR}, #{merId,jdbcType=VARCHAR}, #{merName,jdbcType=VARCHAR}, 
-      #{orderId,jdbcType=VARCHAR}, #{openAccountTime,jdbcType=TIMESTAMP}, #{postponeTime,jdbcType=DECIMAL}, 
-      #{expireTime,jdbcType=TIMESTAMP}, #{postponeExpireTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, 
-      #{uUser,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, 
-      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
+    insert into O_INTERNET_CARD_POSTPONE (ID, ICCID, AGENT_ID,
+    AGENT_NAME, MER_ID, MER_NAME,
+    ORDER_ID, OPEN_ACCOUNT_TIME, POSTPONE_TIME,
+    EXPIRE_TIME, POSTPONE_EXPIRE_TIME, C_USER,
+    U_USER, C_TIME, U_TIME,
+    STATUS, VERSION, BATCH_NUM
+    )
+    values (#{id,jdbcType=VARCHAR}, #{iccid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
+    #{agentName,jdbcType=VARCHAR}, #{merId,jdbcType=VARCHAR}, #{merName,jdbcType=VARCHAR},
+    #{orderId,jdbcType=VARCHAR}, #{openAccountTime,jdbcType=TIMESTAMP}, #{postponeTime,jdbcType=DECIMAL},
+    #{expireTime,jdbcType=TIMESTAMP}, #{postponeExpireTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
+    #{uUser,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP},
+    #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{batchNum,jdbcType=VARCHAR}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.internet.pojo.OInternetCardPostpone">
     insert into O_INTERNET_CARD_POSTPONE
@@ -149,6 +153,9 @@
       <if test="version != null">
         VERSION,
       </if>
+      <if test="batchNum != null">
+        BATCH_NUM,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -201,6 +208,9 @@
       </if>
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="batchNum != null">
+        #{batchNum,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -261,6 +271,9 @@
       <if test="version != null">
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
+      <if test="batchNum != null">
+        BATCH_NUM = #{batchNum,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -281,12 +294,13 @@
       C_TIME = #{cTime,jdbcType=TIMESTAMP},
       U_TIME = #{uTime,jdbcType=TIMESTAMP},
       STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL}
+      VERSION = #{version,jdbcType=DECIMAL},
+      BATCH_NUM = #{batchNum,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">

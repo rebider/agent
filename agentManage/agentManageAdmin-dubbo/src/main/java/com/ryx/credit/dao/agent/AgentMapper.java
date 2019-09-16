@@ -40,4 +40,7 @@ public interface AgentMapper {
     List<Agent> queryAgentTierList(@Param("map") Map<String,Object> map,@Param("page") Page page);
 
     int queryAgentTierCount(@Param("map") Map<String,Object> map);
+
+    //通过登录用户查询代理商
+    Map<String, Object> selectAgentByOrgId(@Param("map")Map<String,Object> map);
 }

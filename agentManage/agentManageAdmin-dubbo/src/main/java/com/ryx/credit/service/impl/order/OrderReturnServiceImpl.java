@@ -1448,11 +1448,14 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             e.printStackTrace();
             throw e;
         }
-
-
     }
 
-
+    /**
+     * 查询退货所有数据&查询代理商退货数据
+     * @param param
+     * @param pageInfo
+     * @return
+     */
     @Override
     public PageInfo orderReturnList(Map<String, Object> param, PageInfo pageInfo) {
         if(StringUtils.isBlank(String.valueOf(param.get("agentId")))){
@@ -1483,6 +1486,37 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         return pageInfo;
     }
 
+    /**
+     * 查询省区退货数据
+     * @param page
+     * @param map
+     * @param userId
+     * @return
+     */
+    @Override
+    public PageInfo queryOrderReturnList(Page page, Map map, Long userId) {
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+        if (orgCodeRes == null && orgCodeRes.size() != 1) {
+            return null;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        map.put("orgId", orgId);
+        map.put("userId", userId);
+        map.put("organizationCode", organizationCode);
+        if (null != map) {
+            String time = String.valueOf(map.get("time"));
+            if (StringUtils.isNotBlank(time)&&!time.equals("null")) {
+                String reltime = time.substring(0, 10);
+                map.put("time", reltime);
+            }
+        }
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(returnOrderMapper.queryOrderReturnProvinceList(map, page));
+        pageInfo.setTotal(returnOrderMapper.queryOrderReturnProvinceCount(map));
+        return pageInfo;
+    }
 
     /**
      * 退货导入物流信息

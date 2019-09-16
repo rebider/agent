@@ -157,4 +157,35 @@ public class ReceiptPlanServiceImpl implements ReceiptPlanService {
         return result;
     }
 
+    @Override
+    public AgentResult revocationShipping(String planNum, String orderId, String user) throws Exception {
+        AgentResult result = new AgentResult(500, "系统异常", "");
+        try {
+            if (null == user) {
+                return AgentResult.fail("操作用户不能为空");
+            }
+            ReceiptPlanExample receiptPlanExample = new ReceiptPlanExample();
+            receiptPlanExample.or()
+                    .andStatusEqualTo(Status.STATUS_1.status)
+                    .andPlanOrderStatusEqualTo(new BigDecimal(PlannerStatus.InTheDeliver.getValue()))
+                    .andPlanNumEqualTo(planNum)
+                    .andOrderIdEqualTo(orderId);
+            List<ReceiptPlan> receiptPlanList = receiptPlanMapper.selectByExample(receiptPlanExample);
+            ReceiptPlan receiptPlan = receiptPlanList.get(0);
+            //撤销发货-更新排单状态为已排单
+            receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.YesPlanner.getValue()));
+            int updateByReceiptPlan = receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan);
+            if (updateByReceiptPlan != 1) {
+                logger.info("撤销发货异常-更新排单数据失败:{}{}", planNum, orderId);
+                throw new MessageException("撤销发货异常!");
+            }
+            result.setStatus(200);
+            result.setMsg("处理成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new MessageException("撤销发货异常!");
+        }
+        return result;
+    }
+
 }

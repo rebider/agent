@@ -125,6 +125,7 @@ public class ActRuTaskServiceImpl implements ActRuTaskService {
         for (Map<String, Object> resultMap : taskList) {
             String agDocPro = String.valueOf(resultMap.get("AG_DOC_PRO"));
             String agDocDistrict = String.valueOf(resultMap.get("AG_DOC_DISTRICT"));
+            String explain = String.valueOf(resultMap.get("EXPLAIN"));
             if(!agDocPro.equals("null")){
                 COrganization proOrganization = organizationService.selectByPrimaryKey(Integer.parseInt(agDocPro));
                 if(proOrganization!=null)
@@ -138,6 +139,11 @@ public class ActRuTaskServiceImpl implements ActRuTaskService {
                 resultMap.put("AG_DOC_DISTRICT_NAME",districtOrganization.getName());
             }else{
                 resultMap.put("AG_DOC_DISTRICT_NAME","");
+            }
+            if (!explain.equals("null")){
+                resultMap.put("EXPLAIN",explain);
+            }else{
+                resultMap.put("EXPLAIN","");
             }
         }
         PageInfo pageInfo = new PageInfo();
