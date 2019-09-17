@@ -402,7 +402,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
 
 
     /**
-     * RDB升级直签
+     * RDB升级直签校验
      * @param paramMap
      * @return
      * @throws Exception
@@ -416,6 +416,15 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         Agent agent = agentVo.getAgent();
         AgentBusInfo agentBusInfo = agentVo.getBusInfoVoList().get(0);
         AgentColinfo agentColinfo = agentVo.getColinfoVoList().get(0);
+
+        if (!agentBusInfo.getBusNum().equals(agentBusInfo.getBusLoginNum())) {
+            return AgentResult.fail("业务平台编号和平台登陆账号必须一致！");
+        }
+
+        if (null == agentBusInfo.getBusNum() || null == agentBusInfo.getBusLoginNum()) {
+            return AgentResult.fail("业务平台编号和平台登录账号不能为空！");
+        }
+
         Map<String,Object> jsonParams = new HashMap<String, Object>();
         jsonParams = commonParam(jsonParams, agentColinfo, agent, agentBusInfo);
 
@@ -428,8 +437,8 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         }
         Dict dict = dictOptionsService.findDictByName(DictGroup.RDBPOS.name(), DictGroup.RDB_POS_LOWER.name(), agentBusInfo.getBusType());//直签终端下限数
         requMap.put("termCount",dict.getdItemvalue());//直签终端下限数
-        requMap.put("channelTopId",agentBusInfo.getBusNum());
-        requMap.put("mobile",agentBusInfo.getBusLoginNum().trim());
+        requMap.put("channelTopId",agentBusInfo.getFinaceRemitOrgan());
+        requMap.put("mobile",agentBusInfo.getBusNum().trim());
         requMap.put("branchid",agentBusInfo.getBusPlatform().split("_")[0]);
         requMap.put("cardno",jsonParams.get("cardno"));
         requMap.put("bankbranchid",jsonParams.get("bankbranchid"));
@@ -450,7 +459,6 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         requMap.put("customerType",jsonParams.get("customerType"));
         requMap.put("invoice",jsonParams.get("invoice"));
         requMap.put("tax",jsonParams.get("tax"));
-        requMap.put("parentAgencyId",jsonParams.get("parentAgencyId"));
 
         // 封装参数，发送请求，解析参数，返回结果。
         try {
@@ -467,10 +475,13 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
                     //升级直签失败，返回相应数据
                     return AgentResult.fail(respJson.getString("msg"));
                 } else {
-                    throw new Exception("请求瑞大宝升级直签接口成功，返回值异常！");
+                    if(null != respJson.getString("msg")) {
+                        return AgentResult.fail(respJson.getString("msg"));
+                    }
+                    return AgentResult.fail("请求瑞大宝升级直签接口成功，返回值异常！");
                 }
             }else{
-                throw new Exception("请求瑞大宝升级直签接口失败！");
+                return AgentResult.fail("请求瑞大宝升级直签接口失败！");
             }
         } catch (Exception e) {
             e.printStackTrace();

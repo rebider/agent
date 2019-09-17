@@ -377,7 +377,7 @@
         on so.order_id = o.id
     left join a_agent_businfo ab
         on o.bus_id = ab.id
-    where  ab.bus_num = #{busNum}
+    where o.review_status = 3 and ab.bus_num = #{busNum}
   </select>
 
 </mapper>

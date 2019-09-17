@@ -12,6 +12,7 @@ import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 
 /**
  * Created by cx on 2018/5/23.
@@ -40,7 +41,7 @@ public interface AgentBusinfoService {
 
     public AgentBusInfo getByBusidAndCode(String platformCode,String busid);
 
-    public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent,String userId,Boolean isPass,String saveStatus)throws Exception;
+    public ResultVO updateAgentBusInfoVo(AgentVo agentVo, List<AgentBusInfoVo> busInfoVoList, Agent agent, String userId, Boolean isPass, String saveStatus)throws Exception;
 
     public ResultVO updateBussiness(List<AgentBusInfoVo> busInfoVoList,String userId)throws Exception;
 

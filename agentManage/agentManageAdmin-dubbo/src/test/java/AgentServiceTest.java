@@ -1,4 +1,5 @@
 import com.ryx.credit.common.enumc.NotifyType;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.dao.order.OLogisticsDetailMapper;
 import com.ryx.credit.dao.order.ReceiptPlanMapper;
@@ -6,6 +7,7 @@ import com.ryx.credit.service.agent.AgentNotifyService;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.order.OLogisticsService;
+import com.ryx.credit.service.order.TerminalTransferService;
 import com.ryx.credit.service.pay.LivenessDetectionService;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -32,6 +34,8 @@ public class AgentServiceTest extends BaseSpringTest  {
     private AgentService agentService;
     @Autowired
     private AgentNetInNotityService agentNetInNotityService;
+    @Autowired
+    private TerminalTransferService terminalTransferService;
 
     @Test
     public void testNotify(){
@@ -65,7 +69,11 @@ public class AgentServiceTest extends BaseSpringTest  {
 
     @Test
     public void testThree(){
-        livenessDetectionService.livenessDetection("陈肖翔","410223198801194051","123");
-        livenessDetectionService.threeElementsCertificationDetection("陈肖翔","410223198801194051","123","6225980167399568");
+        try {
+            Map<String, Object> data =  terminalTransferService.disposeSN("000024026311890023316094","000024026311890023316094");
+            System.out.println(data);
+         } catch (MessageException e) {
+            e.printStackTrace();
+        }
     }
 }

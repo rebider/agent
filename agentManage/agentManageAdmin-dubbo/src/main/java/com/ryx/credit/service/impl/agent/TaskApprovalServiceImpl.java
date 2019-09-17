@@ -135,7 +135,7 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                 //处理财务审批（财务出款机构）
                 for (AgentBusInfoVo agentBusInfoVo : agentVo.getMarketToporgTableIdForm()) {
                     if(StringUtils.isNotBlank(agentBusInfoVo.getBusPlatform())){
-                        if (!agentBusInfoVo.getBusPlatform().equals(ryx_pro) || !agentBusInfoVo.getBusPlatform().equals(ryx_pro1)){
+                        if (!agentBusInfoVo.getBusPlatform().equals(ryx_pro) && !agentBusInfoVo.getBusPlatform().equals(ryx_pro1)){
                             agentBusInfoVo.setBusPlatform(" ");
                         }
 
@@ -233,6 +233,14 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
 
                         if(agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)!=1){
                             throw new ProcessException("审批失败:业务顶级机构更新异常");
+                        }
+                        //修改业务审批关系表
+                        if (StringUtils.isNotBlank(agentVo.getSid()) && StringUtils.isNotBlank(agentBusInfoVo.getBusPlatform())){
+                            BusActRel byActivId = busActRelMapper.findByActivId(agentVo.getSid());
+                            byActivId.setNetInBusType("ACTIVITY_"+agentBusInfoVo.getBusPlatform());
+                            if(busActRelMapper.updateByPrimaryKeySelective(byActivId)!=1){
+                                throw new ProcessException("业务审批关系表更新异常");
+                            }
                         }
                     }
                 }
