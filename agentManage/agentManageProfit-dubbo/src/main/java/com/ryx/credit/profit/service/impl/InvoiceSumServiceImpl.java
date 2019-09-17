@@ -237,7 +237,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
      */
     public void againFreeze(Map<String, Object> param) {
         FreezeAgent freezeAgent = new FreezeAgent();
-        freezeAgent.setId(idService.genId(TabId.P_FREEZE_OPERATION_RECORD));
+        freezeAgent.setId(idService.genId(TabId.P_FREEZE_AGENT));
         freezeAgent.setAgentId(param.get("AGENT_ID").toString());
         freezeAgent.setAgentName(param.get("AGENT_NAME").toString());
     /*    freezeAgent.setParentAgentName(param.get("PARENT_AGENT_NAME").toString());
@@ -298,7 +298,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
 
                 if( null!=invoiceSumList.get(5) && !"".equals(invoiceSumList.get(5))){
                     try {
-                        new BigDecimal(String.valueOf(invoiceSumList.get(5)));
+                        new BigDecimal(String.valueOf(invoiceSumList.get(5)).trim());
                     }catch (Exception e){
                         logger.info("导入上月欠票基数格式不正确，请检查");
                         throw new MessageException("导入上月欠票基数不正确，请检查");
@@ -309,7 +309,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                     throw new MessageException("导入本月日返现有误，请检查");
                 }else{
                     try {
-                        new BigDecimal(String.valueOf(invoiceSumList.get(6)));
+                        new BigDecimal(String.valueOf(invoiceSumList.get(6)).trim());
                     }catch (Exception e){
                         logger.info("导入本月日返现格式不正确，请检查");
                         throw new MessageException("导入本月日返现格式不正确，请检查");
@@ -321,7 +321,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                     throw new MessageException("导入本月日分润有误，请检查");
                 }else{
                     try {
-                        new BigDecimal(String.valueOf(invoiceSumList.get(7)));
+                        new BigDecimal(String.valueOf(invoiceSumList.get(7)).trim());
                     }catch (Exception e){
                         logger.info("本月日分润格式不正确，请检查");
                         throw new MessageException("本月日分润格式不正确，请检查");
@@ -344,7 +344,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                     throw new MessageException("导入代下级开票有误，请检查");
                 }else{
                     try {
-                        new BigDecimal(String.valueOf(invoiceSumList.get(9)));
+                        new BigDecimal(String.valueOf(invoiceSumList.get(9)).trim());
                     }catch (Exception e){
                         logger.info("代下级开票格式不正确，请检查");
                         throw new MessageException("代下级开票格式不正确，请检查");
@@ -357,13 +357,13 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                     logger.info("代理商ID" + invoiceSumList.get(2).toString() + "不存在");
                     throw new MessageException("代理商ID" + invoiceSumList.get(2).toString() + "不存在");
                 }
-                if (!agent.getAgName().equals(invoiceSumList.get(3).toString())) {
+                if (!agent.getAgName().equals(invoiceSumList.get(3).toString().trim())) {
                     logger.info("代理商名称" + invoiceSumList.get(3).toString() + "与ID不匹配");
                     throw new MessageException("代理商名称" + invoiceSumList.get(3).toString() + "与ID不匹配");
                 }
                 int number =0;
                 for (List<Object> invoiceSum1 : param) {
-                    if (invoiceSumList.get(1).toString().equals(invoiceSum1.get(1).toString())) {
+                    if (invoiceSumList.get(1).toString().equals(invoiceSum1.get(1).toString().trim())) {
                         if (invoiceSumList.get(4).toString().equals(invoiceSum1.get(4).toString())) {
                             number++;
                         }
