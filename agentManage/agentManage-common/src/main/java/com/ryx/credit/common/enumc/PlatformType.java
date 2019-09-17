@@ -23,6 +23,7 @@ public enum PlatformType {
     RDBPOS("RDBPOS","瑞大宝"),
     RJQZ("RJQZ","瑞+（条码前置）");
 
+
     public String code;
 
     public String msg;
