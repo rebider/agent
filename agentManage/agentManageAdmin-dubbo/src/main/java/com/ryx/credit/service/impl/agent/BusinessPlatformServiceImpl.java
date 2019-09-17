@@ -778,6 +778,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         List<BusinessOutVo> agentoutVos = agentBusInfoMapper.excelAgent(map);
         List<Dict> BUS_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name());
         List<Dict> BUS_SCOPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name());
+        List<Dict> BUS_STATUS = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_STATUS.name());
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         if (null != agentoutVos && agentoutVos.size() > 0)
             for (BusinessOutVo agentoutVo : agentoutVos) {//类型
@@ -808,11 +809,20 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                             agentoutVo.setBusRegion(name);
                     }
                 }
-
+                //业务范围
                 if (StringUtils.isNotBlank(agentoutVo.getBusScope()) && !agentoutVo.getBusScope().equals("null")) {
-                    for (Dict dict : BUS_SCOPE) {//业务范围
+                    for (Dict dict : BUS_SCOPE) {
                         if (null!=dict  &&  agentoutVo.getBusScope().equals(dict.getdItemvalue())){
                             agentoutVo.setBusScope(dict.getdItemname());
+                            break;
+                        }
+                    }
+                }
+                //业务状态
+                if (StringUtils.isNotBlank(agentoutVo.getBusStatus()) && !agentoutVo.getBusStatus().equals("null")) {
+                    for (Dict dict : BUS_STATUS) {
+                        if (null!=dict && agentoutVo.getBusStatus().equals(dict.getdItemvalue())){
+                            agentoutVo.setBusStatus(dict.getdItemname());
                             break;
                         }
                     }

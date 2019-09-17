@@ -840,7 +840,7 @@
     bus.approve_time,platform.PLATFORM_NAME,
     a1.AG_NAME||businfo_1.id as busParent,
     busRiskParentbusAgent.ag_name as busRiskParent,busActivationParentbusAgent.ag_name as busActivationParent,
-    bus.bus_login_num
+    bus.bus_login_num, bus.bus_status
     from a_agent_businfo bus
     LEFT JOIN  a_agent agent ON agent.id = bus.agent_id
     LEFT JOIN a_agent_businfo busriskparentbus ON bus.bus_risk_parent = busriskparentbus.id
@@ -889,6 +889,9 @@
       <if test="reqMap.busType != null and reqMap.busType != '' " >
       and bus.bus_type = #{reqMap.busType}
       </if>
+      <if test="reqMap.busStatus != null and reqMap.busStatus != '' " >
+      and bus.bus_status = #{reqMap.busStatus}
+      </if>
     and bus.status = #{reqMap.status}
    )
   </select>
@@ -915,6 +918,7 @@
     <result column="APPROVE_TIME"  property="approveTime" jdbcType="TIMESTAMP"/>
     <result column="AG_DOC_PRO"  property="agDocPro" jdbcType="VARCHAR"/>
     <result column="BUS_LOGIN_NUM" property="busLoginNum" jdbcType="VARCHAR"/>
+    <result column="BUS_STATUS" property="busStatus" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!--查询业务编号和代理商信息-->
