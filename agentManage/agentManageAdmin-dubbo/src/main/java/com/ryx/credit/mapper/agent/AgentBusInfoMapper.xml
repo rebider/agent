@@ -663,6 +663,7 @@
                 <if test="par.bus_num!=null and par.bus_num!=''">and a.bus_num = #{par.bus_num}</if>
                 <if test="1==1">and a.status = 1</if>
                 <if test="1==1">and b.status = 1</if>
+                <if test="1==1">and (a.bus_status='1' or a.bus_status='0')</if>
                 <if test="par.page!=null">and rownum &lt;= #{par.page.from} + #{par.page.size}</if>
               </where>
               order by a.c_time desc
