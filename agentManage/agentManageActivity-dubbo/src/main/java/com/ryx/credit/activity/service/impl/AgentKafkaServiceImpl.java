@@ -2,6 +2,7 @@ package com.ryx.credit.activity.service.impl;
 
 import com.ryx.credit.activity.dao.KafkaSendMessageMapper;
 import com.ryx.credit.activity.entity.KafkaSendMessage;
+import com.ryx.credit.common.enumc.KafkaMessageType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.service.AgentKafkaService;
@@ -50,7 +51,7 @@ public class AgentKafkaServiceImpl implements AgentKafkaService {
      * @return
      */
     @Override
-    public AgentResult sendPayMentMessage(String agentId,String agentName,String busId,String busnum,String ktype,String topic, String message) {
+    public AgentResult sendPayMentMessage(String agentId, String agentName, String busId, String busnum, KafkaMessageType ktype, String topic, String message) {
         LocalDateTime ldt = LocalDateTime.now();
         KafkaSendMessage record = new KafkaSendMessage();
         record.setId(UUID.randomUUID().toString().replace("-",""));
@@ -58,44 +59,48 @@ public class AgentKafkaServiceImpl implements AgentKafkaService {
         record.setAgentName(agentName);
         record.setBusid(busId);
         record.setBusnum(busnum);
-        record.setKtype(ktype);
+        record.setKtype(ktype.code);
         record.setKtopic(topic);
         record.setKmessage(message);
         record.setcDateStr(ldt.format(date));
         record.setcDateStr(ldt.format(time));
         record.setStatus(Status.STATUS_0.status);
         if(1==kafkaSendMessageMapper.insertSelective(record)){
-            if(StringUtils.isNotBlank(record.getBusnum())) {
-                ListenableFuture<SendResult<String, String>> listenableFuture = kafkaTemplate.send(topic, record.getId(), record.getKmessage());
-                listenableFuture.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
-                    @Override
-                    public void onFailure(Throwable ex) {
-                        if (ex instanceof KafkaProducerException) {
-                            ProducerRecord<String, String> recode = (ProducerRecord<String, String>) ((KafkaProducerException) ex).getProducerRecord();
-                            logger.info("kafka 发送消息失败 {} {} {}", recode.key(), recode.value(), ex.getMessage());
-                            String kyes = recode.key();
-                            KafkaSendMessage record = kafkaSendMessageMapper.selectByPrimaryKey(kyes);
-                            record.setStatus(Status.STATUS_2.status);
-                            kafkaSendMessageMapper.updateByPrimaryKeySelective(record);
+            try {
+                if(StringUtils.isNotBlank(record.getBusnum())) {
+                    ListenableFuture<SendResult<String, String>> listenableFuture = kafkaTemplate.send(topic, record.getId(), record.getKmessage());
+                    listenableFuture.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
+                        @Override
+                        public void onFailure(Throwable ex) {
+                            if (ex instanceof KafkaProducerException) {
+                                ProducerRecord<String, String> recode = (ProducerRecord<String, String>) ((KafkaProducerException) ex).getProducerRecord();
+                                logger.info("kafka 发送消息失败 {} {} {}", recode.key(), recode.value(), ex.getMessage());
+                                String kyes = recode.key();
+                                KafkaSendMessage record = kafkaSendMessageMapper.selectByPrimaryKey(kyes);
+                                record.setStatus(Status.STATUS_2.status);
+                                kafkaSendMessageMapper.updateByPrimaryKeySelective(record);
+                            }
+                            logger.error("kafka 发送消息失败 {}", ex.getMessage());
+                            ex.printStackTrace();
                         }
-                        logger.error("kafka 发送消息失败 {}", ex.getMessage());
-                        ex.printStackTrace();
-                    }
 
-                    @Override
-                    public void onSuccess(SendResult<String, String> result) {
-                        try {
-                            String kyes = result.getProducerRecord().key();
-                            logger.info("kafka 发送消息成功 {} {}", result.getProducerRecord().key(), result.getProducerRecord().value());
-                            KafkaSendMessage record = kafkaSendMessageMapper.selectByPrimaryKey(kyes);
-                            record.setStatus(Status.STATUS_1.status);
-                            kafkaSendMessageMapper.updateByPrimaryKeySelective(record);
-                        } catch (Exception e) {
-                            logger.error("kafka 发送消息失败 {} {} {}", result.getProducerRecord().key(), result.getProducerRecord().value(), e.getMessage());
-                            e.printStackTrace();
+                        @Override
+                        public void onSuccess(SendResult<String, String> result) {
+                            try {
+                                String kyes = result.getProducerRecord().key();
+                                logger.info("kafka 发送消息成功 {} {}", result.getProducerRecord().key(), result.getProducerRecord().value());
+                                KafkaSendMessage record = kafkaSendMessageMapper.selectByPrimaryKey(kyes);
+                                record.setStatus(Status.STATUS_1.status);
+                                kafkaSendMessageMapper.updateByPrimaryKeySelective(record);
+                            } catch (Exception e) {
+                                logger.error("kafka 发送消息失败 {} {} {}", result.getProducerRecord().key(), result.getProducerRecord().value(), e.getMessage());
+                                e.printStackTrace();
+                            }
                         }
-                    }
-                });
+                    });
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         return AgentResult.ok();
@@ -103,7 +108,7 @@ public class AgentKafkaServiceImpl implements AgentKafkaService {
 
 
     @Override
-    public AgentResult sendPayMentMessage(String id) {
+    public AgentResult sendPayMentMessageById(String id) {
         KafkaSendMessage record =  kafkaSendMessageMapper.selectByPrimaryKey(id);
         if(StringUtils.isNotBlank(record.getBusnum()) && Status.STATUS_0.status.compareTo(record.getStatus())==0) {
             ListenableFuture<SendResult<String, String>> listenableFuture = kafkaTemplate.send(record.getKtopic(), record.getId(), record.getKmessage());

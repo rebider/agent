@@ -1,5 +1,6 @@
 package com.ryx.credit.service;
 
+import com.ryx.credit.common.enumc.KafkaMessageType;
 import com.ryx.credit.common.result.AgentResult;
 
 /**
@@ -19,13 +20,13 @@ public interface AgentKafkaService {
      * @param message
      * @return
      */
-    public AgentResult sendPayMentMessage(String agentId,String agentName,String busId,String busnum,String ktype,String topic, String message);
+    public AgentResult sendPayMentMessage(String agentId, String agentName, String busId, String busnum, KafkaMessageType ktype, String topic, String message);
 
     /**
      * 放存量消息
      * @param id
      * @return
      */
-    public AgentResult sendPayMentMessage(String id);
+    public AgentResult sendPayMentMessageById(String id);
 
 }
