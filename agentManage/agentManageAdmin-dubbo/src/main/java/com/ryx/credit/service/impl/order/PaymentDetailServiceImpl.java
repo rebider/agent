@@ -544,17 +544,17 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
                     PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
                     if(platForm!=null) {
                         OPaymentDetail detail = oPaymentDetails.get(0);
-                        List<Attachment> attr = attachmentMapper.accessoryQuery(orderId, AttachmentRelType.Order.msg);
+                        List<Attachment> attr = attachmentMapper.accessoryQuery(orderId, AttachmentRelType.Order.name());
                         List<String> attrs =  attr.stream().map(att->{return att.getAttDbpath();}).collect(Collectors.toList());
                         PaymentSendBusPlatformVo paymentSendBusPlatformVo = new PaymentSendBusPlatformVo();
                         paymentSendBusPlatformVo.setAg(order.getAgentId());
                         paymentSendBusPlatformVo.setAmount(detail.getRealPayAmount().setScale(2, BigDecimal.ROUND_HALF_UP).toString());
                         paymentSendBusPlatformVo.setAmountType(detail.getPayType());
                         paymentSendBusPlatformVo.setBusNum(agentBusInfo.getBusNum());
-                        paymentSendBusPlatformVo.setCreateTime(DateUtil.format(order.getcTime(), DateUtil.DATE_FORMAT_4));
+                        paymentSendBusPlatformVo.setCreateTime(DateUtil.format(order.getcTime(), DateUtil.DATE_FORMAT_5));
                         paymentSendBusPlatformVo.setOrderNum(order.getId());
                         paymentSendBusPlatformVo.setFqflow(detail.getId());
-                        paymentSendBusPlatformVo.setPayType(PamentSrcType.XXBK.msg);
+                        paymentSendBusPlatformVo.setPayType(PamentSrcType.XXBK.code);
                         paymentSendBusPlatformVo.setOptType(Status.STATUS_1.status + "");
                         paymentSendBusPlatformVo.setPlatform(platForm.getPlatformType());
                         paymentSendBusPlatformVo.setImageList(attrs);
