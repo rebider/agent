@@ -355,6 +355,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 Dict debitRateLower = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfoVo.getBusPlatform(), "debitRateLower");//借记费率下限（%）
                 Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfoVo.getBusPlatform(), "debitCapping");//借记封顶额（元）
                 Dict debitAppearRate = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfoVo.getBusPlatform(), "debitAppearRate");//借记出款费率（%）
+                Dict creditRateFloor = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "creditRateFloor");//贷记费率下限（%）
+                Dict creditRateCeiling = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "creditRateCeiling");//贷记费率上限（%）
                 if(debitRateLower!=null){
                     agentBusInfoVo.setDebitRateLower(debitRateLower.getdItemvalue());
                 }
@@ -363,6 +365,12 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 }
                 if(debitAppearRate!=null){
                     agentBusInfoVo.setDebitAppearRate(debitAppearRate.getdItemvalue());
+                }
+                if (creditRateFloor != null) {
+                    agentBusInfo.setCreditRateFloor(creditRateFloor.getdItemname());
+                }
+                if (creditRateCeiling != null) {
+                    agentBusInfo.setCreditRateCeiling(creditRateCeiling.getdItemname());
                 }
                 agentBusInfoVo.setVersion(agbus.getVersion());
                 int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfoVo);
