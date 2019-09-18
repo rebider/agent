@@ -1331,7 +1331,7 @@
      select count(1) from
     (
     select
-    to_char(o_payment_detail.plan_pay_time,'yyyy-mm') as month,businfo.agent_id,businfo.bus_platform,sum(o_payment_detail.pay_amount) as jjqk
+    to_char(o_payment_detail.plan_pay_time,'yyyy-mm') as tm,businfo.agent_id,businfo.bus_platform,sum(o_payment_detail.pay_amount) as jjqk
     ,businfo.bus_num
     from o_payment_detail o_payment_detail
     left join o_payment op on o_payment_detail.payment_id=op.id and  o_payment_detail.payment_status in (1,3)
@@ -1342,7 +1342,7 @@
     )a left join a_platform on a.bus_platform=a_platform.platform_num
     left join a_agent agent on agent.id=a.agent_id where 1=1
     <include refid="BASE_WHERE_SQL"/>
-    order by agent.id,  a.month desc
+    order by agent.id,  a.tm desc
   </select>
 
   <select id="arrearageList" parameterType="java.util.Map" resultType="java.util.Map">
@@ -1350,7 +1350,7 @@
     select a.*,a_platform.platform_name,agent.ag_name,agent.AG_UNIQ_NUM from
     (
     select
-    to_char(o_payment_detail.plan_pay_time,'yyyy-mm') as month,businfo.agent_id,businfo.bus_platform,sum(o_payment_detail.pay_amount) as jjqk
+    to_char(o_payment_detail.plan_pay_time,'yyyy-mm') as tm,businfo.agent_id,businfo.bus_platform,sum(o_payment_detail.pay_amount) as jjqk
     ,businfo.bus_num
     from o_payment_detail o_payment_detail
     left join o_payment op on o_payment_detail.payment_id=op.id and  o_payment_detail.payment_status in (1,3)
@@ -1361,7 +1361,7 @@
     )a left join a_platform on a.bus_platform=a_platform.platform_num
     left join a_agent agent on agent.id=a.agent_id where 1=1
     <include refid="BASE_WHERE_SQL"/>
-    order by agent.id,  a.month desc
+    order by agent.id,  a.tm desc
     <include refid="PAGING_END" />
   </select>
 
@@ -1379,4 +1379,35 @@
     </if>
     <if test="month!=null and month!=''"> and to_char(o_payment_detail.plan_pay_time,'yyyy-mm')=#{month} </if>
   </sql>
+
+  <!--欠款详情-->
+  <select id="arrearageQuery" parameterType="map" resultType="map">
+    select
+      a.omonth,a_agent_businfo.agent_id,o_order.id as oid,a_agent_businfo.bus_num,a_agent_businfo.bus_platform,o_payment.pay_amount,o_payment.real_amount,o_payment.outstanding_amount,
+      o_payment.down_payment,a.qiankuan,o_payment.pay_method,
+      a_platform.platform_name from
+      (
+        select
+        to_char(o_payment_detail.plan_pay_time,'yyyy-mm') as omonth,
+        o_payment_detail.order_id as oId,
+        sum(o_payment_detail.pay_amount) as qiankuan
+        from
+        o_payment_detail
+        where 1=1
+         <if test="time!=null and time!=''"> and to_char(o_payment_detail.plan_pay_time,'yyyy-mm')=#{time} </if>
+        and  o_payment_detail.payment_status in (1,3)
+        group by to_char(o_payment_detail.plan_pay_time,'yyyy-mm'),o_payment_detail.order_id
+      ) a
+      left join o_order on o_order.id=a.oId
+      left join o_payment on o_payment.order_id=a.oId
+      left join a_agent_businfo on o_order.bus_id=a_agent_businfo.id
+      left join a_platform on a_agent_businfo.bus_platform=a_platform.platform_num
+      where 1=1
+      <if test="busPlatform!=null and busPlatform!=''"> and a_agent_businfo.bus_platform=#{busPlatform} </if>
+      <if test="agentId !=null and agentId !='' ">
+        and  a_agent_businfo.agent_id =#{agentId}
+      </if>
+      order by o_order.agent_id,  a.omonth desc
+  </select>
+
 </mapper>

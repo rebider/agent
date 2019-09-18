@@ -3715,4 +3715,11 @@ public class OrderServiceImpl implements OrderService {
         return pageInfo;
     }
 
+    @Override
+    public PageInfo arrearageQuery(Map map, PageInfo pageInfo) {
+        pageInfo.setRows(orderMapper.arrearageQuery(map));
+        return pageInfo;
+    }
+
+
 }

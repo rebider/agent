@@ -5,6 +5,7 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.AgentoutVo;
@@ -257,4 +258,9 @@ public interface OrderService {
      * 欠款列表
      */
     PageInfo arrearageList(Map<String, Object> param, PageInfo pageInfo);
+
+    /**
+     * 欠款详情查看
+     */
+    PageInfo arrearageQuery(Map map,PageInfo pageInfo);
 }

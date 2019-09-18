@@ -45,4 +45,6 @@ public interface OOrderMapper {
     Long arrearageCount(Map<String, Object> param);
 
     List<Map<String,Object>> arrearageList(Map<String, Object> param);
+
+    List<Map> arrearageQuery(Map map);
 }
