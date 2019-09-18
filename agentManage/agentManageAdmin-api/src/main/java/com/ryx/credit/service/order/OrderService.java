@@ -252,4 +252,9 @@ public interface OrderService {
 
 
     AgentResult orderChangeActivity(String oNum, String subOrderId, String activityId, String userId) throws Exception;
+
+    /**
+     * 欠款列表
+     */
+    PageInfo arrearageList(Map<String, Object> param, PageInfo pageInfo);
 }

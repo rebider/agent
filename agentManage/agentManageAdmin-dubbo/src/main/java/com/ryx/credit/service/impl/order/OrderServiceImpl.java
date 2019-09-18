@@ -3706,4 +3706,13 @@ public class OrderServiceImpl implements OrderService {
         return AgentResult.ok(oNum);
     }
 
+    @Override
+    public PageInfo arrearageList(Map<String, Object> param, PageInfo pageInfo) {
+        Long count = orderMapper.arrearageCount(param);
+        List<Map<String, Object>> list = orderMapper.arrearageList(param);
+        pageInfo.setTotal(count.intValue());
+        pageInfo.setRows(list);
+        return pageInfo;
+    }
+
 }
