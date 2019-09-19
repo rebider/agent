@@ -421,7 +421,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 String goalOrgId = terminalTransferDetail.getGoalOrgId();
                 Map<String, Object> map1 = getAgentType(originalOrgId);
                 Map<String, Object> platFromMap = terminalTransferMapper.queryPlatFrom(map1.get("BUS_PLATFORM").toString());
-                if (!(platFromMap.get("PLATFORM_TYPE").toString().equals("POS")||platFromMap.get("PLATFORM_TYPE").toString().equals("MPOS")||platFromMap.get("PLATFORM_TYPE").toString().equals("ZHPOS"))) {
+                if (!(platFromMap.get("PLATFORM_TYPE").toString().equals("POS")||platFromMap.get("PLATFORM_TYPE").toString().equals("ZPOS")||platFromMap.get("PLATFORM_TYPE").toString().equals("ZHPOS"))) {
                     log.info("您的机构码不属于pos平台请选择：原：" + originalOrgId + "目标：" + goalOrgId);
                     throw new MessageException("您的机构码不属于pos平台请选择：原：" + originalOrgId + "目标：" + goalOrgId);
                 }
