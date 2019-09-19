@@ -2352,7 +2352,11 @@ public class OrderServiceImpl implements OrderService {
 
 
             //TODO 处理线下打款通知kafka
-            paymentDetailService.sendSFPayMentToPlatform(order.getId());
+            try {
+                paymentDetailService.sendSFPayMentToPlatform(order.getId());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
         } else if (actname.equals("reject_end")) {
             logger.info("代理商订单审批完审批拒绝{}",rel.getBusId());
