@@ -1410,4 +1410,19 @@
       order by o_order.agent_id,  a.omonth desc
   </select>
 
+  <!--查询是否还有欠款-->
+  <select id="isRemoveAccount" parameterType="map" resultType="map">
+    select a.* ,a_agent_businfo.id,a_agent_businfo.BUS_PLATFORM,o_payment.outstanding_amount from
+    (select * from o_Payment_detail  where 1=1 and o_payment_detail.PAYMENT_STATUS=1
+    <if test="time!=null and time!=''"> and to_char(o_payment_detail.plan_pay_time,'yyyy-mm')=#{time} </if>
+    )a
+    left join o_order on o_order.id=a.order_id
+    left join o_payment on o_payment.order_id=a.order_id
+    left join a_agent_businfo on o_order.bus_id=a_agent_businfo.id
+    where 1=1
+    <if test="busPlatform!=null and busPlatform!=''"> and a_agent_businfo.bus_platform=#{busPlatform} </if>
+    <if test="agentId !=null and agentId !='' "> and  a_agent_businfo.agent_id =#{agentId} </if>
+    order by a.agent_id,  to_char(a.plan_pay_time,'yyyy-mm') desc
+  </select>
+
 </mapper>

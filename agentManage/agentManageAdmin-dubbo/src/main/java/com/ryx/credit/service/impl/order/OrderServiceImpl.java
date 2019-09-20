@@ -115,6 +115,8 @@ public class OrderServiceImpl implements OrderService {
     private CashSummaryMouthMapper cashSummaryMouthMapper;
     @Autowired
     private ActRuTaskService actRuTaskService;
+    @Autowired
+    private ORemoveAccountMapper oRemoveAccountMapper;
 
 
     /**
@@ -3719,6 +3721,70 @@ public class OrderServiceImpl implements OrderService {
     public PageInfo arrearageQuery(Map map, PageInfo pageInfo) {
         pageInfo.setRows(orderMapper.arrearageQuery(map));
         return pageInfo;
+    }
+
+    @Override
+    public AgentResult isRemoveAccount(Map map) {
+        List<Map> removeAccountList=orderMapper.isRemoveAccount(map);
+        if (null != removeAccountList && removeAccountList.size()> 0) {
+            return AgentResult.ok(removeAccountList);
+        } else {
+            return AgentResult.fail("没有需要进行销账的订单");
+        }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    @Override
+    public ResultVO removeAccountSave(ORemoveAccountVo oRemoveAccountVo) throws Exception {
+        if (null == oRemoveAccountVo.getRemoveAccount()) {
+            logger.info("销账添加:{}", "销账添加信息为空");
+            return ResultVO.fail("销账添加信息为空");
+        }
+        ORemoveAccount removeAccount = oRemoveAccountVo.getRemoveAccount();
+        if (StringUtils.isEmpty(removeAccount.getSubmitPerson())) {
+            logger.info("销账添加:{}", "提交用户不能为空");
+            return ResultVO.fail("提交用户不能为空");
+        }
+        if (StringUtils.isEmpty(removeAccount.getPayMethod())) {
+            logger.info("销账添加:{}", "销账方式不能为空");
+            return ResultVO.fail("销账方式不能为空");
+        }
+        if (StringUtils.isEmpty(removeAccount.getRamount())) {
+            logger.info("销账添加:{}", "销账金额不能为空");
+            return ResultVO.fail("销账金额不能为空");
+        }
+        Date date = Calendar.getInstance().getTime();
+        removeAccount.setId(idService.genId(TabId.O_REMOVE_ACCOUNT));
+        removeAccount.setSubmitTime(date);
+
+
+
+
+        removeAccount.setStatus(Status.STATUS_1.status);
+        removeAccount.setVersion(Status.STATUS_1.status);
+        if (1 == oRemoveAccountMapper.insertSelective(removeAccount)) {
+            oRemoveAccountVo.setRemoveAccount(removeAccount);
+            if (null != oRemoveAccountVo.getRemoveAccountFile() && oRemoveAccountVo.getRemoveAccountFile().size()>0) {
+                List<String> file = oRemoveAccountVo.getRemoveAccountFile();
+                for (String s : file) {
+                    if (org.apache.commons.lang.StringUtils.isEmpty(s)) continue;
+                    AttachmentRel record = new AttachmentRel();
+                    record.setAttId(s);
+                    record.setSrcId(removeAccount.getId());
+                    record.setcUser(removeAccount.getSubmitPerson());
+                    record.setcTime(removeAccount.getSubmitTime());
+                    record.setStatus(Status.STATUS_1.status);
+                    record.setBusType(AttachmentRelType.removeAccount.name());
+                    record.setId(idService.genId(TabId.a_attachment_rel));
+                    if (1 != attachmentRelMapper.insertSelective(record)) {
+                        logger.info("补款添加:{}", "上传打款截图失败");
+                        throw new MessageException("上传打款截图失败");
+                    }
+                }
+            }
+            logger.info("销账添加:成功");
+        }
+        return ResultVO.success(oRemoveAccountVo);
     }
 
 

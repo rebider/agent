@@ -47,4 +47,6 @@ public interface OOrderMapper {
     List<Map<String,Object>> arrearageList(Map<String, Object> param);
 
     List<Map> arrearageQuery(Map map);
+
+    List<Map> isRemoveAccount(Map map);
 }

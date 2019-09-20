@@ -1,9 +1,10 @@
 package com.ryx.credit.pojo.admin.order;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class ORemoveAccount {
+public class ORemoveAccount implements Serializable{
     private String id;
 
     private Date rmonth;
@@ -20,7 +21,7 @@ public class ORemoveAccount {
 
     private String submitPerson;
 
-    private String submitTime;
+    private Date submitTime;
 
     private String payMethod;
 
@@ -108,12 +109,12 @@ public class ORemoveAccount {
         this.submitPerson = submitPerson == null ? null : submitPerson.trim();
     }
 
-    public String getSubmitTime() {
+    public Date getSubmitTime() {
         return submitTime;
     }
 
-    public void setSubmitTime(String submitTime) {
-        this.submitTime = submitTime == null ? null : submitTime.trim();
+    public void setSubmitTime(Date submitTime) {
+        this.submitTime = submitTime;
     }
 
     public String getPayMethod() {

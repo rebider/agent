@@ -10,7 +10,7 @@
     <result column="BUS_PLATFORM" jdbcType="VARCHAR" property="busPlatform" />
     <result column="MACHINES_AMOUNT" jdbcType="DECIMAL" property="machinesAmount" />
     <result column="SUBMIT_PERSON" jdbcType="VARCHAR" property="submitPerson" />
-    <result column="SUBMIT_TIME" jdbcType="VARCHAR" property="submitTime" />
+    <result column="SUBMIT_TIME" jdbcType="TIMESTAMP" property="submitTime" />
     <result column="PAY_METHOD" jdbcType="VARCHAR" property="payMethod" />
     <result column="RAMOUNT" jdbcType="DECIMAL" property="ramount" />
     <result column="REAL_RAMOUNT" jdbcType="DECIMAL" property="realRamount" />
@@ -95,7 +95,7 @@
       STATUS, VERSION)
     values (#{id,jdbcType=VARCHAR}, #{rmonth,jdbcType=TIMESTAMP}, #{agId,jdbcType=VARCHAR}, 
       #{agName,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR}, #{busPlatform,jdbcType=VARCHAR}, 
-      #{machinesAmount,jdbcType=DECIMAL}, #{submitPerson,jdbcType=VARCHAR}, #{submitTime,jdbcType=VARCHAR}, 
+      #{machinesAmount,jdbcType=DECIMAL}, #{submitPerson,jdbcType=VARCHAR}, #{submitTime,jdbcType=TIMESTAMP},
       #{payMethod,jdbcType=VARCHAR}, #{ramount,jdbcType=DECIMAL}, #{realRamount,jdbcType=DECIMAL}, 
       #{rstatus,jdbcType=DECIMAL}, #{finishTime,jdbcType=TIMESTAMP}, #{batchNum,jdbcType=VARCHAR}, 
       #{rtype,jdbcType=DECIMAL}, #{failCause,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
@@ -191,7 +191,7 @@
         #{submitPerson,jdbcType=VARCHAR},
       </if>
       <if test="submitTime != null">
-        #{submitTime,jdbcType=VARCHAR},
+        #{submitTime,jdbcType=TIMESTAMP},
       </if>
       <if test="payMethod != null">
         #{payMethod,jdbcType=VARCHAR},
@@ -259,7 +259,7 @@
         SUBMIT_PERSON = #{submitPerson,jdbcType=VARCHAR},
       </if>
       <if test="submitTime != null">
-        SUBMIT_TIME = #{submitTime,jdbcType=VARCHAR},
+        SUBMIT_TIME = #{submitTime,jdbcType=TIMESTAMP},
       </if>
       <if test="payMethod != null">
         PAY_METHOD = #{payMethod,jdbcType=VARCHAR},
@@ -306,7 +306,7 @@
       BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
       MACHINES_AMOUNT = #{machinesAmount,jdbcType=DECIMAL},
       SUBMIT_PERSON = #{submitPerson,jdbcType=VARCHAR},
-      SUBMIT_TIME = #{submitTime,jdbcType=VARCHAR},
+      SUBMIT_TIME = #{submitTime,jdbcType=TIMESTAMP},
       PAY_METHOD = #{payMethod,jdbcType=VARCHAR},
       RAMOUNT = #{ramount,jdbcType=DECIMAL},
       REAL_RAMOUNT = #{realRamount,jdbcType=DECIMAL},
