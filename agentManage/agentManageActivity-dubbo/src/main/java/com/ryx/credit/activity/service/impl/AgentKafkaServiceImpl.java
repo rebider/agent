@@ -63,7 +63,7 @@ public class AgentKafkaServiceImpl implements AgentKafkaService {
         record.setKtopic(topic);
         record.setKmessage(message);
         record.setcDateStr(ldt.format(date));
-        record.setcDateStr(ldt.format(time));
+        record.setcTimeStr(ldt.format(time));
         record.setStatus(Status.STATUS_0.status);
         if(1==kafkaSendMessageMapper.insertSelective(record)){
             try {

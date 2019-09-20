@@ -5,6 +5,8 @@ import com.ryx.credit.pojo.admin.order.OPaymentDetail;
 import org.apache.commons.lang.StringUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +22,11 @@ public class TestMain {
 
     public static void main(String[] args) {
 
-        System.out.println(Long.valueOf("000024026311890023316094"));
+        LocalDateTime ldt = LocalDateTime.now();
+        String s= ldt.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        System.out.println(s);
+        String s1= ldt.format(DateTimeFormatter.ofPattern("HH24mmss"));
+        System.out.println(s1);
     }
 
 
