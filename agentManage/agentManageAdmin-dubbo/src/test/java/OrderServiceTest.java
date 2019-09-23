@@ -1,5 +1,6 @@
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.service.order.IPaymentDetailService;
 import com.ryx.credit.service.order.OLogisticsService;
 import com.ryx.credit.service.order.OrderRepairService;
 import org.junit.Test;
@@ -24,17 +25,14 @@ public class OrderServiceTest  extends BaseSpringTest  {
     private OLogisticsService oLogisticsService;
     @Autowired
     private OrderRepairService orderRepairService;
+    @Autowired
+    private IPaymentDetailService iPaymentDetailService;
 
     @Test
     public void testIdSn(){
-
-
-
         try {
 
-
-
-                        List<String> data =  oLogisticsService.idList("192JCE197001","192JCE1A1000");
+               List<String> data =  oLogisticsService.idList("192JCE197001","192JCE1A1000");
 
         } catch (MessageException e) {
             e.printStackTrace();
@@ -44,6 +42,15 @@ public class OrderServiceTest  extends BaseSpringTest  {
     public void repairDumpOrderLogic(){
         try {
             orderRepairService.repairDumpOrderLogic(1,"OO20190215000000000002487");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testPayKafka(){
+        try {
+            iPaymentDetailService.sendSFPayMentToPlatform("OD190827330409107");
         } catch (Exception e) {
             e.printStackTrace();
         }

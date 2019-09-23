@@ -63,4 +63,17 @@ public interface IPaymentDetailService {
     String createBatchCode();
 
     BigDecimal getSumDebt(String agentId);
+
+
+    /**
+     * 发送首付信息到Kafka通知业务系统
+     * @param orderId
+     */
+    void sendSFPayMentToPlatform(String orderId);
+
+    /**
+     * 发送不补款信息到kafka通知业务系统
+     * @param orderId
+     */
+    void sendBkPayMentToPlatform(String orderId);
 }

@@ -617,6 +617,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      * @Date: 20:33 2018/8/10
      */
     public void checkSn(List<Map> list, String agentId) {
+        List<String> orderIdList = new ArrayList();
         try {
             for (Map<String, Object> map : list) {
                 String startSn = (String) map.get("startSn");
@@ -634,7 +635,19 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                     //根据sn查询物流信息
                     Map<String, Object> snmap = oLogisticsService.getLogisticsBySn(sn, agentId);
                 }
-                //检查sn是否在退货中
+                //查询SN转发的平台是否相同，不同不允许转发
+                orderIdList.add((String) map.get("orderId"));
+            }
+            //查询平台是否相同
+            if (!(orderIdList.size() > 0)) throw new ProcessException("上传sn订单异常，请联系管理员！！！");
+            List<String> platformTypeList = platFormMapper.selectByOrderIdList(orderIdList);
+
+            if (platformTypeList.size() != 1) {
+                for (String platFormList : platformTypeList) {
+                    if(!PlatformType.whetherPOS(platFormList)){
+                        throw new ProcessException("退货只支持一个平台的退货，请重新上传SN");
+                    }
+                }
             }
         }catch (ProcessException e) {
             throw e;
@@ -658,7 +671,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             throw new ProcessException("解析退货商品失败");
         }
 
-        //检查SN是否允许退货
         //检查SN是否允许退货
         try {
             checkSn(list, agentId);
@@ -954,6 +966,13 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         if (1 != busActRelMapper.insertSelective(record)) {
             log.info("退货提交审批，启动审批异常，添加审批关系失败{}:{}", returnId, proce);
             throw new ProcessException("退货审批流启动失败:添加审批关系失败");
+        }
+
+        //各个平台查询SN是否可用
+        try {
+            checkSnForOtherPlatform(list);
+        } catch (Exception e) {
+            throw new ProcessException("冻结SN失败，请联系管理员！！！");
         }
 
         return null;
@@ -1763,7 +1782,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 }
             }
             // 调用明细接口 插入物流明细
-            ResultVO resultVO = insertLogisticsDetail(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(),Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount), oLogistics.getId(), user, planVo.getId());
+            /*ResultVO resultVO = insertLogisticsDetail(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(),Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount), oLogistics.getId(), user, planVo.getId());
 
             //插入成功更新排单信息
             if (resultVO.isSuccess()) {
@@ -1837,8 +1856,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                             logistics.setSendMsg(e.getLocalizedMessage());
                             oLogisticsMapper.updateByPrimaryKeySelective(logistics);
                         }
-                        //===============================================================================
-                        //cxinfo 机具退货调整首刷接口调用
                     }else if (PlatformType.MPOS.code.equals(platForm.getPlatformType())){
                         log.info("======首刷发货 更新库存记录:{}:{}",proType,stringList);
                         //起始sn
@@ -1988,6 +2005,113 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                             logistics.setSendMsg(e.getLocalizedMessage());
                             oLogisticsMapper.updateByPrimaryKeySelective(logistics);
                         }
+                    }else  if (PlatformType.RDBPOS.code.equals(platForm.getPlatformType())){
+                        //瑞大宝退货转发平台
+                        // terminalNoStart  String    终端编号起始
+                        // terminalNoEnd    String    终端编号结束（必须15位）
+                        // agencyId         String    代理商A码（必须15位）
+                        // isFreeze         String    是否执行冻结("1" 执行)
+                        // id               String    id
+                        // status           Integer   能否转发("1" 能转发 "2"已执行冻结)
+                        // unableNum        Integer   不能转发的终端数量
+                        //============================================================================================================================================================
+
+                        Map<String, Object> reqMap = new HashMap<String, Object>();
+                        reqMap.put("terminalNoStart",oLogistics.getSnBeginNum());   //终端编号起始
+                        reqMap.put("terminalNoEnd",oLogistics.getSnEndNum());   //终端编号结束
+                        reqMap.put("id",oLogistics.getwNumber());   //id
+                        reqMap.put("agencyId",oLogistics.getSnEndNum());    //代理商A码（必须15位）
+                        reqMap.put("isFreeze",oLogistics.getSnEndNum());    //是否执行冻结("1" 执行)
+                        reqMap.put("status",oLogistics.getSnEndNum());      //能否转发("1" 能转发 "2"已执行冻结)
+                        reqMap.put("unableNum",oLogistics.getSnEndNum());   //不能转发的终端数量
+
+                        *//*try {
+                            String json = JsonUtil.objectToJson(reqMap);
+                            log.info("------------------------------------------>>>RDB退货下发查询参数:" + json);
+                            String respResult = HttpClientUtil.doPostJsonWithException(AppConfig.getProperty("rdbpos_return_of_goods"), json);
+
+                            if (!StringUtils.isNotBlank(respResult)) {
+                                throw new Exception("瑞大宝退货下发查询接口返回值为空，请联系管理员！");
+                            }
+
+                            JSONObject respJson = JSONObject.parseObject(respResult);
+                            if (!(null != respJson.getString("code") && null != respJson.getString("success") && respJson.getString("code").equals("0000") && respJson.getBoolean("success"))) {
+                                log.info("------------------------------------------>>>RDB退货下发返回异常:" + respResult);
+                                throw new Exception(null != respJson.getString("msg") ? respJson.getString("msg") : "瑞大宝，查询下发接口，返回值异常，请联系管理员!");
+                            }
+
+                            //查询成功，进行退货下发
+                            reqMap.clear();
+                            reqMap.put("taskId", logistics.getwNumber());
+                            try {
+                                String retJson = JsonUtil.objectToJson(reqMap);
+                                String retString = HttpClientUtil.doPostJsonWithException(AppConfig.getProperty("rdbpos.checkTermResult"), retJson);
+                                if (!StringUtils.isNotBlank(retString)) {
+                                    throw new Exception("瑞大宝,查询,下发接口,返回值为空，请联系管理员！");
+                                }
+
+                                JSONObject resJson = JSONObject.parseObject(retString);
+                                log.info("------------------------------------------>>>RDB退货下发查询接口返回值:" + retString);
+                                log.info("------------------------------------------>>>退货要修改的明细具体信息:" + JsonUtil.objectToJson(listOLogisticsDetailSn));
+                                if (null != resJson.getString("code") && resJson.getString("code").equals("0000") && null != resJson.getBoolean("success") && resJson.getBoolean("success")) {
+                                    //机具,下发成功，更新物流明细为下发成功
+                                    log.info("下发物流接口调用成功：物流编号:{},批次编号:{},时间:{},信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), resJson.getString("msg"));
+                                    listOLogisticsDetailSn.forEach(detail -> {
+                                        detail.setSendStatus(LogisticsDetailSendStatus.send_success.code);
+                                        detail.setSbusMsg(resJson.getString("msg"));
+                                        detail.setuTime(date);
+                                        oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
+                                    });
+                                    retMap.put("result", true);
+                                    return retMap;
+                                } else if (null != resJson.getString("code") && resJson.getString("code").equals("9999") && null != resJson.getBoolean("success") && !resJson.getBoolean("success")) {
+                                    //机具,下发失败，更新物流明细为下发失败，更新物流信息未下发失败，禁止再次发送，人工介入
+                                    List<Dict> dicts = dictOptionsService.dictList(DictGroup.EMAIL.name(), DictGroup.LOGISTICS_FAIL_EMAIL.name());
+                                    String[] emailArr = new String[dicts.size()];
+                                    for (int i = 0; i < dicts.size(); i++) {
+                                        emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
+                                    }
+                                    AppConfig.sendEmail(emailArr, "SN开始：" + logistics.getSnBeginNum() + ",SN结束：" + logistics.getSnEndNum(), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                                    //AppConfig.sendEmails("SN开始：" + logistics.getSnBeginNum() + ",SN结束：" + logistics.getSnEndNum(), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                                    log.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), resJson.getString("msg"));
+                                    listOLogisticsDetailSn.forEach(detail -> {
+                                        detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
+                                        detail.setSbusMsg(resJson.getString("msg"));
+                                        detail.setuTime(date);
+                                        oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
+                                    });
+                                    retMap.put("result", false);
+                                    return retMap;
+                                } else if (null != resJson.getString("code") && resJson.getString("code").equals("2001") && null != resJson.getBoolean("success") && !resJson.getBoolean("success")) {
+                                    //订单处理中，返回到明细处理，明细继续循环处理，一直到业务系统处理完成
+                                    listOLogisticsDetailSn.forEach(detail -> {
+                                        detail.setSendStatus(LogisticsDetailSendStatus.none_send.code);
+                                        detail.setSbusMsg(resJson.getString("msg"));
+                                        detail.setuTime(date);
+                                        oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
+                                    });
+                                    retMap.put("code", "RDBPOS");
+                                    retMap.put("result", false);
+                                    return retMap;
+                                } else {
+                                    throw new Exception("瑞大宝，查询下发接口，返回值不符合要求，请联系管理员！");
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                throw e;
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            //发送异常邮件
+                            List<Dict> dicts = dictOptionsService.dictList(DictGroup.EMAIL.name(), DictGroup.LOGISTICS_FAIL_EMAIL.name());
+                            String[] emailArr = new String[dicts.size()];
+                            for (int i = 0; i < dicts.size(); i++) {
+                                emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
+                            }
+                            AppConfig.sendEmail(emailArr, "瑞大宝，查询下发接口，发送请求失败：" + MailUtil.printStackTrace(e), "瑞大宝接口异常");
+                            throw e;
+                        }*//*
+                        //============================================================================================================================================================
                     }else{
                         OLogistics logistics_send =oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
                         logistics_send.setSendStatus(LogisticsSendStatus.dt_send.code);
@@ -2001,7 +2125,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 }
             }else{
                     return AgentResult.fail(resultVO.getResInfo());
-            }
+            }*/
         return AgentResult.ok();
     }
 
@@ -2481,6 +2605,55 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         }
         log.info("导出退转发明细数据：", receiptOrderVoList);
         return receiptOrderVoList;
+    }
+
+    /**
+     * 冻结其他平台SN号码，防止代理商误操作
+     * @param list
+     */
+    private void checkSnForOtherPlatform(List<Map> list) {
+        try {
+            //查询机具平台
+            PlatForm platForm =platFormMapper.selectByOrderId((String) list.get(0).get("orderId"));
+            if (null == platForm) throw new ProcessException("原订单信息不存在，请核实SN号码是否正确！");
+
+            //RDB业务平台查询sn是否可以下发（后期维护扩展到其他系统校验）
+            if(PlatformType.RDBPOS.code.equals(platForm.getPlatformType())) {
+                Map<String, Object> reqMap = new HashMap<String, Object>();
+                List<Map<String, Object>> reqList = new ArrayList<Map<String, Object>>();
+                for (Map<String, Object> map : list) {
+                    //瑞大宝查询、冻结、所需参数
+                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByOrderId((String) list.get(0).get("orderId"));
+                    reqList.add(FastMap.fastMap("terminalNoStart", map.get("startSn")).
+                            putKeyV("terminalNoEnd", map.get("endSn")).
+                            putKeyV("id", agentBusInfo.getId()).
+                            putKeyV("agencyId", agentBusInfo.getBusNum()) //代理商A码（必须15位）
+                    );
+                }
+                reqMap.put("terminalNos", reqList);
+                reqMap.put("isFreeze", "1"); //"1"执行冻结
+                //冻结Sn、不允许代理商操作机具。
+                try {
+                    String json = JsonUtil.objectToJson(reqMap);
+                    log.info("------------------------------------------>>>RDB退货查询冻结参数:" + json);
+                    String respResult = HttpClientUtil.doPostJsonWithException(AppConfig.getProperty("rdbpos_return_of_goods_freeze"), json);
+
+                    if (!StringUtils.isNotBlank(respResult)) {
+                        throw new Exception("瑞大宝退货下发查询接口返回值为空，请联系管理员！");
+                    }
+
+                    JSONObject respJson = JSONObject.parseObject(respResult);
+                    if (!(null != respJson.getString("code") && null != respJson.getString("success") && respJson.getString("code").equals("0000") && respJson.getBoolean("success"))) {
+                        log.info("------------------------------------------>>>RDB冻结退货SN返回异常:" + respResult);
+                        throw new Exception(null != respJson.getString("msg") ? respJson.getString("msg") : "RDB业务平台冻结SN接口，返回值异常，请联系管理员！！！");
+                    }
+                } catch (Exception e) {
+                    throw new ProcessException("冻结瑞大宝SN失败，瑞大宝接口异常，请联系管理员");
+                }
+            }
+        }catch (ProcessException e) {
+            throw e;
+        }
     }
 
 }
