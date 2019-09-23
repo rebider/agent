@@ -648,6 +648,7 @@ public class AgentServiceImpl implements AgentService {
         if(StringUtils.isNotBlank(map.get("agName"))){
             c.andAgNameEqualTo(map.get("agName"));
         }
+        c.andAgStatusEqualTo(String.valueOf(AgStatus.Refuse.status));
         c.andStatusEqualTo(Status.STATUS_1.status);
         List<Agent> list = agentMapper.selectByExample(example);
         return list;
