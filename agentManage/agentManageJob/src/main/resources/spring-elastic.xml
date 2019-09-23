@@ -173,6 +173,16 @@
                   overwrite="true"
                   disabled="false"/>
 
+    <job:dataflow id="updateAgentCertifiDetail"
+                  job-ref="updateAgentCertifiDetailJob"
+                  registry-center-ref="regCenter"
+                  cron="0 0/1 * * * ? *"
+                  sharding-total-count="1"
+                  sharding-item-parameters="0=C"
+                  streaming-process="true"
+                  description="定时更新代理商工商认证信息"
+                  overwrite="true"
+                  disabled="false"/>
 
     <job:simple id="osnTuiHuoGenSnDetail"
                 job-ref="osnTuiHuoGenSnDetailJob"

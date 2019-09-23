@@ -93,7 +93,11 @@ public enum DictGroup {
 
     EMAIL("邮件模块"),
     LOGISTICS_FAIL_EMAIL("物流失败邮件"),
-    RATYPE("销账方式");
+    RATYPE("销账方式"),
+
+    CERTIFICATION_STATUS("代理商工商认证");
+
+
 
     public String  msg;
 
