@@ -1,6 +1,5 @@
 package com.ryx.credit.pojo.admin.vo;
 
-import com.ryx.credit.pojo.admin.agent.AgentContract;
 import com.ryx.credit.pojo.admin.order.ORemoveAccount;
 
 import java.io.Serializable;
