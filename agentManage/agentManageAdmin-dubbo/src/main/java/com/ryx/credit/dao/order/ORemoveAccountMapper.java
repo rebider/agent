@@ -4,6 +4,7 @@ import com.ryx.credit.pojo.admin.order.ORemoveAccount;
 import com.ryx.credit.pojo.admin.order.ORemoveAccountExample;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ORemoveAccountMapper {
     long countByExample(ORemoveAccountExample example);
@@ -21,4 +22,8 @@ public interface ORemoveAccountMapper {
     int updateByPrimaryKeySelective(ORemoveAccount record);
 
     int updateByPrimaryKey(ORemoveAccount record);
+
+    Long rAccountDetailCount(Map<String, Object> param);
+
+    List<Map<String,Object>> rAccountDetailList(Map<String, Object> param);
 }

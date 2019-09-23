@@ -330,4 +330,48 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+
+  <sql id="PAGING_START">
+    <if test="begin != null  and end != null and end >0">
+      SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
+    </if>
+  </sql>
+
+  <sql id="PAGING_END">
+    <if test="begin != null  and end != null and end >0">
+      ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN > #{begin}
+    </if>
+  </sql>
+
+
+  <!--销账明细-->
+  <select id="rAccountDetailList" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="PAGING_START" />
+    select at.att_name,a.* from O_REMOVE_ACCOUNT a left join A_attachment_rel b on a.BATCH_NUM=b.src_id
+    left join A_attachment at on at.id=b.ATT_ID
+    where  1=1 <include refid="RACCOUNTDETAIL_WHERE_SQL"/> and b.status=1 and a.status=1 and at.status=1
+    <include refid="PAGING_END" />
+  </select>
+
+  <select id="rAccountDetailCount" parameterType="java.util.Map" resultType="java.lang.Long">
+    select count(1) from O_REMOVE_ACCOUNT a left join A_attachment_rel b on a.BATCH_NUM=b.src_id
+    left join A_attachment at on at.id=b.ATT_ID
+    where 1=1<include refid="RACCOUNTDETAIL_WHERE_SQL"/> and b.status=1 and a.status=1 and at.status=1
+  </select>
+
+  <sql id="RACCOUNTDETAIL_WHERE_SQL">
+    <if test="ag_name !=null and ag_name !='' ">
+      and  a.AG_NAME LIKE CONCAT(CONCAT('%',#{ag_name}),'%')
+    </if>
+    <if test="busNum !=null and busNum !='' ">
+      and  a.bus_num LIKE CONCAT(CONCAT('%',#{busNum}),'%')
+    </if>
+    <if test="id !=null and id !='' ">
+      and  a.id LIKE CONCAT(CONCAT('%',#{id}),'%')
+    </if>
+    <if test="batch_num !=null and batch_num !='' ">
+      and  a.BATCH_NUM LIKE CONCAT(CONCAT('%',#{batch_num}),'%')
+    </if>
+  </sql>
 </mapper>

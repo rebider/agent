@@ -3770,7 +3770,7 @@ public class OrderServiceImpl implements OrderService {
                     if (org.apache.commons.lang.StringUtils.isEmpty(s)) continue;
                     AttachmentRel record = new AttachmentRel();
                     record.setAttId(s);
-                    record.setSrcId(removeAccount.getId());
+                    record.setSrcId(removeAccount.getBatchNum());
                     record.setcUser(removeAccount.getSubmitPerson());
                     record.setcTime(removeAccount.getSubmitTime());
                     record.setStatus(Status.STATUS_1.status);
