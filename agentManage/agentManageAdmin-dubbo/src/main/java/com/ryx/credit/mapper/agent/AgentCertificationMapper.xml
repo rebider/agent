@@ -709,7 +709,7 @@
      agentCer.ANCHE_DATE, agentCer.INDUSTRY_PHY_CODE, agentCer.INDUSTRY_PHY_NAME, agentCer.INDUSTRY_CODE,
      agentCer.INDUSTRY_NAME, agentCer.REC_CAP, agentCer.ORI_REG_NO, agentCer.CREDIT_CODE, agentCer.APPR_DATE,
      agentCer.ORG_NO, agentCer.USCI, agentCer.REQ_CER_TM, agentCer.CER_SUCCESS_TM, agentCer.CER_NUM, agentCer.CER_PRO_STAT,
-      agentCer.CER_RES,agentCer.AG_BUS_LIC from a_agent_certification agentCer where agentCer.id = #{map.id} order by agentCer.req_cer_tm desc
+      agentCer.CER_RES,agentCer.AG_BUS_LIC from a_agent_certification agentCer where agentCer.agent_id = #{map.id} order by agentCer.req_cer_tm desc
   </sql>
 
   <select id="queryAgentCerDetails" parameterType="map" resultType="map">
