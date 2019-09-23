@@ -1,12 +1,24 @@
 package com.ryx.credit.pojo.admin.order;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.ryx.credit.common.util.DateJsonDeserializerMonth;
+import com.ryx.credit.common.util.DateJsonSerializerMonth;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class ORemoveAccount implements Serializable{
     private String id;
 
+    @JSONField(format="yyyy-MM")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM", timezone = "GMT+8")
+    @JsonDeserialize(using = DateJsonDeserializerMonth.class)
+    @JsonSerialize(using = DateJsonSerializerMonth.class)
     private Date rmonth;
 
     private String agId;
