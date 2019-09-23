@@ -71,4 +71,14 @@ public interface OsnOperateService {
      * @return
      */
     Map<String, Object> sendInfoToBusinessSystem(List<OLogisticsDetail>  datas, String logcId, BigDecimal batch)throws Exception;
+
+    /**
+     * 更新物流明细状态
+     * @param datas
+     * @param batch
+     * @param code
+     * @return
+     * @throws Exception
+     */
+    public boolean updateDetailBatch(List<OLogisticsDetail> datas, BigDecimal batch, BigDecimal code) throws Exception;
 }

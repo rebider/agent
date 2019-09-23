@@ -93,4 +93,10 @@ public interface AgentBusInfoMapper {
     int updateBusLoginNum(@Param("reqMap")Map<String, Object> reqMap);
 
     List<AgentBusInfo> selectBusInfo(@Param("reqMap")Map<String, Object> reqMap);
+
+    //通过订单ID查询业务信息
+    AgentBusInfo selectByOrderId(String orderId);
+
+    //查询排单对应的（退货子订单明细-->>查询原订单-->>查询原来排单-->>查询原来业务信息表--busNum）
+    Map<String,Object> selectByReturnDetailId(Map<String, Object> reqMap);
 }

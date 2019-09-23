@@ -1095,4 +1095,30 @@ union
         </if>
       </where>
   </select>
+
+  <!-- 通过订单查询代理商业务信息_Z -->
+  <select id="selectByOrderId" parameterType="java.lang.String" resultMap="BaseResultMap">
+      SELECT
+          AB.*
+      FROM
+          A_AGENT_BUSINFO AB
+          LEFT JOIN O_ORDER O ON O.BUS_ID = AB.ID
+      WHERE
+          O.ID=#{orderId,jdbcType=VARCHAR}
+  </select>
+
+  <!-- 查询排单对应的（退货子订单明细->>查询原订单->>查询原来排单->>查询原来业务信息表-busNum）_Z -->
+  <select id="selectByReturnDetailId" parameterType="map" resultType="map">
+      SELECT
+          AB.BUS_NUM AS BUSNUM,
+          A.BUS_PRO_CODE AS BUSPROCODE,
+          AB.BUS_PLATFORM AS BUSPLATFORM
+      FROM
+          A_AGENT_BUSINFO AB
+          LEFT JOIN O_ORDER O ON O.BUS_ID = AB.ID
+          LEFT JOIN O_RETURN_ORDER_DETAIL ROD ON ROD.ORDER_ID = O.ID
+          LEFT JOIN O_ACTIVITY A ON A.ID = ROD.ACTID
+      WHERE
+          ROD.ID = #{returnOrderDetailId}
+  </select>
 </mapper>
