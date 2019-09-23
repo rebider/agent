@@ -14,6 +14,7 @@ import com.ryx.credit.dao.CuserAgentMapper;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.*;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.vo.AgentCaVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.UserVo;
 import com.ryx.credit.service.ICuserAgentService;
@@ -84,6 +85,8 @@ public class AgentServiceImpl implements AgentService {
     private IResourceService iResourceService;
     @Autowired
     private COrganizationMapper organizationMapper;
+    @Autowired
+    private DictOptionsService dictOptionsService;
 
     /**
      * 查询代理商信息
@@ -843,4 +846,41 @@ public class AgentServiceImpl implements AgentService {
         }
         return db_agent;
     }
+
+    @Override
+    public List<Agent> queryByIds(List ids) {
+        List<Agent> agents = agentMapper.selectByPrimaryKeys(ids);
+        return agents;
+    }
+
+    @Override
+    public PageInfo agentCaManageList(Page page, Map map) {
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(agentMapper.queryCaManagerList(map, page));
+        pageInfo.setTotal(agentMapper.queryCaManagerListCount(map,page));
+        return pageInfo;
+    }
+
+    @Override
+    public List<AgentCaVo> exportAgentCa(Map map) {
+
+        List<AgentCaVo> list = agentMapper.expoerCaList(map);
+        List<Dict> caStatus = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.CERTIFICATION_STATUS.name());
+        if (null != list && list.size() > 0)
+            list.forEach(agent->{
+                if (null!=agent.getCaStatus()) {
+                    for (Dict dict : caStatus) {
+                        if (null!=dict  &&  agent.getCaStatus().toString().equals(dict.getdItemvalue())){
+                            agent.setCaStatusMark(dict.getdItemname());
+                            break;
+                        }
+                    }
+                }
+            });
+
+
+        return list;
+    }
+
+
 }
