@@ -35,4 +35,8 @@ public interface PlatFormMapper {
     String selectPlatType(String platformNum);
 
     String selectBusPlatFormByPlatformNum(String platformNum);
+
+    List selectByOrderIdList(List<String> orderIdList);
+
+    PlatForm selectByOrderId(String orderId);
 }
