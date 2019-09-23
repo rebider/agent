@@ -85,7 +85,7 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
                ZoneId zoneId = ZoneId.systemDefault();
                ZonedDateTime zdt = LocalDateTime.now().atZone(zoneId);//Combines this date-time with a time-zone to create a  ZonedDateTime.
                Date date = Date.from(zdt.toInstant());
-               FastMap par = FastMap.fastMap("id",cer.getId());
+               FastMap par = FastMap.fastMap("id",cer.getAgUniqNum());
                agentCer.setId(idService.genIdInTran(TabId.a_agent_certification));
                agentCer.setAgentId(cer.getAgUniqNum());
                agentCer.setReqRegNo("");
