@@ -468,6 +468,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     @Override
     public AgentResult saveBusinessPlatform(AgentVo agentVo) throws ProcessException {
         try {
+            Map<String, Object> reqMap = new HashMap<>();
             Agent agent = agentVo.getAgent();
             agent.setId(agentVo.getAgentId());
             //先查询业务是否已添加 有个添加过 全部返回
@@ -482,8 +483,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     if (StringUtils.isBlank(item.getBusParent())){
                         throw new ProcessException("升级直签上级不能为空");
                     }
-                    Map<String, Object> reqMap = new HashMap<>();
+
                     reqMap.put("busInfo",item);
+                    reqMap.put("agentVo",agentVo);
                     AgentResult agentResult = agentNetInNotityService.agencyLevelCheck(reqMap);
                     if(!agentResult.isOK()){
                         throw new ProcessException(agentResult.getMsg());

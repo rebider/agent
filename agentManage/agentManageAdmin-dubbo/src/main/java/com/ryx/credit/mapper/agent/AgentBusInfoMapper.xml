@@ -1121,4 +1121,16 @@ union
       WHERE
           ROD.ID = #{returnOrderDetailId}
   </select>
+
+  <!-- 通过ID查询平台编码和POS唯一码（后期维护可升级）_Z -->
+  <select id="selectByIdForPosUpSingCheck" parameterType="string" resultType="map">
+      SELECT
+          AB.BUS_NUM AS BUSNUM,
+          P.POSANAMEPREFIX AS POSANAMEPREFIX
+      FROM
+          A_AGENT_BUSINFO AB
+          LEFT JOIN A_PLATFORM P ON P.PLATFORM_NUM=AB.BUS_PLATFORM
+      WHERE
+          AB.ID = #{id}
+  </select>
 </mapper>
