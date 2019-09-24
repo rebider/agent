@@ -483,8 +483,8 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
 
             //查询上级编码，和活动首字母
             Map<String, Object> upSingCheckMap = agentBusInfoMapper.selectByIdForPosUpSingCheck(agentBusInfo.getBusParent());
-            if (null == upSingCheckMap.get("BUSNUM") || null == upSingCheckMap.get("POSANAMEPREFIX"))
-                throw new Exception("POS预升级参数异常，请联系管理员！！！");
+            if (null == upSingCheckMap.get("BUSNUM"))
+                throw new Exception("上级代理商信息不存在，请联系管理员！！！");
 
             String cooperator = Constants.cooperator;
             String tranCode = "ORG018"; // 交易码
@@ -541,6 +541,7 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
                     throw new MessageException("签名验证失败");
                 } else {
                     log.info("签名验证成功");
+                    log.info("POS预升级返回参数："+respXML);
                     JSONObject respXMLObj = JSONObject.parseObject(respXML);
                     JSONObject retObj = JSONObject.parseObject(respXMLObj.getString("data"));
                     if (null != retObj.get("result_code") && null != retObj.get("result_msg") && "000000".equals(retObj.get("result_code"))){
