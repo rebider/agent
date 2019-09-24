@@ -31,7 +31,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ryx.credit.common.exception.ProcessException;
-import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.dict.IdService;
 
@@ -1082,5 +1081,36 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		return map;
 	}
 
+	/**
+	 * 分页查询代理商业务信息
+	 * @param page
+	 * @param agentBusInfo
+	 * @param time
+	 * @return
+	 */
+	@Override
+	public PageInfo queryAgentBusInfoForPage(Page page, AgentBusInfo agentBusInfo, String time) {
+
+		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+		agentBusInfoExample.setPage(page);
+		agentBusInfoExample.setOrderByClause(" c_time desc ");
+
+		// 有条件的分页查询
+		List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByConditionForPage(page, agentBusInfo);
+
+		PageInfo pageInfo = new PageInfo();
+		pageInfo.setRows(agentBusInfos);
+		pageInfo.setTotal(agentBusInfoMapper.countByExample(agentBusInfoExample));
+
+		return pageInfo;
+	}
+
+	/**
+	 * 通过代理商id查询
+	 */
+	@Override
+	public AgentBusInfo queryAgentBusInfoById(String id) {
+		return agentBusInfoMapper.selectByPrimaryKey(id);
+	}
 }
 

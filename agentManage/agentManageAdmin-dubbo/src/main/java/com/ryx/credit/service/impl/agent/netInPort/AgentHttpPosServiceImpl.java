@@ -5,10 +5,7 @@ import com.ryx.credit.common.enumc.DictGroup;
 import com.ryx.credit.common.enumc.OrgType;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.AppConfig;
-import com.ryx.credit.common.util.HttpClientUtil;
-import com.ryx.credit.common.util.JsonUtil;
-import com.ryx.credit.common.util.MailUtil;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.common.util.agentUtil.AESUtil;
 import com.ryx.credit.common.util.agentUtil.RSAUtil;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
@@ -18,6 +15,7 @@ import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInHttpService;
@@ -25,6 +23,7 @@ import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.bank.PosRegionService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.util.Constants;
+import com.sun.corba.se.spi.ior.ObjectKey;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -468,9 +467,92 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
         return httpRequestNetIn(paramMap);
     }
 
+    /**
+     * POS升级直签校验
+     * @param paramMap
+     * @return
+     * @throws Exception
+     */
     @Override
     public AgentResult agencyLevelCheck(Map<String, Object> paramMap)throws Exception{
-        return AgentResult.ok();
+        try {
+            AgentVo agentVo = (AgentVo) paramMap.get("agentVo");
+            if (null == agentVo || null == agentVo.getBusInfoVoList())
+                throw new Exception("信息不完整，请补全业务信息，如有疑问请联系管理员");
+            AgentBusInfo agentBusInfo = agentVo.getBusInfoVoList().get(0);
+
+            //查询上级编码，和活动首字母
+            Map<String, Object> upSingCheckMap = agentBusInfoMapper.selectByIdForPosUpSingCheck(agentBusInfo.getBusParent());
+            if (null == upSingCheckMap.get("BUSNUM") || null == upSingCheckMap.get("POSANAMEPREFIX"))
+                throw new Exception("POS预升级参数异常，请联系管理员！！！");
+
+            String cooperator = Constants.cooperator;
+            String tranCode = "ORG018"; // 交易码
+            String charset = "UTF-8"; // 字符集
+            String reqMsgId = UUID.randomUUID().toString().replace("-", ""); // 请求流水
+            String reqDate = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"); // 请求时间
+
+            JSONObject jsonParams = new JSONObject();
+            jsonParams.put("msgType", "01");
+            jsonParams.put("reqDate", reqDate);
+            jsonParams.put("version", "1.0.0");
+            jsonParams.put("data", FastMap.
+                    fastMap("agentOrgId",upSingCheckMap.get("BUSNUM")).
+                    putKeyV("orgId",agentBusInfo.getBusNum()).
+                    putKeyV("organInitials",upSingCheckMap.get("POSANAMEPREFIX")));
+            String plainXML = jsonParams.toString();
+            // 请求报文加密开始
+            String keyStr = AESUtil.getAESKey();
+            byte[] plainBytes = plainXML.getBytes(charset);
+            byte[] keyBytes = keyStr.getBytes(charset);
+            String encryptData = new String(Base64.encodeBase64((AESUtil.encrypt(plainBytes, keyBytes, "AES", "AES/ECB/PKCS5Padding", null))), charset);
+            String signData = new String(Base64.encodeBase64(RSAUtil.digitalSign(plainBytes, Constants.privateKey, "SHA1WithRSA")), charset);
+            String encrtptKey = new String(org.apache.commons.codec.binary.Base64.encodeBase64(RSAUtil.encrypt(keyBytes, Constants.publicKey, 2048, 11, "RSA/ECB/PKCS1Padding")), charset);
+
+            // 请求报文加密结束
+            Map<String, String> map = new HashMap<>();
+            map.put("encryptData", encryptData);
+            map.put("encryptKey", encrtptKey);
+            map.put("cooperator", cooperator);
+            map.put("signData", signData);
+            map.put("tranCode", tranCode);
+            map.put("reqMsgId", reqMsgId);
+            log.info("通知pos请求参数:{}",map);
+            String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("agent_pos_notify_url"), map);
+            JSONObject jsonObject = JSONObject.parseObject(httpResult);
+            if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
+                log.info("Pos升级直签校验失败：" + httpResult);
+                throw new Exception("pos升级直签校验失败");
+            } else {
+                String resEncryptData = jsonObject.getString("encryptData");
+                String resEncryptKey = jsonObject.getString("encryptKey");
+                byte[] decodeBase64KeyBytes = Base64.decodeBase64(resEncryptKey.getBytes(charset));
+                byte[] merchantAESKeyBytes = RSAUtil.decrypt(decodeBase64KeyBytes, Constants.privateKey, 2048, 11, "RSA/ECB/PKCS1Padding");
+                byte[] decodeBase64DataBytes = Base64.decodeBase64(resEncryptData.getBytes(charset));
+                byte[] merchantXmlDataBytes = AESUtil.decrypt(decodeBase64DataBytes, merchantAESKeyBytes, "AES", "AES/ECB/PKCS5Padding", null);
+                String respXML = new String(merchantXmlDataBytes, charset);
+                log.info("Pos升级直签校验：{}",respXML);
+
+                // 报文验签
+                String resSignData = jsonObject.getString("signData");
+                byte[] signBytes = Base64.decodeBase64(resSignData);
+                if (!RSAUtil.verifyDigitalSign(respXML.getBytes(charset), signBytes, Constants.publicKey, "SHA1WithRSA")) {
+                    log.info("签名验证失败");
+                    throw new MessageException("签名验证失败");
+                } else {
+                    log.info("签名验证成功");
+                    JSONObject respXMLObj = JSONObject.parseObject(respXML);
+                    JSONObject retObj = JSONObject.parseObject(respXMLObj.getString("data"));
+                    if (null != retObj.get("result_code") && null != retObj.get("result_msg") && "000000".equals(retObj.get("result_code"))){
+                        return AgentResult.ok();
+                    } else {
+                        return AgentResult.fail(null != retObj.get("result_msg")?(String)retObj.get("result_msg"):"POS升级直签校验返回值异常，请联系管理员！！！");
+                    }
+                }
+            }
+        }catch (Exception e){
+            throw e;
+        }
     }
 }
 

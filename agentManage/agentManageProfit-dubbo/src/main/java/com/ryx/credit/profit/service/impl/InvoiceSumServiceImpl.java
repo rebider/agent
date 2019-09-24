@@ -166,7 +166,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                     return resultMap;
                 }
             }
-            if (surplusAmt.compareTo(BigDecimal.ZERO) == 0) {
+            if (surplusAmt.compareTo(BigDecimal.ZERO) <= 0) {
                 AdjustFreeze(param);
                 invoiceSum.setInvoiceStatus("99");
             }
@@ -556,6 +556,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                         invoiceSum2.get(0).setDayProfitAmt(new BigDecimal(invoiceSumList.get(7).toString().trim()));
                         invoiceSum2.get(0).setPreProfitMonthAmt(new BigDecimal(invoiceSumList.get(8).toString().trim()));
                         invoiceSum2.get(0).setSubAddInvoiceAmt(new BigDecimal(invoiceSumList.get(9).toString().trim()));
+
                         if(invoiceSums.size()!=0){
                             invoiceSum2.get(0).setOwnInvoice(invoiceSum2.get(0).getPreLeftAmt().add(invoiceSum2.get(0).getSubAddInvoiceAmt()).add(invoiceSum2.get(0).getDayBackAmt()).add(invoiceSum2.get(0).getDayProfitAmt()).add(invoiceSum2.get(0).getPreProfitMonthAmt()).subtract(invoiceSum2.get(0).getAddInvoiceAmt()==null?BigDecimal.ZERO:invoiceSum2.get(0).getAddInvoiceAmt()).add(invoiceSum2.get(0).getAdjustAmt()==null?BigDecimal.ZERO:invoiceSum2.get(0).getAdjustAmt()));
                         }

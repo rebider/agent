@@ -355,6 +355,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 Dict debitRateLower = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfoVo.getBusPlatform(), "debitRateLower");//借记费率下限（%）
                 Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfoVo.getBusPlatform(), "debitCapping");//借记封顶额（元）
                 Dict debitAppearRate = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfoVo.getBusPlatform(), "debitAppearRate");//借记出款费率（%）
+                Dict creditRateFloor = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "creditRateFloor");//贷记费率下限（%）
+                Dict creditRateCeiling = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "creditRateCeiling");//贷记费率上限（%）
                 if(debitRateLower!=null){
                     agentBusInfoVo.setDebitRateLower(debitRateLower.getdItemvalue());
                 }
@@ -363,6 +365,12 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 }
                 if(debitAppearRate!=null){
                     agentBusInfoVo.setDebitAppearRate(debitAppearRate.getdItemvalue());
+                }
+                if (creditRateFloor != null) {
+                    agentBusInfo.setCreditRateFloor(creditRateFloor.getdItemname());
+                }
+                if (creditRateCeiling != null) {
+                    agentBusInfo.setCreditRateCeiling(creditRateCeiling.getdItemname());
                 }
                 agentBusInfoVo.setVersion(agbus.getVersion());
                 int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfoVo);
@@ -468,6 +476,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     @Override
     public AgentResult saveBusinessPlatform(AgentVo agentVo) throws ProcessException {
         try {
+            Map<String, Object> reqMap = new HashMap<>();
             Agent agent = agentVo.getAgent();
             agent.setId(agentVo.getAgentId());
             //先查询业务是否已添加 有个添加过 全部返回
@@ -482,8 +491,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     if (StringUtils.isBlank(item.getBusParent())){
                         throw new ProcessException("升级直签上级不能为空");
                     }
-                    Map<String, Object> reqMap = new HashMap<>();
+
                     reqMap.put("busInfo",item);
+                    reqMap.put("agentVo",agentVo);
                     AgentResult agentResult = agentNetInNotityService.agencyLevelCheck(reqMap);
                     if(!agentResult.isOK()){
                         throw new ProcessException(agentResult.getMsg());
@@ -778,6 +788,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         List<BusinessOutVo> agentoutVos = agentBusInfoMapper.excelAgent(map);
         List<Dict> BUS_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name());
         List<Dict> BUS_SCOPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name());
+        List<Dict> BUS_STATUS = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_STATUS.name());
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         if (null != agentoutVos && agentoutVos.size() > 0)
             for (BusinessOutVo agentoutVo : agentoutVos) {//类型
@@ -808,11 +819,20 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                             agentoutVo.setBusRegion(name);
                     }
                 }
-
+                //业务范围
                 if (StringUtils.isNotBlank(agentoutVo.getBusScope()) && !agentoutVo.getBusScope().equals("null")) {
-                    for (Dict dict : BUS_SCOPE) {//业务范围
+                    for (Dict dict : BUS_SCOPE) {
                         if (null!=dict  &&  agentoutVo.getBusScope().equals(dict.getdItemvalue())){
                             agentoutVo.setBusScope(dict.getdItemname());
+                            break;
+                        }
+                    }
+                }
+                //业务状态
+                if (StringUtils.isNotBlank(agentoutVo.getBusStatus()) && !agentoutVo.getBusStatus().equals("null")) {
+                    for (Dict dict : BUS_STATUS) {
+                        if (null!=dict && agentoutVo.getBusStatus().equals(dict.getdItemvalue())){
+                            agentoutVo.setBusStatus(dict.getdItemname());
                             break;
                         }
                     }

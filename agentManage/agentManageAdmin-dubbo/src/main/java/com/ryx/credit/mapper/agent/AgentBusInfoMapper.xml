@@ -440,7 +440,7 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample" resultType="java.lang.Integer">
     select count(*) from A_AGENT_BUSINFO
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -663,6 +663,7 @@
                 <if test="par.bus_num!=null and par.bus_num!=''">and a.bus_num = #{par.bus_num}</if>
                 <if test="1==1">and a.status = 1</if>
                 <if test="1==1">and b.status = 1</if>
+                <if test="1==1">and (a.bus_status='1' or a.bus_status='0')</if>
                 <if test="par.page!=null">and rownum &lt;= #{par.page.from} + #{par.page.size}</if>
               </where>
               order by a.c_time desc
@@ -840,7 +841,7 @@
     bus.approve_time,platform.PLATFORM_NAME,
     a1.AG_NAME||businfo_1.id as busParent,
     busRiskParentbusAgent.ag_name as busRiskParent,busActivationParentbusAgent.ag_name as busActivationParent,
-    bus.bus_login_num
+    bus.bus_login_num, bus.bus_status
     from a_agent_businfo bus
     LEFT JOIN  a_agent agent ON agent.id = bus.agent_id
     LEFT JOIN a_agent_businfo busriskparentbus ON bus.bus_risk_parent = busriskparentbus.id
@@ -889,6 +890,9 @@
       <if test="reqMap.busType != null and reqMap.busType != '' " >
       and bus.bus_type = #{reqMap.busType}
       </if>
+      <if test="reqMap.busStatus != null and reqMap.busStatus != '' " >
+      and bus.bus_status = #{reqMap.busStatus}
+      </if>
     and bus.status = #{reqMap.status}
    )
   </select>
@@ -915,6 +919,7 @@
     <result column="APPROVE_TIME"  property="approveTime" jdbcType="TIMESTAMP"/>
     <result column="AG_DOC_PRO"  property="agDocPro" jdbcType="VARCHAR"/>
     <result column="BUS_LOGIN_NUM" property="busLoginNum" jdbcType="VARCHAR"/>
+    <result column="BUS_STATUS" property="busStatus" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!--查询业务编号和代理商信息-->
@@ -1094,5 +1099,60 @@ union
           and  1=-1
         </if>
       </where>
+  </select>
+
+  <select id="selectByConditionForPage" parameterType="map" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix"/>
+    select
+    <include refid="Base_Column_List"/>
+    from A_AGENT_BUSINFO
+    <where>
+      <if test="agentBusInfo.agentId != null and agentBusInfo.agentId != ''">
+        and id=#{agentBusInfo.agentId}
+      </if>
+      <if test="agentBusInfo.busNum != null and agentBusInfo.busNum != ''">
+        and id=#{agentBusInfo.busNum}
+      </if>
+    </where>
+    order by c_time desc
+    <include refid="OracleDialectSuffix"/>
+  </select>
+
+  <!-- 通过订单查询代理商业务信息_Z -->
+  <select id="selectByOrderId" parameterType="java.lang.String" resultMap="BaseResultMap">
+      SELECT
+          AB.*
+      FROM
+          A_AGENT_BUSINFO AB
+          LEFT JOIN O_ORDER O ON O.BUS_ID = AB.ID
+      WHERE
+          O.ID=#{orderId,jdbcType=VARCHAR}
+  </select>
+
+  <!-- 查询排单对应的（退货子订单明细->>查询原订单->>查询原来排单->>查询原来业务信息表-busNum）_Z -->
+  <select id="selectByReturnDetailId" parameterType="map" resultType="map">
+      SELECT
+          AB.BUS_NUM AS BUSNUM,
+          A.BUS_PRO_CODE AS BUSPROCODE,
+          AB.BUS_PLATFORM AS BUSPLATFORM
+      FROM
+          A_AGENT_BUSINFO AB
+          LEFT JOIN O_ORDER O ON O.BUS_ID = AB.ID
+          LEFT JOIN O_RETURN_ORDER_DETAIL ROD ON ROD.ORDER_ID = O.ID
+          LEFT JOIN O_ACTIVITY A ON A.ID = ROD.ACTID
+      WHERE
+          ROD.ID = #{returnOrderDetailId}
+  </select>
+
+  <!-- 通过ID查询平台编码和POS唯一码（后期维护可升级）_Z -->
+  <select id="selectByIdForPosUpSingCheck" parameterType="string" resultType="map">
+      SELECT
+          AB.BUS_NUM AS BUSNUM,
+          P.POSANAMEPREFIX AS POSANAMEPREFIX
+      FROM
+          A_AGENT_BUSINFO AB
+          LEFT JOIN A_PLATFORM P ON P.PLATFORM_NUM=AB.BUS_PLATFORM
+      WHERE
+          AB.ID = #{id}
   </select>
 </mapper>

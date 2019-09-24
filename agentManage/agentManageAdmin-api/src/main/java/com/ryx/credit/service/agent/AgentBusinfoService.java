@@ -118,4 +118,14 @@ public interface AgentBusinfoService {
     void updateBusLoginNum(String oldBusLoginNum,String busLoginNum)throws MessageException;
 
     Map<String,String> queryBusInfoByBrandNum(String brandNum)throws MessageException;
+
+    /**
+     * 分页查询代理商业务信息
+     */
+    PageInfo queryAgentBusInfoForPage(Page page, AgentBusInfo agentBusInfo, String time);
+
+    /**
+     * 代理商业务信息查询
+     */
+    AgentBusInfo queryAgentBusInfoById(String id);
 }

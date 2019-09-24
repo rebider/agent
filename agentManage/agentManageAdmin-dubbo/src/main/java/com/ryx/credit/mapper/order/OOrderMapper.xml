@@ -873,7 +873,6 @@
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
-      <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where  o.id=ORDER_ID and status=1 and PRO_TYPE=#{proType} ) </if>
       <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where  o.id=ORDER_ID and status=1 and model=#{model} ) </if>
       <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
@@ -972,7 +971,6 @@
       <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
-      <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
@@ -1256,7 +1254,7 @@
       <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus} </if>
       <if test="agDocDistrict!=null and agDocDistrict!=''"> and b.ag_doc_district = #{agDocDistrict} </if>
       <if test="agDocPro!=null and agDocPro!=''"> and b.ag_doc_pro = #{agDocPro} </if>
-      <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
+      <if test="busNum!=null and busNum!=''"> and aab.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="organizationCode!=null and organizationCode!=''">
         and (orging.CODE like concat(#{organizationCode},'%') or org.CODE like concat(#{organizationCode},'%') )
       </if>
@@ -1325,4 +1323,104 @@
     <result column="profit_mouth" property="profitMouth" jdbcType="VARCHAR"/>
     <result column="profit_form" property="profitForm" jdbcType="VARCHAR"/>
   </resultMap>
+
+  <!--欠款查询 -->
+  <select id="arrearageCount" parameterType="java.util.Map" resultType="java.lang.Long">
+     select count(1) from
+    (
+    select
+    to_char(o_payment_detail.plan_pay_time,'yyyy-mm') as tm,businfo.agent_id,businfo.bus_platform,sum(o_payment_detail.pay_amount) as jjqk
+    ,businfo.bus_num
+    from o_payment_detail o_payment_detail
+    left join o_payment op on o_payment_detail.payment_id=op.id and  o_payment_detail.payment_status in (1,3)
+    left join o_order o on o.id=op.order_id
+    left join a_agent_businfo businfo on businfo.id=o.bus_id where 1=1
+    <include refid="ARREARAGE_WHERE_SQL"/>
+    group by to_char(o_payment_detail.plan_pay_time,'yyyy-mm'),businfo.agent_id,businfo.bus_platform ,businfo.bus_num
+    )a left join a_platform on a.bus_platform=a_platform.platform_num
+    left join a_agent agent on agent.id=a.agent_id where 1=1
+    <include refid="BASE_WHERE_SQL"/>
+    order by agent.id,  a.tm desc
+  </select>
+
+  <select id="arrearageList" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="PAGING_START" />
+    select a.*,a_platform.platform_name,agent.ag_name,agent.AG_UNIQ_NUM from
+    (
+    select
+    to_char(o_payment_detail.plan_pay_time,'yyyy-mm') as tm,businfo.agent_id,businfo.bus_platform,sum(o_payment_detail.pay_amount) as jjqk
+    ,businfo.bus_num
+    from o_payment_detail o_payment_detail
+    left join o_payment op on o_payment_detail.payment_id=op.id and  o_payment_detail.payment_status in (1,3)
+    left join o_order o on o.id=op.order_id
+    left join a_agent_businfo businfo on businfo.id=o.bus_id where 1=1
+    <include refid="ARREARAGE_WHERE_SQL"/>
+    group by to_char(o_payment_detail.plan_pay_time,'yyyy-mm'),businfo.agent_id,businfo.bus_platform ,businfo.bus_num
+    )a left join a_platform on a.bus_platform=a_platform.platform_num
+    left join a_agent agent on agent.id=a.agent_id where 1=1
+    <include refid="BASE_WHERE_SQL"/>
+    order by agent.id,  a.tm desc
+    <include refid="PAGING_END" />
+  </select>
+
+  <sql id="BASE_WHERE_SQL">
+    <if test="agUniqNum!=null and agUniqNum!=''"> and agent.AG_UNIQ_NUM=#{agUniqNum} </if>
+    <if test="agName !=null and agName !='' ">
+      and  agent.AG_NAME LIKE CONCAT(CONCAT('%',#{agName}),'%')
+    </if>
+  </sql>
+
+  <sql id="ARREARAGE_WHERE_SQL">
+    <if test="platform!=null and platform!=''"> and businfo.bus_platform=#{platform} </if>
+    <if test="busNum !=null and busNum !='' ">
+      and  businfo.bus_num LIKE CONCAT(CONCAT('%',#{busNum}),'%')
+    </if>
+    <if test="month!=null and month!=''"> and to_char(o_payment_detail.plan_pay_time,'yyyy-mm')=#{month} </if>
+  </sql>
+
+  <!--欠款详情-->
+  <select id="arrearageQuery" parameterType="map" resultType="map">
+    select
+      a.omonth,a_agent_businfo.agent_id,o_order.id as oid,a_agent_businfo.bus_num,a_agent_businfo.bus_platform,o_payment.pay_amount,o_payment.real_amount,o_payment.outstanding_amount,
+      o_payment.down_payment,a.qiankuan,o_payment.pay_method,
+      a_platform.platform_name from
+      (
+        select
+        to_char(o_payment_detail.plan_pay_time,'yyyy-mm') as omonth,
+        o_payment_detail.order_id as oId,
+        sum(o_payment_detail.pay_amount) as qiankuan
+        from
+        o_payment_detail
+        where 1=1
+         <if test="time!=null and time!=''"> and to_char(o_payment_detail.plan_pay_time,'yyyy-mm')=#{time} </if>
+        and  o_payment_detail.payment_status in (1,3)
+        group by to_char(o_payment_detail.plan_pay_time,'yyyy-mm'),o_payment_detail.order_id
+      ) a
+      left join o_order on o_order.id=a.oId
+      left join o_payment on o_payment.order_id=a.oId
+      left join a_agent_businfo on o_order.bus_id=a_agent_businfo.id
+      left join a_platform on a_agent_businfo.bus_platform=a_platform.platform_num
+      where 1=1
+      <if test="busPlatform!=null and busPlatform!=''"> and a_agent_businfo.bus_platform=#{busPlatform} </if>
+      <if test="agentId !=null and agentId !='' ">
+        and  a_agent_businfo.agent_id =#{agentId}
+      </if>
+      order by o_order.agent_id,  a.omonth desc
+  </select>
+
+  <!--查询是否还有欠款-->
+  <select id="isRemoveAccount" parameterType="map" resultType="map">
+    select a.* ,a_agent_businfo.id,a_agent_businfo.BUS_PLATFORM,o_payment.outstanding_amount from
+    (select * from o_Payment_detail  where 1=1 and o_payment_detail.PAYMENT_STATUS=1
+    <if test="time!=null and time!=''"> and to_char(o_payment_detail.plan_pay_time,'yyyy-mm')=#{time} </if>
+    )a
+    left join o_order on o_order.id=a.order_id
+    left join o_payment on o_payment.order_id=a.order_id
+    left join a_agent_businfo on o_order.bus_id=a_agent_businfo.id
+    where 1=1
+    <if test="busPlatform!=null and busPlatform!=''"> and a_agent_businfo.bus_platform=#{busPlatform} </if>
+    <if test="agentId !=null and agentId !='' "> and  a_agent_businfo.agent_id =#{agentId} </if>
+    order by a.agent_id,  to_char(a.plan_pay_time,'yyyy-mm') desc
+  </select>
+
 </mapper>

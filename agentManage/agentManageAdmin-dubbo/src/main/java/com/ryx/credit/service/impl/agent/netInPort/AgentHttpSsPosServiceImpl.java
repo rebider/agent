@@ -344,6 +344,12 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
 
     @Override
     public AgentResult agencyLevelUpdateChange(Map data) throws Exception {
+        if(1==1){
+            log.info("实时分润禁止升级迁移操作");
+            AgentResult ag = AgentResult.fail("实时分润禁止升级迁移操作");
+            ag.setData("实时分润禁止升级迁移操作");
+            return ag;
+        }
         if(data==null){
             log.info("POS业务升级代理接口数据为空");
         }

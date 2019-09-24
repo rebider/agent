@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
  * 描述：
  */
 @Service("osnOperateService")
-public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOperateService {
+public class OsnOperateServiceImpl implements OsnOperateService {
 
     private static Logger logger = LoggerFactory.getLogger(OsnOperateServiceImpl.class);
 
@@ -115,8 +115,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
      */
     @Override
     public void genLogicDetailTask(){
-        //查询发货数量大于 count_wall的物流id
-        //修改，查询所有的数量
+        //查询所有的未联动的发货物流
         List<String>  list = queryLogicInfoIdByStatus(LogType.Deliver,LogisticsSendStatus.none_send);
         if(list.size()>0) {
             logger.info("非退货物流处理 开始执行sn明细生成任务");
@@ -1034,7 +1033,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
             String oldAgencyId = orderPlatForm.substring(orderPlatForm.indexOf("_") + 1);
 
             Map<String, Object> reqMap = new HashMap<>();
-            reqMap.put("taskId", logistics.getwNumber());//批次号（唯一值,主键,我们用物流运单号）
+            reqMap.put("taskId", logistics.getId());//批次号（唯一值,主键,我们用物流运单号）
             reqMap.put("termBegin", logistics.getSnBeginNum());//起始SN
             reqMap.put("termEnd", logistics.getSnEndNum());//结束SN
             reqMap.put("agencyId", agentBusInfo.getBusNum());//划拨目标
@@ -1059,7 +1058,7 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
 
                 // 发送成功，查询结果
                 reqMap.clear();
-                reqMap.put("taskId", logistics.getwNumber());
+                reqMap.put("taskId", logistics.getId());
                 try {
                     String retJson = JsonUtil.objectToJson(reqMap);
                     String retString = HttpClientUtil.doPostJsonWithException(AppConfig.getProperty("rdbpos.checkTermResult"), retJson);
@@ -1132,5 +1131,10 @@ public class OsnOperateServiceImpl implements com.ryx.credit.service.order.OsnOp
             retMap.put("result", false);
             return retMap;
         }
+    }
+
+    @Override
+    public boolean updateDetailBatch(List<OLogisticsDetail> datas, BigDecimal batch, BigDecimal code) throws Exception {
+        return false;
     }
 }

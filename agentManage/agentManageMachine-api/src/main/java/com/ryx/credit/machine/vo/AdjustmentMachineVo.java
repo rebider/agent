@@ -5,6 +5,7 @@ import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 作者：cx
@@ -55,6 +56,18 @@ public class AdjustmentMachineVo implements Serializable{
     List<OLogisticsDetail> logisticsDetailList;
     ImsTermAdjustDetail imsTermAdjustDetail;
 
+    /**
+     * 增加传递参数
+     */
+    private Map<String, Object> paramMap;
+
+    public Map<String, Object> getParamMap() {
+        return paramMap;
+    }
+
+    public void setParamMap(Map<String, Object> paramMap) {
+        this.paramMap = paramMap;
+    }
 
     public String getOldBusNum() {
         return oldBusNum;

@@ -5,10 +5,7 @@ import com.ryx.credit.common.enumc.BusType;
 import com.ryx.credit.common.enumc.DictGroup;
 import com.ryx.credit.common.enumc.OrgType;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.AppConfig;
-import com.ryx.credit.common.util.HttpClientUtil;
-import com.ryx.credit.common.util.JsonUtil;
-import com.ryx.credit.common.util.MailUtil;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.RegionMapper;
@@ -16,6 +13,7 @@ import com.ryx.credit.dao.bank.BankLineNumsMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.bank.BankLineNums;
 import com.ryx.credit.pojo.admin.bank.BankLineNumsExample;
+import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentColinfoService;
@@ -43,6 +41,11 @@ import java.util.Map;
 public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
 
     private static final String rdbReqUrl = AppConfig.getProperty("rdb_req_url");
+    // --------------
+    private static final String rdbParamCheckUrl = AppConfig.getProperty("rdb_param_check_url");
+    private static final String rdb3desKey = AppConfig.getProperty("rdb_3des_Key");
+    private static final String rdb3desIv = AppConfig.getProperty("rdb_3des_iv");
+    // --------------
     private static Logger log = LoggerFactory.getLogger(AgentNetInNotityServiceImpl.class);
     @Autowired
     private AgentColinfoService agentColinfoService;
@@ -69,7 +72,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             if(agentColinfo==null){
                 agentColinfo = new AgentColinfo();
             }
-            resultMap.put("mobileNo",agentBusInfo.getBusLoginNum().trim());
+            resultMap.put("mobileNo",agentBusInfo.getBusLoginNum());
             resultMap.put("branchid",agentBusInfo.getBusPlatform());
             resultMap.put("direct",direct(agentBusInfo.getBusType()));
             resultMap.put("cardno",agentColinfo.getCloBankAccount());
