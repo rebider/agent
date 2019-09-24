@@ -20,4 +20,20 @@ public interface ORemoveAccountService {
      * 导入销账信息
      */
     public List<String> importExcel(List<List<Object>> list, String userid) throws Exception;
+
+    /**
+     * 提取数据
+     * @param nodecount
+     * @param shardingItem
+     * @return
+     * @throws Exception
+     */
+    public List<String> fetchFhData(int nodecount,int shardingItem)throws Exception;
+
+    /**
+     * 接口调用逻辑处理
+     * @param ids
+     * @return
+     */
+    public boolean processData(List<String> ids);
 }

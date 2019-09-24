@@ -430,4 +430,10 @@
       and  ag.AG_UNIQ_NUM =#{agUniqNum}
     </if>
   </sql>
+
+  <!-- 查询销账列表未处理的所有id-->
+  <select id="queryRaccountByStatus" parameterType="map" resultType="string">
+    select a.id from O_REMOVE_ACCOUNT a where a.status=1
+    and a.RSTATUS = #{rStatus,jdbcType=DECIMAL}
+  </select>
 </mapper>
