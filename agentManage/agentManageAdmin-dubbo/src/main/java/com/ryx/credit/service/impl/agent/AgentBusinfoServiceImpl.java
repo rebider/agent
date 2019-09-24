@@ -1065,7 +1065,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
 		AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
 		criteria.andStatusEqualTo(Status.STATUS_1.status);
-		criteria.andBusStatusNotEqualTo(BusinessStatus.pause.status);
+		criteria.andBusStatusEqualTo(BusinessStatus.Enabled.status);
 		criteria.andBrandNumEqualTo(brandNum);
 		List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
 		if(agentBusInfos==null){

@@ -19,6 +19,7 @@ import com.ryx.credit.machine.vo.*;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
 import com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail;
 import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -213,18 +214,25 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
                 byte[] signBytes = org.apache.commons.codec.binary.Base64.decodeBase64(resSignData);
                 if (!RSAUtil.verifyDigitalSign(respXML.getBytes(charset), signBytes, rsaPublicKey, "SHA1WithRSA")) {
                     log.info("签名验证失败");
+                    return new AgentResult(500, "签名验证失败", respXML);
                 } else {
                     log.info("签名验证成功");
                     JSONObject respXMLObj = JSONObject.parseObject(respXML);
                     String respCode = String.valueOf(respXMLObj.get("respCode"));
                     if (respCode.equals("000000")) {
-                        return AgentResult.build(200, respXMLObj.toString());
+                        AgentResult agentResult = AgentResult.ok();
+                        agentResult.setData(respXMLObj);
+                        return agentResult;
                     } else {
-                        log.info("http请求超时返回错误:{}", respXML);
-                        return AgentResult.fail(respXMLObj.toString());
+                        if(StringUtils.isNotBlank(respXMLObj.getString("respMsg"))) {
+                            log.info("http请求返回错误:{}", respXML);
+                            return AgentResult.fail(respXMLObj.getString("respMsg"));
+                        }else{
+                            log.info("http请求返回错误:{}", respXML);
+                            return AgentResult.fail("服务失败");
+                        }
                     }
                 }
-                return new AgentResult(500, "http请求异常", respXML);
             }
         } catch (Exception e) {
             log.info("通知失败:{}", e.getMessage());
@@ -276,6 +284,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
             mapDetail.put("posSnBegin", refundPriceDiffDetail.getBeginSn());
             mapDetail.put("posSnEnd", refundPriceDiffDetail.getEndSn());
             mapDetail.put("reqPayStatus", "1");
+            mapDetail.put("checkPayStatus", "1");
             mapDetail.put("deliveryTime", refundPriceDiffDetail.getDeliveryTime());
             mapDetail.put("newMachineId", refundPriceDiffDetail.getNewMachineId());
             mapDetail.put("oldMachineId", refundPriceDiffDetail.getOldMachineId());
@@ -291,7 +300,38 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
     public AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception{
         JSONObject data = new JSONObject();
         data.put("serialNumber", serialNumber);
-        return request("ORG017", data);
+        AgentResult agentResult = request("ORG017", data);
+        if(agentResult.isOK()){
+            Object resmsg = agentResult.getData();
+            if(resmsg!=null) {
+                JSONObject res = (JSONObject) resmsg;
+                String result_code = res.getString("result_code");
+                String snAdjStatus = res.getString("snAdjStatus");
+                String serialNumber_res = res.getString("serialNumber");
+                String resMsg = res.getString("resMsg");
+                if(serialNumber.equals(serialNumber_res) && "00".equals(snAdjStatus)){
+                     //调整成功
+                     log.info("活动调整成功:{} {}",serialNumber,platformType);
+                     return AgentResult.ok("00");
+                }else if(serialNumber.equals(serialNumber_res) && "01".equals(snAdjStatus)) {
+                    //调整中
+                    log.info("活动调整中:{} {}",serialNumber,platformType);
+                    return AgentResult.ok("01");
+                }else if(serialNumber.equals(serialNumber_res) && "02".equals(snAdjStatus)) {
+                    //调整失败
+                    log.info("活动调整失败:{} {}",serialNumber,platformType);
+                    return AgentResult.build(AgentResult.OK,resMsg,"02");
+                }else{
+                    //未知结果
+                    return AgentResult.ok("03");
+                }
+            }else{
+                //未知结果
+                return AgentResult.ok("03");
+            }
+        }
+        //未知记过
+        return agentResult;
     }
 
 

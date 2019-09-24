@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.order;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
@@ -33,6 +34,7 @@ import com.ryx.credit.service.order.OCashReceivablesService;
 import com.ryx.credit.service.order.OrderActivityService;
 import com.ryx.credit.service.order.ProductService;
 import com.ryx.internet.pojo.OInternetCardImport;
+import net.sf.jxls.transformer.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * 补差价处理
@@ -496,6 +499,7 @@ public class CompensateServiceImpl implements CompensateService {
                 }
                 refundPriceDiffDetail.setNewMachineId(frontActivity.getBusProCode());
                 refundPriceDiffDetail.setOldMachineId(oSubOrderActivity.getBusProCode());
+//                refundPriceDiffDetail.set
             });
 
             AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(refundPriceDiffDetailList, "check");
@@ -1354,4 +1358,70 @@ public class CompensateServiceImpl implements CompensateService {
     }
 
 
+    @Override
+    public List<String> querySendingOrefundPriceDiffDetail() {
+        ORefundPriceDiffDetailExample oRefundPriceDiffDetailExample = new ORefundPriceDiffDetailExample();
+        ORefundPriceDiffDetailExample.Criteria criteria = oRefundPriceDiffDetailExample.createCriteria();
+        criteria.andStatusEqualTo(LogisticsSendStatus.send_ing.code).andStatusEqualTo(Status.STATUS_1.status).andAppTimeIsNotNull();
+        oRefundPriceDiffDetailExample.setPage(new Page(1,200));
+        List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(oRefundPriceDiffDetailExample);
+        return oRefundPriceDiffDetails.stream().map(item ->{return item.getId();}).collect(Collectors.toList());
+    }
+
+    @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult dealQeruySendingReault(String id)throws Exception {
+        log.info("活动调整异步查询:{}",id);
+        ORefundPriceDiffDetail detail =  refundPriceDiffDetailMapper.selectByPrimaryKey(id);
+        try {
+            AgentResult agentResult = termMachineService.queryCompensateResult(detail.getId(),detail.getPlatformType());
+            if(agentResult.isOK()){
+                //成功
+                if("00".equals(agentResult.getData())){
+                    detail.setSendStatus(LogisticsSendStatus.send_success.code);
+                    detail.setSendMsg(agentResult.getMsg());
+                    if(1!=refundPriceDiffDetailMapper.updateByPrimaryKeySelective(detail)){
+                        log.info("活动调整异步查询 更新数据失败:{}",id);
+                        throw new MessageException("更新数据失败");
+                    }
+                //调整中
+                }else if("01".equals(agentResult.getData())){
+                        log.info("活动调整异步查询 调整中:{}",id);
+                //调整失败
+                }else if("02".equals(agentResult.getData())){
+                    detail.setSendStatus(LogisticsSendStatus.send_fail.code);
+                    detail.setSendMsg(agentResult.getMsg());
+                    if(1!=refundPriceDiffDetailMapper.updateByPrimaryKeySelective(detail)){
+                        log.info("活动调整异步查询 更新数据失败:{}",id);
+                        throw new MessageException("更新数据失败");
+                    }
+                //未知结果
+                }else if("03".equals(agentResult.getData())){
+                    log.info("活动调整异步查询 未知结果:{}",id);
+                //未调整
+                }else if("04".equals(agentResult.getData())){
+                    detail.setSendStatus(LogisticsSendStatus.dt_send.code);
+                    detail.setSendMsg(agentResult.getMsg());
+                    if(1!=refundPriceDiffDetailMapper.updateByPrimaryKeySelective(detail)){
+                        log.info("活动调整异步查询 更新数据失败:{}",id);
+                        throw new MessageException("更新数据失败");
+                    }
+                }else{
+                    log.info("活动调整异步查询 未知的返回结果:{}",id);
+                }
+            }else{
+                log.info("活动调整异步查询结果调用接口失败:{} {}",id,agentResult.getMsg());
+                detail.setSendStatus(LogisticsSendStatus.send_fail.code);
+                detail.setSendMsg(agentResult.getMsg());
+                if(1!=refundPriceDiffDetailMapper.updateByPrimaryKeySelective(detail)){
+                    log.info("活动调整异步查询 更新数据失败:{}",id);
+                    throw new MessageException("更新数据失败");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+        return AgentResult.ok();
+    }
 }

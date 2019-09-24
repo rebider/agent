@@ -219,7 +219,7 @@
             <!--disabled="true"/>-->
 
 
-
+   <import resource="spring-elastic-order.xml"/>
 
 
 
