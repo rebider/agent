@@ -85,7 +85,7 @@
   </sql>
   <sql id="Base_Column_List">
     ID, AGENT_ID, REQ_REG_NO, REQ_ENT_NAME, IS_CACHE, ENTERPRISE_NAME, FR_NAME, REG_NO,
-    REG_CAP, REG_CAP_CUR, ES_DATE, AG_BUS_LIC, OPEN_FROM, OPEN_TO, ENTERPRISE_TYPE, ENTERPRISE_STATUS,
+    REG_CAP, REG_CAP_CUR, ES_DATE, ORG_CER_ID, OPEN_FROM, OPEN_TO, ENTERPRISE_TYPE, ENTERPRISE_STATUS,
     CANCEL_DATE, REVOKE_DATE, ADDRESS, ABU_ITEM, CBU_ITEM, OPERATE_SCOPE, OPERATE_SCOPE_AND_FORM,
     REG_ORG, ANCHE_YEAR, ANCHE_DATE, INDUSTRY_PHY_CODE, INDUSTRY_PHY_NAME, INDUSTRY_CODE,
     INDUSTRY_NAME, REC_CAP, ORI_REG_NO, CREDIT_CODE, APPR_DATE, ORG_NO, USCI, REQ_CER_TM,
@@ -125,7 +125,7 @@
     insert into A_AGENT_CERTIFICATION (ID, AGENT_ID, REQ_REG_NO,
       REQ_ENT_NAME, IS_CACHE, ENTERPRISE_NAME,
       FR_NAME, REG_NO, REG_CAP,
-      REG_CAP_CUR, ES_DATE, AG_BUS_LIC,
+      REG_CAP_CUR, ES_DATE, ORG_CER_ID,
       OPEN_FROM, OPEN_TO, ENTERPRISE_TYPE,
       ENTERPRISE_STATUS, CANCEL_DATE, REVOKE_DATE,
       ADDRESS, ABU_ITEM, CBU_ITEM,
@@ -143,7 +143,7 @@
     values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{reqRegNo,jdbcType=VARCHAR},
       #{reqEntName,jdbcType=VARCHAR}, #{isCache,jdbcType=VARCHAR}, #{enterpriseName,jdbcType=VARCHAR},
       #{frName,jdbcType=VARCHAR}, #{regNo,jdbcType=VARCHAR}, #{regCap,jdbcType=DECIMAL},
-      #{regCapCur,jdbcType=VARCHAR}, #{esDate,jdbcType=VARCHAR}, #{agBusLic,jdbcType=VARCHAR},
+      #{regCapCur,jdbcType=VARCHAR}, #{esDate,jdbcType=VARCHAR}, #{orgCerId,jdbcType=VARCHAR},
       #{openFrom,jdbcType=TIMESTAMP}, #{openTo,jdbcType=TIMESTAMP}, #{enterpriseType,jdbcType=VARCHAR},
       #{enterpriseStatus,jdbcType=VARCHAR}, #{cancelDate,jdbcType=TIMESTAMP}, #{revokeDate,jdbcType=TIMESTAMP},
       #{address,jdbcType=VARCHAR}, #{abuItem,jdbcType=VARCHAR}, #{cbuItem,jdbcType=VARCHAR},
@@ -195,8 +195,8 @@
       <if test="esDate != null">
         ES_DATE,
       </if>
-      <if test="agBusLic != null">
-        AG_BUS_LIC,
+      <if test="orgCerId != null">
+        ORG_CER_ID,
       </if>
       <if test="openFrom != null">
         OPEN_FROM,
@@ -350,8 +350,8 @@
       <if test="esDate != null">
         #{esDate,jdbcType=VARCHAR},
       </if>
-      <if test="agBusLic != null">
-        #{agBusLic,jdbcType=VARCHAR},
+      <if test="orgCerId != null">
+        #{orgCerId,jdbcType=VARCHAR},
       </if>
       <if test="openFrom != null">
         #{openFrom,jdbcType=TIMESTAMP},
@@ -511,8 +511,8 @@
       <if test="esDate != null">
         ES_DATE = #{esDate,jdbcType=VARCHAR},
       </if>
-      <if test="agBusLic != null">
-        AG_BUS_LIC = #{agBusLic,jdbcType=VARCHAR},
+      <if test="orgCerId != null">
+        ORG_CER_ID = #{orgCerId,jdbcType=VARCHAR},
       </if>
       <if test="openFrom != null">
         OPEN_FROM = #{openFrom,jdbcType=TIMESTAMP},
@@ -646,7 +646,7 @@
       REG_CAP = #{regCap,jdbcType=DECIMAL},
       REG_CAP_CUR = #{regCapCur,jdbcType=VARCHAR},
       ES_DATE = #{esDate,jdbcType=VARCHAR},
-      AG_BUS_LIC = #{agBusLic,jdbcType=VARCHAR},
+      ORG_CER_ID = #{orgCerId,jdbcType=VARCHAR},
       OPEN_FROM = #{openFrom,jdbcType=TIMESTAMP},
       OPEN_TO = #{openTo,jdbcType=TIMESTAMP},
       ENTERPRISE_TYPE = #{enterpriseType,jdbcType=VARCHAR},
@@ -701,15 +701,57 @@
 
 
   <sql id="selectCerDetails">
-    select  agentCer.ID, agentCer.AGENT_ID, agentCer.REQ_REG_NO, agentCer.REQ_ENT_NAME, agentCer.IS_CACHE,
-    agentCer.ENTERPRISE_NAME, agentCer.FR_NAME, agentCer.REG_CAP, agentCer.REG_CAP_CUR, agentCer.ES_DATE,
-    agentCer.OPEN_FROM, agentCer.OPEN_TO, agentCer.ENTERPRISE_TYPE, agentCer.ENTERPRISE_STATUS,
-     agentCer.CANCEL_DATE, agentCer.REVOKE_DATE, agentCer.ADDRESS, agentCer.ABU_ITEM, agentCer.CBU_ITEM,
-     agentCer.OPERATE_SCOPE, agentCer.OPERATE_SCOPE_AND_FORM, agentCer.REG_ORG, agentCer.ANCHE_YEAR,
-     agentCer.ANCHE_DATE, agentCer.INDUSTRY_PHY_CODE, agentCer.INDUSTRY_PHY_NAME, agentCer.INDUSTRY_CODE,
-     agentCer.INDUSTRY_NAME, agentCer.REC_CAP, agentCer.ORI_REG_NO, agentCer.CREDIT_CODE, agentCer.APPR_DATE,
-     agentCer.ORG_NO, agentCer.USCI, agentCer.REQ_CER_TM, agentCer.CER_SUCCESS_TM, agentCer.CER_NUM, agentCer.CER_PRO_STAT,
-      agentCer.CER_RES,agentCer.AG_BUS_LIC from a_agent_certification agentCer where agentCer.agent_id = #{map.id} order by agentCer.req_cer_tm asc
+    select  agentCer.ID,
+      agentCer.AGENT_ID,
+      agentCer.REQ_REG_NO,
+      agentCer.REQ_ENT_NAME,
+      agentCer.IS_CACHE,
+      agentCer.ENTERPRISE_NAME,
+      agentCer.FR_NAME,
+      agentCer.REG_NO,
+      agentCer.REG_CAP,
+      agentCer.REG_CAP_CUR,
+      agentCer.ES_DATE,
+      agentCer.ORG_CER_ID,
+      agentCer.OPEN_FROM,
+      agentCer.OPEN_TO,
+      agentCer.ENTERPRISE_TYPE,
+      agentCer.ENTERPRISE_STATUS,
+      agentCer.CANCEL_DATE,
+      agentCer.REVOKE_DATE,
+      agentCer.ADDRESS,
+      agentCer.ABU_ITEM,
+      agentCer.CBU_ITEM,
+      agentCer.OPERATE_SCOPE,
+      agentCer.OPERATE_SCOPE_AND_FORM,
+      agentCer.REG_ORG,
+      agentCer.ANCHE_YEAR,
+      agentCer.ANCHE_DATE,
+      agentCer.INDUSTRY_PHY_CODE,
+      agentCer.INDUSTRY_PHY_NAME,
+      agentCer.INDUSTRY_CODE,
+      agentCer.INDUSTRY_NAME,
+      agentCer.REC_CAP,
+      agentCer.ORI_REG_NO,
+      agentCer.CREDIT_CODE,
+      agentCer.APPR_DATE,
+      agentCer.ORG_NO,
+      agentCer.USCI,
+      agentCer.REQ_CER_TM,
+      agentCer.REQ_CER_USER,
+      agentCer.CER_SUCCESS_TM,
+      agentCer.CER_NUM,
+      agentCer.CER_PRO_STAT,
+      agentCer.CER_RES,
+      agentCer.ORG_AG_NAME,
+      agentCer.ORG_AG_NATURE,
+      agentCer.ORG_AG_CAPITAL,
+      agentCer.ORG_AG_BUS_LIC,
+      agentCer.ORG_AG_BUS_LICB,
+      agentCer.ORG_AG_BUS_LICE,
+      agentCer.ORG_AG_LEGAL,
+      agentCer.ORG_AG_REG_ADD,
+      agentCer.ORG_AG_BUS_SCOPE  from a_agent_certification agentCer where agentCer.agent_id = #{map.id} order by agentCer.req_cer_tm asc
   </sql>
 
   <select id="queryAgentCerDetails" parameterType="map" resultType="map">
@@ -724,7 +766,7 @@
 
   <insert id="insertBatch" parameterType="java.util.List" >
     insert  into a_agent_certification
-    (ID,AGENT_ID,REQ_REG_NO,REQ_ENT_NAME,REQ_CER_TM,CER_NUM,CER_PRO_STAT,AG_BUS_LIC,
+    (ID,AGENT_ID,REQ_REG_NO,REQ_ENT_NAME,REQ_CER_TM,CER_NUM,CER_PRO_STAT,ORG_CER_ID,
     ORG_AG_NAME,ORG_AG_NATURE,ORG_AG_CAPITAL,ORG_AG_BUS_LIC,ORG_AG_BUS_LICB,ORG_AG_BUS_LICE,ORG_AG_LEGAL,ORG_AG_REG_ADD,ORG_AG_BUS_SCOPE)
     (<foreach collection="agentCertifications" separator="union all" item="agentCer" index="">
     select
@@ -735,7 +777,7 @@
     #{agentCer.reqCerTm,jdbcType=TIMESTAMP},
     #{agentCer.cerNum,jdbcType=DECIMAL},
     #{agentCer.cerProStat,jdbcType=DECIMAL},
-    #{agentCer.agBusLic,jdbcType=VARCHAR},
+    #{agentCer.orgCerId,jdbcType=VARCHAR},
     #{agentCer.orgAgName,jdbcType=VARCHAR},
     #{agentCer.orgAgNature,jdbcType=DECIMAL},
     #{agentCer.orgAgCapital,jdbcType=DECIMAL},
@@ -762,7 +804,7 @@
     AGENTCER.REG_CAP,
     AGENTCER.REG_CAP_CUR,
     AGENTCER.ES_DATE,
-    AGENTCER.AG_BUS_LIC,
+    AGENTCER.ORG_CER_ID,
     AGENTCER.OPEN_FROM,
     AGENTCER.OPEN_TO,
     AGENTCER.ENTERPRISE_TYPE,
@@ -808,7 +850,7 @@
     ON AGENTCER.AGENT_ID = AGENT.AG_UNIQ_NUM
     where 1=1
     <if test="map.agBusLic!=null and map.agBusLic!=''">
-      AND AGENT.AG_BUS_LIC = #{map.agBusLic}
+      AND AGENT.ORG_CER_ID = #{map.agBusLic}
     </if>
     <if test="map.agUniqNum!=null and map.agUniqNum!=''">
       AND AGENT.AG_UNIQ_NUM = #{map.agUniqNum}
@@ -897,6 +939,10 @@
     <result column="ORG_AG_REG_ADD" jdbcType="VARCHAR" property="orgAgRegAdd" />
     <result column="ORG_AG_BUS_SCOPE" jdbcType="VARCHAR" property="orgAgBusScope" />
     <result column="C_INCOM_TIME" jdbcType="VARCHAR" property="cIncomTime" />
+    <result column="AG_BUS_LICB" jdbcType="VARCHAR" property="agBusLicb" />
+    <result column="AG_BUS_LICE" jdbcType="VARCHAR" property="agBusLice" />
+    <result column="AG_UNIQ_NUM" jdbcType="VARCHAR" property="agUniqNum" />
+
   </resultMap>
   <select id="exportAgentcertifis" parameterType="map" resultMap="exportAgentCertifi">
  <!--   <include refid="selectCertifi"/>-->/*重复导出*/
@@ -1077,7 +1123,7 @@
     row_number() OVER(PARTITION BY t.agent_id ORDER BY t.agent_id, t.req_cer_tm desc) as row_flg
     from a_agent_certification t) AGENTCER,a_agent AGENT
     where AGENTCER.row_flg = '1' and
-    AGENTCER.AGENT_ID = AGENT.AG_UNIQ_NUM and AGENTCER.CER_PRO_STAT=2
+    AGENTCER.AGENT_ID = AGENT.AG_UNIQ_NUM
     <if test="map.agBusLic!=null and map.agBusLic!=''">
       AND AGENT.AG_BUS_LIC = #{map.agBusLic}
     </if>
@@ -1101,4 +1147,17 @@
     </if>)  a order by a.req_cer_tm desc
   </sql>
 
+  <select id="queryMaxIdByAgentid" parameterType="map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from (select t.*,
+               row_number() OVER(PARTITION BY t.agent_id ORDER BY t.agent_id, t.req_cer_tm desc) as row_flg
+          from a_agent_certification t) AGENTCER
+          where AGENTCER.row_flg = '1'
+     and AGENTCER.CER_PRO_STAT = '2'
+    <if test="map.agentId!=null and map.agentId!=''">
+      and AGENTCER.Agent_Id = #{map.agentId}
+    </if>
+
+  </select>
 </mapper>
