@@ -44,5 +44,6 @@ public interface AgentCertificationMapper {
 
     List<AgentCertifiVo> exportAgentcertifis(@Param("map") Map<String,Object> map);
 
+    AgentCertification queryMaxIdByAgentid(@Param("map") Map<String,Object> map);
 
 }
