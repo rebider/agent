@@ -166,7 +166,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                     return resultMap;
                 }
             }
-            if (surplusAmt.compareTo(BigDecimal.ZERO) == 0) {
+            if (surplusAmt.compareTo(BigDecimal.ZERO) <= 0) {
                 AdjustFreeze(param);
                 invoiceSum.setInvoiceStatus("99");
             }
