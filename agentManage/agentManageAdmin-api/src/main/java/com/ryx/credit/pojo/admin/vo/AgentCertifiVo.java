@@ -112,6 +112,13 @@ public class AgentCertifiVo implements Serializable {
 
     private String cerProStatMark;
 
+    private String agBusLicb;
+
+    private String agBusLice;
+
+    private String agUniqNum;
+
+
     public String getId() {
         return id;
     }
@@ -542,5 +549,29 @@ public class AgentCertifiVo implements Serializable {
 
     public void setCerProStatMark(String cerProStatMark) {
         this.cerProStatMark = cerProStatMark;
+    }
+
+    public String getAgBusLicb() {
+        return agBusLicb;
+    }
+
+    public void setAgBusLicb(String agBusLicb) {
+        this.agBusLicb = agBusLicb;
+    }
+
+    public String getAgBusLice() {
+        return agBusLice;
+    }
+
+    public void setAgBusLice(String agBusLice) {
+        this.agBusLice = agBusLice;
+    }
+
+    public String getAgUniqNum() {
+        return agUniqNum;
+    }
+
+    public void setAgUniqNum(String agUniqNum) {
+        this.agUniqNum = agUniqNum;
     }
 }
