@@ -3,7 +3,9 @@ package com.ryx.job.task;
 
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.dangdang.ddframe.job.api.dataflow.DataflowJob;
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentCertification;
 import com.ryx.credit.service.agent.AgentCertificationService;
@@ -55,9 +57,20 @@ public class UpdateAgentCertifiDetailJob implements DataflowJob<AgentCertificati
                 logger.info("商户唯一编码{},认证记录id{}",cer.getAgentId(),cer.getId());
                 Agent agent = new Agent();
                 agent.setAgUniqNum(cer.getAgentId());
-                AgentResult agentResult = agentCertificationService.processData(agent, cer.getId());
-                logger.info("认证成功");
+                FastMap par = FastMap.fastMap("agentId",cer.getAgentId());
+                AgentCertification  agentCertification = agentCertificationService.getMaxId(par);
+                String orgCerId = "";
+                if (null!=agentCertification)
+                    orgCerId=agentCertification.getId();
+                AgentResult agentResult = agentCertificationService.processData(agent, cer.getId(),orgCerId);
+                if (200!=agentResult.getStatus()){
+                    cer.setCerProStat(Status.STATUS_2.status);
+                    agentCertificationService.updateCertifi(cer);
+                }
             }catch (Exception e){
+                logger.error(e.toString());
+                cer.setCerProStat(Status.STATUS_2.status);
+                agentCertificationService.updateCertifi(cer);
                 logger.error("认证任务执行出错!商户唯一编码{},认证记录id{}",cer.getAgentId(),cer.getId());
             }
 
