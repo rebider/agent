@@ -192,20 +192,20 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                         .andOrderIdEqualTo(String.valueOf(mapItem.get("OID"))).andStatusEqualTo(Status.STATUS_1.status).andPaymentStatusEqualTo(Status.STATUS_1.status);
                                 List<OPaymentDetail> oPaymentDetailList = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
                                 if (null != oPaymentDetailList && oPaymentDetailList.size() > 0) {
-                                    //每次销账金额都会减少
+                                    //每次销账金额都会减少--剩余
                                     BigDecimal residue = oRemoveAccount_item.getRamount();
                                     for (OPaymentDetail oPaymentDetail : oPaymentDetailList) {
-                                        //剩余
-                                        //获取销账金额
                                         if (oPaymentDetail.getPayAmount().compareTo(residue) == 0 || oPaymentDetail.getPayAmount().compareTo(residue) == -1) {
                                             //应付金额等于实付金额  或者  应付金额小于实付金额  则是已结清
                                             oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
-                                            residue=residue.subtract(oPaymentDetail.getRealPayAmount());
-                                            oPaymentDetail.setRealPayAmount(oPaymentDetail.getRealPayAmount());
+                                            //剩余销账金额-本次需销账金额
+                                            residue=residue.subtract(oPaymentDetail.getPayAmount());
+                                            oPaymentDetail.setRealPayAmount(oPaymentDetail.getPayAmount());
                                         } else {
                                             oPaymentDetail.setPaymentStatus(PaymentStatus.YF.code);
-                                            residue=oPaymentDetail.getRealPayAmount().subtract(residue);
-                                            oPaymentDetail.setRealPayAmount(oPaymentDetail.getRealPayAmount().subtract(residue));
+                                            //这条付款明细剩余欠款
+//                                            residue=oPaymentDetail.getPayAmount().subtract(residue);
+                                            oPaymentDetail.setRealPayAmount(residue);
                                         }
                                         oPaymentDetail.setSrcId(oRemoveAccount_item.getId());
                                         oPaymentDetail.setSrcType(oRemoveAccount_item.getPayMethod());
@@ -259,13 +259,13 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                                 logger.info("付款单修改失败");
                                                 throw new MessageException("付款单修改失败");
                                             }
-                                            BigDecimal payAmount = oPayment.getPayAmount();
-                                            //  查询已结清的实际付款金额
-                                            BigDecimal realPayAmount = oPaymentDetailMapper.selectRealAmount(oPaymentDetail.getOrderId(), PamentIdType.ORDER_FKD.code);
-                                            //如果总金额大于实际已经付款金额  则还有未结清金额
+//                                            BigDecimal payAmount = oPayment.getPayAmount();
+//                                            //  查询已结清的实际付款金额
+//                                            BigDecimal realPayAmount = oPaymentDetailMapper.selectRealAmount(oPaymentDetail.getOrderId(), PamentIdType.ORDER_FKD.code);
+//                                            //如果总金额大于实际已经付款金额  则还有未结清金额
 
 
-                                            //再查询是否是最后一期的
+                                            //查询是否是最后一期的
                                             List<OPaymentDetail> notCountMap = oPaymentDetailMapper.selectCount(oPaymentDetail.getOrderId(), PamentIdType.ORDER_FKD.code, PaymentStatus.DF.code);
                                             //去查询还剩几期待付款
                                             BigDecimal count = new BigDecimal(notCountMap.size());
