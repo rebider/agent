@@ -25,8 +25,12 @@ public interface AgentCertificationService {
     //获取并更新认证记录为正在处理
     List<AgentCertification> fetchFhData();
     //处理认证信息
-    AgentResult processData(Agent agent,String id);
+    AgentResult processData(Agent agent,String id,String orgid);
 
     //代理商认证管理列表导出
     List<AgentCertifiVo> exportAgentCertifications(Map map);
+
+    AgentCertification  getMaxId(Map map);
+
+    int updateCertifi(AgentCertification agentCertification);
 }
