@@ -55,10 +55,10 @@ public class UpdateAgentCertifiDetailJob implements DataflowJob<AgentCertificati
                 logger.info("商户唯一编码{},认证记录id{}",cer.getAgentId(),cer.getId());
                 Agent agent = new Agent();
                 agent.setAgUniqNum(cer.getAgentId());
-                agentCertificationService.processData(agent,cer.getId());
+                AgentResult agentResult = agentCertificationService.processData(agent, cer.getId());
+                logger.info("认证成功");
             }catch (Exception e){
-                logger.error("认证任务执行出错!");
-                return;
+                logger.error("认证任务执行出错!商户唯一编码{},认证记录id{}",cer.getAgentId(),cer.getId());
             }
 
         });
