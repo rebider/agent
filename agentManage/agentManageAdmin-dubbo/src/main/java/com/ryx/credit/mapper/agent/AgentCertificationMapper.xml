@@ -13,7 +13,7 @@
     <result column="REG_CAP" jdbcType="DECIMAL" property="regCap" />
     <result column="REG_CAP_CUR" jdbcType="VARCHAR" property="regCapCur" />
     <result column="ES_DATE" jdbcType="VARCHAR" property="esDate" />
-    <result column="AG_BUS_LIC" jdbcType="VARCHAR" property="agBusLic" />
+    <result column="ORG_CER_ID" jdbcType="VARCHAR" property="orgCerId" />
     <result column="OPEN_FROM" jdbcType="TIMESTAMP" property="openFrom" />
     <result column="OPEN_TO" jdbcType="TIMESTAMP" property="openTo" />
     <result column="ENTERPRISE_TYPE" jdbcType="VARCHAR" property="enterpriseType" />
@@ -709,7 +709,7 @@
      agentCer.ANCHE_DATE, agentCer.INDUSTRY_PHY_CODE, agentCer.INDUSTRY_PHY_NAME, agentCer.INDUSTRY_CODE,
      agentCer.INDUSTRY_NAME, agentCer.REC_CAP, agentCer.ORI_REG_NO, agentCer.CREDIT_CODE, agentCer.APPR_DATE,
      agentCer.ORG_NO, agentCer.USCI, agentCer.REQ_CER_TM, agentCer.CER_SUCCESS_TM, agentCer.CER_NUM, agentCer.CER_PRO_STAT,
-      agentCer.CER_RES,agentCer.AG_BUS_LIC from a_agent_certification agentCer where agentCer.agent_id = #{map.id} order by agentCer.req_cer_tm desc
+      agentCer.CER_RES,agentCer.AG_BUS_LIC from a_agent_certification agentCer where agentCer.agent_id = #{map.id} order by agentCer.req_cer_tm asc
   </sql>
 
   <select id="queryAgentCerDetails" parameterType="map" resultType="map">
@@ -832,13 +832,16 @@
   <select id="queryAgentCerList" parameterType="map" resultType="map">
 
     <include refid="OracleDialectPrefix"/>
-    <include refid="selectCertifi"/>
+<!--    <include refid="selectCertifi"/>-->/*重复展示*/
+    <include refid="selectCertifiDetails"/>
     <include refid="OracleDialectSuffix"/>
   </select>
 
   <select id="queryAgentCerListCount" parameterType="map" resultType="int">
     select count(id) from(
-    <include refid="selectCertifi"/>)
+   <!-- <include refid="selectCertifi"/>-->/*重复展示*/
+    <include refid="selectCertifiDetails"/>
+    )
   </select>
 
   <resultMap id="exportAgentCertifi" type="com.ryx.credit.pojo.admin.vo.AgentCertifiVo">
@@ -896,7 +899,8 @@
     <result column="C_INCOM_TIME" jdbcType="VARCHAR" property="cIncomTime" />
   </resultMap>
   <select id="exportAgentcertifis" parameterType="map" resultMap="exportAgentCertifi">
-    <include refid="selectCertifi"/>
+ <!--   <include refid="selectCertifi"/>-->/*重复导出*/
+  <include refid="selectCertifiDetails"/>
   </select>
  <!-- 单条对比 -->
   <select id="queryAgentCerDetailsSingle" parameterType="map" resultType="map">
@@ -962,5 +966,139 @@
     from a_agent_certification agent
     where agent.id = #{map.id})
   </select>
+
+  <sql id="selectCertifiDetails">
+    select * from(
+    select
+    AGENTCER.ID,
+    AGENTCER.AGENT_ID,
+    AGENTCER.REQ_REG_NO,
+    AGENTCER.REQ_ENT_NAME,
+    AGENTCER.IS_CACHE,
+    AGENTCER.ENTERPRISE_NAME,
+    AGENTCER.FR_NAME,
+    AGENTCER.REG_CAP,
+    AGENTCER.REG_CAP_CUR,
+    AGENTCER.ES_DATE,
+    AGENTCER.OPEN_FROM,
+    AGENTCER.OPEN_TO,
+    AGENTCER.ENTERPRISE_TYPE,
+    AGENTCER.ENTERPRISE_STATUS,
+    AGENTCER.CANCEL_DATE,
+    AGENTCER.REVOKE_DATE,
+    AGENTCER.ADDRESS,
+    AGENTCER.ABU_ITEM,
+    AGENTCER.CBU_ITEM,
+    AGENTCER.OPERATE_SCOPE,
+    AGENTCER.OPERATE_SCOPE_AND_FORM,
+    AGENTCER.REG_ORG,
+    AGENTCER.ANCHE_YEAR,
+    AGENTCER.ANCHE_DATE,
+    AGENTCER.INDUSTRY_PHY_CODE,
+    AGENTCER.INDUSTRY_PHY_NAME,
+    AGENTCER.INDUSTRY_CODE,
+    AGENTCER.INDUSTRY_NAME,
+    AGENTCER.REC_CAP,
+    AGENTCER.ORI_REG_NO,
+    AGENTCER.CREDIT_CODE,
+    AGENTCER.APPR_DATE,
+    AGENTCER.ORG_NO,
+    AGENTCER.USCI,
+    AGENTCER.REQ_CER_TM,
+    AGENTCER.REQ_CER_USER,
+    AGENTCER.CER_SUCCESS_TM,
+    AGENTCER.CER_NUM,
+    AGENTCER.CER_PRO_STAT,
+    AGENTCER.CER_RES,
+    AGENTCER.ORG_AG_NAME,
+    AGENTCER.ORG_AG_NATURE,
+    AGENTCER.ORG_AG_CAPITAL,
+    AGENTCER.ORG_AG_BUS_LIC,
+    AGENTCER.ORG_AG_BUS_LICB,
+    AGENTCER.ORG_AG_BUS_LICE,
+    AGENTCER.ORG_AG_LEGAL,
+    AGENTCER.ORG_AG_REG_ADD,
+    AGENTCER.ORG_AG_BUS_SCOPE,
+    AGENT.C_INCOM_TIME,
+    AGENT.AG_NAME,
+    AGENT.AG_BUS_LICB,
+    AGENT.AG_BUS_LICE,
+    AGENT.AG_UNIQ_NUM,
+    AGENT.AG_BUS_LIC
+    from (select t.ID,
+    t.AGENT_ID,
+    t.REQ_REG_NO,
+    t.REQ_ENT_NAME,
+    t.IS_CACHE,
+    t.ENTERPRISE_NAME,
+    t.FR_NAME,
+    t.REG_CAP,
+    t.REG_CAP_CUR,
+    t.ES_DATE,
+    t.OPEN_FROM,
+    t.OPEN_TO,
+    t.ENTERPRISE_TYPE,
+    t.ENTERPRISE_STATUS,
+    t.CANCEL_DATE,
+    t.REVOKE_DATE,
+    t.ADDRESS,
+    t.ABU_ITEM,
+    t.CBU_ITEM,
+    t.OPERATE_SCOPE,
+    t.OPERATE_SCOPE_AND_FORM,
+    t.REG_ORG,
+    t.ANCHE_YEAR,
+    t.ANCHE_DATE,
+    t.INDUSTRY_PHY_CODE,
+    t.INDUSTRY_PHY_NAME,
+    t.INDUSTRY_CODE,
+    t.INDUSTRY_NAME,
+    t.REC_CAP,
+    t.ORI_REG_NO,
+    t.CREDIT_CODE,
+    t.APPR_DATE,
+    t.ORG_NO,
+    t.USCI,
+    t.REQ_CER_TM,
+    t.REQ_CER_USER,
+    t.CER_SUCCESS_TM,
+    t.CER_NUM,
+    t.CER_PRO_STAT,
+    t.CER_RES,
+    t.ORG_AG_NAME,
+    t.ORG_AG_NATURE,
+    t.ORG_AG_CAPITAL,
+    t.ORG_AG_BUS_LIC,
+    t.ORG_AG_BUS_LICB,
+    t.ORG_AG_BUS_LICE,
+    t.ORG_AG_LEGAL,
+    t.ORG_AG_REG_ADD,
+    t.ORG_AG_BUS_SCOPE,
+    row_number() OVER(PARTITION BY t.agent_id ORDER BY t.agent_id, t.req_cer_tm desc) as row_flg
+    from a_agent_certification t) AGENTCER,a_agent AGENT
+    where AGENTCER.row_flg = '1' and
+    AGENTCER.AGENT_ID = AGENT.AG_UNIQ_NUM and AGENTCER.CER_PRO_STAT=2
+    <if test="map.agBusLic!=null and map.agBusLic!=''">
+      AND AGENT.AG_BUS_LIC = #{map.agBusLic}
+    </if>
+    <if test="map.agUniqNum!=null and map.agUniqNum!=''">
+      AND AGENT.AG_UNIQ_NUM = #{map.agUniqNum}
+    </if>
+    <if test="map.agName!=null and map.agName!=''">
+      AND AGENT.AG_NAME = #{map.agName}
+    </if>
+    <if test="map.time!=null and map.time!=''">
+      AND to_char(AGENT.C_INCOM_TIME,'YYYY-MM-dd')=#{map.time}
+    </if>
+    <if test="map.caStatus!=null and map.caStatus!=''">
+      AND AGENT.CA_STATUS = #{map.caStatus}
+    </if>
+    <if test="map.agBusLicb!=null and map.agBusLicb!=''">
+      AND to_char( AGENT.AG_BUS_LICB,'YYYY-MM-dd')=#{map.agBusLicb}
+    </if>
+    <if test="map.agBusLice!=null and map.agBusLice!=''">
+      AND to_char(AGENT.AG_BUS_LICE,'YYYY-MM-dd')=#{map.agBusLice}
+    </if>)  a order by a.req_cer_tm desc
+  </sql>
 
 </mapper>
