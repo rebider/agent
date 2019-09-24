@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -64,10 +65,10 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
     @Override
     public PageInfo agentCertifiDetails(Page page, Map map) {
         PageInfo pageInfo = new PageInfo();
-//        pageInfo.setRows(agentCertificationMapper.queryAgentCerDetails(map,page));
-//        pageInfo.setTotal(agentCertificationMapper.queryAgentCerDetailsCount(map));//
-        pageInfo.setRows(agentCertificationMapper.queryAgentCerDetailsSingle(map,page));
-        pageInfo.setTotal(agentCertificationMapper.queryAgentCerDetailsSingleCount(map));
+        pageInfo.setRows(agentCertificationMapper.queryAgentCerDetails(map,page));
+        pageInfo.setTotal(agentCertificationMapper.queryAgentCerDetailsCount(map));//
+//        pageInfo.setRows(agentCertificationMapper.queryAgentCerDetailsSingle(map,page));
+//        pageInfo.setTotal(agentCertificationMapper.queryAgentCerDetailsSingleCount(map));
 
 
         return pageInfo;
@@ -93,7 +94,6 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
                agentCer.setReqCerTm(date);
                agentCer.setCerNum(new BigDecimal(agentCertificationMapper.queryAgentCerDetailsCount(par)+1));
                agentCer.setCerProStat(Status.STATUS_0.status);
-               agentCer.setAgBusLic(cer.getAgBusLic());
                agentCer.setOrgAgName(cer.getAgName());
                agentCer.setOrgAgNature(cer.getAgNature());
                agentCer.setOrgAgCapital(cer.getAgCapital());
@@ -148,11 +148,12 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
 
     @Override
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
-    public AgentResult processData(Agent agent,String id) {
+    public AgentResult processData(Agent agent,String id,String orgId) {
         agent = agentMapper.selectByAgent(agent);
         AgentCertification agentCertification = agentCertificationMapper.selectByPrimaryKey(id);
         if(agent==null)return AgentResult.fail("工商认证代理商未找到"+agent.getId());
         agentCertification = copyOrgAgentToCertifi(agent,agentCertification);
+        agentCertification.setOrgCerId(orgId);
         //处理代理名称去掉前缀和括号后的信息
         String agname = agent.getAgName();
         logger.info("后台任务进行工商认证|{}|{}",agent.getId(),agname);
@@ -251,8 +252,34 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
                             agentcer.setCerProStatMark("处理失败");
                         }
                     }
+                    if (null!=agentcer.getAgBusLicb()){
+                        try {
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                            Date date = simpleDateFormat.parse((String)agentcer.getAgBusLicb());
+                            agentcer.setAgBusLicb(simpleDateFormat.format(date).toString());
+                        }catch (Exception e){
+
+                        }
+
+                    }
+                    if (null!=agentcer.getAgBusLice()){
+
+                        try {
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                            Date date = simpleDateFormat.parse((String)agentcer.getAgBusLice());
+                            agentcer.setAgBusLice(simpleDateFormat.format(date).toString());
+                        }catch (Exception e){
+
+                        }
+
+                    }
                 }});
         return agentCertifiVos;
+    }
+
+    @Override
+    public AgentCertification  getMaxId(Map map) {
+        return agentCertificationMapper.queryMaxIdByAgentid(map);
     }
 
     private AgentCertification saveAgentCertification(JSONObject dataObj, AgentCertification agentCertification){
@@ -342,4 +369,9 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
         return agentCertification;
     }
 
+    @Override
+    public int updateCertifi(AgentCertification agentCertification) {
+        int i = agentCertificationMapper.updateByPrimaryKeySelective(agentCertification);
+        return i;
+    }
 }
