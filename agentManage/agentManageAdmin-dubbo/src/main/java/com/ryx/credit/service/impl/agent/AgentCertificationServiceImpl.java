@@ -171,7 +171,6 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
         }
 
         if(agentResult.isOK()||(405==agentResult.getStatus())){
-            JSONObject dataObj = (JSONObject)agentResult.getData();
             if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("enterpriseStatus")) && dataObj.getString("enterpriseStatus").startsWith("在营")){
             //更新代理商信息
             if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("regCap")))
