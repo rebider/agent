@@ -159,7 +159,16 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
         agname = agname.replaceAll("[A-Z]|\\(*\\)","");
         logger.info("后台任务进行工商认证|{}|替换后名称|{}",agent.getId(),agname);
         AgentResult agentResult = businessCAService.agentBusinessCA(agname, "0");
-
+        JSONObject dataObj = (JSONObject)agentResult.getData();
+        if ("1".equals((String) dataObj.getString("isTest"))){
+            agent.setCaStatus(Status.STATUS_2.status);
+            agentCertification.setCerProStat(Status.STATUS_2.status);//认证流程状态:0-未处理,1-处理中,2-处理成功,3-处理失败;
+            agentCertification.setCerRes(new BigDecimal(2));//测试环境不认证
+            if(1==agentMapper.updateByPrimaryKeySelective(agent) && 1 == agentCertificationMapper.updateByPrimaryKeySelective(saveAgentCertification(dataObj,agentCertification))){
+                logger.info("测试环境不认证，认证代理商{}状态为{},不进行信息同步",agent.getAgUniqNum(),agent.getCaStatus());
+            }
+            return AgentResult.ok(dataObj);
+        }
 
         if(agentResult.isOK()||(405==agentResult.getStatus())){
             JSONObject dataObj = (JSONObject)agentResult.getData();
