@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -64,10 +65,10 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
     @Override
     public PageInfo agentCertifiDetails(Page page, Map map) {
         PageInfo pageInfo = new PageInfo();
-//        pageInfo.setRows(agentCertificationMapper.queryAgentCerDetails(map,page));
-//        pageInfo.setTotal(agentCertificationMapper.queryAgentCerDetailsCount(map));//
-        pageInfo.setRows(agentCertificationMapper.queryAgentCerDetailsSingle(map,page));
-        pageInfo.setTotal(agentCertificationMapper.queryAgentCerDetailsSingleCount(map));
+        pageInfo.setRows(agentCertificationMapper.queryAgentCerDetails(map,page));
+        pageInfo.setTotal(agentCertificationMapper.queryAgentCerDetailsCount(map));//
+//        pageInfo.setRows(agentCertificationMapper.queryAgentCerDetailsSingle(map,page));
+//        pageInfo.setTotal(agentCertificationMapper.queryAgentCerDetailsSingleCount(map));
 
 
         return pageInfo;
@@ -93,7 +94,6 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
                agentCer.setReqCerTm(date);
                agentCer.setCerNum(new BigDecimal(agentCertificationMapper.queryAgentCerDetailsCount(par)+1));
                agentCer.setCerProStat(Status.STATUS_0.status);
-               agentCer.setAgBusLic(cer.getAgBusLic());
                agentCer.setOrgAgName(cer.getAgName());
                agentCer.setOrgAgNature(cer.getAgNature());
                agentCer.setOrgAgCapital(cer.getAgCapital());
@@ -148,21 +148,31 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
 
     @Override
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
-    public AgentResult processData(Agent agent,String id) {
+    public AgentResult processData(Agent agent,String id,String orgId) {
         agent = agentMapper.selectByAgent(agent);
         AgentCertification agentCertification = agentCertificationMapper.selectByPrimaryKey(id);
         if(agent==null)return AgentResult.fail("工商认证代理商未找到"+agent.getId());
-
+        agentCertification = copyOrgAgentToCertifi(agent,agentCertification);
+        agentCertification.setOrgCerId(orgId);
         //处理代理名称去掉前缀和括号后的信息
         String agname = agent.getAgName();
         logger.info("后台任务进行工商认证|{}|{}",agent.getId(),agname);
         agname = agname.replaceAll("[A-Z]|\\(*\\)","");
         logger.info("后台任务进行工商认证|{}|替换后名称|{}",agent.getId(),agname);
         AgentResult agentResult = businessCAService.agentBusinessCA(agname, "0");
-
+        JSONObject dataObj = (JSONObject)agentResult.getData();
+        if ("1".equals((String) dataObj.getString("isTest"))){
+            agent.setCaStatus(Status.STATUS_2.status);
+            agentCertification.setCerProStat(Status.STATUS_2.status);//认证流程状态:0-未处理,1-处理中,2-处理成功,3-处理失败;
+            agentCertification.setCerRes(new BigDecimal(2));//测试环境不认证
+            if(1==agentMapper.updateByPrimaryKeySelective(agent) && 1 == agentCertificationMapper.updateByPrimaryKeySelective(saveAgentCertification(dataObj,agentCertification))){
+                logger.info("测试环境不认证，认证代理商{}状态为{},不进行信息同步",agent.getAgUniqNum(),agent.getCaStatus());
+            }
+            return AgentResult.ok(dataObj);
+        }
 
         if(agentResult.isOK()||(405==agentResult.getStatus())){
-            JSONObject dataObj = (JSONObject)agentResult.getData();
+            if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("enterpriseStatus")) && dataObj.getString("enterpriseStatus").startsWith("在营")){
             //更新代理商信息
             if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("regCap")))
                 agent.setAgCapital(new BigDecimal(dataObj.getString("regCap").trim()));
@@ -184,56 +194,22 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
                 agent.setAgHead(agent.getAgLegal());
             }
             agent.setCaStatus(Status.STATUS_1.status);
-            //更新认证信息表
-            agentCertification.setEnterpriseName(dataObj.getString("enterpriseName").trim());//企业名称
-            agentCertification.setFrName(dataObj.getString("frName").trim());//法人名称
-            agentCertification.setRegNo                     (dataObj.getString("regNo").trim());//工商注册号
-            if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("regCap")))
-                agentCertification.setRegCap                    (new BigDecimal(dataObj.getString("regCap").trim()));//注册资金
+                //更新认证信息表实体
+                agentCertification.setCerRes(Status.STATUS_1.status);//认证结果;1-成功,2-失败
+                agentCertification.setCerProStat(Status.STATUS_2.status);//认证流程状态:0-未处理,1-处理中,2-处理成功,3-处理失败;
+                if(1==agentMapper.updateByPrimaryKeySelective(agent)&& 1 == agentCertificationMapper.updateByPrimaryKeySelective(saveAgentCertification(dataObj,agentCertification))){
+                    logger.info("工商认证成功，认证代理商{}状态为{},同步信息成功",agent.getAgUniqNum(),dataObj.getString("enterpriseStatus"));
+                }
 
-            agentCertification.setRegCapCur                 (dataObj.getString("regCapCur").trim());//注册币种
-            if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("esDate")))
-                agentCertification.setEsDate(dataObj.getString("esDate"));
-            if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("openFrom")))
-                agentCertification.setOpenFrom                  (DateUtil.format(dataObj.getString("openFrom"),"yyyy-MM-dd"));//经营开始日期
-            if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("openTo")))
-                agentCertification.setOpenTo                    (DateUtil.format(dataObj.getString("openTo"),"yyyy-MM-dd"));//经营结束日期
-            agentCertification.setEnterpriseType            (dataObj.getString("enterpriseType").trim());//企业（机构）类型
-            agentCertification.setEnterpriseStatus          (dataObj.getString("enterpriseStatus").trim());//经营状态
-            if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("cancelDate")))
-                agentCertification.setCancelDate                (DateUtil.format(dataObj.getString("cancelDate"),"yyyy-MM-dd"));//注销日期
-            if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("revokeDate")))
-                agentCertification.setRevokeDate                (DateUtil.format(dataObj.getString("revokeDate"),"yyyy-MM-dd"));//吊销日期
-
-            agentCertification.setAddress                   (dataObj.getString("address").trim());//注册地址
-            agentCertification.setAbuItem                   (dataObj.getString("abuItem").trim());//许可经营项目
-            agentCertification.setCbuItem                   (dataObj.getString("cbuItem").trim());//一般经营项目
-            agentCertification.setOperateScope              (dataObj.getString("operateScope").trim());//经营（业务）范围
-            agentCertification.setOperateScopeAndForm       (dataObj.getString("operateScopeAndForm").trim());//经营（业务）范围及方式
-            agentCertification.setRegOrg                    (dataObj.getString("regOrg").trim());//登记机关
-            agentCertification.setAncheYear                 (dataObj.getString("ancheYear").trim());//最后年检年度
-            if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("ancheDate")))
-                agentCertification.setAncheDate               (DateUtil.format(dataObj.getString("ancheDate"),"yyyy-MM-dd"));//最后年检日期
-            agentCertification.setIndustryPhyCode           (dataObj.getString("industryPhyCode").trim());//行业门类代码
-            agentCertification.setIndustryPhyName           (dataObj.getString("industryPhyName").trim());//行业门类名称
-            agentCertification.setIndustryCode              (dataObj.getString("industryCode").trim());//国民经济行业代码
-            agentCertification.setIndustryName              (dataObj.getString("industryName").trim());//国民经济行业名称
-            if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("recCap")))
-                agentCertification.setRecCap                    (new BigDecimal(dataObj.getString("recCap").trim()));//实收资本
-            agentCertification.setOriRegNo                  (dataObj.getString("oriRegNo").trim());//原注册号
-            agentCertification.setCreditCode                (dataObj.getString("creditCode").trim());//统一信用代码
-            if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("apprDate")))
-                agentCertification.setApprDate               (DateUtil.format(dataObj.getString("apprDate"),"yyyy-MM-dd"));//核准日期
-            agentCertification.setOrgNo                     (dataObj.getString("orgNo").trim());//注册号
-            agentCertification.setUsci                      (dataObj.getString("usci").trim());//组织机构号
-            agentCertification.setCerRes(Status.STATUS_1.status);//认证结果;1-成功,2-失败
-            agentCertification.setCerProStat(Status.STATUS_2.status);//认证流程状态:0-未处理,1-处理中,2-处理成功,3-处理失败
-            ZoneId zoneId = ZoneId.systemDefault();
-            ZonedDateTime zdt = LocalDateTime.now().atZone(zoneId);//Combines this date-time with a time-zone to create a  ZonedDateTime.
-            Date date = Date.from(zdt.toInstant());
-            agentCertification.setCerSuccessTm(date);
-            if(1==agentMapper.updateByPrimaryKeySelective(agent)&& 1 == agentCertificationMapper.updateByPrimaryKeySelective(agentCertification)){
-                logger.info("工商认证成功，同步信息成功"+agent.getId());
+            }else if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("enterpriseStatus")) && !dataObj.getString("enterpriseStatus").startsWith("在营")){
+                //非在营状态则冻结该代理商
+                agent.setFreestatus(new BigDecimal(0));
+                agent.setCaStatus(Status.STATUS_2.status);
+                agentCertification.setCerRes(Status.STATUS_1.status);//认证结果;1-成功,2-失败
+                agentCertification.setCerProStat(Status.STATUS_2.status);//认证流程状态:0-未处理,1-处理中,2-处理成功,3-处理失败;
+                if(1==agentMapper.updateByPrimaryKeySelective(agent)&& 1 == agentCertificationMapper.updateByPrimaryKeySelective(saveAgentCertification(dataObj,agentCertification))){
+                    logger.info("工商认证成功，认证代理商{}状态为{},不进行信息同步",agent.getAgUniqNum(),dataObj.getString("enterpriseStatus"));
+                }
             }
             return AgentResult.ok();
         }else{
@@ -276,9 +252,126 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
                             agentcer.setCerProStatMark("处理失败");
                         }
                     }
+                    if (null!=agentcer.getAgBusLicb()){
+                        try {
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                            Date date = simpleDateFormat.parse((String)agentcer.getAgBusLicb());
+                            agentcer.setAgBusLicb(simpleDateFormat.format(date).toString());
+                        }catch (Exception e){
+
+                        }
+
+                    }
+                    if (null!=agentcer.getAgBusLice()){
+
+                        try {
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                            Date date = simpleDateFormat.parse((String)agentcer.getAgBusLice());
+                            agentcer.setAgBusLice(simpleDateFormat.format(date).toString());
+                        }catch (Exception e){
+
+                        }
+
+                    }
                 }});
         return agentCertifiVos;
     }
 
+    @Override
+    public AgentCertification  getMaxId(Map map) {
+        return agentCertificationMapper.queryMaxIdByAgentid(map);
+    }
 
+    private AgentCertification saveAgentCertification(JSONObject dataObj, AgentCertification agentCertification){
+        //更新认证信息表
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("enterpriseName")))
+        agentCertification.setEnterpriseName(dataObj.getString("enterpriseName").trim());//企业名称
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("frName")))
+        agentCertification.setFrName(dataObj.getString("frName").trim());//法人名称
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("regNo")))
+        agentCertification.setRegNo                     (dataObj.getString("regNo").trim());//工商注册号
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("regCap")))
+            agentCertification.setRegCap                    (new BigDecimal(dataObj.getString("regCap").trim()));//注册资金
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("regCapCur")))
+        agentCertification.setRegCapCur                 (dataObj.getString("regCapCur").trim());//注册币种
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("esDate")))
+            agentCertification.setEsDate(dataObj.getString("esDate"));
+        if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("openFrom")))
+            agentCertification.setOpenFrom                  (DateUtil.format(dataObj.getString("openFrom"),"yyyy-MM-dd"));//经营开始日期
+
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("openTo")) && dataObj.getString("openTo").equals("长期")){
+            agentCertification.setOpenTo(DateUtil.format("2099-12-31","yyyy-MM-dd"));
+        }else if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("openTo"))){
+            agentCertification.setOpenTo(DateUtil.format(dataObj.getString("openTo"),"yyyy-MM-dd"));
+        }
+
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("enterpriseType")))
+        agentCertification.setEnterpriseType            (dataObj.getString("enterpriseType").trim());//企业（机构）类型
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("enterpriseStatus")))
+        agentCertification.setEnterpriseStatus          (dataObj.getString("enterpriseStatus").trim());//经营状态
+        if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("cancelDate")))
+            agentCertification.setCancelDate                (DateUtil.format(dataObj.getString("cancelDate"),"yyyy-MM-dd"));//注销日期
+        if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("revokeDate")))
+            agentCertification.setRevokeDate                (DateUtil.format(dataObj.getString("revokeDate"),"yyyy-MM-dd"));//吊销日期
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("address")))
+        agentCertification.setAddress                   (dataObj.getString("address").trim());//注册地址
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("abuItem")))
+        agentCertification.setAbuItem                   (dataObj.getString("abuItem").trim());//许可经营项目
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("cbuItem")))
+        agentCertification.setCbuItem                   (dataObj.getString("cbuItem").trim());//一般经营项目
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("operateScope")))
+        agentCertification.setOperateScope              (dataObj.getString("operateScope").trim());//经营（业务）范围
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("operateScopeAndForm")))
+        agentCertification.setOperateScopeAndForm       (dataObj.getString("operateScopeAndForm").trim());//经营（业务）范围及方式
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("regOrg")))
+        agentCertification.setRegOrg                    (dataObj.getString("regOrg").trim());//登记机关
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("ancheYear")))
+        agentCertification.setAncheYear                 (dataObj.getString("ancheYear").trim());//最后年检年度
+        if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("ancheDate")))
+            agentCertification.setAncheDate               (DateUtil.format(dataObj.getString("ancheDate"),"yyyy-MM-dd"));//最后年检日期
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("industryPhyCode")))
+        agentCertification.setIndustryPhyCode           (dataObj.getString("industryPhyCode").trim());//行业门类代码
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("industryPhyName")))
+        agentCertification.setIndustryPhyName           (dataObj.getString("industryPhyName").trim());//行业门类名称
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("industryCode")))
+        agentCertification.setIndustryCode              (dataObj.getString("industryCode").trim());//国民经济行业代码
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("industryName")))
+        agentCertification.setIndustryName              (dataObj.getString("industryName").trim());//国民经济行业名称
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("recCap")))
+            agentCertification.setRecCap                    (new BigDecimal(dataObj.getString("recCap").trim()));//实收资本
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("oriRegNo")))
+        agentCertification.setOriRegNo                  (dataObj.getString("oriRegNo").trim());//原注册号
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("creditCode")))
+        agentCertification.setCreditCode                (dataObj.getString("creditCode").trim());//统一信用代码
+        if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("apprDate")))
+            agentCertification.setApprDate               (DateUtil.format(dataObj.getString("apprDate"),"yyyy-MM-dd"));//核准日期
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("orgNo")))
+        agentCertification.setOrgNo                     (dataObj.getString("orgNo").trim());//注册号
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("usci")))
+        agentCertification.setUsci                      (dataObj.getString("usci").trim());//组织机构号
+        ZoneId zoneId = ZoneId.systemDefault();
+        ZonedDateTime zdt = LocalDateTime.now().atZone(zoneId);//Combines this date-time with a time-zone to create a  ZonedDateTime.
+        Date date = Date.from(zdt.toInstant());
+        agentCertification.setCerSuccessTm(date);
+        return agentCertification;
+    }
+
+    private AgentCertification copyOrgAgentToCertifi(Agent agent,AgentCertification agentCertification){
+        agentCertification.setOrgAgName(agent.getAgName());
+        agentCertification.setOrgAgNature(agent.getAgNature());
+        agentCertification.setOrgAgCapital(agent.getAgCapital());
+        agentCertification.setOrgAgBusLic(agent.getAgBusLic());
+        agentCertification.setOrgAgBusLicb(agent.getAgBusLicb());
+        agentCertification.setOrgAgBusLice(agent.getAgBusLice());
+        agentCertification.setOrgAgLegal(agent.getAgLegal());
+        agentCertification.setOrgAgRegAdd(agent.getAgRegAdd());
+        agentCertification.setOrgAgBusScope(agent.getAgBusScope());
+        return agentCertification;
+    }
+
+    @Override
+    public int updateCertifi(AgentCertification agentCertification) {
+        int i = agentCertificationMapper.updateByPrimaryKeySelective(agentCertification);
+        return i;
+    }
 }

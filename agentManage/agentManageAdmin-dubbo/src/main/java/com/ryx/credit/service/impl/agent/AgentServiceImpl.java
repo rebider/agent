@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -876,6 +877,27 @@ public class AgentServiceImpl implements AgentService {
                             break;
                         }
                     }
+                }
+                if (null!=agent.getAgBusLicb()){
+                    try {
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                        Date date = simpleDateFormat.parse((String)agent.getAgBusLicb());
+                        agent.setAgBusLicb(simpleDateFormat.format(date).toString());
+                    }catch (Exception e){
+
+                    }
+
+                }
+                if (null!=agent.getAgBusLice()){
+
+                    try {
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                        Date date = simpleDateFormat.parse((String)agent.getAgBusLice());
+                        agent.setAgBusLice(simpleDateFormat.format(date).toString());
+                    }catch (Exception e){
+
+                    }
+
                 }
             });
 

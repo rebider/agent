@@ -898,73 +898,73 @@ public class AgentCertificationExample {
             return (Criteria) this;
         }
 
-        public Criteria andAgBusLicIsNull() {
-            addCriterion("AG_BUS_LIC is null");
+        public Criteria andOrgCerIdIsNull() {
+            addCriterion("ORG_CER_ID is null");
             return (Criteria) this;
         }
 
-        public Criteria andAgBusLicIsNotNull() {
-            addCriterion("AG_BUS_LIC is not null");
+        public Criteria andOrgCerIdIsNotNull() {
+            addCriterion("ORG_CER_ID is not null");
             return (Criteria) this;
         }
 
-        public Criteria andAgBusLicEqualTo(String value) {
-            addCriterion("AG_BUS_LIC =", value, "agBusLic");
+        public Criteria andOrgCerIdEqualTo(String value) {
+            addCriterion("ORG_CER_ID =", value, "orgCerId");
             return (Criteria) this;
         }
 
-        public Criteria andAgBusLicNotEqualTo(String value) {
-            addCriterion("AG_BUS_LIC <>", value, "agBusLic");
+        public Criteria andOrgCerIdNotEqualTo(String value) {
+            addCriterion("ORG_CER_ID <>", value, "orgCerId");
             return (Criteria) this;
         }
 
-        public Criteria andAgBusLicGreaterThan(String value) {
-            addCriterion("AG_BUS_LIC >", value, "agBusLic");
+        public Criteria andOrgCerIdGreaterThan(String value) {
+            addCriterion("ORG_CER_ID >", value, "orgCerId");
             return (Criteria) this;
         }
 
-        public Criteria andAgBusLicGreaterThanOrEqualTo(String value) {
-            addCriterion("AG_BUS_LIC >=", value, "agBusLic");
+        public Criteria andOrgCerIdGreaterThanOrEqualTo(String value) {
+            addCriterion("ORG_CER_ID >=", value, "orgCerId");
             return (Criteria) this;
         }
 
-        public Criteria andAgBusLicLessThan(String value) {
-            addCriterion("AG_BUS_LIC <", value, "agBusLic");
+        public Criteria andOrgCerIdLessThan(String value) {
+            addCriterion("ORG_CER_ID <", value, "orgCerId");
             return (Criteria) this;
         }
 
-        public Criteria andAgBusLicLessThanOrEqualTo(String value) {
-            addCriterion("AG_BUS_LIC <=", value, "agBusLic");
+        public Criteria andOrgCerIdLessThanOrEqualTo(String value) {
+            addCriterion("ORG_CER_ID <=", value, "orgCerId");
             return (Criteria) this;
         }
 
-        public Criteria andAgBusLicLike(String value) {
-            addCriterion("AG_BUS_LIC like", value, "agBusLic");
+        public Criteria andOrgCerIdLike(String value) {
+            addCriterion("ORG_CER_ID like", value, "orgCerId");
             return (Criteria) this;
         }
 
-        public Criteria andAgBusLicNotLike(String value) {
-            addCriterion("AG_BUS_LIC not like", value, "agBusLic");
+        public Criteria andOrgCerIdNotLike(String value) {
+            addCriterion("ORG_CER_ID not like", value, "orgCerId");
             return (Criteria) this;
         }
 
-        public Criteria andAgBusLicIn(List<String> values) {
-            addCriterion("AG_BUS_LIC in", values, "agBusLic");
+        public Criteria andOrgCerIdIn(List<String> values) {
+            addCriterion("ORG_CER_ID in", values, "orgCerId");
             return (Criteria) this;
         }
 
-        public Criteria andAgBusLicNotIn(List<String> values) {
-            addCriterion("AG_BUS_LIC not in", values, "agBusLic");
+        public Criteria andOrgCerIdNotIn(List<String> values) {
+            addCriterion("ORG_CER_ID not in", values, "orgCerId");
             return (Criteria) this;
         }
 
-        public Criteria andAgBusLicBetween(String value1, String value2) {
-            addCriterion("AG_BUS_LIC between", value1, value2, "agBusLic");
+        public Criteria andOrgCerIdBetween(String value1, String value2) {
+            addCriterion("ORG_CER_ID between", value1, value2, "orgCerId");
             return (Criteria) this;
         }
 
-        public Criteria andAgBusLicNotBetween(String value1, String value2) {
-            addCriterion("AG_BUS_LIC not between", value1, value2, "agBusLic");
+        public Criteria andOrgCerIdNotBetween(String value1, String value2) {
+            addCriterion("ORG_CER_ID not between", value1, value2, "orgCerId");
             return (Criteria) this;
         }
 

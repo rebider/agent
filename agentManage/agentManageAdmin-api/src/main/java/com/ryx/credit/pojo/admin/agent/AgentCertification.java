@@ -1,17 +1,10 @@
 package com.ryx.credit.pojo.admin.agent;
 
-import com.alibaba.fastjson.annotation.JSONField;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.ryx.credit.common.util.DateJsonDeserializer;
-import com.ryx.credit.common.util.DateJsonSerializer;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class AgentCertification  implements Serializable {
+public class AgentCertification implements Serializable {
     private String id;
 
     private String agentId;
@@ -34,7 +27,7 @@ public class AgentCertification  implements Serializable {
 
     private String esDate;
 
-    private String agBusLic;
+    private String orgCerId;
 
     private Date openFrom;
 
@@ -202,12 +195,12 @@ public class AgentCertification  implements Serializable {
         this.esDate = esDate == null ? null : esDate.trim();
     }
 
-    public String getAgBusLic() {
-        return agBusLic;
+    public String getOrgCerId() {
+        return orgCerId;
     }
 
-    public void setAgBusLic(String agBusLic) {
-        this.agBusLic = agBusLic == null ? null : agBusLic.trim();
+    public void setOrgCerId(String orgCerId) {
+        this.orgCerId = orgCerId == null ? null : orgCerId.trim();
     }
 
     public Date getOpenFrom() {
