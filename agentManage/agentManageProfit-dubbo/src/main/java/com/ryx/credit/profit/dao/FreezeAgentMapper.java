@@ -67,5 +67,5 @@ public interface FreezeAgentMapper {
 
     List<FreezeAgent> queryDayFreezeDate(@Param("startNum") Integer startNum, @Param("endNum") Integer endNum);
 
-    Integer deleteInvoiceAgent(String id);
+    Integer deleteInvoiceAgent(@Param("id") String id);
 }
