@@ -142,6 +142,6 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
 
     @Override
     public AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception {
-        return AgentResult.ok("未联动");
+        return AgentResult.ok("04");
     }
 }

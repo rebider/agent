@@ -216,7 +216,8 @@ public class TermMachineServiceImpl  implements TermMachineService {
         }else if(PlatformType.RDBPOS.getValue().equals(platformType)){
             agentResult =  rdbTermMachineServiceImpl.queryCompensateResult(serialNumber,platformType);
         }else {
-            return AgentResult.ok("未联动");
+            //未调整
+            return AgentResult.ok("04");
         }
         return agentResult;
     }
