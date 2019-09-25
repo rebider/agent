@@ -30,5 +30,5 @@
     <dubbo:reference interface="com.ryx.credit.service.agent.AgentCertificationService" id="agentCertificationService"  timeout="1200000" registry="myGroup" check="false"/>
 
     <!-- 退货任务消费者 -->
-    <dubbo:reference interface="com.ryx.credit.service.order.OsnOperateService" id="osnOperateReturnServiceImpl" timeout="1200000" registry="myGroup" />
+    <dubbo:reference interface="com.ryx.credit.service.order.OsnOperateReturnService" id="osnOperateReturnService" timeout="1200000" registry="myGroup" />
 </beans>

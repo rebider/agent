@@ -461,7 +461,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     //瑞大宝订单，默认-->定时调度
                     OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
                     logistics_send.setSendStatus(LogisticsSendStatus.none_send.code);
-                    logistics_send.setSendMsg("瑞大宝业务平台");
+                    logistics_send.setSendMsg("");
                     if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
                         logger.info("瑞大宝物流更新失败,Exception失败{}",JSONObject.toJSONString(oLogistics));
                     }

@@ -348,30 +348,86 @@
   <!--销账明细-->
   <select id="rAccountDetailList" parameterType="java.util.Map" resultType="java.util.Map">
     <include refid="PAGING_START" />
-    select at.att_name,a.* from O_REMOVE_ACCOUNT a left join A_attachment_rel b on a.BATCH_NUM=b.src_id
-    left join A_attachment at on at.id=b.ATT_ID
-    where  1=1 <include refid="RACCOUNTDETAIL_WHERE_SQL"/> and b.status=1 and a.status=1 and at.status=1
+    select ra.id,ra.BATCH_NUM,to_char(ra.RMONTH,'yyyy-mm') as omonth,
+    ag.AG_UNIQ_NUM,ra.ag_name,ra.bus_num,plat.PLATFORM_NAME,a.* ,
+    ra.ramount,ra.pay_method,ra.submit_person,ra.rstatus,ra.remark,
+    ra.FINISH_TIME ,at.att_name
+    from O_REMOVE_ACCOUNT ra left join
+    ( select
+    o_payment_detail.src_id,o_payment_detail.src_type
+    from
+    O_PAYMENT_DETAIL ) a on ra.id=a.src_id
+    left join a_agent ag on ag.id=ra.ag_id
+    left join a_platform plat ON plat.platform_num = ra.bus_platform
+    left join a_attachment_rel rel on rel.SRC_ID=ra.BATCH_NUM
+    left join a_attachment at ON at.id = rel.att_id
+    WHERE  ra.status = 1 <include refid="RACCOUNTDETAIL_WHERE_SQL"/>
+    union
+    select ra.id,ra.BATCH_NUM,to_char(ra.RMONTH,'yyyy-mm') as omonth,
+    ag.AG_UNIQ_NUM,ra.ag_name,ra.bus_num,plat.PLATFORM_NAME,a.* ,
+    ra.ramount,ra.pay_method,ra.submit_person,ra.rstatus,ra.remark,
+    ra.FINISH_TIME ,at.att_name
+    from O_REMOVE_ACCOUNT ra left join
+    ( select
+    o_payment_detail.src_id,o_payment_detail.src_type
+    from
+    O_PAYMENT_DETAIL ) a on ra.id=a.src_id
+    left join a_agent ag on ag.id=ra.ag_id
+    left join a_platform plat ON plat.platform_num = ra.bus_platform
+    left join a_attachment_rel rel on rel.SRC_ID=ra.BATCH_NUM
+    left join a_attachment at ON at.id = rel.att_id
+    WHERE   ra.status = 1 <include refid="RACCOUNTDETAIL_WHERE_SQL"/>
     <include refid="PAGING_END" />
   </select>
 
   <select id="rAccountDetailCount" parameterType="java.util.Map" resultType="java.lang.Long">
-    select count(1) from O_REMOVE_ACCOUNT a left join A_attachment_rel b on a.BATCH_NUM=b.src_id
-    left join A_attachment at on at.id=b.ATT_ID
-    where 1=1<include refid="RACCOUNTDETAIL_WHERE_SQL"/> and b.status=1 and a.status=1 and at.status=1
+
+    select count(1)
+    from O_REMOVE_ACCOUNT ra left join
+    ( select
+    o_payment_detail.src_id,o_payment_detail.src_type
+    from
+    O_PAYMENT_DETAIL ) a on ra.id=a.src_id
+    left join a_agent ag on ag.id=ra.ag_id
+    left join a_platform plat ON plat.platform_num = ra.bus_platform
+    left join a_attachment_rel rel on rel.SRC_ID=ra.BATCH_NUM
+    left join a_attachment at ON at.id = rel.att_id
+    WHERE  ra.status = 1 <include refid="RACCOUNTDETAIL_WHERE_SQL"/>
+    union
+    select ra.id,ra.BATCH_NUM,to_char(ra.RMONTH,'yyyy-mm') as omonth,
+    ag.AG_UNIQ_NUM,ra.ag_name,ra.bus_num,plat.PLATFORM_NAME,a.* ,
+    ra.ramount,ra.pay_method,ra.submit_person,ra.rstatus,ra.remark,
+    ra.FINISH_TIME ,at.att_name
+    from O_REMOVE_ACCOUNT ra left join
+    ( select
+    o_payment_detail.src_id,o_payment_detail.src_type
+    from
+    O_PAYMENT_DETAIL ) a on ra.id=a.src_id
+    left join a_agent ag on ag.id=ra.ag_id
+    left join a_platform plat ON plat.platform_num = ra.bus_platform
+    left join a_attachment_rel rel on rel.SRC_ID=ra.BATCH_NUM
+    left join a_attachment at ON at.id = rel.att_id
+    WHERE   ra.status = 1 <include refid="RACCOUNTDETAIL_WHERE_SQL"/>
   </select>
 
   <sql id="RACCOUNTDETAIL_WHERE_SQL">
-    <if test="ag_name !=null and ag_name !='' ">
-      and  a.AG_NAME LIKE CONCAT(CONCAT('%',#{ag_name}),'%')
+    <if test="agName !=null and agName !='' ">
+      and  ra.AG_NAME LIKE CONCAT(CONCAT('%',#{agName}),'%')
     </if>
     <if test="busNum !=null and busNum !='' ">
-      and  a.bus_num LIKE CONCAT(CONCAT('%',#{busNum}),'%')
+      and  ra.bus_num =#{busNum}
     </if>
     <if test="id !=null and id !='' ">
-      and  a.id LIKE CONCAT(CONCAT('%',#{id}),'%')
+      and  ra.id =#{id}
     </if>
-    <if test="batch_num !=null and batch_num !='' ">
-      and  a.BATCH_NUM LIKE CONCAT(CONCAT('%',#{batch_num}),'%')
+    <if test="batchNum !=null and batchNum !='' ">
+      and  ra.BATCH_NUM =#{batchNum}
+    </if>
+    <if test="busPlatform !=null and busPlatform !='' ">
+      and  ra.BUS_PLATFORM =#{busPlatform}
+    </if>
+    <if test="agUniqNum !=null and agUniqNum !='' ">
+      and  ag.AG_UNIQ_NUM =#{agUniqNum}
     </if>
   </sql>
 </mapper>

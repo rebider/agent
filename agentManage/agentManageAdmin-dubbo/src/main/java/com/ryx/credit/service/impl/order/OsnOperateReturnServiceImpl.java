@@ -22,6 +22,7 @@ import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OLogisticsService;
+import com.ryx.credit.service.order.OsnOperateReturnService;
 import com.ryx.credit.service.order.OsnOperateService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -39,8 +40,8 @@ import java.util.*;
  * 时间：2019/5/9
  * 描述：
  */
-@Service("osnOperateReturnServiceImpl")
-public class OsnOperateReturnServiceImpl implements OsnOperateService {
+@Service("osnOperateReturnService")
+public class OsnOperateReturnServiceImpl implements OsnOperateReturnService {
 
     private static Logger logger = LoggerFactory.getLogger(OsnOperateReturnServiceImpl.class);
 
@@ -76,8 +77,8 @@ public class OsnOperateReturnServiceImpl implements OsnOperateService {
     private CUserMapper cUserMapper;
     @Autowired
     private IdService idService;
-    @Resource(name = "osnOperateReturnServiceImpl")
-    private OsnOperateService osnOperateService;
+    @Resource(name = "osnOperateReturnService")
+    private OsnOperateReturnService osnOperateReturnService;
     @Autowired
     private DictOptionsService dictOptionsService;
     @Autowired
@@ -124,7 +125,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateService {
                     if (1 == oLogisticsMapper.updateByPrimaryKeySelective(logistics)) {
                         try {
                             logger.info("退货物流处理 处理物流生成明细:{},{},{}", logistics.getId(), logistics.getSnBeginNum(), logistics.getSnEndNum());
-                            if (osnOperateService.genOlogicDetailInfo(id)) {
+                            if (osnOperateReturnService.genOlogicDetailInfo(id)) {
                                 logistics = oLogisticsMapper.selectByPrimaryKey(id);
                                 logistics.setSendStatus(LogisticsSendStatus.gen_detail_sucess.code);
                                 if (1 != oLogisticsMapper.updateByPrimaryKeySelective(logistics)) {
@@ -152,7 +153,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateService {
                                 logger.info("退货物流处理 物流生成明细异常，更新数据库成功:{},{},{},{}", logistics.getId(), logistics.getSnBeginNum(), logistics.getSnEndNum(), e.getLocalizedMessage());
                             }
                             e.printStackTrace();
-                            AppConfig.sendEmails("logisticId:" + id + "错误信息:" + MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                            AppConfig.sendEmails("logisticId:" + id + "错误信息:" + MailUtil.printStackTrace(e), "任务生成物流明细错误报警osnOperateReturnServiceImpl");
                         } catch (Exception e) {
                             logger.error("生成物流明细任务异常：", e);
                             logistics = oLogisticsMapper.selectByPrimaryKey(id);
@@ -164,7 +165,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateService {
                                 logger.info("退货物流处理 物流生成明细异常，更新数据库成功:{},{},{},{}", logistics.getId(), logistics.getSnBeginNum(), logistics.getSnEndNum(), e.getLocalizedMessage());
                             }
                             e.printStackTrace();
-                            AppConfig.sendEmails("logisticId:" + id + "错误信息:" + MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                            AppConfig.sendEmails("logisticId:" + id + "错误信息:" + MailUtil.printStackTrace(e), "任务生成物流明细错误报警osnOperateReturnServiceImpl");
                         }
                     }
                 }
@@ -205,18 +206,26 @@ public class OsnOperateReturnServiceImpl implements OsnOperateService {
      */
     @Override
     public boolean processData(List<String> ids) {
+
+        //查询物流失败接收人
+        List<Dict> dicts = dictOptionsService.dictList(DictGroup.EMAIL.name(), DictGroup.LOGISTICS_FAIL_EMAIL.name());
+        String[] emailArr = new String[dicts.size()];
+        for (int i = 0; i < dicts.size(); i++) {
+            emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
+        }
+
         if (ids != null && ids.size() > 0) {
             for (String id:ids) {
                 OLogisticsExample example = new OLogisticsExample();
                 example.or().andSendStatusEqualTo(LogisticsSendStatus.send_ing.code).andIdEqualTo(id);
                 List<OLogistics> logistics_list = oLogisticsMapper.selectByExample(example);
-                OLogistics logistics_item = null;
+                OLogistics logistics = null;
                 //物流赋值
                 if (logistics_list.size() > 0) {
-                    logistics_item = logistics_list.get(0);
+                    logistics = logistics_list.get(0);
                 }
                 //查询到物流才退货转发
-                if (logistics_item != null) {
+                if (logistics != null) {
 
                     //根据物流id查找sn明细，并更新物流明细发送状态为待发送状态，200单位数量为1批次，避免接口错误进行接口请求数量限制。
                     OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
@@ -227,7 +236,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateService {
                     oLogisticsDetailExample.setOrderByClause(" sn_num asc ");
 
                     //每次处理两百条数据
-                    oLogisticsDetailExample.setPage(new Page(0, 200));
+                    //oLogisticsDetailExample.setPage(new Page(0, 200));
                     List<OLogisticsDetail> logisticsDetails = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
 
                     //批次格式为YYYYMMddHHmmss + inerBatch
@@ -237,11 +246,10 @@ public class OsnOperateReturnServiceImpl implements OsnOperateService {
 
                     try {
                         //退货下发，0处理中,1成功，2失败
-                        Map<String, Object> sendInfoRet = osnOperateService.sendInfoToBusinessSystem(logisticsDetails, id, new BigDecimal(batch));
+                        Map<String, Object> sendInfoRet = osnOperateReturnService.sendInfoToBusinessSystem(logisticsDetails, id, new BigDecimal(batch));
                         //根据业务平台返回值更新物流明细
                         if (null != sendInfoRet.get("status") && "0".equals(sendInfoRet.get("status"))) {
                             //处理中，不更改明细，更改物流初始状态
-                            OLogistics logistics = oLogisticsMapper.selectByPrimaryKey(id);
                             logistics.setSendStatus(LogisticsSendStatus.gen_detail_sucess.code);
                             if (oLogisticsMapper.updateByPrimaryKeySelective(logistics) != 1) {
                                 logger.info("更新物流状态为生成明细中失败：", id, batch);
@@ -249,7 +257,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateService {
                         } else if (null != sendInfoRet.get("status") && "1".equals(sendInfoRet.get("status"))) {
                             //成功，更新物流明细
                             while (logisticsDetails.size() > 0) {
-                                if (!osnOperateService.updateDetailBatch(logisticsDetails, new BigDecimal(batch), LogisticsDetailSendStatus.send_ing.code))
+                                if (!osnOperateReturnService.updateDetailBatch(logisticsDetails, new BigDecimal(batch), LogisticsDetailSendStatus.send_ing.code))
                                     throw new Exception("明细更新失败（下发成功）");
                                 //调用接口发送到业务系统，如果接口返回异常，更新物流明细发送失败，不在进行发送
                                 logisticsDetails = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
@@ -257,7 +265,6 @@ public class OsnOperateReturnServiceImpl implements OsnOperateService {
                                 batch = date + inerBatch.intValue();
                             }
                             //检查是否包含有未发送的sn,如果没有更新为处理成功 ，如果处理中的物流没有
-                            OLogistics logistics = oLogisticsMapper.selectByPrimaryKey(id);
                             if (LogisticsSendStatus.send_ing.code.compareTo(logistics.getSendStatus()) == 0) {
                                 if (oLogisticsDetailMapper.countByExample(oLogisticsDetailExample) == 0) {
                                     logistics.setSendStatus(LogisticsSendStatus.send_success.code);
@@ -269,8 +276,9 @@ public class OsnOperateReturnServiceImpl implements OsnOperateService {
                             }
                         } else if (null != sendInfoRet.get("status") && "2".equals(sendInfoRet.get("status"))) {
                             //失败，更新物流明细
+                            AppConfig.sendEmail(emailArr, "SN开始：" + logistics.getSnBeginNum()+",SN结束" + logistics.getSnEndNum() + "错误信息："+null == sendInfoRet.get("msg")?"接口返回值异常！":(String)sendInfoRet.get("msg"), logistics.getProName() + "退货下发失败！！！");
                             while (logisticsDetails.size() > 0) {
-                                if (!osnOperateService.updateDetailBatch(logisticsDetails, new BigDecimal(batch), LogisticsDetailSendStatus.send_fail.code))
+                                if (!osnOperateReturnService.updateDetailBatch(logisticsDetails, new BigDecimal(batch), LogisticsDetailSendStatus.send_fail.code))
                                     throw new Exception("物流明细更新失败（下发失败）");
                                 //调用接口发送到业务系统，如果接口返回异常，更新物流明细发送失败，不在进行发送
                                 logisticsDetails = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
@@ -278,7 +286,6 @@ public class OsnOperateReturnServiceImpl implements OsnOperateService {
                                 batch = date + inerBatch.intValue();
                             }
                             //检查是否包含有未发送的sn,如果没有更新为处理成功 ，如果处理中的物流没有
-                            OLogistics logistics = oLogisticsMapper.selectByPrimaryKey(id);
                             if (LogisticsSendStatus.send_ing.code.compareTo(logistics.getSendStatus()) == 0) {
                                 if (oLogisticsDetailMapper.countByExample(oLogisticsDetailExample) == 0) {
                                     logistics.setSendStatus(LogisticsSendStatus.send_fail.code);
@@ -290,12 +297,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateService {
                             }
                         }
                     } catch (Exception e) {
-                        List<Dict> dicts = dictOptionsService.dictList(DictGroup.EMAIL.name(), DictGroup.LOGISTICS_FAIL_EMAIL.name());
-                        String[] emailArr = new String[dicts.size()];
-                        for (int i = 0; i < dicts.size(); i++) {
-                            emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
-                        }
-                        AppConfig.sendEmail(emailArr, "logisticId:" + id + "错误信息:" + MailUtil.printStackTrace(e), "物流任务，退货下发错误报警！！！");
+                        AppConfig.sendEmails("logisticId:" + id + "错误信息:" + MailUtil.printStackTrace(e), "物流任务，退货下发错误报警！！！");
                         logisticsDetails.forEach(det -> {
                             OLogisticsDetail detail = oLogisticsDetailMapper.selectByPrimaryKey(det.getId());
                             detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
@@ -303,7 +305,6 @@ public class OsnOperateReturnServiceImpl implements OsnOperateService {
                             oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                         });
                         //更新物流为发送失败停止发送，人工介入
-                        OLogistics logistics = oLogisticsMapper.selectByPrimaryKey(id);
                         logistics.setSendStatus(LogisticsSendStatus.send_fail.code);
                         logistics.setSendMsg(e.getLocalizedMessage());
                         if (oLogisticsMapper.updateByPrimaryKeySelective(logistics) != 1) {
@@ -691,7 +692,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateService {
                     putKeyV("terminalNoEnd", logistics.getSnEndNum()). //终端编号结束
                     putKeyV("agencyId", agentBusInfo.getBusNum()).//终端政策id
                     putKeyV("terminalPolicyId", oActivity.getBusProCode()).//代理商A码
-                    putKeyV("inBoundDate", (new SimpleDateFormat("yyyyMMddHHmmss")).format(new Date()))); //发货时间
+                    putKeyV("inBoundDate", (new SimpleDateFormat("yyyyMMdd")).format(new Date()))); //发货时间
             reqMap.put("taskId", logistics.getId()); //唯一值
             reqMap.put("branchId", agentBusInfo.getBusPlatform().substring(0, agentBusInfo.getBusPlatform().indexOf("_"))); //当前品牌id
             reqMap.put("oldAgencyId", agentBusInfoMap.get("BUSNUM")); //代理商A码
@@ -719,10 +720,5 @@ public class OsnOperateReturnServiceImpl implements OsnOperateService {
         } else {
             return FastMap.fastMap("status", "2").putKeyV("msg", "未实现的物流平台");
         }
-    }
-
-    @Override
-    public List<OLogisticsDetail> updateDetailBatch(List<OLogisticsDetail> datas, BigDecimal batch) throws Exception {
-        return null;
     }
 }
