@@ -692,7 +692,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateReturnService {
                     putKeyV("terminalNoEnd", logistics.getSnEndNum()). //终端编号结束
                     putKeyV("agencyId", agentBusInfo.getBusNum()).//终端政策id
                     putKeyV("terminalPolicyId", oActivity.getBusProCode()).//代理商A码
-                    putKeyV("inBoundDate", (new SimpleDateFormat("yyyyMMddHHmmss")).format(new Date()))); //发货时间
+                    putKeyV("inBoundDate", (new SimpleDateFormat("yyyyMMdd")).format(new Date()))); //发货时间
             reqMap.put("taskId", logistics.getId()); //唯一值
             reqMap.put("branchId", agentBusInfo.getBusPlatform().substring(0, agentBusInfo.getBusPlatform().indexOf("_"))); //当前品牌id
             reqMap.put("oldAgencyId", agentBusInfoMap.get("BUSNUM")); //代理商A码
