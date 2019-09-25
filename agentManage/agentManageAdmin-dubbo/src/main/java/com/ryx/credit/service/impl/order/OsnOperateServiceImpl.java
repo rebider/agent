@@ -40,6 +40,7 @@ import sun.rmi.runtime.Log;
 import javax.annotation.Resource;
 import javax.print.attribute.standard.MediaSize;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -976,17 +977,18 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             reqMap.put("oldAgencyId", oldAgencyId);//划拨机构
             reqMap.put("branchId", branchId);//品牌id
             reqMap.put("termPolicyId", oActivity_plan.getBusProCode());//活动代码
+            reqMap.put("inBoundDate", (new SimpleDateFormat("yyyyMMddHHmmss")).format(new Date()));//活动代码
 
             try {
                 String json = JsonUtil.objectToJson(reqMap);
-                logger.info("------------------------------------------>>>请求RDB下发数据:" + json);
+                logger.info("请求RDB下发数据:" + json);
                 String respResult = HttpClientUtil.doPostJsonWithException(AppConfig.getProperty("rdbpos.requestTransfer"), json);
 
                 if (!StringUtils.isNotBlank(respResult)) throw new Exception("瑞大宝下发接口返回值为空，请联系管理员！");
 
                 JSONObject respJson = JSONObject.parseObject(respResult);
                 if (!(null != respJson.getString("code") && null != respJson.getString("success") && respJson.getString("code").equals("0000") && respJson.getBoolean("success"))) {
-                    logger.info("------------------------------------------>>>RDB下发返回异常:" + respResult);
+                    logger.info("RDB下发返回异常:" + respResult);
                     throw new Exception(null != respJson.getString("msg") ? respJson.getString("msg") : "瑞大宝，下发接口，返回值异常，请联系管理员!");
                 }
                 // 发送成功，查询结果
@@ -999,8 +1001,8 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                         throw new Exception("瑞大宝,查询,下发接口,返回值为空，请联系管理员！");
                     }
                     JSONObject resJson = JSONObject.parseObject(retString);
-                    logger.info("------------------------------------------>>>RDB下发查询接口返回值:" + retString);
-                    logger.info("------------------------------------------>>>要修改的明细具体信息:" + JsonUtil.objectToJson(listOLogisticsDetailSn));
+                    logger.info("RDB下发查询接口返回值:" + retString);
+                    logger.info("要修改的明细具体信息:" + JsonUtil.objectToJson(listOLogisticsDetailSn));
                     if (null != resJson.getString("code") && resJson.getString("code").equals("0000") && null != resJson.getBoolean("success") && resJson.getBoolean("success")) {
                         //机具,下发成功，更新物流明细为下发成功
                         logger.info("下发物流接口调用成功：物流编号:{},批次编号:{},时间:{},信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), resJson.getString("msg"));
