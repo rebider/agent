@@ -5,6 +5,7 @@ import com.ryx.credit.pojo.admin.order.OSubOrder;
 import com.ryx.credit.pojo.admin.order.OSubOrderExample;
 
 import java.util.List;
+import java.util.Map;
 
 public interface OSubOrderMapper {
     int countByExample(OSubOrderExample example);
@@ -23,5 +24,5 @@ public interface OSubOrderMapper {
 
     int updateByPrimaryKey(OSubOrder record);
 
-    Long selectProNumByBusNum(String busNum);
+    Long selectProNumByBusNum(Map<String, Object> paramMap);
 }

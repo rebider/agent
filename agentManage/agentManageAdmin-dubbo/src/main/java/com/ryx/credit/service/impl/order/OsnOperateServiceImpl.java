@@ -304,7 +304,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                                 //更新物流为发送失败停止发送，人工介入
                                 OLogistics logistics = oLogisticsMapper.selectByPrimaryKey(id);
                                 logistics.setSendStatus(LogisticsSendStatus.send_fail.code);
-                                logistics.setSendMsg("处理失败请查看处理物流明细");
+                                logistics.setSendMsg("联动失败，联动业务平台异常！！！");
                                 if (oLogisticsMapper.updateByPrimaryKeySelective(logistics) != 1) {
                                     logger.info("物流明细发送业务系统处理失败，更新数据库失败,{},{}", id, batch);
                                 }
@@ -977,7 +977,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             reqMap.put("oldAgencyId", oldAgencyId);//划拨机构
             reqMap.put("branchId", branchId);//品牌id
             reqMap.put("termPolicyId", oActivity_plan.getBusProCode());//活动代码
-            reqMap.put("inBoundDate", (new SimpleDateFormat("yyyyMMddHHmmss")).format(new Date()));//活动代码
+            reqMap.put("inBoundDate", new SimpleDateFormat("yyyyMMdd").format(new Date()));//活动代码
 
             try {
                 String json = JsonUtil.objectToJson(reqMap);
@@ -1016,7 +1016,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                         return retMap;
                     } else if (null != resJson.getString("code") && resJson.getString("code").equals("9999") && null != resJson.getBoolean("success") && !resJson.getBoolean("success")) {
                         //机具,下发失败，更新物流明细为下发失败，更新物流信息未下发失败，禁止再次发送，人工介入
-                        AppConfig.sendEmail(emailArr, "SN开始：" + logistics.getSnBeginNum() + ",SN结束：" + logistics.getSnEndNum(), "瑞大宝机具下发失败");
+                        AppConfig.sendEmail(emailArr, "SN码" + logistics.getSnBeginNum() + "-" + logistics.getSnEndNum(), "瑞大宝机具下发失败");
                         logger.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), resJson.getString("msg"));
                         listOLogisticsDetailSn.forEach(detail -> {
                             detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
@@ -1046,9 +1046,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             } catch (Exception e) {
                 e.printStackTrace();
                 //发送异常邮件
-                //发送内容
-                String msg = "起始SN:" + logistics.getSnBeginNum() + ",结束SN" + logistics.getSnEndNum() + "失败原因：" + e.getLocalizedMessage() + "\n";
-                AppConfig.sendEmail(emailArr, "瑞大宝机具下发失败" + "\n" + msg, "瑞大宝下发失败");
+                AppConfig.sendEmail(emailArr, "机具下发失败，SN码:" + logistics.getSnBeginNum() + "-" + logistics.getSnEndNum() + "。失败原因：" + e.getLocalizedMessage(), "瑞大宝机具下发失败");
                 throw e;
             }
         } else {
