@@ -83,6 +83,16 @@ public class AgentoutVo extends AgentExtends implements Serializable {
 
     private String time;
 
+    private String freeStatus;
+
+    public String getFreeStatus() {
+        return freeStatus;
+    }
+
+    public void setFreeStatus(String freeStatus) {
+        this.freeStatus = freeStatus;
+    }
+
     public String getTime() {
         return time;
     }
