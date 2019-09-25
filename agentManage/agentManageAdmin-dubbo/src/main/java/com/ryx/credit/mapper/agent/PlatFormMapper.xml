@@ -366,7 +366,7 @@
           P.*
       FROM
           A_PLATFORM P
-          LEFT JOIN O_ORDER O ON O.ORDER_PLATFORM = P.BUSPLATFORM
+          LEFT JOIN O_ORDER O ON O.ORDER_PLATFORM = P.PLATFORM_NUM
       WHERE
           O.ID = #{orderId}
   </select>

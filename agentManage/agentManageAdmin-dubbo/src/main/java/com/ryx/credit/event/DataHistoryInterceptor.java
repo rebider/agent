@@ -43,6 +43,10 @@ public class DataHistoryInterceptor implements MethodInterceptor {
         String name = method.getName();
 
         boolean result = name.contains("update") || name.contains("insert") || name.contains("delete");
+        //取出方法
+        if (name.equals("updateSnStatus")) {
+            result = false;
+        }
         String clazz = method.toString();
         if(result && !clazz.contains("CSysLogMapper") && !clazz.contains("DataHistoryRecordMapper") && !clazz.contains("DataHistoryMapper")
                 && !clazz.contains("OInternetCardMapper") && !clazz.contains("OInternetCardImportMapper")){
