@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class OsnFaHuoGenSnDetailJob implements SimpleJob {
 
     private static Logger logger = LoggerFactory.getLogger(OsnFaHuoGenSnDetailJob.class);
 
-    @Autowired
+    @Resource(name = "osnOperateService")
     private OsnOperateService osnOperateService;
 
     @Override

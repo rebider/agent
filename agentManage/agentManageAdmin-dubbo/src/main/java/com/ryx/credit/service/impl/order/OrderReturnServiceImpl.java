@@ -1759,7 +1759,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             oLogistics.setSnBeginNum(beginSn);   // 起始SN序列号
             oLogistics.setSnEndNum(endSn);     // 结束SN序列号
             oLogistics.setSendStatus(LogisticsSendStatus.none_send.code);
-            log.info("导入物流数据============================================{}" , JSONObject.toJSON(oLogistics));
+            log.info("导入物流数据{}" , JSONObject.toJSON(oLogistics));
             if (1 != oLogisticsService.insertImportData(oLogistics)) {
                 throw new MessageException("排单编号为:"+planNum+"处理，插入物流信息失败");
             }
@@ -2008,8 +2008,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                     }else  if (PlatformType.RDBPOS.code.equals(platForm.getPlatformType())){
                         //瑞大宝退货转发平台
                         // terminalNoStart  String    终端编号起始
-                        // terminalNoEnd    String    终端编号结束（必须15位）
-                        // agencyId         String    代理商A码（必须15位）
+                        // terminalNoEnd    String    终端编号结束
+                        // agencyId         String    代理商A码
                         // isFreeze         String    是否执行冻结("1" 执行)
                         // id               String    id
                         // status           Integer   能否转发("1" 能转发 "2"已执行冻结)
@@ -2020,7 +2020,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         reqMap.put("terminalNoStart",oLogistics.getSnBeginNum());   //终端编号起始
                         reqMap.put("terminalNoEnd",oLogistics.getSnEndNum());   //终端编号结束
                         reqMap.put("id",oLogistics.getwNumber());   //id
-                        reqMap.put("agencyId",oLogistics.getSnEndNum());    //代理商A码（必须15位）
+                        reqMap.put("agencyId",oLogistics.getSnEndNum());    //代理商A码
                         reqMap.put("isFreeze",oLogistics.getSnEndNum());    //是否执行冻结("1" 执行)
                         reqMap.put("status",oLogistics.getSnEndNum());      //能否转发("1" 能转发 "2"已执行冻结)
                         reqMap.put("unableNum",oLogistics.getSnEndNum());   //不能转发的终端数量
