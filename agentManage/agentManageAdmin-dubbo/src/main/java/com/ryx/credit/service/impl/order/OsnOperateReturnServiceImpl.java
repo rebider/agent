@@ -227,7 +227,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateService {
                     oLogisticsDetailExample.setOrderByClause(" sn_num asc ");
 
                     //每次处理两百条数据
-                    oLogisticsDetailExample.setPage(new Page(0, 200));
+                    //oLogisticsDetailExample.setPage(new Page(0, 200));
                     List<OLogisticsDetail> logisticsDetails = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
 
                     //批次格式为YYYYMMddHHmmss + inerBatch
