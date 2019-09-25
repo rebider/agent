@@ -1228,7 +1228,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         List<Dict> COLINFO_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.COLINFO_TYPE.name());
         List<Dict> REPORT_STATUS = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.REPORT_STATUS.name());
 
-
         if (null != agentoutVos && agentoutVos.size() > 0)
             for (AgentoutVo agentoutVo : agentoutVos) {
                 if (StringUtils.isNotBlank(agentoutVo.getBusType()) && !agentoutVo.getBusType().equals("null")) {
@@ -1271,6 +1270,13 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                             agentoutVo.setReportString(dict.getdItemname());
                             break;
                         }
+                    }
+                }
+
+                if (StringUtils.isNotBlank(agentoutVo.getFreeStatus()) && !agentoutVo.getFreeStatus().equals("null")) {
+                    String agStatusByValue = FreeStatus.getContentByValue(new BigDecimal(agentoutVo.getFreeStatus()));
+                    if (null != agStatusByValue) {
+                        agentoutVo.setFreeStatus(agStatusByValue);
                     }
                 }
 
