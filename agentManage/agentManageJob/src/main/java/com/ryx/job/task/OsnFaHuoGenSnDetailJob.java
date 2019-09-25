@@ -23,7 +23,7 @@ public class OsnFaHuoGenSnDetailJob implements SimpleJob {
 
     private static Logger logger = LoggerFactory.getLogger(OsnFaHuoGenSnDetailJob.class);
 
-    @Resource(name = "osnOperateService")
+    @Autowired
     private OsnOperateService osnOperateService;
 
     @Override

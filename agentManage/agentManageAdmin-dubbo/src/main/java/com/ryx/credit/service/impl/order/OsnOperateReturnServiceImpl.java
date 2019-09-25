@@ -22,6 +22,7 @@ import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OLogisticsService;
+import com.ryx.credit.service.order.OsnOperateReturnService;
 import com.ryx.credit.service.order.OsnOperateService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -39,8 +40,8 @@ import java.util.*;
  * 时间：2019/5/9
  * 描述：
  */
-@Service("osnOperateReturnServiceImpl")
-public class OsnOperateReturnServiceImpl implements OsnOperateService {
+@Service("osnOperateReturnService")
+public class OsnOperateReturnServiceImpl implements OsnOperateReturnService {
 
     private static Logger logger = LoggerFactory.getLogger(OsnOperateReturnServiceImpl.class);
 
@@ -76,8 +77,8 @@ public class OsnOperateReturnServiceImpl implements OsnOperateService {
     private CUserMapper cUserMapper;
     @Autowired
     private IdService idService;
-    @Resource(name = "osnOperateReturnServiceImpl")
-    private OsnOperateService osnOperateService;
+    @Resource(name = "osnOperateReturnService")
+    private OsnOperateReturnService osnOperateReturnService;
     @Autowired
     private DictOptionsService dictOptionsService;
     @Autowired
@@ -124,7 +125,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateService {
                     if (1 == oLogisticsMapper.updateByPrimaryKeySelective(logistics)) {
                         try {
                             logger.info("退货物流处理 处理物流生成明细:{},{},{}", logistics.getId(), logistics.getSnBeginNum(), logistics.getSnEndNum());
-                            if (osnOperateService.genOlogicDetailInfo(id)) {
+                            if (osnOperateReturnService.genOlogicDetailInfo(id)) {
                                 logistics = oLogisticsMapper.selectByPrimaryKey(id);
                                 logistics.setSendStatus(LogisticsSendStatus.gen_detail_sucess.code);
                                 if (1 != oLogisticsMapper.updateByPrimaryKeySelective(logistics)) {
@@ -152,7 +153,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateService {
                                 logger.info("退货物流处理 物流生成明细异常，更新数据库成功:{},{},{},{}", logistics.getId(), logistics.getSnBeginNum(), logistics.getSnEndNum(), e.getLocalizedMessage());
                             }
                             e.printStackTrace();
-                            AppConfig.sendEmails("logisticId:" + id + "错误信息:" + MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                            AppConfig.sendEmails("logisticId:" + id + "错误信息:" + MailUtil.printStackTrace(e), "任务生成物流明细错误报警osnOperateReturnServiceImpl");
                         } catch (Exception e) {
                             logger.error("生成物流明细任务异常：", e);
                             logistics = oLogisticsMapper.selectByPrimaryKey(id);
@@ -164,7 +165,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateService {
                                 logger.info("退货物流处理 物流生成明细异常，更新数据库成功:{},{},{},{}", logistics.getId(), logistics.getSnBeginNum(), logistics.getSnEndNum(), e.getLocalizedMessage());
                             }
                             e.printStackTrace();
-                            AppConfig.sendEmails("logisticId:" + id + "错误信息:" + MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                            AppConfig.sendEmails("logisticId:" + id + "错误信息:" + MailUtil.printStackTrace(e), "任务生成物流明细错误报警osnOperateReturnServiceImpl");
                         }
                     }
                 }
@@ -237,7 +238,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateService {
 
                     try {
                         //退货下发，0处理中,1成功，2失败
-                        Map<String, Object> sendInfoRet = osnOperateService.sendInfoToBusinessSystem(logisticsDetails, id, new BigDecimal(batch));
+                        Map<String, Object> sendInfoRet = osnOperateReturnService.sendInfoToBusinessSystem(logisticsDetails, id, new BigDecimal(batch));
                         //根据业务平台返回值更新物流明细
                         if (null != sendInfoRet.get("status") && "0".equals(sendInfoRet.get("status"))) {
                             //处理中，不更改明细，更改物流初始状态
@@ -249,7 +250,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateService {
                         } else if (null != sendInfoRet.get("status") && "1".equals(sendInfoRet.get("status"))) {
                             //成功，更新物流明细
                             while (logisticsDetails.size() > 0) {
-                                if (!osnOperateService.updateDetailBatch(logisticsDetails, new BigDecimal(batch), LogisticsDetailSendStatus.send_ing.code))
+                                if (!osnOperateReturnService.updateDetailBatch(logisticsDetails, new BigDecimal(batch), LogisticsDetailSendStatus.send_ing.code))
                                     throw new Exception("明细更新失败（下发成功）");
                                 //调用接口发送到业务系统，如果接口返回异常，更新物流明细发送失败，不在进行发送
                                 logisticsDetails = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
@@ -270,7 +271,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateService {
                         } else if (null != sendInfoRet.get("status") && "2".equals(sendInfoRet.get("status"))) {
                             //失败，更新物流明细
                             while (logisticsDetails.size() > 0) {
-                                if (!osnOperateService.updateDetailBatch(logisticsDetails, new BigDecimal(batch), LogisticsDetailSendStatus.send_fail.code))
+                                if (!osnOperateReturnService.updateDetailBatch(logisticsDetails, new BigDecimal(batch), LogisticsDetailSendStatus.send_fail.code))
                                     throw new Exception("物流明细更新失败（下发失败）");
                                 //调用接口发送到业务系统，如果接口返回异常，更新物流明细发送失败，不在进行发送
                                 logisticsDetails = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
@@ -719,10 +720,5 @@ public class OsnOperateReturnServiceImpl implements OsnOperateService {
         } else {
             return FastMap.fastMap("status", "2").putKeyV("msg", "未实现的物流平台");
         }
-    }
-
-    @Override
-    public List<OLogisticsDetail> updateDetailBatch(List<OLogisticsDetail> datas, BigDecimal batch) throws Exception {
-        return null;
     }
 }
