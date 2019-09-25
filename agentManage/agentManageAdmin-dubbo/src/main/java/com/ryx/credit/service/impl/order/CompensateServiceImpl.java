@@ -116,6 +116,8 @@ public class CompensateServiceImpl implements CompensateService {
     private ProductService productService;
     @Autowired
     private COrganizationMapper organizationMapper;
+    @Autowired
+    private PlatFormMapper platFormMapper;
 
 
     @Override
@@ -579,7 +581,7 @@ public class CompensateServiceImpl implements CompensateService {
             log.info("退补差价提交审批，审批流启动失败{}:{}", id, cuser);
             throw new MessageException("审批流启动失败!");
         }
-        //代理商业务视频关系
+        //代理商业务审批关系
         BusActRel record = new BusActRel();
         record.setBusId(id);
         record.setActivId(proce);
@@ -1121,8 +1123,10 @@ public class CompensateServiceImpl implements CompensateService {
         ORefundPriceDiffDetailExample.Criteria criteria = oRefundPriceDiffDetailExample.createCriteria();
         criteria.andRefundPriceDiffIdEqualTo(oRefundPriceDiff.getId());
         List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(oRefundPriceDiffDetailExample);
+        //新订单数据查询
         if(oRefundPriceDiff.getOrderType().compareTo(OrderType.NEW.getValue())==0){
             for (ORefundPriceDiffDetail oRefundPriceDiffDetail : oRefundPriceDiffDetails) {
+
                 Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.ACTIVITY_DIS_TYPE.name(),oRefundPriceDiffDetail.getActivityWay());
                 oRefundPriceDiffDetail.setActivityWay(dict.getdItemname());
 
@@ -1155,8 +1159,36 @@ public class CompensateServiceImpl implements CompensateService {
                     throw new ProcessException("查询Sn失败请检查Sn有效性");
                 }
                 Map<String, Object> oLogisticsDetailMap = oLogisticsDetails.get(0);
+                //TODO 查询业务平台信息进行展示
+                if(StringUtils.isNotBlank(oRefundPriceDiffDetail.getNewOrgId()) && StringUtils.isNotBlank(oRefundPriceDiffDetail.getPlatformType())) {
+                    PlatFormExample pe = new PlatFormExample();
+                    pe.or().andPlatformTypeEqualTo(oRefundPriceDiffDetail.getPlatformType()).andStatusEqualTo(Status.STATUS_1.status).andPlatformStatusEqualTo(Status.STATUS_1.status);
+                    List<PlatForm>  platFormList = platFormMapper.selectByExample(pe);
+                    AgentBusInfoExample example = new AgentBusInfoExample();
+                    example.or().andBusStatusEqualTo(Status.STATUS_1.status)
+                            .andBusNumEqualTo(oRefundPriceDiffDetail.getNewOrgId())
+                            .andBusPlatformIn(platFormList.stream().map(item->{return item.getPlatformNum();}).collect(Collectors.toList()));
+                    List<AgentBusInfo>  newOrgInfo = agentBusInfoMapper.selectByExample(example);
+                    if(newOrgInfo.size()>0) {
+                        oLogisticsDetailMap.put("NewAgentBusInfo", newOrgInfo.get(0));
+                    }
+                }
+                if(StringUtils.isNotBlank(oRefundPriceDiffDetail.getOldOrgId()) && StringUtils.isNotBlank(oRefundPriceDiffDetail.getPlatformType())) {
+                    PlatFormExample pe = new PlatFormExample();
+                    pe.or().andPlatformTypeEqualTo(oRefundPriceDiffDetail.getPlatformType()).andStatusEqualTo(Status.STATUS_1.status).andPlatformStatusEqualTo(Status.STATUS_1.status);
+                    List<PlatForm>  platFormList = platFormMapper.selectByExample(pe);
+                    AgentBusInfoExample example = new AgentBusInfoExample();
+                    example.or().andBusStatusEqualTo(Status.STATUS_1.status)
+                            .andBusNumEqualTo(oRefundPriceDiffDetail.getNewOrgId())
+                            .andBusPlatformIn(platFormList.stream().map(item->{return item.getPlatformNum();}).collect(Collectors.toList()));
+                    List<AgentBusInfo>  newOrgInfo = agentBusInfoMapper.selectByExample(example);
+                    if(newOrgInfo.size()>0) {
+                        oLogisticsDetailMap.put("OldAgentBusInfo", newOrgInfo.get(0));
+                    }
+                }
                 oRefundPriceDiffDetail.setRefundPriceDiffDetailMap(oLogisticsDetailMap);
             }
+        //历史订单数据查询
         }else{
             for (ORefundPriceDiffDetail oRefundPriceDiffDetail : oRefundPriceDiffDetails) {
                 OActivity oActivity = activityMapper.selectByPrimaryKey(oRefundPriceDiffDetail.getActivityFrontId());
@@ -1362,7 +1394,9 @@ public class CompensateServiceImpl implements CompensateService {
     public List<String> querySendingOrefundPriceDiffDetail() {
         ORefundPriceDiffDetailExample oRefundPriceDiffDetailExample = new ORefundPriceDiffDetailExample();
         ORefundPriceDiffDetailExample.Criteria criteria = oRefundPriceDiffDetailExample.createCriteria();
-        criteria.andStatusEqualTo(LogisticsSendStatus.send_ing.code).andStatusEqualTo(Status.STATUS_1.status).andAppTimeIsNotNull();
+        criteria.andSendStatusEqualTo(LogisticsSendStatus.send_ing.code)
+                .andStatusEqualTo(Status.STATUS_1.status)
+                .andAppTimeIsNotNull();
         oRefundPriceDiffDetailExample.setPage(new Page(1,200));
         List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(oRefundPriceDiffDetailExample);
         return oRefundPriceDiffDetails.stream().map(item ->{return item.getId();}).collect(Collectors.toList());

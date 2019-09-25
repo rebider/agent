@@ -94,6 +94,11 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
 
     @Override
     public AgentResult changeActMachine(ChangeActMachineVo changeActMachine) throws MessageException {
+        if(1==1) {
+            log.info("POS平台调整活动走接口取消，手动下发，{}",changeActMachine);
+            return AgentResult.fail();
+        }
+
         List<OLogisticsDetail> logisticsDetailList = changeActMachine.getLogisticsDetailList();
         if (null == logisticsDetailList) {
             log.info("updateWarehouse请求参数错误1");
@@ -224,13 +229,24 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
                         agentResult.setData(respXMLObj);
                         return agentResult;
                     } else {
-                        if(StringUtils.isNotBlank(respXMLObj.getString("respMsg"))) {
-                            log.info("http请求返回错误:{}", respXML);
-                            return AgentResult.fail(respXMLObj.getString("respMsg"));
+                        JSONObject res_data = respXMLObj.getJSONObject("data");
+                        if(res_data!=null){
+                            if(!"000000".equals(res_data.getString("result_code")) && StringUtils.isNotBlank(res_data.getString("result_msg"))){
+                                log.info("http请求返回错误:{}", res_data.getString("result_msg"));
+                                return AgentResult.fail(res_data.getString("result_msg"));
+                            }else{
+                                return AgentResult.fail(res_data.getString("result_msg"));
+                            }
                         }else{
-                            log.info("http请求返回错误:{}", respXML);
-                            return AgentResult.fail("服务失败");
+                            if(StringUtils.isNotBlank(respXMLObj.getString("respMsg"))) {
+                                log.info("http请求返回错误:{}", respXML);
+                                return AgentResult.fail(respXMLObj.getString("respMsg"));
+                            }else{
+                                log.info("http请求返回错误:{}", respXML);
+                                return AgentResult.fail("服务失败");
+                            }
                         }
+
                     }
                 }
             }
@@ -304,20 +320,21 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
         if(agentResult.isOK()){
             Object resmsg = agentResult.getData();
             if(resmsg!=null) {
-                JSONObject res = (JSONObject) resmsg;
+                JSONObject res_obj = (JSONObject) resmsg;
+                JSONObject res  = res_obj.getJSONObject("data");
                 String result_code = res.getString("result_code");
-                String snAdjStatus = res.getString("snAdjStatus");
+                String snAdjStatus = res.getString("transferStatus");
                 String serialNumber_res = res.getString("serialNumber");
                 String resMsg = res.getString("resMsg");
-                if(serialNumber.equals(serialNumber_res) && "00".equals(snAdjStatus)){
+                if(serialNumber.equals(serialNumber_res) && "00".equals(snAdjStatus) && "000000".equals(result_code)){
                      //调整成功
                      log.info("活动调整成功:{} {}",serialNumber,platformType);
                      return AgentResult.ok("00");
-                }else if(serialNumber.equals(serialNumber_res) && "01".equals(snAdjStatus)) {
+                }else if(serialNumber.equals(serialNumber_res) && "01".equals(snAdjStatus) && "000000".equals(result_code)) {
                     //调整中
                     log.info("活动调整中:{} {}",serialNumber,platformType);
                     return AgentResult.ok("01");
-                }else if(serialNumber.equals(serialNumber_res) && "02".equals(snAdjStatus)) {
+                }else if(serialNumber.equals(serialNumber_res) && "02".equals(snAdjStatus) && "000000".equals(result_code)) {
                     //调整失败
                     log.info("活动调整失败:{} {}",serialNumber,platformType);
                     return AgentResult.build(AgentResult.OK,resMsg,"02");
