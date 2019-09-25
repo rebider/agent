@@ -2633,9 +2633,10 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 reqMap.put("terminalNos", reqList);
                 reqMap.put("isFreeze", "1"); //"1"执行冻结
                 //冻结Sn、不允许代理商操作机具。
+                log.info("请求RBD参数：{}" ,reqMap);
                 try {
-                    String json = JsonUtil.objectToJson(reqMap);
-                    log.info("------------------------------------------>>>RDB退货查询冻结参数:" + json);
+                    String json = JSONObject.toJSONString(reqMap);
+                    log.info("RDB退货查询冻结参数:" + json);
                     String respResult = HttpClientUtil.doPostJsonWithException(AppConfig.getProperty("rdbpos_return_of_goods_freeze"), json);
 
                     if (!StringUtils.isNotBlank(respResult)) {
@@ -2644,7 +2645,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
                     JSONObject respJson = JSONObject.parseObject(respResult);
                     if (!(null != respJson.getString("code") && null != respJson.getString("success") && respJson.getString("code").equals("0000") && respJson.getBoolean("success"))) {
-                        log.info("------------------------------------------>>>RDB冻结退货SN返回异常:" + respResult);
+                        log.info("RDB冻结退货SN返回异常:" + respResult);
                         throw new Exception(null != respJson.getString("msg") ? respJson.getString("msg") : "RDB业务平台冻结SN接口，返回值异常，请联系管理员！！！");
                     }
                 } catch (Exception e) {
