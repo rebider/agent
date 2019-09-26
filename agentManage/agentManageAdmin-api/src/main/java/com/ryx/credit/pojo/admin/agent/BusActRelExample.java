@@ -1,7 +1,6 @@
 package com.ryx.credit.pojo.admin.agent;
 
 import com.ryx.credit.common.util.Page;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1025,6 +1024,76 @@ public class BusActRelExample {
 
         public Criteria andAgDocDistrictNotBetween(String value1, String value2) {
             addCriterion("AG_DOC_DISTRICT not between", value1, value2, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andExplainIsNull() {
+            addCriterion("EXPLAIN is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andExplainIsNotNull() {
+            addCriterion("EXPLAIN is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andExplainEqualTo(String value) {
+            addCriterion("EXPLAIN =", value, "explain");
+            return (Criteria) this;
+        }
+
+        public Criteria andExplainNotEqualTo(String value) {
+            addCriterion("EXPLAIN <>", value, "explain");
+            return (Criteria) this;
+        }
+
+        public Criteria andExplainGreaterThan(String value) {
+            addCriterion("EXPLAIN >", value, "explain");
+            return (Criteria) this;
+        }
+
+        public Criteria andExplainGreaterThanOrEqualTo(String value) {
+            addCriterion("EXPLAIN >=", value, "explain");
+            return (Criteria) this;
+        }
+
+        public Criteria andExplainLessThan(String value) {
+            addCriterion("EXPLAIN <", value, "explain");
+            return (Criteria) this;
+        }
+
+        public Criteria andExplainLessThanOrEqualTo(String value) {
+            addCriterion("EXPLAIN <=", value, "explain");
+            return (Criteria) this;
+        }
+
+        public Criteria andExplainLike(String value) {
+            addCriterion("EXPLAIN like", value, "explain");
+            return (Criteria) this;
+        }
+
+        public Criteria andExplainNotLike(String value) {
+            addCriterion("EXPLAIN not like", value, "explain");
+            return (Criteria) this;
+        }
+
+        public Criteria andExplainIn(List<String> values) {
+            addCriterion("EXPLAIN in", values, "explain");
+            return (Criteria) this;
+        }
+
+        public Criteria andExplainNotIn(List<String> values) {
+            addCriterion("EXPLAIN not in", values, "explain");
+            return (Criteria) this;
+        }
+
+        public Criteria andExplainBetween(String value1, String value2) {
+            addCriterion("EXPLAIN between", value1, value2, "explain");
+            return (Criteria) this;
+        }
+
+        public Criteria andExplainNotBetween(String value1, String value2) {
+            addCriterion("EXPLAIN not between", value1, value2, "explain");
             return (Criteria) this;
         }
     }

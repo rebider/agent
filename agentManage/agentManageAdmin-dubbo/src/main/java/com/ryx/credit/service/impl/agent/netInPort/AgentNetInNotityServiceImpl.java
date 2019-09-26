@@ -3,6 +3,7 @@ package com.ryx.credit.service.impl.agent.netInPort;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.JsonUtil;
@@ -11,6 +12,8 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInHttpService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
@@ -338,7 +341,6 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                 updateAgent.setcIncomStatus(AgentInStatus.NO_ACT.status);//入网未激活
             }
             Date nowDate = new Date();
-            updateAgent.setcIncomTime(nowDate);
             updateAgent.setcUtime(nowDate);
             int upResult1 = agentMapper.updateByPrimaryKeySelective(updateAgent);
             log.info("入网开户修改操作: 接收入网更新入网状态,业务id：{},upResult1:{}",upResult1);
@@ -566,7 +568,6 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                         updateAgent.setVersion(agent.getVersion());
                         updateAgent.setcIncomStatus(AgentInStatus.IN.status);
                         Date nowDate = new Date();
-                        updateAgent.setcIncomTime(nowDate);
                         updateAgent.setcUtime(nowDate);
                         if(1!=agentMapper.updateByPrimaryKeySelective(updateAgent)){
                             log.info("升级开户接口{}平台编号不为空走升级接口,更新的代理商{}",agentBusInfo.getBusNum(),"入网状态更新失败");
@@ -579,6 +580,10 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                         //瑞大宝升级用户填手机号，成功后返回A码更新编码
                         JSONObject jsonObject = (JSONObject)res.getData();
                         agentBusInfo.setBusNum(jsonObject.getString("result"));
+                    }if(platForm.getPlatformType().equals(PlatformType.RHPOS.getValue())){
+                        //瑞花宝升级用户填机构号，成功后返回品牌码更新编码
+                        JSONObject jsonObject = (JSONObject)res.getData();
+                        agentBusInfo.setBrandNum(jsonObject.getString("brandId"));
                     }
                     if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)){
                         log.info("升级开户接口{}平台编号不为空走升级接口,更新业务{}",agentBusInfo.getBusNum(),"入网成功状态更新失败");
@@ -611,5 +616,49 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                 }
             }
         });
+    }
+
+    /**
+     * 升级校验
+     * @param reqMap
+     * @return
+     */
+    @Override
+    public AgentResult agencyLevelCheck(Map<String, Object> reqMap){
+
+        AgentResult result = AgentResult.fail();
+        AgentVo agentVo = (AgentVo) reqMap.get("agentVo");
+        try {
+            AgentBusInfoVo agentBusInfoVo = (AgentBusInfoVo)reqMap.get("busInfo");
+            String busPlatform = agentBusInfoVo.getBusPlatform();
+            if(StringUtils.isBlank(busPlatform) || busPlatform.equals("null")){
+                throw new ProcessException("业务平台码为空");
+            }
+            PlatForm platForm = platFormMapper.selectByPlatFormNum(busPlatform);
+            if(platForm==null){
+                throw new ProcessException("业务平台不存在");
+            }
+            if(PlatformType.whetherPOS(platForm.getPlatformType())){
+                result = agentHttpPosServiceImpl.agencyLevelCheck(reqMap);
+            }else if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
+                result = agentHttpMposServiceImpl.agencyLevelCheck(reqMap);
+            }else if(platForm.getPlatformType().equals(PlatformType.RDBPOS.getValue())){
+                reqMap.put("agentVo",agentVo);
+                result = agentHttpRDBMposServiceImpl.agencyLevelCheck(reqMap);
+            }else if(platForm.getPlatformType().equals(PlatformType.RJPOS.getValue())){
+                result = agentHttpRJPosServiceImpl.agencyLevelCheck(reqMap);
+            }else if(platForm.getPlatformType().equals(PlatformType.RHPOS.getValue())){
+                reqMap.put("brandCode",platForm.getBusplatform());
+                reqMap.put("agentId",agentBusInfoVo.getBusNum());
+                reqMap.put("directAgentId",agentBusInfoVo.getBusParent());
+                result = agentHttpRHBPosServiceImpl.agencyLevelCheck(reqMap);
+            }else if(platForm.getPlatformType().equals(PlatformType.SSPOS.getValue())){
+                result = agentHttpSsPosServiceImpl.agencyLevelCheck(reqMap);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return AgentResult.fail(e.getMessage());
+        }
+        return result;
     }
 }

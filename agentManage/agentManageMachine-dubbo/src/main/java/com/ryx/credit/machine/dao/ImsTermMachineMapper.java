@@ -24,7 +24,7 @@ public interface ImsTermMachineMapper {
 
     int updateByPrimaryKey(ImsTermMachine record);
 
-    List<Map> querySSIMS_TERM_MACHINE();
+    List<Map> querySSIMS_TERM_MACHINE(Map<String,String> par);
 
     Map<String,String> queryIMS_POS_ACTIVITY(@Param("id")String id);
 }

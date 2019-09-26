@@ -1,4 +1,5 @@
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.service.order.OLogisticsService;
 import com.ryx.credit.service.order.OrderRepairService;
 import org.junit.Test;
@@ -26,11 +27,14 @@ public class OrderServiceTest  extends BaseSpringTest  {
 
     @Test
     public void testIdSn(){
+
+
+
         try {
-            List<String> data =  oLogisticsService.idList("00000402G2100385700","00000402G2100385759");
-            for (String datum : data) {
-                logger.info("sn:{}",datum);
-            }
+
+
+
+                        List<String> data =  oLogisticsService.idList("192JCE197001","192JCE1A1000");
 
         } catch (MessageException e) {
             e.printStackTrace();

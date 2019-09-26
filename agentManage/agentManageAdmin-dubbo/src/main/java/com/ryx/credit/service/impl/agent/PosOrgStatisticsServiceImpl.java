@@ -14,6 +14,8 @@ import com.ryx.credit.common.util.agentUtil.AESUtil;
 import com.ryx.credit.common.util.agentUtil.RSAUtil;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.PlatFormMapper;
+import com.ryx.credit.dao.order.OOrderMapper;
+import com.ryx.credit.dao.order.OSubOrderMapper;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.pojo.admin.agent.PlatForm;
@@ -48,6 +50,8 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
     private AgentBusInfoMapper agentBusInfoMapper;
     @Autowired
     private BusinessPlatformService businessPlatformService;
+    @Autowired
+    private OSubOrderMapper oSubOrderMapper;
 
 //    @Override
 //    public AgentResult posOrgStatistics(String busPlatform,String orgId,String busId,String termType)throws Exception{
@@ -342,7 +346,7 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
             AgentResult agentResult = httpForMpos(orgId,parentBusNum,termType);
             agentResult.setMsg(platformType);
             return agentResult;
-        }else if(PlatformType.whetherPOS(platformType)){
+        }else if(PlatformType.whetherPOS(platformType) || PlatformType.SSPOS.getValue().equals(platformType)){
             if(StringUtils.isEmpty(orgId)){
                 if(StringUtils.isNotEmpty(parentBusNum)){
                     orgId = parentBusNum;
@@ -380,6 +384,12 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
             return agentResult;
         }
         return AgentResult.fail();
+    }
+
+    @Override
+    public Long posOrgStatisticsCount(Map map) {
+        //业务bus_num,查询订单id,查询采购订单,pro_num
+        return oSubOrderMapper.selectProNumByBusNum((String)map.get("busNum"));
     }
 
 }

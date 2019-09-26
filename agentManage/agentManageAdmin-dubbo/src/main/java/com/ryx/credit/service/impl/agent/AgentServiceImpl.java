@@ -45,12 +45,9 @@ import java.util.regex.Pattern;
 @Service("agentService")
 public class AgentServiceImpl implements AgentService {
 
-    private static Logger logger = LoggerFactory.getLogger(AgentServiceImpl.class);
-
-    private final String JURIS_DICTION = AppConfig.getProperty("region_jurisdiction");
-
     private static final String permission_key="AGENT_LIST_PLATFORM_";
-
+    private static Logger logger = LoggerFactory.getLogger(AgentServiceImpl.class);
+    private final String JURIS_DICTION = AppConfig.getProperty("region_jurisdiction");
     @Autowired
     private AttachmentRelMapper attachmentRelMapper;
     @Autowired
@@ -85,7 +82,8 @@ public class AgentServiceImpl implements AgentService {
     private CUserRoleMapper cUserRoleMapper;
     @Autowired
     private IResourceService iResourceService;
-
+    @Autowired
+    private COrganizationMapper organizationMapper;
 
     /**
      * 查询代理商信息
@@ -128,9 +126,6 @@ public class AgentServiceImpl implements AgentService {
         page.setTotal(count);
         return page;
     }
-
-    @Autowired
-    private COrganizationMapper organizationMapper;
 
     /**
      * 省区大区查询
@@ -315,7 +310,7 @@ public class AgentServiceImpl implements AgentService {
             if (StringUtils.isNotEmpty(ca.getAgentid())) {
                 Agent agent = agentMapper.selectByPrimaryKey(ca.getAgentid());
                 if (agent != null){
-                    if(agent.getStatus().compareTo(Status.STATUS_1.status)==0)
+//                    if(agent.getStatus().compareTo(Status.STATUS_1.status)==0)
                     return agent;
                 }
             }
@@ -579,8 +574,7 @@ public class AgentServiceImpl implements AgentService {
         String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
         Map<String,Object> reqMap = new HashMap<>();
         //省区大区查看自己的代理商 部门权限
-        if(StringUtils.isNotEmpty(organizationCode) &&
-                (organizationCode.contains("north") || organizationCode.contains("south") || organizationCode.contains("beijing")  || organizationCode.contains("city"))) {
+        if(StringUtils.isNotEmpty(organizationCode) && organizationCode.contains("region")) {
             reqMap.put("organizationCode", organizationCode);
         }
 
@@ -796,5 +790,57 @@ public class AgentServiceImpl implements AgentService {
         }
         return i;
 
+    }
+
+    @Override
+    public Agent updateAgentInfo(Agent agent,String userId)throws MessageException{
+        if (null == agent || StringUtils.isEmpty(agent.getId())) {
+            throw new MessageException("代理商信息错误");
+        }
+        if(StringUtils.isBlank(agent.getAgName())){
+            throw new MessageException("代理商名称不能为空");
+        }
+        Map<String,String> stringMap = new HashMap<String, String>();
+        stringMap.put("agName",agent.getAgName());
+        List<Agent> agentList = getListByORGAndId(stringMap);
+        if(agentList.size() == 1){
+            if(!agent.getId().equals(agentList.get(0).getId())){
+                throw new MessageException("代理商名称重复");
+            }
+        }else if(agentList.size() > 1){
+            throw new MessageException("代理商名称重复");
+        }
+        Agent db_agent = getAgentById(agent.getId());
+        db_agent.setAgName(agent.getAgName());
+        db_agent.setAgNature(agent.getAgNature());
+        db_agent.setAgCapital(agent.getAgCapital());
+        db_agent.setAgBusLic(agent.getAgBusLic());
+        db_agent.setAgBusLicb(agent.getAgBusLicb());
+        db_agent.setAgBusLice(agent.getAgBusLice());
+        db_agent.setAgLegal(agent.getAgLegal());
+        db_agent.setAgLegalCertype(agent.getAgLegalCertype());
+        db_agent.setAgLegalCernum(agent.getAgLegalCernum());
+        db_agent.setAgLegalMobile(agent.getAgLegalMobile());
+        db_agent.setAgHead(agent.getAgHead());
+        db_agent.setAgHeadMobile(agent.getAgHeadMobile());
+        db_agent.setAgRegAdd(agent.getAgRegAdd());
+        db_agent.setAgBusScope(agent.getAgBusScope());
+        db_agent.setCloTaxPoint(agent.getCloTaxPoint());
+        db_agent.setAgDocPro(agent.getAgDocPro());
+        db_agent.setAgDocDistrict(agent.getAgDocDistrict());
+        db_agent.setAgRemark(agent.getAgRemark());
+        db_agent.setStatus(agent.getStatus());
+        db_agent.setAgRegArea(agent.getAgRegArea());
+        db_agent.setBusRiskEmail(agent.getBusRiskEmail());
+        db_agent.setBusContactEmail(agent.getBusContactEmail());
+        if (1 != agentMapper.updateByPrimaryKeySelective(db_agent)) {
+            throw new MessageException("代理商信息更新失败");
+        }else{
+            //保存数据历史
+            if(!agentDataHistoryService.saveDataHistory(db_agent,db_agent.getId(), DataHistoryType.BASICS.code,userId,agent.getVersion()).isOK()){
+                throw new MessageException("代理商信息更新失败！请重试");
+            }
+        }
+        return db_agent;
     }
 }

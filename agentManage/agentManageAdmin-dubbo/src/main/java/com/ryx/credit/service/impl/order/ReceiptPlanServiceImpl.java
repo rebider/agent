@@ -106,7 +106,7 @@ public class ReceiptPlanServiceImpl implements ReceiptPlanService {
             oReceiptPro.setuTime(new Date());
             int updateByOReceiptPro = oReceiptProMapper.updateByPrimaryKeySelective(oReceiptPro);
             if (updateByOReceiptPro != 1) {
-                logger.info("撤回排单异常-更新收货单商品失败");
+                logger.info("撤回排单异常-更新收货单商品失败:{}{}", planNum, orderId);
                 throw new MessageException("撤回排单异常!");
             }
             //排单数据
@@ -114,7 +114,7 @@ public class ReceiptPlanServiceImpl implements ReceiptPlanService {
             receiptPlan.setPlanProNum(BigDecimal.ZERO);
             int updateByReceiptPlan = receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan);
             if (updateByReceiptPlan != 1) {
-                logger.info("撤回排单异常-更新排单数据失败");
+                logger.info("撤回排单异常-更新排单数据失败:{}{}", planNum, orderId);
                 throw new MessageException("撤回排单异常!");
             }
             result.setStatus(200);
@@ -122,6 +122,68 @@ public class ReceiptPlanServiceImpl implements ReceiptPlanService {
         } catch (Exception e) {
             e.printStackTrace();
             throw new MessageException("撤回排单异常!");
+        }
+        return result;
+    }
+
+    @Override
+    public AgentResult startShipping(String planNum, String orderId, String user) throws Exception {
+        AgentResult result = new AgentResult(500, "系统异常", "");
+        try {
+            if (null == user) {
+                return AgentResult.fail("操作用户不能为空");
+            }
+            ReceiptPlanExample receiptPlanExample = new ReceiptPlanExample();
+            receiptPlanExample.or()
+                    .andStatusEqualTo(Status.STATUS_1.status)
+                    .andPlanOrderStatusEqualTo(new BigDecimal(PlannerStatus.YesPlanner.getValue()))
+                    .andPlanNumEqualTo(planNum)
+                    .andOrderIdEqualTo(orderId);
+            List<ReceiptPlan> receiptPlanList = receiptPlanMapper.selectByExample(receiptPlanExample);
+            ReceiptPlan receiptPlan = receiptPlanList.get(0);
+            //更新排单状态为发货中
+            receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.InTheDeliver.getValue()));
+            int updateByReceiptPlan = receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan);
+            if (updateByReceiptPlan != 1) {
+                logger.info("开始发货异常-更新排单数据失败:{}{}", planNum, orderId);
+                throw new MessageException("开始发货异常!");
+            }
+            result.setStatus(200);
+            result.setMsg("处理成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new MessageException("开始发货异常!");
+        }
+        return result;
+    }
+
+    @Override
+    public AgentResult revocationShipping(String planNum, String orderId, String user) throws Exception {
+        AgentResult result = new AgentResult(500, "系统异常", "");
+        try {
+            if (null == user) {
+                return AgentResult.fail("操作用户不能为空");
+            }
+            ReceiptPlanExample receiptPlanExample = new ReceiptPlanExample();
+            receiptPlanExample.or()
+                    .andStatusEqualTo(Status.STATUS_1.status)
+                    .andPlanOrderStatusEqualTo(new BigDecimal(PlannerStatus.InTheDeliver.getValue()))
+                    .andPlanNumEqualTo(planNum)
+                    .andOrderIdEqualTo(orderId);
+            List<ReceiptPlan> receiptPlanList = receiptPlanMapper.selectByExample(receiptPlanExample);
+            ReceiptPlan receiptPlan = receiptPlanList.get(0);
+            //撤销发货-更新排单状态为已排单
+            receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.YesPlanner.getValue()));
+            int updateByReceiptPlan = receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan);
+            if (updateByReceiptPlan != 1) {
+                logger.info("撤销发货异常-更新排单数据失败:{}{}", planNum, orderId);
+                throw new MessageException("撤销发货异常!");
+            }
+            result.setStatus(200);
+            result.setMsg("处理成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new MessageException("撤销发货异常!");
         }
         return result;
     }

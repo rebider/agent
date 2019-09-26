@@ -250,7 +250,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 throw new MessageException("商品类型不能为空");
             }
             if (new BigDecimal(sendProNum).compareTo(new BigDecimal(planProNum))==1) {
-                logger.info("发货数量不能大于排单数量");
+                logger.info("发货数量{}不能大于排单数量{}",sendProNum,planProNum);
                 throw new MessageException("发货数量不能大于排单数量");
             }
 
@@ -421,7 +421,10 @@ public class OLogisticServiceImpl implements OLogisticsService {
 
 
             //如果发货数量大于200-此处大量数据走任务
-            if(oLogistics.getSendNum().compareTo(new BigDecimal(200))>0) {
+            // if(oLogistics.getSendNum().compareTo(new BigDecimal(200))>0) {
+
+            // 放开校验
+            //if(true) {
                 //是否发送物流，不发送直接更新物流状态
                 if("0".equals(isSend)){
                     logger.info("导入物流数据,文件配置物流不发放，物流ID:{}" ,oActivity.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
@@ -454,6 +457,14 @@ public class OLogisticServiceImpl implements OLogisticsService {
                             throw new MessageException("此SN库存数量有误："+idSn);
                         }
                     }
+                }else if (PlatformType.RDBPOS.code.equals(platForm.getPlatformType())) {
+                    //瑞大宝订单，默认-->定时调度
+                    OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
+                    logistics_send.setSendStatus(LogisticsSendStatus.none_send.code);
+                    logistics_send.setSendMsg("瑞大宝业务平台");
+                    if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
+                        logger.info("瑞大宝物流更新失败,Exception失败{}",JSONObject.toJSONString(oLogistics));
+                    }
                 }else{
                     OLogistics logistics_send =oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
                     logistics_send.setSendStatus(LogisticsSendStatus.dt_send.code);
@@ -464,11 +475,13 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     AppConfig.sendEmails("beginSn:"+beginSn+",endSn:"+endSn+",物流未调用业务系统，平台类型与编号:"+platForm.getPlatformType()+","+platForm.getPlatformNum(), "物流未调用业务系统"+platForm.getPlatformType()+","+platForm.getPlatformNum());
                     logger.info("beginSn:"+beginSn+",endSn:"+endSn+",物流未调用业务系统，平台类型与编号:"+platForm.getPlatformType()+","+platForm.getPlatformNum());
                 }
-                logger.info("物流机具数量大于200，采用任务来处理：物流-{}，数量-{}" ,oLogistics.getId(), oLogistics.getSendNum());
+                //logger.info("物流机具数量大于200，采用任务来处理：物流-{}，数量-{}" ,oLogistics.getId(), oLogistics.getSendNum());
+                logger.info("物流机具数量无论多少，采用任务来处理：物流-{}，数量-{}" ,oLogistics.getId(), oLogistics.getSendNum());
                 return AgentResult.ok();
-            }
+            //}
 
-            //直接发送逻辑-此处少量数据直接走接口
+            // 改造原来逻辑不管是不是大于200台，统一定时任务调度
+            /*//直接发送逻辑-此处少量数据直接走接口
             ResultVO resultVO=new ResultVO();
             //遍历查询库里是否存在sn码
             if (platForm.getPlatformType().equals(PlatformType.MPOS.msg) || platForm.getPlatformType().equals(PlatformType.MPOS.code)){
@@ -482,6 +495,10 @@ public class OLogisticServiceImpl implements OLogisticsService {
             }else if (PlatformType.SSPOS.code.equals(platForm.getPlatformType())){
                 //POS发货生成物流明细
                 logger.info("SSPOS发货生成物流明细:{},{},{}",proType,oLogistics.getSnBeginNum(),oLogistics.getSnEndNum());
+                resultVO = insertLogisticsDetail(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(),Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount), oLogistics.getId(), user, planVo.getId());
+            }else if (PlatformType.RDBPOS.code.equals(platForm.getPlatformType())){
+                //瑞大宝发货生成物流明细
+                logger.info("RDBPOS发货生成物流明细:{},{},{}",proType,oLogistics.getSnBeginNum(),oLogistics.getSnEndNum());
                 resultVO = insertLogisticsDetail(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(),Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount), oLogistics.getId(), user, planVo.getId());
             }else{
                 //POS发货生成物流明细
@@ -670,7 +687,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                         imsTermWarehouseDetail.setPosSpePrice(oActivity_plan.getPosSpePrice());
                         imsTermWarehouseDetail.setPosType(oActivity_plan.getPosType());
                         imsTermWarehouseDetail.setStandTime(oActivity_plan.getStandTime());
-                        imsTermWarehouseDetail.setDeliveryTime(DateUtil.format(oLogistics.getSendDate(),"yyyyMMdd"));
+                        imsTermWarehouseDetail.setDeliveryTime(DateUtil.format(oLogistics.getSendDate(),"yyyy-MM-dd"));
                         OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
                         try {
                             LowerHairMachineVo lowerHairMachineVo = new LowerHairMachineVo();
@@ -713,6 +730,45 @@ public class OLogisticServiceImpl implements OLogisticsService {
                                 logger.info("pos下发物流更新失败Exception{}",JSONObject.toJSONString(oLogistics));
                             }
                         }
+                    } else if (PlatformType.RDBPOS.code.equals(platForm.getPlatformType())){
+                        // 瑞大宝机具下发，调用接口
+
+                        *//*
+                                taskId        String    批次号
+                                termBegin     String    起始终端号(SN开始)
+                                termEnd       String    结束终端号(SN结束)
+                                agencyId      String    划拨目标(代理商ID)
+                                oldAgencyId   String    划拨从向
+                                branchId      String    品牌id
+                                termPolicyId  String    政策(活动)id
+                        *//*
+
+                        Map<String, Object> reqMap = new HashMap<>();
+                        reqMap.put("taskId", "");
+                        reqMap.put("termBegin", beginSn);
+                        reqMap.put("termEnd", endSn);
+                        reqMap.put("agencyId", "");
+                        reqMap.put("oldAgencyId", "");
+                        reqMap.put("branchId", "");
+                        reqMap.put("termPolicyId", "");
+
+                        try {
+                            String json = JsonUtil.objectToJson(reqMap);
+                            String respResult = HttpClientUtil.doPostJsonWithException(AppConfig.getProperty("rdbpos.requestTransfer"), json);
+                            if(StringUtils.isNotBlank(respResult)) {
+                                JSONObject respJson = JSONObject.parseObject(respResult);
+                                if (!(null != respJson.getString("code") && null != respJson.getString("success") && respJson.getString("code").equals("0000") && respJson.getBoolean("success"))) {
+                                    throw new Exception("瑞大宝下发接口返回值异常,请联系管理员!");
+                                }
+                            }else{
+                                AppConfig.sendEmails("错误信息："+respResult, "瑞大宝接口异常");
+                                throw new Exception("瑞大宝下发接口返回值为空，请联系管理员！");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            AppConfig.sendEmails("瑞大宝下发接口发送请求失败："+ MailUtil.printStackTrace(e), "瑞大宝接口异常");
+                            throw e;
+                        }
                     }else{
                         OLogistics logistics_send =oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
                         logistics_send.setSendStatus(LogisticsSendStatus.dt_send.code);
@@ -727,7 +783,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             }else{
                 return AgentResult.fail(resultVO.getResInfo());
             }
-        return AgentResult.ok();
+            return AgentResult.ok();*/
     }
 
     /**
@@ -1096,7 +1152,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
 
     @Override
     public List<String> idList(String startSn, String endSn, Integer begins, Integer finish,String proCom) throws MessageException {
-        //1.startSn  2.endSn  3.开始截取的位数   4.结束截取的位数
+        return idList(startSn,endSn);
+       /* //1.startSn  2.endSn  3.开始截取的位数   4.结束截取的位数
         List<String> list = new ArrayList<>();
         if (StringUtils.isBlank(proCom)){
             logger.info("厂家为空");
@@ -1132,7 +1189,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 list.add(startSn);
             }
         }
-        return list;
+        return list;*/
     }
 
 
@@ -1160,7 +1217,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 throw new MessageException("请输入正确的起始和结束SN号位数");
             }
             //检查不一样的字符串是否是联迪sn 位数是是否是12位 变更为是否是字符开头 否则按照普通规则进行匹配
-            if(start.length()==12 && sSub.matches("^[A-Za-z]+\\d{4}")){
+            if(sSub.matches("^[A-Za-z]+\\d{4}") || eSub.matches("^[A-Za-z]+\\d{4}")){
                 list= getBetweenValues(startSn, endSn);
                 logger.info("sn：{}，{}，使用联迪方式解析",start,end);
                 return list;

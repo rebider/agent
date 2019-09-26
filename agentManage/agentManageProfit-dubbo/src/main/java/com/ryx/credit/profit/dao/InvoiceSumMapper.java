@@ -1,9 +1,12 @@
 package com.ryx.credit.profit.dao;
 
+import com.ryx.credit.common.util.Page;
 import com.ryx.credit.profit.pojo.InvoiceSum;
 import com.ryx.credit.profit.pojo.InvoiceSumExample;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface InvoiceSumMapper {
     long countByExample(InvoiceSumExample example);
@@ -21,4 +24,8 @@ public interface InvoiceSumMapper {
     int updateByPrimaryKeySelective(InvoiceSum record);
 
     int updateByPrimaryKey(InvoiceSum record);
+
+    List<Map<String,Object>> getListByMap(@Param("page") Page page, @Param("map") Map<String,String> map);
+
+    int getCountByMap(@Param("map")Map<String,String> map);
 }

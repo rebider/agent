@@ -27,6 +27,7 @@
     <result column="C_FQ_DATE" jdbcType="TIMESTAMP" property="cFqDate" />
     <result column="CLO_REVIEW_STATUS" jdbcType="DECIMAL" property="cloReviewStatus" />
     <result column="FREEZE_AMT" jdbcType="DECIMAL" property="freezeAmt" />
+    <result column="ACTIV_ID" jdbcType="VARCHAR" property="activId" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -60,7 +61,8 @@
   <sql id="Base_Column_List">
     ID, C_TYPE, C_AMOUNT, C_ISIN, C_IN_AMOUNT, C_BUS_STATUS, C_SRC, C_PLANINTIME, C_INTIME,
     C_PAYTIME, C_TIME, C_UTIME, REMARK, STATUS, VERSION, C_AGENT_ID, C_USER, C_PAYUSER,
-    C_FQ_COUNT, C_PAY_TYPE, C_IN_COM, C_FQ_IN_AMOUNT, C_FQ_DATE, CLO_REVIEW_STATUS, FREEZE_AMT
+    C_FQ_COUNT, C_PAY_TYPE, C_IN_COM, C_FQ_IN_AMOUNT, C_FQ_DATE, CLO_REVIEW_STATUS, FREEZE_AMT,
+    ACTIV_ID
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.CapitalExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -99,7 +101,7 @@
     C_AGENT_ID, C_USER, C_PAYUSER,
     C_FQ_COUNT, C_PAY_TYPE, C_IN_COM,
     C_FQ_IN_AMOUNT, C_FQ_DATE, CLO_REVIEW_STATUS,
-    FREEZE_AMT)
+    FREEZE_AMT, ACTIV_ID)
     values (#{id,jdbcType=VARCHAR}, #{cType,jdbcType=VARCHAR}, #{cAmount,jdbcType=DECIMAL},
     #{cIsin,jdbcType=DECIMAL}, #{cInAmount,jdbcType=DECIMAL}, #{cBusStatus,jdbcType=DECIMAL},
     #{cSrc,jdbcType=VARCHAR}, #{cPlanintime,jdbcType=TIMESTAMP}, #{cIntime,jdbcType=TIMESTAMP},
@@ -108,7 +110,7 @@
     #{cAgentId,jdbcType=VARCHAR}, #{cUser,jdbcType=VARCHAR}, #{cPayuser,jdbcType=VARCHAR},
     #{cFqCount,jdbcType=DECIMAL}, #{cPayType,jdbcType=VARCHAR}, #{cInCom,jdbcType=VARCHAR},
     #{cFqInAmount,jdbcType=DECIMAL}, #{cFqDate,jdbcType=TIMESTAMP}, #{cloReviewStatus,jdbcType=DECIMAL},
-    #{freezeAmt,jdbcType=DECIMAL})
+    #{freezeAmt,jdbcType=DECIMAL}, #{activId,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.Capital">
     insert into A_CAPITAL
@@ -188,6 +190,9 @@
       <if test="freezeAmt != null">
         FREEZE_AMT,
       </if>
+      <if test="activId != null">
+        ACTIV_ID,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -265,6 +270,9 @@
       <if test="freezeAmt != null">
         #{freezeAmt,jdbcType=DECIMAL},
       </if>
+      <if test="activId != null">
+        #{activId,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.CapitalExample" resultType="java.lang.Long">
@@ -316,7 +324,7 @@
         STATUS = #{status,jdbcType=DECIMAL},
       </if>
       <if test="version != null">
-        VERSION = #{version,jdbcType=DECIMAL},
+        VERSION = VERSION + 1,
       </if>
       <if test="cAgentId != null">
         C_AGENT_ID = #{cAgentId,jdbcType=VARCHAR},
@@ -348,8 +356,11 @@
       <if test="freezeAmt != null">
         FREEZE_AMT = #{freezeAmt,jdbcType=DECIMAL},
       </if>
+      <if test="activId != null">
+        ACTIV_ID = #{activId,jdbcType=VARCHAR},
+      </if>
     </set>
-    where ID = #{id,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.Capital">
     update A_CAPITAL
@@ -366,7 +377,7 @@
     C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
     REMARK = #{remark,jdbcType=VARCHAR},
     STATUS = #{status,jdbcType=DECIMAL},
-    VERSION = #{version,jdbcType=DECIMAL},
+      VERSION = VERSION + 1,
     C_AGENT_ID = #{cAgentId,jdbcType=VARCHAR},
     C_USER = #{cUser,jdbcType=VARCHAR},
     C_PAYUSER = #{cPayuser,jdbcType=VARCHAR},
@@ -376,8 +387,9 @@
     C_FQ_IN_AMOUNT = #{cFqInAmount,jdbcType=DECIMAL},
     C_FQ_DATE = #{cFqDate,jdbcType=TIMESTAMP},
     CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL},
-    FREEZE_AMT = #{freezeAmt,jdbcType=DECIMAL}
-    where ID = #{id,jdbcType=VARCHAR}
+    FREEZE_AMT = #{freezeAmt,jdbcType=DECIMAL},
+    ACTIV_ID = #{activId,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">

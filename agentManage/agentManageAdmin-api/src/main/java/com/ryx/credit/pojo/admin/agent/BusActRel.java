@@ -27,6 +27,8 @@ public class BusActRel extends BusActRelKey implements Serializable{
 
     private String agDocDistrict;
 
+    private String explain;
+
     public String getBusType() {
         return busType;
     }
@@ -113,5 +115,13 @@ public class BusActRel extends BusActRelKey implements Serializable{
 
     public void setAgDocDistrict(String agDocDistrict) {
         this.agDocDistrict = agDocDistrict == null ? null : agDocDistrict.trim();
+    }
+
+    public String getExplain() {
+        return explain;
+    }
+
+    public void setExplain(String explain) {
+        this.explain = explain;
     }
 }

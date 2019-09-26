@@ -1,7 +1,11 @@
 package com.ryx.credit.dao.order;
 
+import com.ryx.credit.common.util.Page;
 import com.ryx.credit.pojo.admin.order.OReturnOrder;
 import com.ryx.credit.pojo.admin.order.OReturnOrderExample;
+import com.ryx.credit.pojo.admin.vo.ReturnOrderVo;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 import java.util.Map;
 
@@ -27,4 +31,12 @@ public interface OReturnOrderMapper {
     List<Map<String,Object>> getOrderReturnList(Map<String, Object> param);
 
     Map selectByReturnDeId(String returnDetailsId);
+
+    List<ReturnOrderVo> exportRetForDetail(Map map);
+
+    List<Map<String, Object>> queryReceiveOrderActivity(@Param("params") Map<String, String> params);
+
+    List<Map<String, Object>> queryOrderReturnProvinceList(@Param("map") Map<String, Object> map, @Param("page") Page page);
+
+    int queryOrderReturnProvinceCount(@Param("map") Map<String, Object> map);
 }

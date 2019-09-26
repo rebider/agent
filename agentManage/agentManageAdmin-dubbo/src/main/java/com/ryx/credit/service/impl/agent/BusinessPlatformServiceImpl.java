@@ -15,6 +15,7 @@ import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.IResourceService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
+import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.bank.PosRegionService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.RegionService;
@@ -87,6 +88,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     private AgentAssProtocolService agentAssProtocolService;
     @Autowired
     private COrganizationMapper organizationMapper;
+    @Autowired
+    private AgentNetInNotityService agentNetInNotityService;
+
 
     @Override
     public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,Long userId) {
@@ -165,6 +169,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         }
         if ( StringUtils.isNotBlank(approveTimeEnd)) {
             reqMap.put("approveTimeEnd", approveTimeEnd);
+        }
+        if (agentBusInfo.getBusStatus() != null) {
+            reqMap.put("busStatus", agentBusInfo.getBusStatus());
         }
         reqMap.put("status", Status.STATUS_1.status);
         List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
@@ -299,6 +306,20 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     logger.info("请选择业务平台");
                     throw new ProcessException("请选择业务平台");
                 }
+                if(StringUtils.isNotBlank(item.getBusNum())) {
+                    if (!OrgType.zQ(item.getBusType())) {
+                        throw new ProcessException("升级类型必须是直签");
+                    }
+                    if (StringUtils.isBlank(item.getBusParent())){
+                        throw new ProcessException("升级直签上级不能为空");
+                    }
+                    Map<String, Object> reqMap = new HashMap<>();
+                    reqMap.put("busInfo",item);
+                    AgentResult agentResult = agentNetInNotityService.agencyLevelCheck(reqMap);
+                    if(!agentResult.isOK()){
+                        throw new ProcessException(agentResult.getMsg());
+                    }
+                }
                 if(OrgType.zQ(item.getBusType())){
                     if(StringUtils.isBlank(item.getBusParent()))
                         throw new ProcessException("直签上级不能为空");
@@ -368,23 +389,56 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             throw new MessageException("信息错误");
         }
         try{
+            AgentBusInfo agentBusInfo = null;
             for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
-                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                //校验业务编码是否存在
+                if (StringUtils.isNotBlank(agentBusInfoVo.getBusNum())) {
+                    if (StringUtils.isNotBlank(agentBusInfo.getBusNum())) {
+                        if (!agentBusInfo.getBusNum().equals(agentBusInfoVo.getBusNum())) {
+                            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+                            agentBusInfoExample.createCriteria()
+                                    .andStatusEqualTo(Status.STATUS_1.status)
+                                    .andBusNumEqualTo(agentBusInfoVo.getBusNum());
+                            List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+                            if (agentBusInfoList.size() > 0) {
+                                throw new MessageException("业务平台编码已存在！");
+                            }
+                        }
+                    }
+                }
+                //更新值
                 agentBusInfo.setBusType(agentBusInfoVo.getBusType());
                 agentBusInfo.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
                 agentBusInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
                 agentBusInfo.setBusContact(agentBusInfoVo.getBusContact());
                 agentBusInfo.setBusContactMobile(agentBusInfoVo.getBusContactMobile());
-                agentBusInfo.setBusContactEmail(agentBusInfoVo.getBusContactEmail());
+//                agentBusInfo.setBusContactEmail(agentBusInfoVo.getBusContactEmail());
                 agentBusInfo.setBusContactPerson(agentBusInfoVo.getBusContactPerson());
+                agentBusInfo.setBusNum(agentBusInfoVo.getBusNum());
                 agentBusInfo.setBusLoginNum(agentBusInfoVo.getBusLoginNum());
                 agentBusInfo.setBusStatus(agentBusInfoVo.getBusStatus());
+                agentBusInfo.setBusParent(agentBusInfoVo.getBusParent());
                 if(StringUtils.isNotBlank(agentBusInfoVo.getOrganNum()))
                  agentBusInfo.setOrganNum(agentBusInfoVo.getOrganNum());
                 agentBusInfo.setVersion(agentBusInfo.getVersion());
-                int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
-                if (i != 1) {
+                agentBusInfo.setBusUseOrgan(agentBusInfoVo.getBusUseOrgan());
+                agentBusInfo.setBusScope(agentBusInfoVo.getBusScope());
+                int updateAgentBusinfo = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                if (updateAgentBusinfo != 1) {
+                    logger.info("业务数据-更新失败");
                     throw new MessageException("更新失败");
+                } else {
+                    if (StringUtils.isNotBlank(agentBusInfoVo.getBusNum())) {
+                        Agent agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
+                        agent.setcIncomStatus(AgentInStatus.IN.status);
+                        agent.setcUtime(new Date());
+                        int updateAgent = agentMapper.updateByPrimaryKeySelective(agent);
+                        if (updateAgent != 1) {
+                            logger.info("代理商数据-更新失败");
+                            throw new MessageException("更新失败");
+                        }
+                    }
                 }
             }
         } catch (MessageException e) {
@@ -420,6 +474,20 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
                 if (StringUtils.isBlank(item.getBusPlatform())) {
                     throw new ProcessException("业务平台不能为空");
+                }
+                if(StringUtils.isNotBlank(item.getBusNum())) {
+                    if (!OrgType.zQ(item.getBusType())) {
+                        throw new ProcessException("升级类型必须是直签");
+                    }
+                    if (StringUtils.isBlank(item.getBusParent())){
+                        throw new ProcessException("升级直签上级不能为空");
+                    }
+                    Map<String, Object> reqMap = new HashMap<>();
+                    reqMap.put("busInfo",item);
+                    AgentResult agentResult = agentNetInNotityService.agencyLevelCheck(reqMap);
+                    if(!agentResult.isOK()){
+                        throw new ProcessException(agentResult.getMsg());
+                    }
                 }
                 if(OrgType.zQ(item.getBusType())){
                     if(StringUtils.isBlank(item.getBusParent()))
@@ -506,7 +574,18 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 }
             }
             for (CapitalVo item : agentVo.getCapitalVoList()) {
+                if(agentVo.getCapitalVoList().size()!=0){
+                    if(StringUtils.isBlank(item.getcPayType())){
+                        throw new ProcessException("请选择打款方式");
+                    }
+                }
                 if(item.getcPayType().equals(PayType.YHHK.getValue())){
+                    if(StringUtils.isBlank(item.getcPayuser())){
+                        throw new ProcessException("请选择打款人");
+                    }
+                    if(item.getcPaytime()==null){
+                        throw new ProcessException("请选择打款时间");
+                    }
                     if(item.getCapitalTableFile()==null){
                         throw new ProcessException("银行汇款方式必须上传打款凭据");
                     }
@@ -561,6 +640,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         criteria.andBusPlatformEqualTo(agentBusInfo.getBusPlatform());
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         criteria.andCloReviewStatusIn(Arrays.asList(AgStatus.Approved.status,AgStatus.Approving.status));
+        criteria.andBusStatusIn(Arrays.asList(BusStatus.WQY.status,BusStatus.QY.status,BusStatus.WJH.status,BusStatus.SD.status));
         List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(example);
         if (null == agentBusInfos) {
             return true;
@@ -910,6 +990,19 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             }
             return agentBusInfos;
         }
+    }
+
+    @Override
+    public List<PlatForm> queryAblePlatFormPro() {
+       String ryx_pro = AppConfig.getProperty("ryx_pro");
+       String ryx_pro1 = AppConfig.getProperty("ryx_pro1");
+        ArrayList<String> platList = new ArrayList<>();
+        platList.add(ryx_pro);
+        platList.add(ryx_pro1);
+        PlatFormExample example = new PlatFormExample();
+        example.or().andStatusEqualTo(Status.STATUS_1.status).andPlatformStatusEqualTo(Status.STATUS_1.status).andPlatformNumIn(platList);
+        example.setOrderByClause(" platform_type desc,c_time asc");
+        return platFormMapper.selectByExample(example);
     }
 
     /**

@@ -33,6 +33,7 @@ public enum Platform {
     ZHPOS("100013","智慧POS"),
     IF("100015","POS-i付"),
     POSRHB("100016","瑞花宝"),
+    POSRTB("100029"," 瑞通宝plus"),
     JSB("00900007_A01454828700900007","瑞银信极速版"),
     PRO("00900006_A01435890500900006","瑞银信Pro"),
     PRO1("00900006_A01435889300900006","瑞银信Pro1"),
@@ -40,8 +41,8 @@ public enum Platform {
     RDBRYX("00800130_A01429621800800130","瑞盈信"),
     RDBRHF("00900012_A01563127900900012","瑞和付"),
     RDBHZB("00900011_A01563019000900011","瑞刷宝合作版"),
-    RSB("00900003_A01429624500900003","瑞刷宝");
-
+    RSB("00900003_A01429624500900003","瑞刷宝"),
+    RJQZ("100030","瑞+（条码前置）");
 
     public String code;
 
@@ -50,21 +51,6 @@ public enum Platform {
     Platform(String c, String m){
         this.code=c;
         this.msg =m;
-    }
-
-    /**
-     * 取得枚举对象值
-     * @return 枚举对象值
-     */
-    public String getValue() {
-        return this.code;
-    }
-    /**
-     * 取得缓存内容
-     * @return 缓存内容
-     */
-    public String getContent() {
-        return this.msg;
     }
 
     /**
@@ -80,6 +66,22 @@ public enum Platform {
             }
         }
         return "";
+    }
+
+    /**
+     * 取得枚举对象值
+     * @return 枚举对象值
+     */
+    public String getValue() {
+        return this.code;
+    }
+
+    /**
+     * 取得缓存内容
+     * @return 缓存内容
+     */
+    public String getContent() {
+        return this.msg;
     }
 
 }

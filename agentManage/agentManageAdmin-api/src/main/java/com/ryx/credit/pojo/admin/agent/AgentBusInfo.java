@@ -117,6 +117,26 @@ public class AgentBusInfo implements Serializable {
 
     private String brandNum;
 
+    private BigDecimal dredgeD1;
+
+    public BigDecimal getDredgeD1() {
+        return dredgeD1;
+    }
+
+    public void setDredgeD1(BigDecimal dredgeD1) {
+        this.dredgeD1 = dredgeD1;
+    }
+
+    private String flag;//标记
+
+    public void setFlag(String flag) {
+        this.flag = flag;
+    }
+
+    public String getFlag() {
+        return flag;
+    }
+
     public String getBrandNum() {
         return brandNum;
     }

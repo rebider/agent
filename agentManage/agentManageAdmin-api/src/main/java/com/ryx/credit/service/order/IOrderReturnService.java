@@ -2,13 +2,14 @@ package com.ryx.credit.service.order;
 
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.order.OInvoice;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
 import com.ryx.credit.pojo.admin.order.OReturnOrder;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
-import org.apache.ibatis.ognl.enhance.OrderedReturn;
+import com.ryx.credit.pojo.admin.vo.ReturnOrderVo;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -50,13 +51,21 @@ public interface IOrderReturnService {
     void approvalFinish(String processInstanceId, String activityName)throws Exception;
 
     /**
-     * 退货列表及导出
+     * 查询退货所有数据&查询代理商退货数据
      * @param param
      * @param pageInfo
      * @return
      */
     PageInfo orderReturnList(Map<String, Object> param, PageInfo pageInfo);
 
+    /**
+     * 查询省区退货数据
+     * @param page
+     * @param map
+     * @param userId
+     * @return
+     */
+    PageInfo queryOrderReturnList(Page page, Map map, Long userId);
 
     List<String> addList(List<List<Object>> data, String user) throws Exception;
     AgentResult addListItem(List<Object> objectList, String user) throws Exception;
@@ -82,4 +91,7 @@ public interface IOrderReturnService {
 
 
     BigDecimal selectOrderDetails(String orderId);
+
+
+    List<ReturnOrderVo> exportRetForDetail(Map map);
 }

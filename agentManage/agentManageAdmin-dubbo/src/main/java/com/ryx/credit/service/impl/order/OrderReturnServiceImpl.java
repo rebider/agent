@@ -13,23 +13,24 @@ import com.ryx.credit.machine.entity.ImsTermAdjustDetail;
 import com.ryx.credit.machine.service.ImsTermAdjustDetailService;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.AdjustmentMachineVo;
+import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.pojo.admin.vo.ReturnOrderVo;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.IResourceService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.BusActRelService;
-import com.ryx.credit.service.agent.PlatFormService;
+import com.ryx.credit.service.dict.DepartmentService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.IOrderReturnService;
 import com.ryx.credit.service.order.OLogisticsDetailService;
 import com.ryx.credit.service.order.OLogisticsService;
 import com.ryx.credit.service.order.PlannerService;
-import com.sun.org.apache.bcel.internal.generic.RETURN;
 import org.apache.commons.lang.StringUtils;
-import org.apache.ibatis.ognl.enhance.OrderedReturn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import javax.print.attribute.standard.MediaSize;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -52,10 +52,9 @@ import java.util.*;
 @Service("orderReturnService")
 public class OrderReturnServiceImpl implements IOrderReturnService {
 
-    private static Logger log = LoggerFactory.getLogger(OrderReturnServiceImpl.class);
     public final static SimpleDateFormat sdfyyyyMMdd = new SimpleDateFormat("yyyy-MM-dd");
     public final static SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-
+    private static Logger log = LoggerFactory.getLogger(OrderReturnServiceImpl.class);
     private static String refund_agent_modify_id = AppConfig.getProperty("refund_agent_modify_id");
     private static String refund_business1_id = AppConfig.getProperty("refund_business1_id");
     private static String refund_finc1_id = AppConfig.getProperty("refund_finc1_id");
@@ -135,7 +134,10 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     private OInvoiceMapper invoiceMapper;
     @Autowired
     private AttachmentMapper attachmentMapper;
-
+    @Autowired
+    private IResourceService iResourceService;
+    @Autowired
+    private DepartmentService departmentService;
 
 
     /**
@@ -179,6 +181,11 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             throw new ProcessException("退货单不存在");
         }
 
+        //查询已排单列表
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("returnId", returnId);
+        List<Map<String, Object>>  receiptPlans = plannerService.queryOrderReceiptPlanInfo(params);
+
         //查询退货明细
         OReturnOrderDetailExample example = new OReturnOrderDetailExample();
         example.or().andReturnIdEqualTo(returnId);
@@ -196,11 +203,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         ODeductCapitalExample deductCapitalExample = new ODeductCapitalExample();
         deductCapitalExample.or().andSourceIdEqualTo(returnId);
         List<ODeductCapital> deductCapitals = deductCapitalMapper.selectByExample(deductCapitalExample);
-
-        //查询已排单列表
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("returnId", returnId);
-        List<Map<String, Object>> receiptPlans = plannerService.queryOrderReceiptPlanInfo(params);
 
         map.put("returnOrder", returnOrder);
         map.put("returnDetails", returnDetails);
@@ -804,69 +806,73 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         }
 
         BigDecimal invoiceAmt = BigDecimal.ZERO;
-        if(oInvoices!=null)
-        for (OInvoice oInvoice : oInvoices) {
-            if(StringUtils.isBlank(oInvoice.getInvoiceCompany())){
-                throw new ProcessException("开票公司不能为空");
-            }
-            if(StringUtils.isBlank(oInvoice.getInvoiceProject())){
-                throw new ProcessException("开票项目不能为空");
-            }
-            if(null==oInvoice.getInvoiceAmt()){
-                throw new ProcessException("金额不能为空");
-            }
-            if(StringUtils.isBlank(oInvoice.getInvoiceNum())){
-                throw new ProcessException("发票号不能为空");
-            }
-            if(StringUtils.isBlank(oInvoice.getInvoiceCode())){
-                throw new ProcessException("发票代码不能为空");
-            }
-            if(StringUtils.isBlank(oInvoice.getExpressNum())){
-                throw new ProcessException("快递单号不能为空");
-            }
-            if(StringUtils.isBlank(oInvoice.getExpressComp())){
-                throw new ProcessException("快递公司不能为空");
-            }
-            if(null==oInvoice.getSendTime()){
-                throw new ProcessException("寄出时间不能为空");
-            }
-            String oInvoiceId = idService.genId(TabId.O_INVOICE);
-            oInvoice.setId(oInvoiceId);
-            oInvoice.setSrcType(OInvoiceSrcType.RETURNORDER.code);
-            oInvoice.setSrcId(returnId);
-            oInvoice.setAgentId(returnOrder.getAgentId());
-            oInvoice.setcTime(new Date());
-            oInvoice.setuTime(new Date());
-            oInvoice.setcUser(userid);
-            oInvoice.setuUser(userid);
-            oInvoice.setStatus(Status.STATUS_1.status);
-            oInvoice.setVersion(Status.STATUS_1.status);
-            invoiceMapper.insert(oInvoice);
-
-            List<String> invoiceTableFiles = oInvoice.getInvoiceTableFile();
-            //添加新的附件
-            if (invoiceTableFiles != null && invoiceTableFiles.size()!=0) {
-                for (String invoiceTableFile : invoiceTableFiles) {
-                    AttachmentRel record = new AttachmentRel();
-                    record.setAttId(invoiceTableFile);
-                    record.setSrcId(oInvoiceId);
-                    record.setcUser(userid);
-                    record.setcTime(Calendar.getInstance().getTime());
-                    record.setStatus(Status.STATUS_1.status);
-                    record.setBusType(AttachmentRelType.returnOrderInvoice.name());
-                    record.setId(idService.genId(TabId.a_attachment_rel));
-                    int f = attachmentRelMapper.insertSelective(record);
-                    if (1 != f) {
-                        log.info("退货上传发票信息保存附件关系失败");
-                        throw new ProcessException("保存附件失败");
+        if(Status.STATUS_1.status.compareTo(returnOrder.getRetInvoice())==0) {
+            if (oInvoices != null && oInvoices.size() > 0) {
+                for (OInvoice oInvoice : oInvoices) {
+                    if (StringUtils.isBlank(oInvoice.getInvoiceCompany())) {
+                        throw new ProcessException("开票公司不能为空");
                     }
-                }
-            }
-            invoiceAmt = invoiceAmt.add(oInvoice.getInvoiceAmt());
-        }
+                    if (StringUtils.isBlank(oInvoice.getInvoiceProject())) {
+                        throw new ProcessException("开票项目不能为空");
+                    }
+                    if (null == oInvoice.getInvoiceAmt()) {
+                        throw new ProcessException("金额不能为空");
+                    }
+                    if (StringUtils.isBlank(oInvoice.getInvoiceNum())) {
+                        throw new ProcessException("发票号不能为空");
+                    }
+                    if (StringUtils.isBlank(oInvoice.getInvoiceCode())) {
+                        throw new ProcessException("发票代码不能为空");
+                    }
+                    if (StringUtils.isBlank(oInvoice.getExpressNum())) {
+                        throw new ProcessException("快递单号不能为空");
+                    }
+                    if (StringUtils.isBlank(oInvoice.getExpressComp())) {
+                        throw new ProcessException("快递公司不能为空");
+                    }
+                    if (null == oInvoice.getSendTime()) {
+                        throw new ProcessException("寄出时间不能为空");
+                    }
+                    String oInvoiceId = idService.genId(TabId.O_INVOICE);
+                    oInvoice.setId(oInvoiceId);
+                    oInvoice.setSrcType(OInvoiceSrcType.RETURNORDER.code);
+                    oInvoice.setSrcId(returnId);
+                    oInvoice.setAgentId(returnOrder.getAgentId());
+                    oInvoice.setcTime(new Date());
+                    oInvoice.setuTime(new Date());
+                    oInvoice.setcUser(userid);
+                    oInvoice.setuUser(userid);
+                    oInvoice.setStatus(Status.STATUS_1.status);
+                    oInvoice.setVersion(Status.STATUS_1.status);
+                    invoiceMapper.insert(oInvoice);
 
-        if(invoiceAmt.compareTo(totalAmt)==-1){
-            throw new ProcessException("发票金额必须大于退货金额");
+                    List<String> invoiceTableFiles = oInvoice.getInvoiceTableFile();
+                    //添加新的附件
+                    if (invoiceTableFiles != null && invoiceTableFiles.size() != 0) {
+                        for (String invoiceTableFile : invoiceTableFiles) {
+                            AttachmentRel record = new AttachmentRel();
+                            record.setAttId(invoiceTableFile);
+                            record.setSrcId(oInvoiceId);
+                            record.setcUser(userid);
+                            record.setcTime(Calendar.getInstance().getTime());
+                            record.setStatus(Status.STATUS_1.status);
+                            record.setBusType(AttachmentRelType.returnOrderInvoice.name());
+                            record.setId(idService.genId(TabId.a_attachment_rel));
+                            int f = attachmentRelMapper.insertSelective(record);
+                            if (1 != f) {
+                                log.info("退货上传发票信息保存附件关系失败");
+                                throw new ProcessException("保存附件失败");
+                            }
+                        }
+                    }
+                    invoiceAmt = invoiceAmt.add(oInvoice.getInvoiceAmt());
+                }
+                if (invoiceAmt.compareTo(totalAmt) == -1) {
+                    throw new ProcessException("发票金额必须大于退货金额");
+                }
+            }else{
+                throw new ProcessException("请填写发票信息");
+            }
         }
 
         //生成退货和订单关系
@@ -967,7 +973,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         }
         return amt;
     }
-
 
     /**
      * @Author: Zhang Lei
@@ -1443,11 +1448,14 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             e.printStackTrace();
             throw e;
         }
-
-
     }
 
-
+    /**
+     * 查询退货所有数据&查询代理商退货数据
+     * @param param
+     * @param pageInfo
+     * @return
+     */
     @Override
     public PageInfo orderReturnList(Map<String, Object> param, PageInfo pageInfo) {
         if(StringUtils.isBlank(String.valueOf(param.get("agentId")))){
@@ -1478,6 +1486,37 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         return pageInfo;
     }
 
+    /**
+     * 查询省区退货数据
+     * @param page
+     * @param map
+     * @param userId
+     * @return
+     */
+    @Override
+    public PageInfo queryOrderReturnList(Page page, Map map, Long userId) {
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+        if (orgCodeRes == null && orgCodeRes.size() != 1) {
+            return null;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        map.put("orgId", orgId);
+        map.put("userId", userId);
+        map.put("organizationCode", organizationCode);
+        if (null != map) {
+            String time = String.valueOf(map.get("time"));
+            if (StringUtils.isNotBlank(time)&&!time.equals("null")) {
+                String reltime = time.substring(0, 10);
+                map.put("time", reltime);
+            }
+        }
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(returnOrderMapper.queryOrderReturnProvinceList(map, page));
+        pageInfo.setTotal(returnOrderMapper.queryOrderReturnProvinceCount(map));
+        return pageInfo;
+    }
 
     /**
      * 退货导入物流信息
@@ -2353,4 +2392,95 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     public OReturnOrder selectById(String id) {
         return returnOrderMapper.selectByPrimaryKey(id);
     }
+
+    /**
+     * 导出-退转发明细
+     * @param map
+     * @return
+     */
+    @Override
+    public List<ReturnOrderVo> exportRetForDetail(Map map) {
+        if(null != map.get("userId")) {
+            Long userId = (Long) map.get("userId");
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if (orgCodeRes == null && orgCodeRes.size() != 1) {
+                return null;
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+            map.put("organizationCode", organizationCode);
+            List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+            map.put("platfromPerm", platfromPerm);
+        }
+        if (null!=map.get("agName") && StringUtils.isNotBlank(map.get("agName")+"")) {
+            map.put("agName", "%"+map.get("agName")+"%");
+        }
+        if (null!=map.get("id") && StringUtils.isNotBlank(map.get("id")+"")) {
+            map.put("id", map.get("id"));
+        }
+        if (null!=map.get("activityName") && StringUtils.isNotBlank(map.get("activityName")+"")) {
+            map.put("activityName", map.get("activityName"));
+        }
+        if (null!=map.get("platform") && StringUtils.isNotBlank(map.get("platform")+"")) {
+            map.put("platform", map.get("platform"));
+        }
+        if (null!=map.get("proModel") && StringUtils.isNotBlank(map.get("proModel")+"")) {
+            map.put("proModel", map.get("proModel"));
+        }
+        if (null!=map.get("agUniqNum") && StringUtils.isNotBlank(map.get("agUniqNum")+"")) {
+            map.put("agUniqNum", map.get("agUniqNum"));
+        }
+        if (null!=map.get("proType") && StringUtils.isNotBlank(map.get("proType")+"")) {
+            map.put("proType", map.get("proType"));
+        }
+        if (null!=map.get("vender") && StringUtils.isNotBlank(map.get("vender")+"")) {
+            map.put("vender", map.get("vender"));
+        }
+        if (null!=map.get("payMethod") && StringUtils.isNotBlank(map.get("payMethod")+"")) {
+            map.put("payMethod", map.get("payMethod"));
+        }
+        if (null!=map.get("retSchedule") && StringUtils.isNotBlank(map.get("retSchedule")+"")) {
+            map.put("retSchedule", map.get("retSchedule"));
+        }
+        if (null!=map.get("beginTime") && StringUtils.isNotBlank(map.get("beginTime")+"")) {
+            map.put("beginTime", map.get("beginTime"));
+        }
+        if (null!=map.get("endTime") && StringUtils.isNotBlank(map.get("endTime")+"")) {
+            map.put("endTime", map.get("endTime"));
+        }
+
+        List<ReturnOrderVo> receiptOrderVoList = returnOrderMapper.exportRetForDetail(map);
+        for (ReturnOrderVo returnOrderVo : receiptOrderVoList) {
+            Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), returnOrderVo.getVender());
+            if (dict != null) {
+                returnOrderVo.setVender(dict.getdItemname());
+            }
+            String return_order_id = returnOrderVo.getReturnOrderId();//退货单编号
+            String receive_ag_doc_district = returnOrderVo.getAgDocDistrict();//接收方所属大区
+            String receive_ag_doc_pro = returnOrderVo.getAgDocPro();//接收方所属省区
+            if(receive_ag_doc_district==null || receive_ag_doc_district=="" || receive_ag_doc_district=="null"){
+                returnOrderVo.setAgDocDistrict(receive_ag_doc_district==null?"":receive_ag_doc_district);
+            }else{
+                returnOrderVo.setAgDocDistrict(departmentService.getById(receive_ag_doc_district).getName()==null?"":departmentService.getById(receive_ag_doc_district).getName());
+            }
+            if(receive_ag_doc_pro==null || receive_ag_doc_pro=="" || receive_ag_doc_pro=="null"){
+                returnOrderVo.setAgDocPro(receive_ag_doc_pro==null?"":receive_ag_doc_pro);
+            }else{
+                returnOrderVo.setAgDocPro(departmentService.getById(receive_ag_doc_pro).getName()==null?"":departmentService.getById(receive_ag_doc_pro).getName());
+            }
+
+            Map<String, Object> params_plan = new HashMap<String, Object>();
+            params_plan.put("returnId", return_order_id);
+            List<Map<String, Object>> receiptPlans = receiptPlanMapper.queryReveiveAgentData(params_plan);
+            if (receiptPlans.size()!=0 && receiptPlans!=null) {
+                for (Map<String, Object> receiptPlan : receiptPlans) {
+                    String receive_activity_name = String.valueOf(receiptPlan.get("ACTIVITY_NAME"));//接收方活动类型
+                    returnOrderVo.setReceiveActivityName(receive_activity_name==null?"":receive_activity_name);
+                }
+            }
+        }
+        log.info("导出退转发明细数据：", receiptOrderVoList);
+        return receiptOrderVoList;
+    }
+
 }

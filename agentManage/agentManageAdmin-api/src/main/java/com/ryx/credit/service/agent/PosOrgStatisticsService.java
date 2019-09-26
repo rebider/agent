@@ -14,4 +14,11 @@ public interface PosOrgStatisticsService {
     AgentResult posOrgStatistics(String orgId,String termType)throws Exception;
 
     AgentResult posOrgStatistics(Map map)throws Exception;
+
+    /**
+     * 查询订单总数量
+     * @param map
+     * @return
+     */
+    Long posOrgStatisticsCount(Map map);
 }

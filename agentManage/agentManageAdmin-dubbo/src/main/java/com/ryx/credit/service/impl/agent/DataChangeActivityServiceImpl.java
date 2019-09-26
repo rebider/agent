@@ -18,6 +18,7 @@ import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.dict.DictOptionsService;
+import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +26,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import sun.management.resources.agent;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -80,6 +81,16 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     private AgentNetInNotityService agentNetInNotityService;
     @Autowired
     private AgentDataHistoryService agentDataHistoryService;
+    @Autowired
+    private AgentBusinfoService agentBusinfoService;
+    @Autowired
+    private AttachmentMapper attachmentMapper;
+    @Autowired
+    private IdService idService;
+    @Autowired
+    private AttachmentRelMapper attachmentRelMapper;
+    @Autowired
+    private AgentContractService agentContractService;
 
 
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
@@ -153,7 +164,9 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             logger.info("========用户{}启动数据修改申请{}{}启动部门参数为空",dataChangeId,userId,"审批流启动失败字典中未配置部署流程");
             throw new MessageException("启动部门参数为空!");
         }
-
+        if(startPar.get("party").toString().equals("beijing")){
+            startPar.put("rs",ApprovalType.PASS.getValue());
+        }
         String proce = activityService.createDeloyFlow(null,workId,null,null,startPar);
         if(proce==null){
             logger.info("========用户{}启动数据修改申请{}{}",dataChangeId,userId,"数据修改审批，审批流启动失败");
@@ -170,7 +183,13 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         record.setBusType(dateChangeRequest.getDataType());//流程关系类型是数据申请类型
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(dateChangeRequest.getDataId());
-        record.setDataShiro(BusActRelBusType.DC_Agent.key);
+        if(dateChangeRequest.getDataType().equals(BusActRelBusType.DC_Agent.name())){
+            record.setDataShiro(BusActRelBusType.DC_Agent.key);
+        }else if(dateChangeRequest.getDataType().equals(BusActRelBusType.DC_Colinfo.name())){
+            record.setDataShiro(BusActRelBusType.DC_Colinfo.key);
+        }else{
+            record.setDataShiro(BusActRelBusType.DC_Agent.key);
+        }
         Agent agent = agentMapper.selectByPrimaryKey(dateChangeRequest.getDataId());
         if(agent!=null)
             record.setAgentName(agent.getAgName());
@@ -184,6 +203,9 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             record.setNetInBusType("ACTIVITY_"+platForm.getPlatformNum());
             record.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
             record.setAgDocPro(agentBusInfoVo.getAgDocPro());
+            if (StringUtils.isNotBlank(agentBusInfoVo.getBusNum())){
+                record.setExplain(agentBusInfoVo.getBusNum());
+            }
         }else{
             record.setAgDocDistrict(agent.getAgDocDistrict());
             record.setAgDocPro(agent.getAgDocPro());
@@ -283,6 +305,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                     .andStatusEqualTo(Status.STATUS_1.status)
                                     .andBusPlatformIn(pltcode)
                                     .andCloReviewStatusEqualTo(AgStatus.Approved.status)
+                                    .andBusStatusEqualTo(BusinessStatus.Enabled.status)
                                     .andAgentIdEqualTo(vo.getAgent().getId());
                             List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
 
@@ -324,7 +347,55 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                     throw new ProcessException("代理商信息更新失败！请重试");
                                 }
                             }
+                            boolean isHaveYYZZ = false;
+                            boolean isHaveFRSFZ = false;
+                            //添加营业执照等附件
+                            List<String> attrs = vo.getAgentTableFile();
+                            if (attrs != null && attrs.size()>0) {
+                                AttachmentRelExample att_example = new AttachmentRelExample();
+                                att_example.or().andBusTypeEqualTo(AttachmentRelType.Agent.name()).andSrcIdEqualTo(db_agent.getId()).andStatusEqualTo(Status.STATUS_1.status);
+                                List<AttachmentRel> list = attachmentRelMapper.selectByExample(att_example);
+                                for (AttachmentRel attachmentRel : list) {
+                                    attachmentRel.setStatus(Status.STATUS_0.status);
+                                    int i = attachmentRelMapper.updateByPrimaryKeySelective(attachmentRel);
+                                    if (1 != i) {
+                                        logger.info("修改代理商附件关系失败");
+                                        throw new ProcessException("更新修改代理商失败");
+                                    }
+                                }
+
+                                for (String fileId : attrs) {
+
+                                    Attachment attachment = attachmentMapper.selectByPrimaryKey(fileId);
+                                    if(attachment!=null){
+                                        if(AttDataTypeStatic.YYZZ.code.equals(attachment.getAttDataType()+"")){
+                                            isHaveYYZZ = true;
+                                        }
+                                        if(AttDataTypeStatic.SFZZM.code.equals(attachment.getAttDataType()+"")){
+                                            isHaveFRSFZ = true;
+                                        }
+                                    }
+
+                                    AttachmentRel record = new AttachmentRel();
+                                    record.setAttId(fileId);
+                                    record.setSrcId(db_agent.getId());
+                                    record.setcUser(voAgent.getcUser());
+                                    record.setcTime(Calendar.getInstance().getTime());
+                                    record.setStatus(Status.STATUS_1.status);
+                                    record.setBusType(AttachmentRelType.Agent.name());
+                                    record.setId(idService.genId(TabId.a_attachment_rel));
+                                    int i = attachmentRelMapper.insertSelective(record);
+                                    if (1 != i) {
+                                        logger.info("修改代理商附件关系失败");
+                                        throw new ProcessException("更新修改代理商失败");
+                                    }
+                                }
+                            }
+
                             logger.info("===============================更新代理商基础信息成功");
+                            logger.info("===============================更新合同信息开始");
+                            ResultVO updateAgentContractVoRes = agentContractService.updateAgentContractVo(vo.getContractVoList(), vo.getAgent(),vo.getAgent().getcUser());
+                            logger.info("===============================更新合同信息结束");
 
 
                             Agent preVoAgent = preVo.getAgent();
@@ -340,17 +411,18 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                     agentColinfoService.updateAgentColinfoVo(voColinfoVoList, vo.getAgent(),rel.getcUser(),null);
                                     logger.info("========================一分钱验证状态修改完成");
 
-                                    /*logger.info("========================同步至业务系统开始");
+                                    logger.info("========================同步至业务系统开始");
                                     for (AgentBusInfo agentBusInfo : agentBusInfoList) {
                                         agentNetInNotityService.asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
                                     }
-                                    logger.info("========================同步至业务系统完成");*/
+                                    logger.info("========================同步至业务系统完成");
 
                                     //建立收款账户和平台码的关系
                                     AgentColinfo agentColinfoVo=voColinfoVoList.get(0);
 
 
-                                    for (AgentBusInfo agentBusInfo : agentBusInfoList) {        //为业务平台建立练习
+                                    for (AgentBusInfo agentBusInfo : agentBusInfoList) {        //为业务平台建立结算卡关系
+
                                         AgentColinfoRel agentColinfoRel = new AgentColinfoRel();
                                         agentColinfoRel.setcUse(rel.getcUser());
                                         agentColinfoRel.setAgentid(voAgent.getId());
@@ -381,18 +453,49 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                             agentColinfoService.updateAgentColinfoVo(voColinfoVoList, vo.getAgent(),rel.getcUser(),null);
                                             logger.info("========================一分钱验证状态修改完成");
 
-                                            break;
-                                            /*logger.info("========================同步至业务系统开始");
+                                            logger.info("========================修复业务结算卡关系");
+                                            AgentColinfo agentColinfo_db = agentColinfoService.selectByAgentId(vo.getAgent().getId());
+                                            if(agentColinfo_db!=null && StringUtils.isNotBlank(agentColinfo_db.getId())){
+                                                for (AgentBusInfo agentBusInfo : agentBusInfoList) {
+                                                    AgentColinfoRel agentColinfoRel = new AgentColinfoRel();
+                                                    agentColinfoRel.setcUse(rel.getcUser());
+                                                    agentColinfoRel.setAgentid(voAgent.getId());
+                                                    agentColinfoRel.setAgentColinfoid(agentColinfo_db.getId());
+                                                    agentColinfoRel.setBusPlatform(agentBusInfo.getBusPlatform());
+                                                    agentColinfoRel.setAgentbusid(agentBusInfo.getId());
+                                                    agentColinfoService.saveAgentColinfoRel(agentColinfoRel, rel.getcUser());
+                                                }
+                                            }
+                                            logger.info("========================修复业务结算卡关系");
+
+                                            logger.info("========================同步至业务系统开始");
                                             for (AgentBusInfo agentBusInfo : agentBusInfoList) {
                                                 agentNetInNotityService.asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
                                             }
-                                            logger.info("========================同步至业务系统完成");*/
-                                        }/*else if (!synTemp){//同步至业务系统
+                                            logger.info("========================同步至业务系统完成");
+                                            break;
+                                        }else if (!synTemp){//同步至业务系统
+
+                                            logger.info("========================修复业务结算卡关系");
+                                            AgentColinfo agentColinfo_db = agentColinfoService.selectByAgentId(vo.getAgent().getId());
+                                            if(agentColinfo_db!=null && StringUtils.isNotBlank(agentColinfo_db.getId())){
+                                                for (AgentBusInfo agentBusInfo : agentBusInfoList) {
+                                                    AgentColinfoRel agentColinfoRel = new AgentColinfoRel();
+                                                    agentColinfoRel.setcUse(rel.getcUser());
+                                                    agentColinfoRel.setAgentid(voAgent.getId());
+                                                    agentColinfoRel.setAgentColinfoid(agentColinfo_db.getId());
+                                                    agentColinfoRel.setBusPlatform(agentBusInfo.getBusPlatform());
+                                                    agentColinfoRel.setAgentbusid(agentBusInfo.getId());
+                                                    agentColinfoService.saveAgentColinfoRel(agentColinfoRel, rel.getcUser());
+                                                }
+                                            }
+                                            logger.info("========================修复业务结算卡关系");
+
                                             for (AgentBusInfo agentBusInfo : agentBusInfoList) {
                                                 agentNetInNotityService.asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
                                             }
                                             break;
-                                        }*/
+                                        }
                                     }
                                 }
                             }
@@ -423,7 +526,9 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             }
                         }
 
-                        ResultVO res = agentEnterService.updateAgentVo(vo,rel.getcUser(),true,null);
+                        //======================================更新业务信息
+                        ResultVO res =  agentBusinfoService.updateBussiness(vo.getBusInfoVoList(),rel.getcUser());
+                        //======================================更新费率信息
                         for (AgentBusInfoVo agentBusInfoVo : vo.getEditDebitList()) {
                             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
                             agentBusInfoVo.setId(agentBusInfoVo.getId());
@@ -434,6 +539,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                 throw new ProcessException("更新借记费率等信息失败");
                             }
                         }
+
                         logger.info("========审批流完成{}业务{}状态{},结果{}", proIns, rel.getBusType(), agStatus, res.getResInfo());
                         //更新数据状态为审批成功
                         if(res.isSuccess()){
@@ -442,15 +548,6 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             logger.info("========审批流完成{}业务{}状态{},结果{}",proIns,rel.getBusType(),agStatus,"更新数据申请成功");
                             if(1!=dateChangeRequestMapper.updateByPrimaryKeySelective(dr)){
                                 throw new ProcessException("更新数据申请失败");
-                            }
-                            if(null!=vo.getCapitalVoList() && vo.getCapitalVoList().size()>0){
-                                for (Capital capital : vo.getCapitalVoList()) {
-                                    capital.setCloReviewStatus(AgStatus.Approved.getValue());
-                                    int i = capitalMapper.updateByPrimaryKeySelective(capital);
-                                    if(1!=i){
-                                        throw new ProcessException("更新缴纳款审批通过失败");
-                                    }
-                                }
                             }
 
                         }
@@ -644,4 +741,22 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         int i = dateChangeRequestMapper.updateByPrimaryKeySelective(dateChangeRequest);
         return i;
     }
+
+
+    @Override
+    public ResultVO deleteDataChange(String dataChangeId, String userId) throws Exception {
+        logger.info("========用户{}删除数据修改申请{}", userId, dataChangeId);
+
+        DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(dataChangeId);
+        dateChangeRequest.setStatus(Status.STATUS_0.status);
+        dateChangeRequest.setcUpdate(new Date());
+        int updateDateChange = dateChangeRequestMapper.updateByPrimaryKeySelective(dateChangeRequest);
+        if (updateDateChange != 1) {
+            logger.info("删除数据修改申请:{}", "数据删除失败");
+            throw new MessageException("数据删除失败！");
+        }
+
+        return ResultVO.success(null);
+    }
+
 }

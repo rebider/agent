@@ -86,4 +86,9 @@ public interface BusinessPlatformService {
     Boolean selectByBusLoginNumExist(String busLoginNum,String agentId);
 
     List<AgentBusInfo> selectByAgentId(String agentId);
+
+    /**
+     * 查询瑞银信pro pro1
+     */
+    List<PlatForm> queryAblePlatFormPro();
 }

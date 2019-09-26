@@ -9,11 +9,13 @@ import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.*;
 import com.ryx.credit.machine.service.ImsTermWarehouseDetailService;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.ChangeActMachineVo;
+import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
@@ -40,6 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * 补差价处理
@@ -107,6 +110,8 @@ public class CompensateServiceImpl implements CompensateService {
     private RedisService redisService;
     @Autowired
     private ProductService productService;
+    @Autowired
+    private COrganizationMapper organizationMapper;
 
 
 
@@ -197,6 +202,7 @@ public class CompensateServiceImpl implements CompensateService {
         List<Map<String, Object>>  org = userService.orgCode(userId);
         if(org.size()==0){throw new ProcessException("部门信息未找到");}
         String orgId = String.valueOf(org.get(0).get("ORGID"));
+        String orgCode = String.valueOf(org.get(0).get("ORGANIZATIONCODE"));
         if(StringUtils.isBlank(orgId)){
             throw new ProcessException("省区部门参数为空");
         }
@@ -209,7 +215,8 @@ public class CompensateServiceImpl implements CompensateService {
                 throw new ProcessException("代理商信息不存在");
             }
             if(!agent.getId().equals(agentId)){
-                if(!orgId.equals(agent.getAgDocPro())){
+                COrganization cOrganization = organizationMapper.selectByPrimaryKey(Integer.valueOf(agent.getAgDocPro()));
+                if(!Pattern.matches(orgCode+".*",cOrganization.getCode())){
                     log.info("不能提交其他省区的退补差价");
                     throw new ProcessException("不能提交其他省区的退补差价");
                 }
@@ -238,6 +245,7 @@ public class CompensateServiceImpl implements CompensateService {
         }
         return compensateLList;
     }
+
 
     /**
      * 计算变更差价
@@ -492,10 +500,13 @@ public class CompensateServiceImpl implements CompensateService {
         String party = String.valueOf(startPar.get("party"));
         String workId;
         //根据不同的部门信息启动不同的流程
-        if(party.equals("beijing") || party.equals("north") || party.equals("south")) {
-            workId = dictOptionsService.getApproveVersion("compensation");
-        }else{
+        if(agentService.isAgent(cuser).isOK()){
             workId = dictOptionsService.getApproveVersion("agentCompensation");
+        }else{
+            workId = dictOptionsService.getApproveVersion("compensation");
+        }
+        if(startPar.get("party").toString().equals("beijing")) {
+            startPar.put("rs", ApprovalType.PASS.getValue());
         }
         //启动审批
         String proce = activityService.createDeloyFlow(null, workId, null, null, startPar);

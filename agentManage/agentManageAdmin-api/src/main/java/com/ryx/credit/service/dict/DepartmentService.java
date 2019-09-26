@@ -33,4 +33,9 @@ public interface DepartmentService {
      */
     public COrganization getByUserNameParent(String userName);
 
+
+    List<Tree> selectRegion(String pCode);
+
+
+    List<COrganization> selectCityRegion(Long cUser);
 }

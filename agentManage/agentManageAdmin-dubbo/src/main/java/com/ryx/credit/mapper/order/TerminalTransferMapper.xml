@@ -280,12 +280,12 @@
   <select id="getAgentType" parameterType="java.lang.String" resultType="java.util.Map">
     select  * from a_agent_businfo
     <where>
-    bus_num = #{busNum} and  STATUS=1  and ROWNUM = 1
+    bus_num = #{busNum} and  STATUS=1  and ROWNUM = 1 and BUS_STATUS=1
     </where>
   </select>
 <select id="getSN"  resultType="java.util.Map">
-  select SN_BEGIN_NUM,SN_END_NUM from O_TERMINAL_TRANSFER_DETAIL where TERMINAL_TRANSFER_ID in(
-  select ID from O_TERMINAL_TRANSFER where REVIEW_STATUS ='02' )
+    select SN_BEGIN_NUM,SN_END_NUM from O_TERMINAL_TRANSFER_DETAIL aaa left join A_AGENT bbb on aaa.AGENT_ID = bbb.id  where  aaa.TERMINAL_TRANSFER_ID in(
+  select ID from O_TERMINAL_TRANSFER where REVIEW_STATUS ='02' and STATUS ='1')  and aaa.STATUS ='1' and aaa.adjust_status = '1' and bbb.STATUS=1
 </select>
   <select id="querySubBusNum" parameterType="java.lang.String" resultType="java.util.Map">
 
@@ -307,11 +307,16 @@ select distinct nvl(BUS_NUM, '-') BUS_NUM
 
   </select>
   <select id="querySubBusNumTopAgentAll" resultType="java.util.Map" parameterType="java.lang.String">
-     select * from A_AGENT_BUSINFO a  start with a.bus_num=#{bus_num}  CONNECT BY PRIOR BUS_PARENT = ID
+     select * from A_AGENT_BUSINFO a  start with  a.bus_num=#{bus_num}
+  and a.status ='1'and a.bus_status='1' CONNECT BY PRIOR BUS_PARENT = ID
   </select>
 
   <select id="querySubBusNumAgent" resultType="java.util.Map" parameterType="java.lang.String">
      select * from A_AGENT_BUSINFO a  where a.bus_num=#{bus_num}
+  </select>
+
+  <select id="queryPlatFrom" resultType="java.util.Map" parameterType="java.lang.String">
+     select * from A_PLATFORM a  where a.PLATFORM_NUM=#{PLATFORM_NUM}
   </select>
 
 

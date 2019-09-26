@@ -1,5 +1,6 @@
 package com.ryx.credit.service.order;
 
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -22,8 +23,6 @@ public interface TerminalTransferService {
     PageInfo terminalTransferDetailList(TerminalTransferDetail terminalTransferDetail, Page page, String agName, String dataRole, Long userId);
 
     AgentResult startTerminalTransferActivity(String id, String cuser, String agentId, Boolean isSave) throws Exception;
-
-    AgentResult approvalTerminalTransferTask(AgentVo agentVo, String userId, String busId) throws Exception;
 
     AgentResult compressTerminalTransferActivity(String proIns, BigDecimal agStatus)throws Exception;
 
@@ -48,5 +47,9 @@ public interface TerminalTransferService {
     void  queryTerminalTransferResult() throws Exception;
     PageInfo terminalTransferDetailListExport(AgentVoTerminalTransferDetail terminalTransferDetail);
 
-    public Map<String, Object> disposeSN(String snBeginNum, String snEndNum);
+     Map<String, Object> disposeSN(String snBeginNum, String snEndNum) throws MessageException;
+
+    public  Map<String, Object>  queryPlatFrom(String plat);
+    public AgentResult approvalTerminalTransferTask(AgentVo agentVo, String userId, String busId,boolean tf) throws Exception;
+
 }
