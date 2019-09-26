@@ -10,7 +10,7 @@ public interface BusinessCAService {
      * @param agentBusinfoName
      * @return ResultVO
      */
-    AgentResult agentBusinessCA(String agentBusinfoName);
+    AgentResult agentBusinessCA(String agentBusinfoName,String isCache);
 
     /**
      * 工商认证拉取代理商数据
