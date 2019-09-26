@@ -35,6 +35,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -3721,6 +3723,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public PageInfo arrearageList(Map<String, Object> param, PageInfo pageInfo) {
+        if(null!=param && param.size()>0){
+            if(null==param.get("month")){
+                Date date = new Date();
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM");
+                param.put("rmonth",simpleDateFormat.format(date));
+            }
+        }
         Long count = orderMapper.arrearageCount(param);
         List<Map<String, Object>> list = orderMapper.arrearageList(param);
         pageInfo.setTotal(count.intValue());
@@ -3746,7 +3755,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public ResultVO removeAccountSave(ORemoveAccountVo oRemoveAccountVo) throws Exception {
+    public ResultVO removeAccountSave(ORemoveAccountVo oRemoveAccountVo,List<Map> rAmountlist) throws Exception {
+        if (null==rAmountlist && rAmountlist.size()==0){
+            logger.info("销账添加:{}", "请选择需要销账的订单");
+            return ResultVO.fail("请选择需要销账的订单");
+        }
         if (null == oRemoveAccountVo.getRemoveAccount()) {
             logger.info("销账添加:{}", "销账添加信息为空");
             return ResultVO.fail("销账添加信息为空");
@@ -3765,17 +3778,35 @@ public class OrderServiceImpl implements OrderService {
             return ResultVO.fail("销账金额不能为空");
         }
         Date date = Calendar.getInstance().getTime();
-        removeAccount.setId(idService.genId(TabId.O_REMOVE_ACCOUNT));
-        removeAccount.setSubmitTime(date);
-
-
-
-
-        removeAccount.setStatus(Status.STATUS_1.status);
-        removeAccount.setVersion(Status.STATUS_1.status);
-        if (1 == oRemoveAccountMapper.insertSelective(removeAccount)) {
-            oRemoveAccountVo.setRemoveAccount(removeAccount);
-            if (null != oRemoveAccountVo.getRemoveAccountFile() && oRemoveAccountVo.getRemoveAccountFile().size()>0) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
+        String batchNum = Calendar.getInstance().getTime().getTime() + "";
+        for(int i=0;i<rAmountlist.size();i++){
+            Map map = rAmountlist.get(i);
+            removeAccount.setId(idService.genId(TabId.O_REMOVE_ACCOUNT));
+            removeAccount.setAgId(String.valueOf(map.get("agId")));
+            String rmonth = String.valueOf(map.get("rmonth"));
+            if (StringUtils.isNotBlank(rmonth)){
+                removeAccount.setRmonth(format.parse(rmonth));
+            }
+            String agName = String.valueOf(map.get("agName"));
+            agName=new String(agName.getBytes("iso8859-1"),"utf-8");
+            removeAccount.setAgName(agName);
+            removeAccount.setBusNum(String.valueOf(map.get("busNum")));
+            removeAccount.setBusPlatform(String.valueOf(map.get("busPlatform")));
+            String ramount = String.valueOf(map.get("ramount"));
+            removeAccount.setRamount(new BigDecimal(ramount));
+            String machinesAmount = String.valueOf(map.get("machinesAmount"));
+            removeAccount.setMachinesAmount(new BigDecimal(machinesAmount));
+            removeAccount.setRstatus(RemoveAccountStatus.WCL.code);
+            removeAccount.setBatchNum(batchNum);
+            removeAccount.setSubmitTime(date);
+            removeAccount.setStatus(Status.STATUS_1.status);
+            removeAccount.setVersion(Status.STATUS_1.status);
+            if (1 == oRemoveAccountMapper.insertSelective(removeAccount)) {
+                oRemoveAccountVo.setRemoveAccount(removeAccount);
+            }
+        }
+       if (null != oRemoveAccountVo.getRemoveAccountFile() && oRemoveAccountVo.getRemoveAccountFile().size()>0) {
                 List<String> file = oRemoveAccountVo.getRemoveAccountFile();
                 for (String s : file) {
                     if (org.apache.commons.lang.StringUtils.isEmpty(s)) continue;
@@ -3794,7 +3825,6 @@ public class OrderServiceImpl implements OrderService {
                 }
             }
             logger.info("销账添加:成功");
-        }
         return ResultVO.success(oRemoveAccountVo);
     }
 

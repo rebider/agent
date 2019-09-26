@@ -1,5 +1,6 @@
 package com.ryx.credit.dao.order;
 
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.pojo.admin.order.ORemoveAccount;
 import com.ryx.credit.pojo.admin.order.ORemoveAccountExample;
 
@@ -26,4 +27,6 @@ public interface ORemoveAccountMapper {
     Long rAccountDetailCount(Map<String, Object> param);
 
     List<Map<String,Object>> rAccountDetailList(Map<String, Object> param);
+
+    List<String> queryRaccountByStatus(FastMap fastMap);
 }

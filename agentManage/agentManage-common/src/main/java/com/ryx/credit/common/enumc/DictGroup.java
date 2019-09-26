@@ -72,7 +72,6 @@ public enum DictGroup {
     QUIT_MIGR_PLATFORM("代理商退出手刷迁移平台"),
     CAPITAL_MIARKET("保证金变更市场部审批参数"),
     PROFIT_TEMPLATE_APPLY("分润模板线上审批审批流名称"),
-
     POS("POS审批"),
     POS_APR_BUSNISS("POS审批参数"),
     ORDER_RETURN("订单退货业务选择下一级审批人参数"),
@@ -94,8 +93,11 @@ public enum DictGroup {
     EMAIL("邮件模块"),
     LOGISTICS_FAIL_EMAIL("物流失败邮件"),
     RATYPE("销账方式"),
+    RSTATUS("销账状态"),
 
     CERTIFICATION_STATUS("代理商工商认证");
+
+
 
 
 

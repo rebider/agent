@@ -267,5 +267,5 @@ public interface OrderService {
     /**
      * 添加销账
      */
-    public ResultVO removeAccountSave(ORemoveAccountVo oRemoveAccountVo) throws MessageException, Exception;
+    public ResultVO removeAccountSave(ORemoveAccountVo oRemoveAccountVo,List<Map> rAmountlist) throws MessageException, Exception;
 }
