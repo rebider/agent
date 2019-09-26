@@ -12,8 +12,8 @@ import java.util.Map;
 public enum  RemoveAccountStatus {
     WCL(new BigDecimal("1"), "未处理"),
     CLZ(new BigDecimal("2"), "处理中"),
-    CLCG(new BigDecimal("3"), "处理失败"),
-    CLSB(new BigDecimal("4"), "处理成功");
+    CLCG(new BigDecimal("3"), "处理成功"),
+    CLSB(new BigDecimal("4"), "处理失败");
 
     public BigDecimal code;
 

@@ -2,7 +2,6 @@ package com.ryx.credit.service.impl.order;
 
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
-import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -13,7 +12,9 @@ import com.ryx.credit.dao.order.OPaymentMapper;
 import com.ryx.credit.dao.order.ORemoveAccountMapper;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentExample;
+import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.order.*;
+import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.ORemoveAccountService;
 import org.slf4j.Logger;
@@ -50,6 +51,8 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
     private OPaymentDetailMapper oPaymentDetailMapper;
     @Autowired
     private OPaymentMapper oPaymentMapper;
+    @Autowired
+    private DictOptionsService dictOptionsService;
 
     @Override
     public PageInfo removeAccountDetail(Map<String, Object> param, PageInfo pageInfo) {
@@ -194,7 +197,12 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                 if (null != oPaymentDetailList && oPaymentDetailList.size() > 0) {
                                     //每次销账金额都会减少--剩余
                                     BigDecimal residue = oRemoveAccount_item.getRamount();
+                                    boolean flag=true;
                                     for (OPaymentDetail oPaymentDetail : oPaymentDetailList) {
+                                        if(residue.compareTo(new BigDecimal(0))==0 ||flag==false){
+                                            //如果销账金额已抵扣完销账则停止循环
+                                            break;
+                                        }
                                         if (oPaymentDetail.getPayAmount().compareTo(residue) == 0 || oPaymentDetail.getPayAmount().compareTo(residue) == -1) {
                                             //应付金额等于实付金额  或者  应付金额小于实付金额  则是已结清
                                             oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
@@ -204,11 +212,11 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                         } else {
                                             oPaymentDetail.setPaymentStatus(PaymentStatus.YF.code);
                                             //这条付款明细剩余欠款
-//                                            residue=oPaymentDetail.getPayAmount().subtract(residue);
                                             oPaymentDetail.setRealPayAmount(residue);
+                                            flag=false;
                                         }
                                         oPaymentDetail.setSrcId(oRemoveAccount_item.getId());
-                                        oPaymentDetail.setSrcType(oRemoveAccount_item.getPayMethod());
+                                        oPaymentDetail.setSrcType(PamentSrcType.XXXZ.code);
                                         oPaymentDetail.setPayTime(Calendar.getInstance().getTime());
                                         oPaymentDetail.setcUser(oRemoveAccount_item.getSubmitPerson());
                                         if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
@@ -227,19 +235,19 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                         oPayment.setRealAmount(oPayment.getRealAmount().add(oPaymentDetail.getRealPayAmount()));
                                         if (null == oPayment.getOutstandingAmount() || oPayment.getOutstandingAmount().compareTo(new BigDecimal(0)) == 0) {
                                             logger.info("此欠款已还完");
-//                                        todo //需提示失败的原因
-                                            continue;
+                                            throw new MessageException("此欠款已还完");
                                         }
                                         //待付的付款明细
                                         List<OPaymentDetail> countMap = oPaymentDetailMapper.selectCount(oPaymentDetail.getOrderId(), PamentIdType.ORDER_FKD.code, PaymentStatus.DF.code);
-                                        if (oRemoveAccount_item.getRamount().compareTo(oPayment.getOutstandingAmount()) == 1) {
+                                        if (residue.compareTo(oPayment.getOutstandingAmount()) == 1) {
                                             //如果销账金额大于欠款金额
 //                                            logger.info("销账金额大于欠款金额");
 //                                            throw new MessageException("销账金额大于欠款金额");
-                                        } else if (oRemoveAccount_item.getRamount().compareTo(oPayment.getOutstandingAmount()) == 0) {
+                                        } else if (residue.compareTo(oPayment.getOutstandingAmount()) == 0) {
+                                            //销账金额等于欠款金额
                                             if (null != countMap || countMap.size() > 0) {
                                                 for (OPaymentDetail paymentDetail : countMap) {
-                                                    paymentDetail.setPayAmount(new BigDecimal(0));
+                                                    paymentDetail.setPayAmount(oPaymentDetail.getPayAmount());
                                                     paymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
                                                     if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail)) {
                                                         logger.info("实际付款金额等于欠款金额,更新失败");
@@ -276,9 +284,18 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                                     //如果销账金额的剩余小于需补款金额  则新生成一条付款明细
                                                     OPaymentDetail oPaymentDetail_new  = new OPaymentDetail();
                                                     BeanUtils.copyProperties(oPaymentDetail,oPaymentDetail_new);
+                                                    Date planPayTime = oPaymentDetail.getPlanPayTime();
+                                                    Calendar c = Calendar.getInstance();
+                                                    c.setTime(planPayTime);
+                                                    c.add(Calendar.MONTH, +1);
+                                                    Date realPayTime = c.getTime();
+                                                    oPaymentDetail_new.setPlanPayTime(realPayTime);//计划还款日期
                                                     oPaymentDetail_new.setId(idService.genId(TabId.o_payment_detail));
                                                     oPaymentDetail_new.setPaymentStatus(PaymentStatus.DF.code);
                                                     oPaymentDetail_new.setRealPayAmount(BigDecimal.ZERO);
+                                                    oPaymentDetail_new.setBatchCode(Calendar.getInstance().getTime().getTime() + "");
+                                                    oPaymentDetail_new.setcUser(oRemoveAccount_item.getSubmitPerson());
+                                                    oPaymentDetail_new.setcDate(new Date());
                                                     //上一条的需补款金额减去这次销账的金额
                                                     oPaymentDetail_new.setPayAmount(oPaymentDetail.getPayAmount().subtract(residue));
                                                     if(1!= oPaymentDetailMapper.insertSelective(oPaymentDetail_new)){
@@ -295,7 +312,11 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                                     }
                                                 }
                                             } else {
-                                                BigDecimal money = oPaymentDetail.getPayAmount().subtract(residue);
+                                                BigDecimal money = new BigDecimal(0);
+                                                if(residue.compareTo(oPaymentDetail.getPayAmount())==-1){
+                                                    money = oPaymentDetail.getPayAmount().subtract(residue);
+                                                }
+
                                                 for (int j =notCountMap.size()-1; j < notCountMap.size(); j++) {
                                                     OPaymentDetail paymentDetail = notCountMap.get(j);
                                                     paymentDetail.setPayAmount(paymentDetail.getPayAmount().add(money));
@@ -310,10 +331,57 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                 }
                             }
                         }
-                    } catch (MessageException | ProcessException e) {
-
-                    }catch (Exception e) {
+                        //修改销账表
+                        ORemoveAccount oRemoveAccount = oRemoveAccountMapper.selectByPrimaryKey(oRemoveAccount_item.getId());
+                        if (null!=oRemoveAccount){
+                            oRemoveAccount.setRstatus(RemoveAccountStatus.CLCG.code);
+                            oRemoveAccount.setFinishTime(new Date());
+                            //实际销账金额
+                            oRemoveAccount.setRealRamount(new BigDecimal(0));
+                            if (1!=oRemoveAccountMapper.updateByPrimaryKeySelective(oRemoveAccount)){
+                                logger.info("销账更新失败");
+                                throw new MessageException("销账更新失败");
+                            }
+                        }
+                    } catch (MessageException  e) {
+                        logger.error("生成销账任务异常：", e);
+                        ORemoveAccount oRemoveAccount = oRemoveAccountMapper.selectByPrimaryKey(oRemoveAccount_item.getId());
+                        if (null!=oRemoveAccount){
+                            oRemoveAccount.setRstatus(RemoveAccountStatus.CLSB.code);
+                            oRemoveAccount.setFinishTime(new Date());
+                            oRemoveAccount.setFailCause(e.getMsg());
+                            //实际销账金额
+                            oRemoveAccount.setRealRamount(new BigDecimal(0));
+                            if (1!=oRemoveAccountMapper.updateByPrimaryKeySelective(oRemoveAccount)){
+                                logger.info("销账更新失败:{}",oRemoveAccount.getId());
+                            }else{
+                                logger.info("销账更新成功:{}",oRemoveAccount.getId());
+                            }
+                        }
                         e.printStackTrace();
+                        List<Dict> dicts = dictOptionsService.dictList(DictGroup.EMAIL.name(), DictGroup.LOGISTICS_FAIL_EMAIL.name());
+                        String[] emailArr = new String[dicts.size()];
+                        for (int i = 0; i < dicts.size(); i++) {
+                            emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
+                        }
+                        AppConfig.sendEmail(emailArr, "销账失败：" + MailUtil.printStackTrace(e), "销账失败");
+                    }catch (Exception e) {
+                        logger.error("生成销账任务异常：", e);
+                        ORemoveAccount oRemoveAccount = oRemoveAccountMapper.selectByPrimaryKey(oRemoveAccount_item.getId());
+                        if (null!=oRemoveAccount){
+                            oRemoveAccount.setRstatus(RemoveAccountStatus.CLSB.code);
+                            oRemoveAccount.setFinishTime(new Date());
+                            oRemoveAccount.setFailCause(e.getLocalizedMessage().length() > 30 ? e.getLocalizedMessage().substring(0, 30) : e.getLocalizedMessage());
+                            //实际销账金额
+                            oRemoveAccount.setRealRamount(new BigDecimal(0));
+                            if (1!=oRemoveAccountMapper.updateByPrimaryKeySelective(oRemoveAccount)){
+                                logger.info("销账更新失败:{}",oRemoveAccount.getId());
+                            }else{
+                                logger.info("销账更新成功:{}",oRemoveAccount.getId());
+                            }
+                        }
+                        e.printStackTrace();
+                        AppConfig.sendEmails("logisticId:"+id+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                     }
                 }
             }

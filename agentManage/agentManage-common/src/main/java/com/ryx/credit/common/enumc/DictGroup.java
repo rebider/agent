@@ -92,6 +92,7 @@ public enum DictGroup {
 
     EMAIL("邮件模块"),
     LOGISTICS_FAIL_EMAIL("物流失败邮件"),
+    REMOVEACCOUNT_FAIL_EMAIL("销账失败邮件"),
     RATYPE("销账方式"),
     RSTATUS("销账状态"),
 
