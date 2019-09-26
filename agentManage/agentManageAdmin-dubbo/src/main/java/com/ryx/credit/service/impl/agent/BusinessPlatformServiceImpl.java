@@ -497,6 +497,12 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                         throw new ProcessException(agentResult.getMsg());
                     }
                 }
+                if(StringUtils.isBlank(item.getBusScope())){
+                    throw new ProcessException("业务范围不能为空");
+                }
+                if(StringUtils.isBlank(item.getBusUseOrgan())){
+                    throw new ProcessException("使用范围不能为空");
+                }
                 if(OrgType.zQ(item.getBusType())){
                     if(StringUtils.isBlank(item.getBusParent()))
                         throw new ProcessException("直签上级不能为空");

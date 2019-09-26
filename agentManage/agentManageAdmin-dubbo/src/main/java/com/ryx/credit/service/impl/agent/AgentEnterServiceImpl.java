@@ -170,6 +170,12 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 item.setcUser(agent.getcUser());
                 item.setAgentId(agent.getId());
                 item.setCloReviewStatus(AgStatus.Create.status);
+                if(StringUtils.isBlank(item.getBusScope())){
+                    throw new ProcessException("业务范围不能为空");
+                }
+                if(StringUtils.isBlank(item.getBusUseOrgan())){
+                    throw new ProcessException("使用范围不能为空");
+                }
                 AgentBusInfo db_AgentBusInfo = agentBusinfoService.agentBusInfoInsert(item);
             }
         } catch (ProcessException e) {
@@ -323,6 +329,14 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 } else {
                     hav.add(item.getBusPlatform());
                 }
+
+                if(StringUtils.isBlank(item.getBusScope())){
+                    throw new ProcessException("业务范围不能为空");
+                }
+                if(StringUtils.isBlank(item.getBusUseOrgan())){
+                    throw new ProcessException("使用范围不能为空");
+                }
+
                 if (null!=item.getBusPlatform()){
                     PlatformType platformType = platFormService.byPlatformCode(item.getBusPlatform());
                     if (null!=platformType){
