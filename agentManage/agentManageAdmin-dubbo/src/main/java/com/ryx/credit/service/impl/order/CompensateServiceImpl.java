@@ -35,6 +35,7 @@ import com.ryx.credit.service.order.OrderActivityService;
 import com.ryx.credit.service.order.ProductService;
 import com.ryx.internet.pojo.OInternetCardImport;
 import net.sf.jxls.transformer.Row;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -730,28 +731,28 @@ public class CompensateServiceImpl implements CompensateService {
         Map<String, Object> map = orgCodeRes.get(0);
         String orgCode = String.valueOf(map.get("ORGANIZATIONCODE"));
         if(orgCode.equals("business")){
-            if(oRefundPriceDiff.getOrderType().compareTo(OrderType.OLD.getValue())==0){
-                List<ORefundPriceDiffDetail> refundPriceDiffDetailList = agentVo.getRefundPriceDiffDetailList();
-                for (ORefundPriceDiffDetail oRefundPriceDiffDetail : refundPriceDiffDetailList) {
-                    ORefundPriceDiffDetail upPriceDiffDetail = refundPriceDiffDetailMapper.selectByPrimaryKey(oRefundPriceDiffDetail.getId());
-                    if(StringUtils.isNotBlank(oRefundPriceDiffDetail.getSubOrderId())){
-                        upPriceDiffDetail.setSubOrderId(oRefundPriceDiffDetail.getSubOrderId());
-                        OSubOrder oSubOrder = subOrderMapper.selectByPrimaryKey(oRefundPriceDiffDetail.getSubOrderId());
-                        if(null==oSubOrder){
-                            throw new ProcessException("商品不存在");
-                        }
-                        upPriceDiffDetail.setProId(oSubOrder.getProId());
-                        upPriceDiffDetail.setProName(oSubOrder.getProName());
-                    }
-                    if(StringUtils.isNotBlank(oRefundPriceDiffDetail.getOrderId())){
-                        upPriceDiffDetail.setOrderId(oRefundPriceDiffDetail.getOrderId());
-                    }
-                    int i = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(upPriceDiffDetail);
-                    if(i!=1){
-                        throw new ProcessException("更新明细失败");
-                    }
-                }
-            }
+            //            if(oRefundPriceDiff.getOrderType().compareTo(OrderType.OLD.getValue())==0){
+            //                List<ORefundPriceDiffDetail> refundPriceDiffDetailList = agentVo.getRefundPriceDiffDetailList();
+            //                for (ORefundPriceDiffDetail oRefundPriceDiffDetail : refundPriceDiffDetailList) {
+            //                    ORefundPriceDiffDetail upPriceDiffDetail = refundPriceDiffDetailMapper.selectByPrimaryKey(oRefundPriceDiffDetail.getId());
+            //                    if(StringUtils.isNotBlank(oRefundPriceDiffDetail.getSubOrderId())){
+            //                        upPriceDiffDetail.setSubOrderId(oRefundPriceDiffDetail.getSubOrderId());
+            //                        OSubOrder oSubOrder = subOrderMapper.selectByPrimaryKey(oRefundPriceDiffDetail.getSubOrderId());
+            //                        if(null==oSubOrder){
+            //                            throw new ProcessException("商品不存在");
+            //                        }
+            //                        upPriceDiffDetail.setProId(oSubOrder.getProId());
+            //                        upPriceDiffDetail.setProName(oSubOrder.getProName());
+            //                    }
+            //                    if(StringUtils.isNotBlank(oRefundPriceDiffDetail.getOrderId())){
+            //                        upPriceDiffDetail.setOrderId(oRefundPriceDiffDetail.getOrderId());
+            //                    }
+            //                    int i = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(upPriceDiffDetail);
+            //                    if(i!=1){
+            //                        throw new ProcessException("更新明细失败");
+            //                    }
+            //                }
+            //            }
             if(StringUtils.isBlank(agentVo.getDeliveryTime())){
                 throw new ProcessException("请填写发货时间");
             }
@@ -872,7 +873,6 @@ public class CompensateServiceImpl implements CompensateService {
             });
         }else if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
             oRefundPriceDiffDetails.forEach(row->{
-
                 try {
                     OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
                     OLogisticsDetailExample.Criteria criteria1 = oLogisticsDetailExample.createCriteria();
@@ -1219,6 +1219,36 @@ public class CompensateServiceImpl implements CompensateService {
                     }
                 }
                 oRefundPriceDiffDetail.setProMaps(proMaps);
+
+                Map<String, Object> oLogisticsDetailMap = new HashedMap();
+                //TODO 查询业务平台信息进行展示
+                if(StringUtils.isNotBlank(oRefundPriceDiffDetail.getNewOrgId()) && StringUtils.isNotBlank(oRefundPriceDiffDetail.getPlatformType())) {
+                    PlatFormExample pe = new PlatFormExample();
+                    pe.or().andPlatformTypeEqualTo(oRefundPriceDiffDetail.getPlatformType()).andStatusEqualTo(Status.STATUS_1.status).andPlatformStatusEqualTo(Status.STATUS_1.status);
+                    List<PlatForm>  platFormList = platFormMapper.selectByExample(pe);
+                    AgentBusInfoExample example = new AgentBusInfoExample();
+                    example.or().andBusStatusEqualTo(Status.STATUS_1.status)
+                            .andBusNumEqualTo(oRefundPriceDiffDetail.getNewOrgId())
+                            .andBusPlatformIn(platFormList.stream().map(item->{return item.getPlatformNum();}).collect(Collectors.toList()));
+                    List<AgentBusInfo>  newOrgInfo = agentBusInfoMapper.selectByExample(example);
+                    if(newOrgInfo.size()>0) {
+                        oLogisticsDetailMap.put("NewAgentBusInfo", newOrgInfo.get(0));
+                    }
+                }
+                if(StringUtils.isNotBlank(oRefundPriceDiffDetail.getOldOrgId()) && StringUtils.isNotBlank(oRefundPriceDiffDetail.getPlatformType())) {
+                    PlatFormExample pe = new PlatFormExample();
+                    pe.or().andPlatformTypeEqualTo(oRefundPriceDiffDetail.getPlatformType()).andStatusEqualTo(Status.STATUS_1.status).andPlatformStatusEqualTo(Status.STATUS_1.status);
+                    List<PlatForm>  platFormList = platFormMapper.selectByExample(pe);
+                    AgentBusInfoExample example = new AgentBusInfoExample();
+                    example.or().andBusStatusEqualTo(Status.STATUS_1.status)
+                            .andBusNumEqualTo(oRefundPriceDiffDetail.getNewOrgId())
+                            .andBusPlatformIn(platFormList.stream().map(item->{return item.getPlatformNum();}).collect(Collectors.toList()));
+                    List<AgentBusInfo>  newOrgInfo = agentBusInfoMapper.selectByExample(example);
+                    if(newOrgInfo.size()>0) {
+                        oLogisticsDetailMap.put("OldAgentBusInfo", newOrgInfo.get(0));
+                    }
+                }
+                oRefundPriceDiffDetail.setRefundPriceDiffDetailMap(oLogisticsDetailMap);
             }
         }
         oRefundPriceDiff.setRefundPriceDiffDetailList(oRefundPriceDiffDetails);

@@ -219,36 +219,18 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
                 byte[] signBytes = org.apache.commons.codec.binary.Base64.decodeBase64(resSignData);
                 if (!RSAUtil.verifyDigitalSign(respXML.getBytes(charset), signBytes, rsaPublicKey, "SHA1WithRSA")) {
                     log.info("签名验证失败");
-                    return new AgentResult(500, "签名验证失败", respXML);
                 } else {
                     log.info("签名验证成功");
                     JSONObject respXMLObj = JSONObject.parseObject(respXML);
                     String respCode = String.valueOf(respXMLObj.get("respCode"));
                     if (respCode.equals("000000")) {
-                        AgentResult agentResult = AgentResult.ok();
-                        agentResult.setData(respXMLObj);
-                        return agentResult;
+                        return AgentResult.build(200, respXMLObj.toString(),respXMLObj.toString());
                     } else {
-                        JSONObject res_data = respXMLObj.getJSONObject("data");
-                        if(res_data!=null){
-                            if(!"000000".equals(res_data.getString("result_code")) && StringUtils.isNotBlank(res_data.getString("result_msg"))){
-                                log.info("http请求返回错误:{}", res_data.getString("result_msg"));
-                                return AgentResult.fail(res_data.getString("result_msg"));
-                            }else{
-                                return AgentResult.fail(res_data.getString("result_msg"));
-                            }
-                        }else{
-                            if(StringUtils.isNotBlank(respXMLObj.getString("respMsg"))) {
-                                log.info("http请求返回错误:{}", respXML);
-                                return AgentResult.fail(respXMLObj.getString("respMsg"));
-                            }else{
-                                log.info("http请求返回错误:{}", respXML);
-                                return AgentResult.fail("服务失败");
-                            }
-                        }
-
+                        log.info("http请求超时返回错误:{}", respXML);
+                        return AgentResult.fail(respXMLObj.toString());
                     }
                 }
+                return new AgentResult(500, "http请求异常", respXML);
             }
         } catch (Exception e) {
             log.info("通知失败:{}", e.getMessage());
@@ -308,7 +290,53 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
         }
         jsonObject.put("snList", listDetail);
         log.info("活动调整POS请求参数:{}",JSONObject.toJSON(jsonObject));
-        return  request("ORG016", jsonObject);
+        AgentResult res = request("ORG016", jsonObject);
+        if(res.isOK()) {
+            JSONObject respXMLObj = JSONObject.parseObject(res.getMsg());
+            JSONObject res_data = respXMLObj.getJSONObject("data");
+            if (res_data != null && res_data.size() > 0) {
+                if (!"000000".equals(res_data.getString("result_code")) && StringUtils.isNotBlank(res_data.getString("result_msg"))) {
+                    log.info("http请求返回错误:{}", res_data.getString("result_msg"));
+                    return AgentResult.fail(res_data.getString("result_msg"));
+                } else {
+                    return AgentResult.ok();
+                }
+            } else {
+                if (StringUtils.isNotBlank(respXMLObj.getString("respMsg"))) {
+                    log.info("http请求返回错误:{}", respXMLObj.getString("respMsg"));
+                    return AgentResult.fail(respXMLObj.getString("respMsg"));
+                } else {
+                    log.info("http请求返回错误:{}", respXMLObj);
+                    return AgentResult.fail("服务失败");
+                }
+            }
+        }else{
+            try {
+                log.info("活动调整POS返回参数:{}", res.getMsg());
+                JSONObject respXMLObj = JSONObject.parseObject(res.getMsg());
+                JSONObject res_data = respXMLObj.getJSONObject("data");
+                if (res_data != null && res_data.size() > 0) {
+                    if (!"000000".equals(res_data.getString("result_code")) && StringUtils.isNotBlank(res_data.getString("result_msg"))) {
+                        log.info("http请求返回错误:{}", res_data.getString("result_msg"));
+                        return AgentResult.fail(res_data.getString("result_msg"));
+                    } else {
+                        return AgentResult.ok();
+                    }
+                } else {
+                    if (StringUtils.isNotBlank(respXMLObj.getString("respMsg"))) {
+                        log.info("http请求返回错误:{}", respXMLObj.getString("respMsg"));
+                        return AgentResult.fail(respXMLObj.getString("respMsg"));
+                    } else {
+                        log.info("http请求返回错误:{}", respXMLObj);
+                        return AgentResult.fail("服务失败");
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                log.error("活动调整POS请求参数失敗:",e);
+                return AgentResult.fail("服务失败");
+            }
+        }
     }
 
 
@@ -316,7 +344,9 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
     public AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception{
         JSONObject data = new JSONObject();
         data.put("serialNumber", serialNumber);
+        log.info("終端划拨调整结果查询返回：{},{}",serialNumber);
         AgentResult agentResult = request("ORG017", data);
+        log.info("終端划拨调整结果查询返回：{},{}",serialNumber,agentResult);
         if(agentResult.isOK()){
             Object resmsg = agentResult.getData();
             if(resmsg!=null) {
@@ -346,9 +376,9 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
                 //未知结果
                 return AgentResult.ok("03");
             }
+        }else{
+            return AgentResult.ok("03");
         }
-        //未知记过
-        return agentResult;
     }
 
 

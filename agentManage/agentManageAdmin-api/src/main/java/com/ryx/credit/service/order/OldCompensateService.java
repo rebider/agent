@@ -6,6 +6,7 @@ import com.ryx.credit.pojo.admin.order.ORefundPriceDiff;
 import com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail;
 import com.ryx.credit.pojo.admin.order.OSubOrder;
 import com.ryx.credit.pojo.admin.order.OSubOrderActivity;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 
 import java.math.BigDecimal;
@@ -17,10 +18,10 @@ import java.util.Map;
  */
 public interface OldCompensateService {
 
-    List<Map<String,Object>> getOrderMsgByExcel(List<List<Object>> excelList)throws MessageException;
+    List<Map<String,Object>> getOrderMsgByExcel(List<List<Object>> excelList,String agentId)throws MessageException;
 
     AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,
-                                  List<String> refundPriceDiffFile, String cUser, List<OCashReceivablesVo> oCashReceivablesVoList)throws Exception;
+                                  List<String> refundPriceDiffFile, String cUser, List<OCashReceivablesVo> oCashReceivablesVoList,AgentVo agentVo)throws Exception;
 
     AgentResult startCompensateActiviy(String id, String cuser) throws Exception;
 
