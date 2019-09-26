@@ -873,7 +873,6 @@
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
-      <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where  o.id=ORDER_ID and status=1 and PRO_TYPE=#{proType} ) </if>
       <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where  o.id=ORDER_ID and status=1 and model=#{model} ) </if>
       <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
@@ -972,7 +971,6 @@
       <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
-      <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
@@ -1256,7 +1254,7 @@
       <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus} </if>
       <if test="agDocDistrict!=null and agDocDistrict!=''"> and b.ag_doc_district = #{agDocDistrict} </if>
       <if test="agDocPro!=null and agDocPro!=''"> and b.ag_doc_pro = #{agDocPro} </if>
-      <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
+      <if test="busNum!=null and busNum!=''"> and aab.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="organizationCode!=null and organizationCode!=''">
         and (orging.CODE like concat(#{organizationCode},'%') or org.CODE like concat(#{organizationCode},'%') )
       </if>
