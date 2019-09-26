@@ -397,4 +397,12 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
         }
         return true;
     }
+
+    @Override
+    public PageInfo orderDetailList(Map<String, Object> param, PageInfo pageInfo) {
+        List<Map<String, Object>> list = oRemoveAccountMapper.orderDetailList(param);
+        pageInfo.setTotal(list.size());
+        pageInfo.setRows(list);
+        return pageInfo;
+    }
 }

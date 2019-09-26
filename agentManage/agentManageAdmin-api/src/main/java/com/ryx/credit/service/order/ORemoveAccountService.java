@@ -36,4 +36,9 @@ public interface ORemoveAccountService {
      * @return
      */
     public boolean processData(List<String> ids);
+
+    /**
+     * 订单明细列表
+     */
+    PageInfo orderDetailList(Map<String, Object> param, PageInfo pageInfo);
 }

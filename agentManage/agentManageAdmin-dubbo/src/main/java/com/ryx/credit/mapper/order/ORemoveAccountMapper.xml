@@ -438,4 +438,9 @@
     select a.id from O_REMOVE_ACCOUNT a where a.status=1
     and a.RSTATUS = #{rStatus,jdbcType=DECIMAL}
   </select>
+
+
+  <!--订单明细列表-->
+  <select id="orderDetailList" parameterType="java.util.Map" resultType="java.util.Map">
+  </select>
 </mapper>
