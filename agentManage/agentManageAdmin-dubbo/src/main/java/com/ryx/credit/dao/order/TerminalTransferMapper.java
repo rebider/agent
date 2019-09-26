@@ -25,13 +25,24 @@ public interface TerminalTransferMapper {
 
     int updateByPrimaryKey(TerminalTransfer record);
 
-    List<Map<String,Object>> selectTerminalTransferList(@Param("map") Map<String, Object> map, @Param("page") Page page);
+    List<Map<String, Object>> selectTerminalTransferList(@Param("map") Map<String, Object> map, @Param("page") Page page);
 
     int selectTerminalTransferCount(@Param("map") Map<String, Object> map);
 
     List<String> appTerminalTransfer();
 
-    String getAgentType(String busNum);
+    Map<String, Object> getAgentType(String busNum);
 
-    List<Map<String,Object>> getSN();
+    Map<String, Object> querySubBusNumTopAgent(String bus_num);
+
+    List<Map<String, Object>> querySubBusNumTopAgentAll(String bus_num);
+
+    Map<String, Object> querySubBusNumAgent(String bus_num);
+
+    List<Map<String, Object>> getSN();
+
+    List<Map<String, Object>> querySubBusNum(String AGENT_ID);
+
+
+
 }

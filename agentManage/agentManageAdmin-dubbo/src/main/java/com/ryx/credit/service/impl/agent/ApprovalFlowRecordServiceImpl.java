@@ -492,11 +492,19 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
         List<ApprovalFlowRecord> approvalFlowRecords = approvalFlowRecordMapper.selectByExample(approvalFlowRecordExample);
         for (ApprovalFlowRecord approvalFlowRecord : approvalFlowRecords) {
             Map<String,Object> resultMap = new HashMap<>();
+            //审核人
             CUser cUser = iUserService.selectById(approvalFlowRecord.getApprovalPerson());
             if(null!=cUser){
                 resultMap.put("approvalPerson",cUser.getName());
             }else{
                 resultMap.put("approvalPerson",approvalFlowRecord.getApprovalPerson());
+            }
+            //审核部门
+            COrganization cOrganization = cOrganizationMapper.selectByPrimaryKey(Integer.valueOf(approvalFlowRecord.getApprovalDep()));
+            if (null!=cOrganization){
+                resultMap.put("approvalDep",cOrganization.getName());
+            }else{
+                resultMap.put("approvalDep",approvalFlowRecord.getApprovalPerson());
             }
             resultMap.put("createTime",DateUtil.format(approvalFlowRecord.getApprovalTime(),DateUtil.DATE_FORMAT_1));
             resultMap.put("rs",approvalFlowRecord.getApprovalResult());

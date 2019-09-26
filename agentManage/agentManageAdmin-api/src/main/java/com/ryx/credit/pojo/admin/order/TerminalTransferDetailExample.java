@@ -1947,6 +1947,206 @@ public class TerminalTransferDetailExample {
             addCriterion("BUS_ID not between", value1, value2, "busId");
             return (Criteria) this;
         }
+
+        public Criteria andComSnNumIsNull() {
+            addCriterion("COM_SN_NUM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andComSnNumIsNotNull() {
+            addCriterion("COM_SN_NUM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andComSnNumEqualTo(BigDecimal value) {
+            addCriterion("COM_SN_NUM =", value, "comSnNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andComSnNumNotEqualTo(BigDecimal value) {
+            addCriterion("COM_SN_NUM <>", value, "comSnNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andComSnNumGreaterThan(BigDecimal value) {
+            addCriterion("COM_SN_NUM >", value, "comSnNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andComSnNumGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("COM_SN_NUM >=", value, "comSnNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andComSnNumLessThan(BigDecimal value) {
+            addCriterion("COM_SN_NUM <", value, "comSnNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andComSnNumLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("COM_SN_NUM <=", value, "comSnNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andComSnNumIn(List<BigDecimal> values) {
+            addCriterion("COM_SN_NUM in", values, "comSnNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andComSnNumNotIn(List<BigDecimal> values) {
+            addCriterion("COM_SN_NUM not in", values, "comSnNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andComSnNumBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("COM_SN_NUM between", value1, value2, "comSnNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andComSnNumNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("COM_SN_NUM not between", value1, value2, "comSnNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalTypeIsNull() {
+            addCriterion("GOAL_TYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalTypeIsNotNull() {
+            addCriterion("GOAL_TYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalTypeEqualTo(String value) {
+            addCriterion("GOAL_TYPE =", value, "goalType");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalTypeNotEqualTo(String value) {
+            addCriterion("GOAL_TYPE <>", value, "goalType");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalTypeGreaterThan(String value) {
+            addCriterion("GOAL_TYPE >", value, "goalType");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalTypeGreaterThanOrEqualTo(String value) {
+            addCriterion("GOAL_TYPE >=", value, "goalType");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalTypeLessThan(String value) {
+            addCriterion("GOAL_TYPE <", value, "goalType");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalTypeLessThanOrEqualTo(String value) {
+            addCriterion("GOAL_TYPE <=", value, "goalType");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalTypeLike(String value) {
+            addCriterion("GOAL_TYPE like", value, "goalType");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalTypeNotLike(String value) {
+            addCriterion("GOAL_TYPE not like", value, "goalType");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalTypeIn(List<String> values) {
+            addCriterion("GOAL_TYPE in", values, "goalType");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalTypeNotIn(List<String> values) {
+            addCriterion("GOAL_TYPE not in", values, "goalType");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalTypeBetween(String value1, String value2) {
+            addCriterion("GOAL_TYPE between", value1, value2, "goalType");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalTypeNotBetween(String value1, String value2) {
+            addCriterion("GOAL_TYPE not between", value1, value2, "goalType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalTypeIsNull() {
+            addCriterion("ORIGINAL_TYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalTypeIsNotNull() {
+            addCriterion("ORIGINAL_TYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalTypeEqualTo(String value) {
+            addCriterion("ORIGINAL_TYPE =", value, "originalType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalTypeNotEqualTo(String value) {
+            addCriterion("ORIGINAL_TYPE <>", value, "originalType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalTypeGreaterThan(String value) {
+            addCriterion("ORIGINAL_TYPE >", value, "originalType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalTypeGreaterThanOrEqualTo(String value) {
+            addCriterion("ORIGINAL_TYPE >=", value, "originalType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalTypeLessThan(String value) {
+            addCriterion("ORIGINAL_TYPE <", value, "originalType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalTypeLessThanOrEqualTo(String value) {
+            addCriterion("ORIGINAL_TYPE <=", value, "originalType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalTypeLike(String value) {
+            addCriterion("ORIGINAL_TYPE like", value, "originalType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalTypeNotLike(String value) {
+            addCriterion("ORIGINAL_TYPE not like", value, "originalType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalTypeIn(List<String> values) {
+            addCriterion("ORIGINAL_TYPE in", values, "originalType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalTypeNotIn(List<String> values) {
+            addCriterion("ORIGINAL_TYPE not in", values, "originalType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalTypeBetween(String value1, String value2) {
+            addCriterion("ORIGINAL_TYPE between", value1, value2, "originalType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalTypeNotBetween(String value1, String value2) {
+            addCriterion("ORIGINAL_TYPE not between", value1, value2, "originalType");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
