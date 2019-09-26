@@ -46,4 +46,6 @@ public interface AgentCertificationMapper {
 
     AgentCertification queryMaxIdByAgentid(@Param("map") Map<String,Object> map);
 
+    AgentCertification queryCers(@Param("map") Map<String,Object> map);
+
 }
