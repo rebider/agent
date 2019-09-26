@@ -1,6 +1,6 @@
 package com.ryx.credit.profit.pojo;
 
-public class pmsProfitTempWithBLOBs extends pmsProfitTemp {
+public class PmsProfitTempWithBLOBs extends PmsProfitTemp {
     private String sheetHead;
 
     private String sheetData;

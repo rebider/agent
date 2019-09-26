@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class pmsProfitExample {
+public class PmsProfitExample {
     protected String orderByClause;
 
     protected boolean distinct;
@@ -19,7 +19,7 @@ public class pmsProfitExample {
 
     protected Integer limitEnd;
 
-    public pmsProfitExample() {
+    public PmsProfitExample() {
         oredCriteria = new ArrayList<Criteria>();
     }
 

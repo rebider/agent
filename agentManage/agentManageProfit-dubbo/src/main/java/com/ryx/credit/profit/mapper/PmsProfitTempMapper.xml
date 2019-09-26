@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ryx.credit.profit.dao.pmsProfitTempMapper">
-  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.pmsProfitTemp">
+<mapper namespace="com.ryx.credit.profit.dao.PmsProfitTempMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.PmsProfitTemp">
     <id column="MONTH" jdbcType="VARCHAR" property="month" />
     <id column="ORDER_NUMBER" jdbcType="DECIMAL" property="orderNumber" />
     <id column="SHEET_NAME" jdbcType="VARCHAR" property="sheetName" />
@@ -11,7 +11,7 @@
     <result column="BUS_CODE" jdbcType="VARCHAR" property="busCode" />
     <result column="BUS_NAME" jdbcType="VARCHAR" property="busName" />
   </resultMap>
-  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.ryx.credit.profit.pojo.pmsProfitTempWithBLOBs">
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.ryx.credit.profit.pojo.PmsProfitTempWithBLOBs">
     <result column="SHEET_HEAD" jdbcType="CLOB" property="sheetHead" />
     <result column="SHEET_DATA" jdbcType="CLOB" property="sheetData" />
   </resultMap>
@@ -51,7 +51,7 @@
   <sql id="Blob_Column_List">
     SHEET_HEAD, SHEET_DATA
   </sql>
-  <select id="selectByExampleWithBLOBs" parameterType="com.ryx.credit.profit.pojo.pmsProfitTempExample" resultMap="ResultMapWithBLOBs">
+  <select id="selectByExampleWithBLOBs" parameterType="com.ryx.credit.profit.pojo.PmsProfitTempExample" resultMap="ResultMapWithBLOBs">
     select
     <if test="distinct">
       distinct
@@ -67,7 +67,7 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.pmsProfitTempExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PmsProfitTempExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
     <if test="distinct">
@@ -83,7 +83,7 @@
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
-  <select id="selectByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.pmsProfitTempKey" resultMap="ResultMapWithBLOBs">
+  <select id="selectByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.PmsProfitTempKey" resultMap="ResultMapWithBLOBs">
     select 
     <include refid="Base_Column_List" />
     ,
@@ -94,13 +94,13 @@
       and SHEET_NAME = #{sheetName,jdbcType=VARCHAR}
       and IMPORT_PERSON = #{importPerson,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.pmsProfitTempExample">
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PmsProfitTempExample">
     delete from PMS_PROFIT_TEMP
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.pmsProfitTempWithBLOBs">
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PmsProfitTempWithBLOBs">
     insert into PMS_PROFIT_TEMP (MONTH, ORDER_NUMBER, SHEET_NAME, 
       IMPORT_PERSON, UNIQUE_FLAG, AGENT_ID, 
       BUS_CODE, BUS_NAME, SHEET_HEAD, 
@@ -110,7 +110,7 @@
       #{busCode,jdbcType=VARCHAR}, #{busName,jdbcType=VARCHAR}, #{sheetHead,jdbcType=CLOB}, 
       #{sheetData,jdbcType=CLOB})
   </insert>
-  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.pmsProfitTempWithBLOBs">
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PmsProfitTempWithBLOBs">
     insert into PMS_PROFIT_TEMP
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="month != null">
@@ -177,13 +177,13 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.pmsProfitTempExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PmsProfitTempExample" resultType="java.lang.Long">
     select count(*) from PMS_PROFIT_TEMP
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.pmsProfitTempWithBLOBs">
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PmsProfitTempWithBLOBs">
     update PMS_PROFIT_TEMP
     <set>
       <if test="uniqueFlag != null">
@@ -210,7 +210,7 @@
       and SHEET_NAME = #{sheetName,jdbcType=VARCHAR}
       and IMPORT_PERSON = #{importPerson,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.ryx.credit.profit.pojo.pmsProfitTempWithBLOBs">
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.ryx.credit.profit.pojo.PmsProfitTempWithBLOBs">
     update PMS_PROFIT_TEMP
     set UNIQUE_FLAG = #{uniqueFlag,jdbcType=VARCHAR},
       AGENT_ID = #{agentId,jdbcType=VARCHAR},
@@ -223,7 +223,7 @@
       and SHEET_NAME = #{sheetName,jdbcType=VARCHAR}
       and IMPORT_PERSON = #{importPerson,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.pmsProfitTemp">
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.PmsProfitTemp">
     update PMS_PROFIT_TEMP
     set UNIQUE_FLAG = #{uniqueFlag,jdbcType=VARCHAR},
       AGENT_ID = #{agentId,jdbcType=VARCHAR},

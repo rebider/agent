@@ -3,7 +3,7 @@ package com.ryx.credit.profit.pojo;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class pmsProfit implements Serializable {
+public class PmsProfit implements Serializable {
     private String id;
 
     private String month;

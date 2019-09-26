@@ -2,7 +2,7 @@ package com.ryx.credit.profit.pojo;
 
 import java.io.Serializable;
 
-public class pmsProfitLog implements Serializable {
+public class PmsProfitLog implements Serializable {
     private String batchNo;
 
     private String uploadPath;

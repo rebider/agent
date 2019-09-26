@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ryx.credit.profit.dao.pmsProfitLogMapper">
-  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.pmsProfitLog">
+<mapper namespace="com.ryx.credit.profit.dao.PmsProfitLogMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.PmsProfitLog">
     <id column="BATCH_NO" jdbcType="VARCHAR" property="batchNo" />
     <result column="UPLOAD_PATH" jdbcType="VARCHAR" property="uploadPath" />
     <result column="UPLOAD_NAME" jdbcType="VARCHAR" property="uploadName" />
@@ -46,7 +46,7 @@
     BATCH_NO, UPLOAD_PATH, UPLOAD_NAME, RESULT_PATH, RESULT_NAME, UPLOAD_TIME, UPLOAD_USER, 
     STATUS, NOTE, MONTH
   </sql>
-  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.pmsProfitLogExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PmsProfitLogExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
     <if test="distinct">
@@ -68,13 +68,13 @@
     from PMS_PROFIT_LOG
     where BATCH_NO = #{batchNo,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.pmsProfitLogExample">
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PmsProfitLogExample">
     delete from PMS_PROFIT_LOG
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.pmsProfitLog">
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PmsProfitLog">
     insert into PMS_PROFIT_LOG (BATCH_NO, UPLOAD_PATH, UPLOAD_NAME, 
       RESULT_PATH, RESULT_NAME, UPLOAD_TIME, 
       UPLOAD_USER, STATUS, NOTE, 
@@ -84,7 +84,7 @@
       #{uploadUser,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{note,jdbcType=VARCHAR}, 
       #{month,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.pmsProfitLog">
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PmsProfitLog">
     insert into PMS_PROFIT_LOG
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="batchNo != null">
@@ -151,13 +151,13 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.pmsProfitLogExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PmsProfitLogExample" resultType="java.lang.Long">
     select count(*) from PMS_PROFIT_LOG
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.pmsProfitLog">
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PmsProfitLog">
     update PMS_PROFIT_LOG
     <set>
       <if test="uploadPath != null">
@@ -190,7 +190,7 @@
     </set>
     where BATCH_NO = #{batchNo,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.pmsProfitLog">
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.PmsProfitLog">
     update PMS_PROFIT_LOG
     set UPLOAD_PATH = #{uploadPath,jdbcType=VARCHAR},
       UPLOAD_NAME = #{uploadName,jdbcType=VARCHAR},

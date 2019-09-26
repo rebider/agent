@@ -1,6 +1,6 @@
 package com.ryx.credit.profit.pojo;
 
-public class pmsProfitTemp extends pmsProfitTempKey {
+public class PmsProfitTemp extends PmsProfitTempKey {
     private String uniqueFlag;
 
     private String agentId;

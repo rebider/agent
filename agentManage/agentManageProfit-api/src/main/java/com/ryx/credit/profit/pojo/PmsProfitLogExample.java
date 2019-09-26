@@ -5,7 +5,7 @@ import com.ryx.credit.common.util.Page;
 import java.util.ArrayList;
 import java.util.List;
 
-public class pmsProfitLogExample {
+public class PmsProfitLogExample {
     protected String orderByClause;
 
     protected boolean distinct;
@@ -18,7 +18,7 @@ public class pmsProfitLogExample {
 
     protected Integer limitEnd;
 
-    public pmsProfitLogExample() {
+    public PmsProfitLogExample() {
         oredCriteria = new ArrayList<Criteria>();
     }
 

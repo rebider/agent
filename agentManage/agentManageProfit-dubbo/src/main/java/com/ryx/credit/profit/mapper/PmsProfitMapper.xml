@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ryx.credit.profit.pojo.pmsProfitMapper">
-  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.dao.pmsProfitMapper">
+<mapper namespace="com.ryx.credit.profit.pojo.PmsProfitMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.dao.PmsProfitMapper">
     <id column="ID" jdbcType="VARCHAR" property="id" />
     <result column="MONTH" jdbcType="VARCHAR" property="month" />
     <result column="UNIQUE_FLAG" jdbcType="VARCHAR" property="uniqueFlag" />
@@ -62,7 +62,7 @@
     IMPORT_TIME, IMPORT_PERSON, UPDATE_TIME, UPDATE_PERSON, FREE_TIME, PAY_TIME, SHEET_ORDER, 
     ORDER_NUMBER
   </sql>
-  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.pmsProfitExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PmsProfitExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
     <if test="distinct">
@@ -84,13 +84,13 @@
     from PMS_PROFIT
     where ID = #{id,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.pmsProfitExample">
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PmsProfitExample">
     delete from PMS_PROFIT
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.pmsProfit">
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PmsProfit">
     insert into PMS_PROFIT (ID, MONTH, UNIQUE_FLAG, 
       AGENT_ID, BUS_CODE, BUS_NAME, 
       SHEET_NAME, SHEET_COLUMN, SHEET_HEAD, 
@@ -110,7 +110,7 @@
       #{payTime,jdbcType=VARCHAR}, #{sheetOrder,jdbcType=DECIMAL}, #{orderNumber,jdbcType=DECIMAL}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.pmsProfit">
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PmsProfit">
     insert into PMS_PROFIT
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -261,13 +261,13 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.pmsProfitExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PmsProfitExample" resultType="java.lang.Long">
     select count(*) from PMS_PROFIT
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.pmsProfit">
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PmsProfit">
     update PMS_PROFIT
     <set>
       <if test="month != null">
@@ -342,7 +342,7 @@
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.pmsProfit">
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.PmsProfit">
     update PMS_PROFIT
     set MONTH = #{month,jdbcType=VARCHAR},
       UNIQUE_FLAG = #{uniqueFlag,jdbcType=VARCHAR},
