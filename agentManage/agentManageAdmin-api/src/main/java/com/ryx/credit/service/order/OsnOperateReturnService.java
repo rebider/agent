@@ -3,22 +3,18 @@ package com.ryx.credit.service.order;
 import com.ryx.credit.common.enumc.LogType;
 import com.ryx.credit.common.enumc.LogisticsSendStatus;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 作者：cx
- * 时间：2019/4/22
+ * 作者：zyd
+ * 时间：2019/9/25
  * 描述：
  */
-public interface OsnOperateService {
+public interface OsnOperateReturnService {
 
-    static int count_wall = 200;
     /**
      * 根据物流联动状态查询物流id
      * 0：未联动 1：已联动 2：联动失败， 3：部分联动失败， 4：生成明细失败，5：生成明细中，6：生成明细成功7：联动业务系统处理中
@@ -40,7 +36,7 @@ public interface OsnOperateService {
      * @return
      * @throws Exception
      */
-    public List<String> fetchFhData(int nodecount,int shardingItem)throws Exception;
+    public List<String> fetchFhData(int nodecount, int shardingItem)throws Exception;
 
     /**
      * 业务系统接口调用逻辑处理
@@ -49,14 +45,6 @@ public interface OsnOperateService {
      */
     public boolean processData(List<String> ids);
 
-    /**
-     * 批量更新物流明细状态批次
-     * @param datas
-     * @param batch
-     * @return
-     * @throws Exception
-     */
-    public List<OLogisticsDetail> updateDetailBatch(List<OLogisticsDetail>  datas, BigDecimal batch)throws Exception;
     /**
      * 根据物流信息生成物流明细,物流明细生成后进行物流状态的更新，更新为 4：生成明细失败 5：生成明细中 6：生成明细成功 添加版本号控制
      * @param logcId
@@ -70,7 +58,7 @@ public interface OsnOperateService {
      * @param batch
      * @return
      */
-    Map<String, Object> sendInfoToBusinessSystem(List<OLogisticsDetail>  datas, String logcId, BigDecimal batch)throws Exception;
+    Map<String, Object> sendInfoToBusinessSystem(List<OLogisticsDetail> datas, String logcId, BigDecimal batch)throws Exception;
 
     /**
      * 更新物流明细状态

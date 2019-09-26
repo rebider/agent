@@ -340,4 +340,35 @@
   <select id="selectBusPlatFormByPlatformNum" parameterType="string" resultType="string">
     SELECT BUSPLATFORM FROM A_PLATFORM WHERE status=1 AND PLATFORM_NUM=#{platformNum}
   </select>
+
+  <!-- 查询多个订单是否属于同一个平台 -->
+  <select id="selectByOrderIdList" resultType="string" parameterType="list" >
+      SELECT
+          P.PLATFORM_TYPE
+      FROM
+          A_PLATFORM P
+          LEFT JOIN O_ORDER O ON O.ORDER_PLATFORM = P.PLATFORM_NUM
+      WHERE
+          P.STATUS = 1
+          <if test="list != null">
+            AND O.ID IN
+            <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+              #{item}
+            </foreach>
+          </if>
+      GROUP BY
+      P.PLATFORM_TYPE
+  </select>
+
+  <!-- 通过订单ID查询平台编码 -->
+  <select id="selectByOrderId" resultMap="BaseResultMap" parameterType="string" >
+      SELECT
+          P.*
+      FROM
+          A_PLATFORM P
+          LEFT JOIN O_ORDER O ON O.ORDER_PLATFORM = P.PLATFORM_NUM
+      WHERE
+          O.ID = #{orderId}
+  </select>
+
 </mapper>
