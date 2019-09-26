@@ -972,7 +972,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         try {
             checkSnForOtherPlatform(list);
         } catch (Exception e) {
-            throw new ProcessException("冻结SN失败，请联系管理员！！！");
+            throw new ProcessException(e.getLocalizedMessage());
         }
 
         return null;
