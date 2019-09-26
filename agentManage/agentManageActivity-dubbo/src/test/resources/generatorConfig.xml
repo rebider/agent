@@ -33,7 +33,6 @@
 			<property name="enableSubPackages" value="true" />
 		</javaClientGenerator>
 		 <!--要生成那些表(更改tableName和domainObjectName就可以)-->
-		<table tableName="O_TERMINAL_TRANSFER_DETAIL" domainObjectName="TerminalTransferDetail" enableUpdateByExample="false"
-		enableDeleteByPrimaryKey="false"/>
+		<table tableName="KAFKA_SEND_Message" domainObjectName="KafkaSendMessage" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>
 	</context>
 </generatorConfiguration>
