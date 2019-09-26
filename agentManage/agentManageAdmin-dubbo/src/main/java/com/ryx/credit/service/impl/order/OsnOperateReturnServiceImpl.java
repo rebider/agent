@@ -276,7 +276,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateReturnService {
                             }
                         } else if (null != sendInfoRet.get("status") && "2".equals(sendInfoRet.get("status"))) {
                             //失败，更新物流明细
-                            AppConfig.sendEmail(emailArr, "SN开始：" + logistics.getSnBeginNum()+",SN结束" + logistics.getSnEndNum() + "错误信息："+null == sendInfoRet.get("msg")?"接口返回值异常！":(String)sendInfoRet.get("msg"), logistics.getProName() + "退货下发失败！！！");
+                            AppConfig.sendEmail(emailArr, "SN：" + logistics.getSnBeginNum() + "-" + logistics.getSnEndNum() +"失败原因：" + (null == sendInfoRet.get("msg")?"接口返回值异常！":(String)sendInfoRet.get("msg")), logistics.getProName() + "退货下发失败！！！");
                             while (logisticsDetails.size() > 0) {
                                 if (!osnOperateReturnService.updateDetailBatch(logisticsDetails, new BigDecimal(batch), LogisticsDetailSendStatus.send_fail.code))
                                     throw new Exception("物流明细更新失败（下发失败）");
