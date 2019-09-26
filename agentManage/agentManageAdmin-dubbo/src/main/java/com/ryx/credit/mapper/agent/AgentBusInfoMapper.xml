@@ -1144,7 +1144,7 @@ union
           ROD.ID = #{returnOrderDetailId}
   </select>
 
-  <!-- 通过ID查询平台编码和POS唯一码（后期维护可升级）_Z -->
+  <!-- 通过ID查询平台编码和POS唯一码（后期维护可升级） -->
   <select id="selectByIdForPosUpSingCheck" parameterType="string" resultType="map">
       SELECT
           AB.BUS_NUM AS BUSNUM,
@@ -1154,5 +1154,10 @@ union
           LEFT JOIN A_PLATFORM P ON P.PLATFORM_NUM=AB.BUS_PLATFORM
       WHERE
           AB.ID = #{id}
+  </select>
+
+  <!-- 通过ID查询平台编码和POS唯一码（后期维护不建议升级修改） -->
+  <select id="selectByBusNum" parameterType="string" resultMap="BaseResultMap">
+      SELECT AB.* FROM A_AGENT_BUSINFO AB WHERE AB.STATUS='1' AND AB.BUS_NUM = #{busNum}
   </select>
 </mapper>
