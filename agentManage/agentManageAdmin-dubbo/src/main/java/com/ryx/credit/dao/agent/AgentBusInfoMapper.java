@@ -102,4 +102,7 @@ public interface AgentBusInfoMapper {
 
     //通过ID查询编码，和POS升级首字母（后期可升级）
     Map<String, Object> selectByIdForPosUpSingCheck(@Param("id") String id);
+
+    //通过busnum查询是否已经升级成功
+    AgentBusInfo selectByBusNum(String busNum);
 }

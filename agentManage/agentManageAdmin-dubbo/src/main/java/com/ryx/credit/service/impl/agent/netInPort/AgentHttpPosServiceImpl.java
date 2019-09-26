@@ -477,14 +477,17 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
     public AgentResult agencyLevelCheck(Map<String, Object> paramMap)throws Exception{
         try {
             AgentVo agentVo = (AgentVo) paramMap.get("agentVo");
-            if (null == agentVo || null == agentVo.getBusInfoVoList())
-                throw new Exception("信息不完整，请补全业务信息，如有疑问请联系管理员");
+            if (null == agentVo || null == agentVo.getBusInfoVoList()) throw new Exception("信息不完整，请补全业务信息，如有疑问请联系管理员");
             AgentBusInfo agentBusInfo = agentVo.getBusInfoVoList().get(0);
 
             //查询上级编码，和活动首字母
             Map<String, Object> upSingCheckMap = agentBusInfoMapper.selectByIdForPosUpSingCheck(agentBusInfo.getBusParent());
-            if (null == upSingCheckMap.get("BUSNUM"))
-                throw new Exception("上级代理商信息不存在，请联系管理员！！！");
+            if (null == upSingCheckMap.get("BUSNUM")) throw new Exception("上级代理商信息不存在，请联系管理员！！！");
+
+            //查询是否升级完成，升级完成之后不允许再次升级
+            if (null == agentBusInfo.getBusNum()) throw new Exception("请填写业务平台编号！！");
+            AgentBusInfo agentbusInfoByNum = agentBusInfoMapper.selectByBusNum(agentBusInfo.getBusNum());
+            if (null != agentbusInfoByNum || agentBusInfo.getBusNum().equals(agentBusInfo.getBusParent())) throw new Exception("您已经升级成功，请勿重复提交！");
 
             String cooperator = Constants.cooperator;
             String tranCode = "ORG018"; // 交易码
