@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.pmsProfitTempMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.pmsProfitTemp">
+    <id column="MONTH" jdbcType="VARCHAR" property="month" />
+    <id column="ORDER_NUMBER" jdbcType="DECIMAL" property="orderNumber" />
+    <id column="SHEET_NAME" jdbcType="VARCHAR" property="sheetName" />
+    <id column="IMPORT_PERSON" jdbcType="VARCHAR" property="importPerson" />
+    <result column="UNIQUE_FLAG" jdbcType="VARCHAR" property="uniqueFlag" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="BUS_CODE" jdbcType="VARCHAR" property="busCode" />
+    <result column="BUS_NAME" jdbcType="VARCHAR" property="busName" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.ryx.credit.profit.pojo.pmsProfitTempWithBLOBs">
+    <result column="SHEET_HEAD" jdbcType="CLOB" property="sheetHead" />
+    <result column="SHEET_DATA" jdbcType="CLOB" property="sheetData" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    MONTH, ORDER_NUMBER, SHEET_NAME, IMPORT_PERSON, UNIQUE_FLAG, AGENT_ID, BUS_CODE, 
+    BUS_NAME
+  </sql>
+  <sql id="Blob_Column_List">
+    SHEET_HEAD, SHEET_DATA
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.ryx.credit.profit.pojo.pmsProfitTempExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from PMS_PROFIT_TEMP
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.pmsProfitTempExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from PMS_PROFIT_TEMP
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.pmsProfitTempKey" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from PMS_PROFIT_TEMP
+    where MONTH = #{month,jdbcType=VARCHAR}
+      and ORDER_NUMBER = #{orderNumber,jdbcType=DECIMAL}
+      and SHEET_NAME = #{sheetName,jdbcType=VARCHAR}
+      and IMPORT_PERSON = #{importPerson,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.pmsProfitTempExample">
+    delete from PMS_PROFIT_TEMP
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.pmsProfitTempWithBLOBs">
+    insert into PMS_PROFIT_TEMP (MONTH, ORDER_NUMBER, SHEET_NAME, 
+      IMPORT_PERSON, UNIQUE_FLAG, AGENT_ID, 
+      BUS_CODE, BUS_NAME, SHEET_HEAD, 
+      SHEET_DATA)
+    values (#{month,jdbcType=VARCHAR}, #{orderNumber,jdbcType=DECIMAL}, #{sheetName,jdbcType=VARCHAR}, 
+      #{importPerson,jdbcType=VARCHAR}, #{uniqueFlag,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
+      #{busCode,jdbcType=VARCHAR}, #{busName,jdbcType=VARCHAR}, #{sheetHead,jdbcType=CLOB}, 
+      #{sheetData,jdbcType=CLOB})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.pmsProfitTempWithBLOBs">
+    insert into PMS_PROFIT_TEMP
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="month != null">
+        MONTH,
+      </if>
+      <if test="orderNumber != null">
+        ORDER_NUMBER,
+      </if>
+      <if test="sheetName != null">
+        SHEET_NAME,
+      </if>
+      <if test="importPerson != null">
+        IMPORT_PERSON,
+      </if>
+      <if test="uniqueFlag != null">
+        UNIQUE_FLAG,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="busCode != null">
+        BUS_CODE,
+      </if>
+      <if test="busName != null">
+        BUS_NAME,
+      </if>
+      <if test="sheetHead != null">
+        SHEET_HEAD,
+      </if>
+      <if test="sheetData != null">
+        SHEET_DATA,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="month != null">
+        #{month,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNumber != null">
+        #{orderNumber,jdbcType=DECIMAL},
+      </if>
+      <if test="sheetName != null">
+        #{sheetName,jdbcType=VARCHAR},
+      </if>
+      <if test="importPerson != null">
+        #{importPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="uniqueFlag != null">
+        #{uniqueFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="busCode != null">
+        #{busCode,jdbcType=VARCHAR},
+      </if>
+      <if test="busName != null">
+        #{busName,jdbcType=VARCHAR},
+      </if>
+      <if test="sheetHead != null">
+        #{sheetHead,jdbcType=CLOB},
+      </if>
+      <if test="sheetData != null">
+        #{sheetData,jdbcType=CLOB},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.pmsProfitTempExample" resultType="java.lang.Long">
+    select count(*) from PMS_PROFIT_TEMP
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.pmsProfitTempWithBLOBs">
+    update PMS_PROFIT_TEMP
+    <set>
+      <if test="uniqueFlag != null">
+        UNIQUE_FLAG = #{uniqueFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="busCode != null">
+        BUS_CODE = #{busCode,jdbcType=VARCHAR},
+      </if>
+      <if test="busName != null">
+        BUS_NAME = #{busName,jdbcType=VARCHAR},
+      </if>
+      <if test="sheetHead != null">
+        SHEET_HEAD = #{sheetHead,jdbcType=CLOB},
+      </if>
+      <if test="sheetData != null">
+        SHEET_DATA = #{sheetData,jdbcType=CLOB},
+      </if>
+    </set>
+    where MONTH = #{month,jdbcType=VARCHAR}
+      and ORDER_NUMBER = #{orderNumber,jdbcType=DECIMAL}
+      and SHEET_NAME = #{sheetName,jdbcType=VARCHAR}
+      and IMPORT_PERSON = #{importPerson,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.ryx.credit.profit.pojo.pmsProfitTempWithBLOBs">
+    update PMS_PROFIT_TEMP
+    set UNIQUE_FLAG = #{uniqueFlag,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      BUS_CODE = #{busCode,jdbcType=VARCHAR},
+      BUS_NAME = #{busName,jdbcType=VARCHAR},
+      SHEET_HEAD = #{sheetHead,jdbcType=CLOB},
+      SHEET_DATA = #{sheetData,jdbcType=CLOB}
+    where MONTH = #{month,jdbcType=VARCHAR}
+      and ORDER_NUMBER = #{orderNumber,jdbcType=DECIMAL}
+      and SHEET_NAME = #{sheetName,jdbcType=VARCHAR}
+      and IMPORT_PERSON = #{importPerson,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.pmsProfitTemp">
+    update PMS_PROFIT_TEMP
+    set UNIQUE_FLAG = #{uniqueFlag,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      BUS_CODE = #{busCode,jdbcType=VARCHAR},
+      BUS_NAME = #{busName,jdbcType=VARCHAR}
+    where MONTH = #{month,jdbcType=VARCHAR}
+      and ORDER_NUMBER = #{orderNumber,jdbcType=DECIMAL}
+      and SHEET_NAME = #{sheetName,jdbcType=VARCHAR}
+      and IMPORT_PERSON = #{importPerson,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>
