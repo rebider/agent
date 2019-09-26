@@ -369,29 +369,29 @@
 
 
   <select id="querySSIMS_TERM_MACHINE" resultType="map" parameterType="map">
-    select a.pos_activity_id AS ID,
-           (c.brand_name||'|机具活动关系编号:'||a.pos_activity_id
-            ||'|活动名称:'||c.activity_name
-            ||'机型:'||IMS_POS.POS_MODEL||'|单价:'||b.price
-            || '活动时间:' || c.activity_start_time ||'/'|| c.activity_end_time) AS NAME,b.BACK_TYPE,
-      replace(IMS_POS.POS_MODEL,IMS_POS.TMS_MODEL,'')as manufactor,
-      IMS_POS.TMS_MODEL,
-      c.ACTIVITY_START_TIME,
-      c.ACTIVITY_END_TIME,
-      c.STAND_TIME,
-      c.STAND_AMT,
-      b.PRICE,
-    (
+        select a.pos_activity_id AS ID,
+        (c.brand_name||'|机具活动关系编号:'||a.pos_activity_id
+        ||'|活动名称:'||c.activity_name
+        ||'机型:'||IMS_POS.POS_MODEL||'|单价:'||b.DEPOSIT
+        || '活动时间:' || c.activity_start_time ||'/'|| c.activity_end_time) AS NAME,b.BACK_TYPE,
+        replace(IMS_POS.POS_MODEL,IMS_POS.TMS_MODEL,'')as manufactor,
+        IMS_POS.TMS_MODEL,
+        c.ACTIVITY_START_TIME,
+        c.ACTIVITY_END_TIME,
+        c.STAND_TIME,
+        c.STAND_AMT,
+        c.DEPOSIT as PRICE,
+        (
         case c.ACTIVITY_TYPE
-          when '01' then '0' --    01：普通活动 普通机0
-          when '00' then (case c.activate_type  when '00' then '1' when '01' then '2' end )--   00：返现活动  ACTIVATE_TYPE 激活方式 00：首笔交易缴纳押金(特价机 1)，01：预装激活(特价机（无押金）2)
+        when '01' then '0' --    01：普通活动 普通机0
+        when '00' then (case c.activate_type  when '00' then '1' when '01' then '2' end )--   00：返现活动  ACTIVATE_TYPE 激活方式 00：首笔交易缴纳押金(特价机 1)，01：预装激活(特价机（无押金）2)
         end
-    ) as POSTYPE
-    from IMS_POS_ACTIVITY a
-      left join IMS_TERM_MACHINE b on a.pos_id=b.machine_id
-      left join IMS_MACHINE_ACTIVITY c on a.activity_id=c.activity_id
-      left join IMS_POS on IMS_POS.ID=b.Model
-    where b.status=1 and c.status='00'
+        ) as POSTYPE
+        from IMS_POS_ACTIVITY a
+        left join IMS_TERM_MACHINE b on a.pos_id=b.machine_id
+        left join IMS_MACHINE_ACTIVITY c on a.activity_id=c.activity_id
+        left join IMS_POS on IMS_POS.ID=b.Model
+        where b.status=1 and c.status='00'
          <if test="busplatform!=null and brandCode!=''">and c.brand_code=#{busplatform,jdbcType=VARCHAR}</if>
   </select>
 
