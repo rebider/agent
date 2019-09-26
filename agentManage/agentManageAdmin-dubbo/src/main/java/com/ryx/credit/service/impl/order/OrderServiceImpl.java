@@ -3780,30 +3780,36 @@ public class OrderServiceImpl implements OrderService {
         Date date = Calendar.getInstance().getTime();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
         String batchNum = Calendar.getInstance().getTime().getTime() + "";
-        for(int i=0;i<rAmountlist.size();i++){
-            Map map = rAmountlist.get(i);
-            removeAccount.setId(idService.genId(TabId.O_REMOVE_ACCOUNT));
-            removeAccount.setAgId(String.valueOf(map.get("agId")));
-            String rmonth = String.valueOf(map.get("rmonth"));
-            if (StringUtils.isNotBlank(rmonth)){
-                removeAccount.setRmonth(format.parse(rmonth));
-            }
-            String agName = String.valueOf(map.get("agName"));
-            agName=new String(agName.getBytes("iso8859-1"),"utf-8");
-            removeAccount.setAgName(agName);
-            removeAccount.setBusNum(String.valueOf(map.get("busNum")));
-            removeAccount.setBusPlatform(String.valueOf(map.get("busPlatform")));
-            String ramount = String.valueOf(map.get("ramount"));
-            removeAccount.setRamount(new BigDecimal(ramount));
-            String machinesAmount = String.valueOf(map.get("machinesAmount"));
-            removeAccount.setMachinesAmount(new BigDecimal(machinesAmount));
-            removeAccount.setRstatus(RemoveAccountStatus.WCL.code);
-            removeAccount.setBatchNum(batchNum);
-            removeAccount.setSubmitTime(date);
-            removeAccount.setStatus(Status.STATUS_1.status);
-            removeAccount.setVersion(Status.STATUS_1.status);
-            if (1 == oRemoveAccountMapper.insertSelective(removeAccount)) {
-                oRemoveAccountVo.setRemoveAccount(removeAccount);
+        if (null!=rAmountlist && rAmountlist.size()>0){
+            for(int i=0;i<rAmountlist.size();i++){
+                Map map = rAmountlist.get(i);
+                String machinesAmount = String.valueOf(map.get("machinesAmount"));//机具欠款
+                String ramount = String.valueOf(map.get("ramount"));//销账金额
+                String agName = String.valueOf(map.get("agName"));
+                agName=new String(agName.getBytes("iso8859-1"),"utf-8");
+                if(new BigDecimal(ramount).compareTo(new BigDecimal(machinesAmount))==1){
+                    logger.info("填写的金额不能大于机具欠款金额,代理商为:"+agName+",机具金额:"+machinesAmount);
+                    throw new MessageException("填写的金额不能大于机具欠款金额,代理商为:"+agName+",机具金额:"+machinesAmount);
+                }
+                removeAccount.setId(idService.genId(TabId.O_REMOVE_ACCOUNT));
+                removeAccount.setAgId(String.valueOf(map.get("agId")));
+                String rmonth = String.valueOf(map.get("rmonth"));
+                if (StringUtils.isNotBlank(rmonth)){
+                    removeAccount.setRmonth(format.parse(rmonth));
+                }
+                removeAccount.setAgName(agName);
+                removeAccount.setBusNum(String.valueOf(map.get("busNum")));
+                removeAccount.setBusPlatform(String.valueOf(map.get("busPlatform")));
+                removeAccount.setRamount(new BigDecimal(ramount));
+                removeAccount.setMachinesAmount(new BigDecimal(machinesAmount));
+                removeAccount.setRstatus(RemoveAccountStatus.WCL.code);
+                removeAccount.setBatchNum(batchNum);
+                removeAccount.setSubmitTime(date);
+                removeAccount.setStatus(Status.STATUS_1.status);
+                removeAccount.setVersion(Status.STATUS_1.status);
+                if (1 == oRemoveAccountMapper.insertSelective(removeAccount)) {
+                    oRemoveAccountVo.setRemoveAccount(removeAccount);
+                }
             }
         }
        if (null != oRemoveAccountVo.getRemoveAccountFile() && oRemoveAccountVo.getRemoveAccountFile().size()>0) {

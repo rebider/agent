@@ -348,7 +348,8 @@
   <!--销账明细-->
   <select id="rAccountDetailList" parameterType="java.util.Map" resultType="java.util.Map">
     <include refid="PAGING_START" />
-    select ra.id,ra.BATCH_NUM,to_char(ra.RMONTH,'yyyy-mm') as omonth,
+    select * from (
+    select ra.id,ra.BATCH_NUM,to_char(ra.RMONTH,'yyyy-mm') as omonth,ra.SUBMIT_TIME,
     ag.AG_UNIQ_NUM,ra.ag_name,ra.bus_num,plat.PLATFORM_NAME,a.* ,
     ra.ramount,ra.pay_method,ra.submit_person,ra.rstatus,ra.remark,
     ra.FINISH_TIME ,at.att_name
@@ -363,7 +364,7 @@
     left join a_attachment at ON at.id = rel.att_id
     WHERE  ra.status = 1 <include refid="RACCOUNTDETAIL_WHERE_SQL"/>
     union
-    select ra.id,ra.BATCH_NUM,to_char(ra.RMONTH,'yyyy-mm') as omonth,
+    select ra.id,ra.BATCH_NUM,to_char(ra.RMONTH,'yyyy-mm') as omonth,ra.SUBMIT_TIME,
     ag.AG_UNIQ_NUM,ra.ag_name,ra.bus_num,plat.PLATFORM_NAME,a.* ,
     ra.ramount,ra.pay_method,ra.submit_person,ra.rstatus,ra.remark,
     ra.FINISH_TIME ,at.att_name
@@ -377,6 +378,7 @@
     left join a_attachment_rel rel on rel.SRC_ID=ra.BATCH_NUM
     left join a_attachment at ON at.id = rel.att_id
     WHERE   ra.status = 1 <include refid="RACCOUNTDETAIL_WHERE_SQL"/>
+    )aa order by aa.SUBMIT_TIME desc
     <include refid="PAGING_END" />
   </select>
 
