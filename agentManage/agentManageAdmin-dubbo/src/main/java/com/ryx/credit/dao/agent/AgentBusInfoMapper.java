@@ -104,5 +104,5 @@ public interface AgentBusInfoMapper {
     Map<String, Object> selectByIdForPosUpSingCheck(@Param("id") String id);
 
     //通过busnum查询是否已经升级成功
-    AgentBusInfo selectByBusNum(String busNum);
+    int selectByBusNum(String busNum);
 }
