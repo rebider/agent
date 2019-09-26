@@ -7,7 +7,6 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.FastMap;
-import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
@@ -15,7 +14,6 @@ import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.order.*;
 import com.ryx.credit.machine.service.TermMachineService;
-import com.ryx.credit.machine.vo.ChangeActMachineVo;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
@@ -602,7 +600,6 @@ public class OldCompensateServiceImpl implements OldCompensateService {
         if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
             agentResult = cashReceivablesService.finishProcing(CashPayType.REFUNDPRICEDIFF,oRefundPriceDiff.getId(),oRefundPriceDiff.getcUser());
         }
-
         if(!agentResult.isOK()){
             throw new ProcessException("更新打款记录失败");
         }
@@ -615,21 +612,16 @@ public class OldCompensateServiceImpl implements OldCompensateService {
             List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(oRefundPriceDiffDetailExample);
             oRefundPriceDiffDetails.forEach(row->{
                 try {
-
                     row.setAppTime(new Date());
                     row.setSendStatus(LogisticsSendStatus.send_ing.code);
-
                     OActivity activity_old = activityMapper.selectByPrimaryKey(row.getActivityFrontId());
                     OActivity activity_new = activityMapper.selectByPrimaryKey(row.getActivityRealId());
-
                     int j = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(row);
                     if(j!=1){
                         throw new ProcessException("退补差价更新失败");
                     }
-
                     row.setOldMachineId(activity_old.getBusProCode());
                     row.setNewMachineId(activity_new.getBusProCode());
-
                 }catch (ProcessException e) {
                     e.printStackTrace();
                     throw new ProcessException(e.getMessage());
@@ -652,7 +644,6 @@ public class OldCompensateServiceImpl implements OldCompensateService {
     @Override
     public AgentResult compensateAmtEdit(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,
                                          List<String> refundPriceDiffFile, String cUser, List<OCashReceivablesVo> cashReceivablesVoList) {
-
         try {
             if(null==refundPriceDiffDetailList){
                 throw new ProcessException("退补差价明细数据为空");
