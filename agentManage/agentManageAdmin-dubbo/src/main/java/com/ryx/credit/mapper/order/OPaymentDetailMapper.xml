@@ -776,6 +776,7 @@
             </if>
         </where>
         AND PAYMENT_TYPE=#{paymentType} and Payment_status=${paymentStatus}
+        order by PLAN_PAY_TIME
     </select>
 
 </mapper>
