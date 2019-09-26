@@ -1157,7 +1157,7 @@ union
   </select>
 
   <!-- 通过ID查询平台编码和POS唯一码（后期维护不建议升级修改） -->
-  <select id="selectByBusNum" parameterType="string" resultMap="BaseResultMap">
-      SELECT AB.* FROM A_AGENT_BUSINFO AB WHERE AB.STATUS='1' AND AB.BUS_NUM = #{busNum}
+  <select id="selectByBusNum" parameterType="string" resultType="int">
+      SELECT count (1) FROM A_AGENT_BUSINFO AB WHERE AB.STATUS='1' AND AB.BUS_NUM = #{busNum}
   </select>
 </mapper>

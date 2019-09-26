@@ -486,8 +486,8 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
 
             //查询是否升级完成，升级完成之后不允许再次升级
             if (null == agentBusInfo.getBusNum()) throw new Exception("请填写业务平台编号！！");
-            AgentBusInfo agentbusInfoByNum = agentBusInfoMapper.selectByBusNum(agentBusInfo.getBusNum());
-            if (null != agentbusInfoByNum || agentBusInfo.getBusNum().equals(agentBusInfo.getBusParent())) throw new Exception("您已经升级成功，请勿重复提交！");
+            int i = agentBusInfoMapper.selectByBusNum(agentBusInfo.getBusNum());
+            if (i > 0 || agentBusInfo.getBusNum().equals(agentBusInfo.getBusParent())) throw new Exception("您已经升级成功，请勿重复提交！");
 
             String cooperator = Constants.cooperator;
             String tranCode = "ORG018"; // 交易码
