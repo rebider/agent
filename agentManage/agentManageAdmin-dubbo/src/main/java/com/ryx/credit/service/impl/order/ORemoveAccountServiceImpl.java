@@ -59,10 +59,8 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
 
     @Override
     public PageInfo removeAccountDetail(Map<String, Object> param, PageInfo pageInfo) {
-//        Long count = oRemoveAccountMapper.rAccountDetailCount(param);
-        List<Map<String, Object>> list = oRemoveAccountMapper.rAccountDetailList(param);
-        pageInfo.setTotal(list.size());
-        pageInfo.setRows(list);
+        pageInfo.setTotal(oRemoveAccountMapper.rAccountDetailCount(param));
+        pageInfo.setRows(oRemoveAccountMapper.rAccountDetailList(param));
         return pageInfo;
     }
 
