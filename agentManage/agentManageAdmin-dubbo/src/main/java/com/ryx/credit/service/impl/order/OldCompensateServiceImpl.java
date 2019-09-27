@@ -152,6 +152,7 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 listCanChangePlat = listCanChange.stream().map(item -> {
                     return item.getdItemvalue();
                 }).collect(Collectors.toList());
+                listCanChangePlat.add(oActivity.getPlatform());
             }
             //查询可变更的活动
             OActivityExample oActivityExample = new OActivityExample();
