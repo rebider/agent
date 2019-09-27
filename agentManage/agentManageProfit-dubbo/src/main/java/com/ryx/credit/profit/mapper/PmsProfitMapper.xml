@@ -10,8 +10,8 @@
     <result column="BUS_NAME" jdbcType="VARCHAR" property="busName" />
     <result column="SHEET_NAME" jdbcType="VARCHAR" property="sheetName" />
     <result column="SHEET_COLUMN" jdbcType="DECIMAL" property="sheetColumn" />
-    <result column="SHEET_HEAD" jdbcType="OTHER" property="sheetHead" />
-    <result column="SHEET_DATA" jdbcType="OTHER" property="sheetData" />
+    <result column="SHEET_HEAD" jdbcType="VARCHAR" property="sheetHead" />
+    <result column="SHEET_DATA" jdbcType="VARCHAR" property="sheetData" />
     <result column="PROFIT_TYPE" jdbcType="VARCHAR" property="profitType" />
     <result column="PROFIT_HZ" jdbcType="VARCHAR" property="profitHz" />
     <result column="PAY_CONDITION" jdbcType="VARCHAR" property="payCondition" />
@@ -102,8 +102,8 @@
       )
     values (#{id,jdbcType=VARCHAR}, #{month,jdbcType=VARCHAR}, #{uniqueFlag,jdbcType=VARCHAR}, 
       #{agentId,jdbcType=VARCHAR}, #{busCode,jdbcType=VARCHAR}, #{busName,jdbcType=VARCHAR}, 
-      #{sheetName,jdbcType=VARCHAR}, #{sheetColumn,jdbcType=DECIMAL}, #{sheetHead,jdbcType=OTHER}, 
-      #{sheetData,jdbcType=OTHER}, #{profitType,jdbcType=VARCHAR}, #{profitHz,jdbcType=VARCHAR}, 
+      #{sheetName,jdbcType=VARCHAR}, #{sheetColumn,jdbcType=DECIMAL}, #{sheetHead,jdbcType=VARCHAR}, 
+      #{sheetData,jdbcType=VARCHAR}, #{profitType,jdbcType=VARCHAR}, #{profitHz,jdbcType=VARCHAR}, 
       #{payCondition,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{freeReason,jdbcType=VARCHAR}, 
       #{payTranMoney,jdbcType=DECIMAL}, #{importTime,jdbcType=VARCHAR}, #{importPerson,jdbcType=VARCHAR}, 
       #{updateTime,jdbcType=VARCHAR}, #{updatePerson,jdbcType=VARCHAR}, #{freeTime,jdbcType=VARCHAR}, 
@@ -212,10 +212,10 @@
         #{sheetColumn,jdbcType=DECIMAL},
       </if>
       <if test="sheetHead != null">
-        #{sheetHead,jdbcType=OTHER},
+        #{sheetHead,jdbcType=VARCHAR},
       </if>
       <if test="sheetData != null">
-        #{sheetData,jdbcType=OTHER},
+        #{sheetData,jdbcType=VARCHAR},
       </if>
       <if test="profitType != null">
         #{profitType,jdbcType=VARCHAR},
@@ -292,10 +292,10 @@
         SHEET_COLUMN = #{sheetColumn,jdbcType=DECIMAL},
       </if>
       <if test="sheetHead != null">
-        SHEET_HEAD = #{sheetHead,jdbcType=OTHER},
+        SHEET_HEAD = #{sheetHead,jdbcType=VARCHAR},
       </if>
       <if test="sheetData != null">
-        SHEET_DATA = #{sheetData,jdbcType=OTHER},
+        SHEET_DATA = #{sheetData,jdbcType=VARCHAR},
       </if>
       <if test="profitType != null">
         PROFIT_TYPE = #{profitType,jdbcType=VARCHAR},
@@ -351,8 +351,8 @@
       BUS_NAME = #{busName,jdbcType=VARCHAR},
       SHEET_NAME = #{sheetName,jdbcType=VARCHAR},
       SHEET_COLUMN = #{sheetColumn,jdbcType=DECIMAL},
-      SHEET_HEAD = #{sheetHead,jdbcType=OTHER},
-      SHEET_DATA = #{sheetData,jdbcType=OTHER},
+      SHEET_HEAD = #{sheetHead,jdbcType=VARCHAR},
+      SHEET_DATA = #{sheetData,jdbcType=VARCHAR},
       PROFIT_TYPE = #{profitType,jdbcType=VARCHAR},
       PROFIT_HZ = #{profitHz,jdbcType=VARCHAR},
       PAY_CONDITION = #{payCondition,jdbcType=VARCHAR},

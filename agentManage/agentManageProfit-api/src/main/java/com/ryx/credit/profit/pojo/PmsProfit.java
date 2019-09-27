@@ -20,9 +20,9 @@ public class PmsProfit implements Serializable {
 
     private BigDecimal sheetColumn;
 
-    private Object sheetHead;
+    private String sheetHead;
 
-    private Object sheetData;
+    private String sheetData;
 
     private String profitType;
 
@@ -116,19 +116,19 @@ public class PmsProfit implements Serializable {
         this.sheetColumn = sheetColumn;
     }
 
-    public Object getSheetHead() {
+    public String getSheetHead() {
         return sheetHead;
     }
 
-    public void setSheetHead(Object sheetHead) {
+    public void setSheetHead(String sheetHead) {
         this.sheetHead = sheetHead;
     }
 
-    public Object getSheetData() {
+    public String getSheetData() {
         return sheetData;
     }
 
-    public void setSheetData(Object sheetData) {
+    public void setSheetData(String sheetData) {
         this.sheetData = sheetData;
     }
 
