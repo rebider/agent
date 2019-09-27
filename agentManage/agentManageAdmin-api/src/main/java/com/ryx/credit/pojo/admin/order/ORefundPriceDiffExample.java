@@ -24,20 +24,20 @@ public class ORefundPriceDiffExample {
         oredCriteria = new ArrayList<Criteria>();
     }
 
-    public void setOrderByClause(String orderByClause) {
-        this.orderByClause = orderByClause;
-    }
-
     public String getOrderByClause() {
         return orderByClause;
     }
 
-    public void setDistinct(boolean distinct) {
-        this.distinct = distinct;
+    public void setOrderByClause(String orderByClause) {
+        this.orderByClause = orderByClause;
     }
 
     public boolean isDistinct() {
         return distinct;
+    }
+
+    public void setDistinct(boolean distinct) {
+        this.distinct = distinct;
     }
 
     public List<Criteria> getOredCriteria() {
@@ -73,28 +73,28 @@ public class ORefundPriceDiffExample {
         distinct = false;
     }
 
-    public void setPage(Page page) {
-        this.page=page;
-    }
-
     public Page getPage() {
         return page;
     }
 
-    public void setLimitStart(Integer limitStart) {
-        this.limitStart=limitStart;
+    public void setPage(Page page) {
+        this.page=page;
     }
 
     public Integer getLimitStart() {
         return limitStart;
     }
 
-    public void setLimitEnd(Integer limitEnd) {
-        this.limitEnd=limitEnd;
+    public void setLimitStart(Integer limitStart) {
+        this.limitStart=limitStart;
     }
 
     public Integer getLimitEnd() {
         return limitEnd;
+    }
+
+    public void setLimitEnd(Integer limitEnd) {
+        this.limitEnd=limitEnd;
     }
 
     protected abstract static class GeneratedCriteria {
@@ -1527,6 +1527,66 @@ public class ORefundPriceDiffExample {
             addCriterion("ORDER_TYPE not between", value1, value2, "orderType");
             return (Criteria) this;
         }
+
+        public Criteria andAppTimeIsNull() {
+            addCriterion("APP_TIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppTimeIsNotNull() {
+            addCriterion("APP_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppTimeEqualTo(Date value) {
+            addCriterion("APP_TIME =", value, "appTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppTimeNotEqualTo(Date value) {
+            addCriterion("APP_TIME <>", value, "appTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppTimeGreaterThan(Date value) {
+            addCriterion("APP_TIME >", value, "appTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppTimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("APP_TIME >=", value, "appTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppTimeLessThan(Date value) {
+            addCriterion("APP_TIME <", value, "appTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppTimeLessThanOrEqualTo(Date value) {
+            addCriterion("APP_TIME <=", value, "appTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppTimeIn(List<Date> values) {
+            addCriterion("APP_TIME in", values, "appTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppTimeNotIn(List<Date> values) {
+            addCriterion("APP_TIME not in", values, "appTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppTimeBetween(Date value1, Date value2) {
+            addCriterion("APP_TIME between", value1, value2, "appTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppTimeNotBetween(Date value1, Date value2) {
+            addCriterion("APP_TIME not between", value1, value2, "appTime");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
@@ -1552,38 +1612,6 @@ public class ORefundPriceDiffExample {
         private boolean listValue;
 
         private String typeHandler;
-
-        public String getCondition() {
-            return condition;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-
-        public Object getSecondValue() {
-            return secondValue;
-        }
-
-        public boolean isNoValue() {
-            return noValue;
-        }
-
-        public boolean isSingleValue() {
-            return singleValue;
-        }
-
-        public boolean isBetweenValue() {
-            return betweenValue;
-        }
-
-        public boolean isListValue() {
-            return listValue;
-        }
-
-        public String getTypeHandler() {
-            return typeHandler;
-        }
 
         protected Criterion(String condition) {
             super();
@@ -1619,6 +1647,38 @@ public class ORefundPriceDiffExample {
 
         protected Criterion(String condition, Object value, Object secondValue) {
             this(condition, value, secondValue, null);
+        }
+
+        public String getCondition() {
+            return condition;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public Object getSecondValue() {
+            return secondValue;
+        }
+
+        public boolean isNoValue() {
+            return noValue;
+        }
+
+        public boolean isSingleValue() {
+            return singleValue;
+        }
+
+        public boolean isBetweenValue() {
+            return betweenValue;
+        }
+
+        public boolean isListValue() {
+            return listValue;
+        }
+
+        public String getTypeHandler() {
+            return typeHandler;
         }
     }
 }

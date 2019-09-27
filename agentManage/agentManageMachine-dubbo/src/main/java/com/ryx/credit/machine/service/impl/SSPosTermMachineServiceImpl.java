@@ -18,6 +18,7 @@ import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.*;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
+import com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail;
 import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
 import com.ryx.credit.service.order.IOrderReturnService;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -356,6 +357,16 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
     @Override
     public AgentResult queryTerminalTransferResult(String serialNumber, String type) throws Exception {
         return AgentResult.fail("未联动");
+    }
+
+    @Override
+    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws Exception {
+        return AgentResult.ok("未联动");
+    }
+
+    @Override
+    public AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception {
+        return AgentResult.ok("04");
     }
 
 

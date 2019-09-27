@@ -33,6 +33,11 @@
     <result column="ORDER_TYPE" jdbcType="DECIMAL" property="orderType" />
     <result column="FRONT_PRO_ID" jdbcType="VARCHAR" property="frontProId" />
     <result column="FRONT_PRO_NAME" jdbcType="VARCHAR" property="frontProName" />
+    <result column="PLATFORM_TYPE" jdbcType="VARCHAR" property="platformType" />
+    <result column="OLD_ORG_ID" jdbcType="VARCHAR" property="oldOrgId" />
+    <result column="NEW_ORG_ID" jdbcType="VARCHAR" property="newOrgId" />
+    <result column="DELIVERY_TIME" jdbcType="VARCHAR" property="deliveryTime" />
+    <result column="APP_TIME" jdbcType="TIMESTAMP" property="appTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -67,7 +72,8 @@
     ID, SUB_ORDER_ID, AGENT_ID, ACTIVITY_FRONT_ID, ACTIVITY_REAL_ID, REFUND_PRICE_DIFF_ID,
     PRO_ID, PRO_NAME, CHANGE_COUNT, ACTIVITY_NAME, ACTIVITY_WAY, ACTIVITY_RULE, FRONT_PRICE,
     PRICE, S_TIME, BEGIN_SN, END_SN, VENDER, PRO_MODEL, C_TIME, U_TIME, C_USER, U_USER,
-    STATUS, VERSION, ORDER_ID, SEND_STATUS, SEND_MSG, ORDER_TYPE, FRONT_PRO_ID, FRONT_PRO_NAME
+    STATUS, VERSION, ORDER_ID, SEND_STATUS, SEND_MSG, ORDER_TYPE, FRONT_PRO_ID, FRONT_PRO_NAME,
+    PLATFORM_TYPE, OLD_ORG_ID, NEW_ORG_ID, DELIVERY_TIME, APP_TIME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -108,7 +114,9 @@
     C_USER, U_USER, STATUS,
     VERSION, ORDER_ID, SEND_STATUS,
     SEND_MSG, ORDER_TYPE, FRONT_PRO_ID,
-    FRONT_PRO_NAME)
+    FRONT_PRO_NAME, PLATFORM_TYPE, OLD_ORG_ID,
+    NEW_ORG_ID, DELIVERY_TIME, APP_TIME
+    )
     values (#{id,jdbcType=VARCHAR}, #{subOrderId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
     #{activityFrontId,jdbcType=VARCHAR}, #{activityRealId,jdbcType=VARCHAR}, #{refundPriceDiffId,jdbcType=VARCHAR},
     #{proId,jdbcType=VARCHAR}, #{proName,jdbcType=VARCHAR}, #{changeCount,jdbcType=DECIMAL},
@@ -119,7 +127,9 @@
     #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
     #{version,jdbcType=DECIMAL}, #{orderId,jdbcType=VARCHAR}, #{sendStatus,jdbcType=DECIMAL},
     #{sendMsg,jdbcType=VARCHAR}, #{orderType,jdbcType=DECIMAL}, #{frontProId,jdbcType=VARCHAR},
-    #{frontProName,jdbcType=VARCHAR})
+    #{frontProName,jdbcType=VARCHAR}, #{platformType,jdbcType=VARCHAR}, #{oldOrgId,jdbcType=VARCHAR},
+    #{newOrgId,jdbcType=VARCHAR}, #{deliveryTime,jdbcType=VARCHAR}, #{appTime,jdbcType=TIMESTAMP}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail">
     insert into O_REFUND_PRICE_DIFF_DETAIL
@@ -217,6 +227,21 @@
       <if test="frontProName != null">
         FRONT_PRO_NAME,
       </if>
+      <if test="platformType != null">
+        PLATFORM_TYPE,
+      </if>
+      <if test="oldOrgId != null">
+        OLD_ORG_ID,
+      </if>
+      <if test="newOrgId != null">
+        NEW_ORG_ID,
+      </if>
+      <if test="deliveryTime != null">
+        DELIVERY_TIME,
+      </if>
+      <if test="appTime != null">
+        APP_TIME,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -311,6 +336,21 @@
       </if>
       <if test="frontProName != null">
         #{frontProName,jdbcType=VARCHAR},
+      </if>
+      <if test="platformType != null">
+        #{platformType,jdbcType=VARCHAR},
+      </if>
+      <if test="oldOrgId != null">
+        #{oldOrgId,jdbcType=VARCHAR},
+      </if>
+      <if test="newOrgId != null">
+        #{newOrgId,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryTime != null">
+        #{deliveryTime,jdbcType=VARCHAR},
+      </if>
+      <if test="appTime != null">
+        #{appTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -413,6 +453,21 @@
       <if test="frontProName != null">
         FRONT_PRO_NAME = #{frontProName,jdbcType=VARCHAR},
       </if>
+      <if test="platformType != null">
+        PLATFORM_TYPE = #{platformType,jdbcType=VARCHAR},
+      </if>
+      <if test="oldOrgId != null">
+        OLD_ORG_ID = #{oldOrgId,jdbcType=VARCHAR},
+      </if>
+      <if test="newOrgId != null">
+        NEW_ORG_ID = #{newOrgId,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryTime != null">
+        DELIVERY_TIME = #{deliveryTime,jdbcType=VARCHAR},
+      </if>
+      <if test="appTime != null">
+        APP_TIME = #{appTime,jdbcType=TIMESTAMP},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -447,7 +502,12 @@
     SEND_MSG = #{sendMsg,jdbcType=VARCHAR},
     ORDER_TYPE = #{orderType,jdbcType=DECIMAL},
     FRONT_PRO_ID = #{frontProId,jdbcType=VARCHAR},
-    FRONT_PRO_NAME = #{frontProName,jdbcType=VARCHAR}
+    FRONT_PRO_NAME = #{frontProName,jdbcType=VARCHAR},
+    PLATFORM_TYPE = #{platformType,jdbcType=VARCHAR},
+    OLD_ORG_ID = #{oldOrgId,jdbcType=VARCHAR},
+    NEW_ORG_ID = #{newOrgId,jdbcType=VARCHAR},
+    DELIVERY_TIME = #{deliveryTime,jdbcType=VARCHAR},
+    APP_TIME = #{appTime,jdbcType=TIMESTAMP}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

@@ -48,6 +48,22 @@ public enum PlatformType {
         return "";
     }
 
+    /**
+     * 根据值获取内容
+     * @param value
+     * @return
+     */
+    public static String getValueByContent(String value){
+        PlatformType[] fundType = PlatformType.values();
+        for(PlatformType cc : fundType){
+            if(cc.msg.equals(value)){
+                return cc.code;
+            }
+        }
+        return "";
+    }
+
+
     public static PlatformType getContentEnum(String value){
         PlatformType[] fundType = PlatformType.values();
         for(PlatformType cc : fundType){

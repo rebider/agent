@@ -96,11 +96,8 @@ public enum DictGroup {
     RATYPE("销账方式"),
     RSTATUS("销账状态"),
 
-    CERTIFICATION_STATUS("代理商工商认证");
-
-
-
-
+    CERTIFICATION_STATUS("代理商工商认证"),
+    COMPENSATE_PLATFORM_TYPE("补差价可调整关系平台");
 
     public String  msg;
 
