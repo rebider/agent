@@ -1160,4 +1160,16 @@
     </if>
 
   </select>
+
+  <select id="queryCers" resultType="map" resultMap="BaseResultMap">
+
+    select
+    <include refid="Base_Column_List" />
+    from a_agent_certification AGENTCER
+    where (AGENTCER.CER_PRO_STAT = '0' or AGENTCER.CER_PRO_STAT = '1')
+    <if test="map.id!=null and map.id!=''">
+      and AGENTCER.Agent_Id = #{map.id}
+    </if>
+
+  </select>
 </mapper>
