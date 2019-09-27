@@ -5,14 +5,13 @@ import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.order.OOrderMapper;
 import com.ryx.credit.dao.order.OPaymentDetailMapper;
 import com.ryx.credit.dao.order.OPaymentMapper;
 import com.ryx.credit.dao.order.ORemoveAccountMapper;
-import com.ryx.credit.pojo.admin.agent.Agent;
-import com.ryx.credit.pojo.admin.agent.AgentExample;
-import com.ryx.credit.pojo.admin.agent.Dict;
+import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
@@ -24,10 +23,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import sun.management.resources.agent;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * @Auther: lrr
@@ -53,6 +54,8 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
     private OPaymentMapper oPaymentMapper;
     @Autowired
     private DictOptionsService dictOptionsService;
+    @Autowired
+    private AgentBusInfoMapper agentBusInfoMapper;
 
     @Override
     public PageInfo removeAccountDetail(Map<String, Object> param, PageInfo pageInfo) {
@@ -72,7 +75,6 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
             throw new MessageException("导入的数据为空");
         }
         int i=2;
-        Agent agent=new Agent();
         Calendar d = Calendar.getInstance();
         for (List<Object> objectList : list) {
             int j=i++;
@@ -85,38 +87,57 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                 throw new MessageException("请填写第"+j+"行数据的业务平台号");
             }
             if (StringUtils.isBlank(String.valueOf(objectList.get(2)))) {
-                logger.info("销账类型为空:{}", String.valueOf(objectList.get(2)));
-                throw new MessageException("请填写第"+j+"行数据的销账类型");
+                logger.info("业务平台为空:{}", String.valueOf(objectList.get(2)));
+                throw new MessageException("请填写第"+j+"行数据的业务平台");
             }
             if (StringUtils.isBlank(String.valueOf(objectList.get(3)))) {
-                logger.info("销账金额为空:{}", String.valueOf(objectList.get(3)));
+                logger.info("销账类型为空:{}", String.valueOf(objectList.get(3)));
+                throw new MessageException("请填写第"+j+"行数据的销账类型");
+            }
+            if (StringUtils.isBlank(String.valueOf(objectList.get(4)))) {
+                logger.info("销账金额为空:{}", String.valueOf(objectList.get(4)));
                 throw new MessageException("请填写第"+j+"行数据的销账金额");
             }
-            ORemoveAccount oRemoveAccount = new ORemoveAccount();
-            oRemoveAccount.setId(idService.genId(TabId.O_REMOVE_ACCOUNT));
-            oRemoveAccount.setSubmitPerson(userid);
-            //查询代理商id和name
-            AgentExample agentExample = new AgentExample();
-            AgentExample.Criteria criteria = agentExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andAgUniqNumEqualTo(String.valueOf(objectList.get(0)));
-            List<Agent> agentList = agentMapper.selectByExample(agentExample);
-            if (null!=agentList && agentList.size()>0){
-                agent= agentList.get(0);
-                if(null!=agent.getId()){
-                    oRemoveAccount.setAgId(agent.getId());
-                }
-                oRemoveAccount.setAgName(agent.getAgName());
-            }else{
-                logger.info("查无第"+j+"行代理商:"+String.valueOf(objectList.get(0)));
-                throw new MessageException("查无第"+j+"行代理商:"+String.valueOf(objectList.get(0)));
+            if (isInteger(String.valueOf(objectList.get(4)))==false){
+                logger.info("请检查第"+j+"行数据的销账金额的正确性");
+                throw new MessageException("请检查第"+j+"行数据的销账金额的正确性");
             }
-            oRemoveAccount.setBusNum(String.valueOf(objectList.get(1)));//O码
-            if (String.valueOf(objectList.get(2)).equals(RemoveAccotunMethod.XXDK.msg)){
-                oRemoveAccount.setPayMethod(RemoveAccotunMethod.XXDK.code);//销账类型
-            }else if (String.valueOf(objectList.get(2)).equals(RemoveAccotunMethod.FRDK.msg)){
-                oRemoveAccount.setPayMethod(RemoveAccotunMethod.FRDK.code);//销账类型
+            ORemoveAccount oRemoveAccount = new ORemoveAccount();
+            //开始校验ag码 业务平台号是否有效
+            AgentExample agent_Example= new AgentExample();
+            AgentExample.Criteria criteria1 = agent_Example.createCriteria().andIdEqualTo(String.valueOf(objectList.get(0))).andStatusEqualTo(Status.STATUS_1.status);
+            List<Agent> agentList = agentMapper.selectByExample(agent_Example);
+            if (null==agentList || agentList.size()==0){
+                logger.info("请检查第"+j+"行数据的代理商唯一码的正确性");
+                throw new MessageException("请检查第"+j+"行数据的代理商唯一码的正确性");
+            }else{
+                Agent agent= agentList.get(0);
+                oRemoveAccount.setAgId(agent.getId());
+                oRemoveAccount.setAgName(agent.getAgName());
             }
 
-            String amount = String.valueOf(objectList.get(3));
+            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+            agentBusInfoExample.createCriteria().andBusNumEqualTo(String.valueOf(objectList.get(1))).andBusPlatformEqualTo(String.valueOf(objectList.get(2)))
+                    .andStatusEqualTo(Status.STATUS_1.status).andBusStatusEqualTo(Status.STATUS_1.status);
+            List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+            if(null==agentBusInfoList || agentBusInfoList.size()==0){
+                logger.info("请检查第"+j+"行数据的业务平台号或者业务平台的正确性");
+                throw new MessageException("请检查第"+j+"行数据的业务平台号或者业务平台的正确性");
+            }
+            oRemoveAccount.setId(idService.genId(TabId.O_REMOVE_ACCOUNT));
+            oRemoveAccount.setSubmitPerson(userid);
+            oRemoveAccount.setBusNum(String.valueOf(objectList.get(1)));//O码
+            oRemoveAccount.setBusPlatform(String.valueOf(objectList.get(2)));//业务平台
+            if (String.valueOf(objectList.get(3)).equals(RemoveAccotunMethod.XXDK.msg)){
+                oRemoveAccount.setPayMethod(RemoveAccotunMethod.XXDK.code);//销账类型
+            }else if (String.valueOf(objectList.get(3)).equals(RemoveAccotunMethod.FRDK.msg)){
+                oRemoveAccount.setPayMethod(RemoveAccotunMethod.FRDK.code);//销账类型
+            }else{
+                logger.info("请检查第"+j+"行数据的销账类型(填写线下打款 或者 分润抵扣)");
+                throw new MessageException("请检查第"+j+"行数据的销账类型(填写线下打款 或者 分润抵扣)");
+            }
+
+            String amount = String.valueOf(objectList.get(4));
             oRemoveAccount.setRamount((new BigDecimal(amount)));//销账金额
             oRemoveAccount.setSubmitTime(Calendar.getInstance().getTime());
             oRemoveAccount.setRstatus(RemoveAccountStatus.WCL.code);//销账状态
@@ -412,5 +433,10 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
         pageInfo.setTotal(oRemoveAccountMapper.orderDetailCount(param));
         pageInfo.setRows(maps);
         return pageInfo;
+    }
+
+    public static boolean isInteger(String str) {
+        Pattern pattern = Pattern.compile("^[-\\+]?[\\d]*$");
+        return pattern.matcher(str).matches();
     }
 }
