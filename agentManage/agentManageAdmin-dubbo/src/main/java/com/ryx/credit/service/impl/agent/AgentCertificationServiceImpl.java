@@ -167,7 +167,9 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
     public AgentResult processData(Agent agent,String id,String orgId) {
         agent = agentMapper.selectByAgent(agent);
         AgentCertification agentCertification = agentCertificationMapper.selectByPrimaryKey(id);
-        if(agent==null)return AgentResult.fail("工商认证代理商未找到"+agent.getId());
+        if(agent==null){
+            return new AgentResult(404,"工商认证代理商未找到"+agent.getId(),"");
+        }
         agentCertification = copyOrgAgentToCertifi(agent,agentCertification);
         agentCertification.setOrgCerId(orgId);
         //处理代理名称去掉前缀和括号后的信息
@@ -201,10 +203,14 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
             }else if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("openTo"))){
                 agent.setAgBusLice(DateUtil.format(dataObj.getString("openTo"),"yyyy-MM-dd"));
             }
-            agent.setAgLegal(dataObj.getString("frName"));//法人姓名
-            agent.setAgRegAdd(dataObj.getString("address"));//注册地址
+            if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("frName")))
+                agent.setAgLegal(dataObj.getString("frName"));//法人姓名
+            if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("address")))
+                agent.setAgRegAdd(dataObj.getString("address"));//注册地址
+            if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("operateScope")))
             agent.setAgBusScope(dataObj.getString("operateScope"));//经营范围
-            agent.setAgBusLic(dataObj.getString("creditCode"));//营业执照
+                if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("creditCode")))
+                    agent.setAgBusLic(dataObj.getString("creditCode"));//营业执照
             //如果负责人没有，采用工商认证后的法人
             if(StringUtils.isBlank(agent.getAgHead())){
                 agent.setAgHead(agent.getAgLegal());
