@@ -398,6 +398,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 listCanChangePlat = listCanChange.stream().map(item -> {
                     return item.getdItemvalue();
                 }).collect(Collectors.toList());
+                listCanChangePlat.add(oldActivity.getPlatform());
                 //可选的平台代码
                 par.putKeyV("listCanChangePlat", listCanChangePlat);
             //如果没有配置跨平台信息，就采用历史活动的平台
