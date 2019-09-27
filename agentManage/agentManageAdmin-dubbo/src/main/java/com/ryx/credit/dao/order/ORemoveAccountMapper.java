@@ -29,4 +29,8 @@ public interface ORemoveAccountMapper {
     List<Map<String,Object>> rAccountDetailList(Map<String, Object> param);
 
     List<String> queryRaccountByStatus(FastMap fastMap);
+
+    List<Map<String,Object>> orderDetailList(Map<String, Object> param);
+
+    int orderDetailCount(Map<String, Object> param);
 }

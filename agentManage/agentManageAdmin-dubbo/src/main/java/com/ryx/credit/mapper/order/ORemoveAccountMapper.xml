@@ -438,4 +438,38 @@
     select a.id from O_REMOVE_ACCOUNT a where a.status=1
     and a.RSTATUS = #{rStatus,jdbcType=DECIMAL}
   </select>
+
+
+  <!--订单明细列表-->
+  <select id="orderDetailList" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="PAGING_START" />
+    select op.DOWN_PAYMENT_COUNT,o.C_TIME ,ag.AG_UNIQ_NUM,plat.platform_name,
+    to_char(o_payment_detail.plan_pay_time,'yyyy-mm')  rmonth,
+    o_payment_detail.Payment_status ,o_payment_detail.plan_num ,
+    o_payment_detail.pay_amount ,o_payment_detail.order_id ,o_payment_detail.src_id,
+    ra.AG_NAME ,ra.id,ra.AG_ID,
+    ra.BUS_PLATFORM,ra.BUS_NUM, ra.RAMOUNT,ra.REAL_RAMOUNT,
+    ra.PAY_METHOD
+    from O_PAYMENT_DETAIL left join O_REMOVE_ACCOUNT ra
+    on ra.id=o_payment_detail.src_id
+    left join  O_PAYMENT op on O_PAYMENT_DETAIL.PAYMENT_ID=op.id
+    left join a_agent ag on ag.id=ra.ag_id
+    left join a_platform plat ON plat.platform_num = ra.bus_platform
+    left join o_order o on o.id=o_payment_detail.order_id
+    where o_payment_detail.Payment_status in(4,6)
+    <include refid="RACCOUNTDETAIL_WHERE_SQL"/>
+    <include refid="PAGING_END" />
+  </select>
+
+  <select id="orderDetailCount" parameterType="java.util.Map" resultType="int">
+    select count(1)
+    from O_PAYMENT_DETAIL left join O_REMOVE_ACCOUNT ra
+    on ra.id=o_payment_detail.src_id
+    left join  O_PAYMENT op on O_PAYMENT_DETAIL.PAYMENT_ID=op.id
+    left join a_agent ag on ag.id=ra.ag_id
+    left join a_platform plat ON plat.platform_num = ra.bus_platform
+    left join o_order o on o.id=o_payment_detail.order_id
+    where o_payment_detail.Payment_status in(4,6)
+    <include refid="RACCOUNTDETAIL_WHERE_SQL"/>
+  </select>
 </mapper>
