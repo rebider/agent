@@ -371,4 +371,8 @@
           O.ID = #{orderId}
   </select>
 
+  <!-- 通过订单ID查询平台编码 -->
+  <select id="selectPlatformNumByPlatformType" resultType="string" parameterType="string">
+      SELECT PLATFORM_NUM FROM A_PLATFORM WHERE PLATFORM_TYPE=#{platformType}
+  </select>
 </mapper>

@@ -481,6 +481,11 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             agent.setId(agentVo.getAgentId());
             //先查询业务是否已添加 有个添加过 全部返回
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
+                //校验实时分润不能升级
+                List platformList = platFormMapper.selectPlatformNumByPlatformType(item.getBusPlatformType());
+                boolean checkBusPlatform = platformList.contains(item.getBusPlatform()) && (null != item.getBusNum());
+                if (checkBusPlatform) throw new ProcessException("实时分润品牌暂不支持升级！");
+
                 if (StringUtils.isBlank(item.getBusPlatform())) {
                     throw new ProcessException("业务平台不能为空");
                 }
