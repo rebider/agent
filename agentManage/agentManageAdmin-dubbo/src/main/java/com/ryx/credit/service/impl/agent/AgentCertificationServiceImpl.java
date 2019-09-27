@@ -169,10 +169,11 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
         AgentCertification agentCertification = agentCertificationMapper.selectByPrimaryKey(id);
         if(agent==null){
             orgagent.setCaStatus(Status.STATUS_0.status);
-            agentMapper.updateByPrimaryKeySelective(orgagent);
             agentCertification.setCerProStat(Status.STATUS_2.status);
             agentCertification.setCerRes(Status.STATUS_0.status);
-            agentCertificationMapper.updateByPrimaryKeySelective(agentCertification);
+            if(1==agentMapper.updateByPrimaryKeySelective(orgagent) && 1 == agentCertificationMapper.updateByPrimaryKeySelective(agentCertification)){
+                logger.info("认证代理商不存在，认证代理商{}状态为{},不进行信息同步",orgagent.getAgUniqNum(),orgagent.getCaStatus());
+            }
             return new AgentResult(404,"工商认证代理商未找到"+agent.getId(),"");
         }
         agentCertification = copyOrgAgentToCertifi(agent,agentCertification);
