@@ -43,8 +43,7 @@ public interface PlatFormMapper {
 
     /**
      * 查询SSPOS
-     * @param platformType
      * @return
      */
-    List selectPlatformNumByPlatformType(String platformType);
+    List<String> selectPlatformNumByPlatformType();
 }
