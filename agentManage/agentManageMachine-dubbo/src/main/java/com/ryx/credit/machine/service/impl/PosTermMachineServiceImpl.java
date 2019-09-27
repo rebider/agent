@@ -344,13 +344,13 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
     public AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception{
         JSONObject data = new JSONObject();
         data.put("serialNumber", serialNumber);
-        log.info("終端划拨调整结果查询返回：{},{}",serialNumber);
+        log.info("活动调整结果查询返回：{},{}",serialNumber);
         AgentResult agentResult = request("ORG017", data);
-        log.info("終端划拨调整结果查询返回：{},{}",serialNumber,agentResult);
+        log.info("活动调整结果查询返回：{},{}",serialNumber,agentResult);
         if(agentResult.isOK()){
-            Object resmsg = agentResult.getData();
+            String resmsg = agentResult.getMsg();
             if(resmsg!=null) {
-                JSONObject res_obj = (JSONObject) resmsg;
+                JSONObject res_obj = JSONObject.parseObject(resmsg) ;
                 JSONObject res  = res_obj.getJSONObject("data");
                 String result_code = res.getString("result_code");
                 String snAdjStatus = res.getString("transferStatus");
@@ -367,7 +367,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
                 }else if(serialNumber.equals(serialNumber_res) && "02".equals(snAdjStatus) && "000000".equals(result_code)) {
                     //调整失败
                     log.info("活动调整失败:{} {}",serialNumber,platformType);
-                    return AgentResult.build(AgentResult.OK,resMsg,"02");
+                    return AgentResult.ok("02");
                 }else{
                     //未知结果
                     return AgentResult.ok("03");
