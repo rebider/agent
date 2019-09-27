@@ -24,7 +24,7 @@ public interface ORemoveAccountMapper {
 
     int updateByPrimaryKey(ORemoveAccount record);
 
-    Long rAccountDetailCount(Map<String, Object> param);
+    int rAccountDetailCount(Map<String, Object> param);
 
     List<Map<String,Object>> rAccountDetailList(Map<String, Object> param);
 
