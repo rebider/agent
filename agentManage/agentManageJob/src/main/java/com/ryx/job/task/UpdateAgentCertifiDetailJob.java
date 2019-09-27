@@ -71,16 +71,12 @@ public class UpdateAgentCertifiDetailJob implements DataflowJob<AgentCertificati
                 if (null!=agentCertification)
                     orgCerId=agentCertification.getId();
                 AgentResult agentResult = agentCertificationService.processData(agent, cer.getId(),orgCerId);
-                if (400==agentResult.getStatus()){
-                    cer.setCerProStat(Status.STATUS_2.status);
-                    cer.setCerRes(Status.STATUS_0.status);
+                if (404==agentResult.getStatus()){
                     logger.info("{}代理商信息不存在，认证查询无记录!",cer.getOrgAgName());
                 }else if (200!=agentResult.getStatus()){
-                    cer.setCerProStat(Status.STATUS_2.status);
-                    cer.setCerRes(Status.STATUS_1.status);
                     logger.info("{}代理商信息认证失败!",cer.getOrgAgName());
                 }
-                agentCertificationService.updateCertifi(cer);
+
             }catch (Exception e){
                 logger.error(e.toString());
                 cer.setCerProStat(Status.STATUS_3.status);
