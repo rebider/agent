@@ -15,10 +15,7 @@ import com.ryx.credit.dao.order.OActivityVisibleMapper;
 import com.ryx.credit.dao.order.OProductMapper;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.TermMachineVo;
-import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
-import com.ryx.credit.pojo.admin.agent.Dict;
-import com.ryx.credit.pojo.admin.agent.PlatForm;
-import com.ryx.credit.pojo.admin.agent.PlatFormExample;
+import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.profit.service.ProfitMonthService;
 import com.ryx.credit.service.dict.DictOptionsService;
@@ -34,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by RYX on 2018/7/13.
@@ -387,36 +385,45 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         Date date = new Date();
         FastMap par = FastMap.fastMap("beginTime", date)
                              .putKeyV("endTime", date);
-
-        OProduct productObj = oProductMapper.selectByPrimaryKey(product);
         ArrayList<Object> productIdList = new ArrayList<>();
-        productIdList.add(productObj.getId());
+        //如果有历史订单，说明是换互动进行跨平台活动查询
         if (StringUtils.isNotBlank(oldActivityId)) {
             //如果变更活动传递老活动，排除老的活动代码并匹配 相同的厂商和型号。
             OActivity oldActivity = activityMapper.selectByPrimaryKey(oldActivityId);
-            par.putKeyV("notEqActcode", oldActivity.getActCode()).putKeyV("vender", oldActivity.getVender()).putKeyV("proModel", oldActivity.getProModel());
-            //查询可扩展的机具类型
-            List<Dict> changeType = dictOptionsService.findDictListByName(DictGroup.ORDER.name(), DictGroup.COMPENSATE_MODEL_TYPE.name(), productObj.getProType());
-            if(changeType!=null){
-                for (Dict dict : changeType) {
-                    OProductExample oProductExample = new OProductExample();
-                    OProductExample.Criteria criteria = oProductExample.createCriteria();
-                    criteria.andStatusEqualTo(Status.STATUS_1.status);
-                    criteria.andProTypeEqualTo(dict.getdItemvalue());
-                    List<OProduct> products = oProductMapper.selectByExample(oProductExample);
-                    for (OProduct oProduct : products) {
-                        productIdList.add(oProduct.getId());
-                    }
-                }
+            //源平台可跨平台变更的平台
+            List<Dict> listCanChange =  dictOptionsService.dictList(DictGroup.COMPENSATE_PLATFORM_TYPE.name(),oldActivity.getPlatform());
+            //可选的平台活动
+            List<String>  listCanChangePlat =new ArrayList<>();
+            if(listCanChange.size()>0) {
+                listCanChangePlat = listCanChange.stream().map(item -> {
+                    return item.getdItemvalue();
+                }).collect(Collectors.toList());
+                //可选的平台代码
+                par.putKeyV("listCanChangePlat", listCanChangePlat);
+            //如果没有配置跨平台信息，就采用历史活动的平台
+            }else{
+                listCanChangePlat.add(oldActivity.getPlatform());
+                par.putKeyV("listCanChangePlat", listCanChangePlat);
             }
+            //活动代码不等于老的活动代码
+            par.putKeyV("notEqActcode", oldActivity.getActCode())
+                    //变更的活动的厂商要等于原有老活动的厂商
+                    .putKeyV("vender", oldActivity.getVender())
+                    //变更的活动的机型要等于原有老活动的机型
+                    .putKeyV("proModel", oldActivity.getProModel());
+        //如果没有历史订单，根据商品来查询活动
+        }else{
+            //商品
+            OProduct productObj = oProductMapper.selectByPrimaryKey(product);
+            productIdList.add(product);
+            par.putKeyV("productIdList", productIdList);
         }
-        par.putKeyV("productIdList", productIdList);
+        //业务id
         if (StringUtils.isNotBlank(orderAgentBusifo) && !"null".equals(orderAgentBusifo)) {
             //查询平台活动
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(orderAgentBusifo);
             par.putKeyV("platform", agentBusInfo.getBusPlatform());
         }
-
         List<Map<String, Object>> actList = activityMapper.productActivityOrderBuild(par);
         List<OActivity> activitys = new ArrayList<OActivity>();
         for (Map<String, Object> stringObjectMap : actList) {
@@ -427,6 +434,8 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             oActivity.setActCode(stringObjectMap.get("ACT_CODE") + "");
             oActivity.setOriginalPrice(new BigDecimal(stringObjectMap.get("ORIGINALPRICE") + ""));
             oActivity.setProductName(stringObjectMap.get("PRO_NAME")+"");
+
+            //查询活动是否可见
             OActivity activity = activityMapper.selectByPrimaryKey(oActivity.getId());
             if(StringUtils.isBlank(activity.getVisible())){
                 continue;
@@ -437,6 +446,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     continue;
                 }
             }
+
             activitys.add(oActivity);
         }
 
