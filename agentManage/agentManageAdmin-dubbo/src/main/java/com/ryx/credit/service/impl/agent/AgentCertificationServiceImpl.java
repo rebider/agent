@@ -164,10 +164,15 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
 
     @Override
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
-    public AgentResult processData(Agent agent,String id,String orgId) {
-        agent = agentMapper.selectByAgent(agent);
+    public AgentResult processData(Agent orgagent,String id,String orgId) {
+        Agent agent = agentMapper.selectByAgent(orgagent);
         AgentCertification agentCertification = agentCertificationMapper.selectByPrimaryKey(id);
         if(agent==null){
+            orgagent.setCaStatus(Status.STATUS_0.status);
+            agentMapper.updateByPrimaryKeySelective(orgagent);
+            agentCertification.setCerProStat(Status.STATUS_2.status);
+            agentCertification.setCerRes(Status.STATUS_0.status);
+            agentCertificationMapper.updateByPrimaryKeySelective(agentCertification);
             return new AgentResult(404,"工商认证代理商未找到"+agent.getId(),"");
         }
         agentCertification = copyOrgAgentToCertifi(agent,agentCertification);
@@ -238,6 +243,7 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
             //工商认证失败
             agent.setCaStatus(Status.STATUS_2.status);
             agentCertification.setCerProStat(Status.STATUS_3.status);
+            agentCertification.setCerRes(Status.STATUS_2.status);
             if(1==agentMapper.updateByPrimaryKeySelective(agent) && 1 == agentCertificationMapper.updateByPrimaryKeySelective(agentCertification)){
                 logger.info("工商认证失败"+agent.getId());
             }
