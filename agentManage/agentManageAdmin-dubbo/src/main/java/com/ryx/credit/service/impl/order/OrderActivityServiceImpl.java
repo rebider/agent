@@ -414,7 +414,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         //如果没有历史订单，根据商品来查询活动
         }else{
             //商品
-            OProduct productObj = oProductMapper.selectByPrimaryKey(product);
+            //OProduct productObj = oProductMapper.selectByPrimaryKey(product);
             productIdList.add(product);
             par.putKeyV("productIdList", productIdList);
         }
