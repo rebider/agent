@@ -206,8 +206,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             //代理商业务
             for (AgentBusInfo item : agentVo.getBusInfoVoList()) {
                 //校验实时分润不能升级
-                List platformList = platFormMapper.selectPlatformNumByPlatformType(item.getBusPlatformType());
-                boolean checkBusPlatform = platformList.contains(item.getBusPlatform()) && (null != item.getBusNum());
+                List platformList = platFormMapper.selectPlatformNumByPlatformType();
+                boolean checkBusPlatform = platformList.contains(item.getBusPlatform()) && (null != item.getBusNum() || "" != item.getBusNum());
                 if (checkBusPlatform) throw new ProcessException("实时分润品牌暂不支持升级！");
             }
             for (AgentContractVo item : agentVo.getContractVoList()) {
