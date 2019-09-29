@@ -291,7 +291,7 @@ public class OldCompensateServiceImpl implements OldCompensateService {
             for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {
 
                 if(StringUtils.isBlank(refundPriceDiffDetail.getOldOrgId())){
-                    throw new MessageException("源机构编号不能为空");
+                    throw new MessageException("原机构编号不能为空");
                 }
                 if(StringUtils.isBlank(refundPriceDiffDetail.getNewOrgId())){
                     throw new MessageException("目标机构编号不能为空");
