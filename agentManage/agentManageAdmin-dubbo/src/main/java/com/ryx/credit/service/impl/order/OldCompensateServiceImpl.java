@@ -302,6 +302,15 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 if(StringUtils.isBlank(refundPriceDiffDetail.getActivityRealId())){
                     throw new MessageException("请选择要变更的活动");
                 }
+                if(StringUtils.isBlank(refundPriceDiffDetail.getBeginSn())){
+                    throw new MessageException("起始SN为空");
+                }if(StringUtils.isBlank(refundPriceDiffDetail.getEndSn())){
+                    throw new MessageException("结束SN为空");
+                }
+
+                //TODO 校验是否有审批中的活动变更
+
+
                 OActivity oldActivity = activityMapper.selectByPrimaryKey(refundPriceDiffDetail.getActivityFrontId());
                 if(oldActivity==null){
                     throw new MessageException("旧活动不存在");
