@@ -638,10 +638,18 @@ public class CompensateServiceImpl implements CompensateService {
         record.setAgentId(oRefundPriceDiff.getAgentId());
         record.setDataShiro(BusActRelBusType.COMPENSATE.key);
         List<Map<String, Object>> maps = iUserService.orgCode(Long.valueOf(cuser));
-        if(maps!=null){
+        if(maps!=null && maps.size()>0){
             Map<String, Object> stringObjectMap = maps.get(0);
             record.setAgDocPro(stringObjectMap.get("ORGID")+"");
+            if(null!=stringObjectMap.get("isRegion") && (Boolean)stringObjectMap.get("isRegion"))
             record.setAgDocDistrict(stringObjectMap.get("ORGPID")+"");
+            if(null!=stringObjectMap.get("ppidorgcodeisRegion") && (Boolean)stringObjectMap.get("ppidorgcodeisRegion"))
+                record.setAgDocDistrict(stringObjectMap.get("ORGPPID")+"");
+        }else{
+            throw new MessageException("未获取到部门编号!");
+        }
+        if(StringUtils.isBlank(record.getAgDocDistrict())){
+            throw new MessageException("未获取到部门编号!");
         }
         Agent agent = agentMapper.selectByPrimaryKey(oRefundPriceDiff.getAgentId());
         if(null!=agent)

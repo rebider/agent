@@ -139,6 +139,7 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
             return Arrays.asList();
         }
         for (Map<String, Object> stringObjectMap : cUserOrgCodelist) {
+            //上级编号
             String pidorgcode = String.valueOf(stringObjectMap.get("PIDORGCODE"));
             if(StringUtils.isNotBlank(pidorgcode) && !pidorgcode.equals("null")){
                 //针对多级省区优化
@@ -150,6 +151,21 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
                         stringObjectMap.put("isRegion",true);
                     }else{
                         stringObjectMap.put("isRegion",false);
+                    }
+                }
+            }
+            //上上级编号
+            String ppidorgcode = String.valueOf(stringObjectMap.get("ppidOrgCode"));
+            if(StringUtils.isNotBlank(ppidorgcode) && !ppidorgcode.equals("null")){
+                //针对多级省区优化
+                boolean ppidorgcodeisRegion = Pattern.matches("region_[a-zA-Z]{1,5}", ppidorgcode);
+                if(ppidorgcodeisRegion){
+                    stringObjectMap.put("ppidorgcodeisRegion",true);
+                }else {
+                    if("beijing".equals(ppidorgcode)){
+                        stringObjectMap.put("ppidisRegion",true);
+                    }else{
+                        stringObjectMap.put("ppidisRegion",false);
                     }
                 }
             }
