@@ -52,6 +52,11 @@ public class PmsProfit implements Serializable {
 
     private BigDecimal orderNumber;
 
+    private String queryField;// 查询条件
+
+    private String profitAmt;// 分润金额
+
+
     public String getId() {
         return id;
     }
@@ -242,5 +247,21 @@ public class PmsProfit implements Serializable {
 
     public void setOrderNumber(BigDecimal orderNumber) {
         this.orderNumber = orderNumber;
+    }
+
+    public String getQueryField() {
+        return queryField;
+    }
+
+    public void setQueryField(String queryField) {
+        this.queryField = queryField;
+    }
+
+    public String getProfitAmt() {
+        return profitAmt;
+    }
+
+    public void setProfitAmt(String profitAmt) {
+        this.profitAmt = profitAmt;
     }
 }
