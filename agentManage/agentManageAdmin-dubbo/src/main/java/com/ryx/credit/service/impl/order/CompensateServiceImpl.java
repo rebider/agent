@@ -473,6 +473,23 @@ public class CompensateServiceImpl implements CompensateService {
                     log.info("查询oActivity异常");
                     throw new ProcessException("保存失败");
                 }
+                //TODO 校验是否有审批中的活动变更
+                ORefundPriceDiffDetailExample example = new ORefundPriceDiffDetailExample();
+                example.or()
+                        .andBeginSnBetween(refundPriceDiffDetail.getBeginSn(),refundPriceDiffDetail.getEndSn())
+                        .andStatusEqualTo(Status.STATUS_1.status);
+                example.or() .andEndSnBetween(refundPriceDiffDetail.getBeginSn(),refundPriceDiffDetail.getEndSn())
+                        .andStatusEqualTo(Status.STATUS_1.status);
+                List<ORefundPriceDiffDetail> listDetail = refundPriceDiffDetailMapper.selectByExample(example);
+                if(listDetail.size()>0){
+                    for (ORefundPriceDiffDetail detail : listDetail) {
+                        ORefundPriceDiff diff = refundPriceDiffMapper.selectByPrimaryKey(detail.getRefundPriceDiffId());
+                        if(AgStatus.Approving.status.compareTo(diff.getReviewStatus())==0){
+                            throw new ProcessException(detail.getBeginSn()+"-"+detail.getEndSn()+"活动调整正在审批中");
+                        }
+                    }
+                }
+
                 refundPriceDiffDetail.setId(idService.genId(TabId.o_Refund_price_diff_d));
                 refundPriceDiffDetail.setRefundPriceDiffId(priceDiffId);
                 refundPriceDiffDetail.setFrontPrice(logisticsDetail!=null?new BigDecimal(logisticsDetail.get("SETTLEMENT_PRICE").toString()):new BigDecimal(0));
