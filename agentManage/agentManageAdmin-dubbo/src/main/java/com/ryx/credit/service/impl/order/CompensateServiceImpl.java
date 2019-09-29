@@ -348,6 +348,9 @@ public class CompensateServiceImpl implements CompensateService {
                 if(refundPriceDiffFile.size()==0){
                     return AgentResult.fail("代理商打款必须上传打款凭证");
                 }
+                if(oCashReceivablesVoList==null || oCashReceivablesVoList.size()==0){
+                    return AgentResult.fail("代理商打款必须填写打款记录");
+                }
             }
             String priceDiffId = idService.genId(TabId.o_Refund_price_diff);
             oRefundPriceDiff.setId(priceDiffId);
@@ -410,6 +413,7 @@ public class CompensateServiceImpl implements CompensateService {
             }
 
             refundPriceDiffDetailList.forEach(refundPriceDiffDetail->{
+
                 Map<String, Object> logisticsDetail = null;
                 if(StringUtils.isNotBlank(refundPriceDiffDetail.getActivityFrontId()) && !refundPriceDiffDetail.getActivityFrontId().equals("undefined")){
                     Map<String, Object> reqParam = new HashMap<>();
@@ -430,6 +434,29 @@ public class CompensateServiceImpl implements CompensateService {
                         throw new ProcessException("保存失败");
                     }
                     logisticsDetail = oLogisticsDetails.get(0);
+
+                    OActivity oldActivity = activityMapper.selectByPrimaryKey(refundPriceDiffDetail.getActivityFrontId());
+                    if(oldActivity==null){
+                        throw new ProcessException("旧活动不存在");
+                    }
+                    OActivity newActivity = activityMapper.selectByPrimaryKey(refundPriceDiffDetail.getActivityRealId());
+                    if(newActivity==null){
+                        throw new ProcessException("新活动不存在");
+                    }
+                    //检查目标活动和代理商平台码是否一致
+                    if(oldActivity.getPlatform().equals(newActivity.getPlatform())){
+                        //活动没有跨平台，平台号也不允许跨平台
+                        if(!refundPriceDiffDetail.getNewOrgId().equals(refundPriceDiffDetail.getOldOrgId())) {
+                            throw new ProcessException("原平台编号与目标平台编号不一致");
+                        }
+                    }
+                    //检查目标活动和代理商平台码是否一致
+                    if(refundPriceDiffDetail.getNewOrgId().equals(refundPriceDiffDetail.getOldOrgId())){
+                        //平台号没有跨平台，活动也不允许跨平台
+                        if(!oldActivity.getPlatform().equals(newActivity.getPlatform())) {
+                            throw new ProcessException("目标平台编号与调整活动平台不匹配");
+                        }
+                    }
                 }
                 if(StringUtils.isBlank(refundPriceDiffDetail.getActivityRealId())){
                     throw new ProcessException("请选择活动");
