@@ -249,7 +249,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 				//实时分润不能升级
 				List platformList = platFormMapper.selectPlatformNumByPlatformType();
-				boolean checkBusPlatform = platformList.contains(agentBusInfoVo.getBusPlatform()) && (null != agentBusInfoVo.getBusNum() || "" != agentBusInfoVo.getBusNum());
+				boolean checkBusPlatform = platformList.contains(agentBusInfoVo.getBusPlatform()) && (null != agentBusInfoVo.getBusNum() && !"".equals(agentBusInfoVo.getBusNum()));
 				if (checkBusPlatform) throw new ProcessException("实时分润品牌暂不支持升级！");
 
 				if(!"1".equals(saveStatus)){
