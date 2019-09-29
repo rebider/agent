@@ -28,6 +28,6 @@ public interface PmsProfitLogMapper {
 
     Map<String,Object> checkoutData(@Param("agentId")  String agentId ,@Param("busCode") String busCode);
 
-
+    Map<String,Object> getLoginName(@Param("userId")  String userId );
 
 }

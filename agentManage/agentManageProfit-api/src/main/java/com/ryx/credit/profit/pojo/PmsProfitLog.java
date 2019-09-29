@@ -17,6 +17,8 @@ public class PmsProfitLog implements Serializable {
 
     private String uploadUser;
 
+    private String statusName;
+
     private String status;
 
     private String note;
@@ -102,4 +104,6 @@ public class PmsProfitLog implements Serializable {
     public void setMonth(String month) {
         this.month = month == null ? null : month.trim();
     }
+
+
 }

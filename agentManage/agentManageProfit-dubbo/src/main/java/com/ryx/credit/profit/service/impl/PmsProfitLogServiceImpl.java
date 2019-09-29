@@ -56,7 +56,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
 
     @Override
     public PmsProfitLog selectByPrimaryKey(String batchNo) {
-        return selectByPrimaryKey(batchNo);
+        return pmsProfitLogMapper.selectByPrimaryKey(batchNo);
     }
 
     @Override
@@ -115,7 +115,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
             criteria.andBatchNoEqualTo(example.getBatchNo());
         }
         if (StringUtils.isNotBlank(example.getUploadTime())) {
-            criteria.andBatchNoEqualTo(example.getUploadTime());
+            criteria.andUploadTimeEqualTo(example.getUploadTime());
         }
         if (StringUtils.isNotBlank(example.getMonth())) {
             criteria.andMonthEqualTo(example.getMonth());
@@ -127,6 +127,11 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
         pmsProfitLogExample.setPage(page);
 
         List<PmsProfitLog> pmsProfitLogs = pmsProfitLogMapper.selectByExample(pmsProfitLogExample);
+        for (PmsProfitLog pmsProfitLog:pmsProfitLogs ) {
+            Map<String,Object> map = pmsProfitLogMapper.getLoginName(pmsProfitLog.getUploadUser());
+            pmsProfitLog.setUploadUser(map.get("NAME").toString());
+        }
+
         Long count = pmsProfitLogMapper.countByExample(pmsProfitLogExample);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(pmsProfitLogs);
