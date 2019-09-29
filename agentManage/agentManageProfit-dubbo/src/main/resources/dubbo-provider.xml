@@ -73,4 +73,11 @@
 
     <dubbo:reference interface="com.ryx.credit.service.dict.DictOptionsService" id="dictOptionsService"  timeout="1200000" registry="myGroup"/>
 
+
+
+
+ <!--profit-->
+ <dubbo:service interface="com.ryx.credit.profit.service.IPmsProfitLogService" ref="pmsProfitLogService"  timeout="1200000" registry="myGroup"/>
+
+
 </beans>
