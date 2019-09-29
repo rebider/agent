@@ -7,6 +7,7 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtil;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -1435,13 +1436,26 @@ public class CompensateServiceImpl implements CompensateService {
 
     @Override
     public PageInfo compensateDetailList(ORefundPriceDiffDetail refundPriceDiffDetail, Page page, String dataRole,long userId){
-
         ORefundPriceDiffDetailExample refundPriceDiffDetailExample = new ORefundPriceDiffDetailExample();
         ORefundPriceDiffDetailExample.Criteria criteria = refundPriceDiffDetailExample.createCriteria();
-        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        if(StringUtils.isNotBlank(refundPriceDiffDetail.getAgentId())){
+            criteria.andAgentIdEqualTo(refundPriceDiffDetail.getAgentId());
+        }
+        if(StringUtils.isNotBlank(refundPriceDiffDetail.getRefundPriceDiffId())){
+            criteria.andRefundPriceDiffIdEqualTo(refundPriceDiffDetail.getRefundPriceDiffId());
+        }
 
+        FastMap par = FastMap.fastSuccessMap();
+        if(StringUtils.isNotBlank(refundPriceDiffDetail.getAgentId())){
+            par.putKeyV("agentId",refundPriceDiffDetail.getAgentId());
+        }
+        if(StringUtils.isNotBlank(refundPriceDiffDetail.getRefundPriceDiffId())){
+            par.putKeyV("refundPriceDiffId",refundPriceDiffDetail.getRefundPriceDiffId());
+        }
+        par.putKeyV("page",page);
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
         refundPriceDiffDetailExample.setPage(page);
-        List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(refundPriceDiffDetailExample);
+        List<Map> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExampleExtends(par,page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(oRefundPriceDiffDetails);
         pageInfo.setTotal((int)refundPriceDiffDetailMapper.countByExample(refundPriceDiffDetailExample));
