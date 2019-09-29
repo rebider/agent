@@ -455,7 +455,7 @@ public class CompensateServiceImpl implements CompensateService {
                     if(refundPriceDiffDetail.getNewOrgId().equals(refundPriceDiffDetail.getOldOrgId())){
                         //平台号没有跨平台，活动也不允许跨平台
                         if(!oldActivity.getPlatform().equals(newActivity.getPlatform())) {
-                            throw new ProcessException("目标平台编号与调整活动平台不匹配");
+                            throw new ProcessException("平台编号与活动平台不匹配");
                         }
                     }
                 }

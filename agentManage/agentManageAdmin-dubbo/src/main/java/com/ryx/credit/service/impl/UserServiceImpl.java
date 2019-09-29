@@ -155,7 +155,7 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
                 }
             }
             //上上级编号
-            String ppidorgcode = String.valueOf(stringObjectMap.get("ppidOrgCode"));
+            String ppidorgcode = String.valueOf(stringObjectMap.get("PPIDORGCODE"));
             if(StringUtils.isNotBlank(ppidorgcode) && !ppidorgcode.equals("null")){
                 //针对多级省区优化
                 boolean ppidorgcodeisRegion = Pattern.matches("region_[a-zA-Z]{1,5}", ppidorgcode);
