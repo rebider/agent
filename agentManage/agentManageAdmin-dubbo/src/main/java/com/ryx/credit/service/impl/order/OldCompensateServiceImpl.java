@@ -481,7 +481,16 @@ public class OldCompensateServiceImpl implements OldCompensateService {
         if(maps!=null){
             Map<String, Object> stringObjectMap = maps.get(0);
             record.setAgDocPro(stringObjectMap.get("ORGID")+"");
-            record.setAgDocDistrict(stringObjectMap.get("ORGPID")+"");
+            if(null!=stringObjectMap.get("isRegion") && (Boolean)stringObjectMap.get("isRegion")) {
+                record.setAgDocDistrict(stringObjectMap.get("ORGPID") + "");
+            }else if(null!=stringObjectMap.get("ppidorgcodeisRegion") && (Boolean)stringObjectMap.get("ppidorgcodeisRegion")) {
+                record.setAgDocDistrict(stringObjectMap.get("ORGPPID") + "");
+            }
+        }else{
+            throw new MessageException("未获取到部门编号!");
+        }
+        if(StringUtils.isBlank(record.getAgDocDistrict())){
+            throw new MessageException("未获取到部门编号!");
         }
         Agent agent = agentMapper.selectByPrimaryKey(oRefundPriceDiff.getAgentId());
         if(null!=agent)
