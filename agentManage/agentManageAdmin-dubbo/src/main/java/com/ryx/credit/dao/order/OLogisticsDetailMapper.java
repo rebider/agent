@@ -40,4 +40,6 @@ public interface OLogisticsDetailMapper {
     List<OLogisticsDetail> queryHistoryOrder();
 
     List<OLogisticsDetail> querySnCountObj(Map<String, Object> param);
+
+    int updateByLogisticsId(OLogisticsDetail oLogisticsDetail);
 }

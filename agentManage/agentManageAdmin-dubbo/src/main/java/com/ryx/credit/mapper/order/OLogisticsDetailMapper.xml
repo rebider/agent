@@ -704,4 +704,19 @@
     <if test="agentId!=null and agentId!=''"> and AGENT_ID =#{agentId} </if>
   </select>
 
+  <update id="updateByLogisticsId" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
+    update O_LOGISTICS_DETAIL
+    <set>
+        <if test="orderId != null">
+        STATUS = #{status,jdbcType=VARCHAR},
+        </if>
+        <if test="sendStatus != null">
+        SEND_STATUS = #{sendStatus,jdbcType=DECIMAL},
+        </if>
+        <if test="sbusMsg != null">
+            SBUS_MSG = #{sbusMsg,jdbcType=DECIMAL},
+        </if>
+    </set>
+    where LOGISTICS_ID = #{logisticsId,jdbcType=VARCHAR}
+  </update>
 </mapper>
