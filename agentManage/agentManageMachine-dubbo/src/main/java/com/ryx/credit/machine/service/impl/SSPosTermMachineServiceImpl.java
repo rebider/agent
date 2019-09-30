@@ -422,4 +422,9 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
             throw e;
         }
     }
+
+    @Override
+    public boolean checkModleIsEq(Map<String, String> data, String platformType) {
+        return false;
+    }
 }
