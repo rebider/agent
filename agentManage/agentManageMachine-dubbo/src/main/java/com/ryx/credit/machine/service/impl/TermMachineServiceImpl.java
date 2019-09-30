@@ -226,4 +226,19 @@ public class TermMachineServiceImpl  implements TermMachineService {
         }
         return agentResult;
     }
+
+    @Override
+    public boolean checkModleIsEq(Map<String,String> data,String platformType) {
+        if(PlatformType.whetherPOS(platformType)){
+            return posTermMachineServiceImpl.checkModleIsEq(data,platformType);
+        }else if(PlatformType.SSPOS.getValue().equals(platformType)){
+            return false;
+        }else if(PlatformType.MPOS.getValue().equals(platformType)){
+            return false;
+        }else if(PlatformType.RDBPOS.getValue().equals(platformType)){
+            return false;
+        }else {
+            return false;
+        }
+    }
 }

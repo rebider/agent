@@ -281,4 +281,8 @@ public class MposTermMachineServiceImpl implements TermMachineService {
         return AgentResult.ok("04");
     }
 
+    @Override
+    public boolean checkModleIsEq(Map<String, String> data, String platformType) {
+        return false;
+    }
 }

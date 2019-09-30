@@ -210,4 +210,9 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
     public AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception {
         return AgentResult.ok("04");
     }
+
+    @Override
+    public boolean checkModleIsEq(Map<String, String> data, String platformType) {
+        return false;
+    }
 }
