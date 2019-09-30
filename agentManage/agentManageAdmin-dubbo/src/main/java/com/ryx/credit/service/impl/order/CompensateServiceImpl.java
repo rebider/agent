@@ -552,6 +552,14 @@ public class CompensateServiceImpl implements CompensateService {
                 refundPriceDiffDetail.setNewMachineId(new_oActivity.getBusProCode());
                 refundPriceDiffDetail.setOldMachineId(old_Activity.getBusProCode());
 
+                //校验活动是否支持调整
+                Map<String,String> par = new HashedMap();
+                par.put("oldMerid",refundPriceDiffDetail.getOldMachineId());
+                par.put("newMerId",refundPriceDiffDetail.getNewMachineId());
+                if(termMachineService.checkModleIsEq(par,refundPriceDiffDetail.getPlatformType())){
+                    throw new ProcessException(refundPriceDiffDetail.getBeginSn()+"--"+refundPriceDiffDetail.getEndSn()+":("+old_Activity.getActivityName()+")不支持互换("+new_oActivity.getActivityName()+")");
+                }
+
                 int priceDiffDetailInsert = refundPriceDiffDetailMapper.insert(refundPriceDiffDetail);
                 if(priceDiffDetailInsert!=1){
                     log.info("插入补退差价详情表异常");

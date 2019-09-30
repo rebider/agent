@@ -102,4 +102,12 @@ public interface TermMachineService {
 
 
     AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception;
+
+    /**
+     * 校验机具是否可变更
+     * @param data
+     * @param platformType
+     * @return
+     */
+    boolean checkModleIsEq(Map<String,String> data,String platformType);
 }

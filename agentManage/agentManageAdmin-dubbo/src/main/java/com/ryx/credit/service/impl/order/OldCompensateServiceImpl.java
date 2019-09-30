@@ -13,6 +13,7 @@ import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.order.*;
+import com.ryx.credit.machine.service.ImsTermMachineService;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
@@ -29,6 +30,7 @@ import com.ryx.credit.service.order.OCashReceivablesService;
 import com.ryx.credit.service.order.OldCompensateService;
 import com.ryx.credit.service.order.OrderActivityService;
 import com.ryx.credit.service.order.ProductService;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,7 +96,8 @@ public class OldCompensateServiceImpl implements OldCompensateService {
     private AgentService agentService;
     @Autowired
     private IUserService iUserService;
-
+    @Autowired
+    private ImsTermMachineService imsTermMachineService;
 
     /**
      * 解析提交过来的sn,
@@ -386,7 +389,12 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 refundPriceDiffDetail.setVersion(Status.STATUS_0.status);
                 refundPriceDiffDetail.setOrderType(OrderType.OLD.getValue());
                 refundPriceDiffDetail.setSendStatus(Status.STATUS_0.status);
-
+                Map<String,String> par = new HashedMap();
+                par.put("oldMerid",refundPriceDiffDetail.getOldMachineId());
+                par.put("newMerId",refundPriceDiffDetail.getNewMachineId());
+                if(termMachineService.checkModleIsEq(par,refundPriceDiffDetail.getPlatformType())){
+                    throw new MessageException(refundPriceDiffDetail.getBeginSn()+"--"+refundPriceDiffDetail.getEndSn()+":("+oldActivity.getActivityName()+")不支持互换("+newActivity.getActivityName()+")");
+                }
                 int priceDiffDetailInsert = refundPriceDiffDetailMapper.insert(refundPriceDiffDetail);
                 if(priceDiffDetailInsert!=1){
                     log.info("插入补退差价详情表异常");
