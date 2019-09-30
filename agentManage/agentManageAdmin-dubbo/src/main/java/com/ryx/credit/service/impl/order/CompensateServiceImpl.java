@@ -7,6 +7,7 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtil;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -348,6 +349,9 @@ public class CompensateServiceImpl implements CompensateService {
                 if(refundPriceDiffFile.size()==0){
                     return AgentResult.fail("代理商打款必须上传打款凭证");
                 }
+                if(oCashReceivablesVoList==null || oCashReceivablesVoList.size()==0){
+                    return AgentResult.fail("代理商打款必须填写打款记录");
+                }
             }
             String priceDiffId = idService.genId(TabId.o_Refund_price_diff);
             oRefundPriceDiff.setId(priceDiffId);
@@ -410,6 +414,7 @@ public class CompensateServiceImpl implements CompensateService {
             }
 
             refundPriceDiffDetailList.forEach(refundPriceDiffDetail->{
+
                 Map<String, Object> logisticsDetail = null;
                 if(StringUtils.isNotBlank(refundPriceDiffDetail.getActivityFrontId()) && !refundPriceDiffDetail.getActivityFrontId().equals("undefined")){
                     Map<String, Object> reqParam = new HashMap<>();
@@ -430,6 +435,29 @@ public class CompensateServiceImpl implements CompensateService {
                         throw new ProcessException("保存失败");
                     }
                     logisticsDetail = oLogisticsDetails.get(0);
+
+                    OActivity oldActivity = activityMapper.selectByPrimaryKey(refundPriceDiffDetail.getActivityFrontId());
+                    if(oldActivity==null){
+                        throw new ProcessException("旧活动不存在");
+                    }
+                    OActivity newActivity = activityMapper.selectByPrimaryKey(refundPriceDiffDetail.getActivityRealId());
+                    if(newActivity==null){
+                        throw new ProcessException("新活动不存在");
+                    }
+                    //检查目标活动和代理商平台码是否一致
+                    if(oldActivity.getPlatform().equals(newActivity.getPlatform())){
+                        //活动没有跨平台，平台号也不允许跨平台
+                        if(!refundPriceDiffDetail.getNewOrgId().equals(refundPriceDiffDetail.getOldOrgId())) {
+                            throw new ProcessException("原平台编号与目标平台编号不一致");
+                        }
+                    }
+                    //检查目标活动和代理商平台码是否一致
+                    if(refundPriceDiffDetail.getNewOrgId().equals(refundPriceDiffDetail.getOldOrgId())){
+                        //平台号没有跨平台，活动也不允许跨平台
+                        if(!oldActivity.getPlatform().equals(newActivity.getPlatform())) {
+                            throw new ProcessException("平台编号与活动平台不匹配");
+                        }
+                    }
                 }
                 if(StringUtils.isBlank(refundPriceDiffDetail.getActivityRealId())){
                     throw new ProcessException("请选择活动");
@@ -446,6 +474,23 @@ public class CompensateServiceImpl implements CompensateService {
                     log.info("查询oActivity异常");
                     throw new ProcessException("保存失败");
                 }
+                //TODO 校验是否有审批中的活动变更
+                ORefundPriceDiffDetailExample example = new ORefundPriceDiffDetailExample();
+                example.or()
+                        .andBeginSnBetween(refundPriceDiffDetail.getBeginSn(),refundPriceDiffDetail.getEndSn())
+                        .andStatusEqualTo(Status.STATUS_1.status);
+                example.or() .andEndSnBetween(refundPriceDiffDetail.getBeginSn(),refundPriceDiffDetail.getEndSn())
+                        .andStatusEqualTo(Status.STATUS_1.status);
+                List<ORefundPriceDiffDetail> listDetail = refundPriceDiffDetailMapper.selectByExample(example);
+                if(listDetail.size()>0){
+                    for (ORefundPriceDiffDetail detail : listDetail) {
+                        ORefundPriceDiff diff = refundPriceDiffMapper.selectByPrimaryKey(detail.getRefundPriceDiffId());
+                        if(AgStatus.Approving.status.compareTo(diff.getReviewStatus())==0){
+                            throw new ProcessException(detail.getBeginSn()+"-"+detail.getEndSn()+"活动调整正在审批中");
+                        }
+                    }
+                }
+
                 refundPriceDiffDetail.setId(idService.genId(TabId.o_Refund_price_diff_d));
                 refundPriceDiffDetail.setRefundPriceDiffId(priceDiffId);
                 refundPriceDiffDetail.setFrontPrice(logisticsDetail!=null?new BigDecimal(logisticsDetail.get("SETTLEMENT_PRICE").toString()):new BigDecimal(0));
@@ -594,10 +639,19 @@ public class CompensateServiceImpl implements CompensateService {
         record.setAgentId(oRefundPriceDiff.getAgentId());
         record.setDataShiro(BusActRelBusType.COMPENSATE.key);
         List<Map<String, Object>> maps = iUserService.orgCode(Long.valueOf(cuser));
-        if(maps!=null){
+        if(maps!=null && maps.size()>0){
             Map<String, Object> stringObjectMap = maps.get(0);
             record.setAgDocPro(stringObjectMap.get("ORGID")+"");
-            record.setAgDocDistrict(stringObjectMap.get("ORGPID")+"");
+            if(null!=stringObjectMap.get("isRegion") && (Boolean)stringObjectMap.get("isRegion")) {
+                record.setAgDocDistrict(stringObjectMap.get("ORGPID") + "");
+            }else if(null!=stringObjectMap.get("ppidorgcodeisRegion") && (Boolean)stringObjectMap.get("ppidorgcodeisRegion")) {
+                record.setAgDocDistrict(stringObjectMap.get("ORGPPID") + "");
+            }
+        }else{
+            throw new MessageException("未获取到部门编号!");
+        }
+        if(StringUtils.isBlank(record.getAgDocDistrict())){
+            throw new MessageException("未获取到部门编号!");
         }
         Agent agent = agentMapper.selectByPrimaryKey(oRefundPriceDiff.getAgentId());
         if(null!=agent)
@@ -1382,13 +1436,26 @@ public class CompensateServiceImpl implements CompensateService {
 
     @Override
     public PageInfo compensateDetailList(ORefundPriceDiffDetail refundPriceDiffDetail, Page page, String dataRole,long userId){
-
         ORefundPriceDiffDetailExample refundPriceDiffDetailExample = new ORefundPriceDiffDetailExample();
         ORefundPriceDiffDetailExample.Criteria criteria = refundPriceDiffDetailExample.createCriteria();
-        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        if(StringUtils.isNotBlank(refundPriceDiffDetail.getAgentId())){
+            criteria.andAgentIdEqualTo(refundPriceDiffDetail.getAgentId());
+        }
+        if(StringUtils.isNotBlank(refundPriceDiffDetail.getRefundPriceDiffId())){
+            criteria.andRefundPriceDiffIdEqualTo(refundPriceDiffDetail.getRefundPriceDiffId());
+        }
 
+        FastMap par = FastMap.fastSuccessMap();
+        if(StringUtils.isNotBlank(refundPriceDiffDetail.getAgentId())){
+            par.putKeyV("agentId",refundPriceDiffDetail.getAgentId());
+        }
+        if(StringUtils.isNotBlank(refundPriceDiffDetail.getRefundPriceDiffId())){
+            par.putKeyV("refundPriceDiffId",refundPriceDiffDetail.getRefundPriceDiffId());
+        }
+        par.putKeyV("page",page);
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
         refundPriceDiffDetailExample.setPage(page);
-        List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(refundPriceDiffDetailExample);
+        List<Map> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExampleExtends(par,page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(oRefundPriceDiffDetails);
         pageInfo.setTotal((int)refundPriceDiffDetailMapper.countByExample(refundPriceDiffDetailExample));

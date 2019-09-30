@@ -367,7 +367,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
                 }else if(serialNumber.equals(serialNumber_res) && "02".equals(snAdjStatus) && "000000".equals(result_code)) {
                     //调整失败
                     log.info("活动调整失败:{} {}",serialNumber,platformType);
-                    return AgentResult.build(AgentResult.OK,resMsg,"02");
+                    return AgentResult.ok("02");
                 }else{
                     //未知结果
                     return AgentResult.ok("03");
