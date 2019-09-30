@@ -78,15 +78,23 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     public AgentResult addAgentCertifis(List<Agent> agents) {
         logger.info("添加待认证代理商信息");
+        StringBuffer resStr = new StringBuffer();
         try {
            List<AgentCertification> agentCertifications = new ArrayList<>();
 
            agents.forEach((cer)->{
+
+               FastMap par = FastMap.fastMap("id",cer.getAgUniqNum());
+               AgentCertification agentCertification = agentCertificationMapper.queryCers(par);
+                if (agentCertification!=null){
+                    resStr.append(agentCertification.getOrgAgName()).append(",");
+                    return;
+                }
                AgentCertification agentCer = new AgentCertification();
                ZoneId zoneId = ZoneId.systemDefault();
                ZonedDateTime zdt = LocalDateTime.now().atZone(zoneId);//Combines this date-time with a time-zone to create a  ZonedDateTime.
                Date date = Date.from(zdt.toInstant());
-               FastMap par = FastMap.fastMap("id",cer.getAgUniqNum());
+
                agentCer.setId(idService.genIdInTran(TabId.a_agent_certification));
                agentCer.setAgentId(cer.getAgUniqNum());
                agentCer.setReqRegNo("");
@@ -105,12 +113,19 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
                agentCer.setOrgAgBusScope(cer.getAgBusScope());
                agentCertifications.add(agentCer);
            });
-           int insertBatch = agentCertificationMapper.insertBatch(agentCertifications);
-           if (insertBatch > 0){
-              return AgentResult.ok();
+           if (agentCertifications.size()>0){
+               int insertBatch = agentCertificationMapper.insertBatch(agentCertifications);
+               if (insertBatch > 0){
+                   if ("".equals(resStr.toString())||null==resStr)
+                       return AgentResult.ok();
+                   return new AgentResult(200,"存在未处理完成信息:"+resStr.toString()+"未再次添加",null);
+               }else {
+                   return AgentResult.fail("未添加认证数据");
+               }
            }else {
-              return AgentResult.fail("未添加认证数据");
+               return new AgentResult(200,"存在未处理完成信息:"+resStr.toString()+"未再次添加",null);
            }
+
        }catch (Exception e){
             logger.error(e.toString());
           return  new AgentResult(500, "系统异常", e.toString());
@@ -134,6 +149,7 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
         AgentCertificationExample agentCertificationExample = new AgentCertificationExample();
         AgentCertificationExample.Criteria criteria = agentCertificationExample.createCriteria();
         criteria.andCerProStatEqualTo(Status.STATUS_0.status);
+        agentCertificationExample.setOrderByClause(" REQ_CER_TM asc ");
         agentCertificationExample.setPage(new Page(0,100));
         List<AgentCertification> agentCertifications = agentCertificationMapper.selectByExample(agentCertificationExample);
         logger.info("查询未认证的的商户信息结束");
@@ -148,10 +164,18 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
 
     @Override
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
-    public AgentResult processData(Agent agent,String id,String orgId) {
-        agent = agentMapper.selectByAgent(agent);
+    public AgentResult processData(Agent orgagent,String id,String orgId) {
+        Agent agent = agentMapper.selectByAgent(orgagent);
         AgentCertification agentCertification = agentCertificationMapper.selectByPrimaryKey(id);
-        if(agent==null)return AgentResult.fail("工商认证代理商未找到"+agent.getId());
+        if(agent==null){
+            orgagent.setCaStatus(Status.STATUS_0.status);
+            agentCertification.setCerProStat(Status.STATUS_2.status);
+            agentCertification.setCerRes(Status.STATUS_0.status);
+            if(1==agentMapper.updateByPrimaryKeySelective(orgagent) && 1 == agentCertificationMapper.updateByPrimaryKeySelective(agentCertification)){
+                logger.info("认证代理商不存在，认证代理商{}状态为{},不进行信息同步",orgagent.getAgUniqNum(),orgagent.getCaStatus());
+            }
+            return new AgentResult(404,"工商认证代理商未找到"+agent.getId(),"");
+        }
         agentCertification = copyOrgAgentToCertifi(agent,agentCertification);
         agentCertification.setOrgCerId(orgId);
         //处理代理名称去掉前缀和括号后的信息
@@ -185,10 +209,14 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
             }else if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("openTo"))){
                 agent.setAgBusLice(DateUtil.format(dataObj.getString("openTo"),"yyyy-MM-dd"));
             }
-            agent.setAgLegal(dataObj.getString("frName"));//法人姓名
-            agent.setAgRegAdd(dataObj.getString("address"));//注册地址
+            if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("frName")))
+                agent.setAgLegal(dataObj.getString("frName"));//法人姓名
+            if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("address")))
+                agent.setAgRegAdd(dataObj.getString("address"));//注册地址
+            if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("operateScope")))
             agent.setAgBusScope(dataObj.getString("operateScope"));//经营范围
-            agent.setAgBusLic(dataObj.getString("creditCode"));//营业执照
+                if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("creditCode")))
+                    agent.setAgBusLic(dataObj.getString("creditCode"));//营业执照
             //如果负责人没有，采用工商认证后的法人
             if(StringUtils.isBlank(agent.getAgHead())){
                 agent.setAgHead(agent.getAgLegal());
@@ -216,6 +244,7 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
             //工商认证失败
             agent.setCaStatus(Status.STATUS_2.status);
             agentCertification.setCerProStat(Status.STATUS_3.status);
+            agentCertification.setCerRes(Status.STATUS_2.status);
             if(1==agentMapper.updateByPrimaryKeySelective(agent) && 1 == agentCertificationMapper.updateByPrimaryKeySelective(agentCertification)){
                 logger.info("工商认证失败"+agent.getId());
             }

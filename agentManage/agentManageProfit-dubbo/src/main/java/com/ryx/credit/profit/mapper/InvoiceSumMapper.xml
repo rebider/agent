@@ -377,7 +377,15 @@
             ps.INVOICE_STATUS invoiceStatus,ps.SUB_ADD_INVOICE_AMT subAddInvoiceAmt, ps.REV1 rev1,
             ps.REV2 rev2, ps.REV3 rev3, ac.CLO_TAX_POINT tax
     from P_INVOICE_SUM ps
-    left join A_AGENT aa on ps.AGENT_ID = aa.ID
+    inner join (
+      select distinct aab.AGENT_ID from A_AGENT_BUSINFO aab where 1= 1
+      <if test="map.docPro != null and map.docPro != '' ">
+        and aab.AG_DOC_PRO = #{map.docPro}
+      </if>
+      <if test="map.docDis != null and map.docDis != '' ">
+        and aab.AG_DOC_DISTRICT = #{map.docDis}
+      </if>
+    ) ab on ps.AGENT_ID = ab.AGENT_ID
     left join A_AGENT_COLINFO ac on ps.AGENT_ID = ac.AGENT_ID
     where 1 = 1
       <if test="map.agentName != null and map.agentName != '' ">
@@ -400,12 +408,6 @@
       </if>
       <if test="map.invoiceCompany != null and map.invoiceCompany != '' ">
         and ps.INVOICE_COMPANY = #{map.invoiceCompany}
-      </if>
-      <if test="map.docPro != null and map.docPro != '' ">
-        and aa.AG_DOC_PRO = #{map.docPro}
-      </if>
-      <if test="map.docDis != null and map.docDis != '' ">
-        and aa.AG_DOC_DISTRICT = #{map.docDis}
       </if>
   </sql>
 </mapper>
