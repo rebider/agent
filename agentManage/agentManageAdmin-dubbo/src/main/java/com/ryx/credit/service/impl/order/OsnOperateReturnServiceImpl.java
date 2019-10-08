@@ -486,10 +486,10 @@ public class OsnOperateReturnServiceImpl implements OsnOperateReturnService {
                     OReturnOrderDetail detail1 = returnOrderDetailMapper.selectByPrimaryKey(planVo.getReturnOrderDetailId());
                     detail.setReturnOrderId(detail1.getReturnId());
                     detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
-                    detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_LOC.code);
+                    detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
                 }else{
                     detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
-                    detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+                    detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_LOC.code);
                 }
                 detail.setVersion(Status.STATUS_1.status);
                 if (1 != logisticsDetailMapper.insertSelective(detail)) {
@@ -546,10 +546,10 @@ public class OsnOperateReturnServiceImpl implements OsnOperateReturnService {
         }
 
         //流量卡不进行下发操作
-        if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(oActivity.getActCode()) && ("2204".equals(oActivity.getActCode()) || "2004".equals(oActivity.getActCode()))) {
+        /*if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(oActivity.getActCode()) && ("2204".equals(oActivity.getActCode()) || "2004".equals(oActivity.getActCode()))) {
             logger.info("导入物流数据,流量卡不进行下发操作，活动代码", oActivity.getActCode(), logistics.getId(), JSONObject.toJSON(logistics));
             return FastMap.fastMap("status", "2").putKeyV("msg", "流量卡不下发!");
-        }
+        }*/
 
         //进行机具调整操作
         if (PlatformType.whetherPOS(platForm.getPlatformType())) {
