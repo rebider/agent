@@ -2346,12 +2346,50 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             return AgentResult.fail("没有退货子订单编号");
         }
         //进行机具调整操作
-        if (!logistics.getProType().equals(PlatformType.MPOS.msg) && !logistics.getProType().equals(PlatformType.MPOS.code)){
-            log.info("======pos发货 更新库存记录:{}:{}",logistics.getProType(),ids);
-            OOrder oOrder = oOrderMapper.selectByPrimaryKey(logistics.getOrderId());
-            if(null==oOrder){
-                throw new MessageException("查询订单数据失败！");
+        OOrder oOrder = oOrderMapper.selectByPrimaryKey(logistics.getOrderId());
+        if (null==oOrder) throw new MessageException("查询订单数据失败！");
+        PlatForm platForm = platFormMapper.selectByPlatFormNum(oOrder.getOrderPlatform());
+
+        //新增加瑞大宝平台，不是瑞大宝平台按原来逻辑
+        if (platForm.getPlatformType().equals(PlatformType.RDBPOS.code)) {
+            //新增瑞大宝平台重新下发
+            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oOrder.getBusId());
+            if (null==agentBusInfo) throw new MessageException("查询业务数据失败！");
+
+            try {
+                //更新物流明细
+                OLogisticsDetail oLogisticsDetail = new OLogisticsDetail();
+                oLogisticsDetail.setSendStatus(LogisticsDetailSendStatus.none_send.code);
+                oLogisticsDetail.setStatus(Status.STATUS_1.status);
+                oLogisticsDetail.setLogisticsId(logistics.getId());
+                oLogisticsDetail.setSbusMsg("");
+                int deleteInt = logistics.getSendNum().compareTo(BigDecimal.valueOf(logisticsDetailMapper.updateByLogisticsId(oLogisticsDetail)));
+                if (deleteInt != 0) {
+                    log.info("瑞大宝更新物流异常，物流明细和物流发送数量不同。");
+                    throw new Exception("瑞大宝更新物流异常，物流明细和物流发送数量不同。");
+                }
+                //更新物流
+                OLogistics updateLogistics = new OLogistics();
+                updateLogistics.setId(logistics.getId());
+                updateLogistics.setSendStatus(LogisticsSendStatus.gen_detail_sucess.code);
+                updateLogistics.setSendMsg("");
+                updateLogistics.setVersion(logistics.getVersion());//暂时用不到乐观锁，但是要传进去
+                if (1 != oLogisticsMapper.updateByPrimaryKeySelective(updateLogistics)) {
+                    log.info("发货物流，重新发送，更新数据库失败:{},{},{}", logistics.getId(), logistics.getSnBeginNum(), logistics.getSnEndNum());
+                    throw new Exception("瑞大宝更新物流状态发生异常！！！");
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+                logistics.setSendMsg("下发异常");
+                logistics.setSendStatus(Status.STATUS_2.status);
+                if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
+                    log.info("RDB下发物流更新失败Exception{}",JSONObject.toJSONString(logistics));
+                }
+                return AgentResult.fail(e.getLocalizedMessage());
             }
+            return AgentResult.ok();
+        } else if (!logistics.getProType().equals(PlatformType.MPOS.msg) && !logistics.getProType().equals(PlatformType.MPOS.code)){
+            log.info("======pos发货 更新库存记录:{}:{}",logistics.getProType(),ids);
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oOrder.getBusId());
             if(null==agentBusInfo){
                 throw new MessageException("查询订单业务数据失败！");
