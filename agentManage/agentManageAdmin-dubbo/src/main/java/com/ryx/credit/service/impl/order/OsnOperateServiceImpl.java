@@ -762,7 +762,14 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                 oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
             });
             //存储到流量卡表
-            internetCardService.orderInsertInternetCard(listOLogisticsDetailSn,planVo.getProCom());
+            try {
+                internetCardService.orderInsertInternetCard(listOLogisticsDetailSn,planVo.getProCom());
+            }catch (Exception e){
+                AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"。错误信息:"+e.getLocalizedMessage(), "流量卡插入失败！");
+                e.printStackTrace();
+                logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage());
+                throw e;
+            }
             retMap.put("result", true);
             return retMap;
         }
@@ -796,8 +803,8 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                     });
                     retMap.put("result", true);
                     return retMap;
-                    //机具下发失败，更新物流明细为下发失败，并更新物流为发送失败
                 } else {
+                    //机具下发失败，更新物流明细为下发失败，并更新物流为发送失败
                     AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+LogisticsDetailSendStatus.send_fail.msg, logistics.getProType()+"下发失败！");
                     logger.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), posSendRes.getMsg());
                     listOLogisticsDetailSn.forEach(detail -> {
@@ -1053,10 +1060,5 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             retMap.put("result", false);
             return retMap;
         }
-    }
-
-    @Override
-    public boolean updateDetailBatch(List<OLogisticsDetail> datas, BigDecimal batch, BigDecimal code) throws Exception {
-        return false;
     }
 }

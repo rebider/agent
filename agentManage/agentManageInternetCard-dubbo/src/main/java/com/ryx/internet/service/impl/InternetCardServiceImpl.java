@@ -924,27 +924,50 @@ public class InternetCardServiceImpl implements InternetCardService {
 
         String batchNo = IDUtils.getBatchNo();
         for (OLogisticsDetail oLogisticsDetail : logisticsDetailList) {
-            OInternetCard oInternetCard = new OInternetCard();
-            oInternetCard.setIccidNum(oLogisticsDetail.getSnNum());
-            oInternetCard.setBatchNum(batchNo);
-            oInternetCard.setOrderId(oLogisticsDetail.getOrderId());
-            oInternetCard.setDeliverTime(oLogisticsDetail.getcTime());
-            oInternetCard.setAgentId(oLogisticsDetail.getAgentId());
-            Agent agent = agentService.getAgentById(oLogisticsDetail.getAgentId());
-            if(agent!=null)
-            oInternetCard.setAgentName(agent.getAgName());
-            oInternetCard.setManufacturer(manuFacturer);
-            oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
-            oInternetCard.setStop(Status.STATUS_0.status);
-            oInternetCard.setRenew(Status.STATUS_0.status);
-            oInternetCard.setInternetCardStatus(InternetCardStatus.NOACTIVATE.code);
-            Date date = new Date();
-            oInternetCard.setcTime(date);
-            oInternetCard.setuTime(date);
-            oInternetCard.setuUser(oInternetCard.getcUser());
-            oInternetCard.setStatus(Status.STATUS_1.status);
-            oInternetCard.setVersion(BigDecimal.ONE);
-            internetCardMapper.insert(oInternetCard);
+            OInternetCard internetCard = internetCardMapper.selectBySnNum(oLogisticsDetail.getSnNum());
+            if (null != internetCard){
+                //oInternetCard.setIccidNum(oLogisticsDetail.getSnNum());
+                internetCard.setBatchNum(batchNo);
+                internetCard.setOrderId(oLogisticsDetail.getOrderId());
+                internetCard.setDeliverTime(oLogisticsDetail.getcTime());
+                internetCard.setAgentId(oLogisticsDetail.getAgentId());
+                Agent agent = agentService.getAgentById(oLogisticsDetail.getAgentId());
+                if(agent!=null) internetCard.setAgentName(agent.getAgName());
+                internetCard.setManufacturer(manuFacturer);
+                internetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
+                internetCard.setStop(Status.STATUS_0.status);
+                internetCard.setRenew(Status.STATUS_0.status);
+                internetCard.setInternetCardStatus(InternetCardStatus.NOACTIVATE.code);
+                Date date = new Date();
+                internetCard.setcTime(date);
+                internetCard.setuTime(date);
+                internetCard.setuUser(internetCard.getcUser());
+                internetCard.setStatus(Status.STATUS_1.status);
+                internetCard.setVersion(BigDecimal.ONE);
+                internetCardMapper.updateByPrimaryKeySelective(internetCard);
+            }else {
+                OInternetCard oInternetCard = new OInternetCard();
+                oInternetCard.setIccidNum(oLogisticsDetail.getSnNum());
+                oInternetCard.setBatchNum(batchNo);
+                oInternetCard.setOrderId(oLogisticsDetail.getOrderId());
+                oInternetCard.setDeliverTime(oLogisticsDetail.getcTime());
+                oInternetCard.setAgentId(oLogisticsDetail.getAgentId());
+                Agent agent = agentService.getAgentById(oLogisticsDetail.getAgentId());
+                if(agent!=null)
+                oInternetCard.setAgentName(agent.getAgName());
+                oInternetCard.setManufacturer(manuFacturer);
+                oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
+                oInternetCard.setStop(Status.STATUS_0.status);
+                oInternetCard.setRenew(Status.STATUS_0.status);
+                oInternetCard.setInternetCardStatus(InternetCardStatus.NOACTIVATE.code);
+                Date date = new Date();
+                oInternetCard.setcTime(date);
+                oInternetCard.setuTime(date);
+                oInternetCard.setuUser(oInternetCard.getcUser());
+                oInternetCard.setStatus(Status.STATUS_1.status);
+                oInternetCard.setVersion(BigDecimal.ONE);
+                internetCardMapper.insert(oInternetCard);
+            }
         }
     }
 

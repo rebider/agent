@@ -602,4 +602,8 @@
       and (c.INTERNET_CARD_STATUS = #{map.cardStaus1} or c.INTERNET_CARD_STATUS = #{map.cardStaus2})
     </where>
   </sql>
+
+  <select id="selectBySnNum" parameterType="string" resultType="int" resultMap="BaseResultMap">
+    SELECT * FROM O_INTERNET_CARD WHERE ICCID_NUM=#{iccidNum}
+  </select>
 </mapper>
