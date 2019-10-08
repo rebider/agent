@@ -41,4 +41,5 @@ public interface ORemoveAccountService {
      * 订单明细列表
      */
     PageInfo orderDetailList(Map<String, Object> param, PageInfo pageInfo);
+
 }

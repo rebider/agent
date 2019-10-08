@@ -17,7 +17,6 @@ import com.ryx.credit.service.agent.BusinessPlatformService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.ORemoveAccountService;
-import org.apache.commons.lang3.EnumUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +24,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import sun.management.resources.agent;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -160,6 +159,21 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
             oRemoveAccount.setBatchNum(d.getTime().getTime() + "");
             oRemoveAccount.setVersion(Status.STATUS_1.status);
             oRemoveAccount.setStatus(Status.STATUS_1.status);
+            oRemoveAccount.setRealRamount(new BigDecimal(0));
+            //添加销账金额
+            HashMap<Object, Object> map = new HashMap<>();
+            map.put("platform",platName);
+            map.put("busNum",String.valueOf(objectList.get(1)));
+            map.put("agId",String.valueOf(objectList.get(0)));
+            List<Map> listMap=  oOrderMapper.queryJjqk(map);
+             if (null!=listMap && listMap.size()>0){
+                 for (Map jjqk_map : listMap) {
+                     String machinesAmount = String.valueOf(jjqk_map.get("JJQK"));//机具欠款
+                     oRemoveAccount.setMachinesAmount(new BigDecimal(machinesAmount));
+                 }
+             }else{
+                 oRemoveAccount.setMachinesAmount(new BigDecimal(0));
+             }
             //进行添加
             if (1 != oRemoveAccountMapper.insertSelective(oRemoveAccount)) {
                 logger.info("插入失败!");
@@ -211,6 +225,7 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                     boolean f=true;
                     //每次销账金额都会减少--剩余
                     BigDecimal residue = oRemoveAccount_item.getRamount();
+                    BigDecimal real_ramount = new BigDecimal(0);
                     HashMap map = new HashMap();
                     //根据销账保存 为条件
                     if (null != oRemoveAccount_item.getRmonth()) {
@@ -265,6 +280,8 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                         if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
                                             logger.info("付款单明细修改失败{}:", oRemoveAccount_item.getId());
                                             throw new MessageException("付款单明细修改失败");
+                                        }else{
+                                            real_ramount=real_ramount.add(oPaymentDetail.getPayAmount());
                                         }
                                         oPaymentDetail = oPaymentDetailMapper.selectByPrimaryKey(oPaymentDetail.getId());
                                         OPayment oPayment = oPaymentMapper.selectByPrimaryKey(oPaymentDetail.getPaymentId());
@@ -383,7 +400,7 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                             oRemoveAccount.setRstatus(RemoveAccountStatus.CLCG.code);
                             oRemoveAccount.setFinishTime(new Date());
                             //实际销账金额
-                            oRemoveAccount.setRealRamount(new BigDecimal(0));
+                            oRemoveAccount.setRealRamount(real_ramount);
                             if (1!=oRemoveAccountMapper.updateByPrimaryKeySelective(oRemoveAccount)){
                                 logger.info("销账更新失败");
                                 throw new MessageException("销账更新失败");
@@ -397,7 +414,7 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                             oRemoveAccount.setFinishTime(new Date());
                             oRemoveAccount.setFailCause(e.getMsg());
                             //实际销账金额
-                            oRemoveAccount.setRealRamount(new BigDecimal(0));
+                            oRemoveAccount.setRealRamount(real_ramount);
                             if (1!=oRemoveAccountMapper.updateByPrimaryKeySelective(oRemoveAccount)){
                                 logger.info("销账更新失败:{}",oRemoveAccount.getId());
                             }else{
@@ -419,7 +436,7 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                             oRemoveAccount.setFinishTime(new Date());
                             oRemoveAccount.setFailCause(e.getLocalizedMessage().length() > 30 ? e.getLocalizedMessage().substring(0, 30) : e.getLocalizedMessage());
                             //实际销账金额
-                            oRemoveAccount.setRealRamount(new BigDecimal(0));
+                            oRemoveAccount.setRealRamount(real_ramount);
                             if (1!=oRemoveAccountMapper.updateByPrimaryKeySelective(oRemoveAccount)){
                                 logger.info("销账更新失败:{}",oRemoveAccount.getId());
                             }else{
@@ -451,8 +468,10 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
         return pageInfo;
     }
 
+
     public static boolean isInteger(String str) {
-        Pattern pattern = Pattern.compile("^[-\\+]?[\\d]*$");
-        return pattern.matcher(str).matches();
+        Pattern pattern = Pattern.compile("^(([1-9]{1}\\d*)|([0]{1}))(\\.(\\d){0,2})?$"); // 判断小数点后2位的数字的正则表达式
+        Matcher match = pattern.matcher(str);
+        return match.matches();
     }
 }

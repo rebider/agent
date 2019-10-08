@@ -33,4 +33,6 @@ public interface ORemoveAccountMapper {
     List<Map<String,Object>> orderDetailList(Map<String, Object> param);
 
     int orderDetailCount(Map<String, Object> param);
+
+    int isRemoveAccount(Map map);
 }
