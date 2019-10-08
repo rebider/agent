@@ -240,8 +240,8 @@ public class CompensateServiceImpl implements CompensateService {
             if(!agent.getId().equals(agentId)){
                 COrganization cOrganization = organizationMapper.selectByPrimaryKey(Integer.valueOf(agent.getAgDocPro()));
                 if(!Pattern.matches(orgCode+".*",cOrganization.getCode())){
-                    log.info("不能提交其他省区的退补差价");
-                    throw new ProcessException("不能提交其他省区的退补差价");
+                    log.info("不能提交其他省区的活动调整");
+                    throw new ProcessException("不能提交其他省区的活动调整");
                 }
             }
             AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
@@ -409,7 +409,7 @@ public class CompensateServiceImpl implements CompensateService {
             //打款记录
             AgentResult agentResult = cashReceivablesService.addOCashReceivables(oCashReceivablesVoList,cUser,oRefundPriceDiff.getAgentId(),CashPayType.REFUNDPRICEDIFF,oRefundPriceDiff.getId());
             if(!agentResult.isOK()){
-                log.info("退补差价保存打款记录失败1");
+                log.info("活动调整保存打款记录失败1");
                 throw new ProcessException("保存打款记录失败");
             }
 
@@ -519,30 +519,16 @@ public class CompensateServiceImpl implements CompensateService {
                 refundPriceDiffDetail.setFrontProId(old_Activity.getProductId());
                 OProduct oProduct = productService.findById(old_Activity.getProductId());
                 if(oProduct==null){
-                    throw new ProcessException("查询新活动商品失败");
+                    throw new ProcessException("查询老活动商品失败");
                 }
                 refundPriceDiffDetail.setFrontProName(oProduct.getProName());
-
-                OSubOrderExample subOrderExample = new OSubOrderExample();
-                OSubOrderExample.Criteria subOrderCriteria = subOrderExample.createCriteria();
-                subOrderCriteria.andStatusEqualTo(Status.STATUS_1.status);
-                subOrderCriteria.andOrderIdEqualTo(refundPriceDiffDetail.getOrderId());
-                subOrderCriteria.andProIdEqualTo(refundPriceDiffDetail.getProId());
-                List<OSubOrder> oSubOrders = subOrderMapper.selectByExample(subOrderExample);
-                OSubOrder oSubOrder = oSubOrders.get(0);
-                if(oSubOrder==null){
-                    throw new ProcessException("采购单不唯一");
+                //新商品级商品编号级活动名称
+                OProduct new_Product = productService.findById(new_oActivity.getProductId());
+                if(new_Product==null){
+                    throw new ProcessException("查询新活动商品失败");
                 }
-
-                OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
-                OSubOrderActivityExample.Criteria criteria = oSubOrderActivityExample.createCriteria();
-                criteria.andStatusEqualTo(Status.STATUS_1.status);
-                criteria.andSubOrderIdEqualTo(oSubOrder.getId());
-                List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
-                OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
-                if(oSubOrderActivity==null){
-                    throw new ProcessException("活动不唯一");
-                }
+                refundPriceDiffDetail.setProId(new_oActivity.getProductId());
+                refundPriceDiffDetail.setProName(new_Product.getProName());
                 //业务平台
                 PlatForm platForm =  platFormService.selectByPlatformNum(old_Activity.getPlatform());
                 if(platForm==null) throw new ProcessException("业务平台未找到:"+old_Activity.getPlatform());
@@ -580,12 +566,12 @@ public class CompensateServiceImpl implements CompensateService {
             return AgentResult.ok(priceDiffId);
         }catch (ProcessException e) {
             e.printStackTrace();
-            log.info("退补差价保存失败");
+            log.info("活动调整保存失败");
             throw new ProcessException(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            log.info("退补差价保存失败");
-            throw new ProcessException("退补差价保存失败");
+            log.info("活动调整保存失败");
+            throw new ProcessException("活动调整保存失败");
         }
     }
 
@@ -595,23 +581,23 @@ public class CompensateServiceImpl implements CompensateService {
     public AgentResult startCompensateActiviy(String id, String cuser) throws Exception {
 
         if (StringUtils.isBlank(id)) {
-            log.info("退补差价提交审批,订单ID为空{}:{}", id, cuser);
-            return AgentResult.fail("退补差价提交审批，订单ID为空");
+            log.info("活动调整提交审批,订单ID为空{}:{}", id, cuser);
+            return AgentResult.fail("活动调整提交审批，订单ID为空");
         }
         if (StringUtils.isBlank(cuser)) {
-            log.info("退补差价提交审批,操作用户为空{}:{}", id, cuser);
-            return AgentResult.fail("退补差价审批中，操作用户为空");
+            log.info("活动调整提交审批,操作用户为空{}:{}", id, cuser);
+            return AgentResult.fail("活动调整审批中，操作用户为空");
         }
         //更新审批中
         ORefundPriceDiff oRefundPriceDiff = refundPriceDiffMapper.selectByPrimaryKey(id);
         if (oRefundPriceDiff.getReviewStatus().equals(AgStatus.Approving.name())) {
-            log.info("退补差价提交审批,禁止重复提交审批{}:{}", id, cuser);
-            return AgentResult.fail("退补差价提交审批，禁止重复提交审批");
+            log.info("活动调整提交审批,禁止重复提交审批{}:{}", id, cuser);
+            return AgentResult.fail("活动调整提交审批，禁止重复提交审批");
         }
 
         if (!oRefundPriceDiff.getStatus().equals(Status.STATUS_1.status)) {
-            log.info("退补差价提交审批,代理商信息已失效{}:{}", id, cuser);
-            return AgentResult.fail("退补差价信息已失效");
+            log.info("活动调整提交审批,代理商信息已失效{}:{}", id, cuser);
+            return AgentResult.fail("活动调整信息已失效");
         }
 
         ORefundPriceDiff updateRefundPriceDiff = new ORefundPriceDiff();
@@ -620,8 +606,8 @@ public class CompensateServiceImpl implements CompensateService {
         updateRefundPriceDiff.setReviewStatus(AgStatus.Approving.status);
         int i = refundPriceDiffMapper.updateByPrimaryKeySelective(updateRefundPriceDiff);
         if (1 != i) {
-            log.info("退补差价提交审批，更新订单基本信息失败{}:{}", id, cuser);
-            throw new MessageException("退补差价提交审批，更新退补差价基本信息失败");
+            log.info("活动调整提交审批，更新订单基本信息失败{}:{}", id, cuser);
+            throw new MessageException("活动调整提交审批，更新活动调整基本信息失败");
         }
 
         Map startPar = agentEnterService.startPar(cuser);
@@ -643,7 +629,7 @@ public class CompensateServiceImpl implements CompensateService {
         //启动审批
         String proce = activityService.createDeloyFlow(null, workId, null, null, startPar);
         if (proce == null) {
-            log.info("退补差价提交审批，审批流启动失败{}:{}", id, cuser);
+            log.info("活动调整提交审批，审批流启动失败{}:{}", id, cuser);
             throw new MessageException("审批流启动失败!");
         }
         //代理商业务审批关系
@@ -769,7 +755,7 @@ public class CompensateServiceImpl implements CompensateService {
 
                 AgentResult agentResult = compensateService.updateTask(agentVo, deductAmt,userId,agentVo.getoCashReceivablesVoList());
                 if(!agentResult.isOK()){
-                    throw new ProcessException("更新退补差价主表异常");
+                    throw new ProcessException("更新活动调整主表异常");
                 }
             }
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
@@ -788,7 +774,7 @@ public class CompensateServiceImpl implements CompensateService {
     }
 
     /**
-     * 退补差价处理
+     * 活动调整处理
      * @return
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
@@ -905,7 +891,7 @@ public class CompensateServiceImpl implements CompensateService {
         }
         int i = refundPriceDiffMapper.updateByPrimaryKeySelective(oRefundPriceDiff);
         if(i!=1){
-            throw new ProcessException("更新退补差价数据申请失败");
+            throw new ProcessException("更新活动调整数据申请失败");
         }
 
         AgentResult agentResult = AgentResult.fail();
@@ -934,13 +920,13 @@ public class CompensateServiceImpl implements CompensateService {
                 criteria1.andRecordStatusEqualTo(OLogisticsDetailStatus.RECORD_STATUS_LOC.code);
                 List<OLogisticsDetail> oLogisticsDetails = logisticsDetailMapper.selectByExample(oLogisticsDetailExample);
                 if(null==oLogisticsDetails){
-                    throw new ProcessException("退补差价数据完成失败");
+                    throw new ProcessException("活动调整数据完成失败");
                 }
                 oLogisticsDetails.forEach(oLogisticsDetail->{
                     oLogisticsDetail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
                     int update = logisticsDetailMapper.updateByPrimaryKeySelective(oLogisticsDetail);
                     if(1!=update){
-                        throw new ProcessException("退补差价数据更新完成失败");
+                        throw new ProcessException("活动调整数据更新完成失败");
                     }
                 });
             });
@@ -954,7 +940,7 @@ public class CompensateServiceImpl implements CompensateService {
                     criteria1.andRecordStatusEqualTo(OLogisticsDetailStatus.RECORD_STATUS_LOC.code);
                     List<OLogisticsDetail> oLogisticsDetails = logisticsDetailMapper.selectByExample(oLogisticsDetailExample);
                     if(null==oLogisticsDetails){
-                        throw new ProcessException("退补差价数据完成失败");
+                        throw new ProcessException("活动调整数据完成失败");
                     }
                     OActivity activity = orderActivityService.findById(row.getActivityRealId());
                     OActivity activityOld = orderActivityService.findById(row.getActivityFrontId());
@@ -965,7 +951,7 @@ public class CompensateServiceImpl implements CompensateService {
                             oLogisticsDetail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_HIS.code);
                             int update = logisticsDetailMapper.updateByPrimaryKeySelective(oLogisticsDetail);
                             if(1!=update){
-                                throw new ProcessException("退补差价数据更新完成失败");
+                                throw new ProcessException("活动调整数据更新完成失败");
                             }
                             //插入新的物流信息
                             oLogisticsDetail.setId(idService.genId(TabId.o_logistics_detail));
@@ -994,10 +980,10 @@ public class CompensateServiceImpl implements CompensateService {
                             oLogisticsDetail.setBusId(oOrder.getBusId());
                             int insert = logisticsDetailMapper.insert(oLogisticsDetail);
                             if(1!=insert){
-                                throw new ProcessException("退补差价数据新增完成失败");
+                                throw new ProcessException("活动调整数据新增完成失败");
                             }
                         } catch (Exception e) {
-                            throw new ProcessException("退补差价处理完成失败");
+                            throw new ProcessException("活动调整处理完成失败");
                         }
 
                     });
@@ -1005,7 +991,7 @@ public class CompensateServiceImpl implements CompensateService {
                     row.setSendStatus(LogisticsSendStatus.send_ing.code);
                     int j = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(row);
                     if(j!=1){
-                        throw new ProcessException("退补差价更新失败");
+                        throw new ProcessException("活动调整更新失败");
                     }
                     OSubOrderExample subOrderExample = new OSubOrderExample();
                     OSubOrderExample.Criteria subOrderCriteria = subOrderExample.createCriteria();
@@ -1131,7 +1117,7 @@ public class CompensateServiceImpl implements CompensateService {
 
         ORefundPriceDiffDetail oRefundPriceDiffDetail = refundPriceDiffDetailMapper.selectByPrimaryKey(id);
         if(null==oRefundPriceDiffDetail){
-            throw new ProcessException("退补差价明细不存在");
+            throw new ProcessException("活动调整明细不存在");
         }
         if(oRefundPriceDiffDetail.getSendStatus().compareTo(Status.STATUS_1.status)==0){
             throw new ProcessException("已联动成功请勿重复发送");
@@ -1146,10 +1132,10 @@ public class CompensateServiceImpl implements CompensateService {
         criteria1.andRecordStatusIn(recordStatusList);
         List<OLogisticsDetail> oLogisticsDetails = logisticsDetailMapper.selectByExample(oLogisticsDetailExample);
         if(null==oLogisticsDetails){
-            throw new ProcessException("退补差价明细不存在");
+            throw new ProcessException("活动调整明细不存在");
         }
         if(null==oLogisticsDetails){
-            throw new ProcessException("退补差价明细不存在");
+            throw new ProcessException("活动调整明细不存在");
         }
         OActivity activity = orderActivityService.findById(oRefundPriceDiffDetail.getActivityRealId());
         if(null==activity){
@@ -1164,7 +1150,7 @@ public class CompensateServiceImpl implements CompensateService {
 
 
     /**
-     * 查看退补差价明细
+     * 查看活动调整明细
      * @param id
      * @return
      */
@@ -1340,10 +1326,10 @@ public class CompensateServiceImpl implements CompensateService {
 
         try {
             if(null==refundPriceDiffDetailList){
-                throw new ProcessException("退补差价明细数据为空");
+                throw new ProcessException("活动调整明细数据为空");
             }
             if(null==oRefundPriceDiff){
-                throw new ProcessException("退补差价金额数据为空");
+                throw new ProcessException("活动调整金额数据为空");
             }
             refundPriceDiffDetailList.forEach(row->{
                 //查询最新活动
@@ -1366,11 +1352,11 @@ public class CompensateServiceImpl implements CompensateService {
                 row.setFrontProName(oProduct.getProName());
                 int i = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(oRefundPriceDiffDetail);
                 if(i!=1){
-                    throw new ProcessException("修改退补差价数据失败");
+                    throw new ProcessException("修改活动调整数据失败");
                 }
             });
             if(null==oRefundPriceDiff.getId()){
-                throw new ProcessException("退补差价数据id为空");
+                throw new ProcessException("活动调整数据id为空");
             }
             BigDecimal belowPayAmt = new BigDecimal(0);
             BigDecimal shareDeductAmt = new BigDecimal(0);
@@ -1385,7 +1371,7 @@ public class CompensateServiceImpl implements CompensateService {
             oRefundPriceDiff.setShareDeductAmt(shareDeductAmt);
             int k = refundPriceDiffMapper.updateByPrimaryKeySelective(oRefundPriceDiff);
             if(k!=1){
-                throw new ProcessException("更新退补差价数据失败");
+                throw new ProcessException("更新活动调整数据失败");
             }
             //附件修改
             if(null!=refundPriceDiffFile){
@@ -1423,8 +1409,8 @@ public class CompensateServiceImpl implements CompensateService {
             cashReceivablesService.addOCashReceivables(cashReceivablesVoList,cUser,refundPriceDiff.getAgentId(),CashPayType.REFUNDPRICEDIFF,oRefundPriceDiff.getId());
         } catch (Exception e) {
             e.printStackTrace();
-            log.info("退补差价修改失败");
-            throw new ProcessException("退补差价修改失败");
+            log.info("活动调整修改失败");
+            throw new ProcessException("活动调整修改失败");
         }
         return AgentResult.ok();
     }
