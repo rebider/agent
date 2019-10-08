@@ -13,9 +13,11 @@ import com.ryx.credit.dao.order.OPaymentMapper;
 import com.ryx.credit.dao.order.ORemoveAccountMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
+import com.ryx.credit.service.agent.BusinessPlatformService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.ORemoveAccountService;
+import org.apache.commons.lang3.EnumUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +58,8 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
     private DictOptionsService dictOptionsService;
     @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
+    @Autowired
+    public  BusinessPlatformService businessPlatformService;
 
     @Override
     public PageInfo removeAccountDetail(Map<String, Object> param, PageInfo pageInfo) {
@@ -113,9 +117,23 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                 oRemoveAccount.setAgId(agent.getId());
                 oRemoveAccount.setAgName(agent.getAgName());
             }
-
+            int num=0;
+            String platName = String.valueOf(objectList.get(2));
+            List<PlatForm> platFormList = businessPlatformService.queryAblePlatForm();
+            for (int p=0;p<platFormList.size();p++) {
+                num++;
+                if(platFormList.get(p).getPlatformName().equals(platName.trim())){
+                    platName=platFormList.get(p).getPlatformNum();
+                    break;
+                }else if(!platFormList.get(p).getPlatformName().equals(platName.trim())){
+                    continue;
+                }else if(num==platFormList.size()){
+                    logger.info("请检查第"+j+"行数据业务平台的正确性");
+                    throw new MessageException("请检查第"+j+"行数据业务平台的正确性");
+                }
+            }
             AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
-            agentBusInfoExample.createCriteria().andBusNumEqualTo(String.valueOf(objectList.get(1))).andBusPlatformEqualTo(String.valueOf(objectList.get(2)))
+            agentBusInfoExample.createCriteria().andBusNumEqualTo(String.valueOf(objectList.get(1))).andBusPlatformEqualTo(platName)
                     .andStatusEqualTo(Status.STATUS_1.status).andBusStatusEqualTo(Status.STATUS_1.status);
             List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
             if(null==agentBusInfoList || agentBusInfoList.size()==0){
@@ -125,7 +143,7 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
             oRemoveAccount.setId(idService.genId(TabId.O_REMOVE_ACCOUNT));
             oRemoveAccount.setSubmitPerson(userid);
             oRemoveAccount.setBusNum(String.valueOf(objectList.get(1)));//O码
-            oRemoveAccount.setBusPlatform(String.valueOf(objectList.get(2)));//业务平台
+            oRemoveAccount.setBusPlatform(platName);//业务平台
             if (String.valueOf(objectList.get(3)).equals(RemoveAccotunMethod.XXDK.msg)){
                 oRemoveAccount.setPayMethod(RemoveAccotunMethod.XXDK.code);//销账类型
             }else if (String.valueOf(objectList.get(3)).equals(RemoveAccotunMethod.FRDK.msg)){
