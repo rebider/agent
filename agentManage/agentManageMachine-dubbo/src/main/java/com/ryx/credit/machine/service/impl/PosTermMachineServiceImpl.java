@@ -384,6 +384,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
 
     @Override
     public boolean checkModleIsEq(Map<String, String> data, String platformType) {
+        log.info("checkModleIsEq:{},{}",data,platformType);
         return imsTermMachineService.checkModleIsEq(data.get("oldMerid"),data.get("newMerId"));
     }
 }
