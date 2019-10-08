@@ -993,28 +993,9 @@ public class CompensateServiceImpl implements CompensateService {
                     if(j!=1){
                         throw new ProcessException("活动调整更新失败");
                     }
-                    OSubOrderExample subOrderExample = new OSubOrderExample();
-                    OSubOrderExample.Criteria subOrderCriteria = subOrderExample.createCriteria();
-                    subOrderCriteria.andStatusEqualTo(Status.STATUS_1.status);
-                    subOrderCriteria.andOrderIdEqualTo(row.getOrderId());
-                    subOrderCriteria.andProIdEqualTo(row.getProId());
-                    List<OSubOrder> oSubOrders = subOrderMapper.selectByExample(subOrderExample);
-                    OSubOrder oSubOrder = oSubOrders.get(0);
-                    if(oSubOrder==null){
-                        throw new ProcessException("采购单不唯一");
-                    }
 
-                    OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
-                    OSubOrderActivityExample.Criteria oSubOrderCriteria = oSubOrderActivityExample.createCriteria();
-                    oSubOrderCriteria.andStatusEqualTo(Status.STATUS_1.status);
-                    oSubOrderCriteria.andSubOrderIdEqualTo(oSubOrder.getId());
-                    List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
-                    OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
-                    if(oSubOrderActivity==null){
-                        throw new ProcessException("活动不唯一");
-                    }
                     row.setNewMachineId(activity.getBusProCode());
-                    row.setOldMachineId(oSubOrderActivity.getBusProCode());
+                    row.setOldMachineId(activityOld.getBusProCode());
 
                 }catch (ProcessException e) {
                     e.printStackTrace();
