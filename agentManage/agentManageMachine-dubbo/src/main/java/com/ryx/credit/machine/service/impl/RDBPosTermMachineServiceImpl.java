@@ -144,7 +144,7 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
             //发送成功，查询结果
             try {
                 String retJson = JSONObject.toJSONString(FastMap.fastMap("taskId", reqMap.get("taskId")));
-                logger.info("RDB查询下发参数",retJson);
+                logger.info("RDB退货查询下发参数:" + retJson);
                 String retString = HttpClientUtil.doPostJsonWithException(AppConfig.getProperty("rdbpos.checkTermResult"), retJson);
                 if (!StringUtils.isNotBlank(retString)) {
                     agentResult.setStatus(2);
@@ -153,7 +153,7 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
                 }
 
                 JSONObject resJson = JSONObject.parseObject(retString);
-                logger.info("------------------------------------------>>>RDB退货下发查询接口返回值:" + retString);
+                logger.info("RDB退货下发查询接口返回值:" + retString);
                 if (null != resJson.getString("code") && resJson.getString("code").equals("0000") && null != resJson.getBoolean("success") && resJson.getBoolean("success")) {
                     //处理成功
                     agentResult.setStatus(1);
