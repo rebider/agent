@@ -20,5 +20,5 @@ public interface PosOrgStatisticsService {
      * @param map
      * @return
      */
-    Long posOrgStatisticsCount(Map map);
+    Long queryAllOrderByAgentId(Map map);
 }

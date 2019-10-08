@@ -203,6 +203,13 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
             Agent agent = agentService.insertAgent(agentVo.getAgent(), agentVo.getAgentTableFile(),agentVo.getAgent().getcUser(),null);
             agentVo.setAgent(agent);
+            //代理商业务
+            for (AgentBusInfo item : agentVo.getBusInfoVoList()) {
+                //校验实时分润不能升级
+                List platformList = platFormMapper.selectPlatformNumByPlatformType();
+                boolean checkBusPlatform = platformList.contains(item.getBusPlatform()) && (null != item.getBusNum() && !"".equals(item.getBusNum()));
+                if (checkBusPlatform) throw new ProcessException("实时分润品牌暂不支持升级！");
+            }
             for (AgentContractVo item : agentVo.getContractVoList()) {
                 item.setcUser(agent.getcUser());
                 item.setAgentId(agent.getId());
@@ -1228,7 +1235,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         List<Dict> COLINFO_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.COLINFO_TYPE.name());
         List<Dict> REPORT_STATUS = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.REPORT_STATUS.name());
 
-
         if (null != agentoutVos && agentoutVos.size() > 0)
             for (AgentoutVo agentoutVo : agentoutVos) {
                 if (StringUtils.isNotBlank(agentoutVo.getBusType()) && !agentoutVo.getBusType().equals("null")) {
@@ -1271,6 +1277,13 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                             agentoutVo.setReportString(dict.getdItemname());
                             break;
                         }
+                    }
+                }
+
+                if (StringUtils.isNotBlank(agentoutVo.getFreeStatus()) && !agentoutVo.getFreeStatus().equals("null")) {
+                    String agStatusByValue = FreeStatus.getContentByValue(new BigDecimal(agentoutVo.getFreeStatus()));
+                    if (null != agStatusByValue) {
+                        agentoutVo.setFreeStatus(agStatusByValue);
                     }
                 }
 

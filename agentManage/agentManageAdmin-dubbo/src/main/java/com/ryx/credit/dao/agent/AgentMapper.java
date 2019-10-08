@@ -43,4 +43,14 @@ public interface AgentMapper {
 
     //通过登录用户查询代理商
     Map<String, Object> selectAgentByOrgId(@Param("map")Map<String,Object> map);
+
+    List<Agent> selectByPrimaryKeys(List ids);
+
+    List<Map<String,Object>> queryCaManagerList(@Param("map") Map<String,Object> map,@Param("page") Page page);
+
+    int queryCaManagerListCount(@Param("map") Map<String,Object> map,@Param("page") Page page);
+
+    List<Agent> expoerCaList(@Param("map") Map<String,Object> map);
+
+    Agent selectByAgent(Agent agent);
 }

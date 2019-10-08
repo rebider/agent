@@ -1,14 +1,11 @@
 package com.ryx.credit.machine.service.impl;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.PlatformType;
-import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.*;
-import com.ryx.credit.service.agent.PlatFormService;
+import com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail;
 import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,6 +118,8 @@ public class TermMachineServiceImpl  implements TermMachineService {
             return mposTermMachineServiceImpl.adjustmentMachine(adjustmentMachineVo);
         }else if(PlatformType.SSPOS.code.equals(adjustmentMachineVo.getPlatformType())){
             return sPosTermMachineServiceImpl.adjustmentMachine(adjustmentMachineVo);
+        }else if (PlatformType.RDBPOS.code.equals(adjustmentMachineVo.getPlatformType())){
+            return rdbTermMachineServiceImpl.adjustmentMachine(adjustmentMachineVo);
         }
         return AgentResult.fail("未实现的业务");
     }
@@ -190,5 +189,57 @@ public class TermMachineServiceImpl  implements TermMachineService {
 
         }
         return agentResult;
+    }
+
+    @Override
+    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws Exception {
+        String platformType = refundPriceDiffDetailList.get(0).getPlatformType();
+        AgentResult agentResult = AgentResult.fail();
+        if(PlatformType.POS.getValue().equals(platformType)){
+            agentResult =  posTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList,operation);
+        }else if(PlatformType.SSPOS.getValue().equals(platformType)){
+            agentResult =  sPosTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList,operation);
+        }else if(PlatformType.MPOS.getValue().equals(platformType)){
+            agentResult =  mposTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList,operation);
+        }else if(PlatformType.RDBPOS.getValue().equals(platformType)){
+            agentResult =  rdbTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList,operation);
+        }else {
+            return AgentResult.ok("未联动");
+        }
+        return agentResult;
+    }
+
+    @Override
+    public AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception {
+        AgentResult agentResult = AgentResult.fail();
+        if(PlatformType.POS.getValue().equals(platformType)){
+            agentResult =  posTermMachineServiceImpl.queryCompensateResult(serialNumber,platformType);
+        }else if(PlatformType.SSPOS.getValue().equals(platformType)){
+            agentResult =  sPosTermMachineServiceImpl.queryCompensateResult(serialNumber,platformType);
+        }else if(PlatformType.MPOS.getValue().equals(platformType)){
+            agentResult =  mposTermMachineServiceImpl.queryCompensateResult(serialNumber,platformType);
+        }else if(PlatformType.RDBPOS.getValue().equals(platformType)){
+            agentResult =  rdbTermMachineServiceImpl.queryCompensateResult(serialNumber,platformType);
+        }else {
+            //未调整
+            return AgentResult.ok("04");
+        }
+        return agentResult;
+    }
+
+    @Override
+    public boolean checkModleIsEq(Map<String,String> data,String platformType) {
+        logger.info("checkModleIsEq:{},{}",data,platformType);
+        if(PlatformType.whetherPOS(platformType)){
+            return posTermMachineServiceImpl.checkModleIsEq(data,platformType);
+        }else if(PlatformType.SSPOS.getValue().equals(platformType)){
+            return false;
+        }else if(PlatformType.MPOS.getValue().equals(platformType)){
+            return false;
+        }else if(PlatformType.RDBPOS.getValue().equals(platformType)){
+            return false;
+        }else {
+            return false;
+        }
     }
 }

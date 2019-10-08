@@ -41,4 +41,12 @@ public interface OOrderMapper {
     List<Map<String,Object>> queryHavePeiHuoProduct(@Param("orderId") String orderId,@Param("agentId") String agentId);
 
     List<OrderoutVo> excelOrder(Map map);
+
+    Long arrearageCount(Map<String, Object> param);
+
+    List<Map<String,Object>> arrearageList(Map<String, Object> param);
+
+    List<Map> arrearageQuery(Map map);
+
+    List<Map> isRemoveAccount(Map map);
 }

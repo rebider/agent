@@ -425,6 +425,10 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             return AgentResult.fail("业务平台编号和平台登录账号不能为空！");
         }
 
+        int i = agentBusInfoMapper.selectByBusNum(FastMap.fastMap("busNum",agentBusInfo.getBusNum()).putKeyV("busPlatform", agentBusInfo.getBusPlatform()));
+        if (i > 0 || agentBusInfo.getBusNum().equals(agentBusInfo.getBusParent()))
+            return AgentResult.fail("您已经升级成功，请勿重复提交！");
+
         Map<String,Object> jsonParams = new HashMap<String, Object>();
         jsonParams = commonParam(jsonParams, agentColinfo, agent, agentBusInfo);
 

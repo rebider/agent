@@ -346,7 +346,7 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
             AgentResult agentResult = httpForMpos(orgId,parentBusNum,termType);
             agentResult.setMsg(platformType);
             return agentResult;
-        }else if(PlatformType.whetherPOS(platformType)){
+        }else if(PlatformType.whetherPOS(platformType) || PlatformType.SSPOS.getValue().equals(platformType)){
             if(StringUtils.isEmpty(orgId)){
                 if(StringUtils.isNotEmpty(parentBusNum)){
                     orgId = parentBusNum;
@@ -387,9 +387,9 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
     }
 
     @Override
-    public Long posOrgStatisticsCount(Map map) {
+    public Long queryAllOrderByAgentId(Map map) {
         //业务bus_num,查询订单id,查询采购订单,pro_num
-        return oSubOrderMapper.selectProNumByBusNum((String)map.get("busNum"));
+        return oSubOrderMapper.selectProNumByBusNum(map);
     }
 
 }

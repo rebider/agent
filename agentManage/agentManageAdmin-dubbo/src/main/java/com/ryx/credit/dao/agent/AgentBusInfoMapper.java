@@ -96,4 +96,16 @@ public interface AgentBusInfoMapper {
 
     // 有条件的分页查询
     List<AgentBusInfo> selectByConditionForPage(@Param("page")Page page, @Param("agentBusInfo") AgentBusInfo agentBusInfo);
+
+    //通过订单ID查询业务信息
+    AgentBusInfo selectByOrderId(String orderId);
+
+    //查询排单对应的（退货子订单明细-->>查询原订单-->>查询原来排单-->>查询原来业务信息表--busNum）
+    Map<String,Object> selectByReturnDetailId(Map<String, Object> reqMap);
+
+    //通过ID查询编码，和POS升级首字母（后期可升级）
+    Map<String, Object> selectByIdForPosUpSingCheck(@Param("id") String id);
+
+    //通过busnum查询是否已经升级成功
+    int selectByBusNum(Map<String, Object> paramMap);
 }
