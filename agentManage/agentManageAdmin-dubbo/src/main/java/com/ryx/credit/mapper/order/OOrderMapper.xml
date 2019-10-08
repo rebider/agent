@@ -1425,4 +1425,25 @@
     order by a.agent_id,  to_char(a.plan_pay_time,'yyyy-mm') desc
   </select>
 
+  <!--批量销账导入文件查询机具欠款-->
+  <select id="queryJjqk" parameterType="java.util.Map" resultType="java.util.Map">
+    select a.*,a_platform.platform_name,agent.ag_name,agent.AG_UNIQ_NUM from
+    (
+    select
+    businfo.agent_id,businfo.bus_platform,sum(o_payment_detail.pay_amount) as jjqk
+    ,businfo.bus_num
+    from o_payment_detail o_payment_detail
+    left join o_payment op on o_payment_detail.payment_id=op.id and  o_payment_detail.payment_status in (1,3)
+    left join o_order o on o.id=op.order_id
+    left join a_agent_businfo businfo on businfo.id=o.bus_id where 1=1
+    <if test="platform!=null and platform!=''"> and businfo.bus_platform=#{platform} </if>
+    <if test="busNum !=null and busNum !='' ">
+      and  businfo.bus_num =#{busNum}
+    </if>
+    group by businfo.agent_id,businfo.bus_platform ,businfo.bus_num
+    )a left join a_platform on a.bus_platform=a_platform.platform_num
+    left join a_agent agent on agent.id=a.agent_id where 1=1
+    <if test="agId!=null and agId!=''"> and agent.ID=#{agId} </if>
+    order by agent.id
+  </select>
 </mapper>
