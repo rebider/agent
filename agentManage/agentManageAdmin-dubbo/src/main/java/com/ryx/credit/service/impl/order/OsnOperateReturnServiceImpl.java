@@ -715,6 +715,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateReturnService {
                     return FastMap.fastMap("status", "2").putKeyV("msg", null == rdbXF.getMsg()?"RDB接口返回信息为空":rdbXF.getMsg());
                 }
             }catch (Exception e){
+                e.printStackTrace();
                 throw new Exception("RDB接口异常！！！");
             }
         } else {
