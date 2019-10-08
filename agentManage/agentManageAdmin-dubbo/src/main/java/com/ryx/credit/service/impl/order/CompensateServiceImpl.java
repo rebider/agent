@@ -519,30 +519,16 @@ public class CompensateServiceImpl implements CompensateService {
                 refundPriceDiffDetail.setFrontProId(old_Activity.getProductId());
                 OProduct oProduct = productService.findById(old_Activity.getProductId());
                 if(oProduct==null){
-                    throw new ProcessException("查询新活动商品失败");
+                    throw new ProcessException("查询老活动商品失败");
                 }
                 refundPriceDiffDetail.setFrontProName(oProduct.getProName());
-
-                OSubOrderExample subOrderExample = new OSubOrderExample();
-                OSubOrderExample.Criteria subOrderCriteria = subOrderExample.createCriteria();
-                subOrderCriteria.andStatusEqualTo(Status.STATUS_1.status);
-                subOrderCriteria.andOrderIdEqualTo(refundPriceDiffDetail.getOrderId());
-                subOrderCriteria.andProIdEqualTo(refundPriceDiffDetail.getProId());
-                List<OSubOrder> oSubOrders = subOrderMapper.selectByExample(subOrderExample);
-                OSubOrder oSubOrder = oSubOrders.get(0);
-                if(oSubOrder==null){
-                    throw new ProcessException("采购单不唯一");
+                //新商品级商品编号级活动名称
+                OProduct new_Product = productService.findById(new_oActivity.getProductId());
+                if(new_Product==null){
+                    throw new ProcessException("查询新活动商品失败");
                 }
-
-                OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
-                OSubOrderActivityExample.Criteria criteria = oSubOrderActivityExample.createCriteria();
-                criteria.andStatusEqualTo(Status.STATUS_1.status);
-                criteria.andSubOrderIdEqualTo(oSubOrder.getId());
-                List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
-                OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
-                if(oSubOrderActivity==null){
-                    throw new ProcessException("活动不唯一");
-                }
+                refundPriceDiffDetail.setProId(new_oActivity.getProductId());
+                refundPriceDiffDetail.setProName(new_Product.getProName());
                 //业务平台
                 PlatForm platForm =  platFormService.selectByPlatformNum(old_Activity.getPlatform());
                 if(platForm==null) throw new ProcessException("业务平台未找到:"+old_Activity.getPlatform());
