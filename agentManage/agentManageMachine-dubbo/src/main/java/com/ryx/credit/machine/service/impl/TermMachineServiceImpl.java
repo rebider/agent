@@ -224,6 +224,7 @@ public class TermMachineServiceImpl  implements TermMachineService {
 
     @Override
     public boolean checkModleIsEq(Map<String,String> data,String platformType) {
+        logger.info("checkModleIsEq:{},{}",data,platformType);
         if(PlatformType.whetherPOS(platformType)){
             return posTermMachineServiceImpl.checkModleIsEq(data,platformType);
         }else if(PlatformType.SSPOS.getValue().equals(platformType)){
