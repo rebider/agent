@@ -22,7 +22,7 @@ public enum BusActRelBusType {
     refund("/BusActRelBusType/refund","退货审批"),
     hisrefund("/BusActRelBusType/hisrefund","历史退货审批"),
     TOOLS("/BusActRelBusType/TOOLS","机具扣款调整申请"),
-    COMPENSATE("/BusActRelBusType/COMPENSATE","退补差价审批"),
+    COMPENSATE("/BusActRelBusType/COMPENSATE","活动调整审批"),
     POSTAX("/BusActRelBusType/POSTAX","税点调整申请"),
     POSCHECK("/BusActRelBusType/POSCHECK","分润比例考核"),
     POSREWARD("/BusActRelBusType/POSREWARD","POS特殊奖励"),

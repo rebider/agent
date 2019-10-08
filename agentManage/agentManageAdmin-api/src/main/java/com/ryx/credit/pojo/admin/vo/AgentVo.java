@@ -24,15 +24,6 @@ import java.util.Map;
 public class AgentVo implements Serializable {
 
     private Agent agent;
-
-    public String getPretest() {
-        return pretest;
-    }
-
-    public void setPretest(String pretest) {
-        this.pretest = pretest;
-    }
-
     private List<CapitalVo> capitalVoList;
     private List<AgentContractVo> contractVoList;
     private List<AgentColinfoVo> colinfoVoList;
@@ -68,7 +59,6 @@ public class AgentVo implements Serializable {
     private List<ODeductCapital> deductCapitalList;
     //付款单
     private Map<String, String> oPayment;
-
     //退货ID
     private String returnId;
     //退货排单计划
@@ -80,21 +70,11 @@ public class AgentVo implements Serializable {
     private List<Map<String,Object>> reqListMap;
     private ReceiptPlan receiptPlan;
     private List<ReceiptPlan> receiptPlanList;
-
     private String payMethod;
     //退货单
     private OReturnOrder oReturnOrder;
     private List<OCashReceivablesVo> oCashReceivablesVoList;
     private List<TerminalTransferDetail > terminalTransferDetailList;
-
-    public List<String> getTerminalTransferDetailID() {
-        return terminalTransferDetailID;
-    }
-
-    public void setTerminalTransferDetailID(List<String> terminalTransferDetailID) {
-        this.terminalTransferDetailID = terminalTransferDetailID;
-    }
-
     private List<String > terminalTransferDetailID;
     private TerminalTransfer terminalTransfer;
     private String debt;  //欠款
@@ -119,7 +99,37 @@ public class AgentVo implements Serializable {
     private List<AgentBusInfoVo> orgTypeList;//财务出款机构审批数据
     private String finaceRemitOrgan;//财务出款机构
     private List<AgentBusInfoVo> marketToporgTableIdForm;//市场部顶级机构
+    private String deliveryTime;
+    //发票信息
+   private String invoiceId;
+   private  String invoiceReturnReason;
+    private  String invoiceReturnExpressNumber;
+    private  String invoiceReturnExpressCompany;
+    private  String invoiceReturnDate;
 
+    public String getPretest() {
+        return pretest;
+    }
+
+    public void setPretest(String pretest) {
+        this.pretest = pretest;
+    }
+
+    public List<String> getTerminalTransferDetailID() {
+        return terminalTransferDetailID;
+    }
+
+    public void setTerminalTransferDetailID(List<String> terminalTransferDetailID) {
+        this.terminalTransferDetailID = terminalTransferDetailID;
+    }
+
+    public String getDeliveryTime() {
+        return deliveryTime;
+    }
+
+    public void setDeliveryTime(String deliveryTime) {
+        this.deliveryTime = deliveryTime;
+    }
 
     public String getFinaceRemitOrgan() {
         return finaceRemitOrgan;
@@ -168,13 +178,6 @@ public class AgentVo implements Serializable {
     public void setRealitySuppDept(BigDecimal realitySuppDept) {
         this.realitySuppDept = realitySuppDept;
     }
-
-    //发票信息
-   private String invoiceId;
-   private  String invoiceReturnReason;
-    private  String invoiceReturnExpressNumber;
-    private  String invoiceReturnExpressCompany;
-    private  String invoiceReturnDate;
 
     public String getInvoiceId() {
         return invoiceId;

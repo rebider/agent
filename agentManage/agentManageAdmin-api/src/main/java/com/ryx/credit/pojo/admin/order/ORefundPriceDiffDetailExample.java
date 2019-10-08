@@ -24,20 +24,20 @@ public class ORefundPriceDiffDetailExample {
         oredCriteria = new ArrayList<Criteria>();
     }
 
-    public void setOrderByClause(String orderByClause) {
-        this.orderByClause = orderByClause;
-    }
-
     public String getOrderByClause() {
         return orderByClause;
     }
 
-    public void setDistinct(boolean distinct) {
-        this.distinct = distinct;
+    public void setOrderByClause(String orderByClause) {
+        this.orderByClause = orderByClause;
     }
 
     public boolean isDistinct() {
         return distinct;
+    }
+
+    public void setDistinct(boolean distinct) {
+        this.distinct = distinct;
     }
 
     public List<Criteria> getOredCriteria() {
@@ -73,28 +73,28 @@ public class ORefundPriceDiffDetailExample {
         distinct = false;
     }
 
-    public void setPage(Page page) {
-        this.page=page;
-    }
-
     public Page getPage() {
         return page;
     }
 
-    public void setLimitStart(Integer limitStart) {
-        this.limitStart=limitStart;
+    public void setPage(Page page) {
+        this.page=page;
     }
 
     public Integer getLimitStart() {
         return limitStart;
     }
 
-    public void setLimitEnd(Integer limitEnd) {
-        this.limitEnd=limitEnd;
+    public void setLimitStart(Integer limitStart) {
+        this.limitStart=limitStart;
     }
 
     public Integer getLimitEnd() {
         return limitEnd;
+    }
+
+    public void setLimitEnd(Integer limitEnd) {
+        this.limitEnd=limitEnd;
     }
 
     protected abstract static class GeneratedCriteria {
@@ -2207,6 +2207,346 @@ public class ORefundPriceDiffDetailExample {
             addCriterion("FRONT_PRO_NAME not between", value1, value2, "frontProName");
             return (Criteria) this;
         }
+
+        public Criteria andPlatformTypeIsNull() {
+            addCriterion("PLATFORM_TYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeIsNotNull() {
+            addCriterion("PLATFORM_TYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeEqualTo(String value) {
+            addCriterion("PLATFORM_TYPE =", value, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeNotEqualTo(String value) {
+            addCriterion("PLATFORM_TYPE <>", value, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeGreaterThan(String value) {
+            addCriterion("PLATFORM_TYPE >", value, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeGreaterThanOrEqualTo(String value) {
+            addCriterion("PLATFORM_TYPE >=", value, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeLessThan(String value) {
+            addCriterion("PLATFORM_TYPE <", value, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeLessThanOrEqualTo(String value) {
+            addCriterion("PLATFORM_TYPE <=", value, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeLike(String value) {
+            addCriterion("PLATFORM_TYPE like", value, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeNotLike(String value) {
+            addCriterion("PLATFORM_TYPE not like", value, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeIn(List<String> values) {
+            addCriterion("PLATFORM_TYPE in", values, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeNotIn(List<String> values) {
+            addCriterion("PLATFORM_TYPE not in", values, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeBetween(String value1, String value2) {
+            addCriterion("PLATFORM_TYPE between", value1, value2, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeNotBetween(String value1, String value2) {
+            addCriterion("PLATFORM_TYPE not between", value1, value2, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgIdIsNull() {
+            addCriterion("OLD_ORG_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgIdIsNotNull() {
+            addCriterion("OLD_ORG_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgIdEqualTo(String value) {
+            addCriterion("OLD_ORG_ID =", value, "oldOrgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgIdNotEqualTo(String value) {
+            addCriterion("OLD_ORG_ID <>", value, "oldOrgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgIdGreaterThan(String value) {
+            addCriterion("OLD_ORG_ID >", value, "oldOrgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgIdGreaterThanOrEqualTo(String value) {
+            addCriterion("OLD_ORG_ID >=", value, "oldOrgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgIdLessThan(String value) {
+            addCriterion("OLD_ORG_ID <", value, "oldOrgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgIdLessThanOrEqualTo(String value) {
+            addCriterion("OLD_ORG_ID <=", value, "oldOrgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgIdLike(String value) {
+            addCriterion("OLD_ORG_ID like", value, "oldOrgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgIdNotLike(String value) {
+            addCriterion("OLD_ORG_ID not like", value, "oldOrgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgIdIn(List<String> values) {
+            addCriterion("OLD_ORG_ID in", values, "oldOrgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgIdNotIn(List<String> values) {
+            addCriterion("OLD_ORG_ID not in", values, "oldOrgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgIdBetween(String value1, String value2) {
+            addCriterion("OLD_ORG_ID between", value1, value2, "oldOrgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgIdNotBetween(String value1, String value2) {
+            addCriterion("OLD_ORG_ID not between", value1, value2, "oldOrgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgIdIsNull() {
+            addCriterion("NEW_ORG_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgIdIsNotNull() {
+            addCriterion("NEW_ORG_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgIdEqualTo(String value) {
+            addCriterion("NEW_ORG_ID =", value, "newOrgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgIdNotEqualTo(String value) {
+            addCriterion("NEW_ORG_ID <>", value, "newOrgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgIdGreaterThan(String value) {
+            addCriterion("NEW_ORG_ID >", value, "newOrgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgIdGreaterThanOrEqualTo(String value) {
+            addCriterion("NEW_ORG_ID >=", value, "newOrgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgIdLessThan(String value) {
+            addCriterion("NEW_ORG_ID <", value, "newOrgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgIdLessThanOrEqualTo(String value) {
+            addCriterion("NEW_ORG_ID <=", value, "newOrgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgIdLike(String value) {
+            addCriterion("NEW_ORG_ID like", value, "newOrgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgIdNotLike(String value) {
+            addCriterion("NEW_ORG_ID not like", value, "newOrgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgIdIn(List<String> values) {
+            addCriterion("NEW_ORG_ID in", values, "newOrgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgIdNotIn(List<String> values) {
+            addCriterion("NEW_ORG_ID not in", values, "newOrgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgIdBetween(String value1, String value2) {
+            addCriterion("NEW_ORG_ID between", value1, value2, "newOrgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgIdNotBetween(String value1, String value2) {
+            addCriterion("NEW_ORG_ID not between", value1, value2, "newOrgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeliveryTimeIsNull() {
+            addCriterion("DELIVERY_TIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeliveryTimeIsNotNull() {
+            addCriterion("DELIVERY_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeliveryTimeEqualTo(String value) {
+            addCriterion("DELIVERY_TIME =", value, "deliveryTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeliveryTimeNotEqualTo(String value) {
+            addCriterion("DELIVERY_TIME <>", value, "deliveryTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeliveryTimeGreaterThan(String value) {
+            addCriterion("DELIVERY_TIME >", value, "deliveryTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeliveryTimeGreaterThanOrEqualTo(String value) {
+            addCriterion("DELIVERY_TIME >=", value, "deliveryTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeliveryTimeLessThan(String value) {
+            addCriterion("DELIVERY_TIME <", value, "deliveryTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeliveryTimeLessThanOrEqualTo(String value) {
+            addCriterion("DELIVERY_TIME <=", value, "deliveryTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeliveryTimeLike(String value) {
+            addCriterion("DELIVERY_TIME like", value, "deliveryTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeliveryTimeNotLike(String value) {
+            addCriterion("DELIVERY_TIME not like", value, "deliveryTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeliveryTimeIn(List<String> values) {
+            addCriterion("DELIVERY_TIME in", values, "deliveryTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeliveryTimeNotIn(List<String> values) {
+            addCriterion("DELIVERY_TIME not in", values, "deliveryTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeliveryTimeBetween(String value1, String value2) {
+            addCriterion("DELIVERY_TIME between", value1, value2, "deliveryTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeliveryTimeNotBetween(String value1, String value2) {
+            addCriterion("DELIVERY_TIME not between", value1, value2, "deliveryTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppTimeIsNull() {
+            addCriterion("APP_TIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppTimeIsNotNull() {
+            addCriterion("APP_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppTimeEqualTo(Date value) {
+            addCriterion("APP_TIME =", value, "appTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppTimeNotEqualTo(Date value) {
+            addCriterion("APP_TIME <>", value, "appTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppTimeGreaterThan(Date value) {
+            addCriterion("APP_TIME >", value, "appTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppTimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("APP_TIME >=", value, "appTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppTimeLessThan(Date value) {
+            addCriterion("APP_TIME <", value, "appTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppTimeLessThanOrEqualTo(Date value) {
+            addCriterion("APP_TIME <=", value, "appTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppTimeIn(List<Date> values) {
+            addCriterion("APP_TIME in", values, "appTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppTimeNotIn(List<Date> values) {
+            addCriterion("APP_TIME not in", values, "appTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppTimeBetween(Date value1, Date value2) {
+            addCriterion("APP_TIME between", value1, value2, "appTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppTimeNotBetween(Date value1, Date value2) {
+            addCriterion("APP_TIME not between", value1, value2, "appTime");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
@@ -2232,38 +2572,6 @@ public class ORefundPriceDiffDetailExample {
         private boolean listValue;
 
         private String typeHandler;
-
-        public String getCondition() {
-            return condition;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-
-        public Object getSecondValue() {
-            return secondValue;
-        }
-
-        public boolean isNoValue() {
-            return noValue;
-        }
-
-        public boolean isSingleValue() {
-            return singleValue;
-        }
-
-        public boolean isBetweenValue() {
-            return betweenValue;
-        }
-
-        public boolean isListValue() {
-            return listValue;
-        }
-
-        public String getTypeHandler() {
-            return typeHandler;
-        }
 
         protected Criterion(String condition) {
             super();
@@ -2299,6 +2607,38 @@ public class ORefundPriceDiffDetailExample {
 
         protected Criterion(String condition, Object value, Object secondValue) {
             this(condition, value, secondValue, null);
+        }
+
+        public String getCondition() {
+            return condition;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public Object getSecondValue() {
+            return secondValue;
+        }
+
+        public boolean isNoValue() {
+            return noValue;
+        }
+
+        public boolean isSingleValue() {
+            return singleValue;
+        }
+
+        public boolean isBetweenValue() {
+            return betweenValue;
+        }
+
+        public boolean isListValue() {
+            return listValue;
+        }
+
+        public String getTypeHandler() {
+            return typeHandler;
         }
     }
 }

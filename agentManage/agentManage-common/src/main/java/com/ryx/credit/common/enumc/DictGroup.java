@@ -44,7 +44,7 @@ public enum DictGroup {
     ACT_ORDER("订单审批对应的启动流程"),
     ORDER_APR_MARKET("订单审批市场部参数"),
     ORDER_APR_BUSNISS("订单审批业务部参数"),
-    ACT_COMPENSATE("退补差价审批流名称"),
+    ACT_COMPENSATE("活动调整审批流名称"),
     TEMP_AGREE("协议模板"),
     ORDER_STATUS("订单状态"),
     AGREE_TYPE("协议类型"),
@@ -82,6 +82,9 @@ public enum DictGroup {
     REPORT_STATUS("报备状态"),
     INTERNET_RENEW("流量卡续费配置"),
     CARD_AMT("流量卡每张金额"),
+    OFFSET_AMT("轧差每张金额"),
+    COMPENSATE_MODEL_TYPE("补差价可扩展机具类型"),
+    COMPENSATE_PLATFORM_TYPE("补差价可调整关系平台"),
     OFFSET_AMT("轧差每张金额"),
 
     RDBPOS("瑞大宝模块"),
