@@ -3757,8 +3757,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public ResultVO removeAccountSave(ORemoveAccountVo oRemoveAccountVo,List<Map> rAmountlist) throws Exception {
         if (null==rAmountlist && rAmountlist.size()==0){
-            logger.info("销账添加:{}", "请选择需要销账的订单");
-            return ResultVO.fail("请选择需要销账的订单");
+            logger.info("销账添加:{}", "请选择需要销账的数据");
+            return ResultVO.fail("请选择需要销账的数据");
         }
         if (null == oRemoveAccountVo.getRemoveAccount()) {
             logger.info("销账添加:{}", "销账添加信息为空");
@@ -3787,6 +3787,11 @@ public class OrderServiceImpl implements OrderService {
                 String ramount = String.valueOf(map.get("ramount"));//销账金额
                 String agName = String.valueOf(map.get("agName"));
                 agName=new String(agName.getBytes("iso8859-1"),"utf-8");
+                int remove_Account = oRemoveAccountMapper.isRemoveAccount(map);
+                if (remove_Account>=1){
+                    logger.info("已在销账处理中,代理商为:"+agName+",业务平台编码:"+String.valueOf(map.get("busNum")));
+                    return ResultVO.fail("已在销账处理中,代理商为:"+agName+",业务平台编码:"+String.valueOf(map.get("busNum")));
+                }
                 if(new BigDecimal(ramount).compareTo(new BigDecimal(machinesAmount))==1){
                     logger.info("填写的金额不能大于机具欠款金额,代理商为:"+agName+",机具金额:"+machinesAmount);
                     throw new MessageException("填写的金额不能大于机具欠款金额,代理商为:"+agName+",机具金额:"+machinesAmount);
@@ -3807,6 +3812,7 @@ public class OrderServiceImpl implements OrderService {
                 removeAccount.setSubmitTime(date);
                 removeAccount.setStatus(Status.STATUS_1.status);
                 removeAccount.setVersion(Status.STATUS_1.status);
+                removeAccount.setRealRamount(new BigDecimal(0));
                 if (1 == oRemoveAccountMapper.insertSelective(removeAccount)) {
                     oRemoveAccountVo.setRemoveAccount(removeAccount);
                 }

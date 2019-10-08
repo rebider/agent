@@ -32,7 +32,7 @@ public class RemoveAccountJob implements DataflowJob<String> {
     public List<String> fetchData(ShardingContext shardingContext) {
         try {
             logger.debug("销账开始获取数据");
-            return osnOperateService.fetchFhData(0,shardingContext.getShardingItem());
+            return oRemoveAccountService.fetchFhData(0,shardingContext.getShardingItem());
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("销账开始处理失败",e);
@@ -43,7 +43,7 @@ public class RemoveAccountJob implements DataflowJob<String> {
     @Override
     public void processData(ShardingContext shardingContext, List<String> list) {
         logger.info("销账开始处理数据");
-        if(osnOperateService.processData(list)){
+        if(oRemoveAccountService.processData(list)){
             logger.info("销账开始处理成功");
         }else{
             logger.info("销账开始处理失败");

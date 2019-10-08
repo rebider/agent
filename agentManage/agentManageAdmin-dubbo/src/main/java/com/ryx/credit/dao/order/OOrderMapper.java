@@ -6,6 +6,7 @@ import com.ryx.credit.pojo.admin.order.OOrderExample;
 import com.ryx.credit.pojo.admin.vo.OrderoutVo;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,4 +50,6 @@ public interface OOrderMapper {
     List<Map> arrearageQuery(Map map);
 
     List<Map> isRemoveAccount(Map map);
+
+    List<Map> queryJjqk(HashMap<Object, Object> map);
 }

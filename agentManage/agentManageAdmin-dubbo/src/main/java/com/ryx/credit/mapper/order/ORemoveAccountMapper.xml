@@ -476,4 +476,14 @@ select count(1) from (
     where o_payment_detail.Payment_status in(4,6)
     <include refid="RACCOUNTDETAIL_WHERE_SQL"/>
   </select>
+
+  <!--查询是否已经销账-->
+  <select id="isRemoveAccount" parameterType="java.util.Map" resultType="int">
+
+    select count(1) from O_REMOVE_ACCOUNT r where STATUS=1
+    <if test="platform!=null and platform!=''"> and r.bus_platform=#{platform} </if>
+    <if test="busNum !=null and busNum !='' ">and  r.bus_num =#{busNum}</if>
+    <if test="rmonth!=null and rmonth!=''"> and to_char(r.RMONTH,'yyyy-mm')=#{rmonth} </if>
+    <if test="agId!=null and agId!=''"> and r.AG_ID =#{agId} </if>
+  </select>
 </mapper>
