@@ -1054,9 +1054,4 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             return retMap;
         }
     }
-
-    @Override
-    public boolean updateDetailBatch(List<OLogisticsDetail> datas, BigDecimal batch, BigDecimal code) throws Exception {
-        return false;
-    }
 }
