@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.PmsProfitLogMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.PmsProfitLog">
+    <id column="BATCH_NO" jdbcType="VARCHAR" property="batchNo" />
+    <result column="UPLOAD_PATH" jdbcType="VARCHAR" property="uploadPath" />
+    <result column="UPLOAD_NAME" jdbcType="VARCHAR" property="uploadName" />
+    <result column="RESULT_PATH" jdbcType="VARCHAR" property="resultPath" />
+    <result column="RESULT_NAME" jdbcType="VARCHAR" property="resultName" />
+    <result column="UPLOAD_TIME" jdbcType="VARCHAR" property="uploadTime" />
+    <result column="UPLOAD_USER" jdbcType="VARCHAR" property="uploadUser" />
+    <result column="STATUS" jdbcType="VARCHAR" property="status" />
+    <result column="NOTE" jdbcType="VARCHAR" property="note" />
+    <result column="MONTH" jdbcType="VARCHAR" property="month" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    BATCH_NO, UPLOAD_PATH, UPLOAD_NAME, RESULT_PATH, RESULT_NAME, UPLOAD_TIME, UPLOAD_USER, 
+    STATUS, NOTE, MONTH
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PmsProfitLogExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from PMS_PROFIT_LOG
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from PMS_PROFIT_LOG
+    where BATCH_NO = #{batchNo,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PmsProfitLogExample">
+    delete from PMS_PROFIT_LOG
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PmsProfitLog">
+    insert into PMS_PROFIT_LOG (BATCH_NO, UPLOAD_PATH, UPLOAD_NAME, 
+      RESULT_PATH, RESULT_NAME, UPLOAD_TIME, 
+      UPLOAD_USER, STATUS, NOTE, 
+      MONTH)
+    values (#{batchNo,jdbcType=VARCHAR}, #{uploadPath,jdbcType=VARCHAR}, #{uploadName,jdbcType=VARCHAR}, 
+      #{resultPath,jdbcType=VARCHAR}, #{resultName,jdbcType=VARCHAR}, #{uploadTime,jdbcType=VARCHAR}, 
+      #{uploadUser,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{note,jdbcType=VARCHAR}, 
+      #{month,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PmsProfitLog">
+    insert into PMS_PROFIT_LOG
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="batchNo != null">
+        BATCH_NO,
+      </if>
+      <if test="uploadPath != null">
+        UPLOAD_PATH,
+      </if>
+      <if test="uploadName != null">
+        UPLOAD_NAME,
+      </if>
+      <if test="resultPath != null">
+        RESULT_PATH,
+      </if>
+      <if test="resultName != null">
+        RESULT_NAME,
+      </if>
+      <if test="uploadTime != null">
+        UPLOAD_TIME,
+      </if>
+      <if test="uploadUser != null">
+        UPLOAD_USER,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="note != null">
+        NOTE,
+      </if>
+      <if test="month != null">
+        MONTH,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="batchNo != null">
+        #{batchNo,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadPath != null">
+        #{uploadPath,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadName != null">
+        #{uploadName,jdbcType=VARCHAR},
+      </if>
+      <if test="resultPath != null">
+        #{resultPath,jdbcType=VARCHAR},
+      </if>
+      <if test="resultName != null">
+        #{resultName,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadTime != null">
+        #{uploadTime,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadUser != null">
+        #{uploadUser,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="note != null">
+        #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="month != null">
+        #{month,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PmsProfitLogExample" resultType="java.lang.Long">
+    select count(*) from PMS_PROFIT_LOG
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PmsProfitLog">
+    update PMS_PROFIT_LOG
+    <set>
+      <if test="uploadPath != null">
+        UPLOAD_PATH = #{uploadPath,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadName != null">
+        UPLOAD_NAME = #{uploadName,jdbcType=VARCHAR},
+      </if>
+      <if test="resultPath != null">
+        RESULT_PATH = #{resultPath,jdbcType=VARCHAR},
+      </if>
+      <if test="resultName != null">
+        RESULT_NAME = #{resultName,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadTime != null">
+        UPLOAD_TIME = #{uploadTime,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadUser != null">
+        UPLOAD_USER = #{uploadUser,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="note != null">
+        NOTE = #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="month != null">
+        MONTH = #{month,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where BATCH_NO = #{batchNo,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.PmsProfitLog">
+    update PMS_PROFIT_LOG
+    set UPLOAD_PATH = #{uploadPath,jdbcType=VARCHAR},
+      UPLOAD_NAME = #{uploadName,jdbcType=VARCHAR},
+      RESULT_PATH = #{resultPath,jdbcType=VARCHAR},
+      RESULT_NAME = #{resultName,jdbcType=VARCHAR},
+      UPLOAD_TIME = #{uploadTime,jdbcType=VARCHAR},
+      UPLOAD_USER = #{uploadUser,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=VARCHAR},
+      NOTE = #{note,jdbcType=VARCHAR},
+      MONTH = #{month,jdbcType=VARCHAR}
+    where BATCH_NO = #{batchNo,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+
+
+
+
+
+
+  <!--=================================================以上自动生成============================================================-->
+
+
+  <select id="checkoutData" parameterType="java.lang.String" resultType="java.util.Map">
+
+select aa.ID,aa.AG_NAME,bb.BUS_PLATFORM,cc.PLATFORM_NAME  from A_AGENT aa,A_AGENT_BUSINFO bb,A_PLATFORM cc
+ where aa.ID = bb.AGENT_ID and bb.BUS_PLATFORM = cc.PLATFORM_NUM and aa.STATUS='1'and bb.STATUS='1'and cc.STATUS='1'
+ and aa.ID='${agentId}' and bb.BUS_PLATFORM='${busCode}'
+  </select>
+
+  <select id="getLoginName" parameterType="java.lang.String" resultType="java.util.Map">
+    select aa.NAME,aa.LOGIN_NAME from C_USER aa where aa.ID ='${userId}'
+  </select>
+
+</mapper>
