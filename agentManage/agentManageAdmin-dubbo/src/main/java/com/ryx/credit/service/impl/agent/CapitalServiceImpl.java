@@ -7,10 +7,7 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.dao.agent.AgentMapper;
-import com.ryx.credit.dao.agent.CapitalFlowMapper;
-import com.ryx.credit.dao.agent.CapitalMapper;
-import com.ryx.credit.dao.agent.PayCompMapper;
+import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.CapitalService;
@@ -51,6 +48,10 @@ public class CapitalServiceImpl implements CapitalService {
     private PayCompMapper payCompMapper;
     @Autowired
     private AgentMapper agentMapper;
+    @Autowired
+    private AttachmentMapper attachmentMapper;
+    @Autowired
+    private AssProtoColMapper assProtoColMapper;
 
 
     @Override
@@ -404,15 +405,17 @@ public class CapitalServiceImpl implements CapitalService {
     @Override
     public List<Capital> queryCapitalPro(String proIns) {
         if (org.apache.commons.lang.StringUtils.isBlank(proIns)){
-            new ArrayList<AgentContract>();
+            new ArrayList<Capital>();
         }
         CapitalExample capitalExample = new CapitalExample();
         CapitalExample.Criteria criteria = capitalExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andActivIdEqualTo(proIns);
-        List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
-        if (null!=capitals && capitals.size()>0){
-            return capitals;
+        List<Capital> capitalsList = capitalMapper.selectByExample(capitalExample);
+        if (null!=capitalsList && capitalsList.size()>0){
+            for (Capital capitals : capitalsList) {
+                capitals.setAttachmentList(attachmentMapper.accessoryQuery(capitals.getId(), AttachmentRelType.Capital.name()));
+            }
         }
-        return   new ArrayList<Capital>();
+        return   capitalsList;
     }
 
 }

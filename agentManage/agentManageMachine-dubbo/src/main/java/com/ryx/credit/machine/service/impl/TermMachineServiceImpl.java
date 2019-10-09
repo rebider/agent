@@ -113,6 +113,8 @@ public class TermMachineServiceImpl  implements TermMachineService {
             return mposTermMachineServiceImpl.adjustmentMachine(adjustmentMachineVo);
         }else if(PlatformType.SSPOS.code.equals(adjustmentMachineVo.getPlatformType())){
             return sPosTermMachineServiceImpl.adjustmentMachine(adjustmentMachineVo);
+        }else if (PlatformType.RDBPOS.code.equals(adjustmentMachineVo.getPlatformType())){
+            return rdbTermMachineServiceImpl.adjustmentMachine(adjustmentMachineVo);
         }
         return AgentResult.fail("未实现的业务");
     }

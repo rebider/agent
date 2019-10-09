@@ -92,7 +92,11 @@ public enum DictGroup {
     AGENT_CODE_FILTER("代理商过滤代码"),
 
     EMAIL("邮件模块"),
-    LOGISTICS_FAIL_EMAIL("物流失败邮件");
+    LOGISTICS_FAIL_EMAIL("物流失败邮件"),
+
+    CERTIFICATION_STATUS("代理商工商认证");
+
+
 
     public String  msg;
 
