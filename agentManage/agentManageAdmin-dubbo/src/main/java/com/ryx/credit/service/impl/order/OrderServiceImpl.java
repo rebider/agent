@@ -3724,7 +3724,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public PageInfo arrearageList(Map<String, Object> param, PageInfo pageInfo) {
         if(null!=param && param.size()>0){
-            if(null==param.get("month")){
+            if(null==param.get("month")||param.get("month").equals("")){
                 Date date = new Date();
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM");
                 param.put("rmonth",simpleDateFormat.format(date));
