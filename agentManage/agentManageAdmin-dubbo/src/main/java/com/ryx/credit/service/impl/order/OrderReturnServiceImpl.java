@@ -2350,6 +2350,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         if (null==oOrder) throw new MessageException("查询订单数据失败！");
         PlatForm platForm = platFormMapper.selectByPlatFormNum(oOrder.getOrderPlatform());
 
+        log.info("PlatformType:{}",platForm.getPlatformType());
         //新增加瑞大宝平台，不是瑞大宝平台按原来逻辑
         if (platForm.getPlatformType().equals(PlatformType.RDBPOS.code)) {
             //新增瑞大宝平台重新下发
@@ -2388,7 +2389,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 return AgentResult.fail(e.getLocalizedMessage());
             }
             return AgentResult.ok();
-        } else if (!logistics.getProType().equals(PlatformType.MPOS.msg) && !logistics.getProType().equals(PlatformType.MPOS.code)){
+        //POS逻辑
+        } else if (PlatformType.whetherPOS(platForm.getPlatformType())){
             log.info("======pos发货 更新库存记录:{}:{}",logistics.getProType(),ids);
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oOrder.getBusId());
             if(null==agentBusInfo){
@@ -2425,8 +2427,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 }
                 return AgentResult.fail(e.getMsg());
             }
-        //机具退货调整首刷接口调用
-        }else{
+        //手刷逻辑   机具退货调整首刷接口调用
+        }else  if (PlatformType.MPOS.code.equals(platForm.getPlatformType())){
             log.info("======首刷发货 更新库存记录:{}:{}",logistics.getProType(),ids);
             //起始sn
             OLogisticsDetailExample exampleOLogisticsDetailExamplestart = new OLogisticsDetailExample();
@@ -2527,6 +2529,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 }
                 return AgentResult.ok("不同平台不下发，手动调整");
             }
+        }else{
+            return AgentResult.ok("未实现的业务平台");
         }
     }
 
