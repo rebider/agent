@@ -203,6 +203,13 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
             Agent agent = agentService.insertAgent(agentVo.getAgent(), agentVo.getAgentTableFile(),agentVo.getAgent().getcUser(),null);
             agentVo.setAgent(agent);
+            //代理商业务
+            for (AgentBusInfo item : agentVo.getBusInfoVoList()) {
+                //校验实时分润不能升级
+                List platformList = platFormMapper.selectPlatformNumByPlatformType();
+                boolean checkBusPlatform = platformList.contains(item.getBusPlatform()) && (null != item.getBusNum() && !"".equals(item.getBusNum()));
+                if (checkBusPlatform) throw new ProcessException("实时分润品牌暂不支持升级！");
+            }
             for (AgentContractVo item : agentVo.getContractVoList()) {
                 item.setcUser(agent.getcUser());
                 item.setAgentId(agent.getId());

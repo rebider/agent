@@ -306,6 +306,11 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     logger.info("请选择业务平台");
                     throw new ProcessException("请选择业务平台");
                 }
+                //校验实时分润不能升级
+                List platformList = platFormMapper.selectPlatformNumByPlatformType();
+                boolean checkBusPlatform = platformList.contains(item.getBusPlatform()) && (null != item.getBusNum() && !"".equals(item.getBusNum()));
+                if (checkBusPlatform) throw new ProcessException("实时分润品牌暂不支持升级！");
+
                 if(StringUtils.isNotBlank(item.getBusNum())) {
                     if (!OrgType.zQ(item.getBusType())) {
                         throw new ProcessException("升级类型必须是直签");
@@ -468,10 +473,16 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     @Override
     public AgentResult saveBusinessPlatform(AgentVo agentVo) throws ProcessException {
         try {
+            Map<String, Object> reqMap = new HashMap<>();
             Agent agent = agentVo.getAgent();
             agent.setId(agentVo.getAgentId());
             //先查询业务是否已添加 有个添加过 全部返回
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
+                //校验实时分润不能升级
+                List platformList = platFormMapper.selectPlatformNumByPlatformType();
+                boolean checkBusPlatform = platformList.contains(item.getBusPlatform()) && (null != item.getBusNum() && !"".equals(item.getBusNum()));
+                if (checkBusPlatform) throw new ProcessException("实时分润品牌暂不支持升级！");
+
                 if (StringUtils.isBlank(item.getBusPlatform())) {
                     throw new ProcessException("业务平台不能为空");
                 }
@@ -482,8 +493,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     if (StringUtils.isBlank(item.getBusParent())){
                         throw new ProcessException("升级直签上级不能为空");
                     }
-                    Map<String, Object> reqMap = new HashMap<>();
+
                     reqMap.put("busInfo",item);
+                    reqMap.put("agentVo",agentVo);
                     AgentResult agentResult = agentNetInNotityService.agencyLevelCheck(reqMap);
                     if(!agentResult.isOK()){
                         throw new ProcessException(agentResult.getMsg());
