@@ -25,7 +25,9 @@ public interface DictOptionsService {
 
     int updateByPrimaryKeySelective(Dict record);  // 删除（编辑）状态
 
-    public Dict findDictByName(String group, String artifact,String itemName);
+    Dict findDictByName(String group, String artifact,String itemName);
+
+    List<Dict> findDictListByName(String group, String artifact,String itemName);
 
     String getApproveVersion(String approveName)throws ProcessException;
 }

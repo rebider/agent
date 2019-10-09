@@ -1,5 +1,6 @@
 package com.ryx.credit.service.order;
 
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
@@ -31,11 +32,11 @@ public interface CompensateService {
 
     BigDecimal calculatePriceDiff(String beginSn,String endSn,String oldActivityId,String activityId,BigDecimal proNum,ORefundPriceDiff oRefundPriceDiff);
 
-    AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,List<String> refundPriceDiffFile, String cUser ,List<OCashReceivablesVo> oCashReceivablesVoList);
+    AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,List<String> refundPriceDiffFile, String cUser ,List<OCashReceivablesVo> oCashReceivablesVoList,AgentVo agentVo)throws ProcessException;
 
     AgentResult startCompensateActiviy(String id, String cuser) throws Exception;
 
-    AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception;
+    AgentResult approvalTask(AgentVo agentVo, String userId) throws ProcessException;
 
     AgentResult compressCompensateActivity(String proIns,BigDecimal agStatus)throws Exception;
 
@@ -50,5 +51,19 @@ public interface CompensateService {
     PageInfo compensateDetailList(ORefundPriceDiffDetail refundPriceDiffDetail, Page page, String dataRole,long userId);
 
     void manualDispose(String id)throws ProcessException;
+
+    /**
+     * 查询处理中的明细去业务平台查询处理结果
+     * @return
+     */
+    List<String> querySendingOrefundPriceDiffDetail();
+
+    /**
+     * 接口调用获取返回结果
+     * @param id
+     * @return
+     */
+    AgentResult dealQeruySendingReault(String id)throws Exception;
+
 }
 
