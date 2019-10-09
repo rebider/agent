@@ -21,10 +21,6 @@ import java.util.List;
 public class RemoveAccountJob implements DataflowJob<String> {
 
     private static Logger logger = LoggerFactory.getLogger(RemoveAccountJob.class);
-
-    @Autowired
-    private OsnOperateService osnOperateService;
-
     @Autowired
     private ORemoveAccountService oRemoveAccountService;
 
