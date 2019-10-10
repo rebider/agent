@@ -387,7 +387,7 @@
       </if>
     ) ab on ps.AGENT_ID = ab.AGENT_ID
     left join A_AGENT_COLINFO ac on ps.AGENT_ID = ac.AGENT_ID
-    where 1 = 1
+    where 1 = 1 and ac.CLO_INVOICE = 1 and ac.STATUS = 1
       <if test="map.agentName != null and map.agentName != '' ">
         and ps.AGENT_NAME = #{map.agentName}
       </if>
