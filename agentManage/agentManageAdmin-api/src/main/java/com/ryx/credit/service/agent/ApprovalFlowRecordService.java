@@ -3,6 +3,7 @@ package com.ryx.credit.service.agent;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.ApprovalFlowRecord;
+import com.ryx.credit.pojo.admin.vo.ApprovalFlowRecordVo;
 
 import java.util.List;
 import java.util.Map;
@@ -26,13 +27,17 @@ public interface ApprovalFlowRecordService {
     List<Map<String, Object>> exportAgentMerge(ApprovalFlowRecord approvalFlowRecord) throws Exception;
 
     /**
-     * 导出代理商入网数据
+     * 导出代理商入网、业务数据
      * @param approvalFlowRecord
      * @return
      */
-    List<Map<String, Object>> exportAgentNetln(ApprovalFlowRecord approvalFlowRecord) throws Exception;
+    List<ApprovalFlowRecordVo> exportAgentNetln(ApprovalFlowRecord approvalFlowRecord) throws Exception;
 
-
+    /**
+     * 导出代理商业务修改数据
+     * @param approvalFlowRecord
+     * @return
+     */
     List<Map<String, Object>> exportAgentEdit(ApprovalFlowRecord approvalFlowRecord) throws Exception;
 
 
