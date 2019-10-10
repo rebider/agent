@@ -255,6 +255,7 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                 if (null != oPaymentDetailList && oPaymentDetailList.size() > 0) {
                                     boolean flag=true;
                                     for (OPaymentDetail oPaymentDetail : oPaymentDetailList) {
+                                        oPaymentDetail = oPaymentDetailMapper.selectByPrimaryKey(oPaymentDetail.getId());
                                         if(residue.compareTo(new BigDecimal(0))==0 ||flag==false){
                                             //如果销账金额已抵扣完销账则停止循环
                                             f=false;
@@ -281,7 +282,7 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                             logger.info("付款单明细修改失败{}:", oRemoveAccount_item.getId());
                                             throw new MessageException("付款单明细修改失败");
                                         }else{
-                                            real_ramount=real_ramount.add(oPaymentDetail.getPayAmount());
+                                            real_ramount=real_ramount.add(oPaymentDetail.getRealPayAmount());
                                         }
                                         oPaymentDetail = oPaymentDetailMapper.selectByPrimaryKey(oPaymentDetail.getId());
                                         OPayment oPayment = oPaymentMapper.selectByPrimaryKey(oPaymentDetail.getPaymentId());
@@ -377,7 +378,7 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                                     money=residue;
                                                 }
                                                 else if(residue.compareTo(oPaymentDetail.getPayAmount())==-1 && residue.compareTo(new BigDecimal(0))!=0){
-                                                    money = oPaymentDetail.getPayAmount().subtract(residue);
+                                                    money = oPaymentDetail.getPayAmount().subtract(oPaymentDetail.getRealPayAmount());
                                                 }
 
                                                 for (int j =notCountMap.size()-1; j < notCountMap.size(); j++) {
@@ -422,7 +423,7 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                             }
                         }
                         e.printStackTrace();
-                        List<Dict> dicts = dictOptionsService.dictList(DictGroup.EMAIL.name(), DictGroup.LOGISTICS_FAIL_EMAIL.name());
+                        List<Dict> dicts = dictOptionsService.dictList(DictGroup.EMAIL.name(), DictGroup.REMOVEACCOUNT_FAIL_EMAIL.name());
                         String[] emailArr = new String[dicts.size()];
                         for (int i = 0; i < dicts.size(); i++) {
                             emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
@@ -444,7 +445,7 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                             }
                         }
                         e.printStackTrace();
-                        AppConfig.sendEmails("logisticId:"+id+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                        AppConfig.sendEmails("销账id:"+id+"错误信息:"+MailUtil.printStackTrace(e), "任务生成生成销账失误报警ORemoveAccountServiceImpl");
                     }
                 }
             }
