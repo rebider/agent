@@ -23,6 +23,7 @@ import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
+import com.ryx.credit.service.order.IPaymentDetailService;
 import com.ryx.credit.service.order.OCashReceivablesService;
 import com.ryx.credit.service.order.OrderService;
 import org.slf4j.Logger;
@@ -115,6 +116,8 @@ public class OrderServiceImpl implements OrderService {
     private CashSummaryMouthMapper cashSummaryMouthMapper;
     @Autowired
     private ActRuTaskService actRuTaskService;
+    @Autowired
+    private IPaymentDetailService paymentDetailService;
 
 
     /**
@@ -2345,6 +2348,14 @@ public class OrderServiceImpl implements OrderService {
                 logger.info("代理商订单审批完审批完成激活代理商{}",rel.getBusId());
                 agent_check.setcIncomStatus(AgentInStatus.IN.status);
                 agentMapper.updateByPrimaryKeySelective(agent_check);
+            }
+
+
+            //TODO 处理线下打款通知kafka
+            try {
+                paymentDetailService.sendSFPayMentToPlatform(order.getId());
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
         } else if (actname.equals("reject_end")) {

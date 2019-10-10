@@ -1106,6 +1106,6 @@ select count(*) FROM P_FREEZE_AGENT where FREEZE_TYPE ='01'or FREEZE_TYPE='02'
 
   </select>
 <delete id="deleteInvoiceAgent" parameterType="java.lang.String">
-  delete from P_FREEZE_AGENT where ID='${ID}'
+  delete from P_FREEZE_AGENT where ID='${id}'
 </delete>
 </mapper>

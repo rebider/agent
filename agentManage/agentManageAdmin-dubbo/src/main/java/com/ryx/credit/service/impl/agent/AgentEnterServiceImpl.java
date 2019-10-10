@@ -170,6 +170,12 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 item.setcUser(agent.getcUser());
                 item.setAgentId(agent.getId());
                 item.setCloReviewStatus(AgStatus.Create.status);
+                if(StringUtils.isBlank(item.getBusScope())){
+                    throw new ProcessException("业务范围不能为空");
+                }
+                if(StringUtils.isBlank(item.getBusUseOrgan())){
+                    throw new ProcessException("使用范围不能为空");
+                }
                 AgentBusInfo db_AgentBusInfo = agentBusinfoService.agentBusInfoInsert(item);
             }
         } catch (ProcessException e) {
@@ -330,6 +336,14 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 } else {
                     hav.add(item.getBusPlatform());
                 }
+
+                if(StringUtils.isBlank(item.getBusScope())){
+                    throw new ProcessException("业务范围不能为空");
+                }
+                if(StringUtils.isBlank(item.getBusUseOrgan())){
+                    throw new ProcessException("使用范围不能为空");
+                }
+
                 if (null!=item.getBusPlatform()){
                     PlatformType platformType = platFormService.byPlatformCode(item.getBusPlatform());
                     if (null!=platformType){
@@ -1235,7 +1249,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         List<Dict> COLINFO_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.COLINFO_TYPE.name());
         List<Dict> REPORT_STATUS = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.REPORT_STATUS.name());
 
-
         if (null != agentoutVos && agentoutVos.size() > 0)
             for (AgentoutVo agentoutVo : agentoutVos) {
                 if (StringUtils.isNotBlank(agentoutVo.getBusType()) && !agentoutVo.getBusType().equals("null")) {
@@ -1278,6 +1291,13 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                             agentoutVo.setReportString(dict.getdItemname());
                             break;
                         }
+                    }
+                }
+
+                if (StringUtils.isNotBlank(agentoutVo.getFreeStatus()) && !agentoutVo.getFreeStatus().equals("null")) {
+                    String agStatusByValue = FreeStatus.getContentByValue(new BigDecimal(agentoutVo.getFreeStatus()));
+                    if (null != agStatusByValue) {
+                        agentoutVo.setFreeStatus(agStatusByValue);
                     }
                 }
 
