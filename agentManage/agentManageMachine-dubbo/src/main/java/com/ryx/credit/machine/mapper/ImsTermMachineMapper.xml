@@ -367,7 +367,6 @@
     </if>
   </sql>
 
-
   <select id="querySSIMS_TERM_MACHINE" resultType="map" parameterType="map">
     select a.pos_activity_id AS ID,
            (c.brand_name||'|机具活动关系编号:'||a.pos_activity_id
