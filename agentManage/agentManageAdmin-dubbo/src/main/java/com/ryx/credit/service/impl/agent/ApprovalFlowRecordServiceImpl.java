@@ -26,6 +26,8 @@ import org.springframework.stereotype.Service;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -65,9 +67,9 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
     @Autowired
     private ApaycompService apaycompService;
     @Autowired
-    private IUserService  iUserService;
-
-
+    private IUserService iUserService;
+    @Autowired
+    private BusActRelMapper busActRelMapper;
 
     @Override
     public String insert(ApprovalFlowRecord record)throws Exception{
@@ -170,12 +172,10 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
      * @return
      */
     private List<ApprovalFlowRecord> exprotCommon(ApprovalFlowRecord approvalFlowRecord){
-
         ApprovalFlowRecordExample approvalFlowRecordExample = new ApprovalFlowRecordExample();
         ApprovalFlowRecordExample.Criteria criteria = approvalFlowRecordExample.createCriteria();
         Date beginTime = DateUtil.format(approvalFlowRecord.getBeginTime(),"yyyy-MM-dd");
         Date endTime = DateUtil.format(approvalFlowRecord.getEndTime(),"yyyy-MM-dd");
-
         if (StringUtils.isNotBlank(approvalFlowRecord.getApprovalPerson())) {
             String[] split = approvalFlowRecord.getApprovalPerson().split(",");
             List<String> personList = new ArrayList<>();
@@ -213,7 +213,6 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
             }
         }
         criteria.andStatusEqualTo(Status.STATUS_1.status);
-
         List<ApprovalFlowRecord> approvalFlowRecords = approvalFlowRecordMapper.selectByExample(approvalFlowRecordExample);
         return approvalFlowRecords;
     }
@@ -282,84 +281,37 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
     }
 
     /**
-     * 导出代理商入网数据
+     * 代理商入网&代理商业务
      * @param approvalFlowRecord
-     * @return
+     * @throws Exception
      */
     @Override
-    public List<Map<String, Object>> exportAgentNetln(ApprovalFlowRecord approvalFlowRecord) throws Exception {
-
-        List<Map<String, Object>> resultList = new ArrayList<>();
-        List<ApprovalFlowRecord> approvalFlowRecords = exprotCommon(approvalFlowRecord);
-        if (null != approvalFlowRecords && approvalFlowRecords.size() != 0) {
-            for (ApprovalFlowRecord flowRecord : approvalFlowRecords) {
-                Map<String, Object> resultMap = new HashMap<>();
-                Agent agent = agentMapper.selectByPrimaryKey(flowRecord.getBusId());
-                if(agent==null){
-                    continue;
-                }
-                resultMap.put("cUtime",agent.getcUtime()!=null?DateUtil.format(agent.getcUtime()):"");
-                resultMap.put("agentId", agent.getId());
-                resultMap.put("agentName", agent.getAgName());
-
-                if(StringUtils.isNotBlank(agent.getAgDocPro())){
-                    COrganization cOrganization = cOrganizationMapper.selectByPrimaryKey(Integer.valueOf(agent.getAgDocPro()));
-                    if(cOrganization!=null)
-                    resultMap.put("agDocPro", cOrganization.getName());
-                }
-
-                List<AgentBusInfo> agentBusInfosList = agentBusInfoMapper.selectByAgenId(agent.getId());
-                if (null != agentBusInfosList && agentBusInfosList.size() != 0) {
-                    String busType = "";
-                    String busPlatform = "";
-                    String busRegion = "";
-                    String parentBusInfo = "";
-                    for (AgentBusInfo agentBusInfos : agentBusInfosList) {
-                        busRegion += posRegionService.queryNameByCodes(agentBusInfos.getBusRegion()) + ",";
-                        busType += BusType.getContentByValue(agentBusInfos.getBusType()) + ",";
-                        busPlatform += Platform.getContentByValue(agentBusInfos.getBusPlatform()) + ",";
-
-                        List<Map> parentListFromBusInfo = agentBusinfoService.getParentListFromBusInfo(null, agentBusInfos.getId());
-                        parentBusInfo += Platform.getContentByValue(agentBusInfos.getBusPlatform())+"：";
-                        for (Map map : parentListFromBusInfo) {
-                            parentBusInfo += BusType.getContentByValue(String.valueOf(map.get("BUS_TYPE"))) + "-" + map.get("AG_NAME") + ",";
-                        }
-                        if (StringUtils.isNotBlank(parentBusInfo)) {
-                            parentBusInfo = parentBusInfo.substring(0, parentBusInfo.length() -1);
-                        }
-                        parentBusInfo += "&";
-                    }
-                    resultMap.put("busType", StringUtils.isNotBlank(busType) ? busType.substring(0, busType.length() -1) : busType);
-                    resultMap.put("busPlatform", StringUtils.isNotBlank(busPlatform) ? busPlatform.substring(0, busPlatform.length() -1) : busPlatform);
-                    resultMap.put("busRegion", StringUtils.isNotBlank(busRegion) ? busRegion.substring(0, busRegion.length() -1) : busRegion);
-                    resultMap.put("parentBusInfo", StringUtils.isNotBlank(parentBusInfo) ? parentBusInfo.substring(0, parentBusInfo.length() -1) : parentBusInfo);
-                }
-
-                String cPayType = "";
-                String cpayuser = "";
-                String cPaytime = "";
-                List<Capital> capitalsList = capitalMapper.selectByAgenId(agent.getId());
-                if (null != capitalsList && capitalsList.size() != 0) {
-                    for (Capital capital : capitalsList) {
-                        cPayType += PayType.getPayType(capital.getcPayType()) + ",";
-                        cpayuser += capital.getcPayuser() + ",";
-                        cPaytime += DateUtil.format(capital.getcPaytime()) + ",";
-                    }
-                }
-                resultMap.put("cPayType", StringUtils.isNotBlank(cPayType) ? cPayType.substring(0, cPayType.length() -1 ) : cPayType);
-                resultMap.put("cpayuser", StringUtils.isNotBlank(cpayuser) ? cpayuser.substring(0, cpayuser.length() -1) : cpayuser);
-                resultMap.put("cPaytime", StringUtils.isNotBlank(cPaytime) ? cPaytime.substring(0, cPaytime.length() -1) : cPaytime);
-
-                resultList.add(resultMap);
-            }
+    public List<ApprovalFlowRecordVo> exportAgentNetln(ApprovalFlowRecord approvalFlowRecord) throws Exception {
+        FastMap fastMap = FastMap.fastMap("approvalPerson", approvalFlowRecord.getApprovalPerson());
+        fastMap.putKeyV("busId", approvalFlowRecord.getBusId());
+        fastMap.putKeyV("busType", approvalFlowRecord.getBusType());
+        fastMap.putKeyV("approvalResult", approvalFlowRecord.getAppResult());
+        fastMap.putKeyV("agentId", approvalFlowRecord.getAgentId());
+        fastMap.putKeyV("agentName", approvalFlowRecord.getAgentName());
+        if(StringUtils.isNotBlank(approvalFlowRecord.getBeginTime()) && StringUtils.isNotBlank(approvalFlowRecord.getBeginTime())){
+            fastMap.putKeyV("beginTime", approvalFlowRecord.getBeginTime());
+            fastMap.putKeyV("endTime", approvalFlowRecord.getEndTime());
         }
-        return resultList;
+        if(StringUtils.isNotBlank(approvalFlowRecord.getSubMitDateSta()) && StringUtils.isNotBlank(approvalFlowRecord.getSubMitDateEnd())){
+            fastMap.putKeyV("subMitDateSta", approvalFlowRecord.getSubMitDateSta());
+            fastMap.putKeyV("subMitDateEnd", approvalFlowRecord.getSubMitDateEnd());
+        }
+        List<ApprovalFlowRecordVo> approvalFlowRecordList = approvalFlowRecordMapper.exportAgentAndBusinfo(fastMap);
+        return approvalFlowRecordList;
     }
 
-
+    /**
+     * 代理商业务修改
+     * @param approvalFlowRecord
+     * @throws Exception
+     */
     @Override
     public List<Map<String, Object>> exportAgentEdit(ApprovalFlowRecord approvalFlowRecord) throws Exception {
-
         List<Map<String, Object>> resultList = new ArrayList<>();
         List<ApprovalFlowRecord> approvalFlowRecords = exprotCommon(approvalFlowRecord);
         for (ApprovalFlowRecord flowRecord : approvalFlowRecords) {
@@ -369,92 +321,42 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
             DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(busId);
             AgentVo dataPreAgentVo = JsonUtil.jsonToPojo(dateChangeRequest.getDataPreContent(), AgentVo.class);
             AgentVo dataAgentVo = JsonUtil.jsonToPojo(dateChangeRequest.getDataContent(), AgentVo.class);
-            contrastObj(dataPreAgentVo.getAgent(), dataAgentVo.getAgent(),diffList);
-
-            List<CapitalVo> preCapitalVoList = dataPreAgentVo.getCapitalVoList();
-            List<CapitalVo> capitalVoList = dataAgentVo.getCapitalVoList();
-            if (preCapitalVoList != null && capitalVoList != null) {
-                if(capitalVoList.size()>preCapitalVoList.size() && preCapitalVoList.size()==0){
-                    for (CapitalVo capitalVo : capitalVoList) {
-                        if(StringUtils.isNotBlank(capitalVo.getcType())){
-                            Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.CAPITAL_TYPE.name(), capitalVo.getcType());
-                            diffList.add("新增缴纳款项："+dictByValue.getdItemname());
-                        }
-                        if(null!=capitalVo.getcAmount())
-                        diffList.add("新增缴纳金额："+capitalVo.getcAmount());
-                        if(StringUtils.isNotBlank(capitalVo.getcPayType())){
-                            Dict payType = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.PAY_TYPE.name(),capitalVo.getcPayType());
-                            diffList.add("新增打款方式："+payType.getdItemname());
-                        }
-                        if(null!=capitalVo.getcFqCount())
-                        diffList.add("新增分期期数："+capitalVo.getcFqCount());
-                        if(null!=capitalVo.getcPaytime())
-                        diffList.add("新增打款时间："+capitalVo.getcPaytime());
-                        if(StringUtils.isNotBlank(capitalVo.getcPayuser()))
-                        diffList.add("新增打款人："+capitalVo.getcPayuser());
-                        if(StringUtils.isNotBlank(capitalVo.getcInCom())){
-                            PayComp payComp = apaycompService.selectById(capitalVo.getcInCom());
-                            diffList.add("新增收款地方："+payComp.getComName());
-                        }
-                        if(StringUtils.isNotBlank(capitalVo.getRemark()))
-                        diffList.add("新增备注："+capitalVo.getRemark());
-                    }
-                }else{
-                    int i = 0;
-                    for (CapitalVo preCapitalVo : preCapitalVoList) {
-                        CapitalVo capitalVo = capitalVoList.get(i);
-                        contrastObj(preCapitalVo, capitalVo,diffList);
-                        i++;
-                    }
-                }
-            }
-
-            List<AgentContractVo> preContractVoList = dataPreAgentVo.getContractVoList();
-            List<AgentContractVo> contractVoList = dataAgentVo.getContractVoList();
-            if (preContractVoList != null && contractVoList != null) {
-                if (contractVoList.size() > preContractVoList.size() && preContractVoList.size() == 0) {
-                    for (AgentContractVo agentContractVo : contractVoList) {
-                        Dict contractType = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.CONTRACT_TYPE.name(),String.valueOf(agentContractVo.getContType()));
-                        diffList.add("新增合同类型："+contractType.getdItemname());
-                        diffList.add("新增合同号："+agentContractVo.getContNum());
-                        diffList.add("新增合同签约时间："+agentContractVo.getContDate());
-                        diffList.add("新增合同到期时间："+agentContractVo.getContEndDate());
-                        Dict yesOrNo = dictOptionsService.findDictByValue(DictGroup.ALL.name(), DictGroup.YESORNO.name(),String.valueOf(agentContractVo.getAppendAgree()));
-                        diffList.add("新增是否附加协议："+yesOrNo.getdItemname());
-                        diffList.add("新增备注："+agentContractVo.getRemark());
-                    }
-                }
-            }else{
-                int j = 0;
-                for (AgentContractVo preContractVo : preContractVoList) {
-                    AgentContractVo contractVo = contractVoList.get(j);
-                    contrastObj(preContractVo, contractVo,diffList);
-                    j++;
-                }
-            }
-
+            contrastObj(dataPreAgentVo.getAgent(), dataAgentVo.getAgent(), diffList);
+            //变更前的业务信息
             List<AgentBusInfoVo> preBusInfoVoList = dataPreAgentVo.getBusInfoVoList();
+            //变更后的业务信息
             List<AgentBusInfoVo> busInfoVoList = dataAgentVo.getBusInfoVoList();
-            if(busInfoVoList!=null && preBusInfoVoList!=null && busInfoVoList.size()!=0 && preBusInfoVoList.size()!=0){
+            if (busInfoVoList!=null && preBusInfoVoList!=null && busInfoVoList.size()!=0 && preBusInfoVoList.size()!=0) {
                 int k = 0;
                 for (AgentBusInfoVo preBusInfoVo : preBusInfoVoList) {
-                    AgentBusInfoVo busInfoVo = busInfoVoList.get(k);
-                    contrastObj(preBusInfoVo, busInfoVo,diffList);
-                    k++;
+                    if (busInfoVoList.size() > k) {
+                        AgentBusInfoVo busInfoVo = busInfoVoList.get(k);
+                        contrastObj(preBusInfoVo, busInfoVo, diffList);
+                        k++;
+                    }
                 }
             }
-            resultMap.put("dateChange",diffList.toString());
+            ApprovalFlowRecord approvalFlow = approvalFlowRecordMapper.selectByPrimaryKey(flowRecord.getId());
+            BusActRel busActRel = busActRelMapper.findByActivId(approvalFlow.getExecutionId());
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            CUser getApprovalPerson = userService.selectById(approvalFlow.getApprovalPerson());
+            Dict getApprovalResult = dictOptionsService.findDictByValue(DictGroup.AGENT_AUDIT.name(), DictGroup.APPROVAL_TYPE.name(), approvalFlow.getApprovalResult());
+            Dict getActivStatus = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.AG_STATUS_S.name(), busActRel.getActivStatus());
+            resultMap.put("approvalTime", dateFormat.format(approvalFlow.getApprovalTime()));
+            resultMap.put("approvalPerson", getApprovalPerson.getName());
+            resultMap.put("approvalResult", getApprovalResult.getdItemname());
+            resultMap.put("approvalOpinion", approvalFlow.getApprovalOpinion());
+            resultMap.put("activStatus", getActivStatus.getdItemname());
+            resultMap.put("agentId", approvalFlow.getAgentId());
+            resultMap.put("busId", approvalFlow.getBusId());
+            resultMap.put("agentName", approvalFlow.getAgentName());
+            resultMap.put("dateChange", diffList.toString());
             resultList.add(resultMap);
-            resultMap.put("agentId",dateChangeRequest.getDataId());
-            Agent agent = agentMapper.selectByPrimaryKey(dateChangeRequest.getDataId());
-            resultMap.put("agentName",agent.getAgName());
-            COrganization cOrganizationSub = cOrganizationMapper.selectByPrimaryKey(Integer.valueOf(agent.getAgDocPro()));
-            resultMap.put("agDocPro",cOrganizationSub.getName());
         }
         return resultList;
     }
 
-    private static List<String> contrastObj(Object obj1, Object obj2,List<String> textList) {
+    private static List<String> contrastObj(Object obj1, Object obj2, List<String> textList) {
         try {
             Class clazz = obj1.getClass();
             Field[] fields = obj1.getClass().getDeclaredFields();
@@ -466,8 +368,8 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
                 String s1 = o1 == null ? "" : o1.toString();
                 String s2 = o2 == null ? "" : o2.toString();
                 if (!s1.equals(s2)) {
-                    if(!field.getName().equals("agUniqNum") && !field.getName().equals("agStatus") ){
-                        textList.add(FieldTranslate.getNameByField(field.getName())+" 修改前：" + s1 + ",修改后：" + s2);
+                    if (!field.getName().equals("agUniqNum") && !field.getName().equals("agStatus")) {
+                        textList.add(FieldTranslate.getNameByField(field.getName()) + "修改前:" + s1 + ";修改后:" + s2);
                     }
                 }
             }
