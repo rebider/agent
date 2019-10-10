@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
+import com.ryx.credit.common.util.Des3Util;
 import com.ryx.credit.common.util.HttpClientUtil;
+import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.pojo.ProfitOrganTranMonth;
 import com.ryx.credit.profit.pojo.TranCheckData;
@@ -37,10 +39,12 @@ import java.util.*;
 @Service("tranDataJob")
 @Transactional(rollbackFor = Exception.class)
 public class TranDataJob {
-
     private org.slf4j.Logger LOG = LoggerFactory.getLogger(TranDataJob.class);
 
     private static final String URL = AppConfig.getProperty("check_tran_url");
+    private static final String rhbReqUrl = AppConfig.getProperty("rhb_req_url");
+    private static final String rhb3desKey = AppConfig.getProperty("rhb_3des_Key");
+    private static final String rhb3desIv = AppConfig.getProperty("rhb_3des_iv");
 
     @Autowired
     private IPosProfitDataService posProfitDataService;
@@ -252,6 +256,27 @@ public class TranDataJob {
         LOG.info("================"+tranMonth+"交易量核对数据同步开始================");
         Map<String,String> resultMap=new HashMap<>();
 
+
+
+        //瑞花宝交易总额和手续费（技术）:
+        Map<String, Object> ruiHuaBaoData = getRuiHuaBaoProfitAmtAndProfitFee(calendar.getTime());
+        if(ruiHuaBaoData==null||ruiHuaBaoData.size()==0){
+            LOG.error("================瑞花宝交易量手续费查询（技术）拉取失败================");
+            resultMap.put("resultCode","error");
+            resultMap.put("msg","瑞花宝交易量手续费查询（技术）拉取异常");
+            return resultMap;
+        }
+        LOG.info("================瑞花宝交易量手续费查询（技术）拉取完成================");
+
+        //清结算接口数据：
+        Map<String,Object> settleData = doSettleTranAmount(calendar.getTime());
+        if(settleData==null||settleData.size()==0){
+            LOG.error("================清结算接口数据拉取失败================");
+            resultMap.put("resultCode","error");
+            resultMap.put("msg","清结算接口数据拉取异常");
+            return resultMap;
+        }
+        LOG.info("================清结算接口数据拉取完成================");
         //月份润交易接口数据（技术列）:
         Map<String, Object> tradingVolumeData1 = doProfitTradingVolume(calendar.getTime(),"PFT003");
         if(tradingVolumeData1==null||tradingVolumeData1.size()==0){
@@ -288,15 +313,6 @@ public class TranDataJob {
             return resultMap;
         }
         LOG.info("================新月结分润接口数据拉取完成================");
-        //清结算接口数据：
-        Map<String,Object> settleData = doSettleTranAmount(calendar.getTime());
-        if(settleData==null||settleData.size()==0){
-            LOG.error("================清结算接口数据拉取失败================");
-            resultMap.put("resultCode","error");
-            resultMap.put("msg","清结算接口数据拉取异常");
-            return resultMap;
-        }
-        LOG.info("================清结算接口数据拉取完成================");
         //月份润交易接口数据（清算列）:
         Map<String, Object> tradingVolumeData2 = doProfitTradingVolume(calendar.getTime(),"PFT004");
         if(tradingVolumeData2==null||tradingVolumeData2.size()==0){
@@ -388,6 +404,21 @@ public class TranDataJob {
                     }
                     break;
                 }
+                case "ruiHuabao1":{
+                    Object technologyAmt = ruiHuaBaoData.get(platForm.getTechnologyAmt());
+                    Object technologyFee = ruiHuaBaoData.get(platForm.getTechnologyFee());
+                    if(technologyAmt==null){
+                        checkData.setTechnologyAmt(null);
+                    }else{
+                        checkData.setTechnologyAmt(new BigDecimal(technologyAmt.toString()));
+                    }
+                    if(technologyFee==null){
+                        checkData.setTechnologyFee(null);
+                    }else{
+                        checkData.setTechnologyFee(new BigDecimal(technologyFee.toString()));
+                    }
+                    break;
+                }
                 default:{
                     checkData.setTechnologyAmt(null);
                     checkData.setTechnologyFee(null);
@@ -456,6 +487,7 @@ public class TranDataJob {
         param.put("tranType","22");
         param.put("tranMon",tranMonth);
         String resultStr = profitOrganTranMonthService.doSettleTranAmount(param);
+        LOG.info("=========清结算返回数据："+resultStr);
         JSONObject jsonObject = JSONObject.parseObject(resultStr);
         if(jsonObject==null){
             LOG.info("清算接口访问异常,resultStr=====>"+resultStr+"\n\n");
@@ -490,6 +522,31 @@ public class TranDataJob {
             throw new RuntimeException("月份润交易接口访问异常！");
         }
         return agentResultData;
+    }
+
+    public Map<String,Object> getRuiHuaBaoProfitAmtAndProfitFee(Date tranMon) {
+        try {
+            Map<String, String> map = new HashMap<>();
+            map.put("application","queryTradeInfo");
+            map.put("brandCode","RHB");
+            map.put("tradeMonth",new SimpleDateFormat("yyyyMM").format(tranMon));
+            String json = JsonUtil.objectToJson(map);
+            String reqParamEncrypt = Des3Util.Encrypt(json, rhb3desKey, rhb3desIv.getBytes());
+            LOG.info("瑞花宝交易量手续费查询参数：{}",json);
+            LOG.info("瑞花宝交易量手续费查询参数加密：{}",reqParamEncrypt);
+            String httpResult = HttpClientUtil.sendHttpPost(rhbReqUrl, reqParamEncrypt);
+            String reqParamDecrypt = Des3Util.Decrypt(httpResult, rhb3desKey, rhb3desIv.getBytes());
+            LOG.info("瑞花宝交易量手续费查询返回参数：{}",reqParamDecrypt);
+            JSONObject respXMLObj = JSONObject.parseObject(reqParamDecrypt);
+            if (respXMLObj.getString("MSG_CODE").equals("0000")){
+                return respXMLObj.getJSONObject("result");
+            }
+            return null;
+        } catch (Exception e) {
+            LOG.info("通知失败:{}",e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("瑞花宝交易量手续费查询失败！");
+        }
     }
     public Map<String,Object> getTranAmtByMonth(Date tranMon){
         String tranMonth= new SimpleDateFormat("yyyyMM").format(tranMon);
