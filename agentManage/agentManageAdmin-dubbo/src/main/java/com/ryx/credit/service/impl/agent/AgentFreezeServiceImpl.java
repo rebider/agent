@@ -18,6 +18,8 @@ import com.ryx.credit.pojo.admin.vo.AgentFreezePort;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentFreezeService;
 import com.ryx.credit.service.dict.IdService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -25,13 +27,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /***
- *
+ * 代理商冻结
  * @Author liudh
  * @Description //TODO 
  * @Date 2019/10/10 9:14
@@ -41,6 +40,7 @@ import java.util.Map;
 @Service("agentFreezeService")
 public class AgentFreezeServiceImpl implements AgentFreezeService {
 
+    private static Logger log = LoggerFactory.getLogger(AgentEnterServiceImpl.class);
     @Autowired
     private AgentFreezeMapper agentFreezeMapper;
     @Autowired
@@ -70,6 +70,8 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public AgentResult agentFreeze(AgentFreezePort agentFreezePort)throws MessageException{
+
+        log.info("代理商冻结请求参数：{}",JsonUtil.objectToJson(agentFreezePort));
         AgentResult verify = verify(agentFreezePort,FreeStatus.DJ.getValue());
         if(!verify.isOK()){
             return verify;
@@ -100,11 +102,12 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
         agentFreeze.setFreezeCause(agentFreezePort.getFreezeCause());
         agentFreeze.setFreezeDate(new Date());
         agentFreeze.setFreezePerson(agentFreezePort.getOperationPerson());
+        agentFreeze.setFreezeNum(agentFreezePort.getFreezeNum());
         agentFreeze.setRemark(agentFreezePort.getRemark());
         agentFreeze.setStatus(Status.STATUS_1.status);
         agentFreeze.setVersion(BigDecimal.ONE);
         agentFreezeMapper.insert(agentFreeze);
-        return AgentResult.ok();
+        return AgentResult.ok("冻结成功");
     }
 
 
@@ -118,6 +121,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
     @Override
     public AgentResult agentUnFreeze(AgentFreezePort agentFreezePort)throws MessageException{
 
+        log.info("代理商解冻请求参数：{}",JsonUtil.objectToJson(agentFreezePort));
         AgentResult verify = verify(agentFreezePort,FreeStatus.JD.getValue());
         if(!verify.isOK()){
             return verify;
@@ -159,7 +163,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                 throw new MessageException("更新代理商信息解冻失败");
             }
         }
-        return AgentResult.ok();
+        return AgentResult.ok("解冻成功");
     }
 
     /**
@@ -213,6 +217,56 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
         Map<String,Object> resultMap = new HashMap<>();
         resultMap.put("agent",agent);
         resultMap.put("cUser",cUser);
+        return AgentResult.ok(resultMap);
+    }
+
+    /**
+     * 查询代理商是否冻结,冻结返回明细
+     * @param agentId
+     * @return
+     */
+    @Override
+    public AgentResult queryAgentFreeze(String agentId){
+
+        log.info("代理商冻结查询请求参数：{}",agentId);
+        AgentResult agentResult = AgentResult.fail();
+        Map<String,Object> resultMap = new HashMap<>();
+        if(StringUtils.isBlank(agentId)){
+            agentResult.setMsg("请填写代理商编码");
+            return agentResult;
+        }
+        Agent agent = agentMapper.selectByPrimaryKey(agentId);
+        if(agent==null){
+            agentResult.setMsg("代理商信息不存在");
+            return agentResult;
+        }
+        if(!agent.getAgStatus().equals(AgStatus.Approved.name())){
+            agentResult.setMsg("代理商未通过审批");
+            return agentResult;
+        }
+        String freeStatus = FreeStatus.getContentByValue(agent.getFreestatus());
+        resultMap.put("freeStatus",freeStatus);
+
+        if(agent.getFreestatus().compareTo(FreeStatus.DJ.getValue())==0){
+            AgentFreezeExample freezeExample = new AgentFreezeExample();
+            AgentFreezeExample.Criteria freezeCriteria = freezeExample.createCriteria();
+            freezeCriteria.andStatusEqualTo(Status.STATUS_1.status);
+            freezeCriteria.andAgentIdEqualTo(agentId);
+            freezeCriteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+            List<AgentFreeze> agentFreezeList = agentFreezeMapper.selectByExample(freezeExample);
+
+            List<Map<String,Object>> resultList = new ArrayList<>();
+            for (AgentFreeze agentFreeze : agentFreezeList) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("freezeDate",agentFreeze.getFreezeDate());
+                map.put("freezePerson",agentFreeze.getFreezePerson());
+                map.put("freezeCause",agentFreeze.getFreezeCause());
+                resultList.add(map);
+            }
+            resultMap.put("freezeInfo",resultList);
+        }else{
+            resultMap.put("freezeInfo","");
+        }
         return AgentResult.ok(resultMap);
     }
 }

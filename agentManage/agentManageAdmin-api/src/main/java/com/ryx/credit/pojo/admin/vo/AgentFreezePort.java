@@ -1,6 +1,6 @@
 package com.ryx.credit.pojo.admin.vo;
 
-import java.math.BigDecimal;
+import java.io.Serializable;
 
 /***
  * @Author liudh
@@ -9,7 +9,7 @@ import java.math.BigDecimal;
  * @Param
  * @return
  **/
-public class AgentFreezePort {
+public class AgentFreezePort implements Serializable{
 
     private String agentId;
     private String freezeCause;

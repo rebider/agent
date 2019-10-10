@@ -17,4 +17,6 @@ public interface AgentFreezeService {
     AgentResult agentFreeze(AgentFreezePort agentFreezePort)throws MessageException;
 
     AgentResult agentUnFreeze(AgentFreezePort agentFreezePort)throws MessageException;
+
+    AgentResult queryAgentFreeze(String agentId);
 }
