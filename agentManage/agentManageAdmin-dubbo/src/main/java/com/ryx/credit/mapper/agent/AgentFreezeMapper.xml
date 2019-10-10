@@ -248,4 +248,23 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+
+  <select id="queryAgentFreezeList" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix" />
+    <include refid="queryAgentFreezeSql" />
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="queryAgentFreezeCount" parameterType="map" resultType="int">
+    select count(*) from (
+    <include refid="queryAgentFreezeSql"/>
+    )
+  </select>
+  <sql id="queryAgentFreezeSql">
+      select t.*,a.ag_name,a.c_incom_time,a.freestatus
+      from a_agent_freeze t
+      left join a_agent a on a.id=t.agent_id
+      order by t.agent_id,t.freeze_date
+  </sql>
+
 </mapper>
