@@ -261,7 +261,7 @@
     )
   </select>
   <sql id="queryAgentFreezeSql">
-      select t.*,a.ag_name,a.c_incom_time,a.freestatus
+      select t.*,a.ag_name,a.c_incom_time,to_char(a.freestatus) as FREESTATUS
       from a_agent_freeze t
       left join a_agent a on a.id=t.agent_id
       order by t.agent_id,t.freeze_date

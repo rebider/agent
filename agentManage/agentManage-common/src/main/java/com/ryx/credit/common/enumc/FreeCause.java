@@ -1,6 +1,9 @@
 package com.ryx.credit.common.enumc;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 /***
  * 冻结原因
  * @Author liudh
@@ -40,6 +43,16 @@ public enum FreeCause {
         }
         return "";
     }
+
+    public static Map<Object, Object> getContentMap() {
+        FreeCause[] freeCause = FreeCause.values();
+        Map<Object, Object> resultMap = new HashMap<>();
+        for (FreeCause cc : freeCause) {
+            resultMap.put(cc.code,cc.msg);
+        }
+        return resultMap;
+    }
+
 
     /**
      * 取得枚举对象值

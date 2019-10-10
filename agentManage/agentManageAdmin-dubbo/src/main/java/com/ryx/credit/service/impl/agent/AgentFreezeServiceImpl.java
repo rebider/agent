@@ -50,9 +50,24 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
     @Override
     public PageInfo agentFreezeList(AgentFreeze agentFreeze, Page page){
         Map<String, Object> reqMap = JsonUtil.objectToMap(agentFreeze);
-        List<Map<String, String>> resuleMaps = agentFreezeMapper.queryAgentFreezeList(reqMap,page);
+        List<Map<String, String>> resultMaps = agentFreezeMapper.queryAgentFreezeList(reqMap,page);
+        for (Map<String, String> resultMap : resultMaps) {
+            resultMap.put("FREESTATUS_MSG",FreeStatus.getContentByValue(new BigDecimal(resultMap.get("FREESTATUS"))));
+            resultMap.put("FREEZE_CAUSE_MSG",FreeCause.getContentByValue(resultMap.get("FREEZE_CAUSE")));
+            resultMap.put("FREEZE_STATUS_MSG",FreeStatus.getContentByValue(new BigDecimal(resultMap.get("FREEZE_STATUS"))));
+            CUser cUser = userService.selectById(Long.valueOf(resultMap.get("FREEZE_PERSON")));
+            if(null!=cUser){
+                resultMap.put("FREEZE_PERSON_MSG",cUser.getName());
+            }
+            if(StringUtils.isNotBlank(resultMap.get("UNFREEZE_PERSON"))){
+                CUser cUser1 = userService.selectById(Long.valueOf(resultMap.get("UNFREEZE_PERSON")));
+                if(null!=cUser1){
+                    resultMap.put("UNFREEZE_PERSON_MSG",cUser1.getName());
+                }
+            }
+        }
         PageInfo pageInfo = new PageInfo();
-        pageInfo.setRows(resuleMaps);
+        pageInfo.setRows(resultMaps);
         pageInfo.setTotal(agentFreezeMapper.queryAgentFreezeCount(reqMap));
         return pageInfo;
     }
