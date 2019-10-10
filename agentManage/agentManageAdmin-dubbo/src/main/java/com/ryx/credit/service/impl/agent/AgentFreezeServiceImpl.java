@@ -3,10 +3,7 @@ package com.ryx.credit.service.impl.agent;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.JsonUtil;
-import com.ryx.credit.common.util.Page;
-import com.ryx.credit.common.util.PageInfo;
-import com.ryx.credit.common.util.RegExpression;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentFreezeMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
@@ -147,6 +144,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
         agentFreeze.setUnfreezePerson(agentFreezePort.getOperationPerson());
         agentFreeze.setUnfreezeDate(new Date());
         agentFreeze.setUnfreezeCause(agentFreezePort.getUnfreezeCause());
+        agentFreeze.setFreezeStatus(FreeStatus.JD.getValue().toString());
         int j = agentFreezeMapper.updateByPrimaryKeySelective(agentFreeze);
         if(j!=1){
             throw new MessageException("更新解冻失败");
@@ -182,15 +180,15 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
             agentResult.setMsg("未知的冻结原因");
             return agentResult;
         }
-        if(freeStatus.compareTo(FreeStatus.DJ.getValue())==0 && agentFreezePort.getFreezeCause().equals(FreeCause.QTDJ.getValue())){
-            if(StringUtils.isBlank(agentFreezePort.getRemark())){
+        if(freeStatus.compareTo(FreeStatus.DJ.getValue())==0 ){
+            if(agentFreezePort.getFreezeCause().equals(FreeCause.QTDJ.getValue()) && StringUtils.isBlank(agentFreezePort.getRemark())){
                 agentResult.setMsg("冻结原因是其他原因,备注必填");
                 return agentResult;
             }
-        }
-        if(StringUtils.isBlank(agentFreezePort.getFreezeNum())){
-            agentResult.setMsg("请填写请求数据编号");
-            return agentResult;
+            if(StringUtils.isBlank(agentFreezePort.getFreezeNum())){
+                agentResult.setMsg("请填写请求数据编号");
+                return agentResult;
+            }
         }
         if(StringUtils.isBlank(agentFreezePort.getOperationPerson())){
             agentResult.setMsg("请填写操作人");
@@ -245,7 +243,8 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
             return agentResult;
         }
         String freeStatus = FreeStatus.getContentByValue(agent.getFreestatus());
-        resultMap.put("freeStatus",freeStatus);
+        resultMap.put("freeStatus",agent.getFreestatus());
+        resultMap.put("freeMsg",freeStatus);
 
         if(agent.getFreestatus().compareTo(FreeStatus.DJ.getValue())==0){
             AgentFreezeExample freezeExample = new AgentFreezeExample();
@@ -258,9 +257,16 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
             List<Map<String,Object>> resultList = new ArrayList<>();
             for (AgentFreeze agentFreeze : agentFreezeList) {
                 Map<String, Object> map = new HashMap<>();
-                map.put("freezeDate",agentFreeze.getFreezeDate());
-                map.put("freezePerson",agentFreeze.getFreezePerson());
+                map.put("freezeDate",DateUtil.format(agentFreeze.getFreezeDate(),DateUtil.DATE_FORMAT_2));
+                CUser cUser = userService.selectById(Long.valueOf(agentFreeze.getFreezePerson()));
+                if(null==cUser){
+                    map.put("freezePerson","");
+                }else{
+                    map.put("freezePerson",cUser.getName());
+                }
                 map.put("freezeCause",agentFreeze.getFreezeCause());
+                map.put("freezeCauseMsg",FreeCause.getContentByValue(agentFreeze.getFreezeCause()));
+                map.put("remark",agentFreeze.getRemark());
                 resultList.add(map);
             }
             resultMap.put("freezeInfo",resultList);
