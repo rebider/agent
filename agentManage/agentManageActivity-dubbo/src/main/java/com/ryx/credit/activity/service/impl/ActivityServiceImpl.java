@@ -173,6 +173,7 @@ public class ActivityServiceImpl implements ActivityService {
             rs.put("msg","success");
             upFlowRecord.setActivityStatus(Status.STATUS_1.status);
         } catch (MessageException | ProcessException e) {
+            e.printStackTrace();
             logger.error("completeTask error", e);
             rs.put("rs",false);
             rs.put("msg",e.getLocalizedMessage());
@@ -181,6 +182,7 @@ public class ActivityServiceImpl implements ActivityService {
             upFlowRecord.setErrorMsg(e.getLocalizedMessage());
             throw new ProcessException(e.getLocalizedMessage());
         }catch (Exception e) {
+            e.printStackTrace();
             logger.error("completeTask error", e);
             rs.put("rs",false);
             rs.put("msg",e.getMessage());
