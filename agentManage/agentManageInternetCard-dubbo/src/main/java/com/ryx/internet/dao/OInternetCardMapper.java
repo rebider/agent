@@ -47,4 +47,10 @@ public interface OInternetCardMapper {
 
     int updateInternetCardStop(@Param("map")Map<String,Object> map);
 
+    /**
+     * 通过sn查询流量卡是否存在
+     * @param iccidNum
+     * @return
+     */
+    OInternetCard selectBySnNum(String iccidNum);
 }

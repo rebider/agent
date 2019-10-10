@@ -5,6 +5,7 @@ import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.machine.vo.*;
+import com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail;
 import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
 
 import java.util.List;
@@ -96,4 +97,17 @@ public interface TermMachineService {
 
     AgentResult queryTerminalTransferResult(String serialNumber,String type) throws Exception;
 
+
+    AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws Exception;
+
+
+    AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception;
+
+    /**
+     * 校验机具是否可变更
+     * @param data
+     * @param platformType
+     * @return
+     */
+    boolean checkModleIsEq(Map<String,String> data,String platformType);
 }

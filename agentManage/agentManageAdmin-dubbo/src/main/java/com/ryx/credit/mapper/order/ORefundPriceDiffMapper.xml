@@ -24,6 +24,7 @@
     <result column="BELOW_PAY_AMT" jdbcType="DECIMAL" property="belowPayAmt" />
     <result column="SHARE_DEDUCT_AMT" jdbcType="DECIMAL" property="shareDeductAmt" />
     <result column="ORDER_TYPE" jdbcType="DECIMAL" property="orderType" />
+    <result column="APP_TIME" jdbcType="TIMESTAMP" property="appTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -57,7 +58,7 @@
   <sql id="Base_Column_List">
     ID, APPLY_COMP_TYPE, APPLY_COMP_AMT, REL_COMP_TYPE, REL_COMP_AMT, MACH_OWE_AMT, GATHER_TIME,
     GATHER_AMT, REVIEW_STATUS, S_TIME, APPLY_REMARK, DEDUCT_AMT, C_TIME, U_TIME, C_USER,
-    U_USER, STATUS, VERSION, AGENT_ID, BELOW_PAY_AMT, SHARE_DEDUCT_AMT, ORDER_TYPE
+    U_USER, STATUS, VERSION, AGENT_ID, BELOW_PAY_AMT, SHARE_DEDUCT_AMT, ORDER_TYPE, APP_TIME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -95,7 +96,7 @@
     C_TIME, U_TIME, C_USER,
     U_USER, STATUS, VERSION,
     AGENT_ID, BELOW_PAY_AMT, SHARE_DEDUCT_AMT,
-    ORDER_TYPE)
+    ORDER_TYPE, APP_TIME)
     values (#{id,jdbcType=VARCHAR}, #{applyCompType,jdbcType=VARCHAR}, #{applyCompAmt,jdbcType=DECIMAL},
     #{relCompType,jdbcType=VARCHAR}, #{relCompAmt,jdbcType=DECIMAL}, #{machOweAmt,jdbcType=DECIMAL},
     #{gatherTime,jdbcType=TIMESTAMP}, #{gatherAmt,jdbcType=DECIMAL}, #{reviewStatus,jdbcType=DECIMAL},
@@ -103,7 +104,7 @@
     #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
     #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL},
     #{agentId,jdbcType=VARCHAR}, #{belowPayAmt,jdbcType=DECIMAL}, #{shareDeductAmt,jdbcType=DECIMAL},
-    #{orderType,jdbcType=DECIMAL})
+    #{orderType,jdbcType=DECIMAL}, #{appTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiff">
     insert into O_REFUND_PRICE_DIFF
@@ -174,6 +175,9 @@
       <if test="orderType != null">
         ORDER_TYPE,
       </if>
+      <if test="appTime != null">
+        APP_TIME,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -241,6 +245,9 @@
       </if>
       <if test="orderType != null">
         #{orderType,jdbcType=DECIMAL},
+      </if>
+      <if test="appTime != null">
+        #{appTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -316,6 +323,9 @@
       <if test="orderType != null">
         ORDER_TYPE = #{orderType,jdbcType=DECIMAL},
       </if>
+      <if test="appTime != null">
+        APP_TIME = #{appTime,jdbcType=TIMESTAMP},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -341,7 +351,8 @@
     AGENT_ID = #{agentId,jdbcType=VARCHAR},
     BELOW_PAY_AMT = #{belowPayAmt,jdbcType=DECIMAL},
     SHARE_DEDUCT_AMT = #{shareDeductAmt,jdbcType=DECIMAL},
-    ORDER_TYPE = #{orderType,jdbcType=DECIMAL}
+    ORDER_TYPE = #{orderType,jdbcType=DECIMAL},
+    APP_TIME = #{appTime,jdbcType=TIMESTAMP}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

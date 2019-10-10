@@ -33,6 +33,11 @@
     <result column="ORDER_TYPE" jdbcType="DECIMAL" property="orderType" />
     <result column="FRONT_PRO_ID" jdbcType="VARCHAR" property="frontProId" />
     <result column="FRONT_PRO_NAME" jdbcType="VARCHAR" property="frontProName" />
+    <result column="PLATFORM_TYPE" jdbcType="VARCHAR" property="platformType" />
+    <result column="OLD_ORG_ID" jdbcType="VARCHAR" property="oldOrgId" />
+    <result column="NEW_ORG_ID" jdbcType="VARCHAR" property="newOrgId" />
+    <result column="DELIVERY_TIME" jdbcType="VARCHAR" property="deliveryTime" />
+    <result column="APP_TIME" jdbcType="TIMESTAMP" property="appTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -67,7 +72,8 @@
     ID, SUB_ORDER_ID, AGENT_ID, ACTIVITY_FRONT_ID, ACTIVITY_REAL_ID, REFUND_PRICE_DIFF_ID,
     PRO_ID, PRO_NAME, CHANGE_COUNT, ACTIVITY_NAME, ACTIVITY_WAY, ACTIVITY_RULE, FRONT_PRICE,
     PRICE, S_TIME, BEGIN_SN, END_SN, VENDER, PRO_MODEL, C_TIME, U_TIME, C_USER, U_USER,
-    STATUS, VERSION, ORDER_ID, SEND_STATUS, SEND_MSG, ORDER_TYPE, FRONT_PRO_ID, FRONT_PRO_NAME
+    STATUS, VERSION, ORDER_ID, SEND_STATUS, SEND_MSG, ORDER_TYPE, FRONT_PRO_ID, FRONT_PRO_NAME,
+    PLATFORM_TYPE, OLD_ORG_ID, NEW_ORG_ID, DELIVERY_TIME, APP_TIME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -108,7 +114,9 @@
     C_USER, U_USER, STATUS,
     VERSION, ORDER_ID, SEND_STATUS,
     SEND_MSG, ORDER_TYPE, FRONT_PRO_ID,
-    FRONT_PRO_NAME)
+    FRONT_PRO_NAME, PLATFORM_TYPE, OLD_ORG_ID,
+    NEW_ORG_ID, DELIVERY_TIME, APP_TIME
+    )
     values (#{id,jdbcType=VARCHAR}, #{subOrderId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
     #{activityFrontId,jdbcType=VARCHAR}, #{activityRealId,jdbcType=VARCHAR}, #{refundPriceDiffId,jdbcType=VARCHAR},
     #{proId,jdbcType=VARCHAR}, #{proName,jdbcType=VARCHAR}, #{changeCount,jdbcType=DECIMAL},
@@ -119,7 +127,9 @@
     #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
     #{version,jdbcType=DECIMAL}, #{orderId,jdbcType=VARCHAR}, #{sendStatus,jdbcType=DECIMAL},
     #{sendMsg,jdbcType=VARCHAR}, #{orderType,jdbcType=DECIMAL}, #{frontProId,jdbcType=VARCHAR},
-    #{frontProName,jdbcType=VARCHAR})
+    #{frontProName,jdbcType=VARCHAR}, #{platformType,jdbcType=VARCHAR}, #{oldOrgId,jdbcType=VARCHAR},
+    #{newOrgId,jdbcType=VARCHAR}, #{deliveryTime,jdbcType=VARCHAR}, #{appTime,jdbcType=TIMESTAMP}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail">
     insert into O_REFUND_PRICE_DIFF_DETAIL
@@ -217,6 +227,21 @@
       <if test="frontProName != null">
         FRONT_PRO_NAME,
       </if>
+      <if test="platformType != null">
+        PLATFORM_TYPE,
+      </if>
+      <if test="oldOrgId != null">
+        OLD_ORG_ID,
+      </if>
+      <if test="newOrgId != null">
+        NEW_ORG_ID,
+      </if>
+      <if test="deliveryTime != null">
+        DELIVERY_TIME,
+      </if>
+      <if test="appTime != null">
+        APP_TIME,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -311,6 +336,21 @@
       </if>
       <if test="frontProName != null">
         #{frontProName,jdbcType=VARCHAR},
+      </if>
+      <if test="platformType != null">
+        #{platformType,jdbcType=VARCHAR},
+      </if>
+      <if test="oldOrgId != null">
+        #{oldOrgId,jdbcType=VARCHAR},
+      </if>
+      <if test="newOrgId != null">
+        #{newOrgId,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryTime != null">
+        #{deliveryTime,jdbcType=VARCHAR},
+      </if>
+      <if test="appTime != null">
+        #{appTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -413,6 +453,21 @@
       <if test="frontProName != null">
         FRONT_PRO_NAME = #{frontProName,jdbcType=VARCHAR},
       </if>
+      <if test="platformType != null">
+        PLATFORM_TYPE = #{platformType,jdbcType=VARCHAR},
+      </if>
+      <if test="oldOrgId != null">
+        OLD_ORG_ID = #{oldOrgId,jdbcType=VARCHAR},
+      </if>
+      <if test="newOrgId != null">
+        NEW_ORG_ID = #{newOrgId,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryTime != null">
+        DELIVERY_TIME = #{deliveryTime,jdbcType=VARCHAR},
+      </if>
+      <if test="appTime != null">
+        APP_TIME = #{appTime,jdbcType=TIMESTAMP},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -447,7 +502,12 @@
     SEND_MSG = #{sendMsg,jdbcType=VARCHAR},
     ORDER_TYPE = #{orderType,jdbcType=DECIMAL},
     FRONT_PRO_ID = #{frontProId,jdbcType=VARCHAR},
-    FRONT_PRO_NAME = #{frontProName,jdbcType=VARCHAR}
+    FRONT_PRO_NAME = #{frontProName,jdbcType=VARCHAR},
+    PLATFORM_TYPE = #{platformType,jdbcType=VARCHAR},
+    OLD_ORG_ID = #{oldOrgId,jdbcType=VARCHAR},
+    NEW_ORG_ID = #{newOrgId,jdbcType=VARCHAR},
+    DELIVERY_TIME = #{deliveryTime,jdbcType=VARCHAR},
+    APP_TIME = #{appTime,jdbcType=TIMESTAMP}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -460,4 +520,102 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+
+  <resultMap id="BaseResultMapExtends" type="java.util.Map">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="SUB_ORDER_ID" jdbcType="VARCHAR" property="subOrderId" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="ACTIVITY_FRONT_ID" jdbcType="VARCHAR" property="activityFrontId" />
+    <result column="ACTIVITY_REAL_ID" jdbcType="VARCHAR" property="activityRealId" />
+    <result column="REFUND_PRICE_DIFF_ID" jdbcType="VARCHAR" property="refundPriceDiffId" />
+    <result column="PRO_ID" jdbcType="VARCHAR" property="proId" />
+    <result column="PRO_NAME" jdbcType="VARCHAR" property="proName" />
+    <result column="CHANGE_COUNT" jdbcType="DECIMAL" property="changeCount" />
+    <result column="ACTIVITY_NAME" jdbcType="VARCHAR" property="activityName" />
+    <result column="ACTIVITY_WAY" jdbcType="VARCHAR" property="activityWay" />
+    <result column="ACTIVITY_RULE" jdbcType="VARCHAR" property="activityRule" />
+    <result column="FRONT_PRICE" jdbcType="DECIMAL" property="frontPrice" />
+    <result column="PRICE" jdbcType="DECIMAL" property="price" />
+    <result column="S_TIME" jdbcType="TIMESTAMP" property="sTime" />
+    <result column="BEGIN_SN" jdbcType="VARCHAR" property="beginSn" />
+    <result column="END_SN" jdbcType="VARCHAR" property="endSn" />
+    <result column="VENDER" jdbcType="VARCHAR" property="vender" />
+    <result column="PRO_MODEL" jdbcType="VARCHAR" property="proModel" />
+    <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
+    <result column="U_TIME" jdbcType="TIMESTAMP" property="uTime" />
+    <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
+    <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="ORDER_ID" jdbcType="VARCHAR" property="orderId" />
+    <result column="SEND_STATUS" jdbcType="DECIMAL" property="sendStatus" />
+    <result column="SEND_MSG" jdbcType="VARCHAR" property="sendMsg" />
+    <result column="ORDER_TYPE" jdbcType="DECIMAL" property="orderType" />
+    <result column="FRONT_PRO_ID" jdbcType="VARCHAR" property="frontProId" />
+    <result column="FRONT_PRO_NAME" jdbcType="VARCHAR" property="frontProName" />
+    <result column="PLATFORM_TYPE" jdbcType="VARCHAR" property="platformType" />
+    <result column="OLD_ORG_ID" jdbcType="VARCHAR" property="oldOrgId" />
+    <result column="NEW_ORG_ID" jdbcType="VARCHAR" property="newOrgId" />
+    <result column="DELIVERY_TIME" jdbcType="VARCHAR" property="deliveryTime" />
+    <result column="APP_TIME" jdbcType="TIMESTAMP" property="appTime" />
+    <result column="APP_TIME" jdbcType="TIMESTAMP" property="appTime" />
+    <result column="PRE_ACTIVITY_ACTIVITYNAME" jdbcType="VARCHAR" property="pre_activity_activityName" />
+    <result column="PRE_ACTIVITY_ACT_CODE" jdbcType="VARCHAR" property="pre_activity_act_code" />
+    <result column="PRE_ACTIVITY_BUS_PRO_CODE" jdbcType="VARCHAR" property="pre_activity_bus_pro_code" />
+    <result column="PRE_ACTIVITY_PRICE" jdbcType="DECIMAL" property="pre_activity_price" />
+  </resultMap>
+  <select id="selectByExampleExtends" parameterType="map" resultMap="BaseResultMapExtends">
+    <include refid="OracleDialectPrefix" />
+    select
+    O_REFUND_PRICE_DIFF_DETAIL.ID,
+    O_REFUND_PRICE_DIFF_DETAIL.SUB_ORDER_ID,
+    O_REFUND_PRICE_DIFF_DETAIL.AGENT_ID,
+    O_REFUND_PRICE_DIFF_DETAIL.ACTIVITY_FRONT_ID,
+    O_REFUND_PRICE_DIFF_DETAIL.ACTIVITY_REAL_ID,
+    O_REFUND_PRICE_DIFF_DETAIL.REFUND_PRICE_DIFF_ID,
+    O_REFUND_PRICE_DIFF_DETAIL.PRO_ID,
+    O_REFUND_PRICE_DIFF_DETAIL.PRO_NAME,
+    O_REFUND_PRICE_DIFF_DETAIL.CHANGE_COUNT,
+    O_REFUND_PRICE_DIFF_DETAIL.ACTIVITY_NAME,
+    O_REFUND_PRICE_DIFF_DETAIL.ACTIVITY_WAY,
+    O_REFUND_PRICE_DIFF_DETAIL.ACTIVITY_RULE,
+    O_REFUND_PRICE_DIFF_DETAIL.FRONT_PRICE,
+    O_REFUND_PRICE_DIFF_DETAIL.PRICE,
+    O_REFUND_PRICE_DIFF_DETAIL.S_TIME,
+    O_REFUND_PRICE_DIFF_DETAIL.BEGIN_SN,
+    O_REFUND_PRICE_DIFF_DETAIL.END_SN,
+    O_REFUND_PRICE_DIFF_DETAIL.VENDER,
+    O_REFUND_PRICE_DIFF_DETAIL.PRO_MODEL,
+    O_REFUND_PRICE_DIFF_DETAIL.C_TIME,
+    O_REFUND_PRICE_DIFF_DETAIL.U_TIME,
+    O_REFUND_PRICE_DIFF_DETAIL.C_USER,
+    O_REFUND_PRICE_DIFF_DETAIL.U_USER,
+    O_REFUND_PRICE_DIFF_DETAIL.STATUS,
+    O_REFUND_PRICE_DIFF_DETAIL.VERSION,
+    O_REFUND_PRICE_DIFF_DETAIL.ORDER_ID,
+    O_REFUND_PRICE_DIFF_DETAIL.SEND_STATUS,
+    O_REFUND_PRICE_DIFF_DETAIL.SEND_MSG,
+    O_REFUND_PRICE_DIFF_DETAIL.ORDER_TYPE,
+    O_REFUND_PRICE_DIFF_DETAIL.FRONT_PRO_ID,
+    O_REFUND_PRICE_DIFF_DETAIL.FRONT_PRO_NAME,
+    O_REFUND_PRICE_DIFF_DETAIL.PLATFORM_TYPE,
+    O_REFUND_PRICE_DIFF_DETAIL.OLD_ORG_ID,
+    O_REFUND_PRICE_DIFF_DETAIL.NEW_ORG_ID,
+    O_REFUND_PRICE_DIFF_DETAIL.DELIVERY_TIME,
+    O_REFUND_PRICE_DIFF_DETAIL.APP_TIME,
+    pre_activity.activity_name as pre_activity_activityName,
+    pre_activity.act_code as pre_activity_act_code,
+    pre_activity.bus_pro_code as pre_activity_bus_pro_code,
+    pre_activity.price as pre_activity_price
+    from O_REFUND_PRICE_DIFF_DETAIL
+    left join o_activity  pre_activity on pre_activity.id= O_REFUND_PRICE_DIFF_DETAIL.ACTIVITY_FRONT_ID
+    <where>
+      O_REFUND_PRICE_DIFF_DETAIL.status=1
+      <if test="par.agentId!=null and par.agentId!=''"> and O_REFUND_PRICE_DIFF_DETAIL.Agent_Id=#{par.agentId} </if>
+      <if test="par.refundPriceDiffId!=null and par.refundPriceDiffId!=''"> and O_REFUND_PRICE_DIFF_DETAIL.REFUND_PRICE_DIFF_ID=#{par.refundPriceDiffId} </if>
+    </where>
+    order by O_REFUND_PRICE_DIFF_DETAIL.C_TIME desc
+    <include refid="OracleDialectSuffix" />
+  </select>
 </mapper>

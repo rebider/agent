@@ -122,8 +122,7 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
         resultMap.put("uniqueId",agentBusInfo.getId());
         resultMap.put("orgId",agentBusInfo.getBusNum());
         resultMap.put("busiType",platForm.getPosbusitype());
-        Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
-        resultMap.put("orgType",dictByValue.getdItemname().contains(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
+        resultMap.put("orgType",OrgType.zQ(agentBusInfo.getBusType())?OrgType.STR.getValue():OrgType.ORG.getValue());
         resultMap.put("loginName",agentBusInfo.getBusLoginNum());
         AgentBusInfo agentParent = null;
         if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentBusInfo.getBusParent())){
@@ -344,6 +343,12 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
 
     @Override
     public AgentResult agencyLevelUpdateChange(Map data) throws Exception {
+        if(1==1){
+            log.info("实时分润禁止升级迁移操作");
+            AgentResult ag = AgentResult.fail("实时分润禁止升级迁移操作");
+            ag.setData("实时分润禁止升级迁移操作");
+            return ag;
+        }
         if(data==null){
             log.info("POS业务升级代理接口数据为空");
         }

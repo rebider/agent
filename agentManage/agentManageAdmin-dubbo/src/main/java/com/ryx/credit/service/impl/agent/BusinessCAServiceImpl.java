@@ -46,7 +46,7 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 	private AgentService agentService;
 
 	@Override
-	public AgentResult agentBusinessCA(String agentBusinfoName) {
+	public AgentResult agentBusinessCA(String agentBusinfoName,String isCache) {
 
 		AgentResult result = new AgentResult(500,"参数错误","");
 		if (StringUtils.isBlank(agentBusinfoName)) {
@@ -58,7 +58,7 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 			String httpResult = null;
 
 			if(EnvironmentUtil.isProduction()){
-				httpResult = industryAuthRequest(agentBusinfoName);
+				httpResult = industryAuthRequest(agentBusinfoName,isCache);
 			}else{	//测试环境不作工商认证
 				httpResult = "{'respType':'TEST','data':{'isTest':'1'}}";
 			}
@@ -91,7 +91,7 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 		return result;
 	}
 
-	private String industryAuthRequest(String entName)throws Exception{
+	private String industryAuthRequest(String entName,String isCache)throws Exception{
 
 		String cooperator = Constants.cooperator;
 		String charset = "UTF-8"; // 字符集
@@ -106,7 +106,7 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 		jsonParams.put("reqDate", reqDate);
 
 		data.put("entName", entName);
-		data.put("isCache", "1");
+		data.put("isCache", isCache);
 
 		jsonParams.put("data", data);
 
@@ -179,7 +179,7 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 		agname = agname.replaceAll("[A-Z]|\\(*\\)","");
 		logger.info("后台任务进行工商认证|{}|替换后名称|{}",agent.getId(),agname);
 		//工商认证
-		AgentResult agentResult = agentBusinessCA(agname);
+		AgentResult agentResult = agentBusinessCA(agname,"1");
 		if(agentResult.isOK()){
 			//补全代理商信息
 			JSONObject dataObj = (JSONObject)agentResult.getData();

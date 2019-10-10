@@ -558,4 +558,19 @@
     <if test="count!=null and count!=''"> and a.send_num &gt; #{count,jdbcType=DECIMAL} </if>
   </select>
 
+  <!--查询审批完成的退货物流id-->
+  <select id="queryLogicInfoIdByStatusAndApproved" parameterType="map" resultType="string">
+    SELECT
+        L.ID
+    FROM
+        O_LOGISTICS L
+        LEFT JOIN O_RECEIPT_PLAN R ON L.RECEIPT_PLAN_ID = R.ID
+        LEFT JOIN O_RETURN_ORDER_DETAIL ROD ON ROD.ID = R.RETURN_ORDER_DETAIL_ID
+        LEFT JOIN O_RETURN_ORDER RO ON RO.ID=ROD.RETURN_ID
+    WHERE
+        L.STATUS=1 AND
+        RO.RET_SCHEDULE=#{retSchedule} AND
+        L.SEND_STATUS=#{sendStatus} AND
+        L.LOG_TYPE=#{logType}
+  </select>
 </mapper>

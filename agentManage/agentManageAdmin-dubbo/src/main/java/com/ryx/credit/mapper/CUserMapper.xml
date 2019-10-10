@@ -124,14 +124,16 @@
         t.name,
         user_type,
         s.id as orgid,
+        s.code as organizationCode,
         s.pid as orgpid,
-        o.pid as orgppid,
         o.code as pidOrgCode,
-        s.code as organizationCode
+        o.pid as orgppid,
+        p.code as ppidOrgCode
         FROM
         C_USER t
         LEFT JOIN c_organization s ON s.id = t.organization_id
         LEFT JOIN c_organization o ON s.pid = o.id
+        LEFT JOIN c_organization p ON o.pid = p.id
         <where>
             t.id = #{id}
         </where>
@@ -168,5 +170,7 @@
         set status = 1
         where ID = #{id}
     </update>
+
+
 
 </mapper>
