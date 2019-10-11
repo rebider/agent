@@ -239,7 +239,7 @@
   </sql>
   <!-- ======================以上为自动生成代码，请务必把自己添加代码写到下面，防止被覆盖================================-->
   <select id="getAllPlatFormType" resultType="java.lang.String">
-    select distinct PLATFORM_TYPE from TRANCHECK_PLATFORM
+    select distinct PLATFORM_TYPE from TRANCHECK_PLATFORM ORDER BY PLATFORM_TYPE
   </select>
 
   <select id="getTranAmtByMonth" resultType="java.util.Map">
