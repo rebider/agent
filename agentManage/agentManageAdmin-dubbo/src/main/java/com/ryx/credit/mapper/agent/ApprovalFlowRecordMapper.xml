@@ -557,4 +557,16 @@
     from a_approval_flow_record
     where bus_id = #{busId,jdbcType=VARCHAR} and status=1
   </select>
+
+  <select id="selectByAgentName" parameterType="java.lang.String" resultMap="ApprovalFlowRecordVo">
+    select
+    ab.id as bus_id,
+    ab.bus_num as one_parent_num,
+    ab.bus_platform,
+    ab.agent_id,
+    aa.ag_name as one_parent_name
+    from a_agent_businfo ab
+    left join a_agent aa on aa.id = ab.agent_id and aa.status=1
+    where ab.id = #{id,jdbcType=VARCHAR} and ab.status=1
+  </select>
 </mapper>
