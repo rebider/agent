@@ -326,8 +326,7 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
         List<Dict> AG_STATUS_S = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.AG_STATUS_S.name());
         for (ApprovalFlowRecord flowRecord : approvalFlowRecords) {
             Map<String, Object> resultMap = new HashMap<>();
-            String busId = flowRecord.getBusId();
-            DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(busId);
+            DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(flowRecord.getBusId());
             AgentVo dataPreAgentVo = JsonUtil.jsonToPojo(dateChangeRequest.getDataPreContent(), AgentVo.class);
             AgentVo dataAgentVo = JsonUtil.jsonToPojo(dateChangeRequest.getDataContent(), AgentVo.class);
             List<AgentBusInfoVo> preBusInfoVoList = dataPreAgentVo.getBusInfoVoList();
@@ -438,17 +437,16 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
                 resultMap.put("busId", agentBusInfoVo_after.getId());
                 resultMap.put("busNum", agentBusInfoVo_after.getBusNum());
             }
-            ApprovalFlowRecord approvalFlow = approvalFlowRecordMapper.selectByPrimaryKey(flowRecord.getId());
-            BusActRel busActRel = busActRelMapper.findByActivId(approvalFlow.getExecutionId());
-            CUser getApprovalPerson = userService.selectById(approvalFlow.getApprovalPerson());
-            resultMap.put("approvalTime", dateFormat.format(approvalFlow.getApprovalTime()));
-            resultMap.put("approvalOpinion", approvalFlow.getApprovalOpinion());
+            BusActRel busActRel = busActRelMapper.findByActivId(flowRecord.getExecutionId());
+            CUser getApprovalPerson = userService.selectById(flowRecord.getApprovalPerson());
+            resultMap.put("approvalTime", dateFormat.format(flowRecord.getApprovalTime()));
+            resultMap.put("approvalOpinion", flowRecord.getApprovalOpinion());
             resultMap.put("approvalPerson", getApprovalPerson.getName());
-            resultMap.put("agentId", approvalFlow.getAgentId());
-            resultMap.put("agentName", approvalFlow.getAgentName());
-            if(approvalFlow.getApprovalResult()!=null){
+            resultMap.put("agentId", flowRecord.getAgentId());
+            resultMap.put("agentName", flowRecord.getAgentName());
+            if(flowRecord.getApprovalResult()!=null){
                 for (Dict dict : APPROVAL_TYPE) {
-                    if(dict!=null && approvalFlow.getApprovalResult().toString().equals(dict.getdItemvalue())){
+                    if(dict!=null && flowRecord.getApprovalResult().toString().equals(dict.getdItemvalue())){
                         resultMap.put("approvalResult", dict.getdItemname());
                     }
                 }
@@ -472,9 +470,51 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
      */
     @Override
     public List<Map<String, Object>> exportAgentColinfo(ApprovalFlowRecord approvalFlowRecord) throws Exception {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         List<Map<String, Object>> resultList = new ArrayList<>();
         List<ApprovalFlowRecord> approvalFlowRecords = exprotCommon(approvalFlowRecord);
         List<Dict> BUS_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name());
+        List<Dict> APPROVAL_TYPE = dictOptionsService.dictList(DictGroup.AGENT_AUDIT.name(), DictGroup.APPROVAL_TYPE.name());
+        List<Dict> AG_STATUS_S = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.AG_STATUS_S.name());
+        for (ApprovalFlowRecord flowRecord : approvalFlowRecords) {
+            Map<String, Object> resultMap = new HashMap<>();
+            DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(flowRecord.getBusId());
+            AgentVo dataPreAgentVo = JsonUtil.jsonToPojo(dateChangeRequest.getDataPreContent(), AgentVo.class);
+            AgentVo dataAgentVo = JsonUtil.jsonToPojo(dateChangeRequest.getDataContent(), AgentVo.class);
+            Agent preAgentVoAgent = dataPreAgentVo.getAgent();
+            Agent agentVoAgent = dataAgentVo.getAgent();
+            if (preAgentVoAgent!=null && agentVoAgent!=null) {
+                //代理商名称（前）
+                if(preAgentVoAgent.getAgName()!=null)
+                resultMap.put("agentNameBefore", preAgentVoAgent.getAgName());
+                //代理商名称（后）
+                if(agentVoAgent.getAgName()!=null)
+                resultMap.put("agentNameAfter", agentVoAgent.getAgName());
+            }
+            List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByAgenId(flowRecord.getAgentId());
+            BusActRel busActRel = busActRelMapper.findByActivId(flowRecord.getExecutionId());
+            CUser getApprovalPerson = userService.selectById(flowRecord.getApprovalPerson());
+            resultMap.put("approvalTime", dateFormat.format(flowRecord.getApprovalTime()));
+            resultMap.put("approvalPerson", getApprovalPerson.getName());
+            resultMap.put("approvalOpinion", flowRecord.getApprovalOpinion());
+            resultMap.put("agentId", flowRecord.getAgentId());
+            resultMap.put("busId", flowRecord.getBusId());
+            if(flowRecord.getApprovalResult()!=null){
+                for (Dict dict : APPROVAL_TYPE) {
+                    if(dict!=null && flowRecord.getApprovalResult().toString().equals(dict.getdItemvalue())){
+                        resultMap.put("approvalResult", dict.getdItemname());
+                    }
+                }
+            }
+            if(busActRel.getActivStatus()!=null){
+                for (Dict dict : AG_STATUS_S) {
+                    if(dict!=null && busActRel.getActivStatus().toString().equals(dict.getdItemvalue())){
+                        resultMap.put("activStatus", dict.getdItemname());
+                    }
+                }
+            }
+            resultList.add(resultMap);
+        }
         return resultList;
     }
 
