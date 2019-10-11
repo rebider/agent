@@ -328,4 +328,10 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
         }
         return AgentResult.ok(resultMap);
     }
+
+    @Override
+    public AgentFreeze selectByPrimaryKey(String id){
+        AgentFreeze agentFreeze = agentFreezeMapper.selectByPrimaryKey(id);
+        return agentFreeze;
+    }
 }
