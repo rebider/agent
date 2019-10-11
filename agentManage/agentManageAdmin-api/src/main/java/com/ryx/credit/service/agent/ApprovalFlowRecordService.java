@@ -40,6 +40,13 @@ public interface ApprovalFlowRecordService {
      */
     List<Map<String, Object>> exportAgentEdit(ApprovalFlowRecord approvalFlowRecord) throws Exception;
 
+    /**
+     * 导出代理商账户修改数据
+     * @param approvalFlowRecord
+     * @return
+     */
+    List<Map<String, Object>> exportAgentColinfo(ApprovalFlowRecord approvalFlowRecord) throws Exception;
+
 
     List<Map<String,Object>> queryFlowByExecutionId(String executionId);
 }
