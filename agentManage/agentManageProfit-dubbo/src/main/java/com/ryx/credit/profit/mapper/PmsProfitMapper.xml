@@ -616,6 +616,9 @@
     <if test="agentId != null and agentId != ''">
       and agent_id=#{agentId,jdbcType=VARCHAR}
     </if>
+    <if test="busCode != null and busCode != ''">
+      and bus_code=#{busCode,jdbcType=VARCHAR}
+    </if>
     group by month
     <if test="uniqueFlag != null and uniqueFlag != ''">
       ,unique_flag
@@ -642,6 +645,9 @@
     <if test="sheetName != null and sheetName != ''">
       and sheet_name=#{sheetName,jdbcType=VARCHAR}
     </if>
+    <if test="busCode != null and busCode != ''">
+      and bus_code=#{busCode,jdbcType=VARCHAR}
+    </if>
     group by month,unique_flag,sheet_name
     order by dbms_random.value
     )where rownum &lt; 2
@@ -659,6 +665,9 @@
     </if>
     <if test="sheetName != null and sheetName != ''">
       and t.sheet_name=#{sheetName,jdbcType=VARCHAR}
+    </if>
+    <if test="busCode != null and busCode != ''">
+      and t.bus_code=#{busCode,jdbcType=VARCHAR}
     </if>
     and rownum&lt;=1
     ) a
@@ -679,6 +688,9 @@
     </if>
     <if test="sheetName != null and sheetName != ''">
       and t.sheet_name=#{sheetName,jdbcType=VARCHAR}
+    </if>
+    <if test="busCode != null and busCode != ''">
+      and t.bus_code=#{busCode,jdbcType=VARCHAR}
     </if>
     order by t.order_number
   </select>
