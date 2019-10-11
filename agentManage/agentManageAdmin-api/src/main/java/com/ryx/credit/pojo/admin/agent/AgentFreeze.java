@@ -5,10 +5,10 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class AgentFreeze implements Serializable{
+
     private String id;
 
     private String agentId;
-
 
     private String freezeStatus;
 
@@ -31,6 +31,87 @@ public class AgentFreeze implements Serializable{
     private BigDecimal status;
 
     private BigDecimal version;
+
+    private String agentName;
+
+    private String incomTimeBegin;
+
+    private String incomTimeEnd;
+
+    private String freezeDateBegin;
+
+    private String freezeDateEnd;
+
+    private String unFreezeDateBegin;
+
+    private String unFreezeDateEnd;
+
+    private String freeStatus;
+
+
+    public String getIncomTimeBegin() {
+        return incomTimeBegin;
+    }
+
+    public void setIncomTimeBegin(String incomTimeBegin) {
+        this.incomTimeBegin = incomTimeBegin;
+    }
+
+    public String getIncomTimeEnd() {
+        return incomTimeEnd;
+    }
+
+    public void setIncomTimeEnd(String incomTimeEnd) {
+        this.incomTimeEnd = incomTimeEnd;
+    }
+
+    public String getFreezeDateBegin() {
+        return freezeDateBegin;
+    }
+
+    public void setFreezeDateBegin(String freezeDateBegin) {
+        this.freezeDateBegin = freezeDateBegin;
+    }
+
+    public String getFreezeDateEnd() {
+        return freezeDateEnd;
+    }
+
+    public void setFreezeDateEnd(String freezeDateEnd) {
+        this.freezeDateEnd = freezeDateEnd;
+    }
+
+    public String getUnFreezeDateBegin() {
+        return unFreezeDateBegin;
+    }
+
+    public void setUnFreezeDateBegin(String unFreezeDateBegin) {
+        this.unFreezeDateBegin = unFreezeDateBegin;
+    }
+
+    public String getUnFreezeDateEnd() {
+        return unFreezeDateEnd;
+    }
+
+    public void setUnFreezeDateEnd(String unFreezeDateEnd) {
+        this.unFreezeDateEnd = unFreezeDateEnd;
+    }
+
+    public String getFreeStatus() {
+        return freeStatus;
+    }
+
+    public void setFreeStatus(String freeStatus) {
+        this.freeStatus = freeStatus;
+    }
+
+    public String getAgentName() {
+        return agentName;
+    }
+
+    public void setAgentName(String agentName) {
+        this.agentName = agentName;
+    }
 
     public String getId() {
         return id;

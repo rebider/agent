@@ -49,7 +49,45 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
 
     @Override
     public PageInfo agentFreezeList(AgentFreeze agentFreeze, Page page){
-        Map<String, Object> reqMap = JsonUtil.objectToMap(agentFreeze);
+
+        Map<String, Object> reqMap = new HashMap<>();
+        if(StringUtils.isNotBlank(agentFreeze.getId())){
+            reqMap.put("id",agentFreeze.getId());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getAgentId())){
+            reqMap.put("agentId",agentFreeze.getAgentId());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getAgentName())){
+            reqMap.put("agentName",agentFreeze.getAgentName());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getIncomTimeBegin())){
+            reqMap.put("incomTimeBegin",agentFreeze.getIncomTimeBegin());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getIncomTimeEnd())){
+            reqMap.put("incomTimeEnd",agentFreeze.getIncomTimeEnd());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getFreezeDateBegin())){
+            reqMap.put("freezeDateBegin",agentFreeze.getFreezeDateBegin());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getFreezeDateEnd())){
+            reqMap.put("freezeDateEnd",agentFreeze.getFreezeDateEnd());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getUnFreezeDateBegin())){
+            reqMap.put("unFreezeDateBegin",agentFreeze.getUnFreezeDateBegin());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getUnFreezeDateEnd())){
+            reqMap.put("unFreezeDateEnd",agentFreeze.getUnFreezeDateEnd());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getFreeStatus())){
+            reqMap.put("freeStatus",agentFreeze.getFreeStatus());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getFreezeCause())){
+            reqMap.put("freezeCause",agentFreeze.getFreezeCause());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getFreezeStatus())){
+            reqMap.put("freezeStatus",agentFreeze.getFreezeStatus());
+        }
+
         List<Map<String, String>> resultMaps = agentFreezeMapper.queryAgentFreezeList(reqMap,page);
         for (Map<String, String> resultMap : resultMaps) {
             resultMap.put("FREESTATUS_MSG",FreeStatus.getContentByValue(new BigDecimal(resultMap.get("FREESTATUS"))));

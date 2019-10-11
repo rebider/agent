@@ -264,6 +264,44 @@
       select t.*,a.ag_name,a.c_incom_time,to_char(a.freestatus) as FREESTATUS
       from a_agent_freeze t
       left join a_agent a on a.id=t.agent_id
+      <where>
+        <if test="map.id!=null and map.agentId != ''">
+           and t.id = #{map.id,jdbcType=VARCHAR}
+        </if>
+        <if test="map.agentId != null and map.agentId != '' ">
+          and t.agent_Id = #{map.agentId,jdbcType=VARCHAR}
+        </if>
+        <if test="map.agentName != null and map.agentName != '' ">
+          and a.ag_name LIKE CONCAT(CONCAT('%',#{map.agentName}),'%')
+        </if>
+        <if test="map.incomTimeBegin!=null and map.incomTimeBegin!=''">
+          and a.c_incom_time >= to_date(#{map.incomTimeBegin}, 'yy-mm-dd hh24:mi:ss')
+        </if>
+        <if test="map.incomTimeEnd!=null and map.incomTimeEnd!=''">
+          and a.c_incom_time &lt;= to_date(#{map.incomTimeEnd}, 'yy-mm-dd hh24:mi:ss')
+        </if>
+        <if test="map.freezeDateBegin!=null and map.freezeDateBegin!=''">
+          and t.freeze_Date >= to_date(#{map.freezeDateBegin}, 'yy-mm-dd hh24:mi:ss')
+        </if>
+        <if test="map.freezeDateEnd!=null and map.freezeDateEnd!=''">
+          and t.freeze_Date &lt;= to_date(#{map.freezeDateEnd}, 'yy-mm-dd hh24:mi:ss')
+        </if>
+        <if test="map.unFreezeDateBegin!=null and map.unFreezeDateBegin!=''">
+          and t.unFreeze_Date >= to_date(#{map.unFreezeDateBegin}, 'yy-mm-dd hh24:mi:ss')
+        </if>
+        <if test="map.unFreezeDateEnd!=null and map.unFreezeDateEnd!=''">
+          and t.unFreeze_Date &lt;= to_date(#{map.unFreezeDateEnd}, 'yy-mm-dd hh24:mi:ss')
+        </if>
+        <if test="map.freeStatus != null and map.freeStatus != '' ">
+          and a.freestatus = #{map.freeStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="map.freezeCause != null and map.freezeCause != '' ">
+          and t.freeze_Cause = #{map.freezeCause,jdbcType=VARCHAR}
+        </if>
+        <if test="map.freezeStatus != null and map.freezeStatus != '' ">
+          and t.freeze_Status = #{map.freezeStatus,jdbcType=VARCHAR}
+        </if>
+      </where>
       order by t.agent_id,t.freeze_date
   </sql>
 

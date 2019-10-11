@@ -1,6 +1,8 @@
 package com.ryx.credit.common.enumc;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Author Lihl
@@ -22,6 +24,30 @@ public enum FreeStatus {
     }
 
     /**
+     * 根据值获取内容
+     * @param value
+     * @return
+     */
+    public static String getContentByValue(BigDecimal value) {
+        FreeStatus[] freeStatus = FreeStatus.values();
+        for (FreeStatus cc : freeStatus) {
+            if(cc.code.compareTo(value)==0){
+                return cc.msg;
+            }
+        }
+        return "";
+    }
+
+    public static Map<Object, Object> getContentMap() {
+        FreeStatus[] freeStatus = FreeStatus.values();
+        Map<Object, Object> resultMap = new HashMap<>();
+        for (FreeStatus cc : freeStatus) {
+            resultMap.put(cc.code,cc.msg);
+        }
+        return resultMap;
+    }
+
+    /**
      * 取得枚举对象值
      * @return 枚举对象值
      */
@@ -35,21 +61,6 @@ public enum FreeStatus {
      */
     public String getContent() {
         return this.msg;
-    }
-
-    /**
-     * 根据值获取内容
-     * @param value
-     * @return
-     */
-    public static String getContentByValue(BigDecimal value) {
-        FreeStatus[] freeStatus = FreeStatus.values();
-        for (FreeStatus cc : freeStatus) {
-            if(cc.code.compareTo(value)==0){
-                return cc.msg;
-            }
-        }
-        return "";
     }
 
 }
