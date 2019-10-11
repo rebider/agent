@@ -16,7 +16,7 @@ public enum FreeCause {
 
     QPDJ("QPDJ","欠票冻结"),
     RRDJ("RRDJ","分润冻结"),
-    RWDJ("RWDJ","入网冻结"),
+    HTDJ("HTDJ","合同冻结"),
     RZDJ("RZDJ","认证冻结"),
     QTDJ("QTDJ","其他原因");
 
