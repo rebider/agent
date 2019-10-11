@@ -202,8 +202,13 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
         if(j!=1){
             throw new MessageException("更新解冻失败");
         }
+        AgentFreezeExample qfreezeExample = new AgentFreezeExample();
+        AgentFreezeExample.Criteria qfreezeCriteria = qfreezeExample.createCriteria();
+        qfreezeCriteria.andStatusEqualTo(Status.STATUS_1.status);
+        qfreezeCriteria.andAgentIdEqualTo(agentFreezePort.getAgentId());
+        qfreezeCriteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+        List<AgentFreeze> agentFreezes = agentFreezeMapper.selectByExample(qfreezeExample);
 
-        List<AgentFreeze> agentFreezes = agentFreezeMapper.selectByExample(freezeExample);
         //没有冻结的 更新代理商状态为解冻
         if(agentFreezes.size()==0){
             Map<String,Object> dataMap = (Map<String,Object>)verify.getData();
