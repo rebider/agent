@@ -839,7 +839,7 @@
     ,bus.bus_platform,bus.bus_num,bus.bus_type,bus.bus_Inde_ass,
     bus.bus_scope,bus.bus_region,bus.bus_risk_email,e.name as ag_doc_pro,bus.bus_contact_person,
     bus.approve_time,platform.PLATFORM_NAME,
-    a1.AG_NAME as agName,
+    a1.AG_NAME as busParent,
     businfo_1.id as busId,
     businfo_1.bus_num as busParentBusNum,
     busRiskParentbusAgent.ag_name as busRiskParent,busActivationParentbusAgent.ag_name as busActivationParent,
