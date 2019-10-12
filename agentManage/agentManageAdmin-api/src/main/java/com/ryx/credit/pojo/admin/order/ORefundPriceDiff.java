@@ -56,6 +56,8 @@ public class ORefundPriceDiff implements Serializable{
 
     private BigDecimal orderType;
 
+    private Date appTime;
+
     private List<ORefundPriceDiffDetail> refundPriceDiffDetailList;
 
     private List<Attachment> attachmentList;
@@ -63,6 +65,14 @@ public class ORefundPriceDiff implements Serializable{
     private List<ODeductCapital>  deductCapitalList;
 
     private List<Attachment> attachmentFianceList;
+
+    public Date getAppTime() {
+        return appTime;
+    }
+
+    public void setAppTime(Date appTime) {
+        this.appTime = appTime;
+    }
 
     public String getId() {
         return id;

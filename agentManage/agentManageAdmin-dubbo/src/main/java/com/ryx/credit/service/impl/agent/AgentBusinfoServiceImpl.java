@@ -246,6 +246,12 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 			if(agent==null)throw new ProcessException("代理商信息不能为空");
 			Set<String> resultSet = new HashSet<>();
 			for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
+
+				//实时分润不能升级
+				List platformList = platFormMapper.selectPlatformNumByPlatformType();
+				boolean checkBusPlatform = platformList.contains(agentBusInfoVo.getBusPlatform()) && (null != agentBusInfoVo.getBusNum() && !"".equals(agentBusInfoVo.getBusNum()));
+				if (checkBusPlatform) throw new ProcessException("实时分润品牌暂不支持升级！");
+
 				if(!"1".equals(saveStatus)){
 					if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentBusInfoVo.getBusNum())) {
 						if (!OrgType.zQ(agentBusInfoVo.getBusType())) {
@@ -1065,7 +1071,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
 		AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
 		criteria.andStatusEqualTo(Status.STATUS_1.status);
-		criteria.andBusStatusNotEqualTo(BusinessStatus.pause.status);
+		criteria.andBusStatusEqualTo(BusinessStatus.Enabled.status);
 		criteria.andBrandNumEqualTo(brandNum);
 		List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
 		if(agentBusInfos==null){

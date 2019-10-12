@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class OsnFaHuoJob implements DataflowJob<String> {
 
     private static Logger logger = LoggerFactory.getLogger(OsnFaHuoJob.class);
 
-    @Autowired
+    @Resource(name = "osnOperateService")
     private OsnOperateService osnOperateService;
     @Override
     public List<String> fetchData(ShardingContext shardingContext) {

@@ -4,6 +4,7 @@ package com.ryx.credit.dao.agent;
 import com.ryx.credit.pojo.admin.agent.PlatForm;
 import com.ryx.credit.pojo.admin.agent.PlatFormExample;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -35,4 +36,14 @@ public interface PlatFormMapper {
     String selectPlatType(String platformNum);
 
     String selectBusPlatFormByPlatformNum(String platformNum);
+
+    List selectByOrderIdList(List<String> orderIdList);
+
+    PlatForm selectByOrderId(String orderId);
+
+    /**
+     * 查询SSPOS
+     * @return
+     */
+    List<String> selectPlatformNumByPlatformType();
 }

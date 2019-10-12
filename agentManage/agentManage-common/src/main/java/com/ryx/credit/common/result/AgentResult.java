@@ -15,6 +15,7 @@ public class AgentResult implements Serializable{
     // 定义jackson对象
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
+    public static Integer OK = 200;
     // 响应业务状态
     private Integer status;
 

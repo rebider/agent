@@ -43,4 +43,10 @@ import java.util.Map;
      * @return
      */
     List<String> queryLogicInfoIdByStatus(Map<String, Object> param);
+
+    /**
+     * 查询退货物流明细
+     * @return
+     */
+    List<String> queryLogicInfoIdByStatusAndApproved(Map<String, Object> param);
 }
