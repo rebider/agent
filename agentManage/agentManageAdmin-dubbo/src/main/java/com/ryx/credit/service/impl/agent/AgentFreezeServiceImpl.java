@@ -2,6 +2,7 @@ package com.ryx.credit.service.impl.agent;
 
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -46,6 +47,9 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
     private IdService idService;
     @Autowired
     private IUserService userService;
+    @Autowired
+    private RedisService redisService;
+
 
     @Override
     public PageInfo agentFreezeList(AgentFreeze agentFreeze, Page page){
@@ -122,42 +126,53 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
     public AgentResult agentFreeze(AgentFreezePort agentFreezePort)throws MessageException{
 
         log.info("代理商冻结请求参数：{}",JsonUtil.objectToJson(agentFreezePort));
-        AgentResult verify = verify(agentFreezePort,FreeStatus.DJ.getValue());
-        if(!verify.isOK()){
-            return verify;
-        }
-        AgentFreezeExample agentFreezeExample = new AgentFreezeExample();
-        AgentFreezeExample.Criteria criteria = agentFreezeExample.createCriteria();
-        criteria.andStatusEqualTo(Status.STATUS_1.status);
-        criteria.andAgentIdEqualTo(agentFreezePort.getAgentId());
-        criteria.andFreezeCauseEqualTo(agentFreezePort.getFreezeCause());
-        criteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
-        List<AgentFreeze> agentFreezes = agentFreezeMapper.selectByExample(agentFreezeExample);
-        if(agentFreezes.size()!=0){
-            return AgentResult.fail("代理商此原因已被冻结");
-        }
-        Map<String,Object> dataMap = (Map<String,Object>)verify.getData();
-        Agent agent = (Agent)dataMap.get("agent");
-        if(agent.getFreestatus().compareTo(FreeStatus.DJ.getValue())!=0){
-            agent.setFreestatus(FreeStatus.DJ.getValue());
-            int i = agentMapper.updateByPrimaryKeySelective(agent);
-            if(i!=1){
-                throw new MessageException("代理商冻结更新代理商信息失败");
+        String indentifier = "";
+        try {
+            indentifier = redisService.lockWithTimeout(RedisCachKey.AGENT_FREEZE_LOCK + agentFreezePort.getOperationPerson()+agentFreezePort.getFreezeNum(), RedisService.ACQUIRE_TIME_OUT, RedisService.TIME_OUT);
+            if (StringUtils.isBlank(indentifier)) {
+                return AgentResult.fail("系统处理中,请勿重复提交！");
+            }
+            AgentResult verify = verify(agentFreezePort,FreeStatus.DJ.getValue());
+            if(!verify.isOK()){
+                return verify;
+            }
+            AgentFreezeExample agentFreezeExample = new AgentFreezeExample();
+            AgentFreezeExample.Criteria criteria = agentFreezeExample.createCriteria();
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
+            criteria.andAgentIdEqualTo(agentFreezePort.getAgentId());
+            criteria.andFreezeCauseEqualTo(agentFreezePort.getFreezeCause());
+            criteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+            List<AgentFreeze> agentFreezes = agentFreezeMapper.selectByExample(agentFreezeExample);
+            if(agentFreezes.size()!=0){
+                return AgentResult.fail("代理商此原因已被冻结");
+            }
+            Map<String,Object> dataMap = (Map<String,Object>)verify.getData();
+            Agent agent = (Agent)dataMap.get("agent");
+            if(agent.getFreestatus().compareTo(FreeStatus.DJ.getValue())!=0){
+                agent.setFreestatus(FreeStatus.DJ.getValue());
+                int i = agentMapper.updateByPrimaryKeySelective(agent);
+                if(i!=1){
+                    throw new MessageException("代理商冻结更新代理商信息失败");
+                }
+            }
+            AgentFreeze agentFreeze = new AgentFreeze();
+            agentFreeze.setId(idService.genId(TabId.a_agent_freeze));
+            agentFreeze.setAgentId(agentFreezePort.getAgentId());
+            agentFreeze.setFreezeStatus(FreeStatus.DJ.getValue().toString());
+            agentFreeze.setFreezeCause(agentFreezePort.getFreezeCause());
+            agentFreeze.setFreezeDate(new Date());
+            agentFreeze.setFreezePerson(agentFreezePort.getOperationPerson());
+            agentFreeze.setFreezeNum(agentFreezePort.getFreezeNum());
+            agentFreeze.setRemark(agentFreezePort.getRemark());
+            agentFreeze.setStatus(Status.STATUS_1.status);
+            agentFreeze.setVersion(BigDecimal.ONE);
+            agentFreezeMapper.insert(agentFreeze);
+            return AgentResult.ok("冻结成功");
+        }finally {
+            if(StringUtils.isNotBlank(indentifier)){
+                redisService.releaseLock(RedisCachKey.AGENT_FREEZE_LOCK + agentFreezePort.getOperationPerson()+agentFreezePort.getFreezeNum(), indentifier);
             }
         }
-        AgentFreeze agentFreeze = new AgentFreeze();
-        agentFreeze.setId(idService.genId(TabId.a_agent_freeze));
-        agentFreeze.setAgentId(agentFreezePort.getAgentId());
-        agentFreeze.setFreezeStatus(FreeStatus.DJ.getValue().toString());
-        agentFreeze.setFreezeCause(agentFreezePort.getFreezeCause());
-        agentFreeze.setFreezeDate(new Date());
-        agentFreeze.setFreezePerson(agentFreezePort.getOperationPerson());
-        agentFreeze.setFreezeNum(agentFreezePort.getFreezeNum());
-        agentFreeze.setRemark(agentFreezePort.getRemark());
-        agentFreeze.setStatus(Status.STATUS_1.status);
-        agentFreeze.setVersion(BigDecimal.ONE);
-        agentFreezeMapper.insert(agentFreeze);
-        return AgentResult.ok("冻结成功");
     }
 
 
@@ -172,54 +187,66 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
     public AgentResult agentUnFreeze(AgentFreezePort agentFreezePort)throws MessageException{
 
         log.info("代理商解冻请求参数：{}",JsonUtil.objectToJson(agentFreezePort));
-        AgentResult verify = verify(agentFreezePort,FreeStatus.JD.getValue());
-        if(!verify.isOK()){
-            return verify;
-        }
-        if(StringUtils.isBlank(agentFreezePort.getUnfreezeCause())){
-            return AgentResult.fail("解冻原因必填");
-        }
+        String indentifier = "";
+        try {
+            indentifier = redisService.lockWithTimeout(RedisCachKey.AGENT_UN_FREEZE_LOCK + agentFreezePort.getOperationPerson(), RedisService.ACQUIRE_TIME_OUT, RedisService.TIME_OUT);
+            if (StringUtils.isBlank(indentifier)) {
+                return AgentResult.fail("系统处理中,请勿重复提交！");
+            }
 
-        AgentFreezeExample freezeExample = new AgentFreezeExample();
-        AgentFreezeExample.Criteria freezeCriteria = freezeExample.createCriteria();
-        freezeCriteria.andStatusEqualTo(Status.STATUS_1.status);
-        freezeCriteria.andAgentIdEqualTo(agentFreezePort.getAgentId());
-        freezeCriteria.andFreezeCauseEqualTo(agentFreezePort.getFreezeCause());
-        freezeCriteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
-        List<AgentFreeze> agentFreezeList = agentFreezeMapper.selectByExample(freezeExample);
-        if(agentFreezeList.size()==0){
-            return AgentResult.fail("解冻信息不存在");
-        }
-        if(agentFreezeList.size()!=1){
-            return AgentResult.fail("解冻信息不唯一,请联系管理员");
-        }
-        AgentFreeze agentFreeze = agentFreezeList.get(0);
-        agentFreeze.setUnfreezePerson(agentFreezePort.getOperationPerson());
-        agentFreeze.setUnfreezeDate(new Date());
-        agentFreeze.setUnfreezeCause(agentFreezePort.getUnfreezeCause());
-        agentFreeze.setFreezeStatus(FreeStatus.JD.getValue().toString());
-        int j = agentFreezeMapper.updateByPrimaryKeySelective(agentFreeze);
-        if(j!=1){
-            throw new MessageException("更新解冻失败");
-        }
-        AgentFreezeExample qfreezeExample = new AgentFreezeExample();
-        AgentFreezeExample.Criteria qfreezeCriteria = qfreezeExample.createCriteria();
-        qfreezeCriteria.andStatusEqualTo(Status.STATUS_1.status);
-        qfreezeCriteria.andAgentIdEqualTo(agentFreezePort.getAgentId());
-        qfreezeCriteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
-        List<AgentFreeze> agentFreezes = agentFreezeMapper.selectByExample(qfreezeExample);
+            AgentResult verify = verify(agentFreezePort,FreeStatus.JD.getValue());
+            if(!verify.isOK()){
+                return verify;
+            }
+            if(StringUtils.isBlank(agentFreezePort.getUnfreezeCause())){
+                return AgentResult.fail("解冻原因必填");
+            }
 
-        //没有冻结的 更新代理商状态为解冻
-        if(agentFreezes.size()==0){
-            Map<String,Object> dataMap = (Map<String,Object>)verify.getData();
-            Agent agent = (Agent)dataMap.get("agent");
-            agent.setFreestatus(FreeStatus.JD.getValue());
-            int i = agentMapper.updateByPrimaryKeySelective(agent);
-            if(i!=1){
-                throw new MessageException("更新代理商信息解冻失败");
+            AgentFreezeExample freezeExample = new AgentFreezeExample();
+            AgentFreezeExample.Criteria freezeCriteria = freezeExample.createCriteria();
+            freezeCriteria.andStatusEqualTo(Status.STATUS_1.status);
+            freezeCriteria.andAgentIdEqualTo(agentFreezePort.getAgentId());
+            freezeCriteria.andFreezeCauseEqualTo(agentFreezePort.getFreezeCause());
+            freezeCriteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+            List<AgentFreeze> agentFreezeList = agentFreezeMapper.selectByExample(freezeExample);
+            if(agentFreezeList.size()==0){
+                return AgentResult.fail("解冻信息不存在");
+            }
+            if(agentFreezeList.size()!=1){
+                return AgentResult.fail("解冻信息不唯一,请联系管理员");
+            }
+            AgentFreeze agentFreeze = agentFreezeList.get(0);
+            agentFreeze.setUnfreezePerson(agentFreezePort.getOperationPerson());
+            agentFreeze.setUnfreezeDate(new Date());
+            agentFreeze.setUnfreezeCause(agentFreezePort.getUnfreezeCause());
+            agentFreeze.setFreezeStatus(FreeStatus.JD.getValue().toString());
+            int j = agentFreezeMapper.updateByPrimaryKeySelective(agentFreeze);
+            if(j!=1){
+                throw new MessageException("更新解冻失败");
+            }
+            AgentFreezeExample qfreezeExample = new AgentFreezeExample();
+            AgentFreezeExample.Criteria qfreezeCriteria = qfreezeExample.createCriteria();
+            qfreezeCriteria.andStatusEqualTo(Status.STATUS_1.status);
+            qfreezeCriteria.andAgentIdEqualTo(agentFreezePort.getAgentId());
+            qfreezeCriteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+            List<AgentFreeze> agentFreezes = agentFreezeMapper.selectByExample(qfreezeExample);
+
+            //没有冻结的 更新代理商状态为解冻
+            if(agentFreezes.size()==0){
+                Map<String,Object> dataMap = (Map<String,Object>)verify.getData();
+                Agent agent = (Agent)dataMap.get("agent");
+                agent.setFreestatus(FreeStatus.JD.getValue());
+                int i = agentMapper.updateByPrimaryKeySelective(agent);
+                if(i!=1){
+                    throw new MessageException("更新代理商信息解冻失败");
+                }
+            }
+            return AgentResult.ok("解冻成功");
+        }finally {
+            if(StringUtils.isNotBlank(indentifier)){
+                redisService.releaseLock(RedisCachKey.AGENT_UN_FREEZE_LOCK + agentFreezePort.getOperationPerson(), indentifier);
             }
         }
-        return AgentResult.ok("解冻成功");
     }
 
     /**
