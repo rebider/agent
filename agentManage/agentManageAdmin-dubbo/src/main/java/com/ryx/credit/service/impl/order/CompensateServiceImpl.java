@@ -1008,8 +1008,8 @@ public class CompensateServiceImpl implements CompensateService {
 
             AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "adjust");
             if(!synOrVerifyResult.isOK()){
-                //throw new MessageException(synOrVerifyResult.getMsg());
-                throw new ProcessException(synOrVerifyResult.getMsg());
+                throw new MessageException(synOrVerifyResult.getMsg());
+                //throw new ProcessException(synOrVerifyResult.getMsg());
             }
         }
         return AgentResult.ok();
