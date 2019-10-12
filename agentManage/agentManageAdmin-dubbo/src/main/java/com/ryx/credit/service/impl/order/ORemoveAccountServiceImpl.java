@@ -5,12 +5,14 @@ import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.CUserMapper;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.order.OOrderMapper;
 import com.ryx.credit.dao.order.OPaymentDetailMapper;
 import com.ryx.credit.dao.order.OPaymentMapper;
 import com.ryx.credit.dao.order.ORemoveAccountMapper;
+import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.service.agent.BusinessPlatformService;
@@ -58,12 +60,27 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
     @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
     @Autowired
-    public  BusinessPlatformService businessPlatformService;
+    private  BusinessPlatformService businessPlatformService;
+    @Autowired
+    private CUserMapper cUserMapper;
 
     @Override
     public PageInfo removeAccountDetail(Map<String, Object> param, PageInfo pageInfo) {
+        List<Map<String, Object>> maps = oRemoveAccountMapper.rAccountDetailList(param);
+        if(null!=maps && maps.size()>0){
+            for (Map<String, Object> map : maps) {
+                String submit_person = String.valueOf(map.get("SUBMIT_PERSON"));
+               if(StringUtils.isNotBlank(submit_person)){
+                   CUser cUser = cUserMapper.selectById(submit_person);
+                   if (null!=cUser && null !=cUser.getName()){
+                       map.put("SUBMIT_PERSON",cUser.getName());
+                   }
+               }
+            }
+        }
+
         pageInfo.setTotal(oRemoveAccountMapper.rAccountDetailCount(param));
-        pageInfo.setRows(oRemoveAccountMapper.rAccountDetailList(param));
+        pageInfo.setRows(maps);
         return pageInfo;
     }
 

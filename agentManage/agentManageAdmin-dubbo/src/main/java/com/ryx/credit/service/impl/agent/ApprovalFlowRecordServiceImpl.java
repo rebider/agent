@@ -11,11 +11,9 @@ import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.IUserService;
-import com.ryx.credit.service.agent.AgentBusinfoService;
-import com.ryx.credit.service.agent.ApaycompService;
-import com.ryx.credit.service.agent.ApprovalFlowRecordService;
-import com.ryx.credit.service.agent.BusActRelService;
+import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.bank.PosRegionService;
+import com.ryx.credit.service.dict.DepartmentService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
@@ -70,6 +68,11 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
     private IUserService iUserService;
     @Autowired
     private BusActRelMapper busActRelMapper;
+    @Autowired
+    private DepartmentService departmentService;
+    @Autowired
+    private PlatFormService platFormService;
+
 
     @Override
     public String insert(ApprovalFlowRecord record)throws Exception{
@@ -312,45 +315,204 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
      */
     @Override
     public List<Map<String, Object>> exportAgentEdit(ApprovalFlowRecord approvalFlowRecord) throws Exception {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         List<Map<String, Object>> resultList = new ArrayList<>();
         List<ApprovalFlowRecord> approvalFlowRecords = exprotCommon(approvalFlowRecord);
+        List<Dict> BUS_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name());
+        List<Dict> YESORNOISYES = dictOptionsService.dictList(DictGroup.ALL.name(), DictGroup.YESORNOISYES.name());
+        List<Dict> BUS_SCOPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name());
+        List<Dict> YESORNO = dictOptionsService.dictList(DictGroup.ALL.name(), DictGroup.YESORNO.name());
+        List<Dict> APPROVAL_TYPE = dictOptionsService.dictList(DictGroup.AGENT_AUDIT.name(), DictGroup.APPROVAL_TYPE.name());
+        List<Dict> AG_STATUS_S = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.AG_STATUS_S.name());
         for (ApprovalFlowRecord flowRecord : approvalFlowRecords) {
             Map<String, Object> resultMap = new HashMap<>();
-            List<String> diffList = new ArrayList<>();
-            String busId = flowRecord.getBusId();
-            DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(busId);
+            DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(flowRecord.getBusId());
             AgentVo dataPreAgentVo = JsonUtil.jsonToPojo(dateChangeRequest.getDataPreContent(), AgentVo.class);
             AgentVo dataAgentVo = JsonUtil.jsonToPojo(dateChangeRequest.getDataContent(), AgentVo.class);
-            contrastObj(dataPreAgentVo.getAgent(), dataAgentVo.getAgent(), diffList);
-            //变更前的业务信息
             List<AgentBusInfoVo> preBusInfoVoList = dataPreAgentVo.getBusInfoVoList();
-            //变更后的业务信息
             List<AgentBusInfoVo> busInfoVoList = dataAgentVo.getBusInfoVoList();
-            if (busInfoVoList!=null && preBusInfoVoList!=null && busInfoVoList.size()!=0 && preBusInfoVoList.size()!=0) {
-                int k = 0;
-                for (AgentBusInfoVo preBusInfoVo : preBusInfoVoList) {
-                    if (busInfoVoList.size() > k) {
-                        AgentBusInfoVo busInfoVo = busInfoVoList.get(k);
-                        contrastObj(preBusInfoVo, busInfoVo, diffList);
-                        k++;
+            if (preBusInfoVoList!=null && busInfoVoList!=null && preBusInfoVoList.size()!=0 && busInfoVoList.size()!=0) {
+                //变更前的业务信息
+                AgentBusInfoVo agentBusInfoVo_before = preBusInfoVoList.get(0);
+                if(agentBusInfoVo_before.getBusPlatform()!=null){//业务平台（前）
+                    PlatForm platForm_before = platFormService.selectByPlatformNum(agentBusInfoVo_before.getBusPlatform());
+                    resultMap.put("busPlatformBefore", platForm_before.getPlatformName());
+                }
+                if(agentBusInfoVo_before.getBusParent()!=null){//上级代理商（前）、上级业务编码（前）
+                    ApprovalFlowRecordVo getBusParent_before = approvalFlowRecordMapper.selectByAgentName(agentBusInfoVo_before.getBusParent());
+                    if(getBusParent_before!=null)
+                    resultMap.put("busParentBefore", getBusParent_before.getOneParentName());
+                    if(getBusParent_before!=null)
+                    resultMap.put("busParentNumBefore", getBusParent_before.getOneParentNum());
+                }
+                if(agentBusInfoVo_before.getBusActivationParent()!=null){//激活返现代理商（前）、激活返现业务编码（前）
+                    ApprovalFlowRecordVo getBusActivationParent_before = approvalFlowRecordMapper.selectByAgentName(agentBusInfoVo_before.getBusActivationParent());
+                    if(getBusActivationParent_before!=null)
+                    resultMap.put("busActivationParentBefore", getBusActivationParent_before.getOneParentName());
+                    if(getBusActivationParent_before!=null)
+                    resultMap.put("busActivationParentNumBefore", getBusActivationParent_before.getOneParentNum());
+                }
+                if(agentBusInfoVo_before.getBusType()!=null){//业务类型（前）
+                     for (Dict dict : BUS_TYPE) {
+                        if(dict!=null && agentBusInfoVo_before.getBusType().toString().equals(dict.getdItemvalue())){
+                            resultMap.put("busTypeBefore", dict.getdItemname());
+                        }
+                    }
+                }
+                if(agentBusInfoVo_before.getDredgeS0()!=null){//是否开通S0（前）
+                    for (Dict dict : YESORNOISYES) {
+                        if(dict!=null && agentBusInfoVo_before.getDredgeS0().toString().equals(dict.getdItemvalue())){
+                            resultMap.put("dredgeS0Before", dict.getdItemname());
+                        }
+                    }
+                }
+                if(agentBusInfoVo_before.getBusScope()!=null){//业务范围（前）
+                    for (Dict dict : BUS_SCOPE) {
+                        if(dict!=null && agentBusInfoVo_before.getBusScope().toString().equals(dict.getdItemvalue())){
+                            resultMap.put("busScopeBefore", dict.getdItemname());
+                        }
+                    }
+                }
+                if(agentBusInfoVo_before.getBusIndeAss()!=null){//是否独立考核（前）
+                    for (Dict dict : YESORNO) {
+                        if(dict!=null && agentBusInfoVo_before.getBusIndeAss().toString().equals(dict.getdItemvalue())){
+                            resultMap.put("busIndeAssBefore", dict.getdItemname());
+                        }
+                    }
+                }
+                //变更后的业务信息
+                AgentBusInfoVo agentBusInfoVo_after = busInfoVoList.get(0);
+                if(agentBusInfoVo_after.getBusPlatform()!=null){//业务平台（后）
+                    PlatForm platForm_after = platFormService.selectByPlatformNum(agentBusInfoVo_after.getBusPlatform());
+                    resultMap.put("busPlatformAfter", platForm_after.getPlatformName());
+                }
+                if(agentBusInfoVo_after.getBusParent()!=null){//上级代理商（后）、上级业务编码（后）
+                    ApprovalFlowRecordVo getBusParent_after = approvalFlowRecordMapper.selectByAgentName(agentBusInfoVo_after.getBusParent());
+                    if(getBusParent_after!=null)
+                    resultMap.put("busParentAfter", getBusParent_after.getOneParentName());
+                    if(getBusParent_after!=null)
+                    resultMap.put("busParentNumAfter", getBusParent_after.getOneParentNum());
+                }
+                if(agentBusInfoVo_after.getBusParent()!=null){//激活返现代理商（后）、激活返现业务编码（后）
+                    ApprovalFlowRecordVo getBusActivationParent_after = approvalFlowRecordMapper.selectByAgentName(agentBusInfoVo_after.getBusActivationParent());
+                    if(getBusActivationParent_after!=null)
+                    resultMap.put("busActivationParentAfter", getBusActivationParent_after.getOneParentName());
+                    if(getBusActivationParent_after!=null)
+                    resultMap.put("busActivationParentNumAfter", getBusActivationParent_after.getOneParentNum());
+                }
+                if(agentBusInfoVo_after.getBusType()!=null){//业务类型（后）
+                     for (Dict dict : BUS_TYPE) {
+                        if(dict!=null && agentBusInfoVo_after.getBusType().toString().equals(dict.getdItemvalue())){
+                            resultMap.put("busTypeAfter", dict.getdItemname());
+                        }
+                    }
+                }
+                if(agentBusInfoVo_after.getDredgeS0()!=null){//是否开通S0（后）
+                    for (Dict dict : YESORNOISYES) {
+                        if(dict!=null && agentBusInfoVo_after.getDredgeS0().toString().equals(dict.getdItemvalue())){
+                            resultMap.put("dredgeS0After", dict.getdItemname());
+                        }
+                    }
+                }
+                if(agentBusInfoVo_after.getBusScope()!=null){//业务范围（后）
+                     for (Dict dict : BUS_SCOPE) {
+                         if(dict!=null && agentBusInfoVo_after.getBusScope().toString().equals(dict.getdItemvalue())){
+                             resultMap.put("busScopeAfter", dict.getdItemname());
+                         }
+                     }
+                }
+                if(agentBusInfoVo_after.getBusIndeAss()!=null){//是否独立考核（后）
+                    for (Dict dict : YESORNO) {
+                        if(dict!=null && agentBusInfoVo_after.getBusIndeAss().toString().equals(dict.getdItemvalue())){
+                            resultMap.put("busIndeAssAfter", dict.getdItemname());
+                        }
+                    }
+                }
+                if(StringUtils.isNotBlank(agentBusInfoVo_after.getAgDocDistrict()) && StringUtils.isNotBlank(agentBusInfoVo_after.getAgDocPro())){//对接大区、对接省区
+                    COrganization getAgDocDistrict = departmentService.getById(agentBusInfoVo_after.getAgDocDistrict());
+                    COrganization getAgDocPro = departmentService.getById(agentBusInfoVo_after.getAgDocPro());
+                    resultMap.put("agDocDistrict", getAgDocDistrict.getName());
+                    resultMap.put("agDocPro", getAgDocPro.getName());
+                }
+                resultMap.put("busId", agentBusInfoVo_after.getId());
+                resultMap.put("busNum", agentBusInfoVo_after.getBusNum());
+            }
+            BusActRel busActRel = busActRelMapper.findByActivId(flowRecord.getExecutionId());
+            CUser getApprovalPerson = userService.selectById(flowRecord.getApprovalPerson());
+            resultMap.put("approvalTime", dateFormat.format(flowRecord.getApprovalTime()));
+            resultMap.put("approvalOpinion", flowRecord.getApprovalOpinion());
+            resultMap.put("approvalPerson", getApprovalPerson.getName());
+            resultMap.put("agentId", flowRecord.getAgentId());
+            resultMap.put("agentName", flowRecord.getAgentName());
+            if(flowRecord.getApprovalResult()!=null){
+                for (Dict dict : APPROVAL_TYPE) {
+                    if(dict!=null && flowRecord.getApprovalResult().toString().equals(dict.getdItemvalue())){
+                        resultMap.put("approvalResult", dict.getdItemname());
                     }
                 }
             }
-            ApprovalFlowRecord approvalFlow = approvalFlowRecordMapper.selectByPrimaryKey(flowRecord.getId());
-            BusActRel busActRel = busActRelMapper.findByActivId(approvalFlow.getExecutionId());
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            CUser getApprovalPerson = userService.selectById(approvalFlow.getApprovalPerson());
-            Dict getApprovalResult = dictOptionsService.findDictByValue(DictGroup.AGENT_AUDIT.name(), DictGroup.APPROVAL_TYPE.name(), approvalFlow.getApprovalResult());
-            Dict getActivStatus = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.AG_STATUS_S.name(), busActRel.getActivStatus());
-            resultMap.put("approvalTime", dateFormat.format(approvalFlow.getApprovalTime()));
+            if(busActRel.getActivStatus()!=null){
+                for (Dict dict : AG_STATUS_S) {
+                    if(dict!=null && busActRel.getActivStatus().toString().equals(dict.getdItemvalue())){
+                        resultMap.put("activStatus", dict.getdItemname());
+                    }
+                }
+            }
+            resultList.add(resultMap);
+        }
+        return resultList;
+    }
+
+    /**
+     * 代理商账户修改
+     * @param approvalFlowRecord
+     * @throws Exception
+     */
+    @Override
+    public List<Map<String, Object>> exportAgentColinfo(ApprovalFlowRecord approvalFlowRecord) throws Exception {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        List<ApprovalFlowRecord> approvalFlowRecords = exprotCommon(approvalFlowRecord);
+        List<Dict> BUS_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name());
+        List<Dict> APPROVAL_TYPE = dictOptionsService.dictList(DictGroup.AGENT_AUDIT.name(), DictGroup.APPROVAL_TYPE.name());
+        List<Dict> AG_STATUS_S = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.AG_STATUS_S.name());
+        for (ApprovalFlowRecord flowRecord : approvalFlowRecords) {
+            Map<String, Object> resultMap = new HashMap<>();
+            DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(flowRecord.getBusId());
+            AgentVo dataPreAgentVo = JsonUtil.jsonToPojo(dateChangeRequest.getDataPreContent(), AgentVo.class);
+            AgentVo dataAgentVo = JsonUtil.jsonToPojo(dateChangeRequest.getDataContent(), AgentVo.class);
+            Agent preAgentVoAgent = dataPreAgentVo.getAgent();
+            Agent agentVoAgent = dataAgentVo.getAgent();
+            if (preAgentVoAgent!=null && agentVoAgent!=null) {
+                //代理商名称（前）
+                if(preAgentVoAgent.getAgName()!=null)
+                resultMap.put("agentNameBefore", preAgentVoAgent.getAgName());
+                //代理商名称（后）
+                if(agentVoAgent.getAgName()!=null)
+                resultMap.put("agentNameAfter", agentVoAgent.getAgName());
+            }
+            List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByAgenId(flowRecord.getAgentId());
+            BusActRel busActRel = busActRelMapper.findByActivId(flowRecord.getExecutionId());
+            CUser getApprovalPerson = userService.selectById(flowRecord.getApprovalPerson());
+            resultMap.put("approvalTime", dateFormat.format(flowRecord.getApprovalTime()));
             resultMap.put("approvalPerson", getApprovalPerson.getName());
-            resultMap.put("approvalResult", getApprovalResult.getdItemname());
-            resultMap.put("approvalOpinion", approvalFlow.getApprovalOpinion());
-            resultMap.put("activStatus", getActivStatus.getdItemname());
-            resultMap.put("agentId", approvalFlow.getAgentId());
-            resultMap.put("busId", approvalFlow.getBusId());
-            resultMap.put("agentName", approvalFlow.getAgentName());
-            resultMap.put("dateChange", diffList.toString());
+            resultMap.put("approvalOpinion", flowRecord.getApprovalOpinion());
+            resultMap.put("agentId", flowRecord.getAgentId());
+            resultMap.put("busId", flowRecord.getBusId());
+            if(flowRecord.getApprovalResult()!=null){
+                for (Dict dict : APPROVAL_TYPE) {
+                    if(dict!=null && flowRecord.getApprovalResult().toString().equals(dict.getdItemvalue())){
+                        resultMap.put("approvalResult", dict.getdItemname());
+                    }
+                }
+            }
+            if(busActRel.getActivStatus()!=null){
+                for (Dict dict : AG_STATUS_S) {
+                    if(dict!=null && busActRel.getActivStatus().toString().equals(dict.getdItemvalue())){
+                        resultMap.put("activStatus", dict.getdItemname());
+                    }
+                }
+            }
             resultList.add(resultMap);
         }
         return resultList;
@@ -378,8 +540,6 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
         }
         return textList;
     }
-
-
 
     @Override
     public List<Map<String,Object>> queryFlowByExecutionId(String executionId){

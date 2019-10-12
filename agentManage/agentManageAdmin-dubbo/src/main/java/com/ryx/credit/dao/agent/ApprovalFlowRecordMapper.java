@@ -33,4 +33,6 @@ public interface ApprovalFlowRecordMapper {
     List<ApprovalFlowRecordVo> exportBusinfoChange(Map map);
 
     ApprovalFlowRecord selectByBusId(String busId);
+
+    ApprovalFlowRecordVo selectByAgentName(String agentId);
 }
