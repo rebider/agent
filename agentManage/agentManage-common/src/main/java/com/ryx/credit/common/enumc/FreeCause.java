@@ -1,24 +1,30 @@
 package com.ryx.credit.common.enumc;
 
-import java.math.BigDecimal;
+
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @Author Lihl
- * @Date 2019/01/21
- * 代理商冻结解冻状态
- */
-public enum FreeStatus {
+/***
+ * 冻结原因
+ * @Author liudh
+ * @Description //TODO 
+ * @Date 2019/10/10 10:34
+ * @Param
+ * @return
+ **/
+public enum FreeCause {
 
-    DJ(new BigDecimal("0"),"冻结"),
-    JD(new BigDecimal("1"),"解冻");
+    QPDJ("QPDJ","欠票冻结"),
+    RRDJ("RRDJ","分润冻结"),
+    HTDJ("HTDJ","合同冻结"),
+    RZDJ("RZDJ","认证冻结"),
+    QTDJ("QTDJ","其他原因");
 
-    public BigDecimal code;
+    public String code;
 
     public String msg;
 
-    FreeStatus(BigDecimal c, String m){
+    FreeCause(String c, String m){
         this.code = c;
         this.msg = m;
     }
@@ -28,10 +34,10 @@ public enum FreeStatus {
      * @param value
      * @return
      */
-    public static String getContentByValue(BigDecimal value) {
-        FreeStatus[] freeStatus = FreeStatus.values();
-        for (FreeStatus cc : freeStatus) {
-            if(cc.code.compareTo(value)==0){
+    public static String getContentByValue(String value) {
+        FreeCause[] freeCause = FreeCause.values();
+        for (FreeCause cc : freeCause) {
+            if(cc.code.equals(value)){
                 return cc.msg;
             }
         }
@@ -39,19 +45,20 @@ public enum FreeStatus {
     }
 
     public static Map<Object, Object> getContentMap() {
-        FreeStatus[] freeStatus = FreeStatus.values();
+        FreeCause[] freeCause = FreeCause.values();
         Map<Object, Object> resultMap = new HashMap<>();
-        for (FreeStatus cc : freeStatus) {
+        for (FreeCause cc : freeCause) {
             resultMap.put(cc.code,cc.msg);
         }
         return resultMap;
     }
 
+
     /**
      * 取得枚举对象值
      * @return 枚举对象值
      */
-    public BigDecimal getValue() {
+    public String getValue() {
         return this.code;
     }
 
@@ -62,5 +69,4 @@ public enum FreeStatus {
     public String getContent() {
         return this.msg;
     }
-
 }
