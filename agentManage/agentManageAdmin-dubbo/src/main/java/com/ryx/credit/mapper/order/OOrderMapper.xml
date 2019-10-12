@@ -1376,8 +1376,6 @@
       and  businfo.bus_num LIKE CONCAT(CONCAT('%',#{busNum}),'%')
     </if>
     <if test="month!=null and month!=''"> and to_char(o_payment_detail.plan_pay_time,'yyyy-mm')=#{month} </if>
-    <if test="rmonth!=null and rmonth!=''"> and to_char(o_payment_detail.plan_pay_time,'yyyy-mm')=#{rmonth} </if>
-
   </sql>
 
   <!--欠款详情-->
