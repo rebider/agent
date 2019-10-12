@@ -47,8 +47,6 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
 
     private static final String CAPITAL_LOCK = "capital_lock_";
     private static final String CAPITAL_APP_LOCK = "capital_app_lock_";
-    private static final long TIME_OUT = 60000*5;       //锁的超时时间
-    private static final long ACQUIRE_TIME_OUT = 5000;  //超时时间
     private static Logger logger = LoggerFactory.getLogger(CapitalChangeApplyServiceImpl.class);
     @Autowired
     private CapitalChangeApplyMapper capitalChangeApplyMapper;
@@ -156,7 +154,7 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
 
         String indentifier = "";
         try {
-            indentifier = redisService.lockWithTimeout(CAPITAL_LOCK+cUser,ACQUIRE_TIME_OUT,TIME_OUT);
+            indentifier = redisService.lockWithTimeout(CAPITAL_LOCK+cUser,RedisService.ACQUIRE_TIME_OUT,RedisService.TIME_OUT);
             if(StringUtils.isBlank(indentifier)){
                 throw new MessageException("系统处理中,请勿重复提交！");
             }
@@ -331,7 +329,7 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
 
         String indentifier = "";
         try {
-            indentifier = redisService.lockWithTimeout(CAPITAL_APP_LOCK+cUser,ACQUIRE_TIME_OUT,TIME_OUT);
+            indentifier = redisService.lockWithTimeout(CAPITAL_APP_LOCK+cUser,RedisService.ACQUIRE_TIME_OUT,RedisService.TIME_OUT);
             if(StringUtils.isBlank(indentifier)){
                 throw new MessageException("系统处理中,请勿重复提交！");
             }

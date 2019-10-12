@@ -9,18 +9,17 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import com.alibaba.fastjson.JSON;
 import org.springframework.data.redis.core.SessionCallback;
-import redis.clients.jedis.Transaction;
-import redis.clients.jedis.exceptions.JedisException;
-import sun.management.Agent;
 
 public class RedisService {
+
+    public static final long TIME_OUT = 60000*5;       //锁的超时时间
+    public static final long ACQUIRE_TIME_OUT = 5000;  //请求超时时间
 
 	@Autowired
     protected RedisTemplate<String, String> redisTemplate;

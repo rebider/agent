@@ -58,6 +58,14 @@ public class RegExpression {
 		return regExpresMethod(NUMBER,String.valueOf(number));
 	}
 
+	//校验数字
+	public static boolean regNumber(String number){
+		if(null==number){
+			return false;
+		}
+		return regExpresMethod(NUMBER,number);
+	}
+
 	//校验身份证号
 	public static boolean regIdCard(String idCardNo){
 		if(StringUtils.isBlank(idCardNo)){
