@@ -3712,17 +3712,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public PageInfo arrearageList(Map<String, Object> param, PageInfo pageInfo) {
-        if(null!=param && param.size()>0){
-            if(null==param.get("month")||param.get("month").equals("")){
-                Date date = new Date();
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM");
-                param.put("rmonth",simpleDateFormat.format(date));
-            }
-        }
         Long count = orderMapper.arrearageCount(param);
-        List<Map<String, Object>> list = orderMapper.arrearageList(param);
         pageInfo.setTotal(count.intValue());
-        pageInfo.setRows(list);
+        pageInfo.setRows(orderMapper.arrearageList(param));
         return pageInfo;
     }
 
