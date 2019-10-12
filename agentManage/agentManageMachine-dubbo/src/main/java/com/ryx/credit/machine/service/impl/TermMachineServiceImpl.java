@@ -228,17 +228,17 @@ public class TermMachineServiceImpl  implements TermMachineService {
     }
 
     @Override
-    public boolean checkModleIsEq(Map<String,String> data,String platformType) {
-        logger.info("checkModleIsEq:{},{}",data,platformType);
-        if(PlatformType.whetherPOS(platformType)){
-            return posTermMachineServiceImpl.checkModleIsEq(data,platformType);
-        }else if(PlatformType.SSPOS.getValue().equals(platformType)){
+    public boolean checkModleIsEq(Map<String, String> data, String platformType) {
+        logger.info("checkModleIsEq:{},{}", data, platformType);
+        if (PlatformType.whetherPOS(platformType)) {
+            return posTermMachineServiceImpl.checkModleIsEq(data, platformType);
+        } else if (PlatformType.SSPOS.getValue().equals(platformType)) {
             return false;
-        }else if(PlatformType.MPOS.getValue().equals(platformType)){
+        } else if (PlatformType.MPOS.getValue().equals(platformType)) {
             return false;
-        }else if(PlatformType.RDBPOS.getValue().equals(platformType)){
-            return false;
-        }else {
+        } else if (PlatformType.RDBPOS.getValue().equals(platformType)) {
+            return rdbTermMachineServiceImpl.checkModleIsEq(data, platformType);
+        } else {
             return false;
         }
     }
