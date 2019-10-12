@@ -1,6 +1,7 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -496,4 +497,83 @@ public class AgentQueryServiceImpl implements AgentQueryService {
         return colinfoList.size()==1?colinfoList.get(0):null;
     }
 
+
+    @Override
+    public FastMap checkAgentInfoIsComplet(String agCode) throws ProcessException{
+        //需要查询是否存在收款账户记录
+        if (StringUtils.isBlank(agCode)) {
+            return FastMap.fastFailMap("代理商编号不能为空");
+        }
+        Agent agent = agentMapper.selectByPrimaryKey(agCode);
+        if (null==agent){
+            logger.info("信息不完整,请申请基本信息修改(基础信息)");
+            throw new ProcessException("结算卡信息不完整,请申请基本信息修改");
+        }else{
+            if (StringUtils.isBlank(agent.getAgLegalCernum())){
+                logger.info("法人证件号码,请申请基本信息修改");
+                throw new ProcessException("法人证件号码,请申请基本信息修改");
+            }
+            if (StringUtils.isBlank(agent.getAgLegal())){
+                logger.info("法人姓名不完整,请申请基本信息修改");
+                throw new ProcessException("法人姓名不完整,请申请基本信息修改");
+            }
+            if (StringUtils.isBlank(agent.getAgBusLic())){
+                logger.info("营业执照不完整,请申请基本信息修改");
+                throw new ProcessException("营业执照不完整,请申请基本信息修改");
+            }
+        }
+
+        AgentColinfoExample agentColinfoExample = new AgentColinfoExample();
+        AgentColinfoExample.Criteria criteria = agentColinfoExample.createCriteria();
+        criteria.andAgentIdEqualTo(agCode);
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<AgentColinfo> agentColinfos = agentColinfoMapper.selectByExample(agentColinfoExample);
+        if (null == agentColinfos) {
+            throw new ProcessException("结算卡信息不完整,请申请基本信息修改");
+        }
+        if (agentColinfos.size() == 0) {
+            throw new ProcessException("结算卡信息不完整,请申请基本信息修改");
+        }
+        if (agentColinfos.size() != 1) {
+            throw new ProcessException("结算卡信息不完整,请申请基本信息修改");
+        }
+        AgentColinfo agentColinfo =  agentColinfos.get(0);
+        if (null==agentColinfo){
+            logger.info("结算卡信息不完整,请申请基本信息修改");
+            throw new ProcessException("结算卡信息不完整,请申请基本信息修改");
+        }else{
+            if(null==agentColinfo.getCloType()){
+                logger.info("收款账户类型不完整,请申请基本信息修改");
+                throw new ProcessException("收款账户类型不完整,请申请基本信息修改");
+            }if (StringUtils.isBlank(agentColinfo.getCloRealname())){
+                logger.info("收款账户名不完整,请申请基本信息修改");
+                throw new ProcessException("收款账户名不完整,请申请基本信息修改");
+            }if (StringUtils.isBlank(agentColinfo.getCloBank())){
+                logger.info("收款开户总行不完整,请申请基本信息修改");
+                throw new ProcessException("收款开户总行不完整,请申请基本信息修改");
+            }if (StringUtils.isBlank(agentColinfo.getCloBankBranch())){
+                logger.info("收款开户行支行不完整,请申请基本信息修改");
+                throw new ProcessException("收款开户行支行不完整,请申请基本信息修改");
+            }if (StringUtils.isBlank(agentColinfo.getCloBankAccount())){
+                logger.info("收款账号不完整,请申请基本信息修改");
+                throw new ProcessException("收款账号不完整,请申请基本信息修改");
+            }if (StringUtils.isBlank(agentColinfo.getBranchLineNum())){
+                logger.info("支行联行号不完整,请申请基本信息修改");
+                throw new ProcessException("支行联行号不完整,请申请基本信息修改");
+            }if (StringUtils.isBlank(agentColinfo.getAllLineNum())){
+                logger.info("总行联行号不完整,请申请基本信息修改");
+                throw new ProcessException("总行联行号不完整,请申请基本信息修改");
+            }if (null==agentColinfo.getCloTaxPoint()){
+                logger.info("税点不完整,请申请基本信息修改");
+                throw new ProcessException("税点不完整,请申请基本信息修改");
+            }if (null==agentColinfo.getCloInvoice()){
+                logger.info("开具分润发票不完整,请申请基本信息修改");
+                throw new ProcessException("开具分润发票不完整,请申请基本信息修改");
+            }if (StringUtils.isBlank(agentColinfo.getBankRegion())){
+                logger.info("开户行地区不完整,请申请基本信息修改");
+                throw new ProcessException("开户行地区不完整,请申请基本信息修改");
+            }
+        }
+        return FastMap.fastSuccessMap();
+    }
 }
