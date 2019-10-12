@@ -266,9 +266,11 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
             agentResult.setMsg("代理商信息不存在");
             return agentResult;
         }
-        if(!agent.getAgStatus().equals(AgStatus.Approved.name())){
-            agentResult.setMsg("代理商未通过审批");
-            return agentResult;
+        if(!FreeCause.HTDJ.getValue().equals(agentFreezePort.getFreezeCause())){
+            if(!agent.getAgStatus().equals(AgStatus.Approved.name())){
+                agentResult.setMsg("代理商未通过审批");
+                return agentResult;
+            }
         }
         Map<String,Object> resultMap = new HashMap<>();
         resultMap.put("agent",agent);
