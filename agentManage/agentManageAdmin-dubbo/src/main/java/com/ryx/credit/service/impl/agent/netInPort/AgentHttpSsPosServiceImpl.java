@@ -157,7 +157,7 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
         resultMap.put("credName",agent.getAgLegal());//法人姓名
         resultMap.put("credNo",agent.getAgLegalCernum());//法人身份证
         resultMap.put("credPhone",agent.getAgLegalMobile());//法人手机号
-
+        resultMap.put("bankCardType",agentColinfo.getCloType());//1对公2对私
         resultMap.put("bankCardName",agentColinfo.getCloRealname());//结算户名
         resultMap.put("bankCardCredNo",agentColinfo.getAgLegalCernum());//结算卡户主身份证
         resultMap.put("bankCard",agentColinfo.getCloBankAccount());//结算卡号
@@ -232,7 +232,7 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
             data.put("credName",paramMap.get("credName"));//法人姓名
             data.put("credNo",paramMap.get("credNo"));//法人身份证
             data.put("credPhone",paramMap.get("credPhone"));//法人手机号
-
+            data.put("bankCardType",paramMap.get("bankCardType"));//1对公2对私
             data.put("bankCardName",paramMap.get("bankCardName"));//结算户名
             data.put("bankCardCredNo",paramMap.get("bankCardCredNo"));//收款开户支行 户主姓名
             data.put("bankCard",paramMap.get("bankCard"));//结算卡号

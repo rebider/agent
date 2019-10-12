@@ -499,10 +499,10 @@
           and t.id = #{map.id}
          </if>
           <if test="map.snBeginNum != null">
-            and t.sn_Begin_Num = #{map.snBeginNum}
+            and t.sn_Begin_Num like concat('%',concat( #{map.snBeginNum},'%'))
           </if>
           <if test="map.snEndNum != null">
-            and t.sn_End_Num = #{map.snEndNum}
+            and t.sn_Begin_Num like concat('%',concat( #{map.snEndNum},'%'))
           </if>
           <if test="map.adjustStatus != null">
             and t.adjust_Status = #{map.adjustStatus}
