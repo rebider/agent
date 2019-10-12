@@ -268,15 +268,6 @@ public class TranDataJob {
         }
         LOG.info("================瑞花宝交易量手续费查询（技术）拉取完成================");
 
-        //清结算接口数据：
-        Map<String,Object> settleData = doSettleTranAmount(calendar.getTime());
-        if(settleData==null||settleData.size()==0){
-            LOG.error("================清结算接口数据拉取失败================");
-            resultMap.put("resultCode","error");
-            resultMap.put("msg","清结算接口数据拉取异常");
-            return resultMap;
-        }
-        LOG.info("================清结算接口数据拉取完成================");
         //月份润交易接口数据（技术列）:
         Map<String, Object> tradingVolumeData1 = doProfitTradingVolume(calendar.getTime(),"PFT003");
         if(tradingVolumeData1==null||tradingVolumeData1.size()==0){
@@ -286,6 +277,8 @@ public class TranDataJob {
             return resultMap;
         }
         LOG.info("================月份润交易接口数据（技术列）拉取完成================");
+
+
         //手刷平台的交易量和手续费(技术)
         Map<String, Object> tranAmt = getTranAmtByMonth(calendar.getTime());
         if(tranAmt==null||tranAmt.size()==0){
@@ -323,6 +316,15 @@ public class TranDataJob {
         }
         LOG.info("================月份润交易接口数据（清算列）拉取完成================");
 
+        //清结算接口数据：
+        Map<String,Object> settleData = doSettleTranAmount(calendar.getTime());
+        if(settleData==null||settleData.size()==0){
+            LOG.error("================清结算接口数据拉取失败================");
+            resultMap.put("resultCode","error");
+            resultMap.put("msg","清结算接口数据拉取异常");
+            return resultMap;
+        }
+        LOG.info("================清结算接口数据拉取完成================");
 
 
         List<TranCheckPlatForm> platForms = profitOrganTranMonthService.getAllPlatForm();
@@ -490,6 +492,9 @@ public class TranDataJob {
         LOG.info("=========清结算返回数据："+resultStr);
         JSONObject jsonObject = JSONObject.parseObject(resultStr);
         if(jsonObject==null){
+            LOG.info("清算接口访问异常,resultStr=====>"+resultStr+"\n\n");
+            return null;
+        }else if (!"00".equals(jsonObject.get("code"))){
             LOG.info("清算接口访问异常,resultStr=====>"+resultStr+"\n\n");
             return null;
         }

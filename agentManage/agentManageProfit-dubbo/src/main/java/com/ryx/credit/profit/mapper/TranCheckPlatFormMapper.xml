@@ -244,13 +244,13 @@
 
   <select id="getTranAmtByMonth" resultType="java.util.Map">
       select
-            (select sum(IN_TRANS_AMT)from TRANS_PROFIT_DETAIL
+        nvl((select sum(IN_TRANS_AMT)from TRANS_PROFIT_DETAIL
                 where PROFIT_DATE=#{tranMonth}
-                and SOURCE_INFO='MPOS')+(select  sum(TRANS_AMT)from P_PROFIT_DIRECT where TRANS_MONTH=#{tranMonth})
+                and SOURCE_INFO='MPOS')+(select  sum(TRANS_AMT)from P_PROFIT_DIRECT where TRANS_MONTH=#{tranMonth}),0)
                 as MPOS_TRAN_AMT,
-             (select sum(TRANS_FEE)from TRANS_PROFIT_DETAIL
+            nvl((select sum(TRANS_FEE)from TRANS_PROFIT_DETAIL
                 where PROFIT_DATE=#{tranMonth}
-                and SOURCE_INFO='MPOS')+(select  sum(TRANS_FEE)from P_PROFIT_DIRECT where TRANS_MONTH=#{tranMonth})
+                and SOURCE_INFO='MPOS')+(select  sum(TRANS_FEE)from P_PROFIT_DIRECT where TRANS_MONTH=#{tranMonth}),0)
                 as TRANS_FEE
        from dual
   </select>
