@@ -123,6 +123,9 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
         if (StringUtils.isNotBlank(example.getStatus())) {
             criteria.andStatusEqualTo(example.getStatus());
         }
+      /*  if (StringUtils.isNotBlank(example.getUploadUser())) {
+            criteria.andUploadUserEqualTo(example.getUploadUser());
+        }*/
         pmsProfitLogExample.setOrderByClause("UPLOAD_TIME DESC");
         pmsProfitLogExample.setPage(page);
 
