@@ -258,8 +258,18 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                         map.put("busPlatform", oRemoveAccount_item.getBusPlatform());
                     }
                     try {
+                        BigDecimal outstandingAmount = new BigDecimal(0);
                         List<Map> orderList = oOrderMapper.arrearageQuery(map);
                         if (null != orderList && orderList.size() > 0) {
+                            for (Map order_map : orderList) {
+                                OPaymentExample oPaymentExample = new OPaymentExample();
+                                OPaymentExample.Criteria criteria = oPaymentExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andOrderIdEqualTo(String.valueOf(order_map.get("OID"))).andAgentIdEqualTo(String.valueOf(order_map.get("AGENT_ID")));
+                                List<OPayment> oPayments = oPaymentMapper.selectByExample(oPaymentExample);
+                                if (null!=oPayments && oPayments.size()!=0){
+                                    outstandingAmount=outstandingAmount.add(oPayments.get(0).getOutstandingAmount());
+                                }
+
+                            }
                             //查到相关的订单
                             for (int i = 0; i < orderList.size(); i++) {
                                 if(f==false){
@@ -275,19 +285,19 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                     for (OPaymentDetail oPaymentDetail : oPaymentDetailList) {
                                         oPaymentDetail = oPaymentDetailMapper.selectByPrimaryKey(oPaymentDetail.getId());
                                         OPayment oPayment = oPaymentMapper.selectByPrimaryKey(oPaymentDetail.getPaymentId());
-                                        //加步校验---如果销账金额大于剩余欠款金额
-                                        if (residueFlag.compareTo(oPayment.getOutstandingAmount())==1){
-                                            logger.info("销账金额不能大于机具欠款金额,销账金额为:"+residue+",机具欠款金额为:"+oPayment.getOutstandingAmount());
-                                            throw new MessageException("销账金额不能大于机具欠款金额,销账金额为:"+residue+",机具欠款金额为:"+oPayment.getOutstandingAmount());
-                                        }
-                                        if (null == oPayment.getOutstandingAmount() || oPayment.getOutstandingAmount().compareTo(new BigDecimal(0)) == 0) {
-                                            logger.info("此欠款已还完");
-                                            throw new MessageException("此欠款已还完");
-                                        }
                                         if(residue.compareTo(new BigDecimal(0))==0 ||flag==false){
                                             //如果销账金额已抵扣完销账则停止循环
                                             f=false;
                                             break;
+                                        }
+                                        //加步校验---如果销账金额大于剩余欠款金额
+                                        if (residueFlag.compareTo(outstandingAmount)==1){
+                                            logger.info("销账金额不能大于机具欠款金额,销账金额为:"+residue+",机具欠款金额为:"+outstandingAmount);
+                                            throw new MessageException("销账金额不能大于机具欠款金额,销账金额为:"+residue+",机具欠款金额为:"+outstandingAmount);
+                                        }
+                                        if (null == oPayment.getOutstandingAmount() || oPayment.getOutstandingAmount().compareTo(new BigDecimal(0)) == 0) {
+                                            logger.info("此欠款已还完");
+                                            throw new MessageException("此欠款已还完");
                                         }
                                         if (oPaymentDetail.getPayAmount().compareTo(residue) == 0 || oPaymentDetail.getPayAmount().compareTo(residue) == -1) {
                                             //应付金额等于实付金额  或者  应付金额小于实付金额  则是已结清
