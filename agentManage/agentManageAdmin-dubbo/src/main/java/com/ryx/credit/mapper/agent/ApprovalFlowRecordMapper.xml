@@ -410,7 +410,7 @@
     (
     select
     distinct ar.id,
-    ar.bus_type,
+    ar.bus_type as approval_bus_type,
     to_char(ar.approval_time,'YYYY-MM-DD') as approval_time,
     cu.name as approval_person,
     (select d.d_itemname from d_dict d where d.d_group='AGENT_AUDIT' and d.d_artifact='APPROVAL_TYPE'
@@ -486,7 +486,7 @@
     (
     select
     distinct ar.id,
-    ar.bus_type,
+    ar.bus_type as approval_bus_type,
     to_char(ar.approval_time,'YYYY-MM-DD') as approval_time,
     cu.name as approval_person,
     (select d.d_itemname from d_dict d where d.d_group='AGENT_AUDIT' and d.d_artifact='APPROVAL_TYPE'
