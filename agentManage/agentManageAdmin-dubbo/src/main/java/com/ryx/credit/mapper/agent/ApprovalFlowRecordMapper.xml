@@ -406,7 +406,83 @@
 
   </select>
 
-  <select id="exportAgentAndBusinfo" parameterType="map" resultMap="ApprovalFlowRecordVo">
+  <select id="exportAgentInfo" parameterType="map" resultMap="ApprovalFlowRecordVo">
+    (
+    select
+    distinct ar.id,
+    ar.bus_type as approval_bus_type,
+    to_char(ar.approval_time,'YYYY-MM-DD') as approval_time,
+    cu.name as approval_person,
+    (select d.d_itemname from d_dict d where d.d_group='AGENT_AUDIT' and d.d_artifact='APPROVAL_TYPE'
+    and d.d_itemvalue = ar.approval_result and d.d_status=1) as approval_result,
+    ar.approval_opinion,
+    (select d.d_itemname from d_dict d where d.d_group='AGENT' and d.d_artifact='AG_STATUS_S'
+    and d.d_itemvalue = ac.activ_status and d.d_status=1) as activ_status,
+    ar.agent_id,
+    ar.bus_id,
+    ar.agent_name,
+    ab.bus_num,
+    dq.name as ag_doc_district,
+    sq.name as ag_doc_pro,
+    (select d.d_itemname from d_dict d where d.d_group='AGENT' and d.d_artifact='BUS_TYPE'
+    and d.d_itemvalue = ab.bus_type and d.d_status=1) as bus_type,
+    ap.platform_name as bus_platform,
+    (select d.d_itemname from d_dict d where d.d_group='AGENT' and d.d_artifact='BUS_SCOPE'
+    and d.d_itemvalue = ab.bus_scope and d.d_status=1) as bus_scope,
+    ab.bus_login_num,
+    ab.bus_activation_parent,
+    aa_one.ag_name as one_parent_name,
+    ab_one.bus_num as one_parent_num,
+    (select d.d_itemname from d_dict d where d.d_group='AGENT' and d.d_artifact='BUS_TYPE'
+    and d.d_itemvalue = ab_one.bus_type and d.d_status=1) as one_parent_type,
+    ap_one.platform_name as one_parent_platform,
+    aa_two.ag_name as two_parent_name,
+    ab_two.bus_num as two_parent_num,
+    (select d.d_itemname from d_dict d where d.d_group='AGENT' and d.d_artifact='BUS_TYPE'
+    and d.d_itemvalue = ab_two.bus_type and d.d_status=1) as two_parent_type,
+    ap_two.platform_name as two_parent_platform,
+    aa_three.ag_name as three_parent_name,
+    ab_three.bus_num as three_parent_num,
+    (select d.d_itemname from d_dict d where d.d_group='AGENT' and d.d_artifact='BUS_TYPE'
+    and d.d_itemvalue = ab_three.bus_type and d.d_status=1) as three_parent_type,
+    ap_three.platform_name as three_parent_platform
+    from a_approval_flow_record ar
+    left join c_user cu on cu.id = ar.approval_person
+    left join a_bus_act_rel ac on ar.execution_id = ac.activ_id
+    left join a_agent aa on aa.id = ar.agent_id and aa.status=1
+    left join a_agent_businfo ab on ab.agent_id = aa.id and ab.status=1
+    left join a_agent_businfo ab_one on ab_one.id = ab.bus_parent and ab_one.status=1
+    left join a_agent_businfo ab_two on ab_two.id = ab_one.bus_parent and ab_two.status=1
+    left join a_agent_businfo ab_three on ab_three.id = ab_two.bus_parent and ab_three.status=1
+    left join a_agent aa_one on aa_one.id = ab_one.agent_id and aa_one.status=1
+    left join a_agent aa_two on aa_two.id = ab_two.agent_id and aa_two.status=1
+    left join a_agent aa_three on aa_three.id = ab_three.agent_id and aa_three.status=1
+    left join c_organization dq on dq.id = ab.ag_doc_district
+    left join c_organization sq on sq.id = ab.ag_doc_pro
+    left join a_platform ap on ap.platform_num = ab.bus_platform and ap.status=1
+    left join a_platform ap_one on ap_one.platform_num = ab_one.bus_platform and ap_one.status=1
+    left join a_platform ap_two on ap_two.platform_num = ab_two.bus_platform and ap_two.status=1
+    left join a_platform ap_three on ap_three.platform_num = ab_three.bus_platform and ap_three.status=1
+    <where>
+      <if test="1==1"> and ar.status=1 </if>
+      <if test="approvalPerson!=null and approvalPerson!=''"> and ar.approval_person = #{approvalPerson} </if>
+      <if test="busId!=null and busId!=''"> and ar.bus_id = #{busId} </if>
+      <if test="busType!=null and busType!=''"> and ar.bus_type = #{busType} </if>
+      <if test="approvalResult!=null and approvalResult!=''"> and ar.approval_result = #{approvalResult} </if>
+      <if test="agentId!=null and agentId!=''"> and ar.agent_id = #{agentId} </if>
+      <if test="agentName!=null and agentName!=''"> and ar.agent_name like #{agentName} </if>
+      <if test="beginTime!=null and endTime!=null and beginTime!='' and endTime!=''">
+        and to_char(ar.approval_time,'yyyy-MM-dd') &gt;= #{beginTime} and to_char(ar.approval_time,'yyyy-MM-dd') &lt;= #{endTime}
+      </if>
+      <if test="subMitDateSta!=null and subMitDateEnd!=null and subMitDateSta!='' and subMitDateEnd!=''">
+        and to_char(ac.c_time,'yyyy-MM-dd') &gt;= #{subMitDateSta} and to_char(ac.c_time,'yyyy-MM-dd') &lt;= #{subMitDateEnd}
+      </if>
+    </where>
+    )
+    order by approval_time desc
+  </select>
+
+  <select id="exportBusinfo" parameterType="map" resultMap="ApprovalFlowRecordVo">
     (
     select
     distinct ar.id,
