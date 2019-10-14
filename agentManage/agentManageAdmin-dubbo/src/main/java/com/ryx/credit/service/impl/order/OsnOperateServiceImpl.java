@@ -287,7 +287,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                             //发送到业务系统，根据批次号
                             Map<String, Object> retMap = osnOperateService.sendInfoToBusinessSystem(list, id, new BigDecimal(batch));
                             if(null != retMap.get("code") && "0000".equals(retMap.get("code"))){
-                                //处理中，结束循环
+                                //处理中，更新物流状态，结束循环
                                 OLogistics oLogistics = oLogisticsMapper.selectByPrimaryKey(id);
                                 oLogistics.setSendStatus(LogisticsSendStatus.gen_detail_sucess.code);
                                 if(oLogisticsMapper.updateByPrimaryKeySelective(oLogistics) != 1){
@@ -299,7 +299,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                                 //处理成功，不做物流更新待处理完成所有进行状态更新
                                 logger.info("物流明细发送业务系统处理成功,{},{}", id, batch);
                             } else {
-                                //发送失败，停止发送
+                                //处理失败，停止发送
                                 logger.info("物流明细发送业务系统处理失败,{},{}", id, batch);
                                 OLogistics logistics = oLogisticsMapper.selectByPrimaryKey(id);
                                 logistics.setSendStatus(LogisticsSendStatus.send_fail.code);
@@ -345,7 +345,6 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                         logisticsDetails = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
                         inerBatch = inerBatch.add(BigDecimal.ONE);
                         batch = date + inerBatch.intValue();
-                        //检查是否包含有未发送的sn，如果有继续循环发送，如果没有更新物流记录为发送成功
                     }
 
                     //检查是否包含有未发送的sn,如果没有更新为处理成功 ，如果处理中的物流没有
