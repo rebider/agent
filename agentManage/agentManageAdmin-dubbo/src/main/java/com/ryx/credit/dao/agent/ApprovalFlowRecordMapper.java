@@ -28,7 +28,9 @@ public interface ApprovalFlowRecordMapper {
 
     int updateByPrimaryKey(ApprovalFlowRecord record);
 
-    List<ApprovalFlowRecordVo> exportAgentAndBusinfo(Map map);
+    List<ApprovalFlowRecordVo> exportAgentInfo(Map map);
+
+    List<ApprovalFlowRecordVo> exportBusinfo(Map map);
 
     List<ApprovalFlowRecordVo> exportBusinfoChange(Map map);
 

@@ -304,7 +304,12 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
             fastMap.putKeyV("subMitDateSta", approvalFlowRecord.getSubMitDateSta());
             fastMap.putKeyV("subMitDateEnd", approvalFlowRecord.getSubMitDateEnd());
         }
-        List<ApprovalFlowRecordVo> approvalFlowRecordList = approvalFlowRecordMapper.exportAgentAndBusinfo(fastMap);
+        List<ApprovalFlowRecordVo> approvalFlowRecordList = null;
+        if (approvalFlowRecord.getBusType().equals("Agent")) {//代理商入网
+            approvalFlowRecordList = approvalFlowRecordMapper.exportAgentInfo(fastMap);
+        } else if(approvalFlowRecord.getBusType().equals("Business")) {//业务审批
+            approvalFlowRecordList = approvalFlowRecordMapper.exportBusinfo(fastMap);
+        }
         return approvalFlowRecordList;
     }
 
