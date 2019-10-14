@@ -58,6 +58,20 @@
         where (t.code like 'region_%' or t.code like 'beijing%' or t.code = 'agent')
         and c.id = #{cUser}
     </select>
-
+    <select id="selectPorg" resultMap="COrganizationVoMap">
+        select a.id as pid, a.name as pname, b.id as cid, b.name as cname
+          from c_organization a
+         left outer join c_organization b
+            on a.id = b.pid
+         where a.pid is  null
+    </select>
+    <resultMap id="COrganizationVoMap" type="com.ryx.credit.pojo.admin.vo.COrganizationVo">
+        <id column="pid" property="pid"/>
+        <result column="pname" property="pname"/>
+        <collection property="cOrganizations" ofType="com.ryx.credit.pojo.admin.COrganization">
+            <id column="cid" property="id"/>
+            <result column="cname" property="name"/>
+        </collection>
+    </resultMap>
 
 </mapper>
