@@ -368,16 +368,14 @@
     </if>
   </sql>
 
-  <select id="selectProNumByBusNum" parameterType="string" resultType="long">
+  <select id="selectProNumByBusNum" parameterType="map" resultType="long">
     select
         sum(so.pro_num)
     from
         o_sub_order so
     left join o_order o
         on so.order_id = o.id
-    left join a_agent_businfo ab
-        on o.bus_id = ab.id
-    where o.review_status = 3 and ab.bus_num = #{busNum}
+    where o.review_status = 3 and o.AGENT_ID = #{agentId}
   </select>
 
 </mapper>

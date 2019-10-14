@@ -1,20 +1,24 @@
 package com.ryx.credit.service.impl.order;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.DateUtil;
+import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.dao.agent.CapitalMapper;
+import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.OCashReceivablesMapper;
 import com.ryx.credit.dao.order.OOrderMapper;
 import com.ryx.credit.dao.order.OPaymentDetailMapper;
 import com.ryx.credit.dao.order.OPaymentMapper;
-import com.ryx.credit.pojo.admin.agent.Agent;
-import com.ryx.credit.pojo.admin.agent.Capital;
+import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
+import com.ryx.credit.pojo.admin.vo.PaymentSendBusPlatformVo;
+import com.ryx.credit.service.AgentKafkaService;
 import com.ryx.credit.service.agent.CapitalService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.IPaymentDetailService;
@@ -29,6 +33,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Author: Zhang Lei
@@ -55,6 +60,14 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
     private CapitalService capitalService;
     @Autowired
     private OCashReceivablesMapper oCashReceivablesMapper;
+    @Autowired
+    private AttachmentMapper attachmentMapper;
+    @Autowired
+    private AgentKafkaService agentKafkaService;
+    @Autowired
+    private AgentBusInfoMapper agentBusInfoMapper;
+    @Autowired
+    private PlatFormMapper platFormMapper;
 
     /**
      * @Author: Zhang Lei
@@ -507,5 +520,63 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
             sumDebt = sumDebt.add(new BigDecimal(payAmount));
         }
         return sumDebt;
+    }
+
+
+    /**
+     * 发送首付金额到业务系统
+     */
+    @Override
+    public void sendSFPayMentToPlatform(String orderId) {
+        try {
+            OOrder order  = oOrderMapper.selectByPrimaryKey(orderId);
+            if(order !=null && Status.STATUS_1.status.compareTo(order.getStatus())==0 && AgStatus.Approved.status.compareTo(order.getReviewStatus())==0) {
+                //检查首付款金额
+                OPaymentDetailExample example = new OPaymentDetailExample();
+                example.or().andOrderIdEqualTo(orderId)
+                        .andPayTypeIn(Arrays.asList(PaymentType.SF.code,PaymentType.DK.code))
+                        .andPaymentTypeEqualTo(PamentIdType.ORDER_FKD.code)
+                        .andPaymentStatusEqualTo(PaymentStatus.JQ.code);
+                List<OPaymentDetail>  oPaymentDetails = oPaymentDetailMapper.selectByExample(example);
+                if(oPaymentDetails.size()>0) {
+                    //附件
+                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
+                    PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+                    if(platForm!=null) {
+                        OPaymentDetail detail = oPaymentDetails.get(0);
+                        List<Attachment> attr = attachmentMapper.accessoryQuery(orderId, AttachmentRelType.Order.name());
+                        List<String> attrs =  attr.stream().map(att->{return att.getAttDbpath();}).collect(Collectors.toList());
+                        PaymentSendBusPlatformVo paymentSendBusPlatformVo = new PaymentSendBusPlatformVo();
+                        paymentSendBusPlatformVo.setAg(order.getAgentId());
+                        paymentSendBusPlatformVo.setAmount(detail.getRealPayAmount().setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+                        paymentSendBusPlatformVo.setAmountType(detail.getPayType());
+                        paymentSendBusPlatformVo.setBusNum(agentBusInfo.getBusNum());
+                        paymentSendBusPlatformVo.setCreateTime(DateUtil.format(order.getcTime(), DateUtil.DATE_FORMAT_5));
+                        paymentSendBusPlatformVo.setOrderNum(order.getId());
+                        paymentSendBusPlatformVo.setFqflow(detail.getId());
+                        paymentSendBusPlatformVo.setPayType(PamentSrcType.XXBK.code);
+                        paymentSendBusPlatformVo.setOptType(Status.STATUS_1.status + "");
+                        paymentSendBusPlatformVo.setPlatform(platForm.getPlatformType());
+                        paymentSendBusPlatformVo.setImageList(attrs);
+                        agentKafkaService.sendPayMentMessage(order.getAgentId(),
+                                detail.getId(),
+                                order.getBusId(),
+                                agentBusInfo.getBusNum(),
+                                KafkaMessageType.PAYMENT,
+                                KafkaMessageTopic.agent_Payment.code,
+                                JSONObject.toJSONString(paymentSendBusPlatformVo)
+                                );
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("通知kafka消息失败 sendSFPayMentToPlatform {}",orderId);
+        }
+    }
+
+    @Override
+    public void sendBkPayMentToPlatform(String orderId) {
+
     }
 }

@@ -371,10 +371,10 @@
       left join A_bus_act_rel br on  rt.EXECUTION_ID_ = br.activ_id
       left join act_ru_identitylink ri on ri.task_id_ = rt.id_
       left join a_agent a on br.agent_id = a.id
-      left join C_ORGANIZATION oa on oa.id=br.ag_doc_pro
-      left join C_ORGANIZATION ob on ob.id=br.ag_doc_district
+      left join C_ORGANIZATION oa on to_char(oa.id)=br.ag_doc_pro
+      left join C_ORGANIZATION ob on to_char(ob.id)=br.ag_doc_district
       left join a_platform plat on  plat.PLATFORM_NUM =replace(br.NET_IN_BUS_TYPE,'ACTIVITY_','')
-      left join c_user c on br.c_user=c.ID
+      left join c_user c on br.c_user=to_char(c.ID)
     <where>
         1=1
         <include refid="queryMyTaskWhere"/>
@@ -387,10 +387,10 @@
       left join A_bus_act_rel br on  rt.EXECUTION_ID_ = br.activ_id
       left join act_ru_identitylink ri on ri.task_id_ = rt.id_
       left join a_agent a on br.agent_id = a.id
-      left join C_ORGANIZATION oa on oa.id=br.ag_doc_pro
-      left join C_ORGANIZATION ob on ob.id=br.ag_doc_district
+      left join C_ORGANIZATION oa on to_char(oa.id)=br.ag_doc_pro
+      left join C_ORGANIZATION ob on to_char(ob.id)=br.ag_doc_district
       left join a_platform plat on  plat.PLATFORM_NUM =replace(br.NET_IN_BUS_TYPE,'ACTIVITY_','')
-      left join c_user c on br.c_user=c.ID
+      left join c_user c on br.c_user=to_char(c.ID)
       <where>
         1=1
         <include refid="queryMyTaskWhere"/>
@@ -417,7 +417,7 @@
 
   <sql id="queryMyTaskWhere" >
     <if test="params.cUser != null and params.cUser!='' " >
-      and br.c_user = #{params.cUser}
+      and br.c_user = #{params.cUser,jdbcType=VARCHAR}
     </if>
     <if test="params.group != null and params.group!='' and params.group != 'region'" >
       and (ri.group_id_ = #{params.group}
@@ -433,7 +433,7 @@
       and (oa.CODE like concat(#{params.orgCode},'%') or ob.CODE like concat(#{params.orgCode},'%') )
     </if>
     <if test="params.group == 'region' " >
-      and br.AG_DOC_DISTRICT = #{params.orgId}
+      and br.AG_DOC_DISTRICT = to_char(#{params.orgId,jdbcType=VARCHAR})
       and ri.group_id_ in ( #{params.group},'south','north')
     </if>
     <if test="params.busActRelBusType != null and params.busActRelBusType!='' " >

@@ -70,6 +70,7 @@
 
 
     <dubbo:reference interface="com.ryx.credit.service.ActivityService" id="activityService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.AgentKafkaService" id="agentKafkaService"  timeout="1200000" registry="myGroup" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.ActUtilService" id="actUtilService"  timeout="1200000" registry="myGroup" check="false" />
     <dubbo:reference interface="com.ryx.credit.profit.service.PosRewardSDetailService" id="posRewardSDetailService"  timeout="1200000" registry="myGroup" check="false" />
     <dubbo:reference interface="com.ryx.credit.profit.service.IProfitDirectService" id="profitDirectService"  timeout="1200000" registry="myGroup" check="false" />
@@ -152,4 +153,6 @@
 
     <dubbo:service interface="com.ryx.credit.service.agent.AgentDebitCardService" ref="agentDebitCardService"  timeout="1200000" registry="myGroup"/>
 
+    <!-- 退货任务，提供者 -->
+    <dubbo:service interface="com.ryx.credit.service.order.OsnOperateReturnService" ref="osnOperateReturnService"  timeout="1200000" registry="myGroup" />
 </beans>

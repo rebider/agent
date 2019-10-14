@@ -173,21 +173,23 @@ public class ActivityServiceImpl implements ActivityService {
             rs.put("msg","success");
             upFlowRecord.setActivityStatus(Status.STATUS_1.status);
         } catch (MessageException | ProcessException e) {
+            e.printStackTrace();
             logger.error("completeTask error", e);
-            rs.put("rs",false);
-            rs.put("msg",e.getLocalizedMessage());
+            rs.put("rs", false);
+            rs.put("msg", e.getCause().getMessage());
             upFlowRecord.setStatus(Status.STATUS_0.status);
             upFlowRecord.setActivityStatus(Status.STATUS_0.status);
-            upFlowRecord.setErrorMsg(e.getLocalizedMessage());
-            throw new ProcessException(e.getLocalizedMessage());
+            upFlowRecord.setErrorMsg(e.getCause().getMessage());
+            throw new ProcessException(e.getCause().getMessage());
         }catch (Exception e) {
+            e.printStackTrace();
             logger.error("completeTask error", e);
-            rs.put("rs",false);
-            rs.put("msg",e.getMessage());
+            rs.put("rs", false);
+            rs.put("msg", e.getCause().getMessage());
             upFlowRecord.setStatus(Status.STATUS_0.status);
             upFlowRecord.setActivityStatus(Status.STATUS_0.status);
-            upFlowRecord.setErrorMsg(e.getMessage());
-            throw new ProcessException(e.getLocalizedMessage());
+            upFlowRecord.setErrorMsg(e.getCause().getMessage());
+            throw new ProcessException(e.getCause().getMessage());
         }finally {
             approvalFlowRecordService.update(upFlowRecord);
         }

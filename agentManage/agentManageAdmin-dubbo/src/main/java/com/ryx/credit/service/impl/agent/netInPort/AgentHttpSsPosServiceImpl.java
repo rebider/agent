@@ -122,8 +122,7 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
         resultMap.put("uniqueId",agentBusInfo.getId());
         resultMap.put("orgId",agentBusInfo.getBusNum());
         resultMap.put("busiType",platForm.getPosbusitype());
-        Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
-        resultMap.put("orgType",dictByValue.getdItemname().contains(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
+        resultMap.put("orgType",OrgType.zQ(agentBusInfo.getBusType())?OrgType.STR.getValue():OrgType.ORG.getValue());
         resultMap.put("loginName",agentBusInfo.getBusLoginNum());
         AgentBusInfo agentParent = null;
         if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentBusInfo.getBusParent())){
@@ -154,7 +153,7 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
         resultMap.put("credName",agent.getAgLegal());//法人姓名
         resultMap.put("credNo",agent.getAgLegalCernum());//法人身份证
         resultMap.put("credPhone",agent.getAgLegalMobile());//法人手机号
-
+        resultMap.put("bankCardType",agentColinfo.getCloType());//1对公2对私
         resultMap.put("bankCardName",agentColinfo.getCloRealname());//结算户名
         resultMap.put("bankCardCredNo",agentColinfo.getAgLegalCernum());//结算卡户主身份证
         resultMap.put("bankCard",agentColinfo.getCloBankAccount());//结算卡号
@@ -225,7 +224,7 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
             data.put("credName",paramMap.get("credName"));//法人姓名
             data.put("credNo",paramMap.get("credNo"));//法人身份证
             data.put("credPhone",paramMap.get("credPhone"));//法人手机号
-
+            data.put("bankCardType",paramMap.get("bankCardType"));//1对公2对私
             data.put("bankCardName",paramMap.get("bankCardName"));//结算户名
             data.put("bankCardCredNo",paramMap.get("bankCardCredNo"));//收款开户支行 户主姓名
             data.put("bankCard",paramMap.get("bankCard"));//结算卡号
@@ -344,6 +343,12 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
 
     @Override
     public AgentResult agencyLevelUpdateChange(Map data) throws Exception {
+        if(1==1){
+            log.info("实时分润禁止升级迁移操作");
+            AgentResult ag = AgentResult.fail("实时分润禁止升级迁移操作");
+            ag.setData("实时分润禁止升级迁移操作");
+            return ag;
+        }
         if(data==null){
             log.info("POS业务升级代理接口数据为空");
         }

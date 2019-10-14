@@ -9,6 +9,7 @@ import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.*;
+import com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail;
 import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
 import org.apache.commons.collections.FastHashMap;
 import org.slf4j.Logger;
@@ -28,10 +29,9 @@ import java.util.Map;
 @Service("mposTermMachineServiceImpl")
 public class MposTermMachineServiceImpl implements TermMachineService {
 
-    private Logger logger = LoggerFactory.getLogger(MposTermMachineServiceImpl.class);
-
     public static final String MPOS_SUCESS_respCode = "000000";//000000-成功，000002-系统报错，000003-缺失参数，000004-其他, 100000-失败
     public static final String MPOS_SUCESS_respType = "S";//S-成功，E-报错，R-重复请求
+    private Logger logger = LoggerFactory.getLogger(MposTermMachineServiceImpl.class);
 
     @Override
     public List<TermMachineVo> queryTermMachine(PlatformType platformType,Map<String,String> par) throws Exception{
@@ -271,4 +271,18 @@ public class MposTermMachineServiceImpl implements TermMachineService {
         }
     }
 
+    @Override
+    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws Exception {
+        return  AgentResult.ok("未联动");
+    }
+
+    @Override
+    public AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception {
+        return AgentResult.ok("04");
+    }
+
+    @Override
+    public boolean checkModleIsEq(Map<String, String> data, String platformType) {
+        return false;
+    }
 }

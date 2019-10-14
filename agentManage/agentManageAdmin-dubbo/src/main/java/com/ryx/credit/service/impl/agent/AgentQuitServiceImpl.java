@@ -551,7 +551,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         //启动审批
         String proce = activityService.createDeloyFlow(null, workId, null, null, startPar);
         if (proce == null) {
-            logger.info("退补差价提交审批，审批流启动失败{}:{}", id, cUser);
+            logger.info("活动调整提交审批，审批流启动失败{}:{}", id, cUser);
             throw new MessageException("审批流启动失败!");
         }
 
