@@ -14,6 +14,9 @@ import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.dict.IdService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +29,7 @@ import java.util.List;
 /**
  * 首刷日结同步 cxinfo 三期分润汪勇
  */
+@PropertySource("classpath:/config.properties")
 @Service("dailyProfitMposDataJob")
 @Transactional(rollbackFor = RuntimeException.class)
 public class DailyProfitMposDataJob {
@@ -41,13 +45,17 @@ public class DailyProfitMposDataJob {
     @Autowired
     ProfitDayMapper profitDayMapper;
 
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyConfigInDev(){
+        return new PropertySourcesPlaceholderConfigurer();
+    }
 
     /**
      * 同步日结分润数据(ProfitDay)
      * 分润月份（空则为当前日期上2天）yyyymmdd
      * 每日凌晨5点：@Scheduled(cron = "0 0 5 * * ?")
      */
-    @Scheduled(cron = "0 0 5 * * ?")
+    @Scheduled(cron = "${shoushua_rijie_job_cron}")
     public void doCron() {
         String profitDay = DateUtil.sdfDays.format(DateUtil.addDay(new Date(), -2));
         excute(profitDay);

@@ -16,6 +16,9 @@ import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.dict.IdService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +31,7 @@ import java.util.List;
 /**
  * 直发分润数据同步、定时 cxinfo 直发分润数据同步 汪勇
  */
+@PropertySource("classpath:/config.properties")
 @Service("profitZhiFaDataJob")
 public class ProfitZhiFaDataJob {
     private org.slf4j.Logger logger = LoggerFactory.getLogger(ProfitZhiFaDataJob.class);
@@ -48,13 +52,17 @@ public class ProfitZhiFaDataJob {
     private int index = 1;
     private static int c = 1;
 
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyConfigInDev(){
+        return new PropertySourcesPlaceholderConfigurer();
+    }
 
     /**
      * 同步直发分润数据
      * 交易月份（空则为上一月）
      * 每月3号上午10点
      */
-    @Scheduled(cron = "0 0 10 3 * ?")
+    @Scheduled(cron = "${shoushua_zhifa_job_cron}")
     public void doCron(){
         String month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6);
         excute(month);

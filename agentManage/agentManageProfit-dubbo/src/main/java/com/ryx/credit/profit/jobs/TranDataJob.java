@@ -19,6 +19,9 @@ import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.profit.IPosProfitDataService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +39,7 @@ import java.util.*;
  * @Description: 获取交易数据，对数据进行差异核对
  * @date 2018/7/2911:34
  */
+@PropertySource("classpath:/config.properties")
 @Service("tranDataJob")
 @Transactional(rollbackFor = Exception.class)
 public class TranDataJob {
@@ -61,13 +65,17 @@ public class TranDataJob {
     @Autowired
     private IdService idService;
 
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyConfigInDev(){
+        return new PropertySourcesPlaceholderConfigurer();
+    }
     /**
      * @Author: Zhang Lei
      * @Description: 获取交易量数据同步
      * 每月3号12点执行
      * @Date: 11:33 2019/1/24
      */
-    @Scheduled(cron = "0 0 12 3 * ?")
+    @Scheduled(cron = "${profit_checkdata_job_cron}")
     public void doCron() {
         String settleMonth = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
         deal(settleMonth);
@@ -239,7 +247,7 @@ public class TranDataJob {
      * 每月3号12点执行
      * @Date: 15:05 2019/4/2
      */
-    @Scheduled(cron = "0 0 12 3 * ?")
+    @Scheduled(cron = "${profit_checkdata_job_cron}")
     public void doSynchronizeTranCheckData() {
         synchronizeTranCheckData();
     }
