@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.agent.AnnoPlatformRelaMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.AnnoPlatformRela">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="ANNO_ID" jdbcType="VARCHAR" property="annoId" />
+    <result column="RANG_TYPE" jdbcType="VARCHAR" property="rangType" />
+    <result column="RANG_VALUE" jdbcType="VARCHAR" property="rangValue" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, ANNO_ID, RANG_TYPE, RANG_VALUE
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AnnoPlatformRelaExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from A_ANNO_PLATFORM_RELA
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from A_ANNO_PLATFORM_RELA
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.AnnoPlatformRelaExample">
+    delete from A_ANNO_PLATFORM_RELA
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AnnoPlatformRela">
+    insert into A_ANNO_PLATFORM_RELA (ID, ANNO_ID, RANG_TYPE,
+      RANG_VALUE)
+    values (#{id,jdbcType=VARCHAR}, #{annoId,jdbcType=VARCHAR}, #{rangType,jdbcType=VARCHAR},
+      #{rangValue,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AnnoPlatformRela">
+    insert into A_ANNO_PLATFORM_RELA
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="annoId != null">
+        ANNO_ID,
+      </if>
+      <if test="rangType != null">
+        RANG_TYPE,
+      </if>
+      <if test="rangValue != null">
+        RANG_VALUE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="annoId != null">
+        #{annoId,jdbcType=VARCHAR},
+      </if>
+      <if test="rangType != null">
+        #{rangType,jdbcType=VARCHAR},
+      </if>
+      <if test="rangValue != null">
+        #{rangValue,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AnnoPlatformRelaExample" resultType="java.lang.Long">
+    select count(*) from A_ANNO_PLATFORM_RELA
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.AnnoPlatformRela">
+    update A_ANNO_PLATFORM_RELA
+    <set>
+      <if test="annoId != null">
+        ANNO_ID = #{annoId,jdbcType=VARCHAR},
+      </if>
+      <if test="rangType != null">
+        RANG_TYPE = #{rangType,jdbcType=VARCHAR},
+      </if>
+      <if test="rangValue != null">
+        RANG_VALUE = #{rangValue,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AnnoPlatformRela">
+    update A_ANNO_PLATFORM_RELA
+    set ANNO_ID = #{annoId,jdbcType=VARCHAR},
+      RANG_TYPE = #{rangType,jdbcType=VARCHAR},
+      RANG_VALUE = #{rangValue,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from (
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+  <select id="selectAnnoIds" resultType="java.lang.String" parameterType="map">
+    select distinct (anno_id)
+    from a_anno_platform_rela ra
+    left join a_announcement_info aa
+    on aa.ann_id = ra.anno_id
+    where 1 != 1
+    <if test="map.platfromPerm !=null and map.platfromPerm.size > 0">
+       or (ra.rang_type = '1' and
+      <trim suffixOverrides="or">
+        <foreach collection="map.platfromPerm" item="platfromPermItem" >
+          #{platfromPermItem} in (ra.rang_value) or
+        </foreach>
+      </trim>)
+    </if>
+    UNION
+    select distinct (anno_id)
+    from a_anno_platform_rela ra
+    left join a_announcement_info aa
+    on aa.ann_id = ra.anno_id
+    where (ra.rang_type = '2' and instr(ra.rang_value,#{map.orgId})>0 )
+
+  </select>
+  <insert id="saveBatch" parameterType="java.util.List" >
+    insert into A_ANNO_PLATFORM_RELA (ID, ANNO_ID, RANG_TYPE,
+    RANG_VALUE)
+    (<foreach collection="records" separator="union all" item="record" index="">
+    select
+    #{record.id,jdbcType=VARCHAR},
+    #{record.annoId,jdbcType=VARCHAR},
+    #{record.rangType,jdbcType=VARCHAR},
+    #{record.rangValue,jdbcType=VARCHAR}
+    from dual
+  </foreach>)
+  </insert>
+
+</mapper>
