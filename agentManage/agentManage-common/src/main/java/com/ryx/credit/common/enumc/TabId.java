@@ -113,6 +113,8 @@ public enum TabId {
     O_INTERNET_CARD_POSTPONE("OICP%s%015d"),
     P_TEMPLATE_APPLY_RECORD("TAR%s%015d"),
     O_INTERNET_RENEW_OFF_D("OIROD%s%015d"),
+    A_ANNOUNCEMENT_INFO("AN%s%015d"),
+    A_ANNO_PLATFORM_RELA("AR%s%015d"),
     a_agent_certification("AC%s%015d");
 
     public String patt;
