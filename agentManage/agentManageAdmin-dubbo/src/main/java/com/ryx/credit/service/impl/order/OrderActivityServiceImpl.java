@@ -10,9 +10,7 @@ import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.PlatFormMapper;
-import com.ryx.credit.dao.order.OActivityMapper;
-import com.ryx.credit.dao.order.OActivityVisibleMapper;
-import com.ryx.credit.dao.order.OProductMapper;
+import com.ryx.credit.dao.order.*;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.TermMachineVo;
 import com.ryx.credit.pojo.admin.agent.*;
@@ -59,6 +57,8 @@ public class OrderActivityServiceImpl implements OrderActivityService {
     private RedisService redisService;
     @Autowired
     private OActivityVisibleMapper activityVisibleMapper;
+    @Autowired
+    private ORefundPriceDiffDetailMapper oRefundPriceDiffDetailMapper;
 
 
     @Override
@@ -778,5 +778,15 @@ public class OrderActivityServiceImpl implements OrderActivityService {
     @Override
     public List<Map<String,String>> selectConfigured(String activityId){
         return activityVisibleMapper.selectConfigured(activityId);
+    }
+
+    /**
+     * RDB查询换活动的taskID(退补差价ID)
+     * @param detailId
+     * @return
+     */
+    @Override
+    public Map<String, Object> queryTaskIdForChangeActive(String detailId) {
+        return oRefundPriceDiffDetailMapper.selectById(detailId);
     }
 }
