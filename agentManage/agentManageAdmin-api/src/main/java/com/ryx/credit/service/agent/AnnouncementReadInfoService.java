@@ -11,4 +11,5 @@ import com.ryx.credit.pojo.admin.agent.AnnouncementReadInfo;
  **/
 public interface AnnouncementReadInfoService {
     ResultVO saveResdInfo(AnnouncementReadInfo announcementReadInfo);
+    AnnouncementReadInfo queryByRecord(AnnouncementReadInfo announcementReadInfo);
 }

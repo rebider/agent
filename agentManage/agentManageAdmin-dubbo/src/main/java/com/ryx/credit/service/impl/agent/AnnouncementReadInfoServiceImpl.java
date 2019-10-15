@@ -8,6 +8,9 @@ import com.ryx.credit.service.agent.AnnouncementReadInfoService;
 import com.ryx.credit.service.dict.IdService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.PrivateKey;
 
@@ -27,9 +30,17 @@ public class AnnouncementReadInfoServiceImpl implements AnnouncementReadInfoServ
     private IdService idService;
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     public ResultVO saveResdInfo(AnnouncementReadInfo announcementReadInfo) {
-        announcementReadInfo.setId(idService.genAgId(TabId.A_ANNOUNCEMENT_READ_INFO));
+        announcementReadInfo.setId(idService.genIdInTran(TabId.A_ANNOUNCEMENT_READ_INFO));
         announcementReadInfoMapper.insert(announcementReadInfo);
         return ResultVO.success("成功");
     }
+
+    @Override
+    public AnnouncementReadInfo queryByRecord(AnnouncementReadInfo announcementReadInfo) {
+        AnnouncementReadInfo announcementReadInfo1 = announcementReadInfoMapper.queryByRecord(announcementReadInfo);
+        return announcementReadInfo1;
+    }
+
 }
