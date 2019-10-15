@@ -529,8 +529,11 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
     @Override
     public void sendSFPayMentToPlatform(String orderId) {
         try {
+            logger.info("发送订单首付款到kafka {}",orderId);
             OOrder order  = oOrderMapper.selectByPrimaryKey(orderId);
-            if(order !=null && Status.STATUS_1.status.compareTo(order.getStatus())==0 && AgStatus.Approved.status.compareTo(order.getReviewStatus())==0) {
+            if(order !=null && Status.STATUS_1.status.compareTo(order.getStatus())==0
+                    && AgStatus.Approved.status.compareTo(order.getReviewStatus())==0) {
+                logger.info("发送订单首付款到kafka 订单有效 {}",orderId);
                 //检查首付款金额
                 OPaymentDetailExample example = new OPaymentDetailExample();
                 example.or().andOrderIdEqualTo(orderId)
@@ -544,8 +547,13 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
                     PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
                     if(platForm!=null) {
                         OPaymentDetail detail = oPaymentDetails.get(0);
+                        List<String> attrs = new ArrayList<>();
                         List<Attachment> attr = attachmentMapper.accessoryQuery(orderId, AttachmentRelType.Order.name());
-                        List<String> attrs =  attr.stream().map(att->{return att.getAttDbpath();}).collect(Collectors.toList());
+                        if(attr.size()>0) {
+                            attrs = attr.stream().map(att -> {
+                                return att.getAttDbpath();
+                            }).collect(Collectors.toList());
+                        }
                         PaymentSendBusPlatformVo paymentSendBusPlatformVo = new PaymentSendBusPlatformVo();
                         paymentSendBusPlatformVo.setAg(order.getAgentId());
                         paymentSendBusPlatformVo.setAmount(detail.getRealPayAmount().setScale(2, BigDecimal.ROUND_HALF_UP).toString());
@@ -558,16 +566,27 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
                         paymentSendBusPlatformVo.setOptType(Status.STATUS_1.status + "");
                         paymentSendBusPlatformVo.setPlatform(platForm.getPlatformType());
                         paymentSendBusPlatformVo.setImageList(attrs);
-                        agentKafkaService.sendPayMentMessage(order.getAgentId(),
-                                detail.getId(),
-                                order.getBusId(),
-                                agentBusInfo.getBusNum(),
-                                KafkaMessageType.PAYMENT,
-                                KafkaMessageTopic.agent_Payment.code,
-                                JSONObject.toJSONString(paymentSendBusPlatformVo)
-                                );
+                        try {
+                            agentKafkaService.sendPayMentMessage(order.getAgentId(),
+                                    detail.getId(),
+                                    order.getBusId(),
+                                    agentBusInfo.getBusNum(),
+                                    KafkaMessageType.PAYMENT,
+                                    KafkaMessageTopic.agent_Payment.code,
+                                    JSONObject.toJSONString(paymentSendBusPlatformVo)
+                                    );
+                        } catch (Exception e) {
+                            logger.info("kafka接口调用失败 订单无效 {}",orderId);
+                            e.printStackTrace();
+                        }
+                    }else{
+                        logger.info("发送订单首付款到kafka PlatForm未找打 {}",orderId);
                     }
+                }else{
+                    logger.info("发送订单首付款到kafka 交易明细为空 {}",orderId);
                 }
+            }else{
+                logger.info("发送订单首付款到kafka 订单无效 {}",orderId);
             }
         } catch (Exception e) {
             e.printStackTrace();

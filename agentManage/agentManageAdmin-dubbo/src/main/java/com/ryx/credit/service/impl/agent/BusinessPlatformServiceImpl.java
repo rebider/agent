@@ -484,6 +484,11 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             Map<String, Object> reqMap = new HashMap<>();
             Agent agent = agentVo.getAgent();
             agent.setId(agentVo.getAgentId());
+            //新增业务必须保证基础信息完整 检查基础信息是否完整
+            FastMap checkAgentInfoIsComplet = agentQueryService.checkAgentInfoIsComplet(agent.getId());
+            if(!FastMap.isSuc(checkAgentInfoIsComplet)){
+                throw new ProcessException(checkAgentInfoIsComplet.get("msg")+"");
+            }
             //先查询业务是否已添加 有个添加过 全部返回
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
                 //校验实时分润不能升级
@@ -645,6 +650,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             }
             return AgentResult.ok(agentBusInfoList);
         } catch (MessageException e) {
+            e.printStackTrace();
+            throw new ProcessException(e.getMsg());
+        }catch (ProcessException e) {
             e.printStackTrace();
             throw new ProcessException(e.getMsg());
         } catch (Exception e) {
