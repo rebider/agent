@@ -430,7 +430,7 @@
     (select d.d_itemname from d_dict d where d.d_group='AGENT' and d.d_artifact='BUS_SCOPE'
     and d.d_itemvalue = ab.bus_scope and d.d_status=1) as bus_scope,
     ab.bus_login_num,
-    ab.bus_activation_parent,
+    aa_jhfx.ag_name as bus_activation_parent,
     aa_one.ag_name as one_parent_name,
     ab_one.bus_num as one_parent_num,
     (select d.d_itemname from d_dict d where d.d_group='AGENT' and d.d_artifact='BUS_TYPE'
@@ -454,6 +454,7 @@
     left join a_agent_businfo ab_one on ab_one.id = ab.bus_parent and ab_one.status=1
     left join a_agent_businfo ab_two on ab_two.id = ab_one.bus_parent and ab_two.status=1
     left join a_agent_businfo ab_three on ab_three.id = ab_two.bus_parent and ab_three.status=1
+    left join a_agent aa_jhfx on aa_jhfx.id = ab.agent_id and aa_jhfx.status=1
     left join a_agent aa_one on aa_one.id = ab_one.agent_id and aa_one.status=1
     left join a_agent aa_two on aa_two.id = ab_two.agent_id and aa_two.status=1
     left join a_agent aa_three on aa_three.id = ab_three.agent_id and aa_three.status=1
@@ -506,7 +507,7 @@
     (select d.d_itemname from d_dict d where d.d_group='AGENT' and d.d_artifact='BUS_SCOPE'
     and d.d_itemvalue = ab.bus_scope and d.d_status=1) as bus_scope,
     ab.bus_login_num,
-    ab.bus_activation_parent,
+    aa_jhfx.ag_name as bus_activation_parent,
     aa_one.ag_name as one_parent_name,
     ab_one.bus_num as one_parent_num,
     (select d.d_itemname from d_dict d where d.d_group='AGENT' and d.d_artifact='BUS_TYPE'
@@ -530,6 +531,7 @@
     left join a_agent_businfo ab_two on ab_two.id = ab_one.bus_parent and ab_two.status=1
     left join a_agent_businfo ab_three on ab_three.id = ab_two.bus_parent and ab_three.status=1
     left join a_agent aa on aa.id = ar.agent_id and aa.status=1
+    left join a_agent aa_jhfx on aa_jhfx.id = ab.agent_id and aa_jhfx.status=1
     left join a_agent aa_one on aa_one.id = ab_one.agent_id and aa_one.status=1
     left join a_agent aa_two on aa_two.id = ab_two.agent_id and aa_two.status=1
     left join a_agent aa_three on aa_three.id = ab_three.agent_id and aa_three.status=1
