@@ -157,4 +157,12 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         return announceMentInfo;
     }
 
+    @Override
+    public PageInfo selectAnnViewsMaintain(Page page, Map map) {
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(announceMentInfoMapper.selectAnnMaintain(map,page));
+        pageInfo.setTotal(announceMentInfoMapper.selectCountAnnMaintain(map));
+        return pageInfo;
+    }
+
 }

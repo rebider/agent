@@ -19,4 +19,5 @@ public interface  AnnounceMentInfoService {
     ResultVO saveAnn(AnnounceMentInfoVo announceMentInfo);
     ResultVO upStat(AnnounceMentInfo announceMentInfo);
     AnnounceMentInfo queryById(String annId);
+    PageInfo selectAnnViewsMaintain(Page page,Map map);
 }
