@@ -32,7 +32,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -78,9 +82,13 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     public ResultVO saveAnn(AnnounceMentInfoVo announceMentInfoVo) {
         ResultVO resultVO = new ResultVO();
+        ZoneId zoneId = ZoneId.systemDefault();
+        ZonedDateTime zdt = LocalDateTime.now().atZone(zoneId);//Combines this date-time with a time-zone to create a  ZonedDateTime.
+        Date date = Date.from(zdt.toInstant());
         String annId= idService.genId(TabId.A_ANNOUNCEMENT_INFO);
         announceMentInfoVo.setAnnId(annId);
         announceMentInfoVo.setAnnoStat(new BigDecimal(0));
+        announceMentInfoVo.setCreateTm(date);
         announceMentInfoMapper.insert(announceMentInfoVo);
         String orgs = announceMentInfoVo.getOrgs();
         List<AnnoPlatformRela> ralas = new ArrayList<>();
