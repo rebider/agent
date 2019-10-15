@@ -182,6 +182,10 @@ public class ColinfoTaskServiceImpl implements ColinfoTaskService {
             flagList.add(TransFlag.SB.getValue());
             flagList.add(TransFlag.YCX.getValue());
             flagList.add(TransFlag.FXLJ.getValue());
+            flagList.add(TransFlag.NEWCG.getValue());
+            flagList.add(TransFlag.NEWSB.getValue());
+            flagList.add(TransFlag.NEWYCX.getValue());
+            flagList.add(TransFlag.NEWFXLJ.getValue());
             criteria.andFlagNotIn(flagList);
             List<AColinfoPayment> aColinfoPayments = colinfoPaymentMapper.selectByExample(aColinfoPaymentExample);
             if(null==aColinfoPayments){
@@ -207,7 +211,7 @@ public class ColinfoTaskServiceImpl implements ColinfoTaskService {
                 }
                 JSONArray jsonArray = JSONObject.parseArray(String.valueOf(resultMap.get("info")));
                 Map<String, Object> resultInfoMap = JsonUtil.jsonToMap(JsonUtil.objectToJson(jsonArray.get(0)));
-                if(!String.valueOf(resultInfoMap.get("flag")).equals(TransFlag.WCL.getValue())){
+                if(!String.valueOf(resultInfoMap.get("flag")).equals(TransFlag.WCL.getValue()) && !String.valueOf(resultInfoMap.get("flag")).equals(TransFlag.NEWWCL.getValue())){
                     agentColinfoService.updateByPaymentResult(aColinfoPayment,resultInfoMap);
                     if(String.valueOf(resultInfoMap.get("flag")).equals(TransFlag.CG.getValue())){
                         AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
