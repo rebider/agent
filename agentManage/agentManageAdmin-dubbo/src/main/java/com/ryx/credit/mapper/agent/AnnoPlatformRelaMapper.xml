@@ -148,15 +148,16 @@
     from a_anno_platform_rela ra
     left join a_announcement_info aa
     on aa.ann_id = ra.anno_id
-    where 1 != 1
-    <if test="map.platfromPerm !=null and map.platfromPerm.size > 0">
-       or (ra.rang_type = '1' and
-      <trim suffixOverrides="or">
-        <foreach collection="map.platfromPerm" item="platfromPermItem" >
-          #{platfromPermItem} in (ra.rang_value) or
-        </foreach>
-      </trim>)
-    </if>
+    <where>
+      <if test="map.platfromPerm !=null and map.platfromPerm.size > 0">
+         (ra.rang_type = '1' and
+        <trim suffixOverrides="or">
+          <foreach collection="map.platfromPerm" item="platfromPermItem" >
+            #{platfromPermItem} in (ra.rang_value) or
+          </foreach>
+        </trim>)
+      </if>
+    </where>
     UNION
     select distinct (anno_id)
     from a_anno_platform_rela ra
