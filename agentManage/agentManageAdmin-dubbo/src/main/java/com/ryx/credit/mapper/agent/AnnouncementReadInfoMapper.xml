@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.agent.AnnouncementReadInfoMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.AnnouncementReadInfo">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="ANN_ID" jdbcType="VARCHAR" property="annId" />
+    <result column="ANN_TITLE" jdbcType="VARCHAR" property="annTitle" />
+    <result column="ANN_TYPE" jdbcType="DECIMAL" property="annType" />
+    <result column="READ_TM" jdbcType="TIMESTAMP" property="readTm" />
+    <result column="READ_USER_ID" jdbcType="VARCHAR" property="readUserId" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, ANN_ID, ANN_TITLE, ANN_TYPE, READ_TM, READ_USER_ID
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AnnouncementReadInfoExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from A_ANNOUNCEMENT_READ_INFO
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from A_ANNOUNCEMENT_READ_INFO
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.AnnouncementReadInfoExample">
+    delete from A_ANNOUNCEMENT_READ_INFO
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AnnouncementReadInfo">
+    insert into A_ANNOUNCEMENT_READ_INFO (ID, ANN_ID, ANN_TITLE, 
+      ANN_TYPE, READ_TM, READ_USER_ID
+      )
+    values (#{id,jdbcType=VARCHAR}, #{annId,jdbcType=VARCHAR}, #{annTitle,jdbcType=VARCHAR}, 
+      #{annType,jdbcType=DECIMAL}, #{readTm,jdbcType=TIMESTAMP}, #{readUserId,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AnnouncementReadInfo">
+    insert into A_ANNOUNCEMENT_READ_INFO
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="annId != null">
+        ANN_ID,
+      </if>
+      <if test="annTitle != null">
+        ANN_TITLE,
+      </if>
+      <if test="annType != null">
+        ANN_TYPE,
+      </if>
+      <if test="readTm != null">
+        READ_TM,
+      </if>
+      <if test="readUserId != null">
+        READ_USER_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="annId != null">
+        #{annId,jdbcType=VARCHAR},
+      </if>
+      <if test="annTitle != null">
+        #{annTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="annType != null">
+        #{annType,jdbcType=DECIMAL},
+      </if>
+      <if test="readTm != null">
+        #{readTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="readUserId != null">
+        #{readUserId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AnnouncementReadInfoExample" resultType="java.lang.Long">
+    select count(*) from A_ANNOUNCEMENT_READ_INFO
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.AnnouncementReadInfo">
+    update A_ANNOUNCEMENT_READ_INFO
+    <set>
+      <if test="annId != null">
+        ANN_ID = #{annId,jdbcType=VARCHAR},
+      </if>
+      <if test="annTitle != null">
+        ANN_TITLE = #{annTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="annType != null">
+        ANN_TYPE = #{annType,jdbcType=DECIMAL},
+      </if>
+      <if test="readTm != null">
+        READ_TM = #{readTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="readUserId != null">
+        READ_USER_ID = #{readUserId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AnnouncementReadInfo">
+    update A_ANNOUNCEMENT_READ_INFO
+    set ANN_ID = #{annId,jdbcType=VARCHAR},
+      ANN_TITLE = #{annTitle,jdbcType=VARCHAR},
+      ANN_TYPE = #{annType,jdbcType=DECIMAL},
+      READ_TM = #{readTm,jdbcType=TIMESTAMP},
+      READ_USER_ID = #{readUserId,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+  <select id="selectByRecord" parameterType="com.ryx.credit.pojo.admin.agent.AnnouncementReadInfo" resultType="com.ryx.credit.pojo.admin.agent.AnnouncementReadInfo">
+    select
+    <include refid="Base_Column_List" />
+    from A_ANNOUNCEMENT_READ_INFO
+    <where>
+      <trim prefixOverrides="and">
+          <if test="annId != null">
+          ANN_ID = #{annId,jdbcType=VARCHAR}
+          </if>
+          <if test="annTitle != null">
+           and  ANN_TITLE = #{annTitle,jdbcType=VARCHAR}
+          </if>
+          <if test="annType != null">
+            and ANN_TYPE = #{annType,jdbcType=DECIMAL}
+          </if>
+          <if test="readTm != null">
+            and READ_TM = #{readTm,jdbcType=TIMESTAMP}
+          </if>
+          <if test="readUserId != null">
+            and READ_USER_ID = #{readUserId,jdbcType=VARCHAR}
+          </if>
+      </trim>
+    </where>
+  </select>
+</mapper>
