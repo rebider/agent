@@ -343,6 +343,11 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                         oPayment.setRealAmount(oPayment.getRealAmount().add(oPaymentDetail.getRealPayAmount()));
                                         //待付的付款明细
                                         List<OPaymentDetail> countMap = oPaymentDetailMapper.selectCount(oPaymentDetail.getOrderId(), PamentIdType.ORDER_FKD.code, PaymentStatus.DF.code);
+                                        oPayment.setOutstandingAmount(oPayment.getOutstandingAmount().subtract(oPaymentDetail.getRealPayAmount()));
+                                        if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
+                                            logger.info("付款单修改失败");
+                                            throw new MessageException("付款单修改失败");
+                                        }
                                         if (residue.compareTo(oPayment.getOutstandingAmount()) == 1) {
                                             //如果销账金额大于欠款金额
 //                                            logger.info("销账金额大于欠款金额");
@@ -359,18 +364,8 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                                     }
                                                 }
                                             }
-                                            oPayment.setOutstandingAmount(oPayment.getOutstandingAmount().subtract(oPaymentDetail.getRealPayAmount()));
-                                            if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
-                                                logger.info("付款单修改失败");
-                                                throw new MessageException("付款单修改失败");
-                                            }
                                         } else {
                                             //销账金额小于欠款金额
-                                            oPayment.setOutstandingAmount(oPayment.getOutstandingAmount().subtract(oPaymentDetail.getRealPayAmount()));
-                                            if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
-                                                logger.info("付款单修改失败");
-                                                throw new MessageException("付款单修改失败");
-                                            }
 //                                            BigDecimal payAmount = oPayment.getPayAmount();
 //                                            //  查询已结清的实际付款金额
 //                                            BigDecimal realPayAmount = oPaymentDetailMapper.selectRealAmount(oPaymentDetail.getOrderId(), PamentIdType.ORDER_FKD.code);
