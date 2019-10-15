@@ -98,6 +98,8 @@ public class OldCompensateServiceImpl implements OldCompensateService {
     private IUserService iUserService;
     @Autowired
     private ImsTermMachineService imsTermMachineService;
+    @Autowired
+    private OActivityVisibleMapper activityVisibleMapper;
 
     /**
      * 解析提交过来的sn,
@@ -177,7 +179,20 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 String obj = JSONObject.toJSONString(activity);
                 JSONObject activityJsonObject = JSONObject.parseObject(obj);
                 activityJsonObject.put("platFormObj",platForm);
-                oActivitiesObj.add(activityJsonObject);
+                if(activity.getVisible().equals(VisibleStatus.TWO.getValue())){
+                    OActivityVisibleExample oActivityVisibleExample = new OActivityVisibleExample();
+                    OActivityVisibleExample.Criteria visibleCriteria = oActivityVisibleExample.createCriteria();
+                    visibleCriteria.andActivityIdEqualTo(activity.getActCode());
+                    List<OActivityVisible> oActivityVisibles = activityVisibleMapper.selectByExample(oActivityVisibleExample);
+                    for (OActivityVisible oActivityVisible : oActivityVisibles) {
+                        if(oActivityVisible.getAgentId().equals(agentId)){
+                            oActivitiesObj.add(activityJsonObject);
+                            break;
+                        }
+                    }
+                }else{
+                    oActivitiesObj.add(activityJsonObject);
+                }
             }
             resultMap.put("changeActivitys",oActivitiesObj); //可变更的活动
 
