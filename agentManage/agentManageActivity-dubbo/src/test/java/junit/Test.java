@@ -14,10 +14,15 @@ import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ExecutionQuery;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaProducerException;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -41,6 +46,8 @@ public class Test {
     ActivityService activityService;
     @Autowired
     ActIdUserService actIdUserService;
+    @Autowired
+    private KafkaTemplate kafkaTemplate;
 
     /**
      * 测试
@@ -190,6 +197,29 @@ public class Test {
 //        RepositoryService repositoryService = processEngine.getRepositoryService();
 //        RuntimeService runtimeService = processEngine.getRuntimeService();
 //        repositoryService.deleteDeployment("2465008",true);
+
+    }
+
+    @org.junit.Test
+    public void testKafka(){
+
+        ListenableFuture listenableFuture = kafkaTemplate.send("agent","123123213");
+        listenableFuture.addCallback(new ListenableFutureCallback() {
+            @Override
+            public void onFailure(Throwable ex) {
+                if(ex instanceof KafkaProducerException) {
+                    ProducerRecord recode = ((KafkaProducerException) ex).getProducerRecord();
+                    System.out.println(recode.key());
+                    System.out.println(recode.key());
+                    ex.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onSuccess(Object result) {
+                System.out.println(result.toString());
+            }
+        });
 
     }
 

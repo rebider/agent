@@ -5,10 +5,7 @@ import com.ryx.credit.common.enumc.BusType;
 import com.ryx.credit.common.enumc.DictGroup;
 import com.ryx.credit.common.enumc.OrgType;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.AppConfig;
-import com.ryx.credit.common.util.HttpClientUtil;
-import com.ryx.credit.common.util.JsonUtil;
-import com.ryx.credit.common.util.MailUtil;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.RegionMapper;
@@ -421,6 +418,10 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         if (null == agentBusInfo.getBusNum() || null == agentBusInfo.getBusLoginNum()) {
             return AgentResult.fail("业务平台编号和平台登录账号不能为空！");
         }
+
+        int i = agentBusInfoMapper.selectByBusNum(FastMap.fastMap("busNum",agentBusInfo.getBusNum()).putKeyV("busPlatform", agentBusInfo.getBusPlatform()));
+        if (i > 0 || agentBusInfo.getBusNum().equals(agentBusInfo.getBusParent()))
+            return AgentResult.fail("您已经升级成功，请勿重复提交！");
 
         Map<String,Object> jsonParams = new HashMap<String, Object>();
         jsonParams = commonParam(jsonParams, agentColinfo, agent, agentBusInfo);

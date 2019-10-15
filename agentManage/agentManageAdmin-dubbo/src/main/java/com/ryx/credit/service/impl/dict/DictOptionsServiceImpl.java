@@ -116,6 +116,19 @@ public class DictOptionsServiceImpl implements DictOptionsService {
         return dicts.get(0);
     }
 
+
+    @Override
+    public List<Dict> findDictListByName(String group, String artifact, String itemName) {
+        DictExample example = new DictExample();
+        DictExample.Criteria criteria = example.createCriteria();
+        criteria.andDGroupEqualTo(group);
+        criteria.andDItemnameEqualTo(itemName);
+        criteria.andDArtifactEqualTo(artifact);
+        criteria.andDStatusEqualTo(Status.STATUS_1.status);
+        List<Dict> dicts = dictMapper.selectByExample(example);
+        return dicts;
+    }
+
     /**
      * 工作流获取名称版本
      * @param approveName

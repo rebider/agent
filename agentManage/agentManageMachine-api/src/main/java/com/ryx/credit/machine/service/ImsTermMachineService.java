@@ -10,4 +10,6 @@ import java.util.List;
 public interface ImsTermMachineService {
 
     List<ImsTermMachine> selectByExample();
+
+    boolean checkModleIsEq(String oldMerid,String newMerId);
 }

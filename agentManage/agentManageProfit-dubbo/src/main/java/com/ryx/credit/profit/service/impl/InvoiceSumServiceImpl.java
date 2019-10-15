@@ -49,46 +49,6 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
     @Autowired
     private AgentService agentService;
 
-    /*@Override
-    public PageInfo selectByMap(Page page, Map<String, String> param, Map<String,Object> map) {
-
-        InvoiceSumExample invoiceSumExample = new InvoiceSumExample();
-        InvoiceSumExample.Criteria criteria = invoiceSumExample.createCriteria();
-        invoiceSumExample.setPage(page);
-        if (param.get("agentName") != null && !param.get("agentName").equals("")) {
-            criteria.andAgentNameEqualTo(param.get("agentName"));
-        }
-        if (param.get("agentId") != null && !param.get("agentId").equals("")) {
-            criteria.andAgentIdEqualTo(param.get("agentId"));
-
-        }
-        if (param.get("topOrgName") != null && !param.get("topOrgName").equals("")) {
-            criteria.andTopOrgNameEqualTo(param.get("topOrgName"));
-        }
-        if (param.get("topOrgId") != null && !param.get("topOrgId").equals("")) {
-            criteria.andTopOrgIdEqualTo(param.get("topOrgId"));
-        }
-        if (param.get("invoiceStatus") != null && !param.get("invoiceStatus").equals("")) {
-            criteria.andInvoiceStatusEqualTo(param.get("invoiceStatus"));
-        }
-        if (param.get("profitMonth") != null && !param.get("profitMonth").equals("")) {
-            criteria.andProfitMonthEqualTo(param.get("profitMonth"));
-        }
-        if (param.get("invoiceCompany") != null && !param.get("invoiceCompany").equals("")) {
-            criteria.andInvoiceCompanyEqualTo(param.get("invoiceCompany"));
-        }
-        if(map != null){
-            invoiceSumExample.setInnerJoinDepartment(map.get("ORGANIZATIONCODE").toString(), map.get("ORGID").toString());
-        }
-
-        List<InvoiceSum> invoiceSums = invoiceSumMapper.selectByExample(invoiceSumExample);
-        int count = (int) invoiceSumMapper.countByExample(invoiceSumExample);
-        PageInfo pageInfo = new PageInfo();
-        pageInfo.setTotal(count);
-        pageInfo.setRows(invoiceSums);
-        return pageInfo;
-    }*/
-
     /**
      * 获取数据列表
      * @param page
@@ -99,10 +59,11 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
     @Override
     public PageInfo selectByMap(Page page, Map<String, String> param, Map<String,Object> map) {
         if(map != null){
-            if (Objects.equals("south", map.get("ORGANIZATIONCODE").toString() )|| Objects.equals("north", map.get("ORGANIZATIONCODE").toString())) {
-                param.put("docDis",map.get("ORGID").toString());
-            } else if (map.get("ORGANIZATIONCODE").toString().contains("south") || map.get("ORGANIZATIONCODE").toString().contains("north")) {
-                param.put("docPro",map.get("ORGID").toString());
+            String deft = map.get("ORGANIZATIONCODE").toString();
+            if(deft.endsWith("city")){
+                param.put("docPro",map.get("ORGID").toString()); //市
+            }else if((deft.startsWith("region") && !deft.endsWith("city")) || deft.equals("beijing")){
+                param.put("docDis",map.get("ORGID").toString()); // 区
             }
         }
         PageInfo pageInfo = new PageInfo();
@@ -166,7 +127,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                     return resultMap;
                 }
             }
-            if (surplusAmt.compareTo(BigDecimal.ZERO) == 0) {
+            if (surplusAmt.compareTo(BigDecimal.ZERO) <= 0) {
                 AdjustFreeze(param);
                 invoiceSum.setInvoiceStatus("99");
             }

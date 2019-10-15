@@ -15,10 +15,7 @@ import com.ryx.credit.dao.order.OActivityVisibleMapper;
 import com.ryx.credit.dao.order.OProductMapper;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.TermMachineVo;
-import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
-import com.ryx.credit.pojo.admin.agent.Dict;
-import com.ryx.credit.pojo.admin.agent.PlatForm;
-import com.ryx.credit.pojo.admin.agent.PlatFormExample;
+import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.profit.service.ProfitMonthService;
 import com.ryx.credit.service.dict.DictOptionsService;
@@ -34,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by RYX on 2018/7/13.
@@ -387,21 +385,46 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         Date date = new Date();
         FastMap par = FastMap.fastMap("beginTime", date)
                              .putKeyV("endTime", date);
-
+        ArrayList<Object> productIdList = new ArrayList<>();
+        //如果有历史订单，说明是换互动进行跨平台活动查询
         if (StringUtils.isNotBlank(oldActivityId)) {
             //如果变更活动传递老活动，排除老的活动代码并匹配 相同的厂商和型号。
             OActivity oldActivity = activityMapper.selectByPrimaryKey(oldActivityId);
-            par.putKeyV("notEqActcode", oldActivity.getActCode()).putKeyV("vender", oldActivity.getVender()).putKeyV("proModel", oldActivity.getProModel());
+            //源平台可跨平台变更的平台
+            List<Dict> listCanChange =  dictOptionsService.dictList(DictGroup.COMPENSATE_PLATFORM_TYPE.name(),oldActivity.getPlatform());
+            //可选的平台活动
+            List<String>  listCanChangePlat =new ArrayList<>();
+            if(listCanChange.size()>0) {
+                listCanChangePlat = listCanChange.stream().map(item -> {
+                    return item.getdItemvalue();
+                }).collect(Collectors.toList());
+                listCanChangePlat.add(oldActivity.getPlatform());
+                //可选的平台代码
+                par.putKeyV("listCanChangePlat", listCanChangePlat);
+            //如果没有配置跨平台信息，就采用历史活动的平台
+            }else{
+                listCanChangePlat.add(oldActivity.getPlatform());
+                par.putKeyV("listCanChangePlat", listCanChangePlat);
+            }
+            //活动代码不等于老的活动代码
+            par.putKeyV("notEqActcode", oldActivity.getActCode())
+                    //变更的活动的厂商要等于原有老活动的厂商
+                    .putKeyV("vender", oldActivity.getVender())
+                    //变更的活动的机型要等于原有老活动的机型
+                    .putKeyV("proModel", oldActivity.getProModel());
+        //如果没有历史订单，根据商品来查询活动
         }else{
-            OProduct productObj = oProductMapper.selectByPrimaryKey(product);
-            par.putKeyV("productId", productObj.getId());
+            //商品
+            //OProduct productObj = oProductMapper.selectByPrimaryKey(product);
+            productIdList.add(product);
+            par.putKeyV("productIdList", productIdList);
         }
+        //业务id
         if (StringUtils.isNotBlank(orderAgentBusifo) && !"null".equals(orderAgentBusifo)) {
             //查询平台活动
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(orderAgentBusifo);
             par.putKeyV("platform", agentBusInfo.getBusPlatform());
         }
-
         List<Map<String, Object>> actList = activityMapper.productActivityOrderBuild(par);
         List<OActivity> activitys = new ArrayList<OActivity>();
         for (Map<String, Object> stringObjectMap : actList) {
@@ -412,6 +435,8 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             oActivity.setActCode(stringObjectMap.get("ACT_CODE") + "");
             oActivity.setOriginalPrice(new BigDecimal(stringObjectMap.get("ORIGINALPRICE") + ""));
             oActivity.setProductName(stringObjectMap.get("PRO_NAME")+"");
+
+            //查询活动是否可见
             OActivity activity = activityMapper.selectByPrimaryKey(oActivity.getId());
             if(StringUtils.isBlank(activity.getVisible())){
                 continue;
@@ -422,6 +447,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     continue;
                 }
             }
+
             activitys.add(oActivity);
         }
 
@@ -640,13 +666,45 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                         throw new MessageException(posSn + "活动未找到");
                     }
                     Set<BigDecimal> priceSet = new HashSet<>();
+                    OActivity rActivity = null;
+                    here:
                     for (OActivity oActivity : oActivities) {
-                        priceSet.add(oActivity.getPrice());
+                        if(oActivity.getVisible().equals(VisibleStatus.TWO.getValue())){
+                            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+                            AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+                            criteria.andStatusEqualTo(Status.STATUS_1.status);
+                            criteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
+                            criteria.andBusNumEqualTo(orgid);
+                            List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+                            if(agentBusInfos.size()==0){
+                                throw new MessageException("业务编号不存在");
+                            }
+                            if(agentBusInfos.size()!=1){
+                                throw new MessageException("业务编号不唯一");
+                            }
+                            AgentBusInfo agentBusInfo = agentBusInfos.get(0);
+
+                            OActivityVisibleExample oActivityVisibleExample = new OActivityVisibleExample();
+                            OActivityVisibleExample.Criteria visibleCriteria = oActivityVisibleExample.createCriteria();
+                            visibleCriteria.andActivityIdEqualTo(oActivity.getActCode());
+                            List<OActivityVisible> oActivityVisibles = activityVisibleMapper.selectByExample(oActivityVisibleExample);
+                            for (OActivityVisible oActivityVisible : oActivityVisibles) {
+                                if(oActivityVisible.getAgentId().equals(agentBusInfo.getAgentId())){
+                                    rActivity = oActivity;
+                                    break here;
+                                }
+                            }
+                        }else{
+                            priceSet.add(oActivity.getPrice());
+                        }
                     }
                     if (priceSet.size() != 1) {
                         throw new MessageException(posSn + "价格配置错误");
                     }
-                    actSet.add(oActivities.get(0));
+                    if(rActivity==null){
+                        rActivity = oActivities.get(0);
+                    }
+                    actSet.add(rActivity);
                 }
                 if (actSet.size() != 1) {
                     throw new MessageException(snStart + "到" + snEnd + ":活动不一致,请分开上传");

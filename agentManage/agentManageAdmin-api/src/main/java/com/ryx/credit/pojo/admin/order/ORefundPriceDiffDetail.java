@@ -71,11 +71,82 @@ public class ORefundPriceDiffDetail  implements Serializable {
 
     private String frontProName;
 
+    private String platformType;
+
+    private String oldOrgId;
+
+    private String newOrgId;
+
+    private String deliveryTime;
+
+    private Date appTime;
+
     private OActivity activityFront;
 
     private List<OActivity> oActivities;
 
     private List<Map> proMaps;
+
+    private String newMachineId;
+
+    private String oldMachineId;
+
+
+    public String getNewMachineId() {
+        return newMachineId;
+    }
+
+    public void setNewMachineId(String newMachineId) {
+        this.newMachineId = newMachineId;
+    }
+
+    public String getOldMachineId() {
+        return oldMachineId;
+    }
+
+    public void setOldMachineId(String oldMachineId) {
+        this.oldMachineId = oldMachineId;
+    }
+
+    public String getPlatformType() {
+        return platformType;
+    }
+
+    public void setPlatformType(String platformType) {
+        this.platformType = platformType;
+    }
+
+    public String getOldOrgId() {
+        return oldOrgId;
+    }
+
+    public void setOldOrgId(String oldOrgId) {
+        this.oldOrgId = oldOrgId;
+    }
+
+    public String getNewOrgId() {
+        return newOrgId;
+    }
+
+    public void setNewOrgId(String newOrgId) {
+        this.newOrgId = newOrgId;
+    }
+
+    public String getDeliveryTime() {
+        return deliveryTime;
+    }
+
+    public void setDeliveryTime(String deliveryTime) {
+        this.deliveryTime = deliveryTime;
+    }
+
+    public Date getAppTime() {
+        return appTime;
+    }
+
+    public void setAppTime(Date appTime) {
+        this.appTime = appTime;
+    }
 
     public String getFrontProId() {
         return frontProId;
