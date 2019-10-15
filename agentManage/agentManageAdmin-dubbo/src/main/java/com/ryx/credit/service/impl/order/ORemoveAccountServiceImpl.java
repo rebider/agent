@@ -379,12 +379,17 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                                 if (residue.compareTo(amount) == -1 ) {
                                                     //如果销账金额的剩余小于需补款金额  则新生成一条付款明细
                                                     OPaymentDetail oPaymentDetail_new  = new OPaymentDetail();
-                                                    BeanUtils.copyProperties(oPaymentDetail,oPaymentDetail_new);
                                                     Date planPayTime = oPaymentDetail.getPlanPayTime();
                                                     Calendar c = Calendar.getInstance();
                                                     c.setTime(planPayTime);
                                                     c.add(Calendar.MONTH, +1);
                                                     Date realPayTime = c.getTime();
+                                                    oPaymentDetail_new.setPaymentId(oPaymentDetail.getPaymentId());
+                                                    oPaymentDetail_new.setPlanNum(oPaymentDetail.getPlanNum());
+                                                    oPaymentDetail_new.setPaymentType(oPaymentDetail.getPaymentType());
+                                                    oPaymentDetail_new.setOrderId(oPaymentDetail.getOrderId());
+                                                    oPaymentDetail_new.setPayType(oPaymentDetail.getPayType());
+                                                    oPaymentDetail_new.setAgentId(oPaymentDetail.getAgentId());
                                                     oPaymentDetail_new.setPlanPayTime(realPayTime);//计划还款日期
                                                     oPaymentDetail_new.setId(idService.genId(TabId.o_payment_detail));
                                                     oPaymentDetail_new.setPaymentStatus(PaymentStatus.DF.code);
@@ -392,6 +397,8 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                                     oPaymentDetail_new.setBatchCode(Calendar.getInstance().getTime().getTime() + "");
                                                     oPaymentDetail_new.setcUser(oRemoveAccount_item.getSubmitPerson());
                                                     oPaymentDetail_new.setcDate(new Date());
+                                                    oPaymentDetail_new.setStatus(Status.STATUS_1.status);
+                                                    oPaymentDetail_new.setVersion(Status.STATUS_1.status);
                                                     //上一条的需补款金额减去这次销账的金额
                                                     oPaymentDetail_new.setPayAmount(oPaymentDetail.getPayAmount().subtract(residue));
                                                     if(1!= oPaymentDetailMapper.insertSelective(oPaymentDetail_new)){
@@ -428,6 +435,16 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                         }
                                     }
                                 }
+                            }
+                        }else{
+                            if(StringUtils.isNotBlank(oRemoveAccount_item.getAgId()) && null !=oRemoveAccount_item.getRmonth()){
+                                Date rmonth = oRemoveAccount_item.getRmonth();
+                                String rtime = simpleDateFormat.format(rmonth);
+                                logger.info("没有获取到代理商:"+oRemoveAccount_item.getAgId()+",时间:"+rtime+"的数据");
+                                throw new MessageException("没有获取到代理商:"+oRemoveAccount_item.getAgId()+",时间:"+rtime+"的数据");
+                            } else if (StringUtils.isNotBlank(oRemoveAccount_item.getAgId())){
+                                logger.info("没有获取到代理商:"+oRemoveAccount_item.getAgId()+"的数据");
+                                throw new MessageException("没有获取到代理商:"+oRemoveAccount_item.getAgId()+"的数据");
                             }
                         }
                         //修改销账表
