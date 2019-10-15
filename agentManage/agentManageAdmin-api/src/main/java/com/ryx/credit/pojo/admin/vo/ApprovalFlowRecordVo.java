@@ -27,6 +27,7 @@ public class ApprovalFlowRecordVo implements Serializable {
     private String busScope;
     private String busLoginNum;
     private String busActivationParent;
+    private String busParentNum;
     private String oneParentName;
     private String oneParentNum;
     private String oneParentType;
@@ -174,6 +175,14 @@ public class ApprovalFlowRecordVo implements Serializable {
 
     public void setBusActivationParent(String busActivationParent) {
         this.busActivationParent = busActivationParent;
+    }
+
+    public String getBusParentNum() {
+        return busParentNum;
+    }
+
+    public void setBusParentNum(String busParentNum) {
+        this.busParentNum = busParentNum;
     }
 
     public String getOneParentName() {
