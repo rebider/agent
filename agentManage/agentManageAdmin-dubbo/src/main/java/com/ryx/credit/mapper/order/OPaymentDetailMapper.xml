@@ -779,4 +779,22 @@
         order by PLAN_PAY_TIME
     </select>
 
+    <select id="selectOPaymentDetail" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List" />
+        from O_PAYMENT_DETAIL
+        <where>
+            1=1
+            <if test=" orderId!= null and orderId != '' ">
+                and ORDER_ID=#{orderId}
+            </if>
+            <if test=" agentId!= null and agentId != '' ">
+                and  AGENT_ID=#{agentId}
+            </if>
+            <if test=" omonth != null and omonth != '' ">
+                and  to_char(PLAN_PAY_TIME,'YYYY-MM') = #{omonth}
+            </if>
+        </where>
+        AND status=1 and PAYMENT_STATUS=1
+    </select>
 </mapper>

@@ -3768,11 +3768,11 @@ public class OrderServiceImpl implements OrderService {
                 String ramount = String.valueOf(map.get("ramount"));//销账金额
                 String agName = String.valueOf(map.get("agName"));
                 agName=new String(agName.getBytes("iso8859-1"),"utf-8");
-                int remove_Account = oRemoveAccountMapper.isRemoveAccount(map);
+               /* int remove_Account = oRemoveAccountMapper.isRemoveAccount(map);
                 if (remove_Account>=1){
                     logger.info("已在销账处理中,代理商为:"+agName+",业务平台编码:"+String.valueOf(map.get("busNum")));
                     return ResultVO.fail("已在销账处理中,代理商为:"+agName+",业务平台编码:"+String.valueOf(map.get("busNum")));
-                }
+                }*/
                 if(new BigDecimal(ramount).compareTo(new BigDecimal(machinesAmount))==1){
                     logger.info("填写的金额不能大于机具欠款金额,代理商为:"+agName+",机具金额:"+machinesAmount);
                     throw new MessageException("填写的金额不能大于机具欠款金额,代理商为:"+agName+",机具金额:"+machinesAmount);
