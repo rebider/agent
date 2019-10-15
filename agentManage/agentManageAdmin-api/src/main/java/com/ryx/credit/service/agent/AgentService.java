@@ -8,6 +8,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.CuserAgent;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
+import com.ryx.credit.pojo.admin.vo.AgentCaVo;
 
 import java.util.List;
 import java.util.Map;
@@ -96,4 +97,10 @@ public interface AgentService {
     int reportEdit(Agent agent, String userId) throws MessageException;
 
     Agent updateAgentInfo(Agent agent,String userId)throws MessageException;
+
+    List<Agent> queryByIds(List ids);
+
+    PageInfo agentCaManageList(Page page, Map map);
+
+    List<AgentCaVo> exportAgentCa(Map map);
 }

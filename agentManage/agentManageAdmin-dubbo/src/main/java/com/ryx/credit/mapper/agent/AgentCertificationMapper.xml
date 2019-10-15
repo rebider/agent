@@ -1,0 +1,1175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.agent.AgentCertificationMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.AgentCertification">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="REQ_REG_NO" jdbcType="VARCHAR" property="reqRegNo" />
+    <result column="REQ_ENT_NAME" jdbcType="VARCHAR" property="reqEntName" />
+    <result column="IS_CACHE" jdbcType="VARCHAR" property="isCache" />
+    <result column="ENTERPRISE_NAME" jdbcType="VARCHAR" property="enterpriseName" />
+    <result column="FR_NAME" jdbcType="VARCHAR" property="frName" />
+    <result column="REG_NO" jdbcType="VARCHAR" property="regNo" />
+    <result column="REG_CAP" jdbcType="DECIMAL" property="regCap" />
+    <result column="REG_CAP_CUR" jdbcType="VARCHAR" property="regCapCur" />
+    <result column="ES_DATE" jdbcType="VARCHAR" property="esDate" />
+    <result column="ORG_CER_ID" jdbcType="VARCHAR" property="orgCerId" />
+    <result column="OPEN_FROM" jdbcType="TIMESTAMP" property="openFrom" />
+    <result column="OPEN_TO" jdbcType="TIMESTAMP" property="openTo" />
+    <result column="ENTERPRISE_TYPE" jdbcType="VARCHAR" property="enterpriseType" />
+    <result column="ENTERPRISE_STATUS" jdbcType="VARCHAR" property="enterpriseStatus" />
+    <result column="CANCEL_DATE" jdbcType="TIMESTAMP" property="cancelDate" />
+    <result column="REVOKE_DATE" jdbcType="TIMESTAMP" property="revokeDate" />
+    <result column="ADDRESS" jdbcType="VARCHAR" property="address" />
+    <result column="ABU_ITEM" jdbcType="VARCHAR" property="abuItem" />
+    <result column="CBU_ITEM" jdbcType="VARCHAR" property="cbuItem" />
+    <result column="OPERATE_SCOPE" jdbcType="VARCHAR" property="operateScope" />
+    <result column="OPERATE_SCOPE_AND_FORM" jdbcType="VARCHAR" property="operateScopeAndForm" />
+    <result column="REG_ORG" jdbcType="VARCHAR" property="regOrg" />
+    <result column="ANCHE_YEAR" jdbcType="VARCHAR" property="ancheYear" />
+    <result column="ANCHE_DATE" jdbcType="TIMESTAMP" property="ancheDate" />
+    <result column="INDUSTRY_PHY_CODE" jdbcType="VARCHAR" property="industryPhyCode" />
+    <result column="INDUSTRY_PHY_NAME" jdbcType="VARCHAR" property="industryPhyName" />
+    <result column="INDUSTRY_CODE" jdbcType="VARCHAR" property="industryCode" />
+    <result column="INDUSTRY_NAME" jdbcType="VARCHAR" property="industryName" />
+    <result column="REC_CAP" jdbcType="DECIMAL" property="recCap" />
+    <result column="ORI_REG_NO" jdbcType="VARCHAR" property="oriRegNo" />
+    <result column="CREDIT_CODE" jdbcType="VARCHAR" property="creditCode" />
+    <result column="APPR_DATE" jdbcType="TIMESTAMP" property="apprDate" />
+    <result column="ORG_NO" jdbcType="VARCHAR" property="orgNo" />
+    <result column="USCI" jdbcType="VARCHAR" property="usci" />
+    <result column="REQ_CER_TM" jdbcType="TIMESTAMP" property="reqCerTm" />
+    <result column="REQ_CER_USER" jdbcType="VARCHAR" property="reqCerUser" />
+    <result column="CER_SUCCESS_TM" jdbcType="TIMESTAMP" property="cerSuccessTm" />
+    <result column="CER_NUM" jdbcType="DECIMAL" property="cerNum" />
+    <result column="CER_PRO_STAT" jdbcType="DECIMAL" property="cerProStat" />
+    <result column="CER_RES" jdbcType="DECIMAL" property="cerRes" />
+    <result column="ORG_AG_NAME" jdbcType="VARCHAR" property="orgAgName" />
+    <result column="ORG_AG_NATURE" jdbcType="DECIMAL" property="orgAgNature" />
+    <result column="ORG_AG_CAPITAL" jdbcType="DECIMAL" property="orgAgCapital" />
+    <result column="ORG_AG_BUS_LIC" jdbcType="VARCHAR" property="orgAgBusLic" />
+    <result column="ORG_AG_BUS_LICB" jdbcType="TIMESTAMP" property="orgAgBusLicb" />
+    <result column="ORG_AG_BUS_LICE" jdbcType="TIMESTAMP" property="orgAgBusLice" />
+    <result column="ORG_AG_LEGAL" jdbcType="VARCHAR" property="orgAgLegal" />
+    <result column="ORG_AG_REG_ADD" jdbcType="VARCHAR" property="orgAgRegAdd" />
+    <result column="ORG_AG_BUS_SCOPE" jdbcType="VARCHAR" property="orgAgBusScope" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, AGENT_ID, REQ_REG_NO, REQ_ENT_NAME, IS_CACHE, ENTERPRISE_NAME, FR_NAME, REG_NO,
+    REG_CAP, REG_CAP_CUR, ES_DATE, ORG_CER_ID, OPEN_FROM, OPEN_TO, ENTERPRISE_TYPE, ENTERPRISE_STATUS,
+    CANCEL_DATE, REVOKE_DATE, ADDRESS, ABU_ITEM, CBU_ITEM, OPERATE_SCOPE, OPERATE_SCOPE_AND_FORM,
+    REG_ORG, ANCHE_YEAR, ANCHE_DATE, INDUSTRY_PHY_CODE, INDUSTRY_PHY_NAME, INDUSTRY_CODE,
+    INDUSTRY_NAME, REC_CAP, ORI_REG_NO, CREDIT_CODE, APPR_DATE, ORG_NO, USCI, REQ_CER_TM,
+    REQ_CER_USER, CER_SUCCESS_TM, CER_NUM, CER_PRO_STAT, CER_RES, ORG_AG_NAME, ORG_AG_NATURE,
+    ORG_AG_CAPITAL, ORG_AG_BUS_LIC, ORG_AG_BUS_LICB, ORG_AG_BUS_LICE, ORG_AG_LEGAL, ORG_AG_REG_ADD,
+    ORG_AG_BUS_SCOPE
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentCertificationExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from A_AGENT_CERTIFICATION
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from A_AGENT_CERTIFICATION
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentCertificationExample">
+    delete from A_AGENT_CERTIFICATION
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AgentCertification">
+    insert into A_AGENT_CERTIFICATION (ID, AGENT_ID, REQ_REG_NO,
+      REQ_ENT_NAME, IS_CACHE, ENTERPRISE_NAME,
+      FR_NAME, REG_NO, REG_CAP,
+      REG_CAP_CUR, ES_DATE, ORG_CER_ID,
+      OPEN_FROM, OPEN_TO, ENTERPRISE_TYPE,
+      ENTERPRISE_STATUS, CANCEL_DATE, REVOKE_DATE,
+      ADDRESS, ABU_ITEM, CBU_ITEM,
+      OPERATE_SCOPE, OPERATE_SCOPE_AND_FORM, REG_ORG,
+      ANCHE_YEAR, ANCHE_DATE, INDUSTRY_PHY_CODE,
+      INDUSTRY_PHY_NAME, INDUSTRY_CODE, INDUSTRY_NAME,
+      REC_CAP, ORI_REG_NO, CREDIT_CODE,
+      APPR_DATE, ORG_NO, USCI,
+      REQ_CER_TM, REQ_CER_USER, CER_SUCCESS_TM,
+      CER_NUM, CER_PRO_STAT, CER_RES,
+      ORG_AG_NAME, ORG_AG_NATURE, ORG_AG_CAPITAL,
+      ORG_AG_BUS_LIC, ORG_AG_BUS_LICB, ORG_AG_BUS_LICE,
+      ORG_AG_LEGAL, ORG_AG_REG_ADD, ORG_AG_BUS_SCOPE
+      )
+    values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{reqRegNo,jdbcType=VARCHAR},
+      #{reqEntName,jdbcType=VARCHAR}, #{isCache,jdbcType=VARCHAR}, #{enterpriseName,jdbcType=VARCHAR},
+      #{frName,jdbcType=VARCHAR}, #{regNo,jdbcType=VARCHAR}, #{regCap,jdbcType=DECIMAL},
+      #{regCapCur,jdbcType=VARCHAR}, #{esDate,jdbcType=VARCHAR}, #{orgCerId,jdbcType=VARCHAR},
+      #{openFrom,jdbcType=TIMESTAMP}, #{openTo,jdbcType=TIMESTAMP}, #{enterpriseType,jdbcType=VARCHAR},
+      #{enterpriseStatus,jdbcType=VARCHAR}, #{cancelDate,jdbcType=TIMESTAMP}, #{revokeDate,jdbcType=TIMESTAMP},
+      #{address,jdbcType=VARCHAR}, #{abuItem,jdbcType=VARCHAR}, #{cbuItem,jdbcType=VARCHAR},
+      #{operateScope,jdbcType=VARCHAR}, #{operateScopeAndForm,jdbcType=VARCHAR}, #{regOrg,jdbcType=VARCHAR},
+      #{ancheYear,jdbcType=VARCHAR}, #{ancheDate,jdbcType=TIMESTAMP}, #{industryPhyCode,jdbcType=VARCHAR},
+      #{industryPhyName,jdbcType=VARCHAR}, #{industryCode,jdbcType=VARCHAR}, #{industryName,jdbcType=VARCHAR},
+      #{recCap,jdbcType=DECIMAL}, #{oriRegNo,jdbcType=VARCHAR}, #{creditCode,jdbcType=VARCHAR},
+      #{apprDate,jdbcType=TIMESTAMP}, #{orgNo,jdbcType=VARCHAR}, #{usci,jdbcType=VARCHAR},
+      #{reqCerTm,jdbcType=TIMESTAMP}, #{reqCerUser,jdbcType=VARCHAR}, #{cerSuccessTm,jdbcType=TIMESTAMP},
+      #{cerNum,jdbcType=DECIMAL}, #{cerProStat,jdbcType=DECIMAL}, #{cerRes,jdbcType=DECIMAL},
+      #{orgAgName,jdbcType=VARCHAR}, #{orgAgNature,jdbcType=DECIMAL}, #{orgAgCapital,jdbcType=DECIMAL},
+      #{orgAgBusLic,jdbcType=VARCHAR}, #{orgAgBusLicb,jdbcType=TIMESTAMP}, #{orgAgBusLice,jdbcType=TIMESTAMP},
+      #{orgAgLegal,jdbcType=VARCHAR}, #{orgAgRegAdd,jdbcType=VARCHAR}, #{orgAgBusScope,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentCertification">
+    insert into A_AGENT_CERTIFICATION
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="reqRegNo != null">
+        REQ_REG_NO,
+      </if>
+      <if test="reqEntName != null">
+        REQ_ENT_NAME,
+      </if>
+      <if test="isCache != null">
+        IS_CACHE,
+      </if>
+      <if test="enterpriseName != null">
+        ENTERPRISE_NAME,
+      </if>
+      <if test="frName != null">
+        FR_NAME,
+      </if>
+      <if test="regNo != null">
+        REG_NO,
+      </if>
+      <if test="regCap != null">
+        REG_CAP,
+      </if>
+      <if test="regCapCur != null">
+        REG_CAP_CUR,
+      </if>
+      <if test="esDate != null">
+        ES_DATE,
+      </if>
+      <if test="orgCerId != null">
+        ORG_CER_ID,
+      </if>
+      <if test="openFrom != null">
+        OPEN_FROM,
+      </if>
+      <if test="openTo != null">
+        OPEN_TO,
+      </if>
+      <if test="enterpriseType != null">
+        ENTERPRISE_TYPE,
+      </if>
+      <if test="enterpriseStatus != null">
+        ENTERPRISE_STATUS,
+      </if>
+      <if test="cancelDate != null">
+        CANCEL_DATE,
+      </if>
+      <if test="revokeDate != null">
+        REVOKE_DATE,
+      </if>
+      <if test="address != null">
+        ADDRESS,
+      </if>
+      <if test="abuItem != null">
+        ABU_ITEM,
+      </if>
+      <if test="cbuItem != null">
+        CBU_ITEM,
+      </if>
+      <if test="operateScope != null">
+        OPERATE_SCOPE,
+      </if>
+      <if test="operateScopeAndForm != null">
+        OPERATE_SCOPE_AND_FORM,
+      </if>
+      <if test="regOrg != null">
+        REG_ORG,
+      </if>
+      <if test="ancheYear != null">
+        ANCHE_YEAR,
+      </if>
+      <if test="ancheDate != null">
+        ANCHE_DATE,
+      </if>
+      <if test="industryPhyCode != null">
+        INDUSTRY_PHY_CODE,
+      </if>
+      <if test="industryPhyName != null">
+        INDUSTRY_PHY_NAME,
+      </if>
+      <if test="industryCode != null">
+        INDUSTRY_CODE,
+      </if>
+      <if test="industryName != null">
+        INDUSTRY_NAME,
+      </if>
+      <if test="recCap != null">
+        REC_CAP,
+      </if>
+      <if test="oriRegNo != null">
+        ORI_REG_NO,
+      </if>
+      <if test="creditCode != null">
+        CREDIT_CODE,
+      </if>
+      <if test="apprDate != null">
+        APPR_DATE,
+      </if>
+      <if test="orgNo != null">
+        ORG_NO,
+      </if>
+      <if test="usci != null">
+        USCI,
+      </if>
+      <if test="reqCerTm != null">
+        REQ_CER_TM,
+      </if>
+      <if test="reqCerUser != null">
+        REQ_CER_USER,
+      </if>
+      <if test="cerSuccessTm != null">
+        CER_SUCCESS_TM,
+      </if>
+      <if test="cerNum != null">
+        CER_NUM,
+      </if>
+      <if test="cerProStat != null">
+        CER_PRO_STAT,
+      </if>
+      <if test="cerRes != null">
+        CER_RES,
+      </if>
+      <if test="orgAgName != null">
+        ORG_AG_NAME,
+      </if>
+      <if test="orgAgNature != null">
+        ORG_AG_NATURE,
+      </if>
+      <if test="orgAgCapital != null">
+        ORG_AG_CAPITAL,
+      </if>
+      <if test="orgAgBusLic != null">
+        ORG_AG_BUS_LIC,
+      </if>
+      <if test="orgAgBusLicb != null">
+        ORG_AG_BUS_LICB,
+      </if>
+      <if test="orgAgBusLice != null">
+        ORG_AG_BUS_LICE,
+      </if>
+      <if test="orgAgLegal != null">
+        ORG_AG_LEGAL,
+      </if>
+      <if test="orgAgRegAdd != null">
+        ORG_AG_REG_ADD,
+      </if>
+      <if test="orgAgBusScope != null">
+        ORG_AG_BUS_SCOPE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="reqRegNo != null">
+        #{reqRegNo,jdbcType=VARCHAR},
+      </if>
+      <if test="reqEntName != null">
+        #{reqEntName,jdbcType=VARCHAR},
+      </if>
+      <if test="isCache != null">
+        #{isCache,jdbcType=VARCHAR},
+      </if>
+      <if test="enterpriseName != null">
+        #{enterpriseName,jdbcType=VARCHAR},
+      </if>
+      <if test="frName != null">
+        #{frName,jdbcType=VARCHAR},
+      </if>
+      <if test="regNo != null">
+        #{regNo,jdbcType=VARCHAR},
+      </if>
+      <if test="regCap != null">
+        #{regCap,jdbcType=DECIMAL},
+      </if>
+      <if test="regCapCur != null">
+        #{regCapCur,jdbcType=VARCHAR},
+      </if>
+      <if test="esDate != null">
+        #{esDate,jdbcType=VARCHAR},
+      </if>
+      <if test="orgCerId != null">
+        #{orgCerId,jdbcType=VARCHAR},
+      </if>
+      <if test="openFrom != null">
+        #{openFrom,jdbcType=TIMESTAMP},
+      </if>
+      <if test="openTo != null">
+        #{openTo,jdbcType=TIMESTAMP},
+      </if>
+      <if test="enterpriseType != null">
+        #{enterpriseType,jdbcType=VARCHAR},
+      </if>
+      <if test="enterpriseStatus != null">
+        #{enterpriseStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="cancelDate != null">
+        #{cancelDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="revokeDate != null">
+        #{revokeDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="address != null">
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="abuItem != null">
+        #{abuItem,jdbcType=VARCHAR},
+      </if>
+      <if test="cbuItem != null">
+        #{cbuItem,jdbcType=VARCHAR},
+      </if>
+      <if test="operateScope != null">
+        #{operateScope,jdbcType=VARCHAR},
+      </if>
+      <if test="operateScopeAndForm != null">
+        #{operateScopeAndForm,jdbcType=VARCHAR},
+      </if>
+      <if test="regOrg != null">
+        #{regOrg,jdbcType=VARCHAR},
+      </if>
+      <if test="ancheYear != null">
+        #{ancheYear,jdbcType=VARCHAR},
+      </if>
+      <if test="ancheDate != null">
+        #{ancheDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="industryPhyCode != null">
+        #{industryPhyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="industryPhyName != null">
+        #{industryPhyName,jdbcType=VARCHAR},
+      </if>
+      <if test="industryCode != null">
+        #{industryCode,jdbcType=VARCHAR},
+      </if>
+      <if test="industryName != null">
+        #{industryName,jdbcType=VARCHAR},
+      </if>
+      <if test="recCap != null">
+        #{recCap,jdbcType=DECIMAL},
+      </if>
+      <if test="oriRegNo != null">
+        #{oriRegNo,jdbcType=VARCHAR},
+      </if>
+      <if test="creditCode != null">
+        #{creditCode,jdbcType=VARCHAR},
+      </if>
+      <if test="apprDate != null">
+        #{apprDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orgNo != null">
+        #{orgNo,jdbcType=VARCHAR},
+      </if>
+      <if test="usci != null">
+        #{usci,jdbcType=VARCHAR},
+      </if>
+      <if test="reqCerTm != null">
+        #{reqCerTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="reqCerUser != null">
+        #{reqCerUser,jdbcType=VARCHAR},
+      </if>
+      <if test="cerSuccessTm != null">
+        #{cerSuccessTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cerNum != null">
+        #{cerNum,jdbcType=DECIMAL},
+      </if>
+      <if test="cerProStat != null">
+        #{cerProStat,jdbcType=DECIMAL},
+      </if>
+      <if test="cerRes != null">
+        #{cerRes,jdbcType=DECIMAL},
+      </if>
+      <if test="orgAgName != null">
+        #{orgAgName,jdbcType=VARCHAR},
+      </if>
+      <if test="orgAgNature != null">
+        #{orgAgNature,jdbcType=DECIMAL},
+      </if>
+      <if test="orgAgCapital != null">
+        #{orgAgCapital,jdbcType=DECIMAL},
+      </if>
+      <if test="orgAgBusLic != null">
+        #{orgAgBusLic,jdbcType=VARCHAR},
+      </if>
+      <if test="orgAgBusLicb != null">
+        #{orgAgBusLicb,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orgAgBusLice != null">
+        #{orgAgBusLice,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orgAgLegal != null">
+        #{orgAgLegal,jdbcType=VARCHAR},
+      </if>
+      <if test="orgAgRegAdd != null">
+        #{orgAgRegAdd,jdbcType=VARCHAR},
+      </if>
+      <if test="orgAgBusScope != null">
+        #{orgAgBusScope,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentCertificationExample" resultType="java.lang.Long">
+    select count(*) from A_AGENT_CERTIFICATION
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentCertification">
+    update A_AGENT_CERTIFICATION
+    <set>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="reqRegNo != null">
+        REQ_REG_NO = #{reqRegNo,jdbcType=VARCHAR},
+      </if>
+      <if test="reqEntName != null">
+        REQ_ENT_NAME = #{reqEntName,jdbcType=VARCHAR},
+      </if>
+      <if test="isCache != null">
+        IS_CACHE = #{isCache,jdbcType=VARCHAR},
+      </if>
+      <if test="enterpriseName != null">
+        ENTERPRISE_NAME = #{enterpriseName,jdbcType=VARCHAR},
+      </if>
+      <if test="frName != null">
+        FR_NAME = #{frName,jdbcType=VARCHAR},
+      </if>
+      <if test="regNo != null">
+        REG_NO = #{regNo,jdbcType=VARCHAR},
+      </if>
+      <if test="regCap != null">
+        REG_CAP = #{regCap,jdbcType=DECIMAL},
+      </if>
+      <if test="regCapCur != null">
+        REG_CAP_CUR = #{regCapCur,jdbcType=VARCHAR},
+      </if>
+      <if test="esDate != null">
+        ES_DATE = #{esDate,jdbcType=VARCHAR},
+      </if>
+      <if test="orgCerId != null">
+        ORG_CER_ID = #{orgCerId,jdbcType=VARCHAR},
+      </if>
+      <if test="openFrom != null">
+        OPEN_FROM = #{openFrom,jdbcType=TIMESTAMP},
+      </if>
+      <if test="openTo != null">
+        OPEN_TO = #{openTo,jdbcType=TIMESTAMP},
+      </if>
+      <if test="enterpriseType != null">
+        ENTERPRISE_TYPE = #{enterpriseType,jdbcType=VARCHAR},
+      </if>
+      <if test="enterpriseStatus != null">
+        ENTERPRISE_STATUS = #{enterpriseStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="cancelDate != null">
+        CANCEL_DATE = #{cancelDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="revokeDate != null">
+        REVOKE_DATE = #{revokeDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="address != null">
+        ADDRESS = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="abuItem != null">
+        ABU_ITEM = #{abuItem,jdbcType=VARCHAR},
+      </if>
+      <if test="cbuItem != null">
+        CBU_ITEM = #{cbuItem,jdbcType=VARCHAR},
+      </if>
+      <if test="operateScope != null">
+        OPERATE_SCOPE = #{operateScope,jdbcType=VARCHAR},
+      </if>
+      <if test="operateScopeAndForm != null">
+        OPERATE_SCOPE_AND_FORM = #{operateScopeAndForm,jdbcType=VARCHAR},
+      </if>
+      <if test="regOrg != null">
+        REG_ORG = #{regOrg,jdbcType=VARCHAR},
+      </if>
+      <if test="ancheYear != null">
+        ANCHE_YEAR = #{ancheYear,jdbcType=VARCHAR},
+      </if>
+      <if test="ancheDate != null">
+        ANCHE_DATE = #{ancheDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="industryPhyCode != null">
+        INDUSTRY_PHY_CODE = #{industryPhyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="industryPhyName != null">
+        INDUSTRY_PHY_NAME = #{industryPhyName,jdbcType=VARCHAR},
+      </if>
+      <if test="industryCode != null">
+        INDUSTRY_CODE = #{industryCode,jdbcType=VARCHAR},
+      </if>
+      <if test="industryName != null">
+        INDUSTRY_NAME = #{industryName,jdbcType=VARCHAR},
+      </if>
+      <if test="recCap != null">
+        REC_CAP = #{recCap,jdbcType=DECIMAL},
+      </if>
+      <if test="oriRegNo != null">
+        ORI_REG_NO = #{oriRegNo,jdbcType=VARCHAR},
+      </if>
+      <if test="creditCode != null">
+        CREDIT_CODE = #{creditCode,jdbcType=VARCHAR},
+      </if>
+      <if test="apprDate != null">
+        APPR_DATE = #{apprDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orgNo != null">
+        ORG_NO = #{orgNo,jdbcType=VARCHAR},
+      </if>
+      <if test="usci != null">
+        USCI = #{usci,jdbcType=VARCHAR},
+      </if>
+      <if test="reqCerTm != null">
+        REQ_CER_TM = #{reqCerTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="reqCerUser != null">
+        REQ_CER_USER = #{reqCerUser,jdbcType=VARCHAR},
+      </if>
+      <if test="cerSuccessTm != null">
+        CER_SUCCESS_TM = #{cerSuccessTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cerNum != null">
+        CER_NUM = #{cerNum,jdbcType=DECIMAL},
+      </if>
+      <if test="cerProStat != null">
+        CER_PRO_STAT = #{cerProStat,jdbcType=DECIMAL},
+      </if>
+      <if test="cerRes != null">
+        CER_RES = #{cerRes,jdbcType=DECIMAL},
+      </if>
+      <if test="orgAgName != null">
+        ORG_AG_NAME = #{orgAgName,jdbcType=VARCHAR},
+      </if>
+      <if test="orgAgNature != null">
+        ORG_AG_NATURE = #{orgAgNature,jdbcType=DECIMAL},
+      </if>
+      <if test="orgAgCapital != null">
+        ORG_AG_CAPITAL = #{orgAgCapital,jdbcType=DECIMAL},
+      </if>
+      <if test="orgAgBusLic != null">
+        ORG_AG_BUS_LIC = #{orgAgBusLic,jdbcType=VARCHAR},
+      </if>
+      <if test="orgAgBusLicb != null">
+        ORG_AG_BUS_LICB = #{orgAgBusLicb,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orgAgBusLice != null">
+        ORG_AG_BUS_LICE = #{orgAgBusLice,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orgAgLegal != null">
+        ORG_AG_LEGAL = #{orgAgLegal,jdbcType=VARCHAR},
+      </if>
+      <if test="orgAgRegAdd != null">
+        ORG_AG_REG_ADD = #{orgAgRegAdd,jdbcType=VARCHAR},
+      </if>
+      <if test="orgAgBusScope != null">
+        ORG_AG_BUS_SCOPE = #{orgAgBusScope,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AgentCertification">
+    update A_AGENT_CERTIFICATION
+    set AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      REQ_REG_NO = #{reqRegNo,jdbcType=VARCHAR},
+      REQ_ENT_NAME = #{reqEntName,jdbcType=VARCHAR},
+      IS_CACHE = #{isCache,jdbcType=VARCHAR},
+      ENTERPRISE_NAME = #{enterpriseName,jdbcType=VARCHAR},
+      FR_NAME = #{frName,jdbcType=VARCHAR},
+      REG_NO = #{regNo,jdbcType=VARCHAR},
+      REG_CAP = #{regCap,jdbcType=DECIMAL},
+      REG_CAP_CUR = #{regCapCur,jdbcType=VARCHAR},
+      ES_DATE = #{esDate,jdbcType=VARCHAR},
+      ORG_CER_ID = #{orgCerId,jdbcType=VARCHAR},
+      OPEN_FROM = #{openFrom,jdbcType=TIMESTAMP},
+      OPEN_TO = #{openTo,jdbcType=TIMESTAMP},
+      ENTERPRISE_TYPE = #{enterpriseType,jdbcType=VARCHAR},
+      ENTERPRISE_STATUS = #{enterpriseStatus,jdbcType=VARCHAR},
+      CANCEL_DATE = #{cancelDate,jdbcType=TIMESTAMP},
+      REVOKE_DATE = #{revokeDate,jdbcType=TIMESTAMP},
+      ADDRESS = #{address,jdbcType=VARCHAR},
+      ABU_ITEM = #{abuItem,jdbcType=VARCHAR},
+      CBU_ITEM = #{cbuItem,jdbcType=VARCHAR},
+      OPERATE_SCOPE = #{operateScope,jdbcType=VARCHAR},
+      OPERATE_SCOPE_AND_FORM = #{operateScopeAndForm,jdbcType=VARCHAR},
+      REG_ORG = #{regOrg,jdbcType=VARCHAR},
+      ANCHE_YEAR = #{ancheYear,jdbcType=VARCHAR},
+      ANCHE_DATE = #{ancheDate,jdbcType=TIMESTAMP},
+      INDUSTRY_PHY_CODE = #{industryPhyCode,jdbcType=VARCHAR},
+      INDUSTRY_PHY_NAME = #{industryPhyName,jdbcType=VARCHAR},
+      INDUSTRY_CODE = #{industryCode,jdbcType=VARCHAR},
+      INDUSTRY_NAME = #{industryName,jdbcType=VARCHAR},
+      REC_CAP = #{recCap,jdbcType=DECIMAL},
+      ORI_REG_NO = #{oriRegNo,jdbcType=VARCHAR},
+      CREDIT_CODE = #{creditCode,jdbcType=VARCHAR},
+      APPR_DATE = #{apprDate,jdbcType=TIMESTAMP},
+      ORG_NO = #{orgNo,jdbcType=VARCHAR},
+      USCI = #{usci,jdbcType=VARCHAR},
+      REQ_CER_TM = #{reqCerTm,jdbcType=TIMESTAMP},
+      REQ_CER_USER = #{reqCerUser,jdbcType=VARCHAR},
+      CER_SUCCESS_TM = #{cerSuccessTm,jdbcType=TIMESTAMP},
+      CER_NUM = #{cerNum,jdbcType=DECIMAL},
+      CER_PRO_STAT = #{cerProStat,jdbcType=DECIMAL},
+      CER_RES = #{cerRes,jdbcType=DECIMAL},
+      ORG_AG_NAME = #{orgAgName,jdbcType=VARCHAR},
+      ORG_AG_NATURE = #{orgAgNature,jdbcType=DECIMAL},
+      ORG_AG_CAPITAL = #{orgAgCapital,jdbcType=DECIMAL},
+      ORG_AG_BUS_LIC = #{orgAgBusLic,jdbcType=VARCHAR},
+      ORG_AG_BUS_LICB = #{orgAgBusLicb,jdbcType=TIMESTAMP},
+      ORG_AG_BUS_LICE = #{orgAgBusLice,jdbcType=TIMESTAMP},
+      ORG_AG_LEGAL = #{orgAgLegal,jdbcType=VARCHAR},
+      ORG_AG_REG_ADD = #{orgAgRegAdd,jdbcType=VARCHAR},
+      ORG_AG_BUS_SCOPE = #{orgAgBusScope,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from (
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+
+  <sql id="selectCerDetails">
+    select  agentCer.ID,
+      agentCer.AGENT_ID,
+      agentCer.REQ_REG_NO,
+      agentCer.REQ_ENT_NAME,
+      agentCer.IS_CACHE,
+      agentCer.ENTERPRISE_NAME,
+      agentCer.FR_NAME,
+      agentCer.REG_NO,
+      agentCer.REG_CAP,
+      agentCer.REG_CAP_CUR,
+      agentCer.ES_DATE,
+      agentCer.ORG_CER_ID,
+      agentCer.OPEN_FROM,
+      agentCer.OPEN_TO,
+      agentCer.ENTERPRISE_TYPE,
+      agentCer.ENTERPRISE_STATUS,
+      agentCer.CANCEL_DATE,
+      agentCer.REVOKE_DATE,
+      agentCer.ADDRESS,
+      agentCer.ABU_ITEM,
+      agentCer.CBU_ITEM,
+      agentCer.OPERATE_SCOPE,
+      agentCer.OPERATE_SCOPE_AND_FORM,
+      agentCer.REG_ORG,
+      agentCer.ANCHE_YEAR,
+      agentCer.ANCHE_DATE,
+      agentCer.INDUSTRY_PHY_CODE,
+      agentCer.INDUSTRY_PHY_NAME,
+      agentCer.INDUSTRY_CODE,
+      agentCer.INDUSTRY_NAME,
+      agentCer.REC_CAP,
+      agentCer.ORI_REG_NO,
+      agentCer.CREDIT_CODE,
+      agentCer.APPR_DATE,
+      agentCer.ORG_NO,
+      agentCer.USCI,
+      agentCer.REQ_CER_TM,
+      agentCer.REQ_CER_USER,
+      agentCer.CER_SUCCESS_TM,
+      agentCer.CER_NUM,
+      agentCer.CER_PRO_STAT,
+      agentCer.CER_RES,
+      agentCer.ORG_AG_NAME,
+      agentCer.ORG_AG_NATURE,
+      agentCer.ORG_AG_CAPITAL,
+      agentCer.ORG_AG_BUS_LIC,
+      agentCer.ORG_AG_BUS_LICB,
+      agentCer.ORG_AG_BUS_LICE,
+      agentCer.ORG_AG_LEGAL,
+      agentCer.ORG_AG_REG_ADD,
+      agentCer.ORG_AG_BUS_SCOPE  from a_agent_certification agentCer where agentCer.agent_id = #{map.id} order by agentCer.req_cer_tm asc
+  </sql>
+
+  <select id="queryAgentCerDetails" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix"/>
+    <include refid="selectCerDetails"/>
+    <include refid="OracleDialectSuffix"/>
+  </select>
+  <select id="queryAgentCerDetailsCount" parameterType="map" resultType="int">
+    select count(id) from(
+    <include refid="selectCerDetails"/>)
+  </select>
+
+  <insert id="insertBatch" parameterType="java.util.List" >
+    insert  into a_agent_certification
+    (ID,AGENT_ID,REQ_REG_NO,REQ_ENT_NAME,REQ_CER_TM,CER_NUM,CER_PRO_STAT,ORG_CER_ID,
+    ORG_AG_NAME,ORG_AG_NATURE,ORG_AG_CAPITAL,ORG_AG_BUS_LIC,ORG_AG_BUS_LICB,ORG_AG_BUS_LICE,ORG_AG_LEGAL,ORG_AG_REG_ADD,ORG_AG_BUS_SCOPE)
+    (<foreach collection="agentCertifications" separator="union all" item="agentCer" index="">
+    select
+    #{agentCer.id,jdbcType=VARCHAR},
+    #{agentCer.agentId,jdbcType=VARCHAR},
+    #{agentCer.reqRegNo,jdbcType=VARCHAR},
+    #{agentCer.reqEntName,jdbcType=VARCHAR},
+    #{agentCer.reqCerTm,jdbcType=TIMESTAMP},
+    #{agentCer.cerNum,jdbcType=DECIMAL},
+    #{agentCer.cerProStat,jdbcType=DECIMAL},
+    #{agentCer.orgCerId,jdbcType=VARCHAR},
+    #{agentCer.orgAgName,jdbcType=VARCHAR},
+    #{agentCer.orgAgNature,jdbcType=DECIMAL},
+    #{agentCer.orgAgCapital,jdbcType=DECIMAL},
+    #{agentCer.orgAgBusLic,jdbcType=VARCHAR},
+    #{agentCer.orgAgBusLicb,jdbcType=TIMESTAMP},
+    #{agentCer.orgAgBusLice,jdbcType=TIMESTAMP},
+    #{agentCer.orgAgLegal,jdbcType=VARCHAR},
+    #{agentCer.orgAgRegAdd,jdbcType=VARCHAR},
+    #{agentCer.orgAgBusScope,jdbcType=VARCHAR}
+    from dual
+  </foreach>)
+
+  </insert>
+  <sql id="selectCertifi">
+    select
+    AGENTCER.ID,
+    AGENTCER.AGENT_ID,
+    AGENTCER.REQ_REG_NO,
+    AGENTCER.REQ_ENT_NAME,
+    AGENTCER.IS_CACHE,
+    AGENTCER.ENTERPRISE_NAME,
+    AGENTCER.FR_NAME,
+    AGENTCER.REG_NO,
+    AGENTCER.REG_CAP,
+    AGENTCER.REG_CAP_CUR,
+    AGENTCER.ES_DATE,
+    AGENTCER.ORG_CER_ID,
+    AGENTCER.OPEN_FROM,
+    AGENTCER.OPEN_TO,
+    AGENTCER.ENTERPRISE_TYPE,
+    AGENTCER.ENTERPRISE_STATUS,
+    AGENTCER.CANCEL_DATE,
+    AGENTCER.REVOKE_DATE,
+    AGENTCER.ADDRESS,
+    AGENTCER.ABU_ITEM,
+    AGENTCER.CBU_ITEM,
+    AGENTCER.OPERATE_SCOPE,
+    AGENTCER.OPERATE_SCOPE_AND_FORM,
+    AGENTCER.REG_ORG,
+    AGENTCER.ANCHE_YEAR,
+    AGENTCER.ANCHE_DATE,
+    AGENTCER.INDUSTRY_PHY_CODE,
+    AGENTCER.INDUSTRY_PHY_NAME,
+    AGENTCER.INDUSTRY_CODE,
+    AGENTCER.INDUSTRY_NAME,
+    AGENTCER.REC_CAP,
+    AGENTCER.ORI_REG_NO,
+    AGENTCER.CREDIT_CODE,
+    AGENTCER.APPR_DATE,
+    AGENTCER.ORG_NO,
+    AGENTCER.USCI,
+    AGENTCER.REQ_CER_TM,
+    AGENTCER.REQ_CER_USER,
+    AGENTCER.CER_SUCCESS_TM,
+    AGENTCER.CER_NUM,
+    AGENTCER.CER_PRO_STAT,
+    AGENTCER.CER_RES,
+    AGENTCER.ORG_AG_NAME,
+    AGENTCER.ORG_AG_NATURE,
+    AGENTCER.ORG_AG_CAPITAL,
+    AGENTCER.ORG_AG_BUS_LIC,
+    AGENTCER.ORG_AG_BUS_LICB,
+    AGENTCER.ORG_AG_BUS_LICE,
+    AGENTCER.ORG_AG_LEGAL,
+    AGENTCER.ORG_AG_REG_ADD,
+    AGENTCER.ORG_AG_BUS_SCOPE,
+    AGENT.C_INCOM_TIME
+    from  A_AGENT_CERTIFICATION AGENTCER
+    LEFT JOIN A_AGENT AGENT
+    ON AGENTCER.AGENT_ID = AGENT.AG_UNIQ_NUM
+    where 1=1
+    <if test="map.agBusLic!=null and map.agBusLic!=''">
+      AND AGENT.ORG_CER_ID = #{map.agBusLic}
+    </if>
+    <if test="map.agUniqNum!=null and map.agUniqNum!=''">
+      AND AGENT.AG_UNIQ_NUM = #{map.agUniqNum}
+    </if>
+    <if test="map.agName!=null and map.agName!=''">
+      AND AGENT.AG_NAME = #{map.agName}
+    </if>
+    <if test="map.time!=null and map.time!=''">
+      AND to_char(AGENT.C_INCOM_TIME,'YYYY-MM-dd')=#{map.time}
+    </if>
+    <if test="map.caStatus!=null and map.caStatus!=''">
+      AND AGENT.CA_STATUS = #{map.caStatus}
+    </if>
+    <if test="map.agBusLicb!=null and map.agBusLicb!=''">
+      AND to_char( AGENT.AG_BUS_LICB,'YYYY-MM-dd')=#{map.agBusLice}
+    </if>
+    <if test="map.agBusLice!=null and map.agBusLice!=''">
+      AND to_char(AGENT.AG_BUS_LICE,'YYYY-MM-dd')=#{map.agBusLice}
+    </if>  order by AGENTCER.REQ_CER_TM desc
+  </sql>
+  <select id="queryAgentCerList" parameterType="map" resultType="map">
+
+    <include refid="OracleDialectPrefix"/>
+<!--    <include refid="selectCertifi"/>-->/*重复展示*/
+    <include refid="selectCertifiDetails"/>
+    <include refid="OracleDialectSuffix"/>
+  </select>
+
+  <select id="queryAgentCerListCount" parameterType="map" resultType="int">
+    select count(id) from(
+   <!-- <include refid="selectCertifi"/>-->/*重复展示*/
+    <include refid="selectCertifiDetails"/>
+    )
+  </select>
+
+  <resultMap id="exportAgentCertifi" type="com.ryx.credit.pojo.admin.vo.AgentCertifiVo">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="REQ_REG_NO" jdbcType="VARCHAR" property="reqRegNo" />
+    <result column="REQ_ENT_NAME" jdbcType="VARCHAR" property="reqEntName" />
+    <result column="IS_CACHE" jdbcType="VARCHAR" property="isCache" />
+    <result column="ENTERPRISE_NAME" jdbcType="VARCHAR" property="enterpriseName" />
+    <result column="FR_NAME" jdbcType="VARCHAR" property="frName" />
+    <result column="REG_NO" jdbcType="VARCHAR" property="regNo" />
+    <result column="REG_CAP" jdbcType="DECIMAL" property="regCap" />
+    <result column="REG_CAP_CUR" jdbcType="VARCHAR" property="regCapCur" />
+    <result column="ES_DATE" jdbcType="VARCHAR" property="esDate" />
+    <result column="AG_BUS_LIC" jdbcType="VARCHAR" property="agBusLic" />
+    <result column="OPEN_FROM" jdbcType="VARCHAR" property="openFrom" />
+    <result column="OPEN_TO" jdbcType="VARCHAR" property="openTo" />
+    <result column="ENTERPRISE_TYPE" jdbcType="VARCHAR" property="enterpriseType" />
+    <result column="ENTERPRISE_STATUS" jdbcType="VARCHAR" property="enterpriseStatus" />
+    <result column="CANCEL_DATE" jdbcType="VARCHAR" property="cancelDate" />
+    <result column="REVOKE_DATE" jdbcType="VARCHAR" property="revokeDate" />
+    <result column="ADDRESS" jdbcType="VARCHAR" property="address" />
+    <result column="ABU_ITEM" jdbcType="VARCHAR" property="abuItem" />
+    <result column="CBU_ITEM" jdbcType="VARCHAR" property="cbuItem" />
+    <result column="OPERATE_SCOPE" jdbcType="VARCHAR" property="operateScope" />
+    <result column="OPERATE_SCOPE_AND_FORM" jdbcType="VARCHAR" property="operateScopeAndForm" />
+    <result column="REG_ORG" jdbcType="VARCHAR" property="regOrg" />
+    <result column="ANCHE_YEAR" jdbcType="VARCHAR" property="ancheYear" />
+    <result column="ANCHE_DATE" jdbcType="VARCHAR" property="ancheDate" />
+    <result column="INDUSTRY_PHY_CODE" jdbcType="VARCHAR" property="industryPhyCode" />
+    <result column="INDUSTRY_PHY_NAME" jdbcType="VARCHAR" property="industryPhyName" />
+    <result column="INDUSTRY_CODE" jdbcType="VARCHAR" property="industryCode" />
+    <result column="INDUSTRY_NAME" jdbcType="VARCHAR" property="industryName" />
+    <result column="REC_CAP" jdbcType="DECIMAL" property="recCap" />
+    <result column="ORI_REG_NO" jdbcType="VARCHAR" property="oriRegNo" />
+    <result column="CREDIT_CODE" jdbcType="VARCHAR" property="creditCode" />
+    <result column="APPR_DATE" jdbcType="VARCHAR" property="apprDate" />
+    <result column="ORG_NO" jdbcType="VARCHAR" property="orgNo" />
+    <result column="USCI" jdbcType="VARCHAR" property="usci" />
+    <result column="REQ_CER_TM" jdbcType="VARCHAR" property="reqCerTm" />
+    <result column="REQ_CER_USER" jdbcType="VARCHAR" property="reqCerUser" />
+    <result column="CER_SUCCESS_TM" jdbcType="VARCHAR" property="cerSuccessTm" />
+    <result column="CER_NUM" jdbcType="DECIMAL" property="cerNum" />
+    <result column="CER_PRO_STAT" jdbcType="DECIMAL" property="cerProStat" />
+    <result column="CER_RES" jdbcType="DECIMAL" property="cerRes" />
+    <result column="ORG_AG_NAME" jdbcType="VARCHAR" property="orgAgName" />
+    <result column="ORG_AG_NATURE" jdbcType="DECIMAL" property="orgAgNature" />
+    <result column="ORG_AG_CAPITAL" jdbcType="DECIMAL" property="orgAgCapital" />
+    <result column="ORG_AG_BUS_LIC" jdbcType="VARCHAR" property="orgAgBusLic" />
+    <result column="ORG_AG_BUS_LICB" jdbcType="VARCHAR" property="orgAgBusLicb" />
+    <result column="ORG_AG_BUS_LICE" jdbcType="VARCHAR" property="orgAgBusLice" />
+    <result column="ORG_AG_LEGAL" jdbcType="VARCHAR" property="orgAgLegal" />
+    <result column="ORG_AG_REG_ADD" jdbcType="VARCHAR" property="orgAgRegAdd" />
+    <result column="ORG_AG_BUS_SCOPE" jdbcType="VARCHAR" property="orgAgBusScope" />
+    <result column="C_INCOM_TIME" jdbcType="VARCHAR" property="cIncomTime" />
+    <result column="AG_BUS_LICB" jdbcType="VARCHAR" property="agBusLicb" />
+    <result column="AG_BUS_LICE" jdbcType="VARCHAR" property="agBusLice" />
+    <result column="AG_UNIQ_NUM" jdbcType="VARCHAR" property="agUniqNum" />
+
+  </resultMap>
+  <select id="exportAgentcertifis" parameterType="map" resultMap="exportAgentCertifi">
+ <!--   <include refid="selectCertifi"/>-->/*重复导出*/
+  <include refid="selectCertifiDetails"/>
+  </select>
+ <!-- 单条对比 -->
+  <select id="queryAgentCerDetailsSingle" parameterType="map" resultType="map">
+    <!--<include refid="OracleDialectPrefix"/>-->
+    select agent_b.org_ag_name as ENTERPRISE_NAME,
+    to_char(agent_b.org_ag_nature) as ENTERPRISE_TYPE,
+    agent_b.org_ag_capital as REG_CAP,
+    agent_b.org_ag_bus_lic as ORG_AG_BUS_LIC,
+    agent_b.org_ag_bus_licb as OPEN_FROM,
+    agent_b.org_ag_bus_lice as OPEN_TO,
+    agent_b.org_ag_legal as FR_NAME,
+    agent_b.org_ag_reg_add as ADDRESS,
+    agent_b.org_ag_bus_scope as OPERATE_SCOPE,
+    agent_b.cer_success_tm as CER_SUCCESS_TM,
+    agent_b.cer_res as CER_RES,
+    agent_b.cer_num as CER_NUM
+    from a_agent_certification agent_b
+    where agent_b.id = #{map.id}
+    union all
+    select agent.req_ent_name,
+    agent.enterprise_type,
+    agent.reg_cap,
+    agent.credit_code,
+    agent.open_from,
+    agent.open_to,
+    agent.fr_name,
+    agent.address,
+    agent.operate_scope,
+    agent.cer_success_tm,
+    agent.cer_res,
+    agent.cer_num
+    from a_agent_certification agent
+    where agent.id = #{map.id}
+    <!--    <include refid="OracleDialectSuffix"/>-->
+
+  </select>
+
+  <select id="queryAgentCerDetailsSingleCount" parameterType="map" resultType="int">
+    select count(*) from(
+    select agent_b.org_ag_name,
+    to_char(agent_b.org_ag_nature),
+    agent_b.org_ag_capital,
+    agent_b.org_ag_bus_lic,
+    agent_b.org_ag_bus_licb,
+    agent_b.org_ag_bus_lice,
+    agent_b.org_ag_legal,
+    agent_b.org_ag_reg_add,
+    agent_b.org_ag_bus_scope,
+    agent_b.cer_success_tm
+    from a_agent_certification agent_b
+    where agent_b.id = #{map.id}
+        union
+    select agent.req_ent_name,
+    agent.enterprise_type,
+    agent.reg_cap,
+    agent.credit_code,
+    agent.open_to,
+    agent.open_to,
+    agent.fr_name,
+    agent.address,
+    agent.operate_scope,
+    agent.cer_success_tm
+    from a_agent_certification agent
+    where agent.id = #{map.id})
+  </select>
+
+  <sql id="selectCertifiDetails">
+    select * from(
+    select
+    AGENTCER.ID,
+    AGENTCER.AGENT_ID,
+    AGENTCER.REQ_REG_NO,
+    AGENTCER.REQ_ENT_NAME,
+    AGENTCER.IS_CACHE,
+    AGENTCER.ENTERPRISE_NAME,
+    AGENTCER.FR_NAME,
+    AGENTCER.REG_CAP,
+    AGENTCER.REG_CAP_CUR,
+    AGENTCER.ES_DATE,
+    AGENTCER.OPEN_FROM,
+    AGENTCER.OPEN_TO,
+    AGENTCER.ENTERPRISE_TYPE,
+    AGENTCER.ENTERPRISE_STATUS,
+    AGENTCER.CANCEL_DATE,
+    AGENTCER.REVOKE_DATE,
+    AGENTCER.ADDRESS,
+    AGENTCER.ABU_ITEM,
+    AGENTCER.CBU_ITEM,
+    AGENTCER.OPERATE_SCOPE,
+    AGENTCER.OPERATE_SCOPE_AND_FORM,
+    AGENTCER.REG_ORG,
+    AGENTCER.ANCHE_YEAR,
+    AGENTCER.ANCHE_DATE,
+    AGENTCER.INDUSTRY_PHY_CODE,
+    AGENTCER.INDUSTRY_PHY_NAME,
+    AGENTCER.INDUSTRY_CODE,
+    AGENTCER.INDUSTRY_NAME,
+    AGENTCER.REC_CAP,
+    AGENTCER.ORI_REG_NO,
+    AGENTCER.CREDIT_CODE,
+    AGENTCER.APPR_DATE,
+    AGENTCER.ORG_NO,
+    AGENTCER.USCI,
+    AGENTCER.REQ_CER_TM,
+    AGENTCER.REQ_CER_USER,
+    AGENTCER.CER_SUCCESS_TM,
+    AGENTCER.CER_NUM,
+    AGENTCER.CER_PRO_STAT,
+    AGENTCER.CER_RES,
+    AGENTCER.ORG_AG_NAME,
+    AGENTCER.ORG_AG_NATURE,
+    AGENTCER.ORG_AG_CAPITAL,
+    AGENTCER.ORG_AG_BUS_LIC,
+    AGENTCER.ORG_AG_BUS_LICB,
+    AGENTCER.ORG_AG_BUS_LICE,
+    AGENTCER.ORG_AG_LEGAL,
+    AGENTCER.ORG_AG_REG_ADD,
+    AGENTCER.ORG_AG_BUS_SCOPE,
+    AGENT.C_INCOM_TIME,
+    AGENT.AG_NAME,
+    AGENT.AG_BUS_LICB,
+    AGENT.AG_BUS_LICE,
+    AGENT.AG_UNIQ_NUM,
+    AGENT.AG_BUS_LIC
+    from (select t.ID,
+    t.AGENT_ID,
+    t.REQ_REG_NO,
+    t.REQ_ENT_NAME,
+    t.IS_CACHE,
+    t.ENTERPRISE_NAME,
+    t.FR_NAME,
+    t.REG_CAP,
+    t.REG_CAP_CUR,
+    t.ES_DATE,
+    t.OPEN_FROM,
+    t.OPEN_TO,
+    t.ENTERPRISE_TYPE,
+    t.ENTERPRISE_STATUS,
+    t.CANCEL_DATE,
+    t.REVOKE_DATE,
+    t.ADDRESS,
+    t.ABU_ITEM,
+    t.CBU_ITEM,
+    t.OPERATE_SCOPE,
+    t.OPERATE_SCOPE_AND_FORM,
+    t.REG_ORG,
+    t.ANCHE_YEAR,
+    t.ANCHE_DATE,
+    t.INDUSTRY_PHY_CODE,
+    t.INDUSTRY_PHY_NAME,
+    t.INDUSTRY_CODE,
+    t.INDUSTRY_NAME,
+    t.REC_CAP,
+    t.ORI_REG_NO,
+    t.CREDIT_CODE,
+    t.APPR_DATE,
+    t.ORG_NO,
+    t.USCI,
+    t.REQ_CER_TM,
+    t.REQ_CER_USER,
+    t.CER_SUCCESS_TM,
+    t.CER_NUM,
+    t.CER_PRO_STAT,
+    t.CER_RES,
+    t.ORG_AG_NAME,
+    t.ORG_AG_NATURE,
+    t.ORG_AG_CAPITAL,
+    t.ORG_AG_BUS_LIC,
+    t.ORG_AG_BUS_LICB,
+    t.ORG_AG_BUS_LICE,
+    t.ORG_AG_LEGAL,
+    t.ORG_AG_REG_ADD,
+    t.ORG_AG_BUS_SCOPE,
+    row_number() OVER(PARTITION BY t.agent_id ORDER BY t.agent_id, t.req_cer_tm desc) as row_flg
+    from a_agent_certification t) AGENTCER,a_agent AGENT
+    where AGENTCER.row_flg = '1' and
+    AGENTCER.AGENT_ID = AGENT.AG_UNIQ_NUM
+    <if test="map.agBusLic!=null and map.agBusLic!=''">
+      AND AGENT.AG_BUS_LIC = #{map.agBusLic}
+    </if>
+    <if test="map.agUniqNum!=null and map.agUniqNum!=''">
+      AND AGENT.AG_UNIQ_NUM = #{map.agUniqNum}
+    </if>
+    <if test="map.agName!=null and map.agName!=''">
+      AND AGENT.AG_NAME = #{map.agName}
+    </if>
+    <if test="map.time!=null and map.time!=''">
+      AND to_char(AGENT.C_INCOM_TIME,'YYYY-MM-dd')=#{map.time}
+    </if>
+    <if test="map.caStatus!=null and map.caStatus!=''">
+      AND AGENT.CA_STATUS = #{map.caStatus}
+    </if>
+    <if test="map.agBusLicb!=null and map.agBusLicb!=''">
+      AND to_char( AGENT.AG_BUS_LICB,'YYYY-MM-dd')=#{map.agBusLicb}
+    </if>
+    <if test="map.agBusLice!=null and map.agBusLice!=''">
+      AND to_char(AGENT.AG_BUS_LICE,'YYYY-MM-dd')=#{map.agBusLice}
+    </if>)  a order by a.req_cer_tm desc
+  </sql>
+
+  <select id="queryMaxIdByAgentid" parameterType="map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from (select t.*,
+               row_number() OVER(PARTITION BY t.agent_id ORDER BY t.agent_id, t.req_cer_tm desc) as row_flg
+          from a_agent_certification t) AGENTCER
+          where AGENTCER.row_flg = '1'
+     and AGENTCER.CER_PRO_STAT = '2'
+    <if test="map.agentId!=null and map.agentId!=''">
+      and AGENTCER.Agent_Id = #{map.agentId}
+    </if>
+
+  </select>
+
+  <select id="queryCers" resultType="map" resultMap="BaseResultMap">
+
+    select
+    <include refid="Base_Column_List" />
+    from a_agent_certification AGENTCER
+    where (AGENTCER.CER_PRO_STAT = '0' or AGENTCER.CER_PRO_STAT = '1')
+    <if test="map.id!=null and map.id!=''">
+      and AGENTCER.Agent_Id = #{map.id}
+    </if>
+
+  </select>
+</mapper>

@@ -10,8 +10,9 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.*;
 import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +27,7 @@ import java.util.Map;
 @Service("rdbTermMachineServiceImpl")
 public class RDBPosTermMachineServiceImpl implements TermMachineService {
 
-    private static final String RDB_SUCESS_RESPCODE = "0000";//000000-成功，000002-系统报错，000003-缺失参数，000004-其他, 100000-失败
+    private static Logger logger = LoggerFactory.getLogger(RDBPosTermMachineServiceImpl.class);
 
     /**
      * 获取瑞大宝 相关数据具体操作
@@ -47,7 +48,7 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
         }
 
         JSONObject res = request(reqMap, AppConfig.getProperty("rdbpos.queryTermActive"));
-        if(null!=res && RDB_SUCESS_RESPCODE.equals(res.getString("code"))){
+        if(null!=res && "0000".equals(res.getString("code"))){
 
             JSONArray data = res.getJSONObject("result").getJSONArray("termPolicyList");
             List<TermMachineVo> resData = new ArrayList<TermMachineVo>();
@@ -69,7 +70,7 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
     }
 
     /**
-     * 调用瑞大宝 接口获取活动相关数据
+     * 瑞大宝活动调整
      * @param data
      * @param url
      * @return
@@ -109,9 +110,74 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
         return null;
     }
 
+    /**
+     * 机具调整
+     * @param adjustmentMachineVo
+     * @return
+     * @throws Exception
+     */
     @Override
     public AgentResult adjustmentMachine(AdjustmentMachineVo adjustmentMachineVo) throws Exception {
-        return null;
+
+        AgentResult agentResult = new AgentResult();
+        Map<String, Object> reqMap = adjustmentMachineVo.getParamMap();
+
+        try {
+            String json = JsonUtil.objectToJson(reqMap);
+            logger.info("RDB退货下发请求参数:" + json);
+            String respResult = HttpClientUtil.doPostJsonWithException(AppConfig.getProperty("rdbpos.returnOfGoods"), json);
+
+            if (!StringUtils.isNotBlank(respResult)) {
+                agentResult.setStatus(2);
+                agentResult.setMsg("RDB退货下发接口返回空！");
+                return agentResult;
+            }
+            logger.info("RDB退货下发返回参数:" + respResult);
+
+            JSONObject respJson = JSONObject.parseObject(respResult);
+            if (!(null != respJson.getString("code") && null != respJson.getString("success") && respJson.getString("code").equals("0000") && respJson.getBoolean("success"))) {
+                agentResult.setStatus(2);
+                agentResult.setMsg(null != respJson.getString("msg") ? respJson.getString("msg") : "RDB退货下发接口返回值异常！请联系管理员！");
+                return agentResult;
+            }
+
+            //发送成功，查询结果
+            try {
+                String retJson = JSONObject.toJSONString(FastMap.fastMap("taskId", reqMap.get("taskId")));
+                logger.info("RDB退货查询下发参数:" + retJson);
+                String retString = HttpClientUtil.doPostJsonWithException(AppConfig.getProperty("rdbpos.checkTermResult"), retJson);
+                if (!StringUtils.isNotBlank(retString)) {
+                    agentResult.setStatus(2);
+                    agentResult.setMsg("RDB退货下发查询接口返回空！");
+                    return agentResult;
+                }
+
+                JSONObject resJson = JSONObject.parseObject(retString);
+                logger.info("RDB退货下发查询接口返回值:" + retString);
+                if (null != resJson.getString("code") && resJson.getString("code").equals("0000") && null != resJson.getBoolean("success") && resJson.getBoolean("success")) {
+                    //处理成功
+                    agentResult.setStatus(1);
+                    agentResult.setMsg("联动成功");
+                    return agentResult;
+                } else if (null != resJson.getString("code") && resJson.getString("code").equals("2001") && null != resJson.getBoolean("success") && !resJson.getBoolean("success")) {
+                    //处理中
+                    agentResult.setStatus(0);
+                    agentResult.setMsg("RDB退货下发，处理中");
+                    return agentResult;
+                } else if (null != resJson.getString("code") && resJson.getString("code").equals("9999") && null != resJson.getBoolean("success") && !resJson.getBoolean("success") && null !=  resJson.getString("msg")) {
+                    //处理失败
+                    agentResult.setStatus(2);
+                    agentResult.setMsg(resJson.getString("result"));
+                    return agentResult;
+                } else {
+                    throw new Exception("瑞大宝，查询下发接口，返回值不符合要求，请联系管理员！");
+                }
+            } catch (Exception e) {
+                throw e;
+            }
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     @Override

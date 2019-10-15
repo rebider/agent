@@ -639,6 +639,7 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                 throw new ProcessException("业务平台不存在");
             }
             if(PlatformType.whetherPOS(platForm.getPlatformType())){
+                reqMap.put("agentVo",agentVo);
                 result = agentHttpPosServiceImpl.agencyLevelCheck(reqMap);
             }else if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
                 result = agentHttpMposServiceImpl.agencyLevelCheck(reqMap);

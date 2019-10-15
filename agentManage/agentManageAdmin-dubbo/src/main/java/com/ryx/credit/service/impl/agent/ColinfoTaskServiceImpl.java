@@ -112,6 +112,7 @@ public class ColinfoTaskServiceImpl implements ColinfoTaskService {
                 AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
                 AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
                 criteria.andAgentIdEqualTo(String.valueOf(row.get("AGENT_ID")));
+                criteria.andCloReviewStatusEqualTo(AgStatus.Approved.status);
                 List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
                 if(agentBusInfos==null){
                     log.info("synColinfoToPayment,未分配打款公司,暂不出款");

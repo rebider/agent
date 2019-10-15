@@ -461,7 +461,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     //瑞大宝订单，默认-->定时调度
                     OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
                     logistics_send.setSendStatus(LogisticsSendStatus.none_send.code);
-                    logistics_send.setSendMsg("瑞大宝业务平台");
+                    logistics_send.setSendMsg("");
                     if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
                         logger.info("瑞大宝物流更新失败,Exception失败{}",JSONObject.toJSONString(oLogistics));
                     }
@@ -1311,17 +1311,55 @@ public class OLogisticServiceImpl implements OLogisticsService {
             logger.info("物流下发发货数量不匹配");
             return AgentResult.fail("物流下发发货数量不匹配");
         }
-        if (!logistics.getProType().equals(PlatformType.MPOS.msg) && !logistics.getProType().equals(PlatformType.MPOS.code)){
+
+        OOrder oOrder = oOrderMapper.selectByPrimaryKey(logistics.getOrderId());
+        if (null==oOrder) throw new MessageException("查询订单数据失败！");
+        PlatForm platForm = platFormMapper.selectByPlatFormNum(oOrder.getOrderPlatform());
+
+        if (platForm.getPlatformType().equals(PlatformType.RDBPOS.code)) {
+            //新增瑞大宝平台重新下发
+            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oOrder.getBusId());
+            if (null==agentBusInfo) throw new MessageException("查询业务数据失败！");
+
+            try {
+                //删除物流明细
+                OLogisticsDetail oLogisticsDetail = new OLogisticsDetail();
+                oLogisticsDetail.setSendStatus(LogisticsDetailSendStatus.none_send.code);
+                oLogisticsDetail.setStatus(Status.STATUS_1.status);
+                oLogisticsDetail.setLogisticsId(logistics.getId());
+                oLogisticsDetail.setSbusMsg("");
+                int deleteInt = logistics.getSendNum().compareTo(BigDecimal.valueOf(oLogisticsDetailMapper.updateByLogisticsId(oLogisticsDetail)));
+                if (deleteInt != 0) {
+                    logger.info("瑞大宝更新物流异常，物流明细和物流发送数量不同。");
+                    throw new Exception("瑞大宝更新物流异常，物流明细和物流发送数量不同。");
+                }
+                //更新物流
+                OLogistics updateLogistics = new OLogistics();
+                updateLogistics.setId(logistics.getId());
+                updateLogistics.setSendStatus(LogisticsSendStatus.gen_detail_sucess.code);
+                updateLogistics.setSendMsg("");
+                updateLogistics.setVersion(logistics.getVersion());//暂时用不到乐观锁，但是要传进去
+                if (1 != oLogisticsMapper.updateByPrimaryKeySelective(updateLogistics)) {
+                    logger.info("发货物流，重新发送，更新数据库失败:{},{},{}", logistics.getId(), logistics.getSnBeginNum(), logistics.getSnEndNum());
+                    throw new Exception("瑞大宝更新物流状态发生异常！！！");
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+                logistics.setSendMsg("下发异常");
+                logistics.setSendStatus(Status.STATUS_2.status);
+                if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
+                    logger.info("RDB下发物流更新失败Exception{}",JSONObject.toJSONString(logistics));
+                }
+                return AgentResult.fail(e.getLocalizedMessage());
+            }
+            return AgentResult.ok();
+        } else if (!logistics.getProType().equals(PlatformType.MPOS.msg) && !logistics.getProType().equals(PlatformType.MPOS.code)){
             List<String> ids = new ArrayList<>();
             for (OLogisticsDetail listDetail : listDetails) {
                 ids.add(listDetail.getSnNum());
             }
             OLogisticsDetail detail = listDetails.get(0);
             ImsTermWarehouseDetail imsTermWarehouseDetail = new ImsTermWarehouseDetail();
-            OOrder oOrder = oOrderMapper.selectByPrimaryKey(logistics.getOrderId());
-            if (null==oOrder) {
-                throw new MessageException("查询订单数据失败！");
-            }
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oOrder.getBusId());
             if (null==agentBusInfo) {
                 throw new MessageException("查询业务数据失败！");
@@ -1368,7 +1406,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
             }
             //首刷下发业务系统
         }else{
-            OOrder oOrder = oOrderMapper.selectByPrimaryKey(logistics.getOrderId());
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oOrder.getBusId());
             //起始sn
             OLogisticsDetailExample exampleOLogisticsDetailExamplestart = new OLogisticsDetailExample();
