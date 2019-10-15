@@ -164,10 +164,18 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
 
     @Override
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
-    public AgentResult processData(Agent agent,String id,String orgId) {
-        agent = agentMapper.selectByAgent(agent);
+    public AgentResult processData(Agent orgagent,String id,String orgId) {
+        Agent agent = agentMapper.selectByAgent(orgagent);
         AgentCertification agentCertification = agentCertificationMapper.selectByPrimaryKey(id);
-        if(agent==null)return AgentResult.fail("工商认证代理商未找到"+agent.getId());
+        if(agent==null){
+            orgagent.setCaStatus(Status.STATUS_0.status);
+            agentCertification.setCerProStat(Status.STATUS_2.status);
+            agentCertification.setCerRes(Status.STATUS_0.status);
+            if(1==agentMapper.updateByPrimaryKeySelective(orgagent) && 1 == agentCertificationMapper.updateByPrimaryKeySelective(agentCertification)){
+                logger.info("认证代理商不存在，认证代理商{}状态为{},不进行信息同步",orgagent.getAgUniqNum(),orgagent.getCaStatus());
+            }
+            return new AgentResult(404,"工商认证代理商未找到"+agent.getId(),"");
+        }
         agentCertification = copyOrgAgentToCertifi(agent,agentCertification);
         agentCertification.setOrgCerId(orgId);
         //处理代理名称去掉前缀和括号后的信息
@@ -176,18 +184,18 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
         agname = agname.replaceAll("[A-Z]|\\(*\\)","");
         logger.info("后台任务进行工商认证|{}|替换后名称|{}",agent.getId(),agname);
         AgentResult agentResult = businessCAService.agentBusinessCA(agname, "0");
-        JSONObject dataObj = (JSONObject)agentResult.getData();
-        if ("1".equals((String) dataObj.getString("isTest"))){
-            agent.setCaStatus(Status.STATUS_2.status);
-            agentCertification.setCerProStat(Status.STATUS_2.status);//认证流程状态:0-未处理,1-处理中,2-处理成功,3-处理失败;
-            agentCertification.setCerRes(new BigDecimal(2));//测试环境不认证
-            if(1==agentMapper.updateByPrimaryKeySelective(agent) && 1 == agentCertificationMapper.updateByPrimaryKeySelective(saveAgentCertification(dataObj,agentCertification))){
-                logger.info("测试环境不认证，认证代理商{}状态为{},不进行信息同步",agent.getAgUniqNum(),agent.getCaStatus());
-            }
-            return AgentResult.ok(dataObj);
-        }
-
+        logger.info("接口返回"+agentResult.getData());
         if(agentResult.isOK()||(405==agentResult.getStatus())){
+            JSONObject dataObj = (JSONObject)agentResult.getData();
+            if ("1".equals((String) dataObj.getString("isTest"))){
+                agent.setCaStatus(Status.STATUS_2.status);
+                agentCertification.setCerProStat(Status.STATUS_2.status);//认证流程状态:0-未处理,1-处理中,2-处理成功,3-处理失败;
+                agentCertification.setCerRes(new BigDecimal(2));//测试环境不认证
+                if(1==agentMapper.updateByPrimaryKeySelective(agent) && 1 == agentCertificationMapper.updateByPrimaryKeySelective(saveAgentCertification(dataObj,agentCertification))){
+                    logger.info("测试环境不认证，认证代理商{}状态为{},不进行信息同步",agent.getAgUniqNum(),agent.getCaStatus());
+                }
+                return AgentResult.ok(dataObj);
+            }
             if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("enterpriseStatus")) && dataObj.getString("enterpriseStatus").startsWith("在营")){
             //更新代理商信息
             if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("regCap")))
@@ -201,10 +209,14 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
             }else if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("openTo"))){
                 agent.setAgBusLice(DateUtil.format(dataObj.getString("openTo"),"yyyy-MM-dd"));
             }
-            agent.setAgLegal(dataObj.getString("frName"));//法人姓名
-            agent.setAgRegAdd(dataObj.getString("address"));//注册地址
+            if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("frName")))
+                agent.setAgLegal(dataObj.getString("frName"));//法人姓名
+            if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("address")))
+                agent.setAgRegAdd(dataObj.getString("address"));//注册地址
+            if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("operateScope")))
             agent.setAgBusScope(dataObj.getString("operateScope"));//经营范围
-            agent.setAgBusLic(dataObj.getString("creditCode"));//营业执照
+                if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("creditCode")))
+                    agent.setAgBusLic(dataObj.getString("creditCode"));//营业执照
             //如果负责人没有，采用工商认证后的法人
             if(StringUtils.isBlank(agent.getAgHead())){
                 agent.setAgHead(agent.getAgLegal());
@@ -232,6 +244,7 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
             //工商认证失败
             agent.setCaStatus(Status.STATUS_2.status);
             agentCertification.setCerProStat(Status.STATUS_3.status);
+            agentCertification.setCerRes(Status.STATUS_2.status);
             if(1==agentMapper.updateByPrimaryKeySelective(agent) && 1 == agentCertificationMapper.updateByPrimaryKeySelective(agentCertification)){
                 logger.info("工商认证失败"+agent.getId());
             }
