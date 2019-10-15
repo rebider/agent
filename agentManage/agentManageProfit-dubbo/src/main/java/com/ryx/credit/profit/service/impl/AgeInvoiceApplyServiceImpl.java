@@ -165,11 +165,17 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                             int index = remark.indexOf(" ", flag);
                             if (flag != -1) {
                                 if (kBank > flag) {
-                                    invoiceApply.setInvoiceCompany(remark.substring(flag + 7, kBank));
-                                } else if (index > flag) {
-                                    invoiceApply.setInvoiceCompany(remark.substring(flag + 7, index));
+                                    String rs = remark.substring(flag + 7, kBank).trim();
+                                    int rsFlag = rs.indexOf("<br/>");
+                                    if(rsFlag != -1){
+                                        invoiceApply.setInvoiceCompany(rs.substring(0,rs.indexOf("<br/>")));
+                                    }else{
+                                        invoiceApply.setInvoiceCompany(rs);
+                                    }
+                                } else if (index != -1 && index > flag) {
+                                    invoiceApply.setInvoiceCompany(remark.substring(flag + 7, index).trim());
                                 } else {
-                                    invoiceApply.setInvoiceCompany(remark.substring(flag + 7));
+                                    invoiceApply.setInvoiceCompany(remark.substring(flag + 7).trim());
                                 }
                                 invoiceApply.setSallerName(map.get("sallerName").toString());
                                 invoiceApply.setRemark(remark);
@@ -183,11 +189,11 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                         }
 
                         //获取该发票税率及商品名称
-                            List<Map<String,Object>> items = (List<Map<String, Object>>) result.get("items");
-                            if(items.size() > 0){
-                                invoiceApply.setTax(new BigDecimal(items.get(0).get("taxRate").toString()));
-                                invoiceApply.setInvoiceItem(items.get(0).get("goodsName").toString());
-                            }
+                        List<Map<String,Object>> items = (List<Map<String, Object>>) result.get("items");
+                        if(items.size() > 0){
+                            invoiceApply.setTax(new BigDecimal(items.get(0).get("taxRate").toString()));
+                            invoiceApply.setInvoiceItem(items.get(0).get("goodsName").toString());
+                        }
                     }
 
                     //判断发票类型

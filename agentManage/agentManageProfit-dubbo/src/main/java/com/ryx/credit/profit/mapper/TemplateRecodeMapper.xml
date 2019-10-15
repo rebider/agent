@@ -289,11 +289,12 @@
 <!--***********************************以上为自动生成代码**********************************************-->
 
   <select id="getAgentInfoByBusNum" resultType="java.util.Map" parameterType="java.lang.String">
-    select ab.AGENT_ID,aa.AG_NAME,ab.BUS_PLATFORM,ap.PLATFORM_NAME
+    select ab.AGENT_ID,aa.AG_NAME,ab.BUS_PLATFORM,ap.PLATFORM_NAME,ap.PLATFORM_TYPE
     from A_AGENT_BUSINFO ab
-    left join A_AGENT aa on ab.AGENT_ID = aa.ID
-    left join A_PLATFORM ap on ab.BUS_PLATFORM = ap.PLATFORM_NUM
-    where ab.BUS_NUM = #{busNum}
+    inner join A_AGENT aa on ab.AGENT_ID = aa.ID
+    inner join A_PLATFORM ap on ab.BUS_PLATFORM = ap.PLATFORM_NUM
+    where ab.status=1 and ab.bus_status=1 and CLO_REVIEW_STATUS = 3
+      and ab.BUS_NUM = #{busNum}
   </select>
 
 
