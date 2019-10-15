@@ -176,11 +176,11 @@
     <job:dataflow id="removeAccount"
                   job-ref="removeAccountJob"
                   registry-center-ref="regCenter"
-                  cron="0 0 10 * * ?"
+                  cron="0 0/5 * * * ?"
                   sharding-total-count="1"
                   sharding-item-parameters="0=C"
                   streaming-process="true"
-                  description="定时更新销账信息 每10分钟更新一次 单节点"
+                  description="定时更新销账信息 每5分钟更新一次 单节点"
                   overwrite="true"
                   disabled="false"/>
 

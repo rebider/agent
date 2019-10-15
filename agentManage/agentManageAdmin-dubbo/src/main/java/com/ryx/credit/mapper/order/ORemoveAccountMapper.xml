@@ -352,7 +352,7 @@
     select ra.id,ra.BATCH_NUM,to_char(ra.RMONTH,'yyyy-mm') as omonth,ra.SUBMIT_TIME,
     ag.AG_UNIQ_NUM,ra.ag_name,ra.bus_num,plat.PLATFORM_NAME,a.* ,
     ra.ramount,ra.pay_method,ra.submit_person,ra.rstatus,ra.remark,
-    ra.FINISH_TIME ,at.att_name
+    ra.FINISH_TIME ,at.att_name,at.ATT_DBPATH,at.id as asId
     from O_REMOVE_ACCOUNT ra left join
     ( select
     o_payment_detail.src_id,o_payment_detail.src_type
@@ -367,7 +367,7 @@
     select ra.id,ra.BATCH_NUM,to_char(ra.RMONTH,'yyyy-mm') as omonth,ra.SUBMIT_TIME,
     ag.AG_UNIQ_NUM,ra.ag_name,ra.bus_num,plat.PLATFORM_NAME,a.* ,
     ra.ramount,ra.pay_method,ra.submit_person,ra.rstatus,ra.remark,
-    ra.FINISH_TIME ,at.att_name
+    ra.FINISH_TIME ,at.att_name,at.ATT_DBPATH,at.id as asId
     from O_REMOVE_ACCOUNT ra left join
     ( select
     o_payment_detail.src_id,o_payment_detail.src_type
