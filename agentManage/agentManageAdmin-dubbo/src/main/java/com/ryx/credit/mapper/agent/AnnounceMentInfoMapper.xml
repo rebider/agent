@@ -331,6 +331,7 @@
       </if>
       </trim>
       </where>
+      order by a.create_tm desc
       <include refid="OracleDialectSuffix"/>
   </select>
 
@@ -424,6 +425,7 @@
                 and a.pub_org = #{map.pubOrg}
             </if>
         </where>
+        order by a.create_tm desc
         <include refid="OracleDialectSuffix"/>
     </select>
     <select id="selectCountAnnMaintain" parameterType="map" resultType="int">
