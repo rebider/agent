@@ -115,6 +115,7 @@ public enum TabId {
     O_INTERNET_RENEW_OFF_D("OIROD%s%015d"),
     A_ANNOUNCEMENT_INFO("AN%s%015d"),
     A_ANNO_PLATFORM_RELA("AR%s%015d"),
+    A_ANNOUNCEMENT_READ_INFO("AV%s%015d"),
     a_agent_certification("AC%s%015d");
 
     public String patt;
