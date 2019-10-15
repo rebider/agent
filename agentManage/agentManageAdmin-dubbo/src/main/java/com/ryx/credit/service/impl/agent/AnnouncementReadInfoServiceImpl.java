@@ -39,7 +39,7 @@ public class AnnouncementReadInfoServiceImpl implements AnnouncementReadInfoServ
 
     @Override
     public AnnouncementReadInfo queryByRecord(AnnouncementReadInfo announcementReadInfo) {
-        AnnouncementReadInfo announcementReadInfo1 = announcementReadInfoMapper.queryByRecord(announcementReadInfo);
+        AnnouncementReadInfo announcementReadInfo1 = announcementReadInfoMapper.selectByRecord(announcementReadInfo);
         return announcementReadInfo1;
     }
 
