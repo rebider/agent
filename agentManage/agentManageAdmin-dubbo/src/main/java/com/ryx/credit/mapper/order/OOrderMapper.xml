@@ -1405,6 +1405,9 @@
       <if test="agentId !=null and agentId !='' ">
         and  a_agent_businfo.agent_id =#{agentId}
       </if>
+      <if test="busNum !=null and busNum !='' ">
+       and  a_agent_businfo.bus_num =#{busNum}
+      </if>
       order by o_order.agent_id,  a.omonth desc
   </select>
 

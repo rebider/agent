@@ -72,4 +72,6 @@ public interface OPaymentDetailMapper {
 
     List<OPaymentDetail> selectCount(@Param("orderId")String orderId, @Param("paymentType")String paymentType, @Param("paymentStatus")BigDecimal paymentStatus);
 
+    List<OPaymentDetail> selectOPaymentDetail(Map map);
+
 }

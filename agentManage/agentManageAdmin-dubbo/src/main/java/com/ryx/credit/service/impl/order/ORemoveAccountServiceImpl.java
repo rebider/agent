@@ -257,6 +257,9 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                     if (StringUtils.isNotBlank(oRemoveAccount_item.getBusPlatform())) {
                         map.put("busPlatform", oRemoveAccount_item.getBusPlatform());
                     }
+                    if (StringUtils.isNotBlank(oRemoveAccount_item.getBusNum())) {
+                        map.put("busNum", oRemoveAccount_item.getBusNum());
+                    }
                     try {
                         BigDecimal outstandingAmount = new BigDecimal(0);
                         List<Map> orderList = oOrderMapper.arrearageQuery(map);
@@ -277,10 +280,15 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                 }
                                 Map mapItem = orderList.get(i);
                                 //根据agentId和oId查询付款单的明细
-                                OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
-                                OPaymentDetailExample.Criteria criteria = oPaymentDetailExample.createCriteria().andAgentIdEqualTo(String.valueOf(mapItem.get("AGENT_ID")))
-                                        .andOrderIdEqualTo(String.valueOf(mapItem.get("OID"))).andStatusEqualTo(Status.STATUS_1.status).andPaymentStatusEqualTo(Status.STATUS_1.status);
-                                List<OPaymentDetail> oPaymentDetailList = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
+                                HashMap<Object, Object> hashMap = new HashMap<>();
+                                hashMap.put("orderId",String.valueOf(mapItem.get("OID")));
+                                hashMap.put("agentId",String.valueOf(mapItem.get("AGENT_ID")));
+                                if(null!=oRemoveAccount_item.getRmonth()){
+                                    Date rmonth = oRemoveAccount_item.getRmonth();
+                                    String format = simpleDateFormat.format(rmonth);
+                                    hashMap.put("omonth",format);
+                                }
+                                List<OPaymentDetail> oPaymentDetailList = oPaymentDetailMapper.selectOPaymentDetail(hashMap);
                                 if (null != oPaymentDetailList && oPaymentDetailList.size() > 0) {
                                     for (OPaymentDetail oPaymentDetail : oPaymentDetailList) {
                                         oPaymentDetail = oPaymentDetailMapper.selectByPrimaryKey(oPaymentDetail.getId());
