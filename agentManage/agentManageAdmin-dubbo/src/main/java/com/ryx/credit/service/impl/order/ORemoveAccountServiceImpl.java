@@ -349,11 +349,11 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                             logger.info("付款单修改失败");
                                             throw new MessageException("付款单修改失败");
                                         }
-                                        if (residue.compareTo(oPayment.getOutstandingAmount()) == 1) {
+                                        if (residueFlag.compareTo(oPayment.getOutstandingAmount()) == 1) {
                                             //如果销账金额大于欠款金额
 //                                            logger.info("销账金额大于欠款金额");
 //                                            throw new MessageException("销账金额大于欠款金额");
-                                        } else if (residue.compareTo(oPayment.getOutstandingAmount()) == 0) {
+                                        } else if (residueFlag.compareTo(oPayment.getOutstandingAmount()) == 0) {
                                             //销账金额等于欠款金额
                                             if (null != countMap || countMap.size() > 0) {
                                                 for (OPaymentDetail paymentDetail : countMap) {
@@ -380,7 +380,7 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                             if (count.compareTo(new BigDecimal(0)) == 0) {
                                                 //如果就剩本条待付款  没有结清则新生成一条数据
                                                 BigDecimal amount = oPaymentDetail.getPayAmount();//这个是订单需补款金额
-                                                if (residue.compareTo(amount) == -1 ) {
+                                                if (residueFlag.compareTo(amount) == -1 ) {
                                                     //如果销账金额的剩余小于需补款金额  则新生成一条付款明细
                                                     OPaymentDetail oPaymentDetail_new  = new OPaymentDetail();
                                                     Date planPayTime = oPaymentDetail.getPlanPayTime();
@@ -410,7 +410,7 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                                         throw new MessageException("重新生成新数据失败");
                                                     }
 
-                                                } else if (residue.compareTo(amount) == 0) {
+                                                } else if (residueFlag.compareTo(amount) == 0) {
                                                     //否则是相等的  则进行更新
                                                     oPaymentDetail.setPayAmount(residue);
                                                     if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
