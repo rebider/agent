@@ -3791,14 +3791,14 @@ public class OrderServiceImpl implements OrderService {
                     throw new MessageException("填写的金额不能大于机具欠款金额,代理商为:"+agName+",机具金额:"+machinesAmount);
                 }
                 removeAccount.setId(idService.genId(TabId.O_REMOVE_ACCOUNT));
-                removeAccount.setAgId(String.valueOf(map.get("agId")));
+                removeAccount.setAgId(String.valueOf(map.get("agId")).equals("null")?"":String.valueOf(map.get("agId")));
                 String rmonth = String.valueOf(map.get("rmonth"));
                 if (StringUtils.isNotBlank(rmonth)){
                     removeAccount.setRmonth(format.parse(rmonth));
                 }
                 removeAccount.setAgName(agName);
-                removeAccount.setBusNum(String.valueOf(map.get("busNum")));
-                removeAccount.setBusPlatform(String.valueOf(map.get("busPlatform")));
+                removeAccount.setBusNum(String.valueOf(map.get("busNum")).equals("null")?"":String.valueOf(map.get("busNum")));
+                removeAccount.setBusPlatform(String.valueOf(map.get("busPlatform")).equals("null")?"":String.valueOf(map.get("busPlatform")));
                 removeAccount.setRamount(new BigDecimal(ramount));
                 removeAccount.setMachinesAmount(new BigDecimal(machinesAmount));
                 removeAccount.setRstatus(RemoveAccountStatus.WCL.code);

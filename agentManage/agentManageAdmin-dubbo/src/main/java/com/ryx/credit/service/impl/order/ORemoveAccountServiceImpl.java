@@ -96,23 +96,23 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
         Calendar d = Calendar.getInstance();
         for (List<Object> objectList : list) {
             int j=i++;
-            if (StringUtils.isBlank(String.valueOf(objectList.get(0)))) {
+            if (StringUtils.isBlank(String.valueOf(objectList.get(0))) && !String.valueOf(objectList.get(0)).equals("null")) {
                 logger.info("代理商唯一码为空:{}", String.valueOf(objectList.get(0)));
                 throw new MessageException("请填写第"+j+"行数据的代理商唯一码");
             }
-            if (StringUtils.isBlank(String.valueOf(objectList.get(1)))) {
+            if (StringUtils.isBlank(String.valueOf(objectList.get(1))) && !String.valueOf(objectList.get(1)).equals("null")) {
                 logger.info("业务平台号为空:{}", String.valueOf(objectList.get(1)));
                 throw new MessageException("请填写第"+j+"行数据的业务平台号");
             }
-            if (StringUtils.isBlank(String.valueOf(objectList.get(2)))) {
+            if (StringUtils.isBlank(String.valueOf(objectList.get(2)))&& !String.valueOf(objectList.get(2)).equals("null")) {
                 logger.info("业务平台为空:{}", String.valueOf(objectList.get(2)));
                 throw new MessageException("请填写第"+j+"行数据的业务平台");
             }
-            if (StringUtils.isBlank(String.valueOf(objectList.get(3)))) {
+            if (StringUtils.isBlank(String.valueOf(objectList.get(3))) && !String.valueOf(objectList.get(3)).equals("null")) {
                 logger.info("销账类型为空:{}", String.valueOf(objectList.get(3)));
                 throw new MessageException("请填写第"+j+"行数据的销账类型");
             }
-            if (StringUtils.isBlank(String.valueOf(objectList.get(4)))) {
+            if (StringUtils.isBlank(String.valueOf(objectList.get(4)))&& !String.valueOf(objectList.get(4)).equals("null")) {
                 logger.info("销账金额为空:{}", String.valueOf(objectList.get(4)));
                 throw new MessageException("请填写第"+j+"行数据的销账金额");
             }
