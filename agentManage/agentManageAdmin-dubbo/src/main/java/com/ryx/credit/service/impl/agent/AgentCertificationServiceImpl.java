@@ -1,9 +1,8 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.enumc.DictGroup;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.FastMap;
@@ -15,6 +14,7 @@ import com.ryx.credit.dao.agent.AgentCertificationMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentCertifiVo;
+import com.ryx.credit.pojo.admin.vo.AgentFreezePort;
 import com.ryx.credit.service.IResourceService;
 import com.ryx.credit.service.agent.AgentCertificationService;
 import com.ryx.credit.service.agent.BusinessCAService;
@@ -49,7 +49,7 @@ import java.util.Map;
  * @create: 2019-09-18 13:34
  **/
 @Service("agentCertificationService")
-public class AgentCertificationServiceImpl implements AgentCertificationService {
+public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implements AgentCertificationService {
     private static Logger logger = LoggerFactory.getLogger(AgentCertificationServiceImpl.class);
     @Autowired
     private AgentCertificationMapper agentCertificationMapper;
@@ -76,7 +76,7 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
-    public AgentResult addAgentCertifis(List<Agent> agents) {
+    public AgentResult addAgentCertifis(List<Agent> agents,Long userId) {
         logger.info("添加待认证代理商信息");
         StringBuffer resStr = new StringBuffer();
         try {
@@ -100,6 +100,7 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
                agentCer.setReqRegNo("");
                agentCer.setReqEntName(cer.getAgName());
                agentCer.setReqCerTm(date);
+               agentCer.setReqCerUser(String.valueOf(userId));
                agentCer.setCerNum(new BigDecimal(agentCertificationMapper.queryAgentCerDetailsCount(par)+1));
                agentCer.setCerProStat(Status.STATUS_0.status);
                agentCer.setOrgAgName(cer.getAgName());
@@ -164,7 +165,7 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
 
     @Override
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
-    public AgentResult processData(Agent orgagent,String id,String orgId) {
+    public AgentResult processData(Agent orgagent,String id,String orgId) throws MessageException {
         Agent agent = agentMapper.selectByAgent(orgagent);
         AgentCertification agentCertification = agentCertificationMapper.selectByPrimaryKey(id);
         if(agent==null){
@@ -229,6 +230,28 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
                     logger.info("工商认证成功，认证代理商{}状态为{},同步信息成功",agent.getAgUniqNum(),dataObj.getString("enterpriseStatus"));
                 }
 
+                AgentResult agentResultFreeze =  queryAgentFreeze(agent.getId());
+                if (agentResultFreeze.isOK()){
+                    Map<String,Object> resultFreezeData = (Map<String,Object>)agentResultFreeze.getData();
+                    if (FreeStatus.DJ.getValue().toString().equals((String) resultFreezeData.get("freeStatus").toString())){
+                        List<Map<String,Object>> freezeInfo = (List<Map<String,Object>>)resultFreezeData.get("freezeInfo");
+                        AgentFreezePort agentFreezePort = new AgentFreezePort();
+                        agentFreezePort.setAgentId(agent.getId());
+                        agentFreezePort.setUnfreezeCause(FreeCause.RZDJ.code);
+                        agentFreezePort.setOperationPerson(agentCertification.getReqCerUser());
+                        agentFreezePort.setFreezeCause((String) freezeInfo.get(0).get("freezeCause"));
+                        AgentResult agentUnFreeze = null;
+
+                            agentUnFreeze =  agentUnFreeze(agentFreezePort);
+                            if (agentUnFreeze.isOK()){
+                                logger.info("代理商{},成功解冻",agent.getId());
+                            }else {
+                                logger.info("代理商{},解冻失败:{}",agent.getId(),agentResultFreeze.getMsg());
+                            }
+
+                    }
+
+                }
             }else if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("enterpriseStatus")) && !dataObj.getString("enterpriseStatus").startsWith("在营")){
                 //非在营状态则冻结该代理商
                 agent.setFreestatus(new BigDecimal(0));
@@ -238,6 +261,27 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
                 if(1==agentMapper.updateByPrimaryKeySelective(agent)&& 1 == agentCertificationMapper.updateByPrimaryKeySelective(saveAgentCertification(dataObj,agentCertification))){
                     logger.info("工商认证成功，认证代理商{}状态为{},不进行信息同步",agent.getAgUniqNum(),dataObj.getString("enterpriseStatus"));
                 }
+            //非在营状态则冻结该代理商
+                AgentResult agentResultFreeze = queryAgentFreeze(agent.getId());
+                if (agentResultFreeze.isOK()){
+                    Map<String,Object> resultFreezeData = (Map<String,Object>)agentResultFreeze.getData();
+                    if (FreeStatus.JD.getValue().toString().equals(resultFreezeData.get("freeStatus").toString())){
+                        AgentFreezePort agentFreezePort = new AgentFreezePort();
+                        agentFreezePort.setAgentId(agent.getId());
+                        agentFreezePort.setFreezeCause(FreeCause.RZDJ.code);
+                        agentFreezePort.setFreezeNum(agentCertification.getId());
+                        agentFreezePort.setOperationPerson(agentCertification.getReqCerUser());
+
+                            AgentResult agentFreeze = agentFreeze(agentFreezePort);
+                            if (agentFreeze.isOK()){
+                                logger.info("代理商{}冻结",agent.getId());
+                            }else {
+                                logger.info("代理商{}冻结失败{}",agent.getId(),agentFreeze.getMsg());
+                            }
+
+                    }
+
+                }
             }
             return AgentResult.ok();
         }else{
@@ -245,6 +289,10 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
             agent.setCaStatus(Status.STATUS_2.status);
             agentCertification.setCerProStat(Status.STATUS_3.status);
             agentCertification.setCerRes(Status.STATUS_2.status);
+            ZoneId zoneId = ZoneId.systemDefault();
+            ZonedDateTime zdt = LocalDateTime.now().atZone(zoneId);//Combines this date-time with a time-zone to create a  ZonedDateTime.
+            Date date = Date.from(zdt.toInstant());
+            agentCertification.setCerSuccessTm(date);
             if(1==agentMapper.updateByPrimaryKeySelective(agent) && 1 == agentCertificationMapper.updateByPrimaryKeySelective(agentCertification)){
                 logger.info("工商认证失败"+agent.getId());
             }
