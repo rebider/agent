@@ -159,9 +159,21 @@ public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthServ
     }
     @Override
     public String doSettleTranAmount(Map<String,String> param){
-        String params = JsonUtil.objectToJson(param);
+       /* String params = JsonUtil.objectToJson(param);
         String res = HttpClientUtil.doPostJson
-                (AppConfig.getProperty("settle.tranAmount"), params);
+                (AppConfig.getProperty("settle.tranAmount"), params);*/
+
+        //新接口使用get
+        StringBuffer urlBuffer=new StringBuffer();
+        urlBuffer.append(AppConfig.getProperty("settle.tranAmount"));
+        urlBuffer.append("?");
+        Set<String> keys = param.keySet();
+        for (String key:keys){
+            String value = param.get(key);
+            urlBuffer.append(key+"="+value+"&");
+        }
+        urlBuffer.deleteCharAt(urlBuffer.length()-1);
+        String res = HttpClientUtil.doGet(urlBuffer.toString());
         return res;
     }
 
@@ -222,6 +234,7 @@ public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthServ
         if(StringUtils.isNotBlank(profitMonth)){
             criteria.andProfitMonthEqualTo(profitMonth);
         }
+        example.setOrderByClause("PLATFORM_TYPE");
         List<TranCheckData> checkData = tranCheckDataMapper.selectByExample(example);
         return checkData;
     }

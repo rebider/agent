@@ -17,6 +17,9 @@ import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrderService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +31,7 @@ import java.util.List;
 /**
  * 汇总 cxinfo 月分润汇总 汪勇
  */
+@PropertySource("classpath:/config.properties")
 @Service("profitSummaryDataJob")
 public class ProfitSummaryDataJob {
     org.slf4j.Logger logger = LoggerFactory.getLogger(NewProfitMonthMposDataJob.class);
@@ -51,13 +55,17 @@ public class ProfitSummaryDataJob {
 
     private int index = 1;
 
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyConfigInDev(){
+        return new PropertySourcesPlaceholderConfigurer();
+    }
 
     /**
      * 手刷月汇总
      * transDate 交易月份（空则为上一月）
      * 每月3号上午11点30
      */
-    @Scheduled(cron = "0 30 11 3 * ?")
+    @Scheduled(cron = "${shoushua_summarydata_job_cron}")
     public void doCron(){
         String transDate = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6);
         excute(transDate);
