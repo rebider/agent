@@ -234,6 +234,7 @@ public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthServ
         if(StringUtils.isNotBlank(profitMonth)){
             criteria.andProfitMonthEqualTo(profitMonth);
         }
+        example.setOrderByClause("PLATFORM_TYPE");
         List<TranCheckData> checkData = tranCheckDataMapper.selectByExample(example);
         return checkData;
     }
