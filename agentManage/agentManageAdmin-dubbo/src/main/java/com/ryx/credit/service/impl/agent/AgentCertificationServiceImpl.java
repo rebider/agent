@@ -231,6 +231,7 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                 }
 
                 AgentResult agentResultFreeze =  queryAgentFreeze(agent.getId());
+                logger.info("代理商:{},查询冻结解冻状态{}",agent.getId(),agentResultFreeze.getData());
                 if (agentResultFreeze.isOK()){
                     Map<String,Object> resultFreezeData = (Map<String,Object>)agentResultFreeze.getData();
                     if (FreeStatus.DJ.getValue().toString().equals((String) resultFreezeData.get("freeStatus").toString())){
@@ -240,10 +241,10 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                         agentFreezePort.setOperationPerson(agentCertification.getReqCerUser());
                         agentFreezePort.setFreezeCause(FreeCause.RZDJ.code);
                         AgentResult agentUnFreeze = null;
-
+                        logger.info("代理商{}开始解冻",agent.getId());
                             agentUnFreeze =  agentUnFreeze(agentFreezePort);
                             if (agentUnFreeze.isOK()){
-                                logger.info("代理商{},成功解冻",agent.getId());
+                                logger.info("代理商{},解冻成功",agent.getId());
                             }else {
                                 logger.info("代理商{},解冻失败:{}",agent.getId(),agentResultFreeze.getMsg());
                             }
@@ -253,7 +254,6 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                 }
             }else if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("enterpriseStatus")) && !dataObj.getString("enterpriseStatus").startsWith("在营")){
                 //非在营状态则冻结该代理商
-                agent.setFreestatus(new BigDecimal(0));
                 agent.setCaStatus(Status.STATUS_2.status);
                 agentCertification.setCerRes(Status.STATUS_1.status);//认证结果;1-成功,2-失败
                 agentCertification.setCerProStat(Status.STATUS_2.status);//认证流程状态:0-未处理,1-处理中,2-处理成功,3-处理失败;
@@ -262,6 +262,7 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                 }
             //非在营状态则冻结该代理商
                 AgentResult agentResultFreeze = queryAgentFreeze(agent.getId());
+                logger.info("代理商:{},查询冻结解冻状态{}",agent.getId(),agentResultFreeze.getData());
                 if (agentResultFreeze.isOK()){
                     Map<String,Object> resultFreezeData = (Map<String,Object>)agentResultFreeze.getData();
                     if (FreeStatus.JD.getValue().toString().equals(resultFreezeData.get("freeStatus").toString())){
@@ -270,10 +271,10 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                         agentFreezePort.setFreezeCause(FreeCause.RZDJ.code);
                         agentFreezePort.setFreezeNum(agentCertification.getId());
                         agentFreezePort.setOperationPerson(agentCertification.getReqCerUser());
-
+                        logger.info("代理商{}开始冻结",agent.getId());
                             AgentResult agentFreeze = agentFreeze(agentFreezePort);
                             if (agentFreeze.isOK()){
-                                logger.info("代理商{}冻结",agent.getId());
+                                logger.info("代理商{}冻结成功",agent.getId());
                             }else {
                                 logger.info("代理商{}冻结失败{}",agent.getId(),agentFreeze.getMsg());
                             }
