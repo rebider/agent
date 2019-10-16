@@ -433,8 +433,8 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         }else{
             requMap.put("parentAgencyId","");
         }
-        Dict dict = dictOptionsService.findDictByName(DictGroup.RDBPOS.name(), DictGroup.RDB_POS_LOWER.name(), agentBusInfo.getBusType());//直签终端下限数
-        requMap.put("termCount",dict.getdItemvalue());//直签终端下限数
+        Dict dict = dictOptionsService.findDictByValue(DictGroup.RDBPOS.name(), DictGroup.RDB_POS_LOWER.name(), agentBusInfo.getBusType());//直签终端下限数
+        requMap.put("termCount",dict.getdItemname());//直签终端下限数
         requMap.put("channelTopId",agentBusInfo.getFinaceRemitOrgan());
         requMap.put("mobile",agentBusInfo.getBusNum().trim());
         requMap.put("branchid",agentBusInfo.getBusPlatform().split("_")[0]);

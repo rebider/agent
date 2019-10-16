@@ -35,6 +35,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -118,6 +120,8 @@ public class OrderServiceImpl implements OrderService {
     private ActRuTaskService actRuTaskService;
     @Autowired
     private IPaymentDetailService paymentDetailService;
+    @Autowired
+    private ORemoveAccountMapper oRemoveAccountMapper;
 
 
     /**
@@ -3718,5 +3722,117 @@ public class OrderServiceImpl implements OrderService {
 
         return AgentResult.ok(oNum);
     }
+
+    @Override
+    public PageInfo arrearageList(Map<String, Object> param, PageInfo pageInfo) {
+        Long count = orderMapper.arrearageCount(param);
+        pageInfo.setTotal(count.intValue());
+        pageInfo.setRows(orderMapper.arrearageList(param));
+        return pageInfo;
+    }
+
+    @Override
+    public PageInfo arrearageQuery(Map map, PageInfo pageInfo) {
+        pageInfo.setRows(orderMapper.arrearageQuery(map));
+        return pageInfo;
+    }
+
+    @Override
+    public AgentResult isRemoveAccount(Map map) {
+        List<Map> removeAccountList=orderMapper.isRemoveAccount(map);
+        if (null != removeAccountList && removeAccountList.size()> 0) {
+            return AgentResult.ok(removeAccountList);
+        } else {
+            return AgentResult.fail("没有需要进行销账的订单");
+        }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    @Override
+    public ResultVO removeAccountSave(ORemoveAccountVo oRemoveAccountVo,List<Map> rAmountlist) throws Exception {
+        if (null==rAmountlist && rAmountlist.size()==0){
+            logger.info("销账添加:{}", "请选择需要销账的数据");
+            return ResultVO.fail("请选择需要销账的数据");
+        }
+        if (null == oRemoveAccountVo.getRemoveAccount()) {
+            logger.info("销账添加:{}", "销账添加信息为空");
+            return ResultVO.fail("销账添加信息为空");
+        }
+        ORemoveAccount removeAccount = oRemoveAccountVo.getRemoveAccount();
+        if (StringUtils.isEmpty(removeAccount.getSubmitPerson())) {
+            logger.info("销账添加:{}", "提交用户不能为空");
+            return ResultVO.fail("提交用户不能为空");
+        }
+        if (StringUtils.isEmpty(removeAccount.getPayMethod())) {
+            logger.info("销账添加:{}", "销账方式不能为空");
+            return ResultVO.fail("销账方式不能为空");
+        }
+        if (StringUtils.isEmpty(removeAccount.getRamount())) {
+            logger.info("销账添加:{}", "销账金额不能为空");
+            return ResultVO.fail("销账金额不能为空");
+        }
+        Date date = Calendar.getInstance().getTime();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
+        String batchNum = Calendar.getInstance().getTime().getTime() + "";
+        if (null!=rAmountlist && rAmountlist.size()>0){
+            for(int i=0;i<rAmountlist.size();i++){
+                Map map = rAmountlist.get(i);
+                String machinesAmount = String.valueOf(map.get("machinesAmount"));//机具欠款
+                String ramount = String.valueOf(map.get("ramount"));//销账金额
+                String agName = String.valueOf(map.get("agName"));
+                agName=new String(agName.getBytes("iso8859-1"),"utf-8");
+               /* int remove_Account = oRemoveAccountMapper.isRemoveAccount(map);
+                if (remove_Account>=1){
+                    logger.info("已在销账处理中,代理商为:"+agName+",业务平台编码:"+String.valueOf(map.get("busNum")));
+                    return ResultVO.fail("已在销账处理中,代理商为:"+agName+",业务平台编码:"+String.valueOf(map.get("busNum")));
+                }*/
+                if(new BigDecimal(ramount).compareTo(new BigDecimal(machinesAmount))==1){
+                    logger.info("填写的金额不能大于机具欠款金额,代理商为:"+agName+",机具金额:"+machinesAmount);
+                    throw new MessageException("填写的金额不能大于机具欠款金额,代理商为:"+agName+",机具金额:"+machinesAmount);
+                }
+                removeAccount.setId(idService.genId(TabId.O_REMOVE_ACCOUNT));
+                removeAccount.setAgId(String.valueOf(map.get("agId")));
+                String rmonth = String.valueOf(map.get("rmonth"));
+                if (StringUtils.isNotBlank(rmonth)){
+                    removeAccount.setRmonth(format.parse(rmonth));
+                }
+                removeAccount.setAgName(agName);
+                removeAccount.setBusNum(String.valueOf(map.get("busNum")));
+                removeAccount.setBusPlatform(String.valueOf(map.get("busPlatform")));
+                removeAccount.setRamount(new BigDecimal(ramount));
+                removeAccount.setMachinesAmount(new BigDecimal(machinesAmount));
+                removeAccount.setRstatus(RemoveAccountStatus.WCL.code);
+                removeAccount.setBatchNum(batchNum);
+                removeAccount.setSubmitTime(date);
+                removeAccount.setStatus(Status.STATUS_1.status);
+                removeAccount.setVersion(Status.STATUS_1.status);
+                removeAccount.setRealRamount(new BigDecimal(0));
+                if (1 == oRemoveAccountMapper.insertSelective(removeAccount)) {
+                    oRemoveAccountVo.setRemoveAccount(removeAccount);
+                }
+            }
+        }
+       if (null != oRemoveAccountVo.getRemoveAccountFile() && oRemoveAccountVo.getRemoveAccountFile().size()>0) {
+                List<String> file = oRemoveAccountVo.getRemoveAccountFile();
+                for (String s : file) {
+                    if (org.apache.commons.lang.StringUtils.isEmpty(s)) continue;
+                    AttachmentRel record = new AttachmentRel();
+                    record.setAttId(s);
+                    record.setSrcId(removeAccount.getBatchNum());
+                    record.setcUser(removeAccount.getSubmitPerson());
+                    record.setcTime(removeAccount.getSubmitTime());
+                    record.setStatus(Status.STATUS_1.status);
+                    record.setBusType(AttachmentRelType.removeAccount.name());
+                    record.setId(idService.genId(TabId.a_attachment_rel));
+                    if (1 != attachmentRelMapper.insertSelective(record)) {
+                        logger.info("补款添加:{}", "上传打款截图失败");
+                        throw new MessageException("上传打款截图失败");
+                    }
+                }
+            }
+            logger.info("销账添加:成功");
+        return ResultVO.success(oRemoveAccountVo);
+    }
+
 
 }

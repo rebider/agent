@@ -95,6 +95,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private IResourceService iResourceService;
     @Autowired
     private ActRuTaskService actRuTaskService;
+    @Autowired
+    private AgentFreezeService agentFreezeService;
 
 
     /**
@@ -836,6 +838,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         rel.setActivStatus(AgStatus.Approved.name());
         if (1 != busActRelMapper.updateByPrimaryKeySelective(rel)) {
             logger.info("代理商审批通过，更新BusActRel失败{}:{}", processingId, rel.getBusId());
+            throw new ProcessException("更新ActRel失败");
         }
 
         AgentBusInfo bus = agentBusinfoService.getById(busId);
@@ -984,6 +987,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         rel.setActivStatus(AgStatus.Approved.name());
         if (1 != busActRelMapper.updateByPrimaryKeySelective(rel)) {
             logger.info("代理商审批通过，更新BusActRel失败{}:{}", processingId, rel.getBusId());
+            throw new ProcessException("更新ActRel失败");
         }
 
         Agent agent = agentService.getAgentById(busId);
@@ -992,8 +996,23 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         agent.setcIncomTime(Calendar.getInstance().getTime());
         if (1 != agentService.updateAgent(agent)) {
             logger.info("代理商审批通过，代理商信息失败{}:{}", processingId, agent.getId());
+            throw new ProcessException("代理商信息失败");
         }
-
+        //入网合同冻结
+        try {
+            AgentFreezePort agentFreezePort = new AgentFreezePort();
+            agentFreezePort.setAgentId(agent.getId());
+            agentFreezePort.setFreezeCause(FreeCause.HTDJ.getValue());
+            agentFreezePort.setOperationPerson(agent.getcUser());
+            agentFreezePort.setFreezeNum(agent.getId());
+            AgentResult agentResult = agentFreezeService.agentFreeze(agentFreezePort);
+            if(!agentResult.isOK()){
+                throw new ProcessException(agentResult.getMsg());
+            }
+        } catch (MessageException e) {
+            e.printStackTrace();
+            throw new ProcessException(e.getMsg());
+        }
         //获取代理商有效的业务
         List<AgentBusInfo> aginfo = agentBusinfoService.agentBusInfoList(agent.getId(), null, AgStatus.Approving.status);
         for (AgentBusInfo agentBusInfo : aginfo) {
