@@ -261,6 +261,7 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                         map.put("busNum", oRemoveAccount_item.getBusNum());
                     }
                     try {
+                        map.put("flag","1");
                         BigDecimal outstandingAmount = new BigDecimal(0);
                         List<Map> orderList = oOrderMapper.arrearageQuery(map);
                         if (null != orderList && orderList.size() > 0) {
