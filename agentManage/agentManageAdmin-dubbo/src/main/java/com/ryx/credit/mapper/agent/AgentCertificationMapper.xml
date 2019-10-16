@@ -766,7 +766,7 @@
 
   <insert id="insertBatch" parameterType="java.util.List" >
     insert  into a_agent_certification
-    (ID,AGENT_ID,REQ_REG_NO,REQ_ENT_NAME,REQ_CER_TM,CER_NUM,CER_PRO_STAT,ORG_CER_ID,
+    (ID,AGENT_ID,REQ_REG_NO,REQ_ENT_NAME,REQ_CER_TM,REQ_CER_USER,CER_NUM,CER_PRO_STAT,ORG_CER_ID,
     ORG_AG_NAME,ORG_AG_NATURE,ORG_AG_CAPITAL,ORG_AG_BUS_LIC,ORG_AG_BUS_LICB,ORG_AG_BUS_LICE,ORG_AG_LEGAL,ORG_AG_REG_ADD,ORG_AG_BUS_SCOPE)
     (<foreach collection="agentCertifications" separator="union all" item="agentCer" index="">
     select
@@ -775,6 +775,7 @@
     #{agentCer.reqRegNo,jdbcType=VARCHAR},
     #{agentCer.reqEntName,jdbcType=VARCHAR},
     #{agentCer.reqCerTm,jdbcType=TIMESTAMP},
+    #{agentCer.reqCerUser,jdbcType=VARCHAR},
     #{agentCer.cerNum,jdbcType=DECIMAL},
     #{agentCer.cerProStat,jdbcType=DECIMAL},
     #{agentCer.orgCerId,jdbcType=VARCHAR},
