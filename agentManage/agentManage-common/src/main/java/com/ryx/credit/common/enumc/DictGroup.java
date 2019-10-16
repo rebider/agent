@@ -95,7 +95,7 @@ public enum DictGroup {
     LOGISTICS_FAIL_EMAIL("物流失败邮件"),
     REMOVEACCOUNT_FAIL_EMAIL("销账失败邮件"),
     RATYPE("销账方式"),
-    RSTATUS("销账状态");
+    RSTATUS("销账状态"),
 
 
     CERTIFICATION_STATUS("代理商工商认证");
