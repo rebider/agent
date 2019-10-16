@@ -469,4 +469,14 @@
                 </if>
         </where>)
     </select>
+    <select id="selectAnnManage" parameterType="map" resultType="map">
+        <include refid="OracleDialectPrefix"/>
+
+        <include refid="OracleDialectSuffix"/>
+    </select>
+    <select id="selectCountAnnManage" parameterType="map" resultType="int">
+        select count(*) from(
+
+        )
+    </select>
 </mapper>
