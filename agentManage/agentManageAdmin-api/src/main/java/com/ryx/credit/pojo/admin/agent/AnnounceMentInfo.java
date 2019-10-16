@@ -52,6 +52,8 @@ public class AnnounceMentInfo implements Serializable {
     @JsonSerialize(using = DateJsonSerializer.class)
     private Date createTm;
 
+    private String createUser;
+
     private String annInfo;
 
     public String getAnnId() {
@@ -148,6 +150,14 @@ public class AnnounceMentInfo implements Serializable {
 
     public void setCreateTm(Date createTm) {
         this.createTm = createTm;
+    }
+
+    public String getCreateUser() {
+        return createUser;
+    }
+
+    public void setCreateUser(String createUser) {
+        this.createUser = createUser == null ? null : createUser.trim();
     }
 
     public String getAnnInfo() {
