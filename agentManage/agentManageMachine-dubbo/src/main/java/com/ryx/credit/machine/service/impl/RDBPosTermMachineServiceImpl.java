@@ -219,6 +219,11 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
         String taskId = refundPriceDiffDetailList.get(0).getRefundPriceDiffId();
         List<Map<String, Object>> reqList = new ArrayList<>();
         for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {
+
+            //判断机构编不能为空
+            if (null == refundPriceDiffDetail.getOldOrgId() || "".equals(refundPriceDiffDetail.getOldOrgId())) return AgentResult.fail("请输入正确的机构编码");
+            if (null == refundPriceDiffDetail.getNewOrgId() || "".equals(refundPriceDiffDetail.getNewOrgId())) return AgentResult.fail("请输入正确的机构编码");
+
             Map<String, Object> reqMap = new HashMap<>();
             //查询，新旧活动代码
             OActivity oldActivity = orderActivityService.findById(refundPriceDiffDetail.getActivityFrontId());
@@ -227,8 +232,8 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
             reqMap.put("terminalNoEnd", refundPriceDiffDetail.getEndSn());
             reqMap.put("terminalPolicyId", newActivity.getBusProCode());
             reqMap.put("oldTerminalPolicyId", oldActivity.getBusProCode());
-            reqMap.put("currentBranchId", oldActivity.getPlatform().substring(0, oldActivity.getPlatform().indexOf("_")));
-            reqMap.put("currentAgencyId", oldActivity.getPlatform().substring(oldActivity.getPlatform().indexOf("_") + 1));
+            reqMap.put("currentBranchId", refundPriceDiffDetail.getOldOrgId().substring(refundPriceDiffDetail.getOldOrgId().length()-8));
+            reqMap.put("currentAgencyId", refundPriceDiffDetail.getOldOrgId());
             reqList.add(reqMap);
         }
 
@@ -297,7 +302,7 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
                 //处理中
                 logger.info("RDB活动调整中:{} {}",serialNumber,platformType);
                 return AgentResult.ok("01");
-            } else if (null != resJson.getString("code") && resJson.getString("code").equals("9999") && null != resJson.getBoolean("success") && !resJson.getBoolean("success") && null !=  resJson.getString("msg")) {
+            } else if (null != resJson.getBoolean("success") && !resJson.getBoolean("success")) { //瑞大宝可能只返回success
                 //处理失败
                 logger.info("RDB活动调整失败:{} {}",serialNumber,platformType);
                 return AgentResult.ok("02");
