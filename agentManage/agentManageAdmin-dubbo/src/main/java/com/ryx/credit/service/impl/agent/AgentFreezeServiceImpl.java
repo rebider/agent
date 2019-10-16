@@ -121,7 +121,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
      * @return
      * @throws MessageException
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public AgentResult agentFreeze(AgentFreezePort agentFreezePort)throws MessageException{
 
@@ -182,7 +182,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
      * @return
      * @throws MessageException
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public AgentResult agentUnFreeze(AgentFreezePort agentFreezePort)throws MessageException{
 
