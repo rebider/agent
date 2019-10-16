@@ -24,7 +24,21 @@ public enum TransFlag {
     YHCLCG("9","银行处理成功"),
     CG("11","打款成功"),
     SB("12","打款失败"),
-    YHCLSB("20","银行处理失败");
+    YHCLSB("20","银行处理失败"),
+
+    //新版交易返回状态，旧版暂时保留，兼容老数据
+    NEWWCL("00","未处理(新)"),
+    NEWYSP("01","已生批(新)"),
+    NEWDKSB("02","待复核(新)"),
+    NEWFHTG("03","复合通过(新)"),
+    NEWFXLJ("04","复合不通过(新)"),
+    NEWYCX("05","出款拦截(新)"),
+    NEWFHZ("07","已撤销(新)"),
+    NEWYHCLCG("09","银行处理中(新)"),
+    NEWCG("11","打款成功(新)"),
+    NEWSB("12","打款失败(新)"),
+    NEWSBBCK("13","打款失败-补出款(新)"),
+    NEWSPZ("17","生批中(新)");
 
 
     public String code;
@@ -34,21 +48,6 @@ public enum TransFlag {
     TransFlag(String c, String m){
         this.code=c;
         this.msg =m;
-    }
-
-    /**
-     * 取得枚举对象值
-     * @return 枚举对象值
-     */
-    public String getValue() {
-        return this.code;
-    }
-    /**
-     * 取得缓存内容
-     * @return 缓存内容
-     */
-    public String getContent() {
-        return this.msg;
     }
 
     /**
@@ -77,6 +76,22 @@ public enum TransFlag {
             resultMap.put(transFlag.getValue(),transFlag.getContent());
         }
         return resultMap;
+    }
+
+    /**
+     * 取得枚举对象值
+     * @return 枚举对象值
+     */
+    public String getValue() {
+        return this.code;
+    }
+
+    /**
+     * 取得缓存内容
+     * @return 缓存内容
+     */
+    public String getContent() {
+        return this.msg;
     }
 
 }
