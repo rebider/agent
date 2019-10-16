@@ -17,7 +17,7 @@
                   cron="0/20 * * * * ? *"
                   sharding-total-count="1"
                   sharding-item-parameters="0=C"
-                  streaming-process="true"
+                  streaming-process="false"
                   description="活动调整结果查询任务"
                   overwrite="true"
                   disabled="false"/>

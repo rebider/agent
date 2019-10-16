@@ -176,18 +176,17 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
         agname = agname.replaceAll("[A-Z]|\\(*\\)","");
         logger.info("后台任务进行工商认证|{}|替换后名称|{}",agent.getId(),agname);
         AgentResult agentResult = businessCAService.agentBusinessCA(agname, "0");
-        JSONObject dataObj = (JSONObject)agentResult.getData();
-        if ("1".equals((String) dataObj.getString("isTest"))){
-            agent.setCaStatus(Status.STATUS_2.status);
-            agentCertification.setCerProStat(Status.STATUS_2.status);//认证流程状态:0-未处理,1-处理中,2-处理成功,3-处理失败;
-            agentCertification.setCerRes(new BigDecimal(2));//测试环境不认证
-            if(1==agentMapper.updateByPrimaryKeySelective(agent) && 1 == agentCertificationMapper.updateByPrimaryKeySelective(saveAgentCertification(dataObj,agentCertification))){
-                logger.info("测试环境不认证，认证代理商{}状态为{},不进行信息同步",agent.getAgUniqNum(),agent.getCaStatus());
-            }
-            return AgentResult.ok(dataObj);
-        }
-
         if(agentResult.isOK()||(405==agentResult.getStatus())){
+            JSONObject dataObj = (JSONObject)agentResult.getData();
+            if ("1".equals((String) dataObj.getString("isTest"))){
+                agent.setCaStatus(Status.STATUS_2.status);
+                agentCertification.setCerProStat(Status.STATUS_2.status);//认证流程状态:0-未处理,1-处理中,2-处理成功,3-处理失败;
+                agentCertification.setCerRes(new BigDecimal(2));//测试环境不认证
+                if(1==agentMapper.updateByPrimaryKeySelective(agent) && 1 == agentCertificationMapper.updateByPrimaryKeySelective(saveAgentCertification(dataObj,agentCertification))){
+                    logger.info("测试环境不认证，认证代理商{}状态为{},不进行信息同步",agent.getAgUniqNum(),agent.getCaStatus());
+                }
+                return AgentResult.ok(dataObj);
+            }
             if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("enterpriseStatus")) && dataObj.getString("enterpriseStatus").startsWith("在营")){
             //更新代理商信息
             if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("regCap")))
@@ -232,6 +231,11 @@ public class AgentCertificationServiceImpl implements AgentCertificationService 
             //工商认证失败
             agent.setCaStatus(Status.STATUS_2.status);
             agentCertification.setCerProStat(Status.STATUS_3.status);
+            agentCertification.setCerRes(Status.STATUS_2.status);
+            ZoneId zoneId = ZoneId.systemDefault();
+            ZonedDateTime zdt = LocalDateTime.now().atZone(zoneId);//Combines this date-time with a time-zone to create a  ZonedDateTime.
+            Date date = Date.from(zdt.toInstant());
+            agentCertification.setCerSuccessTm(date);
             if(1==agentMapper.updateByPrimaryKeySelective(agent) && 1 == agentCertificationMapper.updateByPrimaryKeySelective(agentCertification)){
                 logger.info("工商认证失败"+agent.getId());
             }
