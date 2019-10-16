@@ -24,6 +24,9 @@ import com.ryx.credit.service.profit.IPosProfitDataService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +46,7 @@ import java.util.Map;
  * @Description: 新版本分润数据处理
  * @date 2018/7/2911:34
  */
+@PropertySource("classpath:/config.properties")
 @Service("newProfitDataJob")
 @Transactional(rollbackFor = RuntimeException.class)
 public class NewProfitDataJob {
@@ -84,6 +88,11 @@ public class NewProfitDataJob {
     @Qualifier("posProfitComputeServiceImpl")
     private DeductService posProfitComputeServiceImpl;
 
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyConfigInDev(){
+        return new PropertySourcesPlaceholderConfigurer();
+    }
+
     /**
      * @Author: Zhang Lei
      * POS分润明细数据同步（TransProfitDetail）
@@ -91,7 +100,7 @@ public class NewProfitDataJob {
      * 每月3号9点10分执行
      * @Date: 11:25 2019/1/24
      */
-    @Scheduled(cron = "0 10 9 3 * ?")
+    @Scheduled(cron = "${pos_profit_job_cron}")
     public void doCron() {
         String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
         deal(profitDate);

@@ -239,18 +239,18 @@
   </sql>
   <!-- ======================以上为自动生成代码，请务必把自己添加代码写到下面，防止被覆盖================================-->
   <select id="getAllPlatFormType" resultType="java.lang.String">
-    select distinct PLATFORM_TYPE from TRANCHECK_PLATFORM
+    select distinct PLATFORM_TYPE from TRANCHECK_PLATFORM ORDER BY PLATFORM_TYPE
   </select>
 
   <select id="getTranAmtByMonth" resultType="java.util.Map">
       select
-            (select sum(IN_TRANS_AMT)from TRANS_PROFIT_DETAIL
+        nvl((select sum(IN_TRANS_AMT)from TRANS_PROFIT_DETAIL
                 where PROFIT_DATE=#{tranMonth}
-                and SOURCE_INFO='MPOS')+(select  sum(TRANS_AMT)from P_PROFIT_DIRECT where TRANS_MONTH=#{tranMonth})
+                and SOURCE_INFO='MPOS')+(select  sum(TRANS_AMT)from P_PROFIT_DIRECT where TRANS_MONTH=#{tranMonth}),0)
                 as MPOS_TRAN_AMT,
-             (select sum(TRANS_FEE)from TRANS_PROFIT_DETAIL
+            nvl((select sum(TRANS_FEE)from TRANS_PROFIT_DETAIL
                 where PROFIT_DATE=#{tranMonth}
-                and SOURCE_INFO='MPOS')+(select  sum(TRANS_FEE)from P_PROFIT_DIRECT where TRANS_MONTH=#{tranMonth})
+                and SOURCE_INFO='MPOS')+(select  sum(TRANS_FEE)from P_PROFIT_DIRECT where TRANS_MONTH=#{tranMonth}),0)
                 as TRANS_FEE
        from dual
   </select>
