@@ -234,12 +234,11 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                 if (agentResultFreeze.isOK()){
                     Map<String,Object> resultFreezeData = (Map<String,Object>)agentResultFreeze.getData();
                     if (FreeStatus.DJ.getValue().toString().equals((String) resultFreezeData.get("freeStatus").toString())){
-                        List<Map<String,Object>> freezeInfo = (List<Map<String,Object>>)resultFreezeData.get("freezeInfo");
                         AgentFreezePort agentFreezePort = new AgentFreezePort();
                         agentFreezePort.setAgentId(agent.getId());
                         agentFreezePort.setUnfreezeCause(FreeCause.RZDJ.code);
                         agentFreezePort.setOperationPerson(agentCertification.getReqCerUser());
-                        agentFreezePort.setFreezeCause((String) freezeInfo.get(0).get("freezeCause"));
+                        agentFreezePort.setFreezeCause(FreeCause.RZDJ.code);
                         AgentResult agentUnFreeze = null;
 
                             agentUnFreeze =  agentUnFreeze(agentFreezePort);
