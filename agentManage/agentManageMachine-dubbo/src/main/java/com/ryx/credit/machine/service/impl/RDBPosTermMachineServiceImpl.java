@@ -302,7 +302,7 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
                 //处理中
                 logger.info("RDB活动调整中:{} {}",serialNumber,platformType);
                 return AgentResult.ok("01");
-            } else if (null != resJson.getString("code") && resJson.getString("code").equals("9999") && null != resJson.getBoolean("success") && !resJson.getBoolean("success") && null !=  resJson.getString("msg")) {
+            } else if (null != resJson.getBoolean("success") && !resJson.getBoolean("success")) { //瑞大宝可能只返回success
                 //处理失败
                 logger.info("RDB活动调整失败:{} {}",serialNumber,platformType);
                 return AgentResult.ok("02");
