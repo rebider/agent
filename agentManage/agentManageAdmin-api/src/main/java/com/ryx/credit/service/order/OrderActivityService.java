@@ -6,6 +6,7 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.order.OActivity;
+import org.apache.kafka.common.protocol.types.Field;
 
 import java.util.List;
 import java.util.Map;
@@ -56,4 +57,11 @@ public interface OrderActivityService {
     void saveActivityVisible(String activityId,String visible,String[] agentIds,String userId)throws MessageException;
 
     List<Map<String,String>> selectConfigured(String activityId);
+
+    /**
+     * RDB查询换活动的taskId(退补差价ID)
+     * @param detailId
+     * @return
+     */
+    Map<String, Object> queryTaskIdForChangeActive(String detailId);
 }
