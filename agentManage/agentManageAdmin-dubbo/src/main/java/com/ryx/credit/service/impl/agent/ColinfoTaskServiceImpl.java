@@ -37,10 +37,6 @@ public class ColinfoTaskServiceImpl implements ColinfoTaskService {
 
     private static final  String COLINFO_URL =  AppConfig.getProperty("colinfo_out_money");
 
-    private static final long TIME_OUT = 60000*5;      //锁的超时时间
-
-    private static final long ACQUIRE_TIME_OUT = 5000;  //超时时间
-
     @Autowired
     private AgentColinfoMapper agentColinfoMapper;
     @Autowired
@@ -68,7 +64,7 @@ public class ColinfoTaskServiceImpl implements ColinfoTaskService {
         String indentifier = null;
         String merchId = "";
         try {
-            indentifier = redisService.lockWithTimeout(RedisCachKey.INSERT_SYS_KEY.code,ACQUIRE_TIME_OUT,TIME_OUT);
+            indentifier = redisService.lockWithTimeout(RedisCachKey.INSERT_SYS_KEY.code,RedisService.ACQUIRE_TIME_OUT,RedisService.TIME_OUT);
             if(StringUtils.isBlank(indentifier)){
                 log.info("synColinfoToPayment,lock锁定中");
                 return;
@@ -171,7 +167,7 @@ public class ColinfoTaskServiceImpl implements ColinfoTaskService {
         String indentifier = null;
         try {
             log.info("synColinfoToQueryPayment定时查询启动:{}",new Date());
-            indentifier = redisService.lockWithTimeout(RedisCachKey.QUERY_SYS_KEY.code,ACQUIRE_TIME_OUT,TIME_OUT);
+            indentifier = redisService.lockWithTimeout(RedisCachKey.QUERY_SYS_KEY.code,RedisService.ACQUIRE_TIME_OUT,RedisService.TIME_OUT);
             if(StringUtils.isBlank(indentifier)){
                 log.info("synColinfoToQueryPayment,lock锁定中");
                 return;
@@ -183,6 +179,10 @@ public class ColinfoTaskServiceImpl implements ColinfoTaskService {
             flagList.add(TransFlag.SB.getValue());
             flagList.add(TransFlag.YCX.getValue());
             flagList.add(TransFlag.FXLJ.getValue());
+            flagList.add(TransFlag.NEWCG.getValue());
+            flagList.add(TransFlag.NEWSB.getValue());
+            flagList.add(TransFlag.NEWYCX.getValue());
+            flagList.add(TransFlag.NEWFXLJ.getValue());
             criteria.andFlagNotIn(flagList);
             List<AColinfoPayment> aColinfoPayments = colinfoPaymentMapper.selectByExample(aColinfoPaymentExample);
             if(null==aColinfoPayments){
@@ -208,7 +208,7 @@ public class ColinfoTaskServiceImpl implements ColinfoTaskService {
                 }
                 JSONArray jsonArray = JSONObject.parseArray(String.valueOf(resultMap.get("info")));
                 Map<String, Object> resultInfoMap = JsonUtil.jsonToMap(JsonUtil.objectToJson(jsonArray.get(0)));
-                if(!String.valueOf(resultInfoMap.get("flag")).equals(TransFlag.WCL.getValue())){
+                if(!String.valueOf(resultInfoMap.get("flag")).equals(TransFlag.WCL.getValue()) && !String.valueOf(resultInfoMap.get("flag")).equals(TransFlag.NEWWCL.getValue())){
                     agentColinfoService.updateByPaymentResult(aColinfoPayment,resultInfoMap);
                     if(String.valueOf(resultInfoMap.get("flag")).equals(TransFlag.CG.getValue())){
                         AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();

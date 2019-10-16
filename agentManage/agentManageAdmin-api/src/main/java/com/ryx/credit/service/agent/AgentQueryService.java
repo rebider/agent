@@ -1,5 +1,7 @@
 package com.ryx.credit.service.agent;
 
+import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.pojo.admin.agent.*;
 
 import java.util.List;
@@ -113,4 +115,11 @@ public interface AgentQueryService {
      * @return
      */
     List<Capital> paymentQueryPass(String agentId);
+
+    /**
+     * 检查代理商信息是否完整
+     * @param agCode
+     * @return
+     */
+    FastMap checkAgentInfoIsComplet(String agCode)throws ProcessException;
 }

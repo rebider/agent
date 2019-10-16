@@ -47,8 +47,6 @@ import java.util.*;
 @Service("internetRenewService")
 public class OInternetRenewServiceImpl implements OInternetRenewService {
 
-    private static final long TIME_OUT = 60000*5;      //锁的超时时间
-    private static final long ACQUIRE_TIME_OUT = 5000;  //超时时间
     private static Logger log = LoggerFactory.getLogger(OInternetRenewServiceImpl.class);
     @Autowired
     private OInternetRenewMapper internetRenewMapper;
@@ -346,7 +344,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
 
         String retIdentifier = "";
         try {
-            retIdentifier = redisService.lockWithTimeout(RedisCachKey.RENEW_CARD.code + cUser, ACQUIRE_TIME_OUT, TIME_OUT);
+            retIdentifier = redisService.lockWithTimeout(RedisCachKey.RENEW_CARD.code + cUser, RedisService.ACQUIRE_TIME_OUT, RedisService.TIME_OUT);
             if (StringUtils.isBlank(retIdentifier)) {
                 log.info("续费中请勿重复提交,cUser:{}", cUser);
                 throw new MessageException("续费中请勿重复提交");

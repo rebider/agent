@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.agent.AgentFreezeMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.AgentFreeze">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="FREEZE_STATUS" jdbcType="VARCHAR" property="freezeStatus" />
+    <result column="FREEZE_PERSON" jdbcType="VARCHAR" property="freezePerson" />
+    <result column="FREEZE_DATE" jdbcType="TIMESTAMP" property="freezeDate" />
+    <result column="FREEZE_CAUSE" jdbcType="VARCHAR" property="freezeCause" />
+    <result column="UNFREEZE_PERSON" jdbcType="VARCHAR" property="unfreezePerson" />
+    <result column="UNFREEZE_DATE" jdbcType="TIMESTAMP" property="unfreezeDate" />
+    <result column="UNFREEZE_CAUSE" jdbcType="VARCHAR" property="unfreezeCause" />
+    <result column="FREEZE_NUM" jdbcType="VARCHAR" property="freezeNum" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="VERSION" jdbcType="DECIMAL" property="version" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, AGENT_ID, FREEZE_STATUS, FREEZE_PERSON, FREEZE_DATE, FREEZE_CAUSE, UNFREEZE_PERSON, 
+    UNFREEZE_DATE, UNFREEZE_CAUSE, FREEZE_NUM, REMARK, STATUS, VERSION
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentFreezeExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from A_AGENT_FREEZE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from A_AGENT_FREEZE
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentFreezeExample">
+    delete from A_AGENT_FREEZE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AgentFreeze">
+    insert into A_AGENT_FREEZE (ID, AGENT_ID, FREEZE_STATUS, 
+      FREEZE_PERSON, FREEZE_DATE, FREEZE_CAUSE, 
+      UNFREEZE_PERSON, UNFREEZE_DATE, UNFREEZE_CAUSE, 
+      FREEZE_NUM, REMARK, STATUS, 
+      VERSION)
+    values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{freezeStatus,jdbcType=VARCHAR}, 
+      #{freezePerson,jdbcType=VARCHAR}, #{freezeDate,jdbcType=TIMESTAMP}, #{freezeCause,jdbcType=VARCHAR}, 
+      #{unfreezePerson,jdbcType=VARCHAR}, #{unfreezeDate,jdbcType=TIMESTAMP}, #{unfreezeCause,jdbcType=VARCHAR}, 
+      #{freezeNum,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, 
+      #{version,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentFreeze">
+    insert into A_AGENT_FREEZE
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="freezeStatus != null">
+        FREEZE_STATUS,
+      </if>
+      <if test="freezePerson != null">
+        FREEZE_PERSON,
+      </if>
+      <if test="freezeDate != null">
+        FREEZE_DATE,
+      </if>
+      <if test="freezeCause != null">
+        FREEZE_CAUSE,
+      </if>
+      <if test="unfreezePerson != null">
+        UNFREEZE_PERSON,
+      </if>
+      <if test="unfreezeDate != null">
+        UNFREEZE_DATE,
+      </if>
+      <if test="unfreezeCause != null">
+        UNFREEZE_CAUSE,
+      </if>
+      <if test="freezeNum != null">
+        FREEZE_NUM,
+      </if>
+      <if test="remark != null">
+        REMARK,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="version != null">
+        VERSION,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeStatus != null">
+        #{freezeStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="freezePerson != null">
+        #{freezePerson,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeDate != null">
+        #{freezeDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="freezeCause != null">
+        #{freezeCause,jdbcType=VARCHAR},
+      </if>
+      <if test="unfreezePerson != null">
+        #{unfreezePerson,jdbcType=VARCHAR},
+      </if>
+      <if test="unfreezeDate != null">
+        #{unfreezeDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="unfreezeCause != null">
+        #{unfreezeCause,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeNum != null">
+        #{freezeNum,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentFreezeExample" resultType="java.lang.Long">
+    select count(*) from A_AGENT_FREEZE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentFreeze">
+    update A_AGENT_FREEZE
+    <set>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeStatus != null">
+        FREEZE_STATUS = #{freezeStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="freezePerson != null">
+        FREEZE_PERSON = #{freezePerson,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeDate != null">
+        FREEZE_DATE = #{freezeDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="freezeCause != null">
+        FREEZE_CAUSE = #{freezeCause,jdbcType=VARCHAR},
+      </if>
+      <if test="unfreezePerson != null">
+        UNFREEZE_PERSON = #{unfreezePerson,jdbcType=VARCHAR},
+      </if>
+      <if test="unfreezeDate != null">
+        UNFREEZE_DATE = #{unfreezeDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="unfreezeCause != null">
+        UNFREEZE_CAUSE = #{unfreezeCause,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeNum != null">
+        FREEZE_NUM = #{freezeNum,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        VERSION = #{version,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AgentFreeze">
+    update A_AGENT_FREEZE
+    set AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      FREEZE_STATUS = #{freezeStatus,jdbcType=VARCHAR},
+      FREEZE_PERSON = #{freezePerson,jdbcType=VARCHAR},
+      FREEZE_DATE = #{freezeDate,jdbcType=TIMESTAMP},
+      FREEZE_CAUSE = #{freezeCause,jdbcType=VARCHAR},
+      UNFREEZE_PERSON = #{unfreezePerson,jdbcType=VARCHAR},
+      UNFREEZE_DATE = #{unfreezeDate,jdbcType=TIMESTAMP},
+      UNFREEZE_CAUSE = #{unfreezeCause,jdbcType=VARCHAR},
+      FREEZE_NUM = #{freezeNum,jdbcType=VARCHAR},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL},
+      VERSION = #{version,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+
+  <select id="queryAgentFreezeList" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix" />
+    <include refid="queryAgentFreezeSql" />
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="queryAgentFreezeCount" parameterType="map" resultType="int">
+    select count(*) from (
+    <include refid="queryAgentFreezeSql"/>
+    )
+  </select>
+  <sql id="queryAgentFreezeSql">
+      select t.*,a.ag_name,a.c_incom_time,to_char(a.freestatus) as FREESTATUS
+      from a_agent_freeze t
+      left join a_agent a on a.id=t.agent_id
+      <where>
+        <if test="map.id!=null and map.agentId != ''">
+           and t.id = #{map.id,jdbcType=VARCHAR}
+        </if>
+        <if test="map.agentId != null and map.agentId != '' ">
+          and t.agent_Id = #{map.agentId,jdbcType=VARCHAR}
+        </if>
+        <if test="map.agentName != null and map.agentName != '' ">
+          and a.ag_name LIKE CONCAT(CONCAT('%',#{map.agentName}),'%')
+        </if>
+        <if test="map.incomTimeBegin!=null and map.incomTimeBegin!=''">
+          and a.c_incom_time >= to_date(#{map.incomTimeBegin}, 'yy-mm-dd hh24:mi:ss')
+        </if>
+        <if test="map.incomTimeEnd!=null and map.incomTimeEnd!=''">
+          and a.c_incom_time &lt;= to_date(#{map.incomTimeEnd}, 'yy-mm-dd hh24:mi:ss')
+        </if>
+        <if test="map.freezeDateBegin!=null and map.freezeDateBegin!=''">
+          and t.freeze_Date >= to_date(#{map.freezeDateBegin}, 'yy-mm-dd hh24:mi:ss')
+        </if>
+        <if test="map.freezeDateEnd!=null and map.freezeDateEnd!=''">
+          and t.freeze_Date &lt;= to_date(#{map.freezeDateEnd}, 'yy-mm-dd hh24:mi:ss')
+        </if>
+        <if test="map.unFreezeDateBegin!=null and map.unFreezeDateBegin!=''">
+          and t.unFreeze_Date >= to_date(#{map.unFreezeDateBegin}, 'yy-mm-dd hh24:mi:ss')
+        </if>
+        <if test="map.unFreezeDateEnd!=null and map.unFreezeDateEnd!=''">
+          and t.unFreeze_Date &lt;= to_date(#{map.unFreezeDateEnd}, 'yy-mm-dd hh24:mi:ss')
+        </if>
+        <if test="map.freeStatus != null and map.freeStatus != '' ">
+          and a.freestatus = #{map.freeStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="map.freezeCause != null and map.freezeCause != '' ">
+          and t.freeze_Cause = #{map.freezeCause,jdbcType=VARCHAR}
+        </if>
+        <if test="map.freezeStatus != null and map.freezeStatus != '' ">
+          and t.freeze_Status = #{map.freezeStatus,jdbcType=VARCHAR}
+        </if>
+      </where>
+      order by t.agent_id,t.freeze_date desc
+  </sql>
+
+</mapper>
