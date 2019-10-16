@@ -26,7 +26,8 @@ public enum AttachmentRelType {
     returnOrderInvoice("退货发票信息上传附件"),
     terminalTransfer("终端划拨上传附件"),
     Organization("机构管理上传附件"),
-    internetRenew("物联网卡续费上传附件");
+    internetRenew("物联网卡续费上传附件"),
+    removeAccount("销账附件");
 
     public String  msg;
 
