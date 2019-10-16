@@ -386,8 +386,8 @@
         and aab.AG_DOC_DISTRICT = #{map.docDis}
       </if>
     ) ab on ps.AGENT_ID = ab.AGENT_ID
-    left join A_AGENT_COLINFO ac on ps.AGENT_ID = ac.AGENT_ID
-    where 1 = 1 and ac.CLO_INVOICE = 1 and ac.STATUS = 1
+    left join (select * from A_AGENT_COLINFO where CLO_INVOICE = 1 and STATUS = 1) ac on ps.AGENT_ID = ac.AGENT_ID
+    where 1 = 1
       <if test="map.agentName != null and map.agentName != '' ">
         and ps.AGENT_NAME = #{map.agentName}
       </if>
@@ -409,5 +409,6 @@
       <if test="map.invoiceCompany != null and map.invoiceCompany != '' ">
         and ps.INVOICE_COMPANY = #{map.invoiceCompany}
       </if>
+    order by ps.PROFIT_MONTH desc
   </sql>
 </mapper>
