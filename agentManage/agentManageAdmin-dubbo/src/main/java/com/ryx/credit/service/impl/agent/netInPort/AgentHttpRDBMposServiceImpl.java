@@ -7,12 +7,14 @@ import com.ryx.credit.common.enumc.OrgType;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
+import com.ryx.credit.dao.agent.AgentColinfoMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.RegionMapper;
 import com.ryx.credit.dao.bank.BankLineNumsMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.bank.BankLineNums;
 import com.ryx.credit.pojo.admin.bank.BankLineNumsExample;
+import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentColinfoService;
@@ -31,7 +33,7 @@ import java.util.Map;
 
 /***
  * @Author liudh
- * @Description //TODO 
+ * @Description //TODO
  * @Date 2019/5/21 17:17
  * @Param
  * @return
@@ -40,6 +42,11 @@ import java.util.Map;
 public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
 
     private static final String rdbReqUrl = AppConfig.getProperty("rdb_req_url");
+    // --------------
+    private static final String rdbParamCheckUrl = AppConfig.getProperty("rdb_param_check_url");
+    private static final String rdb3desKey = AppConfig.getProperty("rdb_3des_Key");
+    private static final String rdb3desIv = AppConfig.getProperty("rdb_3des_iv");
+    // --------------
     private static Logger log = LoggerFactory.getLogger(AgentNetInNotityServiceImpl.class);
     @Autowired
     private AgentColinfoService agentColinfoService;
@@ -55,6 +62,8 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
     private AgentMapper agentMapper;
     @Autowired
     private DictOptionsService dictOptionsService;
+    @Autowired
+    private AgentColinfoMapper agentColinfoMapper;
 
     @Override
     public Map<String, Object> packageParam(Map<String, Object> param) {
@@ -66,7 +75,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             if(agentColinfo==null){
                 agentColinfo = new AgentColinfo();
             }
-            resultMap.put("mobileNo",agentBusInfo.getBusLoginNum().trim());
+            resultMap.put("mobileNo",agentBusInfo.getBusLoginNum());
             resultMap.put("branchid",agentBusInfo.getBusPlatform());
             resultMap.put("direct",direct(agentBusInfo.getBusType()));
             resultMap.put("cardno",agentColinfo.getCloBankAccount());
@@ -186,7 +195,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
      */
     private String direct(String busType){
         if(BusType.ZQZF.key.equals(busType) || BusType.YDX.key.equals(busType) || BusType.JGYD.key.equals(busType) || BusType.ZQ.key.equals(busType) )
-        return "1";
+            return "1";
         return "0";
     }
 
@@ -404,12 +413,23 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
     @Override
     public AgentResult agencyLevelCheck(Map<String, Object> paramMap)throws Exception{
 
+        //查询升级所需参数
         AgentVo agentVo = (AgentVo) paramMap.get("agentVo");
-        String rdbUpSingUrl =  AppConfig.getProperty("rdbpos_up_sing_url");
+        if (null == agentVo) return AgentResult.fail("获取信息为空，请刷新页面重试！");
 
         Agent agent = agentVo.getAgent();
+        if (null == agent) return AgentResult.fail("代理商信息为空，请刷新页面重试！");
+
         AgentBusInfo agentBusInfo = agentVo.getBusInfoVoList().get(0);
-        AgentColinfo agentColinfo = agentVo.getColinfoVoList().get(0);
+        if (null == agentBusInfo) return AgentResult.fail("代理商业务信息为空，请刷新页面重试！");
+
+        AgentColinfo agentColinfo;
+        if (null == agentVo.getColinfoVoList()) {
+            //代理商入网即有agentId不校验
+            agentColinfo = agentColinfoMapper.selectByAgentId(agent.getId());
+        } else {
+            agentColinfo = agentVo.getColinfoVoList().get(0);
+        }
 
         if (!agentBusInfo.getBusNum().equals(agentBusInfo.getBusLoginNum())) {
             return AgentResult.fail("业务平台编号和平台登陆账号必须一致！");
@@ -462,7 +482,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         try {
             String json = JsonUtil.objectToJson(requMap);
             log.info("------------------------------------请求瑞大宝升级直签参数"+json);
-            String httpResult = HttpClientUtil.doPostJsonWithException(rdbUpSingUrl, json);
+            String httpResult = HttpClientUtil.doPostJsonWithException(AppConfig.getProperty("rdbpos_up_sing_url"), json);
             log.info("------------------------------------瑞大宝升级直签返回参数"+httpResult);
             if(StringUtils.isNotBlank(httpResult)) {
                 JSONObject respJson = JSONObject.parseObject(httpResult);
