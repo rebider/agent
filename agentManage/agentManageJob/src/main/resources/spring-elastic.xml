@@ -199,7 +199,7 @@
                   cron="0 0/1 * * * ?"
                   sharding-total-count="1"
                   sharding-item-parameters="0=C"
-                  streaming-process="true"
+                  streaming-process="false"
                   description="退货发货sn下发业务系统任务  单节点 每分钟"
                   overwrite="true"
                   disabled="false"/>

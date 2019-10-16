@@ -60,7 +60,6 @@ public class UpdateAgentCertifiDetailJob implements DataflowJob<AgentCertificati
             ZoneId zoneId = ZoneId.systemDefault();
             ZonedDateTime zdt = LocalDateTime.now().atZone(zoneId);//Combines this date-time with a time-zone to create a  ZonedDateTime.
             Date date = Date.from(zdt.toInstant());
-            cer.setCerSuccessTm(date);
             try {
                 logger.info("商户唯一编码{},认证记录id{}",cer.getAgentId(),cer.getId());
                 Agent agent = new Agent();
@@ -71,16 +70,17 @@ public class UpdateAgentCertifiDetailJob implements DataflowJob<AgentCertificati
                 if (null!=agentCertification)
                     orgCerId=agentCertification.getId();
                 AgentResult agentResult = agentCertificationService.processData(agent, cer.getId(),orgCerId);
-                if (404==agentResult.getStatus()){
-                    logger.info("{}代理商信息不存在，认证查询无记录!",cer.getOrgAgName());
-                }else if (200!=agentResult.getStatus()){
-                    logger.info("{}代理商信息认证失败!",cer.getOrgAgName());
+                if (200!=agentResult.getStatus()){
+                    cer.setCerProStat(Status.STATUS_2.status);
+                    cer.setCerRes(Status.STATUS_2.status);
+                    cer.setCerSuccessTm(date);
+                    agentCertificationService.updateCertifi(cer);
                 }
-
             }catch (Exception e){
                 logger.error(e.toString());
-                cer.setCerProStat(Status.STATUS_3.status);
-                cer.setCerRes(Status.STATUS_1.status);
+                cer.setCerProStat(Status.STATUS_2.status);
+                cer.setCerRes(Status.STATUS_2.status);
+                cer.setCerSuccessTm(date);
                 agentCertificationService.updateCertifi(cer);
                 logger.error("认证任务执行出错!商户唯一编码{},认证记录id{}",cer.getAgentId(),cer.getId());
             }
@@ -90,4 +90,5 @@ public class UpdateAgentCertifiDetailJob implements DataflowJob<AgentCertificati
 
 
     }
+
 }

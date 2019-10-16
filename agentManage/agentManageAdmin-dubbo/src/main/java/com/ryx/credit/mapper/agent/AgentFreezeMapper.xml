@@ -302,7 +302,7 @@
           and t.freeze_Status = #{map.freezeStatus,jdbcType=VARCHAR}
         </if>
       </where>
-      order by t.agent_id,t.freeze_date
+      order by t.agent_id,t.freeze_date desc
   </sql>
 
 </mapper>

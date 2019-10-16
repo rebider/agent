@@ -74,6 +74,7 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 				return AgentResult.ok(dataMap);
 			}
 			if(respType.equals("E")){
+				logger.error("调用接口失败"+String.valueOf(jsonObject.get("respMsg")));
 				return new AgentResult(404,String.valueOf(jsonObject.get("respMsg")),"");
 			}else{
 				if(StringUtils.isNotBlank(dataMap.getString("creditCode"))){
@@ -111,8 +112,7 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 		jsonParams.put("data", data);
 
 		String plainXML = jsonParams.toString();
-		System.out.println("传入明文======" + plainXML);
-
+		logger.info("传入明文======" + plainXML);
 		// 请求报文加密开始
 		String keyStr = AESUtil.getAESKey();
 		byte[] plainBytes = plainXML.getBytes(charset);
@@ -131,12 +131,11 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 		map.put("reqMsgId", reqMsgId);
 
 		String respStr = HttpUtil.doPost(AppConfig.getProperty("gs_auth_url"), map);
-		System.out.println("返回密文======" + respStr);
-
+		logger.info("返回密文======" + respStr);
 		//返回报文解密开始
 		JSONObject jsonObject = JSONObject.parseObject(respStr);
 		if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
-			System.out.println("请求异常======" + respStr);
+			logger.info("请求异常======" + respStr);
 		} else {
 			String resEncryptData = jsonObject.getString("encryptData");
 			String resEncryptKey = jsonObject.getString("encryptKey");
@@ -145,15 +144,14 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 			byte[] decodeBase64DataBytes = Base64.decodeBase64(resEncryptData.getBytes(charset));
 			byte[] merchantXmlDataBytes = AESUtil.decrypt(decodeBase64DataBytes, merchantAESKeyBytes, "AES", "AES/ECB/PKCS5Padding", null);
 			String respXML = new String(merchantXmlDataBytes, charset);
-			System.out.println("返回明文======" + respXML);
-
+			logger.info("返回明文======" + respXML);
 			// 报文验签
 			String resSignData = jsonObject.getString("signData");
 			byte[] signBytes = Base64.decodeBase64(resSignData);
 			if (!RSAUtil.verifyDigitalSign(respXML.getBytes(charset), signBytes, Constants.publicKey, "SHA1WithRSA")) {
-				System.out.println("签名验证失败");
+				logger.info("签名验证失败");
 			} else {
-				System.out.println("签名验证成功");
+				logger.info("签名验证成功");
 			}
 			return respXML;
 		}
