@@ -44,8 +44,6 @@ import java.util.*;
 public class InternetCardServiceImpl implements InternetCardService {
 
     private static final String[] dateFormat = new String[]{DateUtil.DATE_FORMAT_yyyy_MM_dd,DateUtil.DATE_FORMAT_yyyy_MM_dd2};
-    private static final long TIME_OUT = 60000*5;      //锁的超时时间
-    private static final long ACQUIRE_TIME_OUT = 5000;  //超时时间
     private static Logger log = LoggerFactory.getLogger(InternetCardServiceImpl.class);
     @Autowired
     private OInternetCardMapper internetCardMapper;
@@ -731,7 +729,7 @@ public class InternetCardServiceImpl implements InternetCardService {
         log.info("taskDisposeInternetCard定时任务,开始执行");
         String retIdentifier = "";
         try {
-            retIdentifier = redisService.lockWithTimeout(RedisCachKey.TASK_DISPOSEIN_TERNET_CARD.code, ACQUIRE_TIME_OUT, TIME_OUT);
+            retIdentifier = redisService.lockWithTimeout(RedisCachKey.TASK_DISPOSEIN_TERNET_CARD.code, RedisService.ACQUIRE_TIME_OUT, RedisService.TIME_OUT);
             if (StringUtils.isBlank(retIdentifier)) {
                 log.info("物联网卡定时任务处理中");
                 return;
