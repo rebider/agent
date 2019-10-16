@@ -1408,10 +1408,10 @@
       <if test="busNum !=null and busNum !='' ">
        and  a_agent_businfo.bus_num =#{busNum}
       </if>
-      <if test="falg !=null and falg !='' ">
-        order by a.omonth,o_order.agent_id
+      <if test="flag !=null and flag !='' ">
+        order by a.omonth
       </if>
-      <if test="falg ==null and falg =='' ">
+      <if test="flag ==null and flag =='' ">
       order by a.omonth,o_order.agent_id desc
       </if>
   </select>
