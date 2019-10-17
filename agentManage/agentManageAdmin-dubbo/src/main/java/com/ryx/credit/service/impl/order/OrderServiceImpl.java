@@ -3725,6 +3725,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public PageInfo serchArrearage(Map<String, Object> param, PageInfo pageInfo) {
+        Long count = orderMapper.serchArrearageCount(param);
+        pageInfo.setTotal(count.intValue());
+        pageInfo.setRows(orderMapper.serchArrearageList(param));
+        return pageInfo;
+    }
+
+    @Override
     public AgentResult isRemoveAccount(Map map) {
         List<Map> removeAccountList=orderMapper.isRemoveAccount(map);
         if (null != removeAccountList && removeAccountList.size()> 0) {
