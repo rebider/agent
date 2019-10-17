@@ -23,7 +23,7 @@ public class BusinessOutVo extends AgentExtends implements Serializable {
 
     private String agRegAdd;
 
-
+    private String busId;
     private String busNum;
 
     private String busPlatform;
@@ -56,6 +56,34 @@ public class BusinessOutVo extends AgentExtends implements Serializable {
     private String busLoginNum;
 
     private String busStatus;
+
+    private String busParentBusNum;
+
+    private String busactivationparentbusNum;
+
+    public String getBusParentBusNum() {
+        return busParentBusNum;
+    }
+
+    public void setBusParentBusNum(String busParentBusNum) {
+        this.busParentBusNum = busParentBusNum;
+    }
+
+    public String getBusactivationparentbusNum() {
+        return busactivationparentbusNum;
+    }
+
+    public void setBusactivationparentbusNum(String busactivationparentbusNum) {
+        this.busactivationparentbusNum = busactivationparentbusNum;
+    }
+
+    public String getBusId() {
+        return busId;
+    }
+
+    public void setBusId(String busId) {
+        this.busId = busId;
+    }
 
     public String getBusStatus() {
         return busStatus;
