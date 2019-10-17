@@ -300,6 +300,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             throw new MessageException("信息错误");
         }
         try{
+            AgentVo agentVo = new AgentVo();
+            agentVo.setBusInfoVoList(busInfoVoList);
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busInfoVoList.get(0).getId());
             List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByAgenId(agentBusInfo.getAgentId());
             for (AgentBusInfoVo item : busInfoVoList) {
@@ -321,6 +323,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     }
                     Map<String, Object> reqMap = new HashMap<>();
                     reqMap.put("busInfo",item);
+                    reqMap.put("agentVo",agentVo);
                     AgentResult agentResult = agentNetInNotityService.agencyLevelCheck(reqMap);
                     if(!agentResult.isOK()){
                         throw new ProcessException(agentResult.getMsg());
