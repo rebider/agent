@@ -11,15 +11,15 @@ import java.util.Map;
  */
 public interface AgentNetInHttpService {
 
-    Map<String,Object> packageParam(Map<String,Object> param);
+    Map<String,Object> packageParam(Map<String,Object> param)throws Exception;
 
     AgentResult httpRequestNetIn(Map<String,Object> paramMap)throws Exception;
 
-    Map agencyLevelUpdateChangeData(Map data);
+    Map agencyLevelUpdateChangeData(Map data)throws Exception;
 
     AgentResult agencyLevelUpdateChange(Map data) throws Exception;
 
-    Map<String,Object> packageParamUpdate(Map<String,Object> param);
+    Map<String,Object> packageParamUpdate(Map<String,Object> param)throws Exception;
 
     AgentResult httpRequestNetInUpdate(Map<String,Object> paramMap)throws Exception;
 
