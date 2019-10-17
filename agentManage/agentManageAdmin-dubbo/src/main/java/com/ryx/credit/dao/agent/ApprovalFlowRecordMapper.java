@@ -2,6 +2,7 @@ package com.ryx.credit.dao.agent;
 
 import com.ryx.credit.pojo.admin.agent.ApprovalFlowRecord;
 import com.ryx.credit.pojo.admin.agent.ApprovalFlowRecordExample;
+import com.ryx.credit.pojo.admin.vo.ApprovalFlowRecordVo;
 
 import java.util.List;
 import java.util.Map;
@@ -26,4 +27,14 @@ public interface ApprovalFlowRecordMapper {
     int updateByPrimaryKeySelective(ApprovalFlowRecord record);
 
     int updateByPrimaryKey(ApprovalFlowRecord record);
+
+    List<ApprovalFlowRecordVo> exportAgentInfo(Map map);
+
+    List<ApprovalFlowRecordVo> exportBusinfo(Map map);
+
+    List<ApprovalFlowRecordVo> exportBusinfoChange(Map map);
+
+    ApprovalFlowRecord selectByBusId(String busId);
+
+    ApprovalFlowRecordVo selectByAgentName(String agentId);
 }
