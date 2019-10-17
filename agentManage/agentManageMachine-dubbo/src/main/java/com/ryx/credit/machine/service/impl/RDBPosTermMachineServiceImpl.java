@@ -213,8 +213,9 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
      */
     @Override
     public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws Exception {
+        return AgentResult.fail("瑞大宝暂不支持更换活动！");
 
-        //封装参数
+        /*//封装参数
         String currentAgencyId = refundPriceDiffDetailList.get(0).getAgentId();
         String taskId = refundPriceDiffDetailList.get(0).getRefundPriceDiffId();
         List<Map<String, Object>> reqList = new ArrayList<>();
@@ -265,7 +266,7 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
-        }
+        }*/
     }
 
     /**
