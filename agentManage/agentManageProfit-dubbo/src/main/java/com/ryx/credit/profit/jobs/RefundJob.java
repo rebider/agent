@@ -89,7 +89,8 @@ public class RefundJob {
     @Scheduled(cron = "0 0 1 1 * ?")
     public void deal() {
         // 上月的开始及结束日期
-        JSONObject param = new JSONObject();
+        //JSONObject param = new JSONObject();
+        Map<String,String> param = new HashMap<String,String>();
         // pos退单应扣分润
         param.put("bussType", "02");
         getDeductionListAndDeal(param);
@@ -109,13 +110,14 @@ public class RefundJob {
      * @Author: zhaodw
      * @Date: 2018/8/7
      */
-    private void getSupplyListAndDeal(JSONObject param) {
-        param.put("flag","2");
-        JSONObject result = getRefundList(param);
-        if (result.containsKey("info") ) {
+    private void getSupplyListAndDeal(Map<String,String> param) {
+        // param.put("flag","2");
+        param.put("flag","1");
+        JSONObject result = getRefundListByGet(param);
+        if (result != null && result.containsKey("info") ) {
             JSONArray array = result.getJSONArray("info");
             LOG.info("生成补款信息。");
-            insertSupplyList(array, param.getString("bussType"));
+            insertSupplyList(array, param.get("bussType"));
         }else{
             LOG.info("没有获取到补款信息。");
         }
@@ -179,13 +181,13 @@ public class RefundJob {
     * @Author: zhaodw
     * @Date: 2018/8/7
     */
-    private void getDeductionListAndDeal(JSONObject param) {
+    private void getDeductionListAndDeal(Map<String,String> param) {
         Map<String, BigDecimal> orgMap = new HashMap<>(10);
         Map<String, String> deductionIdMap = new HashMap<>(10);
         LOG.info("每月定时获取退单应扣数据。");
-        param.put("flag","1");
-        JSONObject result = getRefundList(param);
-        if (result.containsKey("info") ) {
+        param.put("flag","2");
+        JSONObject result = getRefundListByGet(param);
+        if(result != null && result.containsKey("info")) {
             JSONArray array = result.getJSONArray("info");
             // 获取现有未扣完数据
             String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7).replace("-","");
@@ -201,7 +203,7 @@ public class RefundJob {
             if (orgMap.size() > 0) {
                 Set<String> keys = orgMap.keySet();
                 for (String key : keys) {
-                    insertProfitDeduction(key, orgMap.get(key), deductionIdMap, param.getString("bussType"));
+                    insertProfitDeduction(key, orgMap.get(key), deductionIdMap, param.get("bussType"));
                 }
             }
         }
@@ -218,6 +220,26 @@ public class RefundJob {
         LOG.info("同步退单数据："+result);
         if (StringUtils.isNotBlank(result)) {
             return  JSONObject.parseObject(result);
+        }
+        return null;
+    }
+
+    /**
+     * 通过 get方式获取退单应扣分润列表
+     * @param param 参数
+     * @return
+     */
+    private JSONObject getRefundListByGet(Map<String,String> param) {
+        String result = HttpClientUtil.doGet(URL,param);
+        LOG.info("同步退单数据："+result);
+        if (StringUtils.isBlank(result)) {
+            LOG.info("同步退单数据失败！");
+            return null;
+        }
+        if(JSONObject.parseObject(result).get("code").toString().equals("00")){
+            return JSONObject.parseObject(result);
+        }else{
+            LOG.info("同步退单数据失败原因:"+JSONObject.parseObject(result).get("msg"));
         }
         return null;
     }
@@ -361,7 +383,7 @@ public class RefundJob {
     private void insertSettleErr( JSONObject jsonObject, Map<String, BigDecimal> orgMap, Map<String, String> deductionIdMap, String operate) {
         ProfitSettleErrLs settleErrLs = new ProfitSettleErrLs();
         settleErrLs.setId(idService.genId(TabId.P_SETTLE_ERR_LS));
-        settleErrLs.setChargebackDate(jsonObject.getString("chargebackDate"));
+        settleErrLs.setChargebackDate(jsonObject.getString("backDate"));
         settleErrLs.setTranDate(jsonObject.getString("tranDate"));
         settleErrLs.setMerchId(jsonObject.getString("merchId"));
         settleErrLs.setTranAmt(jsonObject.getBigDecimal("tranAmt"));
@@ -369,19 +391,21 @@ public class RefundJob {
         settleErrLs.setOffsetBalanceAmt(jsonObject.getBigDecimal("offsetBalanceAmt"));
         settleErrLs.setBalanceAmt(jsonObject.getBigDecimal("balanceAmt"));// 剩余未销账金额
         settleErrLs.setHostLs(jsonObject.getString("hostLs"));
-        settleErrLs.setMerchName(jsonObject.getString("merchName"));
+        //settleErrLs.setMerchName(jsonObject.getString("merchName"));
         settleErrLs.setBusinessType(jsonObject.getString("businessType"));
         settleErrLs.setCardNo(jsonObject.getString("cardNo"));
         settleErrLs.setErrDate(jsonObject.getString("errDate"));
-        settleErrLs.setNettingStatus(jsonObject.getString("nettingStatusText"));
+        settleErrLs.setNettingStatus(jsonObject.getString("nettingStatus"));
         settleErrLs.setErrDesc(jsonObject.getString("errDesc"));
         settleErrLs.setMustDeductionAmt(jsonObject.getBigDecimal("shouldDeductAmt").abs());// 应扣分润
         settleErrLs.setMustSupplyAmt(jsonObject.getBigDecimal("shouldMakeAmt"));//应补分润
-        settleErrLs.setErrCode(jsonObject.getString("errCode"));
+        settleErrLs.setErrCode(jsonObject.getString("id"));
         settleErrLs.setCooperationMode(jsonObject.getString("cooperationMode"));
         settleErrLs.setRealDeductAmt(jsonObject.getBigDecimal("realDeductAmt"));
         settleErrLs.setOffsetLossAmt(jsonObject.getBigDecimal("offsetLossAmt"));
-        settleErrLs.setYswsAmt(jsonObject.getBigDecimal("ingshou"));
+        settleErrLs.setYswsAmt(jsonObject.getBigDecimal("yingshou"));
+        settleErrLs.setLossAmt(jsonObject.getBigDecimal("lossAmt"));
+        settleErrLs.setMakeAmt(jsonObject.getBigDecimal("makeAmt"));
         String orgId = jsonObject.getString("instId");//每个业务系统机构编号
 
         synchronized (object) {

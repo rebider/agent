@@ -52,6 +52,7 @@ public class AgentKafkaServiceImpl implements AgentKafkaService {
      */
     @Override
     public AgentResult sendPayMentMessage(String agentId, String agentName, String busId, String busnum, KafkaMessageType ktype, String topic, String message) {
+        logger.info("发送消息到kafka {}",message);
         LocalDateTime ldt = LocalDateTime.now();
         KafkaSendMessage record = new KafkaSendMessage();
         record.setId(UUID.randomUUID().toString().replace("-",""));
@@ -66,8 +67,10 @@ public class AgentKafkaServiceImpl implements AgentKafkaService {
         record.setcTimeStr(ldt.format(time));
         record.setStatus(Status.STATUS_0.status);
         if(1==kafkaSendMessageMapper.insertSelective(record)){
+            logger.info("发送消息到kafka 数据库保存成功 {}",message);
             try {
                 if(StringUtils.isNotBlank(record.getBusnum())) {
+                    logger.info("发送消息到kafka 平台编号不为空发送kafka {}",message);
                     ListenableFuture<SendResult<String, String>> listenableFuture = kafkaTemplate.send(topic, record.getId(), record.getKmessage());
                     listenableFuture.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
                         @Override
@@ -98,10 +101,15 @@ public class AgentKafkaServiceImpl implements AgentKafkaService {
                             }
                         }
                     });
+                    logger.info("发送消息到kafka 平台编号不为空发送kafka 完成 {}",message);
+                }else{
+                    logger.info("发送消息到kafka 平台编号为空发送kafka {}",message);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }else{
+            logger.info("发送消息到kafka 数据库保存失败 {}",message);
         }
         return AgentResult.ok();
     }
@@ -109,8 +117,10 @@ public class AgentKafkaServiceImpl implements AgentKafkaService {
 
     @Override
     public AgentResult sendPayMentMessageById(String id) {
+        logger.info("发送消息到kafka {}",id);
         KafkaSendMessage record =  kafkaSendMessageMapper.selectByPrimaryKey(id);
         if(StringUtils.isNotBlank(record.getBusnum()) && Status.STATUS_0.status.compareTo(record.getStatus())==0) {
+            logger.info("发送消息到kafka Busnum不为空 {}",id);
             ListenableFuture<SendResult<String, String>> listenableFuture = kafkaTemplate.send(record.getKtopic(), record.getId(), record.getKmessage());
             listenableFuture.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
                 @Override
@@ -141,7 +151,10 @@ public class AgentKafkaServiceImpl implements AgentKafkaService {
                     }
                 }
             });
+        }else{
+            logger.info("发送消息到kafka Busnum为空 {}",id);
         }
+        logger.info("发送消息到kafka 完成 {}",id);
         return AgentResult.ok();
     }
 }

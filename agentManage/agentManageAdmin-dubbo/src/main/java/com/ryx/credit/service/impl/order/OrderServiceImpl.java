@@ -2353,8 +2353,10 @@ public class OrderServiceImpl implements OrderService {
 
             //TODO 处理线下打款通知kafka
             try {
+                logger.info("订单审批通过 信息开始发送到kafka:{}",order.getId());
                 paymentDetailService.sendSFPayMentToPlatform(order.getId());
             } catch (Exception e) {
+                logger.info("首付款项发送kafka失败:{}",e.getMessage());
                 e.printStackTrace();
             }
 
