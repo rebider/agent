@@ -32,4 +32,11 @@ public interface AgentColinfoMapper {
     List<Map<String,Object>> synConinfo(@Param("params") Map<String,Object> params);
 
     List<String> queryAgentHaveColinfo();
+
+    /**
+     * 通过业务信息ID查询收款账户信息（RDB预升级）
+     * @param agentId
+     * @return
+     */
+    AgentColinfo selectByAgentId(String agentId);
 }

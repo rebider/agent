@@ -9,6 +9,7 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.dao.CUserMapper;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
+import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.PlatFormMapper;
 import com.ryx.credit.dao.order.*;
 import com.ryx.credit.machine.entity.ImsTermWarehouseDetail;
@@ -17,6 +18,7 @@ import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.LowerHairMachineVo;
 import com.ryx.credit.machine.vo.MposSnVo;
 import com.ryx.credit.pojo.admin.CUser;
+import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.agent.PlatForm;
@@ -93,6 +95,8 @@ public class OsnOperateServiceImpl implements OsnOperateService {
     private InternetCardService internetCardService;
     @Autowired
     private DictOptionsService dictOptionsService;
+    @Autowired
+    private AgentMapper agentMapper;
 
     /**
      * 根据物流联动状态查询物流id
@@ -961,6 +965,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
         } else if (PlatformType.RDBPOS.code.equals(platForm.getPlatformType())) {
             //瑞大宝机具下发
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
+            Agent agent = agentMapper.selectByPrimaryKey(order.getAgentId());
             if (null == oActivity_plan) throw new MessageException("活动信息异常！");
             if (null == order.getOrderPlatform()) throw new MessageException("订单信息中平台异常！");
             if (null == agentBusInfo) throw new MessageException("查询业务数据失败！");
@@ -978,6 +983,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             reqMap.put("branchId", branchId);//品牌id
             reqMap.put("termPolicyId", oActivity_plan.getBusProCode());//活动代码
             reqMap.put("inBoundDate", new SimpleDateFormat("yyyyMMdd").format(new Date()));//物流下发，当前时间
+            reqMap.put("agencyName", agent.getAgName());//划拨目标
 
             try {
                 //发送接口

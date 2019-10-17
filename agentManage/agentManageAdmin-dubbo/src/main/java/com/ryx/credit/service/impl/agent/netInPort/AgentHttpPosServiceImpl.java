@@ -508,6 +508,7 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
                     putKeyV("orgId",agentBusInfo.getBusNum()).
                     putKeyV("organInitials",upSingCheckMap.get("POSANAMEPREFIX")));
             String plainXML = jsonParams.toString();
+            log.info("POS预升级请求参数:{}", plainXML);
             // 请求报文加密开始
             String keyStr = AESUtil.getAESKey();
             byte[] plainBytes = plainXML.getBytes(charset);
@@ -524,11 +525,10 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
             map.put("signData", signData);
             map.put("tranCode", tranCode);
             map.put("reqMsgId", reqMsgId);
-            log.info("通知pos请求参数:{}",map);
             String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("agent_pos_notify_url"), map);
             JSONObject jsonObject = JSONObject.parseObject(httpResult);
             if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
-                log.info("Pos升级直签校验失败：" + httpResult);
+                log.info("POS预升级校验失败:{}", httpResult);
                 throw new Exception("pos升级直签校验失败");
             } else {
                 String resEncryptData = jsonObject.getString("encryptData");
@@ -538,7 +538,6 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
                 byte[] decodeBase64DataBytes = Base64.decodeBase64(resEncryptData.getBytes(charset));
                 byte[] merchantXmlDataBytes = AESUtil.decrypt(decodeBase64DataBytes, merchantAESKeyBytes, "AES", "AES/ECB/PKCS5Padding", null);
                 String respXML = new String(merchantXmlDataBytes, charset);
-                log.info("Pos升级直签校验：{}",respXML);
 
                 // 报文验签
                 String resSignData = jsonObject.getString("signData");
