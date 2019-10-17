@@ -1416,12 +1416,7 @@
       <if test="busNum !=null and busNum !='' ">
        and  a_agent_businfo.bus_num =#{busNum}
       </if>
-      <if test="flag !=null and flag !='' ">
-        order by a.omonth
-      </if>
-      <if test="flag ==null and flag =='' ">
-      order by a.omonth,o_order.agent_id desc
-      </if>
+     order by o_order.O_INURETIME,order_id
   </select>
   <!--欠款详情-->
   <select id="serchArrearageCount" parameterType="java.util.Map" resultType="java.lang.Long">
