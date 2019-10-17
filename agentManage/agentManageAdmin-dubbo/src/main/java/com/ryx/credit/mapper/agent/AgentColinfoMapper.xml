@@ -404,8 +404,9 @@
             A_AGENT_COLINFO AC, A_AGENT A
         WHERE
             A.ID = AC.AGENT_ID
-            AND A.AG_STATUS IN ('Approved', '3')
+            AND AC.CLO_REVIEW_STATUS=3
+            AND A.AG_STATUS = 'Approved'
             AND AC.STATUS = '1'
-            AND A.ID = #{agentId, jdbcType=VARCHAR}}
+            AND A.ID = #{agentId,jdbcType=VARCHAR}
     </select>
 </mapper>

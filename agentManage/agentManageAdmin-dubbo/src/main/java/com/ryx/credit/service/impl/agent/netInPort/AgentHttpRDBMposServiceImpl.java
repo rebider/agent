@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.BusType;
 import com.ryx.credit.common.enumc.DictGroup;
 import com.ryx.credit.common.enumc.OrgType;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
@@ -219,7 +220,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
 
 
     @Override
-    public Map agencyLevelUpdateChangeData(Map data) {
+    public Map agencyLevelUpdateChangeData(Map data) throws Exception{
         Map<String,Object> jsonParams = new HashMap<>();
         String busId = String.valueOf(data.get("agentBusinfoId"));
         AgentBusInfo agentBusInfo = agentBusinfoService.getById(busId);
@@ -301,7 +302,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
      * @param agent
      * @return
      */
-    private Map<String,Object> commonParam(Map<String,Object> jsonParams,AgentColinfo agentColinfo,Agent agent,AgentBusInfo agentBusInfo){
+    private Map<String,Object> commonParam(Map<String,Object> jsonParams,AgentColinfo agentColinfo,Agent agent,AgentBusInfo agentBusInfo)throws MessageException {
         jsonParams.put("cardno",agentColinfo.getCloBankAccount());
         jsonParams.put("bankbranchid",agentColinfo.getBranchLineNum());
         jsonParams.put("bankbranchname",agentColinfo.getCloBankBranch());
@@ -325,7 +326,9 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         jsonParams.put("companyNo",agent.getAgBusLic());
         jsonParams.put("agencyName",agent.getAgName());
         jsonParams.put("cardidx","1");
+        if (StringUtils.isBlank(agentColinfo.getBankRegion())) throw new  MessageException("请走基础信息变更流程，完善结算卡信息。");
         Region region = regionMapper.findByRcode(agentColinfo.getBankRegion());
+        if (null == region) throw new  MessageException("请走基础信息变更流程，完善结算卡信息。");
         jsonParams.put("code",String.valueOf(region.gettType()));
         jsonParams.put("cityid",agentColinfo.getBankRegion());
         jsonParams.put("bankcity",region.getrName());
@@ -344,7 +347,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
     }
 
     @Override
-    public Map<String, Object> packageParamUpdate(Map<String, Object> param) {
+    public Map<String, Object> packageParamUpdate(Map<String, Object> param)throws Exception {
         Map<String,Object> jsonParams = new HashMap<>();
         AgentBusInfo agentBusInfo = (AgentBusInfo)param.get("agentBusInfo");
         Agent agent = (Agent)param.get("agent");
@@ -417,21 +420,32 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         AgentVo agentVo = (AgentVo) paramMap.get("agentVo");
         if (null == agentVo) return AgentResult.fail("获取信息为空，请刷新页面重试！");
 
+        String agentId;
+        if (null != agentVo.getAgentId()) {
+            agentId = agentVo.getAgentId();
+        } else if (null != agentVo.getAgent().getId()) {
+            agentId = agentVo.getAgent().getId();
+        } else if (null != agentVo.getBusInfoVoList().get(0)) {
+            agentId = agentVo.getBusInfoVoList().get(0).getAgentId();
+        } else {
+            return AgentResult.fail("获取代理商信息为空!");
+        }
+
         AgentBusInfo agentBusInfo = agentVo.getBusInfoVoList().get(0);
         if (null == agentBusInfo) return AgentResult.fail("代理商业务信息为空，请刷新页面重试！");
 
         Agent agent;
         if (null == agentVo.getAgent()) {
-            agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
+            agent = agentMapper.selectByPrimaryKey(agentId);
         } else {
             agent = agentVo.getAgent();
         }
 
-        Agent oldAgent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
+        Agent oldAgent = agentMapper.selectByPrimaryKey(agentId);
 
         AgentColinfo agentColinfo;
         if (null == agentVo.getColinfoVoList()) {
-            agentColinfo = agentColinfoMapper.selectByAgentId(agentBusInfo.getAgentId());
+            agentColinfo = agentColinfoMapper.selectByAgentId(agentId);
         } else {
             agentColinfo = agentVo.getColinfoVoList().get(0);
         }
