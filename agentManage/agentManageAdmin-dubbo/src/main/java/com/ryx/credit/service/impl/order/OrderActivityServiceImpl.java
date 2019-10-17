@@ -666,13 +666,45 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                         throw new MessageException(posSn + "活动未找到");
                     }
                     Set<BigDecimal> priceSet = new HashSet<>();
+                    OActivity rActivity = null;
+                    here:
                     for (OActivity oActivity : oActivities) {
-                        priceSet.add(oActivity.getPrice());
+                        if(oActivity.getVisible().equals(VisibleStatus.TWO.getValue())){
+                            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+                            AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+                            criteria.andStatusEqualTo(Status.STATUS_1.status);
+                            criteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
+                            criteria.andBusNumEqualTo(orgid);
+                            List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+                            if(agentBusInfos.size()==0){
+                                throw new MessageException("业务编号不存在");
+                            }
+                            if(agentBusInfos.size()!=1){
+                                throw new MessageException("业务编号不唯一");
+                            }
+                            AgentBusInfo agentBusInfo = agentBusInfos.get(0);
+
+                            OActivityVisibleExample oActivityVisibleExample = new OActivityVisibleExample();
+                            OActivityVisibleExample.Criteria visibleCriteria = oActivityVisibleExample.createCriteria();
+                            visibleCriteria.andActivityIdEqualTo(oActivity.getActCode());
+                            List<OActivityVisible> oActivityVisibles = activityVisibleMapper.selectByExample(oActivityVisibleExample);
+                            for (OActivityVisible oActivityVisible : oActivityVisibles) {
+                                if(oActivityVisible.getAgentId().equals(agentBusInfo.getAgentId())){
+                                    rActivity = oActivity;
+                                    break here;
+                                }
+                            }
+                        }else{
+                            priceSet.add(oActivity.getPrice());
+                        }
                     }
                     if (priceSet.size() != 1) {
                         throw new MessageException(posSn + "价格配置错误");
                     }
-                    actSet.add(oActivities.get(0));
+                    if(rActivity==null){
+                        rActivity = oActivities.get(0);
+                    }
+                    actSet.add(rActivity);
                 }
                 if (actSet.size() != 1) {
                     throw new MessageException(snStart + "到" + snEnd + ":活动不一致,请分开上传");
