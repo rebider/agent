@@ -254,10 +254,13 @@ public interface OrderService {
      */
     PageInfo arrearageList(Map<String, Object> param, PageInfo pageInfo);
 
+
+    PageInfo arrearageQuery(Map map,PageInfo pageInfo);
+
     /**
      * 欠款详情查看
      */
-    PageInfo arrearageQuery(Map map,PageInfo pageInfo);
+    PageInfo serchArrearage(Map<String, Object> param, PageInfo pageInfo);
 
     /**
      * 查看是否存在欠款
