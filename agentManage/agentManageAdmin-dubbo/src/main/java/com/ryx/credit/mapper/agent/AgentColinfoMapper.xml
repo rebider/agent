@@ -395,4 +395,17 @@
           where ac.clo_review_status=3 and ac.status=1
           group by ac.agent_id having count(*) > 1
     </select>
+
+    <!-- 通过代理商ID查询收款账户信息 -->
+    <select id="selectByAgentId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+            AC.*
+        FROM
+            A_AGENT_COLINFO AC
+            LEFT JOIN A_AGENT A ON A.ID = AC.AGENT_ID
+        WHERE
+            A.AG_STATUS IN ('Approved', '3')
+            AND AC.STATUS = '1'
+            AND A.ID = #{agentId}
+    </select>
 </mapper>

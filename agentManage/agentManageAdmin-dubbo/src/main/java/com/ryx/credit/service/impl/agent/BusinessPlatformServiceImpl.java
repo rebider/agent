@@ -228,6 +228,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         busStatusList.add(BusinessStatus.inactive.status);
         agentBusInfoCriteria.andBusStatusIn(busStatusList);
         agentBusInfoCriteria.andStatusEqualTo(Status.STATUS_1.status);
+        agentBusInfoCriteria.andCloReviewStatusEqualTo(AgStatus.Approved.status);
         List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
         if(agentBusInfos.size()==1){
             AgentBusInfo agentBusInfo = agentBusInfos.get(0);
