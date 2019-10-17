@@ -401,7 +401,7 @@
         SELECT
             <include refid="Ac_Base_Column_List"/>
         FROM
-            A_AGENT_COLINFO AC, A_AGENT A ON
+            A_AGENT_COLINFO AC, A_AGENT A
         WHERE
             A.ID = AC.AGENT_ID
             AND AC.CLO_REVIEW_STATUS=3
