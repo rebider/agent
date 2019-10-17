@@ -26,4 +26,6 @@ public interface ORefundPriceDiffDetailMapper {
     int updateByPrimaryKey(ORefundPriceDiffDetail record);
 
     List<Map> selectByExampleExtends(@Param("par") Map map,@Param("page") Page page);
+
+    Map<String, Object> selectById(String id);
 }

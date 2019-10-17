@@ -16,7 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.xml.ws.ServiceMode;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -53,6 +57,9 @@ public class UpdateAgentCertifiDetailJob implements DataflowJob<AgentCertificati
     public void processData(ShardingContext shardingContext, List<AgentCertification> list) {
         logger.info("开始执行认证任务");
         list.forEach(cer->{
+            ZoneId zoneId = ZoneId.systemDefault();
+            ZonedDateTime zdt = LocalDateTime.now().atZone(zoneId);//Combines this date-time with a time-zone to create a  ZonedDateTime.
+            Date date = Date.from(zdt.toInstant());
             try {
                 logger.info("商户唯一编码{},认证记录id{}",cer.getAgentId(),cer.getId());
                 Agent agent = new Agent();
@@ -65,11 +72,15 @@ public class UpdateAgentCertifiDetailJob implements DataflowJob<AgentCertificati
                 AgentResult agentResult = agentCertificationService.processData(agent, cer.getId(),orgCerId);
                 if (200!=agentResult.getStatus()){
                     cer.setCerProStat(Status.STATUS_2.status);
+                    cer.setCerRes(Status.STATUS_2.status);
+                    cer.setCerSuccessTm(date);
                     agentCertificationService.updateCertifi(cer);
                 }
             }catch (Exception e){
                 logger.error(e.toString());
                 cer.setCerProStat(Status.STATUS_2.status);
+                cer.setCerRes(Status.STATUS_2.status);
+                cer.setCerSuccessTm(date);
                 agentCertificationService.updateCertifi(cer);
                 logger.error("认证任务执行出错!商户唯一编码{},认证记录id{}",cer.getAgentId(),cer.getId());
             }
@@ -79,4 +90,5 @@ public class UpdateAgentCertifiDetailJob implements DataflowJob<AgentCertificati
 
 
     }
+
 }
