@@ -52,4 +52,8 @@ public interface OOrderMapper {
     List<Map> isRemoveAccount(Map map);
 
     List<Map> queryJjqk(HashMap<Object, Object> map);
+
+    Long serchArrearageCount(Map<String, Object> param);
+
+    List<Map<String,Object>> serchArrearageList(Map<String, Object> param);
 }
