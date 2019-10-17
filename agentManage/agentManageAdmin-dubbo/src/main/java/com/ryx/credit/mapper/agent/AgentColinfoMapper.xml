@@ -397,16 +397,21 @@
     </select>
 
     <!-- 通过代理商ID查询收款账户信息 -->
+    <sql id="C_Base_Column_List">
+        C.ID, C.AGENT_ID, C.CLO_TYPE, C.CLO_REALNAME, C.CLO_BANK, C.CLO_BANK_BRANCH, C.CLO_BANK_ACCOUNT,
+        C.C_TIME, C.C_UTIME, C.REMARK, C.C_USER, C.CLO_REVIEW_STATUS, C.STATUS, C.VARSION, C.BRANCH_LINE_NUM,
+        C.ALL_LINE_NUM, C.BANK_REGION, C.CLO_TAX_POINT, C.CLO_INVOICE, C.CLO_BANK_CODE, C.PAY_STATUS, C.AG_LEGAL_CERNUM
+    </sql>
     <select id="selectByAgentId" parameterType="string" resultMap="BaseResultMap">
         SELECT
-            <include refid="Ac_Base_Column_List"/>
+            <include refid="C_Base_Column_List" />
         FROM
-            A_AGENT_COLINFO AC, A_AGENT A
+            A_AGENT_COLINFO C, A_AGENT A
         WHERE
-            A.ID = AC.AGENT_ID
-            AND AC.CLO_REVIEW_STATUS=3
+            A.ID = C.AGENT_ID
+            AND C.CLO_REVIEW_STATUS=3
             AND A.AG_STATUS = 'Approved'
-            AND AC.STATUS = '1'
+            AND C.STATUS = '1'
             AND A.ID = #{agentId,jdbcType=VARCHAR}
     </select>
 </mapper>
