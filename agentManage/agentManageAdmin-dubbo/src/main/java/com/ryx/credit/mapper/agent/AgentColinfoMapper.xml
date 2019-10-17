@@ -406,6 +406,6 @@
             A.ID = AC.AGENT_ID
             AND A.AG_STATUS IN ('Approved', '3')
             AND AC.STATUS = '1'
-            AND A.ID = #{agentId}
+            AND A.ID = #{agentId, jdbcType=VARCHAR}}
     </select>
 </mapper>
