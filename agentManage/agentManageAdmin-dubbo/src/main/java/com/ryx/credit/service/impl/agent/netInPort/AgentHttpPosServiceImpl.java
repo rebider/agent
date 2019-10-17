@@ -508,6 +508,7 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
                     putKeyV("orgId",agentBusInfo.getBusNum()).
                     putKeyV("organInitials",upSingCheckMap.get("POSANAMEPREFIX")));
             String plainXML = jsonParams.toString();
+            log.info("通知pos请求参数:{}", plainXML);
             // 请求报文加密开始
             String keyStr = AESUtil.getAESKey();
             byte[] plainBytes = plainXML.getBytes(charset);
@@ -524,7 +525,6 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
             map.put("signData", signData);
             map.put("tranCode", tranCode);
             map.put("reqMsgId", reqMsgId);
-            log.info("通知pos请求参数:{}",map);
             String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("agent_pos_notify_url"), map);
             JSONObject jsonObject = JSONObject.parseObject(httpResult);
             if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
