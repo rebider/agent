@@ -417,16 +417,21 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         AgentVo agentVo = (AgentVo) paramMap.get("agentVo");
         if (null == agentVo) return AgentResult.fail("获取信息为空，请刷新页面重试！");
 
-        Agent agent = agentVo.getAgent();
-        if (null == agent) return AgentResult.fail("代理商信息为空，请刷新页面重试！");
-
         AgentBusInfo agentBusInfo = agentVo.getBusInfoVoList().get(0);
         if (null == agentBusInfo) return AgentResult.fail("代理商业务信息为空，请刷新页面重试！");
 
+        Agent agent;
+        if (null == agentVo.getAgent()) {
+            agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
+        } else {
+            agent = agentVo.getAgent();
+        }
+
+        Agent oldAgent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
+
         AgentColinfo agentColinfo;
         if (null == agentVo.getColinfoVoList()) {
-            //代理商入网即有agentId不校验
-            agentColinfo = agentColinfoMapper.selectByAgentId(agent.getId());
+            agentColinfo = agentColinfoMapper.selectByAgentId(agentBusInfo.getAgentId());
         } else {
             agentColinfo = agentVo.getColinfoVoList().get(0);
         }
@@ -462,10 +467,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         requMap.put("bankbranchid",jsonParams.get("bankbranchid"));
         requMap.put("bankbranchname",jsonParams.get("bankbranchname"));
         requMap.put("customerPid",jsonParams.get("customerPid"));
-        requMap.put("address",jsonParams.get("address"));
-        requMap.put("companyNo",jsonParams.get("companyNo"));
         requMap.put("userName",jsonParams.get("userName"));
-        requMap.put("agencyName",jsonParams.get("agencyName"));
         requMap.put("cardidx",jsonParams.get("cardidx"));
         requMap.put("code",jsonParams.get("code"));
         requMap.put("bankid",jsonParams.get("bankid"));
@@ -477,13 +479,30 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         requMap.put("customerType",jsonParams.get("customerType"));
         requMap.put("invoice",jsonParams.get("invoice"));
         requMap.put("tax",jsonParams.get("tax"));
+        if (null == jsonParams.get("address") || "".equals(jsonParams.get("address")) || "null".equals(jsonParams.get("address"))) {
+            requMap.put("address",oldAgent.getAgRegAdd());
+        } else {
+            requMap.put("address",jsonParams.get("address"));
+        }
+
+        if (null == jsonParams.get("agencyName") || "".equals(jsonParams.get("agencyName")) || "null".equals(jsonParams.get("agencyName"))) {
+            requMap.put("agencyName",oldAgent.getAgName());
+        } else {
+            requMap.put("agencyName",jsonParams.get("agencyName"));
+        }
+
+        if (null == jsonParams.get("companyNo") || "".equals(jsonParams.get("companyNo")) || "null".equals(jsonParams.get("companyNo"))) {
+            requMap.put("companyNo",oldAgent.getAgBusLic());
+        } else {
+            requMap.put("companyNo",jsonParams.get("companyNo"));
+        }
 
         // 封装参数，发送请求，解析参数，返回结果。
         try {
             String json = JsonUtil.objectToJson(requMap);
-            log.info("------------------------------------请求瑞大宝升级直签参数"+json);
+            log.info("瑞大宝预升级直签,请求参数:{}",json);
             String httpResult = HttpClientUtil.doPostJsonWithException(AppConfig.getProperty("rdbpos_up_sing_url"), json);
-            log.info("------------------------------------瑞大宝升级直签返回参数"+httpResult);
+            log.info("瑞大宝预升级直签,返回参数:{}",httpResult);
             if(StringUtils.isNotBlank(httpResult)) {
                 JSONObject respJson = JSONObject.parseObject(httpResult);
                 if (null != respJson.getString("code") && "0000".equals(respJson.getString("code")) && null != respJson.getBoolean("success") && respJson.getBoolean("success")) {
