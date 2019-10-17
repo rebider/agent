@@ -397,14 +397,14 @@
     </select>
 
     <!-- 通过代理商ID查询收款账户信息 -->
-    <select id="selectByAgentId" parameterType="java.lang.String" resultMap="BaseResultMap">
+    <select id="selectByAgentId" parameterType="string" resultMap="BaseResultMap">
         SELECT
-            AC.*
+            <include refid="Ac_Base_Column_List"/>
         FROM
-            A_AGENT_COLINFO AC
-            LEFT JOIN A_AGENT A ON A.ID = AC.AGENT_ID
+            A_AGENT_COLINFO AC, A_AGENT A
         WHERE
-            A.AG_STATUS IN ('Approved', '3')
+            A.ID = AC.AGENT_ID
+            AND A.AG_STATUS IN ('Approved', '3')
             AND AC.STATUS = '1'
             AND A.ID = #{agentId}
     </select>
