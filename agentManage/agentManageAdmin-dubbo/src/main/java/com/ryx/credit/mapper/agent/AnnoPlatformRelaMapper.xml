@@ -149,22 +149,60 @@
     left join a_announcement_info aa
     on aa.ann_id = ra.anno_id
     <where>
-      <if test="map.platfromPerm !=null and map.platfromPerm.size > 0">
-         (ra.rang_type = '1' and
-        <trim suffixOverrides="or">
-          <foreach collection="map.platfromPerm" item="platfromPermItem" >
-            #{platfromPermItem} in (ra.rang_value) or
-          </foreach>
-        </trim>)
-      </if>
+      <choose>
+        <when test="map.platfromPerm !=null and map.platfromPerm.size > 0">
+          ra.rang_type = '1' and
+          (<trim suffixOverrides="or">
+            <foreach open="(" collection="map.platfromPerm" separator=" or " item="platfromPermItem" close=")">
+              (#{platfromPermItem} = ra.rang_value)
+            </foreach>
+          </trim>)
+        </when>
+        <otherwise>
+          1!=1
+        </otherwise>
+      </choose>
     </where>
     UNION
     select distinct (anno_id)
     from a_anno_platform_rela ra
     left join a_announcement_info aa
     on aa.ann_id = ra.anno_id
-    where (ra.rang_type = '2' and instr(ra.rang_value,#{map.orgId})>0 )
-
+    <where>
+      <choose>
+        <when test="map.orgIds !=null and map.orgIds.size > 0">
+          ra.rang_type = '2' and
+          (<trim suffixOverrides="or">
+            <foreach open="(" collection="map.orgIds" separator=" or " item="orgId" close=")" >
+              (instr(ra.rang_value,#{orgId})>0)
+            </foreach>
+          </trim>)
+        </when>
+        <otherwise>
+          1!=1
+        </otherwise>
+      </choose>
+    </where>
+    UNION
+    select distinct (anno_id)
+    from a_anno_platform_rela ra
+    left join a_announcement_info aa
+    on aa.ann_id = ra.anno_id
+    <where>
+      <choose>
+        <when test="map.busTypes !=null and map.busTypes.size > 0">
+          ra.rang_type = '3' and
+          (<trim suffixOverrides="or">
+            <foreach open="(" collection="map.busTypes" separator="or" item="busType" close=")" >
+              (#{busType} = ra.rang_value)
+            </foreach>
+          </trim>)
+        </when>
+        <otherwise>
+          1!=1
+        </otherwise>
+      </choose>
+    </where>
   </select>
   <insert id="saveBatch" parameterType="java.util.List" >
     insert into A_ANNO_PLATFORM_RELA (ID, ANNO_ID, RANG_TYPE,
