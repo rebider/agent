@@ -121,7 +121,6 @@ public class RoleServiceImpl extends ServiceImpl<CRoleMapper, CRole> implements 
     @Override
     @Transactional
     public void copyRole(Long id){
-        System.out.println(id);
         CRole role = roleMapper.selectById(id);
         List<Long> list = new ArrayList();
         list.add(role.getId());
