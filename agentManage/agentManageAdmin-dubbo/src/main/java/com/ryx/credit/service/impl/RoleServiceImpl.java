@@ -7,11 +7,13 @@ import com.ryx.credit.commons.result.Tree;
 import com.ryx.credit.commons.utils.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.*;
+import com.ryx.credit.pojo.admin.CResource;
 import com.ryx.credit.pojo.admin.CRole;
 import com.ryx.credit.pojo.admin.CRoleResource;
 import com.ryx.credit.service.IRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -30,29 +32,35 @@ public class RoleServiceImpl extends ServiceImpl<CRoleMapper, CRole> implements 
     @Autowired
     private CRoleResourceMapper roleResourceMapper;
     
-    public List<CRole> selectAll() {
+    public List<CRole> selectAll(CRole cRole) {
         EntityWrapper<CRole> wrapper = new EntityWrapper<CRole>();
+        if(StringUtils.isNotBlank(cRole.getName())){
+            wrapper.like("name",cRole.getName());
+        }
         wrapper.orderBy("seq");
         return roleMapper.selectList(wrapper);
     }
     
     @Override
-    public PageInfo selectDataGrid(PageInfo pageInfo) {
+    public PageInfo selectDataGrid(PageInfo pageInfo,CRole cRole) {
         Page<CRole> page = new Page<CRole>(pageInfo.getNowpage(), pageInfo.getSize());
         
         EntityWrapper<CRole> wrapper = new EntityWrapper<CRole>();
+        if(StringUtils.isNotBlank(cRole.getName())){
+            wrapper.like("name",cRole.getName());
+        }
         wrapper.orderBy(pageInfo.getSort(), pageInfo.getOrder().equalsIgnoreCase("ASC"));
         selectPage(page, wrapper);
         
         pageInfo.setRows((ArrayList) page.getRecords());
-        pageInfo.setTotal(selectAll().size());
+        pageInfo.setTotal(selectAll(cRole).size());
         return pageInfo;
     }
 
     @Override
     public Object selectTree() {
         List<Tree> trees = new ArrayList<Tree>();
-        List<CRole> roles = this.selectAll();
+        List<CRole> roles = this.selectAll(new CRole());
         for (CRole role : roles) {
             Tree tree = new Tree();
             tree.setId(role.getId()+"");
@@ -107,6 +115,26 @@ public class RoleServiceImpl extends ServiceImpl<CRoleMapper, CRole> implements 
         resourceMap.put("urls", urlSet);
         resourceMap.put("roles", roles);
         return resourceMap;
+    }
+
+
+    @Override
+    @Transactional
+    public void copyRole(Long id){
+        System.out.println(id);
+        CRole role = roleMapper.selectById(id);
+        List<Long> list = new ArrayList();
+        list.add(role.getId());
+        List<CResource> resourceList = roleMapper.selectResourceListByRoleIdList(list);
+        String resourceIds = "";
+        for (CResource resource : resourceList) {
+            resourceIds+=resource.getId()+",";
+        }
+        role.setId(roleMapper.findId()+1);
+        role.setName(role.getName()+"1");
+        roleMapper.insertRole(role);
+        updateRoleResource(role.getId(),resourceIds);
+
     }
 
 }
