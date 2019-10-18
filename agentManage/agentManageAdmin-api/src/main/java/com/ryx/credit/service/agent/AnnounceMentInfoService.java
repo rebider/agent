@@ -17,7 +17,9 @@ import java.util.Map;
 public interface  AnnounceMentInfoService {
     PageInfo selectAnnViews(Page pageInfo, Map map);
     ResultVO saveAnn(AnnounceMentInfoVo announceMentInfo);
-    ResultVO upStat(AnnounceMentInfo announceMentInfo);
+    ResultVO upStat(AnnounceMentInfo announceMentInfo,String orgStat);
     AnnounceMentInfo queryById(String annId);
     PageInfo selectAnnViewsMaintain(Page page,Map map);
+    PageInfo selectAnnViewsManage(Page page,Map map);
+    PageInfo selectAnnViewxAgent(Page page,Map map,Long userId);
 }

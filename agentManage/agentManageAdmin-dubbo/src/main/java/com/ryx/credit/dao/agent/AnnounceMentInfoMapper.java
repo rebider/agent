@@ -38,4 +38,12 @@ public interface AnnounceMentInfoMapper {
     List<Map<String,Object>> selectAnnMaintain(@Param("map")Map<String, Object> map,@Param("page") Page page);
 
     int selectCountAnnMaintain(@Param("map")Map<String,Object> map);
+
+    List<Map<String,Object>> selectAnnManage(@Param("map")Map<String, Object> map,@Param("page") Page page);
+
+    int selectCountAnnManage(@Param("map")Map<String,Object> map);
+
+    List<Map<String,Object>> selectAnnReader(@Param("map")Map<String, Object> map,@Param("page") Page page);
+
+    int selectCountAnnReader(@Param("map")Map<String,Object> map);
 }
