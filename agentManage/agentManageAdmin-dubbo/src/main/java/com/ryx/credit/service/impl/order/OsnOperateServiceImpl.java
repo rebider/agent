@@ -975,7 +975,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             String oldAgencyId = orderPlatForm.substring(orderPlatForm.indexOf("_") + 1);
 
             Map<String, Object> reqMap = new HashMap<>();
-            reqMap.put("taskId", logistics.getId());//批次号（唯一值,主键,我们用物流运单号）
+            reqMap.put("taskId", logistics.getId());//批次号（唯一值,主键,我们用物流ID）
             reqMap.put("termBegin", logistics.getSnBeginNum());//起始SN
             reqMap.put("termEnd", logistics.getSnEndNum());//结束SN
             reqMap.put("agencyId", agentBusInfo.getBusNum());//划拨目标
@@ -984,6 +984,111 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             reqMap.put("termPolicyId", oActivity_plan.getBusProCode());//活动代码
             reqMap.put("inBoundDate", new SimpleDateFormat("yyyyMMdd").format(new Date()));//物流下发，当前时间
             reqMap.put("agencyName", agent.getAgName());//划拨目标
+
+            try {
+                //发送接口
+                String json = JsonUtil.objectToJson(reqMap);
+                logger.info("RDB机具下发接口请求参数:{}", json);
+                String respResult = HttpClientUtil.doPostJsonWithException(AppConfig.getProperty("rdbpos.requestTransfer"), json);
+                if (!StringUtils.isNotBlank(respResult)) throw new Exception("瑞大宝下发接口返回值为空，请联系管理员！");
+                JSONObject respJson = JSONObject.parseObject(respResult);
+                if (!(null != respJson.getString("code") && null != respJson.getString("success") && respJson.getString("code").equals("0000") && respJson.getBoolean("success"))) {
+                    logger.info("RDB下发返回异常:" + respResult);
+                    throw new Exception(null != respJson.getString("msg") ? respJson.getString("msg") : "瑞大宝，下发接口，返回值异常，请联系管理员!");
+                }
+
+                try {
+                    //查询结果接口
+                    String retJson = JSONObject.toJSONString(FastMap.fastMap("taskId", logistics.getId()));
+                    String retString = HttpClientUtil.doPostJsonWithException(AppConfig.getProperty("rdbpos.checkTermResult"), retJson);
+                    if (!StringUtils.isNotBlank(retString)) throw new Exception("瑞大宝,查询,下发接口,返回值为空，请联系管理员！");
+
+                    JSONObject resJson = JSONObject.parseObject(retString);
+                    logger.info("RDB机具下发查询接口返回值:{}", retString);
+                    if (null != resJson.getString("code") && resJson.getString("code").equals("0000") && null != resJson.getBoolean("success") && resJson.getBoolean("success")) {
+                        //下发成功，更新物流明细为下发成功
+                        logger.info("下发物流接口调用成功：物流编号:{},批次编号:{},时间:{},信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), resJson.getString("msg"));
+                        listOLogisticsDetailSn.forEach(detail -> {
+                            detail.setSendStatus(LogisticsDetailSendStatus.send_success.code);
+                            detail.setSbusMsg(resJson.getString("msg"));
+                            detail.setuTime(date);
+                            oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
+                        });
+                        retMap.put("code", "1111");
+                        return retMap;
+                    } else if (null != resJson.getString("code") && resJson.getString("code").equals("9999") && null != resJson.getBoolean("success") && !resJson.getBoolean("success")) {
+                        //下发失败，更新物流明细为下发失败，更新物流信息未下发失败，禁止再次发送，人工介入
+                        AppConfig.sendEmail(emailArr, "SN码" + logistics.getSnBeginNum() + "-" + logistics.getSnEndNum(), "瑞大宝机具下发失败");
+                        logger.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), resJson.getString("msg"));
+                        listOLogisticsDetailSn.forEach(detail -> {
+                            detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
+                            detail.setSbusMsg(resJson.getString("msg"));
+                            detail.setuTime(date);
+                            oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
+                        });
+                        retMap.put("code", "2222");
+                        return retMap;
+                    } else if (null != resJson.getString("code") && resJson.getString("code").equals("2001") && null != resJson.getBoolean("success") && !resJson.getBoolean("success")) {
+                        //下发处理中，返回到明细处理，明细继续循环处理，一直到业务系统处理完成
+                        listOLogisticsDetailSn.forEach(detail -> {
+                            detail.setSendStatus(LogisticsDetailSendStatus.none_send.code);
+                            detail.setSbusMsg(resJson.getString("msg"));
+                            detail.setuTime(date);
+                            oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
+                        });
+                        retMap.put("code", "0000");
+                        return retMap;
+                    } else {
+                        throw new Exception("瑞大宝，查询下发接口，返回值不符合要求，请联系管理员！");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw e;
+                }
+            } catch (Exception e) {
+                //发送异常邮件
+                e.printStackTrace();
+                AppConfig.sendEmail(emailArr, "机具下发失败，SN码:" + logistics.getSnBeginNum() + "-" + logistics.getSnEndNum() + "。失败原因：" + e.getLocalizedMessage(), "瑞大宝机具下发失败");
+                throw e;
+            }
+        } else if (PlatformType.RJPOS.code.equals(platForm.getPlatformType())) {
+            //瑞+物流下发
+            /*
+                        -taskId       | String | 批次号  （保证唯一）
+                        machineId    | String | 机具编号
+                        -posSnBegin   | String | 起始终端号
+                        -posSnEnd     | String | 结束终端号
+                        createPerson | String | 创建人orgid
+                        posType      | String | 机具类型
+                        posSpePrice  | String | 押金
+                        standTime    | String | 达标时间
+                        newOrgId     | String | 要划拨到的机构id
+                        -deliveryTime | String | 发货时间
+             */
+            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
+            Agent agent = agentMapper.selectByPrimaryKey(order.getAgentId());
+            if (null == oActivity_plan) throw new MessageException("活动信息异常！");
+            if (null == order.getOrderPlatform()) throw new MessageException("订单信息中平台异常！");
+            if (null == agentBusInfo) throw new MessageException("查询业务数据失败！");
+
+            String orderPlatForm = order.getOrderPlatform();
+            String branchId = orderPlatForm.substring(0, orderPlatForm.indexOf("_"));
+            String oldAgencyId = orderPlatForm.substring(orderPlatForm.indexOf("_") + 1);
+
+            Map<String, Object> reqMap = new HashMap<>();
+            reqMap.put("taskId", logistics.getId());//批次号（唯一值,主键,我们用物流ID）
+            reqMap.put("posSnBegin", logistics.getSnBeginNum());//起始终端号
+            reqMap.put("posSnEnd", logistics.getSnEndNum());//结束终端号
+            reqMap.put("newOrgId", agentBusInfo.getBusNum());//划拨目标
+            //reqMap.put("oldAgencyId", oldAgencyId);//划拨机构
+            //reqMap.put("branchId", branchId);//品牌id
+            //reqMap.put("termPolicyId", oActivity_plan.getBusProCode());//活动代码
+            reqMap.put("deliveryTime", new SimpleDateFormat("yyyyMMdd").format(new Date()));//物流下发，当前时间
+
+
+
+
+
 
             try {
                 //发送接口
