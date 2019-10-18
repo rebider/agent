@@ -8,15 +8,14 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
-import com.ryx.credit.dao.agent.AnnoPlatformRelaMapper;
-import com.ryx.credit.dao.agent.AnnounceMentInfoMapper;
-import com.ryx.credit.dao.agent.AttachmentMapper;
-import com.ryx.credit.dao.agent.AttachmentRelMapper;
-import com.ryx.credit.pojo.admin.agent.AnnoPlatformRela;
-import com.ryx.credit.pojo.admin.agent.AnnounceMentInfo;
-import com.ryx.credit.pojo.admin.agent.Attachment;
-import com.ryx.credit.pojo.admin.agent.AttachmentRel;
+import com.ryx.credit.dao.agent.*;
+import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AnnounceMentInfoVo;
+import com.ryx.credit.pojo.admin.vo.UserVo;
+import com.ryx.credit.service.IResourceService;
+import com.ryx.credit.service.IUserService;
+import com.ryx.credit.service.agent.AgentBusinfoService;
+import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.agent.AnnoPlatformRelaService;
 import com.ryx.credit.service.agent.AnnounceMentInfoService;
 import com.ryx.credit.service.dict.IdService;
@@ -35,10 +34,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @program: agentManage
@@ -67,6 +63,17 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
     @Autowired
     private AttachmentRelMapper attachmentRelMapper;
 
+    @Autowired
+    private IUserService iUserService;
+
+    @Autowired
+    private AgentService agentService;
+
+    @Autowired
+    private IResourceService iResourceService;
+
+    @Autowired
+    private AgentBusInfoMapper agentBusInfoMapper;
 
     @Override
     public PageInfo selectAnnViews(Page page, Map map) {
@@ -151,7 +158,14 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
     }
 
     @Override
-    public ResultVO upStat(AnnounceMentInfo announceMentInfo) {
+    public ResultVO upStat(AnnounceMentInfo announceMentInfo,String orgStat) {
+
+        AnnounceMentInfo orgAnno = announceMentInfoMapper.selectByPrimaryKey(announceMentInfo.getAnnId());
+        if (orgAnno==null){
+            return ResultVO.fail("公告不存在请刷新后重试!");
+        }
+        if (!orgAnno.getAnnoStat().toString().equals(orgStat))
+        return ResultVO.fail("公告状态异常请刷新后重试!");
         int update = announceMentInfoMapper.updateStatByAnno(announceMentInfo);
         if (update>0){
             return ResultVO.success("保存成功");
@@ -172,5 +186,37 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         pageInfo.setTotal(announceMentInfoMapper.selectCountAnnMaintain(map));
         return pageInfo;
     }
+
+    @Override
+    public PageInfo selectAnnViewsManage(Page page, Map map) {
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(announceMentInfoMapper.selectAnnManage(map,page));
+        pageInfo.setTotal(announceMentInfoMapper.selectCountAnnManage(map));
+        return pageInfo;
+    }
+
+    @Override
+    public PageInfo selectAnnViewxAgent(Page page, Map par,Long userId) {
+        PageInfo pageInfo = new PageInfo();
+        par.put("userId",userId);
+        Agent agent = agentService.queryAgentByUserId(String.valueOf(userId));
+        String agUniqNum = agent.getAgUniqNum();
+        Map<String,Object> map = new HashMap<>();
+        map.put("agentId",agUniqNum);
+        map.put("cloReviewStatus", Status.STATUS_3.status);
+        List<String> plats = agentBusInfoMapper.queryBusPlatform(map);
+        List<String> docPros = agentBusInfoMapper.queryAgDocPro(map);
+        List<String> busTypes = agentBusInfoMapper.queryBusType(map);
+        par.put("platfromPerm",plats);
+        par.put("orgIds",docPros);
+        par.put("busTypes",busTypes);
+        List<String> annoIds = annoPlatformRelaMapper.selectAnnoIds(par);
+        par.put("annoIds",annoIds);
+
+        pageInfo.setRows(announceMentInfoMapper.selectAnnReader(par,page));
+        pageInfo.setTotal(announceMentInfoMapper.selectCountAnnReader(par));
+        return  pageInfo;
+    }
+
 
 }

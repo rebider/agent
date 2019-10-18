@@ -5,9 +5,9 @@ import java.math.BigDecimal;
 public enum AnnoStat {
     //0-待发布，1-发布中,2-取消发布,3-删除
     WAIT(new BigDecimal("0"),"待发布"),
-    PUB(new BigDecimal("0"),"待发布"),
-    UNPB(new BigDecimal("0"),"待发布"),
-    DEL(new BigDecimal("0"),"待发布");
+    PUB(new BigDecimal("1"),"发布"),
+    UNPB(new BigDecimal("2"),"取消发布"),
+    DEL(new BigDecimal("3"),"删除");
 
     public BigDecimal code;
 
