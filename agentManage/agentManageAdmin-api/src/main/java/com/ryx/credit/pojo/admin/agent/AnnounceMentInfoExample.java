@@ -976,6 +976,66 @@ public class AnnounceMentInfoExample {
             addCriterion("CREATE_USER not between", value1, value2, "createUser");
             return (Criteria) this;
         }
+
+        public Criteria andToAgentIsNull() {
+            addCriterion("TO_AGENT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andToAgentIsNotNull() {
+            addCriterion("TO_AGENT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andToAgentEqualTo(BigDecimal value) {
+            addCriterion("TO_AGENT =", value, "toAgent");
+            return (Criteria) this;
+        }
+
+        public Criteria andToAgentNotEqualTo(BigDecimal value) {
+            addCriterion("TO_AGENT <>", value, "toAgent");
+            return (Criteria) this;
+        }
+
+        public Criteria andToAgentGreaterThan(BigDecimal value) {
+            addCriterion("TO_AGENT >", value, "toAgent");
+            return (Criteria) this;
+        }
+
+        public Criteria andToAgentGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("TO_AGENT >=", value, "toAgent");
+            return (Criteria) this;
+        }
+
+        public Criteria andToAgentLessThan(BigDecimal value) {
+            addCriterion("TO_AGENT <", value, "toAgent");
+            return (Criteria) this;
+        }
+
+        public Criteria andToAgentLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("TO_AGENT <=", value, "toAgent");
+            return (Criteria) this;
+        }
+
+        public Criteria andToAgentIn(List<BigDecimal> values) {
+            addCriterion("TO_AGENT in", values, "toAgent");
+            return (Criteria) this;
+        }
+
+        public Criteria andToAgentNotIn(List<BigDecimal> values) {
+            addCriterion("TO_AGENT not in", values, "toAgent");
+            return (Criteria) this;
+        }
+
+        public Criteria andToAgentBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("TO_AGENT between", value1, value2, "toAgent");
+            return (Criteria) this;
+        }
+
+        public Criteria andToAgentNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("TO_AGENT not between", value1, value2, "toAgent");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

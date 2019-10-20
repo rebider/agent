@@ -54,6 +54,8 @@ public class AnnounceMentInfo implements Serializable {
 
     private String createUser;
 
+    private BigDecimal toAgent;
+
     private String annInfo;
 
     public String getAnnId() {
@@ -158,6 +160,14 @@ public class AnnounceMentInfo implements Serializable {
 
     public void setCreateUser(String createUser) {
         this.createUser = createUser == null ? null : createUser.trim();
+    }
+
+    public BigDecimal getToAgent() {
+        return toAgent;
+    }
+
+    public void setToAgent(BigDecimal toAgent) {
+        this.toAgent = toAgent;
     }
 
     public String getAnnInfo() {
