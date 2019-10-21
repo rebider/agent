@@ -118,4 +118,9 @@ public interface AgentBusinfoService {
     void updateBusLoginNum(String oldBusLoginNum,String busLoginNum)throws MessageException;
 
     Map<String,String> queryBusInfoByBrandNum(String brandNum)throws MessageException;
+
+    /**
+     * 查询品牌
+     */
+    public AgentBusInfo agentPlatformNum(String agentId,String platFormNum);
 }
