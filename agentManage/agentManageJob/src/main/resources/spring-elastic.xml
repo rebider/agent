@@ -204,7 +204,6 @@
                   overwrite="true"
                   disabled="false"/>
 
-
     <!--&lt;!&ndash;configure job 样例配置 &ndash;&gt;-->
     <!--<job:simple id="mySimpleTask"-->
                 <!--job-ref="mySimpleTask"-->
