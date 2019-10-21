@@ -13,87 +13,11 @@
     <!--configure registry center -->
     <reg:zookeeper id="regCenter" server-lists="${zk.server}" namespace="${job.namespace}" base-sleep-time-milliseconds="1000" max-sleep-time-milliseconds="3000" max-retries="3" />
 
-    <!--代理商账户完善任务-->
-    <job:simple id="agentLoginAccountCreate"
-                job-ref="agentLoginAccountCreateJob"
-                registry-center-ref="regCenter"
-                cron="0 0/30 * * * ?"
-                overwrite="true"
-                description="代理商账号补全任务"
-                sharding-total-count="1"
-                sharding-item-parameters="0=Server0">
-        <job:distributed-listener class="com.ryx.job.listener.ExmpDistributedListener" started-timeout-milliseconds="100" completed-timeout-milliseconds="100" />
-    </job:simple>
-
-    <job:simple id="cashSummaryMouthData"
-                job-ref="cashSummaryMouthDataJob"
-                registry-center-ref="regCenter"
-                cron="0 10 0 1 * ?"
-                overwrite="true"
-                description="线下打款开票不开票数据汇总，每月1号的0点十分执行"
-                sharding-total-count="1"
-                sharding-item-parameters="0=Server0"/>
-
-
-    <job:simple id="oPdSumCreate"
-                job-ref="oPdSumCreateJob"
-                registry-center-ref="regCenter"
-                cron="0 30 0 1 * ?"
-                overwrite="true"
-                description="分润抵扣机具欠款分期汇总"
-                sharding-total-count="1"
-                sharding-item-parameters="0=Server0"
-                disabled="true"/>
-
-    <job:simple id="synColinfoToPayment"
-                job-ref="synColinfoToPaymentJob"
-                registry-center-ref="regCenter"
-                cron="0 0/30 9-21 * * ?"
-                overwrite="true"
-                description="收款账户同步出款表"
-                sharding-total-count="1"
-                sharding-item-parameters="0=Server0"/>
-
-    <job:simple id="synColinfoToQueryPayment"
-                job-ref="synColinfoToQueryPaymentJob"
-                registry-center-ref="regCenter"
-                cron="0 0/30 * * * ?"
-                overwrite="true"
-                description="收款账户同步出款表"
-                sharding-total-count="1"
-                sharding-item-parameters="0=Server0"/>
-
-    <job:simple id="completAllAgentBusInfoCompany"
-                job-ref="completAllAgentBusInfoCompanyJob"
-                registry-center-ref="regCenter"
-                 cron="0 15 10 ? * *"
-                overwrite="true"
-                description="修复代理商业务平台的打款公司 单节点"
-                sharding-total-count="1"
-                sharding-item-parameters="0=Server0"/>
-
-    <job:simple id="checkAgentColinfoJob"
-                job-ref="checkAgentColinfoJob"
-                registry-center-ref="regCenter"
-                cron="0 0 5 * * ?"
-                overwrite="true"
-                description="代理商收款账户不唯一 每天早上五点执行 单节点"
-                sharding-total-count="1"
-                sharding-item-parameters="0=Server0"/>
-
-    <job:simple id="transferLogisticsHistoryJob"
-                job-ref="transferLogisticsHistoryJob"
-                registry-center-ref="regCenter"
-                cron="0 10 0 1 * ?"
-                overwrite="true"
-                description="物流明细历史记录移动到历史表，每月1号0晨10分 单节点"
-                sharding-total-count="1"
-                sharding-item-parameters="0=Server0"/>
 
     <job:simple id="osnFaHuoGenSnDetail"
                 job-ref="osnFaHuoGenSnDetailJob"
                 registry-center-ref="regCenter"
-                cron="0 0/1 * * * ?"
+                cron="0/10 * * * * ?"
                 overwrite="true"
                 description="发货sn生成明细 单节点 每分钟"
                 sharding-total-count="1"
@@ -102,153 +26,13 @@
     <job:dataflow id="osnFaHuo"
                 job-ref="osnFaHuoJob"
                 registry-center-ref="regCenter"
-                cron="0 0/1 * * * ?"
+                cron="0/10 * * * * ?"
                 sharding-total-count="1"
                 sharding-item-parameters="0=C"
                 streaming-process="false"
                 description="发货sn下发业务系统任务  单节点 每分钟"
                 overwrite="true"
                 disabled="false"/>
-
-
-    <job:simple id="internetCard"
-                job-ref="internetCardJob"
-                registry-center-ref="regCenter"
-                cron="0 0/1 * * * ?"
-                overwrite="true"
-                description="处理未处理的物联网卡导入 1分钟执行一次"
-                sharding-total-count="1"
-                sharding-item-parameters="0=Server0"/>
-
-
-    <job:simple id="internetCardUpdateMechJob"
-                job-ref="internetCardUpdateMechJob"
-                registry-center-ref="regCenter"
-                cron="0 0 6 * * ?"
-                overwrite="true"
-                description="物联网卡，更新已修改的商户信息（是续费，正常）"
-                sharding-total-count="1"
-                sharding-item-parameters="0=Server0"/>
-    <job:simple id="terminalTransferJob"
-                job-ref="terminalTransferJob"
-                registry-center-ref="regCenter"
-                cron="0 */1 * * * ?"
-                overwrite="true"
-                description="终端划拨出查询调整结果"
-                sharding-total-count="1"
-                sharding-item-parameters="0=Server0"/>
-
-
-    <job:dataflow id="internetCardUpdateMechIsNull"
-                  job-ref="internetCardUpdateMechIsNullJob"
-                  registry-center-ref="regCenter"
-                  cron="0 0/30 * * * ? *"
-                  sharding-total-count="1"
-                  sharding-item-parameters="0=C"
-                  streaming-process="true"
-                  description="物联网卡，更新商户为空的数据,30分钟执行一次"
-                  overwrite="true"
-                  disabled="false"/>
-
-
-    <job:dataflow id="internetCardMigrationHistory"
-                  job-ref="internetCardMigrationHistoryJob"
-                  registry-center-ref="regCenter"
-                  cron="0 0 1 * * ?"
-                  sharding-total-count="1"
-                  sharding-item-parameters="0=C"
-                  streaming-process="true"
-                  description="物联网卡，迁移到历史表,每天凌晨一天执行一次"
-                  overwrite="true"
-                  disabled="false"/>
-
-    <job:dataflow id="internetCardOffsetDetail"
-                  job-ref="internetCardOffsetDetailJob"
-                  registry-center-ref="regCenter"
-                  cron="0 0 2 * * ?"
-                  sharding-total-count="1"
-                  sharding-item-parameters="0=C"
-                  streaming-process="true"
-                  description="物联网卡,生产轧差明细每日汇总"
-                  overwrite="true"
-                  disabled="false"/>
-
-    <job:dataflow id="updateAgentCertifiDetail"
-                  job-ref="updateAgentCertifiDetailJob"
-                  registry-center-ref="regCenter"
-                  cron="0 0/30 * * * ? *"
-                  sharding-total-count="1"
-                  sharding-item-parameters="0=C"
-                  streaming-process="true"
-                  description="定时更新代理商工商认证信息"
-                  overwrite="true"
-                  disabled="false"/>
-
-    <job:simple id="osnTuiHuoGenSnDetail"
-                job-ref="osnTuiHuoGenSnDetailJob"
-                registry-center-ref="regCenter"
-                cron="0 0/1 * * * ?"
-                overwrite="true"
-                description="退货发货sn生成明细 单节点 每分钟"
-                sharding-total-count="1"
-                sharding-item-parameters="0=Server0"/>
-
-    <job:dataflow id="osnTuiHuo"
-                  job-ref="osnTuiHuoJob"
-                  registry-center-ref="regCenter"
-                  cron="0 0/1 * * * ?"
-                  sharding-total-count="1"
-                  sharding-item-parameters="0=C"
-                  streaming-process="false"
-                  description="退货发货sn下发业务系统任务  单节点 每分钟"
-                  overwrite="true"
-                  disabled="false"/>
-
-    <!--&lt;!&ndash;configure job 样例配置 &ndash;&gt;-->
-    <!--<job:simple id="mySimpleTask"-->
-                <!--job-ref="mySimpleTask"-->
-                <!--registry-center-ref="regCenter"-->
-                <!--cron="0/10 * * * * ?"-->
-                <!--sharding-total-count="1"-->
-                <!--sharding-item-parameters="0=A"-->
-                <!--description="这是一个测试作业，这里可以写描述"-->
-                <!--overwrite="true"-->
-                <!--failover="true"-->
-                <!--misfire="true"-->
-                <!--job-parameter="job-parameter"-->
-                <!--disabled="true">-->
-        <!--&lt;!&ndash;前置后置任务监听实现类&ndash;&gt;-->
-        <!--<job:listener class="com.ryx.job.listener.ExmpListener" />-->
-        <!--&lt;!&ndash;前置后置任务分布式监听实现类&ndash;&gt;-->
-        <!--<job:distributed-listener class="com.ryx.job.listener.ExmpDistributedListener"-->
-                                  <!--started-timeout-milliseconds="100"-->
-                                  <!--completed-timeout-milliseconds="100" />-->
-    <!--</job:simple>-->
-    <!--&lt;!&ndash;Dataflow类型作业 样例配置&ndash;&gt;-->
-    <!--<job:dataflow id="myDataFlowTask"-->
-                  <!--job-ref="myDataFlowTask"-->
-                  <!--registry-center-ref="regCenter"-->
-                  <!--cron="0/10 * * * * ?"-->
-                  <!--sharding-total-count="1"-->
-                  <!--sharding-item-parameters="0=C"-->
-                  <!--streaming-process="false"-->
-                  <!--overwrite="true"-->
-                  <!--disabled="true"/>-->
-
-
-
-    <!--&lt;!&ndash; 配置脚本作业 样例配置&ndash;&gt;-->
-    <!--<job:script-->
-            <!--id="scriptElasticJob"-->
-            <!--registry-center-ref="regCenter"-->
-            <!--cron="0/10 * * * * ?"-->
-            <!--sharding-total-count="1"-->
-            <!--sharding-item-parameters="0=A"-->
-            <!--script-command-line="/your/file/path/demo.sh"-->
-            <!--overwrite="true"-->
-            <!--disabled="true"/>-->
-
-
    <import resource="spring-elastic-order.xml"/>
 
 
