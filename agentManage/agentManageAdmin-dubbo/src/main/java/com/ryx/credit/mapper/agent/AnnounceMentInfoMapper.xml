@@ -15,6 +15,7 @@
     <result column="UP_STAT_TM" jdbcType="TIMESTAMP" property="upStatTm" />
     <result column="CREATE_TM" jdbcType="TIMESTAMP" property="createTm" />
     <result column="CREATE_USER" jdbcType="VARCHAR" property="createUser" />
+    <result column="TO_AGENT" jdbcType="DECIMAL" property="toAgent" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.ryx.credit.pojo.admin.agent.AnnounceMentInfo">
     <result column="ANN_INFO" jdbcType="CLOB" property="annInfo" />
@@ -50,7 +51,7 @@
   </sql>
   <sql id="Base_Column_List">
     ANN_ID, ANN_TITLE, ANN_TYPE, EFFECT_TM, EXPIRE_TM, ANNO_STAT, PUB_TM, PUB_ORG, PUBLISHER, 
-    UP_STAT_USER, UP_STAT_TM, CREATE_TM, CREATE_USER
+    UP_STAT_USER, UP_STAT_TM, CREATE_TM, CREATE_USER, TO_AGENT
   </sql>
   <sql id="Blob_Column_List">
     ANN_INFO
@@ -88,7 +89,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
-    select
+    select 
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
@@ -106,12 +107,14 @@
       EFFECT_TM, EXPIRE_TM, ANNO_STAT,
       PUB_TM, PUB_ORG, PUBLISHER,
       UP_STAT_USER, UP_STAT_TM, CREATE_TM,
-      CREATE_USER, ANN_INFO)
+      CREATE_USER, TO_AGENT, ANN_INFO
+      )
     values (#{annId,jdbcType=VARCHAR}, #{annTitle,jdbcType=VARCHAR}, #{annType,jdbcType=DECIMAL},
       #{effectTm,jdbcType=TIMESTAMP}, #{expireTm,jdbcType=TIMESTAMP}, #{annoStat,jdbcType=DECIMAL},
       #{pubTm,jdbcType=TIMESTAMP}, #{pubOrg,jdbcType=VARCHAR}, #{publisher,jdbcType=VARCHAR},
       #{upStatUser,jdbcType=VARCHAR}, #{upStatTm,jdbcType=TIMESTAMP}, #{createTm,jdbcType=TIMESTAMP},
-      #{createUser,jdbcType=VARCHAR}, #{annInfo,jdbcType=CLOB})
+      #{createUser,jdbcType=VARCHAR}, #{toAgent,jdbcType=DECIMAL}, #{annInfo,jdbcType=CLOB}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AnnounceMentInfo">
     insert into A_ANNOUNCEMENT_INFO
@@ -155,6 +158,9 @@
       <if test="createUser != null">
         CREATE_USER,
       </if>
+      <if test="toAgent != null">
+        TO_AGENT,
+      </if>
       <if test="annInfo != null">
         ANN_INFO,
       </if>
@@ -195,67 +201,73 @@
       </if>
       <if test="createTm != null">
         #{createTm,jdbcType=TIMESTAMP},
-      </if>
-      <if test="createUser != null">
-        #{createUser,jdbcType=VARCHAR},
-      </if>
-      <if test="annInfo != null">
-        #{annInfo,jdbcType=CLOB},
-      </if>
-    </trim>
-  </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AnnounceMentInfoExample" resultType="java.lang.Long">
-    select count(*) from A_ANNOUNCEMENT_INFO
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-  </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.AnnounceMentInfo">
-    update A_ANNOUNCEMENT_INFO
-    <set>
-      <if test="annTitle != null">
+        </if>
+<if test="createUser != null">
+#{createUser,jdbcType=VARCHAR},
+</if>
+<if test="toAgent != null">
+#{toAgent,jdbcType=DECIMAL},
+</if>
+<if test="annInfo != null">
+#{annInfo,jdbcType=CLOB},
+</if>
+        </trim>
+        </insert>
+<select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AnnounceMentInfoExample" resultType="java.lang.Long">
+select count(*) from A_ANNOUNCEMENT_INFO
+<if test="_parameter != null">
+    <include refid="Example_Where_Clause" />
+</if>
+</select>
+<update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.AnnounceMentInfo">
+update A_ANNOUNCEMENT_INFO
+<set>
+    <if test="annTitle != null">
         ANN_TITLE = #{annTitle,jdbcType=VARCHAR},
-      </if>
-      <if test="annType != null">
+    </if>
+    <if test="annType != null">
         ANN_TYPE = #{annType,jdbcType=DECIMAL},
-      </if>
-      <if test="effectTm != null">
+    </if>
+    <if test="effectTm != null">
         EFFECT_TM = #{effectTm,jdbcType=TIMESTAMP},
-      </if>
-      <if test="expireTm != null">
+    </if>
+    <if test="expireTm != null">
         EXPIRE_TM = #{expireTm,jdbcType=TIMESTAMP},
-      </if>
-      <if test="annoStat != null">
+    </if>
+    <if test="annoStat != null">
         ANNO_STAT = #{annoStat,jdbcType=DECIMAL},
-      </if>
-      <if test="pubTm != null">
+    </if>
+    <if test="pubTm != null">
         PUB_TM = #{pubTm,jdbcType=TIMESTAMP},
-      </if>
-      <if test="pubOrg != null">
+    </if>
+    <if test="pubOrg != null">
         PUB_ORG = #{pubOrg,jdbcType=VARCHAR},
-      </if>
-      <if test="publisher != null">
+    </if>
+    <if test="publisher != null">
         PUBLISHER = #{publisher,jdbcType=VARCHAR},
-      </if>
-      <if test="upStatUser != null">
+    </if>
+    <if test="upStatUser != null">
         UP_STAT_USER = #{upStatUser,jdbcType=VARCHAR},
-      </if>
-      <if test="upStatTm != null">
+    </if>
+    <if test="upStatTm != null">
         UP_STAT_TM = #{upStatTm,jdbcType=TIMESTAMP},
-      </if>
-      <if test="createTm != null">
+    </if>
+    <if test="createTm != null">
         CREATE_TM = #{createTm,jdbcType=TIMESTAMP},
-      </if>
-      <if test="createUser != null">
+    </if>
+    <if test="createUser != null">
         CREATE_USER = #{createUser,jdbcType=VARCHAR},
-      </if>
-      <if test="annInfo != null">
+    </if>
+    <if test="toAgent != null">
+        TO_AGENT = #{toAgent,jdbcType=DECIMAL},
+    </if>
+    <if test="annInfo != null">
         ANN_INFO = #{annInfo,jdbcType=CLOB},
-      </if>
-    </set>
-    where ANN_ID = #{annId,jdbcType=VARCHAR}
-  </update>
-  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.ryx.credit.pojo.admin.agent.AnnounceMentInfo">
+    </if>
+</set>
+where ANN_ID = #{annId,jdbcType=VARCHAR}
+</update>
+<update id="updateByPrimaryKeyWithBLOBs" parameterType="com.ryx.credit.pojo.admin.agent.AnnounceMentInfo">
     update A_ANNOUNCEMENT_INFO
     set ANN_TITLE = #{annTitle,jdbcType=VARCHAR},
       ANN_TYPE = #{annType,jdbcType=DECIMAL},
@@ -269,10 +281,11 @@
       UP_STAT_TM = #{upStatTm,jdbcType=TIMESTAMP},
       CREATE_TM = #{createTm,jdbcType=TIMESTAMP},
       CREATE_USER = #{createUser,jdbcType=VARCHAR},
+      TO_AGENT = #{toAgent,jdbcType=DECIMAL},
       ANN_INFO = #{annInfo,jdbcType=CLOB}
     where ANN_ID = #{annId,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AnnounceMentInfo">
+<update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AnnounceMentInfo">
     update A_ANNOUNCEMENT_INFO
     set ANN_TITLE = #{annTitle,jdbcType=VARCHAR},
       ANN_TYPE = #{annType,jdbcType=DECIMAL},
@@ -285,342 +298,346 @@
       UP_STAT_USER = #{upStatUser,jdbcType=VARCHAR},
       UP_STAT_TM = #{upStatTm,jdbcType=TIMESTAMP},
       CREATE_TM = #{createTm,jdbcType=TIMESTAMP},
-      CREATE_USER = #{createUser,jdbcType=VARCHAR}
+      CREATE_USER = #{createUser,jdbcType=VARCHAR},
+      TO_AGENT = #{toAgent,jdbcType=DECIMAL}
     where ANN_ID = #{annId,jdbcType=VARCHAR}
   </update>
-  <update id="updateStatByAnno" parameterType="com.ryx.credit.pojo.admin.agent.AnnounceMentInfo">
+<update id="updateStatByAnno" parameterType="com.ryx.credit.pojo.admin.agent.AnnounceMentInfo">
     update a_announcement_info a set
-      <if test="publisher != null">
-          PUBLISHER = #{publisher,jdbcType=VARCHAR},
-      </if>
-      PUB_TM = #{pubTm,jdbcType=TIMESTAMP},
-      UP_STAT_USER = #{upStatUser,jdbcType=VARCHAR},
-      UP_STAT_TM = #{upStatTm,jdbcType=TIMESTAMP},
-      ANNO_STAT = #{annoStat,jdbcType=VARCHAR}
-       where ann_id = #{annId}
-  </update>
-  <sql id="OracleDialectPrefix">
-    <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from (
+    <if test="publisher != null">
+        PUBLISHER = #{publisher,jdbcType=VARCHAR},
     </if>
-  </sql>
-  <sql id="OracleDialectSuffix">
-    <if test="page != null">
-      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
-    </if>
-  </sql>
+    PUB_TM = #{pubTm,jdbcType=TIMESTAMP},
+    UP_STAT_USER = #{upStatUser,jdbcType=VARCHAR},
+    UP_STAT_TM = #{upStatTm,jdbcType=TIMESTAMP},
+    ANNO_STAT = #{annoStat,jdbcType=VARCHAR}
+    where ann_id = #{annId}
+</update>
+<sql id="OracleDialectPrefix">
+<if test="page != null">
+    select * from ( select row_.*, rownum rownum_ from (
+</if>
+</sql>
+<sql id="OracleDialectSuffix">
+<if test="page != null">
+    <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+</if>
+</sql>
 
-  <select id="selectAnnRead" resultType="map" parameterType="map">
-      <include refid="OracleDialectPrefix"/>
-      select a.ann_id,
-      a.ann_title,
-      a.ann_type,
-      a.pub_tm,
-      a.effect_tm,
-      a.expire_tm,
-      a.anno_stat,
-      c.name as pub_org,
-      nvl(ri.id, '0') as read_flag
-      from a_announcement_info a
-      left join a_announcement_read_info ri
-      on a.ann_id = ri.ann_id
-      left join c_organization c
-      on c.id = a.pub_org
-      <where>
-      <choose>
-          <when test="map.annoIds!=null and map.annoIds.size>0">
-              ( a.anno_stat != '3'
-              and a.ann_id in
-              <foreach collection="map.annoIds" item="annId" open="(" separator="," close=")">
-                  #{annId}
-              </foreach>)
-          </when>
-          <otherwise>
-              1!=1
-          </otherwise>
-      </choose>
-      <if test="map.annType!=null and map.annType!=''">
-        and a.ann_type = #{map.annType}
-      </if>
-      <if test="map.annTitle!=null and map.annTitle!=''">
-        and a.ann_title like CONCAT(CONCAT('%',#{map.annTitle}),'%')
-      </if>
-      <if test="map.pubTmb!=null and map.pubTmb!=''">
-        and a.pub_tm &gt;= to_date(#{map.pubTmb},'yyyy-mm-dd')
-      </if>
-      <if test="map.pubTme!=null and map.pubTme!=''">
-        and a.pub_tm &lt;= to_date(#{map.pubTme},'yyyy-mm-dd')
-      </if>
-      <if test="map.effectTmb!=null and map.effectTmb!=''">
-        and a.effect_tm &gt;= to_date(#{map.effectTmb},'yyyy-mm-dd')
-      </if>
-      <if test="map.effectTme!=null and map.effectTme!=''">
-        and a.effect_tm &lt;= to_date(#{map.effectTme},'yyyy-mm-dd')
-      </if>
-      <if test="map.pubOrg!=null and map.pubOrg!=''">
-        and a.pub_org = #{map.pubOrg}
-      </if>
-      </where>
-      order by a.create_tm desc
-      <include refid="OracleDialectSuffix"/>
-  </select>
+<select id="selectAnnRead" resultType="map" parameterType="map">
+    <include refid="OracleDialectPrefix"/>
+    select a.ann_id,
+    a.ann_title,
+    a.ann_type,
+    a.pub_tm,
+    a.effect_tm,
+    a.expire_tm,
+    a.anno_stat,
+    c.name as pub_org,
+    nvl(ri.id, '0') as read_flag
+    from a_announcement_info a
+    left join a_announcement_read_info ri
+    on a.ann_id = ri.ann_id
+    left join c_organization c
+    on c.id = a.pub_org
+    <where>
+        <choose>
+            <when test="map.annoIds!=null and map.annoIds.size>0">
+                ( a.anno_stat != '3'
+                and a.ann_id in
+                <foreach collection="map.annoIds" item="annId" open="(" separator="," close=")">
+                    #{annId}
+                </foreach>)
+            </when>
+            <otherwise>
+                1!=1
+            </otherwise>
+        </choose>
+        <if test="map.annType!=null and map.annType!=''">
+            and a.ann_type = #{map.annType}
+        </if>
+        <if test="map.annTitle!=null and map.annTitle!=''">
+            and a.ann_title like CONCAT(CONCAT('%',#{map.annTitle}),'%')
+        </if>
+        <if test="map.pubTmb!=null and map.pubTmb!=''">
+            and a.pub_tm &gt;= to_date(#{map.pubTmb},'yyyy-mm-dd')
+        </if>
+        <if test="map.pubTme!=null and map.pubTme!=''">
+            and a.pub_tm &lt;= to_date(#{map.pubTme},'yyyy-mm-dd')
+        </if>
+        <if test="map.effectTmb!=null and map.effectTmb!=''">
+            and a.effect_tm &gt;= to_date(#{map.effectTmb},'yyyy-mm-dd')
+        </if>
+        <if test="map.effectTme!=null and map.effectTme!=''">
+            and a.effect_tm &lt;= to_date(#{map.effectTme},'yyyy-mm-dd')
+        </if>
+        <if test="map.pubOrg!=null and map.pubOrg!=''">
+            and a.pub_org = #{map.pubOrg}
+        </if>
+    </where>
+    order by a.create_tm desc
+    <include refid="OracleDialectSuffix"/>
+</select>
 
-  <select id="selectCountAnnRead" resultType="int" parameterType="map">
+<select id="selectCountAnnRead" resultType="int" parameterType="map">
     select count(*) from(
-      select a.ann_id,
-      a.ann_title,
-      a.ann_type,
-      a.pub_tm,
-      a.effect_tm,
-      a.expire_tm,
-      a.anno_stat,
-      c.name as pub_org,
-      nvl(ri.id, '0') as read_flag
-      from a_announcement_info a
-      left join a_announcement_read_info ri
-      on a.ann_id = ri.ann_id
-      left join c_organization c
-      on c.id = a.pub_org
-      <where>
-          <choose>
-              <when test="map.annoIds!=null and map.annoIds.size>0">
-                  ( a.anno_stat != '3'
-                  and a.ann_id in
-                  <foreach collection="map.annoIds" item="annId" open="(" separator="," close=")">
-                      #{annId}
-                  </foreach>)
-              </when>
-              <otherwise>
-                  1!=1
-              </otherwise>
-          </choose>
-          <if test="map.annType!=null and map.annType!=''">
-              and a.ann_type = #{map.annType}
-          </if>
-          <if test="map.annTitle!=null and map.annTitle!=''">
-              and a.ann_title like CONCAT(CONCAT('%',#{map.annTitle}),'%')
-          </if>
-          <if test="map.pubTmb!=null and map.pubTmb!=''">
-              and a.pub_tm &gt;= to_date(#{map.pubTmb},'yyyy-mm-dd')
-          </if>
-          <if test="map.pubTme!=null and map.pubTme!=''">
-              and a.pub_tm &lt;= to_date(#{map.pubTme},'yyyy-mm-dd')
-          </if>
-          <if test="map.effectTmb!=null and map.effectTmb!=''">
-              and a.effect_tm &gt;= to_date(#{map.effectTmb},'yyyy-mm-dd')
-          </if>
-          <if test="map.effectTme!=null and map.effectTme!=''">
-              and a.effect_tm &lt;= to_date(#{map.effectTme},'yyyy-mm-dd')
-          </if>
-          <if test="map.pubOrg!=null and map.pubOrg!=''">
-              and a.pub_org = #{map.pubOrg}
-          </if>
-      </where>
-      order by a.create_tm desc)
-  </select>
-    <select id="selectAnnMaintain" parameterType="map" resultType="map">
-        <include refid="OracleDialectPrefix"/>
-        select a.ann_id,
-        a.ann_title,
-        a.ann_type,
-        a.pub_tm,
-        a.effect_tm,
-        a.expire_tm,
-        a.anno_stat,
-        c.name as pub_org,
-        nvl(ri.id, '0') as read_flag
-        from a_announcement_info a
-        left join a_announcement_read_info ri
-        on a.ann_id = ri.ann_id
-        left join c_organization c
-        on c.id = a.pub_org
-        <where>
-            a.anno_stat != '3'
+    select a.ann_id,
+    a.ann_title,
+    a.ann_type,
+    a.pub_tm,
+    a.effect_tm,
+    a.expire_tm,
+    a.anno_stat,
+    c.name as pub_org,
+    nvl(ri.id, '0') as read_flag
+    from a_announcement_info a
+    left join a_announcement_read_info ri
+    on a.ann_id = ri.ann_id
+    left join c_organization c
+    on c.id = a.pub_org
+    <where>
+        <choose>
+            <when test="map.annoIds!=null and map.annoIds.size>0">
+                ( a.anno_stat != '3'
+                and a.ann_id in
+                <foreach collection="map.annoIds" item="annId" open="(" separator="," close=")">
+                    #{annId}
+                </foreach>)
+            </when>
+            <otherwise>
+                1!=1
+            </otherwise>
+        </choose>
+        <if test="map.annType!=null and map.annType!=''">
+            and a.ann_type = #{map.annType}
+        </if>
+        <if test="map.annTitle!=null and map.annTitle!=''">
+            and a.ann_title like CONCAT(CONCAT('%',#{map.annTitle}),'%')
+        </if>
+        <if test="map.pubTmb!=null and map.pubTmb!=''">
+            and a.pub_tm &gt;= to_date(#{map.pubTmb},'yyyy-mm-dd')
+        </if>
+        <if test="map.pubTme!=null and map.pubTme!=''">
+            and a.pub_tm &lt;= to_date(#{map.pubTme},'yyyy-mm-dd')
+        </if>
+        <if test="map.effectTmb!=null and map.effectTmb!=''">
+            and a.effect_tm &gt;= to_date(#{map.effectTmb},'yyyy-mm-dd')
+        </if>
+        <if test="map.effectTme!=null and map.effectTme!=''">
+            and a.effect_tm &lt;= to_date(#{map.effectTme},'yyyy-mm-dd')
+        </if>
+        <if test="map.pubOrg!=null and map.pubOrg!=''">
+            and a.pub_org = #{map.pubOrg}
+        </if>
+    </where>
+    order by a.create_tm desc)
+</select>
+<select id="selectAnnMaintain" parameterType="map" resultType="map">
+<include refid="OracleDialectPrefix"/>
+    select a.ann_id,
+    a.ann_title,
+    a.ann_type,
+    a.pub_tm,
+    a.effect_tm,
+    a.expire_tm,
+    a.anno_stat,
+    c.name as pub_org,
+    nvl(ri.id, '0') as read_flag
+    from a_announcement_info a
+    left join a_announcement_read_info ri
+    on a.ann_id = ri.ann_id
+    left join c_organization c
+    on c.id = a.pub_org
+    <where>
+        a.anno_stat != '3'
 
-            <if test="map.annType!=null and map.annType!=''">
-                and a.ann_type = #{map.annType}
-            </if>
-            <if test="map.annTitle!=null and map.annTitle!=''">
-                and a.ann_title like CONCAT(CONCAT('%',#{map.annTitle}),'%')
-            </if>
-            <if test="map.pubTmb!=null and map.pubTmb!=''">
-                and a.pub_tm &gt;= to_date(#{map.pubTmb},'yyyy-mm-dd')
-            </if>
-            <if test="map.pubTme!=null and map.pubTme!=''">
-                and a.pub_tm &lt;= to_date(#{map.pubTme},'yyyy-mm-dd')
-            </if>
-            <if test="map.effectTmb!=null and map.effectTmb!=''">
-                and a.effect_tm &gt;= to_date(#{map.effectTmb},'yyyy-mm-dd')
-            </if>
-            <if test="map.effectTme!=null and map.effectTme!=''">
-                and a.effect_tm &lt;= to_date(#{map.effectTme},'yyyy-mm-dd')
-            </if>
-            <if test="map.pubOrg!=null and map.pubOrg!=''">
-                and a.pub_org = #{map.pubOrg}
-            </if>
-        </where>
-        order by a.create_tm desc
-        <include refid="OracleDialectSuffix"/>
-    </select>
-    <select id="selectCountAnnMaintain" parameterType="map" resultType="int">
-        select count(*) from(
-        select a.ann_id,
-        a.ann_title,
-        a.ann_type,
-        a.pub_tm,
-        a.effect_tm,
-        a.expire_tm,
-        a.anno_stat,
-        c.name as pub_org,
-        nvl(ri.id, '0') as read_flag
-        from a_announcement_info a
-        left join a_announcement_read_info ri
-        on a.ann_id = ri.ann_id and ri.READ_USER_ID = #{map.userId}
-        left join c_organization c
-        on c.id = a.pub_org
-        <where>
-            a.anno_stat != '3'
-                <if test="map.annType!=null and map.annType!=''">
-                    and a.ann_type = #{map.annType}
-                </if>
-                <if test="map.annTitle!=null and map.annTitle!=''">
-                    and a.ann_title like CONCAT(CONCAT('%',#{map.annTitle}),'%')
-                </if>
-                <if test="map.pubTmb!=null and map.pubTmb!=''">
-                    and a.pub_tm &gt;= to_date(#{map.pubTmb},'yyyy-mm-dd')
-                </if>
-                <if test="map.pubTme!=null and map.pubTme!=''">
-                    and a.pub_tm &lt;= to_date(#{map.pubTme},'yyyy-mm-dd')
-                </if>
-                <if test="map.effectTmb!=null and map.effectTmb!=''">
-                    and a.effect_tm &gt;= to_date(#{map.effectTmb},'yyyy-mm-dd')
-                </if>
-                <if test="map.effectTme!=null and map.effectTme!=''">
-                    and a.effect_tm &lt;= to_date(#{map.effectTme},'yyyy-mm-dd')
-                </if>
-                <if test="map.pubOrg!=null and map.pubOrg!=''">
-                    and a.pub_org = #{map.pubOrg}
-                </if>
-        </where>)
-    </select>
-    <select id="selectAnnManage" parameterType="map" resultType="map">
-        <include refid="OracleDialectPrefix"/>
-        select <include refid="Base_Column_List"/>
-        from a_announcement_info a
-        <where>
-            a.ANNO_STAT != 3
-            <if test="map.userId!=null and map.userId !=''">
-                and a.CREATE_USER = #{map.userId}
-            </if>
-            <if test="map.annType!=null and map.annType!=''">
-                and a.ann_type = #{map.annType}
-            </if>
-            <if test="map.annTitle!=null and map.annTitle!=''">
-                and a.ann_title like CONCAT(CONCAT('%',#{map.annTitle}),'%')
-            </if>
-            <if test="map.pubTmb!=null and map.pubTmb!=''">
-                and a.pub_tm &gt;= to_date(#{map.pubTmb},'yyyy-mm-dd')
-            </if>
-            <if test="map.pubTme!=null and map.pubTme!=''">
-                and a.pub_tm &lt;= to_date(#{map.pubTme},'yyyy-mm-dd')
-            </if>
-            <if test="map.effectTmb!=null and map.effectTmb!=''">
-                and a.effect_tm &gt;= to_date(#{map.effectTmb},'yyyy-mm-dd')
-            </if>
-            <if test="map.effectTme!=null and map.effectTme!=''">
-                and a.effect_tm &lt;= to_date(#{map.effectTme},'yyyy-mm-dd')
-            </if>
-            <if test="map.pubOrg!=null and map.pubOrg!=''">
-                and a.pub_org = #{map.pubOrg}
-            </if>
-        </where>
-        order by CREATE_TM desc
-        <include refid="OracleDialectSuffix"/>
-    </select>
-    <select id="selectCountAnnManage" parameterType="map" resultType="int">
-        select count(*) from(
-            select <include refid="Base_Column_List"/>
-            from a_announcement_info a
-            <where>
-                a.ANNO_STAT != 3
-                <if test="map.userId!=null and map.userId !=''">
-                    and a.CREATE_USER = #{map.userId}
-                </if>
-                <if test="map.annType!=null and map.annType!=''">
-                    and a.ann_type = #{map.annType}
-                </if>
-                <if test="map.annTitle!=null and map.annTitle!=''">
-                    and a.ann_title like CONCAT(CONCAT('%',#{map.annTitle}),'%')
-                </if>
-                <if test="map.pubTmb!=null and map.pubTmb!=''">
-                    and a.pub_tm &gt;= to_date(#{map.pubTmb},'yyyy-mm-dd')
-                </if>
-                <if test="map.pubTme!=null and map.pubTme!=''">
-                    and a.pub_tm &lt;= to_date(#{map.pubTme},'yyyy-mm-dd')
-                </if>
-                <if test="map.effectTmb!=null and map.effectTmb!=''">
-                    and a.effect_tm &gt;= to_date(#{map.effectTmb},'yyyy-mm-dd')
-                </if>
-                <if test="map.effectTme!=null and map.effectTme!=''">
-                    and a.effect_tm &lt;= to_date(#{map.effectTme},'yyyy-mm-dd')
-                </if>
-                <if test="map.pubOrg!=null and map.pubOrg!=''">
-                    and a.pub_org = #{map.pubOrg}
-                </if>
-            </where>
-        )
-    </select>
-    <sql id="selectAnnReaderSql">
-        select a.ann_id,
-        a.ann_title,
-        a.ann_type,
-        a.pub_tm,
-        a.effect_tm,
-        a.expire_tm,
-        a.anno_stat,
-        c.name as pub_org,
-        nvl(ri.id, '0') as read_flag
-        from a_announcement_info a
-        left join a_announcement_read_info ri
-        on a.ann_id = ri.ann_id and ri.READ_USER_ID = #{map.userId}
-        left join c_organization c
-        on c.id = a.pub_org
-        <where>
-            a.anno_stat = '1' and a.ann_id in
-            (<foreach collection="map.annoIds" item="annoId" separator=",">
-                  #{annoId}
-              </foreach>)
-            <if test="map.annType!=null and map.annType!=''">
-                and a.ann_type = #{map.annType}
-            </if>
-            <if test="map.annTitle!=null and map.annTitle!=''">
-                and a.ann_title like CONCAT(CONCAT('%',#{map.annTitle}),'%')
-            </if>
-            <if test="map.pubTmb!=null and map.pubTmb!=''">
-                and a.pub_tm &gt;= to_date(#{map.pubTmb},'yyyy-mm-dd')
-            </if>
-            <if test="map.pubTme!=null and map.pubTme!=''">
-                and a.pub_tm &lt;= to_date(#{map.pubTme},'yyyy-mm-dd')
-            </if>
-            <if test="map.effectTmb!=null and map.effectTmb!=''">
-                and a.effect_tm &gt;= to_date(#{map.effectTmb},'yyyy-mm-dd')
-            </if>
-            <if test="map.effectTme!=null and map.effectTme!=''">
-                and a.effect_tm &lt;= to_date(#{map.effectTme},'yyyy-mm-dd')
-            </if>
-            <if test="map.pubOrg!=null and map.pubOrg!=''">
-                and a.pub_org = #{map.pubOrg}
-            </if>
-        </where>
-        order by a.create_tm desc
-    </sql>
-    <select id="selectAnnReader" parameterType="map" resultType="map">
-        <include refid="OracleDialectPrefix"/>
-        <include refid="selectAnnReaderSql"/>
-        <include refid="OracleDialectSuffix"/>
-    </select>
-    <select id="selectCountAnnReader" parameterType="map" resultType="int">
-        select count(*) from(
-        <include refid="selectAnnReaderSql"/>)
-    </select>
+        <if test="map.annType!=null and map.annType!=''">
+            and a.ann_type = #{map.annType}
+        </if>
+        <if test="map.annTitle!=null and map.annTitle!=''">
+            and a.ann_title like CONCAT(CONCAT('%',#{map.annTitle}),'%')
+        </if>
+        <if test="map.pubTmb!=null and map.pubTmb!=''">
+            and a.pub_tm &gt;= to_date(#{map.pubTmb},'yyyy-mm-dd')
+        </if>
+        <if test="map.pubTme!=null and map.pubTme!=''">
+            and a.pub_tm &lt;= to_date(#{map.pubTme},'yyyy-mm-dd')
+        </if>
+        <if test="map.effectTmb!=null and map.effectTmb!=''">
+            and a.effect_tm &gt;= to_date(#{map.effectTmb},'yyyy-mm-dd')
+        </if>
+        <if test="map.effectTme!=null and map.effectTme!=''">
+            and a.effect_tm &lt;= to_date(#{map.effectTme},'yyyy-mm-dd')
+        </if>
+        <if test="map.pubOrg!=null and map.pubOrg!=''">
+            and a.pub_org = #{map.pubOrg}
+        </if>
+    </where>
+    order by a.create_tm desc
+    <include refid="OracleDialectSuffix"/>
+</select>
+<select id="selectCountAnnMaintain" parameterType="map" resultType="int">
+    select count(*) from(
+    select a.ann_id,
+    a.ann_title,
+    a.ann_type,
+    a.pub_tm,
+    a.effect_tm,
+    a.expire_tm,
+    a.anno_stat,
+    c.name as pub_org,
+    nvl(ri.id, '0') as read_flag
+    from a_announcement_info a
+    left join a_announcement_read_info ri
+    on a.ann_id = ri.ann_id and ri.READ_USER_ID = #{map.userId}
+    left join c_organization c
+    on c.id = a.pub_org
+    <where>
+        a.anno_stat != '3'
+        <if test="map.annType!=null and map.annType!=''">
+            and a.ann_type = #{map.annType}
+        </if>
+        <if test="map.annTitle!=null and map.annTitle!=''">
+            and a.ann_title like CONCAT(CONCAT('%',#{map.annTitle}),'%')
+        </if>
+        <if test="map.pubTmb!=null and map.pubTmb!=''">
+            and a.pub_tm &gt;= to_date(#{map.pubTmb},'yyyy-mm-dd')
+        </if>
+        <if test="map.pubTme!=null and map.pubTme!=''">
+            and a.pub_tm &lt;= to_date(#{map.pubTme},'yyyy-mm-dd')
+        </if>
+        <if test="map.effectTmb!=null and map.effectTmb!=''">
+            and a.effect_tm &gt;= to_date(#{map.effectTmb},'yyyy-mm-dd')
+        </if>
+        <if test="map.effectTme!=null and map.effectTme!=''">
+            and a.effect_tm &lt;= to_date(#{map.effectTme},'yyyy-mm-dd')
+        </if>
+        <if test="map.pubOrg!=null and map.pubOrg!=''">
+            and a.pub_org = #{map.pubOrg}
+        </if>
+    </where>)
+</select>
+<select id="selectAnnManage" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix"/>
+    select <include refid="Base_Column_List"/>
+    from a_announcement_info a
+    <where>
+        a.ANNO_STAT != 3
+        <if test="map.userId!=null and map.userId !=''">
+            and a.CREATE_USER = #{map.userId}
+        </if>
+        <if test="map.annType!=null and map.annType!=''">
+            and a.ann_type = #{map.annType}
+        </if>
+        <if test="map.annTitle!=null and map.annTitle!=''">
+            and a.ann_title like CONCAT(CONCAT('%',#{map.annTitle}),'%')
+        </if>
+        <if test="map.pubTmb!=null and map.pubTmb!=''">
+            and a.pub_tm &gt;= to_date(#{map.pubTmb},'yyyy-mm-dd')
+        </if>
+        <if test="map.pubTme!=null and map.pubTme!=''">
+            and a.pub_tm &lt;= to_date(#{map.pubTme},'yyyy-mm-dd')
+        </if>
+        <if test="map.effectTmb!=null and map.effectTmb!=''">
+            and a.effect_tm &gt;= to_date(#{map.effectTmb},'yyyy-mm-dd')
+        </if>
+        <if test="map.effectTme!=null and map.effectTme!=''">
+            and a.effect_tm &lt;= to_date(#{map.effectTme},'yyyy-mm-dd')
+        </if>
+        <if test="map.pubOrg!=null and map.pubOrg!=''">
+            and a.pub_org = #{map.pubOrg}
+        </if>
+    </where>
+    order by CREATE_TM desc
+    <include refid="OracleDialectSuffix"/>
+</select>
+<select id="selectCountAnnManage" parameterType="map" resultType="int">
+    select count(*) from(
+    select <include refid="Base_Column_List"/>
+    from a_announcement_info a
+    <where>
+        a.ANNO_STAT != 3
+        <if test="map.userId!=null and map.userId !=''">
+            and a.CREATE_USER = #{map.userId}
+        </if>
+        <if test="map.annType!=null and map.annType!=''">
+            and a.ann_type = #{map.annType}
+        </if>
+        <if test="map.annTitle!=null and map.annTitle!=''">
+            and a.ann_title like CONCAT(CONCAT('%',#{map.annTitle}),'%')
+        </if>
+        <if test="map.pubTmb!=null and map.pubTmb!=''">
+            and a.pub_tm &gt;= to_date(#{map.pubTmb},'yyyy-mm-dd')
+        </if>
+        <if test="map.pubTme!=null and map.pubTme!=''">
+            and a.pub_tm &lt;= to_date(#{map.pubTme},'yyyy-mm-dd')
+        </if>
+        <if test="map.effectTmb!=null and map.effectTmb!=''">
+            and a.effect_tm &gt;= to_date(#{map.effectTmb},'yyyy-mm-dd')
+        </if>
+        <if test="map.effectTme!=null and map.effectTme!=''">
+            and a.effect_tm &lt;= to_date(#{map.effectTme},'yyyy-mm-dd')
+        </if>
+        <if test="map.pubOrg!=null and map.pubOrg!=''">
+            and a.pub_org = #{map.pubOrg}
+        </if>
+    </where>
+    )
+</select>
+<sql id="selectAnnReaderSql">
+    select a.ann_id,
+    a.ann_title,
+    a.ann_type,
+    a.pub_tm,
+    a.effect_tm,
+    a.expire_tm,
+    a.anno_stat,
+    c.name as pub_org,
+    nvl(ri.id, '0') as read_flag
+    from a_announcement_info a
+    left join a_announcement_read_info ri
+    on a.ann_id = ri.ann_id and ri.READ_USER_ID = #{map.userId}
+    left join c_organization c
+    on c.id = a.pub_org
+    <where>
+        <if test="map.toAgent!=null and map.toAgent!=''">
+            a.to_agent = '0' and
+        </if>
+        a.anno_stat = '1' and a.ann_id in
+        (<foreach collection="map.annoIds" item="annoId" separator=",">
+        #{annoId}
+    </foreach>)
+        <if test="map.annType!=null and map.annType!=''">
+            and a.ann_type = #{map.annType}
+        </if>
+        <if test="map.annTitle!=null and map.annTitle!=''">
+            and a.ann_title like CONCAT(CONCAT('%',#{map.annTitle}),'%')
+        </if>
+        <if test="map.pubTmb!=null and map.pubTmb!=''">
+            and a.pub_tm &gt;= to_date(#{map.pubTmb},'yyyy-mm-dd')
+        </if>
+        <if test="map.pubTme!=null and map.pubTme!=''">
+            and a.pub_tm &lt;= to_date(#{map.pubTme},'yyyy-mm-dd')
+        </if>
+        <if test="map.effectTmb!=null and map.effectTmb!=''">
+            and a.effect_tm &gt;= to_date(#{map.effectTmb},'yyyy-mm-dd')
+        </if>
+        <if test="map.effectTme!=null and map.effectTme!=''">
+            and a.effect_tm &lt;= to_date(#{map.effectTme},'yyyy-mm-dd')
+        </if>
+        <if test="map.pubOrg!=null and map.pubOrg!=''">
+            and a.pub_org = #{map.pubOrg}
+        </if>
+    </where>
+      order by a.create_tm desc
+</sql>
+<select id="selectAnnReader" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix"/>
+    <include refid="selectAnnReaderSql"/>
+    <include refid="OracleDialectSuffix"/>
+</select>
+<select id="selectCountAnnReader" parameterType="map" resultType="int">
+    select count(*) from(
+    <include refid="selectAnnReaderSql"/>)
+</select>
 </mapper>
