@@ -37,7 +37,7 @@ import java.util.*;
 @Service("newProfitMonthMposDataJob")
 @Transactional(rollbackFor = RuntimeException.class)
 public class NewProfitMonthMposDataJob {
-
+    private static final String environment = AppConfig.getProperty("jobEnvironment");
     org.slf4j.Logger logger = LoggerFactory.getLogger(NewProfitMonthMposDataJob.class);
 
     @Autowired
@@ -71,8 +71,10 @@ public class NewProfitMonthMposDataJob {
      */
     @Scheduled(cron = "${shoushua_yuejie_job_cron}")
     public void doCron() {
-        String transDate = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6);
-        excute(transDate);
+        if (!"preproduction".equals(environment)) {
+            String transDate = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6);
+            excute(transDate);
+        }
     }
 
     @Transactional

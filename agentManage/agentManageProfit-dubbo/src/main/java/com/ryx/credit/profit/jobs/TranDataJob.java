@@ -50,7 +50,7 @@ public class TranDataJob {
     private static final String rhbReqUrl = AppConfig.getProperty("rhb_req_url");
     private static final String rhb3desKey = AppConfig.getProperty("rhb_3des_Key");
     private static final String rhb3desIv = AppConfig.getProperty("rhb_3des_iv");
-    private static final String rdbReqUrl = AppConfig.getProperty("rdb_req_url");
+    private static final String environment = AppConfig.getProperty("jobEnvironment");
 
     @Autowired
     private IPosProfitDataService posProfitDataService;
@@ -79,8 +79,10 @@ public class TranDataJob {
      */
     @Scheduled(cron = "${profit_checkdata_job_cron}")
     public void doCron() {
-        String settleMonth = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
-        deal(settleMonth);
+       if (!"preproduction".equals(environment)){
+           String settleMonth = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
+           deal(settleMonth);
+       }
     }
 
     @Transactional
@@ -251,7 +253,9 @@ public class TranDataJob {
      */
     @Scheduled(cron = "${profit_checkdata_job_cron}")
     public void doSynchronizeTranCheckData() {
-        synchronizeTranCheckData();
+        if (!"preproduction".equals(environment)) {
+            synchronizeTranCheckData();
+        }
     }
 
     /**
