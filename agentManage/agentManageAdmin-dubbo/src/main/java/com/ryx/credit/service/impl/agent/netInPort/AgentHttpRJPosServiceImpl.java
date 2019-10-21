@@ -5,6 +5,7 @@ import com.ryx.credit.common.enumc.OrgType;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.MailUtil;
 import com.ryx.credit.common.util.agentUtil.AESUtil;
@@ -18,6 +19,7 @@ import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.pojo.admin.agent.PlatForm;
 import com.ryx.credit.pojo.admin.order.Organization;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInHttpService;
@@ -473,7 +475,19 @@ public class AgentHttpRJPosServiceImpl implements AgentNetInHttpService {
 
     @Override
     public AgentResult agencyLevelCheck(Map<String, Object> paramMap)throws Exception{
-        return AgentResult.ok();
+        try {
+            AgentVo agentVo = (AgentVo) paramMap.get("agentVo");
+            if (null == agentVo || null == agentVo.getBusInfoVoList()) throw new Exception("信息不完整，请补全业务信息，如有疑问请联系管理员");
+            AgentBusInfo agentBusInfo = agentVo.getBusInfoVoList().get(0);
+
+            if (null == agentBusInfo.getBusLoginNum() || "".equals(agentBusInfo.getBusLoginNum()) || "null".equals(agentBusInfo.getBusLoginNum()))
+                throw new Exception("代理商升级，需填写对应平台登录账号！");
+
+            return AgentResult.ok();
+        }catch (Exception e){
+            e.printStackTrace();
+            throw e;
+        }
     }
 }
 

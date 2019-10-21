@@ -561,6 +561,7 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
                 }
             }
         }catch (Exception e){
+            e.printStackTrace();
             throw e;
         }
     }
