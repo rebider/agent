@@ -61,4 +61,15 @@ public class OrganizationServiceImpl extends ServiceImpl<COrganizationMapper, CO
         return organizationMapper.selectPorg();
     }
 
+    @Override
+    public List<COrganizationVo> selectOrgsByUserId(Long userId) {
+        return organizationMapper.selectPrgByUserId(userId);
+    }
+
+    @Override
+    public List<COrganization> selectPubOrgs(Map map) {
+        return organizationMapper.selectPubOrgs(map);
+    }
+
+
 }
