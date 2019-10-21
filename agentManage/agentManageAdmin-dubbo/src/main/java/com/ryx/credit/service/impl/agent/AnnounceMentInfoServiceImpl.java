@@ -178,7 +178,7 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         AnnounceMentInfo announceMentInfo = announceMentInfoMapper.selectByPrimaryKey(annId);
         return announceMentInfo;
     }
-
+    //公告运维
     @Override
     public PageInfo selectAnnViewsMaintain(Page page, Map map) {
         PageInfo pageInfo = new PageInfo();
@@ -186,7 +186,20 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         pageInfo.setTotal(announceMentInfoMapper.selectCountAnnMaintain(map));
         return pageInfo;
     }
+    //普通查看公告页面
+    @Override
+    public PageInfo selectAnnViewsRead(Page page, Map reqMap,Long userId) {
+        PageInfo pageInfo = new PageInfo();
+        logger.info("查找用户{}所属机构List",userId);
+        List<String> annoIds = annoPlatformRelaMapper.selectAnnoIds(reqMap);
+        reqMap.put("annoIds",annoIds);
+        pageInfo.setRows(announceMentInfoMapper.selectAnnRead(reqMap,page));
+        pageInfo.setTotal(announceMentInfoMapper.selectCountAnnRead(reqMap));
+        return pageInfo;
+    }
 
+
+    //公告管理
     @Override
     public PageInfo selectAnnViewsManage(Page page, Map map) {
         PageInfo pageInfo = new PageInfo();
@@ -194,11 +207,12 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         pageInfo.setTotal(announceMentInfoMapper.selectCountAnnManage(map));
         return pageInfo;
     }
-
+    //代理商查看公告
     @Override
-    public PageInfo selectAnnViewxAgent(Page page, Map par,Long userId) {
+    public PageInfo selectAnnViewsAgent(Page page, Map par,Long userId) {
         PageInfo pageInfo = new PageInfo();
         par.put("userId",userId);
+        par.put("toAgent","0");//是否发布至代理商标志
         Agent agent = agentService.queryAgentByUserId(String.valueOf(userId));
         String agUniqNum = agent.getAgUniqNum();
         Map<String,Object> map = new HashMap<>();
@@ -212,11 +226,16 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         par.put("busTypes",busTypes);
         List<String> annoIds = annoPlatformRelaMapper.selectAnnoIds(par);
         par.put("annoIds",annoIds);
-
+        if (annoIds.size()==0) return pageInfo;
         pageInfo.setRows(announceMentInfoMapper.selectAnnReader(par,page));
         pageInfo.setTotal(announceMentInfoMapper.selectCountAnnReader(par));
         return  pageInfo;
     }
 
+
+    @Override
+    public List<Attachment> queryAttByAnnoid(String id,String busType) {
+        return attachmentMapper.accessoryQuery(id, busType);
+    }
 
 }
