@@ -6,6 +6,7 @@ import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.vo.COrganizationVo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -21,4 +22,8 @@ public interface IOrganizationService extends IService<COrganization> {
     COrganization selectByPrimaryKey(Integer id);
 
     List<COrganizationVo> selectPorg();
+
+    List<COrganizationVo> selectOrgsByUserId(Long userId);
+
+    List<COrganization> selectPubOrgs(Map map);
 }

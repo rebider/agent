@@ -34,4 +34,10 @@ public interface COrganizationMapper extends BaseMapper<COrganization> {
 
     List<COrganizationVo> selectPorg();
 
+    List<COrganizationVo> selectPrgByUserId(Long userId);
+
+    List<COrganization> selectPubOrgs(@Param("map") Map map);
+
+    List<COrganization> selectPorgByorgs(@Param("list") List<String> list);
+
 }
