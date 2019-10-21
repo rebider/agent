@@ -114,7 +114,8 @@ public enum TabId {
     P_TEMPLATE_APPLY_RECORD("TAR%s%015d"),
     O_INTERNET_RENEW_OFF_D("OIROD%s%015d"),
     a_agent_certification("AC%s%015d"),
-    a_agent_freeze("AF%s%015d");
+    a_agent_freeze("AF%s%015d"),
+    O_REMOVE_ACCOUNT("ORA%s%015d");
 
     public String patt;
 
