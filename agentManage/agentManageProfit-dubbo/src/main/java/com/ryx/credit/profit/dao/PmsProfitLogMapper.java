@@ -26,7 +26,7 @@ public interface PmsProfitLogMapper {
 
     int updateByPrimaryKey(PmsProfitLog record);
 
-    Map<String,Object> checkoutData(@Param("agentId")  String agentId ,@Param("busCode") String busCode);
+    List<Map<String,Object>> checkoutData(@Param("agentId")  String agentId ,@Param("busCode") String busCode);
 
     Map<String,Object> getLoginName(@Param("userId")  String userId );
 
