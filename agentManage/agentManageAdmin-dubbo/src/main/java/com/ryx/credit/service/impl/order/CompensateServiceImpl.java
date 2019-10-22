@@ -1193,11 +1193,11 @@ public class CompensateServiceImpl implements CompensateService {
                 oLogisticsDetails = logisticsDetailMapper.queryCompensateLList(reqParam);
                 if(null==oLogisticsDetails){
                     log.info("calculatePriceDiff查询Sn失败请检查Sn有效性1");
-                    throw new ProcessException("查询Sn失败请检查Sn有效性");
+                    throw new ProcessException("查询Sn失败请检查Sn有效性,sn开始:"+oRefundPriceDiffDetail.getBeginSn()+"-sn结束:"+oRefundPriceDiffDetail.getEndSn());
                 }
                 if(oLogisticsDetails.size()!=1){
                     log.info("calculatePriceDiff查询Sn失败请检查Sn有效性2");
-                    throw new ProcessException("查询Sn失败请检查Sn有效性");
+                    throw new ProcessException("查询Sn失败请检查Sn有效性,sn开始:"+oRefundPriceDiffDetail.getBeginSn()+"-sn结束:"+oRefundPriceDiffDetail.getEndSn());
                 }
                 Map<String, Object> oLogisticsDetailMap = oLogisticsDetails.get(0);
                 //TODO 查询业务平台信息进行展示

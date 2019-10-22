@@ -512,6 +512,8 @@
     max(o_activity.activity_name)as ACTIVITYNAME,
     max(o_activity.price) as PRICE ,
     max(o_activity.original_price) as ORIGINALPRICE,
+    max(o_activity.pos_spe_price) as POS_SPE_PRICE,
+    max(o_activity.stand_time) as STAND_TIME,
     O_product.pro_name
     from o_activity left JOIN O_product ON o_activity.product_id = O_product.id
     <where>
