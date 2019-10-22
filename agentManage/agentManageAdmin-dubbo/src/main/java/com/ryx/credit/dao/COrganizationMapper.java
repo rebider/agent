@@ -40,4 +40,5 @@ public interface COrganizationMapper extends BaseMapper<COrganization> {
 
     List<COrganization> selectPorgByorgs(@Param("list") List<String> list);
 
+    List<String> selectSubOrg(List<String> orgs);
 }
