@@ -475,7 +475,7 @@ public class AgentHttpRJPosServiceImpl implements AgentNetInHttpService {
 
     @Override
     public AgentResult agencyLevelCheck(Map<String, Object> paramMap)throws Exception{
-        try {
+        /*try {
             AgentVo agentVo = (AgentVo) paramMap.get("agentVo");
             if (null == agentVo || null == agentVo.getBusInfoVoList()) throw new Exception("信息不完整，请补全业务信息，如有疑问请联系管理员");
             AgentBusInfo agentBusInfo = agentVo.getBusInfoVoList().get(0);
@@ -487,7 +487,8 @@ public class AgentHttpRJPosServiceImpl implements AgentNetInHttpService {
         }catch (Exception e){
             e.printStackTrace();
             throw e;
-        }
+        }*/
+        return AgentResult.ok();
     }
 }
 
