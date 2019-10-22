@@ -186,6 +186,64 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
 //            reqMap.put("orgId",String.valueOf(stringObjectMap.get("ORGID")));
             reqMap.put("orgCode", String.valueOf(stringObjectMap.get("ORGANIZATIONCODE")));
         }
+
+        if(StringUtils.isNotBlank(terminalTransferDetail.getSnBeginNum())){
+
+            String[] querysn = terminalTransferDetail.getSnBeginNum().split("");
+
+            StringBuffer querySame = new StringBuffer();
+            for(int i = querysn.length - 1; i >= 0; i--){
+                if(Character.isDigit(querysn[i].charAt(0))){
+                    querySame.append(querysn[i]);
+                }else {
+                    break;
+                }
+            }
+
+            String snStart = terminalTransferDetail.getSnBeginNum().replaceAll(querySame.reverse().toString(),"");
+          /*  if("".equals(snStart)){
+                if(snStart.length()>5){
+                    snStart=  terminalTransferDetail.getSnBeginNum().substring(0,snStart.length()-5);
+                }
+
+            }*/
+
+            List<Map<String,Object>> queryIntervalMap =  terminalTransferDetailMapper.queryInterval(snStart);
+                    List<String> stringList = new ArrayList<>();
+            for (Map<String,Object> Interval :queryIntervalMap) {
+                if(Interval.get("SN_BEGIN_NUM").toString().length()==terminalTransferDetail.getSnBeginNum().length()){
+                    try {
+                       Map<String,Object>  mapSn = disposeSN(Interval.get("SN_BEGIN_NUM").toString(),Interval.get("SN_END_NUM").toString());
+
+
+/*
+                        if (!((new BigInteger(map1.get("snEndNum1").toString()).compareTo(new BigInteger(map2.get("snBeginNum1").toString()))==-1) || (new BigInteger(map1.get("snBeginNum1").toString()).compareTo(new BigInteger(map2.get("snEndNum1").toString()))==1))) {
+                        map.put("sb", sb);
+                        map.put("snBeginNum1", "".equals(sbBegin) ? "0" : sbBegin);
+                        map.put("snEndNum1", "".equals(sbEnd) ? "0" : sbEnd);
+                        return map;*/
+
+                        if(snStart.equals(mapSn.get("sb"))){
+                            if((new BigInteger(querySame.toString()) .compareTo(new BigInteger(mapSn.get("snBeginNum1").toString()))!=-1)&&(new BigInteger(querySame.toString()) .compareTo(new BigInteger(mapSn.get("snEndNum1").toString()))!=1)){
+                                stringList.add(Interval.get("SN_BEGIN_NUM").toString());
+                            }
+
+                        }
+
+                    } catch (MessageException e) {
+                        log.info("传入两个SN获取区间失败");
+                        e.printStackTrace();
+
+                    }
+                }
+
+            }
+            if(stringList.size()>0){
+                reqMap.put("intervalList",stringList );
+            }
+        }
+
+
         List<Map<String, Object>> terminalTransferList = null;
         if (page != null) {
             terminalTransferList = terminalTransferDetailMapper.selectTerminalTransferDetailList(reqMap, page);
