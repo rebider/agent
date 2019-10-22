@@ -228,6 +228,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         busStatusList.add(BusinessStatus.inactive.status);
         agentBusInfoCriteria.andBusStatusIn(busStatusList);
         agentBusInfoCriteria.andStatusEqualTo(Status.STATUS_1.status);
+        agentBusInfoCriteria.andCloReviewStatusEqualTo(AgStatus.Approved.status);
         List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
         if(agentBusInfos.size()==1){
             AgentBusInfo agentBusInfo = agentBusInfos.get(0);
@@ -299,6 +300,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             throw new MessageException("信息错误");
         }
         try{
+            AgentVo agentVo = new AgentVo();
+            agentVo.setBusInfoVoList(busInfoVoList);
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busInfoVoList.get(0).getId());
             List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByAgenId(agentBusInfo.getAgentId());
             for (AgentBusInfoVo item : busInfoVoList) {
@@ -320,6 +323,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     }
                     Map<String, Object> reqMap = new HashMap<>();
                     reqMap.put("busInfo",item);
+                    reqMap.put("agentVo",agentVo);
                     AgentResult agentResult = agentNetInNotityService.agencyLevelCheck(reqMap);
                     if(!agentResult.isOK()){
                         throw new ProcessException(agentResult.getMsg());
@@ -572,6 +576,33 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     }
                     if(!RegexUtil.checkInt(item.getBusLoginNum())){
                         throw new ProcessException("瑞花宝平台登录账号必须是数字");
+                    }
+                }
+                AgentBusInfo agentBusInfo = agentBusinfoService.agentPlatformNum(agentVo.getAgentId(),item.getBusPlatform());
+                if(null!=agentBusInfo && StringUtils.isNotBlank(agentBusInfo.getBusType())){
+                    if(!agentBusInfo.getBusType().equals( item.getBusType())){
+                        throw new ProcessException("此业务的类型与月结相同品牌不一致");
+                    }
+                }
+                if(null!=agentBusInfo && StringUtils.isNotBlank(agentBusInfo.getBusRegion())){
+                    if(!agentBusInfo.getBusRegion().equals( item.getBusRegion())){
+                        throw new ProcessException("此业务的业务区域与月结相同品牌不一致");
+                    }
+                }
+                if(null!=agentBusInfo && StringUtils.isNotBlank(agentBusInfo.getBusScope())){
+                    if(!agentBusInfo.getBusScope().equals( item.getBusScope())){
+                        throw new ProcessException("此业务的业务范围与月结相同品牌不一致");
+                    }
+                }
+
+                if(null!=agentBusInfo && StringUtils.isNotBlank(agentBusInfo.getAgDocDistrict())){
+                    if(!agentBusInfo.getAgDocDistrict().equals( item.getAgDocDistrict())){
+                        throw new ProcessException("此业务的省区与月结相同品牌不一致");
+                    }
+                }
+                if(null!=agentBusInfo && StringUtils.isNotBlank(agentBusInfo.getAgDocPro())){
+                    if(!agentBusInfo.getAgDocPro().equals( item.getAgDocPro())){
+                        throw new ProcessException("此业务的大区与月结相同品牌不一致");
                     }
                 }
             }

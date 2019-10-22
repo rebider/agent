@@ -84,6 +84,7 @@ public enum DictGroup {
     CARD_AMT("流量卡每张金额"),
     OFFSET_AMT("轧差每张金额"),
     COMPENSATE_MODEL_TYPE("补差价可扩展机具类型"),
+    COMPENSATE_PLATFORM_TYPE("补差价可调整关系平台"),
 
     RDBPOS("瑞大宝模块"),
     RDB_POS_LOWER("瑞大宝直签终端下限"),
@@ -97,7 +98,9 @@ public enum DictGroup {
     RSTATUS("销账状态"),
 
     CERTIFICATION_STATUS("代理商工商认证"),
-    COMPENSATE_PLATFORM_TYPE("补差价可调整关系平台");
+    COMPENSATE_PLATFORM_TYPE("补差价可调整关系平台"),
+    RELATION_PLATFORM_NUM("平台关系");
+
 
     public String  msg;
 
