@@ -107,7 +107,8 @@
     </select>
     <select id="selectPorgByorgs" parameterType="list" resultType="com.ryx.credit.pojo.admin.COrganization">
           select id,name from(
-          <foreach collection="list" item="org" separator="union">SELECT ca.id as id,ca.name as name
+          <foreach collection="list" item="org" separator="union">
+          SELECT ca.id as id,ca.name as name
               FROM
               c_organization ca
               left join c_organization cb
@@ -135,5 +136,29 @@
         where id is not null
         group by id,name
         order by id
+    </select>
+    <select id="selectSubOrg" parameterType="list" resultType="string">
+        select id from(
+        <foreach collection="list" item="org" separator="union">
+        select distinct cc.id
+          from c_organization ca
+          left join c_organization cb
+            on ca.id = cb.pid
+          left join c_organization cc
+            on cb.id = cc.pid
+         where ca.id = #{org}
+        union
+        select distinct cb.id
+          from c_organization ca
+          left join c_organization cb
+            on ca.id = cb.pid
+         where ca.id = #{org}
+        union
+        select distinct ca.id
+          from c_organization ca
+         where ca.id = #{org}
+        </foreach>)
+         where id is not null
+         order by id desc
     </select>
 </mapper>
