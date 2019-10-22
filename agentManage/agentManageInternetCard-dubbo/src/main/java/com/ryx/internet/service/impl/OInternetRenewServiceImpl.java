@@ -808,4 +808,39 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }
 
     }
+
+
+    /**
+     * 给分润提供查询轧差数据
+     * @param reqMap
+     * @return
+     */
+    @Autowired
+    public AgentResult queryMonthSumOffsetAmt(Map<String,Object> reqMap){
+        reqMap.put("month","201908");
+        List<String> agentIdList = new ArrayList<>();
+        agentIdList.add("AG19073576564");
+        reqMap.put("agentIdList",agentIdList);
+
+        AgentResult agentResult = AgentResult.fail();
+        String month = String.valueOf(reqMap.get("month"));
+        if(StringUtils.isBlank(month) || month.equals("null")){
+            agentResult.setMsg("缺少月份");
+            return agentResult;
+        }
+        List<String> agentList = (List<String>) reqMap.get("agentIdList");
+        if(null==agentList){
+            agentResult.setMsg("缺少代理商编号");
+            return agentResult;
+        }
+        if(agentList.size()==0){
+            agentResult.setMsg("缺少代理商编号");
+            return agentResult;
+        }
+        List<Map<String, Object>> list = internetRenewOffsetDetailMapper.queryMonthSumOffsetAmt(reqMap);
+        agentResult.setData(list);
+        return agentResult;
+    }
+
+
 }
