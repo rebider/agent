@@ -87,7 +87,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
     }
 
     @Override
-    public Map<String, Object> checkoutData(String agentId, String busCode) {
+    public List<Map<String, Object>> checkoutData(String agentId, String busCode) {
         return pmsProfitLogMapper.checkoutData(agentId,busCode);
     }
 
