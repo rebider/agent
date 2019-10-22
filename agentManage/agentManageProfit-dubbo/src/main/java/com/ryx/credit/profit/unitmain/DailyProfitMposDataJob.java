@@ -33,7 +33,7 @@ import java.util.List;
 @Service("dailyProfitMposDataJob")
 @Transactional(rollbackFor = RuntimeException.class)
 public class DailyProfitMposDataJob {
-
+    private static final String environment = AppConfig.getProperty("jobEnvironment");
     private org.slf4j.Logger logger = LoggerFactory.getLogger(DailyProfitMposDataJob.class);
 
     @Autowired
@@ -57,8 +57,10 @@ public class DailyProfitMposDataJob {
      */
     @Scheduled(cron = "${shoushua_rijie_job_cron}")
     public void doCron() {
-        String profitDay = DateUtil.sdfDays.format(DateUtil.addDay(new Date(), -2));
-        excute(profitDay);
+        if (!"preproduction".equals(environment)){
+            String profitDay = DateUtil.sdfDays.format(DateUtil.addDay(new Date(), -2));
+            excute(profitDay);
+        }
     }
 
     @Transactional

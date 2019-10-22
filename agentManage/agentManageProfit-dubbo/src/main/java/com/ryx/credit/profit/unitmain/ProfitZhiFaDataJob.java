@@ -34,6 +34,7 @@ import java.util.List;
 @PropertySource("classpath:/config.properties")
 @Service("profitZhiFaDataJob")
 public class ProfitZhiFaDataJob {
+    private static final String environment = AppConfig.getProperty("jobEnvironment");
     private org.slf4j.Logger logger = LoggerFactory.getLogger(ProfitZhiFaDataJob.class);
 
     @Autowired
@@ -64,8 +65,10 @@ public class ProfitZhiFaDataJob {
      */
     @Scheduled(cron = "${shoushua_zhifa_job_cron}")
     public void doCron(){
-        String month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6);
-        excute(month);
+        if (!"preproduction".equals(environment)) {
+            String month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6);
+            excute(month);
+        }
     }
 
 

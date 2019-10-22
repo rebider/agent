@@ -17,6 +17,7 @@ import com.ryx.credit.profit.service.ProfitOrganTranMonthService;
 import com.ryx.credit.profit.service.TransProfitDetailService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.profit.IPosProfitDataService;
+import org.junit.Test;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -50,7 +51,7 @@ public class TranDataJob {
     private static final String rhbReqUrl = AppConfig.getProperty("rhb_req_url");
     private static final String rhb3desKey = AppConfig.getProperty("rhb_3des_Key");
     private static final String rhb3desIv = AppConfig.getProperty("rhb_3des_iv");
-    private static final String rdbReqUrl = AppConfig.getProperty("rdb_req_url");
+    private static final String environment = AppConfig.getProperty("jobEnvironment");
 
     @Autowired
     private IPosProfitDataService posProfitDataService;
@@ -79,8 +80,10 @@ public class TranDataJob {
      */
     @Scheduled(cron = "${profit_checkdata_job_cron}")
     public void doCron() {
-        String settleMonth = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
-        deal(settleMonth);
+       if (!"preproduction".equals(environment)){
+           String settleMonth = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
+           deal(settleMonth);
+       }
     }
 
     @Transactional
@@ -251,7 +254,9 @@ public class TranDataJob {
      */
     @Scheduled(cron = "${profit_checkdata_job_cron}")
     public void doSynchronizeTranCheckData() {
-        synchronizeTranCheckData();
+        if (!"preproduction".equals(environment)) {
+            synchronizeTranCheckData();
+        }
     }
 
     /**
@@ -361,12 +366,20 @@ public class TranDataJob {
                     Object technologyAmt = tradingVolumeData1.get(platForm.getTechnologyAmt());
                     Object technologyFee = tradingVolumeData1.get(platForm.getTechnologyFee());
                     if(technologyAmt==null){
-                        checkData.setTechnologyAmt(null);
+                        if (tradingVolumeData1.containsKey(platForm.getTechnologyAmt())){
+                            checkData.setTechnologyAmt(BigDecimal.ZERO);
+                        }else{
+                            checkData.setTechnologyAmt(null);
+                        }
                     }else{
                         checkData.setTechnologyAmt(new BigDecimal(technologyAmt.toString()));
                     }
                     if(technologyFee==null){
-                        checkData.setTechnologyFee(null);
+                        if (tradingVolumeData1.containsKey(platForm.getTechnologyFee())){
+                            checkData.setTechnologyFee(BigDecimal.ZERO);
+                        }else {
+                            checkData.setTechnologyFee(null);
+                        }
                     }else{
                         checkData.setTechnologyFee(new BigDecimal(technologyFee.toString()));
                     }
@@ -376,12 +389,20 @@ public class TranDataJob {
                     Object technologyAmt = tranAmt.get(platForm.getTechnologyAmt());
                     Object technologyFee = tranAmt.get(platForm.getTechnologyFee());
                     if(technologyAmt==null){
-                        checkData.setTechnologyAmt(null);
+                        if (tranAmt.containsKey(platForm.getTechnologyAmt())){
+                            checkData.setTechnologyAmt(BigDecimal.ZERO);
+                        }else{
+                            checkData.setTechnologyAmt(null);
+                        }
                     }else{
                         checkData.setTechnologyAmt(new BigDecimal(technologyAmt.toString()));
                     }
                     if(technologyFee==null){
-                        checkData.setTechnologyFee(null);
+                        if (tranAmt.containsKey(platForm.getTechnologyFee())){
+                            checkData.setTechnologyFee(BigDecimal.ONE);
+                        }else {
+                            checkData.setTechnologyFee(null);
+                        }
                     }else{
                         checkData.setTechnologyFee(new BigDecimal(technologyFee.toString()));
                     }
@@ -389,8 +410,8 @@ public class TranDataJob {
                 }
                 case "tranBkt":{
                     if(tranBkt!=null){
-                        checkData.setTechnologyAmt(tranBkt.getInTransAmt());
-                        checkData.setTechnologyFee(tranBkt.getTransFee());
+                        checkData.setTechnologyAmt(tranBkt.getInTransAmt()==null?BigDecimal.ZERO:tranBkt.getInTransAmt());
+                        checkData.setTechnologyFee(tranBkt.getTransFee()==null?BigDecimal.ZERO:tranBkt.getTransFee());
                     }
                     break;
                 }
@@ -398,12 +419,20 @@ public class TranDataJob {
                     Object technologyAmt = newMonthData.get(platForm.getTechnologyAmt());
                     Object technologyFee = newMonthData.get(platForm.getTechnologyFee());
                     if(technologyAmt==null){
-                        checkData.setTechnologyAmt(null);
+                        if(newMonthData.containsKey(platForm.getTechnologyAmt())){
+                            checkData.setTechnologyAmt(BigDecimal.ZERO);
+                        }else{
+                            checkData.setTechnologyAmt(null);
+                        }
                     }else{
                         checkData.setTechnologyAmt(new BigDecimal(technologyAmt.toString()));
                     }
                     if(technologyFee==null){
-                        checkData.setTechnologyFee(null);
+                        if (newMonthData.containsKey(platForm.getTechnologyFee())){
+                            checkData.setTechnologyFee(BigDecimal.ZERO);
+                        }else {
+                            checkData.setTechnologyFee(null);
+                        }
                     }else{
                         checkData.setTechnologyFee(new BigDecimal(technologyFee.toString()));
                     }
@@ -413,12 +442,20 @@ public class TranDataJob {
                     Object technologyAmt = settleData.get(platForm.getTechnologyAmt());
                     Object technologyFee = settleData.get(platForm.getTechnologyFee());
                     if(technologyAmt==null){
-                        checkData.setTechnologyAmt(null);
+                        if (settleData.containsKey(platForm.getTechnologyAmt())){
+                            checkData.setTechnologyAmt(BigDecimal.ZERO);
+                        }else {
+                            checkData.setTechnologyAmt(null);
+                        }
                     }else{
                         checkData.setTechnologyAmt(new BigDecimal(technologyAmt.toString()));
                     }
                     if(technologyFee==null){
-                        checkData.setTechnologyFee(null);
+                        if (settleData.containsKey(platForm.getTechnologyFee())){
+                            checkData.setTechnologyFee(BigDecimal.ZERO);
+                        }else{
+                            checkData.setTechnologyFee(null);
+                        }
                     }else{
                         checkData.setTechnologyFee(new BigDecimal(technologyFee.toString()));
                     }
@@ -428,12 +465,20 @@ public class TranDataJob {
                     Object technologyAmt = ruiHuaBaoData.get(platForm.getTechnologyAmt());
                     Object technologyFee = ruiHuaBaoData.get(platForm.getTechnologyFee());
                     if(technologyAmt==null){
-                        checkData.setTechnologyAmt(null);
+                        if (ruiDabaoData.containsKey(platForm.getTechnologyAmt())){
+                            checkData.setTechnologyAmt(BigDecimal.ZERO);
+                        }else {
+                            checkData.setTechnologyAmt(null);
+                        }
                     }else{
                         checkData.setTechnologyAmt(new BigDecimal(technologyAmt.toString()));
                     }
                     if(technologyFee==null){
-                        checkData.setTechnologyFee(null);
+                        if (ruiHuaBaoData.containsKey(platForm.getTechnologyFee())){
+                            checkData.setTechnologyFee(BigDecimal.ZERO);
+                        }else {
+                            checkData.setTechnologyFee(null);
+                        }
                     }else{
                         checkData.setTechnologyFee(new BigDecimal(technologyFee.toString()));
                     }
@@ -443,12 +488,20 @@ public class TranDataJob {
                     Object technologyAmt = ruiDabaoData.get(platForm.getTechnologyAmt());
                     Object technologyFee = ruiDabaoData.get(platForm.getTechnologyFee());
                     if(technologyAmt==null){
-                        checkData.setTechnologyAmt(null);
+                        if (ruiDabaoData.containsKey(platForm.getTechnologyAmt())){
+                            checkData.setTechnologyAmt(BigDecimal.ZERO);
+                        }else {
+                            checkData.setTechnologyAmt(null);
+                        }
                     }else{
                         checkData.setTechnologyAmt(new BigDecimal(technologyAmt.toString()));
                     }
                     if(technologyFee==null){
-                        checkData.setTechnologyFee(null);
+                        if (ruiDabaoData.containsKey(platForm.getTechnologyFee())){
+                            checkData.setTechnologyFee(BigDecimal.ZERO);
+                        }else {
+                            checkData.setTechnologyFee(null);
+                        }
                     }else{
                         checkData.setTechnologyFee(new BigDecimal(technologyFee.toString()));
                     }
@@ -464,12 +517,20 @@ public class TranDataJob {
                     Object clearAmt = settleData.get(platForm.getClearAmt());
                     Object clearFee = settleData.get(platForm.getClearFee());
                     if(clearAmt==null){
-                        checkData.setClearAmt(null);
+                        if (settleData.containsKey(platForm.getClearAmt())){
+                            checkData.setClearAmt(BigDecimal.ZERO);
+                        }else {
+                            checkData.setClearAmt(null);
+                        }
                     }else{
                         checkData.setClearAmt(new BigDecimal(clearAmt.toString()));
                     }
                     if(clearFee==null){
-                        checkData.setClearFee(null);
+                        if (settleData.containsKey(platForm.getClearFee())){
+                            checkData.setClearFee(BigDecimal.ZERO);
+                        }else {
+                            checkData.setClearFee(null);
+                        }
                     }else{
                         checkData.setClearFee(new BigDecimal(clearFee.toString()));
                     }
@@ -479,12 +540,20 @@ public class TranDataJob {
                     Object clearAmt = tradingVolumeData2.get(platForm.getClearAmt());
                     Object clearFee = tradingVolumeData2.get(platForm.getClearFee());
                     if(clearAmt==null){
-                        checkData.setClearAmt(null);
+                        if (tradingVolumeData2.containsKey(platForm.getClearAmt())){
+                            checkData.setClearAmt(BigDecimal.ZERO);
+                        }else {
+                            checkData.setClearAmt(null);
+                        }
                     }else{
                         checkData.setClearAmt(new BigDecimal(clearAmt.toString()));
                     }
                     if(clearFee==null){
-                        checkData.setClearFee(null);
+                        if (tradingVolumeData2.containsKey(platForm.getClearFee())){
+                            checkData.setClearFee(BigDecimal.ZERO);
+                        }else {
+                            checkData.setClearFee(null);
+                        }
                     }else{
                         checkData.setClearFee(new BigDecimal(clearFee.toString()));
                     }

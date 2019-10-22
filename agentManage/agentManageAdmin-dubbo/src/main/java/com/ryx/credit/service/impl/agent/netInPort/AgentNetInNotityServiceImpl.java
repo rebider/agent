@@ -647,6 +647,7 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                 reqMap.put("agentVo",agentVo);
                 result = agentHttpRDBMposServiceImpl.agencyLevelCheck(reqMap);
             }else if(platForm.getPlatformType().equals(PlatformType.RJPOS.getValue())){
+                reqMap.put("agentVo",agentVo);
                 result = agentHttpRJPosServiceImpl.agencyLevelCheck(reqMap);
             }else if(platForm.getPlatformType().equals(PlatformType.RHPOS.getValue())){
                 reqMap.put("brandCode",platForm.getBusplatform());

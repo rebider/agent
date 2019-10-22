@@ -92,12 +92,14 @@ public enum DictGroup {
 
     EMAIL("邮件模块"),
     LOGISTICS_FAIL_EMAIL("物流失败邮件"),
+
+    CERTIFICATION_STATUS("代理商工商认证"),
+    ANN_TYPE("公告类型"),
     REMOVEACCOUNT_FAIL_EMAIL("销账失败邮件"),
     RATYPE("销账方式"),
     RSTATUS("销账状态"),
-
-    CERTIFICATION_STATUS("代理商工商认证"),
     COMPENSATE_PLATFORM_TYPE("补差价可调整关系平台"),
+
     RELATION_PLATFORM_NUM("平台关系");
 
 

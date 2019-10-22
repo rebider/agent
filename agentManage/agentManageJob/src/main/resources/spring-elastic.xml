@@ -204,17 +204,6 @@
                   overwrite="true"
                   disabled="false"/>
 
-    <job:dataflow id="removeAccount"
-                  job-ref="removeAccountJob"
-                  registry-center-ref="regCenter"
-                  cron="0 0/5 * * * ?"
-                  sharding-total-count="1"
-                  sharding-item-parameters="0=C"
-                  streaming-process="true"
-                  description="定时更新销账信息 每5分钟更新一次 单节点"
-                  overwrite="true"
-                  disabled="false"/>
-
     <!--&lt;!&ndash;configure job 样例配置 &ndash;&gt;-->
     <!--<job:simple id="mySimpleTask"-->
                 <!--job-ref="mySimpleTask"-->
