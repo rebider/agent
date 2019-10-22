@@ -27,6 +27,7 @@ public enum AttachmentRelType {
     terminalTransfer("终端划拨上传附件"),
     Organization("机构管理上传附件"),
     internetRenew("物联网卡续费上传附件"),
+    AnnounceMent("公告附件");
     removeAccount("销账附件");
 
     public String  msg;

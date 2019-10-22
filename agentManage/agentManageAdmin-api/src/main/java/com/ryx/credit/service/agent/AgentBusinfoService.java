@@ -128,4 +128,6 @@ public interface AgentBusinfoService {
      * 代理商业务信息查询
      */
     AgentBusInfo queryAgentBusInfoById(String id);
+
+    List<String> queryOrgByAgentid(Map map);
 }
