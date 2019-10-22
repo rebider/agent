@@ -70,6 +70,13 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     private static final String RJ_TEMPLATE_APPLY_CHECK = AppConfig.getProperty("rj.template.apply.check");//校验模板是否相同模板
     private static final String RJ_TEMPLATE_APPLY_CHECKNAME = AppConfig.getProperty("rj.template.apply.checkName");//校验模板名称是否重复
 
+    private static final String SS_TEMPLATE_NOW = AppConfig.getProperty("ss.template.now"); // 获取现有模板
+    private static final String SS_TEMPLATE_APPLY = AppConfig.getProperty("ss.template.apply"); // 申请
+    private static final String SS_TEMPLATE_APPLY_DETAIL = AppConfig.getProperty("ss.template.apply.detail"); //申请明细
+    private static final String SS_TEMPLATE_APPLY_PASS = AppConfig.getProperty("ss.template.apply.pass"); //通过，分配
+    private static final String SS_TEMPLATE_APPLY_CHECK = AppConfig.getProperty("ss.template.apply.check");//校验模板是否相同模板
+    private static final String SS_TEMPLATE_APPLY_CHECKNAME = AppConfig.getProperty("ss.template.apply.checkName");//校验模板名称是否重复
+
 
     /**
      * 获取数据列表
@@ -598,6 +605,35 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             JSONObject param = new JSONObject();
             param.put("orgId", orgId);
             String result = HttpClientUtil.doPostJson(RJ_TEMPLATE_NOW, param.toJSONString());
+            Map<String,Object> resultMap = JSONObject.parseObject(result);
+            if(!(boolean)resultMap.get("result")){
+                throw new MessageException(resultMap.get("msg").toString());
+            }
+            Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
+            return objectMap;
+        }catch (MessageException e){
+            e.printStackTrace();
+            throw new MessageException(e.getMsg());
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new MessageException("联动业务平台获取分润模板数据失败！");
+        }
+    }
+    /**
+     * 获实时分润分润模板
+     * @param orgId
+     * @return
+     * @throws MessageException
+     */
+    @Override
+    public Map<String,Object> getSSTemplateNow(String orgId)throws MessageException{
+        if (StringUtils.isBlank(orgId)){
+            throw new MessageException("业务平台编码不能为空！");
+        }
+        try{
+            JSONObject param = new JSONObject();
+            param.put("orgId", orgId);
+            String result = HttpClientUtil.doPostJson(SS_TEMPLATE_NOW, param.toJSONString());
             Map<String,Object> resultMap = JSONObject.parseObject(result);
             if(!(boolean)resultMap.get("result")){
                 throw new MessageException(resultMap.get("msg").toString());
