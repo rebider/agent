@@ -232,9 +232,6 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         par.put("busTypes",busTypes);
         List<String> annoIds = annoPlatformRelaMapper.selectAnnoIds(par);
         par.put("annoIds",annoIds);
-        if (annoIds.size()==0) return pageInfo;
-
-
         if (par.get("pubOrg")!=null && !"".equals(String.valueOf(par.get("pubOrg")))){
             List<String> orgs = new ArrayList<>();
             orgs.add(String.valueOf(par.get("pubOrg")));
