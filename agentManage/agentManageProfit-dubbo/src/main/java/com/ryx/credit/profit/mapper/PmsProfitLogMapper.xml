@@ -223,7 +223,7 @@
   <!--=================================================以上自动生成============================================================-->
 
 
-  <select id="checkoutData" parameterType="java.lang.String" resultType="java.util.List">
+  <select id="checkoutData" parameterType="java.lang.String" resultType="java.util.Map">
 
 select aa.ID,aa.AG_NAME,bb.BUS_PLATFORM,cc.PLATFORM_NAME  from A_AGENT aa,A_AGENT_BUSINFO bb,A_PLATFORM cc
  where aa.ID = bb.AGENT_ID and bb.BUS_PLATFORM = cc.PLATFORM_NUM and aa.STATUS='1'and bb.STATUS='1'and cc.STATUS='1'and bb.bus_status='1'
