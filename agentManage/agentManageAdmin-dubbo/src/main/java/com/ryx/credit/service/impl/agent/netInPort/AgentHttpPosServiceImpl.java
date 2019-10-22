@@ -509,7 +509,7 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
                     fastMap("agentOrgId",upSingCheckMap.get("BUSNUM")).
                     putKeyV("orgId",agentBusInfo.getBusNum()).
                     putKeyV("organInitials",upSingCheckMap.get("POSANAMEPREFIX")).
-                    putKeyV("busLoginNum", agentBusInfo.getBusLoginNum()));
+                    putKeyV("loginName", agentBusInfo.getBusLoginNum()));
             String plainXML = jsonParams.toString();
             log.info("POS预升级请求参数:{}", plainXML);
             // 请求报文加密开始
