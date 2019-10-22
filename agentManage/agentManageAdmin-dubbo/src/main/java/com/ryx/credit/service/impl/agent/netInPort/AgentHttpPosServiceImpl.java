@@ -493,6 +493,8 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
             int i = agentBusInfoMapper.selectByBusNum(FastMap.fastMap("busNum",agentBusInfo.getBusNum()).putKeyV("busPlatform", agentBusInfo.getBusPlatform()));
             if (i > 0 || agentBusInfo.getBusNum().equals(agentBusInfo.getBusParent())) throw new Exception("您已经升级成功，请勿重复提交！");
 
+            if (null == agentBusInfo.getBusLoginNum() || "".equals(agentBusInfo.getBusLoginNum()) || "null".equals(agentBusInfo.getBusLoginNum())) throw new Exception("代理商升级，需填写对应平台登录账号！");
+
             String cooperator = Constants.cooperator;
             String tranCode = "ORG018"; // 交易码
             String charset = "UTF-8"; // 字符集
@@ -506,7 +508,8 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
             jsonParams.put("data", FastMap.
                     fastMap("agentOrgId",upSingCheckMap.get("BUSNUM")).
                     putKeyV("orgId",agentBusInfo.getBusNum()).
-                    putKeyV("organInitials",upSingCheckMap.get("POSANAMEPREFIX")));
+                    putKeyV("organInitials",upSingCheckMap.get("POSANAMEPREFIX")).
+                    putKeyV("loginName", agentBusInfo.getBusLoginNum()));
             String plainXML = jsonParams.toString();
             log.info("POS预升级请求参数:{}", plainXML);
             // 请求报文加密开始
@@ -558,6 +561,7 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
                 }
             }
         }catch (Exception e){
+            e.printStackTrace();
             throw e;
         }
     }
