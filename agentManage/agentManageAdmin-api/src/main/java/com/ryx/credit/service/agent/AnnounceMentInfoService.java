@@ -16,7 +16,6 @@ import java.util.Map;
  * @Description:
  */
 public interface  AnnounceMentInfoService {
-    PageInfo selectAnnViews(Page pageInfo, Map map);
     ResultVO saveAnn(AnnounceMentInfoVo announceMentInfo);
     ResultVO upStat(AnnounceMentInfo announceMentInfo,String orgStat);
     AnnounceMentInfo queryById(String annId);
@@ -27,7 +26,7 @@ public interface  AnnounceMentInfoService {
     //代理商查看公告
     PageInfo selectAnnViewsAgent(Page page,Map map,Long userId);
     //非代理商查看公告
-    PageInfo selectAnnViewsRead(Page page,Map map,Long userId);
+    PageInfo selectAnnViewsRead(Page page,Map map);
 
     //查询附件
     List<Attachment> queryAttByAnnoid(String id,String busType);
