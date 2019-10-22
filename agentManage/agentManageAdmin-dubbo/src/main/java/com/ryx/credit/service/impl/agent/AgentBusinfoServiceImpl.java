@@ -1092,6 +1092,11 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		return map;
 	}
 
+	/**
+	 * 代理商查看公告的发布机构菜单
+	 * @param map
+	 * @return allOrg
+	 */
 	@Override
 	public List<String> queryOrgByAgentid(Map map) {
 		List<String> allOrg=new ArrayList<>();
