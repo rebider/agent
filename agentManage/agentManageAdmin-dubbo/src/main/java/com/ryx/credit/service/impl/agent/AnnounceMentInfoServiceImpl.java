@@ -8,6 +8,7 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AnnounceMentInfoVo;
@@ -75,15 +76,8 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
     @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
 
-    @Override
-    public PageInfo selectAnnViews(Page page, Map map) {
-        PageInfo pageInfo = new PageInfo();
-        List<String> annoIds = annoPlatformRelaMapper.selectAnnoIds(map);
-        map.put("annoIds",annoIds);
-        pageInfo.setRows(announceMentInfoMapper.selectAnnRead(map,page));
-        pageInfo.setTotal(announceMentInfoMapper.selectCountAnnRead(map));
-        return pageInfo;
-    }
+    @Autowired
+    private COrganizationMapper organizationMapper;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
@@ -182,19 +176,31 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
     @Override
     public PageInfo selectAnnViewsMaintain(Page page, Map map) {
         PageInfo pageInfo = new PageInfo();
+        List<String> orgs = new ArrayList<>();
+        if (map.get("pubOrg")!=null){
+            orgs.add(String.valueOf(map.get("pubOrg")));
+            List<String> pubOrg = organizationMapper.selectSubOrg(orgs);
+            map.put("pubOrg",pubOrg);
+        }
+
         pageInfo.setRows(announceMentInfoMapper.selectAnnMaintain(map,page));
         pageInfo.setTotal(announceMentInfoMapper.selectCountAnnMaintain(map));
         return pageInfo;
     }
     //普通查看公告页面
     @Override
-    public PageInfo selectAnnViewsRead(Page page, Map reqMap,Long userId) {
+    public PageInfo selectAnnViewsRead(Page page, Map reqMap) {
         PageInfo pageInfo = new PageInfo();
-        logger.info("查找用户{}所属机构List",userId);
         List<String> annoIds = annoPlatformRelaMapper.selectAnnoIds(reqMap);
         reqMap.put("annoIds",annoIds);
-        pageInfo.setRows(announceMentInfoMapper.selectAnnRead(reqMap,page));
-        pageInfo.setTotal(announceMentInfoMapper.selectCountAnnRead(reqMap));
+        List<String> orgs = new ArrayList<>();
+        if (reqMap.get("pubOrg")!=null){
+            orgs.add(String.valueOf(reqMap.get("pubOrg")));
+            List<String> pubOrg = organizationMapper.selectSubOrg(orgs);
+            reqMap.put("pubOrg",pubOrg);
+        }
+        pageInfo.setRows(announceMentInfoMapper.selectAnnReader(reqMap,page));
+        pageInfo.setTotal(announceMentInfoMapper.selectCountAnnReader(reqMap));
         return pageInfo;
     }
 
@@ -227,6 +233,15 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         List<String> annoIds = annoPlatformRelaMapper.selectAnnoIds(par);
         par.put("annoIds",annoIds);
         if (annoIds.size()==0) return pageInfo;
+
+
+        if (par.get("pubOrg")!=null && !"".equals(String.valueOf(par.get("pubOrg")))){
+            List<String> orgs = new ArrayList<>();
+            orgs.add(String.valueOf(par.get("pubOrg")));
+            List<String> pubOrg = organizationMapper.selectSubOrg(orgs);
+            par.put("pubOrg",pubOrg);
+        }
+
         pageInfo.setRows(announceMentInfoMapper.selectAnnReader(par,page));
         pageInfo.setTotal(announceMentInfoMapper.selectCountAnnReader(par));
         return  pageInfo;
