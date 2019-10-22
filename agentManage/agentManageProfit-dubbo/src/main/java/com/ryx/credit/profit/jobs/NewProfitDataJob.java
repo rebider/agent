@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
@@ -50,7 +51,7 @@ import java.util.Map;
 @Service("newProfitDataJob")
 @Transactional(rollbackFor = RuntimeException.class)
 public class NewProfitDataJob {
-
+    private static final String environment = AppConfig.getProperty("jobEnvironment");
     private org.slf4j.Logger LOG = LoggerFactory.getLogger(NewProfitDataJob.class);
 
     @Autowired
@@ -102,8 +103,10 @@ public class NewProfitDataJob {
      */
     @Scheduled(cron = "${pos_profit_job_cron}")
     public void doCron() {
-        String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
-        deal(profitDate);
+        if (!"preproduction".equals(environment)){
+            String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
+            deal(profitDate);
+        }
     }
 
     public void deal(String profitDate) {
