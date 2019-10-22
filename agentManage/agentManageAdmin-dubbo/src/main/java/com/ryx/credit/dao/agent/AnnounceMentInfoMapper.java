@@ -29,10 +29,6 @@ public interface AnnounceMentInfoMapper {
 
     int updateByPrimaryKey(AnnounceMentInfo record);
 
-    List<Map<String,Object>> selectAnnRead( @Param("map")Map<String, Object> map,@Param("page") Page page);
-
-    int selectCountAnnRead(@Param("map")Map<String,Object> map);
-
     int updateStatByAnno(AnnounceMentInfo record);
 
     List<Map<String,Object>> selectAnnMaintain(@Param("map")Map<String, Object> map,@Param("page") Page page);
