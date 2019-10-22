@@ -108,4 +108,8 @@ public interface AgentBusInfoMapper {
 
     //通过busnum查询是否已经升级成功
     int selectByBusNum(Map<String, Object> paramMap);
+
+    List<String> queryBusPlatform(@Param("reqMap") Map reqMap);
+    List<String> queryAgDocPro(@Param("reqMap") Map reqMap);
+    List<String> queryBusType(@Param("reqMap") Map reqMap);
 }

@@ -2,6 +2,7 @@ package com.ryx.credit.profit.unitmain;
 
 import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
@@ -34,6 +35,7 @@ import java.util.List;
 @PropertySource("classpath:/config.properties")
 @Service("profitSummaryDataJob")
 public class ProfitSummaryDataJob {
+    private static final String environment = AppConfig.getProperty("jobEnvironment");
     org.slf4j.Logger logger = LoggerFactory.getLogger(NewProfitMonthMposDataJob.class);
 
     @Autowired
@@ -67,8 +69,10 @@ public class ProfitSummaryDataJob {
      */
     @Scheduled(cron = "${shoushua_summarydata_job_cron}")
     public void doCron(){
-        String transDate = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6);
-        excute(transDate);
+        if (!"preproduction".equals(environment)) {
+            String transDate = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6);
+            excute(transDate);
+        }
     }
 
     public void excute(String transDate) {

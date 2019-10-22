@@ -578,6 +578,33 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                         throw new ProcessException("瑞花宝平台登录账号必须是数字");
                     }
                 }
+                AgentBusInfo agentBusInfo = agentBusinfoService.agentPlatformNum(agentVo.getAgentId(),item.getBusPlatform());
+                if(null!=agentBusInfo && StringUtils.isNotBlank(agentBusInfo.getBusType())){
+                    if(!agentBusInfo.getBusType().equals( item.getBusType())){
+                        throw new ProcessException("此业务的类型与月结相同品牌不一致");
+                    }
+                }
+                if(null!=agentBusInfo && StringUtils.isNotBlank(agentBusInfo.getBusRegion())){
+                    if(!agentBusInfo.getBusRegion().equals( item.getBusRegion())){
+                        throw new ProcessException("此业务的业务区域与月结相同品牌不一致");
+                    }
+                }
+                if(null!=agentBusInfo && StringUtils.isNotBlank(agentBusInfo.getBusScope())){
+                    if(!agentBusInfo.getBusScope().equals( item.getBusScope())){
+                        throw new ProcessException("此业务的业务范围与月结相同品牌不一致");
+                    }
+                }
+
+                if(null!=agentBusInfo && StringUtils.isNotBlank(agentBusInfo.getAgDocDistrict())){
+                    if(!agentBusInfo.getAgDocDistrict().equals( item.getAgDocDistrict())){
+                        throw new ProcessException("此业务的省区与月结相同品牌不一致");
+                    }
+                }
+                if(null!=agentBusInfo && StringUtils.isNotBlank(agentBusInfo.getAgDocPro())){
+                    if(!agentBusInfo.getAgDocPro().equals( item.getAgDocPro())){
+                        throw new ProcessException("此业务的大区与月结相同品牌不一致");
+                    }
+                }
             }
             List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByAgenId(agent.getId());
             String json = JsonUtil.objectToJson(agentBusInfos);

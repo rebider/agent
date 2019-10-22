@@ -128,4 +128,11 @@ public interface AgentBusinfoService {
      * 代理商业务信息查询
      */
     AgentBusInfo queryAgentBusInfoById(String id);
+
+    /**
+     * 查询品牌
+     */
+    public AgentBusInfo agentPlatformNum(String agentId,String platFormNum);
+
+    List<String> queryOrgByAgentid(Map map);
 }

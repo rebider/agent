@@ -50,6 +50,7 @@ import java.util.*;
 public class RefundJob {
     private static final Logger LOG = Logger.getLogger(RefundJob.class);
     private static final  String URL =  AppConfig.getProperty("refund_url");
+    private static final String environment = AppConfig.getProperty("jobEnvironment");
 
     private static  final  String DEDUCTION_DESC = "退单扣款";
 
@@ -97,6 +98,7 @@ public class RefundJob {
      */
     @Scheduled(cron = "${profit_refund_job_cron}")
     public void deal() {
+        if (!"preproduction".equals(environment)){
         // 上月的开始及结束日期
         //JSONObject param = new JSONObject();
         Map<String,String> param = new HashMap<String,String>();
@@ -106,11 +108,12 @@ public class RefundJob {
         // pos退单应补分润
         getSupplyListAndDeal(param);
 
-        param.put("bussType", "01");
-        // mpos退单应扣分润
-        getDeductionListAndDeal(param);
-        // 退mpos单应补分润
-        getSupplyListAndDeal(param);
+            param.put("bussType", "01");
+            // mpos退单应扣分润
+            getDeductionListAndDeal(param);
+            // 退mpos单应补分润
+            getSupplyListAndDeal(param);
+        }
     }
 
     /***

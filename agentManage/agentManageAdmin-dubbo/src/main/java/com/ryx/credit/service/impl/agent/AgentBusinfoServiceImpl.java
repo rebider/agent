@@ -8,8 +8,10 @@ import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
+import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.OrganizationMapper;
+import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
@@ -73,6 +75,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	private AgentService agentService;
 	@Autowired
 	private AgentNetInNotityService agentNetInNotityService;
+	@Autowired
+	private COrganizationMapper cOrganizationMapper;
 
     /**
      * 代理商查询插件数据获取
@@ -1118,5 +1122,41 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	public AgentBusInfo queryAgentBusInfoById(String id) {
 		return agentBusInfoMapper.selectByPrimaryKey(id);
 	}
+	@Override
+	public AgentBusInfo agentPlatformNum(String agentId,String platFormNum) {
+		List<Dict> platFormList =  dictOptionsService.dictList(DictGroup.RELATION_PLATFORM_NUM.name(),platFormNum);
+		String busPlatForm="";
+		if (null!=platFormList || platFormList.size()>0){
+			for (Dict dict : platFormList) {
+				busPlatForm=dict.getdItemvalue();//获取POS类型的品牌
+			}
+		}
+		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+		AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria().andAgentIdEqualTo(agentId).andBusPlatformEqualTo(busPlatForm).andBusStatusEqualTo(Status.STATUS_1.status).andStatusEqualTo(Status.STATUS_1.status);
+		List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+		AgentBusInfo agentBusInfo=null;
+		if(null!=agentBusInfoList && agentBusInfoList.size()>0){
+			 agentBusInfo = agentBusInfoList.get(0);
+		}
+
+		return agentBusInfo;
+	}
+
+	/**
+	 * 代理商查看公告的发布机构菜单
+	 * @param map
+	 * @return allOrg
+	 */
+	@Override
+	public List<String> queryOrgByAgentid(Map map) {
+		List<String> allOrg=new ArrayList<>();
+		List<String> orgs = agentBusInfoMapper.queryAgDocPro(map);
+		List<COrganization> cOrganizations = cOrganizationMapper.selectPorgByorgs(orgs);
+		cOrganizations.forEach(org->{
+			allOrg.add(String.valueOf(org.getId()));
+		});
+		return allOrg;
+	}
+
 }
 
