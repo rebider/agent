@@ -144,46 +144,48 @@
   </sql>
 
   <select id="selectAnnoIds" resultType="java.lang.String" parameterType="map">
-    select distinct (anno_id)
-    from a_anno_platform_rela ra
-    left join a_announcement_info aa
-    on aa.ann_id = ra.anno_id
-    <where>
-      <choose>
-        <when test="map.platfromPerm !=null and map.platfromPerm.size > 0">
-          ra.rang_type = '1' and
-          (<trim suffixOverrides="or">
+    <if test="map.agent !=null and map.agent !=''">
+      select distinct (anno_id)
+      from a_anno_platform_rela ra
+      left join a_announcement_info aa
+      on aa.ann_id = ra.anno_id
+      <where>
+        <choose>
+          <when test="map.platfromPerm !=null and map.platfromPerm.size > 0">
+            ra.rang_type = '1' and
+            (<trim suffixOverrides="or">
             <foreach open="(" collection="map.platfromPerm" separator=" or " item="platfromPermItem" close=")">
               (#{platfromPermItem} = ra.rang_value)
             </foreach>
           </trim>)
-        </when>
-        <otherwise>
-          1!=1
-        </otherwise>
-      </choose>
-    </where>
-    union
-    select distinct (anno_id)
-    from a_anno_platform_rela ra
-    left join a_announcement_info aa
-    on aa.ann_id = ra.anno_id
-    <where>
-      <choose>
-        <when test="map.busTypes !=null and map.busTypes.size > 0">
-          ra.rang_type = '0' and
-          (<trim suffixOverrides="or">
-          <foreach open="(" collection="map.busTypes" separator="or" item="busType" close=")" >
-            (#{busType} = ra.rang_value)
-          </foreach>
-        </trim>)
-        </when>
-        <otherwise>
-          1!=1
-        </otherwise>
-      </choose>
-    </where>
-    INTERSECT
+          </when>
+          <otherwise>
+            1!=1
+          </otherwise>
+        </choose>
+      </where>
+      union
+      select distinct (anno_id)
+      from a_anno_platform_rela ra
+      left join a_announcement_info aa
+      on aa.ann_id = ra.anno_id
+      <where>
+        <choose>
+          <when test="map.busTypes !=null and map.busTypes.size > 0">
+            ra.rang_type = '0' and
+            (<trim suffixOverrides="or">
+            <foreach open="(" collection="map.busTypes" separator="or" item="busType" close=")" >
+              (#{busType} = ra.rang_value)
+            </foreach>
+          </trim>)
+          </when>
+          <otherwise>
+            1!=1
+          </otherwise>
+        </choose>
+      </where>
+      INTERSECT
+    </if>
     select distinct (anno_id)
     from a_anno_platform_rela ra
     left join a_announcement_info aa
