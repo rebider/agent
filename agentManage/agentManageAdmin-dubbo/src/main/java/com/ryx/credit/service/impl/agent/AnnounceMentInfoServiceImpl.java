@@ -1,9 +1,6 @@
 package com.ryx.credit.service.impl.agent;
 
-import com.ryx.credit.common.enumc.AttDataTypeStatic;
-import com.ryx.credit.common.enumc.AttachmentRelType;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -87,6 +84,7 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         ZonedDateTime zdt = LocalDateTime.now().atZone(zoneId);//Combines this date-time with a time-zone to create a  ZonedDateTime.
         Date date = Date.from(zdt.toInstant());
         String annId= idService.genId(TabId.A_ANNOUNCEMENT_INFO);
+        logger.info("添加公告id{}",annId);
         announceMentInfoVo.setAnnId(annId);
         announceMentInfoVo.setAnnoStat(new BigDecimal(0));
         announceMentInfoVo.setCreateTm(date);
@@ -97,26 +95,28 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         AnnoPlatformRela organnoPlatformRela = new AnnoPlatformRela();
         organnoPlatformRela.setId(relaId);
         organnoPlatformRela.setAnnoId(announceMentInfoVo.getAnnId());
-        organnoPlatformRela.setRangType("2");
+        organnoPlatformRela.setRangType(RangType.org.code);
         organnoPlatformRela.setRangValue(orgs.toString());
         ralas.add(organnoPlatformRela);
         List<String> plats = announceMentInfoVo.getPlats();
 
         plats.forEach((plat)->{
+            logger.info("添家平台{}",plat);
             AnnoPlatformRela platRela = new AnnoPlatformRela();
             platRela.setId(idService.genIdInTran(TabId.A_ANNO_PLATFORM_RELA));
             platRela.setAnnoId(announceMentInfoVo.getAnnId());
-            platRela.setRangType("1");
+            platRela.setRangType(RangType.plat.code);
             platRela.setRangValue(plat);
             ralas.add(platRela);
         });
 
         List<String> busTypes = announceMentInfoVo.getBusTypes();
         busTypes.forEach((busType)->{
+            logger.info("添加业务{}",busType);
             AnnoPlatformRela platRela = new AnnoPlatformRela();
             platRela.setId(idService.genIdInTran(TabId.A_ANNO_PLATFORM_RELA));
             platRela.setAnnoId(announceMentInfoVo.getAnnId());
-            platRela.setRangType("0");
+            platRela.setRangType(RangType.bustype.code);
             platRela.setRangValue(busType);
             ralas.add(platRela);
         });
@@ -142,6 +142,7 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
             record.setStatus(Status.STATUS_1.status);
             record.setBusType(AttachmentRelType.AnnounceMent.name());
             record.setId(idService.genId(TabId.a_attachment_rel));
+            logger.info("添加公告附件关系,公告ID{},附件ID{}",announceMentInfoVo.getAnnId(),attfile);
             if (1 != attachmentRelMapper.insertSelective(record)) {
                 logger.info("公告添加:{}", "添加公告附件关系失败");
                 throw new ProcessException("添加公告附件关系失败");
@@ -153,18 +154,22 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
 
     @Override
     public ResultVO upStat(AnnounceMentInfo announceMentInfo,String orgStat) {
-
+        logger.info("更新公告{},原状态{},更新为{}",announceMentInfo.getAnnId(),orgStat,announceMentInfo.getAnnoStat());
         AnnounceMentInfo orgAnno = announceMentInfoMapper.selectByPrimaryKey(announceMentInfo.getAnnId());
         if (orgAnno==null){
+            logger.error("更新公告{},公告不存在",announceMentInfo.getAnnId());
             return ResultVO.fail("公告不存在请刷新后重试!");
         }
-        if (!orgAnno.getAnnoStat().toString().equals(orgStat))
-        return ResultVO.fail("公告状态异常请刷新后重试!");
+        if (!orgAnno.getAnnoStat().toString().equals(orgStat)){
+            logger.error("公告{},状态不一致，不能更新",announceMentInfo.getAnnId());
+            return ResultVO.fail("公告状态异常请刷新后重试!");
+        }
         int update = announceMentInfoMapper.updateStatByAnno(announceMentInfo);
         if (update>0){
-            return ResultVO.success("保存成功");
+            return ResultVO.success("更新公告状态成功!");
         }
-        return null;
+        logger.error("公告{},更新异常!",announceMentInfo.getAnnId());
+        return ResultVO.fail("更新公告状态异常!");
     }
 
     @Override
@@ -181,6 +186,7 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
             orgs.add(String.valueOf(map.get("pubOrg")));
             List<String> pubOrg = organizationMapper.selectSubOrg(orgs);
             map.put("pubOrg",pubOrg);
+            logger.info("公告运维可读机构{}",pubOrg);
         }
 
         pageInfo.setRows(announceMentInfoMapper.selectAnnMaintain(map,page));
@@ -192,12 +198,14 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
     public PageInfo selectAnnViewsRead(Page page, Map reqMap) {
         PageInfo pageInfo = new PageInfo();
         List<String> annoIds = annoPlatformRelaMapper.selectAnnoIds(reqMap);
+        logger.info("非代理商可读公告{}",annoIds);
         reqMap.put("annoIds",annoIds);
         List<String> orgs = new ArrayList<>();
         if (reqMap.get("pubOrg")!=null){
             orgs.add(String.valueOf(reqMap.get("pubOrg")));
             List<String> pubOrg = organizationMapper.selectSubOrg(orgs);
             reqMap.put("pubOrg",pubOrg);
+            logger.info("非代理商可读机构{}",pubOrg);
         }
         pageInfo.setRows(announceMentInfoMapper.selectAnnReader(reqMap,page));
         pageInfo.setTotal(announceMentInfoMapper.selectCountAnnReader(reqMap));
@@ -208,6 +216,7 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
     //公告管理
     @Override
     public PageInfo selectAnnViewsManage(Page page, Map map) {
+        logger.info("公告管理service");
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(announceMentInfoMapper.selectAnnManage(map,page));
         pageInfo.setTotal(announceMentInfoMapper.selectCountAnnManage(map));
@@ -223,20 +232,24 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         String agUniqNum = agent.getAgUniqNum();
         Map<String,Object> map = new HashMap<>();
         map.put("agentId",agUniqNum);
+        logger.info("代理商查看公告,唯一编码{}",agUniqNum);
         map.put("cloReviewStatus", Status.STATUS_3.status);
         List<String> plats = agentBusInfoMapper.queryBusPlatform(map);
         List<String> docPros = agentBusInfoMapper.queryAgDocPro(map);
         List<String> busTypes = agentBusInfoMapper.queryBusType(map);
+        logger.info("业务:{},机构:{},业务平台:{}",plats,docPros,busTypes);
         par.put("platfromPerm",plats);
         par.put("orgIds",docPros);
         par.put("busTypes",busTypes);
         List<String> annoIds = annoPlatformRelaMapper.selectAnnoIds(par);
+        logger.info("代理商可读公告{}",annoIds);
         par.put("annoIds",annoIds);
         if (par.get("pubOrg")!=null && !"".equals(String.valueOf(par.get("pubOrg")))){
             List<String> orgs = new ArrayList<>();
             orgs.add(String.valueOf(par.get("pubOrg")));
             List<String> pubOrg = organizationMapper.selectSubOrg(orgs);
             par.put("pubOrg",pubOrg);
+            logger.info("代理商可读机构{}",pubOrg);
         }
 
         pageInfo.setRows(announceMentInfoMapper.selectAnnReader(par,page));

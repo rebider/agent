@@ -349,16 +349,16 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
                 and a.ann_title like CONCAT(CONCAT('%',#{map.annTitle}),'%')
             </if>
             <if test="map.pubTmb!=null and map.pubTmb!=''">
-                and a.pub_tm &gt;= to_date(#{map.pubTmb},'yyyy-mm-dd')
+                and to_char(a.pub_tm,'yyyy-mm-dd') &gt;=  #{map.pubTmb}
             </if>
             <if test="map.pubTme!=null and map.pubTme!=''">
-                and a.pub_tm &lt;= to_date(#{map.pubTme},'yyyy-mm-dd')
+                and to_char(a.pub_tm,'yyyy-mm-dd')  &lt;= #{map.pubTme}
             </if>
             <if test="map.effectTmb!=null and map.effectTmb!=''">
-                and a.effect_tm &gt;= to_date(#{map.effectTmb},'yyyy-mm-dd')
+                and to_char(a.effect_tm,'yyyy-mm-dd') &gt;=  #{map.effectTmb}
             </if>
             <if test="map.effectTme!=null and map.effectTme!=''">
-                and a.effect_tm &lt;= to_date(#{map.effectTme},'yyyy-mm-dd')
+                and to_char(a.effect_tm,'yyyy-mm-dd') &lt;=  #{map.effectTme}
             </if>
             <if test="map.pubOrg!=null and map.pubOrg.size>0">
                 and a.pub_org in (
@@ -395,16 +395,16 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
             and a.ann_title like CONCAT(CONCAT('%',#{map.annTitle}),'%')
         </if>
         <if test="map.pubTmb!=null and map.pubTmb!=''">
-            and a.pub_tm &gt;= to_date(#{map.pubTmb},'yyyy-mm-dd')
+            and to_char(a.pub_tm,'yyyy-mm-dd') &gt;= #{map.pubTmb}
         </if>
         <if test="map.pubTme!=null and map.pubTme!=''">
-            and a.pub_tm &lt;= to_date(#{map.pubTme},'yyyy-mm-dd')
+            and to_char(a.pub_tm,'yyyy-mm-dd') &lt;= #{map.pubTme}
         </if>
         <if test="map.effectTmb!=null and map.effectTmb!=''">
-            and a.effect_tm &gt;= to_date(#{map.effectTmb},'yyyy-mm-dd')
+            and to_char(a.effect_tm,'yyyy-mm-dd') &gt;= #{map.effectTmb}
         </if>
         <if test="map.effectTme!=null and map.effectTme!=''">
-            and a.effect_tm &lt;= to_date(#{map.effectTme},'yyyy-mm-dd')
+            and to_char(a.effect_tm,'yyyy-mm-dd') &lt;= #{map.effectTme}
         </if>
         <if test="map.pubOrg!=null and map.pubOrg!=''">
             and a.pub_org = #{map.pubOrg}
@@ -429,16 +429,16 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
             and a.ann_title like CONCAT(CONCAT('%',#{map.annTitle}),'%')
         </if>
         <if test="map.pubTmb!=null and map.pubTmb!=''">
-            and a.pub_tm &gt;= to_date(#{map.pubTmb},'yyyy-mm-dd')
+            and to_char(a.pub_tm,'yyyy-mm-dd') &gt;= #{map.pubTmb}
         </if>
         <if test="map.pubTme!=null and map.pubTme!=''">
-            and a.pub_tm &lt;= to_date(#{map.pubTme},'yyyy-mm-dd')
+            and to_char(a.pub_tm,'yyyy-mm-dd') &lt;= #{map.pubTme}
         </if>
         <if test="map.effectTmb!=null and map.effectTmb!=''">
-            and a.effect_tm &gt;= to_date(#{map.effectTmb},'yyyy-mm-dd')
+            and to_char(a.effect_tm,'yyyy-mm-dd') &gt;= #{map.effectTmb}
         </if>
         <if test="map.effectTme!=null and map.effectTme!=''">
-            and a.effect_tm &lt;= to_date(#{map.effectTme},'yyyy-mm-dd')
+            and to_char(a.effect_tm,'yyyy-mm-dd') &lt;= #{map.effectTme}
         </if>
         <if test="map.pubOrg!=null and map.pubOrg!=''">
             and a.pub_org = #{map.pubOrg}
@@ -487,16 +487,16 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
             and a.ann_title like CONCAT(CONCAT('%',#{map.annTitle}),'%')
         </if>
         <if test="map.pubTmb!=null and map.pubTmb!=''">
-            and a.pub_tm &gt;= to_date(#{map.pubTmb},'yyyy-mm-dd')
+            and to_char(a.pub_tm,'yyyy-mm-dd') &gt;= {map.pubTmb}
         </if>
         <if test="map.pubTme!=null and map.pubTme!=''">
-            and a.pub_tm &lt;= to_date(#{map.pubTme},'yyyy-mm-dd')
+            and to_char(a.pub_tm,'yyyy-mm-dd') &lt;= #{map.pubTme}
         </if>
         <if test="map.effectTmb!=null and map.effectTmb!=''">
-            and a.effect_tm &gt;= to_date(#{map.effectTmb},'yyyy-mm-dd')
+            and to_char(a.effect_tm,'yyyy-mm-dd') &gt;= #{map.effectTmb}
         </if>
         <if test="map.effectTme!=null and map.effectTme!=''">
-            and a.effect_tm &lt;= to_date(#{map.effectTme},'yyyy-mm-dd')
+            and to_char(a.effect_tm,'yyyy-mm-dd') &lt;= #{map.effectTme}
         </if>
         <if test="map.pubOrg!=null and map.pubOrg.size>0">
             and a.pub_org in (
@@ -505,7 +505,7 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
             </foreach>)
         </if>
     </where>
-      order by a.create_tm desc
+      order by read_flag,a.pub_tm desc,a.effect_tm desc
 </sql>
 <select id="selectAnnReader" parameterType="map" resultType="map">
     <include refid="OracleDialectPrefix"/>
