@@ -493,7 +493,7 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
             and to_char(a.pub_tm,'yyyy-mm-dd') &lt;= #{map.pubTme}
         </if>
         <if test="map.effectTmb!=null and map.effectTmb!=''">
-            and to_char(a.effect_tm,'yyyy-mm-dd') &gt;= #{map.effectTmb}
+            and to_char(a.expire_tm,'yyyy-mm-dd') &gt;= #{map.effectTmb}
         </if>
         <if test="map.effectTme!=null and map.effectTme!=''">
             and to_char(a.effect_tm,'yyyy-mm-dd') &lt;= #{map.effectTme}

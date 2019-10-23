@@ -245,6 +245,7 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         par.put("platfromPerm",plats);
         par.put("orgIds",docPros);
         par.put("busTypes",busTypes);
+        par.put("agent",1);
         List<String> annoIds = annoPlatformRelaMapper.selectAnnoIds(par);
         logger.info("代理商可读公告{}",annoIds);
         par.put("annoIds",annoIds);
@@ -258,7 +259,6 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         }else{
             par.put("pubOrg",orgs);
         }
-
         pageInfo.setRows(announceMentInfoMapper.selectAnnReader(par,page));
         pageInfo.setTotal(announceMentInfoMapper.selectCountAnnReader(par));
         return  pageInfo;
