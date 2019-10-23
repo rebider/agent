@@ -182,11 +182,13 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
     public PageInfo selectAnnViewsMaintain(Page page, Map map) {
         PageInfo pageInfo = new PageInfo();
         List<String> orgs = new ArrayList<>();
-        if (map.get("pubOrg")!=null){
+        if (map.get("pubOrg")!=null && !"".equals(String.valueOf(map.get("pubOrg"))) ){
             orgs.add(String.valueOf(map.get("pubOrg")));
             List<String> pubOrg = organizationMapper.selectSubOrg(orgs);
             map.put("pubOrg",pubOrg);
             logger.info("公告运维可读机构{}",pubOrg);
+        }else {
+            map.put("pubOrg",orgs);
         }
 
         pageInfo.setRows(announceMentInfoMapper.selectAnnMaintain(map,page));
@@ -201,11 +203,13 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         logger.info("非代理商可读公告{}",annoIds);
         reqMap.put("annoIds",annoIds);
         List<String> orgs = new ArrayList<>();
-        if (reqMap.get("pubOrg")!=null){
+        if (reqMap.get("pubOrg")!=null && !"".equals(String.valueOf(reqMap.get("pubOrg")))){
             orgs.add(String.valueOf(reqMap.get("pubOrg")));
             List<String> pubOrg = organizationMapper.selectSubOrg(orgs);
             reqMap.put("pubOrg",pubOrg);
             logger.info("非代理商可读机构{}",pubOrg);
+        }else {
+            reqMap.put("pubOrg",orgs);
         }
         pageInfo.setRows(announceMentInfoMapper.selectAnnReader(reqMap,page));
         pageInfo.setTotal(announceMentInfoMapper.selectCountAnnReader(reqMap));
@@ -244,12 +248,15 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         List<String> annoIds = annoPlatformRelaMapper.selectAnnoIds(par);
         logger.info("代理商可读公告{}",annoIds);
         par.put("annoIds",annoIds);
+        List<String> orgs = new ArrayList<>();
         if (par.get("pubOrg")!=null && !"".equals(String.valueOf(par.get("pubOrg")))){
-            List<String> orgs = new ArrayList<>();
-            orgs.add(String.valueOf(par.get("pubOrg")));
-            List<String> pubOrg = organizationMapper.selectSubOrg(orgs);
+            List<String> orgsTmp = new ArrayList<>();
+            orgsTmp.add(String.valueOf(par.get("pubOrg")));
+            List<String> pubOrg = organizationMapper.selectSubOrg(orgsTmp);
             par.put("pubOrg",pubOrg);
             logger.info("代理商可读机构{}",pubOrg);
+        }else{
+            par.put("pubOrg",orgs);
         }
 
         pageInfo.setRows(announceMentInfoMapper.selectAnnReader(par,page));
