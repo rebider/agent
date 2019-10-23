@@ -508,8 +508,7 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
             jsonParams.put("data", FastMap.
                     fastMap("agentOrgId",upSingCheckMap.get("BUSNUM")).
                     putKeyV("orgId",agentBusInfo.getBusNum()).
-                    putKeyV("organInitials",upSingCheckMap.get("POSANAMEPREFIX")).
-                    putKeyV("loginName", agentBusInfo.getBusLoginNum()));
+                    putKeyV("organInitials",upSingCheckMap.get("POSANAMEPREFIX")));
             String plainXML = jsonParams.toString();
             log.info("POS预升级请求参数:{}", plainXML);
             // 请求报文加密开始
@@ -561,7 +560,6 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
                 }
             }
         }catch (Exception e){
-            e.printStackTrace();
             throw e;
         }
     }

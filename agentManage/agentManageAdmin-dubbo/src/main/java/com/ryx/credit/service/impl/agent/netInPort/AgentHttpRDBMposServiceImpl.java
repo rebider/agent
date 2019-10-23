@@ -458,10 +458,6 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             return AgentResult.fail("业务平台编号和平台登录账号不能为空！");
         }
 
-        int i = agentBusInfoMapper.selectByBusNum(FastMap.fastMap("busNum",agentBusInfo.getBusNum()).putKeyV("busPlatform", agentBusInfo.getBusPlatform()));
-        if (i > 0 || agentBusInfo.getBusNum().equals(agentBusInfo.getBusParent()))
-            return AgentResult.fail("您已经升级成功，请勿重复提交！");
-
         Map<String,Object> jsonParams = new HashMap<String, Object>();
         jsonParams = commonParam(jsonParams, agentColinfo, agent, agentBusInfo);
 
@@ -480,8 +476,6 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         requMap.put("cardno",jsonParams.get("cardno"));
         requMap.put("bankbranchid",jsonParams.get("bankbranchid"));
         requMap.put("bankbranchname",jsonParams.get("bankbranchname"));
-        requMap.put("customerPid",jsonParams.get("customerPid"));
-        requMap.put("userName",jsonParams.get("userName"));
         requMap.put("cardidx",jsonParams.get("cardidx"));
         requMap.put("code",jsonParams.get("code"));
         requMap.put("bankid",jsonParams.get("bankid"));
@@ -493,18 +487,26 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         requMap.put("customerType",jsonParams.get("customerType"));
         requMap.put("invoice",jsonParams.get("invoice"));
         requMap.put("tax",jsonParams.get("tax"));
+        if (null == jsonParams.get("userName") || "".equals(jsonParams.get("userName")) || "null".equals(jsonParams.get("userName"))) {
+            requMap.put("userName",oldAgent.getAgLegal());
+        } else {
+            requMap.put("userName",jsonParams.get("userName"));
+        }
+        if (null == jsonParams.get("customerPid") || "".equals(jsonParams.get("customerPid")) || "null".equals(jsonParams.get("customerPid"))) {
+            requMap.put("customerPid",oldAgent.getAgLegalCernum());
+        } else {
+            requMap.put("customerPid",jsonParams.get("customerPid"));
+        }
         if (null == jsonParams.get("address") || "".equals(jsonParams.get("address")) || "null".equals(jsonParams.get("address"))) {
             requMap.put("address",oldAgent.getAgRegAdd());
         } else {
             requMap.put("address",jsonParams.get("address"));
         }
-
         if (null == jsonParams.get("agencyName") || "".equals(jsonParams.get("agencyName")) || "null".equals(jsonParams.get("agencyName"))) {
             requMap.put("agencyName",oldAgent.getAgName());
         } else {
             requMap.put("agencyName",jsonParams.get("agencyName"));
         }
-
         if (null == jsonParams.get("companyNo") || "".equals(jsonParams.get("companyNo")) || "null".equals(jsonParams.get("companyNo"))) {
             requMap.put("companyNo",oldAgent.getAgBusLic());
         } else {
