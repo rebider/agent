@@ -75,7 +75,11 @@ public class ORefundPriceDiffDetail  implements Serializable {
 
     private String oldOrgId;
 
+    private String oldOrgName;
+
     private String newOrgId;
+
+    private String newOrgName;
 
     private String deliveryTime;
 
@@ -486,5 +490,21 @@ public class ORefundPriceDiffDetail  implements Serializable {
 
     public void setRefundPriceDiffDetailMap(Map<String, Object> refundPriceDiffDetailMap) {
         this.refundPriceDiffDetailMap = refundPriceDiffDetailMap;
+    }
+
+    public String getOldOrgName() {
+        return oldOrgName;
+    }
+
+    public void setOldOrgName(String oldOrgName) {
+        this.oldOrgName = oldOrgName;
+    }
+
+    public String getNewOrgName() {
+        return newOrgName;
+    }
+
+    public void setNewOrgName(String newOrgName) {
+        this.newOrgName = newOrgName;
     }
 }
