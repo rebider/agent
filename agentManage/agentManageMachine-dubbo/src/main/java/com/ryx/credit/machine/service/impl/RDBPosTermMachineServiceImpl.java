@@ -326,4 +326,9 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
     public boolean checkModleIsEq(Map<String, String> data, String platformType) {
         return true;
     }
+
+    @Override
+    public AgentResult queryLogisticsResult(Map<String, Object> pamMap, String platformType) throws Exception {
+        return null;
+    }
 }

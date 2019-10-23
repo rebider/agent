@@ -24,7 +24,6 @@ import java.util.Map;
 @Service("termMachineService")
 public class TermMachineServiceImpl  implements TermMachineService {
 
-
     private Logger logger = LoggerFactory.getLogger(TermMachineServiceImpl.class);
 
     @Resource(name = "posTermMachineServiceImpl")
@@ -39,25 +38,35 @@ public class TermMachineServiceImpl  implements TermMachineService {
     @Resource(name = "rdbTermMachineServiceImpl")
     private TermMachineService rdbTermMachineServiceImpl;
 
-
-
-
+    @Resource(name = "rjTermMachineServiceImpl")
+    private TermMachineService rjTermMachineServiceImpl;
 
     @Override
     public List<TermMachineVo> queryTermMachine(PlatformType platformType,Map<String,String> par) throws Exception{
-        if(PlatformType.whetherPOS(platformType.code)){
-            return posTermMachineServiceImpl.queryTermMachine(platformType,par);
-        }else  if(PlatformType.MPOS.code.equals(platformType.code)){
-            return mposTermMachineServiceImpl.queryTermMachine(platformType,par);
-        }else  if(PlatformType.SSPOS.code.equals(platformType.code)){
-            return sPosTermMachineServiceImpl.queryTermMachine(platformType,par);
-        }else  if(PlatformType.RDBPOS.code.equals(platformType.code)){
-            return rdbTermMachineServiceImpl.queryTermMachine(platformType, par);
-        }else {
-            List<TermMachineVo> list = new ArrayList<>();
-            TermMachineVo vo = new TermMachineVo();
-            vo.setId("");
-            vo.setMechineName("无配置");
+        //封装异常返回，或者未实现的平台查询
+        List<TermMachineVo> list = new ArrayList<>();
+        TermMachineVo vo = new TermMachineVo();
+        vo.setId("");
+        vo.setMechineName("无配置");
+        list.add(vo);
+
+        //分平台查询
+        try {
+            if(PlatformType.whetherPOS(platformType.code)){
+                return posTermMachineServiceImpl.queryTermMachine(platformType,par);
+            }else  if(PlatformType.MPOS.code.equals(platformType.code)){
+                return mposTermMachineServiceImpl.queryTermMachine(platformType,par);
+            }else  if(PlatformType.SSPOS.code.equals(platformType.code)){
+                return sPosTermMachineServiceImpl.queryTermMachine(platformType,par);
+            }else  if(PlatformType.RDBPOS.code.equals(platformType.code)) {
+                return rdbTermMachineServiceImpl.queryTermMachine(platformType, par);
+            }else if (PlatformType.RJPOS.code.equals(platformType.code)){
+                return rjTermMachineServiceImpl.queryTermMachine(platformType, par);
+            }else {
+                return list;
+            }
+        }catch (Exception e){
+            vo.setMechineName(e.getLocalizedMessage());
             list.add(vo);
             return list;
         }
@@ -101,6 +110,8 @@ public class TermMachineServiceImpl  implements TermMachineService {
             return mposTermMachineServiceImpl.lowerHairMachine(lowerHairMachineVo);
         }else if(PlatformType.SSPOS.code.equals(lowerHairMachineVo.getPlatformType())){
             return sPosTermMachineServiceImpl.lowerHairMachine(lowerHairMachineVo);
+        } else if(PlatformType.RJPOS.code.equals(lowerHairMachineVo.getPlatformType())) {
+            return rjTermMachineServiceImpl.lowerHairMachine(lowerHairMachineVo);
         }
         return AgentResult.fail("未实现的业务");
     }
@@ -166,11 +177,12 @@ public class TermMachineServiceImpl  implements TermMachineService {
     @Override
     public AgentResult queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailLists, String operation) throws Exception {
        String type = terminalTransferDetailLists.get(0).getPlatformType().toString();
-      if("1".equals(type)){
+        logger.info("本次联动请求类型为:{}",type);
+      if("1".equals(type)){//pos
             return   posTermMachineServiceImpl.queryTerminalTransfer(terminalTransferDetailLists,operation);
-        }else if("2".equals(type)){
+        }else if("2".equals(type)){//手刷
             return   mposTermMachineServiceImpl.queryTerminalTransfer(terminalTransferDetailLists,operation);
-        }else if("3".equals(type)){
+        }else if("3".equals(type)){//瑞大宝
             return   AgentResult.fail("未联动");
         }
 
@@ -181,11 +193,12 @@ public class TermMachineServiceImpl  implements TermMachineService {
     @Override
     public AgentResult queryTerminalTransferResult(String serialNumber,String type) throws Exception {
         AgentResult agentResult=null;
-        if("1".equals(type)){
+        logger.info("本次联动查询结果类型为:{}",type);
+        if("1".equals(type)){//pos
          agentResult =  posTermMachineServiceImpl.queryTerminalTransferResult(serialNumber,type);
-        }else if("2".equals(type)){
+        }else if("2".equals(type)){//手刷
             agentResult =  mposTermMachineServiceImpl.queryTerminalTransferResult(serialNumber,type);
-        }else if("3".equals(type)){
+        }else if("3".equals(type)){//瑞大宝
 
         }
         return agentResult;
@@ -240,6 +253,15 @@ public class TermMachineServiceImpl  implements TermMachineService {
             return rdbTermMachineServiceImpl.checkModleIsEq(data, platformType);
         } else {
             return false;
+        }
+    }
+
+    @Override
+    public AgentResult queryLogisticsResult(Map<String, Object> pamMap, String platformType) throws Exception {
+        if (PlatformType.RJPOS.getValue().equals(platformType)) {
+            return rjTermMachineServiceImpl.queryLogisticsResult(pamMap, platformType);
+        }else {
+            return AgentResult.fail("未实现的物流平台。");
         }
     }
 }
