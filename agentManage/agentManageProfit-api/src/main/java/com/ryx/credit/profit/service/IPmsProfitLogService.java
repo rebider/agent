@@ -39,4 +39,6 @@ public interface IPmsProfitLogService {
    int insertSelective(PmsProfitTempWithBLOBs record) ;
 
   int insertSelective(PmsProfit record);
+
+    int  save(PmsProfit record);
 }
