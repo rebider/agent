@@ -299,7 +299,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
                     log.info("http请求返回错误:{}", res_data.getString("result_msg"));
                     return AgentResult.fail(res_data.getString("result_msg"));
                 } else {
-                    return AgentResult.ok();
+                    return AgentResult.ok(res_data);
                 }
             } else {
                 if (StringUtils.isNotBlank(respXMLObj.getString("respMsg"))) {
@@ -320,7 +320,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
                         log.info("http请求返回错误:{}", res_data.getString("result_msg"));
                         return AgentResult.fail(res_data.getString("result_msg"));
                     } else {
-                        return AgentResult.ok();
+                        return AgentResult.ok(res_data);
                     }
                 } else {
                     if (StringUtils.isNotBlank(respXMLObj.getString("respMsg"))) {

@@ -81,6 +81,18 @@ public class ORefundPriceDiffDetail  implements Serializable {
 
     private Date appTime;
 
+    private String oldSupdOrgId;
+
+    private String oldSupdOrgName;
+
+    private String newSupdOrgId;
+
+    private String newSupdOrgName;
+
+    private String delayDay;
+
+    private String deliveryTimeType;
+
     private OActivity activityFront;
 
     private List<OActivity> oActivities;
@@ -91,6 +103,54 @@ public class ORefundPriceDiffDetail  implements Serializable {
 
     private String oldMachineId;
 
+
+    public String getOldSupdOrgId() {
+        return oldSupdOrgId;
+    }
+
+    public void setOldSupdOrgId(String oldSupdOrgId) {
+        this.oldSupdOrgId = oldSupdOrgId;
+    }
+
+    public String getOldSupdOrgName() {
+        return oldSupdOrgName;
+    }
+
+    public void setOldSupdOrgName(String oldSupdOrgName) {
+        this.oldSupdOrgName = oldSupdOrgName;
+    }
+
+    public String getNewSupdOrgId() {
+        return newSupdOrgId;
+    }
+
+    public void setNewSupdOrgId(String newSupdOrgId) {
+        this.newSupdOrgId = newSupdOrgId;
+    }
+
+    public String getNewSupdOrgName() {
+        return newSupdOrgName;
+    }
+
+    public void setNewSupdOrgName(String newSupdOrgName) {
+        this.newSupdOrgName = newSupdOrgName;
+    }
+
+    public String getDelayDay() {
+        return delayDay;
+    }
+
+    public void setDelayDay(String delayDay) {
+        this.delayDay = delayDay;
+    }
+
+    public String getDeliveryTimeType() {
+        return deliveryTimeType;
+    }
+
+    public void setDeliveryTimeType(String deliveryTimeType) {
+        this.deliveryTimeType = deliveryTimeType;
+    }
 
     public String getNewMachineId() {
         return newMachineId;
