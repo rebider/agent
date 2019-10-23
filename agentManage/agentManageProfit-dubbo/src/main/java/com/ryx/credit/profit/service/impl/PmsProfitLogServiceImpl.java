@@ -73,6 +73,11 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
     }
 
     @Override
+    public int save(PmsProfit record) {
+        return pmsProfitLogMapper.save(record);
+    }
+
+    @Override
     public int updateByPrimaryKeySelective(PmsProfitLog record) {
         return pmsProfitLogMapper.updateByPrimaryKeySelective(record);
     }
@@ -148,6 +153,8 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
     public int updateByPrimaryKey(PmsProfitLog record) {
         return pmsProfitLogMapper.updateByPrimaryKeySelective(record);
     }
+
+
 
 
 }
