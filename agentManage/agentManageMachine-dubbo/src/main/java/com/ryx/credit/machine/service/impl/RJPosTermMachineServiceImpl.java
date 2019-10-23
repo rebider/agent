@@ -75,7 +75,8 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
 
             //下发接口
             logger.info("RJ机具下发接口请求加密参数:{}", JSONObject.toJSONString(map));
-            String respResult = HttpClientUtil.doPost(AppConfig.getProperty("rjpos.queryTermActive"), map);
+            HttpClientUtil.doPost(AppConfig.getProperty("rjpos.queryTermActive"), map);
+            /*String respResult = HttpClientUtil.doPost(AppConfig.getProperty("rjpos.queryTermActive"), map);
             logger.info("RJ机具下发接口返回加密参数:{}", respResult);
 
             JSONObject jsonObject = JSONObject.parseObject(respResult);
@@ -104,7 +105,9 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
                 //下发异常
                 logger.info("RJ机具下发接口返回异常:{}", respResult);
                 return AgentResult.build(2, null != respJson.getString("msg") ? respJson.getString("msg") : "瑞+，下发接口，返回值异常!");
-            }
+            }*/
+            //默认不接收返回值
+            return AgentResult.build(0,"处理中");
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
@@ -175,34 +178,35 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
             if (!RSAUtil.verifyDigitalSign(respXML.getBytes(charset), signBytes, Constants.publicKey, "SHA1WithRSA"))
                 return AgentResult.build(2,"验证签名失败");
 
-            JSONObject respJson = JSONObject.parseObject(respXML).getJSONObject("data");
-            if (null != respJson.getString("code") && null != respJson.getString("success") && respJson.getString("code").equals("0000") && respJson.getBoolean("success")) {
-                //下发成功（处理中）
+            JSONArray respArray = JSONObject.parseObject(respXML).getJSONObject("data").getJSONArray("SNMachineStorageLog");
+
+            if (null == respArray){
+                return AgentResult.build(2,"未查到信息，请重新下发");
+            }
+
+            JSONObject retObject = (JSONObject) respArray.get(0);
+
+            logger.info("瑞+查询结果最终值:{}", retObject);
+            if (null != retObject.getString("STATUS") && "0".equals(retObject.getString("STATUS"))) {
+                //处理中
                 return AgentResult.build(0,"处理中");
+            } else if (null != retObject.getString("STATUS") && "6".equals(retObject.getString("STATUS"))) {
+                //处理成功
+                return AgentResult.build(1, null != retObject.getString("REASON") ? retObject.getString("REASON") : "瑞+平台划拨成功。");
+            } else if (null != retObject.getString("STATUS") && "1".equals(retObject.getString("STATUS"))) {
+                //处理失败
+                return AgentResult.build(2, null != retObject.getString("REASON") ? retObject.getString("REASON") : "失败，瑞+未返回失败原因。");
+            } else if (null != retObject.getString("STATUS") && "2".equals(retObject.getString("STATUS"))) {
+                //程序失败
+                return AgentResult.build(2, null != retObject.getString("REASON") ? retObject.getString("REASON") : "瑞+平台程序崩溃，请稍后重新下发。");
             } else {
-                //下发异常
-                logger.info("RJ机具下发接口返回异常:{}", respResult);
-                return AgentResult.build(2, null != respJson.getString("msg") ? respJson.getString("msg") : "瑞+，下发接口，返回值异常!");
+                //瑞+返回值异常
+                return AgentResult.build(2, "瑞+查询接口返回异常");
             }
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
         }
-/*
-            //处理返回信息
-            if (null != respJson.getString("code") && null != respJson.getString("success") && respJson.getString("code").equals("0000") && respJson.getBoolean("success")) {
-                //处理中
-                return AgentResult.build(0,"处理中");
-            } else if (null != respJson.getString("code") && null != respJson.getString("success") && respJson.getString("code").equals("0000") && respJson.getBoolean("success")){
-                //处理成功
-                return AgentResult.build(1, null != respJson.getString("msg") ? respJson.getString("msg") : "瑞+平台划拨成功。");
-            } else if (null != respJson.getString("code") && null != respJson.getString("success") && respJson.getString("code").equals("0000") && respJson.getBoolean("success")) {
-                //处理失败
-                return AgentResult.build(2, null != respJson.getString("msg") ? respJson.getString("msg") : "瑞+平台物流划拨失败，无返回失败原因!");
-            } else {
-                //未知结果
-                return AgentResult.build(2, "瑞+查询接口返回异常");
-            }*/
     }
 
     /**

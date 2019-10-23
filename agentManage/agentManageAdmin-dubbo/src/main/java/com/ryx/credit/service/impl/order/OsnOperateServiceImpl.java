@@ -1107,20 +1107,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             }
         } else if (PlatformType.RJPOS.code.equals(platForm.getPlatformType())) {
             //瑞+物流下发
-            /*
-                        -taskId       | String | 批次号  （保证唯一）
-                        -machineId    | String | 机具编号
-                        -posSnBegin   | String | 起始终端号
-                        -posSnEnd     | String | 结束终端号
-                        createPerson | String | 创建人orgid
-                        posType      | String | 机具类型
-                        posSpePrice  | String | 押金
-                        standTime    | String | 达标时间
-                        newOrgId     | String | 要划拨到的机构id
-                        -deliveryTime | String | 发货时间
-             */
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
-            Agent agent = agentMapper.selectByPrimaryKey(order.getAgentId());
             if (null == oActivity_plan) throw new MessageException("活动信息异常！");
             if (null == order.getOrderPlatform()) throw new MessageException("订单信息中平台异常！");
             if (null == agentBusInfo) throw new MessageException("查询业务数据失败！");
@@ -1140,10 +1127,15 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             try {
                 LowerHairMachineVo lowerHairMachineVo = new LowerHairMachineVo();
                 lowerHairMachineVo.setJsonString(JSONObject.toJSONString(reqMap));
-                //物流下发
-                //AgentResult lowerResult = termMachineService.lowerHairMachine(lowerHairMachineVo);
+                lowerHairMachineVo.setPlatformType(platForm.getPlatformType());
+                //瑞+平台沟通无返回，调整后可以放开
+                /*//物流下发
+                AgentResult lowerResult = termMachineService.lowerHairMachine(lowerHairMachineVo);
                 //下发异常
-                //if (0 != lowerResult.getStatus()) throw new Exception(lowerResult.getMsg());
+                if (0 != lowerResult.getStatus()) throw new Exception(lowerResult.getMsg());*/
+
+                //物流下发
+                termMachineService.lowerHairMachine(lowerHairMachineVo);
                 //下发成功，查询结果
                 AgentResult queryResult = termMachineService.queryLogisticsResult(FastMap.fastMap("taskId", logistics.getId()), platForm.getPlatformType());
 
