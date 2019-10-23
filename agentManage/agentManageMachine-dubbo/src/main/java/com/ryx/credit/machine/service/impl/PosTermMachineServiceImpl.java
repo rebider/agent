@@ -2,6 +2,7 @@ package com.ryx.credit.machine.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.BackType;
+import com.ryx.credit.common.enumc.DeliveryTimeType;
 import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
@@ -283,9 +284,21 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
             mapDetail.put("posSnEnd", refundPriceDiffDetail.getEndSn());
             mapDetail.put("reqPayStatus", "1");
             mapDetail.put("checkPayStatus", "1");
-            mapDetail.put("deliveryTime", refundPriceDiffDetail.getDeliveryTime());
             mapDetail.put("newMachineId", refundPriceDiffDetail.getNewMachineId());
             mapDetail.put("oldMachineId", refundPriceDiffDetail.getOldMachineId());
+            if(StringUtils.isNotBlank(refundPriceDiffDetail.getDeliveryTimeType())){
+                mapDetail.put("deliveryTimeType", refundPriceDiffDetail.getDeliveryTimeType());
+                if(refundPriceDiffDetail.getDeliveryTimeType().equals(DeliveryTimeType.ZERO.getValue())){
+                    mapDetail.put("deliveryTime", refundPriceDiffDetail.getDeliveryTime());
+                }else{
+                    mapDetail.put("deliveryTime", "");
+                }
+                if(refundPriceDiffDetail.getDeliveryTimeType().equals(DeliveryTimeType.ONE.getValue())){
+                    mapDetail.put("delayDay", refundPriceDiffDetail.getDelayDay());
+                }else{
+                    mapDetail.put("delayDay", "");
+                }
+            }
             listDetail.add(mapDetail);
         }
         jsonObject.put("snList", listDetail);

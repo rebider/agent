@@ -843,16 +843,33 @@ public class CompensateServiceImpl implements CompensateService {
             //                    }
             //                }
             //            }
-//            if(StringUtils.isBlank(agentVo.getDeliveryTime())){
-//                throw new ProcessException("请填写发货时间");
-//            }
+            if(StringUtils.isNotBlank(agentVo.getDeliveryTimeType())){
+                if(StringUtils.isBlank(DeliveryTimeType.getContentByValue(agentVo.getDeliveryTimeType()))){
+                    throw new ProcessException("请填写发货时间类型错误");
+                }
+                if(agentVo.getDeliveryTimeType().equals(DeliveryTimeType.ZERO.getValue())){
+                    if(StringUtils.isBlank(agentVo.getDeliveryTime())){
+                        throw new ProcessException("请填写发货时间调整至");
+                    }
+                } else if(agentVo.getDeliveryTimeType().equals(DeliveryTimeType.ONE.getValue())){
+                    if(StringUtils.isBlank(agentVo.getDelayDay())){
+                        throw new ProcessException("请填写发货日期延期");
+                    }
+                }
+            }
             ORefundPriceDiffDetailExample oRefundPriceDiffDetailExample = new ORefundPriceDiffDetailExample();
             ORefundPriceDiffDetailExample.Criteria criteria = oRefundPriceDiffDetailExample.createCriteria();
             criteria.andStatusEqualTo(Status.STATUS_1.status);
             criteria.andRefundPriceDiffIdEqualTo(oRefundPriceDiff.getId());
             List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(oRefundPriceDiffDetailExample);
             for (ORefundPriceDiffDetail oRefundPriceDiffDetail : oRefundPriceDiffDetails) {
+                if(StringUtils.isNotBlank(agentVo.getDeliveryTime()))
                 oRefundPriceDiffDetail.setDeliveryTime(agentVo.getDeliveryTime());
+                if(StringUtils.isNotBlank(agentVo.getDeliveryTimeType()))
+                oRefundPriceDiffDetail.setDeliveryTimeType(agentVo.getDeliveryTimeType());
+                if(StringUtils.isNotBlank(agentVo.getDelayDay()))
+                oRefundPriceDiffDetail.setDelayDay(agentVo.getDelayDay());
+                oRefundPriceDiffDetail.setuTime(new Date());
                 int i = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(oRefundPriceDiffDetail);
                 if(i==0){
                     throw new ProcessException("更新发货时间失败");
