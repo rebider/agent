@@ -49,4 +49,11 @@ public interface ITemplateRecodeService {
 
     Map<String,Object> getRJTemplateDetail(String applyId) throws MessageException;
 
+    Map<String,Object> getRDBTemplateNow(String agencyId) throws MessageException;
+
+    Map<String,Object> getRDBTemplateApplyInfo(String agencyId,String taskId,String taskType) throws MessageException;
+
+    void assignRDBTemplate(String id) throws MessageException;
+
+
 }
