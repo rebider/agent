@@ -6,6 +6,7 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtil;
+import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -815,20 +816,16 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
      * @param reqMap
      * @return
      */
-    @Autowired
+    @Override
     public AgentResult queryMonthSumOffsetAmt(Map<String,Object> reqMap){
-        reqMap.put("month","201908");
-        List<String> agentIdList = new ArrayList<>();
-        agentIdList.add("AG19073576564");
-        reqMap.put("agentIdList",agentIdList);
-
+        log.info("给分润提供查询轧差数据,请求参数:{}",reqMap);
         AgentResult agentResult = AgentResult.fail();
         String month = String.valueOf(reqMap.get("month"));
         if(StringUtils.isBlank(month) || month.equals("null")){
             agentResult.setMsg("缺少月份");
             return agentResult;
         }
-        List<String> agentList = (List<String>) reqMap.get("agentIdList");
+        Set<String> agentList = (Set<String>) reqMap.get("agentIdList");
         if(null==agentList){
             agentResult.setMsg("缺少代理商编号");
             return agentResult;
@@ -838,9 +835,13 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             return agentResult;
         }
         List<Map<String, Object>> list = internetRenewOffsetDetailMapper.queryMonthSumOffsetAmt(reqMap);
-        agentResult.setData(list);
-        return agentResult;
+        if(list.size()==0){
+            agentResult.setMsg("暂无代理商数据");
+            log.info("给分润提供查询轧差数据,返回参数1:{}",JsonUtil.objectToJson(agentResult));
+            return agentResult;
+        }
+        log.info("给分润提供查询轧差数据,返回参数2:{}",JsonUtil.objectToJson(AgentResult.ok(list)));
+        return AgentResult.ok(list);
     }
-
 
 }
