@@ -487,7 +487,7 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
             and a.ann_title like CONCAT(CONCAT('%',#{map.annTitle}),'%')
         </if>
         <if test="map.pubTmb!=null and map.pubTmb!=''">
-            and to_char(a.pub_tm,'yyyy-mm-dd') &gt;= {map.pubTmb}
+            and to_char(a.pub_tm,'yyyy-mm-dd') &gt;= #{map.pubTmb}
         </if>
         <if test="map.pubTme!=null and map.pubTme!=''">
             and to_char(a.pub_tm,'yyyy-mm-dd') &lt;= #{map.pubTme}
