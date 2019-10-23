@@ -1118,7 +1118,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             reqMap.put("posSnBegin", logistics.getSnBeginNum());//起始终端号
             reqMap.put("posSnEnd", logistics.getSnEndNum());//结束终端号
             reqMap.put("createPerson", logistics.getcUser());//创建人
-            reqMap.put("posType", oActivity_plan.getProType());//机具类型
+            reqMap.put("posType", oActivity_plan.getPosType());//机具类型
             reqMap.put("posSpePrice", oActivity_plan.getPosSpePrice());//押金
             reqMap.put("standTime", oActivity_plan.getStandTime());//达标时间
             reqMap.put("newOrgId", agentBusInfo.getBusNum());//划拨目标
