@@ -163,7 +163,27 @@
         </otherwise>
       </choose>
     </where>
-    UNION
+    union
+    select distinct (anno_id)
+    from a_anno_platform_rela ra
+    left join a_announcement_info aa
+    on aa.ann_id = ra.anno_id
+    <where>
+      <choose>
+        <when test="map.busTypes !=null and map.busTypes.size > 0">
+          ra.rang_type = '0' and
+          (<trim suffixOverrides="or">
+          <foreach open="(" collection="map.busTypes" separator="or" item="busType" close=")" >
+            (#{busType} = ra.rang_value)
+          </foreach>
+        </trim>)
+        </when>
+        <otherwise>
+          1!=1
+        </otherwise>
+      </choose>
+    </where>
+    INTERSECT
     select distinct (anno_id)
     from a_anno_platform_rela ra
     left join a_announcement_info aa
@@ -183,26 +203,7 @@
         </otherwise>
       </choose>
     </where>
-    UNION
-    select distinct (anno_id)
-    from a_anno_platform_rela ra
-    left join a_announcement_info aa
-    on aa.ann_id = ra.anno_id
-    <where>
-      <choose>
-        <when test="map.busTypes !=null and map.busTypes.size > 0">
-          ra.rang_type = '3' and
-          (<trim suffixOverrides="or">
-            <foreach open="(" collection="map.busTypes" separator="or" item="busType" close=")" >
-              (#{busType} = ra.rang_value)
-            </foreach>
-          </trim>)
-        </when>
-        <otherwise>
-          1!=1
-        </otherwise>
-      </choose>
-    </where>
+
   </select>
   <insert id="saveBatch" parameterType="java.util.List" >
     insert into A_ANNO_PLATFORM_RELA (ID, ANNO_ID, RANG_TYPE,
