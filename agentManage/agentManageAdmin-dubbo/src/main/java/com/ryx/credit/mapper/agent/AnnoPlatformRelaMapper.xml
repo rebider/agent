@@ -164,7 +164,7 @@
           </otherwise>
         </choose>
       </where>
-      union
+      INTERSECT
       select distinct (anno_id)
       from a_anno_platform_rela ra
       left join a_announcement_info aa
