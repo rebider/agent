@@ -368,11 +368,13 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
         agentNotifyVo.setBaseMessage(agent);
         agentNotifyVo.setBusMessage(agentBusInfo);
         agentNotifyVo.setHasS0(agentBusInfo.getDredgeS0().equals(new BigDecimal(1))?"0":"1");
-        agentNotifyVo.setDebitTop(agentBusInfo.getDebitCapping());//借记封顶额（元）
+        agentNotifyVo.setDebitTop(agentBusInfo.getDebitCapping());//借记封顶额上限（元）
         agentNotifyVo.setCkDebitRate(agentBusInfo.getDebitAppearRate());//借记出款费率（%）
         agentNotifyVo.setLowDebitRate(agentBusInfo.getDebitRateLower());//借记费率下限（%）
         agentNotifyVo.setCreditRateLower(agentBusInfo.getCreditRateFloor());//贷记费率下限（%）
         agentNotifyVo.setCreditRateCeiling(agentBusInfo.getCreditRateCeiling());//贷记费率上限（%）
+        agentNotifyVo.setDebitRateCapping(agentBusInfo.getDebitRateCapping());//借记费率上限（%）
+        agentNotifyVo.setDebitCappingLower(agentBusInfo.getDebitCappingLower());//借记封顶额下限（元）
         if(StringUtils.isNotBlank(agentBusInfo.getBusLoginNum())){
             agentNotifyVo.setLoginName(agentBusInfo.getBusLoginNum());
         }
@@ -713,11 +715,13 @@ public class AgentNotifyServiceImpl implements AgentNotifyService{
         agentNotifyVo.setBaseMessage(agent);
         agentNotifyVo.setBusMessage(agentBusInfo);
         agentNotifyVo.setHasS0(agentBusInfo.getDredgeS0().equals(new BigDecimal(1))?"0":"1");
-        agentNotifyVo.setDebitTop(agentBusInfo.getDebitCapping());//借记封顶额（元）
+        agentNotifyVo.setDebitTop(agentBusInfo.getDebitCapping());//借记封顶额上限（元）
         agentNotifyVo.setCkDebitRate(agentBusInfo.getDebitAppearRate());//借记出款费率（%）
         agentNotifyVo.setLowDebitRate(agentBusInfo.getDebitRateLower());//借记费率下限（%）
         agentNotifyVo.setCreditRateLower(agentBusInfo.getCreditRateFloor());//贷记费率下限（%）
         agentNotifyVo.setCreditRateCeiling(agentBusInfo.getCreditRateCeiling());//贷记费率上限（%）
+        agentNotifyVo.setDebitRateCapping(agentBusInfo.getDebitRateCapping());//借记费率上限（%）
+        agentNotifyVo.setDebitCappingLower(agentBusInfo.getDebitCappingLower());//借记封顶额下限（元）
         if(StringUtils.isNotBlank(agentBusInfo.getBusLoginNum())){
             agentNotifyVo.setLoginName(agentBusInfo.getBusLoginNum());
         }
