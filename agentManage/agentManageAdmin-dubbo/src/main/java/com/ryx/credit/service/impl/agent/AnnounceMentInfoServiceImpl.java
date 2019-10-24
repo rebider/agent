@@ -233,6 +233,9 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         par.put("userId",userId);
         par.put("toAgent","0");//是否发布至代理商标志
         Agent agent = agentService.queryAgentByUserId(String.valueOf(userId));
+        if (agent==null){
+            return  pageInfo;
+        }
         String agUniqNum = agent.getAgUniqNum();
         Map<String,Object> map = new HashMap<>();
         map.put("agentId",agUniqNum);
