@@ -2867,6 +2867,146 @@ public class AgentMergeBusInfoExample {
             addCriterion("DEBIT_APPEAR_RATE not between", value1, value2, "debitAppearRate");
             return (Criteria) this;
         }
+
+        public Criteria andDebitCappingLowerIsNull() {
+            addCriterion("DEBIT_CAPPING_LOWER is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitCappingLowerIsNotNull() {
+            addCriterion("DEBIT_CAPPING_LOWER is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitCappingLowerEqualTo(String value) {
+            addCriterion("DEBIT_CAPPING_LOWER =", value, "debitCappingLower");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitCappingLowerNotEqualTo(String value) {
+            addCriterion("DEBIT_CAPPING_LOWER <>", value, "debitCappingLower");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitCappingLowerGreaterThan(String value) {
+            addCriterion("DEBIT_CAPPING_LOWER >", value, "debitCappingLower");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitCappingLowerGreaterThanOrEqualTo(String value) {
+            addCriterion("DEBIT_CAPPING_LOWER >=", value, "debitCappingLower");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitCappingLowerLessThan(String value) {
+            addCriterion("DEBIT_CAPPING_LOWER <", value, "debitCappingLower");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitCappingLowerLessThanOrEqualTo(String value) {
+            addCriterion("DEBIT_CAPPING_LOWER <=", value, "debitCappingLower");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitCappingLowerLike(String value) {
+            addCriterion("DEBIT_CAPPING_LOWER like", value, "debitCappingLower");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitCappingLowerNotLike(String value) {
+            addCriterion("DEBIT_CAPPING_LOWER not like", value, "debitCappingLower");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitCappingLowerIn(List<String> values) {
+            addCriterion("DEBIT_CAPPING_LOWER in", values, "debitCappingLower");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitCappingLowerNotIn(List<String> values) {
+            addCriterion("DEBIT_CAPPING_LOWER not in", values, "debitCappingLower");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitCappingLowerBetween(String value1, String value2) {
+            addCriterion("DEBIT_CAPPING_LOWER between", value1, value2, "debitCappingLower");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitCappingLowerNotBetween(String value1, String value2) {
+            addCriterion("DEBIT_CAPPING_LOWER not between", value1, value2, "debitCappingLower");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitRateCappingIsNull() {
+            addCriterion("DEBIT_RATE_CAPPING is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitRateCappingIsNotNull() {
+            addCriterion("DEBIT_RATE_CAPPING is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitRateCappingEqualTo(String value) {
+            addCriterion("DEBIT_RATE_CAPPING =", value, "debitRateCapping");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitRateCappingNotEqualTo(String value) {
+            addCriterion("DEBIT_RATE_CAPPING <>", value, "debitRateCapping");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitRateCappingGreaterThan(String value) {
+            addCriterion("DEBIT_RATE_CAPPING >", value, "debitRateCapping");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitRateCappingGreaterThanOrEqualTo(String value) {
+            addCriterion("DEBIT_RATE_CAPPING >=", value, "debitRateCapping");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitRateCappingLessThan(String value) {
+            addCriterion("DEBIT_RATE_CAPPING <", value, "debitRateCapping");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitRateCappingLessThanOrEqualTo(String value) {
+            addCriterion("DEBIT_RATE_CAPPING <=", value, "debitRateCapping");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitRateCappingLike(String value) {
+            addCriterion("DEBIT_RATE_CAPPING like", value, "debitRateCapping");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitRateCappingNotLike(String value) {
+            addCriterion("DEBIT_RATE_CAPPING not like", value, "debitRateCapping");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitRateCappingIn(List<String> values) {
+            addCriterion("DEBIT_RATE_CAPPING in", values, "debitRateCapping");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitRateCappingNotIn(List<String> values) {
+            addCriterion("DEBIT_RATE_CAPPING not in", values, "debitRateCapping");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitRateCappingBetween(String value1, String value2) {
+            addCriterion("DEBIT_RATE_CAPPING between", value1, value2, "debitRateCapping");
+            return (Criteria) this;
+        }
+
+        public Criteria andDebitRateCappingNotBetween(String value1, String value2) {
+            addCriterion("DEBIT_RATE_CAPPING not between", value1, value2, "debitRateCapping");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

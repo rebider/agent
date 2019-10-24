@@ -151,10 +151,12 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
                 }
             }
 			Dict debitRateLower = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitRateLower");//借记费率下限（%）
-			Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitCapping");//借记封顶额（元）
+			Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitCapping");//借记封顶额上限（元）
 			Dict debitAppearRate = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitAppearRate");//借记出款费率（%）
 			Dict creditRateFloor = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "creditRateFloor");//贷记费率下限（%）
 			Dict creditRateCeiling = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "creditRateCeiling");//贷记费率上限（%）
+			Dict debitRateCapping = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitRateCapping");//借记费率上限（%）
+			Dict debitCappingLower = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitCappingLower");//借记封顶额下限（元）
 			if(debitRateLower!=null){
 				agentBusInfo.setDebitRateLower(debitRateLower.getdItemvalue());
 			}
@@ -170,7 +172,12 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 			if (creditRateCeiling != null) {
 				agentBusInfo.setCreditRateCeiling(creditRateCeiling.getdItemname());
 			}
-
+			if (debitRateCapping != null) {
+				agentBusInfo.setDebitRateCapping(debitRateCapping.getdItemname());
+			}
+			if (debitCappingLower != null) {
+				agentBusInfo.setDebitCappingLower(debitCappingLower.getdItemname());
+			}
 			if(1!=agentBusInfoMapper.insert(agentBusInfo)){
         		throw new ProcessException("业务添加失败");
 			}
@@ -408,10 +415,12 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 						}
 					}
 					Dict debitRateLower = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitRateLower");//借记费率下限（%）
-					Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitCapping");//借记封顶额（元）
+					Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitCapping");//借记封顶额上限（元）
 					Dict debitAppearRate = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitAppearRate");//借记出款费率（%）
 					Dict creditRateFloor = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "creditRateFloor");//贷记费率下限（%）
 					Dict creditRateCeiling = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "creditRateCeiling");//贷记费率上限（%）
+					Dict debitRateCapping = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitRateCapping");//借记费率上限（%）
+					Dict debitCappingLower = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitCappingLower");//借记封顶额下限（元）
 					if(debitRateLower!=null){
 						db_AgentBusInfo.setDebitRateLower(debitRateLower.getdItemvalue());
 					}
@@ -427,7 +436,12 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					if (creditRateCeiling != null) {
 						db_AgentBusInfo.setCreditRateCeiling(creditRateCeiling.getdItemname());
 					}
-
+					if (debitRateCapping != null) {
+						db_AgentBusInfo.setDebitRateCapping(debitRateCapping.getdItemname());
+					}
+					if (debitCappingLower != null) {
+						db_AgentBusInfo.setDebitCappingLower(debitCappingLower.getdItemname());
+					}
 					if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(db_AgentBusInfo)){
 						throw new MessageException("更新业务信息失败");
 					}else{

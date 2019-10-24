@@ -362,10 +362,12 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
                 AgentBusInfo agbus = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
                 Dict debitRateLower = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfoVo.getBusPlatform(), "debitRateLower");//借记费率下限（%）
-                Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfoVo.getBusPlatform(), "debitCapping");//借记封顶额（元）
+                Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfoVo.getBusPlatform(), "debitCapping");//借记封顶额上限（元）
                 Dict debitAppearRate = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfoVo.getBusPlatform(), "debitAppearRate");//借记出款费率（%）
                 Dict creditRateFloor = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "creditRateFloor");//贷记费率下限（%）
                 Dict creditRateCeiling = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "creditRateCeiling");//贷记费率上限（%）
+                Dict debitRateCapping = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitRateCapping");//借记费率上限（%）
+                Dict debitCappingLower = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitCappingLower");//借记封顶额下限（元）
                 if(debitRateLower!=null){
                     agentBusInfoVo.setDebitRateLower(debitRateLower.getdItemvalue());
                 }
@@ -376,10 +378,16 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     agentBusInfoVo.setDebitAppearRate(debitAppearRate.getdItemvalue());
                 }
                 if (creditRateFloor != null) {
-                    agentBusInfo.setCreditRateFloor(creditRateFloor.getdItemname());
+                    agentBusInfoVo.setCreditRateFloor(creditRateFloor.getdItemname());
                 }
                 if (creditRateCeiling != null) {
-                    agentBusInfo.setCreditRateCeiling(creditRateCeiling.getdItemname());
+                    agentBusInfoVo.setCreditRateCeiling(creditRateCeiling.getdItemname());
+                }
+                if (debitRateCapping != null) {
+                    agentBusInfoVo.setDebitRateCapping(debitRateCapping.getdItemname());
+                }
+                if (debitCappingLower != null) {
+                    agentBusInfoVo.setDebitCappingLower(debitCappingLower.getdItemname());
                 }
                 agentBusInfoVo.setVersion(agbus.getVersion());
                 int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfoVo);
