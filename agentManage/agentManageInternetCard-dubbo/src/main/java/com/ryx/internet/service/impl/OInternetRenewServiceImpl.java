@@ -6,6 +6,7 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtil;
+import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -86,14 +87,6 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     private DepartmentService departmentService;
     @Autowired
     private InternetRenewOffsetDetailMapper internetRenewOffsetDetailMapper;
-
-
-    public static Date stepMonth(Date sourceDate, int month) {
-        Calendar c = Calendar.getInstance();
-        c.setTime(sourceDate);
-        c.add(Calendar.MONTH, month);
-        return c.getTime();
-    }
 
 
     @Override
@@ -735,9 +728,9 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 if(null==oInternetCard.getExpireTime()){
                     throw new MessageException("到期时间为空,不允许续费");
                 }
-                Date date = stepMonth(oInternetCard.getExpireTime(), 3);
+                Date date = DateUtil.dateDay(oInternetCard.getExpireTime(), "22");
                 if(Calendar.getInstance().getTime().getTime()>date.getTime()){
-                    throw new MessageException("到期时间超过3个月,不允许续费");
+                    throw new MessageException("到期时间超过22号,不允许续费");
                 }
             }else{
                 throw new MessageException("状态不正确,不允许续费");
@@ -816,4 +809,39 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }
 
     }
+
+
+    /**
+     * 给分润提供查询轧差数据
+     * @param reqMap
+     * @return
+     */
+    @Override
+    public AgentResult queryMonthSumOffsetAmt(Map<String,Object> reqMap){
+        log.info("给分润提供查询轧差数据,请求参数:{}",reqMap);
+        AgentResult agentResult = AgentResult.fail();
+        String month = String.valueOf(reqMap.get("month"));
+        if(StringUtils.isBlank(month) || month.equals("null")){
+            agentResult.setMsg("缺少月份");
+            return agentResult;
+        }
+        Set<String> agentList = (Set<String>) reqMap.get("agentIdList");
+        if(null==agentList){
+            agentResult.setMsg("缺少代理商编号");
+            return agentResult;
+        }
+        if(agentList.size()==0){
+            agentResult.setMsg("缺少代理商编号");
+            return agentResult;
+        }
+        List<Map<String, Object>> list = internetRenewOffsetDetailMapper.queryMonthSumOffsetAmt(reqMap);
+        if(list.size()==0){
+            agentResult.setMsg("暂无代理商数据");
+            log.info("给分润提供查询轧差数据,返回参数1:{}",JsonUtil.objectToJson(agentResult));
+            return agentResult;
+        }
+        log.info("给分润提供查询轧差数据,返回参数2:{}",JsonUtil.objectToJson(AgentResult.ok(list)));
+        return AgentResult.ok(list);
+    }
+
 }

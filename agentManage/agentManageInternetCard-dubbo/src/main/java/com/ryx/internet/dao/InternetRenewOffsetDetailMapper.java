@@ -4,6 +4,7 @@ import com.ryx.internet.pojo.InternetRenewOffsetDetail;
 import com.ryx.internet.pojo.InternetRenewOffsetDetailExample;
 
 import java.util.List;
+import java.util.Map;
 
 public interface InternetRenewOffsetDetailMapper {
     long countByExample(InternetRenewOffsetDetailExample example);
@@ -21,4 +22,7 @@ public interface InternetRenewOffsetDetailMapper {
     int updateByPrimaryKeySelective(InternetRenewOffsetDetail record);
 
     int updateByPrimaryKey(InternetRenewOffsetDetail record);
+
+    List<Map<String,Object>> queryMonthSumOffsetAmt(Map<String,Object> reqMap);
+
 }

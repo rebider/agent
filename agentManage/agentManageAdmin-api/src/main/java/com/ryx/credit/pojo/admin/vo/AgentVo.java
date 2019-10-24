@@ -100,6 +100,8 @@ public class AgentVo implements Serializable {
     private String finaceRemitOrgan;//财务出款机构
     private List<AgentBusInfoVo> marketToporgTableIdForm;//市场部顶级机构
     private String deliveryTime;
+    private String delayDay;
+    private String deliveryTimeType;
     //发票信息
    private String invoiceId;
    private  String invoiceReturnReason;
@@ -665,5 +667,21 @@ public class AgentVo implements Serializable {
 
     public void setMarketToporgTableIdForm(List<AgentBusInfoVo> marketToporgTableIdForm) {
         this.marketToporgTableIdForm = marketToporgTableIdForm;
+    }
+
+    public String getDelayDay() {
+        return delayDay;
+    }
+
+    public void setDelayDay(String delayDay) {
+        this.delayDay = delayDay;
+    }
+
+    public String getDeliveryTimeType() {
+        return deliveryTimeType;
+    }
+
+    public void setDeliveryTimeType(String deliveryTimeType) {
+        this.deliveryTimeType = deliveryTimeType;
     }
 }

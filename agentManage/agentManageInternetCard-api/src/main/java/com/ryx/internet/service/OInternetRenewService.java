@@ -56,4 +56,6 @@ public interface OInternetRenewService {
     List<InternetRenewOffsetDetail> queryInternetRenewOffsetDetailList(InternetRenewOffsetDetail internetRenewOffsetDetail, Page page,String agentId);
 
     Integer queryInternetRenewOffsetDetailCount(InternetRenewOffsetDetail internetRenewOffsetDetail,String agentId);
+
+    AgentResult queryMonthSumOffsetAmt(Map<String,Object> reqMap);
 }
