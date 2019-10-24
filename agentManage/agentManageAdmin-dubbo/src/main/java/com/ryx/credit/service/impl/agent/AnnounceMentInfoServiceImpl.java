@@ -192,7 +192,9 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         }else {
             map.put("pubOrg",orgs);
         }
-
+        List<Map<String,Object>> announceMentInfos = announceMentInfoMapper.selectAnnMaintain(map, page);
+        announceMentInfos.forEach(announceMentInfo->{
+        });
         pageInfo.setRows(announceMentInfoMapper.selectAnnMaintain(map,page));
         pageInfo.setTotal(announceMentInfoMapper.selectCountAnnMaintain(map));
         return pageInfo;
