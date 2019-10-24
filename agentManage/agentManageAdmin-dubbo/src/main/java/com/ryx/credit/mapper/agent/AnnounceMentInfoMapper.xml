@@ -332,11 +332,8 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
         a.effect_tm,
         a.expire_tm,
         a.anno_stat,
-        c.name as pub_org,
-        nvl(ri.id, '0') as read_flag
+        c.name as pub_org
         from a_announcement_info a
-        left join a_announcement_read_info ri
-        on a.ann_id = ri.ann_id
         left join c_organization c
         on c.id = a.pub_org
         <where>
