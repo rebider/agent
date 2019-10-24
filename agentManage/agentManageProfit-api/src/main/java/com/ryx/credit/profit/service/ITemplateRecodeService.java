@@ -57,5 +57,5 @@ public interface ITemplateRecodeService {
 
     void assignRDBTemplate(String id) throws MessageException;
 
-
+    Map<String,Object> getSSTemplateDetail(String applyId) throws MessageException;
 }
