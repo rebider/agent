@@ -3774,16 +3774,20 @@ public class OrderServiceImpl implements OrderService {
                 Map map = rAmountlist.get(i);
                 String machinesAmount = String.valueOf(map.get("machinesAmount"));//机具欠款
                 String ramount = String.valueOf(map.get("ramount"));//销账金额
-                String agName = String.valueOf(map.get("agName"));
-                agName=new String(agName.getBytes("iso8859-1"),"utf-8");
-               /* int remove_Account = oRemoveAccountMapper.isRemoveAccount(map);
-                if (remove_Account>=1){
-                    logger.info("已在销账处理中,代理商为:"+agName+",业务平台编码:"+String.valueOf(map.get("busNum")));
-                    return ResultVO.fail("已在销账处理中,代理商为:"+agName+",业务平台编码:"+String.valueOf(map.get("busNum")));
-                }*/
+                String agName ="";
                 if(new BigDecimal(ramount).compareTo(new BigDecimal(machinesAmount))==1){
                     logger.info("填写的金额不能大于机具欠款金额,代理商为:"+agName+",机具金额:"+machinesAmount);
                     throw new MessageException("填写的金额不能大于机具欠款金额,代理商为:"+agName+",机具金额:"+machinesAmount);
+                }
+                if(!String.valueOf(map.get("agId")).equals("null")){
+                    AgentExample agentExample = new AgentExample();
+                    AgentExample.Criteria agId = agentExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andIdEqualTo(String.valueOf(map.get("agId")));
+                    List<Agent> agentList= agentMapper.selectByExample(agentExample);
+                    if (null!=agentList && agentList.size()>0){
+                        Agent agent = agentList.get(0);
+                        agName=agent.getAgName();
+                    }
+
                 }
                 removeAccount.setId(idService.genId(TabId.O_REMOVE_ACCOUNT));
                 removeAccount.setAgId(String.valueOf(map.get("agId")).equals("null")?"":String.valueOf(map.get("agId")));
