@@ -29,6 +29,8 @@ public class TranCheckPlatForm implements Serializable {
 
     private String createPerson;
 
+    private String status;
+
     public BigDecimal getId() {
         return id;
     }
@@ -123,5 +125,13 @@ public class TranCheckPlatForm implements Serializable {
 
     public void setCreatePerson(String createPerson) {
         this.createPerson = createPerson == null ? null : createPerson.trim();
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status == null ? null : status.trim();
     }
 }

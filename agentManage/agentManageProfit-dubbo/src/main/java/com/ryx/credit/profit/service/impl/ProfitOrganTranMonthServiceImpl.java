@@ -193,6 +193,8 @@ public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthServ
     @Override
     public List<TranCheckPlatForm> getAllPlatForm() {
         TranCheckPlatFormExample example=new TranCheckPlatFormExample();
+        TranCheckPlatFormExample.Criteria criteria = example.createCriteria();
+        criteria.andStatusEqualTo("0");//查询正常启用的品牌
         List<TranCheckPlatForm> tranCheckPlatForms = tranCheckPlatFormMapper.selectByExample(example);
         return tranCheckPlatForms;
     }
