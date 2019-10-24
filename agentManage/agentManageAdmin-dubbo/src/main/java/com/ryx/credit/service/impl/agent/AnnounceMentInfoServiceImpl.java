@@ -7,6 +7,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.agent.*;
+import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AnnounceMentInfoVo;
 import com.ryx.credit.pojo.admin.vo.UserVo;
@@ -19,6 +20,7 @@ import com.ryx.credit.service.agent.AnnounceMentInfoService;
 import com.ryx.credit.service.dict.IdService;
 import net.sf.ehcache.hibernate.strategy.NonStrictReadWriteEhcacheCollectionRegionAccessStrategy;
 import org.apache.commons.lang.StringUtils;
+import org.apache.kafka.common.protocol.types.Field;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -182,13 +184,17 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
     public PageInfo selectAnnViewsMaintain(Page page, Map map) {
         PageInfo pageInfo = new PageInfo();
         List<String> orgs = new ArrayList<>();
-        if (map.get("pubOrg")!=null){
+        if (map.get("pubOrg")!=null && !"".equals(String.valueOf(map.get("pubOrg"))) ){
             orgs.add(String.valueOf(map.get("pubOrg")));
             List<String> pubOrg = organizationMapper.selectSubOrg(orgs);
             map.put("pubOrg",pubOrg);
             logger.info("公告运维可读机构{}",pubOrg);
+        }else {
+            map.put("pubOrg",orgs);
         }
-
+        List<Map<String,Object>> announceMentInfos = announceMentInfoMapper.selectAnnMaintain(map, page);
+        announceMentInfos.forEach(announceMentInfo->{
+        });
         pageInfo.setRows(announceMentInfoMapper.selectAnnMaintain(map,page));
         pageInfo.setTotal(announceMentInfoMapper.selectCountAnnMaintain(map));
         return pageInfo;
@@ -201,11 +207,13 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         logger.info("非代理商可读公告{}",annoIds);
         reqMap.put("annoIds",annoIds);
         List<String> orgs = new ArrayList<>();
-        if (reqMap.get("pubOrg")!=null){
+        if (reqMap.get("pubOrg")!=null && !"".equals(String.valueOf(reqMap.get("pubOrg")))){
             orgs.add(String.valueOf(reqMap.get("pubOrg")));
             List<String> pubOrg = organizationMapper.selectSubOrg(orgs);
             reqMap.put("pubOrg",pubOrg);
             logger.info("非代理商可读机构{}",pubOrg);
+        }else {
+            reqMap.put("pubOrg",orgs);
         }
         pageInfo.setRows(announceMentInfoMapper.selectAnnReader(reqMap,page));
         pageInfo.setTotal(announceMentInfoMapper.selectCountAnnReader(reqMap));
@@ -229,6 +237,9 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         par.put("userId",userId);
         par.put("toAgent","0");//是否发布至代理商标志
         Agent agent = agentService.queryAgentByUserId(String.valueOf(userId));
+        if (agent==null){
+            return  pageInfo;
+        }
         String agUniqNum = agent.getAgUniqNum();
         Map<String,Object> map = new HashMap<>();
         map.put("agentId",agUniqNum);
@@ -238,20 +249,32 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         List<String> docPros = agentBusInfoMapper.queryAgDocPro(map);
         List<String> busTypes = agentBusInfoMapper.queryBusType(map);
         logger.info("业务:{},机构:{},业务平台:{}",plats,docPros,busTypes);
+        logger.info("查找代理商{}上级机构编号",docPros);
+        Map<String,Object> orgmap = new HashMap<>();
+        orgmap.put("agentId",agUniqNum);
+        orgmap.put("cloReviewStatus", Status.STATUS_3.status);
+        List<COrganization> cOrganizations = organizationMapper.selectPorgByorgs(docPros);
+        List<String> allOrg=new ArrayList<>();
+        cOrganizations.forEach(org->{
+            allOrg.add(String.valueOf(org.getId()));
+        });
         par.put("platfromPerm",plats);
-        par.put("orgIds",docPros);
+        par.put("orgIds",allOrg);
         par.put("busTypes",busTypes);
+        par.put("agent",1);
         List<String> annoIds = annoPlatformRelaMapper.selectAnnoIds(par);
         logger.info("代理商可读公告{}",annoIds);
         par.put("annoIds",annoIds);
+        List<String> orgs = new ArrayList<>();
         if (par.get("pubOrg")!=null && !"".equals(String.valueOf(par.get("pubOrg")))){
-            List<String> orgs = new ArrayList<>();
-            orgs.add(String.valueOf(par.get("pubOrg")));
-            List<String> pubOrg = organizationMapper.selectSubOrg(orgs);
+            List<String> orgsTmp = new ArrayList<>();
+            orgsTmp.add(String.valueOf(par.get("pubOrg")));
+            List<String> pubOrg = organizationMapper.selectSubOrg(orgsTmp);
             par.put("pubOrg",pubOrg);
             logger.info("代理商可读机构{}",pubOrg);
+        }else{
+            par.put("pubOrg",orgs);
         }
-
         pageInfo.setRows(announceMentInfoMapper.selectAnnReader(par,page));
         pageInfo.setTotal(announceMentInfoMapper.selectCountAnnReader(par));
         return  pageInfo;

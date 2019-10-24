@@ -332,11 +332,8 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
         a.effect_tm,
         a.expire_tm,
         a.anno_stat,
-        c.name as pub_org,
-        nvl(ri.id, '0') as read_flag
+        c.name as pub_org
         from a_announcement_info a
-        left join a_announcement_read_info ri
-        on a.ann_id = ri.ann_id
         left join c_organization c
         on c.id = a.pub_org
         <where>
@@ -455,7 +452,8 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
     a.expire_tm,
     a.anno_stat,
     c.name as pub_org,
-    nvl(ri.id, '0') as read_flag
+    nvl(ri.id, '0') as read_flag,
+    ceil( a.expire_tm - sysdate) as expire
     from a_announcement_info a
     left join a_announcement_read_info ri
     on a.ann_id = ri.ann_id and ri.READ_USER_ID = #{map.userId}
@@ -487,13 +485,13 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
             and a.ann_title like CONCAT(CONCAT('%',#{map.annTitle}),'%')
         </if>
         <if test="map.pubTmb!=null and map.pubTmb!=''">
-            and to_char(a.pub_tm,'yyyy-mm-dd') &gt;= {map.pubTmb}
+            and to_char(a.pub_tm,'yyyy-mm-dd') &gt;= #{map.pubTmb}
         </if>
         <if test="map.pubTme!=null and map.pubTme!=''">
             and to_char(a.pub_tm,'yyyy-mm-dd') &lt;= #{map.pubTme}
         </if>
         <if test="map.effectTmb!=null and map.effectTmb!=''">
-            and to_char(a.effect_tm,'yyyy-mm-dd') &gt;= #{map.effectTmb}
+            and to_char(a.expire_tm,'yyyy-mm-dd') &gt;= #{map.effectTmb}
         </if>
         <if test="map.effectTme!=null and map.effectTme!=''">
             and to_char(a.effect_tm,'yyyy-mm-dd') &lt;= #{map.effectTme}

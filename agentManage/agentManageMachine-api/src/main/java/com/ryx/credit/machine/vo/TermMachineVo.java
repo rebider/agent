@@ -31,7 +31,15 @@ public class TermMachineVo implements Serializable{
 
     private String posType;
 
+    private String posSpePrice;
 
+    public String getPosSpePrice() {
+        return posSpePrice;
+    }
+
+    public void setPosSpePrice(String posSpePrice) {
+        this.posSpePrice = posSpePrice;
+    }
 
     public String getId() {
         return id;

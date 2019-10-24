@@ -302,8 +302,17 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                             }else if (list.size() > 0 && null != retMap.get("code") && "1111".equals(retMap.get("code"))) {
                                 //处理成功，不做物流更新待处理完成所有进行状态更新
                                 logger.info("物流明细发送业务系统处理成功,{},{}", id, batch);
-                            } else {
+                            } else if (null != retMap.get("code") && "2222".equals(retMap.get("code"))){
                                 //处理失败，停止发送
+                                logger.info("物流明细发送业务系统处理失败,{},{}", id, batch);
+                                OLogistics logistics = oLogisticsMapper.selectByPrimaryKey(id);
+                                logistics.setSendStatus(LogisticsSendStatus.send_fail.code);
+                                logistics.setSendMsg(null != retMap.get("msg")? (String) retMap.get("msg"):"未返回失败原因。");
+                                if (oLogisticsMapper.updateByPrimaryKeySelective(logistics) != 1) {
+                                    logger.info("物流明细发送业务系统处理失败，更新数据库失败,{},{}", id, batch);
+                                }
+                            } else {
+                                //其他情况
                                 logger.info("物流明细发送业务系统处理失败,{},{}", id, batch);
                                 OLogistics logistics = oLogisticsMapper.selectByPrimaryKey(id);
                                 logistics.setSendStatus(LogisticsSendStatus.send_fail.code);
@@ -1081,6 +1090,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                             oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                         });
                         retMap.put("code", "2222");
+                        retMap.put("msg", resJson.getString("msg"));
                         return retMap;
                     } else if (null != resJson.getString("code") && resJson.getString("code").equals("2001") && null != resJson.getBoolean("success") && !resJson.getBoolean("success")) {
                         //下发处理中，返回到明细处理，明细继续循环处理，一直到业务系统处理完成
@@ -1118,7 +1128,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             reqMap.put("posSnBegin", logistics.getSnBeginNum());//起始终端号
             reqMap.put("posSnEnd", logistics.getSnEndNum());//结束终端号
             reqMap.put("createPerson", logistics.getcUser());//创建人
-            reqMap.put("posType", oActivity_plan.getProType());//机具类型
+            reqMap.put("posType", oActivity_plan.getPosType());//机具类型
             reqMap.put("posSpePrice", oActivity_plan.getPosSpePrice());//押金
             reqMap.put("standTime", oActivity_plan.getStandTime());//达标时间
             reqMap.put("newOrgId", agentBusInfo.getBusNum());//划拨目标
@@ -1136,7 +1146,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
 
                 //物流下发
                 termMachineService.lowerHairMachine(lowerHairMachineVo);
-                //下发成功，查询结果
+                //查询结果
                 AgentResult queryResult = termMachineService.queryLogisticsResult(FastMap.fastMap("taskId", logistics.getId()), platForm.getPlatformType());
 
                 //更新处理结果
@@ -1170,7 +1180,9 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
+                    AppConfig.sendEmail(emailArr, "机具下发失败，SN码:" + logistics.getSnBeginNum() + "-" + logistics.getSnEndNum() + "。失败原因：" + queryResult.getMsg(), "瑞+机具下发失败");
                     retMap.put("code", "2222");
+                    retMap.put("msg", null != queryResult.getMsg()? queryResult.getMsg():"失败，瑞+未返回失败原因。");
                     return retMap;
                 }
             } catch (Exception e) {

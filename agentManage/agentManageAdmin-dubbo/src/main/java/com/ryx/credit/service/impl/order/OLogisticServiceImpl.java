@@ -462,8 +462,16 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
                     logistics_send.setSendStatus(LogisticsSendStatus.none_send.code);
                     logistics_send.setSendMsg("");
-                    if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
-                        logger.info("瑞大宝物流更新失败,Exception失败{}",JSONObject.toJSONString(oLogistics));
+                    if (1 != oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)) {
+                        logger.info("瑞大宝物流更新失败,Exception失败{}", JSONObject.toJSONString(oLogistics));
+                    }
+                } else if (PlatformType.RJPOS.code.equals(platForm.getPlatformType())) {
+                    //瑞+订单
+                    OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
+                    logistics_send.setSendStatus(LogisticsSendStatus.none_send.code);
+                    logistics_send.setSendMsg("");
+                    if (1 != oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)) {
+                        logger.info("瑞+物流更新失败,Exception失败{}", JSONObject.toJSONString(oLogistics));
                     }
                 }else{
                     OLogistics logistics_send =oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
