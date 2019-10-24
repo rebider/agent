@@ -160,9 +160,9 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             throw new MessageException("该业务平台编码不属于该省区！");
         }
         List<TemplateRecode> list1 = checkRepeatRecode(map1.get("orgId"));
-       // if(list1.size() >= 1){
-        //    throw new MessageException("当前代理商存在正在申请的分润模板！");
-        //}
+        if(list1.size() >= 1){
+            throw new MessageException("当前代理商存在正在申请的分润模板！");
+        }
         String result = null;
         Map<String,String> busInfo = getAgentInfo(map1.get("orgId"));
         TemplateRecode templateRecode = new TemplateRecode();
