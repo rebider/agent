@@ -279,11 +279,11 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
             List<TermMachineVo> resData = new ArrayList<TermMachineVo>();
             for (int i = 0; i < machineList.size(); i++) {
                 JSONObject item =  machineList.getJSONObject(i);
-                String name = item.getString("MODELNAME");
-                String id = item.getString("MACHINEID");
                 TermMachineVo machineVo =  new TermMachineVo();
-                machineVo.setId(id);
-                machineVo.setMechineName(name);
+                machineVo.setId(item.getString("MACHINEID"));
+                machineVo.setMechineName(item.getString("MODELNAME"));
+                machineVo.setPosType(item.getString("MODELTYPE"));
+                machineVo.setPosSpePrice(item.getString("DEPOSIT"));
                 resData.add(machineVo);
             }
             return resData;
