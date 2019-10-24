@@ -358,13 +358,13 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 }
                 OProduct product  = productService.findById(newActivity.getProductId());
 
-                //检查目标活动和代理商平台码是否一致
-                if(oldActivity.getPlatform().equals(newActivity.getPlatform())){
-                    //活动没有跨平台，平台号也不允许跨平台
-                    if(!refundPriceDiffDetail.getNewOrgId().equals(refundPriceDiffDetail.getOldOrgId())) {
-                        throw new MessageException("原平台编号与目标平台编号不一致");
-                    }
-                }
+//                //检查目标活动和代理商平台码是否一致
+//                if(oldActivity.getPlatform().equals(newActivity.getPlatform())){
+//                    //活动没有跨平台，平台号也不允许跨平台
+//                    if(!refundPriceDiffDetail.getNewOrgId().equals(refundPriceDiffDetail.getOldOrgId())) {
+//                        throw new MessageException("原平台编号与目标平台编号不一致");
+//                    }
+//                }
                 //检查目标活动和代理商平台码是否一致
                 if(refundPriceDiffDetail.getNewOrgId().equals(refundPriceDiffDetail.getOldOrgId())){
                     //平台号没有跨平台，活动也不允许跨平台

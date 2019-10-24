@@ -444,12 +444,12 @@ public class CompensateServiceImpl implements CompensateService {
                     }
 
                     //检查目标活动和代理商平台码是否一致
-                    if(oldActivity.getPlatform().equals(newActivity.getPlatform())){
+//                    if(oldActivity.getPlatform().equals(newActivity.getPlatform())){
                         //活动没有跨平台，平台号也不允许跨平台
-                        if(!refundPriceDiffDetail.getNewOrgId().equals(refundPriceDiffDetail.getOldOrgId())) {
-                            throw new ProcessException("原平台编号与目标平台编号不一致");
-                        }
-                    }
+//                        if(!refundPriceDiffDetail.getNewOrgId().equals(refundPriceDiffDetail.getOldOrgId())) {
+//                            throw new ProcessException("原平台编号与目标平台编号不一致");
+//                        }
+//                    }
                     //检查目标活动和代理商平台码是否一致
                     if(refundPriceDiffDetail.getNewOrgId().equals(refundPriceDiffDetail.getOldOrgId())){
                         //平台号没有跨平台，活动也不允许跨平台
@@ -480,8 +480,8 @@ public class CompensateServiceImpl implements CompensateService {
                 if(old_Activity==null){
                     throw new ProcessException("查询新活动失败");
                 }
-
                 //TODO 校验是否有审批中的活动变更
+
                 ORefundPriceDiffDetailExample example = new ORefundPriceDiffDetailExample();
                 example.or().andBeginSnBetween(refundPriceDiffDetail.getBeginSn(),refundPriceDiffDetail.getEndSn()).andStatusEqualTo(Status.STATUS_1.status);
                 example.or() .andEndSnBetween(refundPriceDiffDetail.getBeginSn(),refundPriceDiffDetail.getEndSn()).andStatusEqualTo(Status.STATUS_1.status);
