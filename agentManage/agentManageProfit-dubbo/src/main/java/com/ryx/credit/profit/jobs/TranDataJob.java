@@ -17,7 +17,6 @@ import com.ryx.credit.profit.service.ProfitOrganTranMonthService;
 import com.ryx.credit.profit.service.TransProfitDetailService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.profit.IPosProfitDataService;
-import org.junit.Test;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -26,7 +25,6 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sun.rmi.runtime.Log;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -282,7 +280,7 @@ public class TranDataJob {
         LOG.info("================瑞大宝交易总量和手续费查询（技术）拉取完成================");
 
         //瑞花宝交易总量和手续费（技术）:
-        Map<String, Object> ruiHuaBaoData = getRuiHuaBaoProfitAmtAndProfitFee(calendar.getTime());
+        Map<String, Object> ruiHuaBaoData = getRuiHuaBaoProfitAmtAndProfitFee(calendar.getTime(),"RHB");
         if(ruiHuaBaoData==null||ruiHuaBaoData.size()==0){
             LOG.error("================瑞花宝交易量手续费查询（技术）拉取失败================");
             resultMap.put("resultCode","error");
@@ -290,6 +288,16 @@ public class TranDataJob {
             return resultMap;
         }
         LOG.info("================瑞花宝交易量手续费查询（技术）拉取完成================");
+
+        //瑞通宝plus交易总量和手续费（技术）:
+        Map<String, Object> ruiTongBaoPlusData = getRuiHuaBaoProfitAmtAndProfitFee(calendar.getTime(),"RTBP");
+        if(ruiTongBaoPlusData==null||ruiTongBaoPlusData.size()==0){
+            LOG.error("================瑞通宝plus交易量手续费查询（技术）拉取失败================");
+            resultMap.put("resultCode","error");
+            resultMap.put("msg","瑞通宝plus交易量手续费查询（技术）拉取异常");
+            return resultMap;
+        }
+        LOG.info("================瑞通宝plus交易量手续费查询（技术）拉取完成================");
 
         //月分润交易接口数据（技术列）:
         Map<String, Object> tradingVolumeData1 = doProfitTradingVolume(calendar.getTime(),"PFT003");
@@ -461,11 +469,11 @@ public class TranDataJob {
                     }
                     break;
                 }
-                case "ruiHuabao1":{
+                case "ruihuabao":{
                     Object technologyAmt = ruiHuaBaoData.get(platForm.getTechnologyAmt());
                     Object technologyFee = ruiHuaBaoData.get(platForm.getTechnologyFee());
                     if(technologyAmt==null){
-                        if (ruiDabaoData.containsKey(platForm.getTechnologyAmt())){
+                        if (ruiHuaBaoData.containsKey(platForm.getTechnologyAmt())){
                             checkData.setTechnologyAmt(BigDecimal.ZERO);
                         }else {
                             checkData.setTechnologyAmt(null);
@@ -475,6 +483,29 @@ public class TranDataJob {
                     }
                     if(technologyFee==null){
                         if (ruiHuaBaoData.containsKey(platForm.getTechnologyFee())){
+                            checkData.setTechnologyFee(BigDecimal.ZERO);
+                        }else {
+                            checkData.setTechnologyFee(null);
+                        }
+                    }else{
+                        checkData.setTechnologyFee(new BigDecimal(technologyFee.toString()));
+                    }
+                    break;
+                }
+                case "ruitongbaoplus":{
+                    Object technologyAmt = ruiTongBaoPlusData.get(platForm.getTechnologyAmt());
+                    Object technologyFee = ruiTongBaoPlusData.get(platForm.getTechnologyFee());
+                    if(technologyAmt==null){
+                        if (ruiTongBaoPlusData.containsKey(platForm.getTechnologyAmt())){
+                            checkData.setTechnologyAmt(BigDecimal.ZERO);
+                        }else {
+                            checkData.setTechnologyAmt(null);
+                        }
+                    }else{
+                        checkData.setTechnologyAmt(new BigDecimal(technologyAmt.toString()));
+                    }
+                    if(technologyFee==null){
+                        if (ruiTongBaoPlusData.containsKey(platForm.getTechnologyFee())){
                             checkData.setTechnologyFee(BigDecimal.ZERO);
                         }else {
                             checkData.setTechnologyFee(null);
@@ -631,11 +662,11 @@ public class TranDataJob {
         return agentResultData;
     }
 
-    public Map<String,Object> getRuiHuaBaoProfitAmtAndProfitFee(Date tranMon) {
+    public Map<String,Object> getRuiHuaBaoProfitAmtAndProfitFee(Date tranMon,String brandCode) {
         try {
             Map<String, String> map = new HashMap<>();
             map.put("application","queryTradeInfo");
-            map.put("brandCode","RHB");
+            map.put("brandCode",brandCode);
             map.put("tradeMonth",new SimpleDateFormat("yyyyMM").format(tranMon));
             String json = JsonUtil.objectToJson(map);
             String reqParamEncrypt = Des3Util.Encrypt(json, rhb3desKey, rhb3desIv.getBytes());
