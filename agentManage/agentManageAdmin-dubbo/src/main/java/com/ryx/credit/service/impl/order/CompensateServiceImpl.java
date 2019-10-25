@@ -1005,6 +1005,8 @@ public class CompensateServiceImpl implements CompensateService {
                             oLogisticsDetail.setId(idService.genId(TabId.o_logistics_detail));
                             oLogisticsDetail.setOptId(row.getId());
                             oLogisticsDetail.setOptType(OLogisticsDetailOptType.BCJ.code);
+                            oLogisticsDetail.setProId(row.getProId());
+                            oLogisticsDetail.setProName(row.getProName());
                             oLogisticsDetail.setActivityId(row.getActivityRealId());
                             oLogisticsDetail.setActivityName(row.getActivityName());
 
