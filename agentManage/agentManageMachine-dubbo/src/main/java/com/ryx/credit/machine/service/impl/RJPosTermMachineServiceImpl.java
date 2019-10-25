@@ -96,10 +96,10 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
             if (!RSAUtil.verifyDigitalSign(respXML.getBytes(charset), signBytes, Constants.publicKey, "SHA1WithRSA"))
                 return AgentResult.build(2,"验证签名失败");
 
-            JSONObject respJson = JSONObject.parseObject(respXML).getJSONObject("data").getJSONObject("SNMachineStorage");
-            if (null != respJson.getString("MsgStatus") && "true".equals(respJson.getString("MsgStatus"))) {
-                //下发成功（处理中）
-                return AgentResult.build(0,"处理中");
+            JSONObject respJson = JSONObject.parseObject(respXML).getJSONObject("respMsg");
+            if (null != respJson.getString("MsgStatus") && "000000".equals(respJson.getString("respCode"))) {
+                //下发成功
+                return AgentResult.build(0,"下发成功");
             } else {
                 //下发异常
                 logger.info("RJ机具下发接口返回异常:{}", respResult);
