@@ -71,5 +71,10 @@ public class OrganizationServiceImpl extends ServiceImpl<COrganizationMapper, CO
         return organizationMapper.selectPubOrgs(map);
     }
 
+    @Override
+    public List<COrganization> selectMaintainOrg() {
+        return organizationMapper.selectMaintainOrg();
+    }
+
 
 }

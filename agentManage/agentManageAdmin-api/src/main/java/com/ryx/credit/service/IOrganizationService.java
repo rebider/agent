@@ -26,4 +26,6 @@ public interface IOrganizationService extends IService<COrganization> {
     List<COrganizationVo> selectOrgsByUserId(Long userId);
 
     List<COrganization> selectPubOrgs(Map map);
+
+    List<COrganization> selectMaintainOrg();
 }
