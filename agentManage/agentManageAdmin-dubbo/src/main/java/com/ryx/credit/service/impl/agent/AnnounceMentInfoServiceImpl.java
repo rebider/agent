@@ -214,6 +214,7 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
             logger.info("非代理商可读机构{}",pubOrg);
         }else {
             reqMap.put("pubOrg",orgs);
+            logger.info("非代理商可读机构{}",orgs);
         }
         pageInfo.setRows(announceMentInfoMapper.selectAnnReader(reqMap,page));
         pageInfo.setTotal(announceMentInfoMapper.selectCountAnnReader(reqMap));

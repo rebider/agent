@@ -534,7 +534,7 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
             </foreach>)
         </if>
     </where>
-      order by read_flag,a.pub_tm desc,a.effect_tm desc
+      order by a.pub_tm desc,read_flag asc/*,a.effect_tm desc*/
 </sql>
 <select id="selectAnnReader" parameterType="map" resultType="map">
     <include refid="OracleDialectPrefix"/>
