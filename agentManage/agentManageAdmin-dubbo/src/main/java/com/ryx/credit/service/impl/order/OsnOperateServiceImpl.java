@@ -1138,7 +1138,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             reqMap.put("standTime", oActivity_plan.getStandTime());//达标时间
             reqMap.put("newOrgId", agentBusInfo.getBusNum());//划拨目标
             reqMap.put("deliveryTime", new SimpleDateFormat("yyyyMMdd").format(new Date()));//物流下发，当前时间
-            reqMap.put("orgId", orgMap.get("platCode"));//顶级机构
+            reqMap.put("orgId", orgMap.get("PLATCODE"));//顶级机构
             reqMap.put("createPerson", AppConfig.getProperty("rjpos.agent.name"));//创建人
 
             try {
