@@ -97,6 +97,8 @@ public class OsnOperateServiceImpl implements OsnOperateService {
     private DictOptionsService dictOptionsService;
     @Autowired
     private AgentMapper agentMapper;
+    @Autowired
+    private OrgPlatformMapper orgPlatformMapper;
 
     /**
      * 根据物流联动状态查询物流id
@@ -1122,30 +1124,31 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             if (null == order.getOrderPlatform()) throw new MessageException("订单信息中平台异常！");
             if (null == agentBusInfo) throw new MessageException("查询业务数据失败！");
 
+            //查询顶级机构
+            Map orgMap = orgPlatformMapper.selectByMap(FastMap.fastMap("busPlatform", agentBusInfo.getBusPlatform()).putKeyV("organNum", agentBusInfo.getOrganNum()));
+            if (null == orgMap.get("PLATCODE")) throw new MessageException("顶级机构码为空，请联系管理员！");
+
             Map<String, Object> reqMap = new HashMap<>();
             reqMap.put("taskId", logistics.getId());//批次号（唯一值,主键,我们用物流ID）
             reqMap.put("machineId", oActivity_plan.getBusProCode());//活动代码
             reqMap.put("posSnBegin", logistics.getSnBeginNum());//起始终端号
             reqMap.put("posSnEnd", logistics.getSnEndNum());//结束终端号
-            reqMap.put("createPerson", logistics.getcUser());//创建人
             reqMap.put("posType", oActivity_plan.getPosType());//机具类型
             reqMap.put("posSpePrice", oActivity_plan.getPosSpePrice());//押金
             reqMap.put("standTime", oActivity_plan.getStandTime());//达标时间
             reqMap.put("newOrgId", agentBusInfo.getBusNum());//划拨目标
             reqMap.put("deliveryTime", new SimpleDateFormat("yyyyMMdd").format(new Date()));//物流下发，当前时间
+            reqMap.put("orgId", orgMap.get("platCode"));//顶级机构
+            reqMap.put("createPerson", AppConfig.getProperty("rjpos.agent.name"));//创建人
 
             try {
                 LowerHairMachineVo lowerHairMachineVo = new LowerHairMachineVo();
                 lowerHairMachineVo.setJsonString(JSONObject.toJSONString(reqMap));
                 lowerHairMachineVo.setPlatformType(platForm.getPlatformType());
-                //瑞+平台沟通无返回，调整后可以放开
-                /*//物流下发
+                //物流下发
                 AgentResult lowerResult = termMachineService.lowerHairMachine(lowerHairMachineVo);
                 //下发异常
-                if (0 != lowerResult.getStatus()) throw new Exception(lowerResult.getMsg());*/
-
-                //物流下发
-                termMachineService.lowerHairMachine(lowerHairMachineVo);
+                if (0 != lowerResult.getStatus()) throw new Exception(lowerResult.getMsg());
                 //查询结果
                 AgentResult queryResult = termMachineService.queryLogisticsResult(FastMap.fastMap("taskId", logistics.getId()), platForm.getPlatformType());
 
