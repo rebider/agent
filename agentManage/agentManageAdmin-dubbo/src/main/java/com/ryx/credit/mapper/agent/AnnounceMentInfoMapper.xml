@@ -460,13 +460,43 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
     left join c_organization c
     on c.id = a.pub_org
     <where>
+        <if test="map.busTypes !=null and map.busTypes.size > 0">
+            exists (select  ap.anno_id
+            from a_anno_platform_rela ap
+            where  a.ann_id = ap.anno_id and
+            ap.rang_type = '0' and (
+                <foreach collection="map.busTypes" separator="or" item="busType"  >
+                    #{busType} = ap.rang_value
+                </foreach>)
+            )
+        </if>
+        <if test="map.platfromPerm !=null and map.platfromPerm.size > 0">
+            and exists (select ap.anno_id
+            from a_anno_platform_rela ap
+            where  a.ann_id = ap.anno_id and
+            ap.rang_type = '1' and (
+            <foreach collection="map.platfromPerm" separator=" or " item="platfromPermItem"  >
+                #{platfromPermItem} = ap.rang_value
+            </foreach>)
+            )
+        </if>
+        <if test="map.orgIds !=null and map.orgIds.size > 0">
+            and exists(select ap.anno_id
+            from a_anno_platform_rela ap
+            where  a.ann_id = ap.anno_id and
+            ap.rang_type = '2' and (
+            <foreach  collection="map.orgIds" separator=" or " item="orgId" >
+                instr(ap.rang_value,#{orgId})>0
+            </foreach>)
+            )
+        </if>
         <if test="map.selfOrg!=null and map.selfOrg!=''">
-            a.pub_org != #{map.selfOrg} and
+            and a.pub_org != #{map.selfOrg}
         </if>
         <if test="map.toAgent!=null and map.toAgent!=''">
-            a.to_agent = '0' and
+            and a.to_agent = #{map.toAgent}
         </if>
-        <choose>
+        <!--<choose>
             <when test="map.annoIds!=null and map.annoIds.size>0">
                 ( a.anno_stat = '1'
                 and a.ann_id in
@@ -477,7 +507,8 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
             <otherwise>
                 1!=1
             </otherwise>
-        </choose>
+        </choose>-->
+
         <if test="map.annType!=null and map.annType!=''">
             and a.ann_type = #{map.annType}
         </if>

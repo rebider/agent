@@ -203,9 +203,9 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
     @Override
     public PageInfo selectAnnViewsRead(Page page, Map reqMap) {
         PageInfo pageInfo = new PageInfo();
-        List<String> annoIds = annoPlatformRelaMapper.selectAnnoIds(reqMap);
-        logger.info("非代理商可读公告{}",annoIds);
-        reqMap.put("annoIds",annoIds);
+//        List<String> annoIds = annoPlatformRelaMapper.selectAnnoIds(reqMap);
+//        logger.info("非代理商可读公告{}",annoIds);
+//        reqMap.put("annoIds",annoIds);
         List<String> orgs = new ArrayList<>();
         if (reqMap.get("pubOrg")!=null && !"".equals(String.valueOf(reqMap.get("pubOrg")))){
             orgs.add(String.valueOf(reqMap.get("pubOrg")));
@@ -261,10 +261,10 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         par.put("platfromPerm",plats);
         par.put("orgIds",allOrg);
         par.put("busTypes",busTypes);
-        par.put("agent",1);
-        List<String> annoIds = annoPlatformRelaMapper.selectAnnoIds(par);
-        logger.info("代理商可读公告{}",annoIds);
-        par.put("annoIds",annoIds);
+        par.put("agent",Status.STATUS_0.status);
+//        List<String> annoIds = annoPlatformRelaMapper.selectAnnoIds(par);
+//        logger.info("代理商可读公告{}",annoIds);
+//        par.put("annoIds",annoIds);
         List<String> orgs = new ArrayList<>();
         if (par.get("pubOrg")!=null && !"".equals(String.valueOf(par.get("pubOrg")))){
             List<String> orgsTmp = new ArrayList<>();
