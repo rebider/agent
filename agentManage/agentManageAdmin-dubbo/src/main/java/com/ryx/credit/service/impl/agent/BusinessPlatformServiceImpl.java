@@ -10,7 +10,6 @@ import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.*;
-import com.ryx.credit.pojo.admin.bank.DPosRegion;
 import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.IResourceService;
 import com.ryx.credit.service.IUserService;
@@ -18,7 +17,6 @@ import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.bank.PosRegionService;
 import com.ryx.credit.service.dict.DictOptionsService;
-import com.ryx.credit.service.dict.RegionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +25,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -354,47 +351,49 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                         }
                     }
                 }
-            }
-            String json = JsonUtil.objectToJson(agentBusInfos);
-            List<AgentBusInfoVo> agentBusInfoVos = JsonUtil.jsonToList(json, AgentBusInfoVo.class);
-            agentEnterService.verifyOrgAndBZYD(agentBusInfoVos, busInfoVoList);
-
-            for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
-                AgentBusInfo agbus = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
-                Dict debitRateLower = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfoVo.getBusPlatform(), "debitRateLower");//借记费率下限（%）
-                Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfoVo.getBusPlatform(), "debitCapping");//借记封顶额上限（元）
-                Dict debitAppearRate = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfoVo.getBusPlatform(), "debitAppearRate");//借记出款费率（%）
-                Dict creditRateFloor = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "creditRateFloor");//贷记费率下限（%）
-                Dict creditRateCeiling = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "creditRateCeiling");//贷记费率上限（%）
-                Dict debitRateCapping = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitRateCapping");//借记费率上限（%）
-                Dict debitCappingLower = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitCappingLower");//借记封顶额下限（元）
+                //激活返现代理商为空默认自己
+                if (StringUtils.isBlank(item.getBusActivationParent())) {
+                    item.setBusActivationParent(item.getId());
+                }
+                //借贷记费率封顶额默认值
+                AgentBusInfo agbus = agentBusInfoMapper.selectByPrimaryKey(item.getId());
+                Dict debitRateLower = dictOptionsService.findDictByName(DictGroup.AGENT.name(), item.getBusPlatform(), "debitRateLower");//借记费率下限（%）
+                Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), item.getBusPlatform(), "debitCapping");//借记封顶额上限（元）
+                Dict debitAppearRate = dictOptionsService.findDictByName(DictGroup.AGENT.name(), item.getBusPlatform(), "debitAppearRate");//借记出款费率（%）
+                Dict creditRateFloor = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), item.getBusPlatform(), "creditRateFloor");//贷记费率下限（%）
+                Dict creditRateCeiling = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), item.getBusPlatform(), "creditRateCeiling");//贷记费率上限（%）
+                Dict debitRateCapping = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), item.getBusPlatform(), "debitRateCapping");//借记费率上限（%）
+                Dict debitCappingLower = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), item.getBusPlatform(), "debitCappingLower");//借记封顶额下限（元）
                 if(debitRateLower!=null){
-                    agentBusInfoVo.setDebitRateLower(debitRateLower.getdItemvalue());
+                    item.setDebitRateLower(debitRateLower.getdItemvalue());
                 }
                 if(debitCapping!=null){
-                    agentBusInfoVo.setDebitCapping(debitCapping.getdItemvalue());
+                    item.setDebitCapping(debitCapping.getdItemvalue());
                 }
                 if(debitAppearRate!=null){
-                    agentBusInfoVo.setDebitAppearRate(debitAppearRate.getdItemvalue());
+                    item.setDebitAppearRate(debitAppearRate.getdItemvalue());
                 }
                 if (creditRateFloor != null) {
-                    agentBusInfoVo.setCreditRateFloor(creditRateFloor.getdItemname());
+                    item.setCreditRateFloor(creditRateFloor.getdItemname());
                 }
                 if (creditRateCeiling != null) {
-                    agentBusInfoVo.setCreditRateCeiling(creditRateCeiling.getdItemname());
+                    item.setCreditRateCeiling(creditRateCeiling.getdItemname());
                 }
                 if (debitRateCapping != null) {
-                    agentBusInfoVo.setDebitRateCapping(debitRateCapping.getdItemname());
+                    item.setDebitRateCapping(debitRateCapping.getdItemname());
                 }
                 if (debitCappingLower != null) {
-                    agentBusInfoVo.setDebitCappingLower(debitCappingLower.getdItemname());
+                    item.setDebitCappingLower(debitCappingLower.getdItemname());
                 }
-                agentBusInfoVo.setVersion(agbus.getVersion());
-                int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfoVo);
+                item.setVersion(agbus.getVersion());
+                int i = agentBusInfoMapper.updateByPrimaryKeySelective(item);
                 if (i!=1) {
                     throw new MessageException("更新失败");
                 }
             }
+            String json = JsonUtil.objectToJson(agentBusInfos);
+            List<AgentBusInfoVo> agentBusInfoVos = JsonUtil.jsonToList(json, AgentBusInfoVo.class);
+            agentEnterService.verifyOrgAndBZYD(agentBusInfoVos, busInfoVoList);
         } catch (MessageException e) {
             e.printStackTrace();
             throw new MessageException(e.getMsg());
