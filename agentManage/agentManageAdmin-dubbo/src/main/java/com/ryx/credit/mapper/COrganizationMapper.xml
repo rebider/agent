@@ -161,4 +161,13 @@
          where id is not null
          order by id desc
     </select>
+    <select id="selectMaintainOrg" resultType="com.ryx.credit.pojo.admin.COrganization">
+        select a.id, a.name
+          from c_organization a
+         where (a.code like 'region_%' or a.code like 'beijing%' or
+               a.code like 'finance' or a.code like 'business' or
+               a.code like 'market')
+         group by a.id, a.name
+         order by id desc
+    </select>
 </mapper>
