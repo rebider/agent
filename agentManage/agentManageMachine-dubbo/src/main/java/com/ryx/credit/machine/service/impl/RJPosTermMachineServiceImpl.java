@@ -75,8 +75,7 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
 
             //下发接口
             logger.info("RJ机具下发接口请求加密参数:{}", JSONObject.toJSONString(map));
-            HttpClientUtil.doPost(AppConfig.getProperty("rjpos.queryTermActive"), map);
-            /*String respResult = HttpClientUtil.doPost(AppConfig.getProperty("rjpos.queryTermActive"), map);
+            String respResult = HttpClientUtil.doPost(AppConfig.getProperty("rjpos.queryTermActive"), map);
             logger.info("RJ机具下发接口返回加密参数:{}", respResult);
 
             JSONObject jsonObject = JSONObject.parseObject(respResult);
@@ -97,17 +96,15 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
             if (!RSAUtil.verifyDigitalSign(respXML.getBytes(charset), signBytes, Constants.publicKey, "SHA1WithRSA"))
                 return AgentResult.build(2,"验证签名失败");
 
-            JSONObject respJson = JSONObject.parseObject(respXML).getJSONObject("data");
-            if (null != respJson.getString("code") && null != respJson.getString("success") && respJson.getString("code").equals("0000") && respJson.getBoolean("success")) {
+            JSONObject respJson = JSONObject.parseObject(respXML).getJSONObject("data").getJSONObject("SNMachineStorage");
+            if (null != respJson.getString("MsgStatus") && "true".equals(respJson.getString("MsgStatus"))) {
                 //下发成功（处理中）
                 return AgentResult.build(0,"处理中");
             } else {
                 //下发异常
                 logger.info("RJ机具下发接口返回异常:{}", respResult);
                 return AgentResult.build(2, null != respJson.getString("msg") ? respJson.getString("msg") : "瑞+，下发接口，返回值异常!");
-            }*/
-            //默认不接收返回值
-            return AgentResult.build(0,"处理中");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
