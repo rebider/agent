@@ -488,10 +488,10 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
             if (null == upSingCheckMap.get("BUSNUM")) throw new Exception("上级代理商信息不存在，请联系管理员！！！");
 
             //查询是否升级完成，升级完成之后不允许再次升级
-            if (null == agentBusInfo.getBusNum()) throw new Exception("请填写业务平台编号！！！");
+           /* if (null == agentBusInfo.getBusNum()) throw new Exception("请填写业务平台编号！！！");
             if (null == agentBusInfo.getBusPlatform()) throw new Exception("业务平台数据异常！！！");
             int i = agentBusInfoMapper.selectByBusNum(FastMap.fastMap("busNum",agentBusInfo.getBusNum()).putKeyV("busPlatform", agentBusInfo.getBusPlatform()));
-            if (i > 0) throw new Exception("您已经有此平台暂存，或审批中的，或审批通过的业务信息，请核查。");
+            if (i > 0) throw new Exception("您已经有此平台暂存，或审批中的，或审批通过的业务信息，请核查。");*/
 
             String cooperator = Constants.cooperator;
             String tranCode = "ORG018"; // 交易码
