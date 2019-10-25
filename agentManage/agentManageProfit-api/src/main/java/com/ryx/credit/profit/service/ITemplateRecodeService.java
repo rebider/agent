@@ -47,6 +47,8 @@ public interface ITemplateRecodeService {
 
     Map<String,Object> getRJTemplateNow(String orgId)throws MessageException;
 
+    Map<String,Object> getSSTemplateNow(String orgId)throws MessageException;
+
     Map<String,Object> getRJTemplateDetail(String applyId) throws MessageException;
 
     Map<String,Object> getRDBTemplateNow(String agencyId) throws MessageException;
@@ -55,5 +57,5 @@ public interface ITemplateRecodeService {
 
     void assignRDBTemplate(String id) throws MessageException;
 
-
+    Map<String,Object> getSSTemplateDetail(String applyId) throws MessageException;
 }

@@ -76,6 +76,14 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     private static final String RDB_TEMPLATE_CHECKRESULT = AppConfig.getProperty("rdb.template.checkResult");  // 查询结果
     private static final String RDB_TEMPLATE_SETEFFECT = AppConfig.getProperty("rdb.template.setEffect"); // 获取申请模板的使用信息
 
+    private static final String SS_TEMPLATE_NOW = AppConfig.getProperty("ss.template.now"); // 获取现有模板
+    private static final String SS_TEMPLATE_APPLY = AppConfig.getProperty("ss.template.apply"); // 申请
+    private static final String SS_TEMPLATE_APPLY_DETAIL = AppConfig.getProperty("ss.template.apply.detail"); //申请明细
+    private static final String SS_TEMPLATE_APPLY_PASS = AppConfig.getProperty("ss.template.apply.pass"); //通过，分配
+    private static final String SS_TEMPLATE_APPLY_CHECK = AppConfig.getProperty("ss.template.apply.check");//校验模板是否相同模板
+    private static final String SS_TEMPLATE_APPLY_CHECKNAME = AppConfig.getProperty("ss.template.apply.checkName");//校验模板名称是否重复
+
+
     /**
      * 获取数据列表
      * @param page
@@ -160,9 +168,9 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             throw new MessageException("该业务平台编码不属于该省区！");
         }
         List<TemplateRecode> list1 = checkRepeatRecode(map1.get("orgId"));
-       // if(list1.size() >= 1){
-        //    throw new MessageException("当前代理商存在正在申请的分润模板！");
-        //}
+        if(list1.size() >= 1){
+            throw new MessageException("当前代理商存在正在申请的分润模板！");
+        }
         String result = null;
         Map<String,String> busInfo = getAgentInfo(map1.get("orgId"));
         TemplateRecode templateRecode = new TemplateRecode();
@@ -179,6 +187,9 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             }else if("POS".equals(busInfo.get("PLATFORM_TYPE"))){
                 // todo POS平台信息申请
                // result = HttpClientUtil.doPostJson(TEMPLATE_APPLY, map2.toJSONString());
+            }else if("SSPOS".equals(busInfo.get("PLATFORM_TYPE"))){
+                logger.info("请求参数："+map2.toJSONString());
+                reactRJPOSApply(SS_TEMPLATE_APPLY,map2.toJSONString(),templateRecode);
             }
         }catch (MessageException e){
             throw new MessageException(e.getMsg());
@@ -420,6 +431,10 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             }else if("POS".equals(platformType)){
                 // todo
                 //result = HttpClientUtil.doPostJson(TEMPLATE_APPLY, map2.toJSONString());
+            }else if("SSPOS".equals(platformType)){
+                map2.put("applyId",recode.getTemplateId());
+                map2.put("orgId",recode.getBusNum());
+                reactRJPOSApply(SS_TEMPLATE_APPLY,map2.toJSONString(),recode);
             }
         }catch (MessageException e){
             throw new MessageException(e.getMsg());
@@ -498,6 +513,8 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                 result = HttpClientUtil.doPostJson(RJ_TEMPLATE_APPLY_PASS, map2.toJSONString());
             }else if("POS".equals(stringMap.get("PLATFORM_TYPE"))){
                 result = HttpClientUtil.doPostJson(TEMPLATE_APPLY_PASS, map2.toJSONString());
+            }else if("SSPOS".equals(stringMap.get("PLATFORM_TYPE"))){
+                result = HttpClientUtil.doPostJson(SS_TEMPLATE_APPLY_PASS, map2.toJSONString());
             }
             Map<String,Object> resultMap = JSONObject.parseObject(result);
             if(!(boolean)resultMap.get("result")) {
@@ -557,6 +574,8 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                 result = HttpClientUtil.doPostJson(RJ_TEMPLATE_APPLY_CHECK, map2.toJSONString());
             }else if("POS".equals(stringMap.get("PLATFORM_TYPE"))){
                 result = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, map2.toJSONString());
+            }else if("SSPOS".equals(stringMap.get("PLATFORM_TYPE"))){//实时分润
+                result = HttpClientUtil.doPostJson(SS_TEMPLATE_APPLY_CHECK, map2.toJSONString());
             }
             Map<String,Object> resultMap = JSONObject.parseObject(result);
             if(!(boolean)resultMap.get("result")){
@@ -594,6 +613,8 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                 result = HttpClientUtil.doPostJson(RJ_TEMPLATE_APPLY_CHECKNAME, map2.toJSONString());
             }else if("POS".equals(stringMap.get("PLATFORM_TYPE"))){
                 result = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECKNAME, map2.toJSONString());
+            }else if ("SSPOS".equals(stringMap.get("PLATFORM_TYPE"))){
+                result = HttpClientUtil.doPostJson(SS_TEMPLATE_APPLY_CHECKNAME, map2.toJSONString());
             }
             Map<String,Object> resultMap = JSONObject.parseObject(result);
             if(!(boolean)resultMap.get("result")) {
@@ -636,6 +657,36 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             throw new MessageException("联动业务平台获取分润模板数据失败！");
         }
     }
+    /**
+     * 获实时分润分润模板
+     * @param orgId
+     * @return
+     * @throws MessageException
+     */
+    @Override
+    public Map<String,Object> getSSTemplateNow(String orgId)throws MessageException{
+        if (StringUtils.isBlank(orgId)){
+            throw new MessageException("业务平台编码不能为空！");
+        }
+        try{
+            JSONObject param = new JSONObject();
+            param.put("orgId", orgId);
+            String result = HttpClientUtil.doPostJson(SS_TEMPLATE_NOW, param.toJSONString());
+            logger.info("=======================实时分润接口数据："+result);
+            Map<String,Object> resultMap = JSONObject.parseObject(result);
+            if(!(boolean)resultMap.get("result")){
+                throw new MessageException(resultMap.get("msg").toString());
+            }
+            Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
+            return objectMap;
+        }catch (MessageException e){
+            e.printStackTrace();
+            throw new MessageException(e.getMsg());
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new MessageException("联动实时分润平台获取分润模板数据失败！");
+        }
+    }
 
     /**
      * 查看瑞+分润模板申请信息
@@ -650,6 +701,27 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         String result = null;
         try {
             result = HttpClientUtil.doPostJson(RJ_TEMPLATE_APPLY_DETAIL, map.toJSONString());
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new MessageException("联动业务系统获取模板信息失败，请重试！");
+        }
+        Map<String,Object> resultMap = JSONObject.parseObject(result);
+        return resultMap;
+    }
+
+    /**查看实时分润模板详情
+     * @param applyId
+     * @return
+     * @throws MessageException
+     */
+    @Override
+    public Map<String,Object> getSSTemplateDetail(String applyId) throws MessageException{
+        JSONObject map = new JSONObject();
+        map.put("applyId",applyId);
+        String result = null;
+        try {
+            result = HttpClientUtil.doPostJson(SS_TEMPLATE_APPLY_DETAIL, map.toJSONString());
+            logger.info("实时分润模板申请详情查询报文："+result);
         }catch (Exception e){
             e.printStackTrace();
             throw new MessageException("联动业务系统获取模板信息失败，请重试！");
