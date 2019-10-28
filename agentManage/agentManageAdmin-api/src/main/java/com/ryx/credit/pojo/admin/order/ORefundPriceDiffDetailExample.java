@@ -2967,6 +2967,146 @@ public class ORefundPriceDiffDetailExample {
             addCriterion("DELIVERY_TIME_TYPE not between", value1, value2, "deliveryTimeType");
             return (Criteria) this;
         }
+
+        public Criteria andOldOrgNameIsNull() {
+            addCriterion("OLD_ORG_NAME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgNameIsNotNull() {
+            addCriterion("OLD_ORG_NAME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgNameEqualTo(String value) {
+            addCriterion("OLD_ORG_NAME =", value, "oldOrgName");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgNameNotEqualTo(String value) {
+            addCriterion("OLD_ORG_NAME <>", value, "oldOrgName");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgNameGreaterThan(String value) {
+            addCriterion("OLD_ORG_NAME >", value, "oldOrgName");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgNameGreaterThanOrEqualTo(String value) {
+            addCriterion("OLD_ORG_NAME >=", value, "oldOrgName");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgNameLessThan(String value) {
+            addCriterion("OLD_ORG_NAME <", value, "oldOrgName");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgNameLessThanOrEqualTo(String value) {
+            addCriterion("OLD_ORG_NAME <=", value, "oldOrgName");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgNameLike(String value) {
+            addCriterion("OLD_ORG_NAME like", value, "oldOrgName");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgNameNotLike(String value) {
+            addCriterion("OLD_ORG_NAME not like", value, "oldOrgName");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgNameIn(List<String> values) {
+            addCriterion("OLD_ORG_NAME in", values, "oldOrgName");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgNameNotIn(List<String> values) {
+            addCriterion("OLD_ORG_NAME not in", values, "oldOrgName");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgNameBetween(String value1, String value2) {
+            addCriterion("OLD_ORG_NAME between", value1, value2, "oldOrgName");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldOrgNameNotBetween(String value1, String value2) {
+            addCriterion("OLD_ORG_NAME not between", value1, value2, "oldOrgName");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgNameIsNull() {
+            addCriterion("NEW_ORG_NAME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgNameIsNotNull() {
+            addCriterion("NEW_ORG_NAME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgNameEqualTo(String value) {
+            addCriterion("NEW_ORG_NAME =", value, "newOrgName");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgNameNotEqualTo(String value) {
+            addCriterion("NEW_ORG_NAME <>", value, "newOrgName");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgNameGreaterThan(String value) {
+            addCriterion("NEW_ORG_NAME >", value, "newOrgName");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgNameGreaterThanOrEqualTo(String value) {
+            addCriterion("NEW_ORG_NAME >=", value, "newOrgName");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgNameLessThan(String value) {
+            addCriterion("NEW_ORG_NAME <", value, "newOrgName");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgNameLessThanOrEqualTo(String value) {
+            addCriterion("NEW_ORG_NAME <=", value, "newOrgName");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgNameLike(String value) {
+            addCriterion("NEW_ORG_NAME like", value, "newOrgName");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgNameNotLike(String value) {
+            addCriterion("NEW_ORG_NAME not like", value, "newOrgName");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgNameIn(List<String> values) {
+            addCriterion("NEW_ORG_NAME in", values, "newOrgName");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgNameNotIn(List<String> values) {
+            addCriterion("NEW_ORG_NAME not in", values, "newOrgName");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgNameBetween(String value1, String value2) {
+            addCriterion("NEW_ORG_NAME between", value1, value2, "newOrgName");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewOrgNameNotBetween(String value1, String value2) {
+            addCriterion("NEW_ORG_NAME not between", value1, value2, "newOrgName");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

@@ -570,6 +570,8 @@ public class CompensateServiceImpl implements CompensateService {
                             String oldSupDorgName = String.valueOf(oldOrganMap.get("oldSupDorgName"));
                             String newSupDorgId = String.valueOf(newOrganMap.get("newSupDorgId"));
                             String newSupDorgName = String.valueOf(newOrganMap.get("newSupDorgName"));
+                            String newOrgName = String.valueOf(newOrganMap.get("newOrgName"));
+                            String oldOrgName = String.valueOf(newOrganMap.get("oldOrgName"));
                             if(StringUtils.isNotBlank(oldSupDorgId) && !oldSupDorgId.equals("null")) {
                                 refundPriceDiffDetail.setOldSupdOrgId(oldSupDorgId);
                             }
@@ -581,6 +583,12 @@ public class CompensateServiceImpl implements CompensateService {
                             }
                             if(StringUtils.isNotBlank(newSupDorgName) && !newSupDorgName.equals("null")) {
                                 refundPriceDiffDetail.setNewSupdOrgName(newSupDorgName);
+                            }
+                            if(StringUtils.isNotBlank(newOrgName) && !newOrgName.equals("null")) {
+                                refundPriceDiffDetail.setNewOrgName(newOrgName);
+                            }
+                            if(StringUtils.isNotBlank(oldOrgName) && !oldOrgName.equals("null")) {
+                                refundPriceDiffDetail.setOldOrgName(oldOrgName);
                             }
                             int i = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(refundPriceDiffDetail);
                             if(i!=1){
@@ -1217,33 +1225,6 @@ public class CompensateServiceImpl implements CompensateService {
         //新订单数据查询
         if(oRefundPriceDiff.getOrderType().compareTo(OrderType.NEW.getValue())==0){
             for (ORefundPriceDiffDetail oRefundPriceDiffDetail : oRefundPriceDiffDetails) {
-                AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
-                AgentBusInfoExample.Criteria agentBusInfoCriteria = agentBusInfoExample.createCriteria();
-                agentBusInfoCriteria.andStatusEqualTo(Status.STATUS_1.status);
-                agentBusInfoCriteria.andBusNumEqualTo(oRefundPriceDiffDetail.getOldOrgId());
-                agentBusInfoCriteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
-                List<BigDecimal> busStatusList = new ArrayList<>();
-                busStatusList.add(BusStatus.QY.getValue());
-                busStatusList.add(BusStatus.WJH.getValue());
-                agentBusInfoCriteria.andBusStatusIn(busStatusList);
-                List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
-                if(agentBusInfos.size()==1){
-                    AgentBusInfo agentBusInfo = agentBusInfos.get(0);
-                    Agent agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
-                    if(agent!=null){
-                        oRefundPriceDiffDetail.setOldOrgName(agent.getAgName());
-                    }
-                }
-                agentBusInfoCriteria.andBusNumEqualTo(oRefundPriceDiffDetail.getNewOrgId());
-                List<AgentBusInfo> newAgentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
-                if(newAgentBusInfos.size()==1){
-                    AgentBusInfo agentBusInfo = newAgentBusInfos.get(0);
-                    Agent agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
-                    if(agent!=null){
-                        oRefundPriceDiffDetail.setNewOrgName(agent.getAgName());
-                    }
-                }
-
                 Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.ACTIVITY_DIS_TYPE.name(),oRefundPriceDiffDetail.getActivityWay());
                 oRefundPriceDiffDetail.setActivityWay(dict.getdItemname());
 
@@ -1312,33 +1293,6 @@ public class CompensateServiceImpl implements CompensateService {
         //历史订单数据查询
         }else{
             for (ORefundPriceDiffDetail oRefundPriceDiffDetail : oRefundPriceDiffDetails) {
-                AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
-                AgentBusInfoExample.Criteria agentBusInfoCriteria = agentBusInfoExample.createCriteria();
-                agentBusInfoCriteria.andStatusEqualTo(Status.STATUS_1.status);
-                agentBusInfoCriteria.andBusNumEqualTo(oRefundPriceDiffDetail.getOldOrgId());
-                agentBusInfoCriteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
-                List<BigDecimal> busStatusList = new ArrayList<>();
-                busStatusList.add(BusStatus.QY.getValue());
-                busStatusList.add(BusStatus.WJH.getValue());
-                agentBusInfoCriteria.andBusStatusIn(busStatusList);
-                List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
-                if(agentBusInfos.size()==1){
-                    AgentBusInfo agentBusInfo = agentBusInfos.get(0);
-                    Agent agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
-                    if(agent!=null){
-                        oRefundPriceDiffDetail.setOldOrgName(agent.getAgName());
-                    }
-                }
-                agentBusInfoCriteria.andBusNumEqualTo(oRefundPriceDiffDetail.getNewOrgId());
-                List<AgentBusInfo> newAgentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
-                if(newAgentBusInfos.size()==1){
-                    AgentBusInfo agentBusInfo = newAgentBusInfos.get(0);
-                    Agent agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
-                    if(agent!=null){
-                        oRefundPriceDiffDetail.setNewOrgName(agent.getAgName());
-                    }
-                }
-
                 OActivity oActivity = activityMapper.selectByPrimaryKey(oRefundPriceDiffDetail.getActivityFrontId());
                 oRefundPriceDiffDetail.setActivityFront(oActivity);
 
