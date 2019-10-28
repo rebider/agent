@@ -571,7 +571,7 @@ public class CompensateServiceImpl implements CompensateService {
                             String newSupDorgId = String.valueOf(newOrganMap.get("newSupDorgId"));
                             String newSupDorgName = String.valueOf(newOrganMap.get("newSupDorgName"));
                             String newOrgName = String.valueOf(newOrganMap.get("newOrgName"));
-                            String oldOrgName = String.valueOf(newOrganMap.get("oldOrgName"));
+                            String oldOrgName = String.valueOf(oldOrganMap.get("oldOrgName"));
                             if(StringUtils.isNotBlank(oldSupDorgId) && !oldSupDorgId.equals("null")) {
                                 refundPriceDiffDetail.setOldSupdOrgId(oldSupDorgId);
                             }
