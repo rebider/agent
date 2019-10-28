@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.CBranchInnerMapper">
+    <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.CBranchInner">
+        <id column="ID" jdbcType="VARCHAR" property="id" />
+        <result column="BRANCH_ID" jdbcType="VARCHAR" property="branchId" />
+        <result column="INNER" jdbcType="VARCHAR" property="inner" />
+        <result column="C_USER_ID" jdbcType="VARCHAR" property="cUserId" />
+        <result column="BRANCH_NAME" jdbcType="VARCHAR" property="branchName" />
+        <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
+        <result column="STATUS" jdbcType="DECIMAL" property="status" />
+        <result column="C_USER_NAME" jdbcType="VARCHAR" property="cUserName" />
+    </resultMap>
+    <sql id="OracleDialectPrefix">
+        <if test="page != null">
+            select * from ( select row_.*, rownum rownum_ from (
+        </if>
+    </sql>
+    <sql id="OracleDialectSuffix">
+        <if test="page != null">
+            <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+        </if>
+    </sql>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        ID, BRANCH_ID, INNER, C_USER_ID, BRANCH_NAME, to_char(C_TIME,'YYYY-MM-DD') AS C_TIME, STATUS, C_USER_NAME
+    </sql>
+    <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.CBranchInnerExample" resultType="map">
+        <include refid="OracleDialectPrefix" />
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List" />
+        from C_BRANCH_INNER
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+        <include refid="OracleDialectSuffix" />
+    </select>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from C_BRANCH_INNER
+        where ID = #{id,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.CBranchInnerExample">
+        delete from C_BRANCH_INNER
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </delete>
+    <insert id="insert" parameterType="com.ryx.credit.pojo.admin.CBranchInner">
+    insert into C_BRANCH_INNER (ID, BRANCH_ID, INNER,
+      C_USER_ID, BRANCH_NAME, C_TIME,
+      STATUS, C_USER_NAME)
+    values (#{id,jdbcType=VARCHAR}, #{branchId,jdbcType=VARCHAR}, #{inner,jdbcType=VARCHAR},
+      #{cUserId,jdbcType=VARCHAR}, #{branchName,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP},
+      #{status,jdbcType=DECIMAL}, #{cUserName,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.CBranchInner">
+        insert into C_BRANCH_INNER
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                ID,
+            </if>
+            <if test="branchId != null">
+                BRANCH_ID,
+            </if>
+            <if test="inner != null">
+                INNER,
+            </if>
+            <if test="cUserId != null">
+                C_USER_ID,
+            </if>
+            <if test="branchName != null">
+                BRANCH_NAME,
+            </if>
+            <if test="cTime != null">
+                C_TIME,
+            </if>
+            <if test="status != null">
+                STATUS,
+            </if>
+            <if test="cUserName != null">
+                C_USER_NAME,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="branchId != null">
+                #{branchId,jdbcType=VARCHAR},
+            </if>
+            <if test="inner != null">
+                #{inner,jdbcType=VARCHAR},
+            </if>
+            <if test="cUserId != null">
+                #{cUserId,jdbcType=VARCHAR},
+            </if>
+            <if test="branchName != null">
+                #{branchName,jdbcType=VARCHAR},
+            </if>
+            <if test="cTime != null">
+                #{cTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=DECIMAL},
+            </if>
+            <if test="cUserName != null">
+                #{cUserName,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.CBranchInnerExample" resultType="java.lang.Long">
+        select count(*) from C_BRANCH_INNER
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </select>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.CBranchInner">
+        update C_BRANCH_INNER
+        <set>
+            <if test="branchId != null">
+                BRANCH_ID = #{branchId,jdbcType=VARCHAR},
+            </if>
+            <if test="inner != null">
+                INNER = #{inner,jdbcType=VARCHAR},
+            </if>
+            <if test="cUserId != null">
+                C_USER_ID = #{cUserId,jdbcType=VARCHAR},
+            </if>
+            <if test="branchName != null">
+                BRANCH_NAME = #{branchName,jdbcType=VARCHAR},
+            </if>
+            <if test="cTime != null">
+                C_TIME = #{cTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="status != null">
+                STATUS = #{status,jdbcType=DECIMAL},
+            </if>
+            <if test="cUserName != null">
+                C_USER_NAME = #{cUserName,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where ID = #{id,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.CBranchInner">
+        update C_BRANCH_INNER
+        set BRANCH_ID = #{branchId,jdbcType=VARCHAR},
+          INNER = #{inner,jdbcType=VARCHAR},
+          C_USER_ID = #{cUserId,jdbcType=VARCHAR},
+          BRANCH_NAME = #{branchName,jdbcType=VARCHAR},
+          C_TIME = #{cTime,jdbcType=TIMESTAMP},
+          STATUS = #{status,jdbcType=DECIMAL},
+          C_USER_NAME = #{cUserName,jdbcType=VARCHAR}
+        where ID = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectInnerByIds" parameterType="list" resultType="string">
+        SELECT
+	        INNER
+        FROM
+            C_BRANCH_INNER
+        WHERE
+            ID IN
+            <foreach item="id" collection="ids" open="(" separator="," close=")" >
+                #{id, jdbcType=VARCHAR}
+            </foreach>
+    </select>
+</mapper>

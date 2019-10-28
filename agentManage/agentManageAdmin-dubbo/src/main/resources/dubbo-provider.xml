@@ -65,6 +65,7 @@
     <dubbo:service interface="com.ryx.credit.service.agent.CapitalFlowService" ref="capitalFlowService" timeout="1200000" registry="myGroup"/>
     <dubbo:service interface="com.ryx.credit.service.agent.ColinfoTaskService" ref="colinfoTaskService" timeout="1200000" registry="myGroup"/>
     <dubbo:service interface="com.ryx.credit.service.agent.AgentCertificationService" ref="agentCertificationService" timeout="1200000" registry="myGroup"/>
+    <dubbo:service interface="com.ryx.credit.service.IBranchInnerConnectionService" ref="branchInnerConnectionService" timeout="1200000" registry="myGroup"/>
 
 
 
