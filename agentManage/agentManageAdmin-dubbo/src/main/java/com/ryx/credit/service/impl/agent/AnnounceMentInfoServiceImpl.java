@@ -103,7 +103,7 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         List<String> plats = announceMentInfoVo.getPlats();
 
         plats.forEach((plat)->{
-            logger.info("添家平台{}",plat);
+            logger.info("添加平台{}",plat);
             AnnoPlatformRela platRela = new AnnoPlatformRela();
             platRela.setId(idService.genIdInTran(TabId.A_ANNO_PLATFORM_RELA));
             platRela.setAnnoId(announceMentInfoVo.getAnnId());
@@ -122,6 +122,7 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
             platRela.setRangValue(busType);
             ralas.add(platRela);
         });
+        logger.info("添加关联表{}",ralas.toString());
         int i = annoPlatformRelaService.batchSave(ralas);
 
         List<String> attFiles = announceMentInfoVo.getAttFiles();
@@ -151,7 +152,7 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
             }
         });
         }
-        return ResultVO.success("保存成功");
+        return ResultVO.success("新增公告保存成功!");
     }
 
     @Override
@@ -192,9 +193,9 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         }else {
             map.put("pubOrg",orgs);
         }
-        List<Map<String,Object>> announceMentInfos = announceMentInfoMapper.selectAnnMaintain(map, page);
-        announceMentInfos.forEach(announceMentInfo->{
-        });
+//        List<Map<String,Object>> announceMentInfos = announceMentInfoMapper.selectAnnMaintain(map, page);
+//        announceMentInfos.forEach(announceMentInfo->{
+//        });
         pageInfo.setRows(announceMentInfoMapper.selectAnnMaintain(map,page));
         pageInfo.setTotal(announceMentInfoMapper.selectCountAnnMaintain(map));
         return pageInfo;
