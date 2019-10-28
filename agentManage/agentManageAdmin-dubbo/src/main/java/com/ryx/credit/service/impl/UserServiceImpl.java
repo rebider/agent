@@ -21,6 +21,7 @@ import com.ryx.credit.pojo.admin.vo.UserVo;
 import com.ryx.credit.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -183,5 +184,20 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
     @Override
     public Map<String, Object> selectAgentByOrgId(Map<String, Object> map) {
         return agentMapper.selectAgentByOrgId(map);
+    }
+
+    @Override
+    @Transactional
+    public void copyUser(Long id){
+        CUser cUser = userMapper.selectById(id);
+        UserVo userVo = BeanUtils.copy(cUser, UserVo.class);
+        List<CUserRole> cUserRoles = userRoleMapper.selectByUserId(id);
+        String roleIds = "";
+        for (CUserRole cUserRole : cUserRoles) {
+            roleIds+=cUserRole.getRoleId()+",";
+        }
+        userVo.setRoleIds(roleIds);
+        userVo.setLoginName(userVo.getLoginName()+"1");
+        insertByVo(userVo);
     }
 }
