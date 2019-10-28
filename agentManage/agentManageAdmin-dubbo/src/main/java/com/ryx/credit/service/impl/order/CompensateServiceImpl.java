@@ -1281,7 +1281,7 @@ public class CompensateServiceImpl implements CompensateService {
                     List<PlatForm>  platFormList = platFormMapper.selectByExample(pe);
                     AgentBusInfoExample example = new AgentBusInfoExample();
                     example.or().andBusStatusEqualTo(Status.STATUS_1.status)
-                            .andBusNumEqualTo(oRefundPriceDiffDetail.getNewOrgId())
+                            .andBusNumEqualTo(oRefundPriceDiffDetail.getOldOrgId())
                             .andBusPlatformIn(platFormList.stream().map(item->{return item.getPlatformNum();}).collect(Collectors.toList()));
                     List<AgentBusInfo>  newOrgInfo = agentBusInfoMapper.selectByExample(example);
                     if(newOrgInfo.size()>0) {
@@ -1343,7 +1343,7 @@ public class CompensateServiceImpl implements CompensateService {
                     List<PlatForm>  platFormList = platFormMapper.selectByExample(pe);
                     AgentBusInfoExample example = new AgentBusInfoExample();
                     example.or().andBusStatusEqualTo(Status.STATUS_1.status)
-                            .andBusNumEqualTo(oRefundPriceDiffDetail.getNewOrgId())
+                            .andBusNumEqualTo(oRefundPriceDiffDetail.getOldOrgId())
                             .andBusPlatformIn(platFormList.stream().map(item->{return item.getPlatformNum();}).collect(Collectors.toList()));
                     List<AgentBusInfo>  newOrgInfo = agentBusInfoMapper.selectByExample(example);
                     if(newOrgInfo.size()>0) {
