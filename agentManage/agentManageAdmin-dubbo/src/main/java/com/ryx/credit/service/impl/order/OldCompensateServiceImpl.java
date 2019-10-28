@@ -437,6 +437,8 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                             String oldSupDorgName = String.valueOf(oldOrganMap.get("oldSupDorgName"));
                             String newSupDorgId = String.valueOf(newOrganMap.get("newSupDorgId"));
                             String newSupDorgName = String.valueOf(newOrganMap.get("newSupDorgName"));
+                            String newOrgName = String.valueOf(newOrganMap.get("newOrgName"));
+                            String oldOrgName = String.valueOf(oldOrganMap.get("oldOrgName"));
                             if(StringUtils.isNotBlank(oldSupDorgId) && !oldSupDorgId.equals("null")) {
                                 refundPriceDiffDetail.setOldSupdOrgId(oldSupDorgId);
                             }
@@ -448,6 +450,12 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                             }
                             if(StringUtils.isNotBlank(newSupDorgName) && !newSupDorgName.equals("null")) {
                                 refundPriceDiffDetail.setNewSupdOrgName(newSupDorgName);
+                            }
+                            if(StringUtils.isNotBlank(newOrgName) && !newOrgName.equals("null")) {
+                                refundPriceDiffDetail.setNewOrgName(newOrgName);
+                            }
+                            if(StringUtils.isNotBlank(oldOrgName) && !oldOrgName.equals("null")) {
+                                refundPriceDiffDetail.setOldOrgName(oldOrgName);
                             }
                             int i = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(refundPriceDiffDetail);
                             if(i!=1){
