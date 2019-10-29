@@ -3,12 +3,14 @@ package com.ryx.credit.service.impl.agent.netInPort;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.DictGroup;
 import com.ryx.credit.common.enumc.OrgType;
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.common.util.Constants;
 import com.ryx.credit.common.util.agentUtil.AESUtil;
 import com.ryx.credit.common.util.agentUtil.RSAUtil;
+import com.ryx.credit.dao.CBranchInnerMapper;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.RegionMapper;
 import com.ryx.credit.dao.bank.DPosRegionMapper;
@@ -64,6 +66,8 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
     private OrganizationMapper organizationMapper;
     @Autowired
     private AgentColinfoService agentColinfoService;
+    @Autowired
+    private CBranchInnerMapper branchInnerMapper;
 
     /**
      * 入网组装参数
@@ -174,6 +178,11 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
             resultMap.put("actBusId",agentBusInfo.getBusActivationParent());
             resultMap.put("actBusNum",actBudinfo.getBusNum());
         }
+        //查询相关联的大区经理账号
+        List accList = branchInnerMapper.selectInnerLogin(FastMap.fastMap("status", Status.STATUS_1.status).putKeyV("busId", agentBusInfo.getId()));
+        List delList = branchInnerMapper.selectInnerLogin(FastMap.fastMap("status", Status.STATUS_2.status).putKeyV("busId", agentBusInfo.getId()));
+        resultMap.put("managerAccount", String.join(",", accList));
+        resultMap.put("delManagerAccount", String.join(",", delList));
         return resultMap;
     }
 
@@ -246,6 +255,10 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
             data.put("agCode",paramMap.get("agCode"));//AG码
             data.put("actBusId",paramMap.get("actBusId"));//激活返现的业务id
             data.put("actBusNum",paramMap.get("actBusNum"));//激活返现的编码
+            if (null != paramMap.get("managerAccount"))
+                data.put("managerAccount",paramMap.get("managerAccount"));
+            if (null != paramMap.get("delManagerAccount"))
+                data.put("delManagerAccount",paramMap.get("delManagerAccount"));
 
             log.info("通知pos请求参数:{}",data);
             jsonParams.put("data", data);

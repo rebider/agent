@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.machine.dao.LmsUserMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.machine.entity.LmsUser">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="LOGINNAME" jdbcType="VARCHAR" property="loginname" />
+    <result column="NAME" jdbcType="VARCHAR" property="name" />
+    <result column="PASSWORD" jdbcType="VARCHAR" property="password" />
+    <result column="STATUS" jdbcType="VARCHAR" property="status" />
+    <result column="ROLE_ID" jdbcType="VARCHAR" property="roleId" />
+    <result column="EMP_ID" jdbcType="VARCHAR" property="empId" />
+    <result column="DEPT_ID" jdbcType="VARCHAR" property="deptId" />
+    <result column="ORGAN_ID" jdbcType="VARCHAR" property="organId" />
+    <result column="USER_TYPE" jdbcType="VARCHAR" property="userType" />
+    <result column="PHONE" jdbcType="VARCHAR" property="phone" />
+    <result column="POST" jdbcType="VARCHAR" property="post" />
+    <result column="CREATE_TM" jdbcType="TIMESTAMP" property="createTm" />
+    <result column="UPDATE_TM" jdbcType="TIMESTAMP" property="updateTm" />
+    <result column="PWD_UPDATE_TM" jdbcType="TIMESTAMP" property="pwdUpdateTm" />
+    <result column="CREATE_ORG_ID" jdbcType="VARCHAR" property="createOrgId" />
+    <result column="UEFLAG" jdbcType="CHAR" property="ueflag" />
+    <result column="USER_SCOPE" jdbcType="VARCHAR" property="userScope" />
+    <result column="SMS_AUTH_SWITCH" jdbcType="CHAR" property="smsAuthSwitch" />
+    <result column="SYS_TYPE" jdbcType="CHAR" property="sysType" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, LOGINNAME, NAME, PASSWORD, STATUS, ROLE_ID, EMP_ID, DEPT_ID, ORGAN_ID, USER_TYPE, 
+    PHONE, POST, CREATE_TM, UPDATE_TM, PWD_UPDATE_TM, CREATE_ORG_ID, UEFLAG, USER_SCOPE, 
+    SMS_AUTH_SWITCH, SYS_TYPE, CERTI_SWITCH, CERTI_TYPE, IS_SET_PAYPWD, WITHHOLD_AUTH
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.machine.entity.LmsUserExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from LMS_USER
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from LMS_USER
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.machine.entity.LmsUserExample">
+    delete from LMS_USER
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.machine.entity.LmsUser">
+    insert into LMS_USER (ID, LOGINNAME, NAME, 
+      PASSWORD, STATUS, ROLE_ID, 
+      EMP_ID, DEPT_ID, ORGAN_ID, 
+      USER_TYPE, PHONE, POST, 
+      CREATE_TM, UPDATE_TM, PWD_UPDATE_TM, 
+      CREATE_ORG_ID, UEFLAG, USER_SCOPE, 
+      SMS_AUTH_SWITCH, SYS_TYPE, CERTI_SWITCH, 
+      CERTI_TYPE, IS_SET_PAYPWD, WITHHOLD_AUTH
+      )
+    values (#{id,jdbcType=VARCHAR}, #{loginname,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{password,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{roleId,jdbcType=VARCHAR}, 
+      #{empId,jdbcType=VARCHAR}, #{deptId,jdbcType=VARCHAR}, #{organId,jdbcType=VARCHAR}, 
+      #{userType,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{post,jdbcType=VARCHAR}, 
+      #{createTm,jdbcType=TIMESTAMP}, #{updateTm,jdbcType=TIMESTAMP}, #{pwdUpdateTm,jdbcType=TIMESTAMP}, 
+      #{createOrgId,jdbcType=VARCHAR}, #{ueflag,jdbcType=CHAR}, #{userScope,jdbcType=VARCHAR}, 
+      #{smsAuthSwitch,jdbcType=CHAR}, #{sysType,jdbcType=CHAR}, #{certiSwitch,jdbcType=CHAR}, 
+      #{certiType,jdbcType=CHAR}, #{isSetPaypwd,jdbcType=CHAR}, #{withholdAuth,jdbcType=CHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.machine.entity.LmsUser">
+    insert into LMS_USER
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="loginname != null">
+        LOGINNAME,
+      </if>
+      <if test="name != null">
+        NAME,
+      </if>
+      <if test="password != null">
+        PASSWORD,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="roleId != null">
+        ROLE_ID,
+      </if>
+      <if test="empId != null">
+        EMP_ID,
+      </if>
+      <if test="deptId != null">
+        DEPT_ID,
+      </if>
+      <if test="organId != null">
+        ORGAN_ID,
+      </if>
+      <if test="userType != null">
+        USER_TYPE,
+      </if>
+      <if test="phone != null">
+        PHONE,
+      </if>
+      <if test="post != null">
+        POST,
+      </if>
+      <if test="createTm != null">
+        CREATE_TM,
+      </if>
+      <if test="updateTm != null">
+        UPDATE_TM,
+      </if>
+      <if test="pwdUpdateTm != null">
+        PWD_UPDATE_TM,
+      </if>
+      <if test="createOrgId != null">
+        CREATE_ORG_ID,
+      </if>
+      <if test="ueflag != null">
+        UEFLAG,
+      </if>
+      <if test="userScope != null">
+        USER_SCOPE,
+      </if>
+      <if test="smsAuthSwitch != null">
+        SMS_AUTH_SWITCH,
+      </if>
+      <if test="sysType != null">
+        SYS_TYPE,
+      </if>
+      <if test="certiSwitch != null">
+        CERTI_SWITCH,
+      </if>
+      <if test="certiType != null">
+        CERTI_TYPE,
+      </if>
+      <if test="isSetPaypwd != null">
+        IS_SET_PAYPWD,
+      </if>
+      <if test="withholdAuth != null">
+        WITHHOLD_AUTH,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="loginname != null">
+        #{loginname,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="roleId != null">
+        #{roleId,jdbcType=VARCHAR},
+      </if>
+      <if test="empId != null">
+        #{empId,jdbcType=VARCHAR},
+      </if>
+      <if test="deptId != null">
+        #{deptId,jdbcType=VARCHAR},
+      </if>
+      <if test="organId != null">
+        #{organId,jdbcType=VARCHAR},
+      </if>
+      <if test="userType != null">
+        #{userType,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null">
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="post != null">
+        #{post,jdbcType=VARCHAR},
+      </if>
+      <if test="createTm != null">
+        #{createTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTm != null">
+        #{updateTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="pwdUpdateTm != null">
+        #{pwdUpdateTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createOrgId != null">
+        #{createOrgId,jdbcType=VARCHAR},
+      </if>
+      <if test="ueflag != null">
+        #{ueflag,jdbcType=CHAR},
+      </if>
+      <if test="userScope != null">
+        #{userScope,jdbcType=VARCHAR},
+      </if>
+      <if test="smsAuthSwitch != null">
+        #{smsAuthSwitch,jdbcType=CHAR},
+      </if>
+      <if test="sysType != null">
+        #{sysType,jdbcType=CHAR},
+      </if>
+      <if test="certiSwitch != null">
+        #{certiSwitch,jdbcType=CHAR},
+      </if>
+      <if test="certiType != null">
+        #{certiType,jdbcType=CHAR},
+      </if>
+      <if test="isSetPaypwd != null">
+        #{isSetPaypwd,jdbcType=CHAR},
+      </if>
+      <if test="withholdAuth != null">
+        #{withholdAuth,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.machine.entity.LmsUserExample" resultType="java.lang.Long">
+    select count(*) from LMS_USER
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.machine.entity.LmsUser">
+    update LMS_USER
+    <set>
+      <if test="loginname != null">
+        LOGINNAME = #{loginname,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null">
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        PASSWORD = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="roleId != null">
+        ROLE_ID = #{roleId,jdbcType=VARCHAR},
+      </if>
+      <if test="empId != null">
+        EMP_ID = #{empId,jdbcType=VARCHAR},
+      </if>
+      <if test="deptId != null">
+        DEPT_ID = #{deptId,jdbcType=VARCHAR},
+      </if>
+      <if test="organId != null">
+        ORGAN_ID = #{organId,jdbcType=VARCHAR},
+      </if>
+      <if test="userType != null">
+        USER_TYPE = #{userType,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null">
+        PHONE = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="post != null">
+        POST = #{post,jdbcType=VARCHAR},
+      </if>
+      <if test="createTm != null">
+        CREATE_TM = #{createTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTm != null">
+        UPDATE_TM = #{updateTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="pwdUpdateTm != null">
+        PWD_UPDATE_TM = #{pwdUpdateTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createOrgId != null">
+        CREATE_ORG_ID = #{createOrgId,jdbcType=VARCHAR},
+      </if>
+      <if test="ueflag != null">
+        UEFLAG = #{ueflag,jdbcType=CHAR},
+      </if>
+      <if test="userScope != null">
+        USER_SCOPE = #{userScope,jdbcType=VARCHAR},
+      </if>
+      <if test="smsAuthSwitch != null">
+        SMS_AUTH_SWITCH = #{smsAuthSwitch,jdbcType=CHAR},
+      </if>
+      <if test="sysType != null">
+        SYS_TYPE = #{sysType,jdbcType=CHAR},
+      </if>
+      <if test="certiSwitch != null">
+        CERTI_SWITCH = #{certiSwitch,jdbcType=CHAR},
+      </if>
+      <if test="certiType != null">
+        CERTI_TYPE = #{certiType,jdbcType=CHAR},
+      </if>
+      <if test="isSetPaypwd != null">
+        IS_SET_PAYPWD = #{isSetPaypwd,jdbcType=CHAR},
+      </if>
+      <if test="withholdAuth != null">
+        WITHHOLD_AUTH = #{withholdAuth,jdbcType=CHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.machine.entity.LmsUser">
+    update LMS_USER
+    set LOGINNAME = #{loginname,jdbcType=VARCHAR},
+      NAME = #{name,jdbcType=VARCHAR},
+      PASSWORD = #{password,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=VARCHAR},
+      ROLE_ID = #{roleId,jdbcType=VARCHAR},
+      EMP_ID = #{empId,jdbcType=VARCHAR},
+      DEPT_ID = #{deptId,jdbcType=VARCHAR},
+      ORGAN_ID = #{organId,jdbcType=VARCHAR},
+      USER_TYPE = #{userType,jdbcType=VARCHAR},
+      PHONE = #{phone,jdbcType=VARCHAR},
+      POST = #{post,jdbcType=VARCHAR},
+      CREATE_TM = #{createTm,jdbcType=TIMESTAMP},
+      UPDATE_TM = #{updateTm,jdbcType=TIMESTAMP},
+      PWD_UPDATE_TM = #{pwdUpdateTm,jdbcType=TIMESTAMP},
+      CREATE_ORG_ID = #{createOrgId,jdbcType=VARCHAR},
+      UEFLAG = #{ueflag,jdbcType=CHAR},
+      USER_SCOPE = #{userScope,jdbcType=VARCHAR},
+      SMS_AUTH_SWITCH = #{smsAuthSwitch,jdbcType=CHAR},
+      SYS_TYPE = #{sysType,jdbcType=CHAR},
+      CERTI_SWITCH = #{certiSwitch,jdbcType=CHAR},
+      CERTI_TYPE = #{certiType,jdbcType=CHAR},
+      IS_SET_PAYPWD = #{isSetPaypwd,jdbcType=CHAR},
+      WITHHOLD_AUTH = #{withholdAuth,jdbcType=CHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+  <!-- 查询所用的大区经理账号 -->
+  <select id="selectAllLmsUser" resultType="map">
+    SELECT
+	    LOGINNAME, NAME
+    FROM
+        lms_user
+    WHERE
+        ORGAN_ID = '100000000000000'
+        AND POST = '03'
+        AND STATUS != '9'
+  </select>
+
+  <!-- 查询所用的大区经理账号 -->
+  <select id="selectByLogin" resultMap="BaseResultMap" parameterType="string">
+    SELECT
+	    *
+    FROM
+        lms_user
+    WHERE
+        LOGINNAME=#{loginName}
+  </select>
+</mapper>
