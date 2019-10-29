@@ -88,7 +88,7 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         String annId= idService.genId(TabId.A_ANNOUNCEMENT_INFO);
         logger.info("添加公告id{}",annId);
         announceMentInfoVo.setAnnId(annId);
-        announceMentInfoVo.setAnnoStat(new BigDecimal(0));
+        announceMentInfoVo.setAnnoStat(AnnoStat.WAIT.code);
         announceMentInfoVo.setCreateTm(date);
         announceMentInfoMapper.insert(announceMentInfoVo);
         String orgs = announceMentInfoVo.getOrgs();
