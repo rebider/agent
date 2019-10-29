@@ -313,8 +313,10 @@
     ap.TEMPLATE_ID, ap.CREATE_USER, ap.ASSIGN_RESULT, ap.ASSIGN_REASON, ap.CRE_TYPE, ap.TEM_TYPE, ap.REV1,
     ap.REV2
     from P_TEMPLATE_APPLY_RECORD ap
-    inner join  A_AGENT_BUSINFO  ab
-    on ap.BUS_NUM = ab.BUS_NUM
+    left join  (
+    select DISTINCT BUS_NUM, AGENT_ID,AG_DOC_PRO,AG_DOC_DISTRICT from A_AGENT_BUSINFO
+    )  ab
+    on ap.BUS_NUM = ab.BUS_NUM AND ap.AGENT_ID = ab.AGENT_ID
     where 1 = 1
     <if test="map.agDoc != '' and map.agDoc != null">
       and ab.AG_DOC_PRO = #{map.agDoc}
@@ -348,8 +350,10 @@
   <select id="getCountByTem" resultType="java.lang.Integer">
     select count(1)
     from P_TEMPLATE_APPLY_RECORD ap
-    inner join  A_AGENT_BUSINFO  ab
-    on ap.BUS_NUM = ab.BUS_NUM
+    left join  (
+    select DISTINCT BUS_NUM, AGENT_ID,AG_DOC_PRO,AG_DOC_DISTRICT from A_AGENT_BUSINFO
+    )  ab
+    on ap.BUS_NUM = ab.BUS_NUM AND ap.AGENT_ID = ab.AGENT_ID
     where 1 = 1
     <if test="map.agDoc != '' and map.agDoc != null">
       and ab.AG_DOC_PRO = #{map.agDoc}
