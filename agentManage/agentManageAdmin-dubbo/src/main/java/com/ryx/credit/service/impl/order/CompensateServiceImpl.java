@@ -864,6 +864,12 @@ public class CompensateServiceImpl implements CompensateService {
                         throw new ProcessException("请填写发货日期延期");
                     }
                 }
+            }else{
+                if(StringUtils.isNotBlank(agentVo.getDeliveryTime()) || StringUtils.isNotBlank(agentVo.getDelayDay())){
+                    if(StringUtils.isBlank(agentVo.getDeliveryTimeType())) {
+                        throw new ProcessException("请选择发货类型");
+                    }
+                }
             }
             ORefundPriceDiffDetailExample oRefundPriceDiffDetailExample = new ORefundPriceDiffDetailExample();
             ORefundPriceDiffDetailExample.Criteria criteria = oRefundPriceDiffDetailExample.createCriteria();
