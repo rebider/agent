@@ -371,6 +371,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             int z = 1;
             Set<String> agentIdSet = new HashSet<>();
             String agentId = "";
+            String agName = "";
             for (String iccid : iccids) {
                 OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(iccid);
                 if (oInternetCard == null) {
@@ -378,15 +379,16 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 }
                 agentIdSet.add(oInternetCard.getAgentId());
                 agentId = oInternetCard.getAgentId();
+                agName = oInternetCard.getAgentName();
             }
             if(agentIdSet.size()!=1){
                 throw new MessageException("不同代理商请分开申请");
             }
-
-            Agent agent = agentService.getAgentById(agentId);
-            String agName = "";
-            if(null!=agent){
-                agName = agent.getAgName();
+            List<String> agentNameList = dictOptionsService.getAgentNameList(Long.valueOf(cUser));
+            if(agentNameList.size()!=0){
+                if(!internetRenew.getRenewWay().equals(InternetRenewWay.XXBK.getValue())){
+                    throw new MessageException("您只能选择线下打款支付方式,如有问题请联系管理员");
+                }
             }
             BigDecimal renewCardCount = new BigDecimal(iccids.size());
             String internetRenewId = idService.genId(TabId.O_INTERNET_RENEW);
@@ -494,9 +496,9 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 }
                 oInternetRenewDetail.setMerId(oInternetCard.getMerId());
                 oInternetRenewDetail.setMerName(oInternetCard.getMerName());
-                if(StringUtils.isBlank(oInternetCard.getAgentId())){
-                    throw new MessageException("第"+i+"个代理商编号为空");
-                }
+//                if(StringUtils.isBlank(oInternetCard.getAgentId())){
+//                    throw new MessageException("第"+i+"个代理商编号为空");
+//                }
                 oInternetRenewDetail.setAgentId(oInternetCard.getAgentId());
                 if(StringUtils.isBlank(oInternetCard.getAgentName())){
                     throw new MessageException("第"+i+"个代理商名称为空");
@@ -523,7 +525,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 internetRenewDetailMapper.insert(oInternetRenewDetail);
             }
             try {
-                AgentResult agentResult = cashReceivablesService.addOCashReceivablesAndStartProcing(oCashReceivablesVoList,cUser,agentId, CashPayType.INTERNETRENEW,internetRenewId);
+                AgentResult agentResult = cashReceivablesService.addOCashReceivablesAndStartProcing(oCashReceivablesVoList,cUser,StringUtils.isBlank(agentId)?cUser:agentId, StringUtils.isBlank(agentId)?CashPayType.INTERNETRENEWN:CashPayType.INTERNETRENEW,internetRenewId);
                 if(!agentResult.isOK()){
                     throw new ProcessException("保存打款记录失败");
                 }
@@ -545,8 +547,8 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             record.setBusType(BusActRelBusType.cardRenew.name());
             record.setActivStatus(AgStatus.Approving.name());
             record.setDataShiro(BusActRelBusType.cardRenew.key);
-            record.setAgentId(agentId);
-            record.setAgentName(agName);
+            record.setAgentId(StringUtils.isBlank(agentId) || agentId.equals("null")?"":agentId);
+            record.setAgentName(StringUtils.isBlank(agName) || agName.equals("null")?"":agName);
             try {
                 taskApprovalService.addABusActRel(record);
                 log.info("物联网卡续费审批流启动成功");
@@ -602,8 +604,14 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public void approveTashBusiness(AgentVo agentVo, String userId) throws Exception {
+        OInternetRenew oInternetRenew = internetRenewService.selectByPrimaryKey(agentVo.getAgentBusId());
+        List<String> agentNameList = dictOptionsService.getAgentNameList(Long.valueOf(oInternetRenew.getcUser()));
+        CashPayType cashPayType = CashPayType.INTERNETRENEW;
+        if(agentNameList.size()!=0) {
+            cashPayType = CashPayType.INTERNETRENEWN;
+        }
         //目前只有财务节点直接处理，后续加判断
-        AgentResult cashAgentResult = cashReceivablesService.approveTashBusiness(CashPayType.INTERNETRENEW,agentVo.getAgentBusId(),userId,new Date(),agentVo.getoCashReceivablesVoList());
+        AgentResult cashAgentResult = cashReceivablesService.approveTashBusiness(cashPayType,agentVo.getAgentBusId(),userId,new Date(),agentVo.getoCashReceivablesVoList());
         if(!cashAgentResult.isOK()){
             throw new MessageException("更新收款信息失败");
         }
@@ -697,11 +705,16 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }
 
         AgentResult agentResult = AgentResult.fail();
+        List<String> agentNameList = dictOptionsService.getAgentNameList(Long.valueOf(oInternetRenew.getcUser()));
+        CashPayType cashPayType = CashPayType.INTERNETRENEW;
+        if(agentNameList.size()!=0) {
+            cashPayType = CashPayType.INTERNETRENEWN;
+        }
         if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
-            agentResult = cashReceivablesService.refuseProcing(CashPayType.INTERNETRENEW,busActRel.getBusId(),busActRel.getcUser());
+            agentResult = cashReceivablesService.refuseProcing(cashPayType,busActRel.getBusId(),busActRel.getcUser());
         }
         if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
-            agentResult = cashReceivablesService.finishProcing(CashPayType.INTERNETRENEW,busActRel.getBusId(),busActRel.getcUser());
+            agentResult = cashReceivablesService.finishProcing(cashPayType,busActRel.getBusId(),busActRel.getcUser());
         }
         if(!agentResult.isOK()){
             throw new MessageException("更新打款记录失败");
