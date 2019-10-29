@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.agent.AnnounceMentInfoMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.AnnounceMentInfo">
+    <id column="ANN_ID" jdbcType="VARCHAR" property="annId" />
+    <result column="ANN_TITLE" jdbcType="VARCHAR" property="annTitle" />
+    <result column="ANN_TYPE" jdbcType="DECIMAL" property="annType" />
+    <result column="EFFECT_TM" jdbcType="TIMESTAMP" property="effectTm" />
+    <result column="EXPIRE_TM" jdbcType="TIMESTAMP" property="expireTm" />
+    <result column="ANNO_STAT" jdbcType="DECIMAL" property="annoStat" />
+    <result column="PUB_TM" jdbcType="TIMESTAMP" property="pubTm" />
+    <result column="PUB_ORG" jdbcType="VARCHAR" property="pubOrg" />
+    <result column="PUBLISHER" jdbcType="VARCHAR" property="publisher" />
+    <result column="UP_STAT_USER" jdbcType="VARCHAR" property="upStatUser" />
+    <result column="UP_STAT_TM" jdbcType="TIMESTAMP" property="upStatTm" />
+    <result column="CREATE_TM" jdbcType="TIMESTAMP" property="createTm" />
+    <result column="CREATE_USER" jdbcType="VARCHAR" property="createUser" />
+    <result column="TO_AGENT" jdbcType="DECIMAL" property="toAgent" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.ryx.credit.pojo.admin.agent.AnnounceMentInfo">
+    <result column="ANN_INFO" jdbcType="CLOB" property="annInfo" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ANN_ID, ANN_TITLE, ANN_TYPE, EFFECT_TM, EXPIRE_TM, ANNO_STAT, PUB_TM, PUB_ORG, PUBLISHER, 
+    UP_STAT_USER, UP_STAT_TM, CREATE_TM, CREATE_USER, TO_AGENT
+  </sql>
+  <sql id="Blob_Column_List">
+    ANN_INFO
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.ryx.credit.pojo.admin.agent.AnnounceMentInfoExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from A_ANNOUNCEMENT_INFO
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AnnounceMentInfoExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from A_ANNOUNCEMENT_INFO
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from A_ANNOUNCEMENT_INFO
+    where ANN_ID = #{annId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.AnnounceMentInfoExample">
+    delete from A_ANNOUNCEMENT_INFO
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AnnounceMentInfo">
+    insert into A_ANNOUNCEMENT_INFO (ANN_ID, ANN_TITLE, ANN_TYPE,
+      EFFECT_TM, EXPIRE_TM, ANNO_STAT,
+      PUB_TM, PUB_ORG, PUBLISHER,
+      UP_STAT_USER, UP_STAT_TM, CREATE_TM,
+      CREATE_USER, TO_AGENT, ANN_INFO
+      )
+    values (#{annId,jdbcType=VARCHAR}, #{annTitle,jdbcType=VARCHAR}, #{annType,jdbcType=DECIMAL},
+      #{effectTm,jdbcType=TIMESTAMP}, #{expireTm,jdbcType=TIMESTAMP}, #{annoStat,jdbcType=DECIMAL},
+      #{pubTm,jdbcType=TIMESTAMP}, #{pubOrg,jdbcType=VARCHAR}, #{publisher,jdbcType=VARCHAR},
+      #{upStatUser,jdbcType=VARCHAR}, #{upStatTm,jdbcType=TIMESTAMP}, #{createTm,jdbcType=TIMESTAMP},
+      #{createUser,jdbcType=VARCHAR}, #{toAgent,jdbcType=DECIMAL}, #{annInfo,jdbcType=CLOB}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AnnounceMentInfo">
+    insert into A_ANNOUNCEMENT_INFO
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="annId != null">
+        ANN_ID,
+      </if>
+      <if test="annTitle != null">
+        ANN_TITLE,
+      </if>
+      <if test="annType != null">
+        ANN_TYPE,
+      </if>
+      <if test="effectTm != null">
+        EFFECT_TM,
+      </if>
+      <if test="expireTm != null">
+        EXPIRE_TM,
+      </if>
+      <if test="annoStat != null">
+        ANNO_STAT,
+      </if>
+      <if test="pubTm != null">
+        PUB_TM,
+      </if>
+      <if test="pubOrg != null">
+        PUB_ORG,
+      </if>
+      <if test="publisher != null">
+        PUBLISHER,
+      </if>
+      <if test="upStatUser != null">
+        UP_STAT_USER,
+      </if>
+      <if test="upStatTm != null">
+        UP_STAT_TM,
+      </if>
+      <if test="createTm != null">
+        CREATE_TM,
+      </if>
+      <if test="createUser != null">
+        CREATE_USER,
+      </if>
+      <if test="toAgent != null">
+        TO_AGENT,
+      </if>
+      <if test="annInfo != null">
+        ANN_INFO,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="annId != null">
+        #{annId,jdbcType=VARCHAR},
+      </if>
+      <if test="annTitle != null">
+        #{annTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="annType != null">
+        #{annType,jdbcType=DECIMAL},
+      </if>
+      <if test="effectTm != null">
+        #{effectTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="expireTm != null">
+        #{expireTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="annoStat != null">
+        #{annoStat,jdbcType=DECIMAL},
+      </if>
+      <if test="pubTm != null">
+        #{pubTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="pubOrg != null">
+        #{pubOrg,jdbcType=VARCHAR},
+      </if>
+      <if test="publisher != null">
+        #{publisher,jdbcType=VARCHAR},
+      </if>
+      <if test="upStatUser != null">
+        #{upStatUser,jdbcType=VARCHAR},
+      </if>
+      <if test="upStatTm != null">
+        #{upStatTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTm != null">
+        #{createTm,jdbcType=TIMESTAMP},
+        </if>
+<if test="createUser != null">
+#{createUser,jdbcType=VARCHAR},
+</if>
+<if test="toAgent != null">
+#{toAgent,jdbcType=DECIMAL},
+</if>
+<if test="annInfo != null">
+#{annInfo,jdbcType=CLOB},
+</if>
+        </trim>
+        </insert>
+<select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AnnounceMentInfoExample" resultType="java.lang.Long">
+select count(*) from A_ANNOUNCEMENT_INFO
+<if test="_parameter != null">
+    <include refid="Example_Where_Clause" />
+</if>
+</select>
+<update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.AnnounceMentInfo">
+update A_ANNOUNCEMENT_INFO
+<set>
+    <if test="annTitle != null">
+        ANN_TITLE = #{annTitle,jdbcType=VARCHAR},
+    </if>
+    <if test="annType != null">
+        ANN_TYPE = #{annType,jdbcType=DECIMAL},
+    </if>
+    <if test="effectTm != null">
+        EFFECT_TM = #{effectTm,jdbcType=TIMESTAMP},
+    </if>
+    <if test="expireTm != null">
+        EXPIRE_TM = #{expireTm,jdbcType=TIMESTAMP},
+    </if>
+    <if test="annoStat != null">
+        ANNO_STAT = #{annoStat,jdbcType=DECIMAL},
+    </if>
+    <if test="pubTm != null">
+        PUB_TM = #{pubTm,jdbcType=TIMESTAMP},
+    </if>
+    <if test="pubOrg != null">
+        PUB_ORG = #{pubOrg,jdbcType=VARCHAR},
+    </if>
+    <if test="publisher != null">
+        PUBLISHER = #{publisher,jdbcType=VARCHAR},
+    </if>
+    <if test="upStatUser != null">
+        UP_STAT_USER = #{upStatUser,jdbcType=VARCHAR},
+    </if>
+    <if test="upStatTm != null">
+        UP_STAT_TM = #{upStatTm,jdbcType=TIMESTAMP},
+    </if>
+    <if test="createTm != null">
+        CREATE_TM = #{createTm,jdbcType=TIMESTAMP},
+    </if>
+    <if test="createUser != null">
+        CREATE_USER = #{createUser,jdbcType=VARCHAR},
+    </if>
+    <if test="toAgent != null">
+        TO_AGENT = #{toAgent,jdbcType=DECIMAL},
+    </if>
+    <if test="annInfo != null">
+        ANN_INFO = #{annInfo,jdbcType=CLOB},
+    </if>
+</set>
+where ANN_ID = #{annId,jdbcType=VARCHAR}
+</update>
+<update id="updateByPrimaryKeyWithBLOBs" parameterType="com.ryx.credit.pojo.admin.agent.AnnounceMentInfo">
+    update A_ANNOUNCEMENT_INFO
+    set ANN_TITLE = #{annTitle,jdbcType=VARCHAR},
+      ANN_TYPE = #{annType,jdbcType=DECIMAL},
+      EFFECT_TM = #{effectTm,jdbcType=TIMESTAMP},
+      EXPIRE_TM = #{expireTm,jdbcType=TIMESTAMP},
+      ANNO_STAT = #{annoStat,jdbcType=DECIMAL},
+      PUB_TM = #{pubTm,jdbcType=TIMESTAMP},
+      PUB_ORG = #{pubOrg,jdbcType=VARCHAR},
+      PUBLISHER = #{publisher,jdbcType=VARCHAR},
+      UP_STAT_USER = #{upStatUser,jdbcType=VARCHAR},
+      UP_STAT_TM = #{upStatTm,jdbcType=TIMESTAMP},
+      CREATE_TM = #{createTm,jdbcType=TIMESTAMP},
+      CREATE_USER = #{createUser,jdbcType=VARCHAR},
+      TO_AGENT = #{toAgent,jdbcType=DECIMAL},
+      ANN_INFO = #{annInfo,jdbcType=CLOB}
+    where ANN_ID = #{annId,jdbcType=VARCHAR}
+  </update>
+<update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AnnounceMentInfo">
+    update A_ANNOUNCEMENT_INFO
+    set ANN_TITLE = #{annTitle,jdbcType=VARCHAR},
+      ANN_TYPE = #{annType,jdbcType=DECIMAL},
+      EFFECT_TM = #{effectTm,jdbcType=TIMESTAMP},
+      EXPIRE_TM = #{expireTm,jdbcType=TIMESTAMP},
+      ANNO_STAT = #{annoStat,jdbcType=DECIMAL},
+      PUB_TM = #{pubTm,jdbcType=TIMESTAMP},
+      PUB_ORG = #{pubOrg,jdbcType=VARCHAR},
+      PUBLISHER = #{publisher,jdbcType=VARCHAR},
+      UP_STAT_USER = #{upStatUser,jdbcType=VARCHAR},
+      UP_STAT_TM = #{upStatTm,jdbcType=TIMESTAMP},
+      CREATE_TM = #{createTm,jdbcType=TIMESTAMP},
+      CREATE_USER = #{createUser,jdbcType=VARCHAR},
+      TO_AGENT = #{toAgent,jdbcType=DECIMAL}
+    where ANN_ID = #{annId,jdbcType=VARCHAR}
+  </update>
+<update id="updateStatByAnno" parameterType="com.ryx.credit.pojo.admin.agent.AnnounceMentInfo">
+    update a_announcement_info a set
+    <if test="publisher != null">
+        PUBLISHER = #{publisher,jdbcType=VARCHAR},
+    </if>
+    PUB_TM = #{pubTm,jdbcType=TIMESTAMP},
+    UP_STAT_USER = #{upStatUser,jdbcType=VARCHAR},
+    UP_STAT_TM = #{upStatTm,jdbcType=TIMESTAMP},
+    ANNO_STAT = #{annoStat,jdbcType=VARCHAR}
+    where ann_id = #{annId}
+</update>
+<sql id="OracleDialectPrefix">
+<if test="page != null">
+    select * from ( select row_.*, rownum rownum_ from (
+</if>
+</sql>
+<sql id="OracleDialectSuffix">
+<if test="page != null">
+    <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+</if>
+</sql>
+
+    <sql id="selectAnnMaintainSql">
+        select a.ann_id,
+        a.ann_title,
+        a.ann_type,
+        a.pub_tm,
+        a.effect_tm,
+        a.expire_tm,
+        a.anno_stat,
+        c.name as pub_org
+        from a_announcement_info a
+        left join c_organization c
+        on c.id = a.pub_org
+        <where>
+            a.anno_stat != '3'
+
+            <if test="map.annType!=null and map.annType!=''">
+                and a.ann_type = #{map.annType}
+            </if>
+            <if test="map.annTitle!=null and map.annTitle!=''">
+                and a.ann_title like CONCAT(CONCAT('%',#{map.annTitle}),'%')
+            </if>
+            <if test="map.pubTmb!=null and map.pubTmb!=''">
+                and to_char(a.pub_tm,'yyyy-mm-dd') &gt;=  #{map.pubTmb}
+            </if>
+            <if test="map.pubTme!=null and map.pubTme!=''">
+                and to_char(a.pub_tm,'yyyy-mm-dd')  &lt;= #{map.pubTme}
+            </if>
+            <if test="map.effectTmb!=null and map.effectTmb!=''">
+                and to_char(a.effect_tm,'yyyy-mm-dd') &gt;=  #{map.effectTmb}
+            </if>
+            <if test="map.effectTme!=null and map.effectTme!=''">
+                and to_char(a.effect_tm,'yyyy-mm-dd') &lt;=  #{map.effectTme}
+            </if>
+            <if test="map.pubOrg!=null and map.pubOrg.size>0">
+                and a.pub_org in (
+                <foreach collection="map.pubOrg" item="org" separator=",">
+                    #{org}
+                </foreach>)
+            </if>
+        </where>
+        order by a.create_tm desc
+    </sql>
+<select id="selectAnnMaintain" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix"/>
+    <include refid="selectAnnMaintainSql"/>
+    <include refid="OracleDialectSuffix"/>
+</select>
+<select id="selectCountAnnMaintain" parameterType="map" resultType="int">
+    select count(*) from(
+    <include refid="selectAnnMaintainSql"/>
+    )
+</select>
+<select id="selectAnnManage" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix"/>
+    select <include refid="Base_Column_List"/>
+    from a_announcement_info a
+    <where>
+        a.ANNO_STAT != 3
+        <if test="map.userId!=null and map.userId !=''">
+            and a.CREATE_USER = #{map.userId}
+        </if>
+        <if test="map.annType!=null and map.annType!=''">
+            and a.ann_type = #{map.annType}
+        </if>
+        <if test="map.annTitle!=null and map.annTitle!=''">
+            and a.ann_title like CONCAT(CONCAT('%',#{map.annTitle}),'%')
+        </if>
+        <if test="map.pubTmb!=null and map.pubTmb!=''">
+            and to_char(a.pub_tm,'yyyy-mm-dd') &gt;= #{map.pubTmb}
+        </if>
+        <if test="map.pubTme!=null and map.pubTme!=''">
+            and to_char(a.pub_tm,'yyyy-mm-dd') &lt;= #{map.pubTme}
+        </if>
+        <if test="map.effectTmb!=null and map.effectTmb!=''">
+            and to_char(a.effect_tm,'yyyy-mm-dd') &gt;= #{map.effectTmb}
+        </if>
+        <if test="map.effectTme!=null and map.effectTme!=''">
+            and to_char(a.effect_tm,'yyyy-mm-dd') &lt;= #{map.effectTme}
+        </if>
+        <if test="map.pubOrg!=null and map.pubOrg!=''">
+            and a.pub_org = #{map.pubOrg}
+        </if>
+    </where>
+    order by CREATE_TM desc
+    <include refid="OracleDialectSuffix"/>
+</select>
+<select id="selectCountAnnManage" parameterType="map" resultType="int">
+    select count(*) from(
+    select <include refid="Base_Column_List"/>
+    from a_announcement_info a
+    <where>
+        a.ANNO_STAT != 3
+        <if test="map.userId!=null and map.userId !=''">
+            and a.CREATE_USER = #{map.userId}
+        </if>
+        <if test="map.annType!=null and map.annType!=''">
+            and a.ann_type = #{map.annType}
+        </if>
+        <if test="map.annTitle!=null and map.annTitle!=''">
+            and a.ann_title like CONCAT(CONCAT('%',#{map.annTitle}),'%')
+        </if>
+        <if test="map.pubTmb!=null and map.pubTmb!=''">
+            and to_char(a.pub_tm,'yyyy-mm-dd') &gt;= #{map.pubTmb}
+        </if>
+        <if test="map.pubTme!=null and map.pubTme!=''">
+            and to_char(a.pub_tm,'yyyy-mm-dd') &lt;= #{map.pubTme}
+        </if>
+        <if test="map.effectTmb!=null and map.effectTmb!=''">
+            and to_char(a.effect_tm,'yyyy-mm-dd') &gt;= #{map.effectTmb}
+        </if>
+        <if test="map.effectTme!=null and map.effectTme!=''">
+            and to_char(a.effect_tm,'yyyy-mm-dd') &lt;= #{map.effectTme}
+        </if>
+        <if test="map.pubOrg!=null and map.pubOrg!=''">
+            and a.pub_org = #{map.pubOrg}
+        </if>
+    </where>
+    )
+</select>
+<sql id="selectAnnReaderSql">
+    select a.ann_id,
+    a.ann_title,
+    a.ann_type,
+    a.pub_tm,
+    a.effect_tm,
+    a.expire_tm,
+    a.anno_stat,
+    c.name as pub_org,
+    nvl(ri.id, '0') as read_flag,
+    ceil( a.expire_tm - sysdate) as expire
+    from a_announcement_info a
+    left join a_announcement_read_info ri
+    on a.ann_id = ri.ann_id and ri.READ_USER_ID = #{map.userId}
+    left join c_organization c
+    on c.id = a.pub_org
+    <where>
+        <if test="map.busTypes !=null and map.busTypes.size > 0">
+            exists (select  ap.anno_id
+            from a_anno_platform_rela ap
+            where  a.ann_id = ap.anno_id and
+            ap.rang_type = '0' and (
+                <foreach collection="map.busTypes" separator="or" item="busType"  >
+                    #{busType} = ap.rang_value
+                </foreach>)
+            )
+        </if>
+        <if test="map.platfromPerm !=null and map.platfromPerm.size > 0">
+            and exists (select ap.anno_id
+            from a_anno_platform_rela ap
+            where  a.ann_id = ap.anno_id and
+            ap.rang_type = '1' and (
+            <foreach collection="map.platfromPerm" separator=" or " item="platfromPermItem"  >
+                #{platfromPermItem} = ap.rang_value
+            </foreach>)
+            )
+        </if>
+        <if test="map.orgIds !=null and map.orgIds.size > 0">
+            and exists(select ap.anno_id
+            from a_anno_platform_rela ap
+            where  a.ann_id = ap.anno_id and
+            ap.rang_type = '2' and (
+            <foreach  collection="map.orgIds" separator=" or " item="orgId" >
+                instr(ap.rang_value,#{orgId})>0
+            </foreach>)
+            )
+        </if>
+        <if test="map.selfOrg!=null and map.selfOrg!=''">
+            and a.pub_org != #{map.selfOrg}
+        </if>
+        <if test="map.toAgent!=null and map.toAgent!=''">
+            and a.to_agent = #{map.toAgent}
+        </if>
+        <!--<choose>
+            <when test="map.annoIds!=null and map.annoIds.size>0">
+                ( a.anno_stat = '1'
+                and a.ann_id in
+                <foreach collection="map.annoIds" item="annId" open="(" separator="," close=")">
+                    #{annId}
+                </foreach>)
+            </when>
+            <otherwise>
+                1!=1
+            </otherwise>
+        </choose>-->
+        and a.ANNO_STAT = '1'
+        <if test="map.annType!=null and map.annType!=''">
+            and a.ann_type = #{map.annType}
+        </if>
+        <if test="map.annTitle!=null and map.annTitle!=''">
+            and a.ann_title like CONCAT(CONCAT('%',#{map.annTitle}),'%')
+        </if>
+        <if test="map.pubTmb!=null and map.pubTmb!=''">
+            and to_char(a.pub_tm,'yyyy-mm-dd') &gt;= #{map.pubTmb}
+        </if>
+        <if test="map.pubTme!=null and map.pubTme!=''">
+            and to_char(a.pub_tm,'yyyy-mm-dd') &lt;= #{map.pubTme}
+        </if>
+        <if test="map.effectTmb!=null and map.effectTmb!=''">
+            and to_char(a.expire_tm,'yyyy-mm-dd') &gt;= #{map.effectTmb}
+        </if>
+        <if test="map.effectTme!=null and map.effectTme!=''">
+            and to_char(a.effect_tm,'yyyy-mm-dd') &lt;= #{map.effectTme}
+        </if>
+        <if test="map.pubOrg!=null and map.pubOrg.size>0">
+            and a.pub_org in (
+            <foreach collection="map.pubOrg" item="org" separator=",">
+                #{org}
+            </foreach>)
+        </if>
+    </where>
+      order by a.pub_tm desc,read_flag asc/*,a.effect_tm desc*/
+</sql>
+<select id="selectAnnReader" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix"/>
+    <include refid="selectAnnReaderSql"/>
+    <include refid="OracleDialectSuffix"/>
+</select>
+<select id="selectCountAnnReader" parameterType="map" resultType="int">
+    select count(*) from(
+    <include refid="selectAnnReaderSql"/>)
+</select>
+</mapper>

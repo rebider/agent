@@ -98,7 +98,8 @@ public enum DictGroup {
     RSTATUS("销账状态"),
 
 
-    CERTIFICATION_STATUS("代理商工商认证");
+    CERTIFICATION_STATUS("代理商工商认证"),
+    ANN_TYPE("公告类型");
 
 
 
