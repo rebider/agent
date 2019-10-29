@@ -46,4 +46,18 @@ public interface PosRewardSDetailService {
      */
     Map<String,Object> savePosRewardData();
 
+    /**
+     * chenliang
+     * 获取pos扣回
+     */
+    Map<String,Object> savePosKickBackData();
+
+    /**
+     * chenliang
+     * 获取pos扣回
+     */
+    PageInfo posKickbackRewardPageList(Map<String, Object> param, PageInfo pageInfo);
+
+    List<Map<String, Object>> queryBusName();
+
 }

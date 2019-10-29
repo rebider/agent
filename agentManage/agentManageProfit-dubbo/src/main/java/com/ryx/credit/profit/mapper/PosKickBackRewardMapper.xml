@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.PosKickBackRewardMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.PosKickBackReward">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="BUS_NAME" jdbcType="VARCHAR" property="busName" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="REWARD_TYPE" jdbcType="VARCHAR" property="rewardType" />
+    <result column="PRETEAST_CYCLE" jdbcType="VARCHAR" property="preteastCycle" />
+    <result column="CHECK_MONTH" jdbcType="VARCHAR" property="checkMonth" />
+    <result column="CREDIT_CARD_NEW_AMT" jdbcType="DECIMAL" property="creditCardNewAmt" />
+    <result column="ONE_MONTH_COUNT" jdbcType="DECIMAL" property="oneMonthCount" />
+    <result column="TOOLS_COUNT" jdbcType="DECIMAL" property="toolsCount" />
+    <result column="CHECK_STATUS" jdbcType="VARCHAR" property="checkStatus" />
+    <result column="PRETEST_AMT" jdbcType="DECIMAL" property="pretestAmt" />
+    <result column="SHOULD_AMT" jdbcType="DECIMAL" property="shouldAmt" />
+    <result column="CHARGE_AMT" jdbcType="DECIMAL" property="chargeAmt" />
+    <result column="LAST_MONTH_AMT" jdbcType="DECIMAL" property="lastMonthAmt" />
+    <result column="REV1" jdbcType="VARCHAR" property="rev1" />
+    <result column="REV2" jdbcType="VARCHAR" property="rev2" />
+    <result column="PRETEST_K_AMT" jdbcType="DECIMAL" property="pretestKAmt" />
+    <result column="SHOULD_K_AMT" jdbcType="DECIMAL" property="shouldKAmt" />
+    <result column="NOT_AMT" jdbcType="DECIMAL" property="notAmt" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, BUS_NAME, AGENT_NAME, AGENT_ID, REWARD_TYPE, PRETEAST_CYCLE, CHECK_MONTH, CREDIT_CARD_NEW_AMT,
+    ONE_MONTH_COUNT, TOOLS_COUNT, CHECK_STATUS, PRETEST_AMT, SHOULD_AMT, CHARGE_AMT,
+    LAST_MONTH_AMT, REV1, REV2, PRETEST_K_AMT, SHOULD_K_AMT, NOT_AMT
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PosKickBackRewardExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_POS_KICKBACK_REWARD
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from P_POS_KICKBACK_REWARD
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PosKickBackRewardExample">
+    delete from P_POS_KICKBACK_REWARD
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PosKickBackReward">
+    insert into P_POS_KICKBACK_REWARD (ID, BUS_NAME, AGENT_NAME,
+      AGENT_ID, REWARD_TYPE, PRETEAST_CYCLE,
+      CHECK_MONTH, CREDIT_CARD_NEW_AMT, ONE_MONTH_COUNT,
+      TOOLS_COUNT, CHECK_STATUS, PRETEST_AMT,
+      SHOULD_AMT, CHARGE_AMT, LAST_MONTH_AMT,
+      REV1, REV2, PRETEST_K_AMT,
+      SHOULD_K_AMT, NOT_AMT)
+    values (#{id,jdbcType=VARCHAR}, #{busName,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR},
+      #{agentId,jdbcType=VARCHAR}, #{rewardType,jdbcType=VARCHAR}, #{preteastCycle,jdbcType=VARCHAR},
+      #{checkMonth,jdbcType=VARCHAR}, #{creditCardNewAmt,jdbcType=DECIMAL}, #{oneMonthCount,jdbcType=DECIMAL},
+      #{toolsCount,jdbcType=DECIMAL}, #{checkStatus,jdbcType=VARCHAR}, #{pretestAmt,jdbcType=DECIMAL},
+      #{shouldAmt,jdbcType=DECIMAL}, #{chargeAmt,jdbcType=DECIMAL}, #{lastMonthAmt,jdbcType=DECIMAL},
+      #{rev1,jdbcType=VARCHAR}, #{rev2,jdbcType=VARCHAR}, #{pretestKAmt,jdbcType=DECIMAL},
+      #{shouldKAmt,jdbcType=DECIMAL}, #{notAmt,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PosKickBackReward">
+    insert into P_POS_KICKBACK_REWARD
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="busName != null">
+        BUS_NAME,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="rewardType != null">
+        REWARD_TYPE,
+      </if>
+      <if test="preteastCycle != null">
+        PRETEAST_CYCLE,
+      </if>
+      <if test="checkMonth != null">
+        CHECK_MONTH,
+      </if>
+      <if test="creditCardNewAmt != null">
+        CREDIT_CARD_NEW_AMT,
+      </if>
+      <if test="oneMonthCount != null">
+        ONE_MONTH_COUNT,
+      </if>
+      <if test="toolsCount != null">
+        TOOLS_COUNT,
+      </if>
+      <if test="checkStatus != null">
+        CHECK_STATUS,
+      </if>
+      <if test="pretestAmt != null">
+        PRETEST_AMT,
+      </if>
+      <if test="shouldAmt != null">
+        SHOULD_AMT,
+      </if>
+      <if test="chargeAmt != null">
+        CHARGE_AMT,
+      </if>
+      <if test="lastMonthAmt != null">
+        LAST_MONTH_AMT,
+      </if>
+      <if test="rev1 != null">
+        REV1,
+      </if>
+      <if test="rev2 != null">
+        REV2,
+      </if>
+      <if test="pretestKAmt != null">
+        PRETEST_K_AMT,
+      </if>
+      <if test="shouldKAmt != null">
+        SHOULD_K_AMT,
+      </if>
+      <if test="notAmt != null">
+        NOT_AMT,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="busName != null">
+        #{busName,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="rewardType != null">
+        #{rewardType,jdbcType=VARCHAR},
+      </if>
+      <if test="preteastCycle != null">
+        #{preteastCycle,jdbcType=VARCHAR},
+      </if>
+      <if test="checkMonth != null">
+        #{checkMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="creditCardNewAmt != null">
+        #{creditCardNewAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="oneMonthCount != null">
+        #{oneMonthCount,jdbcType=DECIMAL},
+      </if>
+      <if test="toolsCount != null">
+        #{toolsCount,jdbcType=DECIMAL},
+      </if>
+      <if test="checkStatus != null">
+        #{checkStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="pretestAmt != null">
+        #{pretestAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="shouldAmt != null">
+        #{shouldAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="chargeAmt != null">
+        #{chargeAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="lastMonthAmt != null">
+        #{lastMonthAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="rev1 != null">
+        #{rev1,jdbcType=VARCHAR},
+      </if>
+      <if test="rev2 != null">
+        #{rev2,jdbcType=VARCHAR},
+      </if>
+      <if test="pretestKAmt != null">
+        #{pretestKAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="shouldKAmt != null">
+        #{shouldKAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="notAmt != null">
+        #{notAmt,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PosKickBackRewardExample" resultType="java.lang.Long">
+    select count(*) from P_POS_KICKBACK_REWARD
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PosKickBackReward">
+    update P_POS_KICKBACK_REWARD
+    <set>
+      <if test="busName != null">
+        BUS_NAME = #{busName,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="rewardType != null">
+        REWARD_TYPE = #{rewardType,jdbcType=VARCHAR},
+      </if>
+      <if test="preteastCycle != null">
+        PRETEAST_CYCLE = #{preteastCycle,jdbcType=VARCHAR},
+      </if>
+      <if test="checkMonth != null">
+        CHECK_MONTH = #{checkMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="creditCardNewAmt != null">
+        CREDIT_CARD_NEW_AMT = #{creditCardNewAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="oneMonthCount != null">
+        ONE_MONTH_COUNT = #{oneMonthCount,jdbcType=DECIMAL},
+      </if>
+      <if test="toolsCount != null">
+        TOOLS_COUNT = #{toolsCount,jdbcType=DECIMAL},
+      </if>
+      <if test="checkStatus != null">
+        CHECK_STATUS = #{checkStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="pretestAmt != null">
+        PRETEST_AMT = #{pretestAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="shouldAmt != null">
+        SHOULD_AMT = #{shouldAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="chargeAmt != null">
+        CHARGE_AMT = #{chargeAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="lastMonthAmt != null">
+        LAST_MONTH_AMT = #{lastMonthAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="rev1 != null">
+        REV1 = #{rev1,jdbcType=VARCHAR},
+      </if>
+      <if test="rev2 != null">
+        REV2 = #{rev2,jdbcType=VARCHAR},
+      </if>
+      <if test="pretestKAmt != null">
+        PRETEST_K_AMT = #{pretestKAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="shouldKAmt != null">
+        SHOULD_K_AMT = #{shouldKAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="notAmt != null">
+        NOT_AMT = #{notAmt,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.PosKickBackReward">
+    update P_POS_KICKBACK_REWARD
+    set BUS_NAME = #{busName,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      REWARD_TYPE = #{rewardType,jdbcType=VARCHAR},
+      PRETEAST_CYCLE = #{preteastCycle,jdbcType=VARCHAR},
+      CHECK_MONTH = #{checkMonth,jdbcType=VARCHAR},
+      CREDIT_CARD_NEW_AMT = #{creditCardNewAmt,jdbcType=DECIMAL},
+      ONE_MONTH_COUNT = #{oneMonthCount,jdbcType=DECIMAL},
+      TOOLS_COUNT = #{toolsCount,jdbcType=DECIMAL},
+      CHECK_STATUS = #{checkStatus,jdbcType=VARCHAR},
+      PRETEST_AMT = #{pretestAmt,jdbcType=DECIMAL},
+      SHOULD_AMT = #{shouldAmt,jdbcType=DECIMAL},
+      CHARGE_AMT = #{chargeAmt,jdbcType=DECIMAL},
+      LAST_MONTH_AMT = #{lastMonthAmt,jdbcType=DECIMAL},
+      REV1 = #{rev1,jdbcType=VARCHAR},
+      REV2 = #{rev2,jdbcType=VARCHAR},
+      PRETEST_K_AMT = #{pretestKAmt,jdbcType=DECIMAL},
+      SHOULD_K_AMT = #{shouldKAmt,jdbcType=DECIMAL},
+      NOT_AMT = #{notAmt,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from (
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+
+
+
+
+
+
+  <!--========================================================以前代码自动生成================================================================-->
+
+
+
+
+  <select id="posKickbackRewardPageListCount" parameterType="java.util.Map" resultType="java.lang.Long">
+    SELECT COUNT(1)
+    from P_POS_KICKBACK_REWARD
+    where 1=1
+    <if test="AGENT_ID != null and AGENT_ID !='' "> and AGENT_ID = #{AGENT_ID} </if>
+    <if test="AGENT_NAME != null and AGENT_NAME !='' "> and AGENT_NAME = #{AGENT_NAME} </if>
+    <if test="REV1 != null and REV1 !='' "> and REV1 = #{REV1} </if>
+    <if test="BUS_NAME != null and BUS_NAME !='' "> and BUS_NAME = #{BUS_NAME} </if>
+    <if test="CHECK_STATUS != null and CHECK_STATUS !='' "> and CHECK_STATUS = #{CHECK_STATUS} </if>
+  </select>
+
+
+  <select id="posKickbackRewardPageList" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="PAGING_START" />
+    SELECT
+    <include refid="Base_Column_List" />
+    from P_POS_KICKBACK_REWARD
+    where 1=1
+    <if test="AGENT_ID != null and AGENT_ID !='' "> and AGENT_ID = #{AGENT_ID} </if>
+    <if test="AGENT_NAME != null and AGENT_NAME !='' "> and AGENT_NAME = #{AGENT_NAME} </if>
+    <if test="REV1 != null and REV1 !='' "> and REV1 = #{REV1} </if>
+    <if test="BUS_NAME != null and BUS_NAME !='' "> and BUS_NAME = #{BUS_NAME} </if>
+    <if test="CHECK_STATUS != null and CHECK_STATUS !='' "> and CHECK_STATUS = #{CHECK_STATUS} </if>
+
+    <include refid="PAGING_END" />
+  </select>
+
+  <sql id="PAGING_START">
+    <if test="begin != null  and end != null and end &gt;0">
+      SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
+    </if>
+  </sql>
+  <sql id="PAGING_END">
+    <if test="begin != null  and end != null and end &gt;0">
+      ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN &gt; #{begin}
+    </if>
+  </sql>
+
+
+
+  <select id="queryBusName" resultType="java.util.Map">
+
+   select distinct BUS_NAME from P_POS_KICKBACK_REWARD
+  </select>
+
+
+</mapper>
