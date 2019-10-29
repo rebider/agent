@@ -850,7 +850,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
      * @param reqMap
      * @return
      */
-    @Autowired
+    @Override
     public AgentResult queryCardProfit(Map<String,Object> reqMap){
         log.info("查询分润抵扣流量卡数据,请求参数:{}",reqMap);
         AgentResult agentResult = AgentResult.fail();
