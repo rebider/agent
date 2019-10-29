@@ -217,8 +217,8 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
         //查询所有有效的账号
         CBranchInnerExample example = new CBranchInnerExample();
         CBranchInnerExample.Criteria criteria = example.or();
-        if (null != param.get("branchName") && !"".equals(param.get("branchName")))
-            criteria.andBranchLoginLike(((String) param.get("branchName")));
+        if (null != param.get("branchId") && !"".equals(param.get("branchId")))
+            criteria.andBranchLoginEqualTo(((String) param.get("branchId")));
         if (null != param.get("innerLogin") && !"".equals(param.get("innerLogin")))
             criteria.andInnerLoginLike((String) param.get("innerLogin"));
 
