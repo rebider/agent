@@ -178,9 +178,11 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
             resultMap.put("actBusId",agentBusInfo.getBusActivationParent());
             resultMap.put("actBusNum",actBudinfo.getBusNum());
         }
-        //查询关联关系
-        resultMap.put("managerAccount", branchInnerMapper.selectInnerLogin(FastMap.fastMap("status", Status.STATUS_1.status).putKeyV("busId", agentBusInfo.getId())));
-        resultMap.put("delManagerAccount",branchInnerMapper.selectInnerLogin(FastMap.fastMap("status", Status.STATUS_2.status).putKeyV("busId", agentBusInfo.getId())));
+        //查询相关联的大区经理账号
+        List accList = branchInnerMapper.selectInnerLogin(FastMap.fastMap("status", Status.STATUS_1.status).putKeyV("busId", agentBusInfo.getId()));
+        List delList = branchInnerMapper.selectInnerLogin(FastMap.fastMap("status", Status.STATUS_2.status).putKeyV("busId", agentBusInfo.getId()));
+        resultMap.put("managerAccount", String.join(",", accList));
+        resultMap.put("delManagerAccount", String.join(",", delList));
         return resultMap;
     }
 
