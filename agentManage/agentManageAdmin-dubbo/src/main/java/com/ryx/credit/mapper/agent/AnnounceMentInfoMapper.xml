@@ -459,7 +459,11 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
     on a.ann_id = ri.ann_id and ri.READ_USER_ID = #{map.userId}
     left join c_organization c
     on c.id = a.pub_org
+    left join c_user cu
+    on cu.id = #{map.userId}
     <where>
+        a.pub_tm &gt;= cu.CREATE_TIME
+        and a.ANNO_STAT = '1'
         <if test="map.busTypes !=null and map.busTypes.size > 0">
             exists (select  ap.anno_id
             from a_anno_platform_rela ap
@@ -508,7 +512,6 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
                 1!=1
             </otherwise>
         </choose>-->
-        and a.ANNO_STAT = '1'
         <if test="map.annType!=null and map.annType!=''">
             and a.ann_type = #{map.annType}
         </if>
