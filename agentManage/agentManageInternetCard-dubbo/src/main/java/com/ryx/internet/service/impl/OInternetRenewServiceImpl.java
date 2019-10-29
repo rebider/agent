@@ -844,4 +844,42 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         return AgentResult.ok(list);
     }
 
+
+    /**
+     * 查询分润抵扣流量卡数据，提供给分润系统
+     * @param reqMap
+     * @return
+     */
+    @Autowired
+    public AgentResult queryCardProfit(Map<String,Object> reqMap){
+        log.info("查询分润抵扣流量卡数据,请求参数:{}",reqMap);
+        AgentResult agentResult = AgentResult.fail();
+        String month = String.valueOf(reqMap.get("month"));
+        if(StringUtils.isBlank(month) || month.equals("null")){
+            agentResult.setMsg("缺少月份");
+            return agentResult;
+        }
+        Set<String> agentList = (Set<String>) reqMap.get("agentIdList");
+        if(null==agentList){
+            agentResult.setMsg("缺少代理商编号");
+            return agentResult;
+        }
+        if(agentList.size()==0){
+            agentResult.setMsg("缺少代理商编号");
+            return agentResult;
+        }
+        List<String> renewStatusList = new ArrayList<>();
+        renewStatusList.add(InternetRenewStatus.BFXF.getValue());
+        renewStatusList.add(InternetRenewStatus.XFZ.getValue());
+        reqMap.put("renewStatusList",renewStatusList);
+        List<Map<String, Object>> list = internetRenewDetailMapper.queryCardProfit(reqMap);
+        if(list.size()==0){
+            agentResult.setMsg("暂无代理商数据");
+            log.info("查询分润抵扣流量卡数据,,返回参数1:{}",agentResult.toString());
+            return agentResult;
+        }
+        log.info("查询分润抵扣流量卡数据,,返回参数2:{}",JsonUtil.objectToJson(AgentResult.ok(list)));
+        return AgentResult.ok(list);
+    }
+
 }
