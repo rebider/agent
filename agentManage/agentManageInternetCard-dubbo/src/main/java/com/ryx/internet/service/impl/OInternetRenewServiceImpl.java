@@ -90,7 +90,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
 
 
     @Override
-    public PageInfo internetRenewList(OInternetRenew internetRenew, Page page,String agentId){
+    public PageInfo internetRenewList(OInternetRenew internetRenew, Page page,String agentId,Long userId){
 
         OInternetRenewExample internetRenewExample = new OInternetRenewExample();
         OInternetRenewExample.Criteria criteria = internetRenewExample.createCriteria();
@@ -109,7 +109,11 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }else if(StringUtils.isNotBlank(internetRenew.getAgentId())){
             criteria.andAgentIdEqualTo(internetRenew.getAgentId());
         }
-        if(StringUtils.isNotBlank(internetRenew.getAgentName())){
+        //内部人员根据名称查询指定流量卡
+        List<String> agentNameList = dictOptionsService.getAgentNameList(userId);
+        if(agentNameList.size()!=0) {
+            criteria.andAgentNameIn(agentNameList);
+        }else if(StringUtils.isNotBlank(internetRenew.getAgentName())){
             criteria.andAgentNameLike("%"+internetRenew.getAgentName()+"%");
         }
         criteria.andStatusEqualTo(Status.STATUS_1.status);
@@ -129,9 +133,9 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     }
 
     @Override
-    public PageInfo internetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page,String agentId){
+    public PageInfo internetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page,String agentId,Long userId){
 
-        OInternetRenewDetailExample internetRenewDetailExample = queryParam(internetRenewDetail,agentId);
+        OInternetRenewDetailExample internetRenewDetailExample = queryParam(internetRenewDetail,agentId,userId);
         internetRenewDetailExample.setPage(page);
         List<OInternetRenewDetail> internetRenewDetails = internetRenewDetailMapper.selectByExample(internetRenewDetailExample);
         for (OInternetRenewDetail renewDetail : internetRenewDetails) {
@@ -147,16 +151,16 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     }
 
     @Override
-    public List<OInternetRenewDetail> queryInternetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page,String agentId){
-        OInternetRenewDetailExample oInternetRenewDetailExample = queryParam(internetRenewDetail,agentId);
+    public List<OInternetRenewDetail> queryInternetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page,String agentId,Long userId){
+        OInternetRenewDetailExample oInternetRenewDetailExample = queryParam(internetRenewDetail,agentId,userId);
         oInternetRenewDetailExample.setPage(page);
         List<OInternetRenewDetail> internetRenewDetailList = internetRenewDetailMapper.selectByExample(oInternetRenewDetailExample);
         return internetRenewDetailList;
     }
 
     @Override
-    public Integer queryInternetRenewDetailCount(OInternetRenewDetail internetRenewDetail,String agentId){
-        OInternetRenewDetailExample oInternetRenewDetailExample = queryParam(internetRenewDetail,agentId);
+    public Integer queryInternetRenewDetailCount(OInternetRenewDetail internetRenewDetail,String agentId,Long userId){
+        OInternetRenewDetailExample oInternetRenewDetailExample = queryParam(internetRenewDetail,agentId,userId);
         Integer count = Integer.valueOf((int)internetRenewDetailMapper.countByExample(oInternetRenewDetailExample));
         return count;
     }
@@ -166,7 +170,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
      * @param internetRenewDetail
      * @return
      */
-    private OInternetRenewDetailExample queryParam(OInternetRenewDetail internetRenewDetail,String agentId){
+    private OInternetRenewDetailExample queryParam(OInternetRenewDetail internetRenewDetail,String agentId,Long userId){
 
         OInternetRenewDetailExample internetRenewDetailExample = new OInternetRenewDetailExample();
         OInternetRenewDetailExample.Criteria criteria = internetRenewDetailExample.createCriteria();
@@ -176,7 +180,11 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }else if(StringUtils.isNotBlank(internetRenewDetail.getAgentId())){
             criteria.andAgentIdEqualTo(internetRenewDetail.getAgentId());
         }
-        if(StringUtils.isNotBlank(internetRenewDetail.getAgentName())){
+        //内部人员根据名称查询指定流量卡
+        List<String> agentNameList = dictOptionsService.getAgentNameList(userId);
+        if(agentNameList.size()!=0) {
+            criteria.andAgentNameIn(agentNameList);
+        }else if(StringUtils.isNotBlank(internetRenewDetail.getAgentName())){
             criteria.andAgentNameLike("%"+internetRenewDetail.getAgentName()+"%");
         }
         if(StringUtils.isNotBlank(internetRenewDetail.getIccidNum())){
@@ -875,10 +883,10 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         List<Map<String, Object>> list = internetRenewDetailMapper.queryCardProfit(reqMap);
         if(list.size()==0){
             agentResult.setMsg("暂无代理商数据");
-            log.info("查询分润抵扣流量卡数据,,返回参数1:{}",agentResult.toString());
+            log.info("查询分润抵扣流量卡数据,返回参数1:{}",agentResult.toString());
             return agentResult;
         }
-        log.info("查询分润抵扣流量卡数据,,返回参数2:{}",JsonUtil.objectToJson(AgentResult.ok(list)));
+        log.info("查询分润抵扣流量卡数据,返回参数2:{}",JsonUtil.objectToJson(AgentResult.ok(list)));
         return AgentResult.ok(list);
     }
 

@@ -24,9 +24,9 @@ import java.util.Map;
  **/
 public interface OInternetRenewService {
 
-    PageInfo internetRenewList(OInternetRenew internetRenew, Page page,String agentId);
+    PageInfo internetRenewList(OInternetRenew internetRenew, Page page,String agentId,Long userId);
 
-    PageInfo internetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page,String agentId);
+    PageInfo internetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page,String agentId,Long userId);
 
     PageInfo internetRenewOffsetList(InternetRenewOffset internetRenewOffset, Page page, String agentId);
 
@@ -43,9 +43,9 @@ public interface OInternetRenewService {
 
     AgentResult compressCompensateActivity(String proIns, BigDecimal agStatus)throws Exception;
 
-    List<OInternetRenewDetail> queryInternetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page,String agentId);
+    List<OInternetRenewDetail> queryInternetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page,String agentId,Long userId);
 
-    Integer queryInternetRenewDetailCount(OInternetRenewDetail internetRenewDetail,String agentId);
+    Integer queryInternetRenewDetailCount(OInternetRenewDetail internetRenewDetail,String agentId,Long userId);
 
     void renewVerify(String iccidNumIds)throws MessageException;
 
