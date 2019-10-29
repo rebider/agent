@@ -40,7 +40,9 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
     private CUserRoleMapper userRoleMapper;
     @Autowired
     private AgentMapper agentMapper;
-    
+    @Autowired
+    private IBranchInnerConnectionService branchInnerConnectionService;
+
     @Override
     public List<CUser> selectByLoginName(UserVo userVo) {
         CUser user = new CUser();
@@ -55,7 +57,8 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
     }
 
     @Override
-    public void insertByVo(UserVo userVo) {
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public void insertByVo(UserVo userVo, Map<String, String> innerParam) throws Exception{
         CUser user = BeanUtils.copy(userVo, CUser.class);
         user.setCreateTime(new Date());
         this.insert(user);
@@ -67,6 +70,17 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
             userRole.setUserId(userVoNew.getId());
             userRole.setRoleId(Long.valueOf(string));
             userRoleMapper.insert(userRole);
+        }
+        //建立内管账号
+        if (null != innerParam.get("innerType") && "true".equals(innerParam.get("innerType"))) {
+            try {
+                Map<String, Object> retMap = branchInnerConnectionService.buildInnerAccout(userVo, FastMap.fastMap("innerPwd",innerParam.get("innerPwd")));
+                if (!("1".equals(retMap.get("code"))))
+                    throw new Exception(null != retMap.get("msg") ? (String) retMap.get("msg") : "内管添加账号失败！");
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw e;
+            }
         }
     }
 

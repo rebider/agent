@@ -43,4 +43,9 @@ public interface COrganizationMapper extends BaseMapper<COrganization> {
     List<String> selectSubOrg(List<String> orgs);
 
     List<COrganization> selectMaintainOrg();
+    /**
+     * 查询所有的省区
+     * @return
+     */
+    List<Map<String, String>> selectBranchList();
 }
