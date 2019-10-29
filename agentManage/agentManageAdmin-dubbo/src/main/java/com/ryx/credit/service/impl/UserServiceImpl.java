@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.commons.utils.JsonUtils;
@@ -18,9 +19,12 @@ import com.ryx.credit.pojo.admin.CUserRole;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.vo.UserVo;
+import com.ryx.credit.service.IBranchInnerConnectionService;
 import com.ryx.credit.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
@@ -212,6 +216,10 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
         }
         userVo.setRoleIds(roleIds);
         userVo.setLoginName(userVo.getLoginName()+"1");
-        insertByVo(userVo);
+        try {
+            insertByVo(userVo, new HashMap<>());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
