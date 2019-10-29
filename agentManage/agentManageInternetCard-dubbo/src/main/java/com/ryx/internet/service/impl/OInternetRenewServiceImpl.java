@@ -480,7 +480,8 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 oInternetRenewDetail.setExpireTime(oInternetCard.getExpireTime());
                 if(internetRenew.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())
                  || internetRenew.getRenewWay().equals(InternetRenewWay.GSCDGC.getValue())){
-                    if(StringUtils.isBlank(oInternetCard.getMerId()) || StringUtils.isBlank(oInternetCard.getMerName())  ){
+                    if(StringUtils.isBlank(oInternetCard.getMerId()) || StringUtils.isBlank(oInternetCard.getMerName()) ||
+                       oInternetCard.getMerId().equals("无") || oInternetCard.getMerName().equals("无")){
                         throw new MessageException("第"+i+"个商户信息不全,轧差商户方式必须包含商户信息");
                     }
                 }
