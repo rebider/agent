@@ -1,6 +1,6 @@
 package com.ryx.credit.service;
 import com.ryx.credit.common.util.PageInfo;
-import org.apache.kafka.common.protocol.types.Field;
+import com.ryx.credit.pojo.admin.vo.UserVo;
 
 import java.util.List;
 import java.util.Map;
@@ -32,15 +32,22 @@ public interface IBranchInnerConnectionService {
 
     /**
      * 解除和内管的关联关系
-     * @param ids
+     * @param id
      * @return
      */
-    Map<String, Object> removeBranchInnerConnectio(List<String> ids);
+    Map<String, Object> removeBranchInnerConnection(String id);
 
     /**
      * 关联操作
      * @param str
      * @return
      */
-    Map<String, Object> branchConnectionInner(String str) throws Exception;
+    Map<String, Object> branchConnectionInner(String str, Long userId) throws Exception;
+
+    /**
+     * 内管账号的建立
+     * @param userVo
+     * @return
+     */
+    Map<String, Object> buildInnerAccout(UserVo userVo, Map<String, String> param) throws Exception;
 }

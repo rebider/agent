@@ -59,5 +59,13 @@
         and c.id = #{cUser}
     </select>
 
+    <select id="selectBranchList" resultType="map">
+        SELECT
+            C.ID,C.NAME
+        FROM
+            C_ORGANIZATION C
+        WHERE
+            regexp_like (C.CODE, 'region_[a-z|A-Z]+_\d+_*')
+    </select>
 
 </mapper>

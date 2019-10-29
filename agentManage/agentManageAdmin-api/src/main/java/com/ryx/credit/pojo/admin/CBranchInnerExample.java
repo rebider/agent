@@ -1,6 +1,7 @@
 package com.ryx.credit.pojo.admin;
 
 import com.ryx.credit.common.util.Page;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -207,143 +208,143 @@ public class CBranchInnerExample {
             return (Criteria) this;
         }
 
-        public Criteria andBranchIdIsNull() {
-            addCriterion("BRANCH_ID is null");
+        public Criteria andBranchLoginIsNull() {
+            addCriterion("BRANCH_LOGIN is null");
             return (Criteria) this;
         }
 
-        public Criteria andBranchIdIsNotNull() {
-            addCriterion("BRANCH_ID is not null");
+        public Criteria andBranchLoginIsNotNull() {
+            addCriterion("BRANCH_LOGIN is not null");
             return (Criteria) this;
         }
 
-        public Criteria andBranchIdEqualTo(String value) {
-            addCriterion("BRANCH_ID =", value, "branchId");
+        public Criteria andBranchLoginEqualTo(String value) {
+            addCriterion("BRANCH_LOGIN =", value, "branchLogin");
             return (Criteria) this;
         }
 
-        public Criteria andBranchIdNotEqualTo(String value) {
-            addCriterion("BRANCH_ID <>", value, "branchId");
+        public Criteria andBranchLoginNotEqualTo(String value) {
+            addCriterion("BRANCH_LOGIN <>", value, "branchLogin");
             return (Criteria) this;
         }
 
-        public Criteria andBranchIdGreaterThan(String value) {
-            addCriterion("BRANCH_ID >", value, "branchId");
+        public Criteria andBranchLoginGreaterThan(String value) {
+            addCriterion("BRANCH_LOGIN >", value, "branchLogin");
             return (Criteria) this;
         }
 
-        public Criteria andBranchIdGreaterThanOrEqualTo(String value) {
-            addCriterion("BRANCH_ID >=", value, "branchId");
+        public Criteria andBranchLoginGreaterThanOrEqualTo(String value) {
+            addCriterion("BRANCH_LOGIN >=", value, "branchLogin");
             return (Criteria) this;
         }
 
-        public Criteria andBranchIdLessThan(String value) {
-            addCriterion("BRANCH_ID <", value, "branchId");
+        public Criteria andBranchLoginLessThan(String value) {
+            addCriterion("BRANCH_LOGIN <", value, "branchLogin");
             return (Criteria) this;
         }
 
-        public Criteria andBranchIdLessThanOrEqualTo(String value) {
-            addCriterion("BRANCH_ID <=", value, "branchId");
+        public Criteria andBranchLoginLessThanOrEqualTo(String value) {
+            addCriterion("BRANCH_LOGIN <=", value, "branchLogin");
             return (Criteria) this;
         }
 
-        public Criteria andBranchIdLike(String value) {
-            addCriterion("BRANCH_ID like", value, "branchId");
+        public Criteria andBranchLoginLike(String value) {
+            addCriterion("BRANCH_LOGIN like", value, "branchLogin");
             return (Criteria) this;
         }
 
-        public Criteria andBranchIdNotLike(String value) {
-            addCriterion("BRANCH_ID not like", value, "branchId");
+        public Criteria andBranchLoginNotLike(String value) {
+            addCriterion("BRANCH_LOGIN not like", value, "branchLogin");
             return (Criteria) this;
         }
 
-        public Criteria andBranchIdIn(List<String> values) {
-            addCriterion("BRANCH_ID in", values, "branchId");
+        public Criteria andBranchLoginIn(List<String> values) {
+            addCriterion("BRANCH_LOGIN in", values, "branchLogin");
             return (Criteria) this;
         }
 
-        public Criteria andBranchIdNotIn(List<String> values) {
-            addCriterion("BRANCH_ID not in", values, "branchId");
+        public Criteria andBranchLoginNotIn(List<String> values) {
+            addCriterion("BRANCH_LOGIN not in", values, "branchLogin");
             return (Criteria) this;
         }
 
-        public Criteria andBranchIdBetween(String value1, String value2) {
-            addCriterion("BRANCH_ID between", value1, value2, "branchId");
+        public Criteria andBranchLoginBetween(String value1, String value2) {
+            addCriterion("BRANCH_LOGIN between", value1, value2, "branchLogin");
             return (Criteria) this;
         }
 
-        public Criteria andBranchIdNotBetween(String value1, String value2) {
-            addCriterion("BRANCH_ID not between", value1, value2, "branchId");
+        public Criteria andBranchLoginNotBetween(String value1, String value2) {
+            addCriterion("BRANCH_LOGIN not between", value1, value2, "branchLogin");
             return (Criteria) this;
         }
 
-        public Criteria andInnerIsNull() {
-            addCriterion("INNER is null");
+        public Criteria andInnerLoginIsNull() {
+            addCriterion("INNER_LOGIN is null");
             return (Criteria) this;
         }
 
-        public Criteria andInnerIsNotNull() {
-            addCriterion("INNER is not null");
+        public Criteria andInnerLoginIsNotNull() {
+            addCriterion("INNER_LOGIN is not null");
             return (Criteria) this;
         }
 
-        public Criteria andInnerEqualTo(String value) {
-            addCriterion("INNER =", value, "inner");
+        public Criteria andInnerLoginEqualTo(String value) {
+            addCriterion("INNER_LOGIN =", value, "innerLogin");
             return (Criteria) this;
         }
 
-        public Criteria andInnerNotEqualTo(String value) {
-            addCriterion("INNER <>", value, "inner");
+        public Criteria andInnerLoginNotEqualTo(String value) {
+            addCriterion("INNER_LOGIN <>", value, "innerLogin");
             return (Criteria) this;
         }
 
-        public Criteria andInnerGreaterThan(String value) {
-            addCriterion("INNER >", value, "inner");
+        public Criteria andInnerLoginGreaterThan(String value) {
+            addCriterion("INNER_LOGIN >", value, "innerLogin");
             return (Criteria) this;
         }
 
-        public Criteria andInnerGreaterThanOrEqualTo(String value) {
-            addCriterion("INNER >=", value, "inner");
+        public Criteria andInnerLoginGreaterThanOrEqualTo(String value) {
+            addCriterion("INNER_LOGIN >=", value, "innerLogin");
             return (Criteria) this;
         }
 
-        public Criteria andInnerLessThan(String value) {
-            addCriterion("INNER <", value, "inner");
+        public Criteria andInnerLoginLessThan(String value) {
+            addCriterion("INNER_LOGIN <", value, "innerLogin");
             return (Criteria) this;
         }
 
-        public Criteria andInnerLessThanOrEqualTo(String value) {
-            addCriterion("INNER <=", value, "inner");
+        public Criteria andInnerLoginLessThanOrEqualTo(String value) {
+            addCriterion("INNER_LOGIN <=", value, "innerLogin");
             return (Criteria) this;
         }
 
-        public Criteria andInnerLike(String value) {
-            addCriterion("INNER like", value, "inner");
+        public Criteria andInnerLoginLike(String value) {
+            addCriterion("INNER_LOGIN like", value, "innerLogin");
             return (Criteria) this;
         }
 
-        public Criteria andInnerNotLike(String value) {
-            addCriterion("INNER not like", value, "inner");
+        public Criteria andInnerLoginNotLike(String value) {
+            addCriterion("INNER_LOGIN not like", value, "innerLogin");
             return (Criteria) this;
         }
 
-        public Criteria andInnerIn(List<String> values) {
-            addCriterion("INNER in", values, "inner");
+        public Criteria andInnerLoginIn(List<String> values) {
+            addCriterion("INNER_LOGIN in", values, "innerLogin");
             return (Criteria) this;
         }
 
-        public Criteria andInnerNotIn(List<String> values) {
-            addCriterion("INNER not in", values, "inner");
+        public Criteria andInnerLoginNotIn(List<String> values) {
+            addCriterion("INNER_LOGIN not in", values, "innerLogin");
             return (Criteria) this;
         }
 
-        public Criteria andInnerBetween(String value1, String value2) {
-            addCriterion("INNER between", value1, value2, "inner");
+        public Criteria andInnerLoginBetween(String value1, String value2) {
+            addCriterion("INNER_LOGIN between", value1, value2, "innerLogin");
             return (Criteria) this;
         }
 
-        public Criteria andInnerNotBetween(String value1, String value2) {
-            addCriterion("INNER not between", value1, value2, "inner");
+        public Criteria andInnerLoginNotBetween(String value1, String value2) {
+            addCriterion("INNER_LOGIN not between", value1, value2, "innerLogin");
             return (Criteria) this;
         }
 
@@ -674,6 +675,76 @@ public class CBranchInnerExample {
 
         public Criteria andCUserNameNotBetween(String value1, String value2) {
             addCriterion("C_USER_NAME not between", value1, value2, "cUserName");
+            return (Criteria) this;
+        }
+
+        public Criteria andInnerNameIsNull() {
+            addCriterion("INNER_NAME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andInnerNameIsNotNull() {
+            addCriterion("INNER_NAME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andInnerNameEqualTo(String value) {
+            addCriterion("INNER_NAME =", value, "innerName");
+            return (Criteria) this;
+        }
+
+        public Criteria andInnerNameNotEqualTo(String value) {
+            addCriterion("INNER_NAME <>", value, "innerName");
+            return (Criteria) this;
+        }
+
+        public Criteria andInnerNameGreaterThan(String value) {
+            addCriterion("INNER_NAME >", value, "innerName");
+            return (Criteria) this;
+        }
+
+        public Criteria andInnerNameGreaterThanOrEqualTo(String value) {
+            addCriterion("INNER_NAME >=", value, "innerName");
+            return (Criteria) this;
+        }
+
+        public Criteria andInnerNameLessThan(String value) {
+            addCriterion("INNER_NAME <", value, "innerName");
+            return (Criteria) this;
+        }
+
+        public Criteria andInnerNameLessThanOrEqualTo(String value) {
+            addCriterion("INNER_NAME <=", value, "innerName");
+            return (Criteria) this;
+        }
+
+        public Criteria andInnerNameLike(String value) {
+            addCriterion("INNER_NAME like", value, "innerName");
+            return (Criteria) this;
+        }
+
+        public Criteria andInnerNameNotLike(String value) {
+            addCriterion("INNER_NAME not like", value, "innerName");
+            return (Criteria) this;
+        }
+
+        public Criteria andInnerNameIn(List<String> values) {
+            addCriterion("INNER_NAME in", values, "innerName");
+            return (Criteria) this;
+        }
+
+        public Criteria andInnerNameNotIn(List<String> values) {
+            addCriterion("INNER_NAME not in", values, "innerName");
+            return (Criteria) this;
+        }
+
+        public Criteria andInnerNameBetween(String value1, String value2) {
+            addCriterion("INNER_NAME between", value1, value2, "innerName");
+            return (Criteria) this;
+        }
+
+        public Criteria andInnerNameNotBetween(String value1, String value2) {
+            addCriterion("INNER_NAME not between", value1, value2, "innerName");
             return (Criteria) this;
         }
     }

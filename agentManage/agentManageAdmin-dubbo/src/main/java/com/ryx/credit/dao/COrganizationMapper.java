@@ -31,4 +31,9 @@ public interface COrganizationMapper extends BaseMapper<COrganization> {
      */
     List<COrganization> selectCityRegion(@Param("cUser") Long cUser);
 
+    /**
+     * 查询所有的省区
+     * @return
+     */
+    List<Map<String, String>> selectBranchList();
 }

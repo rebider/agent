@@ -3,8 +3,9 @@
 <mapper namespace="com.ryx.credit.dao.CBranchInnerMapper">
     <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.CBranchInner">
         <id column="ID" jdbcType="VARCHAR" property="id" />
-        <result column="BRANCH_ID" jdbcType="VARCHAR" property="branchId" />
-        <result column="INNER" jdbcType="VARCHAR" property="inner" />
+        <result column="BRANCH_LOGIN" jdbcType="VARCHAR" property="branchLogin" />
+        <result column="INNER_LOGIN" jdbcType="VARCHAR" property="innerLogin" />
+        <result column="INNER_NAME" jdbcType="VARCHAR" property="innerName" />
         <result column="C_USER_ID" jdbcType="VARCHAR" property="cUserId" />
         <result column="BRANCH_NAME" jdbcType="VARCHAR" property="branchName" />
         <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
@@ -51,7 +52,7 @@
         </where>
     </sql>
     <sql id="Base_Column_List">
-        ID, BRANCH_ID, INNER, C_USER_ID, BRANCH_NAME, to_char(C_TIME,'YYYY-MM-DD') AS C_TIME, STATUS, C_USER_NAME
+        ID, BRANCH_LOGIN, INNER_NAME, INNER_LOGIN, C_USER_ID, BRANCH_NAME, to_char(C_TIME,'YYYY-MM-DD') AS C_TIME, STATUS, C_USER_NAME
     </sql>
     <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.CBranchInnerExample" resultType="map">
         <include refid="OracleDialectPrefix" />
@@ -82,10 +83,8 @@
         </if>
     </delete>
     <insert id="insert" parameterType="com.ryx.credit.pojo.admin.CBranchInner">
-    insert into C_BRANCH_INNER (ID, BRANCH_ID, INNER,
-      C_USER_ID, BRANCH_NAME, C_TIME,
-      STATUS, C_USER_NAME)
-    values (#{id,jdbcType=VARCHAR}, #{branchId,jdbcType=VARCHAR}, #{inner,jdbcType=VARCHAR},
+    insert into C_BRANCH_INNER (ID, BRANCH_LOGIN, INNER_NAME, INNER_LOGIN, C_USER_ID, BRANCH_NAME, C_TIME, STATUS, C_USER_NAME)
+    values (#{id,jdbcType=VARCHAR}, #{branchLogin,jdbcType=VARCHAR}, #{innerName,jdbcType=VARCHAR}, #{innerLogin,jdbcType=VARCHAR},
       #{cUserId,jdbcType=VARCHAR}, #{branchName,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP},
       #{status,jdbcType=DECIMAL}, #{cUserName,jdbcType=VARCHAR})
     </insert>
@@ -189,15 +188,41 @@
         where ID = #{id,jdbcType=VARCHAR}
     </update>
 
-    <select id="selectInnerByIds" parameterType="list" resultType="string">
+    <delete id="deleteInnerByIds" parameterType="list">
+        DELETE FROM
+            C_BRANCH_INNER
+        WHERE
+            ID = #{id, jdbcType=VARCHAR}
+    </delete>
+
+    <select id="countByIdforUpdate" parameterType="string" resultType="int">
         SELECT
-	        INNER
+            COUNT( * )
         FROM
             C_BRANCH_INNER
         WHERE
-            ID IN
-            <foreach item="id" collection="ids" open="(" separator="," close=")" >
-                #{id, jdbcType=VARCHAR}
-            </foreach>
+            INNER_LOGIN = ( SELECT INNER_LOGIN FROM C_BRANCH_INNER WHERE ID = #{id,jdbcType=VARCHAR} )
+            AND BRANCH_LOGIN = ( SELECT BRANCH_LOGIN FROM C_BRANCH_INNER WHERE ID = #{id,jdbcType=VARCHAR} )
+            AND STATUS = '2'
+    </select>
+
+    <update id="updateByPrimaryId" parameterType="string">
+        UPDATE
+            C_BRANCH_INNER
+        SET
+            STATUS = 2
+        WHERE
+            ID = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectInnerLogin" parameterType="map" resultType="string">
+        SELECT
+            CBI.inner_login
+        FROM
+            C_BRANCH_INNER CBI
+            LEFT JOIN A_AGENT_BUSINFO AAB ON AAB.AG_DOC_PRO = CBI.branch_login
+        WHERE
+            CBI.STATUS = #{status,jdbcType=DECIMAL},
+            AND AAB.ID = #{busId,jdbcType=VARCHAR}
     </select>
 </mapper>

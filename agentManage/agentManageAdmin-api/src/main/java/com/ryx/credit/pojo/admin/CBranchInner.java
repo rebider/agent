@@ -1,19 +1,26 @@
 package com.ryx.credit.pojo.admin;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class CBranchInner implements Serializable {
-
+public class CBranchInner {
     private String id;
-    private String branchId;
-    private String inner;
+
+    private String branchLogin;
+
+    private String innerLogin;
+
     private String cUserId;
+
     private String branchName;
+
     private Date cTime;
+
     private BigDecimal status;
+
     private String cUserName;
+
+    private String innerName;
 
     public String getId() {
         return id;
@@ -23,20 +30,20 @@ public class CBranchInner implements Serializable {
         this.id = id == null ? null : id.trim();
     }
 
-    public String getBranchId() {
-        return branchId;
+    public String getBranchLogin() {
+        return branchLogin;
     }
 
-    public void setBranchId(String branchId) {
-        this.branchId = branchId == null ? null : branchId.trim();
+    public void setBranchLogin(String branchLogin) {
+        this.branchLogin = branchLogin == null ? null : branchLogin.trim();
     }
 
-    public String getInner() {
-        return inner;
+    public String getInnerLogin() {
+        return innerLogin;
     }
 
-    public void setInner(String inner) {
-        this.inner = inner == null ? null : inner.trim();
+    public void setInnerLogin(String innerLogin) {
+        this.innerLogin = innerLogin == null ? null : innerLogin.trim();
     }
 
     public String getcUserId() {
@@ -77,5 +84,13 @@ public class CBranchInner implements Serializable {
 
     public void setcUserName(String cUserName) {
         this.cUserName = cUserName == null ? null : cUserName.trim();
+    }
+
+    public String getInnerName() {
+        return innerName;
+    }
+
+    public void setInnerName(String innerName) {
+        this.innerName = innerName == null ? null : innerName.trim();
     }
 }

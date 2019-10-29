@@ -5,13 +5,28 @@ import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.Status;
 
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.FastMap;
+import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.agentUtil.AESUtil;
+import com.ryx.credit.common.util.agentUtil.RSAUtil;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.CBranchInnerMapper;
+import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.CUserMapper;
+import com.ryx.credit.machine.service.LmsUserService;
+import com.ryx.credit.pojo.admin.CBranchInner;
 import com.ryx.credit.pojo.admin.CBranchInnerExample;
+import com.ryx.credit.pojo.admin.COrganization;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.UserVo;
 import com.ryx.credit.service.IBranchInnerConnectionService;
+import com.ryx.credit.util.Constants;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +35,10 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.channels.SelectableChannel;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Author zhaoYd
@@ -40,83 +54,173 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
     private CBranchInnerMapper branchInnerMapper;
     @Autowired
     private CUserMapper userMapper;
+    @Autowired
+    private LmsUserService lmsUserService;
+    @Autowired
+    private COrganizationMapper organizationMapper;
 
     /**
      * 查询省区账号list
+     *
      * @return
      */
     @Override
     public List<Map<String, String>> queryBranchList() {
-        List<UserVo> branchList = userMapper.selectListByName("省区");
-        return null;
+        return organizationMapper.selectBranchList();
     }
 
     /**
-     * 查询内管账号
-     * @return
-     */
-    @Override
-    public List<Map<String, String>> queryinnerList() {
-        return null;
-    }
-
-    /**
-     * 批量解除关联关系
-     * @param ids
+     * 解除关联关系
+     *
+     * @param id
      * @return
      */
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
-    public Map<String, Object> removeBranchInnerConnectio(List<String> ids) {
+    public Map<String, Object> removeBranchInnerConnection(String id) {
+        int t = 0;
+        //先查询，查询账号是否存在状态为2的，
+        if (branchInnerMapper.countByIdforUpdate(id) == 1) {
+            //存在-删除(此数据)
+            t = branchInnerMapper.deleteInnerByIds(id);
+        } else {
+            //不存在-将状态更新成2
+            t = branchInnerMapper.updateByPrimaryId(id);
+        }
 
-        //查询关联关系表，查询内管账号
-        List<String> inners = branchInnerMapper.selectInnerByIds(ids);
-        //调用接口解除关联
-
-        //将本地的表中数据删除
-
-        return FastMap.fastMap("code", "").putKeyV("msg", "");
+        if (t == 1) {
+            return FastMap.fastMap("code", "1").putKeyV("msg", "删除成功");
+        } else {
+            return FastMap.fastMap("code", "2").putKeyV("msg", "删除失败");
+        }
     }
 
     /**
-     * 具体的关联操作
+     * 关联账号操作
+     *
      * @param str
      * @return
      */
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
-    public Map<String, Object> branchConnectionInner(String str) throws Exception {
+    public Map<String, Object> branchConnectionInner(String str, Long userId) throws Exception {
+        List<Map<String, String>> list = (List<Map<String, String>>) JSONArray.parse(str);
+        for (Map<String, String> map : list) {
+            //循环插入
+            CBranchInner cBranchInner = new CBranchInner();
+            cBranchInner.setcTime(Calendar.getInstance().getTime());
+            cBranchInner.setBranchLogin(map.get("branchId"));
+            COrganization branch = organizationMapper.selectByPrimaryKey(Integer.valueOf(map.get("branchId")));
+            cBranchInner.setBranchName(branch.getName());
+            cBranchInner.setId(StringUtils.getUUId());
+            cBranchInner.setStatus(Status.STATUS_1.status);
+            cBranchInner.setcUserId(userId + "");
+            cBranchInner.setcUserName(userMapper.selectUserVoById(userId).getName());
+            cBranchInner.setInnerLogin(map.get("innerLogin"));
+            cBranchInner.setInnerName(lmsUserService.queryByLogin(map.get("innerLogin")).getName());
+            branchInnerMapper.insert(cBranchInner);
+        }
+        return FastMap.fastMap("code", "1").putKeyV("msg", "关联成功");
+    }
 
-        JSONArray jsonArray = JSONArray.parseArray(str);
-
-        //检验数据是否符合关联
-
+    /**
+     * 新建立内管账号
+     *
+     * @param userVo
+     * @return
+     */
+    @Override
+    public Map<String, Object> buildInnerAccout(UserVo userVo, Map<String, String> param) throws Exception {
         try {
-            //调用内管账号进行关联
+            String cooperator = Constants.cooperator;
+            String tranCode = "ORG019"; // 交易码
+            String charset = "UTF-8"; // 字符集
+            String reqMsgId = UUID.randomUUID().toString().replace("-", ""); // 请求流水
+            String reqDate = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"); // 请求时间
 
-            //将关联成功的存储到数据库
-            return FastMap.fastMap("code", "1").putKeyV("msg", "关联成功");
-        }catch (Exception e){
+            JSONObject jsonParams = new JSONObject();
+            jsonParams.put("msgType", "01");
+            jsonParams.put("reqDate", reqDate);
+            jsonParams.put("version", "1.0.0");
+            jsonParams.put("data", FastMap.fastMap("loginname", userVo.getLoginName()).
+                    putKeyV("name", userVo.getName()).
+                    putKeyV("smsAuthSwitch", 0).
+                    putKeyV("phone", userVo.getPhone()).
+                    //putKeyV("referLoginname","").//省总权限参考登录账号,先不传
+                            putKeyV("password", null != param.get("innerPwd") ? param.get("innerPwd") : ""));
+            String plainXML = jsonParams.toString();
+            // 请求报文加密开始
+            String keyStr = AESUtil.getAESKey();
+            byte[] plainBytes = plainXML.getBytes(charset);
+            byte[] keyBytes = keyStr.getBytes(charset);
+            String encryptData = new String(Base64.encodeBase64((AESUtil.encrypt(plainBytes, keyBytes, "AES", "AES/ECB/PKCS5Padding", null))), charset);
+            String signData = new String(Base64.encodeBase64(RSAUtil.digitalSign(plainBytes, Constants.privateKey, "SHA1WithRSA")), charset);
+            String encrtptKey = new String(org.apache.commons.codec.binary.Base64.encodeBase64(RSAUtil.encrypt(keyBytes, Constants.publicKey, 2048, 11, "RSA/ECB/PKCS1Padding")), charset);
+
+            // 请求报文加密结束
+            Map<String, String> map = new HashMap<>();
+            map.put("encryptData", encryptData);
+            map.put("encryptKey", encrtptKey);
+            map.put("cooperator", cooperator);
+            map.put("signData", signData);
+            map.put("tranCode", tranCode);
+            map.put("reqMsgId", reqMsgId);
+            logger.info("内管账号建立请求加密参数:{}", map);
+            String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("agent_pos_notify_url"), map);
+            logger.info("内管账号建立返回加密参数:{}", map);
+            JSONObject jsonObject = JSONObject.parseObject(httpResult);
+            if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
+                logger.info("内管账号建立校验失败:{}", httpResult);
+                throw new Exception("内管账号建立校验失败");
+            } else {
+                String resEncryptData = jsonObject.getString("encryptData");
+                String resEncryptKey = jsonObject.getString("encryptKey");
+                byte[] decodeBase64KeyBytes = Base64.decodeBase64(resEncryptKey.getBytes(charset));
+                byte[] merchantAESKeyBytes = RSAUtil.decrypt(decodeBase64KeyBytes, Constants.privateKey, 2048, 11, "RSA/ECB/PKCS1Padding");
+                byte[] decodeBase64DataBytes = Base64.decodeBase64(resEncryptData.getBytes(charset));
+                byte[] merchantXmlDataBytes = AESUtil.decrypt(decodeBase64DataBytes, merchantAESKeyBytes, "AES", "AES/ECB/PKCS5Padding", null);
+                String respXML = new String(merchantXmlDataBytes, charset);
+                logger.info("内管账号建立返回解密参数:{}", respXML);
+
+                //报文验签
+                String resSignData = jsonObject.getString("signData");
+                byte[] signBytes = Base64.decodeBase64(resSignData);
+                if (!RSAUtil.verifyDigitalSign(respXML.getBytes(charset), signBytes, Constants.publicKey, "SHA1WithRSA")) {
+                    logger.info("签名验证失败");
+                    throw new MessageException("签名验证失败");
+                } else {
+                    logger.info("签名验证成功");
+                    JSONObject respXMLObj = JSONObject.parseObject(respXML);
+                    JSONObject retObj = JSONObject.parseObject(respXMLObj.getString("data"));
+                    if (null != retObj.get("result_code") && null != retObj.get("result_msg") && "0000".equals(retObj.get("result_code"))) {
+                        return FastMap.fastMap("code", "1").putKeyV("msg", "添加成功");
+                    } else {
+                        return FastMap.fastMap("code", "2").putKeyV("msg", "内管平台建立返回值异常！");
+                    }
+                }
+            }
+        } catch (Exception e) {
             e.printStackTrace();
-            return FastMap.fastMap("code", "2").putKeyV("msg", "关联失败，稍后再试");
+            throw e;
         }
     }
 
     /**
      * 分页查询数据
+     *
      * @param param
      * @param pageInfo
      * @return
      */
     @Override
-    public PageInfo queruAbleBranchInner(Map<String, Object> param, PageInfo pageInfo) throws Exception{
+    public PageInfo queruAbleBranchInner(Map<String, Object> param, PageInfo pageInfo) throws Exception {
         //查询所有有效的账号
         CBranchInnerExample example = new CBranchInnerExample();
         CBranchInnerExample.Criteria criteria = example.or();
         if (null != param.get("branchName") && !"".equals(param.get("branchName")))
-            criteria.andBranchNameLike((String) param.get("branchName"));
-        if (null != param.get("inner") && !"".equals(param.get("inner")))
-            criteria.andInnerEqualTo((String) param.get("inner"));
+            criteria.andBranchLoginLike(((String) param.get("branchName")));
+        if (null != param.get("innerLogin") && !"".equals(param.get("innerLogin")))
+            criteria.andInnerLoginLike((String) param.get("innerLogin"));
 
         //有开始时间，没有结束时间
         if (null != param.get("beginTime") && !"".equals(param.get("beginTime")) && (null == param.get("endTime") || "".equals(param.get("endTime"))))
@@ -125,11 +229,11 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
         if (null != param.get("endTime") && !"".equals(param.get("endTime")) && (null == param.get("beginTime") || "".equals(param.get("beginTime"))))
             criteria.andCTimeLessThanOrEqualTo((Date) param.get("endTime"));
         //有结束时间和开始时间
-        if (null != param.get("endTime") && !"".equals(param.get("endTime")) && null != param.get("beginTime") && !"".equals(param.get("beginTime"))){
+        if (null != param.get("endTime") && !"".equals(param.get("endTime")) && null != param.get("beginTime") && !"".equals(param.get("beginTime"))) {
             try {
-                if (new SimpleDateFormat("yyyy-MM-dd").parse(String.valueOf(param.get("endTime"))).compareTo(new SimpleDateFormat("yyyy-MM-dd").parse(String.valueOf(param.get("beginTime"))))<0)
+                if (new SimpleDateFormat("yyyy-MM-dd").parse(String.valueOf(param.get("endTime"))).compareTo(new SimpleDateFormat("yyyy-MM-dd").parse(String.valueOf(param.get("beginTime")))) < 0)
                     throw new MessageException("开始时间不能小于结束时间");
-            }catch (ParseException e){
+            } catch (ParseException e) {
                 e.printStackTrace();
                 throw e;
             }
@@ -145,5 +249,17 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
         pageInfo.setRows(listAll);
         pageInfo.setTotal((int) branchInnerMapper.countByExample(example));
         return pageInfo;
+    }
+
+    /**
+     * 查询内管账号
+     *
+     * @return
+     */
+    @Override
+    public List<Map<String, String>> queryinnerList() {
+        List<Map<String, String>> innerList = lmsUserService.queryAllLmsUser();
+        logger.info("查询的内管账号:{}", innerList);
+        return innerList;
     }
 }

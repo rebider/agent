@@ -46,8 +46,14 @@ public interface CBranchInnerMapper {
 
     /**
      * 查询要解除的内管账号
-     * @param ids
+     * @param id
      * @return
      */
-    List<String> selectInnerByIds(List<String> ids);
+    int deleteInnerByIds(String id);
+
+    int countByIdforUpdate(String id);
+
+    int updateByPrimaryId(String id);
+
+    List<String> selectInnerLogin(Map<String, Object> map);
 }
