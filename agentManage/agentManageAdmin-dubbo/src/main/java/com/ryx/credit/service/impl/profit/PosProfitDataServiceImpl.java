@@ -161,4 +161,33 @@ public class PosProfitDataServiceImpl implements IPosProfitDataService {
         }
         return result;
     }
+
+
+    @Override
+    public AgentResult getPOSRewardDatas(String settleMonth,String tranCode) throws ProcessException {
+
+        if (StringUtils.isBlank(settleMonth)) {
+            logger.info("请求月份为空");
+            return AgentResult.fail("请求月份为空");
+        }
+        try {
+            String httpResult = posRequest(settleMonth,tranCode);
+            if(StringUtils.isBlank(httpResult)){
+                return AgentResult.fail("联动综管失败");
+            }
+            JSONObject jsonObject = JSONObject.parseObject(httpResult);
+            JSONObject dataMap = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
+            String respType = (String)jsonObject.get("respType");
+            String respCode = (String)jsonObject.get("respCode");
+            if(respType.equals("E") || !respCode.equals("000000")){
+                return new AgentResult(404,String.valueOf(jsonObject.get("respMsg")),"");
+            }else{
+                return AgentResult.ok(dataMap);
+            }
+        } catch (Exception e) {
+            logger.info("Pos奖励查询失败:{}",e.getMessage());
+            e.printStackTrace();
+        }
+        return AgentResult.ok("POS奖励获取失败");
+    }
 }

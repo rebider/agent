@@ -11,4 +11,5 @@ import com.ryx.credit.common.result.AgentResult;
 public interface IPosProfitDataService {
     AgentResult getPosProfitDate(String settleMonth) throws ProcessException;
     AgentResult getTradingVolume(String settleMonth,String tranCode) throws ProcessException;
+    AgentResult getPOSRewardDatas(String settleMonth,String tranCode) throws ProcessException;
 }
