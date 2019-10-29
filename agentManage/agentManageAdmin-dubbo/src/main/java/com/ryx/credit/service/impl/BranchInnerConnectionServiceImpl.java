@@ -192,9 +192,11 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
                     logger.info("签名验证成功");
                     JSONObject respXMLObj = JSONObject.parseObject(respXML);
                     JSONObject retObj = JSONObject.parseObject(respXMLObj.getString("data"));
-                    if (null != retObj.get("result_code") && null != retObj.get("result_msg") && "0000".equals(retObj.get("result_code"))) {
+                    if (null != retObj.get("result_code") && "0000".equals(retObj.get("result_code"))) {
                         return FastMap.fastMap("code", "1").putKeyV("msg", "添加成功");
-                    } else {
+                    } else if (null != retObj.get("result_msg")) {
+                        return FastMap.fastMap("code", "2").putKeyV("msg", retObj.get("result_msg"));
+                    }else {
                         return FastMap.fastMap("code", "2").putKeyV("msg", "内管平台建立返回值异常！");
                     }
                 }
