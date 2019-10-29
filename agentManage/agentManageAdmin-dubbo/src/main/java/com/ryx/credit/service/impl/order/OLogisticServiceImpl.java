@@ -462,8 +462,16 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
                     logistics_send.setSendStatus(LogisticsSendStatus.none_send.code);
                     logistics_send.setSendMsg("");
-                    if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
-                        logger.info("瑞大宝物流更新失败,Exception失败{}",JSONObject.toJSONString(oLogistics));
+                    if (1 != oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)) {
+                        logger.info("瑞大宝物流更新失败,Exception失败{}", JSONObject.toJSONString(oLogistics));
+                    }
+                } else if (PlatformType.RJPOS.code.equals(platForm.getPlatformType())) {
+                    //瑞+订单
+                    OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
+                    logistics_send.setSendStatus(LogisticsSendStatus.none_send.code);
+                    logistics_send.setSendMsg("");
+                    if (1 != oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)) {
+                        logger.info("瑞+物流更新失败,Exception失败{}", JSONObject.toJSONString(oLogistics));
                     }
                 }else{
                     OLogistics logistics_send =oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
@@ -1316,13 +1324,14 @@ public class OLogisticServiceImpl implements OLogisticsService {
         if (null==oOrder) throw new MessageException("查询订单数据失败！");
         PlatForm platForm = platFormMapper.selectByPlatFormNum(oOrder.getOrderPlatform());
 
-        if (platForm.getPlatformType().equals(PlatformType.RDBPOS.code)) {
-            //新增瑞大宝平台重新下发
+        //重新下发分平台操作
+        if (platForm.getPlatformType().equals(PlatformType.RDBPOS.code) || platForm.getPlatformType().equals(PlatformType.RJPOS.code)) {
+            //瑞大宝，瑞+，平台重新下发
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oOrder.getBusId());
             if (null==agentBusInfo) throw new MessageException("查询业务数据失败！");
 
             try {
-                //删除物流明细
+                //更新物流明细初始状态
                 OLogisticsDetail oLogisticsDetail = new OLogisticsDetail();
                 oLogisticsDetail.setSendStatus(LogisticsDetailSendStatus.none_send.code);
                 oLogisticsDetail.setStatus(Status.STATUS_1.status);
@@ -1330,25 +1339,25 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 oLogisticsDetail.setSbusMsg("");
                 int deleteInt = logistics.getSendNum().compareTo(BigDecimal.valueOf(oLogisticsDetailMapper.updateByLogisticsId(oLogisticsDetail)));
                 if (deleteInt != 0) {
-                    logger.info("瑞大宝更新物流异常，物流明细和物流发送数量不同。");
-                    throw new Exception("瑞大宝更新物流异常，物流明细和物流发送数量不同。");
+                    logger.info("物流明细和物流发送数量不同。");
+                    throw new Exception("物流明细和物流发送数量不同。");
                 }
                 //更新物流
                 OLogistics updateLogistics = new OLogistics();
                 updateLogistics.setId(logistics.getId());
                 updateLogistics.setSendStatus(LogisticsSendStatus.gen_detail_sucess.code);
                 updateLogistics.setSendMsg("");
-                updateLogistics.setVersion(logistics.getVersion());//暂时用不到乐观锁，但是要传进去
+                updateLogistics.setVersion(logistics.getVersion());
                 if (1 != oLogisticsMapper.updateByPrimaryKeySelective(updateLogistics)) {
                     logger.info("发货物流，重新发送，更新数据库失败:{},{},{}", logistics.getId(), logistics.getSnBeginNum(), logistics.getSnEndNum());
-                    throw new Exception("瑞大宝更新物流状态发生异常！！！");
+                    throw new Exception("更新物流状态发生异常！！！");
                 }
             }catch (Exception e){
                 e.printStackTrace();
                 logistics.setSendMsg("下发异常");
                 logistics.setSendStatus(Status.STATUS_2.status);
                 if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
-                    logger.info("RDB下发物流更新失败Exception{}",JSONObject.toJSONString(logistics));
+                    logger.info("下发物流更新失败Exception{}",JSONObject.toJSONString(logistics));
                 }
                 return AgentResult.fail(e.getLocalizedMessage());
             }

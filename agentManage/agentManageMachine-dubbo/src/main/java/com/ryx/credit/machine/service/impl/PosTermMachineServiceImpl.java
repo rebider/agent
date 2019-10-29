@@ -400,4 +400,9 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
         log.info("checkModleIsEq:{},{}",data,platformType);
         return imsTermMachineService.checkModleIsEq(data.get("oldMerid"),data.get("newMerId"));
     }
+
+    @Override
+    public AgentResult queryLogisticsResult(Map<String, Object> pamMap, String platformType) throws Exception {
+        return null;
+    }
 }
