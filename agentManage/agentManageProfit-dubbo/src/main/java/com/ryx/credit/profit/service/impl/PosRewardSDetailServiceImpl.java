@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.PosRewardDetailMapper;
+import com.ryx.credit.profit.jobs.POSRewardAndRebateJob;
 import com.ryx.credit.profit.pojo.PosRewardDetail;
 import com.ryx.credit.profit.pojo.PosRewardDetailExample;
 import com.ryx.credit.profit.service.PosRewardSDetailService;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service("posRewardSDetailService")
@@ -21,6 +23,9 @@ public class PosRewardSDetailServiceImpl implements PosRewardSDetailService {
     private PosRewardDetailMapper posRewardDetailMapper;
     @Autowired
     private IdService idService;
+
+    @Autowired
+    private POSRewardAndRebateJob posRewardAndRebateJob;
     @Override
     public PageInfo getRewardDetailList(Map<String, Object> param, PageInfo pageInfo) {
         Long count = posRewardDetailMapper.getRewardDetailCount(param);
@@ -95,5 +100,19 @@ public class PosRewardSDetailServiceImpl implements PosRewardSDetailService {
     @Override
     public Map<String, Object> profitCount(Map<String, Object> param) {
         return posRewardDetailMapper.profitCount(param);
+    }
+
+
+    @Override
+    public Map<String,Object> savePosRewardData() {
+        Calendar calendar = Calendar.getInstance();
+        String searchTime=new SimpleDateFormat("yyyy-MM-dd HH:MM:ss").format(calendar.getTime());
+        calendar.add(Calendar.MONTH, -1);
+        String pftMonth= new SimpleDateFormat("yyyyMM").format(calendar.getTime());
+        PosRewardDetailExample example = new PosRewardDetailExample();
+        PosRewardDetailExample.Criteria criteria = example.createCriteria();
+        criteria.andProfitPosDateEqualTo(pftMonth);
+        posRewardDetailMapper.deleteByExample(example);
+        return posRewardAndRebateJob.savePosRewardData(pftMonth);
     }
 }

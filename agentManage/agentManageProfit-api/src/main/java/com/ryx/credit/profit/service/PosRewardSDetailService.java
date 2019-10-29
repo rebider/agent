@@ -39,4 +39,11 @@ public interface PosRewardSDetailService {
     List<PosRewardDetail> getPosRewardDetailList(PosRewardDetail posRewardDetail, List<String> type, List<String> childAgentList);
 
     Map<String,Object> profitCount(Map<String,Object> param);
+
+    /**
+     * chenliang
+     * 获取pos数据并保存
+     */
+    Map<String,Object> savePosRewardData();
+
 }
