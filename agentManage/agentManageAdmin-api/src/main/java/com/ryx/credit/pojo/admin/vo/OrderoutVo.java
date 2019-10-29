@@ -66,6 +66,34 @@ public class OrderoutVo implements Serializable{
     private String profitMouth;//是否扣存量
     private String profitForm;//分润形式
 
+    private String toPickNum;//待配货
+    private String isPlanNum;//已排单
+    private String toPlanNum;//待排单
+
+    public String getToPickNum() {
+        return toPickNum;
+    }
+
+    public void setToPickNum(String toPickNum) {
+        this.toPickNum = toPickNum;
+    }
+
+    public String getIsPlanNum() {
+        return isPlanNum;
+    }
+
+    public void setIsPlanNum(String isPlanNum) {
+        this.isPlanNum = isPlanNum;
+    }
+
+    public String getToPlanNum() {
+        return toPlanNum;
+    }
+
+    public void setToPlanNum(String toPlanNum) {
+        this.toPlanNum = toPlanNum;
+    }
+
     public String getBusNum() {
         return busNum;
     }
