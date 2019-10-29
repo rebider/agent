@@ -378,4 +378,21 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="queryCardProfit" resultType="map" parameterType="java.lang.String">
+    select ird.id,ird.agent_id,ird.agent_name,ird.mer_id,ird.mer_name,ird.ought_amt,ird.reality_amt
+    from O_INTERNET_RENEW ir left join O_INTERNET_RENEW_DETAIL ird
+    on ir.id = ird.renew_id
+    where
+    trunc(to_char(ir.review_pass_time,'YYYYMM')) = #{month}
+    and ird.renew_status in
+    <foreach close=")" collection="renewStatusList" item="renewStatus" open="(" separator=",">
+      #{renewStatus}
+    </foreach>
+    and ird.agent_id in
+    <foreach close=")" collection="agentIdList" item="agentId" open="(" separator=",">
+      #{agentId}
+    </foreach>
+
+  </select>
 </mapper>

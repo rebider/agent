@@ -679,7 +679,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                             criteria.andBusNumEqualTo(orgid);
                             List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
                             if(agentBusInfos.size()==0){
-                                throw new MessageException("业务编号不存在");
+                                continue;
                             }
                             if(agentBusInfos.size()!=1){
                                 throw new MessageException("业务编号不唯一");
