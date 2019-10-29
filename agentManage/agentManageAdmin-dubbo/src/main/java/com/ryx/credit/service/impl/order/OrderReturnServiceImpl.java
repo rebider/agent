@@ -138,6 +138,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     private IResourceService iResourceService;
     @Autowired
     private DepartmentService departmentService;
+    @Autowired
+    private OActivityVisibleMapper activityVisibleMapper;
 
 
     /**
@@ -1414,9 +1416,13 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 if(activities.size()==0){
                     throw new MessageException("排单订单活动无法确定! 厂商："+receiptPlan.getProCom()+",型号:"+receiptPlan.getModel()+",活动代码:"+new_order_oActivity.getActCode());
                 }
-                //FIXME 活动权限控制
-                OActivity new_act = activities.get(0);
-
+                OActivity new_act = null;
+                //只有一个活动
+                if(activities.size()==1){
+                     new_act = activities.get(0);
+                }else{
+                    throw new MessageException("新订单活动不能确定");
+                }
                 AgentResult result = plannerService.savePlanner(receiptPlan, receiptProId,new_act.getId());
                 log.info("退货排单信息保存:{}{}",receiptPlan.getReturnOrderDetailId(),receiptPlan.getProId(),result.getMsg());
             }
