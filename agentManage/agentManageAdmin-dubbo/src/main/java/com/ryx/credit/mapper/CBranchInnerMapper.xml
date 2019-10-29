@@ -222,7 +222,7 @@
             C_BRANCH_INNER CBI
             LEFT JOIN A_AGENT_BUSINFO AAB ON AAB.AG_DOC_PRO = CBI.branch_login
         WHERE
-            CBI.STATUS = #{status,jdbcType=DECIMAL},
+            CBI.STATUS = #{status,jdbcType=DECIMAL}
             AND AAB.ID = #{busId,jdbcType=VARCHAR}
     </select>
 </mapper>

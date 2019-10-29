@@ -35,5 +35,5 @@ public interface COrganizationMapper extends BaseMapper<COrganization> {
      * 查询所有的省区
      * @return
      */
-    List<Map<String, String>> selectBranchList();
+    List<Map<String, Object>> selectBranchList();
 }
