@@ -465,7 +465,7 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
         a.pub_tm &gt;= cu.CREATE_TIME
         and a.ANNO_STAT = '1'
         <if test="map.busTypes !=null and map.busTypes.size > 0">
-            exists (select  ap.anno_id
+            and exists (select  ap.anno_id
             from a_anno_platform_rela ap
             where  a.ann_id = ap.anno_id and
             ap.rang_type = '0' and (
