@@ -92,6 +92,7 @@ public enum DictGroup {
     LOGISTICS_FAIL_EMAIL("物流失败邮件"),
     CERTIFICATION_STATUS("代理商工商认证"),
     DATA_SHIRO("流量卡内部续费数据权限"),
+    ANN_ORG("公告运维机构"),
 
     ANN_TYPE("公告类型"),
     REMOVEACCOUNT_FAIL_EMAIL("销账失败邮件"),
