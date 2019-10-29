@@ -220,20 +220,20 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
         CBranchInnerExample.Criteria criteria = example.or();
         if (null != param.get("branchId") && !"".equals(param.get("branchId")))
             criteria.andBranchLoginEqualTo(((String) param.get("branchId")));
-        if (null != param.get("innerLogin") && !"".equals(param.get("innerLogin")))
-            criteria.andInnerLoginEqualTo((String) param.get("innerLogin"));
+        if (null != param.get("inner") && !"".equals(param.get("inner")))
+            criteria.andInnerLoginEqualTo((String) param.get("inner"));
 
         //有开始时间，没有结束时间
         if (null != param.get("beginTime") && !"".equals(param.get("beginTime")) && (null == param.get("endTime") || "".equals(param.get("endTime"))))
-            criteria.andCTimeGreaterThanOrEqualTo((Date) param.get("endTime"));
+            throw new MessageException("请输入结束时间！");
         //有结束时间，没有开始时间
         if (null != param.get("endTime") && !"".equals(param.get("endTime")) && (null == param.get("beginTime") || "".equals(param.get("beginTime"))))
-            criteria.andCTimeLessThanOrEqualTo((Date) param.get("endTime"));
+            throw new MessageException("请输入开始时间！");
         //有结束时间和开始时间
         if (null != param.get("endTime") && !"".equals(param.get("endTime")) && null != param.get("beginTime") && !"".equals(param.get("beginTime"))) {
             try {
                 if (new SimpleDateFormat("yyyy-MM-dd").parse(String.valueOf(param.get("endTime"))).compareTo(new SimpleDateFormat("yyyy-MM-dd").parse(String.valueOf(param.get("beginTime")))) < 0)
-                    throw new MessageException("开始时间不能小于结束时间");
+                    throw new MessageException("开始时间不能小于结束时间！");
             } catch (ParseException e) {
                 e.printStackTrace();
                 throw e;
@@ -241,7 +241,8 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
             Calendar c = Calendar.getInstance();
             c.setTime(new SimpleDateFormat("yyyy-MM-dd").parse(String.valueOf(param.get("endTime"))));
             c.add(Calendar.DAY_OF_MONTH, 1);
-            criteria.andCTimeBetween(new SimpleDateFormat("yyyy-MM-dd").parse(String.valueOf(param.get("beginTime"))), new SimpleDateFormat("yyyy-MM-dd").parse(String.valueOf(c.getTime())));
+            c.getTime();
+            criteria.andCTimeBetween(new SimpleDateFormat("yyyy-MM-dd").parse(String.valueOf(param.get("beginTime"))), new SimpleDateFormat("yyyy-MM-dd").parse((new SimpleDateFormat("yyyy-MM-dd").format(c.getTime()))));
         }
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         example.setOrderByClause(" C_TIME desc,BRANCH_NAME asc");
@@ -275,19 +276,19 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
             try {
                 AgentResult agentResult =  branchInnerConnectionService.addListItem(objectList,userId);
                 if(agentResult.isOK()) {
-                    logger.info("导入物流{}成功", objectList.toString());
-                    listRes.add("物流[" + objectList.toString() + "]导入成功");
+                    logger.info("导入账号{}成功", objectList.toString());
+                    listRes.add(objectList.toString() + "导入成功");
                 }else{
-                    listRes.add("物流[" + objectList.toString() + "]导入失败:"+agentResult.getData());
+                    listRes.add(objectList.toString() + "导入失败:"+agentResult.getData());
                 }
             }catch (MessageException e) {
                 e.printStackTrace();
-                logger.info("导入物流{}抛出异常",objectList.toString());
-                listRes.add("物流["+objectList.toString()+"]导入失败:"+e.getMsg());
+                logger.info("导入账号{}抛出异常",objectList.toString());
+                listRes.add("["+objectList.toString()+"]导入失败:"+e.getMsg());
             }catch (Exception e) {
                 e.printStackTrace();
                 logger.info("导入物流{}抛出异常",objectList.toString());
-                listRes.add("物流["+objectList.toString()+"]导入失败:"+e.getMessage());
+                listRes.add("["+objectList.toString()+"]导入失败:"+e.getMessage());
             }
         }
         logger.info("user{}导省区关联信息的数据有{}",userId,listRes.toString());
@@ -305,43 +306,40 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
         branchName = String.valueOf(branchInnerData.get(col.indexOf("BRANCH_NAME"))).trim();
         innerLogin = String.valueOf(branchInnerData.get(col.indexOf("INNER_LOGIN"))).trim();
 
-        if ("".equals(innerLogin) || "".equals(branchName)) {
-            int i = 0, j = 0;
-            String branchLogin = null, innerName = null;
-            //进行姓名和总管进行校验
-            List<Map<String, Object>> listBranch = organizationMapper.selectBranchList();
-            for (Map<String, Object> branch : listBranch) {
-                if (branchName.equals(branch.get("NAME"))) {
-                    i++;
-                    branchLogin = branch.get("ID").toString();
-                }
+        int i = 0, j = 0;
+        String branchLogin = null, innerName = null;
+        //进行姓名和总管进行校验
+        List<Map<String, Object>> listBranch = organizationMapper.selectBranchList();
+        for (Map<String, Object> branch : listBranch) {
+            if (branchName.equals(branch.get("NAME"))) {
+                i++;
+                branchLogin = branch.get("ID").toString();
             }
-            List<Map<String, String>> innerList = lmsUserService.queryAllLmsUser();
-            for (Map<String, String> branch : innerList) {
-                if (innerLogin.equals(branch.get("LOGINNAME"))) {
-                    j++;
-                    innerName = branch.get("NAME") + "";
-                }
-            }
-            if (i != 1) throw new MessageException("[" + branchName + "]不是省区部门。");
-            if (j != 1) throw new MessageException("[" + innerLogin + "]不是有效的内管账号。");
-
-            //插入表中账号
-            CBranchInner cBranchInner = new CBranchInner();
-            cBranchInner.setcTime(Calendar.getInstance().getTime());
-            cBranchInner.setBranchLogin(branchLogin);
-            cBranchInner.setBranchName(branchName);
-            cBranchInner.setId(StringUtils.getUUId());
-            cBranchInner.setStatus(Status.STATUS_1.status);
-            cBranchInner.setcUserId(userId + "");
-            cBranchInner.setcUserName(userMapper.selectUserVoById(Long.parseLong(userId)).getName());
-            cBranchInner.setInnerLogin(innerLogin);
-            cBranchInner.setInnerName(innerName);
-            branchInnerMapper.insert(cBranchInner);
-
-            logger.info("新建用户:{}", cBranchInner);
-            return AgentResult.ok();
         }
-        return AgentResult.fail("表格中存在空值，请完善表格！");
+        List<Map<String, String>> innerList = lmsUserService.queryAllLmsUser();
+        for (Map<String, String> branch : innerList) {
+            if (innerLogin.equals(branch.get("LOGINNAME"))) {
+                j++;
+                innerName = branch.get("NAME") + "";
+            }
+        }
+        if (i != 1) throw new MessageException("[" + branchName + "]不是省区部门。");
+        if (j != 1) throw new MessageException("[" + innerLogin + "]不是有效的内管账号。");
+
+        //插入表中账号
+        CBranchInner cBranchInner = new CBranchInner();
+        cBranchInner.setcTime(Calendar.getInstance().getTime());
+        cBranchInner.setBranchLogin(branchLogin);
+        cBranchInner.setBranchName(branchName);
+        cBranchInner.setId(StringUtils.getUUId());
+        cBranchInner.setStatus(Status.STATUS_1.status);
+        cBranchInner.setcUserId(userId + "");
+        cBranchInner.setcUserName(userMapper.selectUserVoById(Long.parseLong(userId)).getName());
+        cBranchInner.setInnerLogin(innerLogin);
+        cBranchInner.setInnerName(innerName);
+        branchInnerMapper.insert(cBranchInner);
+
+        logger.info("新建用户:{}", cBranchInner);
+        return AgentResult.ok();
     }
 }

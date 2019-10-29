@@ -78,9 +78,13 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
         //建立内管账号
         if (null != innerParam.get("innerType") && "true".equals(innerParam.get("innerType"))) {
             try {
+                //联动内管
                 Map<String, Object> retMap = branchInnerConnectionService.buildInnerAccout(userVo, FastMap.fastMap("innerPwd",innerParam.get("innerPwd")));
-                if (!("1".equals(retMap.get("code"))))
+                if (!("1".equals(retMap.get("code")))){
                     throw new Exception(null != retMap.get("msg") ? (String) retMap.get("msg") : "内管添加账号失败！");
+                }
+                //建立本地账号
+                //branchInnerConnectionService.branchConnectionInner();
             } catch (Exception e) {
                 e.printStackTrace();
                 throw e;
