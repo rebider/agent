@@ -508,7 +508,7 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
                 1!=1
             </otherwise>
         </choose>-->
-
+        and a.ANNO_STAT = '1'
         <if test="map.annType!=null and map.annType!=''">
             and a.ann_type = #{map.annType}
         </if>
