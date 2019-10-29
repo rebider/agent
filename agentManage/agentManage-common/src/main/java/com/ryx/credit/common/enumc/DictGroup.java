@@ -99,7 +99,8 @@ public enum DictGroup {
 
 
     CERTIFICATION_STATUS("代理商工商认证"),
-    ANN_TYPE("公告类型");
+    ANN_TYPE("公告类型"),
+    ANN_ORG("公告运维机构");
 
 
 
