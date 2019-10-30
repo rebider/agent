@@ -34,4 +34,13 @@ public enum LogisticsSendStatus {
         this.msg = m;
     }
 
+    public static String getMsg(BigDecimal s){
+        if(s==null)return null;
+        for (LogisticsSendStatus sendStatus : LogisticsSendStatus.values()) {
+            if(sendStatus.code.compareTo(s)==0){
+                return sendStatus.msg;
+            }
+        }
+        return "";
+    }
 }
