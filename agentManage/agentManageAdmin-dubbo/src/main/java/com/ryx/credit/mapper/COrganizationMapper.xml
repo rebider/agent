@@ -90,7 +90,7 @@
         FROM
             C_ORGANIZATION C
         WHERE
-            regexp_like (C.CODE, 'region_[a-z|A-Z]+_\d+_*')
+            regexp_like (C.CODE, '[a-z|A-Z]+_+[a-z|A-Z]+_+')
     </select>
 
     </select>
