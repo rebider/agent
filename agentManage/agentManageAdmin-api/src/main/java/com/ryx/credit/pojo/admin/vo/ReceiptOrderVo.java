@@ -52,6 +52,15 @@ public class ReceiptOrderVo implements Serializable {
 
     private String orderRemark;//订单备注
 
+    private String rpCTime;//配货时间
+
+    public String getRpCTime() {
+        return rpCTime;
+    }
+
+    public void setRpCTime(String rpCTime) {
+        this.rpCTime = rpCTime;
+    }
 
     public String getOrderId() {
         return orderId;
