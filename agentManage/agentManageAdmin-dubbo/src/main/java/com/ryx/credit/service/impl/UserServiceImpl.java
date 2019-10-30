@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.commons.utils.JsonUtils;
@@ -220,6 +221,10 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
         }
         userVo.setRoleIds(roleIds);
         userVo.setLoginName(userVo.getLoginName()+"1");
-        insertByVo(userVo);
+        try {
+            insertByVo(userVo, new HashMap<String, String>());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }
