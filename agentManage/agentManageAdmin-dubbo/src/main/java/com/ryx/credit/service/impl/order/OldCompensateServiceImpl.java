@@ -242,6 +242,15 @@ public class OldCompensateServiceImpl implements OldCompensateService {
         try {
             if(PriceDiffType.DETAIN_AMT.code.equals(oRefundPriceDiff.getApplyCompType())){
                 if(refundPriceDiffFile.size()==0){
+                    Boolean ispz = false;
+                    for (OCashReceivablesVo oCashReceivablesVo : oCashReceivablesVoList) {
+                        if(oCashReceivablesVo.getPayType().equals(PayType.YHHK.getValue())){
+                            ispz = true;
+                            break;
+                        }
+                    }
+                    //有一个下线下打款的就必须上传打款凭证
+                    if(ispz)
                     return AgentResult.fail("代理商打款必须上传打款凭证，金额"+oRefundPriceDiff.getApplyCompAmt()+"元");
                 }
                 if(oCashReceivablesVoList==null || oCashReceivablesVoList.size()==0){
