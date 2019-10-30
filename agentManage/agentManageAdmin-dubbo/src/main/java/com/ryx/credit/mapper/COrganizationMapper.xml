@@ -61,9 +61,9 @@
 
     <select id="selectBranchList" resultType="map">
         SELECT
-            *
+            C.ID,C.NAME
         FROM
-            pftman.C_ORGANIZATION C
+            C_ORGANIZATION C
         WHERE
             regexp_like (C.CODE, '[a-z|A-Z]+_+[a-z|A-Z]+_+')
     </select>
