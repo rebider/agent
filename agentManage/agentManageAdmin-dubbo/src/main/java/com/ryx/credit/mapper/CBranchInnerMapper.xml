@@ -225,4 +225,35 @@
             CBI.STATUS = #{status,jdbcType=DECIMAL}
             AND AAB.ID = #{busId,jdbcType=VARCHAR}
     </select>
+    <select id="selectBranchInnerByPage" parameterType="map" resultType="map">
+        <include refid="OracleDialectPrefix"/>
+        SELECT
+            <include refid="Base_Column_List"/>
+        FROM
+            C_BRANCH_INNER CBI
+            <where>
+                CBI.STATUS = 1
+                <if test="map.branchId != null and map.branchId !=''">
+                    and CBI.BRANCH_LOGIN = #{map.branchId}
+                </if>
+                <if test="map.innerLogin !=null and map.innerLogin!=''">
+                    and CBI.INNER_LOGIN = #{map.innerLogin}
+                </if>
+                <if test="map.beginTime !=null and map.beginTime!=''">
+                    and to_char(CBI.C_TIME,'yyyy-mm-dd') &gt;= #{map.beginTime}
+                </if>
+                <if test="map.endTime !=null and map.endTime!=''">
+                    and to_char(CBI.C_TIME,'yyyy-mm-dd') &lt;= #{map.endTime}
+                </if>
+            </where>
+        <include refid="OracleDialectSuffix"/>
+    </select>
+
+    <select id="countByPage" parameterType="map" resultType="int">
+        SELECT COUNT(1) FROM C_BRANCH_INNER CBI WHERE CBI.STATUS = 1
+    </select>
+
+    <select id="selectByBranchAndInnerLogin" parameterType="map" resultType="int">
+        SELECT COUNT(1) FROM C_BRANCH_INNER CBI WHERE CBI.STATUS = #{map.status} AND CBI.BRANCH_LOGIN = #{map.branchId} AND CBI.INNER_LOGIN = #{map.innerLogin}
+    </select>
 </mapper>

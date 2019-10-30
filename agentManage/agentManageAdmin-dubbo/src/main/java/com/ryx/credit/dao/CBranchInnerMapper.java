@@ -1,7 +1,9 @@
 package com.ryx.credit.dao;
 
+import com.ryx.credit.common.util.Page;
 import com.ryx.credit.pojo.admin.CBranchInner;
 import com.ryx.credit.pojo.admin.CBranchInnerExample;
+import org.apache.ibatis.annotations.Param;
 import org.apache.kafka.common.protocol.types.Field;
 
 import java.util.List;
@@ -56,4 +58,26 @@ public interface CBranchInnerMapper {
     int updateByPrimaryId(String id);
 
     List<String> selectInnerLogin(Map<String, Object> map);
+
+    /**
+     * 分页查询
+     * @param map
+     * @param page
+     * @return
+     */
+    List<Map<String,Object>> selectBranchInnerByPage(@Param("map")Map<String, Object> map, @Param("page") Page page);
+
+    /**
+     * 查询总行数
+     * @param map
+     * @return
+     */
+    int countByPage(@Param("map")Map<String, Object> map);
+
+    /**
+     * 查询是否存在要插入的关联账号
+     * @param map
+     * @return
+     */
+    int selectByBranchAndInnerLogin(@Param("map")Map<String, Object> map);
 }
