@@ -886,6 +886,10 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             agentResult.setMsg("缺少代理商编号");
             return agentResult;
         }
+        List<String> internetRenewWayList = new ArrayList<>();
+        internetRenewWayList.add(InternetRenewWay.FRDK.getValue());
+        internetRenewWayList.add(InternetRenewWay.FRDKGC.getValue());
+        reqMap.put("internetRenewWayList",internetRenewWayList);
         List<String> renewStatusList = new ArrayList<>();
         renewStatusList.add(InternetRenewStatus.BFXF.getValue());
         renewStatusList.add(InternetRenewStatus.XFZ.getValue());
@@ -967,7 +971,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             throw new MessageException("更新物联网卡信息失败");
         }
         log.info("分润抵扣流量卡数据处理成功");
-        return AgentResult.ok();
+        return AgentResult.ok("抵扣成功");
     }
 
 }
