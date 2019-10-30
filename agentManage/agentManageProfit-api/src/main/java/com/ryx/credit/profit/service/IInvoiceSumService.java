@@ -22,5 +22,10 @@ public interface IInvoiceSumService {
 
     int updateByPrimaryKeySelective(InvoiceSum record);
 
-  void invoicePreLeftAmt(List<List<Object>> param,String profitMonth)throws MessageException;
+    void invoicePreLeftAmt(List<List<Object>> param,String profitMonth,String userId)throws MessageException;
+
+    boolean invocationIntUnFreeze(String agentId, String user,String reason) throws MessageException;
+
+    boolean invocationIntFreeze(String agentId, String user,String id,String reason) throws MessageException;
+
 }

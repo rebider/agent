@@ -337,7 +337,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
     }
 
     @Override
-    public List<Map<String,String>> finalCheckInvoice(List<Map<String,Object>> list){
+    public List<Map<String,String>> finalCheckInvoice(List<Map<String,Object>> list,String user){
         List<Map<String,String>> maps = new ArrayList<Map<String,String>>();
         for (Map<String,Object> map:list) {
             InvoiceApply invoiceApply = new InvoiceApply();
@@ -356,6 +356,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                 mmm.put("PROFIT_MONTH",new SimpleDateFormat("yyyyMM").format(curr.getTime()));
                 mmm.put("INVOICE_AMT",invoiceApply1.getSumAmt());
                 mmm.put("INVOICE_COMPANY",invoiceApply1.getInvoiceCompany());
+                mmm.put("user",user);
                 Map<String,Object> ma = invoiceSumService.getInvoiceFinalData(mmm);
                 if(!"9999".equals(ma.get("returnCode").toString()) ){
                     Map<String,String> mm = new HashMap<String,String>();
