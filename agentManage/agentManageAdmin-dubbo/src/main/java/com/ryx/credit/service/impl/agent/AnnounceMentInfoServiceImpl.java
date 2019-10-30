@@ -90,7 +90,13 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         announceMentInfoVo.setAnnId(annId);
         announceMentInfoVo.setAnnoStat(AnnoStat.WAIT.code);
         announceMentInfoVo.setCreateTm(date);
-        announceMentInfoMapper.insert(announceMentInfoVo);
+       try {
+           announceMentInfoMapper.insert(announceMentInfoVo);
+       }catch (Exception e){
+           logger.error("保存公告表异常");
+           return ResultVO.fail("保存公告失败!");
+       }
+
         String orgs = announceMentInfoVo.getOrgs();
         List<AnnoPlatformRela> ralas = new ArrayList<>();
         String relaId = idService.genIdInTran(TabId.A_ANNO_PLATFORM_RELA);
@@ -123,7 +129,12 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
             ralas.add(platRela);
         });
         logger.info("添加关联表{}",ralas.toString());
-        int i = annoPlatformRelaService.batchSave(ralas);
+        try {
+            annoPlatformRelaService.batchSave(ralas);
+        }catch (Exception e){
+            logger.error("保存公告关联表异常");
+            return ResultVO.fail("保存公告失败,关联表异常!");
+        }
 
         List<String> attFiles = announceMentInfoVo.getAttFiles();
         if(attFiles!=null){
