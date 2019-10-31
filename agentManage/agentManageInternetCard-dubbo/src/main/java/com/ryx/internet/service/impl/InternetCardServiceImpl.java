@@ -742,6 +742,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             Map<String,Object> reqMap = new HashMap<>();
             reqMap.put("renew",Status.STATUS_0.status);//否
             reqMap.put("newRenew",Status.STATUS_1.status);
+            reqMap.put("renewStatus",InternetRenewStatus.WXF.getValue());
             List<String> expireTimeList = new ArrayList<>();
             expireTimeList.add(DateUtil.getPerDayOfMonth(0));
             expireTimeList.add(DateUtil.getPerDayOfMonth(1));
