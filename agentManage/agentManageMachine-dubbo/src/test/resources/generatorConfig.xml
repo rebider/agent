@@ -51,9 +51,9 @@
 		<!--<table tableName="IMS_MACHINE_ACTIVITY" domainObjectName="ImsMachineActivity" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
 
-		<table tableName="IMS_ORGAN_RETURN_TEMPLATE" domainObjectName="ImsOrganReturnTemplate" enableUpdateByExample="false"
+<!--		<table tableName="IMS_ORGAN_RETURN_TEMPLATE" domainObjectName="ImsOrganReturnTemplate" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false"/>-->
+		<table tableName="POS_REWARD_DETAIL" domainObjectName="posRewardDetail" enableUpdateByExample="false"
 			   enableDeleteByPrimaryKey="false"/>
-
-
 	</context>
 </generatorConfiguration>
