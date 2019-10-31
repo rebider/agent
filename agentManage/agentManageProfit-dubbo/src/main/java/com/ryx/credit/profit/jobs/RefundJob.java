@@ -25,6 +25,9 @@ import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.profit.PosOrganDataService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,11 +44,13 @@ import java.util.*;
  * @Description: 退单数据同步
  * @date 2018/7/2911:33
  */
+@PropertySource("classpath:/config.properties")
 @Service("refundJob")
 @Transactional(rollbackFor=RuntimeException.class)
 public class RefundJob {
     private static final Logger LOG = Logger.getLogger(RefundJob.class);
     private static final  String URL =  AppConfig.getProperty("refund_url");
+    private static final String environment = AppConfig.getProperty("jobEnvironment");
 
     private static  final  String DEDUCTION_DESC = "退单扣款";
 
@@ -81,13 +86,19 @@ public class RefundJob {
     @Autowired
     private AgentService agentService;
 
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyConfigInDev(){
+        return new PropertySourcesPlaceholderConfigurer();
+    }
+
     /**
      * @Author: Zhang Lei
      * @Description: 退单数据同步 每月1号凌晨1点执行
      * @Date: 11:50 2019/1/24
      */
-    @Scheduled(cron = "0 0 1 1 * ?")
+    @Scheduled(cron = "${profit_refund_job_cron}")
     public void deal() {
+        if (!"preproduction".equals(environment)){
         // 上月的开始及结束日期
         //JSONObject param = new JSONObject();
         Map<String,String> param = new HashMap<String,String>();
@@ -102,6 +113,7 @@ public class RefundJob {
         getDeductionListAndDeal(param);
         // 退mpos单应补分润
         getSupplyListAndDeal(param);
+        }
     }
 
     /***
