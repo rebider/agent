@@ -14,6 +14,7 @@
     <result column="ORDER_NUM" jdbcType="DECIMAL" property="orderNum" />
     <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
     <result column="CREATE_PERSON" jdbcType="VARCHAR" property="createPerson" />
+    <result column="STATUS" jdbcType="VARCHAR" property="status" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -46,7 +47,7 @@
   </sql>
   <sql id="Base_Column_List">
     ID, PLATFORM_TYPE, PLATFORM_NUM, TECHNOLOGY_ADDRESS, TECHNOLOGY_AMT, TECHNOLOGY_FEE, 
-    CLEAR_ADDRESS, CLEAR_AMT, CLEAR_FEE, ORDER_NUM, CREATE_TIME, CREATE_PERSON
+    CLEAR_ADDRESS, CLEAR_AMT, CLEAR_FEE, ORDER_NUM, CREATE_TIME, CREATE_PERSON, STATUS
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.TranCheckPlatFormExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -80,13 +81,13 @@
     insert into TRANCHECK_PLATFORM (ID, PLATFORM_TYPE, PLATFORM_NUM, 
       TECHNOLOGY_ADDRESS, TECHNOLOGY_AMT, TECHNOLOGY_FEE, 
       CLEAR_ADDRESS, CLEAR_AMT, CLEAR_FEE, 
-      ORDER_NUM, CREATE_TIME, CREATE_PERSON
-      )
+      ORDER_NUM, CREATE_TIME, CREATE_PERSON,
+      STATUS)
     values (#{id,jdbcType=DECIMAL}, #{platformType,jdbcType=VARCHAR}, #{platformNum,jdbcType=VARCHAR}, 
       #{technologyAddress,jdbcType=VARCHAR}, #{technologyAmt,jdbcType=VARCHAR}, #{technologyFee,jdbcType=VARCHAR}, 
       #{clearAddress,jdbcType=VARCHAR}, #{clearAmt,jdbcType=VARCHAR}, #{clearFee,jdbcType=VARCHAR}, 
-      #{orderNum,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, #{createPerson,jdbcType=VARCHAR}
-      )
+      #{orderNum,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, #{createPerson,jdbcType=VARCHAR},
+      #{status,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.TranCheckPlatForm">
     insert into TRANCHECK_PLATFORM
@@ -127,6 +128,9 @@
       <if test="createPerson != null">
         CREATE_PERSON,
       </if>
+      <if test="status != null">
+        STATUS,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -164,6 +168,9 @@
       </if>
       <if test="createPerson != null">
         #{createPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -209,6 +216,9 @@
       <if test="createPerson != null">
         CREATE_PERSON = #{createPerson,jdbcType=VARCHAR},
       </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=DECIMAL}
   </update>
@@ -224,7 +234,8 @@
       CLEAR_FEE = #{clearFee,jdbcType=VARCHAR},
       ORDER_NUM = #{orderNum,jdbcType=DECIMAL},
       CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
-      CREATE_PERSON = #{createPerson,jdbcType=VARCHAR}
+      CREATE_PERSON = #{createPerson,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=DECIMAL}
   </update>
   <sql id="OracleDialectPrefix">
@@ -239,18 +250,18 @@
   </sql>
   <!-- ======================以上为自动生成代码，请务必把自己添加代码写到下面，防止被覆盖================================-->
   <select id="getAllPlatFormType" resultType="java.lang.String">
-    select distinct PLATFORM_TYPE from TRANCHECK_PLATFORM
+    select distinct PLATFORM_TYPE from TRANCHECK_PLATFORM ORDER BY PLATFORM_TYPE
   </select>
 
   <select id="getTranAmtByMonth" resultType="java.util.Map">
       select
-            (select sum(IN_TRANS_AMT)from TRANS_PROFIT_DETAIL
+        nvl((select sum(IN_TRANS_AMT)from TRANS_PROFIT_DETAIL
                 where PROFIT_DATE=#{tranMonth}
-                and SOURCE_INFO='MPOS')+(select  sum(TRANS_AMT)from P_PROFIT_DIRECT where TRANS_MONTH=#{tranMonth})
+                and SOURCE_INFO='MPOS')+(select  sum(TRANS_AMT)from P_PROFIT_DIRECT where TRANS_MONTH=#{tranMonth}),0)
                 as MPOS_TRAN_AMT,
-             (select sum(TRANS_FEE)from TRANS_PROFIT_DETAIL
+            nvl((select sum(TRANS_FEE)from TRANS_PROFIT_DETAIL
                 where PROFIT_DATE=#{tranMonth}
-                and SOURCE_INFO='MPOS')+(select  sum(TRANS_FEE)from P_PROFIT_DIRECT where TRANS_MONTH=#{tranMonth})
+                and SOURCE_INFO='MPOS')+(select  sum(TRANS_FEE)from P_PROFIT_DIRECT where TRANS_MONTH=#{tranMonth}),0)
                 as TRANS_FEE
        from dual
   </select>

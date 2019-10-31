@@ -14,12 +14,12 @@ import java.util.Map;
  * 描述：首刷终端下发vo
  */
 public class LowerHairMachineVo  implements Serializable {
-    //    业务编号，
+    //业务编号
     private String busNum;
-    //    SN码或者sn区间，
+    //SN码或者sn区间，
     private String snStart;
     private String snEnd;
-    //    下发人。
+    //下发人。
     private String optUser;
     //sn集合
     private List<MposSnVo> listSn;
@@ -29,21 +29,14 @@ public class LowerHairMachineVo  implements Serializable {
     private String  PlatformType;
 
     private String actCode;
-
-
-
-
-
-    /**
-     * 物流id
-     */
+    //物流id
     private String oLogisticsId;
-
 
     ImsTermWarehouseDetail imsTermWarehouseDetail;
 
     List<String> snList;
-
+    //RJ封装参数
+    private String jsonString;
 
     public String getBusNum() {
         return busNum;
@@ -135,4 +128,11 @@ public class LowerHairMachineVo  implements Serializable {
     }
 
 
+    public String getJsonString() {
+        return jsonString;
+    }
+
+    public void setJsonString(String jsonString) {
+        this.jsonString = jsonString;
+    }
 }

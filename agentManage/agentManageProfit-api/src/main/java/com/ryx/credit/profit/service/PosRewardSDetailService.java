@@ -39,4 +39,25 @@ public interface PosRewardSDetailService {
     List<PosRewardDetail> getPosRewardDetailList(PosRewardDetail posRewardDetail, List<String> type, List<String> childAgentList);
 
     Map<String,Object> profitCount(Map<String,Object> param);
+
+    /**
+     * chenliang
+     * 获取pos数据并保存
+     */
+    Map<String,Object> savePosRewardData();
+
+    /**
+     * chenliang
+     * 获取pos扣回
+     */
+    Map<String,Object> savePosKickBackData();
+
+    /**
+     * chenliang
+     * 获取pos扣回
+     */
+    PageInfo posKickbackRewardPageList(Map<String, Object> param, PageInfo pageInfo);
+
+    List<Map<String, Object>> queryBusName();
+
 }

@@ -18,7 +18,7 @@ public interface IUserService extends IService<CUser> {
 
     List<CUser> selectByLoginName(UserVo userVo);
 
-    void insertByVo(UserVo userVo);
+    void insertByVo(UserVo userVo, Map<String, String> innerParam) throws Exception;
 
     UserVo selectVoById(Long id);
 
@@ -38,4 +38,5 @@ public interface IUserService extends IService<CUser> {
 
     Map<String, Object> selectAgentByOrgId(Map<String, Object> map);
 
+    void copyUser(Long id);
 }

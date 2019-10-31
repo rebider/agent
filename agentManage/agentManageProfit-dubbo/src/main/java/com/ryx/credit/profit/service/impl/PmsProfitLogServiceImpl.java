@@ -73,6 +73,11 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
     }
 
     @Override
+    public int save(PmsProfit record) {
+        return pmsProfitLogMapper.save(record);
+    }
+
+    @Override
     public int updateByPrimaryKeySelective(PmsProfitLog record) {
         return pmsProfitLogMapper.updateByPrimaryKeySelective(record);
     }
@@ -87,7 +92,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
     }
 
     @Override
-    public Map<String, Object> checkoutData(String agentId, String busCode) {
+    public List<Map<String, Object>> checkoutData(String agentId, String busCode) {
         return pmsProfitLogMapper.checkoutData(agentId,busCode);
     }
 
@@ -148,6 +153,8 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
     public int updateByPrimaryKey(PmsProfitLog record) {
         return pmsProfitLogMapper.updateByPrimaryKeySelective(record);
     }
+
+
 
 
 }

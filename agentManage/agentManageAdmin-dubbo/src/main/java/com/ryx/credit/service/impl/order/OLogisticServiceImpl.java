@@ -15,10 +15,12 @@ import com.ryx.credit.machine.service.ImsTermWarehouseDetailService;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.LowerHairMachineVo;
 import com.ryx.credit.machine.vo.MposSnVo;
+import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.agent.PlatForm;
 import com.ryx.credit.pojo.admin.order.*;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.IOrderReturnService;
@@ -45,10 +47,10 @@ import static com.ryx.credit.common.util.Conver10ToConver33Utils.getBetweenValue
  */
 @Service("oLogisticService")
 public class OLogisticServiceImpl implements OLogisticsService {
-    private static Logger logger = LoggerFactory.getLogger(OLogisticServiceImpl.class);
     public final static SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
     public final static SimpleDateFormat sdfyyyyMMdd = new SimpleDateFormat("yyyy-MM-dd");
     public final static SimpleDateFormat yyyyMMdd = new SimpleDateFormat("yyyy/MM/dd");
+    private static Logger logger = LoggerFactory.getLogger(OLogisticServiceImpl.class);
     @Autowired
     private OOrderMapper oOrderMapper;
     @Autowired
@@ -89,7 +91,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
     private OReturnOrderDetailMapper oReturnOrderDetailMapper;
     @Autowired
     private InternetCardService internetCardService;
-
+    @Autowired
+    private IUserService userService;
 
     /**
      * 物流信息:
@@ -120,7 +123,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
     public int insertImportData(OLogistics oLogistics) {
         return oLogisticsMapper.insertSelective(oLogistics);
     }
-
 
     /**
      * 物流信息：
@@ -462,8 +464,16 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
                     logistics_send.setSendStatus(LogisticsSendStatus.none_send.code);
                     logistics_send.setSendMsg("");
-                    if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
-                        logger.info("瑞大宝物流更新失败,Exception失败{}",JSONObject.toJSONString(oLogistics));
+                    if (1 != oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)) {
+                        logger.info("瑞大宝物流更新失败,Exception失败{}", JSONObject.toJSONString(oLogistics));
+                    }
+                } else if (PlatformType.RJPOS.code.equals(platForm.getPlatformType())) {
+                    //瑞+订单
+                    OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
+                    logistics_send.setSendStatus(LogisticsSendStatus.none_send.code);
+                    logistics_send.setSendMsg("");
+                    if (1 != oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)) {
+                        logger.info("瑞+物流更新失败,Exception失败{}", JSONObject.toJSONString(oLogistics));
                     }
                 }else{
                     OLogistics logistics_send =oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
@@ -813,7 +823,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
         return AgentResult.ok();
     }
 
-
     /**
      * @Author: Zhang Lei
      * @Description: 退货时根据起止Sn号查询订单、物流信息
@@ -930,7 +939,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
         int res = oLogisticsMapper.updateSnStatus(orderId, startSn, endSn, status, recordStatus,returnId);
         return res;
     }
-
 
     /**
      * 插入物流明细
@@ -1149,7 +1157,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
         return ResultVO.success(resOLogisticsDetail);
     }
 
-
     @Override
     public List<String> idList(String startSn, String endSn, Integer begins, Integer finish,String proCom) throws MessageException {
         return idList(startSn,endSn);
@@ -1191,7 +1198,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
         }
         return list;*/
     }
-
 
     @Override
     public List<String> idList(String startSn, String endSn) throws MessageException {
@@ -1270,16 +1276,12 @@ public class OLogisticServiceImpl implements OLogisticsService {
     public PageInfo getOLogisticsDetailList(Map<String, Object> param, PageInfo pageInfo) {
         Long count = oLogisticsDetailMapper.getOLogisticsDetailCount(param);
         List<Map<String, Object>> list = oLogisticsDetailMapper.getOLogisticsDetailList(param);
-    /*    for (Map<String, Object> stringObjectMap : list) {
-            Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),String.valueOf(stringObjectMap.get("PRO_COM")));
-            if(dict!=null){
-                stringObjectMap.put("PRO_COM",dict.getdItemname());
-            }
-            Dict modelType = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MODEL_TYPE.name(),String.valueOf(stringObjectMap.get("PRO_TYPE")));
-            if (null!=modelType){
-                stringObjectMap.put("PRO_TYPE",modelType.getdItemname());
-            }
-        }*/
+        for (Map<String, Object> objectMap : list) {
+            CUser cUser = userService.selectById(Long.valueOf(String.valueOf(objectMap.get("C_USER"))));
+            if(cUser!=null)
+            objectMap.put("C_USER",cUser.getName());
+
+        }
         pageInfo.setTotal(count.intValue());
         pageInfo.setRows(list);
         return pageInfo;
@@ -1316,13 +1318,14 @@ public class OLogisticServiceImpl implements OLogisticsService {
         if (null==oOrder) throw new MessageException("查询订单数据失败！");
         PlatForm platForm = platFormMapper.selectByPlatFormNum(oOrder.getOrderPlatform());
 
-        if (platForm.getPlatformType().equals(PlatformType.RDBPOS.code)) {
-            //新增瑞大宝平台重新下发
+        //重新下发分平台操作
+        if (platForm.getPlatformType().equals(PlatformType.RDBPOS.code) || platForm.getPlatformType().equals(PlatformType.RJPOS.code)) {
+            //瑞大宝，瑞+，平台重新下发
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oOrder.getBusId());
             if (null==agentBusInfo) throw new MessageException("查询业务数据失败！");
 
             try {
-                //删除物流明细
+                //更新物流明细初始状态
                 OLogisticsDetail oLogisticsDetail = new OLogisticsDetail();
                 oLogisticsDetail.setSendStatus(LogisticsDetailSendStatus.none_send.code);
                 oLogisticsDetail.setStatus(Status.STATUS_1.status);
@@ -1330,25 +1333,25 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 oLogisticsDetail.setSbusMsg("");
                 int deleteInt = logistics.getSendNum().compareTo(BigDecimal.valueOf(oLogisticsDetailMapper.updateByLogisticsId(oLogisticsDetail)));
                 if (deleteInt != 0) {
-                    logger.info("瑞大宝更新物流异常，物流明细和物流发送数量不同。");
-                    throw new Exception("瑞大宝更新物流异常，物流明细和物流发送数量不同。");
+                    logger.info("物流明细和物流发送数量不同。");
+                    throw new Exception("物流明细和物流发送数量不同。");
                 }
                 //更新物流
                 OLogistics updateLogistics = new OLogistics();
                 updateLogistics.setId(logistics.getId());
                 updateLogistics.setSendStatus(LogisticsSendStatus.gen_detail_sucess.code);
                 updateLogistics.setSendMsg("");
-                updateLogistics.setVersion(logistics.getVersion());//暂时用不到乐观锁，但是要传进去
+                updateLogistics.setVersion(logistics.getVersion());
                 if (1 != oLogisticsMapper.updateByPrimaryKeySelective(updateLogistics)) {
                     logger.info("发货物流，重新发送，更新数据库失败:{},{},{}", logistics.getId(), logistics.getSnBeginNum(), logistics.getSnEndNum());
-                    throw new Exception("瑞大宝更新物流状态发生异常！！！");
+                    throw new Exception("更新物流状态发生异常！！！");
                 }
             }catch (Exception e){
                 e.printStackTrace();
                 logistics.setSendMsg("下发异常");
                 logistics.setSendStatus(Status.STATUS_2.status);
                 if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
-                    logger.info("RDB下发物流更新失败Exception{}",JSONObject.toJSONString(logistics));
+                    logger.info("下发物流更新失败Exception{}",JSONObject.toJSONString(logistics));
                 }
                 return AgentResult.fail(e.getLocalizedMessage());
             }

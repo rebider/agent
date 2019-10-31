@@ -13,6 +13,39 @@
     <result column="NOTE" jdbcType="VARCHAR" property="note" />
     <result column="MONTH" jdbcType="VARCHAR" property="month" />
   </resultMap>
+
+
+  <resultMap id="BaseResultMap2" type="com.ryx.credit.profit.pojo.PmsProfit">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="MONTH" jdbcType="VARCHAR" property="month" />
+    <result column="UNIQUE_FLAG" jdbcType="VARCHAR" property="uniqueFlag" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="BUS_CODE" jdbcType="VARCHAR" property="busCode" />
+    <result column="BUS_NAME" jdbcType="VARCHAR" property="busName" />
+    <result column="SHEET_NAME" jdbcType="VARCHAR" property="sheetName" />
+    <result column="SHEET_COLUMN" jdbcType="DECIMAL" property="sheetColumn" />
+    <result column="SHEET_HEAD" property="sheetHead" jdbcType="UNDEFINED"  javaType = "java.lang.String"  typeHandler ="com.ryx.credit.common.util.OracleXMLTypeHandler" />
+    <result column="SHEET_DATA" property="sheetData" jdbcType="UNDEFINED"   javaType = "java.lang.String"  typeHandler ="com.ryx.credit.common.util.OracleXMLTypeHandler" />
+    <result column="PROFIT_TYPE" jdbcType="VARCHAR" property="profitType" />
+    <result column="PROFIT_HZ" jdbcType="VARCHAR" property="profitHz" />
+    <result column="PAY_CONDITION" jdbcType="VARCHAR" property="payCondition" />
+    <result column="STATUS" jdbcType="VARCHAR" property="status" />
+    <result column="FREE_REASON" jdbcType="VARCHAR" property="freeReason" />
+    <result column="PAY_TRAN_MONEY" jdbcType="DECIMAL" property="payTranMoney" />
+    <result column="IMPORT_TIME" jdbcType="VARCHAR" property="importTime" />
+    <result column="IMPORT_PERSON" jdbcType="VARCHAR" property="importPerson" />
+    <result column="UPDATE_TIME" jdbcType="VARCHAR" property="updateTime" />
+    <result column="UPDATE_PERSON" jdbcType="VARCHAR" property="updatePerson" />
+    <result column="FREE_TIME" jdbcType="VARCHAR" property="freeTime" />
+    <result column="PAY_TIME" jdbcType="VARCHAR" property="payTime" />
+    <result column="SHEET_ORDER" jdbcType="DECIMAL" property="sheetOrder" />
+    <result column="ORDER_NUMBER" jdbcType="DECIMAL" property="orderNumber" />
+    <result column="PROFIT_AMT" property="profitAmt" jdbcType="VARCHAR" />
+  </resultMap>
+
+
+
+
   <sql id="Example_Where_Clause">
     <where>
       <foreach collection="oredCriteria" item="criteria" separator="or">
@@ -226,12 +259,38 @@
   <select id="checkoutData" parameterType="java.lang.String" resultType="java.util.Map">
 
 select aa.ID,aa.AG_NAME,bb.BUS_PLATFORM,cc.PLATFORM_NAME  from A_AGENT aa,A_AGENT_BUSINFO bb,A_PLATFORM cc
- where aa.ID = bb.AGENT_ID and bb.BUS_PLATFORM = cc.PLATFORM_NUM and aa.STATUS='1'and bb.STATUS='1'and cc.STATUS='1'
+ where aa.ID = bb.AGENT_ID and bb.BUS_PLATFORM = cc.PLATFORM_NUM
  and aa.ID='${agentId}' and bb.BUS_PLATFORM='${busCode}'
   </select>
 
   <select id="getLoginName" parameterType="java.lang.String" resultType="java.util.Map">
     select aa.NAME,aa.LOGIN_NAME from C_USER aa where aa.ID ='${userId}'
   </select>
+
+
+
+    <insert id="save" parameterType="com.ryx.credit.profit.pojo.PmsProfit">
+		insert into pms_profit (MONTH, UNIQUE_FLAG, AGENT_ID, SHEET_NAME,
+		SHEET_COLUMN, SHEET_HEAD, SHEET_DATA, PROFIT_TYPE, PROFIT_HZ,
+		PAY_CONDITION, STATUS, FREE_REASON, PAY_TRAN_MONEY, IMPORT_TIME,
+		IMPORT_PERSON, UPDATE_TIME, UPDATE_PERSON, FREE_TIME, PAY_TIME,sheet_Order,order_number,ID,BUS_CODE,BUS_NAME)
+		values (#{month,jdbcType=VARCHAR},#{ uniqueFlag,jdbcType=VARCHAR},#{
+		agentId,jdbcType=VARCHAR},#{ sheetName,jdbcType=CLOB},#{
+		sheetColumn,jdbcType=INTEGER}, xmlType((
+		select sheet_head from PMS_PROFIT_temp where month=#{month,jdbcType=VARCHAR}
+		and order_Number=#{orderNumber,jdbcType=INTEGER}
+		  and sheet_name=#{sheetName,jdbcType=VARCHAR} and IMPORT_PERSON=#{importPerson,jdbcType=VARCHAR}
+		 )), xmlType((
+		select sheet_data from PMS_PROFIT_temp where month=#{month,jdbcType=VARCHAR}
+		and order_Number=#{orderNumber,jdbcType=INTEGER}
+		  and sheet_name=#{sheetName,jdbcType=VARCHAR} and IMPORT_PERSON=#{importPerson,jdbcType=VARCHAR}
+		 )),#{ profitType,jdbcType=VARCHAR},#{
+		profitHz,jdbcType=VARCHAR},#{ payCondition,jdbcType=VARCHAR},#{
+		status,jdbcType=VARCHAR},#{ freeReason,jdbcType=VARCHAR},#{
+		payTranMoney,jdbcType=VARCHAR},#{ importTime,jdbcType=VARCHAR},#{
+		importPerson,jdbcType=VARCHAR},#{ updateTime,jdbcType=VARCHAR},#{
+		updatePerson,jdbcType=VARCHAR},#{ freeTime,jdbcType=VARCHAR},#{
+		payTime,jdbcType=VARCHAR},#{sheetOrder,jdbcType=INTEGER},#{orderNumber,jdbcType=INTEGER},#{ id,jdbcType=VARCHAR},#{busCode,jdbcType=VARCHAR},#{busName,jdbcType=VARCHAR})
+	</insert>
 
 </mapper>

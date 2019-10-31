@@ -5,6 +5,7 @@ import com.ryx.internet.pojo.OInternetRenewDetail;
 import com.ryx.internet.pojo.OInternetRenewDetailExample;
 
 import java.util.List;
+import java.util.Map;
 
 public interface OInternetRenewDetailMapper {
     long countByExample(OInternetRenewDetailExample example);
@@ -22,4 +23,7 @@ public interface OInternetRenewDetailMapper {
     int updateByPrimaryKeySelective(OInternetRenewDetail record);
 
     int updateByPrimaryKey(OInternetRenewDetail record);
+
+    List<Map<String,Object>> queryCardProfit(Map<String,Object> reqMap);
+
 }

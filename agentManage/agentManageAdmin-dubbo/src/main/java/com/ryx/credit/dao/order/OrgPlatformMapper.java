@@ -28,4 +28,10 @@ public interface OrgPlatformMapper {
 
     List<Map> queryOrg(@Param("platForm")String platForm);
 
+    /**
+     * 查询顶级机构，Map可升级
+     * @param paramMap
+     * @return
+     */
+    Map<String, Object> selectByMap(Map<String, Object> paramMap);
 }

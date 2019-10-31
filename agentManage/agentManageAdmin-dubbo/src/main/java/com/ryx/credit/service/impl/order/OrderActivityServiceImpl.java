@@ -98,6 +98,18 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         if (StringUtils.isNotBlank(activity.getPosType())) {
             criteria.andPosTypeEqualTo(activity.getPosType());
         }
+        if (StringUtils.isNotBlank(activity.getBusProCode())) {
+            criteria.andBusProCodeEqualTo(activity.getBusProCode());
+        }
+        if (null!=activity.getPrice()) {
+            criteria.andPriceEqualTo(activity.getPrice());
+        }
+        if (null!=activity.getOriginalPrice()) {
+            criteria.andOriginalPriceEqualTo(activity.getOriginalPrice());
+        }
+        if (StringUtils.isNotBlank(activity.getId())) {
+            criteria.andIdEqualTo(activity.getId());
+        }
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         example.setOrderByClause(" ACT_CODE,c_time desc");
         example.setPage(page);
@@ -435,6 +447,8 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             oActivity.setActCode(stringObjectMap.get("ACT_CODE") + "");
             oActivity.setOriginalPrice(new BigDecimal(stringObjectMap.get("ORIGINALPRICE") + ""));
             oActivity.setProductName(stringObjectMap.get("PRO_NAME")+"");
+            oActivity.setPosSpePrice(new BigDecimal(stringObjectMap.get("POS_SPE_PRICE")+""));
+            oActivity.setStandTime(new BigDecimal(stringObjectMap.get("STAND_TIME")+""));
 
             //查询活动是否可见
             OActivity activity = activityMapper.selectByPrimaryKey(oActivity.getId());
@@ -677,7 +691,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                             criteria.andBusNumEqualTo(orgid);
                             List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
                             if(agentBusInfos.size()==0){
-                                throw new MessageException("业务编号不存在");
+                                continue;
                             }
                             if(agentBusInfos.size()!=1){
                                 throw new MessageException("业务编号不唯一");

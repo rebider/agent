@@ -1,9 +1,6 @@
 package com.ryx.credit.profit.dao;
 
-import com.ryx.credit.profit.pojo.PmsProfitExample;
-import com.ryx.credit.profit.pojo.PmsProfitLog;
-import com.ryx.credit.profit.pojo.PmsProfitLogExample;
-import com.ryx.credit.profit.pojo.PmsProfitTempExample;
+import com.ryx.credit.profit.pojo.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -26,8 +23,9 @@ public interface PmsProfitLogMapper {
 
     int updateByPrimaryKey(PmsProfitLog record);
 
-    Map<String,Object> checkoutData(@Param("agentId")  String agentId ,@Param("busCode") String busCode);
+    List<Map<String,Object>> checkoutData(@Param("agentId")  String agentId ,@Param("busCode") String busCode);
 
     Map<String,Object> getLoginName(@Param("userId")  String userId );
+    int  save(PmsProfit record);
 
 }

@@ -4,6 +4,7 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.pojo.*;
 
+import java.util.List;
 import java.util.Map;
 
 public interface IPmsProfitLogService {
@@ -33,9 +34,11 @@ public interface IPmsProfitLogService {
 
     int updateByPrimaryKeySelective(PmsProfit record);
 
-    Map<String,Object> checkoutData(String agentId , String busCode);
+    List<Map<String,Object>> checkoutData(String agentId , String busCode);
 
    int insertSelective(PmsProfitTempWithBLOBs record) ;
 
   int insertSelective(PmsProfit record);
+
+    int  save(PmsProfit record);
 }

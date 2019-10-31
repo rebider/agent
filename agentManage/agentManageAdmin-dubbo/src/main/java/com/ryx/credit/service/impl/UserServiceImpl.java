@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.commons.utils.JsonUtils;
@@ -18,9 +19,14 @@ import com.ryx.credit.pojo.admin.CUserRole;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.vo.UserVo;
+import com.ryx.credit.service.IBranchInnerConnectionService;
 import com.ryx.credit.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -39,7 +45,9 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
     private CUserRoleMapper userRoleMapper;
     @Autowired
     private AgentMapper agentMapper;
-    
+    @Autowired
+    private IBranchInnerConnectionService branchInnerConnectionService;
+
     @Override
     public List<CUser> selectByLoginName(UserVo userVo) {
         CUser user = new CUser();
@@ -54,7 +62,8 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
     }
 
     @Override
-    public void insertByVo(UserVo userVo) {
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public void insertByVo(UserVo userVo, Map<String, String> innerParam) throws Exception{
         CUser user = BeanUtils.copy(userVo, CUser.class);
         user.setCreateTime(new Date());
         this.insert(user);
@@ -66,6 +75,21 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
             userRole.setUserId(userVoNew.getId());
             userRole.setRoleId(Long.valueOf(string));
             userRoleMapper.insert(userRole);
+        }
+        //建立内管账号
+        if (null != innerParam.get("innerType") && "true".equals(innerParam.get("innerType"))) {
+            try {
+                //联动内管
+                Map<String, Object> retMap = branchInnerConnectionService.buildInnerAccout(userVo, FastMap.fastMap("innerPwd",innerParam.get("innerPwd")));
+                if (!("1".equals(retMap.get("code")))){
+                    throw new Exception(null != retMap.get("msg") ? (String) retMap.get("msg") : "内管添加账号失败！");
+                }
+                //建立本地账号
+                //branchInnerConnectionService.branchConnectionInner();
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw e;
+            }
         }
     }
 
@@ -183,5 +207,24 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
     @Override
     public Map<String, Object> selectAgentByOrgId(Map<String, Object> map) {
         return agentMapper.selectAgentByOrgId(map);
+    }
+
+    @Override
+    @Transactional
+    public void copyUser(Long id){
+        CUser cUser = userMapper.selectById(id);
+        UserVo userVo = BeanUtils.copy(cUser, UserVo.class);
+        List<CUserRole> cUserRoles = userRoleMapper.selectByUserId(id);
+        String roleIds = "";
+        for (CUserRole cUserRole : cUserRoles) {
+            roleIds+=cUserRole.getRoleId()+",";
+        }
+        userVo.setRoleIds(roleIds);
+        userVo.setLoginName(userVo.getLoginName()+"1");
+        try {
+            insertByVo(userVo, new HashMap<String, String>());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

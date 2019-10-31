@@ -58,6 +58,124 @@
         where (t.code like 'region_%' or t.code like 'beijing%' or t.code = 'agent')
         and c.id = #{cUser}
     </select>
+    <select id="selectPorg" resultMap="COrganizationVoMap">
+        select a.id as pid, a.name as pname, b.id as cid, b.name as cname
+          from c_organization a
+          left outer join c_organization b
+            on a.id = b.pid
+         where a.pid is null
+           and (a.code like 'region_%' or a.code like 'beijing%'/* or
+               a.code like 'agent' */or a.code like 'finance' or
+               a.code like 'business' or a.code like 'market')
+         order by pid asc
+    </select>
+    <select id="selectPrgByUserId" parameterType="long" resultMap="COrganizationVoMap">
+        SELECT t.id as pid, t.name as pname, cb.id as cid ,  cb.name as cname
+          FROM c_organization t
+          left join c_user cu
+            on cu.organization_id = t.id
+          left join c_organization cb
+            on t.id = cb.pid
+         where cu.id = #{userId}
+      /*   union
+        SELECT t.id, t.name, cb.pid, cb.name
+          FROM c_organization t
+          left join c_organization cb
+            on t.id = cb.pid
+          where  t.code like 'agent'*/
+    </select>
+    <resultMap id="COrganizationVoMap" type="com.ryx.credit.pojo.admin.vo.COrganizationVo">
+        <id column="pid" property="pid"/>
+        <result column="pname" property="pname"/>
+        <collection property="cOrganizations" ofType="com.ryx.credit.pojo.admin.COrganization">
+            <id column="cid" property="id"/>
+            <result column="cname" property="name"/>
+        </collection>
+    </resultMap>
+    <select id="selectPubOrgs" parameterType="map" resultType="com.ryx.credit.pojo.admin.COrganization">
+        select a.id, a.name
+            from c_organization a
+            where ( a.code like 'beijing' or  a.code like 'finance' or
+               a.code like 'business' or a.code like 'market')
+               <if test="map.orgs !=null and map.orgs.size>0">
+                   or a.id in (<foreach collection="map.orgs" item="org" separator=",">
+                   #{org}
+               </foreach> )
+               </if>
+         order by pid asc
+    </select>
+    <select id="selectPorgByorgs" parameterType="list" resultType="com.ryx.credit.pojo.admin.COrganization">
+          select id,name from(
+          <foreach collection="list" item="org" separator="union">
+          SELECT ca.id as id,ca.name as name
+              FROM
+              c_organization ca
+              left join c_organization cb
+              on cb.id = ca.pid
+              left join c_organization cc
+              on cc.id = cb.pid
+              where ca.id = #{org}
+              union
+              SELECT cb.id as id,cb.name as name
+              FROM c_organization ca
+              left join c_organization cb
+              on cb.id = ca.pid
+              left join c_organization cc
+              on cc.id = cb.pid
+              where ca.id = #{org}
+              union
+              SELECT cc.id as id,cc.name as name
+              FROM c_organization ca
+              left join c_organization cb
+              on cb.id = ca.pid
+              left join c_organization cc
+              on cc.id = cb.pid
+              where ca.id = #{org}
+          </foreach>)
+        where id is not null
+        group by id,name
+        order by id
+    </select>
+    <select id="selectSubOrg" parameterType="list" resultType="string">
+        select id from(
+        <foreach collection="list" item="org" separator="union">
+        select distinct cc.id
+          from c_organization ca
+          left join c_organization cb
+            on ca.id = cb.pid
+          left join c_organization cc
+            on cb.id = cc.pid
+         where ca.id = #{org}
+        union
+        select distinct cb.id
+          from c_organization ca
+          left join c_organization cb
+            on ca.id = cb.pid
+         where ca.id = #{org}
+        union
+        select distinct ca.id
+          from c_organization ca
+         where ca.id = #{org}
+        </foreach>)
+         where id is not null
+         order by id desc
+    </select>
+    <select id="selectMaintainOrg" resultType="com.ryx.credit.pojo.admin.COrganization">
+        select a.id, a.name
+          from c_organization a
+         where (a.code like 'region_%' or a.code like 'beijing%' or
+               a.code like 'finance' or a.code like 'business' or
+               a.code like 'market')
+         group by a.id, a.name
+         order by id desc
+    </select>
 
-
+    <select id="selectBranchList" resultType="map">
+        SELECT
+            C.ID,C.NAME
+        FROM
+            C_ORGANIZATION C
+        WHERE
+            regexp_like (C.CODE, '[a-z|A-Z]+_+[a-z|A-Z]+_+')
+    </select>
 </mapper>
