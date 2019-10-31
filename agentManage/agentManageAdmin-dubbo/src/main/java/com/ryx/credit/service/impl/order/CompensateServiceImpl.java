@@ -356,7 +356,7 @@ public class CompensateServiceImpl implements CompensateService {
                     return AgentResult.fail("代理商打款必须上传打款凭证");
                 }
                 if(oCashReceivablesVoList==null || oCashReceivablesVoList.size()==0){
-                    return AgentResult.fail("代理商打款必须填写打款记录，金额:"+oRefundPriceDiff.getApplyCompAmt());
+                    return AgentResult.fail("代理商打款必须填写打款记录");
                 }
             }
             String priceDiffId = idService.genId(TabId.o_Refund_price_diff);
