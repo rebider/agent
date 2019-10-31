@@ -16,6 +16,7 @@ import com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail;
 import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
 import com.ryx.credit.util.Constants;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -278,7 +279,12 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
                 JSONObject item =  machineList.getJSONObject(i);
                 TermMachineVo machineVo =  new TermMachineVo();
                 machineVo.setId(item.getString("MACHINEID"));
-                machineVo.setMechineName(item.getString("MODELNAME"));
+                machineVo.setMechineName(
+                        "机具编号:" + item.getString("MACHINEID")
+                        + "|机具型号:" + item.getString("MODELNAME")
+                        + "|机具类型:" + item.getString("MACHINETYPENAME")
+                        + "|押金:" + item.getString("DEPOSIT")
+                        + "|备注:" + (StringUtils.isNotEmpty(item.getString("REMARK"))?item.getString("REMARK"):"--"));
                 machineVo.setPosType(item.getString("MODELTYPE"));
                 machineVo.setPosSpePrice(item.getString("DEPOSIT"));
                 resData.add(machineVo);
