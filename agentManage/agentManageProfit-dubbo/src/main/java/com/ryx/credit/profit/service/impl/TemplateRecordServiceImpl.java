@@ -232,11 +232,12 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         }
 
         if("POS".equals(busInfo.get("PLATFORM_TYPE"))||"ZHPOS".equals(busInfo.get("PLATFORM_TYPE"))){
+            try {
             JSONObject mapJSONObject = new JSONObject();
             mapJSONObject.put("applyId",templateRecode.getTemplateId());
             String CheckResult = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, mapJSONObject.toJSONString());
             Map<String,Object> resultMap = JSONObject.parseObject(CheckResult);
-           try {
+
                Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
 
                if(objectMap.get("isExist").toString().equals("1")&&map2.get("applyRewardRule")!=null&&((Map<String,String>)map2.get("applyRewardRule")).get("rewardType").equals("1")){
@@ -244,7 +245,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                    startPar.put("party","manager");
                }
            }catch (Exception e){
-               return;
+            e.printStackTrace();
 
            }
 
