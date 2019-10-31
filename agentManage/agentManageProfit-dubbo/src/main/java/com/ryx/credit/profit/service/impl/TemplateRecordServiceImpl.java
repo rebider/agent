@@ -235,6 +235,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             try {
             JSONObject mapJSONObject = new JSONObject();
             mapJSONObject.put("applyId",templateRecode.getTemplateId());
+            mapJSONObject.put("isStartMonth","1");
             String CheckResult = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, mapJSONObject.toJSONString());
             Map<String,Object> resultMap = JSONObject.parseObject(CheckResult);
 
