@@ -1,13 +1,9 @@
 package com.ryx.credit.profit.pojo;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
-/**
- * @author RYX
- */
 public class PosRewardDetail implements Serializable {
-
-    private static final long serialVersionUID = -3169932965261141606L;
     private String id;
 
     private String profitPosDate;
@@ -41,6 +37,24 @@ public class PosRewardDetail implements Serializable {
     private String posRemark;
 
     private String posCheckDeductAmt;
+
+    private String orgid;
+
+    private BigDecimal settlemonth1812totaltrans;
+
+    private BigDecimal settlemonthtotaltrans;
+
+    private String isstandard;
+
+    private BigDecimal totalorder;
+
+    private BigDecimal yearafter19totaltrans;
+
+    private String contrastmonth;
+
+    private BigDecimal newtransamount;
+
+    private BigDecimal yearafter19credittrans;
 
     private String childAgentIdList;
 
@@ -180,6 +194,78 @@ public class PosRewardDetail implements Serializable {
         this.posCheckDeductAmt = posCheckDeductAmt == null ? null : posCheckDeductAmt.trim();
     }
 
+    public String getOrgid() {
+        return orgid;
+    }
+
+    public void setOrgid(String orgid) {
+        this.orgid = orgid == null ? null : orgid.trim();
+    }
+
+    public BigDecimal getSettlemonth1812totaltrans() {
+        return settlemonth1812totaltrans;
+    }
+
+    public void setSettlemonth1812totaltrans(BigDecimal settlemonth1812totaltrans) {
+        this.settlemonth1812totaltrans = settlemonth1812totaltrans;
+    }
+
+    public BigDecimal getSettlemonthtotaltrans() {
+        return settlemonthtotaltrans;
+    }
+
+    public void setSettlemonthtotaltrans(BigDecimal settlemonthtotaltrans) {
+        this.settlemonthtotaltrans = settlemonthtotaltrans;
+    }
+
+    public String getIsstandard() {
+        return isstandard;
+    }
+
+    public void setIsstandard(String isstandard) {
+        this.isstandard = isstandard == null ? null : isstandard.trim();
+    }
+
+    public BigDecimal getTotalorder() {
+        return totalorder;
+    }
+
+    public void setTotalorder(BigDecimal totalorder) {
+        this.totalorder = totalorder;
+    }
+
+    public BigDecimal getYearafter19totaltrans() {
+        return yearafter19totaltrans;
+    }
+
+    public void setYearafter19totaltrans(BigDecimal yearafter19totaltrans) {
+        this.yearafter19totaltrans = yearafter19totaltrans;
+    }
+
+    public String getContrastmonth() {
+        return contrastmonth;
+    }
+
+    public void setContrastmonth(String contrastmonth) {
+        this.contrastmonth = contrastmonth == null ? null : contrastmonth.trim();
+    }
+
+    public BigDecimal getNewtransamount() {
+        return newtransamount;
+    }
+
+    public void setNewtransamount(BigDecimal newtransamount) {
+        this.newtransamount = newtransamount;
+    }
+
+    public BigDecimal getYearafter19credittrans() {
+        return yearafter19credittrans;
+    }
+
+    public void setYearafter19credittrans(BigDecimal yearafter19credittrans) {
+        this.yearafter19credittrans = yearafter19credittrans;
+    }
+
     public String getChildAgentIdList() {
         return childAgentIdList;
     }
@@ -187,6 +273,4 @@ public class PosRewardDetail implements Serializable {
     public void setChildAgentIdList(String childAgentIdList) {
         this.childAgentIdList = childAgentIdList == null ? null : childAgentIdList.trim();
     }
-
-
 }

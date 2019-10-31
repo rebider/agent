@@ -1,7 +1,7 @@
 package com.ryx.credit.service;
-import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.commons.utils.PageInfo;
 import com.ryx.credit.pojo.admin.vo.UserVo;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public interface IBranchInnerConnectionService {
      * 条件分页查询
      * @return
      */
-    PageInfo queruAbleBranchInner(Map<String, Object> param, PageInfo pageInfo) throws Exception;
+    PageInfo queruAbleBranchInner(Map<String, Object> param, Page page) throws Exception;
 
     /**
      * 解除和内管的关联关系

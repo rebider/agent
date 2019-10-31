@@ -283,7 +283,6 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
             mapDetail.put("posSnBegin", refundPriceDiffDetail.getBeginSn());
             mapDetail.put("posSnEnd", refundPriceDiffDetail.getEndSn());
             mapDetail.put("reqPayStatus", "1");
-            mapDetail.put("checkPayStatus", "1");
             mapDetail.put("newMachineId", refundPriceDiffDetail.getNewMachineId());
             mapDetail.put("oldMachineId", refundPriceDiffDetail.getOldMachineId());
             if(StringUtils.isNotBlank(refundPriceDiffDetail.getDeliveryTimeType())){
@@ -376,14 +375,20 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
                 }else if(serialNumber.equals(serialNumber_res) && "01".equals(snAdjStatus) && "000000".equals(result_code)) {
                     //调整中
                     log.info("活动调整中:{} {}",serialNumber,platformType);
-                    return AgentResult.ok("01");
+                    AgentResult result = AgentResult.ok("01");
+                    result.setMsg(resMsg);
+                    return result;
                 }else if(serialNumber.equals(serialNumber_res) && "02".equals(snAdjStatus) && "000000".equals(result_code)) {
                     //调整失败
                     log.info("活动调整失败:{} {}",serialNumber,platformType);
-                    return AgentResult.ok("02");
+                    AgentResult result = AgentResult.ok("02");
+                    result.setMsg(resMsg);
+                    return result;
                 }else{
                     //未知结果
-                    return AgentResult.ok("03");
+                    AgentResult result = AgentResult.ok("03");
+                    result.setMsg(resMsg);
+                    return result;
                 }
             }else{
                 //未知结果

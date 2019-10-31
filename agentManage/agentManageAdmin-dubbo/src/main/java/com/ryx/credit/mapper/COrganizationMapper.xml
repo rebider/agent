@@ -84,16 +84,6 @@
             on t.id = cb.pid
           where  t.code like 'agent'*/
     </select>
-    <select id="selectBranchList" resultType="map">
-        SELECT
-            C.ID,C.NAME
-        FROM
-            C_ORGANIZATION C
-        WHERE
-            regexp_like (C.CODE, 'region_[a-z|A-Z]+_\d+_*')
-    </select>
-
-
     <resultMap id="COrganizationVoMap" type="com.ryx.credit.pojo.admin.vo.COrganizationVo">
         <id column="pid" property="pid"/>
         <result column="pname" property="pname"/>
@@ -178,5 +168,14 @@
                a.code like 'market')
          group by a.id, a.name
          order by id desc
+    </select>
+
+    <select id="selectBranchList" resultType="map">
+        SELECT
+            C.ID,C.NAME
+        FROM
+            C_ORGANIZATION C
+        WHERE
+            regexp_like (C.CODE, '[a-z|A-Z]+_+[a-z|A-Z]+_+')
     </select>
 </mapper>

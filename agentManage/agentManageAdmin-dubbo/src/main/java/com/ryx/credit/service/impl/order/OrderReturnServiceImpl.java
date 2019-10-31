@@ -592,7 +592,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             List<OReceiptPro> receiptPros = receiptProMapper.selectByExample(receiptProExample);
             if (receiptPros != null && receiptPros.size() > 0) {
                 OReceiptPro receiptPro = receiptPros.get(0);
-                receiptPro.setSendNum(receiptPro.getSendNum().subtract(receiptPlan.getSendProNum()));
+                //收货单排单数量减去排单表排单数量
+                receiptPro.setSendNum(receiptPro.getSendNum().subtract(receiptPlan.getPlanProNum()));
                 int cts = receiptProMapper.updateByPrimaryKeySelective(receiptPro);
                 if(cts<=0){
                     throw new ProcessException("退货退回时更新已排单数量失败，receiptProId={"+receiptProId+"}");

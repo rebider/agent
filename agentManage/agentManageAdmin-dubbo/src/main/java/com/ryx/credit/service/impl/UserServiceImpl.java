@@ -222,8 +222,8 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
         userVo.setRoleIds(roleIds);
         userVo.setLoginName(userVo.getLoginName()+"1");
         try {
-            insertByVo(userVo,new HashMap<String,String>());
-        } catch (Exception e) {
+            insertByVo(userVo, new HashMap<String, String>());
+        }catch (Exception e){
             e.printStackTrace();
         }
     }

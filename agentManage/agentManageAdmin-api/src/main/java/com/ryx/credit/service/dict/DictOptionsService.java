@@ -30,4 +30,6 @@ public interface DictOptionsService {
     List<Dict> findDictListByName(String group, String artifact,String itemName);
 
     String getApproveVersion(String approveName)throws ProcessException;
+
+    List<String> getAgentNameList(Long userId);
 }

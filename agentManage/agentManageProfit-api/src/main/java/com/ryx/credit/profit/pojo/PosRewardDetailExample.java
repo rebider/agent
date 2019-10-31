@@ -1,6 +1,8 @@
 package com.ryx.credit.profit.pojo;
 
 import com.ryx.credit.common.util.Page;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -1322,6 +1324,576 @@ public class PosRewardDetailExample {
 
         public Criteria andPosCheckDeductAmtNotBetween(String value1, String value2) {
             addCriterion("POS_CHECK_DEDUCT_AMT not between", value1, value2, "posCheckDeductAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgidIsNull() {
+            addCriterion("ORGID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgidIsNotNull() {
+            addCriterion("ORGID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgidEqualTo(String value) {
+            addCriterion("ORGID =", value, "orgid");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgidNotEqualTo(String value) {
+            addCriterion("ORGID <>", value, "orgid");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgidGreaterThan(String value) {
+            addCriterion("ORGID >", value, "orgid");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgidGreaterThanOrEqualTo(String value) {
+            addCriterion("ORGID >=", value, "orgid");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgidLessThan(String value) {
+            addCriterion("ORGID <", value, "orgid");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgidLessThanOrEqualTo(String value) {
+            addCriterion("ORGID <=", value, "orgid");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgidLike(String value) {
+            addCriterion("ORGID like", value, "orgid");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgidNotLike(String value) {
+            addCriterion("ORGID not like", value, "orgid");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgidIn(List<String> values) {
+            addCriterion("ORGID in", values, "orgid");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgidNotIn(List<String> values) {
+            addCriterion("ORGID not in", values, "orgid");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgidBetween(String value1, String value2) {
+            addCriterion("ORGID between", value1, value2, "orgid");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgidNotBetween(String value1, String value2) {
+            addCriterion("ORGID not between", value1, value2, "orgid");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlemonth1812totaltransIsNull() {
+            addCriterion("SETTLEMONTH1812TOTALTRANS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlemonth1812totaltransIsNotNull() {
+            addCriterion("SETTLEMONTH1812TOTALTRANS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlemonth1812totaltransEqualTo(BigDecimal value) {
+            addCriterion("SETTLEMONTH1812TOTALTRANS =", value, "settlemonth1812totaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlemonth1812totaltransNotEqualTo(BigDecimal value) {
+            addCriterion("SETTLEMONTH1812TOTALTRANS <>", value, "settlemonth1812totaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlemonth1812totaltransGreaterThan(BigDecimal value) {
+            addCriterion("SETTLEMONTH1812TOTALTRANS >", value, "settlemonth1812totaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlemonth1812totaltransGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("SETTLEMONTH1812TOTALTRANS >=", value, "settlemonth1812totaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlemonth1812totaltransLessThan(BigDecimal value) {
+            addCriterion("SETTLEMONTH1812TOTALTRANS <", value, "settlemonth1812totaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlemonth1812totaltransLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("SETTLEMONTH1812TOTALTRANS <=", value, "settlemonth1812totaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlemonth1812totaltransIn(List<BigDecimal> values) {
+            addCriterion("SETTLEMONTH1812TOTALTRANS in", values, "settlemonth1812totaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlemonth1812totaltransNotIn(List<BigDecimal> values) {
+            addCriterion("SETTLEMONTH1812TOTALTRANS not in", values, "settlemonth1812totaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlemonth1812totaltransBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SETTLEMONTH1812TOTALTRANS between", value1, value2, "settlemonth1812totaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlemonth1812totaltransNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SETTLEMONTH1812TOTALTRANS not between", value1, value2, "settlemonth1812totaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlemonthtotaltransIsNull() {
+            addCriterion("SETTLEMONTHTOTALTRANS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlemonthtotaltransIsNotNull() {
+            addCriterion("SETTLEMONTHTOTALTRANS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlemonthtotaltransEqualTo(BigDecimal value) {
+            addCriterion("SETTLEMONTHTOTALTRANS =", value, "settlemonthtotaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlemonthtotaltransNotEqualTo(BigDecimal value) {
+            addCriterion("SETTLEMONTHTOTALTRANS <>", value, "settlemonthtotaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlemonthtotaltransGreaterThan(BigDecimal value) {
+            addCriterion("SETTLEMONTHTOTALTRANS >", value, "settlemonthtotaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlemonthtotaltransGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("SETTLEMONTHTOTALTRANS >=", value, "settlemonthtotaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlemonthtotaltransLessThan(BigDecimal value) {
+            addCriterion("SETTLEMONTHTOTALTRANS <", value, "settlemonthtotaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlemonthtotaltransLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("SETTLEMONTHTOTALTRANS <=", value, "settlemonthtotaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlemonthtotaltransIn(List<BigDecimal> values) {
+            addCriterion("SETTLEMONTHTOTALTRANS in", values, "settlemonthtotaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlemonthtotaltransNotIn(List<BigDecimal> values) {
+            addCriterion("SETTLEMONTHTOTALTRANS not in", values, "settlemonthtotaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlemonthtotaltransBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SETTLEMONTHTOTALTRANS between", value1, value2, "settlemonthtotaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlemonthtotaltransNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SETTLEMONTHTOTALTRANS not between", value1, value2, "settlemonthtotaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsstandardIsNull() {
+            addCriterion("ISSTANDARD is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsstandardIsNotNull() {
+            addCriterion("ISSTANDARD is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsstandardEqualTo(String value) {
+            addCriterion("ISSTANDARD =", value, "isstandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsstandardNotEqualTo(String value) {
+            addCriterion("ISSTANDARD <>", value, "isstandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsstandardGreaterThan(String value) {
+            addCriterion("ISSTANDARD >", value, "isstandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsstandardGreaterThanOrEqualTo(String value) {
+            addCriterion("ISSTANDARD >=", value, "isstandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsstandardLessThan(String value) {
+            addCriterion("ISSTANDARD <", value, "isstandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsstandardLessThanOrEqualTo(String value) {
+            addCriterion("ISSTANDARD <=", value, "isstandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsstandardLike(String value) {
+            addCriterion("ISSTANDARD like", value, "isstandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsstandardNotLike(String value) {
+            addCriterion("ISSTANDARD not like", value, "isstandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsstandardIn(List<String> values) {
+            addCriterion("ISSTANDARD in", values, "isstandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsstandardNotIn(List<String> values) {
+            addCriterion("ISSTANDARD not in", values, "isstandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsstandardBetween(String value1, String value2) {
+            addCriterion("ISSTANDARD between", value1, value2, "isstandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsstandardNotBetween(String value1, String value2) {
+            addCriterion("ISSTANDARD not between", value1, value2, "isstandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalorderIsNull() {
+            addCriterion("TOTALORDER is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalorderIsNotNull() {
+            addCriterion("TOTALORDER is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalorderEqualTo(BigDecimal value) {
+            addCriterion("TOTALORDER =", value, "totalorder");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalorderNotEqualTo(BigDecimal value) {
+            addCriterion("TOTALORDER <>", value, "totalorder");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalorderGreaterThan(BigDecimal value) {
+            addCriterion("TOTALORDER >", value, "totalorder");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalorderGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("TOTALORDER >=", value, "totalorder");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalorderLessThan(BigDecimal value) {
+            addCriterion("TOTALORDER <", value, "totalorder");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalorderLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("TOTALORDER <=", value, "totalorder");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalorderIn(List<BigDecimal> values) {
+            addCriterion("TOTALORDER in", values, "totalorder");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalorderNotIn(List<BigDecimal> values) {
+            addCriterion("TOTALORDER not in", values, "totalorder");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalorderBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("TOTALORDER between", value1, value2, "totalorder");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalorderNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("TOTALORDER not between", value1, value2, "totalorder");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearafter19totaltransIsNull() {
+            addCriterion("YEARAFTER19TOTALTRANS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearafter19totaltransIsNotNull() {
+            addCriterion("YEARAFTER19TOTALTRANS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearafter19totaltransEqualTo(BigDecimal value) {
+            addCriterion("YEARAFTER19TOTALTRANS =", value, "yearafter19totaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearafter19totaltransNotEqualTo(BigDecimal value) {
+            addCriterion("YEARAFTER19TOTALTRANS <>", value, "yearafter19totaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearafter19totaltransGreaterThan(BigDecimal value) {
+            addCriterion("YEARAFTER19TOTALTRANS >", value, "yearafter19totaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearafter19totaltransGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("YEARAFTER19TOTALTRANS >=", value, "yearafter19totaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearafter19totaltransLessThan(BigDecimal value) {
+            addCriterion("YEARAFTER19TOTALTRANS <", value, "yearafter19totaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearafter19totaltransLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("YEARAFTER19TOTALTRANS <=", value, "yearafter19totaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearafter19totaltransIn(List<BigDecimal> values) {
+            addCriterion("YEARAFTER19TOTALTRANS in", values, "yearafter19totaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearafter19totaltransNotIn(List<BigDecimal> values) {
+            addCriterion("YEARAFTER19TOTALTRANS not in", values, "yearafter19totaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearafter19totaltransBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("YEARAFTER19TOTALTRANS between", value1, value2, "yearafter19totaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearafter19totaltransNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("YEARAFTER19TOTALTRANS not between", value1, value2, "yearafter19totaltrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andContrastmonthIsNull() {
+            addCriterion("CONTRASTMONTH is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andContrastmonthIsNotNull() {
+            addCriterion("CONTRASTMONTH is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andContrastmonthEqualTo(String value) {
+            addCriterion("CONTRASTMONTH =", value, "contrastmonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andContrastmonthNotEqualTo(String value) {
+            addCriterion("CONTRASTMONTH <>", value, "contrastmonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andContrastmonthGreaterThan(String value) {
+            addCriterion("CONTRASTMONTH >", value, "contrastmonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andContrastmonthGreaterThanOrEqualTo(String value) {
+            addCriterion("CONTRASTMONTH >=", value, "contrastmonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andContrastmonthLessThan(String value) {
+            addCriterion("CONTRASTMONTH <", value, "contrastmonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andContrastmonthLessThanOrEqualTo(String value) {
+            addCriterion("CONTRASTMONTH <=", value, "contrastmonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andContrastmonthLike(String value) {
+            addCriterion("CONTRASTMONTH like", value, "contrastmonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andContrastmonthNotLike(String value) {
+            addCriterion("CONTRASTMONTH not like", value, "contrastmonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andContrastmonthIn(List<String> values) {
+            addCriterion("CONTRASTMONTH in", values, "contrastmonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andContrastmonthNotIn(List<String> values) {
+            addCriterion("CONTRASTMONTH not in", values, "contrastmonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andContrastmonthBetween(String value1, String value2) {
+            addCriterion("CONTRASTMONTH between", value1, value2, "contrastmonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andContrastmonthNotBetween(String value1, String value2) {
+            addCriterion("CONTRASTMONTH not between", value1, value2, "contrastmonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewtransamountIsNull() {
+            addCriterion("NEWTRANSAMOUNT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewtransamountIsNotNull() {
+            addCriterion("NEWTRANSAMOUNT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewtransamountEqualTo(BigDecimal value) {
+            addCriterion("NEWTRANSAMOUNT =", value, "newtransamount");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewtransamountNotEqualTo(BigDecimal value) {
+            addCriterion("NEWTRANSAMOUNT <>", value, "newtransamount");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewtransamountGreaterThan(BigDecimal value) {
+            addCriterion("NEWTRANSAMOUNT >", value, "newtransamount");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewtransamountGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("NEWTRANSAMOUNT >=", value, "newtransamount");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewtransamountLessThan(BigDecimal value) {
+            addCriterion("NEWTRANSAMOUNT <", value, "newtransamount");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewtransamountLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("NEWTRANSAMOUNT <=", value, "newtransamount");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewtransamountIn(List<BigDecimal> values) {
+            addCriterion("NEWTRANSAMOUNT in", values, "newtransamount");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewtransamountNotIn(List<BigDecimal> values) {
+            addCriterion("NEWTRANSAMOUNT not in", values, "newtransamount");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewtransamountBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("NEWTRANSAMOUNT between", value1, value2, "newtransamount");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewtransamountNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("NEWTRANSAMOUNT not between", value1, value2, "newtransamount");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearafter19credittransIsNull() {
+            addCriterion("YEARAFTER19CREDITTRANS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearafter19credittransIsNotNull() {
+            addCriterion("YEARAFTER19CREDITTRANS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearafter19credittransEqualTo(BigDecimal value) {
+            addCriterion("YEARAFTER19CREDITTRANS =", value, "yearafter19credittrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearafter19credittransNotEqualTo(BigDecimal value) {
+            addCriterion("YEARAFTER19CREDITTRANS <>", value, "yearafter19credittrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearafter19credittransGreaterThan(BigDecimal value) {
+            addCriterion("YEARAFTER19CREDITTRANS >", value, "yearafter19credittrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearafter19credittransGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("YEARAFTER19CREDITTRANS >=", value, "yearafter19credittrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearafter19credittransLessThan(BigDecimal value) {
+            addCriterion("YEARAFTER19CREDITTRANS <", value, "yearafter19credittrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearafter19credittransLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("YEARAFTER19CREDITTRANS <=", value, "yearafter19credittrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearafter19credittransIn(List<BigDecimal> values) {
+            addCriterion("YEARAFTER19CREDITTRANS in", values, "yearafter19credittrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearafter19credittransNotIn(List<BigDecimal> values) {
+            addCriterion("YEARAFTER19CREDITTRANS not in", values, "yearafter19credittrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearafter19credittransBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("YEARAFTER19CREDITTRANS between", value1, value2, "yearafter19credittrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearafter19credittransNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("YEARAFTER19CREDITTRANS not between", value1, value2, "yearafter19credittrans");
             return (Criteria) this;
         }
     }
