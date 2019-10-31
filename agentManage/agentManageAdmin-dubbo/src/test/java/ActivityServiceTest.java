@@ -2,10 +2,13 @@ import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.order.IPaymentDetailService;
+import com.ryx.credit.service.order.ORemoveAccountService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 作者：cx
@@ -18,6 +21,16 @@ public class ActivityServiceTest extends BaseSpringTest {
     private ActivityService activityService;
     @Autowired
     private IPaymentDetailService paymentDetailService;
+    @Autowired
+    private ORemoveAccountService oRemoveAccountService;
+
+    @Test
+    public void a(){
+        List<String> list = new ArrayList<>();
+        list.add("ORA20191008000000000000142");
+
+        oRemoveAccountService.processData(list);
+    }
 
     @Test
     public void testInstance(){

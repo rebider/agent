@@ -27,4 +27,9 @@ public interface CRoleMapper extends BaseMapper<CRole> {
 	Set<String> selectShiroUrl(@Param("userId") Long userId,@Param("pid") String pid,@Param("url") String url);
 
     Set<String> findFinanceRole(@Param("userId") Long userId);
+
+    Long insertRole(CRole role);
+
+    Long findId();
+
 }

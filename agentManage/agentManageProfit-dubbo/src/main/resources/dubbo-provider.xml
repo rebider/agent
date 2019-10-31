@@ -70,7 +70,15 @@
     <dubbo:service interface="com.ryx.credit.profit.service.ISetServerAmtService" ref="setServerAmtService"  timeout="1200000" registry="myGroup"/>
     <dubbo:service interface="com.ryx.credit.profit.service.IInvoiceSumService" ref="invoiceSumService"  timeout="1200000" registry="myGroup"/>
     <dubbo:service interface="com.ryx.credit.profit.service.ITemplateRecodeService" ref="templateRecordService" timeout="1200000" registry="myGroup"/>
+    <dubbo:service interface="com.ryx.credit.profit.service.IProfitManageService" ref="profitManageService" timeout="1200000" registry="myGroup"/>
 
     <dubbo:reference interface="com.ryx.credit.service.dict.DictOptionsService" id="dictOptionsService"  timeout="1200000" registry="myGroup"/>
+
+
+
+
+ <!--profit-->
+ <dubbo:service interface="com.ryx.credit.profit.service.IPmsProfitLogService" ref="pmsProfitLogService"  timeout="1200000" registry="myGroup"/>
+
 
 </beans>
