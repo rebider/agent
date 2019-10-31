@@ -101,7 +101,17 @@ public class OrganizationServiceImpl implements OrganizationService {
 
                     ac.setPlatId(ac.getPlatId().substring(0, ac.getPlatId().length() - 1));
                     if (StringUtils.isNotBlank(ac.getBusinessNum())){
-                        ac.setBusinessNum(ac.getBusinessNum().substring(0, ac.getBusinessNum().length() - 1));
+                        String[] splitBus = ac.getBusinessNum().split(",");
+                        String num="";
+                        for (String bus : splitBus) {
+                            if (bus.equals("#")){
+                                num+=""+",";
+                            }else{
+                                num+=bus+",";
+                            }
+
+                        }
+                        ac.setBusinessNum(num.substring(0, num.length()-1));
                     }
                     ac.setcTime(d);
                     ac.setStatus(Status.STATUS_1.status);
@@ -241,11 +251,11 @@ public class OrganizationServiceImpl implements OrganizationService {
                                 if (bus.equals("#")){
                                     num+=""+",";
                                 }else{
-                                    num+=bus;
+                                    num+=bus+",";
                                 }
 
                             }
-                            organization.setBusinessNum(num.substring(0, num.length()));
+                            organization.setBusinessNum(num.substring(0, num.length()-1));
                         }
                         organization.setcUser(agentVo.getSid());
                         organization.setAccountName(ac.getAccountName());
