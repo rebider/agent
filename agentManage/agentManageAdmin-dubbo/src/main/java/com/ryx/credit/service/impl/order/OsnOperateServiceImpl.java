@@ -839,8 +839,9 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             retMap.put("code", "1111");
             return retMap;
         }
-
+        logger.info("进入物流发送阶段，联动各个业务平台！");
         if (PlatformType.whetherPOS(platForm.getPlatformType())) {
+            logger.info("POS平台物流下发！");
             ImsTermWarehouseDetail imsTermWarehouseDetail = new ImsTermWarehouseDetail();
             if (null == order) throw new MessageException("查询订单数据失败！");
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
@@ -894,6 +895,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             }
             //首刷下发业务系统
         } else if (platForm.getPlatformType().equals(PlatformType.MPOS.code)) {
+            logger.info("MPOS平台物流下发！");
             //最大sn
             Optional<OLogisticsDetail> optional_max = listOLogisticsDetailSn.stream().collect(Collectors.maxBy((ar1, ar2) -> {
                 return ar1.getSnNum().compareTo(ar2.getSnNum());
@@ -970,6 +972,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                 throw e;
             }
         }else if(PlatformType.SSPOS.code.equals(platForm.getPlatformType())){
+            logger.info("SSPOS平台物流下发！");
             ImsTermWarehouseDetail imsTermWarehouseDetail = new ImsTermWarehouseDetail();
             if (null == order) throw new MessageException("查询订单数据失败！");
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
@@ -1028,6 +1031,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                 throw e;
             }
         } else if (PlatformType.RDBPOS.code.equals(platForm.getPlatformType())) {
+            logger.info("RDBPOS平台物流下发！");
             //瑞大宝机具下发
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
             Agent agent = agentMapper.selectByPrimaryKey(order.getAgentId());
@@ -1118,6 +1122,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                 throw e;
             }
         } else if (PlatformType.RJPOS.code.equals(platForm.getPlatformType())) {
+            logger.info("RJPOS平台物流下发！");
             //瑞+物流下发
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
             if (null == oActivity_plan) throw new MessageException("活动信息异常！");
@@ -1126,7 +1131,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
 
             //查询顶级机构
             Map orgMap = orgPlatformMapper.selectByMap(FastMap.fastMap("busPlatform", agentBusInfo.getBusPlatform()).putKeyV("organNum", agentBusInfo.getOrganNum()));
-            if (null == orgMap.get("PLATCODE")) throw new MessageException("顶级机构码为空，请联系管理员！");
+            if (null == orgMap || null == orgMap.get("PLATCODE")) throw new MessageException("顶级机构码为空，请补全顶级机构！");
 
             Map<String, Object> reqMap = new HashMap<>();
             reqMap.put("taskId", logistics.getId());//批次号（唯一值,主键,我们用物流ID）
