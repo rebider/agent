@@ -1148,6 +1148,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public AgentResult loadAgentInfo(String id) throws Exception {
 
+        Map<String,Object> orderRecords = new HashMap<>();
+        Map<String,Object> receiptOrder = new HashMap<>();
+        Map<String,Object> countPlan = new HashMap<>();
         //订单
         OOrder order = orderMapper.selectByPrimaryKey(id);
         FastMap f = FastMap.fastMap("order", order);
@@ -1171,6 +1174,13 @@ public class OrderServiceImpl implements OrderService {
         //商品活动信息
         if (oSubOrders.size() > 0) {
             List<String> ids = new ArrayList<>();
+            oSubOrders.forEach(oSubOrder->{
+                OReceiptOrderExample oReceiptOrderExample = new OReceiptOrderExample();
+                oReceiptOrderExample.or().andStatusEqualTo(Status.STATUS_1.status).andOrderIdEqualTo(oSubOrder.getOrderId());
+                Long receiptOrders = oReceiptOrderMapper.countByExample(oReceiptOrderExample);
+                receiptOrder.put("receiptOrders",receiptOrders);
+            });
+
             for (OSubOrder oSubOrder : oSubOrders) {
                 ids.add(oSubOrder.getId());
             }
@@ -1239,11 +1249,7 @@ public class OrderServiceImpl implements OrderService {
         ReceiptPlanExample receiptPlanExample = new ReceiptPlanExample();
         receiptPlanExample.or().andOrderIdEqualTo(order.getId()).andStatusEqualTo(Status.STATUS_1.status);
         List<ReceiptPlan> receiptPlan = receiptPlanMapper.selectByExample(receiptPlanExample);
-        Long countPlan = receiptPlanMapper.countByExample(receiptPlanExample);
-        Map<String,Object> orderNum = new HashMap<>();
         f.putKeyV("receiptPlans", receiptPlan);
-        f.putKeyV("receiptPlanNum",countPlan);
-
         //支付信息
         OPaymentExample oPaymentExample = new OPaymentExample();
         oPaymentExample.or().andStatusEqualTo(Status.STATUS_1.status).andOrderIdEqualTo(order.getId());
