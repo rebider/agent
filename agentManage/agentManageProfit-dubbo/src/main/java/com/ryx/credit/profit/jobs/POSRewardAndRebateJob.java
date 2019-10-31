@@ -184,7 +184,7 @@ public class POSRewardAndRebateJob {
             AgentResult agentResult = posProfitDataService.getPOSRewardDatas(pftMonth,tranCode);
             if(200==agentResult.getStatus()){
                 ResultData = ( Map<String, Object>) agentResult.getData();
-                 agentResultData = (List<Map<String,Object>>) JSONArray.parse(ResultData.get("pftData").toString());
+                 agentResultData = (List<Map<String,Object>>) JSONArray.parse(String.valueOf(ResultData.get("pftData")));
             }else{
                 LOG.info("POS奖励获取数据获取失败:"+agentResult.getMsg());
                 agentResultData=null;
