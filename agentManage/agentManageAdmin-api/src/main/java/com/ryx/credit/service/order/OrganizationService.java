@@ -46,4 +46,9 @@ public interface OrganizationService {
      */
     List<Map> queryOrg(String platForm);
 
+    /**
+     * 根据机构id和业务平台查询平台码
+     */
+    List<OrgPlatform> queryOrgPlatCode(String orgId,String platNum);
+
 }
