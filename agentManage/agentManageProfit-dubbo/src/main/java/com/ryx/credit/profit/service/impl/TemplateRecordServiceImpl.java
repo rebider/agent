@@ -64,6 +64,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     private static final String TEMPLATE_APPLY_CHECK = AppConfig.getProperty("template.apply.check");
     private static final String TEMPLATE_APPLY_CHECKNAME = AppConfig.getProperty("template.apply.checkName");
     private static final String TEMPLATE_CHECKPOSREWARD = AppConfig.getProperty("template.checkPOSReward");
+    private static final String TEMPLATE_DELAPPLY = AppConfig.getProperty("template.delApply");
 
     private static final String RJ_TEMPLATE_NOW = AppConfig.getProperty("rj.template.now"); // 获取现有模板
     private static final String RJ_TEMPLATE_APPLY = AppConfig.getProperty("rj.template.apply"); // 申请
@@ -186,7 +187,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                 templateRecode.setTemplateName(map2.getString("mouldName"));
             }else if("RJPOS".equals(busInfo.get("PLATFORM_TYPE"))){
                 reactRJPOSApply(RJ_TEMPLATE_APPLY,map2.toJSONString(),templateRecode);
-            }else if("POS".equals(busInfo.get("PLATFORM_TYPE"))||"ZPOS".equals(busInfo.get("PLATFORM_TYPE"))||"ZHPOS".equals(busInfo.get("PLATFORM_TYPE"))){
+            }else if("POS".equals(busInfo.get("PLATFORM_TYPE"))||"ZHPOS".equals(busInfo.get("PLATFORM_TYPE"))){
                 // todo POS平台信息申请
                 result = HttpClientUtil.doPostJson(TEMPLATE_APPLY, map2.toJSONString());
                 Map<String,Object> resultMap = JSONObject.parseObject(result);
@@ -235,6 +236,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             try {
             JSONObject mapJSONObject = new JSONObject();
             mapJSONObject.put("applyId",templateRecode.getTemplateId());
+            mapJSONObject.put("isStartMonth","1");
             String CheckResult = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, mapJSONObject.toJSONString());
             Map<String,Object> resultMap = JSONObject.parseObject(CheckResult);
 
@@ -252,9 +254,6 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         }
 
 
-
-
-
         try{
             proceId = activityService.createDeloyFlow(null, workId, null, null, startPar);
             if (proceId == null) {
@@ -267,6 +266,15 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             TemplateRecodeExample pExample = new TemplateRecodeExample();
             pExample.createCriteria().andIdEqualTo(templateRecode.getId());
             recodeMapper.deleteByExample(pExample);
+            try {
+                JSONObject map = new JSONObject();
+                map.put("applyId",templateRecode.getTemplateId());
+                String  resultde = HttpClientUtil.doPostJson(TEMPLATE_DELAPPLY, map.toJSONString());
+                Map<String,Object> resultMap = JSONObject.parseObject(resultde);
+            }catch (Exception e1){
+                e1.printStackTrace();
+
+            }
             throw new MessageException("分润模板线上申请审批流启动失败!");
         }
         BusActRel record = new BusActRel();
@@ -463,7 +471,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                 map2.put("applyId",recode.getTemplateId());
                 map2.put("orgId",recode.getBusNum());
                 reactRJPOSApply(RJ_TEMPLATE_APPLY,map2.toJSONString(),recode);
-            }else if("POS".equals(platformType)||"ZPOS".equals(platformType)||"ZHPOS".equals(platformType)){
+            }else if("POS".equals(platformType)||"ZHPOS".equals(platformType)){
                 // todo POS平台信息修改
                 result = HttpClientUtil.doPostJson(TEMPLATE_APPLY, map2.toJSONString());
                 Map<String,Object> resultMap = JSONObject.parseObject(result);
@@ -523,6 +531,20 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                    // }
                 }else{
                     templateRecode.setApplyResult("3"); // 撤销
+                    try {
+                        JSONObject map = new JSONObject();
+                        map.put("applyId",templateRecode.getTemplateId());
+                        String  result = HttpClientUtil.doPostJson(TEMPLATE_DELAPPLY, map.toJSONString());
+                        Map<String,Object> resultMap = JSONObject.parseObject(result);
+                        if(!(boolean)resultMap.get("result")) {
+                            logger.info("***********修改删除综管数据失败，***********");
+                            throw new MessageException(resultMap.get("msg").toString());
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        recodeMapper.updateByPrimaryKeySelective(templateRecode);
+
+                    }
                 }
                 recodeMapper.updateByPrimaryKeySelective(templateRecode);
 
@@ -556,7 +578,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         try{
             if("RJPOS".equals(stringMap.get("PLATFORM_TYPE"))){ // 瑞+
                 result = HttpClientUtil.doPostJson(RJ_TEMPLATE_APPLY_PASS, map2.toJSONString());
-            }else if("POS".equals(stringMap.get("PLATFORM_TYPE"))||"ZPOS".equals(stringMap.get("PLATFORM_TYPE"))||"ZHPOS".equals(stringMap.get("PLATFORM_TYPE"))){
+            }else if("POS".equals(stringMap.get("PLATFORM_TYPE"))||"ZHPOS".equals(stringMap.get("PLATFORM_TYPE"))){
                 result = HttpClientUtil.doPostJson(TEMPLATE_APPLY_PASS, map2.toJSONString());
             }else if("SSPOS".equals(stringMap.get("PLATFORM_TYPE"))){
                 result = HttpClientUtil.doPostJson(SS_TEMPLATE_APPLY_PASS, map2.toJSONString());
@@ -617,7 +639,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             map2.put("applyId",templateRecode.getTemplateId());
             if("RJPOS".equals(stringMap.get("PLATFORM_TYPE"))){ // 瑞+
                 result = HttpClientUtil.doPostJson(RJ_TEMPLATE_APPLY_CHECK, map2.toJSONString());
-            }else if("POS".equals(stringMap.get("PLATFORM_TYPE"))||"ZPOS".equals(stringMap.get("PLATFORM_TYPE"))||"ZHPOS".equals(stringMap.get("PLATFORM_TYPE"))){
+            }else if("POS".equals(stringMap.get("PLATFORM_TYPE"))||"ZHPOS".equals(stringMap.get("PLATFORM_TYPE"))){
                 result = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, map2.toJSONString());
             }else if("SSPOS".equals(stringMap.get("PLATFORM_TYPE"))){//实时分润
                 result = HttpClientUtil.doPostJson(SS_TEMPLATE_APPLY_CHECK, map2.toJSONString());
@@ -656,7 +678,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             map2.put("applyId",templateRecode.getTemplateId());
             if("RJPOS".equals(stringMap.get("PLATFORM_TYPE"))){ // 瑞+
                 result = HttpClientUtil.doPostJson(RJ_TEMPLATE_APPLY_CHECKNAME, map2.toJSONString());
-            }else if("POS".equals(stringMap.get("PLATFORM_TYPE"))||"ZHPOS".equals(stringMap.get("PLATFORM_TYPE"))||"ZPOS".equals(stringMap.get("PLATFORM_TYPE"))){
+            }else if("POS".equals(stringMap.get("PLATFORM_TYPE"))||"ZHPOS".equals(stringMap.get("PLATFORM_TYPE"))){
                 result = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECKNAME, map2.toJSONString());
             }else if ("SSPOS".equals(stringMap.get("PLATFORM_TYPE"))){
                 result = HttpClientUtil.doPostJson(SS_TEMPLATE_APPLY_CHECKNAME, map2.toJSONString());
