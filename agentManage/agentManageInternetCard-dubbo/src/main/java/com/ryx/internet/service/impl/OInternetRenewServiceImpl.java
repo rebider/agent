@@ -747,9 +747,12 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 if(null==oInternetCard.getExpireTime()){
                     throw new MessageException("到期时间为空,不允许续费");
                 }
-                Date date = DateUtil.dateDay(oInternetCard.getExpireTime(), "22");
-                if(Calendar.getInstance().getTime().getTime()>date.getTime()){
-                    throw new MessageException("到期时间超过22号,不允许续费");
+                String onOff = redisService.getValue(RedisCachKey.CARDRENEW22ONOFF.code);
+                if(onOff.equals(OnOffStatus.ON.code)){
+                    Date date = DateUtil.dateDay(oInternetCard.getExpireTime(), "22");
+                    if(Calendar.getInstance().getTime().getTime()>date.getTime()){
+                        throw new MessageException("到期时间超过22号,不允许续费");
+                    }
                 }
             }else{
                 throw new MessageException("状态不正确,不允许续费");

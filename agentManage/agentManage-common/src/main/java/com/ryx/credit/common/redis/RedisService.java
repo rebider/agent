@@ -172,6 +172,11 @@ public class RedisService {
         return null;
     }
 
+
+    public void set(final String key,final String value) {
+        redisTemplate.opsForValue().set(key,value);
+    }
+
     /**
      * 失效时间
      * @param key
