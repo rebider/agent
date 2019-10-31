@@ -98,6 +98,18 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         if (StringUtils.isNotBlank(activity.getPosType())) {
             criteria.andPosTypeEqualTo(activity.getPosType());
         }
+        if (StringUtils.isNotBlank(activity.getBusProCode())) {
+            criteria.andBusProCodeEqualTo(activity.getBusProCode());
+        }
+        if (null!=activity.getPrice()) {
+            criteria.andPriceEqualTo(activity.getPrice());
+        }
+        if (null!=activity.getOriginalPrice()) {
+            criteria.andOriginalPriceEqualTo(activity.getOriginalPrice());
+        }
+        if (StringUtils.isNotBlank(activity.getId())) {
+            criteria.andIdEqualTo(activity.getId());
+        }
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         example.setOrderByClause(" ACT_CODE,c_time desc");
         example.setPage(page);
