@@ -2,6 +2,7 @@ package com.ryx.credit.dao;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.ryx.credit.pojo.admin.COrganization;
+import com.ryx.credit.pojo.admin.vo.COrganizationVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -31,4 +32,15 @@ public interface COrganizationMapper extends BaseMapper<COrganization> {
      */
     List<COrganization> selectCityRegion(@Param("cUser") Long cUser);
 
+    List<COrganizationVo> selectPorg();
+
+    List<COrganizationVo> selectPrgByUserId(Long userId);
+
+    List<COrganization> selectPubOrgs(@Param("map") Map map);
+
+    List<COrganization> selectPorgByorgs(@Param("list") List<String> list);
+
+    List<String> selectSubOrg(List<String> orgs);
+
+    List<COrganization> selectMaintainOrg();
 }

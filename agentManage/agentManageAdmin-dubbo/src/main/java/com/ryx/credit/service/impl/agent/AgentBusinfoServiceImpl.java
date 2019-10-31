@@ -8,8 +8,10 @@ import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
+import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.OrganizationMapper;
+import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
@@ -74,6 +76,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	private AgentService agentService;
 	@Autowired
 	private AgentNetInNotityService agentNetInNotityService;
+	@Autowired
+	private COrganizationMapper cOrganizationMapper;
 
     /**
      * 代理商查询插件数据获取
@@ -1086,6 +1090,22 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		}
 		map.put("agentId",agentBusInfos.get(0).getAgentId());
 		return map;
+	}
+
+	/**
+	 * 代理商查看公告的发布机构菜单
+	 * @param map
+	 * @return allOrg
+	 */
+	@Override
+	public List<String> queryOrgByAgentid(Map map) {
+		List<String> allOrg=new ArrayList<>();
+		List<String> orgs = agentBusInfoMapper.queryAgDocPro(map);
+		List<COrganization> cOrganizations = cOrganizationMapper.selectPorgByorgs(orgs);
+		cOrganizations.forEach(org->{
+			allOrg.add(String.valueOf(org.getId()));
+		});
+		return allOrg;
 	}
 
 }
