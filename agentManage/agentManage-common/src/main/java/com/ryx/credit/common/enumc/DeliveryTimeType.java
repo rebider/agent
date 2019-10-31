@@ -3,25 +3,16 @@ package com.ryx.credit.common.enumc;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * 物联网卡清算轧差状态
- * @version V1.0
- * @Description:
- * @author: Liudh
- * @date: 2018/12/4 18:11
- */
-public enum InternetCleanStatus {
+public enum DeliveryTimeType {
 
-    ZERO("0","未轧差"),
-    ONE("1","部分轧差"),
-    TWO("2","轧差完毕"),
-    THREE("3","取消");
+    ZERO("00","发货时间正常调整"),
+    ONE("01","延期发货天数");
 
     public String code;
 
     public String msg;
 
-    InternetCleanStatus(String c, String m){
+    DeliveryTimeType(String c, String m){
         this.code=c;
         this.msg =m;
     }
@@ -32,8 +23,8 @@ public enum InternetCleanStatus {
      * @return
      */
     public static String getContentByValue(String value){
-        InternetCleanStatus[] status = InternetCleanStatus.values();
-        for(InternetCleanStatus cc : status){
+        DeliveryTimeType[] status = DeliveryTimeType.values();
+        for(DeliveryTimeType cc : status){
             if(cc.code.equals(value)){
                 return cc.msg;
             }
@@ -42,8 +33,8 @@ public enum InternetCleanStatus {
     }
 
     public static String getContentByMsg(String msg){
-        InternetCleanStatus[] status = InternetCleanStatus.values();
-        for(InternetCleanStatus cc : status){
+        DeliveryTimeType[] status = DeliveryTimeType.values();
+        for(DeliveryTimeType cc : status){
             if(cc.msg.equals(msg)){
                 return cc.code;
             }
@@ -53,8 +44,8 @@ public enum InternetCleanStatus {
 
     public static Map<String, Object> getSelectMap(){
         Map<String, Object> resultMap = new HashMap<>();
-        InternetCleanStatus[] status = InternetCleanStatus.values();
-        for(InternetCleanStatus cc : status){
+        DeliveryTimeType[] status = DeliveryTimeType.values();
+        for(DeliveryTimeType cc : status){
             resultMap.put(cc.code,cc.msg);
         }
         return resultMap;

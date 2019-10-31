@@ -82,4 +82,22 @@
         and u.id = #{userId}
     </select>
 
+
+    <insert id="insertRole" parameterType="com.ryx.credit.pojo.admin.CRole" >
+        insert into
+        c_role(id,name,seq,description,status)
+        values
+        (
+            #{id,jdbcType=VARCHAR},
+            #{name,jdbcType=VARCHAR},
+            #{seq,jdbcType=DECIMAL},
+            #{description,jdbcType=VARCHAR},
+            #{status,jdbcType=DECIMAL}
+        )
+    </insert>
+
+    <select id="findId" resultType="java.lang.Long">
+        SELECT s_role.NEXTVAL FROM DUAL
+    </select>
+
 </mapper>

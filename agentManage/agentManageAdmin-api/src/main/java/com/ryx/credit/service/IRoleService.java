@@ -15,7 +15,7 @@ import java.util.Set;
  */
 public interface IRoleService extends IService<CRole> {
 
-    PageInfo selectDataGrid(PageInfo pageInfo);
+    PageInfo selectDataGrid(PageInfo pageInfo,CRole cRole);
 
     Object selectTree();
 
@@ -25,4 +25,5 @@ public interface IRoleService extends IService<CRole> {
 
     Map<String, Set<String>> selectResourceMapByUserId(Long userId);
 
+    void copyRole(Long id);
 }

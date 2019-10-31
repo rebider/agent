@@ -11,6 +11,7 @@ public enum DictGroup {
     YESORNOISYES("yesornoisyes"),
     AGENT("代理商模块"),
     ORDER("订单模块"),
+    CARD("流量卡模块"),
     RELATION("关系模块"),
     AGENT_AUDIT("代理商审核模块"),
     BUS_TYPE("业务模块类型或者级别"),
@@ -77,7 +78,6 @@ public enum DictGroup {
     ORDER_RETURN("订单退货业务选择下一级审批人参数"),
     APPROVE_MODE("审批流程图当前节点"),
     PRE_APPROVE_MODE("准生产环境审批流程图当前节点"),
-
     ORG_TYPE("机构类型"),
     REPORT_STATUS("报备状态"),
     INTERNET_RENEW("流量卡续费配置"),
@@ -85,20 +85,15 @@ public enum DictGroup {
     OFFSET_AMT("轧差每张金额"),
     COMPENSATE_MODEL_TYPE("补差价可扩展机具类型"),
     COMPENSATE_PLATFORM_TYPE("补差价可调整关系平台"),
-
     RDBPOS("瑞大宝模块"),
     RDB_POS_LOWER("瑞大宝直签终端下限"),
-
     AGENT_CODE_FILTER("代理商过滤代码"),
-
     EMAIL("邮件模块"),
     LOGISTICS_FAIL_EMAIL("物流失败邮件"),
-
     CERTIFICATION_STATUS("代理商工商认证"),
+    DATA_SHIRO("流量卡内部续费数据权限"),
     ANN_TYPE("公告类型"),
     ANN_ORG("公告运维机构"),
-
-
     REMOVEACCOUNT_FAIL_EMAIL("销账失败邮件"),
     RATYPE("销账方式"),
     RSTATUS("销账状态");

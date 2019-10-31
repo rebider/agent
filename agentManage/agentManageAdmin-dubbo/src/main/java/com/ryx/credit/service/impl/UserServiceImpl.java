@@ -5,19 +5,14 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.ryx.credit.common.util.FastMap;
-import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.BeanUtils;
-import com.ryx.credit.commons.utils.JsonUtils;
 import com.ryx.credit.commons.utils.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.CUserMapper;
 import com.ryx.credit.dao.CUserRoleMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
-import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.CUserRole;
-import com.ryx.credit.pojo.admin.agent.Agent;
-import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.vo.UserVo;
 import com.ryx.credit.service.IBranchInnerConnectionService;
 import com.ryx.credit.service.IUserService;
@@ -206,5 +201,20 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
     @Override
     public Map<String, Object> selectAgentByOrgId(Map<String, Object> map) {
         return agentMapper.selectAgentByOrgId(map);
+    }
+
+    @Override
+    @Transactional
+    public void copyUser(Long id){
+        CUser cUser = userMapper.selectById(id);
+        UserVo userVo = BeanUtils.copy(cUser, UserVo.class);
+        List<CUserRole> cUserRoles = userRoleMapper.selectByUserId(id);
+        String roleIds = "";
+        for (CUserRole cUserRole : cUserRoles) {
+            roleIds+=cUserRole.getRoleId()+",";
+        }
+        userVo.setRoleIds(roleIds);
+        userVo.setLoginName(userVo.getLoginName()+"1");
+        insertByVo(userVo);
     }
 }
