@@ -28,4 +28,5 @@ public interface OrgPlatformMapper {
 
     List<Map> queryOrg(@Param("platForm")String platForm);
 
+    List<OrgPlatform> queryOrgPlatCode(@Param("orgId")String orgId, @Param("platNum")String platNum);
 }

@@ -211,4 +211,10 @@
    </if>
 
   </select>
+
+  <select id="queryOrgPlatCode" parameterType="string" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from ORG_PLATFORM where org_id=#{orgId} and plat_num=#{platNum}
+  </select>
 </mapper>

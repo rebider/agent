@@ -453,4 +453,11 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         return orgPlatformMapper.queryOrg(platForm);
     }
+
+    @Override
+    public List<OrgPlatform> queryOrgPlatCode(String orgId, String platNum) {
+        if(StringUtils.isNotBlank(orgId) && StringUtils.isNotBlank(platNum))
+       return orgPlatformMapper.queryOrgPlatCode(orgId,platNum);
+        return null;
+    }
 }
