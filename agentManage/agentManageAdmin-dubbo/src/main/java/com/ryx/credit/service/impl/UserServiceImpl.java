@@ -205,7 +205,7 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
 
     @Override
     @Transactional
-    public void copyUser(Long id){
+    public void copyUser(Long id) throws Exception {
         CUser cUser = userMapper.selectById(id);
         UserVo userVo = BeanUtils.copy(cUser, UserVo.class);
         List<CUserRole> cUserRoles = userRoleMapper.selectByUserId(id);
@@ -215,6 +215,6 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
         }
         userVo.setRoleIds(roleIds);
         userVo.setLoginName(userVo.getLoginName()+"1");
-        insertByVo(userVo);
+        insertByVo(userVo,new HashMap<>());
     }
 }
