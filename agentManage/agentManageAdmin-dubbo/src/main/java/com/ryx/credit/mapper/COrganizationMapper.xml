@@ -170,4 +170,13 @@
          group by a.id, a.name
          order by id desc
     </select>
+    <select id="selectBranchList" resultType="map">
+        SELECT
+            C.ID,C.NAME
+        FROM
+            C_ORGANIZATION C
+        WHERE
+            regexp_like (C.CODE, '[a-z|A-Z]+_+[a-z|A-Z]+_+')
+    </select>
+
 </mapper>
