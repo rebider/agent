@@ -83,6 +83,7 @@
           left join c_organization cb
             on t.id = cb.pid
           where  t.code like 'agent'*/
+
     </select>
     <resultMap id="COrganizationVoMap" type="com.ryx.credit.pojo.admin.vo.COrganizationVo">
         <id column="pid" property="pid"/>
@@ -178,4 +179,5 @@
         WHERE
             regexp_like (C.CODE, '[a-z|A-Z]+_+[a-z|A-Z]+_+')
     </select>
+
 </mapper>

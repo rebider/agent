@@ -90,15 +90,13 @@ public enum DictGroup {
     AGENT_CODE_FILTER("代理商过滤代码"),
     EMAIL("邮件模块"),
     LOGISTICS_FAIL_EMAIL("物流失败邮件"),
+    CERTIFICATION_STATUS("代理商工商认证"),
     DATA_SHIRO("流量卡内部续费数据权限"),
+    ANN_TYPE("公告类型"),
+    ANN_ORG("公告运维机构"),
     REMOVEACCOUNT_FAIL_EMAIL("销账失败邮件"),
     RATYPE("销账方式"),
-    RSTATUS("销账状态"),
-    CERTIFICATION_STATUS("代理商工商认证"),
-    ANN_TYPE("公告类型"),
-    ANN_ORG("公告运维机构");
-
-
+    RSTATUS("销账状态");
 
     public String  msg;
 

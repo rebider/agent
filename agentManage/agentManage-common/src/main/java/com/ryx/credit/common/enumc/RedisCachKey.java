@@ -18,7 +18,8 @@ public enum RedisCachKey {
     INSERT_SYS_KEY("synColinfoToPayment_lock:", "打款账户同步清结算"),
     QUERY_SYS_KEY("synColinfoToQueryPayment_lock:", "打款账户同步清结算查询"),
     AGENT_FREEZE_LOCK("AGENT_FREEZE_LOCK:", "代理商冻结锁"),
-    AGENT_UN_FREEZE_LOCK("AGENT_UN_FREEZE_LOCK:", "代理商解冻锁");
+    AGENT_UN_FREEZE_LOCK("AGENT_UN_FREEZE_LOCK:", "代理商解冻锁"),
+    CARDRENEW22ONOFF("OnOff:CardRenew22OnOff", "续费22号限制开关");
 
     public String code;
 
