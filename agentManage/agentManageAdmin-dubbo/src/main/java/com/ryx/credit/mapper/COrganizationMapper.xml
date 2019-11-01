@@ -177,7 +177,7 @@
         FROM
             C_ORGANIZATION C
         WHERE
-            regexp_like (C.CODE, '[a-z|A-Z]+_+[a-z|A-Z]+_+')
+            C.CODE LIKE 'region_%' OR C.CODE LIKE 'beijing%'
     </select>
 
 </mapper>

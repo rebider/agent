@@ -116,7 +116,7 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
             int i = 0,j = 0;
             List<Map<String, Object>> listBranch = organizationMapper.selectBranchList();
             for (Map<String, Object> branch : listBranch) {
-                if (map.get("branchId").equals(branch.get("ID"))) {
+                if (map.get("branchId").equals(String.valueOf(branch.get("ID")))) {
                     i++;
                 }
             }
