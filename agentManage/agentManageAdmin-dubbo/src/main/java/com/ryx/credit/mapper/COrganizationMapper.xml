@@ -176,7 +176,7 @@
         FROM
             C_ORGANIZATION C
         WHERE
-            regexp_like (C.CODE, '[a-z|A-Z]+_+[a-z|A-Z]+_+')
+            regexp_like (C.CODE, '[a-z|A-Z]+_+[a-z|A-Z|0-9]+_+')
     </select>
 
 </mapper>
