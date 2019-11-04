@@ -2385,9 +2385,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         PlatForm platForm = platFormMapper.selectByPlatFormNum(oOrder.getOrderPlatform());
 
         log.info("PlatformType:{}",platForm.getPlatformType());
-        //新增加瑞大宝平台，不是瑞大宝平台按原来逻辑
-        if (platForm.getPlatformType().equals(PlatformType.RDBPOS.code)) {
-            //新增瑞大宝平台重新下发
+        //重新下发具体操作
+        if (platForm.getPlatformType().equals(PlatformType.RDBPOS.code) || platForm.getPlatformType().equals(PlatformType.RJPOS.code)) {
+            //瑞大宝平台重新下发，瑞+物流重新下发
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oOrder.getBusId());
             if (null==agentBusInfo) throw new MessageException("查询业务数据失败！");
 
@@ -2400,18 +2400,18 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 oLogisticsDetail.setSbusMsg("");
                 int deleteInt = logistics.getSendNum().compareTo(BigDecimal.valueOf(logisticsDetailMapper.updateByLogisticsId(oLogisticsDetail)));
                 if (deleteInt != 0) {
-                    log.info("瑞大宝更新物流异常，物流明细和物流发送数量不同。");
-                    throw new Exception("瑞大宝更新物流异常，物流明细和物流发送数量不同。");
+                    log.info("更新物流异常，物流明细和物流发送数量不同。");
+                    throw new Exception("更新物流异常，物流明细和物流发送数量不同。");
                 }
                 //更新物流
                 OLogistics updateLogistics = new OLogistics();
                 updateLogistics.setId(logistics.getId());
                 updateLogistics.setSendStatus(LogisticsSendStatus.gen_detail_sucess.code);
                 updateLogistics.setSendMsg("");
-                updateLogistics.setVersion(logistics.getVersion());//暂时用不到乐观锁，但是要传进去
+                updateLogistics.setVersion(logistics.getVersion());
                 if (1 != oLogisticsMapper.updateByPrimaryKeySelective(updateLogistics)) {
                     log.info("发货物流，重新发送，更新数据库失败:{},{},{}", logistics.getId(), logistics.getSnBeginNum(), logistics.getSnEndNum());
-                    throw new Exception("瑞大宝更新物流状态发生异常！！！");
+                    throw new Exception("更新物流状态发生异常！！！");
                 }
             }catch (Exception e){
                 e.printStackTrace();
