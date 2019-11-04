@@ -1136,13 +1136,19 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             reqMap.put("machineId", oActivity_plan.getBusProCode());//活动代码
             reqMap.put("posSnBegin", logistics.getSnBeginNum());//起始终端号
             reqMap.put("posSnEnd", logistics.getSnEndNum());//结束终端号
-            reqMap.put("posType", oActivity_plan.getPosType());//机具类型
-            reqMap.put("posSpePrice", oActivity_plan.getPosSpePrice());//押金
-            reqMap.put("standTime", oActivity_plan.getStandTime());//达标时间
             reqMap.put("newOrgId", agentBusInfo.getBusNum());//划拨目标
-            reqMap.put("deliveryTime", new SimpleDateFormat("yyyyMMdd").format(new Date()));//物流下发，当前时间
+            reqMap.put("deliveryTime", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));//物流下发，当前时间
             reqMap.put("orgId", orgMap.get("PLATCODE"));//顶级机构
             reqMap.put("createPerson", AppConfig.getProperty("rjpos.agent.name"));//创建人
+            if (null != oActivity_plan.getPosType() && (oActivity_plan.getPosType().equals("1") || oActivity_plan.getPosType().equals("2"))) {
+                reqMap.put("posType", oActivity_plan.getPosType());//机具类型
+                if (null == oActivity_plan.getPosSpePrice() || null == oActivity_plan.getStandTime())
+                    return FastMap.fastMap("code", "2222").putKeyV("msg", "活动对应的特价机[押金]或[达标时间]不能为空!");
+                reqMap.put("posSpePrice", oActivity_plan.getPosSpePrice());//押金
+                reqMap.put("standTime", oActivity_plan.getStandTime());//达标时间
+            } else if (null == oActivity_plan.getPosType() || oActivity_plan.getPosType().equals("0")) {
+                reqMap.put("posType", "0");//机具类型
+            }
 
             try {
                 LowerHairMachineVo lowerHairMachineVo = new LowerHairMachineVo();
