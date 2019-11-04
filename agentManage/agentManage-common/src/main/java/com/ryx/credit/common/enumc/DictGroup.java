@@ -94,7 +94,9 @@ public enum DictGroup {
     EMAIL("邮件模块"),
     LOGISTICS_FAIL_EMAIL("物流失败邮件"),
 
-    CERTIFICATION_STATUS("代理商工商认证");
+    CERTIFICATION_STATUS("代理商工商认证"),
+    ANN_TYPE("公告类型"),
+    ANN_ORG("公告运维机构");
 
 
 
