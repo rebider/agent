@@ -107,7 +107,9 @@ public class InternetCardServiceImpl implements InternetCardService {
                     continue;
                 }
                 String onOff = redisService.getValue(RedisCachKey.CARDRENEW22ONOFF.code);
-                if(onOff.equals(OnOffStatus.ON.code)){
+                if(StringUtils.isBlank(onOff)){
+                    oInternetCard.setRenewButton("0");
+                }else if( onOff.equals(OnOffStatus.ON.code)){
                     Date date = DateUtil.dateDay(oInternetCard.getExpireTime(), "22");
                     if(Calendar.getInstance().getTime().getTime()<date.getTime()){
                         oInternetCard.setRenewButton("1");

@@ -423,7 +423,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         String agentId;
         if (null != agentVo.getAgentId()) {
             agentId = agentVo.getAgentId();
-        } else if (null != agentVo.getAgent().getId()) {
+        } else if (null != agentVo.getAgent() && null != agentVo.getAgent().getId()) {
             agentId = agentVo.getAgent().getId();
         } else if (null != agentVo.getBusInfoVoList().get(0)) {
             agentId = agentVo.getBusInfoVoList().get(0).getAgentId();

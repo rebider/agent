@@ -38,5 +38,5 @@ public interface IUserService extends IService<CUser> {
 
     Map<String, Object> selectAgentByOrgId(Map<String, Object> map);
 
-    void copyUser(Long id);
+    void copyUser(Long id)throws Exception ;
 }

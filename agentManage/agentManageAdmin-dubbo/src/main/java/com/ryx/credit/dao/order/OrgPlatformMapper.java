@@ -34,4 +34,5 @@ public interface OrgPlatformMapper {
      * @return
      */
     Map<String, Object> selectByMap(Map<String, Object> paramMap);
+    List<OrgPlatform> queryOrgPlatCode(@Param("orgId")String orgId, @Param("platNum")String platNum);
 }
