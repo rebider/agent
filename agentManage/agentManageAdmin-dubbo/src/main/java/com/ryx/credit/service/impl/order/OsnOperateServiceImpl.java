@@ -1144,8 +1144,8 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                 reqMap.put("posType", oActivity_plan.getPosType());//机具类型
                 if (null == oActivity_plan.getPosSpePrice() || null == oActivity_plan.getStandTime())
                     return FastMap.fastMap("code", "2222").putKeyV("msg", "活动对应的特价机[押金]或[达标时间]不能为空!");
-                reqMap.put("posSpePrice", oActivity_plan.getPosSpePrice());//押金
-                reqMap.put("standTime", oActivity_plan.getStandTime());//达标时间
+                reqMap.put("posSpePrice", oActivity_plan.getPosSpePrice().toString());//押金
+                reqMap.put("standTime", oActivity_plan.getStandTime().toString());//达标时间
             } else if (null == oActivity_plan.getPosType() || oActivity_plan.getPosType().equals("0")) {
                 reqMap.put("posType", "0");//机具类型
             }
