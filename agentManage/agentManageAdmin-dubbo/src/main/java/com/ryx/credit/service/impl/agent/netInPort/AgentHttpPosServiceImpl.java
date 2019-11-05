@@ -289,6 +289,9 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
                 data.put("managerAccount",paramMap.get("managerAccount"));
             if (null != paramMap.get("delManagerAccount"))
                 data.put("delManagerAccount",paramMap.get("delManagerAccount"));
+            data.put("IsOper",paramMap.get("IsOper"));
+            data.put("operOrgId",paramMap.get("operOrgId"));
+
             jsonParams.put("data", data);
             String plainXML = jsonParams.toString();
             // 请求报文加密开始
