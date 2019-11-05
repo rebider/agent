@@ -111,6 +111,22 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
                     putKeyV("branchId", map.get("branchId")).
                     putKeyV("innerLogin", map.get("innerLogin")));
             if (checkInsrt > 0) throw new Exception("["+map.get("innerLogin")+"]"+"已经关联，请勿重复添加！");
+
+            //进行姓名和总管进行校验
+            int i = 0,j = 0;
+            List<Map<String, Object>> listBranch = organizationMapper.selectBranchList();
+            for (Map<String, Object> branch : listBranch) {
+                if (map.get("branchId").equals(String.valueOf(branch.get("ID")))) {
+                    i++;
+                }
+            }
+            List<Map<String, String>> innerList = lmsUserService.queryAllLmsUser();
+            for (Map<String, String> branch : innerList) {
+                if (map.get("innerLogin").equals(branch.get("LOGINNAME"))) {
+                    j++;
+                }
+            }
+            if (i != 1 || j != 1) throw new MessageException("输入有误，请重新选择！");
             //封装参数
             CBranchInner cBranchInner = new CBranchInner();
             cBranchInner.setcTime(Calendar.getInstance().getTime());
