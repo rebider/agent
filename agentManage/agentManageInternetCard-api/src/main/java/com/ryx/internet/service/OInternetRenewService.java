@@ -60,4 +60,6 @@ public interface OInternetRenewService {
     AgentResult queryMonthSumOffsetAmt(Map<String,Object> reqMap);
 
     AgentResult queryCardProfit(Map<String,Object> reqMap);
+
+    AgentResult disposeCardProfit(OInternetRenewDetail internetRenewDetail)throws MessageException;
 }

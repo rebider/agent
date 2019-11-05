@@ -100,9 +100,19 @@ public class OrganizationServiceImpl implements OrganizationService {
                     ac.setOrgNick(ac.getOrgName());
 
                     ac.setPlatId(ac.getPlatId().substring(0, ac.getPlatId().length() - 1));
-                    if (StringUtils.isNotBlank(ac.getBusinessNum())){
-                        ac.setBusinessNum(ac.getBusinessNum().substring(0, ac.getBusinessNum().length() - 1));
-                    }
+                 /*   if (StringUtils.isNotBlank(ac.getBusinessNum())){
+                        String[] splitBus = ac.getBusinessNum().split(",");
+                        String num="";
+                        for (String bus : splitBus) {
+                            if (bus.equals("#")){
+                                num+=""+",";
+                            }else{
+                                num+=bus+",";
+                            }
+
+                        }
+                        ac.setBusinessNum(num.substring(0, num.length()-1));
+                    }*/
                     ac.setcTime(d);
                     ac.setStatus(Status.STATUS_1.status);
                     ac.setVersion(Status.STATUS_1.status);
@@ -234,19 +244,19 @@ public class OrganizationServiceImpl implements OrganizationService {
                             throw new MessageException("代理商ID不能为空");
                         }
                         Organization organization = organizationMapper.selectByPrimaryKey(ac.getOrgId());
-                        if (StringUtils.isNotBlank(ac.getBusinessNum())){
+                       /* if (StringUtils.isNotBlank(ac.getBusinessNum())){
                             String[] splitBus = ac.getBusinessNum().split(",");
                             String num="";
                             for (String bus : splitBus) {
                                 if (bus.equals("#")){
                                     num+=""+",";
                                 }else{
-                                    num+=bus;
+                                    num+=bus+",";
                                 }
 
                             }
-                            organization.setBusinessNum(num.substring(0, num.length()));
-                        }
+                            organization.setBusinessNum(num.substring(0, num.length()-1));
+                        }*/
                         organization.setcUser(agentVo.getSid());
                         organization.setAccountName(ac.getAccountName());
                         organization.setAccountBank(ac.getAccountBank());
@@ -287,17 +297,18 @@ public class OrganizationServiceImpl implements OrganizationService {
                 if (null != ac.getOrgPlatform() || ac.getOrgPlatform().size() > 0) {
                     List<OrgPlatform> orgPlatform = ac.getOrgPlatform();
                     for (OrgPlatform platform : orgPlatform) {
-                        String[] platCode = platform.getPlatCode().split(",");
+                        String replace = platform.getPlatCode().replace(" ", "#");
+                        String[] platCode =replace.split(",");
+
                         String[] platNum = platform.getPlatNum().split(",");
                         Date d = Calendar.getInstance().getTime();
                         for (int i = 0; i < platNum.length; i++) {
                             OrgPlatform orgPlat = new OrgPlatform();
-                            if (platCode[i].equals("#")){
-                                orgPlat.setPlatCode("");
+                            if (StringUtils.isBlank(platCode[i])){
+                                orgPlat.setPlatCode("#");
                             }else{
                                 orgPlat.setPlatCode(platCode[i]);
                             }
-                            orgPlat.setPlatCode(platCode[i]);
                             orgPlat.setPlatNum(platNum[i]);
                             orgPlat.setId(idService.genId(TabId.ORG_PLATFORM));
                             orgPlat.setOrgId(ac.getOrgId());
@@ -452,5 +463,12 @@ public class OrganizationServiceImpl implements OrganizationService {
     public List<Map> queryOrg(String platForm) {
 
         return orgPlatformMapper.queryOrg(platForm);
+    }
+
+    @Override
+    public List<OrgPlatform> queryOrgPlatCode(String orgId, String platNum) {
+        if(StringUtils.isNotBlank(orgId) && StringUtils.isNotBlank(platNum))
+       return orgPlatformMapper.queryOrgPlatCode(orgId,platNum);
+        return null;
     }
 }

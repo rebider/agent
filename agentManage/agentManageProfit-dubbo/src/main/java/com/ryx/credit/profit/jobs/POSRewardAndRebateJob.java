@@ -1,6 +1,7 @@
 package com.ryx.credit.profit.jobs;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.profit.dao.PosKickBackRewardMapper;
@@ -122,12 +123,12 @@ public class POSRewardAndRebateJob {
                 posKickBackReward.setBusName(posRewadData.get("TRAN_GROUP_NAME")==null?"":posRewadData.get("TRAN_GROUP_NAME").toString());
                 posKickBackReward.setAgentName(posRewadData.get("ORG_NAME")==null?"":posRewadData.get("ORG_NAME").toString());
                 AgentBusInfo agentBusinfo =agentBusinfoService.selectBusInfo(posRewadData.get("ORG_ID").toString());
-                if(agentBusinfo==null){
-                    posKickBackReward.setAgentId("集团代理商没有查到对应AG码");
-                }else{
+                //if(agentBusinfo==null){
+                //    posKickBackReward.setAgentId("集团代理商没有查到对应AG码");
+                //}else{
                     posKickBackReward.setAgentId(agentBusinfo.getAgentId());
                     posKickBackReward.setRev1(agentBusinfo.getBusNum());
-                }
+                //}
                 posKickBackReward.setRewardType(posRewadData.get("IS_ASSESS_TYPE")==null?"":posRewadData.get("IS_ASSESS_TYPE").toString());
                 posKickBackReward.setPreteastCycle(posRewadData.get("START_END")==null?"":posRewadData.get("START_END").toString());
                 posKickBackReward.setCheckMonth(posRewadData.get("ASSESS_MONTH")==null?"":posRewadData.get("ASSESS_MONTH").toString());
@@ -183,8 +184,13 @@ public class POSRewardAndRebateJob {
         try{
             AgentResult agentResult = posProfitDataService.getPOSRewardDatas(pftMonth,tranCode);
             if(200==agentResult.getStatus()){
-                ResultData = ( Map<String, Object>) agentResult.getData();
-                 agentResultData = (List<Map<String,Object>>) JSONArray.parse(ResultData.get("pftData").toString());
+                //ResultData = ( Map<String, Object>) agentResult.getData();
+                // agentResultData = (List<Map<String,Object>>) JSONArray.parse(String.valueOf(ResultData.get("pftData")));
+
+                JSONObject json = JSONObject.parseObject(agentResult.getData().toString());
+                JSONArray array = json.getJSONArray("pftData");
+                agentResultData = JSONObject.parseObject(array.toJSONString(), List.class);
+
             }else{
                 LOG.info("POS奖励获取数据获取失败:"+agentResult.getMsg());
                 agentResultData=null;

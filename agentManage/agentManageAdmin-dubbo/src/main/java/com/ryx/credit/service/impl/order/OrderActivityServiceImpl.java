@@ -98,6 +98,18 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         if (StringUtils.isNotBlank(activity.getPosType())) {
             criteria.andPosTypeEqualTo(activity.getPosType());
         }
+        if (StringUtils.isNotBlank(activity.getBusProCode())) {
+            criteria.andBusProCodeEqualTo(activity.getBusProCode());
+        }
+        if (null!=activity.getPrice()) {
+            criteria.andPriceEqualTo(activity.getPrice());
+        }
+        if (null!=activity.getOriginalPrice()) {
+            criteria.andOriginalPriceEqualTo(activity.getOriginalPrice());
+        }
+        if (StringUtils.isNotBlank(activity.getId())) {
+            criteria.andIdEqualTo(activity.getId());
+        }
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         example.setOrderByClause(" ACT_CODE,c_time desc");
         example.setPage(page);
@@ -435,9 +447,14 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             oActivity.setActCode(stringObjectMap.get("ACT_CODE") + "");
             oActivity.setOriginalPrice(new BigDecimal(stringObjectMap.get("ORIGINALPRICE") + ""));
             oActivity.setProductName(stringObjectMap.get("PRO_NAME")+"");
-            oActivity.setPosSpePrice(new BigDecimal(stringObjectMap.get("POS_SPE_PRICE")+""));
-            oActivity.setStandTime(new BigDecimal(stringObjectMap.get("STAND_TIME")+""));
-
+            String posSpePrice = String.valueOf(stringObjectMap.get("POS_SPE_PRICE"));
+            if(StringUtils.isNotBlank(posSpePrice) && !posSpePrice.equals("null") && RegexUtil.checkNum(posSpePrice)){
+                oActivity.setPosSpePrice(new BigDecimal(posSpePrice));
+            }
+            String standTime = String.valueOf(stringObjectMap.get("STAND_TIME"));
+            if(StringUtils.isNotBlank(standTime) && !standTime.equals("null") && RegexUtil.checkNum(standTime)){
+                oActivity.setStandTime(new BigDecimal(standTime));
+            }
             //查询活动是否可见
             OActivity activity = activityMapper.selectByPrimaryKey(oActivity.getId());
             if(StringUtils.isBlank(activity.getVisible())){

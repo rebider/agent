@@ -5,10 +5,7 @@ import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.DateUtil;
-import com.ryx.credit.common.util.JsonUtil;
-import com.ryx.credit.common.util.Page;
-import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.CUser;
@@ -750,9 +747,15 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 if(null==oInternetCard.getExpireTime()){
                     throw new MessageException("到期时间为空,不允许续费");
                 }
-                Date date = DateUtil.dateDay(oInternetCard.getExpireTime(), "22");
-                if(Calendar.getInstance().getTime().getTime()>date.getTime()){
-                    throw new MessageException("到期时间超过22号,不允许续费");
+                String onOff = redisService.getValue(RedisCachKey.CARDRENEW22ONOFF.code);
+                if(StringUtils.isBlank(onOff)){
+                    throw new MessageException("参数配置错误,请联系管理员");
+                }
+                if(onOff.equals(OnOffStatus.ON.code)){
+                    Date date = DateUtil.dateDay(oInternetCard.getExpireTime(), "22");
+                    if(Calendar.getInstance().getTime().getTime()>date.getTime()){
+                        throw new MessageException("到期时间超过22号,不允许续费");
+                    }
                 }
             }else{
                 throw new MessageException("状态不正确,不允许续费");
@@ -890,6 +893,10 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             agentResult.setMsg("缺少代理商编号");
             return agentResult;
         }
+        List<String> internetRenewWayList = new ArrayList<>();
+        internetRenewWayList.add(InternetRenewWay.FRDK.getValue());
+        internetRenewWayList.add(InternetRenewWay.FRDKGC.getValue());
+        reqMap.put("internetRenewWayList",internetRenewWayList);
         List<String> renewStatusList = new ArrayList<>();
         renewStatusList.add(InternetRenewStatus.BFXF.getValue());
         renewStatusList.add(InternetRenewStatus.XFZ.getValue());
@@ -902,6 +909,76 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }
         log.info("查询分润抵扣流量卡数据,返回参数2:{}",JsonUtil.objectToJson(AgentResult.ok(list)));
         return AgentResult.ok(list);
+    }
+
+
+    /**
+     * 处理分润系统 返回结果
+     * @param internetRenewDetail
+     * @return
+     * @throws MessageException
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public AgentResult disposeCardProfit(OInternetRenewDetail internetRenewDetail)throws MessageException{
+
+        log.info("分润抵扣流量卡数据处理,请求参数:{}",internetRenewDetail.toString());
+        AgentResult agentResult = AgentResult.fail();
+        if(null==internetRenewDetail.getTheRealityAmt()){
+            agentResult.setMsg("本次抵扣金额为空或格式不正确");
+            return agentResult;
+        }
+        if(null==internetRenewDetail.getId()){
+            agentResult.setMsg("明细编号为空");
+            return agentResult;
+        }
+        Boolean regOperationAmt = RegExpression.regAmount(internetRenewDetail.getTheRealityAmt());
+        if(!regOperationAmt){
+            agentResult.setMsg("操作金额不正确,保留小数点后两位");
+            return agentResult;
+        }
+        if(internetRenewDetail.getTheRealityAmt().compareTo(BigDecimal.ZERO)==0 || internetRenewDetail.getTheRealityAmt().compareTo(new BigDecimal("0.00"))==0){
+            agentResult.setMsg("操作金额不正确,不能为0");
+            return agentResult;
+        }
+        OInternetRenewDetail qInternetRenewDetail = internetRenewDetailMapper.selectByPrimaryKey(internetRenewDetail.getId());
+        if(null==qInternetRenewDetail){
+            agentResult.setMsg("明细不存在");
+            return agentResult;
+        }
+        if(!qInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDK.getValue()) && !qInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())){
+            agentResult.setMsg("只能导入分润抵扣的数据");
+            return agentResult;
+        }
+        BigDecimal realityAmt = internetRenewDetail.getTheRealityAmt().add(qInternetRenewDetail.getRealityAmt());
+        if(realityAmt.compareTo(qInternetRenewDetail.getOughtAmt())==1){
+            agentResult.setMsg("实扣金额不能大于应扣金额");
+            return agentResult;
+        }
+        OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(qInternetRenewDetail.getIccidNum());
+        //等于更新状态已续费
+        if(realityAmt.compareTo(qInternetRenewDetail.getOughtAmt())==0){
+            qInternetRenewDetail.setRenewStatus(InternetRenewStatus.YXF.getValue());
+            oInternetCard.setRenewStatus(InternetRenewStatus.YXF.getValue());
+            //扣足到期时间加一年
+            oInternetCard.setExpireTime(DateUtil.getOneYearLater(oInternetCard.getExpireTime()));
+        }else{
+            qInternetRenewDetail.setRenewStatus(InternetRenewStatus.BFXF.getValue());
+            oInternetCard.setRenewStatus(InternetRenewStatus.BFXF.getValue());
+        }
+        qInternetRenewDetail.setRealityAmt(realityAmt);
+        qInternetRenewDetail.setuTime(new Date());
+        int i = internetRenewDetailMapper.updateByPrimaryKeySelective(qInternetRenewDetail);
+        if(i!=1){
+            throw new MessageException("更新续费明细失败");
+        }
+        oInternetCard.setuTime(new Date());
+        int k = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
+        if(k!=1){
+            throw new MessageException("更新物联网卡信息失败");
+        }
+        log.info("分润抵扣流量卡数据处理成功");
+        return AgentResult.ok("抵扣成功");
     }
 
 }

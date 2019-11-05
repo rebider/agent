@@ -389,6 +389,10 @@
     <foreach close=")" collection="renewStatusList" item="renewStatus" open="(" separator=",">
       #{renewStatus}
     </foreach>
+    and ird.renew_way in
+    <foreach close=")" collection="internetRenewWayList" item="internetRenewWay" open="(" separator=",">
+      #{internetRenewWay}
+    </foreach>
     and ird.agent_id in
     <foreach close=")" collection="agentIdList" item="agentId" open="(" separator=",">
       #{agentId}
