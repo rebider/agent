@@ -204,10 +204,10 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
         }
         if(organization.getAgentId().equals(agent.getId())){
             resultMap.put("IsOper","1");
-            resultMap.put("operOrgId",orgPlatform.getPlatCode());
+            resultMap.put("operOrgId",orgPlatform.getPlatCode().equals("#")?"":orgPlatform.getPlatCode());
         }else{
             resultMap.put("IsOper","0");
-            resultMap.put("operOrgId",orgPlatform.getPlatCode());
+            resultMap.put("operOrgId",orgPlatform.getPlatCode().equals("#")?"":orgPlatform.getPlatCode());
         }
         return resultMap;
     }
