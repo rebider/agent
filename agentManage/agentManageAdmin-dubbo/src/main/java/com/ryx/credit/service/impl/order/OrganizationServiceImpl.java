@@ -304,11 +304,6 @@ public class OrganizationServiceImpl implements OrganizationService {
                         Date d = Calendar.getInstance().getTime();
                         for (int i = 0; i < platNum.length; i++) {
                             OrgPlatform orgPlat = new OrgPlatform();
-                            if (platCode[i].equals("#")){
-                                orgPlat.setPlatCode("");
-                            }else{
-                                orgPlat.setPlatCode(platCode[i]);
-                            }
                             orgPlat.setPlatCode(platCode[i]);
                             orgPlat.setPlatNum(platNum[i]);
                             orgPlat.setId(idService.genId(TabId.ORG_PLATFORM));
