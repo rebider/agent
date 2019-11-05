@@ -1152,6 +1152,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public AgentResult loadAgentInfo(String id) throws Exception {
 
+        List<Map<String,Object>> orderRecords = new ArrayList<>();
+
         //订单
         OOrder order = orderMapper.selectByPrimaryKey(id);
         FastMap f = FastMap.fastMap("order", order);
@@ -1175,6 +1177,22 @@ public class OrderServiceImpl implements OrderService {
         //商品活动信息
         if (oSubOrders.size() > 0) {
             List<String> ids = new ArrayList<>();
+            oSubOrders.forEach(oSubOrder->{
+                ReceiptPlanExample receiptPlanExample = new ReceiptPlanExample();
+                receiptPlanExample.or().andOrderIdEqualTo(oSubOrder.getOrderId()).andProIdEqualTo(oSubOrder.getProId()).andProTypeEqualTo(oSubOrder.getProCode()).andStatusEqualTo(Status.STATUS_1.status);
+                long  countPlans = receiptPlanMapper.countByExample(receiptPlanExample);//排单
+                OReceiptProExample oReceiptProExample = new OReceiptProExample();
+                oReceiptProExample.or().andOrderidEqualTo(oSubOrder.getOrderId()).andProIdEqualTo(oSubOrder.getProId()).andProCodeEqualTo(oSubOrder.getProCode()).andStatusEqualTo(Status.STATUS_1.status);
+                long oReceiptPros = oReceiptProMapper.countByExample(oReceiptProExample);
+                Map<String,Object> orderRecord = new HashMap<>();
+                orderRecord.put("countPlan",countPlans);//排单总计
+                orderRecord.put("oReceiptPros",oReceiptPros);//配货数量
+                orderRecord.put("orderSubId",oSubOrder.getId());
+                orderRecords.add(orderRecord);
+                f.putKeyV("orderRecords",orderRecords);
+
+            });
+
             for (OSubOrder oSubOrder : oSubOrders) {
                 ids.add(oSubOrder.getId());
             }
@@ -1239,7 +1257,11 @@ public class OrderServiceImpl implements OrderService {
         oReceiptProExample.or().andOrderidEqualTo(order.getId()).andStatusEqualTo(Status.STATUS_1.status);
         List<OReceiptPro> oReceiptPros = oReceiptProMapper.selectByExample(oReceiptProExample);
         f.putKeyV("oReceiptPros", oReceiptPros);
-
+        //排单信息
+        ReceiptPlanExample receiptPlanExample = new ReceiptPlanExample();
+        receiptPlanExample.or().andOrderIdEqualTo(order.getId()).andStatusEqualTo(Status.STATUS_1.status);
+        List<ReceiptPlan> receiptPlan = receiptPlanMapper.selectByExample(receiptPlanExample);
+        f.putKeyV("receiptPlans", receiptPlan);
         //支付信息
         OPaymentExample oPaymentExample = new OPaymentExample();
         oPaymentExample.or().andStatusEqualTo(Status.STATUS_1.status).andOrderIdEqualTo(order.getId());
@@ -1265,7 +1287,14 @@ public class OrderServiceImpl implements OrderService {
         oPaymentDetailExample.setOrderByClause(" pay_time asc, plan_num asc, plan_pay_time asc ");
         List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
         f.putKeyV("oPaymentDetails", oPaymentDetails);
-
+        //
+        List<OPaymentDetail> oPaymentDetails1 = oPaymentDetailMapper.selectCount(order.getId(),oPaymentDetails.get(0).getPaymentType(),PaymentStatus.DF.code);
+        BigDecimal[] price = {new BigDecimal(0)};
+        oPaymentDetails1.forEach(oPaymentDetail -> {
+            price[0] = price[0].add(oPaymentDetail.getPayAmount());
+        });
+        BigDecimal singlePrice = price[0].divide(new BigDecimal(oPaymentDetails1.size()),2);
+        f.putKeyV("singlePrice",singlePrice);
         //订单附件
         List<Attachment> attr = attachmentMapper.accessoryQuery(order.getId(), AttachmentRelType.Order.name());
         f.putKeyV("attrs", attr);

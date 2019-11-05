@@ -6,7 +6,7 @@ import com.ryx.credit.pojo.admin.order.OReceiptProExample;
 import java.util.List;
 
 public interface OReceiptProMapper {
-    int countByExample(OReceiptProExample example);
+    long countByExample(OReceiptProExample example);
 
     int deleteByExample(OReceiptProExample example);
 
