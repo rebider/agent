@@ -23,19 +23,9 @@ public class InternetTest extends BaseSpringTest {
     private OInternetRenewService internetRenewService;
 
     @Test
-    public void test() throws MessageException {
-        OInternetRenewDetail internetRenewDetail= new OInternetRenewDetail();
-        internetRenewDetail.setId("IRD2019090200000000000");
-        internetRenewDetail.setTheRealityAmt(new BigDecimal("1.56"));
-        AgentResult agentResult = internetRenewService.disposeCardProfit(internetRenewDetail);
-        System.out.println(agentResult.toString());
-    }
-
-
-    @Test
     public void test1() throws MessageException {
         Map<String,Object> reqMap = new HashMap<>();
-        reqMap.put("month","201909");
+        reqMap.put("month","201907");
         Set<String> agentIdList = new HashSet<>();
         agentIdList.add("AG19073576564");
         reqMap.put("agentIdList",agentIdList);

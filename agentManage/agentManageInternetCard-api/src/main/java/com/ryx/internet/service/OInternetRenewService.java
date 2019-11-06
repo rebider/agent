@@ -61,5 +61,4 @@ public interface OInternetRenewService {
 
     AgentResult queryCardProfit(Map<String,Object> reqMap);
 
-    AgentResult disposeCardProfit(OInternetRenewDetail internetRenewDetail)throws MessageException;
 }

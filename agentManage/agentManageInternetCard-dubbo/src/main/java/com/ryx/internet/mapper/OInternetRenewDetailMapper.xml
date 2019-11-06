@@ -438,15 +438,12 @@
   </sql>
 
   <select id="queryCardProfit" resultType="map" parameterType="java.lang.String">
-    select ird.id,ird.agent_id,ird.agent_name,ird.mer_id,ird.mer_name,ird.ought_amt,ird.reality_amt
+    select ird.agent_id,ird.agent_name,sum(ird.ought_amt) as sum_ought_amt
     from O_INTERNET_RENEW ir left join O_INTERNET_RENEW_DETAIL ird
     on ir.id = ird.renew_id
     where
     trunc(to_char(ir.review_pass_time,'YYYYMM')) = #{month}
-    and ird.renew_status in
-    <foreach close=")" collection="renewStatusList" item="renewStatus" open="(" separator=",">
-      #{renewStatus}
-    </foreach>
+    and ird.renew_status = #{renewStatus}
     and ird.renew_way in
     <foreach close=")" collection="internetRenewWayList" item="internetRenewWay" open="(" separator=",">
       #{internetRenewWay}
@@ -455,6 +452,6 @@
     <foreach close=")" collection="agentIdList" item="agentId" open="(" separator=",">
       #{agentId}
     </foreach>
-
+    group by ird.agent_id,ird.agent_name
   </select>
 </mapper>
