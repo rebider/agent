@@ -20,6 +20,11 @@
     <result column="CLEAN_STATUS" jdbcType="VARCHAR" property="cleanStatus" />
     <result column="PROCESS_DATE" jdbcType="VARCHAR" property="processDate" />
     <result column="PROCESS_TIME" jdbcType="VARCHAR" property="processTime" />
+    <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
+    <result column="BUS_PLATFORM" jdbcType="VARCHAR" property="busPlatform" />
+    <result column="AG_DOC_DISTRICT" jdbcType="VARCHAR" property="agDocDistrict" />
+    <result column="AG_DOC_PRO" jdbcType="VARCHAR" property="agDocPro" />
+    <result column="BUS_CONTACT_PERSON" jdbcType="VARCHAR" property="busContactPerson" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -53,7 +58,7 @@
   <sql id="Base_Column_List">
     FLOW_ID, RENEW_ID, RENEW_DETAIL_ID, ICCID_NUM, AGENT_ID, AGENT_NAME, MER_ID, MER_NAME,
     OFFSET_AMT, ALREADY_OFFSET_AMT, C_TIME, C_USER, U_USER, STATUS, VERSION, CLEAN_STATUS,
-    PROCESS_DATE, PROCESS_TIME
+    PROCESS_DATE, PROCESS_TIME, BUS_NUM, BUS_PLATFORM, AG_DOC_DISTRICT, AG_DOC_PRO, BUS_CONTACT_PERSON
   </sql>
   <select id="selectByExample" parameterType="com.ryx.internet.pojo.InternetRenewOffsetExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -89,15 +94,17 @@
     MER_ID, MER_NAME, OFFSET_AMT,
     ALREADY_OFFSET_AMT, C_TIME, C_USER,
     U_USER, STATUS, VERSION,
-    CLEAN_STATUS, PROCESS_DATE, PROCESS_TIME
-    )
+    CLEAN_STATUS, PROCESS_DATE, PROCESS_TIME,
+    BUS_NUM, BUS_PLATFORM, AG_DOC_DISTRICT,
+    AG_DOC_PRO, BUS_CONTACT_PERSON)
     values (#{flowId,jdbcType=VARCHAR}, #{renewId,jdbcType=VARCHAR}, #{renewDetailId,jdbcType=VARCHAR},
     #{iccidNum,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR},
     #{merId,jdbcType=VARCHAR}, #{merName,jdbcType=VARCHAR}, #{offsetAmt,jdbcType=DECIMAL},
     #{alreadyOffsetAmt,jdbcType=DECIMAL}, #{cTime,jdbcType=VARCHAR}, #{cUser,jdbcType=VARCHAR},
     #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL},
-    #{cleanStatus,jdbcType=VARCHAR}, #{processDate,jdbcType=VARCHAR}, #{processTime,jdbcType=VARCHAR}
-    )
+    #{cleanStatus,jdbcType=VARCHAR}, #{processDate,jdbcType=VARCHAR}, #{processTime,jdbcType=VARCHAR},
+    #{busNum,jdbcType=VARCHAR}, #{busPlatform,jdbcType=VARCHAR}, #{agDocDistrict,jdbcType=VARCHAR},
+    #{agDocPro,jdbcType=VARCHAR}, #{busContactPerson,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.internet.pojo.InternetRenewOffset">
     insert into O_INTERNET_RENEW_OFFSET
@@ -156,6 +163,21 @@
       <if test="processTime != null">
         PROCESS_TIME,
       </if>
+      <if test="busNum != null">
+        BUS_NUM,
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM,
+      </if>
+      <if test="agDocDistrict != null">
+        AG_DOC_DISTRICT,
+      </if>
+      <if test="agDocPro != null">
+        AG_DOC_PRO,
+      </if>
+      <if test="busContactPerson != null">
+        BUS_CONTACT_PERSON,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="flowId != null">
@@ -211,6 +233,21 @@
       </if>
       <if test="processTime != null">
         #{processTime,jdbcType=VARCHAR},
+      </if>
+      <if test="busNum != null">
+        #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocDistrict != null">
+        #{agDocDistrict,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocPro != null">
+        #{agDocPro,jdbcType=VARCHAR},
+      </if>
+      <if test="busContactPerson != null">
+        #{busContactPerson,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -274,6 +311,21 @@
       <if test="processTime != null">
         PROCESS_TIME = #{processTime,jdbcType=VARCHAR},
       </if>
+      <if test="busNum != null">
+        BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocDistrict != null">
+        AG_DOC_DISTRICT = #{agDocDistrict,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocPro != null">
+        AG_DOC_PRO = #{agDocPro,jdbcType=VARCHAR},
+      </if>
+      <if test="busContactPerson != null">
+        BUS_CONTACT_PERSON = #{busContactPerson,jdbcType=VARCHAR},
+      </if>
     </set>
     where FLOW_ID = #{flowId,jdbcType=VARCHAR}
   </update>
@@ -295,7 +347,12 @@
     VERSION = #{version,jdbcType=DECIMAL},
     CLEAN_STATUS = #{cleanStatus,jdbcType=VARCHAR},
     PROCESS_DATE = #{processDate,jdbcType=VARCHAR},
-    PROCESS_TIME = #{processTime,jdbcType=VARCHAR}
+    PROCESS_TIME = #{processTime,jdbcType=VARCHAR},
+    BUS_NUM = #{busNum,jdbcType=VARCHAR},
+    BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+    AG_DOC_DISTRICT = #{agDocDistrict,jdbcType=VARCHAR},
+    AG_DOC_PRO = #{agDocPro,jdbcType=VARCHAR},
+    BUS_CONTACT_PERSON = #{busContactPerson,jdbcType=VARCHAR}
     where FLOW_ID = #{flowId,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

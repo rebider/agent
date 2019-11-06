@@ -26,6 +26,11 @@
     <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
     <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
+    <result column="BUS_PLATFORM" jdbcType="VARCHAR" property="busPlatform" />
+    <result column="AG_DOC_DISTRICT" jdbcType="VARCHAR" property="agDocDistrict" />
+    <result column="AG_DOC_PRO" jdbcType="VARCHAR" property="agDocPro" />
+    <result column="BUS_CONTACT_PERSON" jdbcType="VARCHAR" property="busContactPerson" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -57,9 +62,10 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, RENEW_ID, ICCID_NUM, ORDER_ID, SN_NUM, INTERNET_CARD_NUM, OPEN_ACCOUNT_TIME, 
-    EXPIRE_TIME, MER_NAME, MER_ID, AGENT_ID, AGENT_NAME, RENEW_WAY, OFFSET_AMT, RENEW_AMT, 
-    OUGHT_AMT, REALITY_AMT, RENEW_STATUS, STATUS, C_TIME, U_TIME, C_USER, U_USER, VERSION
+    ID, RENEW_ID, ICCID_NUM, ORDER_ID, SN_NUM, INTERNET_CARD_NUM, OPEN_ACCOUNT_TIME,
+    EXPIRE_TIME, MER_NAME, MER_ID, AGENT_ID, AGENT_NAME, RENEW_WAY, OFFSET_AMT, RENEW_AMT,
+    OUGHT_AMT, REALITY_AMT, RENEW_STATUS, STATUS, C_TIME, U_TIME, C_USER, U_USER, VERSION,
+    BUS_NUM, BUS_PLATFORM, AG_DOC_DISTRICT, AG_DOC_PRO, BUS_CONTACT_PERSON
   </sql>
   <select id="selectByExample" parameterType="com.ryx.internet.pojo.OInternetRenewDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -78,7 +84,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from O_INTERNET_RENEW_DETAIL
     where ID = #{id,jdbcType=VARCHAR}
@@ -90,24 +96,26 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.internet.pojo.OInternetRenewDetail">
-    insert into O_INTERNET_RENEW_DETAIL (ID, RENEW_ID, ICCID_NUM, 
-      ORDER_ID, SN_NUM, INTERNET_CARD_NUM, 
-      OPEN_ACCOUNT_TIME, EXPIRE_TIME, MER_NAME, 
-      MER_ID, AGENT_ID, AGENT_NAME, 
-      RENEW_WAY, OFFSET_AMT, RENEW_AMT, 
-      OUGHT_AMT, REALITY_AMT, RENEW_STATUS, 
-      STATUS, C_TIME, U_TIME, 
-      C_USER, U_USER, VERSION
-      )
-    values (#{id,jdbcType=VARCHAR}, #{renewId,jdbcType=VARCHAR}, #{iccidNum,jdbcType=VARCHAR}, 
-      #{orderId,jdbcType=VARCHAR}, #{snNum,jdbcType=VARCHAR}, #{internetCardNum,jdbcType=VARCHAR}, 
-      #{openAccountTime,jdbcType=TIMESTAMP}, #{expireTime,jdbcType=TIMESTAMP}, #{merName,jdbcType=VARCHAR}, 
-      #{merId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR}, 
-      #{renewWay,jdbcType=VARCHAR}, #{offsetAmt,jdbcType=DECIMAL}, #{renewAmt,jdbcType=DECIMAL}, 
-      #{oughtAmt,jdbcType=DECIMAL}, #{realityAmt,jdbcType=DECIMAL}, #{renewStatus,jdbcType=VARCHAR}, 
-      #{status,jdbcType=DECIMAL}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, 
-      #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{version,jdbcType=DECIMAL}
-      )
+    insert into O_INTERNET_RENEW_DETAIL (ID, RENEW_ID, ICCID_NUM,
+    ORDER_ID, SN_NUM, INTERNET_CARD_NUM,
+    OPEN_ACCOUNT_TIME, EXPIRE_TIME, MER_NAME,
+    MER_ID, AGENT_ID, AGENT_NAME,
+    RENEW_WAY, OFFSET_AMT, RENEW_AMT,
+    OUGHT_AMT, REALITY_AMT, RENEW_STATUS,
+    STATUS, C_TIME, U_TIME,
+    C_USER, U_USER, VERSION,
+    BUS_NUM, BUS_PLATFORM, AG_DOC_DISTRICT,
+    AG_DOC_PRO, BUS_CONTACT_PERSON)
+    values (#{id,jdbcType=VARCHAR}, #{renewId,jdbcType=VARCHAR}, #{iccidNum,jdbcType=VARCHAR},
+    #{orderId,jdbcType=VARCHAR}, #{snNum,jdbcType=VARCHAR}, #{internetCardNum,jdbcType=VARCHAR},
+    #{openAccountTime,jdbcType=TIMESTAMP}, #{expireTime,jdbcType=TIMESTAMP}, #{merName,jdbcType=VARCHAR},
+    #{merId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR},
+    #{renewWay,jdbcType=VARCHAR}, #{offsetAmt,jdbcType=DECIMAL}, #{renewAmt,jdbcType=DECIMAL},
+    #{oughtAmt,jdbcType=DECIMAL}, #{realityAmt,jdbcType=DECIMAL}, #{renewStatus,jdbcType=VARCHAR},
+    #{status,jdbcType=DECIMAL}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP},
+    #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{version,jdbcType=DECIMAL},
+    #{busNum,jdbcType=VARCHAR}, #{busPlatform,jdbcType=VARCHAR}, #{agDocDistrict,jdbcType=VARCHAR},
+    #{agDocPro,jdbcType=VARCHAR}, #{busContactPerson,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.internet.pojo.OInternetRenewDetail">
     insert into O_INTERNET_RENEW_DETAIL
@@ -184,6 +192,21 @@
       <if test="version != null">
         VERSION,
       </if>
+      <if test="busNum != null">
+        BUS_NUM,
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM,
+      </if>
+      <if test="agDocDistrict != null">
+        AG_DOC_DISTRICT,
+      </if>
+      <if test="agDocPro != null">
+        AG_DOC_PRO,
+      </if>
+      <if test="busContactPerson != null">
+        BUS_CONTACT_PERSON,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -257,6 +280,21 @@
       </if>
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="busNum != null">
+        #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocDistrict != null">
+        #{agDocDistrict,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocPro != null">
+        #{agDocPro,jdbcType=VARCHAR},
+      </if>
+      <if test="busContactPerson != null">
+        #{busContactPerson,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -338,39 +376,59 @@
       <if test="version != null">
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
+      <if test="busNum != null">
+        BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocDistrict != null">
+        AG_DOC_DISTRICT = #{agDocDistrict,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocPro != null">
+        AG_DOC_PRO = #{agDocPro,jdbcType=VARCHAR},
+      </if>
+      <if test="busContactPerson != null">
+        BUS_CONTACT_PERSON = #{busContactPerson,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.internet.pojo.OInternetRenewDetail">
     update O_INTERNET_RENEW_DETAIL
     set RENEW_ID = #{renewId,jdbcType=VARCHAR},
-      ICCID_NUM = #{iccidNum,jdbcType=VARCHAR},
-      ORDER_ID = #{orderId,jdbcType=VARCHAR},
-      SN_NUM = #{snNum,jdbcType=VARCHAR},
-      INTERNET_CARD_NUM = #{internetCardNum,jdbcType=VARCHAR},
-      OPEN_ACCOUNT_TIME = #{openAccountTime,jdbcType=TIMESTAMP},
-      EXPIRE_TIME = #{expireTime,jdbcType=TIMESTAMP},
-      MER_NAME = #{merName,jdbcType=VARCHAR},
-      MER_ID = #{merId,jdbcType=VARCHAR},
-      AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
-      RENEW_WAY = #{renewWay,jdbcType=VARCHAR},
-      OFFSET_AMT = #{offsetAmt,jdbcType=DECIMAL},
-      RENEW_AMT = #{renewAmt,jdbcType=DECIMAL},
-      OUGHT_AMT = #{oughtAmt,jdbcType=DECIMAL},
-      REALITY_AMT = #{realityAmt,jdbcType=DECIMAL},
-      RENEW_STATUS = #{renewStatus,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=DECIMAL},
-      C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      U_TIME = #{uTime,jdbcType=TIMESTAMP},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      U_USER = #{uUser,jdbcType=VARCHAR},
-      VERSION = #{version,jdbcType=DECIMAL}
+    ICCID_NUM = #{iccidNum,jdbcType=VARCHAR},
+    ORDER_ID = #{orderId,jdbcType=VARCHAR},
+    SN_NUM = #{snNum,jdbcType=VARCHAR},
+    INTERNET_CARD_NUM = #{internetCardNum,jdbcType=VARCHAR},
+    OPEN_ACCOUNT_TIME = #{openAccountTime,jdbcType=TIMESTAMP},
+    EXPIRE_TIME = #{expireTime,jdbcType=TIMESTAMP},
+    MER_NAME = #{merName,jdbcType=VARCHAR},
+    MER_ID = #{merId,jdbcType=VARCHAR},
+    AGENT_ID = #{agentId,jdbcType=VARCHAR},
+    AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+    RENEW_WAY = #{renewWay,jdbcType=VARCHAR},
+    OFFSET_AMT = #{offsetAmt,jdbcType=DECIMAL},
+    RENEW_AMT = #{renewAmt,jdbcType=DECIMAL},
+    OUGHT_AMT = #{oughtAmt,jdbcType=DECIMAL},
+    REALITY_AMT = #{realityAmt,jdbcType=DECIMAL},
+    RENEW_STATUS = #{renewStatus,jdbcType=VARCHAR},
+    STATUS = #{status,jdbcType=DECIMAL},
+    C_TIME = #{cTime,jdbcType=TIMESTAMP},
+    U_TIME = #{uTime,jdbcType=TIMESTAMP},
+    C_USER = #{cUser,jdbcType=VARCHAR},
+    U_USER = #{uUser,jdbcType=VARCHAR},
+    VERSION = #{version,jdbcType=DECIMAL},
+    BUS_NUM = #{busNum,jdbcType=VARCHAR},
+    BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+    AG_DOC_DISTRICT = #{agDocDistrict,jdbcType=VARCHAR},
+    AG_DOC_PRO = #{agDocPro,jdbcType=VARCHAR},
+    BUS_CONTACT_PERSON = #{busContactPerson,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">

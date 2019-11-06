@@ -31,6 +31,8 @@
     <result column="RENEW_STATUS" jdbcType="VARCHAR" property="renewStatus" />
     <result column="STOP_REASON" jdbcType="VARCHAR" property="stopReason" />
     <result column="SUM_POSTPONE_TIME" jdbcType="DECIMAL" property="sumPostponeTime" />
+    <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
+    <result column="BUS_PLATFORM" jdbcType="VARCHAR" property="busPlatform" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -65,7 +67,8 @@
     ICCID_NUM, CARD_IMPORT_ID, BATCH_NUM, SN_NUM, DELIVER_TIME, CONSIGNEE, ORDER_ID,
     AGENT_ID, AGENT_NAME, INTERNET_CARD_NUM, ISSUER, OPEN_ACCOUNT_TIME, EXPIRE_TIME,
     INTERNET_CARD_STATUS, MER_ID, LATELY_PAY_TIME, MER_NAME, MANUFACTURER, RENEW, C_TIME,
-    U_TIME, C_USER, U_USER, STATUS, VERSION, STOP, RENEW_STATUS, STOP_REASON, SUM_POSTPONE_TIME
+    U_TIME, C_USER, U_USER, STATUS, VERSION, STOP, RENEW_STATUS, STOP_REASON, SUM_POSTPONE_TIME,
+    BUS_NUM, BUS_PLATFORM
   </sql>
   <select id="selectByExample" parameterType="com.ryx.internet.pojo.OInternetCardExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -105,7 +108,8 @@
     RENEW, C_TIME, U_TIME,
     C_USER, U_USER, STATUS,
     VERSION, STOP, RENEW_STATUS,
-    STOP_REASON, SUM_POSTPONE_TIME)
+    STOP_REASON, SUM_POSTPONE_TIME, BUS_NUM,
+    BUS_PLATFORM)
     values (#{iccidNum,jdbcType=VARCHAR}, #{cardImportId,jdbcType=VARCHAR}, #{batchNum,jdbcType=VARCHAR},
     #{snNum,jdbcType=VARCHAR}, #{deliverTime,jdbcType=TIMESTAMP}, #{consignee,jdbcType=VARCHAR},
     #{orderId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR},
@@ -115,7 +119,8 @@
     #{renew,jdbcType=DECIMAL}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP},
     #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
     #{version,jdbcType=DECIMAL}, #{stop,jdbcType=DECIMAL}, #{renewStatus,jdbcType=VARCHAR},
-    #{stopReason,jdbcType=VARCHAR}, #{sumPostponeTime,jdbcType=DECIMAL})
+    #{stopReason,jdbcType=VARCHAR}, #{sumPostponeTime,jdbcType=DECIMAL}, #{busNum,jdbcType=VARCHAR},
+    #{busPlatform,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.internet.pojo.OInternetCard">
     insert into O_INTERNET_CARD
@@ -207,6 +212,12 @@
       <if test="sumPostponeTime != null">
         SUM_POSTPONE_TIME,
       </if>
+      <if test="busNum != null">
+        BUS_NUM,
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="iccidNum != null">
@@ -295,6 +306,12 @@
       </if>
       <if test="sumPostponeTime != null">
         #{sumPostponeTime,jdbcType=DECIMAL},
+      </if>
+      <if test="busNum != null">
+        #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        #{busPlatform,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -391,6 +408,12 @@
       <if test="sumPostponeTime != null">
         SUM_POSTPONE_TIME = #{sumPostponeTime,jdbcType=DECIMAL},
       </if>
+      <if test="busNum != null">
+        BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      </if>
     </set>
     where ICCID_NUM = #{iccidNum,jdbcType=VARCHAR}
   </update>
@@ -423,7 +446,9 @@
     STOP = #{stop,jdbcType=DECIMAL},
     RENEW_STATUS = #{renewStatus,jdbcType=VARCHAR},
     STOP_REASON = #{stopReason,jdbcType=VARCHAR},
-    SUM_POSTPONE_TIME = #{sumPostponeTime,jdbcType=DECIMAL}
+    SUM_POSTPONE_TIME = #{sumPostponeTime,jdbcType=DECIMAL},
+    BUS_NUM = #{busNum,jdbcType=VARCHAR},
+    BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR}
     where ICCID_NUM = #{iccidNum,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

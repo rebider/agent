@@ -20,6 +20,11 @@
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="BATCH_NUM" jdbcType="VARCHAR" property="batchNum" />
+    <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
+    <result column="BUS_PLATFORM" jdbcType="VARCHAR" property="busPlatform" />
+    <result column="AG_DOC_DISTRICT" jdbcType="VARCHAR" property="agDocDistrict" />
+    <result column="AG_DOC_PRO" jdbcType="VARCHAR" property="agDocPro" />
+    <result column="BUS_CONTACT_PERSON" jdbcType="VARCHAR" property="busContactPerson" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -53,7 +58,7 @@
   <sql id="Base_Column_List">
     ID, ICCID, AGENT_ID, AGENT_NAME, MER_ID, MER_NAME, ORDER_ID, OPEN_ACCOUNT_TIME, POSTPONE_TIME,
     EXPIRE_TIME, POSTPONE_EXPIRE_TIME, C_USER, U_USER, C_TIME, U_TIME, STATUS, VERSION,
-    BATCH_NUM
+    BATCH_NUM, BUS_NUM, BUS_PLATFORM, AG_DOC_DISTRICT, AG_DOC_PRO, BUS_CONTACT_PERSON
   </sql>
   <select id="selectByExample" parameterType="com.ryx.internet.pojo.OInternetCardPostponeExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -89,15 +94,17 @@
     ORDER_ID, OPEN_ACCOUNT_TIME, POSTPONE_TIME,
     EXPIRE_TIME, POSTPONE_EXPIRE_TIME, C_USER,
     U_USER, C_TIME, U_TIME,
-    STATUS, VERSION, BATCH_NUM
-    )
+    STATUS, VERSION, BATCH_NUM,
+    BUS_NUM, BUS_PLATFORM, AG_DOC_DISTRICT,
+    AG_DOC_PRO, BUS_CONTACT_PERSON)
     values (#{id,jdbcType=VARCHAR}, #{iccid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
     #{agentName,jdbcType=VARCHAR}, #{merId,jdbcType=VARCHAR}, #{merName,jdbcType=VARCHAR},
     #{orderId,jdbcType=VARCHAR}, #{openAccountTime,jdbcType=TIMESTAMP}, #{postponeTime,jdbcType=DECIMAL},
     #{expireTime,jdbcType=TIMESTAMP}, #{postponeExpireTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
     #{uUser,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP},
-    #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{batchNum,jdbcType=VARCHAR}
-    )
+    #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{batchNum,jdbcType=VARCHAR},
+    #{busNum,jdbcType=VARCHAR}, #{busPlatform,jdbcType=VARCHAR}, #{agDocDistrict,jdbcType=VARCHAR},
+    #{agDocPro,jdbcType=VARCHAR}, #{busContactPerson,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.internet.pojo.OInternetCardPostpone">
     insert into O_INTERNET_CARD_POSTPONE
@@ -156,6 +163,21 @@
       <if test="batchNum != null">
         BATCH_NUM,
       </if>
+      <if test="busNum != null">
+        BUS_NUM,
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM,
+      </if>
+      <if test="agDocDistrict != null">
+        AG_DOC_DISTRICT,
+      </if>
+      <if test="agDocPro != null">
+        AG_DOC_PRO,
+      </if>
+      <if test="busContactPerson != null">
+        BUS_CONTACT_PERSON,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -211,6 +233,21 @@
       </if>
       <if test="batchNum != null">
         #{batchNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busNum != null">
+        #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocDistrict != null">
+        #{agDocDistrict,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocPro != null">
+        #{agDocPro,jdbcType=VARCHAR},
+      </if>
+      <if test="busContactPerson != null">
+        #{busContactPerson,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -274,28 +311,48 @@
       <if test="batchNum != null">
         BATCH_NUM = #{batchNum,jdbcType=VARCHAR},
       </if>
+      <if test="busNum != null">
+        BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocDistrict != null">
+        AG_DOC_DISTRICT = #{agDocDistrict,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocPro != null">
+        AG_DOC_PRO = #{agDocPro,jdbcType=VARCHAR},
+      </if>
+      <if test="busContactPerson != null">
+        BUS_CONTACT_PERSON = #{busContactPerson,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.internet.pojo.OInternetCardPostpone">
     update O_INTERNET_CARD_POSTPONE
     set ICCID = #{iccid,jdbcType=VARCHAR},
-      AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
-      MER_ID = #{merId,jdbcType=VARCHAR},
-      MER_NAME = #{merName,jdbcType=VARCHAR},
-      ORDER_ID = #{orderId,jdbcType=VARCHAR},
-      OPEN_ACCOUNT_TIME = #{openAccountTime,jdbcType=TIMESTAMP},
-      POSTPONE_TIME = #{postponeTime,jdbcType=DECIMAL},
-      EXPIRE_TIME = #{expireTime,jdbcType=TIMESTAMP},
-      POSTPONE_EXPIRE_TIME = #{postponeExpireTime,jdbcType=TIMESTAMP},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      U_USER = #{uUser,jdbcType=VARCHAR},
-      C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      U_TIME = #{uTime,jdbcType=TIMESTAMP},
-      STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL},
-      BATCH_NUM = #{batchNum,jdbcType=VARCHAR}
+    AGENT_ID = #{agentId,jdbcType=VARCHAR},
+    AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+    MER_ID = #{merId,jdbcType=VARCHAR},
+    MER_NAME = #{merName,jdbcType=VARCHAR},
+    ORDER_ID = #{orderId,jdbcType=VARCHAR},
+    OPEN_ACCOUNT_TIME = #{openAccountTime,jdbcType=TIMESTAMP},
+    POSTPONE_TIME = #{postponeTime,jdbcType=DECIMAL},
+    EXPIRE_TIME = #{expireTime,jdbcType=TIMESTAMP},
+    POSTPONE_EXPIRE_TIME = #{postponeExpireTime,jdbcType=TIMESTAMP},
+    C_USER = #{cUser,jdbcType=VARCHAR},
+    U_USER = #{uUser,jdbcType=VARCHAR},
+    C_TIME = #{cTime,jdbcType=TIMESTAMP},
+    U_TIME = #{uTime,jdbcType=TIMESTAMP},
+    STATUS = #{status,jdbcType=DECIMAL},
+    VERSION = #{version,jdbcType=DECIMAL},
+    BATCH_NUM = #{batchNum,jdbcType=VARCHAR},
+    BUS_NUM = #{busNum,jdbcType=VARCHAR},
+    BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+    AG_DOC_DISTRICT = #{agDocDistrict,jdbcType=VARCHAR},
+    AG_DOC_PRO = #{agDocPro,jdbcType=VARCHAR},
+    BUS_CONTACT_PERSON = #{busContactPerson,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

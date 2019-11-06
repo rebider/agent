@@ -43,6 +43,56 @@ public class OInternetCardPostpone implements Serializable{
 
     private String iccidNum;
 
+    private String busNum;
+
+    private String busPlatform;
+
+    private String agDocDistrict;
+
+    private String agDocPro;
+
+    private String busContactPerson;
+
+    public String getBusNum() {
+        return busNum;
+    }
+
+    public void setBusNum(String busNum) {
+        this.busNum = busNum;
+    }
+
+    public String getBusPlatform() {
+        return busPlatform;
+    }
+
+    public void setBusPlatform(String busPlatform) {
+        this.busPlatform = busPlatform;
+    }
+
+    public String getAgDocDistrict() {
+        return agDocDistrict;
+    }
+
+    public void setAgDocDistrict(String agDocDistrict) {
+        this.agDocDistrict = agDocDistrict;
+    }
+
+    public String getAgDocPro() {
+        return agDocPro;
+    }
+
+    public void setAgDocPro(String agDocPro) {
+        this.agDocPro = agDocPro;
+    }
+
+    public String getBusContactPerson() {
+        return busContactPerson;
+    }
+
+    public void setBusContactPerson(String busContactPerson) {
+        this.busContactPerson = busContactPerson;
+    }
+
     public String getIccidNum() {
         return iccidNum;
     }

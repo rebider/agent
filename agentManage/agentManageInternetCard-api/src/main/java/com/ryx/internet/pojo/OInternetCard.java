@@ -87,6 +87,26 @@ public class OInternetCard implements Serializable{
 
     private String postponeTime;
 
+    private String busNum;
+
+    private String busPlatform;
+
+
+    public String getBusPlatform() {
+        return busPlatform;
+    }
+
+    public void setBusPlatform(String busPlatform) {
+        this.busPlatform = busPlatform;
+    }
+
+    public String getBusNum() {
+        return busNum;
+    }
+
+    public void setBusNum(String busNum) {
+        this.busNum = busNum;
+    }
 
     public String getPostponeTime() {
         return postponeTime;
