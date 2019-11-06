@@ -340,12 +340,20 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                     criteria.andAgentIdEqualTo(invoiceSum.getAgentId());
                     List<InvoiceSum> invoiceSums = invoiceSumMapper.selectByExample(invoiceSumExample);
                     if(null!=invoiceSums && invoiceSums.size() ==1){
-                        invoiceSum.setPreLeftAmt(invoiceSums.get(0).getOwnInvoice());
+                        if("" == invoiceSumList.get(5) || null == invoiceSumList.get(5)){
+                            invoiceSum.setPreLeftAmt(invoiceSums.get(0).getOwnInvoice());
+                        }else {
+                            invoiceSum.setPreLeftAmt(new BigDecimal(invoiceSumList.get(5).toString()));
+                        }
                     }else if(invoiceSums.size() > 1){
                         throw new MessageException(""+invoiceSum.getAgentId()+"-"+invoiceSum.getInvoiceCompany()+"-"
                                 +nextProMonth+"查询上月欠票基数时获取到"+invoiceSums.size()+"条数据，导致代理商欠票计算失败！");
                     }else if(invoiceSums.size()==0){
-                        invoiceSum.setPreLeftAmt(BigDecimal.ZERO);
+                        if("" == invoiceSumList.get(5) || null == invoiceSumList.get(5)){
+                            invoiceSum.setPreLeftAmt(BigDecimal.ZERO);
+                        }else {
+                            invoiceSum.setPreLeftAmt(new BigDecimal(invoiceSumList.get(5).toString()));
+                        }
                     }
                     List<InvoiceSum> invoiceSum2 = getSumInvoice(invoiceSum);
                     // 第一次导入
