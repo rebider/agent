@@ -202,12 +202,11 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
         if(orgPlatforms.size()!=0){
             orgPlatform = orgPlatforms.get(0);
         }
-        if(organization.getAgentId().equals(agent.getId())){
+        if(organization.getAgentId().equals(agent.getId()) && StringUtils.isBlank(orgPlatform.getPlatCode())){
             resultMap.put("IsOper","1");
-            resultMap.put("operOrgId",orgPlatform.getPlatCode());
         }else{
             resultMap.put("IsOper","0");
-            resultMap.put("operOrgId",orgPlatform.getPlatCode());
+            resultMap.put("operOrgId",orgPlatform.getPlatCode().equals("#")?"":orgPlatform.getPlatCode());
         }
         return resultMap;
     }
@@ -289,6 +288,9 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
                 data.put("managerAccount",paramMap.get("managerAccount"));
             if (null != paramMap.get("delManagerAccount"))
                 data.put("delManagerAccount",paramMap.get("delManagerAccount"));
+            data.put("IsOper",paramMap.get("IsOper"));
+            data.put("operOrgId",paramMap.get("operOrgId"));
+
             jsonParams.put("data", data);
             String plainXML = jsonParams.toString();
             // 请求报文加密开始

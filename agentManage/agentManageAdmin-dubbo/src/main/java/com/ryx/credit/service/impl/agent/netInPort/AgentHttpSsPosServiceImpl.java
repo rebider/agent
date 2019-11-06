@@ -14,8 +14,11 @@ import com.ryx.credit.dao.CBranchInnerMapper;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.RegionMapper;
 import com.ryx.credit.dao.bank.DPosRegionMapper;
+import com.ryx.credit.dao.order.OrgPlatformMapper;
 import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.order.OrgPlatform;
+import com.ryx.credit.pojo.admin.order.OrgPlatformExample;
 import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentColinfoService;
@@ -68,6 +71,10 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
     private AgentColinfoService agentColinfoService;
     @Autowired
     private CBranchInnerMapper branchInnerMapper;
+    @Autowired
+    private OrgPlatformMapper orgPlatformMapper;
+
+
 
     /**
      * 入网组装参数
@@ -186,6 +193,21 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
         List delList = branchInnerMapper.selectInnerLogin(FastMap.fastMap("status", Status.STATUS_2.status).putKeyV("busId", agentBusInfo.getId()));
         resultMap.put("managerAccount", String.join(",", accList));
         resultMap.put("delManagerAccount", String.join(",", delList));
+        OrgPlatformExample orgPlatformExample = new OrgPlatformExample();
+        OrgPlatformExample.Criteria criteria = orgPlatformExample.createCriteria();
+        criteria.andOrgIdEqualTo(organization.getOrgId());
+        criteria.andPlatNumEqualTo(agentBusInfo.getBusPlatform());
+        List<OrgPlatform> orgPlatforms = orgPlatformMapper.selectByExample(orgPlatformExample);
+        OrgPlatform orgPlatform = new OrgPlatform();
+        if(orgPlatforms.size()!=0){
+            orgPlatform = orgPlatforms.get(0);
+        }
+        if(organization.getAgentId().equals(agent.getId()) && StringUtils.isBlank(orgPlatform.getPlatCode())){
+            resultMap.put("IsOper","1");
+        }else{
+            resultMap.put("IsOper","0");
+            resultMap.put("operOrgId",orgPlatform.getPlatCode().equals("#")?"":orgPlatform.getPlatCode());
+        }
         return resultMap;
     }
 
@@ -265,6 +287,8 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
                 data.put("managerAccount",paramMap.get("managerAccount"));
             if (null != paramMap.get("delManagerAccount"))
                 data.put("delManagerAccount",paramMap.get("delManagerAccount"));
+            data.put("IsOper",paramMap.get("IsOper"));
+            data.put("operOrgId",paramMap.get("operOrgId"));
 
             log.info("通知pos请求参数:{}",data);
             jsonParams.put("data", data);
