@@ -594,6 +594,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 OReceiptPro receiptPro = receiptPros.get(0);
                 //收货单排单数量减去排单表排单数量
                 receiptPro.setSendNum(receiptPro.getSendNum().subtract(receiptPlan.getPlanProNum()));
+                receiptPro.setReceiptProStatus(OReceiptStatus.WAITING_LIST.code);
                 int cts = receiptProMapper.updateByPrimaryKeySelective(receiptPro);
                 if(cts<=0){
                     throw new ProcessException("退货退回时更新已排单数量失败，receiptProId={"+receiptProId+"}");
