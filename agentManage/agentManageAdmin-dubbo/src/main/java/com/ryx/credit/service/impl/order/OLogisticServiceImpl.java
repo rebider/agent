@@ -314,6 +314,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             OLogisticsExample_criteria1.andSnEndNumEqualTo(endSn);
             OLogisticsExample_criteria1.andWNumberEqualTo(wNumber);
             OLogisticsExample_criteria1.andLogComEqualTo(logCom);
+            OLogisticsExample_criteria1.andStatusEqualTo(Status.STATUS_1.status);
             List<OLogistics> oLogistics1 = oLogisticsMapper.selectByExample(oLogisticsExample);
             if(null==oLogistics1){
                 logger.info("该商品已发货请勿重复提交1");
