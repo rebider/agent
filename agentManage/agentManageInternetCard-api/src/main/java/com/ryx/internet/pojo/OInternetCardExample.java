@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class OInternetCardExample {
     protected String orderByClause;
@@ -20,8 +21,18 @@ public class OInternetCardExample {
 
     protected Integer limitEnd;
 
+    protected Map<String,Object> reqMap;
+
     public OInternetCardExample() {
         oredCriteria = new ArrayList<Criteria>();
+    }
+
+    public Map<String, Object> getReqMap() {
+        return reqMap;
+    }
+
+    public void setReqMap(Map<String, Object> reqMap) {
+        this.reqMap = reqMap;
     }
 
     public String getOrderByClause() {
@@ -42,6 +53,10 @@ public class OInternetCardExample {
 
     public List<Criteria> getOredCriteria() {
         return oredCriteria;
+    }
+
+    public void setOredCriteria(List<Criteria> oredCriteria) {
+        this.oredCriteria = oredCriteria;
     }
 
     public void or(Criteria criteria) {

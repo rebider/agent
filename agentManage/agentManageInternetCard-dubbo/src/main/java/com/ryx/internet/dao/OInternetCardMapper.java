@@ -53,4 +53,12 @@ public interface OInternetCardMapper {
      * @return
      */
     OInternetCard selectBySnNum(String iccidNum);
+
+
+    List<OInternetCard> internetCardList(OInternetCardExample example);
+
+
+    int internetCardCount(OInternetCardExample example);
+
+
 }

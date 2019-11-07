@@ -87,7 +87,20 @@ public class InternetCardServiceImpl implements InternetCardService {
         OInternetCardExample oInternetCardExample = new OInternetCardExample();
         oInternetCardExample= queryParam(internetCard, oInternetCardExample,agentId,userId);
         oInternetCardExample.setPage(page);
-        List<OInternetCard> oInternetCards = internetCardMapper.selectByExample(oInternetCardExample);
+
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+        if(orgCodeRes==null && orgCodeRes.size()!=1){
+            return null;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        Map<String,Object> reqMap = new HashMap<>();
+        //省区大区查看自己的代理商 部门权限
+        if(StringUtils.isNotBlank(organizationCode) && (organizationCode.contains("region") || organizationCode.contains("beijing"))) {
+            reqMap.put("orgCode", organizationCode);
+        }
+        oInternetCardExample.setReqMap(reqMap);
+        List<OInternetCard> oInternetCards = internetCardMapper.internetCardList(oInternetCardExample);
         for (OInternetCard oInternetCard : oInternetCards) {
             Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),oInternetCard.getManufacturer());
             if(null!=dict)
@@ -132,7 +145,7 @@ public class InternetCardServiceImpl implements InternetCardService {
         }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(oInternetCards);
-        pageInfo.setTotal((int)internetCardMapper.countByExample(oInternetCardExample));
+        pageInfo.setTotal(internetCardMapper.internetCardCount(oInternetCardExample));
         return pageInfo;
     }
 
@@ -196,6 +209,7 @@ public class InternetCardServiceImpl implements InternetCardService {
         }else if(StringUtils.isNotBlank(internetCard.getAgentId())){
             criteria.andAgentIdEqualTo(internetCard.getAgentId());
         }
+
         //内部人员根据名称查询指定流量卡
         List<String> agentNameList = dictOptionsService.getAgentNameList(userId);
         if(agentNameList.size()!=0){
@@ -636,7 +650,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                 updateInternetCardImport(oInternetCardImport);
                 return;
             }
-
+            internetCard.setBusPlatform(platForm.getPlatformNum());
         }
         if(StringUtils.isNotBlank(internetCard.getBusPlatform()) && StringUtils.isBlank(internetCard.getBusNum())){
             oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
