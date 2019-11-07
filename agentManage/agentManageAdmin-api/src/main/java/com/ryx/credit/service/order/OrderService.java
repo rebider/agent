@@ -28,7 +28,7 @@ public interface OrderService {
 
     /**
      * 获取订单列表
-     * @param product
+     * @param
      * @param page
      * @return
      */
@@ -67,7 +67,7 @@ public interface OrderService {
 
     /**
      * 根据付款单属相初始化参数
-     * @param payment
+     * @param
      * @return
      */
     public OPayment initPayment(OrderFormVo agentVo) throws MessageException;
@@ -271,4 +271,18 @@ public interface OrderService {
      * 添加销账
      */
     public ResultVO removeAccountSave(ORemoveAccountVo oRemoveAccountVo,List<Map> rAmountlist) throws MessageException, Exception;
+
+    /**
+     * 查询欠款信息
+     * @param orderId
+     * @return
+     */
+    AgentResult refreshPaymentDetail(String orderId);
+
+
+    AgentResult saveAdjInfo(OrderUpModelVo orderUpModelVo,Map map);
+
+    PageInfo queryAgentUpModelList(Map par, Page page);
+
+    AgentResult loadUpModelInfo(String adjId);
 }
