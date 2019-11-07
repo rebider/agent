@@ -28,4 +28,13 @@ public class AnnoPlatformRelaServiceImpl implements AnnoPlatformRelaService {
     public int batchSave(List<AnnoPlatformRela> annoPlatformRelas) {
         return  annoPlatformRelaMapper.saveBatch(annoPlatformRelas);
     }
+
+    @Override
+    public List<AnnoPlatformRela> queryByAnnoId(String annoId) {
+
+//        annoPlatformRelaMapper.selectByExample();
+
+        return null;
+    }
+
 }
