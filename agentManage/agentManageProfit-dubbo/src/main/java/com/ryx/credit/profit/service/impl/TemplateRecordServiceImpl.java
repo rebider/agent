@@ -233,7 +233,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         }
 
         if("POS".equals(busInfo.get("PLATFORM_TYPE"))||"ZHPOS".equals(busInfo.get("PLATFORM_TYPE"))){
-            if(startPar.get("party").toString()==null){
+            if(startPar.get("party").toString()=="beijing"){
                 try {
                     JSONObject mapJSONObject = new JSONObject();
                     mapJSONObject.put("applyId",templateRecode.getTemplateId());
