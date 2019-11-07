@@ -222,7 +222,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         Map startPar = agentEnterService.startPar(map1.get("userId"));
         String proceId = null;
 
-        List<Dict> actlist = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.PROFIT_TEMPLATE_APPLY.name());
+        List<Dict> actlist = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.PROFIT_TEMPLATE_APPLY3.name());
         String workId = null;
         for (Dict dict : actlist) {
             workId = dict.getdItemvalue();
