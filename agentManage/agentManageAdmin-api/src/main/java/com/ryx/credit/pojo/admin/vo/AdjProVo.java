@@ -1,5 +1,6 @@
 package com.ryx.credit.pojo.admin.vo;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
@@ -8,7 +9,7 @@ import java.math.BigDecimal;
  * @author: ssx
  * @create: 2019-11-05 21:35
  **/
-public class AdjProVo {
+public class AdjProVo implements Serializable {
     private  String oSubId;
     private String adjNum;
     private BigDecimal calPrice;

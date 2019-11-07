@@ -1,24 +1,25 @@
 package com.ryx.credit.pojo.admin.vo;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
-
 /**
  * @program: agentManage
  * @description: 订单调整vo
  * @author: ssx
  * @create: 2019-11-05 12:39
  **/
-public class OrderUpModelVo {
-    private String orderId;
-    private String curArrAmount;
-    private String orgStagesAmount;
-    private String reson;
-    private String refundAmount;
-    private String refundMethod;
-    private List<AdjProVo> adjPros;
-    private List<BigDecimal> calPriceList;
-    private List<String> files;
+public class OrderUpModelVo implements Serializable {
+    private String orderId;//订单号
+    private String curArrAmount;//当前欠款金额
+    private String orgStagesAmount;//当前分期金额
+    private String adjRepayment;//调整后分期金额
+    private String reson;//原因
+    private String refundAmount;//退款金额
+    private String refundMethod;//退款方式
+    private List<AdjProVo> adjPros;//子商品清单
+    private List<BigDecimal> calPriceList;//差价汇总
+    private List<String> files;//附件
 
     public String getOrderId() {
         return orderId;
@@ -90,5 +91,13 @@ public class OrderUpModelVo {
 
     public void setFiles(List<String> files) {
         this.files = files;
+    }
+
+    public String getAdjRepayment() {
+        return adjRepayment;
+    }
+
+    public void setAdjRepayment(String adjRepayment) {
+        this.adjRepayment = adjRepayment;
     }
 }

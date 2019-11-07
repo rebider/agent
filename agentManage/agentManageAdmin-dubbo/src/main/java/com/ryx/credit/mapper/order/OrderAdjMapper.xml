@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.order.OrderAdjMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.OrderAdj">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="ORDER_ID" jdbcType="VARCHAR" property="orderId" />
+    <result column="ADJ_USER_ID" jdbcType="VARCHAR" property="adjUserId" />
+    <result column="ADJ_TM" jdbcType="TIMESTAMP" property="adjTm" />
+    <result column="CUR_ARR_AMOUNT" jdbcType="DECIMAL" property="curArrAmount" />
+    <result column="ORG_STAGES_AMOUNT" jdbcType="DECIMAL" property="orgStagesAmount" />
+    <result column="STAGES_AMOUNT" jdbcType="DECIMAL" property="stagesAmount" />
+    <result column="RESON" jdbcType="VARCHAR" property="reson" />
+    <result column="REFUND_AMOUNT" jdbcType="DECIMAL" property="refundAmount" />
+    <result column="REFUND_TYPE" jdbcType="DECIMAL" property="refundType" />
+    <result column="REFUND_STAT" jdbcType="DECIMAL" property="refundStat" />
+    <result column="ORG_PAYMENT_ID" jdbcType="VARCHAR" property="orgPaymentId" />
+    <result column="NEW_PAYMENT_ID" jdbcType="VARCHAR" property="newPaymentId" />
+    <result column="REVIEWS_STAT" jdbcType="DECIMAL" property="reviewsStat" />
+    <result column="REVIEWS_DATE" jdbcType="TIMESTAMP" property="reviewsDate" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="VERSION" jdbcType="DECIMAL" property="version" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, ORDER_ID, ADJ_USER_ID, ADJ_TM, CUR_ARR_AMOUNT, ORG_STAGES_AMOUNT, STAGES_AMOUNT, 
+    RESON, REFUND_AMOUNT, REFUND_TYPE, REFUND_STAT, ORG_PAYMENT_ID, NEW_PAYMENT_ID, REVIEWS_STAT, 
+    REVIEWS_DATE, STATUS, VERSION
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from O_ORDER_ADJ
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from O_ORDER_ADJ
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjExample">
+    delete from O_ORDER_ADJ
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OrderAdj">
+    insert into O_ORDER_ADJ (ID, ORDER_ID, ADJ_USER_ID, 
+      ADJ_TM, CUR_ARR_AMOUNT, ORG_STAGES_AMOUNT, 
+      STAGES_AMOUNT, RESON, REFUND_AMOUNT, 
+      REFUND_TYPE, REFUND_STAT, ORG_PAYMENT_ID, 
+      NEW_PAYMENT_ID, REVIEWS_STAT, REVIEWS_DATE, 
+      STATUS, VERSION)
+    values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{adjUserId,jdbcType=VARCHAR}, 
+      #{adjTm,jdbcType=TIMESTAMP}, #{curArrAmount,jdbcType=DECIMAL}, #{orgStagesAmount,jdbcType=DECIMAL}, 
+      #{stagesAmount,jdbcType=DECIMAL}, #{reson,jdbcType=VARCHAR}, #{refundAmount,jdbcType=DECIMAL}, 
+      #{refundType,jdbcType=DECIMAL}, #{refundStat,jdbcType=DECIMAL}, #{orgPaymentId,jdbcType=VARCHAR}, 
+      #{newPaymentId,jdbcType=VARCHAR}, #{reviewsStat,jdbcType=DECIMAL}, #{reviewsDate,jdbcType=TIMESTAMP}, 
+      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OrderAdj">
+    insert into O_ORDER_ADJ
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="orderId != null">
+        ORDER_ID,
+      </if>
+      <if test="adjUserId != null">
+        ADJ_USER_ID,
+      </if>
+      <if test="adjTm != null">
+        ADJ_TM,
+      </if>
+      <if test="curArrAmount != null">
+        CUR_ARR_AMOUNT,
+      </if>
+      <if test="orgStagesAmount != null">
+        ORG_STAGES_AMOUNT,
+      </if>
+      <if test="stagesAmount != null">
+        STAGES_AMOUNT,
+      </if>
+      <if test="reson != null">
+        RESON,
+      </if>
+      <if test="refundAmount != null">
+        REFUND_AMOUNT,
+      </if>
+      <if test="refundType != null">
+        REFUND_TYPE,
+      </if>
+      <if test="refundStat != null">
+        REFUND_STAT,
+      </if>
+      <if test="orgPaymentId != null">
+        ORG_PAYMENT_ID,
+      </if>
+      <if test="newPaymentId != null">
+        NEW_PAYMENT_ID,
+      </if>
+      <if test="reviewsStat != null">
+        REVIEWS_STAT,
+      </if>
+      <if test="reviewsDate != null">
+        REVIEWS_DATE,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="version != null">
+        VERSION,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="orderId != null">
+        #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="adjUserId != null">
+        #{adjUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="adjTm != null">
+        #{adjTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="curArrAmount != null">
+        #{curArrAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="orgStagesAmount != null">
+        #{orgStagesAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="stagesAmount != null">
+        #{stagesAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="reson != null">
+        #{reson,jdbcType=VARCHAR},
+      </if>
+      <if test="refundAmount != null">
+        #{refundAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="refundType != null">
+        #{refundType,jdbcType=DECIMAL},
+      </if>
+      <if test="refundStat != null">
+        #{refundStat,jdbcType=DECIMAL},
+      </if>
+      <if test="orgPaymentId != null">
+        #{orgPaymentId,jdbcType=VARCHAR},
+      </if>
+      <if test="newPaymentId != null">
+        #{newPaymentId,jdbcType=VARCHAR},
+      </if>
+      <if test="reviewsStat != null">
+        #{reviewsStat,jdbcType=DECIMAL},
+      </if>
+      <if test="reviewsDate != null">
+        #{reviewsDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjExample" resultType="java.lang.Long">
+    select count(*) from O_ORDER_ADJ
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.OrderAdj">
+    update O_ORDER_ADJ
+    <set>
+      <if test="orderId != null">
+        ORDER_ID = #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="adjUserId != null">
+        ADJ_USER_ID = #{adjUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="adjTm != null">
+        ADJ_TM = #{adjTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="curArrAmount != null">
+        CUR_ARR_AMOUNT = #{curArrAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="orgStagesAmount != null">
+        ORG_STAGES_AMOUNT = #{orgStagesAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="stagesAmount != null">
+        STAGES_AMOUNT = #{stagesAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="reson != null">
+        RESON = #{reson,jdbcType=VARCHAR},
+      </if>
+      <if test="refundAmount != null">
+        REFUND_AMOUNT = #{refundAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="refundType != null">
+        REFUND_TYPE = #{refundType,jdbcType=DECIMAL},
+      </if>
+      <if test="refundStat != null">
+        REFUND_STAT = #{refundStat,jdbcType=DECIMAL},
+      </if>
+      <if test="orgPaymentId != null">
+        ORG_PAYMENT_ID = #{orgPaymentId,jdbcType=VARCHAR},
+      </if>
+      <if test="newPaymentId != null">
+        NEW_PAYMENT_ID = #{newPaymentId,jdbcType=VARCHAR},
+      </if>
+      <if test="reviewsStat != null">
+        REVIEWS_STAT = #{reviewsStat,jdbcType=DECIMAL},
+      </if>
+      <if test="reviewsDate != null">
+        REVIEWS_DATE = #{reviewsDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        VERSION = #{version,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OrderAdj">
+    update O_ORDER_ADJ
+    set ORDER_ID = #{orderId,jdbcType=VARCHAR},
+      ADJ_USER_ID = #{adjUserId,jdbcType=VARCHAR},
+      ADJ_TM = #{adjTm,jdbcType=TIMESTAMP},
+      CUR_ARR_AMOUNT = #{curArrAmount,jdbcType=DECIMAL},
+      ORG_STAGES_AMOUNT = #{orgStagesAmount,jdbcType=DECIMAL},
+      STAGES_AMOUNT = #{stagesAmount,jdbcType=DECIMAL},
+      RESON = #{reson,jdbcType=VARCHAR},
+      REFUND_AMOUNT = #{refundAmount,jdbcType=DECIMAL},
+      REFUND_TYPE = #{refundType,jdbcType=DECIMAL},
+      REFUND_STAT = #{refundStat,jdbcType=DECIMAL},
+      ORG_PAYMENT_ID = #{orgPaymentId,jdbcType=VARCHAR},
+      NEW_PAYMENT_ID = #{newPaymentId,jdbcType=VARCHAR},
+      REVIEWS_STAT = #{reviewsStat,jdbcType=DECIMAL},
+      REVIEWS_DATE = #{reviewsDate,jdbcType=TIMESTAMP},
+      STATUS = #{status,jdbcType=DECIMAL},
+      VERSION = #{version,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+  <select id="selectAgentUpModelView" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix"/>
+    <include refid="selectAgentUpModelViewSql"/>
+    <include refid="OracleDialectSuffix"/>
+  </select>
+  <select id="selectAgentUpModelViewCount" parameterType="map" resultType="int">
+    select count(*) from(
+    <include refid="selectAgentUpModelViewSql"/>)
+  </select>
+  <sql id="selectAgentUpModelViewSql">
+      select oa.id as adj_id,
+             oo.id as order_id,
+             oa.adj_tm,
+             (select ag.ag_uniq_num
+                from a_agent ag
+                left join o_order
+                  on o_order.agent_id = ag.id
+               where o_order.id = oo.id) as ag_uniq_num,
+             (select ab.bus_num
+                from a_agent_businfo ab
+                left join o_order
+                  on o_order.bus_id = ab.id
+               where o_order.id = oa.order_id) as platform,
+             (select PLATFORM_NAME
+                from A_PLATFORM ap
+                left join a_agent_businfo ab
+                  on ap.platform_num = ab.bus_platform
+                left join o_order
+                  on o_order.bus_id = ab.id
+               where o_order.id = oa.order_id) as platform_name,
+             cu.name as req_name,
+             oa.refund_stat,
+             oa.refund_tm,
+             ag.ag_name,
+             (select LISTAGG(o_sub_order.pro_name, ',') WITHIN GROUP(ORDER BY o_sub_order.order_id)
+                from o_sub_order
+               where o_sub_order.status = 1
+                 and o_sub_order.order_id = oa.order_id) as pro_name,
+             (select LISTAGG(o_sub_order_activity.activity_name, ',') WITHIN GROUP(ORDER BY o_sub_order.order_id)
+                from o_sub_order_activity
+                left join o_sub_order
+                  on o_sub_order_activity.sub_order_id = o_sub_order.id
+                 and o_sub_order.status = 1
+                 and o_sub_order_activity.status = 1
+               where o_sub_order.status = 1
+                 and o_sub_order_activity.status = 1
+                 and o_sub_order.order_id = oo.id) as activity_name,
+             (select c_organization.name
+                from c_organization
+               where c_organization.id =
+                     (select ag_doc_pro
+                        from A_agent_businfo
+                        left join o_order
+                          on o_order.bus_id = A_agent_businfo.Id
+                       where o_order.id = oo.id)) as ag_doc_pro,
+             (select c_organization.name
+                from c_organization
+               where c_organization.id =
+                     (select ag_doc_district
+                        from A_agent_businfo
+                        left join o_order
+                          on o_order.bus_id = A_agent_businfo.Id
+                       where o_order.id = oo.id)) as ag_doc_district
+        from o_order_adj oa
+        left join o_order oo
+          on oa.order_id = oo.id
+        left join a_agent ag
+          on ag.id = oo.agent_id
+        left join c_user cu
+          on cu.id = oa.adj_user_id
+  </sql>
+</mapper>
