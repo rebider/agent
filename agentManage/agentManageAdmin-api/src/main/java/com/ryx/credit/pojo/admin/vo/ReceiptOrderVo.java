@@ -54,6 +54,56 @@ public class ReceiptOrderVo implements Serializable {
 
     private String rpCTime;//配货时间
 
+    private String addrProvince;//省
+
+    private String addrCity;//市
+
+    private String addrDistinct;//区
+
+    private String addrDetail;//详细地址
+
+    private String addrMobile;//电话
+
+    public void setAddrMobile(String addrMobile) {
+        this.addrMobile = addrMobile;
+    }
+
+    public String getAddrMobile() {
+        return addrMobile;
+    }
+
+    public String getAddrProvince() {
+        return addrProvince;
+    }
+
+    public String getAddrCity() {
+        return addrCity;
+    }
+
+    public String getAddrDistinct() {
+        return addrDistinct;
+    }
+
+    public String getAddrDetail() {
+        return addrDetail;
+    }
+
+    public void setAddrProvince(String addrProvince) {
+        this.addrProvince = addrProvince;
+    }
+
+    public void setAddrCity(String addrCity) {
+        this.addrCity = addrCity;
+    }
+
+    public void setAddrDistinct(String addrDistinct) {
+        this.addrDistinct = addrDistinct;
+    }
+
+    public void setAddrDetail(String addrDetail) {
+        this.addrDetail = addrDetail;
+    }
+
     public String getRpCTime() {
         return rpCTime;
     }

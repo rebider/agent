@@ -1234,14 +1234,14 @@
     to_char(cr.real_rec_time,'YYYY-MM-DD') as realRecTime
 
     from o_order o
-    left join a_agent b on o.agent_id = b.id
+    left join a_agent b on o.agent_id = b.id and b.status=1
     left join a_platform c on c.platform_num = o.order_platform
-    left join o_payment d on d.order_id = o.id
+    left join o_payment d on d.order_id = o.id and d.status=1
     left join o_cash_receivables cr on d.id = cr.src_id and cr.cashpay_type='PAYMENT' and cr.status = 1
-    left join a_pay_comp comp on comp.id = cr.collect_company
-    left join c_organization org on org.id = b.ag_doc_pro
-    left join c_organization orging on orging.id = b.ag_doc_district
+    left join a_pay_comp comp on comp.id = cr.collect_company and comp.status=1
     left join a_agent_businfo aab on aab.agent_id = o.agent_id and aab.id = o.bus_id and aab.status = 1
+    left join c_organization org on org.id = aab.ag_doc_pro
+    left join c_organization orging on orging.id = aab.ag_doc_district
     left join o_organization oan on oan.org_id = aab.organ_num and oan.status = 1
     <where>
       <if test="1==1"> and o.status = 1 </if>
