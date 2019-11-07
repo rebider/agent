@@ -119,6 +119,17 @@ public class AgentBusInfo implements Serializable {
 
     private BigDecimal dredgeD1;
 
+    private List<BigDecimal> busStatusList;
+    private String flag;//标记
+
+    public List<BigDecimal> getBusStatusList() {
+        return busStatusList;
+    }
+
+    public void setBusStatusList(List<BigDecimal> busStatusList) {
+        this.busStatusList = busStatusList;
+    }
+
     public BigDecimal getDredgeD1() {
         return dredgeD1;
     }
@@ -127,14 +138,12 @@ public class AgentBusInfo implements Serializable {
         this.dredgeD1 = dredgeD1;
     }
 
-    private String flag;//标记
+    public String getFlag() {
+        return flag;
+    }
 
     public void setFlag(String flag) {
         this.flag = flag;
-    }
-
-    public String getFlag() {
-        return flag;
     }
 
     public String getBrandNum() {

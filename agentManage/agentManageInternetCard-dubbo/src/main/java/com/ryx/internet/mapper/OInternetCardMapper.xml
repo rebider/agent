@@ -604,6 +604,12 @@
       <if test="sumPostponeTime != null">
         SUM_POSTPONE_TIME = #{sumPostponeTime,jdbcType=DECIMAL},
       </if>
+      <if test="busNum != null and busNum != ''">
+        BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null and busPlatform != ''">
+        BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      </if>
     </set>
     where ICCID_NUM = #{iccidNum,jdbcType=VARCHAR}
   </update>
