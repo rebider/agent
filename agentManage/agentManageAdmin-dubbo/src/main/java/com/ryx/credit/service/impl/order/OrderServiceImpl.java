@@ -122,7 +122,10 @@ public class OrderServiceImpl implements OrderService {
     private IPaymentDetailService paymentDetailService;
     @Autowired
     private ORemoveAccountMapper oRemoveAccountMapper;
-
+    @Autowired
+    private OrderAdjMapper orderAdjMapper;
+    @Autowired
+    private OrderAdjDetailMapper orderAdjDetailMapper;
 
     /**
      * 分页查询订单列表
@@ -1290,11 +1293,14 @@ public class OrderServiceImpl implements OrderService {
         //
         List<OPaymentDetail> oPaymentDetails1 = oPaymentDetailMapper.selectCount(order.getId(),oPaymentDetails.get(0).getPaymentType(),PaymentStatus.DF.code);
         BigDecimal[] price = {new BigDecimal(0)};
-        oPaymentDetails1.forEach(oPaymentDetail -> {
-            price[0] = price[0].add(oPaymentDetail.getPayAmount());
-        });
-        BigDecimal singlePrice = price[0].divide(new BigDecimal(oPaymentDetails1.size()),2);
-        f.putKeyV("singlePrice",singlePrice);
+        if (null!=oPaymentDetails1 && oPaymentDetails1.size()>0){
+            oPaymentDetails1.forEach(oPaymentDetail -> {
+                price[0] = price[0].add(oPaymentDetail.getPayAmount());
+            });
+            BigDecimal singlePrice = price[0].divide(new BigDecimal(oPaymentDetails1.size()),2);
+            f.putKeyV("singlePrice",singlePrice);
+        }
+
         //订单附件
         List<Attachment> attr = attachmentMapper.accessoryQuery(order.getId(), AttachmentRelType.Order.name());
         f.putKeyV("attrs", attr);
@@ -3873,6 +3879,125 @@ public class OrderServiceImpl implements OrderService {
             }
             logger.info("销账添加:成功");
         return ResultVO.success(oRemoveAccountVo);
+    }
+
+    @Override
+    public AgentResult refreshPaymentDetail(String orderId) {
+
+        //支付信息
+        OPaymentExample oPaymentExample = new OPaymentExample();
+        oPaymentExample.or().andStatusEqualTo(Status.STATUS_1.status).andOrderIdEqualTo(orderId);
+        List<OPayment> oPaymentList = oPaymentMapper.selectByExample(oPaymentExample);
+        if (oPaymentList.size() != 1) {
+            return AgentResult.fail("支付信息错误");
+        }
+        OPayment oPayment = oPaymentList.get(0);
+
+        OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
+        oPaymentDetailExample.or()
+                .andStatusEqualTo(Status.STATUS_1.status)
+                .andPaymentIdEqualTo(oPayment.getId()).andOrderIdEqualTo(orderId);
+        oPaymentDetailExample.setOrderByClause(" pay_time asc, plan_num asc, plan_pay_time asc ");
+        List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
+
+        //
+        List<OPaymentDetail> oPaymentDetails1 = oPaymentDetailMapper.selectCount(orderId,oPaymentDetails.get(0).getPaymentType(),PaymentStatus.DF.code);
+
+        if (null!= oPaymentDetails1&&oPaymentDetails1.size()>0) {
+
+            BigDecimal[] price = {new BigDecimal(0)};
+            oPaymentDetails1.forEach(oPaymentDetail -> {
+                price[0] = price[0].add(oPaymentDetail.getPayAmount());
+            });
+            FastMap f = FastMap.fastMap("outstandingAmount", price[0]);//待还金额
+            f.putKeyV("outstandingNum",oPaymentDetails1.size());
+            return AgentResult.ok(f);
+        }
+        return null;
+
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    public AgentResult saveAdjInfo(OrderUpModelVo orderUpModelVo, Map map) {
+        AgentResult agentResult = AgentResult.fail("保存失败!");
+        OrderAdj orderAdj = new OrderAdj();
+        orderAdj.setId(idService.genIdInTran(TabId.o_order_adj));
+        orderAdj.setOrderId(orderUpModelVo.getOrderId());
+        orderAdj.setAdjTm(new Date());//申请时间
+        orderAdj.setAdjUserId(String.valueOf(map.get("userId")));//调整人id
+        orderAdj.setCurArrAmount(new BigDecimal(orderUpModelVo.getCurArrAmount()));//当前欠款金额
+        orderAdj.setRefundAmount(new BigDecimal(orderUpModelVo.getRefundAmount()));//退款金额
+        orderAdj.setStagesAmount(new BigDecimal(orderUpModelVo.getAdjRepayment()));//申请分期金额
+        orderAdj.setOrgStagesAmount(new BigDecimal(orderUpModelVo.getOrgStagesAmount()));//原分期金额
+        orderAdj.setReson(orderUpModelVo.getReson());
+        orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundMethod()));
+        orderAdj.setStatus(Status.STATUS_1.status);
+
+        List<AdjProVo> adjPros = orderUpModelVo.getAdjPros();
+        adjPros.forEach(adjProVo -> {
+            OrderAdjDetail orderAdjDetail = new OrderAdjDetail();
+            orderAdjDetail.setAdjId(orderAdj.getId());
+            orderAdjDetail.setAdjNum(new BigDecimal(adjProVo.getAdjNum()));
+            orderAdjDetail.setStatus(Status.STATUS_1.status);
+            orderAdjDetail.setDifAmount(adjProVo.getCalPrice());
+            orderAdjDetail.setSubOrderId(adjProVo.getoSubId());
+            orderAdjDetail.setId(idService.genIdInTran(TabId.o_order_adj_detail));
+            orderAdjDetailMapper.insert(orderAdjDetail);
+        });
+
+        List<String> attFiles = orderUpModelVo.getFiles();
+        AttachmentRel record = new AttachmentRel();
+        if (attFiles.size()>0)
+        attFiles.forEach(attfile->{
+            record.setAttId(attfile);
+            record.setSrcId(orderAdj.getId());
+            record.setcUser(orderAdj.getAdjUserId());
+            record.setcTime(orderAdj.getAdjTm());
+            record.setStatus(Status.STATUS_1.status);
+            record.setBusType(AttachmentRelType.AnnounceMent.name());
+            record.setId(idService.genId(TabId.a_attachment_rel));
+            logger.info("添加订单调整附件关系,订单调整ID{},附件ID{}",orderAdj.getId(),attfile);
+            if (1 != attachmentRelMapper.insertSelective(record)) {
+                logger.info("公告添加:{}", "添加订单调整附件关系失败");
+                throw new ProcessException("添加订单调整附件关系失败");
+            }
+        });
+
+        if (1 == orderAdjMapper.insert(orderAdj)) {
+            agentResult.setStatus(AgentResult.OK);
+            agentResult.setMsg("保存成功");
+        }
+        return agentResult;
+    }
+
+    @Override
+    public PageInfo queryAgentUpModelList(Map par, Page page) {
+        PageInfo pageInfo = new PageInfo();
+        if (par == null) return pageInfo;
+        if (par.get("agentId") == null) return pageInfo;
+        if (StringUtils.isBlank(par.get("agentId").toString())) return pageInfo;
+        if(null!=par.get("userId")) {
+            Long userId = (Long) par.get("userId");
+            List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+            par.put("platfromPerm", platfromPerm);
+        }
+        par.put("page", page);
+        pageInfo.setTotal(orderAdjMapper.selectAgentUpModelViewCount(par));
+        pageInfo.setRows(orderAdjMapper.selectAgentUpModelView(par,page));
+        return pageInfo;
+    }
+
+    @Override
+    public AgentResult loadUpModelInfo(String adjId) {
+        //订单
+        OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(adjId);
+        FastMap res= FastMap.fastMap("orderAdj", orderAdj);
+        OrderAdjDetailExample orderAdjDetailExample = new OrderAdjDetailExample();
+        orderAdjDetailExample.or().andAdjIdEqualTo(orderAdj.getId());
+        List<OrderAdjDetail> orderAdjDetails = orderAdjDetailMapper.selectByExample(orderAdjDetailExample);
+        res.putKeyV("orderAdjDetails",orderAdjDetails);
+        return AgentResult.ok(res);
     }
 
 
