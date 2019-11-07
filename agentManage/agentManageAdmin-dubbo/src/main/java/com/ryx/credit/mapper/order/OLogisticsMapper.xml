@@ -555,6 +555,7 @@
     select a.id from o_logistics a where a.status=1
     and a.log_type=#{logType,jdbcType=VARCHAR}
     and a.send_status = #{sendStatus,jdbcType=DECIMAL}
+    <if test="status != null and status !=''">AND a.status = #{status, jdbcType=DECIMAL}</if>
     <if test="count!=null and count!=''"> and a.send_num &gt; #{count,jdbcType=DECIMAL} </if>
   </select>
 

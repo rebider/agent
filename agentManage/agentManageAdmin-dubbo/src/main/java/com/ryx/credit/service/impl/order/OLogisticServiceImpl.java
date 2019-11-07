@@ -314,6 +314,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             OLogisticsExample_criteria1.andSnEndNumEqualTo(endSn);
             OLogisticsExample_criteria1.andWNumberEqualTo(wNumber);
             OLogisticsExample_criteria1.andLogComEqualTo(logCom);
+            OLogisticsExample_criteria1.andStatusEqualTo(Status.STATUS_1.status);
             List<OLogistics> oLogistics1 = oLogisticsMapper.selectByExample(oLogisticsExample);
             if(null==oLogistics1){
                 logger.info("该商品已发货请勿重复提交1");
@@ -1483,5 +1484,58 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 return AgentResult.fail(e.getLocalizedMessage());
             }
         }
+    }
+
+    @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult delLogistcstInfo(String lgcId, String userId) throws Exception {
+        //查询物流信息
+        OLogistics oLogistics = oLogisticsMapper.selectByPrimaryKey(lgcId);
+        if (null == oLogistics) throw new MessageException("未查到物流信息，请核实物流信息！");
+
+        //更新排单表发货数量
+        ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(oLogistics.getReceiptPlanId());
+        if (receiptPlan != null) {
+            //更新发货数量
+            if(receiptPlan.getSendProNum() != null && (receiptPlan.getSendProNum().subtract(oLogistics.getSendNum())).compareTo(BigDecimal.ZERO) >= 0) {
+                receiptPlan.setSendProNum(receiptPlan.getSendProNum().subtract(oLogistics.getSendNum()));
+            } else {
+                throw new MessageException("排单发货数量异常！");
+            }
+            //更新发货状态
+            /*if(receiptPlan.getSendProNum() != null && (receiptPlan.getSendProNum().subtract(oLogistics.getSendNum())).compareTo(BigDecimal.ZERO) == 0) {
+                receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.InTheDeliver.getValue()));
+            } else {
+                receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.InTheDeliver.getValue()));
+            }*/
+            if (receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan)!= 1) {
+                throw new MessageException("更新排单数据失败！");
+            }
+            logger.info("删除物流更新排单数据:{}", JSONObject.toJSON(receiptPlan));
+        } else {
+            throw new MessageException("排单信息未找到！");
+        }
+
+        //删除物流明细
+        /*int deleteInt = oLogistics.getSendNum().compareTo(BigDecimal.valueOf(oLogisticsDetailMapper.deleteDetailByLogisicalId(oLogistics.getId())));
+        if (deleteInt != 0) {
+            logger.info("删除明细异常，明细数量和发送数量不同！");
+            throw new MessageException("删除明细异常，明细数量和发送数量不同！");
+        }*/
+        //删除物流明细
+        oLogisticsDetailMapper.deleteDetailByLogisicalId(oLogistics.getId());
+
+        //更新物流
+        OLogistics updateLogistics = new OLogistics();
+        updateLogistics.setId(oLogistics.getId());
+        updateLogistics.setStatus(Status.STATUS_2.status);
+        updateLogistics.setVersion(oLogistics.getVersion());
+        updateLogistics.setcUser(userId);
+        if (1 != oLogisticsMapper.updateByPrimaryKeySelective(updateLogistics)) {
+            logger.info("物流删除操作，更新数据库失败:{},{},{}", oLogistics.getId(), oLogistics.getSnBeginNum(), oLogistics.getSnEndNum());
+            throw new MessageException("更新物流状态异常！");
+        }
+
+        return AgentResult.ok();
     }
 }
