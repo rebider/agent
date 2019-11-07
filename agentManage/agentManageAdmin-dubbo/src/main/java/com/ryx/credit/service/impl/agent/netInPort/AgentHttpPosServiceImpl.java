@@ -202,9 +202,8 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
         if(orgPlatforms.size()!=0){
             orgPlatform = orgPlatforms.get(0);
         }
-        if(organization.getAgentId().equals(agent.getId())){
+        if(organization.getAgentId().equals(agent.getId()) && StringUtils.isBlank(orgPlatform.getPlatCode())){
             resultMap.put("IsOper","1");
-            resultMap.put("operOrgId",orgPlatform.getPlatCode().equals("#")?"":orgPlatform.getPlatCode());
         }else{
             resultMap.put("IsOper","0");
             resultMap.put("operOrgId",orgPlatform.getPlatCode().equals("#")?"":orgPlatform.getPlatCode());
