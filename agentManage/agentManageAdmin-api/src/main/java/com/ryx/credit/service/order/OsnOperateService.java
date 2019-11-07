@@ -25,7 +25,7 @@ public interface OsnOperateService {
      * @param sendStatus
      * @return
      */
-    List<String> queryLogicInfoIdByStatus(LogType logType, LogisticsSendStatus sendStatus);
+    List<String> queryLogicInfoIdByStatus(LogType logType, LogisticsSendStatus sendStatus, BigDecimal status);
 
     /**
      * 生成物流明细

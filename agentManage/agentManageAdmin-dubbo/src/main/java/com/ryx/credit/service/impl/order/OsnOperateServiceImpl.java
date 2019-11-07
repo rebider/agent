@@ -106,9 +106,9 @@ public class OsnOperateServiceImpl implements OsnOperateService {
      */
     @Transactional(readOnly = true)
     @Override
-    public List<String> queryLogicInfoIdByStatus(LogType logType, LogisticsSendStatus sendStatus){
+    public List<String> queryLogicInfoIdByStatus(LogType logType, LogisticsSendStatus sendStatus, BigDecimal status){
         // return oLogisticsMapper.queryLogicInfoIdByStatus(FastMap.fastMap("logType", logType.code).putKeyV("sendStatus",sendStatus.code).putKeyV("count",count_wall));
-        return oLogisticsMapper.queryLogicInfoIdByStatus(FastMap.fastMap("logType", logType.code).putKeyV("sendStatus",sendStatus.code));
+        return oLogisticsMapper.queryLogicInfoIdByStatus(FastMap.fastMap("logType", logType.code).putKeyV("sendStatus",sendStatus.code).putKeyV("status", status));
     }
 
 
@@ -121,7 +121,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
     @Override
     public void genLogicDetailTask(){
         //查询所有的未联动的发货物流
-        List<String>  list = queryLogicInfoIdByStatus(LogType.Deliver,LogisticsSendStatus.none_send);
+        List<String>  list = queryLogicInfoIdByStatus(LogType.Deliver,LogisticsSendStatus.none_send, Status.STATUS_1.status);
         if(list.size()>0) {
             logger.info("非退货物流处理 开始执行sn明细生成任务");
             for (String id : list) {

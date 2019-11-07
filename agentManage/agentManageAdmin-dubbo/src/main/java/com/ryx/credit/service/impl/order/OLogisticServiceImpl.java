@@ -1475,4 +1475,55 @@ public class OLogisticServiceImpl implements OLogisticsService {
             }
         }
     }
+
+    @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult delLogistcstInfo(String lgcId, String userId) throws Exception {
+        //查询物流信息
+        OLogistics oLogistics = oLogisticsMapper.selectByPrimaryKey(lgcId);
+        if (null == oLogistics) throw new MessageException("未查到物流信息，请核实物流信息！");
+
+        //更新排单表发货数量
+        ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(oLogistics.getReceiptPlanId());
+        if (receiptPlan != null) {
+            //更新发货数量
+            if(receiptPlan.getSendProNum() != null && (receiptPlan.getSendProNum().subtract(oLogistics.getSendNum())).compareTo(BigDecimal.ZERO) >= 0) {
+                receiptPlan.setSendProNum(receiptPlan.getSendProNum().subtract(oLogistics.getSendNum()));
+            } else {
+                throw new MessageException("排单发货数量异常！");
+            }
+            //更新发货状态
+            if(receiptPlan.getSendProNum() != null && (receiptPlan.getSendProNum().subtract(oLogistics.getSendNum())).compareTo(BigDecimal.ZERO) == 0) {
+                receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.NoDeliver.getValue()));
+            } else {
+                receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.YesDeliver.getValue()));
+            }
+            if (receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan)!= 1) {
+                throw new MessageException("更新排单数据失败！");
+            }
+            logger.info("删除物流更新排单数据:{}", JSONObject.toJSON(receiptPlan));
+        } else {
+            throw new MessageException("排单信息未找到！");
+        }
+
+        //删除物流明细
+        int deleteInt = oLogistics.getSendNum().compareTo(BigDecimal.valueOf(oLogisticsDetailMapper.deleteDetailByLogisicalId(oLogistics.getId())));
+        if (deleteInt != 0) {
+            logger.info("瑞大宝更新物流异常，物流明细和物流发送数量不同。");
+            throw new MessageException("瑞大宝更新物流异常，物流明细和物流发送数量不同。");
+        }
+
+        //更新物流
+        OLogistics updateLogistics = new OLogistics();
+        updateLogistics.setId(oLogistics.getId());
+        updateLogistics.setStatus(Status.STATUS_2.status);
+        updateLogistics.setVersion(oLogistics.getVersion());
+        updateLogistics.setcUser(userId);
+        if (1 != oLogisticsMapper.updateByPrimaryKeySelective(updateLogistics)) {
+            logger.info("发货物流，重新发送，更新数据库失败:{},{},{}", oLogistics.getId(), oLogistics.getSnBeginNum(), oLogistics.getSnEndNum());
+            throw new MessageException("更新物流状态异常！");
+        }
+
+        return AgentResult.ok("删除成功");
+    }
 }
