@@ -185,7 +185,9 @@ public class OrganizationServiceImpl implements OrganizationService {
         List<OrgPlatform> orgPlatforms = orgPlatformMapper.selectByExample(orgPlatformExample);
         if (null != orgPlatforms || orgPlatforms.size() > 0) {
             for (OrgPlatform orgPlatform : orgPlatforms) {
-                if (1!=orgPlatformMapper.deleteOrgPlatform(orgPlatform.getId())){
+                Map<String, Object> hashMap = new HashMap<>();
+                hashMap.put("id",orgPlatform.getId());
+                if (1!=orgPlatformMapper.deleteOrgPlatform(hashMap)){
                     logger.info("机构关系表删除失败");
                     return  AgentResult.fail("机构关系表删除失败");
                 }
@@ -285,7 +287,9 @@ public class OrganizationServiceImpl implements OrganizationService {
                         List<OrgPlatform> orgPlatforms = orgPlatformMapper.selectByExample(orgPlatformExample);
                         if (null != orgPlatforms && orgPlatforms.size() > 0) {
                             for (OrgPlatform orgPlatform : orgPlatforms) {
-                                if (1 != orgPlatformMapper.deleteOrgPlatform(orgPlatform.getId())) {
+                                Map<String, Object> hashMap = new HashMap<>();
+                                hashMap.put("id",orgPlatform.getId());
+                                if (1 != orgPlatformMapper.deleteOrgPlatform(hashMap)) {
                                     logger.info("机构关系表删除失败");
                                     throw new MessageException("机构关系表删除失败");
                                 }
@@ -304,7 +308,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                         Date d = Calendar.getInstance().getTime();
                         for (int i = 0; i < platNum.length; i++) {
                             OrgPlatform orgPlat = new OrgPlatform();
-                            if (StringUtils.isBlank(platCode[i])){
+                            if (StringUtils.isBlank(platCode[i])||platCode[i].equals("null")){
                                 orgPlat.setPlatCode("#");
                             }else{
                                 orgPlat.setPlatCode(platCode[i]);
