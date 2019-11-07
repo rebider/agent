@@ -233,27 +233,27 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         }
 
         if("POS".equals(busInfo.get("PLATFORM_TYPE"))||"ZHPOS".equals(busInfo.get("PLATFORM_TYPE"))){
-            try {
-            JSONObject mapJSONObject = new JSONObject();
-            mapJSONObject.put("applyId",templateRecode.getTemplateId());
-            mapJSONObject.put("isStartMonth","1");
-            String CheckResult = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, mapJSONObject.toJSONString());
-            Map<String,Object> resultMap = JSONObject.parseObject(CheckResult);
+            if(startPar.get("party").toString()==null){
+                try {
+                    JSONObject mapJSONObject = new JSONObject();
+                    mapJSONObject.put("applyId",templateRecode.getTemplateId());
+                    mapJSONObject.put("isStartMonth","1");
+                    String CheckResult = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, mapJSONObject.toJSONString());
+                    Map<String,Object> resultMap = JSONObject.parseObject(CheckResult);
 
-               Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
+                    Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
 
-               if(objectMap.get("isExist").toString().equals("1")&&map2.get("applyRewardRule")!=null&&((Map<String,String>)map2.get("applyRewardRule")).get("rewardType").equals("1")){
+                    if(objectMap.get("isExist").toString().equals("1")&&map2.get("applyRewardRule")!=null&&((Map<String,String>)map2.get("applyRewardRule")).get("rewardType").equals("1")){
+                        startPar.put("party","manager");
+                    }else {
+                        startPar.put("party","beijing");
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
 
-                   startPar.put("party","manager");
-               }
-           }catch (Exception e){
-            e.printStackTrace();
-
-           }
-
+                }
+            }
         }
-
-
         try{
             proceId = activityService.createDeloyFlow(null, workId, null, null, startPar);
             if (proceId == null) {
@@ -387,6 +387,28 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     }
 
 
+    @Override
+    public String downDept(TemplateRecode recode){
+        try {
+            JSONObject mapJSONObject = new JSONObject();
+            mapJSONObject.put("applyId",recode.getTemplateId());
+            mapJSONObject.put("isStartMonth","1");
+            String CheckResult = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, mapJSONObject.toJSONString());
+            Map<String,Object> resultMap = JSONObject.parseObject(CheckResult);
+            Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
+            Map<String, Object> map = getTemplateApplyDetail(recode.getTemplateId());
+            Map<String, Object> dataMap = (Map<String, Object>) map.get("data");
+            if(objectMap.get("isExist").toString().equals("1")&&dataMap.get("applyRewardRule")!=null&&((Map<String,String>)dataMap.get("applyRewardRule")).get("rewardType").equals("1")){
+               return "yuhua";
+            }
+        }catch (Exception e){
+            logger.info("大区获取下级审批部门失败");
+            e.printStackTrace();
+
+        }
+        return "busness";
+    }
+
     /**
      * 审批流任务处理
      * @param agentVo
@@ -395,21 +417,30 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
      * @throws ProcessException
      */
     @Override
-    public AgentResult approvalTask(AgentVo agentVo, String userId) throws ProcessException {
+    public AgentResult approvalTask(AgentVo agentVo, String userId, Map<String,String> downDeptMap) throws ProcessException {
         logger.info("审批对象：{}", JSONObject.toJSON(agentVo));
 
         AgentResult result = new AgentResult(500, "系统异常", "");
         Map<String, Object> reqMap = new HashMap<>();
 
-        if(StringUtils.isNotBlank(agentVo.getOrderAprDept())){
-            reqMap.put("dept", agentVo.getOrderAprDept());
+        if(downDeptMap==null||downDeptMap.size()==0){
+            if(StringUtils.isNotBlank(agentVo.getOrderAprDept())){
+                reqMap.put("dept", agentVo.getOrderAprDept());
+            }
+            //通过
+            if(Objects.equals("pass",agentVo.getApprovalResult())
+                    && StringUtils.isBlank(agentVo.getOrderAprDept())){
+                // reqMap.put("dept", "finish");
+                reqMap.put("dept", "");
+            }
+        }else{
+            if("1".equals(downDeptMap.get("daqv")) && downDeptMap.get("downDept")==null){
+                reqMap.put("dept", "busness");
+            }else {
+                reqMap.put("dept", downDeptMap.get("downDept"));
+            }
         }
-        //通过
-        if(Objects.equals("pass",agentVo.getApprovalResult())
-                && StringUtils.isBlank(agentVo.getOrderAprDept())){
-           // reqMap.put("dept", "finish");
-            reqMap.put("dept", "");
-        }
+
         // if("reject".equals(agentVo.getApprovalResult())
         //        && StringUtils.isBlank(agentVo.getOrderAprDept())){
         if("reject".equals(agentVo.getApprovalResult())){
