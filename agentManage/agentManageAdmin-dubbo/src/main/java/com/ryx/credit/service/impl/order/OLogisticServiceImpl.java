@@ -1494,11 +1494,11 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 throw new MessageException("排单发货数量异常！");
             }
             //更新发货状态
-            if(receiptPlan.getSendProNum() != null && (receiptPlan.getSendProNum().subtract(oLogistics.getSendNum())).compareTo(BigDecimal.ZERO) == 0) {
-                receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.NoDeliver.getValue()));
+            /*if(receiptPlan.getSendProNum() != null && (receiptPlan.getSendProNum().subtract(oLogistics.getSendNum())).compareTo(BigDecimal.ZERO) == 0) {
+                receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.InTheDeliver.getValue()));
             } else {
-                receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.YesDeliver.getValue()));
-            }
+                receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.InTheDeliver.getValue()));
+            }*/
             if (receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan)!= 1) {
                 throw new MessageException("更新排单数据失败！");
             }
@@ -1508,11 +1508,13 @@ public class OLogisticServiceImpl implements OLogisticsService {
         }
 
         //删除物流明细
-        int deleteInt = oLogistics.getSendNum().compareTo(BigDecimal.valueOf(oLogisticsDetailMapper.deleteDetailByLogisicalId(oLogistics.getId())));
+        /*int deleteInt = oLogistics.getSendNum().compareTo(BigDecimal.valueOf(oLogisticsDetailMapper.deleteDetailByLogisicalId(oLogistics.getId())));
         if (deleteInt != 0) {
-            logger.info("瑞大宝更新物流异常，物流明细和物流发送数量不同。");
-            throw new MessageException("瑞大宝更新物流异常，物流明细和物流发送数量不同。");
-        }
+            logger.info("删除明细异常，明细数量和发送数量不同！");
+            throw new MessageException("删除明细异常，明细数量和发送数量不同！");
+        }*/
+        //删除物流明细
+        oLogisticsDetailMapper.deleteDetailByLogisicalId(oLogistics.getId());
 
         //更新物流
         OLogistics updateLogistics = new OLogistics();
@@ -1521,10 +1523,10 @@ public class OLogisticServiceImpl implements OLogisticsService {
         updateLogistics.setVersion(oLogistics.getVersion());
         updateLogistics.setcUser(userId);
         if (1 != oLogisticsMapper.updateByPrimaryKeySelective(updateLogistics)) {
-            logger.info("发货物流，重新发送，更新数据库失败:{},{},{}", oLogistics.getId(), oLogistics.getSnBeginNum(), oLogistics.getSnEndNum());
+            logger.info("物流删除操作，更新数据库失败:{},{},{}", oLogistics.getId(), oLogistics.getSnBeginNum(), oLogistics.getSnEndNum());
             throw new MessageException("更新物流状态异常！");
         }
 
-        return AgentResult.ok("删除成功");
+        return AgentResult.ok();
     }
 }
