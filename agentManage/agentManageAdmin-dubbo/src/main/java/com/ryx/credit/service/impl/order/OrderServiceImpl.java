@@ -3464,7 +3464,7 @@ public class OrderServiceImpl implements OrderService {
     public void CashSummaryMouth() {
         logger.info("======代理商月度打款金额开票不开票信息统计任务执行======");
         Calendar c = Calendar.getInstance();
-        c.set(Calendar.MONTH,-1);
+        c.add(Calendar.MONTH,-1);
         String date = DateUtil.format(c.getTime(),DateUtil.DATE_FORMAT_yyyyMM);
         logger.info("======代理商月度打款金额开票不开票信息统计任务执行======统计月份{}",date);
         //不开票信息
