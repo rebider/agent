@@ -652,7 +652,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             record.setAgentName(StringUtils.isBlank(agName) || agName.equals("null")?"":agName);
             record.setAgDocPro(internetRenew.getAgDocPro());
             record.setAgDocDistrict(internetRenew.getAgDocDistrict());
-            record.setExplain(internetRenew.getBusNum());
+            record.setExplain(busNum);
 
             try {
                 taskApprovalService.addABusActRel(record);
