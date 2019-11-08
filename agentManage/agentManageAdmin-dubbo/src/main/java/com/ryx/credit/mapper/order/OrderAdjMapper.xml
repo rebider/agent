@@ -332,6 +332,7 @@
       select oa.id as adj_id,
              oo.id as order_id,
              oa.adj_tm,
+             oa.REVIEWS_STAT,
              (select ag.ag_uniq_num
                 from a_agent ag
                 left join o_order
