@@ -48,6 +48,7 @@ public enum CardImportType {
         Map<String, Object> resultMap = new HashMap<>();
         CardImportType[] status = CardImportType.values();
         for(CardImportType cc : status){
+            if(!cc.code.equals(CardImportType.F.getValue()))
             resultMap.put(cc.code,cc.msg);
         }
         return resultMap;
