@@ -1188,6 +1188,11 @@ public class InternetCardServiceImpl implements InternetCardService {
         internetCardPostpone.setVersion(BigDecimal.ONE);
         if(StringUtils.isNotBlank(batchNum))
         internetCardPostpone.setBatchNum(batchNum);
+        internetCardPostpone.setBusNum(oInternetCard.getBusNum());
+        internetCardPostpone.setBusPlatform(oInternetCard.getBusPlatform());
+        internetCardPostpone.setAgDocDistrict(oInternetCard.getAgDocDistrict());
+        internetCardPostpone.setAgDocPro(oInternetCard.getAgDocPro());
+        internetCardPostpone.setBusContactPerson(oInternetCard.getBusContactPerson());
         internetCardPostponeMapper.insert(internetCardPostpone);
 
         BigDecimal sumPostponeTime = oInternetCard.getSumPostponeTime();
