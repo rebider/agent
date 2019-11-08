@@ -384,10 +384,35 @@
                        where o_order.id = oo.id)) as ag_doc_district
         from o_order_adj oa
         left join o_order oo
-          on oa.order_id = oo.id
+          on oa.order_id = oo.id and oo.status=1
         left join a_agent ag
-          on ag.id = oo.agent_id
+          on ag.id = oo.agent_id and ag.status=1
         left join c_user cu
           on cu.id = oa.adj_user_id
+        left join a_agent_businfo ab
+          on ab.id = oo.bus_id and ab.status=1
+    <where>
+      <if test="1==1"> and oa.status=1 </if>
+      <if test="map.agentId!=null and map.agentId!=''"> and oa.agent_id = #{map.agentId} </if>
+      <if test="map.agName!=null and map.agName!=''"> and ag.ag_name like concat(concat('%',#{map.agName}),'%') </if>
+      <!--<if test="map.agUniqNum!=null and map.agUniqNum!=''"> and ag.ag_uniq_num = #{map.agUniqNum} </if>-->
+      <if test="map.agUniqNum!=null and map.agUniqNum!=''"> and ag.id = #{map.agUniqNum} </if>
+      <if test="map.refundId!=null and map.refundId!=''"> and oa.id = #{map.refundId} </if>
+      <if test="map.reviewStatus!=null and map.reviewStatus!=''"> and oa.review_status = #{map.reviewStatus} </if>
+      <if test="map.proName!=null and map.proName!=''">
+        and EXISTS
+        (select * from o_sub_order os
+        where os.pro_name like concat(concat('%',#{map.proName}),'%') and os.status = 1 and os.order_id = oa.order_id)
+      </if>
+      <if test="map.platfromPerm!=null and map.platfromPerm.size>0">
+        and ab.bus_platform in
+        <foreach collection="map.platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
+          #{platfromPermItem.PLATFORM_NUM}
+        </foreach>
+      </if>
+      <if test="map.platfromPerm==null or map.platfromPerm.size==0">
+        and 1=-1
+      </if>
+    </where>
   </sql>
 </mapper>
