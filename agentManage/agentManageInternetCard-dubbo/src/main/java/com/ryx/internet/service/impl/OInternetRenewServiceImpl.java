@@ -620,9 +620,9 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 oInternetRenewDetail.setVersion(BigDecimal.ONE);
                 oInternetRenewDetail.setBusNum(oInternetCard.getBusNum());
                 oInternetRenewDetail.setBusPlatform(oInternetCard.getBusPlatform());
-                oInternetRenewDetail.setAgDocDistrict(oInternetCard.getAgDocDistrict());
-                oInternetRenewDetail.setAgDocPro(oInternetCard.getAgDocPro());
-                oInternetRenewDetail.setBusContactPerson(oInternetCard.getBusContactPerson());
+                internetRenew.setAgDocDistrict(queryAgentBusInfo.getAgDocDistrict());
+                internetRenew.setAgDocPro(queryAgentBusInfo.getAgDocPro());
+                internetRenew.setBusContactPerson(queryAgentBusInfo.getBusContactPerson());
                 internetRenewDetailMapper.insert(oInternetRenewDetail);
             }
             try {
@@ -650,6 +650,10 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             record.setDataShiro(BusActRelBusType.cardRenew.key);
             record.setAgentId(StringUtils.isBlank(agentId) || agentId.equals("null")?"":agentId);
             record.setAgentName(StringUtils.isBlank(agName) || agName.equals("null")?"":agName);
+            record.setAgDocPro(internetRenew.getAgDocPro());
+            record.setAgDocDistrict(internetRenew.getAgDocDistrict());
+            record.setExplain(internetRenew.getBusNum());
+
             try {
                 taskApprovalService.addABusActRel(record);
                 log.info("物联网卡续费审批流启动成功");
