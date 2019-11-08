@@ -384,4 +384,75 @@
     process_date = trunc(to_char(sysdate,'YYYYMMDD')-1)
     and status =1 and already_offset_amt!=0
   </select>
+
+
+  <sql id="Renew_Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and i.${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and i.${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and i.${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and i.${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+
+  <sql id="queryInternetRenewOffsetSql">
+    left join C_ORGANIZATION oa on oa.id=i.ag_doc_pro
+    left join C_ORGANIZATION ob on ob.id=i.AG_DOC_DISTRICT
+    <if test="_parameter != null">
+      <include refid="Renew_Example_Where_Clause" />
+    </if>
+    <if test="reqMap.orgCode!=null and reqMap.orgCode!=''and reqMap.agentNameList!=null">
+      and (
+      (oa.CODE like concat(#{reqMap.orgCode},'%') or ob.CODE like concat(#{reqMap.orgCode},'%'))
+      or i.agent_name
+      <foreach collection="reqMap.agentNameList" item="agentName" open=" in(" close=")" separator=",">
+        #{agentName}
+      </foreach>
+      )
+    </if>
+    <if test="reqMap.orgCode!=null and reqMap.orgCode!='' and reqMap.agentNameList==null">
+      and (oa.CODE like concat(#{reqMap.orgCode},'%') or ob.CODE like concat(#{reqMap.orgCode},'%'))
+    </if>
+    <if test="orderByClause != null">
+      order by i.${orderByClause}
+    </if>
+  </sql>
+
+  <select id="internetRenewOffsetList" parameterType="com.ryx.internet.pojo.InternetRenewOffsetExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    i.FLOW_ID, i.RENEW_ID, i.RENEW_DETAIL_ID, i.ICCID_NUM, i.AGENT_ID, i.AGENT_NAME, i.MER_ID, i.MER_NAME,
+    i.OFFSET_AMT, i.ALREADY_OFFSET_AMT, i.C_TIME, i.C_USER, i.U_USER, i.CLEAN_STATUS,i.PROCESS_DATE, i.PROCESS_TIME,
+    i.BUS_NUM, i.BUS_PLATFORM,i.BUS_CONTACT_PERSON,oa.name as AG_DOC_PRO,ob.name as AG_DOC_DISTRICT
+    from o_internet_renew_offset i
+    <include refid="queryInternetRenewOffsetSql" />
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="internetRenewOffsetCount" parameterType="com.ryx.internet.pojo.InternetRenewOffsetExample" resultType="java.lang.Integer">
+    select count(*) from o_internet_renew_offset i
+    <include refid="queryInternetRenewOffsetSql" />
+  </select>
+
 </mapper>
