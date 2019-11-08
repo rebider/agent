@@ -27,6 +27,8 @@ public class OrderAdj implements Serializable {
 
     private BigDecimal refundStat;
 
+    private Date refundTm;
+
     private String orgPaymentId;
 
     private String newPaymentId;
@@ -38,6 +40,8 @@ public class OrderAdj implements Serializable {
     private BigDecimal status;
 
     private BigDecimal version;
+
+    private String agentId;
 
     public String getId() {
         return id;
@@ -127,6 +131,14 @@ public class OrderAdj implements Serializable {
         this.refundStat = refundStat;
     }
 
+    public Date getRefundTm() {
+        return refundTm;
+    }
+
+    public void setRefundTm(Date refundTm) {
+        this.refundTm = refundTm;
+    }
+
     public String getOrgPaymentId() {
         return orgPaymentId;
     }
@@ -173,5 +185,13 @@ public class OrderAdj implements Serializable {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public String getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(String agentId) {
+        this.agentId = agentId == null ? null : agentId.trim();
     }
 }

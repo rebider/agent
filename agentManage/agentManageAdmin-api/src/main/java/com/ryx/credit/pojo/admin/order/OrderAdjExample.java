@@ -837,6 +837,66 @@ public class OrderAdjExample {
             return (Criteria) this;
         }
 
+        public Criteria andRefundTmIsNull() {
+            addCriterion("REFUND_TM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundTmIsNotNull() {
+            addCriterion("REFUND_TM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundTmEqualTo(Date value) {
+            addCriterion("REFUND_TM =", value, "refundTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundTmNotEqualTo(Date value) {
+            addCriterion("REFUND_TM <>", value, "refundTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundTmGreaterThan(Date value) {
+            addCriterion("REFUND_TM >", value, "refundTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundTmGreaterThanOrEqualTo(Date value) {
+            addCriterion("REFUND_TM >=", value, "refundTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundTmLessThan(Date value) {
+            addCriterion("REFUND_TM <", value, "refundTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundTmLessThanOrEqualTo(Date value) {
+            addCriterion("REFUND_TM <=", value, "refundTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundTmIn(List<Date> values) {
+            addCriterion("REFUND_TM in", values, "refundTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundTmNotIn(List<Date> values) {
+            addCriterion("REFUND_TM not in", values, "refundTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundTmBetween(Date value1, Date value2) {
+            addCriterion("REFUND_TM between", value1, value2, "refundTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundTmNotBetween(Date value1, Date value2) {
+            addCriterion("REFUND_TM not between", value1, value2, "refundTm");
+            return (Criteria) this;
+        }
+
         public Criteria andOrgPaymentIdIsNull() {
             addCriterion("ORG_PAYMENT_ID is null");
             return (Criteria) this;
@@ -1214,6 +1274,76 @@ public class OrderAdjExample {
 
         public Criteria andVersionNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("VERSION not between", value1, value2, "version");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdIsNull() {
+            addCriterion("AGENT_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdIsNotNull() {
+            addCriterion("AGENT_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdEqualTo(String value) {
+            addCriterion("AGENT_ID =", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotEqualTo(String value) {
+            addCriterion("AGENT_ID <>", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdGreaterThan(String value) {
+            addCriterion("AGENT_ID >", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdGreaterThanOrEqualTo(String value) {
+            addCriterion("AGENT_ID >=", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdLessThan(String value) {
+            addCriterion("AGENT_ID <", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdLessThanOrEqualTo(String value) {
+            addCriterion("AGENT_ID <=", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdLike(String value) {
+            addCriterion("AGENT_ID like", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotLike(String value) {
+            addCriterion("AGENT_ID not like", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdIn(List<String> values) {
+            addCriterion("AGENT_ID in", values, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotIn(List<String> values) {
+            addCriterion("AGENT_ID not in", values, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdBetween(String value1, String value2) {
+            addCriterion("AGENT_ID between", value1, value2, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotBetween(String value1, String value2) {
+            addCriterion("AGENT_ID not between", value1, value2, "agentId");
             return (Criteria) this;
         }
     }

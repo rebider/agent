@@ -11,6 +11,7 @@ import java.util.List;
  **/
 public class OrderUpModelVo implements Serializable {
     private String orderId;//订单号
+    private String agentId;
     private String curArrAmount;//当前欠款金额
     private String orgStagesAmount;//当前分期金额
     private String adjRepayment;//调整后分期金额
@@ -27,6 +28,14 @@ public class OrderUpModelVo implements Serializable {
 
     public void setOrderId(String orderId) {
         this.orderId = orderId;
+    }
+
+    public String getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(String agentId) {
+        this.agentId = agentId;
     }
 
     public List<BigDecimal> getCalPriceList() {
