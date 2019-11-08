@@ -497,25 +497,6 @@
       and c.status = 1
     </where>
   </select>
-  <sql id="InternetCard_Base_Column_List">
-    ICCID_NUM, CARD_IMPORT_ID, BATCH_NUM, SN_NUM, DELIVER_TIME, CONSIGNEE, ORDER_ID,
-    AGENT_ID, AGENT_NAME, INTERNET_CARD_NUM, ISSUER, OPEN_ACCOUNT_TIME, EXPIRE_TIME,
-    INTERNET_CARD_STATUS, MER_ID, LATELY_PAY_TIME, MER_NAME,d.D_ITEMNAME as MANUFACTURER, RENEW, C_TIME,
-    U_TIME, C_USER, U_USER, STATUS, VERSION ,STOP, RENEW_STATUS, STOP_REASON,SUM_POSTPONE_TIME
-  </sql>
-  <select id="queryInternetCardList" parameterType="com.ryx.internet.pojo.OInternetCardExample" resultMap="BaseResultMap">
-    <include refid="OracleDialectPrefix" />
-    select
-    <include refid="InternetCard_Base_Column_List" />
-    from O_INTERNET_CARD o LEFT JOIN d_dict d on d.d_itemvalue = o.MANUFACTURER AND d.d_group ='ORDER' AND d_artifact='MANUFACTURER'
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-    <if test="orderByClause != null">
-      order by ${orderByClause}
-    </if>
-    <include refid="OracleDialectSuffix" />
-  </select>
 
   <update id="updateByPrimaryKeySelectiveNotNull" parameterType="com.ryx.internet.pojo.OInternetCard">
     update O_INTERNET_CARD
@@ -673,6 +654,7 @@
     <result column="AG_DOC_DISTRICT" jdbcType="VARCHAR" property="agDocDistrict" />
     <result column="AG_DOC_PRO" jdbcType="VARCHAR" property="agDocPro" />
     <result column="BUS_CONTACT_PERSON" jdbcType="VARCHAR" property="busContactPerson" />
+    <result column="PLATFORM_NAME" jdbcType="VARCHAR" property="platformName" />
   </resultMap>
 
   <sql id="Card_Example_Where_Clause">
@@ -708,6 +690,8 @@
     left join a_agent_businfo b on i.bus_num=b.bus_num and i.bus_platform=b.bus_platform
     left join C_ORGANIZATION oa on oa.id=b.ag_doc_pro
     left join C_ORGANIZATION ob on ob.id=b.AG_DOC_DISTRICT
+    left join d_dict d on d.d_itemvalue = i.MANUFACTURER AND d.d_group ='ORDER' AND d_artifact='MANUFACTURER'
+    left join a_platform p on p.PLATFORM_NUM = i.BUS_PLATFORM
     <if test="_parameter != null">
       <include refid="Card_Example_Where_Clause" />
     </if>
@@ -728,10 +712,19 @@
     </if>
   </sql>
 
+  <sql id="InternetCard_Base_Column_List">
+    i.ICCID_NUM, i.CARD_IMPORT_ID, i.BATCH_NUM, i.SN_NUM, i.DELIVER_TIME, i.CONSIGNEE, i.ORDER_ID,
+    i.AGENT_ID, i.AGENT_NAME, i.INTERNET_CARD_NUM, i.ISSUER, i.OPEN_ACCOUNT_TIME, i.EXPIRE_TIME,
+    i.INTERNET_CARD_STATUS, i.MER_ID, i.LATELY_PAY_TIME, i.MER_NAME, d.D_ITEMNAME as MANUFACTURER, i.RENEW, i.C_TIME,
+    i.U_TIME, i.C_USER, i.U_USER, i.STATUS, i.VERSION ,i.STOP, i.RENEW_STATUS, i.STOP_REASON,i.SUM_POSTPONE_TIME,
+    i.BUS_NUM, i.BUS_PLATFORM,p.PLATFORM_NAME,
+  </sql>
+
   <select id="internetCardList" parameterType="com.ryx.internet.pojo.OInternetCardExample" resultMap="CardListResultMap">
     <include refid="OracleDialectPrefix" />
     select
-    i.*,oa.name as AG_DOC_PRO,ob.name as AG_DOC_DISTRICT,b.bus_contact_person
+    <include refid="InternetCard_Base_Column_List" />
+    oa.name as AG_DOC_PRO,ob.name as AG_DOC_DISTRICT,b.bus_contact_person
     from o_internet_card i
     <include refid="queryInternetCardSql" />
     <include refid="OracleDialectSuffix" />

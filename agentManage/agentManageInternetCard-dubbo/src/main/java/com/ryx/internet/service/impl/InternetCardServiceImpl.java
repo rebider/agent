@@ -141,7 +141,7 @@ public class InternetCardServiceImpl implements InternetCardService {
         OInternetCardExample oInternetCardExample = new OInternetCardExample();
         oInternetCardExample = queryParam(internetCard, oInternetCardExample,agentId,userId);
         oInternetCardExample.setPage(page);
-        List<OInternetCard> oInternetCards = internetCardMapper.queryInternetCardList(oInternetCardExample);
+        List<OInternetCard> oInternetCards = internetCardMapper.internetCardList(oInternetCardExample);
         return oInternetCards;
     }
 
@@ -149,7 +149,7 @@ public class InternetCardServiceImpl implements InternetCardService {
     public Integer queryInternetCardCount(OInternetCard internetCard,String agentId,Long userId){
         OInternetCardExample oInternetCardExample = new OInternetCardExample();
         oInternetCardExample = queryParam(internetCard, oInternetCardExample,agentId,userId);
-        Integer count = Integer.valueOf((int)internetCardMapper.countByExample(oInternetCardExample));
+        Integer count = Integer.valueOf(internetCardMapper.internetCardCount(oInternetCardExample));
         return count;
     }
 

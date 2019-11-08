@@ -36,9 +36,6 @@ public interface OInternetCardMapper {
     List<OInternetCard> selectInternetCardRenew(@Param("map")Map<String,Object> map);
 
 
-    List<OInternetCard> queryInternetCardList(OInternetCardExample example);
-
-
     int updateByPrimaryKeySelectiveNotNull(OInternetCard record);
 
 

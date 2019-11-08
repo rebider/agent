@@ -166,14 +166,14 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     public List<OInternetRenewDetail> queryInternetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page,String agentId,Long userId){
         OInternetRenewDetailExample oInternetRenewDetailExample = queryParam(internetRenewDetail,agentId,userId);
         oInternetRenewDetailExample.setPage(page);
-        List<OInternetRenewDetail> internetRenewDetailList = internetRenewDetailMapper.selectByExample(oInternetRenewDetailExample);
+        List<OInternetRenewDetail> internetRenewDetailList = internetRenewDetailMapper.internetRenewDetailList(oInternetRenewDetailExample);
         return internetRenewDetailList;
     }
 
     @Override
     public Integer queryInternetRenewDetailCount(OInternetRenewDetail internetRenewDetail,String agentId,Long userId){
         OInternetRenewDetailExample oInternetRenewDetailExample = queryParam(internetRenewDetail,agentId,userId);
-        Integer count = Integer.valueOf((int)internetRenewDetailMapper.countByExample(oInternetRenewDetailExample));
+        Integer count = Integer.valueOf(internetRenewDetailMapper.internetRenewDetailCount(oInternetRenewDetailExample));
         return count;
     }
 
@@ -393,14 +393,14 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     public List<InternetRenewOffsetDetail> queryInternetRenewOffsetDetailList(InternetRenewOffsetDetail internetRenewOffsetDetail, Page page,String agentId,Long userId){
         InternetRenewOffsetDetailExample internetRenewOffsetDetailExample = queryOffsetDetailParam(internetRenewOffsetDetail, agentId,userId);
         internetRenewOffsetDetailExample.setPage(page);
-        List<InternetRenewOffsetDetail> internetRenewOffsetDetailList = internetRenewOffsetDetailMapper.selectByExample(internetRenewOffsetDetailExample);
+        List<InternetRenewOffsetDetail> internetRenewOffsetDetailList = internetRenewOffsetDetailMapper.internetRenewOffsetDetailList(internetRenewOffsetDetailExample);
         return internetRenewOffsetDetailList;
     }
 
     @Override
     public Integer queryInternetRenewOffsetDetailCount(InternetRenewOffsetDetail internetRenewOffsetDetail,String agentId,Long userId){
         InternetRenewOffsetDetailExample internetRenewOffsetDetailExample = queryOffsetDetailParam(internetRenewOffsetDetail,agentId,userId);
-        Integer count = Integer.valueOf((int)internetRenewOffsetDetailMapper.countByExample(internetRenewOffsetDetailExample));
+        Integer count = Integer.valueOf(internetRenewOffsetDetailMapper.internetRenewOffsetDetailCount(internetRenewOffsetDetailExample));
         return count;
     }
 
