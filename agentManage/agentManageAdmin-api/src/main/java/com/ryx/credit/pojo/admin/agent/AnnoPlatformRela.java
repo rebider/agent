@@ -1,6 +1,8 @@
 package com.ryx.credit.pojo.admin.agent;
 
-public class AnnoPlatformRela {
+import java.io.Serializable;
+
+public class AnnoPlatformRela implements Serializable {
     private String id;
 
     private String annoId;
