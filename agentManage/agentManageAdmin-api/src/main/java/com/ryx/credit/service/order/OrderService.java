@@ -280,9 +280,16 @@ public interface OrderService {
     AgentResult refreshPaymentDetail(String orderId);
 
 
-    AgentResult saveAdjInfo(OrderUpModelVo orderUpModelVo,Map map);
+    AgentResult saveAdjInfo(OrderUpModelVo orderUpModelVo,Map map) throws Exception;
 
     PageInfo queryAgentUpModelList(Map par, Page page);
 
     AgentResult loadUpModelInfo(String adjId);
+
+    /**
+     * 启动订单调整审批
+     * @return
+     * @throws Exception
+     */
+    AgentResult startOrderAdjust(String id, String cuser) throws Exception;
 }

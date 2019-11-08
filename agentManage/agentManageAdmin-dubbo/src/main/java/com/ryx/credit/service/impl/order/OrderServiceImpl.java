@@ -3919,7 +3919,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
-    public AgentResult saveAdjInfo(OrderUpModelVo orderUpModelVo, Map map) {
+    public AgentResult saveAdjInfo(OrderUpModelVo orderUpModelVo, Map map) throws Exception {
         AgentResult agentResult = AgentResult.fail("保存失败!");
         OrderAdj orderAdj = new OrderAdj();
         orderAdj.setId(idService.genIdInTran(TabId.o_order_adj));
@@ -3969,6 +3969,16 @@ public class OrderServiceImpl implements OrderService {
             agentResult.setStatus(AgentResult.OK);
             agentResult.setMsg("保存成功");
         }
+
+        //是否启动流程
+        if (org.apache.commons.lang.StringUtils.isNotEmpty(orderUpModelVo.getIsApproveWhenSubmit()) && "1".equals(orderUpModelVo.getIsApproveWhenSubmit())) {
+            //启动流程审批
+            String userId = (String) map.get("userId");
+            AgentResult result = startOrderAdjust(orderAdj.getId(), userId);
+            if (!result.isOK()) {
+                throw new Exception(result.getMsg());
+            }
+        }
         return agentResult;
     }
 
@@ -3999,6 +4009,103 @@ public class OrderServiceImpl implements OrderService {
         List<OrderAdjDetail> orderAdjDetails = orderAdjDetailMapper.selectByExample(orderAdjDetailExample);
         res.putKeyV("orderAdjDetails",orderAdjDetails);
         return AgentResult.ok(res);
+    }
+
+    /**
+     * 启动订单调整审批
+     * @param id
+     * @param cuser
+     * @return startOrderAdjust
+     * @throws Exception
+     */
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult startOrderAdjust(String id, String cuser) throws Exception {
+        OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(id);
+        if (StringUtils.isBlank(id)) {
+            logger.info("订单调整提交审批，订单调整ID为空{}:{}", id, cuser);
+            return AgentResult.fail("订单调整提交审批，订单ID为空!");
+        }
+        if (StringUtils.isBlank(cuser)) {
+            logger.info("订单调整提交审批，操作用户为空{}:{}", id, cuser);
+            return AgentResult.fail("代理商调整审批中，操作用户为空！");
+        }
+        if (!orderAdj.getAdjUserId().equals(cuser)) {
+            logger.info("提交审批的用户必须是创建订单的用户{}:{}", id, cuser);
+            return AgentResult.fail("提交审批的用户必须是创建订单的用户！");
+        }
+        if (!orderAdj.getStatus().equals(Status.STATUS_1.status)) {
+            logger.info("订单调整提交审批，订单调整信息已失效{}:{}", id, cuser);
+            return AgentResult.fail("订单调整信息已失效！");
+        }
+        if (orderAdj.getReviewsStat().equals(AgStatus.Approving.name())) {
+            logger.info("订单调整提交审批，禁止重复提交审批{}:{}", id, cuser);
+            return AgentResult.fail("订单调整提交审批，禁止重复提交审批！");
+        }
+        if (orderAdj.getReviewsStat().equals(AgStatus.Approved.name())) {
+            logger.info("订单调整提交审批，禁止重复提交审批{}:{}", id, cuser);
+            return AgentResult.fail("订单调整提交审批，禁止重复提交审批！");
+        }
+
+        //更新订单调整数据为审批中
+        orderAdj.setReviewsStat(AgStatus.Approving.status);
+        orderAdj.setReviewsDate(new Date());
+        if (1 != orderAdjMapper.updateByPrimaryKeySelective(orderAdj)) {
+            logger.info("订单调整提交审批，更新订单调整数据失败{}:{}", id, cuser);
+            throw new MessageException("订单调整提交审批，更新订单调整数据失败！");
+        }
+
+        //流程中的部门参数
+        Map startPar = agentEnterService.startPar(cuser);
+        if (null == startPar) {
+            logger.info("========用户{}{}启动部门参数为空", id, cuser);
+            throw new MessageException("启动部门参数为空！");
+        }
+        //不同的业务类型找到不同的启动流程
+//        String workId = null;
+//        if(agentService.isAgent(cuser).isOK()){
+//            workId = dictOptionsService.getApproveVersion("orderAgent");
+//        }else {
+//            workId = dictOptionsService.getApproveVersion("orderCity");
+//        }
+//        if(startPar.get("party").toString().equals("beijing")) {
+//            startPar.put("rs", ApprovalType.PASS.getValue());
+//        }
+//        //订单启动流程
+//        if(StringUtils.isBlank(workId)){
+//            logger.info("========用户{}{}订单启动流程未找到", cuser, workId);
+//            throw new MessageException("订单启动流程未找到!");
+//        }
+        //启动审批
+        String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("orderAdjust"), null, null, startPar);
+        if (proce == null) {
+            logger.info("订单调整提交审批，审批流启动失败{}:{}", id, cuser);
+            throw new MessageException("审批流启动失败！");
+        }
+
+        Agent agent = agentMapper.selectByPrimaryKey(orderAdj.getAgentId());
+        OOrder order = orderMapper.selectByPrimaryKey(orderAdj.getOrderId());
+        AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
+        //添加审批关系
+        BusActRel record = new BusActRel();
+        record.setBusId(orderAdj.getId());
+        record.setActivId(proce);
+        record.setcTime(Calendar.getInstance().getTime());
+        record.setcUser(cuser);
+        record.setStatus(Status.STATUS_1.status);
+        record.setBusType(BusActRelBusType.ORDER.name());
+        record.setActivStatus(AgStatus.Approving.name());
+        record.setAgentId(orderAdj.getAgentId());
+        record.setAgentName(agent.getAgName());
+        record.setDataShiro(BusActRelBusType.ORDER.key);
+        record.setAgDocPro(agentBusInfo.getAgDocPro());
+        record.setAgDocDistrict(agentBusInfo.getAgDocDistrict());
+        record.setNetInBusType("ACTIVITY_"+order.getOrderPlatform());
+        if (1 != busActRelMapper.insertSelective(record)) {
+            logger.info("订单调整提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
+            throw new MessageException("审批流启动失败：添加审批关系失败！");
+        }
+        return AgentResult.ok();
     }
 
 

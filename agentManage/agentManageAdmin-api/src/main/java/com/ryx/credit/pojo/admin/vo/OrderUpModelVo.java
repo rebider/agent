@@ -21,6 +21,15 @@ public class OrderUpModelVo implements Serializable {
     private List<AdjProVo> adjPros;//子商品清单
     private List<BigDecimal> calPriceList;//差价汇总
     private List<String> files;//附件
+    private String isApproveWhenSubmit;
+
+    public String getIsApproveWhenSubmit() {
+        return isApproveWhenSubmit;
+    }
+
+    public void setIsApproveWhenSubmit(String isApproveWhenSubmit) {
+        this.isApproveWhenSubmit = isApproveWhenSubmit;
+    }
 
     public String getOrderId() {
         return orderId;
