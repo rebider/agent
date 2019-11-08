@@ -3924,6 +3924,7 @@ public class OrderServiceImpl implements OrderService {
         OrderAdj orderAdj = new OrderAdj();
         orderAdj.setId(idService.genIdInTran(TabId.o_order_adj));
         orderAdj.setOrderId(orderUpModelVo.getOrderId());
+        orderAdj.setAgentId(orderUpModelVo.getAgentId());
         orderAdj.setAdjTm(new Date());//申请时间
         orderAdj.setAdjUserId(String.valueOf(map.get("userId")));//调整人id
         orderAdj.setCurArrAmount(new BigDecimal(orderUpModelVo.getCurArrAmount()));//当前欠款金额
