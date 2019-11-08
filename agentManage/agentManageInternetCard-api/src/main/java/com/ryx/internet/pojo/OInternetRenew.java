@@ -55,6 +55,7 @@ public class OInternetRenew implements Serializable{
     private String agDocPro;
 
     private String busContactPerson;
+
     private List<Attachment> attachmentList;
 
     public String getBusNum() {

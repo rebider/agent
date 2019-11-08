@@ -401,9 +401,9 @@
   <select id="internetRenewList" parameterType="com.ryx.internet.pojo.OInternetCardExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
-    i.*,
-    oa.name as AG_DOC_PRO_NAME,
-    ob.name as AG_DOC_DISTRICT_NAME
+    i.ID, i.RENEW_WAY, i.RENEW_CARD_COUNT, i.SUM_OFFSET_AMT, i.SUPP_AMT, i.REVIEW_STATUS, i.REVIEW_PASS_TIME,
+    i.APPLY_REMARK, i.AGENT_ID, i.AGENT_NAME,i.BUS_NUM, i.BUS_PLATFORM, i.BUS_CONTACT_PERSON,C_TIME, C_USER,
+    oa.name as AG_DOC_PRO,ob.name as AG_DOC_DISTRICT
     from O_INTERNET_RENEW i
     <include refid="queryInternetRenewSql" />
     <include refid="OracleDialectSuffix" />
