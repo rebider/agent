@@ -398,7 +398,7 @@
       <!--<if test="map.agUniqNum!=null and map.agUniqNum!=''"> and ag.ag_uniq_num = #{map.agUniqNum} </if>-->
       <if test="map.agUniqNum!=null and map.agUniqNum!=''"> and ag.id = #{map.agUniqNum} </if>
       <if test="map.refundId!=null and map.refundId!=''"> and oa.id = #{map.refundId} </if>
-      <if test="map.reviewStatus!=null and map.reviewStatus!=''"> and oa.review_status = #{map.reviewStatus} </if>
+      <if test="map.reviewStatus!=null and map.reviewStatus!=''"> and oa.reviews_stat = #{map.reviewStatus} </if>
       <if test="map.proName!=null and map.proName!=''">
         and EXISTS
         (select * from o_sub_order os
