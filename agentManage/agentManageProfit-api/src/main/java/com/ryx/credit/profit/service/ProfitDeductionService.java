@@ -197,4 +197,10 @@ public interface ProfitDeductionService {
      * @return
      */
     List<Map<String,Object>> getPorfitDataByAgentIdAndProfitMonth(String agentId,String profitMonth);
+
+    /**
+     * 清除代理商流量卡分润抵扣数据
+     * @param profitDate
+     */
+    void clearMortgageProfitData(String profitDate);
 }

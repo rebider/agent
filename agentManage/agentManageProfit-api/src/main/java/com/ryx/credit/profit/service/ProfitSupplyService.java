@@ -43,4 +43,6 @@ public interface ProfitSupplyService {
     List<String> importSupplyList(List<List<Object>> data,String sign) throws Exception;
 
     Map<String,Object> profitCount(Map<String, Object> param);
+
+    void clearRollingDifferenceSupplyData(String profitDate);
 }
