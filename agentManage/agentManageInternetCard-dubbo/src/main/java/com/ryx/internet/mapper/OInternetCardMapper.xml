@@ -711,7 +711,16 @@
     <if test="_parameter != null">
       <include refid="Card_Example_Where_Clause" />
     </if>
-    <if test="reqMap.orgCode!=null and reqMap.orgCode!=''">
+    <if test="reqMap.orgCode!=null and reqMap.orgCode!=''and reqMap.agentNameList!=null">
+      and (
+      (oa.CODE like concat(#{reqMap.orgCode},'%') or ob.CODE like concat(#{reqMap.orgCode},'%'))
+      or i.agent_name
+      <foreach collection="reqMap.agentNameList" item="agentName" open=" in(" close=")" separator=",">
+        #{agentName}
+      </foreach>
+      )
+    </if>
+    <if test="reqMap.orgCode!=null and reqMap.orgCode!='' and reqMap.agentNameList==null">
       and (oa.CODE like concat(#{reqMap.orgCode},'%') or ob.CODE like concat(#{reqMap.orgCode},'%'))
     </if>
     <if test="orderByClause != null">

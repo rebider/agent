@@ -87,19 +87,6 @@ public class InternetCardServiceImpl implements InternetCardService {
         OInternetCardExample oInternetCardExample = new OInternetCardExample();
         oInternetCardExample= queryParam(internetCard, oInternetCardExample,agentId,userId);
         oInternetCardExample.setPage(page);
-
-        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
-        if(orgCodeRes==null && orgCodeRes.size()!=1){
-            return null;
-        }
-        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
-        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
-        Map<String,Object> reqMap = new HashMap<>();
-        //省区大区查看自己的代理商 部门权限
-        if(StringUtils.isNotBlank(organizationCode) && (organizationCode.contains("region") || organizationCode.contains("beijing"))) {
-            reqMap.put("orgCode", organizationCode);
-        }
-        oInternetCardExample.setReqMap(reqMap);
         List<OInternetCard> oInternetCards = internetCardMapper.internetCardList(oInternetCardExample);
         for (OInternetCard oInternetCard : oInternetCards) {
             Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),oInternetCard.getManufacturer());
@@ -210,13 +197,6 @@ public class InternetCardServiceImpl implements InternetCardService {
             criteria.andAgentIdEqualTo(internetCard.getAgentId());
         }
 
-        //内部人员根据名称查询指定流量卡
-        List<String> agentNameList = dictOptionsService.getAgentNameList(userId);
-        if(agentNameList.size()!=0){
-            criteria.andAgentNameIn(agentNameList);
-        }else if(StringUtils.isNotBlank(internetCard.getAgentName())){
-            criteria.andAgentNameLike("%"+internetCard.getAgentName()+"%");
-        }
         if(StringUtils.isNotBlank(internetCard.getOrderId())){
             criteria.andOrderIdEqualTo(internetCard.getOrderId());
         }
@@ -248,8 +228,26 @@ public class InternetCardServiceImpl implements InternetCardService {
             Date format = DateUtil.format(internetCard.getExpireTimeEndStr(), DateUtil.DATE_FORMAT_yyyy_MM_dd);
             criteria.andExpireTimeLessThanOrEqualTo(format);
         }
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+        if(orgCodeRes==null && orgCodeRes.size()!=1){
+            return null;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        Map<String,Object> reqMap = new HashMap<>();
+        //省区大区查看自己的代理商 部门权限
+        if(StringUtils.isNotBlank(organizationCode) && (organizationCode.contains("region") || organizationCode.contains("beijing"))) {
+            reqMap.put("orgCode", organizationCode);
+        }
+        //内部人员根据名称查询指定流量卡
+        List<String> agentNameList = dictOptionsService.getAgentNameList(userId);
+        if(agentNameList.size()!=0){
+            reqMap.put("agentNameList", agentNameList);
+        }else if(StringUtils.isNotBlank(internetCard.getAgentName())){
+            criteria.andAgentNameLike("%"+internetCard.getAgentName()+"%");
+        }
+        oInternetCardExample.setReqMap(reqMap);
         oInternetCardExample.setOrderByClause(" c_time,expire_time desc ");
-
         return oInternetCardExample;
     }
 
