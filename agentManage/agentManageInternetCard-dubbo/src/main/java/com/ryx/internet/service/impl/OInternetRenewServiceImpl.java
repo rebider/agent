@@ -149,7 +149,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
 
         OInternetRenewDetailExample internetRenewDetailExample = queryParam(internetRenewDetail,agentId,userId);
         internetRenewDetailExample.setPage(page);
-        List<OInternetRenewDetail> internetRenewDetails = internetRenewDetailMapper.selectByExample(internetRenewDetailExample);
+        List<OInternetRenewDetail> internetRenewDetails = internetRenewDetailMapper.internetRenewDetailList(internetRenewDetailExample);
         for (OInternetRenewDetail renewDetail : internetRenewDetails) {
             renewDetail.setRenewWayName(InternetRenewWay.getContentByValue(renewDetail.getRenewWay()));
             CUser cUser = iUserService.selectById(renewDetail.getcUser());
@@ -158,7 +158,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(internetRenewDetails);
-        pageInfo.setTotal((int)internetRenewDetailMapper.countByExample(internetRenewDetailExample));
+        pageInfo.setTotal(internetRenewDetailMapper.internetRenewDetailCount(internetRenewDetailExample));
         return pageInfo;
     }
 
@@ -178,7 +178,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     }
 
     /**
-     * 查询和导出的条件
+     * 续费明细 查询和导出的条件
      * @param internetRenewDetail
      * @return
      */
@@ -192,13 +192,26 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }else if(StringUtils.isNotBlank(internetRenewDetail.getAgentId())){
             criteria.andAgentIdEqualTo(internetRenewDetail.getAgentId());
         }
+
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+        if(orgCodeRes==null && orgCodeRes.size()!=1){
+            return null;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        Map<String,Object> reqMap = new HashMap<>();
+        //省区大区查看自己的代理商 部门权限
+        if(StringUtils.isNotBlank(organizationCode) && (organizationCode.contains("region") || organizationCode.contains("beijing"))) {
+            reqMap.put("orgCode", organizationCode);
+        }
         //内部人员根据名称查询指定流量卡
         List<String> agentNameList = dictOptionsService.getAgentNameList(userId);
         if(agentNameList.size()!=0) {
-            criteria.andAgentNameIn(agentNameList);
+            reqMap.put("agentNameList", agentNameList);
         }else if(StringUtils.isNotBlank(internetRenewDetail.getAgentName())){
             criteria.andAgentNameLike("%"+internetRenewDetail.getAgentName()+"%");
         }
+
         if(StringUtils.isNotBlank(internetRenewDetail.getIccidNum())){
             criteria.andIccidNumEqualTo(internetRenewDetail.getIccidNum());
         }
@@ -217,6 +230,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         if(StringUtils.isNotBlank(internetRenewDetail.getRenewStatus())){
             criteria.andRenewStatusEqualTo(internetRenewDetail.getRenewStatus());
         }
+        internetRenewDetailExample.setReqMap(reqMap);
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         internetRenewDetailExample.setOrderByClause(" c_time desc ");
         return internetRenewDetailExample;
