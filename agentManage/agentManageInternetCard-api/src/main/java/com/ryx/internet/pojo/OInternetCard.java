@@ -97,6 +97,16 @@ public class OInternetCard implements Serializable{
 
     private String busContactPerson;//数据库无
 
+    private String platformName; //数据库无
+
+    public String getPlatformName() {
+        return platformName;
+    }
+
+    public void setPlatformName(String platformName) {
+        this.platformName = platformName;
+    }
+
     public String getAgDocDistrict() {
         return agDocDistrict;
     }
