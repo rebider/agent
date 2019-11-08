@@ -398,7 +398,7 @@
     </if>
   </sql>
 
-  <select id="internetRenewList" parameterType="com.ryx.internet.pojo.OInternetCardExample" resultMap="BaseResultMap">
+  <select id="internetRenewList" parameterType="com.ryx.internet.pojo.OInternetRenewExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
     i.ID, i.RENEW_WAY, i.RENEW_CARD_COUNT, i.SUM_OFFSET_AMT, i.SUPP_AMT, i.REVIEW_STATUS, i.REVIEW_PASS_TIME,
@@ -409,7 +409,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
 
-  <select id="internetRenewCount" parameterType="com.ryx.internet.pojo.OInternetCardExample" resultType="java.lang.Integer">
+  <select id="internetRenewCount" parameterType="com.ryx.internet.pojo.OInternetRenewExample" resultType="java.lang.Integer">
     select count(*) from O_INTERNET_RENEW i
     <include refid="queryInternetRenewSql" />
   </select>

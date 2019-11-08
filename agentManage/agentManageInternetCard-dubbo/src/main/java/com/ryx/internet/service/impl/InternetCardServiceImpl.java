@@ -1091,7 +1091,7 @@ public class InternetCardServiceImpl implements InternetCardService {
      * @return
      */
     @Override
-    public PageInfo queryInternetCardPostponeList(OInternetCardPostpone internetCardPostpone,Page page){
+    public PageInfo queryInternetCardPostponeList(OInternetCardPostpone internetCardPostpone,Page page,String agentId,Long userId){
         OInternetCardPostponeExample internetCardPostponeExample = new OInternetCardPostponeExample();
         OInternetCardPostponeExample.Criteria criteria = internetCardPostponeExample.createCriteria();
         internetCardPostponeExample.setPage(page);
@@ -1103,11 +1103,29 @@ public class InternetCardServiceImpl implements InternetCardService {
         if(StringUtils.isNotBlank(internetCardPostpone.getBatchNum())){
             criteria.andBatchNumEqualTo(internetCardPostpone.getBatchNum());
         }
-        if(StringUtils.isNotBlank(internetCardPostpone.getAgentId())){
+        //代理商只查询自己的
+        if(StringUtils.isNotBlank(agentId)){
+            criteria.andAgentIdEqualTo(agentId);
+        }else if(StringUtils.isNotBlank(internetCardPostpone.getAgentId())){
             criteria.andAgentIdEqualTo(internetCardPostpone.getAgentId());
         }
-        if(StringUtils.isNotBlank(internetCardPostpone.getAgentName())){
-            criteria.andAgentNameEqualTo(internetCardPostpone.getAgentName());
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+        if(orgCodeRes==null && orgCodeRes.size()!=1){
+            return null;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        Map<String,Object> reqMap = new HashMap<>();
+        //省区大区查看自己的代理商 部门权限
+        if(StringUtils.isNotBlank(organizationCode) && (organizationCode.contains("region") || organizationCode.contains("beijing"))) {
+            reqMap.put("orgCode", organizationCode);
+        }
+        //内部人员根据名称查询指定流量卡
+        List<String> agentNameList = dictOptionsService.getAgentNameList(userId);
+        if(agentNameList.size()!=0) {
+            reqMap.put("agentNameList", agentNameList);
+        }else if(StringUtils.isNotBlank(internetCardPostpone.getAgentName())){
+            criteria.andAgentNameLike("%"+internetCardPostpone.getAgentName()+"%");
         }
         if(StringUtils.isNotBlank(internetCardPostpone.getMerId())){
             criteria.andMerIdEqualTo(internetCardPostpone.getMerId());
@@ -1130,14 +1148,15 @@ public class InternetCardServiceImpl implements InternetCardService {
                 criteria.andIccidLike(internetCardPostpone.getIccidNum()+"%");
             }
         }
-        List<OInternetCardPostpone> internetCardPostpones = internetCardPostponeMapper.selectByExample(internetCardPostponeExample);
+        internetCardPostponeExample.setReqMap(reqMap);
+        List<OInternetCardPostpone> internetCardPostpones = internetCardPostponeMapper.queryInternetCardPostponeList(internetCardPostponeExample);
         for (OInternetCardPostpone cardPostpone : internetCardPostpones) {
             CUser cUser = iUserService.selectById(cardPostpone.getcUser());
             if(null!=cUser)cardPostpone.setcUser(cUser.getName());
         }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(internetCardPostpones);
-        pageInfo.setTotal((int)internetCardPostponeMapper.countByExample(internetCardPostponeExample));
+        pageInfo.setTotal(internetCardPostponeMapper.queryInternetCardPostponeCount(internetCardPostponeExample));
         return pageInfo;
     }
 
