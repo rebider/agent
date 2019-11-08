@@ -12,4 +12,5 @@ import java.util.List;
  **/
 public interface AnnoPlatformRelaService {
     int batchSave(List<AnnoPlatformRela> annoPlatformRela);
+    List<AnnoPlatformRela> queryByAnnoId(String annoId);
 }

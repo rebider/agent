@@ -26,7 +26,9 @@ public interface ITemplateRecodeService {
 
     void saveAndApply(Map<String,String> map1, JSONObject map2) throws MessageException;
 
-    AgentResult approvalTask(AgentVo agentVo, String userId) throws ProcessException;
+    String downDept(TemplateRecode recode);
+
+    AgentResult approvalTask(AgentVo agentVo, String userId,Map<String,String> downDeptMap) throws ProcessException;
 
     TemplateRecode getTemplateRecodeById(String id);
 

@@ -24,7 +24,7 @@ public interface OrgPlatformMapper {
 
     int updateByPrimaryKey(OrgPlatform record);
 
-    int deleteOrgPlatform(@Param("id") String id);
+    int deleteOrgPlatform(@Param("map") Map map);
 
     List<Map> queryOrg(@Param("platForm")String platForm);
 
