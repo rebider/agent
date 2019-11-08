@@ -106,17 +106,29 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }else if(StringUtils.isNotBlank(internetRenew.getAgentId())){
             criteria.andAgentIdEqualTo(internetRenew.getAgentId());
         }
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+        if(orgCodeRes==null && orgCodeRes.size()!=1){
+            return null;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        Map<String,Object> reqMap = new HashMap<>();
+        //省区大区查看自己的代理商 部门权限
+        if(StringUtils.isNotBlank(organizationCode) && (organizationCode.contains("region") || organizationCode.contains("beijing"))) {
+            reqMap.put("orgCode", organizationCode);
+        }
         //内部人员根据名称查询指定流量卡
         List<String> agentNameList = dictOptionsService.getAgentNameList(userId);
         if(agentNameList.size()!=0) {
-            criteria.andAgentNameIn(agentNameList);
+            reqMap.put("agentNameList", agentNameList);
         }else if(StringUtils.isNotBlank(internetRenew.getAgentName())){
             criteria.andAgentNameLike("%"+internetRenew.getAgentName()+"%");
         }
         criteria.andStatusEqualTo(Status.STATUS_1.status);
+        internetRenewExample.setReqMap(reqMap);
         internetRenewExample.setPage(page);
         internetRenewExample.setOrderByClause(" c_time desc");
-        List<OInternetRenew> internetRenews = internetRenewMapper.selectByExample(internetRenewExample);
+        List<OInternetRenew> internetRenews = internetRenewMapper.internetRenewList(internetRenewExample);
         for (OInternetRenew renew : internetRenews) {
             renew.setRenewWayName(InternetRenewWay.getContentByValue(renew.getRenewWay()));
             CUser cUser = iUserService.selectById(renew.getcUser());
@@ -125,7 +137,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(internetRenews);
-        pageInfo.setTotal((int)internetRenewMapper.countByExample(internetRenewExample));
+        pageInfo.setTotal(internetRenewMapper.internetRenewCount(internetRenewExample));
         return pageInfo;
     }
 

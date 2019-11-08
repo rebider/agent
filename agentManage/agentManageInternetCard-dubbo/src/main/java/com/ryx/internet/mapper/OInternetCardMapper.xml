@@ -738,10 +738,8 @@
   </select>
 
   <select id="internetCardCount" parameterType="com.ryx.internet.pojo.OInternetCardExample" resultType="java.lang.Integer">
-    <include refid="OracleDialectPrefix" />
     select count(*) from o_internet_card i
     <include refid="queryInternetCardSql" />
-    <include refid="OracleDialectSuffix" />
   </select>
 
 </mapper>

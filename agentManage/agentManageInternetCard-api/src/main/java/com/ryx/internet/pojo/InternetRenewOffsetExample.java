@@ -5,6 +5,7 @@ import com.ryx.credit.common.util.Page;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class InternetRenewOffsetExample {
     protected String orderByClause;
@@ -19,8 +20,18 @@ public class InternetRenewOffsetExample {
 
     protected Integer limitEnd;
 
+    protected Map<String,Object> reqMap;
+
     public InternetRenewOffsetExample() {
         oredCriteria = new ArrayList<Criteria>();
+    }
+
+    public Map<String, Object> getReqMap() {
+        return reqMap;
+    }
+
+    public void setReqMap(Map<String, Object> reqMap) {
+        this.reqMap = reqMap;
     }
 
     public String getOrderByClause() {

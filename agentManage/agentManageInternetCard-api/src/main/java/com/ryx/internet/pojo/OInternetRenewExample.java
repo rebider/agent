@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class OInternetRenewExample {
     protected String orderByClause;
@@ -20,8 +21,18 @@ public class OInternetRenewExample {
 
     protected Integer limitEnd;
 
+    protected Map<String,Object> reqMap;
+
     public OInternetRenewExample() {
         oredCriteria = new ArrayList<Criteria>();
+    }
+
+    public Map<String, Object> getReqMap() {
+        return reqMap;
+    }
+
+    public void setReqMap(Map<String, Object> reqMap) {
+        this.reqMap = reqMap;
     }
 
     public String getOrderByClause() {
