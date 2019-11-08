@@ -620,9 +620,9 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 oInternetRenewDetail.setVersion(BigDecimal.ONE);
                 oInternetRenewDetail.setBusNum(oInternetCard.getBusNum());
                 oInternetRenewDetail.setBusPlatform(oInternetCard.getBusPlatform());
-                internetRenew.setAgDocDistrict(queryAgentBusInfo.getAgDocDistrict());
-                internetRenew.setAgDocPro(queryAgentBusInfo.getAgDocPro());
-                internetRenew.setBusContactPerson(queryAgentBusInfo.getBusContactPerson());
+                oInternetRenewDetail.setAgDocDistrict(queryAgentBusInfo.getAgDocDistrict());
+                oInternetRenewDetail.setAgDocPro(queryAgentBusInfo.getAgDocPro());
+                oInternetRenewDetail.setBusContactPerson(queryAgentBusInfo.getBusContactPerson());
                 internetRenewDetailMapper.insert(oInternetRenewDetail);
             }
             try {
