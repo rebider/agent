@@ -383,4 +383,11 @@
     where BUS_BIG_TYPE=#{busBigType} and AGENT_ID=#{agentId} and SUPPLY_DATE=#{supplyDate} and SUPPLY_TYPE=#{supplyType}
   </select>
 
+  <delete id="clearRollingDifferenceSupplyData" parameterType="java.lang.String">
+    delete from P_PROFIT_SUPPLY where SUPPLY_TYPE = '流量卡轧差补款'
+    <if test="profitDate != null">
+      AND DEDUCTION_DATE=#{profitDate,jdbcType=VARCHAR}
+    </if>
+  </delete>
+
 </mapper>

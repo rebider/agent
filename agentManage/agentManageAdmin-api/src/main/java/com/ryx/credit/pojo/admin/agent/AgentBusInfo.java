@@ -123,6 +123,10 @@ public class AgentBusInfo implements Serializable {
 
     private String debitCappingLower;//借记封顶额下限
 
+    private List<BigDecimal> busStatusList;
+
+    private String flag;//标记
+
     public String getDebitRateCapping() {
         return debitRateCapping;
     }
@@ -139,6 +143,14 @@ public class AgentBusInfo implements Serializable {
         this.debitCappingLower = debitCappingLower;
     }
 
+    public List<BigDecimal> getBusStatusList() {
+        return busStatusList;
+    }
+
+    public void setBusStatusList(List<BigDecimal> busStatusList) {
+        this.busStatusList = busStatusList;
+    }
+
     public BigDecimal getDredgeD1() {
         return dredgeD1;
     }
@@ -147,14 +159,12 @@ public class AgentBusInfo implements Serializable {
         this.dredgeD1 = dredgeD1;
     }
 
-    private String flag;//标记
+    public String getFlag() {
+        return flag;
+    }
 
     public void setFlag(String flag) {
         this.flag = flag;
-    }
-
-    public String getFlag() {
-        return flag;
     }
 
     public String getBrandNum() {

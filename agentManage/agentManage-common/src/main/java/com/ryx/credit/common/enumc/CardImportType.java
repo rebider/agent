@@ -18,7 +18,16 @@ public enum CardImportType {
     D("4","退货转发数据"),
     E("5","流量卡状态"),
     F("6","物联网卡续费信息"),
-    G("7","批量延期");
+    G("7","批量延期"),
+
+    AV("0.0.1","流量卡卡号版本"),
+    BV("0.0.1","供应商发卡汇总版本"),
+    CV("0.0.1","历史北京总部发卡版本"),
+    DV("0.0.1","退货转发数据版本"),
+    EV("0.0.1","流量卡状态版本"),
+    FV("0.0.1","物联网卡续费信息版本"),
+    GV("0.0.1","批量延期版本");
+
 
     public String code;
 
@@ -48,6 +57,7 @@ public enum CardImportType {
         Map<String, Object> resultMap = new HashMap<>();
         CardImportType[] status = CardImportType.values();
         for(CardImportType cc : status){
+            if(!cc.code.equals(CardImportType.F.getValue()))
             resultMap.put(cc.code,cc.msg);
         }
         return resultMap;
@@ -55,22 +65,17 @@ public enum CardImportType {
 
     public static String getContentCodeByValue(String value){
         if(CardImportType.A.code.equals(value)){
-            return "InternetCardModel3";
-        }
-        if(CardImportType.B.code.equals(value)){
-            return "InternetCardModel1";
-        }
-        if(CardImportType.C.code.equals(value)){
-            return "InternetCardModel2";
-        }
-        if(CardImportType.D.code.equals(value)){
-            return "InternetCardModel5";
-        }
-        if(CardImportType.E.code.equals(value)){
-            return "InternetCardModel4";
-        }
-        if(CardImportType.G.code.equals(value)){
-            return "InternetCardModel6";
+            return "InternetCardModel3_"+AV.getValue();
+        }else if(CardImportType.B.code.equals(value)){
+            return "InternetCardModel1_"+BV.getValue();
+        }else if(CardImportType.C.code.equals(value)){
+            return "InternetCardModel2_"+CV.getValue();
+        }else if(CardImportType.D.code.equals(value)){
+            return "InternetCardModel5_"+DV.getValue();
+        }else if(CardImportType.E.code.equals(value)){
+            return "InternetCardModel4_"+EV.getValue();
+        }else if(CardImportType.G.code.equals(value)){
+            return "InternetCardModel6_"+GV.getValue();
         }
         return "";
     }

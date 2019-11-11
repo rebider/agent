@@ -106,6 +106,15 @@ public class PlatFormServiceImpl implements PlatFormService{
     }
 
     @Override
+    public PlatForm selectByPlatformName(String platformName){
+        PlatFormExample platFormExample = new PlatFormExample();
+        PlatFormExample.Criteria criteria = platFormExample.createCriteria();
+        criteria.andPlatformNameEqualTo(platformName);
+        List<PlatForm> platForms = platFormMapper.selectByExample(platFormExample);
+        return null!=platForms && platForms.size()!=0?platForms.get(0):null;
+    }
+
+    @Override
     public PlatformType byPlatformCode(String platformCode) {
         PlatFormExample example = new PlatFormExample();
         example.or().andPlatformNumEqualTo(platformCode).andStatusEqualTo(Status.STATUS_1.status);

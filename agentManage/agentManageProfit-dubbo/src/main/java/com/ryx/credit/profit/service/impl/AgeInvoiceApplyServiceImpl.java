@@ -161,28 +161,26 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                         if ("1".equals(result.get("proxyMark").toString())) { // 代开
                             String remark = result.get("remark").toString();  // 获取发票备注
                             int flag = remark.indexOf("代开企业名称:");// 截取代开企业名称
-                            int kBank = remark.indexOf("开户银行:", flag);
-                            int index = remark.indexOf(" ", flag);
                             if (flag != -1) {
-                                if (kBank > flag) {
-                                    String rs = remark.substring(flag + 7, kBank).trim();
-                                    int rsFlag = rs.indexOf("<br/>");
-                                    if(rsFlag != -1){
-                                        invoiceApply.setInvoiceCompany(rs.substring(0,rs.indexOf("<br/>")));
+                                String string = remark.substring(flag + 7);
+                                List<String> stringList = invoiceApplyMapper.getPayCompanyById(agentId);
+                                if(stringList.contains(string.trim())){
+                                    invoiceApply.setInvoiceCompany(string.trim());
+                                }else{
+                                    int brdex = string.indexOf("<br/>");
+                                    if(brdex != -1 ){
+                                        invoiceApply.setInvoiceCompany(string.substring(0,brdex));
                                     }else{
-                                        invoiceApply.setInvoiceCompany(rs);
+                                        invoiceApply.setYsResult("0");
+                                        invoiceApply.setRev1("获取开票公司名称错误,请在备注中开票公司名称后面使用换行符!");
                                     }
-                                } else if (index != -1 && index > flag) {
-                                    invoiceApply.setInvoiceCompany(remark.substring(flag + 7, index).trim());
-                                } else {
-                                    invoiceApply.setInvoiceCompany(remark.substring(flag + 7).trim());
                                 }
                                 invoiceApply.setSallerName(map.get("sallerName").toString());
                                 invoiceApply.setRemark(remark);
                             } else {
                                 invoiceApply.setYsResult("0");
                                 invoiceApply.setInvoiceCompany(map.get("sallerName").toString());
-                                invoiceApply.setRev1("未获取到代开公司数据");
+                                invoiceApply.setRev1("未获取到代开公司数据,请在备注中开票公司前添加'代开企业名称:'字段！");
                             }
                         } else {
                             invoiceApply.setInvoiceCompany(map.get("sallerName").toString());

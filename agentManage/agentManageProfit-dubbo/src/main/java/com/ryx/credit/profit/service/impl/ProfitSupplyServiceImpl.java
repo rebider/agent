@@ -236,4 +236,9 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
         return map;
     }
 
+    @Override
+    public void clearRollingDifferenceSupplyData(String profitDate) {
+        pProfitSupplyMapper.clearRollingDifferenceSupplyData(profitDate);
+    }
+
 }
