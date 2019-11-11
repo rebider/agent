@@ -1,6 +1,7 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.ryx.credit.common.enumc.Status;
+import com.ryx.credit.common.enumc.TransFlag;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -65,8 +66,8 @@ public class AColinfoPaymentServiceImpl implements AColinfoPaymentService {
         AColinfoPaymentExample.Criteria criteria = aColinfoPaymentExample.createCriteria();
         criteria.andMerchIdEqualTo(agentId);
         criteria.andBalanceRcvAccEqualTo(cloBankAccount);
+        criteria.andFlagEqualTo(TransFlag.NEWSB.getValue());
         List<AColinfoPayment> aColinfoPayments = colinfoPaymentMapper.selectByExample(aColinfoPaymentExample);
-
         return aColinfoPayments;
     }
 

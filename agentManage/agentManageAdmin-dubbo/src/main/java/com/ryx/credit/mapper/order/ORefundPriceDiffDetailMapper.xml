@@ -38,6 +38,14 @@
     <result column="NEW_ORG_ID" jdbcType="VARCHAR" property="newOrgId" />
     <result column="DELIVERY_TIME" jdbcType="VARCHAR" property="deliveryTime" />
     <result column="APP_TIME" jdbcType="TIMESTAMP" property="appTime" />
+    <result column="OLD_SUPD_ORG_ID" jdbcType="VARCHAR" property="oldSupdOrgId" />
+    <result column="OLD_SUPD_ORG_NAME" jdbcType="VARCHAR" property="oldSupdOrgName" />
+    <result column="NEW_SUPD_ORG_ID" jdbcType="VARCHAR" property="newSupdOrgId" />
+    <result column="NEW_SUPD_ORG_NAME" jdbcType="VARCHAR" property="newSupdOrgName" />
+    <result column="DELAY_DAY" jdbcType="VARCHAR" property="delayDay" />
+    <result column="DELIVERY_TIME_TYPE" jdbcType="VARCHAR" property="deliveryTimeType" />
+    <result column="OLD_ORG_NAME" jdbcType="VARCHAR" property="oldOrgName" />
+    <result column="NEW_ORG_NAME" jdbcType="VARCHAR" property="newOrgName" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -73,7 +81,9 @@
     PRO_ID, PRO_NAME, CHANGE_COUNT, ACTIVITY_NAME, ACTIVITY_WAY, ACTIVITY_RULE, FRONT_PRICE,
     PRICE, S_TIME, BEGIN_SN, END_SN, VENDER, PRO_MODEL, C_TIME, U_TIME, C_USER, U_USER,
     STATUS, VERSION, ORDER_ID, SEND_STATUS, SEND_MSG, ORDER_TYPE, FRONT_PRO_ID, FRONT_PRO_NAME,
-    PLATFORM_TYPE, OLD_ORG_ID, NEW_ORG_ID, DELIVERY_TIME, APP_TIME
+    PLATFORM_TYPE, OLD_ORG_ID, NEW_ORG_ID, DELIVERY_TIME, APP_TIME, OLD_SUPD_ORG_ID,
+    OLD_SUPD_ORG_NAME, NEW_SUPD_ORG_ID, NEW_SUPD_ORG_NAME, DELAY_DAY, DELIVERY_TIME_TYPE,
+    OLD_ORG_NAME, NEW_ORG_NAME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -115,8 +125,10 @@
     VERSION, ORDER_ID, SEND_STATUS,
     SEND_MSG, ORDER_TYPE, FRONT_PRO_ID,
     FRONT_PRO_NAME, PLATFORM_TYPE, OLD_ORG_ID,
-    NEW_ORG_ID, DELIVERY_TIME, APP_TIME
-    )
+    NEW_ORG_ID, DELIVERY_TIME, APP_TIME,
+    OLD_SUPD_ORG_ID, OLD_SUPD_ORG_NAME, NEW_SUPD_ORG_ID,
+    NEW_SUPD_ORG_NAME, DELAY_DAY, DELIVERY_TIME_TYPE,
+    OLD_ORG_NAME, NEW_ORG_NAME)
     values (#{id,jdbcType=VARCHAR}, #{subOrderId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
     #{activityFrontId,jdbcType=VARCHAR}, #{activityRealId,jdbcType=VARCHAR}, #{refundPriceDiffId,jdbcType=VARCHAR},
     #{proId,jdbcType=VARCHAR}, #{proName,jdbcType=VARCHAR}, #{changeCount,jdbcType=DECIMAL},
@@ -128,8 +140,10 @@
     #{version,jdbcType=DECIMAL}, #{orderId,jdbcType=VARCHAR}, #{sendStatus,jdbcType=DECIMAL},
     #{sendMsg,jdbcType=VARCHAR}, #{orderType,jdbcType=DECIMAL}, #{frontProId,jdbcType=VARCHAR},
     #{frontProName,jdbcType=VARCHAR}, #{platformType,jdbcType=VARCHAR}, #{oldOrgId,jdbcType=VARCHAR},
-    #{newOrgId,jdbcType=VARCHAR}, #{deliveryTime,jdbcType=VARCHAR}, #{appTime,jdbcType=TIMESTAMP}
-    )
+    #{newOrgId,jdbcType=VARCHAR}, #{deliveryTime,jdbcType=VARCHAR}, #{appTime,jdbcType=TIMESTAMP},
+    #{oldSupdOrgId,jdbcType=VARCHAR}, #{oldSupdOrgName,jdbcType=VARCHAR}, #{newSupdOrgId,jdbcType=VARCHAR},
+    #{newSupdOrgName,jdbcType=VARCHAR}, #{delayDay,jdbcType=VARCHAR}, #{deliveryTimeType,jdbcType=VARCHAR},
+    #{oldOrgName,jdbcType=VARCHAR}, #{newOrgName,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail">
     insert into O_REFUND_PRICE_DIFF_DETAIL
@@ -242,6 +256,30 @@
       <if test="appTime != null">
         APP_TIME,
       </if>
+      <if test="oldSupdOrgId != null">
+        OLD_SUPD_ORG_ID,
+      </if>
+      <if test="oldSupdOrgName != null">
+        OLD_SUPD_ORG_NAME,
+      </if>
+      <if test="newSupdOrgId != null">
+        NEW_SUPD_ORG_ID,
+      </if>
+      <if test="newSupdOrgName != null">
+        NEW_SUPD_ORG_NAME,
+      </if>
+      <if test="delayDay != null">
+        DELAY_DAY,
+      </if>
+      <if test="deliveryTimeType != null">
+        DELIVERY_TIME_TYPE,
+      </if>
+      <if test="oldOrgName != null">
+        OLD_ORG_NAME,
+      </if>
+      <if test="newOrgName != null">
+        NEW_ORG_NAME,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -351,6 +389,30 @@
       </if>
       <if test="appTime != null">
         #{appTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="oldSupdOrgId != null">
+        #{oldSupdOrgId,jdbcType=VARCHAR},
+      </if>
+      <if test="oldSupdOrgName != null">
+        #{oldSupdOrgName,jdbcType=VARCHAR},
+      </if>
+      <if test="newSupdOrgId != null">
+        #{newSupdOrgId,jdbcType=VARCHAR},
+      </if>
+      <if test="newSupdOrgName != null">
+        #{newSupdOrgName,jdbcType=VARCHAR},
+      </if>
+      <if test="delayDay != null">
+        #{delayDay,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryTimeType != null">
+        #{deliveryTimeType,jdbcType=VARCHAR},
+      </if>
+      <if test="oldOrgName != null">
+        #{oldOrgName,jdbcType=VARCHAR},
+      </if>
+      <if test="newOrgName != null">
+        #{newOrgName,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -468,6 +530,30 @@
       <if test="appTime != null">
         APP_TIME = #{appTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="oldSupdOrgId != null">
+        OLD_SUPD_ORG_ID = #{oldSupdOrgId,jdbcType=VARCHAR},
+      </if>
+      <if test="oldSupdOrgName != null">
+        OLD_SUPD_ORG_NAME = #{oldSupdOrgName,jdbcType=VARCHAR},
+      </if>
+      <if test="newSupdOrgId != null">
+        NEW_SUPD_ORG_ID = #{newSupdOrgId,jdbcType=VARCHAR},
+      </if>
+      <if test="newSupdOrgName != null">
+        NEW_SUPD_ORG_NAME = #{newSupdOrgName,jdbcType=VARCHAR},
+      </if>
+      <if test="delayDay != null">
+        DELAY_DAY = #{delayDay,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryTimeType != null">
+        DELIVERY_TIME_TYPE = #{deliveryTimeType,jdbcType=VARCHAR},
+      </if>
+      <if test="oldOrgName != null">
+        OLD_ORG_NAME = #{oldOrgName,jdbcType=VARCHAR},
+      </if>
+      <if test="newOrgName != null">
+        NEW_ORG_NAME = #{newOrgName,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -507,7 +593,15 @@
     OLD_ORG_ID = #{oldOrgId,jdbcType=VARCHAR},
     NEW_ORG_ID = #{newOrgId,jdbcType=VARCHAR},
     DELIVERY_TIME = #{deliveryTime,jdbcType=VARCHAR},
-    APP_TIME = #{appTime,jdbcType=TIMESTAMP}
+    APP_TIME = #{appTime,jdbcType=TIMESTAMP},
+    OLD_SUPD_ORG_ID = #{oldSupdOrgId,jdbcType=VARCHAR},
+    OLD_SUPD_ORG_NAME = #{oldSupdOrgName,jdbcType=VARCHAR},
+    NEW_SUPD_ORG_ID = #{newSupdOrgId,jdbcType=VARCHAR},
+    NEW_SUPD_ORG_NAME = #{newSupdOrgName,jdbcType=VARCHAR},
+    DELAY_DAY = #{delayDay,jdbcType=VARCHAR},
+    DELIVERY_TIME_TYPE = #{deliveryTimeType,jdbcType=VARCHAR},
+    OLD_ORG_NAME = #{oldOrgName,jdbcType=VARCHAR},
+    NEW_ORG_NAME = #{newOrgName,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -559,11 +653,18 @@
     <result column="NEW_ORG_ID" jdbcType="VARCHAR" property="newOrgId" />
     <result column="DELIVERY_TIME" jdbcType="VARCHAR" property="deliveryTime" />
     <result column="APP_TIME" jdbcType="TIMESTAMP" property="appTime" />
-    <result column="APP_TIME" jdbcType="TIMESTAMP" property="appTime" />
     <result column="PRE_ACTIVITY_ACTIVITYNAME" jdbcType="VARCHAR" property="pre_activity_activityName" />
     <result column="PRE_ACTIVITY_ACT_CODE" jdbcType="VARCHAR" property="pre_activity_act_code" />
     <result column="PRE_ACTIVITY_BUS_PRO_CODE" jdbcType="VARCHAR" property="pre_activity_bus_pro_code" />
     <result column="PRE_ACTIVITY_PRICE" jdbcType="DECIMAL" property="pre_activity_price" />
+    <result column="OLD_SUPD_ORG_ID" jdbcType="VARCHAR" property="oldSupdOrgId" />
+    <result column="OLD_SUPD_ORG_NAME" jdbcType="VARCHAR" property="oldSupdOrgName" />
+    <result column="NEW_SUPD_ORG_ID" jdbcType="VARCHAR" property="newSupdOrgId" />
+    <result column="NEW_SUPD_ORG_NAME" jdbcType="VARCHAR" property="newSupdOrgName" />
+    <result column="DELAY_DAY" jdbcType="VARCHAR" property="delayDay" />
+    <result column="DELIVERY_TIME_TYPE" jdbcType="VARCHAR" property="deliveryTimeType" />
+    <result column="OLD_ORG_NAME" jdbcType="VARCHAR" property="oldOrgName" />
+    <result column="NEW_ORG_NAME" jdbcType="VARCHAR" property="newOrgName" />
   </resultMap>
   <select id="selectByExampleExtends" parameterType="map" resultMap="BaseResultMapExtends">
     <include refid="OracleDialectPrefix" />
@@ -604,6 +705,14 @@
     O_REFUND_PRICE_DIFF_DETAIL.NEW_ORG_ID,
     O_REFUND_PRICE_DIFF_DETAIL.DELIVERY_TIME,
     O_REFUND_PRICE_DIFF_DETAIL.APP_TIME,
+    O_REFUND_PRICE_DIFF_DETAIL.OLD_SUPD_ORG_ID,
+    O_REFUND_PRICE_DIFF_DETAIL.OLD_SUPD_ORG_NAME,
+    O_REFUND_PRICE_DIFF_DETAIL.NEW_SUPD_ORG_ID,
+    O_REFUND_PRICE_DIFF_DETAIL.NEW_SUPD_ORG_NAME,
+    O_REFUND_PRICE_DIFF_DETAIL.DELAY_DAY,
+    O_REFUND_PRICE_DIFF_DETAIL.DELIVERY_TIME_TYPE,
+    O_REFUND_PRICE_DIFF_DETAIL.OLD_ORG_NAME,
+    O_REFUND_PRICE_DIFF_DETAIL.NEW_ORG_NAME,
     pre_activity.activity_name as pre_activity_activityName,
     pre_activity.act_code as pre_activity_act_code,
     pre_activity.bus_pro_code as pre_activity_bus_pro_code,

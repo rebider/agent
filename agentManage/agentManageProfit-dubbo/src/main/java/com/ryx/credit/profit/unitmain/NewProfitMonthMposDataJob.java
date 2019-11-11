@@ -18,6 +18,9 @@ import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrderService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,10 +33,11 @@ import java.util.*;
 /**
  * 手刷月分润数据同步、定时 cxinfo 同步手刷月分润明细数据 汪勇  todo
  */
+@PropertySource("classpath:/config.properties")
 @Service("newProfitMonthMposDataJob")
 @Transactional(rollbackFor = RuntimeException.class)
 public class NewProfitMonthMposDataJob {
-
+    private static final String environment = AppConfig.getProperty("jobEnvironment");
     org.slf4j.Logger logger = LoggerFactory.getLogger(NewProfitMonthMposDataJob.class);
 
     @Autowired
@@ -55,16 +59,22 @@ public class NewProfitMonthMposDataJob {
     private int index = 1;
     private static BigDecimal allAmount = BigDecimal.ZERO;
 
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyConfigInDev(){
+        return new PropertySourcesPlaceholderConfigurer();
+    }
 
     /**
      * 同步手刷月分润明细数据(TransProfitDetail)
      * transDate 交易日期（空则为上一月）
      * 每月3号上午11点
      */
-    @Scheduled(cron = "0 0 11 3 * ?")
+    @Scheduled(cron = "${shoushua_yuejie_job_cron}")
     public void doCron() {
-        String transDate = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6);
-        excute(transDate);
+        if (!"preproduction".equals(environment)) {
+            String transDate = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6);
+            excute(transDate);
+        }
     }
 
     @Transactional

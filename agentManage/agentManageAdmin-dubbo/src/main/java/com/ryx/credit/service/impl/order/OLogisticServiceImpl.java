@@ -15,10 +15,12 @@ import com.ryx.credit.machine.service.ImsTermWarehouseDetailService;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.LowerHairMachineVo;
 import com.ryx.credit.machine.vo.MposSnVo;
+import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.agent.PlatForm;
 import com.ryx.credit.pojo.admin.order.*;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.IOrderReturnService;
@@ -45,10 +47,10 @@ import static com.ryx.credit.common.util.Conver10ToConver33Utils.getBetweenValue
  */
 @Service("oLogisticService")
 public class OLogisticServiceImpl implements OLogisticsService {
-    private static Logger logger = LoggerFactory.getLogger(OLogisticServiceImpl.class);
     public final static SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
     public final static SimpleDateFormat sdfyyyyMMdd = new SimpleDateFormat("yyyy-MM-dd");
     public final static SimpleDateFormat yyyyMMdd = new SimpleDateFormat("yyyy/MM/dd");
+    private static Logger logger = LoggerFactory.getLogger(OLogisticServiceImpl.class);
     @Autowired
     private OOrderMapper oOrderMapper;
     @Autowired
@@ -89,7 +91,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
     private OReturnOrderDetailMapper oReturnOrderDetailMapper;
     @Autowired
     private InternetCardService internetCardService;
-
+    @Autowired
+    private IUserService userService;
 
     /**
      * 物流信息:
@@ -120,7 +123,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
     public int insertImportData(OLogistics oLogistics) {
         return oLogisticsMapper.insertSelective(oLogistics);
     }
-
 
     /**
      * 物流信息：
@@ -821,7 +823,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
         return AgentResult.ok();
     }
 
-
     /**
      * @Author: Zhang Lei
      * @Description: 退货时根据起止Sn号查询订单、物流信息
@@ -938,7 +939,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
         int res = oLogisticsMapper.updateSnStatus(orderId, startSn, endSn, status, recordStatus,returnId);
         return res;
     }
-
 
     /**
      * 插入物流明细
@@ -1157,7 +1157,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
         return ResultVO.success(resOLogisticsDetail);
     }
 
-
     @Override
     public List<String> idList(String startSn, String endSn, Integer begins, Integer finish,String proCom) throws MessageException {
         return idList(startSn,endSn);
@@ -1199,7 +1198,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
         }
         return list;*/
     }
-
 
     @Override
     public List<String> idList(String startSn, String endSn) throws MessageException {
@@ -1278,16 +1276,12 @@ public class OLogisticServiceImpl implements OLogisticsService {
     public PageInfo getOLogisticsDetailList(Map<String, Object> param, PageInfo pageInfo) {
         Long count = oLogisticsDetailMapper.getOLogisticsDetailCount(param);
         List<Map<String, Object>> list = oLogisticsDetailMapper.getOLogisticsDetailList(param);
-    /*    for (Map<String, Object> stringObjectMap : list) {
-            Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),String.valueOf(stringObjectMap.get("PRO_COM")));
-            if(dict!=null){
-                stringObjectMap.put("PRO_COM",dict.getdItemname());
-            }
-            Dict modelType = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MODEL_TYPE.name(),String.valueOf(stringObjectMap.get("PRO_TYPE")));
-            if (null!=modelType){
-                stringObjectMap.put("PRO_TYPE",modelType.getdItemname());
-            }
-        }*/
+        for (Map<String, Object> objectMap : list) {
+            CUser cUser = userService.selectById(Long.valueOf(String.valueOf(objectMap.get("C_USER"))));
+            if(cUser!=null)
+            objectMap.put("C_USER",cUser.getName());
+
+        }
         pageInfo.setTotal(count.intValue());
         pageInfo.setRows(list);
         return pageInfo;

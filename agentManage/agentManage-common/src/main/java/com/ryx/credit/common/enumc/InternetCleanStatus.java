@@ -1,6 +1,5 @@
 package com.ryx.credit.common.enumc;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,21 +24,6 @@ public enum InternetCleanStatus {
     InternetCleanStatus(String c, String m){
         this.code=c;
         this.msg =m;
-    }
-
-    /**
-     * 取得枚举对象值
-     * @return 枚举对象值
-     */
-    public String getValue() {
-        return this.code;
-    }
-    /**
-     * 取得缓存内容
-     * @return 缓存内容
-     */
-    public String getContent() {
-        return this.msg;
     }
 
     /**
@@ -74,6 +58,22 @@ public enum InternetCleanStatus {
             resultMap.put(cc.code,cc.msg);
         }
         return resultMap;
+    }
+
+    /**
+     * 取得枚举对象值
+     * @return 枚举对象值
+     */
+    public String getValue() {
+        return this.code;
+    }
+
+    /**
+     * 取得缓存内容
+     * @return 缓存内容
+     */
+    public String getContent() {
+        return this.msg;
     }
 
 }

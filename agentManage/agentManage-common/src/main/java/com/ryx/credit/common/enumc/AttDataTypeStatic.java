@@ -18,7 +18,8 @@ public enum AttDataTypeStatic {
     YBNSRZM("YBNSRZM", "一般纳税人证明"),
     ZHBGB("ZHBGB", "账户变更表"),
     JSRSFZ("JSRSFZ", "结算人身份证"),
-    FFRSQS("FFRSQS", "非法人授权书");
+    FFRSQS("FFRSQS", "非法人授权书"),
+    GGFJ("GGFJ", "公告附件");
 
 
     public String code;

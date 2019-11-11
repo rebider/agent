@@ -13,6 +13,9 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,9 +27,10 @@ import java.util.List;
 /**
  * 手刷补差数据同步 cxinfo 手刷补差数据同步 汪勇
  */
+@PropertySource("classpath:/config.properties")
 @Service("profitMposDiffDataJob")
 public class ProfitMposDiffDataJob {
-
+    private static final String environment = AppConfig.getProperty("jobEnvironment");
     org.slf4j.Logger logger = LoggerFactory.getLogger(NewProfitMonthMposDataJob.class);
 
     @Autowired
@@ -38,6 +42,10 @@ public class ProfitMposDiffDataJob {
 
     private int index = 1;
 
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyConfigInDev(){
+        return new PropertySourcesPlaceholderConfigurer();
+    }
 
     public static void main(String agrs[]) {
         HashMap<String, String> map = new HashMap<String, String>();
@@ -60,10 +68,12 @@ public class ProfitMposDiffDataJob {
      * @Description: 手刷补差数据同步，每月3号10:30
      * @Date: 11:04 2019/1/24
      */
-    @Scheduled(cron = "0 30 10 3 * ?")
+    @Scheduled(cron = "${shoushua_diffdata_job_cron}")
     public void doCron(){
-        String month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6);
-        excute(month);
+        if (!"preproduction".equals(environment)) {
+            String month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6);
+            excute(month);
+        }
     }
 
     @Transactional

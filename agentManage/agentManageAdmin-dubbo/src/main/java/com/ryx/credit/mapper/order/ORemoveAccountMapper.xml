@@ -1,0 +1,489 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.order.ORemoveAccountMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.ORemoveAccount">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="RMONTH" jdbcType="TIMESTAMP" property="rmonth" />
+    <result column="AG_ID" jdbcType="VARCHAR" property="agId" />
+    <result column="AG_NAME" jdbcType="VARCHAR" property="agName" />
+    <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
+    <result column="BUS_PLATFORM" jdbcType="VARCHAR" property="busPlatform" />
+    <result column="MACHINES_AMOUNT" jdbcType="DECIMAL" property="machinesAmount" />
+    <result column="SUBMIT_PERSON" jdbcType="VARCHAR" property="submitPerson" />
+    <result column="SUBMIT_TIME" jdbcType="TIMESTAMP" property="submitTime" />
+    <result column="PAY_METHOD" jdbcType="VARCHAR" property="payMethod" />
+    <result column="RAMOUNT" jdbcType="DECIMAL" property="ramount" />
+    <result column="REAL_RAMOUNT" jdbcType="DECIMAL" property="realRamount" />
+    <result column="RSTATUS" jdbcType="DECIMAL" property="rstatus" />
+    <result column="FINISH_TIME" jdbcType="TIMESTAMP" property="finishTime" />
+    <result column="BATCH_NUM" jdbcType="VARCHAR" property="batchNum" />
+    <result column="RTYPE" jdbcType="DECIMAL" property="rtype" />
+    <result column="FAIL_CAUSE" jdbcType="VARCHAR" property="failCause" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="VERSION" jdbcType="DECIMAL" property="version" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, RMONTH, AG_ID, AG_NAME, BUS_NUM, BUS_PLATFORM, MACHINES_AMOUNT, SUBMIT_PERSON, 
+    SUBMIT_TIME, PAY_METHOD, RAMOUNT, REAL_RAMOUNT, RSTATUS, FINISH_TIME, BATCH_NUM, 
+    RTYPE, FAIL_CAUSE, REMARK, STATUS, VERSION
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.ORemoveAccountExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from O_REMOVE_ACCOUNT
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from O_REMOVE_ACCOUNT
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.ORemoveAccountExample">
+    delete from O_REMOVE_ACCOUNT
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.ORemoveAccount">
+    insert into O_REMOVE_ACCOUNT (ID, RMONTH, AG_ID, 
+      AG_NAME, BUS_NUM, BUS_PLATFORM, 
+      MACHINES_AMOUNT, SUBMIT_PERSON, SUBMIT_TIME, 
+      PAY_METHOD, RAMOUNT, REAL_RAMOUNT, 
+      RSTATUS, FINISH_TIME, BATCH_NUM, 
+      RTYPE, FAIL_CAUSE, REMARK, 
+      STATUS, VERSION)
+    values (#{id,jdbcType=VARCHAR}, #{rmonth,jdbcType=TIMESTAMP}, #{agId,jdbcType=VARCHAR}, 
+      #{agName,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR}, #{busPlatform,jdbcType=VARCHAR}, 
+      #{machinesAmount,jdbcType=DECIMAL}, #{submitPerson,jdbcType=VARCHAR}, #{submitTime,jdbcType=TIMESTAMP},
+      #{payMethod,jdbcType=VARCHAR}, #{ramount,jdbcType=DECIMAL}, #{realRamount,jdbcType=DECIMAL}, 
+      #{rstatus,jdbcType=DECIMAL}, #{finishTime,jdbcType=TIMESTAMP}, #{batchNum,jdbcType=VARCHAR}, 
+      #{rtype,jdbcType=DECIMAL}, #{failCause,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
+      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.ORemoveAccount">
+    insert into O_REMOVE_ACCOUNT
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="rmonth != null">
+        RMONTH,
+      </if>
+      <if test="agId != null">
+        AG_ID,
+      </if>
+      <if test="agName != null">
+        AG_NAME,
+      </if>
+      <if test="busNum != null">
+        BUS_NUM,
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM,
+      </if>
+      <if test="machinesAmount != null">
+        MACHINES_AMOUNT,
+      </if>
+      <if test="submitPerson != null">
+        SUBMIT_PERSON,
+      </if>
+      <if test="submitTime != null">
+        SUBMIT_TIME,
+      </if>
+      <if test="payMethod != null">
+        PAY_METHOD,
+      </if>
+      <if test="ramount != null">
+        RAMOUNT,
+      </if>
+      <if test="realRamount != null">
+        REAL_RAMOUNT,
+      </if>
+      <if test="rstatus != null">
+        RSTATUS,
+      </if>
+      <if test="finishTime != null">
+        FINISH_TIME,
+      </if>
+      <if test="batchNum != null">
+        BATCH_NUM,
+      </if>
+      <if test="rtype != null">
+        RTYPE,
+      </if>
+      <if test="failCause != null">
+        FAIL_CAUSE,
+      </if>
+      <if test="remark != null">
+        REMARK,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="version != null">
+        VERSION,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="rmonth != null">
+        #{rmonth,jdbcType=TIMESTAMP},
+      </if>
+      <if test="agId != null">
+        #{agId,jdbcType=VARCHAR},
+      </if>
+      <if test="agName != null">
+        #{agName,jdbcType=VARCHAR},
+      </if>
+      <if test="busNum != null">
+        #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="machinesAmount != null">
+        #{machinesAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="submitPerson != null">
+        #{submitPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="submitTime != null">
+        #{submitTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="payMethod != null">
+        #{payMethod,jdbcType=VARCHAR},
+      </if>
+      <if test="ramount != null">
+        #{ramount,jdbcType=DECIMAL},
+      </if>
+      <if test="realRamount != null">
+        #{realRamount,jdbcType=DECIMAL},
+      </if>
+      <if test="rstatus != null">
+        #{rstatus,jdbcType=DECIMAL},
+      </if>
+      <if test="finishTime != null">
+        #{finishTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="batchNum != null">
+        #{batchNum,jdbcType=VARCHAR},
+      </if>
+      <if test="rtype != null">
+        #{rtype,jdbcType=DECIMAL},
+      </if>
+      <if test="failCause != null">
+        #{failCause,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.ORemoveAccountExample" resultType="java.lang.Long">
+    select count(*) from O_REMOVE_ACCOUNT
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.ORemoveAccount">
+    update O_REMOVE_ACCOUNT
+    <set>
+      <if test="rmonth != null">
+        RMONTH = #{rmonth,jdbcType=TIMESTAMP},
+      </if>
+      <if test="agId != null">
+        AG_ID = #{agId,jdbcType=VARCHAR},
+      </if>
+      <if test="agName != null">
+        AG_NAME = #{agName,jdbcType=VARCHAR},
+      </if>
+      <if test="busNum != null">
+        BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="machinesAmount != null">
+        MACHINES_AMOUNT = #{machinesAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="submitPerson != null">
+        SUBMIT_PERSON = #{submitPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="submitTime != null">
+        SUBMIT_TIME = #{submitTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="payMethod != null">
+        PAY_METHOD = #{payMethod,jdbcType=VARCHAR},
+      </if>
+      <if test="ramount != null">
+        RAMOUNT = #{ramount,jdbcType=DECIMAL},
+      </if>
+      <if test="realRamount != null">
+        REAL_RAMOUNT = #{realRamount,jdbcType=DECIMAL},
+      </if>
+      <if test="rstatus != null">
+        RSTATUS = #{rstatus,jdbcType=DECIMAL},
+      </if>
+      <if test="finishTime != null">
+        FINISH_TIME = #{finishTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="batchNum != null">
+        BATCH_NUM = #{batchNum,jdbcType=VARCHAR},
+      </if>
+      <if test="rtype != null">
+        RTYPE = #{rtype,jdbcType=DECIMAL},
+      </if>
+      <if test="failCause != null">
+        FAIL_CAUSE = #{failCause,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        VERSION = VERSION + 1,
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR} and VERSION =  #{version,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.ORemoveAccount">
+    update O_REMOVE_ACCOUNT
+    set RMONTH = #{rmonth,jdbcType=TIMESTAMP},
+      AG_ID = #{agId,jdbcType=VARCHAR},
+      AG_NAME = #{agName,jdbcType=VARCHAR},
+      BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      MACHINES_AMOUNT = #{machinesAmount,jdbcType=DECIMAL},
+      SUBMIT_PERSON = #{submitPerson,jdbcType=VARCHAR},
+      SUBMIT_TIME = #{submitTime,jdbcType=TIMESTAMP},
+      PAY_METHOD = #{payMethod,jdbcType=VARCHAR},
+      RAMOUNT = #{ramount,jdbcType=DECIMAL},
+      REAL_RAMOUNT = #{realRamount,jdbcType=DECIMAL},
+      RSTATUS = #{rstatus,jdbcType=DECIMAL},
+      FINISH_TIME = #{finishTime,jdbcType=TIMESTAMP},
+      BATCH_NUM = #{batchNum,jdbcType=VARCHAR},
+      RTYPE = #{rtype,jdbcType=DECIMAL},
+      FAIL_CAUSE = #{failCause,jdbcType=VARCHAR},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL},
+       VERSION = VERSION + 1,
+    where ID = #{id,jdbcType=VARCHAR} and VERSION =  #{version,jdbcType=DECIMAL}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+
+  <sql id="PAGING_START">
+    <if test="begin != null  and end != null and end >0">
+      SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
+    </if>
+  </sql>
+
+  <sql id="PAGING_END">
+    <if test="begin != null  and end != null and end >0">
+      ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN > #{begin}
+    </if>
+  </sql>
+
+
+  <!--销账明细-->
+  <select id="rAccountDetailList" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="PAGING_START" />
+    select * from (
+    select ra.id,ra.BATCH_NUM,to_char(ra.RMONTH,'yyyy-mm') as omonth,ra.SUBMIT_TIME,
+    ag.AG_UNIQ_NUM,ra.ag_name,ra.bus_num,plat.PLATFORM_NAME,a.* ,
+    ra.ramount,ra.pay_method,ra.submit_person,ra.rstatus,ra.remark,
+    ra.FINISH_TIME ,at.att_name,at.ATT_DBPATH,at.id as asId
+    from O_REMOVE_ACCOUNT ra left join
+    ( select
+    o_payment_detail.src_id,o_payment_detail.src_type
+    from
+    O_PAYMENT_DETAIL ) a on ra.id=a.src_id
+    left join a_agent ag on ag.id=ra.ag_id
+    left join a_platform plat ON plat.platform_num = ra.bus_platform
+    left join a_attachment_rel rel on rel.SRC_ID=ra.BATCH_NUM
+    left join a_attachment at ON at.id = rel.att_id
+    WHERE  ra.status = 1 <include refid="RACCOUNTDETAIL_WHERE_SQL"/>
+    union
+    select ra.id,ra.BATCH_NUM,to_char(ra.RMONTH,'yyyy-mm') as omonth,ra.SUBMIT_TIME,
+    ag.AG_UNIQ_NUM,ra.ag_name,ra.bus_num,plat.PLATFORM_NAME,a.* ,
+    ra.ramount,ra.pay_method,ra.submit_person,ra.rstatus,ra.remark,
+    ra.FINISH_TIME ,at.att_name,at.ATT_DBPATH,at.id as asId
+    from O_REMOVE_ACCOUNT ra left join
+    ( select
+    o_payment_detail.src_id,o_payment_detail.src_type
+    from
+    O_PAYMENT_DETAIL ) a on ra.id=a.src_id
+    left join a_agent ag on ag.id=ra.ag_id
+    left join a_platform plat ON plat.platform_num = ra.bus_platform
+    left join a_attachment_rel rel on rel.SRC_ID=ra.BATCH_NUM
+    left join a_attachment at ON at.id = rel.att_id
+    WHERE   ra.status = 1 <include refid="RACCOUNTDETAIL_WHERE_SQL"/>
+    )aa order by aa.SUBMIT_TIME desc
+    <include refid="PAGING_END" />
+  </select>
+
+  <select id="rAccountDetailCount" parameterType="java.util.Map" resultType="int">
+select count(1) from (
+    select ra.id,ra.BATCH_NUM,to_char(ra.RMONTH,'yyyy-mm') as omonth,ra.SUBMIT_TIME,
+    ag.AG_UNIQ_NUM,ra.ag_name,ra.bus_num,plat.PLATFORM_NAME,a.* ,
+    ra.ramount,ra.pay_method,ra.submit_person,ra.rstatus,ra.remark,
+    ra.FINISH_TIME ,at.att_name
+    from O_REMOVE_ACCOUNT ra left join
+    ( select
+    o_payment_detail.src_id,o_payment_detail.src_type
+    from
+    O_PAYMENT_DETAIL ) a on ra.id=a.src_id
+    left join a_agent ag on ag.id=ra.ag_id
+    left join a_platform plat ON plat.platform_num = ra.bus_platform
+    left join a_attachment_rel rel on rel.SRC_ID=ra.BATCH_NUM
+    left join a_attachment at ON at.id = rel.att_id
+    WHERE  ra.status = 1 <include refid="RACCOUNTDETAIL_WHERE_SQL"/>
+    union
+    select ra.id,ra.BATCH_NUM,to_char(ra.RMONTH,'yyyy-mm') as omonth,ra.SUBMIT_TIME,
+    ag.AG_UNIQ_NUM,ra.ag_name,ra.bus_num,plat.PLATFORM_NAME,a.* ,
+    ra.ramount,ra.pay_method,ra.submit_person,ra.rstatus,ra.remark,
+    ra.FINISH_TIME ,at.att_name
+    from O_REMOVE_ACCOUNT ra left join
+    ( select
+    o_payment_detail.src_id,o_payment_detail.src_type
+    from
+    O_PAYMENT_DETAIL ) a on ra.id=a.src_id
+    left join a_agent ag on ag.id=ra.ag_id
+    left join a_platform plat ON plat.platform_num = ra.bus_platform
+    left join a_attachment_rel rel on rel.SRC_ID=ra.BATCH_NUM
+    left join a_attachment at ON at.id = rel.att_id
+    WHERE   ra.status = 1 <include refid="RACCOUNTDETAIL_WHERE_SQL"/>
+    )aa order by aa.SUBMIT_TIME desc
+  </select>
+
+  <sql id="RACCOUNTDETAIL_WHERE_SQL">
+    <if test="agName !=null and agName !='' ">
+      and  ra.AG_NAME LIKE CONCAT(CONCAT('%',#{agName}),'%')
+    </if>
+    <if test="busNum !=null and busNum !='' ">
+      and  ra.bus_num =#{busNum}
+    </if>
+    <if test="id !=null and id !='' ">
+      and  ra.id =#{id}
+    </if>
+    <if test="batchNum !=null and batchNum !='' ">
+      and  ra.BATCH_NUM =#{batchNum}
+    </if>
+    <if test="busPlatform !=null and busPlatform !='' ">
+      and  ra.BUS_PLATFORM =#{busPlatform}
+    </if>
+    <if test="agUniqNum !=null and agUniqNum !='' ">
+      and  ag.AG_UNIQ_NUM =#{agUniqNum}
+    </if>
+  </sql>
+
+  <!-- 查询销账列表未处理的所有id-->
+  <select id="queryRaccountByStatus" parameterType="map" resultType="string">
+    select a.id from O_REMOVE_ACCOUNT a where a.status=1
+    and a.RSTATUS = #{rStatus,jdbcType=DECIMAL}
+  </select>
+
+
+  <!--订单明细列表-->
+  <select id="orderDetailList" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="PAGING_START" />
+    select op.DOWN_PAYMENT_COUNT,o.C_TIME ,ag.AG_UNIQ_NUM,plat.platform_name,
+    to_char(o_payment_detail.plan_pay_time,'yyyy-mm')  rmonth,
+    o_payment_detail.Payment_status ,o_payment_detail.plan_num ,
+    o_payment_detail.pay_amount ,o_payment_detail.order_id ,o_payment_detail.src_id,
+    ra.AG_NAME ,ra.id,ra.AG_ID,
+    ra.BUS_PLATFORM,ra.BUS_NUM, ra.RAMOUNT,ra.REAL_RAMOUNT,
+    ra.PAY_METHOD
+    from O_PAYMENT_DETAIL left join O_REMOVE_ACCOUNT ra
+    on ra.id=o_payment_detail.src_id
+    left join  O_PAYMENT op on O_PAYMENT_DETAIL.PAYMENT_ID=op.id
+    left join a_agent ag on ag.id=ra.ag_id
+    left join a_platform plat ON plat.platform_num = ra.bus_platform
+    left join o_order o on o.id=o_payment_detail.order_id
+    where o_payment_detail.Payment_status in(4,6)
+    <include refid="RACCOUNTDETAIL_WHERE_SQL"/>
+    <include refid="PAGING_END" />
+  </select>
+
+  <select id="orderDetailCount" parameterType="java.util.Map" resultType="int">
+    select count(1)
+    from O_PAYMENT_DETAIL left join O_REMOVE_ACCOUNT ra
+    on ra.id=o_payment_detail.src_id
+    left join  O_PAYMENT op on O_PAYMENT_DETAIL.PAYMENT_ID=op.id
+    left join a_agent ag on ag.id=ra.ag_id
+    left join a_platform plat ON plat.platform_num = ra.bus_platform
+    left join o_order o on o.id=o_payment_detail.order_id
+    where o_payment_detail.Payment_status in(4,6)
+    <include refid="RACCOUNTDETAIL_WHERE_SQL"/>
+  </select>
+
+  <!--查询是否已经销账-->
+  <select id="isRemoveAccount" parameterType="java.util.Map" resultType="int">
+
+    select count(1) from O_REMOVE_ACCOUNT r where STATUS=1
+    <if test="platform!=null and platform!=''"> and r.bus_platform=#{platform} </if>
+    <if test="busNum !=null and busNum !='' ">and  r.bus_num =#{busNum}</if>
+    <if test="rmonth!=null and rmonth!=''"> and to_char(r.RMONTH,'yyyy-mm')=#{rmonth} </if>
+    <if test="agId!=null and agId!=''"> and r.AG_ID =#{agId} </if>
+  </select>
+</mapper>

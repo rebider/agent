@@ -498,7 +498,7 @@ public class AgentServiceImpl implements AgentService {
         userVo.setRoleIds(redisService.hGet("config", "role"));
         userVo.setUserType(1);
         userVo.setPhone(agent.getId());
-        iUserService.insertByVo(userVo);
+        iUserService.insertByVo(userVo, new HashMap<String, String>());
         logger.info("生成后台代理商用户成功",agent.getId());
 
         List<UserVo>  list_db = cUserMapper.selectListByLogin(agent.getId());
@@ -722,7 +722,7 @@ public class AgentServiceImpl implements AgentService {
                 userVo.setRoleIds(redisService.hGet("config", "role"));
                 userVo.setUserType(1);
                 userVo.setPhone(agent.getId());
-                iUserService.insertByVo(userVo);
+                iUserService.insertByVo(userVo, new HashMap<String, String>());
                 List<UserVo>  list_db = userMapper.selectListByLogin(agent.getId());
                 UserVo cUser = new UserVo();
                 if(list_db.size()>0){

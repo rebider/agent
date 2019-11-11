@@ -170,6 +170,11 @@
             <artifactId>ojdbc6</artifactId>
             <version>11gR2</version>
         </dependency>
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>xdb6</artifactId>
+            <version>11.2.0.4</version>
+        </dependency>
         <!-- ************************************************ -->
         <!-- 单元测试包 -->
         <dependency>

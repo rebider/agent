@@ -5,12 +5,14 @@ import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.ryx.credit.commons.result.Tree;
 import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.pojo.admin.COrganization;
+import com.ryx.credit.pojo.admin.vo.COrganizationVo;
 import com.ryx.credit.service.IOrganizationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -52,4 +54,27 @@ public class OrganizationServiceImpl extends ServiceImpl<COrganizationMapper, CO
     public COrganization selectByPrimaryKey(Integer id) {
         return organizationMapper.selectByPrimaryKey(id);
     }
+
+    @Override
+    public List<COrganizationVo> selectPorg() {
+
+        return organizationMapper.selectPorg();
+    }
+
+    @Override
+    public List<COrganizationVo> selectOrgsByUserId(Long userId) {
+        return organizationMapper.selectPrgByUserId(userId);
+    }
+
+    @Override
+    public List<COrganization> selectPubOrgs(Map map) {
+        return organizationMapper.selectPubOrgs(map);
+    }
+
+    @Override
+    public List<COrganization> selectMaintainOrg() {
+        return organizationMapper.selectMaintainOrg();
+    }
+
+
 }

@@ -191,7 +191,9 @@ public class ActivityServiceImpl implements ActivityService {
             upFlowRecord.setErrorMsg(e.getCause().getMessage());
             throw new ProcessException(e.getCause().getMessage());
         }finally {
-            approvalFlowRecordService.update(upFlowRecord);
+            if(StringUtils.isNotBlank(upFlowRecord.getId())) {
+                approvalFlowRecordService.update(upFlowRecord);
+            }
         }
 
         return rs;
