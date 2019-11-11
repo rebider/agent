@@ -101,6 +101,9 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         if(null!=internetRenew.getReviewStatus()){
             criteria.andReviewStatusEqualTo(internetRenew.getReviewStatus());
         }
+        if(StringUtils.isNotBlank(internetRenew.getBusNum())){
+            criteria.andBusNumEqualTo(internetRenew.getBusNum());
+        }
         //代理商只查询自己的
         if(StringUtils.isNotBlank(agentId)){
             criteria.andAgentIdEqualTo(agentId);
@@ -230,6 +233,9 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         if(StringUtils.isNotBlank(internetRenewDetail.getRenewStatus())){
             criteria.andRenewStatusEqualTo(internetRenewDetail.getRenewStatus());
         }
+        if(StringUtils.isNotBlank(internetRenewDetail.getBusNum())){
+            criteria.andBusNumEqualTo(internetRenewDetail.getBusNum());
+        }
         internetRenewDetailExample.setReqMap(reqMap);
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         internetRenewDetailExample.setOrderByClause(" c_time desc ");
@@ -282,6 +288,9 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }
         if(StringUtils.isNotBlank(internetRenewOffset.getFlowId())){
             criteria.andFlowIdEqualTo(internetRenewOffset.getFlowId());
+        }
+        if(StringUtils.isNotBlank(internetRenewOffset.getBusNum())){
+            criteria.andBusNumEqualTo(internetRenewOffset.getBusNum());
         }
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         internetRenewOffsetExample.setPage(page);
@@ -380,6 +389,9 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         if(StringUtils.isNotBlank(internetRenewOffsetDetail.getProcessDateEnd())){
             String dateEnd = DateUtil.dateConvertion(internetRenewOffsetDetail.getProcessDateEnd(), DateUtil.DATE_FORMAT_yyyy_MM_dd, DateUtil.DATE_FORMAT_3);
             criteria.andProcessDateLessThanOrEqualTo(dateEnd);
+        }
+        if(StringUtils.isNotBlank(internetRenewOffsetDetail.getBusNum())){
+            criteria.andBusNumEqualTo(internetRenewOffsetDetail.getBusNum());
         }
 
         criteria.andStatusEqualTo(Status.STATUS_1.status);

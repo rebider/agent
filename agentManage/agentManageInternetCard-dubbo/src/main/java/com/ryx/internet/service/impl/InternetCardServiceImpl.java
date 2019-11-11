@@ -212,6 +212,9 @@ public class InternetCardServiceImpl implements InternetCardService {
         if(null!=internetCard.getInternetCardStatus()){
             criteria.andInternetCardStatusEqualTo(internetCard.getInternetCardStatus());
         }
+        if(StringUtils.isNotBlank(internetCard.getBusNum())){
+            criteria.andBusNumEqualTo(internetCard.getBusNum());
+        }
         if(StringUtils.isNotBlank(internetCard.getOpenAccountTimeBeginStr())){
             Date format = DateUtil.format(internetCard.getOpenAccountTimeBeginStr(), DateUtil.DATE_FORMAT_yyyy_MM_dd);
             criteria.andOpenAccountTimeGreaterThanOrEqualTo(format);
@@ -1132,6 +1135,9 @@ public class InternetCardServiceImpl implements InternetCardService {
         }
         if(StringUtils.isNotBlank(internetCardPostpone.getMerName())){
             criteria.andMerNameEqualTo(internetCardPostpone.getMerName());
+        }
+        if(StringUtils.isNotBlank(internetCardPostpone.getBusNum())){
+            criteria.andBusNumEqualTo(internetCardPostpone.getBusNum());
         }
         if(StringUtils.isNotBlank(internetCardPostpone.getIccid())){
             criteria.andIccidEqualTo(internetCardPostpone.getIccid());
