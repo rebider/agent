@@ -1,5 +1,6 @@
 package com.ryx.credit.machine.service.impl;
 
+import com.alibaba.druid.sql.visitor.functions.Substring;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.PlatformType;
@@ -228,6 +229,10 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
             //查询，新旧活动代码
             OActivity oldActivity = orderActivityService.findById(refundPriceDiffDetail.getActivityFrontId());
             OActivity newActivity = orderActivityService.findById(refundPriceDiffDetail.getActivityRealId());
+            //增加判断品牌是不是同一个
+            if (!(newActivity.getBusProCode().substring(0, newActivity.getBusProCode().indexOf("_")).equals(oldActivity.getBusProCode().substring(0, oldActivity.getBusProCode().indexOf("_"))))) {
+                return AgentResult.fail("品牌不同不能更换活动，请选择相同品牌的活动！");
+            }
             reqMap.put("terminalNoStart", refundPriceDiffDetail.getBeginSn());
             reqMap.put("terminalNoEnd", refundPriceDiffDetail.getEndSn());
             reqMap.put("terminalPolicyId", newActivity.getBusProCode());
