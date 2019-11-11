@@ -177,4 +177,13 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+  <select id="countAdjNum" parameterType="map" resultType="java.lang.Long">
+    select count(*)
+    from (select *
+            from o_order_adj_detail adj_d
+            left join o_order_adj ad
+              on ad.id = adj_d.adj_id
+           where SUB_ORDER_ID = #{map.subOrderId}
+             and ad.reviews_stat = '4')
+  </select>
 </mapper>

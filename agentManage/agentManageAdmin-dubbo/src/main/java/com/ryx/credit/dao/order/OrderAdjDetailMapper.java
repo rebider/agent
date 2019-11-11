@@ -2,7 +2,10 @@ package com.ryx.credit.dao.order;
 
 import com.ryx.credit.pojo.admin.order.OrderAdjDetail;
 import com.ryx.credit.pojo.admin.order.OrderAdjDetailExample;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
+import java.util.Map;
 
 public interface OrderAdjDetailMapper {
     long countByExample(OrderAdjDetailExample example);
@@ -20,4 +23,6 @@ public interface OrderAdjDetailMapper {
     int updateByPrimaryKeySelective(OrderAdjDetail record);
 
     int updateByPrimaryKey(OrderAdjDetail record);
+
+    long countAdjNum(@Param("map") Map<String,Object> map);
 }
