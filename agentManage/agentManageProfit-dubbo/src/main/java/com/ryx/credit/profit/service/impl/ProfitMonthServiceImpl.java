@@ -2,23 +2,31 @@ package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.profit.dao.*;
 import com.ryx.credit.profit.enums.CitySupplyStatus;
+import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.*;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.IUserService;
+import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.agent.TaskApprovalService;
 import com.ryx.credit.service.dict.IdService;
+import com.ryx.internet.service.OInternetRenewService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import sun.rmi.runtime.Log;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -110,7 +118,14 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     private IFreezeAgentSercice freezeAgentSercice;
     @Autowired
     private ISetServerAmtService setServerAmtService;
-
+    @Autowired
+    private OInternetRenewService internetRenewService;
+    @Autowired
+    private AgentService agentService;
+    @Autowired
+    private ProfitSupplyMapper pProfitSupplyMapper;
+    @Autowired
+    private ProfitSupplyService profitSupplyService;
 
     public final static Map<String, Map<String, Object>> temp = new HashMap<>();
 
@@ -477,8 +492,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             profitDeducttionDetailService.clearComputData(profitDate,DeductionType.MACHINE.getType());
             LOG.info("清理机具扣款实扣、未扣足数据，{}月，{}", profitDate,DeductionType.MACHINE.getType());
             profitDeductionMapper.clearComputData(profitDate,DeductionType.MACHINE.getType());
-
-
+            LOG.info("清理代理商流量卡分润抵扣数据，{}月", profitDate);
+            profitDeductionServiceImpl.clearMortgageProfitData(profitDate);
+            LOG.info("清理代理商流量卡轧差补款数据，{}月", profitDate);
+            profitSupplyService.clearRollingDifferenceSupplyData(profitDate);
             LOG.info("清理服务费数据，{}月", profitDate);
             setServerAmtService.clearServerAmtDetailData(profitDate);
 
@@ -664,6 +681,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
 
     private BigDecimal getComputAmt(ProfitDetailMonth profitDetailMonthTemp, String computType) {
+
+        //代理商 流量卡轧差金额 算入其他补款中
+        doRollingDifferenceSupplyAmt(profitDetailMonthTemp);
+
         BigDecimal sumAmt = profitDetailMonthTemp.getProfitSumAmt() == null ? BigDecimal.ZERO : profitDetailMonthTemp.getProfitSumAmt();
 
         // pos退单补款
@@ -727,6 +748,9 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         //sumAmt = sumAmt.subtract(profitDetailMonthTemp.getBuDeductionAmt());
         sumAmt = doBLDuction(profitDetailMonthTemp, sumAmt, computType);
 
+        //流量卡分润抵扣
+        doMortgageProfit(profitDetailMonthTemp);
+
         //其他扣款-
         param.put("profitAmt", sumAmt);
         param.put("sourceId", "3");
@@ -749,6 +773,94 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         long updateend = System.currentTimeMillis();
         //System.out.println("修改处理时间" + (updateend - updatestart));
         return sumAmt;
+    }
+    /**
+     * 代理商流量卡轧差补款数据拉取
+     * @param profitDetailMonthTemp
+     */
+    private void doRollingDifferenceSupplyAmt(ProfitDetailMonth profitDetailMonthTemp) {
+        String agentId=profitDetailMonthTemp.getAgentId();
+        String profitDate = profitDetailMonthTemp.getProfitDate();
+        Map<String,Object> reqMap = new HashMap<>();
+        reqMap.put("month",profitDate);
+        Set<String> agentIdList = new HashSet<>();
+        agentIdList.add(agentId);
+        reqMap.put("agentIdList",agentIdList);
+        try {
+            AgentResult agentResult = internetRenewService.queryMonthSumOffsetAmt(reqMap);
+            List<Map<String, Object>> list = (List<Map<String, Object>>) agentResult.getData();
+            Map<String, Object> data = list.get(0);
+            BigDecimal offsetAmt = (BigDecimal) data.get("OFFSET_AMT");
+            String parentAgentId = profitDetailMonthTemp.getParentAgentId();
+            Agent parentAgent = agentService.getAgentById(parentAgentId);
+
+
+            ProfitSupply profitSupply = new ProfitSupply();
+            profitSupply.setId(idService.genId(TabId.p_profit_supply));//ID序列号
+            profitSupply.setSourceId(DateUtils.dateToStrings(new Date()));//录入日期
+            profitSupply.setBusBigType("99");
+            profitSupply.setAgentId(agentId);//代理商编码
+            profitSupply.setAgentName(profitDetailMonthTemp.getAgentName());//代理商名称
+            profitSupply.setParentAgentId(parentAgent.getId());//上级代理商编号
+            profitSupply.setParentAgentName(parentAgent.getAgName());//上级代理商名称
+            profitSupply.setSupplyType("流量卡轧差补款");//补款类型
+            profitSupply.setSupplyAmt(offsetAmt);//补款金额
+            profitSupply.setSupplyDate(profitDate);//月份
+
+            pProfitSupplyMapper.insertSelective(profitSupply);
+        }catch (Exception e){
+            LOG.info("代理商"+agentId+"流量卡轧差数据拉取异常："+e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    /**
+     * 代理商流量卡分润抵扣数据拉取
+     * @param profitDetailMonthTemp
+     */
+    private void doMortgageProfit(ProfitDetailMonth profitDetailMonthTemp) {
+        String agentId = profitDetailMonthTemp.getAgentId();
+        String profitDate = profitDetailMonthTemp.getProfitDate();
+        Map<String, Object> reqMap = new HashMap<>();
+        reqMap.put("month", profitDate);
+        Set<String> agentIdList = new HashSet<>();
+        agentIdList.add(agentId);
+        reqMap.put("agentIdList", agentIdList);
+        try {
+            AgentResult agentResult = internetRenewService.queryCardProfit(reqMap);
+
+            Map<String, Object> data = (Map<String, Object>) agentResult.getData();
+            LOG.info(data.toString());
+            BigDecimal sumOughtAmt = (BigDecimal) data.get("SUM_OUGHT_AMT");
+
+            String parentAgentId = profitDetailMonthTemp.getParentAgentId();
+            Agent parentAgent = agentService.getAgentById(parentAgentId);
+
+            ProfitDeduction deduction = new ProfitDeduction();
+            deduction.setDeductionStatus("0");
+            deduction.setAddDeductionAmt(sumOughtAmt);
+            deduction.setSumDeductionAmt(sumOughtAmt);
+            deduction.setMustDeductionAmt(sumOughtAmt);
+            deduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus());
+            deduction.setId(idService.genIdInTran(TabId.P_DEDUCTION));
+            deduction.setAgentId(agentId);
+            deduction.setParentAgentId(profitDetailMonthTemp.getParentAgentId());
+            deduction.setAgentName(profitDetailMonthTemp.getAgentName());
+            deduction.setParentAgentName(parentAgent.getAgName());
+            deduction.setRemark("流量卡续费扣款");
+            deduction.setDeductionDate(profitDate);
+            deduction.setCreateDateTime(new Date());
+            deduction.setDeductionType("07");   //放入其他扣款中
+            deduction.setSourceId("3");
+            deduction.setUserId("1");       //admin 系统拉取数据
+
+            profitDeductionServiceImpl.insert(deduction);
+        }catch (Exception e){
+            LOG.info("代理商"+agentId+"分润抵扣数据拉取异常："+e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     /**
