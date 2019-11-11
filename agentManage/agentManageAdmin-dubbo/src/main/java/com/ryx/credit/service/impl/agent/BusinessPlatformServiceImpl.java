@@ -1,5 +1,7 @@
 package com.ryx.credit.service.impl.agent;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
@@ -19,6 +21,8 @@ import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.bank.PosRegionService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.RegionService;
+import org.apache.commons.collections.FastArrayList;
+import org.apache.xpath.objects.XObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -139,42 +143,51 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     }
 
     @Override
-    public PageInfo queryBusinessPlatformListManager(AgentBusInfo agentBusInfo, Agent agent, Page page, Long userId,String approveTimeStart,String approveTimeEnd) {
+    public PageInfo queryBusinessPlatformListManager(Page page, Map map) {
         Map<String, Object> reqMap = new HashMap<>();
-
         reqMap.put("agStatus", AgStatus.Approved.name());
-        if (!StringUtils.isBlank(agent.getId())) {
-            reqMap.put("id", agent.getId());
+        if (!StringUtils.isBlank((String)map.get("id"))) {
+            reqMap.put("id", map.get("id"));
         }
-        if (!StringUtils.isBlank(agent.getAgName())) {
-            reqMap.put("agName", agent.getAgName());
+        if (!StringUtils.isBlank((String)map.get("agName"))) {
+            reqMap.put("agName", (String)map.get("agName"));
         }
-        if (!StringUtils.isBlank(agent.getAgUniqNum())) {
-            reqMap.put("agUniqNum", agent.getAgUniqNum());
+        if (!StringUtils.isBlank((String)map.get("agUniqNum"))) {
+            reqMap.put("agUniqNum", (String)map.get("agUniqNum"));
         }
-        if (!StringUtils.isBlank(agentBusInfo.getBusNum())) {
-            reqMap.put("busNum", agentBusInfo.getBusNum());
+        if (!StringUtils.isBlank((String)map.get("busNum"))) {
+            reqMap.put("busNum", (String)map.get("busNum"));
         }
-        if (!StringUtils.isBlank(agentBusInfo.getBusPlatform())) {
-            reqMap.put("busPlatform", agentBusInfo.getBusPlatform());
+        if (!StringUtils.isBlank((String)map.get("busPlatformList"))) {
+            reqMap.put("busPlatformList", Arrays.asList(((String) map.get("busPlatformList")).split(",")));
         }
-        if (agentBusInfo.getCloReviewStatus() != null) {
-            reqMap.put("cloReviewStatus", agentBusInfo.getCloReviewStatus());
+        if (!StringUtils.isBlank((String)map.get("cloReviewStatusList"))) {// bigdecimal 处理
+            List<String> list = Arrays.asList( ((String)map.get("cloReviewStatusList")).split(","));
+            List<BigDecimal> voList = Lists.transform(list, new Function<String, BigDecimal>() {
+                public BigDecimal apply(String string) {
+                    return new BigDecimal(string);
+                }
+            });
+           /* List<BigDecimal> voList = Lists.transform(list, (entity) -> {
+                return new BigDecimal(entity);
+            });*/
+            if( voList!=null && voList.size()>0)
+                reqMap.put("cloReviewStatusList", voList);
         }
-        if (StringUtils.isNotBlank(agentBusInfo.getBusType())) {
-            reqMap.put("busType", agentBusInfo.getBusType());
+        if (StringUtils.isNotBlank((String)map.get("busTypeList"))) {
+            reqMap.put("busTypeList", Arrays.asList(((String)map.get("busTypeList")).split(",")));
         }
-        if ( StringUtils.isNotBlank(approveTimeStart)) {
-            reqMap.put("approveTimeStart", approveTimeStart);
+        if ( StringUtils.isNotBlank((String)map.get("approveTimeStart"))) {
+            reqMap.put("approveTimeStart", (String)map.get("approveTimeStart"));
         }
-        if ( StringUtils.isNotBlank(approveTimeEnd)) {
-            reqMap.put("approveTimeEnd", approveTimeEnd);
+        if ( StringUtils.isNotBlank((String)map.get("approveTimeEnd"))) {
+            reqMap.put("approveTimeEnd", (String)map.get("approveTimeEnd"));
         }
-        if (agentBusInfo.getBusStatus() != null) {
-            reqMap.put("busStatus", agentBusInfo.getBusStatus());
+        if ((String)map.get("busStatus") != null) {
+            reqMap.put("busStatus", new BigDecimal((String)map.get("busStatus")));
         }
         reqMap.put("status", Status.STATUS_1.status);
-        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm((Long)map.get("userId"));
         reqMap.put("platfromPerm",platfromPerm);
         List<Map<String, Object>> agentBusInfoList = agentBusInfoMapper.queryBusinessPlatformList(reqMap, page);
         PageInfo pageInfo = new PageInfo();
@@ -183,6 +196,16 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         return pageInfo;
     }
 
+    public static void main(String[] args) {
+        BigDecimal a= new BigDecimal(1);
+        BigDecimal b = new BigDecimal(2);
+        List<BigDecimal> aa = new ArrayList<BigDecimal>();
+        aa.add(a);aa.add(b);
+        List<String> voList = Lists.transform(aa, (entity) -> {
+            return entity.toString();
+        });
+        System.out.println(voList);
+    }
     /**
      * 根据代理商唯一编号检索
      * @param agUniqNum

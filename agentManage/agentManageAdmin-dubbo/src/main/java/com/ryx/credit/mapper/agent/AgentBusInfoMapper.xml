@@ -721,17 +721,26 @@
     <if test="reqMap.busNum != null and reqMap.busNum != '' " >
       and b.bus_num = #{reqMap.busNum}
     </if>
-    <if test="reqMap.busPlatform != null and reqMap.busPlatform != '' " >
-      and b.bus_platform = #{reqMap.busPlatform}
+    <if test="reqMap.busPlatformList != null and reqMap.busPlatformList.size > 0 " >
+      and b.bus_platform
+      <foreach collection="reqMap.busPlatformList" item="busPlatform" open=" in(" close=")" separator=",">
+        #{busPlatform}
+      </foreach>
     </if>
-    <if test="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >
-      and b.clo_review_status = #{reqMap.cloReviewStatus}
+    <if test="reqMap.cloReviewStatusList != null and reqMap.cloReviewStatusList.size > 0" >
+      and b.clo_review_status
+      <foreach collection="reqMap.cloReviewStatusList" item="cloReviewStatus" open=" in(" close=")" separator=",">
+        #{cloReviewStatus}
+      </foreach>
     </if>
     <if test="reqMap.id != null and reqMap.id != '' " >
       and b.id = #{reqMap.id}
     </if>
-    <if test="reqMap.busType != null and reqMap.busType != '' " >
-      and b.bus_type = #{reqMap.busType}
+    <if test="reqMap.busTypeList != null and reqMap.busTypeList.size > 0" >
+      and b.bus_type
+      <foreach collection="reqMap.busTypeList" item="busType" open=" in(" close=")" separator=",">
+        #{busType}
+      </foreach>
     </if>
     <if test="reqMap.organizationCode!=null and reqMap.organizationCode!=''">
       and (e.CODE like concat(#{reqMap.organizationCode},'%') or g.CODE like concat(#{reqMap.organizationCode},'%') )
