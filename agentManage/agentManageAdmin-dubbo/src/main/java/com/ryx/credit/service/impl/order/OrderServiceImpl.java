@@ -1181,16 +1181,28 @@ public class OrderServiceImpl implements OrderService {
         if (oSubOrders.size() > 0) {
             List<String> ids = new ArrayList<>();
             oSubOrders.forEach(oSubOrder->{
+                FastMap par = FastMap.fastMap("subOrderId",oSubOrder.getId());
                 ReceiptPlanExample receiptPlanExample = new ReceiptPlanExample();
                 receiptPlanExample.or().andOrderIdEqualTo(oSubOrder.getOrderId()).andProIdEqualTo(oSubOrder.getProId()).andProTypeEqualTo(oSubOrder.getProCode()).andStatusEqualTo(Status.STATUS_1.status);
                 long  countPlans = receiptPlanMapper.countByExample(receiptPlanExample);//排单
                 OReceiptProExample oReceiptProExample = new OReceiptProExample();
                 oReceiptProExample.or().andOrderidEqualTo(oSubOrder.getOrderId()).andProIdEqualTo(oSubOrder.getProId()).andProCodeEqualTo(oSubOrder.getProCode()).andStatusEqualTo(Status.STATUS_1.status);
                 long oReceiptPros = oReceiptProMapper.countByExample(oReceiptProExample);
+                long adjSuccessNum = orderAdjDetailMapper.countAdjNum(par);
                 Map<String,Object> orderRecord = new HashMap<>();
                 orderRecord.put("countPlan",countPlans);//排单总计
                 orderRecord.put("oReceiptPros",oReceiptPros);//配货数量
                 orderRecord.put("orderSubId",oSubOrder.getId());
+                orderRecord.put("adjSuccessNum",adjSuccessNum);
+                orderRecord.put("adjNum",oSubOrder.getProNum()
+                        .subtract(BigDecimal.valueOf(countPlans))
+                        .subtract(BigDecimal.valueOf(oReceiptPros))
+                        .subtract(BigDecimal.valueOf(adjSuccessNum)));
+                orderRecord.put("calPrice",oSubOrder.getProRelPrice().multiply(oSubOrder.getProNum()
+                        .subtract(BigDecimal.valueOf(countPlans))
+                        .subtract(BigDecimal.valueOf(oReceiptPros))
+                        .subtract(BigDecimal.valueOf(adjSuccessNum)))
+                        .setScale(2,BigDecimal.ROUND_UP));
                 orderRecords.add(orderRecord);
                 f.putKeyV("orderRecords",orderRecords);
 
@@ -3917,6 +3929,40 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     public AgentResult saveAdjInfo(OrderUpModelVo orderUpModelVo, Map map) throws Exception {
         AgentResult agentResult = AgentResult.fail("保存失败!");
+        boolean adjFlag = true;
+        List<AdjProVo> adjPros = orderUpModelVo.getAdjPros();
+        OOrder order = orderMapper.selectByPrimaryKey(orderUpModelVo.getOrderId());
+        if (null == order){
+            agentResult.setMsg("该订单不存在!");
+            return agentResult;
+        }
+        //检查配货+排单数量
+        for (AdjProVo adjProVo:adjPros){
+            OSubOrderExample osubOrderExample = new OSubOrderExample();
+            osubOrderExample.or().andIdEqualTo(adjProVo.getoSubId()).andStatusEqualTo(Status.STATUS_1.status);
+            List<OSubOrder> oSubOrders = oSubOrderMapper.selectByExample(osubOrderExample);
+            if (oSubOrders.size() > 0) {
+                FastMap par = FastMap.fastMap("subOrderId",oSubOrders.get(0).getId());
+                ReceiptPlanExample receiptPlanExample = new ReceiptPlanExample();
+                receiptPlanExample.or().andOrderIdEqualTo(oSubOrders.get(0).getOrderId()).andProIdEqualTo(oSubOrders.get(0).getProId()).andProTypeEqualTo(oSubOrders.get(0).getProCode()).andStatusEqualTo(Status.STATUS_1.status);
+                long countPlans = receiptPlanMapper.countByExample(receiptPlanExample);//排单
+                OReceiptProExample oReceiptProExample = new OReceiptProExample();
+                oReceiptProExample.or().andOrderidEqualTo(oSubOrders.get(0).getOrderId()).andProIdEqualTo(oSubOrders.get(0).getProId()).andProCodeEqualTo(oSubOrders.get(0).getProCode()).andStatusEqualTo(Status.STATUS_1.status);
+                long oReceiptPros = oReceiptProMapper.countByExample(oReceiptProExample);//配货
+                long adjSuccessNum = orderAdjDetailMapper.countAdjNum(par);
+                BigDecimal enableNum = oSubOrders.get(0).getProNum().subtract(BigDecimal.valueOf(countPlans).add(BigDecimal.valueOf(oReceiptPros)).add(BigDecimal.valueOf(adjSuccessNum)));
+                if (new BigDecimal(adjProVo.getAdjNum()).compareTo(enableNum)<0&&new BigDecimal(adjProVo.getAdjNum()).compareTo(new BigDecimal(0))>0){
+                    agentResult.setMsg("可调整机具数量错误!");
+                    adjFlag = false;
+                    break;
+                }
+            }
+        }
+
+        if (!adjFlag){
+            return agentResult;
+        }
+
         OrderAdj orderAdj = new OrderAdj();
         orderAdj.setId(idService.genIdInTran(TabId.o_order_adj));
         orderAdj.setOrderId(orderUpModelVo.getOrderId());
@@ -3932,7 +3978,7 @@ public class OrderServiceImpl implements OrderService {
         orderAdj.setStatus(Status.STATUS_1.status);
         orderAdj.setReviewsStat(AgStatus.Create.status);
 
-        List<AdjProVo> adjPros = orderUpModelVo.getAdjPros();
+
         adjPros.forEach(adjProVo -> {
             OrderAdjDetail orderAdjDetail = new OrderAdjDetail();
             orderAdjDetail.setAdjId(orderAdj.getId());
