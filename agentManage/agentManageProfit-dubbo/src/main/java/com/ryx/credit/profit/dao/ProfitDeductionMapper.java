@@ -60,4 +60,6 @@ public interface ProfitDeductionMapper {
 
     List<Map<String,String>> selectByExampleToolSupply(ProfitDeductionExample example);
 
+    /**清除代理商流量卡分润抵扣数据*/
+    void clearMortgageProfitData(String profitDate);
 }
