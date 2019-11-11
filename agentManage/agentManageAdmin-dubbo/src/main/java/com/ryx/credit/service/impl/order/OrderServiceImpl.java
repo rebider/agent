@@ -3934,6 +3934,7 @@ public class OrderServiceImpl implements OrderService {
         orderAdj.setReson(orderUpModelVo.getReson());
         orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundMethod()));
         orderAdj.setStatus(Status.STATUS_1.status);
+        orderAdj.setReviewsStat(AgStatus.Create.status);
 
         List<AdjProVo> adjPros = orderUpModelVo.getAdjPros();
         adjPros.forEach(adjProVo -> {
@@ -4008,6 +4009,8 @@ public class OrderServiceImpl implements OrderService {
         orderAdjDetailExample.or().andAdjIdEqualTo(orderAdj.getId());
         List<OrderAdjDetail> orderAdjDetails = orderAdjDetailMapper.selectByExample(orderAdjDetailExample);
         res.putKeyV("orderAdjDetails",orderAdjDetails);
+        String refundMethod = RefundMehod.getContentByValue(orderAdj.getRefundType());
+        res.putKeyV("refundMethod",refundMethod);
         return AgentResult.ok(res);
     }
 
