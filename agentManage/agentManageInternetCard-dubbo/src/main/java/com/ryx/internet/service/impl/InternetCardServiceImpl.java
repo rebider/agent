@@ -1215,9 +1215,27 @@ public class InternetCardServiceImpl implements InternetCardService {
         internetCardPostpone.setBatchNum(batchNum);
         internetCardPostpone.setBusNum(oInternetCard.getBusNum());
         internetCardPostpone.setBusPlatform(oInternetCard.getBusPlatform());
-        internetCardPostpone.setAgDocDistrict(oInternetCard.getAgDocDistrict());
-        internetCardPostpone.setAgDocPro(oInternetCard.getAgDocPro());
-        internetCardPostpone.setBusContactPerson(oInternetCard.getBusContactPerson());
+
+        if(StringUtils.isNotBlank(oInternetCard.getBusNum()) && StringUtils.isNotBlank(oInternetCard.getBusPlatform())){
+            //查询最新对接省区大区对接人
+            AgentBusInfo agentBusInfo = new AgentBusInfo();
+            agentBusInfo.setBusNum(oInternetCard.getBusNum());
+            agentBusInfo.setBusPlatform(oInternetCard.getBusPlatform());
+            List<BigDecimal> busStatusList = new ArrayList<>();
+            busStatusList.add(BusStatus.QY.getValue());
+            busStatusList.add(BusStatus.WJH.getValue());
+            busStatusList.add(BusStatus.WQY.getValue());
+            agentBusInfo.setBusStatusList(busStatusList);
+            agentBusInfo.setCloReviewStatus(AgStatus.Approved.getValue());
+            List<AgentBusInfo> agentBusInfos = agentBusinfoService.selectByAgentBusInfo(agentBusInfo);
+            if(agentBusInfos.size()!=1){
+                throw new MessageException("平台码或平台错误,请联系管理员");
+            }
+            AgentBusInfo queryAgentBusInfo = agentBusInfos.get(0);
+            internetCardPostpone.setAgDocDistrict(queryAgentBusInfo.getAgDocDistrict());
+            internetCardPostpone.setAgDocPro(queryAgentBusInfo.getAgDocPro());
+            internetCardPostpone.setBusContactPerson(queryAgentBusInfo.getBusContactPerson());
+        }
         internetCardPostponeMapper.insert(internetCardPostpone);
 
         BigDecimal sumPostponeTime = oInternetCard.getSumPostponeTime();
