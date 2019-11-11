@@ -4029,8 +4029,6 @@ public class OrderServiceImpl implements OrderService {
     public PageInfo queryAgentUpModelList(Map par, Page page) {
         PageInfo pageInfo = new PageInfo();
         if (par == null) return pageInfo;
-        if (par.get("agentId") == null) return pageInfo;
-        if (StringUtils.isBlank(par.get("agentId").toString())) return pageInfo;
         if(null!=par.get("userId")) {
             Long userId = (Long) par.get("userId");
             List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);

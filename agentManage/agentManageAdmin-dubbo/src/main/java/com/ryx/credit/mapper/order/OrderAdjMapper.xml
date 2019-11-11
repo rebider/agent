@@ -385,7 +385,7 @@
     on ab.id = oo.bus_id and ab.status=1
     <where>
       <if test="1==1"> and oa.status=1 </if>
-      <if test="map.agentId!=null and map.agentId!=''"> and oa.agent_id = #{map.agentId} </if>
+     <!-- <if test="map.agentId!=null and map.agentId!=''"> and oa.agent_id = #{map.agentId} </if>-->
       <if test="map.agName!=null and map.agName!=''"> and ag.ag_name like concat(concat('%',#{map.agName}),'%') </if>
       <!--<if test="map.agUniqNum!=null and map.agUniqNum!=''"> and ag.ag_uniq_num = #{map.agUniqNum} </if>-->
       <if test="map.agUniqNum!=null and map.agUniqNum!=''"> and ag.id = #{map.agUniqNum} </if>
