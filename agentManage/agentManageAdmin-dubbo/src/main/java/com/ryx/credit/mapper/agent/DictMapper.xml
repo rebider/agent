@@ -271,4 +271,15 @@
     </if>
   </select>
 
+  <select id="selectDictByValueAndName" parameterType="com.ryx.credit.pojo.admin.agent.Dict" resultMap="BaseResultMap">
+      select
+          <include refid="Base_Column_List"></include>
+      from
+          D_DICT
+      where
+          D_GROUP = #{dGroup,jdbcType=VARCHAR}
+          and D_ARTIFACT = #{dArtifact,jdbcType=VARCHAR}
+          and D_ITEMVALUE = #{dItemvalue,jdbcType=VARCHAR}
+          and D_ITEMNAME = #{dItemname,jdbcType=VARCHAR}
+  </select>
 </mapper>

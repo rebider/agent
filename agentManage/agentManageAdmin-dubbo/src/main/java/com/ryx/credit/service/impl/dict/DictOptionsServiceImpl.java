@@ -172,4 +172,25 @@ public class DictOptionsServiceImpl implements DictOptionsService {
         return agentNameList;
     }
 
+    /**
+     * 查询字典值
+     * @param dict
+     * @return
+     */
+    @Override
+    public Dict findDictByValueAndName(Dict dict) {
+        return dictMapper.selectDictByValueAndName(dict);
+    }
+
+    /**
+     * 编辑字典值
+     * @param dictMap
+     * @return
+     */
+    @Override
+    public int editDictByDict(Map<String, Dict> dictMap) {
+        return 0;
+    }
+
+
 }

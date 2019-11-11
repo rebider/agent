@@ -6,6 +6,7 @@ import com.ryx.credit.pojo.admin.agent.Dict;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by cx on 2018/5/22.
@@ -32,4 +33,8 @@ public interface DictOptionsService {
     String getApproveVersion(String approveName)throws ProcessException;
 
     List<String> getAgentNameList(Long userId);
+
+    int editDictByDict(Map<String, Dict> dictMap);
+
+    Dict findDictByValueAndName(Dict oldDict);
 }
