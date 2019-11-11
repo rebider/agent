@@ -13,8 +13,11 @@ public enum ReceiptPlanExportColum {
 
     //导出历史排单记录
     ReceiptPlan_ViewColumn("C_DATE,ORDER_ID,TIME,AG_UNIQ_NUM,AG_NAME,PLATFORM_NAME,PRO_TYPE,ACTIVITY_NAME,PRO_COM_STRING,MODEL,SEND_NUM,PLAN_PRO_NUM,RESIDUE,ADDR_REALNAME,ADDR_DETAIL,ADDR_MOBILE,C_TIME","排单导出字段"),
-    ReceiptPlan_ViewTitle("排单日期,订单编号,订单日期,唯一码,代理商,平台,机具类型,活动,订货厂家,机型,总数量,排单数量,剩余未排单数量,收货人,收货人地址,收货人联系方式,配货时间","排单导出标题");
+    ReceiptPlan_ViewTitle("排单日期,订单编号,订单日期,唯一码,代理商,平台,机具类型,活动,订货厂家,机型,总数量,排单数量,剩余未排单数量,收货人,收货人地址,收货人联系方式,配货时间","排单导出标题"),
 
+    //导出欠款记录
+    ARREARAGE_Column("TM,AG_UNIQ_NUM,AG_NAME,BUS_NUM,PLATFORM_NAME,JJQK","欠款导出字段"),
+    ARREARAGE_Title("月份,代理商唯一编码,代理商名称,业务平台编码,业务平台,机具欠款","欠款导出标题");
     public String code;
 
     public String msg;

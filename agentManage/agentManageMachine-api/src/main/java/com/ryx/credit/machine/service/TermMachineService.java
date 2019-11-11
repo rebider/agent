@@ -110,4 +110,12 @@ public interface TermMachineService {
      * @return
      */
     boolean checkModleIsEq(Map<String,String> data,String platformType);
+
+    /**
+     * 查询物流发送结果（异步）
+     * @param pamMap
+     * @return
+     * @throws Exception
+     */
+    AgentResult queryLogisticsResult(Map<String, Object> pamMap, String platformType) throws Exception;
 }

@@ -6,6 +6,7 @@ import com.ryx.credit.pojo.admin.order.OOrderExample;
 import com.ryx.credit.pojo.admin.vo.OrderoutVo;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,4 +42,18 @@ public interface OOrderMapper {
     List<Map<String,Object>> queryHavePeiHuoProduct(@Param("orderId") String orderId,@Param("agentId") String agentId);
 
     List<OrderoutVo> excelOrder(Map map);
+
+    Long arrearageCount(Map<String, Object> param);
+
+    List<Map<String,Object>> arrearageList(Map<String, Object> param);
+
+    List<Map> arrearageQuery(Map map);
+
+    List<Map> isRemoveAccount(Map map);
+
+    List<Map> queryJjqk(HashMap<Object, Object> map);
+
+    Long serchArrearageCount(Map<String, Object> param);
+
+    List<Map<String,Object>> serchArrearageList(Map<String, Object> param);
 }

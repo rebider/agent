@@ -330,4 +330,17 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="queryMonthSumOffsetAmt" resultType="map" parameterType="java.lang.String">
+    select t.agent_id,t.agent_name,sum(t.today_offset_amt) as offset_amt
+    from o_internet_renew_offset_detail t
+    where
+    substr(t.process_date, 0, 6) = #{month}
+    and AGENT_ID in
+    <foreach close=")" collection="agentIdList" item="agentId" open="(" separator=",">
+      #{agentId}
+    </foreach>
+    group by t.agent_id,t.agent_name
+  </select>
+
 </mapper>

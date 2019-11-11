@@ -154,7 +154,9 @@ public class PlannerServiceImpl implements PlannerService {
             receiptPlan.setActivityId(activityId);
             //采购单商品
             OSubOrderExample example = new OSubOrderExample();
-            example.or().andOrderIdEqualTo(oReceiptPro.getOrderid()).andProIdEqualTo(oReceiptPro.getProId()).andStatusEqualTo(Status.STATUS_1.status);
+            example.or().andOrderIdEqualTo(oReceiptPro.getOrderid())
+                    .andProIdEqualTo(oReceiptPro.getProId())
+                    .andStatusEqualTo(Status.STATUS_1.status);
             List<OSubOrder>  oSubOrders = oSubOrderMapper.selectByExample(example);
             if(oSubOrders.size()==0){
                 throw new MessageException("订购商品未找到!");
@@ -173,30 +175,31 @@ public class PlannerServiceImpl implements PlannerService {
             //排单活动
             OActivity sure_activity = oActivityMapper.selectByPrimaryKey(activityId);
             //cxinfo  保存排单 确定具体活动 价格计算采用活动中的价格 xx
+
             //确定活动
-            OActivity real_activity = sure_activity;
-            OSubOrderActivityItem.setActivityId(real_activity.getId());
-            OSubOrderActivityItem.setActivityName(real_activity.getActivityName());
-            OSubOrderActivityItem.setActivityWay(real_activity.getActivityWay());
-            OSubOrderActivityItem.setActivityRule(real_activity.getActivityRule());
-            OSubOrderActivityItem.setVender(real_activity.getVender());
-            OSubOrderActivityItem.setProModel(real_activity.getProModel());
-            OSubOrderActivityItem.setBusProCode(real_activity.getBusProCode());
-            OSubOrderActivityItem.setBusProName(real_activity.getBusProName());
-            OSubOrderActivityItem.setTermBatchcode(real_activity.getTermBatchcode());
-            OSubOrderActivityItem.setTermBatchname(real_activity.getTermBatchname());
-            OSubOrderActivityItem.setTermtype(real_activity.getTermtype());
-            OSubOrderActivityItem.setTermtypename(real_activity.getTermtypename());
-            OSubOrderActivityItem.setOriginalPrice(real_activity.getOriginalPrice());
-            OSubOrderActivityItem.setPrice(real_activity.getPrice());
-            OSubOrderActivityItem.setPosType(real_activity.getPosType());
-            OSubOrderActivityItem.setPosSpePrice(real_activity.getPosSpePrice());
-            OSubOrderActivityItem.setStandTime(real_activity.getStandTime());
-            OSubOrderActivityItem.setBackType(real_activity.getBackType());
-            OSubOrderActivityItem.setStandAmt(real_activity.getStandAmt());
-            if(1!=oSubOrderActivityMapper.updateByPrimaryKeySelective(OSubOrderActivityItem)){
-                throw new MessageException("更新活动失败!");
-            }
+            //            OActivity real_activity = sure_activity;
+            //            OSubOrderActivityItem.setActivityId(real_activity.getId());
+            //            OSubOrderActivityItem.setActivityName(real_activity.getActivityName());
+            //            OSubOrderActivityItem.setActivityWay(real_activity.getActivityWay());
+            //            OSubOrderActivityItem.setActivityRule(real_activity.getActivityRule());
+            //            OSubOrderActivityItem.setVender(real_activity.getVender());
+            //            OSubOrderActivityItem.setProModel(real_activity.getProModel());
+            //            OSubOrderActivityItem.setBusProCode(real_activity.getBusProCode());
+            //            OSubOrderActivityItem.setBusProName(real_activity.getBusProName());
+            //            OSubOrderActivityItem.setTermBatchcode(real_activity.getTermBatchcode());
+            //            OSubOrderActivityItem.setTermBatchname(real_activity.getTermBatchname());
+            //            OSubOrderActivityItem.setTermtype(real_activity.getTermtype());
+            //            OSubOrderActivityItem.setTermtypename(real_activity.getTermtypename());
+            //            OSubOrderActivityItem.setOriginalPrice(real_activity.getOriginalPrice());
+            //            OSubOrderActivityItem.setPrice(real_activity.getPrice());
+            //            OSubOrderActivityItem.setPosType(real_activity.getPosType());
+            //            OSubOrderActivityItem.setPosSpePrice(real_activity.getPosSpePrice());
+            //            OSubOrderActivityItem.setStandTime(real_activity.getStandTime());
+            //            OSubOrderActivityItem.setBackType(real_activity.getBackType());
+            //            OSubOrderActivityItem.setStandAmt(real_activity.getStandAmt());
+            //            if(1!=oSubOrderActivityMapper.updateByPrimaryKeySelective(OSubOrderActivityItem)){
+            //                throw new MessageException("更新活动失败!");
+            //            }
 
 
             receiptPlan.setProType(oSubOrderItem.getProType());
