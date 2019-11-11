@@ -1260,11 +1260,7 @@ public class OrderServiceImpl implements OrderService {
         oReceiptProExample.or().andOrderidEqualTo(order.getId()).andStatusEqualTo(Status.STATUS_1.status);
         List<OReceiptPro> oReceiptPros = oReceiptProMapper.selectByExample(oReceiptProExample);
         f.putKeyV("oReceiptPros", oReceiptPros);
-        //排单信息
-        ReceiptPlanExample receiptPlanExample = new ReceiptPlanExample();
-        receiptPlanExample.or().andOrderIdEqualTo(order.getId()).andStatusEqualTo(Status.STATUS_1.status);
-        List<ReceiptPlan> receiptPlan = receiptPlanMapper.selectByExample(receiptPlanExample);
-        f.putKeyV("receiptPlans", receiptPlan);
+
         //支付信息
         OPaymentExample oPaymentExample = new OPaymentExample();
         oPaymentExample.or().andStatusEqualTo(Status.STATUS_1.status).andOrderIdEqualTo(order.getId());

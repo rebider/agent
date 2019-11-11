@@ -855,8 +855,12 @@
     where o_sub_order.status=1 and o_sub_order_activity.status=1 and o_sub_order.order_id = o.id
     ) as activity_name,
     nvl((select sum(PLAN_PRO_NUM) from O_RECEIPT_PLAN plan where plan.order_id=o.id and plan.status=1),0)as total,
-    nvl((select REVIEWS_STAT from o_order_adj oa where oa.order_id  = o.id and oa.status = 1),9
-    )as adjStat
+    nvl(( select reviews_stat from
+    (select  oa.reviews_stat,row_number() OVER(PARTITION BY oa.reviews_stat ORDER BY   oa.adj_tm desc) as row_flg
+    from o_order_adj oa
+    where oa.order_id =  o.id
+    and oa.status = 1) new_adj where new_adj.row_flg = '1'),
+    9) as adjStat
     from o_order o
     left join a_agent b on o.agent_id = b.id
     left join a_agent_businfo e on o.bus_id = e.id
