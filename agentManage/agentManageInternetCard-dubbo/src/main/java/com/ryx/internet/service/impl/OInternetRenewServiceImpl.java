@@ -849,7 +849,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     }
 
     @Override
-    public void renewVerify(String iccidNumIds)throws MessageException{
+    public void renewVerify(String iccidNumIds,Long userId)throws MessageException{
 
         String[] iccidNumIdsStr = iccidNumIds.split(",");
         for (String iccidNumId : iccidNumIdsStr) {
@@ -881,6 +881,21 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 }
             }else{
                 throw new MessageException("状态不正确,不允许续费");
+            }
+
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if(orgCodeRes==null && orgCodeRes.size()!=1){
+                throw new MessageException("当前登陆用户信息有误,请联系管理员");
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+            if(StringUtils.isBlank(organizationCode)){
+                throw new MessageException("当前登陆用户信息有误,请联系管理员");
+            }
+            if(!organizationCode.equals("agent")) {
+                if(StringUtils.isBlank(oInternetCard.getBusNum()) || StringUtils.isBlank(oInternetCard.getBusPlatform())){
+                    throw new MessageException("非代理商发起,业务平台编码或业务平台不可为空");
+                }
             }
         }
     }

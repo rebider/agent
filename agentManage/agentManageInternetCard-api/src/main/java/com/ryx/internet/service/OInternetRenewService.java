@@ -47,7 +47,7 @@ public interface OInternetRenewService {
 
     Integer queryInternetRenewDetailCount(OInternetRenewDetail internetRenewDetail,String agentId,Long userId);
 
-    void renewVerify(String iccidNumIds)throws MessageException;
+    void renewVerify(String iccidNumIds,Long userId)throws MessageException;
 
     Map<Object, Object> getInternetRenewWay(Long cUser);
 
