@@ -4106,21 +4106,6 @@ public class OrderServiceImpl implements OrderService {
             logger.info("========用户{}{}启动部门参数为空", id, cuser);
             throw new MessageException("启动部门参数为空！");
         }
-        //不同的业务类型找到不同的启动流程
-//        String workId = null;
-//        if(agentService.isAgent(cuser).isOK()){
-//            workId = dictOptionsService.getApproveVersion("orderAgent");
-//        }else {
-//            workId = dictOptionsService.getApproveVersion("orderCity");
-//        }
-//        if(startPar.get("party").toString().equals("beijing")) {
-//            startPar.put("rs", ApprovalType.PASS.getValue());
-//        }
-//        //订单启动流程
-//        if(StringUtils.isBlank(workId)){
-//            logger.info("========用户{}{}订单启动流程未找到", cuser, workId);
-//            throw new MessageException("订单启动流程未找到!");
-//        }
         //启动审批
         String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("orderAdjust"), null, null, startPar);
         if (proce == null) {
