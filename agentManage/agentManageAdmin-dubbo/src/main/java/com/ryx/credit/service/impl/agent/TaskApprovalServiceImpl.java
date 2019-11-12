@@ -146,7 +146,7 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                         AgentBusInfo agent_busInfo = agentBusinfoService.agentPlatformNum(agentBusInfo.getAgentId(),agentBusInfoVo.getBusPlatform());
 
                         if(null!=agent_busInfo && StringUtils.isNotBlank(agent_busInfo.getOrganNum())){
-                            if (!agent_busInfo.getOrganNum().equals(agentBusInfo.getOrganNum())){
+                            if (!agent_busInfo.getOrganNum().equals(agentBusInfoVo.getOrganNum())){
                                 List<Organization> organizationList = organizationMapper.selectOrganization(agent_busInfo.getOrganNum());
                                 String orgNick="";
                                 if(null!=organizationList && organizationList.size()>0){

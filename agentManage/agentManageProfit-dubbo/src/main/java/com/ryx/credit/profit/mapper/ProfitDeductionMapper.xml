@@ -656,9 +656,7 @@
 
     <delete id="clearMortgageProfitData" parameterType="java.lang.String">
         delete from P_DEDUCTION where REMARK = '流量卡续费扣款'
-        <if test="profitDate != null">
-            AND DEDUCTION_DATE=#{profitDate,jdbcType=VARCHAR}
-        </if>
+        AND DEDUCTION_DATE=#{profitDate,jdbcType=VARCHAR}
     </delete>
 
 </mapper>
