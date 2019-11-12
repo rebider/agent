@@ -4041,6 +4041,17 @@ public class OrderServiceImpl implements OrderService {
         OrderAdjDetailExample orderAdjDetailExample = new OrderAdjDetailExample();
         orderAdjDetailExample.or().andAdjIdEqualTo(orderAdj.getId());
         List<OrderAdjDetail> orderAdjDetails = orderAdjDetailMapper.selectByExample(orderAdjDetailExample);
+        for (OrderAdjDetail orderAdjDetail : orderAdjDetails) {
+            OSubOrderExample osubOrderExample = new OSubOrderExample();
+            osubOrderExample.or().andOrderIdEqualTo(orderAdj.getOrderId()).andStatusEqualTo(Status.STATUS_1.status);
+            List<OSubOrder> oSubOrders = oSubOrderMapper.selectByExample(osubOrderExample);
+            OSubOrder oSubOrder = oSubOrders.get(0);//采购单
+            FastMap fastMap = FastMap.fastMap("subOrderId", oSubOrder.getId());
+            BigDecimal countPlans = receiptPlanMapper.planCountTotal(orderAdj.getOrderId());//排单数量
+            BigDecimal oReceiptPros = oReceiptProMapper.receiptCountTotal(orderAdj.getOrderId());//配货数量
+            long adjSuccessNum = orderAdjDetailMapper.countAdjNum(fastMap);//已调整数量
+            orderAdjDetail.setAdjustCount(oSubOrder.getProNum().subtract(oReceiptPros).subtract(BigDecimal.valueOf(adjSuccessNum)));
+        }
         res.putKeyV("orderAdjDetails",orderAdjDetails);
         String refundMethod = RefundMehod.getContentByValue(orderAdj.getRefundType());
         res.putKeyV("refundMethod",refundMethod);
