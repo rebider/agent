@@ -15,6 +15,9 @@ import com.ryx.credit.service.dict.DictOptionsService;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
@@ -193,4 +196,19 @@ public class DictOptionsServiceImpl implements DictOptionsService {
     }
 
 
+    /**
+     * 更新字典表
+     * @param oldDict
+     * @param newDict
+     * @return
+     */
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Override
+    public boolean editDictByOldDict(Dict oldDict, Dict newDict)throws Exception{
+        if ( 1 == dictMapper.updateByOldDict(oldDict, newDict)) {
+            return true;
+        } else {
+            throw new Exception("更新失败，请稍后再试！");
+        }
+    }
 }

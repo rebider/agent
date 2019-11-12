@@ -37,4 +37,6 @@ public interface DictOptionsService {
     int editDictByDict(Map<String, Dict> dictMap);
 
     Dict findDictByValueAndName(Dict oldDict);
+
+    boolean editDictByOldDict(Dict oldDict, Dict newDict)throws Exception;
 }

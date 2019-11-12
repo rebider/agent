@@ -282,4 +282,35 @@
           and D_ITEMVALUE = #{dItemvalue,jdbcType=VARCHAR}
           and D_ITEMNAME = #{dItemname,jdbcType=VARCHAR}
   </select>
+
+    <!-- 更新字典状态 -->
+    <update id="updateByOldDict">
+        update D_DICT
+        <set >
+            <if test="null != newDict and null != newDict.dGroup" >
+                D_GROUP = #{newDict.dGroup,jdbcType=VARCHAR},
+            </if>
+            <if test="null != newDict and null != newDict.dArtifact" >
+                D_ARTIFACT = #{newDict.dArtifact,jdbcType=VARCHAR},
+            </if>
+            <if test="null != newDict and null != newDict.dItemvalue" >
+                D_ITEMVALUE =#{newDict.dItemvalue,jdbcType=VARCHAR},
+            </if>
+            <if test="null != newDict and null != newDict.dItemname" >
+                D_ITEMNAME = #{newDict.dItemname,jdbcType=VARCHAR},
+            </if>
+            <if test="null != newDict and null != newDict.dItemnremark" >
+                D_ITEMNREMARK = #{newDict.dItemnremark,jdbcType=VARCHAR},
+            </if>
+            <if test="null != newDict and null != newDict.dSort" >
+                D_SORT = #{newDict.dSort,jdbcType=DECIMAL},
+            </if>
+        </set>
+        where
+            D_GROUP = #{oldDict.dGroup, jdbcType=DECIMAL}
+            and D_ARTIFACT = #{oldDict.dArtifact, jdbcType=DECIMAL}
+            and D_ITEMVALUE = #{oldDict.dItemvalue, jdbcType=DECIMAL}
+            and D_ITEMNAME = #{oldDict.dItemname, jdbcType=DECIMAL}
+    </update>
+
 </mapper>
