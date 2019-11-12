@@ -4125,11 +4125,11 @@ public class OrderServiceImpl implements OrderService {
         record.setcTime(Calendar.getInstance().getTime());
         record.setcUser(cuser);
         record.setStatus(Status.STATUS_1.status);
-        record.setBusType(BusActRelBusType.ORDER.name());
+        record.setBusType(BusActRelBusType.orderAdjust.name());
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(orderAdj.getAgentId());
         record.setAgentName(agent.getAgName());
-        record.setDataShiro(BusActRelBusType.ORDER.key);
+        record.setDataShiro(BusActRelBusType.orderAdjust.key);
         record.setAgDocPro(agentBusInfo.getAgDocPro());
         record.setAgDocDistrict(agentBusInfo.getAgDocDistrict());
         record.setNetInBusType("ACTIVITY_"+order.getOrderPlatform());
