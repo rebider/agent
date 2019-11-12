@@ -786,8 +786,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         Set<String> agentIdList = new HashSet<>();
         agentIdList.add(agentId);
         reqMap.put("agentIdList",agentIdList);
+        AgentResult agentResult = internetRenewService.queryMonthSumOffsetAmt(reqMap);
         try {
-            AgentResult agentResult = internetRenewService.queryMonthSumOffsetAmt(reqMap);
             List<Map<String, Object>> list = (List<Map<String, Object>>) agentResult.getData();
             Map<String, Object> data = list.get(0);
             BigDecimal offsetAmt = (BigDecimal) data.get("OFFSET_AMT");
@@ -809,7 +809,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
             pProfitSupplyMapper.insertSelective(profitSupply);
         }catch (Exception e){
-            LOG.info("代理商"+agentId+"流量卡轧差数据拉取异常："+e.getMessage());
+            LOG.info("代理商"+agentId+"流量卡轧差数据拉取异常："+agentResult.getMsg());
             e.printStackTrace();
             throw e;
         }
@@ -827,9 +827,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         Set<String> agentIdList = new HashSet<>();
         agentIdList.add(agentId);
         reqMap.put("agentIdList", agentIdList);
+        AgentResult agentResult = internetRenewService.queryCardProfit(reqMap);
         try {
-            AgentResult agentResult = internetRenewService.queryCardProfit(reqMap);
-
             Map<String, Object> data = (Map<String, Object>) agentResult.getData();
             LOG.info(data.toString());
             BigDecimal sumOughtAmt = (BigDecimal) data.get("SUM_OUGHT_AMT");
@@ -857,7 +856,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
             profitDeductionServiceImpl.insert(deduction);
         }catch (Exception e){
-            LOG.info("代理商"+agentId+"分润抵扣数据拉取异常："+e.getMessage());
+            LOG.info("代理商"+agentId+"分润抵扣数据拉取异常："+agentResult.getMsg());
             e.printStackTrace();
             throw e;
         }
