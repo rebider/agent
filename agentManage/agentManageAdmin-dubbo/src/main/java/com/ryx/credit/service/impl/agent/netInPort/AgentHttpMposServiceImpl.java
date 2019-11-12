@@ -58,14 +58,15 @@ public class AgentHttpMposServiceImpl implements AgentNetInHttpService {
         AgentBusInfo agentBusInfo = (AgentBusInfo)param.get("agentBusInfo");
         Agent agent = (Agent)param.get("agent");
 
-        String finaceRemitOrgan = agentBusInfo.getFinaceRemitOrgan();
+
 
         AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
         if(agentColinfo==null){
             log.info("收款账户为空:{},{}",agent.getId(), agentBusInfo.getId());
             agentColinfo = new AgentColinfo();
         }
-
+        //出款机构
+        String finaceRemitOrgan = agentBusInfo.getFinaceRemitOrgan();
         if(StringUtils.isNotBlank(finaceRemitOrgan)) {
             Organization organization = organizationMapper.selectByPrimaryKey(finaceRemitOrgan);
             if(organization!=null) {
