@@ -24,5 +24,5 @@ public interface OReceiptProMapper {
 
     int updateByPrimaryKey(OReceiptPro record);
 
-    BigDecimal receiptCountTotal(@Param("orderId") String orderId);
+    BigDecimal receiptCountTotal(@Param("orderId") String orderId, @Param("proId") String proId);
 }
