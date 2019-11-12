@@ -2,7 +2,9 @@ package com.ryx.credit.dao.order;
 
 import com.ryx.credit.pojo.admin.order.OReceiptPro;
 import com.ryx.credit.pojo.admin.order.OReceiptProExample;
+import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface OReceiptProMapper {
@@ -21,4 +23,6 @@ public interface OReceiptProMapper {
     int updateByPrimaryKeySelective(OReceiptPro record);
 
     int updateByPrimaryKey(OReceiptPro record);
+
+    BigDecimal receiptCountTotal(@Param("orderId") String orderId);
 }

@@ -4,6 +4,7 @@ import com.ryx.credit.pojo.admin.order.ReceiptPlan;
 import com.ryx.credit.pojo.admin.order.ReceiptPlanExample;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -33,4 +34,6 @@ public interface ReceiptPlanMapper {
     List<Map<String, Object>> queryReceiveOrderLogistics(@Param("params") Map<String, String> params);
 
     List<Map<String,Object>> queryReveiveAgentData(Map <String, Object> param);
+
+    BigDecimal planCountTotal(@Param("orderId") String orderId);
 }

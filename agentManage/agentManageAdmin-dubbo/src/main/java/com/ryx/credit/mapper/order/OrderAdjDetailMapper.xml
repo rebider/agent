@@ -186,4 +186,10 @@
            where SUB_ORDER_ID = #{map.subOrderId}
              and ad.reviews_stat = '4')
   </select>
+  <select id="selectByAdjustId" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from O_ORDER_ADJ_DETAIL
+    where ADJ_ID = #{adjId,jdbcType=VARCHAR} and status = 1
+  </select>
 </mapper>

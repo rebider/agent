@@ -25,4 +25,6 @@ public interface OrderAdjDetailMapper {
     int updateByPrimaryKey(OrderAdjDetail record);
 
     long countAdjNum(@Param("map") Map<String,Object> map);
+
+    OrderAdjDetail selectByAdjustId(String adjId);
 }

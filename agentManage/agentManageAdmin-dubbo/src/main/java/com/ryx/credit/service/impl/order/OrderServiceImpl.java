@@ -1154,9 +1154,7 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public AgentResult loadAgentInfo(String id) throws Exception {
-
         List<Map<String,Object>> orderRecords = new ArrayList<>();
-
         //订单
         OOrder order = orderMapper.selectByPrimaryKey(id);
         FastMap f = FastMap.fastMap("order", order);
@@ -1181,31 +1179,26 @@ public class OrderServiceImpl implements OrderService {
         if (oSubOrders.size() > 0) {
             List<String> ids = new ArrayList<>();
             oSubOrders.forEach(oSubOrder->{
-                FastMap par = FastMap.fastMap("subOrderId",oSubOrder.getId());
-                ReceiptPlanExample receiptPlanExample = new ReceiptPlanExample();
-                receiptPlanExample.or().andOrderIdEqualTo(oSubOrder.getOrderId()).andProIdEqualTo(oSubOrder.getProId()).andProTypeEqualTo(oSubOrder.getProCode()).andStatusEqualTo(Status.STATUS_1.status);
-                long  countPlans = receiptPlanMapper.countByExample(receiptPlanExample);//排单
-                OReceiptProExample oReceiptProExample = new OReceiptProExample();
-                oReceiptProExample.or().andOrderidEqualTo(oSubOrder.getOrderId()).andProIdEqualTo(oSubOrder.getProId()).andProCodeEqualTo(oSubOrder.getProCode()).andStatusEqualTo(Status.STATUS_1.status);
-                long oReceiptPros = oReceiptProMapper.countByExample(oReceiptProExample);
+                FastMap par = FastMap.fastMap("subOrderId", oSubOrder.getId());
+                BigDecimal countPlans = receiptPlanMapper.planCountTotal(order.getId());//排单
+                BigDecimal oReceiptPros = oReceiptProMapper.receiptCountTotal(order.getId());//配货
                 long adjSuccessNum = orderAdjDetailMapper.countAdjNum(par);
                 Map<String,Object> orderRecord = new HashMap<>();
-                orderRecord.put("countPlan",countPlans);//排单总计
-                orderRecord.put("oReceiptPros",oReceiptPros);//配货数量
-                orderRecord.put("orderSubId",oSubOrder.getId());
-                orderRecord.put("adjSuccessNum",adjSuccessNum);
-                orderRecord.put("adjNum",oSubOrder.getProNum()
-                        .subtract(BigDecimal.valueOf(countPlans))
-                        .subtract(BigDecimal.valueOf(oReceiptPros))
+                orderRecord.put("countPlan", countPlans);//排单总计
+                orderRecord.put("oReceiptPros", oReceiptPros);//配货数量
+                orderRecord.put("orderSubId", oSubOrder.getId());
+                orderRecord.put("adjSuccessNum", adjSuccessNum);
+                orderRecord.put("adjNum",
+                        oSubOrder.getProNum()
+                        .subtract(oReceiptPros)
                         .subtract(BigDecimal.valueOf(adjSuccessNum)));
-                orderRecord.put("calPrice",oSubOrder.getProRelPrice().multiply(oSubOrder.getProNum()
-                        .subtract(BigDecimal.valueOf(countPlans))
-                        .subtract(BigDecimal.valueOf(oReceiptPros))
+                orderRecord.put("calPrice",
+                        oSubOrder.getProRelPrice().multiply(oSubOrder.getProNum()
+                        .subtract(oReceiptPros)
                         .subtract(BigDecimal.valueOf(adjSuccessNum)))
-                        .setScale(2,BigDecimal.ROUND_UP));
+                        .setScale(2, BigDecimal.ROUND_UP));
                 orderRecords.add(orderRecord);
-                f.putKeyV("orderRecords",orderRecords);
-
+                f.putKeyV("orderRecords", orderRecords);
             });
 
             for (OSubOrder oSubOrder : oSubOrders) {
@@ -3999,11 +3992,11 @@ public class OrderServiceImpl implements OrderService {
             record.setcUser(orderAdj.getAdjUserId());
             record.setcTime(orderAdj.getAdjTm());
             record.setStatus(Status.STATUS_1.status);
-            record.setBusType(AttachmentRelType.AnnounceMent.name());
+            record.setBusType(AttachmentRelType.orderAdjust.name());
             record.setId(idService.genId(TabId.a_attachment_rel));
             logger.info("添加订单调整附件关系,订单调整ID{},附件ID{}",orderAdj.getId(),attfile);
             if (1 != attachmentRelMapper.insertSelective(record)) {
-                logger.info("公告添加:{}", "添加订单调整附件关系失败");
+                logger.info("订单调整:{}", "添加订单调整附件关系失败");
                 throw new ProcessException("添加订单调整附件关系失败");
             }
         });
@@ -4134,6 +4127,119 @@ public class OrderServiceImpl implements OrderService {
             throw new MessageException("审批流启动失败：添加审批关系失败！");
         }
         return AgentResult.ok();
+    }
+
+    /**
+     * 修改订单调整数据
+     * @param orderUpModelVo
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    @Override
+    public AgentResult updateOrderAdjust(OrderUpModelVo orderUpModelVo, String userId) throws Exception {
+        AgentResult agentResult = AgentResult.fail("修改失败!");
+        boolean adjFlag = true;
+        List<AdjProVo> adjPros = orderUpModelVo.getAdjPros();
+        OOrder order = orderMapper.selectByPrimaryKey(orderUpModelVo.getOrderId());
+        if (null == order) {
+            agentResult.setMsg(orderUpModelVo.getOrderId()+"-此订单不存在！");
+            return agentResult;
+        }
+        //检查配货+排单数量
+        for (AdjProVo adjProVo : adjPros) {
+            OSubOrderExample osubOrderExample = new OSubOrderExample();
+            osubOrderExample.or().andIdEqualTo(adjProVo.getoSubId()).andStatusEqualTo(Status.STATUS_1.status);
+            List<OSubOrder> oSubOrders = oSubOrderMapper.selectByExample(osubOrderExample);
+            if (oSubOrders.size() > 0) {
+                FastMap fastMap = FastMap.fastMap("subOrderId", oSubOrders.get(0).getId());
+                //排单
+                ReceiptPlanExample receiptPlanExample = new ReceiptPlanExample();
+                receiptPlanExample.or()
+                        .andOrderIdEqualTo(oSubOrders.get(0).getOrderId())
+                        .andProIdEqualTo(oSubOrders.get(0).getProId())
+                        .andProTypeEqualTo(oSubOrders.get(0).getProCode())
+                        .andStatusEqualTo(Status.STATUS_1.status);
+                long countPlans = receiptPlanMapper.countByExample(receiptPlanExample);
+                //配货
+                OReceiptProExample oReceiptProExample = new OReceiptProExample();
+                oReceiptProExample.or()
+                        .andOrderidEqualTo(oSubOrders.get(0).getOrderId())
+                        .andProIdEqualTo(oSubOrders.get(0).getProId())
+                        .andProCodeEqualTo(oSubOrders.get(0).getProCode())
+                        .andStatusEqualTo(Status.STATUS_1.status);
+                long oReceiptPros = oReceiptProMapper.countByExample(oReceiptProExample);
+                long adjSuccessNum = orderAdjDetailMapper.countAdjNum(fastMap);
+                BigDecimal enableNum = oSubOrders.get(0).getProNum().subtract(BigDecimal.valueOf(countPlans).add(BigDecimal.valueOf(oReceiptPros)).add(BigDecimal.valueOf(adjSuccessNum)));
+                if (new BigDecimal(adjProVo.getAdjNum()).compareTo(enableNum)<0 && new BigDecimal(adjProVo.getAdjNum()).compareTo(new BigDecimal(0))>0) {
+                    agentResult.setMsg("可调整机具数量错误！");
+                    adjFlag = false;
+                    break;
+                }
+            }
+        }
+        if (!adjFlag) {
+            return agentResult;
+        }
+
+        OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(orderUpModelVo.getId());
+        orderAdj.setAdjUserId(userId);
+        orderAdj.setReson(orderUpModelVo.getReson());//原因
+        orderAdj.setCurArrAmount(new BigDecimal(orderUpModelVo.getCurArrAmount()));//当前欠款金额
+        orderAdj.setRefundAmount(new BigDecimal(orderUpModelVo.getRefundAmount()));//退款金额
+        orderAdj.setStagesAmount(new BigDecimal(orderUpModelVo.getAdjRepayment()));//申请分期金额
+        orderAdj.setOrgStagesAmount(new BigDecimal(orderUpModelVo.getOrgStagesAmount()));//原分期金额
+        orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundMethod()));//退款方式
+
+        OrderAdjDetail orderAdjDetail = orderAdjDetailMapper.selectByAdjustId(orderAdj.getId());
+        adjPros.forEach(adjProVo -> {
+            orderAdjDetail.setAdjNum(new BigDecimal(adjProVo.getAdjNum()));
+            orderAdjDetail.setDifAmount(adjProVo.getCalPrice());
+            orderAdjDetailMapper.updateByPrimaryKeySelective(orderAdjDetail);
+        });
+
+        List<String> attFiles = orderUpModelVo.getFiles();
+        //删除附件
+        AttachmentRelExample deleAttr = new AttachmentRelExample();
+        deleAttr.or()
+                .andBusTypeEqualTo(AttachmentRelType.orderAdjust.name())
+                .andSrcIdEqualTo(orderUpModelVo.getId())
+                .andStatusEqualTo(Status.STATUS_1.status);
+        List<AttachmentRel> attachmentRels = attachmentRelMapper.selectByExample(deleAttr);
+        if (attachmentRels.size() > 0) {
+            for (AttachmentRel attachmentRelItem : attachmentRels) {
+                attachmentRelItem.setStatus(Status.STATUS_0.status);
+                if (1 != attachmentRelMapper.updateByPrimaryKeySelective(attachmentRelItem)) {
+                    logger.info("订单调整:{},{},{}", orderAdj.getId(), "删除附件失败", userId);
+                    throw new MessageException("删除附件失败！");
+                }
+                logger.info("订单调整:{},{},{}", orderAdj.getId(), "删除附件成功！", userId);
+            }
+        }
+        //添加新附件
+        AttachmentRel record = new AttachmentRel();
+        if (attFiles.size() > 0)
+            attFiles.forEach(attfile -> {
+                record.setAttId(attfile);
+                record.setSrcId(orderAdj.getId());
+                record.setcUser(orderAdj.getAdjUserId());
+                record.setcTime(orderAdj.getAdjTm());
+                record.setStatus(Status.STATUS_1.status);
+                record.setBusType(AttachmentRelType.orderAdjust.name());
+                record.setId(idService.genId(TabId.a_attachment_rel));
+                logger.info("添加订单调整附件关系,订单调整ID{},附件ID{}", orderAdj.getId(), attfile);
+                if (1 != attachmentRelMapper.insertSelective(record)) {
+                    logger.info("公告添加:{}", "添加订单调整附件关系失败！");
+                    throw new ProcessException("添加订单调整附件关系失败！");
+                }
+            });
+
+        if (1 == orderAdjMapper.updateByPrimaryKeySelective(orderAdj)) {
+            agentResult.setStatus(AgentResult.OK);
+            agentResult.setMsg("保存成功");
+        }
+        return agentResult;
     }
 
 

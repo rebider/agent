@@ -10,6 +10,7 @@ import java.util.List;
  * @create: 2019-11-05 12:39
  **/
 public class OrderUpModelVo implements Serializable {
+    private String id;//订单调整ID
     private String orderId;//订单号
     private String agentId;
     private String curArrAmount;//当前欠款金额
@@ -29,6 +30,14 @@ public class OrderUpModelVo implements Serializable {
 
     public void setIsApproveWhenSubmit(String isApproveWhenSubmit) {
         this.isApproveWhenSubmit = isApproveWhenSubmit;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getOrderId() {

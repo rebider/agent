@@ -292,4 +292,14 @@ public interface OrderService {
      * @throws Exception
      */
     AgentResult startOrderAdjust(String id, String cuser) throws Exception;
+
+    /**
+     * 修改订单调整数据
+     * @param orderUpModelVo
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    AgentResult updateOrderAdjust(OrderUpModelVo orderUpModelVo, String userId) throws Exception;
+
 }
