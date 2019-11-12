@@ -279,7 +279,10 @@
     <where>
       1=1 and pro.status=1
       <if test="orderId!=null and orderId!=''">
-        and pro.orderid = #{orderId} and pro.pro_id = #{proId}
+        and pro.orderid = #{orderId}
+      </if>
+      <if test="proId!=null and proId!=''">
+        and pro.pro_id = #{proId}
       </if>
     </where>
   </select>

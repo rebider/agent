@@ -1181,7 +1181,7 @@ public class OrderServiceImpl implements OrderService {
             oSubOrders.forEach(oSubOrder->{
                 FastMap par = FastMap.fastMap("subOrderId", oSubOrder.getId());
                 BigDecimal oReceiptPros = oReceiptProMapper.receiptCountTotal(order.getId(), oSubOrder.getProId());//配货
-                BigDecimal countPlans = receiptPlanMapper.planCountTotal(order.getId());//排单
+                BigDecimal countPlans = receiptPlanMapper.planCountTotal(order.getId(), oSubOrder.getProId());//排单
                 long adjSuccessNum = orderAdjDetailMapper.countAdjNum(par);
                 Map<String,Object> orderRecord = new HashMap<>();
                 orderRecord.put("oReceiptPros", oReceiptPros);//配货数量
@@ -4048,7 +4048,7 @@ public class OrderServiceImpl implements OrderService {
             OSubOrder oSubOrder = oSubOrders.get(0);//采购单
             FastMap fastMap = FastMap.fastMap("subOrderId", oSubOrder.getId());
             BigDecimal oReceiptPros = oReceiptProMapper.receiptCountTotal(orderAdj.getOrderId(), oSubOrder.getProId());//配货数量
-            BigDecimal countPlans = receiptPlanMapper.planCountTotal(orderAdj.getOrderId());//排单数量
+            BigDecimal countPlans = receiptPlanMapper.planCountTotal(orderAdj.getOrderId(), oSubOrder.getProId());//排单数量
             long adjSuccessNum = orderAdjDetailMapper.countAdjNum(fastMap);//已调整数量
             orderAdjDetail.setAdjustCount(oSubOrder.getProNum().subtract(oReceiptPros).subtract(BigDecimal.valueOf(adjSuccessNum)));
         }
