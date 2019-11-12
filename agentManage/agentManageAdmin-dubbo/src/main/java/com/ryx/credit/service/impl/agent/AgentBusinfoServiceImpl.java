@@ -1122,5 +1122,25 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		return allOrg;
 	}
 
+	@Override
+	public AgentBusInfo agentPlatformNum(String agentId,String platFormNum) {
+		List<Dict> platFormList =  dictOptionsService.dictList(DictGroup.RELATION_PLATFORM_NUM.name(),platFormNum);
+		String busPlatForm="";
+		if (null!=platFormList || platFormList.size()>0){
+			for (Dict dict : platFormList) {
+				busPlatForm=dict.getdItemvalue();//获取POS类型的品牌
+			}
+		}
+		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+		AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria().andAgentIdEqualTo(agentId).andBusPlatformEqualTo(busPlatForm).andBusStatusEqualTo(Status.STATUS_1.status).andStatusEqualTo(Status.STATUS_1.status);
+		List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+		AgentBusInfo agentBusInfo=null;
+		if(null!=agentBusInfoList && agentBusInfoList.size()>0){
+			 agentBusInfo = agentBusInfoList.get(0);
+		}
+
+		return agentBusInfo;
+	}
+
 }
 
