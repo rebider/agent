@@ -34,4 +34,6 @@ public interface TerminalTransferDetailMapper {
     int updateStatusByTerminalTransferId(@Param("map") Map<String, Object> map);
 
     List<TerminalTransferDetail>  queryTerminalTransferDetail();
+
+    List<Map<String,Object>>   queryInterval(@Param("snEndNum") String snEndNum);
 }

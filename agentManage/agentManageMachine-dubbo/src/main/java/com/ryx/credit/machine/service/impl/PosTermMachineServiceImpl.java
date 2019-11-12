@@ -2,6 +2,7 @@ package com.ryx.credit.machine.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.BackType;
+import com.ryx.credit.common.enumc.DeliveryTimeType;
 import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
@@ -282,10 +283,21 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
             mapDetail.put("posSnBegin", refundPriceDiffDetail.getBeginSn());
             mapDetail.put("posSnEnd", refundPriceDiffDetail.getEndSn());
             mapDetail.put("reqPayStatus", "1");
-            mapDetail.put("checkPayStatus", "1");
-            mapDetail.put("deliveryTime", refundPriceDiffDetail.getDeliveryTime());
             mapDetail.put("newMachineId", refundPriceDiffDetail.getNewMachineId());
             mapDetail.put("oldMachineId", refundPriceDiffDetail.getOldMachineId());
+            if(StringUtils.isNotBlank(refundPriceDiffDetail.getDeliveryTimeType())){
+                mapDetail.put("deliveryTimeType", refundPriceDiffDetail.getDeliveryTimeType());
+                if(refundPriceDiffDetail.getDeliveryTimeType().equals(DeliveryTimeType.ZERO.getValue())){
+                    mapDetail.put("deliveryTime", refundPriceDiffDetail.getDeliveryTime());
+                }else{
+                    mapDetail.put("deliveryTime", "");
+                }
+                if(refundPriceDiffDetail.getDeliveryTimeType().equals(DeliveryTimeType.ONE.getValue())){
+                    mapDetail.put("delayDay", refundPriceDiffDetail.getDelayDay());
+                }else{
+                    mapDetail.put("delayDay", "");
+                }
+            }
             listDetail.add(mapDetail);
         }
         jsonObject.put("snList", listDetail);
@@ -299,7 +311,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
                     log.info("http请求返回错误:{}", res_data.getString("result_msg"));
                     return AgentResult.fail(res_data.getString("result_msg"));
                 } else {
-                    return AgentResult.ok();
+                    return AgentResult.ok(res_data);
                 }
             } else {
                 if (StringUtils.isNotBlank(respXMLObj.getString("respMsg"))) {
@@ -320,7 +332,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
                         log.info("http请求返回错误:{}", res_data.getString("result_msg"));
                         return AgentResult.fail(res_data.getString("result_msg"));
                     } else {
-                        return AgentResult.ok();
+                        return AgentResult.ok(res_data);
                     }
                 } else {
                     if (StringUtils.isNotBlank(respXMLObj.getString("respMsg"))) {
@@ -363,14 +375,20 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
                 }else if(serialNumber.equals(serialNumber_res) && "01".equals(snAdjStatus) && "000000".equals(result_code)) {
                     //调整中
                     log.info("活动调整中:{} {}",serialNumber,platformType);
-                    return AgentResult.ok("01");
+                    AgentResult result = AgentResult.ok("01");
+                    result.setMsg(resMsg);
+                    return result;
                 }else if(serialNumber.equals(serialNumber_res) && "02".equals(snAdjStatus) && "000000".equals(result_code)) {
                     //调整失败
                     log.info("活动调整失败:{} {}",serialNumber,platformType);
-                    return AgentResult.ok("02");
+                    AgentResult result = AgentResult.ok("02");
+                    result.setMsg(resMsg);
+                    return result;
                 }else{
                     //未知结果
-                    return AgentResult.ok("03");
+                    AgentResult result = AgentResult.ok("03");
+                    result.setMsg(resMsg);
+                    return result;
                 }
             }else{
                 //未知结果
@@ -386,5 +404,10 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
     public boolean checkModleIsEq(Map<String, String> data, String platformType) {
         log.info("checkModleIsEq:{},{}",data,platformType);
         return imsTermMachineService.checkModleIsEq(data.get("oldMerid"),data.get("newMerId"));
+    }
+
+    @Override
+    public AgentResult queryLogisticsResult(Map<String, Object> pamMap, String platformType) throws Exception {
+        return null;
     }
 }

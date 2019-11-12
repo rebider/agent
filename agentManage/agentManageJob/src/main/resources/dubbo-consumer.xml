@@ -27,6 +27,7 @@
     <dubbo:reference interface="com.ryx.internet.service.InternetCardService" id="internetCardService"  timeout="1200000" registry="myGroup" />
     <dubbo:reference interface="com.ryx.credit.service.order.TerminalTransferService" id="terminalTransferService"  timeout="1200000" registry="myGroup" />
     <dubbo:reference interface="com.ryx.internet.service.OInternetRenewService" id="internetRenewService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.order.ORemoveAccountService" id="oRemoveAccountService"  timeout="1200000" registry="myGroup" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.order.CompensateService" id="compensateService"  timeout="1200000" registry="myGroup"/>
     <dubbo:reference interface="com.ryx.credit.service.agent.AgentCertificationService" id="agentCertificationService"  timeout="1200000" registry="myGroup" check="false"/>
 

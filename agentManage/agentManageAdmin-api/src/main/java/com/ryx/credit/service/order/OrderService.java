@@ -1,18 +1,14 @@
 package com.ryx.credit.service.order;
 
 import com.ryx.credit.common.exception.MessageException;
-import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.order.*;
-import com.ryx.credit.pojo.admin.vo.AgentVo;
-import com.ryx.credit.pojo.admin.vo.AgentoutVo;
-import com.ryx.credit.pojo.admin.vo.OrderFormVo;
-import com.ryx.credit.pojo.admin.vo.OrderoutVo;
+import com.ryx.credit.pojo.admin.vo.*;
 
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -252,4 +248,27 @@ public interface OrderService {
 
 
     AgentResult orderChangeActivity(String oNum, String subOrderId, String activityId, String userId) throws Exception;
+
+    /**
+     * 欠款列表
+     */
+    PageInfo arrearageList(Map<String, Object> param, PageInfo pageInfo);
+
+
+    PageInfo arrearageQuery(Map map,PageInfo pageInfo);
+
+    /**
+     * 欠款详情查看
+     */
+    PageInfo serchArrearage(Map<String, Object> param, PageInfo pageInfo);
+
+    /**
+     * 查看是否存在欠款
+     */
+    AgentResult isRemoveAccount(Map map);
+
+    /**
+     * 添加销账
+     */
+    public ResultVO removeAccountSave(ORemoveAccountVo oRemoveAccountVo,List<Map> rAmountlist) throws MessageException, Exception;
 }

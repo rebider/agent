@@ -369,13 +369,17 @@
   </sql>
 
   <select id="selectProNumByBusNum" parameterType="map" resultType="long">
-    select
-        sum(so.pro_num)
-    from
-        o_sub_order so
-    left join o_order o
-        on so.order_id = o.id
-    where o.review_status = 3 and o.AGENT_ID = #{agentId}
+      SELECT
+          sum( so.pro_num )
+      FROM
+          o_sub_order so
+          LEFT JOIN o_order o ON so.order_id = o.id
+          AND o.status = 1
+      WHERE
+          o.review_status = 3
+          AND o.status = 1
+          AND so.status = 1
+          AND o.AGENT_ID = #{agentId}
   </select>
 
 </mapper>

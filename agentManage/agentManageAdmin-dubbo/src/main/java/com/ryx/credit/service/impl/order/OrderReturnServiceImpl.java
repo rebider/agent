@@ -138,6 +138,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     private IResourceService iResourceService;
     @Autowired
     private DepartmentService departmentService;
+    @Autowired
+    private OActivityVisibleMapper activityVisibleMapper;
 
 
     /**
@@ -590,7 +592,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             List<OReceiptPro> receiptPros = receiptProMapper.selectByExample(receiptProExample);
             if (receiptPros != null && receiptPros.size() > 0) {
                 OReceiptPro receiptPro = receiptPros.get(0);
-                receiptPro.setSendNum(receiptPro.getSendNum().subtract(receiptPlan.getSendProNum()));
+                //收货单排单数量减去排单表排单数量
+                receiptPro.setSendNum(receiptPro.getSendNum().subtract(receiptPlan.getPlanProNum()));
+                receiptPro.setReceiptProStatus(OReceiptStatus.WAITING_LIST.code);
                 int cts = receiptProMapper.updateByPrimaryKeySelective(receiptPro);
                 if(cts<=0){
                     throw new ProcessException("退货退回时更新已排单数量失败，receiptProId={"+receiptProId+"}");
@@ -1372,25 +1376,56 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 //根据退货单的商品活动补充极具类型
                 String O_RETURN_ORDER_DETAIL_ID = jsonObject.getString("O_RETURN_ORDER_DETAIL_ID");
                 OReturnOrderDetail oReturnOrderDetail =  returnOrderDetailMapper.selectByPrimaryKey(O_RETURN_ORDER_DETAIL_ID);
-                //根据订单和商品查询子订单及子订单商品对应的活动
-                OSubOrderExample oSubOrderExample = new OSubOrderExample();
-                oSubOrderExample.or().andOrderIdEqualTo(oReturnOrderDetail.getOrderId()).andProIdEqualTo(oReturnOrderDetail.getProId()).andStatusEqualTo(Status.STATUS_1.status);
-                List<OSubOrder>  zidingdanList =  oSubOrderMapper.selectByExample(oSubOrderExample);
-                if(zidingdanList.size()!=1){
-                    throw new MessageException("未找到退货单商品子订单");
-                }
-                OSubOrder zidingdan = zidingdanList.get(0);
-                OSubOrderActivityExample subOrderActivityExample = new OSubOrderActivityExample();
-                subOrderActivityExample.or().andSubOrderIdEqualTo(zidingdan.getId()).andStatusEqualTo(Status.STATUS_1.status);
-                List<OSubOrderActivity>  listAct =  subOrderActivityMapper.selectByExample(subOrderActivityExample);
-                if(zidingdanList.size()!=1){
-                    throw new MessageException("未找到退货单商品对应活动");
-                }
-                OSubOrderActivity orderActivity = listAct.get(0);
+
                 //机具型号要和退货的机具型号和厂家要一样
-                receiptPlan.setProCom(orderActivity.getVender());
-                receiptPlan.setModel(orderActivity.getProModel());
-                AgentResult result = plannerService.savePlanner(receiptPlan, receiptProId,orderActivity.getActivityId());
+                receiptPlan.setProCom(oReturnOrderDetail.getProCom());
+                receiptPlan.setModel(oReturnOrderDetail.getModel());
+
+                //查询新订单的订单
+                OReceiptPro oReceiptPro = receiptProMapper.selectByPrimaryKey(receiptProId);
+                OSubOrderExample new_oSubOrders = new OSubOrderExample();
+                new_oSubOrders.or().andOrderIdEqualTo(oReceiptPro.getOrderid())
+                        .andProIdEqualTo(oReceiptPro.getProId())
+                        .andStatusEqualTo(Status.STATUS_1.status);
+                List<OSubOrder>  oSubOrders_new = oSubOrderMapper.selectByExample(new_oSubOrders);
+
+                if(oSubOrders_new.size()!=1){
+                    throw new MessageException("订购商品未找到!");
+                }
+                OOrder order = oOrderMapper.selectByPrimaryKey(receiptPlan.getOrderId());
+                //查询新订单的子订单活动
+                OSubOrder subOrder = oSubOrders_new.get(0);
+
+                OSubOrderActivityExample oSubOrderActivityExample_new = new OSubOrderActivityExample();
+                oSubOrderActivityExample_new.or()
+                        .andSubOrderIdEqualTo(subOrder.getId())
+                        .andStatusEqualTo(Status.STATUS_1.status);
+
+                List<OSubOrderActivity>  new_order_activitys = subOrderActivityMapper.selectByExample(oSubOrderActivityExample_new);
+                if(new_order_activitys.size()!=0){
+                    throw new MessageException("排单订单活动未找到!");
+                }
+                OSubOrderActivity new_order_subactivity = new_order_activitys.get(0);
+                OActivity new_order_oActivity = oActivityMapper.selectByPrimaryKey(new_order_subactivity.getActivityId());
+                //找到新订单活动信息
+                OActivityExample find_new_order_activity = new OActivityExample();
+                find_new_order_activity.or()
+                        .andVenderEqualTo(receiptPlan.getProCom())
+                        .andProModelEqualTo(receiptPlan.getModel())
+                        .andActCodeEqualTo(new_order_oActivity.getActCode())
+                        .andStatusEqualTo(Status.STATUS_1.status);
+                List<OActivity> activities = oActivityMapper.selectByExample(find_new_order_activity);
+                if(activities.size()==0){
+                    throw new MessageException("排单订单活动无法确定! 厂商："+receiptPlan.getProCom()+",型号:"+receiptPlan.getModel()+",活动代码:"+new_order_oActivity.getActCode());
+                }
+                OActivity new_act = null;
+                //只有一个活动
+                if(activities.size()==1){
+                     new_act = activities.get(0);
+                }else{
+                    throw new MessageException("新订单活动不能确定");
+                }
+                AgentResult result = plannerService.savePlanner(receiptPlan, receiptProId,new_act.getId());
                 log.info("退货排单信息保存:{}{}",receiptPlan.getReturnOrderDetailId(),receiptPlan.getProId(),result.getMsg());
             }
 
@@ -2351,9 +2386,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         PlatForm platForm = platFormMapper.selectByPlatFormNum(oOrder.getOrderPlatform());
 
         log.info("PlatformType:{}",platForm.getPlatformType());
-        //新增加瑞大宝平台，不是瑞大宝平台按原来逻辑
-        if (platForm.getPlatformType().equals(PlatformType.RDBPOS.code)) {
-            //新增瑞大宝平台重新下发
+        //重新下发具体操作
+        if (platForm.getPlatformType().equals(PlatformType.RDBPOS.code) || platForm.getPlatformType().equals(PlatformType.RJPOS.code)) {
+            //瑞大宝平台重新下发，瑞+物流重新下发
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oOrder.getBusId());
             if (null==agentBusInfo) throw new MessageException("查询业务数据失败！");
 
@@ -2366,18 +2401,18 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 oLogisticsDetail.setSbusMsg("");
                 int deleteInt = logistics.getSendNum().compareTo(BigDecimal.valueOf(logisticsDetailMapper.updateByLogisticsId(oLogisticsDetail)));
                 if (deleteInt != 0) {
-                    log.info("瑞大宝更新物流异常，物流明细和物流发送数量不同。");
-                    throw new Exception("瑞大宝更新物流异常，物流明细和物流发送数量不同。");
+                    log.info("更新物流异常，物流明细和物流发送数量不同。");
+                    throw new Exception("更新物流异常，物流明细和物流发送数量不同。");
                 }
                 //更新物流
                 OLogistics updateLogistics = new OLogistics();
                 updateLogistics.setId(logistics.getId());
                 updateLogistics.setSendStatus(LogisticsSendStatus.gen_detail_sucess.code);
                 updateLogistics.setSendMsg("");
-                updateLogistics.setVersion(logistics.getVersion());//暂时用不到乐观锁，但是要传进去
+                updateLogistics.setVersion(logistics.getVersion());
                 if (1 != oLogisticsMapper.updateByPrimaryKeySelective(updateLogistics)) {
                     log.info("发货物流，重新发送，更新数据库失败:{},{},{}", logistics.getId(), logistics.getSnBeginNum(), logistics.getSnEndNum());
-                    throw new Exception("瑞大宝更新物流状态发生异常！！！");
+                    throw new Exception("更新物流状态发生异常！！！");
                 }
             }catch (Exception e){
                 e.printStackTrace();

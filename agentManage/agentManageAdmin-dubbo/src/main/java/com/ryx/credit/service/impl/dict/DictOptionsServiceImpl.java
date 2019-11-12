@@ -7,8 +7,10 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.EnvironmentUtil;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.dao.agent.DictMapper;
+import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.agent.DictExample;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,9 @@ public class DictOptionsServiceImpl implements DictOptionsService {
 
     @Autowired
     private DictMapper dictMapper;
+    @Autowired
+    private IUserService iUserService;
+
 
     @Override
     public List<Dict> dictList(String group, String artifact) {
@@ -150,4 +155,21 @@ public class DictOptionsServiceImpl implements DictOptionsService {
             return approveMode.getdItemvalue() + "_" + approveMode.getdItemname();
         }
     }
+
+    /**
+     * 内部人员根据名称查询指定流量卡
+     * @param userId
+     * @return
+     */
+    @Override
+    public List<String> getAgentNameList(Long userId){
+        CUser cUser = iUserService.selectById(userId);
+        List<Dict> dataDictList = findDictListByName(DictGroup.CARD.name(), DictGroup.DATA_SHIRO.name(), cUser.getLoginName());
+        List<String> agentNameList = new ArrayList<>();
+        for (Dict dict : dataDictList) {
+            agentNameList.add(dict.getdItemvalue());
+        }
+        return agentNameList;
+    }
+
 }

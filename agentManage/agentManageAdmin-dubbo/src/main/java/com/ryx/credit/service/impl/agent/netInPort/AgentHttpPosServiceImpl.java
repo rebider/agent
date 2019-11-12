@@ -3,11 +3,13 @@ package com.ryx.credit.service.impl.agent.netInPort;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.DictGroup;
 import com.ryx.credit.common.enumc.OrgType;
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.common.util.agentUtil.AESUtil;
 import com.ryx.credit.common.util.agentUtil.RSAUtil;
+import com.ryx.credit.dao.CBranchInnerMapper;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.RegionMapper;
 import com.ryx.credit.dao.bank.DPosRegionMapper;
@@ -64,6 +66,8 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
     private OrganizationMapper organizationMapper;
     @Autowired
     private AgentColinfoService agentColinfoService;
+    @Autowired
+    private CBranchInnerMapper branchInnerMapper;
 
     /**
      * 入网组装参数
@@ -178,6 +182,11 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
             resultMap.put("actBusId",agentBusInfo.getBusActivationParent());
             resultMap.put("actBusNum",actBudinfo.getBusNum());
         }
+        //查询相关联的大区经理账号
+        List accList = branchInnerMapper.selectInnerLogin(FastMap.fastMap("status", Status.STATUS_1.status).putKeyV("busId", agentBusInfo.getId()));
+        List delList = branchInnerMapper.selectInnerLogin(FastMap.fastMap("status", Status.STATUS_2.status).putKeyV("busId", agentBusInfo.getId()));
+        resultMap.put("managerAccount", String.join(",", accList));
+        resultMap.put("delManagerAccount", String.join(",", delList));
         return resultMap;
     }
 
@@ -253,7 +262,11 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
             data.put("agCode",paramMap.get("agCode"));//AG码
             data.put("actBusId",paramMap.get("actBusId"));//激活返现的业务id
             data.put("actBusNum",paramMap.get("actBusNum"));//激活返现的编码
-
+            //关联账号增加关系
+            if (null != paramMap.get("managerAccount"))
+                data.put("managerAccount",paramMap.get("managerAccount"));
+            if (null != paramMap.get("delManagerAccount"))
+                data.put("delManagerAccount",paramMap.get("delManagerAccount"));
             jsonParams.put("data", data);
             String plainXML = jsonParams.toString();
             // 请求报文加密开始
@@ -492,10 +505,12 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
             if (null == upSingCheckMap.get("BUSNUM")) throw new Exception("上级代理商信息不存在，请联系管理员！！！");
 
             //查询是否升级完成，升级完成之后不允许再次升级
-            if (null == agentBusInfo.getBusNum()) throw new Exception("请填写业务平台编号！！！");
+            /*if (null == agentBusInfo.getBusNum()) throw new Exception("请填写业务平台编号！！！");
             if (null == agentBusInfo.getBusPlatform()) throw new Exception("业务平台数据异常！！！");
             int i = agentBusInfoMapper.selectByBusNum(FastMap.fastMap("busNum",agentBusInfo.getBusNum()).putKeyV("busPlatform", agentBusInfo.getBusPlatform()));
-            if (i > 0 || agentBusInfo.getBusNum().equals(agentBusInfo.getBusParent())) throw new Exception("您已经升级成功，请勿重复提交！");
+            if (i > 0 || agentBusInfo.getBusNum().equals(agentBusInfo.getBusParent())) throw new Exception("您已经升级成功，请勿重复提交！");*/
+
+            if (null == agentBusInfo.getBusLoginNum() || "".equals(agentBusInfo.getBusLoginNum()) || "null".equals(agentBusInfo.getBusLoginNum())) throw new Exception("代理商升级，需填写对应平台登录账号！");
 
             String cooperator = Constants.cooperator;
             String tranCode = "ORG018"; // 交易码
@@ -510,7 +525,8 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
             jsonParams.put("data", FastMap.
                     fastMap("agentOrgId",upSingCheckMap.get("BUSNUM")).
                     putKeyV("orgId",agentBusInfo.getBusNum()).
-                    putKeyV("organInitials",upSingCheckMap.get("POSANAMEPREFIX")));
+                    putKeyV("organInitials",upSingCheckMap.get("POSANAMEPREFIX")).
+                    putKeyV("loginName", agentBusInfo.getBusLoginNum()));
             String plainXML = jsonParams.toString();
             log.info("POS预升级请求参数:{}", plainXML);
             // 请求报文加密开始
@@ -562,6 +578,7 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
                 }
             }
         }catch (Exception e){
+            e.printStackTrace();
             throw e;
         }
     }
