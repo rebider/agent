@@ -256,6 +256,10 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                         //更新入库
                         AgentVo vo = JSONObject.parseObject(dr.getDataContent(), AgentVo.class);
                         vo.getAgent().setcUser(rel.getcUser());     //直接新增收款账户时 此字段不可为空
+                        List<AgentColinfoVo> colinfoVoList = vo.getColinfoVoList();
+                        for (AgentColinfoVo agentColinfoVo : colinfoVoList) {
+                            agentColinfoVo.setCloReviewStatus(AgStatus.Approved.status);
+                        }
                         ResultVO res = agentColinfoService.updateAgentColinfoVo(vo.getColinfoVoList(), vo.getAgent(),rel.getcUser(),null);
                         logger.info("========审批流完成{}业务{}状态{},结果{}", proIns, rel.getBusType(), agStatus, res.getResInfo());
                         //更新数据状态为审批成功

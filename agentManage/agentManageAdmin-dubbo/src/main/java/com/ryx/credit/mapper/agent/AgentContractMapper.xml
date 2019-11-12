@@ -292,7 +292,10 @@
   <sql id="queryAgentContract">
     select
     ac.agent_id, aa.ag_name, aa.ag_status,
-    ac.cont_type, ac.cont_num, ac.cont_date, ac.cont_end_date, ac.append_agree, ac.remark
+    ac.cont_type, ac.cont_num,
+    to_char(ac.cont_date,'YYYY-MM-DD') as cont_date,
+    to_char(ac.cont_end_date,'YYYY-MM-DD') as cont_end_date,
+    ac.append_agree, ac.remark
     from a_agent_contract ac
     left join a_agent aa on ac.agent_id = aa.id
     left join c_organization org on org.id = aa.ag_doc_pro

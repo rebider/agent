@@ -35,12 +35,14 @@ public class AgentNotifyVo implements Serializable{
     private String loginName;
     private String remark;
     private java.util.List<String> batchIds;
-    private String debitTop;
-    private String ckDebitRate;
-    private String lowDebitRate;
+    private String debitTop;//借记封顶额上限
+    private String ckDebitRate;//借记出款费率
+    private String lowDebitRate;//借记费率下限
     private String activityType;
-    private String creditRateLower;
-    private String creditRateCeiling;
+    private String creditRateLower;//贷记费率下限
+    private String creditRateCeiling;//贷记费率上限
+    private String debitRateCapping;//借记费率上限
+    private String debitCappingLower;//借记封顶额下限
 
     public String getUniqueId() {
         return uniqueId;
@@ -248,5 +250,21 @@ public class AgentNotifyVo implements Serializable{
 
     public void setCreditRateCeiling(String creditRateCeiling) {
         this.creditRateCeiling = creditRateCeiling;
+    }
+
+    public String getDebitRateCapping() {
+        return debitRateCapping;
+    }
+
+    public void setDebitRateCapping(String debitRateCapping) {
+        this.debitRateCapping = debitRateCapping;
+    }
+
+    public String getDebitCappingLower() {
+        return debitCappingLower;
+    }
+
+    public void setDebitCappingLower(String debitCappingLower) {
+        this.debitCappingLower = debitCappingLower;
     }
 }

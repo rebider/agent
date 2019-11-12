@@ -239,6 +239,9 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
             data.put("lowDebitRate",paramMap.get("lowDebitRate"));
             data.put("lowCreditRate",paramMap.get("lowCreditRate"));
             data.put("ceilingCreditRate",paramMap.get("ceilingCreditRate"));
+            data.put("topDebitRate",paramMap.get("debitRateCapping"));
+            data.put("debitLow",paramMap.get("debitCappingLower"));
+
             if(StringUtils.isNotBlank(String.valueOf(paramMap.get("orgId")))){
                 data.put("orgId",paramMap.get("orgId"));
             }
@@ -285,7 +288,7 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
                 data.put("delManagerAccount",paramMap.get("delManagerAccount"));
             data.put("IsOper",paramMap.get("IsOper"));
             data.put("operOrgId",paramMap.get("operOrgId"));
-            
+
             jsonParams.put("data", data);
             String plainXML = jsonParams.toString();
             // 请求报文加密开始
