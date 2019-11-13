@@ -35,16 +35,16 @@ public class OrderAdjustTaskExecutionListener extends BaseTaskListener implement
             OrderService orderService = (OrderService)MySpringContextHandler.applicationContext.getBean("orderService");
             //审批拒绝
             if ("reject_end".equals(activityName)) {
-                logger.info("=========OrderTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
+                logger.info("=========OrderAdjustTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
                 AgentResult res = orderService.approveFinish(delegateExecution.getProcessInstanceId(),activityName);
-                logger.info("=========OrderTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
+                logger.info("=========OrderAdjustTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
 
             }
             //审批同意更新数据库
             if ("finish_end".equals(activityName)) {
-                logger.info("=========OrderTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
+                logger.info("=========OrderAdjustTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
                 AgentResult res = orderService.approveFinish(delegateExecution.getProcessInstanceId(),activityName);
-                logger.info("=========OrderTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
+                logger.info("=========OrderAdjustTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
 
             }
         } else if ("take".equals(eventName)) {
