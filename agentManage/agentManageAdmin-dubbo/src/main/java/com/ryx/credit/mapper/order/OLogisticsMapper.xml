@@ -554,8 +554,10 @@
   <select id="queryLogicInfoIdByStatus" parameterType="map" resultType="string">
     select a.id from o_logistics a where a.status=1
     and a.log_type=#{logType,jdbcType=VARCHAR}
-    and a.send_status = #{sendStatus,jdbcType=DECIMAL}
     <if test="status != null and status !=''">AND a.status = #{status, jdbcType=DECIMAL}</if>
+    and a.send_status in( #{sendStatus,jdbcType=DECIMAL}
+        <if test="sendStatus2 != null and sendStatus2 != ''">, #{sendStatus2,jdbcType=DECIMAL} </if>
+    )
     <if test="count!=null and count!=''"> and a.send_num &gt; #{count,jdbcType=DECIMAL} </if>
   </select>
 
