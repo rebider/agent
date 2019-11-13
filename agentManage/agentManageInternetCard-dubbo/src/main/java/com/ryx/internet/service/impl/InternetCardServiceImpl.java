@@ -1053,8 +1053,8 @@ public class InternetCardServiceImpl implements InternetCardService {
                 oInternetCard.setStatus(Status.STATUS_1.status);
                 oInternetCard.setVersion(BigDecimal.ONE);
                 if(agentBusInfo!=null){
-                    internetCard.setBusNum(agentBusInfo.getBusNum());
-                    internetCard.setBusPlatform(agentBusInfo.getBusPlatform());
+                    oInternetCard.setBusNum(agentBusInfo.getBusNum());
+                    oInternetCard.setBusPlatform(agentBusInfo.getBusPlatform());
                 }
                 internetCardMapper.insert(oInternetCard);
             }
