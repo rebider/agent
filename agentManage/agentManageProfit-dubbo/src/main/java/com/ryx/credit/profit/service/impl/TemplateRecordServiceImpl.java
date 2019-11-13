@@ -308,6 +308,12 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         recodeMapper.updateByPrimaryKeySelective(templateRecode);
     }
 
+
+
+
+
+
+
     /**
      * 联动RJPOS保存申请信息
      * @param url
@@ -702,6 +708,18 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     @Override
     public Object checkTempalteName(String applyId)throws MessageException{
         TemplateRecode templateRecode = recodeMapper.selectByPrimaryKey(applyId);
+
+        JSONObject mapJSONObject = new JSONObject();
+        mapJSONObject.put("applyId",templateRecode.getTemplateId());
+        mapJSONObject.put("isStartMonth","1");
+        String CheckResult = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, mapJSONObject.toJSONString());
+        Map<String,Object> resultM = JSONObject.parseObject(CheckResult);
+
+        Map<String,Object> objectM = (Map<String,Object>)resultM.get("data");
+
+        if(objectM.get("isExist").toString().equals("1")){
+           return true;
+        }
         if(templateRecode == null){
             throw new MessageException("查询该模板申请信息失败，请联系管理员");
         }
