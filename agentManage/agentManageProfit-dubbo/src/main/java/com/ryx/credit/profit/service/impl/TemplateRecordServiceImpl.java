@@ -222,7 +222,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         Map startPar = agentEnterService.startPar(map1.get("userId"));
         String proceId = null;
 
-        List<Dict> actlist = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.PROFIT_TEMPLATE_APPLY3.name());
+        List<Dict> actlist = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.PROFIT_TEMPLATE_APPLY.name());
         String workId = null;
         for (Dict dict : actlist) {
             workId = dict.getdItemvalue();
@@ -665,14 +665,27 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
      */
     @Override
     public Map<String,Object> checkTemplate(String applyId)throws MessageException{
+        JSONObject map2 = new JSONObject();
         TemplateRecode templateRecode = recodeMapper.selectByPrimaryKey(applyId);
+        JSONObject mapJSONObject = new JSONObject();
+        mapJSONObject.put("applyId",templateRecode.getTemplateId());
+        mapJSONObject.put("isStartMonth","1");
+        String CheckResult = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, mapJSONObject.toJSONString());
+        Map<String,Object> resultM = JSONObject.parseObject(CheckResult);
+
+        Map<String,Object> objectM = (Map<String,Object>)resultM.get("data");
+
+        if(objectM.get("isExist").toString().equals("1")){
+            map2.put("isStartMonth",1);
+        }
+
         if(templateRecode == null){
             throw new MessageException("查询该模板申请信息失败，请联系管理员");
         }
         Map<String,String> stringMap = getAgentInfo(templateRecode.getBusNum());
         try{
             String result = null;
-            JSONObject map2 = new JSONObject();
+
             map2.put("applyId",templateRecode.getTemplateId());
             if("RJPOS".equals(stringMap.get("PLATFORM_TYPE"))){ // 瑞+
                 result = HttpClientUtil.doPostJson(RJ_TEMPLATE_APPLY_CHECK, map2.toJSONString());
