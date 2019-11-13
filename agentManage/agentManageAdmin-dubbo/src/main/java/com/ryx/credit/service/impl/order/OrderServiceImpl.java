@@ -4249,5 +4249,15 @@ public class OrderServiceImpl implements OrderService {
         return agentResult;
     }
 
+    @Override
+    public OrderAdj getByAdjIdStatus(String adjId) {
+        OrderAdjExample orderAdjExample = new OrderAdjExample();
+        orderAdjExample.or()
+                .andStatusEqualTo(Status.STATUS_1.status)
+                .andIdEqualTo(adjId);
+        List<OrderAdj> orderAdjList = orderAdjMapper.selectByExample(orderAdjExample);
+        OrderAdj orderAdj = orderAdjList.get(0);
+        return orderAdj;
+    }
 
 }

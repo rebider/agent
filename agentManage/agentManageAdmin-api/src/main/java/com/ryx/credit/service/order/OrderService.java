@@ -302,4 +302,6 @@ public interface OrderService {
      */
     AgentResult updateOrderAdjust(OrderUpModelVo orderUpModelVo, String userId) throws Exception;
 
+    OrderAdj getByAdjIdStatus(String adjId);
+
 }
