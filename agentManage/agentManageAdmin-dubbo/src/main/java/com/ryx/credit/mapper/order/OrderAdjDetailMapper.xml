@@ -189,7 +189,15 @@
   <select id="selectByAdjustId" parameterType="java.lang.String" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
-    from O_ORDER_ADJ_DETAIL
-    where ADJ_ID = #{adjId,jdbcType=VARCHAR} and status = 1
+    from o_order_adj_detail detail
+    <where>
+      1=1 and detail.status=1
+      <if test="adjId!=null and adjId!=''">
+        and detail.adj_id = #{adjId}
+      </if>
+      <if test="adjDetailId!=null and adjDetailId!=''">
+        and detail.id = #{adjDetailId}
+      </if>
+    </where>
   </select>
 </mapper>

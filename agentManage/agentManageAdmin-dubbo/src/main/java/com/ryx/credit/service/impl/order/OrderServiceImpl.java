@@ -4178,7 +4178,7 @@ public class OrderServiceImpl implements OrderService {
                 BigDecimal countPlans = receiptPlanMapper.planCountTotal(oSubOrders.get(0).getOrderId(), oSubOrders.get(0).getProId());//排单数量
                 long adjSuccessNum = orderAdjDetailMapper.countAdjNum(fastMap);//已调整数量
                 BigDecimal enableNum = oSubOrders.get(0).getProNum().subtract(oReceiptPros.subtract(BigDecimal.valueOf(adjSuccessNum)));
-                if (new BigDecimal(adjProVo.getAdjNum()).compareTo(enableNum)<0 && new BigDecimal(adjProVo.getAdjNum()).compareTo(new BigDecimal(0))>0) {
+                if (new BigDecimal(adjProVo.getAdjNum()).compareTo(enableNum) > 0) {
                     agentResult.setMsg("可调整机具数量错误！");
                     adjFlag = false;
                     break;
@@ -4198,12 +4198,16 @@ public class OrderServiceImpl implements OrderService {
         orderAdj.setOrgStagesAmount(new BigDecimal(orderUpModelVo.getOrgStagesAmount()));//原分期金额
         orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundMethod()));//退款方式
 
-        OrderAdjDetail orderAdjDetail = orderAdjDetailMapper.selectByAdjustId(orderAdj.getId());
-        adjPros.forEach(adjProVo -> {
+        for (AdjProVo adjProVo : adjPros) {
+            OrderAdjDetail orderAdjDetail = orderAdjDetailMapper.selectByAdjustId(orderAdj.getId(), adjProVo.getAdjDetailId());
             orderAdjDetail.setAdjNum(new BigDecimal(adjProVo.getAdjNum()));
             orderAdjDetail.setDifAmount(adjProVo.getCalPrice());
-            orderAdjDetailMapper.updateByPrimaryKeySelective(orderAdjDetail);
-        });
+            if (1 != orderAdjDetailMapper.updateByPrimaryKeySelective(orderAdjDetail)) {
+                logger.info("订单调整明细:{}", "订单调整明细修改失败！");
+                throw new ProcessException("订单调整明细修改失败！");
+            }
+            logger.info("订单调整明细:{},{},{},{}", orderAdj.getId(), adjProVo.getAdjDetailId(), "订单调整明细修改失败！", userId);
+        }
 
         List<String> attFiles = orderUpModelVo.getFiles();
         //删除附件
@@ -4218,28 +4222,29 @@ public class OrderServiceImpl implements OrderService {
                 attachmentRelItem.setStatus(Status.STATUS_0.status);
                 if (1 != attachmentRelMapper.updateByPrimaryKeySelective(attachmentRelItem)) {
                     logger.info("订单调整:{},{},{}", orderAdj.getId(), "删除附件失败", userId);
-                    throw new MessageException("删除附件失败！");
+                    throw new ProcessException("删除附件失败！");
                 }
                 logger.info("订单调整:{},{},{}", orderAdj.getId(), "删除附件成功！", userId);
             }
         }
         //添加新附件
         AttachmentRel record = new AttachmentRel();
-        if (attFiles.size() > 0)
-            attFiles.forEach(attfile -> {
-                record.setAttId(attfile);
+        if (attFiles.size() > 0) {
+            for (String attFile : attFiles) {
+                record.setAttId(attFile);
                 record.setSrcId(orderAdj.getId());
                 record.setcUser(orderAdj.getAdjUserId());
                 record.setcTime(orderAdj.getAdjTm());
                 record.setStatus(Status.STATUS_1.status);
                 record.setBusType(AttachmentRelType.orderAdjust.name());
                 record.setId(idService.genId(TabId.a_attachment_rel));
-                logger.info("添加订单调整附件关系,订单调整ID{},附件ID{}", orderAdj.getId(), attfile);
+                logger.info("添加订单调整附件关系,订单调整ID{},附件ID{}", orderAdj.getId(), attFile);
                 if (1 != attachmentRelMapper.insertSelective(record)) {
-                    logger.info("公告添加:{}", "添加订单调整附件关系失败！");
+                    logger.info("订单调整添加附件:{}", "添加订单调整附件关系失败！");
                     throw new ProcessException("添加订单调整附件关系失败！");
                 }
-            });
+            }
+        }
 
         if (1 == orderAdjMapper.updateByPrimaryKeySelective(orderAdj)) {
             agentResult.setStatus(AgentResult.OK);
