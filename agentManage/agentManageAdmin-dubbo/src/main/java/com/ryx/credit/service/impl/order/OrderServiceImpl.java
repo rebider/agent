@@ -1294,14 +1294,17 @@ public class OrderServiceImpl implements OrderService {
         //计算待付款分期款
         BigDecimal singlePrice = new BigDecimal(0.00);
         if (null!=oPaymentDetails && oPaymentDetails.size()>0){
-            BigDecimal[] price = {new BigDecimal(0)};
-                oPaymentDetails.forEach(oPaymentDetail -> {
-                    if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.DF.code)==0){
-                        price[0] = price[0].add(oPaymentDetail.getPayAmount());
-                    }
-                });
-                singlePrice = price[0].divide(new BigDecimal(oPaymentDetails.size()),2);
-
+            BigDecimal price = BigDecimal.ZERO;
+            BigDecimal size = new BigDecimal(0);
+            for (OPaymentDetail oPaymentDetail:oPaymentDetails){
+                if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.DF.code)==0){
+                    price = price.add(oPaymentDetail.getPayAmount());
+                    size = size.add(BigDecimal.valueOf(1));
+                }
+            }
+            if (size.compareTo(BigDecimal.ZERO) > 0){
+                singlePrice = price.divide(size,2);
+            }
         }
         f.putKeyV("singlePrice",singlePrice);
 
@@ -3900,24 +3903,25 @@ public class OrderServiceImpl implements OrderService {
         OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
         oPaymentDetailExample.or()
                 .andStatusEqualTo(Status.STATUS_1.status)
+                .andPaymentStatusEqualTo(PaymentStatus.DF.code)
                 .andPaymentIdEqualTo(oPayment.getId()).andOrderIdEqualTo(orderId);
         oPaymentDetailExample.setOrderByClause(" pay_time asc, plan_num asc, plan_pay_time asc ");
         List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
 
-        //
-        List<OPaymentDetail> oPaymentDetails1 = oPaymentDetailMapper.selectCount(orderId,oPaymentDetails.get(0).getPaymentType(),PaymentStatus.DF.code);
+        //计算待付款分期款
+        BigDecimal[] price = {new BigDecimal(0)};
+        if (null!=oPaymentDetails && oPaymentDetails.size()>0){
 
-        if (null!= oPaymentDetails1&&oPaymentDetails1.size()>0) {
-
-            BigDecimal[] price = {new BigDecimal(0)};
-            oPaymentDetails1.forEach(oPaymentDetail -> {
-                price[0] = price[0].add(oPaymentDetail.getPayAmount());
+            oPaymentDetails.forEach(oPaymentDetail -> {
+                    price[0] = price[0].add(oPaymentDetail.getPayAmount());
             });
-            FastMap f = FastMap.fastMap("outstandingAmount", price[0]);//待还金额
-            f.putKeyV("outstandingNum",oPaymentDetails1.size());
-            return AgentResult.ok(f);
+
+
         }
-        return null;
+        FastMap f = FastMap.fastMap("outstandingAmount", price[0]);//待还金额
+        f.putKeyV("outstandingNum",oPaymentDetails.size());
+        return AgentResult.ok(f);
+
 
     }
 
