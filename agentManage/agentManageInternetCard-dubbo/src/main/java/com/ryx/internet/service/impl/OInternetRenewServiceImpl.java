@@ -860,7 +860,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             }
             //是否需续费为是,才展示按钮
             if(oInternetCard.getRenew().compareTo(BigDecimal.ZERO)==0){
-                throw new MessageException("是否需续费否,不允许续费");
+                throw new MessageException("是否需续费为否,不允许续费");
             }
             if((oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NORMAL.getValue())==0 || oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NOACTIVATE.getValue())==0 )
                     && oInternetCard.getRenewStatus().equals(InternetRenewStatus.WXF.getValue())){
