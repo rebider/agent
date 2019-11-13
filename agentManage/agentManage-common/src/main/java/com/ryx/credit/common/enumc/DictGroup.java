@@ -97,7 +97,10 @@ public enum DictGroup {
     ANN_ORG("公告运维机构"),
     REMOVEACCOUNT_FAIL_EMAIL("销账失败邮件"),
     RATYPE("销账方式"),
-    RSTATUS("销账状态");
+    RSTATUS("销账状态"),
+
+    RELATION_PLATFORM_NUM("平台关系");
+
 
     public String  msg;
 
