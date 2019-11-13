@@ -65,8 +65,6 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     @Autowired
     private AttachmentRelService attachmentRelService;
     @Autowired
-    private AgentService agentService;
-    @Autowired
     private AttachmentService attachmentService;
     @Autowired
     private AgentEnterService agentEnterService;
