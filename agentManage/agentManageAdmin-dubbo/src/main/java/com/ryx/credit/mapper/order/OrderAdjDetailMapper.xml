@@ -178,14 +178,13 @@
     </if>
   </sql>
   <select id="countAdjNum" parameterType="map" resultType="java.lang.Long">
-    select count(*)
-    from (select *
+    select nvl(sum(adj_d.adj_num),0)
             from o_order_adj_detail adj_d
             left join o_order_adj ad
               on ad.id = adj_d.adj_id and ad.status=1
            where SUB_ORDER_ID = #{map.subOrderId}
              and ad.reviews_stat = '4'
-             and adj_d.status=1)
+             and adj_d.status=1
   </select>
   <select id="selectByAdjustId" parameterType="java.lang.String" resultMap="BaseResultMap">
     select
