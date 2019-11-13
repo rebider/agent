@@ -345,14 +345,17 @@
     from o_sub_order
     where o_sub_order.status = 1
     and o_sub_order.order_id = oa.order_id) as pro_name,
-    (select LISTAGG(o_sub_order_activity.activity_name, ',') WITHIN
-    GROUP(
-    ORDER BY o_sub_order.order_id)
-    from o_sub_order_activity
-    left join o_sub_order on o_sub_order_activity.sub_order_id = o_sub_order.id
-    and o_sub_order_activity.status = 1
-    where o_sub_order.status = 1
-    and o_sub_order.order_id = oo.id) as activity_name,
+    (select LISTAGG(o_sub_order_activity.activity_name,',') WITHIN GROUP(ORDER BY oa.order_id)
+      from o_sub_order_activity
+      left join o_sub_order
+      on o_sub_order_activity.sub_order_id =
+      o_sub_order.id
+      and o_sub_order.status = '1'
+      left join o_order_adj
+      on o_order_adj.order_id = o_sub_order.order_id
+      and o_order_adj.status = 1
+      where o_sub_order.order_id = oa.order_id
+      ) as activity_name,
     f.name as ag_doc_district, g.name as ag_doc_pro
     from o_order_adj oa
     left join o_order oo on oa.order_id = oo.id
