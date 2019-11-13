@@ -321,68 +321,49 @@
   </sql>
   <sql id="selectAgentUpModelViewSql">
     select oa.id as adj_id,
-    oo.id as order_id,
+    oa.order_id,
     oa.adj_tm,
     oa.REVIEWS_STAT,
-    (select ag.ag_uniq_num
-    from a_agent ag
-    left join o_order
-    on o_order.agent_id = ag.id
-    where o_order.id = oo.id) as ag_uniq_num,
-    (select ab.bus_num
+    oa.agent_id,
+    (select ab.bus_platform
     from a_agent_businfo ab
-    left join o_order
-    on o_order.bus_id = ab.id
+    left join o_order on o_order.bus_id = ab.id
     where o_order.id = oa.order_id) as platform,
     (select PLATFORM_NAME
     from A_PLATFORM ap
-    left join a_agent_businfo ab
-    on ap.platform_num = ab.bus_platform
-    left join o_order
-    on o_order.bus_id = ab.id
+    left join a_agent_businfo ab on ap.platform_num =
+    ab.bus_platform
+    left join o_order on o_order.bus_id = ab.id
     where o_order.id = oa.order_id) as platform_name,
     cu.name as req_name,
     oa.refund_stat,
     oa.refund_tm,
     ag.ag_name,
-    (select LISTAGG(o_sub_order.pro_name, ',') WITHIN GROUP(ORDER BY o_sub_order.order_id)
+    (select LISTAGG(o_sub_order.pro_name, ',') WITHIN
+    GROUP(
+    ORDER BY o_sub_order.order_id)
     from o_sub_order
     where o_sub_order.status = 1
     and o_sub_order.order_id = oa.order_id) as pro_name,
-    (select LISTAGG(o_sub_order_activity.activity_name, ',') WITHIN GROUP(ORDER BY o_sub_order.order_id)
+    (select LISTAGG(o_sub_order_activity.activity_name, ',') WITHIN
+    GROUP(
+    ORDER BY o_sub_order.order_id)
     from o_sub_order_activity
-    left join o_sub_order
-    on o_sub_order_activity.sub_order_id = o_sub_order.id
-    and o_sub_order.status = 1
+    left join o_sub_order on o_sub_order_activity.sub_order_id = o_sub_order.id
     and o_sub_order_activity.status = 1
     where o_sub_order.status = 1
-    and o_sub_order_activity.status = 1
     and o_sub_order.order_id = oo.id) as activity_name,
-    (select c_organization.name
-    from c_organization
-    where c_organization.id =
-    (select ag_doc_pro
-    from A_agent_businfo
-    left join o_order
-    on o_order.bus_id = A_agent_businfo.Id
-    where o_order.id = oo.id)) as ag_doc_pro,
-    (select c_organization.name
-    from c_organization
-    where c_organization.id =
-    (select ag_doc_district
-    from A_agent_businfo
-    left join o_order
-    on o_order.bus_id = A_agent_businfo.Id
-    where o_order.id = oo.id)) as ag_doc_district
+    f.name as ag_doc_district, g.name as ag_doc_pro
     from o_order_adj oa
-    left join o_order oo
-    on oa.order_id = oo.id and oo.status=1
-    left join a_agent ag
-    on ag.id = oo.agent_id and ag.status=1
-    left join c_user cu
-    on cu.id = oa.adj_user_id
-    left join a_agent_businfo ab
-    on ab.id = oo.bus_id and ab.status=1
+    left join o_order oo on oa.order_id = oo.id
+    and oo.status = 1
+    left join a_agent ag on ag.id = oa.agent_id
+    and ag.status = 1
+    left join c_user cu on cu.id = oa.adj_user_id
+    left join a_agent_businfo ab on ab.id = oo.bus_id and ag.id = ab.agent_id
+    and ab.status = 1
+    left join c_organization f on f.id= ab.ag_doc_district
+    left join c_organization g on g.id= ab.ag_doc_pro
     <where>
       <if test="1==1"> and oa.status=1 </if>
      <!-- <if test="map.agentId!=null and map.agentId!=''"> and oa.agent_id = #{map.agentId} </if>-->
@@ -396,15 +377,15 @@
         (select * from o_sub_order os
         where os.pro_name like concat(concat('%',#{map.proName}),'%') and os.status = 1 and os.order_id = oa.order_id)
       </if>
-      <if test="map.platfromPerm!=null and map.platfromPerm.size>0">
-        and ab.bus_platform in
-        <foreach collection="map.platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
-          #{platfromPermItem.PLATFORM_NUM}
-        </foreach>
-      </if>
-      <if test="map.platfromPerm==null or map.platfromPerm.size==0">
-        and 1=-1
-      </if>
+      <!--<if test="map.platfromPerm!=null and map.platfromPerm.size>0">-->
+        <!--and ab.bus_platform in-->
+        <!--<foreach collection="map.platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >-->
+          <!--#{platfromPermItem.PLATFORM_NUM}-->
+        <!--</foreach>-->
+      <!--</if>-->
+      <!--<if test="map.platfromPerm==null or map.platfromPerm.size==0">-->
+        <!--and 1=-1-->
+      <!--</if>-->
     </where>
   </sql>
   <select id="selectAgentUpModelView" parameterType="map" resultType="map">

@@ -3890,7 +3890,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public AgentResult refreshPaymentDetail(String orderId) {
-
         //支付信息
         OPaymentExample oPaymentExample = new OPaymentExample();
         oPaymentExample.or().andStatusEqualTo(Status.STATUS_1.status).andOrderIdEqualTo(orderId);
@@ -3911,12 +3910,9 @@ public class OrderServiceImpl implements OrderService {
         //计算待付款分期款
         BigDecimal[] price = {new BigDecimal(0)};
         if (null!=oPaymentDetails && oPaymentDetails.size()>0){
-
             oPaymentDetails.forEach(oPaymentDetail -> {
                     price[0] = price[0].add(oPaymentDetail.getPayAmount());
             });
-
-
         }
         FastMap f = FastMap.fastMap("outstandingAmount", price[0]);//待还金额
         f.putKeyV("outstandingNum",oPaymentDetails.size());
@@ -3937,7 +3933,7 @@ public class OrderServiceImpl implements OrderService {
             return agentResult;
         }
         order.setStatus(OrderStatus.LOCK.status);
-        if (orderMapper.updateByPrimaryKey(order)>0){
+        if (orderMapper.updateByPrimaryKey(order)!=1){
             agentResult.setMsg("更新订单为["+OrderStatus.LOCK.msg+"]失败!");
             return agentResult;
         };
@@ -4084,7 +4080,7 @@ public class OrderServiceImpl implements OrderService {
         }
         if (StringUtils.isBlank(cuser)) {
             logger.info("订单调整提交审批，操作用户为空{}:{}", id, cuser);
-            return AgentResult.fail("代理商调整审批中，操作用户为空！");
+            return AgentResult.fail("订单调整审批中，操作用户为空！");
         }
         if (!orderAdj.getAdjUserId().equals(cuser)) {
             logger.info("提交审批的用户必须是创建订单的用户{}:{}", id, cuser);
@@ -4144,7 +4140,7 @@ public class OrderServiceImpl implements OrderService {
         record.setNetInBusType("ACTIVITY_"+order.getOrderPlatform());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("订单调整提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
-            throw new MessageException("审批流启动失败：添加审批关系失败！");
+            throw new MessageException("订单调整审批流启动失败：添加审批关系失败！");
         }
         return AgentResult.ok();
     }
