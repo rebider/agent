@@ -1067,15 +1067,22 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             oInternetRenewDetail.setuTime(new Date());
             oInternetRenewDetail.setRenewStatus(InternetRenewStatus.YXF.getValue());
             oInternetRenewDetail.setRealityAmt(oInternetRenewDetail.getOughtAmt());
-            internetRenewDetailMapper.updateByPrimaryKeySelective(oInternetRenewDetail);
+            int i = internetRenewDetailMapper.updateByPrimaryKeySelective(oInternetRenewDetail);
+            if(i!=1){
+                log.info("分润抵扣历史数据处理失败1",oInternetRenewDetail.getId());
+                continue;
+            }
             OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(oInternetRenewDetail.getIccidNum());
             oInternetCard.setExpireTime(DateUtil.getOneYearLater(oInternetCard.getExpireTime()));
             oInternetCard.setRenewStatus(InternetRenewStatus.YXF.getValue());
             oInternetCard.setStop(Status.STATUS_0.status);
             oInternetCard.setRenew(Status.STATUS_0.status);
             oInternetCard.setuTime(new Date());
-            internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
+            int j = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
+            if(j!=1){
+                log.info("分润抵扣历史数据处理失败2",oInternetCard.getIccidNum());
+            }
         }
-        log.info("分润抵扣历史数据处理结束");
+        log.info("分润抵扣历史数据处理结束,处理个数{}",oInternetRenewDetails.size());
     }
 }
