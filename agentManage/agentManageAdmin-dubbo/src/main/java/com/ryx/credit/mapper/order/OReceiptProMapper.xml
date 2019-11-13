@@ -274,7 +274,7 @@
   </sql>
 
   <select id="receiptCountTotal" resultType="java.math.BigDecimal" parameterType="String">
-    select sum(pro.pro_num) from o_receipt_pro pro
+    select nvl(sum(pro.pro_num),0) from o_receipt_pro pro
     left join o_receipt_plan rp on rp.id = pro.pro_id and rp.order_id = pro.orderid and rp.status=1
     <where>
       1=1 and pro.status=1

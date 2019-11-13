@@ -4071,7 +4071,7 @@ public class OrderServiceImpl implements OrderService {
         OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(id);
         if (StringUtils.isBlank(id)) {
             logger.info("订单调整提交审批，订单调整ID为空{}:{}", id, cuser);
-            return AgentResult.fail("订单调整提交审批，订单ID为空!");
+            return AgentResult.fail("订单调整提交审批，订单调整ID为空!");
         }
         if (StringUtils.isBlank(cuser)) {
             logger.info("订单调整提交审批，操作用户为空{}:{}", id, cuser);
@@ -4165,24 +4165,10 @@ public class OrderServiceImpl implements OrderService {
             List<OSubOrder> oSubOrders = oSubOrderMapper.selectByExample(osubOrderExample);
             if (oSubOrders.size() > 0) {
                 FastMap fastMap = FastMap.fastMap("subOrderId", oSubOrders.get(0).getId());
-                //排单
-                ReceiptPlanExample receiptPlanExample = new ReceiptPlanExample();
-                receiptPlanExample.or()
-                        .andOrderIdEqualTo(oSubOrders.get(0).getOrderId())
-                        .andProIdEqualTo(oSubOrders.get(0).getProId())
-                        .andProTypeEqualTo(oSubOrders.get(0).getProCode())
-                        .andStatusEqualTo(Status.STATUS_1.status);
-                long countPlans = receiptPlanMapper.countByExample(receiptPlanExample);
-                //配货
-                OReceiptProExample oReceiptProExample = new OReceiptProExample();
-                oReceiptProExample.or()
-                        .andOrderidEqualTo(oSubOrders.get(0).getOrderId())
-                        .andProIdEqualTo(oSubOrders.get(0).getProId())
-                        .andProCodeEqualTo(oSubOrders.get(0).getProCode())
-                        .andStatusEqualTo(Status.STATUS_1.status);
-                long oReceiptPros = oReceiptProMapper.countByExample(oReceiptProExample);
-                long adjSuccessNum = orderAdjDetailMapper.countAdjNum(fastMap);
-                BigDecimal enableNum = oSubOrders.get(0).getProNum().subtract(BigDecimal.valueOf(countPlans).add(BigDecimal.valueOf(oReceiptPros)).add(BigDecimal.valueOf(adjSuccessNum)));
+                BigDecimal oReceiptPros = oReceiptProMapper.receiptCountTotal(oSubOrders.get(0).getOrderId(), oSubOrders.get(0).getProId());//配货数量
+                BigDecimal countPlans = receiptPlanMapper.planCountTotal(oSubOrders.get(0).getOrderId(), oSubOrders.get(0).getProId());//排单数量
+                long adjSuccessNum = orderAdjDetailMapper.countAdjNum(fastMap);//已调整数量
+                BigDecimal enableNum = oSubOrders.get(0).getProNum().subtract(oReceiptPros.subtract(BigDecimal.valueOf(adjSuccessNum)));
                 if (new BigDecimal(adjProVo.getAdjNum()).compareTo(enableNum)<0 && new BigDecimal(adjProVo.getAdjNum()).compareTo(new BigDecimal(0))>0) {
                     agentResult.setMsg("可调整机具数量错误！");
                     adjFlag = false;
