@@ -71,8 +71,6 @@ public class InternetCardServiceImpl implements InternetCardService {
     @Autowired
     private OInternetCardMerchMapper internetCardMerchMapper;
     @Autowired
-    private OInternetRenewDetailMapper internetRenewDetailMapper;
-    @Autowired
     private OInternetCardPostponeMapper internetCardPostponeMapper;
     @Autowired
     private IUserService iUserService;
@@ -901,6 +899,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             expireTimeList.add(DateUtil.getPerDayOfMonth(3));
             reqMap.put("expireTimeList",expireTimeList);
             List<OInternetCard> oInternetCards = internetCardMapper.selectInternetCardRenew(reqMap);
+            log.info("更新已修改的商户信息数量:{}",oInternetCards.size());
             for (OInternetCard oInternetCard : oInternetCards) {
                 OInternetCardMerch oInternetCardMerch = internetCardMerchMapper.selectChnTermposi(BigDataEncode.encode(oInternetCard.getIccidNum()));
                 if(null!=oInternetCardMerch){
@@ -912,6 +911,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                         if(i!=1){
                             log.error("1定时任务更新商户信息失败:IccidNum:{},商户编号:{},商户名称:{}",oInternetCard.getIccidNum(),oInternetCardMerch.getChnMerchId(),oInternetCardMerch.getMerchName());
                         }
+                        log.info("更新息已修改的商户信息1,iccid:{}",oInternetCard.getIccidNum());
                         continue;
                     }
                     //只要有一个不相等就执行更新操作
@@ -922,6 +922,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                         if(i!=1){
                             log.error("2定时任务更新商户信息失败:IccidNum:{},商户编号:{},商户名称:{}",oInternetCard.getIccidNum(),oInternetCardMerch.getChnMerchId(),oInternetCardMerch.getMerchName());
                         }
+                        log.info("更新息已修改的商户信息2,iccid:{}",oInternetCard.getIccidNum());
                         continue;
                     }
                 }
@@ -1005,8 +1006,8 @@ public class InternetCardServiceImpl implements InternetCardService {
         String batchNo = IDUtils.getBatchNo();
         for (OLogisticsDetail oLogisticsDetail : logisticsDetailList) {
             OInternetCard internetCard = internetCardMapper.selectBySnNum(oLogisticsDetail.getSnNum());
+            AgentBusInfo agentBusInfo = agentBusinfoService.getById(oLogisticsDetail.getBusId());
             if (null != internetCard){
-                //oInternetCard.setIccidNum(oLogisticsDetail.getSnNum());
                 internetCard.setBatchNum(batchNo);
                 internetCard.setOrderId(oLogisticsDetail.getOrderId());
                 internetCard.setDeliverTime(oLogisticsDetail.getcTime());
@@ -1024,7 +1025,12 @@ public class InternetCardServiceImpl implements InternetCardService {
                 internetCard.setuUser(internetCard.getcUser());
                 internetCard.setStatus(Status.STATUS_1.status);
                 internetCard.setVersion(BigDecimal.ONE);
+                if(agentBusInfo!=null){
+                    internetCard.setBusNum(agentBusInfo.getBusNum());
+                    internetCard.setBusPlatform(agentBusInfo.getBusPlatform());
+                }
                 internetCardMapper.updateByPrimaryKeySelective(internetCard);
+
             }else {
                 OInternetCard oInternetCard = new OInternetCard();
                 oInternetCard.setIccidNum(oLogisticsDetail.getSnNum());
@@ -1046,6 +1052,10 @@ public class InternetCardServiceImpl implements InternetCardService {
                 oInternetCard.setuUser(oInternetCard.getcUser());
                 oInternetCard.setStatus(Status.STATUS_1.status);
                 oInternetCard.setVersion(BigDecimal.ONE);
+                if(agentBusInfo!=null){
+                    internetCard.setBusNum(agentBusInfo.getBusNum());
+                    internetCard.setBusPlatform(agentBusInfo.getBusPlatform());
+                }
                 internetCardMapper.insert(oInternetCard);
             }
         }
