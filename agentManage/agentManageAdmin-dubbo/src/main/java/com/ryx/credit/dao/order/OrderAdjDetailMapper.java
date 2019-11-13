@@ -26,5 +26,5 @@ public interface OrderAdjDetailMapper {
 
     long countAdjNum(@Param("map") Map<String,Object> map);
 
-    OrderAdjDetail selectByAdjustId(String adjId);
+    OrderAdjDetail selectByAdjustId(@Param("adjId") String adjId, @Param("adjDetailId") String adjDetailId);
 }

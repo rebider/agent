@@ -13,6 +13,15 @@ public class AdjProVo implements Serializable {
     private  String oSubId;
     private String adjNum;
     private BigDecimal calPrice;
+    private String adjDetailId;
+
+    public String getAdjDetailId() {
+        return adjDetailId;
+    }
+
+    public void setAdjDetailId(String adjDetailId) {
+        this.adjDetailId = adjDetailId;
+    }
 
     public String getoSubId() {
         return oSubId;
