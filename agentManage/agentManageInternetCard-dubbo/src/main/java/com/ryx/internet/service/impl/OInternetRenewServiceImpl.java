@@ -516,7 +516,8 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
 
             Dict offsetAmt = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.INTERNET_RENEW.name(), DictGroup.OFFSET_AMT.name());
             //没有轧差直接设置为0
-            if(internetRenew.getRenewWay().equals(InternetRenewWay.FRDK.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.XXBK.getValue())){
+            if(internetRenew.getRenewWay().equals(InternetRenewWay.FRDK.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.XXBK.getValue())
+                || internetRenew.getRenewWay().equals(InternetRenewWay.GSCD.getValue())){
                 internetRenew.setSumOffsetAmt(BigDecimal.ZERO);
             }else{
                 if(offsetAmt==null){
@@ -611,7 +612,13 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 }
                 oInternetRenewDetail.setAgentName(oInternetCard.getAgentName());
                 oInternetRenewDetail.setRenewWay(internetRenew.getRenewWay());
-                oInternetRenewDetail.setOffsetAmt(new BigDecimal(offsetAmt.getdItemvalue()));
+
+                if(internetRenew.getRenewWay().equals(InternetRenewWay.FRDK.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.XXBK.getValue())
+                        || internetRenew.getRenewWay().equals(InternetRenewWay.GSCD.getValue())){
+                    oInternetRenewDetail.setOffsetAmt(BigDecimal.ZERO);
+                }else{
+                    oInternetRenewDetail.setOffsetAmt(new BigDecimal(offsetAmt.getdItemvalue()));
+                }
                 oInternetRenewDetail.setRenewAmt(new BigDecimal(cardAmt.getdItemvalue()));
                 oInternetRenewDetail.setOughtAmt(new BigDecimal(cardAmt.getdItemvalue()));
                 //线下打款直接是实际扣款金额
@@ -777,6 +784,9 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
                 //审批通过直接已续费
                 oInternetRenewDetail.setRenewStatus(InternetRenewStatus.YXF.getValue());
+                if(oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDK.getValue()) || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())){
+                    oInternetRenewDetail.setRealityAmt(oInternetRenewDetail.getOughtAmt());
+                }
                 oInternetCard.setRenewStatus(InternetRenewStatus.YXF.getValue());
                 //续费成功到期时间加一年
                 oInternetCard.setExpireTime(DateUtil.getOneYearLater(oInternetCard.getExpireTime()));
@@ -1067,15 +1077,22 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             oInternetRenewDetail.setuTime(new Date());
             oInternetRenewDetail.setRenewStatus(InternetRenewStatus.YXF.getValue());
             oInternetRenewDetail.setRealityAmt(oInternetRenewDetail.getOughtAmt());
-            internetRenewDetailMapper.updateByPrimaryKeySelective(oInternetRenewDetail);
+            int i = internetRenewDetailMapper.updateByPrimaryKeySelective(oInternetRenewDetail);
+            if(i!=1){
+                log.info("分润抵扣历史数据处理失败1",oInternetRenewDetail.getId());
+                continue;
+            }
             OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(oInternetRenewDetail.getIccidNum());
             oInternetCard.setExpireTime(DateUtil.getOneYearLater(oInternetCard.getExpireTime()));
             oInternetCard.setRenewStatus(InternetRenewStatus.YXF.getValue());
             oInternetCard.setStop(Status.STATUS_0.status);
             oInternetCard.setRenew(Status.STATUS_0.status);
             oInternetCard.setuTime(new Date());
-            internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
+            int j = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
+            if(j!=1){
+                log.info("分润抵扣历史数据处理失败2",oInternetCard.getIccidNum());
+            }
         }
-        log.info("分润抵扣历史数据处理结束");
+        log.info("分润抵扣历史数据处理结束,处理个数{}",oInternetRenewDetails.size());
     }
 }
