@@ -1600,7 +1600,7 @@ public class AimportServiceImpl implements AimportService {
         String  pingtaidengluhao = list.size()>22?list.get(22)+"":"";//平台登陆号
         String  zhongduanshuliangxiaxian = list.size()>23?list.get(23)+"":"";//终端数量下限
         String  jijifeilvxiaxian = list.size()>24?list.get(24)+"":"";//借记费率下限
-        String  jiejifengdinge = list.size()>25?list.get(25)+"":"";//借记封顶额
+        String  jiejifengdinge = list.size()>25?list.get(25)+"":"";//借记封顶额上限
         String  jiejichukuanfeilv = list.size()>26?list.get(26)+"":"";//借记出款费率
         String  shifoukaitongs0 = list.size()>27?list.get(27)+"":"";//是否开通s0
         String  shengqu = list.size()>28?list.get(28)+"":"";//省区
@@ -1609,6 +1609,8 @@ public class AimportServiceImpl implements AimportService {
         String  chukuanjigou = list.size()>31?list.get(31)+"":"";//出款机构
         String  credit_rate_floor = list.size()>32?list.get(32)+"":"";//贷记费率下限
         String  credit_rate_ceiling = list.size()>33?list.get(33)+"":"";//贷记费率上限
+        String  debit_rate_capping = list.size()>33?list.get(34)+"":"";//借记费率上限
+        String  debit_capping_lower = list.size()>33?list.get(35)+"":"";//借记封顶额下限
 
         ag  = ag.trim();
         busPlatform_num = busPlatform_num.trim();
@@ -1833,7 +1835,7 @@ public class AimportServiceImpl implements AimportService {
         if(jijifeilvxiaxian!=null && StringUtils.isNotBlank(jijifeilvxiaxian) && !"null".equals(jijifeilvxiaxian) ) {
             agentBusInfo.setDebitRateLower(jijifeilvxiaxian);
         }
-        //借记封顶额（元）9999
+        //借记封顶额上限（元）9999
         if(jiejifengdinge!=null && StringUtils.isNotBlank(jiejifengdinge) && !"null".equals(jiejifengdinge) ) {
             agentBusInfo.setDebitCapping(jiejifengdinge);
         }
@@ -1845,13 +1847,21 @@ public class AimportServiceImpl implements AimportService {
         if(zhongduanshuliangxiaxian!=null && StringUtils.isNotBlank(zhongduanshuliangxiaxian) && !"null".equals(zhongduanshuliangxiaxian) ) {
             agentBusInfo.setTerminalsLower(zhongduanshuliangxiaxian);
         }
-        //贷记费率下限
+        //贷记费率下限（%）
         if(credit_rate_floor!=null && StringUtils.isNotBlank(credit_rate_floor) && !"null".equals(credit_rate_floor) ) {
             agentBusInfo.setCreditRateFloor(credit_rate_floor);
         }
-        //贷记费率上限
+        //贷记费率上限（%）
         if(credit_rate_ceiling!=null && StringUtils.isNotBlank(credit_rate_ceiling) && !"null".equals(credit_rate_ceiling)) {
             agentBusInfo.setCreditRateCeiling(credit_rate_ceiling);
+        }
+        //借记费率上限（%）
+        if(debit_rate_capping!=null && StringUtils.isNotBlank(debit_rate_capping) && !"null".equals(debit_rate_capping)) {
+            agentBusInfo.setDebitRateCapping(debit_rate_capping);
+        }
+        //借记封顶额下限（元）
+        if(debit_capping_lower!=null && StringUtils.isNotBlank(debit_capping_lower) && !"null".equals(debit_capping_lower)) {
+            agentBusInfo.setDebitCappingLower(debit_capping_lower);
         }
         //省区
         if(StringUtils.isNotBlank(shengqu) && !"null".equalsIgnoreCase(shengqu)) {

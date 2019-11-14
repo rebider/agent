@@ -75,17 +75,17 @@ public class AgentBusInfo implements Serializable {
 
     private String busLoginNum;
 
-    private String debitRateLower;
+    private String debitRateLower;//借记费率下限
 
-    private String debitCapping;
+    private String debitCapping;//借记封顶额上限
 
-    private String debitAppearRate;
+    private String debitAppearRate;//借记出款费率
 
     private String terminalsLower;
 
     private Date approveTime;
 
-    private String creditRateFloor;
+    private String creditRateFloor;//贷记费率下限
 
     private String agDocDistrict;
 
@@ -95,7 +95,7 @@ public class AgentBusInfo implements Serializable {
 
     private String finaceRemitOrgan;
 
-    private String creditRateCeiling;
+    private String creditRateCeiling;//贷记费率上限
 
     private List<Attachment> attachmentList;
 
@@ -118,6 +118,26 @@ public class AgentBusInfo implements Serializable {
     private String brandNum;
 
     private BigDecimal dredgeD1;
+
+    private String debitRateCapping;//借记费率上限
+
+    private String debitCappingLower;//借记封顶额下限
+
+    public String getDebitRateCapping() {
+        return debitRateCapping;
+    }
+
+    public void setDebitRateCapping(String debitRateCapping) {
+        this.debitRateCapping = debitRateCapping;
+    }
+
+    public String getDebitCappingLower() {
+        return debitCappingLower;
+    }
+
+    public void setDebitCappingLower(String debitCappingLower) {
+        this.debitCappingLower = debitCappingLower;
+    }
 
     public BigDecimal getDredgeD1() {
         return dredgeD1;
