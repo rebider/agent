@@ -489,24 +489,27 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             internetRenew.setVersion(BigDecimal.ONE);
             internetRenew.setBusNum(busNum);
             internetRenew.setBusPlatform(busPlatform);
-            //查询最新对接省区大区对接人
-            AgentBusInfo agentBusInfo = new AgentBusInfo();
-            agentBusInfo.setBusNum(busNum);
-            agentBusInfo.setBusPlatform(busPlatform);
-            List<BigDecimal> busStatusList = new ArrayList<>();
-            busStatusList.add(BusStatus.QY.getValue());
-            busStatusList.add(BusStatus.WJH.getValue());
-            busStatusList.add(BusStatus.WQY.getValue());
-            agentBusInfo.setBusStatusList(busStatusList);
-            agentBusInfo.setCloReviewStatus(AgStatus.Approved.getValue());
-            List<AgentBusInfo> agentBusInfos = agentBusinfoService.selectByAgentBusInfo(agentBusInfo);
-            if(agentBusInfos.size()!=1){
-                throw new MessageException("平台码或平台错误,请联系管理员");
+            AgentBusInfo queryAgentBusInfo = null;
+            if(StringUtils.isNotBlank(busNum)){
+                //查询最新对接省区大区对接人
+                AgentBusInfo agentBusInfo = new AgentBusInfo();
+                agentBusInfo.setBusNum(busNum);
+                agentBusInfo.setBusPlatform(busPlatform);
+                List<BigDecimal> busStatusList = new ArrayList<>();
+                busStatusList.add(BusStatus.QY.getValue());
+                busStatusList.add(BusStatus.WJH.getValue());
+                busStatusList.add(BusStatus.WQY.getValue());
+                agentBusInfo.setBusStatusList(busStatusList);
+                agentBusInfo.setCloReviewStatus(AgStatus.Approved.getValue());
+                List<AgentBusInfo> agentBusInfos = agentBusinfoService.selectByAgentBusInfo(agentBusInfo);
+                if(agentBusInfos.size()!=1){
+                    throw new MessageException("平台码或平台错误,请联系管理员");
+                }
+                queryAgentBusInfo = agentBusInfos.get(0);
+                internetRenew.setAgDocDistrict(queryAgentBusInfo.getAgDocDistrict());
+                internetRenew.setAgDocPro(queryAgentBusInfo.getAgDocPro());
+                internetRenew.setBusContactPerson(queryAgentBusInfo.getBusContactPerson());
             }
-            AgentBusInfo queryAgentBusInfo = agentBusInfos.get(0);
-            internetRenew.setAgDocDistrict(queryAgentBusInfo.getAgDocDistrict());
-            internetRenew.setAgDocPro(queryAgentBusInfo.getAgDocPro());
-            internetRenew.setBusContactPerson(queryAgentBusInfo.getBusContactPerson());
 
             Dict cardAmt = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.INTERNET_RENEW.name(), DictGroup.CARD_AMT.name());
             if(cardAmt==null){
@@ -637,9 +640,11 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 oInternetRenewDetail.setVersion(BigDecimal.ONE);
                 oInternetRenewDetail.setBusNum(oInternetCard.getBusNum());
                 oInternetRenewDetail.setBusPlatform(oInternetCard.getBusPlatform());
-                oInternetRenewDetail.setAgDocDistrict(queryAgentBusInfo.getAgDocDistrict());
-                oInternetRenewDetail.setAgDocPro(queryAgentBusInfo.getAgDocPro());
-                oInternetRenewDetail.setBusContactPerson(queryAgentBusInfo.getBusContactPerson());
+                if(null!=queryAgentBusInfo){
+                    oInternetRenewDetail.setAgDocDistrict(queryAgentBusInfo.getAgDocDistrict());
+                    oInternetRenewDetail.setAgDocPro(queryAgentBusInfo.getAgDocPro());
+                    oInternetRenewDetail.setBusContactPerson(queryAgentBusInfo.getBusContactPerson());
+                }
                 internetRenewDetailMapper.insert(oInternetRenewDetail);
             }
             try {

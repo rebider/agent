@@ -1678,6 +1678,76 @@ public class OInternetCardPostponeExample {
             addCriterion("BUS_CONTACT_PERSON not between", value1, value2, "busContactPerson");
             return (Criteria) this;
         }
+
+        public Criteria andPostponeCauseIsNull() {
+            addCriterion("POSTPONE_CAUSE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseIsNotNull() {
+            addCriterion("POSTPONE_CAUSE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseEqualTo(String value) {
+            addCriterion("POSTPONE_CAUSE =", value, "postponeCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseNotEqualTo(String value) {
+            addCriterion("POSTPONE_CAUSE <>", value, "postponeCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseGreaterThan(String value) {
+            addCriterion("POSTPONE_CAUSE >", value, "postponeCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseGreaterThanOrEqualTo(String value) {
+            addCriterion("POSTPONE_CAUSE >=", value, "postponeCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseLessThan(String value) {
+            addCriterion("POSTPONE_CAUSE <", value, "postponeCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseLessThanOrEqualTo(String value) {
+            addCriterion("POSTPONE_CAUSE <=", value, "postponeCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseLike(String value) {
+            addCriterion("POSTPONE_CAUSE like", value, "postponeCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseNotLike(String value) {
+            addCriterion("POSTPONE_CAUSE not like", value, "postponeCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseIn(List<String> values) {
+            addCriterion("POSTPONE_CAUSE in", values, "postponeCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseNotIn(List<String> values) {
+            addCriterion("POSTPONE_CAUSE not in", values, "postponeCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseBetween(String value1, String value2) {
+            addCriterion("POSTPONE_CAUSE between", value1, value2, "postponeCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseNotBetween(String value1, String value2) {
+            addCriterion("POSTPONE_CAUSE not between", value1, value2, "postponeCause");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
