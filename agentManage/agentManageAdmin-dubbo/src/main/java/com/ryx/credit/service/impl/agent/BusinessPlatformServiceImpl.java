@@ -1,7 +1,5 @@
 package com.ryx.credit.service.impl.agent;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
@@ -12,7 +10,6 @@ import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.*;
-import com.ryx.credit.pojo.admin.bank.DPosRegion;
 import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.IResourceService;
 import com.ryx.credit.service.IUserService;
@@ -20,9 +17,6 @@ import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.bank.PosRegionService;
 import com.ryx.credit.service.dict.DictOptionsService;
-import com.ryx.credit.service.dict.RegionService;
-import org.apache.commons.collections.FastArrayList;
-import org.apache.xpath.objects.XObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +25,11 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 业务平台管理
@@ -163,14 +157,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         }
         if (!StringUtils.isBlank((String)map.get("cloReviewStatusList"))) {// bigdecimal 处理
             List<String> list = Arrays.asList( ((String)map.get("cloReviewStatusList")).split(","));
-            List<BigDecimal> voList = Lists.transform(list, new Function<String, BigDecimal>() {
-                public BigDecimal apply(String string) {
-                    return new BigDecimal(string);
-                }
-            });
-           /* List<BigDecimal> voList = Lists.transform(list, (entity) -> {
-                return new BigDecimal(entity);
-            });*/
+            List<BigDecimal> voList = list.stream().map(str -> new BigDecimal(str.trim())).collect(Collectors.toList());
             if( voList!=null && voList.size()>0)
                 reqMap.put("cloReviewStatusList", voList);
         }
@@ -196,16 +183,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         return pageInfo;
     }
 
-    public static void main(String[] args) {
-        BigDecimal a= new BigDecimal(1);
-        BigDecimal b = new BigDecimal(2);
-        List<BigDecimal> aa = new ArrayList<BigDecimal>();
-        aa.add(a);aa.add(b);
-        List<String> voList = Lists.transform(aa, (entity) -> {
-            return entity.toString();
-        });
-        System.out.println(voList);
-    }
     /**
      * 根据代理商唯一编号检索
      * @param agUniqNum

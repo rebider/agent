@@ -872,15 +872,44 @@
       <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
-      <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
-      <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where  o.id=ORDER_ID and status=1 and PRO_TYPE=#{proType} ) </if>
+      <if test="platformList!=null and platformList.size > 0">
+         and c.PLATFORM_NUM
+        <foreach collection="platformList" item="platform" open=" in(" close=")" separator=",">
+          #{platform}
+        </foreach>
+      </if>
+      <if test="proTypeList!=null and proTypeList.size>0">
+       and EXISTS(select * from O_SUB_ORDER where  o.id=ORDER_ID and status=1
+       and PRO_TYPE
+       <foreach collection="proTypeList" item="proType" open=" in(" close=")" separator=",">
+          #{proType}
+       </foreach>
+        )
+      </if>
       <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where  o.id=ORDER_ID and status=1 and model=#{model} ) </if>
-      <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
-      <if test="vender!=null and vender!=''"> and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id and os.order_id=o.id where soa.VENDER=#{vender})</if>
+      <if test="payMethodList!=null and payMethodList.size>0">
+        and d.PAY_METHOD
+        <foreach collection="payMethodList" item="payMethod" open=" in(" close=")" separator=",">
+            #{payMethod}
+        </foreach>
+      </if>
+      <if test="venderList!=null and venderList.size>0 ">
+       and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id and os.order_id=o.id
+       where soa.VENDER
+       <foreach collection="venderList" item="vender" open=" in(" close=")" separator=",">
+          #{vender}
+       </foreach>
+       )
+      </if>
       <if test="activityName!=null and activityName !=''">
         and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on  soa.SUB_ORDER_ID=os.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%') and soa.status=1 and os.order_id = o.id)
       </if>
-      <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus}</if>
+      <if test="reviewStatusList!=null and reviewStatusList.size>0">
+       and o.review_status
+       <foreach collection="reviewStatusList" item="reviewStatus" open=" in(" close=")" separator=",">
+          #{reviewStatus}
+       </foreach>
+      </if>
       <if test="notLookTem=='true'"> and o.review_status != 1</if>
       <if test="agDocDistrict!=null and agDocDistrict!=''">
        and (b.AG_DOC_PRO = #{agDocDistrict} or b.AG_DOC_DISTRICT = #{agDocDistrict})
@@ -973,16 +1002,45 @@
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
-      <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
+      <if test="platformList!=null and platformList.size > 0">
+        and c.PLATFORM_NUM
+        <foreach collection="platformList" item="platform" open=" in(" close=")" separator=",">
+          #{platform}
+        </foreach>
+      </if>
       <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
-      <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where  o.id=ORDER_ID and status=1 and PRO_TYPE=#{proType} ) </if>
+      <if test="proTypeList!=null and proTypeList.size>0">
+        and EXISTS(select * from O_SUB_ORDER where  o.id=ORDER_ID and status=1
+        and PRO_TYPE
+        <foreach collection="proTypeList" item="proType" open=" in(" close=")" separator=",">
+          #{proType}
+        </foreach>
+        )
+      </if>
       <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where  o.id=ORDER_ID and status=1 and model=#{model} ) </if>
-      <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
-      <if test="vender!=null and vender!=''"> and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id and os.order_id=o.id where soa.VENDER=#{vender})</if>
+      <if test="payMethodList!=null and payMethodList.size>0">
+        and d.PAY_METHOD
+        <foreach collection="payMethodList" item="payMethod" open=" in(" close=")" separator=",">
+          #{payMethod}
+        </foreach>
+      </if>
+      <if test="venderList!=null and venderList.size>0 ">
+        and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id and os.order_id=o.id
+        where soa.VENDER
+        <foreach collection="venderList" item="vender" open=" in(" close=")" separator=",">
+          #{vender}
+        </foreach>
+        )
+      </if>
       <if test="activityName!=null and activityName !=''">
         and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on  soa.SUB_ORDER_ID=os.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%') and soa.status=1 and os.order_id = o.id)
       </if>
-      <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus}</if>
+      <if test="reviewStatusList!=null and reviewStatusList.size>0">
+        and o.review_status
+        <foreach collection="reviewStatusList" item="reviewStatus" open=" in(" close=")" separator=",">
+          #{reviewStatus}
+        </foreach>
+      </if>
       <if test="notLookTem=='true'"> and o.review_status != 1</if>
       <if test="agDocDistrict!=null and agDocDistrict!=''">
         and (b.AG_DOC_PRO = #{agDocDistrict} or b.AG_DOC_DISTRICT = #{agDocDistrict})
