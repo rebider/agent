@@ -53,6 +53,16 @@ public class OInternetCardPostpone implements Serializable{
 
     private String busContactPerson;
 
+    private String postponeCause;
+
+    public String getPostponeCause() {
+        return postponeCause;
+    }
+
+    public void setPostponeCause(String postponeCause) {
+        this.postponeCause = postponeCause;
+    }
+
     public String getBusNum() {
         return busNum;
     }
