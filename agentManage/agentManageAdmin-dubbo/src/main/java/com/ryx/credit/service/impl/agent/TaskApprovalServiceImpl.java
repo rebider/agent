@@ -11,6 +11,7 @@ import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.Organization;
+import com.ryx.credit.pojo.admin.order.OrganizationExample;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.CapitalVo;
@@ -138,7 +139,24 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                 for (AgentBusInfoVo agentBusInfoVo : agentVo.getMarketToporgTableIdForm()) {
                     //上级机构和本级机构判断
                     AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                    //必须选择业务顶级机构
+                    if(StringUtils.isBlank(agentBusInfoVo.getOrganNum())){
+                        throw new ProcessException("请选择业务顶级机构");
+                    }
                     if(StringUtils.isNotBlank(agentBusInfoVo.getBusPlatform())){
+//                        顶级机构实时品牌与月结品牌的顶级机构是否一致
+                        AgentBusInfo agent_busInfo = agentBusinfoService.agentPlatformNum(agentBusInfo.getAgentId(),agentBusInfoVo.getBusPlatform());
+
+                        if(null!=agent_busInfo && StringUtils.isNotBlank(agent_busInfo.getOrganNum())){
+                            if (!agent_busInfo.getOrganNum().equals(agentBusInfoVo.getOrganNum())){
+                                List<Organization> organizationList = organizationMapper.selectOrganization(agent_busInfo.getOrganNum());
+                                String orgNick="";
+                                if(null!=organizationList && organizationList.size()>0){
+                                     orgNick = organizationList.get(0).getOrgNick();
+                                }
+                                throw new ProcessException("顶级机构实时品牌与月结品牌的顶级机构不一致,月结品牌的顶级机构为:"+orgNick);
+                            }
+                        }
                         if (!agentBusInfoVo.getBusPlatform().equals(ryx_pro) && !agentBusInfoVo.getBusPlatform().equals(ryx_pro1)){
                             agentBusInfoVo.setBusPlatform(" ");
                         }else{
@@ -154,10 +172,7 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                         }
 
                     }
-                    //必须选择业务顶级机构
-                    if(StringUtils.isBlank(agentBusInfoVo.getOrganNum())){
-                        throw new ProcessException("请选择业务顶级机构");
-                    }
+
 
                     if (StringUtils.isNotBlank(agentBusInfoVo.getBusPlatform())){
                         agentBusInfo.setBusPlatform(agentBusInfoVo.getBusPlatform());
