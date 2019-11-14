@@ -3,6 +3,7 @@ package com.ryx.credit.pojo.admin.order;
 import com.ryx.credit.common.util.Page;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class OrderAdjDetailExample {
@@ -583,6 +584,66 @@ public class OrderAdjDetailExample {
 
         public Criteria andVersionNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("VERSION not between", value1, value2, "version");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTmIsNull() {
+            addCriterion("C_TM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTmIsNotNull() {
+            addCriterion("C_TM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTmEqualTo(Date value) {
+            addCriterion("C_TM =", value, "cTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTmNotEqualTo(Date value) {
+            addCriterion("C_TM <>", value, "cTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTmGreaterThan(Date value) {
+            addCriterion("C_TM >", value, "cTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTmGreaterThanOrEqualTo(Date value) {
+            addCriterion("C_TM >=", value, "cTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTmLessThan(Date value) {
+            addCriterion("C_TM <", value, "cTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTmLessThanOrEqualTo(Date value) {
+            addCriterion("C_TM <=", value, "cTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTmIn(List<Date> values) {
+            addCriterion("C_TM in", values, "cTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTmNotIn(List<Date> values) {
+            addCriterion("C_TM not in", values, "cTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTmBetween(Date value1, Date value2) {
+            addCriterion("C_TM between", value1, value2, "cTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTmNotBetween(Date value1, Date value2) {
+            addCriterion("C_TM not between", value1, value2, "cTm");
             return (Criteria) this;
         }
     }

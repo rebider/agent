@@ -43,6 +43,10 @@ public class OrderAdj implements Serializable {
 
     private String agentId;
 
+    private BigDecimal credit;
+
+    private BigDecimal refundMode;
+
     public String getId() {
         return id;
     }
@@ -193,5 +197,21 @@ public class OrderAdj implements Serializable {
 
     public void setAgentId(String agentId) {
         this.agentId = agentId == null ? null : agentId.trim();
+    }
+
+    public BigDecimal getCredit() {
+        return credit;
+    }
+
+    public void setCredit(BigDecimal credit) {
+        this.credit = credit;
+    }
+
+    public BigDecimal getRefundMode() {
+        return refundMode;
+    }
+
+    public void setRefundMode(BigDecimal refundMode) {
+        this.refundMode = refundMode;
     }
 }
