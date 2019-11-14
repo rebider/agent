@@ -236,29 +236,26 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         if("POS".equals(busInfo.get("PLATFORM_TYPE"))||"ZHPOS".equals(busInfo.get("PLATFORM_TYPE"))||"ZPOS".equals(busInfo.get("PLATFORM_TYPE"))){
 
             JSONObject monthJSONObject = new JSONObject();
-            monthJSONObject.put("applyId",templateRecode.getTemplateId());
-            monthJSONObject.put("isStartMonth","1");
+            monthJSONObject.put("applyId", templateRecode.getTemplateId());
+            monthJSONObject.put("isStartMonth", "1");
             String MonthCheckResult = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, monthJSONObject.toJSONString());
-            Map<String,Object> resultMapMonth = JSONObject.parseObject(MonthCheckResult);
-            if("0".equals(resultMapMonth.get("isExist").toString())){
-                try {
-                    String oldStart = ((Map<String,String>)map2.get("applyTemplate")).get("startMonth");
-                    Calendar calendar = Calendar.getInstance();
-                    String nowMonth= new SimpleDateFormat("yyyyMM").format(calendar.getTime());
-                    String day= new SimpleDateFormat("dd").format(calendar.getTime());
-                    calendar.add(Calendar.MONTH, -1);
-                    String lastMonth= new SimpleDateFormat("yyyyMM").format(calendar.getTime());
-                    if (Integer.parseInt(day) < 10) {
-                        if (Integer.parseInt(oldStart) < Integer.parseInt(lastMonth)) {
-                            throw new MessageException("10号前分配模板，开始时间不能小于上月");
-                        }
-                    } else {
-                        if (Integer.parseInt(oldStart) < Integer.parseInt(nowMonth)) {
-                            throw new MessageException("10号后分配模板，开始时间不能小于本月");
-                        }
+            Map<String, Object> resultMapMonth = JSONObject.parseObject(MonthCheckResult);
+            Map<String,Object> objectMapMonth = (Map<String,Object>)resultMapMonth.get("data");
+            if ("0".equals(objectMapMonth.get("isExist").toString())) {
+                String oldStart = ((Map<String, String>) map2.get("applyTemplate")).get("startMonth");
+                Calendar calendar = Calendar.getInstance();
+                String nowMonth = new SimpleDateFormat("yyyyMM").format(calendar.getTime());
+                String day = new SimpleDateFormat("dd").format(calendar.getTime());
+                calendar.add(Calendar.MONTH, -1);
+                String lastMonth = new SimpleDateFormat("yyyyMM").format(calendar.getTime());
+                if (Integer.parseInt(day) < 10) {
+                    if (Integer.parseInt(oldStart) < Integer.parseInt(lastMonth)) {
+                        throw new MessageException("10号前分配模板，开始时间不能小于上月");
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } else {
+                    if (Integer.parseInt(oldStart) < Integer.parseInt(nowMonth)) {
+                        throw new MessageException("10号后分配模板，开始时间不能小于本月");
+                    }
                 }
             }
 
