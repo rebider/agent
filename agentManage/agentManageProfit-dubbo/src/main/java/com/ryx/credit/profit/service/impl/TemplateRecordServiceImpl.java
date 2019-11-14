@@ -665,19 +665,8 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
      */
     @Override
     public Map<String,Object> checkTemplate(String applyId)throws MessageException{
-        JSONObject map2 = new JSONObject();
+
         TemplateRecode templateRecode = recodeMapper.selectByPrimaryKey(applyId);
-        JSONObject mapJSONObject = new JSONObject();
-        mapJSONObject.put("applyId",templateRecode.getTemplateId());
-        mapJSONObject.put("isStartMonth","1");
-        String CheckResult = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, mapJSONObject.toJSONString());
-        Map<String,Object> resultM = JSONObject.parseObject(CheckResult);
-
-        Map<String,Object> objectM = (Map<String,Object>)resultM.get("data");
-
-        if(objectM.get("isExist").toString().equals("1")){
-            map2.put("isStartMonth",1);
-        }
 
         if(templateRecode == null){
             throw new MessageException("查询该模板申请信息失败，请联系管理员");
@@ -685,13 +674,24 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         Map<String,String> stringMap = getAgentInfo(templateRecode.getBusNum());
         try{
             String result = null;
-
+            JSONObject map2 = new JSONObject();
             map2.put("applyId",templateRecode.getTemplateId());
             if("RDBPOS".equals(stringMap.get("PLATFORM_TYPE"))){
                 return checkRDBTemplateInfo(templateRecode.getBusNum(),templateRecode.getTemplateId());
             }else if("RJPOS".equals(stringMap.get("PLATFORM_TYPE"))){ // 瑞+
                 result = HttpClientUtil.doPostJson(RJ_TEMPLATE_APPLY_CHECK, map2.toJSONString());
             }else if("POS".equals(stringMap.get("PLATFORM_TYPE"))||"ZHPOS".equals(stringMap.get("PLATFORM_TYPE"))||"ZPOS".equals(stringMap.get("PLATFORM_TYPE"))){
+                JSONObject mapJSONObject = new JSONObject();
+                mapJSONObject.put("applyId",templateRecode.getTemplateId());
+                mapJSONObject.put("isStartMonth","1");
+                String CheckResult = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, mapJSONObject.toJSONString());
+                Map<String,Object> resultM = JSONObject.parseObject(CheckResult);
+
+                Map<String,Object> objectM = (Map<String,Object>)resultM.get("data");
+
+                if(objectM.get("isExist").toString().equals("1")){
+                    map2.put("isStartMonth",1);
+                }
                 result = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, map2.toJSONString());
             }else if("SSPOS".equals(stringMap.get("PLATFORM_TYPE"))){//实时分润
                 result = HttpClientUtil.doPostJson(SS_TEMPLATE_APPLY_CHECK, map2.toJSONString());
@@ -721,17 +721,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     public Object checkTempalteName(String applyId)throws MessageException{
         TemplateRecode templateRecode = recodeMapper.selectByPrimaryKey(applyId);
 
-        JSONObject mapJSONObject = new JSONObject();
-        mapJSONObject.put("applyId",templateRecode.getTemplateId());
-        mapJSONObject.put("isStartMonth","1");
-        String CheckResult = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, mapJSONObject.toJSONString());
-        Map<String,Object> resultM = JSONObject.parseObject(CheckResult);
 
-        Map<String,Object> objectM = (Map<String,Object>)resultM.get("data");
-
-        if(objectM.get("isExist").toString().equals("1")){
-           return true;
-        }
         if(templateRecode == null){
             throw new MessageException("查询该模板申请信息失败，请联系管理员");
         }
@@ -745,6 +735,16 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             } else if("RJPOS".equals(stringMap.get("PLATFORM_TYPE"))){ // 瑞+
                 result = HttpClientUtil.doPostJson(RJ_TEMPLATE_APPLY_CHECKNAME, map2.toJSONString());
             }else if("POS".equals(stringMap.get("PLATFORM_TYPE"))||"ZHPOS".equals(stringMap.get("PLATFORM_TYPE"))||"ZPOS".equals(stringMap.get("PLATFORM_TYPE"))){
+                JSONObject mapJSONObject = new JSONObject();
+                mapJSONObject.put("applyId",templateRecode.getTemplateId());
+                mapJSONObject.put("isStartMonth","1");
+                String CheckResult = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, mapJSONObject.toJSONString());
+                Map<String,Object> resultM = JSONObject.parseObject(CheckResult);
+                Map<String,Object> objectM = (Map<String,Object>)resultM.get("data");
+
+                if(objectM.get("isExist").toString().equals("1")){
+                    return true;
+                }
                 result = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECKNAME, map2.toJSONString());
             }else if ("SSPOS".equals(stringMap.get("PLATFORM_TYPE"))){
                 result = HttpClientUtil.doPostJson(SS_TEMPLATE_APPLY_CHECKNAME, map2.toJSONString());
