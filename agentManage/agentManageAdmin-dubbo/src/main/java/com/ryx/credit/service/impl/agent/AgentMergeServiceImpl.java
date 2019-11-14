@@ -1255,11 +1255,13 @@ public class AgentMergeServiceImpl  implements AgentMergeService {
                         agentNotifyVo.setSupDorgId(agentParent.getBusNum());
                     }
                 }
-                agentNotifyVo.setDebitTop(agentBusInfo.getDebitCapping());//借记封顶额（元）
+                agentNotifyVo.setDebitTop(agentBusInfo.getDebitCapping());//借记封顶额上限（元）
                 agentNotifyVo.setCkDebitRate(agentBusInfo.getDebitAppearRate());//借记出款费率（%）
                 agentNotifyVo.setLowDebitRate(agentBusInfo.getDebitRateLower());//借记费率下限（%）
                 agentNotifyVo.setCreditRateLower(agentBusInfo.getCreditRateFloor());//贷记费率下限（%）
                 agentNotifyVo.setCreditRateCeiling(agentBusInfo.getCreditRateCeiling());//贷记费率上限（%）
+                agentNotifyVo.setDebitRateCapping(agentBusInfo.getDebitRateCapping());//借记费率上限（%）
+                agentNotifyVo.setDebitCappingLower(agentBusInfo.getDebitCappingLower());//借记封顶额下限（元）
                 String sendJson = JsonUtil.objectToJson(agentNotifyVo);
                 record.setId(idService.genId(TabId.a_agent_platformsyn));
                 record.setNotifyTime(new Date());
