@@ -438,7 +438,7 @@
     select
     i.ID, i.ICCID, i.AGENT_ID, i.AGENT_NAME, i.MER_ID, i.MER_NAME, i.ORDER_ID, i.OPEN_ACCOUNT_TIME, i.POSTPONE_TIME,
     i.EXPIRE_TIME, i.POSTPONE_EXPIRE_TIME, i.C_USER, i.U_USER, i.C_TIME, i.U_TIME,i.BATCH_NUM, i.BUS_NUM, i.BUS_PLATFORM,
-    i.BUS_CONTACT_PERSON,oa.name as AG_DOC_PRO,ob.name as AG_DOC_DISTRICT
+    i.BUS_CONTACT_PERSON,oa.name as AG_DOC_PRO,ob.name as AG_DOC_DISTRICT,i.POSTPONE_CAUSE
     from O_INTERNET_CARD_POSTPONE i
     <include refid="queryInternetPostponeSql" />
     <include refid="OracleDialectSuffix" />

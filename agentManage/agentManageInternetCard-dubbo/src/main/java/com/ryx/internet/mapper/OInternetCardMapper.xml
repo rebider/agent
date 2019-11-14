@@ -669,6 +669,7 @@
     <result column="AG_DOC_PRO" jdbcType="VARCHAR" property="agDocPro" />
     <result column="BUS_CONTACT_PERSON" jdbcType="VARCHAR" property="busContactPerson" />
     <result column="PLATFORM_NAME" jdbcType="VARCHAR" property="platformName" />
+    <result column="POSTPONE_CAUSE" jdbcType="VARCHAR" property="postponeCause" />
   </resultMap>
 
   <sql id="Card_Example_Where_Clause">
@@ -731,7 +732,7 @@
     i.AGENT_ID, i.AGENT_NAME, i.INTERNET_CARD_NUM, i.ISSUER, i.OPEN_ACCOUNT_TIME, i.EXPIRE_TIME,
     i.INTERNET_CARD_STATUS, i.MER_ID, i.LATELY_PAY_TIME, i.MER_NAME, d.D_ITEMNAME as MANUFACTURER, i.RENEW, i.C_TIME,
     i.U_TIME, i.C_USER, i.U_USER, i.STATUS, i.VERSION ,i.STOP, i.RENEW_STATUS, i.STOP_REASON,i.SUM_POSTPONE_TIME,
-    i.BUS_NUM, i.BUS_PLATFORM,p.PLATFORM_NAME,
+    i.BUS_NUM, i.BUS_PLATFORM,p.PLATFORM_NAME,i.POSTPONE_CAUSE,
   </sql>
 
   <select id="internetCardList" parameterType="com.ryx.internet.pojo.OInternetCardExample" resultMap="CardListResultMap">
