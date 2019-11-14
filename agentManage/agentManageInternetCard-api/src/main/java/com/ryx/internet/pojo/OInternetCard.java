@@ -91,6 +91,8 @@ public class OInternetCard implements Serializable{
 
     private String busPlatform;
 
+    private String postponeCause;
+
     private String agDocDistrict;//数据库无
 
     private String agDocPro;//数据库无
@@ -98,6 +100,14 @@ public class OInternetCard implements Serializable{
     private String busContactPerson;//数据库无
 
     private String platformName; //数据库无
+
+    public String getPostponeCause() {
+        return postponeCause;
+    }
+
+    public void setPostponeCause(String postponeCause) {
+        this.postponeCause = postponeCause;
+    }
 
     public String getPlatformName() {
         return platformName;

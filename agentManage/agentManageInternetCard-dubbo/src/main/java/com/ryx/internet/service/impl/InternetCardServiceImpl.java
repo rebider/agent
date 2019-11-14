@@ -433,8 +433,10 @@ public class InternetCardServiceImpl implements InternetCardService {
                         }else if(importType.equals(CardImportType.G.getValue())){
                             String iccid = String.valueOf(string.size()>=1?string.get(0):"");//iccid
                             String postponeTime = String.valueOf(string.size()>=2?string.get(1):"");//延期月份
+                            String postponeCause = String.valueOf(string.size()>=3?string.get(2):"");//延期原因
                             oInternetCard.setIccidNum(iccid);
                             oInternetCard.setPostponeTime(postponeTime);
+                            oInternetCard.setPostponeCause(postponeCause);
                             jsonList = JsonUtil.objectToJson(oInternetCard);
                         }
                         OInternetCardImport oInternetCardImport = new OInternetCardImport();
@@ -575,6 +577,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                     OInternetCardPostpone internetCardPostpone = new OInternetCardPostpone();
                     internetCardPostpone.setIccid(internetCard.getIccidNum());
                     internetCardPostpone.setPostponeTime(postponeTime);
+                    internetCardPostpone.setPostponeCause(internetCard.getPostponeCause());
                     //更新导入
                     oInternetCardImport.setImportStatus(OInternetCardImportStatus.SUCCESS.getValue());
                     updateInternetCardImport(oInternetCardImport);
@@ -1257,6 +1260,8 @@ public class InternetCardServiceImpl implements InternetCardService {
         oInternetCard.setStop(Status.STATUS_0.status);
         oInternetCard.setRenew(Status.STATUS_0.status);
         oInternetCard.setExpireTime(mondayLater);
+        if(StringUtils.isNotBlank(internetCardPostpone.getPostponeCause()))
+        oInternetCard.setPostponeCause(internetCardPostpone.getPostponeCause());
         if(StringUtils.isNotBlank(importId)){
             oInternetCard.setCardImportId(importId);
         }
