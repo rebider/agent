@@ -72,10 +72,6 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             String platform =activity.getPlatform();
             if (platform.contains(",")) {
                 List<String> platformList = Arrays.asList(platform.split(","));
-//                String[] split = platform.split(",");
-//                for (int i = 0; i < split.length; i++) {
-//                    platformList.add(split[i]);
-//                }
                 criteria.andPlatformIn(platformList);
             } else {
                 criteria.andPlatformEqualTo(platform);
