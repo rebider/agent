@@ -237,8 +237,8 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             monthJSONObject.put("isStartMonth", "1");
             String MonthCheckResult = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, monthJSONObject.toJSONString());
             Map<String, Object> resultMapMonth = JSONObject.parseObject(MonthCheckResult);
-            if ("0".equals(resultMapMonth.get("isExist").toString())) {
-                try {
+            Map<String,Object> objectMapMonth = (Map<String,Object>)resultMapMonth.get("data");
+            if ("0".equals(objectMapMonth.get("isExist").toString())) {
                     String oldStart = ((Map<String, String>) map2.get("applyTemplate")).get("startMonth");
                     Calendar calendar = Calendar.getInstance();
                     String nowMonth = new SimpleDateFormat("yyyyMM").format(calendar.getTime());
@@ -254,9 +254,6 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                             throw new MessageException("10号后分配模板，开始时间不能小于本月");
                         }
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
             }
             if ("beijing".equals(startPar.get("party").toString())) {
                 try {
