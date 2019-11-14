@@ -223,14 +223,14 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         String proceId = null;
 
         List<Dict> actlist = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.PROFIT_TEMPLATE_APPLY.name());
-        String workId = null;
+      /*  String workId = null;
         for (Dict dict : actlist) {
             workId = dict.getdItemvalue();
         }
         if(StringUtils.isEmpty(workId)) {
             logger.info("========用户{}启动数据修改申请{}{}","审批流启动失败字典中未配置部署流程");
             throw new MessageException("审批流启动失败，未获取到数据字典配置部署流程!");
-        }
+        }*/
 
         if("POS".equals(busInfo.get("PLATFORM_TYPE"))||"ZHPOS".equals(busInfo.get("PLATFORM_TYPE"))||"ZPOS".equals(busInfo.get("PLATFORM_TYPE"))){
             if("beijing".equals(startPar.get("party").toString())){
@@ -255,7 +255,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             }
         }
         try{
-            proceId = activityService.createDeloyFlow(null, workId, null, null, startPar);
+            proceId = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("agent_zg_template"), null, null, startPar);
             if (proceId == null) {
                 TemplateRecodeExample pExample = new TemplateRecodeExample();
                 pExample.createCriteria().andIdEqualTo(templateRecode.getId());
