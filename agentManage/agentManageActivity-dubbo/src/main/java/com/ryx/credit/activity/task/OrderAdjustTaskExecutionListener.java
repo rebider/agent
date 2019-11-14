@@ -36,14 +36,14 @@ public class OrderAdjustTaskExecutionListener extends BaseTaskListener implement
             //审批拒绝
             if ("reject_end".equals(activityName)) {
                 logger.info("=========OrderAdjustTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
-                AgentResult res = orderService.approveFinish(delegateExecution.getProcessInstanceId(),activityName);
+                AgentResult res = orderService.approveFinishOrderAdjust(delegateExecution.getProcessInstanceId(), activityName);
                 logger.info("=========OrderAdjustTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
 
             }
             //审批同意更新数据库
             if ("finish_end".equals(activityName)) {
                 logger.info("=========OrderAdjustTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
-                AgentResult res = orderService.approveFinish(delegateExecution.getProcessInstanceId(),activityName);
+                AgentResult res = orderService.approveFinishOrderAdjust(delegateExecution.getProcessInstanceId(), activityName);
                 logger.info("=========OrderAdjustTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
 
             }

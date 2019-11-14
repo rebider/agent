@@ -23,6 +23,60 @@ public class OrderUpModelVo implements Serializable {
     private List<BigDecimal> calPriceList;//差价汇总
     private List<String> files;//附件
     private String isApproveWhenSubmit;
+    private String taskId;
+    private String approvalOpinion;
+    private String approvalResult;
+    private String dept;
+    private String flag;
+    private String orderAdjAprDept;//订单调整审批下个审批部门参数
+
+    public String getOrderAdjAprDept() {
+        return orderAdjAprDept;
+    }
+
+    public void setOrderAdjAprDept(String orderAdjAprDept) {
+        this.orderAdjAprDept = orderAdjAprDept;
+    }
+
+    public String getApprovalOpinion() {
+        return approvalOpinion;
+    }
+
+    public void setApprovalOpinion(String approvalOpinion) {
+        this.approvalOpinion = approvalOpinion;
+    }
+
+    public String getApprovalResult() {
+        return approvalResult;
+    }
+
+    public void setApprovalResult(String approvalResult) {
+        this.approvalResult = approvalResult;
+    }
+
+    public String getDept() {
+        return dept;
+    }
+
+    public void setDept(String dept) {
+        this.dept = dept;
+    }
+
+    public String getFlag() {
+        return flag;
+    }
+
+    public void setFlag(String flag) {
+        this.flag = flag;
+    }
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
 
     public String getIsApproveWhenSubmit() {
         return isApproveWhenSubmit;

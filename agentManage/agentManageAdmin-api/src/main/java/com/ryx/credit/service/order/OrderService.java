@@ -304,4 +304,21 @@ public interface OrderService {
 
     OrderAdj getByAdjIdStatus(String adjId);
 
+    /**
+     * 订单调整审批处理
+     * @param orderUpModelVo
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    AgentResult approvalTaskOrderAdjust(OrderUpModelVo orderUpModelVo, String userId) throws Exception;
+
+    /**
+     * 订单调整审批通过
+     * @param insid
+     * @param actname
+     * @return
+     */
+    AgentResult approveFinishOrderAdjust(String insid, String actname) throws Exception;
+
 }

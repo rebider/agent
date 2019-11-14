@@ -4260,4 +4260,145 @@ public class OrderServiceImpl implements OrderService {
         return orderAdj;
     }
 
+    /**
+     * 订单调整审批处理
+     * @param orderUpModelVo
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    @Override
+    public AgentResult approvalTaskOrderAdjust(OrderUpModelVo orderUpModelVo, String userId) throws Exception {
+        try {
+            //处理审批数据
+            logger.info("订单调整提交审批，完成任务{}:{}：{}", orderUpModelVo.getTaskId(), userId, JSONObject.toJSONString(orderUpModelVo));
+//            //只有通过才处理业务
+//            if (orderUpModelVo.getApprovalResult().equals(ApprovalType.PASS.getValue())) {
+//                AgentResult busres = orderService.approvalTaskBussiData(orderUpModelVo, userId);
+//                if (!busres.isOK()) {
+//                    return busres;
+//                }
+//            }
+            //完成任务
+            AgentResult result = new AgentResult(500, "系统异常", "");
+            Map<String, Object> reqMap = new HashMap<>();
+            reqMap.put("rs", orderUpModelVo.getApprovalResult());
+            reqMap.put("approvalOpinion", orderUpModelVo.getApprovalOpinion());
+            reqMap.put("approvalPerson", userId);
+            reqMap.put("createTime", DateUtils.dateToStringss(new Date()));
+            reqMap.put("taskId", orderUpModelVo.getTaskId());
+            //下一个节点参数
+            if (org.apache.commons.lang.StringUtils.isNotEmpty(orderUpModelVo.getOrderAdjAprDept()))
+                reqMap.put("dept", orderUpModelVo.getOrderAdjAprDept());
+            //传递部门信息
+            Map startPar = agentEnterService.startPar(userId);
+            if (null != startPar) {
+                if (!orderUpModelVo.getApprovalResult().equals("back")) {
+                    ActRuTask actRuTask = actRuTaskService.selectByPrimaryKey(orderUpModelVo.getTaskId());
+                    if (actRuTask==null) {
+                        return result;
+                    }
+                    String[] procDefId = String.valueOf(actRuTask.getProcDefId()).split(":");
+                    if (procDefId==null) {
+                        return result;
+                    }
+                    String taskView = procDefId[0];
+                    String[] taskViewVersion = taskView.split("_");
+                    if (taskViewVersion.length >= 2) {
+                        BigDecimal version = new BigDecimal(taskViewVersion[1]);
+                        if (version.compareTo(new BigDecimal("3.0")) >= 0) {
+                            reqMap.put("party", startPar.get("party"));
+                        } else {
+                            reqMap.put("party", "north");
+                        }
+                    } else {
+                        reqMap.put("party", "north");
+                    }
+                }
+            }
+            //完成任务
+            Map resultMap = activityService.completeTask(orderUpModelVo.getTaskId(), reqMap);
+            if (resultMap == null) {
+                throw new MessageException("catch工作流处理任务异常！");
+            }
+            Boolean rs = (Boolean) resultMap.get("rs");
+            String msg = String.valueOf(resultMap.get("msg"));
+            if (!rs) {
+                throw new MessageException("catch工作流处理任务异常！");
+            }
+            return AgentResult.ok(null);
+        } catch (MessageException e) {
+            e.printStackTrace();
+            throw e;
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    /**
+     * 订单调整审批通过
+     * @param insid
+     * @param actname
+     * @return
+     * @throws Exception
+     */
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult approveFinishOrderAdjust(String insid, String actname) throws Exception {
+        logger.info("订单调整审批完成:{},{}", insid, actname);
+        //审批流关系
+        BusActRel busActRel = busActRelService.findById(insid);
+        if (actname.equals("finish_end")) {//审批完成
+            logger.info("订单调整审批完成,审批通过{}", busActRel.getBusId());
+            busActRel.setActivStatus(AgStatus.Approved.name());
+            if (1 != busActRelService.updateByPrimaryKey(busActRel)) {
+                throw new MessageException("请重新提交！");
+            }
+            OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(busActRel.getBusId());
+            if (orderAdj.getReviewsStat().compareTo(AgStatus.Approved.status) == 0) {
+                logger.info("订单调整审批完成:已审批过:{}", orderAdj.getId());
+                return AgentResult.ok();
+            }
+            OPaymentExample oPaymentExample = new OPaymentExample();
+            oPaymentExample.or().andOrderIdEqualTo(orderAdj.getOrderId()).andStatusEqualTo(Status.STATUS_1.status);
+            List<OPayment> oPaymentList = oPaymentMapper.selectByExample(oPaymentExample);
+            if (oPaymentList.size() != 1) {
+                logger.info("订单调整审批完成:付款单明细未找到:{}", orderAdj.getId());
+                throw new MessageException("付款单明细未找到！");
+            }
+
+            orderAdj.setAdjTm(new Date());
+            orderAdj.setReviewsStat(AgStatus.Approved.status);
+            orderAdj.setReviewsDate(new Date());
+
+            OPayment oPayment = oPaymentList.get(0);
+
+            //订单调整更新
+            if (1 != orderAdjMapper.updateByPrimaryKeySelective(orderAdj)) {
+                throw new MessageException("订单调整数据更新异常！");
+            }
+            //付款单数据更新
+            if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
+                throw new MessageException("付款单数据更新异常！");
+            }
+        } else if(actname.equals("reject_end")) {//审批拒绝
+            logger.info("订单调整审批完审批拒绝{}", busActRel.getBusId());
+            busActRel.setActivStatus(AgStatus.Refuse.name());
+            if (1 != busActRelService.updateByPrimaryKey(busActRel)) {
+                throw new MessageException("请重新提交！");
+            }
+            //订单调整数据
+            OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(busActRel.getBusId());
+            orderAdj.setReviewsStat(AgStatus.Refuse.status);
+            orderAdj.setReviewsDate(new Date());
+
+            //订单调整更新
+            if (1 != orderAdjMapper.updateByPrimaryKeySelective(orderAdj)) {
+                throw new MessageException("订单调整数据更新异常！");
+            }
+        }
+        return AgentResult.ok();
+    }
+
 }
