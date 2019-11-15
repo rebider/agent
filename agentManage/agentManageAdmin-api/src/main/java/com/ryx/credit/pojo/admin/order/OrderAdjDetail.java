@@ -20,7 +20,15 @@ public class OrderAdjDetail implements Serializable {
     private BigDecimal version;
 
     private Date cTm;
+    private BigDecimal adjustCount;
 
+    public BigDecimal getAdjustCount() {
+        return adjustCount;
+    }
+
+    public void setAdjustCount(BigDecimal adjustCount) {
+        this.adjustCount = adjustCount;
+    }
     public String getId() {
         return id;
     }

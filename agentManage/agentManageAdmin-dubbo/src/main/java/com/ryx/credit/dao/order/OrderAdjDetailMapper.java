@@ -4,6 +4,7 @@ import com.ryx.credit.pojo.admin.order.OrderAdjDetail;
 import com.ryx.credit.pojo.admin.order.OrderAdjDetailExample;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -27,4 +28,6 @@ public interface OrderAdjDetailMapper {
     long countAdjNum(@Param("map") Map<String,Object> map);
 
     OrderAdjDetail selectByAdjustId(@Param("adjId") String adjId, @Param("adjDetailId") String adjDetailId);
+
+    BigDecimal sumDifAmount(@Param("adjId")String adjId);
 }

@@ -211,4 +211,9 @@
       </if>
     </where>
   </select>
+  <select id="sumDifAmount" parameterType="string" resultType="java.math.BigDecimal">
+    SELECT SUM(OD.DIF_AMOUNT)
+    FROM O_ORDER_ADJ_DETAIL OD
+    WHERE OD.ADJ_ID = #{adjId}
+  </select>
 </mapper>
