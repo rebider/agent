@@ -654,4 +654,9 @@
         <include refid="OracleDialectSuffix" />
     </select>
 
+    <delete id="clearMortgageProfitData" parameterType="java.lang.String">
+        delete from P_DEDUCTION where REMARK = '流量卡续费扣款'
+        AND DEDUCTION_DATE=#{profitDate,jdbcType=VARCHAR}
+    </delete>
+
 </mapper>
