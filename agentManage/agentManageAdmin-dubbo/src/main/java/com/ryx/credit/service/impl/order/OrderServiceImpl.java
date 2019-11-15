@@ -26,6 +26,7 @@ import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.IPaymentDetailService;
 import com.ryx.credit.service.order.OCashReceivablesService;
 import com.ryx.credit.service.order.OrderService;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,17 +130,19 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private ORefundPriceDiffMapper refundPriceDiffMapper;
     @Autowired
-    OPaymentDetailMapper paymentDetailMapper;
+    private OPaymentDetailMapper paymentDetailMapper;
     @Autowired
     DataHistoryMapper dataHistoryMapper;
     @Autowired
-    OPaymentMapper paymentMapper;
+    private OPaymentMapper paymentMapper;
     @Autowired
-    OAccountAdjustMapper accountAdjustMapper;
+    private OAccountAdjustMapper accountAdjustMapper;
     @Autowired
-    OAccountAdjustDetailMapper accountAdjustDetailMapper;
+    private OAccountAdjustDetailMapper accountAdjustDetailMapper;
     @Autowired
-    ORefundAgentMapper refundAgentMapper;
+    private ORefundAgentMapper refundAgentMapper;
+    @Autowired
+    private OSupplementMapper oSupplementMapper;
     /**
      * 分页查询订单列表
      * @param product
@@ -4384,21 +4387,77 @@ public class OrderServiceImpl implements OrderService {
             orderAdj.setAdjTm(new Date());
             orderAdj.setReviewsStat(AgStatus.Approved.status);
             orderAdj.setReviewsDate(new Date());
-
+            orderAdjMapper.updateByPrimaryKey(orderAdj);
             OPayment oPayment = oPaymentList.get(0);
             //1.计算差价总金额，待付款总计金额
             //2.冲抵分期:更改原分期计划为已付款,补款表增加补款记录(机具退款),增加新的付款计划
             //3.更新订单表为有效,调整表为审批通过,
-            //差价总计金额
+
+            //差价总计金额,即等价于补款到账金额
             BigDecimal sumDifAmount = orderAdjDetailMapper.sumDifAmount(insid);
             //该笔订单的剩余欠款
-            BigDecimal selectArrAmount = oPaymentDetailMapper.selectArrMoney(orderAdj.getOrderId(),PamentIdType.ORDER_FKD.code,PaymentStatus.DF.code);
-            //生成补款单
-            OSupplement oSupplement = new OSupplement();
-//            oSupplement.setAgentId();
-//            oSupplement.setAmount();
-//            oSupplement.setcTime();
-//            oSupplement.setcUser();
+            BigDecimal arrAmount = oPaymentDetailMapper.selectArrMoney(orderAdj.getOrderId(),PamentIdType.ORDER_FKD.code,PaymentStatus.DF.code);
+            //该笔订单剩余欠款记录
+            List<OPaymentDetail> paymentDetails = oPaymentDetailMapper.selectCount(orderAdj.getOrderId(), PamentIdType.ORDER_FKD.code, PaymentStatus.DF.code);
+            //判断退款差价是否大于欠款
+            if(sumDifAmount.compareTo(arrAmount)>=0){//退款大于等于欠款,进行结清操作
+                for(OPaymentDetail paymentDetail:paymentDetails){
+                    //生成补款单
+                    OSupplement oSupplement = new OSupplement();
+                    oSupplement.setId(idService.genId(TabId.o_Supplement));
+                    oSupplement.setAgentId(orderAdj.getAgentId());
+                    oSupplement.setcTime(Calendar.getInstance().getTime());
+                    oSupplement.setcUser(orderAdj.getAdjUserId());
+                    oSupplement.setOrderId(orderAdj.getOrderId());
+                    oSupplement.setPayAmount(paymentDetail.getRealPayAmount());
+                    oSupplement.setRealPayAmount(paymentDetail.getPayAmount());//到账金额
+                    oSupplement.setVersion(Status.STATUS_1.status);
+                    oSupplement.setPkType(PkType.ORDER_REFUND_BK.code);
+                    oSupplement.setSrcId(orderAdj.getId());
+                    oSupplementMapper.insert(oSupplement);
+                    //更新还款计划
+                    paymentDetail.setRealPayAmount(paymentDetail.getPayAmount());
+                    paymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
+                    paymentDetail.setPayTime(Calendar.getInstance().getTime());
+                    paymentDetail.setSrcId(oSupplement.getId());
+                    paymentDetail.setSrcType(PamentSrcType.ORDER_ADJ_DIKOU.code);
+                    paymentDetailMapper.updateByPrimaryKey(paymentDetail);//更新还款计划
+
+                }
+            }else {
+                //欠款期数
+                BigDecimal count = new BigDecimal(paymentDetails.size());
+                BigDecimal new_stage = sumDifAmount.divide(count,2,BigDecimal.ROUND_HALF_UP);
+                //退款金额小于欠款,进行批量补款
+                for(OPaymentDetail paymentDetail:paymentDetails){
+                    List<BigDecimal> divideList = new ArrayList<>();
+                    BigDecimal money = paymentDetail.getPayAmount().subtract(new_stage);
+                    BigDecimal stage = money.divide(count,2,BigDecimal.ROUND_HALF_UP);
+                    BigDecimal tt = BigDecimal.ZERO;
+                    for (int i = 0; i < count.intValue(); i++) {
+                        //补充除不尽余额
+                        if(i==count.intValue()-1){
+                            if(0!=money.subtract(tt).compareTo(stage)){
+                                stage =   money.subtract(tt);
+                            }
+                        }
+                        tt=tt.add(stage);
+                        divideList.add(stage);
+                    }
+                    for (int j = 0; j < paymentDetails.size(); j++) {
+                        OPaymentDetail paymentDetailtmp = paymentDetails.get(j);
+                        paymentDetailtmp.setPayAmount(paymentDetailtmp.getPayAmount().add(divideList.get(j)));
+                        if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetailtmp)) {
+                            logger.info("平均金额失败");
+                            throw new MessageException("平均金额失败");
+                        }
+                    }
+                }
+
+
+
+            };
+
             OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
             oPaymentDetailExample.or().andOrderIdEqualTo(orderAdj.getOrderId()).andPaymentStatusEqualTo(PaymentStatus.DF.code).andStatusEqualTo(Status.STATUS_1.status);
             List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
@@ -4451,7 +4510,7 @@ public class OrderServiceImpl implements OrderService {
         Map<String, Object> result = new HashMap<>();
 
         try {
-            if(isRealAdjust && PamentSrcType.ORDER_ADJ.code.equals(srcType+"")){
+            if(isRealAdjust && PamentSrcType.ORDER_ADJ_DIKOU.code.equals(srcType+"")){
                 ORefundPriceDiff diff = refundPriceDiffMapper.selectByPrimaryKey(srcId);
                 if(diff!=null){
                     if(diff.getMachOweAmt()!=null && diff.getMachOweAmt().compareTo(BigDecimal.ZERO)>0){

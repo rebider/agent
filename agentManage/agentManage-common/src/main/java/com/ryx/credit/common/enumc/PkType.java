@@ -4,7 +4,8 @@ package com.ryx.credit.common.enumc;
  * 补款类型
  */
 public enum PkType {
-    FQBK("1","分期补款");
+    FQBK("1","分期补款"),
+    ORDER_REFUND_BK("2","订单机具数量调整补款");
 
     public String code;
 
