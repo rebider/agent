@@ -44,19 +44,38 @@ public class DataHistoryInterceptor implements MethodInterceptor {
 
         boolean result = name.contains("update") || name.contains("insert") || name.contains("delete");
         //取出方法
-        if (name.equals("updateSnStatus")) {
+        if (name.equals("updateSnStatus") || name.equals("deleteDetailByLogisicalId")) {
             result = false;
         }
         String clazz = method.toString();
         if(result && !clazz.contains("CSysLogMapper") && !clazz.contains("DataHistoryRecordMapper") && !clazz.contains("DataHistoryMapper")
-                && !clazz.contains("OInternetCardMapper") && !clazz.contains("OInternetCardImportMapper")){
+                && !clazz.contains("OInternetCardMapper") && !clazz.contains("OInternetCardImportMapper") && !clazz.contains("AttachmentMapper")){
             //获取该方法的传参
             Object[] paramsArr = mi.getArguments();
             Object o = paramsArr[0];
-            Map<String, Object> objectMap = new HashMap<>();
+            String user = "";
+            String busId = "";
             try {
-                objectMap = JsonUtil.objectToMap(o);
+                Map<String, Object> objectMap = JsonUtil.objectToMap(o);
+                String cUser = String.valueOf(objectMap.get("cUser"));
+                String uUser = String.valueOf(objectMap.get("uUser"));
+                if(StringUtils.isNotBlank(cUser) && !cUser.equals("null")){
+                    user = cUser;
+                }else if(StringUtils.isNotBlank(uUser) && !uUser.equals("null")){
+                    user = uUser;
+                }
+                String id = String.valueOf(objectMap.get("id"));
+                String busid = String.valueOf(objectMap.get("busId"));
+                String orgId = String.valueOf(objectMap.get("orgId"));
+                if(StringUtils.isNotBlank(id) && !id.equals("null")){
+                    busId = id;
+                }else if(StringUtils.isNotBlank(busid) && !busid.equals("null")){
+                    busId = busid;
+                }else if(StringUtils.isNotBlank(orgId) && !busid.equals("null")){
+                    busId = orgId;
+                }
             } catch (Exception e) {
+                log.info("拦截操作历史记录失败,请求参数不规范");
                 e.printStackTrace();
             }
             String params = getParams(paramsArr);
@@ -70,23 +89,8 @@ public class DataHistoryInterceptor implements MethodInterceptor {
             dataHistory.setDataParameter(params);
             dataHistory.setDataVersion(Status.STATUS_1.status);
             dataHistory.setcTime(new Date());
-            String user = "";
-            String cUser = String.valueOf(objectMap.get("cUser"));
-            String uUser = String.valueOf(objectMap.get("uUser"));
-            if(StringUtils.isNotBlank(cUser) && !cUser.equals("null")){
-                user = cUser;
-            }else if(StringUtils.isNotBlank(uUser) && !uUser.equals("null")){
-                user = uUser;
-            }
+
             dataHistory.setcUser(user);
-            String busId = "";
-            String id = String.valueOf(objectMap.get("id"));
-            String busid = String.valueOf(objectMap.get("busId"));
-            if(StringUtils.isNotBlank(id) && !id.equals("null")){
-                busId = id;
-            }else if(StringUtils.isNotBlank(busid) && !busid.equals("null")){
-                busId = busid;
-            }
             dataHistory.setBusId(busId);
             dataHistory.setStatus(Status.STATUS_1.status);
             dataHistoryRecordMapper.insert(dataHistory);

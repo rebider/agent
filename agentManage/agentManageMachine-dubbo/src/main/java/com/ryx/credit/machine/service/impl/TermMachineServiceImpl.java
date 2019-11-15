@@ -112,8 +112,10 @@ public class TermMachineServiceImpl  implements TermMachineService {
             return sPosTermMachineServiceImpl.lowerHairMachine(lowerHairMachineVo);
         } else if(PlatformType.RJPOS.code.equals(lowerHairMachineVo.getPlatformType())) {
             return rjTermMachineServiceImpl.lowerHairMachine(lowerHairMachineVo);
+        } else if (PlatformType.RDBPOS.code.equals(lowerHairMachineVo.getPlatformType())) {
+            return rdbTermMachineServiceImpl.lowerHairMachine(lowerHairMachineVo);
         }
-        return AgentResult.fail("未实现的业务");
+        return AgentResult.fail("未实现的业务平台");
     }
 
     /**
@@ -260,7 +262,9 @@ public class TermMachineServiceImpl  implements TermMachineService {
     public AgentResult queryLogisticsResult(Map<String, Object> pamMap, String platformType) throws Exception {
         if (PlatformType.RJPOS.getValue().equals(platformType)) {
             return rjTermMachineServiceImpl.queryLogisticsResult(pamMap, platformType);
-        }else {
+        }else if (PlatformType.RDBPOS.getValue().equals(platformType)){
+            return rdbTermMachineServiceImpl.queryLogisticsResult(pamMap, platformType);
+        } else {
             return AgentResult.fail("未实现的物流平台。");
         }
     }

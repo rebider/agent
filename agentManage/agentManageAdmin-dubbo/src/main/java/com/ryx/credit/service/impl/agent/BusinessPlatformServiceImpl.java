@@ -367,25 +367,39 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 Dict creditRateCeiling = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), item.getBusPlatform(), "creditRateCeiling");//贷记费率上限（%）
                 Dict debitRateCapping = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), item.getBusPlatform(), "debitRateCapping");//借记费率上限（%）
                 Dict debitCappingLower = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), item.getBusPlatform(), "debitCappingLower");//借记封顶额下限（元）
-                if(debitRateLower!=null){
+                if (debitRateLower==null) {
+                    item.setDebitRateLower("");
+                } else {
                     item.setDebitRateLower(debitRateLower.getdItemvalue());
                 }
-                if(debitCapping!=null){
+                if (debitCapping==null) {
+                    item.setDebitCapping("");
+                } else {
                     item.setDebitCapping(debitCapping.getdItemvalue());
                 }
-                if(debitAppearRate!=null){
+                if (debitAppearRate==null) {
+                    item.setDebitAppearRate("");
+                } else {
                     item.setDebitAppearRate(debitAppearRate.getdItemvalue());
                 }
-                if (creditRateFloor != null) {
+                if (creditRateFloor==null) {
+                    item.setCreditRateFloor("");
+                } else {
                     item.setCreditRateFloor(creditRateFloor.getdItemname());
                 }
-                if (creditRateCeiling != null) {
+                if (creditRateCeiling==null) {
+                    item.setCreditRateCeiling("");
+                } else {
                     item.setCreditRateCeiling(creditRateCeiling.getdItemname());
                 }
-                if (debitRateCapping != null) {
+                if (debitRateCapping==null) {
+                    item.setDebitRateCapping("");
+                } else {
                     item.setDebitRateCapping(debitRateCapping.getdItemname());
                 }
-                if (debitCappingLower != null) {
+                if (debitCappingLower==null) {
+                    item.setDebitCappingLower("");
+                } else {
                     item.setDebitCappingLower(debitCappingLower.getdItemname());
                 }
                 item.setVersion(agbus.getVersion());

@@ -2,6 +2,7 @@ package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.util.DateUtils;
+import com.ryx.credit.common.util.FutureTaskUtils;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -12,23 +13,16 @@ import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.IPmsProfitLogService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 
 
 @Service("pmsProfitLogService")
-public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
+public class PmsProfitLogServiceImpl implements IPmsProfitLogService{
     private final Logger logger = Logger.getLogger(PmsProfitLogServiceImpl.class);
     @Autowired
     PmsProfitLogMapper pmsProfitLogMapper;
@@ -193,9 +187,14 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
     }
 
     @Transactional
-    public void saveSheet(List<Map<String, String>> list, String sheetName, int columnNum, String month, String userId, int sheetOrder) {
+    public void saveSheet(List<Map<String, String>> list, String sheetName, int columnNum, String month, String userId, int sheetOrder,List<Map<String, String>> listOne,int theadi,int count) {
+        if(listOne ==null){
+            listOne = new ArrayList<>();
+            listOne.add(list.get(0));
+            list.removeAll(listOne);
+        }
 
-        for (int i = 1; i < list.size(); i++) {
+        for (int i = 0; i < list.size(); i++) {
 
             PmsProfitTempWithBLOBs pmsProfitTempWithBLOBs = new PmsProfitTempWithBLOBs();
             pmsProfitTempWithBLOBs.setMonth(month);
@@ -203,7 +202,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
             pmsProfitTempWithBLOBs.setAgentId((list.get(i).get("Cell1")));
             pmsProfitTempWithBLOBs.setBusCode(list.get(i).get("Cell3").trim());
             pmsProfitTempWithBLOBs.setBusName(list.get(i).get("Cell4").trim());
-            pmsProfitTempWithBLOBs.setSheetHead(callMapToXML(list.get(0)));
+            pmsProfitTempWithBLOBs.setSheetHead(callMapToXML(listOne.get(0)));
             pmsProfitTempWithBLOBs.setSheetData(callMapToXML(list.get(i)));
             pmsProfitTempWithBLOBs.setSheetName(sheetName);
             pmsProfitTempWithBLOBs.setImportPerson(userId);
@@ -243,7 +242,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
                 throw new RuntimeException("数据查询失败");
             }
             if (mapData.size() < 1) {
-                throw new RuntimeException(sheetName + "sheet页第" + i + "行的平台下" + busCode + "不存在此行唯一码" + agentId);
+                throw new RuntimeException(sheetName + "sheet页第" + ((i+2)+(theadi*count)) + "行的平台下" + busCode + "不存在此行唯一码" + agentId);
             }
          /*   if (!list.get(i).get("Cell1").trim().equals(mapData.get(0).get("AG_NAME").toString().trim())) {
                 logger.info("mapData=======================================" + mapData + "+++++++++++" + mapData.get(0).get("AG_NAME").toString().trim());
@@ -251,7 +250,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
                 throw new RuntimeException(sheetName + "sheet页第" + i + "行唯一标识与代理商名称不匹配");
             }*/
             if (!month.equals((list.get(i).get("Cell2")))) {
-                throw new RuntimeException(sheetName + "sheet页第" + i + "行月份与选择不匹配");
+                throw new RuntimeException(sheetName + "sheet页第" + ((i+2)+(theadi*count)) + "行月份与选择不匹配");
             }
 /*
             if (mapData.get(0).get("PLATFORM_NAME").toString().trim().indexOf(list.get(i).get("Cell4").trim()) == -1) {
@@ -286,7 +285,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
     public int updateByPrimaryKey(PmsProfitLog record) {
         return pmsProfitLogMapper.updateByPrimaryKeySelective(record);
     }
-    public static ExecutorService newFixedThreadPool(int nThreads) {
+    public static Executor newFixedThreadPool(int nThreads) {
         return new ThreadPoolExecutor(nThreads, nThreads,
                 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>());
@@ -295,11 +294,20 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
     @Override
     @Transactional
     public void disposeSheet(List<Map<String, String>> sheetlists, String sheetName, int columnNum, String month, String userId, int sheetOrder) {
-        if (sheetlists.size() > 0 && sheetlists.size() < 10) {
-            saveSheet(sheetlists, sheetName, columnNum, month, userId, sheetOrder);
+        if (sheetlists.size() > 0 && sheetlists.size() < 11) {
+            saveSheet(sheetlists, sheetName, columnNum, month, userId, sheetOrder,null,0,0);
 
         } else {
-            ExecutorService threadPoolTaskExecutor =  newFixedThreadPool(10);
+
+            List<String> taskNameList = new ArrayList<String>();
+            List<FutureTask<Map<String,String>>> taskList = new ArrayList();
+
+            Executor executor = newFixedThreadPool(10);
+
+            List<Map<String, String>> listOne = new ArrayList<>();
+             listOne.add(sheetlists.get(0));
+           sheetlists.removeAll(listOne);
+
 
             int count = sheetlists.size() / 10;
             int yu = sheetlists.size() % 10;
@@ -310,19 +318,39 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
                 } else {
                     list = sheetlists.subList(z * count, count * (z + 1));
                 }
-                SheetThead sheetThead = new SheetThead(list, sheetName, columnNum, month, userId, sheetOrder );
                 try {
-                    threadPoolTaskExecutor.execute(sheetThead);
+                    SheetThead sheetThead = new SheetThead(list, sheetName, columnNum, month, userId, sheetOrder,listOne,z,count);
+                    FutureTask<Map<String,String>> thread = new FutureTask<>(sheetThead);
+                    taskNameList.add("{ SheetThead================================================================-" + sheetName+z + "}");
+                    taskList.add(thread);
+                    executor.execute(thread);
                 } catch (Exception e) {
                     e.printStackTrace();
                     throw new RuntimeException(e.getMessage());
                 }
+
+            }
+
+            // 等待线程执行结束
+            ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) executor;
+            threadPoolExecutor.shutdown();
+            while (true) {
+                if (threadPoolExecutor.getActiveCount() <= 0) {
+                    break;
+                }
+            }
+
+            Map<String,String> resultMap  = FutureTaskUtils.getTaskResult(taskList, taskNameList, logger);
+            // 获取线程执行结果
+            if ("fail".equals(resultMap.get("result"))) {
+                throw new RuntimeException(resultMap.get("Err"));
             }
         }
     }
 
 
-    class SheetThead extends Thread {
+
+    class SheetThead  implements Callable<Map<String,String>> {
 
         private List<Map<String, String>> sheetlists;
         private String month;
@@ -331,25 +359,38 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
         private PmsProfitLog pmsProfitLog;
         private String sheetName;
         int columnNum;
+        private List<Map<String, String>> listOne;
+        int i;
+        int count;
 
-        SheetThead(List<Map<String, String>> sheetlists, String sheetName, int columnNum, String month, String userId, int sheetOrder) {
+        SheetThead(List<Map<String, String>> sheetlists, String sheetName, int columnNum, String month, String userId, int sheetOrder,List<Map<String, String>> listOne,int i,int count) {
             this.sheetlists = sheetlists;
             this.month = month;
             this.userId = userId;
             this.sheetOrder = sheetOrder;
             this.sheetName = sheetName;
             this.columnNum = columnNum;
+           this.listOne =listOne;
+            this.i =i;
+            this.count = count;
         }
+
+
 
         @Override
-        public void run() {
-            saveSheet(sheetlists, sheetName, columnNum, month, userId, sheetOrder);
-
+        public Map<String,String> call(){
+            logger.info("分润导入线程 执行开始-当前线程：{" + this.i + "}");
+            Map<String,String> rMap = new HashMap<>();
+            try {
+                saveSheet(sheetlists, sheetName, columnNum, month, userId, sheetOrder,listOne,i,count);
+                rMap.put("result","success");
+            }catch (Exception e){
+                rMap.put("result","fail");
+                rMap.put("Err",e.getMessage());
+            }
+            logger.info("分润导入线程 执行结束-当前线程：{" + this.i + "}");
+            return rMap;
         }
-
     }
-
-
-
 
 }

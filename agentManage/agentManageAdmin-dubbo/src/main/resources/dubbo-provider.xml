@@ -67,6 +67,7 @@
     <dubbo:service interface="com.ryx.credit.service.agent.AgentCertificationService" ref="agentCertificationService" timeout="1200000" registry="myGroup"/>
     <dubbo:service interface="com.ryx.credit.service.agent.AnnounceMentInfoService" ref="announceMentInfoService" timeout="1200000" registry="myGroup"/>
     <dubbo:service interface="com.ryx.credit.service.agent.AnnouncementReadInfoService" ref="announcementReadInfoService" timeout="1200000" registry="myGroup"/>
+    <dubbo:service interface="com.ryx.credit.service.agent.AnnoPlatformRelaService" ref="annoPlatformRelaService" timeout="1200000" registry="myGroup"/>
     <dubbo:service interface="com.ryx.credit.service.IBranchInnerConnectionService" ref="branchInnerConnectionService" timeout="1200000" registry="myGroup"/>
 
 
@@ -154,9 +155,11 @@
 
     <dubbo:service interface="com.ryx.credit.service.agent.AgentDebitCardService" ref="agentDebitCardService"  timeout="1200000" registry="myGroup"/>
 
-    <!-- 退货任务，提供者 -->
+    <!-- 退货-->
     <dubbo:service interface="com.ryx.credit.service.order.OsnOperateReturnService" ref="osnOperateReturnService"  timeout="1200000" registry="myGroup" />
     <dubbo:service interface="com.ryx.credit.service.agent.AgentFreezeService" ref="agentFreezeService"  timeout="1200000" registry="myGroup" />
     <dubbo:reference interface="com.ryx.credit.machine.service.LmsUserService" id="lmsUserService"  timeout="1200000" registry="myGroup" check="false" />
 
+    <!-- 数据图表 -->
+    <dubbo:service interface="com.ryx.credit.service.data.EchartService" ref="echartService"  timeout="1200000" registry="myGroup"/>
 </beans>

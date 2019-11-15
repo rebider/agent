@@ -118,8 +118,10 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public AgentResult updateApproval(AgentVo agentVo,String userId) throws Exception{
-
-        if(agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())) {
+        if(StringUtils.isBlank(agentVo.getApprovalResult())){
+            throw new ProcessException("审批结果不能为空");
+        }
+        if(ApprovalType.PASS.getValue().equals(agentVo.getApprovalResult())) {
             //判断打款方式--->银行汇款  是否填写了实际到账金额
             List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(userId));
             if(orgCodeRes==null && orgCodeRes.size()!=1){
@@ -146,7 +148,7 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                         AgentBusInfo agent_busInfo = agentBusinfoService.agentPlatformNum(agentBusInfo.getAgentId(),agentBusInfoVo.getBusPlatform());
 
                         if(null!=agent_busInfo && StringUtils.isNotBlank(agent_busInfo.getOrganNum())){
-                            if (!agent_busInfo.getOrganNum().equals(agentBusInfo.getOrganNum())){
+                            if (!agent_busInfo.getOrganNum().equals(agentBusInfoVo.getOrganNum())){
                                 List<Organization> organizationList = organizationMapper.selectOrganization(agent_busInfo.getOrganNum());
                                 String orgNick="";
                                 if(null!=organizationList && organizationList.size()>0){

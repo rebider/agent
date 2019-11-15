@@ -198,8 +198,8 @@
 
 
   <!--  开始写代码-->
-  <delete id="deleteOrgPlatform" parameterType="string">
-     delete from ORG_PLATFORM where id=#{id}
+  <delete id="deleteOrgPlatform" parameterType="map">
+     delete from ORG_PLATFORM where id=#{map.id}
   </delete>
 
   <select id="queryOrg" parameterType="string" resultType="map">

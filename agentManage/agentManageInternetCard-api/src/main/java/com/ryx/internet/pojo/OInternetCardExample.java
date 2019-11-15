@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class OInternetCardExample {
     protected String orderByClause;
@@ -20,8 +21,18 @@ public class OInternetCardExample {
 
     protected Integer limitEnd;
 
+    protected Map<String,Object> reqMap;
+
     public OInternetCardExample() {
         oredCriteria = new ArrayList<Criteria>();
+    }
+
+    public Map<String, Object> getReqMap() {
+        return reqMap;
+    }
+
+    public void setReqMap(Map<String, Object> reqMap) {
+        this.reqMap = reqMap;
     }
 
     public String getOrderByClause() {
@@ -2055,6 +2066,216 @@ public class OInternetCardExample {
 
         public Criteria andSumPostponeTimeNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("SUM_POSTPONE_TIME not between", value1, value2, "sumPostponeTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumIsNull() {
+            addCriterion("BUS_NUM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumIsNotNull() {
+            addCriterion("BUS_NUM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumEqualTo(String value) {
+            addCriterion("BUS_NUM =", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumNotEqualTo(String value) {
+            addCriterion("BUS_NUM <>", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumGreaterThan(String value) {
+            addCriterion("BUS_NUM >", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumGreaterThanOrEqualTo(String value) {
+            addCriterion("BUS_NUM >=", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumLessThan(String value) {
+            addCriterion("BUS_NUM <", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumLessThanOrEqualTo(String value) {
+            addCriterion("BUS_NUM <=", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumLike(String value) {
+            addCriterion("BUS_NUM like", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumNotLike(String value) {
+            addCriterion("BUS_NUM not like", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumIn(List<String> values) {
+            addCriterion("BUS_NUM in", values, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumNotIn(List<String> values) {
+            addCriterion("BUS_NUM not in", values, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumBetween(String value1, String value2) {
+            addCriterion("BUS_NUM between", value1, value2, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumNotBetween(String value1, String value2) {
+            addCriterion("BUS_NUM not between", value1, value2, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformIsNull() {
+            addCriterion("BUS_PLATFORM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformIsNotNull() {
+            addCriterion("BUS_PLATFORM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformEqualTo(String value) {
+            addCriterion("BUS_PLATFORM =", value, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformNotEqualTo(String value) {
+            addCriterion("BUS_PLATFORM <>", value, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformGreaterThan(String value) {
+            addCriterion("BUS_PLATFORM >", value, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformGreaterThanOrEqualTo(String value) {
+            addCriterion("BUS_PLATFORM >=", value, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformLessThan(String value) {
+            addCriterion("BUS_PLATFORM <", value, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformLessThanOrEqualTo(String value) {
+            addCriterion("BUS_PLATFORM <=", value, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformLike(String value) {
+            addCriterion("BUS_PLATFORM like", value, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformNotLike(String value) {
+            addCriterion("BUS_PLATFORM not like", value, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformIn(List<String> values) {
+            addCriterion("BUS_PLATFORM in", values, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformNotIn(List<String> values) {
+            addCriterion("BUS_PLATFORM not in", values, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformBetween(String value1, String value2) {
+            addCriterion("BUS_PLATFORM between", value1, value2, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformNotBetween(String value1, String value2) {
+            addCriterion("BUS_PLATFORM not between", value1, value2, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseIsNull() {
+            addCriterion("POSTPONE_CAUSE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseIsNotNull() {
+            addCriterion("POSTPONE_CAUSE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseEqualTo(String value) {
+            addCriterion("POSTPONE_CAUSE =", value, "postponeCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseNotEqualTo(String value) {
+            addCriterion("POSTPONE_CAUSE <>", value, "postponeCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseGreaterThan(String value) {
+            addCriterion("POSTPONE_CAUSE >", value, "postponeCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseGreaterThanOrEqualTo(String value) {
+            addCriterion("POSTPONE_CAUSE >=", value, "postponeCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseLessThan(String value) {
+            addCriterion("POSTPONE_CAUSE <", value, "postponeCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseLessThanOrEqualTo(String value) {
+            addCriterion("POSTPONE_CAUSE <=", value, "postponeCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseLike(String value) {
+            addCriterion("POSTPONE_CAUSE like", value, "postponeCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseNotLike(String value) {
+            addCriterion("POSTPONE_CAUSE not like", value, "postponeCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseIn(List<String> values) {
+            addCriterion("POSTPONE_CAUSE in", values, "postponeCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseNotIn(List<String> values) {
+            addCriterion("POSTPONE_CAUSE not in", values, "postponeCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseBetween(String value1, String value2) {
+            addCriterion("POSTPONE_CAUSE between", value1, value2, "postponeCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andPostponeCauseNotBetween(String value1, String value2) {
+            addCriterion("POSTPONE_CAUSE not between", value1, value2, "postponeCause");
             return (Criteria) this;
         }
     }
