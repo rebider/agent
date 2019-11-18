@@ -1136,15 +1136,6 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	public AgentBusInfo queryAgentBusInfoById(String id) {
 		return agentBusInfoMapper.selectByPrimaryKey(id);
 	}
-	public List<String> queryOrgByAgentid(Map map) {
-		List<String> allOrg=new ArrayList<>();
-		List<String> orgs = agentBusInfoMapper.queryAgDocPro(map);
-		List<COrganization> cOrganizations = cOrganizationMapper.selectPorgByorgs(orgs);
-		cOrganizations.forEach(org->{
-			allOrg.add(String.valueOf(org.getId()));
-		});
-		return allOrg;
-	}
 
 	@Override
 	public AgentBusInfo agentPlatformNum(String agentId,String platFormNum) {
