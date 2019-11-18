@@ -453,6 +453,7 @@
     </select>
 
     <sql id="organizationWhere">
+        and o.status=1
         <if test="map.orgId!=null and map.orgId!=''"> and o.ORG_ID=#{map.orgId} </if>
         <if test="map.orgName!=null and map.orgName!=''"> and o.ORG_NAME LIKE CONCAT(CONCAT('%',#{map.orgName}),'%')</if>
 
