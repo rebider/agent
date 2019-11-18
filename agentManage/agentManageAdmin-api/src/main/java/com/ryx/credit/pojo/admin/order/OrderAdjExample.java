@@ -1346,6 +1346,126 @@ public class OrderAdjExample {
             addCriterion("AGENT_ID not between", value1, value2, "agentId");
             return (Criteria) this;
         }
+
+        public Criteria andCreditIsNull() {
+            addCriterion("CREDIT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditIsNotNull() {
+            addCriterion("CREDIT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditEqualTo(BigDecimal value) {
+            addCriterion("CREDIT =", value, "credit");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditNotEqualTo(BigDecimal value) {
+            addCriterion("CREDIT <>", value, "credit");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditGreaterThan(BigDecimal value) {
+            addCriterion("CREDIT >", value, "credit");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("CREDIT >=", value, "credit");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditLessThan(BigDecimal value) {
+            addCriterion("CREDIT <", value, "credit");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("CREDIT <=", value, "credit");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditIn(List<BigDecimal> values) {
+            addCriterion("CREDIT in", values, "credit");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditNotIn(List<BigDecimal> values) {
+            addCriterion("CREDIT not in", values, "credit");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("CREDIT between", value1, value2, "credit");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("CREDIT not between", value1, value2, "credit");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundModeIsNull() {
+            addCriterion("REFUND_MODE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundModeIsNotNull() {
+            addCriterion("REFUND_MODE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundModeEqualTo(BigDecimal value) {
+            addCriterion("REFUND_MODE =", value, "refundMode");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundModeNotEqualTo(BigDecimal value) {
+            addCriterion("REFUND_MODE <>", value, "refundMode");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundModeGreaterThan(BigDecimal value) {
+            addCriterion("REFUND_MODE >", value, "refundMode");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundModeGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("REFUND_MODE >=", value, "refundMode");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundModeLessThan(BigDecimal value) {
+            addCriterion("REFUND_MODE <", value, "refundMode");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundModeLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("REFUND_MODE <=", value, "refundMode");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundModeIn(List<BigDecimal> values) {
+            addCriterion("REFUND_MODE in", values, "refundMode");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundModeNotIn(List<BigDecimal> values) {
+            addCriterion("REFUND_MODE not in", values, "refundMode");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundModeBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("REFUND_MODE between", value1, value2, "refundMode");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundModeNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("REFUND_MODE not between", value1, value2, "refundMode");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

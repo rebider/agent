@@ -21,6 +21,8 @@
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="CREDIT" jdbcType="DECIMAL" property="credit" />
+    <result column="REFUND_MODE" jdbcType="DECIMAL" property="refundMode" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -54,7 +56,7 @@
   <sql id="Base_Column_List">
     ID, ORDER_ID, ADJ_USER_ID, ADJ_TM, CUR_ARR_AMOUNT, ORG_STAGES_AMOUNT, STAGES_AMOUNT, 
     RESON, REFUND_AMOUNT, REFUND_TYPE, REFUND_STAT, REFUND_TM, ORG_PAYMENT_ID, NEW_PAYMENT_ID, 
-    REVIEWS_STAT, REVIEWS_DATE, STATUS, VERSION, AGENT_ID
+    REVIEWS_STAT, REVIEWS_DATE, STATUS, VERSION, AGENT_ID, CREDIT, REFUND_MODE
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -91,14 +93,16 @@
       REFUND_TYPE, REFUND_STAT, REFUND_TM, 
       ORG_PAYMENT_ID, NEW_PAYMENT_ID, REVIEWS_STAT, 
       REVIEWS_DATE, STATUS, VERSION, 
-      AGENT_ID)
+      AGENT_ID, CREDIT, REFUND_MODE
+      )
     values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{adjUserId,jdbcType=VARCHAR}, 
       #{adjTm,jdbcType=TIMESTAMP}, #{curArrAmount,jdbcType=DECIMAL}, #{orgStagesAmount,jdbcType=DECIMAL}, 
       #{stagesAmount,jdbcType=DECIMAL}, #{reson,jdbcType=VARCHAR}, #{refundAmount,jdbcType=DECIMAL}, 
       #{refundType,jdbcType=DECIMAL}, #{refundStat,jdbcType=DECIMAL}, #{refundTm,jdbcType=TIMESTAMP}, 
       #{orgPaymentId,jdbcType=VARCHAR}, #{newPaymentId,jdbcType=VARCHAR}, #{reviewsStat,jdbcType=DECIMAL}, 
       #{reviewsDate,jdbcType=TIMESTAMP}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, 
-      #{agentId,jdbcType=VARCHAR})
+      #{agentId,jdbcType=VARCHAR}, #{credit,jdbcType=DECIMAL}, #{refundMode,jdbcType=DECIMAL}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OrderAdj">
     insert into O_ORDER_ADJ
@@ -160,6 +164,12 @@
       <if test="agentId != null">
         AGENT_ID,
       </if>
+      <if test="credit != null">
+        CREDIT,
+      </if>
+      <if test="refundMode != null">
+        REFUND_MODE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -218,6 +228,12 @@
       </if>
       <if test="agentId != null">
         #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="credit != null">
+        #{credit,jdbcType=DECIMAL},
+      </if>
+      <if test="refundMode != null">
+        #{refundMode,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -284,6 +300,12 @@
       <if test="agentId != null">
         AGENT_ID = #{agentId,jdbcType=VARCHAR},
       </if>
+      <if test="credit != null">
+        CREDIT = #{credit,jdbcType=DECIMAL},
+      </if>
+      <if test="refundMode != null">
+        REFUND_MODE = #{refundMode,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -306,7 +328,9 @@
       REVIEWS_DATE = #{reviewsDate,jdbcType=TIMESTAMP},
       STATUS = #{status,jdbcType=DECIMAL},
       VERSION = #{version,jdbcType=DECIMAL},
-      AGENT_ID = #{agentId,jdbcType=VARCHAR}
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      CREDIT = #{credit,jdbcType=DECIMAL},
+      REFUND_MODE = #{refundMode,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

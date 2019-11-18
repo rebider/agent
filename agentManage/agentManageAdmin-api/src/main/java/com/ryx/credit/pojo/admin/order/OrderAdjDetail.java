@@ -2,6 +2,7 @@ package com.ryx.credit.pojo.admin.order;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 
 public class OrderAdjDetail implements Serializable {
     private String id;
@@ -18,6 +19,7 @@ public class OrderAdjDetail implements Serializable {
 
     private BigDecimal version;
 
+    private Date cTm;
     private BigDecimal adjustCount;
 
     public BigDecimal getAdjustCount() {
@@ -27,7 +29,6 @@ public class OrderAdjDetail implements Serializable {
     public void setAdjustCount(BigDecimal adjustCount) {
         this.adjustCount = adjustCount;
     }
-
     public String getId() {
         return id;
     }
@@ -82,5 +83,13 @@ public class OrderAdjDetail implements Serializable {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public Date getcTm() {
+        return cTm;
+    }
+
+    public void setcTm(Date cTm) {
+        this.cTm = cTm;
     }
 }

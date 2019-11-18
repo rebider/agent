@@ -9,6 +9,7 @@
     <result column="DIF_AMOUNT" jdbcType="DECIMAL" property="difAmount" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="C_TM" jdbcType="TIMESTAMP" property="cTm" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -40,7 +41,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, ADJ_ID, SUB_ORDER_ID, ADJ_NUM, DIF_AMOUNT, STATUS, VERSION
+    ID, ADJ_ID, SUB_ORDER_ID, ADJ_NUM, DIF_AMOUNT, STATUS, VERSION, C_TM
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -73,10 +74,10 @@
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjDetail">
     insert into O_ORDER_ADJ_DETAIL (ID, ADJ_ID, SUB_ORDER_ID, 
       ADJ_NUM, DIF_AMOUNT, STATUS, 
-      VERSION)
+      VERSION, C_TM)
     values (#{id,jdbcType=VARCHAR}, #{adjId,jdbcType=VARCHAR}, #{subOrderId,jdbcType=VARCHAR}, 
       #{adjNum,jdbcType=DECIMAL}, #{difAmount,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL}, 
-      #{version,jdbcType=DECIMAL})
+      #{version,jdbcType=DECIMAL}, #{cTm,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjDetail">
     insert into O_ORDER_ADJ_DETAIL
@@ -102,6 +103,9 @@
       <if test="version != null">
         VERSION,
       </if>
+      <if test="cTm != null">
+        C_TM,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -124,6 +128,9 @@
       </if>
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="cTm != null">
+        #{cTm,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -154,6 +161,9 @@
       <if test="version != null">
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
+      <if test="cTm != null">
+        C_TM = #{cTm,jdbcType=TIMESTAMP},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -164,7 +174,8 @@
       ADJ_NUM = #{adjNum,jdbcType=DECIMAL},
       DIF_AMOUNT = #{difAmount,jdbcType=DECIMAL},
       STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL}
+      VERSION = #{version,jdbcType=DECIMAL},
+      C_TM = #{cTm,jdbcType=TIMESTAMP}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -199,5 +210,10 @@
         and detail.id = #{adjDetailId}
       </if>
     </where>
+  </select>
+  <select id="sumDifAmount" parameterType="string" resultType="java.math.BigDecimal">
+    SELECT SUM(OD.DIF_AMOUNT)
+    FROM O_ORDER_ADJ_DETAIL OD
+    WHERE OD.ADJ_ID = #{adjId}
   </select>
 </mapper>
