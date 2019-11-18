@@ -4430,71 +4430,101 @@ public class OrderServiceImpl implements OrderService {
                 }
             }else {
 
-                    //欠款期数
-                    BigDecimal count = new BigDecimal(paymentDetails.size());
-                    BigDecimal new_stage = sumDifAmount.divide(count,2,BigDecimal.ROUND_HALF_UP);
-                    //退款金额小于欠款,进行批量补款
-                    for(OPaymentDetail paymentDetail:paymentDetails) {
-                        List<BigDecimal> divideList = new ArrayList<>();
-                        BigDecimal money = paymentDetail.getPayAmount().subtract(new_stage);
-                        BigDecimal stage = money.divide(count, 2, BigDecimal.ROUND_HALF_UP);
-                        BigDecimal tt = BigDecimal.ZERO;
-                        for (int i = 0; i < count.intValue(); i++) {
-                            //补充除不尽余额
-                            if (i == count.intValue() - 1) {
-                                if (0 != money.subtract(tt).compareTo(stage)) {
-                                    stage = money.subtract(tt);
-                                }
-                            }
-                            tt = tt.add(stage);
-                            divideList.add(stage);
-                        }
-                        for (int j = 0; j < paymentDetails.size(); j++) {
-                            OPaymentDetail paymentDetailtmp = paymentDetails.get(j);
-                            logger.info("====更新明细表开始====");
-                            paymentDetailtmp.setPayAmount(paymentDetailtmp.getPayAmount().add(divideList.get(j)));
-                            logger.info("====更新明细表结束====");
-                            if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetailtmp)) {
-                                logger.info("平均金额失败");
-                                throw new MessageException("平均金额失败");
-                            }
-                        }
-                        Calendar temp = Calendar.getInstance();
-                        //分期数据
-                        List<Map> FKFQ_data = StageUtil.stageOrder(
-                                oPayment.getOutstandingAmount(),
-                                count.intValue(),
-                                paymentDetails.get(0).getPlanPayTime(), temp.get(Calendar.DAY_OF_MONTH));
-                        //明细处理
-                        String batchCode = temp.getTime().getTime() + "";
-                        for (Map datum : FKFQ_data) {
-                            OPaymentDetail record = new OPaymentDetail();
-                            record.setId(idService.genId(TabId.o_payment_detail));
-                            record.setBatchCode(batchCode);
-                            record.setPaymentId(oPayment.getId());
-                            record.setPaymentType(PamentIdType.ORDER_FKD.code);
-                            record.setOrderId(oPayment.getOrderId());
-                            record.setPayType(PaymentType.DKFQ.code);
-                            record.setPayAmount((BigDecimal) datum.get("item"));
-                            record.setRealPayAmount(BigDecimal.ZERO);
-                            record.setPlanPayTime((Date) datum.get("date"));
-                            record.setPlanNum((BigDecimal) datum.get("count"));
-                            record.setAgentId(oPayment.getAgentId());
-                            record.setPaymentStatus(PaymentStatus.DF.code);
-                            record.setcUser(oPayment.getUserId());
-                            record.setcDate(temp.getTime());
-                            record.setStatus(Status.STATUS_1.status);
-                            record.setVersion(Status.STATUS_1.status);
+                //欠款期数
+                BigDecimal count = new BigDecimal(paymentDetails.size());
+                //新的分期金额 = (欠款总计 - 差价金额(补款金额)) / 欠款分期数
+                BigDecimal new_stage = arrAmount.subtract(sumDifAmount).divide(count,2,BigDecimal.ROUND_HALF_UP);
+                Calendar temp = Calendar.getInstance();
+                //分期数据
+                List<Map> FKFQ_data = StageUtil.stageOrder(
+                        oPayment.getOutstandingAmount().subtract(sumDifAmount),
+                        count.intValue(),
+                        paymentDetails.get(0).getPlanPayTime(), temp.get(Calendar.DAY_OF_MONTH));
+                //明细处理
+                List<OPaymentDetail> new_paymentDetials = new ArrayList<>();
+                String batchCode = temp.getTime().getTime() + "";
+                for (Map datum : FKFQ_data) {
+                    OPaymentDetail record = new OPaymentDetail();
+                    record.setId(idService.genId(TabId.o_payment_detail));
+                    record.setBatchCode(batchCode);
+                    record.setPaymentId(oPayment.getId());
+                    record.setPaymentType(PamentIdType.ORDER_FKD.code);
+                    record.setOrderId(oPayment.getOrderId());
+                    record.setPayType(paymentDetails.get(0).getPayType());
+                    record.setPayAmount((BigDecimal) datum.get("item"));
+                    record.setRealPayAmount(BigDecimal.ZERO);
+                    record.setPlanPayTime((Date) datum.get("date"));
+                    record.setPlanNum((BigDecimal) datum.get("count"));
+                    record.setAgentId(oPayment.getAgentId());
+                    record.setPaymentStatus(PaymentStatus.DF.code);
+                    record.setcUser(oPayment.getUserId());
+                    record.setcDate(temp.getTime());
+                    record.setStatus(Status.STATUS_1.status);
+                    record.setVersion(Status.STATUS_1.status);
 
-                            if (1 != oPaymentDetailMapper.insert(record)) {
-                                logger.info("代理商订单审批完成:明细生成失败:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}",
-                                        orderAdj.getOrderId(),
-                                        oPayment.getId(),
-                                        oPayment.getPayMethod(),
-                                        record.getId());
-                                throw new MessageException("分期处理");
-                            }
+                    if (1 != oPaymentDetailMapper.insert(record)) {
+                        logger.info("代理商订单审批完成:明细生成失败:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}",
+                                orderAdj.getOrderId(),
+                                oPayment.getId(),
+                                oPayment.getPayMethod(),
+                                record.getId());
+                        throw new MessageException("分期处理");
+                    }
+                    new_paymentDetials.add(record);
+
+                }
+                    //退款金额小于欠款,进行批量补款
+                    for(int j = 0; j < paymentDetails.size(); j++) {
+//                        List<BigDecimal> divideList = new ArrayList<>();
+//                        BigDecimal money = paymentDetail.getPayAmount().subtract(new_stage);
+//                        BigDecimal stage = money.divide(count, 2, BigDecimal.ROUND_HALF_UP);
+//                        BigDecimal tt = BigDecimal.ZERO;
+//                        for (int i = 0; i < count.intValue(); i++) {
+//                            //补充除不尽余额
+//                            if (i == count.intValue() - 1) {
+//                                if (0 != money.subtract(tt).compareTo(stage)) {
+//                                    stage = money.subtract(tt);
+//                                }
+//                            }
+//                            tt = tt.add(stage);
+//                            divideList.add(stage);
+//                        }
+                        //生成补款单
+                        OSupplement oSupplement = new OSupplement();
+                        oSupplement.setId(idService.genId(TabId.o_Supplement));
+                        oSupplement.setAgentId(orderAdj.getAgentId());
+                        oSupplement.setcTime(Calendar.getInstance().getTime());
+                        oSupplement.setcUser(orderAdj.getAdjUserId());
+                        oSupplement.setOrderId(orderAdj.getOrderId());
+                        oSupplement.setPayAmount(paymentDetails.get(j).getPayAmount().subtract(new_paymentDetials.get(j).getPayAmount()));
+                        oSupplement.setRealPayAmount(paymentDetails.get(j).getPayAmount().subtract(new_paymentDetials.get(j).getPayAmount()));//到账金额
+                        oSupplement.setVersion(Status.STATUS_1.status);
+                        oSupplement.setPkType(PkType.ORDER_REFUND_BK.code);
+                        oSupplement.setSrcId(orderAdj.getId());
+                        oSupplement.setReviewStatus(AgStatus.Approved.status);
+                        oSupplement.setStatus(Status.STATUS_1.status);
+                        oSupplementMapper.insert(oSupplement);
+                        OPaymentDetail paymentDetailtmp = paymentDetails.get(j);
+                        logger.info("====更新明细表开始====");
+                        paymentDetailtmp.setRealPayAmount(paymentDetails.get(j).getPayAmount().subtract(new_paymentDetials.get(j).getPayAmount()));
+                        paymentDetailtmp.setPaymentStatus(PaymentStatus.YF.code);
+                        paymentDetailtmp.setPayTime(Calendar.getInstance().getTime());
+                        paymentDetailtmp.setSrcId(oSupplement.getId());
+                        paymentDetailtmp.setSrcType(PamentSrcType.ORDER_ADJ_DIKOU.code);
+                        if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetailtmp)) {
+                            logger.info("平均金额失败");
+                            throw new MessageException("平均金额失败");
                         }
+                        logger.info("====更新明细表结束====");
+//                        for (int j = 0; j < paymentDetails.size(); j++) {
+//
+//                        }
+                        oPayment.setOutstandingAmount(oPayment.getOutstandingAmount().subtract(new_paymentDetials.get(j).getRealPayAmount()));
+                        if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
+                            logger.info("付款单修改失败");
+                            throw new MessageException("付款单修改失败");
+                        }
+
 
 
                     }
