@@ -4030,7 +4030,7 @@ public class OrderServiceImpl implements OrderService {
         //是否启动流程
         if (org.apache.commons.lang.StringUtils.isNotEmpty(orderUpModelVo.getIsApproveWhenSubmit()) && "1".equals(orderUpModelVo.getIsApproveWhenSubmit())) {
             //启动流程审批
-            String userId = (String) map.get("userId");
+            String userId = String.valueOf(map.get("userId"));
             AgentResult result = startOrderAdjust(orderAdj.getId(), userId);
             if (!result.isOK()) {
                 throw new Exception(result.getMsg());
@@ -4401,7 +4401,8 @@ public class OrderServiceImpl implements OrderService {
             //该笔订单剩余欠款记录
             List<OPaymentDetail> paymentDetails = oPaymentDetailMapper.selectCount(orderAdj.getOrderId(), PamentIdType.ORDER_FKD.code, PaymentStatus.DF.code);
             //判断退款差价是否大于欠款
-            if(sumDifAmount.compareTo(arrAmount)>=0){//退款大于等于欠款,进行结清操作
+            if(sumDifAmount.compareTo(arrAmount)>=0){
+                //退款大于等于欠款,进行结清操作
                 for(OPaymentDetail paymentDetail:paymentDetails){
                     //生成补款单
                     OSupplement oSupplement = new OSupplement();
@@ -4428,35 +4429,75 @@ public class OrderServiceImpl implements OrderService {
 
                 }
             }else {
-                //欠款期数
-                BigDecimal count = new BigDecimal(paymentDetails.size());
-                BigDecimal new_stage = sumDifAmount.divide(count,2,BigDecimal.ROUND_HALF_UP);
-                //退款金额小于欠款,进行批量补款
-                for(OPaymentDetail paymentDetail:paymentDetails){
-                    List<BigDecimal> divideList = new ArrayList<>();
-                    BigDecimal money = paymentDetail.getPayAmount().subtract(new_stage);
-                    BigDecimal stage = money.divide(count,2,BigDecimal.ROUND_HALF_UP);
-                    BigDecimal tt = BigDecimal.ZERO;
-                    for (int i = 0; i < count.intValue(); i++) {
-                        //补充除不尽余额
-                        if(i==count.intValue()-1){
-                            if(0!=money.subtract(tt).compareTo(stage)){
-                                stage =   money.subtract(tt);
+
+                    //欠款期数
+                    BigDecimal count = new BigDecimal(paymentDetails.size());
+                    BigDecimal new_stage = sumDifAmount.divide(count,2,BigDecimal.ROUND_HALF_UP);
+                    //退款金额小于欠款,进行批量补款
+                    for(OPaymentDetail paymentDetail:paymentDetails) {
+                        List<BigDecimal> divideList = new ArrayList<>();
+                        BigDecimal money = paymentDetail.getPayAmount().subtract(new_stage);
+                        BigDecimal stage = money.divide(count, 2, BigDecimal.ROUND_HALF_UP);
+                        BigDecimal tt = BigDecimal.ZERO;
+                        for (int i = 0; i < count.intValue(); i++) {
+                            //补充除不尽余额
+                            if (i == count.intValue() - 1) {
+                                if (0 != money.subtract(tt).compareTo(stage)) {
+                                    stage = money.subtract(tt);
+                                }
+                            }
+                            tt = tt.add(stage);
+                            divideList.add(stage);
+                        }
+                        for (int j = 0; j < paymentDetails.size(); j++) {
+                            OPaymentDetail paymentDetailtmp = paymentDetails.get(j);
+                            logger.info("====更新明细表开始====");
+                            paymentDetailtmp.setPayAmount(paymentDetailtmp.getPayAmount().add(divideList.get(j)));
+                            logger.info("====更新明细表结束====");
+                            if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetailtmp)) {
+                                logger.info("平均金额失败");
+                                throw new MessageException("平均金额失败");
                             }
                         }
-                        tt=tt.add(stage);
-                        divideList.add(stage);
-                    }
-                    for (int j = 0; j < paymentDetails.size(); j++) {
-                        OPaymentDetail paymentDetailtmp = paymentDetails.get(j);
-                        paymentDetailtmp.setPayAmount(paymentDetailtmp.getPayAmount().add(divideList.get(j)));
-                        if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetailtmp)) {
-                            logger.info("平均金额失败");
-                            throw new MessageException("平均金额失败");
-                        }
-                    }
-                }
+                        Calendar temp = Calendar.getInstance();
+                        //分期数据
+                        List<Map> FKFQ_data = StageUtil.stageOrder(
+                                oPayment.getOutstandingAmount(),
+                                count.intValue(),
+                                paymentDetails.get(0).getPlanPayTime(), temp.get(Calendar.DAY_OF_MONTH));
+                        //明细处理
+                        String batchCode = temp.getTime().getTime() + "";
+                        for (Map datum : FKFQ_data) {
+                            OPaymentDetail record = new OPaymentDetail();
+                            record.setId(idService.genId(TabId.o_payment_detail));
+                            record.setBatchCode(batchCode);
+                            record.setPaymentId(oPayment.getId());
+                            record.setPaymentType(PamentIdType.ORDER_FKD.code);
+                            record.setOrderId(oPayment.getOrderId());
+                            record.setPayType(PaymentType.DKFQ.code);
+                            record.setPayAmount((BigDecimal) datum.get("item"));
+                            record.setRealPayAmount(BigDecimal.ZERO);
+                            record.setPlanPayTime((Date) datum.get("date"));
+                            record.setPlanNum((BigDecimal) datum.get("count"));
+                            record.setAgentId(oPayment.getAgentId());
+                            record.setPaymentStatus(PaymentStatus.DF.code);
+                            record.setcUser(oPayment.getUserId());
+                            record.setcDate(temp.getTime());
+                            record.setStatus(Status.STATUS_1.status);
+                            record.setVersion(Status.STATUS_1.status);
 
+                            if (1 != oPaymentDetailMapper.insert(record)) {
+                                logger.info("代理商订单审批完成:明细生成失败:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}",
+                                        orderAdj.getOrderId(),
+                                        oPayment.getId(),
+                                        oPayment.getPayMethod(),
+                                        record.getId());
+                                throw new MessageException("分期处理");
+                            }
+                        }
+
+
+                    }
 
 
             };
@@ -4465,7 +4506,7 @@ public class OrderServiceImpl implements OrderService {
             oPaymentDetailExample.or().andOrderIdEqualTo(orderAdj.getOrderId()).andPaymentStatusEqualTo(PaymentStatus.DF.code).andStatusEqualTo(Status.STATUS_1.status);
             List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
             int dfPayment = oPaymentDetails.size();
-           
+
 
             //订单调整更新
             if (1 != orderAdjMapper.updateByPrimaryKeySelective(orderAdj)) {
