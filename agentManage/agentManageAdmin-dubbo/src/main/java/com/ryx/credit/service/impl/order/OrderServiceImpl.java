@@ -4333,6 +4333,7 @@ public class OrderServiceImpl implements OrderService {
                     }
                 }
             }
+            reqMap.put("remit",false);
             //完成任务
             Map resultMap = activityService.completeTask(orderUpModelVo.getTaskId(), reqMap);
             if (resultMap == null) {
@@ -4394,7 +4395,7 @@ public class OrderServiceImpl implements OrderService {
             //3.更新订单表为有效,调整表为审批通过,
 
             //差价总计金额,即等价于补款到账金额
-            BigDecimal sumDifAmount = orderAdjDetailMapper.sumDifAmount(insid);
+            BigDecimal sumDifAmount = orderAdjDetailMapper.sumDifAmount(orderAdj.getId());
             //该笔订单的剩余欠款
             BigDecimal arrAmount = oPaymentDetailMapper.selectArrMoney(orderAdj.getOrderId(),PamentIdType.ORDER_FKD.code,PaymentStatus.DF.code);
             //该笔订单剩余欠款记录
@@ -4414,6 +4415,8 @@ public class OrderServiceImpl implements OrderService {
                     oSupplement.setVersion(Status.STATUS_1.status);
                     oSupplement.setPkType(PkType.ORDER_REFUND_BK.code);
                     oSupplement.setSrcId(orderAdj.getId());
+                    oSupplement.setReviewStatus(AgStatus.Approved.status);
+                    oSupplement.setStatus(Status.STATUS_1.status);
                     oSupplementMapper.insert(oSupplement);
                     //更新还款计划
                     paymentDetail.setRealPayAmount(paymentDetail.getPayAmount());
