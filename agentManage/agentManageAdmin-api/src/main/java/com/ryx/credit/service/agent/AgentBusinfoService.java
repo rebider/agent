@@ -136,7 +136,6 @@ public interface AgentBusinfoService {
      */
     public AgentBusInfo agentPlatformNum(String agentId,String platFormNum);
 
-    List<String> queryOrgByAgentid(Map map);
 
     List<AgentBusInfo> selectByAgentBusInfo(AgentBusInfo agentBusInfo);
 }
