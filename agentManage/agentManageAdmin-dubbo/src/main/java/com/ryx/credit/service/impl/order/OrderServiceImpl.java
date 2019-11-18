@@ -3287,10 +3287,12 @@ public class OrderServiceImpl implements OrderService {
                     }
                 }
                 if (StringUtils.isNotBlank(orderoutVo.getMqydkAmt()) && !orderoutVo.getMqydkAmt().equals("null")) {
-                    if (orderoutVo.getPayMethod().equals("首付+分润分期") || orderoutVo.getPayMethod().equals("分润分期")) {
-                        orderoutVo.setMqydkAmt(String.valueOf(BigDecimal.ZERO));
-                    } else if (orderoutVo.getPayMethod().equals("首付+打款分期") || orderoutVo.getPayMethod().equals("付款分期")) {
-                        orderoutVo.setMqykAmt(BigDecimal.ZERO);
+                    if (StringUtils.isNotBlank(orderoutVo.getPayMethod())) {
+                        if (orderoutVo.getPayMethod().equals("首付+分润分期") || orderoutVo.getPayMethod().equals("分润分期")) {
+                            orderoutVo.setMqydkAmt(String.valueOf(BigDecimal.ZERO));
+                        } else if (orderoutVo.getPayMethod().equals("首付+打款分期") || orderoutVo.getPayMethod().equals("付款分期")) {
+                            orderoutVo.setMqykAmt(BigDecimal.ZERO);
+                        }
                     }
                 }
                 if (StringUtils.isNotBlank(orderoutVo.getProfitMouth()) && !orderoutVo.getProfitMouth().equals("null")) {
@@ -3374,10 +3376,12 @@ public class OrderServiceImpl implements OrderService {
                     }
                 }
                 if (StringUtils.isNotBlank(orderoutVo.getMqydkAmt()) && !orderoutVo.getMqydkAmt().equals("null")) {
-                    if (orderoutVo.getPayMethod().equals("首付+分润分期") || orderoutVo.getPayMethod().equals("分润分期")) {
-                        orderoutVo.setMqydkAmt(String.valueOf(BigDecimal.ZERO));
-                    } else if (orderoutVo.getPayMethod().equals("首付+打款分期") || orderoutVo.getPayMethod().equals("付款分期")) {
-                        orderoutVo.setMqykAmt(BigDecimal.ZERO);
+                    if (StringUtils.isNotBlank(orderoutVo.getPayMethod())) {
+                        if (orderoutVo.getPayMethod().equals("首付+分润分期") || orderoutVo.getPayMethod().equals("分润分期")) {
+                            orderoutVo.setMqydkAmt(String.valueOf(BigDecimal.ZERO));
+                        } else if (orderoutVo.getPayMethod().equals("首付+打款分期") || orderoutVo.getPayMethod().equals("付款分期")) {
+                            orderoutVo.setMqykAmt(BigDecimal.ZERO);
+                        }
                     }
                 }
                 if (StringUtils.isNotBlank(orderoutVo.getProfitMouth()) && !orderoutVo.getProfitMouth().equals("null")) {
@@ -3464,7 +3468,7 @@ public class OrderServiceImpl implements OrderService {
     public void CashSummaryMouth() {
         logger.info("======代理商月度打款金额开票不开票信息统计任务执行======");
         Calendar c = Calendar.getInstance();
-        c.set(Calendar.MONTH,-1);
+        c.add(Calendar.MONTH,-1);
         String date = DateUtil.format(c.getTime(),DateUtil.DATE_FORMAT_yyyyMM);
         logger.info("======代理商月度打款金额开票不开票信息统计任务执行======统计月份{}",date);
         //不开票信息

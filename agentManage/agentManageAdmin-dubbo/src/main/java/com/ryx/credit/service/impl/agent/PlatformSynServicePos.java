@@ -259,6 +259,10 @@ public class PlatformSynServicePos implements PlatformSynService {
             data.put("debitTop",agentNotifyVo.getDebitTop());
             data.put("ckDebitRate",agentNotifyVo.getCkDebitRate());
             data.put("lowDebitRate",agentNotifyVo.getLowDebitRate());
+            data.put("lowCreditRate",agentNotifyVo.getCreditRateLower());
+            data.put("ceilingCreditRate",agentNotifyVo.getCreditRateCeiling());
+            data.put("topDebitRate",agentNotifyVo.getDebitRateCapping());
+            data.put("debitLow",agentNotifyVo.getDebitCappingLower());
             if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentNotifyVo.getOrgId())){
                 data.put("orgId",agentNotifyVo.getOrgId());
             }
