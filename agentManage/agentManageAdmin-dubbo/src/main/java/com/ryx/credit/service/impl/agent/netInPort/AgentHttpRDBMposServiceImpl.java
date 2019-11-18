@@ -450,6 +450,11 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             agentColinfo = agentVo.getColinfoVoList().get(0);
         }
 
+        //老数据可能为空
+        if (null == agentColinfo) {
+            return AgentResult.fail("收款账户信息完整，请检查审批状态！");
+        }
+
         if (!agentBusInfo.getBusNum().equals(agentBusInfo.getBusLoginNum())) {
             return AgentResult.fail("业务平台编号和平台登陆账号必须一致！");
         }
