@@ -129,6 +129,8 @@ public interface AgentBusinfoService {
      */
     AgentBusInfo queryAgentBusInfoById(String id);
 
+    List<String> queryOrgByAgentid(Map map);
+
     /**
      * 查询品牌
      */
