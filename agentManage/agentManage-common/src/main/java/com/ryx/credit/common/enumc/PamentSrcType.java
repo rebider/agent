@@ -12,7 +12,7 @@ public enum PamentSrcType {
     TUICHAJIA_DIKOU("TUICHAJIA_DIKOU", "退差价抵扣"),
     FENRUN_DIKOU("FENRUN_DIKOU","分润抵扣"),
     AGENT_QUIT_DIKOU("FENRUN_DIKOU","代理商退出抵扣"),
-    ORDER_ADJ_DIKOU("ORDER_ADJ","订单机具数量调整"),
+    ORDER_ADJ_DIKOU("ORDER_ADJ_DIKOU","订单机具数量调整"),
     XXXZ("XXXZ","线下销账");
 
     public String code;
