@@ -385,7 +385,7 @@
 
   <delete id="clearRollingDifferenceSupplyData" parameterType="java.lang.String">
     delete from P_PROFIT_SUPPLY where SUPPLY_TYPE = '流量卡轧差补款'
-      AND SUPPLY_TYPE=#{profitDate,jdbcType=VARCHAR}
+      AND SUPPLY_DATE=#{profitDate,jdbcType=VARCHAR}
   </delete>
 
 </mapper>

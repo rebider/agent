@@ -496,8 +496,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             profitDeductionServiceImpl.clearMortgageProfitData(profitDate);
             LOG.info("清理代理商流量卡轧差补款数据，{}月", profitDate);
             profitSupplyService.clearRollingDifferenceSupplyData(profitDate);
-            LOG.info("清理服务费数据，{}月", profitDate);
-            setServerAmtService.clearServerAmtDetailData(profitDate);
+         /*   LOG.info("清理服务费数据，{}月", profitDate);
+            setServerAmtService.clearServerAmtDetailData(profitDate);*/
 
             LOG.info("更新代理商打款公司");
             profitDetailMonthMapper.updateAgentPayCompany(profitDate);
@@ -545,7 +545,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
             //机具扣款未扣足，关联代理商未扣足，线下补款或者上级代扣。
             //获取本月申请通过的所有代理商数据
-            PToolSupplyExample pToolSupplyExample = new PToolSupplyExample();
+            /*PToolSupplyExample pToolSupplyExample = new PToolSupplyExample();
             PToolSupplyExample.Criteria criteria = pToolSupplyExample.createCriteria();
             criteria.andProfitDateEqualTo(profitDate);
             criteria.andExaminrStatusEqualTo(CitySupplyStatus.STATUS_02.code);
@@ -566,7 +566,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                     throw new RuntimeException("机具扣款汇总补扣失败");
                 }
 
-            }
+            }*/
 
 
 
@@ -585,10 +585,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             profitSupplyTaxService.taxSupplyComputer(params);
 
 
-            LOG.info("计算服务费开始");
+    /*        LOG.info("计算服务费开始");
             //计算服务费开始
             setServerAmtService.calculateServerAmt(profitDate);
-            LOG.info("计算服务费完成");
+            LOG.info("计算服务费完成");*/
 
 
 
@@ -789,10 +789,17 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         AgentResult agentResult = internetRenewService.queryMonthSumOffsetAmt(reqMap);
         try {
             List<Map<String, Object>> list = (List<Map<String, Object>>) agentResult.getData();
-            Map<String, Object> data = list.get(0);
-            BigDecimal offsetAmt = (BigDecimal) data.get("OFFSET_AMT");
+            BigDecimal offsetAmt;
+            if (list!=null && list.size()>0 && agentResult.getStatus()==200){
+                Map<String, Object> data = list.get(0);
+                offsetAmt = (BigDecimal) data.get("OFFSET_AMT");
+            }else{
+                return;
+            }
             String parentAgentId = profitDetailMonthTemp.getParentAgentId();
-            Agent parentAgent = agentService.getAgentById(parentAgentId);
+            Agent parentAgent=null;
+            if (parentAgentId!=null)
+            parentAgent = agentService.getAgentById(parentAgentId);
 
 
             ProfitSupply profitSupply = new ProfitSupply();
@@ -801,8 +808,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             profitSupply.setBusBigType("99");
             profitSupply.setAgentId(agentId);//代理商编码
             profitSupply.setAgentName(profitDetailMonthTemp.getAgentName());//代理商名称
-            profitSupply.setParentAgentId(parentAgent.getId());//上级代理商编号
-            profitSupply.setParentAgentName(parentAgent.getAgName());//上级代理商名称
+            profitSupply.setParentAgentId(parentAgent==null?"":parentAgent.getId());//上级代理商编号
+            profitSupply.setParentAgentName(parentAgent==null?"":parentAgent.getAgName());//上级代理商名称
             profitSupply.setSupplyType("流量卡轧差补款");//补款类型
             profitSupply.setSupplyAmt(offsetAmt);//补款金额
             profitSupply.setSupplyDate(profitDate);//月份
@@ -828,13 +835,20 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         agentIdList.add(agentId);
         reqMap.put("agentIdList", agentIdList);
         AgentResult agentResult = internetRenewService.queryCardProfit(reqMap);
+        LOG.info("返回报文"+agentResult.toString());
         try {
-            Map<String, Object> data = (Map<String, Object>) agentResult.getData();
-            LOG.info(data.toString());
-            BigDecimal sumOughtAmt = (BigDecimal) data.get("SUM_OUGHT_AMT");
-
+            List<Map<String, Object>> list = (List<Map<String, Object>>) agentResult.getData();
+            BigDecimal sumOughtAmt;
+            if (list!=null&&list.size()>0&&agentResult.getStatus()==200){//如果存在分润抵扣数据
+                Map<String, Object> data = list.get(0);
+                sumOughtAmt = (BigDecimal) data.get("SUM_OUGHT_AMT");
+            }else{
+                return;
+            }
             String parentAgentId = profitDetailMonthTemp.getParentAgentId();
-            Agent parentAgent = agentService.getAgentById(parentAgentId);
+            Agent parentAgent=null;
+            if (parentAgentId!=null)
+            parentAgent = agentService.getAgentById(parentAgentId);
 
             ProfitDeduction deduction = new ProfitDeduction();
             deduction.setDeductionStatus("0");
@@ -844,9 +858,9 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             deduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus());
             deduction.setId(idService.genIdInTran(TabId.P_DEDUCTION));
             deduction.setAgentId(agentId);
-            deduction.setParentAgentId(profitDetailMonthTemp.getParentAgentId());
+            deduction.setParentAgentId(parentAgent==null?"":parentAgent.getId());
             deduction.setAgentName(profitDetailMonthTemp.getAgentName());
-            deduction.setParentAgentName(parentAgent.getAgName());
+            deduction.setParentAgentName(parentAgent==null?"":parentAgent.getAgName());
             deduction.setRemark("流量卡续费扣款");
             deduction.setDeductionDate(profitDate);
             deduction.setCreateDateTime(new Date());
