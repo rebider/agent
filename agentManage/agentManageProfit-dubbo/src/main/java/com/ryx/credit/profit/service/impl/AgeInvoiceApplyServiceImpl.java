@@ -164,15 +164,19 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                             if (flag != -1) {
                                 String string = remark.substring(flag + 7);
                                 List<String> stringList = invoiceApplyMapper.getPayCompanyById(agentId);
-                                if(stringList.contains(string.trim())){
+                                if(stringList.size()<= 0){
+                                    invoiceApply.setYsResult("0");
+                                    invoiceApply.setRev1("未查询到该代理商的开票公司信息！");
+                                }else if(stringList.contains(string.trim())){
                                     invoiceApply.setInvoiceCompany(string.trim());
                                 }else{
                                     int brdex = string.indexOf("<br/>");
                                     if(brdex != -1 ){
                                         invoiceApply.setInvoiceCompany(string.substring(0,brdex));
                                     }else{
+                                        invoiceApply.setInvoiceCompany(string);
                                         invoiceApply.setYsResult("0");
-                                        invoiceApply.setRev1("获取开票公司名称错误,请在备注中开票公司名称后面使用换行符!");
+                                        invoiceApply.setRev1("获取开票公司名称错误,请注意代开发票备注格式！");
                                     }
                                 }
                                 invoiceApply.setSallerName(map.get("sallerName").toString());
@@ -180,7 +184,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                             } else {
                                 invoiceApply.setYsResult("0");
                                 invoiceApply.setInvoiceCompany(map.get("sallerName").toString());
-                                invoiceApply.setRev1("未获取到代开公司数据,请在备注中开票公司前添加'代开企业名称:'字段！");
+                                invoiceApply.setRev1("未获取到发票备注中开票公司数据!");
                             }
                         } else {
                             invoiceApply.setInvoiceCompany(map.get("sallerName").toString());
