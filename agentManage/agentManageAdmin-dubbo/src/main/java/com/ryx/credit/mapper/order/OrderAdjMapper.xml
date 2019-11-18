@@ -393,7 +393,6 @@
     left join c_organization g on g.id= ab.ag_doc_pro
     <where>
       <if test="1==1"> and oa.status=1 </if>
-     <!-- <if test="map.agentId!=null and map.agentId!=''"> and oa.agent_id = #{map.agentId} </if>-->
       <if test="map.agName!=null and map.agName!=''"> and ag.ag_name like concat(concat('%',#{map.agName}),'%') </if>
       <!--<if test="map.agUniqNum!=null and map.agUniqNum!=''"> and ag.ag_uniq_num = #{map.agUniqNum} </if>-->
       <if test="map.agUniqNum!=null and map.agUniqNum!=''"> and ag.id = #{map.agUniqNum} </if>
@@ -414,6 +413,7 @@
         <!--and 1=-1-->
       <!--</if>-->
     </where>
+    order by oa.adj_tm desc
   </sql>
   <select id="selectAgentUpModelView" parameterType="map" resultType="map">
     <include refid="OracleDialectPrefix"/>
