@@ -431,31 +431,38 @@
 
     <!--    开始写代码-->
     <select id="organizationList" parameterType="map" resultType="map">
-
         <include refid="OracleDialectPrefix"/>
         select o.plat_id,o.org_id,o.ORG_NAME from o_organization o
-        where exists(select * from org_platform org where 1=1
-        <if test="map.platId!=null and map.platId!=''"> and org.PLAT_NUM =#{map.platId}</if>
-        and o.org_id=org.org_id
-        )
+        <where>
+        <if test="map.platId!=null and map.platId!=''">
+            and exists(select * from org_platform org where 1=1
+            and org.PLAT_NUM =#{map.platId}
+            and o.org_id=org.org_id
+            )
+        </if>
         <include refid="organizationWhere" />
+        </where>
         order by C_TIME desc
         <include refid="OracleDialectSuffix"/>
     </select>
 
     <select id="organizationCount" parameterType="map" resultType="int">
         select count(1) from o_organization o
-        where exists(select * from org_platform org where 1=1
-        <if test="map.platId!=null and map.platId!=''"> and org.PLAT_NUM =#{map.platId}</if>
-        and o.org_id=org.org_id
-        )
+        <where>
+        <if test="map.platId!=null and map.platId!=''">
+            and exists(select * from org_platform org where 1=1
+            and org.PLAT_NUM =#{map.platId}
+            and o.org_id=org.org_id
+            )
+        </if>
         <include refid="organizationWhere" />
+        </where>
     </select>
 
     <sql id="organizationWhere">
+        and o.status=1
         <if test="map.orgId!=null and map.orgId!=''"> and o.ORG_ID=#{map.orgId} </if>
         <if test="map.orgName!=null and map.orgName!=''"> and o.ORG_NAME LIKE CONCAT(CONCAT('%',#{map.orgName}),'%')</if>
-
     </sql>
 
 

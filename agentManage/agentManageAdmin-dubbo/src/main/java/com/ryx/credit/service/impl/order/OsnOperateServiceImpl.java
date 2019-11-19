@@ -757,7 +757,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
         }
 
-        Map<String, Object> retMap = new HashMap<String, Object>();
+        Map<String, Object> retMap = new Hashtable<String, Object>();
         if(datas==null && datas.size()==0){
             retMap.put("code", "1111");
             return retMap;
@@ -962,6 +962,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
         }else if(PlatformType.SSPOS.code.equals(platForm.getPlatformType())){
             logger.info("SSPOS平台物流下发！");
             ImsTermWarehouseDetail imsTermWarehouseDetail = new ImsTermWarehouseDetail();
+            if (null == order) throw new MessageException("查询订单数据失败！");
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
             if (null == agentBusInfo)throw new MessageException("查询业务数据失败！");
 

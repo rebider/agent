@@ -1016,6 +1016,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }
         List<Map<String, Object>> list = internetRenewOffsetDetailMapper.queryMonthSumOffsetAmt(reqMap);
         if(list.size()==0){
+            agentResult.setStatus(AgentResult.OK);
             agentResult.setMsg("暂无代理商数据");
             log.info("给分润提供查询轧差数据,返回参数1:{}",JsonUtil.objectToJson(agentResult));
             return agentResult;
@@ -1055,6 +1056,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         reqMap.put("renewStatus",InternetRenewStatus.YXF.getValue());
         List<Map<String, Object>> list = internetRenewDetailMapper.queryCardProfit(reqMap);
         if(list.size()==0){
+            agentResult.setStatus(AgentResult.OK);
             agentResult.setMsg("暂无代理商数据");
             log.info("查询分润抵扣流量卡数据,返回参数1:{}",agentResult.toString());
             return agentResult;

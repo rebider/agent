@@ -1136,6 +1136,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	public AgentBusInfo queryAgentBusInfoById(String id) {
 		return agentBusInfoMapper.selectByPrimaryKey(id);
 	}
+
 	@Override
 	public AgentBusInfo agentPlatformNum(String agentId,String platFormNum) {
 		List<Dict> platFormList =  dictOptionsService.dictList(DictGroup.RELATION_PLATFORM_NUM.name(),platFormNum);

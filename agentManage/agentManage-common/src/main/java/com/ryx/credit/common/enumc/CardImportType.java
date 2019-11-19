@@ -26,7 +26,7 @@ public enum CardImportType {
     DV("0.0.1","退货转发数据版本"),
     EV("0.0.1","流量卡状态版本"),
     FV("0.0.1","物联网卡续费信息版本"),
-    GV("0.0.1","批量延期版本");
+    GV("0.0.2","批量延期版本");
 
 
     public String code;
@@ -57,11 +57,16 @@ public enum CardImportType {
         Map<String, Object> resultMap = new HashMap<>();
         CardImportType[] status = CardImportType.values();
         for(CardImportType cc : status){
-            if(!cc.code.equals(CardImportType.F.getValue()))
+            if(!cc.code.equals(CardImportType.F.getValue()) && !cc.code.contains("0.0."))
             resultMap.put(cc.code,cc.msg);
         }
         return resultMap;
     }
+
+    public static void main(String[] args){
+        System.out.println(getSelectMap())    ;
+    }
+
 
     public static String getContentCodeByValue(String value){
         if(CardImportType.A.code.equals(value)){
