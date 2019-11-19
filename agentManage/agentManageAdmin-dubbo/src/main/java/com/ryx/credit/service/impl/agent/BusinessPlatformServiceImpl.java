@@ -10,7 +10,6 @@ import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.*;
-import com.ryx.credit.pojo.admin.bank.DPosRegion;
 import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.IResourceService;
 import com.ryx.credit.service.IUserService;
@@ -18,7 +17,6 @@ import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.bank.PosRegionService;
 import com.ryx.credit.service.dict.DictOptionsService;
-import com.ryx.credit.service.dict.RegionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +25,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -354,39 +351,63 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                         }
                     }
                 }
-            }
-            String json = JsonUtil.objectToJson(agentBusInfos);
-            List<AgentBusInfoVo> agentBusInfoVos = JsonUtil.jsonToList(json, AgentBusInfoVo.class);
-            agentEnterService.verifyOrgAndBZYD(agentBusInfoVos, busInfoVoList);
-
-            for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
-                AgentBusInfo agbus = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
-                Dict debitRateLower = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfoVo.getBusPlatform(), "debitRateLower");//借记费率下限（%）
-                Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfoVo.getBusPlatform(), "debitCapping");//借记封顶额（元）
-                Dict debitAppearRate = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfoVo.getBusPlatform(), "debitAppearRate");//借记出款费率（%）
-                Dict creditRateFloor = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "creditRateFloor");//贷记费率下限（%）
-                Dict creditRateCeiling = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "creditRateCeiling");//贷记费率上限（%）
-                if(debitRateLower!=null){
-                    agentBusInfoVo.setDebitRateLower(debitRateLower.getdItemvalue());
+                //激活返现代理商为空默认自己
+                if (StringUtils.isBlank(item.getBusActivationParent())) {
+                    item.setBusActivationParent(item.getId());
                 }
-                if(debitCapping!=null){
-                    agentBusInfoVo.setDebitCapping(debitCapping.getdItemvalue());
+                //借贷记费率封顶额默认值
+                AgentBusInfo agbus = agentBusInfoMapper.selectByPrimaryKey(item.getId());
+                Dict debitRateLower = dictOptionsService.findDictByName(DictGroup.AGENT.name(), item.getBusPlatform(), "debitRateLower");//借记费率下限（%）
+                Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), item.getBusPlatform(), "debitCapping");//借记封顶额上限（元）
+                Dict debitAppearRate = dictOptionsService.findDictByName(DictGroup.AGENT.name(), item.getBusPlatform(), "debitAppearRate");//借记出款费率（%）
+                Dict creditRateFloor = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), item.getBusPlatform(), "creditRateFloor");//贷记费率下限（%）
+                Dict creditRateCeiling = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), item.getBusPlatform(), "creditRateCeiling");//贷记费率上限（%）
+                Dict debitRateCapping = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), item.getBusPlatform(), "debitRateCapping");//借记费率上限（%）
+                Dict debitCappingLower = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), item.getBusPlatform(), "debitCappingLower");//借记封顶额下限（元）
+                if (debitRateLower==null) {
+                    item.setDebitRateLower("");
+                } else {
+                    item.setDebitRateLower(debitRateLower.getdItemvalue());
                 }
-                if(debitAppearRate!=null){
-                    agentBusInfoVo.setDebitAppearRate(debitAppearRate.getdItemvalue());
+                if (debitCapping==null) {
+                    item.setDebitCapping("");
+                } else {
+                    item.setDebitCapping(debitCapping.getdItemvalue());
                 }
-                if (creditRateFloor != null) {
-                    agentBusInfo.setCreditRateFloor(creditRateFloor.getdItemname());
+                if (debitAppearRate==null) {
+                    item.setDebitAppearRate("");
+                } else {
+                    item.setDebitAppearRate(debitAppearRate.getdItemvalue());
                 }
-                if (creditRateCeiling != null) {
-                    agentBusInfo.setCreditRateCeiling(creditRateCeiling.getdItemname());
+                if (creditRateFloor==null) {
+                    item.setCreditRateFloor("");
+                } else {
+                    item.setCreditRateFloor(creditRateFloor.getdItemname());
                 }
-                agentBusInfoVo.setVersion(agbus.getVersion());
-                int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfoVo);
+                if (creditRateCeiling==null) {
+                    item.setCreditRateCeiling("");
+                } else {
+                    item.setCreditRateCeiling(creditRateCeiling.getdItemname());
+                }
+                if (debitRateCapping==null) {
+                    item.setDebitRateCapping("");
+                } else {
+                    item.setDebitRateCapping(debitRateCapping.getdItemname());
+                }
+                if (debitCappingLower==null) {
+                    item.setDebitCappingLower("");
+                } else {
+                    item.setDebitCappingLower(debitCappingLower.getdItemname());
+                }
+                item.setVersion(agbus.getVersion());
+                int i = agentBusInfoMapper.updateByPrimaryKeySelective(item);
                 if (i!=1) {
                     throw new MessageException("更新失败");
                 }
             }
+            String json = JsonUtil.objectToJson(agentBusInfos);
+            List<AgentBusInfoVo> agentBusInfoVos = JsonUtil.jsonToList(json, AgentBusInfoVo.class);
+            agentEnterService.verifyOrgAndBZYD(agentBusInfoVos, busInfoVoList);
         } catch (MessageException e) {
             e.printStackTrace();
             throw new MessageException(e.getMsg());
@@ -576,6 +597,33 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     }
                     if(!RegexUtil.checkInt(item.getBusLoginNum())){
                         throw new ProcessException("瑞花宝平台登录账号必须是数字");
+                    }
+                }
+                AgentBusInfo agentBusInfo = agentBusinfoService.agentPlatformNum(agentVo.getAgentId(),item.getBusPlatform());
+                if(null!=agentBusInfo && StringUtils.isNotBlank(agentBusInfo.getBusType())){
+                    if(!agentBusInfo.getBusType().equals( item.getBusType())){
+                        throw new ProcessException("此业务的类型与月结相同品牌不一致");
+                    }
+                }
+                if(null!=agentBusInfo && StringUtils.isNotBlank(agentBusInfo.getBusRegion())){
+                    if(!agentBusInfo.getBusRegion().equals( item.getBusRegion())){
+                        throw new ProcessException("此业务的业务区域与月结相同品牌不一致");
+                    }
+                }
+                if(null!=agentBusInfo && StringUtils.isNotBlank(agentBusInfo.getBusScope())){
+                    if(!agentBusInfo.getBusScope().equals( item.getBusScope())){
+                        throw new ProcessException("此业务的业务范围与月结相同品牌不一致");
+                    }
+                }
+
+                if(null!=agentBusInfo && StringUtils.isNotBlank(agentBusInfo.getAgDocDistrict())){
+                    if(!agentBusInfo.getAgDocDistrict().equals( item.getAgDocDistrict())){
+                        throw new ProcessException("此业务的省区与月结相同品牌不一致");
+                    }
+                }
+                if(null!=agentBusInfo && StringUtils.isNotBlank(agentBusInfo.getAgDocPro())){
+                    if(!agentBusInfo.getAgDocPro().equals( item.getAgDocPro())){
+                        throw new ProcessException("此业务的大区与月结相同品牌不一致");
                     }
                 }
             }

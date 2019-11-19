@@ -447,4 +447,9 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
     public boolean checkModleIsEq(Map<String, String> data, String platformType) {
         return false;
     }
+
+    @Override
+    public AgentResult queryLogisticsResult(Map<String, Object> pamMap, String platformType) throws Exception {
+        return null;
+    }
 }
