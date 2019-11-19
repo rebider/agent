@@ -1,18 +1,17 @@
 package com.ryx.credit.machine.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.IDUtils;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.machine.dao.ImsOrganMapper;
 import com.ryx.credit.machine.dao.ImsTermTransferDetailMapper;
 import com.ryx.credit.machine.dao.ImsTermTransferMapper;
 import com.ryx.credit.machine.dao.ImsTermWarehouseDetailMapper;
-import com.ryx.credit.machine.entity.ImsTermActive;
-import com.ryx.credit.machine.entity.ImsTermTransfer;
-import com.ryx.credit.machine.entity.ImsTermTransferDetail;
-import com.ryx.credit.machine.entity.ImsTermWarehouseDetail;
+import com.ryx.credit.machine.entity.*;
 import com.ryx.credit.machine.service.ImsTermActiveService;
 import com.ryx.credit.machine.service.ImsTermWarehouseDetailService;
 import org.slf4j.Logger;
@@ -49,6 +48,8 @@ public class ImsTermWarehouseDetailServiceImpl implements ImsTermWarehouseDetail
     private ImsTermTransferMapper imsTermTransferMapper;
     @Autowired
     private ImsTermTransferDetailMapper imsTermTransferDetailMapper;
+    @Autowired
+    private ImsOrganMapper imsOrganMapper;
 
     /**
      * POS入库划拨操作
@@ -66,12 +67,17 @@ public class ImsTermWarehouseDetailServiceImpl implements ImsTermWarehouseDetail
         if(snList.size()==0){
             throw new MessageException("sn数据有误");
         }
-        log.info("同步POS入库划拨数据开始:snList:{},请求参数:{}",snList.size(),imsTermWarehouseDetail);
+        //查询O码是否在pos中存在
+        if (null == imsTermWarehouseDetail.getOrgId()) throw new MessageException("O码不存在,请补全O码!");
+        List<ImsOrgan> imsOrgans = imsOrganMapper.selectImsListByOrgId(imsTermWarehouseDetail.getOrgId());
+        if (!(imsOrgans != null && imsOrgans.size() > 0)) throw new MessageException("O码在内管平台不存在!");
+
+        log.info("POS入库划拨请求数据:SN数量:{},参数:{}",snList.size(), JSONObject.toJSONString(imsTermWarehouseDetail));
         for (String sn : snList) {
             ImsTermActive imsTermActive = imsTermActiveService.selectByPrimaryKey(sn);
             //有记录就表示已激活
             if(null!=imsTermActive){
-                throw new MessageException("Sn机具已激活");
+                throw new MessageException("SN机具已激活");
             }
             if(imsTermWarehouseDetail.getStandTime()==null || StringUtils.isBlank(imsTermWarehouseDetail.getPosType()) || imsTermWarehouseDetail.getPosSpePrice()==null ){
                 throw new MessageException("缺少参数");
