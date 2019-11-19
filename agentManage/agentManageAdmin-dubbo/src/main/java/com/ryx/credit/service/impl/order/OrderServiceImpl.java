@@ -3364,7 +3364,7 @@ public class OrderServiceImpl implements OrderService {
                 }
                 if (StringUtils.isNotBlank(orderoutVo.getDeductionType()) && !orderoutVo.getDeductionType().equals("null")){
                     for (Dict dict : capitalType) {
-                        if (null!=dict  &&  orderoutVo.getDeductionType().equals(dict.getdItemvalue())){
+                        if (null!=dict && orderoutVo.getDeductionType().equals(dict.getdItemvalue())){
                             orderoutVo.setDeductionType(dict.getdItemname());
                             BigDecimal deductionAmount=new BigDecimal(0);
                             if (null!=orderoutVo.getDeductionAmount()){
