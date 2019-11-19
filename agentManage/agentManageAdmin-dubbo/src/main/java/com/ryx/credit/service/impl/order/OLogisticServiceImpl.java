@@ -160,24 +160,24 @@ public class OLogisticServiceImpl implements OLogisticsService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public AgentResult  addListItem(List<Object> objectList, String user) throws Exception{
-            String planNum = "";
-            String orderId = "";
-            String proCode = "";
-            String proId = "";
-            String proName = "";
-            String sendDate = "";
-            String sendProNum = "";
-            String beginSn = "";
-            String endSn = "";
-            String beginSnCount = "";
-            String endSnCount = "";
-            String logCom = "";
-            String wNumber = "";
-            String proType="";
-            String planProNum="";
-            String proComString="";
-            String isSend="1";
+    public AgentResult addListItem(List<Object> objectList, String user) throws Exception {
+        String planNum = "";
+        String orderId = "";
+        String proCode = "";
+        String proId = "";
+        String proName = "";
+        String sendDate = "";
+        String sendProNum = "";
+        String beginSn = "";
+        String endSn = "";
+        String beginSnCount = "";
+        String endSnCount = "";
+        String logCom = "";
+        String wNumber = "";
+        String proType = "";
+        String planProNum = "";
+        String proComString = "";
+        String isSend = "1";
 
         List col = Arrays.asList(ReceiptPlanExportColum.ReceiptPlanExportColum_column.col);
         planNum = String.valueOf(objectList.get(col.indexOf("PLAN_NUM"))).trim();
@@ -315,6 +315,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
         OLogisticsExample_criteria1.andSnEndNumEqualTo(endSn);
         OLogisticsExample_criteria1.andWNumberEqualTo(wNumber);
         OLogisticsExample_criteria1.andLogComEqualTo(logCom);
+        OLogisticsExample_criteria1.andStatusEqualTo(Status.STATUS_1.status);
         List<OLogistics> oLogistics1 = oLogisticsMapper.selectByExample(oLogisticsExample);
         if (null == oLogistics1) {
             logger.info("该商品已发货请勿重复提交1");
@@ -324,23 +325,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
             logger.info("该商品已发货请勿重复提交2");
             throw new MessageException("该商品已发货请勿重复提交");
         }
-            //物流检查
-            OLogisticsExample oLogisticsExample = new OLogisticsExample();
-            OLogisticsExample.Criteria OLogisticsExample_criteria1 = oLogisticsExample.createCriteria();
-            OLogisticsExample_criteria1.andSnBeginNumEqualTo(beginSn);
-            OLogisticsExample_criteria1.andSnEndNumEqualTo(endSn);
-            OLogisticsExample_criteria1.andWNumberEqualTo(wNumber);
-            OLogisticsExample_criteria1.andLogComEqualTo(logCom);
-            OLogisticsExample_criteria1.andStatusEqualTo(Status.STATUS_1.status);
-            List<OLogistics> oLogistics1 = oLogisticsMapper.selectByExample(oLogisticsExample);
-            if(null==oLogistics1){
-                logger.info("该商品已发货请勿重复提交1");
-                throw new MessageException("该商品已发货请勿重复提交");
-            }
-            if(oLogistics1.size()!=0){
-                logger.info("该商品已发货请勿重复提交2");
-                throw new MessageException("该商品已发货请勿重复提交");
-            }
 
         //排单信息
         ReceiptPlan planVo = receiptPlanMapper.selectByPrimaryKey(planNum);
@@ -1006,7 +990,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
         }
         //排单信息
         ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(logistics.getReceiptPlanId());
-        //退货的话调用退货下发
+        //退货的话调用退货重新下发
         if(org.apache.commons.lang.StringUtils.isNotEmpty(receiptPlan.getReturnOrderDetailId())){
            return iOrderReturnService.sendReturnLgcInfoToBusSystem(lgcId,userId);
         }
@@ -1023,172 +1007,91 @@ public class OLogisticServiceImpl implements OLogisticsService {
 
         OOrder oOrder = oOrderMapper.selectByPrimaryKey(logistics.getOrderId());
         if (null==oOrder) throw new MessageException("查询订单数据失败！");
-        PlatForm platForm = platFormMapper.selectByPlatFormNum(oOrder.getOrderPlatform());
 
-        //重新下发分平台操作
-        if (platForm.getPlatformType().equals(PlatformType.RDBPOS.code) || platForm.getPlatformType().equals(PlatformType.RJPOS.code)) {
-            //瑞大宝，瑞+，平台重新下发
-            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oOrder.getBusId());
-            if (null==agentBusInfo) throw new MessageException("查询业务数据失败！");
-
-            try {
-                //更新物流明细初始状态
-                OLogisticsDetail oLogisticsDetail = new OLogisticsDetail();
-                oLogisticsDetail.setSendStatus(LogisticsDetailSendStatus.none_send.code);
-                oLogisticsDetail.setStatus(Status.STATUS_1.status);
-                oLogisticsDetail.setLogisticsId(logistics.getId());
-                oLogisticsDetail.setSbusMsg("");
-                int deleteInt = logistics.getSendNum().compareTo(BigDecimal.valueOf(oLogisticsDetailMapper.updateByLogisticsId(oLogisticsDetail)));
-                if (deleteInt != 0) {
-                    logger.info("物流明细和物流发送数量不同。");
-                    throw new Exception("物流明细和物流发送数量不同。");
-                }
-                //更新物流
-                OLogistics updateLogistics = new OLogistics();
-                updateLogistics.setId(logistics.getId());
-                updateLogistics.setSendStatus(LogisticsSendStatus.gen_detail_sucess.code);
-                updateLogistics.setSendMsg("");
-                updateLogistics.setVersion(logistics.getVersion());
-                if (1 != oLogisticsMapper.updateByPrimaryKeySelective(updateLogistics)) {
-                    logger.info("发货物流，重新发送，更新数据库失败:{},{},{}", logistics.getId(), logistics.getSnBeginNum(), logistics.getSnEndNum());
-                    throw new Exception("更新物流状态发生异常！！！");
-                }
-            }catch (Exception e){
-                e.printStackTrace();
-                logistics.setSendMsg("下发异常");
-                logistics.setSendStatus(Status.STATUS_2.status);
-                if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
-                    logger.info("下发物流更新失败Exception{}",JSONObject.toJSONString(logistics));
-                }
-                return AgentResult.fail(e.getLocalizedMessage());
+        //重新下发更新物流、物流明细
+        try {
+            OLogisticsDetail oLogisticsDetail = new OLogisticsDetail();
+            oLogisticsDetail.setSendStatus(LogisticsDetailSendStatus.none_send.code);
+            oLogisticsDetail.setStatus(Status.STATUS_1.status);
+            oLogisticsDetail.setLogisticsId(logistics.getId());
+            oLogisticsDetail.setSbusMsg("");
+            int deleteInt = logistics.getSendNum().compareTo(BigDecimal.valueOf(oLogisticsDetailMapper.updateByLogisticsId(oLogisticsDetail)));
+            if (deleteInt != 0) {
+                logger.info("物流明细和物流发送数量不同。");
+                throw new Exception("物流明细和物流发送数量不同。");
             }
-            return AgentResult.ok();
-        } else if (!logistics.getProType().equals(PlatformType.MPOS.msg) && !logistics.getProType().equals(PlatformType.MPOS.code)){
-            List<String> ids = new ArrayList<>();
-            for (OLogisticsDetail listDetail : listDetails) {
-                ids.add(listDetail.getSnNum());
+            //更新物流
+            OLogistics updateLogistics = new OLogistics();
+            updateLogistics.setId(logistics.getId());
+            updateLogistics.setSendStatus(LogisticsSendStatus.gen_detail_sucess.code);
+            updateLogistics.setSendMsg("");
+            updateLogistics.setVersion(logistics.getVersion());
+            if (1 != oLogisticsMapper.updateByPrimaryKeySelective(updateLogistics)) {
+                logger.info("发货物流，重新发送，更新数据库失败:{},{},{}", logistics.getId(), logistics.getSnBeginNum(), logistics.getSnEndNum());
+                throw new Exception("更新物流状态发生异常！！！");
             }
-            OLogisticsDetail detail = listDetails.get(0);
-            ImsTermWarehouseDetail imsTermWarehouseDetail = new ImsTermWarehouseDetail();
-            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oOrder.getBusId());
-            if (null==agentBusInfo) {
-                throw new MessageException("查询业务数据失败！");
+        }catch (Exception e){
+            e.printStackTrace();
+            logistics.setSendMsg("下发异常");
+            logistics.setSendStatus(Status.STATUS_2.status);
+            if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
+                logger.info("下发物流更新失败Exception{}",JSONObject.toJSONString(logistics));
             }
-            imsTermWarehouseDetail.setOrgId(agentBusInfo.getBusNum());
-            imsTermWarehouseDetail.setMachineId(detail.getBusProCode());
-            imsTermWarehouseDetail.setPosSpePrice(detail.getPosSpePrice());
-            imsTermWarehouseDetail.setPosType(detail.getPosType());
-            imsTermWarehouseDetail.setStandTime(detail.getStandTime());
-            try {
-                //机具下发接口
-                AgentResult posSendRes = imsTermWarehouseDetailService.insertWarehouseAndTransfer(ids,imsTermWarehouseDetail);
-                if(posSendRes.isOK()){
-                    logistics.setSendMsg(posSendRes.getMsg());
-                    logistics.setSendStatus(Status.STATUS_1.status);
-                    if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
-                        logger.info("pos下发物流更新失败STATUS_1成功{}",JSONObject.toJSONString(logistics));
-                    }
-                    return AgentResult.ok();
-                }else{
-                    logistics.setSendMsg(posSendRes.getMsg());
-                    logistics.setSendStatus(Status.STATUS_2.status);
-                    if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
-                        logger.info("pos下发物流更新失败STATUS_2失败{}",JSONObject.toJSONString(logistics));
-                    }
-                    return AgentResult.fail(posSendRes.getMsg());
-                }
-            } catch (MessageException e) {
-                e.printStackTrace();
-                logistics.setSendMsg(e.getMsg());
-                logistics.setSendStatus(Status.STATUS_2.status);
-                if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
-                    logger.info("pos下发物流更新失败MessageException{}",JSONObject.toJSONString(logistics));
-                }
-                return AgentResult.fail(e.getMsg());
-            }catch (Exception e){
-                e.printStackTrace();
-                logistics.setSendMsg("下发异常");
-                logistics.setSendStatus(Status.STATUS_2.status);
-                if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
-                    logger.info("pos下发物流更新失败Exception{}",JSONObject.toJSONString(logistics));
-                }
-                return AgentResult.fail(e.getLocalizedMessage());
-            }
-            //首刷下发业务系统
-        }else{
-            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oOrder.getBusId());
-            //起始sn
-            OLogisticsDetailExample exampleOLogisticsDetailExamplestart = new OLogisticsDetailExample();
-            exampleOLogisticsDetailExamplestart.or().andSnNumEqualTo(logistics.getSnBeginNum()).andTerminalidTypeEqualTo(PlatformType.MPOS.code);
-            List<OLogisticsDetail> logisticsDetailsstart = oLogisticsDetailMapper.selectByExample(exampleOLogisticsDetailExamplestart);
-            OLogisticsDetail detailstart = logisticsDetailsstart.get(0);
-            //结束sn
-            OLogisticsDetailExample exampleOLogisticsDetailExampleend = new OLogisticsDetailExample();
-            exampleOLogisticsDetailExampleend.or().andSnNumEqualTo(logistics.getSnEndNum()).andTerminalidTypeEqualTo(PlatformType.MPOS.code);
-            List<OLogisticsDetail> logisticsDetailsend = oLogisticsDetailMapper.selectByExample(exampleOLogisticsDetailExampleend);
-            OLogisticsDetail detailend = logisticsDetailsend.get(0);
-
-            //sn号码段
-            LowerHairMachineVo lowerHairMachineVo = new LowerHairMachineVo();
-            lowerHairMachineVo.setBusNum(agentBusInfo.getBusNum());
-            lowerHairMachineVo.setOptUser(userId);
-            lowerHairMachineVo.setSnStart(detailstart.getSnNum()+detailstart.getTerminalidCheck());
-            lowerHairMachineVo.setSnEnd(detailend.getSnNum()+detailend.getTerminalidCheck());
-            lowerHairMachineVo.setoLogisticsId(logistics.getId());
-            //sn明细
-            List<MposSnVo> listSn = new ArrayList<MposSnVo>();
-            String sBusProCode= "";
-            for (OLogisticsDetail forsendSn : listDetails) {
-                listSn.add(new MposSnVo(forsendSn.getTermBatchcode()
-                        ,forsendSn.getSnNum()+(forsendSn.getTerminalidCheck()==null?"":forsendSn.getTerminalidCheck())
-                        ,forsendSn.getTerminalidKey()
-                        ,forsendSn.getBusProCode()
-                        ,forsendSn.getTermtype()));
-                if(org.apache.commons.lang.StringUtils.isEmpty(sBusProCode)) {
-                    sBusProCode = forsendSn.getBusProCode();
-                }
-            }
-            lowerHairMachineVo.setListSn(listSn);
-            lowerHairMachineVo.setActCode(sBusProCode);
-            lowerHairMachineVo.setPlatFormNum(agentBusInfo.getBusPlatform());
-
-            //机具下发接口
-            OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(lowerHairMachineVo.getoLogisticsId());
-            try {
-                AgentResult lowerHairMachineRes = termMachineService.lowerHairMachine(lowerHairMachineVo);
-                logger.info("导入物流：下发到首刷平台结果:{}",lowerHairMachineRes.getMsg());
-                if(lowerHairMachineRes.isOK()) {
-                    logistics_send.setSendStatus(Status.STATUS_1.status);
-                    logistics_send.setSendMsg(lowerHairMachineRes.getMsg());
-                    if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
-                        logger.info("pos下发物流更新记录STATUS_1失败{}",JSONObject.toJSONString(logistics));
-                    }
-                    return AgentResult.ok();
-                }else{
-                    logistics_send.setSendStatus(Status.STATUS_2.status);
-                    logistics_send.setSendMsg(lowerHairMachineRes.getMsg());
-                    if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
-                        logger.info("pos下发物流更新记录STATUS_2失败{}",JSONObject.toJSONString(logistics));
-                    }
-                    return AgentResult.fail(lowerHairMachineRes.getMsg());
-                }
-            }catch (MessageException e) {
-                e.printStackTrace();
-                logistics_send.setSendStatus(Status.STATUS_2.status);
-                logistics_send.setSendMsg(e.getMsg());
-                if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
-                    logger.info("pos下发物流更新记录MessageException失败{}",JSONObject.toJSONString(logistics));
-                }
-                return AgentResult.fail(e.getMsg());
-            } catch (Exception e) {
-                e.printStackTrace();
-                logistics_send.setSendStatus(Status.STATUS_2.status);
-                logistics_send.setSendMsg("下发异常");
-                if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
-                    logger.info("pos下发物流更新记录Exception失败{}",JSONObject.toJSONString(logistics));
-                }
-                return AgentResult.fail(e.getLocalizedMessage());
-            }
+            return AgentResult.fail(e.getLocalizedMessage());
         }
+        return AgentResult.ok();
+    }
+
+    @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult delLogistcstInfo(String lgcId, String userId) throws Exception {
+        //查询物流信息
+        OLogistics oLogistics = oLogisticsMapper.selectByPrimaryKey(lgcId);
+        if (null == oLogistics) throw new MessageException("未查到物流信息，请核实物流信息！");
+
+        //更新排单表发货数量
+        ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(oLogistics.getReceiptPlanId());
+        if (receiptPlan != null) {
+            //更新发货数量
+            if(receiptPlan.getSendProNum() != null && (receiptPlan.getSendProNum().subtract(oLogistics.getSendNum())).compareTo(BigDecimal.ZERO) >= 0) {
+                receiptPlan.setSendProNum(receiptPlan.getSendProNum().subtract(oLogistics.getSendNum()));
+            } else {
+                throw new MessageException("排单发货数量异常！");
+            }
+            //更新发货状态
+            /*if(receiptPlan.getSendProNum() != null && (receiptPlan.getSendProNum().subtract(oLogistics.getSendNum())).compareTo(BigDecimal.ZERO) == 0) {
+                receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.InTheDeliver.getValue()));
+            } else {
+                receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.InTheDeliver.getValue()));
+            }*/
+            if (receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan)!= 1) {
+                throw new MessageException("更新排单数据失败！");
+            }
+            logger.info("删除物流更新排单数据:{}", JSONObject.toJSON(receiptPlan));
+        } else {
+            throw new MessageException("排单信息未找到！");
+        }
+
+        //删除物流明细
+        /*int deleteInt = oLogistics.getSendNum().compareTo(BigDecimal.valueOf(oLogisticsDetailMapper.deleteDetailByLogisicalId(oLogistics.getId())));
+        if (deleteInt != 0) {
+            logger.info("删除明细异常，明细数量和发送数量不同！");
+            throw new MessageException("删除明细异常，明细数量和发送数量不同！");
+        }*/
+        //删除物流明细
+        oLogisticsDetailMapper.deleteDetailByLogisicalId(oLogistics.getId());
+
+        //更新物流
+        OLogistics updateLogistics = new OLogistics();
+        updateLogistics.setId(oLogistics.getId());
+        updateLogistics.setStatus(Status.STATUS_2.status);
+        updateLogistics.setVersion(oLogistics.getVersion());
+        updateLogistics.setcUser(userId);
+        if (1 != oLogisticsMapper.updateByPrimaryKeySelective(updateLogistics)) {
+            logger.info("物流删除操作，更新数据库失败:{},{},{}", oLogistics.getId(), oLogistics.getSnBeginNum(), oLogistics.getSnEndNum());
+            throw new MessageException("更新物流状态异常！");
+        }
+
+        return AgentResult.ok();
     }
 }
