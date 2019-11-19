@@ -9,15 +9,21 @@ public class OrderAdj implements Serializable {
 
     private String orderId;
 
+    private String agentId;
+
     private String adjUserId;
 
-    private Date adjTm;
+    private BigDecimal orgOAmo;
 
-    private BigDecimal curArrAmount;
+    private BigDecimal orgIncentiveAmo;
 
-    private BigDecimal orgStagesAmount;
+    private BigDecimal orgPayAmo;
 
-    private BigDecimal stagesAmount;
+    private BigDecimal oAmo;
+
+    private BigDecimal incentiveAmo;
+
+    private BigDecimal payAmo;
 
     private String reson;
 
@@ -27,8 +33,6 @@ public class OrderAdj implements Serializable {
 
     private BigDecimal refundStat;
 
-    private Date refundTm;
-
     private String orgPaymentId;
 
     private String newPaymentId;
@@ -37,15 +41,11 @@ public class OrderAdj implements Serializable {
 
     private Date reviewsDate;
 
+    private Date adjTm;
+
     private BigDecimal status;
 
     private BigDecimal version;
-
-    private String agentId;
-
-    private BigDecimal credit;
-
-    private BigDecimal refundMode;
 
     public String getId() {
         return id;
@@ -63,6 +63,14 @@ public class OrderAdj implements Serializable {
         this.orderId = orderId == null ? null : orderId.trim();
     }
 
+    public String getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(String agentId) {
+        this.agentId = agentId == null ? null : agentId.trim();
+    }
+
     public String getAdjUserId() {
         return adjUserId;
     }
@@ -71,36 +79,52 @@ public class OrderAdj implements Serializable {
         this.adjUserId = adjUserId == null ? null : adjUserId.trim();
     }
 
-    public Date getAdjTm() {
-        return adjTm;
+    public BigDecimal getOrgOAmo() {
+        return orgOAmo;
     }
 
-    public void setAdjTm(Date adjTm) {
-        this.adjTm = adjTm;
+    public void setOrgOAmo(BigDecimal orgOAmo) {
+        this.orgOAmo = orgOAmo;
     }
 
-    public BigDecimal getCurArrAmount() {
-        return curArrAmount;
+    public BigDecimal getOrgIncentiveAmo() {
+        return orgIncentiveAmo;
     }
 
-    public void setCurArrAmount(BigDecimal curArrAmount) {
-        this.curArrAmount = curArrAmount;
+    public void setOrgIncentiveAmo(BigDecimal orgIncentiveAmo) {
+        this.orgIncentiveAmo = orgIncentiveAmo;
     }
 
-    public BigDecimal getOrgStagesAmount() {
-        return orgStagesAmount;
+    public BigDecimal getOrgPayAmo() {
+        return orgPayAmo;
     }
 
-    public void setOrgStagesAmount(BigDecimal orgStagesAmount) {
-        this.orgStagesAmount = orgStagesAmount;
+    public void setOrgPayAmo(BigDecimal orgPayAmo) {
+        this.orgPayAmo = orgPayAmo;
     }
 
-    public BigDecimal getStagesAmount() {
-        return stagesAmount;
+    public BigDecimal getoAmo() {
+        return oAmo;
     }
 
-    public void setStagesAmount(BigDecimal stagesAmount) {
-        this.stagesAmount = stagesAmount;
+    public void setoAmo(BigDecimal oAmo) {
+        this.oAmo = oAmo;
+    }
+
+    public BigDecimal getIncentiveAmo() {
+        return incentiveAmo;
+    }
+
+    public void setIncentiveAmo(BigDecimal incentiveAmo) {
+        this.incentiveAmo = incentiveAmo;
+    }
+
+    public BigDecimal getPayAmo() {
+        return payAmo;
+    }
+
+    public void setPayAmo(BigDecimal payAmo) {
+        this.payAmo = payAmo;
     }
 
     public String getReson() {
@@ -135,14 +159,6 @@ public class OrderAdj implements Serializable {
         this.refundStat = refundStat;
     }
 
-    public Date getRefundTm() {
-        return refundTm;
-    }
-
-    public void setRefundTm(Date refundTm) {
-        this.refundTm = refundTm;
-    }
-
     public String getOrgPaymentId() {
         return orgPaymentId;
     }
@@ -175,6 +191,14 @@ public class OrderAdj implements Serializable {
         this.reviewsDate = reviewsDate;
     }
 
+    public Date getAdjTm() {
+        return adjTm;
+    }
+
+    public void setAdjTm(Date adjTm) {
+        this.adjTm = adjTm;
+    }
+
     public BigDecimal getStatus() {
         return status;
     }
@@ -189,29 +213,5 @@ public class OrderAdj implements Serializable {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
-    }
-
-    public String getAgentId() {
-        return agentId;
-    }
-
-    public void setAgentId(String agentId) {
-        this.agentId = agentId == null ? null : agentId.trim();
-    }
-
-    public BigDecimal getCredit() {
-        return credit;
-    }
-
-    public void setCredit(BigDecimal credit) {
-        this.credit = credit;
-    }
-
-    public BigDecimal getRefundMode() {
-        return refundMode;
-    }
-
-    public void setRefundMode(BigDecimal refundMode) {
-        this.refundMode = refundMode;
     }
 }

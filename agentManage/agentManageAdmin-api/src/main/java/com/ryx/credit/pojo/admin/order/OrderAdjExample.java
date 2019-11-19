@@ -277,6 +277,76 @@ public class OrderAdjExample {
             return (Criteria) this;
         }
 
+        public Criteria andAgentIdIsNull() {
+            addCriterion("AGENT_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdIsNotNull() {
+            addCriterion("AGENT_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdEqualTo(String value) {
+            addCriterion("AGENT_ID =", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotEqualTo(String value) {
+            addCriterion("AGENT_ID <>", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdGreaterThan(String value) {
+            addCriterion("AGENT_ID >", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdGreaterThanOrEqualTo(String value) {
+            addCriterion("AGENT_ID >=", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdLessThan(String value) {
+            addCriterion("AGENT_ID <", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdLessThanOrEqualTo(String value) {
+            addCriterion("AGENT_ID <=", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdLike(String value) {
+            addCriterion("AGENT_ID like", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotLike(String value) {
+            addCriterion("AGENT_ID not like", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdIn(List<String> values) {
+            addCriterion("AGENT_ID in", values, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotIn(List<String> values) {
+            addCriterion("AGENT_ID not in", values, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdBetween(String value1, String value2) {
+            addCriterion("AGENT_ID between", value1, value2, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotBetween(String value1, String value2) {
+            addCriterion("AGENT_ID not between", value1, value2, "agentId");
+            return (Criteria) this;
+        }
+
         public Criteria andAdjUserIdIsNull() {
             addCriterion("ADJ_USER_ID is null");
             return (Criteria) this;
@@ -347,243 +417,363 @@ public class OrderAdjExample {
             return (Criteria) this;
         }
 
-        public Criteria andAdjTmIsNull() {
-            addCriterion("ADJ_TM is null");
+        public Criteria andOrgOAmoIsNull() {
+            addCriterion("ORG_O_AMO is null");
             return (Criteria) this;
         }
 
-        public Criteria andAdjTmIsNotNull() {
-            addCriterion("ADJ_TM is not null");
+        public Criteria andOrgOAmoIsNotNull() {
+            addCriterion("ORG_O_AMO is not null");
             return (Criteria) this;
         }
 
-        public Criteria andAdjTmEqualTo(Date value) {
-            addCriterion("ADJ_TM =", value, "adjTm");
+        public Criteria andOrgOAmoEqualTo(BigDecimal value) {
+            addCriterion("ORG_O_AMO =", value, "orgOAmo");
             return (Criteria) this;
         }
 
-        public Criteria andAdjTmNotEqualTo(Date value) {
-            addCriterion("ADJ_TM <>", value, "adjTm");
+        public Criteria andOrgOAmoNotEqualTo(BigDecimal value) {
+            addCriterion("ORG_O_AMO <>", value, "orgOAmo");
             return (Criteria) this;
         }
 
-        public Criteria andAdjTmGreaterThan(Date value) {
-            addCriterion("ADJ_TM >", value, "adjTm");
+        public Criteria andOrgOAmoGreaterThan(BigDecimal value) {
+            addCriterion("ORG_O_AMO >", value, "orgOAmo");
             return (Criteria) this;
         }
 
-        public Criteria andAdjTmGreaterThanOrEqualTo(Date value) {
-            addCriterion("ADJ_TM >=", value, "adjTm");
+        public Criteria andOrgOAmoGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("ORG_O_AMO >=", value, "orgOAmo");
             return (Criteria) this;
         }
 
-        public Criteria andAdjTmLessThan(Date value) {
-            addCriterion("ADJ_TM <", value, "adjTm");
+        public Criteria andOrgOAmoLessThan(BigDecimal value) {
+            addCriterion("ORG_O_AMO <", value, "orgOAmo");
             return (Criteria) this;
         }
 
-        public Criteria andAdjTmLessThanOrEqualTo(Date value) {
-            addCriterion("ADJ_TM <=", value, "adjTm");
+        public Criteria andOrgOAmoLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("ORG_O_AMO <=", value, "orgOAmo");
             return (Criteria) this;
         }
 
-        public Criteria andAdjTmIn(List<Date> values) {
-            addCriterion("ADJ_TM in", values, "adjTm");
+        public Criteria andOrgOAmoIn(List<BigDecimal> values) {
+            addCriterion("ORG_O_AMO in", values, "orgOAmo");
             return (Criteria) this;
         }
 
-        public Criteria andAdjTmNotIn(List<Date> values) {
-            addCriterion("ADJ_TM not in", values, "adjTm");
+        public Criteria andOrgOAmoNotIn(List<BigDecimal> values) {
+            addCriterion("ORG_O_AMO not in", values, "orgOAmo");
             return (Criteria) this;
         }
 
-        public Criteria andAdjTmBetween(Date value1, Date value2) {
-            addCriterion("ADJ_TM between", value1, value2, "adjTm");
+        public Criteria andOrgOAmoBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ORG_O_AMO between", value1, value2, "orgOAmo");
             return (Criteria) this;
         }
 
-        public Criteria andAdjTmNotBetween(Date value1, Date value2) {
-            addCriterion("ADJ_TM not between", value1, value2, "adjTm");
+        public Criteria andOrgOAmoNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ORG_O_AMO not between", value1, value2, "orgOAmo");
             return (Criteria) this;
         }
 
-        public Criteria andCurArrAmountIsNull() {
-            addCriterion("CUR_ARR_AMOUNT is null");
+        public Criteria andOrgIncentiveAmoIsNull() {
+            addCriterion("ORG_INCENTIVE_AMO is null");
             return (Criteria) this;
         }
 
-        public Criteria andCurArrAmountIsNotNull() {
-            addCriterion("CUR_ARR_AMOUNT is not null");
+        public Criteria andOrgIncentiveAmoIsNotNull() {
+            addCriterion("ORG_INCENTIVE_AMO is not null");
             return (Criteria) this;
         }
 
-        public Criteria andCurArrAmountEqualTo(BigDecimal value) {
-            addCriterion("CUR_ARR_AMOUNT =", value, "curArrAmount");
+        public Criteria andOrgIncentiveAmoEqualTo(BigDecimal value) {
+            addCriterion("ORG_INCENTIVE_AMO =", value, "orgIncentiveAmo");
             return (Criteria) this;
         }
 
-        public Criteria andCurArrAmountNotEqualTo(BigDecimal value) {
-            addCriterion("CUR_ARR_AMOUNT <>", value, "curArrAmount");
+        public Criteria andOrgIncentiveAmoNotEqualTo(BigDecimal value) {
+            addCriterion("ORG_INCENTIVE_AMO <>", value, "orgIncentiveAmo");
             return (Criteria) this;
         }
 
-        public Criteria andCurArrAmountGreaterThan(BigDecimal value) {
-            addCriterion("CUR_ARR_AMOUNT >", value, "curArrAmount");
+        public Criteria andOrgIncentiveAmoGreaterThan(BigDecimal value) {
+            addCriterion("ORG_INCENTIVE_AMO >", value, "orgIncentiveAmo");
             return (Criteria) this;
         }
 
-        public Criteria andCurArrAmountGreaterThanOrEqualTo(BigDecimal value) {
-            addCriterion("CUR_ARR_AMOUNT >=", value, "curArrAmount");
+        public Criteria andOrgIncentiveAmoGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("ORG_INCENTIVE_AMO >=", value, "orgIncentiveAmo");
             return (Criteria) this;
         }
 
-        public Criteria andCurArrAmountLessThan(BigDecimal value) {
-            addCriterion("CUR_ARR_AMOUNT <", value, "curArrAmount");
+        public Criteria andOrgIncentiveAmoLessThan(BigDecimal value) {
+            addCriterion("ORG_INCENTIVE_AMO <", value, "orgIncentiveAmo");
             return (Criteria) this;
         }
 
-        public Criteria andCurArrAmountLessThanOrEqualTo(BigDecimal value) {
-            addCriterion("CUR_ARR_AMOUNT <=", value, "curArrAmount");
+        public Criteria andOrgIncentiveAmoLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("ORG_INCENTIVE_AMO <=", value, "orgIncentiveAmo");
             return (Criteria) this;
         }
 
-        public Criteria andCurArrAmountIn(List<BigDecimal> values) {
-            addCriterion("CUR_ARR_AMOUNT in", values, "curArrAmount");
+        public Criteria andOrgIncentiveAmoIn(List<BigDecimal> values) {
+            addCriterion("ORG_INCENTIVE_AMO in", values, "orgIncentiveAmo");
             return (Criteria) this;
         }
 
-        public Criteria andCurArrAmountNotIn(List<BigDecimal> values) {
-            addCriterion("CUR_ARR_AMOUNT not in", values, "curArrAmount");
+        public Criteria andOrgIncentiveAmoNotIn(List<BigDecimal> values) {
+            addCriterion("ORG_INCENTIVE_AMO not in", values, "orgIncentiveAmo");
             return (Criteria) this;
         }
 
-        public Criteria andCurArrAmountBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("CUR_ARR_AMOUNT between", value1, value2, "curArrAmount");
+        public Criteria andOrgIncentiveAmoBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ORG_INCENTIVE_AMO between", value1, value2, "orgIncentiveAmo");
             return (Criteria) this;
         }
 
-        public Criteria andCurArrAmountNotBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("CUR_ARR_AMOUNT not between", value1, value2, "curArrAmount");
+        public Criteria andOrgIncentiveAmoNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ORG_INCENTIVE_AMO not between", value1, value2, "orgIncentiveAmo");
             return (Criteria) this;
         }
 
-        public Criteria andOrgStagesAmountIsNull() {
-            addCriterion("ORG_STAGES_AMOUNT is null");
+        public Criteria andOrgPayAmoIsNull() {
+            addCriterion("ORG_PAY_AMO is null");
             return (Criteria) this;
         }
 
-        public Criteria andOrgStagesAmountIsNotNull() {
-            addCriterion("ORG_STAGES_AMOUNT is not null");
+        public Criteria andOrgPayAmoIsNotNull() {
+            addCriterion("ORG_PAY_AMO is not null");
             return (Criteria) this;
         }
 
-        public Criteria andOrgStagesAmountEqualTo(BigDecimal value) {
-            addCriterion("ORG_STAGES_AMOUNT =", value, "orgStagesAmount");
+        public Criteria andOrgPayAmoEqualTo(BigDecimal value) {
+            addCriterion("ORG_PAY_AMO =", value, "orgPayAmo");
             return (Criteria) this;
         }
 
-        public Criteria andOrgStagesAmountNotEqualTo(BigDecimal value) {
-            addCriterion("ORG_STAGES_AMOUNT <>", value, "orgStagesAmount");
+        public Criteria andOrgPayAmoNotEqualTo(BigDecimal value) {
+            addCriterion("ORG_PAY_AMO <>", value, "orgPayAmo");
             return (Criteria) this;
         }
 
-        public Criteria andOrgStagesAmountGreaterThan(BigDecimal value) {
-            addCriterion("ORG_STAGES_AMOUNT >", value, "orgStagesAmount");
+        public Criteria andOrgPayAmoGreaterThan(BigDecimal value) {
+            addCriterion("ORG_PAY_AMO >", value, "orgPayAmo");
             return (Criteria) this;
         }
 
-        public Criteria andOrgStagesAmountGreaterThanOrEqualTo(BigDecimal value) {
-            addCriterion("ORG_STAGES_AMOUNT >=", value, "orgStagesAmount");
+        public Criteria andOrgPayAmoGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("ORG_PAY_AMO >=", value, "orgPayAmo");
             return (Criteria) this;
         }
 
-        public Criteria andOrgStagesAmountLessThan(BigDecimal value) {
-            addCriterion("ORG_STAGES_AMOUNT <", value, "orgStagesAmount");
+        public Criteria andOrgPayAmoLessThan(BigDecimal value) {
+            addCriterion("ORG_PAY_AMO <", value, "orgPayAmo");
             return (Criteria) this;
         }
 
-        public Criteria andOrgStagesAmountLessThanOrEqualTo(BigDecimal value) {
-            addCriterion("ORG_STAGES_AMOUNT <=", value, "orgStagesAmount");
+        public Criteria andOrgPayAmoLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("ORG_PAY_AMO <=", value, "orgPayAmo");
             return (Criteria) this;
         }
 
-        public Criteria andOrgStagesAmountIn(List<BigDecimal> values) {
-            addCriterion("ORG_STAGES_AMOUNT in", values, "orgStagesAmount");
+        public Criteria andOrgPayAmoIn(List<BigDecimal> values) {
+            addCriterion("ORG_PAY_AMO in", values, "orgPayAmo");
             return (Criteria) this;
         }
 
-        public Criteria andOrgStagesAmountNotIn(List<BigDecimal> values) {
-            addCriterion("ORG_STAGES_AMOUNT not in", values, "orgStagesAmount");
+        public Criteria andOrgPayAmoNotIn(List<BigDecimal> values) {
+            addCriterion("ORG_PAY_AMO not in", values, "orgPayAmo");
             return (Criteria) this;
         }
 
-        public Criteria andOrgStagesAmountBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("ORG_STAGES_AMOUNT between", value1, value2, "orgStagesAmount");
+        public Criteria andOrgPayAmoBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ORG_PAY_AMO between", value1, value2, "orgPayAmo");
             return (Criteria) this;
         }
 
-        public Criteria andOrgStagesAmountNotBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("ORG_STAGES_AMOUNT not between", value1, value2, "orgStagesAmount");
+        public Criteria andOrgPayAmoNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ORG_PAY_AMO not between", value1, value2, "orgPayAmo");
             return (Criteria) this;
         }
 
-        public Criteria andStagesAmountIsNull() {
-            addCriterion("STAGES_AMOUNT is null");
+        public Criteria andOAmoIsNull() {
+            addCriterion("O_AMO is null");
             return (Criteria) this;
         }
 
-        public Criteria andStagesAmountIsNotNull() {
-            addCriterion("STAGES_AMOUNT is not null");
+        public Criteria andOAmoIsNotNull() {
+            addCriterion("O_AMO is not null");
             return (Criteria) this;
         }
 
-        public Criteria andStagesAmountEqualTo(BigDecimal value) {
-            addCriterion("STAGES_AMOUNT =", value, "stagesAmount");
+        public Criteria andOAmoEqualTo(BigDecimal value) {
+            addCriterion("O_AMO =", value, "oAmo");
             return (Criteria) this;
         }
 
-        public Criteria andStagesAmountNotEqualTo(BigDecimal value) {
-            addCriterion("STAGES_AMOUNT <>", value, "stagesAmount");
+        public Criteria andOAmoNotEqualTo(BigDecimal value) {
+            addCriterion("O_AMO <>", value, "oAmo");
             return (Criteria) this;
         }
 
-        public Criteria andStagesAmountGreaterThan(BigDecimal value) {
-            addCriterion("STAGES_AMOUNT >", value, "stagesAmount");
+        public Criteria andOAmoGreaterThan(BigDecimal value) {
+            addCriterion("O_AMO >", value, "oAmo");
             return (Criteria) this;
         }
 
-        public Criteria andStagesAmountGreaterThanOrEqualTo(BigDecimal value) {
-            addCriterion("STAGES_AMOUNT >=", value, "stagesAmount");
+        public Criteria andOAmoGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("O_AMO >=", value, "oAmo");
             return (Criteria) this;
         }
 
-        public Criteria andStagesAmountLessThan(BigDecimal value) {
-            addCriterion("STAGES_AMOUNT <", value, "stagesAmount");
+        public Criteria andOAmoLessThan(BigDecimal value) {
+            addCriterion("O_AMO <", value, "oAmo");
             return (Criteria) this;
         }
 
-        public Criteria andStagesAmountLessThanOrEqualTo(BigDecimal value) {
-            addCriterion("STAGES_AMOUNT <=", value, "stagesAmount");
+        public Criteria andOAmoLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("O_AMO <=", value, "oAmo");
             return (Criteria) this;
         }
 
-        public Criteria andStagesAmountIn(List<BigDecimal> values) {
-            addCriterion("STAGES_AMOUNT in", values, "stagesAmount");
+        public Criteria andOAmoIn(List<BigDecimal> values) {
+            addCriterion("O_AMO in", values, "oAmo");
             return (Criteria) this;
         }
 
-        public Criteria andStagesAmountNotIn(List<BigDecimal> values) {
-            addCriterion("STAGES_AMOUNT not in", values, "stagesAmount");
+        public Criteria andOAmoNotIn(List<BigDecimal> values) {
+            addCriterion("O_AMO not in", values, "oAmo");
             return (Criteria) this;
         }
 
-        public Criteria andStagesAmountBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("STAGES_AMOUNT between", value1, value2, "stagesAmount");
+        public Criteria andOAmoBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("O_AMO between", value1, value2, "oAmo");
             return (Criteria) this;
         }
 
-        public Criteria andStagesAmountNotBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("STAGES_AMOUNT not between", value1, value2, "stagesAmount");
+        public Criteria andOAmoNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("O_AMO not between", value1, value2, "oAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andIncentiveAmoIsNull() {
+            addCriterion("INCENTIVE_AMO is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIncentiveAmoIsNotNull() {
+            addCriterion("INCENTIVE_AMO is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIncentiveAmoEqualTo(BigDecimal value) {
+            addCriterion("INCENTIVE_AMO =", value, "incentiveAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andIncentiveAmoNotEqualTo(BigDecimal value) {
+            addCriterion("INCENTIVE_AMO <>", value, "incentiveAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andIncentiveAmoGreaterThan(BigDecimal value) {
+            addCriterion("INCENTIVE_AMO >", value, "incentiveAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andIncentiveAmoGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("INCENTIVE_AMO >=", value, "incentiveAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andIncentiveAmoLessThan(BigDecimal value) {
+            addCriterion("INCENTIVE_AMO <", value, "incentiveAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andIncentiveAmoLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("INCENTIVE_AMO <=", value, "incentiveAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andIncentiveAmoIn(List<BigDecimal> values) {
+            addCriterion("INCENTIVE_AMO in", values, "incentiveAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andIncentiveAmoNotIn(List<BigDecimal> values) {
+            addCriterion("INCENTIVE_AMO not in", values, "incentiveAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andIncentiveAmoBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("INCENTIVE_AMO between", value1, value2, "incentiveAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andIncentiveAmoNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("INCENTIVE_AMO not between", value1, value2, "incentiveAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayAmoIsNull() {
+            addCriterion("PAY_AMO is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayAmoIsNotNull() {
+            addCriterion("PAY_AMO is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayAmoEqualTo(BigDecimal value) {
+            addCriterion("PAY_AMO =", value, "payAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayAmoNotEqualTo(BigDecimal value) {
+            addCriterion("PAY_AMO <>", value, "payAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayAmoGreaterThan(BigDecimal value) {
+            addCriterion("PAY_AMO >", value, "payAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayAmoGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("PAY_AMO >=", value, "payAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayAmoLessThan(BigDecimal value) {
+            addCriterion("PAY_AMO <", value, "payAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayAmoLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("PAY_AMO <=", value, "payAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayAmoIn(List<BigDecimal> values) {
+            addCriterion("PAY_AMO in", values, "payAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayAmoNotIn(List<BigDecimal> values) {
+            addCriterion("PAY_AMO not in", values, "payAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayAmoBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PAY_AMO between", value1, value2, "payAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayAmoNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PAY_AMO not between", value1, value2, "payAmo");
             return (Criteria) this;
         }
 
@@ -834,66 +1024,6 @@ public class OrderAdjExample {
 
         public Criteria andRefundStatNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("REFUND_STAT not between", value1, value2, "refundStat");
-            return (Criteria) this;
-        }
-
-        public Criteria andRefundTmIsNull() {
-            addCriterion("REFUND_TM is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andRefundTmIsNotNull() {
-            addCriterion("REFUND_TM is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andRefundTmEqualTo(Date value) {
-            addCriterion("REFUND_TM =", value, "refundTm");
-            return (Criteria) this;
-        }
-
-        public Criteria andRefundTmNotEqualTo(Date value) {
-            addCriterion("REFUND_TM <>", value, "refundTm");
-            return (Criteria) this;
-        }
-
-        public Criteria andRefundTmGreaterThan(Date value) {
-            addCriterion("REFUND_TM >", value, "refundTm");
-            return (Criteria) this;
-        }
-
-        public Criteria andRefundTmGreaterThanOrEqualTo(Date value) {
-            addCriterion("REFUND_TM >=", value, "refundTm");
-            return (Criteria) this;
-        }
-
-        public Criteria andRefundTmLessThan(Date value) {
-            addCriterion("REFUND_TM <", value, "refundTm");
-            return (Criteria) this;
-        }
-
-        public Criteria andRefundTmLessThanOrEqualTo(Date value) {
-            addCriterion("REFUND_TM <=", value, "refundTm");
-            return (Criteria) this;
-        }
-
-        public Criteria andRefundTmIn(List<Date> values) {
-            addCriterion("REFUND_TM in", values, "refundTm");
-            return (Criteria) this;
-        }
-
-        public Criteria andRefundTmNotIn(List<Date> values) {
-            addCriterion("REFUND_TM not in", values, "refundTm");
-            return (Criteria) this;
-        }
-
-        public Criteria andRefundTmBetween(Date value1, Date value2) {
-            addCriterion("REFUND_TM between", value1, value2, "refundTm");
-            return (Criteria) this;
-        }
-
-        public Criteria andRefundTmNotBetween(Date value1, Date value2) {
-            addCriterion("REFUND_TM not between", value1, value2, "refundTm");
             return (Criteria) this;
         }
 
@@ -1157,6 +1287,66 @@ public class OrderAdjExample {
             return (Criteria) this;
         }
 
+        public Criteria andAdjTmIsNull() {
+            addCriterion("ADJ_TM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAdjTmIsNotNull() {
+            addCriterion("ADJ_TM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAdjTmEqualTo(Date value) {
+            addCriterion("ADJ_TM =", value, "adjTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andAdjTmNotEqualTo(Date value) {
+            addCriterion("ADJ_TM <>", value, "adjTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andAdjTmGreaterThan(Date value) {
+            addCriterion("ADJ_TM >", value, "adjTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andAdjTmGreaterThanOrEqualTo(Date value) {
+            addCriterion("ADJ_TM >=", value, "adjTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andAdjTmLessThan(Date value) {
+            addCriterion("ADJ_TM <", value, "adjTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andAdjTmLessThanOrEqualTo(Date value) {
+            addCriterion("ADJ_TM <=", value, "adjTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andAdjTmIn(List<Date> values) {
+            addCriterion("ADJ_TM in", values, "adjTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andAdjTmNotIn(List<Date> values) {
+            addCriterion("ADJ_TM not in", values, "adjTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andAdjTmBetween(Date value1, Date value2) {
+            addCriterion("ADJ_TM between", value1, value2, "adjTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andAdjTmNotBetween(Date value1, Date value2) {
+            addCriterion("ADJ_TM not between", value1, value2, "adjTm");
+            return (Criteria) this;
+        }
+
         public Criteria andStatusIsNull() {
             addCriterion("STATUS is null");
             return (Criteria) this;
@@ -1274,196 +1464,6 @@ public class OrderAdjExample {
 
         public Criteria andVersionNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("VERSION not between", value1, value2, "version");
-            return (Criteria) this;
-        }
-
-        public Criteria andAgentIdIsNull() {
-            addCriterion("AGENT_ID is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andAgentIdIsNotNull() {
-            addCriterion("AGENT_ID is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andAgentIdEqualTo(String value) {
-            addCriterion("AGENT_ID =", value, "agentId");
-            return (Criteria) this;
-        }
-
-        public Criteria andAgentIdNotEqualTo(String value) {
-            addCriterion("AGENT_ID <>", value, "agentId");
-            return (Criteria) this;
-        }
-
-        public Criteria andAgentIdGreaterThan(String value) {
-            addCriterion("AGENT_ID >", value, "agentId");
-            return (Criteria) this;
-        }
-
-        public Criteria andAgentIdGreaterThanOrEqualTo(String value) {
-            addCriterion("AGENT_ID >=", value, "agentId");
-            return (Criteria) this;
-        }
-
-        public Criteria andAgentIdLessThan(String value) {
-            addCriterion("AGENT_ID <", value, "agentId");
-            return (Criteria) this;
-        }
-
-        public Criteria andAgentIdLessThanOrEqualTo(String value) {
-            addCriterion("AGENT_ID <=", value, "agentId");
-            return (Criteria) this;
-        }
-
-        public Criteria andAgentIdLike(String value) {
-            addCriterion("AGENT_ID like", value, "agentId");
-            return (Criteria) this;
-        }
-
-        public Criteria andAgentIdNotLike(String value) {
-            addCriterion("AGENT_ID not like", value, "agentId");
-            return (Criteria) this;
-        }
-
-        public Criteria andAgentIdIn(List<String> values) {
-            addCriterion("AGENT_ID in", values, "agentId");
-            return (Criteria) this;
-        }
-
-        public Criteria andAgentIdNotIn(List<String> values) {
-            addCriterion("AGENT_ID not in", values, "agentId");
-            return (Criteria) this;
-        }
-
-        public Criteria andAgentIdBetween(String value1, String value2) {
-            addCriterion("AGENT_ID between", value1, value2, "agentId");
-            return (Criteria) this;
-        }
-
-        public Criteria andAgentIdNotBetween(String value1, String value2) {
-            addCriterion("AGENT_ID not between", value1, value2, "agentId");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreditIsNull() {
-            addCriterion("CREDIT is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreditIsNotNull() {
-            addCriterion("CREDIT is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreditEqualTo(BigDecimal value) {
-            addCriterion("CREDIT =", value, "credit");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreditNotEqualTo(BigDecimal value) {
-            addCriterion("CREDIT <>", value, "credit");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreditGreaterThan(BigDecimal value) {
-            addCriterion("CREDIT >", value, "credit");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreditGreaterThanOrEqualTo(BigDecimal value) {
-            addCriterion("CREDIT >=", value, "credit");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreditLessThan(BigDecimal value) {
-            addCriterion("CREDIT <", value, "credit");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreditLessThanOrEqualTo(BigDecimal value) {
-            addCriterion("CREDIT <=", value, "credit");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreditIn(List<BigDecimal> values) {
-            addCriterion("CREDIT in", values, "credit");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreditNotIn(List<BigDecimal> values) {
-            addCriterion("CREDIT not in", values, "credit");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreditBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("CREDIT between", value1, value2, "credit");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreditNotBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("CREDIT not between", value1, value2, "credit");
-            return (Criteria) this;
-        }
-
-        public Criteria andRefundModeIsNull() {
-            addCriterion("REFUND_MODE is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andRefundModeIsNotNull() {
-            addCriterion("REFUND_MODE is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andRefundModeEqualTo(BigDecimal value) {
-            addCriterion("REFUND_MODE =", value, "refundMode");
-            return (Criteria) this;
-        }
-
-        public Criteria andRefundModeNotEqualTo(BigDecimal value) {
-            addCriterion("REFUND_MODE <>", value, "refundMode");
-            return (Criteria) this;
-        }
-
-        public Criteria andRefundModeGreaterThan(BigDecimal value) {
-            addCriterion("REFUND_MODE >", value, "refundMode");
-            return (Criteria) this;
-        }
-
-        public Criteria andRefundModeGreaterThanOrEqualTo(BigDecimal value) {
-            addCriterion("REFUND_MODE >=", value, "refundMode");
-            return (Criteria) this;
-        }
-
-        public Criteria andRefundModeLessThan(BigDecimal value) {
-            addCriterion("REFUND_MODE <", value, "refundMode");
-            return (Criteria) this;
-        }
-
-        public Criteria andRefundModeLessThanOrEqualTo(BigDecimal value) {
-            addCriterion("REFUND_MODE <=", value, "refundMode");
-            return (Criteria) this;
-        }
-
-        public Criteria andRefundModeIn(List<BigDecimal> values) {
-            addCriterion("REFUND_MODE in", values, "refundMode");
-            return (Criteria) this;
-        }
-
-        public Criteria andRefundModeNotIn(List<BigDecimal> values) {
-            addCriterion("REFUND_MODE not in", values, "refundMode");
-            return (Criteria) this;
-        }
-
-        public Criteria andRefundModeBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("REFUND_MODE between", value1, value2, "refundMode");
-            return (Criteria) this;
-        }
-
-        public Criteria andRefundModeNotBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("REFUND_MODE not between", value1, value2, "refundMode");
             return (Criteria) this;
         }
     }

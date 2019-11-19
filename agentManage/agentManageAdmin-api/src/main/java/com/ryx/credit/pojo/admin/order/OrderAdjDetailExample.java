@@ -347,6 +347,66 @@ public class OrderAdjDetailExample {
             return (Criteria) this;
         }
 
+        public Criteria andOrgProNumIsNull() {
+            addCriterion("ORG_PRO_NUM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgProNumIsNotNull() {
+            addCriterion("ORG_PRO_NUM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgProNumEqualTo(BigDecimal value) {
+            addCriterion("ORG_PRO_NUM =", value, "orgProNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgProNumNotEqualTo(BigDecimal value) {
+            addCriterion("ORG_PRO_NUM <>", value, "orgProNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgProNumGreaterThan(BigDecimal value) {
+            addCriterion("ORG_PRO_NUM >", value, "orgProNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgProNumGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("ORG_PRO_NUM >=", value, "orgProNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgProNumLessThan(BigDecimal value) {
+            addCriterion("ORG_PRO_NUM <", value, "orgProNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgProNumLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("ORG_PRO_NUM <=", value, "orgProNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgProNumIn(List<BigDecimal> values) {
+            addCriterion("ORG_PRO_NUM in", values, "orgProNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgProNumNotIn(List<BigDecimal> values) {
+            addCriterion("ORG_PRO_NUM not in", values, "orgProNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgProNumBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ORG_PRO_NUM between", value1, value2, "orgProNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgProNumNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ORG_PRO_NUM not between", value1, value2, "orgProNum");
+            return (Criteria) this;
+        }
+
         public Criteria andAdjNumIsNull() {
             addCriterion("ADJ_NUM is null");
             return (Criteria) this;
@@ -407,6 +467,66 @@ public class OrderAdjDetailExample {
             return (Criteria) this;
         }
 
+        public Criteria andProNumIsNull() {
+            addCriterion("PRO_NUM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNumIsNotNull() {
+            addCriterion("PRO_NUM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNumEqualTo(BigDecimal value) {
+            addCriterion("PRO_NUM =", value, "proNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNumNotEqualTo(BigDecimal value) {
+            addCriterion("PRO_NUM <>", value, "proNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNumGreaterThan(BigDecimal value) {
+            addCriterion("PRO_NUM >", value, "proNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNumGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("PRO_NUM >=", value, "proNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNumLessThan(BigDecimal value) {
+            addCriterion("PRO_NUM <", value, "proNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNumLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("PRO_NUM <=", value, "proNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNumIn(List<BigDecimal> values) {
+            addCriterion("PRO_NUM in", values, "proNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNumNotIn(List<BigDecimal> values) {
+            addCriterion("PRO_NUM not in", values, "proNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNumBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PRO_NUM between", value1, value2, "proNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNumNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PRO_NUM not between", value1, value2, "proNum");
+            return (Criteria) this;
+        }
+
         public Criteria andDifAmountIsNull() {
             addCriterion("DIF_AMOUNT is null");
             return (Criteria) this;
@@ -464,6 +584,66 @@ public class OrderAdjDetailExample {
 
         public Criteria andDifAmountNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("DIF_AMOUNT not between", value1, value2, "difAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTmIsNull() {
+            addCriterion("C_TM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTmIsNotNull() {
+            addCriterion("C_TM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTmEqualTo(Date value) {
+            addCriterion("C_TM =", value, "cTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTmNotEqualTo(Date value) {
+            addCriterion("C_TM <>", value, "cTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTmGreaterThan(Date value) {
+            addCriterion("C_TM >", value, "cTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTmGreaterThanOrEqualTo(Date value) {
+            addCriterion("C_TM >=", value, "cTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTmLessThan(Date value) {
+            addCriterion("C_TM <", value, "cTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTmLessThanOrEqualTo(Date value) {
+            addCriterion("C_TM <=", value, "cTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTmIn(List<Date> values) {
+            addCriterion("C_TM in", values, "cTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTmNotIn(List<Date> values) {
+            addCriterion("C_TM not in", values, "cTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTmBetween(Date value1, Date value2) {
+            addCriterion("C_TM between", value1, value2, "cTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTmNotBetween(Date value1, Date value2) {
+            addCriterion("C_TM not between", value1, value2, "cTm");
             return (Criteria) this;
         }
 
@@ -584,66 +764,6 @@ public class OrderAdjDetailExample {
 
         public Criteria andVersionNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("VERSION not between", value1, value2, "version");
-            return (Criteria) this;
-        }
-
-        public Criteria andCTmIsNull() {
-            addCriterion("C_TM is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andCTmIsNotNull() {
-            addCriterion("C_TM is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andCTmEqualTo(Date value) {
-            addCriterion("C_TM =", value, "cTm");
-            return (Criteria) this;
-        }
-
-        public Criteria andCTmNotEqualTo(Date value) {
-            addCriterion("C_TM <>", value, "cTm");
-            return (Criteria) this;
-        }
-
-        public Criteria andCTmGreaterThan(Date value) {
-            addCriterion("C_TM >", value, "cTm");
-            return (Criteria) this;
-        }
-
-        public Criteria andCTmGreaterThanOrEqualTo(Date value) {
-            addCriterion("C_TM >=", value, "cTm");
-            return (Criteria) this;
-        }
-
-        public Criteria andCTmLessThan(Date value) {
-            addCriterion("C_TM <", value, "cTm");
-            return (Criteria) this;
-        }
-
-        public Criteria andCTmLessThanOrEqualTo(Date value) {
-            addCriterion("C_TM <=", value, "cTm");
-            return (Criteria) this;
-        }
-
-        public Criteria andCTmIn(List<Date> values) {
-            addCriterion("C_TM in", values, "cTm");
-            return (Criteria) this;
-        }
-
-        public Criteria andCTmNotIn(List<Date> values) {
-            addCriterion("C_TM not in", values, "cTm");
-            return (Criteria) this;
-        }
-
-        public Criteria andCTmBetween(Date value1, Date value2) {
-            addCriterion("C_TM between", value1, value2, "cTm");
-            return (Criteria) this;
-        }
-
-        public Criteria andCTmNotBetween(Date value1, Date value2) {
-            addCriterion("C_TM not between", value1, value2, "cTm");
             return (Criteria) this;
         }
     }

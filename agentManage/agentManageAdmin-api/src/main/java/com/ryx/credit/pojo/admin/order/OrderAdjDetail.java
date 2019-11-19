@@ -11,15 +11,20 @@ public class OrderAdjDetail implements Serializable {
 
     private String subOrderId;
 
+    private BigDecimal orgProNum;
+
     private BigDecimal adjNum;
 
+    private BigDecimal proNum;
+
     private BigDecimal difAmount;
+
+    private Date cTm;
 
     private BigDecimal status;
 
     private BigDecimal version;
 
-    private Date cTm;
     private BigDecimal adjustCount;
 
     public BigDecimal getAdjustCount() {
@@ -53,6 +58,14 @@ public class OrderAdjDetail implements Serializable {
         this.subOrderId = subOrderId == null ? null : subOrderId.trim();
     }
 
+    public BigDecimal getOrgProNum() {
+        return orgProNum;
+    }
+
+    public void setOrgProNum(BigDecimal orgProNum) {
+        this.orgProNum = orgProNum;
+    }
+
     public BigDecimal getAdjNum() {
         return adjNum;
     }
@@ -61,12 +74,28 @@ public class OrderAdjDetail implements Serializable {
         this.adjNum = adjNum;
     }
 
+    public BigDecimal getProNum() {
+        return proNum;
+    }
+
+    public void setProNum(BigDecimal proNum) {
+        this.proNum = proNum;
+    }
+
     public BigDecimal getDifAmount() {
         return difAmount;
     }
 
     public void setDifAmount(BigDecimal difAmount) {
         this.difAmount = difAmount;
+    }
+
+    public Date getcTm() {
+        return cTm;
+    }
+
+    public void setcTm(Date cTm) {
+        this.cTm = cTm;
     }
 
     public BigDecimal getStatus() {
@@ -83,13 +112,5 @@ public class OrderAdjDetail implements Serializable {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
-    }
-
-    public Date getcTm() {
-        return cTm;
-    }
-
-    public void setcTm(Date cTm) {
-        this.cTm = cTm;
     }
 }
