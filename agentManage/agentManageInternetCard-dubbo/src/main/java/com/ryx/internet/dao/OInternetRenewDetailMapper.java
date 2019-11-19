@@ -26,4 +26,8 @@ public interface OInternetRenewDetailMapper {
 
     List<Map<String,Object>> queryCardProfit(Map<String,Object> reqMap);
 
+    List<OInternetRenewDetail>  internetRenewDetailList(OInternetRenewDetailExample example);
+
+    int internetRenewDetailCount(OInternetRenewDetailExample example);
+
 }

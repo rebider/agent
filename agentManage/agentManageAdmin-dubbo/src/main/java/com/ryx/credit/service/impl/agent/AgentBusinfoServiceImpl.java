@@ -1144,3 +1144,35 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 }
 
+	@Override
+	public List<AgentBusInfo> selectByAgentBusInfo(AgentBusInfo agentBusInfo){
+
+		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+		AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+		criteria.andStatusEqualTo(Status.STATUS_1.status);
+		if(null!=agentBusInfo.getBusStatus()){
+			criteria.andBusStatusEqualTo(agentBusInfo.getBusStatus());
+		}
+		if(null!=agentBusInfo.getBusStatusList() && agentBusInfo.getBusStatusList().size()!=0){
+			criteria.andBusStatusIn(agentBusInfo.getBusStatusList());
+		}
+		if(null!=agentBusInfo.getBusStatus()){
+			criteria.andBusStatusEqualTo(agentBusInfo.getBusStatus());
+		}
+		if(null!=agentBusInfo.getCloReviewStatus()){
+			criteria.andCloReviewStatusEqualTo(agentBusInfo.getCloReviewStatus());
+		}
+		if(StringUtils.isNotBlank(agentBusInfo.getBusNum())){
+			criteria.andBusNumEqualTo(agentBusInfo.getBusNum());
+		}
+		if(StringUtils.isNotBlank(agentBusInfo.getAgentId())){
+			criteria.andAgentIdEqualTo(agentBusInfo.getAgentId());
+		}
+		if(StringUtils.isNotBlank(agentBusInfo.getBusPlatform())){
+			criteria.andBusPlatformEqualTo(agentBusInfo.getBusPlatform());
+		}
+		List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+		return agentBusInfos;
+	}
+
+}

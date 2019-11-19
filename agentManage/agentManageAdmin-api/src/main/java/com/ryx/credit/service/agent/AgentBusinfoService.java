@@ -125,4 +125,6 @@ public interface AgentBusinfoService {
      * 查询品牌
      */
     public AgentBusInfo agentPlatformNum(String agentId,String platFormNum);
+
+    List<AgentBusInfo> selectByAgentBusInfo(AgentBusInfo agentBusInfo);
 }

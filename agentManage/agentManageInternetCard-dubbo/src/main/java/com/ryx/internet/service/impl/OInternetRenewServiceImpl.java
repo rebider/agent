@@ -65,8 +65,6 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     @Autowired
     private AttachmentRelService attachmentRelService;
     @Autowired
-    private AgentService agentService;
-    @Autowired
     private AttachmentService attachmentService;
     @Autowired
     private AgentEnterService agentEnterService;
@@ -84,7 +82,8 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     private DepartmentService departmentService;
     @Autowired
     private InternetRenewOffsetDetailMapper internetRenewOffsetDetailMapper;
-
+    @Autowired
+    private AgentBusinfoService agentBusinfoService;
 
     @Override
     public PageInfo internetRenewList(OInternetRenew internetRenew, Page page,String agentId,Long userId){
@@ -100,32 +99,49 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         if(null!=internetRenew.getReviewStatus()){
             criteria.andReviewStatusEqualTo(internetRenew.getReviewStatus());
         }
+        if(StringUtils.isNotBlank(internetRenew.getBusNum())){
+            criteria.andBusNumEqualTo(internetRenew.getBusNum());
+        }
         //代理商只查询自己的
         if(StringUtils.isNotBlank(agentId)){
             criteria.andAgentIdEqualTo(agentId);
         }else if(StringUtils.isNotBlank(internetRenew.getAgentId())){
             criteria.andAgentIdEqualTo(internetRenew.getAgentId());
         }
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+        if(orgCodeRes==null && orgCodeRes.size()!=1){
+            return null;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        Map<String,Object> reqMap = new HashMap<>();
+        //省区大区查看自己的代理商 部门权限
+        if(StringUtils.isNotBlank(organizationCode) && (organizationCode.contains("region") || organizationCode.contains("beijing"))) {
+            reqMap.put("orgCode", organizationCode);
+        }
         //内部人员根据名称查询指定流量卡
         List<String> agentNameList = dictOptionsService.getAgentNameList(userId);
         if(agentNameList.size()!=0) {
-            criteria.andAgentNameIn(agentNameList);
+            reqMap.put("agentNameList", agentNameList);
         }else if(StringUtils.isNotBlank(internetRenew.getAgentName())){
             criteria.andAgentNameLike("%"+internetRenew.getAgentName()+"%");
         }
         criteria.andStatusEqualTo(Status.STATUS_1.status);
+        internetRenewExample.setReqMap(reqMap);
         internetRenewExample.setPage(page);
         internetRenewExample.setOrderByClause(" c_time desc");
-        List<OInternetRenew> internetRenews = internetRenewMapper.selectByExample(internetRenewExample);
+        List<OInternetRenew> internetRenews = internetRenewMapper.internetRenewList(internetRenewExample);
         for (OInternetRenew renew : internetRenews) {
             renew.setRenewWayName(InternetRenewWay.getContentByValue(renew.getRenewWay()));
-            CUser cUser = iUserService.selectById(renew.getcUser());
-            if(null!=cUser)
-            renew.setcUser(cUser.getName());
+            if(StringUtils.isNotBlank(renew.getcUser())){
+                CUser cUser = iUserService.selectById(Long.valueOf(renew.getcUser()));
+                if(null!=cUser)
+                renew.setcUser(cUser.getName());
+            }
         }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(internetRenews);
-        pageInfo.setTotal((int)internetRenewMapper.countByExample(internetRenewExample));
+        pageInfo.setTotal(internetRenewMapper.internetRenewCount(internetRenewExample));
         return pageInfo;
     }
 
@@ -134,7 +150,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
 
         OInternetRenewDetailExample internetRenewDetailExample = queryParam(internetRenewDetail,agentId,userId);
         internetRenewDetailExample.setPage(page);
-        List<OInternetRenewDetail> internetRenewDetails = internetRenewDetailMapper.selectByExample(internetRenewDetailExample);
+        List<OInternetRenewDetail> internetRenewDetails = internetRenewDetailMapper.internetRenewDetailList(internetRenewDetailExample);
         for (OInternetRenewDetail renewDetail : internetRenewDetails) {
             renewDetail.setRenewWayName(InternetRenewWay.getContentByValue(renewDetail.getRenewWay()));
             CUser cUser = iUserService.selectById(renewDetail.getcUser());
@@ -143,7 +159,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(internetRenewDetails);
-        pageInfo.setTotal((int)internetRenewDetailMapper.countByExample(internetRenewDetailExample));
+        pageInfo.setTotal(internetRenewDetailMapper.internetRenewDetailCount(internetRenewDetailExample));
         return pageInfo;
     }
 
@@ -151,19 +167,19 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     public List<OInternetRenewDetail> queryInternetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page,String agentId,Long userId){
         OInternetRenewDetailExample oInternetRenewDetailExample = queryParam(internetRenewDetail,agentId,userId);
         oInternetRenewDetailExample.setPage(page);
-        List<OInternetRenewDetail> internetRenewDetailList = internetRenewDetailMapper.selectByExample(oInternetRenewDetailExample);
+        List<OInternetRenewDetail> internetRenewDetailList = internetRenewDetailMapper.internetRenewDetailList(oInternetRenewDetailExample);
         return internetRenewDetailList;
     }
 
     @Override
     public Integer queryInternetRenewDetailCount(OInternetRenewDetail internetRenewDetail,String agentId,Long userId){
         OInternetRenewDetailExample oInternetRenewDetailExample = queryParam(internetRenewDetail,agentId,userId);
-        Integer count = Integer.valueOf((int)internetRenewDetailMapper.countByExample(oInternetRenewDetailExample));
+        Integer count = Integer.valueOf(internetRenewDetailMapper.internetRenewDetailCount(oInternetRenewDetailExample));
         return count;
     }
 
     /**
-     * 查询和导出的条件
+     * 续费明细 查询和导出的条件
      * @param internetRenewDetail
      * @return
      */
@@ -177,13 +193,26 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }else if(StringUtils.isNotBlank(internetRenewDetail.getAgentId())){
             criteria.andAgentIdEqualTo(internetRenewDetail.getAgentId());
         }
+
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+        if(orgCodeRes==null && orgCodeRes.size()!=1){
+            return null;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        Map<String,Object> reqMap = new HashMap<>();
+        //省区大区查看自己的代理商 部门权限
+        if(StringUtils.isNotBlank(organizationCode) && (organizationCode.contains("region") || organizationCode.contains("beijing"))) {
+            reqMap.put("orgCode", organizationCode);
+        }
         //内部人员根据名称查询指定流量卡
         List<String> agentNameList = dictOptionsService.getAgentNameList(userId);
         if(agentNameList.size()!=0) {
-            criteria.andAgentNameIn(agentNameList);
+            reqMap.put("agentNameList", agentNameList);
         }else if(StringUtils.isNotBlank(internetRenewDetail.getAgentName())){
             criteria.andAgentNameLike("%"+internetRenewDetail.getAgentName()+"%");
         }
+
         if(StringUtils.isNotBlank(internetRenewDetail.getIccidNum())){
             criteria.andIccidNumEqualTo(internetRenewDetail.getIccidNum());
         }
@@ -202,13 +231,17 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         if(StringUtils.isNotBlank(internetRenewDetail.getRenewStatus())){
             criteria.andRenewStatusEqualTo(internetRenewDetail.getRenewStatus());
         }
+        if(StringUtils.isNotBlank(internetRenewDetail.getBusNum())){
+            criteria.andBusNumEqualTo(internetRenewDetail.getBusNum());
+        }
+        internetRenewDetailExample.setReqMap(reqMap);
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         internetRenewDetailExample.setOrderByClause(" c_time desc ");
         return internetRenewDetailExample;
     }
 
     @Override
-    public PageInfo internetRenewOffsetList(InternetRenewOffset internetRenewOffset, Page page,String agentId){
+    public PageInfo internetRenewOffsetList(InternetRenewOffset internetRenewOffset, Page page,String agentId,Long userId){
 
         InternetRenewOffsetExample internetRenewOffsetExample = new InternetRenewOffsetExample();
         InternetRenewOffsetExample.Criteria criteria = internetRenewOffsetExample.createCriteria();
@@ -218,7 +251,22 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }else if(StringUtils.isNotBlank(internetRenewOffset.getAgentId())){
             criteria.andAgentIdEqualTo(internetRenewOffset.getAgentId());
         }
-        if(StringUtils.isNotBlank(internetRenewOffset.getAgentName())){
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+        if(orgCodeRes==null && orgCodeRes.size()!=1){
+            return null;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        Map<String,Object> reqMap = new HashMap<>();
+        //省区大区查看自己的代理商 部门权限
+        if(StringUtils.isNotBlank(organizationCode) && (organizationCode.contains("region") || organizationCode.contains("beijing"))) {
+            reqMap.put("orgCode", organizationCode);
+        }
+        //内部人员根据名称查询指定流量卡
+        List<String> agentNameList = dictOptionsService.getAgentNameList(userId);
+        if(agentNameList.size()!=0) {
+            reqMap.put("agentNameList", agentNameList);
+        }else if(StringUtils.isNotBlank(internetRenewOffset.getAgentName())){
             criteria.andAgentNameLike("%"+internetRenewOffset.getAgentName()+"%");
         }
         if(StringUtils.isNotBlank(internetRenewOffset.getRenewId())){
@@ -239,10 +287,14 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         if(StringUtils.isNotBlank(internetRenewOffset.getFlowId())){
             criteria.andFlowIdEqualTo(internetRenewOffset.getFlowId());
         }
+        if(StringUtils.isNotBlank(internetRenewOffset.getBusNum())){
+            criteria.andBusNumEqualTo(internetRenewOffset.getBusNum());
+        }
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         internetRenewOffsetExample.setPage(page);
+        internetRenewOffsetExample.setReqMap(reqMap);
         internetRenewOffsetExample.setOrderByClause(" c_time desc");
-        List<InternetRenewOffset> internetRenewOffsets = internetRenewOffsetMapper.selectByExample(internetRenewOffsetExample);
+        List<InternetRenewOffset> internetRenewOffsets = internetRenewOffsetMapper.internetRenewOffsetList(internetRenewOffsetExample);
         for (InternetRenewOffset offset : internetRenewOffsets) {
             CUser cUser = iUserService.selectById(offset.getcUser());
             if(null!=cUser)
@@ -251,16 +303,16 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(internetRenewOffsets);
-        pageInfo.setTotal((int)internetRenewOffsetMapper.countByExample(internetRenewOffsetExample));
+        pageInfo.setTotal(internetRenewOffsetMapper.internetRenewOffsetCount(internetRenewOffsetExample));
         return pageInfo;
     }
 
     @Override
-    public PageInfo internetRenewOffsetDetailList(InternetRenewOffsetDetail internetRenewOffsetDetail, Page page,String agentId){
+    public PageInfo internetRenewOffsetDetailList(InternetRenewOffsetDetail internetRenewOffsetDetail, Page page,String agentId,Long userId){
 
-        InternetRenewOffsetDetailExample internetRenewOffsetDetailExample = queryOffsetDetailParam(internetRenewOffsetDetail, agentId);
+        InternetRenewOffsetDetailExample internetRenewOffsetDetailExample = queryOffsetDetailParam(internetRenewOffsetDetail, agentId,userId);
         internetRenewOffsetDetailExample.setPage(page);
-        List<InternetRenewOffsetDetail> internetRenewOffsetDetails = internetRenewOffsetDetailMapper.selectByExample(internetRenewOffsetDetailExample);
+        List<InternetRenewOffsetDetail> internetRenewOffsetDetails = internetRenewOffsetDetailMapper.internetRenewOffsetDetailList(internetRenewOffsetDetailExample);
         for (InternetRenewOffsetDetail offsetDetail : internetRenewOffsetDetails) {
             CUser cUser = iUserService.selectById(offsetDetail.getcUser());
             if(null!=cUser)
@@ -269,7 +321,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(internetRenewOffsetDetails);
-        pageInfo.setTotal((int)internetRenewOffsetDetailMapper.countByExample(internetRenewOffsetDetailExample));
+        pageInfo.setTotal(internetRenewOffsetDetailMapper.internetRenewOffsetDetailCount(internetRenewOffsetDetailExample));
         return pageInfo;
     }
 
@@ -279,7 +331,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
      * @param agentId
      * @return
      */
-    private InternetRenewOffsetDetailExample queryOffsetDetailParam(InternetRenewOffsetDetail internetRenewOffsetDetail,String agentId){
+    private InternetRenewOffsetDetailExample queryOffsetDetailParam(InternetRenewOffsetDetail internetRenewOffsetDetail,String agentId,Long userId){
         InternetRenewOffsetDetailExample internetRenewOffsetDetailExample = new InternetRenewOffsetDetailExample();
         InternetRenewOffsetDetailExample.Criteria criteria = internetRenewOffsetDetailExample.createCriteria();
         //代理商只查询自己的
@@ -288,7 +340,23 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }else if(StringUtils.isNotBlank(internetRenewOffsetDetail.getAgentId())){
             criteria.andAgentIdEqualTo(internetRenewOffsetDetail.getAgentId());
         }
-        if(StringUtils.isNotBlank(internetRenewOffsetDetail.getAgentName())){
+
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+        if(orgCodeRes==null && orgCodeRes.size()!=1){
+            return null;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        Map<String,Object> reqMap = new HashMap<>();
+        //省区大区查看自己的代理商 部门权限
+        if(StringUtils.isNotBlank(organizationCode) && (organizationCode.contains("region") || organizationCode.contains("beijing"))) {
+            reqMap.put("orgCode", organizationCode);
+        }
+        //内部人员根据名称查询指定流量卡
+        List<String> agentNameList = dictOptionsService.getAgentNameList(userId);
+        if(agentNameList.size()!=0) {
+            reqMap.put("agentNameList", agentNameList);
+        }else if(StringUtils.isNotBlank(internetRenewOffsetDetail.getAgentName())){
             criteria.andAgentNameLike("%"+internetRenewOffsetDetail.getAgentName()+"%");
         }
         if(StringUtils.isNotBlank(internetRenewOffsetDetail.getRenewId())){
@@ -320,25 +388,29 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             String dateEnd = DateUtil.dateConvertion(internetRenewOffsetDetail.getProcessDateEnd(), DateUtil.DATE_FORMAT_yyyy_MM_dd, DateUtil.DATE_FORMAT_3);
             criteria.andProcessDateLessThanOrEqualTo(dateEnd);
         }
+        if(StringUtils.isNotBlank(internetRenewOffsetDetail.getBusNum())){
+            criteria.andBusNumEqualTo(internetRenewOffsetDetail.getBusNum());
+        }
 
         criteria.andStatusEqualTo(Status.STATUS_1.status);
+        internetRenewOffsetDetailExample.setReqMap(reqMap);
         internetRenewOffsetDetailExample.setOrderByClause(" c_time desc");
         return internetRenewOffsetDetailExample;
     }
 
 
     @Override
-    public List<InternetRenewOffsetDetail> queryInternetRenewOffsetDetailList(InternetRenewOffsetDetail internetRenewOffsetDetail, Page page,String agentId){
-        InternetRenewOffsetDetailExample internetRenewOffsetDetailExample = queryOffsetDetailParam(internetRenewOffsetDetail, agentId);
+    public List<InternetRenewOffsetDetail> queryInternetRenewOffsetDetailList(InternetRenewOffsetDetail internetRenewOffsetDetail, Page page,String agentId,Long userId){
+        InternetRenewOffsetDetailExample internetRenewOffsetDetailExample = queryOffsetDetailParam(internetRenewOffsetDetail, agentId,userId);
         internetRenewOffsetDetailExample.setPage(page);
-        List<InternetRenewOffsetDetail> internetRenewOffsetDetailList = internetRenewOffsetDetailMapper.selectByExample(internetRenewOffsetDetailExample);
+        List<InternetRenewOffsetDetail> internetRenewOffsetDetailList = internetRenewOffsetDetailMapper.internetRenewOffsetDetailList(internetRenewOffsetDetailExample);
         return internetRenewOffsetDetailList;
     }
 
     @Override
-    public Integer queryInternetRenewOffsetDetailCount(InternetRenewOffsetDetail internetRenewOffsetDetail,String agentId){
-        InternetRenewOffsetDetailExample internetRenewOffsetDetailExample = queryOffsetDetailParam(internetRenewOffsetDetail,agentId);
-        Integer count = Integer.valueOf((int)internetRenewOffsetDetailMapper.countByExample(internetRenewOffsetDetailExample));
+    public Integer queryInternetRenewOffsetDetailCount(InternetRenewOffsetDetail internetRenewOffsetDetail,String agentId,Long userId){
+        InternetRenewOffsetDetailExample internetRenewOffsetDetailExample = queryOffsetDetailParam(internetRenewOffsetDetail,agentId,userId);
+        Integer count = Integer.valueOf(internetRenewOffsetDetailMapper.internetRenewOffsetDetailCount(internetRenewOffsetDetailExample));
         return count;
     }
 
@@ -367,20 +439,35 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
 
             int z = 1;
             Set<String> agentIdSet = new HashSet<>();
+            Set<String> busNumSet = new HashSet<>();
+            Set<String> busPlatformSet = new HashSet<>();
             String agentId = "";
             String agName = "";
+            String busNum = "";
+            String busPlatform = "";
             for (String iccid : iccids) {
                 OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(iccid);
                 if (oInternetCard == null) {
                     throw new MessageException("第" + z + "个iccid不存在");
                 }
+                busNumSet.add(oInternetCard.getBusNum());
+                busPlatformSet.add(oInternetCard.getBusPlatform());
                 agentIdSet.add(oInternetCard.getAgentId());
                 agentId = oInternetCard.getAgentId();
                 agName = oInternetCard.getAgentName();
+                busNum = oInternetCard.getBusNum();
+                busPlatform = oInternetCard.getBusPlatform();
             }
             if(agentIdSet.size()!=1){
                 throw new MessageException("不同代理商请分开申请");
             }
+            if(busNumSet.size()!=1){
+                throw new MessageException("不同平台码请分开申请");
+            }
+            if(busPlatformSet.size()!=1){
+                throw new MessageException("不同平台请分开申请");
+            }
+
             List<String> agentNameList = dictOptionsService.getAgentNameList(Long.valueOf(cUser));
             if(agentNameList.size()!=0){
                 if(!internetRenew.getRenewWay().equals(InternetRenewWay.XXBK.getValue())){
@@ -400,6 +487,30 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             internetRenew.setuUser(cUser);
             internetRenew.setStatus(Status.STATUS_1.status);
             internetRenew.setVersion(BigDecimal.ONE);
+            internetRenew.setBusNum(busNum);
+            internetRenew.setBusPlatform(busPlatform);
+            AgentBusInfo queryAgentBusInfo = null;
+            if(StringUtils.isNotBlank(busNum)){
+                //查询最新对接省区大区对接人
+                AgentBusInfo agentBusInfo = new AgentBusInfo();
+                agentBusInfo.setBusNum(busNum);
+                agentBusInfo.setBusPlatform(busPlatform);
+                List<BigDecimal> busStatusList = new ArrayList<>();
+                busStatusList.add(BusStatus.QY.getValue());
+                busStatusList.add(BusStatus.WJH.getValue());
+                busStatusList.add(BusStatus.WQY.getValue());
+                agentBusInfo.setBusStatusList(busStatusList);
+                agentBusInfo.setCloReviewStatus(AgStatus.Approved.getValue());
+                List<AgentBusInfo> agentBusInfos = agentBusinfoService.selectByAgentBusInfo(agentBusInfo);
+                if(agentBusInfos.size()!=1){
+                    throw new MessageException("平台码或平台错误,请联系管理员");
+                }
+                queryAgentBusInfo = agentBusInfos.get(0);
+                internetRenew.setAgDocDistrict(queryAgentBusInfo.getAgDocDistrict());
+                internetRenew.setAgDocPro(queryAgentBusInfo.getAgDocPro());
+                internetRenew.setBusContactPerson(queryAgentBusInfo.getBusContactPerson());
+            }
+
             Dict cardAmt = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.INTERNET_RENEW.name(), DictGroup.CARD_AMT.name());
             if(cardAmt==null){
                 throw new MessageException("缺少参数配置");
@@ -408,7 +519,8 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
 
             Dict offsetAmt = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.INTERNET_RENEW.name(), DictGroup.OFFSET_AMT.name());
             //没有轧差直接设置为0
-            if(internetRenew.getRenewWay().equals(InternetRenewWay.FRDK.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.XXBK.getValue())){
+            if(internetRenew.getRenewWay().equals(InternetRenewWay.FRDK.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.XXBK.getValue())
+                || internetRenew.getRenewWay().equals(InternetRenewWay.GSCD.getValue())){
                 internetRenew.setSumOffsetAmt(BigDecimal.ZERO);
             }else{
                 if(offsetAmt==null){
@@ -503,7 +615,13 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 }
                 oInternetRenewDetail.setAgentName(oInternetCard.getAgentName());
                 oInternetRenewDetail.setRenewWay(internetRenew.getRenewWay());
-                oInternetRenewDetail.setOffsetAmt(new BigDecimal(offsetAmt.getdItemvalue()));
+
+                if(internetRenew.getRenewWay().equals(InternetRenewWay.FRDK.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.XXBK.getValue())
+                        || internetRenew.getRenewWay().equals(InternetRenewWay.GSCD.getValue())){
+                    oInternetRenewDetail.setOffsetAmt(BigDecimal.ZERO);
+                }else{
+                    oInternetRenewDetail.setOffsetAmt(new BigDecimal(offsetAmt.getdItemvalue()));
+                }
                 oInternetRenewDetail.setRenewAmt(new BigDecimal(cardAmt.getdItemvalue()));
                 oInternetRenewDetail.setOughtAmt(new BigDecimal(cardAmt.getdItemvalue()));
                 //线下打款直接是实际扣款金额
@@ -520,6 +638,13 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 oInternetRenewDetail.setcTime(new Date());
                 oInternetRenewDetail.setuTime(new Date());
                 oInternetRenewDetail.setVersion(BigDecimal.ONE);
+                oInternetRenewDetail.setBusNum(oInternetCard.getBusNum());
+                oInternetRenewDetail.setBusPlatform(oInternetCard.getBusPlatform());
+                if(null!=queryAgentBusInfo){
+                    oInternetRenewDetail.setAgDocDistrict(queryAgentBusInfo.getAgDocDistrict());
+                    oInternetRenewDetail.setAgDocPro(queryAgentBusInfo.getAgDocPro());
+                    oInternetRenewDetail.setBusContactPerson(queryAgentBusInfo.getBusContactPerson());
+                }
                 internetRenewDetailMapper.insert(oInternetRenewDetail);
             }
             try {
@@ -547,6 +672,10 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             record.setDataShiro(BusActRelBusType.cardRenew.key);
             record.setAgentId(StringUtils.isBlank(agentId) || agentId.equals("null")?"":agentId);
             record.setAgentName(StringUtils.isBlank(agName) || agName.equals("null")?"":agName);
+            record.setAgDocPro(internetRenew.getAgDocPro());
+            record.setAgDocDistrict(internetRenew.getAgDocDistrict());
+            record.setExplain(busNum);
+
             try {
                 taskApprovalService.addABusActRel(record);
                 log.info("物联网卡续费审批流启动成功");
@@ -658,14 +787,15 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
             }
             if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
-                //如果线下补款,审批通过直接已付款,否则未续费
-                if(oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.XXBK.getValue()) || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue())
-                    || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.GSCD.getValue()) || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.GSCDGC.getValue())){
-                    oInternetRenewDetail.setRenewStatus(InternetRenewStatus.YXF.getValue());
-                    oInternetCard.setRenewStatus(InternetRenewStatus.YXF.getValue());
-                    //续费成功到期时间加一年
-                    oInternetCard.setExpireTime(DateUtil.getOneYearLater(oInternetCard.getExpireTime()));
+                //审批通过直接已续费
+                oInternetRenewDetail.setRenewStatus(InternetRenewStatus.YXF.getValue());
+                if(oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDK.getValue()) || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())){
+                    oInternetRenewDetail.setRealityAmt(oInternetRenewDetail.getOughtAmt());
                 }
+                oInternetCard.setRenewStatus(InternetRenewStatus.YXF.getValue());
+                //续费成功到期时间加一年
+                oInternetCard.setExpireTime(DateUtil.getOneYearLater(oInternetCard.getExpireTime()));
+
                 oInternetCard.setStop(Status.STATUS_0.status);
                 oInternetCard.setRenew(Status.STATUS_0.status);
                 //生成轧差明细，同步清结算
@@ -688,6 +818,11 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                     internetRenewOffset.setStatus(Status.STATUS_1.status);
                     internetRenewOffset.setVersion(BigDecimal.ONE);
                     internetRenewOffset.setCleanStatus(InternetCleanStatus.ZERO.getValue());
+                    internetRenewOffset.setBusNum(oInternetRenewDetail.getBusNum());
+                    internetRenewOffset.setBusPlatform(oInternetRenewDetail.getBusPlatform());
+                    internetRenewOffset.setAgDocDistrict(oInternetRenewDetail.getAgDocDistrict());
+                    internetRenewOffset.setAgDocPro(oInternetRenewDetail.getAgDocPro());
+                    internetRenewOffset.setBusContactPerson(oInternetRenewDetail.getBusContactPerson());
                     internetRenewOffsetMapper.insert(internetRenewOffset);
                 }
             }
@@ -727,7 +862,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     }
 
     @Override
-    public void renewVerify(String iccidNumIds)throws MessageException{
+    public void renewVerify(String iccidNumIds,Long userId)throws MessageException{
 
         String[] iccidNumIdsStr = iccidNumIds.split(",");
         for (String iccidNumId : iccidNumIdsStr) {
@@ -740,7 +875,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             }
             //是否需续费为是,才展示按钮
             if(oInternetCard.getRenew().compareTo(BigDecimal.ZERO)==0){
-                throw new MessageException("是否需续费否,不允许续费");
+                throw new MessageException("是否需续费为否,不允许续费");
             }
             if((oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NORMAL.getValue())==0 || oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NOACTIVATE.getValue())==0 )
                     && oInternetCard.getRenewStatus().equals(InternetRenewStatus.WXF.getValue())){
@@ -759,6 +894,21 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 }
             }else{
                 throw new MessageException("状态不正确,不允许续费");
+            }
+
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if(orgCodeRes==null && orgCodeRes.size()!=1){
+                throw new MessageException("当前登陆用户信息有误,请联系管理员");
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+            if(StringUtils.isBlank(organizationCode)){
+                throw new MessageException("当前登陆用户信息有误,请联系管理员");
+            }
+            if(!organizationCode.equals("agent")) {
+                if(StringUtils.isBlank(oInternetCard.getBusNum()) || StringUtils.isBlank(oInternetCard.getBusPlatform())){
+                    throw new MessageException("非代理商发起,业务平台编码或业务平台不可为空");
+                }
             }
         }
     }
@@ -829,6 +979,11 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             internetRenewOffsetDetail.setCleanStatus(internetRenewOffset.getCleanStatus());
             internetRenewOffsetDetail.setStatus(Status.STATUS_1.status);
             internetRenewOffsetDetail.setVersion(BigDecimal.ONE);
+            internetRenewOffsetDetail.setBusNum(internetRenewOffset.getBusNum());
+            internetRenewOffsetDetail.setBusPlatform(internetRenewOffset.getBusPlatform());
+            internetRenewOffsetDetail.setAgDocDistrict(internetRenewOffset.getAgDocDistrict());
+            internetRenewOffsetDetail.setAgDocPro(internetRenewOffset.getAgDocPro());
+            internetRenewOffsetDetail.setBusContactPerson(internetRenewOffset.getBusContactPerson());
             internetRenewOffsetDetailMapper.insertSelective(internetRenewOffsetDetail);
             log.info("获取前一天轧差数据生成明细,flowId:{},金额:{},结束:", flowId,subtract);
         }
@@ -898,10 +1053,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         internetRenewWayList.add(InternetRenewWay.FRDK.getValue());
         internetRenewWayList.add(InternetRenewWay.FRDKGC.getValue());
         reqMap.put("internetRenewWayList",internetRenewWayList);
-        List<String> renewStatusList = new ArrayList<>();
-        renewStatusList.add(InternetRenewStatus.BFXF.getValue());
-        renewStatusList.add(InternetRenewStatus.XFZ.getValue());
-        reqMap.put("renewStatusList",renewStatusList);
+        reqMap.put("renewStatus",InternetRenewStatus.YXF.getValue());
         List<Map<String, Object>> list = internetRenewDetailMapper.queryCardProfit(reqMap);
         if(list.size()==0){
             agentResult.setStatus(AgentResult.OK);
@@ -914,73 +1066,40 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     }
 
 
-    /**
-     * 处理分润系统 返回结果
-     * @param internetRenewDetail
-     * @return
-     * @throws MessageException
-     */
-    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
-    @Override
-    public AgentResult disposeCardProfit(OInternetRenewDetail internetRenewDetail)throws MessageException{
 
-        log.info("分润抵扣流量卡数据处理,请求参数:{}",internetRenewDetail.toString());
-        AgentResult agentResult = AgentResult.fail();
-        if(null==internetRenewDetail.getTheRealityAmt()){
-            agentResult.setMsg("本次抵扣金额为空或格式不正确");
-            return agentResult;
-        }
-        if(null==internetRenewDetail.getId()){
-            agentResult.setMsg("明细编号为空");
-            return agentResult;
-        }
-        Boolean regOperationAmt = RegExpression.regAmount(internetRenewDetail.getTheRealityAmt());
-        if(!regOperationAmt){
-            agentResult.setMsg("操作金额不正确,保留小数点后两位");
-            return agentResult;
-        }
-        if(internetRenewDetail.getTheRealityAmt().compareTo(BigDecimal.ZERO)==0 || internetRenewDetail.getTheRealityAmt().compareTo(new BigDecimal("0.00"))==0){
-            agentResult.setMsg("操作金额不正确,不能为0");
-            return agentResult;
-        }
-        OInternetRenewDetail qInternetRenewDetail = internetRenewDetailMapper.selectByPrimaryKey(internetRenewDetail.getId());
-        if(null==qInternetRenewDetail){
-            agentResult.setMsg("明细不存在");
-            return agentResult;
-        }
-        if(!qInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDK.getValue()) && !qInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())){
-            agentResult.setMsg("只能导入分润抵扣的数据");
-            return agentResult;
-        }
-        BigDecimal realityAmt = internetRenewDetail.getTheRealityAmt().add(qInternetRenewDetail.getRealityAmt());
-        if(realityAmt.compareTo(qInternetRenewDetail.getOughtAmt())==1){
-            agentResult.setMsg("实扣金额不能大于应扣金额");
-            return agentResult;
-        }
-        OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(qInternetRenewDetail.getIccidNum());
-        //等于更新状态已续费
-        if(realityAmt.compareTo(qInternetRenewDetail.getOughtAmt())==0){
-            qInternetRenewDetail.setRenewStatus(InternetRenewStatus.YXF.getValue());
-            oInternetCard.setRenewStatus(InternetRenewStatus.YXF.getValue());
-            //扣足到期时间加一年
+    @Transactional
+    @Autowired
+    public void frdk(){
+        log.info("分润抵扣历史数据处理开始");
+        OInternetRenewDetailExample oInternetRenewDetailExample = new OInternetRenewDetailExample();
+        OInternetRenewDetailExample.Criteria criteria = oInternetRenewDetailExample.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<String> renewWayList = new ArrayList<>();
+        renewWayList.add(InternetRenewWay.FRDK.getValue());
+        renewWayList.add(InternetRenewWay.FRDKGC.getValue());
+        criteria.andRenewWayIn(renewWayList);
+        criteria.andRenewStatusEqualTo(InternetRenewStatus.XFZ.getValue());
+        List<OInternetRenewDetail> oInternetRenewDetails = internetRenewDetailMapper.selectByExample(oInternetRenewDetailExample);
+        for (OInternetRenewDetail oInternetRenewDetail : oInternetRenewDetails) {
+            oInternetRenewDetail.setuTime(new Date());
+            oInternetRenewDetail.setRenewStatus(InternetRenewStatus.YXF.getValue());
+            oInternetRenewDetail.setRealityAmt(oInternetRenewDetail.getOughtAmt());
+            int i = internetRenewDetailMapper.updateByPrimaryKeySelective(oInternetRenewDetail);
+            if(i!=1){
+                log.info("分润抵扣历史数据处理失败1",oInternetRenewDetail.getId());
+                continue;
+            }
+            OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(oInternetRenewDetail.getIccidNum());
             oInternetCard.setExpireTime(DateUtil.getOneYearLater(oInternetCard.getExpireTime()));
-        }else{
-            qInternetRenewDetail.setRenewStatus(InternetRenewStatus.BFXF.getValue());
-            oInternetCard.setRenewStatus(InternetRenewStatus.BFXF.getValue());
+            oInternetCard.setRenewStatus(InternetRenewStatus.YXF.getValue());
+            oInternetCard.setStop(Status.STATUS_0.status);
+            oInternetCard.setRenew(Status.STATUS_0.status);
+            oInternetCard.setuTime(new Date());
+            int j = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
+            if(j!=1){
+                log.info("分润抵扣历史数据处理失败2",oInternetCard.getIccidNum());
+            }
         }
-        qInternetRenewDetail.setRealityAmt(realityAmt);
-        qInternetRenewDetail.setuTime(new Date());
-        int i = internetRenewDetailMapper.updateByPrimaryKeySelective(qInternetRenewDetail);
-        if(i!=1){
-            throw new MessageException("更新续费明细失败");
-        }
-        oInternetCard.setuTime(new Date());
-        int k = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
-        if(k!=1){
-            throw new MessageException("更新物联网卡信息失败");
-        }
-        log.info("分润抵扣流量卡数据处理成功");
-        return AgentResult.ok("抵扣成功");
+        log.info("分润抵扣历史数据处理结束,处理个数{}",oInternetRenewDetails.size());
     }
-
 }
