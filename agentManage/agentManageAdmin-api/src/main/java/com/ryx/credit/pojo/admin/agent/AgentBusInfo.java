@@ -119,8 +119,29 @@ public class AgentBusInfo implements Serializable {
 
     private BigDecimal dredgeD1;
 
+    private String debitRateCapping;//借记费率上限
+
+    private String debitCappingLower;//借记封顶额下限
+
     private List<BigDecimal> busStatusList;
+
     private String flag;//标记
+
+    public String getDebitRateCapping() {
+        return debitRateCapping;
+    }
+
+    public void setDebitRateCapping(String debitRateCapping) {
+        this.debitRateCapping = debitRateCapping;
+    }
+
+    public String getDebitCappingLower() {
+        return debitCappingLower;
+    }
+
+    public void setDebitCappingLower(String debitCappingLower) {
+        this.debitCappingLower = debitCappingLower;
+    }
 
     public List<BigDecimal> getBusStatusList() {
         return busStatusList;

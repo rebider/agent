@@ -24,8 +24,15 @@ public interface OrgPlatformMapper {
 
     int updateByPrimaryKey(OrgPlatform record);
 
-    int deleteOrgPlatform(@Param("id") String id);
+    int deleteOrgPlatform(@Param("map") Map map);
 
     List<Map> queryOrg(@Param("platForm")String platForm);
 
+    /**
+     * 查询顶级机构，Map可升级
+     * @param paramMap
+     * @return
+     */
+    Map<String, Object> selectByMap(Map<String, Object> paramMap);
+    List<OrgPlatform> queryOrgPlatCode(@Param("orgId")String orgId, @Param("platNum")String platNum);
 }

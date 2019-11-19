@@ -91,15 +91,35 @@ public class AgentMergeBusInfo implements Serializable {
 
     private String mergeStatusName;
 
-    private String debitRateLower;
+    private String debitRateLower;//借记费率下限
 
-    private String debitCapping;
+    private String debitCapping;//借记封顶额上限
 
-    private String debitAppearRate;
+    private String debitAppearRate;//借记出款费率
 
-    private String creditRateFloor;
+    private String creditRateFloor;//贷记费率下限
 
-    private String creditRateCeiling;
+    private String creditRateCeiling;//贷记费率上限
+
+    private String debitRateCapping;//借记费率上限
+
+    private String debitCappingLower;//借记封顶额下限
+
+    public String getDebitRateCapping() {
+        return debitRateCapping;
+    }
+
+    public void setDebitRateCapping(String debitRateCapping) {
+        this.debitRateCapping = debitRateCapping;
+    }
+
+    public String getDebitCappingLower() {
+        return debitCappingLower;
+    }
+
+    public void setDebitCappingLower(String debitCappingLower) {
+        this.debitCappingLower = debitCappingLower;
+    }
 
     public String getMergeStatusName() {
         return mergeStatusName;

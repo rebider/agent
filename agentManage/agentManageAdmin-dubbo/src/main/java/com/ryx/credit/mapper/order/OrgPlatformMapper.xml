@@ -198,8 +198,8 @@
 
 
   <!--  开始写代码-->
-  <delete id="deleteOrgPlatform" parameterType="string">
-     delete from ORG_PLATFORM where id=#{id}
+  <delete id="deleteOrgPlatform" parameterType="map">
+     delete from ORG_PLATFORM where id=#{map.id}
   </delete>
 
   <select id="queryOrg" parameterType="string" resultType="map">
@@ -211,4 +211,22 @@
    </if>
 
   </select>
+
+  <select id="queryOrgPlatCode" parameterType="string" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from ORG_PLATFORM where org_id=#{orgId} and plat_num=#{platNum}
+  </select>
+
+  <!-- 查询顶级机构，Map可升级 -->
+  <select id="selectByMap" parameterType="map" resultType="map">
+      SELECT
+          ORG.PLAT_CODE AS platCode
+      FROM
+          ORG_PLATFORM ORG
+      WHERE
+          ORG.PLAT_NUM = #{busPlatform,jdbcType=VARCHAR}
+          AND ORG.ORG_ID = #{organNum,jdbcType=VARCHAR}
+  </select>
+
 </mapper>
