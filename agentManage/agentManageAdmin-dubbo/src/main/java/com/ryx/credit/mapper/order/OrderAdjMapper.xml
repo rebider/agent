@@ -23,6 +23,8 @@
     <result column="ADJ_TM" jdbcType="TIMESTAMP" property="adjTm" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="ORG_PLAN_NUM" jdbcType="DECIMAL" property="orgPlanNum" />
+    <result column="STAGES_AMOUNT" jdbcType="DECIMAL" property="stagesAmount" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -56,7 +58,8 @@
   <sql id="Base_Column_List">
     ID, ORDER_ID, AGENT_ID, ADJ_USER_ID, ORG_O_AMO, ORG_INCENTIVE_AMO, ORG_PAY_AMO, O_AMO, 
     INCENTIVE_AMO, PAY_AMO, RESON, REFUND_AMOUNT, REFUND_TYPE, REFUND_STAT, ORG_PAYMENT_ID, 
-    NEW_PAYMENT_ID, REVIEWS_STAT, REVIEWS_DATE, ADJ_TM, STATUS, VERSION
+    NEW_PAYMENT_ID, REVIEWS_STAT, REVIEWS_DATE, ADJ_TM, STATUS, VERSION, ORG_PLAN_NUM, 
+    STAGES_AMOUNT
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -93,16 +96,16 @@
       PAY_AMO, RESON, REFUND_AMOUNT, 
       REFUND_TYPE, REFUND_STAT, ORG_PAYMENT_ID, 
       NEW_PAYMENT_ID, REVIEWS_STAT, REVIEWS_DATE, 
-      ADJ_TM, STATUS, VERSION
-      )
+      ADJ_TM, STATUS, VERSION, 
+      ORG_PLAN_NUM, STAGES_AMOUNT)
     values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
       #{adjUserId,jdbcType=VARCHAR}, #{orgOAmo,jdbcType=DECIMAL}, #{orgIncentiveAmo,jdbcType=DECIMAL}, 
       #{orgPayAmo,jdbcType=DECIMAL}, #{oAmo,jdbcType=DECIMAL}, #{incentiveAmo,jdbcType=DECIMAL}, 
       #{payAmo,jdbcType=DECIMAL}, #{reson,jdbcType=VARCHAR}, #{refundAmount,jdbcType=DECIMAL}, 
       #{refundType,jdbcType=DECIMAL}, #{refundStat,jdbcType=DECIMAL}, #{orgPaymentId,jdbcType=VARCHAR}, 
       #{newPaymentId,jdbcType=VARCHAR}, #{reviewsStat,jdbcType=DECIMAL}, #{reviewsDate,jdbcType=TIMESTAMP}, 
-      #{adjTm,jdbcType=TIMESTAMP}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}
-      )
+      #{adjTm,jdbcType=TIMESTAMP}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, 
+      #{orgPlanNum,jdbcType=DECIMAL}, #{stagesAmount,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OrderAdj">
     insert into O_ORDER_ADJ
@@ -170,6 +173,12 @@
       <if test="version != null">
         VERSION,
       </if>
+      <if test="orgPlanNum != null">
+        ORG_PLAN_NUM,
+      </if>
+      <if test="stagesAmount != null">
+        STAGES_AMOUNT,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -234,6 +243,12 @@
       </if>
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="orgPlanNum != null">
+        #{orgPlanNum,jdbcType=DECIMAL},
+      </if>
+      <if test="stagesAmount != null">
+        #{stagesAmount,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -306,6 +321,12 @@
       <if test="version != null">
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
+      <if test="orgPlanNum != null">
+        ORG_PLAN_NUM = #{orgPlanNum,jdbcType=DECIMAL},
+      </if>
+      <if test="stagesAmount != null">
+        STAGES_AMOUNT = #{stagesAmount,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -330,7 +351,9 @@
       REVIEWS_DATE = #{reviewsDate,jdbcType=TIMESTAMP},
       ADJ_TM = #{adjTm,jdbcType=TIMESTAMP},
       STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL}
+      VERSION = #{version,jdbcType=DECIMAL},
+      ORG_PLAN_NUM = #{orgPlanNum,jdbcType=DECIMAL},
+      STAGES_AMOUNT = #{stagesAmount,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
