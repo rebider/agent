@@ -1007,10 +1007,13 @@ public class InternetCardServiceImpl implements InternetCardService {
     public void orderInsertInternetCard(List<OLogisticsDetail> logisticsDetailList,String manuFacturer)throws Exception{
 
         String batchNo = IDUtils.getBatchNo();
+        log.info("订单发货同步到流量卡信息表中开始:{},个数{}",batchNo,logisticsDetailList.size());
         for (OLogisticsDetail oLogisticsDetail : logisticsDetailList) {
+            log.info("订单发货同步到流量卡信息表中开始:sn:{}",oLogisticsDetail.getSnNum());
             OInternetCard internetCard = internetCardMapper.selectBySnNum(oLogisticsDetail.getSnNum());
             AgentBusInfo agentBusInfo = agentBusinfoService.getById(oLogisticsDetail.getBusId());
             if (null != internetCard){
+                log.info("订单发货同步到流量卡更新开始:sn:{}",oLogisticsDetail.getSnNum());
                 internetCard.setBatchNum(batchNo);
                 internetCard.setOrderId(oLogisticsDetail.getOrderId());
                 internetCard.setDeliverTime(oLogisticsDetail.getcTime());
@@ -1032,9 +1035,13 @@ public class InternetCardServiceImpl implements InternetCardService {
                     internetCard.setBusNum(agentBusInfo.getBusNum());
                     internetCard.setBusPlatform(agentBusInfo.getBusPlatform());
                 }
-                internetCardMapper.updateByPrimaryKeySelective(internetCard);
-
+                int i = internetCardMapper.updateByPrimaryKeySelective(internetCard);
+                if(i!=1){
+                    throw new MessageException("订单发货流量卡信息更新失败");
+                }
+                log.info("订单发货同步到流量卡更新结束:i:{}",i);
             }else {
+                log.info("订单发货同步到流量卡插入开始:sn:{}",oLogisticsDetail.getSnNum());
                 OInternetCard oInternetCard = new OInternetCard();
                 oInternetCard.setIccidNum(oLogisticsDetail.getSnNum());
                 oInternetCard.setBatchNum(batchNo);
@@ -1060,8 +1067,10 @@ public class InternetCardServiceImpl implements InternetCardService {
                     oInternetCard.setBusPlatform(agentBusInfo.getBusPlatform());
                 }
                 internetCardMapper.insert(oInternetCard);
+                log.info("订单发货同步到流量卡插入结束sn:{}",oLogisticsDetail.getSnNum());
             }
         }
+        log.info("订单发货同步到流量卡信息表中结束");
     }
 
 
@@ -1076,7 +1085,9 @@ public class InternetCardServiceImpl implements InternetCardService {
         Date dateAfter = DateUtil.getDateAfterReturnDate(new Date(), -5);
         criteria.andCTimeLessThanOrEqualTo(dateAfter);
         oInternetCardImportExample.setPage(new Page(0,100));
-        return internetCardImportMapper.selectByExample(oInternetCardImportExample);
+        List<OInternetCardImport> oInternetCardImports = internetCardImportMapper.selectByExample(oInternetCardImportExample);
+        log.info("查询要迁移的数据个数{}",oInternetCardImports.size());
+        return oInternetCardImports;
     }
 
 
@@ -1088,6 +1099,7 @@ public class InternetCardServiceImpl implements InternetCardService {
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     @Override
     public void migrationHistory(OInternetCardImport oInternetCardImport)throws MessageException{
+        log.info("导入迁移到历史表开始{}",oInternetCardImport.toString());
         InternetCardImportHistory internetCardImportHistory = new InternetCardImportHistory();
         BeanUtils.copyProperties(oInternetCardImport,internetCardImportHistory);
         internetCardImportHistoryMapper.insert(internetCardImportHistory);
@@ -1189,6 +1201,7 @@ public class InternetCardServiceImpl implements InternetCardService {
     @Override
     public void internetCardPostpone(OInternetCardPostpone internetCardPostpone,String cUser,String importId,String batchNum)throws MessageException{
 
+        log.info("延期处理开始");
         if(internetCardPostpone.getPostponeTime()==null){
             throw new MessageException("请填写延期月份");
         }
