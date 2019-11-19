@@ -436,7 +436,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                             String postponeCause = String.valueOf(string.size()>=3?string.get(2):"");//延期原因
                             oInternetCard.setIccidNum(iccid);
                             oInternetCard.setPostponeTime(postponeTime);
-                            oInternetCard.setPostponeCause(postponeCause);
+                            oInternetCard.setPostponeCause(postponeCause.equals("null")?"":postponeCause);
                             jsonList = JsonUtil.objectToJson(oInternetCard);
                         }
                         OInternetCardImport oInternetCardImport = new OInternetCardImport();
