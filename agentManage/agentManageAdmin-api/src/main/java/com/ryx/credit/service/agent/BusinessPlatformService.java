@@ -10,7 +10,6 @@ import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.PlatForm;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
-import com.ryx.credit.pojo.admin.vo.AgentoutVo;
 import com.ryx.credit.pojo.admin.vo.BusinessOutVo;
 
 import java.text.ParseException;
@@ -25,7 +24,7 @@ import java.util.Map;
  * @date: 2018/5/22 9:27
  */
 public interface BusinessPlatformService {
-
+    PageInfo queryBusinessPlatformList(Map map, Agent agent, Page page, Long userId);
     PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,Long userId);
     PageInfo queryBusinessPlatformListManager(Page page, Map map);
 
