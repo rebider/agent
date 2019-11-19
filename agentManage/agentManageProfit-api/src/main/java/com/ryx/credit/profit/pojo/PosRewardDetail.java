@@ -56,6 +56,20 @@ public class PosRewardDetail implements Serializable {
 
     private BigDecimal yearafter19credittrans;
 
+    private BigDecimal settleMonthCreditTrans;
+
+    private BigDecimal specialRewardStandard;
+
+    private BigDecimal specialReward;
+
+    private String assessStatus;
+
+    private BigDecimal executeReward;
+
+    private BigDecimal deductedReward;
+
+    private BigDecimal executeRewardStandard;
+
     private String childAgentIdList;
 
     public String getId() {
@@ -264,6 +278,62 @@ public class PosRewardDetail implements Serializable {
 
     public void setYearafter19credittrans(BigDecimal yearafter19credittrans) {
         this.yearafter19credittrans = yearafter19credittrans;
+    }
+
+    public BigDecimal getSettleMonthCreditTrans() {
+        return settleMonthCreditTrans;
+    }
+
+    public void setSettleMonthCreditTrans(BigDecimal settleMonthCreditTrans) {
+        this.settleMonthCreditTrans = settleMonthCreditTrans;
+    }
+
+    public BigDecimal getSpecialRewardStandard() {
+        return specialRewardStandard;
+    }
+
+    public void setSpecialRewardStandard(BigDecimal specialRewardStandard) {
+        this.specialRewardStandard = specialRewardStandard;
+    }
+
+    public BigDecimal getSpecialReward() {
+        return specialReward;
+    }
+
+    public void setSpecialReward(BigDecimal specialReward) {
+        this.specialReward = specialReward;
+    }
+
+    public String getAssessStatus() {
+        return assessStatus;
+    }
+
+    public void setAssessStatus(String assessStatus) {
+        this.assessStatus = assessStatus == null ? null : assessStatus.trim();
+    }
+
+    public BigDecimal getExecuteReward() {
+        return executeReward;
+    }
+
+    public void setExecuteReward(BigDecimal executeReward) {
+        this.executeReward = executeReward;
+    }
+
+    public BigDecimal getDeductedReward() {
+        return deductedReward;
+    }
+
+    public void setDeductedReward(BigDecimal deductedReward) {
+        this.deductedReward = deductedReward;
+    }
+
+    public BigDecimal getExecuteRewardStandard() {
+        return executeRewardStandard;
+    }
+
+    public void setExecuteRewardStandard(BigDecimal executeRewardStandard) {
+        this.executeRewardStandard = executeRewardStandard;
     }
 
     public String getChildAgentIdList() {

@@ -91,6 +91,13 @@ public class POSRewardAndRebateJob {
                 posRewardDetail.setYearafter19credittrans(new BigDecimal(String.valueOf(posRewadData.get("YEARAFTER19_CREDIT_TRANS")==null?0:posRewadData.get("YEARAFTER19_CREDIT_TRANS"))));
                 posRewardDetail.setPosStandard( posRewadData.get("REWARD_STANDARD")==null?"":posRewadData.get("REWARD_STANDARD").toString());
                 posRewardDetail.setPosReawrdProfit(posRewadData.get("REWARD")==null?"":posRewadData.get("REWARD").toString());
+                posRewardDetail.setSettlemonthtotaltrans(new BigDecimal(String.valueOf(posRewadData.get("SETTLE_MONTH_CREDIT_TRANS")==null?0:posRewadData.get("SETTLE_MONTH_CREDIT_TRANS"))));
+                posRewardDetail.setSpecialRewardStandard(new BigDecimal(String.valueOf(posRewadData.get("SPECIAL_REWARD_STANDARD")==null?0:posRewadData.get("SPECIAL_REWARD_STANDARD"))));
+                posRewardDetail.setSpecialReward(new BigDecimal(String.valueOf(posRewadData.get("SPECIAL_REWARD")==null?0:posRewadData.get("SPECIAL_REWARD"))));
+                posRewardDetail.setAssessStatus( posRewadData.get("ASSESS_STATUS")==null?"":posRewadData.get("ASSESS_STATUS").toString());
+                posRewardDetail.setExecuteReward(new BigDecimal(String.valueOf(posRewadData.get("EXECUTE_REWARD")==null?0:posRewadData.get("EXECUTE_REWARD"))));
+                posRewardDetail.setDeductedReward(new BigDecimal(String.valueOf(posRewadData.get("DEDUCTED_REWARD")==null?0:posRewadData.get("DEDUCTED_REWARD"))));
+                posRewardDetail.setExecuteRewardStandard(new BigDecimal(String.valueOf(posRewadData.get("EXECUTE_REWARD_STANDARD")==null?0:posRewadData.get("EXECUTE_REWARD_STANDARD"))));
                 posRewardDetailMapper.insertSelective(posRewardDetail);
             }catch (Exception e){
                 posRewardDataMaps.put("resultCode","error");

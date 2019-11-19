@@ -28,6 +28,13 @@
     <result column="CONTRASTMONTH" jdbcType="VARCHAR" property="contrastmonth" />
     <result column="NEWTRANSAMOUNT" jdbcType="DECIMAL" property="newtransamount" />
     <result column="YEARAFTER19CREDITTRANS" jdbcType="DECIMAL" property="yearafter19credittrans" />
+    <result column="SETTLE_MONTH_CREDIT_TRANS" jdbcType="DECIMAL" property="settleMonthCreditTrans" />
+    <result column="SPECIAL_REWARD_STANDARD" jdbcType="DECIMAL" property="specialRewardStandard" />
+    <result column="SPECIAL_REWARD" jdbcType="DECIMAL" property="specialReward" />
+    <result column="ASSESS_STATUS" jdbcType="VARCHAR" property="assessStatus" />
+    <result column="EXECUTE_REWARD" jdbcType="DECIMAL" property="executeReward" />
+    <result column="DEDUCTED_REWARD" jdbcType="DECIMAL" property="deductedReward" />
+    <result column="EXECUTE_REWARD_STANDARD" jdbcType="DECIMAL" property="executeRewardStandard" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.ryx.credit.profit.pojo.PosRewardDetail">
     <result column="CHILD_AGENT_ID_LIST" jdbcType="CLOB" property="childAgentIdList" />
@@ -61,12 +68,43 @@
       </foreach>
     </where>
   </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
   <sql id="Base_Column_List">
     ID, PROFIT_POS_DATE, POS_AGENT_ID, POS_AGENT_NAME, POS_MECHANISM_TYPE, POS_MECHANISM_ID,
     POS_COMPARE_COUNT, POS_CURRENT_COUNT, POS_COMPARE_LOAN_COUNT, POS_CURRENT_LOAN_COUNT,
     POS_AMT, POS_STANDARD, POS_OWN_REWARD, POS_DOWN_REWARD, POS_REAWRD_PROFIT, POS_REMARK,
     POS_CHECK_DEDUCT_AMT, ORGID, SETTLEMONTH1812TOTALTRANS, SETTLEMONTHTOTALTRANS, ISSTANDARD,
-    TOTALORDER, YEARAFTER19TOTALTRANS, CONTRASTMONTH, NEWTRANSAMOUNT, YEARAFTER19CREDITTRANS
+    TOTALORDER, YEARAFTER19TOTALTRANS, CONTRASTMONTH, NEWTRANSAMOUNT, YEARAFTER19CREDITTRANS,
+    SETTLE_MONTH_CREDIT_TRANS, SPECIAL_REWARD_STANDARD, SPECIAL_REWARD, ASSESS_STATUS,
+    EXECUTE_REWARD, DEDUCTED_REWARD, EXECUTE_REWARD_STANDARD
   </sql>
   <sql id="Blob_Column_List">
     CHILD_AGENT_ID_LIST
@@ -127,6 +165,9 @@
       SETTLEMONTH1812TOTALTRANS, SETTLEMONTHTOTALTRANS,
       ISSTANDARD, TOTALORDER, YEARAFTER19TOTALTRANS,
       CONTRASTMONTH, NEWTRANSAMOUNT, YEARAFTER19CREDITTRANS,
+      SETTLE_MONTH_CREDIT_TRANS, SPECIAL_REWARD_STANDARD,
+      SPECIAL_REWARD, ASSESS_STATUS, EXECUTE_REWARD,
+      DEDUCTED_REWARD, EXECUTE_REWARD_STANDARD,
       CHILD_AGENT_ID_LIST)
     values (#{id,jdbcType=VARCHAR}, #{profitPosDate,jdbcType=VARCHAR}, #{posAgentId,jdbcType=VARCHAR},
       #{posAgentName,jdbcType=VARCHAR}, #{posMechanismType,jdbcType=VARCHAR}, #{posMechanismId,jdbcType=VARCHAR},
@@ -137,6 +178,9 @@
       #{settlemonth1812totaltrans,jdbcType=DECIMAL}, #{settlemonthtotaltrans,jdbcType=DECIMAL},
       #{isstandard,jdbcType=VARCHAR}, #{totalorder,jdbcType=DECIMAL}, #{yearafter19totaltrans,jdbcType=DECIMAL},
       #{contrastmonth,jdbcType=VARCHAR}, #{newtransamount,jdbcType=DECIMAL}, #{yearafter19credittrans,jdbcType=DECIMAL},
+      #{settleMonthCreditTrans,jdbcType=DECIMAL}, #{specialRewardStandard,jdbcType=DECIMAL},
+      #{specialReward,jdbcType=DECIMAL}, #{assessStatus,jdbcType=VARCHAR}, #{executeReward,jdbcType=DECIMAL},
+      #{deductedReward,jdbcType=DECIMAL}, #{executeRewardStandard,jdbcType=DECIMAL},
       #{childAgentIdList,jdbcType=CLOB})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PosRewardDetail">
@@ -219,6 +263,27 @@
       </if>
       <if test="yearafter19credittrans != null">
         YEARAFTER19CREDITTRANS,
+      </if>
+      <if test="settleMonthCreditTrans != null">
+        SETTLE_MONTH_CREDIT_TRANS,
+      </if>
+      <if test="specialRewardStandard != null">
+        SPECIAL_REWARD_STANDARD,
+      </if>
+      <if test="specialReward != null">
+        SPECIAL_REWARD,
+      </if>
+      <if test="assessStatus != null">
+        ASSESS_STATUS,
+      </if>
+      <if test="executeReward != null">
+        EXECUTE_REWARD,
+      </if>
+      <if test="deductedReward != null">
+        DEDUCTED_REWARD,
+      </if>
+      <if test="executeRewardStandard != null">
+        EXECUTE_REWARD_STANDARD,
       </if>
       <if test="childAgentIdList != null">
         CHILD_AGENT_ID_LIST,
@@ -303,6 +368,27 @@
       <if test="yearafter19credittrans != null">
         #{yearafter19credittrans,jdbcType=DECIMAL},
       </if>
+      <if test="settleMonthCreditTrans != null">
+        #{settleMonthCreditTrans,jdbcType=DECIMAL},
+      </if>
+      <if test="specialRewardStandard != null">
+        #{specialRewardStandard,jdbcType=DECIMAL},
+      </if>
+      <if test="specialReward != null">
+        #{specialReward,jdbcType=DECIMAL},
+      </if>
+      <if test="assessStatus != null">
+        #{assessStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="executeReward != null">
+        #{executeReward,jdbcType=DECIMAL},
+      </if>
+      <if test="deductedReward != null">
+        #{deductedReward,jdbcType=DECIMAL},
+      </if>
+      <if test="executeRewardStandard != null">
+        #{executeRewardStandard,jdbcType=DECIMAL},
+      </if>
       <if test="childAgentIdList != null">
         #{childAgentIdList,jdbcType=CLOB},
       </if>
@@ -314,6 +400,195 @@
       <include refid="Example_Where_Clause" />
     </if>
   </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update POS_REWARD_DETAIL
+    <set>
+      <if test="record.id != null">
+        ID = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.profitPosDate != null">
+        PROFIT_POS_DATE = #{record.profitPosDate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posAgentId != null">
+        POS_AGENT_ID = #{record.posAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posAgentName != null">
+        POS_AGENT_NAME = #{record.posAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posMechanismType != null">
+        POS_MECHANISM_TYPE = #{record.posMechanismType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posMechanismId != null">
+        POS_MECHANISM_ID = #{record.posMechanismId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posCompareCount != null">
+        POS_COMPARE_COUNT = #{record.posCompareCount,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posCurrentCount != null">
+        POS_CURRENT_COUNT = #{record.posCurrentCount,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posCompareLoanCount != null">
+        POS_COMPARE_LOAN_COUNT = #{record.posCompareLoanCount,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posCurrentLoanCount != null">
+        POS_CURRENT_LOAN_COUNT = #{record.posCurrentLoanCount,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posAmt != null">
+        POS_AMT = #{record.posAmt,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posStandard != null">
+        POS_STANDARD = #{record.posStandard,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posOwnReward != null">
+        POS_OWN_REWARD = #{record.posOwnReward,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posDownReward != null">
+        POS_DOWN_REWARD = #{record.posDownReward,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posReawrdProfit != null">
+        POS_REAWRD_PROFIT = #{record.posReawrdProfit,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posRemark != null">
+        POS_REMARK = #{record.posRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posCheckDeductAmt != null">
+        POS_CHECK_DEDUCT_AMT = #{record.posCheckDeductAmt,jdbcType=VARCHAR},
+      </if>
+      <if test="record.orgid != null">
+        ORGID = #{record.orgid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.settlemonth1812totaltrans != null">
+        SETTLEMONTH1812TOTALTRANS = #{record.settlemonth1812totaltrans,jdbcType=DECIMAL},
+      </if>
+      <if test="record.settlemonthtotaltrans != null">
+        SETTLEMONTHTOTALTRANS = #{record.settlemonthtotaltrans,jdbcType=DECIMAL},
+      </if>
+      <if test="record.isstandard != null">
+        ISSTANDARD = #{record.isstandard,jdbcType=VARCHAR},
+      </if>
+      <if test="record.totalorder != null">
+        TOTALORDER = #{record.totalorder,jdbcType=DECIMAL},
+      </if>
+      <if test="record.yearafter19totaltrans != null">
+        YEARAFTER19TOTALTRANS = #{record.yearafter19totaltrans,jdbcType=DECIMAL},
+      </if>
+      <if test="record.contrastmonth != null">
+        CONTRASTMONTH = #{record.contrastmonth,jdbcType=VARCHAR},
+      </if>
+      <if test="record.newtransamount != null">
+        NEWTRANSAMOUNT = #{record.newtransamount,jdbcType=DECIMAL},
+      </if>
+      <if test="record.yearafter19credittrans != null">
+        YEARAFTER19CREDITTRANS = #{record.yearafter19credittrans,jdbcType=DECIMAL},
+      </if>
+      <if test="record.settleMonthCreditTrans != null">
+        SETTLE_MONTH_CREDIT_TRANS = #{record.settleMonthCreditTrans,jdbcType=DECIMAL},
+      </if>
+      <if test="record.specialRewardStandard != null">
+        SPECIAL_REWARD_STANDARD = #{record.specialRewardStandard,jdbcType=DECIMAL},
+      </if>
+      <if test="record.specialReward != null">
+        SPECIAL_REWARD = #{record.specialReward,jdbcType=DECIMAL},
+      </if>
+      <if test="record.assessStatus != null">
+        ASSESS_STATUS = #{record.assessStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="record.executeReward != null">
+        EXECUTE_REWARD = #{record.executeReward,jdbcType=DECIMAL},
+      </if>
+      <if test="record.deductedReward != null">
+        DEDUCTED_REWARD = #{record.deductedReward,jdbcType=DECIMAL},
+      </if>
+      <if test="record.executeRewardStandard != null">
+        EXECUTE_REWARD_STANDARD = #{record.executeRewardStandard,jdbcType=DECIMAL},
+      </if>
+      <if test="record.childAgentIdList != null">
+        CHILD_AGENT_ID_LIST = #{record.childAgentIdList,jdbcType=CLOB},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map">
+    update POS_REWARD_DETAIL
+    set ID = #{record.id,jdbcType=VARCHAR},
+    PROFIT_POS_DATE = #{record.profitPosDate,jdbcType=VARCHAR},
+    POS_AGENT_ID = #{record.posAgentId,jdbcType=VARCHAR},
+    POS_AGENT_NAME = #{record.posAgentName,jdbcType=VARCHAR},
+    POS_MECHANISM_TYPE = #{record.posMechanismType,jdbcType=VARCHAR},
+    POS_MECHANISM_ID = #{record.posMechanismId,jdbcType=VARCHAR},
+    POS_COMPARE_COUNT = #{record.posCompareCount,jdbcType=VARCHAR},
+    POS_CURRENT_COUNT = #{record.posCurrentCount,jdbcType=VARCHAR},
+    POS_COMPARE_LOAN_COUNT = #{record.posCompareLoanCount,jdbcType=VARCHAR},
+    POS_CURRENT_LOAN_COUNT = #{record.posCurrentLoanCount,jdbcType=VARCHAR},
+    POS_AMT = #{record.posAmt,jdbcType=VARCHAR},
+    POS_STANDARD = #{record.posStandard,jdbcType=VARCHAR},
+    POS_OWN_REWARD = #{record.posOwnReward,jdbcType=VARCHAR},
+    POS_DOWN_REWARD = #{record.posDownReward,jdbcType=VARCHAR},
+    POS_REAWRD_PROFIT = #{record.posReawrdProfit,jdbcType=VARCHAR},
+    POS_REMARK = #{record.posRemark,jdbcType=VARCHAR},
+    POS_CHECK_DEDUCT_AMT = #{record.posCheckDeductAmt,jdbcType=VARCHAR},
+    ORGID = #{record.orgid,jdbcType=VARCHAR},
+    SETTLEMONTH1812TOTALTRANS = #{record.settlemonth1812totaltrans,jdbcType=DECIMAL},
+    SETTLEMONTHTOTALTRANS = #{record.settlemonthtotaltrans,jdbcType=DECIMAL},
+    ISSTANDARD = #{record.isstandard,jdbcType=VARCHAR},
+    TOTALORDER = #{record.totalorder,jdbcType=DECIMAL},
+    YEARAFTER19TOTALTRANS = #{record.yearafter19totaltrans,jdbcType=DECIMAL},
+    CONTRASTMONTH = #{record.contrastmonth,jdbcType=VARCHAR},
+    NEWTRANSAMOUNT = #{record.newtransamount,jdbcType=DECIMAL},
+    YEARAFTER19CREDITTRANS = #{record.yearafter19credittrans,jdbcType=DECIMAL},
+    SETTLE_MONTH_CREDIT_TRANS = #{record.settleMonthCreditTrans,jdbcType=DECIMAL},
+    SPECIAL_REWARD_STANDARD = #{record.specialRewardStandard,jdbcType=DECIMAL},
+    SPECIAL_REWARD = #{record.specialReward,jdbcType=DECIMAL},
+    ASSESS_STATUS = #{record.assessStatus,jdbcType=VARCHAR},
+    EXECUTE_REWARD = #{record.executeReward,jdbcType=DECIMAL},
+    DEDUCTED_REWARD = #{record.deductedReward,jdbcType=DECIMAL},
+    EXECUTE_REWARD_STANDARD = #{record.executeRewardStandard,jdbcType=DECIMAL},
+    CHILD_AGENT_ID_LIST = #{record.childAgentIdList,jdbcType=CLOB}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update POS_REWARD_DETAIL
+    set ID = #{record.id,jdbcType=VARCHAR},
+    PROFIT_POS_DATE = #{record.profitPosDate,jdbcType=VARCHAR},
+    POS_AGENT_ID = #{record.posAgentId,jdbcType=VARCHAR},
+    POS_AGENT_NAME = #{record.posAgentName,jdbcType=VARCHAR},
+    POS_MECHANISM_TYPE = #{record.posMechanismType,jdbcType=VARCHAR},
+    POS_MECHANISM_ID = #{record.posMechanismId,jdbcType=VARCHAR},
+    POS_COMPARE_COUNT = #{record.posCompareCount,jdbcType=VARCHAR},
+    POS_CURRENT_COUNT = #{record.posCurrentCount,jdbcType=VARCHAR},
+    POS_COMPARE_LOAN_COUNT = #{record.posCompareLoanCount,jdbcType=VARCHAR},
+    POS_CURRENT_LOAN_COUNT = #{record.posCurrentLoanCount,jdbcType=VARCHAR},
+    POS_AMT = #{record.posAmt,jdbcType=VARCHAR},
+    POS_STANDARD = #{record.posStandard,jdbcType=VARCHAR},
+    POS_OWN_REWARD = #{record.posOwnReward,jdbcType=VARCHAR},
+    POS_DOWN_REWARD = #{record.posDownReward,jdbcType=VARCHAR},
+    POS_REAWRD_PROFIT = #{record.posReawrdProfit,jdbcType=VARCHAR},
+    POS_REMARK = #{record.posRemark,jdbcType=VARCHAR},
+    POS_CHECK_DEDUCT_AMT = #{record.posCheckDeductAmt,jdbcType=VARCHAR},
+    ORGID = #{record.orgid,jdbcType=VARCHAR},
+    SETTLEMONTH1812TOTALTRANS = #{record.settlemonth1812totaltrans,jdbcType=DECIMAL},
+    SETTLEMONTHTOTALTRANS = #{record.settlemonthtotaltrans,jdbcType=DECIMAL},
+    ISSTANDARD = #{record.isstandard,jdbcType=VARCHAR},
+    TOTALORDER = #{record.totalorder,jdbcType=DECIMAL},
+    YEARAFTER19TOTALTRANS = #{record.yearafter19totaltrans,jdbcType=DECIMAL},
+    CONTRASTMONTH = #{record.contrastmonth,jdbcType=VARCHAR},
+    NEWTRANSAMOUNT = #{record.newtransamount,jdbcType=DECIMAL},
+    YEARAFTER19CREDITTRANS = #{record.yearafter19credittrans,jdbcType=DECIMAL},
+    SETTLE_MONTH_CREDIT_TRANS = #{record.settleMonthCreditTrans,jdbcType=DECIMAL},
+    SPECIAL_REWARD_STANDARD = #{record.specialRewardStandard,jdbcType=DECIMAL},
+    SPECIAL_REWARD = #{record.specialReward,jdbcType=DECIMAL},
+    ASSESS_STATUS = #{record.assessStatus,jdbcType=VARCHAR},
+    EXECUTE_REWARD = #{record.executeReward,jdbcType=DECIMAL},
+    DEDUCTED_REWARD = #{record.deductedReward,jdbcType=DECIMAL},
+    EXECUTE_REWARD_STANDARD = #{record.executeRewardStandard,jdbcType=DECIMAL}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
   <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PosRewardDetail">
     update POS_REWARD_DETAIL
     <set>
@@ -392,6 +667,27 @@
       <if test="yearafter19credittrans != null">
         YEARAFTER19CREDITTRANS = #{yearafter19credittrans,jdbcType=DECIMAL},
       </if>
+      <if test="settleMonthCreditTrans != null">
+        SETTLE_MONTH_CREDIT_TRANS = #{settleMonthCreditTrans,jdbcType=DECIMAL},
+      </if>
+      <if test="specialRewardStandard != null">
+        SPECIAL_REWARD_STANDARD = #{specialRewardStandard,jdbcType=DECIMAL},
+      </if>
+      <if test="specialReward != null">
+        SPECIAL_REWARD = #{specialReward,jdbcType=DECIMAL},
+      </if>
+      <if test="assessStatus != null">
+        ASSESS_STATUS = #{assessStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="executeReward != null">
+        EXECUTE_REWARD = #{executeReward,jdbcType=DECIMAL},
+      </if>
+      <if test="deductedReward != null">
+        DEDUCTED_REWARD = #{deductedReward,jdbcType=DECIMAL},
+      </if>
+      <if test="executeRewardStandard != null">
+        EXECUTE_REWARD_STANDARD = #{executeRewardStandard,jdbcType=DECIMAL},
+      </if>
       <if test="childAgentIdList != null">
         CHILD_AGENT_ID_LIST = #{childAgentIdList,jdbcType=CLOB},
       </if>
@@ -425,6 +721,13 @@
       CONTRASTMONTH = #{contrastmonth,jdbcType=VARCHAR},
       NEWTRANSAMOUNT = #{newtransamount,jdbcType=DECIMAL},
       YEARAFTER19CREDITTRANS = #{yearafter19credittrans,jdbcType=DECIMAL},
+      SETTLE_MONTH_CREDIT_TRANS = #{settleMonthCreditTrans,jdbcType=DECIMAL},
+      SPECIAL_REWARD_STANDARD = #{specialRewardStandard,jdbcType=DECIMAL},
+      SPECIAL_REWARD = #{specialReward,jdbcType=DECIMAL},
+      ASSESS_STATUS = #{assessStatus,jdbcType=VARCHAR},
+      EXECUTE_REWARD = #{executeReward,jdbcType=DECIMAL},
+      DEDUCTED_REWARD = #{deductedReward,jdbcType=DECIMAL},
+      EXECUTE_REWARD_STANDARD = #{executeRewardStandard,jdbcType=DECIMAL},
       CHILD_AGENT_ID_LIST = #{childAgentIdList,jdbcType=CLOB}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -454,7 +757,14 @@
       YEARAFTER19TOTALTRANS = #{yearafter19totaltrans,jdbcType=DECIMAL},
       CONTRASTMONTH = #{contrastmonth,jdbcType=VARCHAR},
       NEWTRANSAMOUNT = #{newtransamount,jdbcType=DECIMAL},
-      YEARAFTER19CREDITTRANS = #{yearafter19credittrans,jdbcType=DECIMAL}
+      YEARAFTER19CREDITTRANS = #{yearafter19credittrans,jdbcType=DECIMAL},
+      SETTLE_MONTH_CREDIT_TRANS = #{settleMonthCreditTrans,jdbcType=DECIMAL},
+      SPECIAL_REWARD_STANDARD = #{specialRewardStandard,jdbcType=DECIMAL},
+      SPECIAL_REWARD = #{specialReward,jdbcType=DECIMAL},
+      ASSESS_STATUS = #{assessStatus,jdbcType=VARCHAR},
+      EXECUTE_REWARD = #{executeReward,jdbcType=DECIMAL},
+      DEDUCTED_REWARD = #{deductedReward,jdbcType=DECIMAL},
+      EXECUTE_REWARD_STANDARD = #{executeRewardStandard,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

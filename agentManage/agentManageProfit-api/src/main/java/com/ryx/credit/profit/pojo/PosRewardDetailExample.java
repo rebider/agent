@@ -1896,6 +1896,436 @@ public class PosRewardDetailExample {
             addCriterion("YEARAFTER19CREDITTRANS not between", value1, value2, "yearafter19credittrans");
             return (Criteria) this;
         }
+
+        public Criteria andSettleMonthCreditTransIsNull() {
+            addCriterion("SETTLE_MONTH_CREDIT_TRANS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleMonthCreditTransIsNotNull() {
+            addCriterion("SETTLE_MONTH_CREDIT_TRANS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleMonthCreditTransEqualTo(BigDecimal value) {
+            addCriterion("SETTLE_MONTH_CREDIT_TRANS =", value, "settleMonthCreditTrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleMonthCreditTransNotEqualTo(BigDecimal value) {
+            addCriterion("SETTLE_MONTH_CREDIT_TRANS <>", value, "settleMonthCreditTrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleMonthCreditTransGreaterThan(BigDecimal value) {
+            addCriterion("SETTLE_MONTH_CREDIT_TRANS >", value, "settleMonthCreditTrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleMonthCreditTransGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("SETTLE_MONTH_CREDIT_TRANS >=", value, "settleMonthCreditTrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleMonthCreditTransLessThan(BigDecimal value) {
+            addCriterion("SETTLE_MONTH_CREDIT_TRANS <", value, "settleMonthCreditTrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleMonthCreditTransLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("SETTLE_MONTH_CREDIT_TRANS <=", value, "settleMonthCreditTrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleMonthCreditTransIn(List<BigDecimal> values) {
+            addCriterion("SETTLE_MONTH_CREDIT_TRANS in", values, "settleMonthCreditTrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleMonthCreditTransNotIn(List<BigDecimal> values) {
+            addCriterion("SETTLE_MONTH_CREDIT_TRANS not in", values, "settleMonthCreditTrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleMonthCreditTransBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SETTLE_MONTH_CREDIT_TRANS between", value1, value2, "settleMonthCreditTrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleMonthCreditTransNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SETTLE_MONTH_CREDIT_TRANS not between", value1, value2, "settleMonthCreditTrans");
+            return (Criteria) this;
+        }
+
+        public Criteria andSpecialRewardStandardIsNull() {
+            addCriterion("SPECIAL_REWARD_STANDARD is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSpecialRewardStandardIsNotNull() {
+            addCriterion("SPECIAL_REWARD_STANDARD is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSpecialRewardStandardEqualTo(BigDecimal value) {
+            addCriterion("SPECIAL_REWARD_STANDARD =", value, "specialRewardStandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andSpecialRewardStandardNotEqualTo(BigDecimal value) {
+            addCriterion("SPECIAL_REWARD_STANDARD <>", value, "specialRewardStandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andSpecialRewardStandardGreaterThan(BigDecimal value) {
+            addCriterion("SPECIAL_REWARD_STANDARD >", value, "specialRewardStandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andSpecialRewardStandardGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("SPECIAL_REWARD_STANDARD >=", value, "specialRewardStandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andSpecialRewardStandardLessThan(BigDecimal value) {
+            addCriterion("SPECIAL_REWARD_STANDARD <", value, "specialRewardStandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andSpecialRewardStandardLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("SPECIAL_REWARD_STANDARD <=", value, "specialRewardStandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andSpecialRewardStandardIn(List<BigDecimal> values) {
+            addCriterion("SPECIAL_REWARD_STANDARD in", values, "specialRewardStandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andSpecialRewardStandardNotIn(List<BigDecimal> values) {
+            addCriterion("SPECIAL_REWARD_STANDARD not in", values, "specialRewardStandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andSpecialRewardStandardBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SPECIAL_REWARD_STANDARD between", value1, value2, "specialRewardStandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andSpecialRewardStandardNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SPECIAL_REWARD_STANDARD not between", value1, value2, "specialRewardStandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andSpecialRewardIsNull() {
+            addCriterion("SPECIAL_REWARD is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSpecialRewardIsNotNull() {
+            addCriterion("SPECIAL_REWARD is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSpecialRewardEqualTo(BigDecimal value) {
+            addCriterion("SPECIAL_REWARD =", value, "specialReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andSpecialRewardNotEqualTo(BigDecimal value) {
+            addCriterion("SPECIAL_REWARD <>", value, "specialReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andSpecialRewardGreaterThan(BigDecimal value) {
+            addCriterion("SPECIAL_REWARD >", value, "specialReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andSpecialRewardGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("SPECIAL_REWARD >=", value, "specialReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andSpecialRewardLessThan(BigDecimal value) {
+            addCriterion("SPECIAL_REWARD <", value, "specialReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andSpecialRewardLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("SPECIAL_REWARD <=", value, "specialReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andSpecialRewardIn(List<BigDecimal> values) {
+            addCriterion("SPECIAL_REWARD in", values, "specialReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andSpecialRewardNotIn(List<BigDecimal> values) {
+            addCriterion("SPECIAL_REWARD not in", values, "specialReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andSpecialRewardBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SPECIAL_REWARD between", value1, value2, "specialReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andSpecialRewardNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SPECIAL_REWARD not between", value1, value2, "specialReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andAssessStatusIsNull() {
+            addCriterion("ASSESS_STATUS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAssessStatusIsNotNull() {
+            addCriterion("ASSESS_STATUS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAssessStatusEqualTo(String value) {
+            addCriterion("ASSESS_STATUS =", value, "assessStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andAssessStatusNotEqualTo(String value) {
+            addCriterion("ASSESS_STATUS <>", value, "assessStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andAssessStatusGreaterThan(String value) {
+            addCriterion("ASSESS_STATUS >", value, "assessStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andAssessStatusGreaterThanOrEqualTo(String value) {
+            addCriterion("ASSESS_STATUS >=", value, "assessStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andAssessStatusLessThan(String value) {
+            addCriterion("ASSESS_STATUS <", value, "assessStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andAssessStatusLessThanOrEqualTo(String value) {
+            addCriterion("ASSESS_STATUS <=", value, "assessStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andAssessStatusLike(String value) {
+            addCriterion("ASSESS_STATUS like", value, "assessStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andAssessStatusNotLike(String value) {
+            addCriterion("ASSESS_STATUS not like", value, "assessStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andAssessStatusIn(List<String> values) {
+            addCriterion("ASSESS_STATUS in", values, "assessStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andAssessStatusNotIn(List<String> values) {
+            addCriterion("ASSESS_STATUS not in", values, "assessStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andAssessStatusBetween(String value1, String value2) {
+            addCriterion("ASSESS_STATUS between", value1, value2, "assessStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andAssessStatusNotBetween(String value1, String value2) {
+            addCriterion("ASSESS_STATUS not between", value1, value2, "assessStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andExecuteRewardIsNull() {
+            addCriterion("EXECUTE_REWARD is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andExecuteRewardIsNotNull() {
+            addCriterion("EXECUTE_REWARD is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andExecuteRewardEqualTo(BigDecimal value) {
+            addCriterion("EXECUTE_REWARD =", value, "executeReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andExecuteRewardNotEqualTo(BigDecimal value) {
+            addCriterion("EXECUTE_REWARD <>", value, "executeReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andExecuteRewardGreaterThan(BigDecimal value) {
+            addCriterion("EXECUTE_REWARD >", value, "executeReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andExecuteRewardGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("EXECUTE_REWARD >=", value, "executeReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andExecuteRewardLessThan(BigDecimal value) {
+            addCriterion("EXECUTE_REWARD <", value, "executeReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andExecuteRewardLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("EXECUTE_REWARD <=", value, "executeReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andExecuteRewardIn(List<BigDecimal> values) {
+            addCriterion("EXECUTE_REWARD in", values, "executeReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andExecuteRewardNotIn(List<BigDecimal> values) {
+            addCriterion("EXECUTE_REWARD not in", values, "executeReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andExecuteRewardBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("EXECUTE_REWARD between", value1, value2, "executeReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andExecuteRewardNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("EXECUTE_REWARD not between", value1, value2, "executeReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductedRewardIsNull() {
+            addCriterion("DEDUCTED_REWARD is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductedRewardIsNotNull() {
+            addCriterion("DEDUCTED_REWARD is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductedRewardEqualTo(BigDecimal value) {
+            addCriterion("DEDUCTED_REWARD =", value, "deductedReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductedRewardNotEqualTo(BigDecimal value) {
+            addCriterion("DEDUCTED_REWARD <>", value, "deductedReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductedRewardGreaterThan(BigDecimal value) {
+            addCriterion("DEDUCTED_REWARD >", value, "deductedReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductedRewardGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("DEDUCTED_REWARD >=", value, "deductedReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductedRewardLessThan(BigDecimal value) {
+            addCriterion("DEDUCTED_REWARD <", value, "deductedReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductedRewardLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("DEDUCTED_REWARD <=", value, "deductedReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductedRewardIn(List<BigDecimal> values) {
+            addCriterion("DEDUCTED_REWARD in", values, "deductedReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductedRewardNotIn(List<BigDecimal> values) {
+            addCriterion("DEDUCTED_REWARD not in", values, "deductedReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductedRewardBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("DEDUCTED_REWARD between", value1, value2, "deductedReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductedRewardNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("DEDUCTED_REWARD not between", value1, value2, "deductedReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andExecuteRewardStandardIsNull() {
+            addCriterion("EXECUTE_REWARD_STANDARD is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andExecuteRewardStandardIsNotNull() {
+            addCriterion("EXECUTE_REWARD_STANDARD is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andExecuteRewardStandardEqualTo(BigDecimal value) {
+            addCriterion("EXECUTE_REWARD_STANDARD =", value, "executeRewardStandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andExecuteRewardStandardNotEqualTo(BigDecimal value) {
+            addCriterion("EXECUTE_REWARD_STANDARD <>", value, "executeRewardStandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andExecuteRewardStandardGreaterThan(BigDecimal value) {
+            addCriterion("EXECUTE_REWARD_STANDARD >", value, "executeRewardStandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andExecuteRewardStandardGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("EXECUTE_REWARD_STANDARD >=", value, "executeRewardStandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andExecuteRewardStandardLessThan(BigDecimal value) {
+            addCriterion("EXECUTE_REWARD_STANDARD <", value, "executeRewardStandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andExecuteRewardStandardLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("EXECUTE_REWARD_STANDARD <=", value, "executeRewardStandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andExecuteRewardStandardIn(List<BigDecimal> values) {
+            addCriterion("EXECUTE_REWARD_STANDARD in", values, "executeRewardStandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andExecuteRewardStandardNotIn(List<BigDecimal> values) {
+            addCriterion("EXECUTE_REWARD_STANDARD not in", values, "executeRewardStandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andExecuteRewardStandardBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("EXECUTE_REWARD_STANDARD between", value1, value2, "executeRewardStandard");
+            return (Criteria) this;
+        }
+
+        public Criteria andExecuteRewardStandardNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("EXECUTE_REWARD_STANDARD not between", value1, value2, "executeRewardStandard");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
