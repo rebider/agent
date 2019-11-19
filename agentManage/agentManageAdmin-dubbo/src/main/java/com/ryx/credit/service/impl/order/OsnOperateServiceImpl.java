@@ -108,8 +108,8 @@ public class OsnOperateServiceImpl implements OsnOperateService {
      */
     @Transactional(readOnly = true)
     @Override
-    public List<String> queryLogicInfoIdByStatus(LogType logType, LogisticsSendStatus sendStatus, BigDecimal status, LogisticsSendStatus sendStatus2){
-        return oLogisticsMapper.queryLogicInfoIdByStatus(FastMap.fastMap("logType", logType.code).putKeyV("sendStatus",sendStatus.code).putKeyV("status", status).putKeyV("sendStatus2", sendStatus2.code));
+    public List<String> queryLogicInfoIdByStatus(LogType logType, LogisticsSendStatus sendStatus, LogisticsSendStatus sendStatus2){
+        return oLogisticsMapper.queryLogicInfoIdByStatus(FastMap.fastMap("logType", logType.code).putKeyV("sendStatus",sendStatus.code).putKeyV("sendStatus2", sendStatus2.code));
     }
 
 
@@ -122,7 +122,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
     @Override
     public void genLogicDetailTask(){
         //查询所有的未联动和无需联动状态的物流
-        List<String>  list = queryLogicInfoIdByStatus(LogType.Deliver,LogisticsSendStatus.none_send, Status.STATUS_1.status, LogisticsSendStatus.dt_send);
+        List<String>  list = queryLogicInfoIdByStatus(LogType.Deliver,LogisticsSendStatus.none_send, LogisticsSendStatus.dt_send);
         if(list.size()>0) {
             logger.info("发货生成SN明细开始！");
             for (String id : list) {
@@ -298,7 +298,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                             //发送到业务系统，（瑞+瑞大宝全部发送，其他按200条发送）
                             Map<String, Object> retMap = osnOperateService.sendInfoToBusinessSystem(list, id, new BigDecimal(batch));
                             //解析发送结果，更新物流和明细
-                            if(null != retMap.get("code") && "0000".equals(retMap.get("code"))){
+                            if(null != retMap.get("code") && "0".equals(retMap.get("code"))){
                                 //处理中，更新物流状态，结束循环
                                 OLogistics oLogistics = oLogisticsMapper.selectByPrimaryKey(id);
                                 oLogistics.setSendStatus(LogisticsSendStatus.gen_detail_sucess.code);
@@ -307,10 +307,10 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                                     throw new MessageException("更新物流状态失败,物流ID:{}", id);
                                 }
                                 break;
-                            }else if (list.size() > 0 && null != retMap.get("code") && "1111".equals(retMap.get("code"))) {
+                            }else if (list.size() > 0 && null != retMap.get("code") && "1".equals(retMap.get("code"))) {
                                 //处理成功,不更新物流状态,等处理完所有的物流明细,才更新状态
                                 logger.info("物流明细发送业务系统处理成功,{},{}", id, batch);
-                            } else if (null != retMap.get("code") && "2222".equals(retMap.get("code"))){
+                            } else if (null != retMap.get("code") && "2".equals(retMap.get("code"))){
                                 //处理失败，停止发送
                                 logger.info("物流明细发送业务系统处理失败,{},{}", id, batch);
                                 AppConfig.sendEmail(emailArr, "机具下发失败，SN码:" + logistics_item.getSnBeginNum() + "-" + logistics_item.getSnEndNum() + "。失败原因：" + (null == retMap.get("msg")? "无": retMap.get("msg")), "物流下发失败");
@@ -465,63 +465,114 @@ public class OsnOperateServiceImpl implements OsnOperateService {
         if(PlatformType.MPOS.code.equals(platForm.getPlatformType())){
             logger.info("首刷发货 更新库存记录:{}:{}-{}",logistics.getProType(),logistics.getSnBeginNum(),logistics.getSnEndNum());
             //遍历sn进行逐个更新
-            for (String idSn : ids) {
-                OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
-                oLogisticsDetailExample.or().andStatusEqualTo(Status.STATUS_0.status).andRecordStatusEqualTo(Status.STATUS_1.status).andSnNumEqualTo(idSn).andTerminalidTypeEqualTo(PlatformType.MPOS.code);
-                List<OLogisticsDetail>  listOLogisticsDetailSn = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
-                if (listOLogisticsDetailSn==null){
-                    logger.info("此SN码不存在");
-                    throw new MessageException("此SN码不存在:"+idSn);
-                }else if(listOLogisticsDetailSn.size()!=1){
-                    logger.info("此SN码不存在");
-                    throw new MessageException("此SN码不存在:"+idSn);
-                }
-                //获取物流明细并更新
-                OLogisticsDetail detail = listOLogisticsDetailSn.get(0);
-                //id，物流id，创建人，更新人，状态
-                detail.setOrderId(oSubOrder.getOrderId());
-                detail.setOrderNum(order.getoNum());
-                detail.setLogisticsId(logcId);
-                detail.setProId(oSubOrder.getProId());
-                detail.setProName(oSubOrder.getProName());
-                detail.setSettlementPrice(oSubOrder.getProRelPrice());
-                if(OSubOrderActivitylist.size()>0){
-                    detail.setActivityId(oActivity_plan.getId());
-                    detail.setActivityName(oActivity_plan.getActivityName());
-                    detail.setgTime(oActivity_plan.getgTime());
-                    detail.setBusProCode(oActivity_plan.getBusProCode());
-                    detail.setBusProName(oActivity_plan.getBusProName());
-                    detail.setTermBatchcode(oActivity_plan.getTermBatchcode());
-                    detail.setTermBatchname(oActivity_plan.getTermBatchname());
-                    detail.setTermtype(oActivity_plan.getTermtype());
-                    detail.setTermtypename(oActivity_plan.getTermtypename());
-                    detail.setSettlementPrice(oActivity_plan.getPrice());
-                    detail.setPosType(oActivity_plan.getPosType());
-                    detail.setPosSpePrice(oActivity_plan.getPosSpePrice());
-                    detail.setStandTime(oActivity_plan.getStandTime());
-                }
-                detail.setAgentId(order.getAgentId());
-                detail.setcUser(logistics.getcUser());
-                detail.setuUser(logistics.getcUser());
-                detail.setcTime(Calendar.getInstance().getTime());
-                detail.setuTime(Calendar.getInstance().getTime());
-                detail.setOptType(OLogisticsDetailOptType.ORDER.code);
-                detail.setOptId(orderId);
-                OOrder oOrder = oOrderMapper.selectByPrimaryKey(orderId);
-                detail.setBusId(oOrder.getBusId());
-                if(StringUtils.isNotBlank(planVo.getReturnOrderDetailId())) {
-                    OReturnOrderDetail detail1 = oReturnOrderDetailMapper.selectByPrimaryKey(planVo.getReturnOrderDetailId());
-                    detail.setReturnOrderId(detail1.getReturnId());
-                    detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
-                    detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_LOC.code);
-                }else{
+            if (oActivity_plan != null && StringUtils.isNotBlank(oActivity_plan.getActCode()) && ("2204".equals(oActivity_plan.getActCode()) || "2004".equals(oActivity_plan.getActCode()))) {
+                for (String id : ids) {
+                    OLogisticsDetail detail = new OLogisticsDetail();
+                    //id，物流id，创建人，更新人，状态
+                    detail.setId(idService.genId(TabId.o_logistics_detail));
+                    detail.setOrderId(oSubOrder.getOrderId());
+                    detail.setOrderNum(order.getoNum());
+                    detail.setLogisticsId(logistics.getId());
+                    detail.setProId(oSubOrder.getProId());
+                    detail.setProName(oSubOrder.getProName());
+                    detail.setSettlementPrice(oSubOrder.getProRelPrice());
+                    if (OSubOrderActivitylist.size() > 0) {
+                        detail.setActivityId(oActivity_plan.getId());
+                        detail.setActivityName(oActivity_plan.getActivityName());
+                        detail.setgTime(oActivity_plan.getgTime());
+                        detail.setBusProCode(oActivity_plan.getBusProCode());
+                        detail.setBusProName(oActivity_plan.getBusProName());
+                        detail.setTermBatchcode(oActivity_plan.getTermBatchcode());
+                        detail.setTermBatchname(oActivity_plan.getTermBatchname());
+                        detail.setTermtype(oActivity_plan.getTermtype());
+                        detail.setTermtypename(oActivity_plan.getTermtypename());
+                        detail.setSettlementPrice(oActivity_plan.getPrice());
+                        detail.setPosType(oActivity_plan.getPosType());
+                        detail.setPosSpePrice(oActivity_plan.getPosSpePrice());
+                        detail.setStandTime(oActivity_plan.getStandTime());
+                    }
+                    detail.setSnNum(id);
+                    detail.setAgentId(order.getAgentId());
+                    detail.setcUser(logistics.getcUser());
+                    detail.setuUser(logistics.getcUser());
+                    detail.setcTime(Calendar.getInstance().getTime());
+                    detail.setuTime(Calendar.getInstance().getTime());
+                    detail.setOptType(OLogisticsDetailOptType.ORDER.code);
+                    detail.setOptId(orderId);
+                    OOrder oOrder = oOrderMapper.selectByPrimaryKey(orderId);
+                    detail.setBusId(oOrder.getBusId());
+                    if (StringUtils.isNotBlank(planVo.getReturnOrderDetailId())) {
+                        OReturnOrderDetail detail1 = oReturnOrderDetailMapper.selectByPrimaryKey(planVo.getReturnOrderDetailId());
+                        detail.setReturnOrderId(detail1.getReturnId());
+                    }
                     detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
                     detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+                    detail.setSendStatus(LogisticsDetailSendStatus.none_send.code);
+                    detail.setVersion(Status.STATUS_1.status);
+                    if (1 != oLogisticsDetailMapper.insertSelective(detail)) {
+                        logger.info("物流明细添加失败:{},{}", logistics.getId(), id);
+                        throw new MessageException("物流明细添加失败:" + logistics.getId() + ":" + id);
+                    }
                 }
-                detail.setSendStatus(LogisticsDetailSendStatus.none_send.code);
-                if (1 != oLogisticsDetailMapper.updateByPrimaryKeySelective(detail)) {
-                    logger.info("修改失败");
-                    throw new MessageException("更新物流明细失败："+idSn);
+            } else {
+                for (String idSn : ids) {
+                    OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
+                    oLogisticsDetailExample.or().andStatusEqualTo(Status.STATUS_0.status).andRecordStatusEqualTo(Status.STATUS_1.status).andSnNumEqualTo(idSn).andTerminalidTypeEqualTo(PlatformType.MPOS.code);
+                    List<OLogisticsDetail>  listOLogisticsDetailSn = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
+                    if (listOLogisticsDetailSn==null){
+                        logger.info("此SN码不存在");
+                        throw new MessageException("此SN码不存在:"+idSn);
+                    }else if(listOLogisticsDetailSn.size()!=1){
+                        logger.info("此SN码不存在");
+                        throw new MessageException("此SN码不存在:"+idSn);
+                    }
+                    //获取物流明细并更新
+                    OLogisticsDetail detail = listOLogisticsDetailSn.get(0);
+                    //id，物流id，创建人，更新人，状态
+                    detail.setOrderId(oSubOrder.getOrderId());
+                    detail.setOrderNum(order.getoNum());
+                    detail.setLogisticsId(logcId);
+                    detail.setProId(oSubOrder.getProId());
+                    detail.setProName(oSubOrder.getProName());
+                    detail.setSettlementPrice(oSubOrder.getProRelPrice());
+                    if(OSubOrderActivitylist.size()>0){
+                        detail.setActivityId(oActivity_plan.getId());
+                        detail.setActivityName(oActivity_plan.getActivityName());
+                        detail.setgTime(oActivity_plan.getgTime());
+                        detail.setBusProCode(oActivity_plan.getBusProCode());
+                        detail.setBusProName(oActivity_plan.getBusProName());
+                        detail.setTermBatchcode(oActivity_plan.getTermBatchcode());
+                        detail.setTermBatchname(oActivity_plan.getTermBatchname());
+                        detail.setTermtype(oActivity_plan.getTermtype());
+                        detail.setTermtypename(oActivity_plan.getTermtypename());
+                        detail.setSettlementPrice(oActivity_plan.getPrice());
+                        detail.setPosType(oActivity_plan.getPosType());
+                        detail.setPosSpePrice(oActivity_plan.getPosSpePrice());
+                        detail.setStandTime(oActivity_plan.getStandTime());
+                    }
+                    detail.setAgentId(order.getAgentId());
+                    detail.setcUser(logistics.getcUser());
+                    detail.setuUser(logistics.getcUser());
+                    detail.setcTime(Calendar.getInstance().getTime());
+                    detail.setuTime(Calendar.getInstance().getTime());
+                    detail.setOptType(OLogisticsDetailOptType.ORDER.code);
+                    detail.setOptId(orderId);
+                    OOrder oOrder = oOrderMapper.selectByPrimaryKey(orderId);
+                    detail.setBusId(oOrder.getBusId());
+                    if(StringUtils.isNotBlank(planVo.getReturnOrderDetailId())) {
+                        OReturnOrderDetail detail1 = oReturnOrderDetailMapper.selectByPrimaryKey(planVo.getReturnOrderDetailId());
+                        detail.setReturnOrderId(detail1.getReturnId());
+                        detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
+                        detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_LOC.code);
+                    }else{
+                        detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
+                        detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+                    }
+                    detail.setSendStatus(LogisticsDetailSendStatus.none_send.code);
+                    if (1 != oLogisticsDetailMapper.updateByPrimaryKeySelective(detail)) {
+                        logger.info("修改失败");
+                        throw new MessageException("更新物流明细失败："+idSn);
+                    }
                 }
             }
         }else if(PlatformType.whetherPOS(platForm.getPlatformType())){
@@ -757,9 +808,9 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
         }
 
-        Map<String, Object> retMap = new Hashtable<String, Object>();
+        Map<String, Object> retMap = new HashMap<String, Object>();
         if(datas==null && datas.size()==0){
-            retMap.put("code", "1111");
+            retMap.put("code", "1");
             return retMap;
         }
         OLogistics logistics = oLogisticsMapper.selectByPrimaryKey(logcId);
@@ -809,7 +860,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
 
         //流量卡不进行下发操作
         if(oActivity_plan!=null && com.ryx.credit.commons.utils.StringUtils.isNotBlank(oActivity_plan.getActCode()) && ("2204".equals(oActivity_plan.getActCode()) || "2004".equals(oActivity_plan.getActCode())) ){
-            logger.info("导入物流数据,流量卡不进行下发操作，活动代码{}={}={}" ,oActivity_plan.getActCode(),logcId, JSONObject.toJSON(logistics));
+            logger.info("导入物流数据,流量卡不进行下发操作,活动代码:{},物流ID:{},物流信息:{}" ,oActivity_plan.getActCode(),logcId, JSONObject.toJSONString(logistics));
             listOLogisticsDetailSn.forEach(detail -> {
                 detail.setSendStatus(LogisticsDetailSendStatus.send_success.code);
                 detail.setSbusMsg("流量卡不下发");
@@ -825,7 +876,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                 logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage());
                 throw e;
             }
-            retMap.put("code", "1111");
+            retMap.put("code", "1");
             return retMap;
         }
         logger.info("进入物流发送阶段，联动各个业务平台！");
@@ -846,39 +897,39 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                 AgentResult posSendRes = imsTermWarehouseDetailService.insertWarehouseAndTransfer(snList, imsTermWarehouseDetail);
                 //机具下发成功，更新物流明细为下发成功
                 if (posSendRes.isOK()) {
-                    logger.info("下发物流接口调用成功：物流编号:{},批次编号:{},时间:{},信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), posSendRes.getMsg());
+                    logger.info("下发物流接口调用成功：物流编号:{},批次编号:{},时间:{},信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), posSendRes.getMsg(), platForm.getPlatformType());
                     listOLogisticsDetailSn.forEach(detail -> {
                         detail.setSendStatus(LogisticsDetailSendStatus.send_success.code);
                         detail.setSbusMsg(posSendRes.getMsg());
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    retMap.put("code", "1111");
+                    retMap.put("code", "1");
                     return retMap;
                 } else {
                     //机具下发失败，更新物流明细为下发失败，并更新物流为发送失败
                     AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+LogisticsDetailSendStatus.send_fail.msg, logistics.getProType()+"下发失败！");
-                    logger.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), posSendRes.getMsg());
+                    logger.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), posSendRes.getMsg(), platForm.getPlatformType());
                     listOLogisticsDetailSn.forEach(detail -> {
                         detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
                         detail.setSbusMsg(posSendRes.getMsg());
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    retMap.put("code", "2222");
+                    retMap.put("code", "2");
                     return retMap;
                 }
                 //机具下发失败，更新物流明细为下发失败，并更新物流为发送失败，禁止继续发送 ,人工介入
             } catch (MessageException e) {
                 AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+e.getLocalizedMessage(), logistics.getProType()+"下发失败！");
                 e.printStackTrace();
-                logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage());
+                logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage(), platForm.getPlatformType());
                 throw e;
             } catch (Exception e) {
                 //机具下发失败，更新物流明细为下发失败，并更新物流为发送失败 ，禁止继续发送,人工介入
                 AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+e.getLocalizedMessage(), logistics.getProType()+"下发失败！");
                 e.printStackTrace();
-                logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage());
+                logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage(), platForm.getPlatformType());
                throw e;
             }
             //首刷下发业务系统
@@ -924,45 +975,44 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                 logger.info("下发物流接口调用：下发到首刷平台结果:{}", lowerHairMachineRes.getMsg());
                 if (lowerHairMachineRes.isOK()) {
                     //机具下发成功，更新物流明细为下发成功
-                    logger.info("下发物流接口调用成功：物流编号:{},批次编号:{},时间:{},信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), lowerHairMachineRes.getMsg());
+                    logger.info("下发物流接口调用成功：物流编号:{},批次编号:{},时间:{},信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), lowerHairMachineRes.getMsg(), platForm.getPlatformType());
                     listOLogisticsDetailSn.forEach(detail -> {
                         detail.setSendStatus(LogisticsDetailSendStatus.send_success.code);
                         detail.setSbusMsg(lowerHairMachineRes.getMsg());
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    retMap.put("code", "1111");
+                    retMap.put("code", "1");
                     return retMap;
                 } else {
                     //机具下发失败，更新物流明细为下发失败，更新物流信息未下发失败，禁止再次发送，人工介入
                     AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum(), logistics.getProType()+"下发失败！");
-                    logger.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), lowerHairMachineRes.getMsg());
+                    logger.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), lowerHairMachineRes.getMsg(), platForm.getPlatformType());
                     listOLogisticsDetailSn.forEach(detail -> {
                         detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
                         detail.setSbusMsg(lowerHairMachineRes.getMsg());
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    retMap.put("code", "2222");
+                    retMap.put("code", "2");
                     return retMap;
                 }
             } catch (MessageException e) {
                 //机具下发失败，更新物流明细为下发失败，更新物流信息未下发失败，禁止再次发送，人工介入
                 AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum() + "错误信息：" + e.getLocalizedMessage(), logistics.getProType()+"机具下发失败！");
                 e.printStackTrace();
-                logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage());
+                logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage(), platForm.getPlatformType());
                 throw e;
             } catch (Exception e) {
                 //机具下发失败，更新物流明细为下发失败，更新物流信息未下发失败，禁止再次发送，人工介入
                 AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+e.getLocalizedMessage(), logistics.getProType()+"机具下发失败！");
                 e.printStackTrace();
-                logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage());
+                logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage(), platForm.getPlatformType());
                 throw e;
             }
         }else if(PlatformType.SSPOS.code.equals(platForm.getPlatformType())){
             logger.info("SSPOS平台物流下发！");
             ImsTermWarehouseDetail imsTermWarehouseDetail = new ImsTermWarehouseDetail();
-            if (null == order) throw new MessageException("查询订单数据失败！");
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
             if (null == agentBusInfo)throw new MessageException("查询业务数据失败！");
 
@@ -990,32 +1040,32 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    retMap.put("code", "1111");
+                    retMap.put("code", "1");
                     return retMap;
                 }else{
                     //下发失败
                     AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+LogisticsDetailSendStatus.send_fail.msg, logistics.getProType()+"机具下发失败！");
-                    logger.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), posSendRes.getMsg());
+                    logger.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), posSendRes.getMsg(), platForm.getPlatformType());
                     listOLogisticsDetailSn.forEach(detail -> {
                         detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
                         detail.setSbusMsg(posSendRes.getMsg());
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    retMap.put("code", "2222");
+                    retMap.put("code", "2");
                     return retMap;
                 }
             } catch (MessageException e) {
                 //机具下发失败
                 AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), logistics.getProType()+"机具下发失败！");
                 e.printStackTrace();
-                logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage());
+                logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage(), platForm.getPlatformType());
                 throw e;
             } catch (Exception e) {
                 //机具下发失败，更新物流明细为下发失败，并更新物流为发送失败 ，禁止继续发送,人工介入
                 AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                 e.printStackTrace();
-                logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage());
+                logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage(), platForm.getPlatformType());
                 throw e;
             }
         } else if (PlatformType.RDBPOS.code.equals(platForm.getPlatformType())) {
@@ -1062,7 +1112,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    retMap.put("code", "1111");
+                    retMap.put("code", "1");
                     return retMap;
                 } else if (0 == queryResult.getStatus()) {
                     //下发处理中，更新物流明细为原始状态
@@ -1072,18 +1122,18 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    retMap.put("code", "0000");
+                    retMap.put("code", "0");
                     return retMap;
                 } else {
                     //下发失败，更新物流明细为下发失败
-                    logger.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), queryResult.getMsg());
+                    logger.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), queryResult.getMsg(), platForm.getPlatformType());
                     listOLogisticsDetailSn.forEach(detail -> {
                         detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
                         detail.setSbusMsg(queryResult.getMsg());
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    retMap.put("code", "2222");
+                    retMap.put("code", "2");
                     retMap.put("msg", null != queryResult.getMsg()? queryResult.getMsg():"失败，瑞大宝未返回失败原因。");
                     return retMap;
                 }
@@ -1116,7 +1166,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             if (null != oActivity_plan.getPosType() && (oActivity_plan.getPosType().equals("1") || oActivity_plan.getPosType().equals("2"))) {
                 reqMap.put("posType", oActivity_plan.getPosType());//机具类型
                 if (null == oActivity_plan.getPosSpePrice() || null == oActivity_plan.getStandTime())
-                    return FastMap.fastMap("code", "2222").putKeyV("msg", "活动对应的特价机[押金]或[达标时间]不能为空!");
+                    return FastMap.fastMap("code", "2").putKeyV("msg", "活动对应的特价机[押金]或[达标时间]不能为空!");
                 reqMap.put("posSpePrice", oActivity_plan.getPosSpePrice().toString());//押金
                 reqMap.put("standTime", oActivity_plan.getStandTime().toString());//达标时间
             } else if (null == oActivity_plan.getPosType() || oActivity_plan.getPosType().equals("0")) {
@@ -1137,14 +1187,14 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                 //更新处理结果
                 if (1 == queryResult.getStatus()) {
                     //下发成功，更新物流明细为下发成功
-                    logger.info("下发物流接口调用成功：物流编号:{},批次编号:{},时间:{},信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), queryResult.getMsg());
+                    logger.info("下发物流接口调用成功：物流编号:{},批次编号:{},时间:{},信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), queryResult.getMsg(), platForm.getPlatformType());
                     listOLogisticsDetailSn.forEach(detail -> {
                         detail.setSendStatus(LogisticsDetailSendStatus.send_success.code);
                         detail.setSbusMsg(queryResult.getMsg());
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    retMap.put("code", "1111");
+                    retMap.put("code", "1");
                     return retMap;
                 } else if (0 == queryResult.getStatus()) {
                     //下发处理中，更新物流明细为原始状态
@@ -1154,18 +1204,18 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    retMap.put("code", "0000");
+                    retMap.put("code", "0");
                     return retMap;
                 } else {
                     //下发失败，更新物流明细为下发失败
-                    logger.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), queryResult.getMsg());
+                    logger.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), queryResult.getMsg());
                     listOLogisticsDetailSn.forEach(detail -> {
                         detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
                         detail.setSbusMsg(queryResult.getMsg());
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    retMap.put("code", "2222");
+                    retMap.put("code", "2");
                     retMap.put("msg", null != queryResult.getMsg()? queryResult.getMsg():"失败，瑞+未返回失败原因。");
                     return retMap;
                 }
@@ -1175,7 +1225,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                 throw e;
             }
         } else {
-            retMap.put("code", "2222");
+            retMap.put("code", "2");
             return retMap;
         }
     }
