@@ -1466,6 +1466,126 @@ public class OrderAdjExample {
             addCriterion("VERSION not between", value1, value2, "version");
             return (Criteria) this;
         }
+
+        public Criteria andOrgPlanNumIsNull() {
+            addCriterion("ORG_PLAN_NUM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgPlanNumIsNotNull() {
+            addCriterion("ORG_PLAN_NUM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgPlanNumEqualTo(BigDecimal value) {
+            addCriterion("ORG_PLAN_NUM =", value, "orgPlanNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgPlanNumNotEqualTo(BigDecimal value) {
+            addCriterion("ORG_PLAN_NUM <>", value, "orgPlanNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgPlanNumGreaterThan(BigDecimal value) {
+            addCriterion("ORG_PLAN_NUM >", value, "orgPlanNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgPlanNumGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("ORG_PLAN_NUM >=", value, "orgPlanNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgPlanNumLessThan(BigDecimal value) {
+            addCriterion("ORG_PLAN_NUM <", value, "orgPlanNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgPlanNumLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("ORG_PLAN_NUM <=", value, "orgPlanNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgPlanNumIn(List<BigDecimal> values) {
+            addCriterion("ORG_PLAN_NUM in", values, "orgPlanNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgPlanNumNotIn(List<BigDecimal> values) {
+            addCriterion("ORG_PLAN_NUM not in", values, "orgPlanNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgPlanNumBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ORG_PLAN_NUM between", value1, value2, "orgPlanNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgPlanNumNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ORG_PLAN_NUM not between", value1, value2, "orgPlanNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagesAmountIsNull() {
+            addCriterion("STAGES_AMOUNT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagesAmountIsNotNull() {
+            addCriterion("STAGES_AMOUNT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagesAmountEqualTo(BigDecimal value) {
+            addCriterion("STAGES_AMOUNT =", value, "stagesAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagesAmountNotEqualTo(BigDecimal value) {
+            addCriterion("STAGES_AMOUNT <>", value, "stagesAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagesAmountGreaterThan(BigDecimal value) {
+            addCriterion("STAGES_AMOUNT >", value, "stagesAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagesAmountGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("STAGES_AMOUNT >=", value, "stagesAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagesAmountLessThan(BigDecimal value) {
+            addCriterion("STAGES_AMOUNT <", value, "stagesAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagesAmountLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("STAGES_AMOUNT <=", value, "stagesAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagesAmountIn(List<BigDecimal> values) {
+            addCriterion("STAGES_AMOUNT in", values, "stagesAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagesAmountNotIn(List<BigDecimal> values) {
+            addCriterion("STAGES_AMOUNT not in", values, "stagesAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagesAmountBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("STAGES_AMOUNT between", value1, value2, "stagesAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagesAmountNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("STAGES_AMOUNT not between", value1, value2, "stagesAmount");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

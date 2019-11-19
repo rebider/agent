@@ -47,6 +47,10 @@ public class OrderAdj implements Serializable {
 
     private BigDecimal version;
 
+    private BigDecimal orgPlanNum;
+
+    private BigDecimal stagesAmount;
+
     public String getId() {
         return id;
     }
@@ -213,5 +217,21 @@ public class OrderAdj implements Serializable {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public BigDecimal getOrgPlanNum() {
+        return orgPlanNum;
+    }
+
+    public void setOrgPlanNum(BigDecimal orgPlanNum) {
+        this.orgPlanNum = orgPlanNum;
+    }
+
+    public BigDecimal getStagesAmount() {
+        return stagesAmount;
+    }
+
+    public void setStagesAmount(BigDecimal stagesAmount) {
+        this.stagesAmount = stagesAmount;
     }
 }
