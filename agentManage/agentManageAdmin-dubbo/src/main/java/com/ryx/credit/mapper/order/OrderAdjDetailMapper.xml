@@ -5,11 +5,13 @@
     <id column="ID" jdbcType="VARCHAR" property="id" />
     <result column="ADJ_ID" jdbcType="VARCHAR" property="adjId" />
     <result column="SUB_ORDER_ID" jdbcType="VARCHAR" property="subOrderId" />
+    <result column="ORG_PRO_NUM" jdbcType="DECIMAL" property="orgProNum" />
     <result column="ADJ_NUM" jdbcType="DECIMAL" property="adjNum" />
+    <result column="PRO_NUM" jdbcType="DECIMAL" property="proNum" />
     <result column="DIF_AMOUNT" jdbcType="DECIMAL" property="difAmount" />
+    <result column="C_TM" jdbcType="TIMESTAMP" property="cTm" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
-    <result column="C_TM" jdbcType="TIMESTAMP" property="cTm" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -41,7 +43,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, ADJ_ID, SUB_ORDER_ID, ADJ_NUM, DIF_AMOUNT, STATUS, VERSION, C_TM
+    ID, ADJ_ID, SUB_ORDER_ID, ORG_PRO_NUM, ADJ_NUM, PRO_NUM, DIF_AMOUNT, C_TM, STATUS, 
+    VERSION
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -73,11 +76,13 @@
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjDetail">
     insert into O_ORDER_ADJ_DETAIL (ID, ADJ_ID, SUB_ORDER_ID, 
-      ADJ_NUM, DIF_AMOUNT, STATUS, 
-      VERSION, C_TM)
+      ORG_PRO_NUM, ADJ_NUM, PRO_NUM, 
+      DIF_AMOUNT, C_TM, STATUS, 
+      VERSION)
     values (#{id,jdbcType=VARCHAR}, #{adjId,jdbcType=VARCHAR}, #{subOrderId,jdbcType=VARCHAR}, 
-      #{adjNum,jdbcType=DECIMAL}, #{difAmount,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL}, 
-      #{version,jdbcType=DECIMAL}, #{cTm,jdbcType=TIMESTAMP})
+      #{orgProNum,jdbcType=DECIMAL}, #{adjNum,jdbcType=DECIMAL}, #{proNum,jdbcType=DECIMAL}, 
+      #{difAmount,jdbcType=DECIMAL}, #{cTm,jdbcType=TIMESTAMP}, #{status,jdbcType=DECIMAL}, 
+      #{version,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjDetail">
     insert into O_ORDER_ADJ_DETAIL
@@ -91,20 +96,26 @@
       <if test="subOrderId != null">
         SUB_ORDER_ID,
       </if>
+      <if test="orgProNum != null">
+        ORG_PRO_NUM,
+      </if>
       <if test="adjNum != null">
         ADJ_NUM,
       </if>
+      <if test="proNum != null">
+        PRO_NUM,
+      </if>
       <if test="difAmount != null">
         DIF_AMOUNT,
+      </if>
+      <if test="cTm != null">
+        C_TM,
       </if>
       <if test="status != null">
         STATUS,
       </if>
       <if test="version != null">
         VERSION,
-      </if>
-      <if test="cTm != null">
-        C_TM,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -117,20 +128,26 @@
       <if test="subOrderId != null">
         #{subOrderId,jdbcType=VARCHAR},
       </if>
+      <if test="orgProNum != null">
+        #{orgProNum,jdbcType=DECIMAL},
+      </if>
       <if test="adjNum != null">
         #{adjNum,jdbcType=DECIMAL},
       </if>
+      <if test="proNum != null">
+        #{proNum,jdbcType=DECIMAL},
+      </if>
       <if test="difAmount != null">
         #{difAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="cTm != null">
+        #{cTm,jdbcType=TIMESTAMP},
       </if>
       <if test="status != null">
         #{status,jdbcType=DECIMAL},
       </if>
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
-      </if>
-      <if test="cTm != null">
-        #{cTm,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -149,20 +166,26 @@
       <if test="subOrderId != null">
         SUB_ORDER_ID = #{subOrderId,jdbcType=VARCHAR},
       </if>
+      <if test="orgProNum != null">
+        ORG_PRO_NUM = #{orgProNum,jdbcType=DECIMAL},
+      </if>
       <if test="adjNum != null">
         ADJ_NUM = #{adjNum,jdbcType=DECIMAL},
       </if>
+      <if test="proNum != null">
+        PRO_NUM = #{proNum,jdbcType=DECIMAL},
+      </if>
       <if test="difAmount != null">
         DIF_AMOUNT = #{difAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="cTm != null">
+        C_TM = #{cTm,jdbcType=TIMESTAMP},
       </if>
       <if test="status != null">
         STATUS = #{status,jdbcType=DECIMAL},
       </if>
       <if test="version != null">
         VERSION = #{version,jdbcType=DECIMAL},
-      </if>
-      <if test="cTm != null">
-        C_TM = #{cTm,jdbcType=TIMESTAMP},
       </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
@@ -171,11 +194,13 @@
     update O_ORDER_ADJ_DETAIL
     set ADJ_ID = #{adjId,jdbcType=VARCHAR},
       SUB_ORDER_ID = #{subOrderId,jdbcType=VARCHAR},
+      ORG_PRO_NUM = #{orgProNum,jdbcType=DECIMAL},
       ADJ_NUM = #{adjNum,jdbcType=DECIMAL},
+      PRO_NUM = #{proNum,jdbcType=DECIMAL},
       DIF_AMOUNT = #{difAmount,jdbcType=DECIMAL},
+      C_TM = #{cTm,jdbcType=TIMESTAMP},
       STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL},
-      C_TM = #{cTm,jdbcType=TIMESTAMP}
+      VERSION = #{version,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

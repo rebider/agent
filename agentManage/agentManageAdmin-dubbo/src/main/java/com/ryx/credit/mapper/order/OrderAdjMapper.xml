@@ -4,25 +4,25 @@
   <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.OrderAdj">
     <id column="ID" jdbcType="VARCHAR" property="id" />
     <result column="ORDER_ID" jdbcType="VARCHAR" property="orderId" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
     <result column="ADJ_USER_ID" jdbcType="VARCHAR" property="adjUserId" />
-    <result column="ADJ_TM" jdbcType="TIMESTAMP" property="adjTm" />
-    <result column="CUR_ARR_AMOUNT" jdbcType="DECIMAL" property="curArrAmount" />
-    <result column="ORG_STAGES_AMOUNT" jdbcType="DECIMAL" property="orgStagesAmount" />
-    <result column="STAGES_AMOUNT" jdbcType="DECIMAL" property="stagesAmount" />
+    <result column="ORG_O_AMO" jdbcType="DECIMAL" property="orgOAmo" />
+    <result column="ORG_INCENTIVE_AMO" jdbcType="DECIMAL" property="orgIncentiveAmo" />
+    <result column="ORG_PAY_AMO" jdbcType="DECIMAL" property="orgPayAmo" />
+    <result column="O_AMO" jdbcType="DECIMAL" property="oAmo" />
+    <result column="INCENTIVE_AMO" jdbcType="DECIMAL" property="incentiveAmo" />
+    <result column="PAY_AMO" jdbcType="DECIMAL" property="payAmo" />
     <result column="RESON" jdbcType="VARCHAR" property="reson" />
     <result column="REFUND_AMOUNT" jdbcType="DECIMAL" property="refundAmount" />
     <result column="REFUND_TYPE" jdbcType="DECIMAL" property="refundType" />
     <result column="REFUND_STAT" jdbcType="DECIMAL" property="refundStat" />
-    <result column="REFUND_TM" jdbcType="TIMESTAMP" property="refundTm" />
     <result column="ORG_PAYMENT_ID" jdbcType="VARCHAR" property="orgPaymentId" />
     <result column="NEW_PAYMENT_ID" jdbcType="VARCHAR" property="newPaymentId" />
     <result column="REVIEWS_STAT" jdbcType="DECIMAL" property="reviewsStat" />
     <result column="REVIEWS_DATE" jdbcType="TIMESTAMP" property="reviewsDate" />
+    <result column="ADJ_TM" jdbcType="TIMESTAMP" property="adjTm" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
-    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
-    <result column="CREDIT" jdbcType="DECIMAL" property="credit" />
-    <result column="REFUND_MODE" jdbcType="DECIMAL" property="refundMode" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -54,9 +54,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, ORDER_ID, ADJ_USER_ID, ADJ_TM, CUR_ARR_AMOUNT, ORG_STAGES_AMOUNT, STAGES_AMOUNT, 
-    RESON, REFUND_AMOUNT, REFUND_TYPE, REFUND_STAT, REFUND_TM, ORG_PAYMENT_ID, NEW_PAYMENT_ID, 
-    REVIEWS_STAT, REVIEWS_DATE, STATUS, VERSION, AGENT_ID, CREDIT, REFUND_MODE
+    ID, ORDER_ID, AGENT_ID, ADJ_USER_ID, ORG_O_AMO, ORG_INCENTIVE_AMO, ORG_PAY_AMO, O_AMO, 
+    INCENTIVE_AMO, PAY_AMO, RESON, REFUND_AMOUNT, REFUND_TYPE, REFUND_STAT, ORG_PAYMENT_ID, 
+    NEW_PAYMENT_ID, REVIEWS_STAT, REVIEWS_DATE, ADJ_TM, STATUS, VERSION
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -87,21 +87,21 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OrderAdj">
-    insert into O_ORDER_ADJ (ID, ORDER_ID, ADJ_USER_ID, 
-      ADJ_TM, CUR_ARR_AMOUNT, ORG_STAGES_AMOUNT, 
-      STAGES_AMOUNT, RESON, REFUND_AMOUNT, 
-      REFUND_TYPE, REFUND_STAT, REFUND_TM, 
-      ORG_PAYMENT_ID, NEW_PAYMENT_ID, REVIEWS_STAT, 
-      REVIEWS_DATE, STATUS, VERSION, 
-      AGENT_ID, CREDIT, REFUND_MODE
+    insert into O_ORDER_ADJ (ID, ORDER_ID, AGENT_ID, 
+      ADJ_USER_ID, ORG_O_AMO, ORG_INCENTIVE_AMO, 
+      ORG_PAY_AMO, O_AMO, INCENTIVE_AMO, 
+      PAY_AMO, RESON, REFUND_AMOUNT, 
+      REFUND_TYPE, REFUND_STAT, ORG_PAYMENT_ID, 
+      NEW_PAYMENT_ID, REVIEWS_STAT, REVIEWS_DATE, 
+      ADJ_TM, STATUS, VERSION
       )
-    values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{adjUserId,jdbcType=VARCHAR}, 
-      #{adjTm,jdbcType=TIMESTAMP}, #{curArrAmount,jdbcType=DECIMAL}, #{orgStagesAmount,jdbcType=DECIMAL}, 
-      #{stagesAmount,jdbcType=DECIMAL}, #{reson,jdbcType=VARCHAR}, #{refundAmount,jdbcType=DECIMAL}, 
-      #{refundType,jdbcType=DECIMAL}, #{refundStat,jdbcType=DECIMAL}, #{refundTm,jdbcType=TIMESTAMP}, 
-      #{orgPaymentId,jdbcType=VARCHAR}, #{newPaymentId,jdbcType=VARCHAR}, #{reviewsStat,jdbcType=DECIMAL}, 
-      #{reviewsDate,jdbcType=TIMESTAMP}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, 
-      #{agentId,jdbcType=VARCHAR}, #{credit,jdbcType=DECIMAL}, #{refundMode,jdbcType=DECIMAL}
+    values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
+      #{adjUserId,jdbcType=VARCHAR}, #{orgOAmo,jdbcType=DECIMAL}, #{orgIncentiveAmo,jdbcType=DECIMAL}, 
+      #{orgPayAmo,jdbcType=DECIMAL}, #{oAmo,jdbcType=DECIMAL}, #{incentiveAmo,jdbcType=DECIMAL}, 
+      #{payAmo,jdbcType=DECIMAL}, #{reson,jdbcType=VARCHAR}, #{refundAmount,jdbcType=DECIMAL}, 
+      #{refundType,jdbcType=DECIMAL}, #{refundStat,jdbcType=DECIMAL}, #{orgPaymentId,jdbcType=VARCHAR}, 
+      #{newPaymentId,jdbcType=VARCHAR}, #{reviewsStat,jdbcType=DECIMAL}, #{reviewsDate,jdbcType=TIMESTAMP}, 
+      #{adjTm,jdbcType=TIMESTAMP}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OrderAdj">
@@ -113,20 +113,29 @@
       <if test="orderId != null">
         ORDER_ID,
       </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
       <if test="adjUserId != null">
         ADJ_USER_ID,
       </if>
-      <if test="adjTm != null">
-        ADJ_TM,
+      <if test="orgOAmo != null">
+        ORG_O_AMO,
       </if>
-      <if test="curArrAmount != null">
-        CUR_ARR_AMOUNT,
+      <if test="orgIncentiveAmo != null">
+        ORG_INCENTIVE_AMO,
       </if>
-      <if test="orgStagesAmount != null">
-        ORG_STAGES_AMOUNT,
+      <if test="orgPayAmo != null">
+        ORG_PAY_AMO,
       </if>
-      <if test="stagesAmount != null">
-        STAGES_AMOUNT,
+      <if test="oAmo != null">
+        O_AMO,
+      </if>
+      <if test="incentiveAmo != null">
+        INCENTIVE_AMO,
+      </if>
+      <if test="payAmo != null">
+        PAY_AMO,
       </if>
       <if test="reson != null">
         RESON,
@@ -140,9 +149,6 @@
       <if test="refundStat != null">
         REFUND_STAT,
       </if>
-      <if test="refundTm != null">
-        REFUND_TM,
-      </if>
       <if test="orgPaymentId != null">
         ORG_PAYMENT_ID,
       </if>
@@ -155,20 +161,14 @@
       <if test="reviewsDate != null">
         REVIEWS_DATE,
       </if>
+      <if test="adjTm != null">
+        ADJ_TM,
+      </if>
       <if test="status != null">
         STATUS,
       </if>
       <if test="version != null">
         VERSION,
-      </if>
-      <if test="agentId != null">
-        AGENT_ID,
-      </if>
-      <if test="credit != null">
-        CREDIT,
-      </if>
-      <if test="refundMode != null">
-        REFUND_MODE,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -178,20 +178,29 @@
       <if test="orderId != null">
         #{orderId,jdbcType=VARCHAR},
       </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
       <if test="adjUserId != null">
         #{adjUserId,jdbcType=VARCHAR},
       </if>
-      <if test="adjTm != null">
-        #{adjTm,jdbcType=TIMESTAMP},
+      <if test="orgOAmo != null">
+        #{orgOAmo,jdbcType=DECIMAL},
       </if>
-      <if test="curArrAmount != null">
-        #{curArrAmount,jdbcType=DECIMAL},
+      <if test="orgIncentiveAmo != null">
+        #{orgIncentiveAmo,jdbcType=DECIMAL},
       </if>
-      <if test="orgStagesAmount != null">
-        #{orgStagesAmount,jdbcType=DECIMAL},
+      <if test="orgPayAmo != null">
+        #{orgPayAmo,jdbcType=DECIMAL},
       </if>
-      <if test="stagesAmount != null">
-        #{stagesAmount,jdbcType=DECIMAL},
+      <if test="oAmo != null">
+        #{oAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="incentiveAmo != null">
+        #{incentiveAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="payAmo != null">
+        #{payAmo,jdbcType=DECIMAL},
       </if>
       <if test="reson != null">
         #{reson,jdbcType=VARCHAR},
@@ -205,9 +214,6 @@
       <if test="refundStat != null">
         #{refundStat,jdbcType=DECIMAL},
       </if>
-      <if test="refundTm != null">
-        #{refundTm,jdbcType=TIMESTAMP},
-      </if>
       <if test="orgPaymentId != null">
         #{orgPaymentId,jdbcType=VARCHAR},
       </if>
@@ -220,20 +226,14 @@
       <if test="reviewsDate != null">
         #{reviewsDate,jdbcType=TIMESTAMP},
       </if>
+      <if test="adjTm != null">
+        #{adjTm,jdbcType=TIMESTAMP},
+      </if>
       <if test="status != null">
         #{status,jdbcType=DECIMAL},
       </if>
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
-      </if>
-      <if test="agentId != null">
-        #{agentId,jdbcType=VARCHAR},
-      </if>
-      <if test="credit != null">
-        #{credit,jdbcType=DECIMAL},
-      </if>
-      <if test="refundMode != null">
-        #{refundMode,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -249,20 +249,29 @@
       <if test="orderId != null">
         ORDER_ID = #{orderId,jdbcType=VARCHAR},
       </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
       <if test="adjUserId != null">
         ADJ_USER_ID = #{adjUserId,jdbcType=VARCHAR},
       </if>
-      <if test="adjTm != null">
-        ADJ_TM = #{adjTm,jdbcType=TIMESTAMP},
+      <if test="orgOAmo != null">
+        ORG_O_AMO = #{orgOAmo,jdbcType=DECIMAL},
       </if>
-      <if test="curArrAmount != null">
-        CUR_ARR_AMOUNT = #{curArrAmount,jdbcType=DECIMAL},
+      <if test="orgIncentiveAmo != null">
+        ORG_INCENTIVE_AMO = #{orgIncentiveAmo,jdbcType=DECIMAL},
       </if>
-      <if test="orgStagesAmount != null">
-        ORG_STAGES_AMOUNT = #{orgStagesAmount,jdbcType=DECIMAL},
+      <if test="orgPayAmo != null">
+        ORG_PAY_AMO = #{orgPayAmo,jdbcType=DECIMAL},
       </if>
-      <if test="stagesAmount != null">
-        STAGES_AMOUNT = #{stagesAmount,jdbcType=DECIMAL},
+      <if test="oAmo != null">
+        O_AMO = #{oAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="incentiveAmo != null">
+        INCENTIVE_AMO = #{incentiveAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="payAmo != null">
+        PAY_AMO = #{payAmo,jdbcType=DECIMAL},
       </if>
       <if test="reson != null">
         RESON = #{reson,jdbcType=VARCHAR},
@@ -276,9 +285,6 @@
       <if test="refundStat != null">
         REFUND_STAT = #{refundStat,jdbcType=DECIMAL},
       </if>
-      <if test="refundTm != null">
-        REFUND_TM = #{refundTm,jdbcType=TIMESTAMP},
-      </if>
       <if test="orgPaymentId != null">
         ORG_PAYMENT_ID = #{orgPaymentId,jdbcType=VARCHAR},
       </if>
@@ -291,20 +297,14 @@
       <if test="reviewsDate != null">
         REVIEWS_DATE = #{reviewsDate,jdbcType=TIMESTAMP},
       </if>
+      <if test="adjTm != null">
+        ADJ_TM = #{adjTm,jdbcType=TIMESTAMP},
+      </if>
       <if test="status != null">
         STATUS = #{status,jdbcType=DECIMAL},
       </if>
       <if test="version != null">
         VERSION = #{version,jdbcType=DECIMAL},
-      </if>
-      <if test="agentId != null">
-        AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      </if>
-      <if test="credit != null">
-        CREDIT = #{credit,jdbcType=DECIMAL},
-      </if>
-      <if test="refundMode != null">
-        REFUND_MODE = #{refundMode,jdbcType=DECIMAL},
       </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
@@ -312,25 +312,25 @@
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OrderAdj">
     update O_ORDER_ADJ
     set ORDER_ID = #{orderId,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
       ADJ_USER_ID = #{adjUserId,jdbcType=VARCHAR},
-      ADJ_TM = #{adjTm,jdbcType=TIMESTAMP},
-      CUR_ARR_AMOUNT = #{curArrAmount,jdbcType=DECIMAL},
-      ORG_STAGES_AMOUNT = #{orgStagesAmount,jdbcType=DECIMAL},
-      STAGES_AMOUNT = #{stagesAmount,jdbcType=DECIMAL},
+      ORG_O_AMO = #{orgOAmo,jdbcType=DECIMAL},
+      ORG_INCENTIVE_AMO = #{orgIncentiveAmo,jdbcType=DECIMAL},
+      ORG_PAY_AMO = #{orgPayAmo,jdbcType=DECIMAL},
+      O_AMO = #{oAmo,jdbcType=DECIMAL},
+      INCENTIVE_AMO = #{incentiveAmo,jdbcType=DECIMAL},
+      PAY_AMO = #{payAmo,jdbcType=DECIMAL},
       RESON = #{reson,jdbcType=VARCHAR},
       REFUND_AMOUNT = #{refundAmount,jdbcType=DECIMAL},
       REFUND_TYPE = #{refundType,jdbcType=DECIMAL},
       REFUND_STAT = #{refundStat,jdbcType=DECIMAL},
-      REFUND_TM = #{refundTm,jdbcType=TIMESTAMP},
       ORG_PAYMENT_ID = #{orgPaymentId,jdbcType=VARCHAR},
       NEW_PAYMENT_ID = #{newPaymentId,jdbcType=VARCHAR},
       REVIEWS_STAT = #{reviewsStat,jdbcType=DECIMAL},
       REVIEWS_DATE = #{reviewsDate,jdbcType=TIMESTAMP},
+      ADJ_TM = #{adjTm,jdbcType=TIMESTAMP},
       STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL},
-      AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      CREDIT = #{credit,jdbcType=DECIMAL},
-      REFUND_MODE = #{refundMode,jdbcType=DECIMAL}
+      VERSION = #{version,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
