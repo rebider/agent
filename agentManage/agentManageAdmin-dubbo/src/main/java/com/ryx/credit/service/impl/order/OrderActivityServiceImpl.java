@@ -69,7 +69,13 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             criteria.andActivityNameLike("%"+activity.getActivityName()+"%");
         }
         if (StringUtils.isNotBlank(activity.getPlatform())) {
-            criteria.andPlatformEqualTo(activity.getPlatform());
+            String platform =activity.getPlatform();
+            if (platform.contains(",")) {
+                List<String> platformList = Arrays.asList(platform.split(","));
+                criteria.andPlatformIn(platformList);
+            } else {
+                criteria.andPlatformEqualTo(platform);
+            }
         }
         if (StringUtils.isNotBlank(activity.getActCode())) {
             criteria.andActCodeEqualTo(activity.getActCode());
@@ -84,7 +90,13 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             criteria.andProModelEqualTo(activity.getProModel());
         }
         if (StringUtils.isNotBlank(activity.getProductId())) {
-            criteria.andProductIdEqualTo(activity.getProductId());
+            String productId =activity.getProductId();
+            if (productId.contains(",")) {
+                List<String> productIdList = Arrays.asList(productId.split(","));
+                criteria.andProductIdIn(productIdList);
+            } else {
+                criteria.andProductIdEqualTo(productId);
+            }
         }
         if (StringUtils.isNotBlank(activity.getBusProName())) {
             criteria.andBusProNameLike("%"+activity.getBusProName()+"%");
@@ -96,7 +108,13 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             criteria.andTermtypenameEqualTo(activity.getTermtypename());
         }
         if (StringUtils.isNotBlank(activity.getPosType())) {
-            criteria.andPosTypeEqualTo(activity.getPosType());
+            String postype =activity.getPosType();
+            if (postype.contains(",")) {
+                List<String> postypeList = Arrays.asList(postype.split(","));
+                criteria.andPosTypeIn(postypeList);
+            } else {
+                criteria.andPosTypeEqualTo(postype);
+            }
         }
         if (StringUtils.isNotBlank(activity.getBusProCode())) {
             criteria.andBusProCodeEqualTo(activity.getBusProCode());
