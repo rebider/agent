@@ -108,6 +108,15 @@ public class AgentVo implements Serializable {
     private  String invoiceReturnExpressNumber;
     private  String invoiceReturnExpressCompany;
     private  String invoiceReturnDate;
+    private String renewWay;
+
+    public String getRenewWay() {
+        return renewWay;
+    }
+
+    public void setRenewWay(String renewWay) {
+        this.renewWay = renewWay;
+    }
 
     public String getPretest() {
         return pretest;

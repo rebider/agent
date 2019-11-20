@@ -84,6 +84,10 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     private InternetRenewOffsetDetailMapper internetRenewOffsetDetailMapper;
     @Autowired
     private AgentBusinfoService agentBusinfoService;
+    @Autowired
+    private AgentService agentService;
+
+
 
     @Override
     public PageInfo internetRenewList(OInternetRenew internetRenew, Page page,String agentId,Long userId){
@@ -655,8 +659,20 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             } catch (Exception e) {
                 throw new MessageException(e.getMessage());
             }
+            Map<String,Object> reqMap = new HashMap<>();
+            String workId = "";
+            if(agentService.isAgent(cUser).isOK()){
+                workId = dictOptionsService.getApproveVersion("cardRenew");
+            }else {
+                workId = dictOptionsService.getApproveVersion("cardRenewCity");
+                if(internetRenew.getRenewWay().equals(InternetRenewWay.FRDK.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())){
+                    reqMap.put("renewWay",InternetRenewWay.FRDK.getValue());
+                }else{
+                    reqMap.put("renewWay",internetRenew.getRenewWay());
+                }
+            }
             //启动审批
-            String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("cardRenew"), null, null,null);
+            String proce = activityService.createDeloyFlow(null,workId, null, null,reqMap);
             if (proce == null) {
                 throw new MessageException("审批流启动失败!");
             }
@@ -710,8 +726,24 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     public AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception {
         try {
             if (agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())) {
-                //开启独立事务，审批通过需处理
-                internetRenewService.approveTashBusiness(agentVo,userId);
+                List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(userId));
+                if(orgCodeRes==null && orgCodeRes.size()!=1){
+                    throw new ProcessException("部门参数为空");
+                }
+                Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+                String orgCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+                //财务审批
+                if(orgCode.equals("finance")){
+                    //开启独立事务，审批通过需处理
+                    internetRenewService.approveTashBusiness(agentVo,userId);
+                }else{
+                    OInternetRenew oInternetRenew = internetRenewService.selectByPrimaryKey(agentVo.getAgentBusId());
+                    if(oInternetRenew.getRenewWay().equals(InternetRenewWay.FRDK.getValue()) || oInternetRenew.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())){
+                        agentVo.setRenewWay(InternetRenewWay.FRDK.getValue());
+                    }else{
+                        agentVo.setRenewWay(oInternetRenew.getRenewWay());
+                    }
+                }
             }
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
             if(!result.isOK()){
@@ -737,7 +769,6 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         if(agentNameList.size()!=0) {
             cashPayType = CashPayType.INTERNETRENEWN;
         }
-        //目前只有财务节点直接处理，后续加判断
         AgentResult cashAgentResult = cashReceivablesService.approveTashBusiness(cashPayType,agentVo.getAgentBusId(),userId,new Date(),agentVo.getoCashReceivablesVoList());
         if(!cashAgentResult.isOK()){
             throw new MessageException("更新收款信息失败");

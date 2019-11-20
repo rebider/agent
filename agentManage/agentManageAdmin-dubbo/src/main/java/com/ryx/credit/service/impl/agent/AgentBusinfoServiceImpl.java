@@ -1142,7 +1142,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		return agentBusInfo;
 	}
 
-}
+
 
 	@Override
 	public List<AgentBusInfo> selectByAgentBusInfo(AgentBusInfo agentBusInfo){
