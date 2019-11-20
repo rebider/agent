@@ -73,10 +73,10 @@ public class DataHistoryInterceptor implements MethodInterceptor {
             String user = "";
             String cUser = String.valueOf(objectMap.get("cUser"));
             String uUser = String.valueOf(objectMap.get("uUser"));
-            if(StringUtils.isNotBlank(cUser) && !cUser.equals("null")){
-                user = cUser;
-            }else if(StringUtils.isNotBlank(uUser) && !uUser.equals("null")){
+            if(StringUtils.isNotBlank(uUser) && !uUser.equals("null")){
                 user = uUser;
+            }else if(StringUtils.isNotBlank(cUser) && !cUser.equals("null")){
+                user = cUser;
             }
             dataHistory.setcUser(user);
             String busId = "";
