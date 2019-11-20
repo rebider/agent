@@ -18,6 +18,11 @@
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
     <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
+    <result column="BUS_PLATFORM" jdbcType="VARCHAR" property="busPlatform" />
+    <result column="AG_DOC_DISTRICT" jdbcType="VARCHAR" property="agDocDistrict" />
+    <result column="AG_DOC_PRO" jdbcType="VARCHAR" property="agDocPro" />
+    <result column="BUS_CONTACT_PERSON" jdbcType="VARCHAR" property="busContactPerson" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -50,7 +55,8 @@
   </sql>
   <sql id="Base_Column_List">
     ID, RENEW_WAY, RENEW_CARD_COUNT, SUM_OFFSET_AMT, SUPP_AMT, REVIEW_STATUS, REVIEW_PASS_TIME,
-    APPLY_REMARK, C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION, AGENT_ID, AGENT_NAME
+    APPLY_REMARK, C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION, AGENT_ID, AGENT_NAME,
+    BUS_NUM, BUS_PLATFORM, AG_DOC_DISTRICT, AG_DOC_PRO, BUS_CONTACT_PERSON
   </sql>
   <select id="selectByExample" parameterType="com.ryx.internet.pojo.OInternetRenewExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -86,13 +92,17 @@
     REVIEW_PASS_TIME, APPLY_REMARK, C_TIME,
     U_TIME, C_USER, U_USER,
     STATUS, VERSION, AGENT_ID,
-    AGENT_NAME)
+    AGENT_NAME, BUS_NUM, BUS_PLATFORM,
+    AG_DOC_DISTRICT, AG_DOC_PRO, BUS_CONTACT_PERSON
+    )
     values (#{id,jdbcType=VARCHAR}, #{renewWay,jdbcType=VARCHAR}, #{renewCardCount,jdbcType=DECIMAL},
     #{sumOffsetAmt,jdbcType=DECIMAL}, #{suppAmt,jdbcType=DECIMAL}, #{reviewStatus,jdbcType=DECIMAL},
     #{reviewPassTime,jdbcType=TIMESTAMP}, #{applyRemark,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP},
     #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR},
     #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{agentId,jdbcType=VARCHAR},
-    #{agentName,jdbcType=VARCHAR})
+    #{agentName,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR}, #{busPlatform,jdbcType=VARCHAR},
+    #{agDocDistrict,jdbcType=VARCHAR}, #{agDocPro,jdbcType=VARCHAR}, #{busContactPerson,jdbcType=VARCHAR}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.internet.pojo.OInternetRenew">
     insert into O_INTERNET_RENEW
@@ -145,6 +155,21 @@
       <if test="agentName != null">
         AGENT_NAME,
       </if>
+      <if test="busNum != null">
+        BUS_NUM,
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM,
+      </if>
+      <if test="agDocDistrict != null">
+        AG_DOC_DISTRICT,
+      </if>
+      <if test="agDocPro != null">
+        AG_DOC_PRO,
+      </if>
+      <if test="busContactPerson != null">
+        BUS_CONTACT_PERSON,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -194,6 +219,21 @@
       </if>
       <if test="agentName != null">
         #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="busNum != null">
+        #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocDistrict != null">
+        #{agDocDistrict,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocPro != null">
+        #{agDocPro,jdbcType=VARCHAR},
+      </if>
+      <if test="busContactPerson != null">
+        #{busContactPerson,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -251,6 +291,21 @@
       <if test="agentName != null">
         AGENT_NAME = #{agentName,jdbcType=VARCHAR},
       </if>
+      <if test="busNum != null">
+        BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocDistrict != null">
+        AG_DOC_DISTRICT = #{agDocDistrict,jdbcType=VARCHAR},
+      </if>
+      <if test="agDocPro != null">
+        AG_DOC_PRO = #{agDocPro,jdbcType=VARCHAR},
+      </if>
+      <if test="busContactPerson != null">
+        BUS_CONTACT_PERSON = #{busContactPerson,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -270,7 +325,12 @@
     STATUS = #{status,jdbcType=DECIMAL},
     VERSION = #{version,jdbcType=DECIMAL},
     AGENT_ID = #{agentId,jdbcType=VARCHAR},
-    AGENT_NAME = #{agentName,jdbcType=VARCHAR}
+    AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+    BUS_NUM = #{busNum,jdbcType=VARCHAR},
+    BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+    AG_DOC_DISTRICT = #{agDocDistrict,jdbcType=VARCHAR},
+    AG_DOC_PRO = #{agDocPro,jdbcType=VARCHAR},
+    BUS_CONTACT_PERSON = #{busContactPerson,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -283,4 +343,75 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+
+  <sql id="Renew_Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and i.${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and i.${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and i.${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and i.${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+
+  <sql id="queryInternetRenewSql">
+    left join C_ORGANIZATION oa on oa.id=i.ag_doc_pro
+    left join C_ORGANIZATION ob on ob.id=i.AG_DOC_DISTRICT
+    <if test="_parameter != null">
+      <include refid="Renew_Example_Where_Clause" />
+    </if>
+    <if test="reqMap.orgCode!=null and reqMap.orgCode!=''and reqMap.agentNameList!=null">
+      and (
+      (oa.CODE like concat(#{reqMap.orgCode},'%') or ob.CODE like concat(#{reqMap.orgCode},'%'))
+      or i.agent_name
+      <foreach collection="reqMap.agentNameList" item="agentName" open=" in(" close=")" separator=",">
+        #{agentName}
+      </foreach>
+      )
+    </if>
+    <if test="reqMap.orgCode!=null and reqMap.orgCode!='' and reqMap.agentNameList==null">
+      and (oa.CODE like concat(#{reqMap.orgCode},'%') or ob.CODE like concat(#{reqMap.orgCode},'%'))
+    </if>
+    <if test="orderByClause != null">
+      order by i.${orderByClause}
+    </if>
+  </sql>
+
+  <select id="internetRenewList" parameterType="com.ryx.internet.pojo.OInternetRenewExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    i.ID, i.RENEW_WAY, i.RENEW_CARD_COUNT, i.SUM_OFFSET_AMT, i.SUPP_AMT, i.REVIEW_STATUS, i.REVIEW_PASS_TIME,
+    i.APPLY_REMARK, i.AGENT_ID, i.AGENT_NAME,i.BUS_NUM, i.BUS_PLATFORM, i.BUS_CONTACT_PERSON,C_TIME, C_USER,
+    oa.name as AG_DOC_PRO,ob.name as AG_DOC_DISTRICT
+    from O_INTERNET_RENEW i
+    <include refid="queryInternetRenewSql" />
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="internetRenewCount" parameterType="com.ryx.internet.pojo.OInternetRenewExample" resultType="java.lang.Integer">
+    select count(*) from O_INTERNET_RENEW i
+    <include refid="queryInternetRenewSql" />
+  </select>
+
 </mapper>

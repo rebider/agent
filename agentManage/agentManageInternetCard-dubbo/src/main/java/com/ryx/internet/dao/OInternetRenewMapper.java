@@ -21,4 +21,8 @@ public interface OInternetRenewMapper {
     int updateByPrimaryKeySelective(OInternetRenew record);
 
     int updateByPrimaryKey(OInternetRenew record);
+
+    List<OInternetRenew> internetRenewList(OInternetRenewExample example);
+
+    int internetRenewCount(OInternetRenewExample example);
 }

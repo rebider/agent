@@ -20,5 +20,5 @@
                   streaming-process="false"
                   description="活动调整结果查询任务"
                   overwrite="true"
-                  disabled="false"/>
+                  disabled="${job.compensateResQueryJob}"/>
 </beans>
