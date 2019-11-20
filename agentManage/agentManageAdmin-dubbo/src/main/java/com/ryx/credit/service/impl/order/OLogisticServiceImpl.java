@@ -1058,12 +1058,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
             } else {
                 throw new MessageException("排单发货数量异常！");
             }
-            //更新发货状态
-            /*if(receiptPlan.getSendProNum() != null && (receiptPlan.getSendProNum().subtract(oLogistics.getSendNum())).compareTo(BigDecimal.ZERO) == 0) {
-                receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.InTheDeliver.getValue()));
-            } else {
-                receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.InTheDeliver.getValue()));
-            }*/
             if (receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan)!= 1) {
                 throw new MessageException("更新排单数据失败！");
             }
@@ -1073,12 +1067,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
         }
 
         //删除物流明细
-        /*int deleteInt = oLogistics.getSendNum().compareTo(BigDecimal.valueOf(oLogisticsDetailMapper.deleteDetailByLogisicalId(oLogistics.getId())));
-        if (deleteInt != 0) {
-            logger.info("删除明细异常，明细数量和发送数量不同！");
-            throw new MessageException("删除明细异常，明细数量和发送数量不同！");
-        }*/
-        //删除物流明细
         oLogisticsDetailMapper.deleteDetailByLogisicalId(oLogistics.getId());
 
         //更新物流
@@ -1086,6 +1074,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
         updateLogistics.setId(oLogistics.getId());
         updateLogistics.setStatus(Status.STATUS_2.status);
         updateLogistics.setVersion(oLogistics.getVersion());
+        updateLogistics.setwNumber(oLogistics.getwNumber() + "_" + (new SimpleDateFormat("yyyyMMddHHmmss").format(new Date())));
         updateLogistics.setcUser(userId);
         if (1 != oLogisticsMapper.updateByPrimaryKeySelective(updateLogistics)) {
             logger.info("物流删除操作，更新数据库失败:{},{},{}", oLogistics.getId(), oLogistics.getSnBeginNum(), oLogistics.getSnEndNum());
