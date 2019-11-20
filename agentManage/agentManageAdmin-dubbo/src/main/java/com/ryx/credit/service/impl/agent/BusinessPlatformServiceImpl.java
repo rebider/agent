@@ -589,6 +589,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     if(!RegexUtil.checkInt(item.getBusLoginNum())){
                         throw new ProcessException("瑞大宝平台登录账号必须为数字");
                     }
+                    if(item.getBusLoginNum().length()!=11){
+                        throw new ProcessException("手机位数不正确");
+                    }
                 }
                 if(PlatformType.RHPOS.code.equals(platformType.getValue())){
                     //检查手机号是否填写
@@ -597,6 +600,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     }
                     if(!RegexUtil.checkInt(item.getBusLoginNum())){
                         throw new ProcessException("瑞花宝平台登录账号必须是数字");
+                    }
+                    if(item.getBusLoginNum().length()!=11){
+                        throw new ProcessException("手机位数不正确");
                     }
                 }
                 AgentBusInfo agentBusInfo = agentBusinfoService.agentPlatformNum(agentVo.getAgentId(),item.getBusPlatform());
