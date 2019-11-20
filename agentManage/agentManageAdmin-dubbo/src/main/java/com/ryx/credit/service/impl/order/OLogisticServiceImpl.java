@@ -501,7 +501,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
         for (int i=0;i<18;i++){
             if(!col[i].equals("SEND_PRO_NUM")){
                 if(null==db.get(col[i]) || db.get(col[i]).toString().length()==0){
-                   continue;
+                    continue;
                 }
                 if(excel.get(i)==null || StringUtils.isBlank(excel.get(i).toString())){
                     return AgentResult.fail(PLAN_NUM+title[i]+"有改动");
@@ -566,55 +566,55 @@ public class OLogisticServiceImpl implements OLogisticsService {
             String terminalid_seq="";
             String terminalidCheck="";
             String sn_num="";
-                if (StringUtils.isBlank(list.get(0))) {
-                    logger.info("终端号不能为空");
-                    throw new MessageException("终端号不能为空");
-                }
-                if (StringUtils.isBlank(list.get(1))) {
-                    logger.info("SN码不能为空");
-                    throw new MessageException("SN码不能为空");
-                }
-                if (StringUtils.isBlank(list.get(2))) {
-                    logger.info("秘钥不能为空");
-                    throw new MessageException("秘钥不能为空");
-                }
-                if (StringUtils.isBlank(list.get(3))) {
-                    logger.info("序列不能为空");
-                    throw new MessageException("序列不能为空");
-                }
+            if (StringUtils.isBlank(list.get(0))) {
+                logger.info("终端号不能为空");
+                throw new MessageException("终端号不能为空");
+            }
+            if (StringUtils.isBlank(list.get(1))) {
+                logger.info("SN码不能为空");
+                throw new MessageException("SN码不能为空");
+            }
+            if (StringUtils.isBlank(list.get(2))) {
+                logger.info("秘钥不能为空");
+                throw new MessageException("秘钥不能为空");
+            }
+            if (StringUtils.isBlank(list.get(3))) {
+                logger.info("序列不能为空");
+                throw new MessageException("序列不能为空");
+            }
 
-                terminalid=String.valueOf(list.get(0));
-                String sn = list.get(1);
-                sn_num=String.valueOf(sn.substring(0, sn.length() - 1));
-                terminalid_key= String.valueOf(list.get(2));
-                terminalid_seq=String.valueOf(list.get(3));
-                terminalidCheck=String.valueOf(sn.substring(sn.length()-1));
-                OLogisticsDetail oLogisticsDetail = new OLogisticsDetail();
-                oLogisticsDetail.setId(idService.genId(TabId.o_logistics_detail));
-                oLogisticsDetail.setcTime(Calendar.getInstance().getTime());
-                oLogisticsDetail.setcUser(user);
-                oLogisticsDetail.setTerminalid(terminalid);
-                oLogisticsDetail.setTerminalidKey(terminalid_key);
-                oLogisticsDetail.setTerminalidSeq(terminalid_seq);
-                oLogisticsDetail.setTerminalidCheck(terminalidCheck);
-                oLogisticsDetail.setSnNum(sn_num);
-                oLogisticsDetail.setStatus(Status.STATUS_0.status);
-                oLogisticsDetail.setRecordStatus(Status.STATUS_1.status);
-                oLogisticsDetail.setVersion(Status.STATUS_0.status);
-                oLogisticsDetail.setTerminalidType(PlatformType.MPOS.code);
+            terminalid=String.valueOf(list.get(0));
+            String sn = list.get(1);
+            sn_num=String.valueOf(sn.substring(0, sn.length() - 1));
+            terminalid_key= String.valueOf(list.get(2));
+            terminalid_seq=String.valueOf(list.get(3));
+            terminalidCheck=String.valueOf(sn.substring(sn.length()-1));
+            OLogisticsDetail oLogisticsDetail = new OLogisticsDetail();
+            oLogisticsDetail.setId(idService.genId(TabId.o_logistics_detail));
+            oLogisticsDetail.setcTime(Calendar.getInstance().getTime());
+            oLogisticsDetail.setcUser(user);
+            oLogisticsDetail.setTerminalid(terminalid);
+            oLogisticsDetail.setTerminalidKey(terminalid_key);
+            oLogisticsDetail.setTerminalidSeq(terminalid_seq);
+            oLogisticsDetail.setTerminalidCheck(terminalidCheck);
+            oLogisticsDetail.setSnNum(sn_num);
+            oLogisticsDetail.setStatus(Status.STATUS_0.status);
+            oLogisticsDetail.setRecordStatus(Status.STATUS_1.status);
+            oLogisticsDetail.setVersion(Status.STATUS_0.status);
+            oLogisticsDetail.setTerminalidType(PlatformType.MPOS.code);
 
-                OLogisticsDetailExample example = new OLogisticsDetailExample();
-                example.or().andSnNumEqualTo(sn_num);
-                if(oLogisticsDetailMapper.selectByExample(example).size()>0){
-                    logger.info("导入sn{}已存在",sn_num);
-                    throw new MessageException(sn_num+"已存在");
-                }
+            OLogisticsDetailExample example = new OLogisticsDetailExample();
+            example.or().andSnNumEqualTo(sn_num);
+            if(oLogisticsDetailMapper.selectByExample(example).size()>0){
+                logger.info("导入sn{}已存在",sn_num);
+                throw new MessageException(sn_num+"已存在");
+            }
 
-                if ( oLogisticsDetailMapper.insertSelective(oLogisticsDetail)==0){
-                    logger.info("导入sn码失败");
-                    throw new MessageException("导入sn码失败");
-                }
-                snList.add(oLogisticsDetail.getId());
+            if ( oLogisticsDetailMapper.insertSelective(oLogisticsDetail)==0){
+                logger.info("导入sn码失败");
+                throw new MessageException("导入sn码失败");
+            }
+            snList.add(oLogisticsDetail.getId());
 
         }
         return snList;
@@ -970,7 +970,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
         for (Map<String, Object> objectMap : list) {
             CUser cUser = userService.selectById(Long.valueOf(String.valueOf(objectMap.get("C_USER"))));
             if(cUser!=null)
-            objectMap.put("C_USER",cUser.getName());
+                objectMap.put("C_USER",cUser.getName());
 
         }
         pageInfo.setTotal(count.intValue());
@@ -992,7 +992,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
         ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(logistics.getReceiptPlanId());
         //退货的话调用退货重新下发
         if(org.apache.commons.lang.StringUtils.isNotEmpty(receiptPlan.getReturnOrderDetailId())){
-           return iOrderReturnService.sendReturnLgcInfoToBusSystem(lgcId,userId);
+            return iOrderReturnService.sendReturnLgcInfoToBusSystem(lgcId,userId);
         }
         OLogisticsDetailExample example = new OLogisticsDetailExample();
         example.or().andLogisticsIdEqualTo(logistics.getId()).andRecordStatusEqualTo(Status.STATUS_1.status).andStatusEqualTo(Status.STATUS_1.status);
