@@ -75,17 +75,17 @@ public class AgentBusInfo implements Serializable {
 
     private String busLoginNum;
 
-    private String debitRateLower;//借记费率下限
+    private String debitRateLower;
 
-    private String debitCapping;//借记封顶额上限
+    private String debitCapping;
 
-    private String debitAppearRate;//借记出款费率
+    private String debitAppearRate;
 
     private String terminalsLower;
 
     private Date approveTime;
 
-    private String creditRateFloor;//贷记费率下限
+    private String creditRateFloor;
 
     private String agDocDistrict;
 
@@ -95,7 +95,7 @@ public class AgentBusInfo implements Serializable {
 
     private String finaceRemitOrgan;
 
-    private String creditRateCeiling;//贷记费率上限
+    private String creditRateCeiling;
 
     private List<Attachment> attachmentList;
 

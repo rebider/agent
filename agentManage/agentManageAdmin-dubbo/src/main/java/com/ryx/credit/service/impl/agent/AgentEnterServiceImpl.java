@@ -795,6 +795,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         if(agentVo.getAmt() != null){
             reqMap.put("amt", agentVo.getAmt());
         }
+        if(StringUtils.isNotBlank(agentVo.getRenewWay())){
+            reqMap.put("renewWay", agentVo.getRenewWay());
+        }
 
         //传递部门信息
         Map startPar = startPar(userId);
