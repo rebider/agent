@@ -398,22 +398,28 @@
       on o_sub_order_activity.sub_order_id =
       o_sub_order.id
       and o_sub_order.status = '1'
-      left join o_order_adj
-      on o_order_adj.order_id = o_sub_order.order_id
-      and o_order_adj.status = 1
-      where o_sub_order.order_id = oa.order_id
+      where o_sub_order.order_id = oa.order_id  and o_sub_order_activity.status = '1'
       ) as activity_name,
-    f.name as ag_doc_district, g.name as ag_doc_pro
+      (select ab.id
+      from a_agent_businfo ab
+      left join o_order on o_order.bus_id = ab.id
+      where o_order.id = oa.order_id) as bus_id,
+      (select dq.name
+      from c_organization dq
+      left join a_agent_businfo ab on dq.id = ab.ag_doc_district
+      left join o_order on o_order.bus_id = ab.id
+      where o_order.id = oa.order_id) as ag_doc_district,
+      (select sq.name
+      from c_organization sq
+      left join a_agent_businfo ab on sq.id = ab.ag_doc_pro
+      left join o_order on o_order.bus_id = ab.id
+      where o_order.id = oa.order_id) as ag_doc_pro
     from o_order_adj oa
     left join o_order oo on oa.order_id = oo.id
     and oo.status = 1
     left join a_agent ag on ag.id = oa.agent_id
     and ag.status = 1
     left join c_user cu on cu.id = oa.adj_user_id
-    left join a_agent_businfo ab on ab.id = oo.bus_id and ag.id = ab.agent_id
-    and ab.status = 1
-    left join c_organization f on f.id= ab.ag_doc_district
-    left join c_organization g on g.id= ab.ag_doc_pro
     <where>
       <if test="1==1"> and oa.status=1 </if>
       <if test="map.agName!=null and map.agName!=''"> and ag.ag_name like concat(concat('%',#{map.agName}),'%') </if>
