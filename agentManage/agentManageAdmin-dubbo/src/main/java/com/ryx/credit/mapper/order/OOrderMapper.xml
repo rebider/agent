@@ -1197,7 +1197,7 @@
 
     d.real_amount, d.outstanding_amount, d.actual_receipt, d.down_payment_user, d.pay_amount, d.real_amount,
     d.outstanding_amount, d.nuclear_time, d.down_payment, o.id, o.order_platform, o.o_amo, o.o_apytime,
-    b.id as agentId, b.ag_doc_pro, b.ag_doc_district, comp.com_name, cr.pay_user,
+    b.id as agentId, b.ag_doc_pro, b.ag_doc_district,
     nvl(d.pay_amount,0) as dd_amt,
     nvl((
       select sum(o_payment_detail.pay_amount)
