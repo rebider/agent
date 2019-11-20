@@ -201,7 +201,7 @@
   </select>
 
   <select id="countPlatForm" parameterType="map" resultType="Integer">
-    select count(ID) from A_PLATFORM where status=1 order by C_TIME desc
+    select count(ID) from A_PLATFORM   <include refid="selectPlatForm"/>
   </select>
 
   <!--查询-->
@@ -213,7 +213,7 @@
     select A.* ,ROWNUM rn from (select
     <include refid="Base_Column_List" />
     from A_PLATFORM
-    where status=1 order by C_TIME desc
+    <include refid="selectPlatForm"/>
     )A
     <if test='pageNumStop != null and pageNumStop!=""'>
       <![CDATA[where ROWNUM <=#{pageNumStop}]]>
@@ -224,6 +224,21 @@
     </if>
   </select>
 
+  <sql id="selectPlatForm">
+    <where>
+      status=1
+      <if test="platformNum != null and  ''!=platformNum" >
+        and PLATFORM_NUM=#{platformNum}
+      </if>
+      <if test="platformName != null and  ''!=platformName">
+        and PLATFORM_NAME LIKE CONCAT(CONCAT('%',#{platformName}),'%')
+      </if>
+      <if test="platformType != null and  ''!=platformType">
+        and PLATFORM_TYPE=#{platformType}
+      </if>
+      order by C_TIME desc
+    </where>
+  </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.PlatForm" >
     select
     <include refid="Base_Column_List" />

@@ -28,9 +28,9 @@ public interface OInternetRenewService {
 
     PageInfo internetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page,String agentId,Long userId);
 
-    PageInfo internetRenewOffsetList(InternetRenewOffset internetRenewOffset, Page page, String agentId);
+    PageInfo internetRenewOffsetList(InternetRenewOffset internetRenewOffset, Page page, String agentId,Long userId);
 
-    PageInfo internetRenewOffsetDetailList(InternetRenewOffsetDetail internetRenewOffsetDetail, Page page, String agentId);
+    PageInfo internetRenewOffsetDetailList(InternetRenewOffsetDetail internetRenewOffsetDetail, Page page, String agentId,Long userId);
 
     AgentResult saveAndApprove(OInternetRenew internetRenew, List<String> iccids, String cUser,
                                List<OCashReceivablesVo> oCashReceivablesVoList)throws MessageException;
@@ -47,19 +47,18 @@ public interface OInternetRenewService {
 
     Integer queryInternetRenewDetailCount(OInternetRenewDetail internetRenewDetail,String agentId,Long userId);
 
-    void renewVerify(String iccidNumIds)throws MessageException;
+    void renewVerify(String iccidNumIds,Long userId)throws MessageException;
 
     Map<Object, Object> getInternetRenewWay(Long cUser);
 
     void processDataInternetCardOffset();
 
-    List<InternetRenewOffsetDetail> queryInternetRenewOffsetDetailList(InternetRenewOffsetDetail internetRenewOffsetDetail, Page page,String agentId);
+    List<InternetRenewOffsetDetail> queryInternetRenewOffsetDetailList(InternetRenewOffsetDetail internetRenewOffsetDetail, Page page,String agentId,Long userId);
 
-    Integer queryInternetRenewOffsetDetailCount(InternetRenewOffsetDetail internetRenewOffsetDetail,String agentId);
+    Integer queryInternetRenewOffsetDetailCount(InternetRenewOffsetDetail internetRenewOffsetDetail,String agentId,Long userId);
 
     AgentResult queryMonthSumOffsetAmt(Map<String,Object> reqMap);
 
     AgentResult queryCardProfit(Map<String,Object> reqMap);
 
-    AgentResult disposeCardProfit(OInternetRenewDetail internetRenewDetail)throws MessageException;
 }

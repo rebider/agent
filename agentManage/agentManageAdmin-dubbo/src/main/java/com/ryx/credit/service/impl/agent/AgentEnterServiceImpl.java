@@ -432,7 +432,12 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Override
     public void verifyOrgAndBZYD(List<AgentBusInfoVo> agentBusInfoVoList, List<AgentBusInfoVo> busInfoVoList) throws Exception {
         Boolean busInfo = false;
+        List<String> stringList = new ArrayList<String>();
         for (AgentBusInfoVo agentBusInfoVo : agentBusInfoVoList) {
+            if (agentBusInfoVo.getBusType().equals(BusType.JG.key) || agentBusInfoVo.getBusType().equals(BusType.BZYD.key)) {
+                BigDecimal cloReviewStatus = agentBusInfoVo.getCloReviewStatus();
+                stringList.add(String.valueOf(cloReviewStatus));
+            }
             if (agentBusInfoVo.getBusType().equals(BusType.JG.key) || agentBusInfoVo.getBusType().equals(BusType.BZYD.key)) {
                 busInfo = true;
             }
@@ -440,7 +445,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         if (busInfo) {
             for (AgentBusInfoVo busInfoVo : busInfoVoList) {
                 if (!busInfoVo.getBusType().equals(BusType.JG.key) && !busInfoVo.getBusType().equals(BusType.BZYD.key)) {
-                    throw new ProcessException("当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台");
+//                    if (!busInfoVo.getCloReviewStatus().equals(AgStatus.Refuse.status)) {
+                        throw new ProcessException("当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台");
+//                    }
                 }
             }
         }

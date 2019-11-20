@@ -28,6 +28,9 @@
     <dubbo:reference interface="com.ryx.credit.service.agent.BusActRelService" id="busActRelService"  timeout="1200000" registry="myGroup" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.IUserService" id="iUserService"  timeout="1200000" registry="myGroup" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.dict.DepartmentService" id="departmentService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.agent.AgentBusinfoService" id="agentBusinfoService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.agent.PlatFormService" id="platFormService"  timeout="1200000" registry="myGroup" check="false"/>
+
 
     <dubbo:service interface="com.ryx.internet.service.InternetCardService" ref="internetCardService" timeout="1200000" registry="myGroup" />
     <dubbo:service interface="com.ryx.internet.service.OInternetRenewService" ref="internetRenewService" timeout="1200000" registry="myGroup" />

@@ -129,10 +129,13 @@ public interface AgentBusinfoService {
      */
     AgentBusInfo queryAgentBusInfoById(String id);
 
+    List<String> queryOrgByAgentid(Map map);
+
     /**
      * 查询品牌
      */
     public AgentBusInfo agentPlatformNum(String agentId,String platFormNum);
 
-    List<String> queryOrgByAgentid(Map map);
+
+    List<AgentBusInfo> selectByAgentBusInfo(AgentBusInfo agentBusInfo);
 }
