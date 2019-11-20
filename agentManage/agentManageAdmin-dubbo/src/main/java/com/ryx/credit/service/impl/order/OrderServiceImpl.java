@@ -4308,6 +4308,12 @@ public class OrderServiceImpl implements OrderService {
 //                    return busres;
 //                }
 //            }
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(userId));
+            if(orgCodeRes==null && orgCodeRes.size()!=1){
+                throw new ProcessException("部门参数为空");
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            String orgCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
             //完成任务
             AgentResult result = new AgentResult(500, "系统异常", "");
             Map<String, Object> reqMap = new HashMap<>();
@@ -4345,12 +4351,14 @@ public class OrderServiceImpl implements OrderService {
                     }
                 }
             }
-            if(String.valueOf(OrderAdjRefundType.CDFQ_GZ.code).equals(orderUpModelVo.getRefundType())){
-                reqMap.put("remit",false);
-            }else if(String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
-                reqMap.put("remit",true);
+            //财务审批
+            if(orgCode.equals("finance")){
+                if(String.valueOf(OrderAdjRefundType.CDFQ_GZ.code).equals(orderUpModelVo.getRefundType())){
+                    reqMap.put("remit",false);
+                }else if(String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
+                    reqMap.put("remit",true);
+                }
             }
-
             //完成任务
             Map resultMap = activityService.completeTask(orderUpModelVo.getTaskId(), reqMap);
             if (resultMap == null) {
