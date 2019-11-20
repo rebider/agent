@@ -565,7 +565,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                     if(!internetRenew.getRenewWay().equals(InternetRenewWay.XXBK.getValue())){
                         if(StringUtils.isBlank(oInternetCard.getAgentId()) || StringUtils.isBlank(oInternetCard.getAgentName())
                           || StringUtils.isBlank(oInternetCard.getMerId()) || StringUtils.isBlank(oInternetCard.getMerName()))
-                        throw new MessageException("您只能选择线下打款支付方式,如有问题请联系管理员");
+                        throw new MessageException("缺少代理商编号/代理商名称/商户编号/商户名称,只能选择线下打款支付方式,如有问题请联系管理员");
                     }
                 }
                 OInternetRenewDetailExample oInternetRenewDetailExample = new OInternetRenewDetailExample();
