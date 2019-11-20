@@ -466,8 +466,13 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
         <if test="map.busTypes !=null and map.busTypes.size > 0">
             and exists (select  ap.anno_id
             from a_anno_platform_rela ap
+            left join c_user_agent cg
+            on  cg.userid = cu.id
+            left join A_agent_businfo ab
+            on ap.rang_value = ab.BUS_TYPE and cg.agentid = ab.agent_id
+            and ab.status = '1'
             where  a.ann_id = ap.anno_id and
-            ap.rang_type = '0' and (
+            ap.rang_type = '0'  and ab.bus_status = '1' and (
                 <foreach collection="map.busTypes" separator="or" item="busType"  >
                     #{busType} = ap.rang_value
                 </foreach>)
@@ -476,8 +481,15 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
         <if test="map.platfromPerm !=null and map.platfromPerm.size > 0">
             and exists (select ap.anno_id
             from a_anno_platform_rela ap
+            left join A_agent_businfo ab
+            on ap.rang_value = ab.bus_platform and  ab.bus_status = '1'
+            left join c_user_agent cg
+            on  cg.userid = cu.id
+            left join A_agent_businfo ab
+            on ap.rang_value = ab.bus_platform and cg.agentid = ab.agent_id
+            and ab.status = '1'
             where  a.ann_id = ap.anno_id and
-            ap.rang_type = '1' and (
+            ap.rang_type = '1' and ab.bus_status = '1' and (
             <foreach collection="map.platfromPerm" separator=" or " item="platfromPermItem"  >
                 #{platfromPermItem} = ap.rang_value
             </foreach>)
