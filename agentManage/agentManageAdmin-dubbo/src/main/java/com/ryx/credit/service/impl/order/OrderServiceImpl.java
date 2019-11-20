@@ -3987,9 +3987,10 @@ public class OrderServiceImpl implements OrderService {
         orderAdj.setOrgOAmo(order.getoAmo());                        //原订单总计金额
         orderAdj.setOrgIncentiveAmo(order.getIncentiveAmo());        //原订单优惠金额
         orderAdj.setOrgPayAmo(order.getPayAmo());                    //原订单应付金额
-        orderAdj.setOrgPlanNum(new BigDecimal(oPaymentDetails.size()));//分期次数
+        orderAdj.setOrgPlanNum(new BigDecimal(oPaymentDetails.size()));//剩余分期次数
         orderAdj.setStagesAmount(new BigDecimal(orderUpModelVo.getAdjRepayment()));//预计分期金额
         orderAdj.setRefundAmount(new BigDecimal(orderUpModelVo.getRefundAmount()));//退款金额
+        orderAdj.setOrgPaymentId(oPaymentDetails.get(0).getBatchCode());//原还款计划批次号
         orderAdj.setReson(orderUpModelVo.getReson());
         orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundMethod()));
         orderAdj.setStatus(Status.STATUS_1.status);
@@ -4400,12 +4401,16 @@ public class OrderServiceImpl implements OrderService {
                 logger.info("订单调整审批完成:付款单明细未找到:{}", orderAdj.getId());
                 throw new MessageException("付款单明细未找到！");
             }
-
+            Calendar orderdate = Calendar.getInstance();
+            Calendar d = Calendar.getInstance();
+            Calendar temp = Calendar.getInstance();
+            String batchCode = d.getTime().getTime() + "";
             orderAdj.setAdjTm(new Date());
             orderAdj.setReviewsStat(AgStatus.Approved.status);
             orderAdj.setReviewsDate(new Date());
-            BigDecimal difAmount = orderAdjDetailMapper.sumDifAmount(orderAdj.getId());
+            orderAdj.setNewPaymentId(batchCode);
             orderAdjMapper.updateByPrimaryKey(orderAdj);//更新调整数据为审批通过
+            BigDecimal difAmount = orderAdjDetailMapper.sumDifAmount(orderAdj.getId());
             OPayment oPayment = oPaymentList.get(0);
             oPayment.setPayAmount(oPayment.getPayAmount().subtract(difAmount));//应付金额=原应付金额-差价金额
             oPayment.setOutstandingAmount(oPayment.getOutstandingAmount().subtract(difAmount));//欠款金额=原欠款金额-差价
@@ -4424,10 +4429,6 @@ public class OrderServiceImpl implements OrderService {
                 forRealPayAmount = forRealPayAmount.add(oSubOrder.getProRelPrice().multiply(oSubOrder.getProNum()));
                 oSubOrderMapper.updateByPrimaryKeySelective(oSubOrder);//更新子订单数量为调整后
             }
-            Calendar orderdate = Calendar.getInstance();
-            Calendar d = Calendar.getInstance();
-            Calendar temp = Calendar.getInstance();
-            String batchCode = d.getTime().getTime() + "";
             Date orderTime = DateUtil.getDateFromStr(DateUtil.format(orderdate.getTime(), "yyyy-MM-dd"), "yyyy-MM-dd");
             //更新订单信息
             OOrder order = orderMapper.selectByPrimaryKey(orderAdj.getOrderId());
