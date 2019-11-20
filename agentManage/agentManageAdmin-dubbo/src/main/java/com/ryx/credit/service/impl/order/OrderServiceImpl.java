@@ -4145,6 +4145,11 @@ public class OrderServiceImpl implements OrderService {
 
         Agent agent = agentMapper.selectByPrimaryKey(orderAdj.getAgentId());
         OOrder order = orderMapper.selectByPrimaryKey(orderAdj.getOrderId());
+        order.setOrderStatus(OrderStatus.LOCK.status);
+        if (1 != orderMapper.updateByPrimaryKeySelective(order)){
+            logger.info("更新订单为锁定状态失败:{}", orderAdj.getOrderId());
+            throw new MessageException("更新订单为锁定状态失败！");
+        };
         AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
         //添加审批关系
         BusActRel record = new BusActRel();
@@ -4339,7 +4344,12 @@ public class OrderServiceImpl implements OrderService {
                     }
                 }
             }
-            reqMap.put("remit",false);
+            if(String.valueOf(OrderAdjRefundType.CDFQ_GZ.code).equals(orderUpModelVo.getRefundType())){
+                reqMap.put("remit",false);
+            }else if(String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
+                reqMap.put("remit",true);
+            }
+
             //完成任务
             Map resultMap = activityService.completeTask(orderUpModelVo.getTaskId(), reqMap);
             if (resultMap == null) {
@@ -4424,6 +4434,7 @@ public class OrderServiceImpl implements OrderService {
             order.setIncentiveAmo(forPayAmount.subtract(forRealPayAmount));
             order.setoAmo(forPayAmount);
             order.setPayAmo(forRealPayAmount);
+            order.setOrderStatus(OrderStatus.ENABLE.status);
             if( 1 != orderMapper.updateByPrimaryKeySelective(order)){
 
                 throw new MessageException("分期数有误");

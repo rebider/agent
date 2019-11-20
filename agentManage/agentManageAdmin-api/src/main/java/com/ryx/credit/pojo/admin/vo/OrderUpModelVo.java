@@ -29,6 +29,15 @@ public class OrderUpModelVo implements Serializable {
     private String dept;
     private String flag;
     private String orderAdjAprDept;//订单调整审批下个审批部门参数
+    private String refundType;
+
+    public String getRefundType() {
+        return refundType;
+    }
+
+    public void setRefundType(String refundType) {
+        this.refundType = refundType;
+    }
 
     public String getOrderAdjAprDept() {
         return orderAdjAprDept;
