@@ -398,10 +398,7 @@
       on o_sub_order_activity.sub_order_id =
       o_sub_order.id
       and o_sub_order.status = '1'
-      left join o_order_adj
-      on o_order_adj.order_id = o_sub_order.order_id
-      and o_order_adj.status = 1
-      where o_sub_order.order_id = oa.order_id
+      where o_sub_order.order_id = oa.order_id  and o_sub_order_activity.status = '1'
       ) as activity_name,
     f.name as ag_doc_district, g.name as ag_doc_pro
     from o_order_adj oa
