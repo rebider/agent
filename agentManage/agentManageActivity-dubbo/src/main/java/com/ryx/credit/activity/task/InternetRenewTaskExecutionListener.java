@@ -36,12 +36,12 @@ public class InternetRenewTaskExecutionListener extends BaseTaskListener impleme
             OInternetRenewService internetRenewService = (OInternetRenewService) MySpringContextHandler.applicationContext.getBean("internetRenewService");
             //审批拒绝
             if ("reject_end".equals(activityName)) {
-                AgentResult res = internetRenewService.compressCompensateActivity(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.status);
+                AgentResult res = internetRenewService.compressCompensateActivity(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.status,"app",null);
                 logger.info("=========InternetRenewTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
             }
             //审批同意更新数据库
             if ("finish_end".equals(activityName)) {
-                AgentResult res = internetRenewService.compressCompensateActivity(delegateExecution.getProcessInstanceId(), AgStatus.Approved.status);
+                AgentResult res = internetRenewService.compressCompensateActivity(delegateExecution.getProcessInstanceId(), AgStatus.Approved.status,"app",null);
                 logger.info("=========InternetRenewTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
             }
         } else if ("take".equals(eventName)) {
