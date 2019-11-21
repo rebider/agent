@@ -1402,7 +1402,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         .andStatusEqualTo(Status.STATUS_1.status);
 
                 List<OSubOrderActivity>  new_order_activitys = subOrderActivityMapper.selectByExample(oSubOrderActivityExample_new);
-                if(new_order_activitys.size()!=0){
+                if(new_order_activitys.size()==0){
                     throw new MessageException("排单订单活动未找到!");
                 }
                 OSubOrderActivity new_order_subactivity = new_order_activitys.get(0);
