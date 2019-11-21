@@ -6,7 +6,7 @@
     <result column="S_TYPE" jdbcType="DECIMAL" property="sType" />
     <result column="S_AMOUNT" jdbcType="DECIMAL" property="sAmount" />
     <result column="S_TM" jdbcType="TIMESTAMP" property="sTm" />
-    <result column="C_STATUS" jdbcType="DECIMAL" property="cStatus" />
+    <result column="S_STATUS" jdbcType="DECIMAL" property="sStatus" />
     <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
     <result column="SRC_ID" jdbcType="VARCHAR" property="srcId" />
     <result column="TAR_ID" jdbcType="VARCHAR" property="tarId" />
@@ -48,7 +48,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, S_TYPE, S_AMOUNT, S_TM, C_STATUS, AGENT_ID, SRC_ID, TAR_ID, C_TM, C_USER, C_UTM, 
+    ID, S_TYPE, S_AMOUNT, S_TM, S_STATUS, AGENT_ID, SRC_ID, TAR_ID, C_TM, C_USER, C_UTM, 
     C_OPERATOR, REMARK, STATUS, VERSION
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.SettleAccountsExample" resultMap="BaseResultMap">
@@ -81,13 +81,13 @@
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.SettleAccounts">
     insert into O_SETTLE_ACCOUNTS (ID, S_TYPE, S_AMOUNT, 
-      S_TM, C_STATUS, AGENT_ID, 
+      S_TM, S_STATUS, AGENT_ID, 
       SRC_ID, TAR_ID, C_TM, 
       C_USER, C_UTM, C_OPERATOR, 
       REMARK, STATUS, VERSION
       )
     values (#{id,jdbcType=VARCHAR}, #{sType,jdbcType=DECIMAL}, #{sAmount,jdbcType=DECIMAL}, 
-      #{sTm,jdbcType=TIMESTAMP}, #{cStatus,jdbcType=DECIMAL}, #{agentId,jdbcType=VARCHAR}, 
+      #{sTm,jdbcType=TIMESTAMP}, #{sStatus,jdbcType=DECIMAL}, #{agentId,jdbcType=VARCHAR}, 
       #{srcId,jdbcType=VARCHAR}, #{tarId,jdbcType=VARCHAR}, #{cTm,jdbcType=TIMESTAMP}, 
       #{cUser,jdbcType=VARCHAR}, #{cUtm,jdbcType=TIMESTAMP}, #{cOperator,jdbcType=VARCHAR}, 
       #{remark,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}
@@ -108,8 +108,8 @@
       <if test="sTm != null">
         S_TM,
       </if>
-      <if test="cStatus != null">
-        C_STATUS,
+      <if test="sStatus != null">
+        S_STATUS,
       </if>
       <if test="agentId != null">
         AGENT_ID,
@@ -155,8 +155,8 @@
       <if test="sTm != null">
         #{sTm,jdbcType=TIMESTAMP},
       </if>
-      <if test="cStatus != null">
-        #{cStatus,jdbcType=DECIMAL},
+      <if test="sStatus != null">
+        #{sStatus,jdbcType=DECIMAL},
       </if>
       <if test="agentId != null">
         #{agentId,jdbcType=VARCHAR},
@@ -208,8 +208,8 @@
       <if test="sTm != null">
         S_TM = #{sTm,jdbcType=TIMESTAMP},
       </if>
-      <if test="cStatus != null">
-        C_STATUS = #{cStatus,jdbcType=DECIMAL},
+      <if test="sStatus != null">
+        S_STATUS = #{sStatus,jdbcType=DECIMAL},
       </if>
       <if test="agentId != null">
         AGENT_ID = #{agentId,jdbcType=VARCHAR},
@@ -249,7 +249,7 @@
     set S_TYPE = #{sType,jdbcType=DECIMAL},
       S_AMOUNT = #{sAmount,jdbcType=DECIMAL},
       S_TM = #{sTm,jdbcType=TIMESTAMP},
-      C_STATUS = #{cStatus,jdbcType=DECIMAL},
+      S_STATUS = #{sStatus,jdbcType=DECIMAL},
       AGENT_ID = #{agentId,jdbcType=VARCHAR},
       SRC_ID = #{srcId,jdbcType=VARCHAR},
       TAR_ID = #{tarId,jdbcType=VARCHAR},

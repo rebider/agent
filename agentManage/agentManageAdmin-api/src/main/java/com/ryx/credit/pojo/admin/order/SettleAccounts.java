@@ -1,9 +1,10 @@
 package com.ryx.credit.pojo.admin.order;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class SettleAccounts {
+public class SettleAccounts implements Serializable {
     private String id;
 
     private BigDecimal sType;
@@ -12,7 +13,7 @@ public class SettleAccounts {
 
     private Date sTm;
 
-    private BigDecimal cStatus;
+    private BigDecimal sStatus;
 
     private String agentId;
 
@@ -66,12 +67,12 @@ public class SettleAccounts {
         this.sTm = sTm;
     }
 
-    public BigDecimal getcStatus() {
-        return cStatus;
+    public BigDecimal getsStatus() {
+        return sStatus;
     }
 
-    public void setcStatus(BigDecimal cStatus) {
-        this.cStatus = cStatus;
+    public void setsStatus(BigDecimal sStatus) {
+        this.sStatus = sStatus;
     }
 
     public String getAgentId() {

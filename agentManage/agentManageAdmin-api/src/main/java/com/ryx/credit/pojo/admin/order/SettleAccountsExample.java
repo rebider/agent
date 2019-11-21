@@ -387,63 +387,63 @@ public class SettleAccountsExample {
             return (Criteria) this;
         }
 
-        public Criteria andCStatusIsNull() {
-            addCriterion("C_STATUS is null");
+        public Criteria andSStatusIsNull() {
+            addCriterion("S_STATUS is null");
             return (Criteria) this;
         }
 
-        public Criteria andCStatusIsNotNull() {
-            addCriterion("C_STATUS is not null");
+        public Criteria andSStatusIsNotNull() {
+            addCriterion("S_STATUS is not null");
             return (Criteria) this;
         }
 
-        public Criteria andCStatusEqualTo(BigDecimal value) {
-            addCriterion("C_STATUS =", value, "cStatus");
+        public Criteria andSStatusEqualTo(BigDecimal value) {
+            addCriterion("S_STATUS =", value, "sStatus");
             return (Criteria) this;
         }
 
-        public Criteria andCStatusNotEqualTo(BigDecimal value) {
-            addCriterion("C_STATUS <>", value, "cStatus");
+        public Criteria andSStatusNotEqualTo(BigDecimal value) {
+            addCriterion("S_STATUS <>", value, "sStatus");
             return (Criteria) this;
         }
 
-        public Criteria andCStatusGreaterThan(BigDecimal value) {
-            addCriterion("C_STATUS >", value, "cStatus");
+        public Criteria andSStatusGreaterThan(BigDecimal value) {
+            addCriterion("S_STATUS >", value, "sStatus");
             return (Criteria) this;
         }
 
-        public Criteria andCStatusGreaterThanOrEqualTo(BigDecimal value) {
-            addCriterion("C_STATUS >=", value, "cStatus");
+        public Criteria andSStatusGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("S_STATUS >=", value, "sStatus");
             return (Criteria) this;
         }
 
-        public Criteria andCStatusLessThan(BigDecimal value) {
-            addCriterion("C_STATUS <", value, "cStatus");
+        public Criteria andSStatusLessThan(BigDecimal value) {
+            addCriterion("S_STATUS <", value, "sStatus");
             return (Criteria) this;
         }
 
-        public Criteria andCStatusLessThanOrEqualTo(BigDecimal value) {
-            addCriterion("C_STATUS <=", value, "cStatus");
+        public Criteria andSStatusLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("S_STATUS <=", value, "sStatus");
             return (Criteria) this;
         }
 
-        public Criteria andCStatusIn(List<BigDecimal> values) {
-            addCriterion("C_STATUS in", values, "cStatus");
+        public Criteria andSStatusIn(List<BigDecimal> values) {
+            addCriterion("S_STATUS in", values, "sStatus");
             return (Criteria) this;
         }
 
-        public Criteria andCStatusNotIn(List<BigDecimal> values) {
-            addCriterion("C_STATUS not in", values, "cStatus");
+        public Criteria andSStatusNotIn(List<BigDecimal> values) {
+            addCriterion("S_STATUS not in", values, "sStatus");
             return (Criteria) this;
         }
 
-        public Criteria andCStatusBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("C_STATUS between", value1, value2, "cStatus");
+        public Criteria andSStatusBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("S_STATUS between", value1, value2, "sStatus");
             return (Criteria) this;
         }
 
-        public Criteria andCStatusNotBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("C_STATUS not between", value1, value2, "cStatus");
+        public Criteria andSStatusNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("S_STATUS not between", value1, value2, "sStatus");
             return (Criteria) this;
         }
 
