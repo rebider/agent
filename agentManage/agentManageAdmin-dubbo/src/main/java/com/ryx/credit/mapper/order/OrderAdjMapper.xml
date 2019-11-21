@@ -420,6 +420,7 @@
     oa.adj_tm,
     oa.REVIEWS_STAT,
     oa.agent_id,
+    oa.adj_user_id,
     (select ab.bus_platform
     from a_agent_businfo ab
     left join o_order on o_order.bus_id = ab.id
