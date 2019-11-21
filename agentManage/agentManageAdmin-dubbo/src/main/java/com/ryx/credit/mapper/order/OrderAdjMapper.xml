@@ -25,6 +25,10 @@
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="ORG_PLAN_NUM" jdbcType="DECIMAL" property="orgPlanNum" />
     <result column="STAGES_AMOUNT" jdbcType="DECIMAL" property="stagesAmount" />
+    <result column="REFUND_TM" jdbcType="TIMESTAMP" property="refundTm" />
+    <result column="SETTLE_AMOUNT" jdbcType="DECIMAL" property="settleAmount" />
+    <result column="REAL_REFUND_AMO" jdbcType="DECIMAL" property="realRefundAmo" />
+    <result column="REFUND_METHOD" jdbcType="DECIMAL" property="refundMethod" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -59,7 +63,7 @@
     ID, ORDER_ID, AGENT_ID, ADJ_USER_ID, ORG_O_AMO, ORG_INCENTIVE_AMO, ORG_PAY_AMO, O_AMO, 
     INCENTIVE_AMO, PAY_AMO, RESON, REFUND_AMOUNT, REFUND_TYPE, REFUND_STAT, ORG_PAYMENT_ID, 
     NEW_PAYMENT_ID, REVIEWS_STAT, REVIEWS_DATE, ADJ_TM, STATUS, VERSION, ORG_PLAN_NUM, 
-    STAGES_AMOUNT
+    STAGES_AMOUNT, REFUND_TM, SETTLE_AMOUNT, REAL_REFUND_AMO, REFUND_METHOD
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -97,7 +101,9 @@
       REFUND_TYPE, REFUND_STAT, ORG_PAYMENT_ID, 
       NEW_PAYMENT_ID, REVIEWS_STAT, REVIEWS_DATE, 
       ADJ_TM, STATUS, VERSION, 
-      ORG_PLAN_NUM, STAGES_AMOUNT)
+      ORG_PLAN_NUM, STAGES_AMOUNT, REFUND_TM, 
+      SETTLE_AMOUNT, REAL_REFUND_AMO, REFUND_METHOD
+      )
     values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
       #{adjUserId,jdbcType=VARCHAR}, #{orgOAmo,jdbcType=DECIMAL}, #{orgIncentiveAmo,jdbcType=DECIMAL}, 
       #{orgPayAmo,jdbcType=DECIMAL}, #{oAmo,jdbcType=DECIMAL}, #{incentiveAmo,jdbcType=DECIMAL}, 
@@ -105,7 +111,9 @@
       #{refundType,jdbcType=DECIMAL}, #{refundStat,jdbcType=DECIMAL}, #{orgPaymentId,jdbcType=VARCHAR}, 
       #{newPaymentId,jdbcType=VARCHAR}, #{reviewsStat,jdbcType=DECIMAL}, #{reviewsDate,jdbcType=TIMESTAMP}, 
       #{adjTm,jdbcType=TIMESTAMP}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, 
-      #{orgPlanNum,jdbcType=DECIMAL}, #{stagesAmount,jdbcType=DECIMAL})
+      #{orgPlanNum,jdbcType=DECIMAL}, #{stagesAmount,jdbcType=DECIMAL}, #{refundTm,jdbcType=TIMESTAMP}, 
+      #{settleAmount,jdbcType=DECIMAL}, #{realRefundAmo,jdbcType=DECIMAL}, #{refundMethod,jdbcType=DECIMAL}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OrderAdj">
     insert into O_ORDER_ADJ
@@ -179,6 +187,18 @@
       <if test="stagesAmount != null">
         STAGES_AMOUNT,
       </if>
+      <if test="refundTm != null">
+        REFUND_TM,
+      </if>
+      <if test="settleAmount != null">
+        SETTLE_AMOUNT,
+      </if>
+      <if test="realRefundAmo != null">
+        REAL_REFUND_AMO,
+      </if>
+      <if test="refundMethod != null">
+        REFUND_METHOD,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -249,6 +269,18 @@
       </if>
       <if test="stagesAmount != null">
         #{stagesAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="refundTm != null">
+        #{refundTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="settleAmount != null">
+        #{settleAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="realRefundAmo != null">
+        #{realRefundAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="refundMethod != null">
+        #{refundMethod,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -327,6 +359,18 @@
       <if test="stagesAmount != null">
         STAGES_AMOUNT = #{stagesAmount,jdbcType=DECIMAL},
       </if>
+      <if test="refundTm != null">
+        REFUND_TM = #{refundTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="settleAmount != null">
+        SETTLE_AMOUNT = #{settleAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="realRefundAmo != null">
+        REAL_REFUND_AMO = #{realRefundAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="refundMethod != null">
+        REFUND_METHOD = #{refundMethod,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -353,7 +397,11 @@
       STATUS = #{status,jdbcType=DECIMAL},
       VERSION = #{version,jdbcType=DECIMAL},
       ORG_PLAN_NUM = #{orgPlanNum,jdbcType=DECIMAL},
-      STAGES_AMOUNT = #{stagesAmount,jdbcType=DECIMAL}
+      STAGES_AMOUNT = #{stagesAmount,jdbcType=DECIMAL},
+      REFUND_TM = #{refundTm,jdbcType=TIMESTAMP},
+      SETTLE_AMOUNT = #{settleAmount,jdbcType=DECIMAL},
+      REAL_REFUND_AMO = #{realRefundAmo,jdbcType=DECIMAL},
+      REFUND_METHOD = #{refundMethod,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
