@@ -4378,6 +4378,7 @@ public class OrderServiceImpl implements OrderService {
                     settleAccounts.setsType(SettleType.ORDER_ADJUST.key);//挂账类型:订单调整
                     settleAccounts.setsTm(orderdate.getTime());
                     settleAccounts.setcTm(orderdate.getTime());
+                    settleAccounts.setsStatus(Status.STATUS_0.status);
                     settleAccounts.setcUser(userId);
                     settleAccounts.setsAmount(new BigDecimal(orderUpModelVo.getSettleAmount()));
                     settleAccounts.setSrcId(orderAdj.getId());//数据源id
