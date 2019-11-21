@@ -253,7 +253,7 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         if (agent==null){
             return  pageInfo;
         }
-        String agUniqNum = agent.getAgUniqNum();
+        String agUniqNum = agent.getId();
         Map<String,Object> map = new HashMap<>();
         map.put("agentId",agUniqNum);
         logger.info("代理商查看公告,唯一编码{}",agUniqNum);
