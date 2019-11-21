@@ -1586,6 +1586,246 @@ public class OrderAdjExample {
             addCriterion("STAGES_AMOUNT not between", value1, value2, "stagesAmount");
             return (Criteria) this;
         }
+
+        public Criteria andRefundTmIsNull() {
+            addCriterion("REFUND_TM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundTmIsNotNull() {
+            addCriterion("REFUND_TM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundTmEqualTo(Date value) {
+            addCriterion("REFUND_TM =", value, "refundTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundTmNotEqualTo(Date value) {
+            addCriterion("REFUND_TM <>", value, "refundTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundTmGreaterThan(Date value) {
+            addCriterion("REFUND_TM >", value, "refundTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundTmGreaterThanOrEqualTo(Date value) {
+            addCriterion("REFUND_TM >=", value, "refundTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundTmLessThan(Date value) {
+            addCriterion("REFUND_TM <", value, "refundTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundTmLessThanOrEqualTo(Date value) {
+            addCriterion("REFUND_TM <=", value, "refundTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundTmIn(List<Date> values) {
+            addCriterion("REFUND_TM in", values, "refundTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundTmNotIn(List<Date> values) {
+            addCriterion("REFUND_TM not in", values, "refundTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundTmBetween(Date value1, Date value2) {
+            addCriterion("REFUND_TM between", value1, value2, "refundTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundTmNotBetween(Date value1, Date value2) {
+            addCriterion("REFUND_TM not between", value1, value2, "refundTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleAmountIsNull() {
+            addCriterion("SETTLE_AMOUNT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleAmountIsNotNull() {
+            addCriterion("SETTLE_AMOUNT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleAmountEqualTo(BigDecimal value) {
+            addCriterion("SETTLE_AMOUNT =", value, "settleAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleAmountNotEqualTo(BigDecimal value) {
+            addCriterion("SETTLE_AMOUNT <>", value, "settleAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleAmountGreaterThan(BigDecimal value) {
+            addCriterion("SETTLE_AMOUNT >", value, "settleAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleAmountGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("SETTLE_AMOUNT >=", value, "settleAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleAmountLessThan(BigDecimal value) {
+            addCriterion("SETTLE_AMOUNT <", value, "settleAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleAmountLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("SETTLE_AMOUNT <=", value, "settleAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleAmountIn(List<BigDecimal> values) {
+            addCriterion("SETTLE_AMOUNT in", values, "settleAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleAmountNotIn(List<BigDecimal> values) {
+            addCriterion("SETTLE_AMOUNT not in", values, "settleAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleAmountBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SETTLE_AMOUNT between", value1, value2, "settleAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleAmountNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SETTLE_AMOUNT not between", value1, value2, "settleAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealRefundAmoIsNull() {
+            addCriterion("REAL_REFUND_AMO is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealRefundAmoIsNotNull() {
+            addCriterion("REAL_REFUND_AMO is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealRefundAmoEqualTo(BigDecimal value) {
+            addCriterion("REAL_REFUND_AMO =", value, "realRefundAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealRefundAmoNotEqualTo(BigDecimal value) {
+            addCriterion("REAL_REFUND_AMO <>", value, "realRefundAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealRefundAmoGreaterThan(BigDecimal value) {
+            addCriterion("REAL_REFUND_AMO >", value, "realRefundAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealRefundAmoGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("REAL_REFUND_AMO >=", value, "realRefundAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealRefundAmoLessThan(BigDecimal value) {
+            addCriterion("REAL_REFUND_AMO <", value, "realRefundAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealRefundAmoLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("REAL_REFUND_AMO <=", value, "realRefundAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealRefundAmoIn(List<BigDecimal> values) {
+            addCriterion("REAL_REFUND_AMO in", values, "realRefundAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealRefundAmoNotIn(List<BigDecimal> values) {
+            addCriterion("REAL_REFUND_AMO not in", values, "realRefundAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealRefundAmoBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("REAL_REFUND_AMO between", value1, value2, "realRefundAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealRefundAmoNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("REAL_REFUND_AMO not between", value1, value2, "realRefundAmo");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundMethodIsNull() {
+            addCriterion("REFUND_METHOD is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundMethodIsNotNull() {
+            addCriterion("REFUND_METHOD is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundMethodEqualTo(BigDecimal value) {
+            addCriterion("REFUND_METHOD =", value, "refundMethod");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundMethodNotEqualTo(BigDecimal value) {
+            addCriterion("REFUND_METHOD <>", value, "refundMethod");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundMethodGreaterThan(BigDecimal value) {
+            addCriterion("REFUND_METHOD >", value, "refundMethod");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundMethodGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("REFUND_METHOD >=", value, "refundMethod");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundMethodLessThan(BigDecimal value) {
+            addCriterion("REFUND_METHOD <", value, "refundMethod");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundMethodLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("REFUND_METHOD <=", value, "refundMethod");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundMethodIn(List<BigDecimal> values) {
+            addCriterion("REFUND_METHOD in", values, "refundMethod");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundMethodNotIn(List<BigDecimal> values) {
+            addCriterion("REFUND_METHOD not in", values, "refundMethod");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundMethodBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("REFUND_METHOD between", value1, value2, "refundMethod");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundMethodNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("REFUND_METHOD not between", value1, value2, "refundMethod");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

@@ -51,6 +51,14 @@ public class OrderAdj implements Serializable {
 
     private BigDecimal stagesAmount;
 
+    private Date refundTm;
+
+    private BigDecimal settleAmount;
+
+    private BigDecimal realRefundAmo;
+
+    private BigDecimal refundMethod;
+
     public String getId() {
         return id;
     }
@@ -233,5 +241,37 @@ public class OrderAdj implements Serializable {
 
     public void setStagesAmount(BigDecimal stagesAmount) {
         this.stagesAmount = stagesAmount;
+    }
+
+    public Date getRefundTm() {
+        return refundTm;
+    }
+
+    public void setRefundTm(Date refundTm) {
+        this.refundTm = refundTm;
+    }
+
+    public BigDecimal getSettleAmount() {
+        return settleAmount;
+    }
+
+    public void setSettleAmount(BigDecimal settleAmount) {
+        this.settleAmount = settleAmount;
+    }
+
+    public BigDecimal getRealRefundAmo() {
+        return realRefundAmo;
+    }
+
+    public void setRealRefundAmo(BigDecimal realRefundAmo) {
+        this.realRefundAmo = realRefundAmo;
+    }
+
+    public BigDecimal getRefundMethod() {
+        return refundMethod;
+    }
+
+    public void setRefundMethod(BigDecimal refundMethod) {
+        this.refundMethod = refundMethod;
     }
 }
