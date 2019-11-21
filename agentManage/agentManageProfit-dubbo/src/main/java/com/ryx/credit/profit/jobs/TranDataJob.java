@@ -670,7 +670,8 @@ public class TranDataJob {
             map.put("application","queryTradeInfo");
             map.put("brandCode",brandCode);
             map.put("tradeMonth",new SimpleDateFormat("yyyyMM").format(tranMon));
-            String json = JsonUtil.objectToJson(map);         String reqParamEncrypt = Des3Util.Encrypt(json, rhb3desKey, rhb3desIv.getBytes());
+            String json = JsonUtil.objectToJson(map);
+            String reqParamEncrypt = Des3Util.Encrypt(json, rhb3desKey, rhb3desIv.getBytes());
             LOG.info("瑞花宝交易量手续费查询参数：{}",json);
             LOG.info("瑞花宝交易量手续费查询参数加密：{}",reqParamEncrypt);
             String httpResult = HttpClientUtil.sendHttpPost(rhbReqUrl, reqParamEncrypt);

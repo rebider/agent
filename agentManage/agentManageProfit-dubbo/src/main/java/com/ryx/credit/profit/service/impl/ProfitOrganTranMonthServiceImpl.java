@@ -59,6 +59,10 @@ public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthServ
     ProfitMposDiffDataJob profitMposDiffDataJob;
     @Autowired
     ProfitSummaryDataJob profitSummaryDataJob;
+    @Autowired
+    ProfitMonthRdbPosDataJob profitMonthRdbPosDataJob;
+    @Autowired
+    ProfitMonthRhbPosDataJob profitMonthRhbPosDataJob;
 
     @Override
     public void insert(ProfitOrganTranMonth profitOrganTranMonth) {
@@ -138,6 +142,10 @@ public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthServ
                 profitMposDiffDataJob.excute(month);
             } else if ("7".equals(type)) {//手刷月汇总重算
                 profitSummaryDataJob.excute(month);
+            }else if ("8".equals(type)) {//瑞大宝月分润数据重新同步
+                profitMonthRdbPosDataJob.excute(month);
+            }else if ("9".equals(type)) {//瑞花宝月分润数据重新同步
+                profitMonthRhbPosDataJob.excute(month);
             }
         } catch (Exception e) {
             e.printStackTrace();
