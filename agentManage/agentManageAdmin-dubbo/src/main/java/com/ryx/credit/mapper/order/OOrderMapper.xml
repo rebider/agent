@@ -1134,7 +1134,7 @@
     order by O_Receipt_order.Address_Id asc, o_receipt_pro.c_time desc
   </select>
 
-  <!--订单发货的导出-->
+  <!--订单导出-->
   <select id="excelOrder" parameterType="map" resultMap="OrderoutVo">
     (
     select
@@ -1230,7 +1230,6 @@
     nvl(d.outstanding_amount,0) as syqk_amt,
     o.review_status,
     to_char(o.o_inuretime,'YYYY-MM-DD') as oinuretime,
-    org.name as agdocppro,
     oan.org_name,
     o.remark,
     d.pay_method,
@@ -1252,10 +1251,25 @@
       select sum(o_receipt_pro.pro_num)-sum(o_receipt_pro.send_num) from o_receipt_pro
       where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)
     ),0) as to_plan_num,
+    o.user_id as order_user,
+    to_char(o.o_apytime,'YYYY-MM-DD') as orderDate,
+    orging.name as ag_doc_district,
+    org.name as ag_doc_pro,
+    nvl((
+    select LISTAGG(o_sub_order.pro_code,',') WITHIN GROUP (ORDER BY o_sub_order.order_id)
+    from o_sub_order
+    left join o_order on o_sub_order.order_id = o_order.id and o_sub_order.status=1 and o_order.status=1
+    where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
+    ),0) as pro_code,
+    nvl((
+    select LISTAGG(o_sub_order.pro_name,',') WITHIN GROUP (ORDER BY o_sub_order.order_id)
+    from o_sub_order
+    left join o_order on o_sub_order.order_id = o_order.id and o_sub_order.status=1 and o_order.status=1
+    where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
+    ),0) as pro_name,
 
     d.real_amount, d.outstanding_amount, d.actual_receipt, d.down_payment_user, d.pay_amount, d.real_amount,
-    d.outstanding_amount, d.nuclear_time, d.down_payment, o.id, o.order_platform, o.o_amo, o.o_apytime,
-    b.id as agentId, b.ag_doc_pro, b.ag_doc_district,
+    d.outstanding_amount, d.nuclear_time, d.down_payment, o.o_amo, o.o_apytime,
     nvl(d.pay_amount,0) as dd_amt,
     nvl((
       select sum(o_payment_detail.pay_amount)
@@ -1296,7 +1310,7 @@
     left join a_platform c on c.platform_num = o.order_platform
     left join o_payment d on d.order_id = o.id and d.status=1
     left join o_cash_receivables cr on d.id = cr.src_id and cr.cashpay_type='PAYMENT' and cr.status = 1
-    left join a_pay_comp comp on comp.id = cr.collect_company and comp.status=1
+    left join a_pay_comp comp on comp.id = cr.collect_company
     left join a_agent_businfo aab on aab.agent_id = o.agent_id and aab.id = o.bus_id and aab.status = 1
     left join c_organization org on org.id = aab.ag_doc_pro
     left join c_organization orging on orging.id = aab.ag_doc_district
@@ -1363,7 +1377,6 @@
     <result column="nuclear_user" property="nuclearUser" jdbcType="VARCHAR"/>
     <result column="nuclear_user_string" property="nuclearTimeString" jdbcType="VARCHAR"/>
     <result column="nuclear_time" property="nuclearTime" jdbcType="TIMESTAMP"/>
-    <result column="agdocppro" property="agDocPpro" jdbcType="VARCHAR"/>
     <result column="xxAmount" property="xxAmount" jdbcType="DECIMAL"/>
 
     <result column="pro_type" property="proType" jdbcType="VARCHAR"/>
@@ -1399,6 +1412,13 @@
     <result column="to_pick_num" property="toPickNum" jdbcType="VARCHAR"/>
     <result column="is_plan_num" property="isPlanNum" jdbcType="VARCHAR"/>
     <result column="to_plan_num" property="toPlanNum" jdbcType="VARCHAR"/>
+
+    <result column="order_user" property="orderUser" jdbcType="VARCHAR"/>
+    <result column="order_date" property="orderDate" jdbcType="TIMESTAMP"/>
+    <result column="ag_doc_district" property="agDocDistrict" jdbcType="VARCHAR"/>
+    <result column="ag_doc_pro" property="agDocPro" jdbcType="VARCHAR"/>
+    <result column="pro_code" property="proCode" jdbcType="VARCHAR"/>
+    <result column="pro_name" property="proName" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!--欠款查询 -->
