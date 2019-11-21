@@ -330,21 +330,21 @@
       <if test="orgCode!=null and orgCode!='' and agentNameList==null">
         and (oa.CODE like concat(#{orgCode},'%') or ob.CODE like concat(#{orgCode},'%'))
       </if>
-      <!--<if test="id != null">-->
-       <!--and i.id = #{id}-->
-      <!--</if>-->
-      <!--<if test="agentId != null">-->
-        <!--and i.agent_Id = #{agentId}-->
-      <!--</if>-->
-      <!--<if test="agentName != null">-->
-        <!--and i.agent_Name = #{agentName}-->
-      <!--</if>-->
-      <!--<if test="busNum != null">-->
-        <!--and i.bus_Num = #{busNum}-->
-      <!--</if>-->
-      <!--<if test="reviewStatus != null">-->
-        <!--and i.review_status = #{reviewStatus}-->
-      <!--</if>-->
+      <if test="id != null">
+       and i.id = #{id}
+      </if>
+      <if test="agentId != null">
+        and i.agent_Id = #{agentId}
+      </if>
+      <if test="agentName != null">
+        and i.agent_Name = #{agentName}
+      </if>
+      <if test="busNum != null">
+        and i.bus_Num = #{busNum}
+      </if>
+      <if test="reviewStatus != null">
+        and i.review_status = #{reviewStatus}
+      </if>
     </where>
     order by c_time desc
   </sql>

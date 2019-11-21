@@ -73,10 +73,24 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
     private IUserService iUserService;
 
 
-
     @Override
     public PageInfo internetCardLogoutList(InternetLogout internetLogout, Page page, String agentId, Long userId){
-        Map<String, Object> reqMap = JsonUtil.objectToMap(internetLogout);
+        Map<String, Object> reqMap = new HashMap<>();
+        if(StringUtils.isNotBlank(internetLogout.getId())){
+            reqMap.put("id",internetLogout.getId());
+        }
+        if(StringUtils.isNotBlank(internetLogout.getAgentId())){
+            reqMap.put("agentId",internetLogout.getAgentId());
+        }
+        if(StringUtils.isNotBlank(internetLogout.getAgentName())){
+            reqMap.put("agentName",internetLogout.getAgentName());
+        }
+        if(StringUtils.isNotBlank(internetLogout.getBusNum())){
+            reqMap.put("busNum",internetLogout.getBusNum());
+        }
+        if(null!=internetLogout.getReviewStatus()){
+            reqMap.put("reviewStatus",internetLogout.getReviewStatus());
+        }
         List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
         if(orgCodeRes==null && orgCodeRes.size()!=1){
             return null;
