@@ -1,7 +1,9 @@
 package com.ryx.credit.service.impl.agent;
 
+import com.ryx.credit.common.enumc.RangType;
 import com.ryx.credit.dao.agent.AnnoPlatformRelaMapper;
 import com.ryx.credit.pojo.admin.agent.AnnoPlatformRela;
+import com.ryx.credit.pojo.admin.agent.AnnoPlatformRelaExample;
 import com.ryx.credit.service.agent.AnnoPlatformRelaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,6 +11,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,4 +31,14 @@ public class AnnoPlatformRelaServiceImpl implements AnnoPlatformRelaService {
     public int batchSave(List<AnnoPlatformRela> annoPlatformRelas) {
         return  annoPlatformRelaMapper.saveBatch(annoPlatformRelas);
     }
+
+    @Override
+    public List<AnnoPlatformRela> queryByAnnoId(String annoId) {
+        AnnoPlatformRelaExample annoPlatformRelaExample = new AnnoPlatformRelaExample();
+        annoPlatformRelaExample.or().andAnnoIdEqualTo(annoId);
+        List<AnnoPlatformRela> annoPlatformRelas = annoPlatformRelaMapper.selectByExample(annoPlatformRelaExample);
+
+        return annoPlatformRelas;
+    }
+
 }
