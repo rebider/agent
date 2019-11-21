@@ -74,6 +74,7 @@
 
     <dubbo:reference interface="com.ryx.credit.service.dict.DictOptionsService" id="dictOptionsService"  timeout="1200000" registry="myGroup"/>
     <dubbo:reference interface="com.ryx.credit.service.agent.AgentFreezeService" id="agentFreezeService"  timeout="1200000" registry="myGroup"/>
+ <dubbo:reference interface="com.ryx.internet.service.OInternetRenewService" id="internetRenewService"  timeout="1200000" registry="myGroup" check="false"/>
 
 
 
