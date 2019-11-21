@@ -308,4 +308,55 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+  <sql id="internetCardLogoutSql">
+    select
+    i.ID, AGENT_ID, i.AGENT_NAME, i.BUS_NUM, i.BUS_PLATFORM, i.AG_DOC_DISTRICT, i.AG_DOC_PRO, i.BUS_CONTACT_PERSON,
+    i.LOGOUT_CARD_COUNT, i.REVIEW_STATUS, i.REVIEW_PASS_TIME, i.APPLY_REMARK, i.C_TIME, i.U_TIME,
+    i.C_USER, i.U_USER ,oa.name as AG_DOC_PRO_NAME,ob.name as AG_DOC_DISTRICT_NAME
+    from o_Internet_logout i
+    left join C_ORGANIZATION oa on oa.id=i.ag_doc_pro
+    left join C_ORGANIZATION ob on ob.id=i.AG_DOC_DISTRICT
+    <where>
+      and i.status=1
+      <if test="orgCode!=null and orgCode!=''and agentNameList!=null">
+        and (
+        (oa.CODE like concat(#{orgCode},'%') or ob.CODE like concat(#{orgCode},'%'))
+        or i.agent_name
+        <foreach collection="agentNameList" item="agentName" open=" in(" close=")" separator=",">
+          #{agentName}
+        </foreach>
+        )
+      </if>
+      <if test="orgCode!=null and orgCode!='' and agentNameList==null">
+        and (oa.CODE like concat(#{orgCode},'%') or ob.CODE like concat(#{orgCode},'%'))
+      </if>
+      <!--<if test="id != null">-->
+       <!--and i.id = #{id}-->
+      <!--</if>-->
+      <!--<if test="agentId != null">-->
+        <!--and i.agent_Id = #{agentId}-->
+      <!--</if>-->
+      <!--<if test="agentName != null">-->
+        <!--and i.agent_Name = #{agentName}-->
+      <!--</if>-->
+      <!--<if test="busNum != null">-->
+        <!--and i.bus_Num = #{busNum}-->
+      <!--</if>-->
+      <!--<if test="reviewStatus != null">-->
+        <!--and i.review_status = #{reviewStatus}-->
+      <!--</if>-->
+    </where>
+    order by c_time desc
+  </sql>
+  <select id="internetCardLogoutList" resultType="java.util.Map" parameterType="java.util.Map">
+    <include refid="OracleDialectPrefix" />
+    <include refid="internetCardLogoutSql" />
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="internetCardLogoutCount" resultType="int" parameterType="java.util.Map">
+     select count(*) from (
+        <include refid="internetCardLogoutSql" />
+     )
+  </select>
+
 </mapper>

@@ -8,10 +8,12 @@ import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
@@ -67,20 +69,41 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
     private ActivityService activityService;
     @Autowired
     private AgentService agentService;
-
+    @Autowired
+    private IUserService iUserService;
 
 
 
     @Override
     public PageInfo internetCardLogoutList(InternetLogout internetLogout, Page page, String agentId, Long userId){
         Map<String, Object> reqMap = JsonUtil.objectToMap(internetLogout);
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+        if(orgCodeRes==null && orgCodeRes.size()!=1){
+            return null;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        //省区大区查看自己的代理商 部门权限
+        if(StringUtils.isNotBlank(organizationCode) && (organizationCode.contains("region") || organizationCode.contains("beijing"))) {
+            reqMap.put("orgCode", organizationCode);
+        }
+        //内部人员根据名称查询指定流量卡
+        List<String> agentNameList = dictOptionsService.getAgentNameList(userId);
+        if(agentNameList.size()!=0) {
+            reqMap.put("agentNameList", agentNameList);
+        }
         reqMap.put("page",page);
-
-
-
+        List<Map<String, Object>> internetLogoutList = internetLogoutMapper.internetCardLogoutList(reqMap);
+        for (Map<String, Object> map : internetLogoutList) {
+            if(StringUtils.isNotBlank(String.valueOf(map.get("C_USER")))){
+                CUser cUser = iUserService.selectById(Long.valueOf(String.valueOf(map.get("C_USER"))));
+                if(null!=cUser)
+                map.put("C_USER",cUser.getName());
+            }
+        }
         PageInfo pageInfo = new PageInfo();
-        pageInfo.setRows(null);
-        pageInfo.setTotal(0);
+        pageInfo.setRows(internetLogoutList);
+        pageInfo.setTotal(internetLogoutMapper.internetCardLogoutCount(reqMap));
         return pageInfo;
     }
 
