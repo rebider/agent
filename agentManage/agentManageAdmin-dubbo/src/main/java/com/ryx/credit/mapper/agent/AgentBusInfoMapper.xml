@@ -1209,9 +1209,7 @@ union
     select
        distinct(ab.bus_platform) as bus_platform
       from A_AGENT_BUSINFO ab
-      left join A_AGENT ag
-      on ag.AG_UNIQ_NUM = ab.AGENT_ID
-     where AGENT_ID = #{reqMap.agentId}
+     where ab.AGENT_ID = #{reqMap.agentId}
      <if test="reqMap.cloReviewStatus !=null and reqMap.cloReviewStatus !=''">
        and CLO_REVIEW_STATUS = #{reqMap.cloReviewStatus}
      </if>
@@ -1220,9 +1218,7 @@ union
     select
        distinct(ab.AG_DOC_PRO) as AG_DOC_PRO
       from A_AGENT_BUSINFO ab
-      left join A_AGENT ag
-      on ag.AG_UNIQ_NUM = ab.AGENT_ID
-     where AGENT_ID = #{reqMap.agentId}
+     where ab.AGENT_ID = #{reqMap.agentId}
     <if test="reqMap.cloReviewStatus !=null and reqMap.cloReviewStatus !=''">
       and CLO_REVIEW_STATUS = #{reqMap.cloReviewStatus}
     </if>
@@ -1231,9 +1227,7 @@ union
     select
        distinct(ab.BUS_TYPE) as BUS_TYPE
       from A_AGENT_BUSINFO ab
-      left join A_AGENT ag
-      on ag.AG_UNIQ_NUM = ab.AGENT_ID
-     where AGENT_ID = #{reqMap.agentId}
+     where ab.AGENT_ID = #{reqMap.agentId}
     <if test="reqMap.cloReviewStatus !=null and reqMap.cloReviewStatus !=''">
       and CLO_REVIEW_STATUS = #{reqMap.cloReviewStatus}
     </if>
