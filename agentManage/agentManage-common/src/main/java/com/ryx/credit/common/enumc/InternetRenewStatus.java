@@ -15,7 +15,7 @@ public enum InternetRenewStatus {
 
     WXF("1","未续费"),
     YXF("2","已续费"),
-    BFXF("3","未扣足"),
+//    BFXF("3","未扣足"),
     XFZ("4","续费中"),
     SX("5","失效");
 
@@ -26,21 +26,6 @@ public enum InternetRenewStatus {
     InternetRenewStatus(String c, String m){
         this.code=c;
         this.msg =m;
-    }
-
-    /**
-     * 取得枚举对象值
-     * @return 枚举对象值
-     */
-    public String getValue() {
-        return this.code;
-    }
-    /**
-     * 取得缓存内容
-     * @return 缓存内容
-     */
-    public String getContent() {
-        return this.msg;
     }
 
     /**
@@ -57,7 +42,6 @@ public enum InternetRenewStatus {
         }
         return "";
     }
-
 
     public static  Map<Object, Object> getContentMap(){
         Map<Object, Object> map = new HashMap<>();
@@ -81,6 +65,22 @@ public enum InternetRenewStatus {
             }
         }
         return "";
+    }
+
+    /**
+     * 取得枚举对象值
+     * @return 枚举对象值
+     */
+    public String getValue() {
+        return this.code;
+    }
+
+    /**
+     * 取得缓存内容
+     * @return 缓存内容
+     */
+    public String getContent() {
+        return this.msg;
     }
 
 
