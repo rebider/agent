@@ -44,7 +44,7 @@ public class DataHistoryInterceptor implements MethodInterceptor {
 
         boolean result = name.contains("update") || name.contains("insert") || name.contains("delete");
         //取出方法
-        if (name.equals("updateSnStatus") || name.equals("deleteDetailByLogisicalId")) {
+        if (name.equals("updateSnStatus")) {
             result = false;
         }
         String clazz = method.toString();

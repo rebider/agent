@@ -163,21 +163,11 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                             int flag = remark.indexOf("代开企业名称:");// 截取代开企业名称
                             if (flag != -1) {
                                 String string = remark.substring(flag + 7);
-                                List<String> stringList = invoiceApplyMapper.getPayCompanyById(agentId);
-                                if(stringList.size()<= 0){
-                                    invoiceApply.setYsResult("0");
-                                    invoiceApply.setRev1("未查询到该代理商的开票公司信息！");
-                                }else if(stringList.contains(string.trim())){
-                                    invoiceApply.setInvoiceCompany(string.trim());
+                                int brdex = string.indexOf("<br/>");
+                                if(brdex != -1){
+                                    invoiceApply.setInvoiceCompany(string.substring(0,brdex));
                                 }else{
-                                    int brdex = string.indexOf("<br/>");
-                                    if(brdex != -1 ){
-                                        invoiceApply.setInvoiceCompany(string.substring(0,brdex));
-                                    }else{
-                                        invoiceApply.setInvoiceCompany(string);
-                                        invoiceApply.setYsResult("0");
-                                        invoiceApply.setRev1("获取开票公司名称错误,请注意代开发票备注格式！");
-                                    }
+                                    invoiceApply.setInvoiceCompany(string.trim());
                                 }
                                 invoiceApply.setSallerName(map.get("sallerName").toString());
                                 invoiceApply.setRemark(remark);

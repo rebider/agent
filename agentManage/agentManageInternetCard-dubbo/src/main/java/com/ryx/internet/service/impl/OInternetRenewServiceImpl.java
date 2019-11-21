@@ -472,12 +472,6 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 throw new MessageException("不同平台请分开申请");
             }
 
-            List<String> agentNameList = dictOptionsService.getAgentNameList(Long.valueOf(cUser));
-            if(agentNameList.size()!=0){
-                if(!internetRenew.getRenewWay().equals(InternetRenewWay.XXBK.getValue())){
-                    throw new MessageException("您只能选择线下打款支付方式,如有问题请联系管理员");
-                }
-            }
             BigDecimal renewCardCount = new BigDecimal(iccids.size());
             String internetRenewId = idService.genId(TabId.O_INTERNET_RENEW);
             internetRenew.setId(internetRenewId);
@@ -571,10 +565,17 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                     }
                 }
             }
-
+            List<String> agentNameList = dictOptionsService.getAgentNameList(Long.valueOf(cUser));
             int i = 1;
             for (String iccid : iccids) {
                 OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(iccid);
+                if(agentNameList.size()!=0){
+                    if(!internetRenew.getRenewWay().equals(InternetRenewWay.XXBK.getValue())){
+                        if(StringUtils.isBlank(oInternetCard.getAgentId()) || StringUtils.isBlank(oInternetCard.getAgentName())
+                          || StringUtils.isBlank(oInternetCard.getMerId()) || StringUtils.isBlank(oInternetCard.getMerName()))
+                        throw new MessageException("缺少代理商编号/代理商名称/商户编号/商户名称,只能选择线下打款支付方式,如有问题请联系管理员");
+                    }
+                }
                 OInternetRenewDetailExample oInternetRenewDetailExample = new OInternetRenewDetailExample();
                 OInternetRenewDetailExample.Criteria criteria = oInternetRenewDetailExample.createCriteria();
                 criteria.andStatusEqualTo(Status.STATUS_1.status);
@@ -939,21 +940,6 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 }
             }else{
                 throw new MessageException("状态不正确,不允许续费");
-            }
-
-            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
-            if(orgCodeRes==null && orgCodeRes.size()!=1){
-                throw new MessageException("当前登陆用户信息有误,请联系管理员");
-            }
-            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
-            String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
-            if(StringUtils.isBlank(organizationCode)){
-                throw new MessageException("当前登陆用户信息有误,请联系管理员");
-            }
-            if(!organizationCode.equals("agent")) {
-                if(StringUtils.isBlank(oInternetCard.getBusNum()) || StringUtils.isBlank(oInternetCard.getBusPlatform())){
-                    throw new MessageException("非代理商发起,业务平台编码或业务平台不可为空");
-                }
             }
         }
     }
