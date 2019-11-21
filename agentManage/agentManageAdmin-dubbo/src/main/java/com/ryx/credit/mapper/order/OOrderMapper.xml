@@ -812,7 +812,7 @@
     o.pay_amo,
     d.pay_amount,
     d.real_amount,
-    d.outstanding_amount,
+    nvl(d.outstanding_amount,0) as outstanding_amount,
     d.pay_status,
     o.clear_status,
     o.review_status,
