@@ -34,16 +34,16 @@ public class InternetLogoutTaskExecutionListener extends BaseTaskListener implem
         } else if ("end".equals(eventName)) {
             String activityName = delegateExecution.getCurrentActivityName();
             //数据变更服务类
-            InternetCardLogoutService internetCardLogoutService = (InternetCardLogoutService) MySpringContextHandler.applicationContext.getBean("internetRenewService");
+            InternetCardLogoutService internetCardLogoutService = (InternetCardLogoutService) MySpringContextHandler.applicationContext.getBean("internetCardLogoutService");
             //审批拒绝
             if ("reject_end".equals(activityName)) {
-//                AgentResult res = internetRenewService.compressCompensateActivity(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.status);
-//                logger.info("=========InternetLogoutTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
+                AgentResult res = internetCardLogoutService.compressCompensateActivity(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.status);
+                logger.info("=========InternetLogoutTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
             }
             //审批同意更新数据库
             if ("finish_end".equals(activityName)) {
-//                AgentResult res = internetRenewService.compressCompensateActivity(delegateExecution.getProcessInstanceId(), AgStatus.Approved.status);
-//                logger.info("=========InternetLogoutTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
+                AgentResult res = internetCardLogoutService.compressCompensateActivity(delegateExecution.getProcessInstanceId(), AgStatus.Approved.status);
+                logger.info("=========InternetLogoutTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
             }
         } else if ("take".equals(eventName)) {
             logger.info("take=========" + "ActivityId:" + delegateExecution.getCurrentActivityId() + "  ProcessInstanceId:" + delegateExecution.getProcessInstanceId() + "  Execution:" + delegateExecution.getId());
