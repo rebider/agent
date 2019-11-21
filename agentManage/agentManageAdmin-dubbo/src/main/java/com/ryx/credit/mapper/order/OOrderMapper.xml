@@ -488,7 +488,7 @@
         and model=#{model} and o.id=ORDER_ID) </if>
       <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
       <if test="vender!=null and vender!=''"> and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id
-        and os.order_id=o.id where soa.VENDER=#{vender})</if>
+        where soa.VENDER=#{vender} and os.order_id=o.id )</if>
       <if test="activityName!=null and activityName !=''">
         and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on  soa.SUB_ORDER_ID=os.id
         and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
@@ -583,7 +583,7 @@
         and model=#{model} and o.id=ORDER_ID) </if>
       <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
       <if test="vender!=null and vender!=''"> and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id
-        and os.order_id=o.id where soa.VENDER=#{vender})</if>
+        where soa.VENDER=#{vender} and os.order_id=o.id )</if>
       <if test="activityName!=null and activityName !=''">
         and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on soa.SUB_ORDER_ID=os.id
         and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
@@ -684,7 +684,7 @@
         and model=#{model} and o.id=ORDER_ID) </if>
       <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
       <if test="vender!=null and vender!=''"> and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id
-        and os.order_id=o.id where soa.VENDER=#{vender})</if>
+        where soa.VENDER=#{vender} and os.order_id=o.id )</if>
       <if test="activityName!=null and activityName !=''">
         and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on  soa.SUB_ORDER_ID=os.id
         and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
@@ -775,7 +775,7 @@
         and model=#{model} and o.id=ORDER_ID) </if>
       <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
       <if test="vender!=null and vender!=''"> and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id
-        and os.order_id=o.id where soa.VENDER=#{vender})</if>
+        where soa.VENDER=#{vender} and os.order_id=o.id )</if>
       <if test="activityName!=null and activityName !=''">
         and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on soa.SUB_ORDER_ID=os.id
         and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
@@ -894,8 +894,8 @@
         </foreach>
       </if>
       <if test="venderList!=null and venderList.size>0 ">
-       and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id and os.order_id=o.id
-       where soa.VENDER
+       and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id
+       where os.order_id=o.id and soa.VENDER
        <foreach collection="venderList" item="vender" open=" in(" close=")" separator=",">
           #{vender}
        </foreach>
@@ -1025,8 +1025,8 @@
         </foreach>
       </if>
       <if test="venderList!=null and venderList.size>0 ">
-        and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id and os.order_id=o.id
-        where soa.VENDER
+        and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id
+        where os.order_id=o.id and soa.VENDER
         <foreach collection="venderList" item="vender" open=" in(" close=")" separator=",">
           #{vender}
         </foreach>
@@ -1303,7 +1303,7 @@
       <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
       <if test="vender!=null and vender!=''">
         and EXISTS(select * from o_sub_order os
-        left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id and os.order_id=o.id where soa.VENDER=#{vender})
+        left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id where os.order_id=o.id and soa.VENDER=#{vender})
       </if>
       <if test="activityName!=null and activityName!=''">
         and EXISTS (select * from o_sub_order_activity soa
