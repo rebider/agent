@@ -879,7 +879,7 @@
           #{busPlatform}
         </foreach>
       </if>
-      <if test="reqMap.cloReviewStatusList != null and reqMap.cloReviewStatusList.size > 0" >
+      <if test="reqMap.cloReviewStatusList != null and reqMap.cloReviewStatusList.size > 0 " >
         and bus.clo_review_status
         <foreach collection="reqMap.cloReviewStatusList" item="cloReviewStatus" open=" in(" close=")" separator=",">
           #{cloReviewStatus}
