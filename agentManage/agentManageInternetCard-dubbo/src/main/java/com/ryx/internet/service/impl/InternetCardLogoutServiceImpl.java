@@ -111,6 +111,13 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 log.info("续费中请勿重复提交,cUser:{}", cUser);
                 throw new MessageException("注销中请勿重复提交");
             }
+            //流程中的部门参数
+            Map startPar = agentEnterService.startPar(cUser);
+            if (null == startPar) {
+                log.info("========用户{}启动部门参数为空", cUser);
+                throw new MessageException("启动部门参数为空!");
+            }
+            String party = String.valueOf(startPar.get("party"));
 
             String internetLogoutId = idService.genId(TabId.O_INTERNET_LOGOUT);
             AgentBusInfo queryAgentBusInfo = null;
@@ -200,15 +207,20 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
             if(busPlatformSet.size()!=1){
                 throw new MessageException("不同平台请分开申请");
             }
+            if(party.equals("agent") && queryAgentBusInfo==null){
+                throw new MessageException("缺少平台码或平台");
+            }
 
             internetLogout.setId(internetLogoutId);
             internetLogout.setAgentId(agentId);
             internetLogout.setAgentName(agName);
-            internetLogout.setBusNum(queryAgentBusInfo.getBusNum());
-            internetLogout.setBusPlatform(queryAgentBusInfo.getBusPlatform());
-            internetLogout.setAgDocPro(queryAgentBusInfo.getAgDocPro());
-            internetLogout.setAgDocDistrict(queryAgentBusInfo.getAgDocDistrict());
-            internetLogout.setBusContactPerson(queryAgentBusInfo.getBusContactPerson());
+            if(queryAgentBusInfo==null){
+                internetLogout.setBusNum(queryAgentBusInfo.getBusNum());
+                internetLogout.setBusPlatform(queryAgentBusInfo.getBusPlatform());
+                internetLogout.setAgDocPro(queryAgentBusInfo.getAgDocPro());
+                internetLogout.setAgDocDistrict(queryAgentBusInfo.getAgDocDistrict());
+                internetLogout.setBusContactPerson(queryAgentBusInfo.getBusContactPerson());
+            }
             internetLogout.setLogoutCardCount(cardCount);
             internetLogout.setReviewStatus(AgStatus.Approving.getValue());
             internetLogout.setStatus(Status.STATUS_1.status);
@@ -219,13 +231,6 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
             internetLogout.setVersion(BigDecimal.ONE);
             internetLogoutMapper.insertSelective(internetLogout);
 
-            //流程中的部门参数
-            Map startPar = agentEnterService.startPar(cUser);
-            if (null == startPar) {
-                log.info("========用户{}{}启动部门参数为空", internetLogoutId, cUser);
-                throw new MessageException("启动部门参数为空!");
-            }
-            String party = String.valueOf(startPar.get("party"));
             if(party.equals("agent")){
                 //启动审批
                 String proce = activityService.createDeloyFlow(null,dictOptionsService.getApproveVersion("cardLogout"), null, null,null);
