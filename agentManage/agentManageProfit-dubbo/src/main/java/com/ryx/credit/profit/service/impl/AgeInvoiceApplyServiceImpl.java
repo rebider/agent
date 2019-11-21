@@ -163,24 +163,18 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                             int flag = remark.indexOf("代开企业名称:");// 截取代开企业名称
                             if (flag != -1) {
                                 String string = remark.substring(flag + 7);
-                                List<String> stringList = invoiceApplyMapper.getPayCompanyById(agentId);
-                                if(stringList.contains(string.trim())){
-                                    invoiceApply.setInvoiceCompany(string.trim());
+                                int brdex = string.indexOf("<br/>");
+                                if(brdex != -1){
+                                    invoiceApply.setInvoiceCompany(string.substring(0,brdex));
                                 }else{
-                                    int brdex = string.indexOf("<br/>");
-                                    if(brdex != -1 ){
-                                        invoiceApply.setInvoiceCompany(string.substring(0,brdex));
-                                    }else{
-                                        invoiceApply.setYsResult("0");
-                                        invoiceApply.setRev1("获取开票公司名称错误,请在备注中开票公司名称后面使用换行符!");
-                                    }
+                                    invoiceApply.setInvoiceCompany(string.trim());
                                 }
                                 invoiceApply.setSallerName(map.get("sallerName").toString());
                                 invoiceApply.setRemark(remark);
                             } else {
                                 invoiceApply.setYsResult("0");
                                 invoiceApply.setInvoiceCompany(map.get("sallerName").toString());
-                                invoiceApply.setRev1("未获取到代开公司数据,请在备注中开票公司前添加'代开企业名称:'字段！");
+                                invoiceApply.setRev1("未获取到发票备注中开票公司数据!");
                             }
                         } else {
                             invoiceApply.setInvoiceCompany(map.get("sallerName").toString());
