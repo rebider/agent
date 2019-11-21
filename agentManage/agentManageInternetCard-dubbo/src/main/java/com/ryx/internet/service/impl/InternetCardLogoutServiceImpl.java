@@ -181,7 +181,6 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                     cardCount = cardCount.add(BigDecimal.ONE);
                 }
                 internetLogoutDetailMapper.insertSelective(internetLogoutDetail);
-
                 busNumSet.add(oInternetCard.getBusNum());
                 busPlatformSet.add(oInternetCard.getBusPlatform());
                 agentIdSet.add(oInternetCard.getAgentId());

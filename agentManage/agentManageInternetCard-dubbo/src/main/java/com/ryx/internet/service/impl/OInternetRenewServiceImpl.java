@@ -920,12 +920,12 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             }
             //是否需续费为是,才展示按钮
             if(oInternetCard.getRenew().compareTo(BigDecimal.ZERO)==0){
-                throw new MessageException("是否需续费为否,不允许续费");
+                throw new MessageException("是否需续费为否,不允许续费/注销");
             }
             if((oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NORMAL.getValue())==0 || oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NOACTIVATE.getValue())==0 )
                     && oInternetCard.getRenewStatus().equals(InternetRenewStatus.WXF.getValue())){
                 if(null==oInternetCard.getExpireTime()){
-                    throw new MessageException("到期时间为空,不允许续费");
+                    throw new MessageException("到期时间为空,不允许续费/注销");
                 }
                 String onOff = redisService.getValue(RedisCachKey.CARDRENEW22ONOFF.code);
                 if(StringUtils.isBlank(onOff)){
@@ -934,11 +934,11 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 if(onOff.equals(OnOffStatus.ON.code)){
                     Date date = DateUtil.dateDay(oInternetCard.getExpireTime(), "22");
                     if(Calendar.getInstance().getTime().getTime()>date.getTime()){
-                        throw new MessageException("到期时间超过22号,不允许续费");
+                        throw new MessageException("到期时间超过22号,不允许续费/注销");
                     }
                 }
             }else{
-                throw new MessageException("状态不正确,不允许续费");
+                throw new MessageException("状态不正确,不允许续费/注销");
             }
 
             List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);

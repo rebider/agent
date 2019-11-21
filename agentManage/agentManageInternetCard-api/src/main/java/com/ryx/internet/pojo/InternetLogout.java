@@ -41,6 +41,16 @@ public class InternetLogout implements Serializable{
 
     private BigDecimal version;
 
+    private String iccidNumIds;
+
+    public String getIccidNumIds() {
+        return iccidNumIds;
+    }
+
+    public void setIccidNumIds(String iccidNumIds) {
+        this.iccidNumIds = iccidNumIds;
+    }
+
     public String getId() {
         return id;
     }
