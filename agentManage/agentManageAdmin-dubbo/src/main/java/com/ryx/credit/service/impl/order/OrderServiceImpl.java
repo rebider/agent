@@ -145,6 +145,8 @@ public class OrderServiceImpl implements OrderService {
     private OSupplementMapper oSupplementMapper;
     @Autowired
     private ODeductCapitalMapper deductCapitalMapper;
+    @Autowired
+    private SettleAccountsMapper settleAccountsMapper;
     /**
      * 分页查询订单列表
      * @param product
@@ -3946,7 +3948,7 @@ public class OrderServiceImpl implements OrderService {
             agentResult.setMsg("该订单不存在!");
             return agentResult;
         }
-        order.setStatus(OrderStatus.LOCK.status);
+        order.setOrderStatus(OrderStatus.LOCK.status);
         if (orderMapper.updateByPrimaryKey(order)!=1){
             agentResult.setMsg("更新订单为["+OrderStatus.LOCK.msg+"]失败!");
             return agentResult;
@@ -3994,7 +3996,7 @@ public class OrderServiceImpl implements OrderService {
         orderAdj.setRefundAmount(new BigDecimal(orderUpModelVo.getRefundAmount()));//退款金额
         orderAdj.setOrgPaymentId(oPaymentDetails.get(0).getBatchCode());//原还款计划批次号
         orderAdj.setReson(orderUpModelVo.getReson());
-        orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundMethod()));
+        orderAdj.setRefundMethod(new BigDecimal(orderUpModelVo.getRefundMethod()));
         orderAdj.setStatus(Status.STATUS_1.status);
         orderAdj.setVersion(Status.STATUS_0.status);
         orderAdj.setReviewsStat(AgStatus.Create.status);
@@ -4224,7 +4226,7 @@ public class OrderServiceImpl implements OrderService {
         orderAdj.setAdjUserId(userId);
         orderAdj.setReson(orderUpModelVo.getReson());//原因
         orderAdj.setRefundAmount(new BigDecimal(orderUpModelVo.getRefundAmount()));//退款金额
-        orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundMethod()));//退款方式
+        orderAdj.setRefundMethod(new BigDecimal(orderUpModelVo.getRefundMethod()));//退款方式
 
         for (AdjProVo adjProVo : adjPros) {
             OSubOrder oSubOrder = oSubOrderMapper.selectByPrimaryKey(adjProVo.getoSubId());
@@ -4360,9 +4362,36 @@ public class OrderServiceImpl implements OrderService {
             }
             //财务审批
             if(orgCode.equals("finance")){
+                OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(orderUpModelVo.getId());
                 if(String.valueOf(OrderAdjRefundType.CDFQ_GZ.code).equals(orderUpModelVo.getRefundType())){
+                    orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
+                    orderAdj.setSettleAmount(new BigDecimal(orderUpModelVo.getSettleAmount()));
+                    orderAdj.setRefundTm(new Date());
+                    //事务原因,需单独更新
+                    if(!orderService.approvalTaskSettle(orderAdj).isOK()){
+                        return AgentResult.fail("提交失败!");
+                    };
+                    Calendar orderdate = Calendar.getInstance();
+                    SettleAccounts settleAccounts = new SettleAccounts();
+                    settleAccounts.setId(idService.genId(TabId.o_settle_accounts));
+                    settleAccounts.setAgentId(orderAdj.getAgentId());//代理商id
+                    settleAccounts.setsType(SettleType.ORDER_ADJUST.key);//挂账类型:订单调整
+                    settleAccounts.setsTm(orderdate.getTime());
+                    settleAccounts.setcTm(orderdate.getTime());
+                    settleAccounts.setcUser(userId);
+                    settleAccounts.setsAmount(new BigDecimal(orderUpModelVo.getSettleAmount()));
+                    settleAccounts.setSrcId(orderAdj.getId());//数据源id
+                    settleAccounts.setStatus(Status.STATUS_1.status);
+                    settleAccounts.setVersion(Status.STATUS_1.status);
+                    if(1!=settleAccountsMapper.insertSelective(settleAccounts)){
+                        return AgentResult.fail("保存挂账记录失败!");
+                    };
                     reqMap.put("remit",false);
                 }else if(String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
+                    orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
+                    orderAdj.setRefundAmount(orderAdj.getRealRefundAmo());
+                    orderAdj.setRefundTm(new Date());
+                    orderAdjMapper.updateByPrimaryKeySelective(orderAdj);
                     reqMap.put("remit",true);
                 }
             }
@@ -5072,6 +5101,13 @@ public class OrderServiceImpl implements OrderService {
         map.put("cutId", deductCapital.getId());
 
         return map;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    public AgentResult approvalTaskSettle(OrderAdj orderAdj) throws ProcessException {
+
+        return orderAdjMapper.updateByPrimaryKeySelective(orderAdj)==1?AgentResult.ok():AgentResult.fail();
     }
 
     public void updatePaymentDetail(OPaymentDetail updateOPaymentDetail, String srcId, String srcType) throws ProcessException {

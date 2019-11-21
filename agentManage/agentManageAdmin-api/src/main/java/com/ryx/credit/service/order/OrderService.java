@@ -323,4 +323,8 @@ public interface OrderService {
     AgentResult approveFinishOrderAdjust(String insid, String actname) throws Exception;
 
     Map<String,Object> saveCut(String orderAdjId, String amt, String ctype);
+
+    AgentResult approvalTaskSettle(OrderAdj orderAdj) throws ProcessException;
+
+
 }
