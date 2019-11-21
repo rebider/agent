@@ -4091,7 +4091,7 @@ public class OrderServiceImpl implements OrderService {
 //        List<ODeductCapital> deductCapitals = deductCapitalMapper.selectByExample(deductCapitalExample);
 //        res.putKeyV("deductCapitals",deductCapitals);
         res.putKeyV("orderAdjDetails",orderAdjDetails);
-        String refundMethod = RefundMehod.getContentByValue(orderAdj.getRefundType());
+        String refundMethod = RefundMehod.getContentByValue(orderAdj.getRefundMethod());
         res.putKeyV("refundMethod",refundMethod);
         return AgentResult.ok(res);
     }
