@@ -4069,31 +4069,37 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public AgentResult loadUpModelInfo(String adjId) {
-        //订单
-        OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(adjId);
-        FastMap res= FastMap.fastMap("orderAdj", orderAdj);
-        OrderAdjDetailExample orderAdjDetailExample = new OrderAdjDetailExample();
-        orderAdjDetailExample.or().andAdjIdEqualTo(orderAdj.getId());
-        List<OrderAdjDetail> orderAdjDetails = orderAdjDetailMapper.selectByExample(orderAdjDetailExample);
-        for (OrderAdjDetail orderAdjDetail : orderAdjDetails) {
-            OSubOrderExample osubOrderExample = new OSubOrderExample();
-            osubOrderExample.or().andOrderIdEqualTo(orderAdj.getOrderId()).andStatusEqualTo(Status.STATUS_1.status);
-            List<OSubOrder> oSubOrders = oSubOrderMapper.selectByExample(osubOrderExample);
-            OSubOrder oSubOrder = oSubOrders.get(0);//采购单
-            FastMap fastMap = FastMap.fastMap("subOrderId", oSubOrder.getId());
-            BigDecimal oReceiptPros = oReceiptProMapper.receiptCountTotal(orderAdj.getOrderId(), oSubOrder.getProId());//配货数量
-            BigDecimal countPlans = receiptPlanMapper.planCountTotal(orderAdj.getOrderId(), oSubOrder.getProId());//排单数量
-            orderAdjDetail.setAdjustCount(oSubOrder.getProNum().subtract(oReceiptPros));
-        }
+        FastMap res= FastMap.fastFailMap();
+        try {
+            //订单
+            OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(adjId);
+            res.putKeyV("orderAdj", orderAdj);
+            OrderAdjDetailExample orderAdjDetailExample = new OrderAdjDetailExample();
+            orderAdjDetailExample.or().andAdjIdEqualTo(orderAdj.getId()).andStatusEqualTo(Status.STATUS_1.status);
+            List<OrderAdjDetail> orderAdjDetails = orderAdjDetailMapper.selectByExample(orderAdjDetailExample);
+            for (OrderAdjDetail orderAdjDetail : orderAdjDetails) {
+                OSubOrderExample osubOrderExample = new OSubOrderExample();
+                osubOrderExample.or().andOrderIdEqualTo(orderAdj.getOrderId()).andStatusEqualTo(Status.STATUS_1.status);
+                List<OSubOrder> oSubOrders = oSubOrderMapper.selectByExample(osubOrderExample);
+                OSubOrder oSubOrder = oSubOrders.get(0);//采购单
+                FastMap fastMap = FastMap.fastMap("subOrderId", oSubOrder.getId());
+                BigDecimal oReceiptPros = oReceiptProMapper.receiptCountTotal(orderAdj.getOrderId(), oSubOrder.getProId());//配货数量
+                BigDecimal countPlans = receiptPlanMapper.planCountTotal(orderAdj.getOrderId(), oSubOrder.getProId());//排单数量
+                orderAdjDetail.setAdjustCount(oSubOrder.getProNum().subtract(oReceiptPros));
+            }
 //        //查询扣款款项
 //        ODeductCapitalExample deductCapitalExample = new ODeductCapitalExample();
 //        deductCapitalExample.or().andSourceIdEqualTo(adjId);
 //        List<ODeductCapital> deductCapitals = deductCapitalMapper.selectByExample(deductCapitalExample);
 //        res.putKeyV("deductCapitals",deductCapitals);
-        res.putKeyV("orderAdjDetails",orderAdjDetails);
-        String refundMethod = RefundMehod.getContentByValue(orderAdj.getRefundMethod());
-        res.putKeyV("refundMethod",refundMethod);
-        return AgentResult.ok(res);
+            res.putKeyV("orderAdjDetails",orderAdjDetails);
+            String refundMethod = RefundMehod.getContentByValue(orderAdj.getRefundMethod());
+            res.putKeyV("refundMethod",refundMethod);
+            return AgentResult.ok(res);
+        }catch (Exception e){
+            logger.error("查询订单调整信息失败,adjId{},失败原因{}",adjId,e);
+            return AgentResult.fail("查询订单调整信息失败!"+e);
+        }
     }
 
     /**
@@ -4390,9 +4396,11 @@ public class OrderServiceImpl implements OrderService {
                     reqMap.put("remit",false);
                 }else if(String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
                     orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
-                    orderAdj.setRefundAmount(orderAdj.getRealRefundAmo());
+                    orderAdj.setRealRefundAmo(orderAdj.getRefundAmount());
                     orderAdj.setRefundTm(new Date());
-                    orderAdjMapper.updateByPrimaryKeySelective(orderAdj);
+                    if(1!=orderAdjMapper.updateByPrimaryKeySelective(orderAdj)){
+                        return AgentResult.fail("更新订单调整记录失败!");
+                    };
                     reqMap.put("remit",true);
                 }
             }
@@ -4428,7 +4436,7 @@ public class OrderServiceImpl implements OrderService {
         logger.info("订单调整审批完成:{},{}", insid, actname);
         //审批流关系
         BusActRel busActRel = busActRelService.findById(insid);
-        if (actname.equals("finish_end")) {//审批完成
+        if (actname.equals("finish_end")) { //审批完成
             logger.info("订单调整审批完成,审批通过{}", busActRel.getBusId());
             busActRel.setActivStatus(AgStatus.Approved.name());
             if (1 != busActRelService.updateByPrimaryKey(busActRel)) {
@@ -5074,6 +5082,11 @@ public class OrderServiceImpl implements OrderService {
             OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(busActRel.getBusId());
             orderAdj.setReviewsStat(AgStatus.Refuse.status);
             orderAdj.setReviewsDate(new Date());
+            OOrderExample oOrderExample = new OOrderExample();
+            oOrderExample.or().andIdEqualTo(orderAdj.getOrderId()).andStatusEqualTo(Status.STATUS_1.status);
+            List<OOrder> oOrders = orderMapper.selectByExample(oOrderExample);
+            oOrders.get(0).setOrderStatus(OrderStatus.ENABLE.status);
+            orderMapper.updateByPrimaryKeySelective(oOrders.get(0));
 
             //订单调整更新
             if (1 != orderAdjMapper.updateByPrimaryKeySelective(orderAdj)) {
