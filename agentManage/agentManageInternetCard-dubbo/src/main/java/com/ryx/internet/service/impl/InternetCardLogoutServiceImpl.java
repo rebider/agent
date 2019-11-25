@@ -79,7 +79,9 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
         if(StringUtils.isNotBlank(internetLogout.getId())){
             reqMap.put("id",internetLogout.getId());
         }
-        if(StringUtils.isNotBlank(internetLogout.getAgentId())){
+        if(StringUtils.isNotBlank(agentId)){
+            reqMap.put("agentId",agentId);
+        }else if(StringUtils.isNotBlank(internetLogout.getAgentId())){
             reqMap.put("agentId",internetLogout.getAgentId());
         }
         if(StringUtils.isNotBlank(internetLogout.getAgentName())){
@@ -124,14 +126,63 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
 
     @Override
     public PageInfo internetCardLogoutDetailList(InternetLogoutDetail internetLogoutDetail, Page page, String agentId, Long userId){
-        Map<String, Object> reqMap = JsonUtil.objectToMap(internetLogoutDetail);
+        Map<String, Object> reqMap = new HashMap<>();
+        if(StringUtils.isNotBlank(internetLogoutDetail.getId())){
+            reqMap.put("id",internetLogoutDetail.getId());
+        }
+        if(StringUtils.isNotBlank(agentId)){
+            reqMap.put("agentId",agentId);
+        }else if(StringUtils.isNotBlank(internetLogoutDetail.getAgentId())){
+            reqMap.put("agentId",internetLogoutDetail.getAgentId());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getAgentName())){
+            reqMap.put("agentName",internetLogoutDetail.getAgentName());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getBusNum())){
+            reqMap.put("busNum",internetLogoutDetail.getBusNum());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getIccidNum())){
+            reqMap.put("iccidNum",internetLogoutDetail.getIccidNum());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getRenewId())){
+            reqMap.put("renewId",internetLogoutDetail.getRenewId());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getSnNum())){
+            reqMap.put("snNum",internetLogoutDetail.getSnNum());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getMerId())){
+            reqMap.put("merId",internetLogoutDetail.getMerId());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getMerName())){
+            reqMap.put("merName",internetLogoutDetail.getMerName());
+        }
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+        if(orgCodeRes==null && orgCodeRes.size()!=1){
+            return null;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        //省区大区查看自己的代理商 部门权限
+        if(StringUtils.isNotBlank(organizationCode) && (organizationCode.contains("region") || organizationCode.contains("beijing"))) {
+            reqMap.put("orgCode", organizationCode);
+        }
+        //内部人员根据名称查询指定流量卡
+        List<String> agentNameList = dictOptionsService.getAgentNameList(userId);
+        if(agentNameList.size()!=0) {
+            reqMap.put("agentNameList", agentNameList);
+        }
         reqMap.put("page",page);
-
-
-
+        List<Map<String, Object>> internetLogoutList = internetLogoutDetailMapper.internetCardLogoutDetailList(reqMap);
+        for (Map<String, Object> map : internetLogoutList) {
+            if(StringUtils.isNotBlank(String.valueOf(map.get("C_USER")))){
+                CUser cUser = iUserService.selectById(Long.valueOf(String.valueOf(map.get("C_USER"))));
+                if(null!=cUser)
+                    map.put("C_USER",cUser.getName());
+            }
+        }
         PageInfo pageInfo = new PageInfo();
-        pageInfo.setRows(null);
-        pageInfo.setTotal(0);
+        pageInfo.setRows(internetLogoutList);
+        pageInfo.setTotal(internetLogoutDetailMapper.internetCardLogoutDetailCount(reqMap));
         return pageInfo;
     }
 

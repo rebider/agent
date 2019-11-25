@@ -4,6 +4,7 @@ import com.ryx.internet.pojo.InternetLogoutDetail;
 import com.ryx.internet.pojo.InternetLogoutDetailExample;
 
 import java.util.List;
+import java.util.Map;
 
 public interface InternetLogoutDetailMapper {
 
@@ -22,4 +23,9 @@ public interface InternetLogoutDetailMapper {
     int updateByPrimaryKeySelective(InternetLogoutDetail record);
 
     int updateByPrimaryKey(InternetLogoutDetail record);
+
+    List<Map<String,Object>> internetCardLogoutDetailList(Map<String,Object> map);
+
+    int internetCardLogoutDetailCount(Map<String,Object> map);
+
 }
