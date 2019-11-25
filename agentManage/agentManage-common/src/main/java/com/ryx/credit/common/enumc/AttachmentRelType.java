@@ -29,7 +29,8 @@ public enum AttachmentRelType {
     internetRenew("物联网卡续费上传附件"),
     AnnounceMent("公告附件"),
     removeAccount("销账附件"),
-    orderAdjust("订单调整附件");
+    orderAdjust("订单调整附件"),
+    orderAdjust_refund("订单调整退款附件");
 
     public String  msg;
 
