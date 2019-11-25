@@ -472,8 +472,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         colinfoPayment.setId(id);
         colinfoPayment.setBalanceLs(id);  //流水号
         int insert = colinfoPaymentMapper.insert(colinfoPayment);
-        AgentColinfo agentColinfo = new AgentColinfo();
-        agentColinfo.setId(colinfoPayment.getColinfoId());
+        AgentColinfo agentColinfo = agentColinfoMapper.selectByPrimaryKey(colinfoPayment.getColinfoId());
         agentColinfo.setPayStatus(ColinfoPayStatus.B.getValue());
         int update = agentColinfoMapper.updateByPrimaryKeySelective(agentColinfo);
         if (insert != 1 || update != 1) {
