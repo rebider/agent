@@ -160,6 +160,6 @@
     <dubbo:service interface="com.ryx.credit.service.agent.AgentFreezeService" ref="agentFreezeService"  timeout="1200000" registry="myGroup" />
     <dubbo:reference interface="com.ryx.credit.machine.service.LmsUserService" id="lmsUserService"  timeout="1200000" registry="myGroup" check="false" />
 
-    <!-- 数据图表 -->
-    <dubbo:service interface="com.ryx.credit.service.data.EchartService" ref="echartService"  timeout="1200000" registry="myGroup"/>
+    <!-- 图表数据 -->
+    <dubbo:service interface="com.ryx.credit.service.data.EchartDataService" ref="echartDataService"  timeout="1200000" registry="myGroup" />
 </beans>
