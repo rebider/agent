@@ -4,6 +4,7 @@ package com.ryx.credit.profit.service.impl;/**
  * @Description:
  */
 
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.ProfitOrganTranMonthMapper;
@@ -121,8 +122,9 @@ public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthServ
     }
 
     @Override
-    public void importData(String type) {
+    public AgentResult importData(String type) {
         String month = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
+        AgentResult result=AgentResult.fail();
         try {
             if (type.equals("1")) {//交易量重新导入
                 tranDataJob.deal(month);
@@ -147,8 +149,12 @@ public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthServ
             }else if ("9".equals(type)) {//瑞花宝月分润数据重新同步
                 profitMonthRhbPosDataJob.excute(month);
             }
+            result = AgentResult.ok();
         } catch (Exception e) {
+            result.setMsg(e.getMessage());
             e.printStackTrace();
+        } finally {
+            return result;
         }
     }
 

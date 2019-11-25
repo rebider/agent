@@ -186,10 +186,10 @@ public class ProfitMonthRdbPosDataJob {
 
                 detail.setInTransAmt(tranData.getBigDecimal("tranAmount")==null?BigDecimal.ZERO:tranData.getBigDecimal("tranAmount"));//付款交易金额
                 detail.setTransFee(tranData.getBigDecimal("tranFeeAmount")==null?BigDecimal.ZERO:tranData.getBigDecimal("tranFeeAmount"));//交易手续费
+                detail.setServerAmt(tranData.getBigDecimal("upFee")==null?BigDecimal.ZERO:tranData.getBigDecimal("upFee"));//服务费
                 detail.setPayCompany(null == agentBusInfo ? "3" : agentBusInfo.getCloPayCompany());//打款公司
                 detail.setAgentType(null == agentBusInfo ? "3" : agentBusInfo.getBusType());
-                detail.setNotaxAmt(BigDecimal.ZERO);//日结金额 * 瑞大宝有无待确认
-                detail.setProfitAmt(tranData.getBigDecimal("frAmount").subtract(detail.getNotaxAmt()));//分润金额
+                detail.setProfitAmt(tranData.getBigDecimal("frAmount"));//分润金额
 
                 detail.setSourceInfo("RDBPOS");
                 detail.setSupplyAmt(tranData.getBigDecimal("disc"));//补款
