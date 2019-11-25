@@ -1080,12 +1080,23 @@
   <select id="excelOrder" parameterType="map" resultMap="OrderoutVo">
     (
     select
-    to_char(o.O_INURETIME,'YYYY-MM-DD') as oinuretime,
+    to_char(o.c_time,'YYYY-MM-DD') as apytime,
     o.o_num as num,
     b.ag_uniq_num,
-    aab.bus_num,
     c.platform_name,
     b.ag_name,
+    nvl((
+      select LISTAGG(o_sub_order.pro_code,',') WITHIN GROUP (ORDER BY o_sub_order.order_id)
+      from o_sub_order
+      left join o_order on o_sub_order.order_id = o_order.id
+      where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
+    ),0) as pro_code,
+    nvl((
+      select LISTAGG(o_sub_order.pro_name,',') WITHIN GROUP (ORDER BY o_sub_order.order_id)
+      from o_sub_order
+      left join o_order on o_sub_order.order_id = o_order.id
+      where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
+    ),0) as pro_name,
     nvl((
       select LISTAGG(o_sub_order.pro_type,',') WITHIN GROUP (ORDER BY o_sub_order.order_id)
       from o_sub_order
@@ -1141,6 +1152,7 @@
       from o_cash_receivables cr
       where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),'') as realRecTime,
+    d.nuclear_user,
     nvl((
       select to_char(cr.check_date,'YYYY-MM-DD')
       from o_cash_receivables cr
@@ -1151,7 +1163,8 @@
       from o_cash_receivables cr
       where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),0) as xxAmount,
-    d.nuclear_user,
+    d.profit_mouth,
+    d.profit_form,
     nvl((d.outstanding_amount),0) as ykfr_amt,
     to_char(d.down_payment_date,'YYYY-MM') as down_payment_date,
     nvl((
@@ -1195,92 +1208,36 @@
       and (o_payment_detail.pay_type='DKFQ' or o_payment_detail.pay_type='FRFQ')
     ),0) as sjdk_amt,
     nvl(d.outstanding_amount,0) as syqk_amt,
-    o.review_status,
-    to_char(o.o_inuretime,'YYYY-MM-DD') as oinuretime,
-    oan.org_name,
-    o.remark,
-    d.pay_method,
-    d.deduction_type,
-    d.deduction_amount,
-    d.nuclear_user,
-    d.profit_mouth,
-    d.profit_form,
     (
-    nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0)
-    -
-    nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro
-    where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)
+      nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0)
+      -
+      nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro
+      where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)
     )as to_pick_num,
     nvl((
-      select sum(PLAN_PRO_NUM) from O_RECEIPT_PLAN plan where plan.order_id = o.id and plan.status = 1
+      select sum(plans.plan_pro_num) from o_receipt_plan plans where plans.order_id = o.id and plans.status = 1
     ),0) as is_plan_num,
-    nvl((
-      select sum(o_receipt_pro.pro_num)-sum(o_receipt_pro.send_num) from o_receipt_pro
-      where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)
-    ),0) as to_plan_num,
-    o.user_id as order_user,
-    to_char(o.o_apytime,'YYYY-MM-DD') as orderDate,
+    o.review_status,
+    to_char(o.o_inuretime,'YYYY-MM-DD') as oinuretime,
     orging.name as ag_doc_district,
     org.name as ag_doc_pro,
+    o.user_id as order_user,
     nvl((
-    select LISTAGG(o_sub_order.pro_code,',') WITHIN GROUP (ORDER BY o_sub_order.order_id)
-    from o_sub_order
-    left join o_order on o_sub_order.order_id = o_order.id and o_sub_order.status=1 and o_order.status=1
-    where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
-    ),0) as pro_code,
-    nvl((
-    select LISTAGG(o_sub_order.pro_name,',') WITHIN GROUP (ORDER BY o_sub_order.order_id)
-    from o_sub_order
-    left join o_order on o_sub_order.order_id = o_order.id and o_sub_order.status=1 and o_order.status=1
-    where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
-    ),0) as pro_name,
-
-    d.real_amount, d.outstanding_amount, d.actual_receipt, d.down_payment_user, d.pay_amount,
-    d.real_amount, d.outstanding_amount, d.nuclear_time, d.down_payment, o.o_amo, o.o_apytime,
-    nvl(d.pay_amount,0) as dd_amt,
-    nvl((
-      select sum(o_payment_detail.pay_amount)
-      from o_payment_detail
-      where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.status=1
-      and (o_payment_detail.pay_type='FRFQ' or o_payment_detail.pay_type='DKFQ')
-    ),0) as money,
-    nvl((
-      select COUNT(o_payment_detail.plan_num)
-      from o_payment_detail
-      where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.status=1
-      and (o_payment_detail.pay_type='FRFQ'or o_payment_detail.pay_type='DKFQ')
-    ),0) as planNum,
-    nvl((
-      select sum(o_payment_detail.pay_amount)
-      from o_payment_detail
-      where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.payment_status in (1,3)
-    ),0) as qk,
-    to_char(d.down_payment_date,'YYYY-MM') as down_payment_date,
-    NVL2(d.nuclear_time, to_char(d.nuclear_time,'YYYY-MM-DD'),'')as nuclear_user_string,
-    nvl((
-      case d.pay_method
-        when 'SF1' then d.down_payment_count
-        when 'FRFQ' then d.down_payment_count
-        else 0
-      end
-    ),0) as down_payment_count,
-    nvl((
-      select sum(o_payment_detail.real_pay_amount)
-      from o_payment_detail
-      where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.status = 1
-      and o_payment_detail.pay_type='FRFQ'
-    ),0) as skfr_amt
-
+      select oan.org_name
+      from o_organization oan
+      where oan.org_id = aab.organ_num and oan.status = 1
+    ),'') as org_name,
+    to_char(o.o_apytime,'YYYY-MM-DD') as orderDate,
+    o.remark
     from o_order o
-    left join a_agent b on o.agent_id = b.id and b.status=1
-    left join a_agent_businfo aab on aab.agent_id = o.agent_id and aab.id = o.bus_id and aab.status = 1
+    left join a_agent b on o.agent_id = b.id
+    left join a_agent_businfo aab on aab.id = o.bus_id and aab.agent_id = o.agent_id
     left join a_platform c on c.platform_num = o.order_platform
     left join o_payment d on d.order_id = o.id and d.status=1
     left join c_organization org on org.id = aab.ag_doc_pro
     left join c_organization orging on orging.id = aab.ag_doc_district
-    left join o_organization oan on oan.org_id = aab.organ_num and oan.status = 1
     <where>
-      <if test="1==1"> and o.status = 1 </if>
+      <if test="1==1"> and o.status = 1 and b.status = 1 and aab.status = 1 </if>
       <if test="nuclearUser!=null and nuclearUser!=''"> and d.nuclear_user = #{nuclearUser} </if>
       <if test="oNum!=null and oNum!=''"> and o.o_num = #{oNum} </if>
       <if test="id!=null and id!=''"> and o.id = #{id} </if>
@@ -1324,7 +1281,7 @@
     <result column="ag_name" property="agName" jdbcType="VARCHAR"/>
     <result column="o_num" property="num" jdbcType="VARCHAR"/>
     <result column="pay_amo" property="payAmo" jdbcType="VARCHAR"/>
-    <result column="o_inuretime" jdbcType="TIMESTAMP" property="inuretime" />
+    <result column="o_apytime" property="apytime" jdbcType="TIMESTAMP"/>
     <result column="platform_name" property="platformName" jdbcType="VARCHAR"/>
     <result column="pro_num" property="proNum" jdbcType="VARCHAR"/>
     <result column="pay_method" property="payMethod" jdbcType="VARCHAR"/>

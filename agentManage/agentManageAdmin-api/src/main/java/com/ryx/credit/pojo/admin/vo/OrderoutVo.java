@@ -13,7 +13,7 @@ import java.util.Date;
 public class OrderoutVo implements Serializable{
     private String num;//单号
     private String payAmo;//总金额
-    private Date inuretime;//订单日期
+    private String apytime;//订单日期
     private String agUniqNum;//唯一码
     private String agName;//代理商名称
     private String platformName;//平台
@@ -462,12 +462,12 @@ public class OrderoutVo implements Serializable{
         this.num = num;
     }
 
-    public Date getInuretime() {
-        return inuretime;
+    public String getApytime() {
+        return apytime;
     }
 
-    public void setInuretime(Date inuretime) {
-        this.inuretime = inuretime;
+    public void setApytime(String apytime) {
+        this.apytime = apytime;
     }
 
     public String getNuclearUser() {
