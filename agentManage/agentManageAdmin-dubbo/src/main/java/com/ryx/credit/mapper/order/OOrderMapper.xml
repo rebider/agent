@@ -476,7 +476,7 @@
     left join c_organization g on g.id= e.ag_doc_pro
     <where>
       o.user_id=#{userId}
-      <if test="1==1"> and  o.status = 1 or o.status=3 </if>
+      <if test="1==1"> and  o.status = 1  </if>
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
       <if test="id!=null and id!=''"> and  o.id = #{id} </if>
       <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
@@ -680,7 +680,7 @@
     left join c_organization g on g.id= e.ag_doc_pro
     <where>
       o.user_id=#{userId}
-      <if test="1==1"> and  o.status = 1 or o.status=3</if>
+      <if test="1==1"> and  o.status = 1 </if>
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
       <if test="id!=null and id!=''"> and  o.id = #{id} </if>
       <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
