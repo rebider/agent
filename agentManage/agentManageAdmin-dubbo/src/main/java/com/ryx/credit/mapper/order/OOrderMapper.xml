@@ -459,6 +459,8 @@
     left join o_sub_order on o_sub_order_activity.sub_order_id = o_sub_order.id and o_sub_order.status=1 and o_sub_order_activity.status=1
     where o_sub_order.status=1 and o_sub_order_activity.status=1 and o_sub_order.order_id = o.id
     ) as activity_name,
+      nvl((select sum(o_receipt_pro.pro_num)-sum(o_receipt_pro.send_num) from o_receipt_pro
+      where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0) as for_send_num,
     nvl(( select reviews_stat from
     (select  oa.reviews_stat,row_number() OVER(PARTITION BY oa.order_id ORDER BY   oa.adj_tm desc) as row_flg
     from o_order_adj oa
