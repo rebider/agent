@@ -1307,7 +1307,7 @@
     left join c_organization org on org.id = aab.ag_doc_pro
     left join c_organization orging on orging.id = aab.ag_doc_district
     <where>
-      <if test="1==1"> and o.status = 1 and b.status = 1 and aab.status = 1 </if>
+      <if test="1==1"> and o.status = 1 or o.status = 3 and b.status = 1 and aab.status = 1 </if>
       <if test="nuclearUser!=null and nuclearUser!=''"> and d.nuclear_user = #{nuclearUser} </if>
       <if test="oNum!=null and oNum!=''"> and o.o_num = #{oNum} </if>
       <if test="id!=null and id!=''"> and o.id = #{id} </if>
@@ -1511,42 +1511,43 @@
     left join c_organization orging on orging.id = aab.ag_doc_district
     <where>
       o.user_id = #{userId}
-        <if test="nuclearUser!=null and nuclearUser!=''"> and d.nuclear_user = #{nuclearUser} </if>
-        <if test="oNum!=null and oNum!=''"> and o.o_num = #{oNum} </if>
-        <if test="id!=null and id!=''"> and o.id = #{id} </if>
-        <if test="agentId!=null and agentId!=''"> and o.agent_id = #{agentId} </if>
-        <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform = #{orderPlatform} </if>
-        <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
-        <if test="agName!=null and agName!=''"> and b.ag_name like #{agName} </if>
-        <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
-        <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
-        <if test="agUniqNum!=null and agUniqNum!=''"> and b.AG_UNIQ_NUM=#{agUniqNum} </if>
-        <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1 and PRO_TYPE=#{proType} and o.id=ORDER_ID) </if>
-        <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1 and model=#{model} and o.id=ORDER_ID) </if>
-        <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
-        <if test="vender!=null and vender!=''">
-            and EXISTS(select * from o_sub_order os
-            left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id and os.order_id=o.id where soa.VENDER=#{vender})
-        </if>
-        <if test="activityName!=null and activityName!=''">
-            and EXISTS (select * from o_sub_order_activity soa
-            left join o_sub_order os on soa.SUB_ORDER_ID=os.id and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
-        </if>
-        <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus} </if>
-        <if test="agDocDistrict!=null and agDocDistrict!=''">
-            and (b.ag_doc_pro = #{agDocDistrict} or and b.ag_doc_district = #{agDocDistrict})
-        </if>
-        <if test="agDocPro!=null and agDocPro!=''"> and b.ag_doc_pro = #{agDocPro} </if>
-        <if test="busNum!=null and busNum!=''"> and aab.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
-        <if test="organizationCode!=null and organizationCode!=''">
-            and (orging.CODE like concat(#{organizationCode},'%') or org.CODE like concat(#{organizationCode},'%') )
-        </if>
-        <if test="platfromPerm!=null and platfromPerm.size>0">
-            and o.order_platform in
-            <foreach collection="platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
-                #{platfromPermItem.PLATFORM_NUM}
-            </foreach>
-        </if>
+      <if test="1==1"> and o.status = 1 or o.status = 3 and b.status = 1 and aab.status = 1 </if>
+      <if test="nuclearUser!=null and nuclearUser!=''"> and d.nuclear_user = #{nuclearUser} </if>
+      <if test="oNum!=null and oNum!=''"> and o.o_num = #{oNum} </if>
+      <if test="id!=null and id!=''"> and o.id = #{id} </if>
+      <if test="agentId!=null and agentId!=''"> and o.agent_id = #{agentId} </if>
+      <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform = #{orderPlatform} </if>
+      <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
+      <if test="agName!=null and agName!=''"> and b.ag_name like #{agName} </if>
+      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+      <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
+      <if test="agUniqNum!=null and agUniqNum!=''"> and b.AG_UNIQ_NUM=#{agUniqNum} </if>
+      <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1 and PRO_TYPE=#{proType} and o.id=ORDER_ID) </if>
+      <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1 and model=#{model} and o.id=ORDER_ID) </if>
+      <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
+      <if test="vender!=null and vender!=''">
+        and EXISTS(select * from o_sub_order os
+        left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id and os.order_id=o.id where soa.VENDER=#{vender})
+      </if>
+      <if test="activityName!=null and activityName!=''">
+        and EXISTS (select * from o_sub_order_activity soa
+        left join o_sub_order os on soa.SUB_ORDER_ID=os.id and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
+      </if>
+      <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus} </if>
+      <if test="agDocDistrict!=null and agDocDistrict!=''">
+        and (b.ag_doc_pro = #{agDocDistrict} or and b.ag_doc_district = #{agDocDistrict})
+      </if>
+      <if test="agDocPro!=null and agDocPro!=''"> and b.ag_doc_pro = #{agDocPro} </if>
+      <if test="busNum!=null and busNum!=''"> and aab.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
+      <if test="organizationCode!=null and organizationCode!=''">
+        and (orging.CODE like concat(#{organizationCode},'%') or org.CODE like concat(#{organizationCode},'%') )
+      </if>
+      <if test="platfromPerm!=null and platfromPerm.size>0">
+        and o.order_platform in
+        <foreach collection="platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
+          #{platfromPermItem.PLATFORM_NUM}
+        </foreach>
+      </if>
     </where>
     UNION
     select
