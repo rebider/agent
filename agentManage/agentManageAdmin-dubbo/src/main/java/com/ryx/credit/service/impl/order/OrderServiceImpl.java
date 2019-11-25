@@ -3981,7 +3981,12 @@ public class OrderServiceImpl implements OrderService {
         OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
         oPaymentDetailExample.or().andOrderIdEqualTo(orderUpModelVo.getOrderId()).andPaymentTypeEqualTo(PamentIdType.ORDER_FKD.code).andStatusEqualTo(Status.STATUS_1.status);
         List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
-
+        BigDecimal unpaySize = BigDecimal.ZERO;
+        for (OPaymentDetail oPaymentDetail:oPaymentDetails){
+            if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.DF.code) == 0){
+                unpaySize = unpaySize.add(new BigDecimal("1"));
+            }
+        }
         OrderAdj orderAdj = new OrderAdj();
         orderAdj.setId(idService.genIdInTran(TabId.o_order_adj));
         orderAdj.setOrderId(orderUpModelVo.getOrderId());            //订单id
@@ -3991,7 +3996,7 @@ public class OrderServiceImpl implements OrderService {
         orderAdj.setOrgOAmo(order.getoAmo());                        //原订单总计金额
         orderAdj.setOrgIncentiveAmo(order.getIncentiveAmo());        //原订单优惠金额
         orderAdj.setOrgPayAmo(order.getPayAmo());                    //原订单应付金额
-        orderAdj.setOrgPlanNum(new BigDecimal(oPaymentDetails.size()));//剩余分期次数
+        orderAdj.setOrgPlanNum(unpaySize);//剩余分期次数
         orderAdj.setStagesAmount(new BigDecimal(orderUpModelVo.getAdjRepayment()));//预计分期金额
         orderAdj.setRefundAmount(new BigDecimal(orderUpModelVo.getRefundAmount()));//退款金额
         orderAdj.setOrgPaymentId(oPaymentDetails.get(0).getBatchCode());//原还款计划批次号
