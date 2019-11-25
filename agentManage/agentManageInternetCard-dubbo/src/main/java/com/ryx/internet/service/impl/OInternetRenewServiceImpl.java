@@ -921,12 +921,12 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             }
             //是否需续费为是,才展示按钮
             if(oInternetCard.getRenew().compareTo(BigDecimal.ZERO)==0){
-                throw new MessageException("是否需续费为否,不允许续费");
+                throw new MessageException("是否需续费为否,不允许续费/注销");
             }
             if((oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NORMAL.getValue())==0 || oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NOACTIVATE.getValue())==0 )
                     && oInternetCard.getRenewStatus().equals(InternetRenewStatus.WXF.getValue())){
                 if(null==oInternetCard.getExpireTime()){
-                    throw new MessageException("到期时间为空,不允许续费");
+                    throw new MessageException("到期时间为空,不允许续费/注销");
                 }
                 String onOff = redisService.getValue(RedisCachKey.CARDRENEW22ONOFF.code);
                 if(StringUtils.isBlank(onOff)){
@@ -935,11 +935,11 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 if(onOff.equals(OnOffStatus.ON.code)){
                     Date date = DateUtil.dateDay(oInternetCard.getExpireTime(), "22");
                     if(Calendar.getInstance().getTime().getTime()>date.getTime()){
-                        throw new MessageException("到期时间超过22号,不允许续费");
+                        throw new MessageException("到期时间超过22号,不允许续费/注销");
                     }
                 }
             }else{
-                throw new MessageException("状态不正确,不允许续费");
+                throw new MessageException("状态不正确,不允许续费/注销");
             }
         }
     }
@@ -1098,39 +1098,39 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
 
 
 
-    @Transactional
-    @Autowired
-    public void frdk(){
-        log.info("分润抵扣历史数据处理开始");
-        OInternetRenewDetailExample oInternetRenewDetailExample = new OInternetRenewDetailExample();
-        OInternetRenewDetailExample.Criteria criteria = oInternetRenewDetailExample.createCriteria();
-        criteria.andStatusEqualTo(Status.STATUS_1.status);
-        List<String> renewWayList = new ArrayList<>();
-        renewWayList.add(InternetRenewWay.FRDK.getValue());
-        renewWayList.add(InternetRenewWay.FRDKGC.getValue());
-        criteria.andRenewWayIn(renewWayList);
-        criteria.andRenewStatusEqualTo(InternetRenewStatus.XFZ.getValue());
-        List<OInternetRenewDetail> oInternetRenewDetails = internetRenewDetailMapper.selectByExample(oInternetRenewDetailExample);
-        for (OInternetRenewDetail oInternetRenewDetail : oInternetRenewDetails) {
-            oInternetRenewDetail.setuTime(new Date());
-            oInternetRenewDetail.setRenewStatus(InternetRenewStatus.YXF.getValue());
-            oInternetRenewDetail.setRealityAmt(oInternetRenewDetail.getOughtAmt());
-            int i = internetRenewDetailMapper.updateByPrimaryKeySelective(oInternetRenewDetail);
-            if(i!=1){
-                log.info("分润抵扣历史数据处理失败1",oInternetRenewDetail.getId());
-                continue;
-            }
-            OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(oInternetRenewDetail.getIccidNum());
-            oInternetCard.setExpireTime(DateUtil.getOneYearLater(oInternetCard.getExpireTime()));
-            oInternetCard.setRenewStatus(InternetRenewStatus.YXF.getValue());
-            oInternetCard.setStop(Status.STATUS_0.status);
-            oInternetCard.setRenew(Status.STATUS_0.status);
-            oInternetCard.setuTime(new Date());
-            int j = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
-            if(j!=1){
-                log.info("分润抵扣历史数据处理失败2",oInternetCard.getIccidNum());
-            }
-        }
-        log.info("分润抵扣历史数据处理结束,处理个数{}",oInternetRenewDetails.size());
-    }
+//    @Transactional
+//    @Autowired
+//    public void frdk(){
+//        log.info("分润抵扣历史数据处理开始");
+//        OInternetRenewDetailExample oInternetRenewDetailExample = new OInternetRenewDetailExample();
+//        OInternetRenewDetailExample.Criteria criteria = oInternetRenewDetailExample.createCriteria();
+//        criteria.andStatusEqualTo(Status.STATUS_1.status);
+//        List<String> renewWayList = new ArrayList<>();
+//        renewWayList.add(InternetRenewWay.FRDK.getValue());
+//        renewWayList.add(InternetRenewWay.FRDKGC.getValue());
+//        criteria.andRenewWayIn(renewWayList);
+//        criteria.andRenewStatusEqualTo(InternetRenewStatus.XFZ.getValue());
+//        List<OInternetRenewDetail> oInternetRenewDetails = internetRenewDetailMapper.selectByExample(oInternetRenewDetailExample);
+//        for (OInternetRenewDetail oInternetRenewDetail : oInternetRenewDetails) {
+//            oInternetRenewDetail.setuTime(new Date());
+//            oInternetRenewDetail.setRenewStatus(InternetRenewStatus.YXF.getValue());
+//            oInternetRenewDetail.setRealityAmt(oInternetRenewDetail.getOughtAmt());
+//            int i = internetRenewDetailMapper.updateByPrimaryKeySelective(oInternetRenewDetail);
+//            if(i!=1){
+//                log.info("分润抵扣历史数据处理失败1",oInternetRenewDetail.getId());
+//                continue;
+//            }
+//            OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(oInternetRenewDetail.getIccidNum());
+//            oInternetCard.setExpireTime(DateUtil.getOneYearLater(oInternetCard.getExpireTime()));
+//            oInternetCard.setRenewStatus(InternetRenewStatus.YXF.getValue());
+//            oInternetCard.setStop(Status.STATUS_0.status);
+//            oInternetCard.setRenew(Status.STATUS_0.status);
+//            oInternetCard.setuTime(new Date());
+//            int j = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
+//            if(j!=1){
+//                log.info("分润抵扣历史数据处理失败2",oInternetCard.getIccidNum());
+//            }
+//        }
+//        log.info("分润抵扣历史数据处理结束,处理个数{}",oInternetRenewDetails.size());
+//    }
 }

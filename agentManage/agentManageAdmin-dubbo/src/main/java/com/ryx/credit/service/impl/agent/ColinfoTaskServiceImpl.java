@@ -107,16 +107,17 @@ public class ColinfoTaskServiceImpl implements ColinfoTaskService {
                 payment.setDatasource("13");  //收款账户同步清结算类型
                 AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
                 AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
-                criteria.andAgentIdEqualTo(String.valueOf(row.get("AGENT_ID")));
+                String agentId = String.valueOf(row.get("AGENT_ID"));
+                criteria.andAgentIdEqualTo(agentId);
                 criteria.andCloReviewStatusEqualTo(AgStatus.Approved.status);
                 List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
                 if(agentBusInfos==null){
-                    log.info("synColinfoToPayment,未分配打款公司,暂不出款");
-                    return;
+                    log.info("synColinfoToPayment,未分配打款公司,暂不出款,agentId：{}",agentId);
+                    continue;
                 }
                 if(agentBusInfos.size()==0){
-                    log.info("synColinfoToPayment,未分配打款公司,暂不出款");
-                    return;
+                    log.info("synColinfoToPayment,未分配打款公司,暂不出款,agentId：{}",agentId);
+                    continue;
                 }
                 payment.setAccountId(agentBusInfos.get(0).getCloPayCompany());  //出款
                 try {
