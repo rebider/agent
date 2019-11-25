@@ -634,25 +634,25 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         if(PlatformType.RDBPOS.code.equals(platformType.getValue())){
             //检查手机号是否填写
             if(StringUtils.isBlank(abus.getBusLoginNum())){
-                throw new ProcessException("瑞大宝平台登录账号不能为空");
+                throw new MessageException("瑞大宝平台登录账号不能为空");
             }
             if(!RegexUtil.checkInt(abus.getBusLoginNum())){
-                throw new ProcessException("瑞大宝平台登录账号必须为数字");
+                throw new MessageException("瑞大宝平台登录账号必须为数字");
             }
             if(abus.getBusLoginNum().length()!=11){
-                throw new ProcessException("手机位数不正确");
+                throw new MessageException("手机位数不正确");
             }
         }
         if(PlatformType.RHPOS.code.equals(platformType.getValue())){
             //检查手机号是否填写
             if(StringUtils.isBlank(abus.getBusLoginNum())){
-                throw new ProcessException("瑞花宝平台登录账号不能为空");
+                throw new MessageException("瑞花宝平台登录账号不能为空");
             }
             if(!RegexUtil.checkInt(abus.getBusLoginNum())){
-                throw new ProcessException("瑞花宝平台登录账号必须是数字");
+                throw new MessageException("瑞花宝平台登录账号必须是数字");
             }
             if(abus.getBusLoginNum().length()!=11){
-                throw new ProcessException("手机位数不正确");
+                throw new MessageException("手机位数不正确");
             }
         }
         //检查是否有审批中的代理商新
