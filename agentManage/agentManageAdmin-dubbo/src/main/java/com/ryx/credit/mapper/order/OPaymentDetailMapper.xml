@@ -797,4 +797,11 @@
         </where>
         AND status=1 and PAYMENT_STATUS=1
     </select>
+    <select id="selectArrMoney" parameterType="string" resultType="java.math.BigDecimal">
+      SELECT NVL(SUM(PAY_AMOUNT),0)
+      FROM O_PAYMENT_DETAIL PD
+      WHERE PD.ORDER_ID = #{orderId}
+      AND PD.PAYMENT_TYPE = #{paymentType}
+      AND PD.PAYMENT_STATUS= ${paymentStatus}
+    </select>
 </mapper>

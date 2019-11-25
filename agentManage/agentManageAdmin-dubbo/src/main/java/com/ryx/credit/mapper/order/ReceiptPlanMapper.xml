@@ -531,4 +531,20 @@
     (select id from o_return_order_detail where return_id = #{returnId})
     order by r.c_date desc
   </select>
+
+  <select id="planCountTotal" resultType="java.math.BigDecimal" parameterType="String">
+    select nvl(sum(rp.plan_pro_num),0) from o_receipt_plan rp
+    left join o_order oo on oo.id = rp.order_id and oo.status=1
+    left join o_receipt_pro pro on pro.orderid = oo.id and rp.pro_id = pro.id and pro.status=1
+    left join o_sub_order os on os.pro_id = pro.pro_id and os.order_id = oo.id and os.status=1
+    <where>
+      1=1 and rp.status=1
+      <if test="orderId!=null and orderId!=''">
+        and rp.order_id = #{orderId}
+      </if>
+      <if test="proId!=null and proId!=''">
+        and pro.pro_id = #{proId}
+      </if>
+    </where>
+  </select>
 </mapper>

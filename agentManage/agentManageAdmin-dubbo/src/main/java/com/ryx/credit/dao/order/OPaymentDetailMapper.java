@@ -74,4 +74,5 @@ public interface OPaymentDetailMapper {
 
     List<OPaymentDetail> selectOPaymentDetail(Map map);
 
+    BigDecimal selectArrMoney(@Param("orderId")String orderId,@Param("paymentType")String paymentType, @Param("paymentStatus")BigDecimal paymentStatus);
 }
