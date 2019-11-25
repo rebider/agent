@@ -4181,7 +4181,7 @@ public class OrderServiceImpl implements OrderService {
         record.setDataShiro(BusActRelBusType.orderAdjust.key);
         record.setAgDocPro(agentBusInfo.getAgDocPro());
         record.setAgDocDistrict(agentBusInfo.getAgDocDistrict());
-        record.setNetInBusType("ACTIVITY_"+order.getOrderPlatform());
+//        record.setNetInBusType("ACTIVITY_"+order.getOrderPlatform());//入网流程需要该字段
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("订单调整提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
             throw new MessageException("订单调整审批流启动失败：添加审批关系失败！");
@@ -4721,17 +4721,15 @@ public class OrderServiceImpl implements OrderService {
                     break;
                 case "XXDK":
 
-                    if (oPayment.getActualReceipt() == null || oPayment.getActualReceipt().compareTo(BigDecimal.ZERO) <= 0) {
+                    if (oPayment.getActualReceipt() == null || oPayment.getActualReceipt().compareTo(BigDecimal.ZERO) < 0) {
                         logger.info("订单审批完成:实际收款金额不能为空:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
                         throw new MessageException("实际收款金额不能为空");
                     }
-
-                    //未付清生成待付明细
-                    if (oPayment.getOutstandingAmount().compareTo(BigDecimal.ZERO) > 0) {
+                    if (isZero){
                         //分期数据
                         List<Map> XXDK_data = StageUtil.stageOrder(
-                                oPayment.getOutstandingAmount(),
-                                orderAdj.getOrgPlanNum().intValue(),
+                                re.abs(),
+                                1,
                                 oPayment.getDownPaymentDate(), temp.get(Calendar.DAY_OF_MONTH));
                         //明细处理
                         for (Map datum : XXDK_data) {
@@ -4743,12 +4741,12 @@ public class OrderServiceImpl implements OrderService {
                             record_XXDK.setPaymentType(PamentIdType.ORDER_FKD.code);
                             record_XXDK.setOrderId(oPayment.getOrderId());
                             record_XXDK.setPayType(PaymentType.DK.code);
-                            record_XXDK.setPayAmount(oPayment.getOutstandingAmount());
-                            record_XXDK.setRealPayAmount(BigDecimal.ZERO);
+                            record_XXDK.setPayAmount(re);
+                            record_XXDK.setRealPayAmount(re);
                             record_XXDK.setPlanPayTime(d.getTime());
                             record_XXDK.setPlanNum(Status.STATUS_0.status);
                             record_XXDK.setAgentId(oPayment.getAgentId());
-                            record_XXDK.setPaymentStatus(PaymentStatus.DF.code);
+                            record_XXDK.setPaymentStatus(PaymentStatus.JQ.code);
                             record_XXDK.setcUser(oPayment.getUserId());
                             record_XXDK.setcDate(d.getTime());
                             record_XXDK.setStatus(Status.STATUS_1.status);
@@ -4761,6 +4759,40 @@ public class OrderServiceImpl implements OrderService {
                                     oPayment.getOutstandingAmount(),
                                     oPayment.getPayMethod());
                         }
+                        break;
+                    }
+                    //分期数据
+                    List<Map> XXDK_data = StageUtil.stageOrder(
+                            oPayment.getOutstandingAmount(),
+                            orderAdj.getOrgPlanNum().intValue(),
+                            oPayment.getDownPaymentDate(), temp.get(Calendar.DAY_OF_MONTH));
+                    //明细处理
+                    for (Map datum : XXDK_data) {
+                        //添加分期明细
+                        OPaymentDetail record_XXDK = new OPaymentDetail();
+                        record_XXDK.setId(idService.genId(TabId.o_payment_detail));
+                        record_XXDK.setBatchCode(batchCode);
+                        record_XXDK.setPaymentId(oPayment.getId());
+                        record_XXDK.setPaymentType(PamentIdType.ORDER_FKD.code);
+                        record_XXDK.setOrderId(oPayment.getOrderId());
+                        record_XXDK.setPayType(PaymentType.DK.code);
+                        record_XXDK.setPayAmount(oPayment.getOutstandingAmount());
+                        record_XXDK.setRealPayAmount(BigDecimal.ZERO);
+                        record_XXDK.setPlanPayTime(d.getTime());
+                        record_XXDK.setPlanNum(Status.STATUS_0.status);
+                        record_XXDK.setAgentId(oPayment.getAgentId());
+                        record_XXDK.setPaymentStatus(PaymentStatus.DF.code);
+                        record_XXDK.setcUser(oPayment.getUserId());
+                        record_XXDK.setcDate(d.getTime());
+                        record_XXDK.setStatus(Status.STATUS_1.status);
+                        record_XXDK.setVersion(Status.STATUS_1.status);
+                        if (1 != oPaymentDetailMapper.insert(record_XXDK)) {
+                            throw new MessageException("打款明细错误");
+                        }
+                        logger.info("订单调整审批完成处理明细完成首付数据成功{}:{},{}",
+                                order.getId(),
+                                oPayment.getOutstandingAmount(),
+                                oPayment.getPayMethod());
                     }
                     break;
                 case "SF1"://首付+分润分期
