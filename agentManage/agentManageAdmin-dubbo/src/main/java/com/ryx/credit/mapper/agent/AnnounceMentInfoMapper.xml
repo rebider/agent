@@ -467,7 +467,7 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
             and exists (select  ap.anno_id
             from a_anno_platform_rela ap
             left join c_user_agent cg
-            on  cg.userid = cu.id
+            on  cg.userid = #{map.userId}
             left join A_agent_businfo ab
             on ap.rang_value = ab.BUS_TYPE and cg.agentid = ab.agent_id
             and ab.status = '1'
@@ -484,7 +484,7 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
             left join A_agent_businfo ab
             on ap.rang_value = ab.bus_platform and  ab.bus_status = '1'
             left join c_user_agent cg
-            on  cg.userid = cu.id
+            on  cg.userid = #{map.userId}
             left join A_agent_businfo ab
             on ap.rang_value = ab.bus_platform and cg.agentid = ab.agent_id
             and ab.status = '1'

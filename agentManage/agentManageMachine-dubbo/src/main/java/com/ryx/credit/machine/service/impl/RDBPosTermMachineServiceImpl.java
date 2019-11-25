@@ -261,9 +261,9 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
             OActivity oldActivity = orderActivityService.findById(refundPriceDiffDetail.getActivityFrontId());
             OActivity newActivity = orderActivityService.findById(refundPriceDiffDetail.getActivityRealId());
             //增加判断品牌是不是同一个
-            if (!(newActivity.getBusProCode().substring(0, newActivity.getBusProCode().indexOf("-")).equals(oldActivity.getBusProCode().substring(0, oldActivity.getBusProCode().indexOf("-"))))) {
+            /*if (!(newActivity.getBusProCode().substring(0, newActivity.getBusProCode().indexOf("-")).equals(oldActivity.getBusProCode().substring(0, oldActivity.getBusProCode().indexOf("-"))))) {
                 return AgentResult.fail("品牌不同不能更换活动，请选择相同品牌的活动！");
-            }
+            }*/
             reqMap.put("terminalNoStart", refundPriceDiffDetail.getBeginSn());
             reqMap.put("terminalNoEnd", refundPriceDiffDetail.getEndSn());
             reqMap.put("terminalPolicyId", newActivity.getBusProCode());
