@@ -1157,7 +1157,7 @@
     nvl((
       select LISTAGG(o_sub_order.pro_type,',') WITHIN GROUP (ORDER BY o_sub_order.order_id)
       from o_sub_order
-      left join o_order on o_sub_order.order_id = o_order.id and o_sub_order.status=1 and o_order.status=1
+      left join o_order on o_sub_order.order_id = o_order.id
       left join d_dict dict on dict.d_group='ORDER' and dict.d_artifact='MODEL_TYPE' and dict.d_status=1 and dict.d_itemname = o_sub_order.pro_type
       where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
     ),0) as pro_type,
@@ -1165,36 +1165,61 @@
       select LISTAGG(o_sub_order_activity.activity_name,',')
       WITHIN GROUP(ORDER BY o_sub_order.order_id)
       from o_sub_order_activity
-      left join o_sub_order on o_sub_order_activity.sub_order_id = o_sub_order.id and o_sub_order.status=1 and o_sub_order_activity.status=1
+      left join o_sub_order on o_sub_order_activity.sub_order_id = o_sub_order.id
       where o_sub_order.status=1 and o_sub_order_activity.status=1 and o_sub_order.order_id = o.id
     ) as activity_name,
     (
       select LISTAGG(o_sub_order.model,',') WITHIN GROUP (ORDER BY o_sub_order.order_id)
-      from o_sub_order left join o_order on o_sub_order.order_id = o_order.id and o_sub_order.status=1 and o_order.status=1
+      from o_sub_order
+      left join o_order on o_sub_order.order_id = o_order.id
       where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
     ) as model,
     nvl((
       select LISTAGG(o_sub_order.pro_rel_price,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)
-      from o_sub_order left join o_order on o_sub_order.order_id = o_order.id and o_sub_order.status=1 and o_order.status=1
+      from o_sub_order
+      left join o_order on o_sub_order.order_id = o_order.id
       where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
     ),0) as pro_rel_price,
     nvl((
       select LISTAGG(o_sub_order.pro_num,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)
-      from o_sub_order left join o_order on o_sub_order.order_id = o_order.id and o_sub_order.status=1 and o_order.status=1
+      from o_sub_order
+      left join o_order on o_sub_order.order_id = o_order.id
       where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
     ),0) as pro_num,
     nvl((
       select LISTAGG(o_sub_order.pro_rel_price*o_sub_order.pro_num,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)
-      from o_sub_order left join o_order on o_sub_order.order_id = o_order.id and o_sub_order.status=1 and o_order.status=1
+      from o_sub_order
+      left join o_order on o_sub_order.order_id = o_order.id
       where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
     ),0) as pay_amo,
     o.payment_method,
-    comp.com_name,
-    cr.pay_user,
-    to_char(cr.real_rec_time,'YYYY-MM-DD') as realRecTime,
+    nvl((
+      select comp.com_name
+      from a_pay_comp comp
+      left join o_cash_receivables cr on d.id = cr.src_id and cr.cashpay_type='PAYMENT' and cr.status = 1
+      where comp.id = cr.collect_company
+    ),'') as com_name,
+    nvl((
+      select cr.pay_user
+      from o_cash_receivables cr
+      where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
+    ),'') as pay_user,
+    nvl((
+      select to_char(cr.real_rec_time,'YYYY-MM-DD')
+      from o_cash_receivables cr
+      where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
+    ),'') as realRecTime,
+    nvl((
+      select to_char(cr.check_date,'YYYY-MM-DD')
+      from o_cash_receivables cr
+      where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
+    ),'') as checkDate,
+    nvl((
+      select cr.amount
+      from o_cash_receivables cr
+      where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
+    ),0) as xxAmount,
     d.nuclear_user,
-    to_char(cr.check_date,'YYYY-MM-DD') as checkDate,
-    cr.amount as xxAmount,
     nvl((d.outstanding_amount),0) as ykfr_amt,
     to_char(d.down_payment_date,'YYYY-MM') as down_payment_date,
     nvl((
@@ -1278,8 +1303,8 @@
     where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
     ),0) as pro_name,
 
-    d.real_amount, d.outstanding_amount, d.actual_receipt, d.down_payment_user, d.pay_amount, d.real_amount,
-    d.outstanding_amount, d.nuclear_time, d.down_payment, o.o_amo, o.o_apytime,
+    d.real_amount, d.outstanding_amount, d.actual_receipt, d.down_payment_user, d.pay_amount,
+    d.real_amount, d.outstanding_amount, d.nuclear_time, d.down_payment, o.o_amo, o.o_apytime,
     nvl(d.pay_amount,0) as dd_amt,
     nvl((
       select sum(o_payment_detail.pay_amount)
@@ -1312,16 +1337,13 @@
       from o_payment_detail
       where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.status = 1
       and o_payment_detail.pay_type='FRFQ'
-    ),0) as skfr_amt,
-    to_char(cr.real_rec_time,'YYYY-MM-DD') as realRecTime
+    ),0) as skfr_amt
 
     from o_order o
     left join a_agent b on o.agent_id = b.id and b.status=1
+    left join a_agent_businfo aab on aab.agent_id = o.agent_id and aab.id = o.bus_id and aab.status = 1
     left join a_platform c on c.platform_num = o.order_platform
     left join o_payment d on d.order_id = o.id and d.status=1
-    left join o_cash_receivables cr on d.id = cr.src_id and cr.cashpay_type='PAYMENT' and cr.status = 1
-    left join a_pay_comp comp on comp.id = cr.collect_company
-    left join a_agent_businfo aab on aab.agent_id = o.agent_id and aab.id = o.bus_id and aab.status = 1
     left join c_organization org on org.id = aab.ag_doc_pro
     left join c_organization orging on orging.id = aab.ag_doc_district
     left join o_organization oan on oan.org_id = aab.organ_num and oan.status = 1
