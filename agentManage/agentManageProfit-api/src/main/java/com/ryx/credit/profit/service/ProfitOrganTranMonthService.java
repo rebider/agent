@@ -4,6 +4,7 @@ package com.ryx.credit.profit.service;/**
  * @Description:
  */
 
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.pojo.ProfitOrganTranMonth;
@@ -60,8 +61,8 @@ public interface ProfitOrganTranMonthService {
     * @Param:  profitOrganTranMonth 交易信息
     * @Author: zhaodw
     * @Date: 2018/8/10 
-    */ 
-    void importData(String type);
+    */
+    AgentResult importData(String type);
 
     /**
      * 调用清结算接口 查询消费交易总额
