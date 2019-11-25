@@ -470,11 +470,11 @@
     and ag.status = 1
     left join c_user cu on cu.id = oa.adj_user_id
     <where>
-      <if test="1==1"> and oa.status=1 </if>
+      <if test="1==1"> and oa.status=1 and cu.id = #{map.userId} </if>
       <if test="map.agName!=null and map.agName!=''"> and ag.ag_name like concat(concat('%',#{map.agName}),'%') </if>
       <!--<if test="map.agUniqNum!=null and map.agUniqNum!=''"> and ag.ag_uniq_num = #{map.agUniqNum} </if>-->
       <if test="map.agUniqNum!=null and map.agUniqNum!=''"> and ag.id = #{map.agUniqNum} </if>
-      <if test="map.refundId!=null and map.refundId!=''"> and oa.id = #{map.refundId} </if>
+      <if test="map.refundId!=null and map.refundId!=''"> and oa.order_id = #{map.refundId} </if>
       <if test="map.reviewStatus!=null and map.reviewStatus!=''"> and oa.reviews_stat = #{map.reviewStatus} </if>
       <if test="map.proName!=null and map.proName!=''">
         and EXISTS
