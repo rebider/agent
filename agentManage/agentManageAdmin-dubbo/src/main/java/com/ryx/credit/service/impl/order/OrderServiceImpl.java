@@ -4087,7 +4087,7 @@ public class OrderServiceImpl implements OrderService {
                 osubOrderExample.or().andOrderIdEqualTo(orderAdj.getOrderId()).andStatusEqualTo(Status.STATUS_1.status);
                 List<OSubOrder> oSubOrders = oSubOrderMapper.selectByExample(osubOrderExample);
                 for (OSubOrder oSubOrder:oSubOrders){
-                    if (oSubOrder.getId() == orderAdjDetail.getSubOrderId()){
+                    if (oSubOrder.getId().equals(orderAdjDetail.getSubOrderId()) ){
                         FastMap fastMap = FastMap.fastMap("subOrderId", oSubOrder.getId());
                         BigDecimal oReceiptPros = oReceiptProMapper.receiptCountTotal(orderAdj.getOrderId(), oSubOrder.getProId());//配货数量
                         BigDecimal countPlans = receiptPlanMapper.planCountTotal(orderAdj.getOrderId(), oSubOrder.getProId());//排单数量
