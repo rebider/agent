@@ -1307,7 +1307,7 @@
     left join c_organization org on org.id = aab.ag_doc_pro
     left join c_organization orging on orging.id = aab.ag_doc_district
     <where>
-      <if test="1==1"> and o.status = 1 or o.status = 3 and b.status = 1 and aab.status = 1 </if>
+      <if test="1==1"> and o.status = 1 and b.status = 1 and aab.status = 1 </if>
       <if test="nuclearUser!=null and nuclearUser!=''"> and d.nuclear_user = #{nuclearUser} </if>
       <if test="oNum!=null and oNum!=''"> and o.o_num = #{oNum} </if>
       <if test="id!=null and id!=''"> and o.id = #{id} </if>
@@ -1511,7 +1511,7 @@
     left join c_organization orging on orging.id = aab.ag_doc_district
     <where>
       o.user_id = #{userId}
-      <if test="1==1"> and o.status = 1 or o.status = 3 and b.status = 1 and aab.status = 1 </if>
+      <if test="1==1"> and o.status = 1 and b.status = 1 and aab.status = 1 </if>
       <if test="nuclearUser!=null and nuclearUser!=''"> and d.nuclear_user = #{nuclearUser} </if>
       <if test="oNum!=null and oNum!=''"> and o.o_num = #{oNum} </if>
       <if test="id!=null and id!=''"> and o.id = #{id} </if>
