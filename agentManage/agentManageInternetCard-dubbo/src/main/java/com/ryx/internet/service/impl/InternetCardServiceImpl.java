@@ -636,7 +636,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                 return;
             }
             AgentBusInfo agentBusInfo = new AgentBusInfo();
-            agentBusInfo.setBusNum(internetCard.getBusNum());
+            agentBusInfo.setBusNum(internetCard.getBusNum().trim());
             agentBusInfo.setBusPlatform(platForm.getPlatformNum());
             List<BigDecimal> busStatusList = new ArrayList<>();
             busStatusList.add(BusStatus.QY.getValue());
@@ -653,6 +653,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                 return;
             }
             internetCard.setBusPlatform(platForm.getPlatformNum());
+            internetCard.setBusNum(internetCard.getBusNum().trim());
         }
         if(StringUtils.isNotBlank(internetCard.getBusPlatform()) && StringUtils.isBlank(internetCard.getBusNum())){
             oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());

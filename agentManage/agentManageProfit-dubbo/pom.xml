@@ -39,6 +39,11 @@
             <artifactId>junit</artifactId>
             <version>4.12</version>
         </dependency>
+        <dependency>
+            <groupId>com.ryx.ry</groupId>
+            <artifactId>agentManageInternetCard-api</artifactId>
+            <version>${agentManage.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <finalName>agentManageProfit-dubbo</finalName>

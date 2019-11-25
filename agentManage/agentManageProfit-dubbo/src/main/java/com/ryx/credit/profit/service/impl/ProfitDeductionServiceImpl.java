@@ -1058,4 +1058,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         }
         return profitDeductionMapper.getPorfitDataByAgentIdAndProfitMonth(agentId,profitMonth);
     }
+
+    @Override
+    public void clearMortgageProfitData(String profitDate) {
+        profitDeductionMapper.clearMortgageProfitData(profitDate);
+    }
 }

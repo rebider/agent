@@ -3259,7 +3259,7 @@ public class OrderServiceImpl implements OrderService {
             map.put("platfromPerm", platfromPerm);
         }
 
-        List<OrderoutVo> orderoutList = orderMapper.excelOrder(map);
+        List<OrderoutVo> orderoutList = orderMapper.orderExcel(map);
         List<Dict> dictList = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.SETTLEMENT_TYPE.name());
         List<Dict> capitalType = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.CAPITAL_TYPE.name());
 
@@ -3364,7 +3364,7 @@ public class OrderServiceImpl implements OrderService {
                 }
                 if (StringUtils.isNotBlank(orderoutVo.getDeductionType()) && !orderoutVo.getDeductionType().equals("null")){
                     for (Dict dict : capitalType) {
-                        if (null!=dict  &&  orderoutVo.getDeductionType().equals(dict.getdItemvalue())){
+                        if (null!=dict && orderoutVo.getDeductionType().equals(dict.getdItemvalue())){
                             orderoutVo.setDeductionType(dict.getdItemname());
                             BigDecimal deductionAmount=new BigDecimal(0);
                             if (null!=orderoutVo.getDeductionAmount()){

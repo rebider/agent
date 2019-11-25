@@ -1115,6 +1115,10 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	public List<String> queryOrgByAgentid(Map map) {
 		List<String> allOrg=new ArrayList<>();
 		List<String> orgs = agentBusInfoMapper.queryAgDocPro(map);
+		//查询信息判断
+		if (!(orgs.size() > 0 )) {
+			return  null;
+		}
 		List<COrganization> cOrganizations = cOrganizationMapper.selectPorgByorgs(orgs);
 		cOrganizations.forEach(org->{
 			allOrg.add(String.valueOf(org.getId()));

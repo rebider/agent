@@ -298,7 +298,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                             //发送到业务系统，（瑞+瑞大宝全部发送，其他按200条发送）
                             Map<String, Object> retMap = osnOperateService.sendInfoToBusinessSystem(list, id, new BigDecimal(batch));
                             //解析发送结果，更新物流和明细
-                            if(null != retMap.get("code") && "0000".equals(retMap.get("code"))){
+                            if(null != retMap.get("code") && "0".equals(retMap.get("code"))){
                                 //处理中，更新物流状态，结束循环
                                 OLogistics oLogistics = oLogisticsMapper.selectByPrimaryKey(id);
                                 oLogistics.setSendStatus(LogisticsSendStatus.gen_detail_sucess.code);
@@ -307,10 +307,10 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                                     throw new MessageException("更新物流状态失败,物流ID:{}", id);
                                 }
                                 break;
-                            }else if (list.size() > 0 && null != retMap.get("code") && "1111".equals(retMap.get("code"))) {
+                            }else if (list.size() > 0 && null != retMap.get("code") && "1".equals(retMap.get("code"))) {
                                 //处理成功,不更新物流状态,等处理完所有的物流明细,才更新状态
                                 logger.info("物流明细发送业务系统处理成功,{},{}", id, batch);
-                            } else if (null != retMap.get("code") && "2222".equals(retMap.get("code"))){
+                            } else if (null != retMap.get("code") && "2".equals(retMap.get("code"))){
                                 //处理失败，停止发送
                                 logger.info("物流明细发送业务系统处理失败,{},{}", id, batch);
                                 AppConfig.sendEmail(emailArr, "机具下发失败，SN码:" + logistics_item.getSnBeginNum() + "-" + logistics_item.getSnEndNum() + "。失败原因：" + (null == retMap.get("msg")? "无": retMap.get("msg")), "物流下发失败");
@@ -810,7 +810,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
 
         Map<String, Object> retMap = new HashMap<String, Object>();
         if(datas==null && datas.size()==0){
-            retMap.put("code", "1111");
+            retMap.put("code", "1");
             return retMap;
         }
         OLogistics logistics = oLogisticsMapper.selectByPrimaryKey(logcId);
@@ -860,7 +860,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
 
         //流量卡不进行下发操作
         if(oActivity_plan!=null && com.ryx.credit.commons.utils.StringUtils.isNotBlank(oActivity_plan.getActCode()) && ("2204".equals(oActivity_plan.getActCode()) || "2004".equals(oActivity_plan.getActCode())) ){
-            logger.info("导入物流数据,流量卡不进行下发操作，活动代码{}={}={}" ,oActivity_plan.getActCode(),logcId, JSONObject.toJSON(logistics));
+            logger.info("导入物流数据,流量卡不进行下发操作,活动代码:{},物流ID:{},物流信息:{}" ,oActivity_plan.getActCode(),logcId, JSONObject.toJSONString(logistics));
             listOLogisticsDetailSn.forEach(detail -> {
                 detail.setSendStatus(LogisticsDetailSendStatus.send_success.code);
                 detail.setSbusMsg("流量卡不下发");
@@ -876,7 +876,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                 logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage());
                 throw e;
             }
-            retMap.put("code", "1111");
+            retMap.put("code", "1");
             return retMap;
         }
         logger.info("进入物流发送阶段，联动各个业务平台！");
@@ -904,7 +904,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    retMap.put("code", "1111");
+                    retMap.put("code", "1");
                     return retMap;
                 } else {
                     //机具下发失败，更新物流明细为下发失败，并更新物流为发送失败
@@ -916,7 +916,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    retMap.put("code", "2222");
+                    retMap.put("code", "2");
                     return retMap;
                 }
                 //机具下发失败，更新物流明细为下发失败，并更新物流为发送失败，禁止继续发送 ,人工介入
@@ -982,7 +982,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    retMap.put("code", "1111");
+                    retMap.put("code", "1");
                     return retMap;
                 } else {
                     //机具下发失败，更新物流明细为下发失败，更新物流信息未下发失败，禁止再次发送，人工介入
@@ -994,7 +994,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    retMap.put("code", "2222");
+                    retMap.put("code", "2");
                     return retMap;
                 }
             } catch (MessageException e) {
@@ -1040,7 +1040,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    retMap.put("code", "1111");
+                    retMap.put("code", "1");
                     return retMap;
                 }else{
                     //下发失败
@@ -1052,7 +1052,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    retMap.put("code", "2222");
+                    retMap.put("code", "2");
                     return retMap;
                 }
             } catch (MessageException e) {
@@ -1112,7 +1112,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    retMap.put("code", "1111");
+                    retMap.put("code", "1");
                     return retMap;
                 } else if (0 == queryResult.getStatus()) {
                     //下发处理中，更新物流明细为原始状态
@@ -1122,7 +1122,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    retMap.put("code", "0000");
+                    retMap.put("code", "0");
                     return retMap;
                 } else {
                     //下发失败，更新物流明细为下发失败
@@ -1133,7 +1133,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    retMap.put("code", "2222");
+                    retMap.put("code", "2");
                     retMap.put("msg", null != queryResult.getMsg()? queryResult.getMsg():"失败，瑞大宝未返回失败原因。");
                     return retMap;
                 }
@@ -1166,7 +1166,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             if (null != oActivity_plan.getPosType() && (oActivity_plan.getPosType().equals("1") || oActivity_plan.getPosType().equals("2"))) {
                 reqMap.put("posType", oActivity_plan.getPosType());//机具类型
                 if (null == oActivity_plan.getPosSpePrice() || null == oActivity_plan.getStandTime())
-                    return FastMap.fastMap("code", "2222").putKeyV("msg", "活动对应的特价机[押金]或[达标时间]不能为空!");
+                    return FastMap.fastMap("code", "2").putKeyV("msg", "活动对应的特价机[押金]或[达标时间]不能为空!");
                 reqMap.put("posSpePrice", oActivity_plan.getPosSpePrice().toString());//押金
                 reqMap.put("standTime", oActivity_plan.getStandTime().toString());//达标时间
             } else if (null == oActivity_plan.getPosType() || oActivity_plan.getPosType().equals("0")) {
@@ -1194,7 +1194,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    retMap.put("code", "1111");
+                    retMap.put("code", "1");
                     return retMap;
                 } else if (0 == queryResult.getStatus()) {
                     //下发处理中，更新物流明细为原始状态
@@ -1204,7 +1204,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    retMap.put("code", "0000");
+                    retMap.put("code", "0");
                     return retMap;
                 } else {
                     //下发失败，更新物流明细为下发失败
@@ -1215,7 +1215,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                         detail.setuTime(date);
                         oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                     });
-                    retMap.put("code", "2222");
+                    retMap.put("code", "2");
                     retMap.put("msg", null != queryResult.getMsg()? queryResult.getMsg():"失败，瑞+未返回失败原因。");
                     return retMap;
                 }
@@ -1225,7 +1225,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                 throw e;
             }
         } else {
-            retMap.put("code", "2222");
+            retMap.put("code", "2");
             return retMap;
         }
     }
