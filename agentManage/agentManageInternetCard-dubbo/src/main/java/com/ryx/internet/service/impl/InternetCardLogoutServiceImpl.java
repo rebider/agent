@@ -126,6 +126,30 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
 
     @Override
     public PageInfo internetCardLogoutDetailList(InternetLogoutDetail internetLogoutDetail, Page page, String agentId, Long userId){
+
+        Map<String, Object> reqMap = internetLogoutDetailCommon(internetLogoutDetail, agentId, userId);
+        reqMap.put("page",page);
+        List<Map<String, Object>> internetLogoutList = internetLogoutDetailMapper.internetCardLogoutDetailList(reqMap);
+        for (Map<String, Object> map : internetLogoutList) {
+            if(StringUtils.isNotBlank(String.valueOf(map.get("C_USER")))){
+                CUser cUser = iUserService.selectById(Long.valueOf(String.valueOf(map.get("C_USER"))));
+                if(null!=cUser)
+                    map.put("C_USER",cUser.getName());
+            }
+        }
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(internetLogoutList);
+        pageInfo.setTotal(internetLogoutDetailMapper.internetCardLogoutDetailCount(reqMap));
+        return pageInfo;
+    }
+
+    /**
+     * 查询导出公共部分
+     * @param internetLogoutDetail
+     * @param agentId
+     * @return
+     */
+    private Map<String, Object> internetLogoutDetailCommon(InternetLogoutDetail internetLogoutDetail,String agentId,Long userId){
         Map<String, Object> reqMap = new HashMap<>();
         if(StringUtils.isNotBlank(internetLogoutDetail.getId())){
             reqMap.put("id",internetLogoutDetail.getId());
@@ -171,19 +195,15 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
         if(agentNameList.size()!=0) {
             reqMap.put("agentNameList", agentNameList);
         }
-        reqMap.put("page",page);
-        List<Map<String, Object>> internetLogoutList = internetLogoutDetailMapper.internetCardLogoutDetailList(reqMap);
-        for (Map<String, Object> map : internetLogoutList) {
-            if(StringUtils.isNotBlank(String.valueOf(map.get("C_USER")))){
-                CUser cUser = iUserService.selectById(Long.valueOf(String.valueOf(map.get("C_USER"))));
-                if(null!=cUser)
-                    map.put("C_USER",cUser.getName());
-            }
-        }
-        PageInfo pageInfo = new PageInfo();
-        pageInfo.setRows(internetLogoutList);
-        pageInfo.setTotal(internetLogoutDetailMapper.internetCardLogoutDetailCount(reqMap));
-        return pageInfo;
+        return reqMap;
+    }
+
+
+    @Override
+    public Integer queryInternetLogoutDetailCount(InternetLogoutDetail internetLogoutDetail,String agentId,Long userId){
+        Map<String, Object> reqMap = internetLogoutDetailCommon(internetLogoutDetail, agentId, userId);
+        Integer count = internetLogoutDetailMapper.internetCardLogoutDetailCount(reqMap);
+        return count;
     }
 
 

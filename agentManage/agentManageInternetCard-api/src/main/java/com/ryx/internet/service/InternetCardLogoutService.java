@@ -24,6 +24,8 @@ public interface InternetCardLogoutService {
 
     PageInfo internetCardLogoutDetailList(InternetLogoutDetail internetLogoutDetail, Page page, String agentId, Long userId);
 
+    Integer queryInternetLogoutDetailCount(InternetLogoutDetail internetLogoutDetail,String agentId,Long userId);
+
     AgentResult saveAndApprove(InternetLogout internetLogout, List<String> iccids, String cUser)throws MessageException;
 
     AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception;
