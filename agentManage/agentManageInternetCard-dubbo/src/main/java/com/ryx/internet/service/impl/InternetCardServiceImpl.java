@@ -78,6 +78,10 @@ public class InternetCardServiceImpl implements InternetCardService {
     private AgentBusinfoService agentBusinfoService;
     @Autowired
     private PlatFormService platFormService;
+    @Autowired
+    private InternetLogoutDetailMapper internetLogoutDetailMapper;
+
+
 
     @Override
     public PageInfo internetCardList(OInternetCard internetCard, Page page,String agentId,Long userId){
@@ -679,7 +683,8 @@ public class InternetCardServiceImpl implements InternetCardService {
             internetCard.setRenew(BigDecimal.ZERO);
             internetCard.setStop(BigDecimal.ZERO);
         }
-        if(internetCard.getInternetCardStatus()!=null && internetCard.getInternetCardStatus().compareTo(InternetCardStatus.STOP.getValue())==0){
+        if(internetCard.getInternetCardStatus()!=null && (internetCard.getInternetCardStatus().compareTo(InternetCardStatus.STOP.getValue())==0
+            || internetCard.getInternetCardStatus().compareTo(InternetCardStatus.LOGOUT.getValue())==0)){
             internetCard.setRenew(BigDecimal.ZERO);
             internetCard.setStop(BigDecimal.ZERO);
         }
@@ -704,6 +709,35 @@ public class InternetCardServiceImpl implements InternetCardService {
             internetCard.setcUser(oInternetCardImport.getcUser());
             insertInternetCard(internetCard);
         }else{
+            //如果之前是注销状态，不能在导入其他状态
+            if(oInternetCard.getInternetCardStatus()!=null && oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.LOGOUT.getValue())==0){
+                if(null!=internetCard.getInternetCardStatus()){
+                    oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
+                    oInternetCardImport.setErrorMsg("卡状态已是注销,不可在更新状态");
+                    //更新导入记录
+                    updateInternetCardImport(oInternetCardImport);
+                    return;
+                }
+            }
+            if(internetCard.getInternetCardStatus()!=null && internetCard.getInternetCardStatus().compareTo(InternetCardStatus.LOGOUT.getValue())==0){
+                InternetLogoutDetailExample internetLogoutDetailExample = new InternetLogoutDetailExample();
+                InternetLogoutDetailExample.Criteria criteria = internetLogoutDetailExample.createCriteria();
+                criteria.andStatusEqualTo(Status.STATUS_1.status);
+                criteria.andIccidNumEqualTo(internetCard.getIccidNum());
+                criteria.andLogoutStatusEqualTo(InternetLogoutStatus.DZX.getValue());
+                List<InternetLogoutDetail> internetLogoutDetails = internetLogoutDetailMapper.selectByExample(internetLogoutDetailExample);
+                for (InternetLogoutDetail internetLogoutDetail : internetLogoutDetails) {
+                    internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.ZXCG.getValue());
+                    int i = internetLogoutDetailMapper.updateByPrimaryKey(internetLogoutDetail);
+                    if(i!=1){
+                        oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
+                        oInternetCardImport.setErrorMsg("注销更新记录失败");
+                        //更新导入记录
+                        updateInternetCardImport(oInternetCardImport);
+                        return;
+                    }
+                }
+            }
             updateInternetCard(internetCard);
         }
         oInternetCardImport.setImportStatus(OInternetCardImportStatus.SUCCESS.getValue());

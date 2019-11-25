@@ -121,8 +121,9 @@ public enum TabId {
     a_agent_certification("AC%s%015d"),
     o_order_adj("AD%s%015d"),
     o_order_adj_detail("ADD%s%015d"),
-    o_settle_accounts("SA%s%015d");
-
+    o_settle_accounts("SA%s%015d"),
+    O_INTERNET_LOGOUT("IL%s%015d"),
+    O_INTERNET_LOGOUT_DETAIL("ILD%s%015d");
 
     public String patt;
 
