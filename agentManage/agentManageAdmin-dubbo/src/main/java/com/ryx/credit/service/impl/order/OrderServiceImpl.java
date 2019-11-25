@@ -3259,7 +3259,7 @@ public class OrderServiceImpl implements OrderService {
             map.put("platfromPerm", platfromPerm);
         }
 
-        List<OrderoutVo> orderoutList = orderMapper.excelOrder(map);
+        List<OrderoutVo> orderoutList = orderMapper.orderExcel(map);
         List<Dict> dictList = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.SETTLEMENT_TYPE.name());
         List<Dict> capitalType = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.CAPITAL_TYPE.name());
 

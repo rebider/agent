@@ -21,4 +21,8 @@ public interface OInternetCardPostponeMapper {
     int updateByPrimaryKeySelective(OInternetCardPostpone record);
 
     int updateByPrimaryKey(OInternetCardPostpone record);
+
+    List<OInternetCardPostpone> queryInternetCardPostponeList(OInternetCardPostponeExample example);
+
+    int queryInternetCardPostponeCount(OInternetCardPostponeExample example);
 }
