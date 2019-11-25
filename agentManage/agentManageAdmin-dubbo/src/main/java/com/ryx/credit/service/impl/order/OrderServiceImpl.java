@@ -4050,6 +4050,7 @@ public class OrderServiceImpl implements OrderService {
             //启动流程审批
             String userId = String.valueOf(map.get("userId"));
             AgentResult result = startOrderAdjust(orderAdj.getId(), userId);
+            agentResult.setMsg("提交审批成功");
             if (!result.isOK()) {
                 throw new Exception(result.getMsg());
             }
