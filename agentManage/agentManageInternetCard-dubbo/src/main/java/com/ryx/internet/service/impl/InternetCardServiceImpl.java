@@ -1118,7 +1118,7 @@ public class InternetCardServiceImpl implements InternetCardService {
         OInternetCardImportExample.Criteria criteria = oInternetCardImportExample.createCriteria();
         Date dateAfter = DateUtil.getDateAfterReturnDate(new Date(), -5);
         criteria.andCTimeLessThanOrEqualTo(dateAfter);
-        oInternetCardImportExample.setPage(new Page(0,100));
+        oInternetCardImportExample.setPage(new Page(0,10000));
         List<OInternetCardImport> oInternetCardImports = internetCardImportMapper.selectByExample(oInternetCardImportExample);
         log.info("查询要迁移的数据个数{}",oInternetCardImports.size());
         return oInternetCardImports;
