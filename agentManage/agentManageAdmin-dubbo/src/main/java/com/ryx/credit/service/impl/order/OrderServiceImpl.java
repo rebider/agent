@@ -4195,7 +4195,7 @@ public class OrderServiceImpl implements OrderService {
             logger.info("订单调整提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
             throw new MessageException("订单调整审批流启动失败：添加审批关系失败！");
         }
-        return AgentResult.ok("提交审批成功");
+        return AgentResult.ok();
     }
 
     /**
