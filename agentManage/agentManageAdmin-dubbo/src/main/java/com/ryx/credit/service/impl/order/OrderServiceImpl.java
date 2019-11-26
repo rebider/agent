@@ -40,6 +40,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Created by RYX on 2018/7/13.
@@ -270,7 +273,7 @@ public class OrderServiceImpl implements OrderService {
                 .andReviewStatusEqualTo(approveStatus)
                 .andOrderStatusIn(orderStatus);
         List<OOrder> orders = orderMapper.selectByExample(example);
-        List<String> ids = orders.stream().map(OOrder::getId).collect(Collectors.toList());
+        List<String> ids = orders.stream().map(OOrder::getId).collect(toList());
         OPaymentExample oPaymentExample = new OPaymentExample();
         OPaymentExample.Criteria c = oPaymentExample.or().andStatusEqualTo(Status.STATUS_1.status);
         if(ids.size()>0){
@@ -3914,11 +3917,11 @@ public class OrderServiceImpl implements OrderService {
             return AgentResult.fail("支付信息错误");
         }
         OPayment oPayment = oPaymentList.get(0);
-
+        List<BigDecimal> paymentStatus = Stream.of(PaymentStatus.DF.code,PaymentStatus.YQ.code).collect(toList()) ;
         OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
         oPaymentDetailExample.or()
                 .andStatusEqualTo(Status.STATUS_1.status)
-                .andPaymentStatusEqualTo(PaymentStatus.DF.code)
+                .andPaymentStatusIn(paymentStatus)
                 .andPaymentIdEqualTo(oPayment.getId()).andOrderIdEqualTo(orderId);
         oPaymentDetailExample.setOrderByClause(" pay_time asc, plan_num asc, plan_pay_time asc ");
         List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
@@ -3983,7 +3986,7 @@ public class OrderServiceImpl implements OrderService {
         List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
         BigDecimal unpaySize = BigDecimal.ZERO;
         for (OPaymentDetail oPaymentDetail:oPaymentDetails){
-            if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.DF.code) == 0){
+            if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.DF.code) == 0 || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.YQ.code) == 0){
                 unpaySize = unpaySize.add(new BigDecimal("1"));
             }
         }
@@ -4514,8 +4517,9 @@ public class OrderServiceImpl implements OrderService {
 
                 throw new MessageException("分期数有误");
             }
+            List<BigDecimal> paymentStatus = Stream.of(PaymentStatus.DF.code,PaymentStatus.YQ.code).collect(toList());
             OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
-            oPaymentDetailExample.or().andOrderIdEqualTo(orderAdj.getOrderId()).andPaymentStatusEqualTo(PaymentStatus.DF.code).andStatusEqualTo(Status.STATUS_1.status);
+            oPaymentDetailExample.or().andOrderIdEqualTo(orderAdj.getOrderId()).andPaymentStatusIn(paymentStatus).andStatusEqualTo(Status.STATUS_1.status);
             List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
             for(OPaymentDetail oPaymentDetail:oPaymentDetails){
                 oPaymentDetail.setStatus(Status.STATUS_0.status);
@@ -4735,14 +4739,7 @@ public class OrderServiceImpl implements OrderService {
                         throw new MessageException("实际收款金额不能为空");
                     }
                     if (isZero){
-                        //分期数据
-                        List<Map> XXDK_data = StageUtil.stageOrder(
-                                re.abs(),
-                                1,
-                                oPayment.getDownPaymentDate(), temp.get(Calendar.DAY_OF_MONTH));
-                        //明细处理
-                        for (Map datum : XXDK_data) {
-                            //添加分期明细
+                            //添加打款明细
                             OPaymentDetail record_XXDK = new OPaymentDetail();
                             record_XXDK.setId(idService.genId(TabId.o_payment_detail));
                             record_XXDK.setBatchCode(batchCode);
@@ -4767,17 +4764,12 @@ public class OrderServiceImpl implements OrderService {
                                     order.getId(),
                                     oPayment.getOutstandingAmount(),
                                     oPayment.getPayMethod());
+                            break;
                         }
-                        break;
-                    }
-                    //分期数据
-                    List<Map> XXDK_data = StageUtil.stageOrder(
-                            oPayment.getOutstandingAmount(),
-                            orderAdj.getOrgPlanNum().intValue(),
-                            oPayment.getDownPaymentDate(), temp.get(Calendar.DAY_OF_MONTH));
-                    //明细处理
-                    for (Map datum : XXDK_data) {
-                        //添加分期明细
+
+                    //未付清生成待付明细
+                    if (oPayment.getOutstandingAmount().compareTo(BigDecimal.ZERO) > 0) {
+                        //添加打款明细
                         OPaymentDetail record_XXDK = new OPaymentDetail();
                         record_XXDK.setId(idService.genId(TabId.o_payment_detail));
                         record_XXDK.setBatchCode(batchCode);
@@ -4798,12 +4790,12 @@ public class OrderServiceImpl implements OrderService {
                         if (1 != oPaymentDetailMapper.insert(record_XXDK)) {
                             throw new MessageException("打款明细错误");
                         }
-                        logger.info("订单调整审批完成处理明细完成首付数据成功{}:{},{}",
+                        logger.info("代理商订单审批完成处理明细完成首付数据成功{}:{},{}",
                                 order.getId(),
                                 oPayment.getOutstandingAmount(),
                                 oPayment.getPayMethod());
+                        break;
                     }
-                    break;
                 case "SF1"://首付+分润分期
                     temp.setTime(oPayment.getDownPaymentDate());
                     if(oPayment.getDownPayment()==null || oPayment.getDownPayment().compareTo(BigDecimal.ZERO)<0){
