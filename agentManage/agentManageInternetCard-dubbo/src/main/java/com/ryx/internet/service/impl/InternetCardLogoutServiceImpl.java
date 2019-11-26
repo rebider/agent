@@ -322,7 +322,7 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
             internetLogout.setId(internetLogoutId);
             internetLogout.setAgentId(agentId);
             internetLogout.setAgentName(agName);
-            if(queryAgentBusInfo==null){
+            if(queryAgentBusInfo!=null){
                 internetLogout.setBusNum(queryAgentBusInfo.getBusNum());
                 internetLogout.setBusPlatform(queryAgentBusInfo.getBusPlatform());
                 internetLogout.setAgDocPro(queryAgentBusInfo.getAgDocPro());
