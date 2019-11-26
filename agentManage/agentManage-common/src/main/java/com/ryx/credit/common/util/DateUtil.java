@@ -3,6 +3,7 @@ package com.ryx.credit.common.util;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Year;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
@@ -451,7 +452,6 @@ public class DateUtil {
         return dft.format(calendar.getTime());
     }
 
-
     /**
      * 得到几天后的时间
      * @param d
@@ -500,10 +500,6 @@ public class DateUtil {
         return now.getTime();
     }
 
-    public static void main(String[] args){
-        System.out.println(getMondayLater(new Date(),1));
-    }
-
     /**
      * 字符串类型格式转换
      * @param str
@@ -531,6 +527,76 @@ public class DateUtil {
         String nowDate = format + day;
         Date format1 = DateUtil.format(nowDate, DateUtil.DATE_FORMAT_3);
         return format1;
+    }
+
+    /**
+     * 获取指定年月的第一天
+     * @param year
+     * @param month
+     * @return
+     */
+    public static String getFirstDayOfMonth(int year, int month) {
+        Calendar cal = Calendar.getInstance();
+        //设置年份
+        cal.set(Calendar.YEAR, year);
+        //设置月份
+        cal.set(Calendar.MONTH, month-1);
+        //获取某月最小天数
+        int firstDay = cal.getMinimum(Calendar.DATE);
+        //设置日历中月份的最小天数
+        cal.set(Calendar.DAY_OF_MONTH,firstDay);
+        //格式化日期
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        return sdf.format(cal.getTime());
+    }
+
+    /**
+     * 获取指定年月的最后一天
+     * @param year
+     * @param month
+     * @return
+     */
+    public static String getLastDayOfMonth(int year, int month) {
+        Calendar cal = Calendar.getInstance();
+        //设置年份
+        cal.set(Calendar.YEAR, year);
+        //设置月份
+        cal.set(Calendar.MONTH, month-1);
+        //获取某月最大天数
+        int lastDay = cal.getActualMaximum(Calendar.DATE);
+        //设置日历中月份的最大天数
+        cal.set(Calendar.DAY_OF_MONTH, lastDay);
+        //格式化日期
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        return sdf.format(cal.getTime());
+    }
+
+
+    /**
+     * 获取某月
+     * @param month
+     * @param type  Year/Month
+     * @return
+     */
+    public static int getYearMonthOfMonthType(int month,String type){
+        Date dNow = new Date();   //当前时间
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(dNow);
+        calendar.add(Calendar.MONTH, month); //设置为前3月
+        int reyear = calendar.get(Calendar.YEAR);
+        int remonth = calendar.get(Calendar.MONTH) + 1;
+        if(type.equals("Year")){
+            return reyear;
+        }
+        if(type.equals("Month")){
+            return remonth;
+        }
+        return -1;
+    }
+
+    public static void main(String[] args){
+        System.out.println(getFirstDayOfMonth(getYearMonthOfMonthType(0, "Year"),getYearMonthOfMonthType(0, "Month")));
+        System.out.println(getLastDayOfMonth(getYearMonthOfMonthType(3, "Year"),getYearMonthOfMonthType(3, "Month")));
     }
 
 
