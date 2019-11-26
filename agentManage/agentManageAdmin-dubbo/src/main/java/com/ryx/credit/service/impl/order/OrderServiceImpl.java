@@ -5212,6 +5212,70 @@ public class OrderServiceImpl implements OrderService {
                     logger.info("订单调整审批完成处理明细完成{}:{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
                     break;
                 case "QT":
+                    //产生退款
+                    if (isZero) {
+                        //生成补款单
+                        OSupplement oSupplement = new OSupplement();
+                        oSupplement.setId(idService.genId(TabId.o_Supplement));
+                        oSupplement.setAgentId(orderAdj.getAgentId());
+                        oSupplement.setcTime(Calendar.getInstance().getTime());
+                        oSupplement.setcUser(orderAdj.getAdjUserId());
+                        oSupplement.setOrderId(orderAdj.getOrderId());
+                        oSupplement.setPayAmount(re);
+                        oSupplement.setRealPayAmount(re);//到账金额
+                        oSupplement.setVersion(Status.STATUS_1.status);
+                        oSupplement.setPkType(PkType.ORDER_REFUND_BK.code);
+                        oSupplement.setSrcId(orderAdj.getId());
+                        oSupplement.setReviewStatus(AgStatus.Approved.status);
+                        oSupplement.setStatus(Status.STATUS_1.status);
+                        if (1 !=  oSupplementMapper.insert(oSupplement)) {
+                            logger.info("订单调整审批完成，有退款:补款生成失败:订单ID:{},付款方式:{}，明细ID:{}",
+                                    order.getId(),
+                                    oPayment.getPayMethod(),
+                                    oSupplement.getId());
+                            throw new MessageException("补款处理失败");
+                        }
+                        //添加抵扣后的余款为欠款
+                        OPaymentDetail record_QT = new OPaymentDetail();
+                        record_QT.setId(idService.genId(TabId.o_payment_detail));
+                        record_QT.setBatchCode(batchCode);
+                        record_QT.setPaymentId(oPayment.getId());
+                        record_QT.setPaymentType(PamentIdType.ORDER_FKD.code);
+                        record_QT.setOrderId(oPayment.getOrderId());
+                        record_QT.setPayType(PaymentType.SF.code);
+                        record_QT.setPayAmount(re);
+                        record_QT.setRealPayAmount(re);
+                        record_QT.setPlanPayTime(d.getTime());
+                        record_QT.setPlanNum(Status.STATUS_0.status);
+                        record_QT.setAgentId(oPayment.getAgentId());
+                        record_QT.setPaymentStatus(PaymentStatus.JQ.code);
+                        record_QT.setcUser(oPayment.getUserId());
+                        record_QT.setcDate(d.getTime());
+                        record_QT.setStatus(Status.STATUS_1.status);
+                        record_QT.setVersion(Status.STATUS_1.status);
+                        if (OrderAdjRefundType.CDFQ_GZ.code.compareTo(orderAdj.getRefundType())==0) {
+                            SettleAccounts settleAccounts = new SettleAccounts();
+                            settleAccounts.setId(idService.genId(TabId.o_settle_accounts));
+                            settleAccounts.setAgentId(orderAdj.getAgentId());//代理商id
+                            settleAccounts.setsType(SettleType.ORDER_ADJUST.key);//挂账类型:订单调整
+                            settleAccounts.setsTm(orderdate.getTime());
+                            settleAccounts.setcTm(orderdate.getTime());
+                            settleAccounts.setsStatus(Status.STATUS_0.status);
+                            settleAccounts.setcUser(orderAdj.getAdjUserId());
+                            settleAccounts.setsAmount(orderAdj.getSettleAmount());
+                            settleAccounts.setSrcId(orderAdj.getId());//数据源id
+                            settleAccounts.setStatus(Status.STATUS_1.status);
+                            settleAccounts.setVersion(Status.STATUS_1.status);
+                            if(1!=settleAccountsMapper.insertSelective(settleAccounts)){
+                                return AgentResult.fail("保存挂账记录失败!");
+                            };
+                            record_QT.setSrcId(oSupplement.getId());
+                            record_QT.setSrcType(PamentSrcType.ORDER_ADJ_SETTLE.code);
+                        }else {
+                            record_QT.setSrcType(PamentSrcType.ORDER_ADJ_REFUND.code);
+                            record_QT.setSrcId(oSupplement.getId());
+                        }
+                    }
                     //抵扣金额必须等于待付金额
                     logger.info("订单调整审批完成QT抵扣金额不等于订单待付金额{}:{},{},{}",
                             order.getId(),
@@ -5236,10 +5300,7 @@ public class OrderServiceImpl implements OrderService {
                     record_QT.setcDate(d.getTime());
                     record_QT.setStatus(Status.STATUS_1.status);
                     record_QT.setVersion(Status.STATUS_1.status);
-                    if (isZero) {
-                        record_QT.setPayAmount(re);
-                        record_QT.setRealPayAmount(re);
-                    }
+
                     if (1 != oPaymentDetailMapper.insert(record_QT)) {
                         throw new MessageException("生成退款记录错误");
                     }
