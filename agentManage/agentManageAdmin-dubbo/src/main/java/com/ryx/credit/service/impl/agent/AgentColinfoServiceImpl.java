@@ -511,8 +511,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
             upPayment.setRemark(String.valueOf(resultMap.get("remark")));
         int upPay = colinfoPaymentMapper.updateByPrimaryKeySelective(upPayment);
 
-        AgentColinfo upColinfo = new AgentColinfo();
-        upColinfo.setId(aColinfoPayment.getColinfoId());
+        AgentColinfo upColinfo = agentColinfoMapper.selectByPrimaryKey(aColinfoPayment.getColinfoId());
         if (String.valueOf(resultMap.get("flag")).equals(TransFlag.CG.getValue())) {
             upColinfo.setPayStatus(ColinfoPayStatus.C.getValue());
         } else if (String.valueOf(resultMap.get("flag")).equals(TransFlag.SB.getValue())) {
