@@ -4399,17 +4399,42 @@ public class OrderServiceImpl implements OrderService {
                 if(String.valueOf(OrderAdjRefundType.CDFQ_GZ.code).equals(orderUpModelVo.getRefundType())){
                     orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
                     orderAdj.setSettleAmount(new BigDecimal(orderUpModelVo.getSettleAmount()));
-                    orderAdj.setRefundTm(new Date());
+                    orderAdj.setRefundTm(orderUpModelVo.getRefundTm());
                     //事务原因,需单独更新
                     if(!orderService.approvalTaskSettle(orderAdj).isOK()){
                         return AgentResult.fail("提交失败!");
                     };
                     reqMap.put("remit",false);
                 }else if(String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
+                    if(null==orderUpModelVo.getRefundTm() || "".equals(orderUpModelVo.getRefundTm())){
+                        logger.error("未填写退款日期,adjId{}",orderUpModelVo.getId());
+                        return AgentResult.fail("请输入线下退款时间！");
+                    }
+                    if(orderUpModelVo.getFiles().size()==0){
+                        logger.error("未上传凭证,adjId{}",orderUpModelVo.getId());
+                        return AgentResult.fail("请上传打款凭证！");
+                    }
+                    AttachmentRel record = new AttachmentRel();
+                    List<String> attFiles = orderUpModelVo.getFiles();
+                    if (attFiles.size()>0)
+                        attFiles.forEach(attfile->{
+                            record.setAttId(attfile);
+                            record.setSrcId(orderAdj.getId());
+                            record.setcUser(orderAdj.getAdjUserId());
+                            record.setcTime(orderAdj.getAdjTm());
+                            record.setStatus(Status.STATUS_1.status);
+                            record.setBusType(AttachmentRelType.orderAdjust_refund.name());
+                            record.setId(idService.genId(TabId.a_attachment_rel));
+                            logger.info("添加订单调整退款附件关系,订单调整ID{},附件ID{}",orderAdj.getId(),attfile);
+                            if (1 != attachmentRelMapper.insertSelective(record)) {
+                                logger.info("订单调整:{}", "添加订单调整附件关系失败");
+                                throw new ProcessException("添加订单调整附件关系失败");
+                            }
+                        });
                     orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
                     orderAdj.setRealRefundAmo(orderAdj.getRefundAmount());
-                    orderAdj.setRefundTm(new Date());
-                    if(1!=orderAdjMapper.updateByPrimaryKeySelective(orderAdj)){
+                    orderAdj.setRefundTm(orderUpModelVo.getRefundTm());
+                    if(!orderService.approvalTaskSettle(orderAdj).isOK()){
                         return AgentResult.fail("更新订单调整记录失败!");
                     };
                     reqMap.put("remit",true);
@@ -4445,6 +4470,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public AgentResult approveFinishOrderAdjust(String insid, String actname) throws Exception {
         logger.info("订单调整审批完成:{},{}", insid, actname);
+        boolean isZero = false;
         //审批流关系
         BusActRel busActRel = busActRelService.findById(insid);
         if (actname.equals("finish_end")) { //审批完成
@@ -4465,16 +4491,6 @@ public class OrderServiceImpl implements OrderService {
                 logger.info("订单调整审批完成:付款单明细未找到:{}", orderAdj.getId());
                 throw new MessageException("付款单明细未找到！");
             }
-            Calendar orderdate = Calendar.getInstance();
-            Calendar d = Calendar.getInstance();
-            Calendar temp = Calendar.getInstance();
-            String batchCode = d.getTime().getTime() + "";
-            boolean isZero = false;
-            orderAdj.setAdjTm(new Date());
-            orderAdj.setReviewsStat(AgStatus.Approved.status);
-            orderAdj.setReviewsDate(new Date());
-            orderAdj.setNewPaymentId(batchCode);//新的还款计划批次号
-            orderAdjMapper.updateByPrimaryKey(orderAdj);//更新调整数据为审批通过
             BigDecimal difAmount = orderAdjDetailMapper.sumDifAmount(orderAdj.getId());
             OPayment oPayment = oPaymentList.get(0);
             oPayment.setPayAmount(oPayment.getPayAmount().subtract(difAmount));//应付金额=原应付金额-差价金额
@@ -4488,9 +4504,17 @@ public class OrderServiceImpl implements OrderService {
                 oPayment.setOutstandingAmount(BigDecimal.ZERO);//欠款金额=0
                 oPayment.setRealAmount(oPayment.getRealAmount().subtract(orderAdj.getRefundAmount()));//已付金额=原已付金额-退款金额
             }
-
-
             oPaymentMapper.updateByPrimaryKey(oPayment);//更新原付款单为调整后的金额,
+            Calendar orderdate = Calendar.getInstance();
+            Calendar d = Calendar.getInstance();
+            Calendar temp = Calendar.getInstance();
+            String batchCode = d.getTime().getTime() + "";
+            orderAdj.setReviewsStat(AgStatus.Approved.status);
+            orderAdj.setReviewsDate(new Date());
+            orderAdj.setNewPaymentId(batchCode);//新的还款计划批次号
+            orderAdjMapper.updateByPrimaryKey(orderAdj);//更新调整数据为审批通过
+
+
             OrderAdjDetailExample orderAdjDetailExample = new OrderAdjDetailExample();
             orderAdjDetailExample.or().andAdjIdEqualTo(orderAdj.getId()).andStatusEqualTo(Status.STATUS_1.status);
             List<OrderAdjDetail> orderAdjDetails = orderAdjDetailMapper.selectByExample(orderAdjDetailExample);
