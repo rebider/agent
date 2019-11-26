@@ -4064,6 +4064,7 @@ public class OrderServiceImpl implements OrderService {
             //启动流程审批
             String userId = String.valueOf(map.get("userId"));
             AgentResult result = startOrderAdjust(orderAdj.getId(), userId);
+            agentResult.setMsg("提交审批成功");
             if (!result.isOK()) {
                 throw new Exception(result.getMsg());
             }
@@ -4255,6 +4256,7 @@ public class OrderServiceImpl implements OrderService {
         orderAdj.setReson(orderUpModelVo.getReson());//原因
         orderAdj.setRefundAmount(new BigDecimal(orderUpModelVo.getRefundAmount()));//退款金额
         orderAdj.setRefundMethod(new BigDecimal(orderUpModelVo.getRefundMethod()));//退款方式
+        orderAdj.setStagesAmount(new BigDecimal(orderUpModelVo.getAdjRepayment()));//预计分期金额
 
         for (AdjProVo adjProVo : adjPros) {
             OSubOrder oSubOrder = oSubOrderMapper.selectByPrimaryKey(adjProVo.getoSubId());
