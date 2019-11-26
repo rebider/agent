@@ -168,7 +168,7 @@ public class ProfitMonthRdbPosDataJob {
                 detail.setAgentId(agentBusInfo.getAgentId());
                 detail.setAgentName(agencyName);
                 detail.setBusNum(agencyId);
-                detail.setBusCode(tranData.getString("branchId"));//平台号
+                detail.setBusCode(agentBusInfo.getBusPlatform());//平台号
                 detail.setId(idService.genId(TabId.P_PROFIT_DETAIL_M));//主键
                 detail.setProfitDate(transDate);//月份
                 AgentBusInfo parentAgentBusInfo=null;
