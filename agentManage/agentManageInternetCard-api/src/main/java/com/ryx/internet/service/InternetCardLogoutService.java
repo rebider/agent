@@ -32,4 +32,6 @@ public interface InternetCardLogoutService {
 
     AgentResult compressCompensateActivity(String proIns, BigDecimal agStatus)throws Exception;
 
+    InternetLogout selectByPrimaryKey(String id);
+
 }
