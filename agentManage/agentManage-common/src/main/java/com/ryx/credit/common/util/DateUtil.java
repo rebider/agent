@@ -595,8 +595,7 @@ public class DateUtil {
     }
 
     public static void main(String[] args){
-        System.out.println(getFirstDayOfMonth(getYearMonthOfMonthType(0, "Year"),getYearMonthOfMonthType(0, "Month")));
-        System.out.println(getLastDayOfMonth(getYearMonthOfMonthType(3, "Year"),getYearMonthOfMonthType(3, "Month")));
+        System.out.println(DateUtil.getDateAfterReturnDate(new Date(), -5));
     }
 
 
