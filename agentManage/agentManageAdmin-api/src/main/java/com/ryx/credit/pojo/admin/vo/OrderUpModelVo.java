@@ -1,7 +1,16 @@
 package com.ryx.credit.pojo.admin.vo;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.ryx.credit.common.util.DateJsonDeserializer;
+import com.ryx.credit.common.util.DateJsonSerializer;
+
+import javax.xml.crypto.Data;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 /**
  * @program: agentManage
@@ -31,6 +40,19 @@ public class OrderUpModelVo implements Serializable {
     private String orderAdjAprDept;//订单调整审批下个审批部门参数
     private String refundType;//退款类型
     private String settleAmount;
+    @JSONField(format="yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonDeserialize(using = DateJsonDeserializer.class)
+    @JsonSerialize(using = DateJsonSerializer.class)
+    private Date refundTm;
+
+    public Date getRefundTm() {
+        return refundTm;
+    }
+
+    public void setRefundTm(Date refundTm) {
+        this.refundTm = refundTm;
+    }
 
     public String getSettleAmount() {
         return settleAmount;
