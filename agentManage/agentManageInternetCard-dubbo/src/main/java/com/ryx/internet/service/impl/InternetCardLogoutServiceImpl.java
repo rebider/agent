@@ -214,7 +214,7 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
 
         String retIdentifier = "";
         try {
-            retIdentifier = redisService.lockWithTimeout(RedisCachKey.LOGOUT_CARD.code + cUser, RedisService.ACQUIRE_TIME_OUT, RedisService.TIME_OUT);
+            retIdentifier = redisService.lockWithTimeout(RedisCachKey.RENEW_CARD.code + cUser, RedisService.ACQUIRE_TIME_OUT, RedisService.TIME_OUT);
             if (StringUtils.isBlank(retIdentifier)) {
                 log.info("续费中请勿重复提交,cUser:{}", cUser);
                 throw new MessageException("注销中请勿重复提交");
@@ -373,7 +373,7 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
             }
         }finally {
             if(StringUtils.isNotBlank(retIdentifier)){
-                redisService.releaseLock(RedisCachKey.LOGOUT_CARD.code+cUser, retIdentifier);
+                redisService.releaseLock(RedisCachKey.RENEW_CARD.code+cUser, retIdentifier);
             }
         }
 

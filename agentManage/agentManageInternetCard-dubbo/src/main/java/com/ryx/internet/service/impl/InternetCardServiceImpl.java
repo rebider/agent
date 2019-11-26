@@ -91,9 +91,6 @@ public class InternetCardServiceImpl implements InternetCardService {
         oInternetCardExample.setPage(page);
         List<OInternetCard> oInternetCards = internetCardMapper.internetCardList(oInternetCardExample);
         for (OInternetCard oInternetCard : oInternetCards) {
-            Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),oInternetCard.getManufacturer());
-            if(null!=dict)
-            oInternetCard.setManufacturer(dict.getdItemname());
             oInternetCard.setIccidNumId(oInternetCard.getIccidNum());
             if(null==oInternetCard.getInternetCardStatus()){
                 oInternetCard.setRenewButton("0");
@@ -225,14 +222,16 @@ public class InternetCardServiceImpl implements InternetCardService {
             Date format = DateUtil.format(internetCard.getOpenAccountTimeEndStr(), DateUtil.DATE_FORMAT_yyyy_MM_dd);
             criteria.andOpenAccountTimeLessThanOrEqualTo(format);
         }
-        if(StringUtils.isNotBlank(internetCard.getExpireTimeBeginStr())){
-            Date format = DateUtil.format(internetCard.getExpireTimeBeginStr(), DateUtil.DATE_FORMAT_yyyy_MM_dd);
-            criteria.andExpireTimeGreaterThanOrEqualTo(format);
+        if(StringUtils.isNotBlank(internetCard.getExpireTimeBeginStr()) && StringUtils.isNotBlank(internetCard.getExpireTimeEndStr())){
+            Date begin = DateUtil.format(internetCard.getExpireTimeBeginStr(), DateUtil.DATE_FORMAT_yyyy_MM_dd);
+            Date end = DateUtil.format(internetCard.getExpireTimeEndStr(), DateUtil.DATE_FORMAT_yyyy_MM_dd);
+            criteria.andExpireTimeBetween(begin,end);
+        }else{
+            Date begin = DateUtil.format(DateUtil.getFirstDayOfMonth(DateUtil.getYearMonthOfMonthType(0, "Year"),DateUtil.getYearMonthOfMonthType(0, "Month")),DateUtil.DATE_FORMAT_yyyy_MM_dd);
+            Date end = DateUtil.format(DateUtil.getLastDayOfMonth(DateUtil.getYearMonthOfMonthType(3, "Year"),DateUtil.getYearMonthOfMonthType(3, "Month")), DateUtil.DATE_FORMAT_yyyy_MM_dd);
+            criteria.andExpireTimeBetween(begin,end);
         }
-        if(StringUtils.isNotBlank(internetCard.getExpireTimeEndStr())){
-            Date format = DateUtil.format(internetCard.getExpireTimeEndStr(), DateUtil.DATE_FORMAT_yyyy_MM_dd);
-            criteria.andExpireTimeLessThanOrEqualTo(format);
-        }
+
         List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
         if(orgCodeRes==null && orgCodeRes.size()!=1){
             return null;
@@ -252,7 +251,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             criteria.andAgentNameLike("%"+internetCard.getAgentName()+"%");
         }
         oInternetCardExample.setReqMap(reqMap);
-        oInternetCardExample.setOrderByClause(" c_time,expire_time desc ");
+        oInternetCardExample.setOrderByClause("expire_time asc ");
         return oInternetCardExample;
     }
 
