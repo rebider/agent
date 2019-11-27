@@ -619,7 +619,7 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
                         PaymentSendBusPlatformVo paymentSendBusPlatformVo = new PaymentSendBusPlatformVo();
                         paymentSendBusPlatformVo.setAg(order.getAgentId());
                         paymentSendBusPlatformVo.setAmount(detail.getRealPayAmount().setScale(2, BigDecimal.ROUND_HALF_UP).abs().toString());
-                        paymentSendBusPlatformVo.setAmountType(detail.getPayType());
+                        paymentSendBusPlatformVo.setAmountType("KK");
                         paymentSendBusPlatformVo.setBusNum(agentBusInfo.getBusNum());
                         paymentSendBusPlatformVo.setCreateTime(DateUtil.format(order.getcTime(), DateUtil.DATE_FORMAT_5));
                         paymentSendBusPlatformVo.setOrderNum(order.getId());
