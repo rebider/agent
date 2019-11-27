@@ -939,7 +939,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                     }
                 }
             }else{
-                throw new MessageException("状态不正确,不允许续费/注销");
+                throw new MessageException("卡状态不正确,不允许续费/注销");
             }
         }
     }
