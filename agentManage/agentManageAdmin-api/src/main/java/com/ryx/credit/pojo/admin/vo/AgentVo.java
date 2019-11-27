@@ -14,6 +14,7 @@ import com.ryx.credit.pojo.admin.order.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -692,5 +693,84 @@ public class AgentVo implements Serializable {
 
     public void setDeliveryTimeType(String deliveryTimeType) {
         this.deliveryTimeType = deliveryTimeType;
+    }
+
+    @Override
+    public String toString() {
+        return "AgentVo{" +
+                "agent=" + agent +
+                ", capitalVoList=" + capitalVoList +
+                ", contractVoList=" + contractVoList +
+                ", colinfoVoList=" + colinfoVoList +
+                ", busInfoVoList=" + busInfoVoList +
+                ", agentTableFile=" + agentTableFile +
+                ", agentId='" + agentId + '\'' +
+                ", submitType='" + submitType + '\'' +
+                ", agDocProString='" + agDocProString + '\'' +
+                ", agDocDistrictString='" + agDocDistrictString + '\'' +
+                ", agentColinfoRelList=" + agentColinfoRelList +
+                ", approvalOpinion='" + approvalOpinion + '\'' +
+                ", approvalResult='" + approvalResult + '\'' +
+                ", dept='" + dept + '\'' +
+                ", taskId='" + taskId + '\'' +
+                ", flag='" + flag + '\'' +
+                ", agentBusId='" + agentBusId + '\'' +
+                ", realPayAmount=" + realPayAmount +
+                ", supplementId='" + supplementId + '\'' +
+                ", remitTime=" + remitTime +
+                ", pretest='" + pretest + '\'' +
+                ", checkTime=" + checkTime +
+                ", orderAprDept='" + orderAprDept + '\'' +
+                ", refundPriceDiffDetailList=" + refundPriceDiffDetailList +
+                ", refundPriceDiffFile=" + refundPriceDiffFile +
+                ", refundPriceDiffFinanceFile=" + refundPriceDiffFinanceFile +
+                ", oRefundPriceDiff=" + oRefundPriceDiff +
+                ", oRefundPriceDiffVo=" + oRefundPriceDiffVo +
+                ", deductCapitalList=" + deductCapitalList +
+                ", oPayment=" + oPayment +
+                ", returnId='" + returnId + '\'' +
+                ", plans='" + plans + '\'' +
+                ", sid='" + sid + '\'' +
+                ", attachments=" + Arrays.toString(attachments) +
+                ", reqListMap=" + reqListMap +
+                ", receiptPlan=" + receiptPlan +
+                ", receiptPlanList=" + receiptPlanList +
+                ", payMethod='" + payMethod + '\'' +
+                ", oReturnOrder=" + oReturnOrder +
+                ", oCashReceivablesVoList=" + oCashReceivablesVoList +
+                ", terminalTransferDetailList=" + terminalTransferDetailList +
+                ", terminalTransferDetailID=" + terminalTransferDetailID +
+                ", terminalTransfer=" + terminalTransfer +
+                ", debt='" + debt + '\'' +
+                ", oweTicket='" + oweTicket + '\'' +
+                ", mergeType=" + mergeType +
+                ", mainDocDistrict='" + mainDocDistrict + '\'' +
+                ", subDocDistrict='" + subDocDistrict + '\'' +
+                ", agentQuit=" + agentQuit +
+                ", realitySuppDept=" + realitySuppDept +
+                ", quitRefundFile=" + quitRefundFile +
+                ", capitalChangeFinaFiles=" + capitalChangeFinaFiles +
+                ", operationType='" + operationType + '\'' +
+                ", amt=" + amt +
+                ", remitTimeStr='" + remitTimeStr + '\'' +
+                ", remitPerson='" + remitPerson + '\'' +
+                ", remitAmt=" + remitAmt +
+                ", editDebitList=" + editDebitList +
+                ", terminalsLowerList=" + terminalsLowerList +
+                ", creditRateFloorList=" + creditRateFloorList +
+                ", oorganizationVoList=" + oorganizationVoList +
+                ", orgTypeList=" + orgTypeList +
+                ", finaceRemitOrgan='" + finaceRemitOrgan + '\'' +
+                ", marketToporgTableIdForm=" + marketToporgTableIdForm +
+                ", deliveryTime='" + deliveryTime + '\'' +
+                ", delayDay='" + delayDay + '\'' +
+                ", deliveryTimeType='" + deliveryTimeType + '\'' +
+                ", invoiceId='" + invoiceId + '\'' +
+                ", invoiceReturnReason='" + invoiceReturnReason + '\'' +
+                ", invoiceReturnExpressNumber='" + invoiceReturnExpressNumber + '\'' +
+                ", invoiceReturnExpressCompany='" + invoiceReturnExpressCompany + '\'' +
+                ", invoiceReturnDate='" + invoiceReturnDate + '\'' +
+                ", renewWay='" + renewWay + '\'' +
+                '}';
     }
 }

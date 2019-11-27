@@ -68,8 +68,6 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
     @Autowired
     private ActivityService activityService;
     @Autowired
-    private AgentService agentService;
-    @Autowired
     private IUserService iUserService;
 
 
@@ -212,6 +210,7 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     public AgentResult saveAndApprove(InternetLogout internetLogout, List<String> iccids, String cUser)throws MessageException {
 
+        log.info("注销保存提交审批请求参数,internetLogout:{},iccids:{},cUser:{}",internetLogout.toString(),iccids.toString(),cUser);
         String retIdentifier = "";
         try {
             retIdentifier = redisService.lockWithTimeout(RedisCachKey.RENEW_CARD.code + cUser, RedisService.ACQUIRE_TIME_OUT, RedisService.TIME_OUT);
@@ -295,6 +294,7 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                     internetLogoutDetail.setBusContactPerson(queryAgentBusInfo.getBusContactPerson());
                     cardCount = cardCount.add(BigDecimal.ONE);
                 }
+                log.info("注销明细保存参数,internetLogoutDetail:{}",internetLogoutDetail.toString());
                 internetLogoutDetailMapper.insertSelective(internetLogoutDetail);
                 busNumSet.add(oInternetCard.getBusNum());
                 busPlatformSet.add(oInternetCard.getBusPlatform());
@@ -337,8 +337,9 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
             internetLogout.setcUser(cUser);
             internetLogout.setuUser(cUser);
             internetLogout.setVersion(BigDecimal.ONE);
+            log.info("注销申请保存参数,internetLogout:{}",internetLogout.toString());
             internetLogoutMapper.insertSelective(internetLogout);
-
+            log.info("注销申请请求类型,party:{}",party);
             if(party.equals("agent")){
                 //启动审批
                 String proce = activityService.createDeloyFlow(null,dictOptionsService.getApproveVersion("cardLogout"), null, null,null);
@@ -383,6 +384,7 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
     @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception {
+        log.info("注销处理任务开始:agentVo:{},userId:{}",agentVo.toString(),userId);
         try {
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
             if(!result.isOK()){
@@ -396,14 +398,22 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
             e.printStackTrace();
             throw new MessageException(e.getLocalizedMessage());
         }
+        log.info("注销处理任务完成");
         return AgentResult.ok();
     }
 
-
+    /**
+     * 完成监听
+     * @param proIns
+     * @param agStatus
+     * @return
+     * @throws MessageException
+     */
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public AgentResult compressCompensateActivity(String proIns, BigDecimal agStatus)throws MessageException{
 
+        log.info("注销完成监听:请求参数:proIns:{},agStatus:{}",proIns,agStatus);
         BusActRel busActRel = busActRelService.findByProIns(proIns);
         if (busActRel==null){
             log.info("审批任务结束{}{}，未找到审批中的审批和数据关系", proIns, agStatus);
@@ -419,6 +429,7 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
         if(z!=1) {
             throw new MessageException("物联网卡注销更新关系表失败");
         }
+        log.info("注销完成监听:完成");
         return AgentResult.ok();
     }
 
@@ -429,6 +440,8 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
      * @throws MessageException
      */
     private void saveOrCompress(InternetLogout internetLogout,BigDecimal agStatus)throws MessageException{
+
+        log.info("注销直接保存/审批通过后调用:请求参数:internetLogout:{},agStatus:{}",internetLogout.toString(),agStatus);
         internetLogout.setReviewStatus(agStatus);
         if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
             internetLogout.setReviewPassTime(new Date());
@@ -454,6 +467,7 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 throw new MessageException("更新注销明细失败");
             }
         }
+        log.info("注销直接保存/审批通过后调用结束");
     }
 
     @Override

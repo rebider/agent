@@ -254,4 +254,35 @@ public class InternetLogoutDetail implements Serializable {
     public void setVersion(BigDecimal version) {
         this.version = version;
     }
+
+    @Override
+    public String toString() {
+        return "InternetLogoutDetail{" +
+                "id='" + id + '\'' +
+                ", renewId='" + renewId + '\'' +
+                ", iccidNum='" + iccidNum + '\'' +
+                ", internetCardStatus=" + internetCardStatus +
+                ", orderId='" + orderId + '\'' +
+                ", snNum='" + snNum + '\'' +
+                ", internetCardNum='" + internetCardNum + '\'' +
+                ", openAccountTime=" + openAccountTime +
+                ", expireTime=" + expireTime +
+                ", merName='" + merName + '\'' +
+                ", merId='" + merId + '\'' +
+                ", agentId='" + agentId + '\'' +
+                ", agentName='" + agentName + '\'' +
+                ", logoutStatus='" + logoutStatus + '\'' +
+                ", status=" + status +
+                ", busNum='" + busNum + '\'' +
+                ", busPlatform='" + busPlatform + '\'' +
+                ", agDocDistrict='" + agDocDistrict + '\'' +
+                ", agDocPro='" + agDocPro + '\'' +
+                ", busContactPerson='" + busContactPerson + '\'' +
+                ", cTime=" + cTime +
+                ", uTime=" + uTime +
+                ", cUser='" + cUser + '\'' +
+                ", uUser='" + uUser + '\'' +
+                ", version=" + version +
+                '}';
+    }
 }
