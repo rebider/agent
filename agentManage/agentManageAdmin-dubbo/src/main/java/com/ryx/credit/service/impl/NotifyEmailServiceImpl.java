@@ -116,11 +116,11 @@ public class NotifyEmailServiceImpl implements NotifyEmailService {
                     if(busActRel.getBusType().equals(BusActRelBusType.Agent.name()) || busActRel.getBusType().equals(BusActRelBusType.Business.name())){
                         Set<String> strings = roleService.selectShiroUrl(userVo.getId(), netInUrlsPid, busActRel.getNetInBusType());
                         //说明有权限收邮件
-                        if(strings.size()!=0 && StringUtils.isNotBlank(userVo.getUserEmail())){
+                        if(strings.size()!=0 && StringUtils.isNotBlank(userVo.getUserEmail()) && userVo.getStatus()==0){
                             notityEmail.add(userVo.getUserEmail());
                         }
                     }else{
-                        if(StringUtils.isNotBlank(userVo.getUserEmail())){
+                        if(StringUtils.isNotBlank(userVo.getUserEmail()) && userVo.getStatus()==0){
                             notityEmail.add(userVo.getUserEmail());
                         }
                     }
