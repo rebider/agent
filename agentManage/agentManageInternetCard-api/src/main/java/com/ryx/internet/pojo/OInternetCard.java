@@ -484,4 +484,58 @@ public class OInternetCard implements Serializable{
     public void setVersion(BigDecimal version) {
         this.version = version;
     }
+
+    @Override
+    public String toString() {
+        return "OInternetCard{" +
+                "iccidNum='" + iccidNum + '\'' +
+                ", cardImportId='" + cardImportId + '\'' +
+                ", batchNum='" + batchNum + '\'' +
+                ", snNum='" + snNum + '\'' +
+                ", deliverTime=" + deliverTime +
+                ", consignee='" + consignee + '\'' +
+                ", orderId='" + orderId + '\'' +
+                ", agentId='" + agentId + '\'' +
+                ", agentName='" + agentName + '\'' +
+                ", internetCardNum='" + internetCardNum + '\'' +
+                ", issuer='" + issuer + '\'' +
+                ", openAccountTime=" + openAccountTime +
+                ", expireTime=" + expireTime +
+                ", internetCardStatus=" + internetCardStatus +
+                ", merId='" + merId + '\'' +
+                ", latelyPayTime='" + latelyPayTime + '\'' +
+                ", merName='" + merName + '\'' +
+                ", manufacturer='" + manufacturer + '\'' +
+                ", renew=" + renew +
+                ", cTime=" + cTime +
+                ", uTime=" + uTime +
+                ", cUser='" + cUser + '\'' +
+                ", uUser='" + uUser + '\'' +
+                ", status=" + status +
+                ", version=" + version +
+                ", stop=" + stop +
+                ", renewStatus='" + renewStatus + '\'' +
+                ", stopReason='" + stopReason + '\'' +
+                ", sumPostponeTime=" + sumPostponeTime +
+                ", snCount='" + snCount + '\'' +
+                ", beginSn='" + beginSn + '\'' +
+                ", endSn='" + endSn + '\'' +
+                ", iccidNumId='" + iccidNumId + '\'' +
+                ", openAccountTimeBeginStr='" + openAccountTimeBeginStr + '\'' +
+                ", openAccountTimeEndStr='" + openAccountTimeEndStr + '\'' +
+                ", expireTimeBeginStr='" + expireTimeBeginStr + '\'' +
+                ", expireTimeEndStr='" + expireTimeEndStr + '\'' +
+                ", renewButton='" + renewButton + '\'' +
+                ", iccidNumBegin='" + iccidNumBegin + '\'' +
+                ", iccidNumEnd='" + iccidNumEnd + '\'' +
+                ", postponeTime='" + postponeTime + '\'' +
+                ", busNum='" + busNum + '\'' +
+                ", busPlatform='" + busPlatform + '\'' +
+                ", postponeCause='" + postponeCause + '\'' +
+                ", agDocDistrict='" + agDocDistrict + '\'' +
+                ", agDocPro='" + agDocPro + '\'' +
+                ", busContactPerson='" + busContactPerson + '\'' +
+                ", platformName='" + platformName + '\'' +
+                '}';
+    }
 }

@@ -424,6 +424,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     public AgentResult saveAndApprove(OInternetRenew internetRenew,List<String> iccids, String cUser,
                                       List<OCashReceivablesVo> oCashReceivablesVoList)throws MessageException{
 
+        log.info("续费保存提交审批请求参数:internetRenew:{},iccids:{},cUser:{},oCashReceivablesVoList:{}",internetRenew.toString(),iccids,cUser,oCashReceivablesVoList);
         String retIdentifier = "";
         try {
             retIdentifier = redisService.lockWithTimeout(RedisCachKey.RENEW_CARD.code + cUser, RedisService.ACQUIRE_TIME_OUT, RedisService.TIME_OUT);
@@ -545,6 +546,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                     throw new MessageException("分润抵扣请勿填写打款记录");
                 }
             }
+            log.info("续费保存参数:internetRenew:{}",internetRenew.toString());
             internetRenewMapper.insert(internetRenew);
 
             //添加新的附件
@@ -654,6 +656,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                     oInternetRenewDetail.setAgDocPro(queryAgentBusInfo.getAgDocPro());
                     oInternetRenewDetail.setBusContactPerson(queryAgentBusInfo.getBusContactPerson());
                 }
+                log.info("续费明细保存参数:internetRenew:{}",oInternetRenewDetail.toString());
                 internetRenewDetailMapper.insert(oInternetRenewDetail);
             }
             try {
@@ -796,6 +799,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     @Override
     public AgentResult compressCompensateActivity(String proIns, BigDecimal agStatus,String reqType,OInternetRenew oInternetRenew)throws Exception{
 
+        log.info("续费完成处理请求参数:internetRenew:{},agStatus:{},reqType:{},proIns:{}",oInternetRenew.toString(),agStatus,reqType,proIns);
         BusActRel busActRel = null;
         if(reqType.equals("app")){
             busActRel = busActRelService.findByProIns(proIns);
@@ -812,6 +816,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
             oInternetRenew.setReviewPassTime(new Date());
         }
+        log.info("续费完成更新请求参数:internetRenew:{}",oInternetRenew.toString());
         int i = internetRenewMapper.updateByPrimaryKeySelective(oInternetRenew);
         if(i!=1){
             throw new MessageException("更新续费记录失败");
@@ -868,14 +873,17 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                     internetRenewOffset.setAgDocDistrict(oInternetRenewDetail.getAgDocDistrict());
                     internetRenewOffset.setAgDocPro(oInternetRenewDetail.getAgDocPro());
                     internetRenewOffset.setBusContactPerson(oInternetRenewDetail.getBusContactPerson());
+                    log.info("续费完成插入轧差表参数:internetRenewOffset:{}",internetRenewOffset.toString());
                     internetRenewOffsetMapper.insert(internetRenewOffset);
                 }
             }
+            log.info("续费完成更新续费明细表参数:oInternetRenewDetail:{}",oInternetRenewDetail.toString());
             int j = internetRenewDetailMapper.updateByPrimaryKeySelective(oInternetRenewDetail);
             if(j!=1){
                 throw new MessageException("更新续费明细失败");
             }
             oInternetCard.setuTime(new Date());
+            log.info("续费完成卡总表参数:oInternetCard:{}",oInternetCard.toString());
             int k = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
             if(k!=1){
                 throw new MessageException("更新物联网卡信息失败");
@@ -899,6 +907,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }
         if(reqType.equals("app")){
             busActRel.setActivStatus(AgStatus.getAgStatusString(agStatus));
+            log.info("续费完成中间表参数:busActRel:{}",busActRel.toString());
             int z = busActRelService.updateByPrimaryKey(busActRel);
             if(z!=1) {
                 throw new MessageException("物联网卡更新关系表失败");
