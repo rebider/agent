@@ -5129,6 +5129,9 @@ public class OrderServiceImpl implements OrderService {
                             record.setPaymentStatus(PaymentStatus.JQ.code);
                             record.setcUser(oPayment.getUserId());
                             record.setcDate(d.getTime());
+                            record.setPayTime(new Date());
+                            record.setStatus(Status.STATUS_1.status);
+                            record.setVersion(Status.STATUS_1.status);
                             if (OrderAdjRefundType.CDFQ_GZ.code.compareTo(orderAdj.getRefundType())==0) {
                                 SettleAccounts settleAccounts = new SettleAccounts();
                                 settleAccounts.setId(idService.genId(TabId.o_settle_accounts));
@@ -5150,19 +5153,20 @@ public class OrderServiceImpl implements OrderService {
                             }else {
                                 record.setSrcType(PamentSrcType.ORDER_ADJ_REFUND.code);
                                 record.setSrcId(oSupplement.getId());
+                                if (1 != oPaymentDetailMapper.insert(record)) {
+                                    logger.info("订单调整审批完成:明细生成失败:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(), record.getId());
+                                    throw new MessageException("分期处理");
+                                }
+                                //TODO 处理线下退款通知kafka
+                                logger.info("订单调整审批通过 信息开始发送到kafka:{}",order.getId());
+                                paymentDetailService.sendRefundMentToPlatform(order.getId());
                             }
-                            record.setPayTime(new Date());
-                            record.setStatus(Status.STATUS_1.status);
-                            record.setVersion(Status.STATUS_1.status);
-
                             if (1 != oPaymentDetailMapper.insert(record)) {
                                 logger.info("订单调整审批完成:明细生成失败:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(), record.getId());
                                 throw new MessageException("分期处理");
                             }
                             logger.info("订单调整审批完成:明细生成:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(), record.getId());
-
                         }
-
                         logger.info("订单调整审批完成处理明细完成{}:{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
                         break;
                     }
@@ -5269,7 +5273,7 @@ public class OrderServiceImpl implements OrderService {
                             if(1!=settleAccountsMapper.insertSelective(settleAccounts)){
                                 return AgentResult.fail("保存挂账记录失败!");
                             };
-                            record_QT.setSrcId(oSupplement.getId());
+                            record_QT.setSrcId(settleAccounts.getId());
                             record_QT.setSrcType(PamentSrcType.ORDER_ADJ_SETTLE.code);
                         }else {
                             record_QT.setSrcType(PamentSrcType.ORDER_ADJ_REFUND.code);
