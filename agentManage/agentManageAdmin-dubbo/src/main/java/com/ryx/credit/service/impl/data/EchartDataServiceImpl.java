@@ -1,7 +1,11 @@
 package com.ryx.credit.service.impl.data;
 
 import com.ryx.credit.common.util.FastMap;
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.service.data.EchartDataService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,6 +20,8 @@ import java.util.Map;
 @Service("echartDataService")
 public class EchartDataServiceImpl implements EchartDataService {
 
+    @Autowired
+    private AgentMapper agentMapper;
     /**
      * 图表数据获取
      * @param paramMap
@@ -41,5 +47,13 @@ public class EchartDataServiceImpl implements EchartDataService {
         yData.add("70");
         yData.add("20");
         return FastMap.fastMap("xName", xName).putKeyV("yData", yData);
+    }
+
+    @Override
+    public PageInfo echartDataList(Page page, Map map, Long userId) {
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(agentMapper.queryEchartDataList(map,page));
+        pageInfo.setTotal(agentMapper.queryEchartDataCount(map));
+        return pageInfo;
     }
 }

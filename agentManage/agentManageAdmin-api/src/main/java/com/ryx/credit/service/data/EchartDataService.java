@@ -1,5 +1,8 @@
 package com.ryx.credit.service.data;
 
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
+
 import java.util.Map;
 
 /**
@@ -15,4 +18,6 @@ public interface EchartDataService {
      * @return
      */
     Map<String, Object> getChartData(Map<String, Object> paramMap);
+
+    PageInfo echartDataList(Page page, Map map, Long userId);
 }
