@@ -194,4 +194,29 @@ public class InternetLogout implements Serializable{
     public void setVersion(BigDecimal version) {
         this.version = version;
     }
+
+    @Override
+    public String toString() {
+        return "InternetLogout{" +
+                "id='" + id + '\'' +
+                ", agentId='" + agentId + '\'' +
+                ", agentName='" + agentName + '\'' +
+                ", busNum='" + busNum + '\'' +
+                ", busPlatform='" + busPlatform + '\'' +
+                ", agDocDistrict='" + agDocDistrict + '\'' +
+                ", agDocPro='" + agDocPro + '\'' +
+                ", busContactPerson='" + busContactPerson + '\'' +
+                ", logoutCardCount=" + logoutCardCount +
+                ", reviewStatus=" + reviewStatus +
+                ", reviewPassTime=" + reviewPassTime +
+                ", applyRemark='" + applyRemark + '\'' +
+                ", cTime=" + cTime +
+                ", uTime=" + uTime +
+                ", cUser='" + cUser + '\'' +
+                ", uUser='" + uUser + '\'' +
+                ", status=" + status +
+                ", version=" + version +
+                ", iccidNumIds='" + iccidNumIds + '\'' +
+                '}';
+    }
 }
