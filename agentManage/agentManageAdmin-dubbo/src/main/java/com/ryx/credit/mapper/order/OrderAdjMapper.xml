@@ -470,6 +470,7 @@
     and ag.status = 1
     left join c_user cu on cu.id = oa.adj_user_id
     <where>
+      oa.adj_user_id=#{map.userId}
       <if test="1==1"> and oa.status=1 and cu.id = #{map.userId} </if>
       <if test="map.agName!=null and map.agName!=''"> and ag.ag_name like concat(concat('%',#{map.agName}),'%') </if>
       <!--<if test="map.agUniqNum!=null and map.agUniqNum!=''"> and ag.ag_uniq_num = #{map.agUniqNum} </if>-->

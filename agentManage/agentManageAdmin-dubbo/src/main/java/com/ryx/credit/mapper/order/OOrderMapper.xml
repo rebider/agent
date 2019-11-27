@@ -466,7 +466,14 @@
     from o_order_adj oa
     where oa.order_id =  o.id
     and oa.status = 1) new_adj where new_adj.row_flg = '1'),
-    9) as adjStat
+    9) as adjStat,
+    nvl((select 1
+    from dual
+    where exists (select *
+    from o_payment_detail
+    where PAYMENT_STATUS = '5'
+    and status = '1'
+    and order_id = o.id)),0) as paymentStatus
     from o_order o
     left join a_agent b on o.agent_id = b.id and b.status = 1
     left join a_agent_businfo e on e.agent_id = o.agent_id and o.bus_id = e.id and e.status = 1
@@ -570,7 +577,14 @@
     from o_order_adj oa
     where oa.order_id =  o.id
     and oa.status = 1) new_adj where new_adj.row_flg = '1'),
-    9) as adjStat
+    9) as adjStat,
+    nvl((select 1
+    from dual
+    where exists (select *
+    from o_payment_detail
+    where PAYMENT_STATUS = '5'
+    and status = '1'
+    and order_id = o.id)),0) as paymentStatus
     from  o_order o
     left join a_agent b on o.agent_id = b.id and b.status = 1
     left join a_agent_businfo e on e.agent_id = o.agent_id and o.bus_id = e.id and e.status = 1
