@@ -743,17 +743,26 @@
     <if test="reqMap.busNum != null and reqMap.busNum != '' " >
       and b.bus_num = #{reqMap.busNum}
     </if>
-    <if test="reqMap.busPlatform != null and reqMap.busPlatform != '' " >
-      and b.bus_platform = #{reqMap.busPlatform}
+    <if test="reqMap.busPlatformList != null and reqMap.busPlatformList.size > 0 " >
+      and b.bus_platform
+      <foreach collection="reqMap.busPlatformList" item="busPlatform" open=" in(" close=")" separator=",">
+        #{busPlatform}
+      </foreach>
     </if>
-    <if test="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >
-      and b.clo_review_status = #{reqMap.cloReviewStatus}
+    <if test="reqMap.cloReviewStatusList != null and reqMap.cloReviewStatusList.size > 0" >
+      and b.clo_review_status
+      <foreach collection="reqMap.cloReviewStatusList" item="cloReviewStatus" open=" in(" close=")" separator=",">
+        #{cloReviewStatus}
+      </foreach>
     </if>
     <if test="reqMap.id != null and reqMap.id != '' " >
       and b.id = #{reqMap.id}
     </if>
-    <if test="reqMap.busType != null and reqMap.busType != '' " >
-      and b.bus_type = #{reqMap.busType}
+    <if test="reqMap.busTypeList != null and reqMap.busTypeList.size > 0" >
+      and b.bus_type
+      <foreach collection="reqMap.busTypeList" item="busType" open=" in(" close=")" separator=",">
+        #{busType}
+      </foreach>
     </if>
     <if test="reqMap.organizationCode!=null and reqMap.organizationCode!=''">
       and (e.CODE like concat(#{reqMap.organizationCode},'%') or g.CODE like concat(#{reqMap.organizationCode},'%') )
@@ -1183,9 +1192,7 @@ union
     select
        distinct(ab.bus_platform) as bus_platform
       from A_AGENT_BUSINFO ab
-      left join A_AGENT ag
-      on ag.AG_UNIQ_NUM = ab.AGENT_ID
-     where AGENT_ID = #{reqMap.agentId}
+     where ab.AGENT_ID = #{reqMap.agentId}
      <if test="reqMap.cloReviewStatus !=null and reqMap.cloReviewStatus !=''">
        and CLO_REVIEW_STATUS = #{reqMap.cloReviewStatus}
      </if>
@@ -1194,9 +1201,7 @@ union
     select
        distinct(ab.AG_DOC_PRO) as AG_DOC_PRO
       from A_AGENT_BUSINFO ab
-      left join A_AGENT ag
-      on ag.AG_UNIQ_NUM = ab.AGENT_ID
-     where AGENT_ID = #{reqMap.agentId}
+     where ab.AGENT_ID = #{reqMap.agentId}
     <if test="reqMap.cloReviewStatus !=null and reqMap.cloReviewStatus !=''">
       and CLO_REVIEW_STATUS = #{reqMap.cloReviewStatus}
     </if>
@@ -1205,9 +1210,7 @@ union
     select
        distinct(ab.BUS_TYPE) as BUS_TYPE
       from A_AGENT_BUSINFO ab
-      left join A_AGENT ag
-      on ag.AG_UNIQ_NUM = ab.AGENT_ID
-     where AGENT_ID = #{reqMap.agentId}
+     where ab.AGENT_ID = #{reqMap.agentId}
     <if test="reqMap.cloReviewStatus !=null and reqMap.cloReviewStatus !=''">
       and CLO_REVIEW_STATUS = #{reqMap.cloReviewStatus}
     </if>

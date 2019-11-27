@@ -603,7 +603,7 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonthExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonthExample" resultType="java.lang.Integer">
     select count(*) from P_PROFIT_DETAIL_M
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />

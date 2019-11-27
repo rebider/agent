@@ -5,6 +5,7 @@ import com.ryx.credit.common.util.Page;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class InternetRenewOffsetExample {
     protected String orderByClause;
@@ -19,24 +20,34 @@ public class InternetRenewOffsetExample {
 
     protected Integer limitEnd;
 
+    protected Map<String,Object> reqMap;
+
     public InternetRenewOffsetExample() {
         oredCriteria = new ArrayList<Criteria>();
     }
 
-    public void setOrderByClause(String orderByClause) {
-        this.orderByClause = orderByClause;
+    public Map<String, Object> getReqMap() {
+        return reqMap;
+    }
+
+    public void setReqMap(Map<String, Object> reqMap) {
+        this.reqMap = reqMap;
     }
 
     public String getOrderByClause() {
         return orderByClause;
     }
 
-    public void setDistinct(boolean distinct) {
-        this.distinct = distinct;
+    public void setOrderByClause(String orderByClause) {
+        this.orderByClause = orderByClause;
     }
 
     public boolean isDistinct() {
         return distinct;
+    }
+
+    public void setDistinct(boolean distinct) {
+        this.distinct = distinct;
     }
 
     public List<Criteria> getOredCriteria() {
@@ -72,28 +83,28 @@ public class InternetRenewOffsetExample {
         distinct = false;
     }
 
-    public void setPage(Page page) {
-        this.page=page;
-    }
-
     public Page getPage() {
         return page;
     }
 
-    public void setLimitStart(Integer limitStart) {
-        this.limitStart=limitStart;
+    public void setPage(Page page) {
+        this.page=page;
     }
 
     public Integer getLimitStart() {
         return limitStart;
     }
 
-    public void setLimitEnd(Integer limitEnd) {
-        this.limitEnd=limitEnd;
+    public void setLimitStart(Integer limitStart) {
+        this.limitStart=limitStart;
     }
 
     public Integer getLimitEnd() {
         return limitEnd;
+    }
+
+    public void setLimitEnd(Integer limitEnd) {
+        this.limitEnd=limitEnd;
     }
 
     protected abstract static class GeneratedCriteria {
@@ -1356,6 +1367,356 @@ public class InternetRenewOffsetExample {
             addCriterion("PROCESS_TIME not between", value1, value2, "processTime");
             return (Criteria) this;
         }
+
+        public Criteria andBusNumIsNull() {
+            addCriterion("BUS_NUM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumIsNotNull() {
+            addCriterion("BUS_NUM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumEqualTo(String value) {
+            addCriterion("BUS_NUM =", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumNotEqualTo(String value) {
+            addCriterion("BUS_NUM <>", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumGreaterThan(String value) {
+            addCriterion("BUS_NUM >", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumGreaterThanOrEqualTo(String value) {
+            addCriterion("BUS_NUM >=", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumLessThan(String value) {
+            addCriterion("BUS_NUM <", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumLessThanOrEqualTo(String value) {
+            addCriterion("BUS_NUM <=", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumLike(String value) {
+            addCriterion("BUS_NUM like", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumNotLike(String value) {
+            addCriterion("BUS_NUM not like", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumIn(List<String> values) {
+            addCriterion("BUS_NUM in", values, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumNotIn(List<String> values) {
+            addCriterion("BUS_NUM not in", values, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumBetween(String value1, String value2) {
+            addCriterion("BUS_NUM between", value1, value2, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumNotBetween(String value1, String value2) {
+            addCriterion("BUS_NUM not between", value1, value2, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformIsNull() {
+            addCriterion("BUS_PLATFORM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformIsNotNull() {
+            addCriterion("BUS_PLATFORM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformEqualTo(String value) {
+            addCriterion("BUS_PLATFORM =", value, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformNotEqualTo(String value) {
+            addCriterion("BUS_PLATFORM <>", value, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformGreaterThan(String value) {
+            addCriterion("BUS_PLATFORM >", value, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformGreaterThanOrEqualTo(String value) {
+            addCriterion("BUS_PLATFORM >=", value, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformLessThan(String value) {
+            addCriterion("BUS_PLATFORM <", value, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformLessThanOrEqualTo(String value) {
+            addCriterion("BUS_PLATFORM <=", value, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformLike(String value) {
+            addCriterion("BUS_PLATFORM like", value, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformNotLike(String value) {
+            addCriterion("BUS_PLATFORM not like", value, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformIn(List<String> values) {
+            addCriterion("BUS_PLATFORM in", values, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformNotIn(List<String> values) {
+            addCriterion("BUS_PLATFORM not in", values, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformBetween(String value1, String value2) {
+            addCriterion("BUS_PLATFORM between", value1, value2, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformNotBetween(String value1, String value2) {
+            addCriterion("BUS_PLATFORM not between", value1, value2, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictIsNull() {
+            addCriterion("AG_DOC_DISTRICT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictIsNotNull() {
+            addCriterion("AG_DOC_DISTRICT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictEqualTo(String value) {
+            addCriterion("AG_DOC_DISTRICT =", value, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictNotEqualTo(String value) {
+            addCriterion("AG_DOC_DISTRICT <>", value, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictGreaterThan(String value) {
+            addCriterion("AG_DOC_DISTRICT >", value, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictGreaterThanOrEqualTo(String value) {
+            addCriterion("AG_DOC_DISTRICT >=", value, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictLessThan(String value) {
+            addCriterion("AG_DOC_DISTRICT <", value, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictLessThanOrEqualTo(String value) {
+            addCriterion("AG_DOC_DISTRICT <=", value, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictLike(String value) {
+            addCriterion("AG_DOC_DISTRICT like", value, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictNotLike(String value) {
+            addCriterion("AG_DOC_DISTRICT not like", value, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictIn(List<String> values) {
+            addCriterion("AG_DOC_DISTRICT in", values, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictNotIn(List<String> values) {
+            addCriterion("AG_DOC_DISTRICT not in", values, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictBetween(String value1, String value2) {
+            addCriterion("AG_DOC_DISTRICT between", value1, value2, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocDistrictNotBetween(String value1, String value2) {
+            addCriterion("AG_DOC_DISTRICT not between", value1, value2, "agDocDistrict");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProIsNull() {
+            addCriterion("AG_DOC_PRO is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProIsNotNull() {
+            addCriterion("AG_DOC_PRO is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProEqualTo(String value) {
+            addCriterion("AG_DOC_PRO =", value, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProNotEqualTo(String value) {
+            addCriterion("AG_DOC_PRO <>", value, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProGreaterThan(String value) {
+            addCriterion("AG_DOC_PRO >", value, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProGreaterThanOrEqualTo(String value) {
+            addCriterion("AG_DOC_PRO >=", value, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProLessThan(String value) {
+            addCriterion("AG_DOC_PRO <", value, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProLessThanOrEqualTo(String value) {
+            addCriterion("AG_DOC_PRO <=", value, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProLike(String value) {
+            addCriterion("AG_DOC_PRO like", value, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProNotLike(String value) {
+            addCriterion("AG_DOC_PRO not like", value, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProIn(List<String> values) {
+            addCriterion("AG_DOC_PRO in", values, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProNotIn(List<String> values) {
+            addCriterion("AG_DOC_PRO not in", values, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProBetween(String value1, String value2) {
+            addCriterion("AG_DOC_PRO between", value1, value2, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgDocProNotBetween(String value1, String value2) {
+            addCriterion("AG_DOC_PRO not between", value1, value2, "agDocPro");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactPersonIsNull() {
+            addCriterion("BUS_CONTACT_PERSON is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactPersonIsNotNull() {
+            addCriterion("BUS_CONTACT_PERSON is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactPersonEqualTo(String value) {
+            addCriterion("BUS_CONTACT_PERSON =", value, "busContactPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactPersonNotEqualTo(String value) {
+            addCriterion("BUS_CONTACT_PERSON <>", value, "busContactPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactPersonGreaterThan(String value) {
+            addCriterion("BUS_CONTACT_PERSON >", value, "busContactPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactPersonGreaterThanOrEqualTo(String value) {
+            addCriterion("BUS_CONTACT_PERSON >=", value, "busContactPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactPersonLessThan(String value) {
+            addCriterion("BUS_CONTACT_PERSON <", value, "busContactPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactPersonLessThanOrEqualTo(String value) {
+            addCriterion("BUS_CONTACT_PERSON <=", value, "busContactPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactPersonLike(String value) {
+            addCriterion("BUS_CONTACT_PERSON like", value, "busContactPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactPersonNotLike(String value) {
+            addCriterion("BUS_CONTACT_PERSON not like", value, "busContactPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactPersonIn(List<String> values) {
+            addCriterion("BUS_CONTACT_PERSON in", values, "busContactPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactPersonNotIn(List<String> values) {
+            addCriterion("BUS_CONTACT_PERSON not in", values, "busContactPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactPersonBetween(String value1, String value2) {
+            addCriterion("BUS_CONTACT_PERSON between", value1, value2, "busContactPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactPersonNotBetween(String value1, String value2) {
+            addCriterion("BUS_CONTACT_PERSON not between", value1, value2, "busContactPerson");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
@@ -1381,38 +1742,6 @@ public class InternetRenewOffsetExample {
         private boolean listValue;
 
         private String typeHandler;
-
-        public String getCondition() {
-            return condition;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-
-        public Object getSecondValue() {
-            return secondValue;
-        }
-
-        public boolean isNoValue() {
-            return noValue;
-        }
-
-        public boolean isSingleValue() {
-            return singleValue;
-        }
-
-        public boolean isBetweenValue() {
-            return betweenValue;
-        }
-
-        public boolean isListValue() {
-            return listValue;
-        }
-
-        public String getTypeHandler() {
-            return typeHandler;
-        }
 
         protected Criterion(String condition) {
             super();
@@ -1448,6 +1777,38 @@ public class InternetRenewOffsetExample {
 
         protected Criterion(String condition, Object value, Object secondValue) {
             this(condition, value, secondValue, null);
+        }
+
+        public String getCondition() {
+            return condition;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public Object getSecondValue() {
+            return secondValue;
+        }
+
+        public boolean isNoValue() {
+            return noValue;
+        }
+
+        public boolean isSingleValue() {
+            return singleValue;
+        }
+
+        public boolean isBetweenValue() {
+            return betweenValue;
+        }
+
+        public boolean isListValue() {
+            return listValue;
+        }
+
+        public String getTypeHandler() {
+            return typeHandler;
         }
     }
 }

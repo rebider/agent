@@ -21,39 +21,45 @@ public interface OLogisticsService {
 
     PageInfo getOLogisticsList(Map<String, Object> param, PageInfo pageInfo);
 
-
     List<Map<String, Object>> getLogisticsBySn(String startSn, String endSn, String agentId) throws ProcessException;
 
     ResultVO insertLogisticsDetail(String startSn, String endSn, Integer begins, Integer finish,String logisticsId, String cUser, String planId) throws MessageException;
 
     ResultVO updateLogisticsDetail(List<String> idList,String logisticsId, String cUser, String planId) throws MessageException;
 
-    public List<String> addList(List<List<Object>> data, String user)throws Exception;
+    List<String> addList(List<List<Object>> data, String user)throws Exception;
 
-    public List<String> idList(String startSn, String endSn, Integer begins, Integer finish,String proCom) throws MessageException;
+    List<String> idList(String startSn, String endSn, Integer begins, Integer finish,String proCom) throws MessageException;
 
-    public List<String> idList(String startSn, String endSn) throws MessageException;
+    List<String> idList(String startSn, String endSn) throws MessageException;
 
-    public AgentResult isInSnSegment(String snStart,String snEnd,String isInStart,String isInEnd);
+    AgentResult isInSnSegment(String snStart,String snEnd,String isInStart,String isInEnd);
 
-    public AgentResult addListItem(List<Object> data, String user) throws Exception;
+    AgentResult addListItem(List<Object> data, String user) throws Exception;
 
-    public int insertImportData(OLogistics oLogistics);
+    int insertImportData(OLogistics oLogistics);
 
     int updateSnStatus(String orderId, String startSn, String endSn, BigDecimal code, BigDecimal recordStatus,String returnId)throws Exception;
 
     Map<String, Object> getLogisticsBySn(String sn, String agentId) throws ProcessException;
 
-//    List<String> idList(String startSn, String endSn, Integer begins, Integer finish) throws MessageException;
-    public List<String> addSn(List<List<String>>  data, String user)throws Exception;
+    List<String> addSn(List<List<String>>  data, String user)throws Exception;
 
     PageInfo getOLogisticsDetailList(Map<String, Object> param, PageInfo pageInfo);
-    public AgentResult checkRecordPlan(List<Object> excel,Map<String,Object> db);
+
+    AgentResult checkRecordPlan(List<Object> excel,Map<String,Object> db);
 
     /**
      * 发送物流到业务系统
      * @param lgcId
      * @return
      */
-    public AgentResult sendLgcInfoToBusSystem(String lgcId,String userId)throws Exception;
+    AgentResult sendLgcInfoToBusSystem(String lgcId,String userId)throws Exception;
+
+    /**
+     * 删除物流（sn上传错误等。。）
+     * @param lgcId
+     * @return
+     */
+    AgentResult delLogistcstInfo(String lgcId,String userId)throws Exception;
 }

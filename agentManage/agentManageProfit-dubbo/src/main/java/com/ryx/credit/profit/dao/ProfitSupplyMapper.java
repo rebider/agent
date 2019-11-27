@@ -45,4 +45,5 @@ public interface ProfitSupplyMapper {
     BigDecimal getTotalByPidMonthAndAndAG(Map<String,String> param);
 
 
+    void clearRollingDifferenceSupplyData(String profitDate);
 }

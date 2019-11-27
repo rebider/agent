@@ -707,11 +707,11 @@
   <update id="updateByLogisticsId" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
     update O_LOGISTICS_DETAIL
     <set>
-        <if test="orderId != null">
-        STATUS = #{status,jdbcType=VARCHAR},
+        <if test="status != null">
+            STATUS = #{status,jdbcType=VARCHAR},
         </if>
         <if test="sendStatus != null">
-        SEND_STATUS = #{sendStatus,jdbcType=DECIMAL},
+            SEND_STATUS = #{sendStatus,jdbcType=DECIMAL},
         </if>
         <if test="sbusMsg != null">
             SBUS_MSG = #{sbusMsg,jdbcType=DECIMAL},
@@ -719,4 +719,11 @@
     </set>
     where LOGISTICS_ID = #{logisticsId,jdbcType=VARCHAR}
   </update>
+
+  <delete id="deleteDetailByLogisicalId" parameterType="string">
+    delete from
+        O_LOGISTICS_DETAIL
+    where
+        LOGISTICS_ID = #{logisticsId,jdbcType=VARCHAR}
+  </delete>
 </mapper>

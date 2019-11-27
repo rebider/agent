@@ -37,4 +37,7 @@ public interface DictMapper {
 
     int updateByPrimaryKeySelective(Dict record);  // 删除（编辑）状态
 
+    Dict selectDictByValueAndName(Dict record);
+
+    int updateByOldDict(@Param("oldDict")Dict oldDict,@Param("newDict")Dict newDict);
 }
