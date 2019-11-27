@@ -4457,6 +4457,7 @@ public class OrderServiceImpl implements OrderService {
     public AgentResult approveFinishOrderAdjust(String insid, String actname) throws Exception {
         logger.info("订单调整审批完成:{},{}", insid, actname);
         boolean isZero = false;
+        boolean sendMsgToPlatm = false;
         //审批流关系
         BusActRel busActRel = busActRelService.findById(insid);
         if (actname.equals("finish_end")) { //审批完成
@@ -4605,7 +4606,6 @@ public class OrderServiceImpl implements OrderService {
                             }else {
                                 record.setSrcType(PamentSrcType.ORDER_ADJ_REFUND.code);
                                 record.setSrcId(oSupplement.getId());
-
                             }
                             record.setPayTime(new Date());
                             record.setStatus(Status.STATUS_1.status);
@@ -4754,7 +4754,6 @@ public class OrderServiceImpl implements OrderService {
                             }else {
                                 record.setSrcType(PamentSrcType.ORDER_ADJ_REFUND.code);
                                 record.setSrcId(oSupplement.getId());
-
                             }
                             record.setPayTime(new Date());
                             record.setStatus(Status.STATUS_1.status);
@@ -4896,7 +4895,7 @@ public class OrderServiceImpl implements OrderService {
                         }else {
                             record_XXDK.setSrcType(PamentSrcType.ORDER_ADJ_REFUND.code);
                             record_XXDK.setSrcId(oSupplement.getId());
-
+                            sendMsgToPlatm = true;
                         }
                         record_XXDK.setPayTime(new Date());
                         record_XXDK.setStatus(Status.STATUS_1.status);
@@ -5011,6 +5010,7 @@ public class OrderServiceImpl implements OrderService {
                             }else {
                                 record.setSrcType(PamentSrcType.ORDER_ADJ_REFUND.code);
                                 record.setSrcId(oSupplement.getId());
+                                sendMsgToPlatm = true;
                             }
                             record.setPayTime(new Date());
                             record.setStatus(Status.STATUS_1.status);
@@ -5153,13 +5153,7 @@ public class OrderServiceImpl implements OrderService {
                             }else {
                                 record.setSrcType(PamentSrcType.ORDER_ADJ_REFUND.code);
                                 record.setSrcId(oSupplement.getId());
-                                if (1 != oPaymentDetailMapper.insert(record)) {
-                                    logger.info("订单调整审批完成:明细生成失败:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(), record.getId());
-                                    throw new MessageException("分期处理");
-                                }
-                                //TODO 处理线下退款通知kafka
-                                logger.info("订单调整审批通过 信息开始发送到kafka:{}",order.getId());
-                                paymentDetailService.sendRefundMentToPlatform(order.getId());
+                                sendMsgToPlatm = true;
                             }
                             if (1 != oPaymentDetailMapper.insert(record)) {
                                 logger.info("订单调整审批完成:明细生成失败:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(), record.getId());
@@ -5310,6 +5304,11 @@ public class OrderServiceImpl implements OrderService {
                     }
                     logger.info("订单调整审批完成处理明细完成首付数据成功{}:{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
                 break;
+            }
+            if (sendMsgToPlatm){
+                //TODO 处理线下退款通知kafka
+                logger.info("订单调整审批通过,有退款,信息开始发送到kafka:{}",order.getId());
+                paymentDetailService.sendRefundMentToPlatform(order.getId());
             }
 
             //1.计算差价总金额，待付款总计金额
