@@ -4790,6 +4790,7 @@ public class OrderServiceImpl implements OrderService {
                                     oPayment.getPayMethod(),
                                     record.getId());
                         }
+                        break;
                     }
                     if (oPayment.getDownPaymentCount() == null || oPayment.getDownPaymentCount().compareTo(BigDecimal.ZERO) <= 0) {
                         logger.info("代理商订单审批完成:分期数据为错误:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
@@ -5301,6 +5302,7 @@ public class OrderServiceImpl implements OrderService {
                             record_QT.setSrcType(PamentSrcType.ORDER_ADJ_REFUND.code);
                             record_QT.setSrcId(oSupplement.getId());
                         }
+                        break;
                     }
                     //抵扣金额必须等于待付金额
                     logger.info("订单调整审批完成QT抵扣金额不等于订单待付金额{}:{},{},{}",
