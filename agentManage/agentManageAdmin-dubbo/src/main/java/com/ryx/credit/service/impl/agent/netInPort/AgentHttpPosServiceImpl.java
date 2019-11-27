@@ -239,8 +239,8 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
             data.put("lowDebitRate",paramMap.get("lowDebitRate"));
             data.put("lowCreditRate",paramMap.get("lowCreditRate"));
             data.put("ceilingCreditRate",paramMap.get("ceilingCreditRate"));
-            data.put("topDebitRate",paramMap.get("debitRateCapping"));
-            data.put("debitLow",paramMap.get("debitCappingLower"));
+            data.put("topDebitRate",paramMap.get("topDebitRate"));
+            data.put("debitLow",paramMap.get("debitLow"));
 
             if(StringUtils.isNotBlank(String.valueOf(paramMap.get("orgId")))){
                 data.put("orgId",paramMap.get("orgId"));
