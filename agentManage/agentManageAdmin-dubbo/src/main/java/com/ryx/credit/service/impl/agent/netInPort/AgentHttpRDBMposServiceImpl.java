@@ -3,19 +3,14 @@ package com.ryx.credit.service.impl.agent.netInPort;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.BusType;
 import com.ryx.credit.common.enumc.DictGroup;
-import com.ryx.credit.common.enumc.OrgType;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
-import com.ryx.credit.dao.agent.AgentBusInfoMapper;
-import com.ryx.credit.dao.agent.AgentColinfoMapper;
-import com.ryx.credit.dao.agent.AgentMapper;
-import com.ryx.credit.dao.agent.RegionMapper;
+import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.bank.BankLineNumsMapper;
+import com.ryx.credit.dao.order.OrgPlatformMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.bank.BankLineNums;
-import com.ryx.credit.pojo.admin.bank.BankLineNumsExample;
-import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentColinfoService;
@@ -29,7 +24,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /***
@@ -65,6 +59,12 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
     private DictOptionsService dictOptionsService;
     @Autowired
     private AgentColinfoMapper agentColinfoMapper;
+    @Autowired
+    private OrgPlatformMapper orgPlatformMapper;
+    @Autowired
+    private PlatFormMapper platFormMapper;
+
+
 
     @Override
     public Map<String, Object> packageParam(Map<String, Object> param) {
@@ -78,6 +78,11 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             }
             resultMap.put("mobileNo",agentBusInfo.getBusLoginNum());
             resultMap.put("branchid",agentBusInfo.getBusPlatform());
+            PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+//            resultMap.put("branchid",platForm.getBusplatform());//暂时先注释,等瑞大宝改造完成放开
+            //查询顶级机构
+            Map orgMap = orgPlatformMapper.selectByMap(FastMap.fastMap("busPlatform", agentBusInfo.getBusPlatform()).putKeyV("organNum", agentBusInfo.getOrganNum()));
+            resultMap.put("organId",String.valueOf(orgMap.get("PLATCODE")));
             resultMap.put("direct",direct(agentBusInfo.getBusType()));
             resultMap.put("cardno",agentColinfo.getCloBankAccount());
             resultMap.put("termCount",agentBusInfo.getTerminalsLower());
@@ -152,6 +157,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             jsonParams.put("cardno",paramMap.get("cardno"));
             jsonParams.put("termCount",paramMap.get("termCount"));
             jsonParams.put("bankbranchid",paramMap.get("bankbranchid"));
+            jsonParams.put("organId",paramMap.get("organId"));
             jsonParams.put("bankbranchname",paramMap.get("bankbranchname"));
             jsonParams.put("customerPid",paramMap.get("customerPid"));
             jsonParams.put("address",paramMap.get("address"));
