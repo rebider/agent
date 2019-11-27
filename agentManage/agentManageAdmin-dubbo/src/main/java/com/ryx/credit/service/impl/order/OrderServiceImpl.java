@@ -4521,10 +4521,8 @@ public class OrderServiceImpl implements OrderService {
             order.setIncentiveAmo(forPayAmount.subtract(forRealPayAmount));
             order.setoAmo(forPayAmount);
             order.setPayAmo(forRealPayAmount);
-            if (isZero && null == order.getRemark() ){
-                order.setRemark("有退款");
-            }else if (isZero && !order.getRemark().contains("有退款")){
-                order.setRemark(order.getRemark()+"有退款");
+            if (isZero) {
+                order.setRemark(StringUtils.isBlank(order.getRemark()) ? "有退款" : order.getRemark() + "有退款");
             }
             order.setOrderStatus(OrderStatus.ENABLE.status);
             if( 1 != orderMapper.updateByPrimaryKeySelective(order)){
