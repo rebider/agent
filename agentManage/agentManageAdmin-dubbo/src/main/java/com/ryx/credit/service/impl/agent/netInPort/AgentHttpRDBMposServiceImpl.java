@@ -131,6 +131,8 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             resultMap.put("channelTopId",agentBusInfo.getFinaceRemitOrgan());
             resultMap.put("invoice",String.valueOf(agentColinfo.getCloInvoice()));
             resultMap.put("tax",String.valueOf(agentColinfo.getCloTaxPoint()));
+            resultMap.put("channelOrganTopId",agentBusInfo.getOrganNum());
+
         } catch (Exception e) {
             log.info("入网组装参数为空，"+e.getMessage());
             e.printStackTrace();
@@ -170,6 +172,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             jsonParams.put("channelTopId",paramMap.get("channelTopId"));
             jsonParams.put("invoice",paramMap.get("invoice"));
             jsonParams.put("tax",paramMap.get("tax"));
+            jsonParams.put("channelOrganTopId",paramMap.get("channelOrganTopId"));
 
             String json = JSONObject.toJSONString(jsonParams);
             log.info("通知瑞大宝入网请求参数：{}",json);
@@ -275,6 +278,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             jsonParams.put("invoice",data.get("invoice"));
             jsonParams.put("tax",data.get("tax"));
             jsonParams.put("parentAgencyId",data.get("parentAgencyId"));
+            jsonParams.put("channelOrganTopId",data.get("channelOrganTopId"));
 
             String json = JSONObject.toJSONString(jsonParams);
             log.info("通知瑞大宝升级请求参数：{}",json);
@@ -343,6 +347,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
         jsonParams.put("channelTopId",agentBusInfo.getFinaceRemitOrgan());
         jsonParams.put("invoice",String.valueOf(agentColinfo.getCloInvoice()));
         jsonParams.put("tax",String.valueOf(agentColinfo.getCloTaxPoint()));
+        jsonParams.put("channelOrganTopId",agentBusInfo.getOrganNum());
         return jsonParams;
     }
 
@@ -385,6 +390,7 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
             jsonParams.put("channelTopId",paramMap.get("channelTopId"));
             jsonParams.put("invoice",paramMap.get("invoice"));
             jsonParams.put("tax",paramMap.get("tax"));
+            jsonParams.put("channelOrganTopId",paramMap.get("channelOrganTopId"));
 
             String json = JSONObject.toJSONString(jsonParams);
             log.info("通知瑞大宝入网修改请求参数：{}",json);
