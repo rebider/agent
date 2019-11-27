@@ -4576,7 +4576,6 @@ public class OrderServiceImpl implements OrderService {
                             record.setPaymentId(oPayment.getId());
                             record.setPaymentType(PamentIdType.ORDER_FKD.code);
                             record.setOrderId(oPayment.getOrderId());
-                            record.setPayType(PaymentType.TK.code);
                             record.setPayAmount(re);
                             record.setRealPayAmount(re);
                             record.setPlanPayTime((Date) datum.get("date"));
@@ -4601,9 +4600,11 @@ public class OrderServiceImpl implements OrderService {
                                 if(1!=settleAccountsMapper.insertSelective(settleAccounts)){
                                     return AgentResult.fail("保存挂账记录失败!");
                                 };
+                                record.setPayType(PaymentType.GZ.code);
                                 record.setSrcType(PamentSrcType.ORDER_ADJ_SETTLE.code);
                                 record.setSrcId(settleAccounts.getId());
                             }else {
+                                record.setPayType(PaymentType.TK.code);
                                 record.setSrcType(PamentSrcType.ORDER_ADJ_REFUND.code);
                                 record.setSrcId(oSupplement.getId());
                             }
@@ -4724,7 +4725,6 @@ public class OrderServiceImpl implements OrderService {
                             record.setPaymentId(oPayment.getId());
                             record.setPaymentType(PamentIdType.ORDER_FKD.code);
                             record.setOrderId(oPayment.getOrderId());
-                            record.setPayType(PaymentType.TK.code);
                             record.setPayAmount(re);
                             record.setRealPayAmount(re);
                             record.setPlanPayTime((Date) datum.get("date"));
@@ -4749,9 +4749,11 @@ public class OrderServiceImpl implements OrderService {
                                 if(1!=settleAccountsMapper.insertSelective(settleAccounts)){
                                     return AgentResult.fail("保存挂账记录失败!");
                                 };
+                                record.setPayType(PaymentType.GZ.code);
                                 record.setSrcType(PamentSrcType.ORDER_ADJ_SETTLE.code);
                                 record.setSrcId(settleAccounts.getId());
                             }else {
+                                record.setPayType(PaymentType.TK.code);
                                 record.setSrcType(PamentSrcType.ORDER_ADJ_REFUND.code);
                                 record.setSrcId(oSupplement.getId());
                             }
@@ -4864,7 +4866,6 @@ public class OrderServiceImpl implements OrderService {
                         record_XXDK.setPaymentId(oPayment.getId());
                         record_XXDK.setPaymentType(PamentIdType.ORDER_FKD.code);
                         record_XXDK.setOrderId(oPayment.getOrderId());
-                        record_XXDK.setPayType(PaymentType.TK.code);
                         record_XXDK.setPayAmount(re);
                         record_XXDK.setRealPayAmount(re);
                         record_XXDK.setPlanPayTime(d.getTime());
@@ -4890,9 +4891,11 @@ public class OrderServiceImpl implements OrderService {
                             if(1!=settleAccountsMapper.insertSelective(settleAccounts)){
                                 return AgentResult.fail("保存挂账记录失败!");
                             };
+                            record_XXDK.setPayType(PaymentType.GZ.code);
                             record_XXDK.setSrcType(PamentSrcType.ORDER_ADJ_SETTLE.code);
                             record_XXDK.setSrcId(settleAccounts.getId());
                         }else {
+                            record_XXDK.setPayType(PaymentType.TK.code);
                             record_XXDK.setSrcType(PamentSrcType.ORDER_ADJ_REFUND.code);
                             record_XXDK.setSrcId(oSupplement.getId());
                             sendMsgToPlatm = true;
@@ -4980,7 +4983,6 @@ public class OrderServiceImpl implements OrderService {
                             record.setPaymentId(oPayment.getId());
                             record.setPaymentType(PamentIdType.ORDER_FKD.code);
                             record.setOrderId(oPayment.getOrderId());
-                            record.setPayType(PaymentType.TK.code);
                             record.setPayAmount(re);
                             record.setRealPayAmount(re);
                             record.setPlanPayTime((Date) datum.get("date"));
@@ -5005,9 +5007,11 @@ public class OrderServiceImpl implements OrderService {
                                 if(1!=settleAccountsMapper.insertSelective(settleAccounts)){
                                     return AgentResult.fail("保存挂账记录失败!");
                                 };
+                                record.setPayType(PaymentType.GZ.code);
                                 record.setSrcType(PamentSrcType.ORDER_ADJ_SETTLE.code);
                                 record.setSrcId(settleAccounts.getId());
                             }else {
+                                record.setPayType(PaymentType.TK.code);
                                 record.setSrcType(PamentSrcType.ORDER_ADJ_REFUND.code);
                                 record.setSrcId(oSupplement.getId());
                                 sendMsgToPlatm = true;
@@ -5120,7 +5124,6 @@ public class OrderServiceImpl implements OrderService {
                             record.setPaymentId(oPayment.getId());
                             record.setPaymentType(PamentIdType.ORDER_FKD.code);
                             record.setOrderId(oPayment.getOrderId());
-                            record.setPayType(PaymentType.TK.code);
                             record.setPayAmount(re);
                             record.setRealPayAmount(re);
                             record.setPlanPayTime((Date) datum.get("date"));
@@ -5148,9 +5151,11 @@ public class OrderServiceImpl implements OrderService {
                                 if(1!=settleAccountsMapper.insertSelective(settleAccounts)){
                                     return AgentResult.fail("保存挂账记录失败!");
                                 };
+                                record.setPayType(PaymentType.GZ.code);
                                 record.setSrcType(PamentSrcType.ORDER_ADJ_SETTLE.code);
                                 record.setSrcId(settleAccounts.getId());
                             }else {
+                                record.setPayType(PaymentType.TK.code);
                                 record.setSrcType(PamentSrcType.ORDER_ADJ_REFUND.code);
                                 record.setSrcId(oSupplement.getId());
                                 sendMsgToPlatm = true;
@@ -5239,7 +5244,6 @@ public class OrderServiceImpl implements OrderService {
                         record_QT.setPaymentId(oPayment.getId());
                         record_QT.setPaymentType(PamentIdType.ORDER_FKD.code);
                         record_QT.setOrderId(oPayment.getOrderId());
-                        record_QT.setPayType(PaymentType.TK.code);
                         record_QT.setPayAmount(re);
                         record_QT.setRealPayAmount(re);
                         record_QT.setPlanPayTime(d.getTime());
@@ -5266,9 +5270,11 @@ public class OrderServiceImpl implements OrderService {
                             if(1!=settleAccountsMapper.insertSelective(settleAccounts)){
                                 return AgentResult.fail("保存挂账记录失败!");
                             };
+                            record_QT.setPayType(PaymentType.GZ.code);
                             record_QT.setSrcId(settleAccounts.getId());
                             record_QT.setSrcType(PamentSrcType.ORDER_ADJ_SETTLE.code);
                         }else {
+                            record_QT.setPayType(PaymentType.TK.code);
                             record_QT.setSrcType(PamentSrcType.ORDER_ADJ_REFUND.code);
                             record_QT.setSrcId(oSupplement.getId());
                         }

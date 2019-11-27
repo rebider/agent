@@ -12,6 +12,7 @@ public enum PaymentType {
     FRFQ("FRFQ","分润分期"),
     DKFQ("DKFQ","打款分期"),
     TK("TK","退款"),
+    GZ("GZ","挂账"),
     DK("DK","打款");
 
     public String code;
