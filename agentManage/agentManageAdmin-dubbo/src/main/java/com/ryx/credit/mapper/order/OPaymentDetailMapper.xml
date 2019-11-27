@@ -804,4 +804,11 @@
       AND PD.PAYMENT_TYPE = #{paymentType}
       AND PD.PAYMENT_STATUS= ${paymentStatus}
     </select>
+
+    <select id="selectRefunOPaymentDetail" parameterType="string" resultMap="BaseResultMap">
+        select * from o_payment_detail dea
+        left join o_supplement su on su.id=dea.src_id
+        where dea.status=1 and su.status=1 and dea.src_type='ORDER_ADJ_REFUND' and dea.order_id=#{orderId}
+        order by dea.c_date desc
+    </select>
 </mapper>
