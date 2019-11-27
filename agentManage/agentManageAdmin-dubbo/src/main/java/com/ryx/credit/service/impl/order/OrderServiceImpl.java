@@ -4576,7 +4576,7 @@ public class OrderServiceImpl implements OrderService {
                             record.setPaymentId(oPayment.getId());
                             record.setPaymentType(PamentIdType.ORDER_FKD.code);
                             record.setOrderId(oPayment.getOrderId());
-                            record.setPayType(PaymentType.DKFQ.code);
+                            record.setPayType(PaymentType.TK.code);
                             record.setPayAmount(re);
                             record.setRealPayAmount(re);
                             record.setPlanPayTime((Date) datum.get("date"));
@@ -4724,7 +4724,7 @@ public class OrderServiceImpl implements OrderService {
                             record.setPaymentId(oPayment.getId());
                             record.setPaymentType(PamentIdType.ORDER_FKD.code);
                             record.setOrderId(oPayment.getOrderId());
-                            record.setPayType(PaymentType.FRFQ.code);
+                            record.setPayType(PaymentType.TK.code);
                             record.setPayAmount(re);
                             record.setRealPayAmount(re);
                             record.setPlanPayTime((Date) datum.get("date"));
@@ -4864,7 +4864,7 @@ public class OrderServiceImpl implements OrderService {
                         record_XXDK.setPaymentId(oPayment.getId());
                         record_XXDK.setPaymentType(PamentIdType.ORDER_FKD.code);
                         record_XXDK.setOrderId(oPayment.getOrderId());
-                        record_XXDK.setPayType(PaymentType.DK.code);
+                        record_XXDK.setPayType(PaymentType.TK.code);
                         record_XXDK.setPayAmount(re);
                         record_XXDK.setRealPayAmount(re);
                         record_XXDK.setPlanPayTime(d.getTime());
@@ -4980,7 +4980,7 @@ public class OrderServiceImpl implements OrderService {
                             record.setPaymentId(oPayment.getId());
                             record.setPaymentType(PamentIdType.ORDER_FKD.code);
                             record.setOrderId(oPayment.getOrderId());
-                            record.setPayType(PaymentType.FRFQ.code);
+                            record.setPayType(PaymentType.TK.code);
                             record.setPayAmount(re);
                             record.setRealPayAmount(re);
                             record.setPlanPayTime((Date) datum.get("date"));
@@ -5120,7 +5120,7 @@ public class OrderServiceImpl implements OrderService {
                             record.setPaymentId(oPayment.getId());
                             record.setPaymentType(PamentIdType.ORDER_FKD.code);
                             record.setOrderId(oPayment.getOrderId());
-                            record.setPayType(PaymentType.DKFQ.code);
+                            record.setPayType(PaymentType.TK.code);
                             record.setPayAmount(re);
                             record.setRealPayAmount(re);
                             record.setPlanPayTime((Date) datum.get("date"));
@@ -5233,14 +5233,13 @@ public class OrderServiceImpl implements OrderService {
                                     oSupplement.getId());
                             throw new MessageException("补款处理失败");
                         }
-                        //添加抵扣后的余款为欠款
                         OPaymentDetail record_QT = new OPaymentDetail();
                         record_QT.setId(idService.genId(TabId.o_payment_detail));
                         record_QT.setBatchCode(batchCode);
                         record_QT.setPaymentId(oPayment.getId());
                         record_QT.setPaymentType(PamentIdType.ORDER_FKD.code);
                         record_QT.setOrderId(oPayment.getOrderId());
-                        record_QT.setPayType(PaymentType.SF.code);
+                        record_QT.setPayType(PaymentType.TK.code);
                         record_QT.setPayAmount(re);
                         record_QT.setRealPayAmount(re);
                         record_QT.setPlanPayTime(d.getTime());
