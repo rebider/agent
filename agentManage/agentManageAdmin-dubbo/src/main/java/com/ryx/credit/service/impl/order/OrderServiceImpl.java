@@ -5350,9 +5350,10 @@ public class OrderServiceImpl implements OrderService {
                 break;
             }
             if (sendMsgToPlatm){
+                logger.info("暂时不发送瑞大宝免税额度");
                 //TODO 处理线下退款通知kafka
-                logger.info("订单调整审批通过,有退款,信息开始发送到kafka:{}",order.getId());
-                paymentDetailService.sendRefundMentToPlatform(order.getId());
+//                logger.info("订单调整审批通过,有退款,信息开始发送到kafka:{}",order.getId());
+//                paymentDetailService.sendRefundMentToPlatform(order.getId());
             }
             //订单调整更新
             if (1 != orderAdjMapper.updateByPrimaryKeySelective(orderAdj)) {
