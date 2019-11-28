@@ -592,7 +592,7 @@
 left join  A_AGENT  bb on aa.PARENT_AGENT_ID = bb.ID
 where
   <if test="SOURCE_INFO=='POS'">(aa.SOURCE_INFO='POS'or aa.SOURCE_INFO='ZPOS')</if>
-  <if test="SOURCE_INFO=='MPOS'">aa.SOURCE_INFO='MPOS'</if>
+  <if test="SOURCE_INFO=='MPOS'">(aa.SOURCE_INFO='MPOS' or aa.SOURCE_INFO='RDBPOS' or aa.SOURCE_INFO='RHPOS')</if>
  <if test="AGENT_ID!=null and AGENT_ID!=''"> and aa.AGENT_ID=#{AGENT_ID,jdbcType=VARCHAR}</if>
   <if test="AGENT_NAME!=null and AGENT_NAME!=''"> and aa.AGENT_NAME=#{AGENT_NAME,jdbcType=VARCHAR}</if>
   <if test="BUS_CODE!=null and BUS_CODE!=''"> and aa.BUS_CODE=#{BUS_CODE,jdbcType=VARCHAR}</if>
@@ -611,7 +611,7 @@ where
     </if>
     where
     <if test="SOURCE_INFO=='POS'">(SOURCE_INFO='POS'or SOURCE_INFO='ZPOS')</if>
-    <if test="SOURCE_INFO=='MPOS'">SOURCE_INFO='MPOS'</if>
+    <if test="SOURCE_INFO=='MPOS'">(SOURCE_INFO='MPOS' or SOURCE_INFO='RDBPOS' or SOURCE_INFO='RHPOS')</if>
     <if test="AGENT_ID!=null and AGENT_ID!=''"> and AGENT_ID=#{AGENT_ID,jdbcType=VARCHAR}</if>
     <if test="AGENT_NAME!=null and AGENT_NAME!=''"> and AGENT_NAME=#{AGENT_NAME,jdbcType=VARCHAR}</if>
     <if test="BUS_CODE!=null and BUS_CODE!=''"> and BUS_CODE=#{BUS_CODE,jdbcType=VARCHAR}</if>
@@ -637,7 +637,7 @@ where
     left join  A_AGENT  bb on aa.PARENT_AGENT_ID = bb.ID
     start with
     <if test="SOURCE_INFO=='POS'">(aa.SOURCE_INFO='POS'or aa.SOURCE_INFO='ZPOS')</if>
-    <if test="SOURCE_INFO=='MPOS'">aa.SOURCE_INFO='MPOS'</if>
+    <if test="SOURCE_INFO=='MPOS'">(aa.SOURCE_INFO='MPOS' or aa.SOURCE_INFO='RDBPOS' or aa.SOURCE_INFO='RHPOS')</if>
     <if test="AGENT_ID!=null and AGENT_ID!=''"> and aa.AGENT_ID=#{AGENT_ID,jdbcType=VARCHAR}</if>
     <if test="AGENT_NAME!=null and AGENT_NAME!=''"> and aa.AGENT_NAME=#{AGENT_NAME,jdbcType=VARCHAR}</if>
     <if test="BUS_CODE!=null and BUS_CODE!=''"> and aa.BUS_CODE=#{BUS_CODE,jdbcType=VARCHAR}</if>
@@ -657,7 +657,7 @@ where
     </if>
     start with
     <if test="SOURCE_INFO=='POS'">(SOURCE_INFO='POS'or SOURCE_INFO='ZPOS')</if>
-    <if test="SOURCE_INFO=='MPOS'">SOURCE_INFO='MPOS'</if>
+    <if test="SOURCE_INFO=='MPOS'">(SOURCE_INFO='MPOS' or SOURCE_INFO='RDBPOS' or SOURCE_INFO='RHPOS')</if>
     <if test="AGENT_ID!=null and AGENT_ID!=''"> and AGENT_ID=#{AGENT_ID,jdbcType=VARCHAR}</if>
     <if test="AGENT_NAME!=null and AGENT_NAME!=''"> and AGENT_NAME=#{AGENT_NAME,jdbcType=VARCHAR}</if>
     <if test="BUS_CODE!=null and BUS_CODE!=''"> and BUS_CODE=#{BUS_CODE,jdbcType=VARCHAR}</if>
@@ -738,6 +738,10 @@ where
       AND PLATFORM_TYPE ='POS' or PLATFORM_TYPE ='ZPOS'
     </if>
 
+  </select>
+
+  <select id="queryAllMPosBusNum" resultType="java.util.Map">
+    select  PLATFORM_NUM,PLATFORM_NAME from A_PLATFORM where PLATFORM_TYPE in('MPOS','RDBPOS','RHPOS') order by PLATFORM_TYPE
   </select>
 
   <select id="selectByBusNum" resultType="java.util.Map">
