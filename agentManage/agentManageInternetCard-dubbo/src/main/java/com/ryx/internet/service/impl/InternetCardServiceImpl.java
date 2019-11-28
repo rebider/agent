@@ -938,30 +938,41 @@ public class InternetCardServiceImpl implements InternetCardService {
             List<OInternetCard> oInternetCards = internetCardMapper.selectInternetCardRenew(reqMap);
             log.info("更新已修改的商户信息数量:{}",oInternetCards.size());
             for (OInternetCard oInternetCard : oInternetCards) {
-                OInternetCardMerch oInternetCardMerch = internetCardMerchMapper.selectChnTermposi(BigDataEncode.encode(oInternetCard.getIccidNum()));
-                if(null!=oInternetCardMerch){
-                    //之前未获取当商户信息的直接更新
-                    if(StringUtils.isBlank(oInternetCard.getMerId()) || StringUtils.isBlank(oInternetCard.getMerName())){
-                        oInternetCard.setMerId(oInternetCardMerch.getChnMerchId());
-                        oInternetCard.setMerName(oInternetCardMerch.getMerchName());
+                try {
+                    log.info("更新已修改的商户信息,OInternetCard:{}",oInternetCard);
+                    OInternetCardMerch oInternetCardMerch = internetCardMerchMapper.selectChnTermposi(BigDataEncode.encode(oInternetCard.getIccidNum()));
+                    log.info("更新已修改的商户信息,OInternetCardMerch:{}",oInternetCardMerch);
+                    if(null!=oInternetCardMerch){
+                        //之前未获取当商户信息的直接更新
+                        if(StringUtils.isBlank(oInternetCard.getMerId()) || StringUtils.isBlank(oInternetCard.getMerName())){
+                            oInternetCard.setMerId(oInternetCardMerch.getChnMerchId());
+                            oInternetCard.setMerName(oInternetCardMerch.getMerchName());
+                        }
+                        else if(StringUtils.isNotBlank(oInternetCardMerch.getChnMerchId()) && StringUtils.isNotBlank(oInternetCardMerch.getMerchName()) &&
+                               (!oInternetCardMerch.getChnMerchId().equals(oInternetCard.getMerId()) || !oInternetCardMerch.getMerchName().equals(oInternetCard.getMerName()))){
+                            oInternetCard.setMerId(oInternetCardMerch.getChnMerchId());
+                            oInternetCard.setMerName(oInternetCardMerch.getMerchName());
+                        }
+                        else if(StringUtils.isNotBlank(oInternetCardMerch.getChnMerchId()) && !oInternetCardMerch.getChnMerchId().equals(oInternetCard.getMerId())){
+                            oInternetCard.setMerId(oInternetCardMerch.getChnMerchId());
+                            oInternetCard.setMerName("无");
+                        }
+                        else if(StringUtils.isNotBlank(oInternetCardMerch.getMerchName()) && !oInternetCardMerch.getMerchName().equals(oInternetCard.getMerName())){
+                            oInternetCard.setMerId("无");
+                            oInternetCard.setMerName(oInternetCardMerch.getMerchName());
+                        }else{
+                            continue;
+                        }
                         int i = internetCardMapper.updateByPrimaryKeySelectiveNotNull(oInternetCard);
                         if(i!=1){
-                            log.error("1定时任务更新商户信息失败:IccidNum:{},商户编号:{},商户名称:{}",oInternetCard.getIccidNum(),oInternetCardMerch.getChnMerchId(),oInternetCardMerch.getMerchName());
+                            log.error("更新已修改的商户信息失败:IccidNum:{},商户编号:{},商户名称:{}",oInternetCard.getIccidNum(),oInternetCardMerch.getChnMerchId(),oInternetCardMerch.getMerchName());
                         }
-                        log.info("更新息已修改的商户信息1,iccid:{}",oInternetCard.getIccidNum());
+                        log.info("更新已修改的商户信息成功,iccid:{}",oInternetCard.getIccidNum());
                         continue;
                     }
-                    //只要有一个不相等就执行更新操作
-                    if(!oInternetCardMerch.getChnMerchId().equals(oInternetCard.getMerId()) || !oInternetCardMerch.getMerchName().equals(oInternetCard.getMerName())){
-                        oInternetCard.setMerId(oInternetCardMerch.getChnMerchId());
-                        oInternetCard.setMerName(oInternetCardMerch.getMerchName());
-                        int i = internetCardMapper.updateByPrimaryKeySelectiveNotNull(oInternetCard);
-                        if(i!=1){
-                            log.error("2定时任务更新商户信息失败:IccidNum:{},商户编号:{},商户名称:{}",oInternetCard.getIccidNum(),oInternetCardMerch.getChnMerchId(),oInternetCardMerch.getMerchName());
-                        }
-                        log.info("更新息已修改的商户信息2,iccid:{}",oInternetCard.getIccidNum());
-                        continue;
-                    }
+                } catch (Exception e) {
+                    log.info("更新已修改的商户信息异常,iccid:{}",oInternetCard.getIccidNum());
+                    e.printStackTrace();
                 }
             }
             long t2 = System.currentTimeMillis();
