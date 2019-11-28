@@ -76,4 +76,10 @@ public interface IPaymentDetailService {
      * @param orderId
      */
     void sendBkPayMentToPlatform(String orderId);
+
+    /**
+     * 发送退款信息到Kafka通知业务系统
+     * @param orderId
+     */
+    void sendRefundMentToPlatform(String orderId);
 }
