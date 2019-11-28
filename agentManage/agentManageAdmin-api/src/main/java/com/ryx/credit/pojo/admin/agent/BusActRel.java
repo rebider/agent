@@ -124,4 +124,22 @@ public class BusActRel extends BusActRelKey implements Serializable{
     public void setExplain(String explain) {
         this.explain = explain;
     }
+
+    @Override
+    public String toString() {
+        return "BusActRel{" +
+                "busType='" + busType + '\'' +
+                ", cTime=" + cTime +
+                ", cUser='" + cUser + '\'' +
+                ", activStatus='" + activStatus + '\'' +
+                ", status=" + status +
+                ", agentId='" + agentId + '\'' +
+                ", agentName='" + agentName + '\'' +
+                ", netInBusType='" + netInBusType + '\'' +
+                ", dataShiro='" + dataShiro + '\'' +
+                ", agDocPro='" + agDocPro + '\'' +
+                ", agDocDistrict='" + agDocDistrict + '\'' +
+                ", explain='" + explain + '\'' +
+                '}';
+    }
 }

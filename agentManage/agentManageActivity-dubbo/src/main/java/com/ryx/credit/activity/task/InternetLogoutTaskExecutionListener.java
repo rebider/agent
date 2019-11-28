@@ -3,7 +3,7 @@ package com.ryx.credit.activity.task;
 import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.spring.MySpringContextHandler;
-import com.ryx.internet.pojo.OInternetRenew;
+import com.ryx.internet.service.InternetCardLogoutService;
 import com.ryx.internet.service.OInternetRenewService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.DelegateTask;
@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * To change this template use File | Settings | File Templates.
  */
 
-public class InternetRenewTaskExecutionListener extends BaseTaskListener implements TaskListener, ExecutionListener {
+public class InternetLogoutTaskExecutionListener extends BaseTaskListener implements TaskListener, ExecutionListener {
     private static final Logger logger = LoggerFactory.getLogger(CompensationTaskExecutionListener.class);
 
 
@@ -34,16 +34,16 @@ public class InternetRenewTaskExecutionListener extends BaseTaskListener impleme
         } else if ("end".equals(eventName)) {
             String activityName = delegateExecution.getCurrentActivityName();
             //数据变更服务类
-            OInternetRenewService internetRenewService = (OInternetRenewService) MySpringContextHandler.applicationContext.getBean("internetRenewService");
+            InternetCardLogoutService internetCardLogoutService = (InternetCardLogoutService) MySpringContextHandler.applicationContext.getBean("internetCardLogoutService");
             //审批拒绝
             if ("reject_end".equals(activityName)) {
-                AgentResult res = internetRenewService.compressCompensateActivity(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.status,"app",new OInternetRenew());
-                logger.info("=========InternetRenewTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
+                AgentResult res = internetCardLogoutService.compressCompensateActivity(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.status);
+                logger.info("=========InternetLogoutTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
             }
             //审批同意更新数据库
             if ("finish_end".equals(activityName)) {
-                AgentResult res = internetRenewService.compressCompensateActivity(delegateExecution.getProcessInstanceId(), AgStatus.Approved.status,"app",new OInternetRenew());
-                logger.info("=========InternetRenewTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
+                AgentResult res = internetCardLogoutService.compressCompensateActivity(delegateExecution.getProcessInstanceId(), AgStatus.Approved.status);
+                logger.info("=========InternetLogoutTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
             }
         } else if ("take".equals(eventName)) {
             logger.info("take=========" + "ActivityId:" + delegateExecution.getCurrentActivityId() + "  ProcessInstanceId:" + delegateExecution.getProcessInstanceId() + "  Execution:" + delegateExecution.getId());
