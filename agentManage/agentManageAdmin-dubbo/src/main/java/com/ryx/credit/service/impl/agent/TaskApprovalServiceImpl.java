@@ -6,6 +6,7 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
+import com.ryx.credit.common.util.RegexUtil;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.OrganizationMapper;
@@ -126,6 +127,51 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
             List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(userId));
             if(orgCodeRes==null && orgCodeRes.size()!=1){
                 throw new ProcessException("部门参数为空");
+            }
+            //根据实例id 去查询业务id
+            if(StringUtils.isNotBlank(agentVo.getSid())){
+                BusActRel byActivId = busActRelMapper.findByActivId(agentVo.getSid());
+                if(StringUtils.isNotBlank(byActivId.getBusId())){
+                    AgentBusInfo abus = agentBusinfoService.getById(byActivId.getBusId());
+                    if (abus == null) {
+                        logger.info("代理商信息审批中,业务信息未找到{}", byActivId.getBusId());
+                        throw new MessageException("业务信息未找到");
+                    }
+
+                    //检查业务平台数据
+                    PlatForm platForm = platFormMapper.selectByPlatFormNum(abus.getBusPlatform());
+                    if(platForm==null){
+                        throw new MessageException("业务平台不存在");
+                    }
+                    //校验平台登陆账号是否是11位
+                    PlatformType platformType = platFormService.byPlatformCode(abus.getBusPlatform());
+                    if(PlatformType.RDBPOS.code.equals(platformType.getValue())){
+                        //检查手机号是否填写
+                        if(StringUtils.isBlank(abus.getBusLoginNum())){
+                            throw new ProcessException("瑞大宝平台登录账号不能为空");
+                        }
+                        if(!RegexUtil.checkInt(abus.getBusLoginNum())){
+                            throw new ProcessException("瑞大宝平台登录账号必须为数字");
+                        }
+                        if(abus.getBusLoginNum().length()!=11){
+                            throw new ProcessException("手机位数不正确");
+                        }
+                    }
+                    if(PlatformType.RHPOS.code.equals(platformType.getValue())){
+                        //检查手机号是否填写
+                        if(StringUtils.isBlank(abus.getBusLoginNum())){
+                            throw new ProcessException("瑞花宝平台登录账号不能为空");
+                        }
+                        if(!RegexUtil.checkInt(abus.getBusLoginNum())){
+                            throw new ProcessException("瑞花宝平台登录账号必须是数字");
+                        }
+                        if(abus.getBusLoginNum().length()!=11){
+                            throw new ProcessException("手机位数不正确");
+                        }
+                    }
+                }
+
+
             }
             Map<String, Object> stringObjectMap = orgCodeRes.get(0);
             String orgCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
