@@ -3385,6 +3385,11 @@ public class OrderServiceImpl implements OrderService {
                     if(null != cUser)
                     orderoutVo.setNuclearUser(cUser.getName());
                 }
+                if (StringUtils.isNotBlank(orderoutVo.getOrderUser())) {
+                    CUser cUser = iUserService.selectById(orderoutVo.getOrderUser());
+                    if(null != cUser)
+                    orderoutVo.setOrderUser(cUser.getName());
+                }
                 if (StringUtils.isNotBlank(orderoutVo.getReviewStatus()) && !orderoutVo.getReviewStatus().equals("null")) {
                     String agStatusByValue = AgStatus.getMsg(new BigDecimal(orderoutVo.getReviewStatus()));
                     if (null != agStatusByValue) {
@@ -3473,6 +3478,11 @@ public class OrderServiceImpl implements OrderService {
                     CUser cUser = iUserService.selectById(orderoutVo.getNuclearUser());
                     if(null!=cUser)
                         orderoutVo.setNuclearUser(cUser.getName());
+                }
+                if (StringUtils.isNotBlank(orderoutVo.getOrderUser())) {
+                    CUser cUser = iUserService.selectById(orderoutVo.getOrderUser());
+                    if(null != cUser)
+                        orderoutVo.setOrderUser(cUser.getName());
                 }
                 if (StringUtils.isNotBlank(orderoutVo.getReviewStatus()) && !orderoutVo.getReviewStatus().equals("null")) {
                     String agStatusByValue = AgStatus.getMsg(new BigDecimal(orderoutVo.getReviewStatus()));
