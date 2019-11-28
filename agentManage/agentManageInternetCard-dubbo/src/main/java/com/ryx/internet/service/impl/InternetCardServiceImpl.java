@@ -961,6 +961,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                             oInternetCard.setMerId("无");
                             oInternetCard.setMerName(oInternetCardMerch.getMerchName());
                         }else{
+                            log.info("更新已修改的商户信息,已是最新数据:{}",oInternetCard.getIccidNum());
                             continue;
                         }
                         int i = internetCardMapper.updateByPrimaryKeySelectiveNotNull(oInternetCard);
