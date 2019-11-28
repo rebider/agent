@@ -1222,29 +1222,29 @@
     ),0) as pay_amo,
     o.payment_method as pay_method,
     nvl((
-      select comp.com_name
+      select LISTAGG(comp.com_name,',') WITHIN GROUP (ORDER BY comp.id)
       from a_pay_comp comp
-      left join o_cash_receivables cr on d.id = cr.src_id and cr.cashpay_type='PAYMENT' and cr.status = 1
-      where comp.id = cr.collect_company
+      left join o_cash_receivables cr on cr.cashpay_type='PAYMENT' and cr.status = 1
+      where comp.id = cr.collect_company and d.id = cr.src_id
     ),'') as com_name,
     nvl((
-      select cr.pay_user
+      select LISTAGG(cr.pay_user,',') WITHIN GROUP (ORDER BY cr.src_id)
       from o_cash_receivables cr
       where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),'') as pay_user,
     nvl((
-      select to_char(cr.real_rec_time,'YYYY-MM-DD')
+      select LISTAGG(to_char(cr.real_rec_time,'YYYY-MM-DD'),',') WITHIN GROUP (ORDER BY cr.src_id)
       from o_cash_receivables cr
       where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),'') as realRecTime,
     d.nuclear_user,
     nvl((
-      select to_char(cr.check_date,'YYYY-MM-DD')
+      select LISTAGG(to_char(cr.check_date,'YYYY-MM-DD'),',') WITHIN GROUP (ORDER BY cr.src_id)
       from o_cash_receivables cr
       where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),'') as checkDate,
     nvl((
-      select cr.amount
+      select LISTAGG(cr.amount,',') WITHIN GROUP (ORDER BY cr.src_id)
       from o_cash_receivables cr
       where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),0) as xxAmount,
@@ -1452,29 +1452,29 @@
     ),0) as pay_amo,
     o.payment_method as pay_method,
     nvl((
-    select comp.com_name
+    select LISTAGG(comp.com_name,',') WITHIN GROUP (ORDER BY comp.id)
     from a_pay_comp comp
-    left join o_cash_receivables cr on d.id = cr.src_id and cr.cashpay_type='PAYMENT' and cr.status = 1
-    where comp.id = cr.collect_company
+    left join o_cash_receivables cr on cr.cashpay_type='PAYMENT' and cr.status = 1
+    where comp.id = cr.collect_company and d.id = cr.src_id
     ),'') as com_name,
     nvl((
-    select cr.pay_user
+    select LISTAGG(cr.pay_user,',') WITHIN GROUP (ORDER BY cr.src_id)
     from o_cash_receivables cr
     where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),'') as pay_user,
     nvl((
-    select to_char(cr.real_rec_time,'YYYY-MM-DD')
+    select LISTAGG(to_char(cr.real_rec_time,'YYYY-MM-DD'),',') WITHIN GROUP (ORDER BY cr.src_id)
     from o_cash_receivables cr
     where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),'') as realRecTime,
     d.nuclear_user,
     nvl((
-    select to_char(cr.check_date,'YYYY-MM-DD')
+    select LISTAGG(to_char(cr.check_date,'YYYY-MM-DD'),',') WITHIN GROUP (ORDER BY cr.src_id)
     from o_cash_receivables cr
     where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),'') as checkDate,
     nvl((
-    select cr.amount
+    select LISTAGG(cr.amount,',') WITHIN GROUP (ORDER BY cr.src_id)
     from o_cash_receivables cr
     where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),0) as xxAmount,
