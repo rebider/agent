@@ -442,11 +442,11 @@
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
-    and o_payment_detail.payment_status in (1,3) ),0) as qk,
+    and o_payment_detail.payment_status in (1,3) and o_payment_detail.status = '1' ),0) as qk,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
-    and o_payment_detail.payment_status in (1,3,5) and to_char(plan_pay_time,'mm')=to_char(sysdate,'mm')),0) as byqk,
+    and o_payment_detail.payment_status in (1,3,5) and to_char(plan_pay_time,'mm')=to_char(sysdate,'mm') and o_payment_detail.status = '1'),0) as byqk,
     (
     nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0)
     -
@@ -460,7 +460,20 @@
     where o_sub_order.status=1 and o_sub_order_activity.status=1 and o_sub_order.order_id = o.id
     ) as activity_name,
     nvl((select sum(o_receipt_pro.pro_num)-sum(o_receipt_pro.send_num) from o_receipt_pro
-    where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0) as for_send_num
+    where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0) as for_send_num,
+    nvl(( select reviews_stat from
+    (select  oa.reviews_stat,row_number() OVER(PARTITION BY oa.order_id ORDER BY   oa.adj_tm desc) as row_flg
+    from o_order_adj oa
+    where oa.order_id =  o.id
+    and oa.status = 1) new_adj where new_adj.row_flg = '1'),
+    9) as adjStat,
+    nvl((select 1
+    from dual
+    where exists (select *
+    from o_payment_detail
+    where PAYMENT_STATUS = '5'
+    and status = '1'
+    and order_id = o.id)),0) as paymentStatus
     from o_order o
     left join a_agent b on o.agent_id = b.id and b.status = 1
     left join a_agent_businfo e on e.agent_id = o.agent_id and o.bus_id = e.id and e.status = 1
@@ -540,11 +553,11 @@
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
-    and o_payment_detail.payment_status in (1,3) ),0) as qk,
+    and o_payment_detail.payment_status in (1,3) and o_payment_detail.status = '1' ),0) as qk,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
-    and o_payment_detail.payment_status in (1,3,5) and to_char(plan_pay_time,'mm')=to_char(sysdate,'mm')),0) as byqk,
+    and o_payment_detail.payment_status in (1,3,5) and to_char(plan_pay_time,'mm')=to_char(sysdate,'mm') and o_payment_detail.status = '1'),0) as byqk,
     (
     nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0)
     -
@@ -558,7 +571,20 @@
     where o_sub_order.status=1 and o_sub_order_activity.status=1 and o_sub_order.order_id = o.id
     ) as activity_name,
     nvl((select sum(o_receipt_pro.pro_num)-sum(o_receipt_pro.send_num) from o_receipt_pro
-    where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0) as for_send_num
+    where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0) as for_send_num,
+    nvl(( select reviews_stat from
+    (select  oa.reviews_stat,row_number() OVER(PARTITION BY oa.order_id ORDER BY   oa.adj_tm desc) as row_flg
+    from o_order_adj oa
+    where oa.order_id =  o.id
+    and oa.status = 1) new_adj where new_adj.row_flg = '1'),
+    9) as adjStat,
+    nvl((select 1
+    from dual
+    where exists (select *
+    from o_payment_detail
+    where PAYMENT_STATUS = '5'
+    and status = '1'
+    and order_id = o.id)),0) as paymentStatus
     from  o_order o
     left join a_agent b on o.agent_id = b.id and b.status = 1
     left join a_agent_businfo e on e.agent_id = o.agent_id and o.bus_id = e.id and e.status = 1
@@ -646,11 +672,11 @@
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
-    and o_payment_detail.payment_status in (1,3) ),0) as qk,
+    and o_payment_detail.payment_status in (1,3) and o_payment_detail.status = '1' ),0) as qk,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
-    and o_payment_detail.payment_status in (1,3,5) and to_char(plan_pay_time,'mm')=to_char(sysdate,'mm')),0) as byqk,
+    and o_payment_detail.payment_status in (1,3,5) and to_char(plan_pay_time,'mm')=to_char(sysdate,'mm') and o_payment_detail.status = '1'),0) as byqk,
     (
     nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0)
     -
@@ -738,11 +764,11 @@
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
-    and o_payment_detail.payment_status in (1,3) ),0) as qk,
+    and o_payment_detail.payment_status in (1,3) and o_payment_detail.status = '1' ),0) as qk,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
-    and o_payment_detail.payment_status in (1,3,5) and to_char(plan_pay_time,'mm')=to_char(sysdate,'mm')),0) as byqk,
+    and o_payment_detail.payment_status in (1,3,5) and to_char(plan_pay_time,'mm')=to_char(sysdate,'mm') and o_payment_detail.status = '1'),0) as byqk,
     (
     nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0)
     -
@@ -838,11 +864,11 @@
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id
-    and o_payment_detail.payment_status in (1,3)),0) as qk,
+    and o_payment_detail.payment_status in (1,3) and o_payment_detail.status = '1' ),0) as qk,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id
-    and o_payment_detail.payment_status in (1,3,5) and to_char(plan_pay_time,'mm')=to_char(sysdate,'mm')),0) as byqk,
+    and o_payment_detail.payment_status in (1,3,5) and to_char(plan_pay_time,'mm')=to_char(sysdate,'mm') and o_payment_detail.status = '1'),0) as byqk,
     (nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0)
     -
     nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)
@@ -971,11 +997,11 @@
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id
-    and o_payment_detail.payment_status in (1,3)),0) as qk,
+    and o_payment_detail.payment_status in (1,3) and o_payment_detail.status = '1' ),0) as qk,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id
-    and o_payment_detail.payment_status in (1,3,5) and to_char(plan_pay_time,'mm')=to_char(sysdate,'mm')),0) as byqk,
+    and o_payment_detail.payment_status in (1,3,5) and to_char(plan_pay_time,'mm')=to_char(sysdate,'mm') and o_payment_detail.status = '1'),0) as byqk,
     (nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0)
     -
     nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)

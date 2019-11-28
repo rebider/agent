@@ -98,9 +98,9 @@ public enum DictGroup {
     REMOVEACCOUNT_FAIL_EMAIL("销账失败邮件"),
     RATYPE("销账方式"),
     RSTATUS("销账状态"),
-
-    RELATION_PLATFORM_NUM("平台关系");
-
+    RELATION_PLATFORM_NUM("平台关系"),
+    ADJ_STAT("订单机具调整审批状态"),
+    REFUND_TYPE("退款类型");
 
     public String  msg;
 

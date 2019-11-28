@@ -113,6 +113,7 @@ public enum TabId {
     O_INTERNET_CARD_POSTPONE("OICP%s%015d"),
     P_TEMPLATE_APPLY_RECORD("TAR%s%015d"),
     O_INTERNET_RENEW_OFF_D("OIROD%s%015d"),
+
     a_agent_freeze("AF%s%015d"),
     O_REMOVE_ACCOUNT("ORA%s%015d"),
     A_ANNOUNCEMENT_INFO("AN%s%015d"),
@@ -120,7 +121,10 @@ public enum TabId {
     a_agent_certification("AC%s%015d"),
     A_ANNOUNCEMENT_READ_INFO("AV%s%015d"),
     O_INTERNET_LOGOUT("IL%s%015d"),
-    O_INTERNET_LOGOUT_DETAIL("ILD%s%015d");
+    O_INTERNET_LOGOUT_DETAIL("ILD%s%015d"),
+    o_order_adj("AD%s%015d"),
+    o_order_adj_detail("ADD%s%015d"),
+    o_settle_accounts("SA%s%015d");
 
     public String patt;
 

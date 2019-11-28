@@ -272,4 +272,18 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="receiptCountTotal" resultType="java.math.BigDecimal" parameterType="String">
+    select nvl(sum(pro.pro_num),0) from o_receipt_pro pro
+    left join o_receipt_plan rp on rp.id = pro.pro_id and rp.order_id = pro.orderid and rp.status=1
+    <where>
+      1=1 and pro.status=1
+      <if test="orderId!=null and orderId!=''">
+        and pro.orderid = #{orderId}
+      </if>
+      <if test="proId!=null and proId!=''">
+        and pro.pro_id = #{proId}
+      </if>
+    </where>
+  </select>
 </mapper>
