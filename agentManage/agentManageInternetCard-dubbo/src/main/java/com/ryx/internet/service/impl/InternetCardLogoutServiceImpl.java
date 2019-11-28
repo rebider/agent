@@ -220,11 +220,30 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
             }
             //流程中的部门参数
             Map startPar = agentEnterService.startPar(cUser);
+            String party = "";
             if (null == startPar) {
-                log.info("========用户{}启动部门参数为空", cUser);
-                throw new MessageException("启动部门参数为空!");
+                List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(cUser));
+                if(orgCodeRes==null && orgCodeRes.size()!=1){
+                    throw new MessageException("登陆账户有误,请联系管理员!");
+                }
+                Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+                String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+                Map<String,Object> reqMap = new HashMap<>();
+                //省区大区查看自己的代理商 部门权限
+                if(StringUtils.isNotBlank(organizationCode) && (organizationCode.contains("region") || organizationCode.contains("beijing"))) {
+                    reqMap.put("orgCode", organizationCode);
+                }
+                //内部人员根据名称查询指定流量卡
+                List<String> agentNameList = dictOptionsService.getAgentNameList(Long.valueOf(cUser));
+                if(agentNameList.size()!=0) {
+                    party = "interior";
+                }else{
+                    log.info("========用户{}启动部门参数为空", cUser);
+                    throw new MessageException("启动部门参数为空!");
+                }
+            }else{
+                party = String.valueOf(startPar.get("party"));
             }
-            String party = String.valueOf(startPar.get("party"));
 
             String internetLogoutId = idService.genId(TabId.O_INTERNET_LOGOUT);
             AgentBusInfo queryAgentBusInfo = null;
@@ -292,7 +311,6 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                     internetLogoutDetail.setAgDocPro(queryAgentBusInfo.getAgDocPro());
                     internetLogoutDetail.setAgDocDistrict(queryAgentBusInfo.getAgDocDistrict());
                     internetLogoutDetail.setBusContactPerson(queryAgentBusInfo.getBusContactPerson());
-                    cardCount = cardCount.add(BigDecimal.ONE);
                 }
                 log.info("注销明细保存参数,internetLogoutDetail:{}",internetLogoutDetail.toString());
                 internetLogoutDetailMapper.insertSelective(internetLogoutDetail);
@@ -302,6 +320,7 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 agentNameSet.add(oInternetCard.getAgentName());
                 agentId = oInternetCard.getAgentId();
                 agName = oInternetCard.getAgentName();
+                cardCount = cardCount.add(BigDecimal.ONE);
             }
             if(agentIdSet.size()!=1){
                 throw new MessageException("不同代理商编码请分开申请");
