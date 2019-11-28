@@ -461,12 +461,12 @@
     ) as activity_name,
     nvl((select sum(o_receipt_pro.pro_num)-sum(o_receipt_pro.send_num) from o_receipt_pro
     where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0) as for_send_num,
-    nvl(( select reviews_stat from
-    (select  oa.reviews_stat,row_number() OVER(PARTITION BY oa.order_id ORDER BY   oa.adj_tm desc) as row_flg
+    nvl((select reviews_stat
+    from (select oa.reviews_stat,order_id,
+    row_number() OVER(PARTITION BY oa.order_id ORDER BY oa.adj_tm desc) as row_flg
     from o_order_adj oa
-    where oa.order_id =  o.id
-    and oa.status = 1) new_adj where new_adj.row_flg = '1'),
-    9) as adjStat,
+    where oa.status = 1) new_adj
+    where new_adj.row_flg = '1' and new_adj.order_id=o.id),9) as adjStat,
     nvl((select 1
     from dual
     where exists (select *
@@ -572,12 +572,12 @@
     ) as activity_name,
     nvl((select sum(o_receipt_pro.pro_num)-sum(o_receipt_pro.send_num) from o_receipt_pro
     where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0) as for_send_num,
-    nvl(( select reviews_stat from
-    (select  oa.reviews_stat,row_number() OVER(PARTITION BY oa.order_id ORDER BY   oa.adj_tm desc) as row_flg
+    nvl((select reviews_stat
+    from (select oa.reviews_stat,order_id,
+    row_number() OVER(PARTITION BY oa.order_id ORDER BY oa.adj_tm desc) as row_flg
     from o_order_adj oa
-    where oa.order_id =  o.id
-    and oa.status = 1) new_adj where new_adj.row_flg = '1'),
-    9) as adjStat,
+    where oa.status = 1) new_adj
+    where new_adj.row_flg = '1' and new_adj.order_id=o.id),9) as adjStat,
     nvl((select 1
     from dual
     where exists (select *
