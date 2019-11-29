@@ -194,6 +194,13 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 throw new MessageException("相同活动代码价格必须相同");
             }
         }
+        OProductExample oProductExample = new OProductExample();
+        OProductExample.Criteria criteria = oProductExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andIdEqualTo(activity.getProductId());
+        List<OProduct> oProductList = oProductMapper.selectByExample(oProductExample);
+        if (null!=oProductList && oProductList.size()>0){
+            OProduct oProduct = oProductList.get(0);
+            activity.setProType(oProduct.getProType());
+        }
 
         int insert = activityMapper.insert(activity);
         if (insert != 1) {
@@ -263,6 +270,13 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 logger.info("2004和2204活动代码禁止使用");
                 return AgentResult.fail("2004和2204活动代码禁止使用");
             }
+        }
+        OProductExample oProductExample = new OProductExample();
+        OProductExample.Criteria criteria = oProductExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andIdEqualTo(activity.getProductId());
+        List<OProduct> oProductList = oProductMapper.selectByExample(oProductExample);
+        if (null!=oProductList && oProductList.size()>0){
+            OProduct oProduct = oProductList.get(0);
+            activity.setProType(oProduct.getProType());
         }
         int update = activityMapper.updateByPrimaryKeySelective(activity);
         if (update == 1) {
