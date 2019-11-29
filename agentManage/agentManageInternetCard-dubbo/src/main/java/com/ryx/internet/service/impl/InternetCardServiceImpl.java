@@ -458,6 +458,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                         internetCardImportMapper.insert(oInternetCardImport);
                     }
                 }catch (Exception e) {
+                    AppConfig.sendEmails(MailUtil.printStackTrace(e), "流量卡导入出现异常");
                     e.printStackTrace();
                 }
             }
@@ -595,7 +596,8 @@ public class InternetCardServiceImpl implements InternetCardService {
                 //更新导入记录
                 try {
                     updateInternetCardImport(oInternetCardImport);
-                } catch (MessageException e1) {
+                } catch (Exception e1) {
+                    AppConfig.sendEmails(MailUtil.printStackTrace(e1), "流量卡导入出现异常,analysisImport方法1");
                 }
             } catch (Exception e) {
                 log.info("analysisImport处理导入表数据,Exception:{}",e.getLocalizedMessage());
@@ -606,6 +608,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                 try {
                     updateInternetCardImport(oInternetCardImport);
                 } catch (MessageException e1) {
+                    AppConfig.sendEmails(MailUtil.printStackTrace(e1), "流量卡导入出现异常,analysisImport方法2");
                     e1.printStackTrace();
                 }
             }
@@ -976,12 +979,14 @@ public class InternetCardServiceImpl implements InternetCardService {
                     }
                 } catch (Exception e) {
                     log.info("更新已修改的商户信息异常,iccid:{}",oInternetCard.getIccidNum());
+                    AppConfig.sendEmails(MailUtil.printStackTrace(e), "更新已修改的商户信息出现异常,taskUpdateMech方法");
                     e.printStackTrace();
                 }
             }
             long t2 = System.currentTimeMillis();
             log.info("更新已修改的商户信息，处理时间:{} ms", (t2 - t1));
         } catch (Exception e) {
+            AppConfig.sendEmails(MailUtil.printStackTrace(e), "更新已修改的商户信息出现异常,taskUpdateMech方法2");
             e.printStackTrace();
         }
     }
@@ -1042,6 +1047,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                 log.error("为空定时任务更新商户信息失败:IccidNum:{},商户编号:{},商户名称:{}",internetCard.getIccidNum(),oInternetCardMerch.getChnMerchId(),oInternetCardMerch.getMerchName());
             }
         } catch (Exception e) {
+            AppConfig.sendEmails(MailUtil.printStackTrace(e), "为空定时任务更新商户信息出现异常,processDataUpdateMechIsNull方法");
             e.printStackTrace();
         }
     }
@@ -1086,6 +1092,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                 }
                 int i = internetCardMapper.updateByPrimaryKeySelective(internetCard);
                 if(i!=1){
+                    AppConfig.sendEmails("订单发货流量卡信息更新失败", "订单发货流量卡信息更新出现异常,orderInsertInternetCard方法");
                     throw new MessageException("订单发货流量卡信息更新失败");
                 }
                 log.info("订单发货同步到流量卡更新结束:i:{}",i);
@@ -1157,6 +1164,7 @@ public class InternetCardServiceImpl implements InternetCardService {
         criteria.andIdEqualTo(oInternetCardImport.getId());
         int i = internetCardImportMapper.deleteByExample(internetCardImportExample);
         if(i!=1){
+            AppConfig.sendEmails("","导入迁移到历史表出现异常,migrationHistory方法");
             throw new MessageException("删除失败");
         }
     }
