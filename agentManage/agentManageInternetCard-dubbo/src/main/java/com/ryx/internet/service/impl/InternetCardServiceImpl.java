@@ -251,7 +251,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             criteria.andAgentNameLike("%"+internetCard.getAgentName()+"%");
         }
         oInternetCardExample.setReqMap(reqMap);
-        oInternetCardExample.setOrderByClause("expire_time asc ");
+//        oInternetCardExample.setOrderByClause("expire_time asc ");
         return oInternetCardExample;
     }
 
