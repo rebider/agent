@@ -72,6 +72,7 @@ public class ColinfoTaskServiceImpl implements ColinfoTaskService {
             Map<String,Object> params = new HashMap<>();
             params.put("payStatus", ColinfoPayStatus.A.getValue());
             params.put("agStatus",AgStatus.Approved.name());
+            params.put("cloReviewStatus",AgStatus.Approved.status);
             List<Map<String, Object>> synList = agentColinfoMapper.synConinfo(params);
             if(null==synList){
                 log.info("synColinfoToPayment,synList is null");
