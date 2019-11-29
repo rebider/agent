@@ -387,6 +387,7 @@
         <where>
             c.pay_status = #{params.payStatus}
             and a.ag_status = #{params.agStatus}
+            and c.clo_review_status = #{params.cloReviewStatus}
         </where>
     </select>
 

@@ -52,4 +52,15 @@ public class OInternetCardMerch implements Serializable{
     public void setTranTime(String tranTime) {
         this.tranTime = tranTime == null ? null : tranTime.trim();
     }
+
+    @Override
+    public String toString() {
+        return "OInternetCardMerch{" +
+                "chnTermposi='" + chnTermposi + '\'' +
+                ", chnMerchId='" + chnMerchId + '\'' +
+                ", merchName='" + merchName + '\'' +
+                ", tranDate='" + tranDate + '\'' +
+                ", tranTime='" + tranTime + '\'' +
+                '}';
+    }
 }

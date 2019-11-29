@@ -444,6 +444,9 @@
       <if test="merName != null">
         and i.mer_Name = #{merName}
       </if>
+      <if test="logoutStatus != null">
+        and i.logout_status = #{logoutStatus}
+      </if>
     </where>
     order by c_time desc
   </sql>

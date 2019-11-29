@@ -4,9 +4,7 @@ import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.JsonUtil;
-import com.ryx.credit.common.util.Page;
-import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
@@ -177,6 +175,9 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
         }
         if(StringUtils.isNotBlank(internetLogoutDetail.getMerName())){
             reqMap.put("merName",internetLogoutDetail.getMerName());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getLogoutStatus())){
+            reqMap.put("logoutStatus",internetLogoutDetail.getLogoutStatus());
         }
         List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
         if(orgCodeRes==null && orgCodeRes.size()!=1){
@@ -384,6 +385,7 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                     taskApprovalService.addABusActRel(record);
                     log.info("物联网卡注销审批流启动成功");
                 } catch (Exception e) {
+                    AppConfig.sendEmails(MailUtil.printStackTrace(e), "申请注销保存出现异常,saveAndApprove方法");
                     e.getStackTrace();
                     log.error("物联网卡注销审批流启动失败{}");
                     throw new MessageException("物联网卡注销审批流启动失败!:{}",e.getMessage());
@@ -411,9 +413,11 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 throw new MessageException("工作流处理任务异常");
             }
         } catch (MessageException e) {
+            AppConfig.sendEmails(MailUtil.printStackTrace(e), "申请注销审批出现异常,approvalTask方法1");
             e.printStackTrace();
             throw new MessageException(e.getMsg());
         } catch (Exception e) {
+            AppConfig.sendEmails(MailUtil.printStackTrace(e), "申请注销审批出现异常,approvalTask方法2");
             e.printStackTrace();
             throw new MessageException(e.getLocalizedMessage());
         }
