@@ -541,9 +541,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         Date date = new Date();
         List<OActivity> OActivityList = activityMapper.planChoiseProComAndModel(
                 FastMap.fastMap("productId", productId)
-                        .putKeyV("orderId", orderId)
-                        .putKeyV("beginTime", date)
-                        .putKeyV("endTime", date));
+                        .putKeyV("orderId", orderId));
         List<Map<String, String>> resList = new ArrayList<>();
         for (OActivity oActivity : OActivityList) {
             Map<String, String> item = new HashMap<>();
