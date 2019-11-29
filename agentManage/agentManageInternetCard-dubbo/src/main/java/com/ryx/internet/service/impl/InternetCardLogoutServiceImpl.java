@@ -176,6 +176,9 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
         if(StringUtils.isNotBlank(internetLogoutDetail.getMerName())){
             reqMap.put("merName",internetLogoutDetail.getMerName());
         }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getLogoutStatus())){
+            reqMap.put("logoutStatus",internetLogoutDetail.getLogoutStatus());
+        }
         List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
         if(orgCodeRes==null && orgCodeRes.size()!=1){
             return null;
