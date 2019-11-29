@@ -253,8 +253,18 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                 record.setExplain(agentBusInfoVo.getBusNum());
             }
         }else{
-            record.setAgDocDistrict(agent.getAgDocDistrict());
-            record.setAgDocPro(agent.getAgDocPro());
+            List<Map<String, Object>> maps = iUserService.orgCode(Long.valueOf(userId));
+            if(maps!=null && maps.size()>0){
+                Map<String, Object> stringObjectMap = maps.get(0);
+                record.setAgDocPro(stringObjectMap.get("ORGID")+"");
+                if(null!=stringObjectMap.get("isRegion") && (Boolean)stringObjectMap.get("isRegion")) {
+                    record.setAgDocDistrict(stringObjectMap.get("ORGPID") + "");
+                }else if(null!=stringObjectMap.get("ppidorgcodeisRegion") && (Boolean)stringObjectMap.get("ppidorgcodeisRegion")) {
+                    record.setAgDocDistrict(stringObjectMap.get("ORGPPID") + "");
+                }
+            }else{
+                throw new MessageException("未获取到部门编号!");
+            }
         }
         if(1!=busActRelMapper.insertSelective(record)){
             logger.info("代理商审批，启动审批异常，添加审批关系失败{}:{}",dateChangeRequest.getId(),proce);
