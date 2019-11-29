@@ -573,9 +573,15 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(iccid);
                 if(agentNameList.size()!=0){
                     if(!internetRenew.getRenewWay().equals(InternetRenewWay.XXBK.getValue())){
-                        if(StringUtils.isBlank(oInternetCard.getAgentId()) || StringUtils.isBlank(oInternetCard.getAgentName())
-                          || StringUtils.isBlank(oInternetCard.getMerId()) || StringUtils.isBlank(oInternetCard.getMerName()))
-                        throw new MessageException("缺少代理商编号/代理商名称/商户编号/商户名称,只能选择线下打款支付方式,如有问题请联系管理员");
+                        if(internetRenew.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())
+                        || internetRenew.getRenewWay().equals(InternetRenewWay.GSCDGC.getValue())){
+                            if(StringUtils.isBlank(oInternetCard.getMerId()) || StringUtils.isBlank(oInternetCard.getMerName())){
+                                throw new MessageException("轧差方式必须包含商户信息");
+                            }
+                        }
+                        if(StringUtils.isBlank(oInternetCard.getAgentId()) || StringUtils.isBlank(oInternetCard.getAgentName())){
+                            throw new MessageException("缺少代理商编号/代理商名称,只能选择线下打款支付方式,如有问题请联系管理员");
+                        }
                     }
                 }
                 OInternetRenewDetailExample oInternetRenewDetailExample = new OInternetRenewDetailExample();
@@ -678,6 +684,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                         compressCompensateActivity("",AgStatus.Approved.status,"save",internetRenew);
                         return AgentResult.ok();
                     } catch (Exception e) {
+                        AppConfig.sendEmails(MailUtil.printStackTrace(e), "省区续费审批完成失败出现异常,saveAndApprove方法2");
                         e.printStackTrace();
                         throw new MessageException("省区续费审批完成失败!:{}",e.getMessage());
                     }
@@ -708,6 +715,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 taskApprovalService.addABusActRel(record);
                 log.info("物联网卡续费审批流启动成功");
             } catch (Exception e) {
+                AppConfig.sendEmails(MailUtil.printStackTrace(e), "物联网卡续费审批流启动失败出现异常,saveAndApprove方法2");
                 e.getStackTrace();
                 log.error("物联网卡续费审批流启动失败{}");
                 throw new MessageException("物联网卡续费审批流启动失败!:{}",e.getMessage());
@@ -763,9 +771,11 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 throw new MessageException("工作流处理任务异常");
             }
         } catch (MessageException e) {
+            AppConfig.sendEmails(MailUtil.printStackTrace(e), "物联网卡续费审批流处理出现异常,approvalTask方法1");
             e.printStackTrace();
             throw new MessageException(e.getMsg());
         } catch (Exception e) {
+            AppConfig.sendEmails(MailUtil.printStackTrace(e), "物联网卡续费审批流处理出现异常,approvalTask方法2");
             e.printStackTrace();
             throw new MessageException(e.getLocalizedMessage());
         }
@@ -983,49 +993,56 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         List<InternetRenewOffset> internetRenewOffsetList = internetRenewOffsetMapper.selectInternetCardOffset();
         log.info("获取前一天轧差数据生成明细,轧差明细数量:{}",internetRenewOffsetList.size());
         for (InternetRenewOffset internetRenewOffset : internetRenewOffsetList) {
-            String flowId = internetRenewOffset.getFlowId();
-            BigDecimal alreadyAmt = BigDecimal.ZERO;
-            InternetRenewOffsetDetailExample internetRenewOffsetDetailExample = new InternetRenewOffsetDetailExample();
-            InternetRenewOffsetDetailExample.Criteria criteria = internetRenewOffsetDetailExample.createCriteria();
-            criteria.andStatusEqualTo(Status.STATUS_1.status);
-            criteria.andFlowIdEqualTo(flowId);
-            List<InternetRenewOffsetDetail> internetRenewOffsetDetails = internetRenewOffsetDetailMapper.selectByExample(internetRenewOffsetDetailExample);
-            for (InternetRenewOffsetDetail internetRenewOffsetDetail : internetRenewOffsetDetails) {
-                alreadyAmt = alreadyAmt.add(internetRenewOffsetDetail.getTodayOffsetAmt());
+            try {
+                log.info("获取前一天轧差数据生成明细,internetRenewOffset:{}", internetRenewOffset.toString());
+                String flowId = internetRenewOffset.getFlowId();
+                BigDecimal alreadyAmt = BigDecimal.ZERO;
+                InternetRenewOffsetDetailExample internetRenewOffsetDetailExample = new InternetRenewOffsetDetailExample();
+                InternetRenewOffsetDetailExample.Criteria criteria = internetRenewOffsetDetailExample.createCriteria();
+                criteria.andStatusEqualTo(Status.STATUS_1.status);
+                criteria.andFlowIdEqualTo(flowId);
+                List<InternetRenewOffsetDetail> internetRenewOffsetDetails = internetRenewOffsetDetailMapper.selectByExample(internetRenewOffsetDetailExample);
+                for (InternetRenewOffsetDetail internetRenewOffsetDetail : internetRenewOffsetDetails) {
+                    alreadyAmt = alreadyAmt.add(internetRenewOffsetDetail.getTodayOffsetAmt());
+                }
+                InternetRenewOffsetDetail internetRenewOffsetDetail = new InternetRenewOffsetDetail();
+                internetRenewOffsetDetail.setId(idService.genId(TabId.O_INTERNET_RENEW_OFF_D));
+                internetRenewOffsetDetail.setFlowId(flowId);
+                internetRenewOffsetDetail.setRenewId(internetRenewOffset.getRenewId());
+                internetRenewOffsetDetail.setRenewDetailId(internetRenewOffset.getRenewDetailId());
+                internetRenewOffsetDetail.setIccidNum(internetRenewOffset.getIccidNum());
+                internetRenewOffsetDetail.setAgentId(internetRenewOffset.getAgentId());
+                internetRenewOffsetDetail.setAgentName(internetRenewOffset.getAgentName());
+                internetRenewOffsetDetail.setMerId(internetRenewOffset.getMerId());
+                internetRenewOffsetDetail.setMerName(internetRenewOffset.getMerName());
+                internetRenewOffsetDetail.setOffsetAmt(internetRenewOffset.getOffsetAmt());
+                internetRenewOffsetDetail.setAlreadyOffsetAmt(internetRenewOffset.getAlreadyOffsetAmt());
+                BigDecimal subtract = internetRenewOffset.getAlreadyOffsetAmt().subtract(alreadyAmt);
+                if(subtract.compareTo(BigDecimal.ZERO)==0){
+                    log.info("获取前一天轧差数据生成明细,今天没有变更不生成明细,flowId:{}",flowId);
+                    continue;
+                }
+                internetRenewOffsetDetail.setTodayOffsetAmt(subtract);
+                internetRenewOffsetDetail.setcTime(internetRenewOffset.getcTime());
+                internetRenewOffsetDetail.setProcessDate(internetRenewOffset.getProcessDate());
+                internetRenewOffsetDetail.setProcessTime(internetRenewOffset.getProcessTime());
+                internetRenewOffsetDetail.setcUser(internetRenewOffset.getcUser());
+                internetRenewOffsetDetail.setuUser(internetRenewOffset.getuUser());
+                internetRenewOffsetDetail.setCleanStatus(internetRenewOffset.getCleanStatus());
+                internetRenewOffsetDetail.setStatus(Status.STATUS_1.status);
+                internetRenewOffsetDetail.setVersion(BigDecimal.ONE);
+                internetRenewOffsetDetail.setBusNum(internetRenewOffset.getBusNum());
+                internetRenewOffsetDetail.setBusPlatform(internetRenewOffset.getBusPlatform());
+                internetRenewOffsetDetail.setAgDocDistrict(internetRenewOffset.getAgDocDistrict());
+                internetRenewOffsetDetail.setAgDocPro(internetRenewOffset.getAgDocPro());
+                internetRenewOffsetDetail.setBusContactPerson(internetRenewOffset.getBusContactPerson());
+                internetRenewOffsetDetailMapper.insertSelective(internetRenewOffsetDetail);
+                log.info("获取前一天轧差数据生成明细,flowId:{},金额:{},结束:", flowId,subtract);
+            } catch (Exception e) {
+                AppConfig.sendEmails(MailUtil.printStackTrace(e), "轧差数据生成明细出现异常,processDataInternetCardOffset方法");
+                log.info("获取前一天轧差数据生成明细,异常：{}",e.getLocalizedMessage());
+                e.printStackTrace();
             }
-            InternetRenewOffsetDetail internetRenewOffsetDetail = new InternetRenewOffsetDetail();
-            internetRenewOffsetDetail.setId(idService.genId(TabId.O_INTERNET_RENEW_OFF_D));
-            internetRenewOffsetDetail.setFlowId(flowId);
-            internetRenewOffsetDetail.setRenewId(internetRenewOffset.getRenewId());
-            internetRenewOffsetDetail.setRenewDetailId(internetRenewOffset.getRenewDetailId());
-            internetRenewOffsetDetail.setIccidNum(internetRenewOffset.getIccidNum());
-            internetRenewOffsetDetail.setAgentId(internetRenewOffset.getAgentId());
-            internetRenewOffsetDetail.setAgentName(internetRenewOffset.getAgentName());
-            internetRenewOffsetDetail.setMerId(internetRenewOffset.getMerId());
-            internetRenewOffsetDetail.setMerName(internetRenewOffset.getMerName());
-            internetRenewOffsetDetail.setOffsetAmt(internetRenewOffset.getOffsetAmt());
-            internetRenewOffsetDetail.setAlreadyOffsetAmt(internetRenewOffset.getAlreadyOffsetAmt());
-            BigDecimal subtract = internetRenewOffset.getAlreadyOffsetAmt().subtract(alreadyAmt);
-            if(subtract.compareTo(BigDecimal.ZERO)==0){
-                log.info("获取前一天轧差数据生成明细,今天没有变更不生成明细,flowId:{}",flowId);
-                continue;
-            }
-            internetRenewOffsetDetail.setTodayOffsetAmt(subtract);
-            internetRenewOffsetDetail.setcTime(internetRenewOffset.getcTime());
-            internetRenewOffsetDetail.setProcessDate(internetRenewOffset.getProcessDate());
-            internetRenewOffsetDetail.setProcessTime(internetRenewOffset.getProcessTime());
-            internetRenewOffsetDetail.setcUser(internetRenewOffset.getcUser());
-            internetRenewOffsetDetail.setuUser(internetRenewOffset.getuUser());
-            internetRenewOffsetDetail.setCleanStatus(internetRenewOffset.getCleanStatus());
-            internetRenewOffsetDetail.setStatus(Status.STATUS_1.status);
-            internetRenewOffsetDetail.setVersion(BigDecimal.ONE);
-            internetRenewOffsetDetail.setBusNum(internetRenewOffset.getBusNum());
-            internetRenewOffsetDetail.setBusPlatform(internetRenewOffset.getBusPlatform());
-            internetRenewOffsetDetail.setAgDocDistrict(internetRenewOffset.getAgDocDistrict());
-            internetRenewOffsetDetail.setAgDocPro(internetRenewOffset.getAgDocPro());
-            internetRenewOffsetDetail.setBusContactPerson(internetRenewOffset.getBusContactPerson());
-            internetRenewOffsetDetailMapper.insertSelective(internetRenewOffsetDetail);
-            log.info("获取前一天轧差数据生成明细,flowId:{},金额:{},结束:", flowId,subtract);
         }
 
     }
