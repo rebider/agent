@@ -398,7 +398,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
 
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         internetRenewOffsetDetailExample.setReqMap(reqMap);
-        internetRenewOffsetDetailExample.setOrderByClause(" c_time desc");
+        internetRenewOffsetDetailExample.setOrderByClause(" process_date desc");
         return internetRenewOffsetDetailExample;
     }
 
