@@ -54,7 +54,7 @@ public interface AgentMapper {
 
     Agent selectByAgent(Agent agent);
 
-    List queryEchartDataList(@Param("map") Map<String,Object> map,@Param("page") Page page);
+    List<Map<String,Object>> queryEchartDataList(@Param("map") Map<String,Object> map,@Param("page") Page page);
 
     int queryEchartDataCount(@Param("map") Map<String,Object> map);
 }
