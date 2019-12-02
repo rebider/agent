@@ -138,6 +138,4 @@ public interface AgentBusinfoService {
      */
     public AgentBusInfo agentPlatformNum(String agentId,String platFormNum);
 
-
-    List<AgentBusInfo> selectByAgentBusInfo(AgentBusInfo agentBusInfo);
 }
