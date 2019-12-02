@@ -1182,25 +1182,6 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		return agentBusInfo;
 	}
 
-	/**
-	 * 代理商查看公告的发布机构菜单
-	 * @param map
-	 * @return allOrg
-	 */
-	@Override
-	public List<String> queryOrgByAgentid(Map map) {
-		List<String> allOrg=new ArrayList<>();
-		List<String> orgs = agentBusInfoMapper.queryAgDocPro(map);
-		//查询信息判断
-		if (!(orgs.size() > 0 )) {
-			return  null;
-		}
-		List<COrganization> cOrganizations = cOrganizationMapper.selectPorgByorgs(orgs);
-		cOrganizations.forEach(org->{
-			allOrg.add(String.valueOf(org.getId()));
-		});
-		return allOrg;
-	}
 
 
 	@Override
