@@ -315,6 +315,12 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 }
                 log.info("注销明细保存参数,internetLogoutDetail:{}",internetLogoutDetail.toString());
                 internetLogoutDetailMapper.insertSelective(internetLogoutDetail);
+                oInternetCard.setRenewStatus(InternetRenewStatus.ZXZ.getValue());
+                int j = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
+                if(j!=1){
+                    throw new MessageException("更新物联网卡信息失败");
+                }
+
                 busNumSet.add(oInternetCard.getBusNum());
                 busPlatformSet.add(oInternetCard.getBusPlatform());
                 agentIdSet.add(oInternetCard.getAgentId());
@@ -488,6 +494,15 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
             int j = internetLogoutDetailMapper.updateByPrimaryKeySelective(internetLogoutDetail);
             if(j!=1){
                 throw new MessageException("更新注销明细失败");
+            }
+            OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(internetLogoutDetail.getIccidNum());
+            if(null==oInternetCard){
+                throw new MessageException("iccid不存在");
+            }
+            oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());
+            int k = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
+            if(k!=1){
+                throw new MessageException("更新物联网卡信息失败");
             }
         }
         log.info("注销直接保存/审批通过后调用结束");
