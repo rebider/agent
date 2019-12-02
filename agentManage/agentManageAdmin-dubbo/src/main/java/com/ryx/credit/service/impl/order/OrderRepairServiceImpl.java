@@ -1,6 +1,8 @@
 package com.ryx.credit.service.impl.order;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.LogisticsSendStatus;
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.order.OLogisticsDetailHMapper;
@@ -68,34 +70,50 @@ public class OrderRepairServiceImpl implements com.ryx.credit.service.order.Orde
                    continue;
                 }
                 logger.info("处理重复物流："+ JSONObject.toJSONString(stringObjectMap));
-                OLogisticsExample example = new OLogisticsExample();
-                example.or().andOrderIdEqualTo(ORDER_ID+"")
+                OLogisticsExample example_success = new OLogisticsExample();
+
+                example_success.or().andOrderIdEqualTo(ORDER_ID+"")
                         .andReceiptPlanIdEqualTo(RECEIPT_PLAN_ID+"")
                         .andWNumberEqualTo(W_NUMBER+"")
                         .andSnBeginNumEqualTo(SN_BEGIN_NUM+"")
-                        .andSnEndNumEqualTo(SN_END_NUM+"");
+                        .andSnEndNumEqualTo(SN_END_NUM+"")
+                        .andSendStatusEqualTo(LogisticsSendStatus.send_success.code);
 
-                List<OLogistics>  oLogisticsList = oLogisticsMapper.selectByExample(example);
-                if(oLogisticsList.size()>1){
-                    logger.info("物流个数大于1："+ JSONObject.toJSONString(stringObjectMap));
-                    for (OLogistics logistics : oLogisticsList) {
-                        OLogisticsExample delEx = new OLogisticsExample();
-                        delEx.or().andIdEqualTo(logistics.getId());
-                        oLogisticsMapper.deleteByExample(delEx);
-                        logger.info("删除物流："+ JSONObject.toJSONString(logistics));
+                   List<OLogistics>  oLogisticsList_sucess = oLogisticsMapper.selectByExample(example_success);
 
-                        OLogisticsDetailExample oLogisticsDetailex = new OLogisticsDetailExample();
-                        oLogisticsDetailex.or().andLogisticsIdEqualTo(logistics.getId());
-                        int detailCount = oLogisticsDetailMapper.deleteByExample(oLogisticsDetailex);
-                        logger.info("删除物流明细：{},count:{}", JSONObject.toJSONString(logistics),detailCount);
-                        List<OLogistics>  shengyue = oLogisticsMapper.selectByExample(example);
-                        if(shengyue.size()==1){
-                            break;
+                    OLogisticsExample example = new OLogisticsExample();
+                    example.or().andOrderIdEqualTo(ORDER_ID + "")
+                            .andReceiptPlanIdEqualTo(RECEIPT_PLAN_ID + "")
+                            .andWNumberEqualTo(W_NUMBER + "")
+                            .andSnBeginNumEqualTo(SN_BEGIN_NUM + "")
+                            .andSnEndNumEqualTo(SN_END_NUM + "")
+                            .andSendStatusNotEqualTo(LogisticsSendStatus.send_success.code);
+
+                    List<OLogistics> oLogisticsList = oLogisticsMapper.selectByExample(example);
+
+//                    if (oLogisticsList.size() > 1) {
+                        logger.info("物流个数大于1：" + JSONObject.toJSONString(stringObjectMap));
+                        for (OLogistics logistics : oLogisticsList) {
+                            OLogisticsExample delEx = new OLogisticsExample();
+                            delEx.or().andIdEqualTo(logistics.getId());
+                            oLogisticsMapper.deleteByExample(delEx);
+                            logger.info("删除物流：" + JSONObject.toJSONString(logistics));
+
+                            OLogisticsDetailExample oLogisticsDetailex = new OLogisticsDetailExample();
+                            oLogisticsDetailex.or().andLogisticsIdEqualTo(logistics.getId());
+                            int detailCount = oLogisticsDetailMapper.deleteByExample(oLogisticsDetailex);
+                            logger.info("删除物流明细：{},count:{}", JSONObject.toJSONString(logistics), detailCount);
+                            List<OLogistics> shengyue = oLogisticsMapper.selectByExample(example);
+                            //如果沒有成功的就留一条
+                            if(oLogisticsList_sucess.size()==0) {
+                                if (shengyue.size() == 1) {
+                                    break;
+                                }
+                            }
                         }
-                    }
-                }else{
-                    logger.info("物流个数小于等于1："+ JSONObject.toJSONString(stringObjectMap));
-                }
+//                    } else {
+//                        logger.info("物流个数小于等于1：" + JSONObject.toJSONString(stringObjectMap));
+//                    }
             }
         }
         return FastMap.fastSuccessMap();

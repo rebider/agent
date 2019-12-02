@@ -459,14 +459,14 @@
     left join o_sub_order on o_sub_order_activity.sub_order_id = o_sub_order.id and o_sub_order.status=1 and o_sub_order_activity.status=1
     where o_sub_order.status=1 and o_sub_order_activity.status=1 and o_sub_order.order_id = o.id
     ) as activity_name,
-      nvl((select sum(o_receipt_pro.pro_num)-sum(o_receipt_pro.send_num) from o_receipt_pro
-      where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0) as for_send_num,
-    nvl(( select reviews_stat from
-    (select  oa.reviews_stat,row_number() OVER(PARTITION BY oa.order_id ORDER BY   oa.adj_tm desc) as row_flg
+    nvl((select sum(o_receipt_pro.pro_num)-sum(o_receipt_pro.send_num) from o_receipt_pro
+    where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0) as for_send_num,
+    nvl((select reviews_stat
+    from (select oa.reviews_stat,order_id,
+    row_number() OVER(PARTITION BY oa.order_id ORDER BY oa.adj_tm desc) as row_flg
     from o_order_adj oa
-    where oa.order_id =  o.id
-    and oa.status = 1) new_adj where new_adj.row_flg = '1'),
-    9) as adjStat,
+    where oa.status = 1) new_adj
+    where new_adj.row_flg = '1' and new_adj.order_id=o.id),9) as adjStat,
     nvl((select 1
     from dual
     where exists (select *
@@ -572,12 +572,12 @@
     ) as activity_name,
     nvl((select sum(o_receipt_pro.pro_num)-sum(o_receipt_pro.send_num) from o_receipt_pro
     where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0) as for_send_num,
-    nvl(( select reviews_stat from
-    (select  oa.reviews_stat,row_number() OVER(PARTITION BY oa.order_id ORDER BY   oa.adj_tm desc) as row_flg
+    nvl((select reviews_stat
+    from (select oa.reviews_stat,order_id,
+    row_number() OVER(PARTITION BY oa.order_id ORDER BY oa.adj_tm desc) as row_flg
     from o_order_adj oa
-    where oa.order_id =  o.id
-    and oa.status = 1) new_adj where new_adj.row_flg = '1'),
-    9) as adjStat,
+    where oa.status = 1) new_adj
+    where new_adj.row_flg = '1' and new_adj.order_id=o.id),9) as adjStat,
     nvl((select 1
     from dual
     where exists (select *
@@ -1222,29 +1222,29 @@
     ),0) as pay_amo,
     o.payment_method as pay_method,
     nvl((
-      select comp.com_name
+      select LISTAGG(comp.com_name,',') WITHIN GROUP (ORDER BY comp.id)
       from a_pay_comp comp
-      left join o_cash_receivables cr on d.id = cr.src_id and cr.cashpay_type='PAYMENT' and cr.status = 1
-      where comp.id = cr.collect_company
+      left join o_cash_receivables cr on cr.cashpay_type='PAYMENT' and cr.status = 1
+      where comp.id = cr.collect_company and d.id = cr.src_id
     ),'') as com_name,
     nvl((
-      select cr.pay_user
+      select LISTAGG(cr.pay_user,',') WITHIN GROUP (ORDER BY cr.src_id)
       from o_cash_receivables cr
       where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),'') as pay_user,
     nvl((
-      select to_char(cr.real_rec_time,'YYYY-MM-DD')
+      select LISTAGG(to_char(cr.real_rec_time,'YYYY-MM-DD'),',') WITHIN GROUP (ORDER BY cr.src_id)
       from o_cash_receivables cr
       where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),'') as realRecTime,
     d.nuclear_user,
     nvl((
-      select to_char(cr.check_date,'YYYY-MM-DD')
+      select LISTAGG(to_char(cr.check_date,'YYYY-MM-DD'),',') WITHIN GROUP (ORDER BY cr.src_id)
       from o_cash_receivables cr
       where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),'') as checkDate,
     nvl((
-      select cr.amount
+      select LISTAGG(cr.amount,',') WITHIN GROUP (ORDER BY cr.src_id)
       from o_cash_receivables cr
       where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),0) as xxAmount,
@@ -1371,11 +1371,9 @@
           #{reviewStatus}
         </foreach>
       </if>
-      <if test="agDocDistrict!=null and agDocDistrict!=''"> and b.ag_doc_district = #{agDocDistrict} </if>
-      <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus} </if>
-      <if test="agDocDistrict!=null and agDocDistrict!=''">
-        and (b.ag_doc_pro = #{agDocDistrict} or and b.ag_doc_district = #{agDocDistrict})
-      </if>
+        <if test="agDocDistrict!=null and agDocDistrict!=''">
+            and (b.ag_doc_pro = #{agDocDistrict} or and b.ag_doc_district = #{agDocDistrict})
+        </if>
       <if test="agDocPro!=null and agDocPro!=''"> and b.ag_doc_pro = #{agDocPro} </if>
       <if test="busNum!=null and busNum!=''"> and aab.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="organizationCode!=null and organizationCode!=''">
@@ -1454,29 +1452,29 @@
     ),0) as pay_amo,
     o.payment_method as pay_method,
     nvl((
-    select comp.com_name
+    select LISTAGG(comp.com_name,',') WITHIN GROUP (ORDER BY comp.id)
     from a_pay_comp comp
-    left join o_cash_receivables cr on d.id = cr.src_id and cr.cashpay_type='PAYMENT' and cr.status = 1
-    where comp.id = cr.collect_company
+    left join o_cash_receivables cr on cr.cashpay_type='PAYMENT' and cr.status = 1
+    where comp.id = cr.collect_company and d.id = cr.src_id
     ),'') as com_name,
     nvl((
-    select cr.pay_user
+    select LISTAGG(cr.pay_user,',') WITHIN GROUP (ORDER BY cr.src_id)
     from o_cash_receivables cr
     where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),'') as pay_user,
     nvl((
-    select to_char(cr.real_rec_time,'YYYY-MM-DD')
+    select LISTAGG(to_char(cr.real_rec_time,'YYYY-MM-DD'),',') WITHIN GROUP (ORDER BY cr.src_id)
     from o_cash_receivables cr
     where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),'') as realRecTime,
     d.nuclear_user,
     nvl((
-    select to_char(cr.check_date,'YYYY-MM-DD')
+    select LISTAGG(to_char(cr.check_date,'YYYY-MM-DD'),',') WITHIN GROUP (ORDER BY cr.src_id)
     from o_cash_receivables cr
     where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),'') as checkDate,
     nvl((
-    select cr.amount
+    select LISTAGG(cr.amount,',') WITHIN GROUP (ORDER BY cr.src_id)
     from o_cash_receivables cr
     where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),0) as xxAmount,
@@ -1653,29 +1651,29 @@
     ),0) as pay_amo,
     o.payment_method as pay_method,
     nvl((
-    select comp.com_name
+    select LISTAGG(comp.com_name,',') WITHIN GROUP (ORDER BY comp.id)
     from a_pay_comp comp
-    left join o_cash_receivables cr on d.id = cr.src_id and cr.cashpay_type='PAYMENT' and cr.status = 1
-    where comp.id = cr.collect_company
+    left join o_cash_receivables cr on cr.cashpay_type='PAYMENT' and cr.status = 1
+    where comp.id = cr.collect_company and d.id = cr.src_id
     ),'') as com_name,
     nvl((
-    select cr.pay_user
+    select LISTAGG(cr.pay_user,',') WITHIN GROUP (ORDER BY cr.src_id)
     from o_cash_receivables cr
     where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),'') as pay_user,
     nvl((
-    select to_char(cr.real_rec_time,'YYYY-MM-DD')
+    select LISTAGG(to_char(cr.real_rec_time,'YYYY-MM-DD'),',') WITHIN GROUP (ORDER BY cr.src_id)
     from o_cash_receivables cr
     where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),'') as realRecTime,
     d.nuclear_user,
     nvl((
-    select to_char(cr.check_date,'YYYY-MM-DD')
+    select LISTAGG(to_char(cr.check_date,'YYYY-MM-DD'),',') WITHIN GROUP (ORDER BY cr.src_id)
     from o_cash_receivables cr
     where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),'') as checkDate,
     nvl((
-    select cr.amount
+    select LISTAGG(cr.amount,',') WITHIN GROUP (ORDER BY cr.src_id)
     from o_cash_receivables cr
     where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),0) as xxAmount,
@@ -1817,7 +1815,7 @@
     <result column="real_rec_time" property="realRecTime" jdbcType="TIMESTAMP"/>
     <result column="nuclear_user" property="nuclearUser" jdbcType="VARCHAR"/>
     <result column="check_date" property="checkDate" jdbcType="TIMESTAMP"/>
-    <result column="xxAmount" property="xxAmount" jdbcType="DECIMAL"/>
+    <result column="xxAmount" property="xxAmount" jdbcType="VARCHAR"/>
     <result column="profit_mouth" property="profitMouth" jdbcType="VARCHAR"/>
     <result column="profit_form" property="profitForm" jdbcType="VARCHAR"/>
     <result column="ykfr_amt" property="ykfrAmt" jdbcType="DECIMAL"/>

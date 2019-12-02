@@ -126,8 +126,6 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
         resultMap.put("lowDebitRate",agentBusInfo.getDebitRateLower());
         resultMap.put("lowCreditRate",agentBusInfo.getCreditRateFloor());
         resultMap.put("ceilingCreditRate",agentBusInfo.getCreditRateCeiling());
-        resultMap.put("topDebitRate",agentBusInfo.getDebitRateCapping());
-        resultMap.put("debitLow",agentBusInfo.getDebitCappingLower());
 
         resultMap.put("hasS0",agentBusInfo.getDredgeS0().equals(new BigDecimal(1))?"0":"1");
         resultMap.put("orgName",agent.getAgName());
