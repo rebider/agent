@@ -52,7 +52,33 @@ public class EchartDataServiceImpl implements EchartDataService {
     @Override
     public PageInfo echartDataList(Page page, Map map, Long userId) {
         PageInfo pageInfo = new PageInfo();
-        pageInfo.setRows(agentMapper.queryEchartDataList(map,page));
+        List<Map<String,Object>> echartDataMapList = agentMapper.queryEchartDataList(map, page);
+       if(null!=echartDataMapList && echartDataMapList.size()!=0){
+           for (Map<String, Object> EchartDataMap : echartDataMapList) {
+               if(null==EchartDataMap.get("RAPPROVE")){
+                   EchartDataMap.put("RAPPROVE",0);
+               }
+               if(null==EchartDataMap.get("RAPPROVING")){
+                   EchartDataMap.put("RAPPROVING",0);
+               }
+               if(null==EchartDataMap.get("PHL")){
+                   EchartDataMap.put("PHL",0);
+               }
+               if(null==EchartDataMap.get("PDL")){
+                   EchartDataMap.put("PDL",0);
+               }
+               if(null==EchartDataMap.get("FHL")){
+                   EchartDataMap.put("FHL",0);
+               }
+               if(null==EchartDataMap.get("THSPZ")){
+                   EchartDataMap.put("THSPZ",0);
+               }
+               if(null==EchartDataMap.get("YTH")){
+                   EchartDataMap.put("YTH",0);
+               }
+           }
+       }
+        pageInfo.setRows(echartDataMapList);
         pageInfo.setTotal(agentMapper.queryEchartDataCount(map));
         return pageInfo;
     }
