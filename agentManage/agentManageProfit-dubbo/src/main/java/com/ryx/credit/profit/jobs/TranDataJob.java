@@ -264,8 +264,8 @@ public class TranDataJob {
      */
     public Map<String,String> synchronizeTranCheckData(){
         Calendar calendar = Calendar.getInstance();
-        String searchTime=new SimpleDateFormat("yyyy-MM-dd HH:MM:ss").format(calendar.getTime());
         calendar.add(Calendar.MONTH, -1);
+        String searchTime=new SimpleDateFormat("yyyy-MM-dd HH:MM:ss").format(calendar.getTime());
         String tranMonth= new SimpleDateFormat("yyyyMM").format(calendar.getTime());
         LOG.info("================"+tranMonth+"交易量核对数据同步开始================");
         Map<String,String> resultMap=new HashMap<>();
