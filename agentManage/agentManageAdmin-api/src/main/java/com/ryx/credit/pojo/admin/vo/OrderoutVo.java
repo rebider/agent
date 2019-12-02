@@ -22,7 +22,7 @@ public class OrderoutVo implements Serializable{
     private String downPaymentUser;//付款人
     private String comName;//收款地方
     private BigDecimal actualReceipt;//付款金额
-    private BigDecimal xxAmount;//付款金额
+    private String xxAmount;//付款金额
     private Date actualReceiptDate;//收款日期
     private String actualTime;
     private String oinuretime;//审批时间
@@ -494,11 +494,11 @@ public class OrderoutVo implements Serializable{
         this.nuclearTimeString = nuclearTimeString;
     }
 
-    public BigDecimal getXxAmount() {
+    public String getXxAmount() {
         return xxAmount;
     }
 
-    public void setXxAmount(BigDecimal xxAmount) {
+    public void setXxAmount(String xxAmount) {
         this.xxAmount = xxAmount;
     }
 
