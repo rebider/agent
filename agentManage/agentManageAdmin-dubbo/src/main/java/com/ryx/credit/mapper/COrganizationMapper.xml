@@ -170,6 +170,7 @@
          group by a.id, a.name
          order by id desc
     </select>
+
     <select id="selectBranchList" resultType="map">
         SELECT
             C.ID,C.NAME
