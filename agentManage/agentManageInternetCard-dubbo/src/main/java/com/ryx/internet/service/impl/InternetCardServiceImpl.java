@@ -226,11 +226,12 @@ public class InternetCardServiceImpl implements InternetCardService {
             Date begin = DateUtil.format(internetCard.getExpireTimeBeginStr(), DateUtil.DATE_FORMAT_yyyy_MM_dd);
             Date end = DateUtil.format(internetCard.getExpireTimeEndStr(), DateUtil.DATE_FORMAT_yyyy_MM_dd);
             criteria.andExpireTimeBetween(begin,end);
-        }else{
-            Date begin = DateUtil.format(DateUtil.getFirstDayOfMonth(DateUtil.getYearMonthOfMonthType(0, "Year"),DateUtil.getYearMonthOfMonthType(0, "Month")),DateUtil.DATE_FORMAT_yyyy_MM_dd);
-            Date end = DateUtil.format(DateUtil.getLastDayOfMonth(DateUtil.getYearMonthOfMonthType(3, "Year"),DateUtil.getYearMonthOfMonthType(3, "Month")), DateUtil.DATE_FORMAT_yyyy_MM_dd);
-            criteria.andExpireTimeBetween(begin,end);
         }
+//        else{
+//            Date begin = DateUtil.format(DateUtil.getFirstDayOfMonth(DateUtil.getYearMonthOfMonthType(0, "Year"),DateUtil.getYearMonthOfMonthType(0, "Month")),DateUtil.DATE_FORMAT_yyyy_MM_dd);
+//            Date end = DateUtil.format(DateUtil.getLastDayOfMonth(DateUtil.getYearMonthOfMonthType(3, "Year"),DateUtil.getYearMonthOfMonthType(3, "Month")), DateUtil.DATE_FORMAT_yyyy_MM_dd);
+//            criteria.andExpireTimeBetween(begin,end);
+//        }
 
         List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
         if(orgCodeRes==null && orgCodeRes.size()!=1){
