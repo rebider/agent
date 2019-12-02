@@ -93,4 +93,6 @@ public interface AgentEnterService {
 
 //    void verifyOther(List<AgentBusInfoVo> busInfoVoList)throws Exception;
 
+    public ResultVO selectPlatType(String platformNum);
+
 }

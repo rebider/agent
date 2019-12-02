@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import sun.management.resources.agent;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -458,6 +459,17 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         }
     }
 
+    @Override
+    public ResultVO selectPlatType(String platformNum) {
+        String platFormType="";
+        if (StringUtils.isNotBlank(platformNum)){
+            platFormType  = platFormMapper.selectPlatType(platformNum);
+        }else {
+            throw new ProcessException("请选择品牌");
+        }
+        return ResultVO.success(platFormType);
+    }
+
     /**
      * （业务市场财务去掉必须是同一个上级限制，此方法废弃 20190313）
      * 代理商新签入网业务平台类型为机构一代、二代直签直发、直签不直发、一代X时，所有业务平台上级必须为同一个。
@@ -628,6 +640,31 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             throw new MessageException("业务平台不存在");
         }
 
+        PlatformType platformType = platFormService.byPlatformCode(abus.getBusPlatform());
+        if(PlatformType.RDBPOS.code.equals(platformType.getValue())){
+            //检查手机号是否填写
+            if(StringUtils.isBlank(abus.getBusLoginNum())){
+                throw new MessageException("瑞大宝平台登录账号不能为空");
+            }
+            if(!RegexUtil.checkInt(abus.getBusLoginNum())){
+                throw new MessageException("瑞大宝平台登录账号必须为数字");
+            }
+            if(abus.getBusLoginNum().length()!=11){
+                throw new MessageException("手机位数不正确");
+            }
+        }
+        if(PlatformType.RHPOS.code.equals(platformType.getValue())){
+            //检查手机号是否填写
+            if(StringUtils.isBlank(abus.getBusLoginNum())){
+                throw new MessageException("瑞花宝平台登录账号不能为空");
+            }
+            if(!RegexUtil.checkInt(abus.getBusLoginNum())){
+                throw new MessageException("瑞花宝平台登录账号必须是数字");
+            }
+            if(abus.getBusLoginNum().length()!=11){
+                throw new MessageException("手机位数不正确");
+            }
+        }
         //检查是否有审批中的代理商新
         Agent agent = agentService.getAgentById(abus.getAgentId());
         if (agent.getAgStatus().equals(AgStatus.Approving.name())) {
