@@ -17,7 +17,9 @@ public enum InternetRenewStatus {
     YXF("2","已续费"),
 //    BFXF("3","未扣足"),
     XFZ("4","续费中"),
-    SX("5","失效");
+    SX("5","失效"),
+    ZXZ("6","注销中"),
+    YZX("7","已注销");
 
     public String code;
 

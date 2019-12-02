@@ -926,6 +926,12 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         return AgentResult.ok();
     }
 
+    /**
+     * 续费验证
+     * @param iccidNumIds
+     * @param userId
+     * @throws MessageException
+     */
     @Override
     public void renewVerify(String iccidNumIds,Long userId)throws MessageException{
 
@@ -958,7 +964,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                     }
                 }
             }else{
-                throw new MessageException("卡状态不正确,不允许续费/注销");
+                throw new MessageException("卡状态/续费状态不正确,不允许续费/注销");
             }
         }
     }
