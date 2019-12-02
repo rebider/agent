@@ -913,6 +913,28 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         map.put("platfromPerm",platfromPerm);
         map.put("status", Status.STATUS_1.status);
         map.put("agStatus", AgStatus.Approved.name());
+
+        if (!StringUtils.isBlank((String)map.get("busPlatformList"))) {
+            map.put("busPlatformList", Arrays.asList(((String) map.get("busPlatformList")).split(",")));
+        }else{
+            map.put("busPlatformList",new ArrayList<BigDecimal>());
+        }
+
+        List<BigDecimal> voList= new ArrayList<BigDecimal>();
+        if (!StringUtils.isBlank((String)map.get("cloReviewStatusList"))) {// bigdecimal 处理
+            List<String> list = Arrays.asList( ((String)map.get("cloReviewStatusList")).split(","));
+            voList = list.stream().map(str -> new BigDecimal(str.trim())).collect(Collectors.toList());
+            if( voList!=null && voList.size()>0)
+                map.put("cloReviewStatusList", voList);
+        }else{
+            map.put("cloReviewStatusList", new ArrayList<BigDecimal>());
+        }
+
+        if (StringUtils.isNotBlank((String)map.get("busTypeList"))) {
+            map.put("busTypeList", Arrays.asList(((String)map.get("busTypeList")).split(",")));
+        }else{
+            map.put("busTypeList", new ArrayList<BigDecimal>());
+        }
         List<BusinessOutVo> agentoutVos = agentBusInfoMapper.excelAgent(map);
         List<Dict> BUS_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name());
         List<Dict> BUS_SCOPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name());
