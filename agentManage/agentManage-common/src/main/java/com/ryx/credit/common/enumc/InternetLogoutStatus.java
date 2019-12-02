@@ -5,27 +5,24 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 续费状态
+ * 注销状态
  * @version V1.0
  * @Description:
  * @author: Liudh
  * @date: 2018/7/1 18:11
  */
-public enum InternetRenewStatus {
+public enum InternetLogoutStatus {
 
-    WXF("1","未续费"),
-    YXF("2","已续费"),
-//    BFXF("3","未扣足"),
-    XFZ("4","续费中"),
-    SX("5","失效"),
-    ZXZ("6","注销中"),
-    YZX("7","已注销");
+    DZX("DZX","待注销"),
+    ZXZ("ZXZ","注销中"),
+    ZXCG("ZXCG","注销成功"),
+    SX("SX","失效");
 
     public String code;
 
     public String msg;
 
-    InternetRenewStatus(String c, String m){
+    InternetLogoutStatus(String c, String m){
         this.code=c;
         this.msg =m;
     }
@@ -36,8 +33,8 @@ public enum InternetRenewStatus {
      * @return
      */
     public static String getContentByValue(String value){
-        InternetRenewStatus[] fundType = InternetRenewStatus.values();
-        for(InternetRenewStatus cc : fundType){
+        InternetLogoutStatus[] fundType = InternetLogoutStatus.values();
+        for(InternetLogoutStatus cc : fundType){
             if(cc.code.equals(value)){
                 return cc.msg;
             }
@@ -47,8 +44,8 @@ public enum InternetRenewStatus {
 
     public static  Map<Object, Object> getContentMap(){
         Map<Object, Object> map = new HashMap<>();
-        InternetRenewStatus[] fundType = InternetRenewStatus.values();
-        for(InternetRenewStatus cc : fundType){
+        InternetLogoutStatus[] fundType = InternetLogoutStatus.values();
+        for(InternetLogoutStatus cc : fundType){
             map.put(cc.getValue(),cc.getContent());
         }
         return map;
@@ -60,8 +57,8 @@ public enum InternetRenewStatus {
      * @return
      */
     public static String getValueByContent(String content){
-        InternetRenewStatus[] fundType = InternetRenewStatus.values();
-        for(InternetRenewStatus cc : fundType){
+        InternetLogoutStatus[] fundType = InternetLogoutStatus.values();
+        for(InternetLogoutStatus cc : fundType){
             if(cc.getContent().equals(content)){
                 return cc.code;
             }
