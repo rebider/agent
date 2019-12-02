@@ -4370,28 +4370,7 @@ public class OrderServiceImpl implements OrderService {
             //传递部门信息
             Map startPar = agentEnterService.startPar(userId);
             if (null != startPar) {
-                if (!orderUpModelVo.getApprovalResult().equals("back")) {
-                    ActRuTask actRuTask = actRuTaskService.selectByPrimaryKey(orderUpModelVo.getTaskId());
-                    if (actRuTask==null) {
-                        return result;
-                    }
-                    String[] procDefId = String.valueOf(actRuTask.getProcDefId()).split(":");
-                    if (procDefId==null) {
-                        return result;
-                    }
-                    String taskView = procDefId[0];
-                    String[] taskViewVersion = taskView.split("_");
-                    if (taskViewVersion.length >= 2) {
-                        BigDecimal version = new BigDecimal(taskViewVersion[1]);
-                        if (version.compareTo(new BigDecimal("3.0")) >= 0) {
-                            reqMap.put("party", startPar.get("party"));
-                        } else {
-                            reqMap.put("party", "north");
-                        }
-                    } else {
-                        reqMap.put("party", "north");
-                    }
-                }
+                reqMap.put("party",startPar.get("party"));
             }
             //财务审批
             if(orgCode.equals("finance")){
