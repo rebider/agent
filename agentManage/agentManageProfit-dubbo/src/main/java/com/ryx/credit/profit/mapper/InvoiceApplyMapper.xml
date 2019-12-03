@@ -824,8 +824,24 @@
       case
         when ES_RESULT = '1' then '通过'
         when ES_RESULT = '0' then '未通过'
-        else '未审核' end as ESRESULT
-    from P_INVOICE_APPLY N ${innerJoinDepartment}
+        else '未审核' end as ESRESULT,
+      case
+        when INVOICE_TYPE = '1' then '普通电子发票'
+        when INVOICE_TYPE = '2' then '电子发票专票'
+        when INVOICE_TYPE = '3' then '普通纸质发票'
+        when INVOICE_TYPE = '4' then '专用纸质发票'
+        when INVOICE_TYPE = '5' then '普通纸质卷票'
+        when INVOICE_TYPE = '7' then '通用机打'
+        when INVOICE_TYPE = '8' then '的士票'
+        when INVOICE_TYPE = '9' then '火车票'
+        when INVOICE_TYPE = '10' then '飞机票'
+        when INVOICE_TYPE = '11' then '其他'
+        when INVOICE_TYPE = '12' then '机动车'
+        when INVOICE_TYPE = '13' then '二手车'
+        when INVOICE_TYPE = '14' then '定额发票'
+        when INVOICE_TYPE = '15' then '通行费'
+        else INVOICE_TYPE end as INVOICETYPE
+    from P_INVOICE_APPLY
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
