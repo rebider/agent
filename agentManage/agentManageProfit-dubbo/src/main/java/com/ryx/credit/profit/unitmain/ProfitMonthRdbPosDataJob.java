@@ -163,18 +163,22 @@ public class ProfitMonthRdbPosDataJob {
                 TransProfitDetail detail = new TransProfitDetail();
                 if (agencyId==null ||agencyId.equals(""))
                     continue;
-                AgentBusInfo agentBusInfo = businfoService.queryAgentBusInfo(agencyId);
-                if (agentBusInfo==null){
-                    notSuccessAgent.add(agencyId);
-                    logger.info("代理商详情查询失败-----agencyId："+agencyId);
-                    continue;
-                }else{
+
+                AgentBusInfo agentBusInfo;
+                try {
+                    agentBusInfo = businfoService.queryAgentBusInfo(agencyId);
                     if(!OrgType.zQ(agentBusInfo.getBusType())){
                         notZQAgent.add(agencyId);
                         logger.info("非直签代理商-----agencyId："+agencyId);
                         continue;
                     }
+                }catch (Exception e){
+                    notSuccessAgent.add(agencyId);
+                    logger.info("代理商详情查询失败-----agencyId："+agencyId);
+                    e.printStackTrace();
+                    continue;
                 }
+
                 detail.setAgentId(agentBusInfo.getAgentId());
                 detail.setAgentName(agencyName);
                 detail.setBusNum(agencyId);
