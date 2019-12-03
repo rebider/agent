@@ -233,4 +233,33 @@ public class InternetRenewOffset implements Serializable{
     public void setProcessTime(String processTime) {
         this.processTime = processTime == null ? null : processTime.trim();
     }
+
+    @Override
+    public String toString() {
+        return "InternetRenewOffset{" +
+                "flowId='" + flowId + '\'' +
+                ", renewId='" + renewId + '\'' +
+                ", renewDetailId='" + renewDetailId + '\'' +
+                ", iccidNum='" + iccidNum + '\'' +
+                ", agentId='" + agentId + '\'' +
+                ", agentName='" + agentName + '\'' +
+                ", merId='" + merId + '\'' +
+                ", merName='" + merName + '\'' +
+                ", offsetAmt=" + offsetAmt +
+                ", alreadyOffsetAmt=" + alreadyOffsetAmt +
+                ", cTime='" + cTime + '\'' +
+                ", cUser='" + cUser + '\'' +
+                ", uUser='" + uUser + '\'' +
+                ", status=" + status +
+                ", version=" + version +
+                ", cleanStatus='" + cleanStatus + '\'' +
+                ", processDate='" + processDate + '\'' +
+                ", processTime='" + processTime + '\'' +
+                ", busNum='" + busNum + '\'' +
+                ", busPlatform='" + busPlatform + '\'' +
+                ", agDocDistrict='" + agDocDistrict + '\'' +
+                ", agDocPro='" + agDocPro + '\'' +
+                ", busContactPerson='" + busContactPerson + '\'' +
+                '}';
+    }
 }

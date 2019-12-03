@@ -34,5 +34,6 @@
 
     <dubbo:service interface="com.ryx.internet.service.InternetCardService" ref="internetCardService" timeout="1200000" registry="myGroup" />
     <dubbo:service interface="com.ryx.internet.service.OInternetRenewService" ref="internetRenewService" timeout="1200000" registry="myGroup" />
+    <dubbo:service interface="com.ryx.internet.service.InternetCardLogoutService" ref="internetCardLogoutService" timeout="1200000" registry="myGroup" />
 
 </beans>

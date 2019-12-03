@@ -497,6 +497,37 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                         }
                     }
                 }
+                //检查业务平台数据
+                PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfoVo.getBusPlatform());
+                if(platForm==null){
+                    throw new MessageException("业务平台不存在");
+                }
+                PlatformType platformType = platFormService.byPlatformCode(agentBusInfoVo.getBusPlatform());
+                if(PlatformType.RDBPOS.code.equals(platformType.getValue())){
+                    //检查手机号是否填写
+                    if(StringUtils.isBlank(agentBusInfoVo.getBusLoginNum())){
+                        throw new MessageException("瑞大宝平台登录账号不能为空");
+                    }
+                    if(!RegexUtil.checkInt(agentBusInfoVo.getBusLoginNum())){
+                        throw new MessageException("瑞大宝平台登录账号必须为数字");
+                    }
+                    if(agentBusInfoVo.getBusLoginNum().length()!=11){
+                        throw new MessageException("手机位数不正确");
+                    }
+                }
+                if(PlatformType.RHPOS.code.equals(platformType.getValue())){
+                    //检查手机号是否填写
+                    if(StringUtils.isBlank(agentBusInfoVo.getBusLoginNum())){
+                        throw new MessageException("瑞花宝平台登录账号不能为空");
+                    }
+                    if(!RegexUtil.checkInt(agentBusInfoVo.getBusLoginNum())){
+                        throw new MessageException("瑞花宝平台登录账号必须是数字");
+                    }
+                    if(agentBusInfoVo.getBusLoginNum().length()!=11){
+                        throw new MessageException("手机位数不正确");
+                    }
+                }
+
                 //更新值
                 agentBusInfo.setBusType(agentBusInfoVo.getBusType());
                 agentBusInfo.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
@@ -641,6 +672,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     if(!RegexUtil.checkInt(item.getBusLoginNum())){
                         throw new ProcessException("瑞大宝平台登录账号必须为数字");
                     }
+                    if(item.getBusLoginNum().length()!=11){
+                        throw new ProcessException("手机位数不正确");
+                    }
                 }
                 if(PlatformType.RHPOS.code.equals(platformType.getValue())){
                     //检查手机号是否填写
@@ -649,6 +683,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     }
                     if(!RegexUtil.checkInt(item.getBusLoginNum())){
                         throw new ProcessException("瑞花宝平台登录账号必须是数字");
+                    }
+                    if(item.getBusLoginNum().length()!=11){
+                        throw new ProcessException("手机位数不正确");
                     }
                 }
                 AgentBusInfo agentBusInfo = agentBusinfoService.agentPlatformNum(agentVo.getAgentId(),item.getBusPlatform());
@@ -913,6 +950,28 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         map.put("platfromPerm",platfromPerm);
         map.put("status", Status.STATUS_1.status);
         map.put("agStatus", AgStatus.Approved.name());
+
+        if (!StringUtils.isBlank((String)map.get("busPlatformList"))) {
+            map.put("busPlatformList", Arrays.asList(((String) map.get("busPlatformList")).split(",")));
+        }else{
+            map.put("busPlatformList",new ArrayList<BigDecimal>());
+        }
+
+        List<BigDecimal> voList= new ArrayList<BigDecimal>();
+        if (!StringUtils.isBlank((String)map.get("cloReviewStatusList"))) {// bigdecimal 处理
+            List<String> list = Arrays.asList( ((String)map.get("cloReviewStatusList")).split(","));
+            voList = list.stream().map(str -> new BigDecimal(str.trim())).collect(Collectors.toList());
+            if( voList!=null && voList.size()>0)
+                map.put("cloReviewStatusList", voList);
+        }else{
+            map.put("cloReviewStatusList", new ArrayList<BigDecimal>());
+        }
+
+        if (StringUtils.isNotBlank((String)map.get("busTypeList"))) {
+            map.put("busTypeList", Arrays.asList(((String)map.get("busTypeList")).split(",")));
+        }else{
+            map.put("busTypeList", new ArrayList<BigDecimal>());
+        }
         List<BusinessOutVo> agentoutVos = agentBusInfoMapper.excelAgent(map);
         List<Dict> BUS_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name());
         List<Dict> BUS_SCOPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name());

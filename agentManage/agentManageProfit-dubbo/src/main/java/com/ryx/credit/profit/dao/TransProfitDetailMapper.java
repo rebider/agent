@@ -62,4 +62,5 @@ public interface TransProfitDetailMapper {
 
     List<Map<String,String>> selectByBusNum(@Param("date") String date, @Param("busNum")String busNum);
 
+    List<Map<String, Object>> queryAllMPosBusNum();
 }

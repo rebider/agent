@@ -222,7 +222,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         String proceId = null;
 
         List<Dict> actlist = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.PROFIT_TEMPLATE_APPLY.name());
-      /*  String workId = null;
+       /* String workId = null;
         for (Dict dict : actlist) {
             workId = dict.getdItemvalue();
         }
@@ -231,9 +231,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             throw new MessageException("审批流启动失败，未获取到数据字典配置部署流程!");
         }*/
 
-
-        if("POS".equals(busInfo.get("PLATFORM_TYPE"))||"ZHPOS".equals(busInfo.get("PLATFORM_TYPE"))||"ZPOS".equals(busInfo.get("PLATFORM_TYPE"))){
-
+        if ("POS".equals(busInfo.get("PLATFORM_TYPE")) || "ZHPOS".equals(busInfo.get("PLATFORM_TYPE")) || "ZPOS".equals(busInfo.get("PLATFORM_TYPE"))) {
             JSONObject monthJSONObject = new JSONObject();
             monthJSONObject.put("applyId", templateRecode.getTemplateId());
             monthJSONObject.put("isStartMonth", "1");
@@ -241,24 +239,23 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             Map<String, Object> resultMapMonth = JSONObject.parseObject(MonthCheckResult);
             Map<String,Object> objectMapMonth = (Map<String,Object>)resultMapMonth.get("data");
             if ("0".equals(objectMapMonth.get("isExist").toString())) {
-                String oldStart = ((Map<String, String>) map2.get("applyTemplate")).get("startMonth");
-                Calendar calendar = Calendar.getInstance();
-                String nowMonth = new SimpleDateFormat("yyyyMM").format(calendar.getTime());
-                String day = new SimpleDateFormat("dd").format(calendar.getTime());
-                calendar.add(Calendar.MONTH, -1);
-                String lastMonth = new SimpleDateFormat("yyyyMM").format(calendar.getTime());
-                if (Integer.parseInt(day) < 10) {
-                    if (Integer.parseInt(oldStart) < Integer.parseInt(lastMonth)) {
-                        throw new MessageException("10号前分配模板，开始时间不能小于上月");
+                    String oldStart = ((Map<String, String>) map2.get("applyTemplate")).get("startMonth");
+                    Calendar calendar = Calendar.getInstance();
+                    String nowMonth = new SimpleDateFormat("yyyyMM").format(calendar.getTime());
+                    String day = new SimpleDateFormat("dd").format(calendar.getTime());
+                    calendar.add(Calendar.MONTH, -1);
+                    String lastMonth = new SimpleDateFormat("yyyyMM").format(calendar.getTime());
+                    if (Integer.parseInt(day) < 10) {
+                        if (Integer.parseInt(oldStart) < Integer.parseInt(lastMonth)) {
+                            throw new MessageException("10号前分配模板，开始时间不能小于上月");
+                        }
+                    } else {
+                        if (Integer.parseInt(oldStart) < Integer.parseInt(nowMonth)) {
+                            throw new MessageException("10号后分配模板，开始时间不能小于本月");
+                        }
                     }
-                } else {
-                    if (Integer.parseInt(oldStart) < Integer.parseInt(nowMonth)) {
-                        throw new MessageException("10号后分配模板，开始时间不能小于本月");
-                    }
-                }
             }
-
-            if("beijing".equals(startPar.get("party").toString())){
+            if ("beijing".equals(startPar.get("party").toString())) {
                 try {
                     JSONObject mapJSONObject = new JSONObject();
                     mapJSONObject.put("applyId",templateRecode.getTemplateId());
