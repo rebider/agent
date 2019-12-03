@@ -649,7 +649,7 @@ public class AgentServiceImpl implements AgentService {
         if(StringUtils.isNotBlank(map.get("agName"))){
             c.andAgNameEqualTo(map.get("agName"));
         }
-        c.andAgStatusNotEqualTo(String.valueOf(AgStatus.Refuse.status));
+        c.andAgStatusIn(Arrays.asList(AgStatus.Approving.name(),AgStatus.Approved.name(),AgStatus.Create.name()));
         c.andStatusEqualTo(Status.STATUS_1.status);
         List<Agent> list = agentMapper.selectByExample(example);
         return list;
@@ -771,7 +771,7 @@ public class AgentServiceImpl implements AgentService {
         AgentExample.Criteria criteria1 = agentExample.createCriteria();
         criteria1.andStatusEqualTo(Status.STATUS_1.status);
         criteria1.andAgBusLicEqualTo(lic);
-        criteria1.andAgStatusIn(Arrays.asList(AgStatus.Approving.name(),AgStatus.Approved.name()));
+        criteria1.andAgStatusIn(Arrays.asList(AgStatus.Approving.name(),AgStatus.Approved.name(),AgStatus.Create.name()));
         List<Agent> agents = agentMapper.selectByExample(agentExample);
         if(agents.size()!=0) {
             return AgentResult.ok(agents.get(0).getId());
