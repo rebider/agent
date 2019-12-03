@@ -1179,7 +1179,7 @@
   <select id="excelOrder" parameterType="map" resultMap="OrderoutVo">
     (
     select
-    to_char(o.c_time,'YYYY-MM-DD') as apytime,
+    to_char(o.c_time,'YYYY-MM-DD HH:mm:ss') as apytime,
     o.o_num as num,
     b.ag_uniq_num,
     aab.bus_num,
@@ -1318,7 +1318,7 @@
       select sum(plans.plan_pro_num) from o_receipt_plan plans where plans.order_id = o.id and plans.status = 1
     ),0) as is_plan_num,
     o.review_status,
-    to_char(o.o_inuretime,'YYYY-MM-DD') as oinuretime,
+    to_char(o.o_inuretime,'YYYY-MM-DD HH:mm:ss') as oinuretime,
     orging.name as ag_doc_district,
     org.name as ag_doc_pro,
     o.user_id as order_user,
@@ -1327,7 +1327,7 @@
       from o_organization oan
       where oan.org_id = aab.organ_num and oan.status = 1
     ),'') as org_name,
-    to_char(o.o_apytime,'YYYY-MM-DD') as orderDate,
+    to_char(o.o_apytime,'YYYY-MM-DD HH:mm:ss') as orderDate,
     o.remark
     from o_order o
     left join a_agent b on o.agent_id = b.id
@@ -1410,7 +1410,7 @@
   <select id="orderExcel" parameterType="map" resultMap="OrderoutVo">
     (
     select
-    to_char(o.c_time,'YYYY-MM-DD') as apytime,
+    to_char(o.c_time,'YYYY-MM-DD HH:mm:ss') as apytime,
     o.o_num as num,
     b.ag_uniq_num,
     aab.bus_num,
@@ -1549,7 +1549,7 @@
     select sum(plans.plan_pro_num) from o_receipt_plan plans where plans.order_id = o.id and plans.status = 1
     ),0) as is_plan_num,
     o.review_status,
-    to_char(o.o_inuretime,'YYYY-MM-DD') as oinuretime,
+    to_char(o.o_inuretime,'YYYY-MM-DD HH:mm:ss') as oinuretime,
     orging.name as ag_doc_district,
     org.name as ag_doc_pro,
     o.user_id as order_user,
@@ -1558,7 +1558,7 @@
     from o_organization oan
     where oan.org_id = aab.organ_num and oan.status = 1
     ),'') as org_name,
-    to_char(o.o_apytime,'YYYY-MM-DD') as orderDate,
+    to_char(o.o_apytime,'YYYY-MM-DD HH:mm:ss') as orderDate,
     o.remark
     from o_order o
     left join a_agent b on o.agent_id = b.id
@@ -1610,7 +1610,7 @@
     </where>
     UNION
     select
-    to_char(o.c_time,'YYYY-MM-DD') as apytime,
+    to_char(o.c_time,'YYYY-MM-DD HH:mm:ss') as apytime,
     o.o_num as num,
     b.ag_uniq_num,
     aab.bus_num,
@@ -1749,7 +1749,7 @@
     select sum(plans.plan_pro_num) from o_receipt_plan plans where plans.order_id = o.id and plans.status = 1
     ),0) as is_plan_num,
     o.review_status,
-    to_char(o.o_inuretime,'YYYY-MM-DD') as oinuretime,
+    to_char(o.o_inuretime,'YYYY-MM-DD HH:mm:ss') as oinuretime,
     orging.name as ag_doc_district,
     org.name as ag_doc_pro,
     o.user_id as order_user,
@@ -1758,7 +1758,7 @@
     from o_organization oan
     where oan.org_id = aab.organ_num and oan.status = 1
     ),'') as org_name,
-    to_char(o.o_apytime,'YYYY-MM-DD') as orderDate,
+    to_char(o.o_apytime,'YYYY-MM-DD HH:mm:ss') as orderDate,
     o.remark
     from o_order o
     left join a_agent b on o.agent_id = b.id
