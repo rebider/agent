@@ -771,7 +771,6 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 throw new MessageException("工作流处理任务异常");
             }
         } catch (MessageException e) {
-            AppConfig.sendEmails(MailUtil.printStackTrace(e), "物联网卡续费审批流处理出现异常,approvalTask方法1");
             e.printStackTrace();
             throw new MessageException(e.getMsg());
         } catch (Exception e) {
