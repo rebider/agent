@@ -580,13 +580,12 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             try {
                 AgentResult agentResult = termMachineService.querySnMsg(PlatformType.RDBPOS, snStart, snEnd);
                 if (!agentResult.isOK()) {
-                    throw new MessageException(null == agentResult.getMsg()?"瑞大宝活动查询失败！":agentResult.getMsg());
+                    throw new MessageException(agentResult.getMsg());
                 }
                 logger.info("根据SN查询业务系统返回:" + agentResult.getData());
                 Map<String, Object> resMap = (Map<String, Object>) agentResult.getData();
                 if(null == resMap.get("busProCode")) throw new MessageException("在瑞大宝平台未查到该活动！");
                 if(null == resMap.get("busNum")) throw new MessageException("在瑞大宝平台未查到该代理商！");
-                //
                 String busProCode = (String) resMap.get("busProCode");
                 String busNum = (String) resMap.get("busNum");
 

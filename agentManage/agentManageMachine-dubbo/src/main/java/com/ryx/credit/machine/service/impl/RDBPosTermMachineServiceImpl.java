@@ -257,8 +257,12 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
                 //可以更换活动
                 return  AgentResult.ok(retMap);
             } else if (null != resJson.getString("code") && resJson.getString("code").equals("9999") && null != resJson.getString("msg")) {
+                String retMsg = resJson.getString("msg");
+                if (null == retMsg) return AgentResult.fail("瑞大宝返回值异常！");
+                String snEndAndBusProCode = retMsg.substring(retMsg.indexOf(":") + 1);
+                String msg = snEndAndBusProCode.substring(snEndAndBusProCode.indexOf(":") + 1);
                 //查询失败
-                return AgentResult.fail(resJson.getString("msg"));
+                return AgentResult.fail(null == msg?"瑞大宝，查询返回值异常！":msg);
             } else {
                 //异常
                 return AgentResult.fail("查询瑞大宝历史换活动返回值异常！");
