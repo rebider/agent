@@ -132,6 +132,46 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
             if(StringUtils.isNotBlank(agentVo.getSid())){
                 BusActRel byActivId = busActRelMapper.findByActivId(agentVo.getSid());
                 if(StringUtils.isNotBlank(byActivId.getBusId())){
+                    if(byActivId.getBusType().equals("Agent")){
+                        List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.businessQuery(byActivId.getBusId());
+                        if(null!=agentBusInfos){
+                            for (AgentBusInfo abus : agentBusInfos) {
+                                if(abus.getBusStatus().equals(BusStatus.QY.status)){
+                                    //检查业务平台数据
+                                    PlatForm platForm = platFormMapper.selectByPlatFormNum(abus.getBusPlatform());
+                                    if(platForm==null){
+                                        throw new MessageException("业务平台不存在");
+                                    }
+                                    //校验平台登陆账号是否是11位
+                                    PlatformType platformType = platFormService.byPlatformCode(abus.getBusPlatform());
+                                    if(PlatformType.RDBPOS.code.equals(platformType.getValue())){
+                                        //检查手机号是否填写
+                                        if(StringUtils.isBlank(abus.getBusLoginNum())){
+                                            throw new ProcessException("瑞大宝平台登录账号不能为空");
+                                        }
+                                        if(!RegexUtil.checkInt(abus.getBusLoginNum())){
+                                            throw new ProcessException("瑞大宝平台登录账号必须为数字");
+                                        }
+                                        if(abus.getBusLoginNum().length()!=11){
+                                            throw new ProcessException("手机位数不正确");
+                                        }
+                                    }
+                                    if(PlatformType.RHPOS.code.equals(platformType.getValue())){
+                                        //检查手机号是否填写
+                                        if(StringUtils.isBlank(abus.getBusLoginNum())){
+                                            throw new ProcessException("瑞花宝平台登录账号不能为空");
+                                        }
+                                        if(!RegexUtil.checkInt(abus.getBusLoginNum())){
+                                            throw new ProcessException("瑞花宝平台登录账号必须是数字");
+                                        }
+                                        if(abus.getBusLoginNum().length()!=11){
+                                            throw new ProcessException("手机位数不正确");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }else if(byActivId.getBusType().equals("Business")){
                     AgentBusInfo abus = agentBusinfoService.getById(byActivId.getBusId());
                     if (abus == null) {
                         logger.info("代理商信息审批中,业务信息未找到{}", byActivId.getBusId());
@@ -168,6 +208,7 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                         if(abus.getBusLoginNum().length()!=11){
                             throw new ProcessException("手机位数不正确");
                         }
+                    }
                     }
                 }
 
