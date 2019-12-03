@@ -109,11 +109,11 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
             criteria.andYsDateLessThanOrEqualTo(dateMap.get("ysDateEnd"));
         }
         if(StringUtils.isNotBlank(dateMap.get("esDateStart")) && StringUtils.isNotBlank(dateMap.get("esDateEnd"))){
-            criteria.andYsDateBetween(dateMap.get("esDateStart"),dateMap.get("esDateEnd"));
+            criteria.andEsDateBetween(dateMap.get("esDateStart"),dateMap.get("esDateEnd"));
         }else if(StringUtils.isNotBlank(dateMap.get("esDateStart"))){
-            criteria.andYsDateGreaterThanOrEqualTo(dateMap.get("esDateStart"));
+            criteria.andEsDateGreaterThanOrEqualTo(dateMap.get("esDateStart"));
         }else if(StringUtils.isNotBlank(dateMap.get("esDateEnd"))){
-            criteria.andYsDateLessThanOrEqualTo(dateMap.get("esDateEnd"));
+            criteria.andEsDateLessThanOrEqualTo(dateMap.get("esDateEnd"));
         }
 
         example.setOrderByClause("CREATE_DATE DESC ");
@@ -583,11 +583,11 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
             criteria.andYsDateLessThanOrEqualTo(dateMap.get("ysDateEnd"));
         }
         if(StringUtils.isNotBlank(dateMap.get("esDateStart")) && StringUtils.isNotBlank(dateMap.get("esDateEnd"))){
-            criteria.andYsDateBetween(dateMap.get("esDateStart"),dateMap.get("esDateEnd"));
+            criteria.andEsDateBetween(dateMap.get("esDateStart"),dateMap.get("esDateEnd"));
         }else if(StringUtils.isNotBlank(dateMap.get("esDateStart"))){
-            criteria.andYsDateGreaterThanOrEqualTo(dateMap.get("esDateStart"));
+            criteria.andEsDateGreaterThanOrEqualTo(dateMap.get("esDateStart"));
         }else if(StringUtils.isNotBlank(dateMap.get("esDateEnd"))){
-            criteria.andYsDateLessThanOrEqualTo(dateMap.get("esDateEnd"));
+            criteria.andEsDateLessThanOrEqualTo(dateMap.get("esDateEnd"));
         }
 
         example.setOrderByClause("CREATE_DATE DESC ");
