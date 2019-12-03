@@ -370,6 +370,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                         invoiceApply1.setRev2("到票金额汇总失败："+ma.get("returnInfo").toString());
                     }else{
                         invoiceApply1.setEsResult("1");
+                        invoiceApply1.setRev2("");
                         invoiceApply1.setStatus("1");
                     }
                     invoiceApply1.setEsDate(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date()));
