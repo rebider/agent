@@ -2,6 +2,7 @@ package com.ryx.credit.profit.unitmain;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.OrgType;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtil;
@@ -56,6 +57,7 @@ public class ProfitMonthRdbPosDataJob {
     OrderService orderService;
 
     private List<String> notSuccessAgent;
+    private List<String> notZQAgent;
     private Map<String,Integer> repeatAgent;
     //未成功的代理商
 
@@ -96,6 +98,7 @@ public class ProfitMonthRdbPosDataJob {
     public void synchroProfitMonth(String transDate) {
 
         notSuccessAgent=new ArrayList<String>();
+        notZQAgent=new ArrayList<String>();
         repeatAgent=new HashMap<String,Integer>();
 
         HashMap<String, String> map = new HashMap<String, String>();
@@ -128,6 +131,7 @@ public class ProfitMonthRdbPosDataJob {
                 //插入新拉取数据
                 insertTransProfit(data, transDate);
                 logger.info("未同步成功代理商"+notSuccessAgent.toString());
+                logger.info("非直签代理商"+notZQAgent.toString());
                 logger.info("代理商:"+repeatAgent.toString());
                 return ;
             }
@@ -159,11 +163,17 @@ public class ProfitMonthRdbPosDataJob {
                 TransProfitDetail detail = new TransProfitDetail();
                 if (agencyId==null ||agencyId.equals(""))
                     continue;
-                AgentBusInfo agentBusInfo = businfoService.selectBusInfo(agencyId);
+                AgentBusInfo agentBusInfo = businfoService.queryAgentBusInfo(agencyId);
                 if (agentBusInfo==null){
                     notSuccessAgent.add(agencyId);
                     logger.info("代理商详情查询失败-----agencyId："+agencyId);
                     continue;
+                }else{
+                    if(!OrgType.zQ(agentBusInfo.getBusType())){
+                        notZQAgent.add(agencyId);
+                        logger.info("非直签代理商-----agencyId："+agencyId);
+                        continue;
+                    }
                 }
                 detail.setAgentId(agentBusInfo.getAgentId());
                 detail.setAgentName(agencyName);
