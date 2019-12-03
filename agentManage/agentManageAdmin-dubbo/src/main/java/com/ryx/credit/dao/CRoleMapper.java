@@ -32,4 +32,5 @@ public interface CRoleMapper extends BaseMapper<CRole> {
 
     Long findId();
 
+    List<CResource> selectResourcByRoleId(@Param("id") Long id);
 }
