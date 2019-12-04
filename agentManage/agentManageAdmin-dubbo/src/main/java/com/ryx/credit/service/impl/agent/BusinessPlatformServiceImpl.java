@@ -527,8 +527,24 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                         throw new MessageException("手机位数不正确");
                     }
                 }
-
+                Map<String, String> hashMap = new HashMap<>();
+                hashMap.put("agentId",agentBusInfoVo.getAgentId());
+                hashMap.put("busType",BusType.JG.key);
+                hashMap.put("busTypeOne",BusType.BZYD.key);
+                List<AgentBusInfo> busInfosList=agentBusInfoMapper.queryBusinfo(hashMap);
+                if(null!=busInfosList && busInfosList.size()>0){
+                    for (AgentBusInfo busInfo : busInfosList) {
+                        busInfo.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
+                        busInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
+                        busInfo.setVersion(busInfo.getVersion());
+                        if(1!=agentBusInfoMapper.updateByPrimaryKey(busInfo)){
+                            logger.info("业务修改省区更新失败");
+                            throw new MessageException("业务修改省区更新失败");
+                        }
+                    }
+                }
                 //更新值
+//                agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
                 agentBusInfo.setBusType(agentBusInfoVo.getBusType());
                 agentBusInfo.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
                 agentBusInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
@@ -542,7 +558,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 agentBusInfo.setBusParent(agentBusInfoVo.getBusParent());
                 if(StringUtils.isNotBlank(agentBusInfoVo.getOrganNum()))
                  agentBusInfo.setOrganNum(agentBusInfoVo.getOrganNum());
-                agentBusInfo.setVersion(agentBusInfo.getVersion());
+                agentBusInfo.setVersion(agentBusInfo.getVersion().add(new BigDecimal(1)));
                 agentBusInfo.setBusUseOrgan(agentBusInfoVo.getBusUseOrgan());
                 agentBusInfo.setBusScope(agentBusInfoVo.getBusScope());
                 int updateAgentBusinfo = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
@@ -707,14 +723,19 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
 
                 if(null!=agentBusInfo && StringUtils.isNotBlank(agentBusInfo.getAgDocDistrict())){
                     if(!agentBusInfo.getAgDocDistrict().equals( item.getAgDocDistrict())){
-                        throw new ProcessException("此业务的省区与月结相同品牌不一致");
+                        throw new ProcessException("此业务的大区与月结相同品牌不一致");
                     }
                 }
                 if(null!=agentBusInfo && StringUtils.isNotBlank(agentBusInfo.getAgDocPro())){
                     if(!agentBusInfo.getAgDocPro().equals( item.getAgDocPro())){
-                        throw new ProcessException("此业务的大区与月结相同品牌不一致");
+                        throw new ProcessException("此业务的省区与月结相同品牌不一致");
                     }
                 }
+                //判断标准一代、机构只能有一个业务对接省区
+                if(StringUtils.isNotBlank(item.getBusType()) && StringUtils.isNotBlank(item.getAgentId()) && StringUtils.isNotBlank(item.getAgDocPro())){
+
+                }
+
             }
             List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByAgenId(agent.getId());
             String json = JsonUtil.objectToJson(agentBusInfos);
