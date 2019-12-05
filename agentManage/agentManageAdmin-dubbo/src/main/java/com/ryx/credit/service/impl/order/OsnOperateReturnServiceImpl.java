@@ -562,7 +562,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateReturnService {
             OLogistics posLogistics = oLogisticsMapper.selectByPrimaryKey(logcId);
             logger.info("退货上传物流下发到POS系统:", user, logistics.getId(), datas.toString());
             try {
-                AgentResult ar = imsTermAdjustDetailService.insertImsTermAdjustDetail(datas, imsTermAdjustDetail);
+                AgentResult ar = imsTermAdjustDetailService.insertImsTermAdjustDetail(logistics,datas, imsTermAdjustDetail);
                 if (ar.isOK()) {
                     return FastMap.fastMap("status", "1");
                 } else {
