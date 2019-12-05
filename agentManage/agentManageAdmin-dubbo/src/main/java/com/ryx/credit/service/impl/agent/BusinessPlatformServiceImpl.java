@@ -732,10 +732,42 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     }
                 }
                 //判断标准一代、机构只能有一个业务对接省区
-                if(StringUtils.isNotBlank(item.getBusType()) && StringUtils.isNotBlank(item.getAgentId()) && StringUtils.isNotBlank(item.getAgDocPro())){
+                if(StringUtils.isNotBlank(item.getBusType()) && StringUtils.isNotBlank(item.getAgentId()) && StringUtils.isNotBlank(item.getAgDocPro()) &&StringUtils.isNotBlank(item.getAgDocDistrict())){
 
+                    if(item.getBusType().equals(BusType.JG.key) ||item.getBusType().equals(BusType.BZYD.key)){
+                        Map<String, String> hashMap = new HashMap<>();
+                        hashMap.put("agentId",item.getAgentId());
+                        hashMap.put("busType",BusType.JG.key);
+                        hashMap.put("busTypeOne",BusType.BZYD.key);
+                        List<AgentBusInfo> busInfoList = agentBusInfoMapper.queryBusinfo(hashMap);
+                        Set<String> hashSetDocDistrict = new HashSet<>();
+                        Set<String> hashSetocPro = new HashSet<>();
+                        if(null!=busInfoList && busInfoList.size()>0){
+                            for (AgentBusInfo busInfo : busInfoList) {
+                                hashSetocPro.add(busInfo.getAgDocPro());
+                                hashSetDocDistrict.add(busInfo.getAgDocDistrict());
+                            }
+                           if(hashSetDocDistrict.size()==1 || hashSetocPro.size()==1){
+                                //如果只有一个则进行更改大区省区
+                                AgentBusInfo agent_businfo = busInfoList.get(0);
+                                if(StringUtils.isNotBlank(agent_businfo.getAgDocPro()) && StringUtils.isNotBlank(agent_businfo.getAgDocDistrict())){
+                                    if(!agent_businfo.getAgDocPro().equals(item.getAgDocPro()) || !agent_businfo.getAgDocDistrict().equals(item.getAgDocDistrict())){
+                                        logger.info("机构/标准一代的省区只能为相同省区");
+                                        throw new ProcessException("机构/标准一代的省区只能为相同省区");
+                                    }
+                                }
+                            }else if(hashSetDocDistrict.size()>1 || hashSetocPro.size()>1){
+                                logger.info("请联系市场部统一更改后再开通业务或修改业务");
+                                throw new ProcessException("请联系市场部统一更改后再开通业务或修改业务");
+                            }
+                         }
+                    }
+                }else{
+                    if(StringUtils.isBlank(item.getAgDocDistrict()) || StringUtils.isBlank(item.getAgDocPro())){
+                        logger.info("请填写大区或者省区");
+                        throw new ProcessException("请填写大区或者省区");
+                    }
                 }
-
             }
             List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByAgenId(agent.getId());
             String json = JsonUtil.objectToJson(agentBusInfos);
