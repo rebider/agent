@@ -115,7 +115,11 @@ public class ImsTermAdjustDetailServiceImpl implements ImsTermAdjustDetailServic
             imsTermWarehouseDetail.setCreatePerson(ZHYY_CREATE_PERSON);
             imsTermWarehouseDetail.setUpdateTime(createTime);
             imsTermWarehouseDetail.setPayStatus("1");  //支付状态 0 已付 1 未付
-            imsTermWarehouseDetail.setDeliveryTime(DateUtil.formatDay(new Date()));
+            if(oLogistics.getSendDate()!=null) {
+                imsTermWarehouseDetail.setDeliveryTime(DateUtil.formatDay(oLogistics.getSendDate()));
+            }else{
+                imsTermWarehouseDetail.setDeliveryTime(DateUtil.formatDay(new Date()));
+            }
             int k = imsTermWarehouseDetailMapper.updateByPrimaryKeySelective(imsTermWarehouseDetail);
             log.info("同步POS调整更新库存明细返回结果:{}",k);
             if(k!=1){

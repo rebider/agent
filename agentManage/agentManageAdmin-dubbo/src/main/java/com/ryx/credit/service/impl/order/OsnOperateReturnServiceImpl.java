@@ -257,7 +257,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateReturnService {
                         } else if (null != sendInfoRet.get("status") && "1".equals(sendInfoRet.get("status"))) {
                             //成功，更新物流明细
                             while (logisticsDetails.size() > 0) {
-                                if (!osnOperateReturnService.updateDetailBatch(logisticsDetails, new BigDecimal(batch), LogisticsDetailSendStatus.send_ing.code))
+                                if (!osnOperateReturnService.updateDetailBatch(logisticsDetails, new BigDecimal(batch), LogisticsDetailSendStatus.send_success.code))
                                     throw new Exception("明细更新失败（下发成功）");
                                 //调用接口发送到业务系统，如果接口返回异常，更新物流明细发送失败，不在进行发送
                                 logisticsDetails = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
