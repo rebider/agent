@@ -35,6 +35,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -771,6 +772,7 @@ public class AgentServiceImpl implements AgentService {
         AgentExample.Criteria criteria1 = agentExample.createCriteria();
         criteria1.andStatusEqualTo(Status.STATUS_1.status);
         criteria1.andAgBusLicEqualTo(lic);
+        criteria1.andAgStatusIn(Arrays.asList(AgStatus.Approving.name(),AgStatus.Approved.name()));
         List<Agent> agents = agentMapper.selectByExample(agentExample);
         if(agents.size()!=0) {
             return AgentResult.ok(agents.get(0).getId());
