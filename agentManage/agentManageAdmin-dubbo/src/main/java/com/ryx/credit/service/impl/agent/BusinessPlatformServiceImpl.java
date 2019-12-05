@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import sun.management.resources.agent;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -403,6 +404,47 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                         }
                     }
                 }
+
+                //判断标准一代、机构只能有一个业务对接省区
+                if(StringUtils.isNotBlank(item.getBusType()) && StringUtils.isNotBlank(item.getAgentId()) && StringUtils.isNotBlank(item.getAgDocPro()) &&StringUtils.isNotBlank(item.getAgDocDistrict())){
+
+                    if(item.getBusType().equals(BusType.JG.key) ||item.getBusType().equals(BusType.BZYD.key)){
+                        Map<String, String> hashMap = new HashMap<>();
+                        hashMap.put("agentId",item.getAgentId());
+                        hashMap.put("busType",BusType.JG.key);
+                        hashMap.put("busTypeOne",BusType.BZYD.key);
+                        List<AgentBusInfo> busInfoList = agentBusInfoMapper.queryBusinfo(hashMap);
+                        Set<String> hashSetDocDistrict = new HashSet<>();
+                        Set<String> hashSetocPro = new HashSet<>();
+                        if(null!=busInfoList && busInfoList.size()>0){
+                            for (AgentBusInfo busInfo : busInfoList) {
+                                hashSetocPro.add(busInfo.getAgDocPro());
+                                hashSetDocDistrict.add(busInfo.getAgDocDistrict());
+                            }
+                            if(hashSetDocDistrict.size()==1 || hashSetocPro.size()==1){
+                                //如果只有一个则进行更改大区省区
+                                AgentBusInfo agent_businfo = busInfoList.get(0);
+                                if(StringUtils.isNotBlank(agent_businfo.getAgDocPro()) && StringUtils.isNotBlank(agent_businfo.getAgDocDistrict())){
+                                    if(!agent_businfo.getAgDocPro().equals(item.getAgDocPro()) || !agent_businfo.getAgDocDistrict().equals(item.getAgDocDistrict())){
+                                        if(!agent_businfo.getId().equals(item.getId())){
+                                            logger.info("机构/标准一代省区必须一致，不能修改");
+                                            throw new ProcessException("机构/标准一代省区必须一致，不能修改");
+                                        }
+                                    }
+                                }
+                            }else if(hashSetDocDistrict.size()>1 || hashSetocPro.size()>1){
+                                logger.info("请联系市场部统一更改后再开通业务或修改业务");
+                                throw new ProcessException("请联系市场部统一更改后再开通业务或修改业务");
+                            }
+                        }
+                    }
+                }else{
+                    if(StringUtils.isBlank(item.getAgDocDistrict()) || StringUtils.isBlank(item.getAgDocPro())){
+                        logger.info("请填写大区或者省区");
+                        throw new ProcessException("请填写大区或者省区");
+                    }
+                }
+
                 //激活返现代理商为空默认自己
                 if (StringUtils.isBlank(item.getBusActivationParent())) {
                     item.setBusActivationParent(item.getId());
@@ -538,8 +580,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                         busInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
                         busInfo.setVersion(busInfo.getVersion());
                         if(1!=agentBusInfoMapper.updateByPrimaryKey(busInfo)){
-                            logger.info("业务修改省区更新失败");
-                            throw new MessageException("业务修改省区更新失败");
+                            logger.info("业务修改大区省区更新失败");
+                            throw new MessageException("业务修改大区省区更新失败");
                         }
                     }
                 }
