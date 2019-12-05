@@ -1265,6 +1265,11 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         return platFormMapper.selectByExample(example);
     }
 
+    @Override
+    public List<AgentBusInfo> queryBusinfo(Map hashMap) {
+        return agentBusInfoMapper.queryBusinfo(hashMap);
+    }
+
     /**
      * 根据登陆账号查询是否存在，存在查询跟agentid是否相符
      * @param busLoginNum
