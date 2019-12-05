@@ -729,7 +729,7 @@ public class TranDataJob {
         String url = AppConfig.getProperty("old_brand_ss_url");
         String tranMonth= new SimpleDateFormat("yyyyMM").format(tranMon);
         JSONObject object=new JSONObject();
-        object.put("tradeTime","201909");
+        object.put("tradeTime",tranMonth);
         String res = HttpClientUtil.doPostJson(url,object.toJSONString());
         LOG.info("手刷老品牌分润数据查询接口查询返回参数：{}",res);
         JSONObject result = JSONObject.parseObject(res);
