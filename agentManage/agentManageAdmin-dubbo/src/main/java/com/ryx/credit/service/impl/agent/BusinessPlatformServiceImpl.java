@@ -484,17 +484,26 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
                 //校验业务编码是否存在
                 if (StringUtils.isNotBlank(agentBusInfoVo.getBusNum())) {
-                    if (StringUtils.isNotBlank(agentBusInfo.getBusNum())) {
-                        if (!agentBusInfo.getBusNum().equals(agentBusInfoVo.getBusNum())) {
-                            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
-                            agentBusInfoExample.createCriteria()
-                                    .andStatusEqualTo(Status.STATUS_1.status)
-                                    .andBusNumEqualTo(agentBusInfoVo.getBusNum());
-                            List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
-                            if (agentBusInfoList.size() > 0) {
-                                throw new MessageException("业务平台编码已存在！");
-                            }
-                        }
+                    AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+                    agentBusInfoExample.createCriteria()
+                            .andStatusEqualTo(Status.STATUS_1.status)
+                            .andBusNumEqualTo(agentBusInfoVo.getBusNum())
+                            .andIdNotEqualTo(agentBusInfo.getId());
+                    List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+                    if (agentBusInfoList.size() > 0) {
+                        throw new MessageException("业务平台编码已存在！");
+                    }
+                }
+                //校验智慧POS登录账号是否存在
+                if (StringUtils.isNotBlank(agentBusInfoVo.getPosPlatCode())) {
+                    AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+                    agentBusInfoExample.createCriteria()
+                            .andStatusEqualTo(Status.STATUS_1.status)
+                            .andPosPlatCodeEqualTo(agentBusInfoVo.getPosPlatCode())
+                            .andIdNotEqualTo(agentBusInfo.getId());
+                    List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+                    if (agentBusInfoList.size() > 0) {
+                        throw new MessageException("智慧POS登录账号已存在！");
                     }
                 }
                 //检查业务平台数据
