@@ -587,7 +587,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     }
                 }
                 //更新值
-//                agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
                 agentBusInfo.setBusType(agentBusInfoVo.getBusType());
                 agentBusInfo.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
                 agentBusInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
@@ -601,7 +601,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 agentBusInfo.setBusParent(agentBusInfoVo.getBusParent());
                 if(StringUtils.isNotBlank(agentBusInfoVo.getOrganNum()))
                  agentBusInfo.setOrganNum(agentBusInfoVo.getOrganNum());
-                agentBusInfo.setVersion(agentBusInfo.getVersion().add(new BigDecimal(1)));
+                agentBusInfo.setVersion(agentBusInfo.getVersion());
                 agentBusInfo.setBusUseOrgan(agentBusInfoVo.getBusUseOrgan());
                 agentBusInfo.setBusScope(agentBusInfoVo.getBusScope());
                 int updateAgentBusinfo = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
