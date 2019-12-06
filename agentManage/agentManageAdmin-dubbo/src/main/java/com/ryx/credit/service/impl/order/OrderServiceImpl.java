@@ -5394,6 +5394,13 @@ public class OrderServiceImpl implements OrderService {
         return orderAdjMapper.updateByPrimaryKeySelective(orderAdj)==1?AgentResult.ok():AgentResult.fail();
     }
 
+    @Override
+    public Map<String, Object> saveProAmo(String adjId, String proAmount) {
+        OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(adjId);
+        orderAdj.setRealRefundAmo(orderAdj.getRefundAmount().subtract(new BigDecimal(proAmount)));
+        return null;
+    }
+
     public void updatePaymentDetail(OPaymentDetail updateOPaymentDetail, String srcId, String srcType) throws ProcessException {
         updateOPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
         updateOPaymentDetail.setRealPayAmount(updateOPaymentDetail.getPayAmount());
@@ -5477,4 +5484,5 @@ public class OrderServiceImpl implements OrderService {
             throw new ProcessException("插入抵扣付款明细失败srcId={" + srcId + "},srcType{" + srcType + "}");
         }
     }
+
 }

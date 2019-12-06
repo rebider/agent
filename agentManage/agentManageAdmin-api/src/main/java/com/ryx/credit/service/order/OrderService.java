@@ -326,5 +326,5 @@ public interface OrderService {
 
     AgentResult approvalTaskSettle(OrderAdj orderAdj) throws ProcessException;
 
-
+    Map<String,Object> saveProAmo(String adjId,String proAmount);
 }
