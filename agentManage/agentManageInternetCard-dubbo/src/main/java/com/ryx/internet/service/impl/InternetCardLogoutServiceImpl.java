@@ -486,20 +486,21 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
         criteria.andRenewIdEqualTo(internetLogout.getId());
         List<InternetLogoutDetail> internetLogoutDetails = internetLogoutDetailMapper.selectByExample(internetLogoutDetailExample);
         for (InternetLogoutDetail internetLogoutDetail : internetLogoutDetails) {
+            OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(internetLogoutDetail.getIccidNum());
+            if(null==oInternetCard){
+                throw new MessageException("iccid不存在");
+            }
             if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
                 internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.SX.getValue());
+                oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
             }else if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
                 internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.DZX.getValue());
+                oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());
             }
             int j = internetLogoutDetailMapper.updateByPrimaryKeySelective(internetLogoutDetail);
             if(j!=1){
                 throw new MessageException("更新注销明细失败");
             }
-            OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(internetLogoutDetail.getIccidNum());
-            if(null==oInternetCard){
-                throw new MessageException("iccid不存在");
-            }
-            oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());
             int k = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
             if(k!=1){
                 throw new MessageException("更新物联网卡信息失败");
