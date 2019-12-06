@@ -419,10 +419,12 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 throw new MessageException("工作流处理任务异常");
             }
         } catch (MessageException e) {
+            log.info("申请注销审批出现异常,approvalTask方法1");
             AppConfig.sendEmails(MailUtil.printStackTrace(e), "申请注销审批出现异常,approvalTask方法1");
             e.printStackTrace();
             throw new MessageException(e.getMsg());
         } catch (Exception e) {
+            log.info("申请注销审批出现异常,approvalTask方法2");
             AppConfig.sendEmails(MailUtil.printStackTrace(e), "申请注销审批出现异常,approvalTask方法2");
             e.printStackTrace();
             throw new MessageException(e.getLocalizedMessage());
