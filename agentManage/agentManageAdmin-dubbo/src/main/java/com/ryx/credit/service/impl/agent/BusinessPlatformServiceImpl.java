@@ -423,12 +423,13 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                             }
                             if(hashSetDocDistrict.size()==1 || hashSetocPro.size()==1){
                                 //如果只有一个则进行更改大区省区
-                                AgentBusInfo agent_businfo = busInfoList.get(0);
-                                if(StringUtils.isNotBlank(agent_businfo.getAgDocPro()) && StringUtils.isNotBlank(agent_businfo.getAgDocDistrict())){
-                                    if(!agent_businfo.getAgDocPro().equals(item.getAgDocPro()) || !agent_businfo.getAgDocDistrict().equals(item.getAgDocDistrict())){
-                                        if(!agent_businfo.getId().equals(item.getId())){
-                                            logger.info("机构/标准一代省区必须一致，不能修改");
-                                            throw new ProcessException("机构/标准一代省区必须一致，不能修改");
+                                for (AgentBusInfo busInfo : busInfoList) {
+                                    if(StringUtils.isNotBlank(busInfo.getAgDocPro()) && StringUtils.isNotBlank(busInfo.getAgDocDistrict())){
+                                        if(!busInfo.getId().equals(item.getId())){
+                                            if(!busInfo.getAgDocPro().equals(item.getAgDocPro()) || !busInfo.getAgDocDistrict().equals(item.getAgDocDistrict())) {
+                                                logger.info("机构/标准一代省区必须一致，不能修改");
+                                                throw new ProcessException("机构/标准一代省区必须一致，不能修改");
+                                            }
                                         }
                                     }
                                 }
