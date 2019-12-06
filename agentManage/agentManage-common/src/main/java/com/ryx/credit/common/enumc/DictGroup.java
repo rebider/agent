@@ -100,7 +100,8 @@ public enum DictGroup {
     RSTATUS("销账状态"),
     RELATION_PLATFORM_NUM("平台关系"),
     ADJ_STAT("订单机具调整审批状态"),
-    REFUND_TYPE("退款类型");
+    REFUND_TYPE("退款类型"),
+    ORDER_ADJ_APR_BUSNISS("业务部订单调整审批参数");
 
     public String  msg;
 
