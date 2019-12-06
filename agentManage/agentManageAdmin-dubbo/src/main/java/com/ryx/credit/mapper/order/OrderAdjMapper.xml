@@ -29,6 +29,7 @@
     <result column="SETTLE_AMOUNT" jdbcType="DECIMAL" property="settleAmount" />
     <result column="REAL_REFUND_AMO" jdbcType="DECIMAL" property="realRefundAmo" />
     <result column="REFUND_METHOD" jdbcType="DECIMAL" property="refundMethod" />
+    <result column="PRO_REFUND_AMOUNT" jdbcType="DECIMAL" property="proRefundAmount" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -63,7 +64,7 @@
     ID, ORDER_ID, AGENT_ID, ADJ_USER_ID, ORG_O_AMO, ORG_INCENTIVE_AMO, ORG_PAY_AMO, O_AMO, 
     INCENTIVE_AMO, PAY_AMO, RESON, REFUND_AMOUNT, REFUND_TYPE, REFUND_STAT, ORG_PAYMENT_ID, 
     NEW_PAYMENT_ID, REVIEWS_STAT, REVIEWS_DATE, ADJ_TM, STATUS, VERSION, ORG_PLAN_NUM, 
-    STAGES_AMOUNT, REFUND_TM, SETTLE_AMOUNT, REAL_REFUND_AMO, REFUND_METHOD
+    STAGES_AMOUNT, REFUND_TM, SETTLE_AMOUNT, REAL_REFUND_AMO, REFUND_METHOD, PRO_REFUND_AMOUNT
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -102,8 +103,8 @@
       NEW_PAYMENT_ID, REVIEWS_STAT, REVIEWS_DATE, 
       ADJ_TM, STATUS, VERSION, 
       ORG_PLAN_NUM, STAGES_AMOUNT, REFUND_TM, 
-      SETTLE_AMOUNT, REAL_REFUND_AMO, REFUND_METHOD
-      )
+      SETTLE_AMOUNT, REAL_REFUND_AMO, REFUND_METHOD, 
+      PRO_REFUND_AMOUNT)
     values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
       #{adjUserId,jdbcType=VARCHAR}, #{orgOAmo,jdbcType=DECIMAL}, #{orgIncentiveAmo,jdbcType=DECIMAL}, 
       #{orgPayAmo,jdbcType=DECIMAL}, #{oAmo,jdbcType=DECIMAL}, #{incentiveAmo,jdbcType=DECIMAL}, 
@@ -112,8 +113,8 @@
       #{newPaymentId,jdbcType=VARCHAR}, #{reviewsStat,jdbcType=DECIMAL}, #{reviewsDate,jdbcType=TIMESTAMP}, 
       #{adjTm,jdbcType=TIMESTAMP}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, 
       #{orgPlanNum,jdbcType=DECIMAL}, #{stagesAmount,jdbcType=DECIMAL}, #{refundTm,jdbcType=TIMESTAMP}, 
-      #{settleAmount,jdbcType=DECIMAL}, #{realRefundAmo,jdbcType=DECIMAL}, #{refundMethod,jdbcType=DECIMAL}
-      )
+      #{settleAmount,jdbcType=DECIMAL}, #{realRefundAmo,jdbcType=DECIMAL}, #{refundMethod,jdbcType=DECIMAL}, 
+      #{proRefundAmount,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OrderAdj">
     insert into O_ORDER_ADJ
@@ -199,6 +200,9 @@
       <if test="refundMethod != null">
         REFUND_METHOD,
       </if>
+      <if test="proRefundAmount != null">
+        PRO_REFUND_AMOUNT,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -281,6 +285,9 @@
       </if>
       <if test="refundMethod != null">
         #{refundMethod,jdbcType=DECIMAL},
+      </if>
+      <if test="proRefundAmount != null">
+        #{proRefundAmount,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -371,6 +378,9 @@
       <if test="refundMethod != null">
         REFUND_METHOD = #{refundMethod,jdbcType=DECIMAL},
       </if>
+      <if test="proRefundAmount != null">
+        PRO_REFUND_AMOUNT = #{proRefundAmount,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -401,7 +411,8 @@
       REFUND_TM = #{refundTm,jdbcType=TIMESTAMP},
       SETTLE_AMOUNT = #{settleAmount,jdbcType=DECIMAL},
       REAL_REFUND_AMO = #{realRefundAmo,jdbcType=DECIMAL},
-      REFUND_METHOD = #{refundMethod,jdbcType=DECIMAL}
+      REFUND_METHOD = #{refundMethod,jdbcType=DECIMAL},
+      PRO_REFUND_AMOUNT = #{proRefundAmount,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

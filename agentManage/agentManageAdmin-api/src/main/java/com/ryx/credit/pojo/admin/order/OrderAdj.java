@@ -59,6 +59,8 @@ public class OrderAdj implements Serializable {
 
     private BigDecimal refundMethod;
 
+    private BigDecimal proRefundAmount;
+
     public String getId() {
         return id;
     }
@@ -273,5 +275,13 @@ public class OrderAdj implements Serializable {
 
     public void setRefundMethod(BigDecimal refundMethod) {
         this.refundMethod = refundMethod;
+    }
+
+    public BigDecimal getProRefundAmount() {
+        return proRefundAmount;
+    }
+
+    public void setProRefundAmount(BigDecimal proRefundAmount) {
+        this.proRefundAmount = proRefundAmount;
     }
 }

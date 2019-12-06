@@ -1826,6 +1826,66 @@ public class OrderAdjExample {
             addCriterion("REFUND_METHOD not between", value1, value2, "refundMethod");
             return (Criteria) this;
         }
+
+        public Criteria andProRefundAmountIsNull() {
+            addCriterion("PRO_REFUND_AMOUNT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProRefundAmountIsNotNull() {
+            addCriterion("PRO_REFUND_AMOUNT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProRefundAmountEqualTo(BigDecimal value) {
+            addCriterion("PRO_REFUND_AMOUNT =", value, "proRefundAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andProRefundAmountNotEqualTo(BigDecimal value) {
+            addCriterion("PRO_REFUND_AMOUNT <>", value, "proRefundAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andProRefundAmountGreaterThan(BigDecimal value) {
+            addCriterion("PRO_REFUND_AMOUNT >", value, "proRefundAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andProRefundAmountGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("PRO_REFUND_AMOUNT >=", value, "proRefundAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andProRefundAmountLessThan(BigDecimal value) {
+            addCriterion("PRO_REFUND_AMOUNT <", value, "proRefundAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andProRefundAmountLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("PRO_REFUND_AMOUNT <=", value, "proRefundAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andProRefundAmountIn(List<BigDecimal> values) {
+            addCriterion("PRO_REFUND_AMOUNT in", values, "proRefundAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andProRefundAmountNotIn(List<BigDecimal> values) {
+            addCriterion("PRO_REFUND_AMOUNT not in", values, "proRefundAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andProRefundAmountBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PRO_REFUND_AMOUNT between", value1, value2, "proRefundAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andProRefundAmountNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PRO_REFUND_AMOUNT not between", value1, value2, "proRefundAmount");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
