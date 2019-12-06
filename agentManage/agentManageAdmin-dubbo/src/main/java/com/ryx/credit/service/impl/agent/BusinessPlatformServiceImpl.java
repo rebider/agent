@@ -421,7 +421,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                                 hashSetocPro.add(busInfo.getAgDocPro());
                                 hashSetDocDistrict.add(busInfo.getAgDocDistrict());
                             }
-                            if(hashSetDocDistrict.size()==1 || hashSetocPro.size()==1){
+                            if(hashSetDocDistrict.size()==1 && hashSetocPro.size()==1){
                                 //如果只有一个则进行更改大区省区
                                 for (AgentBusInfo busInfo : busInfoList) {
                                     if(StringUtils.isNotBlank(busInfo.getAgDocPro()) && StringUtils.isNotBlank(busInfo.getAgDocDistrict())){
