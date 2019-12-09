@@ -126,6 +126,8 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
         resultMap.put("lowDebitRate",agentBusInfo.getDebitRateLower());
         resultMap.put("lowCreditRate",agentBusInfo.getCreditRateFloor());
         resultMap.put("ceilingCreditRate",agentBusInfo.getCreditRateCeiling());
+        resultMap.put("topDebitRate",agentBusInfo.getDebitRateCapping());
+        resultMap.put("debitLow",agentBusInfo.getDebitCappingLower());
 
         resultMap.put("hasS0",agentBusInfo.getDredgeS0().equals(new BigDecimal(1))?"0":"1");
         resultMap.put("orgName",agent.getAgName());
@@ -159,6 +161,8 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
             organization = new Organization();
         }
         //组装参数
+        //组装参数
+        resultMap.put("brand",platForm.getBusplatform()); //品牌编号
         resultMap.put("brandName",platForm.getPlatformName());//平台名称
         resultMap.put("alwaysProfit","00");//该机构是否参与实时分润
         resultMap.put("agentId",organization.getOrgId());//机构ID
@@ -259,6 +263,7 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
                 data.put("supDorgId",paramMap.get("supDorgId"));
 
             //组装参数
+            data.put("brand",paramMap.get("brand")); //品牌编号
             data.put("brandName",paramMap.get("brandName"));//平台名称
             data.put("alwaysProfit",paramMap.get("alwaysProfit"));//该机构是否参与实时分润
             data.put("finaceRemitOrgan",paramMap.get("finaceRemitOrgan"));//财务出款机构
