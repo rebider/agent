@@ -344,10 +344,19 @@ public class CompensateServiceImpl implements CompensateService {
         try {
             if(PriceDiffType.DETAIN_AMT.code.equals(oRefundPriceDiff.getApplyCompType())){
                 if(refundPriceDiffFile.size()==0){
-                    return AgentResult.fail("代理商打款必须上传打款凭证，金额:"+oRefundPriceDiff.getApplyCompAmt());
+                    Boolean ispz = false;
+                    for (OCashReceivablesVo oCashReceivablesVo : oCashReceivablesVoList) {
+                        if(oCashReceivablesVo.getPayType().equals(PayType.YHHK.getValue())){
+                            ispz = true;
+                            break;
+                        }
+                    }
+                    //有一个下线下打款的就必须上传打款凭证
+                    if(ispz)
+                    return AgentResult.fail("代理商打款必须上传打款凭证");
                 }
                 if(oCashReceivablesVoList==null || oCashReceivablesVoList.size()==0){
-                    return AgentResult.fail("代理商打款必须填写打款记录，金额:"+oRefundPriceDiff.getApplyCompAmt());
+                    return AgentResult.fail("代理商打款必须填写打款记录");
                 }
             }
             String priceDiffId = idService.genId(TabId.o_Refund_price_diff);
@@ -862,6 +871,12 @@ public class CompensateServiceImpl implements CompensateService {
                 } else if(agentVo.getDeliveryTimeType().equals(DeliveryTimeType.ONE.getValue())){
                     if(StringUtils.isBlank(agentVo.getDelayDay())){
                         throw new ProcessException("请填写发货日期延期");
+                    }
+                }
+            }else{
+                if(StringUtils.isNotBlank(agentVo.getDeliveryTime()) || StringUtils.isNotBlank(agentVo.getDelayDay())){
+                    if(StringUtils.isBlank(agentVo.getDeliveryTimeType())) {
+                        throw new ProcessException("请选择发货类型");
                     }
                 }
             }

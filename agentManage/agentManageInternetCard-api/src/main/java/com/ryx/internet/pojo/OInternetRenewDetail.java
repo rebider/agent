@@ -57,6 +57,56 @@ public class OInternetRenewDetail implements Serializable {
 
     private BigDecimal theRealityAmt;
 
+    private String busNum;
+
+    private String busPlatform;
+
+    private String agDocDistrict;
+
+    private String agDocPro;
+
+    private String busContactPerson;
+
+    public String getBusNum() {
+        return busNum;
+    }
+
+    public void setBusNum(String busNum) {
+        this.busNum = busNum;
+    }
+
+    public String getBusPlatform() {
+        return busPlatform;
+    }
+
+    public void setBusPlatform(String busPlatform) {
+        this.busPlatform = busPlatform;
+    }
+
+    public String getAgDocDistrict() {
+        return agDocDistrict;
+    }
+
+    public void setAgDocDistrict(String agDocDistrict) {
+        this.agDocDistrict = agDocDistrict;
+    }
+
+    public String getAgDocPro() {
+        return agDocPro;
+    }
+
+    public void setAgDocPro(String agDocPro) {
+        this.agDocPro = agDocPro;
+    }
+
+    public String getBusContactPerson() {
+        return busContactPerson;
+    }
+
+    public void setBusContactPerson(String busContactPerson) {
+        this.busContactPerson = busContactPerson;
+    }
+
     public BigDecimal getTheRealityAmt() {
         return theRealityAmt;
     }
@@ -263,5 +313,37 @@ public class OInternetRenewDetail implements Serializable {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    @Override
+    public String toString() {
+        return "OInternetRenewDetail{" +
+                "id='" + id + '\'' +
+                ", renewId='" + renewId + '\'' +
+                ", iccidNum='" + iccidNum + '\'' +
+                ", orderId='" + orderId + '\'' +
+                ", snNum='" + snNum + '\'' +
+                ", internetCardNum='" + internetCardNum + '\'' +
+                ", openAccountTime=" + openAccountTime +
+                ", expireTime=" + expireTime +
+                ", merName='" + merName + '\'' +
+                ", merId='" + merId + '\'' +
+                ", agentId='" + agentId + '\'' +
+                ", agentName='" + agentName + '\'' +
+                ", renewWay='" + renewWay + '\'' +
+                ", offsetAmt=" + offsetAmt +
+                ", renewAmt=" + renewAmt +
+                ", oughtAmt=" + oughtAmt +
+                ", realityAmt=" + realityAmt +
+                ", renewStatus='" + renewStatus + '\'' +
+                ", status=" + status +
+                ", cTime=" + cTime +
+                ", uTime=" + uTime +
+                ", cUser='" + cUser + '\'' +
+                ", uUser='" + uUser + '\'' +
+                ", version=" + version +
+                ", renewWayName='" + renewWayName + '\'' +
+                ", theRealityAmt=" + theRealityAmt +
+                '}';
     }
 }

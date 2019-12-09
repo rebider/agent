@@ -16,6 +16,8 @@ import com.ryx.credit.dao.bank.DPosRegionMapper;
 import com.ryx.credit.dao.order.OrgPlatformMapper;
 import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.order.OrgPlatform;
+import com.ryx.credit.pojo.admin.order.OrgPlatformExample;
 import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
@@ -190,6 +192,22 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
         List delList = branchInnerMapper.selectInnerLogin(FastMap.fastMap("status", Status.STATUS_2.status).putKeyV("busId", agentBusInfo.getId()));
         resultMap.put("managerAccount", String.join(",", accList));
         resultMap.put("delManagerAccount", String.join(",", delList));
+
+        OrgPlatformExample orgPlatformExample = new OrgPlatformExample();
+        OrgPlatformExample.Criteria criteria = orgPlatformExample.createCriteria();
+        criteria.andOrgIdEqualTo(organization.getOrgId());
+        criteria.andPlatNumEqualTo(agentBusInfo.getBusPlatform());
+        List<OrgPlatform> orgPlatforms = orgPlatformMapper.selectByExample(orgPlatformExample);
+        OrgPlatform orgPlatform = new OrgPlatform();
+        if(orgPlatforms.size()!=0){
+            orgPlatform = orgPlatforms.get(0);
+        }
+        if(organization.getAgentId().equals(agent.getId()) && StringUtils.isBlank(orgPlatform.getPlatCode())){
+            resultMap.put("IsOper","1");
+        }else{
+            resultMap.put("IsOper","0");
+            resultMap.put("operOrgId",orgPlatform.getPlatCode());
+        }
         return resultMap;
     }
 
@@ -223,6 +241,8 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
             data.put("lowDebitRate",paramMap.get("lowDebitRate"));
             data.put("lowCreditRate",paramMap.get("lowCreditRate"));
             data.put("ceilingCreditRate",paramMap.get("ceilingCreditRate"));
+            data.put("topDebitRate",paramMap.get("topDebitRate"));
+            data.put("debitLow",paramMap.get("debitLow"));
 
             if(StringUtils.isNotBlank(String.valueOf(paramMap.get("orgId")))){
                 data.put("orgId",paramMap.get("orgId"));
@@ -269,6 +289,9 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
                 data.put("managerAccount",paramMap.get("managerAccount"));
             if (null != paramMap.get("delManagerAccount"))
                 data.put("delManagerAccount",paramMap.get("delManagerAccount"));
+            data.put("IsOper",paramMap.get("IsOper"));
+            data.put("operOrgId",paramMap.get("operOrgId"));
+
             jsonParams.put("data", data);
             String plainXML = jsonParams.toString();
             // 请求报文加密开始
@@ -507,10 +530,10 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
             if (null == upSingCheckMap.get("BUSNUM")) throw new Exception("上级代理商信息不存在，请联系管理员！！！");
 
             //查询是否升级完成，升级完成之后不允许再次升级
-           /* if (null == agentBusInfo.getBusNum()) throw new Exception("请填写业务平台编号！！！");
+            /*if (null == agentBusInfo.getBusNum()) throw new Exception("请填写业务平台编号！！！");
             if (null == agentBusInfo.getBusPlatform()) throw new Exception("业务平台数据异常！！！");
             int i = agentBusInfoMapper.selectByBusNum(FastMap.fastMap("busNum",agentBusInfo.getBusNum()).putKeyV("busPlatform", agentBusInfo.getBusPlatform()));
-            if (i > 0) throw new Exception("您已经有此平台暂存，或审批中的，或审批通过的业务信息，请核查。");*/
+            if (i > 0 || agentBusInfo.getBusNum().equals(agentBusInfo.getBusParent())) throw new Exception("您已经升级成功，请勿重复提交！");*/
 
             if (null == agentBusInfo.getBusLoginNum() || "".equals(agentBusInfo.getBusLoginNum()) || "null".equals(agentBusInfo.getBusLoginNum())) throw new Exception("代理商升级，需填写对应平台登录账号！");
 

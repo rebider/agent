@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.redis.RedisService;
-import com.ryx.credit.common.util.AppConfig;
-import com.ryx.credit.common.util.DateUtil;
-import com.ryx.credit.common.util.HttpClientUtil;
-import com.ryx.credit.common.util.JsonUtil;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AColinfoPaymentMapper;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
@@ -72,6 +69,7 @@ public class ColinfoTaskServiceImpl implements ColinfoTaskService {
             Map<String,Object> params = new HashMap<>();
             params.put("payStatus", ColinfoPayStatus.A.getValue());
             params.put("agStatus",AgStatus.Approved.name());
+            params.put("cloReviewStatus",AgStatus.Approved.status);
             List<Map<String, Object>> synList = agentColinfoMapper.synConinfo(params);
             if(null==synList){
                 log.info("synColinfoToPayment,synList is null");
@@ -107,27 +105,30 @@ public class ColinfoTaskServiceImpl implements ColinfoTaskService {
                 payment.setDatasource("13");  //收款账户同步清结算类型
                 AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
                 AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
-                criteria.andAgentIdEqualTo(String.valueOf(row.get("AGENT_ID")));
+                String agentId = String.valueOf(row.get("AGENT_ID"));
+                criteria.andAgentIdEqualTo(agentId);
                 criteria.andCloReviewStatusEqualTo(AgStatus.Approved.status);
                 List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
                 if(agentBusInfos==null){
-                    log.info("synColinfoToPayment,未分配打款公司,暂不出款");
-                    return;
+                    log.info("synColinfoToPayment,未分配打款公司,暂不出款,agentId：{}",agentId);
+                    continue;
                 }
                 if(agentBusInfos.size()==0){
-                    log.info("synColinfoToPayment,未分配打款公司,暂不出款");
-                    return;
+                    log.info("synColinfoToPayment,未分配打款公司,暂不出款,agentId：{}",agentId);
+                    continue;
                 }
                 payment.setAccountId(agentBusInfos.get(0).getCloPayCompany());  //出款
                 try {
                     agentColinfoService.insertByPayment(payment);
                 } catch (Exception e) {
                     log.info("synColinfoToPayment同步insert,merchId:{},异常:{}", payment.getMerchId(), e.getMessage());
+                    AppConfig.sendEmails("银行卡同步插入出款表出现异常：agentId:"+payment.getMerchId()+","+MailUtil.printStackTrace(e), "银行卡同步出现异常,synColinfoToPayment方法1");
                     e.printStackTrace();
                 }
             }
         } catch (Exception e) {
             log.error("synColinfoToPayment同步出现异常:{},代理商ID:{}",e,merchId);
+            AppConfig.sendEmails("银行卡同步插入出款表出现异常：agentId:"+merchId+","+MailUtil.printStackTrace(e), "银行卡同步出现异常,synColinfoToPayment方法2");
             e.printStackTrace();
         } finally {
             if(StringUtils.isNotBlank(indentifier)){
@@ -252,6 +253,7 @@ public class ColinfoTaskServiceImpl implements ColinfoTaskService {
                 }
             }
         } catch (Exception e) {
+            AppConfig.sendEmails("银行卡查询结果出现异常"+MailUtil.printStackTrace(e), "银行卡查询结果出现异常,synColinfoToQueryPayment方法");
             log.info("synColinfoToQueryPayment处理异常:{}",e.getMessage());
             e.printStackTrace();
         }finally {

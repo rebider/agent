@@ -64,6 +64,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     private static final String TEMPLATE_APPLY_CHECK = AppConfig.getProperty("template.apply.check");
     private static final String TEMPLATE_APPLY_CHECKNAME = AppConfig.getProperty("template.apply.checkName");
     private static final String TEMPLATE_CHECKPOSREWARD = AppConfig.getProperty("template.checkPOSReward");
+    private static final String TEMPLATE_DELAPPLY = AppConfig.getProperty("template.delApply");
 
     private static final String RJ_TEMPLATE_NOW = AppConfig.getProperty("rj.template.now"); // 获取现有模板
     private static final String RJ_TEMPLATE_APPLY = AppConfig.getProperty("rj.template.apply"); // 申请
@@ -74,8 +75,9 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
 
     private static final String RDB_TEMPLATE_NOW = AppConfig.getProperty("rdb.template.now");  // 现使用模板
     private static final String RDB_TEMPLATE_APPLY = AppConfig.getProperty("rdb.template.apply");  // 添加模板
-    private static final String RDB_TEMPLATE_UPDATE = AppConfig.getProperty("rdb.template.update"); // 修改信息
-    private static final String RDB_TEMPLATE_CHECKRESULT = AppConfig.getProperty("rdb.template.checkResult");  // 查询结果
+    private static final String RDB_TEMPLATE_APPLYINFO = AppConfig.getProperty("rdb.template.applyInfo"); // 修改信息
+    private static final String RDB_TEMPLATE_CHECKTEMPLATENAME = AppConfig.getProperty("rdb.template.checkTemplateName");  // 查询结果
+    private static final String RDB_TEMPLATE_CHECKRULEVALUE = AppConfig.getProperty("rdb.template.checkRuleValue");
     private static final String RDB_TEMPLATE_SETEFFECT = AppConfig.getProperty("rdb.template.setEffect"); // 获取申请模板的使用信息
 
     private static final String SS_TEMPLATE_NOW = AppConfig.getProperty("ss.template.now"); // 获取现有模板
@@ -179,14 +181,12 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         templateRecode.setId(idService.genId(TabId.P_TEMPLATE_APPLY_RECORD));
         try {
             if("RDBPOS".equals(busInfo.get("PLATFORM_TYPE"))){
-                map2.put("agencyId",map1.get("orgId"));
-                map2.put("taskId",templateRecode.getId());
-                saveRDBPOSApplyInfo(RDB_TEMPLATE_APPLY,map2);
-                templateRecode.setTemplateId(templateRecode.getId());
+                String id = saveRDBPOSApplyInfo(RDB_TEMPLATE_APPLY,map2).toString();
+                templateRecode.setTemplateId(id);
                 templateRecode.setTemplateName(map2.getString("mouldName"));
             }else if("RJPOS".equals(busInfo.get("PLATFORM_TYPE"))){
                 reactRJPOSApply(RJ_TEMPLATE_APPLY,map2.toJSONString(),templateRecode);
-            }else if("POS".equals(busInfo.get("PLATFORM_TYPE"))||"ZPOS".equals(busInfo.get("PLATFORM_TYPE"))||"ZHPOS".equals(busInfo.get("PLATFORM_TYPE"))){
+            }else if("POS".equals(busInfo.get("PLATFORM_TYPE"))||"ZHPOS".equals(busInfo.get("PLATFORM_TYPE"))){
                 // todo POS平台信息申请
                 result = HttpClientUtil.doPostJson(TEMPLATE_APPLY, map2.toJSONString());
                 Map<String,Object> resultMap = JSONObject.parseObject(result);
@@ -222,16 +222,64 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         String proceId = null;
 
         List<Dict> actlist = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.PROFIT_TEMPLATE_APPLY.name());
-        String workId = null;
+       /* String workId = null;
         for (Dict dict : actlist) {
             workId = dict.getdItemvalue();
         }
         if(StringUtils.isEmpty(workId)) {
             logger.info("========用户{}启动数据修改申请{}{}","审批流启动失败字典中未配置部署流程");
             throw new MessageException("审批流启动失败，未获取到数据字典配置部署流程!");
+        }*/
+
+        if ("POS".equals(busInfo.get("PLATFORM_TYPE")) || "ZHPOS".equals(busInfo.get("PLATFORM_TYPE")) || "ZPOS".equals(busInfo.get("PLATFORM_TYPE"))) {
+            JSONObject monthJSONObject = new JSONObject();
+            monthJSONObject.put("applyId", templateRecode.getTemplateId());
+            monthJSONObject.put("isStartMonth", "1");
+            String MonthCheckResult = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, monthJSONObject.toJSONString());
+            Map<String, Object> resultMapMonth = JSONObject.parseObject(MonthCheckResult);
+            Map<String,Object> objectMapMonth = (Map<String,Object>)resultMapMonth.get("data");
+            if ("0".equals(objectMapMonth.get("isExist").toString())) {
+                    String oldStart = ((Map<String, String>) map2.get("applyTemplate")).get("startMonth");
+                    Calendar calendar = Calendar.getInstance();
+                    String nowMonth = new SimpleDateFormat("yyyyMM").format(calendar.getTime());
+                    String day = new SimpleDateFormat("dd").format(calendar.getTime());
+                    calendar.add(Calendar.MONTH, -1);
+                    String lastMonth = new SimpleDateFormat("yyyyMM").format(calendar.getTime());
+                    if (Integer.parseInt(day) < 10) {
+                        if (Integer.parseInt(oldStart) < Integer.parseInt(lastMonth)) {
+                            throw new MessageException("10号前分配模板，开始时间不能小于上月");
+                        }
+                    } else {
+                        if (Integer.parseInt(oldStart) < Integer.parseInt(nowMonth)) {
+                            throw new MessageException("10号后分配模板，开始时间不能小于本月");
+                        }
+                    }
+            }
+            if ("beijing".equals(startPar.get("party").toString())) {
+                try {
+                    JSONObject mapJSONObject = new JSONObject();
+                    mapJSONObject.put("applyId",templateRecode.getTemplateId());
+                    mapJSONObject.put("isStartMonth","1");
+                    String CheckResult = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, mapJSONObject.toJSONString());
+                    Map<String,Object> resultMap = JSONObject.parseObject(CheckResult);
+
+                    Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
+
+                    if(objectMap.get("isExist").toString().equals("1")&&map2.get("applyRewardRule")!=null&&((Map<String,String>)map2.get("applyRewardRule")).get("rewardType").equals("1")){
+                        startPar.put("party","manager");
+                    }else {
+                        startPar.put("party","beijing");
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+
+                }
+            }
         }
+
+
         try{
-            proceId = activityService.createDeloyFlow(null, workId, null, null, startPar);
+            proceId = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("agent_zg_template"), null, null, startPar);
             if (proceId == null) {
                 TemplateRecodeExample pExample = new TemplateRecodeExample();
                 pExample.createCriteria().andIdEqualTo(templateRecode.getId());
@@ -242,6 +290,15 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             TemplateRecodeExample pExample = new TemplateRecodeExample();
             pExample.createCriteria().andIdEqualTo(templateRecode.getId());
             recodeMapper.deleteByExample(pExample);
+            try {
+                JSONObject map = new JSONObject();
+                map.put("applyId",templateRecode.getTemplateId());
+                String  resultde = HttpClientUtil.doPostJson(TEMPLATE_DELAPPLY, map.toJSONString());
+                Map<String,Object> resultMap = JSONObject.parseObject(resultde);
+            }catch (Exception e1){
+                e1.printStackTrace();
+
+            }
             throw new MessageException("分润模板线上申请审批流启动失败!");
         }
         BusActRel record = new BusActRel();
@@ -273,6 +330,12 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         templateRecode.setApplyResult("1"); // 申请中
         recodeMapper.updateByPrimaryKeySelective(templateRecode);
     }
+
+
+
+
+
+
 
     /**
      * 联动RJPOS保存申请信息
@@ -354,6 +417,28 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     }
 
 
+    @Override
+    public String downDept(TemplateRecode recode){
+        try {
+            JSONObject mapJSONObject = new JSONObject();
+            mapJSONObject.put("applyId",recode.getTemplateId());
+            mapJSONObject.put("isStartMonth","1");
+            String CheckResult = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, mapJSONObject.toJSONString());
+            Map<String,Object> resultMap = JSONObject.parseObject(CheckResult);
+            Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
+            Map<String, Object> map = getTemplateApplyDetail(recode.getTemplateId());
+            Map<String, Object> dataMap = (Map<String, Object>) map.get("data");
+            if(objectMap.get("isExist").toString().equals("1")&&dataMap.get("applyRewardRule")!=null&&((Map<String,String>)dataMap.get("applyRewardRule")).get("rewardType").equals("1")){
+               return "yuhua";
+            }
+        }catch (Exception e){
+            logger.info("大区获取下级审批部门失败");
+            e.printStackTrace();
+
+        }
+        return "busness";
+    }
+
     /**
      * 审批流任务处理
      * @param agentVo
@@ -362,20 +447,28 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
      * @throws ProcessException
      */
     @Override
-    public AgentResult approvalTask(AgentVo agentVo, String userId) throws ProcessException {
+    public AgentResult approvalTask(AgentVo agentVo, String userId, Map<String,String> downDeptMap) throws ProcessException {
         logger.info("审批对象：{}", JSONObject.toJSON(agentVo));
 
         AgentResult result = new AgentResult(500, "系统异常", "");
         Map<String, Object> reqMap = new HashMap<>();
 
-        if(StringUtils.isNotBlank(agentVo.getOrderAprDept())){
-            reqMap.put("dept", agentVo.getOrderAprDept());
-        }
-        //通过
-        if(Objects.equals("pass",agentVo.getApprovalResult())
-                && StringUtils.isBlank(agentVo.getOrderAprDept())){
-           // reqMap.put("dept", "finish");
-            reqMap.put("dept", "");
+        if(downDeptMap==null||downDeptMap.size()==0){
+            if(StringUtils.isNotBlank(agentVo.getOrderAprDept())){
+                reqMap.put("dept", agentVo.getOrderAprDept());
+            }
+            //通过
+            if(Objects.equals("pass",agentVo.getApprovalResult())
+                    && StringUtils.isBlank(agentVo.getOrderAprDept())){
+                // reqMap.put("dept", "finish");
+                reqMap.put("dept", "");
+            }
+        }else{
+            if("1".equals(downDeptMap.get("daqv")) && downDeptMap.get("downDept")==null){
+                reqMap.put("dept", "busness");
+            }else {
+                reqMap.put("dept", downDeptMap.get("downDept"));
+            }
         }
         // if("reject".equals(agentVo.getApprovalResult())
         //        && StringUtils.isBlank(agentVo.getOrderAprDept())){
@@ -429,16 +522,14 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         try {
             String busPlatform = map1.get("busPlatform");
             if("RDBPOS".equals(platformType)){
-                String taskId = idService.genId(TabId.P_TEMPLATE_APPLY_RECORD);
-                map2.put("agencyId",recode.getBusNum());
-                map2.put("taskId",taskId);
-                recode.setTemplateId(taskId);
-                saveRDBPOSApplyInfo(RDB_TEMPLATE_UPDATE,map2);
+               String id =  saveRDBPOSApplyInfo(RDB_TEMPLATE_APPLY,map2).toString();
+               recode.setTemplateId(id);
+               recode.setTemplateName(map2.getString("mouldName"));
             }else if("RJPOS".equals(platformType)){
                 map2.put("applyId",recode.getTemplateId());
                 map2.put("orgId",recode.getBusNum());
                 reactRJPOSApply(RJ_TEMPLATE_APPLY,map2.toJSONString(),recode);
-            }else if("POS".equals(platformType)||"ZPOS".equals(platformType)||"ZHPOS".equals(platformType)){
+            }else if("POS".equals(platformType)||"ZHPOS".equals(platformType)||"ZPOS".equals(platformType)){
                 // todo POS平台信息修改
                 result = HttpClientUtil.doPostJson(TEMPLATE_APPLY, map2.toJSONString());
                 Map<String,Object> resultMap = JSONObject.parseObject(result);
@@ -498,6 +589,20 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                    // }
                 }else{
                     templateRecode.setApplyResult("3"); // 撤销
+                    try {
+                        JSONObject map = new JSONObject();
+                        map.put("applyId",templateRecode.getTemplateId());
+                        String  result = HttpClientUtil.doPostJson(TEMPLATE_DELAPPLY, map.toJSONString());
+                        Map<String,Object> resultMap = JSONObject.parseObject(result);
+                        if(!(boolean)resultMap.get("result")) {
+                            logger.info("***********修改删除综管数据失败，***********");
+                            throw new MessageException(resultMap.get("msg").toString());
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        recodeMapper.updateByPrimaryKeySelective(templateRecode);
+
+                    }
                 }
                 recodeMapper.updateByPrimaryKeySelective(templateRecode);
 
@@ -529,9 +634,12 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         JSONObject map2 = new JSONObject();
         map2.put("applyId",templateRecode.getTemplateId());
         try{
-            if("RJPOS".equals(stringMap.get("PLATFORM_TYPE"))){ // 瑞+
+            if("RDBPOS".equals(stringMap.get("PLATFORM_TYPE"))){
+                assignRDBTemplate(templateRecode.getId());
+                return null;
+            }else if("RJPOS".equals(stringMap.get("PLATFORM_TYPE"))){ // 瑞+
                 result = HttpClientUtil.doPostJson(RJ_TEMPLATE_APPLY_PASS, map2.toJSONString());
-            }else if("POS".equals(stringMap.get("PLATFORM_TYPE"))||"ZPOS".equals(stringMap.get("PLATFORM_TYPE"))||"ZHPOS".equals(stringMap.get("PLATFORM_TYPE"))){
+            }else if("POS".equals(stringMap.get("PLATFORM_TYPE"))||"ZHPOS".equals(stringMap.get("PLATFORM_TYPE"))||"ZPOS".equals(stringMap.get("PLATFORM_TYPE"))){
                 result = HttpClientUtil.doPostJson(TEMPLATE_APPLY_PASS, map2.toJSONString());
             }else if("SSPOS".equals(stringMap.get("PLATFORM_TYPE"))){
                 result = HttpClientUtil.doPostJson(SS_TEMPLATE_APPLY_PASS, map2.toJSONString());
@@ -581,7 +689,9 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
      */
     @Override
     public Map<String,Object> checkTemplate(String applyId)throws MessageException{
+
         TemplateRecode templateRecode = recodeMapper.selectByPrimaryKey(applyId);
+
         if(templateRecode == null){
             throw new MessageException("查询该模板申请信息失败，请联系管理员");
         }
@@ -590,9 +700,22 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             String result = null;
             JSONObject map2 = new JSONObject();
             map2.put("applyId",templateRecode.getTemplateId());
-            if("RJPOS".equals(stringMap.get("PLATFORM_TYPE"))){ // 瑞+
+            if("RDBPOS".equals(stringMap.get("PLATFORM_TYPE"))){
+                return checkRDBTemplateInfo(templateRecode.getBusNum(),templateRecode.getTemplateId());
+            }else if("RJPOS".equals(stringMap.get("PLATFORM_TYPE"))){ // 瑞+
                 result = HttpClientUtil.doPostJson(RJ_TEMPLATE_APPLY_CHECK, map2.toJSONString());
-            }else if("POS".equals(stringMap.get("PLATFORM_TYPE"))||"ZPOS".equals(stringMap.get("PLATFORM_TYPE"))||"ZHPOS".equals(stringMap.get("PLATFORM_TYPE"))){
+            }else if("POS".equals(stringMap.get("PLATFORM_TYPE"))||"ZHPOS".equals(stringMap.get("PLATFORM_TYPE"))||"ZPOS".equals(stringMap.get("PLATFORM_TYPE"))){
+                JSONObject mapJSONObject = new JSONObject();
+                mapJSONObject.put("applyId",templateRecode.getTemplateId());
+                mapJSONObject.put("isStartMonth","1");
+                String CheckResult = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, mapJSONObject.toJSONString());
+                Map<String,Object> resultM = JSONObject.parseObject(CheckResult);
+
+                Map<String,Object> objectM = (Map<String,Object>)resultM.get("data");
+
+                if(objectM.get("isExist").toString().equals("1")){
+                    map2.put("isStartMonth",1);
+                }
                 result = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, map2.toJSONString());
             }else if("SSPOS".equals(stringMap.get("PLATFORM_TYPE"))){//实时分润
                 result = HttpClientUtil.doPostJson(SS_TEMPLATE_APPLY_CHECK, map2.toJSONString());
@@ -621,6 +744,8 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     @Override
     public Object checkTempalteName(String applyId)throws MessageException{
         TemplateRecode templateRecode = recodeMapper.selectByPrimaryKey(applyId);
+
+
         if(templateRecode == null){
             throw new MessageException("查询该模板申请信息失败，请联系管理员");
         }
@@ -629,9 +754,21 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             String result = null;
             JSONObject map2 = new JSONObject();
             map2.put("applyId",templateRecode.getTemplateId());
-            if("RJPOS".equals(stringMap.get("PLATFORM_TYPE"))){ // 瑞+
+            if("RDBPOS".equals(stringMap.get("PLATFORM_TYPE"))){
+               return checkRDBTemplateName(templateRecode.getBusNum(),templateRecode.getTemplateName());
+            } else if("RJPOS".equals(stringMap.get("PLATFORM_TYPE"))){ // 瑞+
                 result = HttpClientUtil.doPostJson(RJ_TEMPLATE_APPLY_CHECKNAME, map2.toJSONString());
             }else if("POS".equals(stringMap.get("PLATFORM_TYPE"))||"ZHPOS".equals(stringMap.get("PLATFORM_TYPE"))||"ZPOS".equals(stringMap.get("PLATFORM_TYPE"))){
+                JSONObject mapJSONObject = new JSONObject();
+                mapJSONObject.put("applyId",templateRecode.getTemplateId());
+                mapJSONObject.put("isStartMonth","1");
+                String CheckResult = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, mapJSONObject.toJSONString());
+                Map<String,Object> resultM = JSONObject.parseObject(CheckResult);
+                Map<String,Object> objectM = (Map<String,Object>)resultM.get("data");
+
+                if(objectM.get("isExist").toString().equals("1")){
+                    return true;
+                }
                 result = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECKNAME, map2.toJSONString());
             }else if ("SSPOS".equals(stringMap.get("PLATFORM_TYPE"))){
                 result = HttpClientUtil.doPostJson(SS_TEMPLATE_APPLY_CHECKNAME, map2.toJSONString());
@@ -784,26 +921,14 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         }
     }
 
-    private void saveRDBPOSApplyInfo(String url,JSONObject jsonObject) throws MessageException{
+    private Object saveRDBPOSApplyInfo(String url,JSONObject jsonObject) throws MessageException{
         try{
             String result =  HttpClientUtil.doPostJson(url, jsonObject.toJSONString());
             if(!"0000".equals(JSONObject.parseObject(result).get("code"))){
                 throw new MessageException(JSONObject.parseObject(result).getString("msg"));
-            }
-            JSONObject map = new JSONObject();
-            map.put("taskId",jsonObject.getString("taskId"));
-            map.put("agencyId",jsonObject.getString("agencyId"));
-            // 获取数据处理结果
-            while (true){
-                String result01 =  HttpClientUtil.doPostJson(RDB_TEMPLATE_CHECKRESULT, map.toJSONString());
-                if("0000".equals(JSONObject.parseObject(result01).get("code"))){
-                    break;
-                }else if("9999".equals(JSONObject.parseObject(result01).get("code"))){
-                    throw new MessageException(JSONObject.parseObject(result01).getString("msg"));
-                }else if("1000".equals(JSONObject.parseObject(result01).get("code"))){
-                    continue;
-                }
-                Thread.sleep(2000);
+            }else {
+                Map<String,Object> resultMap = (Map<String,Object>)JSONObject.parseObject(result).get("result");
+                return resultMap.get("id");
             }
         }catch (MessageException e){
             e.printStackTrace();
@@ -843,10 +968,8 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     public Map<String, Object> getRDBTemplateApplyInfo(String agencyId, String taskId,String taskType) throws MessageException {
         try {
             JSONObject map = new JSONObject();
-            map.put("agencyId",agencyId);
-            map.put("taskId",taskId);
-            map.put("taskType",taskType);
-            String result =  HttpClientUtil.doPostJson(RDB_TEMPLATE_CHECKRESULT, map.toJSONString());
+            map.put("id",taskId);
+            String result =  HttpClientUtil.doPostJson(RDB_TEMPLATE_APPLYINFO, map.toJSONString());
             if(!"0000".equals(JSONObject.parseObject(result).get("code"))){
                 throw new MessageException(JSONObject.parseObject(result).get("msg").toString());
             }
@@ -869,9 +992,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         logger.info("瑞大宝模板分配联动。。。。。");
         TemplateRecode recode = recodeMapper.selectByPrimaryKey(id);
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("agencyId",recode.getBusNum());
-        jsonObject.put("taskId",recode.getTemplateId());
-        jsonObject.put("auditDate",new SimpleDateFormat("yyyyMMdd").format(new Date()));
+        jsonObject.put("id",recode.getTemplateId());
         String result =  HttpClientUtil.doPostJson(RDB_TEMPLATE_SETEFFECT, jsonObject.toJSONString());
         if(!"0000".equals(JSONObject.parseObject(result).get("code"))){
             throw new MessageException(JSONObject.parseObject(result).get("msg").toString());
@@ -898,4 +1019,42 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         return "1";
 
     }
+
+
+    private boolean checkRDBTemplateName(String agencyId,String templateName)throws MessageException{
+        JSONObject map = new JSONObject();
+        map.put("agencyId",agencyId);
+        map.put("mouldName",templateName);
+        if(StringUtils.isBlank(templateName)){
+            throw new MessageException("模板名称不能为空！");
+        }
+        String result = HttpClientUtil.doPostJson(RDB_TEMPLATE_CHECKTEMPLATENAME, map.toJSONString());
+        if("0000".equals(JSONObject.parseObject(result).getString("code"))){
+            return true;
+        }else if("0001".equals(JSONObject.parseObject(result).getString("code"))) {
+            return false;
+        }else {
+            throw new MessageException(JSONObject.parseObject(result).getString("msg"));
+        }
+    }
+
+    private Map<String,Object> checkRDBTemplateInfo(String agencyId,String id) throws MessageException{
+        Map<String,Object> objectMap = new HashMap<String,Object>();
+        JSONObject map = new JSONObject();
+        map.put("agencyId",agencyId);
+        map.put("id",id);
+        String result = HttpClientUtil.doPostJson(RDB_TEMPLATE_CHECKRULEVALUE, map.toJSONString());
+        if("0000".equals(JSONObject.parseObject(result).getString("code"))){
+            objectMap.put("isExist","0");
+        }else if("0001".equals(JSONObject.parseObject(result).getString("code"))) {
+            objectMap.put("isExist","1");
+            Map<String,Object> resultMap = (Map<String,Object>)JSONObject.parseObject(result).get("result");
+            objectMap.put("templateName",resultMap.get("mouldName"));
+        }else {
+            throw new MessageException(JSONObject.parseObject(result).getString("msg"));
+        }
+        return objectMap;
+    }
+
+
 }

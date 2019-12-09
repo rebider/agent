@@ -25,4 +25,8 @@ public interface InternetRenewOffsetDetailMapper {
 
     List<Map<String,Object>> queryMonthSumOffsetAmt(Map<String,Object> reqMap);
 
+    List<InternetRenewOffsetDetail> internetRenewOffsetDetailList(InternetRenewOffsetDetailExample example);
+
+    int internetRenewOffsetDetailCount(InternetRenewOffsetDetailExample example);
+
 }

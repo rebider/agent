@@ -5,24 +5,20 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.ryx.credit.common.util.FastMap;
-import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.BeanUtils;
-import com.ryx.credit.commons.utils.JsonUtils;
 import com.ryx.credit.commons.utils.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.CUserMapper;
 import com.ryx.credit.dao.CUserRoleMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
-import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.CUserRole;
-import com.ryx.credit.pojo.admin.agent.Agent;
-import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.vo.UserVo;
 import com.ryx.credit.service.IBranchInnerConnectionService;
 import com.ryx.credit.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,9 +74,13 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
         //建立内管账号
         if (null != innerParam.get("innerType") && "true".equals(innerParam.get("innerType"))) {
             try {
+                //联动内管
                 Map<String, Object> retMap = branchInnerConnectionService.buildInnerAccout(userVo, FastMap.fastMap("innerPwd",innerParam.get("innerPwd")));
-                if (!("1".equals(retMap.get("code"))))
+                if (!("1".equals(retMap.get("code")))){
                     throw new Exception(null != retMap.get("msg") ? (String) retMap.get("msg") : "内管添加账号失败！");
+                }
+                //建立本地账号
+                //branchInnerConnectionService.branchConnectionInner();
             } catch (Exception e) {
                 e.printStackTrace();
                 throw e;
@@ -189,9 +189,9 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
                     stringObjectMap.put("ppidorgcodeisRegion",true);
                 }else {
                     if("beijing".equals(ppidorgcode)){
-                        stringObjectMap.put("ppidisRegion",true);
+                        stringObjectMap.put("ppidorgcodeisRegion",true);
                     }else{
-                        stringObjectMap.put("ppidisRegion",false);
+                        stringObjectMap.put("ppidorgcodeisRegion",false);
                     }
                 }
             }
@@ -206,7 +206,7 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
 
     @Override
     @Transactional
-    public void copyUser(Long id){
+    public void copyUser(Long id) throws Exception {
         CUser cUser = userMapper.selectById(id);
         UserVo userVo = BeanUtils.copy(cUser, UserVo.class);
         List<CUserRole> cUserRoles = userRoleMapper.selectByUserId(id);
@@ -216,10 +216,6 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
         }
         userVo.setRoleIds(roleIds);
         userVo.setLoginName(userVo.getLoginName()+"1");
-        try {
-            insertByVo(userVo, new HashMap<>());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        insertByVo(userVo,new HashMap<>());
     }
 }

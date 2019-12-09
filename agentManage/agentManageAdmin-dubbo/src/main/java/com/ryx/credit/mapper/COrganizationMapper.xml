@@ -64,8 +64,8 @@
           left outer join c_organization b
             on a.id = b.pid
          where a.pid is null
-           and (a.code like 'region_%' or a.code like 'beijing%'/* or
-               a.code like 'agent' */or a.code like 'finance' or
+           and (a.code like 'region_%' or a.code like 'beijing%' or
+               a.code like 'jszx' or a.code like 'finance' or
                a.code like 'business' or a.code like 'market')
          order by pid asc
     </select>
@@ -164,19 +164,20 @@
     <select id="selectMaintainOrg" resultType="com.ryx.credit.pojo.admin.COrganization">
         select a.id, a.name
           from c_organization a
-         where (a.code like 'region_%' or a.code like 'beijing%' or
-               a.code like 'finance' or a.code like 'business' or
-               a.code like 'market')
+         where (a.code like 'region_%' or a.code like 'beijing%'
+               or a.code like 'jszx' or a.code like 'finance'
+               or a.code like 'business' or a.code like 'market')
          group by a.id, a.name
          order by id desc
     </select>
+
     <select id="selectBranchList" resultType="map">
         SELECT
             C.ID,C.NAME
         FROM
             C_ORGANIZATION C
         WHERE
-            regexp_like (C.CODE, 'region_[a-z|A-Z]+_\d+_*')
+            C.CODE LIKE 'region_%' OR C.CODE LIKE 'beijing%'
     </select>
 
 </mapper>

@@ -112,4 +112,6 @@ public interface AgentBusInfoMapper {
     List<String> queryBusPlatform(@Param("reqMap") Map reqMap);
     List<String> queryAgDocPro(@Param("reqMap") Map reqMap);
     List<String> queryBusType(@Param("reqMap") Map reqMap);
+
+    List<AgentBusInfo> queryBusinfo(@Param("map") Map<String, String> map);
 }

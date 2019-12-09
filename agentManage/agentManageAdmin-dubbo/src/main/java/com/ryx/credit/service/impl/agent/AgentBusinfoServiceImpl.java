@@ -328,6 +328,9 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 							if(!RegexUtil.checkInt(agentBusInfoVo.getBusLoginNum())){
 								throw new ProcessException("平台登录账号必须是数字");
 							}
+							if(agentBusInfoVo.getBusLoginNum().length()!=11){
+								throw new ProcessException("手机位数不正确");
+							}
 						}
 						if(PlatformType.RHPOS.code.equals(platformType.code)){
 							if (StringUtils.isEmpty(agentBusInfoVo.getBusLoginNum())){
@@ -336,6 +339,9 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 							}
 							if(!RegexUtil.checkInt(agentBusInfoVo.getBusLoginNum())){
 								throw new ProcessException("平台登录账号必须是数字");
+							}
+							if(agentBusInfoVo.getBusLoginNum().length()!=11){
+								throw new ProcessException("手机位数不正确");
 							}
 						}
 						//判断所选机构是否属于所选平台（机构编号&业务平台）
@@ -406,6 +412,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					db_AgentBusInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
 					db_AgentBusInfo.setOrganNum(agentBusInfoVo.getOrganNum());
 					db_AgentBusInfo.setDredgeD1(agentBusInfoVo.getDredgeD1());
+//					db_AgentBusInfo.setPosPlatCode(agentBusInfoVo.getPosPlatCode());
 					if(StringUtils.isNotEmpty(db_AgentBusInfo.getBusParent())){
 						if(StringUtils.isNotEmpty(db_AgentBusInfo.getBusPlatform())){
 							AgentBusInfo busInfoParent = agentBusInfoMapper.selectByPrimaryKey(db_AgentBusInfo.getBusParent());
@@ -547,6 +554,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 				db_AgentBusInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
 				db_AgentBusInfo.setOrganNum(agentBusInfoVo.getOrganNum());
 				db_AgentBusInfo.setDredgeD1(agentBusInfoVo.getDredgeD1());
+//				db_AgentBusInfo.setPosPlatCode(agentBusInfoVo.getPosPlatCode());
 				if(StringUtils.isNotEmpty(db_AgentBusInfo.getBusParent())){
 					if(StringUtils.isNotEmpty(db_AgentBusInfo.getBusPlatform())){
 						AgentBusInfo busInfoParent = agentBusInfoMapper.selectByPrimaryKey(db_AgentBusInfo.getBusParent());
@@ -1104,38 +1112,58 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		map.put("agentId",agentBusInfos.get(0).getAgentId());
 		return map;
 	}
+    /**
+     * 分页查询代理商业务信息
+     * @param page
+     * @param agentBusInfo
+     * @param time
+     * @return
+     */
+    @Override
+    public PageInfo queryAgentBusInfoForPage(Page page, AgentBusInfo agentBusInfo, String time) {
+
+        AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+        agentBusInfoExample.setPage(page);
+        agentBusInfoExample.setOrderByClause(" c_time desc ");
+
+        // 有条件的分页查询
+        List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByConditionForPage(page, agentBusInfo);
+
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(agentBusInfos);
+        pageInfo.setTotal(agentBusInfoMapper.countByExample(agentBusInfoExample));
+
+        return pageInfo;
+    }
+
+    /**
+     * 通过代理商id查询
+     */
+    @Override
+    public AgentBusInfo queryAgentBusInfoById(String id) {
+        return agentBusInfoMapper.selectByPrimaryKey(id);
+    }
 
 	/**
-	 * 分页查询代理商业务信息
-	 * @param page
-	 * @param agentBusInfo
-	 * @param time
-	 * @return
+	 * 代理商查看公告的发布机构菜单
+	 * @param map
+	 * @return allOrg
 	 */
 	@Override
-	public PageInfo queryAgentBusInfoForPage(Page page, AgentBusInfo agentBusInfo, String time) {
-
-		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
-		agentBusInfoExample.setPage(page);
-		agentBusInfoExample.setOrderByClause(" c_time desc ");
-
-		// 有条件的分页查询
-		List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByConditionForPage(page, agentBusInfo);
-
-		PageInfo pageInfo = new PageInfo();
-		pageInfo.setRows(agentBusInfos);
-		pageInfo.setTotal(agentBusInfoMapper.countByExample(agentBusInfoExample));
-
-		return pageInfo;
+	public List<String> queryOrgByAgentid(Map map) {
+		List<String> allOrg=new ArrayList<>();
+		List<String> orgs = agentBusInfoMapper.queryAgDocPro(map);
+		//查询信息判断
+		if (!(orgs.size() > 0 )) {
+			return  null;
+		}
+		List<COrganization> cOrganizations = cOrganizationMapper.selectPorgByorgs(orgs);
+		cOrganizations.forEach(org->{
+			allOrg.add(String.valueOf(org.getId()));
+		});
+		return allOrg;
 	}
 
-	/**
-	 * 通过代理商id查询
-	 */
-	@Override
-	public AgentBusInfo queryAgentBusInfoById(String id) {
-		return agentBusInfoMapper.selectByPrimaryKey(id);
-	}
 	@Override
 	public AgentBusInfo agentPlatformNum(String agentId,String platFormNum) {
 		List<Dict> platFormList =  dictOptionsService.dictList(DictGroup.RELATION_PLATFORM_NUM.name(),platFormNum);
@@ -1156,21 +1184,37 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		return agentBusInfo;
 	}
 
-	/**
-	 * 代理商查看公告的发布机构菜单
-	 * @param map
-	 * @return allOrg
-	 */
+
+
 	@Override
-	public List<String> queryOrgByAgentid(Map map) {
-		List<String> allOrg=new ArrayList<>();
-		List<String> orgs = agentBusInfoMapper.queryAgDocPro(map);
-		List<COrganization> cOrganizations = cOrganizationMapper.selectPorgByorgs(orgs);
-		cOrganizations.forEach(org->{
-			allOrg.add(String.valueOf(org.getId()));
-		});
-		return allOrg;
+	public List<AgentBusInfo> selectByAgentBusInfo(AgentBusInfo agentBusInfo){
+
+		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+		AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+		criteria.andStatusEqualTo(Status.STATUS_1.status);
+		if(null!=agentBusInfo.getBusStatus()){
+			criteria.andBusStatusEqualTo(agentBusInfo.getBusStatus());
+		}
+		if(null!=agentBusInfo.getBusStatusList() && agentBusInfo.getBusStatusList().size()!=0){
+			criteria.andBusStatusIn(agentBusInfo.getBusStatusList());
+		}
+		if(null!=agentBusInfo.getBusStatus()){
+			criteria.andBusStatusEqualTo(agentBusInfo.getBusStatus());
+		}
+		if(null!=agentBusInfo.getCloReviewStatus()){
+			criteria.andCloReviewStatusEqualTo(agentBusInfo.getCloReviewStatus());
+		}
+		if(StringUtils.isNotBlank(agentBusInfo.getBusNum())){
+			criteria.andBusNumEqualTo(agentBusInfo.getBusNum());
+		}
+		if(StringUtils.isNotBlank(agentBusInfo.getAgentId())){
+			criteria.andAgentIdEqualTo(agentBusInfo.getAgentId());
+		}
+		if(StringUtils.isNotBlank(agentBusInfo.getBusPlatform())){
+			criteria.andBusPlatformEqualTo(agentBusInfo.getBusPlatform());
+		}
+		List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+		return agentBusInfos;
 	}
 
 }
-

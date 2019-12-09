@@ -2,7 +2,6 @@ package com.ryx.credit.service.impl.dict;
 
 import com.ryx.credit.common.enumc.DictGroup;
 import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.EnvironmentUtil;
 import com.ryx.credit.common.util.PageInfo;
@@ -13,8 +12,13 @@ import com.ryx.credit.pojo.admin.agent.DictExample;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import org.apache.ibatis.annotations.Param;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
@@ -29,6 +33,8 @@ import java.util.Map;
  */
 @Service("dictOptionsService")
 public class DictOptionsServiceImpl implements DictOptionsService {
+
+    private static Logger logger = LoggerFactory.getLogger(DictOptionsServiceImpl.class);
 
     @Autowired
     private DictMapper dictMapper;
@@ -90,13 +96,14 @@ public class DictOptionsServiceImpl implements DictOptionsService {
         return platForm;
     }
 
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
-    public boolean insertDict(Dict dict, @Param("tableName") String tableName) {
-        if (StringUtils.isEmpty(dict.getdGroup())) dict.setdGroup(dictMapper.sqlId(tableName) + "");
-        if (1 == dictMapper.insertDict(dict)) {
+    public boolean insertDict(Dict dict) throws Exception {
+        int insertDict = dictMapper.insertDict(dict);
+        if (1 == insertDict) {
             return true;
         } else {
-            return false;
+            throw new Exception("添加失败！");
         }
     }
 
@@ -172,4 +179,43 @@ public class DictOptionsServiceImpl implements DictOptionsService {
         return agentNameList;
     }
 
+    /**
+     * 查询字典值
+     * @param dict
+     * @return
+     */
+    @Override
+    public Dict findDictByValueAndName(Dict dict) {
+        logger.info("字典查询参数:{}",dict);
+        Dict oldDict = dictMapper.selectDictByValueAndName(dict);
+        logger.info("查询结果:{}", oldDict);
+        return oldDict;
+    }
+
+    /**
+     * 编辑字典值
+     * @param dictMap
+     * @return
+     */
+    @Override
+    public int editDictByDict(Map<String, Dict> dictMap) {
+        return 0;
+    }
+
+
+    /**
+     * 更新字典表
+     * @param oldDict
+     * @param newDict
+     * @return
+     */
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Override
+    public boolean editDictByOldDict(Dict oldDict, Dict newDict)throws Exception{
+        if ( 1 == dictMapper.updateByOldDict(oldDict, newDict)) {
+            return true;
+        } else {
+            throw new Exception("更新失败，请稍后再试！");
+        }
+    }
 }

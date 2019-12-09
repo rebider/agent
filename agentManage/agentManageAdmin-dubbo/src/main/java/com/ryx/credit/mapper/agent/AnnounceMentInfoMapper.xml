@@ -459,12 +459,20 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
     on a.ann_id = ri.ann_id and ri.READ_USER_ID = #{map.userId}
     left join c_organization c
     on c.id = a.pub_org
+    left join c_user cu
+    on cu.id = #{map.userId}
     <where>
+        a.ANNO_STAT = '1'
         <if test="map.busTypes !=null and map.busTypes.size > 0">
-            exists (select  ap.anno_id
+            and exists (select  ap.anno_id
             from a_anno_platform_rela ap
+            left join c_user_agent cg
+            on  cg.userid = #{map.userId}
+            left join A_agent_businfo ab
+            on ap.rang_value = ab.BUS_TYPE and cg.agentid = ab.agent_id
+            and ab.status = '1'
             where  a.ann_id = ap.anno_id and
-            ap.rang_type = '0' and (
+            ap.rang_type = '0'  and ab.bus_status = '1' and (
                 <foreach collection="map.busTypes" separator="or" item="busType"  >
                     #{busType} = ap.rang_value
                 </foreach>)
@@ -473,8 +481,15 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
         <if test="map.platfromPerm !=null and map.platfromPerm.size > 0">
             and exists (select ap.anno_id
             from a_anno_platform_rela ap
+            left join A_agent_businfo ab
+            on ap.rang_value = ab.bus_platform and  ab.bus_status = '1'
+            left join c_user_agent cg
+            on  cg.userid = #{map.userId}
+            left join A_agent_businfo ab
+            on ap.rang_value = ab.bus_platform and cg.agentid = ab.agent_id
+            and ab.status = '1'
             where  a.ann_id = ap.anno_id and
-            ap.rang_type = '1' and (
+            ap.rang_type = '1' and ab.bus_status = '1' and (
             <foreach collection="map.platfromPerm" separator=" or " item="platfromPermItem"  >
                 #{platfromPermItem} = ap.rang_value
             </foreach>)
@@ -508,7 +523,6 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
                 1!=1
             </otherwise>
         </choose>-->
-        and a.ANNO_STAT = '1'
         <if test="map.annType!=null and map.annType!=''">
             and a.ann_type = #{map.annType}
         </if>

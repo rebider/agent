@@ -87,6 +87,75 @@ public class OInternetCard implements Serializable{
 
     private String postponeTime;
 
+    private String busNum;
+
+    private String busPlatform;
+
+    private String postponeCause;
+
+    private String agDocDistrict;//数据库无
+
+    private String agDocPro;//数据库无
+
+    private String busContactPerson;//数据库无
+
+    private String platformName; //数据库无
+
+    public String getPostponeCause() {
+        return postponeCause;
+    }
+
+    public void setPostponeCause(String postponeCause) {
+        this.postponeCause = postponeCause;
+    }
+
+    public String getPlatformName() {
+        return platformName;
+    }
+
+    public void setPlatformName(String platformName) {
+        this.platformName = platformName;
+    }
+
+    public String getAgDocDistrict() {
+        return agDocDistrict;
+    }
+
+    public void setAgDocDistrict(String agDocDistrict) {
+        this.agDocDistrict = agDocDistrict;
+    }
+
+    public String getAgDocPro() {
+        return agDocPro;
+    }
+
+    public void setAgDocPro(String agDocPro) {
+        this.agDocPro = agDocPro;
+    }
+
+    public String getBusContactPerson() {
+        return busContactPerson;
+    }
+
+    public void setBusContactPerson(String busContactPerson) {
+        this.busContactPerson = busContactPerson;
+    }
+
+    public String getBusPlatform() {
+        return busPlatform;
+    }
+
+    public void setBusPlatform(String busPlatform) {
+        this.busPlatform = busPlatform;
+    }
+
+    public String getBusNum() {
+        return busNum;
+    }
+
+    public void setBusNum(String busNum) {
+        this.busNum = busNum;
+    }
 
     public String getPostponeTime() {
         return postponeTime;
@@ -414,5 +483,59 @@ public class OInternetCard implements Serializable{
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    @Override
+    public String toString() {
+        return "OInternetCard{" +
+                "iccidNum='" + iccidNum + '\'' +
+                ", cardImportId='" + cardImportId + '\'' +
+                ", batchNum='" + batchNum + '\'' +
+                ", snNum='" + snNum + '\'' +
+                ", deliverTime=" + deliverTime +
+                ", consignee='" + consignee + '\'' +
+                ", orderId='" + orderId + '\'' +
+                ", agentId='" + agentId + '\'' +
+                ", agentName='" + agentName + '\'' +
+                ", internetCardNum='" + internetCardNum + '\'' +
+                ", issuer='" + issuer + '\'' +
+                ", openAccountTime=" + openAccountTime +
+                ", expireTime=" + expireTime +
+                ", internetCardStatus=" + internetCardStatus +
+                ", merId='" + merId + '\'' +
+                ", latelyPayTime='" + latelyPayTime + '\'' +
+                ", merName='" + merName + '\'' +
+                ", manufacturer='" + manufacturer + '\'' +
+                ", renew=" + renew +
+                ", cTime=" + cTime +
+                ", uTime=" + uTime +
+                ", cUser='" + cUser + '\'' +
+                ", uUser='" + uUser + '\'' +
+                ", status=" + status +
+                ", version=" + version +
+                ", stop=" + stop +
+                ", renewStatus='" + renewStatus + '\'' +
+                ", stopReason='" + stopReason + '\'' +
+                ", sumPostponeTime=" + sumPostponeTime +
+                ", snCount='" + snCount + '\'' +
+                ", beginSn='" + beginSn + '\'' +
+                ", endSn='" + endSn + '\'' +
+                ", iccidNumId='" + iccidNumId + '\'' +
+                ", openAccountTimeBeginStr='" + openAccountTimeBeginStr + '\'' +
+                ", openAccountTimeEndStr='" + openAccountTimeEndStr + '\'' +
+                ", expireTimeBeginStr='" + expireTimeBeginStr + '\'' +
+                ", expireTimeEndStr='" + expireTimeEndStr + '\'' +
+                ", renewButton='" + renewButton + '\'' +
+                ", iccidNumBegin='" + iccidNumBegin + '\'' +
+                ", iccidNumEnd='" + iccidNumEnd + '\'' +
+                ", postponeTime='" + postponeTime + '\'' +
+                ", busNum='" + busNum + '\'' +
+                ", busPlatform='" + busPlatform + '\'' +
+                ", postponeCause='" + postponeCause + '\'' +
+                ", agDocDistrict='" + agDocDistrict + '\'' +
+                ", agDocPro='" + agDocPro + '\'' +
+                ", busContactPerson='" + busContactPerson + '\'' +
+                ", platformName='" + platformName + '\'' +
+                '}';
     }
 }

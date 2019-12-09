@@ -67,6 +67,7 @@
     <dubbo:service interface="com.ryx.credit.service.agent.AgentCertificationService" ref="agentCertificationService" timeout="1200000" registry="myGroup"/>
     <dubbo:service interface="com.ryx.credit.service.agent.AnnounceMentInfoService" ref="announceMentInfoService" timeout="1200000" registry="myGroup"/>
     <dubbo:service interface="com.ryx.credit.service.agent.AnnouncementReadInfoService" ref="announcementReadInfoService" timeout="1200000" registry="myGroup"/>
+    <dubbo:service interface="com.ryx.credit.service.agent.AnnoPlatformRelaService" ref="annoPlatformRelaService" timeout="1200000" registry="myGroup"/>
     <dubbo:service interface="com.ryx.credit.service.IBranchInnerConnectionService" ref="branchInnerConnectionService" timeout="1200000" registry="myGroup"/>
 
 
@@ -128,7 +129,6 @@
     <dubbo:reference interface="com.ryx.credit.profit.service.IOwnInvoiceService" id="ownInvoiceService"  timeout="1200000" registry="myGroup" check="false" />
     <dubbo:reference interface="com.ryx.credit.profit.service.IProfitMergeDeductionService" id="profitMergeDeductionServiceImpl"  timeout="1200000" registry="myGroup" check="false" />
     <dubbo:reference interface="com.ryx.credit.profit.service.ProfitDeductionService" id="profitDeductionServiceImpl"  timeout="1200000" registry="myGroup" check="false" />
-    <dubbo:reference interface="com.ryx.credit.machine.service.LmsUserService" id="lmsUserService"  timeout="1200000" registry="myGroup" check="false" />
 
     <dubbo:service interface="com.ryx.credit.service.ISendSMSService" ref="sendSMSService"  timeout="1200000" registry="myGroup" />
     <dubbo:service interface="com.ryx.credit.service.ICuserAgentService" ref="cuserAgentService"  timeout="1200000" registry="myGroup" />
@@ -155,7 +155,11 @@
 
     <dubbo:service interface="com.ryx.credit.service.agent.AgentDebitCardService" ref="agentDebitCardService"  timeout="1200000" registry="myGroup"/>
 
-    <!-- 退货任务，提供者 -->
+    <!-- 退货-->
     <dubbo:service interface="com.ryx.credit.service.order.OsnOperateReturnService" ref="osnOperateReturnService"  timeout="1200000" registry="myGroup" />
     <dubbo:service interface="com.ryx.credit.service.agent.AgentFreezeService" ref="agentFreezeService"  timeout="1200000" registry="myGroup" />
+    <dubbo:reference interface="com.ryx.credit.machine.service.LmsUserService" id="lmsUserService"  timeout="1200000" registry="myGroup" check="false" />
+
+    <!-- 图表数据 -->
+    <dubbo:service interface="com.ryx.credit.service.data.EchartDataService" ref="echartDataService"  timeout="1200000" registry="myGroup" />
 </beans>

@@ -16,6 +16,7 @@ import com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail;
 import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
 import com.ryx.credit.util.Constants;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +56,7 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
             jsonParams.put("reqDate", reqDate);
             jsonParams.put("data", JSONObject.parseObject(lowerHairMachineVo.getJsonString()));
             String plainXML = jsonParams.toString();
-            logger.info("RJ机具下发接口请求参数:{}", plainXML);
+            logger.info("瑞+物流下发接口封装参数:{}", plainXML);
             //请求报文加密开始
             String keyStr = AESUtil.getAESKey();
             byte[] plainBytes = plainXML.getBytes(charset);
@@ -74,9 +75,9 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
             map.put("reqMsgId", reqMsgId);
 
             //下发接口
-            logger.info("RJ机具下发接口请求加密参数:{}", JSONObject.toJSONString(map));
-            String respResult = HttpClientUtil.doPost(AppConfig.getProperty("rjpos.queryTermActive"), map);
-            logger.info("RJ机具下发接口返回加密参数:{}", respResult);
+            logger.info("瑞+物流下发接口请求地址:{},参数:{},", AppConfig.getProperty("rjpos.queryTermActive"), JSONObject.toJSONString(map));
+            String respResult = HttpClientUtil.doGet(AppConfig.getProperty("rjpos.queryTermActive"), map);
+            logger.info("瑞+物流下发接口返回参数:{}", respResult);
 
             JSONObject jsonObject = JSONObject.parseObject(respResult);
             if (!(jsonObject.containsKey("encryptData") && jsonObject.containsKey("encryptKey"))) return AgentResult.build(2,"瑞+请求下发返回失败！");
@@ -88,7 +89,7 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
             byte[] decodeBase64DataBytes = Base64.decodeBase64(resEncryptData.getBytes(charset));
             byte[] merchantXmlDataBytes = AESUtil.decrypt(decodeBase64DataBytes, merchantAESKeyBytes, "AES", "AES/ECB/PKCS5Padding", null);
             String respXML = new String(merchantXmlDataBytes, charset);
-            logger.info("瑞+物流下发接口返回参数:{}", respXML);
+            logger.info("瑞+物流下发接口返回参数解密后:{}", respXML);
 
             //验签
             String resSignData = jsonObject.getString("signData");
@@ -102,8 +103,8 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
                 return AgentResult.build(0,"下发成功");
             } else {
                 //下发异常
-                logger.info("RJ机具下发接口返回异常:{}", respResult);
-                return AgentResult.build(2, null != respJson.getString("msg") ? respJson.getString("msg") : "瑞+，下发接口，返回值异常!");
+                logger.info("瑞+物流下发接口返回异常:{}", respResult);
+                return AgentResult.build(2, null != respJson.getString("respMsg") ? respJson.getString("respMsg") : "瑞+平台返回异常!");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -134,7 +135,7 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
             jsonParams.put("reqDate", reqDate);
             jsonParams.put("data", JSONObject.toJSONString(FastMap.fastMap("taskId", pamMap.get("taskId"))));
             String plainXML = jsonParams.toString();
-            logger.info("RJ机具下发查询接口请求参数:{}", plainXML);
+            logger.info("瑞+机具下发查询接口请求参数:{}", plainXML);
             //请求报文加密开始
             String keyStr = AESUtil.getAESKey();
             byte[] plainBytes = plainXML.getBytes(charset);
@@ -153,9 +154,9 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
             map.put("reqMsgId", reqMsgId);
 
             //下发接口
-            logger.info("RJ机具下发查询接口请求加密参数:{}", JSONObject.toJSONString(map));
+            logger.info("瑞+机具下发查询接口请求加密参数:{}", JSONObject.toJSONString(map));
             String respResult = HttpClientUtil.doPost(AppConfig.getProperty("rjpos.queryTermActive"), map);
-            logger.info("RJ机具下发查询接口返回加密参数:{}", respResult);
+            logger.info("瑞+机具下发查询接口返回加密参数:{}", respResult);
 
             JSONObject jsonObject = JSONObject.parseObject(respResult);
             if (!(jsonObject.containsKey("encryptData") && jsonObject.containsKey("encryptKey"))) return AgentResult.build(2,"瑞+请求下发返回失败！");
@@ -278,7 +279,12 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
                 JSONObject item =  machineList.getJSONObject(i);
                 TermMachineVo machineVo =  new TermMachineVo();
                 machineVo.setId(item.getString("MACHINEID"));
-                machineVo.setMechineName(item.getString("MODELNAME"));
+                machineVo.setMechineName(
+                        "机具编号:" + item.getString("MACHINEID")
+                        + "|机具型号:" + item.getString("MODELNAME")
+                        + "|机具类型:" + item.getString("MACHINETYPENAME")
+                        + "|押金:" + item.getString("DEPOSIT")
+                        + "|备注:" + (StringUtils.isNotEmpty(item.getString("REMARK"))?item.getString("REMARK"):"--"));
                 machineVo.setPosType(item.getString("MODELTYPE"));
                 machineVo.setPosSpePrice(item.getString("DEPOSIT"));
                 resData.add(machineVo);

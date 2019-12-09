@@ -384,7 +384,8 @@
         to_char(orders.O_INURETIME, 'YYYY-MM-DD') as TIME,
         businfo.bus_num,
         businfo.ag_doc_district,
-        businfo.ag_doc_pro
+        businfo.ag_doc_pro,
+        to_char(P.c_time, 'YYYY-MM-DD') as C_TIME
       FROM O_RECEIPT_PLAN R
       LEFT JOIN O_RECEIPT_ORDER O ON R.RECEIPT_ID = O.ID and o.status=1 and R.status=1
       LEFT JOIN D_REGION D ON O.ADDR_PROVINCE = D.R_CODE
@@ -417,25 +418,13 @@
     LEFT JOIN D_REGION E ON O.ADDR_DISTRICT = E.R_CODE
     LEFT JOIN O_RECEIPT_PRO P ON R.PRO_ID = P.ID and p.status=1
     LEFT JOIN o_order orders on R.order_id = orders.id and orders.status=1
-    left join o_sub_order os on os.order_id = orders.id
-    and os.status = 1
-    AND OS.PRO_ID = P.PRO_ID
-    left join o_sub_order_activity oso on oso.sub_order_id =
-    os.id
-    and oso.status = 1
+    left join o_activity oso on oso.id=R.ACTIVITY_ID
     left join a_agent agent on agent.id = orders.agent_id and agent.status=1
-    left join a_platform on a_platform.platform_num =
-    orders.order_platform and a_platform.status=1
-    LEFT JOIN D_DICT protype_dict ON protype_dict.D_GROUP =
-    'ORDER'
-    AND protype_dict.D_ARTIFACT =
-    'MODEL_TYPE'
-    and protype_dict.d_status = 1
-    AND protype_dict.D_ITEMVALUE =
-    os.pro_type
-    LEFT JOIN D_DICT DI ON DI.D_GROUP = 'ORDER'
-    AND DI.D_ARTIFACT = 'MANUFACTURER'
-    AND DI.D_ITEMVALUE = R.PRO_COM
+    left join a_agent_businfo businfo on businfo.agent_id = orders.agent_id and businfo.id = orders.bus_id and businfo.status = 1
+    left join a_platform on a_platform.platform_num = orders.order_platform and a_platform.status=1
+    LEFT JOIN D_DICT protype_dict ON protype_dict.D_GROUP = 'ORDER' AND protype_dict.D_ARTIFACT = 'MODEL_TYPE'
+    and protype_dict.d_status = 1 AND protype_dict.D_ITEMVALUE = oso.pro_type
+    LEFT JOIN D_DICT DI ON DI.D_GROUP = 'ORDER' AND DI.D_ARTIFACT = 'MANUFACTURER' AND DI.D_ITEMVALUE = R.PRO_COM
     left join o_payment d on d.order_id = R.order_id and d.status=1
     where R.status=1
     <include refid="BASE_WHERE_SQL"></include>
@@ -541,5 +530,21 @@
     where 1=1 and r.status=1 and r.return_order_detail_id in
     (select id from o_return_order_detail where return_id = #{returnId})
     order by r.c_date desc
+  </select>
+
+  <select id="planCountTotal" resultType="java.math.BigDecimal" parameterType="String">
+    select nvl(sum(rp.plan_pro_num),0) from o_receipt_plan rp
+    left join o_order oo on oo.id = rp.order_id and oo.status=1
+    left join o_receipt_pro pro on pro.orderid = oo.id and rp.pro_id = pro.id and pro.status=1
+    left join o_sub_order os on os.pro_id = pro.pro_id and os.order_id = oo.id and os.status=1
+    <where>
+      1=1 and rp.status=1
+      <if test="orderId!=null and orderId!=''">
+        and rp.order_id = #{orderId}
+      </if>
+      <if test="proId!=null and proId!=''">
+        and pro.pro_id = #{proId}
+      </if>
+    </where>
   </select>
 </mapper>

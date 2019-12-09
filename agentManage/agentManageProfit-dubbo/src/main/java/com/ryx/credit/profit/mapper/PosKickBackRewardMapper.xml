@@ -383,7 +383,6 @@
 
 
   <select id="queryBusName" resultType="java.util.Map">
-
    select distinct BUS_NAME from P_POS_KICKBACK_REWARD
   </select>
 

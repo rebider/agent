@@ -291,7 +291,7 @@
                 STATUS = #{status,jdbcType=DECIMAL},
             </if>
             <if test="varsion != null">
-                VARSION = #{varsion,jdbcType=DECIMAL},
+                VARSION = VARSION + 1 ,
             </if>
             <if test="branchLineNum != null">
                 BRANCH_LINE_NUM = #{branchLineNum,jdbcType=VARCHAR},
@@ -318,7 +318,7 @@
                 AG_LEGAL_CERNUM = #{agLegalCernum,jdbcType=VARCHAR},
             </if>
         </set>
-        where ID = #{id,jdbcType=VARCHAR}
+        where ID = #{id,jdbcType=VARCHAR} and VARSION = #{varsion,jdbcType=DECIMAL}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AgentColinfo">
         update A_AGENT_COLINFO
@@ -334,7 +334,7 @@
         C_USER = #{cUser,jdbcType=VARCHAR},
         CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL},
         STATUS = #{status,jdbcType=DECIMAL},
-        VARSION = #{varsion,jdbcType=DECIMAL},
+        VARSION = VARSION + 1,
         BRANCH_LINE_NUM = #{branchLineNum,jdbcType=VARCHAR},
         ALL_LINE_NUM = #{allLineNum,jdbcType=VARCHAR},
         BANK_REGION = #{bankRegion,jdbcType=VARCHAR},
@@ -343,7 +343,7 @@
         CLO_BANK_CODE = #{cloBankCode,jdbcType=VARCHAR},
         PAY_STATUS = #{payStatus,jdbcType=DECIMAL},
         AG_LEGAL_CERNUM = #{agLegalCernum,jdbcType=VARCHAR}
-        where ID = #{id,jdbcType=VARCHAR}
+        where ID = #{id,jdbcType=VARCHAR} and VARSION = #{varsion,jdbcType=DECIMAL}
     </update>
     <sql id="OracleDialectPrefix">
         <if test="page != null">
@@ -387,6 +387,7 @@
         <where>
             c.pay_status = #{params.payStatus}
             and a.ag_status = #{params.agStatus}
+            and c.clo_review_status = #{params.cloReviewStatus}
         </where>
     </select>
 

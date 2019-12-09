@@ -75,17 +75,17 @@ public class AgentBusInfo implements Serializable {
 
     private String busLoginNum;
 
-    private String debitRateLower;//借记费率下限
+    private String debitRateLower;
 
-    private String debitCapping;//借记封顶额上限
+    private String debitCapping;
 
-    private String debitAppearRate;//借记出款费率
+    private String debitAppearRate;
 
     private String terminalsLower;
 
     private Date approveTime;
 
-    private String creditRateFloor;//贷记费率下限
+    private String creditRateFloor;
 
     private String agDocDistrict;
 
@@ -95,7 +95,7 @@ public class AgentBusInfo implements Serializable {
 
     private String finaceRemitOrgan;
 
-    private String creditRateCeiling;//贷记费率上限
+    private String creditRateCeiling;
 
     private List<Attachment> attachmentList;
 
@@ -123,6 +123,20 @@ public class AgentBusInfo implements Serializable {
 
     private String debitCappingLower;//借记封顶额下限
 
+    private List<BigDecimal> busStatusList;
+
+    private String flag;//标记
+
+    private String posPlatCode;//智慧POS平台码
+
+    public String getPosPlatCode() {
+        return posPlatCode;
+    }
+
+    public void setPosPlatCode(String posPlatCode) {
+        this.posPlatCode = posPlatCode;
+    }
+
     public String getDebitRateCapping() {
         return debitRateCapping;
     }
@@ -139,6 +153,14 @@ public class AgentBusInfo implements Serializable {
         this.debitCappingLower = debitCappingLower;
     }
 
+    public List<BigDecimal> getBusStatusList() {
+        return busStatusList;
+    }
+
+    public void setBusStatusList(List<BigDecimal> busStatusList) {
+        this.busStatusList = busStatusList;
+    }
+
     public BigDecimal getDredgeD1() {
         return dredgeD1;
     }
@@ -147,14 +169,12 @@ public class AgentBusInfo implements Serializable {
         this.dredgeD1 = dredgeD1;
     }
 
-    private String flag;//标记
+    public String getFlag() {
+        return flag;
+    }
 
     public void setFlag(String flag) {
         this.flag = flag;
-    }
-
-    public String getFlag() {
-        return flag;
     }
 
     public String getBrandNum() {

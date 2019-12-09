@@ -15,6 +15,7 @@ import java.math.BigDecimal;
  7：联动业务系统处理中
  */
 public enum LogisticsSendStatus {
+    no_send(new BigDecimal(-2),"无需联动"),
     dt_send(new BigDecimal(-1),"无需联动"),
     none_send(new BigDecimal(0),"未联动"),
     send_success(new BigDecimal(1),"已联动"),
@@ -34,4 +35,13 @@ public enum LogisticsSendStatus {
         this.msg = m;
     }
 
+    public static String getMsg(BigDecimal s){
+        if(s==null)return null;
+        for (LogisticsSendStatus sendStatus : LogisticsSendStatus.values()) {
+            if(sendStatus.code.compareTo(s)==0){
+                return sendStatus.msg;
+            }
+        }
+        return "";
+    }
 }

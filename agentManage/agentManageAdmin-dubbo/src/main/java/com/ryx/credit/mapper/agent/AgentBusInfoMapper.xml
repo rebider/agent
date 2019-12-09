@@ -51,6 +51,7 @@
     <result column="DREDGE_D1" jdbcType="DECIMAL" property="dredgeD1" />
     <result column="DEBIT_RATE_CAPPING" jdbcType="VARCHAR" property="debitRateCapping" />
     <result column="DEBIT_CAPPING_LOWER" jdbcType="VARCHAR" property="debitCappingLower" />
+    <result column="POS_PLAT_CODE" jdbcType="VARCHAR" property="posPlatCode" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -89,7 +90,7 @@
     C_UTIME, C_USER, STATUS, VERSION, AG_ZBH, BUS_USE_ORGAN, BUS_SCOPE, DREDGE_S0, BUS_LOGIN_NUM,
     DEBIT_RATE_LOWER, DEBIT_CAPPING, DEBIT_APPEAR_RATE, TERMINALS_LOWER, CREDIT_RATE_FLOOR,
     AG_DOC_DISTRICT, AG_DOC_PRO, ORGAN_NUM, FINACE_REMIT_ORGAN, APPROVE_TIME, CREDIT_RATE_CEILING,
-    BRAND_NUM, DREDGE_D1, DEBIT_RATE_CAPPING, DEBIT_CAPPING_LOWER
+    BRAND_NUM, DREDGE_D1, DEBIT_RATE_CAPPING, DEBIT_CAPPING_LOWER, POS_PLAT_CODE
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -135,7 +136,7 @@
     DEBIT_APPEAR_RATE, TERMINALS_LOWER, CREDIT_RATE_FLOOR,
     AG_DOC_DISTRICT, AG_DOC_PRO, ORGAN_NUM,
     FINACE_REMIT_ORGAN, APPROVE_TIME, CREDIT_RATE_CEILING,
-    BRAND_NUM, DREDGE_D1, DEBIT_RATE_CAPPING, DEBIT_CAPPING_LOWER)
+    BRAND_NUM, DREDGE_D1, DEBIT_RATE_CAPPING, DEBIT_CAPPING_LOWER, POS_PLAT_CODE)
     values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR},
     #{busPlatform,jdbcType=VARCHAR}, #{busType,jdbcType=VARCHAR}, #{busParent,jdbcType=VARCHAR},
     #{busRiskParent,jdbcType=VARCHAR}, #{busActivationParent,jdbcType=VARCHAR}, #{busRegion,jdbcType=VARCHAR},
@@ -151,7 +152,8 @@
     #{debitAppearRate,jdbcType=VARCHAR}, #{terminalsLower,jdbcType=VARCHAR}, #{creditRateFloor,jdbcType=VARCHAR},
     #{agDocDistrict,jdbcType=VARCHAR}, #{agDocPro,jdbcType=VARCHAR}, #{organNum,jdbcType=VARCHAR},
     #{finaceRemitOrgan,jdbcType=VARCHAR}, #{approveTime,jdbcType=TIMESTAMP}, #{creditRateCeiling,jdbcType=VARCHAR},
-    #{brandNum,jdbcType=VARCHAR}, #{dredgeD1,jdbcType=DECIMAL}, #{debitRateCapping,jdbcType=VARCHAR}, #{debitCappingLower,jdbcType=VARCHAR})
+    #{brandNum,jdbcType=VARCHAR}, #{dredgeD1,jdbcType=DECIMAL}, #{debitRateCapping,jdbcType=VARCHAR}, #{debitCappingLower,jdbcType=VARCHAR},
+    #{posPlatCode,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfo">
     insert into A_AGENT_BUSINFO
@@ -303,6 +305,9 @@
       <if test="debitRateCapping != null">
         DEBIT_RATE_CAPPING,
       </if>
+      <if test="posPlatCode != null">
+        POS_PLAT_CODE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -451,6 +456,9 @@
       </if>
       <if test="debitCappingLower != null">
         #{debitCappingLower,jdbcType=VARCHAR},
+      </if>
+      <if test="posPlatCode != null">
+        #{posPlatCode,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -607,6 +615,9 @@
       <if test="debitCappingLower != null">
         DEBIT_CAPPING_LOWER = #{debitCappingLower,jdbcType=VARCHAR},
       </if>
+      <if test="posPlatCode != null">
+        POS_PLAT_CODE = #{posPlatCode,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
@@ -659,7 +670,8 @@
     BRAND_NUM = #{brandNum,jdbcType=VARCHAR},
     DREDGE_D1 = #{dredgeD1,jdbcType=DECIMAL},
     DEBIT_RATE_CAPPING = #{debitRateCapping,jdbcType=VARCHAR},
-    DEBIT_CAPPING_LOWER = #{debitCappingLower,jdbcType=VARCHAR}
+    DEBIT_CAPPING_LOWER = #{debitCappingLower,jdbcType=VARCHAR},
+    POS_PLAT_CODE = #{posPlatCode,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <sql id="OracleDialectPrefix">
@@ -743,17 +755,26 @@
     <if test="reqMap.busNum != null and reqMap.busNum != '' " >
       and b.bus_num = #{reqMap.busNum}
     </if>
-    <if test="reqMap.busPlatform != null and reqMap.busPlatform != '' " >
-      and b.bus_platform = #{reqMap.busPlatform}
+    <if test="reqMap.busPlatformList != null and reqMap.busPlatformList.size > 0 " >
+      and b.bus_platform
+      <foreach collection="reqMap.busPlatformList" item="busPlatform" open=" in(" close=")" separator=",">
+        #{busPlatform}
+      </foreach>
     </if>
-    <if test="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >
-      and b.clo_review_status = #{reqMap.cloReviewStatus}
+    <if test="reqMap.cloReviewStatusList != null and reqMap.cloReviewStatusList.size > 0" >
+      and b.clo_review_status
+      <foreach collection="reqMap.cloReviewStatusList" item="cloReviewStatus" open=" in(" close=")" separator=",">
+        #{cloReviewStatus}
+      </foreach>
     </if>
     <if test="reqMap.id != null and reqMap.id != '' " >
       and b.id = #{reqMap.id}
     </if>
-    <if test="reqMap.busType != null and reqMap.busType != '' " >
-      and b.bus_type = #{reqMap.busType}
+    <if test="reqMap.busTypeList != null and reqMap.busTypeList.size > 0" >
+      and b.bus_type
+      <foreach collection="reqMap.busTypeList" item="busType" open=" in(" close=")" separator=",">
+        #{busType}
+      </foreach>
     </if>
     <if test="reqMap.organizationCode!=null and reqMap.organizationCode!=''">
       and (e.CODE like concat(#{reqMap.organizationCode},'%') or g.CODE like concat(#{reqMap.organizationCode},'%') )
@@ -886,11 +907,17 @@
       </if>
       <if test="reqMap.busNum != null and reqMap.busNum != '' " >and bus.bus_num = #{reqMap.busNum}
       </if>
-      <if test="reqMap.busPlatform != null and reqMap.busPlatform != '' " >and bus.bus_platform =
-        #{reqMap.busPlatform}
+      <if test="reqMap.busPlatformList != null and reqMap.busPlatformList.size > 0 " >
+        and bus.bus_platform
+        <foreach collection="reqMap.busPlatformList" item="busPlatform" open=" in(" close=")" separator=",">
+          #{busPlatform}
+        </foreach>
       </if>
-      <if test="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >and bus.clo_review_status =
-        #{reqMap.cloReviewStatus}
+      <if test="reqMap.cloReviewStatusList != null and reqMap.cloReviewStatusList.size > 0 " >
+        and bus.clo_review_status
+        <foreach collection="reqMap.cloReviewStatusList" item="cloReviewStatus" open=" in(" close=")" separator=",">
+          #{cloReviewStatus}
+        </foreach>
       </if>
       <if test="reqMap.id != null and reqMap.id != '' " >and bus.id = #{reqMap.id}
       </if>
@@ -912,8 +939,11 @@
       <if test="reqMap.approveTimeEnd != null and reqMap.approveTimeEnd != '' " >
         and to_char(bus.approve_time,'yyyy-MM-dd') &lt;= #{reqMap.approveTimeEnd}
       </if>
-      <if test="reqMap.busType != null and reqMap.busType != '' " >
-      and bus.bus_type = #{reqMap.busType}
+      <if test="reqMap.busTypeList != null and reqMap.busTypeList.size > 0" >
+        and bus.bus_type
+        <foreach collection="reqMap.busTypeList" item="busType" open=" in(" close=")" separator=",">
+          #{busType}
+        </foreach>
       </if>
       <if test="reqMap.busStatus != null and reqMap.busStatus != '' " >
       and bus.bus_status = #{reqMap.busStatus}
@@ -1200,9 +1230,7 @@ union
     select
        distinct(ab.bus_platform) as bus_platform
       from A_AGENT_BUSINFO ab
-      left join A_AGENT ag
-      on ag.AG_UNIQ_NUM = ab.AGENT_ID
-     where AGENT_ID = #{reqMap.agentId}
+     where ab.AGENT_ID = #{reqMap.agentId}
      <if test="reqMap.cloReviewStatus !=null and reqMap.cloReviewStatus !=''">
        and CLO_REVIEW_STATUS = #{reqMap.cloReviewStatus}
      </if>
@@ -1211,9 +1239,7 @@ union
     select
        distinct(ab.AG_DOC_PRO) as AG_DOC_PRO
       from A_AGENT_BUSINFO ab
-      left join A_AGENT ag
-      on ag.AG_UNIQ_NUM = ab.AGENT_ID
-     where AGENT_ID = #{reqMap.agentId}
+     where ab.AGENT_ID = #{reqMap.agentId}
     <if test="reqMap.cloReviewStatus !=null and reqMap.cloReviewStatus !=''">
       and CLO_REVIEW_STATUS = #{reqMap.cloReviewStatus}
     </if>
@@ -1222,11 +1248,23 @@ union
     select
        distinct(ab.BUS_TYPE) as BUS_TYPE
       from A_AGENT_BUSINFO ab
-      left join A_AGENT ag
-      on ag.AG_UNIQ_NUM = ab.AGENT_ID
-     where AGENT_ID = #{reqMap.agentId}
+     where ab.AGENT_ID = #{reqMap.agentId}
     <if test="reqMap.cloReviewStatus !=null and reqMap.cloReviewStatus !=''">
       and CLO_REVIEW_STATUS = #{reqMap.cloReviewStatus}
+    </if>
+  </select>
+
+
+  <select id="queryBusinfo" parameterType="map" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from A_AGENT_BUSINFO
+    where status=1
+    <if test="map.agentId !=null and map.agentId !=''">
+      and AGENT_ID = #{map.agentId}
+    </if>
+    <if test="map.busType !=null and map.busType !='' and map.busTypeOne !=null and map.busTypeOne !=''">
+      and BUS_TYPE in(#{map.busType},#{map.busTypeOne})
     </if>
   </select>
 </mapper>

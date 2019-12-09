@@ -24,11 +24,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import sun.management.resources.agent;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 业务平台管理
@@ -90,6 +92,55 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
 
 
     @Override
+    public PageInfo queryBusinessPlatformList(Map map, Agent agent, Page page, Long userId) {
+        Map<String, Object> reqMap = new HashMap<>();
+
+        reqMap.put("agStatus", AgStatus.Approved.name());
+        if (!StringUtils.isBlank(agent.getId())) {
+            reqMap.put("id", agent.getId());
+        }
+        if (!StringUtils.isBlank(agent.getAgName())) {
+            reqMap.put("agName", agent.getAgName());
+        }
+        if (!StringUtils.isBlank(agent.getAgUniqNum())) {
+            reqMap.put("agUniqNum", agent.getAgUniqNum());
+        }
+        if (!StringUtils.isBlank((String)map.get("busNum"))) {
+            reqMap.put("busNum", map.get("busNum"));
+        }
+        if (!StringUtils.isBlank((String)map.get("busPlatformList"))) {
+            reqMap.put("busPlatformList", Arrays.asList( ((String)map.get("busPlatformList")).split(",")));
+        }
+        if (!StringUtils.isBlank((String)map.get("cloReviewStatusList"))) {
+            List<String> list = Arrays.asList( ((String)map.get("cloReviewStatusList")).split(","));
+            List<BigDecimal> voList = list.stream().map(str -> new BigDecimal(str.trim())).collect(Collectors.toList());
+            if( voList!=null && voList.size()>0)
+                reqMap.put("cloReviewStatusList", voList);
+        }
+        if (!StringUtils.isBlank((String)map.get("busTypeList"))) {
+            reqMap.put("busTypeList", Arrays.asList( ((String)map.get("busTypeList")).split(",")));
+        }
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf((String)map.get("cUser")));
+        if(orgCodeRes==null && orgCodeRes.size()!=1){
+            return null;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        reqMap.put("orgId",orgId);
+        reqMap.put("userId",Long.valueOf((String)map.get("cUser")));
+        reqMap.put("organizationCode", organizationCode);
+        reqMap.put("status", Status.STATUS_1.status);
+        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+        reqMap.put("platfromPerm",platfromPerm);
+        List<Map<String, Object>> agentBusInfoList = agentBusInfoMapper.queryBusinessPlatformList(reqMap, page);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(agentBusInfoList);
+        pageInfo.setTotal(agentBusInfoMapper.queryBusinessPlatformCount(reqMap));
+        return pageInfo;
+    }
+
+    @Override
     public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,Long userId) {
         Map<String, Object> reqMap = new HashMap<>();
 
@@ -136,42 +187,44 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     }
 
     @Override
-    public PageInfo queryBusinessPlatformListManager(AgentBusInfo agentBusInfo, Agent agent, Page page, Long userId,String approveTimeStart,String approveTimeEnd) {
+    public PageInfo queryBusinessPlatformListManager(Page page, Map map) {
         Map<String, Object> reqMap = new HashMap<>();
-
         reqMap.put("agStatus", AgStatus.Approved.name());
-        if (!StringUtils.isBlank(agent.getId())) {
-            reqMap.put("id", agent.getId());
+        if (!StringUtils.isBlank((String)map.get("id"))) {
+            reqMap.put("id", map.get("id"));
         }
-        if (!StringUtils.isBlank(agent.getAgName())) {
-            reqMap.put("agName", agent.getAgName());
+        if (!StringUtils.isBlank((String)map.get("agName"))) {
+            reqMap.put("agName", (String)map.get("agName"));
         }
-        if (!StringUtils.isBlank(agent.getAgUniqNum())) {
-            reqMap.put("agUniqNum", agent.getAgUniqNum());
+        if (!StringUtils.isBlank((String)map.get("agUniqNum"))) {
+            reqMap.put("agUniqNum", (String)map.get("agUniqNum"));
         }
-        if (!StringUtils.isBlank(agentBusInfo.getBusNum())) {
-            reqMap.put("busNum", agentBusInfo.getBusNum());
+        if (!StringUtils.isBlank((String)map.get("busNum"))) {
+            reqMap.put("busNum", (String)map.get("busNum"));
         }
-        if (!StringUtils.isBlank(agentBusInfo.getBusPlatform())) {
-            reqMap.put("busPlatform", agentBusInfo.getBusPlatform());
+        if (!StringUtils.isBlank((String)map.get("busPlatformList"))) {
+            reqMap.put("busPlatformList", Arrays.asList(((String) map.get("busPlatformList")).split(",")));
         }
-        if (agentBusInfo.getCloReviewStatus() != null) {
-            reqMap.put("cloReviewStatus", agentBusInfo.getCloReviewStatus());
+        if (!StringUtils.isBlank((String)map.get("cloReviewStatusList"))) {// bigdecimal 处理
+            List<String> list = Arrays.asList( ((String)map.get("cloReviewStatusList")).split(","));
+            List<BigDecimal> voList = list.stream().map(str -> new BigDecimal(str.trim())).collect(Collectors.toList());
+            if( voList!=null && voList.size()>0)
+                reqMap.put("cloReviewStatusList", voList);
         }
-        if (StringUtils.isNotBlank(agentBusInfo.getBusType())) {
-            reqMap.put("busType", agentBusInfo.getBusType());
+        if (StringUtils.isNotBlank((String)map.get("busTypeList"))) {
+            reqMap.put("busTypeList", Arrays.asList(((String)map.get("busTypeList")).split(",")));
         }
-        if ( StringUtils.isNotBlank(approveTimeStart)) {
-            reqMap.put("approveTimeStart", approveTimeStart);
+        if ( StringUtils.isNotBlank((String)map.get("approveTimeStart"))) {
+            reqMap.put("approveTimeStart", (String)map.get("approveTimeStart"));
         }
-        if ( StringUtils.isNotBlank(approveTimeEnd)) {
-            reqMap.put("approveTimeEnd", approveTimeEnd);
+        if ( StringUtils.isNotBlank((String)map.get("approveTimeEnd"))) {
+            reqMap.put("approveTimeEnd", (String)map.get("approveTimeEnd"));
         }
-        if (agentBusInfo.getBusStatus() != null) {
-            reqMap.put("busStatus", agentBusInfo.getBusStatus());
+        if ((String)map.get("busStatus") != null) {
+            reqMap.put("busStatus", new BigDecimal((String)map.get("busStatus")));
         }
         reqMap.put("status", Status.STATUS_1.status);
-        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm((Long)map.get("userId"));
         reqMap.put("platfromPerm",platfromPerm);
         List<Map<String, Object>> agentBusInfoList = agentBusInfoMapper.queryBusinessPlatformList(reqMap, page);
         PageInfo pageInfo = new PageInfo();
@@ -351,6 +404,48 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                         }
                     }
                 }
+
+                //判断标准一代、机构只能有一个业务对接省区
+                if(StringUtils.isNotBlank(item.getBusType()) && StringUtils.isNotBlank(item.getAgentId()) && StringUtils.isNotBlank(item.getAgDocPro()) &&StringUtils.isNotBlank(item.getAgDocDistrict())){
+
+                    if(item.getBusType().equals(BusType.JG.key) ||item.getBusType().equals(BusType.BZYD.key)){
+                        Map<String, String> hashMap = new HashMap<>();
+                        hashMap.put("agentId",item.getAgentId());
+                        hashMap.put("busType",BusType.JG.key);
+                        hashMap.put("busTypeOne",BusType.BZYD.key);
+                        List<AgentBusInfo> busInfoList = agentBusInfoMapper.queryBusinfo(hashMap);
+                        Set<String> hashSetDocDistrict = new HashSet<>();
+                        Set<String> hashSetocPro = new HashSet<>();
+                        if(null!=busInfoList && busInfoList.size()>0){
+                            for (AgentBusInfo busInfo : busInfoList) {
+                                hashSetocPro.add(busInfo.getAgDocPro());
+                                hashSetDocDistrict.add(busInfo.getAgDocDistrict());
+                            }
+                            if(hashSetDocDistrict.size()==1 && hashSetocPro.size()==1){
+                                //如果只有一个则进行更改大区省区
+                                for (AgentBusInfo busInfo : busInfoList) {
+                                    if(StringUtils.isNotBlank(busInfo.getAgDocPro()) && StringUtils.isNotBlank(busInfo.getAgDocDistrict())){
+                                        if(!busInfo.getId().equals(item.getId())){
+                                            if(!busInfo.getAgDocPro().equals(item.getAgDocPro()) || !busInfo.getAgDocDistrict().equals(item.getAgDocDistrict())) {
+                                                logger.info("机构/标准一代省区必须一致，不能修改");
+                                                throw new ProcessException("机构/标准一代省区必须一致，不能修改");
+                                            }
+                                        }
+                                    }
+                                }
+                            }else if(hashSetDocDistrict.size()>1 || hashSetocPro.size()>1){
+                                logger.info("请联系市场部统一更改后再开通业务或修改业务");
+                                throw new ProcessException("请联系市场部统一更改后再开通业务或修改业务");
+                            }
+                        }
+                    }
+                }else{
+                    if(StringUtils.isBlank(item.getAgDocDistrict()) || StringUtils.isBlank(item.getAgDocPro())){
+                        logger.info("请填写大区或者省区");
+                        throw new ProcessException("请填写大区或者省区");
+                    }
+                }
+
                 //激活返现代理商为空默认自己
                 if (StringUtils.isBlank(item.getBusActivationParent())) {
                     item.setBusActivationParent(item.getId());
@@ -364,25 +459,39 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 Dict creditRateCeiling = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), item.getBusPlatform(), "creditRateCeiling");//贷记费率上限（%）
                 Dict debitRateCapping = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), item.getBusPlatform(), "debitRateCapping");//借记费率上限（%）
                 Dict debitCappingLower = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), item.getBusPlatform(), "debitCappingLower");//借记封顶额下限（元）
-                if(debitRateLower!=null){
+                if (debitRateLower==null) {
+                    item.setDebitRateLower("");
+                } else {
                     item.setDebitRateLower(debitRateLower.getdItemvalue());
                 }
-                if(debitCapping!=null){
+                if (debitCapping==null) {
+                    item.setDebitCapping("");
+                } else {
                     item.setDebitCapping(debitCapping.getdItemvalue());
                 }
-                if(debitAppearRate!=null){
+                if (debitAppearRate==null) {
+                    item.setDebitAppearRate("");
+                } else {
                     item.setDebitAppearRate(debitAppearRate.getdItemvalue());
                 }
-                if (creditRateFloor != null) {
+                if (creditRateFloor==null) {
+                    item.setCreditRateFloor("");
+                } else {
                     item.setCreditRateFloor(creditRateFloor.getdItemname());
                 }
-                if (creditRateCeiling != null) {
+                if (creditRateCeiling==null) {
+                    item.setCreditRateCeiling("");
+                } else {
                     item.setCreditRateCeiling(creditRateCeiling.getdItemname());
                 }
-                if (debitRateCapping != null) {
+                if (debitRateCapping==null) {
+                    item.setDebitRateCapping("");
+                } else {
                     item.setDebitRateCapping(debitRateCapping.getdItemname());
                 }
-                if (debitCappingLower != null) {
+                if (debitCappingLower==null) {
+                    item.setDebitCappingLower("");
+                } else {
                     item.setDebitCappingLower(debitCappingLower.getdItemname());
                 }
                 item.setVersion(agbus.getVersion());
@@ -418,20 +527,76 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
                 //校验业务编码是否存在
                 if (StringUtils.isNotBlank(agentBusInfoVo.getBusNum())) {
-                    if (StringUtils.isNotBlank(agentBusInfo.getBusNum())) {
-                        if (!agentBusInfo.getBusNum().equals(agentBusInfoVo.getBusNum())) {
-                            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
-                            agentBusInfoExample.createCriteria()
-                                    .andStatusEqualTo(Status.STATUS_1.status)
-                                    .andBusNumEqualTo(agentBusInfoVo.getBusNum());
-                            List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
-                            if (agentBusInfoList.size() > 0) {
-                                throw new MessageException("业务平台编码已存在！");
-                            }
+                    AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+                    agentBusInfoExample.createCriteria()
+                            .andStatusEqualTo(Status.STATUS_1.status)
+                            .andBusNumEqualTo(agentBusInfoVo.getBusNum())
+                            .andIdNotEqualTo(agentBusInfo.getId());
+                    List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+                    if (agentBusInfoList.size() > 0) {
+                        throw new MessageException("业务平台编码已存在！");
+                    }
+                }
+                //校验智慧POS登录账号是否存在
+                if (StringUtils.isNotBlank(agentBusInfoVo.getPosPlatCode())) {
+                    AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+                    agentBusInfoExample.createCriteria()
+                            .andStatusEqualTo(Status.STATUS_1.status)
+                            .andPosPlatCodeEqualTo(agentBusInfoVo.getPosPlatCode())
+                            .andIdNotEqualTo(agentBusInfo.getId());
+                    List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+                    if (agentBusInfoList.size() > 0) {
+                        throw new MessageException("智慧POS登录账号已存在！");
+                    }
+                }
+                //检查业务平台数据
+                PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfoVo.getBusPlatform());
+                if(platForm==null){
+                    throw new MessageException("业务平台不存在");
+                }
+                PlatformType platformType = platFormService.byPlatformCode(agentBusInfoVo.getBusPlatform());
+                if(PlatformType.RDBPOS.code.equals(platformType.getValue())){
+                    //检查手机号是否填写
+                    if(StringUtils.isBlank(agentBusInfoVo.getBusLoginNum())){
+                        throw new MessageException("瑞大宝平台登录账号不能为空");
+                    }
+                    if(!RegexUtil.checkInt(agentBusInfoVo.getBusLoginNum())){
+                        throw new MessageException("瑞大宝平台登录账号必须为数字");
+                    }
+                    if(agentBusInfoVo.getBusLoginNum().length()!=11){
+                        throw new MessageException("手机位数不正确");
+                    }
+                }
+                if(PlatformType.RHPOS.code.equals(platformType.getValue())){
+                    //检查手机号是否填写
+                    if(StringUtils.isBlank(agentBusInfoVo.getBusLoginNum())){
+                        throw new MessageException("瑞花宝平台登录账号不能为空");
+                    }
+                    if(!RegexUtil.checkInt(agentBusInfoVo.getBusLoginNum())){
+                        throw new MessageException("瑞花宝平台登录账号必须是数字");
+                    }
+                    if(agentBusInfoVo.getBusLoginNum().length()!=11){
+                        throw new MessageException("手机位数不正确");
+                    }
+                }
+                Map<String, String> hashMap = new HashMap<>();
+                hashMap.put("agentId",agentBusInfoVo.getAgentId());
+                hashMap.put("busType",BusType.JG.key);
+                hashMap.put("busTypeOne",BusType.BZYD.key);
+                List<AgentBusInfo> busInfosList=agentBusInfoMapper.queryBusinfo(hashMap);
+                if(null!=busInfosList && busInfosList.size()>0){
+                    for (AgentBusInfo busInfo : busInfosList) {
+                        busInfo.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
+                        busInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
+                        busInfo.setVersion(busInfo.getVersion());
+                        if(1!=agentBusInfoMapper.updateByPrimaryKey(busInfo)){
+                            logger.info("业务修改大区省区更新失败");
+                            throw new MessageException("业务修改大区省区更新失败");
                         }
                     }
                 }
                 //更新值
+                agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
                 agentBusInfo.setBusType(agentBusInfoVo.getBusType());
                 agentBusInfo.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
                 agentBusInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
@@ -448,6 +613,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 agentBusInfo.setVersion(agentBusInfo.getVersion());
                 agentBusInfo.setBusUseOrgan(agentBusInfoVo.getBusUseOrgan());
                 agentBusInfo.setBusScope(agentBusInfoVo.getBusScope());
+                agentBusInfo.setPosPlatCode(agentBusInfoVo.getPosPlatCode());
                 int updateAgentBusinfo = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
                 if (updateAgentBusinfo != 1) {
                     logger.info("业务数据-更新失败");
@@ -575,6 +741,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     if(!RegexUtil.checkInt(item.getBusLoginNum())){
                         throw new ProcessException("瑞大宝平台登录账号必须为数字");
                     }
+                    if(item.getBusLoginNum().length()!=11){
+                        throw new ProcessException("手机位数不正确");
+                    }
                 }
                 if(PlatformType.RHPOS.code.equals(platformType.getValue())){
                     //检查手机号是否填写
@@ -583,6 +752,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     }
                     if(!RegexUtil.checkInt(item.getBusLoginNum())){
                         throw new ProcessException("瑞花宝平台登录账号必须是数字");
+                    }
+                    if(item.getBusLoginNum().length()!=11){
+                        throw new ProcessException("手机位数不正确");
                     }
                 }
                 AgentBusInfo agentBusInfo = agentBusinfoService.agentPlatformNum(agentVo.getAgentId(),item.getBusPlatform());
@@ -604,12 +776,49 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
 
                 if(null!=agentBusInfo && StringUtils.isNotBlank(agentBusInfo.getAgDocDistrict())){
                     if(!agentBusInfo.getAgDocDistrict().equals( item.getAgDocDistrict())){
-                        throw new ProcessException("此业务的省区与月结相同品牌不一致");
+                        throw new ProcessException("此业务的大区与月结相同品牌不一致");
                     }
                 }
                 if(null!=agentBusInfo && StringUtils.isNotBlank(agentBusInfo.getAgDocPro())){
                     if(!agentBusInfo.getAgDocPro().equals( item.getAgDocPro())){
-                        throw new ProcessException("此业务的大区与月结相同品牌不一致");
+                        throw new ProcessException("此业务的省区与月结相同品牌不一致");
+                    }
+                }
+                //判断标准一代、机构只能有一个业务对接省区
+                if(StringUtils.isNotBlank(item.getBusType()) && StringUtils.isNotBlank(item.getAgentId()) && StringUtils.isNotBlank(item.getAgDocPro()) &&StringUtils.isNotBlank(item.getAgDocDistrict())){
+
+                    if(item.getBusType().equals(BusType.JG.key) ||item.getBusType().equals(BusType.BZYD.key)){
+                        Map<String, String> hashMap = new HashMap<>();
+                        hashMap.put("agentId",item.getAgentId());
+                        hashMap.put("busType",BusType.JG.key);
+                        hashMap.put("busTypeOne",BusType.BZYD.key);
+                        List<AgentBusInfo> busInfoList = agentBusInfoMapper.queryBusinfo(hashMap);
+                        Set<String> hashSetDocDistrict = new HashSet<>();
+                        Set<String> hashSetocPro = new HashSet<>();
+                        if(null!=busInfoList && busInfoList.size()>0){
+                            for (AgentBusInfo busInfo : busInfoList) {
+                                hashSetocPro.add(busInfo.getAgDocPro());
+                                hashSetDocDistrict.add(busInfo.getAgDocDistrict());
+                            }
+                           if(hashSetDocDistrict.size()==1 || hashSetocPro.size()==1){
+                                //如果只有一个则进行更改大区省区
+                                AgentBusInfo agent_businfo = busInfoList.get(0);
+                                if(StringUtils.isNotBlank(agent_businfo.getAgDocPro()) && StringUtils.isNotBlank(agent_businfo.getAgDocDistrict())){
+                                    if(!agent_businfo.getAgDocPro().equals(item.getAgDocPro()) || !agent_businfo.getAgDocDistrict().equals(item.getAgDocDistrict())){
+                                        logger.info("机构/标准一代的省区只能为相同省区");
+                                        throw new ProcessException("机构/标准一代的省区只能为相同省区");
+                                    }
+                                }
+                            }else if(hashSetDocDistrict.size()>1 || hashSetocPro.size()>1){
+                                logger.info("请联系市场部统一更改后再开通业务或修改业务");
+                                throw new ProcessException("请联系市场部统一更改后再开通业务或修改业务");
+                            }
+                         }
+                    }
+                }else{
+                    if(StringUtils.isBlank(item.getAgDocDistrict()) || StringUtils.isBlank(item.getAgDocPro())){
+                        logger.info("请填写大区或者省区");
+                        throw new ProcessException("请填写大区或者省区");
                     }
                 }
             }
@@ -847,6 +1056,28 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         map.put("platfromPerm",platfromPerm);
         map.put("status", Status.STATUS_1.status);
         map.put("agStatus", AgStatus.Approved.name());
+
+        if (!StringUtils.isBlank((String)map.get("busPlatformList"))) {
+            map.put("busPlatformList", Arrays.asList(((String) map.get("busPlatformList")).split(",")));
+        }else{
+            map.put("busPlatformList",new ArrayList<BigDecimal>());
+        }
+
+        List<BigDecimal> voList= new ArrayList<BigDecimal>();
+        if (!StringUtils.isBlank((String)map.get("cloReviewStatusList"))) {// bigdecimal 处理
+            List<String> list = Arrays.asList( ((String)map.get("cloReviewStatusList")).split(","));
+            voList = list.stream().map(str -> new BigDecimal(str.trim())).collect(Collectors.toList());
+            if( voList!=null && voList.size()>0)
+                map.put("cloReviewStatusList", voList);
+        }else{
+            map.put("cloReviewStatusList", new ArrayList<BigDecimal>());
+        }
+
+        if (StringUtils.isNotBlank((String)map.get("busTypeList"))) {
+            map.put("busTypeList", Arrays.asList(((String)map.get("busTypeList")).split(",")));
+        }else{
+            map.put("busTypeList", new ArrayList<BigDecimal>());
+        }
         List<BusinessOutVo> agentoutVos = agentBusInfoMapper.excelAgent(map);
         List<Dict> BUS_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name());
         List<Dict> BUS_SCOPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name());
@@ -1085,6 +1316,11 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         example.or().andStatusEqualTo(Status.STATUS_1.status).andPlatformStatusEqualTo(Status.STATUS_1.status).andPlatformNumIn(platList);
         example.setOrderByClause(" platform_type desc,c_time asc");
         return platFormMapper.selectByExample(example);
+    }
+
+    @Override
+    public List<AgentBusInfo> queryBusinfo(Map hashMap) {
+        return agentBusInfoMapper.queryBusinfo(hashMap);
     }
 
     /**

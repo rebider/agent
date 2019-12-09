@@ -90,7 +90,13 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         announceMentInfoVo.setAnnId(annId);
         announceMentInfoVo.setAnnoStat(AnnoStat.WAIT.code);
         announceMentInfoVo.setCreateTm(date);
-        announceMentInfoMapper.insert(announceMentInfoVo);
+       try {
+           announceMentInfoMapper.insert(announceMentInfoVo);
+       }catch (Exception e){
+           logger.error("保存公告表异常");
+           return ResultVO.fail("保存公告失败!");
+       }
+
         String orgs = announceMentInfoVo.getOrgs();
         List<AnnoPlatformRela> ralas = new ArrayList<>();
         String relaId = idService.genIdInTran(TabId.A_ANNO_PLATFORM_RELA);
@@ -123,7 +129,12 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
             ralas.add(platRela);
         });
         logger.info("添加关联表{}",ralas.toString());
-        int i = annoPlatformRelaService.batchSave(ralas);
+        try {
+            annoPlatformRelaService.batchSave(ralas);
+        }catch (Exception e){
+            logger.error("保存公告关联表异常");
+            return ResultVO.fail("保存公告失败,关联表异常!");
+        }
 
         List<String> attFiles = announceMentInfoVo.getAttFiles();
         if(attFiles!=null){
@@ -242,7 +253,7 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         if (agent==null){
             return  pageInfo;
         }
-        String agUniqNum = agent.getAgUniqNum();
+        String agUniqNum = agent.getId();
         Map<String,Object> map = new HashMap<>();
         map.put("agentId",agUniqNum);
         logger.info("代理商查看公告,唯一编码{}",agUniqNum);
@@ -250,6 +261,10 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         List<String> plats = agentBusInfoMapper.queryBusPlatform(map);
         List<String> docPros = agentBusInfoMapper.queryAgDocPro(map);
         List<String> busTypes = agentBusInfoMapper.queryBusType(map);
+        //查询信息判断
+        if (!(plats.size() > 0 &&  docPros.size() > 0 && busTypes.size() > 0)) {
+            return  new PageInfo();
+        }
         logger.info("业务:{},机构:{},业务平台:{}",plats,docPros,busTypes);
         logger.info("查找代理商{}上级机构编号",docPros);
         Map<String,Object> orgmap = new HashMap<>();

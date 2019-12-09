@@ -21,7 +21,9 @@
                 overwrite="true"
                 description="代理商账号补全任务"
                 sharding-total-count="1"
-                sharding-item-parameters="0=Server0">
+                sharding-item-parameters="0=Server0"
+                disabled="${job.agentLoginAccountCreateJob}"
+                >
         <job:distributed-listener class="com.ryx.job.listener.ExmpDistributedListener" started-timeout-milliseconds="100" completed-timeout-milliseconds="100" />
     </job:simple>
 
@@ -32,7 +34,8 @@
                 overwrite="true"
                 description="线下打款开票不开票数据汇总，每月1号的0点十分执行"
                 sharding-total-count="1"
-                sharding-item-parameters="0=Server0"/>
+                sharding-item-parameters="0=Server0"
+                disabled="${job.cashSummaryMouthDataJob}"/>
 
 
     <job:simple id="oPdSumCreate"
@@ -43,7 +46,7 @@
                 description="分润抵扣机具欠款分期汇总"
                 sharding-total-count="1"
                 sharding-item-parameters="0=Server0"
-                disabled="true"/>
+                disabled="${job.oPdSumCreateJob}"/>
 
     <job:simple id="synColinfoToPayment"
                 job-ref="synColinfoToPaymentJob"
@@ -52,7 +55,8 @@
                 overwrite="true"
                 description="收款账户同步出款表"
                 sharding-total-count="1"
-                sharding-item-parameters="0=Server0"/>
+                sharding-item-parameters="0=Server0"
+                disabled="${job.synColinfoToPaymentJob}"/>
 
     <job:simple id="synColinfoToQueryPayment"
                 job-ref="synColinfoToQueryPaymentJob"
@@ -61,7 +65,8 @@
                 overwrite="true"
                 description="收款账户同步出款表"
                 sharding-total-count="1"
-                sharding-item-parameters="0=Server0"/>
+                sharding-item-parameters="0=Server0"
+                disabled="${job.synColinfoToQueryPaymentJob}"/>
 
     <job:simple id="completAllAgentBusInfoCompany"
                 job-ref="completAllAgentBusInfoCompanyJob"
@@ -70,7 +75,8 @@
                 overwrite="true"
                 description="修复代理商业务平台的打款公司 单节点"
                 sharding-total-count="1"
-                sharding-item-parameters="0=Server0"/>
+                sharding-item-parameters="0=Server0"
+                disabled="${job.completAllAgentBusInfoCompanyJob}"/>
 
     <job:simple id="checkAgentColinfoJob"
                 job-ref="checkAgentColinfoJob"
@@ -79,7 +85,8 @@
                 overwrite="true"
                 description="代理商收款账户不唯一 每天早上五点执行 单节点"
                 sharding-total-count="1"
-                sharding-item-parameters="0=Server0"/>
+                sharding-item-parameters="0=Server0"
+                disabled="${job.checkAgentColinfoJob}"/>
 
     <job:simple id="transferLogisticsHistoryJob"
                 job-ref="transferLogisticsHistoryJob"
@@ -88,7 +95,8 @@
                 overwrite="true"
                 description="物流明细历史记录移动到历史表，每月1号0晨10分 单节点"
                 sharding-total-count="1"
-                sharding-item-parameters="0=Server0"/>
+                sharding-item-parameters="0=Server0"
+                disabled="${job.transferLogisticsHistoryJob}"/>
 
     <job:simple id="osnFaHuoGenSnDetail"
                 job-ref="osnFaHuoGenSnDetailJob"
@@ -97,7 +105,8 @@
                 overwrite="true"
                 description="发货sn生成明细 单节点 每分钟"
                 sharding-total-count="1"
-                sharding-item-parameters="0=Server0"/>
+                sharding-item-parameters="0=Server0"
+                disabled="${job.osnFaHuoGenSnDetailJob}"/>
 
     <job:dataflow id="osnFaHuo"
                 job-ref="osnFaHuoJob"
@@ -108,7 +117,7 @@
                 streaming-process="false"
                 description="发货sn下发业务系统任务  单节点 每分钟"
                 overwrite="true"
-                disabled="false"/>
+                disabled="${job.osnFaHuoJob}"/>
 
 
     <job:simple id="internetCard"
@@ -118,7 +127,8 @@
                 overwrite="true"
                 description="处理未处理的物联网卡导入 1分钟执行一次"
                 sharding-total-count="1"
-                sharding-item-parameters="0=Server0"/>
+                sharding-item-parameters="0=Server0"
+                disabled="${job.internetCardJob}"/>
 
 
     <job:simple id="internetCardUpdateMechJob"
@@ -128,7 +138,9 @@
                 overwrite="true"
                 description="物联网卡，更新已修改的商户信息（是续费，正常）"
                 sharding-total-count="1"
-                sharding-item-parameters="0=Server0"/>
+                sharding-item-parameters="0=Server0"
+                disabled="${job.internetCardUpdateMechJob}"/>
+
     <job:simple id="terminalTransferJob"
                 job-ref="terminalTransferJob"
                 registry-center-ref="regCenter"
@@ -136,7 +148,8 @@
                 overwrite="true"
                 description="终端划拨出查询调整结果"
                 sharding-total-count="1"
-                sharding-item-parameters="0=Server0"/>
+                sharding-item-parameters="0=Server0"
+                disabled="${job.terminalTransferJob}"/>
 
 
     <job:dataflow id="internetCardUpdateMechIsNull"
@@ -148,7 +161,7 @@
                   streaming-process="true"
                   description="物联网卡，更新商户为空的数据,30分钟执行一次"
                   overwrite="true"
-                  disabled="false"/>
+                  disabled="${job.internetCardUpdateMechIsNullJob}"/>
 
 
     <job:dataflow id="internetCardMigrationHistory"
@@ -160,7 +173,7 @@
                   streaming-process="true"
                   description="物联网卡，迁移到历史表,每天凌晨一天执行一次"
                   overwrite="true"
-                  disabled="false"/>
+                  disabled="${job.internetCardMigrationHistoryJob}"/>
 
     <job:dataflow id="internetCardOffsetDetail"
                   job-ref="internetCardOffsetDetailJob"
@@ -171,7 +184,7 @@
                   streaming-process="true"
                   description="物联网卡,生产轧差明细每日汇总"
                   overwrite="true"
-                  disabled="false"/>
+                  disabled="${job.internetCardOffsetDetailJob}"/>
 
     <job:dataflow id="updateAgentCertifiDetail"
                   job-ref="updateAgentCertifiDetailJob"
@@ -182,7 +195,7 @@
                   streaming-process="true"
                   description="定时更新代理商工商认证信息"
                   overwrite="true"
-                  disabled="false"/>
+                  disabled="${job.updateAgentCertifiDetailJob}"/>
 
     <job:simple id="osnTuiHuoGenSnDetail"
                 job-ref="osnTuiHuoGenSnDetailJob"
@@ -191,7 +204,8 @@
                 overwrite="true"
                 description="退货发货sn生成明细 单节点 每分钟"
                 sharding-total-count="1"
-                sharding-item-parameters="0=Server0"/>
+                sharding-item-parameters="0=Server0"
+                disabled="${job.osnTuiHuoGenSnDetailJob}"/>
 
     <job:dataflow id="osnTuiHuo"
                   job-ref="osnTuiHuoJob"
@@ -202,7 +216,18 @@
                   streaming-process="false"
                   description="退货发货sn下发业务系统任务  单节点 每分钟"
                   overwrite="true"
-                  disabled="false"/>
+                  disabled="${job.osnTuiHuoJob}"/>
+
+    <job:dataflow id="removeAccount"
+                  job-ref="removeAccountJob"
+                  registry-center-ref="regCenter"
+                  cron="0 0/5 * * * ?"
+                  sharding-total-count="1"
+                  sharding-item-parameters="0=C"
+                  streaming-process="true"
+                  description="定时更新销账信息 每5分钟更新一次 单节点"
+                  overwrite="true"
+                  disabled="${job.removeAccountJob}"/>
 
     <!--&lt;!&ndash;configure job 样例配置 &ndash;&gt;-->
     <!--<job:simple id="mySimpleTask"-->

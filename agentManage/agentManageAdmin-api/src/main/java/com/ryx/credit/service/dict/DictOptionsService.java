@@ -6,6 +6,7 @@ import com.ryx.credit.pojo.admin.agent.Dict;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by cx on 2018/5/22.
@@ -21,7 +22,7 @@ public interface DictOptionsService {
 
     Dict selectByPrimaryKey(String id);
 
-    boolean insertDict(Dict dict, @Param("tableName")String tableName);
+    boolean insertDict(Dict dict) throws Exception;
 
     int updateByPrimaryKeySelective(Dict record);  // 删除（编辑）状态
 
@@ -32,4 +33,10 @@ public interface DictOptionsService {
     String getApproveVersion(String approveName)throws ProcessException;
 
     List<String> getAgentNameList(Long userId);
+
+    int editDictByDict(Map<String, Dict> dictMap);
+
+    Dict findDictByValueAndName(Dict oldDict);
+
+    boolean editDictByOldDict(Dict oldDict, Dict newDict)throws Exception;
 }

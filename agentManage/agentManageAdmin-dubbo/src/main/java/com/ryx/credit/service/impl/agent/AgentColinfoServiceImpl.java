@@ -472,8 +472,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         colinfoPayment.setId(id);
         colinfoPayment.setBalanceLs(id);  //流水号
         int insert = colinfoPaymentMapper.insert(colinfoPayment);
-        AgentColinfo agentColinfo = new AgentColinfo();
-        agentColinfo.setId(colinfoPayment.getColinfoId());
+        AgentColinfo agentColinfo = agentColinfoMapper.selectByPrimaryKey(colinfoPayment.getColinfoId());
         agentColinfo.setPayStatus(ColinfoPayStatus.B.getValue());
         int update = agentColinfoMapper.updateByPrimaryKeySelective(agentColinfo);
         if (insert != 1 || update != 1) {
@@ -512,8 +511,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
             upPayment.setRemark(String.valueOf(resultMap.get("remark")));
         int upPay = colinfoPaymentMapper.updateByPrimaryKeySelective(upPayment);
 
-        AgentColinfo upColinfo = new AgentColinfo();
-        upColinfo.setId(aColinfoPayment.getColinfoId());
+        AgentColinfo upColinfo = agentColinfoMapper.selectByPrimaryKey(aColinfoPayment.getColinfoId());
         if (String.valueOf(resultMap.get("flag")).equals(TransFlag.CG.getValue())) {
             upColinfo.setPayStatus(ColinfoPayStatus.C.getValue());
         } else if (String.valueOf(resultMap.get("flag")).equals(TransFlag.SB.getValue())) {
