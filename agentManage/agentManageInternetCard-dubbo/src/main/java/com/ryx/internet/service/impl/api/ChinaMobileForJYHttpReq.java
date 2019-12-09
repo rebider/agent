@@ -24,6 +24,8 @@ public class ChinaMobileForJYHttpReq {
     private final static String ryxCode = "2001841663"; //集团编码
     private final static String version = "3.0"; //接口版本
     private final static String format = "json"; //通信报文格式
+    private final static String batchQueryCardUrl = "http://120.197.89.173:8081/openapi/router";
+
     private static Logger log = LoggerFactory.getLogger(ChinaMobileForJYHttpReq.class);
 
     /**
@@ -39,28 +41,32 @@ public class ChinaMobileForJYHttpReq {
         return ryxCode+dateTime+randomNum;
     }
 
-
-    public static String HttpRequest(){
+    /**
+     * 请求
+     * @param iccids
+     * @return
+     */
+    public static String batchQueryCardStatus(String iccids){
         Map<String, String> paramMap = new HashMap<>();
         paramMap.put("appKey",appKey);
         paramMap.put("format",format);
         paramMap.put("method","triopi.member.lifecycle.batch.query");
         paramMap.put("transID",getTransId());
         paramMap.put("v",version);
-        paramMap.put("iccids","89860405191891848577");
+        paramMap.put("iccids",iccids);
         String sign = ApiUtils.sign(paramMap, secretKey);
         paramMap.put("sign",sign);
         paramMap= ApiUtils.sortMap(paramMap);
         log.info("揭阳移动接口查询状态请求参数：{}",paramMap);
-        String result = HttpClientUtil.doPost("http://120.197.89.173:8081/openapi/router", paramMap);
+        String result = HttpClientUtil.doPost(batchQueryCardUrl, paramMap);
         String decrypt = DESUtils.decrypt(result, secretKey);
         log.info("揭阳移动接口查询状态返回参数：{}",decrypt);
-        return "";
+        return decrypt;
     }
 
 
     public static void main(String[] args){
-        System.out.println(HttpRequest());
+        System.out.println(batchQueryCardStatus("898604051918918485771"));
     }
 
 
