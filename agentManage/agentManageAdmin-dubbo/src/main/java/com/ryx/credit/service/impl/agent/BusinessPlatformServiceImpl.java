@@ -579,19 +579,23 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                         throw new MessageException("手机位数不正确");
                     }
                 }
-                Map<String, String> hashMap = new HashMap<>();
-                hashMap.put("agentId",agentBusInfoVo.getAgentId());
-                hashMap.put("busType",BusType.JG.key);
-                hashMap.put("busTypeOne",BusType.BZYD.key);
-                List<AgentBusInfo> busInfosList=agentBusInfoMapper.queryBusinfo(hashMap);
-                if(null!=busInfosList && busInfosList.size()>0){
-                    for (AgentBusInfo busInfo : busInfosList) {
-                        busInfo.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
-                        busInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
-                        busInfo.setVersion(busInfo.getVersion());
-                        if(1!=agentBusInfoMapper.updateByPrimaryKey(busInfo)){
-                            logger.info("业务修改大区省区更新失败");
-                            throw new MessageException("业务修改大区省区更新失败");
+                if(StringUtils.isNotBlank(agentBusInfoVo.getBusType())){
+                    if(agentBusInfoVo.getBusType().equals(BusType.JG.key) || agentBusInfoVo.getBusType().equals(BusType.BZYD.key)){
+                        Map<String, String> hashMap = new HashMap<>();
+                        hashMap.put("agentId",agentBusInfoVo.getAgentId());
+                        hashMap.put("busType",BusType.JG.key);
+                        hashMap.put("busTypeOne",BusType.BZYD.key);
+                        List<AgentBusInfo> busInfosList=agentBusInfoMapper.queryBusinfo(hashMap);
+                        if(null!=busInfosList && busInfosList.size()>0){
+                            for (AgentBusInfo busInfo : busInfosList) {
+                                busInfo.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
+                                busInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
+                                busInfo.setVersion(busInfo.getVersion());
+                                if(1!=agentBusInfoMapper.updateByPrimaryKey(busInfo)){
+                                    logger.info("业务修改大区省区更新失败");
+                                    throw new MessageException("业务修改大区省区更新失败");
+                                }
+                            }
                         }
                     }
                 }
