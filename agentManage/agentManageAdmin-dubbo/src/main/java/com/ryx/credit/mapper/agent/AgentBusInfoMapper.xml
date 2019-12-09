@@ -1230,7 +1230,7 @@ union
     select
     <include refid="Base_Column_List" />
     from A_AGENT_BUSINFO
-    where status=1
+    where status=1 and  CLO_REVIEW_STATUS in (2,3)
     <if test="map.agentId !=null and map.agentId !=''">
       and AGENT_ID = #{map.agentId}
     </if>
