@@ -4,6 +4,8 @@ import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.dao.agent.AgentMapper;
+import com.ryx.credit.dao.agent.PlatFormMapper;
+import com.ryx.credit.pojo.admin.agent.PlatForm;
 import com.ryx.credit.service.data.EchartDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,8 @@ public class EchartDataServiceImpl implements EchartDataService {
 
     @Autowired
     private AgentMapper agentMapper;
+    @Autowired
+    private PlatFormMapper platFormMapper;
     /**
      * 图表数据获取
      * @param paramMap
@@ -81,5 +85,10 @@ public class EchartDataServiceImpl implements EchartDataService {
         pageInfo.setRows(echartDataMapList);
         pageInfo.setTotal(agentMapper.queryEchartDataCount(map));
         return pageInfo;
+    }
+
+    @Override
+    public List<PlatForm> getPlatFormType() {
+        return platFormMapper.getPlatFormType();
     }
 }
