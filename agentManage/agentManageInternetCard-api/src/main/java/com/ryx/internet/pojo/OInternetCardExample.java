@@ -2278,6 +2278,76 @@ public class OInternetCardExample {
             addCriterion("POSTPONE_CAUSE not between", value1, value2, "postponeCause");
             return (Criteria) this;
         }
+
+        public Criteria andStatusTimeIsNull() {
+            addCriterion("STATUS_TIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusTimeIsNotNull() {
+            addCriterion("STATUS_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusTimeEqualTo(String value) {
+            addCriterion("STATUS_TIME =", value, "statusTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusTimeNotEqualTo(String value) {
+            addCriterion("STATUS_TIME <>", value, "statusTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusTimeGreaterThan(String value) {
+            addCriterion("STATUS_TIME >", value, "statusTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusTimeGreaterThanOrEqualTo(String value) {
+            addCriterion("STATUS_TIME >=", value, "statusTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusTimeLessThan(String value) {
+            addCriterion("STATUS_TIME <", value, "statusTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusTimeLessThanOrEqualTo(String value) {
+            addCriterion("STATUS_TIME <=", value, "statusTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusTimeLike(String value) {
+            addCriterion("STATUS_TIME like", value, "statusTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusTimeNotLike(String value) {
+            addCriterion("STATUS_TIME not like", value, "statusTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusTimeIn(List<String> values) {
+            addCriterion("STATUS_TIME in", values, "statusTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusTimeNotIn(List<String> values) {
+            addCriterion("STATUS_TIME not in", values, "statusTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusTimeBetween(String value1, String value2) {
+            addCriterion("STATUS_TIME between", value1, value2, "statusTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusTimeNotBetween(String value1, String value2) {
+            addCriterion("STATUS_TIME not between", value1, value2, "statusTime");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

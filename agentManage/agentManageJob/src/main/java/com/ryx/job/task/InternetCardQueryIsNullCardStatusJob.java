@@ -18,10 +18,10 @@ import java.util.List;
  * @Param
  * @return
  **/
-@Service("internetCardQueryCardStatusJob")
-public class InternetCardQueryCardStatusJob implements DataflowJob<OInternetCard> {
+@Service("internetCardQueryIsNullCardStatusJob")
+public class InternetCardQueryIsNullCardStatusJob implements DataflowJob<OInternetCard> {
 
-    private static Logger log = LoggerFactory.getLogger(InternetCardQueryCardStatusJob.class);
+    private static Logger log = LoggerFactory.getLogger(InternetCardQueryIsNullCardStatusJob.class);
 
     @Autowired
     private QueryCardStatusJobService queryCardStatusJobService;
@@ -29,12 +29,12 @@ public class InternetCardQueryCardStatusJob implements DataflowJob<OInternetCard
 
     @Override
     public List<OInternetCard> fetchData(ShardingContext shardingContext) {
-        return queryCardStatusJobService.fetchDataUpdateCardStatus("");
+        return queryCardStatusJobService.fetchDataUpdateCardStatus("selectNull");
     }
 
     @Override
     public void processData(ShardingContext shardingContext, List<OInternetCard> list) {
-        log.info("查询要更新状态的数据,不为空，processData开始");
+        log.info("查询要更新状态的数据,为空，processData开始");
         long t1 = System.currentTimeMillis();
         queryCardStatusJobService.processDataUpdateCardStatus(list);
         long t2 = System.currentTimeMillis();

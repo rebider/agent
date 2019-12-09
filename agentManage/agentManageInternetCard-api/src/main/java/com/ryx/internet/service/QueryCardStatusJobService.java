@@ -9,6 +9,9 @@ import java.util.List;
  */
 public interface QueryCardStatusJobService {
 
-    List<OInternetCard> fetchDataUpdateCardStatus();
+    List<OInternetCard> fetchDataUpdateCardStatus(String type);
+
+    void processDataUpdateCardStatus( List<OInternetCard> internetCardList);
+
 
 }
