@@ -71,11 +71,11 @@
     <job:dataflow id="internetCardQueryIsNullCardStatus"
                   job-ref="internetCardQueryIsNullCardStatusJob"
                   registry-center-ref="regCenter"
-                  cron="0 0/30 * * * ? *"
+                  cron="0/3 * 7-23 * * ?"
                   sharding-total-count="1"
                   sharding-item-parameters="0=C"
-                  streaming-process="true"
-                  description="物联网卡，更新卡状态为空，半小时更新一次"
+                  streaming-process="false"
+                  description="物联网卡，更新卡状态为空，7点到23点，3秒执行一次"
                   overwrite="true"
                   disabled="${job.internetCardQueryIsNullCardStatusJob}"/>
 
@@ -83,11 +83,11 @@
     <job:dataflow id="internetCardQueryCardStatus"
                   job-ref="internetCardQueryCardStatusJob"
                   registry-center-ref="regCenter"
-                  cron="0 0 1 * * ?"
+                  cron="0/3 * 7-23 * * ?"
                   sharding-total-count="1"
                   sharding-item-parameters="0=C"
-                  streaming-process="true"
-                  description="物联网卡，更新卡状态不为空，每天凌晨1点更新一次"
+                  streaming-process="false"
+                  description="物联网卡，更新卡状态不为空，0点到7点，3秒执行一次"
                   overwrite="true"
                   disabled="${job.internetCardQueryCardStatusJob}"/>
 
