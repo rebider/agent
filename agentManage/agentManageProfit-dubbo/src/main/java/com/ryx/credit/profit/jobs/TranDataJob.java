@@ -741,8 +741,8 @@ public class TranDataJob {
         for (Map<String,Object> map:jsonObj){
             BigDecimal amount = new BigDecimal(map.get("amount")==null?"0":map.get("amount").toString());
             BigDecimal fee = new BigDecimal(map.get("fee")==null?"0":map.get("fee").toString());
-            profitAmt.add(amount);
-            profitFee.add(fee);
+            profitAmt=profitAmt.add(amount);
+            profitFee=profitFee.add(fee);
         }
 
         Map<String, Object> tranAmt = new HashMap<>();
