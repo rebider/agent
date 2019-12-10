@@ -61,6 +61,10 @@ public class OrderAdj implements Serializable {
 
     private BigDecimal proRefundAmount;
 
+    private BigDecimal offsetAmount;
+
+    private BigDecimal difAmount;
+
     public String getId() {
         return id;
     }
@@ -283,5 +287,21 @@ public class OrderAdj implements Serializable {
 
     public void setProRefundAmount(BigDecimal proRefundAmount) {
         this.proRefundAmount = proRefundAmount;
+    }
+
+    public BigDecimal getOffsetAmount() {
+        return offsetAmount;
+    }
+
+    public void setOffsetAmount(BigDecimal offsetAmount) {
+        this.offsetAmount = offsetAmount;
+    }
+
+    public BigDecimal getDifAmount() {
+        return difAmount;
+    }
+
+    public void setDifAmount(BigDecimal difAmount) {
+        this.difAmount = difAmount;
     }
 }
