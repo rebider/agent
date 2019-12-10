@@ -780,4 +780,26 @@
     <include refid="queryInternetCardSql" />
   </select>
 
+
+  <select id="selectUpdateCardStatus" parameterType="map" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select c.iccid_num from o_internet_Card c
+    <where>
+        c.status = 1
+        and c.issuer = #{map.issuer}
+        and TO_CHAR(c.expire_time, 'YYYY-MM')
+        <foreach collection="map.expireTimeList" item="expireTime" open=" in(" close=")" separator=",">
+          #{expireTime}
+        </foreach>
+        <if test="map.type == 'selectNull'">
+           and c.status_time is null and c.task_status_time is null
+        </if>
+        <if test="map.type != 'selectNull'">
+           and c.status_time is not null and c.task_status_time &lt; #{map.tasksStatusTime}
+        </if>
+    </where>
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+
 </mapper>

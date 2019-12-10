@@ -20,9 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /***
  * 揭阳移动同步更新状态Job
@@ -47,19 +45,19 @@ public class QueryCardStatusJobServiceImpl implements QueryCardStatusJobService 
     @Override
     public List<OInternetCard> fetchDataUpdateCardStatus(String type){
         log.info("fetchDataUpdateCardStatus查询流量卡更新卡状态开始");
-        OInternetCardExample oInternetCardExample = new OInternetCardExample();
-        OInternetCardExample.Criteria criteria = oInternetCardExample.createCriteria();
-        criteria.andStatusEqualTo(Status.STATUS_1.status);
-        criteria.andIssuerEqualTo(Issuerstatus.JY_MOBILE.getValue());
-        if(type.equals("selectNull")){
-            criteria.andStatusTimeIsNull();
-            criteria.andTaskStatusTimeIsNull();
-        }else{
-            criteria.andStatusTimeIsNotNull();
-            criteria.andTaskStatusTimeLessThan(DateUtil.getTodayTimeZero(new Date()));
+        Map<String,Object> reqMap = new HashMap<>();
+        List<String> expireTimeList = new ArrayList<>();
+        expireTimeList.add(DateUtil.getPerDayOfMonth(0));
+        expireTimeList.add(DateUtil.getPerDayOfMonth(1));
+        expireTimeList.add(DateUtil.getPerDayOfMonth(2));
+        expireTimeList.add(DateUtil.getPerDayOfMonth(3));
+        reqMap.put("expireTimeList",expireTimeList);
+        reqMap.put("issuer",Issuerstatus.JY_MOBILE.getValue());
+        reqMap.put("type",type);
+        if(!type.equals("selectNull")){
+            reqMap.put("tasksStatusTime",DateUtil.getTodayTimeZero(new Date()));
         }
-        oInternetCardExample.setPage(new Page(0,100));
-        List<OInternetCard> internetCards = internetCardMapper.selectByExample(oInternetCardExample);
+        List<OInternetCard> internetCards = internetCardMapper.selectUpdateCardStatus(reqMap, new Page(0, 100));
         log.info("fetchDataUpdateCardStatus查询流量卡更新卡状态数量为:{}",internetCards.size());
         return internetCards;
     }
