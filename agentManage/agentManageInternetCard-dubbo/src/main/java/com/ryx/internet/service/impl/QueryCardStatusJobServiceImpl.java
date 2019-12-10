@@ -76,8 +76,14 @@ public class QueryCardStatusJobServiceImpl implements QueryCardStatusJobService 
         }
         log.info("揭阳移动返回数据处理,iccids：{}",iccids);
         String mobileResult = ChinaMobileForJYHttpReq.batchQueryCardStatus(iccids.toString().substring(0, iccids.toString().length() - 1));
-
         JSONObject jsonObj = JSONObject.parseObject(mobileResult);
+        String code = jsonObj.getString("code");
+        //所有非0返回结果码均表示请求处理失败
+        if(!code.equals("0")){
+            log.info("揭阳移动返回数据处理,code!=0,error:{}",jsonObj.getString("error"));
+            return;
+        }
+
         JSONObject jsonData = JSONObject.parseObject(jsonObj.getString("data"));
         JSONObject statusList = JSONObject.parseObject(jsonData.getString("statusList"));
         List<Map<String,String>> resultListMap = (List)statusList.getJSONArray("list");
