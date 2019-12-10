@@ -253,7 +253,7 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         if (agent==null){
             return  pageInfo;
         }
-        String agUniqNum = agent.getAgUniqNum();
+        String agUniqNum = agent.getId();
         Map<String,Object> map = new HashMap<>();
         map.put("agentId",agUniqNum);
         logger.info("代理商查看公告,唯一编码{}",agUniqNum);
@@ -261,6 +261,10 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         List<String> plats = agentBusInfoMapper.queryBusPlatform(map);
         List<String> docPros = agentBusInfoMapper.queryAgDocPro(map);
         List<String> busTypes = agentBusInfoMapper.queryBusType(map);
+        //查询信息判断
+        if (!(plats.size() > 0 &&  docPros.size() > 0 && busTypes.size() > 0)) {
+            return  new PageInfo();
+        }
         logger.info("业务:{},机构:{},业务平台:{}",plats,docPros,busTypes);
         logger.info("查找代理商{}上级机构编号",docPros);
         Map<String,Object> orgmap = new HashMap<>();

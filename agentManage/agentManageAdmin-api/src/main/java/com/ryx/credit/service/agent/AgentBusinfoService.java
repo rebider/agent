@@ -120,4 +120,11 @@ public interface AgentBusinfoService {
     Map<String,String> queryBusInfoByBrandNum(String brandNum)throws MessageException;
 
     List<String> queryOrgByAgentid(Map map);
+
+    List<AgentBusInfo> selectByAgentBusInfo(AgentBusInfo agentBusInfo);
+
+    /**
+     * 查询品牌
+     */
+    public AgentBusInfo agentPlatformNum(String agentId,String platFormNum);
 }

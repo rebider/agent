@@ -99,20 +99,20 @@ public class RefundJob {
     @Scheduled(cron = "${profit_refund_job_cron}")
     public void deal() {
         if (!"preproduction".equals(environment)){
-            // 上月的开始及结束日期
-            //JSONObject param = new JSONObject();
-            Map<String,String> param = new HashMap<String,String>();
-            // pos退单应扣分润
-            param.put("bussType", "02");
-            getDeductionListAndDeal(param);
-            // pos退单应补分润
-            getSupplyListAndDeal(param);
+        // 上月的开始及结束日期
+        //JSONObject param = new JSONObject();
+        Map<String,String> param = new HashMap<String,String>();
+        // pos退单应扣分润
+        param.put("bussType", "02");
+        getDeductionListAndDeal(param);
+        // pos退单应补分润
+        getSupplyListAndDeal(param);
 
-            param.put("bussType", "01");
-            // mpos退单应扣分润
-            getDeductionListAndDeal(param);
-            // 退mpos单应补分润
-            getSupplyListAndDeal(param);
+        param.put("bussType", "01");
+        // mpos退单应扣分润
+        getDeductionListAndDeal(param);
+        // 退mpos单应补分润
+        getSupplyListAndDeal(param);
         }
     }
 

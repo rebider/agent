@@ -384,7 +384,8 @@
     to_char(orders.O_INURETIME, 'YYYY-MM-DD') as TIME,
     businfo.bus_num,
     businfo.ag_doc_district,
-    businfo.ag_doc_pro
+    businfo.ag_doc_pro,
+      to_char(P.c_time, 'YYYY-MM-DD') as C_TIME
     FROM O_RECEIPT_PLAN R
     LEFT JOIN O_RECEIPT_ORDER O ON R.RECEIPT_ID = O.ID and o.status=1 and R.status=1
     LEFT JOIN D_REGION D ON O.ADDR_PROVINCE = D.R_CODE
@@ -528,5 +529,21 @@
     where 1=1 and r.status=1 and r.return_order_detail_id in
     (select id from o_return_order_detail where return_id = #{returnId})
     order by r.c_date desc
+  </select>
+
+  <select id="planCountTotal" resultType="java.math.BigDecimal" parameterType="String">
+    select nvl(sum(rp.plan_pro_num),0) from o_receipt_plan rp
+    left join o_order oo on oo.id = rp.order_id and oo.status=1
+    left join o_receipt_pro pro on pro.orderid = oo.id and rp.pro_id = pro.id and pro.status=1
+    left join o_sub_order os on os.pro_id = pro.pro_id and os.order_id = oo.id and os.status=1
+    <where>
+      1=1 and rp.status=1
+      <if test="orderId!=null and orderId!=''">
+        and rp.order_id = #{orderId}
+      </if>
+      <if test="proId!=null and proId!=''">
+        and pro.pro_id = #{proId}
+      </if>
+    </where>
   </select>
 </mapper>

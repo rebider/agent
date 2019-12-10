@@ -6,6 +6,7 @@ import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
+import com.ryx.credit.common.util.RegexUtil;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.COrganizationMapper;
@@ -140,6 +141,43 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                 }
             }
         }
+
+        if(null!=agentVo.getBusInfoVoList() && agentVo.getBusInfoVoList().size()>0){
+            for (AgentBusInfoVo abus : agentVo.getBusInfoVoList()) {
+                //检查业务平台数据
+                PlatForm platForm = platFormMapper.selectByPlatFormNum(abus.getBusPlatform());
+                if(platForm==null){
+                    throw new MessageException("业务平台不存在");
+                }
+
+                PlatformType platformType = platFormService.byPlatformCode(abus.getBusPlatform());
+                if(PlatformType.RDBPOS.code.equals(platformType.getValue())){
+                    //检查手机号是否填写
+                    if(StringUtils.isBlank(abus.getBusLoginNum())){
+                        throw new MessageException("瑞大宝平台登录账号不能为空");
+                    }
+                    if(!RegexUtil.checkInt(abus.getBusLoginNum())){
+                        throw new MessageException("瑞大宝平台登录账号必须为数字");
+                    }
+                    if(abus.getBusLoginNum().length()!=11){
+                        throw new MessageException("手机位数不正确");
+                    }
+                }
+                if(PlatformType.RHPOS.code.equals(platformType.getValue())){
+                    //检查手机号是否填写
+                    if(StringUtils.isBlank(abus.getBusLoginNum())){
+                        throw new MessageException("瑞花宝平台登录账号不能为空");
+                    }
+                    if(!RegexUtil.checkInt(abus.getBusLoginNum())){
+                        throw new MessageException("瑞花宝平台登录账号必须是数字");
+                    }
+                    if(abus.getBusLoginNum().length()!=11){
+                        throw new MessageException("手机位数不正确");
+                    }
+                }
+            }
+        }
+
         BusActRelExample example = new BusActRelExample();
         example.or().andBusIdEqualTo(dateChangeRequest.getId()).andActivStatusEqualTo(AgStatus.Approving.name()).andStatusEqualTo(Status.STATUS_1.status);
         List<BusActRel> list = busActRelMapper.selectByExample(example);
@@ -215,8 +253,18 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                 record.setExplain(agentBusInfoVo.getBusNum());
             }
         }else{
-            record.setAgDocDistrict(agent.getAgDocDistrict());
-            record.setAgDocPro(agent.getAgDocPro());
+            List<Map<String, Object>> maps = iUserService.orgCode(Long.valueOf(userId));
+            if(maps!=null && maps.size()>0){
+                Map<String, Object> stringObjectMap = maps.get(0);
+                record.setAgDocPro(stringObjectMap.get("ORGID")+"");
+                if(null!=stringObjectMap.get("isRegion") && (Boolean)stringObjectMap.get("isRegion")) {
+                    record.setAgDocDistrict(stringObjectMap.get("ORGPID") + "");
+                }else if(null!=stringObjectMap.get("ppidorgcodeisRegion") && (Boolean)stringObjectMap.get("ppidorgcodeisRegion")) {
+                    record.setAgDocDistrict(stringObjectMap.get("ORGPPID") + "");
+                }
+            }else{
+                throw new MessageException("未获取到部门编号!");
+            }
         }
         if(1!=busActRelMapper.insertSelective(record)){
             logger.info("代理商审批，启动审批异常，添加审批关系失败{}:{}",dateChangeRequest.getId(),proce);
@@ -256,6 +304,10 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                         //更新入库
                         AgentVo vo = JSONObject.parseObject(dr.getDataContent(), AgentVo.class);
                         vo.getAgent().setcUser(rel.getcUser());     //直接新增收款账户时 此字段不可为空
+                        List<AgentColinfoVo> colinfoVoList = vo.getColinfoVoList();
+                        for (AgentColinfoVo agentColinfoVo : colinfoVoList) {
+                            agentColinfoVo.setCloReviewStatus(AgStatus.Approved.status);
+                        }
                         ResultVO res = agentColinfoService.updateAgentColinfoVo(vo.getColinfoVoList(), vo.getAgent(),rel.getcUser(),null);
                         logger.info("========审批流完成{}业务{}状态{},结果{}", proIns, rel.getBusType(), agStatus, res.getResInfo());
                         //更新数据状态为审批成功

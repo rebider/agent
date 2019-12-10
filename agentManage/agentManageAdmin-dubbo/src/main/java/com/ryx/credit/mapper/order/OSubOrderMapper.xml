@@ -376,10 +376,10 @@
           LEFT JOIN o_order o ON so.order_id = o.id
           AND o.status = 1
       WHERE
-        o.review_status = 3
-        AND o.status = 1
-        AND so.status = 1
-        and o.AGENT_ID = #{agentId}
+          o.review_status = 3
+          AND o.status = 1
+          AND so.status = 1
+          AND o.AGENT_ID = #{agentId}
   </select>
 
 </mapper>

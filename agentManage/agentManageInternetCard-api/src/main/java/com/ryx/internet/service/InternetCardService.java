@@ -47,5 +47,5 @@ public interface InternetCardService {
 
     void internetCardPostpone(OInternetCardPostpone internetCardPostpone, String cUser,String importId,String batchNum)throws MessageException;
 
-    PageInfo queryInternetCardPostponeList(OInternetCardPostpone internetCardPostpone,Page page);
+    PageInfo queryInternetCardPostponeList(OInternetCardPostpone internetCardPostpone,Page page,String agentId,Long userId);
 }

@@ -42,4 +42,6 @@ public interface OLogisticsDetailMapper {
     List<OLogisticsDetail> querySnCountObj(Map<String, Object> param);
 
     int updateByLogisticsId(OLogisticsDetail oLogisticsDetail);
+
+    int deleteDetailByLogisicalId(String logisticsId);
 }

@@ -437,7 +437,8 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                 List<OReceiptPro> receiptPros = receiptProMapper.selectByExample(receiptProExample);
                 if (receiptPros != null && receiptPros.size() > 0) {
                     OReceiptPro receiptPro = receiptPros.get(0);
-                    receiptPro.setSendNum(receiptPro.getSendNum().subtract(receiptPlan.getSendProNum()));
+                    receiptPro.setSendNum(receiptPro.getSendNum().subtract(receiptPlan.getPlanProNum()));
+                    receiptPro.setReceiptProStatus(OReceiptStatus.WAITING_LIST.code);
                     int cts = receiptProMapper.updateByPrimaryKeySelective(receiptPro);
                     if(cts<=0){
                         throw new ProcessException("退货退回时更新已排单数量失败，receiptProId={"+receiptProId+"}");

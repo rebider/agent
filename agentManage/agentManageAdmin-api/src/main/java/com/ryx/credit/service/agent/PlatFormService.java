@@ -25,6 +25,9 @@ public interface PlatFormService {
     int updateByPrimaryKey(PlatForm record);
 
     PlatForm selectByPlatformNum(String platformNum);
+
+    PlatForm selectByPlatformName(String platformName);
+
     public PlatformType byPlatformCode(String platformCode);
 
     /**

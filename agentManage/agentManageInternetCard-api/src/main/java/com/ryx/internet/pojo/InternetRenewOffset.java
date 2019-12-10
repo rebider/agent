@@ -40,6 +40,56 @@ public class InternetRenewOffset implements Serializable{
 
     private String processTime;
 
+    private String busNum;
+
+    private String busPlatform;
+
+    private String agDocDistrict;
+
+    private String agDocPro;
+
+    private String busContactPerson;
+
+    public String getBusNum() {
+        return busNum;
+    }
+
+    public void setBusNum(String busNum) {
+        this.busNum = busNum;
+    }
+
+    public String getBusPlatform() {
+        return busPlatform;
+    }
+
+    public void setBusPlatform(String busPlatform) {
+        this.busPlatform = busPlatform;
+    }
+
+    public String getAgDocDistrict() {
+        return agDocDistrict;
+    }
+
+    public void setAgDocDistrict(String agDocDistrict) {
+        this.agDocDistrict = agDocDistrict;
+    }
+
+    public String getAgDocPro() {
+        return agDocPro;
+    }
+
+    public void setAgDocPro(String agDocPro) {
+        this.agDocPro = agDocPro;
+    }
+
+    public String getBusContactPerson() {
+        return busContactPerson;
+    }
+
+    public void setBusContactPerson(String busContactPerson) {
+        this.busContactPerson = busContactPerson;
+    }
+
     public String getFlowId() {
         return flowId;
     }
@@ -182,5 +232,34 @@ public class InternetRenewOffset implements Serializable{
 
     public void setProcessTime(String processTime) {
         this.processTime = processTime == null ? null : processTime.trim();
+    }
+
+    @Override
+    public String toString() {
+        return "InternetRenewOffset{" +
+                "flowId='" + flowId + '\'' +
+                ", renewId='" + renewId + '\'' +
+                ", renewDetailId='" + renewDetailId + '\'' +
+                ", iccidNum='" + iccidNum + '\'' +
+                ", agentId='" + agentId + '\'' +
+                ", agentName='" + agentName + '\'' +
+                ", merId='" + merId + '\'' +
+                ", merName='" + merName + '\'' +
+                ", offsetAmt=" + offsetAmt +
+                ", alreadyOffsetAmt=" + alreadyOffsetAmt +
+                ", cTime='" + cTime + '\'' +
+                ", cUser='" + cUser + '\'' +
+                ", uUser='" + uUser + '\'' +
+                ", status=" + status +
+                ", version=" + version +
+                ", cleanStatus='" + cleanStatus + '\'' +
+                ", processDate='" + processDate + '\'' +
+                ", processTime='" + processTime + '\'' +
+                ", busNum='" + busNum + '\'' +
+                ", busPlatform='" + busPlatform + '\'' +
+                ", agDocDistrict='" + agDocDistrict + '\'' +
+                ", agDocPro='" + agDocPro + '\'' +
+                ", busContactPerson='" + busContactPerson + '\'' +
+                '}';
     }
 }

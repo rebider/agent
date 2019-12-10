@@ -152,10 +152,12 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
                 }
             }
 			Dict debitRateLower = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitRateLower");//借记费率下限（%）
-			Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitCapping");//借记封顶额（元）
+			Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitCapping");//借记封顶额上限（元）
 			Dict debitAppearRate = dictOptionsService.findDictByName(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitAppearRate");//借记出款费率（%）
 			Dict creditRateFloor = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "creditRateFloor");//贷记费率下限（%）
 			Dict creditRateCeiling = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "creditRateCeiling");//贷记费率上限（%）
+			Dict debitRateCapping = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitRateCapping");//借记费率上限（%）
+			Dict debitCappingLower = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), agentBusInfo.getBusPlatform(), "debitCappingLower");//借记封顶额下限（元）
 			if(debitRateLower!=null){
 				agentBusInfo.setDebitRateLower(debitRateLower.getdItemvalue());
 			}
@@ -171,7 +173,12 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 			if (creditRateCeiling != null) {
 				agentBusInfo.setCreditRateCeiling(creditRateCeiling.getdItemname());
 			}
-
+			if (debitRateCapping != null) {
+				agentBusInfo.setDebitRateCapping(debitRateCapping.getdItemname());
+			}
+			if (debitCappingLower != null) {
+				agentBusInfo.setDebitCappingLower(debitCappingLower.getdItemname());
+			}
 			if(1!=agentBusInfoMapper.insert(agentBusInfo)){
         		throw new ProcessException("业务添加失败");
 			}
@@ -322,6 +329,9 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 							if(!RegexUtil.checkInt(agentBusInfoVo.getBusLoginNum())){
 								throw new ProcessException("平台登录账号必须是数字");
 							}
+							if(agentBusInfoVo.getBusLoginNum().length()!=11){
+								throw new ProcessException("手机位数不正确");
+							}
 						}
 						if(PlatformType.RHPOS.code.equals(platformType.code)){
 							if (StringUtils.isEmpty(agentBusInfoVo.getBusLoginNum())){
@@ -330,6 +340,9 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 							}
 							if(!RegexUtil.checkInt(agentBusInfoVo.getBusLoginNum())){
 								throw new ProcessException("平台登录账号必须是数字");
+							}
+							if(agentBusInfoVo.getBusLoginNum().length()!=11){
+								throw new ProcessException("手机位数不正确");
 							}
 						}
 						//判断所选机构是否属于所选平台（机构编号&业务平台）
@@ -409,10 +422,12 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 						}
 					}
 					Dict debitRateLower = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitRateLower");//借记费率下限（%）
-					Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitCapping");//借记封顶额（元）
+					Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitCapping");//借记封顶额上限（元）
 					Dict debitAppearRate = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitAppearRate");//借记出款费率（%）
 					Dict creditRateFloor = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "creditRateFloor");//贷记费率下限（%）
 					Dict creditRateCeiling = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "creditRateCeiling");//贷记费率上限（%）
+					Dict debitRateCapping = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitRateCapping");//借记费率上限（%）
+					Dict debitCappingLower = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitCappingLower");//借记封顶额下限（元）
 					if(debitRateLower!=null){
 						db_AgentBusInfo.setDebitRateLower(debitRateLower.getdItemvalue());
 					}
@@ -428,7 +443,12 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					if (creditRateCeiling != null) {
 						db_AgentBusInfo.setCreditRateCeiling(creditRateCeiling.getdItemname());
 					}
-
+					if (debitRateCapping != null) {
+						db_AgentBusInfo.setDebitRateCapping(debitRateCapping.getdItemname());
+					}
+					if (debitCappingLower != null) {
+						db_AgentBusInfo.setDebitCappingLower(debitCappingLower.getdItemname());
+					}
 					if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(db_AgentBusInfo)){
 						throw new MessageException("更新业务信息失败");
 					}else{
@@ -1101,6 +1121,10 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	public List<String> queryOrgByAgentid(Map map) {
 		List<String> allOrg=new ArrayList<>();
 		List<String> orgs = agentBusInfoMapper.queryAgDocPro(map);
+		//查询信息判断
+		if (!(orgs.size() > 0 )) {
+			return  null;
+		}
 		List<COrganization> cOrganizations = cOrganizationMapper.selectPorgByorgs(orgs);
 		cOrganizations.forEach(org->{
 			allOrg.add(String.valueOf(org.getId()));
@@ -1108,5 +1132,57 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		return allOrg;
 	}
 
-}
+	@Override
+	public AgentBusInfo agentPlatformNum(String agentId,String platFormNum) {
+		List<Dict> platFormList =  dictOptionsService.dictList(DictGroup.RELATION_PLATFORM_NUM.name(),platFormNum);
+		String busPlatForm="";
+		if (null!=platFormList || platFormList.size()>0){
+			for (Dict dict : platFormList) {
+				busPlatForm=dict.getdItemvalue();//获取POS类型的品牌
+			}
+		}
+		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+		AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria().andAgentIdEqualTo(agentId).andBusPlatformEqualTo(busPlatForm).andBusStatusEqualTo(Status.STATUS_1.status).andStatusEqualTo(Status.STATUS_1.status);
+		List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+		AgentBusInfo agentBusInfo=null;
+		if(null!=agentBusInfoList && agentBusInfoList.size()>0){
+			 agentBusInfo = agentBusInfoList.get(0);
+		}
 
+		return agentBusInfo;
+	}
+
+
+
+	@Override
+	public List<AgentBusInfo> selectByAgentBusInfo(AgentBusInfo agentBusInfo){
+
+		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+		AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+		criteria.andStatusEqualTo(Status.STATUS_1.status);
+		if(null!=agentBusInfo.getBusStatus()){
+			criteria.andBusStatusEqualTo(agentBusInfo.getBusStatus());
+		}
+		if(null!=agentBusInfo.getBusStatusList() && agentBusInfo.getBusStatusList().size()!=0){
+			criteria.andBusStatusIn(agentBusInfo.getBusStatusList());
+		}
+		if(null!=agentBusInfo.getBusStatus()){
+			criteria.andBusStatusEqualTo(agentBusInfo.getBusStatus());
+		}
+		if(null!=agentBusInfo.getCloReviewStatus()){
+			criteria.andCloReviewStatusEqualTo(agentBusInfo.getCloReviewStatus());
+		}
+		if(StringUtils.isNotBlank(agentBusInfo.getBusNum())){
+			criteria.andBusNumEqualTo(agentBusInfo.getBusNum());
+		}
+		if(StringUtils.isNotBlank(agentBusInfo.getAgentId())){
+			criteria.andAgentIdEqualTo(agentBusInfo.getAgentId());
+		}
+		if(StringUtils.isNotBlank(agentBusInfo.getBusPlatform())){
+			criteria.andBusPlatformEqualTo(agentBusInfo.getBusPlatform());
+		}
+		List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+		return agentBusInfos;
+	}
+
+}

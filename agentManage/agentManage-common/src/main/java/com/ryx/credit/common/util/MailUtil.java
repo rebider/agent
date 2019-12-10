@@ -1,6 +1,5 @@
 package com.ryx.credit.common.util;
 
-import com.ryx.credit.common.exception.MessageException;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -28,6 +27,7 @@ public class MailUtil {
 	private static Logger logger = Logger.getLogger(MailUtil.class);
 	private static Properties emailProps; //邮件会话对象   
 	private static String emailHost; //邮件服务器地址
+	private static int emailPort; //邮件服务器端口
 	private static String emailUsername; //邮件登录用户名
 	private static String emailPassword; //邮件登录密码
 //	private static String jy_callUrl;
@@ -37,6 +37,7 @@ public class MailUtil {
 			Resource emailResource = new ClassPathResource("/email.properties");
 			emailProps = PropertiesLoaderUtils.loadProperties(emailResource);
 			emailHost = emailProps.getProperty("mail.smtp.host");
+			emailPort = Integer.valueOf(emailProps.getProperty("mail.smtp.port"));
 			emailUsername = emailProps.getProperty("username");
 			emailPassword = emailProps.getProperty("password");
 		} catch (IOException e) {
@@ -56,8 +57,8 @@ public class MailUtil {
 			logger.info("======邮件主题："+mimeMsg.getSubject());
 			logger.info("======smtp："+emailHost);
             Session mailSession = Session.getInstance(emailProps,null);   
-            Transport transport = mailSession.getTransport("smtp");   
-            transport.connect(emailHost,emailUsername,emailPassword);  
+            Transport transport = mailSession.getTransport("smtp");
+            transport.connect(emailHost,emailPort,emailUsername,emailPassword);
             Address[] to = mimeMsg.getRecipients(Message.RecipientType.TO);
             logger.info("======收件人列表："+InternetAddress.toString(to));
             transport.sendMessage(mimeMsg,to); 

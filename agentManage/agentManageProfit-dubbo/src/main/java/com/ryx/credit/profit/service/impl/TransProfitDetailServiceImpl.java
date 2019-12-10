@@ -70,6 +70,9 @@ public class TransProfitDetailServiceImpl implements TransProfitDetailService {
 
     @Override
     public List<Map<String, Object>> queryBusNum(String type) {
+        if ("ALLMPOS".equals(type)){
+            return transProfitDetailMapper.queryAllMPosBusNum();
+        }
         return transProfitDetailMapper.queryBusNum(type);
     }
 

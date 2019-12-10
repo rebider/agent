@@ -15,7 +15,18 @@ import java.util.List;
 public class InternetCardVo implements Serializable{
 
     private OInternetRenew internetRenew;
+
+    private InternetLogout internetLogout;
+
     private List<OCashReceivablesVo> oCashReceivablesVoList;
+
+    public InternetLogout getInternetLogout() {
+        return internetLogout;
+    }
+
+    public void setInternetLogout(InternetLogout internetLogout) {
+        this.internetLogout = internetLogout;
+    }
 
     public OInternetRenew getInternetRenew() {
         return internetRenew;

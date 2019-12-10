@@ -13,7 +13,7 @@ import java.util.Date;
 public class OrderoutVo implements Serializable{
     private String num;//单号
     private String payAmo;//总金额
-    private Date inuretime;//订单日期
+    private String apytime;//订单日期
     private String agUniqNum;//唯一码
     private String agName;//代理商名称
     private String platformName;//平台
@@ -22,7 +22,7 @@ public class OrderoutVo implements Serializable{
     private String downPaymentUser;//付款人
     private String comName;//收款地方
     private BigDecimal actualReceipt;//付款金额
-    private BigDecimal xxAmount;//付款金额
+    private String xxAmount;//付款金额
     private Date actualReceiptDate;//收款日期
     private String actualTime;
     private String oinuretime;//审批时间
@@ -35,7 +35,6 @@ public class OrderoutVo implements Serializable{
     private String nuclearUser;//核款人
     private Date nuclearTime;
     private String nuclearTimeString;
-    private String agDocPpro;//业务对接省区
 
     private String proType;//机具类型
     private String activityName;//活动名称
@@ -65,6 +64,89 @@ public class OrderoutVo implements Serializable{
     private String mqydkAmt;//每期应打款金额
     private String profitMouth;//是否扣存量
     private String profitForm;//分润形式
+
+    private String toPickNum;//待配货
+    private String isPlanNum;//已排单
+    private String toPlanNum;//待排单
+
+    private String orderUser;//订单提交人
+    private String orderDate;//订单提交时间
+    private String agDocDistrict;//对接大区
+    private String agDocPro;//对接省区
+    private String proCode;//商品编号
+    private String proName;//商品名称
+
+    public String getOrderUser() {
+        return orderUser;
+    }
+
+    public void setOrderUser(String orderUser) {
+        this.orderUser = orderUser;
+    }
+
+    public String getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(String orderDate) {
+        this.orderDate = orderDate;
+    }
+
+    public String getAgDocDistrict() {
+        return agDocDistrict;
+    }
+
+    public void setAgDocDistrict(String agDocDistrict) {
+        this.agDocDistrict = agDocDistrict;
+    }
+
+    public String getAgDocPro() {
+        return agDocPro;
+    }
+
+    public void setAgDocPro(String agDocPro) {
+        this.agDocPro = agDocPro;
+    }
+
+    public String getProCode() {
+        return proCode;
+    }
+
+    public void setProCode(String proCode) {
+        this.proCode = proCode;
+    }
+
+    public String getProName() {
+        return proName;
+    }
+
+    public void setProName(String proName) {
+        this.proName = proName;
+    }
+
+    public String getToPickNum() {
+        return toPickNum;
+    }
+
+    public void setToPickNum(String toPickNum) {
+        this.toPickNum = toPickNum;
+    }
+
+    public String getIsPlanNum() {
+        return isPlanNum;
+    }
+
+    public void setIsPlanNum(String isPlanNum) {
+        this.isPlanNum = isPlanNum;
+    }
+
+    public String getToPlanNum() {
+        return toPlanNum;
+    }
+
+    public void setToPlanNum(String toPlanNum) {
+        this.toPlanNum = toPlanNum;
+    }
 
     public String getBusNum() {
         return busNum;
@@ -380,12 +462,12 @@ public class OrderoutVo implements Serializable{
         this.num = num;
     }
 
-    public Date getInuretime() {
-        return inuretime;
+    public String getApytime() {
+        return apytime;
     }
 
-    public void setInuretime(Date inuretime) {
-        this.inuretime = inuretime;
+    public void setApytime(String apytime) {
+        this.apytime = apytime;
     }
 
     public String getNuclearUser() {
@@ -412,19 +494,11 @@ public class OrderoutVo implements Serializable{
         this.nuclearTimeString = nuclearTimeString;
     }
 
-    public String getAgDocPpro() {
-        return agDocPpro;
-    }
-
-    public void setAgDocPpro(String agDocPpro) {
-        this.agDocPpro = agDocPpro;
-    }
-
-    public BigDecimal getXxAmount() {
+    public String getXxAmount() {
         return xxAmount;
     }
 
-    public void setXxAmount(BigDecimal xxAmount) {
+    public void setXxAmount(String xxAmount) {
         this.xxAmount = xxAmount;
     }
 

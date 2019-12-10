@@ -1,5 +1,6 @@
 package com.ryx.credit.profit.jobs;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.result.AgentResult;
@@ -263,11 +264,31 @@ public class TranDataJob {
      */
     public Map<String,String> synchronizeTranCheckData(){
         Calendar calendar = Calendar.getInstance();
-        String searchTime=new SimpleDateFormat("yyyy-MM-dd HH:MM:ss").format(calendar.getTime());
         calendar.add(Calendar.MONTH, -1);
+        String searchTime=new SimpleDateFormat("yyyy-MM-dd HH:MM:ss").format(calendar.getTime());
         String tranMonth= new SimpleDateFormat("yyyyMM").format(calendar.getTime());
         LOG.info("================"+tranMonth+"交易量核对数据同步开始================");
         Map<String,String> resultMap=new HashMap<>();
+
+        //手刷平台的交易量和手续费(技术)
+        Map<String, Object> tranAmt = getTranAmtByMonth(calendar.getTime());
+        if(tranAmt==null||tranAmt.size()==0){
+            LOG.error("================手刷平台的交易量和手续费(技术)拉取失败================");
+            resultMap.put("resultCode","error");
+            resultMap.put("msg","手刷平台的交易量和手续费(技术)拉取异常");
+            return resultMap;
+        }
+        LOG.info("================手刷平台的交易量和手续费(技术)拉取完成================");
+
+        //清结算接口数据：
+        Map<String,Object> settleData = doSettleTranAmount(calendar.getTime());
+        if(settleData==null||settleData.size()==0){
+            LOG.error("================清结算接口数据拉取失败================");
+            resultMap.put("resultCode","error");
+            resultMap.put("msg","清结算接口数据拉取异常");
+            return resultMap;
+        }
+        LOG.info("================清结算接口数据拉取完成================");
 
         //瑞大宝交易总量和手续费(技术):
         Map<String,Object>ruiDabaoData=getRuiDaBaoProfitAmtAndProfitFee(calendar.getTime());
@@ -309,16 +330,6 @@ public class TranDataJob {
         }
         LOG.info("================月分润交易接口数据（技术列）拉取完成================");
 
-
-        //手刷平台的交易量和手续费(技术)
-        Map<String, Object> tranAmt = getTranAmtByMonth(calendar.getTime());
-        if(tranAmt==null||tranAmt.size()==0){
-            LOG.error("================手刷平台的交易量和手续费(技术)拉取失败================");
-            resultMap.put("resultCode","error");
-            resultMap.put("msg","手刷平台的交易量和手续费(技术)拉取异常");
-            return resultMap;
-        }
-        LOG.info("================手刷平台的交易量和手续费(技术)拉取完成================");
         //手刷百卡通数据：
         TransProfitDetail tranBkt = getTranBktByProfitMonth(tranMonth);
         if (tranBkt==null){
@@ -347,15 +358,6 @@ public class TranDataJob {
         }
         LOG.info("================月分润交易接口数据（清算列）拉取完成================");
 
-        //清结算接口数据：
-        Map<String,Object> settleData = doSettleTranAmount(calendar.getTime());
-        if(settleData==null||settleData.size()==0){
-            LOG.error("================清结算接口数据拉取失败================");
-            resultMap.put("resultCode","error");
-            resultMap.put("msg","清结算接口数据拉取异常");
-            return resultMap;
-        }
-        LOG.info("================清结算接口数据拉取完成================");
 
 
         List<TranCheckPlatForm> platForms = profitOrganTranMonthService.getAllPlatForm();
@@ -723,8 +725,29 @@ public class TranDataJob {
         }
     }
     public Map<String,Object> getTranAmtByMonth(Date tranMon){
+
+        String url = AppConfig.getProperty("old_brand_ss_url");
         String tranMonth= new SimpleDateFormat("yyyyMM").format(tranMon);
-        Map<String, Object> tranAmt = profitOrganTranMonthService.getTranAmtByMonth(tranMonth);
+        JSONObject object=new JSONObject();
+        object.put("tradeTime",tranMonth);
+        String res = HttpClientUtil.doPostJson(url,object.toJSONString());
+        LOG.info("手刷老品牌分润数据查询接口查询返回参数：{}",res);
+        JSONObject result = JSONObject.parseObject(res);
+        String data = (String) result.get("data");
+        LOG.info("手刷老品牌分润数据查询接口查询返回数据data:"+data);
+        List<Map> jsonObj = JSONArray.parseArray(data, Map.class);
+        BigDecimal profitAmt=BigDecimal.ZERO;
+        BigDecimal profitFee=BigDecimal.ZERO;
+        for (Map<String,Object> map:jsonObj){
+            BigDecimal amount = new BigDecimal(map.get("amount")==null?"0":map.get("amount").toString());
+            BigDecimal fee = new BigDecimal(map.get("fee")==null?"0":map.get("fee").toString());
+            profitAmt=profitAmt.add(amount);
+            profitFee=profitFee.add(fee);
+        }
+
+        Map<String, Object> tranAmt = new HashMap<>();
+        tranAmt.put("MPOS_TRAN_AMT",profitAmt);
+        tranAmt.put("TRANS_FEE",profitFee);
         return tranAmt;
     }
     public TransProfitDetail getTranBktByProfitMonth(String profitMonth){

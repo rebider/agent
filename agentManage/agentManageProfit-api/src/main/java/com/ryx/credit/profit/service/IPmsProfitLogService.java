@@ -41,4 +41,6 @@ public interface IPmsProfitLogService {
   int insertSelective(PmsProfit record);
 
     int  save(PmsProfit record);
+
+  void disposeSheet(List<Map<String, String>> sheetlists, String sheetName, int columnNum, String month, String userId, int sheetOrder);
 }

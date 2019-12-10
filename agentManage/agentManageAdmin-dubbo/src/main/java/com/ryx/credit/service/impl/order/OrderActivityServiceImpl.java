@@ -69,7 +69,13 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             criteria.andActivityNameLike("%"+activity.getActivityName()+"%");
         }
         if (StringUtils.isNotBlank(activity.getPlatform())) {
-            criteria.andPlatformEqualTo(activity.getPlatform());
+            String platform =activity.getPlatform();
+            if (platform.contains(",")) {
+                List<String> platformList = Arrays.asList(platform.split(","));
+                criteria.andPlatformIn(platformList);
+            } else {
+                criteria.andPlatformEqualTo(platform);
+            }
         }
         if (StringUtils.isNotBlank(activity.getActCode())) {
             criteria.andActCodeEqualTo(activity.getActCode());
@@ -84,7 +90,13 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             criteria.andProModelEqualTo(activity.getProModel());
         }
         if (StringUtils.isNotBlank(activity.getProductId())) {
-            criteria.andProductIdEqualTo(activity.getProductId());
+            String productId =activity.getProductId();
+            if (productId.contains(",")) {
+                List<String> productIdList = Arrays.asList(productId.split(","));
+                criteria.andProductIdIn(productIdList);
+            } else {
+                criteria.andProductIdEqualTo(productId);
+            }
         }
         if (StringUtils.isNotBlank(activity.getBusProName())) {
             criteria.andBusProNameLike("%"+activity.getBusProName()+"%");
@@ -96,7 +108,13 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             criteria.andTermtypenameEqualTo(activity.getTermtypename());
         }
         if (StringUtils.isNotBlank(activity.getPosType())) {
-            criteria.andPosTypeEqualTo(activity.getPosType());
+            String postype =activity.getPosType();
+            if (postype.contains(",")) {
+                List<String> postypeList = Arrays.asList(postype.split(","));
+                criteria.andPosTypeIn(postypeList);
+            } else {
+                criteria.andPosTypeEqualTo(postype);
+            }
         }
         if (StringUtils.isNotBlank(activity.getBusProCode())) {
             criteria.andBusProCodeEqualTo(activity.getBusProCode());
@@ -194,6 +212,13 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 throw new MessageException("相同活动代码价格必须相同");
             }
         }
+        OProductExample oProductExample = new OProductExample();
+        OProductExample.Criteria criteria = oProductExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andIdEqualTo(activity.getProductId());
+        List<OProduct> oProductList = oProductMapper.selectByExample(oProductExample);
+        if (null!=oProductList && oProductList.size()>0){
+            OProduct oProduct = oProductList.get(0);
+            activity.setProType(oProduct.getProType());
+        }
 
         int insert = activityMapper.insert(activity);
         if (insert != 1) {
@@ -263,6 +288,13 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 logger.info("2004和2204活动代码禁止使用");
                 return AgentResult.fail("2004和2204活动代码禁止使用");
             }
+        }
+        OProductExample oProductExample = new OProductExample();
+        OProductExample.Criteria criteria = oProductExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andIdEqualTo(activity.getProductId());
+        List<OProduct> oProductList = oProductMapper.selectByExample(oProductExample);
+        if (null!=oProductList && oProductList.size()>0){
+            OProduct oProduct = oProductList.get(0);
+            activity.setProType(oProduct.getProType());
         }
         int update = activityMapper.updateByPrimaryKeySelective(activity);
         if (update == 1) {
@@ -447,9 +479,14 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             oActivity.setActCode(stringObjectMap.get("ACT_CODE") + "");
             oActivity.setOriginalPrice(new BigDecimal(stringObjectMap.get("ORIGINALPRICE") + ""));
             oActivity.setProductName(stringObjectMap.get("PRO_NAME")+"");
-            oActivity.setPosSpePrice(new BigDecimal(stringObjectMap.get("POS_SPE_PRICE")+""));
-            oActivity.setStandTime(new BigDecimal(stringObjectMap.get("STAND_TIME")+""));
-
+            String posSpePrice = String.valueOf(stringObjectMap.get("POS_SPE_PRICE"));
+            if(StringUtils.isNotBlank(posSpePrice) && !posSpePrice.equals("null") && RegexUtil.checkNum(posSpePrice)){
+                oActivity.setPosSpePrice(new BigDecimal(posSpePrice));
+            }
+            String standTime = String.valueOf(stringObjectMap.get("STAND_TIME"));
+            if(StringUtils.isNotBlank(standTime) && !standTime.equals("null") && RegexUtil.checkNum(standTime)){
+                oActivity.setStandTime(new BigDecimal(standTime));
+            }
             //查询活动是否可见
             OActivity activity = activityMapper.selectByPrimaryKey(oActivity.getId());
             if(StringUtils.isBlank(activity.getVisible())){
@@ -518,9 +555,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         Date date = new Date();
         List<OActivity> OActivityList = activityMapper.planChoiseProComAndModel(
                 FastMap.fastMap("productId", productId)
-                        .putKeyV("orderId", orderId)
-                        .putKeyV("beginTime", date)
-                        .putKeyV("endTime", date));
+                        .putKeyV("orderId", orderId));
         List<Map<String, String>> resList = new ArrayList<>();
         for (OActivity oActivity : OActivityList) {
             Map<String, String> item = new HashMap<>();

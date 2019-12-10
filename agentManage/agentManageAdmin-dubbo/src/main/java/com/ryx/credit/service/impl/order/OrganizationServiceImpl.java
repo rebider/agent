@@ -100,9 +100,19 @@ public class OrganizationServiceImpl implements OrganizationService {
                     ac.setOrgNick(ac.getOrgName());
 
                     ac.setPlatId(ac.getPlatId().substring(0, ac.getPlatId().length() - 1));
-                    if (StringUtils.isNotBlank(ac.getBusinessNum())){
-                        ac.setBusinessNum(ac.getBusinessNum().substring(0, ac.getBusinessNum().length() - 1));
-                    }
+                 /*   if (StringUtils.isNotBlank(ac.getBusinessNum())){
+                        String[] splitBus = ac.getBusinessNum().split(",");
+                        String num="";
+                        for (String bus : splitBus) {
+                            if (bus.equals("#")){
+                                num+=""+",";
+                            }else{
+                                num+=bus+",";
+                            }
+
+                        }
+                        ac.setBusinessNum(num.substring(0, num.length()-1));
+                    }*/
                     ac.setcTime(d);
                     ac.setStatus(Status.STATUS_1.status);
                     ac.setVersion(Status.STATUS_1.status);
@@ -132,26 +142,18 @@ public class OrganizationServiceImpl implements OrganizationService {
                     if (null != ac.getOrgPlatform() || ac.getOrgPlatform().size() > 0) {
                         List<OrgPlatform> orgPlatform = ac.getOrgPlatform();
                         for (OrgPlatform platform : orgPlatform) {
-                            String[] platCode = platform.getPlatCode().split(",");
-                            String[] platNum = platform.getPlatNum().split(",");
-                            /*if (platCode.length != platNum.length) {
-                                logger.info("请检查业务平台和业务编码填写有误！");
-                                throw new MessageException("请检查业务平台和业务编码填写有误！");
-                            }*/
-                            for (int i = 0; i < platCode.length; i++) {
-                                OrgPlatform orgPlat = new OrgPlatform();
-                                orgPlat.setPlatCode(platCode[i]);
-                                orgPlat.setPlatNum(platNum[i]);
-                                orgPlat.setId(idService.genId(TabId.ORG_PLATFORM));
-                                orgPlat.setOrgId(ac.getOrgId());
-                                orgPlat.setcTime(d);
-                                orgPlat.setcUser(agentVo.getSid());
-                                if (1 != orgPlatformMapper.insertSelective(orgPlat)) {
+                            if(StringUtils.isBlank(platform.getPlatNum())){
+                                throw new MessageException("请填写业务平台号");
+                            }
+                            platform.setId(idService.genId(TabId.ORG_PLATFORM));
+                            platform.setOrgId(ac.getOrgId());
+                            platform.setcTime(d);
+                            platform.setcUser(agentVo.getSid());
+                                if (1 != orgPlatformMapper.insertSelective(platform)) {
                                     logger.info("添加机构平台关系表:{}", "添加机构平台关系表失败");
                                     throw new MessageException("添加机构平台关系表失败");
                                 }
                             }
-                        }
 
                     }
                 } catch (ProcessException e) {
@@ -175,7 +177,9 @@ public class OrganizationServiceImpl implements OrganizationService {
         List<OrgPlatform> orgPlatforms = orgPlatformMapper.selectByExample(orgPlatformExample);
         if (null != orgPlatforms || orgPlatforms.size() > 0) {
             for (OrgPlatform orgPlatform : orgPlatforms) {
-                if (1!=orgPlatformMapper.deleteOrgPlatform(orgPlatform.getId())){
+                Map<String, Object> hashMap = new HashMap<>();
+                hashMap.put("id",orgPlatform.getId());
+                if (1!=orgPlatformMapper.deleteOrgPlatform(hashMap)){
                     logger.info("机构关系表删除失败");
                     return  AgentResult.fail("机构关系表删除失败");
                 }
@@ -234,19 +238,19 @@ public class OrganizationServiceImpl implements OrganizationService {
                             throw new MessageException("代理商ID不能为空");
                         }
                         Organization organization = organizationMapper.selectByPrimaryKey(ac.getOrgId());
-                        if (StringUtils.isNotBlank(ac.getBusinessNum())){
+                       /* if (StringUtils.isNotBlank(ac.getBusinessNum())){
                             String[] splitBus = ac.getBusinessNum().split(",");
                             String num="";
                             for (String bus : splitBus) {
                                 if (bus.equals("#")){
                                     num+=""+",";
                                 }else{
-                                    num+=bus;
+                                    num+=bus+",";
                                 }
 
                             }
-                            organization.setBusinessNum(num.substring(0, num.length()));
-                        }
+                            organization.setBusinessNum(num.substring(0, num.length()-1));
+                        }*/
                         organization.setcUser(agentVo.getSid());
                         organization.setAccountName(ac.getAccountName());
                         organization.setAccountBank(ac.getAccountBank());
@@ -275,7 +279,9 @@ public class OrganizationServiceImpl implements OrganizationService {
                         List<OrgPlatform> orgPlatforms = orgPlatformMapper.selectByExample(orgPlatformExample);
                         if (null != orgPlatforms && orgPlatforms.size() > 0) {
                             for (OrgPlatform orgPlatform : orgPlatforms) {
-                                if (1 != orgPlatformMapper.deleteOrgPlatform(orgPlatform.getId())) {
+                                Map<String, Object> hashMap = new HashMap<>();
+                                hashMap.put("id",orgPlatform.getId());
+                                if (1 != orgPlatformMapper.deleteOrgPlatform(hashMap)) {
                                     logger.info("机构关系表删除失败");
                                     throw new MessageException("机构关系表删除失败");
                                 }
@@ -283,33 +289,23 @@ public class OrganizationServiceImpl implements OrganizationService {
 
                         }
 
-                        //机构平台关系表的添加
+                //机构平台关系表的添加
                 if (null != ac.getOrgPlatform() || ac.getOrgPlatform().size() > 0) {
                     List<OrgPlatform> orgPlatform = ac.getOrgPlatform();
                     for (OrgPlatform platform : orgPlatform) {
-                        String[] platCode = platform.getPlatCode().split(",");
-                        String[] platNum = platform.getPlatNum().split(",");
+                        if(StringUtils.isBlank(platform.getPlatNum())){
+                            throw new MessageException("请填写业务平台号");
+                        }
                         Date d = Calendar.getInstance().getTime();
-                        for (int i = 0; i < platNum.length; i++) {
-                            OrgPlatform orgPlat = new OrgPlatform();
-                            if (platCode[i].equals("#")){
-                                orgPlat.setPlatCode("");
-                            }else{
-                                orgPlat.setPlatCode(platCode[i]);
-                            }
-                            orgPlat.setPlatCode(platCode[i]);
-                            orgPlat.setPlatNum(platNum[i]);
-                            orgPlat.setId(idService.genId(TabId.ORG_PLATFORM));
-                            orgPlat.setOrgId(ac.getOrgId());
-                            orgPlat.setcTime(d);
-                            orgPlat.setcUser(agentVo.getSid());
-                            if (1 != orgPlatformMapper.insertSelective(orgPlat)) {
-                                logger.info("添加机构平台关系表:{}", "添加机构平台关系表失败");
-                                throw new MessageException("添加机构平台关系表失败");
-                            }
+                        platform.setId(idService.genId(TabId.ORG_PLATFORM));
+                        platform.setOrgId(ac.getOrgId());
+                        platform.setcTime(d);
+                        platform.setcUser(agentVo.getSid());
+                        if (1 != orgPlatformMapper.insertSelective(platform)) {
+                            logger.info("添加机构平台关系表:{}", "添加机构平台关系表失败");
+                            throw new MessageException("添加机构平台关系表失败");
                         }
                     }
-
                 }
                         //添加新的附件
                         List<String> fileIdList = ac.getOrganizationbleFile();
@@ -452,5 +448,12 @@ public class OrganizationServiceImpl implements OrganizationService {
     public List<Map> queryOrg(String platForm) {
 
         return orgPlatformMapper.queryOrg(platForm);
+    }
+
+    @Override
+    public List<OrgPlatform> queryOrgPlatCode(String orgId, String platNum) {
+        if(StringUtils.isNotBlank(orgId) && StringUtils.isNotBlank(platNum))
+       return orgPlatformMapper.queryOrgPlatCode(orgId,platNum);
+        return null;
     }
 }

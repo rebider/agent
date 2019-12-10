@@ -17,22 +17,22 @@
 			<property name="forceLongs" value="false" />
 		</javaTypeResolver>
 		<!-- 生成模型的包名和位置 -->
-		<javaModelGenerator targetPackage="com.ryx.credit.activity.entity"
-			targetProject="src\main\java">
+		<javaModelGenerator targetPackage="com.ryx.credit.pojo.admin.order"
+			targetProject="D:\Code">
 			<property name="enableSubPackages" value="true" />
 			<property name="trimStrings" value="true" />
 		</javaModelGenerator>
 		<!-- 生成的映射文件包名和位置 -->
-		<sqlMapGenerator targetPackage="com.ryx.credit.activity.mapper"
-			targetProject="src\main\java">
+		<sqlMapGenerator targetPackage="com.ryx.credit.mapper.order"
+			targetProject="D:\Code">
 			<property name="enableSubPackages" value="true" />
 		</sqlMapGenerator>
 		 <!--生成DAO的包名和位置-->
 		<javaClientGenerator type="XMLMAPPER"
-			targetPackage="com.ryx.credit.activity.dao" targetProject="src\main\java">
+			targetPackage="com.ryx.credit.dao.order" targetProject="D:\Code">
 			<property name="enableSubPackages" value="true" />
 		</javaClientGenerator>
 		 <!--要生成那些表(更改tableName和domainObjectName就可以)-->
-		<table tableName="KAFKA_SEND_Message" domainObjectName="KafkaSendMessage" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>
+		<table tableName="o_order_adj" domainObjectName="OrderAdj" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>
 	</context>
 </generatorConfiguration>

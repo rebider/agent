@@ -1,10 +1,12 @@
 package com.ryx.credit.dao.order;
 
 
+import com.ryx.credit.common.util.Page;
 import com.ryx.credit.pojo.admin.order.OOrder;
 import com.ryx.credit.pojo.admin.order.OOrderExample;
 import com.ryx.credit.pojo.admin.vo.OrderoutVo;
 import org.apache.ibatis.annotations.Param;
+import org.apache.kafka.common.protocol.types.Field;
 
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +45,8 @@ public interface OOrderMapper {
 
     List<OrderoutVo> excelOrder(Map map);
 
+    List<OrderoutVo> orderExcel(Map map);
+
     Long arrearageCount(Map<String, Object> param);
 
     List<Map<String,Object>> arrearageList(Map<String, Object> param);
@@ -56,4 +60,5 @@ public interface OOrderMapper {
     Long serchArrearageCount(Map<String, Object> param);
 
     List<Map<String,Object>> serchArrearageList(Map<String, Object> param);
+
 }

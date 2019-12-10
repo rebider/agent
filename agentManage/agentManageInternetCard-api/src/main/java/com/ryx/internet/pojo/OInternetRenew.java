@@ -46,7 +46,57 @@ public class OInternetRenew implements Serializable{
 
     private String renewWayName;
 
+    private String busNum;
+
+    private String busPlatform;
+
+    private String agDocDistrict;
+
+    private String agDocPro;
+
+    private String busContactPerson;
+
     private List<Attachment> attachmentList;
+
+    public String getBusNum() {
+        return busNum;
+    }
+
+    public void setBusNum(String busNum) {
+        this.busNum = busNum;
+    }
+
+    public String getBusPlatform() {
+        return busPlatform;
+    }
+
+    public void setBusPlatform(String busPlatform) {
+        this.busPlatform = busPlatform;
+    }
+
+    public String getAgDocDistrict() {
+        return agDocDistrict;
+    }
+
+    public void setAgDocDistrict(String agDocDistrict) {
+        this.agDocDistrict = agDocDistrict;
+    }
+
+    public String getAgDocPro() {
+        return agDocPro;
+    }
+
+    public void setAgDocPro(String agDocPro) {
+        this.agDocPro = agDocPro;
+    }
+
+    public String getBusContactPerson() {
+        return busContactPerson;
+    }
+
+    public void setBusContactPerson(String busContactPerson) {
+        this.busContactPerson = busContactPerson;
+    }
 
     public String getRenewWayName() {
         return renewWayName;
@@ -206,5 +256,36 @@ public class OInternetRenew implements Serializable{
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    @Override
+    public String toString() {
+        return "OInternetRenew{" +
+                "id='" + id + '\'' +
+                ", renewWay='" + renewWay + '\'' +
+                ", renewCardCount=" + renewCardCount +
+                ", sumOffsetAmt=" + sumOffsetAmt +
+                ", suppAmt=" + suppAmt +
+                ", reviewStatus=" + reviewStatus +
+                ", reviewPassTime=" + reviewPassTime +
+                ", applyRemark='" + applyRemark + '\'' +
+                ", cTime=" + cTime +
+                ", uTime=" + uTime +
+                ", cUser='" + cUser + '\'' +
+                ", uUser='" + uUser + '\'' +
+                ", status=" + status +
+                ", version=" + version +
+                ", agentId='" + agentId + '\'' +
+                ", agentName='" + agentName + '\'' +
+                ", files='" + files + '\'' +
+                ", iccidNumIds='" + iccidNumIds + '\'' +
+                ", renewWayName='" + renewWayName + '\'' +
+                ", busNum='" + busNum + '\'' +
+                ", busPlatform='" + busPlatform + '\'' +
+                ", agDocDistrict='" + agDocDistrict + '\'' +
+                ", agDocPro='" + agDocPro + '\'' +
+                ", busContactPerson='" + busContactPerson + '\'' +
+                ", attachmentList=" + attachmentList +
+                '}';
     }
 }

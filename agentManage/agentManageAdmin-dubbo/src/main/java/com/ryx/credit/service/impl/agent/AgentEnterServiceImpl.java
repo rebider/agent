@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import sun.management.resources.agent;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -432,7 +433,12 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Override
     public void verifyOrgAndBZYD(List<AgentBusInfoVo> agentBusInfoVoList, List<AgentBusInfoVo> busInfoVoList) throws Exception {
         Boolean busInfo = false;
+        List<String> stringList = new ArrayList<String>();
         for (AgentBusInfoVo agentBusInfoVo : agentBusInfoVoList) {
+            if (agentBusInfoVo.getBusType().equals(BusType.JG.key) || agentBusInfoVo.getBusType().equals(BusType.BZYD.key)) {
+                BigDecimal cloReviewStatus = agentBusInfoVo.getCloReviewStatus();
+                stringList.add(String.valueOf(cloReviewStatus));
+            }
             if (agentBusInfoVo.getBusType().equals(BusType.JG.key) || agentBusInfoVo.getBusType().equals(BusType.BZYD.key)) {
                 busInfo = true;
             }
@@ -440,10 +446,28 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         if (busInfo) {
             for (AgentBusInfoVo busInfoVo : busInfoVoList) {
                 if (!busInfoVo.getBusType().equals(BusType.JG.key) && !busInfoVo.getBusType().equals(BusType.BZYD.key)) {
-                    throw new ProcessException("当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台");
+//                    throw new ProcessException("当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台");
+                    if (stringList.size()>0 && stringList!=null) {
+                        for (String str : stringList) {
+                            if (!str.equals(String.valueOf(AgStatus.Refuse.status))) {
+                                throw new ProcessException("当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台");
+                            }
+                        }
+                    }
                 }
             }
         }
+    }
+
+    @Override
+    public ResultVO selectPlatType(String platformNum) {
+        String platFormType="";
+        if (StringUtils.isNotBlank(platformNum)){
+            platFormType  = platFormMapper.selectPlatType(platformNum);
+        }else {
+            throw new ProcessException("请选择品牌");
+        }
+        return ResultVO.success(platFormType);
     }
 
     /**
@@ -616,6 +640,31 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             throw new MessageException("业务平台不存在");
         }
 
+        PlatformType platformType = platFormService.byPlatformCode(abus.getBusPlatform());
+        if(PlatformType.RDBPOS.code.equals(platformType.getValue())){
+            //检查手机号是否填写
+            if(StringUtils.isBlank(abus.getBusLoginNum())){
+                throw new MessageException("瑞大宝平台登录账号不能为空");
+            }
+            if(!RegexUtil.checkInt(abus.getBusLoginNum())){
+                throw new MessageException("瑞大宝平台登录账号必须为数字");
+            }
+            if(abus.getBusLoginNum().length()!=11){
+                throw new MessageException("手机位数不正确");
+            }
+        }
+        if(PlatformType.RHPOS.code.equals(platformType.getValue())){
+            //检查手机号是否填写
+            if(StringUtils.isBlank(abus.getBusLoginNum())){
+                throw new MessageException("瑞花宝平台登录账号不能为空");
+            }
+            if(!RegexUtil.checkInt(abus.getBusLoginNum())){
+                throw new MessageException("瑞花宝平台登录账号必须是数字");
+            }
+            if(abus.getBusLoginNum().length()!=11){
+                throw new MessageException("手机位数不正确");
+            }
+        }
         //检查是否有审批中的代理商新
         Agent agent = agentService.getAgentById(abus.getAgentId());
         if (agent.getAgStatus().equals(AgStatus.Approving.name())) {
@@ -750,6 +799,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
 
         if(agentVo.getAmt() != null){
             reqMap.put("amt", agentVo.getAmt());
+        }
+        if(StringUtils.isNotBlank(agentVo.getRenewWay())){
+            reqMap.put("renewWay", agentVo.getRenewWay());
         }
 
         //传递部门信息
