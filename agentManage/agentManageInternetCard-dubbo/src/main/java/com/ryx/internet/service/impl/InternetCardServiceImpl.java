@@ -92,6 +92,7 @@ public class InternetCardServiceImpl implements InternetCardService {
         List<OInternetCard> oInternetCards = internetCardMapper.internetCardList(oInternetCardExample);
         for (OInternetCard oInternetCard : oInternetCards) {
             oInternetCard.setIccidNumId(oInternetCard.getIccidNum());
+            oInternetCard.setIssuer(Issuerstatus.getContentByValue(oInternetCard.getIssuer()));
             if(null==oInternetCard.getInternetCardStatus()){
                 oInternetCard.setRenewButton("0");
                 continue;
@@ -669,7 +670,17 @@ public class InternetCardServiceImpl implements InternetCardService {
             updateInternetCardImport(oInternetCardImport);
             return;
         }
-
+        if(StringUtils.isNotBlank(internetCard.getIssuer())){
+            String issuerCode = Issuerstatus.getContentByMsg(internetCard.getIssuer());
+            if(StringUtils.isBlank(issuerCode)){
+                oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
+                oInternetCardImport.setErrorMsg("发卡方不存在,请联系管理员");
+                //更新导入记录
+                updateInternetCardImport(oInternetCardImport);
+                return;
+            }
+            internetCard.setIssuer(issuerCode);
+        }
         if(StringUtils.isBlank(internetCard.getIccidNum())){
             oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
             oInternetCardImport.setErrorMsg("缺少iccid");
