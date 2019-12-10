@@ -1,5 +1,6 @@
 package com.ryx.internet.dao;
 
+import com.ryx.credit.common.util.Page;
 import com.ryx.internet.pojo.OInternetCard;
 import com.ryx.internet.pojo.OInternetCardExample;
 import org.apache.ibatis.annotations.Param;
@@ -57,5 +58,7 @@ public interface OInternetCardMapper {
 
     int internetCardCount(OInternetCardExample example);
 
+
+    List<OInternetCard> selectUpdateCardStatus(@Param("map")Map<String,Object> map,@Param("page") Page page);
 
 }

@@ -1,9 +1,6 @@
 package com.ryx.internet.service.impl.api;
 
-import com.ryx.credit.common.util.ApiUtils;
-import com.ryx.credit.common.util.DESUtils;
-import com.ryx.credit.common.util.DateUtil;
-import com.ryx.credit.common.util.HttpClientUtil;
+import com.ryx.credit.common.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,21 +44,27 @@ public class ChinaMobileForJYHttpReq {
      * @return
      */
     public static String batchQueryCardStatus(String iccids){
-        Map<String, String> paramMap = new HashMap<>();
-        paramMap.put("appKey",appKey);
-        paramMap.put("format",format);
-        paramMap.put("method","triopi.member.lifecycle.batch.query");
-        paramMap.put("transID",getTransId());
-        paramMap.put("v",version);
-        paramMap.put("iccids",iccids);
-        String sign = ApiUtils.sign(paramMap, secretKey);
-        paramMap.put("sign",sign);
-        paramMap= ApiUtils.sortMap(paramMap);
-        log.info("揭阳移动接口查询状态请求参数：{}",paramMap);
-        String result = HttpClientUtil.doPost(batchQueryCardUrl, paramMap);
-        String decrypt = DESUtils.decrypt(result, secretKey);
-        log.info("揭阳移动接口查询状态返回参数：{}",decrypt);
-        return decrypt;
+        try {
+            Map<String, String> paramMap = new HashMap<>();
+            paramMap.put("appKey",appKey);
+            paramMap.put("format",format);
+            paramMap.put("method","triopi.member.lifecycle.batch.query");
+            paramMap.put("transID",getTransId());
+            paramMap.put("v",version);
+            paramMap.put("iccids",iccids);
+            String sign = ApiUtils.sign(paramMap, secretKey);
+            paramMap.put("sign",sign);
+            paramMap= ApiUtils.sortMap(paramMap);
+            log.info("揭阳移动接口查询状态请求参数：{}",paramMap);
+            String result = HttpClientUtil.doPost(batchQueryCardUrl, paramMap);
+            String decrypt = DESUtils.decrypt(result, secretKey);
+            log.info("揭阳移动接口查询状态返回参数：{}",decrypt);
+            return decrypt;
+        } catch (Exception e) {
+            AppConfig.sendEmails(MailUtil.printStackTrace(e), "物联网移动接口请求异常,方法batchQueryCardStatus");
+            e.printStackTrace();
+        }
+        return "";
     }
 
 
