@@ -311,7 +311,8 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         record.setAgentName(templateRecode.getAgentName());
         record.setActivStatus(AgStatus.Approving.name());
         record.setBusType(BusActRelBusType.profitTempalteApply.name());
-        record.setDataShiro(BusActRelBusType.profitTempalteApply.key);  //
+        record.setDataShiro(BusActRelBusType.profitTempalteApply.key);
+        record.setExplain(templateRecode.getBusNum());
 
         Map<String,String> reMap = stringList.get(0);
         record.setNetInBusType("ACTIVITY_"+reMap.get("BUS_PLATFORM"));
