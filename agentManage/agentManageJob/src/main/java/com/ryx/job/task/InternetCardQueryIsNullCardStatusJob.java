@@ -29,6 +29,7 @@ public class InternetCardQueryIsNullCardStatusJob implements DataflowJob<OIntern
 
     @Override
     public List<OInternetCard> fetchData(ShardingContext shardingContext) {
+        log.info("InternetCardQueryCardStatusJob查询要更新状态的数据,为空selectNull");
         return queryCardStatusJobService.fetchDataUpdateCardStatus("selectNull");
     }
 
