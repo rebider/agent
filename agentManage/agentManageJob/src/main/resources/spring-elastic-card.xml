@@ -69,7 +69,7 @@
 
 
     <job:dataflow id="internetCardQueryIsNullCardStatus"
-                  job-ref="InternetCardQueryIsNullCardStatusJob"
+                  job-ref="internetCardQueryIsNullCardStatusJob"
                   registry-center-ref="regCenter"
                   cron="0 0/30 * * * ? *"
                   sharding-total-count="1"
