@@ -2,6 +2,7 @@ package com.ryx.internet.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.InternetCardStatus;
+import com.ryx.credit.common.enumc.Issuerstatus;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtil;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 /***
+ * 揭阳移动同步更新状态Job
  * @Author liudh
  * @Description //TODO 
  * @Date 2019/12/9 16:12
@@ -48,8 +50,7 @@ public class QueryCardStatusJobServiceImpl implements QueryCardStatusJobService 
         OInternetCardExample oInternetCardExample = new OInternetCardExample();
         OInternetCardExample.Criteria criteria = oInternetCardExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
-        //只是揭阳移动查询缺少判断
-
+        criteria.andIssuerEqualTo(Issuerstatus.JY_MOBILE.getValue());
         if(type.equals("selectNull")){
             criteria.andStatusTimeIsNull();
             criteria.andTaskStatusTimeIsNull();
