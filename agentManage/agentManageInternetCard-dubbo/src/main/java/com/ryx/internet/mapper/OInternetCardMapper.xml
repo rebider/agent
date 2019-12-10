@@ -35,6 +35,7 @@
     <result column="BUS_PLATFORM" jdbcType="VARCHAR" property="busPlatform" />
     <result column="POSTPONE_CAUSE" jdbcType="VARCHAR" property="postponeCause" />
     <result column="STATUS_TIME" jdbcType="VARCHAR" property="statusTime" />
+    <result column="TASK_STATUS_TIME" jdbcType="TIMESTAMP" property="taskStatusTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -70,7 +71,7 @@
     AGENT_ID, AGENT_NAME, INTERNET_CARD_NUM, ISSUER, OPEN_ACCOUNT_TIME, EXPIRE_TIME,
     INTERNET_CARD_STATUS, MER_ID, LATELY_PAY_TIME, MER_NAME, MANUFACTURER, RENEW, C_TIME,
     U_TIME, C_USER, U_USER, STATUS, VERSION, STOP, RENEW_STATUS, STOP_REASON, SUM_POSTPONE_TIME,
-    BUS_NUM, BUS_PLATFORM, POSTPONE_CAUSE, STATUS_TIME
+    BUS_NUM, BUS_PLATFORM, POSTPONE_CAUSE, STATUS_TIME, TASK_STATUS_TIME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.internet.pojo.OInternetCardExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -111,8 +112,8 @@
     C_USER, U_USER, STATUS,
     VERSION, STOP, RENEW_STATUS,
     STOP_REASON, SUM_POSTPONE_TIME, BUS_NUM,
-    BUS_PLATFORM, POSTPONE_CAUSE, STATUS_TIME
-    )
+    BUS_PLATFORM, POSTPONE_CAUSE, STATUS_TIME,
+    TASK_STATUS_TIME)
     values (#{iccidNum,jdbcType=VARCHAR}, #{cardImportId,jdbcType=VARCHAR}, #{batchNum,jdbcType=VARCHAR},
     #{snNum,jdbcType=VARCHAR}, #{deliverTime,jdbcType=TIMESTAMP}, #{consignee,jdbcType=VARCHAR},
     #{orderId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR},
@@ -123,8 +124,8 @@
     #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
     #{version,jdbcType=DECIMAL}, #{stop,jdbcType=DECIMAL}, #{renewStatus,jdbcType=VARCHAR},
     #{stopReason,jdbcType=VARCHAR}, #{sumPostponeTime,jdbcType=DECIMAL}, #{busNum,jdbcType=VARCHAR},
-    #{busPlatform,jdbcType=VARCHAR}, #{postponeCause,jdbcType=VARCHAR}, #{statusTime,jdbcType=VARCHAR}
-    )
+    #{busPlatform,jdbcType=VARCHAR}, #{postponeCause,jdbcType=VARCHAR}, #{statusTime,jdbcType=VARCHAR},
+    #{taskStatusTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.internet.pojo.OInternetCard">
     insert into O_INTERNET_CARD
@@ -228,6 +229,9 @@
       <if test="statusTime != null">
         STATUS_TIME,
       </if>
+      <if test="taskStatusTime != null">
+        TASK_STATUS_TIME,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="iccidNum != null">
@@ -328,6 +332,9 @@
       </if>
       <if test="statusTime != null">
         #{statusTime,jdbcType=VARCHAR},
+      </if>
+      <if test="taskStatusTime != null">
+        #{taskStatusTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -436,6 +443,9 @@
       <if test="statusTime != null">
         STATUS_TIME = #{statusTime,jdbcType=VARCHAR},
       </if>
+      <if test="taskStatusTime != null">
+        TASK_STATUS_TIME = #{taskStatusTime,jdbcType=TIMESTAMP},
+      </if>
     </set>
     where ICCID_NUM = #{iccidNum,jdbcType=VARCHAR}
   </update>
@@ -472,7 +482,8 @@
     BUS_NUM = #{busNum,jdbcType=VARCHAR},
     BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
     POSTPONE_CAUSE = #{postponeCause,jdbcType=VARCHAR},
-    STATUS_TIME = #{statusTime,jdbcType=VARCHAR}
+    STATUS_TIME = #{statusTime,jdbcType=VARCHAR},
+    TASK_STATUS_TIME = #{taskStatusTime,jdbcType=TIMESTAMP}
     where ICCID_NUM = #{iccidNum,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -620,6 +631,9 @@
       </if>
       <if test="statusTime != null and statusTime != ''">
         STATUS_TIME = #{statusTime,jdbcType=VARCHAR},
+      </if>
+      <if test="taskStatusTime != null">
+        TASK_STATUS_TIME = #{taskStatusTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     where ICCID_NUM = #{iccidNum,jdbcType=VARCHAR}

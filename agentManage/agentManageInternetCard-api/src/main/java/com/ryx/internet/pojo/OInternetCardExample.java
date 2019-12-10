@@ -2348,6 +2348,66 @@ public class OInternetCardExample {
             addCriterion("STATUS_TIME not between", value1, value2, "statusTime");
             return (Criteria) this;
         }
+
+        public Criteria andTaskStatusTimeIsNull() {
+            addCriterion("TASK_STATUS_TIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskStatusTimeIsNotNull() {
+            addCriterion("TASK_STATUS_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskStatusTimeEqualTo(Date value) {
+            addCriterion("TASK_STATUS_TIME =", value, "taskStatusTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskStatusTimeNotEqualTo(Date value) {
+            addCriterion("TASK_STATUS_TIME <>", value, "taskStatusTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskStatusTimeGreaterThan(Date value) {
+            addCriterion("TASK_STATUS_TIME >", value, "taskStatusTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskStatusTimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("TASK_STATUS_TIME >=", value, "taskStatusTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskStatusTimeLessThan(Date value) {
+            addCriterion("TASK_STATUS_TIME <", value, "taskStatusTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskStatusTimeLessThanOrEqualTo(Date value) {
+            addCriterion("TASK_STATUS_TIME <=", value, "taskStatusTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskStatusTimeIn(List<Date> values) {
+            addCriterion("TASK_STATUS_TIME in", values, "taskStatusTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskStatusTimeNotIn(List<Date> values) {
+            addCriterion("TASK_STATUS_TIME not in", values, "taskStatusTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskStatusTimeBetween(Date value1, Date value2) {
+            addCriterion("TASK_STATUS_TIME between", value1, value2, "taskStatusTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskStatusTimeNotBetween(Date value1, Date value2) {
+            addCriterion("TASK_STATUS_TIME not between", value1, value2, "taskStatusTime");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

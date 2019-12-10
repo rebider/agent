@@ -595,9 +595,19 @@ public class DateUtil {
         return -1;
     }
 
-    public static void main(String[] args){
-        System.out.println(DateUtil.getDateAfterReturnDate(new Date(), -5));
-    }
+    /**
+     * 获取某个时间0点
+     * @return
+     */
+   public static Date getTodayTimeZero(Date date){
+       Calendar calendar = Calendar.getInstance();
+       calendar.setTime(date);
+       calendar.set(Calendar.HOUR_OF_DAY, 0);
+       calendar.set(Calendar.MINUTE, 0);
+       calendar.set(Calendar.SECOND, 0);
+       Date zero = calendar.getTime();
+       return zero;
+   }
 
 
 }

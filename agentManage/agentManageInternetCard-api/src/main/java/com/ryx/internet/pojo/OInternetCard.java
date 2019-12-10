@@ -95,6 +95,8 @@ public class OInternetCard implements Serializable{
 
     private String statusTime;
 
+    private Date taskStatusTime;
+
     private String agDocDistrict;//数据库无
 
     private String agDocPro;//数据库无
@@ -109,6 +111,14 @@ public class OInternetCard implements Serializable{
 
     public void setStatusTime(String statusTime) {
         this.statusTime = statusTime;
+    }
+
+    public Date getTaskStatusTime() {
+        return taskStatusTime;
+    }
+
+    public void setTaskStatusTime(Date taskStatusTime) {
+        this.taskStatusTime = taskStatusTime;
     }
 
     public String getPostponeCause() {
