@@ -439,6 +439,7 @@
     f.name as ag_doc_district_name ,
     g.name as ag_doc_pro_name ,
     o.user_id as user_id,
+    org.ORG_NICK,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
@@ -481,6 +482,7 @@
     left join o_payment d on d.order_id = o.id
     left join c_organization f on f.id= e.ag_doc_district
     left join c_organization g on g.id= e.ag_doc_pro
+    left join o_organization org on e.ORGAN_NUM = org.ORG_ID
     <where>
       o.user_id=#{userId}
       <if test="1==1"> and  o.status = 1  </if>
@@ -554,6 +556,7 @@
     f.name as ag_doc_district_name ,
     g.name as ag_doc_pro_name ,
     o.user_id as user_id,
+    org.ORG_NICK,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
@@ -596,6 +599,7 @@
     left join o_payment d on d.order_id = o.id
     left join c_organization f on f.id= e.ag_doc_district
     left join c_organization g on g.id= e.ag_doc_pro
+    left join o_organization org on e.ORGAN_NUM = org.ORG_ID
     <where>
       <if test="1==1"> and  o.status = 1 </if>
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
