@@ -126,6 +126,7 @@ public class QueryCardStatusJobServiceImpl implements QueryCardStatusJobService 
         if(StringUtils.isNotBlank(sb)){
             AppConfig.sendEmails(sb.toString(), "物联网移动数据异常,方法processDataUpdateCardStatus");
         }
+        log.info("揭阳移动返回数据处理,结束");
     }
 
 }
