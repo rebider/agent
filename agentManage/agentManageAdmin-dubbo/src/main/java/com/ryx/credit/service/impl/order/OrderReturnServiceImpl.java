@@ -2436,7 +2436,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             imsTermAdjustDetail.setMachineId(detail.getBusProCode());
             log.info("退货上传物流下发到首刷系统:{}:{}:{}",userId,logistics.getId(),ids.toString());
             try {
-                AgentResult ar =  imsTermAdjustDetailService.insertImsTermAdjustDetail(listDetails,imsTermAdjustDetail);
+                AgentResult ar =  imsTermAdjustDetailService.insertImsTermAdjustDetail(logistics,listDetails,imsTermAdjustDetail);
                 if(ar.isOK()){
                     logistics.setSendStatus(Status.STATUS_1.status);
                     logistics.setSendMsg(ar.getMsg());

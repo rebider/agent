@@ -502,11 +502,15 @@
       <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
         and model=#{model} and o.id=ORDER_ID) </if>
       <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
-      <if test="vender!=null and vender!=''"> and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id
-        where soa.VENDER=#{vender} and os.order_id=o.id )</if>
+      <if test="vender!=null and vender!=''">
+        and  EXISTS(select * FROM o_sub_order os
+        left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id
+        where soa.VENDER=#{vender} and os.order_id=o.id )
+      </if>
       <if test="activityName!=null and activityName !=''">
-        and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on  soa.SUB_ORDER_ID=os.id
-        and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
+        and EXISTS (select * from o_sub_order_activity soa
+        left join o_sub_order os on soa.SUB_ORDER_ID = os.id and os.status = 1 and os.status = 1
+        where os.order_id = o.id and soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
       </if>
       <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus}</if>
       <if test="platfromPerm!=null and platfromPerm.size>0">
@@ -612,11 +616,15 @@
       <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
         and model=#{model} and o.id=ORDER_ID) </if>
       <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
-      <if test="vender!=null and vender!=''"> and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id
-        where soa.VENDER=#{vender} and os.order_id=o.id )</if>
+      <if test="vender!=null and vender!=''">
+        and  EXISTS(select * FROM o_sub_order os
+        left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id
+        where soa.VENDER=#{vender} and os.order_id=o.id )
+      </if>
       <if test="activityName!=null and activityName !=''">
-        and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on soa.SUB_ORDER_ID=os.id
-        and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
+        and EXISTS (select * from o_sub_order_activity soa
+        left join o_sub_order os on soa.SUB_ORDER_ID = os.id and os.status = 1 and os.status = 1
+        where os.order_id = o.id and soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
       </if>
       <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus}</if>
       <if test="organizationCode!=null and organizationCode !=''">
@@ -713,11 +721,14 @@
       <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
         and model=#{model} and o.id=ORDER_ID) </if>
       <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
-      <if test="vender!=null and vender!=''"> and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id
+      <if test="vender!=null and vender!=''">
+        and  EXISTS(select * FROM o_sub_order os
+        left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id
         where soa.VENDER=#{vender} and os.order_id=o.id )</if>
       <if test="activityName!=null and activityName !=''">
-        and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on  soa.SUB_ORDER_ID=os.id
-        and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
+        and EXISTS (select * from o_sub_order_activity soa
+        left join o_sub_order os on soa.SUB_ORDER_ID = os.id and os.status = 1 and os.status = 1
+        where os.order_id = o.id and soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
       </if>
       <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus}</if>
       <if test="platfromPerm!=null and platfromPerm.size>0">
@@ -804,11 +815,15 @@
       <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
         and model=#{model} and o.id=ORDER_ID) </if>
       <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
-      <if test="vender!=null and vender!=''"> and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id
-        where soa.VENDER=#{vender} and os.order_id=o.id )</if>
+      <if test="vender!=null and vender!=''">
+        and  EXISTS(select * FROM o_sub_order os
+        left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id
+        where soa.VENDER=#{vender} and os.order_id=o.id )
+      </if>
       <if test="activityName!=null and activityName !=''">
-        and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on soa.SUB_ORDER_ID=os.id
-        and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
+        and EXISTS (select * from o_sub_order_activity soa
+        left join o_sub_order os on soa.SUB_ORDER_ID = os.id and os.status = 1 and os.status = 1
+        where os.order_id = o.id and soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
       </if>
       <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus}</if>
       <if test="organizationCode!=null and organizationCode !=''">
@@ -1164,7 +1179,7 @@
   <select id="excelOrder" parameterType="map" resultMap="OrderoutVo">
     (
     select
-    to_char(o.c_time,'YYYY-MM-DD') as apytime,
+    to_char(o.c_time,'yyyy-MM-dd hh24:mi:ss') as apytime,
     o.o_num as num,
     b.ag_uniq_num,
     aab.bus_num,
@@ -1303,7 +1318,7 @@
       select sum(plans.plan_pro_num) from o_receipt_plan plans where plans.order_id = o.id and plans.status = 1
     ),0) as is_plan_num,
     o.review_status,
-    to_char(o.o_inuretime,'YYYY-MM-DD') as oinuretime,
+    to_char(o.o_inuretime,'yyyy-MM-dd hh24:mi:ss') as oinuretime,
     orging.name as ag_doc_district,
     org.name as ag_doc_pro,
     o.user_id as order_user,
@@ -1312,7 +1327,7 @@
       from o_organization oan
       where oan.org_id = aab.organ_num and oan.status = 1
     ),'') as org_name,
-    to_char(o.o_apytime,'YYYY-MM-DD') as orderDate,
+    to_char(o.o_apytime,'yyyy-MM-dd hh24:mi:ss') as orderDate,
     o.remark
     from o_order o
     left join a_agent b on o.agent_id = b.id
@@ -1363,7 +1378,8 @@
       </if>
       <if test="activityName!=null and activityName!=''">
         and EXISTS (select * from o_sub_order_activity soa
-        left join o_sub_order os on soa.SUB_ORDER_ID=os.id and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
+        left join o_sub_order os on soa.SUB_ORDER_ID = os.id and os.status = 1 and os.status = 1
+        where os.order_id = o.id and soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
       </if>
       <if test="reviewStatusList!=null and reviewStatusList.size>0">
         and o.review_status
@@ -1394,7 +1410,7 @@
   <select id="orderExcel" parameterType="map" resultMap="OrderoutVo">
     (
     select
-    to_char(o.c_time,'YYYY-MM-DD') as apytime,
+    to_char(o.c_time,'yyyy-MM-dd hh24:mi:ss') as apytime,
     o.o_num as num,
     b.ag_uniq_num,
     aab.bus_num,
@@ -1533,7 +1549,7 @@
     select sum(plans.plan_pro_num) from o_receipt_plan plans where plans.order_id = o.id and plans.status = 1
     ),0) as is_plan_num,
     o.review_status,
-    to_char(o.o_inuretime,'YYYY-MM-DD') as oinuretime,
+    to_char(o.o_inuretime,'yyyy-MM-dd hh24:mi:ss') as oinuretime,
     orging.name as ag_doc_district,
     org.name as ag_doc_pro,
     o.user_id as order_user,
@@ -1542,7 +1558,7 @@
     from o_organization oan
     where oan.org_id = aab.organ_num and oan.status = 1
     ),'') as org_name,
-    to_char(o.o_apytime,'YYYY-MM-DD') as orderDate,
+    to_char(o.o_apytime,'yyyy-MM-dd hh24:mi:ss') as orderDate,
     o.remark
     from o_order o
     left join a_agent b on o.agent_id = b.id
@@ -1569,11 +1585,12 @@
       <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
       <if test="vender!=null and vender!=''">
         and EXISTS(select * from o_sub_order os
-        left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id and os.order_id=o.id where soa.VENDER=#{vender})
+        left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id where os.order_id=o.id and soa.VENDER=#{vender})
       </if>
       <if test="activityName!=null and activityName!=''">
         and EXISTS (select * from o_sub_order_activity soa
-        left join o_sub_order os on soa.SUB_ORDER_ID=os.id and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
+        left join o_sub_order os on soa.SUB_ORDER_ID = os.id and os.status = 1 and os.status = 1
+        where os.order_id = o.id and soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
       </if>
       <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus} </if>
       <if test="agDocDistrict!=null and agDocDistrict!=''">
@@ -1593,7 +1610,7 @@
     </where>
     UNION
     select
-    to_char(o.c_time,'YYYY-MM-DD') as apytime,
+    to_char(o.c_time,'yyyy-MM-dd hh24:mi:ss') as apytime,
     o.o_num as num,
     b.ag_uniq_num,
     aab.bus_num,
@@ -1732,7 +1749,7 @@
     select sum(plans.plan_pro_num) from o_receipt_plan plans where plans.order_id = o.id and plans.status = 1
     ),0) as is_plan_num,
     o.review_status,
-    to_char(o.o_inuretime,'YYYY-MM-DD') as oinuretime,
+    to_char(o.o_inuretime,'yyyy-MM-dd hh24:mi:ss') as oinuretime,
     orging.name as ag_doc_district,
     org.name as ag_doc_pro,
     o.user_id as order_user,
@@ -1741,7 +1758,7 @@
     from o_organization oan
     where oan.org_id = aab.organ_num and oan.status = 1
     ),'') as org_name,
-    to_char(o.o_apytime,'YYYY-MM-DD') as orderDate,
+    to_char(o.o_apytime,'yyyy-MM-dd hh24:mi:ss') as orderDate,
     o.remark
     from o_order o
     left join a_agent b on o.agent_id = b.id
@@ -1767,11 +1784,12 @@
       <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
       <if test="vender!=null and vender!=''">
         and EXISTS(select * from o_sub_order os
-        left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id and os.order_id=o.id where soa.VENDER=#{vender})
+        left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id where os.order_id=o.id and soa.VENDER=#{vender})
       </if>
       <if test="activityName!=null and activityName!=''">
         and EXISTS (select * from o_sub_order_activity soa
-        left join o_sub_order os on soa.SUB_ORDER_ID=os.id and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
+        left join o_sub_order os on soa.SUB_ORDER_ID = os.id and os.status = 1 and os.status = 1
+        where os.order_id = o.id and soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
       </if>
       <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus} </if>
       <if test="agDocDistrict!=null and agDocDistrict!=''">
