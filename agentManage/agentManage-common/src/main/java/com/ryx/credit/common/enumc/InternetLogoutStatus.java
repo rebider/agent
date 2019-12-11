@@ -13,8 +13,10 @@ import java.util.Map;
  */
 public enum InternetLogoutStatus {
 
-    DZX("DZX","待注销"),
     ZXZ("ZXZ","注销中"),
+    TJCLZ("TJCLZ","停机处理中"),
+    TJSB("TJSB","停机失败"),
+    DZX("DZX","待注销"),//停机成功
     ZXCG("ZXCG","注销成功"),
     SX("SX","失效");
 

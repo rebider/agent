@@ -293,6 +293,7 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 internetLogoutDetail.setcUser(cUser);
                 internetLogoutDetail.setuUser(cUser);
                 internetLogoutDetail.setVersion(BigDecimal.ONE);
+                internetLogoutDetail.setIssuer(oInternetCard.getIssuer());
                 if(StringUtils.isNotBlank(oInternetCard.getBusNum()) && StringUtils.isNotBlank(oInternetCard.getBusPlatform())){
                     //查询最新对接省区大区对接人
                     AgentBusInfo agentBusInfo = new AgentBusInfo();
@@ -496,8 +497,8 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.SX.getValue());
                 oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
             }else if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
-                internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.DZX.getValue());
-                oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());
+                internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.TJCLZ.getValue());
+//                oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());
             }
             int j = internetLogoutDetailMapper.updateByPrimaryKeySelective(internetLogoutDetail);
             if(j!=1){

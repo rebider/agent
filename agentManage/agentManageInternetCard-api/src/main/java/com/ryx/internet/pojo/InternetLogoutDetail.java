@@ -1,10 +1,9 @@
 package com.ryx.internet.pojo;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class InternetLogoutDetail implements Serializable {
+public class InternetLogoutDetail {
     private String id;
 
     private String renewId;
@@ -54,6 +53,12 @@ public class InternetLogoutDetail implements Serializable {
     private String uUser;
 
     private BigDecimal version;
+
+    private String issuer;
+
+    private String failCause;
+
+    private String mobileOrderNo;
 
     public String getId() {
         return id;
@@ -255,6 +260,30 @@ public class InternetLogoutDetail implements Serializable {
         this.version = version;
     }
 
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer == null ? null : issuer.trim();
+    }
+
+    public String getFailCause() {
+        return failCause;
+    }
+
+    public void setFailCause(String failCause) {
+        this.failCause = failCause == null ? null : failCause.trim();
+    }
+
+    public String getMobileOrderNo() {
+        return mobileOrderNo;
+    }
+
+    public void setMobileOrderNo(String mobileOrderNo) {
+        this.mobileOrderNo = mobileOrderNo == null ? null : mobileOrderNo.trim();
+    }
+
     @Override
     public String toString() {
         return "InternetLogoutDetail{" +
@@ -283,6 +312,9 @@ public class InternetLogoutDetail implements Serializable {
                 ", cUser='" + cUser + '\'' +
                 ", uUser='" + uUser + '\'' +
                 ", version=" + version +
+                ", issuer='" + issuer + '\'' +
+                ", failCause='" + failCause + '\'' +
+                ", mobileOrderNo='" + mobileOrderNo + '\'' +
                 '}';
     }
 }

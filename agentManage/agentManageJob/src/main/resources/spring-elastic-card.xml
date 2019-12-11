@@ -91,4 +91,15 @@
                   overwrite="true"
                   disabled="${job.internetCardQueryCardStatusJob}"/>
 
+
+    <job:simple id="internetCardLogoutMobileStop"
+                job-ref="internetCardLogoutMobileStopJob"
+                registry-center-ref="regCenter"
+                cron="0 0/1 * * * ?"
+                overwrite="true"
+                description="物联网卡，注销明细数据推送移动，1分钟执行一次"
+                sharding-total-count="1"
+                sharding-item-parameters="0=Server0"
+                disabled="${job.internetCardJob}"/>
+
 </beans>
