@@ -50,13 +50,14 @@ public class ChinaMobileForJYHttpReq {
             paramMap.put("appKey",appKey);
             paramMap.put("format",format);
             paramMap.put("method","triopi.member.lifecycle.batch.query");
-            paramMap.put("transID",getTransId());
+            String transId = getTransId();
+            paramMap.put("transID",transId);
             paramMap.put("v",version);
             paramMap.put("iccids",iccids);
             String sign = ApiUtils.sign(paramMap, secretKey);
             paramMap.put("sign",sign);
             paramMap= ApiUtils.sortMap(paramMap);
-            log.info("揭阳移动接口查询状态请求参数：{}",paramMap);
+            log.info("揭阳移动接口查询状态请求参数：iccids:{},transId:{}",iccids,transId);
             String result = HttpClientUtil.doPost(JY_MOBILE_CARD_URL, paramMap);
             String decrypt = DESUtils.decrypt(result, secretKey);
             log.info("揭阳移动接口查询状态返回参数：{}",decrypt);
@@ -88,7 +89,7 @@ public class ChinaMobileForJYHttpReq {
             String sign = ApiUtils.sign(paramMap, secretKey);
             paramMap.put("sign",sign);
             paramMap= ApiUtils.sortMap(paramMap);
-            log.info("揭阳移动接口批量号码停开机请求参数：{}",paramMap);
+            log.info("揭阳移动接口批量号码停开机请求参数：msisdns:{},optType:{}",msisdns,optType);
             String result = HttpClientUtil.doPost(JY_MOBILE_CARD_URL, paramMap);
             String decrypt = DESUtils.decrypt(result, secretKey);
             log.info("揭阳移动接口批量号码停开机返回参数：{}",decrypt);
@@ -117,7 +118,7 @@ public class ChinaMobileForJYHttpReq {
             String sign = ApiUtils.sign(paramMap, secretKey);
             paramMap.put("sign",sign);
             paramMap= ApiUtils.sortMap(paramMap);
-            log.info("揭阳移动接口根据订单号查询返回结果请求参数：{}",paramMap);
+            log.info("揭阳移动接口根据订单号查询返回结果请求参数：orderNo:{}",orderNo);
             String result = HttpClientUtil.doPost(JY_MOBILE_CARD_URL, paramMap);
             String decrypt = DESUtils.decrypt(result, secretKey);
             log.info("揭阳移动接口根据订单号查询返回结果返回参数：{}",decrypt);
@@ -141,14 +142,15 @@ public class ChinaMobileForJYHttpReq {
             paramMap.put("appKey",appKey);
             paramMap.put("format",format);
             paramMap.put("method","triopi.business.member.switch");
-            paramMap.put("transID",getTransId());
+            String transId = getTransId();
+            paramMap.put("transID",transId);
             paramMap.put("v",version);
             paramMap.put("msisdn",msisdn);//物联卡号
             paramMap.put("optType",optType);
             String sign = ApiUtils.sign(paramMap, secretKey);
             paramMap.put("sign",sign);
             paramMap= ApiUtils.sortMap(paramMap);
-            log.info("揭阳移动接口批量号码停开机请求参数：{}",paramMap);
+            log.info("揭阳移动接口批量号码停开机请求参数：msisdn:{},optType:{},transId:{}",msisdn,optType,transId);
             String result = HttpClientUtil.doPost(JY_MOBILE_CARD_URL, paramMap);
             String decrypt = DESUtils.decrypt(result, secretKey);
             log.info("揭阳移动接口批量号码停开机返回参数：{}",decrypt);
