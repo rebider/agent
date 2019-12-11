@@ -736,7 +736,7 @@
     </where>
   </sql>
   <sql id="queryInternetCardSql">
-    left join a_agent_businfo b on i.bus_num=b.bus_num and i.bus_platform=b.bus_platform
+    left join a_agent_businfo b on i.bus_num=b.bus_num and i.bus_platform=b.bus_platform and b.status=1
     left join C_ORGANIZATION oa on oa.id=b.ag_doc_pro
     left join C_ORGANIZATION ob on ob.id=b.AG_DOC_DISTRICT
     left join d_dict d on d.d_itemvalue = i.MANUFACTURER AND d.d_group ='ORDER' AND d_artifact='MANUFACTURER'

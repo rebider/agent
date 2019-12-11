@@ -90,31 +90,32 @@ public class LogoutMobileStopJobServiceImpl implements LogoutMobileStopJobServic
                             AppConfig.sendEmails("logoutMobileStopJob申请注销明细通知移动，更新异常2，iccid："+internetLogoutDetail.getIccidNum(), "申请注销明细通知移动出现异常,logoutMobileStopJob方法");
                             continue;
                         }
-                    }
-                    JSONObject jsonData = JSONObject.parseObject(jsonObj.getString("data"));
-                    String dataCode = jsonData.getString("code");
-                    if(dataCode.equals("0")){
-                        internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.DZX.getValue());
-                        oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());
-                    }else{
-                        internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.TJSB.getValue());
-                        oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
-                    }
-                    if(StringUtils.isNotBlank(jsonObj.getString("orderNo")))
-                    internetLogoutDetail.setMobileOrderNo(jsonObj.getString("orderNo"));
-                    if(StringUtils.isNotBlank(jsonObj.getString("error")))
-                    internetLogoutDetail.setFailCause(jsonObj.getString("error"));
-                    internetLogoutDetail.setuTime(new Date());
-                    int i = internetLogoutDetailMapper.updateByPrimaryKey(internetLogoutDetail);
-                    if(i!=1){
-                        AppConfig.sendEmails("logoutMobileStopJob申请注销明细通知移动，更新异常3，iccid："+internetLogoutDetail.getIccidNum(), "申请注销明细通知移动出现异常,logoutMobileStopJob方法");
-                        continue;
-                    }
-                    oInternetCard.setuTime(new Date());
-                    int k = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
-                    if(k!=1){
-                        AppConfig.sendEmails("logoutMobileStopJob申请注销明细通知移动，更新异常4，iccid："+internetLogoutDetail.getIccidNum(), "申请注销明细通知移动出现异常,logoutMobileStopJob方法");
-                        continue;
+                    }else {
+                        JSONObject jsonData = JSONObject.parseObject(jsonObj.getString("data"));
+                        String dataCode = jsonData.getString("code");
+                        if(dataCode.equals("0")){
+                            internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.DZX.getValue());
+                            oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());
+                        }else{
+                            internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.TJSB.getValue());
+                            oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
+                        }
+                        if(StringUtils.isNotBlank(jsonObj.getString("orderNo")))
+                            internetLogoutDetail.setMobileOrderNo(jsonObj.getString("orderNo"));
+                        if(StringUtils.isNotBlank(jsonObj.getString("error")))
+                            internetLogoutDetail.setFailCause(jsonObj.getString("error"));
+                        internetLogoutDetail.setuTime(new Date());
+                        int i = internetLogoutDetailMapper.updateByPrimaryKey(internetLogoutDetail);
+                        if(i!=1){
+                            AppConfig.sendEmails("logoutMobileStopJob申请注销明细通知移动，更新异常3，iccid："+internetLogoutDetail.getIccidNum(), "申请注销明细通知移动出现异常,logoutMobileStopJob方法");
+                            continue;
+                        }
+                        oInternetCard.setuTime(new Date());
+                        int k = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
+                        if(k!=1){
+                            AppConfig.sendEmails("logoutMobileStopJob申请注销明细通知移动，更新异常4，iccid："+internetLogoutDetail.getIccidNum(), "申请注销明细通知移动出现异常,logoutMobileStopJob方法");
+                            continue;
+                        }
                     }
                 } catch (Exception e) {
                     AppConfig.sendEmails(MailUtil.printStackTrace(e), "申请注销明细通知移动出现异常,logoutMobileStopJob方法");

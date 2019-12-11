@@ -127,6 +127,8 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
         reqMap.put("page",page);
         List<Map<String, Object>> internetLogoutList = internetLogoutDetailMapper.internetCardLogoutDetailList(reqMap);
         for (Map<String, Object> map : internetLogoutList) {
+            map.put("ISSUER",Issuerstatus.getContentByValue(String.valueOf(map.get("ISSUER"))));
+            map.put("LOGOUT_STATUS",InternetLogoutStatus.getContentByValue(String.valueOf(map.get("LOGOUT_STATUS"))));
             if(StringUtils.isNotBlank(String.valueOf(map.get("C_USER")))){
                 CUser cUser = iUserService.selectById(Long.valueOf(String.valueOf(map.get("C_USER"))));
                 if(null!=cUser)
@@ -259,6 +261,14 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(iccid);
                 if(oInternetCard==null){
                     throw new MessageException("iccid有误");
+                }
+                if(StringUtils.isBlank(oInternetCard.getInternetCardNum())){
+                    throw new MessageException("物联卡号为空,不可申请注销,iccid:"+iccid);
+                }
+                if(party.equals("agent")){
+                    if(StringUtils.isBlank(oInternetCard.getBusNum()) || StringUtils.isBlank(oInternetCard.getBusPlatform())){
+                        throw new MessageException("业务平台数据不全,不可申请注销,iccid:"+iccid);
+                    }
                 }
                 InternetLogoutDetailExample internetLogoutDetailExample = new InternetLogoutDetailExample();
                 InternetLogoutDetailExample.Criteria criteria = internetLogoutDetailExample.createCriteria();

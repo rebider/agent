@@ -1,9 +1,10 @@
 package com.ryx.internet.pojo;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class InternetLogoutDetail {
+public class InternetLogoutDetail implements Serializable{
     private String id;
 
     private String renewId;
