@@ -53,10 +53,10 @@ public class QueryCardStatusJobServiceImpl implements QueryCardStatusJobService 
         expireTimeList.add(DateUtil.getPerDayOfMonth(3));
         reqMap.put("expireTimeList",expireTimeList);
         reqMap.put("issuer",Issuerstatus.JY_MOBILE.getValue());
-        reqMap.put("type","");
-//        if(!type.equals("selectNull")){
+        reqMap.put("type",type);
+        if(!type.equals("selectNull")){
             reqMap.put("tasksStatusTime",DateUtil.format(new Date(),DateUtil.DATE_FORMAT_yyyy_MM_dd));
-//        }
+        }
         List<OInternetCard> internetCards = internetCardMapper.selectUpdateCardStatus(reqMap, new Page(0, 100));
         log.info("fetchDataUpdateCardStatus查询流量卡更新卡状态数量为:{}",internetCards.size());
         return internetCards;
