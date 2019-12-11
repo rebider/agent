@@ -799,8 +799,9 @@
            and c.status_time is null and c.task_status_time is null
         </if>
         <if test="map.type != 'selectNull'">
-           and c.status_time is not null and c.task_status_time &lt; #{map.tasksStatusTime}
+           and c.task_status_time &lt; to_date(#{map.tasksStatusTime},'yyyy-MM-dd')
         </if>
+        order by c.expire_time asc
     </where>
     <include refid="OracleDialectSuffix" />
   </select>
