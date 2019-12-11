@@ -390,4 +390,17 @@
   <select id="selectPlatformNumByPlatformType" resultType="string">
       SELECT PLATFORM_NUM FROM A_PLATFORM WHERE PLATFORM_TYPE='SSPOS'
   </select>
+
+  <select id="getPlatFormType" resultMap="BaseResultMap">
+   select
+    distinct case platform.platform_type
+    when 'POS' THEN 'POS'
+    when 'ZHPOS' THEN 'POS'
+    when 'ZPOS' THEN 'POS'
+    when 'SSPOS' THEN 'POS'
+    else platform.platform_type
+    end PLATFORM_TYPE
+    from A_platform platform where status=1
+    group by platform.platform_type
+  </select>
 </mapper>
