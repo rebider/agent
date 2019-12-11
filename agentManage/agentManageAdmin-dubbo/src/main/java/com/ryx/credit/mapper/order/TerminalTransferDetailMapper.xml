@@ -33,6 +33,8 @@
     <result column="GOAL_TYPE" jdbcType="VARCHAR" property="goalType" />
     <result column="ORIGINAL_TYPE" jdbcType="VARCHAR" property="originalType" />
     <result column="IS_NO_PAY" jdbcType="VARCHAR" property="isNoPay" />
+    <result column="ORIGINAL_ORG_ID_S" jdbcType="VARCHAR" property="originalOrgIdS" />
+    <result column="GOAL_ORG_ID_S" jdbcType="VARCHAR" property="goalOrgIdS" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -68,7 +70,7 @@
     ORIGINAL_ORG_NAME, ORIGINAL_BUS_ID, GOAL_ORG_ID, GOAL_ORG_NAME, GOAL_BUS_ID, ADJUST_TIME,
     SN_COUNT, BUTT_JOINT_PERSON, ADJUST_STATUS, REMARK, BATCH_NUM, AGENT_ID, C_TIME,
     U_TIME, C_USER, U_USER, STATUS, VERSION, PLATFORM_TYPE, BUS_ID, COM_SN_NUM, GOAL_TYPE,
-    ORIGINAL_TYPE, IS_NO_PAY
+    ORIGINAL_TYPE, IS_NO_PAY, ORIGINAL_ORG_ID_S, GOAL_ORG_ID_S
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -109,7 +111,8 @@
       C_USER, U_USER, STATUS,
       VERSION, PLATFORM_TYPE, BUS_ID,
       COM_SN_NUM, GOAL_TYPE, ORIGINAL_TYPE,
-      IS_NO_PAY)
+      IS_NO_PAY, ORIGINAL_ORG_ID_S, GOAL_ORG_ID_S
+      )
     values (#{id,jdbcType=VARCHAR}, #{terminalTransferId,jdbcType=VARCHAR}, #{snBeginNum,jdbcType=VARCHAR},
       #{snEndNum,jdbcType=VARCHAR}, #{proCom,jdbcType=VARCHAR}, #{proModel,jdbcType=VARCHAR},
       #{originalOrgId,jdbcType=VARCHAR}, #{originalOrgName,jdbcType=VARCHAR}, #{originalBusId,jdbcType=VARCHAR},
@@ -120,7 +123,8 @@
       #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
       #{version,jdbcType=DECIMAL}, #{platformType,jdbcType=DECIMAL}, #{busId,jdbcType=VARCHAR},
       #{comSnNum,jdbcType=DECIMAL}, #{goalType,jdbcType=VARCHAR}, #{originalType,jdbcType=VARCHAR},
-      #{isNoPay,jdbcType=VARCHAR})
+      #{isNoPay,jdbcType=VARCHAR}, #{originalOrgIdS,jdbcType=VARCHAR}, #{goalOrgIdS,jdbcType=VARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetail">
     insert into O_TERMINAL_TRANSFER_DETAIL
@@ -218,6 +222,12 @@
       <if test="isNoPay != null">
         IS_NO_PAY,
       </if>
+      <if test="originalOrgIdS != null">
+        ORIGINAL_ORG_ID_S,
+      </if>
+      <if test="goalOrgIdS != null">
+        GOAL_ORG_ID_S,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -312,6 +322,12 @@
       </if>
       <if test="isNoPay != null">
         #{isNoPay,jdbcType=VARCHAR},
+      </if>
+      <if test="originalOrgIdS != null">
+        #{originalOrgIdS,jdbcType=VARCHAR},
+      </if>
+      <if test="goalOrgIdS != null">
+        #{goalOrgIdS,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -414,6 +430,12 @@
       <if test="isNoPay != null">
         IS_NO_PAY = #{isNoPay,jdbcType=VARCHAR},
       </if>
+      <if test="originalOrgIdS != null">
+        ORIGINAL_ORG_ID_S = #{originalOrgIdS,jdbcType=VARCHAR},
+      </if>
+      <if test="goalOrgIdS != null">
+        GOAL_ORG_ID_S = #{goalOrgIdS,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -448,7 +470,9 @@
       COM_SN_NUM = #{comSnNum,jdbcType=DECIMAL},
       GOAL_TYPE = #{goalType,jdbcType=VARCHAR},
       ORIGINAL_TYPE = #{originalType,jdbcType=VARCHAR},
-      IS_NO_PAY = #{isNoPay,jdbcType=VARCHAR}
+      IS_NO_PAY = #{isNoPay,jdbcType=VARCHAR},
+      ORIGINAL_ORG_ID_S = #{originalOrgIdS,jdbcType=VARCHAR},
+      GOAL_ORG_ID_S = #{goalOrgIdS,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -461,7 +485,7 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
-
+<!--==========================以上代码自动生成，请勿修改==========================-->
 
   <select id="exprotTerminalTransferDetails" parameterType="map" resultType="map">
       <include refid="TerminalTransferListSql" />
