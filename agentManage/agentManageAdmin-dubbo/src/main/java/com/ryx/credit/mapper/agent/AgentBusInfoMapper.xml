@@ -1236,4 +1236,18 @@ union
       and CLO_REVIEW_STATUS = #{reqMap.cloReviewStatus}
     </if>
   </select>
+
+
+  <select id="queryBusinfo" parameterType="map" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from A_AGENT_BUSINFO
+    where status=1 and  CLO_REVIEW_STATUS in (2,3)
+    <if test="map.agentId !=null and map.agentId !=''">
+      and AGENT_ID = #{map.agentId}
+    </if>
+    <if test="map.busType !=null and map.busType !='' and map.busTypeOne !=null and map.busTypeOne !=''">
+      and BUS_TYPE in(#{map.busType},#{map.busTypeOne})
+    </if>
+  </select>
 </mapper>
