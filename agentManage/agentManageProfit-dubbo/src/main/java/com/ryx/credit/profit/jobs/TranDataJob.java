@@ -264,8 +264,8 @@ public class TranDataJob {
      */
     public Map<String,String> synchronizeTranCheckData(){
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MONTH, -1);
         String searchTime=new SimpleDateFormat("yyyy-MM-dd HH:MM:ss").format(calendar.getTime());
+        calendar.add(Calendar.MONTH, -1);
         String tranMonth= new SimpleDateFormat("yyyyMM").format(calendar.getTime());
         LOG.info("================"+tranMonth+"交易量核对数据同步开始================");
         Map<String,String> resultMap=new HashMap<>();
@@ -653,6 +653,7 @@ public class TranDataJob {
         try{
             if(!"".equals(agentResult.getData())){
                 agentResultData = (Map<String, Object>) agentResult.getData();
+                LOG.info("月分润交易接口返回数据"+tranCode+":"+agentResultData.toString());
             }else{
                 LOG.info("月分润交易接口访问异常:"+agentResult.getMsg());
                 agentResultData=null;
