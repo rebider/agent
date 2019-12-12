@@ -471,10 +471,10 @@ public class CompensateServiceImpl implements CompensateService {
                     throw new ProcessException("请选择活动");
                 }
                 if(StringUtils.isBlank(refundPriceDiffDetail.getOldOrgId())){
-                    throw new ProcessException("请填写目标机构编码");
+                    throw new ProcessException("请填写原机构编码");
                 }
                 if(StringUtils.isBlank(refundPriceDiffDetail.getNewOrgId())){
-                    throw new ProcessException("请填写原机构编码");
+                    throw new ProcessException("请填写目标机构编码");
                 }
 
                 //变更后活动
