@@ -155,10 +155,8 @@ public class ProfitMonthRdbPosDataJob {
                 AgentBusInfo agentBusInfo;
                 try {
                     agentBusInfo = businfoService.queryAgentBusInfo(agencyId);
-                }catch (Exception e){
+                }catch (Exception e){//查询失败的代理商
                     notSuccessAgent.add(agencyId);
-                    logger.info("代理商详情查询失败-----agencyId："+agencyId);
-                    e.printStackTrace();
                     continue;
                 }
 
