@@ -257,7 +257,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateReturnService {
                         } else if (null != sendInfoRet.get("status") && "1".equals(sendInfoRet.get("status"))) {
                             //成功，更新物流明细
                             while (logisticsDetails.size() > 0) {
-                                if (!osnOperateReturnService.updateDetailBatch(logisticsDetails, new BigDecimal(batch), LogisticsDetailSendStatus.send_ing.code))
+                                if (!osnOperateReturnService.updateDetailBatch(logisticsDetails, new BigDecimal(batch), LogisticsDetailSendStatus.send_success.code))
                                     throw new Exception("明细更新失败（下发成功）");
                                 //调用接口发送到业务系统，如果接口返回异常，更新物流明细发送失败，不在进行发送
                                 logisticsDetails = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
@@ -562,7 +562,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateReturnService {
             OLogistics posLogistics = oLogisticsMapper.selectByPrimaryKey(logcId);
             logger.info("退货上传物流下发到POS系统:", user, logistics.getId(), datas.toString());
             try {
-                AgentResult ar = imsTermAdjustDetailService.insertImsTermAdjustDetail(datas, imsTermAdjustDetail);
+                AgentResult ar = imsTermAdjustDetailService.insertImsTermAdjustDetail(logistics,datas, imsTermAdjustDetail);
                 if (ar.isOK()) {
                     return FastMap.fastMap("status", "1");
                 } else {
@@ -650,6 +650,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateReturnService {
             } else {
                 return FastMap.fastMap("status", "2").putKeyV("msg", "不同平台不下发，手动调整");
             }
+        //退货发货调整
         } else if (PlatformType.SSPOS.code.equals(platForm.getPlatformType())) {
             logger.info("pos发货 更新库存记录:{}:{}", proType, beginSn, endSn);
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oOrder.getBusId());
@@ -667,7 +668,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateReturnService {
             try {
                 vo.setImsTermAdjustDetail(imsTermAdjustDetail);
                 vo.setLogisticsDetailList(datas);
-                AgentResult ar = termMachineService.adjustmentMachine(vo);
+                AgentResult ar = AgentResult.fail("未实现的业务平台");
                 if (ar.isOK()) {
                     return FastMap.fastMap("status", "1");
                 } else {
@@ -692,7 +693,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateReturnService {
                     putKeyV("terminalNoEnd", logistics.getSnEndNum()). //终端编号结束
                     putKeyV("agencyId", agentBusInfo.getBusNum()).//终端政策id
                     putKeyV("terminalPolicyId", oActivity.getBusProCode()).//代理商A码
-                    putKeyV("inBoundDate", (new SimpleDateFormat("yyyyMMdd")).format(new Date()))); //发货时间
+                    putKeyV("inBoundDate", DateUtil.format(logistics.getSendDate(),"yyyyMMdd"))); //发货时间
             reqMap.put("taskId", logistics.getId()); //唯一值
             reqMap.put("branchId", agentBusInfo.getBusPlatform().substring(0, agentBusInfo.getBusPlatform().indexOf("_"))); //当前品牌id
             reqMap.put("oldAgencyId", agentBusInfoMap.get("BUSNUM")); //代理商A码

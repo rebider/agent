@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.order;
 
+import com.alibaba.druid.sql.ast.statement.SQLIfStatement;
 import com.alibaba.fastjson.JSONObject;
 import com.rabbitmq.client.AMQP;
 import com.ryx.credit.common.enumc.*;
@@ -891,6 +892,11 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             imsTermWarehouseDetail.setPosSpePrice(oActivity_plan.getPosSpePrice());
             imsTermWarehouseDetail.setPosType(oActivity_plan.getPosType());
             imsTermWarehouseDetail.setStandTime(oActivity_plan.getStandTime());
+            if(logistics.getSendDate()!=null) {
+                imsTermWarehouseDetail.setDeliveryTime(DateUtil.formatDay(logistics.getSendDate()));
+            }else{
+                imsTermWarehouseDetail.setDeliveryTime(DateUtil.formatDay(new Date()));
+            }
             try {
                 //机具下发接口
                 logger.info("机具下发接口调用：logcId：{},batch：{},snList：{}",logcId,batch,snList.size());
@@ -1089,7 +1095,11 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             reqMap.put("oldAgencyId", oldAgencyId);//划拨机构
             reqMap.put("branchId", branchId);//品牌id
             reqMap.put("termPolicyId", oActivity_plan.getBusProCode());//活动代码
-            reqMap.put("inBoundDate", new SimpleDateFormat("yyyyMMdd").format(new Date()));//物流下发，当前时间
+            if(logistics.getSendDate()!=null) {
+                reqMap.put("inBoundDate", DateUtil.format(logistics.getSendDate(),"yyyyMMdd"));//物流下发，当前时间
+            }else{
+                reqMap.put("inBoundDate", DateUtil.format(new Date(),"yyyyMMdd"));//物流下发，当前时间
+            }
             reqMap.put("agencyName", agent.getAgName());//划拨目标
             try {
                 LowerHairMachineVo lowerHairMachineVo = new LowerHairMachineVo();
@@ -1160,7 +1170,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             reqMap.put("posSnBegin", logistics.getSnBeginNum());//起始终端号
             reqMap.put("posSnEnd", logistics.getSnEndNum());//结束终端号
             reqMap.put("newOrgId", agentBusInfo.getBusNum());//划拨目标
-            reqMap.put("deliveryTime", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));//物流下发，当前时间
+            reqMap.put("deliveryTime", DateUtil.format(logistics.getSendDate(),"yyyy-MM-dd"));//物流下发，当前时间
             reqMap.put("orgId", orgMap.get("PLATCODE"));//顶级机构
             reqMap.put("createPerson", AppConfig.getProperty("rjpos.agent.name"));//创建人
             if (null != oActivity_plan.getPosType() && (oActivity_plan.getPosType().equals("1") || oActivity_plan.getPosType().equals("2"))) {
