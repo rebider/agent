@@ -19,11 +19,13 @@ public interface InternetCardService {
 
     PageInfo internetCardImportList(OInternetCardImport internetCardImport, Page page);
 
+    int internetCardImportCount(OInternetCardImport internetCardImport);
+
     void importInternetCard(String fileUrl, String importType, String userId,String batchNo)throws Exception;
 
     void disposeSn(List<String> snList,OInternetCard internetCard,OInternetCardImport oInternetCardImport)throws MessageException;
 
-    List<OInternetCardImport>  exportErrorExcel(OInternetCardImport internetCardImport);
+//    List<OInternetCardImport>  exportErrorExcel(OInternetCardImport internetCardImport);
 
     void taskDisposeInternetCard();
 

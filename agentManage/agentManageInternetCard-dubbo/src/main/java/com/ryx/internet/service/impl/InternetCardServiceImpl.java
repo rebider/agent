@@ -260,7 +260,33 @@ public class InternetCardServiceImpl implements InternetCardService {
 
     @Override
     public PageInfo internetCardImportList(OInternetCardImport internetCardImport, Page page){
+        OInternetCardImportExample internetCardImportExample = commonImport(internetCardImport);
+        internetCardImportExample.setPage(page);
+        internetCardImportExample.setOrderByClause(" c_time desc ");
+        List<OInternetCardImport> oInternetCards = internetCardImportMapper.selectByExample(internetCardImportExample);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(oInternetCards);
+        pageInfo.setTotal((int)internetCardImportMapper.countByExample(internetCardImportExample));
+        return pageInfo;
+    }
 
+    /**
+     * 导出查询个数
+     * @param internetCardImport
+     * @return
+     */
+    @Override
+    public int internetCardImportCount(OInternetCardImport internetCardImport){
+        OInternetCardImportExample internetCardImportExample = commonImport(internetCardImport);
+        return (int)internetCardImportMapper.countByExample(internetCardImportExample);
+    }
+
+    /**
+     * 查询和导出
+     * @param internetCardImport
+     * @return
+     */
+    private OInternetCardImportExample commonImport(OInternetCardImport internetCardImport){
         OInternetCardImportExample internetCardImportExample = new OInternetCardImportExample();
         OInternetCardImportExample.Criteria criteria = internetCardImportExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
@@ -273,16 +299,8 @@ public class InternetCardServiceImpl implements InternetCardService {
         if(StringUtils.isNotBlank(internetCardImport.getBatchNum())){
             criteria.andBatchNumEqualTo(internetCardImport.getBatchNum());
         }
-        internetCardImportExample.setPage(page);
-        internetCardImportExample.setOrderByClause(" c_time desc ");
-        List<OInternetCardImport> oInternetCards = internetCardImportMapper.selectByExample(internetCardImportExample);
-
-        PageInfo pageInfo = new PageInfo();
-        pageInfo.setRows(oInternetCards);
-        pageInfo.setTotal((int)internetCardImportMapper.countByExample(internetCardImportExample));
-        return pageInfo;
+        return internetCardImportExample;
     }
-
 
 
     @Override
@@ -824,23 +842,23 @@ public class InternetCardServiceImpl implements InternetCardService {
         }
     }
 
-    /**
-     * 导出错误数据
-     * @param internetCardImport
-     * @return
-     * @throws MessageException
-     */
-    @Override
-    public List<OInternetCardImport>  exportErrorExcel(OInternetCardImport internetCardImport){
-        OInternetCardImportExample oInternetCardImportExample = new OInternetCardImportExample();
-        OInternetCardImportExample.Criteria criteria = oInternetCardImportExample.createCriteria();
-        criteria.andStatusEqualTo(Status.STATUS_1.status);
-        criteria.andBatchNumEqualTo(internetCardImport.getBatchNum());
-        criteria.andImportTypeEqualTo(internetCardImport.getImportType());
-        criteria.andImportStatusEqualTo(OInternetCardImportStatus.FAIL.code);
-        List<OInternetCardImport> oInternetCardImports = internetCardImportMapper.selectByExample(oInternetCardImportExample);
-        return oInternetCardImports;
-    }
+//    /**
+//     * 导出错误数据
+//     * @param internetCardImport
+//     * @return
+//     * @throws MessageException
+//     */
+//    @Override
+//    public List<OInternetCardImport>  exportErrorExcel(OInternetCardImport internetCardImport){
+//        OInternetCardImportExample oInternetCardImportExample = new OInternetCardImportExample();
+//        OInternetCardImportExample.Criteria criteria = oInternetCardImportExample.createCriteria();
+//        criteria.andStatusEqualTo(Status.STATUS_1.status);
+//        criteria.andBatchNumEqualTo(internetCardImport.getBatchNum());
+//        criteria.andImportTypeEqualTo(internetCardImport.getImportType());
+//        criteria.andImportStatusEqualTo(OInternetCardImportStatus.FAIL.code);
+//        List<OInternetCardImport> oInternetCardImports = internetCardImportMapper.selectByExample(oInternetCardImportExample);
+//        return oInternetCardImports;
+//    }
 
 
     public void updateInternetCardImport(OInternetCardImport internetCardImport)throws MessageException{
