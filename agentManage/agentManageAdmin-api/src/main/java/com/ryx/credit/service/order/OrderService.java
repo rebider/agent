@@ -322,9 +322,9 @@ public interface OrderService {
      */
     AgentResult approveFinishOrderAdjust(String insid, String actname) throws Exception;
 
-    Map<String,Object> saveCut(String orderAdjId, String amt, String ctype);
-
     AgentResult approvalTaskSettle(OrderAdj orderAdj) throws ProcessException;
+
+    Map<String,Object> freshRefundAmo(String adjId,String proAmount,String refundAmo,String refundType);
 
     Map<String,Object> saveProAmo(String adjId,String proAmount);
 }
