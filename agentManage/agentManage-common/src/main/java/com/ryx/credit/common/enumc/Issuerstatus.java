@@ -1,5 +1,8 @@
 package com.ryx.credit.common.enumc;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 流量卡发卡方
  * @version V1.0
@@ -44,6 +47,15 @@ public enum Issuerstatus {
             }
         }
         return "";
+    }
+
+    public static Map<String,Object> getContentMap(){
+        Map<String,Object> resultMap = new HashMap<>();
+        Issuerstatus[] issuerstatus = Issuerstatus.values();
+        for(Issuerstatus cc : issuerstatus){
+            resultMap.put(cc.code,cc.msg);
+        }
+        return resultMap;
     }
 
     /**

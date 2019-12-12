@@ -129,6 +129,7 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
         for (Map<String, Object> map : internetLogoutList) {
             map.put("ISSUER",Issuerstatus.getContentByValue(String.valueOf(map.get("ISSUER"))));
             map.put("LOGOUT_STATUS",InternetLogoutStatus.getContentByValue(String.valueOf(map.get("LOGOUT_STATUS"))));
+            map.put("REVIEW_STATUS",AgStatus.getMsg(new BigDecimal(map.get("REVIEW_STATUS").toString())));
             if(StringUtils.isNotBlank(String.valueOf(map.get("C_USER")))){
                 CUser cUser = iUserService.selectById(Long.valueOf(String.valueOf(map.get("C_USER"))));
                 if(null!=cUser)
@@ -181,6 +182,28 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
         if(StringUtils.isNotBlank(internetLogoutDetail.getLogoutStatus())){
             reqMap.put("logoutStatus",internetLogoutDetail.getLogoutStatus());
         }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getInternetCardNum())){
+            reqMap.put("internetCardNum",internetLogoutDetail.getInternetCardNum());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getIssuer())){
+            reqMap.put("issuer",internetLogoutDetail.getIssuer());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getReviewStatus())){
+            reqMap.put("reviewStatus",internetLogoutDetail.getReviewStatus());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getBeginCTime())){
+            reqMap.put("beginCTime",internetLogoutDetail.getBeginCTime());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getEndCTime())){
+            reqMap.put("endCTime",internetLogoutDetail.getEndCTime());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getBeginSnNum())){
+            reqMap.put("beginSnNum",internetLogoutDetail.getBeginSnNum());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getEndSnNum())){
+            reqMap.put("endSnNum",internetLogoutDetail.getEndSnNum());
+        }
+
         List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
         if(orgCodeRes==null && orgCodeRes.size()!=1){
             return null;

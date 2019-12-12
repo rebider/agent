@@ -61,6 +61,56 @@ public class InternetLogoutDetail implements Serializable{
 
     private String mobileOrderNo;
 
+    private String reviewStatus;
+
+    private String beginCTime;
+
+    private String endCTime;
+
+    private String beginSnNum;
+
+    private String endSnNum;
+
+    public String getBeginCTime() {
+        return beginCTime;
+    }
+
+    public void setBeginCTime(String beginCTime) {
+        this.beginCTime = beginCTime;
+    }
+
+    public String getEndCTime() {
+        return endCTime;
+    }
+
+    public void setEndCTime(String endCTime) {
+        this.endCTime = endCTime;
+    }
+
+    public String getBeginSnNum() {
+        return beginSnNum;
+    }
+
+    public void setBeginSnNum(String beginSnNum) {
+        this.beginSnNum = beginSnNum;
+    }
+
+    public String getEndSnNum() {
+        return endSnNum;
+    }
+
+    public void setEndSnNum(String endSnNum) {
+        this.endSnNum = endSnNum;
+    }
+
+    public String getReviewStatus() {
+        return reviewStatus;
+    }
+
+    public void setReviewStatus(String reviewStatus) {
+        this.reviewStatus = reviewStatus;
+    }
+
     public String getId() {
         return id;
     }
