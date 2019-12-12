@@ -880,7 +880,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                 OLogistics logistics =  oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
                 logger.info("退货上传物流下发到POS系统:{}:{}:{}",user,logistics.getId(),snList.toString());
                 try {
-                    AgentResult ar =  imsTermAdjustDetailService.insertImsTermAdjustDetail(snList,imsTermAdjustDetail);
+                    AgentResult ar =  imsTermAdjustDetailService.insertImsTermAdjustDetail(oLogistics,snList,imsTermAdjustDetail);
                     if(ar.isOK()){
                         logistics.setSendStatus(Status.STATUS_1.status);
                         logistics.setSendMsg(ar.getMsg());
