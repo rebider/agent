@@ -82,7 +82,6 @@ public class InternetCardServiceImpl implements InternetCardService {
     private InternetLogoutDetailMapper internetLogoutDetailMapper;
 
 
-
     @Override
     public PageInfo internetCardList(OInternetCard internetCard, Page page,String agentId,Long userId){
 
@@ -93,42 +92,6 @@ public class InternetCardServiceImpl implements InternetCardService {
         for (OInternetCard oInternetCard : oInternetCards) {
             oInternetCard.setIccidNumId(oInternetCard.getIccidNum());
             oInternetCard.setIssuer(Issuerstatus.getContentByValue(oInternetCard.getIssuer()));
-            if(null==oInternetCard.getInternetCardStatus()){
-                oInternetCard.setRenewButton("0");
-                continue;
-            }
-            if(null==oInternetCard.getRenew()){
-                oInternetCard.setRenewButton("0");
-                continue;
-            }
-            //是否需续费为是,才展示按钮
-            if(oInternetCard.getRenew().compareTo(BigDecimal.ZERO)==0){
-                oInternetCard.setRenewButton("0");
-                continue;
-            }
-            if((oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NORMAL.getValue())==0 || oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NOACTIVATE.getValue())==0 )
-                    && oInternetCard.getRenewStatus().equals(InternetRenewStatus.WXF.getValue())){
-                oInternetCard.setRenewButton("1");
-                if(null==oInternetCard.getExpireTime()){
-                    oInternetCard.setRenewButton("0");
-                    continue;
-                }
-                String onOff = redisService.getValue(RedisCachKey.CARDRENEW22ONOFF.code);
-                if(StringUtils.isBlank(onOff)){
-                    oInternetCard.setRenewButton("0");
-                }else if( onOff.equals(OnOffStatus.ON.code)){
-                    Date date = DateUtil.dateDay(oInternetCard.getExpireTime(), "22");
-                    if(Calendar.getInstance().getTime().getTime()<date.getTime()){
-                        oInternetCard.setRenewButton("1");
-                    }else{
-                        oInternetCard.setRenewButton("0");
-                    }
-                }else{
-                    oInternetCard.setRenewButton("1");
-                }
-            }else{
-                oInternetCard.setRenewButton("0");
-            }
         }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(oInternetCards);

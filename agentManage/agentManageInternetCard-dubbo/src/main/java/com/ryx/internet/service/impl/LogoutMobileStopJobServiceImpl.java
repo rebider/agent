@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.List;
 
 /***
- * 揭阳移动Job
+ * 揭阳移动通知移动关停Job
  * @Author liudh
  * @Description //TODO 
  * @Date 2019/12/9 16:12
