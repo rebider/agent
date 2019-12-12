@@ -931,13 +931,16 @@ public class InternetCardServiceImpl implements InternetCardService {
             Map<String,Object> reqMap = new HashMap<>();
             reqMap.put("renew",Status.STATUS_0.status);//否
             reqMap.put("newRenew",Status.STATUS_1.status);//是续费
-//            reqMap.put("internetCardStatus",InternetCardStatus.NORMAL.getValue());
             List<String> expireTimeList = new ArrayList<>();
             expireTimeList.add(DateUtil.getPerDayOfMonth(0));
             expireTimeList.add(DateUtil.getPerDayOfMonth(1));
             expireTimeList.add(DateUtil.getPerDayOfMonth(2));
             expireTimeList.add(DateUtil.getPerDayOfMonth(3));
             reqMap.put("expireTimeList",expireTimeList);
+            List<BigDecimal> cardStatusList = new ArrayList<>();
+            cardStatusList.add(InternetCardStatus.NORMAL.getValue());
+            cardStatusList.add(InternetCardStatus.NOACTIVATE.getValue());
+            reqMap.put("cardStatusList",cardStatusList);
             List<OInternetCard> oInternetCards = internetCardMapper.selectInternetCardRenew(reqMap);
             log.info("更新已修改的商户信息数量:{}",oInternetCards.size());
             for (OInternetCard oInternetCard : oInternetCards) {
@@ -976,7 +979,6 @@ public class InternetCardServiceImpl implements InternetCardService {
                             log.error("更新已修改的商户信息失败:IccidNum:{},商户编号:{},商户名称:{}",oInternetCard.getIccidNum(),oInternetCardMerch.getChnMerchId(),oInternetCardMerch.getMerchName());
                         }
                         log.info("更新已修改的商户信息成功,iccid:{}",oInternetCard.getIccidNum());
-                        continue;
                     }
                 } catch (Exception e) {
                     log.info("更新已修改的商户信息异常,iccid:{}",oInternetCard.getIccidNum());

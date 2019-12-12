@@ -100,4 +100,29 @@
         SELECT s_role.NEXTVAL FROM DUAL
     </select>
 
+
+    <select id="selectResourcByRoleId" resultType="com.ryx.credit.pojo.admin.CResource" parameterType="java.lang.Long">
+        SELECT
+        DISTINCT s.id AS id,
+        s.NAME as name,
+        s.url AS url,
+        s.description AS description,
+        s.icon AS icon,
+        s.pid AS pid,
+        s.seq AS seq,
+        s.STATUS AS status,
+        s.open_mode AS openMode,
+        s.opened as opened,
+        s.resource_type AS resourceType,
+        s.create_time AS createTime
+        FROM
+        c_role r
+        LEFT JOIN c_role_resource e ON r.id = e.role_id
+        LEFT JOIN c_resource s ON e.resource_id = s.id
+        WHERE
+        r.id = #{id}
+        ORDER BY seq
+    </select>
+
+
 </mapper>
