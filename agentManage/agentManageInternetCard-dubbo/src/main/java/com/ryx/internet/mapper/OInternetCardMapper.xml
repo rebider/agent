@@ -505,6 +505,10 @@
       <foreach collection="map.expireTimeList" item="expireTime" open=" in(" close=")" separator=",">
         #{expireTime}
       </foreach>
+      and c.internet_card_status
+      <foreach collection="map.cardStatusList" item="cardStatus" open=" in(" close=")" separator=",">
+        #{cardStatus}
+      </foreach>
       and c.status = 1
     </where>
   </select>

@@ -122,9 +122,7 @@ public class RoleServiceImpl extends ServiceImpl<CRoleMapper, CRole> implements 
     @Transactional
     public void copyRole(Long id){
         CRole role = roleMapper.selectById(id);
-        List<Long> list = new ArrayList();
-        list.add(role.getId());
-        List<CResource> resourceList = roleMapper.selectResourceListByRoleIdList(list);
+        List<CResource> resourceList = roleMapper.selectResourcByRoleId(role.getId());
         String resourceIds = "";
         for (CResource resource : resourceList) {
             resourceIds+=resource.getId()+",";
@@ -133,7 +131,6 @@ public class RoleServiceImpl extends ServiceImpl<CRoleMapper, CRole> implements 
         role.setName(role.getName()+"1");
         roleMapper.insertRole(role);
         updateRoleResource(role.getId(),resourceIds);
-
     }
 
 }

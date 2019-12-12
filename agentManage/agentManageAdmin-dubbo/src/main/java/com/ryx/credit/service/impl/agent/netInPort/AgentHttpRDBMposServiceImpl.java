@@ -77,9 +77,9 @@ public class AgentHttpRDBMposServiceImpl implements AgentNetInHttpService{
                 agentColinfo = new AgentColinfo();
             }
             resultMap.put("mobileNo",agentBusInfo.getBusLoginNum());
-            resultMap.put("branchid",agentBusInfo.getBusPlatform());
+//            resultMap.put("branchid",agentBusInfo.getBusPlatform());
             PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
-//            resultMap.put("branchid",platForm.getBusplatform());//暂时先注释,等瑞大宝改造完成放开
+            resultMap.put("branchid",platForm.getBusplatform());
             //查询顶级机构
             Map orgMap = orgPlatformMapper.selectByMap(FastMap.fastMap("busPlatform", agentBusInfo.getBusPlatform()).putKeyV("organNum", agentBusInfo.getOrganNum()));
             resultMap.put("organId",String.valueOf(orgMap.get("PLATCODE")));
