@@ -216,7 +216,7 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
     }
 
     /**
-     * 瑞大宝历史换活动查询Sn
+     * 瑞大宝查询历史SN
      * @param platformType
      * @param snBegin
      * @param snEnd

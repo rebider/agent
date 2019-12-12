@@ -218,7 +218,7 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                         .andBusStatusIn(Arrays.asList(BusStatus.QY.getValue(),BusStatus.WJH.getValue(),BusStatus.WQY.getValue()))
                         .andBusPlatformIn(listCanChangePlat);
                 List<AgentBusInfo>  canchange = agentBusInfoMapper.selectByExample(agentBusInfoExample);
-                resultMap.put("agentBusInfoListNew",canchange); //原平台
+                resultMap.put("agentBusInfoListNew",canchange); //目标平台
             }
             resultList.add(resultMap);
         }
