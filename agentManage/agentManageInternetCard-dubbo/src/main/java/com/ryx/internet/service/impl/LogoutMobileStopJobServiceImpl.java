@@ -100,10 +100,10 @@ public class LogoutMobileStopJobServiceImpl implements LogoutMobileStopJobServic
                             internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.TJSB.getValue());
                             oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
                         }
-                        if(StringUtils.isNotBlank(jsonObj.getString("orderNo")))
-                            internetLogoutDetail.setMobileOrderNo(jsonObj.getString("orderNo"));
-                        if(StringUtils.isNotBlank(jsonObj.getString("error")))
-                            internetLogoutDetail.setFailCause(jsonObj.getString("error"));
+                        if(StringUtils.isNotBlank(jsonData.getString("orderNo")))
+                            internetLogoutDetail.setMobileOrderNo(jsonData.getString("orderNo"));
+                        if(StringUtils.isNotBlank(jsonData.getString("error")))
+                            internetLogoutDetail.setFailCause(jsonData.getString("error"));
                         internetLogoutDetail.setuTime(new Date());
                         int i = internetLogoutDetailMapper.updateByPrimaryKey(internetLogoutDetail);
                         if(i!=1){
