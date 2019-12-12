@@ -891,6 +891,11 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             imsTermWarehouseDetail.setPosSpePrice(oActivity_plan.getPosSpePrice());
             imsTermWarehouseDetail.setPosType(oActivity_plan.getPosType());
             imsTermWarehouseDetail.setStandTime(oActivity_plan.getStandTime());
+            if(logistics.getSendDate()!=null) {
+                imsTermWarehouseDetail.setDeliveryTime(DateUtil.formatDay(logistics.getSendDate()));
+            }else{
+                imsTermWarehouseDetail.setDeliveryTime(DateUtil.formatDay(new Date()));
+            }
             try {
                 //机具下发接口
                 logger.info("机具下发接口调用：logcId：{},batch：{},snList：{}",logcId,batch,snList.size());
