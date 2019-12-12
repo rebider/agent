@@ -46,8 +46,7 @@ public class PlatformSynServicePos implements PlatformSynService {
     private AgentBusinfoService agentBusinfoService;
     @Autowired
     private PlatFormMapper platFormMapper;
-    @Autowired
-    private imsOrganMapper imsOrganMapper;
+
     @Override
     public Boolean isMyPlatform(String id) {
             AgentBusInfo agentBusInfo = agentBusinfoService.getById(id);

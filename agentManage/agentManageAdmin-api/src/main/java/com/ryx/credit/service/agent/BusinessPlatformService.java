@@ -90,4 +90,7 @@ public interface BusinessPlatformService {
      * 查询瑞银信pro pro1
      */
     List<PlatForm> queryAblePlatFormPro();
+
+
+    List<AgentBusInfo> queryBusinfo(Map hashMap);
 }
