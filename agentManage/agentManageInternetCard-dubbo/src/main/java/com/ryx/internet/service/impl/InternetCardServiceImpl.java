@@ -92,6 +92,8 @@ public class InternetCardServiceImpl implements InternetCardService {
         for (OInternetCard oInternetCard : oInternetCards) {
             oInternetCard.setIccidNumId(oInternetCard.getIccidNum());
             oInternetCard.setIssuer(Issuerstatus.getContentByValue(oInternetCard.getIssuer()));
+            oInternetCard.setInternetCardStatusName(InternetCardStatus.getContentByValue(oInternetCard.getInternetCardStatus()));
+            oInternetCard.setRenewStatus(InternetRenewStatus.getContentByValue(oInternetCard.getRenewStatus()));
         }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(oInternetCards);

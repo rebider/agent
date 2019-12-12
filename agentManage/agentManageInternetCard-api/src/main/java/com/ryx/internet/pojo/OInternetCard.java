@@ -105,6 +105,16 @@ public class OInternetCard implements Serializable{
 
     private String platformName; //数据库无
 
+    private String internetCardStatusName;
+
+    public String getInternetCardStatusName() {
+        return internetCardStatusName;
+    }
+
+    public void setInternetCardStatusName(String internetCardStatusName) {
+        this.internetCardStatusName = internetCardStatusName;
+    }
+
     public String getStatusTime() {
         return statusTime;
     }
