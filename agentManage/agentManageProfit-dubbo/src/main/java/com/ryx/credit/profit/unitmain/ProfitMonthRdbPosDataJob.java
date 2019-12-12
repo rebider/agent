@@ -56,9 +56,8 @@ public class ProfitMonthRdbPosDataJob {
     @Autowired
     OrderService orderService;
 
-    private List<String> notSuccessAgent;
-    private Map<String,Integer> repeatAgent;
     //未成功的代理商
+    private List<String> notSuccessAgent;
 
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertyConfigInDev(){
@@ -97,7 +96,6 @@ public class ProfitMonthRdbPosDataJob {
     public void synchroProfitMonth(String transDate) {
 
         notSuccessAgent=new ArrayList<String>();
-        repeatAgent=new HashMap<String,Integer>();
 
         HashMap<String, String> map = new HashMap<String, String>();
         map.put("month",transDate);
@@ -129,7 +127,6 @@ public class ProfitMonthRdbPosDataJob {
                 //插入新拉取数据
                 insertTransProfit(data, transDate);
                 logger.info("未同步成功代理商"+notSuccessAgent.toString());
-                logger.info("代理商:"+repeatAgent.toString());
                 return ;
             }
         } catch (Exception e) {
@@ -150,12 +147,6 @@ public class ProfitMonthRdbPosDataJob {
             for (int j = 0; j < agencyData.size(); j++) {//代理商数据
                 JSONObject tranData = agencyData.getJSONObject(j);
                 String agencyId = tranData.getString("agencyId");
-
-                if (repeatAgent.containsKey(agencyId)){
-                    repeatAgent.put(agencyId,repeatAgent.get(agencyId)+1);
-                }else{
-                    repeatAgent.put(agencyId,1);
-                }
 
                 TransProfitDetail detail = new TransProfitDetail();
                 if (agencyId==null ||agencyId.equals(""))
