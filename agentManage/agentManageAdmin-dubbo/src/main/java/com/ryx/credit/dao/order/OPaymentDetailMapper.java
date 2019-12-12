@@ -77,4 +77,6 @@ public interface OPaymentDetailMapper {
     List<OPaymentDetail> selectRefunOPaymentDetail(@Param("orderId")String orderId);
 
     BigDecimal selectArrMoney(@Param("orderId")String orderId,@Param("paymentType")String paymentType, @Param("paymentStatus")BigDecimal paymentStatus);
+
+    List<OPaymentDetail> selectQkRefund(@Param("agentId")String agentId,@Param("adjId")String adjId);
 }
