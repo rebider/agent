@@ -75,29 +75,33 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
      * @Date: 17:01 2018/7/24
      */
     @Override
-    public List<OPaymentDetail> getCanTakeoutPaymentsByAgentId(String agentId) throws ProcessException {
-        OPaymentDetailExample example = new OPaymentDetailExample();
+    public List<OPaymentDetail> getCanTakeoutPaymentsByAgentId(String agentId,String adjustType,String adjId) throws ProcessException {
+        if (adjustType!=null && AdjustType.ORDER_ADJ.adjustType.equals(adjustType)){
+            return  oPaymentDetailMapper.selectQkRefund(agentId, adjId);
+        }else {
+            OPaymentDetailExample example = new OPaymentDetailExample();
 
-        //付款类型过滤条件
-        List<String> payTypeList = new ArrayList<>();
-        payTypeList.add(PaymentType.DKFQ.code);
-        payTypeList.add(PaymentType.FRFQ.code);
+            //付款类型过滤条件
+            List<String> payTypeList = new ArrayList<>();
+            payTypeList.add(PaymentType.DKFQ.code);
+            payTypeList.add(PaymentType.FRFQ.code);
 
-        //订单状态过滤条件
-        List<BigDecimal> paymentStatusList = new ArrayList<>();
-        paymentStatusList.add(PaymentStatus.DF.code);
-        paymentStatusList.add(PaymentStatus.BF.code);
-        paymentStatusList.add(PaymentStatus.YQ.code);
+            //订单状态过滤条件
+            List<BigDecimal> paymentStatusList = new ArrayList<>();
+            paymentStatusList.add(PaymentStatus.DF.code);
+            paymentStatusList.add(PaymentStatus.BF.code);
+            paymentStatusList.add(PaymentStatus.YQ.code);
 
-        example.or()
-                .andAgentIdEqualTo(agentId)
-                .andPayTypeIn(payTypeList)
-                .andPaymentStatusIn(paymentStatusList)
-                .andPaymentTypeEqualTo(PamentIdType.ORDER_FKD.code);
-        //example.setOrderByClause("Payment_type asc");
-        //example.setOrderByClause("order_id asc");
-        example.setOrderByClause("plan_pay_time asc");
-        return oPaymentDetailMapper.selectByExample(example);
+            example.or()
+                    .andAgentIdEqualTo(agentId)
+                    .andPayTypeIn(payTypeList)
+                    .andPaymentStatusIn(paymentStatusList)
+                    .andPaymentTypeEqualTo(PamentIdType.ORDER_FKD.code);
+            //example.setOrderByClause("Payment_type asc");
+            //example.setOrderByClause("order_id asc");
+            example.setOrderByClause("plan_pay_time asc");
+            return oPaymentDetailMapper.selectByExample(example);
+        }
     }
 
     /**
