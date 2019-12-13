@@ -32,4 +32,6 @@ public interface TemplateRecodeMapper {
     List<TemplateRecode> getListByTem(@Param("page") Page page,@Param("record") TemplateRecode record,@Param("map") Map<String,String> map);
 
     int getCountByTem(@Param("record") TemplateRecode record,@Param("map") Map<String,String> map);
+
+    List<Map<String, Object>> queryBusInfo(Map<String,String> param);
 }
