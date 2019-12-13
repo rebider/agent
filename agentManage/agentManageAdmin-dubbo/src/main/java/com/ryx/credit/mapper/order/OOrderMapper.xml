@@ -439,7 +439,7 @@
     f.name as ag_doc_district_name ,
     g.name as ag_doc_pro_name ,
     o.user_id as user_id,
-    org.ORG_NICK,to_char(o.c_time,'YYYY-MM-DD') as c_time,
+    org.ORG_NICK,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
@@ -496,7 +496,8 @@
             and (b.AG_DOC_PRO = #{agDocDistrict} or b.AG_DOC_DISTRICT = #{agDocDistrict})
         </if>
       <if test="agDocPro!=null and agDocPro!=''"> and b.AG_DOC_PRO like  #{agDocPro} </if>
-      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
+      <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
       <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
@@ -556,7 +557,7 @@
     f.name as ag_doc_district_name ,
     g.name as ag_doc_pro_name ,
     o.user_id as user_id,
-    org.ORG_NICK,to_char(o.c_time,'YYYY-MM-DD') as c_time,
+    org.ORG_NICK,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
@@ -612,7 +613,8 @@
             and (b.AG_DOC_PRO = #{agDocDistrict} or b.AG_DOC_DISTRICT = #{agDocDistrict})
         </if>
       <if test="agDocPro!=null and agDocPro!=''"> and b.AG_DOC_PRO like  #{agDocPro} </if>
-      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD')  between #{beginTime} and #{endTime}) </if>
+      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
+      <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
       <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
@@ -717,7 +719,8 @@
         and (b.AG_DOC_PRO = #{agDocDistrict} or b.AG_DOC_DISTRICT = #{agDocDistrict})
       </if>
       <if test="agDocPro!=null and agDocPro!=''"> and b.AG_DOC_PRO like  #{agDocPro} </if>
-      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
+      <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
       <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
@@ -811,7 +814,8 @@
         and (b.AG_DOC_PRO = #{agDocDistrict} or b.AG_DOC_DISTRICT = #{agDocDistrict})
       </if>
       <if test="agDocPro!=null and agDocPro!=''"> and b.AG_DOC_PRO like  #{agDocPro} </if>
-      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD')  between #{beginTime} and #{endTime}) </if>
+      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
+      <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
       <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
@@ -867,7 +871,7 @@
     o.review_status,
     o.order_status,
     o.o_apytime,
-    to_char(o.c_time,'YYYY-MM-DD') as c_time,
+    o.c_time,
     o.remark,
     o.ox_order,
     b.id as agentId,
@@ -924,7 +928,8 @@
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
       <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
-      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
+      <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
       <if test="platformList!=null and platformList.size > 0">
          and c.PLATFORM_NUM
         <foreach collection="platformList" item="platform" open=" in(" close=")" separator=",">
@@ -1056,7 +1061,8 @@
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
-      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
+      <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
       <if test="platformList!=null and platformList.size > 0">
         and c.PLATFORM_NUM
         <foreach collection="platformList" item="platform" open=" in(" close=")" separator=",">
