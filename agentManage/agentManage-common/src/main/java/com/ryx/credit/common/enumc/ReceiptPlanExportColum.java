@@ -18,6 +18,7 @@ public enum ReceiptPlanExportColum {
     //导出欠款记录
     ARREARAGE_Column("TM,AG_UNIQ_NUM,AG_NAME,BUS_NUM,PLATFORM_NAME,JJQK","欠款导出字段"),
     ARREARAGE_Title("月份,代理商唯一编码,代理商名称,业务平台编码,业务平台,机具欠款","欠款导出标题");
+
     public String code;
 
     public String msg;
