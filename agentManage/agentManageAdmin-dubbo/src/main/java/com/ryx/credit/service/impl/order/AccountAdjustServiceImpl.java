@@ -130,7 +130,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
             if (isAdjustOrder != 0) {
 
                 //查询欠款明细列表
-                List<OPaymentDetail> paymentDetails = paymentDetailService.getCanTakeoutPaymentsByAgentId(agentId);
+                List<OPaymentDetail> paymentDetails = paymentDetailService.getCanTakeoutPaymentsByAgentId(agentId,adjustType,srcId);
                 for (OPaymentDetail ndetail : paymentDetails) {
                     //金额全部抵扣完时退出循环
                     if (leftAmt.compareTo(BigDecimal.ZERO) <= 0) {
