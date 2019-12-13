@@ -46,4 +46,6 @@ public interface PlatFormMapper {
      * @return
      */
     List<String> selectPlatformNumByPlatformType();
+
+    List<PlatForm> getPlatFormType();
 }
