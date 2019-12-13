@@ -452,28 +452,28 @@
         and (oa.CODE like concat(#{orgCode},'%') or ob.CODE like concat(#{orgCode},'%'))
       </if>
       <if test="id != null">
-        and i.id = #{id}
+        and i.id like concat(#{id},'%')
       </if>
       <if test="agentId != null">
-        and i.agent_Id = #{agentId}
+        and i.agent_Id like concat(#{agentId},'%')
       </if>
       <if test="agentName != null">
         and i.agent_Name like concat(#{agentName},'%')
       </if>
       <if test="busNum != null">
-        and i.bus_Num = #{busNum}
+        and i.bus_Num like concat(#{busNum},'%')
       </if>
       <if test="iccidNum != null">
         and i.iccid_Num like concat(#{iccidNum},'%')
       </if>
       <if test="renewId != null">
-        and i.renew_Id = #{renewId}
+        and i.renew_Id like concat(#{renewId},'%')
       </if>
       <if test="snNum != null">
         and i.sn_Num like concat(#{snNum},'%')
       </if>
       <if test="merId != null">
-        and i.mer_Id = #{merId}
+        and i.mer_Id like concat(#{merId},'%')
       </if>
       <if test="merName != null">
         and i.mer_Name like concat(#{merName},'%')
