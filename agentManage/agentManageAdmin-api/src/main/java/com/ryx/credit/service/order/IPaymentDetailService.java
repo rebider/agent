@@ -27,7 +27,7 @@ public interface IPaymentDetailService {
      * @Description: 查询代理商可抵扣欠款, 先根据欠款类型排序，欠款类型相同的根据订单号排序
      * @Date: 16:52 2018/7/24
      */
-    List<OPaymentDetail> getCanTakeoutPaymentsByAgentId(String agentId) throws ProcessException;
+    List<OPaymentDetail> getCanTakeoutPaymentsByAgentId(String agentId,String adjustType,String adjId) throws ProcessException;
 
     /**
      * 提供分润接口
