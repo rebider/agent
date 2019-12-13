@@ -5464,4 +5464,45 @@ public class OrderServiceImpl implements OrderService {
         resMap.put("settleAmount",orderAdj.getSettleAmount());
         return resMap;
     }
+
+    /**
+     * 订单数量调整导出
+     * @param map
+     * @return
+     */
+    @Override
+    public List<OrderAdjustVo> excelOrderAdjustAll(Map map) {
+        if(null != map.get("userId")) {
+            Long userId = (Long) map.get("userId");
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if (orgCodeRes == null && orgCodeRes.size() != 1) {
+                return null;
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+            map.put("organizationCode", organizationCode);
+            List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+            map.put("platfromPerm", platfromPerm);
+        }
+
+        List<OrderAdjustVo> orderAdjVoList = orderAdjMapper.excelOrderAdjustAll(map);
+
+        if (null!=orderAdjVoList && orderAdjVoList.size()>0) {
+            for (OrderAdjustVo orderAdjustVo : orderAdjVoList) {
+                if (StringUtils.isNotBlank(orderAdjustVo.getReviewsStat()) && !orderAdjustVo.getReviewsStat().equals("null")) {
+                    String reviewsStatusByValue = AgStatus.getMsg(new BigDecimal(orderAdjustVo.getReviewsStat()));
+                    if (null != reviewsStatusByValue) {
+                        orderAdjustVo.setReviewsStat(reviewsStatusByValue);
+                    }
+                }
+                if (StringUtils.isNotBlank(orderAdjustVo.getRefundStat()) && !orderAdjustVo.getRefundStat().equals("null")) {
+                    Dict refundStatusByValue = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.REFUND_STAT.name(), orderAdjustVo.getRefundStat());
+                    if (null != refundStatusByValue) {
+                        orderAdjustVo.setRefundStat(refundStatusByValue.getdItemname());
+                    }
+                }
+            }
+        }
+        return orderAdjVoList;
+    }
 }
