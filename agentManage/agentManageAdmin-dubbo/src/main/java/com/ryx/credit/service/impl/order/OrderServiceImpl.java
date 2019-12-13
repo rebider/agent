@@ -4392,7 +4392,7 @@ public class OrderServiceImpl implements OrderService {
                 if(String.valueOf(OrderAdjRefundType.CDFQ_GZ.code).equals(orderUpModelVo.getRefundType()) && orderUpModelVo.getApprovalResult().equals(ApprovalType.PASS.getValue())){
                     //第一个财务节点,挂账-无退款
                     if(orderUpModelVo.getSid().equals("sid-F315F787-E98B-40FA-A6DC-6A962201075D")){
-                        orderAdj.setSettleAmount(new BigDecimal(orderUpModelVo.getRefundAmount()).setScale(2, RoundingMode.HALF_UP).subtract(orderAdj.getProRefundAmount()));
+                        orderAdj.setSettleAmount(new BigDecimal(orderUpModelVo.getRefundAmount()));
                         orderAdj.setRealRefundAmo(BigDecimal.ZERO);
                         orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
                         orderAdj.setRefundStat(RefundStat.UNREFUND.key);
@@ -4406,7 +4406,7 @@ public class OrderServiceImpl implements OrderService {
                 }else if(String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType()) && orderUpModelVo.getApprovalResult().equals(ApprovalType.PASS.getValue())){
                     //第一个财务节点,线下退款-退款中
                     if(orderUpModelVo.getSid().equals("sid-F315F787-E98B-40FA-A6DC-6A962201075D")){
-                        orderAdj.setRealRefundAmo(new BigDecimal(orderUpModelVo.getRefundAmount()).setScale(2, RoundingMode.HALF_UP).subtract(orderAdj.getProRefundAmount()));
+                        orderAdj.setRealRefundAmo(new BigDecimal(orderUpModelVo.getRefundAmount()));
                         orderAdj.setSettleAmount(BigDecimal.ZERO);
                         orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
                         orderAdj.setRefundStat(RefundStat.REFUNDING.key);
@@ -4440,7 +4440,6 @@ public class OrderServiceImpl implements OrderService {
                             });
                         orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
                         orderAdj.setRefundStat(RefundStat.REFUNED.key);
-                        orderAdj.setRealRefundAmo(orderAdj.getRefundAmount());
                         orderAdj.setRefundTm(orderUpModelVo.getRefundTm());
                     }
 
@@ -4529,15 +4528,17 @@ public class OrderServiceImpl implements OrderService {
                 BigDecimal takeout_amount = orderAdj.getOffsetAmount()==null?new BigDecimal(0):orderAdj.getOffsetAmount();
                 try {
                     Map<String, Object> oAccountAdjusts =   accountAdjustService.adjust(true, amount.subtract(proRefundAmo).subtract(takeout_amount), AdjustType.ORDER_ADJ.adjustType, 1, orderAdj.getAgentId(), orderAdj.getAdjUserId(), orderAdj.getId(), PamentSrcType.ORDER_ADJ_REFUND.code);
-                    orderAdj.setOffsetAmount(new BigDecimal((String)oAccountAdjusts.get("takeAmt")));;//抵扣金额
+                    orderAdj.setOffsetAmount((BigDecimal) oAccountAdjusts.get("takeAmt"));;//抵扣金额
                     ORefundAgent oRefundAgent =  (ORefundAgent) oAccountAdjusts.get("refund");//退款金额实体
                     oAccountAdjusts.get("planNows");//现在的还款计划
                     BigDecimal refundAmount = oRefundAgent.getRefundAmount();
                     orderAdj.setRealRefundAmo(refundAmount);
                 } catch (ProcessException e) {
-
+                    logger.error("调用调账接口失败,{}",orderAdj.getId());
+                    throw new MessageException("调用调账接口失败");
                 } catch (Exception e) {
-
+                    logger.error("调用调账接口失败,{}",orderAdj.getId());
+                    throw new MessageException("调用调账接口失败");
                 }
                 /******调用调账接口 结束*********/
             }
@@ -5431,16 +5432,16 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public Map<String, Object> freshRefundAmo(String adjId, String proAmount,String refundAmo,String refundType) {
+    public Map<String, Object> freshRefundAmo(String adjId, String proAmount,String refundAmo,String refundType,String takeAmt) {
         Map<String, Object> resMap = new HashMap();
         OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(adjId);
         orderAdj.setProRefundAmount(new BigDecimal(proAmount));
         if (new BigDecimal(refundType).compareTo(OrderAdjRefundType.CDFQ_XXTK.code)==0){
-            orderAdj.setRealRefundAmo(new BigDecimal(refundAmo).setScale(2, RoundingMode.HALF_UP).subtract(orderAdj.getProRefundAmount()));
+            orderAdj.setRealRefundAmo(new BigDecimal(refundAmo).setScale(2, RoundingMode.HALF_UP));
             orderAdj.setSettleAmount(BigDecimal.ZERO);
             orderAdj.setRefundType(new BigDecimal(refundType));
         }else if (new BigDecimal(refundType).compareTo(OrderAdjRefundType.CDFQ_GZ.code)==0){
-            orderAdj.setSettleAmount(new BigDecimal(refundAmo).setScale(2, RoundingMode.HALF_UP).subtract(orderAdj.getProRefundAmount()));
+            orderAdj.setSettleAmount(new BigDecimal(refundAmo).setScale(2, RoundingMode.HALF_UP));
             orderAdj.setRealRefundAmo(BigDecimal.ZERO);
             orderAdj.setRefundType(new BigDecimal(refundType));
         }

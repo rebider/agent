@@ -324,7 +324,7 @@ public interface OrderService {
 
     AgentResult approvalTaskSettle(OrderAdj orderAdj) throws ProcessException;
 
-    Map<String,Object> freshRefundAmo(String adjId,String proAmount,String refundAmo,String refundType);
+    Map<String,Object> freshRefundAmo(String adjId,String proAmount,String refundAmo,String refundType,String takeAmt);
 
     Map<String,Object> saveProAmo(String adjId,String proAmount);
 }
