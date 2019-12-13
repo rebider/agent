@@ -327,4 +327,9 @@ public interface OrderService {
     Map<String,Object> freshRefundAmo(String adjId,String proAmount,String refundAmo,String refundType);
 
     Map<String,Object> saveProAmo(String adjId,String proAmount);
+
+    /**
+     * 订单数量调整导出
+     */
+    List<OrderAdjustVo> excelOrderAdjustAll(Map map);
 }
