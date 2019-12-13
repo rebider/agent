@@ -1089,6 +1089,10 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             agentResult.setMsg("缺少代理商编号");
             return agentResult;
         }
+        if(agentList.size()>500){
+            agentResult.setMsg("代理商个数超过500");
+            return agentResult;
+        }
         List<Map<String, Object>> list = internetRenewOffsetDetailMapper.queryMonthSumOffsetAmt(reqMap);
         if(list.size()==0){
             agentResult.setStatus(AgentResult.OK);
@@ -1122,6 +1126,10 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }
         if(agentList.size()==0){
             agentResult.setMsg("缺少代理商编号");
+            return agentResult;
+        }
+        if(agentList.size()>500){
+            agentResult.setMsg("代理商个数超过500");
             return agentResult;
         }
         List<String> internetRenewWayList = new ArrayList<>();
