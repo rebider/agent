@@ -439,7 +439,7 @@
     f.name as ag_doc_district_name ,
     g.name as ag_doc_pro_name ,
     o.user_id as user_id,
-    org.ORG_NICK,
+    org.ORG_NICK,to_char(o.c_time,'YYYY-MM-DD') as c_time,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
@@ -556,7 +556,7 @@
     f.name as ag_doc_district_name ,
     g.name as ag_doc_pro_name ,
     o.user_id as user_id,
-    org.ORG_NICK,
+    org.ORG_NICK,to_char(o.c_time,'YYYY-MM-DD') as c_time,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
@@ -867,7 +867,7 @@
     o.review_status,
     o.order_status,
     o.o_apytime,
-    o.c_time,
+    to_char(o.c_time,'YYYY-MM-DD') as c_time,
     o.remark,
     o.ox_order,
     b.id as agentId,
@@ -978,7 +978,7 @@
        and 1=-1
      </if>
     </where>
-    order by c_time desc
+    order by o.c_time desc
     <include refid="OracleDialectSuffix" />
   </select>
 
