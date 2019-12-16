@@ -32,4 +32,8 @@ public interface OrderAdjMapper {
     int  selectAgentUpModelViewCount(@Param("map") Map<String,Object> map);
 
     List<OrderAdjustVo> excelOrderAdjustAll(Map map);
+
+    List<Map<String,Object>> selectUpModelViewAll(@Param("map") Map<String,Object> map, @Param("page") Page page);
+
+    int  selectUpModelViewAllCount(@Param("map") Map<String,Object> map);
 }

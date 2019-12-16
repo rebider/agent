@@ -332,4 +332,12 @@ public interface OrderService {
      * 订单数量调整导出
      */
     List<OrderAdjustVo> excelOrderAdjustAll(Map map);
+
+    /**
+     * 查看全部调整明细
+     * @param par
+     * @param page
+     * @return
+     */
+    PageInfo queryUpModelListAll(Map par, Page page);
 }

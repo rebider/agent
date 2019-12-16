@@ -5505,4 +5505,25 @@ public class OrderServiceImpl implements OrderService {
         }
         return orderAdjVoList;
     }
+
+    /**
+     * 查询全部订单调整明细
+     * @param par
+     * @param page
+     * @return
+     */
+    @Override
+    public PageInfo queryUpModelListAll(Map par, Page page) {
+        PageInfo pageInfo = new PageInfo();
+        if (par == null) return pageInfo;
+        if(null!=par.get("userId")) {
+            Long userId = (Long) par.get("userId");
+            List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+            par.put("platfromPerm", platfromPerm);
+        }
+        par.put("page", page);
+        pageInfo.setTotal(orderAdjMapper.selectUpModelViewAllCount(par));
+        pageInfo.setRows(orderAdjMapper.selectUpModelViewAll(par,page));
+        return pageInfo;
+    }
 }
