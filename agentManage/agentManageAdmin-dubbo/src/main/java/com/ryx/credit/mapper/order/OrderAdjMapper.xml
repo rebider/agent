@@ -651,11 +651,12 @@
       left join o_order oo on oo.bus_id = ab.id
       where oo.id = adj.order_id and ab.status=1 and oo.status=1
     ) as platform_name,
-    (
-      select ab.organ_num from a_agent_businfo ab
-      left join o_order oo on oo.bus_id = ab.id
-      where oo.id = adj.order_id and ab.status=1 and oo.status=1
-    ) as organ_num,
+    nvl((
+      select oan.org_name
+      from o_organization oan
+      left join a_agent_businfo ab on ab.organ_num = oan.org_id
+      where ab.id = oo.bus_id and oan.status=1 and ab.status=1
+    ),'') as organ_num,
     (
       select LISTAGG(oso.activity_name,',') WITHIN GROUP(ORDER BY os.order_id)
       from o_sub_order_activity oso
