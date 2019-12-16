@@ -4271,7 +4271,7 @@ public class OrderServiceImpl implements OrderService {
         orderAdj.setRefundAmount(new BigDecimal(orderUpModelVo.getRefundAmount()));//退款金额
         orderAdj.setRefundMethod(new BigDecimal(orderUpModelVo.getRefundMethod()));//退款方式
         orderAdj.setStagesAmount(new BigDecimal(orderUpModelVo.getAdjRepayment()));//预计分期金额
-
+        BigDecimal difAmount = BigDecimal.ZERO;
         for (AdjProVo adjProVo : adjPros) {
             OSubOrder oSubOrder = oSubOrderMapper.selectByPrimaryKey(adjProVo.getoSubId());
             OrderAdjDetail orderAdjDetail = orderAdjDetailMapper.selectByAdjustId(orderAdj.getId(), adjProVo.getAdjDetailId());
@@ -4279,13 +4279,14 @@ public class OrderServiceImpl implements OrderService {
             orderAdjDetail.setOrgProNum(oSubOrder.getProNum());
             orderAdjDetail.setProNum(oSubOrder.getProNum().subtract(new BigDecimal(adjProVo.getAdjNum())));
             orderAdjDetail.setDifAmount(adjProVo.getCalPrice());
+            difAmount = difAmount.add(adjProVo.getCalPrice());
             if (1 != orderAdjDetailMapper.updateByPrimaryKeySelective(orderAdjDetail)) {
                 logger.info("订单调整明细:{}", "订单调整明细修改失败！");
                 throw new ProcessException("订单调整明细修改失败！");
             }
             logger.info("订单调整明细:{},{},{},{}", orderAdj.getId(), adjProVo.getAdjDetailId(), "订单调整明细修改失败！", userId);
         }
-
+        orderAdj.setDifAmount(difAmount);
         List<String> attFiles = orderUpModelVo.getFiles();
         //删除附件
         AttachmentRelExample deleAttr = new AttachmentRelExample();
