@@ -518,15 +518,29 @@
         (select * from o_sub_order os
         where os.pro_name like concat(concat('%',#{map.proName}),'%') and os.status = 1 and os.order_id = oa.order_id)
       </if>
-      <!--<if test="map.platfromPerm!=null and map.platfromPerm.size>0">-->
-        <!--and ab.bus_platform in-->
-        <!--<foreach collection="map.platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >-->
-          <!--#{platfromPermItem.PLATFORM_NUM}-->
-        <!--</foreach>-->
-      <!--</if>-->
-      <!--<if test="map.platfromPerm==null or map.platfromPerm.size==0">-->
-        <!--and 1=-1-->
-      <!--</if>-->
+      <if test="map.platform!=null and map.platform !=''">
+        and EXISTS (select ab.bus_num
+        FROM a_agent_businfo ab
+        LEFT JOIN o_order oo
+        ON oo.bus_id = ab.id
+        WHERE oo.id = oa.order_id
+        and ab.status = 1
+        and oo.status = 1
+        and  ab.bus_num= #{map.platform})
+      </if>
+      and EXISTS (select ab.id
+      from a_agent_businfo ab
+      left join o_order on o_order.bus_id = ab.id
+      where o_order.id = oa.order_id
+      <if test="map.platfromPerm!=null and map.platfromPerm.size>0">
+        and ab.bus_platform in
+        <foreach collection="map.platfromPerm" item="platfromPermItem" open="(" separator="," close=")">
+          #{platfromPermItem.PLATFORM_NUM}
+        </foreach>
+      </if>
+      <if test="map.platfromPerm==null or map.platfromPerm.size==0">
+        and 1=-1
+      </if>)
     </where>
     order by oa.adj_tm desc
   </sql>
@@ -578,16 +592,7 @@
     (select ab.id
     from a_agent_businfo ab
     left join o_order on o_order.bus_id = ab.id
-    where o_order.id = oa.order_id
-     <if test="map.platfromPerm!=null and map.platfromPerm.size>0">
-    and ab.bus_platform in
-    <foreach collection="map.platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
-      #{platfromPermItem.PLATFORM_NUM}
-    </foreach>
-    </if>
-    <if test="map.platfromPerm==null or map.platfromPerm.size==0">
-      and 1=-1
-    </if>) as bus_id,
+    where o_order.id = oa.order_id) as bus_id,
     (select dq.name
     from c_organization dq
     left join a_agent_businfo ab on dq.id = ab.ag_doc_district
@@ -616,7 +621,29 @@
         (select * from o_sub_order os
         where os.pro_name like concat(concat('%',#{map.proName}),'%') and os.status = 1 and os.order_id = oa.order_id)
       </if>
-
+      <if test="map.platform!=null and map.platform !=''">
+        and EXISTS (select ab.bus_num
+        FROM a_agent_businfo ab
+        LEFT JOIN o_order oo
+        ON oo.bus_id = ab.id
+        WHERE oo.id = oa.order_id
+        and ab.status = 1
+        and oo.status = 1
+        and  ab.bus_num= #{map.platform})
+      </if>
+      and EXISTS (select ab.id
+      from a_agent_businfo ab
+      left join o_order on o_order.bus_id = ab.id
+      where o_order.id = oa.order_id
+      <if test="map.platfromPerm!=null and map.platfromPerm.size>0">
+        and ab.bus_platform in
+        <foreach collection="map.platfromPerm" item="platfromPermItem" open="(" separator="," close=")">
+          #{platfromPermItem.PLATFORM_NUM}
+        </foreach>
+      </if>
+      <if test="map.platfromPerm==null or map.platfromPerm.size==0">
+        and 1=-1
+      </if>)
     </where>
     order by oa.adj_tm desc
   </sql>
