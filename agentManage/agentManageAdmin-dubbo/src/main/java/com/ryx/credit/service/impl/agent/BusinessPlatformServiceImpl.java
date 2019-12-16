@@ -99,6 +99,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         if (!StringUtils.isBlank(agent.getId())) {
             reqMap.put("id", agent.getId());
         }
+        if (!StringUtils.isBlank((String)map.get("ag"))) {
+            reqMap.put("ag", (String)map.get("ag"));
+        }
         if (!StringUtils.isBlank(agent.getAgName())) {
             reqMap.put("agName", agent.getAgName());
         }
