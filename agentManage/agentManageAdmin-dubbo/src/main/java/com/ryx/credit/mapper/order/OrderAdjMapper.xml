@@ -678,11 +678,12 @@
       left join o_order oo on oo.bus_id = ab.id
       where oo.id = adj.order_id and ab.status=1 and oo.status=1
     ) as platform_name,
-    (
-      select ab.organ_num from a_agent_businfo ab
-      left join o_order oo on oo.bus_id = ab.id
-      where oo.id = adj.order_id and ab.status=1 and oo.status=1
-    ) as organ_num,
+    nvl((
+      select oan.org_name
+      from o_organization oan
+      left join a_agent_businfo ab on ab.organ_num = oan.org_id
+      where ab.id = oo.bus_id and oan.status=1 and ab.status=1
+    ),'') as organ_num,
     (
       select LISTAGG(oso.activity_name,',') WITHIN GROUP(ORDER BY os.order_id)
       from o_sub_order_activity oso
@@ -717,7 +718,22 @@
     to_char(adj.adj_tm,'yyyy-MM-dd') as adj_tm,
     adj.reviews_stat,
     adj.refund_stat,
-    to_char(adj.refund_tm,'yyyy-MM-dd') as refund_tm
+    to_char(adj.refund_tm,'yyyy-MM-dd') as refund_tm,
+    (
+      select ab.id
+      from a_agent_businfo ab
+      left join o_order oo on oo.bus_id = ab.id
+      where oo.id = adj.order_id
+      <if test="platfromPerm!=null and platfromPerm.size>0">
+        and ab.bus_platform in
+        <foreach collection="platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
+          #{platfromPermItem.PLATFORM_NUM}
+        </foreach>
+      </if>
+      <if test="platfromPerm==null or platfromPerm.size==0">
+        and 1=-1
+      </if>
+    ) as bus_id
     from o_order_adj adj
     left join o_order oo on oo.id = adj.order_id and oo.status=1
     left join a_agent ag on ag.id = adj.agent_id and ag.status=1
