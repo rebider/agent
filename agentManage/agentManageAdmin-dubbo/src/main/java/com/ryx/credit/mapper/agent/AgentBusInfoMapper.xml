@@ -749,6 +749,9 @@
     <if test="reqMap.agName != null and reqMap.agName != '' " >
       and a.ag_name  like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
     </if>
+    <if test="reqMap.ag != null and reqMap.ag != '' " >
+      and a.id = #{reqMap.ag}
+    </if>
     <if test="reqMap.agUniqNum != null and reqMap.agUniqNum != '' " >
       and a.ag_uniq_num = #{reqMap.agUniqNum}
     </if>
