@@ -719,22 +719,7 @@
     to_char(adj.adj_tm,'yyyy-MM-dd') as adj_tm,
     adj.reviews_stat,
     adj.refund_stat,
-    to_char(adj.refund_tm,'yyyy-MM-dd') as refund_tm,
-    (
-      select ab.id
-      from a_agent_businfo ab
-      left join o_order oo on oo.bus_id = ab.id
-      where oo.id = adj.order_id
-      <if test="platfromPerm!=null and platfromPerm.size>0">
-        and ab.bus_platform in
-        <foreach collection="platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
-          #{platfromPermItem.PLATFORM_NUM}
-        </foreach>
-      </if>
-      <if test="platfromPerm==null or platfromPerm.size==0">
-        and 1=-1
-      </if>
-    ) as bus_id
+    to_char(adj.refund_tm,'yyyy-MM-dd') as refund_tm
     from o_order_adj adj
     left join o_order oo on oo.id = adj.order_id and oo.status=1
     left join a_agent ag on ag.id = adj.agent_id and ag.status=1
@@ -743,13 +728,32 @@
       <if test="1==1"> and adj.status=1 </if>
       <if test="agName!=null and agName!=''"> and ag.ag_name like concat(concat('%',#{agName}),'%') </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and ag.id = #{agUniqNum} </if>
-      <if test="refundId!=null and refundId!=''"> and oa.order_id = #{refundId} </if>
-      <if test="reviewStatus!=null and reviewStatus!=''"> and oa.reviews_stat = #{reviewStatus} </if>
+      <if test="refundId!=null and refundId!=''"> and adj.order_id = #{refundId} </if>
+      <if test="reviewStatus!=null and reviewStatus!=''"> and adj.reviews_stat = #{reviewStatus} </if>
       <if test="proName!=null and proName!=''">
         and EXISTS
         (select * from o_sub_order os
-        where os.pro_name like concat(concat('%',#{proName}),'%') and os.status = 1 and os.order_id = oa.order_id)
+        where os.pro_name like concat(concat('%',#{proName}),'%') and os.status = 1 and os.order_id = adj.order_id)
       </if>
+      <if test="platform!=null and platform !=''">
+        and EXISTS
+        (select ab.bus_num from a_agent_businfo ab
+        left join o_order oo on oo.bus_id = ab.id
+        where oo.id = adj.order_id and ab.status=1 and oo.status=1 and ab.bus_num = #{platform})
+      </if>
+      and EXISTS
+      (select ab.id from a_agent_businfo ab
+      left join o_order oo on oo.bus_id = ab.id
+      where oo.id = adj.order_id
+      <if test="platfromPerm!=null and platfromPerm.size>0">
+        and ab.bus_platform in
+        <foreach collection="platfromPerm" item="platfromPermItem" open="(" separator="," close=")">
+          #{platfromPermItem.PLATFORM_NUM}
+        </foreach>
+      </if>
+      <if test="platfromPerm==null or platfromPerm.size==0">
+        and 1=-1
+      </if>)
     </where>
     order by adj.adj_tm desc
   </select>
