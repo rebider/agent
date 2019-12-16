@@ -11,10 +11,7 @@ import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
-import com.ryx.credit.dao.order.OCashReceivablesMapper;
-import com.ryx.credit.dao.order.OOrderMapper;
-import com.ryx.credit.dao.order.OPaymentDetailMapper;
-import com.ryx.credit.dao.order.OPaymentMapper;
+import com.ryx.credit.dao.order.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.PaymentSendBusPlatformVo;
@@ -68,7 +65,8 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
     private AgentBusInfoMapper agentBusInfoMapper;
     @Autowired
     private PlatFormMapper platFormMapper;
-
+    @Autowired
+    private OrderAdjMapper orderAdjMapper;
     /**
      * @Author: Zhang Lei
      * @Description: 查询代理商可抵扣欠款, 先根据欠款类型排序，欠款类型相同的根据订单号排序
@@ -604,59 +602,54 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
     }
 
     @Override
-    public void sendRefundMentToPlatform(String orderId) {
+    public void sendRefundMentToPlatform(String adjId) {
         try {
-            logger.info("发送订单退款到kafka {}",orderId);
-            OOrder order  = oOrderMapper.selectByPrimaryKey(orderId);
+            logger.info("发送订单退款信息到kafka {}",adjId);
+            OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(adjId);
+            OOrder order  = oOrderMapper.selectByPrimaryKey(orderAdj.getOrderId());
             if(order !=null && Status.STATUS_1.status.compareTo(order.getStatus())==0
                     && AgStatus.Approved.status.compareTo(order.getReviewStatus())==0) {
-                logger.info("发送订单退款到kafka 订单有效 {}",orderId);
-                //检查首付款金额
-                List<OPaymentDetail>  oPaymentDetails = oPaymentDetailMapper.selectRefunOPaymentDetail(orderId);
-                if(oPaymentDetails.size()>0) {
-                    //附件
-                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
-                    PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
-                    if(platForm!=null) {
-                        OPaymentDetail detail = oPaymentDetails.get(0);
-                        List<String> attrs = new ArrayList<>();
-                        PaymentSendBusPlatformVo paymentSendBusPlatformVo = new PaymentSendBusPlatformVo();
-                        paymentSendBusPlatformVo.setAg(order.getAgentId());
-                        paymentSendBusPlatformVo.setAmount(detail.getRealPayAmount().setScale(2, BigDecimal.ROUND_HALF_UP).abs().toString());
-                        paymentSendBusPlatformVo.setAmountType(detail.getPayType());
-                        paymentSendBusPlatformVo.setBusNum(agentBusInfo.getBusNum());
-                        paymentSendBusPlatformVo.setCreateTime(DateUtil.format(order.getcTime(), DateUtil.DATE_FORMAT_5));
-                        paymentSendBusPlatformVo.setOrderNum(order.getId());
-                        paymentSendBusPlatformVo.setFqflow(detail.getId());
-                        paymentSendBusPlatformVo.setPayType(PamentSrcType.ORDER_ADJ_REFUND.code);
-                        paymentSendBusPlatformVo.setOptType(Status.STATUS_0.status + "");//退款
-                        paymentSendBusPlatformVo.setPlatform(platForm.getPlatformType());
-                        paymentSendBusPlatformVo.setImageList(attrs);
-                        try {
-                            agentKafkaService.sendPayMentMessage(order.getAgentId(),
-                                    detail.getId(),
-                                    order.getBusId(),
-                                    agentBusInfo.getBusNum(),
-                                    KafkaMessageType.PAYMENT,
-                                    KafkaMessageTopic.agent_Payment.code,
-                                    JSONObject.toJSONString(paymentSendBusPlatformVo)
-                            );
-                        } catch (Exception e) {
-                            logger.info("kafka接口调用失败 订单无效 {}",orderId);
-                            e.printStackTrace();
-                        }
-                    }else{
-                        logger.info("发送订单退款到kafka PlatForm未找打 {}",orderId);
+                logger.info("发送订单退款信息到kafka 订单有效 {}",adjId);
+
+                //附件
+                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
+                PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+                if(platForm!=null) {
+                    List<String> attrs = new ArrayList<>();
+                    PaymentSendBusPlatformVo paymentSendBusPlatformVo = new PaymentSendBusPlatformVo();
+                    paymentSendBusPlatformVo.setAg(order.getAgentId());
+                    paymentSendBusPlatformVo.setAmount(orderAdj.getRealRefundAmo().setScale(2, BigDecimal.ROUND_HALF_UP).abs().toString());
+                    paymentSendBusPlatformVo.setAmountType(PaymentType.TK.code);//退款
+                    paymentSendBusPlatformVo.setBusNum(agentBusInfo.getBusNum());
+                    paymentSendBusPlatformVo.setCreateTime(DateUtil.format(order.getcTime(), DateUtil.DATE_FORMAT_5));
+                    paymentSendBusPlatformVo.setOrderNum(order.getId());
+                    paymentSendBusPlatformVo.setFqflow(orderAdj.getId());
+                    paymentSendBusPlatformVo.setPayType(PamentSrcType.ORDER_ADJ_REFUND.code);
+                    paymentSendBusPlatformVo.setOptType(Status.STATUS_0.status + "");//退款
+                    paymentSendBusPlatformVo.setPlatform(platForm.getPlatformType());
+                    paymentSendBusPlatformVo.setImageList(attrs);
+                    try {
+                        agentKafkaService.sendPayMentMessage(order.getAgentId(),
+                                orderAdj.getId(),
+                                order.getBusId(),
+                                agentBusInfo.getBusNum(),
+                                KafkaMessageType.PAYMENT,
+                                KafkaMessageTopic.agent_Payment.code,
+                                JSONObject.toJSONString(paymentSendBusPlatformVo));
+                    } catch (Exception e) {
+                        logger.info("kafka接口调用失败 订单无效 {}",adjId);
+                        e.printStackTrace();
                     }
                 }else{
-                    logger.info("发送订单退款到kafka 交易明细为空 {}",orderId);
+                    logger.info("发送订单退款到kafka PlatForm未找打 {}",adjId);
                 }
+
             }else{
-                logger.info("发送订单退款到kafka 订单无效 {}",orderId);
+                logger.info("发送订单退款到kafka 订单无效 {}",adjId);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("通知kafka消息失败 sendRefundMentToPlatform {}",orderId);
+            logger.error("通知kafka消息失败 sendRefundMentToPlatform {}",adjId);
         }
     }
 

@@ -4532,7 +4532,16 @@ public class OrderServiceImpl implements OrderService {
                     ORefundAgent oRefundAgent =  (ORefundAgent) oAccountAdjusts.get("refund");//退款金额实体
                     oAccountAdjusts.get("planNows");//现在的还款计划
                     BigDecimal refundAmount = oRefundAgent.getRefundAmount();
-                    orderAdj.setRealRefundAmo(refundAmount);
+                    if (refundAmount.compareTo(BigDecimal.ZERO)>0){
+                        if (orderAdj.getRefundType().compareTo(OrderAdjRefundType.CDFQ_XXTK.code)==0){
+                            orderAdj.setRealRefundAmo(refundAmount);
+                            orderAdj.setSettleAmount(BigDecimal.ZERO);
+                        }else {
+                            orderAdj.setRealRefundAmo(BigDecimal.ZERO);
+                            orderAdj.setSettleAmount(refundAmount);
+                        }
+                        sendMsgToPlatm = true;
+                    }
                 } catch (ProcessException e) {
                     logger.error("调用调账接口失败,{}",orderAdj.getId());
                     throw new MessageException("调用调账接口失败");
@@ -4648,31 +4657,34 @@ public class OrderServiceImpl implements OrderService {
                             record.setPaymentStatus(PaymentStatus.JQ.code);
                             record.setcUser(oPayment.getUserId());
                             record.setcDate(d.getTime());
+                            record.setSrcId(oSupplement.getId());
                             orderAdj.setStagesAmount(BigDecimal.ZERO);//更新为实际的分期金额
                             if (OrderAdjRefundType.CDFQ_GZ.code.compareTo(orderAdj.getRefundType())==0) {
-                                SettleAccounts settleAccounts = new SettleAccounts();
-                                settleAccounts.setId(idService.genId(TabId.o_settle_accounts));
-                                settleAccounts.setAgentId(orderAdj.getAgentId());//代理商id
-                                settleAccounts.setsType(SettleType.ORDER_ADJUST.key);//挂账类型:订单调整
-                                settleAccounts.setsTm(orderdate.getTime());
-                                settleAccounts.setcTm(orderdate.getTime());
-                                settleAccounts.setsStatus(Status.STATUS_0.status);
-                                settleAccounts.setcUser(orderAdj.getAdjUserId());
-                                settleAccounts.setsAmount(orderAdj.getSettleAmount());
-                                settleAccounts.setSrcId(orderAdj.getId());//数据源id
-                                settleAccounts.setStatus(Status.STATUS_1.status);
-                                settleAccounts.setVersion(Status.STATUS_1.status);
-                                if(1!=settleAccountsMapper.insertSelective(settleAccounts)){
-                                    return AgentResult.fail("保存挂账记录失败!");
-                                };
+                                if (sendMsgToPlatm){
+                                    SettleAccounts settleAccounts = new SettleAccounts();
+                                    settleAccounts.setId(idService.genId(TabId.o_settle_accounts));
+                                    settleAccounts.setAgentId(orderAdj.getAgentId());//代理商id
+                                    settleAccounts.setsType(SettleType.ORDER_ADJUST.key);//挂账类型:订单调整
+                                    settleAccounts.setsTm(orderdate.getTime());
+                                    settleAccounts.setcTm(orderdate.getTime());
+                                    settleAccounts.setsStatus(Status.STATUS_0.status);
+                                    settleAccounts.setcUser(orderAdj.getAdjUserId());
+                                    settleAccounts.setsAmount(orderAdj.getSettleAmount());
+                                    settleAccounts.setSrcId(orderAdj.getId());//数据源id
+                                    settleAccounts.setStatus(Status.STATUS_1.status);
+                                    settleAccounts.setVersion(Status.STATUS_1.status);
+                                    if(1!=settleAccountsMapper.insertSelective(settleAccounts)){
+                                        return AgentResult.fail("保存挂账记录失败!");
+                                    };
+                                    record.setSrcId(settleAccounts.getId());
+                                }
                                 record.setPayType(PaymentType.GZ.code);
                                 record.setSrcType(PamentSrcType.ORDER_ADJ_SETTLE.code);
-                                record.setSrcId(settleAccounts.getId());
                             }else {
                                 record.setPayType(PaymentType.TK.code);
                                 record.setSrcType(PamentSrcType.ORDER_ADJ_REFUND.code);
-                                record.setSrcId(oSupplement.getId());
                             }
+
                             record.setPayTime(new Date());
                             record.setStatus(Status.STATUS_1.status);
                             record.setVersion(Status.STATUS_1.status);
@@ -4798,30 +4810,32 @@ public class OrderServiceImpl implements OrderService {
                             record.setPaymentStatus(PaymentStatus.JQ.code);
                             record.setcUser(oPayment.getUserId());
                             record.setcDate(d.getTime());
+                            record.setSrcId(oSupplement.getId());
                             orderAdj.setStagesAmount(BigDecimal.ZERO);//更新为实际的分期金额
                             if (OrderAdjRefundType.CDFQ_GZ.code.compareTo(orderAdj.getRefundType())==0) {
-                                SettleAccounts settleAccounts = new SettleAccounts();
-                                settleAccounts.setId(idService.genId(TabId.o_settle_accounts));
-                                settleAccounts.setAgentId(orderAdj.getAgentId());//代理商id
-                                settleAccounts.setsType(SettleType.ORDER_ADJUST.key);//挂账类型:订单调整
-                                settleAccounts.setsTm(orderdate.getTime());
-                                settleAccounts.setcTm(orderdate.getTime());
-                                settleAccounts.setsStatus(Status.STATUS_0.status);
-                                settleAccounts.setcUser(orderAdj.getAdjUserId());
-                                settleAccounts.setsAmount(orderAdj.getSettleAmount());
-                                settleAccounts.setSrcId(orderAdj.getId());//数据源id
-                                settleAccounts.setStatus(Status.STATUS_1.status);
-                                settleAccounts.setVersion(Status.STATUS_1.status);
-                                if(1!=settleAccountsMapper.insertSelective(settleAccounts)){
-                                    return AgentResult.fail("保存挂账记录失败!");
-                                };
+                                if (sendMsgToPlatm){
+                                    SettleAccounts settleAccounts = new SettleAccounts();
+                                    settleAccounts.setId(idService.genId(TabId.o_settle_accounts));
+                                    settleAccounts.setAgentId(orderAdj.getAgentId());//代理商id
+                                    settleAccounts.setsType(SettleType.ORDER_ADJUST.key);//挂账类型:订单调整
+                                    settleAccounts.setsTm(orderdate.getTime());
+                                    settleAccounts.setcTm(orderdate.getTime());
+                                    settleAccounts.setsStatus(Status.STATUS_0.status);
+                                    settleAccounts.setcUser(orderAdj.getAdjUserId());
+                                    settleAccounts.setsAmount(orderAdj.getSettleAmount());
+                                    settleAccounts.setSrcId(orderAdj.getId());//数据源id
+                                    settleAccounts.setStatus(Status.STATUS_1.status);
+                                    settleAccounts.setVersion(Status.STATUS_1.status);
+                                    if(1!=settleAccountsMapper.insertSelective(settleAccounts)){
+                                        return AgentResult.fail("保存挂账记录失败!");
+                                    };
+                                    record.setSrcId(settleAccounts.getId());
+                                }
                                 record.setPayType(PaymentType.GZ.code);
                                 record.setSrcType(PamentSrcType.ORDER_ADJ_SETTLE.code);
-                                record.setSrcId(settleAccounts.getId());
                             }else {
                                 record.setPayType(PaymentType.TK.code);
                                 record.setSrcType(PamentSrcType.ORDER_ADJ_REFUND.code);
-                                record.setSrcId(oSupplement.getId());
                             }
                             record.setPayTime(new Date());
                             record.setStatus(Status.STATUS_1.status);
@@ -4945,29 +4959,29 @@ public class OrderServiceImpl implements OrderService {
                         record_XXDK.setSrcId(oSupplement.getId());
                         orderAdj.setStagesAmount(BigDecimal.ZERO);//更新为实际的分期金额
                         if (OrderAdjRefundType.CDFQ_GZ.code.compareTo(orderAdj.getRefundType())==0) {
-                            SettleAccounts settleAccounts = new SettleAccounts();
-                            settleAccounts.setId(idService.genId(TabId.o_settle_accounts));
-                            settleAccounts.setAgentId(orderAdj.getAgentId());//代理商id
-                            settleAccounts.setsType(SettleType.ORDER_ADJUST.key);//挂账类型:订单调整
-                            settleAccounts.setsTm(orderdate.getTime());
-                            settleAccounts.setcTm(orderdate.getTime());
-                            settleAccounts.setsStatus(Status.STATUS_0.status);
-                            settleAccounts.setcUser(orderAdj.getAdjUserId());
-                            settleAccounts.setsAmount(orderAdj.getSettleAmount());
-                            settleAccounts.setSrcId(orderAdj.getId());//数据源id
-                            settleAccounts.setStatus(Status.STATUS_1.status);
-                            settleAccounts.setVersion(Status.STATUS_1.status);
-                            if(1!=settleAccountsMapper.insertSelective(settleAccounts)){
-                                return AgentResult.fail("保存挂账记录失败!");
-                            };
+                            if (sendMsgToPlatm){
+                                SettleAccounts settleAccounts = new SettleAccounts();
+                                settleAccounts.setId(idService.genId(TabId.o_settle_accounts));
+                                settleAccounts.setAgentId(orderAdj.getAgentId());//代理商id
+                                settleAccounts.setsType(SettleType.ORDER_ADJUST.key);//挂账类型:订单调整
+                                settleAccounts.setsTm(orderdate.getTime());
+                                settleAccounts.setcTm(orderdate.getTime());
+                                settleAccounts.setsStatus(Status.STATUS_0.status);
+                                settleAccounts.setcUser(orderAdj.getAdjUserId());
+                                settleAccounts.setsAmount(orderAdj.getSettleAmount());
+                                settleAccounts.setSrcId(orderAdj.getId());//数据源id
+                                settleAccounts.setStatus(Status.STATUS_1.status);
+                                settleAccounts.setVersion(Status.STATUS_1.status);
+                                if(1!=settleAccountsMapper.insertSelective(settleAccounts)){
+                                    return AgentResult.fail("保存挂账记录失败!");
+                                };
+                                record_XXDK.setSrcId(settleAccounts.getId());
+                            }
                             record_XXDK.setPayType(PaymentType.GZ.code);
                             record_XXDK.setSrcType(PamentSrcType.ORDER_ADJ_SETTLE.code);
-                            record_XXDK.setSrcId(settleAccounts.getId());
                         }else {
                             record_XXDK.setPayType(PaymentType.TK.code);
                             record_XXDK.setSrcType(PamentSrcType.ORDER_ADJ_REFUND.code);
-                            record_XXDK.setSrcId(oSupplement.getId());
-                            sendMsgToPlatm = true;
                         }
                         record_XXDK.setPayTime(new Date());
                         record_XXDK.setStatus(Status.STATUS_1.status);
@@ -5061,31 +5075,32 @@ public class OrderServiceImpl implements OrderService {
                             record.setPaymentStatus(PaymentStatus.JQ.code);
                             record.setcUser(oPayment.getUserId());
                             record.setcDate(d.getTime());
+                            record.setSrcId(oSupplement.getId());
                             orderAdj.setStagesAmount(BigDecimal.ZERO);//更新为实际的分期金额
                             if (OrderAdjRefundType.CDFQ_GZ.code.compareTo(orderAdj.getRefundType())==0) {
-                                SettleAccounts settleAccounts = new SettleAccounts();
-                                settleAccounts.setId(idService.genId(TabId.o_settle_accounts));
-                                settleAccounts.setAgentId(orderAdj.getAgentId());//代理商id
-                                settleAccounts.setsType(SettleType.ORDER_ADJUST.key);//挂账类型:订单调整
-                                settleAccounts.setsTm(orderdate.getTime());
-                                settleAccounts.setcTm(orderdate.getTime());
-                                settleAccounts.setsStatus(Status.STATUS_0.status);
-                                settleAccounts.setcUser(orderAdj.getAdjUserId());
-                                settleAccounts.setsAmount(orderAdj.getSettleAmount());
-                                settleAccounts.setSrcId(orderAdj.getId());//数据源id
-                                settleAccounts.setStatus(Status.STATUS_1.status);
-                                settleAccounts.setVersion(Status.STATUS_1.status);
-                                if(1!=settleAccountsMapper.insertSelective(settleAccounts)){
-                                    return AgentResult.fail("保存挂账记录失败!");
-                                };
+                                if(sendMsgToPlatm){
+                                    SettleAccounts settleAccounts = new SettleAccounts();
+                                    settleAccounts.setId(idService.genId(TabId.o_settle_accounts));
+                                    settleAccounts.setAgentId(orderAdj.getAgentId());//代理商id
+                                    settleAccounts.setsType(SettleType.ORDER_ADJUST.key);//挂账类型:订单调整
+                                    settleAccounts.setsTm(orderdate.getTime());
+                                    settleAccounts.setcTm(orderdate.getTime());
+                                    settleAccounts.setsStatus(Status.STATUS_0.status);
+                                    settleAccounts.setcUser(orderAdj.getAdjUserId());
+                                    settleAccounts.setsAmount(orderAdj.getSettleAmount());
+                                    settleAccounts.setSrcId(orderAdj.getId());//数据源id
+                                    settleAccounts.setStatus(Status.STATUS_1.status);
+                                    settleAccounts.setVersion(Status.STATUS_1.status);
+                                    if(1!=settleAccountsMapper.insertSelective(settleAccounts)){
+                                        return AgentResult.fail("保存挂账记录失败!");
+                                    };
+                                    record.setSrcId(settleAccounts.getId());
+                                }
                                 record.setPayType(PaymentType.GZ.code);
                                 record.setSrcType(PamentSrcType.ORDER_ADJ_SETTLE.code);
-                                record.setSrcId(settleAccounts.getId());
                             }else {
                                 record.setPayType(PaymentType.TK.code);
                                 record.setSrcType(PamentSrcType.ORDER_ADJ_REFUND.code);
-                                record.setSrcId(oSupplement.getId());
-                                sendMsgToPlatm = true;
                             }
                             record.setPayTime(new Date());
                             record.setStatus(Status.STATUS_1.status);
@@ -5207,31 +5222,32 @@ public class OrderServiceImpl implements OrderService {
                             record.setPayTime(new Date());
                             record.setStatus(Status.STATUS_1.status);
                             record.setVersion(Status.STATUS_1.status);
+                            record.setSrcId(oSupplement.getId());
                             orderAdj.setStagesAmount(BigDecimal.ZERO);
                             if (OrderAdjRefundType.CDFQ_GZ.code.compareTo(orderAdj.getRefundType())==0) {
-                                SettleAccounts settleAccounts = new SettleAccounts();
-                                settleAccounts.setId(idService.genId(TabId.o_settle_accounts));
-                                settleAccounts.setAgentId(orderAdj.getAgentId());//代理商id
-                                settleAccounts.setsType(SettleType.ORDER_ADJUST.key);//挂账类型:订单调整
-                                settleAccounts.setsTm(orderdate.getTime());
-                                settleAccounts.setcTm(orderdate.getTime());
-                                settleAccounts.setsStatus(Status.STATUS_0.status);
-                                settleAccounts.setcUser(orderAdj.getAdjUserId());
-                                settleAccounts.setsAmount(orderAdj.getSettleAmount());
-                                settleAccounts.setSrcId(orderAdj.getId());//数据源id
-                                settleAccounts.setStatus(Status.STATUS_1.status);
-                                settleAccounts.setVersion(Status.STATUS_1.status);
-                                if(1!=settleAccountsMapper.insertSelective(settleAccounts)){
-                                    return AgentResult.fail("保存挂账记录失败!");
-                                };
+                                if (sendMsgToPlatm){
+                                    SettleAccounts settleAccounts = new SettleAccounts();
+                                    settleAccounts.setId(idService.genId(TabId.o_settle_accounts));
+                                    settleAccounts.setAgentId(orderAdj.getAgentId());//代理商id
+                                    settleAccounts.setsType(SettleType.ORDER_ADJUST.key);//挂账类型:订单调整
+                                    settleAccounts.setsTm(orderdate.getTime());
+                                    settleAccounts.setcTm(orderdate.getTime());
+                                    settleAccounts.setsStatus(Status.STATUS_0.status);
+                                    settleAccounts.setcUser(orderAdj.getAdjUserId());
+                                    settleAccounts.setsAmount(orderAdj.getSettleAmount());
+                                    settleAccounts.setSrcId(orderAdj.getId());//数据源id
+                                    settleAccounts.setStatus(Status.STATUS_1.status);
+                                    settleAccounts.setVersion(Status.STATUS_1.status);
+                                    if(1!=settleAccountsMapper.insertSelective(settleAccounts)){
+                                        return AgentResult.fail("保存挂账记录失败!");
+                                    };
+                                    record.setSrcId(settleAccounts.getId());
+                                }
                                 record.setPayType(PaymentType.GZ.code);
                                 record.setSrcType(PamentSrcType.ORDER_ADJ_SETTLE.code);
-                                record.setSrcId(settleAccounts.getId());
                             }else {
                                 record.setPayType(PaymentType.TK.code);
                                 record.setSrcType(PamentSrcType.ORDER_ADJ_REFUND.code);
-                                record.setSrcId(oSupplement.getId());
-                                sendMsgToPlatm = true;
                             }
                             if (1 != oPaymentDetailMapper.insert(record)) {
                                 logger.info("订单调整审批完成:明细生成失败:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(), record.getId());
@@ -5327,30 +5343,32 @@ public class OrderServiceImpl implements OrderService {
                         record_QT.setcDate(d.getTime());
                         record_QT.setStatus(Status.STATUS_1.status);
                         record_QT.setVersion(Status.STATUS_1.status);
+                        record_QT.setSrcId(oSupplement.getId());
                         orderAdj.setStagesAmount(BigDecimal.ZERO);
                         if (OrderAdjRefundType.CDFQ_GZ.code.compareTo(orderAdj.getRefundType())==0) {
-                            SettleAccounts settleAccounts = new SettleAccounts();
-                            settleAccounts.setId(idService.genId(TabId.o_settle_accounts));
-                            settleAccounts.setAgentId(orderAdj.getAgentId());//代理商id
-                            settleAccounts.setsType(SettleType.ORDER_ADJUST.key);//挂账类型:订单调整
-                            settleAccounts.setsTm(orderdate.getTime());
-                            settleAccounts.setcTm(orderdate.getTime());
-                            settleAccounts.setsStatus(Status.STATUS_0.status);
-                            settleAccounts.setcUser(orderAdj.getAdjUserId());
-                            settleAccounts.setsAmount(orderAdj.getSettleAmount());
-                            settleAccounts.setSrcId(orderAdj.getId());//数据源id
-                            settleAccounts.setStatus(Status.STATUS_1.status);
-                            settleAccounts.setVersion(Status.STATUS_1.status);
-                            if(1!=settleAccountsMapper.insertSelective(settleAccounts)){
-                                return AgentResult.fail("保存挂账记录失败!");
-                            };
+                            if (sendMsgToPlatm){
+                                SettleAccounts settleAccounts = new SettleAccounts();
+                                settleAccounts.setId(idService.genId(TabId.o_settle_accounts));
+                                settleAccounts.setAgentId(orderAdj.getAgentId());//代理商id
+                                settleAccounts.setsType(SettleType.ORDER_ADJUST.key);//挂账类型:订单调整
+                                settleAccounts.setsTm(orderdate.getTime());
+                                settleAccounts.setcTm(orderdate.getTime());
+                                settleAccounts.setsStatus(Status.STATUS_0.status);
+                                settleAccounts.setcUser(orderAdj.getAdjUserId());
+                                settleAccounts.setsAmount(orderAdj.getSettleAmount());
+                                settleAccounts.setSrcId(orderAdj.getId());//数据源id
+                                settleAccounts.setStatus(Status.STATUS_1.status);
+                                settleAccounts.setVersion(Status.STATUS_1.status);
+                                if(1!=settleAccountsMapper.insertSelective(settleAccounts)){
+                                    return AgentResult.fail("保存挂账记录失败!");
+                                };
+                                record_QT.setSrcId(settleAccounts.getId());
+                            }
                             record_QT.setPayType(PaymentType.GZ.code);
-                            record_QT.setSrcId(settleAccounts.getId());
                             record_QT.setSrcType(PamentSrcType.ORDER_ADJ_SETTLE.code);
                         }else {
                             record_QT.setPayType(PaymentType.TK.code);
                             record_QT.setSrcType(PamentSrcType.ORDER_ADJ_REFUND.code);
-                            record_QT.setSrcId(oSupplement.getId());
                         }
                         break;
                     }
@@ -5388,8 +5406,8 @@ public class OrderServiceImpl implements OrderService {
             if (sendMsgToPlatm){
                 logger.info("暂时不发送瑞大宝免税额度");
                 //TODO 处理线下退款通知kafka
-//                logger.info("订单调整审批通过,有退款,信息开始发送到kafka:{}",order.getId());
-//                paymentDetailService.sendRefundMentToPlatform(order.getId());
+                logger.info("订单调整审批通过,有退款,信息开始发送到kafka:{}",orderAdj.getId());
+                paymentDetailService.sendRefundMentToPlatform(orderAdj.getId());
             }
             //订单调整更新
             if (1 != orderAdjMapper.updateByPrimaryKeySelective(orderAdj)) {
