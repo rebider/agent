@@ -1212,10 +1212,11 @@
       where o_sub_order.status=1 and o_sub_order_activity.status=1 and o_sub_order.order_id = o.id
     ) as activity_name,
     (
-      select LISTAGG(o_sub_order.model,',') WITHIN GROUP (ORDER BY o_sub_order.order_id)
-      from o_sub_order
-      left join o_order on o_sub_order.order_id = o_order.id
-      where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
+      select LISTAGG(o_sub_order_activity.pro_model,',')
+      WITHIN GROUP(ORDER BY o_sub_order.order_id)
+      from o_sub_order_activity
+      left join o_sub_order on o_sub_order_activity.sub_order_id = o_sub_order.id
+      where o_sub_order.status=1 and o_sub_order_activity.status=1 and o_sub_order.order_id = o.id
     ) as model,
     nvl((
       select LISTAGG(o_sub_order.pro_rel_price,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)
@@ -1443,10 +1444,11 @@
     where o_sub_order.status=1 and o_sub_order_activity.status=1 and o_sub_order.order_id = o.id
     ) as activity_name,
     (
-    select LISTAGG(o_sub_order.model,',') WITHIN GROUP (ORDER BY o_sub_order.order_id)
-    from o_sub_order
-    left join o_order on o_sub_order.order_id = o_order.id
-    where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
+    select LISTAGG(o_sub_order_activity.pro_model,',')
+    WITHIN GROUP(ORDER BY o_sub_order.order_id)
+    from o_sub_order_activity
+    left join o_sub_order on o_sub_order_activity.sub_order_id = o_sub_order.id
+    where o_sub_order.status=1 and o_sub_order_activity.status=1 and o_sub_order.order_id = o.id
     ) as model,
     nvl((
     select LISTAGG(o_sub_order.pro_rel_price,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)
@@ -1643,10 +1645,11 @@
     where o_sub_order.status=1 and o_sub_order_activity.status=1 and o_sub_order.order_id = o.id
     ) as activity_name,
     (
-    select LISTAGG(o_sub_order.model,',') WITHIN GROUP (ORDER BY o_sub_order.order_id)
-    from o_sub_order
-    left join o_order on o_sub_order.order_id = o_order.id
-    where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
+    select LISTAGG(o_sub_order_activity.pro_model,',')
+    WITHIN GROUP(ORDER BY o_sub_order.order_id)
+    from o_sub_order_activity
+    left join o_sub_order on o_sub_order_activity.sub_order_id = o_sub_order.id
+    where o_sub_order.status=1 and o_sub_order_activity.status=1 and o_sub_order.order_id = o.id
     ) as model,
     nvl((
     select LISTAGG(o_sub_order.pro_rel_price,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)
