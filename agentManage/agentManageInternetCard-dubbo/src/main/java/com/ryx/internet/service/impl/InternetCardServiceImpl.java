@@ -90,9 +90,13 @@ public class InternetCardServiceImpl implements InternetCardService {
         oInternetCardExample.setPage(page);
         List<OInternetCard> oInternetCards = internetCardMapper.internetCardList(oInternetCardExample);
         for (OInternetCard oInternetCard : oInternetCards) {
+            if(StringUtils.isNotBlank(oInternetCard.getIccidNum()))
             oInternetCard.setIccidNumId(oInternetCard.getIccidNum());
+            if(StringUtils.isNotBlank(oInternetCard.getIssuer()))
             oInternetCard.setIssuer(Issuerstatus.getContentByValue(oInternetCard.getIssuer()));
+            if(null!=oInternetCard.getInternetCardStatus())
             oInternetCard.setInternetCardStatusName(InternetCardStatus.getContentByValue(oInternetCard.getInternetCardStatus()));
+            if(StringUtils.isNotBlank(oInternetCard.getRenewStatus()))
             oInternetCard.setRenewStatus(InternetRenewStatus.getContentByValue(oInternetCard.getRenewStatus()));
         }
         PageInfo pageInfo = new PageInfo();
