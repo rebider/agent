@@ -553,7 +553,7 @@
     ro.AGENT_ID, rp.ORDERID, rp.RECEIPT_ID, rp.PRO_ID, rp.PRO_CODE, rp.PRO_NAME, rp.PRO_NUM, rp.SEND_NUM, rp.id as receipt_Pro_Id,
     ag.AG_NAME, o.REMARK as ORDER_REMARK,
     to_char(o.O_INURETIME,'YYYY-MM-DD') as oinuretime,
-    nvl(rp.PRO_NUM-rp.SEND_NUM,0) FOR_SEND_NUM,to_char(rp.c_time, 'YYYY-MM-DD') as rpCTime,
+    nvl(rp.PRO_NUM-rp.SEND_NUM,0) FOR_SEND_NUM,to_char(rp.c_time, 'yyyy-mm-dd hh24:mi:ss') as rpCTime,
     d.r_name as addrProvince,
     c.r_name as addrCity,
     e.r_name as addrDistinct
