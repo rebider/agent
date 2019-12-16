@@ -696,9 +696,10 @@
       where os.order_id = adj.order_id and os.status=1
     ) as pro_name,
     (
-      select LISTAGG(os.model,',') WITHIN GROUP (ORDER BY os.order_id)
-      from o_sub_order os
-      where os.order_id = adj.order_id and os.status=1
+    select LISTAGG(oso.pro_model,',') WITHIN GROUP(ORDER BY os.order_id)
+    from o_sub_order_activity oso
+    left join o_sub_order os on oso.sub_order_id = os.id and os.status=1
+    where os.order_id = adj.order_id and oso.status=1
     ) as model,
     nvl((
       select LISTAGG(os.pro_rel_price,',') WITHIN GROUP (ORDER BY os.order_id)
