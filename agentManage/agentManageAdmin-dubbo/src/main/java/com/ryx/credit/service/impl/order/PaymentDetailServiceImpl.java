@@ -128,6 +128,7 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
         OPaymentDetailExample example = new OPaymentDetailExample();
         OPaymentDetailExample.Criteria c = example.or();
         c.andPaymentIdEqualTo(paymentId);
+        c.andStatusEqualTo(Status.STATUS_1.status);
 
         if (paymentStatus != null && paymentStatus.length > 0) {
             List<BigDecimal> paymentStatusList = new ArrayList<>();
