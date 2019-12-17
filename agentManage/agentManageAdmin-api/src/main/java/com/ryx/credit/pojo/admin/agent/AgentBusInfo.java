@@ -127,6 +127,16 @@ public class AgentBusInfo implements Serializable {
 
     private String flag;//标记
 
+    private String posPlatCode;//智慧POS平台码
+
+    public String getPosPlatCode() {
+        return posPlatCode;
+    }
+
+    public void setPosPlatCode(String posPlatCode) {
+        this.posPlatCode = posPlatCode;
+    }
+
     public String getDebitRateCapping() {
         return debitRateCapping;
     }

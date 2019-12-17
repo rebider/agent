@@ -69,7 +69,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
 
 
     @Override
-    public PageInfo queryInvoiceDetail(InvoiceApply invoiceApply, Page page,Map<String, Object> department,boolean flag) {
+    public PageInfo queryInvoiceDetail(InvoiceApply invoiceApply, Map<String,String> dateMap,Page page,Map<String, Object> department,boolean flag) {
         InvoiceApplyExample example = new InvoiceApplyExample();
         example.setPage(page);
         InvoiceApplyExample.Criteria criteria = example.createCriteria();
@@ -88,7 +88,9 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         if(StringUtils.isNotBlank(invoiceApply.getAgentId())){
             criteria.andAgentIdEqualTo(invoiceApply.getAgentId());
         }
-        if(StringUtils.isNotBlank(invoiceApply.getYsResult())){
+        if("3".equals(invoiceApply.getYsResult())){
+            criteria.andYsResultNotEqualTo("0");
+        }else if(StringUtils.isNotBlank(invoiceApply.getYsResult())){
             criteria.andYsResultEqualTo(invoiceApply.getYsResult());
         }
         if (StringUtils.isNotBlank(invoiceApply.getAgentName())){
@@ -99,9 +101,21 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
             criteria.andExpressDateIsNotNull();
             criteria.andExpressNumberIsNotNull();
         }
-        /*if(department != null){
-            example.setInnerJoinDepartment(department.get("ORGANIZATIONCODE").toString(), department.get("ORGID").toString());
-        }*/
+        if(StringUtils.isNotBlank(dateMap.get("ysDateStart")) && StringUtils.isNotBlank(dateMap.get("ysDateEnd"))){
+            criteria.andYsDateBetween(dateMap.get("ysDateStart"),dateMap.get("ysDateEnd"));
+        }else if(StringUtils.isNotBlank(dateMap.get("ysDateStart"))){
+            criteria.andYsDateGreaterThanOrEqualTo(dateMap.get("ysDateStart"));
+        }else if(StringUtils.isNotBlank(dateMap.get("ysDateEnd"))){
+            criteria.andYsDateLessThanOrEqualTo(dateMap.get("ysDateEnd"));
+        }
+        if(StringUtils.isNotBlank(dateMap.get("esDateStart")) && StringUtils.isNotBlank(dateMap.get("esDateEnd"))){
+            criteria.andEsDateBetween(dateMap.get("esDateStart"),dateMap.get("esDateEnd"));
+        }else if(StringUtils.isNotBlank(dateMap.get("esDateStart"))){
+            criteria.andEsDateGreaterThanOrEqualTo(dateMap.get("esDateStart"));
+        }else if(StringUtils.isNotBlank(dateMap.get("esDateEnd"))){
+            criteria.andEsDateLessThanOrEqualTo(dateMap.get("esDateEnd"));
+        }
+
         example.setOrderByClause("CREATE_DATE DESC ");
         List<InvoiceApply> list = invoiceApplyMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
@@ -173,7 +187,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                                 invoiceApply.setRemark(remark);
                             } else {
                                 invoiceApply.setYsResult("0");
-                                invoiceApply.setInvoiceCompany(map.get("sallerName").toString());
+                                invoiceApply.setInvoiceCompany("");
                                 invoiceApply.setRev1("未获取到发票备注中开票公司数据!");
                             }
                         } else {
@@ -279,8 +293,9 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                     invoiceApply.setInvoiceDate(map.get("invoiceDate").toString());
                     invoiceApply.setInvoiceType(map.get("invoiceType").toString());
                     invoiceApply.setExpenseStatus(map.get("expenseStatus").toString());
-                    invoiceApply.setYsDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+                    invoiceApply.setYsDate(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date()));
                     invoiceApply.setStatus("0");
+                    invoiceApply.setCreateDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 
                     // 对发票金额进行判断，若通过初审金额大于欠票金额 则不能导入
                     if("1".equals(invoiceApply.getYsResult())){
@@ -329,48 +344,113 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
     }
 
     @Override
-    public List<Map<String,String>> finalCheckInvoice(List<Map<String,Object>> list,String user){
-        List<Map<String,String>> maps = new ArrayList<Map<String,String>>();
-        for (Map<String,Object> map:list) {
-            InvoiceApply invoiceApply = new InvoiceApply();
-            invoiceApply.setInvoiceNumber(map.get("invoiceNo").toString());
-            invoiceApply.setInvoiceCode(map.get("invoiceCode").toString());
-            invoiceApply.setYsResult("1");
-            invoiceApply.setStatus("0");
-            List<InvoiceApply> invoiceApplies =  getListByExample(invoiceApply);
-            if(invoiceApplies.size() >= 1){
-                InvoiceApply invoiceApply1 = invoiceApplies.get(0);
-                Calendar curr = Calendar.getInstance();
-                curr.setTime(new Date(System.currentTimeMillis()));
-                curr.add(Calendar.MONTH, -1);
-                Map<String,Object> mmm = new HashMap<String,Object>();
-                mmm.put("AGENT_ID",invoiceApply1.getAgentId());
-                mmm.put("PROFIT_MONTH",new SimpleDateFormat("yyyyMM").format(curr.getTime()));
-                mmm.put("INVOICE_AMT",invoiceApply1.getSumAmt());
-                mmm.put("INVOICE_COMPANY",invoiceApply1.getInvoiceCompany());
-                mmm.put("user",user);
-                Map<String,Object> ma = invoiceSumService.getInvoiceFinalData(mmm);
-                if(!"9999".equals(ma.get("returnCode").toString()) ){
-                    Map<String,String> mm = new HashMap<String,String>();
-                    mm.put("invoiceCode",invoiceApply.getInvoiceCode()+"（发票代码："+invoiceApply.getInvoiceNumber()+")");
-                    mm.put("errorInfo","汇总失败："+ma.get("returnInfo").toString());
-                    maps.add(mm);
-                    invoiceApply1.setEsResult("0");
+    public void finalCheckInvoice(List<Map<String,Object>> list,String user) throws MessageException{
+        try{
+            for (Map<String,Object> map:list) {
+                InvoiceApply invoiceApply = new InvoiceApply();
+                invoiceApply.setInvoiceNumber(map.get("invoiceNo").toString());
+                invoiceApply.setInvoiceCode(map.get("invoiceCode").toString());
+                invoiceApply.setYsResult("1");
+                invoiceApply.setStatus("0");
+                List<InvoiceApply> invoiceApplies =  getListByExample(invoiceApply);
+                if(invoiceApplies.size() >= 1){
+                    InvoiceApply invoiceApply1 = invoiceApplies.get(0);
+                    Calendar curr = Calendar.getInstance();
+                    curr.setTime(new Date(System.currentTimeMillis()));
+                    curr.add(Calendar.MONTH, -1);
+                    Map<String,Object> mmm = new HashMap<String,Object>();
+                    mmm.put("AGENT_ID",invoiceApply1.getAgentId());
+                    mmm.put("PROFIT_MONTH",new SimpleDateFormat("yyyyMM").format(curr.getTime()));
+                    mmm.put("INVOICE_AMT",invoiceApply1.getSumAmt());
+                    mmm.put("INVOICE_COMPANY",invoiceApply1.getInvoiceCompany());
+                    mmm.put("user",user);
+                    Map<String,Object> ma = invoiceSumService.getInvoiceFinalData(mmm);
+                    if(!"9999".equals(ma.get("returnCode").toString()) ){
+                        invoiceApply1.setEsResult("0");
+                        invoiceApply1.setRev2("到票金额汇总失败："+ma.get("returnInfo").toString());
+                    }else{
+                        invoiceApply1.setEsResult("1");
+                        invoiceApply1.setRev2("");
+                        invoiceApply1.setStatus("1");
+                    }
+                    invoiceApply1.setEsDate(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date()));
+                    invoiceApply1.setProfitMonth(new SimpleDateFormat("yyyyMM").format(curr.getTime()));
+                    invoiceApplyMapper.updateByPrimaryKeySelective(invoiceApply1);
                 }else{
-                    invoiceApply1.setEsResult("1");
-                    invoiceApply1.setStatus("1");
+                    saveEsFailInvoiceInfo(map,user,"该发票未进行初审");
                 }
-                invoiceApply1.setEsDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-                invoiceApply1.setProfitMonth(new SimpleDateFormat("yyyyMM").format(curr.getTime()));
-                invoiceApplyMapper.updateByPrimaryKeySelective(invoiceApply1);
-            }else{
-                Map<String,String> mm = new HashMap<String,String>();
-                mm.put("invoiceCode",invoiceApply.getInvoiceCode());
-                mm.put("errorInfo","未找到该发票符合信息");
-                maps.add(mm);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new MessageException(e.getMessage());
+        }
+    }
+
+    /**
+     *  对于终审失败，且失败原因是 该发票未进行初审的记录进行保存
+     * @param map
+     */
+    private void saveEsFailInvoiceInfo(Map<String,Object> map,String user,String rev2)throws Exception{
+        InvoiceApply invoiceApply = new InvoiceApply();
+        invoiceApply.setId(idService.genId(TabId.P_INVOICE_APPLY));
+        invoiceApply.setAgentId("");
+        invoiceApply.setAgentName("");
+        invoiceApply.setCreateName(user);
+        invoiceApply.setYsResult("2");
+        invoiceApply.setYsDate(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date()));
+        invoiceApply.setRev1("该条数据未进行初审，由终审导入");
+        invoiceApply.setEsResult("0");
+        invoiceApply.setEsDate(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date()));
+        invoiceApply.setRev2(rev2);
+        invoiceApply.setSallerName(map.get("sallerName").toString());
+        invoiceApply.setSerialNo(map.get("serialNo").toString());
+        invoiceApply.setInvoiceCode(map.get("invoiceCode").toString());
+        invoiceApply.setInvoiceNumber(map.get("invoiceNo").toString());
+        invoiceApply.setAmountTax(new BigDecimal(map.get("taxAmount").toString()));
+        invoiceApply.setSumAmt(new BigDecimal(map.get("totalAmount").toString()));
+        invoiceApply.setAmount(new BigDecimal(map.get("amount").toString()));
+        invoiceApply.setSallerNo(map.get("sallerTaxNo").toString());
+        invoiceApply.setInvoiceDate(map.get("invoiceDate").toString());
+        invoiceApply.setInvoiceType(map.get("invoiceType").toString());
+        invoiceApply.setExpenseStatus(map.get("expenseStatus").toString());
+        invoiceApply.setExpressCompany(".");
+        invoiceApply.setExpressNumber(".");
+        invoiceApply.setExpressDate(".");
+        invoiceApply.setStatus("0");
+        invoiceApply.setCreateDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+
+        Map<String,Object> map1 = getAccessTocken();
+        if("0000".equals(map1.get("errcode"))){
+            tocken = map1.get("access_token").toString();
+            Map<String,Object> result = getTicketInfo(map.get("invoiceCode").toString(),map.get("invoiceNo").toString(),tocken);
+            if(result != null){
+                List<Map<String,Object>> items = (List<Map<String, Object>>) result.get("items");
+                if(items.size() > 0){
+                    invoiceApply.setTax(new BigDecimal(items.get(0).get("taxRate").toString()));
+                    invoiceApply.setInvoiceItem(items.get(0).get("goodsName").toString());
+                }
+                //代开发票截取开票公司名称
+                if ("1".equals(result.get("proxyMark").toString())) {
+                    String remark = result.get("remark").toString();
+                    int flag = remark.indexOf("代开企业名称:");
+                    if (flag != -1) {
+                        String str = remark.substring(flag + 7);
+                        int brdex = str.indexOf("<br/>");
+                        if(brdex != -1){
+                            invoiceApply.setInvoiceCompany(str.substring(0,brdex));
+                        }else{
+                            invoiceApply.setInvoiceCompany(str.trim());
+                        }
+                        invoiceApply.setRemark(remark);
+                    }else{
+                        invoiceApply.setInvoiceCompany(".");
+                    }
+                }else{
+                    invoiceApply.setInvoiceCompany(map.get("sallerName").toString());
+                }
             }
         }
-        return  maps;
+        invoiceApplyMapper.insert(invoiceApply);
     }
 
     private  List<InvoiceApply> getListByExample(InvoiceApply invoiceApply){
@@ -465,7 +545,54 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
     }
 
     @Override
-    public List<Map<String, Object>> exports(InvoiceApply invoiceApply) {
-        return invoiceApplyMapper.exports(invoiceApply);
+    public List<Map<String,Object>> exports(InvoiceApply invoiceApply,Map<String,String> dateMap) {
+        InvoiceApplyExample example = new InvoiceApplyExample();
+        InvoiceApplyExample.Criteria criteria = example.createCriteria();
+        if(StringUtils.isNotBlank(invoiceApply.getInvoiceCompany())){
+            criteria.andInvoiceCompanyLike(invoiceApply.getInvoiceCompany());
+        }
+        if(StringUtils.isNotBlank(invoiceApply.getInvoiceNumber())){
+            criteria.andInvoiceNumberEqualTo(invoiceApply.getInvoiceNumber());
+        }
+        if(StringUtils.isNotBlank(invoiceApply.getInvoiceCode())){
+            criteria.andInvoiceCodeEqualTo(invoiceApply.getInvoiceCode());
+        }
+        if(StringUtils.isNotBlank(invoiceApply.getEsResult())){
+            criteria.andEsResultEqualTo(invoiceApply.getEsResult());
+        }
+        if(StringUtils.isNotBlank(invoiceApply.getAgentId())){
+            criteria.andAgentIdEqualTo(invoiceApply.getAgentId());
+        }
+        if("3".equals(invoiceApply.getYsResult())){
+            criteria.andYsResultNotEqualTo("0");
+        }else if(StringUtils.isNotBlank(invoiceApply.getYsResult())){
+            criteria.andYsResultEqualTo(invoiceApply.getYsResult());
+        }
+        if (StringUtils.isNotBlank(invoiceApply.getAgentName())){
+            criteria.andAgentNameLike("%"+invoiceApply.getAgentName()+"%");
+        }
+        //if(flag){
+            criteria.andExpressCompanyIsNotNull();
+            criteria.andExpressDateIsNotNull();
+            criteria.andExpressNumberIsNotNull();
+       // }
+        if(StringUtils.isNotBlank(dateMap.get("ysDateStart")) && StringUtils.isNotBlank(dateMap.get("ysDateEnd"))){
+            criteria.andYsDateBetween(dateMap.get("ysDateStart"),dateMap.get("ysDateEnd"));
+        }else if(StringUtils.isNotBlank(dateMap.get("ysDateStart"))){
+            criteria.andYsDateGreaterThanOrEqualTo(dateMap.get("ysDateStart"));
+        }else if(StringUtils.isNotBlank(dateMap.get("ysDateEnd"))){
+            criteria.andYsDateLessThanOrEqualTo(dateMap.get("ysDateEnd"));
+        }
+        if(StringUtils.isNotBlank(dateMap.get("esDateStart")) && StringUtils.isNotBlank(dateMap.get("esDateEnd"))){
+            criteria.andEsDateBetween(dateMap.get("esDateStart"),dateMap.get("esDateEnd"));
+        }else if(StringUtils.isNotBlank(dateMap.get("esDateStart"))){
+            criteria.andEsDateGreaterThanOrEqualTo(dateMap.get("esDateStart"));
+        }else if(StringUtils.isNotBlank(dateMap.get("esDateEnd"))){
+            criteria.andEsDateLessThanOrEqualTo(dateMap.get("esDateEnd"));
+        }
+
+        example.setOrderByClause("CREATE_DATE DESC ");
+        List<Map<String,Object>> list = invoiceApplyMapper.exports(example);
+        return list;
     }
 }
