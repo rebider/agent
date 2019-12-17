@@ -473,7 +473,6 @@ public class InternetCardServiceImpl implements InternetCardService {
             try {
                 log.info("analysisImport处理导入表数据,oInternetCardImport:{}",oInternetCardImport.toString());
                 String importType = oInternetCardImport.getImportType();
-
                 if(importType.equals(CardImportType.A.getValue()) || importType.equals(CardImportType.B.getValue()) || importType.equals(CardImportType.E.getValue())){
                     OInternetCard internetCard = JsonUtil.jsonToPojo(oInternetCardImport.getImportMsg(), OInternetCard.class);
                     disposeInternetCard(oInternetCardImport,internetCard);
@@ -614,6 +613,13 @@ public class InternetCardServiceImpl implements InternetCardService {
      */
     public void disposeInternetCard(OInternetCardImport oInternetCardImport, OInternetCard internetCard)throws Exception{
 
+        if(StringUtils.isBlank(internetCard.getIccidNum())){
+            oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
+            oInternetCardImport.setErrorMsg("缺少iccid");
+            //更新导入记录
+            updateInternetCardImport(oInternetCardImport);
+            return;
+        }
         if(StringUtils.isNotBlank(internetCard.getBusNum())){
             if(StringUtils.isBlank(internetCard.getBusPlatform())){
                 oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
@@ -667,13 +673,6 @@ public class InternetCardServiceImpl implements InternetCardService {
                 return;
             }
             internetCard.setIssuer(issuerCode);
-        }
-        if(StringUtils.isBlank(internetCard.getIccidNum())){
-            oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
-            oInternetCardImport.setErrorMsg("缺少iccid");
-            //更新导入记录
-            updateInternetCardImport(oInternetCardImport);
-            return;
         }
         OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(internetCard.getIccidNum());
         internetCard.setBatchNum(oInternetCardImport.getBatchNum());
@@ -1155,7 +1154,7 @@ public class InternetCardServiceImpl implements InternetCardService {
     public List<OInternetCardImport> queryMigrationHistory(){
         OInternetCardImportExample oInternetCardImportExample = new OInternetCardImportExample();
         OInternetCardImportExample.Criteria criteria = oInternetCardImportExample.createCriteria();
-        Date dateAfter = DateUtil.getDateAfterReturnDate(new Date(), -5);
+        Date dateAfter = DateUtil.getDateAfterReturnDate(new Date(), -30);
         criteria.andCTimeLessThanOrEqualTo(dateAfter);
         oInternetCardImportExample.setPage(new Page(0,10000));
         List<OInternetCardImport> oInternetCardImports = internetCardImportMapper.selectByExample(oInternetCardImportExample);
