@@ -920,10 +920,11 @@
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
       <if test="id!=null and id!=''"> and  o.id = #{id} </if>
       <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
+      <if test="ag!=null and ag!=''"> and  b.id = #{ag} </if>
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
       <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
-      <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
+      <if test="agName!=null and agName!=''"> and b.ag_name like  CONCAT(CONCAT('%',#{agName}),'%') </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
       <if test="platformList!=null and platformList.size > 0">
          and c.PLATFORM_NUM
