@@ -132,7 +132,7 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
             } else {
                 //下发异常
                 logger.info("RDB下发返回异常:" + respResult);
-                return AgentResult.build(2, null != respJson.getString("msg") ? respJson.getString("msg") : "瑞+平台返回异常!");
+                return AgentResult.build(2, null != respJson.getString("msg") ? respJson.getString("msg") : "瑞大宝平台返回异常!");
             }
         } catch (Exception e) {
             e.printStackTrace();
