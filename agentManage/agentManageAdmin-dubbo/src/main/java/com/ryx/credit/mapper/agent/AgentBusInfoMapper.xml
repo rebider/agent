@@ -902,7 +902,9 @@
     LEFT JOIN a_agent busriskparentbusagent ON busriskparentbusagent.id = busriskparentbus.agent_id
     LEFT JOIN a_agent_businfo busactivationparentbus ON bus.bus_activation_parent = busactivationparentbus.id
     LEFT JOIN a_agent busactivationparentbusagent ON busactivationparentbusagent.id = busactivationparentbus.agent_id
-    where 1=1   and agent.ag_status = #{reqMap.agStatus} and agent.status=1
+    where agent.status=1
+      and agent.ag_status = #{reqMap.agStatus}
+    <if test="reqMap.ag != null and reqMap.ag != '' ">and agent.id = #{reqMap.ag}</if>
       <if test="reqMap.agName != null and reqMap.agName != '' ">and agent.ag_name like
         CONCAT(CONCAT('%',#{reqMap.agName}),'%')
       </if>
