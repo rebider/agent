@@ -721,6 +721,22 @@ public class InternetCardServiceImpl implements InternetCardService {
                 }
             }
             if(internetCard.getInternetCardStatus()!=null && internetCard.getInternetCardStatus().compareTo(InternetCardStatus.LOGOUT.getValue())==0){
+                InternetLogoutDetailExample internetLogoutDetailEx = new InternetLogoutDetailExample();
+                InternetLogoutDetailExample.Criteria logoutCriteria = internetLogoutDetailEx.createCriteria();
+                logoutCriteria.andStatusEqualTo(Status.STATUS_1.status);
+                logoutCriteria.andIccidNumEqualTo(internetCard.getIccidNum());
+                List<String> logoutStatusList = new ArrayList<>();
+                logoutStatusList.add(InternetLogoutStatus.ZXZ.getValue());
+                logoutStatusList.add(InternetLogoutStatus.TJCLZ.getValue());
+                logoutCriteria.andLogoutStatusIn(logoutStatusList);
+                List<InternetLogoutDetail> internetLogoutDetailList = internetLogoutDetailMapper.selectByExample(internetLogoutDetailEx);
+                if(internetLogoutDetailList.size()!=0){
+                    oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
+                    oInternetCardImport.setErrorMsg("iccid:"+internetCard.getIccidNum()+",正在注销中,不可在更新卡状态");
+                    //更新导入记录
+                    updateInternetCardImport(oInternetCardImport);
+                    return;
+                }
                 InternetLogoutDetailExample internetLogoutDetailExample = new InternetLogoutDetailExample();
                 InternetLogoutDetailExample.Criteria criteria = internetLogoutDetailExample.createCriteria();
                 criteria.andStatusEqualTo(Status.STATUS_1.status);
