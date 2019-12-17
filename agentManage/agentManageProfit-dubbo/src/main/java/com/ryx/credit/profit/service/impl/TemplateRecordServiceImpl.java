@@ -1068,7 +1068,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         List<Map<String, Object>> orgIdMaps = recodeMapper.queryBusInfo(fastMap);
         if(orgIdMaps==null||orgIdMaps.size()!=1){
             logger.info("查询S码用户数据并不唯一:{}", param);
-            throw new MessageException("查询S码用户数据并不唯一:{}" + param);
+            throw new MessageException("查询S码用户数据并不唯一:" + param);
         }
         Map<String, Object> orgIdMap = orgIdMaps.get(0);
         if (orgIdMaps == null || orgIdMaps.isEmpty()) {
