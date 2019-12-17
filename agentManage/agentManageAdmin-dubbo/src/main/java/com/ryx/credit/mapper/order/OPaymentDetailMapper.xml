@@ -836,12 +836,12 @@
         FROM O_PAYMENT_DETAIL opd
              left join o_order od
              on od.id = opd.order_id
-        WHERE opd.AGENT_ID = 'AG19113710136' and
+        WHERE opd.AGENT_ID = #{agentId} and
             od.id != (select o.id
             FROM o_order_adj oad
             LEFT JOIN o_order o
             ON o.id = oad.order_id
-            WHERE oad.id = 'AD20191212000000000000323') and
+            WHERE oad.id = #{adjId})and
             opd.PAY_TYPE in ('FRFQ', 'DKFQ') and opd.PAYMENT_STATUS in (1, 2, 3) and
             opd.PAYMENT_TYPE = 'ORDER_FKD' and od.order_status = '2'
         order by plan_pay_time asc
