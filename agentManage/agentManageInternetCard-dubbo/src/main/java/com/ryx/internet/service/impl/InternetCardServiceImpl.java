@@ -785,7 +785,12 @@ public class InternetCardServiceImpl implements InternetCardService {
             OInternetCard oInternetCard = oInternetCards.get(0);
             oInternetCard.setOrderId(internetCard.getOrderId());
             oInternetCard.setAgentName(internetCard.getAgentName());
-            oInternetCard.setManufacturer(internetCard.getManufacturer());
+            if(StringUtils.isNotBlank(internetCard.getAgentName())){
+                Agent agent = agentService.getAgentByName(internetCard.getAgentName());
+                if(agent!=null){
+                    oInternetCard.setAgentId(agent.getId());
+                }
+            }
             oInternetCard.setDeliverTime(internetCard.getDeliverTime());
             if(StringUtils.isNotBlank(internetCard.getManufacturer())){
                 Dict dict = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),internetCard.getManufacturer());
