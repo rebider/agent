@@ -843,7 +843,7 @@
             ON o.id = oad.order_id
             WHERE oad.id = #{adjId})and
             opd.PAY_TYPE in ('FRFQ', 'DKFQ') and opd.PAYMENT_STATUS in (1, 2, 3) and
-            opd.PAYMENT_TYPE = 'ORDER_FKD' and od.order_status = '2'
+            opd.PAYMENT_TYPE = 'ORDER_FKD' and od.order_status = '2' and opd.status = '1'
         order by plan_pay_time asc
     </select>
 </mapper>
