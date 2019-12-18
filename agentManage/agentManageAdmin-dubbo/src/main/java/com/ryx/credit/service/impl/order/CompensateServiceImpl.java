@@ -330,7 +330,7 @@ public class CompensateServiceImpl implements CompensateService {
     }
 
     /**
-     * save
+     * 活动更换保存退补差价明细
      * @param oRefundPriceDiff
      * @param refundPriceDiffDetailList
      * @param cUser
@@ -418,7 +418,13 @@ public class CompensateServiceImpl implements CompensateService {
                 log.info("活动调整保存打款记录失败1");
                 throw new ProcessException("保存打款记录失败");
             }
-
+            //代理商打款，代理商打款不能小于活动差价。
+            if (null != oRefundPriceDiff.getApplyCompType() && oRefundPriceDiff.getApplyCompType().equals("1")) {
+                //状态为1说明代理商要打款
+                if (oRefundPriceDiff.getApplyCompAmt().compareTo(belowPayAmt.add(shareDeductAmt)) != 0){
+                    throw new ProcessException("应打款金额："+oRefundPriceDiff.getApplyCompAmt());
+                }
+            }
             //遍历补差价明细进行校验和信息补全
             refundPriceDiffDetailList.forEach(refundPriceDiffDetail->{
                 Map<String, Object> logisticsDetail = null;
@@ -602,6 +608,43 @@ public class CompensateServiceImpl implements CompensateService {
                             int i = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(refundPriceDiffDetail);
                             if(i!=1){
                                 throw new ProcessException("更新返回数据失败");
+                            }
+                        }
+                    }
+                }
+            } else if (PlatformType.RDBPOS.getValue().equals(platformType)) {
+                List<Map<String, Object>> resultList = (List<Map<String, Object>>) synOrVerifyResult.getData();
+                for (Map<String, Object> stringObjectMap : resultList) {
+                    String oldOrgId = String.valueOf(stringObjectMap.get("oldOrgId"));
+                    for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {
+                        if (oldOrgId.equals(refundPriceDiffDetail.getOldOrgId())) {
+                            String oldSupDorgId = String.valueOf(stringObjectMap.get("oldSupDorgId"));
+                            String oldSupDorgName = String.valueOf(stringObjectMap.get("oldSupDorgName"));
+                            String oldOrgName = String.valueOf(stringObjectMap.get("oldOrgName"));
+                            String newSupDorgId = String.valueOf(stringObjectMap.get("oldSupDorgId"));
+                            String newSupDorgName = String.valueOf(stringObjectMap.get("oldSupDorgName"));
+                            String newOrgName = String.valueOf(stringObjectMap.get("oldOrgName"));
+                            if (StringUtils.isNotBlank(oldSupDorgId) && !oldSupDorgId.equals("null")) {
+                                refundPriceDiffDetail.setOldSupdOrgId(oldSupDorgId);
+                            }
+                            if (StringUtils.isNotBlank(oldSupDorgName) && !oldSupDorgName.equals("null")) {
+                                refundPriceDiffDetail.setOldSupdOrgName(oldSupDorgName);
+                            }
+                            if (StringUtils.isNotBlank(oldOrgName) && !oldOrgName.equals("null")) {
+                                refundPriceDiffDetail.setOldOrgName(oldOrgName);
+                            }
+                            if (StringUtils.isNotBlank(newSupDorgId) && !newSupDorgId.equals("null")) {
+                                refundPriceDiffDetail.setNewSupdOrgId(newSupDorgId);
+                            }
+                            if (StringUtils.isNotBlank(newSupDorgName) && !newSupDorgName.equals("null")) {
+                                refundPriceDiffDetail.setNewSupdOrgName(newSupDorgName);
+                            }
+                            if (StringUtils.isNotBlank(newOrgName) && !newOrgName.equals("null")) {
+                                refundPriceDiffDetail.setNewOrgName(newOrgName);
+                            }
+                            int i = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(refundPriceDiffDetail);
+                            if (i != 1) {
+                                throw new ProcessException("瑞大宝调整活动更新不差价明细失败！");
                             }
                         }
                     }

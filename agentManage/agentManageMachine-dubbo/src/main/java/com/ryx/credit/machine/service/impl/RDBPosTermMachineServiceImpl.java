@@ -336,8 +336,8 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
 
             //返回最终查询结果
             if (null != resJson.getString("code") && resJson.getString("code").equals("0000")) {
-                //可以更换活动
-                return  AgentResult.ok();
+                //可以更换活动，封装参参数返回
+                return  AgentResult.ok(resJson.get("result"));
             } else if (null != resJson.getString("code") && resJson.getString("code").equals("9999") && null != resJson.getString("msg")) {
                 //不可以更换活动
                 return AgentResult.fail(resJson.getString("msg") + "，不可以更换活动！");
