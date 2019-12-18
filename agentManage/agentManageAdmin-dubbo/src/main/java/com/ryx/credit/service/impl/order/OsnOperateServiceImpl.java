@@ -223,12 +223,11 @@ public class OsnOperateServiceImpl implements OsnOperateService {
     public List<String> fetchFhData(int nodecount,int shardingItem)throws Exception{
 
         //查询待处理的物流列表，并更新成处理中
-         List<String> data = oLogisticsMapper.queryLogicInfoIdByStatus(FastMap
-        .fastMap("logType",LogType.Deliver.code)
-            .putKeyV("sendStatus",LogisticsSendStatus.gen_detail_sucess.code)
-            .putKeyV("pagesize",200)
-            //.putKeyV("count",count_wall)
-         );
+        List<String> data = oLogisticsMapper.queryLogicInfoIdByStatus(FastMap
+                .fastMap("logType", LogType.Deliver.code)
+                .putKeyV("sendStatus", LogisticsSendStatus.gen_detail_sucess.code)
+                .putKeyV("pagesize", 200)
+        );
 
          //更新物流为下发处理中，任务更新状态，下次不再查询
         data.forEach(ids ->{
