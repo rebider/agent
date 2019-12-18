@@ -451,6 +451,7 @@
       <if test="isDeliver!=null and isDeliver!='' and isDeliver=='yes'"> and r.return_order_detail_id is null</if>
       <if test="agName !=null and agName !='' "> and  agent.AG_NAME LIKE CONCAT(CONCAT('%',#{agName}),'%') </if>
       <if test="proName !=null and proName !='' ">and  P.PRO_NAME LIKE CONCAT(CONCAT('%',#{proName}),'%')</if>
+      <if test="ag !=null and ag !='' "> and  agent.id = #{ag} </if>
 
   </sql>
 
