@@ -333,8 +333,6 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                                 break;
                             }
                         } catch (Exception e) {
-                            //程序异常
-                            //AppConfig.sendEmails("logisticId:"+id+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                             e.printStackTrace();
                             //更新物流明细
                             logisticsDetails.forEach(det -> {
