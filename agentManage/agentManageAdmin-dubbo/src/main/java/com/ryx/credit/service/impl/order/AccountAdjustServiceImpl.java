@@ -146,7 +146,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                     //查询付款单和付款单明细
                     OPayment payment = paymentDetailService.getPaymentById(paymentId);
                     //查此付款单的可抵扣明细
-                    List<OPaymentDetail> oPaymentDetails = paymentDetailService.getPaymentDetails(paymentId, "DF", "BF", "YQ");
+                    List<OPaymentDetail> oPaymentDetails = paymentDetailService.getPaymentDetails(paymentId, adjustType,"DF", "BF", "YQ");
                     //计算此付款单可抵扣金额
                     BigDecimal thisPaymentOutstandingAmt = BigDecimal.ZERO;
                     for (OPaymentDetail oneDetail : oPaymentDetails) {
@@ -186,7 +186,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                         //抵扣记录 抵扣剩余所有金额
                         takeoutList.add(createTkeRecord(payment, leftAmt));
                         //========生成新的付款计划。先计算剩余代付金额和剩余期数======
-                        List<OPaymentDetail> planNows = paymentDetailService.getPaymentDetails(paymentId);
+                        List<OPaymentDetail> planNows = paymentDetailService.getPaymentDetails(paymentId,adjustType);
                         //现在付款计划未还部分
                         List<OPaymentDetail> planNows_df = new ArrayList<>();
                         //现在付款计划已付部分

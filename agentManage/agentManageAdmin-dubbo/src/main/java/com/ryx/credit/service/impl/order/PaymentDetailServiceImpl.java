@@ -118,8 +118,11 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
      * @Date: 9:32 2018/7/28
      */
     @Override
-    public List<OPaymentDetail> getPaymentDetails(String paymentId, String... paymentStatus) throws ProcessException {
+    public List<OPaymentDetail> getPaymentDetails(String paymentId,String adjustType, String... paymentStatus) throws ProcessException {
 
+        if (adjustType!=null && AdjustType.ORDER_ADJ.adjustType.equals(adjustType)){
+            return  oPaymentDetailMapper.selectPaymentDetails(paymentId);
+        }else {
         //付款类型过滤条件
         List<String> payTypeList = new ArrayList<>();
         payTypeList.add(PaymentType.DKFQ.code);
@@ -142,6 +145,7 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
         c.andPaymentTypeEqualTo(PamentIdType.ORDER_FKD.code);
         example.setOrderByClause("plan_num asc");
         return oPaymentDetailMapper.selectByExample(example);
+        }
     }
 
 

@@ -46,7 +46,7 @@ public interface IPaymentDetailService {
      * @Description: 查询一个付款单下付款明细，可根据付款状态筛选
      * @Date: 9:31 2018/7/28
      */
-    List<OPaymentDetail> getPaymentDetails(String paymentId, String... paymentStatus) throws ProcessException;
+    List<OPaymentDetail> getPaymentDetails(String paymentId,String adjustType,String... paymentStatus) throws ProcessException;
 
     /**
      * 更新状态
