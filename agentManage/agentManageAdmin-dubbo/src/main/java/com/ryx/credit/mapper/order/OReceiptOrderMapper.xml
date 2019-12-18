@@ -472,7 +472,7 @@
     ro.ADDR_CITY as addrCity, ro.ADDR_DISTRICT as addrDistinct, ro.ADDR_DETAIL, ro.REMARK, ro.ZIP_CODE, ro.PRO_NUM as PRO_NUM_SUM, ro.EXPRESS_REMARK,
     ro.EXPRESS_SUC_DATE, ro.C_TIME, ro.C_USER, ro.U_TIME, ro.RECEIPT_STATUS, ro.U_USER, ro.STATUS, ro.VERSION,
     ro.AGENT_ID, rp.ORDERID, rp.RECEIPT_ID, rp.PRO_ID, rp.PRO_CODE, rp.PRO_NAME, rp.PRO_NUM,rp.SEND_NUM,rp.id as receipt_Pro_Id,
-    ag.AG_NAME,to_char(o.O_INURETIME,'yyyy-MM-dd') as O_INURETIME, o.REMARK as ORDER_REMARK,to_char(rp.c_time, 'YYYY-MM-DD') as RP_C_TIME,
+    ag.AG_NAME,to_char(o.O_INURETIME,'yyyy-MM-dd') as O_INURETIME, o.REMARK as ORDER_REMARK,to_char(rp.c_time, 'yyyy-MM-dd hh24:mi:ss') as RP_C_TIME,
     d.r_name as ADDR_PROVINCE,
     c.r_name as ADDR_CITY,
     e.r_name as ADDR_DISTRICT
