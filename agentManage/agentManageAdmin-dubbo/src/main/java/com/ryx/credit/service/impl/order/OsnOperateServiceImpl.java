@@ -321,6 +321,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                                 if (oLogisticsMapper.updateByPrimaryKeySelective(logistics) != 1) {
                                     logger.info("物流明细发送业务系统处理失败，更新数据库失败,{},{}", id, batch);
                                 }
+                                break;
                             } else {
                                 //代码异常
                                 logger.info("物流明细发送业务系统处理失败,{},{}", id, batch);
@@ -330,10 +331,11 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                                 if (oLogisticsMapper.updateByPrimaryKeySelective(logistics) != 1) {
                                     logger.info("发送到业务系统异常，请检查代码,{},{}", id, batch);
                                 }
+                                break;
                             }
                         } catch (Exception e) {
                             //程序异常
-                            AppConfig.sendEmails("logisticId:"+id+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                            //AppConfig.sendEmails("logisticId:"+id+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                             e.printStackTrace();
                             //更新物流明细
                             logisticsDetails.forEach(det -> {
@@ -434,10 +436,8 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                 emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
             }
             AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e),"任务生成物流明细错误报警OsnOperateServiceImpl");
-            //AppConfig.sendEmails("SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
             e.printStackTrace();
             logger.info("sn生成异常{},{},{}",logistics.getSnBeginNum(),logistics.getSnEndNum(),e.getLocalizedMessage());
-            logger.error("sn生成异常",e);
             throw e;
         }
         //查询订单信息
@@ -925,12 +925,6 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                     retMap.put("code", "2");
                     return retMap;
                 }
-                //机具下发失败，更新物流明细为下发失败，并更新物流为发送失败，禁止继续发送 ,人工介入
-            } catch (MessageException e) {
-                AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+e.getLocalizedMessage(), logistics.getProType()+"下发失败！");
-                e.printStackTrace();
-                logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage(), platForm.getPlatformType());
-                throw e;
             } catch (Exception e) {
                 //机具下发失败，更新物流明细为下发失败，并更新物流为发送失败 ，禁止继续发送,人工介入
                 AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+e.getLocalizedMessage(), logistics.getProType()+"下发失败！");
