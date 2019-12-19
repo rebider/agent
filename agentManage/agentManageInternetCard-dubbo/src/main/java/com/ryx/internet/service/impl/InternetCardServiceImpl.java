@@ -151,7 +151,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             criteria.andIccidNumBetween(internetCard.getIccidNumBegin(),internetCard.getIccidNumEnd());
         }
         if(StringUtils.isNotBlank(internetCard.getSnNum())){
-            criteria.andSnNumEqualTo(internetCard.getSnNum());
+            criteria.andSnNumLike(internetCard.getSnNum()+"%");
         }
         if(StringUtils.isNotBlank(internetCard.getCardImportId())){
             criteria.andCardImportIdEqualTo(internetCard.getCardImportId());
@@ -202,6 +202,12 @@ public class InternetCardServiceImpl implements InternetCardService {
 //            Date end = DateUtil.format(DateUtil.getLastDayOfMonth(DateUtil.getYearMonthOfMonthType(3, "Year"),DateUtil.getYearMonthOfMonthType(3, "Month")), DateUtil.DATE_FORMAT_yyyy_MM_dd);
 //            criteria.andExpireTimeBetween(begin,end);
 //        }
+        if(StringUtils.isNotBlank(internetCard.getMerId())){
+            criteria.andMerIdLike(internetCard.getMerId()+"%");
+        }
+        if(StringUtils.isNotBlank(internetCard.getMerName())){
+            criteria.andMerNameEqualTo(internetCard.getMerName());
+        }
 
         List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
         if(orgCodeRes==null && orgCodeRes.size()!=1){
