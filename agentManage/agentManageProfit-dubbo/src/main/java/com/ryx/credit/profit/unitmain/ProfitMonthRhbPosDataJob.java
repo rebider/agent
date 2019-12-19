@@ -2,6 +2,7 @@ package com.ryx.credit.profit.unitmain;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.OrgType;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.pojo.admin.agent.Agent;
@@ -133,6 +134,11 @@ public class ProfitMonthRhbPosDataJob {
             if (agentBusInfo == null) {
                 logger.info("代理商详情查询失败-----agencyId：" + agencyId);
                 continue;
+            }else{
+                if(!OrgType.zQ(agentBusInfo.getBusType())){
+                    logger.info("非直签代理商-----agencyId："+agencyId);
+                    continue;
+                }
             }
             Agent agent = agentService.getAgentById(agentBusInfo.getAgentId());
 

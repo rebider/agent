@@ -94,6 +94,9 @@ public interface AgentBusInfoMapper {
 
     List<AgentBusInfo> selectBusInfo(@Param("reqMap")Map<String, Object> reqMap);
 
+    // 有条件的分页查询
+    List<AgentBusInfo> selectByConditionForPage(@Param("page")Page page, @Param("agentBusInfo") AgentBusInfo agentBusInfo);
+
     //通过订单ID查询业务信息
     AgentBusInfo selectByOrderId(String orderId);
 
@@ -109,4 +112,6 @@ public interface AgentBusInfoMapper {
     List<String> queryBusPlatform(@Param("reqMap") Map reqMap);
     List<String> queryAgDocPro(@Param("reqMap") Map reqMap);
     List<String> queryBusType(@Param("reqMap") Map reqMap);
+
+    List<AgentBusInfo> queryBusinfo(@Param("map") Map<String, String> map);
 }

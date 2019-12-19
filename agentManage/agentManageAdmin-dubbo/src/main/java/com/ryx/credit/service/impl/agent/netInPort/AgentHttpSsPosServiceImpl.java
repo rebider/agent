@@ -163,6 +163,7 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
             organization=new Organization();
         }
         //组装参数
+        resultMap.put("brand",platForm.getBusplatform()); //品牌编号
         resultMap.put("brandName",platForm.getPlatformName());//平台名称
         resultMap.put("alwaysProfit","01");//该机构是否参与实时分润
         resultMap.put("agentId",organization.getOrgId());//机构ID
@@ -206,7 +207,7 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
             resultMap.put("IsOper","1");
         }else{
             resultMap.put("IsOper","0");
-            resultMap.put("operOrgId",orgPlatform.getPlatCode().equals("#")?"":orgPlatform.getPlatCode());
+            resultMap.put("operOrgId",orgPlatform.getPlatCode());
         }
         return resultMap;
     }
@@ -261,6 +262,7 @@ public class AgentHttpSsPosServiceImpl implements AgentNetInHttpService  {
             if(paramMap.get("orgType").equals(OrgType.STR.getValue()))
                 data.put("supDorgId",paramMap.get("supDorgId"));
             //组装参数
+            data.put("brand",paramMap.get("brand")); //品牌编号
             data.put("brandName",paramMap.get("brandName"));//平台名称
             data.put("alwaysProfit","01");//该机构是否参与实时分润
             data.put("finaceRemitOrgan",paramMap.get("finaceRemitOrgan"));//财务出款机构

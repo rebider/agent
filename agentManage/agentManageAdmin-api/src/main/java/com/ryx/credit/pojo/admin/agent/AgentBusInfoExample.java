@@ -3417,6 +3417,76 @@ public class AgentBusInfoExample {
             addCriterion("DEBIT_RATE_CAPPING not between", value1, value2, "debitRateCapping");
             return (Criteria) this;
         }
+
+        public Criteria andPosPlatCodeIsNull() {
+            addCriterion("POS_PLAT_CODE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosPlatCodeIsNotNull() {
+            addCriterion("POS_PLAT_CODE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosPlatCodeEqualTo(String value) {
+            addCriterion("POS_PLAT_CODE =", value, "posPlatCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosPlatCodeNotEqualTo(String value) {
+            addCriterion("POS_PLAT_CODE <>", value, "posPlatCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosPlatCodeGreaterThan(String value) {
+            addCriterion("POS_PLAT_CODE >", value, "posPlatCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosPlatCodeGreaterThanOrEqualTo(String value) {
+            addCriterion("POS_PLAT_CODE >=", value, "posPlatCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosPlatCodeLessThan(String value) {
+            addCriterion("POS_PLAT_CODE <", value, "posPlatCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosPlatCodeLessThanOrEqualTo(String value) {
+            addCriterion("POS_PLAT_CODE <=", value, "posPlatCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosPlatCodeLike(String value) {
+            addCriterion("POS_PLAT_CODE like", value, "posPlatCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosPlatCodeNotLike(String value) {
+            addCriterion("POS_PLAT_CODE not like", value, "posPlatCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosPlatCodeIn(List<String> values) {
+            addCriterion("POS_PLAT_CODE in", values, "posPlatCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosPlatCodeNotIn(List<String> values) {
+            addCriterion("POS_PLAT_CODE not in", values, "posPlatCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosPlatCodeBetween(String value1, String value2) {
+            addCriterion("POS_PLAT_CODE between", value1, value2, "posPlatCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosPlatCodeNotBetween(String value1, String value2) {
+            addCriterion("POS_PLAT_CODE not between", value1, value2, "posPlatCode");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

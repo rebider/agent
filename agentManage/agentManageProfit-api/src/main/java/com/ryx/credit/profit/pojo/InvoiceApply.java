@@ -36,6 +36,7 @@ public class InvoiceApply implements Serializable {
 
     private String esDate;
 
+    /** 0：初审造成的未通过  1：初审通过  2：由终审导入的未通过**/
     private String ysResult;
 
     private String returnReason;
@@ -56,10 +57,12 @@ public class InvoiceApply implements Serializable {
 
     private String invoiceAmtMonth;
 
+    /****0: 终审未通过  1：终审通过***/
     private String esResult;
 
     private BigDecimal amountTax;
 
+    /***0：该发票金额未汇总  1：该发票金额已汇总至本月到票 **/
     private String status;
 
     private String serialNo;
@@ -74,12 +77,16 @@ public class InvoiceApply implements Serializable {
 
     private String sallerNo;
 
+    /**发票备注**/
     private String remark;
 
+    /***汇总月份****/
     private String profitMonth;
 
+    /***初审备注**/
     private String rev1;
 
+    /*******终审备注*****/
     private String rev2;
 
     private String rev3;

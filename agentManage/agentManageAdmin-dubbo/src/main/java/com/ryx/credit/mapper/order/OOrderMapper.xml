@@ -439,6 +439,7 @@
     f.name as ag_doc_district_name ,
     g.name as ag_doc_pro_name ,
     o.user_id as user_id,
+    org.ORG_NICK,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
@@ -481,9 +482,10 @@
     left join o_payment d on d.order_id = o.id
     left join c_organization f on f.id= e.ag_doc_district
     left join c_organization g on g.id= e.ag_doc_pro
+    left join o_organization org on e.ORGAN_NUM = org.ORG_ID
     <where>
       o.user_id=#{userId}
-      <if test="1==1"> and  o.status = 1 </if>
+      <if test="1==1"> and  o.status = 1  </if>
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
       <if test="id!=null and id!=''"> and  o.id = #{id} </if>
       <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
@@ -554,6 +556,7 @@
     f.name as ag_doc_district_name ,
     g.name as ag_doc_pro_name ,
     o.user_id as user_id,
+    org.ORG_NICK,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
@@ -596,6 +599,7 @@
     left join o_payment d on d.order_id = o.id
     left join c_organization f on f.id= e.ag_doc_district
     left join c_organization g on g.id= e.ag_doc_pro
+    left join o_organization org on e.ORGAN_NUM = org.ORG_ID
     <where>
       <if test="1==1"> and  o.status = 1 </if>
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
@@ -876,6 +880,7 @@
     o.user_id as user_id,
     f.name as ag_doc_district_name,
     g.name as ag_doc_pro_name,
+    org.ORG_NICK,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id
@@ -900,7 +905,7 @@
     where o_sub_order.status=1 and o_sub_order_activity.status=1 and o_sub_order.order_id = o.id
     ) as activity_name,
     nvl((select sum(PLAN_PRO_NUM) from O_RECEIPT_PLAN plan where plan.order_id=o.id and plan.status=1),0)as total,
-    nvl((select sum(o_receipt_pro.pro_num)-sum(o_receipt_pro.send_num) from o_receipt_pro
+    nvl((select sum(o_receipt_pro.pro_num)-sum(o_receipt_pro.send_num)from o_receipt_pro
     where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0) as for_send_num
     from o_order o
     left join a_agent b on o.agent_id = b.id
@@ -909,6 +914,7 @@
     left join o_payment d on d.order_id = o.id
     left join c_organization f on f.id = e.ag_doc_district
     left join c_organization g on g.id = e.ag_doc_pro
+    left join o_organization org on e.ORGAN_NUM = org.ORG_ID
  <where>
       <if test="1==1"> and  o.status = 1 and  b.STATUS=1 and e.STATUS=1 </if>
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
@@ -1179,7 +1185,7 @@
   <select id="excelOrder" parameterType="map" resultMap="OrderoutVo">
     (
     select
-    to_char(o.c_time,'YYYY-MM-DD') as apytime,
+    to_char(o.c_time,'yyyy-MM-dd hh24:mi:ss') as apytime,
     o.o_num as num,
     b.ag_uniq_num,
     aab.bus_num,
@@ -1318,7 +1324,7 @@
       select sum(plans.plan_pro_num) from o_receipt_plan plans where plans.order_id = o.id and plans.status = 1
     ),0) as is_plan_num,
     o.review_status,
-    to_char(o.o_inuretime,'YYYY-MM-DD') as oinuretime,
+    to_char(o.o_inuretime,'yyyy-MM-dd hh24:mi:ss') as oinuretime,
     orging.name as ag_doc_district,
     org.name as ag_doc_pro,
     o.user_id as order_user,
@@ -1327,7 +1333,7 @@
       from o_organization oan
       where oan.org_id = aab.organ_num and oan.status = 1
     ),'') as org_name,
-    to_char(o.o_apytime,'YYYY-MM-DD') as orderDate,
+    to_char(o.o_apytime,'yyyy-MM-dd hh24:mi:ss') as orderDate,
     o.remark
     from o_order o
     left join a_agent b on o.agent_id = b.id
@@ -1410,7 +1416,7 @@
   <select id="orderExcel" parameterType="map" resultMap="OrderoutVo">
     (
     select
-    to_char(o.c_time,'YYYY-MM-DD') as apytime,
+    to_char(o.c_time,'yyyy-MM-dd hh24:mi:ss') as apytime,
     o.o_num as num,
     b.ag_uniq_num,
     aab.bus_num,
@@ -1549,7 +1555,7 @@
     select sum(plans.plan_pro_num) from o_receipt_plan plans where plans.order_id = o.id and plans.status = 1
     ),0) as is_plan_num,
     o.review_status,
-    to_char(o.o_inuretime,'YYYY-MM-DD') as oinuretime,
+    to_char(o.o_inuretime,'yyyy-MM-dd hh24:mi:ss') as oinuretime,
     orging.name as ag_doc_district,
     org.name as ag_doc_pro,
     o.user_id as order_user,
@@ -1558,7 +1564,7 @@
     from o_organization oan
     where oan.org_id = aab.organ_num and oan.status = 1
     ),'') as org_name,
-    to_char(o.o_apytime,'YYYY-MM-DD') as orderDate,
+    to_char(o.o_apytime,'yyyy-MM-dd hh24:mi:ss') as orderDate,
     o.remark
     from o_order o
     left join a_agent b on o.agent_id = b.id
@@ -1610,7 +1616,7 @@
     </where>
     UNION
     select
-    to_char(o.c_time,'YYYY-MM-DD') as apytime,
+    to_char(o.c_time,'yyyy-MM-dd hh24:mi:ss') as apytime,
     o.o_num as num,
     b.ag_uniq_num,
     aab.bus_num,
@@ -1749,7 +1755,7 @@
     select sum(plans.plan_pro_num) from o_receipt_plan plans where plans.order_id = o.id and plans.status = 1
     ),0) as is_plan_num,
     o.review_status,
-    to_char(o.o_inuretime,'YYYY-MM-DD') as oinuretime,
+    to_char(o.o_inuretime,'yyyy-MM-dd hh24:mi:ss') as oinuretime,
     orging.name as ag_doc_district,
     org.name as ag_doc_pro,
     o.user_id as order_user,
@@ -1758,7 +1764,7 @@
     from o_organization oan
     where oan.org_id = aab.organ_num and oan.status = 1
     ),'') as org_name,
-    to_char(o.o_apytime,'YYYY-MM-DD') as orderDate,
+    to_char(o.o_apytime,'yyyy-MM-dd hh24:mi:ss') as orderDate,
     o.remark
     from o_order o
     left join a_agent b on o.agent_id = b.id

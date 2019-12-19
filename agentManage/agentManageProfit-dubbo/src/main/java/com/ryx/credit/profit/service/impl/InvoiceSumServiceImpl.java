@@ -119,7 +119,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
         if (invoiceSums.size() != 1) {
             logger.info("查询本月代理商有误");
             resultMap.put("returnCode", 0000);
-            resultMap.put("returnInfo", "查询本月代理商有误");
+            resultMap.put("returnInfo", "查询本月代理商欠票信息有误！");
             return resultMap;
         }
         InvoiceSum invoiceSum = invoiceSums.get(0);

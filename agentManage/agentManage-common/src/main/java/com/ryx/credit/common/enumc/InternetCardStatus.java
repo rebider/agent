@@ -17,7 +17,14 @@ public enum InternetCardStatus {
     NOACTIVATE(new BigDecimal("2"),"待激活"),
     STOP(new BigDecimal("3"),"停用"),  //停机可以启用
     LOGOUT(new BigDecimal("4"),"注销"),  //注销不能在开机
-    UNKNOWN(new BigDecimal("0"),"未知");
+    UNKNOWN(new BigDecimal("0"),"未知"),
+    //揭阳移动状态
+    test(new BigDecimal("5"),"测试期"),
+    silent(new BigDecimal("6"),"沉默期"),
+    inventory(new BigDecimal("7"),"库存期"),
+    bespeakClose(new BigDecimal("8"),"预约销户");
+
+
 
     public BigDecimal code;
 
@@ -62,8 +69,28 @@ public enum InternetCardStatus {
         return resultMap;
     }
 
-    public static void main(String[] args){
-        System.out.println(getContentByMsg("正常"));
+    /**
+     * 揭阳移动状态关系映射
+     * @param mobileStatus
+     * @return
+     */
+    public static BigDecimal getCardStatusByJYMobile(String mobileStatus){
+        if(mobileStatus.equals("normal")){
+            return NORMAL.code;
+        }
+        if(mobileStatus.equals("stop")){
+            return STOP.code;
+        }
+        if(mobileStatus.equals("preclose")){
+            return LOGOUT.code;
+        }
+        InternetCardStatus[] internetCardStatuss = InternetCardStatus.values();
+        for(InternetCardStatus internetCardStatus : internetCardStatuss){
+            if(mobileStatus.equals(internetCardStatus.name())){
+                return internetCardStatus.code;
+            }
+        }
+        return new BigDecimal(-1);
     }
 
     /**
@@ -81,4 +108,5 @@ public enum InternetCardStatus {
     public String getContent() {
         return this.msg;
     }
+
 }

@@ -186,7 +186,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                 templateRecode.setTemplateName(map2.getString("mouldName"));
             }else if("RJPOS".equals(busInfo.get("PLATFORM_TYPE"))){
                 reactRJPOSApply(RJ_TEMPLATE_APPLY,map2.toJSONString(),templateRecode);
-            }else if("POS".equals(busInfo.get("PLATFORM_TYPE"))||"ZHPOS".equals(busInfo.get("PLATFORM_TYPE"))||"ZPOS".equals(busInfo.get("PLATFORM_TYPE"))){
+            }else if("POS".equals(busInfo.get("PLATFORM_TYPE"))||"ZHPOS".equals(busInfo.get("PLATFORM_TYPE"))){
                 // todo POS平台信息申请
                 result = HttpClientUtil.doPostJson(TEMPLATE_APPLY, map2.toJSONString());
                 Map<String,Object> resultMap = JSONObject.parseObject(result);
@@ -279,6 +279,8 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                 }
             }
         }
+
+
         try{
             proceId = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("agent_zg_template"), null, null, startPar);
             if (proceId == null) {
@@ -311,7 +313,8 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         record.setAgentName(templateRecode.getAgentName());
         record.setActivStatus(AgStatus.Approving.name());
         record.setBusType(BusActRelBusType.profitTempalteApply.name());
-        record.setDataShiro(BusActRelBusType.profitTempalteApply.key);  //
+        record.setDataShiro(BusActRelBusType.profitTempalteApply.key);
+        record.setExplain(templateRecode.getBusNum());
 
         Map<String,String> reMap = stringList.get(0);
         record.setNetInBusType("ACTIVITY_"+reMap.get("BUS_PLATFORM"));
@@ -471,7 +474,6 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                 reqMap.put("dept", downDeptMap.get("downDept"));
             }
         }
-
         // if("reject".equals(agentVo.getApprovalResult())
         //        && StringUtils.isBlank(agentVo.getOrderAprDept())){
         if("reject".equals(agentVo.getApprovalResult())){

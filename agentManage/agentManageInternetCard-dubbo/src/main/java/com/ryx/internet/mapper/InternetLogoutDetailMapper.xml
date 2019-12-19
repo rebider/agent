@@ -27,6 +27,9 @@
     <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
     <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="ISSUER" jdbcType="VARCHAR" property="issuer" />
+    <result column="FAIL_CAUSE" jdbcType="VARCHAR" property="failCause" />
+    <result column="MOBILE_ORDER_NO" jdbcType="VARCHAR" property="mobileOrderNo" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -58,10 +61,10 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, RENEW_ID, ICCID_NUM, INTERNET_CARD_STATUS, ORDER_ID, SN_NUM, INTERNET_CARD_NUM, 
-    OPEN_ACCOUNT_TIME, EXPIRE_TIME, MER_NAME, MER_ID, AGENT_ID, AGENT_NAME, LOGOUT_STATUS, 
-    STATUS, BUS_NUM, BUS_PLATFORM, AG_DOC_DISTRICT, AG_DOC_PRO, BUS_CONTACT_PERSON, C_TIME, 
-    U_TIME, C_USER, U_USER, VERSION
+    ID, RENEW_ID, ICCID_NUM, INTERNET_CARD_STATUS, ORDER_ID, SN_NUM, INTERNET_CARD_NUM,
+    OPEN_ACCOUNT_TIME, EXPIRE_TIME, MER_NAME, MER_ID, AGENT_ID, AGENT_NAME, LOGOUT_STATUS,
+    STATUS, BUS_NUM, BUS_PLATFORM, AG_DOC_DISTRICT, AG_DOC_PRO, BUS_CONTACT_PERSON, C_TIME,
+    U_TIME, C_USER, U_USER, VERSION, ISSUER, FAIL_CAUSE, MOBILE_ORDER_NO
   </sql>
   <select id="selectByExample" parameterType="com.ryx.internet.pojo.InternetLogoutDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -80,7 +83,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from O_INTERNET_LOGOUT_DETAIL
     where ID = #{id,jdbcType=VARCHAR}
@@ -92,24 +95,26 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.internet.pojo.InternetLogoutDetail">
-    insert into O_INTERNET_LOGOUT_DETAIL (ID, RENEW_ID, ICCID_NUM, 
-      INTERNET_CARD_STATUS, ORDER_ID, SN_NUM, 
-      INTERNET_CARD_NUM, OPEN_ACCOUNT_TIME, EXPIRE_TIME, 
-      MER_NAME, MER_ID, AGENT_ID, 
-      AGENT_NAME, LOGOUT_STATUS, STATUS, 
-      BUS_NUM, BUS_PLATFORM, AG_DOC_DISTRICT, 
-      AG_DOC_PRO, BUS_CONTACT_PERSON, C_TIME, 
-      U_TIME, C_USER, U_USER, 
-      VERSION)
-    values (#{id,jdbcType=VARCHAR}, #{renewId,jdbcType=VARCHAR}, #{iccidNum,jdbcType=VARCHAR}, 
-      #{internetCardStatus,jdbcType=DECIMAL}, #{orderId,jdbcType=VARCHAR}, #{snNum,jdbcType=VARCHAR}, 
-      #{internetCardNum,jdbcType=VARCHAR}, #{openAccountTime,jdbcType=TIMESTAMP}, #{expireTime,jdbcType=TIMESTAMP}, 
-      #{merName,jdbcType=VARCHAR}, #{merId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
-      #{agentName,jdbcType=VARCHAR}, #{logoutStatus,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, 
-      #{busNum,jdbcType=VARCHAR}, #{busPlatform,jdbcType=VARCHAR}, #{agDocDistrict,jdbcType=VARCHAR}, 
-      #{agDocPro,jdbcType=VARCHAR}, #{busContactPerson,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, 
-      #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, 
-      #{version,jdbcType=DECIMAL})
+    insert into O_INTERNET_LOGOUT_DETAIL (ID, RENEW_ID, ICCID_NUM,
+    INTERNET_CARD_STATUS, ORDER_ID, SN_NUM,
+    INTERNET_CARD_NUM, OPEN_ACCOUNT_TIME, EXPIRE_TIME,
+    MER_NAME, MER_ID, AGENT_ID,
+    AGENT_NAME, LOGOUT_STATUS, STATUS,
+    BUS_NUM, BUS_PLATFORM, AG_DOC_DISTRICT,
+    AG_DOC_PRO, BUS_CONTACT_PERSON, C_TIME,
+    U_TIME, C_USER, U_USER,
+    VERSION, ISSUER, FAIL_CAUSE,
+    MOBILE_ORDER_NO)
+    values (#{id,jdbcType=VARCHAR}, #{renewId,jdbcType=VARCHAR}, #{iccidNum,jdbcType=VARCHAR},
+    #{internetCardStatus,jdbcType=DECIMAL}, #{orderId,jdbcType=VARCHAR}, #{snNum,jdbcType=VARCHAR},
+    #{internetCardNum,jdbcType=VARCHAR}, #{openAccountTime,jdbcType=TIMESTAMP}, #{expireTime,jdbcType=TIMESTAMP},
+    #{merName,jdbcType=VARCHAR}, #{merId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
+    #{agentName,jdbcType=VARCHAR}, #{logoutStatus,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
+    #{busNum,jdbcType=VARCHAR}, #{busPlatform,jdbcType=VARCHAR}, #{agDocDistrict,jdbcType=VARCHAR},
+    #{agDocPro,jdbcType=VARCHAR}, #{busContactPerson,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP},
+    #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR},
+    #{version,jdbcType=DECIMAL}, #{issuer,jdbcType=VARCHAR}, #{failCause,jdbcType=VARCHAR},
+    #{mobileOrderNo,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.internet.pojo.InternetLogoutDetail">
     insert into O_INTERNET_LOGOUT_DETAIL
@@ -189,6 +194,15 @@
       <if test="version != null">
         VERSION,
       </if>
+      <if test="issuer != null">
+        ISSUER,
+      </if>
+      <if test="failCause != null">
+        FAIL_CAUSE,
+      </if>
+      <if test="mobileOrderNo != null">
+        MOBILE_ORDER_NO,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -265,6 +279,15 @@
       </if>
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="issuer != null">
+        #{issuer,jdbcType=VARCHAR},
+      </if>
+      <if test="failCause != null">
+        #{failCause,jdbcType=VARCHAR},
+      </if>
+      <if test="mobileOrderNo != null">
+        #{mobileOrderNo,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -349,40 +372,52 @@
       <if test="version != null">
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
+      <if test="issuer != null">
+        ISSUER = #{issuer,jdbcType=VARCHAR},
+      </if>
+      <if test="failCause != null">
+        FAIL_CAUSE = #{failCause,jdbcType=VARCHAR},
+      </if>
+      <if test="mobileOrderNo != null">
+        MOBILE_ORDER_NO = #{mobileOrderNo,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.internet.pojo.InternetLogoutDetail">
     update O_INTERNET_LOGOUT_DETAIL
     set RENEW_ID = #{renewId,jdbcType=VARCHAR},
-      ICCID_NUM = #{iccidNum,jdbcType=VARCHAR},
-      INTERNET_CARD_STATUS = #{internetCardStatus,jdbcType=DECIMAL},
-      ORDER_ID = #{orderId,jdbcType=VARCHAR},
-      SN_NUM = #{snNum,jdbcType=VARCHAR},
-      INTERNET_CARD_NUM = #{internetCardNum,jdbcType=VARCHAR},
-      OPEN_ACCOUNT_TIME = #{openAccountTime,jdbcType=TIMESTAMP},
-      EXPIRE_TIME = #{expireTime,jdbcType=TIMESTAMP},
-      MER_NAME = #{merName,jdbcType=VARCHAR},
-      MER_ID = #{merId,jdbcType=VARCHAR},
-      AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
-      LOGOUT_STATUS = #{logoutStatus,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=DECIMAL},
-      BUS_NUM = #{busNum,jdbcType=VARCHAR},
-      BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
-      AG_DOC_DISTRICT = #{agDocDistrict,jdbcType=VARCHAR},
-      AG_DOC_PRO = #{agDocPro,jdbcType=VARCHAR},
-      BUS_CONTACT_PERSON = #{busContactPerson,jdbcType=VARCHAR},
-      C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      U_TIME = #{uTime,jdbcType=TIMESTAMP},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      U_USER = #{uUser,jdbcType=VARCHAR},
-      VERSION = #{version,jdbcType=DECIMAL}
+    ICCID_NUM = #{iccidNum,jdbcType=VARCHAR},
+    INTERNET_CARD_STATUS = #{internetCardStatus,jdbcType=DECIMAL},
+    ORDER_ID = #{orderId,jdbcType=VARCHAR},
+    SN_NUM = #{snNum,jdbcType=VARCHAR},
+    INTERNET_CARD_NUM = #{internetCardNum,jdbcType=VARCHAR},
+    OPEN_ACCOUNT_TIME = #{openAccountTime,jdbcType=TIMESTAMP},
+    EXPIRE_TIME = #{expireTime,jdbcType=TIMESTAMP},
+    MER_NAME = #{merName,jdbcType=VARCHAR},
+    MER_ID = #{merId,jdbcType=VARCHAR},
+    AGENT_ID = #{agentId,jdbcType=VARCHAR},
+    AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+    LOGOUT_STATUS = #{logoutStatus,jdbcType=VARCHAR},
+    STATUS = #{status,jdbcType=DECIMAL},
+    BUS_NUM = #{busNum,jdbcType=VARCHAR},
+    BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+    AG_DOC_DISTRICT = #{agDocDistrict,jdbcType=VARCHAR},
+    AG_DOC_PRO = #{agDocPro,jdbcType=VARCHAR},
+    BUS_CONTACT_PERSON = #{busContactPerson,jdbcType=VARCHAR},
+    C_TIME = #{cTime,jdbcType=TIMESTAMP},
+    U_TIME = #{uTime,jdbcType=TIMESTAMP},
+    C_USER = #{cUser,jdbcType=VARCHAR},
+    U_USER = #{uUser,jdbcType=VARCHAR},
+    VERSION = #{version,jdbcType=DECIMAL},
+    ISSUER = #{issuer,jdbcType=VARCHAR},
+    FAIL_CAUSE = #{failCause,jdbcType=VARCHAR},
+    MOBILE_ORDER_NO = #{mobileOrderNo,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
@@ -391,14 +426,13 @@
     </if>
   </sql>
 
-
   <sql id="internetCardLogoutDetailSql">
     select
     i.ID, i.RENEW_ID, i.ICCID_NUM, i.INTERNET_CARD_STATUS, i.ORDER_ID, i.SN_NUM, i.INTERNET_CARD_NUM,
     i.OPEN_ACCOUNT_TIME, i.EXPIRE_TIME, i.MER_NAME, i.MER_ID, i.AGENT_ID, i.AGENT_NAME, i.LOGOUT_STATUS,
     i.STATUS, i.BUS_NUM, i.BUS_PLATFORM, i.AG_DOC_DISTRICT, i.AG_DOC_PRO, i.BUS_CONTACT_PERSON, i.C_TIME,
     i.U_TIME, i.C_USER, i.U_USER,oa.name as AG_DOC_PRO_NAME,ob.name as AG_DOC_DISTRICT_NAME,l.REVIEW_STATUS,
-    l.REVIEW_PASS_TIME
+    l.REVIEW_PASS_TIME,ISSUER, FAIL_CAUSE, MOBILE_ORDER_NO
     from O_INTERNET_LOGOUT_DETAIL i
     left join O_INTERNET_LOGOUT l on l.id = i.RENEW_ID
     left join C_ORGANIZATION oa on oa.id=i.ag_doc_pro
@@ -418,34 +452,55 @@
         and (oa.CODE like concat(#{orgCode},'%') or ob.CODE like concat(#{orgCode},'%'))
       </if>
       <if test="id != null">
-        and i.id = #{id}
+        and i.id like concat(#{id},'%')
       </if>
       <if test="agentId != null">
-        and i.agent_Id = #{agentId}
+        and i.agent_Id like concat(#{agentId},'%')
       </if>
       <if test="agentName != null">
-        and i.agent_Name = #{agentName}
+        and i.agent_Name like concat(#{agentName},'%')
       </if>
       <if test="busNum != null">
-        and i.bus_Num = #{busNum}
+        and i.bus_Num like concat(#{busNum},'%')
       </if>
       <if test="iccidNum != null">
-        and i.iccid_Num = #{iccidNum}
+        and i.iccid_Num like concat(#{iccidNum},'%')
       </if>
       <if test="renewId != null">
-        and i.renew_Id = #{renewId}
+        and i.renew_Id like concat(#{renewId},'%')
       </if>
       <if test="snNum != null">
-        and i.sn_Num = #{snNum}
+        and i.sn_Num like concat(#{snNum},'%')
       </if>
       <if test="merId != null">
-        and i.mer_Id = #{merId}
+        and i.mer_Id like concat(#{merId},'%')
       </if>
       <if test="merName != null">
-        and i.mer_Name = #{merName}
+        and i.mer_Name like concat(#{merName},'%')
       </if>
       <if test="logoutStatus != null">
         and i.logout_status = #{logoutStatus}
+      </if>
+      <if test="internetCardNum != null">
+        and i.internet_card_num like concat(#{internetCardNum},'%')
+      </if>
+      <if test="issuer != null">
+        and i.issuer = #{issuer}
+      </if>
+      <if test="reviewStatus != null">
+        and l.review_status = #{reviewStatus}
+      </if>
+      <if test="beginCTime != null">
+        <![CDATA[ and i.c_time >= to_date(#{beginCTime},'yyyy-mm-dd hh24:mi:ss') ]]>
+      </if>
+      <if test="endCTime != null">
+        <![CDATA[ and i.c_time <= to_date(#{endCTime},'yyyy-mm-dd hh24:mi:ss') ]]>
+      </if>
+      <if test="beginSnNum != null">
+        <![CDATA[  and i.sn_Num >= #{beginSnNum}  ]]>
+      </if>
+      <if test="endSnNum != null">
+        <![CDATA[  and i.sn_Num <= #{endSnNum} ]]>
       </if>
     </where>
     order by c_time desc
