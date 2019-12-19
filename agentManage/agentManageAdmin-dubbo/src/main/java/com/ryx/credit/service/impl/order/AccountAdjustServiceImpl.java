@@ -67,7 +67,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
         oneTakeoutRecord.put("orderId", payment.getOrderId());
         oneTakeoutRecord.put("paymentId", payment.getId());
         oneTakeoutRecord.put("payType", payment.getPayMethod());
-        oneTakeoutRecord.put("payAmt", thisPaymentOutstandingAmt);
+        oneTakeoutRecord.put("payAmt", thisPaymentOutstandingAmt.setScale(2));
         oneTakeoutRecord.put("payment", payment);
         return oneTakeoutRecord;
     }
@@ -206,6 +206,12 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                                     outPlanNum = outPlanNum + 1;
                                     if (startTime == null) {
                                         startTime = detail.getPlanPayTime();
+                                        Calendar calendar = Calendar.getInstance();
+                                        if (adjustType.equals(String.valueOf(AdjustType.ORDER_ADJ.adjustType))){
+                                            calendar.setTime(detail.getPlanPayTime());
+                                            calendar.add(Calendar.MONTH, -1);
+                                        }
+                                        startTime = calendar.getTime();
                                         startPlanNum = detail.getPlanNum().subtract(BigDecimal.ONE);
                                     }
                                 }
@@ -298,7 +304,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
             //if (leftAmt.compareTo(BigDecimal.ZERO) > 0) {
             refundAgent.setRefundType(adjustType);
             refundAgent.setSrcId(srcId);
-            refundAgent.setRefundAmount(leftAmt);
+            refundAgent.setRefundAmount(leftAmt.setScale(2));
             refundAgent.setAgentId(agentId);
             refundAgent.setcUser(userid);
             result.put("refund", refundAgent);
@@ -368,7 +374,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
             //抵扣欠款金额
             BigDecimal takeAmt = BigDecimal.ZERO;
             takeAmt = adjustAmt.subtract(leftAmt);
-            result.put("takeAmt", takeAmt);
+            result.put("takeAmt", takeAmt.setScale(2));
             result.put("realreturnAmt", leftAmt);
             //更新退货表
             if (isRealAdjust && adjustType.equals(AdjustType.TKTH.adjustType)) {
