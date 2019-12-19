@@ -842,7 +842,7 @@
             LEFT JOIN o_order o
             ON o.id = oad.order_id
             WHERE oad.id = #{adjId})and
-            pd.PAY_TYPE in ('FRFQ', 'DKFQ','DK','SF') andopd.PAYMENT_STATUS in (1, 2, 3) and
+            opd.PAY_TYPE in ('FRFQ', 'DKFQ','DK','SF') and opd.PAYMENT_STATUS in (1, 2, 3) and
             opd.PAYMENT_TYPE = 'ORDER_FKD' and od.order_status = '2' and opd.status = '1'
         order by plan_pay_time asc
     </select>
@@ -870,8 +870,8 @@
                opd.O_PD_SUM_ID
         FROM O_PAYMENT_DETAIL opd
         WHERE
-             PAYMENT_ID = #{paymentId} and pd.PAY_TYPE in ('FRFQ', 'DKFQ','DK','SF') and opd.PAYMENT_STATUS in (1, 2, 3) and
-            opd.PAYMENT_TYPE = 'ORDER_FKD'  and opd.status = '1'
+             PAYMENT_ID = #{paymentId} and opd.PAY_TYPE in ('FRFQ', 'DKFQ','DK','SF') and opd.PAYMENT_STATUS in (1, 2, 3)
+          and opd.PAYMENT_TYPE = 'ORDER_FKD'  and opd.status = '1'
         order by plan_pay_time asc
     </select>
 </mapper>
