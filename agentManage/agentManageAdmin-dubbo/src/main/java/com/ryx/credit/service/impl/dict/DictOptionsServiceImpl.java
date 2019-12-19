@@ -96,13 +96,14 @@ public class DictOptionsServiceImpl implements DictOptionsService {
         return platForm;
     }
 
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
-    public boolean insertDict(Dict dict, @Param("tableName") String tableName) {
-        if (StringUtils.isEmpty(dict.getdGroup())) dict.setdGroup(dictMapper.sqlId(tableName) + "");
-        if (1 == dictMapper.insertDict(dict)) {
+    public boolean insertDict(Dict dict) throws Exception {
+        int insertDict = dictMapper.insertDict(dict);
+        if (1 == insertDict) {
             return true;
         } else {
-            return false;
+            throw new Exception("添加失败！");
         }
     }
 

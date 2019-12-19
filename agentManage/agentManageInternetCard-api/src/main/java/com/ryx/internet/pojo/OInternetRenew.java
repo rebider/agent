@@ -257,4 +257,35 @@ public class OInternetRenew implements Serializable{
     public void setVersion(BigDecimal version) {
         this.version = version;
     }
+
+    @Override
+    public String toString() {
+        return "OInternetRenew{" +
+                "id='" + id + '\'' +
+                ", renewWay='" + renewWay + '\'' +
+                ", renewCardCount=" + renewCardCount +
+                ", sumOffsetAmt=" + sumOffsetAmt +
+                ", suppAmt=" + suppAmt +
+                ", reviewStatus=" + reviewStatus +
+                ", reviewPassTime=" + reviewPassTime +
+                ", applyRemark='" + applyRemark + '\'' +
+                ", cTime=" + cTime +
+                ", uTime=" + uTime +
+                ", cUser='" + cUser + '\'' +
+                ", uUser='" + uUser + '\'' +
+                ", status=" + status +
+                ", version=" + version +
+                ", agentId='" + agentId + '\'' +
+                ", agentName='" + agentName + '\'' +
+                ", files='" + files + '\'' +
+                ", iccidNumIds='" + iccidNumIds + '\'' +
+                ", renewWayName='" + renewWayName + '\'' +
+                ", busNum='" + busNum + '\'' +
+                ", busPlatform='" + busPlatform + '\'' +
+                ", agDocDistrict='" + agDocDistrict + '\'' +
+                ", agDocPro='" + agDocPro + '\'' +
+                ", busContactPerson='" + busContactPerson + '\'' +
+                ", attachmentList=" + attachmentList +
+                '}';
+    }
 }

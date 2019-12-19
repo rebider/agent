@@ -22,7 +22,7 @@ public interface DictOptionsService {
 
     Dict selectByPrimaryKey(String id);
 
-    boolean insertDict(Dict dict, @Param("tableName")String tableName);
+    boolean insertDict(Dict dict) throws Exception;
 
     int updateByPrimaryKeySelective(Dict record);  // 删除（编辑）状态
 

@@ -68,7 +68,28 @@ public class TerminalTransferDetail implements Serializable{
     private String goalType;
 
     private String originalType;
+
     private String isNoPay;
+
+    private String originalOrgIdS;
+
+    private String goalOrgIdS;
+
+    public String getOriginalOrgIdS() {
+        return originalOrgIdS;
+    }
+
+    public void setOriginalOrgIdS(String originalOrgIdS) {
+        this.originalOrgIdS = originalOrgIdS;
+    }
+
+    public String getGoalOrgIdS() {
+        return goalOrgIdS;
+    }
+
+    public void setGoalOrgIdS(String goalOrgIdS) {
+        this.goalOrgIdS = goalOrgIdS;
+    }
 
     public String getIsNoPay() {
         return isNoPay;

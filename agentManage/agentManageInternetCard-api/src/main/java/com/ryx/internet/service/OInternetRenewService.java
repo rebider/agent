@@ -41,7 +41,7 @@ public interface OInternetRenewService {
 
     void approveTashBusiness(AgentVo agentVo, String userId) throws Exception;
 
-    AgentResult compressCompensateActivity(String proIns, BigDecimal agStatus)throws Exception;
+    AgentResult compressCompensateActivity(String proIns, BigDecimal agStatus,String reqType,OInternetRenew oInternetRenew)throws Exception;
 
     List<OInternetRenewDetail> queryInternetRenewDetailList(OInternetRenewDetail internetRenewDetail, Page page,String agentId,Long userId);
 

@@ -319,5 +319,7 @@ select distinct nvl(BUS_NUM, '-') BUS_NUM
      select * from A_PLATFORM a  where a.PLATFORM_NUM=#{PLATFORM_NUM}
   </select>
 
-
+  <select id="queryBusInfo" resultType="java.util.Map" parameterType="java.util.Map">
+     select AGENT_ID,BUS_TYPE,BUS_NUM,BUS_PLATFORM from A_AGENT_BUSINFO  where POS_PLAT_CODE = #{POS_PLAT_CODE} and STATUS=1  and BUS_STATUS in('1','2')
+  </select>
 </mapper>

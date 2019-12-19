@@ -329,6 +329,9 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 							if(!RegexUtil.checkInt(agentBusInfoVo.getBusLoginNum())){
 								throw new ProcessException("平台登录账号必须是数字");
 							}
+							if(agentBusInfoVo.getBusLoginNum().length()!=11){
+								throw new ProcessException("手机位数不正确");
+							}
 						}
 						if(PlatformType.RHPOS.code.equals(platformType.code)){
 							if (StringUtils.isEmpty(agentBusInfoVo.getBusLoginNum())){
@@ -337,6 +340,9 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 							}
 							if(!RegexUtil.checkInt(agentBusInfoVo.getBusLoginNum())){
 								throw new ProcessException("平台登录账号必须是数字");
+							}
+							if(agentBusInfoVo.getBusLoginNum().length()!=11){
+								throw new ProcessException("手机位数不正确");
 							}
 						}
 						//判断所选机构是否属于所选平台（机构编号&业务平台）
@@ -1145,6 +1151,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 		return agentBusInfo;
 	}
+
 
 
 	@Override

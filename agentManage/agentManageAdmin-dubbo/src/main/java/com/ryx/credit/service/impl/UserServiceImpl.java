@@ -189,9 +189,9 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
                     stringObjectMap.put("ppidorgcodeisRegion",true);
                 }else {
                     if("beijing".equals(ppidorgcode)){
-                        stringObjectMap.put("ppidisRegion",true);
+                        stringObjectMap.put("ppidorgcodeisRegion",true);
                     }else{
-                        stringObjectMap.put("ppidisRegion",false);
+                        stringObjectMap.put("ppidorgcodeisRegion",false);
                     }
                 }
             }

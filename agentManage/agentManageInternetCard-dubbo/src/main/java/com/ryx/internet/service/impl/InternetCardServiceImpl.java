@@ -78,6 +78,10 @@ public class InternetCardServiceImpl implements InternetCardService {
     private AgentBusinfoService agentBusinfoService;
     @Autowired
     private PlatFormService platFormService;
+    @Autowired
+    private InternetLogoutDetailMapper internetLogoutDetailMapper;
+
+
 
     @Override
     public PageInfo internetCardList(OInternetCard internetCard, Page page,String agentId,Long userId){
@@ -87,9 +91,6 @@ public class InternetCardServiceImpl implements InternetCardService {
         oInternetCardExample.setPage(page);
         List<OInternetCard> oInternetCards = internetCardMapper.internetCardList(oInternetCardExample);
         for (OInternetCard oInternetCard : oInternetCards) {
-            Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),oInternetCard.getManufacturer());
-            if(null!=dict)
-            oInternetCard.setManufacturer(dict.getdItemname());
             oInternetCard.setIccidNumId(oInternetCard.getIccidNum());
             if(null==oInternetCard.getInternetCardStatus()){
                 oInternetCard.setRenewButton("0");
@@ -221,14 +222,17 @@ public class InternetCardServiceImpl implements InternetCardService {
             Date format = DateUtil.format(internetCard.getOpenAccountTimeEndStr(), DateUtil.DATE_FORMAT_yyyy_MM_dd);
             criteria.andOpenAccountTimeLessThanOrEqualTo(format);
         }
-        if(StringUtils.isNotBlank(internetCard.getExpireTimeBeginStr())){
-            Date format = DateUtil.format(internetCard.getExpireTimeBeginStr(), DateUtil.DATE_FORMAT_yyyy_MM_dd);
-            criteria.andExpireTimeGreaterThanOrEqualTo(format);
+        if(StringUtils.isNotBlank(internetCard.getExpireTimeBeginStr()) && StringUtils.isNotBlank(internetCard.getExpireTimeEndStr())){
+            Date begin = DateUtil.format(internetCard.getExpireTimeBeginStr(), DateUtil.DATE_FORMAT_yyyy_MM_dd);
+            Date end = DateUtil.format(internetCard.getExpireTimeEndStr(), DateUtil.DATE_FORMAT_yyyy_MM_dd);
+            criteria.andExpireTimeBetween(begin,end);
         }
-        if(StringUtils.isNotBlank(internetCard.getExpireTimeEndStr())){
-            Date format = DateUtil.format(internetCard.getExpireTimeEndStr(), DateUtil.DATE_FORMAT_yyyy_MM_dd);
-            criteria.andExpireTimeLessThanOrEqualTo(format);
-        }
+//        else{
+//            Date begin = DateUtil.format(DateUtil.getFirstDayOfMonth(DateUtil.getYearMonthOfMonthType(0, "Year"),DateUtil.getYearMonthOfMonthType(0, "Month")),DateUtil.DATE_FORMAT_yyyy_MM_dd);
+//            Date end = DateUtil.format(DateUtil.getLastDayOfMonth(DateUtil.getYearMonthOfMonthType(3, "Year"),DateUtil.getYearMonthOfMonthType(3, "Month")), DateUtil.DATE_FORMAT_yyyy_MM_dd);
+//            criteria.andExpireTimeBetween(begin,end);
+//        }
+
         List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
         if(orgCodeRes==null && orgCodeRes.size()!=1){
             return null;
@@ -248,7 +252,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             criteria.andAgentNameLike("%"+internetCard.getAgentName()+"%");
         }
         oInternetCardExample.setReqMap(reqMap);
-        oInternetCardExample.setOrderByClause(" c_time,expire_time desc ");
+//        oInternetCardExample.setOrderByClause("expire_time asc ");
         return oInternetCardExample;
     }
 
@@ -455,6 +459,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                         internetCardImportMapper.insert(oInternetCardImport);
                     }
                 }catch (Exception e) {
+                    AppConfig.sendEmails(MailUtil.printStackTrace(e), "流量卡导入出现异常");
                     e.printStackTrace();
                 }
             }
@@ -592,7 +597,8 @@ public class InternetCardServiceImpl implements InternetCardService {
                 //更新导入记录
                 try {
                     updateInternetCardImport(oInternetCardImport);
-                } catch (MessageException e1) {
+                } catch (Exception e1) {
+                    AppConfig.sendEmails(MailUtil.printStackTrace(e1), "流量卡导入出现异常,analysisImport方法1");
                 }
             } catch (Exception e) {
                 log.info("analysisImport处理导入表数据,Exception:{}",e.getLocalizedMessage());
@@ -603,6 +609,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                 try {
                     updateInternetCardImport(oInternetCardImport);
                 } catch (MessageException e1) {
+                    AppConfig.sendEmails(MailUtil.printStackTrace(e1), "流量卡导入出现异常,analysisImport方法2");
                     e1.printStackTrace();
                 }
             }
@@ -679,7 +686,8 @@ public class InternetCardServiceImpl implements InternetCardService {
             internetCard.setRenew(BigDecimal.ZERO);
             internetCard.setStop(BigDecimal.ZERO);
         }
-        if(internetCard.getInternetCardStatus()!=null && internetCard.getInternetCardStatus().compareTo(InternetCardStatus.STOP.getValue())==0){
+        if(internetCard.getInternetCardStatus()!=null && (internetCard.getInternetCardStatus().compareTo(InternetCardStatus.STOP.getValue())==0
+            || internetCard.getInternetCardStatus().compareTo(InternetCardStatus.LOGOUT.getValue())==0)){
             internetCard.setRenew(BigDecimal.ZERO);
             internetCard.setStop(BigDecimal.ZERO);
         }
@@ -704,6 +712,35 @@ public class InternetCardServiceImpl implements InternetCardService {
             internetCard.setcUser(oInternetCardImport.getcUser());
             insertInternetCard(internetCard);
         }else{
+            //如果之前是注销状态，不能在导入其他状态
+            if(oInternetCard.getInternetCardStatus()!=null && oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.LOGOUT.getValue())==0){
+                if(null!=internetCard.getInternetCardStatus()){
+                    oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
+                    oInternetCardImport.setErrorMsg("卡状态已是注销,不可在更新状态");
+                    //更新导入记录
+                    updateInternetCardImport(oInternetCardImport);
+                    return;
+                }
+            }
+            if(internetCard.getInternetCardStatus()!=null && internetCard.getInternetCardStatus().compareTo(InternetCardStatus.LOGOUT.getValue())==0){
+                InternetLogoutDetailExample internetLogoutDetailExample = new InternetLogoutDetailExample();
+                InternetLogoutDetailExample.Criteria criteria = internetLogoutDetailExample.createCriteria();
+                criteria.andStatusEqualTo(Status.STATUS_1.status);
+                criteria.andIccidNumEqualTo(internetCard.getIccidNum());
+                criteria.andLogoutStatusEqualTo(InternetLogoutStatus.DZX.getValue());
+                List<InternetLogoutDetail> internetLogoutDetails = internetLogoutDetailMapper.selectByExample(internetLogoutDetailExample);
+                for (InternetLogoutDetail internetLogoutDetail : internetLogoutDetails) {
+                    internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.ZXCG.getValue());
+                    int i = internetLogoutDetailMapper.updateByPrimaryKey(internetLogoutDetail);
+                    if(i!=1){
+                        oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
+                        oInternetCardImport.setErrorMsg("注销更新记录失败");
+                        //更新导入记录
+                        updateInternetCardImport(oInternetCardImport);
+                        return;
+                    }
+                }
+            }
             updateInternetCard(internetCard);
         }
         oInternetCardImport.setImportStatus(OInternetCardImportStatus.SUCCESS.getValue());
@@ -895,7 +932,6 @@ public class InternetCardServiceImpl implements InternetCardService {
             reqMap.put("renew",Status.STATUS_0.status);//否
             reqMap.put("newRenew",Status.STATUS_1.status);//是续费
 //            reqMap.put("internetCardStatus",InternetCardStatus.NORMAL.getValue());
-
             List<String> expireTimeList = new ArrayList<>();
             expireTimeList.add(DateUtil.getPerDayOfMonth(0));
             expireTimeList.add(DateUtil.getPerDayOfMonth(1));
@@ -905,35 +941,53 @@ public class InternetCardServiceImpl implements InternetCardService {
             List<OInternetCard> oInternetCards = internetCardMapper.selectInternetCardRenew(reqMap);
             log.info("更新已修改的商户信息数量:{}",oInternetCards.size());
             for (OInternetCard oInternetCard : oInternetCards) {
-                OInternetCardMerch oInternetCardMerch = internetCardMerchMapper.selectChnTermposi(BigDataEncode.encode(oInternetCard.getIccidNum()));
-                if(null!=oInternetCardMerch){
-                    //之前未获取当商户信息的直接更新
-                    if(StringUtils.isBlank(oInternetCard.getMerId()) || StringUtils.isBlank(oInternetCard.getMerName())){
-                        oInternetCard.setMerId(oInternetCardMerch.getChnMerchId());
-                        oInternetCard.setMerName(oInternetCardMerch.getMerchName());
+                try {
+                    log.info("更新已修改的商户信息,OInternetCard:{}",oInternetCard.toString());
+                    OInternetCardMerch oInternetCardMerch = internetCardMerchMapper.selectChnTermposi(BigDataEncode.encode(oInternetCard.getIccidNum()));
+                    if(null!=oInternetCardMerch){
+                        log.info("更新已修改的商户信息,OInternetCardMerch:{}",oInternetCardMerch.toString());
+                        //之前未获取当商户信息的直接更新
+                        if(StringUtils.isBlank(oInternetCard.getMerId()) || StringUtils.isBlank(oInternetCard.getMerName())){
+                            oInternetCard.setMerId(oInternetCardMerch.getChnMerchId());
+                            oInternetCard.setMerName(oInternetCardMerch.getMerchName());
+                            log.info("更新已修改的商户信息,1:{}",oInternetCard.getIccidNum());
+                        }
+                        else if(StringUtils.isNotBlank(oInternetCardMerch.getChnMerchId()) && StringUtils.isNotBlank(oInternetCardMerch.getMerchName()) &&
+                               (!oInternetCardMerch.getChnMerchId().equals(oInternetCard.getMerId()) || !oInternetCardMerch.getMerchName().equals(oInternetCard.getMerName()))){
+                            oInternetCard.setMerId(oInternetCardMerch.getChnMerchId());
+                            oInternetCard.setMerName(oInternetCardMerch.getMerchName());
+                            log.info("更新已修改的商户信息,2:{}",oInternetCard.getIccidNum());
+                        }
+                        else if(StringUtils.isNotBlank(oInternetCardMerch.getChnMerchId()) && !oInternetCardMerch.getChnMerchId().equals(oInternetCard.getMerId())){
+                            oInternetCard.setMerId(oInternetCardMerch.getChnMerchId());
+                            oInternetCard.setMerName("无");
+                            log.info("更新已修改的商户信息,3:{}",oInternetCard.getIccidNum());
+                        }
+                        else if(StringUtils.isNotBlank(oInternetCardMerch.getMerchName()) && !oInternetCardMerch.getMerchName().equals(oInternetCard.getMerName())){
+                            oInternetCard.setMerId("无");
+                            oInternetCard.setMerName(oInternetCardMerch.getMerchName());
+                            log.info("更新已修改的商户信息,4:{}",oInternetCard.getIccidNum());
+                        }else{
+                            log.info("更新已修改的商户信息,已是最新数据:{}",oInternetCard.getIccidNum());
+                            continue;
+                        }
                         int i = internetCardMapper.updateByPrimaryKeySelectiveNotNull(oInternetCard);
                         if(i!=1){
-                            log.error("1定时任务更新商户信息失败:IccidNum:{},商户编号:{},商户名称:{}",oInternetCard.getIccidNum(),oInternetCardMerch.getChnMerchId(),oInternetCardMerch.getMerchName());
+                            log.error("更新已修改的商户信息失败:IccidNum:{},商户编号:{},商户名称:{}",oInternetCard.getIccidNum(),oInternetCardMerch.getChnMerchId(),oInternetCardMerch.getMerchName());
                         }
-                        log.info("更新息已修改的商户信息1,iccid:{}",oInternetCard.getIccidNum());
+                        log.info("更新已修改的商户信息成功,iccid:{}",oInternetCard.getIccidNum());
                         continue;
                     }
-                    //只要有一个不相等就执行更新操作
-                    if(!oInternetCardMerch.getChnMerchId().equals(oInternetCard.getMerId()) || !oInternetCardMerch.getMerchName().equals(oInternetCard.getMerName())){
-                        oInternetCard.setMerId(oInternetCardMerch.getChnMerchId());
-                        oInternetCard.setMerName(oInternetCardMerch.getMerchName());
-                        int i = internetCardMapper.updateByPrimaryKeySelectiveNotNull(oInternetCard);
-                        if(i!=1){
-                            log.error("2定时任务更新商户信息失败:IccidNum:{},商户编号:{},商户名称:{}",oInternetCard.getIccidNum(),oInternetCardMerch.getChnMerchId(),oInternetCardMerch.getMerchName());
-                        }
-                        log.info("更新息已修改的商户信息2,iccid:{}",oInternetCard.getIccidNum());
-                        continue;
-                    }
+                } catch (Exception e) {
+                    log.info("更新已修改的商户信息异常,iccid:{}",oInternetCard.getIccidNum());
+                    AppConfig.sendEmails(MailUtil.printStackTrace(e), "更新已修改的商户信息出现异常,taskUpdateMech方法");
+                    e.printStackTrace();
                 }
             }
             long t2 = System.currentTimeMillis();
             log.info("更新已修改的商户信息，处理时间:{} ms", (t2 - t1));
         } catch (Exception e) {
+            AppConfig.sendEmails(MailUtil.printStackTrace(e), "更新已修改的商户信息出现异常,taskUpdateMech方法2");
             e.printStackTrace();
         }
     }
@@ -994,6 +1048,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                 log.error("为空定时任务更新商户信息失败:IccidNum:{},商户编号:{},商户名称:{}",internetCard.getIccidNum(),oInternetCardMerch.getChnMerchId(),oInternetCardMerch.getMerchName());
             }
         } catch (Exception e) {
+            AppConfig.sendEmails(MailUtil.printStackTrace(e), "为空定时任务更新商户信息出现异常,processDataUpdateMechIsNull方法");
             e.printStackTrace();
         }
     }
@@ -1038,6 +1093,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                 }
                 int i = internetCardMapper.updateByPrimaryKeySelective(internetCard);
                 if(i!=1){
+                    AppConfig.sendEmails("订单发货流量卡信息更新失败", "订单发货流量卡信息更新出现异常,orderInsertInternetCard方法");
                     throw new MessageException("订单发货流量卡信息更新失败");
                 }
                 log.info("订单发货同步到流量卡更新结束:i:{}",i);
@@ -1085,7 +1141,7 @@ public class InternetCardServiceImpl implements InternetCardService {
         OInternetCardImportExample.Criteria criteria = oInternetCardImportExample.createCriteria();
         Date dateAfter = DateUtil.getDateAfterReturnDate(new Date(), -5);
         criteria.andCTimeLessThanOrEqualTo(dateAfter);
-        oInternetCardImportExample.setPage(new Page(0,100));
+        oInternetCardImportExample.setPage(new Page(0,10000));
         List<OInternetCardImport> oInternetCardImports = internetCardImportMapper.selectByExample(oInternetCardImportExample);
         log.info("查询要迁移的数据个数{}",oInternetCardImports.size());
         return oInternetCardImports;
@@ -1109,6 +1165,7 @@ public class InternetCardServiceImpl implements InternetCardService {
         criteria.andIdEqualTo(oInternetCardImport.getId());
         int i = internetCardImportMapper.deleteByExample(internetCardImportExample);
         if(i!=1){
+            AppConfig.sendEmails("","导入迁移到历史表出现异常,migrationHistory方法");
             throw new MessageException("删除失败");
         }
     }

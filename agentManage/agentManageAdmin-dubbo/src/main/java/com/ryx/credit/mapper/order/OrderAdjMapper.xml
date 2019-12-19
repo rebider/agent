@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.order.OrderAdjMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.OrderAdj">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="ORDER_ID" jdbcType="VARCHAR" property="orderId" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="ADJ_USER_ID" jdbcType="VARCHAR" property="adjUserId" />
+    <result column="ORG_O_AMO" jdbcType="DECIMAL" property="orgOAmo" />
+    <result column="ORG_INCENTIVE_AMO" jdbcType="DECIMAL" property="orgIncentiveAmo" />
+    <result column="ORG_PAY_AMO" jdbcType="DECIMAL" property="orgPayAmo" />
+    <result column="O_AMO" jdbcType="DECIMAL" property="oAmo" />
+    <result column="INCENTIVE_AMO" jdbcType="DECIMAL" property="incentiveAmo" />
+    <result column="PAY_AMO" jdbcType="DECIMAL" property="payAmo" />
+    <result column="RESON" jdbcType="VARCHAR" property="reson" />
+    <result column="REFUND_AMOUNT" jdbcType="DECIMAL" property="refundAmount" />
+    <result column="REFUND_TYPE" jdbcType="DECIMAL" property="refundType" />
+    <result column="REFUND_STAT" jdbcType="DECIMAL" property="refundStat" />
+    <result column="ORG_PAYMENT_ID" jdbcType="VARCHAR" property="orgPaymentId" />
+    <result column="NEW_PAYMENT_ID" jdbcType="VARCHAR" property="newPaymentId" />
+    <result column="REVIEWS_STAT" jdbcType="DECIMAL" property="reviewsStat" />
+    <result column="REVIEWS_DATE" jdbcType="TIMESTAMP" property="reviewsDate" />
+    <result column="ADJ_TM" jdbcType="TIMESTAMP" property="adjTm" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="ORG_PLAN_NUM" jdbcType="DECIMAL" property="orgPlanNum" />
+    <result column="STAGES_AMOUNT" jdbcType="DECIMAL" property="stagesAmount" />
+    <result column="REFUND_TM" jdbcType="TIMESTAMP" property="refundTm" />
+    <result column="SETTLE_AMOUNT" jdbcType="DECIMAL" property="settleAmount" />
+    <result column="REAL_REFUND_AMO" jdbcType="DECIMAL" property="realRefundAmo" />
+    <result column="REFUND_METHOD" jdbcType="DECIMAL" property="refundMethod" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, ORDER_ID, AGENT_ID, ADJ_USER_ID, ORG_O_AMO, ORG_INCENTIVE_AMO, ORG_PAY_AMO, O_AMO, 
+    INCENTIVE_AMO, PAY_AMO, RESON, REFUND_AMOUNT, REFUND_TYPE, REFUND_STAT, ORG_PAYMENT_ID, 
+    NEW_PAYMENT_ID, REVIEWS_STAT, REVIEWS_DATE, ADJ_TM, STATUS, VERSION, ORG_PLAN_NUM, 
+    STAGES_AMOUNT, REFUND_TM, SETTLE_AMOUNT, REAL_REFUND_AMO, REFUND_METHOD
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from O_ORDER_ADJ
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from O_ORDER_ADJ
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjExample">
+    delete from O_ORDER_ADJ
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OrderAdj">
+    insert into O_ORDER_ADJ (ID, ORDER_ID, AGENT_ID, 
+      ADJ_USER_ID, ORG_O_AMO, ORG_INCENTIVE_AMO, 
+      ORG_PAY_AMO, O_AMO, INCENTIVE_AMO, 
+      PAY_AMO, RESON, REFUND_AMOUNT, 
+      REFUND_TYPE, REFUND_STAT, ORG_PAYMENT_ID, 
+      NEW_PAYMENT_ID, REVIEWS_STAT, REVIEWS_DATE, 
+      ADJ_TM, STATUS, VERSION, 
+      ORG_PLAN_NUM, STAGES_AMOUNT, REFUND_TM, 
+      SETTLE_AMOUNT, REAL_REFUND_AMO, REFUND_METHOD
+      )
+    values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
+      #{adjUserId,jdbcType=VARCHAR}, #{orgOAmo,jdbcType=DECIMAL}, #{orgIncentiveAmo,jdbcType=DECIMAL}, 
+      #{orgPayAmo,jdbcType=DECIMAL}, #{oAmo,jdbcType=DECIMAL}, #{incentiveAmo,jdbcType=DECIMAL}, 
+      #{payAmo,jdbcType=DECIMAL}, #{reson,jdbcType=VARCHAR}, #{refundAmount,jdbcType=DECIMAL}, 
+      #{refundType,jdbcType=DECIMAL}, #{refundStat,jdbcType=DECIMAL}, #{orgPaymentId,jdbcType=VARCHAR}, 
+      #{newPaymentId,jdbcType=VARCHAR}, #{reviewsStat,jdbcType=DECIMAL}, #{reviewsDate,jdbcType=TIMESTAMP}, 
+      #{adjTm,jdbcType=TIMESTAMP}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, 
+      #{orgPlanNum,jdbcType=DECIMAL}, #{stagesAmount,jdbcType=DECIMAL}, #{refundTm,jdbcType=TIMESTAMP}, 
+      #{settleAmount,jdbcType=DECIMAL}, #{realRefundAmo,jdbcType=DECIMAL}, #{refundMethod,jdbcType=DECIMAL}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OrderAdj">
+    insert into O_ORDER_ADJ
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="orderId != null">
+        ORDER_ID,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="adjUserId != null">
+        ADJ_USER_ID,
+      </if>
+      <if test="orgOAmo != null">
+        ORG_O_AMO,
+      </if>
+      <if test="orgIncentiveAmo != null">
+        ORG_INCENTIVE_AMO,
+      </if>
+      <if test="orgPayAmo != null">
+        ORG_PAY_AMO,
+      </if>
+      <if test="oAmo != null">
+        O_AMO,
+      </if>
+      <if test="incentiveAmo != null">
+        INCENTIVE_AMO,
+      </if>
+      <if test="payAmo != null">
+        PAY_AMO,
+      </if>
+      <if test="reson != null">
+        RESON,
+      </if>
+      <if test="refundAmount != null">
+        REFUND_AMOUNT,
+      </if>
+      <if test="refundType != null">
+        REFUND_TYPE,
+      </if>
+      <if test="refundStat != null">
+        REFUND_STAT,
+      </if>
+      <if test="orgPaymentId != null">
+        ORG_PAYMENT_ID,
+      </if>
+      <if test="newPaymentId != null">
+        NEW_PAYMENT_ID,
+      </if>
+      <if test="reviewsStat != null">
+        REVIEWS_STAT,
+      </if>
+      <if test="reviewsDate != null">
+        REVIEWS_DATE,
+      </if>
+      <if test="adjTm != null">
+        ADJ_TM,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="version != null">
+        VERSION,
+      </if>
+      <if test="orgPlanNum != null">
+        ORG_PLAN_NUM,
+      </if>
+      <if test="stagesAmount != null">
+        STAGES_AMOUNT,
+      </if>
+      <if test="refundTm != null">
+        REFUND_TM,
+      </if>
+      <if test="settleAmount != null">
+        SETTLE_AMOUNT,
+      </if>
+      <if test="realRefundAmo != null">
+        REAL_REFUND_AMO,
+      </if>
+      <if test="refundMethod != null">
+        REFUND_METHOD,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="orderId != null">
+        #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="adjUserId != null">
+        #{adjUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="orgOAmo != null">
+        #{orgOAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="orgIncentiveAmo != null">
+        #{orgIncentiveAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="orgPayAmo != null">
+        #{orgPayAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="oAmo != null">
+        #{oAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="incentiveAmo != null">
+        #{incentiveAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="payAmo != null">
+        #{payAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="reson != null">
+        #{reson,jdbcType=VARCHAR},
+      </if>
+      <if test="refundAmount != null">
+        #{refundAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="refundType != null">
+        #{refundType,jdbcType=DECIMAL},
+      </if>
+      <if test="refundStat != null">
+        #{refundStat,jdbcType=DECIMAL},
+      </if>
+      <if test="orgPaymentId != null">
+        #{orgPaymentId,jdbcType=VARCHAR},
+      </if>
+      <if test="newPaymentId != null">
+        #{newPaymentId,jdbcType=VARCHAR},
+      </if>
+      <if test="reviewsStat != null">
+        #{reviewsStat,jdbcType=DECIMAL},
+      </if>
+      <if test="reviewsDate != null">
+        #{reviewsDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="adjTm != null">
+        #{adjTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="orgPlanNum != null">
+        #{orgPlanNum,jdbcType=DECIMAL},
+      </if>
+      <if test="stagesAmount != null">
+        #{stagesAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="refundTm != null">
+        #{refundTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="settleAmount != null">
+        #{settleAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="realRefundAmo != null">
+        #{realRefundAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="refundMethod != null">
+        #{refundMethod,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjExample" resultType="java.lang.Long">
+    select count(*) from O_ORDER_ADJ
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.OrderAdj">
+    update O_ORDER_ADJ
+    <set>
+      <if test="orderId != null">
+        ORDER_ID = #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="adjUserId != null">
+        ADJ_USER_ID = #{adjUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="orgOAmo != null">
+        ORG_O_AMO = #{orgOAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="orgIncentiveAmo != null">
+        ORG_INCENTIVE_AMO = #{orgIncentiveAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="orgPayAmo != null">
+        ORG_PAY_AMO = #{orgPayAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="oAmo != null">
+        O_AMO = #{oAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="incentiveAmo != null">
+        INCENTIVE_AMO = #{incentiveAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="payAmo != null">
+        PAY_AMO = #{payAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="reson != null">
+        RESON = #{reson,jdbcType=VARCHAR},
+      </if>
+      <if test="refundAmount != null">
+        REFUND_AMOUNT = #{refundAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="refundType != null">
+        REFUND_TYPE = #{refundType,jdbcType=DECIMAL},
+      </if>
+      <if test="refundStat != null">
+        REFUND_STAT = #{refundStat,jdbcType=DECIMAL},
+      </if>
+      <if test="orgPaymentId != null">
+        ORG_PAYMENT_ID = #{orgPaymentId,jdbcType=VARCHAR},
+      </if>
+      <if test="newPaymentId != null">
+        NEW_PAYMENT_ID = #{newPaymentId,jdbcType=VARCHAR},
+      </if>
+      <if test="reviewsStat != null">
+        REVIEWS_STAT = #{reviewsStat,jdbcType=DECIMAL},
+      </if>
+      <if test="reviewsDate != null">
+        REVIEWS_DATE = #{reviewsDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="adjTm != null">
+        ADJ_TM = #{adjTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        VERSION = #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="orgPlanNum != null">
+        ORG_PLAN_NUM = #{orgPlanNum,jdbcType=DECIMAL},
+      </if>
+      <if test="stagesAmount != null">
+        STAGES_AMOUNT = #{stagesAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="refundTm != null">
+        REFUND_TM = #{refundTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="settleAmount != null">
+        SETTLE_AMOUNT = #{settleAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="realRefundAmo != null">
+        REAL_REFUND_AMO = #{realRefundAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="refundMethod != null">
+        REFUND_METHOD = #{refundMethod,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OrderAdj">
+    update O_ORDER_ADJ
+    set ORDER_ID = #{orderId,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      ADJ_USER_ID = #{adjUserId,jdbcType=VARCHAR},
+      ORG_O_AMO = #{orgOAmo,jdbcType=DECIMAL},
+      ORG_INCENTIVE_AMO = #{orgIncentiveAmo,jdbcType=DECIMAL},
+      ORG_PAY_AMO = #{orgPayAmo,jdbcType=DECIMAL},
+      O_AMO = #{oAmo,jdbcType=DECIMAL},
+      INCENTIVE_AMO = #{incentiveAmo,jdbcType=DECIMAL},
+      PAY_AMO = #{payAmo,jdbcType=DECIMAL},
+      RESON = #{reson,jdbcType=VARCHAR},
+      REFUND_AMOUNT = #{refundAmount,jdbcType=DECIMAL},
+      REFUND_TYPE = #{refundType,jdbcType=DECIMAL},
+      REFUND_STAT = #{refundStat,jdbcType=DECIMAL},
+      ORG_PAYMENT_ID = #{orgPaymentId,jdbcType=VARCHAR},
+      NEW_PAYMENT_ID = #{newPaymentId,jdbcType=VARCHAR},
+      REVIEWS_STAT = #{reviewsStat,jdbcType=DECIMAL},
+      REVIEWS_DATE = #{reviewsDate,jdbcType=TIMESTAMP},
+      ADJ_TM = #{adjTm,jdbcType=TIMESTAMP},
+      STATUS = #{status,jdbcType=DECIMAL},
+      VERSION = #{version,jdbcType=DECIMAL},
+      ORG_PLAN_NUM = #{orgPlanNum,jdbcType=DECIMAL},
+      STAGES_AMOUNT = #{stagesAmount,jdbcType=DECIMAL},
+      REFUND_TM = #{refundTm,jdbcType=TIMESTAMP},
+      SETTLE_AMOUNT = #{settleAmount,jdbcType=DECIMAL},
+      REAL_REFUND_AMO = #{realRefundAmo,jdbcType=DECIMAL},
+      REFUND_METHOD = #{refundMethod,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+  <sql id="selectAgentUpModelViewSql">
+    select oa.id as adj_id,
+    oa.order_id,
+    oa.adj_tm,
+    oa.REVIEWS_STAT,
+    oa.agent_id,
+    oa.adj_user_id,
+    (select ab.bus_platform
+    from a_agent_businfo ab
+    left join o_order on o_order.bus_id = ab.id
+    where o_order.id = oa.order_id) as platform,
+    (select PLATFORM_NAME
+    from A_PLATFORM ap
+    left join a_agent_businfo ab on ap.platform_num =
+    ab.bus_platform
+    left join o_order on o_order.bus_id = ab.id
+    where o_order.id = oa.order_id) as platform_name,
+    cu.name as req_name,
+    oa.refund_stat,
+    oa.refund_tm,
+    ag.ag_name,
+    (select LISTAGG(o_sub_order.pro_name, ',') WITHIN
+    GROUP(
+    ORDER BY o_sub_order.order_id)
+    from o_sub_order
+    where o_sub_order.status = 1
+    and o_sub_order.order_id = oa.order_id) as pro_name,
+    (select LISTAGG(o_sub_order_activity.activity_name,',') WITHIN GROUP(ORDER BY oa.order_id)
+      from o_sub_order_activity
+      left join o_sub_order
+      on o_sub_order_activity.sub_order_id =
+      o_sub_order.id
+      and o_sub_order.status = '1'
+      where o_sub_order.order_id = oa.order_id  and o_sub_order_activity.status = '1'
+      ) as activity_name,
+      (select ab.id
+      from a_agent_businfo ab
+      left join o_order on o_order.bus_id = ab.id
+      where o_order.id = oa.order_id) as bus_id,
+      (select dq.name
+      from c_organization dq
+      left join a_agent_businfo ab on dq.id = ab.ag_doc_district
+      left join o_order on o_order.bus_id = ab.id
+      where o_order.id = oa.order_id) as ag_doc_district,
+      (select sq.name
+      from c_organization sq
+      left join a_agent_businfo ab on sq.id = ab.ag_doc_pro
+      left join o_order on o_order.bus_id = ab.id
+      where o_order.id = oa.order_id) as ag_doc_pro
+    from o_order_adj oa
+    left join o_order oo on oa.order_id = oo.id
+    and oo.status = 1
+    left join a_agent ag on ag.id = oa.agent_id
+    and ag.status = 1
+    left join c_user cu on cu.id = oa.adj_user_id
+    <where>
+      oa.adj_user_id=#{map.userId}
+      <if test="1==1"> and oa.status=1 and cu.id = #{map.userId} </if>
+      <if test="map.agName!=null and map.agName!=''"> and ag.ag_name like concat(concat('%',#{map.agName}),'%') </if>
+      <!--<if test="map.agUniqNum!=null and map.agUniqNum!=''"> and ag.ag_uniq_num = #{map.agUniqNum} </if>-->
+      <if test="map.agUniqNum!=null and map.agUniqNum!=''"> and ag.id = #{map.agUniqNum} </if>
+      <if test="map.refundId!=null and map.refundId!=''"> and oa.order_id = #{map.refundId} </if>
+      <if test="map.reviewStatus!=null and map.reviewStatus!=''"> and oa.reviews_stat = #{map.reviewStatus} </if>
+      <if test="map.proName!=null and map.proName!=''">
+        and EXISTS
+        (select * from o_sub_order os
+        where os.pro_name like concat(concat('%',#{map.proName}),'%') and os.status = 1 and os.order_id = oa.order_id)
+      </if>
+      <!--<if test="map.platfromPerm!=null and map.platfromPerm.size>0">-->
+        <!--and ab.bus_platform in-->
+        <!--<foreach collection="map.platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >-->
+          <!--#{platfromPermItem.PLATFORM_NUM}-->
+        <!--</foreach>-->
+      <!--</if>-->
+      <!--<if test="map.platfromPerm==null or map.platfromPerm.size==0">-->
+        <!--and 1=-1-->
+      <!--</if>-->
+    </where>
+    order by oa.adj_tm desc
+  </sql>
+  <select id="selectAgentUpModelView" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix"/>
+    <include refid="selectAgentUpModelViewSql"/>
+    <include refid="OracleDialectSuffix"/>
+  </select>
+  <select id="selectAgentUpModelViewCount" parameterType="map" resultType="int">
+    select count(*) from(
+    <include refid="selectAgentUpModelViewSql"/>)
+  </select>
+</mapper>
