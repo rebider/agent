@@ -84,6 +84,6 @@
 		<!--<table tableName="P_FREEZE_AGENT" domainObjectName="FreezeAgent" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>-->
 	<!--	<table tableName="P_POS_REWARD" domainObjectName="PosReward" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>-->
 
-		<table tableName="O_TERMINAL_TRANSFER_DETAIL" domainObjectName="TerminalTransferDetail" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>
+		<table tableName="P_TEMPLATE_APPLY_RECORD" domainObjectName="TemplateRecode" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>
 	</context>
 </generatorConfiguration>

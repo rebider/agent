@@ -3,7 +3,6 @@ package com.ryx.credit.profit.pojo;
 import java.io.Serializable;
 
 public class TemplateRecode implements Serializable {
-
     private String id;
 
     private String agentId;
@@ -35,6 +34,8 @@ public class TemplateRecode implements Serializable {
     private String rev1;
 
     private String rev2;
+
+    private String busNumS;
 
     public String getId() {
         return id;
@@ -162,5 +163,13 @@ public class TemplateRecode implements Serializable {
 
     public void setRev2(String rev2) {
         this.rev2 = rev2 == null ? null : rev2.trim();
+    }
+
+    public String getBusNumS() {
+        return busNumS;
+    }
+
+    public void setBusNumS(String busNumS) {
+        this.busNumS = busNumS == null ? null : busNumS.trim();
     }
 }
