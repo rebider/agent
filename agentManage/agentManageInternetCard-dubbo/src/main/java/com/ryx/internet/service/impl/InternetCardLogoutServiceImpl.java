@@ -536,7 +536,7 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.SX.getValue());
                 oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
             }else if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
-                if(internetLogoutDetail.getIssuer().equals(Issuerstatus.JY_MOBILE.getValue())){
+                if(StringUtils.isNotBlank(internetLogoutDetail.getIssuer()) && internetLogoutDetail.getIssuer().equals(Issuerstatus.JY_MOBILE.getValue())){
                     internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.TJCLZ.getValue());
                 }else{
                     internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.DZX.getValue());
