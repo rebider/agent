@@ -2,6 +2,7 @@ package com.ryx.internet.service.impl;
 
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
@@ -455,17 +456,22 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
         try {
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
             if(!result.isOK()){
-                log.error(result.getMsg());
+                log.error("申请注销审批出现异常，msg：{}"+result.getMsg());
                 throw new MessageException("工作流处理任务异常");
             }
-        } catch (MessageException e) {
+        } catch (ProcessException e) {
             log.info("申请注销审批出现异常,approvalTask方法1");
             AppConfig.sendEmails(MailUtil.printStackTrace(e), "申请注销审批出现异常,approvalTask方法1");
             e.printStackTrace();
             throw new MessageException(e.getMsg());
-        } catch (Exception e) {
+        } catch (MessageException e) {
             log.info("申请注销审批出现异常,approvalTask方法2");
             AppConfig.sendEmails(MailUtil.printStackTrace(e), "申请注销审批出现异常,approvalTask方法2");
+            e.printStackTrace();
+            throw new MessageException(e.getMsg());
+        } catch (Exception e) {
+            log.info("申请注销审批出现异常,approvalTask方法3");
+            AppConfig.sendEmails(MailUtil.printStackTrace(e), "申请注销审批出现异常,approvalTask方法3");
             e.printStackTrace();
             throw new MessageException(e.getLocalizedMessage());
         }
