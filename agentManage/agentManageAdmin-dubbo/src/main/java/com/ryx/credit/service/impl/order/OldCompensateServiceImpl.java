@@ -432,6 +432,15 @@ public class OldCompensateServiceImpl implements OldCompensateService {
             if(!synOrVerifyResult.isOK()){
                 throw new ProcessException(synOrVerifyResult.getMsg());
             }
+
+            //代理商打款，代理商打款不能小于活动差价。
+            if (null != oRefundPriceDiff.getApplyCompType() && oRefundPriceDiff.getApplyCompType().equals("1")) {
+                //状态为1说明代理商要打款
+                if (oRefundPriceDiff.getRelCompAmt().compareTo(belowPayAmt.add(shareDeductAmt)) != 0){
+                    throw new ProcessException("应打款金额："+oRefundPriceDiff.getRelCompAmt());
+                }
+            }
+
             String platformType = refundPriceDiffDetailList.get(0).getPlatformType();
             if(PlatformType.POS.getValue().equals(platformType)){
                 JSONObject resData =  (JSONObject)synOrVerifyResult.getData();
