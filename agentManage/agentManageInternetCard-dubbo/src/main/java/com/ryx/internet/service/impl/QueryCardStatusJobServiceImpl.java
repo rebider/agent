@@ -76,6 +76,7 @@ public class QueryCardStatusJobServiceImpl implements QueryCardStatusJobService 
         String mobileResult = ChinaMobileForJYHttpReq.batchQueryCardStatus(iccids.toString().substring(0, iccids.toString().length() - 1));
         if(StringUtils.isBlank(mobileResult)){
             log.info("揭阳移动返回数据处理,接口请求异常");
+            AppConfig.sendEmails("接口请求异常：mobileResult:"+mobileResult, "物联网移动数据异常,方法processDataUpdateCardStatus");
             return;
         }
         JSONObject jsonObj = JSONObject.parseObject(mobileResult);
