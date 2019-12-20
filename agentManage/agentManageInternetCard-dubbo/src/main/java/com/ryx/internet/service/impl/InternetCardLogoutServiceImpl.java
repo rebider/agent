@@ -297,7 +297,10 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 InternetLogoutDetailExample.Criteria criteria = internetLogoutDetailExample.createCriteria();
                 criteria.andStatusEqualTo(Status.STATUS_1.status);
                 criteria.andIccidNumEqualTo(iccid);
-                criteria.andLogoutStatusNotEqualTo(InternetLogoutStatus.SX.getValue());
+                List<String> logoutStatusList = new ArrayList<>();
+                logoutStatusList.add(InternetLogoutStatus.SX.getValue());
+                logoutStatusList.add(InternetLogoutStatus.TJSB.getValue());
+                criteria.andLogoutStatusNotIn(logoutStatusList);
                 List<InternetLogoutDetail> internetLogoutDetails = internetLogoutDetailMapper.selectByExample(internetLogoutDetailExample);
                 if (internetLogoutDetails.size() != 0) {
                     throw new MessageException("iccid:" + iccid + "注销中,请勿重复发起");
