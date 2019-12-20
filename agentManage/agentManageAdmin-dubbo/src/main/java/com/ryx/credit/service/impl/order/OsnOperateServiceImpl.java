@@ -1053,15 +1053,13 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                     return retMap;
                 }
             } catch (MessageException e) {
-                //机具下发失败
-                AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), logistics.getProType()+"机具下发失败！");
                 e.printStackTrace();
+                AppConfig.sendEmail(emailArr, "SN开始：" + logistics.getSnBeginNum() + ",SN结束：" + logistics.getSnEndNum() + "错误信息:" + e.getLocalizedMessage(), logistics.getProType() + "机具下发失败！");
                 logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage(), platForm.getPlatformType());
                 throw e;
             } catch (Exception e) {
-                //机具下发失败，更新物流明细为下发失败，并更新物流为发送失败 ，禁止继续发送,人工介入
-                AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                 e.printStackTrace();
+                AppConfig.sendEmail(emailArr, "SN开始：" + logistics.getSnBeginNum() + ",SN结束：" + logistics.getSnEndNum() + "错误信息:" + MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                 logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage(), platForm.getPlatformType());
                 throw e;
             }
