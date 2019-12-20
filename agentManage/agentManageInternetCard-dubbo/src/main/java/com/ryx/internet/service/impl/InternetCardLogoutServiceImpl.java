@@ -288,6 +288,9 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 if(StringUtils.isBlank(oInternetCard.getInternetCardNum())){
                     throw new MessageException("物联卡号为空,不可申请注销,iccid:"+iccid);
                 }
+                if(StringUtils.isBlank(oInternetCard.getIssuer())){
+                    throw new MessageException("发卡方为空,不可申请注销,iccid:"+iccid);
+                }
                 if(party.equals("agent")){
                     if(StringUtils.isBlank(oInternetCard.getBusNum()) || StringUtils.isBlank(oInternetCard.getBusPlatform())){
                         throw new MessageException("业务平台数据不全,不可申请注销,iccid:"+iccid);
