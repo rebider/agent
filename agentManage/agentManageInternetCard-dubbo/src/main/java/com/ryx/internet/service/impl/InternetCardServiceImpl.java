@@ -904,22 +904,22 @@ public class InternetCardServiceImpl implements InternetCardService {
                 log.info("taskDisposeInternetCard：1检测是否续费,暂无更新数据:{}",i);
             }
             //2. 到期日提前5天  还未续费的 更新“是否需关停”为是
-            Map<String,Object> reqRenewMap = new HashMap<>();
-            reqRenewMap.put("renewStatus",InternetRenewStatus.WXF.getValue());
-            reqRenewMap.put("expireTime",DateUtil.getDateAfter(new Date(),+5));
-            reqRenewMap.put("nowTime",DateUtil.format(new Date(),"yyyy-MM-dd"));
-            reqRenewMap.put("stop",Status.STATUS_1.status);
-            reqRenewMap.put("oldStop",Status.STATUS_0.status);
-            //待激活和正常
-            reqRenewMap.put("cardStaus1",InternetCardStatus.NORMAL.getValue());
-            reqRenewMap.put("cardStaus2",InternetCardStatus.NOACTIVATE.getValue());
-            int j = internetCardMapper.selectInternetCardStopCount(reqRenewMap);
-            if(j>0){
-                int updateCount = internetCardMapper.updateInternetCardStop(reqRenewMap);
-                log.info("taskDisposeInternetCard：2到期日减去5天还未续费的,本次更次了数据条数:{}",updateCount);
-            }else{
-                log.info("taskDisposeInternetCard：2到期日减去5天还未续费的,暂无更新数据:{}",i);
-            }
+//            Map<String,Object> reqRenewMap = new HashMap<>();
+//            reqRenewMap.put("renewStatus",InternetRenewStatus.WXF.getValue());
+//            reqRenewMap.put("expireTime",DateUtil.getDateAfter(new Date(),+5));
+//            reqRenewMap.put("nowTime",DateUtil.format(new Date(),"yyyy-MM-dd"));
+//            reqRenewMap.put("stop",Status.STATUS_1.status);
+//            reqRenewMap.put("oldStop",Status.STATUS_0.status);
+//            //待激活和正常
+//            reqRenewMap.put("cardStaus1",InternetCardStatus.NORMAL.getValue());
+//            reqRenewMap.put("cardStaus2",InternetCardStatus.NOACTIVATE.getValue());
+//            int j = internetCardMapper.selectInternetCardStopCount(reqRenewMap);
+//            if(j>0){
+//                int updateCount = internetCardMapper.updateInternetCardStop(reqRenewMap);
+//                log.info("taskDisposeInternetCard：2到期日减去5天还未续费的,本次更次了数据条数:{}",updateCount);
+//            }else{
+//                log.info("taskDisposeInternetCard：2到期日减去5天还未续费的,暂无更新数据:{}",i);
+//            }
             //3.处理未处理的导入记录
             Map map = new HashMap<>();
             map.put("importStatus",OInternetCardImportStatus.UNTREATED.getValue());
