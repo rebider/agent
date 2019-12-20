@@ -205,11 +205,12 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                                 if (detail.getPayType().equals(PaymentType.DKFQ.code) || detail.getPayType().equals(PaymentType.FRFQ.code)) {
                                     outPlanNum = outPlanNum + 1;
                                     if (startTime == null) {
-                                        startTime = detail.getPlanPayTime();
                                         Calendar calendar = Calendar.getInstance();
                                         if (adjustType.equals(String.valueOf(AdjustType.ORDER_ADJ.adjustType))){
                                             calendar.setTime(detail.getPlanPayTime());
                                             calendar.add(Calendar.MONTH, -1);
+                                        }else {
+                                            startTime = detail.getPlanPayTime();
                                         }
                                         startTime = calendar.getTime();
                                         startPlanNum = detail.getPlanNum().subtract(BigDecimal.ONE);
@@ -227,7 +228,13 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                         //计算新付款计划
                         List<Map> calNews = new ArrayList<>();
                         if (outPlanNum > 0) {
-                            calNews = StageUtil.stageOrder(outAmt, outPlanNum, startTime, 16);
+                            if (adjustType.equals(String.valueOf(AdjustType.ORDER_ADJ.adjustType))){
+                                Calendar temp = Calendar.getInstance();
+                                calNews = StageUtil.stageOrder(outAmt, outPlanNum, startTime, temp.get(Calendar.DAY_OF_MONTH));
+                            }else {
+                                calNews = StageUtil.stageOrder(outAmt, outPlanNum, startTime, 16);
+                            }
+
                         }
 
 
