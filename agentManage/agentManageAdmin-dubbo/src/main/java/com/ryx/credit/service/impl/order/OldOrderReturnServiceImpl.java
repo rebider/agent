@@ -11,12 +11,9 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.*;
 import com.ryx.credit.machine.entity.ImsTermAdjustDetail;
-import com.ryx.credit.machine.entity.ImsTermWarehouseDetail;
 import com.ryx.credit.machine.service.ImsTermAdjustDetailService;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.AdjustmentMachineVo;
-import com.ryx.credit.machine.vo.LowerHairMachineVo;
-import com.ryx.credit.machine.vo.MposSnVo;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
@@ -30,7 +27,6 @@ import com.ryx.credit.service.agent.BusActRelService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.*;
-import org.apache.commons.collections.FastHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,9 +53,6 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
 
     @Resource(name = "oldOrderReturnService")
     private OldOrderReturnService oldOrderReturnService;
-    /**
-     * 服务引用
-     */
     @Autowired
     private OReturnOrderMapper returnOrderMapper;
     @Resource
@@ -67,19 +60,11 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
     @Autowired
     private OReturnOrderDetailMapper returnOrderDetailMapper;
     @Autowired
-    private OReturnOrderRelMapper returnOrderRelMapper;
-    @Autowired
-    private ODeductCapitalMapper deductCapitalMapper;
-    @Resource
-    private PlannerService plannerService;
-    @Autowired
     private BusActRelMapper busActRelMapper;
     @Autowired
     private AgentEnterService agentEnterService;
     @Autowired
     private ActivityService activityService;
-    @Autowired
-    private AttachmentRelMapper attachmentRelMapper;
     @Resource
     private OLogisticsService oLogisticsService;
     @Autowired
@@ -94,8 +79,6 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
     private OAccountAdjustMapper accountAdjustMapper;
     @Autowired
     private OReceiptProMapper receiptProMapper;
-    @Autowired
-    private OLogisticsDetailService logisticsDetailService;
     @Autowired
     private OSubOrderMapper oSubOrderMapper;
     @Autowired
@@ -119,8 +102,6 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
     @Autowired
     private OActivityMapper oActivityMapper;
     @Autowired
-    private IUserService iUserService;
-    @Autowired
     private OSubOrderActivityMapper oSubOrderActivityMapper;
     @Autowired
     private OProductMapper oProductMapper;
@@ -132,6 +113,8 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
     private OrderActivityService orderActivityService;
     @Autowired
     private PlatFormMapper platFormMapper;
+    @Autowired
+    private ORefundPriceDiffMapper refundPriceDiffMapper;
 
 
 
@@ -159,23 +142,33 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                 return AgentResult.fail("数量必须大于0");
             }
             //检查sn是否在退货中
-           int checkCount = returnOrderDetailMapper.checkSnIsReturn(FastMap
+            int checkCount = returnOrderDetailMapper.checkSnIsReturn(FastMap
                    .fastMap("begin",oldOrderReturnSubmitProVo.getSnStart())
                    .putKeyV("end",oldOrderReturnSubmitProVo.getSnEnd())
                    .putKeyV("sts",Arrays.asList(RetSchedule.DFH.code,RetSchedule.FHZ.code,RetSchedule.SPZ.code,RetSchedule.TH.code,RetSchedule.TKZ.code,RetSchedule.YFH.code))
-           );
-           if(checkCount>0)  return AgentResult.fail(oldOrderReturnSubmitProVo.getSnStart()+":"+oldOrderReturnSubmitProVo.getSnEnd()+"在退货中");
+            );
+            if(checkCount>0)  return AgentResult.fail(oldOrderReturnSubmitProVo.getSnStart()+":"+oldOrderReturnSubmitProVo.getSnEnd()+"在退货中");
 
-           //检查机构编号
-           String org = redisService.getValue(oldOrderReturnSubmitProVo.getSnStart()+","+oldOrderReturnSubmitProVo.getSnEnd()+"_org");
-           if(StringUtils.isNotBlank(org)){
+            //检查机构编号
+            String org = redisService.getValue(oldOrderReturnSubmitProVo.getSnStart()+","+oldOrderReturnSubmitProVo.getSnEnd()+"_org");
+            if(StringUtils.isNotBlank(org)){
                AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
                agentBusInfoExample.or().andBusNumEqualTo(org).andAgentIdEqualTo(agent.getId()).andStatusEqualTo(Status.STATUS_1.status);
                List<AgentBusInfo> businfo = agentBusInfoMapper.selectByExample(agentBusInfoExample);
                if(businfo==null || businfo.size()==0){
                    return AgentResult.fail(oldOrderReturnSubmitProVo.getSnStart()+","+oldOrderReturnSubmitProVo.getSnEnd()+"不是代理商"+agent.getAgName()+"的sn");
                }
-           }
+            }
+
+            //检查历史订单是否换活动中
+            int approvingRow = refundPriceDiffMapper.selectReviewStatusBySN(FastMap
+                    .fastMap("beginSn", oldOrderReturnSubmitProVo.getSnStart())
+                    .putKeyV("endSn", oldOrderReturnSubmitProVo.getSnEnd())
+                    .putKeyV("reviewStatus", AgStatus.Approving.status));
+            if (approvingRow > 0){
+                return AgentResult.fail(oldOrderReturnSubmitProVo.getSnStart()+","+oldOrderReturnSubmitProVo.getSnEnd()+"：活动调整中，不可退货！");
+            }
+
         }
 
         //保存审批中的退货申请单

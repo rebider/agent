@@ -30,4 +30,11 @@ public interface ORefundPriceDiffMapper {
     List<Map<String,Object>> selectByAgent(@Param("map") Map<String, Object> map,@Param("page") Page page);
 
     int selectByAgentCount(@Param("map") Map<String, Object> map);
+
+    /**
+     * 通过SN审批状态查询条数
+     * @param map
+     * @return
+     */
+    int selectReviewStatusBySN(@Param("map") Map map);
 }
