@@ -259,9 +259,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
         }
 
         if(ids!=null && ids.size()>0) {
-
             ids.forEach(id -> {
-
                 OLogisticsExample example = new OLogisticsExample();
                 example.or().andSendStatusEqualTo(LogisticsSendStatus.send_ing.code).andIdEqualTo(id);
                 List<OLogistics> logistics_list = oLogisticsMapper.selectByExample(example);
@@ -295,7 +293,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                         try {
                             //更行物流批次号
                             List<OLogisticsDetail> list = osnOperateService.updateDetailBatch(logisticsDetails, new BigDecimal(batch));
-                            //发送到业务系统，（瑞+瑞大宝全部发送，其他按200条发送）
+                            //发送到业务系统
                             Map<String, Object> retMap = osnOperateService.sendInfoToBusinessSystem(list, id, new BigDecimal(batch));
                             //解析发送结果，更新物流和明细
                             if(null != retMap.get("code") && "0".equals(retMap.get("code"))){
