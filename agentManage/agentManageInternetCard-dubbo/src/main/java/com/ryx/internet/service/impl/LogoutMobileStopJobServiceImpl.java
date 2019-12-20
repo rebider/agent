@@ -58,6 +58,7 @@ public class LogoutMobileStopJobServiceImpl implements LogoutMobileStopJobServic
             InternetLogoutDetailExample.Criteria criteria = internetLogoutDetailExample.createCriteria();
             criteria.andStatusEqualTo(Status.STATUS_1.status);
             criteria.andLogoutStatusEqualTo(InternetLogoutStatus.TJCLZ.getValue());
+            criteria.andIssuerEqualTo(Issuerstatus.JY_MOBILE.getValue());
             internetLogoutDetailExample.setOrderByClause(" c_time asc ");
             internetLogoutDetailExample.setPage(new Page(0,20));
             List<InternetLogoutDetail> internetLogoutDetails = internetLogoutDetailMapper.selectByExample(internetLogoutDetailExample);

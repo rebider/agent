@@ -533,8 +533,12 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.SX.getValue());
                 oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
             }else if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
-                internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.TJCLZ.getValue());
-//                oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());
+                if(internetLogoutDetail.getIssuer().equals(Issuerstatus.JY_MOBILE.getValue())){
+                    internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.TJCLZ.getValue());
+                }else{
+                    internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.DZX.getValue());
+                    oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());
+                }
             }
             int j = internetLogoutDetailMapper.updateByPrimaryKeySelective(internetLogoutDetail);
             if(j!=1){
