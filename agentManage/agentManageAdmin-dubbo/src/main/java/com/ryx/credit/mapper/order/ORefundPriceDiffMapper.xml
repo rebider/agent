@@ -447,8 +447,8 @@
             O_REFUND_PRICE_DIFF d
             INNER JOIN O_REFUND_PRICE_DIFF_DETAIL dd ON d.id = dd.refund_price_diff_id
         WHERE
-            dd.begin_sn = #{beginSn,jdbcType=VARCHAR}
-            AND dd.end_sn = #{endSn,jdbcType=VARCHAR}
-            AND d.review_status = #{reviewStatus,jdbcType=VARCHAR}
+            dd.begin_sn = #{map.beginSn,jdbcType=VARCHAR}
+            AND dd.end_sn = #{map.endSn,jdbcType=VARCHAR}
+            AND d.review_status = #{map.reviewStatus,jdbcType=VARCHAR}
     </select>
 </mapper>
