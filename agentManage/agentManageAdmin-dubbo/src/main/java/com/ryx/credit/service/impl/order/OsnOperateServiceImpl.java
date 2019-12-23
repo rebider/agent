@@ -367,7 +367,10 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                             if (oLogisticsMapper.updateByPrimaryKeySelective(logistics) != 1) {
                                 logger.info("物流明细发送业务系统处理异常，更新数据库失败,{},{}", id, batch);
                             }
-                            AppConfig.sendEmail(emailArr, "机具下发失败，SN码:" + logistics_item.getSnBeginNum() + "-" + logistics_item.getSnEndNum() + "。失败原因：" + "===", logistics_item.getProName()+"下发失败");
+                            OLogisticsDetailExample queryFailMsgExample = new OLogisticsDetailExample();
+                            queryFailMsgExample.or().andLogisticsIdEqualTo(id);
+                            List<OLogisticsDetail> failDetails = oLogisticsDetailMapper.selectByExample(queryFailMsgExample);
+                            AppConfig.sendEmail(emailArr, "机具下发失败，SN码:" + logistics_item.getSnBeginNum() + "-" + logistics_item.getSnEndNum() + "。失败原因：" + null == failDetails.get(0).getSbusMsg()?"失败原因较多请查看明细":failDetails.get(0).getSbusMsg(), logistics_item.getProName()+"下发失败");
                         } else if (sendStatusList.size() > 1 && sendStatusList.contains(Status.STATUS_2.status) && sendStatusList.contains(Status.STATUS_2.status)) {
                             logistics.setSendStatus(LogisticsSendStatus.send_part_fail.code);
                             logistics.setSendMsg("部分失败");
