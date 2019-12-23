@@ -4385,12 +4385,12 @@ public class OrderServiceImpl implements OrderService {
                 reqMap.put("party",startPar.get("party"));
             }
             //财务审批
-            if(orgCode.equals("finance")){
+            if(orgCode.equals("finance") && orderUpModelVo.getApprovalResult().equals(ApprovalType.PASS.getValue())){
                 OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(orderUpModelVo.getId());
                 String agentId = orderAdj.getAgentId();
                 AgentColinfo agentColinfo = agentColinfoMapper.selectByAgentId(agentId);
                 //挂账审批通过
-                if(String.valueOf(OrderAdjRefundType.CDFQ_GZ.code).equals(orderUpModelVo.getRefundType()) && orderUpModelVo.getApprovalResult().equals(ApprovalType.PASS.getValue())){
+                if(String.valueOf(OrderAdjRefundType.CDFQ_GZ.code).equals(orderUpModelVo.getRefundType()) ){
                     //第一个财务节点,挂账-无退款
                     if(orderUpModelVo.getSid().equals("sid-F315F787-E98B-40FA-A6DC-6A962201075D")){
                         orderAdj.setSettleAmount(new BigDecimal(orderUpModelVo.getRefundAmount()));
@@ -4404,7 +4404,7 @@ public class OrderServiceImpl implements OrderService {
                         reqMap.put("remit",false);
                     }
                     //线下退款,审批通过
-                }else if(String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType()) && orderUpModelVo.getApprovalResult().equals(ApprovalType.PASS.getValue())){
+                }else if(String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
                     //第一个财务节点,线下退款-退款中
                     if(orderUpModelVo.getSid().equals("sid-F315F787-E98B-40FA-A6DC-6A962201075D")){
                         orderAdj.setRealRefundAmo(new BigDecimal(orderUpModelVo.getRefundAmount()));
