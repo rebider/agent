@@ -264,12 +264,29 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                 example.or().andSendStatusEqualTo(LogisticsSendStatus.send_ing.code).andIdEqualTo(id);
                 List<OLogistics> logistics_list = oLogisticsMapper.selectByExample(example);
                 OLogistics logistics_item = null;
+
                 //物流赋值
                 if(logistics_list.size()>0){
                     logistics_item = logistics_list.get(0);
                 }
+
                 //查询到物流才进行处理
                 if(logistics_item != null) {
+
+                    //明细数量校验
+                    OLogisticsDetailExample querySnNumExample = new OLogisticsDetailExample();
+                    querySnNumExample.or()
+                            .andLogisticsIdEqualTo(id)
+                            .andRecordStatusEqualTo(Status.STATUS_1.status)
+                            .andStatusEqualTo(Status.STATUS_1.status);
+                    if (logistics_item.getSendNum().compareTo(new BigDecimal(oLogisticsDetailMapper.countByExample(querySnNumExample))) != 0) {
+                        logistics_item.setSendStatus(LogisticsSendStatus.send_fail.code);
+                        logistics_item.setSendMsg("明细数量异常!");
+                        if (oLogisticsMapper.updateByPrimaryKeySelective(logistics_item) != 1) {
+                            logger.info("物流明细发送业务，更新数据库失败,{}", id);
+                        }
+                    }
+
                     //根据物流id查找sn明细，并更新物流明细发送状态为待发送状态，200单位数量为1批次，避免接口错误进行接口请求数量限制。
                     OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
                     oLogisticsDetailExample.or()
@@ -310,12 +327,6 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                             } else {
                                 //处理失败，停止本批次发送，继续剩下物流发送
                                 logger.info("物流明细发送业务系统处理失败,{},{}", id, batch);
-                                AppConfig.sendEmail(emailArr, "机具下发失败，SN码:" + logistics_item.getSnBeginNum() + "-" + logistics_item.getSnEndNum() + "。失败原因：" + (null == retMap.get("msg")? "无": retMap.get("msg")), "物流下发失败");
-                                /*logistics.setSendStatus(LogisticsSendStatus.send_fail.code);
-                                logistics.setSendMsg(null != retMap.get("msg")? (String) retMap.get("msg"):"未返回失败原因。");
-                                if (oLogisticsMapper.updateByPrimaryKeySelective(logistics) != 1) {
-                                    logger.info("物流明细发送业务系统处理失败，更新数据库失败,{},{}", id, batch);
-                                }*/
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -326,12 +337,6 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                                 detail.setSbusMsg(e.getLocalizedMessage());
                                 oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
                             });
-                            /*//更新物流失败
-                            logistics.setSendStatus(LogisticsSendStatus.send_fail.code);
-                            logistics.setSendMsg(e.getLocalizedMessage());
-                            if (oLogisticsMapper.updateByPrimaryKeySelective(logistics) != 1) {
-                                logger.info("物流明细发送业务系统处理异常，更新数据库失败,{},{}", id, batch);
-                            }*/
                         }
                         //查询未发送的物流明细（重新赋值明细list）
                         logisticsDetails = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
@@ -343,56 +348,40 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                     //更新物流处理状态
                     OLogistics logistics = oLogisticsMapper.selectByPrimaryKey(id);
                     if (LogisticsSendStatus.send_ing.code.compareTo(logistics.getSendStatus()) == 0) {
-                        OLogisticsDetailExample querySnNumExample = new OLogisticsDetailExample();
-                        querySnNumExample.or()
-                                .andLogisticsIdEqualTo(id)
-                                .andRecordStatusEqualTo(Status.STATUS_1.status)
-                                .andStatusEqualTo(Status.STATUS_1.status);
-                        //明细数量和物流发送SN数量是否相等（不相等更新物流状态失败）
-                        if (logistics.getSendNum().compareTo(new BigDecimal(oLogisticsDetailMapper.countByExample(querySnNumExample))) != 0) {
-                                logistics.setSendStatus(LogisticsSendStatus.send_fail.code);
-                                logistics.setSendMsg("明细数量异常!");
-                                if (oLogisticsMapper.updateByPrimaryKeySelective(logistics) != 1) {
-                                    logger.info("物流明细发送业务，更新数据库失败,{},{}", id, batch);
-                                }
-                        } else {
-                            List<BigDecimal> sendStatusList = oLogisticsDetailMapper.selectSendStatusByMap(FastMap
-                                    .fastMap("logisticsId", id)
-                                    .putKeyV("status", Status.STATUS_1.status)
-                                    .putKeyV("recordStatus", Status.STATUS_1.status));
-                            //查询sendStatus中的发送状态
-                            boolean result = sendStatusList.contains(1);
+                        List<BigDecimal> sendStatusList = oLogisticsDetailMapper.selectSendStatusByMap(FastMap
+                                .fastMap("logisticsId", id)
+                                .putKeyV("status", Status.STATUS_1.status)
+                                .putKeyV("recordStatus", Status.STATUS_1.status));
 
-                            // 1. 全部发送成功 2，全部发送失败 3，部分成功，失败
-                            if (sendStatusList.size() == 1 && sendStatusList.contains(Status.STATUS_1.status)) {
-                                logistics.setSendStatus(LogisticsSendStatus.send_success.code);
-                                logistics.setSendMsg("联动业务系统成功");
-                                if (oLogisticsMapper.updateByPrimaryKeySelective(logistics) != 1) {
-                                    logger.info("物流明细发送业务系统处理异常，更新数据库失败,{},{}", id, batch);
-                                }
-                                AppConfig.sendEmail(emailArr, "机具下发失败，SN码:" + logistics_item.getSnBeginNum() + "-" + logistics_item.getSnEndNum() , "物流下发成功");
-                            } else if (sendStatusList.size() == 1 && sendStatusList.contains(Status.STATUS_2.status)) {
-                                logistics.setSendStatus(LogisticsSendStatus.send_fail.code);
-                                logistics.setSendMsg("联动业务系统失败");
-                                if (oLogisticsMapper.updateByPrimaryKeySelective(logistics) != 1) {
-                                    logger.info("物流明细发送业务系统处理异常，更新数据库失败,{},{}", id, batch);
-                                }
-                                AppConfig.sendEmail(emailArr, "机具下发失败，SN码:" + logistics_item.getSnBeginNum() + "-" + logistics_item.getSnEndNum() + "。失败原因：" + "===", "物流下发失败");
-                            } else if (sendStatusList.size() > 1 && sendStatusList.contains(Status.STATUS_2.status) && sendStatusList.contains(Status.STATUS_2.status)) {
-                                logistics.setSendStatus(LogisticsSendStatus.send_part_fail.code);
-                                logistics.setSendMsg("部分失败");
-                                if (oLogisticsMapper.updateByPrimaryKeySelective(logistics) != 1) {
-                                    logger.info("物流明细发送业务系统处理异常，更新数据库失败,{},{}", id, batch);
-                                }
-                                AppConfig.sendEmail(emailArr, "机具下发失败，SN码:" + logistics_item.getSnBeginNum() + "-" + logistics_item.getSnEndNum() + "。失败原因：" + "部分失败请查看明细", "物流下发失败");
-                            } else {
-                                logistics.setSendStatus(LogisticsSendStatus.send_fail.code);
-                                logistics.setSendMsg("明细状态异常");
-                                if (oLogisticsMapper.updateByPrimaryKeySelective(logistics) != 1) {
-                                    logger.info("物流明细发送业务系统处理异常，更新数据库失败,{},{}", id, batch);
-                                }
-                                AppConfig.sendEmail(emailArr, "机具下发失败，SN码:" + logistics_item.getSnBeginNum() + "-" + logistics_item.getSnEndNum() + "。失败原因：" + "明细状态异常", "物流下发失败");
+                        // 1. 全部发送成功 2，全部发送失败 3，部分成功，失败
+                        if (sendStatusList.size() == 1 && sendStatusList.contains(Status.STATUS_1.status)) {
+                            logistics.setSendStatus(LogisticsSendStatus.send_success.code);
+                            logistics.setSendMsg("联动业务系统成功");
+                            if (oLogisticsMapper.updateByPrimaryKeySelective(logistics) != 1) {
+                                logger.info("物流明细发送业务系统处理异常，更新数据库失败,{},{}", id, batch);
                             }
+                            AppConfig.sendEmail(emailArr, "机具下发失败，SN码:" + logistics_item.getSnBeginNum() + "-" + logistics_item.getSnEndNum() , logistics_item.getProName()+"物流下发成功");
+                        } else if (sendStatusList.size() == 1 && sendStatusList.contains(Status.STATUS_2.status)) {
+                            logistics.setSendStatus(LogisticsSendStatus.send_fail.code);
+                            logistics.setSendMsg("联动业务系统失败");
+                            if (oLogisticsMapper.updateByPrimaryKeySelective(logistics) != 1) {
+                                logger.info("物流明细发送业务系统处理异常，更新数据库失败,{},{}", id, batch);
+                            }
+                            AppConfig.sendEmail(emailArr, "机具下发失败，SN码:" + logistics_item.getSnBeginNum() + "-" + logistics_item.getSnEndNum() + "。失败原因：" + "===", logistics_item.getProName()+"下发失败");
+                        } else if (sendStatusList.size() > 1 && sendStatusList.contains(Status.STATUS_2.status) && sendStatusList.contains(Status.STATUS_2.status)) {
+                            logistics.setSendStatus(LogisticsSendStatus.send_part_fail.code);
+                            logistics.setSendMsg("部分失败");
+                            if (oLogisticsMapper.updateByPrimaryKeySelective(logistics) != 1) {
+                                logger.info("物流明细发送业务系统处理异常，更新数据库失败,{},{}", id, batch);
+                            }
+                            AppConfig.sendEmail(emailArr, "机具下发失败，SN码:" + logistics_item.getSnBeginNum() + "-" + logistics_item.getSnEndNum() + "。失败原因：" + "部分失败请查看明细", logistics_item.getProName()+"下发失败");
+                        } else {
+                            logistics.setSendStatus(LogisticsSendStatus.send_fail.code);
+                            logistics.setSendMsg("明细状态异常");
+                            if (oLogisticsMapper.updateByPrimaryKeySelective(logistics) != 1) {
+                                logger.info("物流明细发送业务系统处理异常，更新数据库失败,{},{}", id, batch);
+                            }
+                            AppConfig.sendEmail(emailArr, "机具下发失败，SN码:" + logistics_item.getSnBeginNum() + "-" + logistics_item.getSnEndNum() + "。失败原因：" + "明细状态异常", logistics_item.getProName()+"下发失败");
                         }
                     }
                 }
@@ -810,18 +799,18 @@ public class OsnOperateServiceImpl implements OsnOperateService {
      * @return
      */
     @Override
-    @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
-    public Map<String, Object> sendInfoToBusinessSystem(List<OLogisticsDetail>  datas,String logcId,BigDecimal batch)throws Exception {
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRES_NEW)
+    public Map<String, Object> sendInfoToBusinessSystem(List<OLogisticsDetail> datas, String logcId, BigDecimal batch) throws Exception {
 
-        //查询发送邮件接收人
+        /*//查询发送邮件接收人
         List<Dict> dicts = dictOptionsService.dictList(DictGroup.EMAIL.name(), DictGroup.LOGISTICS_FAIL_EMAIL.name());
         String[] emailArr = new String[dicts.size()];
         for (int i = 0; i < dicts.size(); i++) {
             emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
-        }
+        }*/
 
         Map<String, Object> retMap = new HashMap<String, Object>();
-        if(datas==null && datas.size()==0){
+        if (datas == null || datas.size() == 0) {
             retMap.put("code", "1");
             return retMap;
         }
@@ -836,12 +825,12 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                 .andSbusBatchEqualTo(batch);
         oLogisticsDetailExample.setOrderByClause(" SN_NUM asc ");
         List<OLogisticsDetail> listOLogisticsDetailSn = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
-        logger.info("物流明细查出数量：{},{},{},{}",logcId,batch,listOLogisticsDetailSn.size(),datas.size());
+        logger.info("物流明细查出数量：{},{},{},{}", logcId, batch, listOLogisticsDetailSn.size(), datas.size());
         List<String> snList = new ArrayList<>();
         listOLogisticsDetailSn.forEach(detail -> {
             snList.add(detail.getSnNum());
         });
-        logger.info("物流明细snID数量：{},{},{}",logcId,batch,snList.size());
+        logger.info("物流明细snID数量：{},{},{}", logcId, batch, snList.size());
         //查询订单信息
         ReceiptPlan planVo = receiptPlanMapper.selectByPrimaryKey(logistics.getReceiptPlanId());
         String orderId = planVo.getOrderId();//订单ID
@@ -883,7 +872,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             try {
                 internetCardService.orderInsertInternetCard(listOLogisticsDetailSn,planVo.getProCom());
             }catch (Exception e){
-                AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"。错误信息:"+e.getLocalizedMessage(), "流量卡插入失败！");
+                //AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"。错误信息:"+e.getLocalizedMessage(), "流量卡插入失败！");
                 e.printStackTrace();
                 logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage());
                 throw e;
@@ -925,7 +914,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                     return retMap;
                 } else {
                     //机具下发失败，更新物流明细为下发失败，并更新物流为发送失败
-                    AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+LogisticsDetailSendStatus.send_fail.msg, logistics.getProType()+"下发失败！");
+                    //AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+LogisticsDetailSendStatus.send_fail.msg, logistics.getProType()+"下发失败！");
                     logger.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), posSendRes.getMsg(), platForm.getPlatformType());
                     listOLogisticsDetailSn.forEach(detail -> {
                         detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
@@ -937,7 +926,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                     return retMap;
                 }
             } catch (Exception e) {
-                AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+e.getLocalizedMessage(), logistics.getProType()+"下发失败！");
+                //AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+e.getLocalizedMessage(), logistics.getProType()+"下发失败！");
                 e.printStackTrace();
                 logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage(), platForm.getPlatformType());
                 throw e;
@@ -996,7 +985,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                     return retMap;
                 } else {
                     //机具下发失败，更新物流明细为下发失败，更新物流信息未下发失败，禁止再次发送，人工介入
-                    AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum(), logistics.getProType()+"下发失败！");
+                    //AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum(), logistics.getProType()+"下发失败！");
                     logger.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), lowerHairMachineRes.getMsg(), platForm.getPlatformType());
                     listOLogisticsDetailSn.forEach(detail -> {
                         detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
@@ -1009,13 +998,13 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                 }
             } catch (MessageException e) {
                 //机具下发失败，更新物流明细为下发失败，更新物流信息未下发失败，禁止再次发送，人工介入
-                AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum() + "错误信息：" + e.getLocalizedMessage(), logistics.getProType()+"机具下发失败！");
+                //AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum() + "错误信息：" + e.getLocalizedMessage(), logistics.getProType()+"机具下发失败！");
                 e.printStackTrace();
                 logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage(), platForm.getPlatformType());
                 throw e;
             } catch (Exception e) {
                 //机具下发失败，更新物流明细为下发失败，更新物流信息未下发失败，禁止再次发送，人工介入
-                AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+e.getLocalizedMessage(), logistics.getProType()+"机具下发失败！");
+                //AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+e.getLocalizedMessage(), logistics.getProType()+"机具下发失败！");
                 e.printStackTrace();
                 logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage(), platForm.getPlatformType());
                 throw e;
@@ -1054,7 +1043,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                     return retMap;
                 }else{
                     //下发失败
-                    AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+LogisticsDetailSendStatus.send_fail.msg, logistics.getProType()+"机具下发失败！");
+                    //AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+LogisticsDetailSendStatus.send_fail.msg, logistics.getProType()+"机具下发失败！");
                     logger.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), posSendRes.getMsg(), platForm.getPlatformType());
                     listOLogisticsDetailSn.forEach(detail -> {
                         detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
@@ -1067,12 +1056,12 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                 }
             } catch (MessageException e) {
                 e.printStackTrace();
-                AppConfig.sendEmail(emailArr, "SN开始：" + logistics.getSnBeginNum() + ",SN结束：" + logistics.getSnEndNum() + "错误信息:" + e.getLocalizedMessage(), logistics.getProType() + "机具下发失败！");
+                //AppConfig.sendEmail(emailArr, "SN开始：" + logistics.getSnBeginNum() + ",SN结束：" + logistics.getSnEndNum() + "错误信息:" + e.getLocalizedMessage(), logistics.getProType() + "机具下发失败！");
                 logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage(), platForm.getPlatformType());
                 throw e;
             } catch (Exception e) {
                 e.printStackTrace();
-                AppConfig.sendEmail(emailArr, "SN开始：" + logistics.getSnBeginNum() + ",SN结束：" + logistics.getSnEndNum() + "错误信息:" + MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
+                //AppConfig.sendEmail(emailArr, "SN开始：" + logistics.getSnBeginNum() + ",SN结束：" + logistics.getSnEndNum() + "错误信息:" + MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                 logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage(), platForm.getPlatformType());
                 throw e;
             }
@@ -1150,7 +1139,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                AppConfig.sendEmail(emailArr, "机具下发失败，SN码:" + logistics.getSnBeginNum() + "-" + logistics.getSnEndNum() + "。失败原因：" + e.getLocalizedMessage(), "瑞大宝机具下发失败");
+                //AppConfig.sendEmail(emailArr, "机具下发失败，SN码:" + logistics.getSnBeginNum() + "-" + logistics.getSnEndNum() + "。失败原因：" + e.getLocalizedMessage(), "瑞大宝机具下发失败");
                 throw e;
             }
         } else if (PlatformType.RJPOS.code.equals(platForm.getPlatformType())) {
@@ -1231,7 +1220,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                AppConfig.sendEmail(emailArr, "机具下发失败，SN码:" + logistics.getSnBeginNum() + "-" + logistics.getSnEndNum() + "。失败原因：" + e.getLocalizedMessage(), "瑞+机具下发失败");
+                //AppConfig.sendEmail(emailArr, "机具下发失败，SN码:" + logistics.getSnBeginNum() + "-" + logistics.getSnEndNum() + "。失败原因：" + e.getLocalizedMessage(), "瑞+机具下发失败");
                 throw e;
             }
         } else {
