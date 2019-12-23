@@ -759,6 +759,8 @@ public class InternetCardServiceImpl implements InternetCardService {
                         return;
                     }
                 }
+                internetCard.setRenew(Status.STATUS_0.status);
+                internetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());
             }
             updateInternetCard(internetCard);
         }
