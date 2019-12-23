@@ -361,7 +361,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                             if (oLogisticsMapper.updateByPrimaryKeySelective(logistics) != 1) {
                                 logger.info("物流明细发送业务系统处理异常，更新数据库失败,{},{}", id, batch);
                             }
-                            AppConfig.sendEmail(emailArr, "机具下发失败，SN码:" + logistics_item.getSnBeginNum() + "-" + logistics_item.getSnEndNum() , logistics_item.getProName()+"物流下发成功");
+                            //AppConfig.sendEmail(emailArr, "机具下发成功，SN码:" + logistics_item.getSnBeginNum() + "-" + logistics_item.getSnEndNum() , logistics_item.getProName()+"物流下发成功");
                         } else if (sendStatusList.size() == 1 && sendStatusList.contains(Status.STATUS_2.status)) {
                             OLogisticsDetailExample queryFailMsgExample = new OLogisticsDetailExample();
                             queryFailMsgExample.or().andLogisticsIdEqualTo(id);
