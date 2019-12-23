@@ -259,7 +259,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
         }
 
         if(ids!=null && ids.size()>0) {
-            ids.forEach(id -> {
+            for (String id :ids){
                 OLogisticsExample example = new OLogisticsExample();
                 example.or().andSendStatusEqualTo(LogisticsSendStatus.send_ing.code).andIdEqualTo(id);
                 List<OLogistics> logistics_list = oLogisticsMapper.selectByExample(example);
@@ -285,6 +285,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                         if (oLogisticsMapper.updateByPrimaryKeySelective(logistics_item) != 1) {
                             logger.info("物流明细发送业务，更新数据库失败,{}", id);
                         }
+                        continue;
                     }
 
                     //根据物流id查找sn明细，并更新物流明细发送状态为待发送状态，200单位数量为1批次，避免接口错误进行接口请求数量限制。
@@ -325,8 +326,8 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                                 //单批次处理成功
                                 logger.info("物流明细发送业务系统处理成功,ID:{},批次:{}", id, batch);
                             } else {
-                                //处理失败，停止本批次发送，继续剩下物流发送
-                                logger.info("物流明细发送业务系统处理失败,{},{}", id, batch);
+                                //单批次处理失败
+                                logger.info("物流明细发送业务系统处理成功,ID:{},批次:{}", id, batch);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -362,15 +363,16 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                             }
                             AppConfig.sendEmail(emailArr, "机具下发失败，SN码:" + logistics_item.getSnBeginNum() + "-" + logistics_item.getSnEndNum() , logistics_item.getProName()+"物流下发成功");
                         } else if (sendStatusList.size() == 1 && sendStatusList.contains(Status.STATUS_2.status)) {
-                            logistics.setSendStatus(LogisticsSendStatus.send_fail.code);
-                            logistics.setSendMsg("联动业务系统失败");
-                            if (oLogisticsMapper.updateByPrimaryKeySelective(logistics) != 1) {
-                                logger.info("物流明细发送业务系统处理异常，更新数据库失败,{},{}", id, batch);
-                            }
                             OLogisticsDetailExample queryFailMsgExample = new OLogisticsDetailExample();
                             queryFailMsgExample.or().andLogisticsIdEqualTo(id);
                             List<OLogisticsDetail> failDetails = oLogisticsDetailMapper.selectByExample(queryFailMsgExample);
-                            AppConfig.sendEmail(emailArr, "机具下发失败，SN码:" + logistics_item.getSnBeginNum() + "-" + logistics_item.getSnEndNum() + "。失败原因：" + null == failDetails.get(0).getSbusMsg()?"失败原因较多请查看明细":failDetails.get(0).getSbusMsg(), logistics_item.getProName()+"下发失败");
+                            String failMsg = null == failDetails.get(0).getSbusMsg()?"失败原因请查看明细":failDetails.get(0).getSbusMsg();
+                            logistics.setSendStatus(LogisticsSendStatus.send_fail.code);
+                            logistics.setSendMsg(failMsg);
+                            if (oLogisticsMapper.updateByPrimaryKeySelective(logistics) != 1) {
+                                logger.info("物流明细发送业务系统处理异常，更新数据库失败,{},{}", id, batch);
+                            }
+                            AppConfig.sendEmail(emailArr, "机具下发失败，SN码:" + logistics_item.getSnBeginNum() + "-" + logistics_item.getSnEndNum() + "。失败原因：" + failMsg, logistics_item.getProName()+"下发失败");
                         } else if (sendStatusList.size() > 1 && sendStatusList.contains(Status.STATUS_2.status) && sendStatusList.contains(Status.STATUS_2.status)) {
                             logistics.setSendStatus(LogisticsSendStatus.send_part_fail.code);
                             logistics.setSendMsg("部分失败");
@@ -388,7 +390,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                         }
                     }
                 }
-            });
+            }
         }
         return true;
     }
