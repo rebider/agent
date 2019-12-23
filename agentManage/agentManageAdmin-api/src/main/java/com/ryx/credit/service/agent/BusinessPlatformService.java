@@ -93,4 +93,12 @@ public interface BusinessPlatformService {
 
 
     List<AgentBusInfo> queryBusinfo(Map hashMap);
+
+    /**
+     * 顶级菜单客服服务-列表查询
+     * @param page
+     * @param map
+     * @return
+     */
+    PageInfo queryBusinfoTopMenuList(Page page, Map map);
 }

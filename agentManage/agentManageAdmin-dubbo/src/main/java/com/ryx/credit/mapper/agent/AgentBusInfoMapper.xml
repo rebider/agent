@@ -1250,4 +1250,52 @@ union
       and BUS_TYPE in(#{map.busType},#{map.busTypeOne})
     </if>
   </select>
+
+
+  <!--顶级菜单客服服务-列表查询-->
+  <select id="queryBusinfoTopMenuList" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix" />
+    <include refid="queryBusinfoTopMenuSql" />
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="queryBusinfoTopMenuCount" parameterType="map" resultType="int">
+    select count(*) from(
+    <include refid="queryBusinfoTopMenuSql" />
+    )
+  </select>
+  <sql id="queryBusinfoTopMenuSql">
+    select
+    b.id, b.bus_num, b.bus_platform, b.agent_id, a.ag_name,
+    o.name as ag_doc_pro, b.bus_contact_person, b.bus_status, b.clo_review_status
+    from a_agent_businfo b
+    left join a_agent a on b.agent_id = a.id
+    left join c_organization o on o.id = b.ag_doc_pro
+    where a.id = b.agent_id and a.status = '1'
+    and b.status = #{reqMap.status} and a.ag_status = #{reqMap.agStatus}
+    <if test="reqMap.busNum!=null and reqMap.busNum!=''"> and b.bus_num = #{reqMap.busNum} </if>
+    <if test="reqMap.busStatus!=null and reqMap.busStatus!=''"> and b.bus_status = #{reqMap.busStatus} </if>
+    <if test="reqMap.agName!=null and reqMap.agName!=''"> and a.ag_name like CONCAT(CONCAT('%',#{reqMap.agName}),'%') </if>
+    <if test="reqMap.busContactPerson!=null and reqMap.busContactPerson!=''"> and b.bus_contact_person = #{reqMap.busContactPerson} </if>
+    <if test="reqMap.agDocPro!=null and reqMap.agDocPro!=''"> and (b.ag_doc_pro = #{reqMap.agDocPro} or b.ag_doc_district = #{reqMap.agDocPro}) </if>
+    <if test="reqMap.busPlatformList!=null and reqMap.busPlatformList.size>0">
+      and b.bus_platform
+      <foreach collection="reqMap.busPlatformList" item="busPlatform" open=" in(" close=")" separator=",">
+        #{busPlatform}
+      </foreach>
+    </if>
+    <if test="reqMap.cloReviewStatusList!=null and reqMap.cloReviewStatusList.size>0">
+      and b.clo_review_status
+      <foreach collection="reqMap.cloReviewStatusList" item="cloReviewStatus" open=" in(" close=")" separator=",">
+        #{cloReviewStatus}
+      </foreach>
+    </if>
+    <if test="reqMap.platfromPerm!=null and reqMap.platfromPerm.size>0">
+      and b.bus_platform in
+      <foreach collection="reqMap.platfromPerm" item="platfromPermItem" open="(" separator="," close=")">
+        #{platfromPermItem.PLATFORM_NUM}
+      </foreach>
+    </if>
+    <if test="reqMap.platfromPerm==null or reqMap.platfromPerm.size==0"> and 1=-1 </if>
+    order by b.c_time desc
+  </sql>
 </mapper>
