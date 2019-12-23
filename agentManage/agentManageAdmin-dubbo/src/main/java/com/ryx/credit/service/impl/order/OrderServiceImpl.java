@@ -4384,70 +4384,85 @@ public class OrderServiceImpl implements OrderService {
             if (null != startPar) {
                 reqMap.put("party",startPar.get("party"));
             }
+            OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(orderUpModelVo.getId());
             //财务审批
+
             if(orgCode.equals("finance") && orderUpModelVo.getApprovalResult().equals(ApprovalType.PASS.getValue())){
-                OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(orderUpModelVo.getId());
+
                 String agentId = orderAdj.getAgentId();
                 AgentColinfo agentColinfo = agentColinfoMapper.selectByAgentId(agentId);
-                //挂账审批通过
-                if(String.valueOf(OrderAdjRefundType.CDFQ_GZ.code).equals(orderUpModelVo.getRefundType()) ){
-                    //第一个财务节点,挂账-无退款
-                    if(orderUpModelVo.getSid().equals("sid-F315F787-E98B-40FA-A6DC-6A962201075D")){
+                //第一个财务节点,挂账-无退款
+                if(orderUpModelVo.getSid().equals("sid-F315F787-E98B-40FA-A6DC-6A962201075D")){
+                    //挂账审批通过
+                    if(String.valueOf(OrderAdjRefundType.CDFQ_GZ.code).equals(orderUpModelVo.getRefundType()) ){
                         orderAdj.setSettleAmount(new BigDecimal(orderUpModelVo.getRefundAmount()));
                         orderAdj.setRealRefundAmo(BigDecimal.ZERO);
                         orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
                         orderAdj.setRefundStat(RefundStat.UNREFUND.key);
-                        //事务原因,需单独更新
-                        if(!orderService.approvalTaskSettle(orderAdj).isOK()){
-                            return AgentResult.fail("提交失败!");
-                        };
                         reqMap.put("remit",false);
-                    }
-                    //线下退款,审批通过
-                }else if(String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
-                    //第一个财务节点,线下退款-退款中
-                    if(orderUpModelVo.getSid().equals("sid-F315F787-E98B-40FA-A6DC-6A962201075D")){
+                    }else if(String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
                         orderAdj.setRealRefundAmo(new BigDecimal(orderUpModelVo.getRefundAmount()));
                         orderAdj.setSettleAmount(BigDecimal.ZERO);
                         orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
                         orderAdj.setRefundStat(RefundStat.REFUNDING.key);
                         reqMap.put("remit",true);
-                    //第二个财务节点,线下退款-完成
-                    }else if (orderUpModelVo.getSid().equals("sid-E2BA6A16-66BD-4A2D-A006-9AD5DC09A51D")){
-                        if(null==orderUpModelVo.getRefundTm() || "".equals(orderUpModelVo.getRefundTm())){
-                            logger.error("未填写退款日期,adjId{}",orderUpModelVo.getId());
-                            return AgentResult.fail("请输入线下退款时间！");
-                        }
-                        if(orderUpModelVo.getFiles().size()==0){
-                            logger.error("未上传凭证,adjId{}",orderUpModelVo.getId());
-                            return AgentResult.fail("请上传打款凭证！");
-                        }
-                        AttachmentRel record = new AttachmentRel();
-                        List<String> attFiles = orderUpModelVo.getFiles();
-                        if (attFiles.size()>0)
-                            attFiles.forEach(attfile->{
-                                record.setAttId(attfile);
-                                record.setSrcId(orderAdj.getId());
-                                record.setcUser(orderAdj.getAdjUserId());
-                                record.setcTime(orderAdj.getAdjTm());
-                                record.setStatus(Status.STATUS_1.status);
-                                record.setBusType(AttachmentRelType.orderAdjust_refund.name());
-                                record.setId(idService.genId(TabId.a_attachment_rel));
-                                logger.info("添加订单调整退款附件关系,订单调整ID{},附件ID{}",orderAdj.getId(),attfile);
-                                if (1 != attachmentRelMapper.insertSelective(record)) {
-                                    logger.info("订单调整:{}", "添加订单调整附件关系失败");
-                                    throw new ProcessException("添加订单调整附件关系失败");
-                                }
-                            });
-                        orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
-                        orderAdj.setRefundStat(RefundStat.REFUNED.key);
-                        orderAdj.setRefundTm(orderUpModelVo.getRefundTm());
                     }
-
+                    if(!orderService.approvalTaskSettle(orderAdj).isOK()){
+                        return AgentResult.fail("更新订单调整记录失败!");
+                    };
+                    //第二个财务节点,线下退款-完成
+                }else if (orderUpModelVo.getSid().equals("sid-E2BA6A16-66BD-4A2D-A006-9AD5DC09A51D")){
+                    if(null==orderUpModelVo.getRefundTm() || "".equals(orderUpModelVo.getRefundTm())){
+                        logger.error("未填写退款日期,adjId{}",orderUpModelVo.getId());
+                        return AgentResult.fail("请输入线下退款时间！");
+                    }
+                    if(orderUpModelVo.getFiles().size()==0){
+                        logger.error("未上传凭证,adjId{}",orderUpModelVo.getId());
+                        return AgentResult.fail("请上传打款凭证！");
+                    }
+                    AttachmentRel record = new AttachmentRel();
+                    List<String> attFiles = orderUpModelVo.getFiles();
+                    if (attFiles.size()>0)
+                        attFiles.forEach(attfile->{
+                            record.setAttId(attfile);
+                            record.setSrcId(orderAdj.getId());
+                            record.setcUser(orderAdj.getAdjUserId());
+                            record.setcTime(orderAdj.getAdjTm());
+                            record.setStatus(Status.STATUS_1.status);
+                            record.setBusType(AttachmentRelType.orderAdjust_refund.name());
+                            record.setId(idService.genId(TabId.a_attachment_rel));
+                            logger.info("添加订单调整退款附件关系,订单调整ID{},附件ID{}",orderAdj.getId(),attfile);
+                            if (1 != attachmentRelMapper.insertSelective(record)) {
+                                logger.info("订单调整:{}", "添加订单调整附件关系失败");
+                                throw new ProcessException("添加订单调整附件关系失败");
+                            }
+                        });
+                    orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
+                    orderAdj.setRefundStat(RefundStat.REFUNED.key);
+                    orderAdj.setRefundTm(orderUpModelVo.getRefundTm());
                     if(!orderService.approvalTaskSettle(orderAdj).isOK()){
                         return AgentResult.fail("更新订单调整记录失败!");
                     };
                 }
+            }
+            if ("boss".equals(orgCode)){
+                //挂账审批通过
+                if(String.valueOf(OrderAdjRefundType.CDFQ_GZ.code).equals(orderUpModelVo.getRefundType()) ){
+                    orderAdj.setSettleAmount(new BigDecimal(orderUpModelVo.getRefundAmount()));
+                    orderAdj.setRealRefundAmo(BigDecimal.ZERO);
+                    orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
+                    orderAdj.setRefundStat(RefundStat.UNREFUND.key);
+                    reqMap.put("remit",false);
+                }else if(String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
+                    orderAdj.setRealRefundAmo(new BigDecimal(orderUpModelVo.getRefundAmount()));
+                    orderAdj.setSettleAmount(BigDecimal.ZERO);
+                    orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
+                    orderAdj.setRefundStat(RefundStat.REFUNDING.key);
+                    reqMap.put("remit",true);
+                }
+                if(!orderService.approvalTaskSettle(orderAdj).isOK()){
+                    return AgentResult.fail("更新订单调整记录失败!");
+                };
             }
             //完成任务
             Map resultMap = activityService.completeTask(orderUpModelVo.getTaskId(), reqMap);
