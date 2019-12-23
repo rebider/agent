@@ -930,7 +930,19 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 }
             }
         } else {
-            throw new MessageException("类型错误");
+            OActivityVisibleExample oActivityVisibleExample = new OActivityVisibleExample();
+            OActivityVisibleExample.Criteria criteria = oActivityVisibleExample.createCriteria();
+            criteria.andActivityIdEqualTo(activityId);
+            activityVisibleMapper.deleteByExample(oActivityVisibleExample);
+            OActivity oActivity = new OActivity();
+            oActivity.setActCode(activityId);
+            oActivity.setVisible("");
+            oActivity.setuTime(new Date());
+            oActivity.setuUser(userId);
+            int i = activityMapper.updateByActCode(oActivity);
+            if (i == 0) {
+                throw new MessageException("设置失败");
+            }
         }
     }
 

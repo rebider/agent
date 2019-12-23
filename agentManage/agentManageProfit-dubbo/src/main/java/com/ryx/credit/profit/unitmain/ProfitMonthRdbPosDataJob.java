@@ -2,6 +2,7 @@ package com.ryx.credit.profit.unitmain;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.OrgType;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtil;
@@ -55,9 +56,8 @@ public class ProfitMonthRdbPosDataJob {
     @Autowired
     OrderService orderService;
 
-    private List<String> notSuccessAgent;
-    private Map<String,Integer> repeatAgent;
     //未成功的代理商
+    private List<String> notSuccessAgent;
 
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertyConfigInDev(){
@@ -96,7 +96,6 @@ public class ProfitMonthRdbPosDataJob {
     public void synchroProfitMonth(String transDate) {
 
         notSuccessAgent=new ArrayList<String>();
-        repeatAgent=new HashMap<String,Integer>();
 
         HashMap<String, String> map = new HashMap<String, String>();
         map.put("month",transDate);
@@ -128,7 +127,6 @@ public class ProfitMonthRdbPosDataJob {
                 //插入新拉取数据
                 insertTransProfit(data, transDate);
                 logger.info("未同步成功代理商"+notSuccessAgent.toString());
-                logger.info("代理商:"+repeatAgent.toString());
                 return ;
             }
         } catch (Exception e) {
@@ -150,21 +148,18 @@ public class ProfitMonthRdbPosDataJob {
                 JSONObject tranData = agencyData.getJSONObject(j);
                 String agencyId = tranData.getString("agencyId");
 
-                if (repeatAgent.containsKey(agencyId)){
-                    repeatAgent.put(agencyId,repeatAgent.get(agencyId)+1);
-                }else{
-                    repeatAgent.put(agencyId,1);
-                }
-
                 TransProfitDetail detail = new TransProfitDetail();
                 if (agencyId==null ||agencyId.equals(""))
                     continue;
-                AgentBusInfo agentBusInfo = businfoService.selectBusInfo(agencyId);
-                if (agentBusInfo==null){
+
+                AgentBusInfo agentBusInfo;
+                try {
+                    agentBusInfo = businfoService.queryAgentBusInfo(agencyId);
+                }catch (Exception e){//查询失败的代理商
                     notSuccessAgent.add(agencyId);
-                    logger.info("代理商详情查询失败-----agencyId："+agencyId);
                     continue;
                 }
+
                 detail.setAgentId(agentBusInfo.getAgentId());
                 detail.setAgentName(agencyName);
                 detail.setBusNum(agencyId);

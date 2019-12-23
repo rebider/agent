@@ -18,6 +18,7 @@
     <result column="TEM_TYPE" jdbcType="VARCHAR" property="temType" />
     <result column="REV1" jdbcType="VARCHAR" property="rev1" />
     <result column="REV2" jdbcType="VARCHAR" property="rev2" />
+    <result column="BUS_NUM_S" jdbcType="VARCHAR" property="busNumS" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -51,7 +52,7 @@
   <sql id="Base_Column_List">
     ID, AGENT_ID, AGENT_NAME, BUS_NUM, BUS_PLATFORM, CREATE_DATE, APPLY_RESULT, TEMPLATE_NAME,
     TEMPLATE_ID, CREATE_USER, ASSIGN_RESULT, ASSIGN_REASON, CRE_TYPE, TEM_TYPE, REV1,
-    REV2
+    REV2, BUS_NUM_S
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.TemplateRecodeExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -87,13 +88,13 @@
       APPLY_RESULT, TEMPLATE_NAME, TEMPLATE_ID,
       CREATE_USER, ASSIGN_RESULT, ASSIGN_REASON,
       CRE_TYPE, TEM_TYPE, REV1,
-      REV2)
+      REV2, BUS_NUM_S)
     values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR},
       #{busNum,jdbcType=VARCHAR}, #{busPlatform,jdbcType=VARCHAR}, #{createDate,jdbcType=VARCHAR},
       #{applyResult,jdbcType=VARCHAR}, #{templateName,jdbcType=VARCHAR}, #{templateId,jdbcType=VARCHAR},
       #{createUser,jdbcType=VARCHAR}, #{assignResult,jdbcType=VARCHAR}, #{assignReason,jdbcType=VARCHAR},
       #{creType,jdbcType=VARCHAR}, #{temType,jdbcType=VARCHAR}, #{rev1,jdbcType=VARCHAR},
-      #{rev2,jdbcType=VARCHAR})
+      #{rev2,jdbcType=VARCHAR}, #{busNumS,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.TemplateRecode">
     insert into P_TEMPLATE_APPLY_RECORD
@@ -146,6 +147,9 @@
       <if test="rev2 != null">
         REV2,
       </if>
+      <if test="busNumS != null">
+        BUS_NUM_S,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -195,6 +199,9 @@
       </if>
       <if test="rev2 != null">
         #{rev2,jdbcType=VARCHAR},
+      </if>
+      <if test="busNumS != null">
+        #{busNumS,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -252,6 +259,9 @@
       <if test="rev2 != null">
         REV2 = #{rev2,jdbcType=VARCHAR},
       </if>
+      <if test="busNumS != null">
+        BUS_NUM_S = #{busNumS,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -271,7 +281,8 @@
       CRE_TYPE = #{creType,jdbcType=VARCHAR},
       TEM_TYPE = #{temType,jdbcType=VARCHAR},
       REV1 = #{rev1,jdbcType=VARCHAR},
-      REV2 = #{rev2,jdbcType=VARCHAR}
+      REV2 = #{rev2,jdbcType=VARCHAR},
+      BUS_NUM_S = #{busNumS,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -316,7 +327,7 @@
     select
     ap.ID, ap.AGENT_ID, ap.AGENT_NAME, ap.BUS_NUM, ap.BUS_PLATFORM, ap.CREATE_DATE, ap.APPLY_RESULT, ap.TEMPLATE_NAME,
     ap.TEMPLATE_ID, ap.CREATE_USER, ap.ASSIGN_RESULT, ap.ASSIGN_REASON, ap.CRE_TYPE, ap.TEM_TYPE, ap.REV1,
-    ap.REV2
+    ap.REV2,ap.BUS_NUM_S
     from P_TEMPLATE_APPLY_RECORD ap
     left join  (
     select DISTINCT BUS_NUM, AGENT_ID,AG_DOC_PRO,AG_DOC_DISTRICT from A_AGENT_BUSINFO
@@ -386,4 +397,10 @@
       and ap.APPLY_RESULT = #{record.applyResult}
     </if>
   </select>
+
+
+  <select id="queryBusInfo" resultType="java.util.Map" parameterType="java.util.Map">
+     select AGENT_ID,BUS_TYPE,BUS_NUM,BUS_PLATFORM from A_AGENT_BUSINFO  where POS_PLAT_CODE = #{POS_PLAT_CODE} and STATUS='1'  and BUS_STATUS in('1','2')
+  </select>
+
 </mapper>

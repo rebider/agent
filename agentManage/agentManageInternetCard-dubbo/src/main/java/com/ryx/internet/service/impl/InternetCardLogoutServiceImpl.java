@@ -127,6 +127,9 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
         reqMap.put("page",page);
         List<Map<String, Object>> internetLogoutList = internetLogoutDetailMapper.internetCardLogoutDetailList(reqMap);
         for (Map<String, Object> map : internetLogoutList) {
+            map.put("ISSUER",Issuerstatus.getContentByValue(String.valueOf(map.get("ISSUER"))));
+            map.put("LOGOUT_STATUS",InternetLogoutStatus.getContentByValue(String.valueOf(map.get("LOGOUT_STATUS"))));
+            map.put("REVIEW_STATUS",AgStatus.getMsg(new BigDecimal(map.get("REVIEW_STATUS").toString())));
             if(StringUtils.isNotBlank(String.valueOf(map.get("C_USER")))){
                 CUser cUser = iUserService.selectById(Long.valueOf(String.valueOf(map.get("C_USER"))));
                 if(null!=cUser)
@@ -179,6 +182,28 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
         if(StringUtils.isNotBlank(internetLogoutDetail.getLogoutStatus())){
             reqMap.put("logoutStatus",internetLogoutDetail.getLogoutStatus());
         }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getInternetCardNum())){
+            reqMap.put("internetCardNum",internetLogoutDetail.getInternetCardNum());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getIssuer())){
+            reqMap.put("issuer",internetLogoutDetail.getIssuer());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getReviewStatus())){
+            reqMap.put("reviewStatus",internetLogoutDetail.getReviewStatus());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getBeginCTime())){
+            reqMap.put("beginCTime",internetLogoutDetail.getBeginCTime());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getEndCTime())){
+            reqMap.put("endCTime",internetLogoutDetail.getEndCTime());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getBeginSnNum())){
+            reqMap.put("beginSnNum",internetLogoutDetail.getBeginSnNum());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getEndSnNum())){
+            reqMap.put("endSnNum",internetLogoutDetail.getEndSnNum());
+        }
+
         List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
         if(orgCodeRes==null && orgCodeRes.size()!=1){
             return null;
@@ -260,6 +285,14 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 if(oInternetCard==null){
                     throw new MessageException("iccid有误");
                 }
+                if(StringUtils.isBlank(oInternetCard.getInternetCardNum())){
+                    throw new MessageException("物联卡号为空,不可申请注销,iccid:"+iccid);
+                }
+                if(party.equals("agent")){
+                    if(StringUtils.isBlank(oInternetCard.getBusNum()) || StringUtils.isBlank(oInternetCard.getBusPlatform())){
+                        throw new MessageException("业务平台数据不全,不可申请注销,iccid:"+iccid);
+                    }
+                }
                 InternetLogoutDetailExample internetLogoutDetailExample = new InternetLogoutDetailExample();
                 InternetLogoutDetailExample.Criteria criteria = internetLogoutDetailExample.createCriteria();
                 criteria.andStatusEqualTo(Status.STATUS_1.status);
@@ -293,6 +326,7 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 internetLogoutDetail.setcUser(cUser);
                 internetLogoutDetail.setuUser(cUser);
                 internetLogoutDetail.setVersion(BigDecimal.ONE);
+                internetLogoutDetail.setIssuer(oInternetCard.getIssuer());
                 if(StringUtils.isNotBlank(oInternetCard.getBusNum()) && StringUtils.isNotBlank(oInternetCard.getBusPlatform())){
                     //查询最新对接省区大区对接人
                     AgentBusInfo agentBusInfo = new AgentBusInfo();
@@ -496,8 +530,8 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.SX.getValue());
                 oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
             }else if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
-                internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.DZX.getValue());
-                oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());
+                internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.TJCLZ.getValue());
+//                oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());
             }
             int j = internetLogoutDetailMapper.updateByPrimaryKeySelective(internetLogoutDetail);
             if(j!=1){

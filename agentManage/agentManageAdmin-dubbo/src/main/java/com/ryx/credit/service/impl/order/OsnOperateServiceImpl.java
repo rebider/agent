@@ -1110,7 +1110,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                 //更新处理结果
                 if (1 == queryResult.getStatus()) {
                     //下发成功，更新物流明细为下发成功
-                    logger.info("下发物流接口调用成功：物流编号:{},批次编号:{},时间:{},信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), queryResult.getMsg(), platForm.getPlatformType());
+                    logger.info("下发物流接口调用成功：物流编号:{},批次编号:{},时间:{},信息:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), queryResult.getMsg());
                     listOLogisticsDetailSn.forEach(detail -> {
                         detail.setSendStatus(LogisticsDetailSendStatus.send_success.code);
                         detail.setSbusMsg(queryResult.getMsg());
