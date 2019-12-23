@@ -326,33 +326,23 @@ public class ActivityServiceImpl implements ActivityService {
         List<String> highFlows = new ArrayList<>();
         // 用以保存高亮的线flowId
         for (int i = 0; i < historicActivityInstances.size() - 1; i++) {
-            ActivityImpl activityImpl = processDefinitionEntity
-                    .findActivity(historicActivityInstances.get(i)
-                            .getActivityId());
+            ActivityImpl activityImpl = processDefinitionEntity.findActivity(historicActivityInstances.get(i).getActivityId());
             List<ActivityImpl> sameStartTimeNodes = new ArrayList<>();
-            ActivityImpl sameActivityImpl1 = processDefinitionEntity
-                    .findActivity(historicActivityInstances.get(i + 1)
-                            .getActivityId());
+            ActivityImpl sameActivityImpl1 = processDefinitionEntity.findActivity(historicActivityInstances.get(i + 1).getActivityId());
             sameStartTimeNodes.add(sameActivityImpl1);
             for (int j = i + 1; j < historicActivityInstances.size() - 1; j++) {
-                HistoricActivityInstance activityImpl1 = historicActivityInstances
-                        .get(j);
-                HistoricActivityInstance activityImpl2 = historicActivityInstances
-                        .get(j + 1);
-                if (activityImpl1.getStartTime().equals(
-                        activityImpl2.getStartTime())) {
-                    ActivityImpl sameActivityImpl2 = processDefinitionEntity
-                            .findActivity(activityImpl2.getActivityId());
+                HistoricActivityInstance activityImpl1 = historicActivityInstances.get(j);
+                HistoricActivityInstance activityImpl2 = historicActivityInstances.get(j + 1);
+                if (activityImpl1.getStartTime().equals(activityImpl2.getStartTime())) {
+                    ActivityImpl sameActivityImpl2 = processDefinitionEntity.findActivity(activityImpl2.getActivityId());
                     sameStartTimeNodes.add(sameActivityImpl2);
                 } else {
                     break;
                 }
             }
-            List<PvmTransition> pvmTransitions = activityImpl
-                    .getOutgoingTransitions();
+            List<PvmTransition> pvmTransitions = activityImpl.getOutgoingTransitions();
             for (PvmTransition pvmTransition : pvmTransitions) {
-                ActivityImpl pvmActivityImpl = (ActivityImpl) pvmTransition
-                        .getDestination();
+                ActivityImpl pvmActivityImpl = (ActivityImpl) pvmTransition.getDestination();
                 if (sameStartTimeNodes.contains(pvmActivityImpl)) {
                     highFlows.add(pvmTransition.getId());
                 }

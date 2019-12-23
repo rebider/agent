@@ -433,11 +433,15 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Override
     public void verifyOrgAndBZYD(List<AgentBusInfoVo> agentBusInfoVoList, List<AgentBusInfoVo> busInfoVoList) throws Exception {
         Boolean busInfo = false;
-        List<String> stringList = new ArrayList<String>();
+        List<Map> stringList = new ArrayList<Map>();
         for (AgentBusInfoVo agentBusInfoVo : agentBusInfoVoList) {
             if (agentBusInfoVo.getBusType().equals(BusType.JG.key) || agentBusInfoVo.getBusType().equals(BusType.BZYD.key)) {
-                BigDecimal cloReviewStatus = agentBusInfoVo.getCloReviewStatus();
-                stringList.add(String.valueOf(cloReviewStatus));
+                BigDecimal cloReviewStatus = agentBusInfoVo.getCloReviewStatus();//审核状态
+                BigDecimal busStatus = agentBusInfoVo.getBusStatus();//业务状态
+                Map<String, String> listMap = new HashMap();
+                listMap.put("cloReviewStatus", String.valueOf(cloReviewStatus));
+                listMap.put("busStatus", String.valueOf(busStatus));
+                stringList.add(listMap);
             }
             if (agentBusInfoVo.getBusType().equals(BusType.JG.key) || agentBusInfoVo.getBusType().equals(BusType.BZYD.key)) {
                 busInfo = true;
@@ -446,10 +450,10 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         if (busInfo) {
             for (AgentBusInfoVo busInfoVo : busInfoVoList) {
                 if (!busInfoVo.getBusType().equals(BusType.JG.key) && !busInfoVo.getBusType().equals(BusType.BZYD.key)) {
-//                    throw new ProcessException("当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台");
                     if (stringList.size()>0 && stringList!=null) {
-                        for (String str : stringList) {
-                            if (!str.equals(String.valueOf(AgStatus.Refuse.status))) {
+                        for (Map map : stringList) {
+                            if (!map.get("cloReviewStatus").equals(String.valueOf(AgStatus.Refuse.status))
+                                    || !map.get("cloReviewStatus").equals(String.valueOf(BusStatus.YWTC.status))) {
                                 throw new ProcessException("当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台");
                             }
                         }
