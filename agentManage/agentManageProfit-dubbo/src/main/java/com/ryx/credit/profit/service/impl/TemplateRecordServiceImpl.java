@@ -1075,7 +1075,8 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             logger.info("此用户并未找到对应的直签代理商信息，核对信息:{}", param);
             throw new MessageException("此用户并未找到对应的直签代理商信息：原业务平台编码：" + param);
         } else {
-            if (orgIdMap.get("BUS_PLATFORM") != null && "100013".equals(String.valueOf(orgIdMap.get("BUS_PLATFORM")))) {
+            Map<String, Object> platFromMap = recodeMapper.queryPlatFrom(String.valueOf(orgIdMap.get("BUS_PLATFORM")));
+            if (platFromMap.get("PLATFORM_TYPE") != null && "ZHPOS".equals(String.valueOf(platFromMap.get("PLATFORM_TYPE")))) {
                 if (orgIdMap.get("BUS_NUM") != null) {
                     return String.valueOf(orgIdMap.get("BUS_NUM"));
                 } else {
@@ -1083,8 +1084,8 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                     throw new MessageException("此用户并未找到对应的业务平台编码：原业务平台编码：" + param);
                 }
             } else {
-                logger.info("此用户并不是智慧pos平台用户，核对信息:{}", param);
-                throw new MessageException("此用户并不是智慧pos平台用户：原业务平台编码：" + param);
+                logger.info("此用户并不是智慧平台用户，核对信息:{}", param);
+                throw new MessageException("此用户并不是智慧平台用户：原业务平台编码：" + param);
             }
         }
     }

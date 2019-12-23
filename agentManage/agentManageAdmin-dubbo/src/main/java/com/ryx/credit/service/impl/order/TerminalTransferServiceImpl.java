@@ -661,7 +661,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             log.info("此用户并未找到对应的直签代理商信息，核对信息:{}", JSONObject.toJSON(terminalTransferDetail));
             throw new MessageException("此用户并未找到对应的直签代理商信息：原业务平台编码：" + param);
         } else {
-            if (terminalTransferOriginalOrgIdMap.get("BUS_PLATFORM") != null && "100013".equals(String.valueOf(terminalTransferOriginalOrgIdMap.get("BUS_PLATFORM")))) {
+            Map<String, Object> queryPlatFromMap =terminalTransferMapper.queryPlatFrom(String.valueOf(terminalTransferOriginalOrgIdMap.get("BUS_PLATFORM")));
+            if (queryPlatFromMap.get("PLATFORM_TYPE") != null && "ZHPOS".equals(String.valueOf(queryPlatFromMap.get("PLATFORM_TYPE")))) {
                 if (terminalTransferOriginalOrgIdMap.get("BUS_NUM") != null) {
                     return String.valueOf(terminalTransferOriginalOrgIdMap.get("BUS_NUM"));
                 } else {
