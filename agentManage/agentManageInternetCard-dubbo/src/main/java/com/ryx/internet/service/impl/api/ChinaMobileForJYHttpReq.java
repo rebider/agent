@@ -2,6 +2,7 @@ package com.ryx.internet.service.impl.api;
 
 import com.ryx.credit.common.enumc.JyMobileOptType;
 import com.ryx.credit.common.util.*;
+import com.ryx.credit.commons.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +60,11 @@ public class ChinaMobileForJYHttpReq {
             paramMap= ApiUtils.sortMap(paramMap);
             log.info("揭阳移动接口查询状态请求参数：iccids:{},transId:{}",iccids,transId);
             String result = HttpClientUtil.doPost(JY_MOBILE_CARD_URL, paramMap);
+            if(StringUtils.isBlank(result)){
+                log.info("揭阳移动接口查询状态返回参数：result:{}",result);
+                AppConfig.sendEmails("接口请求错误：result："+result, "物联网移动接口请求异常,方法batchQueryCardStatus");
+                return "";
+            }
             String decrypt = DESUtils.decrypt(result, secretKey);
             log.info("揭阳移动接口查询状态返回参数：{}",decrypt);
             return decrypt;
@@ -152,6 +158,11 @@ public class ChinaMobileForJYHttpReq {
             paramMap= ApiUtils.sortMap(paramMap);
             log.info("揭阳移动接口批量号码停开机请求参数：msisdn:{},optType:{},transId:{}",msisdn,optType,transId);
             String result = HttpClientUtil.doPost(JY_MOBILE_CARD_URL, paramMap);
+            if(StringUtils.isBlank(result)){
+                log.info("揭阳移动接口批量号码停开机返回参数：result:{}",result);
+                AppConfig.sendEmails("接口请求错误：result："+result, "物联网移动接口请求异常,方法msisdnSwitch");
+                return "";
+            }
             String decrypt = DESUtils.decrypt(result, secretKey);
             log.info("揭阳移动接口批量号码停开机返回参数：{}",decrypt);
             return decrypt;
