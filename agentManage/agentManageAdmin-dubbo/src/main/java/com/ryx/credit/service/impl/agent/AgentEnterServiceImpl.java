@@ -1397,7 +1397,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 }
 
                 if (null != agentoutVo.getCloTaxPoint()) {
-                    agentoutVo.setPoint(String.valueOf(agentoutVo.getCloTaxPoint()) + "%");
+                    agentoutVo.setPoint(String.valueOf(agentoutVo.getCloTaxPoint()));
                 }
 
                 //业务区域

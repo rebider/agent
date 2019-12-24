@@ -65,6 +65,7 @@ public class PlannerServiceImpl implements PlannerService {
         Map<String, Object> reqMap = new HashMap<>();
 //        reqMap.put("receiptStatus", OReceiptStatus.WAITING_LIST.code);
         reqMap.put("receiptProStatus", OReceiptStatus.WAITING_LIST.code);
+
         if (StringUtils.isNotBlank(receiptOrder.getOrderId())) {
             reqMap.put("orderId", receiptOrder.getOrderId());
         }
@@ -83,6 +84,9 @@ public class PlannerServiceImpl implements PlannerService {
         //            reqMap.put("proId", map.get("PRO_ID"));
         //        }
         //增加增加厂家和机型
+        if (null!=map.get("ag") && StringUtils.isNotBlank(map.get("ag")+"")){
+            reqMap.put("ag", map.get("ag"));
+        }
         if (null!=map.get("VENDER") && StringUtils.isNotBlank(map.get("VENDER")+"")){
             reqMap.put("vender", map.get("VENDER"));
         }

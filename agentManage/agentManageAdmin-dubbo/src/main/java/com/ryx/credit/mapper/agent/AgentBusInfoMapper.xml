@@ -736,7 +736,7 @@
 
   <sql id="queryBusinessPlatformSql">
     select
-    b.id,b.agent_id,b.bus_num,b.bus_platform,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
+    b.id,b.agent_id,b.bus_num,b.bus_platform,b.bus_type,a.id as ag,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
     a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time,b.clo_pay_company,b.bus_Inde_ass,d.ag_name as risk_parent,e.name as ag_doc_pro,to_char(b.approve_time,'yyyy-MM-dd hh24:mi:ss') as approve_time
     from A_agent_businfo b
     left join A_agent a on b.agent_id = a.id
@@ -748,6 +748,9 @@
     and a.ag_status = #{reqMap.agStatus} and a.status=1
     <if test="reqMap.agName != null and reqMap.agName != '' " >
       and a.ag_name  like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
+    </if>
+    <if test="reqMap.ag != null and reqMap.ag != '' " >
+      and a.id = #{reqMap.ag}
     </if>
     <if test="reqMap.agUniqNum != null and reqMap.agUniqNum != '' " >
       and a.ag_uniq_num = #{reqMap.agUniqNum}
@@ -899,7 +902,9 @@
     LEFT JOIN a_agent busriskparentbusagent ON busriskparentbusagent.id = busriskparentbus.agent_id
     LEFT JOIN a_agent_businfo busactivationparentbus ON bus.bus_activation_parent = busactivationparentbus.id
     LEFT JOIN a_agent busactivationparentbusagent ON busactivationparentbusagent.id = busactivationparentbus.agent_id
-    where 1=1   and agent.ag_status = #{reqMap.agStatus} and agent.status=1
+    where agent.status=1
+      and agent.ag_status = #{reqMap.agStatus}
+    <if test="reqMap.ag != null and reqMap.ag != '' ">and agent.id = #{reqMap.ag}</if>
       <if test="reqMap.agName != null and reqMap.agName != '' ">and agent.ag_name like
         CONCAT(CONCAT('%',#{reqMap.agName}),'%')
       </if>
