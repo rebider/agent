@@ -340,4 +340,9 @@ public interface OrderService {
      * @return
      */
     PageInfo queryUpModelListAll(Map par, Page page);
+
+    /**
+     * 执行订单调整计划
+     */
+    AgentResult adjustDoPayPlan(String adjId,OrderAdj orderAdj)throws Exception;
 }
