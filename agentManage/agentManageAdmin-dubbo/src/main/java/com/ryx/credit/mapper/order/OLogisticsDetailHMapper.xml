@@ -587,9 +587,9 @@
 
   <sql id="historyListWhere">
     <where>
-      history.status = #{map.status}
-      <if test="map.orderId != null"> and history.order_id = #{map.orderId} </if>
-      <if test="map.snNum != null"> and history.sn_num = #{map.snNum} </if>
+      <if test="map.status!=null and map.status!=''"> and history.status = #{map.status} </if>
+      <if test="map.orderId!=null and map.orderId!=''"> and history.order_id = #{map.orderId} </if>
+      <if test="map.snNum!=null and map.snNum!=''"> and history.sn_num = #{map.snNum} </if>
     </where>
   </sql>
 
