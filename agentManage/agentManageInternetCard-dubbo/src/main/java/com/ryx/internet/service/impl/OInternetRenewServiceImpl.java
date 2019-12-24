@@ -965,7 +965,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                         calendar.setTime(oInternetCard.getExpireTime());
                         calendar.add(Calendar.MONTH, -1);
                         Date expireTime = calendar.getTime();
-                        Date date = DateUtil.dateDay(expireTime, "10");
+                        Date date = DateUtil.dateDay(expireTime, "11");
                         if(Calendar.getInstance().getTime().getTime()>date.getTime()){
                             throw new MessageException("iccid:"+iccidNumId+",已经超过续费截止时间,不允许续费");
                         }
