@@ -209,10 +209,10 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                                         if (adjustType.equals(String.valueOf(AdjustType.ORDER_ADJ.adjustType))){
                                             calendar.setTime(detail.getPlanPayTime());
                                             calendar.add(Calendar.MONTH, -1);
+                                            startTime = calendar.getTime();
                                         }else {
                                             startTime = detail.getPlanPayTime();
                                         }
-                                        startTime = calendar.getTime();
                                         startPlanNum = detail.getPlanNum().subtract(BigDecimal.ONE);
                                     }
                                 }
@@ -230,7 +230,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                         if (outPlanNum > 0) {
                             if (adjustType.equals(String.valueOf(AdjustType.ORDER_ADJ.adjustType))){
                                 Calendar temp = Calendar.getInstance();
-                                calNews = StageUtil.stageOrder(outAmt, outPlanNum, startTime, temp.get(Calendar.DAY_OF_MONTH));
+                                calNews = StageUtil.stageOrder(outAmt, outPlanNum, startTime, temp.get(Calendar.ERA));
                             }else {
                                 calNews = StageUtil.stageOrder(outAmt, outPlanNum, startTime, 16);
                             }
