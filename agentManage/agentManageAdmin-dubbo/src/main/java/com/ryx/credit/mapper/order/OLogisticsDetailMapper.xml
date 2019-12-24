@@ -677,6 +677,7 @@
       1=1
       <if test="orderId!=null and orderId!=''"> and detail.ORDER_ID=#{orderId} </if>
       <if test="snNum!=null and snNum!=''"> and detail.SN_NUM=#{snNum}</if>
+      <if test="snNumStart!=null and snNumEnd!=''">and detail.SN_NUM between #{snNumStart} and #{snNumEnd} </if>
     </where>
   </sql>
   <sql id='SORTING'>

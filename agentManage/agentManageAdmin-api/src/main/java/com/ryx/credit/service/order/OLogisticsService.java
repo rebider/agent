@@ -62,4 +62,13 @@ public interface OLogisticsService {
      * @return
      */
     AgentResult delLogistcstInfo(String lgcId,String userId)throws Exception;
+
+    /**
+     * 物流明细-批量退转发
+     * @param logsDetailId
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    AgentResult updateByIdSnInfo(String logsDetailId, String userId) throws Exception;
 }
