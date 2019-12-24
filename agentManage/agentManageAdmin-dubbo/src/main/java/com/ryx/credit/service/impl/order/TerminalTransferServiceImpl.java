@@ -654,7 +654,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         List<Map<String, Object>> terminalTransferOriginalOrgIdMaps = terminalTransferMapper.queryBusInfo(fastMap);
         if(terminalTransferOriginalOrgIdMaps==null||terminalTransferOriginalOrgIdMaps.size()!=1){
             log.info("查询S码用户数据并不唯一:{}", JSONObject.toJSON(terminalTransferDetail));
-            throw new MessageException("查询S码用户数据并不唯一:{}" + param);
+            throw new MessageException("查询S码用户数据并不唯一:" + param);
         }
         Map<String, Object> terminalTransferOriginalOrgIdMap = terminalTransferOriginalOrgIdMaps.get(0);
         if (terminalTransferOriginalOrgIdMap == null || terminalTransferOriginalOrgIdMap.isEmpty()) {
