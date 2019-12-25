@@ -442,7 +442,7 @@ public class OldCompensateServiceImpl implements OldCompensateService {
             }
 
             String platformType = refundPriceDiffDetailList.get(0).getPlatformType();
-            if(PlatformType.POS.getValue().equals(platformType)){
+            if(PlatformType.whetherPOS(platformType)){
                 JSONObject resData =  (JSONObject)synOrVerifyResult.getData();
                 List<Map<String,Object>> resultList = (List<Map<String,Object>>)resData.get("resultList");
                 for (Map<String, Object> stringObjectMap : resultList) {
