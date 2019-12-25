@@ -17,11 +17,12 @@
     <job:simple id="agentLoginAccountCreate"
                 job-ref="agentLoginAccountCreateJob"
                 registry-center-ref="regCenter"
-                cron="0 0/30 * * * ?"
+                cron="0 0 0/1 * * ?"
                 overwrite="true"
                 description="代理商账号补全任务"
                 sharding-total-count="1"
                 sharding-item-parameters="0=Server0"
+                misfire="false"
                 disabled="${job.agentLoginAccountCreateJob}"
                 >
         <job:distributed-listener class="com.ryx.job.listener.ExmpDistributedListener" started-timeout-milliseconds="100" completed-timeout-milliseconds="100" />

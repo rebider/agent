@@ -175,4 +175,11 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+  <select id="queryDiffUserInfo" resultType="map">
+    select a.id as AG,c.id as USERID,c.name as USERNAME,a.ag_name as AGNAME
+    from a_agent  a
+      left join c_user_agent b on a.id=b.agentid
+      left join c_user c on c.id=b.userid
+    where a.ag_name!=c.name and a.status=1 and c.status=0 and b.status=1
+  </select>
 </mapper>

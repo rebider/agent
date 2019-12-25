@@ -926,7 +926,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     }
 
     /**
-     * 续费验证
+     * 续费/注销 验证
      * @param iccidNumIds
      * @param userId
      * @throws MessageException
@@ -937,8 +937,11 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         String[] iccidNumIdsStr = iccidNumIds.split(",");
         for (String iccidNumId : iccidNumIdsStr) {
             OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(iccidNumId);
-            if(null==oInternetCard.getInternetCardStatus()){
+            if(null==oInternetCard){
                 throw new MessageException("iccid:"+iccidNumId+",物联网卡信息不存在,请联系相关部门");
+            }
+            if(null==oInternetCard.getInternetCardStatus()){
+                throw new MessageException("iccid:"+iccidNumId+",物联网卡状态不存在,请联系相关部门");
             }
             if(null==oInternetCard.getRenew()){
                 throw new MessageException("iccid:"+iccidNumId+",物联网卡续费状态不存在,请联系相关部门");
@@ -962,7 +965,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                         calendar.setTime(oInternetCard.getExpireTime());
                         calendar.add(Calendar.MONTH, -1);
                         Date expireTime = calendar.getTime();
-                        Date date = DateUtil.dateDay(expireTime, "10");
+                        Date date = DateUtil.dateDay(expireTime, "11");
                         if(Calendar.getInstance().getTime().getTime()>date.getTime()){
                             throw new MessageException("iccid:"+iccidNumId+",已经超过续费截止时间,不允许续费");
                         }

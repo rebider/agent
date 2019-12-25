@@ -127,7 +127,7 @@ public class OLogisticsDetailHServiceImpl implements OLogisticsDetailHService {
     @Override
     public PageInfo getOLogDetailHistoryList(OLogisticsDetailH oLogisticsDetailH, Page page) {
         Map<String, Object> reqMap = new HashMap<>();
-        reqMap.put("status", Status.STATUS_1.status);
+//        reqMap.put("status", Status.STATUS_1.status);
         if (StringUtils.isNotBlank(oLogisticsDetailH.getOrderId())) {
             reqMap.put("orderId", oLogisticsDetailH.getOrderId());
         }

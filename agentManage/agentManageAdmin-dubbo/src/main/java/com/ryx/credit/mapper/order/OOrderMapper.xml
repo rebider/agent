@@ -489,14 +489,16 @@
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
       <if test="id!=null and id!=''"> and  o.id = #{id} </if>
       <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
+      <if test="ag!=null and ag!=''"> and  b.id = #{ag} </if>
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
-      <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
+      <if test="agName!=null and agName!=''"> and b.ag_name like CONCAT(CONCAT('%',#{agName}),'%') </if>
         <if test="agDocDistrict!=null and agDocDistrict!=''">
             and (b.AG_DOC_PRO = #{agDocDistrict} or b.AG_DOC_DISTRICT = #{agDocDistrict})
         </if>
       <if test="agDocPro!=null and agDocPro!=''"> and b.AG_DOC_PRO like  #{agDocPro} </if>
-      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
+      <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
       <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
@@ -605,14 +607,16 @@
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
       <if test="id!=null and id!=''"> and  o.id = #{id} </if>
       <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
+      <if test="ag!=null and ag!=''"> and  b.id = #{ag} </if>
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
-      <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
+      <if test="agName!=null and agName!=''"> and b.ag_name like  CONCAT(CONCAT('%',#{agName}),'%') </if>
         <if test="agDocDistrict!=null and agDocDistrict!=''">
             and (b.AG_DOC_PRO = #{agDocDistrict} or b.AG_DOC_DISTRICT = #{agDocDistrict})
         </if>
       <if test="agDocPro!=null and agDocPro!=''"> and b.AG_DOC_PRO like  #{agDocPro} </if>
-      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD')  between #{beginTime} and #{endTime}) </if>
+      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
+      <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
       <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
@@ -710,14 +714,16 @@
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
       <if test="id!=null and id!=''"> and  o.id = #{id} </if>
       <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
+      <if test="ag!=null and ag!=''"> and  b.id = #{ag} </if>
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
-      <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
+      <if test="agName!=null and agName!=''"> and b.ag_name like  CONCAT(CONCAT('%',#{agName}),'%') </if>
       <if test="agDocDistrict!=null and agDocDistrict!=''">
         and (b.AG_DOC_PRO = #{agDocDistrict} or b.AG_DOC_DISTRICT = #{agDocDistrict})
       </if>
       <if test="agDocPro!=null and agDocPro!=''"> and b.AG_DOC_PRO like  #{agDocPro} </if>
-      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
+      <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
       <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
@@ -804,14 +810,16 @@
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
       <if test="id!=null and id!=''"> and  o.id = #{id} </if>
       <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
+      <if test="ag!=null and ag!=''"> and  b.id = #{ag} </if>
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
-      <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
+      <if test="agName!=null and agName!=''"> and b.ag_name like  CONCAT(CONCAT('%',#{agName}),'%') </if>
       <if test="agDocDistrict!=null and agDocDistrict!=''">
         and (b.AG_DOC_PRO = #{agDocDistrict} or b.AG_DOC_DISTRICT = #{agDocDistrict})
       </if>
       <if test="agDocPro!=null and agDocPro!=''"> and b.AG_DOC_PRO like  #{agDocPro} </if>
-      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD')  between #{beginTime} and #{endTime}) </if>
+      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
+      <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
       <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
@@ -920,11 +928,13 @@
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
       <if test="id!=null and id!=''"> and  o.id = #{id} </if>
       <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
+      <if test="ag!=null and ag!=''"> and  b.id = #{ag} </if>
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
       <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
-      <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
-      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+      <if test="agName!=null and agName!=''"> and b.ag_name like  CONCAT(CONCAT('%',#{agName}),'%') </if>
+      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
+      <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
       <if test="platformList!=null and platformList.size > 0">
          and c.PLATFORM_NUM
         <foreach collection="platformList" item="platform" open=" in(" close=")" separator=",">
@@ -978,7 +988,7 @@
        and 1=-1
      </if>
     </where>
-    order by c_time desc
+    order by o.c_time desc
     <include refid="OracleDialectSuffix" />
   </select>
 
@@ -1053,10 +1063,12 @@
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
       <if test="id!=null and id!=''"> and  o.id = #{id} </if>
       <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
+      <if test="ag!=null and ag!=''"> and  b.id = #{ag} </if>
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
-      <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
-      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+      <if test="agName!=null and agName!=''"> and b.ag_name like  CONCAT(CONCAT('%',#{agName}),'%') </if>
+      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
+      <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
       <if test="platformList!=null and platformList.size > 0">
         and c.PLATFORM_NUM
         <foreach collection="platformList" item="platform" open=" in(" close=")" separator=",">
@@ -1181,12 +1193,12 @@
     order by O_Receipt_order.Address_Id asc, o_receipt_pro.c_time desc
   </select>
 
-  <!--所有订单导出-->
+  <!--订单管理导出-->
   <select id="excelOrder" parameterType="map" resultMap="OrderoutVo">
     (
     select
-    to_char(o.c_time,'yyyy-MM-dd hh24:mi:ss') as apytime,
-    o.o_num as num,
+    o.c_time as apytime,
+    o.o_num as num,o.O_INURETIME,
     b.ag_uniq_num,
     aab.bus_num,
     c.platform_name,
@@ -1348,10 +1360,12 @@
       <if test="oNum!=null and oNum!=''"> and o.o_num = #{oNum} </if>
       <if test="id!=null and id!=''"> and o.id = #{id} </if>
       <if test="agentId!=null and agentId!=''"> and o.agent_id = #{agentId} </if>
+      <if test="ag!=null and ag!=''"> and b.id = #{ag} </if>
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform = #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
-      <if test="agName!=null and agName!=''"> and b.ag_name like #{agName} </if>
-      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+      <if test="agName!=null and agName!=''"> and b.ag_name like CONCAT(CONCAT('%',#{agName}),'%')  </if>
+      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
+      <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
       <if test="platformList!=null and platformList.size > 0">
         and c.PLATFORM_NUM
         <foreach collection="platformList" item="platform" open=" in(" close=")" separator=",">
@@ -1416,8 +1430,8 @@
   <select id="orderExcel" parameterType="map" resultMap="OrderoutVo">
     (
     select
-    to_char(o.c_time,'yyyy-MM-dd hh24:mi:ss') as apytime,
-    o.o_num as num,
+    o.c_time as apytime,
+    o.o_num as num,  o.o_inuretime,
     b.ag_uniq_num,
     aab.bus_num,
     c.platform_name,
@@ -1582,8 +1596,9 @@
       <if test="agentId!=null and agentId!=''"> and o.agent_id = #{agentId} </if>
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform = #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
-      <if test="agName!=null and agName!=''"> and b.ag_name like #{agName} </if>
-      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+      <if test="agName!=null and agName!=''"> and b.ag_name like CONCAT(CONCAT('%',#{agName}),'%')  </if>
+      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
+      <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.AG_UNIQ_NUM=#{agUniqNum} </if>
       <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1 and PRO_TYPE=#{proType} and o.id=ORDER_ID) </if>
@@ -1616,8 +1631,8 @@
     </where>
     UNION
     select
-    to_char(o.c_time,'yyyy-MM-dd hh24:mi:ss') as apytime,
-    o.o_num as num,
+    o.c_time as apytime,
+    o.o_num as num,  o.o_inuretime ,
     b.ag_uniq_num,
     aab.bus_num,
     c.platform_name,
@@ -1781,8 +1796,9 @@
       <if test="agentId!=null and agentId!=''"> and o.agent_id = #{agentId} </if>
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform = #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
-      <if test="agName!=null and agName!=''"> and b.ag_name like #{agName} </if>
-      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+      <if test="agName!=null and agName!=''"> and b.ag_name like  CONCAT(CONCAT('%',#{agName}),'%') </if>
+      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
+      <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.AG_UNIQ_NUM=#{agUniqNum} </if>
       <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1 and PRO_TYPE=#{proType} and o.id=ORDER_ID) </if>
