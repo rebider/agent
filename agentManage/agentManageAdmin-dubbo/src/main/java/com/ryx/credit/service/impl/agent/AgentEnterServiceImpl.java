@@ -166,6 +166,11 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                         item.setAgLegalCernum(agent.getAgLegalCernum());
                     }
                 }
+                if(StringUtils.isNotBlank(item.getAgLegalCernum())){
+                    if(item.getAgLegalCernum().contains("x")){
+                        throw new ProcessException("请输入大写X");
+                    }
+                }
                 agentColinfoService.agentColinfoInsert(item, item.getColinfoTableFile(), "1");
             }
             // 保存业务信息
