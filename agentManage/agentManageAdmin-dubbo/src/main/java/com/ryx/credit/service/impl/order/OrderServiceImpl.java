@@ -5545,6 +5545,11 @@ public class OrderServiceImpl implements OrderService {
                         record_QT.setPayType(PaymentType.TK.code);
                         record_QT.setSrcType(PamentSrcType.ORDER_ADJ_REFUND.code);
                     }
+                    if (1 != oPaymentDetailMapper.insert(record_QT)) {
+                        logger.info("订单调整审批完成:明细生成失败:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(), record_QT.getId());
+                        throw new MessageException("分期处理");
+                    }
+                    logger.info("订单调整审批完成:明细生成:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(), record_QT.getId());
                     break;
                 }
                 //抵扣金额必须等于待付金额
