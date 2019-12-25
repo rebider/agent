@@ -236,8 +236,12 @@ public class OldCompensateServiceImpl implements OldCompensateService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,
-                                         List<String> refundPriceDiffFile, String cUser, List<OCashReceivablesVo> oCashReceivablesVoList,AgentVo agentVo)throws Exception{
+    public AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff,
+                                         List<ORefundPriceDiffDetail> refundPriceDiffDetailList,
+                                         List<String> refundPriceDiffFile,
+                                         String cUser,
+                                         List<OCashReceivablesVo> oCashReceivablesVoList,
+                                         AgentVo agentVo)throws Exception{
 
         try {
             if(PriceDiffType.DETAIN_AMT.code.equals(oRefundPriceDiff.getApplyCompType())){
@@ -414,6 +418,16 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 refundPriceDiffDetail.setVersion(Status.STATUS_0.status);
                 refundPriceDiffDetail.setOrderType(OrderType.OLD.getValue());
                 refundPriceDiffDetail.setSendStatus(Status.STATUS_0.status);
+
+                //特殊平台增加个校验（智慧POS，智能POS）
+                if (PlatformType.ZHPOS.code.equals(platForm.getPlatformType()) || PlatformType.ZPOS.code.equals(platForm.getPlatformType())) {
+                    List<Map<String, Object>> list = agentBusInfoMapper.queryBusinfo(FastMap.fastMap("posPlatCode", ""));
+                    if (list.size() != 1) {
+                        throw new MessageException("输入的S码有误，未找到业务平台！");
+                    }
+
+                }
+
                 Map<String,String> par = new HashedMap();
                 par.put("oldMerid",refundPriceDiffDetail.getOldMachineId());
                 par.put("newMerId",refundPriceDiffDetail.getNewMachineId());
