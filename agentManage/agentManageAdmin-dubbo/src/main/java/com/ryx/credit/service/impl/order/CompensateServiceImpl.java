@@ -235,7 +235,16 @@ public class CompensateServiceImpl implements CompensateService {
                 throw new ProcessException("代理商信息不存在");
             }
             if(!agent.getId().equals(agentId)){
-                COrganization cOrganization = organizationMapper.selectByPrimaryKey(Integer.valueOf(agent.getAgDocPro()));
+                //先取业务中对接省区，业务中不存在按照原来代理商表中取
+                COrganization cOrganization = new COrganization();
+                if (null == agent.getAgDocPro()) {
+                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(String.valueOf(stringObjectMap.get("BUS_ID")));
+                    if (null != agentBusInfo && null != agentBusInfo.getAgDocPro()){
+                        cOrganization = organizationMapper.selectByPrimaryKey(Integer.valueOf(agentBusInfo.getAgDocPro()));
+                    }
+                }else {
+                    cOrganization = organizationMapper.selectByPrimaryKey(Integer.valueOf(agent.getAgDocPro()));
+                }
                 if(!Pattern.matches(orgCode+".*",cOrganization.getCode())){
                     log.info("不能提交其他省区的活动调整");
                     throw new ProcessException("不能提交其他省区的活动调整");
@@ -338,8 +347,11 @@ public class CompensateServiceImpl implements CompensateService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,
-                                         List<String> refundPriceDiffFile, String cUser,List<OCashReceivablesVo> oCashReceivablesVoList,AgentVo agentVo)throws ProcessException{
+    public AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff,
+                                         List<ORefundPriceDiffDetail> refundPriceDiffDetailList,
+                                         List<String> refundPriceDiffFile,
+                                         String cUser,List<OCashReceivablesVo> oCashReceivablesVoList,
+                                         AgentVo agentVo)throws ProcessException{
 
         try {
             if(PriceDiffType.DETAIN_AMT.code.equals(oRefundPriceDiff.getApplyCompType())){
@@ -644,7 +656,7 @@ public class CompensateServiceImpl implements CompensateService {
                             }
                             int i = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(refundPriceDiffDetail);
                             if (i != 1) {
-                                throw new ProcessException("瑞大宝调整活动更新不差价明细失败！");
+                                throw new ProcessException("瑞大宝调整活动更新补差价明细失败！");
                             }
                         }
                     }

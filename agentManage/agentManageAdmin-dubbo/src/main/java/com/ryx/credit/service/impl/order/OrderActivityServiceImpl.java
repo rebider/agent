@@ -616,33 +616,35 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 OActivity rActivity = null;
                 here:
                 for (OActivity oActivity : oActivities) {
-                    if(oActivity.getVisible().equals(VisibleStatus.TWO.getValue())){
-                        AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
-                        AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
-                        criteria.andStatusEqualTo(Status.STATUS_1.status);
-                        criteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
-                        criteria.andBusNumEqualTo(busNum);
-                        List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
-                        if(agentBusInfos.size()==0){
-                            continue;
-                        }
-                        if(agentBusInfos.size()!=1){
-                            throw new MessageException("业务编号不唯一");
-                        }
-                        AgentBusInfo agentBusInfo = agentBusInfos.get(0);
-
-                        OActivityVisibleExample oActivityVisibleExample = new OActivityVisibleExample();
-                        OActivityVisibleExample.Criteria visibleCriteria = oActivityVisibleExample.createCriteria();
-                        visibleCriteria.andActivityIdEqualTo(oActivity.getActCode());
-                        List<OActivityVisible> oActivityVisibles = activityVisibleMapper.selectByExample(oActivityVisibleExample);
-                        for (OActivityVisible oActivityVisible : oActivityVisibles) {
-                            if(oActivityVisible.getAgentId().equals(agentBusInfo.getAgentId())){
-                                rActivity = oActivity;
-                                break here;
+                    if (null != oActivity.getVisible()) {
+                        if(oActivity.getVisible().equals(VisibleStatus.TWO.getValue())){
+                            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+                            AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+                            criteria.andStatusEqualTo(Status.STATUS_1.status);
+                            criteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
+                            criteria.andBusNumEqualTo(busNum);
+                            List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+                            if(agentBusInfos.size()==0){
+                                continue;
                             }
+                            if(agentBusInfos.size()!=1){
+                                throw new MessageException("业务编号不唯一");
+                            }
+                            AgentBusInfo agentBusInfo = agentBusInfos.get(0);
+
+                            OActivityVisibleExample oActivityVisibleExample = new OActivityVisibleExample();
+                            OActivityVisibleExample.Criteria visibleCriteria = oActivityVisibleExample.createCriteria();
+                            visibleCriteria.andActivityIdEqualTo(oActivity.getActCode());
+                            List<OActivityVisible> oActivityVisibles = activityVisibleMapper.selectByExample(oActivityVisibleExample);
+                            for (OActivityVisible oActivityVisible : oActivityVisibles) {
+                                if(oActivityVisible.getAgentId().equals(agentBusInfo.getAgentId())){
+                                    rActivity = oActivity;
+                                    break here;
+                                }
+                            }
+                        }else{
+                            priceSet.add(oActivity.getPrice());
                         }
-                    }else{
-                        priceSet.add(oActivity.getPrice());
                     }
                 }
                 if (priceSet.size() != 1) {
