@@ -667,6 +667,24 @@ public class AgentServiceImpl implements AgentService {
             if(com.ryx.credit.commons.utils.StringUtils.isBlank(is_create_account_begindate) || com.ryx.credit.commons.utils.StringUtils.isBlank(is_create_account) || !is_create_account.equals("1")){
                 return AgentResult.fail("开关未开启");
             }
+
+            //修复代理商信息 查询代理商名称和登录用户中不相同的ag登录信息
+            List<Map<String,Object>> listDiffUserInfoList =  cuserAgentMapper.queryDiffUserInfo();
+            for (Map<String, Object> stringObjectMap : listDiffUserInfoList) {
+                if(stringObjectMap.get("USERID")!=null && stringObjectMap.get("AGNAME")!=null){
+                    Object userId = stringObjectMap.get("USERID");
+                    Object agname = stringObjectMap.get("AGNAME");
+                    Object username = stringObjectMap.get("USERNAME");
+                    CUser cUser = cUserMapper.selectById(Long.valueOf(userId+""));
+                    cUser.setName(String.valueOf(agname));
+                    if(cUserMapper.updateById(cUser)==1){
+                        redisService.hSet(RedisCachKey.USER_NAMES.code,cUser.getId()+"",cUser.getName());
+                        logger.info("代理商登录信息从 {} 从 {} 名称变更为 {}",userId,username,agname);
+                    }
+                }
+            }
+
+
             logger.info("启动代理商开户任务");
             AgentExample example = new AgentExample();
             example.or().andAgStatusEqualTo(AgStatus.Approved.name())

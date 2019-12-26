@@ -419,6 +419,9 @@
       <if test="par.agentId != null and par.agentId!=''" >
         and ag.id = #{par.agentId}
       </if>
+      <if test="par.ag != null and par.ag!=''" >
+        and ag.id = #{par.ag}
+      </if>
       <if test="par.proName != null and par.proName!=''" >
         and suborder.pro_name like '${par.proName}'
       </if>
@@ -495,6 +498,9 @@
       </if>
       <if test="par.agentId != null and par.agentId!=''" >
         and ag.id = #{par.agentId}
+      </if>
+      <if test="par.ag != null and par.ag!=''" >
+        and ag.id = #{par.ag}
       </if>
       <if test="par.proName != null and par.proName!=''" >
         and suborder.pro_name like '${par.proName}'
@@ -586,6 +592,9 @@
       </if>
       <if test="agentName != null and agentName!=''" >
         and ag.AG_NAME like '${agentName}'
+      </if>
+      <if test="ag != null and ag!=''" >
+        and ag.id = #{ag}
       </if>
       <if test="proName != null and proName!=''" >
         and suborder.PRO_NAME like '${proName}'
