@@ -1108,33 +1108,40 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public AgentResult compressTerminalTransferActivity(String proIns, BigDecimal agStatus) throws Exception {
+        log.info("终端划拨流程结束,proIns:{},agStatus:{}",proIns,agStatus+"");
+        String retIdentifier = "";
+        try {
+            retIdentifier = redisService.lockWithTimeout(RedisCachKey.RENEW_CARD.code + proIns, RedisService.ACQUIRE_TIME_OUT, RedisService.TIME_OUT);
+            if (StringUtils.isBlank(retIdentifier)) {
+                log.info("已经联动划拨，请勿重复提交,proIns:{}", proIns);
+                throw new MessageException("已经联动划拨，请勿重复提交");
+            }
+            BusActRelExample example = new BusActRelExample();
+            example.or().andActivIdEqualTo(proIns).andStatusEqualTo(Status.STATUS_1.status).andActivStatusEqualTo(AgStatus.Approving.name());
+            List<BusActRel> list = busActRelMapper.selectByExample(example);
+            if (list.size() != 1) {
+                log.info("审批任务结束{}{}，未找到审批中的审批和数据关系", proIns, agStatus);
+                throw new MessageException("审批和数据关系有误");
+            }
+            BusActRel busActRel = list.get(0);
+            TerminalTransfer terminalTransfer = terminalTransferMapper.selectByPrimaryKey(busActRel.getBusId());
 
-        BusActRelExample example = new BusActRelExample();
-        example.or().andActivIdEqualTo(proIns).andStatusEqualTo(Status.STATUS_1.status).andActivStatusEqualTo(AgStatus.Approving.name());
-        List<BusActRel> list = busActRelMapper.selectByExample(example);
-        if (list.size() != 1) {
-            log.info("审批任务结束{}{}，未找到审批中的审批和数据关系", proIns, agStatus);
-            throw new MessageException("审批和数据关系有误");
-        }
-        BusActRel busActRel = list.get(0);
-        TerminalTransfer terminalTransfer = terminalTransferMapper.selectByPrimaryKey(busActRel.getBusId());
 
-
-        terminalTransfer.setReviewStatus(agStatus);
-        terminalTransfer.setuTime(new Date());
-        int i = terminalTransferMapper.updateByPrimaryKeySelective(terminalTransfer);
-        if (i != 1) {
-            log.info("审批任务结束{}{}，终端划拨更新失败1", proIns, agStatus);
-            throw new MessageException("终端划拨更新失败");
-        }
-        TerminalTransferDetailExample terminalTransferDetailExample = new TerminalTransferDetailExample();
-        TerminalTransferDetailExample.Criteria criteria = terminalTransferDetailExample.createCriteria();
-        criteria.andStatusEqualTo(Status.STATUS_1.status);
-        criteria.andTerminalTransferIdEqualTo(terminalTransfer.getId());
-        List<TerminalTransferDetail> terminalTransferDetails = terminalTransferDetailMapper.selectByExample(terminalTransferDetailExample);
-        if (terminalTransferDetails.size() == 0) {
-            throw new MessageException("终端划拨更新失败");
-        }
+            terminalTransfer.setReviewStatus(agStatus);
+            terminalTransfer.setuTime(new Date());
+            int i = terminalTransferMapper.updateByPrimaryKeySelective(terminalTransfer);
+            if (i != 1) {
+                log.info("审批任务结束{}{}，终端划拨更新失败1", proIns, agStatus);
+                throw new MessageException("终端划拨更新失败");
+            }
+            TerminalTransferDetailExample terminalTransferDetailExample = new TerminalTransferDetailExample();
+            TerminalTransferDetailExample.Criteria criteria = terminalTransferDetailExample.createCriteria();
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
+            criteria.andTerminalTransferIdEqualTo(terminalTransfer.getId());
+            List<TerminalTransferDetail> terminalTransferDetails = terminalTransferDetailMapper.selectByExample(terminalTransferDetailExample);
+            if (terminalTransferDetails.size() == 0) {
+                throw new MessageException("终端划拨更新失败");
+            }
         /*for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetails) {
             try {
                 //从redis取出导入的数据更新到DB
@@ -1156,22 +1163,27 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 throw new MessageException("终端划拨明细更新到DB失败");
             }
         }*/
-        busActRel.setActivStatus(AgStatus.getAgStatusString(agStatus));
-        int j = busActRelMapper.updateByPrimaryKey(busActRel);
-        if (j != 1) {
-            log.info("审批任务结束{}{}，终端划拨更新失败2", proIns, agStatus);
-            throw new MessageException("终端划拨更新失败");
+            busActRel.setActivStatus(AgStatus.getAgStatusString(agStatus));
+            int j = busActRelMapper.updateByPrimaryKey(busActRel);
+            if (j != 1) {
+                log.info("审批任务结束{}{}，终端划拨更新失败2", proIns, agStatus);
+                throw new MessageException("终端划拨更新失败");
+            }
+
+
+            if (agStatus.compareTo(AgStatus.Refuse.status) == 0) {
+                RefuseTransfer(terminalTransfer);
+            } else if (agStatus.compareTo(AgStatus.Approved.status) == 0) {
+                //将通过的结果再次返回给业务平台通知他们开始划拨
+                startTransfer(terminalTransfer);
+            }
+
+            return AgentResult.ok();
+        }finally {
+            if(StringUtils.isNotBlank(retIdentifier)){
+                redisService.releaseLock(RedisCachKey.RENEW_CARD.code+proIns, retIdentifier);
+            }
         }
-
-
-        if (agStatus.compareTo(AgStatus.Refuse.status) == 0) {
-            RefuseTransfer(terminalTransfer);
-        } else if (agStatus.compareTo(AgStatus.Approved.status) == 0) {
-            //将通过的结果再次返回给业务平台通知他们开始划拨
-            startTransfer(terminalTransfer);
-        }
-
-        return AgentResult.ok();
     }
 
 
