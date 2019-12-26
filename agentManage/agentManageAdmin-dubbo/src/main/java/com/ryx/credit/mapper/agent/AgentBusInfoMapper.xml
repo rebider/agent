@@ -462,7 +462,7 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample" resultType="java.lang.Integer">
     select count(*) from A_AGENT_BUSINFO
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -736,7 +736,7 @@
 
   <sql id="queryBusinessPlatformSql">
     select
-    b.id,b.agent_id,b.bus_num,b.bus_platform,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
+    b.id,b.agent_id,b.bus_num,b.bus_platform,b.bus_type,a.id as ag,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
     a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time,b.clo_pay_company,b.bus_Inde_ass,d.ag_name as risk_parent,e.name as ag_doc_pro,to_char(b.approve_time,'yyyy-MM-dd hh24:mi:ss') as approve_time
     from A_agent_businfo b
     left join A_agent a on b.agent_id = a.id
@@ -748,6 +748,9 @@
     and a.ag_status = #{reqMap.agStatus} and a.status=1
     <if test="reqMap.agName != null and reqMap.agName != '' " >
       and a.ag_name  like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
+    </if>
+    <if test="reqMap.ag != null and reqMap.ag != '' " >
+      and a.id = #{reqMap.ag}
     </if>
     <if test="reqMap.agUniqNum != null and reqMap.agUniqNum != '' " >
       and a.ag_uniq_num = #{reqMap.agUniqNum}
@@ -899,7 +902,9 @@
     LEFT JOIN a_agent busriskparentbusagent ON busriskparentbusagent.id = busriskparentbus.agent_id
     LEFT JOIN a_agent_businfo busactivationparentbus ON bus.bus_activation_parent = busactivationparentbus.id
     LEFT JOIN a_agent busactivationparentbusagent ON busactivationparentbusagent.id = busactivationparentbus.agent_id
-    where 1=1   and agent.ag_status = #{reqMap.agStatus} and agent.status=1
+    where agent.status=1
+      and agent.ag_status = #{reqMap.agStatus}
+    <if test="reqMap.ag != null and reqMap.ag != '' ">and agent.id = #{reqMap.ag}</if>
       <if test="reqMap.agName != null and reqMap.agName != '' ">and agent.ag_name like
         CONCAT(CONCAT('%',#{reqMap.agName}),'%')
       </if>
@@ -1159,6 +1164,23 @@ union
       </where>
   </select>
 
+  <select id="selectByConditionForPage" parameterType="map" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix"/>
+    select
+    <include refid="Base_Column_List"/>
+    from A_AGENT_BUSINFO
+    <where>
+      <if test="agentBusInfo.agentId != null and agentBusInfo.agentId != ''">
+        and id=#{agentBusInfo.agentId}
+      </if>
+      <if test="agentBusInfo.busNum != null and agentBusInfo.busNum != ''">
+        and id=#{agentBusInfo.busNum}
+      </if>
+    </where>
+    order by c_time desc
+    <include refid="OracleDialectSuffix"/>
+  </select>
+
   <!-- 通过订单查询代理商业务信息_Z -->
   <select id="selectByOrderId" parameterType="java.lang.String" resultMap="BaseResultMap">
       SELECT
@@ -1239,15 +1261,20 @@ union
 
 
   <select id="queryBusinfo" parameterType="map" resultMap="BaseResultMap" >
-    select
-    <include refid="Base_Column_List" />
-    from A_AGENT_BUSINFO
-    where status=1 and  CLO_REVIEW_STATUS in (2,3)
-    <if test="map.agentId !=null and map.agentId !=''">
-      and AGENT_ID = #{map.agentId}
-    </if>
-    <if test="map.busType !=null and map.busType !='' and map.busTypeOne !=null and map.busTypeOne !=''">
-      and BUS_TYPE in(#{map.busType},#{map.busTypeOne})
-    </if>
+      select
+          <include refid="Base_Column_List" />
+      from
+          A_AGENT_BUSINFO
+      where
+          status=1 and  CLO_REVIEW_STATUS in (2,3)
+          <if test="map.agentId !=null and map.agentId !=''">
+            and AGENT_ID = #{map.agentId}
+          </if>
+          <if test="map.busType !=null and map.busType !='' and map.busTypeOne !=null and map.busTypeOne !=''">
+            and BUS_TYPE in(#{map.busType},#{map.busTypeOne})
+          </if>
+          <if test="map.posPlatCode !=null and map.posPlatCode != ''">
+            and POS_PLAT_CODE = #{map.posPlatCode}
+          </if>
   </select>
 </mapper>

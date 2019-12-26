@@ -108,11 +108,11 @@ public class RefundJob {
         // pos退单应补分润
         getSupplyListAndDeal(param);
 
-        param.put("bussType", "01");
-        // mpos退单应扣分润
-        getDeductionListAndDeal(param);
-        // 退mpos单应补分润
-        getSupplyListAndDeal(param);
+            param.put("bussType", "01");
+            // mpos退单应扣分润
+            getDeductionListAndDeal(param);
+            // 退mpos单应补分润
+            getSupplyListAndDeal(param);
         }
     }
 

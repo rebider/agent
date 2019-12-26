@@ -5,6 +5,7 @@ import com.ryx.credit.activity.entity.ActRuTask;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -98,7 +99,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private ActRuTaskService actRuTaskService;
     @Autowired
     private AgentFreezeService agentFreezeService;
-
+    @Autowired
+    private RedisService redisService;
 
     /**
      * 代理商入网信息保存
@@ -164,6 +166,11 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 if (item.getCloType().compareTo(new BigDecimal(1)) == 0) {
                     if (agentName.equals(trueName)) {
                         item.setAgLegalCernum(agent.getAgLegalCernum());
+                    }
+                }
+                if(StringUtils.isNotBlank(item.getAgLegalCernum())){
+                    if(item.getAgLegalCernum().contains("x")){
+                        throw new ProcessException("请输入大写X");
                     }
                 }
                 agentColinfoService.agentColinfoInsert(item, item.getColinfoTableFile(), "1");
@@ -433,11 +440,15 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Override
     public void verifyOrgAndBZYD(List<AgentBusInfoVo> agentBusInfoVoList, List<AgentBusInfoVo> busInfoVoList) throws Exception {
         Boolean busInfo = false;
-        List<String> stringList = new ArrayList<String>();
+        List<Map> stringList = new ArrayList<Map>();
         for (AgentBusInfoVo agentBusInfoVo : agentBusInfoVoList) {
             if (agentBusInfoVo.getBusType().equals(BusType.JG.key) || agentBusInfoVo.getBusType().equals(BusType.BZYD.key)) {
-                BigDecimal cloReviewStatus = agentBusInfoVo.getCloReviewStatus();
-                stringList.add(String.valueOf(cloReviewStatus));
+                BigDecimal cloReviewStatus = agentBusInfoVo.getCloReviewStatus();//审核状态
+                BigDecimal busStatus = agentBusInfoVo.getBusStatus();//业务状态
+                Map<String, String> listMap = new HashMap();
+                listMap.put("cloReviewStatus", String.valueOf(cloReviewStatus));
+                listMap.put("busStatus", String.valueOf(busStatus));
+                stringList.add(listMap);
             }
             if (agentBusInfoVo.getBusType().equals(BusType.JG.key) || agentBusInfoVo.getBusType().equals(BusType.BZYD.key)) {
                 busInfo = true;
@@ -446,10 +457,10 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         if (busInfo) {
             for (AgentBusInfoVo busInfoVo : busInfoVoList) {
                 if (!busInfoVo.getBusType().equals(BusType.JG.key) && !busInfoVo.getBusType().equals(BusType.BZYD.key)) {
-//                    throw new ProcessException("当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台");
                     if (stringList.size()>0 && stringList!=null) {
-                        for (String str : stringList) {
-                            if (!str.equals(String.valueOf(AgStatus.Refuse.status))) {
+                        for (Map map : stringList) {
+                            if (!map.get("cloReviewStatus").equals(String.valueOf(AgStatus.Refuse.status))
+                                    || !map.get("cloReviewStatus").equals(String.valueOf(BusStatus.YWTC.status))) {
                                 throw new ProcessException("当前代理商已有标准一代/机构类型的业务平台，不可再次选择直签类型业务平台");
                             }
                         }
@@ -770,76 +781,89 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
     public AgentResult completeTaskEnterActivity(AgentVo agentVo, String userId) throws ProcessException {
+        String retIdentifier = "";
+        try {
+            retIdentifier = redisService.lockWithTimeout("task:"+agentVo.getTaskId(), RedisService.ACQUIRE_TIME_OUT, RedisService.TIME_OUT);
+            if (StringUtils.isBlank(retIdentifier)) {
+                throw new ProcessException("审批处理中,请勿重复提交");
+            }
+            AgentResult result = new AgentResult(500, "系统异常", "");
+            Map<String, Object> reqMap = new HashMap<>();
+            reqMap.put("rs", agentVo.getApprovalResult());
+            reqMap.put("approvalOpinion", agentVo.getApprovalOpinion());
+            reqMap.put("approvalPerson", userId);
+            reqMap.put("createTime", DateUtils.dateToStringss(new Date()));
+            reqMap.put("taskId", agentVo.getTaskId());
+            reqMap.put("dept", agentVo.getDept());
+            if(StringUtils.isNotBlank(agentVo.getMainDocDistrict()) && StringUtils.isNotBlank(agentVo.getSubDocDistrict())){
+                reqMap.put(agentVo.getMainDocDistrict(),agentVo.getMainDocDistrict());
+                reqMap.put(agentVo.getSubDocDistrict(),agentVo.getSubDocDistrict());
+                if(!reqMap.containsValue("beijing")){
+                    reqMap.put("beijing","");
+                }
+                if(!reqMap.containsValue("south")){
+                    reqMap.put("south","");
+                }
+                if(!reqMap.containsValue("north")){
+                    reqMap.put("north","");
+                }
+            }
 
-        AgentResult result = new AgentResult(500, "系统异常", "");
-        Map<String, Object> reqMap = new HashMap<>();
-        reqMap.put("rs", agentVo.getApprovalResult());
-        reqMap.put("approvalOpinion", agentVo.getApprovalOpinion());
-        reqMap.put("approvalPerson", userId);
-        reqMap.put("createTime", DateUtils.dateToStringss(new Date()));
-        reqMap.put("taskId", agentVo.getTaskId());
-        reqMap.put("dept", agentVo.getDept());
-        if(StringUtils.isNotBlank(agentVo.getMainDocDistrict()) && StringUtils.isNotBlank(agentVo.getSubDocDistrict())){
-            reqMap.put(agentVo.getMainDocDistrict(),agentVo.getMainDocDistrict());
-            reqMap.put(agentVo.getSubDocDistrict(),agentVo.getSubDocDistrict());
-            if(!reqMap.containsValue("beijing")){
-                reqMap.put("beijing","");
+            if(StringUtils.isNotBlank(agentVo.getOperationType())){
+                reqMap.put("operationType", agentVo.getOperationType());
             }
-            if(!reqMap.containsValue("south")){
-                reqMap.put("south","");
-            }
-            if(!reqMap.containsValue("north")){
-                reqMap.put("north","");
-            }
-        }
 
-        if(StringUtils.isNotBlank(agentVo.getOperationType())){
-            reqMap.put("operationType", agentVo.getOperationType());
-        }
-
-        if(agentVo.getAmt() != null){
-            reqMap.put("amt", agentVo.getAmt());
-        }
-        if(StringUtils.isNotBlank(agentVo.getRenewWay())){
-            reqMap.put("renewWay", agentVo.getRenewWay());
-        }
-
-        //传递部门信息
-        Map startPar = startPar(userId);
-        if (null != startPar) {
-            ActRuTask actRuTask = actRuTaskService.selectByPrimaryKey(agentVo.getTaskId());
-            if(actRuTask==null){
-                return result;
+            if(agentVo.getAmt() != null){
+                reqMap.put("amt", agentVo.getAmt());
             }
-            String[] procDefId = String.valueOf(actRuTask.getProcDefId()).split(":");
-            if(procDefId==null){
-                return result;
+            if(StringUtils.isNotBlank(agentVo.getRenewWay())){
+                reqMap.put("renewWay", agentVo.getRenewWay());
             }
-            String taskView = procDefId[0];
-            String[] taskViewVersion = taskView.split("_");
-            if(taskViewVersion.length>=2){
-                BigDecimal version = new BigDecimal(taskViewVersion[1]);
-                if(version.compareTo(new BigDecimal("3.0"))>=0){
-                    reqMap.put("party", startPar.get("party"));
+
+            //传递部门信息
+            Map startPar = startPar(userId);
+            if (null != startPar) {
+                ActRuTask actRuTask = actRuTaskService.selectByPrimaryKey(agentVo.getTaskId());
+                if(actRuTask==null){
+                    result.setMsg(" actRuTask is null");
+                    return result;
+                }
+                String[] procDefId = String.valueOf(actRuTask.getProcDefId()).split(":");
+                if(procDefId==null){
+                    result.setMsg(" procDefId is null");
+                    return result;
+                }
+                String taskView = procDefId[0];
+                String[] taskViewVersion = taskView.split("_");
+                if(taskViewVersion.length>=2){
+                    BigDecimal version = new BigDecimal(taskViewVersion[1]);
+                    if(version.compareTo(new BigDecimal("3.0"))>=0){
+                        reqMap.put("party", startPar.get("party"));
+                    }else{
+                        reqMap.put("party", "north");
+                    }
                 }else{
                     reqMap.put("party", "north");
                 }
-            }else{
-                reqMap.put("party", "north");
+            }
+
+            Map resultMap = activityService.completeTask(agentVo.getTaskId(), reqMap);
+            Boolean rs = (Boolean) resultMap.get("rs");
+            String msg = String.valueOf(resultMap.get("msg"));
+            if (resultMap == null) {
+                result.setMsg("resultMap is null");
+                return result;
+            }
+            if (!rs) {
+                result.setMsg("resultMap,msg:{}"+msg);
+                return result;
+            }
+            return AgentResult.ok(resultMap);
+        }finally {
+            if(StringUtils.isNotBlank(retIdentifier)){
+                redisService.releaseLock("task:"+agentVo.getTaskId(), retIdentifier);
             }
         }
-
-        Map resultMap = activityService.completeTask(agentVo.getTaskId(), reqMap);
-        Boolean rs = (Boolean) resultMap.get("rs");
-        String msg = String.valueOf(resultMap.get("msg"));
-        if (resultMap == null) {
-            return result;
-        }
-        if (!rs) {
-            result.setMsg(msg);
-            return result;
-        }
-        return AgentResult.ok(resultMap);
     }
 
 
@@ -1378,7 +1402,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 }
 
                 if (null != agentoutVo.getCloTaxPoint()) {
-                    agentoutVo.setPoint(String.valueOf(agentoutVo.getCloTaxPoint()) + "%");
+                    agentoutVo.setPoint(String.valueOf(agentoutVo.getCloTaxPoint()));
                 }
 
                 //业务区域

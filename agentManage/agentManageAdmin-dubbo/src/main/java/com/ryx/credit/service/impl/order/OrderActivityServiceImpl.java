@@ -31,6 +31,8 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.bouncycastle.asn1.x500.style.RFC4519Style.sn;
+
 /**
  * Created by RYX on 2018/7/13.
  */
@@ -587,7 +589,89 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         }
         FastMap res = FastMap.fastSuccessMap();
         Set<OActivity> actSet = new HashSet<>();
-        if (modelType.getdItemvalue().equals(PlatformType.MPOS.code)) {
+        //历史sn查询，分平台
+        if (modelType.getdItemvalue().equals(PlatformType.RDBPOS.code)) {
+            try {
+                AgentResult agentResult = termMachineService.querySnMsg(PlatformType.RDBPOS, snStart, snEnd);
+                if (!agentResult.isOK()) {
+                    throw new MessageException(agentResult.getMsg());
+                }
+                logger.info("根据SN查询业务系统返回:" + agentResult.getData());
+                Map<String, Object> resMap = (Map<String, Object>) agentResult.getData();
+                if(null == resMap.get("busProCode")) throw new MessageException("在瑞大宝平台未查到该活动！");
+                if(null == resMap.get("busNum")) throw new MessageException("在瑞大宝平台未查到该代理商！");
+                String busProCode = (String) resMap.get("busProCode");
+                String busNum = (String) resMap.get("busNum");
+
+                //活动校验
+                OActivityExample oActivityExample = new OActivityExample();
+                OActivityExample.Criteria activityCriteria = oActivityExample.createCriteria();
+                activityCriteria.andStatusEqualTo(Status.STATUS_1.status);
+                activityCriteria.andBusProCodeEqualTo(busProCode);
+                List<OActivity> oActivities = activityMapper.selectByExample(oActivityExample);
+                if (oActivities == null || oActivities.size() == 0) {
+                    throw new MessageException("活动未找到，请配置相应活动！");
+                }
+                Set<BigDecimal> priceSet = new HashSet<>();
+                OActivity rActivity = null;
+                here:
+                for (OActivity oActivity : oActivities) {
+                    if (null != oActivity.getVisible()) {
+                        if(oActivity.getVisible().equals(VisibleStatus.TWO.getValue())){
+                            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+                            AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+                            criteria.andStatusEqualTo(Status.STATUS_1.status);
+                            criteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
+                            criteria.andBusNumEqualTo(busNum);
+                            List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+                            if(agentBusInfos.size()==0){
+                                continue;
+                            }
+                            if(agentBusInfos.size()!=1){
+                                throw new MessageException("业务编号不唯一");
+                            }
+                            AgentBusInfo agentBusInfo = agentBusInfos.get(0);
+
+                            OActivityVisibleExample oActivityVisibleExample = new OActivityVisibleExample();
+                            OActivityVisibleExample.Criteria visibleCriteria = oActivityVisibleExample.createCriteria();
+                            visibleCriteria.andActivityIdEqualTo(oActivity.getActCode());
+                            List<OActivityVisible> oActivityVisibles = activityVisibleMapper.selectByExample(oActivityVisibleExample);
+                            for (OActivityVisible oActivityVisible : oActivityVisibles) {
+                                if(oActivityVisible.getAgentId().equals(agentBusInfo.getAgentId())){
+                                    rActivity = oActivity;
+                                    break here;
+                                }
+                            }
+                        }else{
+                            priceSet.add(oActivity.getPrice());
+                        }
+                    }
+                }
+                if (priceSet.size() != 1) {
+                    throw new MessageException("价格配置错误");
+                }
+                if(rActivity==null) rActivity = oActivities.get(0);
+                actSet.add(rActivity);
+                //号段活动存储在redis中
+                redisService.delete(snStart + "," + snEnd + "_act");
+                for (OActivity activity : actSet) {
+                    redisService.lpushList(snStart + "," + snEnd + "_act", activity.getId());
+                }
+                //放入代理商信息
+                redisService.setValue(snStart + "," + snEnd + "_org", busNum, 60 * 60 * 24L);
+                OActivity oActivity = actSet.iterator().next();
+                res.putKeyV("snStart", snStart)
+                        .putKeyV("snEnd", snEnd)
+                        .putKeyV("count", count)
+                        .putKeyV("price", oActivity.getPrice())
+                        .putKeyV("amt", oActivity.getPrice().multiply(new BigDecimal(count)))
+                        .putKeyV("activity", actSet)
+                        .putKeyV("modelType", modelType.getdItemvalue());
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new MessageException("查询机具sn异常:" + e.getLocalizedMessage());
+            }
+        }else if (modelType.getdItemvalue().equals(PlatformType.MPOS.code)) {
             try {
                 AgentResult agentResult = termMachineService.querySnMsg(PlatformType.MPOS, snStart, snEnd);
                 if (!agentResult.isOK()) {
@@ -703,8 +787,8 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     OActivityExample oActivityExample = new OActivityExample();
                     OActivityExample.Criteria activityCriteria = oActivityExample.createCriteria();
                     activityCriteria.andStatusEqualTo(Status.STATUS_1.status);
-//                    activityCriteria.andVenderEqualTo(manufaValue);
-//                    activityCriteria.andProModelEqualTo(tmsModel);
+                    //activityCriteria.andVenderEqualTo(manufaValue);
+                    //activityCriteria.andProModelEqualTo(tmsModel);
                     activityCriteria.andPosTypeEqualTo(posType);
                     activityCriteria.andBusProCodeEqualTo(machineId);
                     List<OActivity> oActivities = activityMapper.selectByExample(oActivityExample);
@@ -848,7 +932,19 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 }
             }
         } else {
-            throw new MessageException("类型错误");
+            OActivityVisibleExample oActivityVisibleExample = new OActivityVisibleExample();
+            OActivityVisibleExample.Criteria criteria = oActivityVisibleExample.createCriteria();
+            criteria.andActivityIdEqualTo(activityId);
+            activityVisibleMapper.deleteByExample(oActivityVisibleExample);
+            OActivity oActivity = new OActivity();
+            oActivity.setActCode(activityId);
+            oActivity.setVisible("");
+            oActivity.setuTime(new Date());
+            oActivity.setuUser(userId);
+            int i = activityMapper.updateByActCode(oActivity);
+            if (i == 0) {
+                throw new MessageException("设置失败");
+            }
         }
     }
 

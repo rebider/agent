@@ -48,10 +48,10 @@ public enum OInternetCardImportStatus {
      * @param value
      * @return
      */
-    public static String getContentByValue(String value){
+    public static String getContentByValue(BigDecimal value){
         OInternetCardImportStatus[] status = OInternetCardImportStatus.values();
         for(OInternetCardImportStatus cc : status){
-            if(cc.code.equals(value)){
+            if(cc.code.compareTo(value)==0){
                 return cc.msg;
             }
         }

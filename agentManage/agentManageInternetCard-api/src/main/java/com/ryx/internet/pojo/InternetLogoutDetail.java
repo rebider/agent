@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class InternetLogoutDetail implements Serializable {
+public class InternetLogoutDetail implements Serializable{
     private String id;
 
     private String renewId;
@@ -54,6 +54,62 @@ public class InternetLogoutDetail implements Serializable {
     private String uUser;
 
     private BigDecimal version;
+
+    private String issuer;
+
+    private String failCause;
+
+    private String mobileOrderNo;
+
+    private String reviewStatus;
+
+    private String beginCTime;
+
+    private String endCTime;
+
+    private String beginSnNum;
+
+    private String endSnNum;
+
+    public String getBeginCTime() {
+        return beginCTime;
+    }
+
+    public void setBeginCTime(String beginCTime) {
+        this.beginCTime = beginCTime;
+    }
+
+    public String getEndCTime() {
+        return endCTime;
+    }
+
+    public void setEndCTime(String endCTime) {
+        this.endCTime = endCTime;
+    }
+
+    public String getBeginSnNum() {
+        return beginSnNum;
+    }
+
+    public void setBeginSnNum(String beginSnNum) {
+        this.beginSnNum = beginSnNum;
+    }
+
+    public String getEndSnNum() {
+        return endSnNum;
+    }
+
+    public void setEndSnNum(String endSnNum) {
+        this.endSnNum = endSnNum;
+    }
+
+    public String getReviewStatus() {
+        return reviewStatus;
+    }
+
+    public void setReviewStatus(String reviewStatus) {
+        this.reviewStatus = reviewStatus;
+    }
 
     public String getId() {
         return id;
@@ -255,6 +311,30 @@ public class InternetLogoutDetail implements Serializable {
         this.version = version;
     }
 
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer == null ? null : issuer.trim();
+    }
+
+    public String getFailCause() {
+        return failCause;
+    }
+
+    public void setFailCause(String failCause) {
+        this.failCause = failCause == null ? null : failCause.trim();
+    }
+
+    public String getMobileOrderNo() {
+        return mobileOrderNo;
+    }
+
+    public void setMobileOrderNo(String mobileOrderNo) {
+        this.mobileOrderNo = mobileOrderNo == null ? null : mobileOrderNo.trim();
+    }
+
     @Override
     public String toString() {
         return "InternetLogoutDetail{" +
@@ -283,6 +363,9 @@ public class InternetLogoutDetail implements Serializable {
                 ", cUser='" + cUser + '\'' +
                 ", uUser='" + uUser + '\'' +
                 ", version=" + version +
+                ", issuer='" + issuer + '\'' +
+                ", failCause='" + failCause + '\'' +
+                ", mobileOrderNo='" + mobileOrderNo + '\'' +
                 '}';
     }
 }

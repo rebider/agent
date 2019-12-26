@@ -28,16 +28,12 @@ public class TermMachineServiceImpl  implements TermMachineService {
 
     @Resource(name = "posTermMachineServiceImpl")
     private TermMachineService posTermMachineServiceImpl;
-
     @Resource(name = "mposTermMachineServiceImpl")
     private TermMachineService mposTermMachineServiceImpl;
-
     @Resource(name = "sPosTermMachineServiceImpl")
     private TermMachineService sPosTermMachineServiceImpl;
-
     @Resource(name = "rdbTermMachineServiceImpl")
     private TermMachineService rdbTermMachineServiceImpl;
-
     @Resource(name = "rjTermMachineServiceImpl")
     private TermMachineService rjTermMachineServiceImpl;
 
@@ -170,8 +166,10 @@ public class TermMachineServiceImpl  implements TermMachineService {
     public AgentResult querySnMsg(PlatformType platformType,String snBegin,String snEnd)throws Exception{
         if(PlatformType.whetherPOS(platformType.name())){
             return posTermMachineServiceImpl.querySnMsg(platformType,snBegin,snEnd);
-        }else  if(PlatformType.MPOS.code.equals(platformType.name())){
+        }else  if (PlatformType.MPOS.code.equals(platformType.name())){
             return mposTermMachineServiceImpl.querySnMsg(platformType,snBegin,snEnd);
+        } else if (PlatformType.RDBPOS.code.equals(platformType.name())){
+            return rdbTermMachineServiceImpl.querySnMsg(platformType,snBegin,snEnd);
         }
         return AgentResult.fail("未知业务平台");
     }
@@ -210,7 +208,7 @@ public class TermMachineServiceImpl  implements TermMachineService {
     public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws Exception {
         String platformType = refundPriceDiffDetailList.get(0).getPlatformType();
         AgentResult agentResult = AgentResult.fail();
-        if(PlatformType.POS.getValue().equals(platformType)){
+        if(PlatformType.whetherPOS(platformType)){
             agentResult =  posTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList,operation);
         }else if(PlatformType.SSPOS.getValue().equals(platformType)){
             agentResult =  sPosTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList,operation);

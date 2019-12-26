@@ -919,11 +919,11 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 logger.info("sn：{}，{}，使用联迪方式解析",start,end);
                 return list;
             }
-            if(Integer.parseInt(eSub) - Integer.parseInt(sSub)<=0){
-                throw new MessageException("sn码填写有误");
-            }
             ////按照普通规则进行匹配 不一样的部分不包含字母
             if(sSub.matches(".*[A-Za-z]+.*") || eSub.matches(".*[A-Za-z]+.*")){
+                throw new MessageException("sn码填写有误");
+            }
+            if(Integer.parseInt(eSub) - Integer.parseInt(sSub)<=0){
                 throw new MessageException("sn码填写有误");
             }
             //按照普通规则进行匹配 不一样的部分不包含字母

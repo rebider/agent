@@ -653,6 +653,7 @@ public class TranDataJob {
         try{
             if(!"".equals(agentResult.getData())){
                 agentResultData = (Map<String, Object>) agentResult.getData();
+                LOG.info("月分润交易接口返回数据"+tranCode+":"+agentResultData.toString());
             }else{
                 LOG.info("月分润交易接口访问异常:"+agentResult.getMsg());
                 agentResultData=null;
@@ -729,7 +730,7 @@ public class TranDataJob {
         String url = AppConfig.getProperty("old_brand_ss_url");
         String tranMonth= new SimpleDateFormat("yyyyMM").format(tranMon);
         JSONObject object=new JSONObject();
-        object.put("tradeTime","201909");
+        object.put("tradeTime",tranMonth);
         String res = HttpClientUtil.doPostJson(url,object.toJSONString());
         LOG.info("手刷老品牌分润数据查询接口查询返回参数：{}",res);
         JSONObject result = JSONObject.parseObject(res);
@@ -741,8 +742,8 @@ public class TranDataJob {
         for (Map<String,Object> map:jsonObj){
             BigDecimal amount = new BigDecimal(map.get("amount")==null?"0":map.get("amount").toString());
             BigDecimal fee = new BigDecimal(map.get("fee")==null?"0":map.get("fee").toString());
-            profitAmt.add(amount);
-            profitFee.add(fee);
+            profitAmt=profitAmt.add(amount);
+            profitFee=profitFee.add(fee);
         }
 
         Map<String, Object> tranAmt = new HashMap<>();

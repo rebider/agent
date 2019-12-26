@@ -180,19 +180,21 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 String obj = JSONObject.toJSONString(activity);
                 JSONObject activityJsonObject = JSONObject.parseObject(obj);
                 activityJsonObject.put("platFormObj",platForm);
-                if(activity.getVisible().equals(VisibleStatus.TWO.getValue())){
-                    OActivityVisibleExample oActivityVisibleExample = new OActivityVisibleExample();
-                    OActivityVisibleExample.Criteria visibleCriteria = oActivityVisibleExample.createCriteria();
-                    visibleCriteria.andActivityIdEqualTo(activity.getActCode());
-                    List<OActivityVisible> oActivityVisibles = activityVisibleMapper.selectByExample(oActivityVisibleExample);
-                    for (OActivityVisible oActivityVisible : oActivityVisibles) {
-                        if(oActivityVisible.getAgentId().equals(agentId)){
-                            oActivitiesObj.add(activityJsonObject);
-                            break;
+                if (null != activity.getVisible()) {
+                    if(activity.getVisible().equals(VisibleStatus.TWO.getValue())){
+                        OActivityVisibleExample oActivityVisibleExample = new OActivityVisibleExample();
+                        OActivityVisibleExample.Criteria visibleCriteria = oActivityVisibleExample.createCriteria();
+                        visibleCriteria.andActivityIdEqualTo(activity.getActCode());
+                        List<OActivityVisible> oActivityVisibles = activityVisibleMapper.selectByExample(oActivityVisibleExample);
+                        for (OActivityVisible oActivityVisible : oActivityVisibles) {
+                            if(oActivityVisible.getAgentId().equals(agentId)){
+                                oActivitiesObj.add(activityJsonObject);
+                                break;
+                            }
                         }
+                    }else{
+                        oActivitiesObj.add(activityJsonObject);
                     }
-                }else{
-                    oActivitiesObj.add(activityJsonObject);
                 }
             }
             resultMap.put("changeActivitys",oActivitiesObj); //可变更的活动
@@ -218,7 +220,7 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                         .andBusStatusIn(Arrays.asList(BusStatus.QY.getValue(),BusStatus.WJH.getValue(),BusStatus.WQY.getValue()))
                         .andBusPlatformIn(listCanChangePlat);
                 List<AgentBusInfo>  canchange = agentBusInfoMapper.selectByExample(agentBusInfoExample);
-                resultMap.put("agentBusInfoListNew",canchange); //原平台
+                resultMap.put("agentBusInfoListNew",canchange); //目标平台
             }
             resultList.add(resultMap);
         }
@@ -236,8 +238,12 @@ public class OldCompensateServiceImpl implements OldCompensateService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,
-                                         List<String> refundPriceDiffFile, String cUser, List<OCashReceivablesVo> oCashReceivablesVoList,AgentVo agentVo)throws Exception{
+    public AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff,
+                                         List<ORefundPriceDiffDetail> refundPriceDiffDetailList,
+                                         List<String> refundPriceDiffFile,
+                                         String cUser,
+                                         List<OCashReceivablesVo> oCashReceivablesVoList,
+                                         AgentVo agentVo)throws Exception{
 
         try {
             if(PriceDiffType.DETAIN_AMT.code.equals(oRefundPriceDiff.getApplyCompType())){
@@ -432,6 +438,15 @@ public class OldCompensateServiceImpl implements OldCompensateService {
             if(!synOrVerifyResult.isOK()){
                 throw new ProcessException(synOrVerifyResult.getMsg());
             }
+
+            //代理商打款，代理商打款不能小于活动差价。
+            if (null != oRefundPriceDiff.getApplyCompType() && oRefundPriceDiff.getApplyCompType().equals("1")) {
+                //状态为1说明代理商要打款
+                if (oRefundPriceDiff.getApplyCompAmt().compareTo(belowPayAmt.add(shareDeductAmt)) != 0){
+                    throw new ProcessException("应打款金额："+oRefundPriceDiff.getRelCompAmt());
+                }
+            }
+
             String platformType = refundPriceDiffDetailList.get(0).getPlatformType();
             if(PlatformType.POS.getValue().equals(platformType)){
                 JSONObject resData =  (JSONObject)synOrVerifyResult.getData();
@@ -469,6 +484,43 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                             int i = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(refundPriceDiffDetail);
                             if(i!=1){
                                 throw new ProcessException("更新返回数据失败");
+                            }
+                        }
+                    }
+                }
+            } else if (PlatformType.RDBPOS.getValue().equals(platformType)) {
+                List<Map<String, Object>> resultList = (List<Map<String, Object>>) synOrVerifyResult.getData();
+                for (Map<String, Object> stringObjectMap : resultList) {
+                    String oldOrgId = String.valueOf(stringObjectMap.get("oldOrgId"));
+                    for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {
+                        if (oldOrgId.equals(refundPriceDiffDetail.getOldOrgId())) {
+                            String oldSupDorgId = String.valueOf(stringObjectMap.get("oldSupDorgId"));
+                            String oldSupDorgName = String.valueOf(stringObjectMap.get("oldSupDorgName"));
+                            String oldOrgName = String.valueOf(stringObjectMap.get("oldOrgName"));
+                            String newSupDorgId = String.valueOf(stringObjectMap.get("oldSupDorgId"));
+                            String newSupDorgName = String.valueOf(stringObjectMap.get("oldSupDorgName"));
+                            String newOrgName = String.valueOf(stringObjectMap.get("oldOrgName"));
+                            if (StringUtils.isNotBlank(oldSupDorgId) && !oldSupDorgId.equals("null")) {
+                                refundPriceDiffDetail.setOldSupdOrgId(oldSupDorgId);
+                            }
+                            if (StringUtils.isNotBlank(oldSupDorgName) && !oldSupDorgName.equals("null")) {
+                                refundPriceDiffDetail.setOldSupdOrgName(oldSupDorgName);
+                            }
+                            if (StringUtils.isNotBlank(oldOrgName) && !oldOrgName.equals("null")) {
+                                refundPriceDiffDetail.setOldOrgName(oldOrgName);
+                            }
+                            if (StringUtils.isNotBlank(newSupDorgId) && !newSupDorgId.equals("null")) {
+                                refundPriceDiffDetail.setNewSupdOrgId(newSupDorgId);
+                            }
+                            if (StringUtils.isNotBlank(newSupDorgName) && !newSupDorgName.equals("null")) {
+                                refundPriceDiffDetail.setNewSupdOrgName(newSupDorgName);
+                            }
+                            if (StringUtils.isNotBlank(newOrgName) && !newOrgName.equals("null")) {
+                                refundPriceDiffDetail.setNewOrgName(newOrgName);
+                            }
+                            int i = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(refundPriceDiffDetail);
+                            if (i != 1) {
+                                throw new ProcessException("瑞大宝调整活动更新不差价明细失败！");
                             }
                         }
                     }

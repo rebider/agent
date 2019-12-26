@@ -5,6 +5,7 @@ import com.ryx.credit.pojo.admin.CuserAgentExample;
 import com.ryx.credit.pojo.admin.CuserAgentKey;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CuserAgentMapper {
     long countByExample(CuserAgentExample example);
@@ -22,4 +23,6 @@ public interface CuserAgentMapper {
     int updateByPrimaryKeySelective(CuserAgent record);
 
     int updateByPrimaryKey(CuserAgent record);
+
+    List<Map<String,Object>>  queryDiffUserInfo();
 }

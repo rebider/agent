@@ -2,6 +2,7 @@ package com.ryx.internet.service.impl;
 
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
@@ -127,6 +128,9 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
         reqMap.put("page",page);
         List<Map<String, Object>> internetLogoutList = internetLogoutDetailMapper.internetCardLogoutDetailList(reqMap);
         for (Map<String, Object> map : internetLogoutList) {
+            map.put("ISSUER",Issuerstatus.getContentByValue(String.valueOf(map.get("ISSUER"))));
+            map.put("LOGOUT_STATUS",InternetLogoutStatus.getContentByValue(String.valueOf(map.get("LOGOUT_STATUS"))));
+            map.put("REVIEW_STATUS",AgStatus.getMsg(new BigDecimal(map.get("REVIEW_STATUS").toString())));
             if(StringUtils.isNotBlank(String.valueOf(map.get("C_USER")))){
                 CUser cUser = iUserService.selectById(Long.valueOf(String.valueOf(map.get("C_USER"))));
                 if(null!=cUser)
@@ -179,6 +183,28 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
         if(StringUtils.isNotBlank(internetLogoutDetail.getLogoutStatus())){
             reqMap.put("logoutStatus",internetLogoutDetail.getLogoutStatus());
         }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getInternetCardNum())){
+            reqMap.put("internetCardNum",internetLogoutDetail.getInternetCardNum());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getIssuer())){
+            reqMap.put("issuer",internetLogoutDetail.getIssuer());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getReviewStatus())){
+            reqMap.put("reviewStatus",internetLogoutDetail.getReviewStatus());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getBeginCTime())){
+            reqMap.put("beginCTime",internetLogoutDetail.getBeginCTime());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getEndCTime())){
+            reqMap.put("endCTime",internetLogoutDetail.getEndCTime());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getBeginSnNum())){
+            reqMap.put("beginSnNum",internetLogoutDetail.getBeginSnNum());
+        }
+        if(StringUtils.isNotBlank(internetLogoutDetail.getEndSnNum())){
+            reqMap.put("endSnNum",internetLogoutDetail.getEndSnNum());
+        }
+
         List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
         if(orgCodeRes==null && orgCodeRes.size()!=1){
             return null;
@@ -260,11 +286,25 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 if(oInternetCard==null){
                     throw new MessageException("iccid有误");
                 }
+                if(StringUtils.isBlank(oInternetCard.getInternetCardNum())){
+                    throw new MessageException("物联卡号为空,不可申请注销,iccid:"+iccid);
+                }
+                if(StringUtils.isBlank(oInternetCard.getIssuer())){
+                    throw new MessageException("发卡方为空,不可申请注销,iccid:"+iccid);
+                }
+                if(party.equals("agent")){
+                    if(StringUtils.isBlank(oInternetCard.getBusNum()) || StringUtils.isBlank(oInternetCard.getBusPlatform())){
+                        throw new MessageException("业务平台数据不全,不可申请注销,iccid:"+iccid);
+                    }
+                }
                 InternetLogoutDetailExample internetLogoutDetailExample = new InternetLogoutDetailExample();
                 InternetLogoutDetailExample.Criteria criteria = internetLogoutDetailExample.createCriteria();
                 criteria.andStatusEqualTo(Status.STATUS_1.status);
                 criteria.andIccidNumEqualTo(iccid);
-                criteria.andLogoutStatusNotEqualTo(InternetLogoutStatus.SX.getValue());
+                List<String> logoutStatusList = new ArrayList<>();
+                logoutStatusList.add(InternetLogoutStatus.SX.getValue());
+                logoutStatusList.add(InternetLogoutStatus.TJSB.getValue());
+                criteria.andLogoutStatusNotIn(logoutStatusList);
                 List<InternetLogoutDetail> internetLogoutDetails = internetLogoutDetailMapper.selectByExample(internetLogoutDetailExample);
                 if (internetLogoutDetails.size() != 0) {
                     throw new MessageException("iccid:" + iccid + "注销中,请勿重复发起");
@@ -293,6 +333,7 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 internetLogoutDetail.setcUser(cUser);
                 internetLogoutDetail.setuUser(cUser);
                 internetLogoutDetail.setVersion(BigDecimal.ONE);
+                internetLogoutDetail.setIssuer(oInternetCard.getIssuer());
                 if(StringUtils.isNotBlank(oInternetCard.getBusNum()) && StringUtils.isNotBlank(oInternetCard.getBusPlatform())){
                     //查询最新对接省区大区对接人
                     AgentBusInfo agentBusInfo = new AgentBusInfo();
@@ -415,17 +456,22 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
         try {
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
             if(!result.isOK()){
-                log.error(result.getMsg());
+                log.error("申请注销审批出现异常，msg：{}"+result.getMsg());
                 throw new MessageException("工作流处理任务异常");
             }
-        } catch (MessageException e) {
+        } catch (ProcessException e) {
             log.info("申请注销审批出现异常,approvalTask方法1");
             AppConfig.sendEmails(MailUtil.printStackTrace(e), "申请注销审批出现异常,approvalTask方法1");
             e.printStackTrace();
             throw new MessageException(e.getMsg());
-        } catch (Exception e) {
+        } catch (MessageException e) {
             log.info("申请注销审批出现异常,approvalTask方法2");
             AppConfig.sendEmails(MailUtil.printStackTrace(e), "申请注销审批出现异常,approvalTask方法2");
+            e.printStackTrace();
+            throw new MessageException(e.getMsg());
+        } catch (Exception e) {
+            log.info("申请注销审批出现异常,approvalTask方法3");
+            AppConfig.sendEmails(MailUtil.printStackTrace(e), "申请注销审批出现异常,approvalTask方法3");
             e.printStackTrace();
             throw new MessageException(e.getLocalizedMessage());
         }
@@ -496,8 +542,12 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.SX.getValue());
                 oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
             }else if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
-                internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.DZX.getValue());
-                oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());
+                if(StringUtils.isNotBlank(internetLogoutDetail.getIssuer()) && internetLogoutDetail.getIssuer().equals(Issuerstatus.JY_MOBILE.getValue())){
+                    internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.TJCLZ.getValue());
+                }else{
+                    internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.DZX.getValue());
+                    oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());
+                }
             }
             int j = internetLogoutDetailMapper.updateByPrimaryKeySelective(internetLogoutDetail);
             if(j!=1){

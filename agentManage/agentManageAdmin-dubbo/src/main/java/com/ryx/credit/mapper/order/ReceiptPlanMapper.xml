@@ -385,7 +385,7 @@
     businfo.bus_num,
     businfo.ag_doc_district,
     businfo.ag_doc_pro,
-      to_char(P.c_time, 'YYYY-MM-DD') as C_TIME
+      to_char(P.c_time, 'yyyy-MM-dd hh24:mi:ss') as C_TIME
     FROM O_RECEIPT_PLAN R
     LEFT JOIN O_RECEIPT_ORDER O ON R.RECEIPT_ID = O.ID and o.status=1 and R.status=1
     LEFT JOIN D_REGION D ON O.ADDR_PROVINCE = D.R_CODE
@@ -451,6 +451,7 @@
       <if test="isDeliver!=null and isDeliver!='' and isDeliver=='yes'"> and r.return_order_detail_id is null</if>
       <if test="agName !=null and agName !='' "> and  agent.AG_NAME LIKE CONCAT(CONCAT('%',#{agName}),'%') </if>
       <if test="proName !=null and proName !='' ">and  P.PRO_NAME LIKE CONCAT(CONCAT('%',#{proName}),'%')</if>
+      <if test="ag !=null and ag !='' "> and  agent.id = #{ag} </if>
 
   </sql>
 

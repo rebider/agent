@@ -6,7 +6,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public class InternetLogoutDetailExample {
     protected String orderByClause;
@@ -1816,6 +1815,216 @@ public class InternetLogoutDetailExample {
 
         public Criteria andVersionNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("VERSION not between", value1, value2, "version");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssuerIsNull() {
+            addCriterion("ISSUER is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssuerIsNotNull() {
+            addCriterion("ISSUER is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssuerEqualTo(String value) {
+            addCriterion("ISSUER =", value, "issuer");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssuerNotEqualTo(String value) {
+            addCriterion("ISSUER <>", value, "issuer");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssuerGreaterThan(String value) {
+            addCriterion("ISSUER >", value, "issuer");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssuerGreaterThanOrEqualTo(String value) {
+            addCriterion("ISSUER >=", value, "issuer");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssuerLessThan(String value) {
+            addCriterion("ISSUER <", value, "issuer");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssuerLessThanOrEqualTo(String value) {
+            addCriterion("ISSUER <=", value, "issuer");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssuerLike(String value) {
+            addCriterion("ISSUER like", value, "issuer");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssuerNotLike(String value) {
+            addCriterion("ISSUER not like", value, "issuer");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssuerIn(List<String> values) {
+            addCriterion("ISSUER in", values, "issuer");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssuerNotIn(List<String> values) {
+            addCriterion("ISSUER not in", values, "issuer");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssuerBetween(String value1, String value2) {
+            addCriterion("ISSUER between", value1, value2, "issuer");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssuerNotBetween(String value1, String value2) {
+            addCriterion("ISSUER not between", value1, value2, "issuer");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailCauseIsNull() {
+            addCriterion("FAIL_CAUSE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailCauseIsNotNull() {
+            addCriterion("FAIL_CAUSE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailCauseEqualTo(String value) {
+            addCriterion("FAIL_CAUSE =", value, "failCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailCauseNotEqualTo(String value) {
+            addCriterion("FAIL_CAUSE <>", value, "failCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailCauseGreaterThan(String value) {
+            addCriterion("FAIL_CAUSE >", value, "failCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailCauseGreaterThanOrEqualTo(String value) {
+            addCriterion("FAIL_CAUSE >=", value, "failCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailCauseLessThan(String value) {
+            addCriterion("FAIL_CAUSE <", value, "failCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailCauseLessThanOrEqualTo(String value) {
+            addCriterion("FAIL_CAUSE <=", value, "failCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailCauseLike(String value) {
+            addCriterion("FAIL_CAUSE like", value, "failCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailCauseNotLike(String value) {
+            addCriterion("FAIL_CAUSE not like", value, "failCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailCauseIn(List<String> values) {
+            addCriterion("FAIL_CAUSE in", values, "failCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailCauseNotIn(List<String> values) {
+            addCriterion("FAIL_CAUSE not in", values, "failCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailCauseBetween(String value1, String value2) {
+            addCriterion("FAIL_CAUSE between", value1, value2, "failCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailCauseNotBetween(String value1, String value2) {
+            addCriterion("FAIL_CAUSE not between", value1, value2, "failCause");
+            return (Criteria) this;
+        }
+
+        public Criteria andMobileOrderNoIsNull() {
+            addCriterion("MOBILE_ORDER_NO is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMobileOrderNoIsNotNull() {
+            addCriterion("MOBILE_ORDER_NO is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMobileOrderNoEqualTo(String value) {
+            addCriterion("MOBILE_ORDER_NO =", value, "mobileOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andMobileOrderNoNotEqualTo(String value) {
+            addCriterion("MOBILE_ORDER_NO <>", value, "mobileOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andMobileOrderNoGreaterThan(String value) {
+            addCriterion("MOBILE_ORDER_NO >", value, "mobileOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andMobileOrderNoGreaterThanOrEqualTo(String value) {
+            addCriterion("MOBILE_ORDER_NO >=", value, "mobileOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andMobileOrderNoLessThan(String value) {
+            addCriterion("MOBILE_ORDER_NO <", value, "mobileOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andMobileOrderNoLessThanOrEqualTo(String value) {
+            addCriterion("MOBILE_ORDER_NO <=", value, "mobileOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andMobileOrderNoLike(String value) {
+            addCriterion("MOBILE_ORDER_NO like", value, "mobileOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andMobileOrderNoNotLike(String value) {
+            addCriterion("MOBILE_ORDER_NO not like", value, "mobileOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andMobileOrderNoIn(List<String> values) {
+            addCriterion("MOBILE_ORDER_NO in", values, "mobileOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andMobileOrderNoNotIn(List<String> values) {
+            addCriterion("MOBILE_ORDER_NO not in", values, "mobileOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andMobileOrderNoBetween(String value1, String value2) {
+            addCriterion("MOBILE_ORDER_NO between", value1, value2, "mobileOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andMobileOrderNoNotBetween(String value1, String value2) {
+            addCriterion("MOBILE_ORDER_NO not between", value1, value2, "mobileOrderNo");
             return (Criteria) this;
         }
     }

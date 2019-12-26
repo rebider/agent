@@ -17,11 +17,12 @@
     <job:simple id="agentLoginAccountCreate"
                 job-ref="agentLoginAccountCreateJob"
                 registry-center-ref="regCenter"
-                cron="0 0/30 * * * ?"
+                cron="0 0 0/1 * * ?"
                 overwrite="true"
                 description="代理商账号补全任务"
                 sharding-total-count="1"
                 sharding-item-parameters="0=Server0"
+                misfire="false"
                 disabled="${job.agentLoginAccountCreateJob}"
                 >
         <job:distributed-listener class="com.ryx.job.listener.ExmpDistributedListener" started-timeout-milliseconds="100" completed-timeout-milliseconds="100" />
@@ -120,27 +121,6 @@
                 disabled="${job.osnFaHuoJob}"/>
 
 
-    <job:simple id="internetCard"
-                job-ref="internetCardJob"
-                registry-center-ref="regCenter"
-                cron="0 0/1 * * * ?"
-                overwrite="true"
-                description="处理未处理的物联网卡导入 1分钟执行一次"
-                sharding-total-count="1"
-                sharding-item-parameters="0=Server0"
-                disabled="${job.internetCardJob}"/>
-
-
-    <job:simple id="internetCardUpdateMechJob"
-                job-ref="internetCardUpdateMechJob"
-                registry-center-ref="regCenter"
-                cron="0 0 6 * * ?"
-                overwrite="true"
-                description="物联网卡，更新已修改的商户信息（是续费，正常）"
-                sharding-total-count="1"
-                sharding-item-parameters="0=Server0"
-                disabled="${job.internetCardUpdateMechJob}"/>
-
     <job:simple id="terminalTransferJob"
                 job-ref="terminalTransferJob"
                 registry-center-ref="regCenter"
@@ -151,40 +131,6 @@
                 sharding-item-parameters="0=Server0"
                 disabled="${job.terminalTransferJob}"/>
 
-
-    <job:dataflow id="internetCardUpdateMechIsNull"
-                  job-ref="internetCardUpdateMechIsNullJob"
-                  registry-center-ref="regCenter"
-                  cron="0 0/30 * * * ? *"
-                  sharding-total-count="1"
-                  sharding-item-parameters="0=C"
-                  streaming-process="true"
-                  description="物联网卡，更新商户为空的数据,30分钟执行一次"
-                  overwrite="true"
-                  disabled="${job.internetCardUpdateMechIsNullJob}"/>
-
-
-    <job:dataflow id="internetCardMigrationHistory"
-                  job-ref="internetCardMigrationHistoryJob"
-                  registry-center-ref="regCenter"
-                  cron="0 0 1 * * ?"
-                  sharding-total-count="1"
-                  sharding-item-parameters="0=C"
-                  streaming-process="true"
-                  description="物联网卡，迁移到历史表,每天凌晨一天执行一次"
-                  overwrite="true"
-                  disabled="${job.internetCardMigrationHistoryJob}"/>
-
-    <job:dataflow id="internetCardOffsetDetail"
-                  job-ref="internetCardOffsetDetailJob"
-                  registry-center-ref="regCenter"
-                  cron="0 0 2 * * ?"
-                  sharding-total-count="1"
-                  sharding-item-parameters="0=C"
-                  streaming-process="true"
-                  description="物联网卡,生产轧差明细每日汇总"
-                  overwrite="true"
-                  disabled="${job.internetCardOffsetDetailJob}"/>
 
     <job:dataflow id="updateAgentCertifiDetail"
                   job-ref="updateAgentCertifiDetailJob"
@@ -275,6 +221,7 @@
 
 
    <import resource="spring-elastic-order.xml"/>
+   <import resource="spring-elastic-card.xml"/>
 
 
 
