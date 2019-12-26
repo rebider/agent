@@ -132,7 +132,7 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
             } else {
                 //下发异常
                 logger.info("RDB下发返回异常:" + respResult);
-                return AgentResult.build(2, null != respJson.getString("msg") ? respJson.getString("msg") : "瑞+平台返回异常!");
+                return AgentResult.build(2, null != respJson.getString("msg") ? respJson.getString("msg") : "瑞大宝平台返回异常!");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -216,7 +216,7 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
     }
 
     /**
-     * 瑞大宝历史换活动查询Sn
+     * 瑞大宝查询历史SN
      * @param platformType
      * @param snBegin
      * @param snEnd
@@ -336,8 +336,8 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
 
             //返回最终查询结果
             if (null != resJson.getString("code") && resJson.getString("code").equals("0000")) {
-                //可以更换活动
-                return  AgentResult.ok();
+                //可以更换活动，封装参参数返回
+                return  AgentResult.ok(resJson.get("result"));
             } else if (null != resJson.getString("code") && resJson.getString("code").equals("9999") && null != resJson.getString("msg")) {
                 //不可以更换活动
                 return AgentResult.fail(resJson.getString("msg") + "，不可以更换活动！");

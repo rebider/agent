@@ -3,6 +3,7 @@ package com.ryx.credit.dao.order;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetailExample;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -44,4 +45,11 @@ public interface OLogisticsDetailMapper {
     int updateByLogisticsId(OLogisticsDetail oLogisticsDetail);
 
     int deleteDetailByLogisicalId(String logisticsId);
+
+    /**
+     * 查询物流明细发送状态
+     * @param param
+     * @return
+     */
+    List<BigDecimal> selectSendStatusByMap(Map<String, Object> param);
 }

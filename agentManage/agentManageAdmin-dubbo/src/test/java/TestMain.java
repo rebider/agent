@@ -22,29 +22,33 @@ public class TestMain {
 
     public static void main(String[] args) {
 
-        LocalDateTime ldt = LocalDateTime.now();
-        String s= ldt.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        System.out.println(s);
-        String s1= ldt.format(DateTimeFormatter.ofPattern("HH24mmss"));
-        System.out.println(s1);
+        for (int i = 0; i < 10; i++) {
+            try {
+                int m = 0, t = 1;
+                int r = 1 / 0;
+                System.out.println(i);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 
     public static Map getDigit(String firstSn, String lastSn) {
         char[] chars = firstSn.toCharArray();
         char[] charss = lastSn.toCharArray();
-        int num=0;
-        for (int i=1;i<= chars.length;i++){
-            if (chars[i]!=charss[i]){
-                num=i;
+        int num = 0;
+        for (int i = 1; i <= chars.length; i++) {
+            if (chars[i] != charss[i]) {
+                num = i;
                 break;
             }
         }
         HashMap<String, Object> map = new HashMap<>();
-        map.put("num",num);
-        map.put("length",chars.length);
-        map.put("firstSn",firstSn);
-        map.put("lastSn",lastSn);
+        map.put("num", num);
+        map.put("length", chars.length);
+        map.put("firstSn", firstSn);
+        map.put("lastSn", lastSn);
         return map;
     }
 }

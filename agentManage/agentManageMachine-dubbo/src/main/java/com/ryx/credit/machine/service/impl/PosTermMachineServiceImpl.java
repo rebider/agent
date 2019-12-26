@@ -168,6 +168,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
 
     private AgentResult request(String tranCode, JSONObject data) throws Exception {
         try {
+            log.info("pos机具信息请求参数明文:{}", data);
             PrivateKey rsaPrivateKey = RSAUtil.getRSAPrivateKey(AppConfig.getProperty("industryAuth_local_private_key"), "pem", null, "RSA");
             PublicKey rsaPublicKey = RSAUtil.getRSAPublicKey(AppConfig.getProperty("industryAuth_cooper_public_key"), "pem", "RSA");
             String cooperator = AppConfig.getProperty("industryAuth_cooperator");

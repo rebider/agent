@@ -235,7 +235,16 @@ public class CompensateServiceImpl implements CompensateService {
                 throw new ProcessException("代理商信息不存在");
             }
             if(!agent.getId().equals(agentId)){
-                COrganization cOrganization = organizationMapper.selectByPrimaryKey(Integer.valueOf(agent.getAgDocPro()));
+                //先取业务中对接省区，业务中不存在按照原来代理商表中取
+                COrganization cOrganization = new COrganization();
+                if (null == agent.getAgDocPro()) {
+                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(String.valueOf(stringObjectMap.get("BUS_ID")));
+                    if (null != agentBusInfo && null != agentBusInfo.getAgDocPro()){
+                        cOrganization = organizationMapper.selectByPrimaryKey(Integer.valueOf(agentBusInfo.getAgDocPro()));
+                    }
+                }else {
+                    cOrganization = organizationMapper.selectByPrimaryKey(Integer.valueOf(agent.getAgDocPro()));
+                }
                 if(!Pattern.matches(orgCode+".*",cOrganization.getCode())){
                     log.info("不能提交其他省区的活动调整");
                     throw new ProcessException("不能提交其他省区的活动调整");
@@ -330,7 +339,7 @@ public class CompensateServiceImpl implements CompensateService {
     }
 
     /**
-     * save
+     * 活动更换保存退补差价明细
      * @param oRefundPriceDiff
      * @param refundPriceDiffDetailList
      * @param cUser
@@ -338,8 +347,11 @@ public class CompensateServiceImpl implements CompensateService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,
-                                         List<String> refundPriceDiffFile, String cUser,List<OCashReceivablesVo> oCashReceivablesVoList,AgentVo agentVo)throws ProcessException{
+    public AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff,
+                                         List<ORefundPriceDiffDetail> refundPriceDiffDetailList,
+                                         List<String> refundPriceDiffFile,
+                                         String cUser,List<OCashReceivablesVo> oCashReceivablesVoList,
+                                         AgentVo agentVo)throws ProcessException{
 
         try {
             if(PriceDiffType.DETAIN_AMT.code.equals(oRefundPriceDiff.getApplyCompType())){
@@ -418,7 +430,13 @@ public class CompensateServiceImpl implements CompensateService {
                 log.info("活动调整保存打款记录失败1");
                 throw new ProcessException("保存打款记录失败");
             }
-
+            //代理商打款，代理商打款不能小于活动差价。
+            if (null != oRefundPriceDiff.getApplyCompType() && oRefundPriceDiff.getApplyCompType().equals("1")) {
+                //状态为1说明代理商要打款
+                if (oRefundPriceDiff.getApplyCompAmt().compareTo(belowPayAmt.add(shareDeductAmt)) != 0){
+                    throw new ProcessException("应打款金额："+oRefundPriceDiff.getRelCompAmt());
+                }
+            }
             //遍历补差价明细进行校验和信息补全
             refundPriceDiffDetailList.forEach(refundPriceDiffDetail->{
                 Map<String, Object> logisticsDetail = null;
@@ -471,10 +489,10 @@ public class CompensateServiceImpl implements CompensateService {
                     throw new ProcessException("请选择活动");
                 }
                 if(StringUtils.isBlank(refundPriceDiffDetail.getOldOrgId())){
-                    throw new ProcessException("请填写目标机构编码");
+                    throw new ProcessException("请填写原机构编码");
                 }
                 if(StringUtils.isBlank(refundPriceDiffDetail.getNewOrgId())){
-                    throw new ProcessException("请填写原机构编码");
+                    throw new ProcessException("请填写目标机构编码");
                 }
 
                 //变更后活动
@@ -602,6 +620,43 @@ public class CompensateServiceImpl implements CompensateService {
                             int i = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(refundPriceDiffDetail);
                             if(i!=1){
                                 throw new ProcessException("更新返回数据失败");
+                            }
+                        }
+                    }
+                }
+            } else if (PlatformType.RDBPOS.getValue().equals(platformType)) {
+                List<Map<String, Object>> resultList = (List<Map<String, Object>>) synOrVerifyResult.getData();
+                for (Map<String, Object> stringObjectMap : resultList) {
+                    String oldOrgId = String.valueOf(stringObjectMap.get("oldOrgId"));
+                    for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {
+                        if (oldOrgId.equals(refundPriceDiffDetail.getOldOrgId())) {
+                            String oldSupDorgId = String.valueOf(stringObjectMap.get("oldSupDorgId"));
+                            String oldSupDorgName = String.valueOf(stringObjectMap.get("oldSupDorgName"));
+                            String oldOrgName = String.valueOf(stringObjectMap.get("oldOrgName"));
+                            String newSupDorgId = String.valueOf(stringObjectMap.get("oldSupDorgId"));
+                            String newSupDorgName = String.valueOf(stringObjectMap.get("oldSupDorgName"));
+                            String newOrgName = String.valueOf(stringObjectMap.get("oldOrgName"));
+                            if (StringUtils.isNotBlank(oldSupDorgId) && !oldSupDorgId.equals("null")) {
+                                refundPriceDiffDetail.setOldSupdOrgId(oldSupDorgId);
+                            }
+                            if (StringUtils.isNotBlank(oldSupDorgName) && !oldSupDorgName.equals("null")) {
+                                refundPriceDiffDetail.setOldSupdOrgName(oldSupDorgName);
+                            }
+                            if (StringUtils.isNotBlank(oldOrgName) && !oldOrgName.equals("null")) {
+                                refundPriceDiffDetail.setOldOrgName(oldOrgName);
+                            }
+                            if (StringUtils.isNotBlank(newSupDorgId) && !newSupDorgId.equals("null")) {
+                                refundPriceDiffDetail.setNewSupdOrgId(newSupDorgId);
+                            }
+                            if (StringUtils.isNotBlank(newSupDorgName) && !newSupDorgName.equals("null")) {
+                                refundPriceDiffDetail.setNewSupdOrgName(newSupDorgName);
+                            }
+                            if (StringUtils.isNotBlank(newOrgName) && !newOrgName.equals("null")) {
+                                refundPriceDiffDetail.setNewOrgName(newOrgName);
+                            }
+                            int i = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(refundPriceDiffDetail);
+                            if (i != 1) {
+                                throw new ProcessException("瑞大宝调整活动更新补差价明细失败！");
                             }
                         }
                     }

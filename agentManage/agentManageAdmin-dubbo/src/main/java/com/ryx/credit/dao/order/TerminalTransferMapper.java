@@ -45,6 +45,6 @@ public interface TerminalTransferMapper {
 
     Map<String, Object> queryPlatFrom(String PLATFORM_NUM);
 
-
+    List<Map<String, Object>> queryBusInfo(Map<String,String> param);
 
 }

@@ -208,7 +208,7 @@ public class TermMachineServiceImpl  implements TermMachineService {
     public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws Exception {
         String platformType = refundPriceDiffDetailList.get(0).getPlatformType();
         AgentResult agentResult = AgentResult.fail();
-        if(PlatformType.POS.getValue().equals(platformType)){
+        if(PlatformType.whetherPOS(platformType)){
             agentResult =  posTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList,operation);
         }else if(PlatformType.SSPOS.getValue().equals(platformType)){
             agentResult =  sPosTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList,operation);
