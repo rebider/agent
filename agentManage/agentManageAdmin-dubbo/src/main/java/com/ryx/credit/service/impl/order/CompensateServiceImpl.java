@@ -1305,13 +1305,15 @@ public class CompensateServiceImpl implements CompensateService {
                 reqParam.put("status",OLogisticsDetailStatus.STATUS_FH.code);
 
                 ArrayList<Object> recordStatusList = new ArrayList<>();
-                //新建
+                //审批状态,对应物流明细状态
                 if(oRefundPriceDiff.getReviewStatus().equals(AgStatus.Create.getValue())){
                     recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
                 }else if(oRefundPriceDiff.getReviewStatus().equals(AgStatus.Approving.getValue())){
                     recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_LOC.code);
-                }else if(oRefundPriceDiff.getReviewStatus().equals(AgStatus.Approved.getValue()) || oRefundPriceDiff.getReviewStatus().equals(AgStatus.Refuse.getValue())){
+                }else if(oRefundPriceDiff.getReviewStatus().equals(AgStatus.Approved.getValue())){
                     recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_HIS.code);
+                }else if(oRefundPriceDiff.getReviewStatus().equals(AgStatus.Refuse.getValue())){
+                    recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
                 }
                 reqParam.put("recordStatusList",recordStatusList);
                 if(!oRefundPriceDiff.getReviewStatus().equals(AgStatus.Create.getValue())){
