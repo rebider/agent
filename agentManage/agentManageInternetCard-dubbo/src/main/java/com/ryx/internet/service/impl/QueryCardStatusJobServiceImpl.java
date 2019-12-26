@@ -1,15 +1,16 @@
 package com.ryx.internet.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.enumc.InternetCardStatus;
-import com.ryx.credit.common.enumc.Issuerstatus;
-import com.ryx.credit.common.enumc.Status;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.MailUtil;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.internet.dao.InternetLogoutDetailMapper;
 import com.ryx.internet.dao.OInternetCardMapper;
+import com.ryx.internet.pojo.InternetLogoutDetail;
+import com.ryx.internet.pojo.InternetLogoutDetailExample;
 import com.ryx.internet.pojo.OInternetCard;
 import com.ryx.internet.pojo.OInternetCardExample;
 import com.ryx.internet.service.QueryCardStatusJobService;
@@ -36,6 +37,9 @@ public class QueryCardStatusJobServiceImpl implements QueryCardStatusJobService 
     private static Logger log = LoggerFactory.getLogger(QueryCardStatusJobServiceImpl.class);
     @Autowired
     private OInternetCardMapper internetCardMapper;
+    @Autowired
+    private InternetLogoutDetailMapper internetLogoutDetailMapper;
+
 
     /**
      * 查询要更新状态的数据
@@ -116,6 +120,21 @@ public class QueryCardStatusJobServiceImpl implements QueryCardStatusJobService 
                     oInternetCard.setInternetCardStatus(cardStatusByJYMobile);
                     if(StringUtils.isNotBlank(statusTime)){
                         oInternetCard.setStatusTime(statusTime);
+                    }
+                    //如果是注销状态  更新申请注销明细
+                    if(cardStatusByJYMobile.compareTo(InternetCardStatus.LOGOUT.getValue())==0){
+                        InternetLogoutDetailExample internetLogoutDetailExample = new InternetLogoutDetailExample();
+                        InternetLogoutDetailExample.Criteria criteria = internetLogoutDetailExample.createCriteria();
+                        criteria.andStatusEqualTo(Status.STATUS_1.status);
+                        criteria.andIccidNumEqualTo(oInternetCard.getIccidNum());
+                        criteria.andLogoutStatusEqualTo(InternetLogoutStatus.DZX.getValue());
+                        List<InternetLogoutDetail> internetLogoutDetails = internetLogoutDetailMapper.selectByExample(internetLogoutDetailExample);
+                        for (InternetLogoutDetail internetLogoutDetail : internetLogoutDetails) {
+                            internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.ZXCG.getValue());
+                            internetLogoutDetailMapper.updateByPrimaryKey(internetLogoutDetail);
+                        }
+                        oInternetCard.setRenew(Status.STATUS_0.status);
+                        oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());
                     }
                 }else{
                     String error = resultMap.get("error");
