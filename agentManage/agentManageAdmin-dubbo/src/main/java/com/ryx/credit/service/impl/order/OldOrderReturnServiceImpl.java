@@ -1002,7 +1002,15 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                         logger.info("机具退货调整首刷接口调用Exception更新数据库失败:{}",JSONObject.toJSONString(logistics));
                     }
                 }
-            }else{
+            } else if(platForm.getPlatformType().equals(PlatformType.RDBPOS.code)){
+                OLogistics logistics_send =oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
+                logistics_send.setSendStatus(LogisticsSendStatus.none_send.code);
+                logistics_send.setSendMsg("");
+                if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
+                    logger.info("RDB下发物流更新记录Exception失败{}",JSONObject.toJSONString(oLogistics));
+                }
+                return AgentResult.ok();
+            } else {
                 OLogistics logistics_send =oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
                 logistics_send.setSendStatus(LogisticsSendStatus.dt_send.code);
                 logistics_send.setSendMsg("未实现的业务平台物流");
