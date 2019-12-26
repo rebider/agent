@@ -9,7 +9,7 @@ import java.math.BigDecimal;
  */
 public enum AdjustType {
 
-    TKTH("TKTH", "退款退货"), TCJ("TCJ", "退差价");
+    TKTH("TKTH", "退款退货"), TCJ("TCJ", "退差价"),ORDER_ADJ("ADJ","订单调整");
 
     public String adjustType;
 

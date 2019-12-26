@@ -67,7 +67,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
         oneTakeoutRecord.put("orderId", payment.getOrderId());
         oneTakeoutRecord.put("paymentId", payment.getId());
         oneTakeoutRecord.put("payType", payment.getPayMethod());
-        oneTakeoutRecord.put("payAmt", thisPaymentOutstandingAmt);
+        oneTakeoutRecord.put("payAmt", thisPaymentOutstandingAmt.setScale(2));
         oneTakeoutRecord.put("payment", payment);
         return oneTakeoutRecord;
     }
@@ -130,7 +130,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
             if (isAdjustOrder != 0) {
 
                 //查询欠款明细列表
-                List<OPaymentDetail> paymentDetails = paymentDetailService.getCanTakeoutPaymentsByAgentId(agentId);
+                List<OPaymentDetail> paymentDetails = paymentDetailService.getCanTakeoutPaymentsByAgentId(agentId,adjustType,srcId);
                 for (OPaymentDetail ndetail : paymentDetails) {
                     //金额全部抵扣完时退出循环
                     if (leftAmt.compareTo(BigDecimal.ZERO) <= 0) {
@@ -146,7 +146,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                     //查询付款单和付款单明细
                     OPayment payment = paymentDetailService.getPaymentById(paymentId);
                     //查此付款单的可抵扣明细
-                    List<OPaymentDetail> oPaymentDetails = paymentDetailService.getPaymentDetails(paymentId, "DF", "BF", "YQ");
+                    List<OPaymentDetail> oPaymentDetails = paymentDetailService.getPaymentDetails(paymentId, adjustType,"DF", "BF", "YQ");
                     //计算此付款单可抵扣金额
                     BigDecimal thisPaymentOutstandingAmt = BigDecimal.ZERO;
                     for (OPaymentDetail oneDetail : oPaymentDetails) {
@@ -186,7 +186,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                         //抵扣记录 抵扣剩余所有金额
                         takeoutList.add(createTkeRecord(payment, leftAmt));
                         //========生成新的付款计划。先计算剩余代付金额和剩余期数======
-                        List<OPaymentDetail> planNows = paymentDetailService.getPaymentDetails(paymentId);
+                        List<OPaymentDetail> planNows = paymentDetailService.getPaymentDetails(paymentId,adjustType);
                         //现在付款计划未还部分
                         List<OPaymentDetail> planNows_df = new ArrayList<>();
                         //现在付款计划已付部分
@@ -205,7 +205,14 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                                 if (detail.getPayType().equals(PaymentType.DKFQ.code) || detail.getPayType().equals(PaymentType.FRFQ.code)) {
                                     outPlanNum = outPlanNum + 1;
                                     if (startTime == null) {
-                                        startTime = detail.getPlanPayTime();
+                                        Calendar calendar = Calendar.getInstance();
+                                        if (adjustType.equals(String.valueOf(AdjustType.ORDER_ADJ.adjustType))){
+                                            calendar.setTime(detail.getPlanPayTime());
+                                            calendar.add(Calendar.MONTH, -1);
+                                            startTime = calendar.getTime();
+                                        }else {
+                                            startTime = detail.getPlanPayTime();
+                                        }
                                         startPlanNum = detail.getPlanNum().subtract(BigDecimal.ONE);
                                     }
                                 }
@@ -221,7 +228,13 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                         //计算新付款计划
                         List<Map> calNews = new ArrayList<>();
                         if (outPlanNum > 0) {
-                            calNews = StageUtil.stageOrder(outAmt, outPlanNum, startTime, 16);
+                            if (adjustType.equals(String.valueOf(AdjustType.ORDER_ADJ.adjustType))){
+                                Calendar temp = Calendar.getInstance();
+                                calNews = StageUtil.stageOrder(outAmt, outPlanNum, startTime, temp.get(Calendar.ERA));
+                            }else {
+                                calNews = StageUtil.stageOrder(outAmt, outPlanNum, startTime, 16);
+                            }
+
                         }
 
 
@@ -298,7 +311,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
             //if (leftAmt.compareTo(BigDecimal.ZERO) > 0) {
             refundAgent.setRefundType(adjustType);
             refundAgent.setSrcId(srcId);
-            refundAgent.setRefundAmount(leftAmt);
+            refundAgent.setRefundAmount(leftAmt.setScale(2));
             refundAgent.setAgentId(agentId);
             refundAgent.setcUser(userid);
             result.put("refund", refundAgent);
@@ -368,7 +381,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
             //抵扣欠款金额
             BigDecimal takeAmt = BigDecimal.ZERO;
             takeAmt = adjustAmt.subtract(leftAmt);
-            result.put("takeAmt", takeAmt);
+            result.put("takeAmt", takeAmt.setScale(2));
             result.put("realreturnAmt", leftAmt);
             //更新退货表
             if (isRealAdjust && adjustType.equals(AdjustType.TKTH.adjustType)) {
