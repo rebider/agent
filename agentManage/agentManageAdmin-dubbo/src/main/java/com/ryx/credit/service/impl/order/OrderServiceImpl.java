@@ -4215,6 +4215,7 @@ public class OrderServiceImpl implements OrderService {
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(orderAdj.getAgentId());
         record.setAgentName(agent.getAgName());
+        record.setNetInBusType("ACTIVITY_"+agentBusInfo.getBusPlatform());//数据权限
         record.setDataShiro(BusActRelBusType.orderAdjust.key);
         record.setAgDocPro(agentBusInfo.getAgDocPro());
         record.setAgDocDistrict(agentBusInfo.getAgDocDistrict());
