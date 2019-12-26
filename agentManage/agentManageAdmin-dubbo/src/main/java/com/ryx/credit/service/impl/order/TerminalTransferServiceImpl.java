@@ -624,7 +624,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             String originalOrgId = terminalTransferDetail.getOriginalOrgId();
             String goalOrgId = terminalTransferDetail.getGoalOrgId();
             //原代理商
-            if (originalOrgId.startsWith("S")) {
+            if (originalOrgId.startsWith("S")||originalOrgId.startsWith("P")) {
                 log.info("原代理商业务平台S开头处理开始。。。。。。。。。。。。。。");
                 String originalOrgIds = judgeStartsWithSUtil(originalOrgId, terminalTransferDetail);
                 terminalTransferDetail.setOriginalOrgId(originalOrgIds);
@@ -634,7 +634,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             }
 
             //目标代码商
-            if (goalOrgId.startsWith("S")) {
+            if (goalOrgId.startsWith("S")||goalOrgId.startsWith("P")) {
                 log.info("目标代理商业务平台S开头处理开始。。。。。。。。。。。。。。");
                 String goalOrgIds = judgeStartsWithSUtil(goalOrgId, terminalTransferDetail);
                 terminalTransferDetail.setGoalOrgId(goalOrgIds);
@@ -653,8 +653,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         FastMap fastMap = FastMap.fastMap("POS_PLAT_CODE", param);
         List<Map<String, Object>> terminalTransferOriginalOrgIdMaps = terminalTransferMapper.queryBusInfo(fastMap);
         if(terminalTransferOriginalOrgIdMaps==null||terminalTransferOriginalOrgIdMaps.size()!=1){
-            log.info("查询S码用户数据并不唯一:{}", JSONObject.toJSON(terminalTransferDetail));
-            throw new MessageException("查询S码用户数据并不唯一:" + param);
+            log.info("查询用户数据并不唯一:{}", JSONObject.toJSON(terminalTransferDetail));
+            throw new MessageException("查询用户数据并不唯一:" + param);
         }
         Map<String, Object> terminalTransferOriginalOrgIdMap = terminalTransferOriginalOrgIdMaps.get(0);
         if (terminalTransferOriginalOrgIdMap == null || terminalTransferOriginalOrgIdMap.isEmpty()) {
