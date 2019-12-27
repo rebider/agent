@@ -1826,6 +1826,186 @@ public class OrderAdjExample {
             addCriterion("REFUND_METHOD not between", value1, value2, "refundMethod");
             return (Criteria) this;
         }
+
+        public Criteria andProRefundAmountIsNull() {
+            addCriterion("PRO_REFUND_AMOUNT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProRefundAmountIsNotNull() {
+            addCriterion("PRO_REFUND_AMOUNT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProRefundAmountEqualTo(BigDecimal value) {
+            addCriterion("PRO_REFUND_AMOUNT =", value, "proRefundAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andProRefundAmountNotEqualTo(BigDecimal value) {
+            addCriterion("PRO_REFUND_AMOUNT <>", value, "proRefundAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andProRefundAmountGreaterThan(BigDecimal value) {
+            addCriterion("PRO_REFUND_AMOUNT >", value, "proRefundAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andProRefundAmountGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("PRO_REFUND_AMOUNT >=", value, "proRefundAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andProRefundAmountLessThan(BigDecimal value) {
+            addCriterion("PRO_REFUND_AMOUNT <", value, "proRefundAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andProRefundAmountLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("PRO_REFUND_AMOUNT <=", value, "proRefundAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andProRefundAmountIn(List<BigDecimal> values) {
+            addCriterion("PRO_REFUND_AMOUNT in", values, "proRefundAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andProRefundAmountNotIn(List<BigDecimal> values) {
+            addCriterion("PRO_REFUND_AMOUNT not in", values, "proRefundAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andProRefundAmountBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PRO_REFUND_AMOUNT between", value1, value2, "proRefundAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andProRefundAmountNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PRO_REFUND_AMOUNT not between", value1, value2, "proRefundAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOffsetAmountIsNull() {
+            addCriterion("OFFSET_AMOUNT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOffsetAmountIsNotNull() {
+            addCriterion("OFFSET_AMOUNT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOffsetAmountEqualTo(BigDecimal value) {
+            addCriterion("OFFSET_AMOUNT =", value, "offsetAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOffsetAmountNotEqualTo(BigDecimal value) {
+            addCriterion("OFFSET_AMOUNT <>", value, "offsetAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOffsetAmountGreaterThan(BigDecimal value) {
+            addCriterion("OFFSET_AMOUNT >", value, "offsetAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOffsetAmountGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("OFFSET_AMOUNT >=", value, "offsetAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOffsetAmountLessThan(BigDecimal value) {
+            addCriterion("OFFSET_AMOUNT <", value, "offsetAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOffsetAmountLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("OFFSET_AMOUNT <=", value, "offsetAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOffsetAmountIn(List<BigDecimal> values) {
+            addCriterion("OFFSET_AMOUNT in", values, "offsetAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOffsetAmountNotIn(List<BigDecimal> values) {
+            addCriterion("OFFSET_AMOUNT not in", values, "offsetAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOffsetAmountBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("OFFSET_AMOUNT between", value1, value2, "offsetAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOffsetAmountNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("OFFSET_AMOUNT not between", value1, value2, "offsetAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andDifAmountIsNull() {
+            addCriterion("DIF_AMOUNT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDifAmountIsNotNull() {
+            addCriterion("DIF_AMOUNT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDifAmountEqualTo(BigDecimal value) {
+            addCriterion("DIF_AMOUNT =", value, "difAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andDifAmountNotEqualTo(BigDecimal value) {
+            addCriterion("DIF_AMOUNT <>", value, "difAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andDifAmountGreaterThan(BigDecimal value) {
+            addCriterion("DIF_AMOUNT >", value, "difAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andDifAmountGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("DIF_AMOUNT >=", value, "difAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andDifAmountLessThan(BigDecimal value) {
+            addCriterion("DIF_AMOUNT <", value, "difAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andDifAmountLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("DIF_AMOUNT <=", value, "difAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andDifAmountIn(List<BigDecimal> values) {
+            addCriterion("DIF_AMOUNT in", values, "difAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andDifAmountNotIn(List<BigDecimal> values) {
+            addCriterion("DIF_AMOUNT not in", values, "difAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andDifAmountBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("DIF_AMOUNT between", value1, value2, "difAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andDifAmountNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("DIF_AMOUNT not between", value1, value2, "difAmount");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

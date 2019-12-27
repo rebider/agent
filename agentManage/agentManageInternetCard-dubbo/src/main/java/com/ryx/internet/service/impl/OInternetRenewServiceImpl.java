@@ -955,12 +955,16 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 if(null==oInternetCard.getExpireTime()){
                     throw new MessageException("iccid:"+iccidNumId+",到期时间为空,不允许续费/注销");
                 }
-                String onOff = redisService.getValue(RedisCachKey.CARDRENEW22ONOFF.code);
-                if(StringUtils.isBlank(onOff)){
+                String renewOnOff = redisService.getValue(RedisCachKey.CARD_RENEW_ONOFF.code);
+                if(StringUtils.isBlank(renewOnOff)){
                     throw new MessageException("参数配置错误,请联系管理员");
                 }
-                if(onOff.equals(OnOffStatus.ON.code)){
-                    if(reqType.equals("renew")){
+                String logoutOnOff = redisService.getValue(RedisCachKey.LOGOUT_ONOFF.code);
+                if(StringUtils.isBlank(logoutOnOff)){
+                    throw new MessageException("参数配置错误,请联系管理员");
+                }
+                if(reqType.equals("renew")){
+                    if(renewOnOff.equals(OnOffStatus.ON.code)) {
                         Calendar calendar = Calendar.getInstance();
                         calendar.setTime(oInternetCard.getExpireTime());
                         calendar.add(Calendar.MONTH, -1);
@@ -969,14 +973,16 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                         if(Calendar.getInstance().getTime().getTime()>date.getTime()){
                             throw new MessageException("iccid:"+iccidNumId+",已经超过续费截止时间,不允许续费");
                         }
-                    }else if(reqType.equals("logout")){
+                    }
+                }else if(reqType.equals("logout")){
+                    if(logoutOnOff.equals(OnOffStatus.ON.code)) {
                         Date date = DateUtil.dateDay(oInternetCard.getExpireTime(), "20");
                         if(Calendar.getInstance().getTime().getTime()>date.getTime()){
                             throw new MessageException("iccid:"+iccidNumId+",到期时间超过20号,不允许注销");
                         }
-                    }else{
-                        throw new MessageException("操作有误");
                     }
+                }else{
+                    throw new MessageException("操作有误");
                 }
             }else{
                 throw new MessageException("iccid:"+iccidNumId+",卡状态/续费状态不正确,不允许续费/注销");

@@ -322,9 +322,27 @@ public interface OrderService {
      */
     AgentResult approveFinishOrderAdjust(String insid, String actname) throws Exception;
 
-    Map<String,Object> saveCut(String orderAdjId, String amt, String ctype);
-
     AgentResult approvalTaskSettle(OrderAdj orderAdj) throws ProcessException;
 
+    Map<String,Object> freshRefundAmo(String adjId,String proAmount,String refundAmo,String refundType,String takeAmt);
 
+    Map<String,Object> saveProAmo(String adjId,String proAmount);
+
+    /**
+     * 订单数量调整导出
+     */
+    List<OrderAdjustVo> excelOrderAdjustAll(Map map);
+
+    /**
+     * 查看全部调整明细
+     * @param par
+     * @param page
+     * @return
+     */
+    PageInfo queryUpModelListAll(Map par, Page page);
+
+    /**
+     * 执行订单调整计划
+     */
+    AgentResult adjustDoPayPlan(String adjId,OrderAdj orderAdj)throws Exception;
 }

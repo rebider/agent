@@ -797,14 +797,14 @@
     <where>
         c.status = 1
         and c.issuer = #{map.issuer}
-        and TO_CHAR(c.expire_time, 'YYYY-MM')
-        <foreach collection="map.expireTimeList" item="expireTime" open=" in(" close=")" separator=",">
-          #{expireTime}
-        </foreach>
         <if test="map.type == 'selectNull'">
            and c.status_time is null and c.task_status_time is null
         </if>
         <if test="map.type != 'selectNull'">
+          and TO_CHAR(c.expire_time, 'YYYY-MM')
+          <foreach collection="map.expireTimeList" item="expireTime" open=" in(" close=")" separator=",">
+            #{expireTime}
+          </foreach>
            and c.task_status_time &lt; to_date(#{map.tasksStatusTime},'yyyy-MM-dd')
         </if>
         order by c.expire_time asc
