@@ -414,6 +414,9 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
     public void approvalReject(String processInstanceId, String activityName) throws MessageException{
         try {
             logger.info("退货审批拒绝回调:{},{}", processInstanceId, activityName);
+            //解冻sn在业务平台状态封装参数
+            List<Map<String, Object>> snList = new ArrayList<>();
+            Map<String, Object> snMap = new HashMap<>();
             //审批流关系
             BusActRel rel = busActRelService.findById(processInstanceId);
             //退货编号
@@ -433,6 +436,20 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             for (OReturnOrderDetail oReturnOrderDetail : list) {
                 redisService.delete(oReturnOrderDetail.getBeginSn()+","+oReturnOrderDetail.getEndSn());
                 redisService.delete(oReturnOrderDetail.getBeginSn()+","+oReturnOrderDetail.getEndSn()+"_act");
+                //平台解冻sn
+                snMap.put("terminalNoStart", oReturnOrderDetail.getBeginSn());
+                snMap.put("terminalNoEnd", oReturnOrderDetail.getEndSn());
+                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByOrderId(oReturnOrderDetail.getOrderId());
+                snMap.put("agencyId", agentBusInfo.getBusNum());
+                snList.add(snMap);
+            }
+            //业务平台执行解冻操作
+            try {
+                PlatForm platForm =platFormMapper.selectByOrderId(list.get(0).getOrderId());
+                if (null == platForm) throw new ProcessException("原订单信息不存在，请核实SN号码是否正确！");
+                termMachineService.unfreezeOrderReturnSN(snList, "");
+            } catch (Exception e){
+                throw  new MessageException("业务平台解冻失败!");
             }
             //删除排单和物流
             List<String> order_return_details_id = new ArrayList<>();

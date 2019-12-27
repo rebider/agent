@@ -413,6 +413,11 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
     }
 
     @Override
+    public AgentResult unfreezeOrderReturnSN(List<Map<String, Object>> list, String platformType) throws Exception {
+        return AgentResult.ok();
+    }
+
+    @Override
     public AgentResult queryLogisticsResult(Map<String, Object> pamMap, String platformType) throws Exception {
         return null;
     }

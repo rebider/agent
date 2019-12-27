@@ -1,7 +1,5 @@
 package com.ryx.credit.activity.task;
 
-import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.profit.service.IProfitAgentMergerService;
 import com.ryx.credit.service.order.OldOrderReturnService;
 import com.ryx.credit.spring.MySpringContextHandler;
 import org.activiti.engine.delegate.DelegateExecution;

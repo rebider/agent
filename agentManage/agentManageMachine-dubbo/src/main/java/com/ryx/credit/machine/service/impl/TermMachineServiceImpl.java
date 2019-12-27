@@ -273,6 +273,22 @@ public class TermMachineServiceImpl  implements TermMachineService {
     }
 
     @Override
+    public AgentResult unfreezeOrderReturnSN(List<Map<String, Object>> list, String platformType) throws Exception {
+        logger.info("业务平台sn解冻list:{},paltformType:{}", JSONObject.toJSONString(list), platformType);
+        if (PlatformType.whetherPOS(platformType)) {
+            return posTermMachineServiceImpl.unfreezeOrderReturnSN(list, platformType);
+        } else if (PlatformType.SSPOS.getValue().equals(platformType)) {
+            return rdbTermMachineServiceImpl.unfreezeOrderReturnSN(list, platformType);
+        } else if (PlatformType.MPOS.getValue().equals(platformType)) {
+            return rdbTermMachineServiceImpl.unfreezeOrderReturnSN(list, platformType);
+        } else if (PlatformType.RDBPOS.getValue().equals(platformType)) {
+            return rdbTermMachineServiceImpl.unfreezeOrderReturnSN(list, platformType);
+        } else {
+            return AgentResult.ok();
+        }
+    }
+
+    @Override
     public AgentResult queryLogisticsResult(Map<String, Object> pamMap, String platformType) throws Exception {
         if (PlatformType.RJPOS.getValue().equals(platformType)) {
             return rjTermMachineServiceImpl.queryLogisticsResult(pamMap, platformType);

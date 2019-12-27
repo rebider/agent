@@ -447,6 +447,11 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
         return AgentResult.ok();
     }
 
+    @Override
+    public AgentResult unfreezeOrderReturnSN(List<Map<String, Object>> list, String platformType) throws Exception {
+        return AgentResult.ok();
+    }
+
     /**
      * 瑞大宝查询物流发送结果
      * @param pamMap
