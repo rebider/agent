@@ -112,6 +112,14 @@ public interface TermMachineService {
     boolean checkModleIsEq(Map<String,String> data,String platformType);
 
     /**
+     * 校验各个业务平台是否可以退转发,如果可以执行冻结操作
+     * @param list
+     * @return
+     * @throws Exception
+     */
+    AgentResult checkOrderReturnSN(List<Map<String, Object>> list, String platformType) throws Exception;
+
+    /**
      * 查询物流发送结果（异步）
      * @param pamMap
      * @return

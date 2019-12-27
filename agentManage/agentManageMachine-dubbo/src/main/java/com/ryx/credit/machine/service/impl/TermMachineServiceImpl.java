@@ -257,6 +257,22 @@ public class TermMachineServiceImpl  implements TermMachineService {
     }
 
     @Override
+    public AgentResult checkOrderReturnSN(List<Map<String, Object>> list, String platformType) throws Exception {
+        logger.info("查询业务平台sn可否退转发list:{},paltformType:{}", JSONObject.toJSONString(list), platformType);
+        if (PlatformType.whetherPOS(platformType)) {
+            return posTermMachineServiceImpl.checkOrderReturnSN(list, platformType);
+        } else if (PlatformType.SSPOS.getValue().equals(platformType)) {
+            return rdbTermMachineServiceImpl.checkOrderReturnSN(list, platformType);
+        } else if (PlatformType.MPOS.getValue().equals(platformType)) {
+            return rdbTermMachineServiceImpl.checkOrderReturnSN(list, platformType);
+        } else if (PlatformType.RDBPOS.getValue().equals(platformType)) {
+            return rdbTermMachineServiceImpl.checkOrderReturnSN(list, platformType);
+        } else {
+            return AgentResult.ok();
+        }
+    }
+
+    @Override
     public AgentResult queryLogisticsResult(Map<String, Object> pamMap, String platformType) throws Exception {
         if (PlatformType.RJPOS.getValue().equals(platformType)) {
             return rjTermMachineServiceImpl.queryLogisticsResult(pamMap, platformType);

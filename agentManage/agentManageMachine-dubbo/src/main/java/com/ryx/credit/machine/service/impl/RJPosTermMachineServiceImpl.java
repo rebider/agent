@@ -350,4 +350,9 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
     public boolean checkModleIsEq(Map<String, String> data, String platformType) {
         return false;
     }
+
+    @Override
+    public AgentResult checkOrderReturnSN(List<Map<String, Object>> list, String platformType) throws Exception {
+        return AgentResult.ok();
+    }
 }

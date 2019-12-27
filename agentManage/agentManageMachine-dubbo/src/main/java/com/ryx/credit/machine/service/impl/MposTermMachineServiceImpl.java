@@ -287,6 +287,11 @@ public class MposTermMachineServiceImpl implements TermMachineService {
     }
 
     @Override
+    public AgentResult checkOrderReturnSN(List<Map<String, Object>> list, String platformType) throws Exception {
+        return AgentResult.ok();
+    }
+
+    @Override
     public AgentResult queryLogisticsResult(Map<String, Object> pamMap, String platformType) throws Exception {
         return null;
     }

@@ -127,6 +127,10 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
     @Override
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public AgentResult saveOldReturnOrder(OldOrderReturnVo oldOrderReturnVo)throws Exception{
+        //冻结sn在业务平台状态
+        List<Map<String, Object>> snList = new ArrayList<>();
+        Map<String, Object> snMap = new HashMap<>();
+
         List<OldOrderReturnSubmitProVo> oldOrderReturnSubmitProVos = oldOrderReturnVo.getOldOrderReturnSubmitProVoList();
         if(oldOrderReturnSubmitProVos==null || oldOrderReturnSubmitProVos.size()==0){
             return AgentResult.fail("请填写退货sn号码段");
@@ -234,6 +238,15 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             }
 
             tt = tt.add(oReturnOrderDetail.getReturnAmt());
+
+            //封装业务平台冻结sn
+            snMap.put("endSn", oReturnOrderDetail.getEndSn());
+            snMap.put("beginSn", oReturnOrderDetail.getBeginSn());
+            snMap.put("taskId", oReturnOrderDetail.getId());
+            snMap.put("orderId", oReturnOrderDetail.getOrderId());
+            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByOrderId(oReturnOrderDetail.getOrderId());
+            snMap.put("agencyId", agentBusInfo.getBusNum());
+            snList.add(snMap);
         }
 
         //退货单添加
@@ -275,6 +288,15 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("历史订单退货流程审批，启动审批异常，添加审批关系失败{}:{}", oReturnOrder.getId(), processingId);
             throw new MessageException("审批流启动失败:添加审批关系失败");
+        }
+
+        //查询各个平台sn是否可退转发，如果可以执行冻结
+        try {
+            PlatForm platForm = platFormMapper.selectByOrderId((String) snList.get(0).get("orderId"));
+            if (null == platForm) throw new ProcessException("原订单信息不存在，请核实SN号码是否正确！");
+            termMachineService.checkOrderReturnSN(snList, platForm.getPlatformType());
+        } catch (Exception e) {
+            throw new ProcessException(e.getLocalizedMessage());
         }
         return AgentResult.ok();
     }

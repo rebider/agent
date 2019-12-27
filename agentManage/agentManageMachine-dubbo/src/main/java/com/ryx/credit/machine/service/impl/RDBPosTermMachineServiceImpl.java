@@ -4,11 +4,14 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.*;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
+import com.ryx.credit.pojo.admin.agent.PlatForm;
 import com.ryx.credit.pojo.admin.order.OActivity;
 import com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail;
 import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
@@ -407,6 +410,41 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
     @Override
     public boolean checkModleIsEq(Map<String, String> data, String platformType) {
         return true;
+    }
+
+    @Override
+    public AgentResult checkOrderReturnSN(List<Map<String, Object>> list, String platformType) throws Exception {
+        try {
+            //查询机具平台
+            Map<String, Object> reqMap = new HashMap<String, Object>();
+            List<Map<String, Object>> reqList = new ArrayList<Map<String, Object>>();
+            for (Map<String, Object> map : list) {
+                //瑞大宝查询、冻结、所需参数
+                reqList.add(FastMap.fastMap("terminalNoStart", String.valueOf(map.get("beginSn"))).
+                        putKeyV("terminalNoEnd", String.valueOf(map.get("endSn"))).
+                        putKeyV("id", String.valueOf(map.get("taskId"))).
+                        putKeyV("agencyId", String.valueOf(map.get("agencyId"))) //代理商A码
+                );
+            }
+            reqMap.put("terminalNos", reqList);
+            reqMap.put("isFreeze", "1"); //"1"执行冻结
+            String json = JSONObject.toJSONString(reqMap);
+
+            logger.info("RDB退货查询冻结参数:" + json);
+            String respResult = HttpClientUtil.doPostJsonWithException(AppConfig.getProperty("rdbpos_return_of_goods_freeze"), json);
+
+            if (!StringUtils.isNotBlank(respResult)) {
+                throw new Exception("瑞大宝退货下发查询接口返回值为空，请联系管理员！");
+            }
+            JSONObject respJson = JSONObject.parseObject(respResult);
+            if (!(null != respJson.getString("code") && respJson.getString("code").equals("0000"))) {
+                logger.info("RDB冻结退货SN返回异常:" + respResult);
+                throw new Exception(null != respJson.getString("msg") ? respJson.getString("msg") : "RDB业务平台冻结SN接口，返回值异常，请联系管理员！！！");
+            }
+        } catch (Exception e) {
+            throw new ProcessException("冻结瑞大宝SN失败，瑞大宝接口异常，请联系管理员");
+        }
+        return AgentResult.ok();
     }
 
     /**
