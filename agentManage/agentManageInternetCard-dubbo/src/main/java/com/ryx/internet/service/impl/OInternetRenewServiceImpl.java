@@ -453,12 +453,12 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             for (String iccid : iccids) {
                 OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(iccid);
                 if (oInternetCard == null) {
-                    throw new MessageException("第" + z + "个iccid不存在");
+                    throw new MessageException("第" + z + "个iccid不存在");// z 没有递增
                 }
                 busNumSet.add(oInternetCard.getBusNum());
                 busPlatformSet.add(oInternetCard.getBusPlatform());
                 agentIdSet.add(oInternetCard.getAgentId());
-                agentId = oInternetCard.getAgentId();
+                agentId = oInternetCard.getAgentId();// 每个循环值 都是一样的？
                 agName = oInternetCard.getAgentName();
                 busNum = oInternetCard.getBusNum();
                 busPlatform = oInternetCard.getBusPlatform();
@@ -474,7 +474,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             }
 
             BigDecimal renewCardCount = new BigDecimal(iccids.size());
-            String internetRenewId = idService.genId(TabId.O_INTERNET_RENEW);
+            String internetRenewId = idService.genId(TabId.O_INTERNET_RENEW);// 续费申请记录
             internetRenew.setId(internetRenewId);
             internetRenew.setReviewStatus(AgStatus.Approving.status);
             internetRenew.setRenewCardCount(renewCardCount);
@@ -552,7 +552,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             //添加新的附件
             if (StringUtils.isNotBlank(internetRenew.getFiles())) {
                 String[] files = internetRenew.getFiles().split(",");
-                for (int i=0;i<files.length;i++){
+                for (int i=0;i<files.length;i++){  //TODO 这个是保存什么？ 没懂
                     AttachmentRel record = new AttachmentRel();
                     record.setAttId(files[i]);
                     record.setSrcId(internetRenewId);
@@ -598,6 +598,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 if(j!=1){
                     throw new MessageException("更新物联网卡信息失败");
                 }
+                // 这是 续费明细
                 OInternetRenewDetail oInternetRenewDetail = new OInternetRenewDetail();
                 oInternetRenewDetail.setId(idService.genId(TabId.O_INTERNET_RENEW_DETAIL));
                 oInternetRenewDetail.setRenewId(internetRenewId);
@@ -1158,4 +1159,308 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
     }
 
 
+
+//    @Transactional
+//    @Autowired
+//    public void frdk(){
+//        log.info("分润抵扣历史数据处理开始");
+//        OInternetRenewDetailExample oInternetRenewDetailExample = new OInternetRenewDetailExample();
+//        OInternetRenewDetailExample.Criteria criteria = oInternetRenewDetailExample.createCriteria();
+//        criteria.andStatusEqualTo(Status.STATUS_1.status);
+//        List<String> renewWayList = new ArrayList<>();
+//        renewWayList.add(InternetRenewWay.FRDK.getValue());
+//        renewWayList.add(InternetRenewWay.FRDKGC.getValue());
+//        criteria.andRenewWayIn(renewWayList);
+//        criteria.andRenewStatusEqualTo(InternetRenewStatus.XFZ.getValue());
+//        List<OInternetRenewDetail> oInternetRenewDetails = internetRenewDetailMapper.selectByExample(oInternetRenewDetailExample);
+//        for (OInternetRenewDetail oInternetRenewDetail : oInternetRenewDetails) {
+//            oInternetRenewDetail.setuTime(new Date());
+//            oInternetRenewDetail.setRenewStatus(InternetRenewStatus.YXF.getValue());
+//            oInternetRenewDetail.setRealityAmt(oInternetRenewDetail.getOughtAmt());
+//            int i = internetRenewDetailMapper.updateByPrimaryKeySelective(oInternetRenewDetail);
+//            if(i!=1){
+//                log.info("分润抵扣历史数据处理失败1",oInternetRenewDetail.getId());
+//                continue;
+//            }
+//            OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(oInternetRenewDetail.getIccidNum());
+//            oInternetCard.setExpireTime(DateUtil.getOneYearLater(oInternetCard.getExpireTime()));
+//            oInternetCard.setRenewStatus(InternetRenewStatus.YXF.getValue());
+//            oInternetCard.setStop(Status.STATUS_0.status);
+//            oInternetCard.setRenew(Status.STATUS_0.status);
+//            oInternetCard.setuTime(new Date());
+//            int j = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
+//            if(j!=1){
+//                log.info("分润抵扣历史数据处理失败2",oInternetCard.getIccidNum());
+//            }
+//        }
+//        log.info("分润抵扣历史数据处理结束,处理个数{}",oInternetRenewDetails.size());
+//    }
+
+    /**
+     *
+     * @param internetRenew
+     * @param iccid
+     * @return
+     */
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    public AgentResult batchRenewInsert(OInternetRenew internetRenew, String iccid) throws MessageException{
+        log.info("批量续费导入提交参数: internetRenew:{}, iccids:{}", internetRenew.toString(), iccid);
+        String retIdentifier = "";
+        try {
+            retIdentifier = redisService.lockWithTimeout(RedisCachKey.RENEW_CARD.code + internetRenew.getcUser(), RedisService.ACQUIRE_TIME_OUT, RedisService.TIME_OUT);
+            if (StringUtils.isBlank(retIdentifier)) {
+                log.info("续费中请勿重复提交,cUser:{}", internetRenew.getcUser());
+                throw new MessageException("续费中请勿重复提交");
+            }
+            if(StringUtils.isBlank(InternetRenewWay.getContentByValue(internetRenew.getRenewWay()))){
+                throw new MessageException("续费方式错误");
+            }
+            if(iccid==null){
+                throw new MessageException("请选择要续费的卡");
+            }
+            if(internetRenew.getRenewWay() == null){
+                throw new MessageException("请选择要续费方式");
+            }
+
+
+            OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(iccid);
+            if (oInternetCard == null) {
+                throw new MessageException("iccid:"+iccid+"不存在");
+            }
+
+            // 检查 ICCID 有效性
+            renewVerify(iccid,null, "renew");
+
+            String busNum = "";
+            String busPlatform = "";
+            busNum = oInternetCard.getBusNum();
+            busPlatform = oInternetCard.getBusPlatform();
+
+            AgentBusInfo queryAgentBusInfo = null;
+            if(StringUtils.isNotBlank(busNum)){
+                //查询最新对接省区大区对接人
+                AgentBusInfo agentBusInfo = new AgentBusInfo();
+                agentBusInfo.setBusNum(busNum);
+                agentBusInfo.setBusPlatform(busPlatform);
+                List<BigDecimal> busStatusList = new ArrayList<>();
+                busStatusList.add(BusStatus.QY.getValue());
+                busStatusList.add(BusStatus.WJH.getValue());
+                busStatusList.add(BusStatus.WQY.getValue());
+                agentBusInfo.setBusStatusList(busStatusList);
+                agentBusInfo.setCloReviewStatus(AgStatus.Approved.getValue());
+                List<AgentBusInfo> agentBusInfos = agentBusinfoService.selectByAgentBusInfo(agentBusInfo);
+                if(agentBusInfos.size()!=1){
+                    throw new MessageException("平台码或平台错误,请联系管理员");
+                }
+                queryAgentBusInfo = agentBusInfos.get(0);
+            }
+
+            // 续费申请记录
+            if(internetRenew.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.XXBK.getValue())) {
+                // 不支持线下补款
+                throw new MessageException("线下打款必须填写打款记录");
+            }
+
+            String internetRenewId = idService.genId(TabId.O_INTERNET_RENEW);
+//            List<String> agentNameList = dictOptionsService.getAgentNameList(Long.valueOf(internetRenew.getcUser()));
+//
+//            if(agentNameList.size()!=0) {
+//
+//            }
+            if (!internetRenew.getRenewWay().equals(InternetRenewWay.XXBK.getValue())) {
+                if (internetRenew.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())
+                        || internetRenew.getRenewWay().equals(InternetRenewWay.GSCDGC.getValue())) {
+                    if (StringUtils.isBlank(oInternetCard.getMerId()) || StringUtils.isBlank(oInternetCard.getMerName())) {
+                        throw new MessageException("轧差方式必须包含商户信息");
+                    }
+                }
+                if (StringUtils.isBlank(oInternetCard.getAgentId()) || StringUtils.isBlank(oInternetCard.getAgentName())) {
+                    throw new MessageException("缺少代理商编号/代理商名称,只能选择线下打款支付方式,如有问题请联系管理员");
+                }
+            }
+
+            OInternetRenewDetailExample oInternetRenewDetailExample = new OInternetRenewDetailExample();
+            OInternetRenewDetailExample.Criteria criteria = oInternetRenewDetailExample.createCriteria();
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
+            criteria.andIccidNumEqualTo(iccid);
+            criteria.andRenewStatusEqualTo(InternetRenewStatus.XFZ.getValue());
+            List<OInternetRenewDetail> oInternetRenewDetails = internetRenewDetailMapper.selectByExample(oInternetRenewDetailExample);
+            if (oInternetRenewDetails.size() != 0) {
+                throw new MessageException("iccid:" + iccid + "续费中,请勿重复发起");
+            }
+            oInternetCard.setRenewStatus(InternetRenewStatus.XFZ.getValue());
+            int j = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
+            if (j != 1) {
+                throw new MessageException("更新物联网卡信息失败");
+            }
+            // 续费明细
+            OInternetRenewDetail oInternetRenewDetail = new OInternetRenewDetail();
+            oInternetRenewDetail.setId(idService.genId(TabId.O_INTERNET_RENEW_DETAIL));
+            oInternetRenewDetail.setRenewId(internetRenewId); // TODO 需要放置申请流水号 ？
+            oInternetRenewDetail.setIccidNum(iccid);
+            oInternetRenewDetail.setOrderId(oInternetCard.getOrderId());
+            oInternetRenewDetail.setSnNum(oInternetCard.getSnNum());
+            oInternetRenewDetail.setInternetCardNum(oInternetCard.getInternetCardNum());
+            Date earlyDate = DateUtil.format("1900-01-01 00:00:00");
+            if (oInternetCard.getOpenAccountTime().getTime() < earlyDate.getTime()) {
+                throw new MessageException("iccid:" + iccid + "开户日期不正确请联系相关部门");
+            }
+            oInternetRenewDetail.setOpenAccountTime(oInternetCard.getOpenAccountTime());
+            if (oInternetCard.getExpireTime() == null) {
+                throw new MessageException("iccid:" + iccid + "缺少到期时间");
+            }
+            oInternetRenewDetail.setExpireTime(oInternetCard.getExpireTime());
+            if (internetRenew.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())
+                    || internetRenew.getRenewWay().equals(InternetRenewWay.GSCDGC.getValue())) {
+                if (StringUtils.isBlank(oInternetCard.getMerId()) || StringUtils.isBlank(oInternetCard.getMerName()) ||
+                        oInternetCard.getMerId().equals("无") || oInternetCard.getMerName().equals("无")) {
+                    throw new MessageException("iccid:" + iccid + "商户信息不全,轧差商户方式必须包含商户信息");
+                }
+            }
+            oInternetRenewDetail.setMerId(oInternetCard.getMerId());
+            oInternetRenewDetail.setMerName(oInternetCard.getMerName());
+            oInternetRenewDetail.setAgentId(oInternetCard.getAgentId());
+            if (StringUtils.isBlank(oInternetCard.getAgentName())) {
+                throw new MessageException("iccid:" + iccid + "代理商名称为空");
+            }
+            oInternetRenewDetail.setAgentName(oInternetCard.getAgentName());
+            oInternetRenewDetail.setRenewWay(internetRenew.getRenewWay());
+            Dict offsetAmt = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.INTERNET_RENEW.name(), DictGroup.OFFSET_AMT.name());
+            Dict cardAmt = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.INTERNET_RENEW.name(), DictGroup.CARD_AMT.name());
+            if (cardAmt == null) {
+                throw new MessageException("缺少 cardAmt 参数配置");
+            }
+            if (offsetAmt == null) {
+                throw new MessageException("缺少 offsetAmt 参数配置");
+            }
+            if (internetRenew.getRenewWay().equals(InternetRenewWay.FRDK.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.XXBK.getValue())
+                    || internetRenew.getRenewWay().equals(InternetRenewWay.GSCD.getValue())) {
+                oInternetRenewDetail.setOffsetAmt(BigDecimal.ZERO);
+            } else {
+                oInternetRenewDetail.setOffsetAmt(new BigDecimal(offsetAmt.getdItemvalue()));
+            }
+            oInternetRenewDetail.setRenewAmt(new BigDecimal(cardAmt.getdItemvalue()));
+            oInternetRenewDetail.setOughtAmt(new BigDecimal(cardAmt.getdItemvalue()));
+            // 线下打款直接是实际扣款金额
+            if (internetRenew.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.XXBK.getValue()) ||
+                    internetRenew.getRenewWay().equals(InternetRenewWay.GSCDGC.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.GSCD.getValue())) {
+                oInternetRenewDetail.setRealityAmt(new BigDecimal(cardAmt.getdItemvalue()));
+            } else {
+                oInternetRenewDetail.setRealityAmt(BigDecimal.ZERO);
+            }
+            oInternetRenewDetail.setRenewStatus(InternetRenewStatus.XFZ.getValue());
+            oInternetRenewDetail.setStatus(Status.STATUS_1.status);
+            oInternetRenewDetail.setcUser(oInternetCard.getcUser());
+            oInternetRenewDetail.setuUser(oInternetCard.getuUser());
+            oInternetRenewDetail.setcTime(new Date());
+            oInternetRenewDetail.setuTime(new Date());
+            oInternetRenewDetail.setVersion(BigDecimal.ONE);
+            oInternetRenewDetail.setBusNum(oInternetCard.getBusNum());
+            oInternetRenewDetail.setBusPlatform(oInternetCard.getBusPlatform());
+            if (null != queryAgentBusInfo) {
+                oInternetRenewDetail.setAgDocDistrict(queryAgentBusInfo.getAgDocDistrict());
+                oInternetRenewDetail.setAgDocPro(queryAgentBusInfo.getAgDocPro());
+                oInternetRenewDetail.setBusContactPerson(queryAgentBusInfo.getBusContactPerson());
+            }
+            log.info("续费明细保存参数:internetRenew:{}", oInternetRenewDetail.toString());
+            internetRenewDetailMapper.insert(oInternetRenewDetail);
+
+            //
+            Map<String, Object> reqMap = new HashMap<>();
+
+            if (internetRenew.getRenewWay().equals(InternetRenewWay.FRDK.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())) {
+                try {
+
+                    BigDecimal agStatus = AgStatus.Approved.status;
+                    internetRenew.setReviewStatus(agStatus);
+                    if (agStatus.compareTo(AgStatus.Approved.getValue()) == 0) {
+                        internetRenew.setReviewPassTime(new Date());
+                    }
+                    log.info("续费完成更新请求参数:internetRenew:{}", internetRenew.toString());
+                    // 这是更新续费申请请求  请求记录是没有的 只有申请号
+//                    int i = internetRenewMapper.updateByPrimaryKeySelective(internetRenew);
+//                    if (i != 1) {
+//                        throw new MessageException("更新续费记录失败");
+//                    }
+//                        oInternetRenewDetailExample = new OInternetRenewDetailExample();
+//                        criteria = oInternetRenewDetailExample.createCriteria();
+//                        criteria.andStatusEqualTo(Status.STATUS_1.status);
+//                        criteria.andRenewIdEqualTo(internetRenew.getId()); // id 没有查不到的
+//                        oInternetRenewDetails = internetRenewDetailMapper.selectByExample(oInternetRenewDetailExample);
+
+//                        for (OInternetRenewDetail oInternetRenewDetail : oInternetRenewDetails) {
+//                        }
+                    //
+                    // 拒绝全部失效
+                    if (agStatus.compareTo(AgStatus.Refuse.getValue()) == 0) {
+                        oInternetRenewDetail.setRenewStatus(InternetRenewStatus.SX.getValue());
+                        oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
+                    }
+                    if (agStatus.compareTo(AgStatus.Approved.getValue()) == 0) {
+                        //审批通过直接已续费
+                        oInternetRenewDetail.setRenewStatus(InternetRenewStatus.YXF.getValue());
+                        if (oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDK.getValue()) || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())) {
+                            oInternetRenewDetail.setRealityAmt(oInternetRenewDetail.getOughtAmt());
+                        }
+                        oInternetCard.setRenewStatus(InternetRenewStatus.YXF.getValue());
+                        //续费成功到期时间加一年
+                        oInternetCard.setExpireTime(DateUtil.getOneYearLater(oInternetCard.getExpireTime()));
+
+                        oInternetCard.setStop(Status.STATUS_0.status);
+                        oInternetCard.setRenew(Status.STATUS_0.status);
+                        //生成轧差明细，同步清结算
+                        if (oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())
+                                || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.GSCDGC.getValue())) {
+                            InternetRenewOffset internetRenewOffset = new InternetRenewOffset();
+                            internetRenewOffset.setFlowId(idService.genInternetOffset());
+                            internetRenewOffset.setRenewId(internetRenew.getId());
+                            internetRenewOffset.setRenewDetailId(oInternetRenewDetail.getId());
+                            internetRenewOffset.setIccidNum(oInternetRenewDetail.getIccidNum());
+                            internetRenewOffset.setAgentId(oInternetRenewDetail.getAgentId());
+                            internetRenewOffset.setAgentName(oInternetRenewDetail.getAgentName());
+                            internetRenewOffset.setMerId(oInternetRenewDetail.getMerId());
+                            internetRenewOffset.setMerName(oInternetRenewDetail.getMerName());
+                            internetRenewOffset.setOffsetAmt(oInternetRenewDetail.getOffsetAmt());
+                            internetRenewOffset.setAlreadyOffsetAmt(BigDecimal.ZERO);
+                            internetRenewOffset.setcTime(DateUtil.format(new Date(), DateUtil.DATE_FORMAT_3));
+                            internetRenewOffset.setcUser(oInternetRenewDetail.getcUser());
+                            internetRenewOffset.setuUser(oInternetRenewDetail.getuUser());
+                            internetRenewOffset.setStatus(Status.STATUS_1.status);
+                            internetRenewOffset.setVersion(BigDecimal.ONE);
+                            internetRenewOffset.setCleanStatus(InternetCleanStatus.ZERO.getValue());
+                            internetRenewOffset.setBusNum(oInternetRenewDetail.getBusNum());
+                            internetRenewOffset.setBusPlatform(oInternetRenewDetail.getBusPlatform());
+                            internetRenewOffset.setAgDocDistrict(oInternetRenewDetail.getAgDocDistrict());
+                            internetRenewOffset.setAgDocPro(oInternetRenewDetail.getAgDocPro());
+                            internetRenewOffset.setBusContactPerson(oInternetRenewDetail.getBusContactPerson());
+                            log.info("续费完成插入轧差表参数:internetRenewOffset:{}", internetRenewOffset.toString());
+                            internetRenewOffsetMapper.insert(internetRenewOffset);
+                        }
+                    }
+                    log.info("续费完成更新续费明细表参数:oInternetRenewDetail:{}", oInternetRenewDetail.toString());
+                    int l = internetRenewDetailMapper.updateByPrimaryKeySelective(oInternetRenewDetail);
+                    if (l != 1) {
+                        throw new MessageException("更新续费明细失败");
+                    }
+                    oInternetCard.setuTime(new Date());
+                    log.info("续费完成卡总表参数:oInternetCard:{}", oInternetCard.toString());
+                    int k = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
+                    if (k != 1) {
+                        throw new MessageException("更新物联网卡信息失败");
+                    }
+                } catch (Exception e) {
+                    AppConfig.sendEmails(MailUtil.printStackTrace(e), "省区续费审批完成失败出现异常,saveAndApprove方法2");
+                    e.printStackTrace();
+                    throw new MessageException("省区续费审批完成失败!:{}", e.getMessage());
+                }
+            }
+            return AgentResult.ok();
+        }finally {
+            if(StringUtils.isNotBlank(retIdentifier)){
+                redisService.releaseLock(RedisCachKey.RENEW_CARD.code+internetRenew.getcUser(), retIdentifier);
+            }
+        }
+//        return null;
+    }
 }
