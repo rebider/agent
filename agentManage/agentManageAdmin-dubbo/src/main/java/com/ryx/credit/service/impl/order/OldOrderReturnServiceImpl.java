@@ -198,6 +198,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         oReturnOrder.setOreturntype(Oreturntype.OLD.code);
 
         //保存提货申请明细
+        String platform = "";
         BigDecimal tt = BigDecimal.ZERO;
         OReturnOrderDetail oReturnOrderDetail = new OReturnOrderDetail();
         for (OldOrderReturnSubmitProVo oldOrderReturnSubmitProVo : oldOrderReturnVo.getOldOrderReturnSubmitProVoList()) {
@@ -243,9 +244,9 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             snMap.put("endSn", oReturnOrderDetail.getEndSn());
             snMap.put("beginSn", oReturnOrderDetail.getBeginSn());
             snMap.put("taskId", oReturnOrderDetail.getId());
-            snMap.put("orderId", oReturnOrderDetail.getOrderId());
-            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByOrderId(oReturnOrderDetail.getOrderId());
-            snMap.put("agencyId", agentBusInfo.getBusNum());
+            String busNum = redisService.getValue(oldOrderReturnSubmitProVo.getSnStart() + "," + oldOrderReturnSubmitProVo.getSnEnd() + "_org");
+            platform = redisService.getValue(oldOrderReturnSubmitProVo.getSnStart() + "," + oldOrderReturnSubmitProVo.getSnEnd() + "_plat");
+            snMap.put("agencyId", busNum);
             snList.add(snMap);
         }
 
@@ -292,9 +293,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
 
         //查询各个平台sn是否可退转发，如果可以执行冻结
         try {
-            PlatForm platForm = platFormMapper.selectByOrderId((String) snList.get(0).get("orderId"));
-            if (null == platForm) throw new ProcessException("原订单信息不存在，请核实SN号码是否正确！");
-            termMachineService.checkOrderReturnSN(snList, platForm.getPlatformType());
+            termMachineService.checkOrderReturnSN(snList, platform);
         } catch (Exception e) {
             throw new ProcessException(e.getLocalizedMessage());
         }
