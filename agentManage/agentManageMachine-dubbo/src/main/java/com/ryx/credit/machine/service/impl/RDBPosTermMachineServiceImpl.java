@@ -449,6 +449,16 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
 
     @Override
     public AgentResult unfreezeOrderReturnSN(List<Map<String, Object>> list, String platformType) throws Exception {
+        logger.info("瑞大宝解冻接口请求参数:{}", JSONObject.toJSONString(list));
+        String httpResult = HttpClientUtil.doPostJsonWithException(AppConfig.getProperty("rdbpos.unfreezeTerm"), JSONObject.toJSONString(list));
+        if(StringUtils.isBlank(httpResult)) {
+            throw new Exception("瑞大宝解冻返回值为空！");
+        }
+        logger.info("瑞大宝解冻接口返回参数:{}", httpResult);
+        JSONObject respJsonObj = JSONObject.parseObject(httpResult);
+        if (!(null != respJsonObj.get("code") && respJsonObj.get("code").equals("0000"))) {
+            throw new Exception("瑞大宝解冻sn异常！");
+        }
         return AgentResult.ok();
     }
 

@@ -413,9 +413,6 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
     public void approvalReject(String processInstanceId, String activityName) throws MessageException{
         try {
             logger.info("退货审批拒绝回调:{},{}", processInstanceId, activityName);
-            //解冻sn在业务平台状态封装参数
-            List<Map<String, Object>> snList = new ArrayList<>();
-            Map<String, Object> snMap = new HashMap<>();
             //审批流关系
             BusActRel rel = busActRelService.findById(processInstanceId);
             //退货编号
@@ -432,22 +429,27 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             OReturnOrderDetailExample example = new OReturnOrderDetailExample();
             example.or().andReturnIdEqualTo(returnId).andStatusEqualTo(Status.STATUS_1.status);
             List<OReturnOrderDetail> list = returnOrderDetailMapper.selectByExample(example);
+            //解冻sn在业务平台状态封装参数
+            List<Map<String, Object>> snList = new ArrayList<>();
+            String platform = "";
             for (OReturnOrderDetail oReturnOrderDetail : list) {
-                redisService.delete(oReturnOrderDetail.getBeginSn()+","+oReturnOrderDetail.getEndSn());
-                redisService.delete(oReturnOrderDetail.getBeginSn()+","+oReturnOrderDetail.getEndSn()+"_act");
                 //平台解冻sn
+                Map<String, Object> snMap = new HashMap<>();
                 snMap.put("terminalNoStart", oReturnOrderDetail.getBeginSn());
                 snMap.put("terminalNoEnd", oReturnOrderDetail.getEndSn());
-                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByOrderId(oReturnOrderDetail.getOrderId());
-                snMap.put("agencyId", agentBusInfo.getBusNum());
+                snMap.put("agencyId", redisService.getValue(oReturnOrderDetail.getBeginSn()+","+oReturnOrderDetail.getEndSn() + "_org"));
+                platform = redisService.getValue(oReturnOrderDetail.getBeginSn()+","+oReturnOrderDetail.getEndSn()+"_plat");
                 snList.add(snMap);
+                redisService.delete(oReturnOrderDetail.getBeginSn()+","+oReturnOrderDetail.getEndSn());
+                redisService.delete(oReturnOrderDetail.getBeginSn()+","+oReturnOrderDetail.getEndSn()+"_act");
+                redisService.delete(oReturnOrderDetail.getBeginSn()+","+oReturnOrderDetail.getEndSn()+"_org");
+                redisService.delete(oReturnOrderDetail.getBeginSn()+","+oReturnOrderDetail.getEndSn()+"_plat");
             }
             //业务平台执行解冻操作
             try {
-                PlatForm platForm =platFormMapper.selectByOrderId(list.get(0).getOrderId());
-                if (null == platForm) throw new ProcessException("原订单信息不存在，请核实SN号码是否正确！");
-                termMachineService.unfreezeOrderReturnSN(snList, "");
+                termMachineService.unfreezeOrderReturnSN(snList, platform);
             } catch (Exception e){
+                e.printStackTrace();
                 throw  new MessageException("业务平台解冻失败!");
             }
             //删除排单和物流
@@ -1088,6 +1090,8 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             for (OReturnOrderDetail oReturnOrderDetail : list) {
                 redisService.delete(oReturnOrderDetail.getBeginSn()+","+oReturnOrderDetail.getEndSn());
                 redisService.delete(oReturnOrderDetail.getBeginSn()+","+oReturnOrderDetail.getEndSn()+"_act");
+                redisService.delete(oReturnOrderDetail.getBeginSn()+","+oReturnOrderDetail.getEndSn()+"_org");
+                redisService.delete(oReturnOrderDetail.getBeginSn()+","+oReturnOrderDetail.getEndSn()+"_plat");
                 //更新历史订单退货数量
                 OSubOrderExample oSubOrderExample = new OSubOrderExample();
                 oSubOrderExample.or()

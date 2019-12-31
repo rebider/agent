@@ -658,8 +658,9 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     redisService.lpushList(snStart + "," + snEnd + "_act", activity.getId());
                 }
                 //放入代理商信息
-                redisService.setValue(snStart + "," + snEnd + "_org", busNum, 60 * 60 * 24L);
-                redisService.setValue(snStart + "," + snEnd + "_plat", PlatformType.RDBPOS.code, 60 * 60 * 24L);
+                //redisService.setValue(snStart + "," + snEnd + "_org", busNum, 60 * 60 * 24L);
+                redisService.set(snStart + "," + snEnd + "_org", busNum);
+                redisService.set(snStart + "," + snEnd + "_plat", PlatformType.RDBPOS.code);
                 OActivity oActivity = actSet.iterator().next();
                 res.putKeyV("snStart", snStart)
                         .putKeyV("snEnd", snEnd)
