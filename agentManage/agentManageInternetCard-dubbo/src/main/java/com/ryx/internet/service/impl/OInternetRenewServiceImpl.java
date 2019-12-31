@@ -1297,7 +1297,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             // 续费明细
             OInternetRenewDetail oInternetRenewDetail = new OInternetRenewDetail();
             oInternetRenewDetail.setId(idService.genId(TabId.O_INTERNET_RENEW_DETAIL));
-            oInternetRenewDetail.setRenewId(internetRenewId); // TODO 需要放置申请流水号 ？
+            oInternetRenewDetail.setRenewId(internetRenewId);
             oInternetRenewDetail.setIccidNum(iccid);
             oInternetRenewDetail.setOrderId(oInternetCard.getOrderId());
             oInternetRenewDetail.setSnNum(oInternetCard.getSnNum());
