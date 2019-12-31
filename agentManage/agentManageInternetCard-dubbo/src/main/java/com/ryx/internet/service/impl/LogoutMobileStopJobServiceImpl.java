@@ -69,6 +69,11 @@ public class LogoutMobileStopJobServiceImpl implements LogoutMobileStopJobServic
                         AppConfig.sendEmails("logoutMobileStopJob申请注销明细通知移动，缺少物联网卡号，iccid："+internetLogoutDetail.getIccidNum(), "申请注销明细通知移动出现异常,logoutMobileStopJob方法");
                         continue;
                     }
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+
+                    }
                     String mobileResult = ChinaMobileForJYHttpReq.msisdnSwitch(internetLogoutDetail.getInternetCardNum(), JyMobileOptType.STOP.getValue());
                     OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(internetLogoutDetail.getIccidNum());
                     if(StringUtils.isBlank(mobileResult)){

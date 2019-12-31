@@ -137,8 +137,10 @@ public class QueryCardStatusJobServiceImpl implements QueryCardStatusJobService 
                         oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());
                     }
                 }else{
-                    String error = resultMap.get("error");
-                    sb.append("iccid:"+iccid+",error:"+error+"\n");
+                    if(iccid.length()==20){
+                        String error = resultMap.get("error");
+                        sb.append("iccid:"+iccid+",error:"+error+"\n");
+                    }
                 }
                 oInternetCard.setTaskStatusTime(new Date());
                 int i = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
@@ -156,5 +158,6 @@ public class QueryCardStatusJobServiceImpl implements QueryCardStatusJobService 
         }
         log.info("揭阳移动返回数据处理,结束");
     }
+
 
 }
