@@ -453,12 +453,13 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             for (String iccid : iccids) {
                 OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(iccid);
                 if (oInternetCard == null) {
-                    throw new MessageException("第" + z + "个iccid不存在");// z 没有递增
+                    throw new MessageException("第" + z + "个iccid不存在");
                 }
+                z++;
                 busNumSet.add(oInternetCard.getBusNum());
                 busPlatformSet.add(oInternetCard.getBusPlatform());
                 agentIdSet.add(oInternetCard.getAgentId());
-                agentId = oInternetCard.getAgentId();// 每个循环值 都是一样的？
+                agentId = oInternetCard.getAgentId();
                 agName = oInternetCard.getAgentName();
                 busNum = oInternetCard.getBusNum();
                 busPlatform = oInternetCard.getBusPlatform();
@@ -552,7 +553,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             //添加新的附件
             if (StringUtils.isNotBlank(internetRenew.getFiles())) {
                 String[] files = internetRenew.getFiles().split(",");
-                for (int i=0;i<files.length;i++){  //TODO 这个是保存什么？ 没懂
+                for (int i=0;i<files.length;i++){
                     AttachmentRel record = new AttachmentRel();
                     record.setAttId(files[i]);
                     record.setSrcId(internetRenewId);
