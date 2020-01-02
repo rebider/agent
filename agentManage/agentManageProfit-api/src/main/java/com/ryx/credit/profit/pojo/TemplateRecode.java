@@ -37,6 +37,8 @@ public class TemplateRecode implements Serializable {
 
     private String busNumS;
 
+    private String changeflag;
+
     public String getId() {
         return id;
     }
@@ -171,5 +173,13 @@ public class TemplateRecode implements Serializable {
 
     public void setBusNumS(String busNumS) {
         this.busNumS = busNumS == null ? null : busNumS.trim();
+    }
+
+    public String getChangeflag() {
+        return changeflag;
+    }
+
+    public void setChangeflag(String changeflag) {
+        this.changeflag = changeflag == null ? null : changeflag.trim();
     }
 }
