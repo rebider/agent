@@ -1205,7 +1205,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
      */
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
-    public AgentResult batchRenewInsert(OInternetRenew internetRenew, String iccid) throws MessageException{
+    public AgentResult batchRenewInsert(OInternetRenew internetRenew, String iccid,String batchNo) throws MessageException{
         log.info("批量续费导入提交参数: internetRenew:{}, iccids:{}", internetRenew.toString(), iccid);
         String retIdentifier = "";
         try {
@@ -1298,7 +1298,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             // 续费明细
             OInternetRenewDetail oInternetRenewDetail = new OInternetRenewDetail();
             oInternetRenewDetail.setId(idService.genId(TabId.O_INTERNET_RENEW_DETAIL));
-            oInternetRenewDetail.setRenewId(internetRenewId);
+            oInternetRenewDetail.setRenewId(batchNo); // 放置批次号
             oInternetRenewDetail.setIccidNum(iccid);
             oInternetRenewDetail.setOrderId(oInternetCard.getOrderId());
             oInternetRenewDetail.setSnNum(oInternetCard.getSnNum());

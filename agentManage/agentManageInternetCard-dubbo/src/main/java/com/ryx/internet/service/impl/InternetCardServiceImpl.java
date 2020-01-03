@@ -606,7 +606,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                     // 延期
                     oInternetRenew.setRenewWay(oInternetRenew.getRenewWay());// 续费方式获取
                     String iccids = oInternetRenew.getIccidNumIds();// ICCIDS
-                    oInternetRenewService.batchRenewInsert(oInternetRenew, iccids);
+                    oInternetRenewService.batchRenewInsert(oInternetRenew, iccids, batchNo);
                 }
             } catch (MessageException e) {
                 log.info("analysisImport处理导入表数据,MessageException:{}",e.getLocalizedMessage());

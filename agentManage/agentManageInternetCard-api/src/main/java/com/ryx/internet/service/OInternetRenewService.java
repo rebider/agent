@@ -61,5 +61,5 @@ public interface OInternetRenewService {
 
     AgentResult queryCardProfit(Map<String,Object> reqMap);
 
-    AgentResult batchRenewInsert(OInternetRenew internetRenew, String iccids) throws MessageException;
+    AgentResult batchRenewInsert(OInternetRenew internetRenew, String iccids,String batchNo) throws MessageException;
 }
