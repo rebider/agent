@@ -1071,7 +1071,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                 throw e;
             }
         } else if (PlatformType.RDBPOS.code.equals(platForm.getPlatformType())) {
-            logger.info("RDBPOS平台物流下发！");
+            logger.info("瑞大宝平台物流下发！");
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
             Agent agent = agentMapper.selectByPrimaryKey(order.getAgentId());
             if (null == oActivity_plan) throw new MessageException("活动信息异常！");
@@ -1087,7 +1087,10 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             reqMap.put("termBegin", logistics.getSnBeginNum());//起始SN
             reqMap.put("termEnd", logistics.getSnEndNum());//结束SN
             reqMap.put("agencyId", agentBusInfo.getBusNum());//划拨目标
-            reqMap.put("oldAgencyId", oldAgencyId);//划拨机构
+            //查询顶级机构
+            Map<String, Object> orgMap = orgPlatformMapper.selectByMap(FastMap.fastMap("busPlatform", agentBusInfo.getBusPlatform()).putKeyV("organNum", agentBusInfo.getOrganNum()));
+            if (null == orgMap || null == orgMap.get("PLATCODE")) throw new MessageException("顶级机构码为空，请补全顶级机构！");
+            reqMap.put("oldAgencyId", orgMap.get("PLATCODE"));//顶级机构
             reqMap.put("branchId", branchId);//品牌id
             reqMap.put("termPolicyId", oActivity_plan.getBusProCode());//活动代码
             if(logistics.getSendDate()!=null) {
@@ -1155,7 +1158,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             if (null == agentBusInfo) throw new MessageException("查询业务数据失败！");
 
             //查询顶级机构
-            Map orgMap = orgPlatformMapper.selectByMap(FastMap.fastMap("busPlatform", agentBusInfo.getBusPlatform()).putKeyV("organNum", agentBusInfo.getOrganNum()));
+            Map<String, Object> orgMap = orgPlatformMapper.selectByMap(FastMap.fastMap("busPlatform", agentBusInfo.getBusPlatform()).putKeyV("organNum", agentBusInfo.getOrganNum()));
             if (null == orgMap || null == orgMap.get("PLATCODE")) throw new MessageException("顶级机构码为空，请补全顶级机构！");
 
             Map<String, Object> reqMap = new HashMap<>();
