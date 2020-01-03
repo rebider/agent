@@ -304,6 +304,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                     } else {
                         db_AgentColinfo.setAgLegalCernum(agentColinfoVo.getAgLegalCernum());
                     }
+                    db_AgentColinfo.setcUtime(Calendar.getInstance().getTime());
                     if (1 != agentColinfoMapper.updateByPrimaryKeySelective(db_AgentColinfo)) {
                         throw new MessageException("更新收款信息失败");
                     } else {

@@ -6,6 +6,7 @@ import com.ryx.credit.activity.entity.ActRuTask;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.common.util.agentUtil.StageUtil;
@@ -37,6 +38,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
@@ -153,6 +155,8 @@ public class OrderServiceImpl implements OrderService {
     private ODeductCapitalMapper deductCapitalMapper;
     @Autowired
     private SettleAccountsMapper settleAccountsMapper;
+    @Resource(name = "redisService")
+    private RedisService  redisService;
     @Autowired
     private IAccountAdjustService accountAdjustService;
     @Autowired
@@ -322,6 +326,8 @@ public class OrderServiceImpl implements OrderService {
                 throw new Exception(agentResult.getMsg());
             }
         }
+
+
         //添加到数据历史表
         agentDataHistoryService.saveDataHistory(orderFormVo, DataHistoryType.ORDER.getValue());
         return AgentResult.ok(orderFormVo.getId());
@@ -421,6 +427,14 @@ public class OrderServiceImpl implements OrderService {
                 }
                 if (payment.getDownPaymentCount() == null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new MessageException("分期期数有误");
+                }else{
+                   //分期情况下自定义分期校验
+                   if(Status.STATUS_1.status.toString().equals(payment.getCustomStaging())){
+                       //检查分期数据
+                       if(agentVo.getCustomStagingUser()==null || (agentVo.getCustomStagingUser().size()!=payment.getDownPaymentCount().intValue()) ){
+                           throw new MessageException("分期期数和自定义分期期数不对等");
+                       }
+                   }
                 }
                 // cxinfo 修改为多条打款信息
                 List<OCashReceivablesVo> cash = agentVo.getoCashReceivables();
@@ -448,6 +462,14 @@ public class OrderServiceImpl implements OrderService {
                 }
                 if (payment.getDownPaymentCount() == null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new MessageException("分期期数有误");
+                }else{
+                    //分期情况下自定义分期校验
+                    if(Status.STATUS_1.status.toString().equals(payment.getCustomStaging())){
+                        //检查分期数据
+                        if(agentVo.getCustomStagingUser()==null || (agentVo.getCustomStagingUser().size()!=payment.getDownPaymentCount().intValue()) ){
+                            throw new MessageException("分期期数和自定义分期期数不对等");
+                        }
+                    }
                 }
                 // cxinfo 修改为多条打款信息
                 List<OCashReceivablesVo> cash_sf2 = agentVo.getoCashReceivables();
@@ -472,6 +494,14 @@ public class OrderServiceImpl implements OrderService {
                 }
                 if (payment.getDownPaymentCount() == null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new MessageException("分期期数有误");
+                }else{
+                    //分期情况下自定义分期校验
+                    if(Status.STATUS_1.status.toString().equals(payment.getCustomStaging())){
+                        //检查分期数据
+                        if(agentVo.getCustomStagingUser()==null || (agentVo.getCustomStagingUser().size()!=payment.getDownPaymentCount().intValue()) ){
+                            throw new MessageException("分期期数和自定义分期期数不对等");
+                        }
+                    }
                 }
                 List<OCashReceivablesVo> cash_FKFQ = agentVo.getoCashReceivables();
                 if (cash_FKFQ==null || cash_FKFQ.size()> 0) {
@@ -490,6 +520,14 @@ public class OrderServiceImpl implements OrderService {
                 }
                 if (payment.getDownPaymentCount() == null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new MessageException("分期期数有误");
+                }else{
+                    //分期情况下自定义分期校验
+                    if(Status.STATUS_1.status.toString().equals(payment.getCustomStaging())){
+                        //检查分期数据
+                        if(agentVo.getCustomStagingUser()==null || (agentVo.getCustomStagingUser().size()!=payment.getDownPaymentCount().intValue()) ){
+                            throw new MessageException("分期期数和自定义分期期数不对等");
+                        }
+                    }
                 }
                 List<OCashReceivablesVo> cash_FRFQ = agentVo.getoCashReceivables();
                 if (cash_FRFQ==null || cash_FRFQ.size()> 0) {
@@ -503,6 +541,10 @@ public class OrderServiceImpl implements OrderService {
                 payment.setActualReceipt(BigDecimal.ZERO);
                 return payment;
             case "XXDK"://线下打款
+                //分期情况下自定义分期校验
+                if(Status.STATUS_1.status.toString().equals(payment.getCustomStaging())){
+                        throw new MessageException("线下打款不支持自定义分期");
+                }
                 // cxinfo 修改为多条打款信息
                 List<OCashReceivablesVo> cash_XXDK = agentVo.getoCashReceivables();
                 if (cash_XXDK==null || cash_XXDK.size()== 0) {
@@ -516,6 +558,9 @@ public class OrderServiceImpl implements OrderService {
                 payment.setDownPaymentCount(BigDecimal.ZERO);
                 return payment;
             case "QT"://其他
+                if(Status.STATUS_1.status.toString().equals(payment.getCustomStaging())){
+                    throw new MessageException("该支付方式不支持自定义分期");
+                }
                 // cxinfo 修改为多条打款信息
                 List<OCashReceivablesVo> cash_QT = agentVo.getoCashReceivables();
                 if (cash_QT==null || cash_QT.size()== 0) {
@@ -528,6 +573,193 @@ public class OrderServiceImpl implements OrderService {
                 return payment;
         }
         return payment;
+    }
+
+    /**
+     * 生成自定义分期
+     * @param agentVo
+     * @return
+     * @throws MessageException
+     */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    @Override
+    public boolean initPaymentDetail(String paymentId,String paymentMethod,List<String> data) throws MessageException {
+        Date da = Calendar.getInstance().getTime();
+        OPayment payment = oPaymentMapper.selectByPrimaryKey(paymentId);
+        //记录分期金额
+        BigDecimal fqje = BigDecimal.ZERO;
+        //将已生成的分期删除重新生成分期
+        OPaymentDetailExample example = new OPaymentDetailExample();
+        example.or().andOrderIdEqualTo(payment.getOrderId());
+        oPaymentDetailMapper.deleteByExample(example);
+        logger.info("生成自定义分期 删除付款明细 {}"+payment.getOrderId());
+        if(StringUtils.isNotBlank(payment.getCustomStaging()) && Status.STATUS_1.status.toString().equals(payment.getCustomStaging())) {
+            //初始化生成明细
+            switch (paymentMethod) {
+                case "FKFQ":
+                    //生成自定义预分期数据
+                    if (StringUtils.isNotBlank(payment.getCustomStaging()) && Status.STATUS_1.status.toString().equals(payment.getCustomStaging())) {
+                        Date DownPaymentDate = payment.getDownPaymentDate();
+                        Calendar c = Calendar.getInstance();
+                        c.setTime(DownPaymentDate);
+
+                        for (int i = 0; i < data.size(); i++) {
+
+                            c.add(Calendar.MONTH,1);
+
+                            String amount = data.get(i);
+                            OPaymentDetail record = new OPaymentDetail();
+                            record.setId(idService.genId(TabId.o_payment_detail));
+                            record.setBatchCode(da.getTime()+"");
+                            record.setPaymentId(payment.getId());
+                            record.setPaymentType(PamentIdType.ORDER_FKD.code);
+                            record.setOrderId(payment.getOrderId());
+                            record.setPayType(PaymentType.DKFQ.code);
+                            record.setPayAmount(new BigDecimal(amount));
+                            record.setRealPayAmount(BigDecimal.ZERO);
+                            record.setPlanPayTime(c.getTime());
+                            record.setPlanNum(new BigDecimal(i).add(BigDecimal.ONE));
+                            record.setAgentId(payment.getAgentId());
+                            record.setPaymentStatus(PaymentStatus.DS.code);
+                            record.setcUser(payment.getUserId());
+                            record.setcDate(da);
+                            record.setStatus(Status.STATUS_1.status);
+                            record.setVersion(Status.STATUS_1.status);
+                            if (1 != oPaymentDetailMapper.insert(record)) {
+                                throw new MessageException("分期处理");
+                            }
+                            fqje = fqje.add(record.getPayAmount());
+
+                        }
+                    }
+                    break;
+                case "FRFQ":
+                    //生成自定义预分期数据
+                    if (StringUtils.isNotBlank(payment.getCustomStaging()) && Status.STATUS_1.status.toString().equals(payment.getCustomStaging())) {
+                        Date DownPaymentDate = payment.getDownPaymentDate();
+                        Calendar c = Calendar.getInstance();
+                        c.setTime(DownPaymentDate);
+
+                        for (int i = 0; i < data.size(); i++) {
+
+                            c.add(Calendar.MONTH,1);
+
+                            String amount = data.get(i);
+                            OPaymentDetail record = new OPaymentDetail();
+                            record.setId(idService.genId(TabId.o_payment_detail));
+                            record.setBatchCode(da.getTime()+"");
+                            record.setPaymentId(payment.getId());
+                            record.setPaymentType(PamentIdType.ORDER_FKD.code);
+                            record.setOrderId(payment.getOrderId());
+                            record.setPayType(PaymentType.FRFQ.code);
+                            record.setPayAmount(new BigDecimal(amount));
+                            record.setRealPayAmount(BigDecimal.ZERO);
+                            record.setPlanPayTime(c.getTime());
+                            record.setPlanNum(new BigDecimal(i).add(BigDecimal.ONE));
+                            record.setAgentId(payment.getAgentId());
+                            record.setPaymentStatus(PaymentStatus.DS.code);
+                            record.setcUser(payment.getUserId());
+                            record.setcDate(da);
+                            record.setStatus(Status.STATUS_1.status);
+                            record.setVersion(Status.STATUS_1.status);
+                            if (1 != oPaymentDetailMapper.insert(record)) {
+                                throw new MessageException("分期处理");
+                            }
+                            fqje = fqje.add(record.getPayAmount());
+                        }
+                    }
+                    break;
+                case "XXDK":
+                    if (StringUtils.isNotBlank(payment.getCustomStaging()) && Status.STATUS_1.status.toString().equals(payment.getCustomStaging())) {
+                        throw new MessageException("线下打款不支持自定义分期");
+                    }
+                    break;
+                case "SF1"://首付+分润分期
+                    if (StringUtils.isNotBlank(payment.getCustomStaging()) && Status.STATUS_1.status.toString().equals(payment.getCustomStaging())) {
+                        Date DownPaymentDate = payment.getDownPaymentDate();
+                        Calendar c = Calendar.getInstance();
+                        c.setTime(DownPaymentDate);
+
+                        for (int i = 0; i < data.size(); i++) {
+
+                            c.add(Calendar.MONTH,1);
+
+                            String amount = data.get(i);
+                            OPaymentDetail record = new OPaymentDetail();
+                            record.setId(idService.genId(TabId.o_payment_detail));
+                            record.setBatchCode(da.getTime()+"");
+                            record.setPaymentId(payment.getId());
+                            record.setPaymentType(PamentIdType.ORDER_FKD.code);
+                            record.setOrderId(payment.getOrderId());
+                            record.setPayType(PaymentType.FRFQ.code);
+                            record.setPayAmount(new BigDecimal(amount));
+                            record.setRealPayAmount(BigDecimal.ZERO);
+                            record.setPlanPayTime(c.getTime());
+                            record.setPlanNum(new BigDecimal(i).add(BigDecimal.ONE));
+                            record.setAgentId(payment.getAgentId());
+                            record.setPaymentStatus(PaymentStatus.DS.code);
+                            record.setcUser(payment.getUserId());
+                            record.setcDate(da);
+                            record.setStatus(Status.STATUS_1.status);
+                            record.setVersion(Status.STATUS_1.status);
+                            if (1 != oPaymentDetailMapper.insert(record)) {
+                                throw new MessageException("分期处理");
+                            }
+                            fqje = fqje.add(record.getPayAmount());
+                        }
+                    }
+                    break;
+                case "SF2"://打款分期
+                    if (StringUtils.isNotBlank(payment.getCustomStaging()) && Status.STATUS_1.status.toString().equals(payment.getCustomStaging())) {
+                        Date DownPaymentDate = payment.getDownPaymentDate();
+                        Calendar c = Calendar.getInstance();
+                        c.setTime(DownPaymentDate);
+                        for (int i = 0; i < data.size(); i++) {
+                            c.add(Calendar.MONTH,1);
+                            String amount = data.get(i);
+                            OPaymentDetail record = new OPaymentDetail();
+                            record.setId(idService.genId(TabId.o_payment_detail));
+                            record.setBatchCode(da.getTime()+"");
+                            record.setPaymentId(payment.getId());
+                            record.setPaymentType(PamentIdType.ORDER_FKD.code);
+                            record.setOrderId(payment.getOrderId());
+                            record.setPayType(PaymentType.DKFQ.code);
+                            record.setPayAmount(new BigDecimal(amount));
+                            record.setRealPayAmount(BigDecimal.ZERO);
+                            record.setPlanPayTime(c.getTime());
+                            record.setPlanNum(new BigDecimal(i).add(BigDecimal.ONE));
+                            record.setAgentId(payment.getAgentId());
+                            record.setPaymentStatus(PaymentStatus.DS.code);
+                            record.setcUser(payment.getUserId());
+                            record.setcDate(da);
+                            record.setStatus(Status.STATUS_1.status);
+                            record.setVersion(Status.STATUS_1.status);
+                            if (1 != oPaymentDetailMapper.insert(record)) {
+                                throw new MessageException("分期处理");
+                            }
+                            fqje = fqje.add(record.getPayAmount());
+                        }
+                    }
+                    break;
+                case "QT"://抵扣金额必须等于待付金额
+                    if (StringUtils.isNotBlank(payment.getCustomStaging()) && Status.STATUS_1.status.toString().equals(payment.getCustomStaging())) {
+                    throw new MessageException("其他付款方式不支持自定义分期");
+                    }
+                    break;
+            }
+
+            if(payment.getDeductionAmount()==null){
+                payment.setDeductionAmount(BigDecimal.ZERO);
+            }
+            if(payment.getDownPayment()==null){
+                payment.setDownPayment(BigDecimal.ZERO);
+            }
+            //TODO 检查付款明细及打款信息是否和订单金额一致 订单应付金额 = 分期金额+首付金额+抵扣金额
+            if(payment.getPayAmount().compareTo(payment.getDownPayment().add(payment.getDeductionAmount()).add(fqje))!=0){
+              throw new MessageException("分期金额配置失败:应为"+ payment.getPayAmount().subtract(payment.getDownPayment()).subtract(payment.getDeductionAmount()));
+            }
+        }
+        return true;
     }
 
     /**
@@ -842,6 +1074,10 @@ public class OrderServiceImpl implements OrderService {
             throw new MessageException("oPayment添加失败");
         }
 
+        //初始化订单自定义分期
+        if(!initPaymentDetail(oPayment.getId(),oPayment.getPayMethod(),orderFormVo.getCustomStagingUser())){
+            throw new MessageException("自定义分期处理失败");
+        }
         return orderFormVo;
     }
 

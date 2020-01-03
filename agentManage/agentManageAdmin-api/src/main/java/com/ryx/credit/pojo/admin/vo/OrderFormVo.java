@@ -11,6 +11,7 @@ import java.util.List;
  */
 public class OrderFormVo extends OOrder{
 
+
     private OPayment oPayment;
 
     private List<OSubOrder> oSubOrder;

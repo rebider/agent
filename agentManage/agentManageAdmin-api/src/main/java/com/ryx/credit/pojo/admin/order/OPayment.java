@@ -118,6 +118,8 @@ public class OPayment implements Serializable{
 
     private String profitMouth;
 
+    private String customStaging;
+
     public String getId() {
         return id;
     }
@@ -404,5 +406,13 @@ public class OPayment implements Serializable{
 
     public void setProfitMouth(String profitMouth) {
         this.profitMouth = profitMouth == null ? null : profitMouth.trim();
+    }
+
+    public String getCustomStaging() {
+        return customStaging;
+    }
+
+    public void setCustomStaging(String customStaging) {
+        this.customStaging = customStaging == null ? null : customStaging.trim();
     }
 }
