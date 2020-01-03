@@ -948,7 +948,6 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             if(null==oInternetCard.getRenew()){
                 throw new MessageException("iccid:"+iccidNumId+",物联网卡续费状态不存在,请联系相关部门");
             }
-            //是否需续费为是,才展示按钮
             // renewFinance 财务批量导入，不检查是否续费、是否超过截止时间
             if(reqType.equals("renewFinance")){
                 if(null==oInternetCard.getExpireTime()){
@@ -964,6 +963,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 }
                 return;
             }
+            //是否需续费为是,才展示按钮
             if(oInternetCard.getRenew().compareTo(BigDecimal.ZERO)==0){
                 throw new MessageException("iccid:"+iccidNumId+",是否需续费为否,不允许续费/注销");
             }
