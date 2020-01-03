@@ -949,6 +949,21 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 throw new MessageException("iccid:"+iccidNumId+",物联网卡续费状态不存在,请联系相关部门");
             }
             //是否需续费为是,才展示按钮
+            // renewFinance 财务批量导入，不检查是否续费、是否超过截止时间
+            if(reqType.equals("renewFinance")){
+                if(null==oInternetCard.getExpireTime()){
+                    throw new MessageException("iccid:"+iccidNumId+",到期时间为空,不允许续费/注销");
+                }
+                String renewOnOff = redisService.getValue(RedisCachKey.CARD_RENEW_ONOFF.code);
+                if(StringUtils.isBlank(renewOnOff)){
+                    throw new MessageException("参数配置错误,请联系管理员");
+                }
+                String logoutOnOff = redisService.getValue(RedisCachKey.LOGOUT_ONOFF.code);
+                if(StringUtils.isBlank(logoutOnOff)){
+                    throw new MessageException("参数配置错误,请联系管理员");
+                }
+                return;
+            }
             if(oInternetCard.getRenew().compareTo(BigDecimal.ZERO)==0){
                 throw new MessageException("iccid:"+iccidNumId+",是否需续费为否,不允许续费/注销");
             }
@@ -1231,7 +1246,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             }
 
             // 检查 ICCID 有效性
-            renewVerify(iccid,null, "renew");
+            renewVerify(iccid,null, "renewFinance");
 
             String busNum = "";
             String busPlatform = "";

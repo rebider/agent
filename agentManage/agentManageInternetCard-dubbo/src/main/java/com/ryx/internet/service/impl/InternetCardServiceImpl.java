@@ -443,6 +443,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                             oInternetRenew.setIccidNumIds(iccid);
                             oInternetRenew.setcUser(userId);
                             oInternetRenew.setRenewWay(internetRenewWayCode);
+                            oInternetRenew.setRenewWayName(internetRenewWay);
                             jsonList = JsonUtil.objectToJson(oInternetRenew);
                         }
                         OInternetCardImport oInternetCardImport = new OInternetCardImport();
@@ -598,7 +599,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                         throw new MessageException("缺少ICCID");
                     }
                     if(StringUtils.isBlank(oInternetRenew.getRenewWay())){
-                        throw new MessageException("缺少续费方式");
+                        throw new MessageException("缺少续费方式或不正确");
                     }
                     // 更新导入
                     oInternetCardImport.setImportStatus(OInternetCardImportStatus.SUCCESS.getValue());
