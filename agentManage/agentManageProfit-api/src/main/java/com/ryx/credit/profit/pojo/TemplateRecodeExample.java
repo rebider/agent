@@ -1,6 +1,7 @@
 package com.ryx.credit.profit.pojo;
 
 import com.ryx.credit.common.util.Page;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -1252,6 +1253,76 @@ public class TemplateRecodeExample {
 
         public Criteria andRev2NotBetween(String value1, String value2) {
             addCriterion("REV2 not between", value1, value2, "rev2");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumSIsNull() {
+            addCriterion("BUS_NUM_S is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumSIsNotNull() {
+            addCriterion("BUS_NUM_S is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumSEqualTo(String value) {
+            addCriterion("BUS_NUM_S =", value, "busNumS");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumSNotEqualTo(String value) {
+            addCriterion("BUS_NUM_S <>", value, "busNumS");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumSGreaterThan(String value) {
+            addCriterion("BUS_NUM_S >", value, "busNumS");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumSGreaterThanOrEqualTo(String value) {
+            addCriterion("BUS_NUM_S >=", value, "busNumS");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumSLessThan(String value) {
+            addCriterion("BUS_NUM_S <", value, "busNumS");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumSLessThanOrEqualTo(String value) {
+            addCriterion("BUS_NUM_S <=", value, "busNumS");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumSLike(String value) {
+            addCriterion("BUS_NUM_S like", value, "busNumS");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumSNotLike(String value) {
+            addCriterion("BUS_NUM_S not like", value, "busNumS");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumSIn(List<String> values) {
+            addCriterion("BUS_NUM_S in", values, "busNumS");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumSNotIn(List<String> values) {
+            addCriterion("BUS_NUM_S not in", values, "busNumS");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumSBetween(String value1, String value2) {
+            addCriterion("BUS_NUM_S between", value1, value2, "busNumS");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumSNotBetween(String value1, String value2) {
+            addCriterion("BUS_NUM_S not between", value1, value2, "busNumS");
             return (Criteria) this;
         }
     }

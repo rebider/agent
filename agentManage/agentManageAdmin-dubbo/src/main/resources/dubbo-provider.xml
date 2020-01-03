@@ -104,6 +104,7 @@
     <dubbo:service interface="com.ryx.credit.service.order.IOPdSumService" ref="OPdSumService"  timeout="1200000" registry="myGroup"/>
     <dubbo:service interface="com.ryx.credit.service.order.OLogisticsDetailHService" ref="oLogisticsDetailHService" timeout="1200000" registry="myGroup"/>
     <dubbo:service interface="com.ryx.credit.service.order.OrderRepairService" ref="orderRepairService" timeout="1200000" registry="myGroup"/>
+    <dubbo:service interface="com.ryx.credit.service.order.TerminalTransferService" ref="terminalTransferService" timeout="1200000" registry="myGroup"/>
 
 
     <!-- 基础资源维护-->
@@ -154,7 +155,7 @@
 
     <dubbo:service interface="com.ryx.credit.service.agent.AgentDebitCardService" ref="agentDebitCardService"  timeout="1200000" registry="myGroup"/>
 
-    <!-- 退货任务，提供者 -->
+    <!-- 退货-->
     <dubbo:service interface="com.ryx.credit.service.order.OsnOperateReturnService" ref="osnOperateReturnService"  timeout="1200000" registry="myGroup" />
     <dubbo:service interface="com.ryx.credit.service.agent.AgentFreezeService" ref="agentFreezeService"  timeout="1200000" registry="myGroup" />
     <dubbo:reference interface="com.ryx.credit.machine.service.LmsUserService" id="lmsUserService"  timeout="1200000" registry="myGroup" check="false" />

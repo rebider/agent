@@ -252,7 +252,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateReturnService {
                             //处理中，不更改明细，更改物流初始状态
                             logistics.setSendStatus(LogisticsSendStatus.gen_detail_sucess.code);
                             if (oLogisticsMapper.updateByPrimaryKeySelective(logistics) != 1) {
-                                logger.info("更新物流状态为生成明细中失败：", id, batch);
+                                logger.info("更新物流状态为生成明细中失败：{}, {}", id, batch);
                             }
                         } else if (null != sendInfoRet.get("status") && "1".equals(sendInfoRet.get("status"))) {
                             //成功，更新物流明细
@@ -270,7 +270,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateReturnService {
                                     logistics.setSendStatus(LogisticsSendStatus.send_success.code);
                                     logistics.setSendMsg("联动业务系统成功");
                                     if (oLogisticsMapper.updateByPrimaryKeySelective(logistics) != 1) {
-                                        logger.info("物流明细发送业务系统处理异常，更新数据库失败：", id, batch);
+                                        logger.info("物流明细发送业务系统处理异常，更新数据库失败：{},{}", id, batch);
                                     }
                                 }
                             }
@@ -308,7 +308,7 @@ public class OsnOperateReturnServiceImpl implements OsnOperateReturnService {
                         logistics.setSendStatus(LogisticsSendStatus.send_fail.code);
                         logistics.setSendMsg(e.getLocalizedMessage());
                         if (oLogisticsMapper.updateByPrimaryKeySelective(logistics) != 1) {
-                            logger.info("物流明细发送业务系统处理异常，更新数据库失败：", id, batch);
+                            logger.info("物流明细发送业务系统处理异常，更新数据库失败：{}, {}", id, batch);
                         }
                     }
 

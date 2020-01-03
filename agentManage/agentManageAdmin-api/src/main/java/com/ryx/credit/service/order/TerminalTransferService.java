@@ -26,6 +26,8 @@ public interface TerminalTransferService {
 
     AgentResult compressTerminalTransferActivity(String proIns, BigDecimal agStatus)throws Exception;
 
+    String judgeStartsWithSUtil(String param, TerminalTransferDetail terminalTransferDetail) throws MessageException;
+
     AgentResult saveTerminalTransfer(TerminalTransfer terminalTransfer, List<TerminalTransferDetail> terminalTransferDetailList, String cuser, String agentId, String saveFlag)throws Exception;
 
     TerminalTransfer queryTerminalTransfer(String terminalTransferId);

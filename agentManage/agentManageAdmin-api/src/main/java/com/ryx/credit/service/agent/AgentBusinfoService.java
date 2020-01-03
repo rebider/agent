@@ -119,6 +119,16 @@ public interface AgentBusinfoService {
 
     Map<String,String> queryBusInfoByBrandNum(String brandNum)throws MessageException;
 
+    /**
+     * 分页查询代理商业务信息
+     */
+    PageInfo queryAgentBusInfoForPage(Page page, AgentBusInfo agentBusInfo, String time);
+
+    /**
+     * 代理商业务信息查询
+     */
+    AgentBusInfo queryAgentBusInfoById(String id);
+
     List<String> queryOrgByAgentid(Map map);
 
     List<AgentBusInfo> selectByAgentBusInfo(AgentBusInfo agentBusInfo);
@@ -127,4 +137,5 @@ public interface AgentBusinfoService {
      * 查询品牌
      */
     public AgentBusInfo agentPlatformNum(String agentId,String platFormNum);
+
 }

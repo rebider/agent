@@ -316,7 +316,7 @@
         o.CHECK_PEOPLE,ag.AG_NAME
         from O_SUPPLEMENT o left join  a_agent ag on agent_id = ag.id
         where
-        o.STATUS=1 and ag.status=1
+        o.STATUS=1 and ag.status=1 and pk_type != '2'
         <if test="map.pkType != null and map.pkType != '' ">
             and o.PK_TYPE = #{map.pkType}
         </if>
@@ -343,7 +343,7 @@
         select
         count(*)
         from O_SUPPLEMENT o left join  a_agent ag on agent_id = ag.id
-        where o.STATUS=1 and ag.status=1
+        where o.STATUS=1 and ag.status=1 and pk_type != '2'
         <if test="map.pkType != null and map.pkType != '' ">
             and o.PK_TYPE = #{map.pkType}
         </if>

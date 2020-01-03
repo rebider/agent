@@ -2217,6 +2217,146 @@ public class TerminalTransferDetailExample {
             addCriterion("IS_NO_PAY not between", value1, value2, "isNoPay");
             return (Criteria) this;
         }
+
+        public Criteria andOriginalOrgIdSIsNull() {
+            addCriterion("ORIGINAL_ORG_ID_S is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalOrgIdSIsNotNull() {
+            addCriterion("ORIGINAL_ORG_ID_S is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalOrgIdSEqualTo(String value) {
+            addCriterion("ORIGINAL_ORG_ID_S =", value, "originalOrgIdS");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalOrgIdSNotEqualTo(String value) {
+            addCriterion("ORIGINAL_ORG_ID_S <>", value, "originalOrgIdS");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalOrgIdSGreaterThan(String value) {
+            addCriterion("ORIGINAL_ORG_ID_S >", value, "originalOrgIdS");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalOrgIdSGreaterThanOrEqualTo(String value) {
+            addCriterion("ORIGINAL_ORG_ID_S >=", value, "originalOrgIdS");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalOrgIdSLessThan(String value) {
+            addCriterion("ORIGINAL_ORG_ID_S <", value, "originalOrgIdS");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalOrgIdSLessThanOrEqualTo(String value) {
+            addCriterion("ORIGINAL_ORG_ID_S <=", value, "originalOrgIdS");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalOrgIdSLike(String value) {
+            addCriterion("ORIGINAL_ORG_ID_S like", value, "originalOrgIdS");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalOrgIdSNotLike(String value) {
+            addCriterion("ORIGINAL_ORG_ID_S not like", value, "originalOrgIdS");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalOrgIdSIn(List<String> values) {
+            addCriterion("ORIGINAL_ORG_ID_S in", values, "originalOrgIdS");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalOrgIdSNotIn(List<String> values) {
+            addCriterion("ORIGINAL_ORG_ID_S not in", values, "originalOrgIdS");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalOrgIdSBetween(String value1, String value2) {
+            addCriterion("ORIGINAL_ORG_ID_S between", value1, value2, "originalOrgIdS");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalOrgIdSNotBetween(String value1, String value2) {
+            addCriterion("ORIGINAL_ORG_ID_S not between", value1, value2, "originalOrgIdS");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalOrgIdSIsNull() {
+            addCriterion("GOAL_ORG_ID_S is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalOrgIdSIsNotNull() {
+            addCriterion("GOAL_ORG_ID_S is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalOrgIdSEqualTo(String value) {
+            addCriterion("GOAL_ORG_ID_S =", value, "goalOrgIdS");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalOrgIdSNotEqualTo(String value) {
+            addCriterion("GOAL_ORG_ID_S <>", value, "goalOrgIdS");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalOrgIdSGreaterThan(String value) {
+            addCriterion("GOAL_ORG_ID_S >", value, "goalOrgIdS");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalOrgIdSGreaterThanOrEqualTo(String value) {
+            addCriterion("GOAL_ORG_ID_S >=", value, "goalOrgIdS");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalOrgIdSLessThan(String value) {
+            addCriterion("GOAL_ORG_ID_S <", value, "goalOrgIdS");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalOrgIdSLessThanOrEqualTo(String value) {
+            addCriterion("GOAL_ORG_ID_S <=", value, "goalOrgIdS");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalOrgIdSLike(String value) {
+            addCriterion("GOAL_ORG_ID_S like", value, "goalOrgIdS");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalOrgIdSNotLike(String value) {
+            addCriterion("GOAL_ORG_ID_S not like", value, "goalOrgIdS");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalOrgIdSIn(List<String> values) {
+            addCriterion("GOAL_ORG_ID_S in", values, "goalOrgIdS");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalOrgIdSNotIn(List<String> values) {
+            addCriterion("GOAL_ORG_ID_S not in", values, "goalOrgIdS");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalOrgIdSBetween(String value1, String value2) {
+            addCriterion("GOAL_ORG_ID_S between", value1, value2, "goalOrgIdS");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoalOrgIdSNotBetween(String value1, String value2) {
+            addCriterion("GOAL_ORG_ID_S not between", value1, value2, "goalOrgIdS");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

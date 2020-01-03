@@ -1,25 +1,22 @@
 package com.ryx.credit.machine.service.impl;
 
-import com.alibaba.druid.sql.visitor.functions.Substring;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.enumc.LogisticsDetailSendStatus;
 import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
-import com.ryx.credit.common.util.agentUtil.AESUtil;
-import com.ryx.credit.common.util.agentUtil.RSAUtil;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.*;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
+import com.ryx.credit.pojo.admin.agent.PlatForm;
 import com.ryx.credit.pojo.admin.order.OActivity;
 import com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail;
 import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
 import com.ryx.credit.service.order.OrderActivityService;
-import com.ryx.credit.util.Constants;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.time.DateFormatUtils;
+import org.bouncycastle.jcajce.provider.symmetric.Shacal2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,7 +135,7 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
             } else {
                 //下发异常
                 logger.info("RDB下发返回异常:" + respResult);
-                return AgentResult.build(2, null != respJson.getString("msg") ? respJson.getString("msg") : "瑞+平台返回异常!");
+                return AgentResult.build(2, null != respJson.getString("msg") ? respJson.getString("msg") : "瑞大宝平台返回异常!");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -221,9 +218,62 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
         return null;
     }
 
+    /**
+     * 瑞大宝查询历史SN
+     * @param platformType
+     * @param snBegin
+     * @param snEnd
+     * @return
+     * @throws Exception
+     */
     @Override
     public AgentResult querySnMsg(PlatformType platformType, String snBegin, String snEnd) throws Exception {
-        return null;
+
+        try {
+            List<String> snList = new ArrayList<>();
+            snList.add(snBegin+":"+snEnd);
+            String httpString = JSONObject.toJSONString(FastMap.fastMap("psamids", snList));
+            //查询是sn历史活动
+            logger.info("瑞大宝历史换活动查询参数:{}", httpString);
+            String retString = HttpClientUtil.doPostJsonWithException(AppConfig.getProperty("rdbpos.queryTerminalPolicy"), httpString);
+            logger.info("瑞大宝历史换活动查询返回值:{}", retString);
+
+            //验证返回值
+            if (!StringUtils.isNotBlank(retString)) return AgentResult.fail("瑞大宝历史换活动接口，返回值为空。");
+            JSONObject resJson = JSONObject.parseObject(retString);
+
+            //返回查询结果
+            if (null != resJson.getString("code") && resJson.getString("code").equals("0000")) {
+
+                JSONObject result = resJson.getJSONObject("result");
+                if (null == result) return AgentResult.fail("瑞大宝返回值异常！");
+                JSONArray psamids = result.getJSONArray("psamids");
+                if (null == psamids) return AgentResult.fail("瑞大宝返回SN值异常！");
+                String busNum = result.getString("agencyId");
+                if (null == busNum) return AgentResult.fail("瑞大宝返回agencyId值异常！");
+
+                String snAndBusProCode = psamids.getString(0);
+                String snEndAndBusProCode = snAndBusProCode.substring(snAndBusProCode.indexOf(":") + 1);
+                String busProCode = snEndAndBusProCode.substring(snEndAndBusProCode.indexOf(":") + 1);
+                FastMap retMap = FastMap.fastMap("busProCode", busProCode).putKeyV("busNum", busNum);
+
+                //可以更换活动
+                return  AgentResult.ok(retMap);
+            } else if (null != resJson.getString("code") && resJson.getString("code").equals("9999") && null != resJson.getString("msg")) {
+                String retMsg = resJson.getString("msg");
+                if (null == retMsg) return AgentResult.fail("瑞大宝返回值异常！");
+                String snEndAndBusProCode = retMsg.substring(retMsg.indexOf(":") + 1);
+                String msg = snEndAndBusProCode.substring(snEndAndBusProCode.indexOf(":") + 1);
+                //查询失败
+                return AgentResult.fail(null == msg?"瑞大宝，查询返回值异常！":msg);
+            } else {
+                //异常
+                return AgentResult.fail("查询瑞大宝历史换活动返回值异常！");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Override
@@ -289,8 +339,8 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
 
             //返回最终查询结果
             if (null != resJson.getString("code") && resJson.getString("code").equals("0000")) {
-                //可以更换活动
-                return  AgentResult.ok();
+                //可以更换活动，封装参参数返回
+                return  AgentResult.ok(resJson.get("result"));
             } else if (null != resJson.getString("code") && resJson.getString("code").equals("9999") && null != resJson.getString("msg")) {
                 //不可以更换活动
                 return AgentResult.fail(resJson.getString("msg") + "，不可以更换活动！");
@@ -360,6 +410,56 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
     @Override
     public boolean checkModleIsEq(Map<String, String> data, String platformType) {
         return true;
+    }
+
+    @Override
+    public AgentResult checkOrderReturnSN(List<Map<String, Object>> list, String platformType) throws Exception {
+        try {
+            //查询机具平台
+            Map<String, Object> reqMap = new HashMap<String, Object>();
+            List<Map<String, Object>> reqList = new ArrayList<Map<String, Object>>();
+            for (Map<String, Object> map : list) {
+                //瑞大宝查询、冻结、所需参数
+                reqList.add(FastMap.fastMap("terminalNoStart", String.valueOf(map.get("beginSn"))).
+                        putKeyV("terminalNoEnd", String.valueOf(map.get("endSn"))).
+                        putKeyV("id", String.valueOf(map.get("taskId"))).
+                        putKeyV("agencyId", String.valueOf(map.get("agencyId"))) //代理商A码
+                );
+            }
+            reqMap.put("terminalNos", reqList);
+            reqMap.put("isFreeze", "1"); //"1"执行冻结
+            String json = JSONObject.toJSONString(reqMap);
+
+            logger.info("RDB退货查询冻结参数:" + json);
+            String respResult = HttpClientUtil.doPostJsonWithException(AppConfig.getProperty("rdbpos_return_of_goods_freeze"), json);
+
+            if (!StringUtils.isNotBlank(respResult)) {
+                throw new Exception("瑞大宝退货下发查询接口返回值为空，请联系管理员！");
+            }
+            JSONObject respJson = JSONObject.parseObject(respResult);
+            if (!(null != respJson.getString("code") && respJson.getString("code").equals("0000"))) {
+                logger.info("RDB冻结退货SN返回异常:" + respResult);
+                throw new Exception(null != respJson.getString("msg") ? respJson.getString("msg") : "RDB业务平台冻结SN接口，返回值异常，请联系管理员！！！");
+            }
+        } catch (Exception e) {
+            throw new ProcessException("冻结瑞大宝SN失败，瑞大宝接口异常，请联系管理员");
+        }
+        return AgentResult.ok();
+    }
+
+    @Override
+    public AgentResult unfreezeOrderReturnSN(List<Map<String, Object>> list, String platformType) throws Exception {
+        logger.info("瑞大宝解冻接口请求参数:{}", JSONObject.toJSONString(list));
+        String httpResult = HttpClientUtil.doPostJsonWithException(AppConfig.getProperty("rdbpos.unfreezeTerm"), JSONObject.toJSONString(list));
+        if(StringUtils.isBlank(httpResult)) {
+            throw new Exception("瑞大宝解冻返回值为空！");
+        }
+        logger.info("瑞大宝解冻接口返回参数:{}", httpResult);
+        JSONObject respJsonObj = JSONObject.parseObject(httpResult);
+        if (!(null != respJsonObj.get("code") && respJsonObj.get("code").equals("0000"))) {
+            throw new Exception("瑞大宝解冻sn异常！");
+        }
+        return AgentResult.ok();
     }
 
     /**

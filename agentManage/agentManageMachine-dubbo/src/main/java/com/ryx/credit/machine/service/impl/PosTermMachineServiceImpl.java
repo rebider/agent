@@ -5,6 +5,7 @@ import com.ryx.credit.common.enumc.BackType;
 import com.ryx.credit.common.enumc.DeliveryTimeType;
 import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.common.util.agentUtil.AESUtil;
@@ -17,9 +18,12 @@ import com.ryx.credit.machine.service.ImsTermActiveService;
 import com.ryx.credit.machine.service.ImsTermMachineService;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.*;
+import com.ryx.credit.pojo.admin.order.OActivity;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
 import com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail;
 import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
+import com.ryx.credit.service.agent.PlatFormService;
+import com.ryx.credit.service.order.OrderActivityService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
@@ -28,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.*;
@@ -52,6 +57,10 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
     private ImsTermWarehouseLogMapper imsTermWarehouseLogMapper;
     @Autowired
     private ImsPosMapper imsPosMapper;
+    @Autowired
+    private PlatFormService platFormService;
+    @Autowired
+    private OrderActivityService orderActivityService;
 
 
     @Override
@@ -168,6 +177,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
 
     private AgentResult request(String tranCode, JSONObject data) throws Exception {
         try {
+            log.info("pos机具信息请求参数明文:{}", data);
             PrivateKey rsaPrivateKey = RSAUtil.getRSAPrivateKey(AppConfig.getProperty("industryAuth_local_private_key"), "pem", null, "RSA");
             PublicKey rsaPublicKey = RSAUtil.getRSAPublicKey(AppConfig.getProperty("industryAuth_cooper_public_key"), "pem", "RSA");
             String cooperator = AppConfig.getProperty("industryAuth_cooperator");
@@ -276,6 +286,25 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
         jsonObject.put("operation", operation);
         List<Map<String, Object>> listDetail = new ArrayList<>();
         for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {
+
+            //校验新活动是否存在
+            OActivity new_activity = orderActivityService.findById(refundPriceDiffDetail.getActivityRealId());
+            if(new_activity==null){
+                log.error("新活动未找到:{} snbegin:{} snend:{}",refundPriceDiffDetail.getActivityRealId(),refundPriceDiffDetail.getBeginSn(),refundPriceDiffDetail.getEndSn());
+                throw new ProcessException("新活动未找到");
+            }
+            if(StringUtils.isBlank(new_activity.getPosType())){
+                log.error("POS类型未配置:{} snbegin:{} snend:{}",refundPriceDiffDetail.getActivityRealId(),refundPriceDiffDetail.getBeginSn(),refundPriceDiffDetail.getEndSn());
+                throw new ProcessException("POS类型未配置");
+            }
+            if(null==new_activity.getPosSpePrice() || BigDecimal.ZERO.compareTo(new_activity.getPosSpePrice())>0){
+                log.error("特价机价格配置错误:{} snbegin:{} snend:{}",refundPriceDiffDetail.getActivityRealId(),refundPriceDiffDetail.getBeginSn(),refundPriceDiffDetail.getEndSn());
+                throw new ProcessException("特价机价格配置错误");
+            }
+            if(null==new_activity.getStandTime() || BigDecimal.ZERO.compareTo(new_activity.getStandTime())>0){
+                log.error("达标时间配置错误:{} snbegin:{} snend:{}",refundPriceDiffDetail.getActivityRealId(),refundPriceDiffDetail.getBeginSn(),refundPriceDiffDetail.getEndSn());
+                throw new ProcessException("达标时间配置错误");
+            }
             Map<String, Object> mapDetail = new HashMap<>();
             mapDetail.put("serialNumber", refundPriceDiffDetail.getId());
             mapDetail.put("newOrgId", refundPriceDiffDetail.getNewOrgId());
@@ -298,6 +327,12 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
                     mapDetail.put("delayDay", "");
                 }
             }
+
+            //活动转换添加参数
+            mapDetail.put("standTime", new_activity.getStandTime().setScale(0,BigDecimal.ROUND_HALF_UP).toString());
+            mapDetail.put("posType", new_activity.getPosType());
+            mapDetail.put("deposit", new_activity.getPosSpePrice().setScale(0,BigDecimal.ROUND_HALF_UP).toString());
+
             listDetail.add(mapDetail);
         }
         jsonObject.put("snList", listDetail);
@@ -404,6 +439,16 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
     public boolean checkModleIsEq(Map<String, String> data, String platformType) {
         log.info("checkModleIsEq:{},{}",data,platformType);
         return imsTermMachineService.checkModleIsEq(data.get("oldMerid"),data.get("newMerId"));
+    }
+
+    @Override
+    public AgentResult checkOrderReturnSN(List<Map<String, Object>> list, String platformType) throws Exception {
+        return AgentResult.ok();
+    }
+
+    @Override
+    public AgentResult unfreezeOrderReturnSN(List<Map<String, Object>> list, String platformType) throws Exception {
+        return AgentResult.ok();
     }
 
     @Override

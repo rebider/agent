@@ -12,6 +12,7 @@ import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.agent.Dict;
+import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.dao.TemplateRecodeMapper;
 import com.ryx.credit.profit.pojo.TemplateRecode;
@@ -186,7 +187,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                 templateRecode.setTemplateName(map2.getString("mouldName"));
             }else if("RJPOS".equals(busInfo.get("PLATFORM_TYPE"))){
                 reactRJPOSApply(RJ_TEMPLATE_APPLY,map2.toJSONString(),templateRecode);
-            }else if("POS".equals(busInfo.get("PLATFORM_TYPE"))||"ZHPOS".equals(busInfo.get("PLATFORM_TYPE"))||"ZPOS".equals(busInfo.get("PLATFORM_TYPE"))){
+            }else if("POS".equals(busInfo.get("PLATFORM_TYPE"))||"ZHPOS".equals(busInfo.get("PLATFORM_TYPE"))){
                 // todo POS平台信息申请
                 result = HttpClientUtil.doPostJson(TEMPLATE_APPLY, map2.toJSONString());
                 Map<String,Object> resultMap = JSONObject.parseObject(result);
@@ -196,6 +197,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                 Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
                 templateRecode.setTemplateId(((Map) objectMap.get("applyTemplate")).get("applyId").toString());
                 templateRecode.setTemplateName(((Map) objectMap.get("applyTemplate")).get("templateName").toString());
+                templateRecode.setBusNumS(map1.get("orgId_s"));
                // result = HttpClientUtil.doPostJson(TEMPLATE_APPLY, map2.toJSONString());
             }else if("SSPOS".equals(busInfo.get("PLATFORM_TYPE"))){
                 logger.info("请求参数："+map2.toJSONString());
@@ -222,7 +224,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         String proceId = null;
 
         List<Dict> actlist = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.PROFIT_TEMPLATE_APPLY.name());
-       /* String workId = null;
+      /*  String workId = null;
         for (Dict dict : actlist) {
             workId = dict.getdItemvalue();
         }
@@ -231,7 +233,9 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             throw new MessageException("审批流启动失败，未获取到数据字典配置部署流程!");
         }*/
 
-        if ("POS".equals(busInfo.get("PLATFORM_TYPE")) || "ZHPOS".equals(busInfo.get("PLATFORM_TYPE")) || "ZPOS".equals(busInfo.get("PLATFORM_TYPE"))) {
+
+        if("POS".equals(busInfo.get("PLATFORM_TYPE"))||"ZHPOS".equals(busInfo.get("PLATFORM_TYPE"))||"ZPOS".equals(busInfo.get("PLATFORM_TYPE"))){
+
             JSONObject monthJSONObject = new JSONObject();
             monthJSONObject.put("applyId", templateRecode.getTemplateId());
             monthJSONObject.put("isStartMonth", "1");
@@ -239,23 +243,24 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             Map<String, Object> resultMapMonth = JSONObject.parseObject(MonthCheckResult);
             Map<String,Object> objectMapMonth = (Map<String,Object>)resultMapMonth.get("data");
             if ("0".equals(objectMapMonth.get("isExist").toString())) {
-                    String oldStart = ((Map<String, String>) map2.get("applyTemplate")).get("startMonth");
-                    Calendar calendar = Calendar.getInstance();
-                    String nowMonth = new SimpleDateFormat("yyyyMM").format(calendar.getTime());
-                    String day = new SimpleDateFormat("dd").format(calendar.getTime());
-                    calendar.add(Calendar.MONTH, -1);
-                    String lastMonth = new SimpleDateFormat("yyyyMM").format(calendar.getTime());
-                    if (Integer.parseInt(day) < 10) {
-                        if (Integer.parseInt(oldStart) < Integer.parseInt(lastMonth)) {
-                            throw new MessageException("10号前分配模板，开始时间不能小于上月");
-                        }
-                    } else {
-                        if (Integer.parseInt(oldStart) < Integer.parseInt(nowMonth)) {
-                            throw new MessageException("10号后分配模板，开始时间不能小于本月");
-                        }
+                String oldStart = ((Map<String, String>) map2.get("applyTemplate")).get("startMonth");
+                Calendar calendar = Calendar.getInstance();
+                String nowMonth = new SimpleDateFormat("yyyyMM").format(calendar.getTime());
+                String day = new SimpleDateFormat("dd").format(calendar.getTime());
+                calendar.add(Calendar.MONTH, -1);
+                String lastMonth = new SimpleDateFormat("yyyyMM").format(calendar.getTime());
+                if (Integer.parseInt(day) < 10) {
+                    if (Integer.parseInt(oldStart) < Integer.parseInt(lastMonth)) {
+                        throw new MessageException("10号前分配模板，开始时间不能小于上月");
                     }
+                } else {
+                    if (Integer.parseInt(oldStart) < Integer.parseInt(nowMonth)) {
+                        throw new MessageException("10号后分配模板，开始时间不能小于本月");
+                    }
+                }
             }
-            if ("beijing".equals(startPar.get("party").toString())) {
+
+            if("beijing".equals(startPar.get("party").toString())){
                 try {
                     JSONObject mapJSONObject = new JSONObject();
                     mapJSONObject.put("applyId",templateRecode.getTemplateId());
@@ -276,6 +281,8 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                 }
             }
         }
+
+
         try{
             proceId = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("agent_zg_template"), null, null, startPar);
             if (proceId == null) {
@@ -469,7 +476,6 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                 reqMap.put("dept", downDeptMap.get("downDept"));
             }
         }
-
         // if("reject".equals(agentVo.getApprovalResult())
         //        && StringUtils.isBlank(agentVo.getOrderAprDept())){
         if("reject".equals(agentVo.getApprovalResult())){
@@ -1057,4 +1063,34 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     }
 
 
+
+
+
+    @Override
+    public String judgeStartsWithSUtil(String param) throws MessageException {
+        FastMap fastMap = FastMap.fastMap("POS_PLAT_CODE", param);
+        List<Map<String, Object>> orgIdMaps = recodeMapper.queryBusInfo(fastMap);
+        if(orgIdMaps==null||orgIdMaps.size()!=1){
+            logger.info("查询S码用户数据并不唯一:{}", param);
+            throw new MessageException("查询S码用户数据并不唯一:" + param);
+        }
+        Map<String, Object> orgIdMap = orgIdMaps.get(0);
+        if (orgIdMaps == null || orgIdMaps.isEmpty()) {
+            logger.info("此用户并未找到对应的直签代理商信息，核对信息:{}", param);
+            throw new MessageException("此用户并未找到对应的直签代理商信息：原业务平台编码：" + param);
+        } else {
+            Map<String, Object> platFromMap = recodeMapper.queryPlatFrom(String.valueOf(orgIdMap.get("BUS_PLATFORM")));
+            if (platFromMap.get("PLATFORM_TYPE") != null && "ZHPOS".equals(String.valueOf(platFromMap.get("PLATFORM_TYPE")))) {
+                if (orgIdMap.get("BUS_NUM") != null) {
+                    return String.valueOf(orgIdMap.get("BUS_NUM"));
+                } else {
+                    logger.info("此用户并未找到对应的业务平台编码，核对信息:{}", param);
+                    throw new MessageException("此用户并未找到对应的业务平台编码：原业务平台编码：" + param);
+                }
+            } else {
+                logger.info("此用户并不是智慧平台用户，核对信息:{}", param);
+                throw new MessageException("此用户并不是智慧平台用户：原业务平台编码：" + param);
+            }
+        }
+    }
 }

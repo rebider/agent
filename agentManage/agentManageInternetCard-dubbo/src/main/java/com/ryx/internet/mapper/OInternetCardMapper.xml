@@ -34,6 +34,8 @@
     <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
     <result column="BUS_PLATFORM" jdbcType="VARCHAR" property="busPlatform" />
     <result column="POSTPONE_CAUSE" jdbcType="VARCHAR" property="postponeCause" />
+    <result column="STATUS_TIME" jdbcType="VARCHAR" property="statusTime" />
+    <result column="TASK_STATUS_TIME" jdbcType="TIMESTAMP" property="taskStatusTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -69,7 +71,7 @@
     AGENT_ID, AGENT_NAME, INTERNET_CARD_NUM, ISSUER, OPEN_ACCOUNT_TIME, EXPIRE_TIME,
     INTERNET_CARD_STATUS, MER_ID, LATELY_PAY_TIME, MER_NAME, MANUFACTURER, RENEW, C_TIME,
     U_TIME, C_USER, U_USER, STATUS, VERSION, STOP, RENEW_STATUS, STOP_REASON, SUM_POSTPONE_TIME,
-    BUS_NUM, BUS_PLATFORM, POSTPONE_CAUSE
+    BUS_NUM, BUS_PLATFORM, POSTPONE_CAUSE, STATUS_TIME, TASK_STATUS_TIME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.internet.pojo.OInternetCardExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -110,7 +112,8 @@
     C_USER, U_USER, STATUS,
     VERSION, STOP, RENEW_STATUS,
     STOP_REASON, SUM_POSTPONE_TIME, BUS_NUM,
-    BUS_PLATFORM, POSTPONE_CAUSE)
+    BUS_PLATFORM, POSTPONE_CAUSE, STATUS_TIME,
+    TASK_STATUS_TIME)
     values (#{iccidNum,jdbcType=VARCHAR}, #{cardImportId,jdbcType=VARCHAR}, #{batchNum,jdbcType=VARCHAR},
     #{snNum,jdbcType=VARCHAR}, #{deliverTime,jdbcType=TIMESTAMP}, #{consignee,jdbcType=VARCHAR},
     #{orderId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR},
@@ -121,7 +124,8 @@
     #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
     #{version,jdbcType=DECIMAL}, #{stop,jdbcType=DECIMAL}, #{renewStatus,jdbcType=VARCHAR},
     #{stopReason,jdbcType=VARCHAR}, #{sumPostponeTime,jdbcType=DECIMAL}, #{busNum,jdbcType=VARCHAR},
-    #{busPlatform,jdbcType=VARCHAR}, #{postponeCause,jdbcType=VARCHAR})
+    #{busPlatform,jdbcType=VARCHAR}, #{postponeCause,jdbcType=VARCHAR}, #{statusTime,jdbcType=VARCHAR},
+    #{taskStatusTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.internet.pojo.OInternetCard">
     insert into O_INTERNET_CARD
@@ -222,6 +226,12 @@
       <if test="postponeCause != null">
         POSTPONE_CAUSE,
       </if>
+      <if test="statusTime != null">
+        STATUS_TIME,
+      </if>
+      <if test="taskStatusTime != null">
+        TASK_STATUS_TIME,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="iccidNum != null">
@@ -319,6 +329,12 @@
       </if>
       <if test="postponeCause != null">
         #{postponeCause,jdbcType=VARCHAR},
+      </if>
+      <if test="statusTime != null">
+        #{statusTime,jdbcType=VARCHAR},
+      </if>
+      <if test="taskStatusTime != null">
+        #{taskStatusTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -424,6 +440,12 @@
       <if test="postponeCause != null">
         POSTPONE_CAUSE = #{postponeCause,jdbcType=VARCHAR},
       </if>
+      <if test="statusTime != null">
+        STATUS_TIME = #{statusTime,jdbcType=VARCHAR},
+      </if>
+      <if test="taskStatusTime != null">
+        TASK_STATUS_TIME = #{taskStatusTime,jdbcType=TIMESTAMP},
+      </if>
     </set>
     where ICCID_NUM = #{iccidNum,jdbcType=VARCHAR}
   </update>
@@ -459,7 +481,9 @@
     SUM_POSTPONE_TIME = #{sumPostponeTime,jdbcType=DECIMAL},
     BUS_NUM = #{busNum,jdbcType=VARCHAR},
     BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
-    POSTPONE_CAUSE = #{postponeCause,jdbcType=VARCHAR}
+    POSTPONE_CAUSE = #{postponeCause,jdbcType=VARCHAR},
+    STATUS_TIME = #{statusTime,jdbcType=VARCHAR},
+    TASK_STATUS_TIME = #{taskStatusTime,jdbcType=TIMESTAMP}
     where ICCID_NUM = #{iccidNum,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -492,6 +516,10 @@
       </foreach>
       and c.status = 1
       and (c.INTERNET_CARD_STATUS = #{map.cardStaus1} or c.INTERNET_CARD_STATUS = #{map.cardStaus2})
+      and c.renew_status
+      <foreach collection="map.renewStatusList" item="renewStatus" open=" in(" close=")" separator=",">
+        #{renewStatus}
+      </foreach>
     </where>
   </sql>
 
@@ -609,6 +637,12 @@
       <if test="postponeCause != null and postponeCause != ''">
         POSTPONE_CAUSE = #{postponeCause,jdbcType=VARCHAR},
       </if>
+      <if test="statusTime != null and statusTime != ''">
+        STATUS_TIME = #{statusTime,jdbcType=VARCHAR},
+      </if>
+      <if test="taskStatusTime != null">
+        TASK_STATUS_TIME = #{taskStatusTime,jdbcType=TIMESTAMP},
+      </if>
     </set>
     where ICCID_NUM = #{iccidNum,jdbcType=VARCHAR}
   </update>
@@ -674,6 +708,8 @@
     <result column="BUS_CONTACT_PERSON" jdbcType="VARCHAR" property="busContactPerson" />
     <result column="PLATFORM_NAME" jdbcType="VARCHAR" property="platformName" />
     <result column="POSTPONE_CAUSE" jdbcType="VARCHAR" property="postponeCause" />
+    <result column="STATUS_TIME" jdbcType="VARCHAR" property="statusTime" />
+    <result column="TASK_STATUS_TIME" jdbcType="TIMESTAMP" property="taskStatusTime" />
   </resultMap>
 
   <sql id="Card_Example_Where_Clause">
@@ -706,7 +742,7 @@
     </where>
   </sql>
   <sql id="queryInternetCardSql">
-    left join a_agent_businfo b on i.bus_num=b.bus_num and i.bus_platform=b.bus_platform
+    left join a_agent_businfo b on i.bus_num=b.bus_num and i.bus_platform=b.bus_platform and b.status=1
     left join C_ORGANIZATION oa on oa.id=b.ag_doc_pro
     left join C_ORGANIZATION ob on ob.id=b.AG_DOC_DISTRICT
     left join d_dict d on d.d_itemvalue = i.MANUFACTURER AND d.d_group ='ORDER' AND d_artifact='MANUFACTURER'
@@ -736,7 +772,7 @@
     i.AGENT_ID, i.AGENT_NAME, i.INTERNET_CARD_NUM, i.ISSUER, i.OPEN_ACCOUNT_TIME, i.EXPIRE_TIME,
     i.INTERNET_CARD_STATUS, i.MER_ID, i.LATELY_PAY_TIME, i.MER_NAME, d.D_ITEMNAME as MANUFACTURER, i.RENEW,
     i.STOP, i.RENEW_STATUS, i.STOP_REASON,i.SUM_POSTPONE_TIME,i.BUS_NUM, i.BUS_PLATFORM,p.PLATFORM_NAME,
-    i.POSTPONE_CAUSE,
+    i.POSTPONE_CAUSE,i.STATUS_TIME, i.TASK_STATUS_TIME,
   </sql>
 
   <select id="internetCardList" parameterType="com.ryx.internet.pojo.OInternetCardExample" resultMap="CardListResultMap">
@@ -753,5 +789,28 @@
     select count(*) from o_internet_card i
     <include refid="queryInternetCardSql" />
   </select>
+
+
+  <select id="selectUpdateCardStatus" parameterType="map" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select c.iccid_num from o_internet_Card c
+    <where>
+        c.status = 1
+        and c.issuer = #{map.issuer}
+        <if test="map.type == 'selectNull'">
+           and c.status_time is null and c.task_status_time is null
+        </if>
+        <if test="map.type != 'selectNull'">
+          and TO_CHAR(c.expire_time, 'YYYY-MM')
+          <foreach collection="map.expireTimeList" item="expireTime" open=" in(" close=")" separator=",">
+            #{expireTime}
+          </foreach>
+           and c.task_status_time &lt; to_date(#{map.tasksStatusTime},'yyyy-MM-dd')
+        </if>
+        order by c.expire_time asc
+    </where>
+    <include refid="OracleDialectSuffix" />
+  </select>
+
 
 </mapper>

@@ -67,4 +67,5 @@ public interface ITemplateRecodeService {
     String saveNewTemplateName(JSONObject map) throws MessageException;
 
 
+    String judgeStartsWithSUtil(String param) throws MessageException;
 }

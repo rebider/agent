@@ -36,10 +36,19 @@ public class OrderUpModelVo implements Serializable {
     private String approvalOpinion;
     private String approvalResult;
     private String dept;
-    private String flag;
+    private String sid;
     private String orderAdjAprDept;//订单调整审批下个审批部门参数
     private String refundType;//退款类型
     private String settleAmount;
+
+    public String getSid() {
+        return sid;
+    }
+
+    public void setSid(String sid) {
+        this.sid = sid;
+    }
+
     @JSONField(format="yyyy-MM-dd")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @JsonDeserialize(using = DateJsonDeserializer.class)
@@ -100,14 +109,6 @@ public class OrderUpModelVo implements Serializable {
 
     public void setDept(String dept) {
         this.dept = dept;
-    }
-
-    public String getFlag() {
-        return flag;
-    }
-
-    public void setFlag(String flag) {
-        this.flag = flag;
     }
 
     public String getTaskId() {

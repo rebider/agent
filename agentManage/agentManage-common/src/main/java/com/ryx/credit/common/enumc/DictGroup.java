@@ -93,14 +93,17 @@ public enum DictGroup {
     LOGISTICS_FAIL_EMAIL("物流失败邮件"),
     CERTIFICATION_STATUS("代理商工商认证"),
     DATA_SHIRO("流量卡内部续费数据权限"),
-    ANN_TYPE("公告类型"),
     ANN_ORG("公告运维机构"),
+
+    ANN_TYPE("公告类型"),
     REMOVEACCOUNT_FAIL_EMAIL("销账失败邮件"),
     RATYPE("销账方式"),
     RSTATUS("销账状态"),
     RELATION_PLATFORM_NUM("平台关系"),
     ADJ_STAT("订单机具调整审批状态"),
-    REFUND_TYPE("退款类型");
+    REFUND_TYPE("退款类型"),
+    REFUND_STAT("退款状态"),
+    ORDER_ADJ_APR_BUSNISS("业务部订单调整审批参数");
 
     public String  msg;
 

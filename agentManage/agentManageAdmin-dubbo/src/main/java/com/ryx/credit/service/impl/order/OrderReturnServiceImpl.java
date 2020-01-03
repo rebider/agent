@@ -30,6 +30,7 @@ import com.ryx.credit.service.order.IOrderReturnService;
 import com.ryx.credit.service.order.OLogisticsDetailService;
 import com.ryx.credit.service.order.OLogisticsService;
 import com.ryx.credit.service.order.PlannerService;
+import org.apache.commons.collections4.Put;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -667,6 +668,10 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     @Transactional
     public Map<String, Object> apply(String agentId, OReturnOrder returnOrder, String productsJson, String userid,String invoiceList) throws ProcessException {
 
+        //冻结sn在业务平台状态
+        List<Map<String, Object>> snList = new ArrayList<>();
+        Map<String, Object> snMap = new HashMap<>();
+
         List<Map> list = null;
         try {
             list = JSONObject.parseArray(productsJson, Map.class);
@@ -803,6 +808,15 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             }
             BigDecimal amt = iOrderReturnService.selectOrderDetails(orderId);
             orderTotalAmt = orderTotalAmt.add(oPayment.getPayAmount()).subtract(amt);
+
+            //封装业务平台冻结sn
+            snMap.put("endSn", returnOrderDetail.getEndSn());
+            snMap.put("beginSn", returnOrderDetail.getBeginSn());
+            snMap.put("taskId", returnOrderDetail.getId());
+            snMap.put("orderId", returnOrderDetail.getOrderId());
+            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByOrderId(returnOrderDetail.getOrderId());
+            snMap.put("agencyId", agentBusInfo.getBusNum());
+            snList.add(snMap);
         }
         //订单下单时的发票开具状态为是 且 收款账号为深圳财务的
         if(isCloInvoice.compareTo(Status.STATUS_1.status)==0 && collectCompany.equals("7")){
@@ -974,7 +988,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
         //各个平台查询SN是否可用
         try {
-            checkSnForOtherPlatform(list);
+            PlatForm platForm =platFormMapper.selectByOrderId((String) list.get(0).get("orderId"));
+            if (null == platForm) throw new ProcessException("原订单信息不存在，请核实SN号码是否正确！");
+            termMachineService.checkOrderReturnSN(snList, platForm.getPlatformType());
         } catch (Exception e) {
             throw new ProcessException(e.getLocalizedMessage());
         }

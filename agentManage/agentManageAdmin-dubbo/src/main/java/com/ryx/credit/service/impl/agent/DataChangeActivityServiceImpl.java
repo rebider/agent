@@ -280,6 +280,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
      * @param agStatus
      * @return
      */
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public ResultVO compressColInfoDataChangeActivity(String proIns, String agStatus)throws Exception {
         try {
