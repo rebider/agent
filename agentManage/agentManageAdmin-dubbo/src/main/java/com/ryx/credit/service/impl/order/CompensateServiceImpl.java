@@ -562,6 +562,21 @@ public class CompensateServiceImpl implements CompensateService {
                 refundPriceDiffDetail.setNewMachineId(new_oActivity.getBusProCode());
                 refundPriceDiffDetail.setOldMachineId(old_Activity.getBusProCode());
 
+                //特殊平台增加个校验（智慧POS，智能POS）替换busNum
+                if (PlatformType.ZHPOS.code.equals(platForm.getPlatformType()) || PlatformType.ZPOS.code.equals(platForm.getPlatformType())) {
+                    List<AgentBusInfo> oldList = agentBusInfoMapper.queryBusinfo(FastMap.fastMap("posPlatCode", refundPriceDiffDetail.getOldOrgId()));
+                    if (oldList.size() == 1 && null != oldList.get(0).getBusNum()) {
+                        refundPriceDiffDetail.setOldOrgId(String.valueOf(oldList.get(0).getBusNum()));
+                    } else {
+                        throw new ProcessException("原机构S码有误，未找到业务平台编码！");
+                    }
+                    List<AgentBusInfo> newList = agentBusInfoMapper.queryBusinfo(FastMap.fastMap("posPlatCode", refundPriceDiffDetail.getNewOrgId()));
+                    if (newList.size() == 1 && null != newList.get(0).getBusNum()) {
+                        refundPriceDiffDetail.setOldOrgId(String.valueOf(newList.get(0).getBusNum()));
+                    } else {
+                        throw new ProcessException("目标机构S码有误，未找到业务平台编码！");
+                    }
+                }
                 //校验活动是否支持调整
                 Map<String,String> par = new HashedMap();
                 par.put("oldMerid",refundPriceDiffDetail.getOldMachineId());
@@ -584,7 +599,7 @@ public class CompensateServiceImpl implements CompensateService {
                 throw new ProcessException(synOrVerifyResult.getMsg());
             }
             String platformType = refundPriceDiffDetailList.get(0).getPlatformType();
-            if(PlatformType.POS.getValue().equals(platformType)){
+            if (PlatformType.whetherPOS(platformType)) {
                 JSONObject resData =  (JSONObject)synOrVerifyResult.getData();
                 List<Map<String,Object>> resultList = (List<Map<String,Object>>)resData.get("resultList");
                 for (Map<String, Object> stringObjectMap : resultList) {
