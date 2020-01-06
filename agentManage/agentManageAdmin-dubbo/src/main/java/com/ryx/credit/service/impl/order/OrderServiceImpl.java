@@ -416,6 +416,9 @@ public class OrderServiceImpl implements OrderService {
         c.set(Calendar.SECOND,c.getActualMinimum(Calendar.SECOND));
         c.set(Calendar.MINUTE,c.getActualMinimum(Calendar.MINUTE));
         Date dateFromStr = DateUtil.getDateFromStr(DateUtil.format(c.getTime(), "yyyy-MM-dd"), "yyyy-MM-dd");
+        if(StringUtils.isNotBlank(payment.getCustomStaging()) && !payment.getCustomStaging().equals(Status.STATUS_1.status.toPlainString()) && !payment.getCustomStaging().equals(Status.STATUS_0.status.toPlainString()) ){
+            throw new MessageException("是否自定义分期状态异常");
+        }
         switch (payment.getPayMethod()) {
             case "SF1"://首付+分润分期
                 if (payment.getDownPayment() == null || payment.getDownPayment().compareTo(BigDecimal.ZERO) == 0) {
@@ -556,6 +559,7 @@ public class OrderServiceImpl implements OrderService {
                 payment.setDownPayment(BigDecimal.ZERO);
                 payment.setDownPaymentDate(null);
                 payment.setDownPaymentCount(BigDecimal.ZERO);
+                payment.setCustomStaging(Status.STATUS_0.status.toPlainString());
                 return payment;
             case "QT"://其他
                 if(Status.STATUS_1.status.toString().equals(payment.getCustomStaging())){
@@ -570,6 +574,7 @@ public class OrderServiceImpl implements OrderService {
                 payment.setDownPaymentDate(null);
                 payment.setDownPaymentCount(BigDecimal.ZERO);
                 payment.setActualReceipt(BigDecimal.ZERO);
+                payment.setCustomStaging(Status.STATUS_0.status.toPlainString());
                 return payment;
         }
         return payment;
@@ -1408,6 +1413,11 @@ public class OrderServiceImpl implements OrderService {
         }else{
             //添加到数据历史表
             agentDataHistoryService.saveDataHistory(oPayment_db,oPayment_db.getId(),DataHistoryType.ORDER_PAYMENT.code,userId,oPayment_db.getVersion());
+        }
+
+        //初始化订单自定义分期
+        if(!initPaymentDetail(oPayment.getId(),oPayment.getPayMethod(),orderFormVo.getCustomStagingUser())){
+            throw new MessageException("自定义分期处理失败");
         }
         return orderFormVo;
     }
