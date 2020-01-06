@@ -2064,7 +2064,7 @@ public class OrderServiceImpl implements OrderService {
                             oPayment.getPayMethod());
 
                     //如果是自定义分期
-                    if(StringUtils.isBlank(oPayment.getCustomStaging()) && Status.STATUS_1.status.toPlainString().equals(oPayment.getCustomStaging())){
+                    if(StringUtils.isNotBlank(oPayment.getCustomStaging()) && Status.STATUS_1.status.toPlainString().equals(oPayment.getCustomStaging())){
                         //这里不处理首付值处理分期
                         //更新付款分期为审批通过，检查分期金额是否等于待付金额
                         OPaymentDetailExample customStaginDetailQeury = new OPaymentDetailExample();
@@ -2191,7 +2191,7 @@ public class OrderServiceImpl implements OrderService {
                             oPayment.getId(),
                             oPayment.getPayMethod());
                     //如果是自定义分期
-                    if(StringUtils.isBlank(oPayment.getCustomStaging()) && Status.STATUS_1.status.toPlainString().equals(oPayment.getCustomStaging())) {
+                    if(StringUtils.isNotBlank(oPayment.getCustomStaging()) && Status.STATUS_1.status.toPlainString().equals(oPayment.getCustomStaging())) {
                         //这里不处理首付值处理分期
                         //更新付款分期为审批通过，检查分期金额是否等于待付金额
                         OPaymentDetailExample customStaginDetailQeury = new OPaymentDetailExample();
@@ -2426,7 +2426,7 @@ public class OrderServiceImpl implements OrderService {
                         }
                     }
                     //如果是自定义分期
-                    if(StringUtils.isBlank(oPayment.getCustomStaging()) && Status.STATUS_1.status.toPlainString().equals(oPayment.getCustomStaging())) {
+                    if(StringUtils.isNotBlank(oPayment.getCustomStaging()) && Status.STATUS_1.status.toPlainString().equals(oPayment.getCustomStaging())) {
                         //这里不处理首付值处理分期
                         //更新付款分期为审批通过，检查分期金额是否等于待付金额
                         OPaymentDetailExample customStaginDetailQeury = new OPaymentDetailExample();
@@ -2572,7 +2572,7 @@ public class OrderServiceImpl implements OrderService {
                         }
                     }
                     //如果是自定义分期
-                    if(StringUtils.isBlank(oPayment.getCustomStaging()) && Status.STATUS_1.status.toPlainString().equals(oPayment.getCustomStaging())) {
+                    if(StringUtils.isNotBlank(oPayment.getCustomStaging()) && Status.STATUS_1.status.toPlainString().equals(oPayment.getCustomStaging())) {
                         //这里不处理首付值处理分期
                         //更新付款分期为审批通过，检查分期金额是否等于待付金额
                         OPaymentDetailExample customStaginDetailQeury = new OPaymentDetailExample();
