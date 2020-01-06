@@ -507,8 +507,8 @@ public class CompensateServiceImpl implements CompensateService {
                 if(old_Activity==null){
                     throw new ProcessException("查询新活动失败");
                 }
-                //TODO 校验是否有审批中的活动变更
 
+                //TODO 校验是否有审批中的活动变更
                 ORefundPriceDiffDetailExample example = new ORefundPriceDiffDetailExample();
                 example.or().andBeginSnBetween(refundPriceDiffDetail.getBeginSn(),refundPriceDiffDetail.getEndSn()).andStatusEqualTo(Status.STATUS_1.status);
                 example.or() .andEndSnBetween(refundPriceDiffDetail.getBeginSn(),refundPriceDiffDetail.getEndSn()).andStatusEqualTo(Status.STATUS_1.status);
@@ -572,7 +572,7 @@ public class CompensateServiceImpl implements CompensateService {
                     }
                     List<AgentBusInfo> newList = agentBusInfoMapper.queryBusinfo(FastMap.fastMap("posPlatCode", refundPriceDiffDetail.getNewOrgId()));
                     if (newList.size() == 1 && null != newList.get(0).getBusNum()) {
-                        refundPriceDiffDetail.setOldOrgId(String.valueOf(newList.get(0).getBusNum()));
+                        refundPriceDiffDetail.setNewOrgId(String.valueOf(newList.get(0).getBusNum()));
                     } else {
                         throw new ProcessException("目标机构S码有误，未找到业务平台编码！");
                     }

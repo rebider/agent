@@ -422,7 +422,6 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 refundPriceDiffDetail.setSendStatus(Status.STATUS_0.status);
 
                 //特殊平台增加个校验（智慧POS，智能POS）
-                //特殊平台增加个校验（智慧POS，智能POS）
                 if (PlatformType.ZHPOS.code.equals(platForm.getPlatformType()) || PlatformType.ZPOS.code.equals(platForm.getPlatformType())) {
                     List<AgentBusInfo> oldList = agentBusInfoMapper.queryBusinfo(FastMap.fastMap("posPlatCode", refundPriceDiffDetail.getOldOrgId()));
                     if (oldList.size() == 1 && null != oldList.get(0).getBusNum()) {
@@ -432,7 +431,7 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                     }
                     List<AgentBusInfo> newList = agentBusInfoMapper.queryBusinfo(FastMap.fastMap("posPlatCode", refundPriceDiffDetail.getNewOrgId()));
                     if (newList.size() == 1 && null != newList.get(0).getBusNum()) {
-                        refundPriceDiffDetail.setOldOrgId(String.valueOf(newList.get(0).getBusNum()));
+                        refundPriceDiffDetail.setNewOrgId(String.valueOf(newList.get(0).getBusNum()));
                     } else {
                         throw new ProcessException("目标机构S码有误，未找到业务平台编码！");
                     }
