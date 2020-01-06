@@ -104,8 +104,8 @@ public class OsnOperateReturnServiceImpl implements OsnOperateReturnService {
 
     @Override
     public void genLogicDetailTask() {
-        //查询所有审核通过、退货物流、没有联动的
-        List<String> list = oLogisticsMapper.queryLogicInfoIdByStatusAndApproved(FastMap.fastMap("logType", LogType.Refund.code).putKeyV("sendStatus",LogisticsSendStatus.none_send.code).putKeyV("retSchedule",RetSchedule.WC.code));
+        //查询所有,退货物流、没有联动的
+        List<String> list = oLogisticsMapper.queryLogicInfoIdByStatusAndApproved(FastMap.fastMap("logType", LogType.Refund.code).putKeyV("sendStatus",LogisticsSendStatus.none_send.code));
         if (list.size() > 0) {
             logger.info("退货物流处理 开始执行sn明细生成任务");
             for (String id : list) {
