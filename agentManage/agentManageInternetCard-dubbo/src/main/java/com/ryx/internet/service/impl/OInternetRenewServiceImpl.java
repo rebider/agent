@@ -1433,7 +1433,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                             || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.GSCDGC.getValue())) {
                         InternetRenewOffset internetRenewOffset = new InternetRenewOffset();
                         internetRenewOffset.setFlowId(idService.genInternetOffset());
-                        internetRenewOffset.setRenewId(internetRenew.getId());
+                        internetRenewOffset.setRenewId(batchNo);
                         internetRenewOffset.setRenewDetailId(oInternetRenewDetail.getId());
                         internetRenewOffset.setIccidNum(oInternetRenewDetail.getIccidNum());
                         internetRenewOffset.setAgentId(oInternetRenewDetail.getAgentId());
