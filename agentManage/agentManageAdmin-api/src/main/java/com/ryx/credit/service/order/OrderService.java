@@ -219,7 +219,7 @@ public interface OrderService {
     /**
      * 刪除订单
      */
-    AgentResult updateStatus(String id, String user);
+    AgentResult updateStatus(String id, String user)throws Exception;
 
 
     /**
