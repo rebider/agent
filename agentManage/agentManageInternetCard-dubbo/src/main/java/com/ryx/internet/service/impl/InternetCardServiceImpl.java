@@ -590,7 +590,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                     updateInternetCardImport(oInternetCardImport);
                     //延期
                     internetCardService.internetCardPostpone(internetCardPostpone,oInternetCardImport.getcUser(),oInternetCardImport.getId(),oInternetCardImport.getBatchNum());
-                }else if(importType.equals(CardImportType.H.getValue())){ // 批量缴费
+                }else if(importType.equals(CardImportType.H.getValue())){ // 批量续费
                     OInternetRenew oInternetRenew = JsonUtil.jsonToPojo(oInternetCardImport.getImportMsg(), OInternetRenew.class);
                     if(null==oInternetRenew){
                         throw new MessageException("导入信息不存在");

@@ -1385,16 +1385,19 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             //
             Map<String, Object> reqMap = new HashMap<>();
 
-            if (internetRenew.getRenewWay().equals(InternetRenewWay.FRDK.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())) {
-                try {
 
-                    BigDecimal agStatus = AgStatus.Approved.status;
-                    internetRenew.setReviewStatus(agStatus);
-                    if (agStatus.compareTo(AgStatus.Approved.getValue()) == 0) {
-                        internetRenew.setReviewPassTime(new Date());
-                    }
-                    log.info("续费完成更新请求参数:internetRenew:{}", internetRenew.toString());
-                    // 这是更新续费申请请求  请求记录是没有的 只有申请号
+//            if (internetRenew.getRenewWay().equals(InternetRenewWay.FRDK.getValue()) || internetRenew.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())) {
+//                compressCompensateActivity();
+//            }
+            try {
+
+                BigDecimal agStatus = AgStatus.Approved.status;
+                internetRenew.setReviewStatus(agStatus);
+                if (agStatus.compareTo(AgStatus.Approved.getValue()) == 0) {
+                    internetRenew.setReviewPassTime(new Date());
+                }
+                log.info("续费完成更新请求参数:internetRenew:{}", internetRenew.toString());
+                // 这是更新续费申请请求  请求记录是没有的 只有申请号
 //                    int i = internetRenewMapper.updateByPrimaryKeySelective(internetRenew);
 //                    if (i != 1) {
 //                        throw new MessageException("更新续费记录失败");
@@ -1407,69 +1410,68 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
 
 //                        for (OInternetRenewDetail oInternetRenewDetail : oInternetRenewDetails) {
 //                        }
-                    //
-                    // 拒绝全部失效
-                    if (agStatus.compareTo(AgStatus.Refuse.getValue()) == 0) {
-                        oInternetRenewDetail.setRenewStatus(InternetRenewStatus.SX.getValue());
-                        oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
-                    }
-                    if (agStatus.compareTo(AgStatus.Approved.getValue()) == 0) {
-                        //审批通过直接已续费
-                        oInternetRenewDetail.setRenewStatus(InternetRenewStatus.YXF.getValue());
-                        if (oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDK.getValue()) || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())) {
-                            oInternetRenewDetail.setRealityAmt(oInternetRenewDetail.getOughtAmt());
-                        }
-                        oInternetCard.setRenewStatus(InternetRenewStatus.YXF.getValue());
-                        //续费成功到期时间加一年
-                        oInternetCard.setExpireTime(DateUtil.getOneYearLater(oInternetCard.getExpireTime()));
-
-                        oInternetCard.setStop(Status.STATUS_0.status);
-                        oInternetCard.setRenew(Status.STATUS_0.status);
-                        //生成轧差明细，同步清结算
-                        if (oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())
-                                || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.GSCDGC.getValue())) {
-                            InternetRenewOffset internetRenewOffset = new InternetRenewOffset();
-                            internetRenewOffset.setFlowId(idService.genInternetOffset());
-                            internetRenewOffset.setRenewId(internetRenew.getId());
-                            internetRenewOffset.setRenewDetailId(oInternetRenewDetail.getId());
-                            internetRenewOffset.setIccidNum(oInternetRenewDetail.getIccidNum());
-                            internetRenewOffset.setAgentId(oInternetRenewDetail.getAgentId());
-                            internetRenewOffset.setAgentName(oInternetRenewDetail.getAgentName());
-                            internetRenewOffset.setMerId(oInternetRenewDetail.getMerId());
-                            internetRenewOffset.setMerName(oInternetRenewDetail.getMerName());
-                            internetRenewOffset.setOffsetAmt(oInternetRenewDetail.getOffsetAmt());
-                            internetRenewOffset.setAlreadyOffsetAmt(BigDecimal.ZERO);
-                            internetRenewOffset.setcTime(DateUtil.format(new Date(), DateUtil.DATE_FORMAT_3));
-                            internetRenewOffset.setcUser(oInternetRenewDetail.getcUser());
-                            internetRenewOffset.setuUser(oInternetRenewDetail.getuUser());
-                            internetRenewOffset.setStatus(Status.STATUS_1.status);
-                            internetRenewOffset.setVersion(BigDecimal.ONE);
-                            internetRenewOffset.setCleanStatus(InternetCleanStatus.ZERO.getValue());
-                            internetRenewOffset.setBusNum(oInternetRenewDetail.getBusNum());
-                            internetRenewOffset.setBusPlatform(oInternetRenewDetail.getBusPlatform());
-                            internetRenewOffset.setAgDocDistrict(oInternetRenewDetail.getAgDocDistrict());
-                            internetRenewOffset.setAgDocPro(oInternetRenewDetail.getAgDocPro());
-                            internetRenewOffset.setBusContactPerson(oInternetRenewDetail.getBusContactPerson());
-                            log.info("续费完成插入轧差表参数:internetRenewOffset:{}", internetRenewOffset.toString());
-                            internetRenewOffsetMapper.insert(internetRenewOffset);
-                        }
-                    }
-                    log.info("续费完成更新续费明细表参数:oInternetRenewDetail:{}", oInternetRenewDetail.toString());
-                    int l = internetRenewDetailMapper.updateByPrimaryKeySelective(oInternetRenewDetail);
-                    if (l != 1) {
-                        throw new MessageException("更新续费明细失败");
-                    }
-                    oInternetCard.setuTime(new Date());
-                    log.info("续费完成卡总表参数:oInternetCard:{}", oInternetCard.toString());
-                    int k = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
-                    if (k != 1) {
-                        throw new MessageException("更新物联网卡信息失败");
-                    }
-                } catch (Exception e) {
-                    AppConfig.sendEmails(MailUtil.printStackTrace(e), "省区续费审批完成失败出现异常,saveAndApprove方法2");
-                    e.printStackTrace();
-                    throw new MessageException("省区续费审批完成失败!:{}", e.getMessage());
+                //
+                // 拒绝全部失效
+                if (agStatus.compareTo(AgStatus.Refuse.getValue()) == 0) {
+                    oInternetRenewDetail.setRenewStatus(InternetRenewStatus.SX.getValue());
+                    oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
                 }
+                if (agStatus.compareTo(AgStatus.Approved.getValue()) == 0) {
+                    //审批通过直接已续费
+                    oInternetRenewDetail.setRenewStatus(InternetRenewStatus.YXF.getValue());
+                    if (oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDK.getValue()) || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())) {
+                        oInternetRenewDetail.setRealityAmt(oInternetRenewDetail.getOughtAmt());
+                    }
+                    oInternetCard.setRenewStatus(InternetRenewStatus.YXF.getValue());
+                    //续费成功到期时间加一年
+                    oInternetCard.setExpireTime(DateUtil.getOneYearLater(oInternetCard.getExpireTime()));
+
+                    oInternetCard.setStop(Status.STATUS_0.status);
+                    oInternetCard.setRenew(Status.STATUS_0.status);
+                    //生成轧差明细，同步清结算
+                    if (oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.XXBKGC.getValue()) || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.FRDKGC.getValue())
+                            || oInternetRenewDetail.getRenewWay().equals(InternetRenewWay.GSCDGC.getValue())) {
+                        InternetRenewOffset internetRenewOffset = new InternetRenewOffset();
+                        internetRenewOffset.setFlowId(idService.genInternetOffset());
+                        internetRenewOffset.setRenewId(internetRenew.getId());
+                        internetRenewOffset.setRenewDetailId(oInternetRenewDetail.getId());
+                        internetRenewOffset.setIccidNum(oInternetRenewDetail.getIccidNum());
+                        internetRenewOffset.setAgentId(oInternetRenewDetail.getAgentId());
+                        internetRenewOffset.setAgentName(oInternetRenewDetail.getAgentName());
+                        internetRenewOffset.setMerId(oInternetRenewDetail.getMerId());
+                        internetRenewOffset.setMerName(oInternetRenewDetail.getMerName());
+                        internetRenewOffset.setOffsetAmt(oInternetRenewDetail.getOffsetAmt());
+                        internetRenewOffset.setAlreadyOffsetAmt(BigDecimal.ZERO);
+                        internetRenewOffset.setcTime(DateUtil.format(new Date(), DateUtil.DATE_FORMAT_3));
+                        internetRenewOffset.setcUser(oInternetRenewDetail.getcUser());
+                        internetRenewOffset.setuUser(oInternetRenewDetail.getuUser());
+                        internetRenewOffset.setStatus(Status.STATUS_1.status);
+                        internetRenewOffset.setVersion(BigDecimal.ONE);
+                        internetRenewOffset.setCleanStatus(InternetCleanStatus.ZERO.getValue());
+                        internetRenewOffset.setBusNum(oInternetRenewDetail.getBusNum());
+                        internetRenewOffset.setBusPlatform(oInternetRenewDetail.getBusPlatform());
+                        internetRenewOffset.setAgDocDistrict(oInternetRenewDetail.getAgDocDistrict());
+                        internetRenewOffset.setAgDocPro(oInternetRenewDetail.getAgDocPro());
+                        internetRenewOffset.setBusContactPerson(oInternetRenewDetail.getBusContactPerson());
+                        log.info("续费完成插入轧差表参数:internetRenewOffset:{}", internetRenewOffset.toString());
+                        internetRenewOffsetMapper.insert(internetRenewOffset);
+                    }
+                }
+                log.info("续费完成更新续费明细表参数:oInternetRenewDetail:{}", oInternetRenewDetail.toString());
+                int l = internetRenewDetailMapper.updateByPrimaryKeySelective(oInternetRenewDetail);
+                if (l != 1) {
+                    throw new MessageException("更新续费明细失败");
+                }
+                oInternetCard.setuTime(new Date());
+                log.info("续费完成卡总表参数:oInternetCard:{}", oInternetCard.toString());
+                int k = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
+                if (k != 1) {
+                    throw new MessageException("更新物联网卡信息失败");
+                }
+            } catch (Exception e) {
+                AppConfig.sendEmails(MailUtil.printStackTrace(e), "省区续费审批完成失败出现异常,saveAndApprove方法2");
+                e.printStackTrace();
+                throw new MessageException("省区续费审批完成失败!:{}", e.getMessage());
             }
             return AgentResult.ok();
         }finally {
