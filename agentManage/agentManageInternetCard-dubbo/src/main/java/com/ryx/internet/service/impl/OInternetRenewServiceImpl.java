@@ -1213,6 +1213,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
 //    }
 
     /**
+     * 财务-批量续费轧差功能
      *
      * @param internetRenew
      * @param iccid
