@@ -317,8 +317,8 @@
       and  BUS_NUM = #{busNum,jdbcType=VARCHAR}
     </if>
     <if test="docDic!= '' and docDic != null">
-    and
-    AG_DOC_PRO = #{docDic,jdbcType=VARCHAR}
+      and (AG_DOC_PRO in ( select id from C_ORGANIZATION where PID = #{docDic,jdbcType=VARCHAR} )
+                or AG_DOC_PRO = #{docDic,jdbcType=VARCHAR} )
     </if>
   </select>
 
@@ -335,8 +335,8 @@
     on ap.BUS_NUM = ab.BUS_NUM AND ap.AGENT_ID = ab.AGENT_ID
     where 1 = 1
     <if test="map.agDoc != '' and map.agDoc != null">
-      and ab.AG_DOC_PRO = #{map.agDoc}
-      and ap.CREATE_USER = #{record.createUser}
+      and (ab.AG_DOC_PRO in ( select id from C_ORGANIZATION where PID = #{map.agDoc} )
+                  or AG_DOC_PRO = #{map.agDoc} )
     </if>
     <if test="map.agDis != '' and map.agDis != null">
       and ab.AG_DOC_DISTRICT = #{map.agDis}
@@ -372,8 +372,8 @@
     on ap.BUS_NUM = ab.BUS_NUM AND ap.AGENT_ID = ab.AGENT_ID
     where 1 = 1
     <if test="map.agDoc != '' and map.agDoc != null">
-      and ab.AG_DOC_PRO = #{map.agDoc}
-      and ap.CREATE_USER = #{record.createUser}
+      and (ab.AG_DOC_PRO in ( select id from C_ORGANIZATION where PID = #{map.agDoc} )
+      or AG_DOC_PRO = #{map.agDoc} )
     </if>
     <if test="map.agDis != '' and map.agDis != null">
       and ab.AG_DOC_DISTRICT = #{map.agDis}
