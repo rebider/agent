@@ -316,12 +316,11 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                         logger.info("========审批流完成{}业务{}状态{},结果{}", proIns, rel.getBusType(), agStatus, res.getResInfo());
                         //更新数据状态为审批成功
                         if(res.isSuccess()){
+                            //调整业务出款机构
                             ResultVO adjustFinOrg =  dataChangeActivityService.adjustFinanceOrgByAccount(vo.getAgent().getId());
                             if(!adjustFinOrg.isSuccess()){
                                 throw new ProcessException("出款机构调整失败");
                             }
-
-
                             dr.setAppyStatus(AgStatus.Approved.status);
                             dr.setcUpdate(Calendar.getInstance().getTime());
                             logger.info("========审批流完成{}业务{}状态{},结果{}",proIns,rel.getBusType(),agStatus,"更新数据申请成功");
