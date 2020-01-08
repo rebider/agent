@@ -1460,6 +1460,32 @@ public class CompensateServiceImpl implements CompensateService {
                         oLogisticsDetailMap.put("OldAgentBusInfo", newOrgInfo.get(0));
                     }
                 }
+                if (PlatformType.ZHPOS.code.equals(oRefundPriceDiffDetail.getPlatformType())){
+                    if (null != oRefundPriceDiffDetail.getOldOrgId()) {
+                        List<AgentBusInfo> oldList = agentBusInfoMapper.queryBusinfo(FastMap.fastMap("busNum", oRefundPriceDiffDetail.getOldOrgId()));
+                        if (oldList.size() == 1 && null != oldList.get(0).getPosPlatCode()) {
+                            oRefundPriceDiffDetail.setOldPosPlatCode(oldList.get(0).getPosPlatCode());
+                        }
+                    }
+                    if (null != oRefundPriceDiffDetail.getNewOrgId()) {
+                        List<AgentBusInfo> newList = agentBusInfoMapper.queryBusinfo(FastMap.fastMap("busNum", oRefundPriceDiffDetail.getNewOrgId()));
+                        if (newList.size() == 1 && null != newList.get(0).getPosPlatCode()) {
+                            oRefundPriceDiffDetail.setNewPosPlatCode(newList.get(0).getPosPlatCode());
+                        }
+                    }
+                    if (null != oRefundPriceDiffDetail.getOldSupdOrgId()) {
+                        List<AgentBusInfo> newSupdList = agentBusInfoMapper.queryBusinfo(FastMap.fastMap("busNum", oRefundPriceDiffDetail.getOldSupdOrgId()));
+                        if (newSupdList.size() == 1 && null != newSupdList.get(0).getPosPlatCode()) {
+                            oRefundPriceDiffDetail.setOldSupdPosPlatCode(newSupdList.get(0).getPosPlatCode());
+                        }
+                    }
+                    if (null != oRefundPriceDiffDetail.getNewSupdOrgId()) {
+                        List<AgentBusInfo> newSupdList = agentBusInfoMapper.queryBusinfo(FastMap.fastMap("busNum", oRefundPriceDiffDetail.getNewSupdOrgId()));
+                        if (newSupdList.size() == 1 && null != newSupdList.get(0).getPosPlatCode()) {
+                            oRefundPriceDiffDetail.setNewSupdPosPlatCode(newSupdList.get(0).getPosPlatCode());
+                        }
+                    }
+                }
                 oRefundPriceDiffDetail.setRefundPriceDiffDetailMap(oLogisticsDetailMap);
             }
         }
