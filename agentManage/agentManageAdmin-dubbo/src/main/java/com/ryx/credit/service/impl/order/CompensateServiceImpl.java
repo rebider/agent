@@ -13,7 +13,6 @@ import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.*;
 import com.ryx.credit.machine.service.ImsTermWarehouseDetailService;
 import com.ryx.credit.machine.service.TermMachineService;
-import com.ryx.credit.machine.vo.ChangeActMachineVo;
 import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
@@ -31,8 +30,6 @@ import com.ryx.credit.service.order.CompensateService;
 import com.ryx.credit.service.order.OCashReceivablesService;
 import com.ryx.credit.service.order.OrderActivityService;
 import com.ryx.credit.service.order.ProductService;
-import com.ryx.internet.pojo.OInternetCardImport;
-import net.sf.jxls.transformer.Row;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1375,9 +1372,35 @@ public class CompensateServiceImpl implements CompensateService {
                         oLogisticsDetailMap.put("OldAgentBusInfo", newOrgInfo.get(0));
                     }
                 }
+                if (PlatformType.ZHPOS.code.equals(oRefundPriceDiffDetail.getPlatformType())){
+                    if (null != oRefundPriceDiffDetail.getOldOrgId()) {
+                        List<AgentBusInfo> oldList = agentBusInfoMapper.queryBusinfo(FastMap.fastMap("busNum", oRefundPriceDiffDetail.getOldOrgId()));
+                        if (oldList.size() == 1 && null != oldList.get(0).getPosPlatCode()) {
+                            oRefundPriceDiffDetail.setOldPosPlatCode(oldList.get(0).getPosPlatCode());
+                        }
+                    }
+                    if (null != oRefundPriceDiffDetail.getNewOrgId()) {
+                        List<AgentBusInfo> newList = agentBusInfoMapper.queryBusinfo(FastMap.fastMap("busNum", oRefundPriceDiffDetail.getNewOrgId()));
+                        if (newList.size() == 1 && null != newList.get(0).getPosPlatCode()) {
+                            oRefundPriceDiffDetail.setNewPosPlatCode(newList.get(0).getPosPlatCode());
+                        }
+                    }
+                    if (null != oRefundPriceDiffDetail.getOldSupdOrgId()) {
+                        List<AgentBusInfo> newSupdList = agentBusInfoMapper.queryBusinfo(FastMap.fastMap("busNum", oRefundPriceDiffDetail.getOldSupdOrgId()));
+                        if (newSupdList.size() == 1 && null != newSupdList.get(0).getPosPlatCode()) {
+                            oRefundPriceDiffDetail.setOldSupdPosPlatCode(newSupdList.get(0).getPosPlatCode());
+                        }
+                    }
+                    if (null != oRefundPriceDiffDetail.getNewSupdOrgId()) {
+                        List<AgentBusInfo> newSupdList = agentBusInfoMapper.queryBusinfo(FastMap.fastMap("busNum", oRefundPriceDiffDetail.getNewSupdOrgId()));
+                        if (newSupdList.size() == 1 && null != newSupdList.get(0).getPosPlatCode()) {
+                            oRefundPriceDiffDetail.setNewSupdPosPlatCode(newSupdList.get(0).getPosPlatCode());
+                        }
+                    }
+                }
                 oRefundPriceDiffDetail.setRefundPriceDiffDetailMap(oLogisticsDetailMap);
             }
-        //历史订单数据查询
+            //历史订单数据查询
         }else{
             for (ORefundPriceDiffDetail oRefundPriceDiffDetail : oRefundPriceDiffDetails) {
                 OActivity oActivity = activityMapper.selectByPrimaryKey(oRefundPriceDiffDetail.getActivityFrontId());
@@ -1591,8 +1614,44 @@ public class CompensateServiceImpl implements CompensateService {
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         refundPriceDiffDetailExample.setPage(page);
         List<Map> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExampleExtends(par,page);
+        log.info("活动调整明细查询结果：{}", JSONObject.toJSONString(oRefundPriceDiffDetails));
+        //当活动明细中有智慧pos的话，查询s码放到Map中。
+        List<Map> maps = new ArrayList<>();
+        for (Map retMap: oRefundPriceDiffDetails){
+            if (PlatformType.ZHPOS.code.equals(retMap.get("platformType"))){
+                retMap.put("oldPosPlatCode", "");
+                if (null != retMap.get("oldOrgId")) {
+                    List<AgentBusInfo> oldList = agentBusInfoMapper.queryBusinfo(FastMap.fastMap("busNum", retMap.get("oldOrgId")));
+                    if (oldList.size() == 1 && null != oldList.get(0).getPosPlatCode()) {
+                        retMap.put("oldPosPlatCode", oldList.get(0).getPosPlatCode());
+                    }
+                }
+                retMap.put("newPosPlatCode", "");
+                if (null != retMap.get("newOrgId")) {
+                    List<AgentBusInfo> newList = agentBusInfoMapper.queryBusinfo(FastMap.fastMap("busNum", retMap.get("newOrgId")));
+                    if (newList.size() == 1 && null != newList.get(0).getPosPlatCode()) {
+                        retMap.put("newPosPlatCode", newList.get(0).getPosPlatCode());
+                    }
+                }
+                retMap.put("oldSupdPosPlatCode", "");
+                if (null != retMap.get("oldSupdOrgId")) {
+                    List<AgentBusInfo> newList = agentBusInfoMapper.queryBusinfo(FastMap.fastMap("busNum", retMap.get("oldSupdOrgId")));
+                    if (newList.size() == 1 && null != newList.get(0).getPosPlatCode()) {
+                        retMap.put("oldSupdPosPlatCode", newList.get(0).getPosPlatCode());
+                    }
+                }
+                retMap.put("newSupdPosPlatCode", "");
+                if (null != retMap.get("newSupdOrgId")) {
+                    List<AgentBusInfo> newList = agentBusInfoMapper.queryBusinfo(FastMap.fastMap("busNum", retMap.get("newSupdOrgId")));
+                    if (newList.size() == 1 && null != newList.get(0).getPosPlatCode()) {
+                        retMap.put("newSupdPosPlatCode", newList.get(0).getPosPlatCode());
+                    }
+                }
+            }
+            maps.add(retMap);
+        }
         PageInfo pageInfo = new PageInfo();
-        pageInfo.setRows(oRefundPriceDiffDetails);
+        pageInfo.setRows(maps);
         pageInfo.setTotal((int)refundPriceDiffDetailMapper.countByExample(refundPriceDiffDetailExample));
         return pageInfo;
     }
