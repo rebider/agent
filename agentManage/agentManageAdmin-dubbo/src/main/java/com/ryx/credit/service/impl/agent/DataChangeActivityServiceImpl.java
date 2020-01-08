@@ -984,7 +984,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                     for (Dict dict : list) {
                         String part = dict.getdItemname();
                         String[] partItems = part.split(":");
-                        if(partItems.length==5){
+                        if(partItems.length==4){
 
                             String part_djjg = partItems[0];//顶级机构
                             String part_dgds = partItems[1];//对公对私
