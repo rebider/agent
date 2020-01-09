@@ -7,10 +7,7 @@ import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.CUser;
-import com.ryx.credit.pojo.admin.agent.Agent;
-import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
-import com.ryx.credit.pojo.admin.agent.Dict;
-import com.ryx.credit.pojo.admin.agent.PlatForm;
+import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentBusinfoService;
@@ -22,6 +19,7 @@ import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.internet.pojo.*;
 import com.ryx.internet.service.InternetCardService;
+import com.ryx.internet.service.OInternetRenewService;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +78,8 @@ public class InternetCardServiceImpl implements InternetCardService {
     private PlatFormService platFormService;
     @Autowired
     private InternetLogoutDetailMapper internetLogoutDetailMapper;
-
+    @Autowired
+    private OInternetRenewService oInternetRenewService;
 
     @Override
     public PageInfo internetCardList(OInternetCard internetCard, Page page,String agentId,Long userId){
@@ -436,6 +435,16 @@ public class InternetCardServiceImpl implements InternetCardService {
                             oInternetCard.setPostponeTime(postponeTime);
                             oInternetCard.setPostponeCause(postponeCause.equals("null")?"":postponeCause);
                             jsonList = JsonUtil.objectToJson(oInternetCard);
+                        }else if(importType.equals(CardImportType.H.getValue())){
+                            OInternetRenew oInternetRenew = new OInternetRenew();
+                            String iccid = String.valueOf(string.size()>=1?string.get(0):"");// iccid
+                            String internetRenewWay = String.valueOf(string.size()>=2?string.get(1):"");// 续费方式
+                            String internetRenewWayCode = InternetRenewWay.getValueByContent(internetRenewWay);
+                            oInternetRenew.setIccidNumIds(iccid);
+                            oInternetRenew.setcUser(userId);
+                            oInternetRenew.setRenewWay(internetRenewWayCode);
+                            oInternetRenew.setRenewWayName(internetRenewWay);
+                            jsonList = JsonUtil.objectToJson(oInternetRenew);
                         }
                         OInternetCardImport oInternetCardImport = new OInternetCardImport();
                         oInternetCardImport.setId(idService.genId(TabId.O_INTERNET_CARD_IMPORT));
@@ -581,6 +590,24 @@ public class InternetCardServiceImpl implements InternetCardService {
                     updateInternetCardImport(oInternetCardImport);
                     //延期
                     internetCardService.internetCardPostpone(internetCardPostpone,oInternetCardImport.getcUser(),oInternetCardImport.getId(),oInternetCardImport.getBatchNum());
+                }else if(importType.equals(CardImportType.H.getValue())){ // 批量续费
+                    OInternetRenew oInternetRenew = JsonUtil.jsonToPojo(oInternetCardImport.getImportMsg(), OInternetRenew.class);
+                    if(null==oInternetRenew){
+                        throw new MessageException("导入信息不存在");
+                    }
+                    if(StringUtils.isBlank(oInternetRenew.getIccidNumIds())){
+                        throw new MessageException("缺少ICCID");
+                    }
+                    if(StringUtils.isBlank(oInternetRenew.getRenewWay())){
+                        throw new MessageException("缺少续费方式或不正确");
+                    }
+                    // 更新导入
+                    oInternetCardImport.setImportStatus(OInternetCardImportStatus.SUCCESS.getValue());
+                    updateInternetCardImport(oInternetCardImport);
+                    // 延期
+                    oInternetRenew.setRenewWay(oInternetRenew.getRenewWay());// 续费方式获取
+                    String iccids = oInternetRenew.getIccidNumIds();// ICCIDS
+                    oInternetRenewService.batchRenewInsert(oInternetRenew, iccids, batchNo);
                 }
             } catch (MessageException e) {
                 log.info("analysisImport处理导入表数据,MessageException:{}",e.getLocalizedMessage());
@@ -608,8 +635,6 @@ public class InternetCardServiceImpl implements InternetCardService {
             }
         }
     }
-
-
 
     /**
      * 处理业务逻辑
@@ -898,7 +923,7 @@ public class InternetCardServiceImpl implements InternetCardService {
             renewStatusList.add(InternetRenewStatus.WXF.getValue());
             renewStatusList.add(InternetRenewStatus.YXF.getValue());
             reqMap.put("renewStatusList",renewStatusList);
-            int i = internetCardMapper.selectInternetCardExpireCount(reqMap);
+            int i = internetCardMapper.selectInternetCardExpireCount(reqMap);//TODO 这里是查几个月呢？
             if(i>0){
                 int updateCount = internetCardMapper.updateInternetCardExpire(reqMap);
                 log.info("taskDisposeInternetCard：1检测是否续费,本次更次了数据条数:{}",updateCount);
