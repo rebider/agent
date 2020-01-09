@@ -1354,4 +1354,48 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         }
         return true;
     }
+
+    /**
+     * 顶级菜单客服服务-列表查询
+     * @param page
+     * @param map
+     * @return
+     */
+    @Override
+    public PageInfo queryBusinfoTopMenuList(Page page, Map map) {
+        Map<String, Object> reqMap = new HashMap<>();
+        reqMap.put("status", Status.STATUS_1.status);
+        reqMap.put("agStatus", AgStatus.Approved.name());
+        if (!StringUtils.isBlank((String)map.get("busNum"))) {
+            reqMap.put("busNum", (String)map.get("busNum"));
+        }
+        if (!StringUtils.isBlank((String)map.get("busPlatformList"))) {
+            reqMap.put("busPlatformList", Arrays.asList(((String)map.get("busPlatformList")).split(",")));
+        }
+        if (!StringUtils.isBlank((String)map.get("agName"))) {
+            reqMap.put("agName", (String)map.get("agName"));
+        }
+        if (!StringUtils.isBlank((String)map.get("agDocPro"))) {
+            reqMap.put("agDocPro", (String)map.get("agDocPro"));
+        }
+        if (!StringUtils.isBlank((String)map.get("busContactPerson"))) {
+            reqMap.put("busContactPerson", (String)map.get("busContactPerson"));
+        }
+        if (!StringUtils.isBlank((String)map.get("busStatus"))) {
+            reqMap.put("busStatus", (String)map.get("busStatus"));
+        }
+        if (!StringUtils.isBlank((String)map.get("cloReviewStatusList"))) {
+            List<String> list = Arrays.asList(((String)map.get("cloReviewStatusList")).split(","));
+            List<BigDecimal> voList = list.stream().map(str -> new BigDecimal(str.trim())).collect(Collectors.toList());
+            if(voList!=null && voList.size()>0)
+                reqMap.put("cloReviewStatusList", voList);
+        }
+        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm((Long)map.get("userId"));
+        reqMap.put("platfromPerm", platfromPerm);
+        List<Map<String, Object>> agentBusInfoList = agentBusInfoMapper.queryBusinfoTopMenuList(reqMap, page);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(agentBusInfoList);
+        pageInfo.setTotal(agentBusInfoMapper.queryBusinfoTopMenuCount(reqMap));
+        return pageInfo;
+    }
 }
