@@ -1083,4 +1083,29 @@ public class OLogisticServiceImpl implements OLogisticsService {
 
         return AgentResult.ok();
     }
+
+    /**
+     * 物流明细-批量退转发
+     * @param logsDetailId
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult updateByIdSnInfo(String logsDetailId, String userId) throws Exception {
+        OLogisticsDetail logisticsDetail = oLogisticsDetailMapper.selectByPrimaryKey(logsDetailId);
+        if (logisticsDetail != null) {
+            logisticsDetail.setuUser(userId);
+            logisticsDetail.setuTime(new Date());
+            logisticsDetail.setStatus(Status.STATUS_2.status);
+            logisticsDetail.setRecordStatus(Status.STATUS_3.status);
+            int updateInfo = oLogisticsDetailMapper.updateByPrimaryKeySelective(logisticsDetail);
+            if (updateInfo != 1) {
+                logger.info("批量退转发sn数据,更新数据库失败:{},{},{}", logisticsDetail.getId(), logisticsDetail.getSnNum());
+                throw new Exception("处理sn数据异常！");
+            }
+        }
+        return AgentResult.ok();
+    }
 }
