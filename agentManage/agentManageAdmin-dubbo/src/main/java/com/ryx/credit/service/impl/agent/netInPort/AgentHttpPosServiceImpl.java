@@ -188,6 +188,7 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
             AgentBusInfo actBudinfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusActivationParent());
             resultMap.put("actBusId",agentBusInfo.getBusActivationParent());
             resultMap.put("actBusNum",actBudinfo.getBusNum());
+            resultMap.put("reOrgId",actBudinfo.getBusNum());
         }
         //查询相关联的大区经理账号
         List accList = branchInnerMapper.selectInnerLogin(FastMap.fastMap("status", Status.STATUS_1.status).putKeyV("busId", agentBusInfo.getId()));
@@ -210,6 +211,8 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
             resultMap.put("IsOper","0");
             resultMap.put("operOrgId",orgPlatform.getPlatCode());
         }
+
+
         return resultMap;
     }
 
@@ -286,6 +289,7 @@ public class AgentHttpPosServiceImpl implements AgentNetInHttpService {
             data.put("agCode",paramMap.get("agCode"));//AG码
             data.put("actBusId",paramMap.get("actBusId"));//激活返现的业务id
             data.put("actBusNum",paramMap.get("actBusNum"));//激活返现的编码
+            data.put("reOrgId",paramMap.get("reOrgId"));//返现机构编码
             //关联账号增加关系
             if (null != paramMap.get("managerAccount"))
                 data.put("managerAccount",paramMap.get("managerAccount"));
