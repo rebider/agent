@@ -34,4 +34,14 @@ public interface InternetCardLogoutService {
 
     InternetLogout selectByPrimaryKey(String id);
 
+    /**
+     * 查询导出数目总和
+     * @param internetLogout
+     * @param page
+     * @param agentId
+     * @param userId
+     * @return
+     */
+    Integer internetCardLogoutCount(InternetLogout internetLogout, Page page, String agentId, Long userId);
+
 }
