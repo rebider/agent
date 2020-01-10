@@ -235,19 +235,21 @@ public class CompensateServiceImpl implements CompensateService {
                 throw new ProcessException("代理商信息不存在");
             }
             if(!agent.getId().equals(agentId)){
-                //先取业务中对接省区，业务中不存在按照原来代理商表中取
-                COrganization cOrganization = new COrganization();
-                if (null == agent.getAgDocPro()) {
+                //先取业务中对接省区
+                if(null!=stringObjectMap.get("BUS_ID")) {
+                    COrganization cOrganization = new COrganization();
                     AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(String.valueOf(stringObjectMap.get("BUS_ID")));
-                    if (null != agentBusInfo && null != agentBusInfo.getAgDocPro()){
+                    if (null != agentBusInfo && null != agentBusInfo.getAgDocPro()) {
                         cOrganization = organizationMapper.selectByPrimaryKey(Integer.valueOf(agentBusInfo.getAgDocPro()));
+                    } else {
+                        throw new ProcessException("未获取到对应的省区");
                     }
-                }else {
-                    cOrganization = organizationMapper.selectByPrimaryKey(Integer.valueOf(agent.getAgDocPro()));
-                }
-                if(!Pattern.matches(orgCode+".*",cOrganization.getCode())){
-                    log.info("不能提交其他省区的活动调整");
-                    throw new ProcessException("不能提交其他省区的活动调整");
+                    if (!Pattern.matches(orgCode + ".*", cOrganization.getCode())) {
+                        log.info("不能提交其他省区的活动调整");
+                        throw new ProcessException("不能提交其他省区的活动调整");
+                    }
+                }else{
+                    throw new ProcessException("未获取到对应的业务信息");
                 }
             }
             AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
