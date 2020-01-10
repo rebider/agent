@@ -355,7 +355,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         if(agentVo.getDeductCapitalList()!=null && agentVo.getDeductCapitalList().size()>0 && "pass".equals(agentVo.getApprovalResult())){
             OReturnOrder returnOrder = returnOrderMapper.selectByPrimaryKey(agentVo.getReturnId());
             returnOrder.setCutAmo(new BigDecimal(0));
-            returnOrder.setReturnAmo(new BigDecimal(0));
+            returnOrder.setReturnAmo(returnOrder.getGoodsReturnAmo());
             returnOrder.setuTime(new Date());
             returnOrderMapper.updateByPrimaryKeySelective(returnOrder);
             for (ODeductCapital oDeductCapital : agentVo.getDeductCapitalList()) {
