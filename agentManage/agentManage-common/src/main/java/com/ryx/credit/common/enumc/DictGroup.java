@@ -103,7 +103,12 @@ public enum DictGroup {
     ADJ_STAT("订单机具调整审批状态"),
     REFUND_TYPE("退款类型"),
     REFUND_STAT("退款状态"),
-    ORDER_ADJ_APR_BUSNISS("业务部订单调整审批参数");
+    ORDER_ADJ_APR_BUSNISS("业务部订单调整审批参数"),
+    FINACEORG_CONFIG("出款机构调整逻辑"),
+    FINACEORG_PAR("出款机构调整逻辑匹配模式配置"),
+    ;
+
+
 
     public String  msg;
 

@@ -3510,7 +3510,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public AgentResult updateStatus(String id, String user) {
+    public AgentResult updateStatus(String id, String user) throws Exception{
+        //删除订单
         if (null == user) return AgentResult.fail("操作用户不能为空");
         if (StringUtils.isBlank(id)) return AgentResult.fail("ID不能为空");
         OOrder oOrder = new OOrder();
@@ -3519,6 +3520,34 @@ public class OrderServiceImpl implements OrderService {
         oOrder.setStatus(Status.STATUS_0.status);
         if (1==orderMapper.updateByPrimaryKeySelective(oOrder)){
             return AgentResult.ok("成功");
+        }
+        //删除订单付款信息
+        OPaymentExample paymentExample = new OPaymentExample();
+        paymentExample.or().andOrderIdEqualTo(id);
+        List<OPayment> listPayment = oPaymentMapper.selectByExample(paymentExample);
+        for (OPayment oPayment : listPayment) {
+            oPayment.setStatus(Status.STATUS_0.status);
+            if(1!=oPaymentMapper.updateByPrimaryKeySelective(oPayment)){
+                throw new MessageException("删除订单付款单失败");
+            }
+            //删除付款信息打款记录
+            List<OCashReceivables> oCashReceivables = oCashReceivablesService.query(null,null,null,oPayment.getId(),null);
+            for (OCashReceivables oCashReceivable : oCashReceivables) {
+                oCashReceivable.setStatus(Status.STATUS_0.status);
+                if(!oCashReceivablesService.dele(oCashReceivable,user).isOK()){
+                    throw new MessageException("删除订单付款单失败");
+                }
+            }
+        }
+        //订单付款明细
+        OPaymentDetailExample paymentDetailExample = new OPaymentDetailExample();
+        paymentDetailExample.or().andOrderIdEqualTo(id);
+        List<OPaymentDetail> paymentDetails = oPaymentDetailMapper.selectByExample(paymentDetailExample);
+        for (OPaymentDetail paymentDetail : paymentDetails) {
+            paymentDetail.setStatus(Status.STATUS_0.status);
+            if(1!=oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail)){
+                throw new MessageException("删除订单付款单失败");
+            }
         }
         return AgentResult.fail();
     }

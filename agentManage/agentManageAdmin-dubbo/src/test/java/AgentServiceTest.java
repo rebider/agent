@@ -5,6 +5,7 @@ import com.ryx.credit.dao.order.OLogisticsDetailMapper;
 import com.ryx.credit.dao.order.ReceiptPlanMapper;
 import com.ryx.credit.service.agent.AgentNotifyService;
 import com.ryx.credit.service.agent.AgentService;
+import com.ryx.credit.service.agent.DataChangeActivityService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.order.OLogisticsService;
 import com.ryx.credit.service.order.TerminalTransferService;
@@ -36,6 +37,8 @@ public class AgentServiceTest extends BaseSpringTest  {
     private AgentNetInNotityService agentNetInNotityService;
     @Autowired
     private TerminalTransferService terminalTransferService;
+    @Autowired
+    private DataChangeActivityService dataChangeActivityService;
 
     @Test
     public void testNotify(){
@@ -73,6 +76,14 @@ public class AgentServiceTest extends BaseSpringTest  {
             Map<String, Object> data =  terminalTransferService.disposeSN("000024026311890023316094","000024026311890023316094");
             System.out.println(data);
          } catch (MessageException e) {
+            e.printStackTrace();
+        }
+    }
+    @Test
+    public void adjustFinanceOrgByAccount(){
+        try {
+            dataChangeActivityService.adjustFinanceOrgByAccount("AG20013748164");
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

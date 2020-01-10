@@ -9,8 +9,11 @@ import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.RegexUtil;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
+import com.ryx.credit.dao.order.OOrderMapper;
 import com.ryx.credit.dao.order.OrganizationMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.order.OOrder;
+import com.ryx.credit.pojo.admin.order.OOrderExample;
 import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.order.OrganizationExample;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
@@ -20,6 +23,7 @@ import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.dict.DictOptionsService;
+import oracle.sql.BINARY_DOUBLE;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +73,8 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
     @Autowired
     private AgentMapper agentMapper;
     @Autowired
+    private OOrderMapper orderMapper;
+    @Autowired
     private OrganizationMapper organizationMapper;
     @Autowired
     private PlatFormService platFormService;
@@ -103,6 +109,42 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
     public AgentResult approvalTask(AgentVo agentVo,String userId) throws Exception{
 
         try {
+            //入网-新增业务审批流 发起人退回时要验证有没有订单
+            String approvalResult = agentVo.getApprovalResult();
+            if ("cancel".equals(approvalResult)){
+                String sid = agentVo.getSid();
+                BusActRel record = busActRelMapper.findById(sid);
+                if (BusActRelBusType.Agent.name().equals(record.getBusType())){//代理商入网审批
+                    List<AgentBusInfo> agentBusInfos = agentBusinfoService.agentBusInfoList(record.getAgentId());
+                    if (agentBusInfos.size()==1){
+                        OOrderExample example=new OOrderExample();
+                        OOrderExample.Criteria criteria = example.createCriteria();
+                        criteria.andBusIdEqualTo(agentBusInfos.get(0).getId());
+                        criteria.andStatusEqualTo(BigDecimal.ONE);
+                        List<BigDecimal> list=new ArrayList<BigDecimal>();
+                        list.add(new BigDecimal(2));
+                        list.add(new BigDecimal(3));
+                        criteria.andReviewStatusIn(list);
+                        List<OOrder> orders = orderMapper.selectByExample(example);
+                        if (orders.size()>0){
+                            throw new RuntimeException("此业务平台有关联订单，不允许撤销审批，如有问题，请线下联系业务人员。");
+                        }
+                    }
+                }else if (BusActRelBusType.Business.name().equals(record.getBusType())){//业务审批
+                    OOrderExample example=new OOrderExample();
+                    OOrderExample.Criteria criteria = example.createCriteria();
+                    criteria.andBusIdEqualTo(record.getBusId());
+                    criteria.andStatusEqualTo(BigDecimal.ONE);
+                    List<BigDecimal> list=new ArrayList<BigDecimal>();
+                    list.add(new BigDecimal(2));
+                    list.add(new BigDecimal(3));
+                    criteria.andReviewStatusIn(list);
+                    List<OOrder> orders = orderMapper.selectByExample(example);
+                    if (orders.size()>0){
+                        throw new RuntimeException("此业务平台有关联订单，不允许撤销审批，如有问题，请线下联系业务人员。");
+                    }
+                }
+            }
             taskApprovalService.updateApproval(agentVo, userId);
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
             if(!result.isOK()){

@@ -298,7 +298,9 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                     db_AgentColinfo.setCloInvoice(agentColinfoVo.getCloInvoice());
                     db_AgentColinfo.setCloTaxPoint(agentColinfoVo.getCloTaxPoint());
                     db_AgentColinfo.setCloBankCode(agentColinfoVo.getCloBankCode());
-                    db_AgentColinfo.setPayStatus(ColinfoPayStatus.A.getValue());
+                    if(agentColinfoVo.getPayStatus()==null) {
+                        db_AgentColinfo.setPayStatus(ColinfoPayStatus.A.getValue());
+                    }
                     if (agLegalName.equals(trueName)) {
                         db_AgentColinfo.setAgLegalCernum(agent.getAgLegalCernum());
                     } else {

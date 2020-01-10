@@ -309,36 +309,18 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                         for (AgentColinfoVo agentColinfoVo : colinfoVoList) {
                             agentColinfoVo.setCloReviewStatus(AgStatus.Approved.status);
                         }
+                        //代理商编号判断
+                        if(StringUtils.isBlank(vo.getAgent().getId()))throw new ProcessException("代理商编号为空");
+                        //将结算卡更新到数据库
                         ResultVO res = agentColinfoService.updateAgentColinfoVo(vo.getColinfoVoList(), vo.getAgent(),rel.getcUser(),null);
                         logger.info("========审批流完成{}业务{}状态{},结果{}", proIns, rel.getBusType(), agStatus, res.getResInfo());
                         //更新数据状态为审批成功
                         if(res.isSuccess()){
-                            //调整出款机构
-                            if(vo!=null && vo.getColinfoVoList()!=null && vo.getColinfoVoList().size()>0 && vo.getAgent()!=null && vo.getAgent().getId()!=null){
-                                //查询业务调整出款机构
-                                AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
-                                agentBusInfoExample.or()
-                                        .andStatusEqualTo(Status.STATUS_1.status)
-                                        .andCloReviewStatusEqualTo(AgStatus.Approved.status)
-                                        .andAgentIdEqualTo(vo.getAgent().getId());
-                                List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
-
-                                for (AgentColinfoVo agentColinfoVo : vo.getColinfoVoList()) {
-                                    for (AgentBusInfo agentBusInfo : agentBusInfoList) {
-                                        //如果对公就调整出款公司为瑞银信
-                                        if(agentColinfoVo.getCloType()!= null && BigDecimal.valueOf(1).compareTo(agentColinfoVo.getCloType())==0){
-                                            agentBusInfo.setFinaceRemitOrgan("ORG20190625000000000000048");
-                                            //对私为湶致
-                                        }else  if(agentColinfoVo.getCloType()!= null && BigDecimal.valueOf(2).compareTo(agentColinfoVo.getCloType())==0){
-                                            agentBusInfo.setFinaceRemitOrgan("ORG20190627000000000000000");
-                                        }
-                                        agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
-                                    }
-
-                                }
+                            //调整业务出款机构
+                            ResultVO adjustFinOrg =  dataChangeActivityService.adjustFinanceOrgByAccount(vo.getAgent().getId());
+                            if(!adjustFinOrg.isSuccess()){
+                                throw new ProcessException("出款机构调整失败");
                             }
-
-
                             dr.setAppyStatus(AgStatus.Approved.status);
                             dr.setcUpdate(Calendar.getInstance().getTime());
                             logger.info("========审批流完成{}业务{}状态{},结果{}",proIns,rel.getBusType(),agStatus,"更新数据申请成功");
@@ -935,7 +917,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         return AgentResult.ok();
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public int updateByPrimaryKeySelective(DateChangeRequest dateChangeRequest){
         int i = dateChangeRequestMapper.updateByPrimaryKeySelective(dateChangeRequest);
@@ -973,5 +955,103 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             return false;
         }
         return true;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public ResultVO adjustFinanceOrgByAccount(String agentId) throws Exception {
+        try {
+            //查询结算卡
+            AgentColinfo agentColinfo = agentColinfoMapper.selectByAgentId(agentId);
+            //查询代理商业务
+            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+            agentBusInfoExample.or()
+                    .andAgentIdEqualTo(agentId)
+                    .andStatusEqualTo(Status.STATUS_1.status)
+                    .andOrganNumIsNotNull();
+            List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+            //线上出款机构调整逻辑
+            //对公 且 开票 出款机构瑞银信 ALL:1:1:orgryx
+            //顶级机构为瑞银信的   对私 不开票 出款机构为 烟台澜韵信息技术有限公司 orgryx:2:0:org烟台澜韵信息技术有限公司
+            //顶级机构为非瑞银信的 对私 不开票 出款机构为 出款机构顶级机构        !orgryx:2:0:TOPORG
+            //顶级机构为瑞银信的   对公 不开票 出款机构为 烟台澜韵信息技术有限公司 orgryx:1:0:org烟台澜韵信息技术有限公司
+            //顶级机构为非瑞银信的 对公 不开票 出款机构为 烟台澜韵信息技术有限公司 !orgryx:1:0:org烟台澜韵信息技术有限公司
+            List<Dict> list = dictOptionsService.dictList(DictGroup.FINACEORG_CONFIG.name(),DictGroup.FINACEORG_PAR.name());
+            //遍历所有有效业务进行出款公司的变更
+            for (AgentBusInfo agentBusInfo : agentBusInfoList) {
+
+                    //表达式循环匹配
+                    for (Dict dict : list) {
+                        String part = dict.getdItemname();
+                        String[] partItems = part.split(":");
+                        if(partItems.length==4){
+
+                            String part_djjg = partItems[0];//顶级机构
+                            String part_dgds = partItems[1];//对公对私
+                            String part_isv = partItems[2];//是否开票
+                            String part_ckjg = partItems[3];//出款机构
+                            //顶级机构等于或者不等于
+                            if(!"ALL".equalsIgnoreCase(part_djjg)) {
+                                //顶级机构取非
+                                if (part_djjg.startsWith("!")) {
+                                    //不等于匹配
+                                    part_djjg = part_djjg.replace("!", "");
+                                    if(!part_djjg.equals(agentBusInfo.getOrganNum())){
+                                        logger.info("表达式匹配 顶级机构:{} {}",agentBusInfo.getOrganNum(),part);
+                                    }else{
+                                        logger.info("表达式不匹配 顶级机构:{} {}",agentBusInfo.getOrganNum(),part);
+                                        continue;
+                                    }
+                                }else{
+                                    //等于匹配
+                                    if(part_djjg.equals(agentBusInfo.getOrganNum())){
+                                        logger.info("表达式匹配 顶级机构:{} {}",agentBusInfo.getOrganNum(),part);
+                                    }else{
+                                        logger.info("表达式不匹配 顶级机构:{} {}",agentBusInfo.getOrganNum(),part);
+                                        continue;
+                                    }
+                                }
+                            }
+
+                            //银行卡类型匹配
+                            if(agentColinfo.getCloType()!=null && agentColinfo.getCloType().toPlainString().equals(part_dgds)){
+                                logger.info("表达式匹配 银行卡类型:{} {}",agentColinfo.getCloType(),part);
+                            }else{
+                                logger.info("表达式不匹配 银行卡类型:{} {}",agentColinfo.getCloType(),part);
+                                continue;
+                            }
+
+                            //开票类型类型匹配
+                            if(agentColinfo.getCloInvoice()!=null && agentColinfo.getCloInvoice().toPlainString().equals(part_isv)){
+                                logger.info("表达式匹配 开票类型:{} {}",agentColinfo.getCloType(),part);
+                            }else{
+                                logger.info("表达式不匹配 开票类型:{} {}",agentColinfo.getCloType(),part);
+                                continue;
+                            }
+                            logger.info("结算卡变更调整出款公司 {} {} 变更前出款公司 {}",agentBusInfo.getId(),agentBusInfo.getBusNum(),agentBusInfo.getFinaceRemitOrgan());
+                            if("TOPORG".equalsIgnoreCase(part_ckjg)){
+                                agentBusInfo.setFinaceRemitOrgan(agentBusInfo.getOrganNum());
+                            }else{
+                                agentBusInfo.setFinaceRemitOrgan(part_ckjg);
+                            }
+                            if(agentBusInfo.getFinaceRemitOrgan() == null || null == organizationMapper.selectByPrimaryKey(agentBusInfo.getFinaceRemitOrgan())){
+                                throw new MessageException("顶级机构未找到");
+                            }
+                            logger.info("结算卡变更调整出款公司 {} {} 变更后出款公司 {}",agentBusInfo.getId(),agentBusInfo.getBusNum(),agentBusInfo.getFinaceRemitOrgan());
+                            if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)){
+                                logger.info("结算卡变更调整出款公司 变更数据库失败 抛出异常 {} {} 变更后出款公司 {}",agentBusInfo.getId(),agentBusInfo.getBusNum(),agentBusInfo.getFinaceRemitOrgan());
+                                throw new MessageException("出款机构更新失败");
+                            }
+                            break;
+                        }
+
+                    }
+            }
+            return ResultVO.success(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("调整出款机构失败 {} {}",agentId,e.getMessage());
+            throw new MessageException("调整出款机构失败");
+        }
     }
 }

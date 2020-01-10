@@ -566,4 +566,52 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
         InternetLogout internetLogout = internetLogoutMapper.selectByPrimaryKey(id);
         return internetLogout;
     }
+
+    /**
+     * 查询导出数目总和
+     * @param internetLogout
+     * @param page
+     * @param agentId
+     * @param userId
+     * @return
+     */
+    @Override
+    public Integer internetCardLogoutCount(InternetLogout internetLogout, Page page, String agentId, Long userId){
+        Map<String, Object> reqMap = new HashMap<>();
+        if(StringUtils.isNotBlank(internetLogout.getId())){
+            reqMap.put("id",internetLogout.getId());
+        }
+        if(StringUtils.isNotBlank(agentId)){
+            reqMap.put("agentId",agentId);
+        }else if(StringUtils.isNotBlank(internetLogout.getAgentId())){
+            reqMap.put("agentId",internetLogout.getAgentId());
+        }
+        if(StringUtils.isNotBlank(internetLogout.getAgentName())){
+            reqMap.put("agentName",internetLogout.getAgentName());
+        }
+        if(StringUtils.isNotBlank(internetLogout.getBusNum())){
+            reqMap.put("busNum",internetLogout.getBusNum());
+        }
+        if(null!=internetLogout.getReviewStatus()){
+            reqMap.put("reviewStatus",internetLogout.getReviewStatus());
+        }
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+        if(orgCodeRes==null && orgCodeRes.size()!=1){
+            return 0;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        //省区大区查看自己的代理商 部门权限
+        if(StringUtils.isNotBlank(organizationCode) && (organizationCode.contains("region") || organizationCode.contains("beijing"))) {
+            reqMap.put("orgCode", organizationCode);
+        }
+        //内部人员根据名称查询指定流量卡
+        List<String> agentNameList = dictOptionsService.getAgentNameList(userId);
+        if(agentNameList.size()!=0) {
+            reqMap.put("agentNameList", agentNameList);
+        }
+        reqMap.put("page",page);
+        int total  = internetLogoutMapper.internetCardLogoutCount(reqMap);
+        return total;
+    }
 }

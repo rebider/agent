@@ -35,4 +35,16 @@ public interface DataChangeActivityService {
 
 
     ResultVO deleteDataChange(String dataChangeId, String userId) throws Exception;
+
+
+    /**
+     * 根据代理商结算卡调整业务出款公司
+     * @param agentId
+     * @return
+     * @throws Exception
+     */
+    ResultVO adjustFinanceOrgByAccount(String agentId)throws Exception;
+
+
+
 }
