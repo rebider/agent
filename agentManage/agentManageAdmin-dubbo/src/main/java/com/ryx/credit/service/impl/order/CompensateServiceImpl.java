@@ -234,6 +234,7 @@ public class CompensateServiceImpl implements CompensateService {
                 log.info("代理商信息不存在");
                 throw new ProcessException("代理商信息不存在");
             }
+            //如果SN代理商和登录代理商不一样就校验省区代码是否有权限提交
             if(!agent.getId().equals(agentId)){
                 //先取业务中对接省区
                 if(null!=stringObjectMap.get("BUS_ID")) {
