@@ -121,16 +121,21 @@ public class LogoutMobileStopJobServiceImpl implements LogoutMobileStopJobServic
                             internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.DZX.getValue());
                             oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());
                         }else{
-                            if(StringUtils.isNotBlank(jsonData.getString("error")) && jsonData.getString("error").contains("请降低服务访问的频率")){
+                            String error = jsonData.getString("error");
+                            if(StringUtils.isNotBlank(error) && error.contains("请降低服务访问的频率")){
                                 continue;
                             }
                             internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.TJSB.getValue());
                             oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
+                            if(error.equals("该号码已经是停机")){
+                                internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.DZX.getValue());
+                                oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());
+                            }
                         }
                         if(StringUtils.isNotBlank(jsonData.getString("orderNo")))
-                            internetLogoutDetail.setMobileOrderNo(jsonData.getString("orderNo"));
+                        internetLogoutDetail.setMobileOrderNo(jsonData.getString("orderNo"));
                         if(StringUtils.isNotBlank(jsonData.getString("error")))
-                            internetLogoutDetail.setFailCause(jsonData.getString("error"));
+                        internetLogoutDetail.setFailCause(jsonData.getString("error"));
                         internetLogoutDetail.setuTime(new Date());
                         int i = internetLogoutDetailMapper.updateByPrimaryKey(internetLogoutDetail);
                         if(i!=1){

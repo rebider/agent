@@ -9,6 +9,7 @@ import java.util.Map;
 import org.apache.commons.codec.Charsets;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -74,8 +75,11 @@ public class HttpClientUtil {
 		CloseableHttpResponse response = null;
 		String resultString = "";
 		try {
+			RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(30000)
+					.setSocketTimeout(30000).setConnectTimeout(30000).build();
 			// 创建Http Post请求
 			HttpPost httpPost = new HttpPost(url);
+			httpPost.setConfig(requestConfig);
 			// 创建参数列表
 			if (param != null) {
 				List<NameValuePair> paramList = new ArrayList<>();
