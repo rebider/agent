@@ -117,7 +117,7 @@ public class LogoutMobileStopJobServiceImpl implements LogoutMobileStopJobServic
                     }else {
                         JSONObject jsonData = JSONObject.parseObject(jsonObj.getString("data"));
                         String dataCode = jsonData.getString("code");
-                        if(jsonData.getString("error").contains("请降低服务访问的频率")){
+                        if(StringUtils.isNotBlank(jsonData.getString("error")) && jsonData.getString("error").contains("请降低服务访问的频率")){
                             continue;
                         }
                         if(dataCode.equals("0")){
