@@ -2,6 +2,7 @@ package junit;
 
 
 import com.ryx.credit.activity.entity.ActIdUser;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.service.ActIdUserService;
 import com.ryx.credit.service.ActivityService;
 import org.activiti.engine.ProcessEngine;
@@ -10,6 +11,7 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.activiti.engine.repository.ProcessDefinition;
+import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ExecutionQuery;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -222,6 +224,42 @@ public class Test {
         });
 
     }
+
+
+    @org.junit.Test
+    public void testStartProcess(){
+        RuntimeService runtimeService = processEngineConfiguration.buildProcessEngine().getRuntimeService();
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("test_bingxing_back",
+                FastMap.fastMap("v",1)
+                .putKeyV("res","pass")
+                        .putKeyV("user1","pass")
+                        .putKeyV("user2","reject"));
+        System.out.println(processInstance.getId());
+        System.out.println(processInstance.getDeploymentId());
+        System.out.println(processInstance.getBusinessKey());
+//        test_process_var
+    }
+
+
+    @org.junit.Test
+    public void completTask(){
+        TaskService taskService = processEngineConfiguration.buildProcessEngine().getTaskService();
+//        taskService.complete("4472509");
+        taskService.complete("4475005",FastMap.fastMap("v",1)
+                .putKeyV("user1","pass"));
+        taskService.complete("4475007",FastMap.fastMap("v",1)
+                .putKeyV("user2","pass"));
+        System.out.println("任务完成");
+    }
+
+    @org.junit.Test
+    public void qeurySelectActivity(){
+        ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
+        RepositoryService repositoryService = processEngine.getRepositoryService();
+        ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery();
+
+    }
+
 
 
 }
