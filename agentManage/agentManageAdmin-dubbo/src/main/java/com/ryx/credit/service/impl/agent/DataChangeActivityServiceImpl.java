@@ -687,15 +687,9 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                 agent.getAgRegAdd().equals(preagent.getAgRegAdd()); //注册地址
     }
 
-
-    /**
-     * 处理任务
-     * @return
-     */
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception{
-
+    public AgentResult approvalTaskBusi(AgentVo agentVo, String userId) throws Exception {
         try {
             List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(userId));
             if(orgCodeRes==null && orgCodeRes.size()!=1){
@@ -709,23 +703,23 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             }
             //财务审批
             if(orgCode.equals("finance")){
-/*//                财务填写实际到账金额
-                for (CapitalVo  capitalVo:agentVo.getCapitalVoList()){
-                    if (capitalVo.getcPayType().equals(PayType.YHHK.code)){
-                        if (null==capitalVo.getcInAmount() || capitalVo.getcInAmount().equals("")){
-                            logger.info("请填写实际到账金额");
-                            throw new ProcessException("请填写实际到账金额");
+    /*//                财务填写实际到账金额
+                    for (CapitalVo  capitalVo:agentVo.getCapitalVoList()){
+                        if (capitalVo.getcPayType().equals(PayType.YHHK.code)){
+                            if (null==capitalVo.getcInAmount() || capitalVo.getcInAmount().equals("")){
+                                logger.info("请填写实际到账金额");
+                                throw new ProcessException("请填写实际到账金额");
+                            }
+                            if (StringUtils.isNotBlank(capitalVo.getTime())){
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                Date cPaytime = sdf.parse(capitalVo.getTime());
+                                capitalVo.setcPaytime(cPaytime);
+                            }
+                            if(null!=capitalVo.getcInAmount()){
+                                capitalVo.setcFqInAmount(capitalVo.getcInAmount());
+                            }
                         }
-                        if (StringUtils.isNotBlank(capitalVo.getTime())){
-                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                            Date cPaytime = sdf.parse(capitalVo.getTime());
-                            capitalVo.setcPaytime(cPaytime);
-                        }
-                        if(null!=capitalVo.getcInAmount()){
-                            capitalVo.setcFqInAmount(capitalVo.getcInAmount());
-                        }
-                    }
-                }*/
+                    }*/
                 //数据修改
                 if(dateChangeRequest.getDataType().equals(DataChangeApyType.DC_Agent.name())){
                     AgentVo vo = JSONObject.parseObject(dateChangeRequest.getDataContent(), AgentVo.class);
@@ -756,8 +750,10 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                 //数据修改
                 if(dateChangeRequest.getDataType().equals(DataChangeApyType.DC_Agent.name())){
                     AgentVo vo = JSONObject.parseObject(dateChangeRequest.getDataContent(), AgentVo.class);
+                    logger.info("处理任务：更新失败 更新DataContent {} {}",orgCode,dateChangeRequest.getDataContent());
                     vo.setEditDebitList(agentVo.getEditDebitList());
                     String voJson = JSONObject.toJSONString(vo);
+                    logger.info("处理任务：更新失败 更新AFTER DataContent {} {}",orgCode,voJson);
                     dateChangeRequest.setDataContent(voJson);
                     int i = dataChangeActivityService.updateByPrimaryKeySelective(dateChangeRequest);
                     if(i!=1){
@@ -870,7 +866,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                     }
                                 }
                             }
-//
+    //
                             AgentVo vo = JSONObject.parseObject(dateChangeRequest.getDataContent(), AgentVo.class);
                             List<AgentBusInfoVo> busInfoVoList = vo.getBusInfoVoList();
                             for (AgentBusInfoVo busInfoVo : busInfoVoList) {
@@ -904,7 +900,28 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                 }
 
             }
+            return AgentResult.ok();
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            throw e;
+        } catch (ProcessException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
 
+    /**
+     * 处理任务
+     * @return
+     */
+    @Override
+    public AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception{
+        logger.info("信息变更，任务处理，传递参数{}", JSONObject.toJSONString(agentVo));
+        try {
+            AgentResult resultBus = dataChangeActivityService.approvalTaskBusi(agentVo,userId);
+            if(!resultBus.isOK()){
+                throw new ProcessException(resultBus.getMsg());
+            }
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
             if(!result.isOK()){
                 logger.error(result.getMsg());

@@ -98,16 +98,27 @@ public class LogoutMobileStopJobServiceImpl implements LogoutMobileStopJobServic
                     String code = jsonObj.getString("code");
                     //所有非0返回结果码均表示请求处理失败
                     if(!code.equals("0")){
+                        String error = jsonObj.getString("error");
+                        if(StringUtils.isNotBlank(error) && error.contains("请降低服务访问的频率")){
+                            continue;
+                        }
                         log.info("logoutMobileStopJob申请注销明细通知移动,code!=0,error:{}",jsonObj.getString("error"));
                         internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.TJSB.getValue());
-                        internetLogoutDetail.setFailCause(jsonObj.getString("error"));
+                        internetLogoutDetail.setFailCause(error);
                         internetLogoutDetail.setuTime(new Date());
+                        if(error.equals("该号码已经是停机")){
+                            internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.DZX.getValue());
+                        }
                         int i = internetLogoutDetailMapper.updateByPrimaryKey(internetLogoutDetail);
                         if(i!=1){
                             AppConfig.sendEmails("logoutMobileStopJob申请注销明细通知移动，更新异常3，iccid："+internetLogoutDetail.getIccidNum(), "申请注销明细通知移动出现异常,logoutMobileStopJob方法");
                             continue;
                         }
                         oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
+                        if(error.equals("该号码已经是停机")) {
+                            oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());
+                            oInternetCard.setRenew(Status.STATUS_0.status);
+                        }
                         oInternetCard.setuTime(new Date());
                         int k = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
                         if(k!=1){
@@ -120,17 +131,15 @@ public class LogoutMobileStopJobServiceImpl implements LogoutMobileStopJobServic
                         if(dataCode.equals("0")){
                             internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.DZX.getValue());
                             oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());
+                            oInternetCard.setRenew(Status.STATUS_0.status);
                         }else{
-                            if(StringUtils.isNotBlank(jsonData.getString("error")) && jsonData.getString("error").contains("请降低服务访问的频率")){
-                                continue;
-                            }
                             internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.TJSB.getValue());
                             oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
                         }
                         if(StringUtils.isNotBlank(jsonData.getString("orderNo")))
-                            internetLogoutDetail.setMobileOrderNo(jsonData.getString("orderNo"));
+                        internetLogoutDetail.setMobileOrderNo(jsonData.getString("orderNo"));
                         if(StringUtils.isNotBlank(jsonData.getString("error")))
-                            internetLogoutDetail.setFailCause(jsonData.getString("error"));
+                        internetLogoutDetail.setFailCause(jsonData.getString("error"));
                         internetLogoutDetail.setuTime(new Date());
                         int i = internetLogoutDetailMapper.updateByPrimaryKey(internetLogoutDetail);
                         if(i!=1){
@@ -157,10 +166,4 @@ public class LogoutMobileStopJobServiceImpl implements LogoutMobileStopJobServic
         log.info("logoutMobileStopJob申请注销明细通知移动关停结束");
     }
 
-    public static void main(String[] args){
-        String str ="应用调用服务的频率超限:请降低服务访问的频率[isv.invalid-invoketimes-group:xxx->频繁调用次数20/分钟;]";
-        boolean aa = str.contains("请降低服务访问的频率");
-            System.out.println(aa);
-
-    }
 }
