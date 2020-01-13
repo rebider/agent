@@ -30,7 +30,6 @@ public class BaseTaskListener {
             groupId = iterator.next().getGroupId();
         }
         String processInstanceId = delegateTask.getProcessInstanceId();
-        String executionId = delegateTask.getExecutionId();
         String eventName = delegateTask.getEventName();
         notifyEmailService.notifyEmail(groupId,processInstanceId,eventName);
     }
