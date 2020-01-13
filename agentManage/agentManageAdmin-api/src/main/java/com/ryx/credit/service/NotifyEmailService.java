@@ -5,6 +5,6 @@ package com.ryx.credit.service;
  */
 public interface NotifyEmailService {
 
-    void notifyEmail(String groupId,String executionId,String eventName);
+    void notifyEmail(String groupId,String processInstanceId,String eventName);
 
 }

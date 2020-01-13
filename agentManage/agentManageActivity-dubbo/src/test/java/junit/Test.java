@@ -10,6 +10,10 @@ import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
+import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
+import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.activiti.engine.impl.pvm.process.ActivityImpl;
+import org.activiti.engine.impl.pvm.runtime.ExecutionImpl;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.engine.runtime.Execution;
@@ -255,8 +259,31 @@ public class Test {
     @org.junit.Test
     public void qeurySelectActivity(){
         ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
-        RepositoryService repositoryService = processEngine.getRepositoryService();
-        ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery();
+
+
+        RepositoryService repositoryService =  processEngineConfiguration.getRepositoryService();
+        ProcessDefinitionEntity processDefinitionEntity = (ProcessDefinitionEntity)repositoryService.createProcessDefinitionQuery().processDefinitionKey("test_bingxing_back").active().singleResult();
+
+        RuntimeService runtimeService = processEngine.getRuntimeService();
+        List<ProcessDefinition> definitions =  processEngine.getRepositoryService()
+                .createProcessDefinitionQuery().processDefinitionKey("test_bingxing_back").list();
+
+        List<ProcessInstance> processDefinitionQuery = runtimeService.createProcessInstanceQuery()
+                .processDefinitionKey("test_bingxing_back")
+                .processInstanceId("4482501").list();
+        for (ProcessInstance processInstance : processDefinitionQuery) {
+            ExecutionImpl execution = (ExecutionImpl)processInstance;
+            execution.getActivity();
+            System.out.println("--------:"+processInstance.getTenantId());
+            System.out.println("--------:"+processInstance.getBusinessKey());
+            System.out.println("--------:"+processInstance.getDeploymentId());
+            System.out.println("--------:"+processInstance.getProcessDefinitionKey());
+            System.out.println("--------:"+processInstance.getProcessDefinitionId());
+            System.out.println("--------:"+processInstance.getActivityId());
+
+        }
+
+
 
     }
 
