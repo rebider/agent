@@ -29,6 +29,7 @@ public interface DataChangeActivityService {
 
 
     AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception;
+    AgentResult approvalTaskBusi(AgentVo agentVo, String userId) throws Exception;
 
 
     int updateByPrimaryKeySelective(DateChangeRequest dateChangeRequest);
