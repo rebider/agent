@@ -3066,7 +3066,12 @@ public class OrderServiceImpl implements OrderService {
     public AgentResult subOrderPeiHuoUpdate(OReceiptPro oReceiptPro) throws Exception {
 
         logger.info("用户{}修改{}", oReceiptPro.getuUser(), JSONObject.toJSONString(oReceiptPro));
-
+        BigDecimal flag = new BigDecimal(0);
+        if(null!=oReceiptPro){
+            if(null!=oReceiptPro.getProNum()){
+                flag=oReceiptPro.getProNum();
+            }
+        }
         //数据库配货地址商品
         OReceiptPro oReceiptPro_db = oReceiptProMapper.selectByPrimaryKey(oReceiptPro.getId());
         oReceiptPro_db.setuUser(oReceiptPro.getuUser());
@@ -3110,17 +3115,21 @@ public class OrderServiceImpl implements OrderService {
             throw new MessageException("商品"+oReceiptPro_db.getProName()+"修改失败,订单商品总数"+sum+"超出"+count.subtract(sum)+"件");
         }
 
+        if(flag.compareTo(oReceiptPro_db.getSendNum())==-1){
+            logger.info("已部分排单,最低可调整为"+oReceiptPro_db.getSendNum()+"台");
+            throw new MessageException("已部分排单,最低可调整为"+oReceiptPro_db.getSendNum()+"台");
+        } else if(flag.compareTo(oReceiptPro_db.getSendNum())==0){
+            oReceiptPro_db.setReceiptProStatus(OReceiptStatus.DISPATCHED_ORDER.code);
+        }
         //还得判断已排单和订货数量
         ReceiptPlanExample receiptPlanExample = new ReceiptPlanExample();
         ReceiptPlanExample.Criteria criteria2 = receiptPlanExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andReceiptIdEqualTo(oReceiptPro_db.getReceiptId()).andProIdEqualTo(oReceiptPro_db.getId());
         List<ReceiptPlan> receiptPlans = receiptPlanMapper.selectByExample(receiptPlanExample);
-        BigDecimal planCount = new BigDecimal(0);
+    /*    BigDecimal planCount = new BigDecimal(0);
         if (null!=receiptPlans && receiptPlans.size()>0){
             logger.info("已排单,不可修改,如需要请联系业务部撤销排单");
             throw new MessageException("已排单,不可修改,如需要请联系业务部撤销排单");
-        }
-
-
+        }*/
 
         if (null != oReceiptPro.getProNum()) {
             oReceiptPro_db.setProNum(oReceiptPro.getProNum());
@@ -3650,7 +3659,12 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public AgentResult deletePeihuoAction(OReceiptPro oReceiptPro) throws Exception {
         logger.info("配货{}删除{}", oReceiptPro.getuUser(), JSONObject.toJSONString(oReceiptPro));
-
+        BigDecimal flag = new BigDecimal(0);
+        if(null!=oReceiptPro){
+            if(null!=oReceiptPro.getProNum()){
+                flag=oReceiptPro.getProNum();
+            }
+        }
         //数据库配货地址商品
         OReceiptPro oReceiptPro_db = oReceiptProMapper.selectByPrimaryKey(oReceiptPro.getId());
         oReceiptPro.setuTime(Calendar.getInstance().getTime());
@@ -3659,16 +3673,23 @@ public class OrderServiceImpl implements OrderService {
             logger.info("用户{}删除{},{},删除发货商品失败请重试", oReceiptPro.getuUser(), oReceiptPro.getId(), oReceiptPro.getProNum());
             return AgentResult.fail("该条信息已经排单");
         }
+        if(flag.compareTo(oReceiptPro_db.getSendNum())==-1){
+            logger.info("已部分排单,最低可调整为"+oReceiptPro_db.getSendNum()+"台");
+            throw new MessageException("已部分排单,最低可调整为"+oReceiptPro_db.getSendNum()+"台");
+        }else if(flag.compareTo(oReceiptPro_db.getSendNum())==0){
+            oReceiptPro.setStatus(Status.STATUS_1.status);
+            oReceiptPro.setReceiptProStatus(OReceiptStatus.DISPATCHED_ORDER.code);
+        }
         //还得判断已排单和订货数量
         ReceiptPlanExample receiptPlanExample = new ReceiptPlanExample();
         ReceiptPlanExample.Criteria criteria2 = receiptPlanExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andReceiptIdEqualTo(oReceiptPro_db.getReceiptId()).andProIdEqualTo(oReceiptPro_db.getId());
         List<ReceiptPlan> receiptPlans = receiptPlanMapper.selectByExample(receiptPlanExample);
         BigDecimal planCount = new BigDecimal(0);
-        if (null!=receiptPlans && receiptPlans.size()>0){
+       /* if (null!=receiptPlans && receiptPlans.size()>0){
             logger.info("已排单,不可删除");
             throw new MessageException("已排单,不可删除");
 
-        }
+        }*/
 
         //检查数量
         OReceiptProExample oReceiptProExample = new OReceiptProExample();
