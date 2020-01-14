@@ -38,6 +38,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -3673,12 +3674,15 @@ public class OrderServiceImpl implements OrderService {
             logger.info("用户{}删除{},{},删除发货商品失败请重试", oReceiptPro.getuUser(), oReceiptPro.getId(), oReceiptPro.getProNum());
             return AgentResult.fail("该条信息已经排单");
         }
-        if(flag.compareTo(oReceiptPro_db.getSendNum())==-1){
-            logger.info("已部分排单,最低可调整为"+oReceiptPro_db.getSendNum()+"台");
-            throw new MessageException("已部分排单,最低可调整为"+oReceiptPro_db.getSendNum()+"台");
-        }else if(flag.compareTo(oReceiptPro_db.getSendNum())==0){
-            oReceiptPro.setStatus(Status.STATUS_1.status);
-            oReceiptPro.setReceiptProStatus(OReceiptStatus.DISPATCHED_ORDER.code);
+        //有排单的情况下是不允许删除的
+        if(oReceiptPro_db.getSendNum().compareTo(new BigDecimal(BigInteger.ZERO))==1 ){
+            if(flag.compareTo(oReceiptPro_db.getSendNum())==-1||flag.compareTo(oReceiptPro_db.getSendNum())==1){
+                logger.info("已有部分排单为"+oReceiptPro_db.getSendNum()+"台,不可删除");
+                throw new MessageException("已有部分排单为"+oReceiptPro_db.getSendNum()+"台,不可删除");
+            }else if(flag.compareTo(oReceiptPro_db.getSendNum())==0){
+                logger.info(oReceiptPro_db.getSendNum()+"台已全部排单,不可删除，可选择修改");
+                throw new MessageException(oReceiptPro_db.getSendNum()+"台已全部排单,不可删除，可选择修改");
+            }
         }
         //还得判断已排单和订货数量
         ReceiptPlanExample receiptPlanExample = new ReceiptPlanExample();
