@@ -189,21 +189,34 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                 reactRJPOSApply(RJ_TEMPLATE_APPLY,map2.toJSONString(),templateRecode);
             }else if("POS".equals(busInfo.get("PLATFORM_TYPE"))||"ZHPOS".equals(busInfo.get("PLATFORM_TYPE"))||"ZPOS".equals(busInfo.get("PLATFORM_TYPE"))){
                 // todo POS平台信息申请
-                result = HttpClientUtil.doPostJson(TEMPLATE_APPLY, map2.toJSONString());
-                Map<String,Object> resultMap = JSONObject.parseObject(result);
-                if(!(boolean)resultMap.get("result")){
-                    throw new MessageException(resultMap.get("msg").toString());
+
+                    result = HttpClientUtil.doPostJson(TEMPLATE_APPLY, map2.toJSONString());
+                    Map<String,Object> resultMap = JSONObject.parseObject(result);
+                    if(!(boolean)resultMap.get("result")){
+                        throw new MessageException(resultMap.get("msg").toString());
+                    }
+                try {
+                    Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
+                    templateRecode.setTemplateId(((Map) objectMap.get("applyTemplate")).get("applyId").toString());
+                    templateRecode.setTemplateName(((Map) objectMap.get("applyTemplate")).get("templateName").toString());
+                    templateRecode.setBusNumS(map1.get("orgId_s"));
+                    if((boolean)objectMap.get("changeFlag")){
+                        templateRecode.setChangeflag("1");//修改啦
+                    }else {
+                        templateRecode.setChangeflag("0");//没修改
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    JSONObject map = new JSONObject();
+                    map.put("applyId",templateRecode.getTemplateId());
+                    String  resultDelete = HttpClientUtil.doPostJson(TEMPLATE_DELAPPLY, map.toJSONString());
+                    Map<String,Object> resultMapDelete = JSONObject.parseObject(resultDelete);
+                    if(!(boolean)resultMapDelete.get("result")) {
+                        logger.info("***********本地异常后删除综管数据失败，***********");
+                        throw new MessageException(resultMapDelete.get("msg").toString());
+                    }
                 }
-                Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
-                templateRecode.setTemplateId(((Map) objectMap.get("applyTemplate")).get("applyId").toString());
-                templateRecode.setTemplateName(((Map) objectMap.get("applyTemplate")).get("templateName").toString());
-                templateRecode.setBusNumS(map1.get("orgId_s"));
-                if((boolean)objectMap.get("changeFlag")){
-                    templateRecode.setChangeflag("1");//修改啦
-                }else {
-                    templateRecode.setChangeflag("0");//没修改
-                }
-               // result = HttpClientUtil.doPostJson(TEMPLATE_APPLY, map2.toJSONString());
+                // result = HttpClientUtil.doPostJson(TEMPLATE_APPLY, map2.toJSONString());
             }else if("SSPOS".equals(busInfo.get("PLATFORM_TYPE"))){
                 logger.info("请求参数："+map2.toJSONString());
                 reactRJPOSApply(SS_TEMPLATE_APPLY,map2.toJSONString(),templateRecode);

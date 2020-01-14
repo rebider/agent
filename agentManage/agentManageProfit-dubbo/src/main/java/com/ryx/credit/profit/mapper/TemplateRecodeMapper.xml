@@ -2,7 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ryx.credit.profit.dao.TemplateRecodeMapper">
   <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.TemplateRecode">
-    <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.TemplateRecode">
         <id column="ID" jdbcType="VARCHAR" property="id" />
         <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
         <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
