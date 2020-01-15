@@ -225,17 +225,26 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     public Map<String, Object> saveCut(String returnId, String amt, String ctype) {
 
         Map<String, Object> map = new HashMap<>();
-
         OReturnOrder returnOrder = returnOrderMapper.selectByPrimaryKey(returnId);
 
-        ODeductCapital deductCapital = new ODeductCapital();
-        deductCapital.setId(idService.genId(TabId.o_deduct_capital));
-        deductCapital.setcAmount(new BigDecimal(amt));
-        deductCapital.setcType(ctype);
-        deductCapital.setcAgentId(returnOrder.getAgentId());
-        deductCapital.setSourceId(returnId);
-        deductCapital.setcTime(new Date());
-        deductCapitalMapper.insertSelective(deductCapital);
+        //查询，如果是修改，就更新
+        List<ODeductCapital> deductCapitals = deductCapitalMapper.selectCountByMap(FastMap.fastMap("returnId", returnId).putKeyV("cType", ctype));
+        if (deductCapitals.size() == 1) {
+            ODeductCapital oDeductCapital = deductCapitals.get(0);
+            oDeductCapital.setcAmount(new BigDecimal(amt));
+            deductCapitalMapper.updateByPrimaryKey(oDeductCapital);
+            map.put("cutId", oDeductCapital.getId());
+        } else {
+            ODeductCapital deductCapital = new ODeductCapital();
+            deductCapital.setId(idService.genId(TabId.o_deduct_capital));
+            deductCapital.setcAmount(new BigDecimal(amt));
+            deductCapital.setcType(ctype);
+            deductCapital.setcAgentId(returnOrder.getAgentId());
+            deductCapital.setSourceId(returnId);
+            deductCapital.setcTime(new Date());
+            deductCapitalMapper.insertSelective(deductCapital);
+            map.put("cutId", deductCapital.getId());
+        }
 
         returnOrder.setCutAmo(returnOrder.getCutAmo().add(new BigDecimal(amt)));
         returnOrder.setReturnAmo(returnOrder.getReturnAmo().subtract(new BigDecimal(amt)));
@@ -245,7 +254,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         map.put("goodsReturnAmo", returnOrder.getGoodsReturnAmo());
         map.put("returnAmo", returnOrder.getReturnAmo());
         map.put("cutAmo", returnOrder.getCutAmo());
-        map.put("cutId", deductCapital.getId());
 
         return map;
     }
