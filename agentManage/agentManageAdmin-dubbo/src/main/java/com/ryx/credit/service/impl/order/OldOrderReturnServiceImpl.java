@@ -50,7 +50,6 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
 
     private static final Logger logger = LoggerFactory.getLogger(OldOrderReturnServiceImpl.class);
 
-
     @Resource(name = "oldOrderReturnService")
     private OldOrderReturnService oldOrderReturnService;
     @Autowired
@@ -115,6 +114,8 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
     private PlatFormMapper platFormMapper;
     @Autowired
     private ORefundPriceDiffMapper refundPriceDiffMapper;
+    @Autowired
+    private ODeductCapitalMapper deductCapitalMapper;
 
 
 
@@ -300,9 +301,16 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         return AgentResult.ok();
     }
 
+    /**
+     * 退货明细
+     * @param returnId
+     * @return
+     */
     @Override
     public AgentResult loadOldOrderApproveData(String returnId){
+        //退货单
         OReturnOrder oReturnOrder = returnOrderMapper.selectByPrimaryKey(returnId);
+        //退货明细
         OReturnOrderDetailExample oReturnOrderDetailExample = new OReturnOrderDetailExample();
         oReturnOrderDetailExample.or().andReturnIdEqualTo(returnId).andStatusEqualTo(Status.STATUS_1.status);
         List<OReturnOrderDetail> details  =returnOrderDetailMapper.selectByExample(oReturnOrderDetailExample);
@@ -310,9 +318,16 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             List<String> listAct = redisService.lrange(detail.getBeginSn()+","+detail.getEndSn()+"_act",0,-1);
             detail.setAct(listAct.size()>0?oActivityMapper.selectByPrimaryKey(listAct.get(0)):null);
         }
+        //退款信息
+        ODeductCapitalExample ODeductCapitalExample = new ODeductCapitalExample();
+        ODeductCapitalExample.or().andSourceIdEqualTo(returnId);
+        List<ODeductCapital> oDeductCapitals = deductCapitalMapper.selectByExample(ODeductCapitalExample);
+
         AgentResult agentResult = AgentResult.ok();
         agentResult.setMapData(
-                FastMap.fastMap("details",details).putKeyV("oReturnOrder",oReturnOrder)
+                FastMap.fastMap("details", details)
+                        .putKeyV("oReturnOrder", oReturnOrder)
+                        .putKeyV("oDeductCapitals", oDeductCapitals)
         );
         return agentResult;
     }
