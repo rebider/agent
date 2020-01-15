@@ -162,7 +162,6 @@ public class ChinaMobileForJYHttpReq {
             String result = HttpClientUtil.doPost(JY_MOBILE_CARD_URL, paramMap);
             log.info("揭阳移动接口单个号码停开机返回参数：result:{}",result);
             if(StringUtils.isBlank(result)){
-                AppConfig.sendEmails("接口请求错误：result："+result, "物联网移动接口请求异常,方法msisdnSwitch");
                 return "";
             }
             String decrypt = DESUtils.decrypt(result, secretKey);
