@@ -1160,7 +1160,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                 oInternetCard.setIccidNum(oLogisticsDetail.getSnNum());
                 oInternetCard.setBatchNum(batchNo);
                 oInternetCard.setOrderId(oLogisticsDetail.getOrderId());
-                oInternetCard.setDeliverTime(oLogisticsDetail.getcTime());
+                oInternetCard.setDeliverTime(oLogisticsDetail.getcTime());// oLogisticsDetail  物流明细
                 oInternetCard.setAgentId(oLogisticsDetail.getAgentId());
                 Agent agent = agentService.getAgentById(oLogisticsDetail.getAgentId());
                 if(agent!=null)
@@ -1171,8 +1171,9 @@ public class InternetCardServiceImpl implements InternetCardService {
                 oInternetCard.setRenew(Status.STATUS_0.status);
                 oInternetCard.setInternetCardStatus(InternetCardStatus.NOACTIVATE.code);
                 Date date = new Date();
-                oInternetCard.setcTime(date);
-                oInternetCard.setuTime(date);
+                oInternetCard.setcTime(date); // ctime  创建
+                oInternetCard.setuTime(date); // utime  更新
+                // 发货时间
                 oInternetCard.setuUser(oInternetCard.getcUser());
                 oInternetCard.setStatus(Status.STATUS_1.status);
                 oInternetCard.setVersion(BigDecimal.ONE);
