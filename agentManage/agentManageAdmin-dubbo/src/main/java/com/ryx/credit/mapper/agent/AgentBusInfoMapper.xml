@@ -1325,4 +1325,24 @@ union
     <if test="reqMap.platfromPerm==null or reqMap.platfromPerm.size==0"> and 1=-1 </if>
     order by b.c_time desc
   </sql>
+
+
+  <select id="queyrBusInfoByBusNumAndPlatformType" parameterType="map" resultType="map">
+    select
+      B.AGENT_ID,
+      A.AG_NAME,
+      B.BUS_NUM,
+      B.BUS_PLATFORM,
+      C.PLATFORM_TYPE
+    from a_agent_businfo b
+    left join a_agent a on  a.id=b.agent_id and a.status=1
+    left join a_platform c on c.platform_num=b.bus_platform and c.status=1
+    where a.status=1
+      and a.ag_status='Approved'
+      and b.status=1 and
+      b.clo_review_status=3
+      and b.bus_status in (0,1,2,3,4)
+      and c.platform_type=#{platformType}
+      and b.bus_num=#{busNum}
+  </select>
 </mapper>
