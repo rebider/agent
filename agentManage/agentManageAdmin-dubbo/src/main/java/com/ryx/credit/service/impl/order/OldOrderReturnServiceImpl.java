@@ -374,7 +374,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             returnOrder.setuTime(new Date());
             returnOrderMapper.updateByPrimaryKeySelective(returnOrder);
             for (ODeductCapital oDeductCapital : agentVo.getDeductCapitalList()) {
-                if(null!=oDeductCapital.getcAmount() && oDeductCapital.getcAmount().compareTo(BigDecimal.ZERO)>0) {
+                if(null!=oDeductCapital.getcAmount() && oDeductCapital.getcAmount().compareTo(BigDecimal.ZERO) >= 0) {
                     iOrderReturnService.saveCut(agentVo.getReturnId(), oDeductCapital.getcAmount().toString(), oDeductCapital.getcType());
                 }
             }
