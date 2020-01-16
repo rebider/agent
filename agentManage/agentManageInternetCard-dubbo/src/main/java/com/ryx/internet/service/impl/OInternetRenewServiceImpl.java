@@ -950,6 +950,13 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             }
             // renewFinance 财务批量导入，不检查是否续费、是否超过截止时间
             if(reqType.equals("renewFinance")){
+                // 检查卡状态
+                if(!(oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NORMAL.getValue())==0
+                        || oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NOACTIVATE.getValue())==0
+                        || oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.silent.getValue())==0
+                        || oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.test.getValue())==0)){
+                    throw new MessageException("iccid:"+iccidNumId+",卡状态不正常,不允许续费/注销，当前状态为："+InternetCardStatus.getContentByValue(oInternetCard.getInternetCardStatus()));
+                }
                 if(null==oInternetCard.getExpireTime()){
                     throw new MessageException("iccid:"+iccidNumId+",到期时间为空,不允许续费/注销");
                 }
@@ -967,7 +974,10 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             if(oInternetCard.getRenew().compareTo(BigDecimal.ZERO)==0){
                 throw new MessageException("iccid:"+iccidNumId+",是否需续费为否,不允许续费/注销");
             }
-            if((oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NORMAL.getValue())==0 || oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NOACTIVATE.getValue())==0 )
+            if((oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NORMAL.getValue())==0
+                    || oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NOACTIVATE.getValue())==0
+                    || oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.silent.getValue())==0
+                    || oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.test.getValue())==0)
                     && oInternetCard.getRenewStatus().equals(InternetRenewStatus.WXF.getValue())){
                 if(null==oInternetCard.getExpireTime()){
                     throw new MessageException("iccid:"+iccidNumId+",到期时间为空,不允许续费/注销");
@@ -1002,7 +1012,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                     throw new MessageException("操作有误");
                 }
             }else{
-                throw new MessageException("iccid:"+iccidNumId+",卡状态/续费状态不正确,不允许续费/注销");
+                throw new MessageException("iccid:"+iccidNumId+",卡状态/续费状态不正确,不允许续费/注销，当前状态为："+InternetCardStatus.getContentByValue(oInternetCard.getInternetCardStatus()));
             }
         }
     }
