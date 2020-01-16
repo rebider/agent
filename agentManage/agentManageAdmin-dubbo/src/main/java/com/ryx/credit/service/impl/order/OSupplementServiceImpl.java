@@ -2,7 +2,6 @@ package com.ryx.credit.service.impl.order;
 
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
-import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
@@ -13,10 +12,7 @@ import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
-import com.ryx.credit.dao.order.OOrderMapper;
-import com.ryx.credit.dao.order.OPaymentDetailMapper;
-import com.ryx.credit.dao.order.OPaymentMapper;
-import com.ryx.credit.dao.order.OSupplementMapper;
+import com.ryx.credit.dao.order.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
@@ -30,7 +26,6 @@ import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OCashReceivablesService;
 import com.ryx.credit.service.order.OSupplementService;
-import com.sun.corba.se.spi.ior.ObjectKey;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -75,6 +70,8 @@ public class OSupplementServiceImpl implements OSupplementService {
     private OOrderMapper oOrderMapper;
     @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
+    @Autowired
+    private OPayDetailMapper oPayDetailMapper;
 
 
     @Override
@@ -235,6 +232,7 @@ public class OSupplementServiceImpl implements OSupplementService {
         oSupplement.setSchstatus(SchStatus.ONE.getValue());//补款状态
         oSupplement.setStatus(Status.STATUS_1.status);
         oSupplement.setVersion(Status.STATUS_1.status);
+        oSupplement.setLogicalVersion(LogicalVersion.ONE.code);
         AgentResult result = oCashReceivablesService.addOCashReceivables(osupplementVo.getoCashReceivablesVos(), String.valueOf(oSupplement.getcUser()), osupplementVo.getSupplement().getAgentId(), CashPayType.getContentEnum(CashPayType.SUPPLEMENT.code), osupplementVo.getSupplement().getId());
         if (result.getMapData() != null) {
             Map<String, Object> resMapCash = result.getMapData();
@@ -265,6 +263,56 @@ public class OSupplementServiceImpl implements OSupplementService {
                     }
                 }
             }
+           /* if(null!=notCountMap && notCountMap.size()>1){
+                boolean flag=true;
+                boolean f=true;
+                BigDecimal residue=oSupplement.getPayAmount();
+
+                //说明存在多条补款
+                for (OPaymentDetail paymentDetail : notCountMap) {
+                    BigDecimal initialize = new BigDecimal(0);
+                    OPayDetail oPayDetail = new OPayDetail();
+                    if(f==false){
+                        break;
+                    }
+                    if(residue.compareTo(new BigDecimal(0))==0 ||flag==false){
+                        //如果销账金额已抵扣完销账则停止循环
+                        f=false;
+                        break;
+                    }
+                    if(residue.compareTo(paymentDetail.getPayAmount())==0){
+                        initialize=paymentDetail.getPayAmount();
+                        oPayDetail.setAmount(initialize);
+                        oPayDetail.setSrcId(oSupplement.getId());
+                        flag=false;
+                        logger.info("还款-------:"+initialize);
+                    }else if(residue.compareTo(paymentDetail.getPayAmount())==-1){
+                        initialize.add(residue);
+                        oPayDetail.setAmount(initialize.add(residue));
+                        oPayDetail.setSrcId(oSupplement.getId());
+                        flag=false;
+                        logger.info("还款-------:"+initialize.add(residue));
+                    }else if(residue.compareTo(paymentDetail.getPayAmount())==1){
+                        residue = residue.subtract(paymentDetail.getPayAmount());
+                        oPayDetail.setAmount(paymentDetail.getPayAmount());
+                        oPayDetail.setSrcId(oSupplement.getId());
+                        logger.info("还款--------:"+paymentDetail.getPayAmount());
+                    }
+                    //进行添加付款明细数据
+                    oPayDetail.setId(idService.genId(TabId.O_PAY_DETAIL));
+                    oPayDetail.setArrId(paymentDetail.getId());
+                    oPayDetail.setPayType("补款");
+                    oPayDetail.setBusStat(Status.STATUS_0.status);
+                    oPayDetail.setStatus(Status.STATUS_1.status);
+                    oPayDetail.setVersion(Status.STATUS_1.status);
+                    oPayDetail.setcTm(date);
+                    oPayDetail.setcUser(oSupplement.getcUser());
+                    if(1!=oPayDetailMapper.insertSelective(oPayDetail)){
+                        logger.info("付款明细添加失败");
+                        throw new MessageException("付款明细添加失败");
+                    }
+                }
+            }*/
             startSuppActivity(osupplementVo.getSupplement().getId(), oSupplement.getcUser() + "");
             logger.info("补款添加:成功");
         }

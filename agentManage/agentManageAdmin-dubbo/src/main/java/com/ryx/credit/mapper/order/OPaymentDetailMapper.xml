@@ -775,7 +775,7 @@
                 ORDER_ID=#{orderId}
             </if>
         </where>
-        AND PAYMENT_TYPE=#{paymentType} and Payment_status=${paymentStatus}
+        AND PAYMENT_TYPE=#{paymentType} and Payment_status in(1,2,3)
         order by PLAN_PAY_TIME
     </select>
 
