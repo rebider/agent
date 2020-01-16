@@ -1343,6 +1343,7 @@ union
       b.clo_review_status=3
       and b.bus_status in (0,1,2,3,4)
       and c.platform_type=#{platformType}
-      and b.bus_num=#{busNum}
+      and b.bus_num is not NULL
+      <if test="busNum!=null and busNum!=''">and b.bus_num=#{busNum}</if>
   </select>
 </mapper>
