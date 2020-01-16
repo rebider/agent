@@ -221,8 +221,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      * @Date: 20:25 2018/7/27
      */
     @Override
-    @Transactional
-    public Map<String, Object> saveCut(String returnId, String amt, String ctype) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    public Map<String, Object> saveCut(String returnId, String amt, String ctype) throws MessageException {
 
         Map<String, Object> map = new HashMap<>();
         OReturnOrder returnOrder = returnOrderMapper.selectByPrimaryKey(returnId);
@@ -231,9 +231,23 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         List<ODeductCapital> deductCapitals = deductCapitalMapper.selectCountByMap(FastMap.fastMap("returnId", returnId).putKeyV("cType", ctype));
         if (deductCapitals.size() == 1) {
             ODeductCapital oDeductCapital = deductCapitals.get(0);
+            BigDecimal amtBack = oDeductCapital.getcAmount();
+
             oDeductCapital.setcAmount(new BigDecimal(amt));
             deductCapitalMapper.updateByPrimaryKey(oDeductCapital);
+            //退货单更新
+            if (returnOrder.getReturnAmo().add(amtBack).subtract(new BigDecimal(amt)).compareTo(new BigDecimal(0)) < 0) {
+                throw new MessageException("扣款金额不能大于机具金额！");
+            }
+            returnOrder.setCutAmo(returnOrder.getCutAmo().add(new BigDecimal(amt)).subtract(amtBack));
+            returnOrder.setReturnAmo(returnOrder.getReturnAmo().add(amtBack).subtract(new BigDecimal(amt)));
+            returnOrder.setuTime(new Date());
+            returnOrderMapper.updateByPrimaryKeySelective(returnOrder);
+            //返回参数封装
             map.put("cutId", oDeductCapital.getId());
+            map.put("goodsReturnAmo", returnOrder.getGoodsReturnAmo());
+            map.put("returnAmo", returnOrder.getReturnAmo());
+            map.put("cutAmo", returnOrder.getCutAmo());
         } else {
             ODeductCapital deductCapital = new ODeductCapital();
             deductCapital.setId(idService.genId(TabId.o_deduct_capital));
@@ -243,18 +257,20 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             deductCapital.setSourceId(returnId);
             deductCapital.setcTime(new Date());
             deductCapitalMapper.insertSelective(deductCapital);
+            //退货单更新
+            if (returnOrder.getReturnAmo().subtract(new BigDecimal(amt)).compareTo(new BigDecimal(0)) < 0) {
+                throw new MessageException("扣款金额不能大于机具金额！");
+            }
+            returnOrder.setCutAmo(returnOrder.getCutAmo().add(new BigDecimal(amt)));
+            returnOrder.setReturnAmo(returnOrder.getReturnAmo().subtract(new BigDecimal(amt)));
+            returnOrder.setuTime(new Date());
+            returnOrderMapper.updateByPrimaryKeySelective(returnOrder);
+            //返回参数封装
             map.put("cutId", deductCapital.getId());
+            map.put("goodsReturnAmo", returnOrder.getGoodsReturnAmo());
+            map.put("returnAmo", returnOrder.getReturnAmo());
+            map.put("cutAmo", returnOrder.getCutAmo());
         }
-
-        returnOrder.setCutAmo(returnOrder.getCutAmo().add(new BigDecimal(amt)));
-        returnOrder.setReturnAmo(returnOrder.getReturnAmo().subtract(new BigDecimal(amt)));
-        returnOrder.setuTime(new Date());
-        returnOrderMapper.updateByPrimaryKeySelective(returnOrder);
-
-        map.put("goodsReturnAmo", returnOrder.getGoodsReturnAmo());
-        map.put("returnAmo", returnOrder.getReturnAmo());
-        map.put("cutAmo", returnOrder.getCutAmo());
-
         return map;
     }
 
@@ -2757,5 +2773,17 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             throw e;
         }
     }
+    /**
+     * 查询扣款信息
+     */
+    public Map<String, Object> deductDetail(String returnId) throws ProcessException {
+        Map<String, Object> map = new HashMap<>();
+        //查询扣款款项
+        ODeductCapitalExample deductCapitalExample = new ODeductCapitalExample();
+        deductCapitalExample.or().andSourceIdEqualTo(returnId);
+        List<ODeductCapital> deductCapitals = deductCapitalMapper.selectByExample(deductCapitalExample);
 
+        map.put("deductCapitals", deductCapitals);
+        return map;
+    }
 }

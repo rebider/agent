@@ -368,11 +368,6 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         }
         //保存抵扣信息
         if(agentVo.getDeductCapitalList()!=null && agentVo.getDeductCapitalList().size()>0 && "pass".equals(agentVo.getApprovalResult())){
-            OReturnOrder returnOrder = returnOrderMapper.selectByPrimaryKey(agentVo.getReturnId());
-            returnOrder.setCutAmo(new BigDecimal(0));
-            returnOrder.setReturnAmo(returnOrder.getGoodsReturnAmo());
-            returnOrder.setuTime(new Date());
-            returnOrderMapper.updateByPrimaryKeySelective(returnOrder);
             for (ODeductCapital oDeductCapital : agentVo.getDeductCapitalList()) {
                 if(null!=oDeductCapital.getcAmount() && oDeductCapital.getcAmount().compareTo(BigDecimal.ZERO) >= 0) {
                     iOrderReturnService.saveCut(agentVo.getReturnId(), oDeductCapital.getcAmount().toString(), oDeductCapital.getcType());
