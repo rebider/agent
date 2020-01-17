@@ -107,8 +107,8 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                     }
                     resPaymentDetail.add(paymentDetail);
                     //更新付款单明细为付款中
-                    paymentDetail.setPaymentStatus(PaymentStatus.FKING.code);
-                    oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail);
+//                    paymentDetail.setPaymentStatus(PaymentStatus.FKING.code);
+//                    oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail);
                     //进行添加付款明细数据
                     oPayDetail.setId(idService.genId(TabId.O_PAY_DETAIL));
                     oPayDetail.setArrId(paymentDetail.getId());
