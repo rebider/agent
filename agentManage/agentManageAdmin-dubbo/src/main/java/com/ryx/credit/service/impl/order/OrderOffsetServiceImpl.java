@@ -86,12 +86,12 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                     }
                     OPayDetail oPayDetail = new OPayDetail();
                     if(residue.compareTo(paymentDetail.getPayAmount())==0){
-                        residue = residue.subtract(initialize);
                         initialize=paymentDetail.getPayAmount();
                         flag=false;
                         logger.info("还款-------:"+initialize);
                         oPayDetail.setAmount(residue);
                         oPayDetail.setSrcId(oSupplement.getId());
+                        residue = residue.subtract(initialize);
                     }else if(residue.compareTo(paymentDetail.getPayAmount())==-1){
                         initialize.add(residue);
                         residue = BigDecimal.ZERO;
