@@ -9,6 +9,7 @@ import com.ryx.credit.dao.order.OPaymentDetailMapper;
 import com.ryx.credit.dao.order.OSupplementMapper;
 import com.ryx.credit.pojo.admin.order.OPayDetail;
 import com.ryx.credit.pojo.admin.order.OPaymentDetail;
+import com.ryx.credit.pojo.admin.order.OPaymentDetailExample;
 import com.ryx.credit.pojo.admin.order.OSupplement;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrderOffsetService;
@@ -129,6 +130,10 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
 
     @Override
     public AgentResult OffsetArrearsComit(BigDecimal amount, String paytype, String srcId) {
+        OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
+        oPaymentDetailExample.or().andStatusEqualTo(Status.STATUS_1.status)
+                .andSrcIdEqualTo(srcId)
+                .andPayTypeEqualTo(paytype);
         return null;
     }
 
