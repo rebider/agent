@@ -7,10 +7,7 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.order.OPayDetailMapper;
 import com.ryx.credit.dao.order.OPaymentDetailMapper;
 import com.ryx.credit.dao.order.OSupplementMapper;
-import com.ryx.credit.pojo.admin.order.OPayDetail;
-import com.ryx.credit.pojo.admin.order.OPaymentDetail;
-import com.ryx.credit.pojo.admin.order.OPaymentDetailExample;
-import com.ryx.credit.pojo.admin.order.OSupplement;
+import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrderOffsetService;
 import org.slf4j.Logger;
@@ -134,11 +131,17 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
     }
 
     @Override
-    public AgentResult OffsetArrearsComit(BigDecimal amount, String paytype, String srcId) throws MessageException{
-        OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
-        oPaymentDetailExample.or().andStatusEqualTo(Status.STATUS_1.status)
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public AgentResult OffsetArrearsCommit(BigDecimal amount, String paytype, String srcId) throws MessageException{
+        OPayDetailExample oPayDetailExample = new OPayDetailExample();
+        oPayDetailExample.or().andStatusEqualTo(Status.STATUS_1.status)
                 .andSrcIdEqualTo(srcId)
                 .andPayTypeEqualTo(paytype);
+        List<OPayDetail> oPayDetails = oPayDetailMapper.selectByExample(oPayDetailExample);
+        if (null == oPayDetails || oPayDetails.size() == 0){
+            return AgentResult.fail("未查询到付款明细信息");
+        }
+
         return null;
     }
 
