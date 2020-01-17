@@ -57,6 +57,8 @@ public class ORemoveAccount implements Serializable{
 
     private BigDecimal version;
 
+    private String logicalVersion;
+
     public String getId() {
         return id;
     }
@@ -215,5 +217,13 @@ public class ORemoveAccount implements Serializable{
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public String getLogicalVersion() {
+        return logicalVersion;
+    }
+
+    public void setLogicalVersion(String logicalVersion) {
+        this.logicalVersion = logicalVersion;
     }
 }
