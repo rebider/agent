@@ -94,11 +94,11 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                         residue = residue.subtract(initialize);
                     }else if(residue.compareTo(paymentDetail.getPayAmount())==-1){
                         initialize.add(residue);
-                        residue = BigDecimal.ZERO;
                         flag=false;
                         logger.info("还款-------:"+initialize.add(residue));
                         oPayDetail.setAmount(residue);
                         oPayDetail.setSrcId(oSupplement.getId());
+                        residue = BigDecimal.ZERO;
                     }else if(residue.compareTo(paymentDetail.getPayAmount())==1){
                         residue = residue.subtract(paymentDetail.getPayAmount());
                         oPayDetail.setAmount(paymentDetail.getPayAmount());
@@ -141,19 +141,22 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
         if (null == oPayDetails || oPayDetails.size() == 0){
             return AgentResult.fail("未查询到付款明细信息");
         }
-        for (OPayDetail oPayDetail:oPayDetails){
-            oPayDetail.setBusStat(Status.STATUS_1.status);
-            oPayDetailMapper.updateByPrimaryKeySelective(oPayDetail);
-            OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectById(oPayDetail.getArrId());
-            oPaymentDetail.setRealPayAmount(oPaymentDetail.getRealPayAmount().add(oPayDetail.getAmount()));
-            if (oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())==0){
-                oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
-            }else if (oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())==-1){
-                oPaymentDetail.setPaymentStatus(PaymentStatus.BF.code);
+        if (paytype.equals(DDBK.code    )){
+            for (OPayDetail oPayDetail:oPayDetails){
+                oPayDetail.setBusStat(Status.STATUS_1.status);
+                oPayDetailMapper.updateByPrimaryKeySelective(oPayDetail);
+                OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectById(oPayDetail.getArrId());
+                oPaymentDetail.setRealPayAmount(oPaymentDetail.getRealPayAmount().add(oPayDetail.getAmount()));
+                if (oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())==0){
+                    oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
+                }else if (oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())==-1){
+                    oPaymentDetail.setPaymentStatus(PaymentStatus.BF.code);
+                }
+                oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail);
             }
-            oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail);
         }
-        return null;
+
+        return AgentResult.ok();
     }
 
     @Override
