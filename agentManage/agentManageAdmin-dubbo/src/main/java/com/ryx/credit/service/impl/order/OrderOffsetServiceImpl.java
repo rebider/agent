@@ -136,11 +136,18 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
         OPayDetailExample oPayDetailExample = new OPayDetailExample();
         oPayDetailExample.or().andStatusEqualTo(Status.STATUS_1.status)
                 .andSrcIdEqualTo(srcId)
-                .andPayTypeEqualTo(paytype);
+                .andPayTypeEqualTo(paytype)
+                .andBusStatEqualTo(Status.STATUS_0.status);
         List<OPayDetail> oPayDetails = oPayDetailMapper.selectByExample(oPayDetailExample);
         if (null == oPayDetails || oPayDetails.size() == 0){
             return AgentResult.fail("未查询到付款明细信息");
         }
+        BigDecimal offsetAmt = BigDecimal.ZERO;
+        for (OPayDetail oPayDetail : oPayDetails) {
+            offsetAmt = offsetAmt.add(oPayDetail.getAmount());
+        }
+        if (offsetAmt.compareTo(amount)!=0) return AgentResult.fail("冲抵金额与申请不一致");
+
         if (paytype.equals(DDBK.code    )){
             for (OPayDetail oPayDetail:oPayDetails){
                 oPayDetail.setBusStat(Status.STATUS_1.status);
