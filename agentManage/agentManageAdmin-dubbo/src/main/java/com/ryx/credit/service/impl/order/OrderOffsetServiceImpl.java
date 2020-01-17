@@ -17,6 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -37,19 +40,19 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
 
     private Logger logger = LoggerFactory.getLogger(OrderOffsetServiceImpl.class);
     @Override
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public AgentResult OffsetArrears(List<OPaymentDetail> opaymentDetailList, BigDecimal amount, String paytype, String srcId) throws MessageException {
         //1、判断付款类型
         //2、检查欠款明细,总金额与抵扣金额
         //3、计算冲抵欠款明细，生成付款明细实体，修改欠款明细为付款中，
         //4、更新数据库
-
         logger.info("["+srcId+"]开始进行补款生成付款明细,补款类型["+ OffsetPaytype.getContentByValue(paytype) +"]");
         if ( null == opaymentDetailList || !(opaymentDetailList.size()>0) || amount.compareTo(BigDecimal.ZERO)==0 || StringUtils.isBlank(srcId)){
            return AgentResult.fail("参数传入错误");
         }
         Map<String,Object> resultMap = new HashMap<>();
         List<OPaymentDetail> resPaymentDetail = new ArrayList<>();
-        BigDecimal Amt = BigDecimal.ZERO;
+        BigDecimal resAmt = BigDecimal.ZERO;
         AgentResult result = AgentResult.ok();
         if (paytype.equals(DDBK.code)){ //订单补款
             //待还金额
@@ -86,6 +89,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                     }
                     OPayDetail oPayDetail = new OPayDetail();
                     if(residue.compareTo(paymentDetail.getPayAmount())==0){
+                        residue = residue.subtract(initialize);
                         initialize=paymentDetail.getPayAmount();
                         flag=false;
                         logger.info("还款-------:"+initialize);
@@ -93,6 +97,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                         oPayDetail.setSrcId(oSupplement.getId());
                     }else if(residue.compareTo(paymentDetail.getPayAmount())==-1){
                         initialize.add(residue);
+                        residue = BigDecimal.ZERO;
                         flag=false;
                         logger.info("还款-------:"+initialize.add(residue));
                         oPayDetail.setAmount(residue);
@@ -129,7 +134,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
     }
 
     @Override
-    public AgentResult OffsetArrearsComit(BigDecimal amount, String paytype, String srcId) {
+    public AgentResult OffsetArrearsComit(BigDecimal amount, String paytype, String srcId) throws MessageException{
         OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
         oPaymentDetailExample.or().andStatusEqualTo(Status.STATUS_1.status)
                 .andSrcIdEqualTo(srcId)
@@ -138,7 +143,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
     }
 
     @Override
-    public AgentResult OffsetArrearsCancle(BigDecimal amount, String paytype, String srcId) {
+    public AgentResult OffsetArrearsCancle(BigDecimal amount, String paytype, String srcId) throws MessageException{
         return null;
     }
 
