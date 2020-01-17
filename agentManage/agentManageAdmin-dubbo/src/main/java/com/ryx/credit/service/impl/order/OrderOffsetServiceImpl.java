@@ -58,7 +58,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                 if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.DF.code)==0
                         || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.BF.code)==0
                         || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.YQ.code)==0){
-                    arrearsAmt.add(oPaymentDetail.getPayAmount());
+                    arrearsAmt = arrearsAmt.add(oPaymentDetail.getPayAmount());
                 }
             }
             if(amount.compareTo(arrearsAmt)>0){
@@ -141,7 +141,18 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
         if (null == oPayDetails || oPayDetails.size() == 0){
             return AgentResult.fail("未查询到付款明细信息");
         }
-
+        for (OPayDetail oPayDetail:oPayDetails){
+            oPayDetail.setBusStat(Status.STATUS_1.status);
+            oPayDetailMapper.updateByPrimaryKeySelective(oPayDetail);
+            OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectById(oPayDetail.getArrId());
+            oPaymentDetail.setRealPayAmount(oPaymentDetail.getRealPayAmount().add(oPayDetail.getAmount()));
+            if (oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())==0){
+                oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
+            }else if (oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())==-1){
+                oPaymentDetail.setPaymentStatus(PaymentStatus.BF.code);
+            }
+            oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail);
+        }
         return null;
     }
 

@@ -25,7 +25,7 @@ public interface OrderOffsetService {
      * @param srcId
      * @return
      */
-    AgentResult OffsetArrearsComit(BigDecimal amount, String OffsetPaytype, String srcId)throws MessageException;
+    AgentResult OffsetArrearsCommit(BigDecimal amount, String OffsetPaytype, String srcId) throws MessageException;
 
     /**
      * 根据欠款明细与金额删除入库付款明细
@@ -34,7 +34,7 @@ public interface OrderOffsetService {
      * @param srcId
      * @return
      */
-    AgentResult OffsetArrearsCancle(BigDecimal amount, String OffsetPaytype, String srcId)throws MessageException;
+    AgentResult OffsetArrearsCancle(BigDecimal amount, String OffsetPaytype, String srcId) throws MessageException;
 
     /**
      * 根据欠款明细与金额查询入库付款明细
