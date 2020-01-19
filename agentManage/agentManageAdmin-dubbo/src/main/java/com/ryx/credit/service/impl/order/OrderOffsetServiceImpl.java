@@ -168,8 +168,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                     throw new MessageException("付款单明细更新失败");
                 };
                 //更新付款单
-                OPaymentDetail oPaymentDetail1 = oPaymentDetailMapper.selectById(oPaymentDetail.getPaymentId());
-                OPayment oPayment = oPaymentMapper.selectByPrimaryKey(oPaymentDetail1.getPaymentId());
+                OPayment oPayment = oPaymentMapper.selectByPrimaryKey(oPaymentDetail.getPaymentId());
                 oPayment.setRealAmount(oPayment.getRealAmount().add(amount));
                 oPayment.setPayAmount(oPayment.getOutstandingAmount());
                 if(oPaymentMapper.updateByPrimaryKeySelective(oPayment)!=1){
