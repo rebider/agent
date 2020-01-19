@@ -109,9 +109,6 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                         logger.info("还款--------:"+paymentDetail.getPayAmount());
                     }
                     resPaymentDetail.add(paymentDetail);
-                    //更新付款单明细为付款中
-//                    paymentDetail.setPaymentStatus(PaymentStatus.FKING.code);
-//                    oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail);
                     //进行添加付款明细数据
                     oPayDetail.setId(idService.genId(TabId.O_PAY_DETAIL));
                     oPayDetail.setArrId(paymentDetail.getId());
@@ -162,6 +159,10 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                 }else if (oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())==-1){
                     oPaymentDetail.setPaymentStatus(PaymentStatus.BF.code);
                 }
+                OSupplement oSupplement = oSupplementMapper.selectByPrimaryKey(srcId);
+                oPaymentDetail.setSrcType(oSupplement.getPkType());
+                oPaymentDetail.setSrcId(srcId);
+                oPaymentDetail.setPayTime(new Date());
                 if (oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)!=0){
                     logger.info("付款单明细更新失败");
                     throw new MessageException("付款单明细更新失败");
