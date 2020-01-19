@@ -159,7 +159,6 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                 }else if (oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())==-1){
                     oPaymentDetail.setPaymentStatus(PaymentStatus.BF.code);
                 }
-                OSupplement oSupplement = oSupplementMapper.selectByPrimaryKey(srcId);
                 oPaymentDetail.setSrcType(PamentSrcType.XXBK.code);
                 oPaymentDetail.setSrcId(srcId);
                 oPaymentDetail.setPayTime(new Date());
@@ -170,7 +169,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                 //更新付款单
                 OPayment oPayment = oPaymentMapper.selectByPrimaryKey(oPaymentDetail.getPaymentId());
                 oPayment.setRealAmount(oPayment.getRealAmount().add(amount));
-                oPayment.setPayAmount(oPayment.getOutstandingAmount());
+                oPayment.setPayAmount(oPayment.getOutstandingAmount().subtract(amount));
                 if(oPaymentMapper.updateByPrimaryKeySelective(oPayment)!=1){
                     logger.info("付款单更新失败");
                     throw new MessageException("付款单更新失败");
