@@ -183,7 +183,35 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
 
     @Override
     public AgentResult OffsetArrearsCancle(BigDecimal amount, String paytype, String srcId) throws MessageException{
-        return null;
+
+        List<OPayDetail> opayDetails = getOpayMentDetails(srcId, paytype);
+        if (null == opayDetails || opayDetails.size() == 0){
+            logger.info("付款明细不存在");
+            throw new MessageException("付款明细不存在");
+        }
+        BigDecimal offsetAmt = BigDecimal.ZERO;
+        for (OPayDetail oPayDetail : opayDetails) {
+            offsetAmt = offsetAmt.add(oPayDetail.getAmount());
+        }
+        if (offsetAmt.compareTo(amount)!=0) return AgentResult.fail("冲抵金额与申请不一致");
+        for (OPayDetail oPayDetail:opayDetails){
+            oPayDetail.setStatus(Status.STATUS_0.status);
+            if(oPayDetailMapper.updateByPrimaryKeySelective(oPayDetail)!=1){
+                logger.info("付款明细更新失败");
+                throw new MessageException("付款明细更新失败");
+            };
+            OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectById(oPayDetail.getArrId());
+            oPaymentDetail.setPaymentStatus(PaymentStatus.DF.code);
+            if (oPaymentDetail.getRealPayAmount().compareTo(BigDecimal.ZERO)>0){
+                oPaymentDetail.setPaymentStatus(PaymentStatus.BF.code);
+            }
+            if (oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)!=0){
+                logger.info("付款单明细更新失败");
+                throw new MessageException("付款单明细更新失败");
+            };
+        }
+
+        return AgentResult.ok();
     }
 
     @Override
