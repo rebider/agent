@@ -26,6 +26,7 @@ import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OCashReceivablesService;
 import com.ryx.credit.service.order.OSupplementService;
+import com.ryx.credit.service.order.OrderOffsetService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
+
+import static com.ryx.credit.common.enumc.OffsetPaytype.DDBK;
 
 @Service("oSupplementService")
 public class OSupplementServiceImpl implements OSupplementService {
@@ -71,7 +75,7 @@ public class OSupplementServiceImpl implements OSupplementService {
     @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
     @Autowired
-    private OPayDetailMapper oPayDetailMapper;
+    private OrderOffsetService orderOffsetService;
 
 
     @Override
@@ -213,9 +217,9 @@ public class OSupplementServiceImpl implements OSupplementService {
 
 
         //再查询是否是最后一期的补款 不可多补或者少补
-        List<OPaymentDetail> notCountMap = oPaymentDetailMapper.selectCount(oPaymentDetail.getOrderId(), PamentIdType.ORDER_FKD.code, PaymentStatus.DF.code);
+        List<OPaymentDetail> oPaymentDetailList = oPaymentDetailMapper.selectCount(oPaymentDetail.getOrderId(), PamentIdType.ORDER_FKD.code, PaymentStatus.DF.code);
         //去查询还剩几期待付款
-        BigDecimal count = new BigDecimal(notCountMap.size());
+        BigDecimal count = new BigDecimal(oPaymentDetailList.size());
         if (count.compareTo(new BigDecimal(1)) == 0) {
             //如果就剩本条待付款  则需全部结清
             BigDecimal amount = oPaymentDetail.getPayAmount();//这个是订单需补款金额
@@ -263,56 +267,18 @@ public class OSupplementServiceImpl implements OSupplementService {
                     }
                 }
             }
-           /* if(null!=notCountMap && notCountMap.size()>1){
-                boolean flag=true;
-                boolean f=true;
-                BigDecimal residue=oSupplement.getPayAmount();
-
-                //说明存在多条补款
-                for (OPaymentDetail paymentDetail : notCountMap) {
-                    BigDecimal initialize = new BigDecimal(0);
-                    OPayDetail oPayDetail = new OPayDetail();
-                    if(f==false){
-                        break;
-                    }
-                    if(residue.compareTo(new BigDecimal(0))==0 ||flag==false){
-                        //如果销账金额已抵扣完销账则停止循环
-                        f=false;
-                        break;
-                    }
-                    if(residue.compareTo(paymentDetail.getPayAmount())==0){
-                        initialize=paymentDetail.getPayAmount();
-                        oPayDetail.setAmount(initialize);
-                        oPayDetail.setSrcId(oSupplement.getId());
-                        flag=false;
-                        logger.info("还款-------:"+initialize);
-                    }else if(residue.compareTo(paymentDetail.getPayAmount())==-1){
-                        initialize.add(residue);
-                        oPayDetail.setAmount(initialize.add(residue));
-                        oPayDetail.setSrcId(oSupplement.getId());
-                        flag=false;
-                        logger.info("还款-------:"+initialize.add(residue));
-                    }else if(residue.compareTo(paymentDetail.getPayAmount())==1){
-                        residue = residue.subtract(paymentDetail.getPayAmount());
-                        oPayDetail.setAmount(paymentDetail.getPayAmount());
-                        oPayDetail.setSrcId(oSupplement.getId());
-                        logger.info("还款--------:"+paymentDetail.getPayAmount());
-                    }
-                    //进行添加付款明细数据
-                    oPayDetail.setId(idService.genId(TabId.O_PAY_DETAIL));
-                    oPayDetail.setArrId(paymentDetail.getId());
-                    oPayDetail.setPayType("补款");
-                    oPayDetail.setBusStat(Status.STATUS_0.status);
-                    oPayDetail.setStatus(Status.STATUS_1.status);
-                    oPayDetail.setVersion(Status.STATUS_1.status);
-                    oPayDetail.setcTm(date);
-                    oPayDetail.setcUser(oSupplement.getcUser());
-                    if(1!=oPayDetailMapper.insertSelective(oPayDetail)){
-                        logger.info("付款明细添加失败");
-                        throw new MessageException("付款明细添加失败");
-                    }
+            AgentResult agentResult= orderOffsetService.OffsetArrears(oPaymentDetailList, oSupplement.getPayAmount(), DDBK.code, oSupplement.getId());
+            if (agentResult.getMapData() != null) {
+                Map<String, Object> resMapCash = agentResult.getMapData();
+                BigDecimal residueAmt = new BigDecimal(resMapCash.get("residueAmt").toString());
+                if (residueAmt.compareTo(new BigDecimal(BigInteger.ZERO))==-1 || residueAmt.compareTo(new BigDecimal(BigInteger.ZERO))==1) {
+                    logger.info("补款失败:{}", "抵扣金额大于或小于欠款金额"+residueAmt);
+                    throw new MessageException("抵扣金额大于或小于欠款金额"+residueAmt);
                 }
-            }*/
+                List<OPaymentDetail> offsetPaymentDetails=(ArrayList)resMapCash.get("offsetPaymentDetails");
+
+
+            }
             startSuppActivity(osupplementVo.getSupplement().getId(), oSupplement.getcUser() + "");
             logger.info("补款添加:成功");
         }
@@ -542,9 +508,10 @@ public class OSupplementServiceImpl implements OSupplementService {
             } catch (Exception e) {
                 throw new MessageException("拒绝审批失败");
             }
+            OSupplement osupplement = oSupplementMapper.selectByPrimaryKey(oSupplement.getId());
+            AgentResult agentResult = orderOffsetService.OffsetArrearsCommit(osupplement.getPayAmount(), OffsetPaytype.DDBK.code, osupplement.getId());
 
-
-            //修改订单明细付款状态
+         /*   //修改订单明细付款状态
             OSupplement supplement = selectOSupplement(oSupplement.getId());
             if (supplement.getPkType().equals(PkType.FQBK.code)) {
                 OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectByPrimaryKey(supplement.getSrcId());
@@ -626,9 +593,9 @@ public class OSupplementServiceImpl implements OSupplementService {
                     BigDecimal residue = new BigDecimal(0);
                     //剩余未结清的金额
                     residue = payAmount.subtract(realPayAmount);
-                /*if (residue.compareTo(oPayMent.getOutstandingAmount()) == 0) {
+                *//*if (residue.compareTo(oPayMent.getOutstandingAmount()) == 0) {
                     return ResultVO.success(null);
-                }*/
+                }*//*
                     List<OPaymentDetail> notCountMap = oPaymentDetailMapper.selectCount(oPaymentDetail.getOrderId(), PamentIdType.ORDER_FKD.code, PaymentStatus.DF.code);
                     //去查询还剩几期待付款
                     BigDecimal count = new BigDecimal(notCountMap.size());
@@ -676,7 +643,7 @@ public class OSupplementServiceImpl implements OSupplementService {
                         }
                     }
                 }
-            }
+            }*/
         }
         return ResultVO.success(null);
     }
@@ -775,6 +742,11 @@ public class OSupplementServiceImpl implements OSupplementService {
             return new OPayment();
         }
         return oPayments.get(0);
+    }
+
+    @Override
+    public List<OPaymentDetail> selectCount(String orderId, String code) {
+      return   oPaymentDetailMapper.selectCount(orderId,code, null);
     }
 
 }
