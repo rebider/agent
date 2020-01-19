@@ -262,9 +262,9 @@ public class TermMachineServiceImpl  implements TermMachineService {
         if (PlatformType.whetherPOS(platformType)) {
             return posTermMachineServiceImpl.checkOrderReturnSN(list, platformType);
         } else if (PlatformType.SSPOS.getValue().equals(platformType)) {
-            return rdbTermMachineServiceImpl.checkOrderReturnSN(list, platformType);
+            return sPosTermMachineServiceImpl.checkOrderReturnSN(list, platformType);
         } else if (PlatformType.MPOS.getValue().equals(platformType)) {
-            return rdbTermMachineServiceImpl.checkOrderReturnSN(list, platformType);
+            return mposTermMachineServiceImpl.checkOrderReturnSN(list, platformType);
         } else if (PlatformType.RDBPOS.getValue().equals(platformType)) {
             return rdbTermMachineServiceImpl.checkOrderReturnSN(list, platformType);
         } else {
@@ -278,9 +278,9 @@ public class TermMachineServiceImpl  implements TermMachineService {
         if (PlatformType.whetherPOS(platformType)) {
             return posTermMachineServiceImpl.unfreezeOrderReturnSN(list, platformType);
         } else if (PlatformType.SSPOS.getValue().equals(platformType)) {
-            return rdbTermMachineServiceImpl.unfreezeOrderReturnSN(list, platformType);
+            return sPosTermMachineServiceImpl.unfreezeOrderReturnSN(list, platformType);
         } else if (PlatformType.MPOS.getValue().equals(platformType)) {
-            return rdbTermMachineServiceImpl.unfreezeOrderReturnSN(list, platformType);
+            return mposTermMachineServiceImpl.unfreezeOrderReturnSN(list, platformType);
         } else if (PlatformType.RDBPOS.getValue().equals(platformType)) {
             return rdbTermMachineServiceImpl.unfreezeOrderReturnSN(list, platformType);
         } else {
