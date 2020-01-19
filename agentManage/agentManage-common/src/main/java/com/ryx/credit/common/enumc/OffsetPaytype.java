@@ -5,11 +5,11 @@ import java.math.BigDecimal;
 public enum OffsetPaytype {
 
     THTK("THTK","退货退款"),
-    DDTZ("DDTZ","订单调整"),
-    DDBK("DDBK","订单补款"),
-    DDXZ("DDXZ","订单销账"),
+    DDTZ("DDTZ","机具数量调整退款"),
+    DDBK("DDBK","线下打款"),
+    DDXZ("DDXZ","线上销账退款"),
     FRDK("FRDK","分润抵扣"),
-    DDMD("DDMD","订单换活动");
+    DDMD("DDMD","换活动退款");
 
     public String code;
 

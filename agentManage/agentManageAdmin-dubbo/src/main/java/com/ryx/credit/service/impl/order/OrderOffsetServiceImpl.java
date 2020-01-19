@@ -160,7 +160,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                     oPaymentDetail.setPaymentStatus(PaymentStatus.BF.code);
                 }
                 OSupplement oSupplement = oSupplementMapper.selectByPrimaryKey(srcId);
-                oPaymentDetail.setSrcType(oSupplement.getPkType());
+                oPaymentDetail.setSrcType(PamentSrcType.XXBK.code);
                 oPaymentDetail.setSrcId(srcId);
                 oPaymentDetail.setPayTime(new Date());
                 if (oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)!=1){
