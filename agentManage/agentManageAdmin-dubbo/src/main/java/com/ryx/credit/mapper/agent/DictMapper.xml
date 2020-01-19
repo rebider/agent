@@ -280,7 +280,6 @@
           D_GROUP = #{dGroup,jdbcType=VARCHAR}
           and D_ARTIFACT = #{dArtifact,jdbcType=VARCHAR}
           and D_ITEMVALUE = #{dItemvalue,jdbcType=VARCHAR}
-          and D_ITEMNAME = #{dItemname,jdbcType=VARCHAR}
   </select>
 
     <!-- 更新字典状态 -->
