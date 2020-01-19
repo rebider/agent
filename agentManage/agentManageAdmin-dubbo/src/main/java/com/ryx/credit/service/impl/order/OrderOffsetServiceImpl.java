@@ -148,15 +148,6 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
         if (offsetAmt.compareTo(amount)!=0) return AgentResult.fail("冲抵金额与申请不一致");
 
         if (paytype.equals(DDBK.code    )){
-            //更新付款单
-            String payMentDetailId = oPayDetails.get(0).getArrId();
-            OPayment oPayment = oPaymentMapper.selectByPrimaryKey(payMentDetailId);
-            oPayment.setRealAmount(oPayment.getRealAmount().add(amount));
-            oPayment.setPayAmount(oPayment.getOutstandingAmount());
-            if(oPaymentMapper.updateByPrimaryKeySelective(oPayment)!=1){
-                logger.info("付款单更新失败");
-                throw new MessageException("付款单更新失败");
-            };
             //更新付款单明细
             for (OPayDetail oPayDetail:oPayDetails){
                 oPayDetail.setBusStat(Status.STATUS_1.status);
@@ -175,6 +166,15 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                     logger.info("付款单明细更新失败");
                     throw new MessageException("付款单明细更新失败");
                 };
+                //更新付款单
+                OPaymentDetail oPaymentDetail1 = oPaymentDetailMapper.selectById(oPaymentDetail.getPaymentId());
+                OPayment oPayment = oPaymentMapper.selectByPrimaryKey(oPaymentDetail1.getPaymentId());
+                oPayment.setRealAmount(oPayment.getRealAmount().add(amount));
+                oPayment.setPayAmount(oPayment.getOutstandingAmount());
+                if(oPaymentMapper.updateByPrimaryKeySelective(oPayment)!=1){
+                    logger.info("付款单更新失败");
+                    throw new MessageException("付款单更新失败");
+                };
             }
         }
 
@@ -187,7 +187,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
         List<OPayDetail> opayDetails = getOpayMentDetails(srcId, paytype);
         if (null == opayDetails || opayDetails.size() == 0){
             logger.info("付款明细不存在");
-            throw new MessageException("付款明细不存在");
+            return AgentResult.fail("付款明细不存在");
         }
         BigDecimal offsetAmt = BigDecimal.ZERO;
         for (OPayDetail oPayDetail : opayDetails) {
