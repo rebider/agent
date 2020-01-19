@@ -163,7 +163,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                 oPaymentDetail.setSrcType(oSupplement.getPkType());
                 oPaymentDetail.setSrcId(srcId);
                 oPaymentDetail.setPayTime(new Date());
-                if (oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)!=0){
+                if (oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)!=1){
                     logger.info("付款单明细更新失败");
                     throw new MessageException("付款单明细更新失败");
                 };
@@ -206,7 +206,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
             if (oPaymentDetail.getRealPayAmount().compareTo(BigDecimal.ZERO)>0){
                 oPaymentDetail.setPaymentStatus(PaymentStatus.BF.code);
             }
-            if (oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)!=0){
+            if (oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)!=1){
                 logger.info("付款单明细更新失败");
                 throw new MessageException("付款单明细更新失败");
             };
