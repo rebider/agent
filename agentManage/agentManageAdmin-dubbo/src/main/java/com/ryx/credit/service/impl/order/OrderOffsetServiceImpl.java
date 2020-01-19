@@ -6,6 +6,7 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.order.OPayDetailMapper;
 import com.ryx.credit.dao.order.OPaymentDetailMapper;
+import com.ryx.credit.dao.order.OPaymentMapper;
 import com.ryx.credit.dao.order.OSupplementMapper;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.service.dict.IdService;
@@ -32,6 +33,8 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
     private OPayDetailMapper oPayDetailMapper;
     @Autowired
     private OSupplementMapper oSupplementMapper;
+    @Autowired
+    private OPaymentMapper oPaymentMapper;
     @Autowired
     private IdService idService;
 
@@ -133,15 +136,11 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
     @Override
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public AgentResult OffsetArrearsCommit(BigDecimal amount, String paytype, String srcId) throws MessageException{
-        OPayDetailExample oPayDetailExample = new OPayDetailExample();
-        oPayDetailExample.or().andStatusEqualTo(Status.STATUS_1.status)
-                .andSrcIdEqualTo(srcId)
-                .andPayTypeEqualTo(paytype)
-                .andBusStatEqualTo(Status.STATUS_0.status);
-        List<OPayDetail> oPayDetails = oPayDetailMapper.selectByExample(oPayDetailExample);
+        List<OPayDetail> oPayDetails = getOpayMentDetails(srcId,paytype);
         if (null == oPayDetails || oPayDetails.size() == 0){
             return AgentResult.fail("未查询到付款明细信息");
         }
+
         BigDecimal offsetAmt = BigDecimal.ZERO;
         for (OPayDetail oPayDetail : oPayDetails) {
             offsetAmt = offsetAmt.add(oPayDetail.getAmount());
@@ -149,12 +148,20 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
         if (offsetAmt.compareTo(amount)!=0) return AgentResult.fail("冲抵金额与申请不一致");
 
         if (paytype.equals(DDBK.code    )){
+            //更新付款单
+            String payMentDetailId = oPayDetails.get(0).getArrId();
+            OPayment oPayment = oPaymentMapper.selectByPrimaryKey(payMentDetailId);
+            oPayment.setRealAmount(oPayment.getRealAmount().add(amount));
+            oPayment.setPayAmount(oPayment.getOutstandingAmount());
+            oPaymentMapper.updateByPrimaryKeySelective(oPayment);
+            //更新付款单明细
             for (OPayDetail oPayDetail:oPayDetails){
                 oPayDetail.setBusStat(Status.STATUS_1.status);
                 oPayDetailMapper.updateByPrimaryKeySelective(oPayDetail);
                 OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectById(oPayDetail.getArrId());
                 oPaymentDetail.setRealPayAmount(oPaymentDetail.getRealPayAmount().add(oPayDetail.getAmount()));
                 if (oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())==0){
+//                    oPaymentDetail.setPayType();
                     oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
                 }else if (oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())==-1){
                     oPaymentDetail.setPaymentStatus(PaymentStatus.BF.code);
@@ -174,6 +181,16 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
     @Override
     public AgentResult OffsetArrearsQuery(String paytype, String srcId) {
         return null;
+    }
+
+    public List<OPayDetail> getOpayMentDetails(String srcId,String paytype){
+        OPayDetailExample oPayDetailExample = new OPayDetailExample();
+        oPayDetailExample.or().andStatusEqualTo(Status.STATUS_1.status)
+                .andSrcIdEqualTo(srcId)
+                .andPayTypeEqualTo(paytype)
+                .andBusStatEqualTo(Status.STATUS_0.status);
+        List<OPayDetail> oPayDetails = oPayDetailMapper.selectByExample(oPayDetailExample);
+        return oPayDetails;
     }
 
 }
