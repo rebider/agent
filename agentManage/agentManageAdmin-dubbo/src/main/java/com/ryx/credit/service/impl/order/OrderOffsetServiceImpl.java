@@ -153,20 +153,28 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
             OPayment oPayment = oPaymentMapper.selectByPrimaryKey(payMentDetailId);
             oPayment.setRealAmount(oPayment.getRealAmount().add(amount));
             oPayment.setPayAmount(oPayment.getOutstandingAmount());
-            oPaymentMapper.updateByPrimaryKeySelective(oPayment);
+            if(oPaymentMapper.updateByPrimaryKeySelective(oPayment)!=1){
+                logger.info("付款单更新失败");
+                throw new MessageException("付款单更新失败");
+            };
             //更新付款单明细
             for (OPayDetail oPayDetail:oPayDetails){
                 oPayDetail.setBusStat(Status.STATUS_1.status);
-                oPayDetailMapper.updateByPrimaryKeySelective(oPayDetail);
+                if(oPayDetailMapper.updateByPrimaryKeySelective(oPayDetail)!=1){
+                    logger.info("付款明细更新失败");
+                    throw new MessageException("付款明细更新失败");
+                };
                 OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectById(oPayDetail.getArrId());
                 oPaymentDetail.setRealPayAmount(oPaymentDetail.getRealPayAmount().add(oPayDetail.getAmount()));
                 if (oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())==0){
-//                    oPaymentDetail.setPayType();
                     oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
                 }else if (oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())==-1){
                     oPaymentDetail.setPaymentStatus(PaymentStatus.BF.code);
                 }
-                oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail);
+                if (oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)!=0){
+                    logger.info("付款单明细更新失败");
+                    throw new MessageException("付款单明细更新失败");
+                };
             }
         }
 
