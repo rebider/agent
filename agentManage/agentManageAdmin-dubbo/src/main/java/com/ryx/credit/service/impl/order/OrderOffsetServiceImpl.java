@@ -4,10 +4,7 @@ import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.dao.order.OPayDetailMapper;
-import com.ryx.credit.dao.order.OPaymentDetailMapper;
-import com.ryx.credit.dao.order.OPaymentMapper;
-import com.ryx.credit.dao.order.OSupplementMapper;
+import com.ryx.credit.dao.order.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrderOffsetService;
@@ -23,6 +20,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import static com.ryx.credit.common.enumc.OffsetPaytype.DDBK;
+import static com.ryx.credit.common.enumc.OffsetPaytype.DDTZ;
 
 @Service("orderOffsetService")
 public class OrderOffsetServiceImpl implements OrderOffsetService {
@@ -35,6 +33,8 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
     private OSupplementMapper oSupplementMapper;
     @Autowired
     private OPaymentMapper oPaymentMapper;
+    @Autowired
+    private OrderAdjMapper orderAdjMapper;
     @Autowired
     private IdService idService;
 
@@ -112,7 +112,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                     //进行添加付款明细数据
                     oPayDetail.setId(idService.genId(TabId.O_PAY_DETAIL));
                     oPayDetail.setArrId(paymentDetail.getId());
-                    oPayDetail.setPayType(DDBK.code);
+                    oPayDetail.setPayType(paytype);
                     oPayDetail.setBusStat(Status.STATUS_0.status);
                     oPayDetail.setStatus(Status.STATUS_1.status);
                     oPayDetail.setVersion(Status.STATUS_1.status);
@@ -126,6 +126,75 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                 }
                 resultMap.put("offsetPaymentDetails",resPaymentDetail);
                 resultMap.put("residueAmt",residue);
+        }else if (paytype.equals(DDTZ.code)){
+            //待还金额
+            BigDecimal arrearsAmt = BigDecimal.ZERO;
+            for(OPaymentDetail oPaymentDetail:opaymentDetailList){
+                if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.DF.code)==0
+                        || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.BF.code)==0
+                        || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.YQ.code)==0){
+                    arrearsAmt = arrearsAmt.add(oPaymentDetail.getPayAmount());
+                }
+            }
+            //付款明细
+            List<OPayDetail> oPayDetails = new ArrayList<>();
+            OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(srcId);
+            boolean flag=true;
+            boolean f=true;
+            //1.获取补款实际支付金额
+            BigDecimal residue=orderAdj.getRefundAmount().subtract(orderAdj.getProRefundAmount());
+
+            //多条补款
+            for (OPaymentDetail paymentDetail : opaymentDetailList) {
+                //2.累计还款金额
+                BigDecimal initialize = new BigDecimal(0);
+                if(f==false){
+                    break;
+                }
+                if(residue.compareTo(new BigDecimal(0))==0 ||flag==false){
+                    //如果销账金额已抵扣完销账则停止循环
+                    f=false;
+                    break;
+                }
+                OPayDetail oPayDetail = new OPayDetail();
+                if(residue.compareTo(paymentDetail.getPayAmount())==0){
+                    initialize=paymentDetail.getPayAmount();
+                    flag=false;
+                    logger.info("还款-------:"+initialize);
+                    oPayDetail.setAmount(residue);
+                    oPayDetail.setSrcId(srcId);
+                    residue = residue.subtract(initialize);
+                }else if(residue.compareTo(paymentDetail.getPayAmount())==-1){
+                    initialize.add(residue);
+                    flag=false;
+                    logger.info("还款-------:"+initialize.add(residue));
+                    oPayDetail.setAmount(residue);
+                    oPayDetail.setSrcId(srcId);
+                    residue = BigDecimal.ZERO;
+                }else if(residue.compareTo(paymentDetail.getPayAmount())==1){
+                    residue = residue.subtract(paymentDetail.getPayAmount());
+                    oPayDetail.setAmount(paymentDetail.getPayAmount());
+                    oPayDetail.setSrcId(srcId);
+                    logger.info("还款--------:"+paymentDetail.getPayAmount());
+                }
+                resPaymentDetail.add(paymentDetail);
+                //进行添加付款明细数据
+                oPayDetail.setId(idService.genId(TabId.O_PAY_DETAIL));
+                oPayDetail.setArrId(paymentDetail.getId());
+                oPayDetail.setPayType(paytype);
+                oPayDetail.setBusStat(Status.STATUS_0.status);
+                oPayDetail.setStatus(Status.STATUS_1.status);
+                oPayDetail.setVersion(Status.STATUS_1.status);
+                oPayDetail.setcTm(new Date());
+                oPayDetail.setcUser(orderAdj.getAdjUserId());
+                oPayDetails.add(oPayDetail);
+                if(1!=oPayDetailMapper.insertSelective(oPayDetail)){
+                    logger.info("付款明细添加失败");
+                    throw new MessageException("付款明细添加失败");
+                }
+            }
+            resultMap.put("offsetPaymentDetails",resPaymentDetail);
+            resultMap.put("residueAmt",residue);
         }
         return AgentResult.okMap(resultMap);
     }
@@ -214,8 +283,11 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
     }
 
     @Override
-    public AgentResult OffsetArrearsQuery(String paytype, String srcId) {
-        return null;
+    public List<OPayDetail> OffsetArrearsQuery(String paytype, String srcId) {
+        OPayDetailExample oPayDetailExample = new OPayDetailExample();
+        oPayDetailExample.or().andSrcIdEqualTo(srcId);
+        List<OPayDetail> oPayDetails = oPayDetailMapper.selectByExample(oPayDetailExample);
+        return oPayDetails;
     }
 
     public List<OPayDetail> getOpayMentDetails(String srcId,String paytype){

@@ -2,6 +2,7 @@ package com.ryx.credit.service.order;
 
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.pojo.admin.order.OPayDetail;
 import com.ryx.credit.pojo.admin.order.OPaymentDetail;
 
 import java.math.BigDecimal;
@@ -42,5 +43,5 @@ public interface OrderOffsetService {
      * @param srcId
      * @return
      */
-    AgentResult OffsetArrearsQuery(String OffsetPaytype, String srcId);
+    List<OPayDetail>  OffsetArrearsQuery(String OffsetPaytype, String srcId);
 }
