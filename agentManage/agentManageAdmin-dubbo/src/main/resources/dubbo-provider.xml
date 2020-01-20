@@ -106,6 +106,7 @@
     <dubbo:service interface="com.ryx.credit.service.order.OrderRepairService" ref="orderRepairService" timeout="1200000" registry="myGroup"/>
     <dubbo:service interface="com.ryx.credit.service.order.TerminalTransferService" ref="terminalTransferService" timeout="1200000" registry="myGroup"/>
     <dubbo:service interface="com.ryx.credit.service.order.OrderOffsetService" ref="orderOffsetService" timeout="1200000" registry="myGroup"/>
+    <dubbo:service interface="com.ryx.credit.service.order.OPayDetailService" ref="oPayDetailService" timeout="1200000" registry="myGroup"/>
 
 
     <!-- 基础资源维护-->
