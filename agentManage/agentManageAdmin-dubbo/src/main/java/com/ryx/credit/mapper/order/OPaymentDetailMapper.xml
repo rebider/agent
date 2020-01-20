@@ -571,7 +571,7 @@
     </select>
 
     <select id="selectMoney" parameterType="string" resultType="com.ryx.credit.pojo.admin.order.OPaymentDetail">
-        select PAY_AMOUNT as payAmount,REAL_PAY_AMOUNT as realPayAmount from o_Payment_detail where id=#{id} and  PAYMENT_STATUS in(1,3,5)
+        select PAY_AMOUNT as payAmount,REAL_PAY_AMOUNT as realPayAmount from o_Payment_detail where id=#{id} and  PAYMENT_STATUS in(1,3,2)
         and status=1
     </select>
 
