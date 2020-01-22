@@ -2006,6 +2006,66 @@ public class OrderAdjExample {
             addCriterion("DIF_AMOUNT not between", value1, value2, "difAmount");
             return (Criteria) this;
         }
+
+        public Criteria andLogicalVersionIsNull() {
+            addCriterion("LOGICAL_VERSION is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogicalVersionIsNotNull() {
+            addCriterion("LOGICAL_VERSION is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogicalVersionEqualTo(BigDecimal value) {
+            addCriterion("LOGICAL_VERSION =", value, "logicalVersion");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogicalVersionNotEqualTo(BigDecimal value) {
+            addCriterion("LOGICAL_VERSION <>", value, "logicalVersion");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogicalVersionGreaterThan(BigDecimal value) {
+            addCriterion("LOGICAL_VERSION >", value, "logicalVersion");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogicalVersionGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("LOGICAL_VERSION >=", value, "logicalVersion");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogicalVersionLessThan(BigDecimal value) {
+            addCriterion("LOGICAL_VERSION <", value, "logicalVersion");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogicalVersionLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("LOGICAL_VERSION <=", value, "logicalVersion");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogicalVersionIn(List<BigDecimal> values) {
+            addCriterion("LOGICAL_VERSION in", values, "logicalVersion");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogicalVersionNotIn(List<BigDecimal> values) {
+            addCriterion("LOGICAL_VERSION not in", values, "logicalVersion");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogicalVersionBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("LOGICAL_VERSION between", value1, value2, "logicalVersion");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogicalVersionNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("LOGICAL_VERSION not between", value1, value2, "logicalVersion");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
