@@ -1028,16 +1028,14 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	}
 
 
-	public AgentBusInfo queryBusInfo(String busNum)throws MessageException{
+	public List<Map<String,Object>> queryBusInfo(String busNum,String platformType)throws MessageException{
 		if(StringUtils.isBlank(busNum)){
 			throw new MessageException("业务编号不能为空");
 		}
-		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
-		AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
-		criteria.andStatusEqualTo(Status.STATUS_1.status);
-		criteria.andBusStatusNotEqualTo(BusinessStatus.pause.status);
-		criteria.andBusNumEqualTo(busNum);
-		List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+		if(StringUtils.isBlank(platformType)){
+			throw new MessageException("业务平台不能为空");
+		}
+		List<Map<String,Object>> agentBusInfos = agentBusInfoMapper.queyrBusInfoByBusNumAndPlatformType(FastMap.fastMap("busNum",busNum).putKeyV("platformType",platformType));
 		if(agentBusInfos==null){
 			throw new MessageException("业务不存在");
 		}
@@ -1047,8 +1045,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		if(agentBusInfos.size()!=1){
 			throw new MessageException("业务不唯一");
 		}
-		AgentBusInfo agentBusInfo = agentBusInfos.get(0);
-		return agentBusInfo;
+		return agentBusInfos;
 	}
 
 	/**
@@ -1058,8 +1055,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	 * @throws MessageException
 	 */
 	@Override
-	public AgentBusInfo queryAgentBusInfo(String busNum)throws MessageException{
-		return queryBusInfo(busNum);
+	public List<Map<String,Object>> queryAgentBusInfo(String busNum,String platformType)throws MessageException{
+		return queryBusInfo(busNum,platformType);
 	}
 
 	/**
