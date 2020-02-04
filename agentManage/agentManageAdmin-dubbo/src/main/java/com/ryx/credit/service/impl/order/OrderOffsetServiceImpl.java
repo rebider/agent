@@ -4,8 +4,11 @@ import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.CUserMapper;
 import com.ryx.credit.dao.order.*;
 import com.ryx.credit.pojo.admin.order.*;
+import com.ryx.credit.pojo.admin.vo.UserVo;
+import com.ryx.credit.service.ICuserAgentService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrderOffsetService;
 import org.slf4j.Logger;
@@ -37,6 +40,8 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
     private OrderAdjMapper orderAdjMapper;
     @Autowired
     private IdService idService;
+    @Autowired
+    private CUserMapper cUserMapper;
 
     private Logger logger = LoggerFactory.getLogger(OrderOffsetServiceImpl.class);
     @Override
@@ -299,6 +304,12 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
             .andStatusEqualTo(Status.STATUS_1.status);
         }
         List<OPayDetail> oPayDetails = oPayDetailMapper.selectByExample(oPayDetailExample);
+
+        for (OPayDetail oPayDetail:oPayDetails){
+            UserVo userVo = cUserMapper.selectUserVoById(Long.valueOf(oPayDetail.getcUser()));
+            oPayDetail.setcUser(userVo.getName());
+        }
+
         return oPayDetails;
     }
 
