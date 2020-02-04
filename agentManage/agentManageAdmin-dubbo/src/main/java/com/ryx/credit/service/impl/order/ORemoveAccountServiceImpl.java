@@ -180,6 +180,7 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
             oRemoveAccount.setVersion(Status.STATUS_1.status);
             oRemoveAccount.setStatus(Status.STATUS_1.status);
             oRemoveAccount.setRealRamount(new BigDecimal(0));
+            oRemoveAccount.setLogicalVersion(LogicalVersion.ONE.code);
             //添加销账金额
             HashMap<Object, Object> map = new HashMap<>();
             map.put("platform",platName);
@@ -230,6 +231,19 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM");
         if (ids != null && ids.size() > 0) {
             for (String id : ids) {
+                //准备数据
+                OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
+                OPaymentDetailExample.Criteria criteria1 = oPaymentDetailExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andSrcIdEqualTo(id);
+                List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
+                if(null!=oPaymentDetails && oPaymentDetails.size()>0){
+                    for (OPaymentDetail oPaymentDetail : oPaymentDetails) {
+                        List<OPaymentDetail> oPaymentDetailList = oPaymentDetailMapper.selectCount(oPaymentDetail.getOrderId(), PamentIdType.ORDER_FKD.code, PaymentStatus.DF.code);
+
+                    }
+                }
+
+
+
                 ORemoveAccountExample oRemoveAccountExample = new ORemoveAccountExample();
                 oRemoveAccountExample.or().andRstatusEqualTo(RemoveAccountStatus.CLZ.code).andIdEqualTo(id);
                 //每次处理一百条数据

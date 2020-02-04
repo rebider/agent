@@ -106,6 +106,7 @@ public enum DictGroup {
     ORDER_ADJ_APR_BUSNISS("业务部订单调整审批参数"),
     FINACEORG_CONFIG("出款机构调整逻辑"),
     FINACEORG_PAR("出款机构调整逻辑匹配模式配置"),
+    OFFSET_PAY_TYPE("补款方式")
     ;
 
 

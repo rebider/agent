@@ -3932,6 +3932,7 @@ public class OrderServiceImpl implements OrderService {
                 removeAccount.setStatus(Status.STATUS_1.status);
                 removeAccount.setVersion(Status.STATUS_1.status);
                 removeAccount.setRealRamount(new BigDecimal(0));
+                removeAccount.setLogicalVersion(LogicalVersion.ONE.code);
                 if (1 == oRemoveAccountMapper.insertSelective(removeAccount)) {
                     oRemoveAccountVo.setRemoveAccount(removeAccount);
                 }

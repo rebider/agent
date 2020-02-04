@@ -510,7 +510,10 @@ public class OSupplementServiceImpl implements OSupplementService {
             }
             OSupplement osupplement = oSupplementMapper.selectByPrimaryKey(oSupplement.getId());
             AgentResult agentResult = orderOffsetService.OffsetArrearsCommit(osupplement.getPayAmount(), OffsetPaytype.DDBK.code, osupplement.getId());
-
+            if (!agentResult.isOK()){
+                logger.info("补款更新异常");
+                throw new MessageException("补款更新异常！");
+            }
          /*   //修改订单明细付款状态
             OSupplement supplement = selectOSupplement(oSupplement.getId());
             if (supplement.getPkType().equals(PkType.FQBK.code)) {
@@ -747,6 +750,15 @@ public class OSupplementServiceImpl implements OSupplementService {
     @Override
     public List<OPaymentDetail> selectCount(String orderId, String code) {
       return   oPaymentDetailMapper.selectCount(orderId,code, null);
+    }
+
+    @Override
+    public List<OPayDetail> selectOpayDetail(OSupplement oSupplement) {
+        if(null!=oSupplement){
+            return  orderOffsetService.OffsetArrearsQuery(QueryType.ARRID.code,oSupplement.getSrcId());
+
+        }
+        return new ArrayList<>();
     }
 
 }

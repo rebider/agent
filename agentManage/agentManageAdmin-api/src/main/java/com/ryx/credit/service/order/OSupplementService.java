@@ -10,6 +10,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
+import com.ryx.credit.pojo.admin.order.OPayDetail;
 import com.ryx.credit.pojo.admin.order.OPayment;
 import com.ryx.credit.pojo.admin.order.OPaymentDetail;
 import com.ryx.credit.pojo.admin.order.OSupplement;
@@ -88,5 +89,10 @@ public interface OSupplementService {
     OPayment selectOpayment(String id);
 
     public List<OPaymentDetail>selectCount(String orderId, String code);;
+
+    /**
+     * 查看补款详情
+     */
+    public List<OPayDetail> selectOpayDetail(OSupplement oSupplement);
 
 }
