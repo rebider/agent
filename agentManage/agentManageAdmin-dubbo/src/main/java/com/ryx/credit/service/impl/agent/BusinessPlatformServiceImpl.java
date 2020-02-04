@@ -597,6 +597,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             AgentBusInfo agentBusInfo = null;
             for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
                 agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                if (StringUtils.isBlank(agentBusInfoVo.getBusParent())) {
+                    agentBusInfoVo.setBusParent(agentBusInfo.getBusParent());
+                }
                 //校验代理商类型更改规则
                 verifyBusinfoType(agentBusInfo, agentBusInfoVo);
                 //校验业务编码是否存在
