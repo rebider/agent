@@ -212,4 +212,14 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+  <select id="queryOPaydetails" parameterType="string" resultType="com.ryx.credit.pojo.admin.vo.OPayDetailVo">
+    select op.ARR_ID as arrId,op.amount as amount, opd.order_id as orderId
+    from o_pay_detail op
+           left join o_payment_detail opd
+                     on op.arr_id = opd.id
+    where op.src_id = #{srcId}
+      and op.c_user = #{userId}
+      and op.pay_type = #{payType}
+      and op.status = '1'
+  </select>
 </mapper>
