@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.order;
 
+import com.ryx.credit.dao.order.OOrderMapper;
 import com.ryx.credit.dao.order.OPayDetailMapper;
 import com.ryx.credit.dao.order.OPaymentDetailMapper;
 import com.ryx.credit.pojo.admin.order.OPayDetail;
@@ -23,24 +24,33 @@ public class OPayDetailServiceImpl implements OPayDetailService {
     private Logger logger = LoggerFactory.getLogger(OPayDetailServiceImpl.class);
     @Autowired
     private OPayDetailMapper oPayDetailMapper;
+    @Autowired
+    private OPaymentDetailMapper oPaymentDetailMapper;
 
     @Override
-    public Map<String, Object> getAdjDetail(String srcId, String payType, String userId, String agentId) {
+    public Map<String, Object> getAdjDetail(String srcId, String payType, String agentId) {
         logger.info("查询付款明细");
         Map<String,Object> resMap = new HashMap<>();
-        BigDecimal refundAmount = BigDecimal.ZERO;
+        BigDecimal takeAmount = BigDecimal.ZERO;
         OPayDetailExample oPayDetailExample = new OPayDetailExample();
         oPayDetailExample.or().andSrcIdEqualTo(srcId)
-                .andPayTypeEqualTo(payType)
-                .andCUserEqualTo(userId);
+                .andPayTypeEqualTo(payType);
         List<OPayDetail> oPayDetails = oPayDetailMapper.selectByExample(oPayDetailExample);
+        List<OPayDetailVo> oPayDetailVos = new ArrayList<>();
         if (oPayDetails != null && oPayDetails.size() > 0){
             for (OPayDetail oPayDetail:oPayDetails){
-                refundAmount = refundAmount.add(oPayDetail.getAmount());
+                OPayDetailVo oPayDetailVo = new OPayDetailVo();
+                oPayDetailVo.setArrId(oPayDetail.getArrId());
+                oPayDetailVo.setAmount(oPayDetail.getAmount());
+                OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectById(oPayDetailVo.getArrId());
+                oPayDetailVo.setOrderId(oPaymentDetail.getOrderId());
+                oPayDetailVos.add(oPayDetailVo);
+                takeAmount = takeAmount.add(oPayDetail.getAmount());
+                resMap.put("viewDetails",oPayDetailVos);
             }
             resMap.put("details",oPayDetails);
         }
-        resMap.put("refundAmount",refundAmount);
+        resMap.put("takeAmount",takeAmount);
         return resMap;
     }
 }
