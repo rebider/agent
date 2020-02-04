@@ -192,6 +192,11 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                     logger.info("付款明细添加失败");
                     throw new MessageException("付款明细添加失败");
                 }
+                paymentDetail.setPaymentStatus(PaymentStatus.FKING.code);
+                if(1!=oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail)){
+                    logger.info("付款明细添加失败");
+                    throw new MessageException("付款明细添加失败");
+                }
             }
             resultMap.put("offsetPaymentDetails",resPaymentDetail);
             resultMap.put("residueAmt",residue);
