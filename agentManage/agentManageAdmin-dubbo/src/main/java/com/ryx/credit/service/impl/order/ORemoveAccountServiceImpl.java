@@ -19,6 +19,7 @@ import com.ryx.credit.service.agent.BusinessPlatformService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.ORemoveAccountService;
+import com.ryx.credit.service.order.OrderOffsetService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +64,8 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
     private  BusinessPlatformService businessPlatformService;
     @Autowired
     private CUserMapper cUserMapper;
+    @Autowired
+    private OrderOffsetService orderOffsetService;
 
     @Override
     public PageInfo removeAccountDetail(Map<String, Object> param, PageInfo pageInfo) {
