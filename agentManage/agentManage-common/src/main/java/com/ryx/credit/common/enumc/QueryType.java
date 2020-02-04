@@ -1,6 +1,5 @@
 package com.ryx.credit.common.enumc;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,14 +10,14 @@ import java.util.Map;
 public enum QueryType {
 
 
-    ARRID(new BigDecimal("0"), "欠款Id"),
-    XXDK(new BigDecimal("1"), "补款Id");
+    ARRID("0", "欠款Id"),
+    SRCID("1", "补款Id");
 
-    public BigDecimal code;
+    public String code;
 
     public String msg;
 
-    QueryType(BigDecimal c, String m) {
+    QueryType(String c, String m) {
         this.code = c;
         this.msg = m;
     }
@@ -27,7 +26,7 @@ public enum QueryType {
      * 取得枚举对象值
      * @return 枚举对象值
      */
-    public BigDecimal getValue() {
+    public String getValue() {
         return this.code;
     }
 
@@ -58,8 +57,8 @@ public enum QueryType {
      * 获取下拉列表
      * @return
      */
-    public static Map<BigDecimal, Object> getContentMap() {
-        Map<BigDecimal, Object> resultMap = new HashMap<>();
+    public static Map<String, Object> getContentMap() {
+        Map<String, Object> resultMap = new HashMap<>();
         QueryType[] queryTypes = QueryType.values();
         for (QueryType cc : queryTypes) {
             resultMap.put(cc.code, cc.msg);
