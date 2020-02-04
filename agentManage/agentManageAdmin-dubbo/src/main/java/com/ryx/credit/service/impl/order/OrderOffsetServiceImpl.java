@@ -289,8 +289,15 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
 
     @Override
     public List<OPayDetail> OffsetArrearsQuery(String paytype, String srcId) {
+
         OPayDetailExample oPayDetailExample = new OPayDetailExample();
-        oPayDetailExample.or().andSrcIdEqualTo(srcId);
+        if (paytype.equals(QueryType.ARRID.code)){
+            oPayDetailExample.or().andArrIdEqualTo(srcId)
+            .andStatusEqualTo(Status.STATUS_1.status);
+        }else if (paytype.equals(QueryType.SRCID.code)){
+            oPayDetailExample.or().andSrcIdEqualTo(srcId)
+            .andStatusEqualTo(Status.STATUS_1.status);
+        }
         List<OPayDetail> oPayDetails = oPayDetailMapper.selectByExample(oPayDetailExample);
         return oPayDetails;
     }
