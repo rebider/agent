@@ -238,6 +238,19 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         if(StringUtils.isNotBlank(internetRenewDetail.getBusNum())){
             criteria.andBusNumEqualTo(internetRenewDetail.getBusNum());
         }
+        if(StringUtils.isNotBlank(internetRenewDetail.getOpenAccountTimeBeginStr())){
+            Date format = DateUtil.format(internetRenewDetail.getOpenAccountTimeBeginStr(), DateUtil.DATE_FORMAT_yyyy_MM_dd);
+            criteria.andOpenAccountTimeGreaterThanOrEqualTo(format);
+        }
+        if(StringUtils.isNotBlank(internetRenewDetail.getOpenAccountTimeEndStr())){
+            Date format = DateUtil.format(internetRenewDetail.getOpenAccountTimeEndStr(), DateUtil.DATE_FORMAT_yyyy_MM_dd);
+            criteria.andOpenAccountTimeLessThanOrEqualTo(format);
+        }
+        if(StringUtils.isNotBlank(internetRenewDetail.getExpireTimeBeginStr()) && StringUtils.isNotBlank(internetRenewDetail.getExpireTimeEndStr())){
+            Date begin = DateUtil.format(internetRenewDetail.getExpireTimeBeginStr(), DateUtil.DATE_FORMAT_yyyy_MM_dd);
+            Date end = DateUtil.format(internetRenewDetail.getExpireTimeEndStr(), DateUtil.DATE_FORMAT_yyyy_MM_dd);
+            criteria.andExpireTimeBetween(begin,end);
+        }
         internetRenewDetailExample.setReqMap(reqMap);
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         internetRenewDetailExample.setOrderByClause(" c_time desc ");
