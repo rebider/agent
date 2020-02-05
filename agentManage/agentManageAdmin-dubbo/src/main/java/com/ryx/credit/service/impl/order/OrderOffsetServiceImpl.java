@@ -298,10 +298,12 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
         OPayDetailExample oPayDetailExample = new OPayDetailExample();
         if (paytype.equals(QueryType.ARRID.code)){
             oPayDetailExample.or().andArrIdEqualTo(srcId)
-            .andStatusEqualTo(Status.STATUS_1.status);
+                    .andBusStatEqualTo(Status.STATUS_1.status)
+                    .andStatusEqualTo(Status.STATUS_1.status);
         }else if (paytype.equals(QueryType.SRCID.code)){
             oPayDetailExample.or().andSrcIdEqualTo(srcId)
-            .andStatusEqualTo(Status.STATUS_1.status);
+                    .andBusStatEqualTo(Status.STATUS_1.status)
+                    .andStatusEqualTo(Status.STATUS_1.status);
         }
         List<OPayDetail> oPayDetails = oPayDetailMapper.selectByExample(oPayDetailExample);
 
