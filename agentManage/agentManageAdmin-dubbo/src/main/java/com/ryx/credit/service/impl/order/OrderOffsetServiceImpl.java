@@ -173,6 +173,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                     oPayDetail.setAmount(residue);
                     oPayDetail.setSrcId(oRemoveAccount.getId());
                     residue = residue.subtract(initialize);
+                    resAmt = resAmt.add(oPayDetail.getAmount());
                 }else if(residue.compareTo(paymentDetail.getPayAmount())==-1){
                     initialize.add(residue);
                     flag=false;
@@ -180,10 +181,12 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                     oPayDetail.setAmount(residue);
                     oPayDetail.setSrcId(oRemoveAccount.getId());
                     residue = BigDecimal.ZERO;
+                    resAmt = resAmt.add(oPayDetail.getAmount());
                 }else if(residue.compareTo(paymentDetail.getPayAmount())==1){
                     residue = residue.subtract(paymentDetail.getPayAmount());
                     oPayDetail.setAmount(paymentDetail.getPayAmount());
                     oPayDetail.setSrcId(oRemoveAccount.getId());
+                    resAmt = resAmt.add(oPayDetail.getAmount());
                     logger.info("销账还款--------:"+paymentDetail.getPayAmount());
                 }
                 resPaymentDetail.add(paymentDetail);
@@ -203,6 +206,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                 }
             }
             resultMap.put("offsetPaymentDetails",resPaymentDetail);
+            resultMap.put("OfffsetAmt",resAmt);
             resultMap.put("residueAmt",residue);
         }else if (paytype.equals(DDTZ.code)){
             //待还金额
