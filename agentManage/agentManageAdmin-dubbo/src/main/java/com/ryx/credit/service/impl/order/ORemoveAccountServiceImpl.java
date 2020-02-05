@@ -2,6 +2,7 @@ package com.ryx.credit.service.impl.order;
 
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -29,10 +30,13 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.ryx.credit.common.enumc.OffsetPaytype.DDBK;
 
 /**
  * @Auther: lrr
@@ -231,19 +235,6 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM");
         if (ids != null && ids.size() > 0) {
             for (String id : ids) {
-                //准备数据
-                OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
-                OPaymentDetailExample.Criteria criteria1 = oPaymentDetailExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andSrcIdEqualTo(id);
-                List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
-                if(null!=oPaymentDetails && oPaymentDetails.size()>0){
-                    for (OPaymentDetail oPaymentDetail : oPaymentDetails) {
-                        List<OPaymentDetail> oPaymentDetailList = oPaymentDetailMapper.selectCount(oPaymentDetail.getOrderId(), PamentIdType.ORDER_FKD.code, PaymentStatus.DF.code);
-
-                    }
-                }
-
-
-
                 ORemoveAccountExample oRemoveAccountExample = new ORemoveAccountExample();
                 oRemoveAccountExample.or().andRstatusEqualTo(RemoveAccountStatus.CLZ.code).andIdEqualTo(id);
                 //每次处理一百条数据
@@ -278,7 +269,7 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                         map.put("busNum", oRemoveAccount_item.getBusNum());
                     }
                     try {
-                        map.put("flag","1");
+//                        map.put("flag","1");
                         BigDecimal outstandingAmount = new BigDecimal(0);
                         List<Map> orderList = oOrderMapper.arrearageQuery(map);
                         if (null != orderList && orderList.size() > 0) {
@@ -293,9 +284,9 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                             }
                             //查到相关的订单
                             for (int i = 0; i < orderList.size(); i++) {
-                                if(f==false){
+                               /* if(f==false){
                                     break;
-                                }
+                                }*/
                                 Map mapItem = orderList.get(i);
                                 //根据agentId和oId查询付款单的明细
                                 HashMap<Object, Object> hashMap = new HashMap<>();
@@ -307,7 +298,27 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                     hashMap.put("omonth",format);
                                 }
                                 List<OPaymentDetail> oPaymentDetailList = oPaymentDetailMapper.selectOPaymentDetail(hashMap);
-                                if (null != oPaymentDetailList && oPaymentDetailList.size() > 0) {
+
+
+                                AgentResult agentResult= orderOffsetService.OffsetArrears(oPaymentDetailList, residue,OffsetPaytype.DDXZ.code, id);
+                                if (agentResult.getMapData() != null && agentResult.getMapData().size()!=0) {
+                                    Map<String, Object> resMapCash = agentResult.getMapData();
+                                    BigDecimal residueAmt = new BigDecimal(resMapCash.get("residueAmt").toString());
+                                    real_ramount = new BigDecimal(resMapCash.get("OfffsetAmt").toString());
+                                    if (residueAmt.compareTo(new BigDecimal(BigInteger.ZERO))==-1 || residueAmt.compareTo(new BigDecimal(BigInteger.ZERO))==1) {
+                                        logger.info("销账失败:{}", "抵扣金额大于或小于欠款金额"+residueAmt);
+                                        throw new MessageException("抵扣金额大于或小于欠款金额"+residueAmt);
+                                    }
+                                    List<OPaymentDetail> offsetPaymentDetails=(ArrayList)resMapCash.get("offsetPaymentDetails");
+                                }
+
+                                ORemoveAccount oRemoveAccount = oRemoveAccountMapper.selectByPrimaryKey(id);
+                                AgentResult agentResultCommit = orderOffsetService.OffsetArrearsCommit(oRemoveAccount.getRealRamount(), OffsetPaytype.DDXZ.code, oRemoveAccount.getId());
+                                if (!agentResultCommit.isOK()){
+                                    throw new MessageException("销账数据更新异常！");
+                                }
+
+                              /*  if (null != oPaymentDetailList && oPaymentDetailList.size() > 0) {
                                     for (OPaymentDetail oPaymentDetail : oPaymentDetailList) {
                                         oPaymentDetail = oPaymentDetailMapper.selectByPrimaryKey(oPaymentDetail.getId());
                                         OPayment oPayment = oPaymentMapper.selectByPrimaryKey(oPaymentDetail.getPaymentId());
@@ -455,7 +466,7 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                             }
                                         }
                                     }
-                                }
+                                }*/
                             }
                         }else{
                             if(StringUtils.isNotBlank(oRemoveAccount_item.getAgId()) && null !=oRemoveAccount_item.getRmonth()){

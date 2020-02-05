@@ -475,7 +475,7 @@ select count(1) from (
     left join a_agent ag on ag.id=ra.ag_id
     left join a_platform plat ON plat.platform_num = ra.bus_platform
     left join o_order o on o.id=o_payment_detail.order_id
-    where o_payment_detail.Payment_status in(4,6)
+    where o_payment_detail.Payment_status in(2,4,6)
     <include refid="RACCOUNTDETAIL_WHERE_SQL"/>
     <include refid="PAGING_END" />
   </select>
@@ -488,7 +488,7 @@ select count(1) from (
     left join a_agent ag on ag.id=ra.ag_id
     left join a_platform plat ON plat.platform_num = ra.bus_platform
     left join o_order o on o.id=o_payment_detail.order_id
-    where o_payment_detail.Payment_status in(4,6)
+    where o_payment_detail.Payment_status in(2,4,6)
     <include refid="RACCOUNTDETAIL_WHERE_SQL"/>
   </select>
 
