@@ -4419,7 +4419,7 @@ public class OrderServiceImpl implements OrderService {
                 reqMap.put("party",startPar.get("party"));
             }
             OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(orderUpModelVo.getId());
-            if (orderUpModelVo.getSid().equals("sid-F315F787-E98B-40FA-A6DC-6A962201075D")){
+            if (orderUpModelVo.getSid().equals("sid-C911F512-9E63-44CC-9E6E-763484FA0E5B")&& orderUpModelVo.getApprovalResult().equals(ApprovalType.PASS.getValue())){
                 //应该退款金额
                 BigDecimal amount = orderAdj.getRefundAmount() == null ? new BigDecimal(0) : orderAdj.getRefundAmount();
                 //手续费
@@ -4429,7 +4429,11 @@ public class OrderServiceImpl implements OrderService {
                 List<OPaymentDetail> paymentDetails = paymentDetailService.getCanTakeoutPaymentsByAgentId(orderAdj.getAgentId(), AdjustType.ORDER_ADJ.adjustType, orderAdj.getId());
                 AgentResult agentResult= orderOffsetService.OffsetArrears(paymentDetails, amount.subtract(proRefundAmo).subtract(takeout_amount), DDTZ.code, orderAdj.getId());
                 if (agentResult.isOK()){
-                    agentResult.getMapData().get("residue");
+                    BigDecimal residue =  (BigDecimal) agentResult.getMapData().get("residueAmt");
+                    orderAdj.setOffsetAmount(amount.subtract(proRefundAmo).subtract(takeout_amount).subtract(residue));
+                    if(!orderService.approvalTaskSettle(orderAdj).isOK()){
+                        return AgentResult.fail("更新订单调整记录失败!");
+                    };
                 }
             }
             //财务审批
@@ -4590,6 +4594,12 @@ public class OrderServiceImpl implements OrderService {
             List<OOrder> oOrders = orderMapper.selectByExample(oOrderExample);
             oOrders.get(0).setOrderStatus(OrderStatus.ENABLE.status);
             orderMapper.updateByPrimaryKeySelective(oOrders.get(0));
+            if(orderAdj.getOffsetAmount().compareTo(BigDecimal.ZERO)>0&&orderAdj.getLogicalVersion().compareTo(BigDecimal.ONE)==0){
+                AgentResult agentResult = orderOffsetService.OffsetArrearsCancle(orderAdj.getOffsetAmount(), DDTZ.code, orderAdj.getId());
+                if (!agentResult.isOK()){
+                    throw new MessageException("订单调整抵扣欠款数据更新异常！");
+                }
+            }
 
             //订单调整更新
             if (1 != orderAdjMapper.updateByPrimaryKeySelective(orderAdj)) {
