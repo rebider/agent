@@ -38,6 +38,8 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
     @Autowired
     private OrderAdjMapper orderAdjMapper;
     @Autowired
+    private ORemoveAccountMapper oRemoveAccountMapper;
+    @Autowired
     private IdService idService;
     @Autowired
     private CUserMapper cUserMapper;
@@ -58,7 +60,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
         List<OPaymentDetail> resPaymentDetail = new ArrayList<>();
         BigDecimal resAmt = BigDecimal.ZERO;
         AgentResult result = AgentResult.ok();
-        if (paytype.equals(DDBK.code) || paytype.equals(DDXZ.code)){ //订单补款、销账
+        if (paytype.equals(DDBK.code)){ //订单补款
             //待还金额
             BigDecimal arrearsAmt = BigDecimal.ZERO;
             for(OPaymentDetail oPaymentDetail:opaymentDetailList){
@@ -130,6 +132,78 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                 }
                 resultMap.put("offsetPaymentDetails",resPaymentDetail);
                 resultMap.put("residueAmt",residue);
+        }else if (paytype.equals(DDXZ.code)){
+            //待还金额
+            BigDecimal arrearsAmt = BigDecimal.ZERO;
+            for(OPaymentDetail oPaymentDetail:opaymentDetailList){
+                if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.DF.code)==0
+                        || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.BF.code)==0
+                        || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.YQ.code)==0){
+                    arrearsAmt = arrearsAmt.add(oPaymentDetail.getPayAmount());
+                }
+            }
+            if(amount.compareTo(arrearsAmt)>0){
+                return AgentResult.fail("补款金额不能大于欠款金额!");
+            }
+            //付款明细
+            List<OPayDetail> oPayDetails = new ArrayList<>();
+            ORemoveAccount oRemoveAccount = oRemoveAccountMapper.selectByPrimaryKey(srcId);
+            boolean flag=true;
+            boolean f=true;
+            //1.获取补款实际支付金额
+            BigDecimal residue=oRemoveAccount.getRamount();
+
+            //多条补款
+            for (OPaymentDetail paymentDetail : opaymentDetailList) {
+                //2.累计还款金额
+                BigDecimal initialize = new BigDecimal(0);
+                if(f==false){
+                    break;
+                }
+                if(residue.compareTo(new BigDecimal(0))==0 ||flag==false){
+                    //如果销账金额已抵扣完销账则停止循环
+                    f=false;
+                    break;
+                }
+                OPayDetail oPayDetail = new OPayDetail();
+                if(residue.compareTo(paymentDetail.getPayAmount())==0){
+                    initialize=paymentDetail.getPayAmount();
+                    flag=false;
+                    logger.info("还款-------:"+initialize);
+                    oPayDetail.setAmount(residue);
+                    oPayDetail.setSrcId(oRemoveAccount.getId());
+                    residue = residue.subtract(initialize);
+                }else if(residue.compareTo(paymentDetail.getPayAmount())==-1){
+                    initialize.add(residue);
+                    flag=false;
+                    logger.info("还款-------:"+initialize.add(residue));
+                    oPayDetail.setAmount(residue);
+                    oPayDetail.setSrcId(oRemoveAccount.getId());
+                    residue = BigDecimal.ZERO;
+                }else if(residue.compareTo(paymentDetail.getPayAmount())==1){
+                    residue = residue.subtract(paymentDetail.getPayAmount());
+                    oPayDetail.setAmount(paymentDetail.getPayAmount());
+                    oPayDetail.setSrcId(oRemoveAccount.getId());
+                    logger.info("还款--------:"+paymentDetail.getPayAmount());
+                }
+                resPaymentDetail.add(paymentDetail);
+                //进行添加付款明细数据
+                oPayDetail.setId(idService.genId(TabId.O_PAY_DETAIL));
+                oPayDetail.setArrId(paymentDetail.getId());
+                oPayDetail.setPayType(paytype);
+                oPayDetail.setBusStat(Status.STATUS_0.status);
+                oPayDetail.setStatus(Status.STATUS_1.status);
+                oPayDetail.setVersion(Status.STATUS_1.status);
+                oPayDetail.setcTm(new Date());
+                oPayDetail.setcUser(oRemoveAccount.getSubmitPerson());
+                oPayDetails.add(oPayDetail);
+                if(1!=oPayDetailMapper.insertSelective(oPayDetail)){
+                    logger.info("付款明细添加失败");
+                    throw new MessageException("付款明细添加失败");
+                }
+            }
+            resultMap.put("offsetPaymentDetails",resPaymentDetail);
+            resultMap.put("residueAmt",residue);
         }else if (paytype.equals(DDTZ.code)){
             //待还金额
             BigDecimal arrearsAmt = BigDecimal.ZERO;
