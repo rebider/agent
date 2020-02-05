@@ -22,8 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static com.ryx.credit.common.enumc.OffsetPaytype.DDBK;
-import static com.ryx.credit.common.enumc.OffsetPaytype.DDTZ;
+import static com.ryx.credit.common.enumc.OffsetPaytype.*;
 
 @Service("orderOffsetService")
 public class OrderOffsetServiceImpl implements OrderOffsetService {
@@ -59,7 +58,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
         List<OPaymentDetail> resPaymentDetail = new ArrayList<>();
         BigDecimal resAmt = BigDecimal.ZERO;
         AgentResult result = AgentResult.ok();
-        if (paytype.equals(DDBK.code)){ //订单补款
+        if (paytype.equals(DDBK.code) && paytype.equals(DDXZ.code)){ //订单补款、销账
             //待还金额
             BigDecimal arrearsAmt = BigDecimal.ZERO;
             for(OPaymentDetail oPaymentDetail:opaymentDetailList){
@@ -223,7 +222,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
         }
         if (offsetAmt.compareTo(amount)!=0) return AgentResult.fail("冲抵金额与申请不一致");
 
-        if (paytype.equals(DDBK.code    )){
+        if (paytype.equals(DDBK.code) && paytype.equals(DDXZ.code)){
             //更新付款单明细
             for (OPayDetail oPayDetail:oPayDetails){
                 oPayDetail.setBusStat(Status.STATUS_1.status);
