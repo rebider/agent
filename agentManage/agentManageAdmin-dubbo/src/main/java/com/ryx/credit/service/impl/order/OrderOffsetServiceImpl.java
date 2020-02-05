@@ -132,7 +132,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                 }
                 resultMap.put("offsetPaymentDetails",resPaymentDetail);
                 resultMap.put("residueAmt",residue);
-        }else if (paytype.equals(DDXZ.code)){
+        }else if (paytype.equals(DDXZ.code)){ //线下销账
             //待还金额
             BigDecimal arrearsAmt = BigDecimal.ZERO;
             for(OPaymentDetail oPaymentDetail:opaymentDetailList){
@@ -150,8 +150,8 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
             ORemoveAccount oRemoveAccount = oRemoveAccountMapper.selectByPrimaryKey(srcId);
             boolean flag=true;
             boolean f=true;
-            //1.获取补款实际支付金额
-            BigDecimal residue=oRemoveAccount.getRamount();
+            //1.获取补款实际到账金额
+            BigDecimal residue=oRemoveAccount.getRealRamount();
 
             //多条补款
             for (OPaymentDetail paymentDetail : opaymentDetailList) {
@@ -169,14 +169,14 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                 if(residue.compareTo(paymentDetail.getPayAmount())==0){
                     initialize=paymentDetail.getPayAmount();
                     flag=false;
-                    logger.info("还款-------:"+initialize);
+                    logger.info("销账还款-------:"+initialize);
                     oPayDetail.setAmount(residue);
                     oPayDetail.setSrcId(oRemoveAccount.getId());
                     residue = residue.subtract(initialize);
                 }else if(residue.compareTo(paymentDetail.getPayAmount())==-1){
                     initialize.add(residue);
                     flag=false;
-                    logger.info("还款-------:"+initialize.add(residue));
+                    logger.info("销账还款-------:"+initialize.add(residue));
                     oPayDetail.setAmount(residue);
                     oPayDetail.setSrcId(oRemoveAccount.getId());
                     residue = BigDecimal.ZERO;
@@ -184,7 +184,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                     residue = residue.subtract(paymentDetail.getPayAmount());
                     oPayDetail.setAmount(paymentDetail.getPayAmount());
                     oPayDetail.setSrcId(oRemoveAccount.getId());
-                    logger.info("还款--------:"+paymentDetail.getPayAmount());
+                    logger.info("销账还款--------:"+paymentDetail.getPayAmount());
                 }
                 resPaymentDetail.add(paymentDetail);
                 //进行添加付款明细数据
