@@ -151,7 +151,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
             boolean flag=true;
             boolean f=true;
             //1.获取补款实际到账金额
-            BigDecimal residue=oRemoveAccount.getRealRamount();
+            BigDecimal residue=oRemoveAccount.getRamount();
 
             //多条补款
             for (OPaymentDetail paymentDetail : opaymentDetailList) {
