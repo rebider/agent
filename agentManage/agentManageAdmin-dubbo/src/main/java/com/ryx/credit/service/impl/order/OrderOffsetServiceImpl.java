@@ -58,7 +58,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
         List<OPaymentDetail> resPaymentDetail = new ArrayList<>();
         BigDecimal resAmt = BigDecimal.ZERO;
         AgentResult result = AgentResult.ok();
-        if (paytype.equals(DDBK.code) && paytype.equals(DDXZ.code)){ //订单补款、销账
+        if (paytype.equals(DDBK.code) || paytype.equals(DDXZ.code)){ //订单补款、销账
             //待还金额
             BigDecimal arrearsAmt = BigDecimal.ZERO;
             for(OPaymentDetail oPaymentDetail:opaymentDetailList){
@@ -222,7 +222,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
         }
         if (offsetAmt.compareTo(amount)!=0) return AgentResult.fail("冲抵金额与申请不一致");
 
-        if (paytype.equals(DDBK.code) && paytype.equals(DDXZ.code)){
+        if (paytype.equals(DDBK.code) || paytype.equals(DDXZ.code) ||  paytype.equals(DDTZ.code)){
             //更新付款单明细
             for (OPayDetail oPayDetail:oPayDetails){
                 oPayDetail.setBusStat(Status.STATUS_1.status);
@@ -237,7 +237,14 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                 }else if (oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())==-1){
                     oPaymentDetail.setPaymentStatus(PaymentStatus.BF.code);
                 }
-                oPaymentDetail.setSrcType(PamentSrcType.XXBK.code);
+                if (paytype.equals(DDBK.code)){
+                    oPaymentDetail.setSrcType(PamentSrcType.XXBK.code);
+                }else if (paytype.equals(DDXZ.code)){
+                    oPaymentDetail.setSrcType(PamentSrcType.XXXZ.code);
+                }else if (paytype.equals(DDTZ.code)){
+                    oPaymentDetail.setSrcType(PamentSrcType.ORDER_ADJ_SETTLE.code);
+                }
+
                 oPaymentDetail.setSrcId(srcId);
                 oPaymentDetail.setPayTime(new Date());
                 if (oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)!=1){
