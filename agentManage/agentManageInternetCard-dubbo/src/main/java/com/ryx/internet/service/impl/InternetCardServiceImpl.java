@@ -916,9 +916,11 @@ public class InternetCardServiceImpl implements InternetCardService {
             expireTimeList.add(DateUtil.getPerDayOfMonth(2));
             expireTimeList.add(DateUtil.getPerDayOfMonth(3));
             reqMap.put("expireTimeList",expireTimeList);
-            //待激活和正常
+            // 待激活和正常 测试期 沉默期
             reqMap.put("cardStaus1",InternetCardStatus.NORMAL.getValue());
             reqMap.put("cardStaus2",InternetCardStatus.NOACTIVATE.getValue());
+            reqMap.put("cardStaus3",InternetCardStatus.test.getValue());
+            reqMap.put("cardStaus4",InternetCardStatus.silent.getValue());
             List<String> renewStatusList = new ArrayList<>();
             renewStatusList.add(InternetRenewStatus.WXF.getValue());
             renewStatusList.add(InternetRenewStatus.YXF.getValue());
