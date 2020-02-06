@@ -1025,7 +1025,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                     throw new MessageException("操作有误");
                 }
             }else{
-                if(oInternetCard.getRenewStatus().equals(InternetRenewStatus.WXF.getValue())){
+                if(oInternetCard.getRenewStatus().equals(InternetRenewStatus.XFZ.getValue())){
                     throw new MessageException("iccid:"+iccidNumId+",当前流量卡已提交续费申请，请无重复操作");
                 }
                 throw new MessageException("iccid:"+iccidNumId+",卡状态/续费状态不正确,不允许续费/注销，当前状态为："+InternetCardStatus.getContentByValue(oInternetCard.getInternetCardStatus()));
