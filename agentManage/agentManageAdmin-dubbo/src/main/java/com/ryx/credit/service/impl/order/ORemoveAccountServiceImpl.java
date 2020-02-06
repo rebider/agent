@@ -313,7 +313,7 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                 }
 
                                 ORemoveAccount oRemoveAccount = oRemoveAccountMapper.selectByPrimaryKey(id);
-                                AgentResult agentResultCommit = orderOffsetService.OffsetArrearsCommit(oRemoveAccount.getRealRamount(), OffsetPaytype.DDXZ.code, oRemoveAccount.getId());
+                                AgentResult agentResultCommit = orderOffsetService.OffsetArrearsCommit(oRemoveAccount.getRamount(), OffsetPaytype.DDXZ.code, oRemoveAccount.getId());
                                 if (!agentResultCommit.isOK()){
                                     throw new MessageException("销账数据更新异常！");
                                 }
@@ -498,8 +498,6 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                             oRemoveAccount.setRstatus(RemoveAccountStatus.CLSB.code);
                             oRemoveAccount.setFinishTime(new Date());
                             oRemoveAccount.setFailCause(e.getMsg());
-                            //实际销账金额
-                            oRemoveAccount.setRealRamount(real_ramount);
                             if (1!=oRemoveAccountMapper.updateByPrimaryKeySelective(oRemoveAccount)){
                                 logger.info("销账更新失败:{}",oRemoveAccount.getId());
                             }else{
@@ -520,8 +518,6 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                             oRemoveAccount.setRstatus(RemoveAccountStatus.CLSB.code);
                             oRemoveAccount.setFinishTime(new Date());
                             oRemoveAccount.setFailCause(e.getLocalizedMessage().length() > 30 ? e.getLocalizedMessage().substring(0, 30) : e.getLocalizedMessage());
-                            //实际销账金额
-                            oRemoveAccount.setRealRamount(real_ramount);
                             if (1!=oRemoveAccountMapper.updateByPrimaryKeySelective(oRemoveAccount)){
                                 logger.info("销账更新失败:{}",oRemoveAccount.getId());
                             }else{
