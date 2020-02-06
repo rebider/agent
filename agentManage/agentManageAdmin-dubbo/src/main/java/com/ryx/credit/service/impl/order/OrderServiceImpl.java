@@ -4889,6 +4889,7 @@ public class OrderServiceImpl implements OrderService {
                     oSupplement.setSrcId(orderAdj.getId());
                     oSupplement.setReviewStatus(AgStatus.Approved.status);
                     oSupplement.setStatus(Status.STATUS_1.status);
+                    oSupplement.setLogicalVersion(String.valueOf(Status.STATUS_1.status));
                     if (1 !=  oSupplementMapper.insert(oSupplement)) {
                         logger.info("订单调整审批完成，有退款:补款生成失败:订单ID:{},付款方式:{}，明细ID:{}",
                                 order.getId(),
@@ -5041,6 +5042,7 @@ public class OrderServiceImpl implements OrderService {
                     oSupplement.setSrcId(orderAdj.getId());
                     oSupplement.setReviewStatus(AgStatus.Approved.status);
                     oSupplement.setStatus(Status.STATUS_1.status);
+                    oSupplement.setLogicalVersion(String.valueOf(Status.STATUS_1.status));
                     if (1 !=  oSupplementMapper.insert(oSupplement)) {
                         logger.info("订单调整审批完成，有退款:补款生成失败:订单ID:{},付款方式:{}，明细ID:{}",
                                 order.getId(),
@@ -5193,6 +5195,7 @@ public class OrderServiceImpl implements OrderService {
                     oSupplement.setSrcId(orderAdj.getId());
                     oSupplement.setReviewStatus(AgStatus.Approved.status);
                     oSupplement.setStatus(Status.STATUS_1.status);
+                    oSupplement.setLogicalVersion(String.valueOf(Status.STATUS_1.status));
                     if (1 !=  oSupplementMapper.insert(oSupplement)) {
                         logger.info("订单调整审批完成，有退款:补款生成失败:订单ID:{},付款方式:{}，明细ID:{}",
                                 order.getId(),
@@ -5306,6 +5309,7 @@ public class OrderServiceImpl implements OrderService {
                     oSupplement.setSrcId(orderAdj.getId());
                     oSupplement.setReviewStatus(AgStatus.Approved.status);
                     oSupplement.setStatus(Status.STATUS_1.status);
+                    oSupplement.setLogicalVersion(String.valueOf(Status.STATUS_1.status));
                     if (1 !=  oSupplementMapper.insert(oSupplement)) {
                         logger.info("订单调整审批完成，有退款:补款生成失败:订单ID:{},付款方式:{}，明细ID:{}",
                                 order.getId(),
@@ -5450,6 +5454,7 @@ public class OrderServiceImpl implements OrderService {
                     oSupplement.setSrcId(orderAdj.getId());
                     oSupplement.setReviewStatus(AgStatus.Approved.status);
                     oSupplement.setStatus(Status.STATUS_1.status);
+                    oSupplement.setLogicalVersion(String.valueOf(Status.STATUS_1.status));
                     if (1 !=  oSupplementMapper.insert(oSupplement)) {
                         logger.info("订单调整审批完成，有退款:补款生成失败:订单ID:{},付款方式:{}，明细ID:{}",
                                 order.getId(),
@@ -5579,6 +5584,7 @@ public class OrderServiceImpl implements OrderService {
                     oSupplement.setSrcId(orderAdj.getId());
                     oSupplement.setReviewStatus(AgStatus.Approved.status);
                     oSupplement.setStatus(Status.STATUS_1.status);
+                    oSupplement.setLogicalVersion(String.valueOf(Status.STATUS_1.status));
                     if (1 !=  oSupplementMapper.insert(oSupplement)) {
                         logger.info("订单调整审批完成，有退款:补款生成失败:订单ID:{},付款方式:{}，明细ID:{}",
                                 order.getId(),
