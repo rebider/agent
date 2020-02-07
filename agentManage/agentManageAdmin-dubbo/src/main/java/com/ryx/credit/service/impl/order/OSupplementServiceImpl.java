@@ -276,8 +276,6 @@ public class OSupplementServiceImpl implements OSupplementService {
                     throw new MessageException("抵扣金额大于或小于欠款金额"+residueAmt);
                 }
                 List<OPaymentDetail> offsetPaymentDetails=(ArrayList)resMapCash.get("offsetPaymentDetails");
-
-
             }
             startSuppActivity(osupplementVo.getSupplement().getId(), oSupplement.getcUser() + "");
             logger.info("补款添加:成功");
