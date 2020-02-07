@@ -214,9 +214,14 @@ public class CompensateServiceImpl implements CompensateService {
                 }
             }
             if (StringUtils.isNotBlank(String.valueOf(maps.get("ORDER_TYPE"))) && !String.valueOf(maps.get("ORDER_TYPE")).equals("null")) {
-                String order_type = OrderType.getContentByValue(new BigDecimal(String.valueOf(maps.get("ORDER_TYPE"))));
-                if (null != order_type) {
-                    maps.put("ORDER_TYPE", order_type);
+//                String order_type = OrderType.getContentByValue(new BigDecimal(String.valueOf(maps.get("ORDER_TYPE"))));
+//                if (null != order_type) {
+//                    maps.put("ORDER_TYPE", order_type);
+//                }
+                if (String.valueOf(maps.get("ORDER_TYPE")).equals("1")) {
+                    maps.put("ORDER_TYPE", "新订单");
+                } else if(String.valueOf(maps.get("ORDER_TYPE")).equals("2")) {
+                    maps.put("ORDER_TYPE", "历史订单");
                 }
             }
         }
@@ -255,9 +260,14 @@ public class CompensateServiceImpl implements CompensateService {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         for (Map maps : list) {
             if (StringUtils.isNotBlank(String.valueOf(maps.get("orderType"))) && !String.valueOf(maps.get("orderType")).equals("null")) {
-                String order_type = OrderType.getContentByValue(new BigDecimal(String.valueOf(maps.get("orderType"))));
-                if (null != order_type) {
-                    maps.put("orderType", order_type);
+//                String order_type = OrderType.getContentByValue(new BigDecimal(String.valueOf(maps.get("orderType"))));
+//                if (null != order_type) {
+//                    maps.put("orderType", order_type);
+//                }
+                if (String.valueOf(maps.get("orderType")).equals("1")) {
+                    maps.put("orderType", "新订单");
+                } else if(String.valueOf(maps.get("orderType")).equals("2")) {
+                    maps.put("orderType", "历史订单");
                 }
             }
             if (StringUtils.isNotBlank(String.valueOf(maps.get("uTime"))) && !String.valueOf(maps.get("uTime")).equals("null")) {
