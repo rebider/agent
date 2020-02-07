@@ -668,7 +668,7 @@ public class OSupplementServiceImpl implements OSupplementService {
         }
         OPaymentDetail oPaymentDetail = oPaymentDetails.get(0);
         if (null != oPaymentDetail.getPaymentStatus()) {
-            if (oPaymentDetail.getPaymentStatus().equals(PaymentStatus.DF.code)) {
+            if (oPaymentDetail.getPaymentStatus().equals(PaymentStatus.DF.code) || oPaymentDetail.getPaymentStatus().equals(PaymentStatus.BF.code )|| oPaymentDetail.getPaymentStatus().equals(PaymentStatus.YQ.code)) {
                 return res.success("");
             }
         }
