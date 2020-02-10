@@ -37,6 +37,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.ryx.credit.common.enumc.OffsetPaytype.DDBK;
 
@@ -194,8 +196,7 @@ public class OSupplementServiceImpl implements OSupplementService {
         criteria.andSrcIdEqualTo(srcId);
         criteria.andPkTypeEqualTo(pkType);
         criteria.andStatusEqualTo(Status.STATUS_1.status);
-        criteria.andReviewStatusIn(Arrays.asList(AgStatus.Create.status, AgStatus.Approving.status
-                , AgStatus.Approved.status, AgStatus.Reject.status));
+        criteria.andReviewStatusIn(Arrays.asList(AgStatus.Create.status, AgStatus.Approving.status));
         List<OSupplement> oSupplements = oSupplementMapper.selectByExample(oSupplementExample);
         if (null != oSupplements && oSupplements.size() > 0) {
             logger.info("补款添加:{}", "已在补款中");
@@ -313,7 +314,8 @@ public class OSupplementServiceImpl implements OSupplementService {
             orderId = oPaymentDetail.getOrderId();
 
             BigDecimal paymentStatus = oPaymentDetail.getPaymentStatus();
-            if (!paymentStatus.equals(PaymentStatus.DF.code)) {
+            List<String> status =  Stream.of(String.valueOf(PaymentStatus.DF.code),String.valueOf(PaymentStatus.YQ.code),String.valueOf(PaymentStatus.BF.code)).collect(Collectors.toList());
+            if (!status.contains(String.valueOf(paymentStatus))){
                 logger.info("补款信息状态异常{}:{}", id, userId);
                 throw new MessageException("补款信息状态异常");
             }
