@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://code.alibabatech.com/schema/dubbo
+       http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+
+    <!-- 提供方应用信息，用于计算依赖关系 -->
+    <dubbo:application name="pms-dubbo-server"/>
+    <dubbo:provider id="payload" payload="888888888"  timeout="1200000"/>
+    <dubbo:registry protocol="zookeeper" address="${zk.server}" group="${zk.group}"  id="myGroup"/>
+    <!-- 用dubbo协议在22880端口暴露服务 -->
+    <dubbo:protocol name="dubbo" port="${zk.port}"/>
+    <dubbo:annotation package="com.ryx.account.service.*" />
+    <dubbo:reference interface="com.ryx.credit.service.dict.IdService" id="idService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:service interface="com.ryx.account.service.InternetCardService" ref="internetCardService" timeout="1200000" registry="myGroup" />
+
+</beans>
