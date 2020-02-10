@@ -76,6 +76,8 @@ public class OReturnOrder implements Serializable {
 
     private String oreturntype;
 
+    private String logicalVersion;
+
     public String getId() {
         return id;
     }
@@ -274,5 +276,13 @@ public class OReturnOrder implements Serializable {
 
     public void setOreturntype(String oreturntype) {
         this.oreturntype = oreturntype == null ? null : oreturntype.trim();
+    }
+
+    public String getLogicalVersion() {
+        return logicalVersion;
+    }
+
+    public void setLogicalVersion(String logicalVersion) {
+        this.logicalVersion = logicalVersion == null ? null : logicalVersion.trim();
     }
 }
