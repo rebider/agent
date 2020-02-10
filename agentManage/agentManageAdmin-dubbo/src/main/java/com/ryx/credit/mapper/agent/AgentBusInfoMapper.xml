@@ -1295,7 +1295,7 @@ union
   </select>
   <sql id="queryBusinfoTopMenuSql">
     select
-    b.id, b.bus_num, b.bus_platform, b.agent_id, a.ag_name,
+    b.id, b.bus_num, b.bus_platform, b.agent_id, a.ag_name, a.bus_risk_email,
     o.name as ag_doc_pro, b.bus_contact_person, b.bus_status, b.clo_review_status
     from a_agent_businfo b
     left join a_agent a on b.agent_id = a.id
