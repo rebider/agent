@@ -609,4 +609,15 @@ public class DateUtil {
        return format(zero);
    }
 
+    /**
+     * 当前时间+多少秒
+     * @return
+     */
+    public static Date dateAddSecond(Date date,int second){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.SECOND, second);
+        return calendar.getTime();
+    }
+
 }

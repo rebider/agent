@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ryx.account.dao.authLoginTokenMapper">
-  <resultMap id="BaseResultMap" type="com.ryx.account.pojo.authLoginToken">
+<mapper namespace="com.ryx.account.dao.AuthLoginTokenMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.account.pojo.AuthLoginToken">
     <id column="ID" jdbcType="VARCHAR" property="id" />
     <result column="AUTH_CODE" jdbcType="VARCHAR" property="authCode" />
     <result column="LOG_NAME" jdbcType="VARCHAR" property="logName" />
@@ -46,7 +46,7 @@
     ID, AUTH_CODE, LOG_NAME, PASS_WORD, PLATFORM_TYPE, TOKEN, TOKEN_BEGIN_TIME, TOKEN_END_TIME, 
     REQUEST_ID, STATUS
   </sql>
-  <select id="selectByExample" parameterType="com.ryx.account.pojo.authLoginTokenExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.ryx.account.pojo.AuthLoginTokenExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
     <if test="distinct">
@@ -68,13 +68,13 @@
     from AUTH_LOGIN_TOKEN
     where ID = #{id,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByExample" parameterType="com.ryx.account.pojo.authLoginTokenExample">
+  <delete id="deleteByExample" parameterType="com.ryx.account.pojo.AuthLoginTokenExample">
     delete from AUTH_LOGIN_TOKEN
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.ryx.account.pojo.authLoginToken">
+  <insert id="insert" parameterType="com.ryx.account.pojo.AuthLoginToken">
     insert into AUTH_LOGIN_TOKEN (ID, AUTH_CODE, LOG_NAME, 
       PASS_WORD, PLATFORM_TYPE, TOKEN, 
       TOKEN_BEGIN_TIME, TOKEN_END_TIME, REQUEST_ID, 
@@ -84,7 +84,7 @@
       #{tokenBeginTime,jdbcType=TIMESTAMP}, #{tokenEndTime,jdbcType=TIMESTAMP}, #{requestId,jdbcType=VARCHAR}, 
       #{status,jdbcType=CHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.ryx.account.pojo.authLoginToken">
+  <insert id="insertSelective" parameterType="com.ryx.account.pojo.AuthLoginToken">
     insert into AUTH_LOGIN_TOKEN
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -151,13 +151,13 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.account.pojo.authLoginTokenExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.ryx.account.pojo.AuthLoginTokenExample" resultType="java.lang.Long">
     select count(*) from AUTH_LOGIN_TOKEN
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.account.pojo.authLoginToken">
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.account.pojo.AuthLoginToken">
     update AUTH_LOGIN_TOKEN
     <set>
       <if test="authCode != null">
@@ -190,7 +190,7 @@
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.ryx.account.pojo.authLoginToken">
+  <update id="updateByPrimaryKey" parameterType="com.ryx.account.pojo.AuthLoginToken">
     update AUTH_LOGIN_TOKEN
     set AUTH_CODE = #{authCode,jdbcType=VARCHAR},
       LOG_NAME = #{logName,jdbcType=VARCHAR},

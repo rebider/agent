@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class authLoginTokenExample {
+public class AuthLoginTokenExample {
     protected String orderByClause;
 
     protected boolean distinct;
@@ -19,7 +19,7 @@ public class authLoginTokenExample {
 
     protected Integer limitEnd;
 
-    public authLoginTokenExample() {
+    public AuthLoginTokenExample() {
         oredCriteria = new ArrayList<Criteria>();
     }
 

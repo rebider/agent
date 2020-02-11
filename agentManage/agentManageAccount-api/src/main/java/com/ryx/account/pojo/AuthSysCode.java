@@ -1,9 +1,8 @@
 package com.ryx.account.pojo;
 
-import java.io.Serializable;
 import java.util.Date;
 
-public class authSysCode implements Serializable {
+public class AuthSysCode {
     private String id;
 
     private String platformType;

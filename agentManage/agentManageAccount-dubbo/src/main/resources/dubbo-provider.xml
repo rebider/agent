@@ -16,6 +16,7 @@
     <dubbo:protocol name="dubbo" port="${zk.port}"/>
     <dubbo:annotation package="com.ryx.account.service.*" />
     <dubbo:reference interface="com.ryx.credit.service.dict.IdService" id="idService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.dict.DictOptionsService" id="dictOptionsService"  timeout="1200000" registry="myGroup" check="false"/>
     <dubbo:service interface="com.ryx.account.service.AccountAuthService" ref="accountAuthService" timeout="1200000" registry="myGroup" />
 
 </beans>

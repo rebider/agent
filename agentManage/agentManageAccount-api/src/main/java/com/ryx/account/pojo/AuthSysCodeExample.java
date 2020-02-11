@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class authSysCodeExample {
+public class AuthSysCodeExample {
     protected String orderByClause;
 
     protected boolean distinct;
@@ -19,7 +19,7 @@ public class authSysCodeExample {
 
     protected Integer limitEnd;
 
-    public authSysCodeExample() {
+    public AuthSysCodeExample() {
         oredCriteria = new ArrayList<Criteria>();
     }
 

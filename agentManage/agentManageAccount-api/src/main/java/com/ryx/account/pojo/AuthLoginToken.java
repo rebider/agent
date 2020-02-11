@@ -1,9 +1,8 @@
 package com.ryx.account.pojo;
 
-import java.io.Serializable;
 import java.util.Date;
 
-public class authLoginToken implements Serializable{
+public class AuthLoginToken {
     private String id;
 
     private String authCode;

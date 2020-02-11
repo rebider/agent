@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ryx.account.dao.authSysCodeMapper">
-  <resultMap id="BaseResultMap" type="com.ryx.account.pojo.authSysCode">
+<mapper namespace="com.ryx.account.dao.AuthSysCodeMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.account.pojo.AuthSysCode">
     <id column="ID" jdbcType="VARCHAR" property="id" />
     <result column="PLATFORM_TYPE" jdbcType="VARCHAR" property="platformType" />
     <result column="AUTH_CODE_BEGIN_TIME" jdbcType="TIMESTAMP" property="authCodeBeginTime" />
@@ -43,7 +43,7 @@
     ID, PLATFORM_TYPE, AUTH_CODE_BEGIN_TIME, AUTH_CODE_END_TIME, AUTH_CODE, SERVER_IP, 
     STATUS
   </sql>
-  <select id="selectByExample" parameterType="com.ryx.account.pojo.authSysCodeExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.ryx.account.pojo.AuthSysCodeExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
     <if test="distinct">
@@ -65,13 +65,13 @@
     from AUTH_SYS_CODE
     where ID = #{id,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByExample" parameterType="com.ryx.account.pojo.authSysCodeExample">
+  <delete id="deleteByExample" parameterType="com.ryx.account.pojo.AuthSysCodeExample">
     delete from AUTH_SYS_CODE
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.ryx.account.pojo.authSysCode">
+  <insert id="insert" parameterType="com.ryx.account.pojo.AuthSysCode">
     insert into AUTH_SYS_CODE (ID, PLATFORM_TYPE, AUTH_CODE_BEGIN_TIME, 
       AUTH_CODE_END_TIME, AUTH_CODE, SERVER_IP, 
       STATUS)
@@ -79,7 +79,7 @@
       #{authCodeEndTime,jdbcType=TIMESTAMP}, #{authCode,jdbcType=VARCHAR}, #{serverIp,jdbcType=VARCHAR}, 
       #{status,jdbcType=CHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.ryx.account.pojo.authSysCode">
+  <insert id="insertSelective" parameterType="com.ryx.account.pojo.AuthSysCode">
     insert into AUTH_SYS_CODE
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -128,13 +128,13 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.account.pojo.authSysCodeExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.ryx.account.pojo.AuthSysCodeExample" resultType="java.lang.Long">
     select count(*) from AUTH_SYS_CODE
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.account.pojo.authSysCode">
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.account.pojo.AuthSysCode">
     update AUTH_SYS_CODE
     <set>
       <if test="platformType != null">
@@ -158,7 +158,7 @@
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.ryx.account.pojo.authSysCode">
+  <update id="updateByPrimaryKey" parameterType="com.ryx.account.pojo.AuthSysCode">
     update AUTH_SYS_CODE
     set PLATFORM_TYPE = #{platformType,jdbcType=VARCHAR},
       AUTH_CODE_BEGIN_TIME = #{authCodeBeginTime,jdbcType=TIMESTAMP},
