@@ -1908,13 +1908,13 @@
     left join o_payment op on o_payment_detail.payment_id=op.id
     left join o_order o on o.id=op.order_id
     left join a_agent_businfo businfo on businfo.id=o.bus_id
-    where o_payment_detail.status=1 and o.status=1 and op.status=1
+    where o_payment_detail.status=1 and o.status=1 and op.status=1   and  o_payment_detail.payment_status in (1,2,3)
     and  businfo.agent_id is not null
     and payment_type = 'ORDER_FKD'
     <include refid="ARREARAGE_WHERE_SQL"/>
     group by to_char(o_payment_detail.plan_pay_time,'yyyy-mm'),businfo.agent_id,businfo.bus_platform ,businfo.bus_num
     )a left join a_platform on a.bus_platform=a_platform.platform_num
-    left join a_agent agent on agent.id=a.agent_id where 1=1 and  jjqk !=0
+    left join a_agent agent on agent.id=a.agent_id where 1=1
     <include refid="BASE_WHERE_SQL"/>
     order by agent.id,  a.tm desc
   </select>
@@ -1932,13 +1932,13 @@
     left join o_payment op on o_payment_detail.payment_id=op.id
     left join o_order o on o.id=op.order_id
     left join a_agent_businfo businfo on businfo.id=o.bus_id
-    where o_payment_detail.status=1 and o.status=1 and op.status=1
-     and  businfo.agent_id is not null
+    where o_payment_detail.status=1 and o.status=1 and op.status=1   and  o_payment_detail.payment_status in (1,2,3)
+    and  businfo.agent_id is not null
      and payment_type = 'ORDER_FKD'
     <include refid="ARREARAGE_WHERE_SQL"/>
     group by to_char(o_payment_detail.plan_pay_time,'yyyy-mm'),businfo.agent_id,businfo.bus_platform ,businfo.bus_num
     )a left join a_platform on a.bus_platform=a_platform.platform_num
-    left join a_agent agent on agent.id=a.agent_id where 1=1 and jjqk !=0
+    left join a_agent agent on agent.id=a.agent_id where 1=1
     <include refid="BASE_WHERE_SQL"/>
     order by agent.id,  a.tm desc
     <include refid="PAGING_END" />
@@ -1999,12 +1999,13 @@
     select
     to_char(o_payment_detail.plan_pay_time,'yyyy-mm') as omonth,
     o_payment_detail.order_id as oId,
-    sum(o_payment_detail.pay_amount) as qiankuan
+    sum(case when o_payment_detail.payment_status in(1,3) then o_payment_detail.pay_amount else 0 end)+
+    sum(case when o_payment_detail.payment_status =2 then o_payment_detail.pay_amount-o_payment_detail.real_pay_amount else 0 end)qiankuan
     from
     o_payment_detail
     where 1=1
     <if test="time!=null and time!=''"> and to_char(o_payment_detail.plan_pay_time,'yyyy-mm')=#{time} </if>
-    and  o_payment_detail.payment_status in (1,3)
+    and  o_payment_detail.payment_status in (1,2,3)
     group by to_char(o_payment_detail.plan_pay_time,'yyyy-mm'),o_payment_detail.order_id
     ) a
     left join o_order on o_order.id=a.oId
@@ -2032,12 +2033,13 @@
     select
     to_char(o_payment_detail.plan_pay_time,'yyyy-mm') as omonth,
     o_payment_detail.order_id as oId,
-    sum(o_payment_detail.pay_amount) as qiankuan
+    sum(case when o_payment_detail.payment_status in(1,3) then o_payment_detail.pay_amount else 0 end)+
+    sum(case when o_payment_detail.payment_status =2 then o_payment_detail.pay_amount-o_payment_detail.real_pay_amount else 0 end)qiankuan
     from
     o_payment_detail
     where 1=1
     <if test="time!=null and time!=''"> and to_char(o_payment_detail.plan_pay_time,'yyyy-mm')=#{time} </if>
-    and  o_payment_detail.payment_status in (1,3)
+    and  o_payment_detail.payment_status in (1,2,3)
     group by to_char(o_payment_detail.plan_pay_time,'yyyy-mm'),o_payment_detail.order_id
     ) a
     left join o_order on o_order.id=a.oId
