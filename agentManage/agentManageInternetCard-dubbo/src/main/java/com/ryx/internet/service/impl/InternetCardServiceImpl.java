@@ -312,8 +312,8 @@ public class InternetCardServiceImpl implements InternetCardService {
                             oInternetCard.setInternetCardNum(internetCardNum.equals("null")?"":internetCardNum);
                             oInternetCard.setBusNum(busNum.equals("null")?"":busNum);
                             oInternetCard.setBusPlatform(busPlatform.equals("null")?"":busPlatform);
-                            if(StringUtils.isNotBlank(openAccountTime.equals("null")?"":openAccountTime))
-                            oInternetCard.setOpenAccountTime(DateUtils.parseDate(openAccountTime,dateFormat));
+//                            if(StringUtils.isNotBlank(openAccountTime.equals("null")?"":openAccountTime))
+//                            oInternetCard.setOpenAccountTime(DateUtils.parseDate(openAccountTime,dateFormat)); // 可空，开户日期不更新
                             jsonList = JsonUtil.objectToJson(oInternetCard);
                         }else if(importType.equals(CardImportType.B.getValue())){
                             String manufacturer = String.valueOf(string.size()>=1?string.get(0):"");//发货方/厂商
@@ -384,8 +384,8 @@ public class InternetCardServiceImpl implements InternetCardService {
                             }
                             oInternetCard.setInternetCardStatus(contentByMsg);
                             oInternetCard.setLatelyPayTime(latelyPayTime.equals("null")?"":latelyPayTime);
-                            if(StringUtils.isNotBlank(openAccountTime) && !openAccountTime.equals("null"))
-                            oInternetCard.setOpenAccountTime(DateUtils.parseDate(openAccountTime,dateFormat));
+//                            if(StringUtils.isNotBlank(openAccountTime) && !openAccountTime.equals("null")) // 可空 开户日期不更新
+//                            oInternetCard.setOpenAccountTime(DateUtils.parseDate(openAccountTime,dateFormat));
                             oInternetCard.setMerId(merId.equals("null")?"":merId);
                             oInternetCard.setMerName(merName.equals("null")?"":merName);
                             oInternetCard.setAgentName(agentName.equals("null")?"":agentName);
@@ -490,6 +490,13 @@ public class InternetCardServiceImpl implements InternetCardService {
                 String importType = oInternetCardImport.getImportType();
                 if(importType.equals(CardImportType.A.getValue()) || importType.equals(CardImportType.B.getValue()) || importType.equals(CardImportType.E.getValue())){
                     OInternetCard internetCard = JsonUtil.jsonToPojo(oInternetCardImport.getImportMsg(), OInternetCard.class);
+                    if(importType.equals(CardImportType.C.getValue()) && internetCard.getDeliverTime() == null){
+                        throw new MessageException("历史北京总部发卡-发货日期不能为空，iccid："+internetCard.getIccidNum());
+                    }else {// 流量卡卡号 流量卡状态 开户日期为空
+                        if(internetCard.getOpenAccountTime() !=null ){
+                            internetCard.setOpenAccountTime(null);
+                        }
+                    }
                     disposeInternetCard(oInternetCardImport,internetCard);
                 }else if(importType.equals(CardImportType.C.getValue())){
                     OInternetCard internetCard = JsonUtil.jsonToPojo(oInternetCardImport.getImportMsg(), OInternetCard.class);
@@ -708,8 +715,8 @@ public class InternetCardServiceImpl implements InternetCardService {
         OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(internetCard.getIccidNum());
         internetCard.setBatchNum(oInternetCardImport.getBatchNum());
         internetCard.setCardImportId(oInternetCardImport.getId());
-        if(internetCard.getOpenAccountTime()!=null){
-            Date date = DateUtil.getOneYearLater(internetCard.getOpenAccountTime());
+        if(internetCard.getDeliverTime()!=null){ // 取其发货日期为开户日期
+            Date date = DateUtil.getOneYearLater(internetCard.getDeliverTime());
             internetCard.setExpireTime(date);
             internetCard.setRenew(BigDecimal.ZERO);
             internetCard.setStop(BigDecimal.ZERO);
