@@ -20,6 +20,7 @@
         <result column="REV2" jdbcType="VARCHAR" property="rev2" />
         <result column="BUS_NUM_S" jdbcType="VARCHAR" property="busNumS" />
         <result column="CHANGEFLAG" jdbcType="VARCHAR" property="changeflag" />
+        <result column="REWARD_NAME" jdbcType="VARCHAR" property="rewardName" />
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
@@ -53,7 +54,7 @@
     <sql id="Base_Column_List">
     ID, AGENT_ID, AGENT_NAME, BUS_NUM, BUS_PLATFORM, CREATE_DATE, APPLY_RESULT, TEMPLATE_NAME,
     TEMPLATE_ID, CREATE_USER, ASSIGN_RESULT, ASSIGN_REASON, CRE_TYPE, TEM_TYPE, REV1,
-    REV2, BUS_NUM_S, CHANGEFLAG
+    REV2, BUS_NUM_S, CHANGEFLAG, REWARD_NAME
   </sql>
     <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.TemplateRecodeExample" resultMap="BaseResultMap">
         <include refid="OracleDialectPrefix" />
@@ -89,15 +90,15 @@
       APPLY_RESULT, TEMPLATE_NAME, TEMPLATE_ID,
       CREATE_USER, ASSIGN_RESULT, ASSIGN_REASON,
       CRE_TYPE, TEM_TYPE, REV1,
-      REV2, BUS_NUM_S, CHANGEFLAG
-      )
+      REV2, BUS_NUM_S, CHANGEFLAG,
+      REWARD_NAME)
     values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR},
       #{busNum,jdbcType=VARCHAR}, #{busPlatform,jdbcType=VARCHAR}, #{createDate,jdbcType=VARCHAR},
       #{applyResult,jdbcType=VARCHAR}, #{templateName,jdbcType=VARCHAR}, #{templateId,jdbcType=VARCHAR},
       #{createUser,jdbcType=VARCHAR}, #{assignResult,jdbcType=VARCHAR}, #{assignReason,jdbcType=VARCHAR},
       #{creType,jdbcType=VARCHAR}, #{temType,jdbcType=VARCHAR}, #{rev1,jdbcType=VARCHAR},
-      #{rev2,jdbcType=VARCHAR}, #{busNumS,jdbcType=VARCHAR}, #{changeflag,jdbcType=VARCHAR}
-      )
+      #{rev2,jdbcType=VARCHAR}, #{busNumS,jdbcType=VARCHAR}, #{changeflag,jdbcType=VARCHAR},
+      #{rewardName,jdbcType=VARCHAR})
   </insert>
     <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.TemplateRecode">
         insert into P_TEMPLATE_APPLY_RECORD
@@ -156,6 +157,9 @@
             <if test="changeflag != null">
                 CHANGEFLAG,
             </if>
+            <if test="rewardName != null">
+                REWARD_NAME,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -211,6 +215,9 @@
             </if>
             <if test="changeflag != null">
                 #{changeflag,jdbcType=VARCHAR},
+            </if>
+            <if test="rewardName != null">
+                #{rewardName,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>
@@ -274,6 +281,9 @@
             <if test="changeflag != null">
                 CHANGEFLAG = #{changeflag,jdbcType=VARCHAR},
             </if>
+            <if test="rewardName != null">
+                REWARD_NAME = #{rewardName,jdbcType=VARCHAR},
+            </if>
         </set>
         where ID = #{id,jdbcType=VARCHAR}
     </update>
@@ -295,7 +305,8 @@
       REV1 = #{rev1,jdbcType=VARCHAR},
       REV2 = #{rev2,jdbcType=VARCHAR},
       BUS_NUM_S = #{busNumS,jdbcType=VARCHAR},
-      CHANGEFLAG = #{changeflag,jdbcType=VARCHAR}
+      CHANGEFLAG = #{changeflag,jdbcType=VARCHAR},
+      REWARD_NAME = #{rewardName,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
     <sql id="OracleDialectPrefix">
@@ -340,7 +351,7 @@
     select
     ap.ID, ap.AGENT_ID, ap.AGENT_NAME, ap.BUS_NUM, ap.BUS_PLATFORM, ap.CREATE_DATE, ap.APPLY_RESULT, ap.TEMPLATE_NAME,
     ap.TEMPLATE_ID, ap.CREATE_USER, ap.ASSIGN_RESULT, ap.ASSIGN_REASON, ap.CRE_TYPE, ap.TEM_TYPE, ap.REV1,
-    ap.REV2,ap.BUS_NUM_S
+    ap.REV2,ap.BUS_NUM_S,ap.REWARD_NAME
     from P_TEMPLATE_APPLY_RECORD ap
     left join  (
     select DISTINCT BUS_NUM, AGENT_ID,AG_DOC_PRO,AG_DOC_DISTRICT from A_AGENT_BUSINFO

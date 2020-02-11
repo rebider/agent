@@ -198,11 +198,16 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                 try {
                     Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
                     templateRecode.setTemplateId(((Map) objectMap.get("applyTemplate")).get("applyId").toString());
-                    templateRecode.setTemplateName(((Map) objectMap.get("applyTemplate")).get("templateName").toString());
                     templateRecode.setBusNumS(map1.get("orgId_s"));
                     if((boolean)objectMap.get("changeFlag")){
                         templateRecode.setChangeflag("1");//修改啦
+                        templateRecode.setTemplateName(((Map) objectMap.get("applyTemplate")).get("templateName").toString());
+                        templateRecode.setRewardName(map1.get("rewardName")==null?"":map1.get("rewardName"));
                     }else {
+                        if(map1.get("rewardName")==null||"".equals(map1.get("rewardName"))){
+                            throw new MessageException("本次提交没有做任何处理，请确认是否修改分润模板或者申请POS奖励");
+                        }
+                        templateRecode.setRewardName(map1.get("rewardName"));
                         templateRecode.setChangeflag("0");//没修改
                     }
                 } catch (Exception e) {
@@ -600,8 +605,15 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                 Map<String,Object> objectMapA = (Map<String,Object>)resultMap.get("data");
                 if((boolean)objectMapA.get("changeFlag")){
                     recode.setChangeflag("1");//修改啦
-                }else {
-                    recode.setChangeflag("0");//没修改
+                    recode.setTemplateName(((Map) map2.get("applyTemplate")).get("templateName").toString());
+                    recode.setRewardName(map1.get("rewardName"));
+                }else {//没修改
+                    if(map1.get("rewardName")==null||"".equals(map1.get("rewardName"))){
+                        throw new MessageException("本次提交没有做任何处理，请确认是否修改分润模板或者申请POS奖励");
+                    }
+                    recode.setTemplateName("");
+                    recode.setRewardName(map1.get("rewardName"));
+                    recode.setChangeflag("0");
                 }
             }else if("SSPOS".equals(platformType)){
                 map2.put("applyId",recode.getTemplateId());
