@@ -246,7 +246,7 @@ public class TermMachineServiceImpl  implements TermMachineService {
         if (PlatformType.whetherPOS(platformType)) {
             return posTermMachineServiceImpl.checkModleIsEq(data, platformType);
         } else if (PlatformType.SSPOS.getValue().equals(platformType)) {
-            return false;
+            return sPosTermMachineServiceImpl.checkModleIsEq(data, platformType);
         } else if (PlatformType.MPOS.getValue().equals(platformType)) {
             return false;
         } else if (PlatformType.RDBPOS.getValue().equals(platformType)) {
