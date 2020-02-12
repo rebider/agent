@@ -9,7 +9,9 @@ import java.math.BigDecimal;
  */
 public enum PaySign {
     JQ("4","结清"),
-    FKING("5","付款中");
+    FKING("5","付款中"),
+    YQ("1","逾期"),
+    BF("2","部分付款");
 
     public BigDecimal code;
 
