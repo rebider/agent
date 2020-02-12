@@ -2005,7 +2005,7 @@
     o_payment_detail
     where 1=1
     <if test="time!=null and time!=''"> and to_char(o_payment_detail.plan_pay_time,'yyyy-mm')=#{time} </if>
-    and  o_payment_detail.payment_status in (1,2,3)
+    and  o_payment_detail.payment_status in (1,2,3) and o_payment_detail.status=1
     group by to_char(o_payment_detail.plan_pay_time,'yyyy-mm'),o_payment_detail.order_id
     ) a
     left join o_order on o_order.id=a.oId
@@ -2039,7 +2039,7 @@
     o_payment_detail
     where 1=1
     <if test="time!=null and time!=''"> and to_char(o_payment_detail.plan_pay_time,'yyyy-mm')=#{time} </if>
-    and  o_payment_detail.payment_status in (1,2,3)
+    and  o_payment_detail.payment_status in (1,2,3) and o_payment_detail.status=1
     group by to_char(o_payment_detail.plan_pay_time,'yyyy-mm'),o_payment_detail.order_id
     ) a
     left join o_order on o_order.id=a.oId
