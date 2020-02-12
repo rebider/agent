@@ -19,6 +19,7 @@ import com.ryx.credit.service.AgentKafkaService;
 import com.ryx.credit.service.agent.CapitalService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.IPaymentDetailService;
+import com.ryx.credit.service.order.OrderOffsetService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -67,6 +69,8 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
     private PlatFormMapper platFormMapper;
     @Autowired
     private OrderAdjMapper orderAdjMapper;
+    @Autowired
+    private OrderOffsetService orderOffsetService;
     /**
      * @Author: Zhang Lei
      * @Description: 查询代理商可抵扣欠款, 先根据欠款类型排序，欠款类型相同的根据订单号排序
@@ -495,22 +499,28 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
                 List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
                 if (1 != oPaymentDetails.size())
                     throw new ProcessException("没有查找到相关数据");
+                try {
+                    AgentResult agentResult= orderOffsetService.OffsetArrears(oPaymentDetails, new BigDecimal(realPayAmount),OffsetPaytype.FRDK.code, srcId);
+                    if (!agentResult.isOK()) {
+                        throw new MessageException(agentResult.getMsg());
+                    }else if (agentResult.getMapData() != null && agentResult.getMapData().size()!=0) {
+                        Map<String, Object> resMapCash = agentResult.getMapData();
+                        BigDecimal residueAmt = new BigDecimal(resMapCash.get("residueAmt").toString());
+                        if (residueAmt.compareTo(new BigDecimal(BigInteger.ZERO))==-1 || residueAmt.compareTo(new BigDecimal(BigInteger.ZERO))==1) {
+                            logger.info("分润失败:{}", "抵扣金额大于或小于欠款金额"+residueAmt);
+                            throw new MessageException("抵扣金额大于或小于欠款金额"+residueAmt);
+                        }
+                        List<OPaymentDetail> offsetPaymentDetails=(ArrayList)resMapCash.get("offsetPaymentDetails");
+                        AgentResult agentResultCommit = orderOffsetService.OffsetArrearsCommit(new BigDecimal(realPayAmount), OffsetPaytype.FRDK.code, srcId);
+                        if (!agentResultCommit.isOK()){
+                            throw new MessageException("销分润数据提交更新异常！");
+                        }
+                    }
+                }catch (Exception e){
+                    logger.info("分润抵扣失败:{}",srcId);
+                }
                 OPaymentDetail oPaymentDetail = oPaymentDetails.get(0);
-                oPaymentDetail.setPayTime(Calendar.getInstance().getTime());
-                if (payStatus.compareTo(PaySign.FKING.code)==0){//付款中
-                    oPaymentDetail.setPaymentStatus(PaymentStatus.FKING.code);
-                }else if(payStatus.compareTo(PaySign.JQ.code)==0){//已结清
-                    if(new BigDecimal(payAmount).compareTo(oPaymentDetail.getPayAmount())==1 ||new BigDecimal(payAmount).compareTo(oPaymentDetail.getPayAmount())==-1){//判断传的参数应扣款和库里是否一致
-                        logger.info("应扣金额有误");
-                        throw new ProcessException("应扣金额有误");
-                    }
-                    oPaymentDetail.setRealPayAmount(new BigDecimal(realPayAmount));
-                    //                查询库里的实扣金额
-                    if(new BigDecimal(payAmount).compareTo(new BigDecimal(realPayAmount))==0){
-                        oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
-                    }else{
-                        oPaymentDetail.setPaymentStatus(PaymentStatus.YF.code);
-                    }
+                if(payStatus.compareTo(PaySign.JQ.code)==0){//已结清
                     //判断如果未扣足大于0的话  需要再添加一条数据
                     BigDecimal notDeduction = new BigDecimal(payAmount).subtract(new BigDecimal(realPayAmount));
                     if(notDeduction.compareTo(new BigDecimal(notDeductionAmt))==1 ||notDeduction.compareTo(new BigDecimal(notDeductionAmt))==-1){
