@@ -475,10 +475,10 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
 
     public List<OPayDetail> getOpayMentDetails(String srcId,String paytype){
         OPayDetailExample oPayDetailExample = new OPayDetailExample();
-        oPayDetailExample.or().andStatusEqualTo(Status.STATUS_0.status)
+        oPayDetailExample.or().andStatusEqualTo(Status.STATUS_1.status)
                 .andSrcIdEqualTo(srcId)
                 .andPayTypeEqualTo(paytype)
-                .andBusStatEqualTo(Status.STATUS_0.status);
+                .andBusStatEqualTo(Status.STATUS_1.status);
         List<OPayDetail> oPayDetails = oPayDetailMapper.selectByExample(oPayDetailExample);
         return oPayDetails;
     }
