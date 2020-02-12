@@ -478,7 +478,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
         oPayDetailExample.or().andStatusEqualTo(Status.STATUS_1.status)
                 .andSrcIdEqualTo(srcId)
                 .andPayTypeEqualTo(paytype)
-                .andBusStatEqualTo(Status.STATUS_1.status);
+                .andBusStatEqualTo(Status.STATUS_0.status);
         List<OPayDetail> oPayDetails = oPayDetailMapper.selectByExample(oPayDetailExample);
         return oPayDetails;
     }
