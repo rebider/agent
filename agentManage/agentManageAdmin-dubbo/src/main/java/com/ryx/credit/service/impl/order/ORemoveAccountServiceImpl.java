@@ -247,12 +247,10 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                 }
                 //查询到销账信息才进行处理
                 if (oRemoveAccount_item != null) {
-                    boolean f=true;
-                    boolean flag=true;
                     //每次销账金额都会减少--剩余
                     BigDecimal residue = oRemoveAccount_item.getRamount();
-                    BigDecimal residueFlag = oRemoveAccount_item.getRamount();
                     BigDecimal real_ramount = new BigDecimal(0);
+                    ArrayList<OPaymentDetail> lists = new ArrayList<>();
                     HashMap map = new HashMap();
                     //根据销账保存 为条件
                     if (null != oRemoveAccount_item.getRmonth()) {
@@ -269,7 +267,6 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                         map.put("busNum", oRemoveAccount_item.getBusNum());
                     }
                     try {
-//                        map.put("flag","1");
                         BigDecimal outstandingAmount = new BigDecimal(0);
                         List<Map> orderList = oOrderMapper.arrearageQuery(map);
                         if (null != orderList && orderList.size() > 0) {
@@ -284,9 +281,6 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                             }
                             //查到相关的订单
                             for (int i = 0; i < orderList.size(); i++) {
-                               /* if(f==false){
-                                    break;
-                                }*/
                                 Map mapItem = orderList.get(i);
                                 //根据agentId和oId查询付款单的明细
                                 HashMap<Object, Object> hashMap = new HashMap<>();
@@ -298,176 +292,29 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                     hashMap.put("omonth",format);
                                 }
                                 List<OPaymentDetail> oPaymentDetailList = oPaymentDetailMapper.selectOPaymentDetail(hashMap);
-
-
-                                AgentResult agentResult= orderOffsetService.OffsetArrears(oPaymentDetailList, residue,OffsetPaytype.DDXZ.code, id);
-                                if (agentResult.getMapData() != null && agentResult.getMapData().size()!=0) {
-                                    Map<String, Object> resMapCash = agentResult.getMapData();
-                                    BigDecimal residueAmt = new BigDecimal(resMapCash.get("residueAmt").toString());
-                                    real_ramount = new BigDecimal(resMapCash.get("OfffsetAmt").toString());
-                                    if (residueAmt.compareTo(new BigDecimal(BigInteger.ZERO))==-1 || residueAmt.compareTo(new BigDecimal(BigInteger.ZERO))==1) {
-                                        logger.info("销账失败:{}", "抵扣金额大于或小于欠款金额"+residueAmt);
-                                        throw new MessageException("抵扣金额大于或小于欠款金额"+residueAmt);
-                                    }
-                                    List<OPaymentDetail> offsetPaymentDetails=(ArrayList)resMapCash.get("offsetPaymentDetails");
-                                }
-
-                                ORemoveAccount oRemoveAccount = oRemoveAccountMapper.selectByPrimaryKey(id);
-                                AgentResult agentResultCommit = orderOffsetService.OffsetArrearsCommit(oRemoveAccount.getRamount(), OffsetPaytype.DDXZ.code, oRemoveAccount.getId());
-                                if (!agentResultCommit.isOK()){
-                                    throw new MessageException("销账数据更新异常！");
-                                }
-
-                              /*  if (null != oPaymentDetailList && oPaymentDetailList.size() > 0) {
-                                    for (OPaymentDetail oPaymentDetail : oPaymentDetailList) {
-                                        oPaymentDetail = oPaymentDetailMapper.selectByPrimaryKey(oPaymentDetail.getId());
-                                        OPayment oPayment = oPaymentMapper.selectByPrimaryKey(oPaymentDetail.getPaymentId());
-                                        if(residue.compareTo(new BigDecimal(0))==0 ||flag==false){
-                                            //如果销账金额已抵扣完销账则停止循环
-                                            f=false;
-                                            break;
-                                        }
-                                        //加步校验---如果销账金额大于剩余欠款金额
-                                        if (residueFlag.compareTo(outstandingAmount)==1){
-                                            logger.info("销账金额不能大于机具欠款金额,销账金额为:"+residue+",机具欠款金额为:"+outstandingAmount);
-                                            throw new MessageException("销账金额不能大于机具欠款金额,销账金额为:"+residue+",机具欠款金额为:"+outstandingAmount);
-                                        }
-                                        if (null == oPayment.getOutstandingAmount() || oPayment.getOutstandingAmount().compareTo(new BigDecimal(0)) == 0) {
-                                            logger.info("此欠款已还完");
-                                            throw new MessageException("此欠款已还完");
-                                        }
-                                        if (oPaymentDetail.getPayAmount().compareTo(residue) == 0 || oPaymentDetail.getPayAmount().compareTo(residue) == -1) {
-                                            //应付金额等于实付金额  或者  应付金额小于实付金额  则是已结清
-                                            oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
-                                            //剩余销账金额-本次需销账金额
-                                            residue=residue.subtract(oPaymentDetail.getPayAmount());
-                                            residueFlag=residueFlag.subtract(oPaymentDetail.getPayAmount());
-                                            oPaymentDetail.setRealPayAmount(oPaymentDetail.getPayAmount());
-                                        } else {
-                                            oPaymentDetail.setPaymentStatus(PaymentStatus.YF.code);
-                                            //这条付款明细剩余欠款
-                                            oPaymentDetail.setRealPayAmount(residue);
-                                            residueFlag=residueFlag.subtract(residueFlag);
-                                            //作个标记 表示是已付款  销账金额小于要还款的金额
-                                            flag=false;
-                                        }
-                                        oPaymentDetail.setSrcId(oRemoveAccount_item.getId());
-                                        oPaymentDetail.setSrcType(PamentSrcType.XXXZ.code);
-                                        oPaymentDetail.setPayTime(Calendar.getInstance().getTime());
-                                        oPaymentDetail.setcUser(oRemoveAccount_item.getSubmitPerson());
-                                        if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
-                                            logger.info("付款单明细修改失败{}:", oRemoveAccount_item.getId());
-                                            throw new MessageException("付款单明细修改失败");
-                                        }else{
-                                            real_ramount=real_ramount.add(oPaymentDetail.getRealPayAmount());
-                                        }
-                                        oPaymentDetail = oPaymentDetailMapper.selectByPrimaryKey(oPaymentDetail.getId());
-                                        if (null == oPayment) {
-                                            logger.info("无此数据");
-                                            throw new MessageException("无此数据!!!");
-                                        }
-                                        if (null == oPaymentDetail.getRealPayAmount()) {
-                                            oPaymentDetail.setRealPayAmount(new BigDecimal(0));
-                                        }
-                                        oPayment.setRealAmount(oPayment.getRealAmount().add(oPaymentDetail.getRealPayAmount()));
-                                        //待付的付款明细
-                                        List<OPaymentDetail> countMap = oPaymentDetailMapper.selectCount(oPaymentDetail.getOrderId(), PamentIdType.ORDER_FKD.code, PaymentStatus.DF.code);
-                                        oPayment.setOutstandingAmount(oPayment.getOutstandingAmount().subtract(oPaymentDetail.getRealPayAmount()));
-                                        if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
-                                            logger.info("付款单修改失败");
-                                            throw new MessageException("付款单修改失败");
-                                        }
-                                        if (residueFlag.compareTo(oPayment.getOutstandingAmount()) == 1) {
-                                            //如果销账金额大于欠款金额
-//                                            logger.info("销账金额大于欠款金额");
-//                                            throw new MessageException("销账金额大于欠款金额");
-                                        } else if (residueFlag.compareTo(oPayment.getOutstandingAmount()) == 0) {
-                                            //销账金额等于欠款金额
-                                            if (null != countMap || countMap.size() > 0) {
-                                                for (OPaymentDetail paymentDetail : countMap) {
-                                                    paymentDetail.setPayAmount(oPaymentDetail.getPayAmount());
-                                                    paymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
-                                                    if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail)) {
-                                                        logger.info("实际付款金额等于欠款金额,更新失败");
-                                                        throw new MessageException("更新失败");
-                                                    }
-                                                }
-                                            }
-                                        } else {
-                                            //销账金额小于欠款金额
-//                                            BigDecimal payAmount = oPayment.getPayAmount();
-//                                            //  查询已结清的实际付款金额
-//                                            BigDecimal realPayAmount = oPaymentDetailMapper.selectRealAmount(oPaymentDetail.getOrderId(), PamentIdType.ORDER_FKD.code);
-//                                            //如果总金额大于实际已经付款金额  则还有未结清金额
-
-
-                                            //查询是否是最后一期的
-                                            List<OPaymentDetail> notCountMap = oPaymentDetailMapper.selectCount(oPaymentDetail.getOrderId(), PamentIdType.ORDER_FKD.code, PaymentStatus.DF.code);
-                                            //去查询还剩几期待付款
-                                            BigDecimal count = new BigDecimal(notCountMap.size());
-                                            if (count.compareTo(new BigDecimal(0)) == 0) {
-                                                //如果就剩本条待付款  没有结清则新生成一条数据
-                                                BigDecimal amount = oPaymentDetail.getPayAmount();//这个是订单需补款金额
-                                                if (residueFlag.compareTo(amount) == -1 ) {
-                                                    //如果销账金额的剩余小于需补款金额  则新生成一条付款明细
-                                                    OPaymentDetail oPaymentDetail_new  = new OPaymentDetail();
-                                                    Date planPayTime = oPaymentDetail.getPlanPayTime();
-                                                    Calendar c = Calendar.getInstance();
-                                                    c.setTime(planPayTime);
-                                                    c.add(Calendar.MONTH, +1);
-                                                    Date realPayTime = c.getTime();
-                                                    oPaymentDetail_new.setPaymentId(oPaymentDetail.getPaymentId());
-                                                    oPaymentDetail_new.setPlanNum(oPaymentDetail.getPlanNum());
-                                                    oPaymentDetail_new.setPaymentType(oPaymentDetail.getPaymentType());
-                                                    oPaymentDetail_new.setOrderId(oPaymentDetail.getOrderId());
-                                                    oPaymentDetail_new.setPayType(oPaymentDetail.getPayType());
-                                                    oPaymentDetail_new.setAgentId(oPaymentDetail.getAgentId());
-                                                    oPaymentDetail_new.setPlanPayTime(realPayTime);//计划还款日期
-                                                    oPaymentDetail_new.setId(idService.genId(TabId.o_payment_detail));
-                                                    oPaymentDetail_new.setPaymentStatus(PaymentStatus.DF.code);
-                                                    oPaymentDetail_new.setRealPayAmount(BigDecimal.ZERO);
-                                                    oPaymentDetail_new.setBatchCode(Calendar.getInstance().getTime().getTime() + "");
-                                                    oPaymentDetail_new.setcUser(oRemoveAccount_item.getSubmitPerson());
-                                                    oPaymentDetail_new.setcDate(new Date());
-                                                    oPaymentDetail_new.setStatus(Status.STATUS_1.status);
-                                                    oPaymentDetail_new.setVersion(Status.STATUS_1.status);
-                                                    //上一条的需补款金额减去这次销账的金额
-                                                    oPaymentDetail_new.setPayAmount(oPaymentDetail.getPayAmount().subtract(residue));
-                                                    if(1!= oPaymentDetailMapper.insertSelective(oPaymentDetail_new)){
-                                                        logger.info("重新生成新数据失败");
-                                                        throw new MessageException("重新生成新数据失败");
-                                                    }
-
-                                                } else if (residueFlag.compareTo(amount) == 0) {
-                                                    //否则是相等的  则进行更新
-                                                    oPaymentDetail.setPayAmount(residue);
-                                                    if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
-                                                        logger.info("付款金额更新失败");
-                                                        throw new MessageException("付款金额更新失败");
-                                                    }
-                                                }
-                                            } else {
-                                                BigDecimal money = new BigDecimal(0);
-                                                if (residue.compareTo(new BigDecimal(0))==0){
-                                                    money=residue;
-                                                }
-                                                else if(residue.compareTo(oPaymentDetail.getPayAmount())==-1){
-                                                    money = oPaymentDetail.getPayAmount().subtract(oPaymentDetail.getRealPayAmount());
-                                                }
-
-                                                for (int j =notCountMap.size()-1; j < notCountMap.size(); j++) {
-                                                    OPaymentDetail paymentDetail = notCountMap.get(0);
-                                                    paymentDetail.setPayAmount(paymentDetail.getPayAmount().add(money));
-                                                    if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail)) {
-                                                        logger.info("更新到下期的付款金额失败");
-                                                        throw new MessageException("更新到下期的付款金额失败");
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }*/
+                                lists.addAll(oPaymentDetailList);
                             }
+                            AgentResult agentResult= orderOffsetService.OffsetArrears(lists, residue,OffsetPaytype.DDXZ.code, id);
+                            if (!agentResult.isOK()){
+                                throw new MessageException(agentResult.getMsg());
+                            }else if (agentResult.getMapData() != null && agentResult.getMapData().size()!=0) {
+                                Map<String, Object> resMapCash = agentResult.getMapData();
+                                BigDecimal residueAmt = new BigDecimal(resMapCash.get("residueAmt").toString());
+                                real_ramount = new BigDecimal(resMapCash.get("OfffsetAmt").toString());
+                                if (residueAmt.compareTo(new BigDecimal(BigInteger.ZERO))==-1 || residueAmt.compareTo(new BigDecimal(BigInteger.ZERO))==1) {
+                                    logger.info("销账失败:{}", "抵扣金额大于或小于欠款金额"+residueAmt);
+                                    throw new MessageException("抵扣金额大于或小于欠款金额"+residueAmt);
+                                }
+                                List<OPaymentDetail> offsetPaymentDetails=(ArrayList)resMapCash.get("offsetPaymentDetails");
+                            }
+
+                            ORemoveAccount oRemoveAccount = oRemoveAccountMapper.selectByPrimaryKey(id);
+                            AgentResult agentResultCommit = orderOffsetService.OffsetArrearsCommit(oRemoveAccount.getRamount(), OffsetPaytype.DDXZ.code, oRemoveAccount.getId());
+                            if (!agentResultCommit.isOK()){
+                                throw new MessageException("销账数据提交更新异常！");
+                            }
+
+
                         }else{
                             if(StringUtils.isNotBlank(oRemoveAccount_item.getAgId()) && null !=oRemoveAccount_item.getRmonth()){
                                 Date rmonth = oRemoveAccount_item.getRmonth();
