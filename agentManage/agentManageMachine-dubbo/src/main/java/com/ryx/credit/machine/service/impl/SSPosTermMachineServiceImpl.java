@@ -396,12 +396,8 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
             mapDetail.put("reqPayStatus", "1");
             mapDetail.put("newMachineId", refundPriceDiffDetail.getNewMachineId());
             mapDetail.put("oldMachineId", refundPriceDiffDetail.getOldMachineId());
-
             mapDetail.put("oldBrandCode", refundPriceDiffDetail.getOldBrandCode());
             mapDetail.put("newBrandCode", refundPriceDiffDetail.getNewBrandCode());
-
-
-
             if(org.apache.commons.lang.StringUtils.isNotBlank(refundPriceDiffDetail.getDeliveryTimeType())){
                 mapDetail.put("deliveryTimeType", refundPriceDiffDetail.getDeliveryTimeType());
                 if(refundPriceDiffDetail.getDeliveryTimeType().equals(DeliveryTimeType.ZERO.getValue())){
