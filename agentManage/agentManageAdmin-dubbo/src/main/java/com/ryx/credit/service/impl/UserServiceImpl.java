@@ -222,7 +222,7 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
     public UserVo selectByLogin(UserVo userVo) {
         UserVo voUser = userMapper.selectbyName(userVo.getLoginName());
         if (voUser != null) {
-            if (voUser.getPassword().equals(voUser.getPassword())) {
+            if (userVo.getPassword().equals(voUser.getPassword())) {
                 userVo = voUser;
             }
         }
