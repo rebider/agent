@@ -624,7 +624,8 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
                     }
                 }
                 //更新分期明细
-                if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
+                OPaymentDetail o_payment_detail = oPaymentDetailMapper.selectByPrimaryKey(oPaymentDetail.getId());
+                if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(o_payment_detail)) {
                     logger.info("付款明细更新数据失败");
                     throw new ProcessException("付款明细更新数据失败");
                 }

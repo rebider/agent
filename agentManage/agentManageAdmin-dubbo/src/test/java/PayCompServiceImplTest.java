@@ -66,15 +66,15 @@ public class PayCompServiceImplTest extends BaseSpringTest {
     @Test
     public void update() {
       Map map = new HashMap<String, String>();
-        map.put("detailId", "OPD2018101700000000001834");
-        map.put("srcId", "RO20181018000000000000467");
-        map.put("mustDeductionAmtSum", "1000");
-        map.put("actualDeductionAmtSum", "100");
-        map.put("notDeductionAmt", "900");
-        map.put("deductTime", "900");
+        map.put("detailId", "OPD1018100800000000002831");
+        map.put("srcId", "RO20181107000000000000661");
+        map.put("mustDeductionAmtSum", "500");//应付
+        map.put("actualDeductionAmtSum", "400");//实付
+        map.put("notDeductionAmt", "100");//未扣足
+        map.put("deductTime","900");
         List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
         list.add(map);
-        ResultVO resultVO = paymentDetailService.uploadStatus(list, PaySign.JQ.code);
+        ResultVO resultVO = paymentDetailService.fenrunDeduction(list, PaySign.JQ.code);
         System.out.println(resultVO);
     }
 
