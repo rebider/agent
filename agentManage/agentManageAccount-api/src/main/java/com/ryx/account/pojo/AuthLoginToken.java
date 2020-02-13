@@ -1,8 +1,9 @@
 package com.ryx.account.pojo;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class AuthLoginToken {
+public class AuthLoginToken implements Serializable{
     private String id;
 
     private String authCode;
@@ -22,6 +23,8 @@ public class AuthLoginToken {
     private String requestId;
 
     private String status;
+
+    private String busInfo;
 
     public String getId() {
         return id;
@@ -101,5 +104,13 @@ public class AuthLoginToken {
 
     public void setStatus(String status) {
         this.status = status == null ? null : status.trim();
+    }
+
+    public String getBusInfo() {
+        return busInfo;
+    }
+
+    public void setBusInfo(String busInfo) {
+        this.busInfo = busInfo == null ? null : busInfo.trim();
     }
 }

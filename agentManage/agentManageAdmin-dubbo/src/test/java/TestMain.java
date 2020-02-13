@@ -2,6 +2,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.Conver10ToConver33Utils;
+import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.agentUtil.AESUtil;
 import com.ryx.credit.common.util.agentUtil.RSAUtil;
 import com.ryx.credit.pojo.admin.order.OPaymentDetail;
@@ -32,8 +33,8 @@ public class TestMain {
         try {
 
             JSONObject par = new JSONObject();
-            par.put("busNum","O00000000374961");
             par.put("platformType","POS");
+            par.put("tokenCode","aa73efa6282947819d19374af961dfff");
             String pars = par.toJSONString();
             System.out.println(pars);
             String agent_public_key="MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnb/YbYzvf+aVfhQHu1u0"+
@@ -88,8 +89,13 @@ public class TestMain {
             map.put("encryptData", encryptData);
             map.put("encryptKey", encrtptKey);
             map.put("signData", signData);
-            map.put("Identification", "RDBPOS");
-            System.out.println(JSONObject.toJSONString(map));
+            map.put("identification", "RDBPOS");
+            String s = JSONObject.toJSONString(map);
+            Map<String, String> reqmap = new HashMap<>();
+            reqmap.put("param",s);
+            String s1 = HttpClientUtil.doPost("http://localhost:8085/center/tokenCodeRefresh", reqmap);
+            System.out.println(s1);
+
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

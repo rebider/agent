@@ -816,6 +816,76 @@ public class AuthLoginTokenExample {
             addCriterion("STATUS not between", value1, value2, "status");
             return (Criteria) this;
         }
+
+        public Criteria andBusInfoIsNull() {
+            addCriterion("BUS_INFO is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusInfoIsNotNull() {
+            addCriterion("BUS_INFO is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusInfoEqualTo(String value) {
+            addCriterion("BUS_INFO =", value, "busInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusInfoNotEqualTo(String value) {
+            addCriterion("BUS_INFO <>", value, "busInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusInfoGreaterThan(String value) {
+            addCriterion("BUS_INFO >", value, "busInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusInfoGreaterThanOrEqualTo(String value) {
+            addCriterion("BUS_INFO >=", value, "busInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusInfoLessThan(String value) {
+            addCriterion("BUS_INFO <", value, "busInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusInfoLessThanOrEqualTo(String value) {
+            addCriterion("BUS_INFO <=", value, "busInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusInfoLike(String value) {
+            addCriterion("BUS_INFO like", value, "busInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusInfoNotLike(String value) {
+            addCriterion("BUS_INFO not like", value, "busInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusInfoIn(List<String> values) {
+            addCriterion("BUS_INFO in", values, "busInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusInfoNotIn(List<String> values) {
+            addCriterion("BUS_INFO not in", values, "busInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusInfoBetween(String value1, String value2) {
+            addCriterion("BUS_INFO between", value1, value2, "busInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusInfoNotBetween(String value1, String value2) {
+            addCriterion("BUS_INFO not between", value1, value2, "busInfo");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
