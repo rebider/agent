@@ -33,10 +33,10 @@ public class TestMain {
         try {
 
             JSONObject par = new JSONObject();
-            par.put("platformType","POS");
-            par.put("tokenCode","aa73efa6282947819d19374af961dfff");
+            par.put("identification","RDBPOS");
             String pars = par.toJSONString();
-            System.out.println(pars);
+
+            System.out.println("请求明文:"+pars);
             String agent_public_key="MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnb/YbYzvf+aVfhQHu1u0"+
                     "nSAy1RT2slmUiErvCMiLe21sJroLIZ/X1sdFeOSuTj21ejGYknhu+JbqcozmAG0s"+
                     "JSvgFNh86HXmcaPM46BqjWEgFGE85/RoyGNoK/vanwjZst4ouf7U3jLIupcJtxEU"+
@@ -91,9 +91,13 @@ public class TestMain {
             map.put("signData", signData);
             map.put("identification", "RDBPOS");
             String s = JSONObject.toJSONString(map);
+
+            System.out.println("param值:"+map);
+
             Map<String, String> reqmap = new HashMap<>();
             reqmap.put("param",s);
-            String s1 = HttpClientUtil.doPost("http://localhost:8085/center/tokenCodeRefresh", reqmap);
+            String s1 = HttpClientUtil.doPost("http://localhost:8080/center/authCode", reqmap);
+
             System.out.println(s1);
 
         } catch (UnsupportedEncodingException e) {
