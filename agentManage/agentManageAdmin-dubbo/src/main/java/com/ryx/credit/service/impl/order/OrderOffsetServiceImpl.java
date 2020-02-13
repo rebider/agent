@@ -478,6 +478,8 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                     oPaymentDetail.setSrcType(PamentSrcType.ORDER_ADJ_SETTLE.code);
                 }else if (paytype.equals(THTK.code)){
                     oPaymentDetail.setSrcType(PamentSrcType.TUIKUAN_DIKOU.code);
+                }else if (paytype.equals(FRDK.code)){
+                    oPaymentDetail.setSrcType(PamentSrcType.FENRUN_DIKOU.code);
                 }
 
                 oPaymentDetail.setSrcId(srcId);
