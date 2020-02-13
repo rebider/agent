@@ -121,4 +121,6 @@ public interface AgentBusInfoMapper {
 
 
     List<Map<String, Object>> queyrBusInfoByBusNumAndPlatformType(Map<String,Object> reqMap);
+
+    List<Map<String, Object>> queryByBusInfo(Map<String, Object> map);
 }

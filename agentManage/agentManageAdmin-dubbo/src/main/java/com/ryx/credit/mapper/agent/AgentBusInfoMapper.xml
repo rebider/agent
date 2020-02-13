@@ -1346,4 +1346,12 @@ union
       and b.bus_num is not NULL
       <if test="busNum!=null and busNum!=''">and b.bus_num=#{busNum}</if>
   </select>
+
+  <select id="queryByBusInfo" parameterType="map" resultType="map">
+    select
+      b.bus_platform, b.bus_num, b.brand_num, b.bus_type
+    from a_agent_businfo b
+           left join a_platform p on p.platform_num=b.bus_platform and p.status=1
+    where b.status=1 and b.agent_id=#{agentId} and p.platform_type=#{platformType}
+  </select>
 </mapper>

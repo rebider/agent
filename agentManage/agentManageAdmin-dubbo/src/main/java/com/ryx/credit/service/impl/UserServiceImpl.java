@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -218,4 +217,17 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
         userVo.setLoginName(userVo.getLoginName()+"1");
         insertByVo(userVo,new HashMap<>());
     }
+
+    @Override
+    public UserVo selectByLogin(UserVo userVo) {
+        UserVo voUser = userMapper.selectbyName(userVo.getLoginName());
+        if (voUser != null) {
+            if (voUser.getPassword().equals(voUser.getPassword())) {
+                userVo = voUser;
+            }
+        }
+        return voUser;
+    }
+
+
 }

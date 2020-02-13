@@ -138,4 +138,6 @@ public interface AgentBusinfoService {
      */
     public AgentBusInfo agentPlatformNum(String agentId,String platFormNum);
 
+    List<Map<String,Object>> selectByBusinfo(String loginName, String platformType);
+
 }
