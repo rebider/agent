@@ -115,6 +115,26 @@ public class ORefundPriceDiffDetail  implements Serializable {
     private String oldSupdPosPlatCode;
     //目标平台上级S码
     private String newSupdPosPlatCode;
+    //当前机构品牌
+    private String oldBrandCode;
+    //目标机构品牌
+    private String newBrandCode;
+
+    public String getOldBrandCode() {
+        return oldBrandCode;
+    }
+
+    public void setOldBrandCode(String oldBrandCode) {
+        this.oldBrandCode = oldBrandCode;
+    }
+
+    public String getNewBrandCode() {
+        return newBrandCode;
+    }
+
+    public void setNewBrandCode(String newBrandCode) {
+        this.newBrandCode = newBrandCode;
+    }
 
     public String getOldPosPlatCode() {
         return oldPosPlatCode;

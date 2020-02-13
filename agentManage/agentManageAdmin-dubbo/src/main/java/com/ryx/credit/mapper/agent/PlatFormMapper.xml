@@ -403,4 +403,21 @@
     from A_platform platform where status=1
     group by platform.platform_type
   </select>
+
+  <select id="queryPlatFormByMap" parameterType="map" resultMap="BaseResultMap">
+    SELECT
+	    p.*
+    FROM
+        a_platform p
+        LEFT JOIN a_agent_businfo b ON p.platform_num = b.bus_platform
+    WHERE
+        1=1
+        AND p.status=1
+        <if test="agentId != null" >
+          AND b.agent_id = #{agentId}
+        </if>
+        <if test="busNum != null" >
+          AND b.bus_num = #{busNum}
+        </if>
+  </select>
 </mapper>

@@ -48,4 +48,11 @@ public interface PlatFormMapper {
     List<String> selectPlatformNumByPlatformType();
 
     List<PlatForm> getPlatFormType();
+
+
+    /**
+     * 条件查询业务平台
+     * @return
+     */
+    List<PlatForm> queryPlatFormByMap(Map map);
 }

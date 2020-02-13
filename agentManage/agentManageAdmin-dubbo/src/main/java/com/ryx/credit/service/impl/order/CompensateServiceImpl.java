@@ -562,8 +562,9 @@ public class CompensateServiceImpl implements CompensateService {
                 refundPriceDiffDetail.setNewMachineId(new_oActivity.getBusProCode());
                 refundPriceDiffDetail.setOldMachineId(old_Activity.getBusProCode());
 
-                //特殊平台增加个校验（智慧POS，智能POS）替换busNum
+                //封装不同平台所需的不同参数
                 if (PlatformType.ZHPOS.code.equals(platForm.getPlatformType()) || PlatformType.ZPOS.code.equals(platForm.getPlatformType())) {
+                    //特殊平台增加个校验（智慧POS，智能POS）替换busNum
                     List<AgentBusInfo> oldList = agentBusInfoMapper.queryBusinfo(FastMap.fastMap("posPlatCode", refundPriceDiffDetail.getOldOrgId()));
                     if (oldList.size() == 1 && null != oldList.get(0).getBusNum()) {
                         refundPriceDiffDetail.setOldOrgId(String.valueOf(oldList.get(0).getBusNum()));
@@ -576,6 +577,17 @@ public class CompensateServiceImpl implements CompensateService {
                     } else {
                         throw new ProcessException("目标机构S码有误，未找到业务平台编码！");
                     }
+                }  else if (PlatformType.SSPOS.getValue().equals(platForm.getPlatformType())) {
+                    List<PlatForm> oldPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("agentId", refundPriceDiffDetail.getAgentId()).putKeyV("busNum",refundPriceDiffDetail.getOldOrgId()));
+                    List<PlatForm> newPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("agentId", refundPriceDiffDetail.getAgentId()).putKeyV("busNum",refundPriceDiffDetail.getNewOrgId()));
+                    if (null == oldPlatForm || oldPlatForm.size() != 1 || null == oldPlatForm.get(0).getBusplatform()) {
+                        throw new ProcessException("未找到原目标业务平台，请核查原目标业务平台！");
+                    }
+                    if (null == newPlatForm || newPlatForm.size() != 1 || null == newPlatForm.get(0).getBusplatform()) {
+                        throw new ProcessException("未找到目标业务平台，请核查目标业务平台！");
+                    }
+                    refundPriceDiffDetail.setOldBrandCode(oldPlatForm.get(0).getBusplatform());
+                    refundPriceDiffDetail.setNewBrandCode(newPlatForm.get(0).getBusplatform());
                 }
                 //校验活动是否支持调整
                 Map<String,String> par = new HashedMap();
