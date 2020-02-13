@@ -43,6 +43,8 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
     private IdService idService;
     @Autowired
     private CUserMapper cUserMapper;
+    @Autowired
+    private OReturnOrderMapper oReturnOrderMapper;
 
     private Logger logger = LoggerFactory.getLogger(OrderOffsetServiceImpl.class);
     @Override
@@ -53,13 +55,17 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
         //3、计算冲抵欠款明细，生成付款明细实体，修改欠款明细为付款中，
         //4、更新数据库
         logger.info("["+srcId+"]开始进行补款生成付款明细,补款类型["+ OffsetPaytype.getContentByValue(paytype) +"]");
-        if ( null == opaymentDetailList || !(opaymentDetailList.size()>0) || amount.compareTo(BigDecimal.ZERO)==0 || StringUtils.isBlank(srcId)){
-           return AgentResult.fail("参数传入错误");
-        }
+
         Map<String,Object> resultMap = new HashMap<>();
         List<OPaymentDetail> resPaymentDetail = new ArrayList<>();
         BigDecimal resAmt = BigDecimal.ZERO;
         AgentResult result = AgentResult.ok();
+        if ( null == opaymentDetailList || !(opaymentDetailList.size()>0) || amount.compareTo(BigDecimal.ZERO)==0 || StringUtils.isBlank(srcId)){
+            resultMap.put("offsetPaymentDetails",resPaymentDetail);
+            resultMap.put("residueAmt",amount);
+           return AgentResult.okMap(resultMap);
+        }
+
         if (paytype.equals(DDBK.code)){ //订单补款
             //待还金额
             BigDecimal arrearsAmt = BigDecimal.ZERO;
@@ -294,11 +300,11 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
             }
             //付款明细
             List<OPayDetail> oPayDetails = new ArrayList<>();
-            OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(srcId);
+            OReturnOrder oReturnOrder = oReturnOrderMapper.selectByPrimaryKey(srcId);
             boolean flag=true;
             boolean f=true;
             //1.获取补款实际支付金额
-            BigDecimal residue=orderAdj.getRefundAmount().subtract(orderAdj.getProRefundAmount());
+            BigDecimal residue=oReturnOrder.getReturnAmo();
 
             //多条补款
             for (OPaymentDetail paymentDetail : opaymentDetailList) {
@@ -342,7 +348,81 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                 oPayDetail.setStatus(Status.STATUS_1.status);
                 oPayDetail.setVersion(Status.STATUS_1.status);
                 oPayDetail.setcTm(new Date());
-                oPayDetail.setcUser(orderAdj.getAdjUserId());
+                oPayDetail.setcUser(oReturnOrder.getcUser());
+                oPayDetails.add(oPayDetail);
+                if(1!=oPayDetailMapper.insertSelective(oPayDetail)){
+                    logger.info("付款明细添加失败");
+                    throw new MessageException("付款明细添加失败");
+                }
+                paymentDetail.setPaymentStatus(PaymentStatus.FKING.code);
+                if(1!=oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail)){
+                    logger.info("付款明细添加失败");
+                    throw new MessageException("付款明细添加失败");
+                }
+            }
+            resultMap.put("offsetPaymentDetails",resPaymentDetail);
+            resultMap.put("residueAmt",residue);
+        }else if (paytype.equals(FRDK.code)){
+            //待还金额
+            BigDecimal arrearsAmt = BigDecimal.ZERO;
+            for(OPaymentDetail oPaymentDetail:opaymentDetailList){
+                if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.DF.code)==0
+                        || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.BF.code)==0
+                        || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.YQ.code)==0){
+                    arrearsAmt = arrearsAmt.add(oPaymentDetail.getPayAmount());
+                }
+            }
+            //付款明细
+            List<OPayDetail> oPayDetails = new ArrayList<>();
+            OReturnOrder oReturnOrder = oReturnOrderMapper.selectByPrimaryKey(srcId);
+            boolean flag=true;
+            boolean f=true;
+            //1.获取补款实际支付金额
+            BigDecimal residue=amount;
+
+            //多条补款
+            for (OPaymentDetail paymentDetail : opaymentDetailList) {
+                //2.累计还款金额
+                BigDecimal initialize = new BigDecimal(0);
+                if(f==false){
+                    break;
+                }
+                if(residue.compareTo(new BigDecimal(0))==0 ||flag==false){
+                    //如果销账金额已抵扣完销账则停止循环
+                    f=false;
+                    break;
+                }
+                OPayDetail oPayDetail = new OPayDetail();
+                if(residue.compareTo(paymentDetail.getPayAmount())==0){
+                    initialize=paymentDetail.getPayAmount();
+                    flag=false;
+                    logger.info("还款-------:"+initialize);
+                    oPayDetail.setAmount(residue);
+                    oPayDetail.setSrcId(srcId);
+                    residue = residue.subtract(initialize);
+                }else if(residue.compareTo(paymentDetail.getPayAmount())==-1){
+                    initialize.add(residue);
+                    flag=false;
+                    logger.info("还款-------:"+initialize.add(residue));
+                    oPayDetail.setAmount(residue);
+                    oPayDetail.setSrcId(srcId);
+                    residue = BigDecimal.ZERO;
+                }else if(residue.compareTo(paymentDetail.getPayAmount())==1){
+                    residue = residue.subtract(paymentDetail.getPayAmount());
+                    oPayDetail.setAmount(paymentDetail.getPayAmount());
+                    oPayDetail.setSrcId(srcId);
+                    logger.info("还款--------:"+paymentDetail.getPayAmount());
+                }
+                resPaymentDetail.add(paymentDetail);
+                //进行添加付款明细数据
+                oPayDetail.setId(idService.genId(TabId.O_PAY_DETAIL));
+                oPayDetail.setArrId(paymentDetail.getId());
+                oPayDetail.setPayType(paytype);
+                oPayDetail.setBusStat(Status.STATUS_0.status);
+                oPayDetail.setStatus(Status.STATUS_1.status);
+                oPayDetail.setVersion(Status.STATUS_1.status);
+                oPayDetail.setcTm(new Date());
+                oPayDetail.setcUser(oReturnOrder.getcUser());
                 oPayDetails.add(oPayDetail);
                 if(1!=oPayDetailMapper.insertSelective(oPayDetail)){
                     logger.info("付款明细添加失败");
@@ -374,7 +454,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
         }
         if (offsetAmt.compareTo(amount)!=0) return AgentResult.fail("冲抵金额与申请不一致");
 
-        if (paytype.equals(DDBK.code) || paytype.equals(DDXZ.code) ||  paytype.equals(DDTZ.code)){
+        if (paytype.equals(DDBK.code) || paytype.equals(DDXZ.code) ||  paytype.equals(DDTZ.code) || paytype.equals(THTK.code) || paytype.equals(FRDK.code)){
             //更新付款单明细
             for (OPayDetail oPayDetail:oPayDetails){
                 oPayDetail.setBusStat(Status.STATUS_1.status);
@@ -383,7 +463,8 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                     throw new MessageException("付款明细更新失败");
                 };
                 OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectById(oPayDetail.getArrId());
-                oPaymentDetail.setRealPayAmount(oPaymentDetail.getRealPayAmount().add(oPayDetail.getAmount()));
+                BigDecimal realAmt = oPaymentDetail.getRealPayAmount()==null?BigDecimal.ZERO:oPaymentDetail.getRealPayAmount();
+                oPaymentDetail.setRealPayAmount(realAmt.add(oPayDetail.getAmount()));
                 if (oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())==0){
                     oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
                 }else if (oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())==-1){
@@ -395,6 +476,8 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                     oPaymentDetail.setSrcType(PamentSrcType.XXXZ.code);
                 }else if (paytype.equals(DDTZ.code)){
                     oPaymentDetail.setSrcType(PamentSrcType.ORDER_ADJ_SETTLE.code);
+                }else if (paytype.equals(THTK.code)){
+                    oPaymentDetail.setSrcType(PamentSrcType.TUIKUAN_DIKOU.code);
                 }
 
                 oPaymentDetail.setSrcId(srcId);
