@@ -204,6 +204,9 @@ public class AccountAuthServiceImpl implements AccountAuthService {
         if(StringUtils.isBlank(passWord)){
             throw new MessageException("缺少密码");
         }
+        if(busInfos.size()==0){
+            throw new MessageException("缺少业务信息");
+        }
         AuthLoginTokenExample authLoginTokenExample = new AuthLoginTokenExample();
         AuthLoginTokenExample.Criteria criteria = authLoginTokenExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status.toString());
@@ -241,6 +244,74 @@ public class AccountAuthServiceImpl implements AccountAuthService {
 
 
 
+    /**
+     * 令牌刷新
+     * @param tokenCode
+     * @param platformType
+     * @param serverIp
+     * @throws MessageException
+     */
+    @Override
+    public Map<String,Object> refreshTokenCode(String tokenCode,String platformType,String serverIp)throws MessageException{
+
+        commonVerify(platformType);
+        if(StringUtils.isBlank(serverIp)){
+            throw new MessageException("缺少请求ip地址");
+        }
+        AuthLoginToken authLoginToken = tokenVerity(tokenCode, platformType);
+        if(!serverIp.equals(authLoginToken.getRequestId())){
+            throw new MessageException("请求ip与上次请求ip不一致");
+        }
+        authLoginToken.setTokenEndTime(DateUtil.dateAddSecond(new Date(),tokenTime));
+        int i = authLoginTokenMapper.updateByPrimaryKey(authLoginToken);
+        if(i!=1){
+            throw new MessageException("令牌刷新失败");
+        }
+
+        Map<String,Object> resultMap = new HashMap<>();
+        resultMap.put("tokenCode",authLoginToken.getAuthCode());
+        resultMap.put("tokenCodeBeginTime",DateUtil.format(authLoginToken.getTokenBeginTime()));
+        resultMap.put("tokenCodeEndTime",DateUtil.format(authLoginToken.getTokenEndTime()));
+        return resultMap;
+    }
+
+    private AuthLoginToken tokenVerity(String tokenCode,String platformType)throws MessageException{
+        if(StringUtils.isBlank(tokenCode)){
+            throw new MessageException("缺少令牌");
+        }
+        AuthLoginTokenExample authLoginTokenExample = new AuthLoginTokenExample();
+        AuthLoginTokenExample.Criteria criteria = authLoginTokenExample.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status.toString());
+        criteria.andPlatformTypeEqualTo(platformType);
+        criteria.andTokenEqualTo(tokenCode);
+        List<AuthLoginToken> authLoginTokens = authLoginTokenMapper.selectByExample(authLoginTokenExample);
+        if(authLoginTokens.size()!=1){
+            throw new MessageException("令牌不存在");
+        }
+        AuthLoginToken authLoginToken = authLoginTokens.get(0);
+        return authLoginToken;
+    }
+
+    /**
+     * 令牌验证
+     * @param platformType
+     * @param tokenCode
+     * @throws MessageException
+     */
+    @Override
+    public Map<String,Object> approveTokenCode(String platformType,String tokenCode)throws MessageException{
+
+        AuthLoginToken authLoginToken = tokenVerity(tokenCode, platformType);
+        if(authLoginToken.getTokenEndTime().getTime()<new Date().getTime()){
+            throw new MessageException("令牌已过期");
+        }
+        String busInfo = authLoginToken.getBusInfo();
+
+        Map<String,Object> resultMap = new HashMap<>();
+        resultMap.put("loginName",authLoginToken.getLogName());
+        resultMap.put("busInfo",busInfo);
+        return resultMap;
+    }
 
 
 }
