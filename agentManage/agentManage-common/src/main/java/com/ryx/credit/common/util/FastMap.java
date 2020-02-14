@@ -43,7 +43,10 @@ public class FastMap extends HashMap {
         }
         return false;
     }
-
+    public  FastMap putData(Object val){
+        this.put("data",val);
+        return this;
+    }
     public  FastMap putKeyV(String key,Object val){
         this.put(key,val);
         return this;
