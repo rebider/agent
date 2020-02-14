@@ -108,8 +108,8 @@ public class AccountAuthServiceImpl implements AccountAuthService {
         authSysCodeMapper.insertSelective(authSysCode);
         Map<String,Object> resultMap = new HashMap<>();
         resultMap.put("authCode",authSysCode.getAuthCode());
-        resultMap.put("authCodeBeginTime",DateUtil.format(authSysCode.getAuthCodeBeginTime()));
-        resultMap.put("authCodeEndTime",DateUtil.format(authSysCode.getAuthCodeEndTime()));
+        resultMap.put("authCodeBeginTime",authSysCode.getAuthCodeBeginTime().getTime());
+        resultMap.put("authCodeEndTime",authSysCode.getAuthCodeEndTime().getTime());
         return resultMap;
      }
 
