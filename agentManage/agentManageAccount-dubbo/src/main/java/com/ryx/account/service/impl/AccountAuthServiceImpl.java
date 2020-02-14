@@ -34,8 +34,8 @@ import java.util.*;
 @Service("accountAuthService")
 public class AccountAuthServiceImpl implements AccountAuthService {
 
-    private int authTime = 300;     //默认五分钟
-    private int tokenTime = 300*6;  //默认半小时
+    private static int authTime = 300;     //默认五分钟
+    private static int tokenTime = 300*6;  //默认半小时
 
     @Autowired
     private IdService idService;
@@ -51,11 +51,11 @@ public class AccountAuthServiceImpl implements AccountAuthService {
     public void init(){
         Dict authTimeDict = dictOptionsService.findDictByName(DictGroup.AUTH.name(), DictGroup.AUTH_TIME.name(), DictGroup.AUTH_CODE.name());
         if(authTimeDict!=null){
-            authTime = Integer.getInteger(authTimeDict.getdItemvalue());
+            authTime = Integer.parseInt(authTimeDict.getdItemvalue());
         }
         Dict tokenTimeDict = dictOptionsService.findDictByName(DictGroup.AUTH.name(),DictGroup.AUTH_TIME.name(),DictGroup.TOKEN_CODE.name());
         if(tokenTimeDict!=null){
-            tokenTime = Integer.getInteger(tokenTimeDict.getdItemvalue());
+            tokenTime = Integer.parseInt(tokenTimeDict.getdItemvalue());
         }
     }
 
