@@ -34,7 +34,7 @@ import java.util.*;
 @Service("accountAuthService")
 public class AccountAuthServiceImpl implements AccountAuthService {
 
-    private static int authTime = 300;     //默认五分钟
+    private static int authTime = 604800;     //默认一周
     private static int tokenTime = 300*6;  //默认半小时
 
     @Autowired
