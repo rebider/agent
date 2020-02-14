@@ -613,10 +613,10 @@ public class DateUtil {
      * 当前时间+多少秒
      * @return
      */
-    public static Date dateAddSecond(Date date,int second){
+    public static Date dateAddMinute(Date date,int minute){
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
-        calendar.add(Calendar.SECOND, second);
+        calendar.add(Calendar.MINUTE, minute);
         return calendar.getTime();
     }
 
