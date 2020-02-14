@@ -1347,19 +1347,24 @@ union
       <if test="busNum!=null and busNum!=''">and b.bus_num=#{busNum}</if>
   </select>
 
-  <select id="queryByBusInfo" parameterType="map" resultMap="BaseResultMapBusinfo">
+  <select id="queryByBusInfo" parameterType="map" resultType="map">
     select
-      b.BUS_PLATFORM, b.BUS_NUM, p.BUSPLATFORM, b.BUS_TYPE
+      b.id,
+      b.agent_id,
+      a.ag_name,
+      b.bus_num,
+      b.bus_login_num,
+      p.platform_name,
+      p.busplatform
     from a_agent_businfo b
-           left join a_platform p on p.PLATFORM_NUM = b.BUS_PLATFORM and p.STATUS = 1
-    where b.STATUS = 1
-      and b.AGENT_ID = #{agentId,jdbcType=VARCHAR} and p.PLATFORM_TYPE = #{platformType,jdbcType=VARCHAR}
+      left join a_agent a on a.id=b.agent_id and a.status=1
+      left join a_platform p on p.platform_num=b.bus_platform and p.status=1
+    where
+      b.status=1 and a.status=1 and b.clo_review_status=3 and a.ag_status='Approved'
+      and b.bus_status in ('0','1','2')
+      and b.agent_id=#{agentId}
+      and p.platform_type=#{platformType}
+      and b.bus_num is not null
+      and b.bus_login_num is not null
   </select>
-
-  <resultMap id="BaseResultMapBusinfo" type="java.util.Map">
-    <result column="BUS_PLATFORM" jdbcType="VARCHAR" property="busPlatform" />
-    <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
-    <result column="BUSPLATFORM" jdbcType="VARCHAR" property="brandNum" />
-    <result column="BUS_TYPE" jdbcType="VARCHAR" property="busType" />
-  </resultMap>
 </mapper>

@@ -221,12 +221,12 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
     @Override
     public UserVo selectByLogin(UserVo userVo) {
         UserVo voUser = userMapper.selectbyName(userVo.getLoginName());
-        if (voUser != null) {
-            if (userVo.getPassword().equals(voUser.getPassword())) {
-                userVo = voUser;
+        if (voUser != null && voUser.getPassword()!=null) {
+            if (voUser.getPassword().equals(userVo.getPassword())) {
+                return voUser;
             }
         }
-        return voUser;
+        return null;
     }
 
 
