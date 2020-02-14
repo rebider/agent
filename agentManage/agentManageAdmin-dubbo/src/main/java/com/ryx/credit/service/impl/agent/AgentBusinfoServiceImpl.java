@@ -1214,9 +1214,9 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		return agentBusInfos;
 	}
 
-	public List<Map<String,Object>> selectByBusinfo(String loginName, String platformType) {
+	public List<Map<String,Object>> selectByBusinfo(String agentId, String platformType) {
 		List<Map<String,Object>> listMap = agentBusInfoMapper.queryByBusInfo(
-				FastMap.fastMap("angetId", loginName)
+				FastMap.fastMap("agentId", agentId)
 						.putKeyV("platformType", platformType));
 		if (listMap.size()==0) {
 			return null;

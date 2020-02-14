@@ -139,8 +139,8 @@ public class AccountAuthServiceImpl implements AccountAuthService {
         }
         Map<String,Object> resultMap = new HashMap<>();
         resultMap.put("authCode",authSysCode.getAuthCode());
-        resultMap.put("authCodeBeginTime",DateUtil.format(authSysCode.getAuthCodeBeginTime()));
-        resultMap.put("authCodeEndTime",DateUtil.format(authSysCode.getAuthCodeEndTime()));
+        resultMap.put("authCodeBeginTime",authSysCode.getAuthCodeBeginTime().getTime());
+        resultMap.put("authCodeEndTime",authSysCode.getAuthCodeEndTime().getTime());
         return resultMap;
 
     }
@@ -237,8 +237,8 @@ public class AccountAuthServiceImpl implements AccountAuthService {
 
         Map<String,Object> resultMap = new HashMap<>();
         resultMap.put("tokenCode",authLoginToken.getAuthCode());
-        resultMap.put("tokenCodeBeginTime",DateUtil.format(authLoginToken.getTokenBeginTime()));
-        resultMap.put("tokenCodeEndTime",DateUtil.format(authLoginToken.getTokenEndTime()));
+        resultMap.put("tokenCodeBeginTime",authLoginToken.getTokenBeginTime().getTime());
+        resultMap.put("tokenCodeEndTime",authLoginToken.getTokenEndTime().getTime());
         return resultMap;
     }
 
