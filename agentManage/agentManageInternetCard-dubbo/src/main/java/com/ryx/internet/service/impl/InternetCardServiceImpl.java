@@ -717,6 +717,7 @@ public class InternetCardServiceImpl implements InternetCardService {
         internetCard.setCardImportId(oInternetCardImport.getId());
         if(internetCard.getDeliverTime()!=null){ // 取其发货日期为开户日期
             Date date = DateUtil.getOneYearLater(internetCard.getDeliverTime());
+            internetCard.setOpenAccountTime(internetCard.getDeliverTime());
             internetCard.setExpireTime(date);
             internetCard.setRenew(BigDecimal.ZERO);
             internetCard.setStop(BigDecimal.ZERO);
