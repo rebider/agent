@@ -1349,9 +1349,22 @@ union
 
   <select id="queryByBusInfo" parameterType="map" resultType="map">
     select
-      b.bus_platform, b.bus_num, b.brand_num, b.bus_type
+      b.id,
+      b.agent_id,
+      a.ag_name,
+      b.bus_num,
+      b.bus_login_num,
+      p.platform_name,
+      p.busplatform
     from a_agent_businfo b
-           left join a_platform p on p.platform_num=b.bus_platform and p.status=1
-    where b.status=1 and b.agent_id=#{agentId} and p.platform_type=#{platformType}
+      left join a_agent a on a.id=b.agent_id and a.status=1
+      left join a_platform p on p.platform_num=b.bus_platform and p.status=1
+    where
+      b.status=1 and a.status=1 and b.clo_review_status=3 and a.ag_status='Approved'
+      and b.bus_status in ('0','1','2')
+      and b.agent_id=#{agentId}
+      and p.platform_type=#{platformType}
+      and b.bus_num is not null
+      and b.bus_login_num is not null
   </select>
 </mapper>
