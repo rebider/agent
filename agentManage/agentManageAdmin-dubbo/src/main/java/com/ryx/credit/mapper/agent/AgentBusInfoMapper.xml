@@ -1347,11 +1347,19 @@ union
       <if test="busNum!=null and busNum!=''">and b.bus_num=#{busNum}</if>
   </select>
 
-  <select id="queryByBusInfo" parameterType="map" resultType="map">
+  <select id="queryByBusInfo" parameterType="map" resultMap="BaseResultMapBusinfo">
     select
-      b.bus_platform, b.bus_num, b.brand_num, b.bus_type
+      b.BUS_PLATFORM, b.BUS_NUM, p.BUSPLATFORM, b.BUS_TYPE
     from a_agent_businfo b
-           left join a_platform p on p.platform_num=b.bus_platform and p.status=1
-    where b.status=1 and b.agent_id=#{agentId} and p.platform_type=#{platformType}
+           left join a_platform p on p.PLATFORM_NUM = b.BUS_PLATFORM and p.STATUS = 1
+    where b.STATUS = 1
+      and b.AGENT_ID = #{agentId,jdbcType=VARCHAR} and p.PLATFORM_TYPE = #{platformType,jdbcType=VARCHAR}
   </select>
+
+  <resultMap id="BaseResultMapBusinfo" type="java.util.Map">
+    <result column="BUS_PLATFORM" jdbcType="VARCHAR" property="busPlatform" />
+    <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
+    <result column="BUSPLATFORM" jdbcType="VARCHAR" property="brandNum" />
+    <result column="BUS_TYPE" jdbcType="VARCHAR" property="busType" />
+  </resultMap>
 </mapper>
