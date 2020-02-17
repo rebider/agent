@@ -98,7 +98,8 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
                     .andAgentIdEqualTo(agentId)
                     .andPayTypeIn(payTypeList)
                     .andPaymentStatusIn(paymentStatusList)
-                    .andPaymentTypeEqualTo(PamentIdType.ORDER_FKD.code);
+                    .andPaymentTypeEqualTo(PamentIdType.ORDER_FKD.code)
+            .andStatusEqualTo(Status.STATUS_1.status);
             //example.setOrderByClause("Payment_type asc");
             //example.setOrderByClause("order_id asc");
             example.setOrderByClause("plan_pay_time asc");

@@ -26,10 +26,7 @@ import com.ryx.credit.service.agent.BusActRelService;
 import com.ryx.credit.service.dict.DepartmentService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
-import com.ryx.credit.service.order.IOrderReturnService;
-import com.ryx.credit.service.order.OLogisticsDetailService;
-import com.ryx.credit.service.order.OLogisticsService;
-import com.ryx.credit.service.order.PlannerService;
+import com.ryx.credit.service.order.*;
 import org.apache.commons.collections4.Put;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -141,6 +138,10 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     private DepartmentService departmentService;
     @Autowired
     private OActivityVisibleMapper activityVisibleMapper;
+    @Autowired
+    private OrderOffsetService orderOffsetService;
+    @Autowired
+    private OPayDetailMapper oPayDetailMapper;
 
 
     /**
@@ -709,7 +710,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             returnOrder.setTakeOutAmo(BigDecimal.ZERO);
             returnOrder.setRelReturnAmo(BigDecimal.ZERO);
             returnOrder.setVersion(Status.STATUS_1.status);
+            returnOrder.setLogicalVersion(String.valueOf(Status.STATUS_1.status));
             returnOrder.setStatus(Status.STATUS_1.status);
+
             returnOrderMapper.insertSelective(returnOrder);
         } catch (Exception e) {
             log.error("生成退货单失败", e);
@@ -1125,11 +1128,23 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
             //财务最后审批时上传打款凭证,并且是已经执行退款方案
             if (approveResult.equals(ApprovalType.PASS.getValue()) && sid.equals(refund_finc2_id)) {
-                OAccountAdjustExample oAccountAdjustExample = new OAccountAdjustExample();
-                oAccountAdjustExample.or().andSrcIdEqualTo(agentVo.getReturnId()).andAdjustTypeEqualTo(AdjustType.TKTH.adjustType);
-                List<OAccountAdjust> oAccountAdjusts = accountAdjustMapper.selectByExample(oAccountAdjustExample);
-                if (oAccountAdjusts == null || oAccountAdjusts.size() <= 0) {
-                    return AgentResult.fail("您还未执行退款方案");
+                if (returnOrder.getLogicalVersion()!=null && returnOrder.getLogicalVersion().equals(String.valueOf(Status.STATUS_1.status))){
+                    //根据新的逻辑版本号，判断是否执行了抵扣计划
+                    OPayDetailExample oPayDetailExample = new OPayDetailExample();
+                    oPayDetailExample.or().andSrcIdEqualTo(returnOrder.getId())
+                            .andBusStatEqualTo(Status.STATUS_0.status)
+                            .andStatusEqualTo(Status.STATUS_1.status);
+                    List<OPayDetail> oPayDetails = oPayDetailMapper.selectByExample(oPayDetailExample);
+                    if (oPayDetails == null || oPayDetails.size() <= 0) {
+                        return AgentResult.fail("您还未执行退款方案");
+                    }
+                }else {
+                    OAccountAdjustExample oAccountAdjustExample = new OAccountAdjustExample();
+                    oAccountAdjustExample.or().andSrcIdEqualTo(agentVo.getReturnId()).andAdjustTypeEqualTo(AdjustType.TKTH.adjustType);
+                    List<OAccountAdjust> oAccountAdjusts = accountAdjustMapper.selectByExample(oAccountAdjustExample);
+                    if (oAccountAdjusts == null || oAccountAdjusts.size() <= 0) {
+                        return AgentResult.fail("您还未执行退款方案");
+                    }
                 }
 
                 if (returnOrder.getRelReturnAmo().compareTo(BigDecimal.ZERO) > 0 && agentVo.getAttachments().length <= 0) {
@@ -1222,6 +1237,14 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             BusActRel rel = busActRelService.findById(processInstanceId);
             //退货编号
             String returnId = rel.getBusId();
+            //取消抵扣
+            OReturnOrder oReturnOrder = returnOrderMapper.selectByPrimaryKey(returnId);
+            //取消抵扣
+            AgentResult agentResult = orderOffsetService.OffsetArrearsCancle(oReturnOrder.getTakeOutAmo(), OffsetPaytype.THTK.code, returnId);
+            if (!agentResult.isOK()){
+                log.error("抵扣欠款取消失败");
+                throw new MessageException("抵扣欠款取消失败！");
+            }
             //更新退货单
             updateOrderReturn(returnId, new BigDecimal(RetSchedule.JJ.code));
             //更新原始订单SN
@@ -1248,6 +1271,13 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             BusActRel rel = busActRelService.findById(processInstanceId);
             //退货编号
             String returnId = rel.getBusId();
+            OReturnOrder oReturnOrder = returnOrderMapper.selectByPrimaryKey(returnId);
+            //提交抵扣
+            AgentResult agentResult = orderOffsetService.OffsetArrearsCommit(oReturnOrder.getReturnAmo(), OffsetPaytype.THTK.code, returnId);
+            if (!agentResult.isOK()){
+                log.error("抵扣欠款提交失败");
+                throw new MessageException(agentResult.getMsg());
+            }
             //更新退货单
             if(updateOrderReturn(returnId, new BigDecimal(RetSchedule.WC.code))!=1){
                 log.info("退货审批完成回调:{},{},更新退货单失败", processInstanceId, activityName);
@@ -2698,6 +2728,14 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         }
         log.info("导出退转发明细数据：", receiptOrderVoList);
         return receiptOrderVoList;
+    }
+
+    @Override
+    public AgentResult updateReturnOrder(OReturnOrder oReturnOrder) {
+        if (returnOrderMapper.updateByPrimaryKeySelective(oReturnOrder)!=1){
+            return AgentResult.fail();
+        }
+        return AgentResult.ok();
     }
 
     /**

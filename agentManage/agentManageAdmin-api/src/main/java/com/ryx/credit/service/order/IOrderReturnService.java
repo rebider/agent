@@ -94,4 +94,6 @@ public interface IOrderReturnService {
 
 
     List<ReturnOrderVo> exportRetForDetail(Map map);
+
+    AgentResult updateReturnOrder(OReturnOrder oReturnOrder);
 }
