@@ -490,18 +490,17 @@ public class InternetCardServiceImpl implements InternetCardService {
                 String importType = oInternetCardImport.getImportType();
                 if(importType.equals(CardImportType.A.getValue()) || importType.equals(CardImportType.B.getValue()) || importType.equals(CardImportType.E.getValue())){
                     OInternetCard internetCard = JsonUtil.jsonToPojo(oInternetCardImport.getImportMsg(), OInternetCard.class);
-                    if(importType.equals(CardImportType.C.getValue()) && internetCard.getDeliverTime() == null){
-                        throw new MessageException("历史北京总部发卡-发货日期不能为空，iccid："+internetCard.getIccidNum());
-                    }else {// 流量卡卡号 流量卡状态 开户日期为空
-                        if(internetCard.getOpenAccountTime() !=null ){
-                            internetCard.setOpenAccountTime(null);
-                        }
+                    if(internetCard.getOpenAccountTime() !=null ){// 不更新开户日期
+                        internetCard.setOpenAccountTime(null);
                     }
                     disposeInternetCard(oInternetCardImport,internetCard);
                 }else if(importType.equals(CardImportType.C.getValue())){
                     OInternetCard internetCard = JsonUtil.jsonToPojo(oInternetCardImport.getImportMsg(), OInternetCard.class);
                     if(StringUtils.isBlank(internetCard.getBeginSn()) || StringUtils.isBlank(internetCard.getSnCount())){
                         throw new MessageException("缺少iccid开始号段或总数量");
+                    }
+                    if(importType.equals(CardImportType.C.getValue()) && internetCard.getDeliverTime() == null){
+                        throw new MessageException("历史北京总部发卡-发货日期不能为空");
                     }
                     List<String> iccidList = logisticsService.idList(internetCard.getBeginSn(), StringUtils.isBlank(internetCard.getEndSn())?internetCard.getBeginSn():internetCard.getEndSn());
                     if(iccidList.size()!=Integer.parseInt(RegexUtil.rvZeroAndDot(internetCard.getSnCount()))){
