@@ -28,7 +28,7 @@ public class OPayDetailServiceImpl implements OPayDetailService {
     private OPaymentDetailMapper oPaymentDetailMapper;
 
     @Override
-    public Map<String, Object> getAdjDetail(String srcId, String payType, String agentId) {
+    public Map<String, Object> getAdjDetail(String srcId, String payType) {
         logger.info("查询付款明细");
         Map<String,Object> resMap = new HashMap<>();
         BigDecimal takeAmount = BigDecimal.ZERO;
@@ -47,10 +47,10 @@ public class OPayDetailServiceImpl implements OPayDetailService {
                 oPayDetailVos.add(oPayDetailVo);
                 takeAmount = takeAmount.add(oPayDetail.getAmount());
                 resMap.put("viewDetails",oPayDetailVos);
+                resMap.put("takeAmount",takeAmount);
             }
-            resMap.put("details",oPayDetails);
         }
-        resMap.put("takeAmount",takeAmount);
+
         return resMap;
     }
 }
