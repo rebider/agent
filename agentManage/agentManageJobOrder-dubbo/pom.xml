@@ -8,15 +8,15 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>agentManageWorkOrder-dubbo</artifactId>
-    <name>agentManageWorkOrder-dubbo</name>
+    <artifactId>agentManageJobOrder-dubbo</artifactId>
+    <name>agentManageJobOrder-dubbo</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
     <build>
-        <finalName>agentManageWorkOrder-dubbo</finalName>
+        <finalName>agentManageJobOrder-dubbo</finalName>
         <filters>
             <!-- 全局配置 -->
             <filter>${project.basedir}/../src/main/filters/filter-global.properties</filter>
@@ -102,7 +102,7 @@
                             <manifest>
                                 <addClasspath>true</addClasspath>
                                 <classpathPrefix>lib/</classpathPrefix>
-                                <mainClass>com.ryx.work.spring.SpringEngine</mainClass>
+                                <mainClass>com.ryx.JobOrder.spring.SpringEngine</mainClass>
                                 <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                                 <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                             </manifest>

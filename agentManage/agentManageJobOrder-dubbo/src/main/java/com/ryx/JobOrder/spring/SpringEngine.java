@@ -1,4 +1,4 @@
-package com.ryx.work.spring;
+package com.ryx.JobOrder.spring;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
