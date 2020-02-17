@@ -1341,7 +1341,7 @@ union
       and a.ag_status='Approved'
       and b.status=1 and
       b.clo_review_status=3
-      and b.bus_status in (0,1,2,3,4)
+      and b.bus_status in (0,1,2,3)
       and c.platform_type=#{platformType}
       and b.bus_num is not NULL
       <if test="busNum!=null and busNum!=''">and b.bus_num=#{busNum}</if>
