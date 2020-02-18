@@ -344,8 +344,18 @@ public class InternetCardServiceImpl implements InternetCardService {
                             oInternetCard.setOrderId(orderId.equals("null")?"":orderId);
                             oInternetCard.setAgentName(agentName.equals("null")?"":agentName);
                             oInternetCard.setSnCount(snCount.equals("null")?"":snCount);
-                            if(StringUtils.isNotBlank(deliverTime) && !deliverTime.equals("null"))
-                            oInternetCard.setDeliverTime(DateUtils.parseDate(deliverTime,dateFormat));
+                            if(StringUtils.isNotBlank(deliverTime) && !deliverTime.equals("null")) {
+                                String str = null;
+                                if (deliverTime.contains("/")) {
+                                    str = deliverTime.substring(0, deliverTime.indexOf("/"));
+                                } else if (deliverTime.contains("-")){
+                                    str = deliverTime.substring(0, deliverTime.indexOf("-"));
+                                }
+                                if(str.length() != 4)
+                                    oInternetCard.setDeliverTime(null);
+                                else
+                                    oInternetCard.setDeliverTime(DateUtils.parseDate(deliverTime, dateFormat));// DateUtils.stringToDate(deliverTime)
+                            }
                             oInternetCard.setBeginSn(beginSn.equals("null")?"":beginSn);
                             oInternetCard.setEndSn(endSn.equals("null")?"":endSn);
                             jsonList = JsonUtil.objectToJson(oInternetCard);
@@ -500,7 +510,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                         throw new MessageException("缺少iccid开始号段或总数量");
                     }
                     if(importType.equals(CardImportType.C.getValue()) && internetCard.getDeliverTime() == null){
-                        throw new MessageException("历史北京总部发卡-发货日期不能为空");
+                        throw new MessageException("发货日期不能为空或将日期单元格格式为文本且格式为年-月-日");
                     }
                     List<String> iccidList = logisticsService.idList(internetCard.getBeginSn(), StringUtils.isBlank(internetCard.getEndSn())?internetCard.getBeginSn():internetCard.getEndSn());
                     if(iccidList.size()!=Integer.parseInt(RegexUtil.rvZeroAndDot(internetCard.getSnCount()))){
