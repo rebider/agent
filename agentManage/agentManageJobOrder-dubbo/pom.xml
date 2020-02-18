@@ -148,6 +148,11 @@
         </dependency>
         <dependency>
             <groupId>com.ryx.ry</groupId>
+            <artifactId>agentManageJobOrder-api</artifactId>
+            <version>${agentManage.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ryx.ry</groupId>
             <artifactId>agentManageAdmin-api</artifactId>
             <version>${agentManage.version}</version>
         </dependency>
