@@ -287,6 +287,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         record.setDataShiro(BusActRelBusType.refund.key);//退货权限数据
         record.setAgDocDistrict(agent.getAgDocDistrict());
         record.setAgDocPro(agent.getAgDocPro());
+        record.setNetInBusType("ACTIVITY_" + platform);
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("历史订单退货流程审批，启动审批异常，添加审批关系失败{}:{}", oReturnOrder.getId(), processingId);
             throw new MessageException("审批流启动失败:添加审批关系失败");

@@ -750,6 +750,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         String collectCompany = "7";  //北京财务
         Set<String> agDocDistrict = new HashSet<>();
         Set<String> agDocPro = new HashSet<>();
+        Set<String> busPlatform = new HashSet<>();
         for (Map<String, Object> map : list) {
 
             String orderId = (String) map.get("orderId");
@@ -843,6 +844,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByOrderId(returnOrderDetail.getOrderId());
             agDocDistrict.add(agentBusInfo.getAgDocDistrict());
             agDocPro.add(agentBusInfo.getAgDocPro());
+            busPlatform.add(agentBusInfo.getBusPlatform());
             snMap.put("agencyId", agentBusInfo.getBusNum());
             snList.add(snMap);
         }
@@ -1002,14 +1004,14 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(agentId);
         record.setDataShiro(BusActRelBusType.refund.key);
-
         Agent agent = agentMapper.selectByPrimaryKey(agentId);
         if(agent!=null) {
             record.setAgentName(agent.getAgName());
         }
-        if (agDocDistrict.size() != 1 || agDocPro.size() != 1) {
+        if (busPlatform.size() != 1 || agDocDistrict.size() != 1 || agDocPro.size() != 1) {
             throw new ProcessException("一次只能提交一种业务类型的机具！");
         }
+        record.setNetInBusType("ACTIVITY_" + busPlatform.iterator().next());
         record.setAgDocDistrict(agDocDistrict.iterator().next());
         record.setAgDocPro(agDocPro.iterator().next());
         if (1 != busActRelMapper.insertSelective(record)) {
