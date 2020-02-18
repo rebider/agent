@@ -551,7 +551,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                 OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectById(oPayDetail.getArrId());
                 BigDecimal realAmt = oPaymentDetail.getRealPayAmount()==null?BigDecimal.ZERO:oPaymentDetail.getRealPayAmount();
                 oPaymentDetail.setRealPayAmount(realAmt.add(oPayDetail.getAmount()));
-                if (oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())==0){
+                if (oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())>=0){
                     oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
                 }else if (oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())==-1){
                     oPaymentDetail.setPaymentStatus(PaymentStatus.BF.code);
