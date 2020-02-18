@@ -510,7 +510,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                         throw new MessageException("缺少iccid开始号段或总数量");
                     }
                     if(importType.equals(CardImportType.C.getValue()) && internetCard.getDeliverTime() == null){
-                        throw new MessageException("发货日期不能为空或将日期单元格格式为文本且格式为年-月-日");
+                        throw new MessageException("发货日期不能为空或将日期单元格格式为文本且内容格式为年-月-日,iccid开始号"+internetCard.getBeginSn());
                     }
                     List<String> iccidList = logisticsService.idList(internetCard.getBeginSn(), StringUtils.isBlank(internetCard.getEndSn())?internetCard.getBeginSn():internetCard.getEndSn());
                     if(iccidList.size()!=Integer.parseInt(RegexUtil.rvZeroAndDot(internetCard.getSnCount()))){
