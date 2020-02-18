@@ -102,7 +102,7 @@
                             <manifest>
                                 <addClasspath>true</addClasspath>
                                 <classpathPrefix>lib/</classpathPrefix>
-                                <mainClass>com.ryx.JobOrder.spring.SpringEngine</mainClass>
+                                <mainClass>com.ryx.jobOrder.spring.SpringEngine</mainClass>
                                 <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                                 <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                             </manifest>
