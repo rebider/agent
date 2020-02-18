@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -87,6 +88,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     private static final String SS_TEMPLATE_APPLY_PASS = AppConfig.getProperty("ss.template.apply.pass"); //通过，分配
     private static final String SS_TEMPLATE_APPLY_CHECK = AppConfig.getProperty("ss.template.apply.check");//校验模板是否相同模板
     private static final String SS_TEMPLATE_APPLY_CHECKNAME = AppConfig.getProperty("ss.template.apply.checkName");//校验模板名称是否重复
+    private static final String SS_TEMPLATE_APPLY_DELAPPLY = AppConfig.getProperty("ss.template.apply.delApply");
 
 
     /**
@@ -201,7 +203,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                // result = HttpClientUtil.doPostJson(TEMPLATE_APPLY, map2.toJSONString());
             }else if("SSPOS".equals(busInfo.get("PLATFORM_TYPE"))){
                 logger.info("请求参数："+map2.toJSONString());
-                reactRJPOSApply(SS_TEMPLATE_APPLY,map2.toJSONString(),templateRecode);
+                reactSSPOSApply(SS_TEMPLATE_APPLY,map2,templateRecode);
             }
         }catch (MessageException e){
             throw new MessageException(e.getMsg());
@@ -298,7 +300,14 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             try {
                 JSONObject map = new JSONObject();
                 map.put("applyId",templateRecode.getTemplateId());
-                String  resultde = HttpClientUtil.doPostJson(TEMPLATE_DELAPPLY, map.toJSONString());
+                List<Map<String, String>> agentInfoByBusNum = recodeMapper.getAgentInfoByBusNum(templateRecode.getBusNum());
+                String platformType = agentInfoByBusNum.get(0).get("PLATFORM_TYPE");
+                String  resultde;
+                if ("SSPOS".equals(platformType)){
+                    resultde = HttpClientUtil.doPostJson(SS_TEMPLATE_APPLY_DELAPPLY, map.toJSONString());
+                }else {
+                    resultde = HttpClientUtil.doPostJson(TEMPLATE_DELAPPLY, map.toJSONString());
+                }
                 Map<String,Object> resultMap = JSONObject.parseObject(resultde);
             }catch (Exception e1){
                 e1.printStackTrace();
@@ -353,6 +362,52 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     private void reactRJPOSApply(String url,String json,TemplateRecode recode) throws MessageException{
         try {
            String result = HttpClientUtil.doPostJson(url, json);
+            Map<String,Object> resultMap = JSONObject.parseObject(result);
+            if(!(boolean)resultMap.get("result")){
+                 throw new MessageException(resultMap.get("msg").toString());
+             }
+             Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
+
+            recode.setTemplateId(objectMap.get("applyId").toString());
+            recode.setTemplateName(objectMap.get("templateName").toString());
+        }catch (MessageException e){
+            e.printStackTrace();
+            throw new MessageException(e.getMsg());
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new MessageException("联动平台保存信息失败！");
+        }
+    }
+
+    /**
+     * 联动SSPOS保存申请信息
+     * @param url
+     * @param json
+     * @param recode
+     * @throws MessageException
+     */
+    private void reactSSPOSApply(String url,JSONObject json,TemplateRecode recode) throws MessageException{
+        try {
+
+            JSONObject ssApiApply = new JSONObject();
+            //分润奖励(判断是否申请分润奖励)
+            BigDecimal profitReward = json.getBigDecimal("profitReward");//分润奖励值
+            String remarkReward = json.getString("remarkReward");
+            JSONObject ssApiApplyReward=null;
+            if ((remarkReward!=null&&!"".equals(remarkReward))||!profitReward.equals(BigDecimal.ZERO)){ //申请了奖励分润
+                ssApiApplyReward = new JSONObject();
+                ssApiApplyReward.put("applyId",json.getString("templateId"));
+                ssApiApplyReward.put("orgId",json.getString("orgId"));
+                ssApiApplyReward.put("ruleValue",profitReward);
+                ssApiApplyReward.put("description",remarkReward);//描述
+            }
+
+            ssApiApply.put("applyType",json.getString("applyType"));
+            ssApiApply.put("orgId",json.getString("orgId"));
+            ssApiApply.put("applyTemplate",json);
+            ssApiApply.put("applyReward",ssApiApplyReward);
+
+           String result = HttpClientUtil.doPostJson(url, ssApiApply.toJSONString());
             Map<String,Object> resultMap = JSONObject.parseObject(result);
             if(!(boolean)resultMap.get("result")){
                  throw new MessageException(resultMap.get("msg").toString());
@@ -546,7 +601,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             }else if("SSPOS".equals(platformType)){
                 map2.put("applyId",recode.getTemplateId());
                 map2.put("orgId",recode.getBusNum());
-                reactRJPOSApply(SS_TEMPLATE_APPLY,map2.toJSONString(),recode);
+                reactSSPOSApply(SS_TEMPLATE_APPLY,map2,recode);
             }
         }catch (MessageException e){
             throw new MessageException(e.getMsg());
@@ -577,6 +632,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             BusActRel rel =  taskApprovalService.queryBusActRel(busActRel);
             if (rel != null) {
                 TemplateRecode templateRecode = recodeMapper.selectByPrimaryKey(rel.getBusId());
+                List<Map<String, String>> agentInfoByBusNum = recodeMapper.getAgentInfoByBusNum(templateRecode.getBusNum());
                 if("1".equals(status)){ //通过
                     templateRecode.setApplyResult("4"); // 通过
                     //JSONObject map2 = new JSONObject();
@@ -595,10 +651,16 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                    // }
                 }else{
                     templateRecode.setApplyResult("3"); // 撤销
+                    String platformType = agentInfoByBusNum.get(0).get("PLATFORM_TYPE");
                     try {
                         JSONObject map = new JSONObject();
                         map.put("applyId",templateRecode.getTemplateId());
-                        String  result = HttpClientUtil.doPostJson(TEMPLATE_DELAPPLY, map.toJSONString());
+                        String  result;
+                        if ("SSPOS".equals(platformType)){
+                           result = HttpClientUtil.doPostJson(SS_TEMPLATE_APPLY_DELAPPLY, map.toJSONString());
+                        }else {
+                            result = HttpClientUtil.doPostJson(TEMPLATE_DELAPPLY, map.toJSONString());
+                        }
                         Map<String,Object> resultMap = JSONObject.parseObject(result);
                         if(!(boolean)resultMap.get("result")) {
                             logger.info("***********修改删除综管数据失败，***********");
