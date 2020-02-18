@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.jobOrder.dao.JoOrderMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.jobOrder.pojo.JoOrder">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="AG_ID" jdbcType="VARCHAR" property="agId" />
+    <result column="AG_NAME" jdbcType="VARCHAR" property="agName" />
+    <result column="BUS_ID" jdbcType="VARCHAR" property="busId" />
+    <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
+    <result column="PALTFORM_NUM" jdbcType="VARCHAR" property="paltformNum" />
+    <result column="PLATFORM_NAME" jdbcType="VARCHAR" property="platformName" />
+    <result column="JO_FIRST_KEY_NUM" jdbcType="VARCHAR" property="joFirstKeyNum" />
+    <result column="JO_SECOND_KEY_NUM" jdbcType="VARCHAR" property="joSecondKeyNum" />
+    <result column="PRIORITY_LEVEL" jdbcType="VARCHAR" property="priorityLevel" />
+    <result column="LAUNCH_TIME" jdbcType="TIMESTAMP" property="launchTime" />
+    <result column="LAUNCH_PERSON_ID" jdbcType="VARCHAR" property="launchPersonId" />
+    <result column="LAUNCH_PERSON_NAME" jdbcType="VARCHAR" property="launchPersonName" />
+    <result column="LAUNCH_PERSON_EMAIL" jdbcType="VARCHAR" property="launchPersonEmail" />
+    <result column="LAUNCH_BRANCH_ID" jdbcType="VARCHAR" property="launchBranchId" />
+    <result column="LAUNCH_BRANCH_NAME" jdbcType="VARCHAR" property="launchBranchName" />
+    <result column="ACCEPT_BRANCH" jdbcType="VARCHAR" property="acceptBranch" />
+    <result column="ACCEPT_NOW_BRANCH" jdbcType="VARCHAR" property="acceptNowBranch" />
+    <result column="DEAL_TIME_START" jdbcType="TIMESTAMP" property="dealTimeStart" />
+    <result column="DEAL_TIME_END" jdbcType="TIMESTAMP" property="dealTimeEnd" />
+    <result column="DEAL_TIME_LENGTH" jdbcType="DECIMAL" property="dealTimeLength" />
+    <result column="JO_PROGRESS" jdbcType="VARCHAR" property="joProgress" />
+    <result column="JO_TITLE" jdbcType="VARCHAR" property="joTitle" />
+    <result column="JO_CONTENT" jdbcType="VARCHAR" property="joContent" />
+    <result column="JO_ASSESS_LEVEL" jdbcType="DECIMAL" property="joAssessLevel" />
+    <result column="JO_ASSESSOR_NAME" jdbcType="VARCHAR" property="joAssessorName" />
+    <result column="JO_ASSESSOR_TYPE" jdbcType="VARCHAR" property="joAssessorType" />
+    <result column="JO_ASSESSOR_ID" jdbcType="VARCHAR" property="joAssessorId" />
+    <result column="JO_ASSESS_CONTENT" jdbcType="VARCHAR" property="joAssessContent" />
+    <result column="JO_ASSESS_TIME" jdbcType="TIMESTAMP" property="joAssessTime" />
+    <result column="VERSION" jdbcType="DECIMAL" property="version" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, AG_ID, AG_NAME, BUS_ID, BUS_NUM, PALTFORM_NUM, PLATFORM_NAME, JO_FIRST_KEY_NUM, 
+    JO_SECOND_KEY_NUM, PRIORITY_LEVEL, LAUNCH_TIME, LAUNCH_PERSON_ID, LAUNCH_PERSON_NAME, 
+    LAUNCH_PERSON_EMAIL, LAUNCH_BRANCH_ID, LAUNCH_BRANCH_NAME, ACCEPT_BRANCH, ACCEPT_NOW_BRANCH, 
+    DEAL_TIME_START, DEAL_TIME_END, DEAL_TIME_LENGTH, JO_PROGRESS, JO_TITLE, JO_CONTENT, 
+    JO_ASSESS_LEVEL, JO_ASSESSOR_NAME, JO_ASSESSOR_TYPE, JO_ASSESSOR_ID, JO_ASSESS_CONTENT, 
+    JO_ASSESS_TIME, VERSION
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.jobOrder.pojo.JoOrderExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from JO_ORDER
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from JO_ORDER
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.jobOrder.pojo.JoOrderExample">
+    delete from JO_ORDER
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.jobOrder.pojo.JoOrder">
+    insert into JO_ORDER (ID, AG_ID, AG_NAME, 
+      BUS_ID, BUS_NUM, PALTFORM_NUM, 
+      PLATFORM_NAME, JO_FIRST_KEY_NUM, JO_SECOND_KEY_NUM, 
+      PRIORITY_LEVEL, LAUNCH_TIME, LAUNCH_PERSON_ID, 
+      LAUNCH_PERSON_NAME, LAUNCH_PERSON_EMAIL, LAUNCH_BRANCH_ID, 
+      LAUNCH_BRANCH_NAME, ACCEPT_BRANCH, ACCEPT_NOW_BRANCH, 
+      DEAL_TIME_START, DEAL_TIME_END, DEAL_TIME_LENGTH, 
+      JO_PROGRESS, JO_TITLE, JO_CONTENT, 
+      JO_ASSESS_LEVEL, JO_ASSESSOR_NAME, JO_ASSESSOR_TYPE, 
+      JO_ASSESSOR_ID, JO_ASSESS_CONTENT, JO_ASSESS_TIME, 
+      VERSION)
+    values (#{id,jdbcType=VARCHAR}, #{agId,jdbcType=VARCHAR}, #{agName,jdbcType=VARCHAR}, 
+      #{busId,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR}, #{paltformNum,jdbcType=VARCHAR}, 
+      #{platformName,jdbcType=VARCHAR}, #{joFirstKeyNum,jdbcType=VARCHAR}, #{joSecondKeyNum,jdbcType=VARCHAR}, 
+      #{priorityLevel,jdbcType=VARCHAR}, #{launchTime,jdbcType=TIMESTAMP}, #{launchPersonId,jdbcType=VARCHAR}, 
+      #{launchPersonName,jdbcType=VARCHAR}, #{launchPersonEmail,jdbcType=VARCHAR}, #{launchBranchId,jdbcType=VARCHAR}, 
+      #{launchBranchName,jdbcType=VARCHAR}, #{acceptBranch,jdbcType=VARCHAR}, #{acceptNowBranch,jdbcType=VARCHAR}, 
+      #{dealTimeStart,jdbcType=TIMESTAMP}, #{dealTimeEnd,jdbcType=TIMESTAMP}, #{dealTimeLength,jdbcType=DECIMAL}, 
+      #{joProgress,jdbcType=VARCHAR}, #{joTitle,jdbcType=VARCHAR}, #{joContent,jdbcType=VARCHAR}, 
+      #{joAssessLevel,jdbcType=DECIMAL}, #{joAssessorName,jdbcType=VARCHAR}, #{joAssessorType,jdbcType=VARCHAR}, 
+      #{joAssessorId,jdbcType=VARCHAR}, #{joAssessContent,jdbcType=VARCHAR}, #{joAssessTime,jdbcType=TIMESTAMP}, 
+      #{version,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.jobOrder.pojo.JoOrder">
+    insert into JO_ORDER
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="agId != null">
+        AG_ID,
+      </if>
+      <if test="agName != null">
+        AG_NAME,
+      </if>
+      <if test="busId != null">
+        BUS_ID,
+      </if>
+      <if test="busNum != null">
+        BUS_NUM,
+      </if>
+      <if test="paltformNum != null">
+        PALTFORM_NUM,
+      </if>
+      <if test="platformName != null">
+        PLATFORM_NAME,
+      </if>
+      <if test="joFirstKeyNum != null">
+        JO_FIRST_KEY_NUM,
+      </if>
+      <if test="joSecondKeyNum != null">
+        JO_SECOND_KEY_NUM,
+      </if>
+      <if test="priorityLevel != null">
+        PRIORITY_LEVEL,
+      </if>
+      <if test="launchTime != null">
+        LAUNCH_TIME,
+      </if>
+      <if test="launchPersonId != null">
+        LAUNCH_PERSON_ID,
+      </if>
+      <if test="launchPersonName != null">
+        LAUNCH_PERSON_NAME,
+      </if>
+      <if test="launchPersonEmail != null">
+        LAUNCH_PERSON_EMAIL,
+      </if>
+      <if test="launchBranchId != null">
+        LAUNCH_BRANCH_ID,
+      </if>
+      <if test="launchBranchName != null">
+        LAUNCH_BRANCH_NAME,
+      </if>
+      <if test="acceptBranch != null">
+        ACCEPT_BRANCH,
+      </if>
+      <if test="acceptNowBranch != null">
+        ACCEPT_NOW_BRANCH,
+      </if>
+      <if test="dealTimeStart != null">
+        DEAL_TIME_START,
+      </if>
+      <if test="dealTimeEnd != null">
+        DEAL_TIME_END,
+      </if>
+      <if test="dealTimeLength != null">
+        DEAL_TIME_LENGTH,
+      </if>
+      <if test="joProgress != null">
+        JO_PROGRESS,
+      </if>
+      <if test="joTitle != null">
+        JO_TITLE,
+      </if>
+      <if test="joContent != null">
+        JO_CONTENT,
+      </if>
+      <if test="joAssessLevel != null">
+        JO_ASSESS_LEVEL,
+      </if>
+      <if test="joAssessorName != null">
+        JO_ASSESSOR_NAME,
+      </if>
+      <if test="joAssessorType != null">
+        JO_ASSESSOR_TYPE,
+      </if>
+      <if test="joAssessorId != null">
+        JO_ASSESSOR_ID,
+      </if>
+      <if test="joAssessContent != null">
+        JO_ASSESS_CONTENT,
+      </if>
+      <if test="joAssessTime != null">
+        JO_ASSESS_TIME,
+      </if>
+      <if test="version != null">
+        VERSION,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="agId != null">
+        #{agId,jdbcType=VARCHAR},
+      </if>
+      <if test="agName != null">
+        #{agName,jdbcType=VARCHAR},
+      </if>
+      <if test="busId != null">
+        #{busId,jdbcType=VARCHAR},
+      </if>
+      <if test="busNum != null">
+        #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="paltformNum != null">
+        #{paltformNum,jdbcType=VARCHAR},
+      </if>
+      <if test="platformName != null">
+        #{platformName,jdbcType=VARCHAR},
+      </if>
+      <if test="joFirstKeyNum != null">
+        #{joFirstKeyNum,jdbcType=VARCHAR},
+      </if>
+      <if test="joSecondKeyNum != null">
+        #{joSecondKeyNum,jdbcType=VARCHAR},
+      </if>
+      <if test="priorityLevel != null">
+        #{priorityLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="launchTime != null">
+        #{launchTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="launchPersonId != null">
+        #{launchPersonId,jdbcType=VARCHAR},
+      </if>
+      <if test="launchPersonName != null">
+        #{launchPersonName,jdbcType=VARCHAR},
+      </if>
+      <if test="launchPersonEmail != null">
+        #{launchPersonEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="launchBranchId != null">
+        #{launchBranchId,jdbcType=VARCHAR},
+      </if>
+      <if test="launchBranchName != null">
+        #{launchBranchName,jdbcType=VARCHAR},
+      </if>
+      <if test="acceptBranch != null">
+        #{acceptBranch,jdbcType=VARCHAR},
+      </if>
+      <if test="acceptNowBranch != null">
+        #{acceptNowBranch,jdbcType=VARCHAR},
+      </if>
+      <if test="dealTimeStart != null">
+        #{dealTimeStart,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dealTimeEnd != null">
+        #{dealTimeEnd,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dealTimeLength != null">
+        #{dealTimeLength,jdbcType=DECIMAL},
+      </if>
+      <if test="joProgress != null">
+        #{joProgress,jdbcType=VARCHAR},
+      </if>
+      <if test="joTitle != null">
+        #{joTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="joContent != null">
+        #{joContent,jdbcType=VARCHAR},
+      </if>
+      <if test="joAssessLevel != null">
+        #{joAssessLevel,jdbcType=DECIMAL},
+      </if>
+      <if test="joAssessorName != null">
+        #{joAssessorName,jdbcType=VARCHAR},
+      </if>
+      <if test="joAssessorType != null">
+        #{joAssessorType,jdbcType=VARCHAR},
+      </if>
+      <if test="joAssessorId != null">
+        #{joAssessorId,jdbcType=VARCHAR},
+      </if>
+      <if test="joAssessContent != null">
+        #{joAssessContent,jdbcType=VARCHAR},
+      </if>
+      <if test="joAssessTime != null">
+        #{joAssessTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.jobOrder.pojo.JoOrderExample" resultType="java.lang.Long">
+    select count(*) from JO_ORDER
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.jobOrder.pojo.JoOrder">
+    update JO_ORDER
+    <set>
+      <if test="agId != null">
+        AG_ID = #{agId,jdbcType=VARCHAR},
+      </if>
+      <if test="agName != null">
+        AG_NAME = #{agName,jdbcType=VARCHAR},
+      </if>
+      <if test="busId != null">
+        BUS_ID = #{busId,jdbcType=VARCHAR},
+      </if>
+      <if test="busNum != null">
+        BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="paltformNum != null">
+        PALTFORM_NUM = #{paltformNum,jdbcType=VARCHAR},
+      </if>
+      <if test="platformName != null">
+        PLATFORM_NAME = #{platformName,jdbcType=VARCHAR},
+      </if>
+      <if test="joFirstKeyNum != null">
+        JO_FIRST_KEY_NUM = #{joFirstKeyNum,jdbcType=VARCHAR},
+      </if>
+      <if test="joSecondKeyNum != null">
+        JO_SECOND_KEY_NUM = #{joSecondKeyNum,jdbcType=VARCHAR},
+      </if>
+      <if test="priorityLevel != null">
+        PRIORITY_LEVEL = #{priorityLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="launchTime != null">
+        LAUNCH_TIME = #{launchTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="launchPersonId != null">
+        LAUNCH_PERSON_ID = #{launchPersonId,jdbcType=VARCHAR},
+      </if>
+      <if test="launchPersonName != null">
+        LAUNCH_PERSON_NAME = #{launchPersonName,jdbcType=VARCHAR},
+      </if>
+      <if test="launchPersonEmail != null">
+        LAUNCH_PERSON_EMAIL = #{launchPersonEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="launchBranchId != null">
+        LAUNCH_BRANCH_ID = #{launchBranchId,jdbcType=VARCHAR},
+      </if>
+      <if test="launchBranchName != null">
+        LAUNCH_BRANCH_NAME = #{launchBranchName,jdbcType=VARCHAR},
+      </if>
+      <if test="acceptBranch != null">
+        ACCEPT_BRANCH = #{acceptBranch,jdbcType=VARCHAR},
+      </if>
+      <if test="acceptNowBranch != null">
+        ACCEPT_NOW_BRANCH = #{acceptNowBranch,jdbcType=VARCHAR},
+      </if>
+      <if test="dealTimeStart != null">
+        DEAL_TIME_START = #{dealTimeStart,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dealTimeEnd != null">
+        DEAL_TIME_END = #{dealTimeEnd,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dealTimeLength != null">
+        DEAL_TIME_LENGTH = #{dealTimeLength,jdbcType=DECIMAL},
+      </if>
+      <if test="joProgress != null">
+        JO_PROGRESS = #{joProgress,jdbcType=VARCHAR},
+      </if>
+      <if test="joTitle != null">
+        JO_TITLE = #{joTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="joContent != null">
+        JO_CONTENT = #{joContent,jdbcType=VARCHAR},
+      </if>
+      <if test="joAssessLevel != null">
+        JO_ASSESS_LEVEL = #{joAssessLevel,jdbcType=DECIMAL},
+      </if>
+      <if test="joAssessorName != null">
+        JO_ASSESSOR_NAME = #{joAssessorName,jdbcType=VARCHAR},
+      </if>
+      <if test="joAssessorType != null">
+        JO_ASSESSOR_TYPE = #{joAssessorType,jdbcType=VARCHAR},
+      </if>
+      <if test="joAssessorId != null">
+        JO_ASSESSOR_ID = #{joAssessorId,jdbcType=VARCHAR},
+      </if>
+      <if test="joAssessContent != null">
+        JO_ASSESS_CONTENT = #{joAssessContent,jdbcType=VARCHAR},
+      </if>
+      <if test="joAssessTime != null">
+        JO_ASSESS_TIME = #{joAssessTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="version != null">
+        VERSION = #{version,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.jobOrder.pojo.JoOrder">
+    update JO_ORDER
+    set AG_ID = #{agId,jdbcType=VARCHAR},
+      AG_NAME = #{agName,jdbcType=VARCHAR},
+      BUS_ID = #{busId,jdbcType=VARCHAR},
+      BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      PALTFORM_NUM = #{paltformNum,jdbcType=VARCHAR},
+      PLATFORM_NAME = #{platformName,jdbcType=VARCHAR},
+      JO_FIRST_KEY_NUM = #{joFirstKeyNum,jdbcType=VARCHAR},
+      JO_SECOND_KEY_NUM = #{joSecondKeyNum,jdbcType=VARCHAR},
+      PRIORITY_LEVEL = #{priorityLevel,jdbcType=VARCHAR},
+      LAUNCH_TIME = #{launchTime,jdbcType=TIMESTAMP},
+      LAUNCH_PERSON_ID = #{launchPersonId,jdbcType=VARCHAR},
+      LAUNCH_PERSON_NAME = #{launchPersonName,jdbcType=VARCHAR},
+      LAUNCH_PERSON_EMAIL = #{launchPersonEmail,jdbcType=VARCHAR},
+      LAUNCH_BRANCH_ID = #{launchBranchId,jdbcType=VARCHAR},
+      LAUNCH_BRANCH_NAME = #{launchBranchName,jdbcType=VARCHAR},
+      ACCEPT_BRANCH = #{acceptBranch,jdbcType=VARCHAR},
+      ACCEPT_NOW_BRANCH = #{acceptNowBranch,jdbcType=VARCHAR},
+      DEAL_TIME_START = #{dealTimeStart,jdbcType=TIMESTAMP},
+      DEAL_TIME_END = #{dealTimeEnd,jdbcType=TIMESTAMP},
+      DEAL_TIME_LENGTH = #{dealTimeLength,jdbcType=DECIMAL},
+      JO_PROGRESS = #{joProgress,jdbcType=VARCHAR},
+      JO_TITLE = #{joTitle,jdbcType=VARCHAR},
+      JO_CONTENT = #{joContent,jdbcType=VARCHAR},
+      JO_ASSESS_LEVEL = #{joAssessLevel,jdbcType=DECIMAL},
+      JO_ASSESSOR_NAME = #{joAssessorName,jdbcType=VARCHAR},
+      JO_ASSESSOR_TYPE = #{joAssessorType,jdbcType=VARCHAR},
+      JO_ASSESSOR_ID = #{joAssessorId,jdbcType=VARCHAR},
+      JO_ASSESS_CONTENT = #{joAssessContent,jdbcType=VARCHAR},
+      JO_ASSESS_TIME = #{joAssessTime,jdbcType=TIMESTAMP},
+      VERSION = #{version,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>
