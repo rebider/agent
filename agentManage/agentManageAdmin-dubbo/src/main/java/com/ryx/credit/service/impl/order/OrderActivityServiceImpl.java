@@ -885,7 +885,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 throw new MessageException(e.getMessage());
             }
         } else {
-            throw new MessageException(proModel + "平台暂不支持换活动！");
+            throw new MessageException(proModel + "平台暂不支持退货或换活动！");
         }
         AgentResult agentResult = AgentResult.ok();
         agentResult.setMapData(res);
