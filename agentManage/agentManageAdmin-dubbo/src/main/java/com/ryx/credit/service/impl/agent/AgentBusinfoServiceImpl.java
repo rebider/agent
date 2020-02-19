@@ -1029,21 +1029,12 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 
 	public List<Map<String,Object>> queryBusInfo(String busNum,String platformType)throws MessageException{
-		if(StringUtils.isBlank(busNum)){
-			throw new MessageException("业务编号不能为空");
-		}
 		if(StringUtils.isBlank(platformType)){
 			throw new MessageException("业务平台不能为空");
 		}
 		List<Map<String,Object>> agentBusInfos = agentBusInfoMapper.queyrBusInfoByBusNumAndPlatformType(FastMap.fastMap("busNum",busNum).putKeyV("platformType",platformType));
 		if(agentBusInfos==null){
 			throw new MessageException("业务不存在");
-		}
-		if(agentBusInfos.size()==0){
-			throw new MessageException("业务不存在");
-		}
-		if(agentBusInfos.size()!=1){
-			throw new MessageException("业务不唯一");
 		}
 		return agentBusInfos;
 	}
@@ -1224,4 +1215,17 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		return listMap;
 	}
 
+
+	@Override
+	public PageInfo queyrBusInfoByBusNumAndPlatformTypePage(Page page, String busNum, String platformType) throws MessageException{
+		if(page==null)throw new MessageException("分页数据未获取到");
+		if(StringUtils.isBlank(platformType))throw new MessageException("平台类型未获取到");
+		PageInfo pageInfo = new PageInfo();
+		FastMap PAR = FastMap.fastMap("platformType",platformType).putKeyV("page",page);
+		if(StringUtils.isBlank(busNum))
+		PAR.putKeyV("busNum",busNum);
+		pageInfo.setRows(agentBusInfoMapper.queyrBusInfoByBusNumAndPlatformTypePage(PAR));
+		pageInfo.setTotal(agentBusInfoMapper.queyrBusInfoByBusNumAndPlatformTypePageCount(PAR));
+		return pageInfo;
+	}
 }

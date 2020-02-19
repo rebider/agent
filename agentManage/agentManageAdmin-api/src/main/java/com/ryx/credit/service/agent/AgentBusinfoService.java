@@ -140,4 +140,12 @@ public interface AgentBusinfoService {
 
     List<Map<String,Object>> selectByBusinfo(String agentId, String platformType);
 
+    /**
+     * 根据业务平台批量查询 代理商AG和业务平台号关系
+     * @param page
+     * @param busNum
+     * @param platformType
+     * @return
+     */
+    PageInfo queyrBusInfoByBusNumAndPlatformTypePage(Page page, String busNum, String platformType)throws MessageException;
 }
