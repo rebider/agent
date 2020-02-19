@@ -748,6 +748,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         BigDecimal invoiceTotalAmt = BigDecimal.ZERO;      //发票总金额
         BigDecimal isCloInvoice = Status.STATUS_0.status;  //是否开具发票
         String collectCompany = "7";  //北京财务
+        Set<String> agDocDistrict = new HashSet<>();
+        Set<String> agDocPro = new HashSet<>();
+        Set<String> busPlatform = new HashSet<>();
         for (Map<String, Object> map : list) {
 
             String orderId = (String) map.get("orderId");
@@ -839,6 +842,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             snMap.put("taskId", returnOrderDetail.getId());
             snMap.put("orderId", returnOrderDetail.getOrderId());
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByOrderId(returnOrderDetail.getOrderId());
+            agDocDistrict.add(agentBusInfo.getAgDocDistrict());
+            agDocPro.add(agentBusInfo.getAgDocPro());
+            busPlatform.add(agentBusInfo.getBusPlatform());
             snMap.put("agencyId", agentBusInfo.getBusNum());
             snList.add(snMap);
         }
@@ -998,13 +1004,16 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(agentId);
         record.setDataShiro(BusActRelBusType.refund.key);
-
         Agent agent = agentMapper.selectByPrimaryKey(agentId);
         if(agent!=null) {
             record.setAgentName(agent.getAgName());
         }
-        record.setAgDocDistrict(agent.getAgDocDistrict());
-        record.setAgDocPro(agent.getAgDocPro());
+        if (busPlatform.size() != 1 || agDocDistrict.size() != 1 || agDocPro.size() != 1) {
+            throw new ProcessException("一次只能提交一种业务类型的机具！");
+        }
+        record.setNetInBusType("ACTIVITY_" + busPlatform.iterator().next());
+        record.setAgDocDistrict(agDocDistrict.iterator().next());
+        record.setAgDocPro(agDocPro.iterator().next());
         if (1 != busActRelMapper.insertSelective(record)) {
             log.info("退货提交审批，启动审批异常，添加审批关系失败{}:{}", returnId, proce);
             throw new ProcessException("退货审批流启动失败:添加审批关系失败");

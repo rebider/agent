@@ -202,6 +202,9 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         String platform = "";
         BigDecimal tt = BigDecimal.ZERO;
         OReturnOrderDetail oReturnOrderDetail = new OReturnOrderDetail();
+        Set<String> agDocDistrict = new HashSet<>();
+        Set<String> agDocPro = new HashSet<>();
+        Set<String> busPlatform = new HashSet<>();
         for (OldOrderReturnSubmitProVo oldOrderReturnSubmitProVo : oldOrderReturnVo.getOldOrderReturnSubmitProVoList()) {
             List<OLogisticsDetail>  details = logisticsDetailMapper.querySnCountObj(
                     FastMap.fastMap("snBegin",oldOrderReturnSubmitProVo.getSnStart())
@@ -249,6 +252,10 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             platform = redisService.getValue(oldOrderReturnSubmitProVo.getSnStart() + "," + oldOrderReturnSubmitProVo.getSnEnd() + "_plat");
             snMap.put("agencyId", busNum);
             snList.add(snMap);
+            List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.queryBusinfo(FastMap.fastMap("agentId", oldOrderReturnVo.getAgentId()).putKeyV("busNum", busNum));
+            agDocDistrict.add(agentBusInfos.get(0).getAgDocDistrict());
+            agDocPro.add(agentBusInfos.get(0).getAgDocPro());
+            busPlatform.add(agentBusInfos.get(0).getBusPlatform());
         }
 
         //退货单添加
@@ -287,6 +294,12 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         record.setDataShiro(BusActRelBusType.refund.key);//退货权限数据
         record.setAgDocDistrict(agent.getAgDocDistrict());
         record.setAgDocPro(agent.getAgDocPro());
+        if (busPlatform.size() != 1 || agDocDistrict.size() != 1 || agDocPro.size() != 1) {
+            throw new ProcessException("一次只能提交一种业务类型的机具！");
+        }
+        record.setNetInBusType("ACTIVITY_" + busPlatform.iterator().next());
+        record.setAgDocDistrict(agDocDistrict.iterator().next());
+        record.setAgDocPro(agDocPro.iterator().next());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("历史订单退货流程审批，启动审批异常，添加审批关系失败{}:{}", oReturnOrder.getId(), processingId);
             throw new MessageException("审批流启动失败:添加审批关系失败");
