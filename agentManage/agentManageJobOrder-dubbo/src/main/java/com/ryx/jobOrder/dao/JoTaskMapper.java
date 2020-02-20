@@ -2,6 +2,7 @@ package com.ryx.jobOrder.dao;
 
 import com.ryx.jobOrder.pojo.JoTask;
 import com.ryx.jobOrder.pojo.JoTaskExample;
+
 import java.util.List;
 
 public interface JoTaskMapper {
