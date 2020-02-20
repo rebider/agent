@@ -413,17 +413,14 @@
     WHERE
         1=1
         AND p.status=1
-        <if test="agentId != null" >
-          AND b.agent_id = #{agentId}
-        </if>
         <if test="busNum != null" >
           AND b.bus_num = #{busNum}
         </if>
         <if test="platformType != null and (platformType == ZHPOS or platformType == ZPOS)" >
-          AND b.platform_type = #{platformType}
+          AND (p.platform_type = 'ZHPOS' OR p.platform_type = 'ZPOS')
         </if>
-        <if test="platformType != null and platformType != ZHPOS and platformType != ZPOS)" >
-          AND b.platform_type = #{platformType}
+        <if test="platformType != null and platformType != ZHPOS and platformType != ZPOS" >
+          AND p.platform_type = #{platformType}
         </if>
   </select>
 </mapper>
