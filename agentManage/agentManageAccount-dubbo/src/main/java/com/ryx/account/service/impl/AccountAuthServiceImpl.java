@@ -213,11 +213,24 @@ public class AccountAuthServiceImpl implements AccountAuthService {
         AuthLoginTokenExample.Criteria criteria = authLoginTokenExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status.toString());
         criteria.andPlatformTypeEqualTo(platformType);
-        criteria.andAuthCodeEqualTo(authCode);
+        criteria.andLogNameEqualTo(loginName);
         criteria.andTokenEndTimeGreaterThan(new Date());
         List<AuthLoginToken> authLoginTokens = authLoginTokenMapper.selectByExample(authLoginTokenExample);
-        if(authLoginTokens.size()!=0){
-            throw new MessageException("令牌尚未失效，请勿重复请求");
+        if(authLoginTokens.size()>1){
+            throw new MessageException("令牌获取异常");
+        }
+        if(authLoginTokens.size()==1){
+            AuthLoginToken authLoginToken = authLoginTokens.get(0);
+            authLoginToken.setTokenEndTime(DateUtil.dateAddMinute(new Date(),getTokenTime()));
+            int i = authLoginTokenMapper.updateByPrimaryKeySelective(authLoginToken);
+            if(i!=1){
+                throw new MessageException("令牌获取异常!");
+            }
+            Map<String,Object> resultMap = new HashMap<>();
+            resultMap.put("tokenCode",authLoginToken.getAuthCode());
+            resultMap.put("tokenCodeBeginTime",authLoginToken.getTokenBeginTime().getTime());
+            resultMap.put("tokenCodeEndTime",authLoginToken.getTokenEndTime().getTime());
+            return resultMap;
         }
 
         AuthLoginToken authLoginToken = new AuthLoginToken();
