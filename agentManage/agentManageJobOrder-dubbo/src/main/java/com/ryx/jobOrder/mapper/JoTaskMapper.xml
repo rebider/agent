@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.jobOrder.dao.JoTaskMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.jobOrder.pojo.JoTask">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="JO_ID" jdbcType="VARCHAR" property="joId" />
+    <result column="JO_TASK_STATUS" jdbcType="VARCHAR" property="joTaskStatus" />
+    <result column="JO_TASK_TIME" jdbcType="TIMESTAMP" property="joTaskTime" />
+    <result column="JO_TASK_ACCEPT_TIME" jdbcType="TIMESTAMP" property="joTaskAcceptTime" />
+    <result column="JO_TASK_NEXT_TIME" jdbcType="TIMESTAMP" property="joTaskNextTime" />
+    <result column="DEAL_GROUP_ID" jdbcType="VARCHAR" property="dealGroupId" />
+    <result column="DEAL_GROUP" jdbcType="VARCHAR" property="dealGroup" />
+    <result column="DEAL_PERSON_ID" jdbcType="VARCHAR" property="dealPersonId" />
+    <result column="DEAL_PERSON_NAME" jdbcType="VARCHAR" property="dealPersonName" />
+    <result column="SECOND_DEAL_GROUP" jdbcType="VARCHAR" property="secondDealGroup" />
+    <result column="BACK_DEAL_GROUP" jdbcType="VARCHAR" property="backDealGroup" />
+    <result column="BACK_DEAL_PERSON" jdbcType="VARCHAR" property="backDealPerson" />
+    <result column="JO_TASK_CONTENT" jdbcType="VARCHAR" property="joTaskContent" />
+    <result column="JO_TASK_ANNEX_ID" jdbcType="VARCHAR" property="joTaskAnnexId" />
+    <result column="JO_TASK_TIME_LENGTH" jdbcType="DECIMAL" property="joTaskTimeLength" />
+    <result column="VERSION" jdbcType="DECIMAL" property="version" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, JO_ID, JO_TASK_STATUS, JO_TASK_TIME, JO_TASK_ACCEPT_TIME, JO_TASK_NEXT_TIME, 
+    DEAL_GROUP_ID, DEAL_GROUP, DEAL_PERSON_ID, DEAL_PERSON_NAME, SECOND_DEAL_GROUP, BACK_DEAL_GROUP, 
+    BACK_DEAL_PERSON, JO_TASK_CONTENT, JO_TASK_ANNEX_ID, JO_TASK_TIME_LENGTH, VERSION
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.jobOrder.pojo.JoTaskExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from JO_TASK
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from JO_TASK
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.jobOrder.pojo.JoTaskExample">
+    delete from JO_TASK
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.jobOrder.pojo.JoTask">
+    insert into JO_TASK (ID, JO_ID, JO_TASK_STATUS, 
+      JO_TASK_TIME, JO_TASK_ACCEPT_TIME, JO_TASK_NEXT_TIME, 
+      DEAL_GROUP_ID, DEAL_GROUP, DEAL_PERSON_ID, 
+      DEAL_PERSON_NAME, SECOND_DEAL_GROUP, BACK_DEAL_GROUP, 
+      BACK_DEAL_PERSON, JO_TASK_CONTENT, JO_TASK_ANNEX_ID, 
+      JO_TASK_TIME_LENGTH, VERSION)
+    values (#{id,jdbcType=VARCHAR}, #{joId,jdbcType=VARCHAR}, #{joTaskStatus,jdbcType=VARCHAR}, 
+      #{joTaskTime,jdbcType=TIMESTAMP}, #{joTaskAcceptTime,jdbcType=TIMESTAMP}, #{joTaskNextTime,jdbcType=TIMESTAMP}, 
+      #{dealGroupId,jdbcType=VARCHAR}, #{dealGroup,jdbcType=VARCHAR}, #{dealPersonId,jdbcType=VARCHAR}, 
+      #{dealPersonName,jdbcType=VARCHAR}, #{secondDealGroup,jdbcType=VARCHAR}, #{backDealGroup,jdbcType=VARCHAR}, 
+      #{backDealPerson,jdbcType=VARCHAR}, #{joTaskContent,jdbcType=VARCHAR}, #{joTaskAnnexId,jdbcType=VARCHAR}, 
+      #{joTaskTimeLength,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.jobOrder.pojo.JoTask">
+    insert into JO_TASK
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="joId != null">
+        JO_ID,
+      </if>
+      <if test="joTaskStatus != null">
+        JO_TASK_STATUS,
+      </if>
+      <if test="joTaskTime != null">
+        JO_TASK_TIME,
+      </if>
+      <if test="joTaskAcceptTime != null">
+        JO_TASK_ACCEPT_TIME,
+      </if>
+      <if test="joTaskNextTime != null">
+        JO_TASK_NEXT_TIME,
+      </if>
+      <if test="dealGroupId != null">
+        DEAL_GROUP_ID,
+      </if>
+      <if test="dealGroup != null">
+        DEAL_GROUP,
+      </if>
+      <if test="dealPersonId != null">
+        DEAL_PERSON_ID,
+      </if>
+      <if test="dealPersonName != null">
+        DEAL_PERSON_NAME,
+      </if>
+      <if test="secondDealGroup != null">
+        SECOND_DEAL_GROUP,
+      </if>
+      <if test="backDealGroup != null">
+        BACK_DEAL_GROUP,
+      </if>
+      <if test="backDealPerson != null">
+        BACK_DEAL_PERSON,
+      </if>
+      <if test="joTaskContent != null">
+        JO_TASK_CONTENT,
+      </if>
+      <if test="joTaskAnnexId != null">
+        JO_TASK_ANNEX_ID,
+      </if>
+      <if test="joTaskTimeLength != null">
+        JO_TASK_TIME_LENGTH,
+      </if>
+      <if test="version != null">
+        VERSION,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="joId != null">
+        #{joId,jdbcType=VARCHAR},
+      </if>
+      <if test="joTaskStatus != null">
+        #{joTaskStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="joTaskTime != null">
+        #{joTaskTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="joTaskAcceptTime != null">
+        #{joTaskAcceptTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="joTaskNextTime != null">
+        #{joTaskNextTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dealGroupId != null">
+        #{dealGroupId,jdbcType=VARCHAR},
+      </if>
+      <if test="dealGroup != null">
+        #{dealGroup,jdbcType=VARCHAR},
+      </if>
+      <if test="dealPersonId != null">
+        #{dealPersonId,jdbcType=VARCHAR},
+      </if>
+      <if test="dealPersonName != null">
+        #{dealPersonName,jdbcType=VARCHAR},
+      </if>
+      <if test="secondDealGroup != null">
+        #{secondDealGroup,jdbcType=VARCHAR},
+      </if>
+      <if test="backDealGroup != null">
+        #{backDealGroup,jdbcType=VARCHAR},
+      </if>
+      <if test="backDealPerson != null">
+        #{backDealPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="joTaskContent != null">
+        #{joTaskContent,jdbcType=VARCHAR},
+      </if>
+      <if test="joTaskAnnexId != null">
+        #{joTaskAnnexId,jdbcType=VARCHAR},
+      </if>
+      <if test="joTaskTimeLength != null">
+        #{joTaskTimeLength,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.jobOrder.pojo.JoTaskExample" resultType="java.lang.Long">
+    select count(*) from JO_TASK
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.jobOrder.pojo.JoTask">
+    update JO_TASK
+    <set>
+      <if test="joId != null">
+        JO_ID = #{joId,jdbcType=VARCHAR},
+      </if>
+      <if test="joTaskStatus != null">
+        JO_TASK_STATUS = #{joTaskStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="joTaskTime != null">
+        JO_TASK_TIME = #{joTaskTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="joTaskAcceptTime != null">
+        JO_TASK_ACCEPT_TIME = #{joTaskAcceptTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="joTaskNextTime != null">
+        JO_TASK_NEXT_TIME = #{joTaskNextTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dealGroupId != null">
+        DEAL_GROUP_ID = #{dealGroupId,jdbcType=VARCHAR},
+      </if>
+      <if test="dealGroup != null">
+        DEAL_GROUP = #{dealGroup,jdbcType=VARCHAR},
+      </if>
+      <if test="dealPersonId != null">
+        DEAL_PERSON_ID = #{dealPersonId,jdbcType=VARCHAR},
+      </if>
+      <if test="dealPersonName != null">
+        DEAL_PERSON_NAME = #{dealPersonName,jdbcType=VARCHAR},
+      </if>
+      <if test="secondDealGroup != null">
+        SECOND_DEAL_GROUP = #{secondDealGroup,jdbcType=VARCHAR},
+      </if>
+      <if test="backDealGroup != null">
+        BACK_DEAL_GROUP = #{backDealGroup,jdbcType=VARCHAR},
+      </if>
+      <if test="backDealPerson != null">
+        BACK_DEAL_PERSON = #{backDealPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="joTaskContent != null">
+        JO_TASK_CONTENT = #{joTaskContent,jdbcType=VARCHAR},
+      </if>
+      <if test="joTaskAnnexId != null">
+        JO_TASK_ANNEX_ID = #{joTaskAnnexId,jdbcType=VARCHAR},
+      </if>
+      <if test="joTaskTimeLength != null">
+        JO_TASK_TIME_LENGTH = #{joTaskTimeLength,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        VERSION = #{version,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.jobOrder.pojo.JoTask">
+    update JO_TASK
+    set JO_ID = #{joId,jdbcType=VARCHAR},
+      JO_TASK_STATUS = #{joTaskStatus,jdbcType=VARCHAR},
+      JO_TASK_TIME = #{joTaskTime,jdbcType=TIMESTAMP},
+      JO_TASK_ACCEPT_TIME = #{joTaskAcceptTime,jdbcType=TIMESTAMP},
+      JO_TASK_NEXT_TIME = #{joTaskNextTime,jdbcType=TIMESTAMP},
+      DEAL_GROUP_ID = #{dealGroupId,jdbcType=VARCHAR},
+      DEAL_GROUP = #{dealGroup,jdbcType=VARCHAR},
+      DEAL_PERSON_ID = #{dealPersonId,jdbcType=VARCHAR},
+      DEAL_PERSON_NAME = #{dealPersonName,jdbcType=VARCHAR},
+      SECOND_DEAL_GROUP = #{secondDealGroup,jdbcType=VARCHAR},
+      BACK_DEAL_GROUP = #{backDealGroup,jdbcType=VARCHAR},
+      BACK_DEAL_PERSON = #{backDealPerson,jdbcType=VARCHAR},
+      JO_TASK_CONTENT = #{joTaskContent,jdbcType=VARCHAR},
+      JO_TASK_ANNEX_ID = #{joTaskAnnexId,jdbcType=VARCHAR},
+      JO_TASK_TIME_LENGTH = #{joTaskTimeLength,jdbcType=DECIMAL},
+      VERSION = #{version,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>
