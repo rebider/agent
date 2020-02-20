@@ -131,9 +131,10 @@ public class AccountAuthServiceImpl implements AccountAuthService {
             throw new MessageException("缺少请求ip地址");
         }
         AuthSysCode authSysCode = verifyAuthCode(platformType, authCode);
-        if(!serverIp.equals(authSysCode.getServerIp())){
-            throw new MessageException("请求ip与上次请求ip不一致");
-        }
+//        if(!serverIp.equals(authSysCode.getServerIp())){
+//            throw new MessageException("请求ip与上次请求ip不一致");
+//        }
+        authSysCode.setServerIp(serverIp);
         authSysCode.setAuthCodeEndTime(DateUtil.dateAddMinute(new Date(),getAuthTime()));
         int i = authSysCodeMapper.updateByPrimaryKey(authSysCode);
         if(i!=1){
@@ -274,9 +275,10 @@ public class AccountAuthServiceImpl implements AccountAuthService {
             throw new MessageException("缺少请求ip地址");
         }
         AuthLoginToken authLoginToken = tokenVerity(tokenCode, platformType);
-        if(!serverIp.equals(authLoginToken.getRequestId())){
-            throw new MessageException("请求ip与上次请求ip不一致");
-        }
+//        if(!serverIp.equals(authLoginToken.getRequestId())){
+//            throw new MessageException("请求ip与上次请求ip不一致");
+//        }
+        authLoginToken.setRequestId(serverIp);
         authLoginToken.setTokenEndTime(DateUtil.dateAddMinute(new Date(),getTokenTime()));
         int i = authLoginTokenMapper.updateByPrimaryKey(authLoginToken);
         if(i!=1){
