@@ -1333,7 +1333,8 @@ union
       A.AG_NAME,
       B.BUS_NUM,
       B.BUS_PLATFORM,
-      C.PLATFORM_TYPE
+      C.PLATFORM_TYPE,
+      c.BUSPLATFORM
     from a_agent_businfo b
     left join a_agent a on  a.id=b.agent_id and a.status=1
     left join a_platform c on c.platform_num=b.bus_platform and c.status=1
@@ -1354,7 +1355,8 @@ union
       A.AG_NAME,
       B.BUS_NUM,
       B.BUS_PLATFORM,
-      C.PLATFORM_TYPE
+      C.PLATFORM_TYPE,
+      c.BUSPLATFORM
       from a_agent_businfo b
       left join a_agent a on  a.id=b.agent_id and a.status=1
       left join a_platform c on c.platform_num=b.bus_platform and c.status=1
