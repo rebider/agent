@@ -577,8 +577,8 @@ public class CompensateServiceImpl implements CompensateService {
                     } else {
                         throw new ProcessException("目标机构S码有误，未找到业务平台编码！");
                     }
-                    List<PlatForm> oldPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("agentId", refundPriceDiffDetail.getAgentId()).putKeyV("busNum",refundPriceDiffDetail.getOldOrgId()));
-                    List<PlatForm> newPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("agentId", refundPriceDiffDetail.getAgentId()).putKeyV("busNum",refundPriceDiffDetail.getNewOrgId()));
+                    List<PlatForm> oldPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("platformType", platForm.getPlatformType()).putKeyV("busNum",refundPriceDiffDetail.getOldOrgId()));
+                    List<PlatForm> newPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("platformType", platForm.getPlatformType()).putKeyV("busNum",refundPriceDiffDetail.getNewOrgId()));
                     if (null == oldPlatForm || oldPlatForm.size() != 1 || null == oldPlatForm.get(0).getBusplatform()) {
                         throw new ProcessException("未找到原目标业务平台，请核查原目标业务平台！");
                     }
@@ -588,8 +588,8 @@ public class CompensateServiceImpl implements CompensateService {
                     refundPriceDiffDetail.setOldBrandCode(oldPlatForm.get(0).getBusplatform());
                     refundPriceDiffDetail.setNewBrandCode(newPlatForm.get(0).getBusplatform());
                 }  else if (PlatformType.SSPOS.getValue().equals(platForm.getPlatformType())) {
-                    List<PlatForm> oldPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("agentId", refundPriceDiffDetail.getAgentId()).putKeyV("busNum",refundPriceDiffDetail.getOldOrgId()));
-                    List<PlatForm> newPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("agentId", refundPriceDiffDetail.getAgentId()).putKeyV("busNum",refundPriceDiffDetail.getNewOrgId()));
+                    List<PlatForm> oldPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("platformType", platForm.getPlatformType()).putKeyV("busNum",refundPriceDiffDetail.getOldOrgId()));
+                    List<PlatForm> newPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("platformType", platForm.getPlatformType()).putKeyV("busNum",refundPriceDiffDetail.getNewOrgId()));
                     if (null == oldPlatForm || oldPlatForm.size() != 1 || null == oldPlatForm.get(0).getBusplatform()) {
                         throw new ProcessException("未找到原目标业务平台，请核查原目标业务平台！");
                     }
@@ -599,8 +599,8 @@ public class CompensateServiceImpl implements CompensateService {
                     refundPriceDiffDetail.setOldBrandCode(oldPlatForm.get(0).getBusplatform());
                     refundPriceDiffDetail.setNewBrandCode(newPlatForm.get(0).getBusplatform());
                 } else if (PlatformType.POS.getValue().equals(platForm.getPlatformType())) {
-                    List<PlatForm> oldPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("agentId", refundPriceDiffDetail.getAgentId()).putKeyV("busNum",refundPriceDiffDetail.getOldOrgId()));
-                    List<PlatForm> newPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("agentId", refundPriceDiffDetail.getAgentId()).putKeyV("busNum",refundPriceDiffDetail.getNewOrgId()));
+                    List<PlatForm> oldPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("platformType", platForm.getPlatformType()).putKeyV("busNum",refundPriceDiffDetail.getOldOrgId()));
+                    List<PlatForm> newPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("platformType", platForm.getPlatformType()).putKeyV("busNum",refundPriceDiffDetail.getNewOrgId()));
                     if (null == oldPlatForm || oldPlatForm.size() != 1 || null == oldPlatForm.get(0).getBusplatform()) {
                         throw new ProcessException("未找到原目标业务平台，请核查原目标业务平台！");
                     }

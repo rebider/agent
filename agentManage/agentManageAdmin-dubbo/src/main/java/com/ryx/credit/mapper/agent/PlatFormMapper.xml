@@ -419,5 +419,11 @@
         <if test="busNum != null" >
           AND b.bus_num = #{busNum}
         </if>
+        <if test="platformType != null and (platformType == ZHPOS or platformType == ZPOS)" >
+          AND b.platform_type = #{platformType}
+        </if>
+        <if test="platformType != null and platformType != ZHPOS and platformType != ZPOS)" >
+          AND b.platform_type = #{platformType}
+        </if>
   </select>
 </mapper>
