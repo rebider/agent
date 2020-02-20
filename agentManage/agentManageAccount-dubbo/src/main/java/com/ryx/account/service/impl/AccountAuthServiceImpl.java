@@ -197,7 +197,7 @@ public class AccountAuthServiceImpl implements AccountAuthService {
      * @throws MessageException
      */
     @Override
-        public Map<String,Object> getTokenCode(String platformType,String authCode,String serverIp,String loginName,String passWord,List<Map<String,Object>> busInfos)throws MessageException{
+    public Map<String,Object> getTokenCode(String platformType,String authCode,String serverIp,String loginName,String passWord,List<Map<String,Object>> busInfos)throws MessageException{
 
         approveAuthCode(platformType, authCode);
         if(StringUtils.isBlank(loginName)){
