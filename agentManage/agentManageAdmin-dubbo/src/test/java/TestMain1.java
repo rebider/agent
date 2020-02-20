@@ -1,39 +1,28 @@
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.exception.MessageException;
-import com.ryx.credit.common.exception.ProcessException;
-import com.ryx.credit.common.util.Conver10ToConver33Utils;
 import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.agentUtil.AESUtil;
 import com.ryx.credit.common.util.agentUtil.RSAUtil;
-import com.ryx.credit.pojo.admin.order.OPaymentDetail;
-import com.ryx.credit.util.Constants;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
-
-import static com.ryx.credit.common.util.Conver10ToConver33Utils.getBetweenValues;
 
 /**
  * Created by cx on 2018/6/12.
  */
-public class TestMain {
+public class TestMain1 {
 
     public static void main(String[] args) {
         try {
 
             JSONObject par = new JSONObject();
             par.put("identification","RDBPOS");
+            par.put("authCode","e626a05200584565a315607ae09f8f56");
+            par.put("agAccount","AG19093683980");
+            par.put("agPassword","Test123$");
             String pars = par.toJSONString();
 
             System.out.println("请求明文:"+pars);
@@ -96,7 +85,7 @@ public class TestMain {
 
             Map<String, String> reqmap = new HashMap<>();
             reqmap.put("param",s);
-            String s1 = HttpClientUtil.doPost("http://localhost:8085/center/authCode", reqmap);
+            String s1 = HttpClientUtil.doPost("http://localhost:8081/ag/login", reqmap);
 
             System.out.println(s1);
 

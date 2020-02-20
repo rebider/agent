@@ -34,9 +34,6 @@ import java.util.*;
 @Service("accountAuthService")
 public class AccountAuthServiceImpl implements AccountAuthService {
 
-    private static int authTime = 60*24*7;     //默认一周  10080
-    private static int tokenTime = 30;         //默认半小时
-
     @Autowired
     private IdService idService;
     @Autowired
@@ -46,17 +43,22 @@ public class AccountAuthServiceImpl implements AccountAuthService {
     @Autowired
     private AuthLoginTokenMapper authLoginTokenMapper;
 
-
-    @PostConstruct
-    public void init(){
+    private int getAuthTime(){
+        int authTime = 60*24*7;//默认一周  10080
         Dict authTimeDict = dictOptionsService.findDictByName(DictGroup.AUTH.name(), DictGroup.AUTH_TIME.name(), DictGroup.AUTH_CODE.name());
         if(authTimeDict!=null){
             authTime = Integer.parseInt(authTimeDict.getdItemvalue());
         }
-        Dict tokenTimeDict = dictOptionsService.findDictByName(DictGroup.AUTH.name(),DictGroup.AUTH_TIME.name(),DictGroup.TOKEN_CODE.name());
-        if(tokenTimeDict!=null){
+        return authTime;
+    }
+
+    private int getTokenTime() {
+        int tokenTime = 30;//默认半小时
+        Dict tokenTimeDict = dictOptionsService.findDictByName(DictGroup.AUTH.name(), DictGroup.AUTH_TIME.name(), DictGroup.TOKEN_CODE.name());
+        if (tokenTimeDict != null) {
             tokenTime = Integer.parseInt(tokenTimeDict.getdItemvalue());
         }
+        return tokenTime;
     }
 
     private String getCode(){
@@ -101,7 +103,7 @@ public class AccountAuthServiceImpl implements AccountAuthService {
         authSysCode.setPlatformType(platformType);
         Date date = new Date();
         authSysCode.setAuthCodeBeginTime(date);
-        authSysCode.setAuthCodeEndTime(DateUtil.dateAddMinute(date,authTime));
+        authSysCode.setAuthCodeEndTime(DateUtil.dateAddMinute(date,getAuthTime()));
         authSysCode.setAuthCode(getCode());
         authSysCode.setServerIp(serverIp);
         authSysCode.setStatus(Status.STATUS_1.status.toString());
@@ -132,7 +134,7 @@ public class AccountAuthServiceImpl implements AccountAuthService {
         if(!serverIp.equals(authSysCode.getServerIp())){
             throw new MessageException("请求ip与上次请求ip不一致");
         }
-        authSysCode.setAuthCodeEndTime(DateUtil.dateAddMinute(new Date(),authTime));
+        authSysCode.setAuthCodeEndTime(DateUtil.dateAddMinute(new Date(),getAuthTime()));
         int i = authSysCodeMapper.updateByPrimaryKey(authSysCode);
         if(i!=1){
             throw new MessageException("授权码刷新失败");
@@ -195,7 +197,7 @@ public class AccountAuthServiceImpl implements AccountAuthService {
      * @throws MessageException
      */
     @Override
-        public Map<String,Object> getTokenCode(String platformType,String authCode,String serverIp,String loginName,String passWord,List<Map<String,Object>> busInfos)throws MessageException{
+    public Map<String,Object> getTokenCode(String platformType,String authCode,String serverIp,String loginName,String passWord,List<Map<String,Object>> busInfos)throws MessageException{
 
         approveAuthCode(platformType, authCode);
         if(StringUtils.isBlank(loginName)){
@@ -211,11 +213,24 @@ public class AccountAuthServiceImpl implements AccountAuthService {
         AuthLoginTokenExample.Criteria criteria = authLoginTokenExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status.toString());
         criteria.andPlatformTypeEqualTo(platformType);
-        criteria.andAuthCodeEqualTo(authCode);
+        criteria.andLogNameEqualTo(loginName);
         criteria.andTokenEndTimeGreaterThan(new Date());
         List<AuthLoginToken> authLoginTokens = authLoginTokenMapper.selectByExample(authLoginTokenExample);
-        if(authLoginTokens.size()!=0){
-            throw new MessageException("令牌尚未失效，请勿重复请求");
+        if(authLoginTokens.size()>1){
+            throw new MessageException("令牌获取异常");
+        }
+        if(authLoginTokens.size()==1){
+            AuthLoginToken authLoginToken = authLoginTokens.get(0);
+            authLoginToken.setTokenEndTime(DateUtil.dateAddMinute(new Date(),getTokenTime()));
+            int i = authLoginTokenMapper.updateByPrimaryKeySelective(authLoginToken);
+            if(i!=1){
+                throw new MessageException("令牌获取异常!");
+            }
+            Map<String,Object> resultMap = new HashMap<>();
+            resultMap.put("tokenCode",authLoginToken.getAuthCode());
+            resultMap.put("tokenCodeBeginTime",authLoginToken.getTokenBeginTime().getTime());
+            resultMap.put("tokenCodeEndTime",authLoginToken.getTokenEndTime().getTime());
+            return resultMap;
         }
 
         AuthLoginToken authLoginToken = new AuthLoginToken();
@@ -226,7 +241,7 @@ public class AccountAuthServiceImpl implements AccountAuthService {
         authLoginToken.setPassWord(passWord);
         Date date = new Date();
         authLoginToken.setTokenBeginTime(date);
-        authLoginToken.setTokenEndTime(DateUtil.dateAddMinute(date,tokenTime));
+        authLoginToken.setTokenEndTime(DateUtil.dateAddMinute(date,getTokenTime()));
         String token = getCode();
         authLoginToken.setToken(token);
         authLoginToken.setRequestId(serverIp);
@@ -262,7 +277,7 @@ public class AccountAuthServiceImpl implements AccountAuthService {
         if(!serverIp.equals(authLoginToken.getRequestId())){
             throw new MessageException("请求ip与上次请求ip不一致");
         }
-        authLoginToken.setTokenEndTime(DateUtil.dateAddMinute(new Date(),tokenTime));
+        authLoginToken.setTokenEndTime(DateUtil.dateAddMinute(new Date(),getTokenTime()));
         int i = authLoginTokenMapper.updateByPrimaryKey(authLoginToken);
         if(i!=1){
             throw new MessageException("令牌刷新失败");

@@ -244,6 +244,7 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
                 uv.setLoginName(db_User.getLoginName());
                 uv.setId(db_User.getId());
                 uv.setName(db_User.getName());
+                uv.setPassword(pas);
                 return uv;
             }else{
                 return null;
