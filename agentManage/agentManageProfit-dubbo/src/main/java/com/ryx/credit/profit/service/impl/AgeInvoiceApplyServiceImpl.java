@@ -116,7 +116,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
             criteria.andEsDateLessThanOrEqualTo(dateMap.get("esDateEnd"));
         }
 
-        example.setOrderByClause("CREATE_DATE DESC ");
+        example.setOrderByClause("YS_DATE DESC , ID ASC ");
         List<InvoiceApply> list = invoiceApplyMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(list);
@@ -402,7 +402,6 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         invoiceApply.setEsResult("0");
         invoiceApply.setEsDate(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date()));
         invoiceApply.setRev2(rev2);
-        invoiceApply.setSallerName(map.get("sallerName").toString());
         invoiceApply.setSerialNo(map.get("serialNo").toString());
         invoiceApply.setInvoiceCode(map.get("invoiceCode").toString());
         invoiceApply.setInvoiceNumber(map.get("invoiceNo").toString());
@@ -443,12 +442,14 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                         }
                         invoiceApply.setRemark(remark);
                     }else{
-                        invoiceApply.setInvoiceCompany(".");
+                        invoiceApply.setInvoiceCompany("");
                     }
                 }else{
                     invoiceApply.setInvoiceCompany(map.get("sallerName").toString());
                 }
             }
+        }else{
+            logger.info("发票终审错误数据存储===============获取发票云tocken授权失败，无法获取该发票详细税点，及代开发票具体信息。");
         }
         invoiceApplyMapper.insert(invoiceApply);
     }
@@ -578,7 +579,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
        // }
         if(StringUtils.isNotBlank(dateMap.get("ysDateStart")) && StringUtils.isNotBlank(dateMap.get("ysDateEnd"))){
             criteria.andYsDateBetween(dateMap.get("ysDateStart"),dateMap.get("ysDateEnd"));
-        }else if(StringUtils.isNotBlank(dateMap.get("ysDateStart"))){
+        }else if(StringUtils.isNotBlank(dateMap.get("ysDa   teStart"))){
             criteria.andYsDateGreaterThanOrEqualTo(dateMap.get("ysDateStart"));
         }else if(StringUtils.isNotBlank(dateMap.get("ysDateEnd"))){
             criteria.andYsDateLessThanOrEqualTo(dateMap.get("ysDateEnd"));
@@ -591,7 +592,8 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
             criteria.andEsDateLessThanOrEqualTo(dateMap.get("esDateEnd"));
         }
 
-        example.setOrderByClause("CREATE_DATE DESC ");
+        example.setOrderByClause("YS_DATE DESC , ID ASC ");
+
         List<Map<String,Object>> list = invoiceApplyMapper.exports(example);
         return list;
     }

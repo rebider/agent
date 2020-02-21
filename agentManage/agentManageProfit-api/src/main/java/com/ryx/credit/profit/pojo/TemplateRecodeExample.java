@@ -1325,6 +1325,146 @@ public class TemplateRecodeExample {
             addCriterion("BUS_NUM_S not between", value1, value2, "busNumS");
             return (Criteria) this;
         }
+
+        public Criteria andChangeflagIsNull() {
+            addCriterion("CHANGEFLAG is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andChangeflagIsNotNull() {
+            addCriterion("CHANGEFLAG is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andChangeflagEqualTo(String value) {
+            addCriterion("CHANGEFLAG =", value, "changeflag");
+            return (Criteria) this;
+        }
+
+        public Criteria andChangeflagNotEqualTo(String value) {
+            addCriterion("CHANGEFLAG <>", value, "changeflag");
+            return (Criteria) this;
+        }
+
+        public Criteria andChangeflagGreaterThan(String value) {
+            addCriterion("CHANGEFLAG >", value, "changeflag");
+            return (Criteria) this;
+        }
+
+        public Criteria andChangeflagGreaterThanOrEqualTo(String value) {
+            addCriterion("CHANGEFLAG >=", value, "changeflag");
+            return (Criteria) this;
+        }
+
+        public Criteria andChangeflagLessThan(String value) {
+            addCriterion("CHANGEFLAG <", value, "changeflag");
+            return (Criteria) this;
+        }
+
+        public Criteria andChangeflagLessThanOrEqualTo(String value) {
+            addCriterion("CHANGEFLAG <=", value, "changeflag");
+            return (Criteria) this;
+        }
+
+        public Criteria andChangeflagLike(String value) {
+            addCriterion("CHANGEFLAG like", value, "changeflag");
+            return (Criteria) this;
+        }
+
+        public Criteria andChangeflagNotLike(String value) {
+            addCriterion("CHANGEFLAG not like", value, "changeflag");
+            return (Criteria) this;
+        }
+
+        public Criteria andChangeflagIn(List<String> values) {
+            addCriterion("CHANGEFLAG in", values, "changeflag");
+            return (Criteria) this;
+        }
+
+        public Criteria andChangeflagNotIn(List<String> values) {
+            addCriterion("CHANGEFLAG not in", values, "changeflag");
+            return (Criteria) this;
+        }
+
+        public Criteria andChangeflagBetween(String value1, String value2) {
+            addCriterion("CHANGEFLAG between", value1, value2, "changeflag");
+            return (Criteria) this;
+        }
+
+        public Criteria andChangeflagNotBetween(String value1, String value2) {
+            addCriterion("CHANGEFLAG not between", value1, value2, "changeflag");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardNameIsNull() {
+            addCriterion("REWARD_NAME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardNameIsNotNull() {
+            addCriterion("REWARD_NAME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardNameEqualTo(String value) {
+            addCriterion("REWARD_NAME =", value, "rewardName");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardNameNotEqualTo(String value) {
+            addCriterion("REWARD_NAME <>", value, "rewardName");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardNameGreaterThan(String value) {
+            addCriterion("REWARD_NAME >", value, "rewardName");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardNameGreaterThanOrEqualTo(String value) {
+            addCriterion("REWARD_NAME >=", value, "rewardName");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardNameLessThan(String value) {
+            addCriterion("REWARD_NAME <", value, "rewardName");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardNameLessThanOrEqualTo(String value) {
+            addCriterion("REWARD_NAME <=", value, "rewardName");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardNameLike(String value) {
+            addCriterion("REWARD_NAME like", value, "rewardName");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardNameNotLike(String value) {
+            addCriterion("REWARD_NAME not like", value, "rewardName");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardNameIn(List<String> values) {
+            addCriterion("REWARD_NAME in", values, "rewardName");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardNameNotIn(List<String> values) {
+            addCriterion("REWARD_NAME not in", values, "rewardName");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardNameBetween(String value1, String value2) {
+            addCriterion("REWARD_NAME between", value1, value2, "rewardName");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardNameNotBetween(String value1, String value2) {
+            addCriterion("REWARD_NAME not between", value1, value2, "rewardName");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
