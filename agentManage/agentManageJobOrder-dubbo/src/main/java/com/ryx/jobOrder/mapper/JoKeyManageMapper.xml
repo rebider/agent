@@ -64,7 +64,7 @@
     select 
     <include refid="Base_Column_List" />
     from JO_KEY_MANAGE
-    where ID = #{id,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR} and JO_STATUS=1
   </select>
   <delete id="deleteByExample" parameterType="com.ryx.jobOrder.pojo.JoKeyManageExample">
     delete from JO_KEY_MANAGE
@@ -195,11 +195,12 @@
   <!--              开始写代码         -->
   <select id="keywordList" parameterType="map" resultType="map">
     <include refid="OracleDialectPrefix"/>
-    select <include refid="Base_Column_List"/> from JO_KEY_MANAGE
+    select <include refid="Base_Column_List"/> from JO_KEY_MANAGE where JO_STATUS=1
     <include refid="OracleDialectSuffix"/>
   </select>
 
   <select id="keywordCount" parameterType="map" resultType="int">
-    select count(1) from JO_KEY_MANAGE
+    select count(1) from JO_KEY_MANAGE where JO_STATUS=1
   </select>
+
 </mapper>

@@ -29,4 +29,5 @@ public interface JoKeyManageMapper {
     List<Map<String,Object>> keywordList(@Param("map")HashMap<String, Object> map,@Param("page") Page page);
 
     int keywordCount(@Param("map")HashMap<String, Object> map);
+
 }
