@@ -16,7 +16,7 @@
     <dubbo:protocol name="dubbo" port="${zk.port}"/>
     <dubbo:annotation package="com.ryx.jobOrder.service.*" />
 
-
+    <dubbo:service interface="com.ryx.jobOrder.service.JobOrderAuthService" ref="jobOrderAuthService" timeout="1200000" registry="myGroup"></dubbo:service>
 
 
 </beans>
