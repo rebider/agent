@@ -60,8 +60,8 @@ public class ChinaMobileForJYHttpReq {
             paramMap= ApiUtils.sortMap(paramMap);
             log.info("揭阳移动接口查询状态请求参数：iccids:{},transId:{}",iccids,transId);
             String result = HttpClientUtil.doPost(JY_MOBILE_CARD_URL, paramMap);
+            log.info("揭阳移动接口查询状态返回参数：result:{}",result);
             if(StringUtils.isBlank(result)){
-                log.info("揭阳移动接口查询状态返回参数：result:{}",result);
                 AppConfig.sendEmails("接口请求错误：result："+result, "物联网移动接口请求异常,方法batchQueryCardStatus");
                 return "";
             }
@@ -97,6 +97,7 @@ public class ChinaMobileForJYHttpReq {
             paramMap= ApiUtils.sortMap(paramMap);
             log.info("揭阳移动接口批量号码停开机请求参数：msisdns:{},optType:{}",msisdns,optType);
             String result = HttpClientUtil.doPost(JY_MOBILE_CARD_URL, paramMap);
+            log.info("揭阳移动接口批量号码停开机返回参数：{}",result);
             String decrypt = DESUtils.decrypt(result, secretKey);
             log.info("揭阳移动接口批量号码停开机返回参数：{}",decrypt);
             return decrypt;
@@ -126,6 +127,7 @@ public class ChinaMobileForJYHttpReq {
             paramMap= ApiUtils.sortMap(paramMap);
             log.info("揭阳移动接口根据订单号查询返回结果请求参数：orderNo:{}",orderNo);
             String result = HttpClientUtil.doPost(JY_MOBILE_CARD_URL, paramMap);
+            log.info("揭阳移动接口根据订单号查询返回结果返回参数：{}",result);
             String decrypt = DESUtils.decrypt(result, secretKey);
             log.info("揭阳移动接口根据订单号查询返回结果返回参数：{}",decrypt);
             return decrypt;
@@ -156,15 +158,14 @@ public class ChinaMobileForJYHttpReq {
             String sign = ApiUtils.sign(paramMap, secretKey);
             paramMap.put("sign",sign);
             paramMap= ApiUtils.sortMap(paramMap);
-            log.info("揭阳移动接口批量号码停开机请求参数：msisdn:{},optType:{},transId:{}",msisdn,optType,transId);
+            log.info("揭阳移动接口单个码停开机请求参数：msisdn:{},optType:{},transId:{}",msisdn,optType,transId);
             String result = HttpClientUtil.doPost(JY_MOBILE_CARD_URL, paramMap);
+            log.info("揭阳移动接口单个号码停开机返回参数：result:{}",result);
             if(StringUtils.isBlank(result)){
-                log.info("揭阳移动接口批量号码停开机返回参数：result:{}",result);
-                AppConfig.sendEmails("接口请求错误：result："+result, "物联网移动接口请求异常,方法msisdnSwitch");
                 return "";
             }
             String decrypt = DESUtils.decrypt(result, secretKey);
-            log.info("揭阳移动接口批量号码停开机返回参数：{}",decrypt);
+            log.info("揭阳移动接口单个号码停开机返回参数：{}",decrypt);
             return decrypt;
         } catch (Exception e) {
             AppConfig.sendEmails(MailUtil.printStackTrace(e), "物联网移动接口请求异常,方法msisdnSwitch");

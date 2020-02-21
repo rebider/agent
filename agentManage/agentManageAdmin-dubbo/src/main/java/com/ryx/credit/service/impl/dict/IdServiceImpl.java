@@ -90,10 +90,9 @@ public class IdServiceImpl implements IdService {
 
     @Override
     public String genInternetOffset(){
-        String data = sdf_MMDD.format(Calendar.getInstance().getTime());
+        String data = sdf_yyMM.format(Calendar.getInstance().getTime());
         long seq_id = dictMapper.sqlId(TabId.O_INTERNET_RENEW_OFFSET.name());
-        String rund = RandomCharUtil.getRandomNumberChar(2);
-        String numId = String.format("I%s%05d%02d", data, (seq_id % 100000), Integer.valueOf(rund));
+        String numId = String.format("I%s%07d", data, (seq_id % 10000000));
         return numId;
     }
 
