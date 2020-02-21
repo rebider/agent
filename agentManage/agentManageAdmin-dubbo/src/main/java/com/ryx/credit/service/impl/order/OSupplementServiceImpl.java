@@ -477,7 +477,7 @@ public class OSupplementServiceImpl implements OSupplementService {
             } catch (Exception e) {
                 throw new MessageException("审批通过失败");
             }
-            OSupplement supplement = selectOSupplement(oSupplement.getId());
+           /* OSupplement supplement = selectOSupplement(oSupplement.getId());
             if (supplement.getPkType().equals(PkType.FQBK.code)) {
                 OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectByPrimaryKey(supplement.getSrcId());
                 oPaymentDetail.setPaymentStatus(PaymentStatus.DF.code);
@@ -488,6 +488,12 @@ public class OSupplementServiceImpl implements OSupplementService {
                 logger.info("补款审批拒绝更新记录为待付款状态成功{}{}:", busActRel.getActivId(), oSupplement.getId());
             } else {
                 logger.info("补款审批拒绝pktype不匹配{}{}:", busActRel.getActivId(), oSupplement.getId());
+            }
+*/
+            AgentResult agentResult = orderOffsetService.OffsetArrearsCancle(oSupplement.getPayAmount(), OffsetPaytype.DDBK.code, oSupplement.getId());
+            if (!agentResult.isOK()){
+                logger.error("补款拒绝失败");
+                throw new MessageException("补款拒绝失败！");
             }
         } else if ("finish_end".equals(activityName)) {//审批同意
             logger.info("补款审批同意{}{}:", busActRel.getActivId(), oSupplement.getId());
