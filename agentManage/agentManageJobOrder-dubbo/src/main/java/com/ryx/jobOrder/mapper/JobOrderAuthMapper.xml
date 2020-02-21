@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.jobOrder.dao.JobOrderAuthMapper">
+
+    <select id="getReqJobOrderAuth" resultType="java.util.Map">
+
+    </select>
+    <select id="getAcceptCode" resultType="java.util.Map" parameterType="string">
+        select cr.*
+        from c_role cr
+                 left join c_role_resource crr
+                           on crr.role_id = cr.id
+                 left join c_resource cre
+                           on cre.id = crr.resource_id
+        where cr.status = '0'
+          <if test="jobOrderType != null">
+              and cre.url = #{jobOrderType}
+          </if>
+    </select>
+</mapper>
