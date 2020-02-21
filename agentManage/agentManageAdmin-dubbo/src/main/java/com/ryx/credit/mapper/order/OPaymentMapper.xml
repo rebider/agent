@@ -38,6 +38,7 @@
     <result column="EXTENDSCODE" jdbcType="VARCHAR" property="extendscode" />
     <result column="PROFIT_FORM" jdbcType="VARCHAR" property="profitForm" />
     <result column="PROFIT_MOUTH" jdbcType="VARCHAR" property="profitMouth" />
+    <result column="CUSTOM_STAGING" jdbcType="VARCHAR" property="customStaging" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -74,7 +75,7 @@
     SHARE_TEMPLET, IS_CLO_INVOICE, DEDUCTION_TYPE, DEDUCTION_AMOUNT, DOWN_PAYMENT, DOWN_PAYMENT_COUNT,
     DOWN_PAYMENT_DATE, COLLECT_COMPANY, REMARK, STATUS, VERSION, ACTUAL_RECEIPT, ACTUAL_RECEIPT_DATE,
     PROFIT_TAX_AMT, DOWN_PAYMENT_USER, SETTLEMENT_PRICE_STR, NUCLEAR_TIME, NUCLEAR_USER,
-    EXTENDSCODE, PROFIT_FORM, PROFIT_MOUTH
+    EXTENDSCODE, PROFIT_FORM, PROFIT_MOUTH, CUSTOM_STAGING
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OPaymentExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -116,8 +117,8 @@
     STATUS, VERSION, ACTUAL_RECEIPT,
     ACTUAL_RECEIPT_DATE, PROFIT_TAX_AMT, DOWN_PAYMENT_USER,
     SETTLEMENT_PRICE_STR, NUCLEAR_TIME, NUCLEAR_USER,
-    EXTENDSCODE, PROFIT_FORM, PROFIT_MOUTH
-    )
+    EXTENDSCODE, PROFIT_FORM, PROFIT_MOUTH,
+    CUSTOM_STAGING)
     values (#{id,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR},
     #{agentId,jdbcType=VARCHAR}, #{payMethod,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP},
     #{payAmount,jdbcType=DECIMAL}, #{realAmount,jdbcType=DECIMAL}, #{outstandingAmount,jdbcType=DECIMAL},
@@ -129,8 +130,8 @@
     #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{actualReceipt,jdbcType=DECIMAL},
     #{actualReceiptDate,jdbcType=TIMESTAMP}, #{profitTaxAmt,jdbcType=DECIMAL}, #{downPaymentUser,jdbcType=VARCHAR},
     #{settlementPriceStr,jdbcType=VARCHAR}, #{nuclearTime,jdbcType=TIMESTAMP}, #{nuclearUser,jdbcType=VARCHAR},
-    #{extendscode,jdbcType=VARCHAR}, #{profitForm,jdbcType=VARCHAR}, #{profitMouth,jdbcType=VARCHAR}
-    )
+    #{extendscode,jdbcType=VARCHAR}, #{profitForm,jdbcType=VARCHAR}, #{profitMouth,jdbcType=VARCHAR},
+    #{customStaging,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OPayment">
     insert into O_PAYMENT
@@ -243,6 +244,9 @@
       <if test="profitMouth != null">
         PROFIT_MOUTH,
       </if>
+      <if test="customStaging != null">
+        CUSTOM_STAGING,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -352,6 +356,9 @@
       </if>
       <if test="profitMouth != null">
         #{profitMouth,jdbcType=VARCHAR},
+      </if>
+      <if test="customStaging != null">
+        #{customStaging,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -469,6 +476,9 @@
       <if test="profitMouth != null">
         PROFIT_MOUTH = #{profitMouth,jdbcType=VARCHAR},
       </if>
+      <if test="customStaging != null">
+        CUSTOM_STAGING = #{customStaging,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -508,7 +518,8 @@
     NUCLEAR_USER = #{nuclearUser,jdbcType=VARCHAR},
     EXTENDSCODE = #{extendscode,jdbcType=VARCHAR},
     PROFIT_FORM = #{profitForm,jdbcType=VARCHAR},
-    PROFIT_MOUTH = #{profitMouth,jdbcType=VARCHAR}
+    PROFIT_MOUTH = #{profitMouth,jdbcType=VARCHAR},
+    CUSTOM_STAGING = #{customStaging,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

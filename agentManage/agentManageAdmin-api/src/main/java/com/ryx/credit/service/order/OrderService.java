@@ -73,6 +73,14 @@ public interface OrderService {
      */
     public OPayment initPayment(OrderFormVo agentVo) throws MessageException;
 
+    /**
+     * 初始化分期明细
+     * @param agentVo
+     * @return
+     * @throws MessageException
+     */
+    public boolean initPaymentDetail(String paymentId,String paymentMethod,List<String> data) throws MessageException;
+
 
     public AgentResult checkDownPaymentDate(Date date);
 
