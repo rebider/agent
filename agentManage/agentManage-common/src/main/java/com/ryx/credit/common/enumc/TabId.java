@@ -123,7 +123,8 @@ public enum TabId {
     o_order_adj_detail("ADD%s%015d"),
     o_settle_accounts("SA%s%015d"),
     O_INTERNET_LOGOUT("IL%s%015d"),
-    O_INTERNET_LOGOUT_DETAIL("ILD%s%015d");
+    O_INTERNET_LOGOUT_DETAIL("ILD%s%015d"),
+    JO_KEY_MANAGE("JK%s%015d");
 
     public String patt;
 

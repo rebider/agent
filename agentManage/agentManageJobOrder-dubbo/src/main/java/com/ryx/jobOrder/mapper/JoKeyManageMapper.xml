@@ -189,4 +189,17 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+
+
+  <!--              开始写代码         -->
+  <select id="keywordList" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix"/>
+    select <include refid="Base_Column_List"/> from JO_KEY_MANAGE
+    <include refid="OracleDialectSuffix"/>
+  </select>
+
+  <select id="keywordCount" parameterType="map" resultType="int">
+    select count(1) from JO_KEY_MANAGE
+  </select>
 </mapper>
