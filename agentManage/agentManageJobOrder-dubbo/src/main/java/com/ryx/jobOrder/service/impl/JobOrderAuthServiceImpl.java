@@ -15,8 +15,9 @@ public class JobOrderAuthServiceImpl implements JobOrderAuthService {
     private JobOrderAuthMapper jobOrderAuthMapper;
 
     @Override
-    public CResource getReqJobOrderAuth(Long userId) {
-        return null;
+    public Map<String,Object> getReqJobOrderAuth(Long userId) {
+        Map<String, Object> reqJobOrderAuth = jobOrderAuthMapper.getReqJobOrderAuth(userId);
+        return reqJobOrderAuth;
     }
 
     @Override
