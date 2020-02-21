@@ -107,6 +107,46 @@ public class ORefundPriceDiffDetail  implements Serializable {
 
     private String oldMachineId;
 
+    //原平台S码
+    private String oldPosPlatCode;
+    //目标平台S码
+    private String newPosPlatCode;
+    //原平台上级S码
+    private String oldSupdPosPlatCode;
+    //目标平台上级S码
+    private String newSupdPosPlatCode;
+
+    public String getOldPosPlatCode() {
+        return oldPosPlatCode;
+    }
+
+    public void setOldPosPlatCode(String oldPosPlatCode) {
+        this.oldPosPlatCode = oldPosPlatCode;
+    }
+
+    public String getNewPosPlatCode() {
+        return newPosPlatCode;
+    }
+
+    public void setNewPosPlatCode(String newPosPlatCode) {
+        this.newPosPlatCode = newPosPlatCode;
+    }
+
+    public String getOldSupdPosPlatCode() {
+        return oldSupdPosPlatCode;
+    }
+
+    public void setOldSupdPosPlatCode(String oldSupdPosPlatCode) {
+        this.oldSupdPosPlatCode = oldSupdPosPlatCode;
+    }
+
+    public String getNewSupdPosPlatCode() {
+        return newSupdPosPlatCode;
+    }
+
+    public void setNewSupdPosPlatCode(String newSupdPosPlatCode) {
+        this.newSupdPosPlatCode = newSupdPosPlatCode;
+    }
 
     public String getOldSupdOrgId() {
         return oldSupdOrgId;

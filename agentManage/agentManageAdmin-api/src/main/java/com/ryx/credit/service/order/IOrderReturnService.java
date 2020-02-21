@@ -1,5 +1,6 @@
 package com.ryx.credit.service.order;
 
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
@@ -32,7 +33,7 @@ public interface IOrderReturnService {
 
     Map<String, Object> view(String returnId) throws ProcessException;
 
-    Map<String, Object> saveCut(String returnId, String amt, String ctype);
+    Map<String, Object> saveCut(String returnId, String amt, String ctype) throws MessageException;
 
     Map<String, Object> delCut(String returnId,String cutId,String userid)throws ProcessException;
 
@@ -94,4 +95,6 @@ public interface IOrderReturnService {
 
 
     List<ReturnOrderVo> exportRetForDetail(Map map);
+
+    Map<String, Object> deductDetail(String returnId) throws ProcessException;
 }
