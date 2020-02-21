@@ -1,5 +1,7 @@
 package com.ryx.credit.common.enumc;
 
+import jdk.nashorn.internal.scripts.JO;
+
 /**
  * 数据表
  * Created by cx on 2018/5/22.
@@ -123,7 +125,10 @@ public enum TabId {
     o_order_adj_detail("ADD%s%015d"),
     o_settle_accounts("SA%s%015d"),
     O_INTERNET_LOGOUT("IL%s%015d"),
-    O_INTERNET_LOGOUT_DETAIL("ILD%s%015d");
+    O_INTERNET_LOGOUT_DETAIL("ILD%s%015d"),
+    jo_order("JO%s%015d"),
+    jo_order_task("JT%s%015d"),
+    jo_order_expand("JE%s%015d");
 
     public String patt;
 
