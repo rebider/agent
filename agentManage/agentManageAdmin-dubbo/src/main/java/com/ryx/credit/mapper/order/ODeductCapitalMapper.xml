@@ -307,4 +307,8 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="selectCountByMap" parameterType="map" resultMap="BaseResultMap">
+    select * from O_DEDUCT_CAPITAL where SOURCE_ID = #{returnId} AND c_type = #{cType, jdbcType=VARCHAR}
+  </select>
 </mapper>

@@ -1276,6 +1276,9 @@ union
           <if test="map.posPlatCode !=null and map.posPlatCode != ''">
             and POS_PLAT_CODE = #{map.posPlatCode}
           </if>
+          <if test="map.busNum !=null and map.busNum != ''">
+            and BUS_NUM = #{map.busNum}
+          </if>
   </select>
 
 

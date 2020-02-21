@@ -176,9 +176,9 @@ public class TermMachineServiceImpl  implements TermMachineService {
 
     @Override
     public AgentResult queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailLists, String operation) throws Exception {
-       String type = terminalTransferDetailLists.get(0).getPlatformType().toString();
+        String type = terminalTransferDetailLists.get(0).getPlatformType().toString();
         logger.info("本次联动请求类型为:{}",type);
-      if("1".equals(type)){//pos
+      if("1".equals(type)||"4".equals(type)){//pos
             return   posTermMachineServiceImpl.queryTerminalTransfer(terminalTransferDetailLists,operation);
         }else if("2".equals(type)){//手刷
             return   mposTermMachineServiceImpl.queryTerminalTransfer(terminalTransferDetailLists,operation);
