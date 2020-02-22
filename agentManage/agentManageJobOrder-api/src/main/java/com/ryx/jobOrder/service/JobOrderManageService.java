@@ -4,9 +4,6 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
-import com.ryx.credit.pojo.admin.vo.AgentVo;
-import com.ryx.credit.pojo.admin.vo.JobOrderManageVo;
-import com.ryx.jobOrder.pojo.JoCustomKey;
 import com.ryx.jobOrder.pojo.JoKeyManage;
 
 /**
@@ -18,9 +15,11 @@ public interface JobOrderManageService {
 
     boolean keywordAdd(JoKeyManage joKeyManage) throws Exception;
 
-    AgentResult keywordDelete(String id, String user);
+    AgentResult keywordDelete(String id);
 
     ResultVO keywordEdit(JoKeyManage joKeyManage) throws Exception;
+
+    JoKeyManage queryKeywordDialog(String id);
 
 
 }

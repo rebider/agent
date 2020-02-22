@@ -6,6 +6,7 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.jobOrder.dao.JoCustomKeyMapper;
 import com.ryx.jobOrder.dao.JoKeyManageMapper;
@@ -38,11 +39,17 @@ public class JobOrderManageServiceImpl implements JobOrderManageService {
     @Override
     public PageInfo keywordList(Page page, JoKeyManage joKeyManage) {
         HashMap<String, Object> map = new HashMap<>();
-       /* if (null != joCustomKey) {
-            if (StringUtils.isNotBlank(joCustomKey.getJoFirstKeyNum())) {
-                map.put("keyNum", joCustomKey.getJoFirstKeyNum());
+        if (null != joKeyManage) {
+            if (StringUtils.isNotBlank(joKeyManage.getJoKey())) {
+                map.put("joKey", joKeyManage.getJoKey());
             }
-        }*/
+            if (StringUtils.isNotBlank(joKeyManage.getJoKeyType())) {
+                map.put("joKeyType", joKeyManage.getJoKeyType());
+            }
+            if (StringUtils.isNotBlank(joKeyManage.getJoKeyName())) {
+                map.put("joKeyName", joKeyManage.getJoKeyName());
+            }
+        }
         List<Map<String, Object>> joCustomKeyList = joKeyManageMapper.keywordList(map, page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(joCustomKeyList);
@@ -66,12 +73,29 @@ public class JobOrderManageServiceImpl implements JobOrderManageService {
     }
 
     @Override
-    public AgentResult keywordDelete(String id, String user) {
-        return null;
+    public AgentResult keywordDelete(String id) {
+        if (StringUtils.isBlank(id)) return AgentResult.fail("ID不能为空");
+        JoKeyManage joKeyManage = new JoKeyManage();
+        joKeyManage.setId(id);
+        joKeyManage.setJoStatus(Status.STATUS_0.status.toString());
+        if (1 == joKeyManageMapper.updateByPrimaryKeySelective(joKeyManage)) {
+            return AgentResult.ok("成功");
+        }
+        return AgentResult.fail();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    @Override
+    public ResultVO keywordEdit(JoKeyManage joKeyManage) throws Exception {
+        if ( 1 == joKeyManageMapper.updateByPrimaryKey(joKeyManage)) {
+            return ResultVO.success(joKeyManage);
+        } else {
+            return ResultVO.fail("修改关键词失败");
+        }
     }
 
     @Override
-    public ResultVO keywordEdit(JoKeyManage joKeyManage) throws Exception {
-        return null;
+    public JoKeyManage queryKeywordDialog(String id) {
+        return joKeyManageMapper.selectByPrimaryKey(id);
     }
 }
