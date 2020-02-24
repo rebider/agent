@@ -295,4 +295,94 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+  <resultMap id="JoTaskVoBaseResultMap" type="com.ryx.jobOrder.vo.JoTaskVo">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="AG_ID" jdbcType="VARCHAR" property="agId" />
+    <result column="AG_NAME" jdbcType="VARCHAR" property="agName" />
+    <result column="BUS_ID" jdbcType="VARCHAR" property="busId" />
+    <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
+    <result column="PALTFORM_NUM" jdbcType="VARCHAR" property="paltformNum" />
+    <result column="PLATFORM_NAME" jdbcType="VARCHAR" property="platformName" />
+    <result column="JO_FIRST_KEY_NUM" jdbcType="VARCHAR" property="joFirstKeyNum" />
+    <result column="JO_SECOND_KEY_NUM" jdbcType="VARCHAR" property="joSecondKeyNum" />
+    <result column="PRIORITY_LEVEL" jdbcType="VARCHAR" property="priorityLevel" />
+    <result column="LAUNCH_TIME" jdbcType="TIMESTAMP" property="launchTime" />
+    <result column="LAUNCH_PERSON_ID" jdbcType="VARCHAR" property="launchPersonId" />
+    <result column="LAUNCH_PERSON_NAME" jdbcType="VARCHAR" property="launchPersonName" />
+    <result column="LAUNCH_PERSON_EMAIL" jdbcType="VARCHAR" property="launchPersonEmail" />
+    <result column="LAUNCH_BRANCH_ID" jdbcType="VARCHAR" property="launchBranchId" />
+    <result column="LAUNCH_BRANCH_NAME" jdbcType="VARCHAR" property="launchBranchName" />
+    <result column="ACCEPT_GROUP_CODE" jdbcType="VARCHAR" property="acceptGroupCode" />
+    <result column="ACCEPT_GROUP" jdbcType="VARCHAR" property="acceptGroup" />
+    <result column="ACCEPT_NOW_GROUP" jdbcType="VARCHAR" property="acceptNowGroup" />
+    <result column="DEAL_TIME_START" jdbcType="TIMESTAMP" property="dealTimeStart" />
+    <result column="DEAL_TIME_END" jdbcType="TIMESTAMP" property="dealTimeEnd" />
+    <result column="DEAL_TIME_LENGTH" jdbcType="DECIMAL" property="dealTimeLength" />
+    <result column="joTaskId" jdbcType="VARCHAR" property="joTaskId" />
+    <result column="joTaskStatus" jdbcType="VARCHAR" property="joTaskStatus" />
+    <result column="joTaskTime" jdbcType="VARCHAR" property="joTaskTime" />
+    <result column="joTaskAcceptTime" jdbcType="VARCHAR" property="joTaskAcceptTime" />
+  </resultMap>
+  <sql id="JoTaskVo_Column_List">
+    jo.ID, jo.AG_ID, jo.AG_NAME, jo.BUS_ID, jo.BUS_NUM, jo.PALTFORM_NUM, jo.PLATFORM_NAME, jo.JO_FIRST_KEY_NUM,
+    jo.JO_SECOND_KEY_NUM, jo.PRIORITY_LEVEL, jo.LAUNCH_TIME, jo.LAUNCH_PERSON_ID, jo.LAUNCH_PERSON_NAME,
+    jo.LAUNCH_PERSON_EMAIL, jo.LAUNCH_BRANCH_ID, jo.LAUNCH_BRANCH_NAME, jo.ACCEPT_GROUP_CODE, jo.ACCEPT_GROUP,
+    jo.ACCEPT_NOW_GROUP, jo.DEAL_TIME_START, jo.DEAL_TIME_END, jo.DEAL_TIME_LENGTH, jo.JO_PROGRESS,
+    jt.id as joTaskId, jt.jo_task_status  as joTaskStatus, jt.jo_task_time as joTaskTime,
+    jt.jo_task_accept_time as joTaskAcceptTime
+  </sql>
+  <select id="selectByJoTaskVo" parameterType="com.ryx.jobOrder.vo.JoTaskVo" resultMap="JoTaskVoBaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="JoTaskVo_Column_List" />
+    from JO_ORDER jo
+    left join JO_TASK jt on jo.id = jt.id
+    <if test="_parameter != null">
+      <include refid="TaskVoExample_Where_Clause" />
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <sql id="TaskVoExample_Where_Clause">
+    <where>
+      <if test="joTaskId != null">
+        jt.id = ${joTaskId}
+      </if>
+      <if test="joFirstKeyNum != null">
+        jo.jo_first_key_num = ${joFirstKeyNum}
+      </if>
+      <if test="joSecondKeyNum != null">
+        jo.jo_second_key_num = ${joSecondKeyNum}
+      </if>
+      <if test="agId != null">
+        jo.ag_id = ${agId}
+      </if>
+      <if test="agName != null">
+        jo.ag_name = ${agName}
+      </if>
+      <if test="busNum != null">
+        jo.bus_num = ${busNum}
+      </if>
+      <if test="busNum != null">
+        jo.bus_num = ${busNum}
+      </if>
+      <if test="priorityLevel != null">
+        jo.priority_level = ${priorityLevel}
+      </if>
+      <if test="joProgress != null">
+        jo.jo_progress = ${joProgress}
+      </if>
+      <if test="joTaskStatus != null">
+        jt.jo_task_status = ${joTaskStatus}
+      </if>
+      <if test="joStartTimeBegin != null and joStartTimeEnd != null">
+        and between #{joStartTimeBegin} and #{joStartTimeEnd}
+      </if>
+      <if test="joAcceptTimeBegin != null and joAcceptTimeEnd != null">
+        and between #{joAcceptTimeBegin} and #{joAcceptTimeEnd}
+      </if>
+    </where>
+  </sql>
 </mapper>
