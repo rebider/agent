@@ -30,4 +30,6 @@ public interface JoKeyManageMapper {
 
     int keywordCount(@Param("map")HashMap<String, Object> map);
 
+    List<Map<String,Object>> selectLevel();
+
 }

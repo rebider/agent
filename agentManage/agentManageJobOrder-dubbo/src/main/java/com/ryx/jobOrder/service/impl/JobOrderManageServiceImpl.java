@@ -11,6 +11,7 @@ import com.ryx.credit.service.dict.IdService;
 import com.ryx.jobOrder.dao.JoCustomKeyMapper;
 import com.ryx.jobOrder.dao.JoKeyManageMapper;
 import com.ryx.jobOrder.pojo.JoKeyManage;
+import com.ryx.jobOrder.pojo.JoKeyManageExample;
 import com.ryx.jobOrder.service.JobOrderManageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,10 +61,8 @@ public class JobOrderManageServiceImpl implements JobOrderManageService {
 
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
-    public boolean keywordAdd(JoKeyManage joKeyManage) throws Exception {
-        String s = idService.genId(TabId.JO_KEY_MANAGE);
-        String substring = s.substring(0, 5);
-        joKeyManage.setId(substring);
+    public boolean keywordAdd(JoKeyManage joKeyManage,String userId) throws Exception {
+        joKeyManage.setId(idService.genJoKeyManageId(TabId.JO_KEY_MANAGE,Integer.valueOf(userId)));
         joKeyManage.setJoStatus(Status.STATUS_1.status.toString());
         int insertDict = joKeyManageMapper.insertSelective(joKeyManage);
         if (1 == insertDict) {
@@ -97,5 +97,30 @@ public class JobOrderManageServiceImpl implements JobOrderManageService {
     @Override
     public JoKeyManage queryKeywordDialog(String id) {
         return joKeyManageMapper.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public List<JoKeyManage> queryKeywordByJoStatus(String joKeyType) {
+        JoKeyManageExample joKeyManageExample = new JoKeyManageExample();
+        JoKeyManageExample.Criteria criteria = joKeyManageExample.createCriteria();
+        if (StringUtils.isNotBlank(joKeyType)){
+            criteria.andJoKeyTypeEqualTo(joKeyType);
+        }
+        /*if(StringUtils.isNotBlank(joKeyBackNum)){
+            criteria.andJoKeyBackNumEqualTo(joKeyBackNum);
+        }*/
+        criteria.andJoStatusEqualTo(Status.STATUS_1.status.toString());
+        List<JoKeyManage> joKeyManageList = joKeyManageMapper.selectByExample(joKeyManageExample);
+        if(null!=joKeyManageList && joKeyManageList.size()>0){
+            return joKeyManageList;
+        }
+
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List selectLevel() {
+        List<Map<String, Object>> mapList = joKeyManageMapper.selectLevel();
+        return mapList;
     }
 }

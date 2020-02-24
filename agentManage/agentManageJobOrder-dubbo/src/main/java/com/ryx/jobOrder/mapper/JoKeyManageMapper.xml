@@ -215,4 +215,12 @@
     <if test="map.joKey!=null and map.joKey!=''"> and jo.JO_KEY=#{map.joKey} </if>
     <if test="map.joKeyName!=null and map.joKeyName!=''"> and jo.JO_KEY_NAME LIKE CONCAT(CONCAT('%',#{map.joKeyName}),'%')</if>
   </sql>
+
+  <!--查询一级和二级类型-->
+  <select id="selectLevel" resultType="map">
+    select a.*,jo.id as idOne,jo.JO_KEY as joKeyOne, jo.JO_KEY_NAME as joKeyNameOne
+    from (select jk.id as id,jk.JO_KEY as joKey,jk.JO_KEY_NAME as joKeyName,jk.JO_KEY_BACK_NUM  from JO_KEY_MANAGE jk
+    where jo_key_type =2 )a
+    left join JO_KEY_MANAGE  jo on a.JO_KEY_BACK_NUM=jo.id
+  </select>
 </mapper>
