@@ -795,7 +795,7 @@
                 and  to_char(PLAN_PAY_TIME,'YYYY-MM') = #{omonth}
             </if>
         </where>
-        AND status=1 and PAYMENT_STATUS=1
+        AND status=1 and PAYMENT_STATUS in(1,2,3)
     </select>
     <select id="selectArrMoney" parameterType="string" resultType="java.math.BigDecimal">
       SELECT NVL(SUM(PAY_AMOUNT),0)
