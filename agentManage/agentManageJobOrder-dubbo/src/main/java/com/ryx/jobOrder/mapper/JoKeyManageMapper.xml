@@ -41,7 +41,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, JO_KEY_TYPE, JO_KEY, JO_KEY_NAME, JO_KEY_VALUE_TYPE, JO_STATUS, JO_KEY_BACK_NUM, 
+    ID, JO_KEY_TYPE, JO_KEY, JO_KEY_NAME, JO_KEY_VALUE_TYPE, JO_STATUS, JO_KEY_BACK_NUM,
     JO_KEY_SORT
   </sql>
   <select id="selectByExample" parameterType="com.ryx.jobOrder.pojo.JoKeyManageExample" resultMap="BaseResultMap">
@@ -64,7 +64,7 @@
     select 
     <include refid="Base_Column_List" />
     from JO_KEY_MANAGE
-    where ID = #{id,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR} and JO_STATUS=1
   </select>
   <delete id="deleteByExample" parameterType="com.ryx.jobOrder.pojo.JoKeyManageExample">
     delete from JO_KEY_MANAGE
@@ -189,4 +189,38 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+
+
+  <!--              开始写代码         -->
+  <select id="keywordList" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix"/>
+    select <include refid="Base_Column_List"/> from JO_KEY_MANAGE jo
+    <where>
+    <include refid="jokeyNabageWhere" />
+    </where>
+    <include refid="OracleDialectSuffix"/>
+  </select>
+
+  <select id="keywordCount" parameterType="map" resultType="int">
+    select count(1) from JO_KEY_MANAGE jo
+    <where>
+    <include refid="jokeyNabageWhere" />
+    </where>
+  </select>
+
+  <sql id="jokeyNabageWhere">
+    and jo.JO_STATUS=1
+    <if test="map.joKeyType!=null and map.joKeyType!=''"> and jo.JO_KEY_TYPE=#{map.joKeyType} </if>
+    <if test="map.joKey!=null and map.joKey!=''"> and jo.JO_KEY=#{map.joKey} </if>
+    <if test="map.joKeyName!=null and map.joKeyName!=''"> and jo.JO_KEY_NAME LIKE CONCAT(CONCAT('%',#{map.joKeyName}),'%')</if>
+  </sql>
+
+  <!--查询一级和二级类型-->
+  <select id="selectLevel" resultType="map">
+    select a.*,jo.id as idOne,jo.JO_KEY as joKeyOne, jo.JO_KEY_NAME as joKeyNameOne
+    from (select jk.id as id,jk.JO_KEY as joKey,jk.JO_KEY_NAME as joKeyName,jk.JO_KEY_BACK_NUM  from JO_KEY_MANAGE jk
+    where jo_key_type =2 )a
+    left join JO_KEY_MANAGE  jo on a.JO_KEY_BACK_NUM=jo.id
+  </select>
 </mapper>
