@@ -1058,15 +1058,35 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	 */
 	@Override
 	public void updateBusLoginNum(String busNum,String oldBusLoginNum,String busLoginNum,String platformType)throws MessageException{
-		logger.info("根据平台编号修改登陆手机号请求参数:{},{}",oldBusLoginNum,busLoginNum);
-		Map<String, Object> reqMap = new HashMap<>();
-		reqMap.put("oldBusLoginNum",oldBusLoginNum);
-		reqMap.put("busLoginNum",busLoginNum);
-		reqMap.put("platformType",PlatformType.RDBPOS.code);
-		int i = agentBusInfoMapper.updateBusLoginNum(reqMap);
-		logger.info("根据平台编号修改登陆手机号处理结果:{}",i);
-		if(i==0){
-			throw new MessageException("更新失败");
+		logger.info("根据平台编号修改登陆手机号请求参数:{},{},{},{}",busNum,oldBusLoginNum,busLoginNum,platformType);
+		List<Map<String,Object>> busInfos= queryBusInfo(busNum,platformType);
+		if(busInfos.size()==1){
+			Map<String,Object> bus = busInfos.get(0);
+			Object AGENT_ID =  bus.get("AGENT_ID");
+			Object BUS_NUM = bus.get("BUS_NUM");
+			Object BUS_PLATFORM = bus.get("BUS_PLATFORM");
+			AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+			agentBusInfoExample.or().andAgentIdEqualTo(AGENT_ID+"").andBusNumEqualTo(BUS_NUM.toString()).andBusPlatformEqualTo(BUS_PLATFORM+"");
+			List<AgentBusInfo>  db_bus = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+			if(db_bus.size()==1){
+				AgentBusInfo agentBusInfo = db_bus.get(0);
+				if(StringUtils.isNotBlank(oldBusLoginNum) && oldBusLoginNum.equals(agentBusInfo.getBusLoginNum())){
+					agentBusInfo.setBusLoginNum(busLoginNum);
+					if(1==agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)){
+						return;
+					}else{
+						throw new MessageException("更新失败");
+					}
+				}else{
+					throw new MessageException("老登录账号不唯一");
+				}
+			}else{
+				throw new MessageException("业务查询不唯一");
+			}
+		}else if(busInfos.size()>1){
+			throw new MessageException("业务查询不唯一");
+		}else{
+			throw new MessageException("未找到业务");
 		}
 	}
 
