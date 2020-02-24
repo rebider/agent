@@ -580,17 +580,22 @@ public class OrderActivityServiceImpl implements OrderActivityService {
     }
 
 
+    /**
+     * 历史Sn查询各个平台
+     * @param snStart
+     * @param snEnd
+     * @param count
+     * @param proModel POS 手刷
+     * @return
+     * @throws MessageException
+     */
     @Override
     public AgentResult querySnInfoFromBusSystem(String snStart, String snEnd, String count, String proModel) throws MessageException {
 
-        Dict modelType = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MODEL_TYPE.name(), proModel);
-        if (modelType == null) {
-            throw new MessageException("导入类型错误");
-        }
         FastMap res = FastMap.fastSuccessMap();
         Set<OActivity> actSet = new HashSet<>();
         //历史sn查询，分平台
-        if (modelType.getdItemvalue().equals(PlatformType.RDBPOS.code)) {
+        if (proModel.equals(PlatformType.RDBPOS.msg)) {
             try {
                 AgentResult agentResult = termMachineService.querySnMsg(PlatformType.RDBPOS, snStart, snEnd);
                 if (!agentResult.isOK()) {
@@ -658,7 +663,6 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     redisService.lpushList(snStart + "," + snEnd + "_act", activity.getId());
                 }
                 //放入代理商信息
-                //redisService.setValue(snStart + "," + snEnd + "_org", busNum, 60 * 60 * 24L);
                 redisService.set(snStart + "," + snEnd + "_org", busNum);
                 redisService.set(snStart + "," + snEnd + "_plat", PlatformType.RDBPOS.code);
                 OActivity oActivity = actSet.iterator().next();
@@ -668,12 +672,12 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                         .putKeyV("price", oActivity.getPrice())
                         .putKeyV("amt", oActivity.getPrice().multiply(new BigDecimal(count)))
                         .putKeyV("activity", actSet)
-                        .putKeyV("modelType", modelType.getdItemvalue());
+                        .putKeyV("modelType", PlatformType.RDBPOS.code);
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new MessageException("查询机具sn异常:" + e.getLocalizedMessage());
             }
-        }else if (modelType.getdItemvalue().equals(PlatformType.MPOS.code)) {
+        } else if (proModel.equals(PlatformType.MPOS.msg)) {
             try {
                 AgentResult agentResult = termMachineService.querySnMsg(PlatformType.MPOS, snStart, snEnd);
                 if (!agentResult.isOK()) {
@@ -751,12 +755,12 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                         .putKeyV("price", oActivity.getPrice())
                         .putKeyV("amt", oActivity.getPrice().multiply(new BigDecimal(count)))
                         .putKeyV("activity", actSet)
-                        .putKeyV("modelType", modelType.getdItemvalue());
+                        .putKeyV("modelType", PlatformType.MPOS.code);
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new MessageException("查询机具sn异常:" + e.getLocalizedMessage());
             }
-        } else {
+        } else if (proModel.equals(PlatformType.POS.msg)) {
             try {
                 AgentResult agentResult = termMachineService.querySnMsg(PlatformType.POS, snStart, snEnd);
                 if (!agentResult.isOK()) {
@@ -875,11 +879,13 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                         .putKeyV("price", oActivity.getPrice())
                         .putKeyV("amt", oActivity.getPrice().multiply(new BigDecimal(count)))
                         .putKeyV("activity", actSet)
-                        .putKeyV("modelType", modelType.getdItemvalue());
+                        .putKeyV("modelType", PlatformType.POS.code);
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new MessageException(e.getMessage());
             }
+        } else {
+            throw new MessageException(proModel + "平台暂不支持退货或换活动！");
         }
         AgentResult agentResult = AgentResult.ok();
         agentResult.setMapData(res);

@@ -40,7 +40,7 @@ public interface CompensateService {
 
     AgentResult compressCompensateActivity(String proIns,BigDecimal agStatus)throws Exception;
 
-    ORefundPriceDiff queryRefDiffDetail(String id);
+    ORefundPriceDiff queryRefDiffDetail(String id) throws MessageException;
 
     AgentResult updateTask(AgentVo agentVo,BigDecimal deductAmt,String userId,List<OCashReceivablesVo> cashReceivablesVoList)throws Exception;
 
@@ -65,5 +65,8 @@ public interface CompensateService {
      */
     AgentResult dealQeruySendingReault(String id)throws Exception;
 
+    PageInfo exportRefundPriceDiff(ORefundPriceDiffVo refundPriceDiff, PageInfo pageInfo, Boolean isPlan);
+
+    PageInfo exportRefundPriceDiffDetail(ORefundPriceDiffDetail refundPriceDiffDetail, PageInfo pageInfo, Boolean isPlan);
 }
 

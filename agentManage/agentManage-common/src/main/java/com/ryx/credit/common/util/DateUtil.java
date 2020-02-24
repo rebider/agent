@@ -483,10 +483,24 @@ public class DateUtil {
         Calendar now = Calendar.getInstance();
         now.setTime(d);
         now.set(Calendar.YEAR, now.get(Calendar.YEAR)+1);//+后 -前
-        now.set(Calendar.DAY_OF_MONTH,0);
+        now.set(Calendar.DAY_OF_MONTH, 0);
         return now.getTime();
     }
 
+    /**
+     * 获取一年以后的今天
+     * @param d
+     * @return
+     */
+    public static Date getOneYearLaterNow(Date d) {
+        Calendar now = Calendar.getInstance();
+        now.setTime(d);
+        now.set(Calendar.MONTH, now.get(Calendar.MONTH));//+后 -前
+        now.set(Calendar.DAY_OF_MONTH, 1);
+        now.set(Calendar.YEAR, now.get(Calendar.YEAR)+1);//+后 -前
+        now.roll(Calendar.DATE, -1);
+        return now.getTime();
+    }
 
     /**
      * 获取几个月后

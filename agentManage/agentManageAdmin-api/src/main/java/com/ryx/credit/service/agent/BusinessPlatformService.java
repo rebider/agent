@@ -101,4 +101,7 @@ public interface BusinessPlatformService {
      * @return
      */
     PageInfo queryBusinfoTopMenuList(Page page, Map map);
+
+    //业务类型更改限制
+    void verifyBusinfoType(AgentBusInfo preBusInfoVo, AgentBusInfoVo newBusInfoVo) throws Exception;
 }
