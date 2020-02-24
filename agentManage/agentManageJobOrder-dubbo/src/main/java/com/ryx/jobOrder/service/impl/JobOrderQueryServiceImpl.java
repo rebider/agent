@@ -57,4 +57,9 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
         return jobOrder;
     }
 
+    @Override
+    public PageInfo jobOrderQueryLaunchList(Map map, Page page) {
+        return null;
+    }
+
 }
