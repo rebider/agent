@@ -4,6 +4,7 @@ import com.ryx.jobOrder.pojo.JoOrder;
 import com.ryx.jobOrder.pojo.JoOrderExample;
 
 import java.util.List;
+import java.util.Map;
 
 public interface JoOrderMapper {
     long countByExample(JoOrderExample example);
@@ -21,4 +22,8 @@ public interface JoOrderMapper {
     int updateByPrimaryKeySelective(JoOrder record);
 
     int updateByPrimaryKey(JoOrder record);
+
+    List<Map<String, Object>> queryJobOrderList(Map<String, Object> param);
+
+    int queryJobOrderListCount(Map<String, Object> param);
 }

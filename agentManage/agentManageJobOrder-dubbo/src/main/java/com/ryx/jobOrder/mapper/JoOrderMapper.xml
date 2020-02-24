@@ -473,4 +473,53 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+
+  <select id="queryJobOrderList" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix" />
+    <include refid="selectByJobOrderSql" />
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="queryJobOrderListCount" parameterType="map" resultType="int">
+    select count(*) from (
+    <include refid="selectByJobOrderSql" />
+    )
+  </select>
+
+  <sql id="selectByJobOrderSql">
+    select
+    jo.id,
+    jo.ag_id,
+    jo.ag_name,
+    jo.bus_num,
+    jo.platform_name,
+    jo.jo_first_key_num,
+    jo.jo_second_key_num,
+    jo.priority_level,
+    jo.launch_time,
+    jo.launch_person_name,
+    jo.launch_branch_name,
+    jo.launch_person_email,
+    jo.jo_progress,
+    jo.accept_group,
+    ta.deal_person_name,
+    ta.jo_task_accept_time
+    from jo_order jo
+    left join jo_task ta on ta.jo_id = jo.id
+    <where>
+      1 = 1
+      <if test="id!=null and id!=''">and jo.id = #{id} </if>
+      <if test="joFirstKeyNum!=null and joFirstKeyNum!=''"> and jo.jo_first_key_num = #{joFirstKeyNum} </if>
+      <if test="joSecondKeyNum!=null and joSecondKeyNum!=''"> and jo.jo_second_key_num = #{joSecondKeyNum} </if>
+      <if test="agName!=null and agName!=''"> andjo.ag_name like CONCAT(CONCAT('%',#{agName}),'%') </if>
+      <if test="busNum!=null and busNum!=''"> andjo.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
+      <if test="priorityLevel!=null and priorityLevel!=''"> andjo.priority_level = #{priorityLevel} </if>
+      <if test="joProgress!=null and joProgress!=''"> andjo.jo_progress = #{joProgress} </if>
+      <if test="launchBranchName!=null and launchBranchName!=''"> andjo.launch_branch_name = #{launchBranchName} </if>
+      <if test="launchBeginTime!=null and launchEndTime!=''"> and (to_char(jo.taskEndTime,'yyyy-mm-dd') between #{launchBeginTime} and #{taskEndTimime}) </if>
+      <if test="taskBeginTime!=null and taskEndTime!=''"> and (to_char(ta.jo_task_accept_time,'yyyy-mm-dd') between #{taskBeginTime} and #{taskEndTime}) </if>
+    </where>
+    order by jo.launch_time desc
+  </sql>
 </mapper>
