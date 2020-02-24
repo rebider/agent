@@ -105,26 +105,53 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                         break;
                     }
                     OPayDetail oPayDetail = new OPayDetail();
-                    if(residue.compareTo(paymentDetail.getPayAmount())==0){
-                        initialize=paymentDetail.getPayAmount();
-                        flag=false;
-                        logger.info("还款-------:"+initialize);
-                        oPayDetail.setAmount(residue);
-                        oPayDetail.setSrcId(oSupplement.getId());
-                        residue = residue.subtract(initialize);
-                    }else if(residue.compareTo(paymentDetail.getPayAmount())==-1){
-                        initialize.add(residue);
-                        flag=false;
-                        logger.info("还款-------:"+initialize.add(residue));
-                        oPayDetail.setAmount(residue);
-                        oPayDetail.setSrcId(oSupplement.getId());
-                        residue = BigDecimal.ZERO;
-                    }else if(residue.compareTo(paymentDetail.getPayAmount())==1){
-                        residue = residue.subtract(paymentDetail.getPayAmount());
-                        oPayDetail.setAmount(paymentDetail.getPayAmount());
-                        oPayDetail.setSrcId(oSupplement.getId());
-                        logger.info("还款--------:"+paymentDetail.getPayAmount());
+                    if (paymentDetail.getPaymentStatus().compareTo(PaymentStatus.DF.code) == 0 || paymentDetail.getPaymentStatus().compareTo(PaymentStatus.YQ.code) == 0){
+                        if(residue.compareTo(paymentDetail.getPayAmount())==0){
+                            initialize=paymentDetail.getPayAmount();
+                            flag=false;
+                            logger.info("还款-------:"+initialize);
+                            oPayDetail.setAmount(residue);
+                            oPayDetail.setSrcId(oSupplement.getId());
+                            residue = residue.subtract(initialize);
+                        }else if(residue.compareTo(paymentDetail.getPayAmount())==-1){
+                            initialize.add(residue);
+                            flag=false;
+                            logger.info("还款-------:"+initialize.add(residue));
+                            oPayDetail.setAmount(residue);
+                            oPayDetail.setSrcId(oSupplement.getId());
+                            residue = BigDecimal.ZERO;
+                        }else if(residue.compareTo(paymentDetail.getPayAmount())==1){
+                            residue = residue.subtract(paymentDetail.getPayAmount());
+                            oPayDetail.setAmount(paymentDetail.getPayAmount());
+                            oPayDetail.setSrcId(oSupplement.getId());
+                            logger.info("还款--------:"+paymentDetail.getPayAmount());
+                        }
+                    }else if (paymentDetail.getPaymentStatus().compareTo(PaymentStatus.BF.code) == 0){
+                        if(residue.compareTo(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()))==0){
+                            initialize=paymentDetail.getPayAmount();
+                            flag=false;
+                            logger.info("还款-------:"+initialize);
+                            oPayDetail.setAmount(residue);
+                            oPayDetail.setSrcId(oSupplement.getId());
+                            residue = residue.subtract(initialize);
+                        }else if(residue.compareTo(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()))==-1){
+                            initialize.add(residue);
+                            flag=false;
+                            logger.info("还款-------:"+initialize.add(residue));
+                            oPayDetail.setAmount(residue);
+                            oPayDetail.setSrcId(oSupplement.getId());
+                            residue = BigDecimal.ZERO;
+                        }else if(residue.compareTo(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()))==1){
+                            residue = residue.subtract(paymentDetail.getPayAmount());
+                            oPayDetail.setAmount(paymentDetail.getPayAmount());
+                            oPayDetail.setSrcId(oSupplement.getId());
+                            logger.info("还款--------:"+paymentDetail.getPayAmount());
+                        }
+                    }else {
+                        logger.info("付款明细付款状态不允许补款");
+                        throw new MessageException("付款明细付款状态不允许补款");
                     }
+
                     resPaymentDetail.add(paymentDetail);
                     //进行添加付款明细数据
                     oPayDetail.setId(idService.genId(TabId.O_PAY_DETAIL));
