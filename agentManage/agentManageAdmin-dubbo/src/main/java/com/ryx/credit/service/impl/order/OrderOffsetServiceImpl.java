@@ -128,7 +128,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                         }
                     }else if (paymentDetail.getPaymentStatus().compareTo(PaymentStatus.BF.code) == 0){
                         if(residue.compareTo(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()))==0){
-                            initialize=paymentDetail.getPayAmount();
+                            initialize=residue;
                             flag=false;
                             logger.info("还款-------:"+initialize);
                             oPayDetail.setAmount(residue);
@@ -142,10 +142,10 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                             oPayDetail.setSrcId(oSupplement.getId());
                             residue = BigDecimal.ZERO;
                         }else if(residue.compareTo(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()))==1){
-                            residue = residue.subtract(paymentDetail.getPayAmount());
+                            residue = residue.subtract(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
                             oPayDetail.setAmount(paymentDetail.getPayAmount());
                             oPayDetail.setSrcId(oSupplement.getId());
-                            logger.info("还款--------:"+paymentDetail.getPayAmount());
+                            logger.info("还款--------:"+paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
                         }
                     }else {
                         logger.info("付款明细付款状态不允许补款");
@@ -227,7 +227,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                     }
                 }else if (paymentDetail.getPaymentStatus().compareTo(PaymentStatus.BF.code) == 0){
                     if(residue.compareTo(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()))==0){
-                        initialize=paymentDetail.getPayAmount();
+                        initialize=residue;
                         flag=false;
                         logger.info("还款-------:"+initialize);
                         oPayDetail.setAmount(residue);
@@ -241,10 +241,10 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                         oPayDetail.setSrcId(oRemoveAccount.getId());
                         residue = BigDecimal.ZERO;
                     }else if(residue.compareTo(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()))==1){
-                        residue = residue.subtract(paymentDetail.getPayAmount());
+                        residue = residue.subtract(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
                         oPayDetail.setAmount(paymentDetail.getPayAmount());
                         oPayDetail.setSrcId(oRemoveAccount.getId());
-                        logger.info("还款--------:"+paymentDetail.getPayAmount());
+                        logger.info("还款--------:"+paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
                     }
                 }else {
                     logger.info("付款明细付款状态不允许补款");
@@ -323,7 +323,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                     }
                 }else if (paymentDetail.getPaymentStatus().compareTo(PaymentStatus.BF.code) == 0){
                     if(residue.compareTo(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()))==0){
-                        initialize=paymentDetail.getPayAmount();
+                        initialize=residue;
                         flag=false;
                         logger.info("还款-------:"+initialize);
                         oPayDetail.setAmount(residue);
@@ -337,7 +337,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                         oPayDetail.setSrcId(srcId);
                         residue = BigDecimal.ZERO;
                     }else if(residue.compareTo(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()))==1){
-                        residue = residue.subtract(paymentDetail.getPayAmount());
+                        residue = residue.subtract(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
                         oPayDetail.setAmount(paymentDetail.getPayAmount());
                         oPayDetail.setSrcId(srcId);
                         logger.info("还款--------:"+paymentDetail.getPayAmount());
@@ -424,7 +424,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                     }
                 }else if (paymentDetail.getPaymentStatus().compareTo(PaymentStatus.BF.code) == 0){
                     if(residue.compareTo(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()))==0){
-                        initialize=paymentDetail.getPayAmount();
+                        initialize=residue;
                         flag=false;
                         logger.info("还款-------:"+initialize);
                         oPayDetail.setAmount(residue);
@@ -438,10 +438,10 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                         oPayDetail.setSrcId(srcId);
                         residue = BigDecimal.ZERO;
                     }else if(residue.compareTo(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()))==1){
-                        residue = residue.subtract(paymentDetail.getPayAmount());
+                        residue = residue.subtract(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
                         oPayDetail.setAmount(paymentDetail.getPayAmount());
                         oPayDetail.setSrcId(srcId);
-                        logger.info("还款--------:"+paymentDetail.getPayAmount());
+                        logger.info("还款--------:"+paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
                     }
                 }else {
                     logger.info("付款明细付款状态不允许补款");
@@ -525,7 +525,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                     }
                 }else if (paymentDetail.getPaymentStatus().compareTo(PaymentStatus.BF.code) == 0){
                     if(residue.compareTo(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()))==0){
-                        initialize=paymentDetail.getPayAmount();
+                        initialize=residue;
                         flag=false;
                         logger.info("还款-------:"+initialize);
                         oPayDetail.setAmount(residue);
@@ -539,10 +539,10 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                         oPayDetail.setSrcId(srcId);
                         residue = BigDecimal.ZERO;
                     }else if(residue.compareTo(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()))==1){
-                        residue = residue.subtract(paymentDetail.getPayAmount());
+                        residue = residue.subtract(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
                         oPayDetail.setAmount(paymentDetail.getPayAmount());
                         oPayDetail.setSrcId(srcId);
-                        logger.info("还款--------:"+paymentDetail.getPayAmount());
+                        logger.info("还款--------:"+paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
                     }
                 }else {
                     logger.info("付款明细付款状态不允许补款");
@@ -616,7 +616,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                     }
                 }else if (paymentDetail.getPaymentStatus().compareTo(PaymentStatus.BF.code) == 0){
                     if(residue.compareTo(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()))==0){
-                        initialize=paymentDetail.getPayAmount();
+                        initialize=residue;
                         flag=false;
                         logger.info("还款-------:"+initialize);
                         oPayDetail.setAmount(residue);
@@ -630,10 +630,10 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                         oPayDetail.setSrcId(srcId);
                         residue = BigDecimal.ZERO;
                     }else if(residue.compareTo(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()))==1){
-                        residue = residue.subtract(paymentDetail.getPayAmount());
+                        residue = residue.subtract(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
                         oPayDetail.setAmount(paymentDetail.getPayAmount());
                         oPayDetail.setSrcId(srcId);
-                        logger.info("还款--------:"+paymentDetail.getPayAmount());
+                        logger.info("还款--------:"+paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
                     }
                 }else {
                     logger.info("付款明细付款状态不允许补款");
