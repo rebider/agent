@@ -1057,7 +1057,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	 * @throws MessageException
 	 */
 	@Override
-	public void updateBusLoginNum(String oldBusLoginNum,String busLoginNum)throws MessageException{
+	public void updateBusLoginNum(String busNum,String oldBusLoginNum,String busLoginNum,String platformType)throws MessageException{
 		logger.info("根据平台编号修改登陆手机号请求参数:{},{}",oldBusLoginNum,busLoginNum);
 		Map<String, Object> reqMap = new HashMap<>();
 		reqMap.put("oldBusLoginNum",oldBusLoginNum);
@@ -1205,13 +1205,16 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		return agentBusInfos;
 	}
 
-	public List<Map<String,Object>> selectByBusinfo(String agentId, String platformType) {
-		List<Map<String,Object>> listMap = agentBusInfoMapper.queryByBusInfo(
-				FastMap.fastMap("agentId", agentId)
-						.putKeyV("platformType", platformType));
+	public List<Map<String,Object>> selectByBusinfo(String agentId,  List<String> platformTypes) {
+
+		if(platformTypes==null || platformTypes.size()==0)return new ArrayList<Map<String,Object>>();
+
+		List<Map<String,Object>> listMap = agentBusInfoMapper.queryByBusInfo(FastMap.fastMap("agentId", agentId).putKeyV("platformTypes", platformTypes));
+
 		if (listMap.size()==0) {
 			return null;
 		}
+
 		return listMap;
 	}
 

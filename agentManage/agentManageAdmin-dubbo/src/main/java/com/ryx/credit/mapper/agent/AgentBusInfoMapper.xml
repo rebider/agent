@@ -1396,8 +1396,12 @@ union
       b.status=1 and a.status=1 and b.clo_review_status=3 and a.ag_status='Approved'
       and b.bus_status in ('0','1','2')
       and b.agent_id=#{agentId}
-      and p.platform_type=#{platformType}
       and b.bus_num is not null
       and b.bus_login_num is not null
+      <if test="platformTypes == null">and 1=-1</if>
+      and p.platform_type in
+      <foreach collection="platformTypes" open="(" separator="," close=")" item="platformType">
+           #{platformType}
+      </foreach>
   </select>
 </mapper>

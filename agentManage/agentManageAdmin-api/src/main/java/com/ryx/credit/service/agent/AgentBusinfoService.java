@@ -115,7 +115,7 @@ public interface AgentBusinfoService {
 
     List<Map<String,Object>> queryAgentBusInfo(String busNum,String platformType)throws MessageException;
 
-    void updateBusLoginNum(String oldBusLoginNum,String busLoginNum)throws MessageException;
+    void updateBusLoginNum(String busNum,String oldBusLoginNum,String busLoginNum,String platformType)throws MessageException;
 
     Map<String,String> queryBusInfoByBrandNum(String brandNum)throws MessageException;
 
@@ -138,7 +138,7 @@ public interface AgentBusinfoService {
      */
     public AgentBusInfo agentPlatformNum(String agentId,String platFormNum);
 
-    List<Map<String,Object>> selectByBusinfo(String agentId, String platformType);
+    List<Map<String,Object>> selectByBusinfo(String agentId, List<String> platformTypes);
 
     /**
      * 根据业务平台批量查询 代理商AG和业务平台号关系
