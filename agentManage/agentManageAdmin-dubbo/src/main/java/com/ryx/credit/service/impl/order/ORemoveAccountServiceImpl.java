@@ -286,10 +286,8 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                                 HashMap<Object, Object> hashMap = new HashMap<>();
                                 hashMap.put("orderId",String.valueOf(mapItem.get("OID")));
                                 hashMap.put("agentId",String.valueOf(mapItem.get("AGENT_ID")));
-                                if(null!=oRemoveAccount_item.getRmonth()){
-                                    Date rmonth = oRemoveAccount_item.getRmonth();
-                                    String format = simpleDateFormat.format(rmonth);
-                                    hashMap.put("omonth",format);
+                                if(StringUtils.isNotBlank(String.valueOf( mapItem.get("OMONTH")))){
+                                    hashMap.put("omonth",String.valueOf( mapItem.get("OMONTH")));
                                 }
                                 List<OPaymentDetail> oPaymentDetailList = oPaymentDetailMapper.selectOPaymentDetail(hashMap);
                                 lists.addAll(oPaymentDetailList);
@@ -311,6 +309,7 @@ public class ORemoveAccountServiceImpl implements ORemoveAccountService {
                             ORemoveAccount oRemoveAccount = oRemoveAccountMapper.selectByPrimaryKey(id);
                             AgentResult agentResultCommit = orderOffsetService.OffsetArrearsCommit(oRemoveAccount.getRamount(), OffsetPaytype.DDXZ.code, oRemoveAccount.getId());
                             if (!agentResultCommit.isOK()){
+                                logger.info(agentResultCommit.getMsg());
                                 throw new MessageException("销账数据提交更新异常！");
                             }
 

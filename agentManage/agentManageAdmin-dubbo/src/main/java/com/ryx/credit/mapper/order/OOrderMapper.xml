@@ -1984,7 +1984,7 @@
       where 1=1
       <if test="busPlatform!=null and busPlatform!=''"> and a_agent_businfo.bus_platform=#{busPlatform} </if>
       <if test="agentId !=null and agentId !='' ">
-        and  a_agent_businfo.agent_id =#{agentId}
+        and  o_order.agent_id =#{agentId}
       </if>
       <if test="busNum !=null and busNum !='' ">
        and  a_agent_businfo.bus_num =#{busNum}

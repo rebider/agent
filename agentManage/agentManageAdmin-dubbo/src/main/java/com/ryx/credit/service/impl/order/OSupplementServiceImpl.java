@@ -517,7 +517,7 @@ public class OSupplementServiceImpl implements OSupplementService {
             OSupplement osupplement = oSupplementMapper.selectByPrimaryKey(oSupplement.getId());
             AgentResult agentResult = orderOffsetService.OffsetArrearsCommit(osupplement.getPayAmount(), OffsetPaytype.DDBK.code, osupplement.getId());
             if (!agentResult.isOK()){
-                logger.info("补款更新异常");
+                logger.info(agentResult.getMsg());
                 throw new MessageException("补款更新异常！");
             }
          /*   //修改订单明细付款状态
