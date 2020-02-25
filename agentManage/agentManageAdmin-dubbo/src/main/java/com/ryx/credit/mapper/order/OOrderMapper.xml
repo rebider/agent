@@ -440,6 +440,7 @@
     g.name as ag_doc_pro_name ,
     o.user_id as user_id,
     org.ORG_NICK,
+    d.CUSTOM_STAGING,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
@@ -559,6 +560,7 @@
     g.name as ag_doc_pro_name ,
     o.user_id as user_id,
     org.ORG_NICK,
+    d.CUSTOM_STAGING,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
@@ -889,6 +891,7 @@
     f.name as ag_doc_district_name,
     g.name as ag_doc_pro_name,
     org.ORG_NICK,
+    d.CUSTOM_STAGING,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id

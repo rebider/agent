@@ -17,7 +17,15 @@ public enum ReceiptPlanExportColum {
 
     //导出欠款记录
     ARREARAGE_Column("TM,AG_UNIQ_NUM,AG_NAME,BUS_NUM,PLATFORM_NAME,JJQK","欠款导出字段"),
-    ARREARAGE_Title("月份,代理商唯一编码,代理商名称,业务平台编码,业务平台,机具欠款","欠款导出标题");
+    ARREARAGE_Title("月份,代理商唯一编码,代理商名称,业务平台编码,业务平台,机具欠款","欠款导出标题"),
+
+    //导出活动调整
+    RefundPriceDiff_Column("ID,AGENT_ID,AG_NAME,DEDUCT_AMT,BELOW_PAY_AMT,SHARE_DEDUCT_AMT,GATHER_TIME,GATHER_AMT,APPLY_REMARK,REVIEW_STATUS,ORDER_TYPE,S_TIME,U_TIME","活动调整导出字段"),
+    RefundPriceDiff_Title("补差价编号,代理商唯一编码,代理商名称,扣除总金额,线下打款金额,分润抵扣金额,收款时间,收款金额,申请备注,审批状态,订单类型,申请时间,更新时间","活动调整导出标题"),
+
+    //导出活动调整明细
+    RefundPriceDiffDetail_Column("id,refundPriceDiffId,proName,changeCount,activityName,frontPrice,price,beginSn,endSn,pre_activity_activityName,pre_activity_act_code,pre_activity_bus_pro_code,pre_activity_price,orderType,oldOrgId,oldOrgName,newOrgId,newOrgName,oldSupdOrgId,oldSupdOrgName,newSupdOrgId,newSupdOrgName,uTime","活动调整明细导出字段"),
+    RefundPriceDiffDetail_Title("编号,申请单号,商品名称,变更数量,活动名称,前价格,价格,开始SN,结束SN,原活动,原活动代码,原机具编号,原价格,订单类型,原机构编号,原机构名称,目标机构编号,目标机构名称,原机构直签类上级平台码,原机构直签类上级,目标机构直签类上级平台码,目标机构直签类上级,更新时间","活动调整明细导出标题");
 
     public String code;
 

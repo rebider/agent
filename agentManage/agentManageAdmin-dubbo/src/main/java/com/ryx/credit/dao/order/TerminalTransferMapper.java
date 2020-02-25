@@ -39,7 +39,7 @@ public interface TerminalTransferMapper {
 
     Map<String, Object> querySubBusNumAgent(String bus_num);
 
-    List<Map<String, Object>> getSN();
+    List<Map<String, Object>> getSN(@Param("common") String common);
 
     List<Map<String, Object>> querySubBusNum(String AGENT_ID);
 

@@ -37,6 +37,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -160,6 +161,116 @@ public class CompensateServiceImpl implements CompensateService {
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(refundPriceDiffs);
         pageInfo.setTotal(refundPriceDiffMapper.selectByAgentCount(reqMap));
+        return pageInfo;
+    }
+
+    /**
+     * 导出-活动调整
+     * @param refundPriceDiff
+     * @param pageInfo
+     * @param isPlan
+     * @return
+     */
+    @Override
+    public PageInfo exportRefundPriceDiff(ORefundPriceDiffVo refundPriceDiff, PageInfo pageInfo, Boolean isPlan) {
+        Map<String, Object> reqMap = new HashMap<>();
+        if (null != refundPriceDiff.getReviewStatus()) {
+            reqMap.put("reviewStatus", refundPriceDiff.getReviewStatus());
+        }
+        if (StringUtils.isNotBlank(refundPriceDiff.getApplyBeginTime())) {
+            reqMap.put("applyBeginTime", refundPriceDiff.getApplyBeginTime());
+        }
+        if (StringUtils.isNotBlank(refundPriceDiff.getApplyEndTime())) {
+            reqMap.put("applyEndTime", refundPriceDiff.getApplyEndTime());
+        }
+        if (StringUtils.isNotBlank(refundPriceDiff.getAgentId())) {
+            reqMap.put("agentId", refundPriceDiff.getAgentId());
+        }
+        if (StringUtils.isNotBlank(refundPriceDiff.getAgentName())) {
+            reqMap.put("agentName", refundPriceDiff.getAgentName());
+        }
+        int count = refundPriceDiffMapper.selectByAgentCount(reqMap);
+        List<Map<String, Object>> list = refundPriceDiffMapper.selectByAgent(reqMap, null);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        for (Map<String, Object> maps : list) {
+            if (StringUtils.isNotBlank(String.valueOf(maps.get("GATHER_TIME"))) && !String.valueOf(maps.get("GATHER_TIME")).equals("null")) {
+                maps.put("GATHER_TIME", format.format((Date)maps.get("GATHER_TIME")));
+            }
+            if (StringUtils.isNotBlank(String.valueOf(maps.get("S_TIME"))) && !String.valueOf(maps.get("S_TIME")).equals("null")) {
+                maps.put("S_TIME", format.format((Date)maps.get("S_TIME")));
+            }
+            if (StringUtils.isNotBlank(String.valueOf(maps.get("U_TIME"))) && !String.valueOf(maps.get("U_TIME")).equals("null")) {
+                maps.put("U_TIME", format.format((Date)maps.get("U_TIME")));
+            }
+            if (StringUtils.isNotBlank(String.valueOf(maps.get("REVIEW_STATUS"))) && !String.valueOf(maps.get("REVIEW_STATUS")).equals("null")) {
+                String review_status = AgStatus.getMsg(new BigDecimal(String.valueOf(maps.get("REVIEW_STATUS"))));
+                if (null != review_status) {
+                    maps.put("REVIEW_STATUS", review_status);
+                }
+            }
+            if (StringUtils.isNotBlank(String.valueOf(maps.get("ORDER_TYPE"))) && !String.valueOf(maps.get("ORDER_TYPE")).equals("null")) {
+//                String order_type = OrderType.getContentByValue(new BigDecimal(String.valueOf(maps.get("ORDER_TYPE"))));
+//                if (null != order_type) {
+//                    maps.put("ORDER_TYPE", order_type);
+//                }
+                if (String.valueOf(maps.get("ORDER_TYPE")).equals("1")) {
+                    maps.put("ORDER_TYPE", "新订单");
+                } else if(String.valueOf(maps.get("ORDER_TYPE")).equals("2")) {
+                    maps.put("ORDER_TYPE", "历史订单");
+                }
+            }
+        }
+        pageInfo.setTotal(count);
+        pageInfo.setRows(list);
+        return pageInfo;
+    }
+
+    /**
+     * 导出-活动调整明细
+     * @param refundPriceDiffDetail
+     * @param pageInfo
+     * @param isPlan
+     * @return
+     */
+    @Override
+    public PageInfo exportRefundPriceDiffDetail(ORefundPriceDiffDetail refundPriceDiffDetail, PageInfo pageInfo, Boolean isPlan) {
+        ORefundPriceDiffDetailExample refundPriceDiffDetailExample = new ORefundPriceDiffDetailExample();
+        ORefundPriceDiffDetailExample.Criteria criteria = refundPriceDiffDetailExample.createCriteria();
+        if (StringUtils.isNotBlank(refundPriceDiffDetail.getAgentId())) {
+            criteria.andAgentIdEqualTo(refundPriceDiffDetail.getAgentId());
+        }
+        if (StringUtils.isNotBlank(refundPriceDiffDetail.getRefundPriceDiffId())) {
+            criteria.andRefundPriceDiffIdEqualTo(refundPriceDiffDetail.getRefundPriceDiffId());
+        }
+        FastMap par = FastMap.fastSuccessMap();
+        if (StringUtils.isNotBlank(refundPriceDiffDetail.getAgentId())) {
+            par.putKeyV("agentId", refundPriceDiffDetail.getAgentId());
+        }
+        if (StringUtils.isNotBlank(refundPriceDiffDetail.getRefundPriceDiffId())) {
+            par.putKeyV("refundPriceDiffId", refundPriceDiffDetail.getRefundPriceDiffId());
+        }
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        long count = refundPriceDiffDetailMapper.countByExample(refundPriceDiffDetailExample);
+        List<Map> list = refundPriceDiffDetailMapper.selectByExampleExtends(par,null);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        for (Map maps : list) {
+            if (StringUtils.isNotBlank(String.valueOf(maps.get("orderType"))) && !String.valueOf(maps.get("orderType")).equals("null")) {
+//                String order_type = OrderType.getContentByValue(new BigDecimal(String.valueOf(maps.get("orderType"))));
+//                if (null != order_type) {
+//                    maps.put("orderType", order_type);
+//                }
+                if (String.valueOf(maps.get("orderType")).equals("1")) {
+                    maps.put("orderType", "新订单");
+                } else if(String.valueOf(maps.get("orderType")).equals("2")) {
+                    maps.put("orderType", "历史订单");
+                }
+            }
+            if (StringUtils.isNotBlank(String.valueOf(maps.get("uTime"))) && !String.valueOf(maps.get("uTime")).equals("null")) {
+                maps.put("uTime", format.format((Date)maps.get("uTime")));
+            }
+        }
+        pageInfo.setTotal((int)count);
+        pageInfo.setRows(list);
         return pageInfo;
     }
 

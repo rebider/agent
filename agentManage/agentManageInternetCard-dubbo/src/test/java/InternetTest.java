@@ -5,6 +5,7 @@ import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.order.IPaymentDetailService;
 import com.ryx.internet.pojo.OInternetRenewDetail;
+import com.ryx.internet.service.InternetCardService;
 import com.ryx.internet.service.OInternetRenewService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ public class InternetTest extends BaseSpringTest {
     @Autowired
     private OInternetRenewService internetRenewService;
 
+    @Autowired
+    private InternetCardService internetCardService;
+
     @Test
     public void test1() throws MessageException {
         Map<String,Object> reqMap = new HashMap<>();
@@ -31,6 +35,13 @@ public class InternetTest extends BaseSpringTest {
         reqMap.put("agentIdList",agentIdList);
         AgentResult agentResult = internetRenewService.queryCardProfit(reqMap);
         System.out.println(agentResult.toString());
+    }
+
+    @Test
+    public void test2() throws MessageException {
+        internetCardService.taskDisposeInternetCard();
+        System.out.println();
+        internetCardService.taskDisposeInternetCard();
     }
 
 }

@@ -178,7 +178,7 @@ public class TermMachineServiceImpl  implements TermMachineService {
     public AgentResult queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailLists, String operation) throws Exception {
         String type = terminalTransferDetailLists.get(0).getPlatformType().toString();
         logger.info("本次联动请求类型为:{}",type);
-        if("1".equals(type)){//pos
+      if("1".equals(type)||"4".equals(type)){//pos
             return   posTermMachineServiceImpl.queryTerminalTransfer(terminalTransferDetailLists,operation);
         }else if("2".equals(type)){//手刷
             return   mposTermMachineServiceImpl.queryTerminalTransfer(terminalTransferDetailLists,operation);
@@ -195,7 +195,7 @@ public class TermMachineServiceImpl  implements TermMachineService {
         AgentResult agentResult=null;
         logger.info("本次联动查询结果类型为:{}",type);
         if("1".equals(type)){//pos
-            agentResult =  posTermMachineServiceImpl.queryTerminalTransferResult(serialNumber,type);
+         agentResult =  posTermMachineServiceImpl.queryTerminalTransferResult(serialNumber,type);
         }else if("2".equals(type)){//手刷
             agentResult =  mposTermMachineServiceImpl.queryTerminalTransferResult(serialNumber,type);
         }else if("3".equals(type)){//瑞大宝
@@ -225,7 +225,7 @@ public class TermMachineServiceImpl  implements TermMachineService {
     @Override
     public AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception {
         AgentResult agentResult = AgentResult.fail();
-        if(PlatformType.whetherPOS(platformType)){
+        if(PlatformType.POS.getValue().equals(platformType)){
             agentResult =  posTermMachineServiceImpl.queryCompensateResult(serialNumber,platformType);
         }else if(PlatformType.SSPOS.getValue().equals(platformType)){
             agentResult =  sPosTermMachineServiceImpl.queryCompensateResult(serialNumber,platformType);
@@ -262,9 +262,9 @@ public class TermMachineServiceImpl  implements TermMachineService {
         if (PlatformType.whetherPOS(platformType)) {
             return posTermMachineServiceImpl.checkOrderReturnSN(list, platformType);
         } else if (PlatformType.SSPOS.getValue().equals(platformType)) {
-            return sPosTermMachineServiceImpl.checkOrderReturnSN(list, platformType);
+            return rdbTermMachineServiceImpl.checkOrderReturnSN(list, platformType);
         } else if (PlatformType.MPOS.getValue().equals(platformType)) {
-            return mposTermMachineServiceImpl.checkOrderReturnSN(list, platformType);
+            return rdbTermMachineServiceImpl.checkOrderReturnSN(list, platformType);
         } else if (PlatformType.RDBPOS.getValue().equals(platformType)) {
             return rdbTermMachineServiceImpl.checkOrderReturnSN(list, platformType);
         } else {
@@ -278,9 +278,9 @@ public class TermMachineServiceImpl  implements TermMachineService {
         if (PlatformType.whetherPOS(platformType)) {
             return posTermMachineServiceImpl.unfreezeOrderReturnSN(list, platformType);
         } else if (PlatformType.SSPOS.getValue().equals(platformType)) {
-            return sPosTermMachineServiceImpl.unfreezeOrderReturnSN(list, platformType);
+            return rdbTermMachineServiceImpl.unfreezeOrderReturnSN(list, platformType);
         } else if (PlatformType.MPOS.getValue().equals(platformType)) {
-            return mposTermMachineServiceImpl.unfreezeOrderReturnSN(list, platformType);
+            return rdbTermMachineServiceImpl.unfreezeOrderReturnSN(list, platformType);
         } else if (PlatformType.RDBPOS.getValue().equals(platformType)) {
             return rdbTermMachineServiceImpl.unfreezeOrderReturnSN(list, platformType);
         } else {
