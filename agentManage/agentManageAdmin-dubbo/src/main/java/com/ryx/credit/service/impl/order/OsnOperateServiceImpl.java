@@ -1262,7 +1262,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
         if (null == fastMap.get("beginSN")) return FastMap.fastFailMap("起始SN为空！");
         if (null == fastMap.get("endSN")) return FastMap.fastFailMap("结束SN为空！");
 
-        if (!(null != fastMap.get("type") && "transfer".equals(fastMap.get("type")))) {
+        if (!(null != fastMap.get("type") && "transfer".equals(fastMap.get("type").toString()))) {
             //检验SN是否处于划拨中
             int checkTransCount = terminalTransferMapper.checkSnIsTransfer(FastMap
                     .fastMap("begin", fastMap.get("beginSN"))
