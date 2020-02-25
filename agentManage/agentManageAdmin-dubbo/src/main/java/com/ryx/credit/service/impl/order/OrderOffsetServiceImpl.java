@@ -143,7 +143,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                             residue = BigDecimal.ZERO;
                         }else if(residue.compareTo(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()))==1){
                             residue = residue.subtract(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
-                            oPayDetail.setAmount(paymentDetail.getPayAmount());
+                            oPayDetail.setAmount(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
                             oPayDetail.setSrcId(oSupplement.getId());
                             logger.info("还款--------:"+paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
                         }
@@ -242,7 +242,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                         residue = BigDecimal.ZERO;
                     }else if(residue.compareTo(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()))==1){
                         residue = residue.subtract(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
-                        oPayDetail.setAmount(paymentDetail.getPayAmount());
+                        oPayDetail.setAmount(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
                         oPayDetail.setSrcId(oRemoveAccount.getId());
                         logger.info("还款--------:"+paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
                     }
@@ -338,7 +338,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                         residue = BigDecimal.ZERO;
                     }else if(residue.compareTo(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()))==1){
                         residue = residue.subtract(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
-                        oPayDetail.setAmount(paymentDetail.getPayAmount());
+                        oPayDetail.setAmount(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
                         oPayDetail.setSrcId(srcId);
                         logger.info("还款--------:"+paymentDetail.getPayAmount());
                     }
@@ -439,7 +439,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                         residue = BigDecimal.ZERO;
                     }else if(residue.compareTo(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()))==1){
                         residue = residue.subtract(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
-                        oPayDetail.setAmount(paymentDetail.getPayAmount());
+                        oPayDetail.setAmount(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
                         oPayDetail.setSrcId(srcId);
                         logger.info("还款--------:"+paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
                     }
@@ -540,7 +540,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                         residue = BigDecimal.ZERO;
                     }else if(residue.compareTo(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()))==1){
                         residue = residue.subtract(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
-                        oPayDetail.setAmount(paymentDetail.getPayAmount());
+                        oPayDetail.setAmount(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
                         oPayDetail.setSrcId(srcId);
                         logger.info("还款--------:"+paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
                     }
@@ -631,7 +631,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                         residue = BigDecimal.ZERO;
                     }else if(residue.compareTo(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()))==1){
                         residue = residue.subtract(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
-                        oPayDetail.setAmount(paymentDetail.getPayAmount());
+                        oPayDetail.setAmount(paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
                         oPayDetail.setSrcId(srcId);
                         logger.info("还款--------:"+paymentDetail.getPayAmount().subtract(paymentDetail.getRealPayAmount()));
                     }
