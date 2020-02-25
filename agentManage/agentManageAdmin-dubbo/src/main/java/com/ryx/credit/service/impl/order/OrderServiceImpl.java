@@ -4426,14 +4426,17 @@ public class OrderServiceImpl implements OrderService {
                 BigDecimal proRefundAmo = orderAdj.getProRefundAmount() == null ? BigDecimal.ZERO : orderAdj.getProRefundAmount();
                 //机具已抵扣金额
                 BigDecimal takeout_amount = orderAdj.getOffsetAmount() == null ? new BigDecimal(0) : orderAdj.getOffsetAmount();
-                List<OPaymentDetail> paymentDetails = paymentDetailService.getCanTakeoutPaymentsByAgentId(orderAdj.getAgentId(), AdjustType.ORDER_ADJ.adjustType, orderAdj.getId());
-                AgentResult agentResult= orderOffsetService.OffsetArrears(paymentDetails, amount.subtract(proRefundAmo).subtract(takeout_amount), DDTZ.code, orderAdj.getId());
-                if (agentResult.isOK()){
-                    BigDecimal residue =  (BigDecimal) agentResult.getMapData().get("residueAmt");
-                    orderAdj.setOffsetAmount(amount.subtract(proRefundAmo).subtract(takeout_amount).subtract(residue));
-                    if(!orderService.approvalTaskSettle(orderAdj).isOK()){
-                        return AgentResult.fail("更新订单调整记录失败!");
-                    };
+                if (amount.subtract(proRefundAmo).subtract(takeout_amount).compareTo(BigDecimal.ZERO) == 1){
+                    logger.info("退款金额大于0,进行抵扣入库");
+                    List<OPaymentDetail> paymentDetails = paymentDetailService.getCanTakeoutPaymentsByAgentId(orderAdj.getAgentId(), AdjustType.ORDER_ADJ.adjustType, orderAdj.getId());
+                    AgentResult agentResult= orderOffsetService.OffsetArrears(paymentDetails, amount.subtract(proRefundAmo).subtract(takeout_amount), DDTZ.code, orderAdj.getId());
+                    if (agentResult.isOK()){
+                        BigDecimal residue =  (BigDecimal) agentResult.getMapData().get("residueAmt");
+                        orderAdj.setOffsetAmount(amount.subtract(proRefundAmo).subtract(takeout_amount).subtract(residue));
+                        if(!orderService.approvalTaskSettle(orderAdj).isOK()){
+                            return AgentResult.fail("更新订单调整记录失败!");
+                        };
+                    }
                 }
             }
             //财务审批
@@ -4559,11 +4562,18 @@ public class OrderServiceImpl implements OrderService {
                 throw new MessageException("请重新提交！");
             }
             OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(busActRel.getBusId());
-            AgentResult agentResult = orderOffsetService.OffsetArrearsCommit(orderAdj.getOffsetAmount(), DDTZ.code, orderAdj.getId());
-            if (!agentResult.isOK()){
-                throw new MessageException("订单调整数据更新异常！");
+            //应该退款金额
+            BigDecimal amount = orderAdj.getRefundAmount() == null ? new BigDecimal(0) : orderAdj.getRefundAmount();
+            //手续费
+            BigDecimal proRefundAmo = orderAdj.getProRefundAmount() == null ? BigDecimal.ZERO : orderAdj.getProRefundAmount();
+            //机具已抵扣金额
+            BigDecimal takeout_amount = orderAdj.getOffsetAmount() == null ? new BigDecimal(0) : orderAdj.getOffsetAmount();
+            if (amount.subtract(proRefundAmo).subtract(takeout_amount).compareTo(BigDecimal.ZERO) == 1) {
+                AgentResult agentResult = orderOffsetService.OffsetArrearsCommit(orderAdj.getOffsetAmount(), DDTZ.code, orderAdj.getId());
+                if (!agentResult.isOK()) {
+                    throw new MessageException("订单调整数据更新异常！");
+                }
             }
-
             if (orderAdj.getReviewsStat().compareTo(AgStatus.Approved.status) == 0) {
                 logger.info("订单调整审批完成:已审批过:{}", orderAdj.getId());
                 return AgentResult.ok();
