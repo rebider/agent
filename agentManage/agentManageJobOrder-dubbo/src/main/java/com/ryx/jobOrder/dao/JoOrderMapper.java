@@ -26,4 +26,8 @@ public interface JoOrderMapper {
     List<Map<String, Object>> queryJobOrderList(Map<String, Object> param);
 
     int queryJobOrderListCount(Map<String, Object> param);
+
+    List<Map<String, Object>> queryJobOrderLaunchList(Map<String, Object> param);
+
+    int queryJobOrderLaunchListCount(Map<String, Object> param);
 }
