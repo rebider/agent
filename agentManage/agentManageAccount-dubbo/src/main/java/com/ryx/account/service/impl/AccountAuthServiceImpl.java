@@ -248,6 +248,19 @@ public class AccountAuthServiceImpl implements AccountAuthService {
             resultMap.put("tokenCodeEndTime",authLoginToken.getTokenEndTime().getTime());
             return resultMap;
         }
+        AuthLoginTokenExample authLoginTokenExample1 = new AuthLoginTokenExample();
+        AuthLoginTokenExample.Criteria criteria1 = authLoginTokenExample1.createCriteria();
+        criteria1.andStatusEqualTo(Status.STATUS_1.status.toString());
+        criteria1.andPlatformTypeEqualTo(platformType);
+        criteria1.andLogNameEqualTo(loginName);
+        List<AuthLoginToken> authLoginTokenList = authLoginTokenMapper.selectByExample(authLoginTokenExample1);
+        for (AuthLoginToken authLoginToken : authLoginTokenList) {
+            authLoginToken.setStatus(Status.STATUS_0.status.toString());
+            int i = authLoginTokenMapper.updateByPrimaryKeySelective(authLoginToken);
+            if(i!=1){
+                throw new MessageException("令牌获取异常!");
+            }
+        }
 
         AuthLoginToken authLoginToken = new AuthLoginToken();
         authLoginToken.setId(idService.genId(TabId.AUTH_LOGIN_TOKEN));
