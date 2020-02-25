@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 
 /***
@@ -350,11 +349,10 @@ public class AccountAuthServiceImpl implements AccountAuthService {
         if(authLoginToken.getTokenEndTime().getTime()<new Date().getTime()){
             throw new MessageException("令牌已过期");
         }
-        String busInfo = authLoginToken.getBusInfo();
-
         Map<String,Object> resultMap = new HashMap<>();
         resultMap.put("loginName",authLoginToken.getLogName());
-        resultMap.put("busInfo",busInfo);
+        List<Map<String,Object>> resultList = JSONObject.parseObject(authLoginToken.getBusInfo(),List.class);
+        resultMap.put("busInfo",resultList);
         return resultMap;
     }
 
