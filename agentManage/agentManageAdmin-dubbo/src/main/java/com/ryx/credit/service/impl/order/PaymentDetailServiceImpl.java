@@ -208,7 +208,7 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public ResultVO uploadStatus(List<Map<String, Object>> maps,BigDecimal payStatus) {
+    public ResultVO  fenrunDeduction(List<Map<String, Object>> maps,BigDecimal payStatus) {
         if (null == maps && maps.size() < 0) {
             logger.info("更新数据为空:{}", maps);
             return ResultVO.fail("更新数据为空");
@@ -451,10 +451,13 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public ResultVO fenrunDeduction(List<Map<String, Object>> maps,BigDecimal payStatus){
+    public ResultVO uploadStatus(List<Map<String, Object>> maps,BigDecimal payStatus){
         if (null == maps && maps.size() < 0) {
             logger.info("更新数据为空:{}", maps);
             return ResultVO.fail("更新数据为空");
+        }else if(null != maps || maps.size() >0){
+            logger.info("分润抵扣有误:{}", maps);
+            return ResultVO.fail("分润抵扣有误");
         }
         if (null==payStatus) {
             logger.info("支付状态为空:{}", maps);
