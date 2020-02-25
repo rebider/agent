@@ -410,7 +410,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             FastMap fastMap = osnOperateService.checkSNApproval(FastMap
                     .fastMap("beginSN", terminalTransferDetail.getSnBeginNum())
                     .putKeyV("endSN", terminalTransferDetail.getSnEndNum())
-                    .putKeyV("type","transfer "));
+                    .putKeyV("type","transfer"));
             if (!FastMap.isSuc(fastMap)) throw new MessageException(fastMap.get("msg").toString());
             String snBeginNum = terminalTransferDetail.getSnBeginNum();
             String snEndNum = terminalTransferDetail.getSnEndNum();
@@ -1518,7 +1518,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             FastMap fastMap = osnOperateService.checkSNApproval(FastMap
                     .fastMap("beginSN", terminalTransferDetail.getSnBeginNum())
                     .putKeyV("endSN", terminalTransferDetail.getSnEndNum())
-                    .putKeyV("type","transfer "));
+                    .putKeyV("type","transfer"));
             if (!FastMap.isSuc(fastMap)) throw new MessageException(fastMap.get("msg").toString());
 
             String snBeginNum = terminalTransferDetail.getSnBeginNum();
