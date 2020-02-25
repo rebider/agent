@@ -267,7 +267,7 @@ public class AccountAuthServiceImpl implements AccountAuthService {
         authLoginTokenMapper.insertSelective(authLoginToken);
 
         Map<String,Object> resultMap = new HashMap<>();
-        resultMap.put("tokenCode",authLoginToken.getAuthCode());
+        resultMap.put("tokenCode",authLoginToken.getToken());
         resultMap.put("tokenCodeBeginTime",authLoginToken.getTokenBeginTime().getTime());
         resultMap.put("tokenCodeEndTime",authLoginToken.getTokenEndTime().getTime());
         return resultMap;
