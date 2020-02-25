@@ -3,6 +3,7 @@ package com.ryx.credit.service.impl.order;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.FastMap;
@@ -26,6 +27,7 @@ import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.BusinessPlatformService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
+import com.ryx.credit.service.order.OsnOperateService;
 import com.ryx.credit.service.order.TerminalTransferDetail2;
 import com.ryx.credit.service.order.TerminalTransferService;
 import org.slf4j.Logger;
@@ -94,6 +96,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     private TermMachineService termMachineService;
     @Autowired
     private TerminalTransferDetail2 terminalTransferDetail2;
+    @Autowired
+    private OsnOperateService osnOperateService;
 
     private String QUERY_SWITCH = "TerminalTransfer:ISOPEN_RES_QUERY";
     private String TRANS_SWITCH = "TerminalTransfer:ISOPEN_RES_trans";
@@ -398,9 +402,16 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             }
         }
 
+
 //提交是否含有重复SN在审核中
 
         for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailList) {
+            //检查sn是否在划拨，换活动，退货审批中
+            FastMap fastMap = osnOperateService.checkSNApproval(FastMap
+                    .fastMap("beginSN", terminalTransferDetail.getSnBeginNum())
+                    .putKeyV("endSN", terminalTransferDetail.getSnEndNum())
+                    .putKeyV("type","transfer "));
+            if (!FastMap.isSuc(fastMap)) throw new MessageException(fastMap.get("msg").toString());
             String snBeginNum = terminalTransferDetail.getSnBeginNum();
             String snEndNum = terminalTransferDetail.getSnEndNum();
             Map<String, Object> map3 = disposeSN(snBeginNum, snEndNum);
@@ -664,6 +675,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             judgeSubSup(terminalTransferDetailList, agentId);
             //判断sn
             repetitionSN(terminalTransferDetailList);
+
 
             terminalTransfer.setReviewStatus(AgStatus.Create.status);
             String terminalTransferId = idService.genId(TabId.O_TERMINAL_TRANSFER);
@@ -1501,6 +1513,14 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
 //提交是否含有重复SN在审核中
 
         for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailList) {
+
+            //检查sn是否在划拨，换活动，退货审批中
+            FastMap fastMap = osnOperateService.checkSNApproval(FastMap
+                    .fastMap("beginSN", terminalTransferDetail.getSnBeginNum())
+                    .putKeyV("endSN", terminalTransferDetail.getSnEndNum())
+                    .putKeyV("type","transfer "));
+            if (!FastMap.isSuc(fastMap)) throw new MessageException(fastMap.get("msg").toString());
+
             String snBeginNum = terminalTransferDetail.getSnBeginNum();
             String snEndNum = terminalTransferDetail.getSnEndNum();
             Map<String, Object> map3 = disposeSN(snBeginNum, snEndNum);
