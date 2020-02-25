@@ -1,5 +1,6 @@
 package com.ryx.jobOrder.service;
 
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -17,6 +18,6 @@ public interface JobOrderQueryService {
 
     PageInfo jobOrderQueryLaunchList(Map map, Page page);
 
-    AgentResult jobOrderCancle(Map map);
+    AgentResult jobOrderCancle(Map map) throws MessageException;
 
 }
