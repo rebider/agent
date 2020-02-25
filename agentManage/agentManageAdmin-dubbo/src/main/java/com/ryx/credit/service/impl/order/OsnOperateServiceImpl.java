@@ -1262,13 +1262,15 @@ public class OsnOperateServiceImpl implements OsnOperateService {
         if (null == fastMap.get("beginSN")) return FastMap.fastFailMap("起始SN为空！");
         if (null == fastMap.get("endSN")) return FastMap.fastFailMap("结束SN为空！");
 
-        //检验SN是否处于划拨中
-        int checkTransCount = terminalTransferMapper.checkSnIsTransfer(FastMap
-                .fastMap("begin", fastMap.get("beginSN"))
-                .putKeyV("end", fastMap.get("endSN"))
-                .putKeyV("reviewStatus", AgStatus.Approving.status)
-        );
-        if(checkTransCount > 0)  return FastMap.fastFailMap("SN:"+fastMap.get("beginSN")+"-"+fastMap.get("endSN")+"已经提交划拨审批，审批结束后，才可以再次提交。");
+        if (!(null != fastMap.get("type") && "transfer".equals(fastMap.get("type")))) {
+            //检验SN是否处于划拨中
+            int checkTransCount = terminalTransferMapper.checkSnIsTransfer(FastMap
+                    .fastMap("begin", fastMap.get("beginSN"))
+                    .putKeyV("end", fastMap.get("endSN"))
+                    .putKeyV("reviewStatus", AgStatus.Approving.status)
+            );
+            if(checkTransCount > 0)  return FastMap.fastFailMap("SN:"+fastMap.get("beginSN")+"-"+fastMap.get("endSN")+"已经提交划拨审批，审批结束后，才可以再次提交。");
+        }
 
         //检验SN是否处于换活动中
         int checkRefundCount = refundPriceDiffMapper.checkSnIsRefund(FastMap
