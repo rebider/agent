@@ -304,7 +304,7 @@ public class CompensateServiceImpl implements CompensateService {
             throw new ProcessException("导入解析文件失败");
         }
         if(compensateLList.size()==0){
-            throw new ProcessException("sn号在审批中或已退货");
+            throw new ProcessException("当前SN:"+snBegin+"-"+snEnd+"在审批中或已退货");
         }
         BigDecimal proNumSum = new BigDecimal(0);
         Set<String> platformTypeSet = new HashSet<>();
