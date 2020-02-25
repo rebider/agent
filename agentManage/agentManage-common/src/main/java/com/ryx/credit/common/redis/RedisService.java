@@ -15,6 +15,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import com.alibaba.fastjson.JSON;
 import org.springframework.data.redis.core.SessionCallback;
+import org.springframework.data.redis.support.atomic.RedisAtomicLong;
 
 public class RedisService {
 
@@ -559,5 +560,27 @@ public class RedisService {
     public Set<String> smembers(String key){
         return redisTemplate.opsForSet().members(key);
     }
+
+
+    /**
+     * 获取自增
+     * @param key
+     * @return
+     */
+    public long getAndIncrement(String key){
+        RedisAtomicLong entityIdCounter = new RedisAtomicLong(key, redisTemplate.getConnectionFactory());
+        return entityIdCounter.getAndIncrement();
+    }
+
+    /**
+     * 自增获取
+     * @param key
+     * @return
+     */
+    public long incrementAndGet(String key){
+        RedisAtomicLong entityIdCounter = new RedisAtomicLong(key, redisTemplate.getConnectionFactory());
+        return entityIdCounter.incrementAndGet();
+    }
+
 
 }
