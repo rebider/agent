@@ -37,4 +37,6 @@ public interface ORefundPriceDiffMapper {
      * @return
      */
     int selectReviewStatusBySN(@Param("map") Map map);
+
+    int checkSnIsRefund(Map map);
 }
