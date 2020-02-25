@@ -20,6 +20,9 @@ import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
@@ -84,6 +87,7 @@ public class AccountAuthServiceImpl implements AccountAuthService {
      * @throws MessageException
      */
     @Override
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     public Map<String,Object> getAuthCode(String platformType, String serverIp)throws MessageException{
 
         commonVerify(platformType);
@@ -97,7 +101,18 @@ public class AccountAuthServiceImpl implements AccountAuthService {
         if(authSysCodes.size()!=0){
             throw new MessageException("授权码尚未失效，请勿重复请求");
         }
-
+        AuthSysCodeExample authSysCodeExample1 = new AuthSysCodeExample();
+        AuthSysCodeExample.Criteria criteria1 = authSysCodeExample1.createCriteria();
+        criteria1.andStatusEqualTo(Status.STATUS_1.status.toString());
+        criteria1.andPlatformTypeEqualTo(platformType);
+        List<AuthSysCode> authSysCodeList = authSysCodeMapper.selectByExample(authSysCodeExample1);
+        for (AuthSysCode authSysCode : authSysCodeList) {
+            authSysCode.setStatus(Status.STATUS_0.status.toString());
+            int i = authSysCodeMapper.updateByPrimaryKeySelective(authSysCode);
+            if(i!=1){
+                throw new MessageException("获取授权码失败");
+            }
+        }
         AuthSysCode authSysCode = new AuthSysCode();
         authSysCode.setId(idService.genId(TabId.AUTH_SYS_CODE));
         authSysCode.setPlatformType(platformType);
