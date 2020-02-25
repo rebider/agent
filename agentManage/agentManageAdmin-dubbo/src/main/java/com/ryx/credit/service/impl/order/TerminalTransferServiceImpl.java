@@ -887,6 +887,11 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         criteria.andTerminalTransferIdEqualTo(terminalTransfer.getId());
         criteria.andStatusEqualTo(new BigDecimal("1"));
         List<TerminalTransferDetail> terminalTransferDetails = terminalTransferDetailMapper.selectByExample(terminalTransferDetailExample);
+        for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetails) {
+            //判断代理商名称吧
+            Map<String, String> resultMap = saveOrEditVerify(terminalTransferDetail, agentId);
+        }
+        //判断平台是否属于提交平台
         platformSame(terminalTransferDetails, SaveFlag.TJSP.getValue());
         if (terminalTransfer == null) {
             throw new MessageException("提交审批信息有误");
