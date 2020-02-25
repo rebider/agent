@@ -1,11 +1,15 @@
 package com.ryx.jobOrder.service.impl;
 
+import com.ryx.credit.common.enumc.JoOrderStatus;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.result.Result;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.service.IUserService;
 import com.ryx.jobOrder.dao.JoOrderMapper;
+import com.ryx.jobOrder.dao.JobOrderAuthMapper;
 import com.ryx.jobOrder.pojo.JoOrder;
 import com.ryx.jobOrder.pojo.JoOrderExample;
 import com.ryx.jobOrder.service.JobOrderQueryService;
@@ -13,6 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -72,12 +79,30 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
     }
 
     @Override
-    public Result jobOrderCancle(Map map) {
-        JoOrder joOrder = joOrderMapper.selectByPrimaryKey(String.valueOf(map.get("jobId")));
+    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    public AgentResult jobOrderCancle(Map map) {
+        logger.info("--查找取消的工单--"+map.get("jobId"));
+        AgentResult agentResult = AgentResult.fail("撤销工单失败!");
         JoOrderExample joOrderExample = new JoOrderExample();
-        joOrderExample.or().andIdEqualTo(joOrder.getId());
-        int i = joOrderMapper.updateByPrimaryKeySelective(joOrder);
-        return null;
+        joOrderExample.or().andIdEqualTo(String.valueOf(map.get("jobId")))
+        .andJoProgressEqualTo(JoOrderStatus.WCL.key)
+        .andLaunchPersonIdEqualTo(String.valueOf(map.get("userId")));
+        List<JoOrder> joOrders = joOrderMapper.selectByExample(joOrderExample);
+        if (joOrders != null && joOrders.size() == 1){
+            JoOrder joOrder = joOrders.get(0);
+            joOrder.setJoProgress(JoOrderStatus.CANCLE.key);
+            if (joOrderMapper.updateByPrimaryKeySelective(joOrder)==1){
+                agentResult.setStatus(200);
+                agentResult.setMsg("撤销工单成功");
+                logger.error("--撤销工单成功--"+map.get("jobId"));
+                return agentResult;
+            }else {
+                logger.error("--撤销工单失败--"+map.get("jobId"));
+                return agentResult;
+            }
+        }
+
+        return agentResult;
     }
 
 }

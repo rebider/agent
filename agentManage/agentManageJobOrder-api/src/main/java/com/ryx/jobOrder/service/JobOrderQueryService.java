@@ -1,8 +1,8 @@
 package com.ryx.jobOrder.service;
 
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
-import com.ryx.credit.commons.result.Result;
 import com.ryx.jobOrder.pojo.JoOrder;
 
 import java.util.Map;
@@ -17,6 +17,6 @@ public interface JobOrderQueryService {
 
     PageInfo jobOrderQueryLaunchList(Map map, Page page);
 
-    Result jobOrderCancle(Map map);
+    AgentResult jobOrderCancle(Map map);
 
 }
