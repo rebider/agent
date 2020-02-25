@@ -26,10 +26,7 @@ import com.ryx.credit.service.agent.BusActRelService;
 import com.ryx.credit.service.dict.DepartmentService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
-import com.ryx.credit.service.order.IOrderReturnService;
-import com.ryx.credit.service.order.OLogisticsDetailService;
-import com.ryx.credit.service.order.OLogisticsService;
-import com.ryx.credit.service.order.PlannerService;
+import com.ryx.credit.service.order.*;
 import org.apache.commons.collections4.Put;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -141,7 +138,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     private DepartmentService departmentService;
     @Autowired
     private OActivityVisibleMapper activityVisibleMapper;
-
+    @Autowired
+    private OsnOperateService osnOperateService;
 
     /**
      * @Author: Zhang Lei
@@ -653,12 +651,13 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 String endSn = (String) map.get("endSn");
                 Integer begins = (Integer) map.get("begins");
                 Integer finish = (Integer) map.get("finish");
-                int checkCount = returnOrderDetailMapper.checkSnIsReturn(FastMap
-                        .fastMap("begin",startSn)
-                        .putKeyV("end",endSn)
-                        .putKeyV("sts",Arrays.asList(RetSchedule.DFH.code,RetSchedule.FHZ.code,RetSchedule.SPZ.code,RetSchedule.TH.code,RetSchedule.TKZ.code,RetSchedule.YFH.code))
-                );
-                if(checkCount>0)throw new ProcessException(startSn+":"+endSn+"在退货中");
+
+                //检查sn是否在划拨，换活动，退货中
+                FastMap fastMap = osnOperateService.checkSNApproval(FastMap
+                        .fastMap("beginSN", startSn)
+                        .putKeyV("endSN", endSn));
+                if (!FastMap.isSuc(fastMap)) throw new ProcessException(fastMap.get("msg").toString());
+
                 List<String> sns = logisticsDetailService.querySnLList(startSn, endSn);
                 for (String sn : sns) {
                     //根据sn查询物流信息
