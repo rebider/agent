@@ -287,7 +287,7 @@ public class CapitalServiceImpl implements CapitalService {
             }
         }
 
-        if (residueAmt.compareTo(BigDecimal.ZERO) == 1) {
+        if (residueAmt.compareTo(BigDecimal.ZERO) > 1) {
             throw new MessageException("缴款金额不足，无法进行全额冻结");
         }
     }
