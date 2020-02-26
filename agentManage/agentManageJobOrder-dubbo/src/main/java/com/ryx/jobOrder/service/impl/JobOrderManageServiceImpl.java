@@ -10,6 +10,8 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.jobOrder.dao.JoCustomKeyMapper;
 import com.ryx.jobOrder.dao.JoKeyManageMapper;
+import com.ryx.jobOrder.pojo.JoCustomKey;
+import com.ryx.jobOrder.pojo.JoCustomKeyExample;
 import com.ryx.jobOrder.pojo.JoKeyManage;
 import com.ryx.jobOrder.pojo.JoKeyManageExample;
 import com.ryx.jobOrder.service.JobOrderManageService;
@@ -100,15 +102,15 @@ public class JobOrderManageServiceImpl implements JobOrderManageService {
     }
 
     @Override
-    public List<JoKeyManage> queryKeywordByJoStatus(String joKeyType) {
+    public List<JoKeyManage> queryKeywordByJoStatus(JoKeyManage joKeyManage) {
         JoKeyManageExample joKeyManageExample = new JoKeyManageExample();
         JoKeyManageExample.Criteria criteria = joKeyManageExample.createCriteria();
-        if (StringUtils.isNotBlank(joKeyType)){
-            criteria.andJoKeyTypeEqualTo(joKeyType);
+        if (StringUtils.isNotBlank(joKeyManage.getJoKeyType())){
+            criteria.andJoKeyTypeEqualTo(joKeyManage.getJoKeyType());
         }
-        /*if(StringUtils.isNotBlank(joKeyBackNum)){
-            criteria.andJoKeyBackNumEqualTo(joKeyBackNum);
-        }*/
+        if(StringUtils.isNotBlank(joKeyManage.getJoKeyBackNum())){
+            criteria.andJoKeyBackNumEqualTo(joKeyManage.getJoKeyBackNum());
+        }
         criteria.andJoStatusEqualTo(Status.STATUS_1.status.toString());
         List<JoKeyManage> joKeyManageList = joKeyManageMapper.selectByExample(joKeyManageExample);
         if(null!=joKeyManageList && joKeyManageList.size()>0){
@@ -121,6 +123,17 @@ public class JobOrderManageServiceImpl implements JobOrderManageService {
     @Override
     public List selectLevel() {
         List<Map<String, Object>> mapList = joKeyManageMapper.selectLevel();
+        return mapList;
+    }
+
+    @Override
+    public List selectCustomListBySedType(JoCustomKey joCustomKey) {
+        JoCustomKeyExample example = new JoCustomKeyExample();
+        JoCustomKeyExample.Criteria criteria = example.createCriteria();
+        if(StringUtils.isNotBlank(joCustomKey.getJoSecondKeyNum())){
+            criteria.andJoSecondKeyNumEqualTo(joCustomKey.getJoSecondKeyNum());
+        }
+        List<JoCustomKey> mapList = joCustomKeyMapper.selectByExample(example);
         return mapList;
     }
 }
