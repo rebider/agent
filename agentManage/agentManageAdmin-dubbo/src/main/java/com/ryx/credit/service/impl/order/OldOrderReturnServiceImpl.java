@@ -1158,19 +1158,11 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                 throw new MessageException("导入解析文件失败，检查是否缺少字段");
             }
             try {
-                //检查是否在退货中
-                int checkCount = returnOrderDetailMapper.checkSnIsReturn(FastMap
-                        .fastMap("begin",snBegin)
-                        .putKeyV("end",snEnd)
-                        .putKeyV("sts",Arrays.asList(
-                                RetSchedule.DFH.code,
-                                RetSchedule.FHZ.code,
-                                RetSchedule.SPZ.code,
-                                RetSchedule.TH.code,
-                                RetSchedule.TKZ.code,
-                                RetSchedule.YFH.code))
-                );
-                if(checkCount>0)  return AgentResult.fail(snEnd+":"+snEnd+"在退货中");
+                //检查sn是否在划拨，换活动，退货中
+                FastMap fastMap = osnOperateService.checkSNApproval(FastMap
+                        .fastMap("beginSN", snBegin)
+                        .putKeyV("endSN", snEnd));
+                if (!FastMap.isSuc(fastMap)) return AgentResult.fail(fastMap.get("msg").toString());
 
                 Dict modelType = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MODEL_TYPE.name(),proModel);
                 if(modelType==null){
