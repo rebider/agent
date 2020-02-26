@@ -12,6 +12,7 @@
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
     <result column="C_TM" jdbcType="TIMESTAMP" property="cTm" />
+    <result column="SUCCESS_TM" jdbcType="TIMESTAMP" property="successTm" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -43,7 +44,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, ARR_ID, AMOUNT, PAY_TYPE, SRC_ID, BUS_STAT, STATUS, VERSION, C_USER, C_TM
+    ID, ARR_ID, AMOUNT, PAY_TYPE, SRC_ID, BUS_STAT, STATUS, VERSION, C_USER, C_TM, SUCCESS_TM
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OPayDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -77,11 +78,11 @@
     insert into O_PAY_DETAIL (ID, ARR_ID, AMOUNT, 
       PAY_TYPE, SRC_ID, BUS_STAT, 
       STATUS, VERSION, C_USER, 
-      C_TM)
+      C_TM, SUCCESS_TM)
     values (#{id,jdbcType=VARCHAR}, #{arrId,jdbcType=VARCHAR}, #{amount,jdbcType=DECIMAL}, 
       #{payType,jdbcType=VARCHAR}, #{srcId,jdbcType=VARCHAR}, #{busStat,jdbcType=DECIMAL}, 
       #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{cUser,jdbcType=VARCHAR}, 
-      #{cTm,jdbcType=TIMESTAMP})
+      #{cTm,jdbcType=TIMESTAMP}, #{successTm,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OPayDetail">
     insert into O_PAY_DETAIL
@@ -116,6 +117,9 @@
       <if test="cTm != null">
         C_TM,
       </if>
+      <if test="successTm != null">
+        SUCCESS_TM,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -147,6 +151,9 @@
       </if>
       <if test="cTm != null">
         #{cTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="successTm != null">
+        #{successTm,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -181,10 +188,13 @@
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
       <if test="cUser != null">
-        C_USER = #{cUser,jdbcType=VARCHAR},
+        C_USER = VERSION + 1,
       </if>
       <if test="cTm != null">
         C_TM = #{cTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="successTm != null">
+        SUCCESS_TM = #{successTm,jdbcType=TIMESTAMP},
       </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
@@ -199,7 +209,8 @@
       STATUS = #{status,jdbcType=DECIMAL},
       VERSION = #{version,jdbcType=DECIMAL},
       C_USER = #{cUser,jdbcType=VARCHAR},
-      C_TM = #{cTm,jdbcType=TIMESTAMP}
+      C_TM = #{cTm,jdbcType=TIMESTAMP},
+      SUCCESS_TM = #{successTm,jdbcType=TIMESTAMP}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

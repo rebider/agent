@@ -719,6 +719,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
             //更新付款单明细
             for (OPayDetail oPayDetail:oPayDetails){
                 oPayDetail.setBusStat(Status.STATUS_1.status);
+                oPayDetail.setSuccessTm(new Date());
                 if(oPayDetailMapper.updateByPrimaryKeySelective(oPayDetail)!=1){
                     logger.info("付款明细更新失败");
                     throw new MessageException("付款明细更新失败");

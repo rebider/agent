@@ -25,6 +25,8 @@ public class OPayDetail implements Serializable {
 
     private Date cTm;
 
+    private Date successTm;
+
     public String getId() {
         return id;
     }
@@ -103,5 +105,13 @@ public class OPayDetail implements Serializable {
 
     public void setcTm(Date cTm) {
         this.cTm = cTm;
+    }
+
+    public Date getSuccessTm() {
+        return successTm;
+    }
+
+    public void setSuccessTm(Date successTm) {
+        this.successTm = successTm;
     }
 }

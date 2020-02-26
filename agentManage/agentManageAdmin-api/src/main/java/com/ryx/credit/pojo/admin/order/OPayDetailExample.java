@@ -1,7 +1,6 @@
 package com.ryx.credit.pojo.admin.order;
 
 import com.ryx.credit.common.util.Page;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -785,6 +784,66 @@ public class OPayDetailExample {
 
         public Criteria andCTmNotBetween(Date value1, Date value2) {
             addCriterion("C_TM not between", value1, value2, "cTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccessTmIsNull() {
+            addCriterion("SUCCESS_TM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccessTmIsNotNull() {
+            addCriterion("SUCCESS_TM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccessTmEqualTo(Date value) {
+            addCriterion("SUCCESS_TM =", value, "successTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccessTmNotEqualTo(Date value) {
+            addCriterion("SUCCESS_TM <>", value, "successTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccessTmGreaterThan(Date value) {
+            addCriterion("SUCCESS_TM >", value, "successTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccessTmGreaterThanOrEqualTo(Date value) {
+            addCriterion("SUCCESS_TM >=", value, "successTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccessTmLessThan(Date value) {
+            addCriterion("SUCCESS_TM <", value, "successTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccessTmLessThanOrEqualTo(Date value) {
+            addCriterion("SUCCESS_TM <=", value, "successTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccessTmIn(List<Date> values) {
+            addCriterion("SUCCESS_TM in", values, "successTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccessTmNotIn(List<Date> values) {
+            addCriterion("SUCCESS_TM not in", values, "successTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccessTmBetween(Date value1, Date value2) {
+            addCriterion("SUCCESS_TM between", value1, value2, "successTm");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccessTmNotBetween(Date value1, Date value2) {
+            addCriterion("SUCCESS_TM not between", value1, value2, "successTm");
             return (Criteria) this;
         }
     }
