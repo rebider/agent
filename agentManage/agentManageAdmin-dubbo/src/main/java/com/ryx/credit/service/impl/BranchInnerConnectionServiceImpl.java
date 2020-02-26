@@ -17,6 +17,7 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.CBranchInnerMapper;
 import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.CUserMapper;
+import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.machine.service.LmsUserService;
 import com.ryx.credit.pojo.admin.CBranchInner;
 import com.ryx.credit.pojo.admin.CBranchInnerExample;
@@ -60,6 +61,8 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
     private COrganizationMapper organizationMapper;
     @Autowired
     private IBranchInnerConnectionService branchInnerConnectionService;
+    @Autowired
+    private AgentBusInfoMapper agentBusInfoMapper;
 
     /**
      * 查询省区账号list
@@ -79,12 +82,16 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
     @Override
     public Map<String, Object> removeBranchInnerConnection(String id) throws Exception{
 
-        JSONObject data = new JSONObject();
-        data.put("serialNumber", "serialNumber");
-        logger.info("活动调整结果查询返回：{}","serialNumber");
-        AgentResult agentResult = request("ORG020", data);
-        //logger.info("活动调整结果查询返回：{},{}", serialNumber, agentResult);
+        //查询busNum
 
+
+
+        CBranchInner cBranchInner = branchInnerMapper.selectByPrimaryKey(id);
+        JSONObject data = new JSONObject();
+        data.put("loginname", cBranchInner.getInnerLogin());
+        data.put("dType", "1");
+        data.put("delOrgIds", "serialNumber");
+        AgentResult agentResult = request("ORG020", data);
 
         int t = 0;
         //先查询，查询账号是否存在状态为2的，
