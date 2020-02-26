@@ -27,10 +27,7 @@ import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.agent.PlatFormService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
-import com.ryx.credit.service.order.CompensateService;
-import com.ryx.credit.service.order.OCashReceivablesService;
-import com.ryx.credit.service.order.OrderActivityService;
-import com.ryx.credit.service.order.ProductService;
+import com.ryx.credit.service.order.*;
 import com.ryx.internet.pojo.OInternetCardImport;
 import net.sf.jxls.transformer.Row;
 import org.apache.commons.collections.map.HashedMap;
@@ -117,6 +114,8 @@ public class CompensateServiceImpl implements CompensateService {
     private COrganizationMapper organizationMapper;
     @Autowired
     private PlatFormMapper platFormMapper;
+    @Autowired
+    private OrderOffsetService orderOffsetService;
 
 
     @Override
@@ -1059,6 +1058,12 @@ public class CompensateServiceImpl implements CompensateService {
                     }
                 });
             });
+            //取消抵扣
+            agentResult = orderOffsetService.OffsetArrearsCancle(oRefundPriceDiff.getMachOweAmt(), OffsetPaytype.DDMD.code, oRefundPriceDiff.getId());
+            if (!agentResult.isOK()){
+                log.error("换活动抵扣欠款取消失败!id"+oRefundPriceDiff.getId());
+                throw new MessageException("换活动抵扣欠款取消失败!id"+oRefundPriceDiff.getId());
+            }
         }else if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
             oRefundPriceDiffDetails.forEach(row->{
                 try {
@@ -1136,7 +1141,12 @@ public class CompensateServiceImpl implements CompensateService {
                     throw new ProcessException("处理失败");
                 }
             });
-
+            //提交抵扣
+            agentResult = orderOffsetService.OffsetArrearsCommit(oRefundPriceDiff.getMachOweAmt(), OffsetPaytype.DDMD.code, oRefundPriceDiff.getId());
+            if (!agentResult.isOK()){
+                log.error("换活动抵扣欠款失败!id"+oRefundPriceDiff.getId());
+                throw new MessageException("换活动抵扣欠款失败!id"+oRefundPriceDiff.getId());
+            }
             AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "adjust");
             if(!synOrVerifyResult.isOK()){
                 throw new MessageException(synOrVerifyResult.getMsg());
@@ -1675,6 +1685,14 @@ public class CompensateServiceImpl implements CompensateService {
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
+        }
+        return AgentResult.ok();
+    }
+
+    @Override
+    public AgentResult updateoRefundPriceDiff(ORefundPriceDiff oRefundPriceDiff) {
+        if (refundPriceDiffMapper.updateByPrimaryKeySelective(oRefundPriceDiff)!=1){
+            return AgentResult.fail();
         }
         return AgentResult.ok();
     }
