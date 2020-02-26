@@ -3136,11 +3136,10 @@ public class OrderServiceImpl implements OrderService {
         String batchCode = Calendar.getInstance().getTime().getTime()+"";
         if(flows.size()>0){
             //检查保证金等是否有分期
-            OPaymentDetail record_QT = null;
             for (CapitalFlow capitalFlow : flows) {
                 //添加抵扣明细
-                 record_QT = new OPaymentDetail();
-                record_QT.setId(idService.genId(TabId.o_payment_detail));
+                OPaymentDetail record_QT = new OPaymentDetail();
+                record_QT.setId(idService.genIdInTran(TabId.o_payment_detail));
                 record_QT.setBatchCode(batchCode);
                 record_QT.setPaymentId(payment.getId());
                 record_QT.setPaymentType(PamentIdType.ORDER_FKD.code);
