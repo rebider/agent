@@ -2004,11 +2004,11 @@
     to_char(o_payment_detail.plan_pay_time,'yyyy-mm') as omonth,
     o_payment_detail.order_id as oId,
     o_payment_detail.payment_status,
-    sum(case when o_payment_detail.payment_status in(1,3) then o_payment_detail.pay_amount else 0 end)+
-    sum(case when o_payment_detail.payment_status =2 then o_payment_detail.pay_amount-o_payment_detail.real_pay_amount else 0 end)
-    qiankuan,sum(o_payment_detail.REAL_PAY_AMOUNT)realPayAmount,  sum(case when o_payment_detail.payment_status in(1,3) then o_payment_detail.pay_amount else 0 end)+
-    sum(case when o_payment_detail.payment_status =2 then o_payment_detail.pay_amount-o_payment_detail.real_pay_amount else 0 end)
-    -sum(o_payment_detail.REAL_PAY_AMOUNT)repay
+    sum(case when o_payment_detail.payment_status in(1,2,3) then o_payment_detail.pay_amount else 0 end)
+    qiankuan,
+    nvl( sum(case when o_payment_detail.payment_status in(1,2,3) then o_payment_detail.REAL_PAY_AMOUNT else 0 end),0)realPayAmount,
+    nvl(sum(case when o_payment_detail.payment_status in(1,2,3) then o_payment_detail.pay_amount else 0 end)
+    -sum(o_payment_detail.REAL_PAY_AMOUNT),0)repay
     from
     o_payment_detail
     where 1=1
@@ -2042,11 +2042,11 @@
     to_char(o_payment_detail.plan_pay_time,'yyyy-mm') as omonth,
     o_payment_detail.order_id as oId,
     o_payment_detail.payment_status,
-    sum(case when o_payment_detail.payment_status in(1,3) then o_payment_detail.pay_amount else 0 end)+
-    sum(case when o_payment_detail.payment_status =2 then o_payment_detail.pay_amount-o_payment_detail.real_pay_amount else 0 end)
-    qiankuan,sum(o_payment_detail.REAL_PAY_AMOUNT)realPayAmount,  sum(case when o_payment_detail.payment_status in(1,3) then o_payment_detail.pay_amount else 0 end)+
-    sum(case when o_payment_detail.payment_status =2 then o_payment_detail.pay_amount-o_payment_detail.real_pay_amount else 0 end)
-    -sum(o_payment_detail.REAL_PAY_AMOUNT)repay
+    sum(case when o_payment_detail.payment_status in(1,2,3) then o_payment_detail.pay_amount else 0 end)
+    qiankuan,
+    nvl( sum(case when o_payment_detail.payment_status in(1,2,3) then o_payment_detail.REAL_PAY_AMOUNT else 0 end),0)realPayAmount,
+    nvl(sum(case when o_payment_detail.payment_status in(1,2,3) then o_payment_detail.pay_amount else 0 end)
+    -sum(o_payment_detail.REAL_PAY_AMOUNT),0)repay
     from
     o_payment_detail
     where 1=1
