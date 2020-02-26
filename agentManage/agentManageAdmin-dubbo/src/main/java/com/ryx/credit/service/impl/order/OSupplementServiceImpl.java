@@ -713,8 +713,7 @@ public class OSupplementServiceImpl implements OSupplementService {
             logger.info("请填写核款时间");
             throw new MessageException("请填写核款时间");
         }
-        OSupplement oSupplement = new OSupplement();
-        oSupplement.setId(agentVo.getSupplementId());
+        OSupplement oSupplement = selectOSupplement(agentVo.getSupplementId());
         oSupplement.setRealPayAmount(agentVo.getRealPayAmount());
         oSupplement.setCheckTime(agentVo.getCheckTime());
         oSupplement.setCheckPeople(String.valueOf(userId));
