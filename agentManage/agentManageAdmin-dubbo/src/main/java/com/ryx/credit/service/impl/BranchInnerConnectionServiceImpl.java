@@ -34,6 +34,8 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -75,7 +77,15 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
      */
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
-    public Map<String, Object> removeBranchInnerConnection(String id) {
+    public Map<String, Object> removeBranchInnerConnection(String id) throws Exception{
+
+        JSONObject data = new JSONObject();
+        data.put("serialNumber", "serialNumber");
+        logger.info("活动调整结果查询返回：{}","serialNumber");
+        AgentResult agentResult = request("ORG020", data);
+        //logger.info("活动调整结果查询返回：{},{}", serialNumber, agentResult);
+
+
         int t = 0;
         //先查询，查询账号是否存在状态为2的，
         if (branchInnerMapper.countByIdforUpdate(id) == 1) {
@@ -335,5 +345,85 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
 
         logger.info("新建用户:{}", cBranchInner);
         return AgentResult.ok();
+    }
+
+    /**
+     * 请求POS接口封装参数
+     * @param tranCode
+     * @param data
+     * @return
+     * @throws Exception
+     */
+    private AgentResult request(String tranCode, JSONObject data) throws Exception {
+        try {
+            logger.info("POS省总账号联动请求参数明文:{}", data);
+            PrivateKey rsaPrivateKey = RSAUtil.getRSAPrivateKey(AppConfig.getProperty("industryAuth_local_private_key"), "pem", null, "RSA");
+            PublicKey rsaPublicKey = RSAUtil.getRSAPublicKey(AppConfig.getProperty("industryAuth_cooper_public_key"), "pem", "RSA");
+            String cooperator = AppConfig.getProperty("industryAuth_cooperator");
+            String charset = "UTF-8"; // 字符集
+            String reqMsgId = UUID.randomUUID().toString().replace("-", ""); // 请求流水
+            String reqDate = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"); // 请求时间
+
+            JSONObject jsonParams = new JSONObject();
+            jsonParams.put("version", "1.0.0");
+            jsonParams.put("msgType", "01");
+            jsonParams.put("reqDate", reqDate);
+            jsonParams.put("data", data);
+            String plainXML = jsonParams.toString();
+            // 请求报文加密开始
+            String keyStr = AESUtil.getAESKey();
+            byte[] plainBytes = plainXML.getBytes(charset);
+            byte[] keyBytes = keyStr.getBytes(charset);
+            String encryptData = new String(org.apache.commons.codec.binary.Base64.encodeBase64((AESUtil.encrypt(plainBytes, keyBytes, "AES", "AES/ECB/PKCS5Padding", null))), charset);
+            String signData = new String(org.apache.commons.codec.binary.Base64.encodeBase64(RSAUtil.digitalSign(plainBytes, rsaPrivateKey, "SHA1WithRSA")), charset);
+            String encrtptKey = new String(org.apache.commons.codec.binary.Base64.encodeBase64(RSAUtil.encrypt(keyBytes, rsaPublicKey, 2048, 11, "RSA/ECB/PKCS1Padding")), charset);
+            // 请求报文加密结束
+
+            Map<String, String> map = new HashMap<>();
+            map.put("encryptData", encryptData);
+            map.put("encryptKey", encrtptKey);
+            map.put("cooperator", cooperator);
+            map.put("signData", signData);
+            map.put("tranCode", tranCode);
+            map.put("reqMsgId", reqMsgId);
+
+            logger.info("POS省总账号联动请求参数:{}", map);
+            String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("industryAuth_url"), map);
+            JSONObject jsonObject = JSONObject.parseObject(httpResult);
+            if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
+                logger.info("POS省总账号联动请求异常" + httpResult);
+                return AgentResult.fail("POS省总账号联动接口调用失败");
+            } else {
+                String resEncryptData = jsonObject.getString("encryptData");
+                String resEncryptKey = jsonObject.getString("encryptKey");
+                byte[] decodeBase64KeyBytes = org.apache.commons.codec.binary.Base64.decodeBase64(resEncryptKey.getBytes(charset));
+                byte[] merchantAESKeyBytes = RSAUtil.decrypt(decodeBase64KeyBytes, rsaPrivateKey, 2048, 11, "RSA/ECB/PKCS1Padding");
+                byte[] decodeBase64DataBytes = org.apache.commons.codec.binary.Base64.decodeBase64(resEncryptData.getBytes(charset));
+                byte[] merchantXmlDataBytes = AESUtil.decrypt(decodeBase64DataBytes, merchantAESKeyBytes, "AES", "AES/ECB/PKCS5Padding", null);
+                String respXML = new String(merchantXmlDataBytes, charset);
+                logger.info("POS省总账号联动返回参数：{}", respXML);
+
+                // 报文验签
+                String resSignData = jsonObject.getString("signData");
+                byte[] signBytes = org.apache.commons.codec.binary.Base64.decodeBase64(resSignData);
+                if (!RSAUtil.verifyDigitalSign(respXML.getBytes(charset), signBytes, rsaPublicKey, "SHA1WithRSA")) {
+                    logger.info("POS省总账号联动签名验证失败");
+                } else {
+                    logger.info("POS省总账号联动签名验证成功");
+                    JSONObject respXMLObj = JSONObject.parseObject(respXML);
+                    String respCode = String.valueOf(respXMLObj.get("respCode"));
+                    if (respCode.equals("000000")) {
+                        return AgentResult.build(200, respXMLObj.toString(),respXMLObj.toString());
+                    } else {
+                        logger.info("POS省总账号联动返回错误:{}", respXML);
+                        return AgentResult.fail(respXMLObj.toString());
+                    }
+                }
+                return new AgentResult(500, "POS省总账号联动请求异常", respXML);
+            }
+        } catch (Exception e) {
+            logger.info("POS省总账号联动通知失败:{}", e.getMessage());
+            throw e;
+        }
     }
 }
