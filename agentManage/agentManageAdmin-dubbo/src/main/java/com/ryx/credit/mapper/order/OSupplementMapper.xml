@@ -267,7 +267,7 @@
                 STATUS = #{status,jdbcType=DECIMAL},
             </if>
             <if test="version != null">
-                VERSION = #{version,jdbcType=DECIMAL},
+                VERSION = VERSION +1 ,
             </if>
             <if test="remitTime != null">
                 REMIT_TIME = #{remitTime,jdbcType=TIMESTAMP},
@@ -285,7 +285,7 @@
                 LOGICAL_VERSION = #{logicalVersion,jdbcType=VARCHAR},
             </if>
         </set>
-        where ID = #{id,jdbcType=VARCHAR}
+        where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OSupplement">
         update O_SUPPLEMENT
