@@ -3970,7 +3970,7 @@ public class OrderServiceImpl implements OrderService {
             return AgentResult.fail("支付信息错误");
         }
         OPayment oPayment = oPaymentList.get(0);
-        List<BigDecimal> paymentStatus = Stream.of(PaymentStatus.DF.code,PaymentStatus.YQ.code).collect(toList()) ;
+        List<BigDecimal> paymentStatus = Stream.of(PaymentStatus.DF.code,PaymentStatus.YQ.code,PaymentStatus.BF.code).collect(toList()) ;
         OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
         oPaymentDetailExample.or()
                 .andStatusEqualTo(Status.STATUS_1.status)
@@ -3983,7 +3983,11 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal[] price = {new BigDecimal(0)};
         if (null!=oPaymentDetails && oPaymentDetails.size()>0){
             oPaymentDetails.forEach(oPaymentDetail -> {
+                if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.BF.code) == 0){
+                    price[0] = price[0].add(oPaymentDetail.getPayAmount().subtract(oPaymentDetail.getRealPayAmount()));
+                }else {
                     price[0] = price[0].add(oPaymentDetail.getPayAmount());
+                }
             });
         }
         FastMap f = FastMap.fastMap("outstandingAmount", price[0]);//待还金额
@@ -4039,7 +4043,7 @@ public class OrderServiceImpl implements OrderService {
         List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
         BigDecimal unpaySize = BigDecimal.ZERO;
         for (OPaymentDetail oPaymentDetail:oPaymentDetails){
-            if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.DF.code) == 0 || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.YQ.code) == 0){
+            if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.DF.code) == 0 || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.YQ.code) == 0 || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.BF.code) == 0){
                 unpaySize = unpaySize.add(new BigDecimal("1"));
             }
         }
@@ -4566,9 +4570,7 @@ public class OrderServiceImpl implements OrderService {
             BigDecimal amount = orderAdj.getRefundAmount() == null ? new BigDecimal(0) : orderAdj.getRefundAmount();
             //手续费
             BigDecimal proRefundAmo = orderAdj.getProRefundAmount() == null ? BigDecimal.ZERO : orderAdj.getProRefundAmount();
-            //机具已抵扣金额
-            BigDecimal takeout_amount = orderAdj.getOffsetAmount() == null ? new BigDecimal(0) : orderAdj.getOffsetAmount();
-            if (amount.subtract(proRefundAmo).subtract(takeout_amount).compareTo(BigDecimal.ZERO) == 1) {
+            if (amount.subtract(proRefundAmo).compareTo(BigDecimal.ZERO) == 1) {
                 AgentResult agentResult = orderOffsetService.OffsetArrearsCommit(orderAdj.getOffsetAmount(), DDTZ.code, orderAdj.getId());
                 if (!agentResult.isOK()) {
                     throw new MessageException("订单调整数据更新异常！");
@@ -4865,18 +4867,21 @@ public class OrderServiceImpl implements OrderService {
             logger.error("更新订单失败!订单表id{}",order.getId());
             throw new MessageException("更新订单失败");
         }
-        List<BigDecimal> paymentStatus = Stream.of(PaymentStatus.DF.code,PaymentStatus.YQ.code).collect(toList());
+        List<BigDecimal> paymentStatus = Stream.of(PaymentStatus.DF.code,PaymentStatus.YQ.code,PaymentStatus.BF.code).collect(toList());
         OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
         oPaymentDetailExample.or().andOrderIdEqualTo(orderAdj.getOrderId()).andPaymentStatusIn(paymentStatus).andStatusEqualTo(Status.STATUS_1.status);
         List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
         for(OPaymentDetail oPaymentDetail:oPaymentDetails){
-            oPaymentDetail.setStatus(Status.STATUS_0.status);
+            if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.BF.code) == 0 ){
+                oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
+            }else {
+                oPaymentDetail.setStatus(Status.STATUS_0.status);
+            }
             if (1!=oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)){
                 logger.error("更新还款计划失败!还款计划id{},订单id{}",oPaymentDetail.getId(),oPaymentDetail.getOrderId());
                 throw new MessageException("更新订单失败");
             };
         }
-
         switch (order.getPaymentMethod()) {
             case "FKFQ":
                 temp.setTime(oPayment.getDownPaymentDate());

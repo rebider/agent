@@ -756,7 +756,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
         List<OPayDetail> opayDetails = getOpayMentDetails(srcId, paytype);
         if (null == opayDetails || opayDetails.size() == 0){
             logger.info("付款明细不存在");
-            return AgentResult.fail("付款明细不存在");
+            return AgentResult.ok("付款明细不存在");
         }
         BigDecimal offsetAmt = BigDecimal.ZERO;
         for (OPayDetail oPayDetail : opayDetails) {
