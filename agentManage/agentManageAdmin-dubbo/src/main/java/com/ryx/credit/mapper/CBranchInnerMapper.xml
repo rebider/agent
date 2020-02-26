@@ -71,8 +71,7 @@
         <include refid="OracleDialectSuffix" />
     </select>
     <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-        select
-        <include refid="Base_Column_List" />
+        select *
         from C_BRANCH_INNER
         where ID = #{id,jdbcType=VARCHAR}
     </select>

@@ -82,16 +82,16 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
     @Override
     public Map<String, Object> removeBranchInnerConnection(String id) throws Exception{
 
-        //查询busNum
-        List<String> busNums = agentBusInfoMapper.selectBusNumByBusProCode(FastMap.fastMap("", "").putKeyV("", ""));
-
-
         CBranchInner cBranchInner = branchInnerMapper.selectByPrimaryKey(id);
+        //查询busNum
+        List<String> busNums = agentBusInfoMapper.selectBusNumByBusProCode(FastMap.fastMap("platformType", PlatformType.POS.code).putKeyV("branchLogin", cBranchInner.getBranchLogin()));
+
         JSONObject data = new JSONObject();
         data.put("loginname", cBranchInner.getInnerLogin());
         data.put("dType", "1");
-        data.put("delOrgIds", "serialNumber");
+        data.put("delOrgIds", String.join(",", busNums));
         AgentResult agentResult = request("ORG020", data);
+        if (!agentResult.isOK()) return FastMap.fastMap("code", "2").putKeyV("msg", agentResult.getMsg());
 
         int t = 0;
         //先查询，查询账号是否存在状态为2的，
@@ -377,6 +377,7 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
             jsonParams.put("reqDate", reqDate);
             jsonParams.put("data", data);
             String plainXML = jsonParams.toString();
+            logger.info("POS省总账号联动请求参数:{}", plainXML);
             // 请求报文加密开始
             String keyStr = AESUtil.getAESKey();
             byte[] plainBytes = plainXML.getBytes(charset);
@@ -393,8 +394,6 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
             map.put("signData", signData);
             map.put("tranCode", tranCode);
             map.put("reqMsgId", reqMsgId);
-
-            logger.info("POS省总账号联动请求参数:{}", map);
             String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("industryAuth_url"), map);
             JSONObject jsonObject = JSONObject.parseObject(httpResult);
             if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
@@ -416,17 +415,16 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
                 if (!RSAUtil.verifyDigitalSign(respXML.getBytes(charset), signBytes, rsaPublicKey, "SHA1WithRSA")) {
                     logger.info("POS省总账号联动签名验证失败");
                 } else {
-                    logger.info("POS省总账号联动签名验证成功");
+                    logger.info("POS省总账号联动返回参数:{}", respXML);
                     JSONObject respXMLObj = JSONObject.parseObject(respXML);
                     String respCode = String.valueOf(respXMLObj.get("respCode"));
                     if (respCode.equals("000000")) {
-                        return AgentResult.build(200, respXMLObj.toString(),respXMLObj.toString());
+                        return AgentResult.ok();
                     } else {
-                        logger.info("POS省总账号联动返回错误:{}", respXML);
-                        return AgentResult.fail(respXMLObj.toString());
+                        return AgentResult.fail("业务系统删除失败！");
                     }
                 }
-                return new AgentResult(500, "POS省总账号联动请求异常", respXML);
+                return AgentResult.fail("POS省总账号联动请求异常");
             }
         } catch (Exception e) {
             logger.info("POS省总账号联动通知失败:{}", e.getMessage());
