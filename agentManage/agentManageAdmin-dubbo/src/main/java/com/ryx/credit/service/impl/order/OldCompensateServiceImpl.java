@@ -27,10 +27,7 @@ import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.agent.PlatFormService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
-import com.ryx.credit.service.order.OCashReceivablesService;
-import com.ryx.credit.service.order.OldCompensateService;
-import com.ryx.credit.service.order.OrderActivityService;
-import com.ryx.credit.service.order.ProductService;
+import com.ryx.credit.service.order.*;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,6 +98,8 @@ public class OldCompensateServiceImpl implements OldCompensateService {
     private ImsTermMachineService imsTermMachineService;
     @Autowired
     private OActivityVisibleMapper activityVisibleMapper;
+    @Autowired
+    private OrderOffsetService orderOffsetService;
 
     /**
      * 解析提交过来的sn,
@@ -751,6 +750,12 @@ public class OldCompensateServiceImpl implements OldCompensateService {
         //审批拒绝处理缴款信息
         if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
             agentResult = cashReceivablesService.refuseProcing(CashPayType.REFUNDPRICEDIFF,oRefundPriceDiff.getId(),oRefundPriceDiff.getcUser());
+            //取消抵扣
+            agentResult = orderOffsetService.OffsetArrearsCancle(oRefundPriceDiff.getMachOweAmt(), OffsetPaytype.DDMD.code, oRefundPriceDiff.getId());
+            if (!agentResult.isOK()){
+                log.error("换活动抵扣欠款取消失败!id"+oRefundPriceDiff.getId());
+                throw new MessageException("换活动抵扣欠款取消失败!id"+oRefundPriceDiff.getId());
+            }
         }
         //审批通过处理缴款信息
         if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
@@ -786,6 +791,12 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                     throw new ProcessException("处理失败");
                 }
             });
+            //提交抵扣
+            agentResult = orderOffsetService.OffsetArrearsCommit(oRefundPriceDiff.getMachOweAmt(), OffsetPaytype.DDMD.code, oRefundPriceDiff.getId());
+            if (!agentResult.isOK()){
+                log.error("换活动抵扣欠款失败!id"+oRefundPriceDiff.getId());
+                throw new MessageException("换活动抵扣欠款失败!id"+oRefundPriceDiff.getId());
+            }
             //调用接口调整
             AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "adjust");
             if(!synOrVerifyResult.isOK()){

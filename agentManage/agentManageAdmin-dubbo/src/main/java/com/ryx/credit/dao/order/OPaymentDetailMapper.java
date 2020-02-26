@@ -81,4 +81,6 @@ public interface OPaymentDetailMapper {
     List<OPaymentDetail> selectQkRefund(@Param("agentId")String agentId,@Param("adjId")String adjId);
 
     List<OPaymentDetail> selectPaymentDetails(@Param("paymentId")String paymentId);
+
+    List<OPaymentDetail> selectThtkPaymentDetails(@Param("agentId")String agentId);
 }

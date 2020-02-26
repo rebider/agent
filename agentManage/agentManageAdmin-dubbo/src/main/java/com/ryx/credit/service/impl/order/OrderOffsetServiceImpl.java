@@ -715,7 +715,7 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
         }
         if (offsetAmt.compareTo(amount)!=0) return AgentResult.fail("冲抵金额与申请不一致");
 
-        if (paytype.equals(DDBK.code) || paytype.equals(DDXZ.code) ||  paytype.equals(DDTZ.code) || paytype.equals(THTK.code) || paytype.equals(FRDK.code)){
+        if (paytype.equals(DDBK.code) || paytype.equals(DDXZ.code) ||  paytype.equals(DDTZ.code) || paytype.equals(THTK.code) || paytype.equals(FRDK.code) || paytype.equals(DDMD.code)){
             //更新付款单明细
             for (OPayDetail oPayDetail:oPayDetails){
                 oPayDetail.setBusStat(Status.STATUS_1.status);

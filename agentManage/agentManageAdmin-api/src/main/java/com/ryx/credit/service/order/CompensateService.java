@@ -65,5 +65,7 @@ public interface CompensateService {
      */
     AgentResult dealQeruySendingReault(String id)throws Exception;
 
+    AgentResult updateoRefundPriceDiff(ORefundPriceDiff oRefundPriceDiff);
+
 }
 
