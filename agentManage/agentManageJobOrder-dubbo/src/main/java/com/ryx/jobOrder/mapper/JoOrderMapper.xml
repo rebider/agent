@@ -564,6 +564,7 @@
       <if test="launchBranchName!=null and launchBranchName!=''"> andjo.launch_branch_name = #{launchBranchName} </if>
       <if test="launchBeginTime!=null and launchEndTime!=''"> and (to_char(jo.taskEndTime,'yyyy-mm-dd') between #{launchBeginTime} and #{taskEndTimime}) </if>
       <if test="taskBeginTime!=null and taskEndTime!=''"> and (to_char(ta.jo_task_accept_time,'yyyy-mm-dd') between #{taskBeginTime} and #{taskEndTime}) </if>
+      <if test="launchPersonId!=null and launchPersonId!=''"> and jo.launch_person_id = #{launchPersonId} </if>
     </where>
     order by jo.launch_time desc
   </sql>
