@@ -1328,4 +1328,19 @@ union
     <if test="reqMap.platfromPerm==null or reqMap.platfromPerm.size==0"> and 1=-1 </if>
     order by b.c_time desc
   </sql>
+
+  <select id="selectBusNumByBusProCode" parameterType="map" resultType="string" >
+    SELECT
+      b.bus_num as busNum
+    FROM
+      a_agent_businfo b
+      LEFT JOIN a_platform p ON b.bus_platform = p.platform_num
+      LEFT JOIN c_BRANCH_INNER bi ON bi.branch_login = b.ag_doc_pro
+      WHERE 1=1
+      AND p.platform_type = #{platformType}
+      AND b.ag_doc_pro IS NOT NULL
+      AND b.bus_num IS NOT NULL
+      AND bi.branch_login = #{branchLogin}
+      GROUP BY b.bus_num
+  </select>
 </mapper>

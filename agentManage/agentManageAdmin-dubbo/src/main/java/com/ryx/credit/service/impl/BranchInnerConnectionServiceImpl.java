@@ -83,7 +83,7 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
     public Map<String, Object> removeBranchInnerConnection(String id) throws Exception{
 
         //查询busNum
-
+        List<String> busNums = agentBusInfoMapper.selectBusNumByBusProCode(FastMap.fastMap("", "").putKeyV("", ""));
 
 
         CBranchInner cBranchInner = branchInnerMapper.selectByPrimaryKey(id);
