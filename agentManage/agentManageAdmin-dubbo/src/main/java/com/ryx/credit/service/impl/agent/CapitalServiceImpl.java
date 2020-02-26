@@ -282,7 +282,7 @@ public class CapitalServiceImpl implements CapitalService {
             capitalFlow.setVersion(BigDecimal.ZERO);
             capitalFlow.setFlowStatus(Status.STATUS_0.status);//未生效
             capitalFlowMapper.insertSelective(capitalFlow);
-            if (residueAmt.compareTo(BigDecimal.ZERO) < 1) {
+            if (residueAmt.compareTo(BigDecimal.ZERO) <= 1) {
                 break;
             }
         }
