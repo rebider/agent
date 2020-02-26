@@ -78,7 +78,11 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                 if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.DF.code)==0
                         || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.BF.code)==0
                         || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.YQ.code)==0){
-                    arrearsAmt = arrearsAmt.add(oPaymentDetail.getPayAmount());
+                    if(oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.BF.code)==0){
+                        arrearsAmt = arrearsAmt.add(oPaymentDetail.getPayAmount().subtract(oPaymentDetail.getRealPayAmount()));
+                    }else {
+                        arrearsAmt = arrearsAmt.add(oPaymentDetail.getPayAmount());
+                    }
                 }
             }
             if(amount.compareTo(arrearsAmt)>0){
@@ -280,7 +284,11 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                 if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.DF.code)==0
                         || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.BF.code)==0
                         || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.YQ.code)==0){
-                    arrearsAmt = arrearsAmt.add(oPaymentDetail.getPayAmount());
+                    if(oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.BF.code)==0){
+                        arrearsAmt = arrearsAmt.add(oPaymentDetail.getPayAmount().subtract(oPaymentDetail.getRealPayAmount()));
+                    }else {
+                        arrearsAmt = arrearsAmt.add(oPaymentDetail.getPayAmount());
+                    }
                 }
             }
             //付款明细
@@ -381,7 +389,11 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                 if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.DF.code)==0
                         || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.BF.code)==0
                         || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.YQ.code)==0){
-                    arrearsAmt = arrearsAmt.add(oPaymentDetail.getPayAmount());
+                    if(oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.BF.code)==0){
+                        arrearsAmt = arrearsAmt.add(oPaymentDetail.getPayAmount().subtract(oPaymentDetail.getRealPayAmount()));
+                    }else {
+                        arrearsAmt = arrearsAmt.add(oPaymentDetail.getPayAmount());
+                    }
                 }
             }
             //付款明细
@@ -481,7 +493,11 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                 if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.DF.code)==0
                         || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.BF.code)==0
                         || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.YQ.code)==0){
-                    arrearsAmt = arrearsAmt.add(oPaymentDetail.getPayAmount());
+                    if(oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.BF.code)==0){
+                        arrearsAmt = arrearsAmt.add(oPaymentDetail.getPayAmount().subtract(oPaymentDetail.getRealPayAmount()));
+                    }else {
+                        arrearsAmt = arrearsAmt.add(oPaymentDetail.getPayAmount());
+                    }
                 }
             }
             //付款明细
