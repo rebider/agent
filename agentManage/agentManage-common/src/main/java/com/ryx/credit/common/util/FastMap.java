@@ -30,6 +30,10 @@ public class FastMap extends HashMap {
     public static FastMap fastFailMap(String msg){
         return new FastMap().putKeyV("msg",msg).putKeyV("code","1000");
     }
+
+    public static FastMap fastFailMap(String msg,String code){
+        return new FastMap().putKeyV("msg",msg).putKeyV("code",code);
+    }
     public static FastMap fastFailMap(Map<String,Object> map){
         FastMap fastMap = new FastMap().putKeyV("msg", "失败").putKeyV("code", "1000");
         for (String result : map.keySet()) {
