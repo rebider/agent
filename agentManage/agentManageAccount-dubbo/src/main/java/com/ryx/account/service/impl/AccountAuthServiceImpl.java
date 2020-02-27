@@ -215,7 +215,7 @@ public class AccountAuthServiceImpl implements AccountAuthService {
     public void approveAuthCode(String platformType,String authCode)throws MessageException{
         AuthSysCode authSysCode = verifyAuthCode(platformType, authCode);
         if(authSysCode.getAuthCodeEndTime().getTime()<new Date().getTime()){
-            throw new MessageException(AuthCode.AUTH_PAST.getContent());
+            throw new MessageException(AuthCode.EXPIRED.getContent());
         }
     }
 
