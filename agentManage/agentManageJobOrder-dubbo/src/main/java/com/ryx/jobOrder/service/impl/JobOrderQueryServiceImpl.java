@@ -54,25 +54,9 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
 //            String organizationCode = String.valueOf(resultMap.get("ORGANIZATIONCODE"));
 //            map.put("organizationCode", organizationCode);
 //        }
-        long listCount = joOrderMapper.queryJobOrderListCount(map);
+//        int = joOrderMapper.queryJobOrderListCount(map);
         List<JoTaskVo> jobOrderList = joOrderMapper.queryJobOrderList(map);
         pageInfo.setTotal(jobOrderList.size());
-        pageInfo.setRows(jobOrderList);
-        return pageInfo;
-    }
-
-    @Override
-    public PageInfo jobTaskInfo(Map map, Page page) throws MessageException {
-        logger.info("------任务消息查看------");
-        PageInfo pageInfo = new PageInfo();
-        map.put("page", page);
-        if (null != map.get("id")) {
-            logger.error("---工单编号为空,获取不到任务信息---");
-            throw new MessageException("未获取到工单编号");
-        }
-        int listCount = joTaskMapper.queryJobTaskInfoCount(map);
-        List<Map<String, Object>> jobOrderList = joTaskMapper.queryJobTaskInfo(map);
-        pageInfo.setTotal(listCount);
         pageInfo.setRows(jobOrderList);
         return pageInfo;
     }
@@ -85,16 +69,6 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
         }
         JoOrder jobOrder = joOrderMapper.selectByPrimaryKey(id);
         return jobOrder;
-    }
-
-    @Override
-    public JoExpandKey getByJobExpandId(String jobId) {
-        if (StringUtils.isBlank(jobId)) {
-            logger.error("---工单id为空,获取不到数据---");
-            return null;
-        }
-        JoExpandKey joExpandKey = joExpandKeyMapper.selectByPrimaryKey(jobId);
-        return joExpandKey;
     }
 
     @Override
