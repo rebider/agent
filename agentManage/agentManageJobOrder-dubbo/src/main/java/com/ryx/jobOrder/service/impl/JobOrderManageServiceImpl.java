@@ -153,4 +153,29 @@ public class JobOrderManageServiceImpl implements JobOrderManageService {
         List<Map> mapList = joCustomKeyMapper.selectMapByExample(example);
         return mapList;
     }
+
+    @Override
+    public List<Map> selectKeyWord(JoCustomKey joCustomKey) {
+        if(null!=joCustomKey){
+            if(StringUtils.isNotBlank(joCustomKey.getJoSecondKeyNum())){
+                List<Map> joCustomKeyList=joCustomKeyMapper.selectKeyWord(joCustomKey.getJoSecondKeyNum());
+                if(null!=joCustomKeyList && joCustomKeyList.size()>0){
+                    return joCustomKeyList;
+                }else {
+                    new ArrayList<>();
+                }
+
+            }
+        }
+        return new ArrayList<>();
+    }
+
+    @Override
+    public PageInfo joCustomKeyList(Page page, Map map) {
+        List<Map<String, Object>> joCustomKeyList = joCustomKeyMapper.joCustomKeyList(map, page);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(joCustomKeyList);
+        pageInfo.setTotal(joCustomKeyMapper.joCustomKeyCount(map));
+        return pageInfo;
+    }
 }
