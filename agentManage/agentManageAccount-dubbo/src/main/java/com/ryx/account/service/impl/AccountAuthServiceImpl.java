@@ -144,10 +144,34 @@ public class AccountAuthServiceImpl implements AccountAuthService {
         if(StringUtils.isBlank(serverIp)){
             throw new MessageException("缺少请求ip地址");
         }
-        AuthSysCode authSysCode = verifyAuthCode(platformType, authCode);
+        if(StringUtils.isBlank(authCode)){
+            throw new MessageException("缺少授权码");
+        }
+        AuthSysCodeExample authSysCodeExample = new AuthSysCodeExample();
+        AuthSysCodeExample.Criteria criteria = authSysCodeExample.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status.toString());
+        criteria.andPlatformTypeEqualTo(platformType);
+        List<AuthSysCode> authSysCodes = authSysCodeMapper.selectByExample(authSysCodeExample);
+        for (AuthSysCode authSysCode : authSysCodes) {
+            authSysCode.setStatus(Status.STATUS_0.status.toString());
+            int i = authSysCodeMapper.updateByPrimaryKeySelective(authSysCode);
+            if(i!=1){
+                throw new MessageException("刷新失败");
+            }
+        }
+        AuthSysCodeExample authSysCodeExample1 = new AuthSysCodeExample();
+        AuthSysCodeExample.Criteria criteria1 = authSysCodeExample1.createCriteria();
+        criteria1.andPlatformTypeEqualTo(platformType);
+        criteria1.andAuthCodeEqualTo(authCode);
+        List<AuthSysCode> authSysCodeList = authSysCodeMapper.selectByExample(authSysCodeExample1);
+        if(authSysCodeList.size()!=1){
+            throw new MessageException("刷新失败,存在多个授权码");
+        }
+        AuthSysCode authSysCode = authSysCodes.get(0);
 //        if(!serverIp.equals(authSysCode.getServerIp())){
 //            throw new MessageException("请求ip与上次请求ip不一致");
 //        }
+        authSysCode.setStatus(Status.STATUS_1.status.toString());
         authSysCode.setServerIp(serverIp);
         authSysCode.setAuthCodeEndTime(DateUtil.dateAddMinute(new Date(),getAuthTime()));
         int i = authSysCodeMapper.updateByPrimaryKey(authSysCode);
