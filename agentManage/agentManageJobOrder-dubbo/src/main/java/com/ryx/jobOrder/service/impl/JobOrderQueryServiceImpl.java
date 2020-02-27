@@ -1,22 +1,18 @@
 package com.ryx.jobOrder.service.impl;
 
 import com.ryx.credit.common.enumc.JoOrderStatus;
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.result.Result;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.service.IUserService;
-import com.ryx.jobOrder.dao.JoOrderMapper;
-import com.ryx.jobOrder.dao.JoTaskMapper;
-import com.ryx.jobOrder.dao.JobOrderAuthMapper;
-import com.ryx.jobOrder.pojo.JoOrder;
-import com.ryx.jobOrder.pojo.JoOrderExample;
-import com.ryx.jobOrder.pojo.JoTask;
-import com.ryx.jobOrder.pojo.JoTaskExample;
+import com.ryx.jobOrder.dao.*;
+import com.ryx.jobOrder.pojo.*;
 import com.ryx.jobOrder.service.JobOrderQueryService;
+import com.ryx.jobOrder.vo.JoTaskVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,14 +34,18 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
     private IUserService iUserService;
     @Autowired
     private JoTaskMapper joTaskMapper;
+    @Autowired
+    private JoExpandKeyMapper joExpandKeyMapper;
+    @Autowired
+    private JoKeyManageMapper joKeyManageMapper;
 
     @Override
     public PageInfo jobOrderQueryList(Map map, Page page) {
         logger.info("------我收到的工单列表查询------");
         PageInfo pageInfo = new PageInfo();
         map.put("page", page);
-//        if(null != map.get("userId")) {
-//            Long userId = (Long) map.get("userId");
+//        if(null != map.get("dealPersonId")) {
+//            Long userId = (Long) map.get("dealPersonId");
 //            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
 //            if (orgCodeRes==null && orgCodeRes.size()!=1) {
 //                return null;
@@ -54,21 +54,58 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
 //            String organizationCode = String.valueOf(resultMap.get("ORGANIZATIONCODE"));
 //            map.put("organizationCode", organizationCode);
 //        }
-        int listCount = joOrderMapper.queryJobOrderListCount(map);
-        List<Map<String, Object>> jobOrderList = joOrderMapper.queryJobOrderList(map);
+        long listCount = joOrderMapper.queryJobOrderListCount(map);
+        List<JoTaskVo> jobOrderList = joOrderMapper.queryJobOrderList(map);
+        pageInfo.setTotal(jobOrderList.size());
+        pageInfo.setRows(jobOrderList);
+        return pageInfo;
+    }
+
+    @Override
+    public PageInfo jobTaskInfo(Map map, Page page) throws MessageException {
+        logger.info("------任务消息查看------");
+        PageInfo pageInfo = new PageInfo();
+        map.put("page", page);
+        if (null != map.get("id")) {
+            logger.error("---工单编号为空,获取不到任务信息---");
+            throw new MessageException("未获取到工单编号");
+        }
+        int listCount = joTaskMapper.queryJobTaskInfoCount(map);
+        List<Map<String, Object>> jobOrderList = joTaskMapper.queryJobTaskInfo(map);
         pageInfo.setTotal(listCount);
         pageInfo.setRows(jobOrderList);
         return pageInfo;
     }
 
-
     @Override
     public JoOrder getByJobId(String id) {
         if (StringUtils.isBlank(id)) {
+            logger.error("---工单id为空,获取不到数据---");
             return null;
         }
         JoOrder jobOrder = joOrderMapper.selectByPrimaryKey(id);
         return jobOrder;
+    }
+
+    @Override
+    public JoExpandKey getByJobExpandId(String jobId) {
+        if (StringUtils.isBlank(jobId)) {
+            logger.error("---工单id为空,获取不到数据---");
+            return null;
+        }
+        JoExpandKey joExpandKey = joExpandKeyMapper.selectByPrimaryKey(jobId);
+        return joExpandKey;
+    }
+
+    @Override
+    public List<JoKeyManage> queryManageList(String keyType) {
+        JoKeyManageExample joKeyManageExample = new JoKeyManageExample();
+        joKeyManageExample.createCriteria().andJoStatusEqualTo(String.valueOf(Status.STATUS_1.status));
+        if (StringUtils.isNotBlank(keyType)) {
+            joKeyManageExample.createCriteria().andJoKeyTypeEqualTo(keyType);
+        }
+        List<JoKeyManage> selectByExample = joKeyManageMapper.selectByExample(joKeyManageExample);
+        return selectByExample;
     }
 
     @Override
