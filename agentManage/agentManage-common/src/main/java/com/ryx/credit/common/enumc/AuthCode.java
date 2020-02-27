@@ -28,7 +28,12 @@ public enum AuthCode {
     LACK_BUS_INFO("1012","缺少业务信息"),
     LACK_TOKEN("1013","缺少令牌"),
     NO_TOKEN("1014","令牌不存在"),
-    TOKEN_PAST("1015","令牌已过期");
+    TOKEN_PAST("1015","令牌已过期"),
+    NO_CROSS_PLATFORM("1016","不允许跨平台查询"),
+    ACCOUNT_LOCK("1017","账号已锁定"),
+    PASS_WORD_ERROR("1018","账号或密码错误"),
+    NO_BUS_INFO("1019","没有可用的业务"),
+    PLATFORM_NULL("1020","平台不能为空");
 
     public String code;
 
