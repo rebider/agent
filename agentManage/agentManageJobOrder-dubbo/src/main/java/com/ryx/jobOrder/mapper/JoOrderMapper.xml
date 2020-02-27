@@ -511,7 +511,7 @@
 
   <sql id="selectByJobOrderSql">
     select
-    jo.id,
+    distinct (jo.id) as id,
     jo.ag_id,
     jo.ag_name,
     jo.bus_num,
@@ -529,8 +529,8 @@
     jo.accept_now_group
     from jo_order jo
     left join jo_task ta on ta.jo_id = jo.id
-    left join jo_key_manage one on one.jo_key_type = jo.jo_first_key_num
-    left join jo_key_manage two on two.jo_key_type = jo.jo_second_key_num
+    left join jo_key_manage one on one.jo_key = jo.jo_first_key_num
+    left join jo_key_manage two on two.jo_key = jo.jo_second_key_num
     <where>
       1 = 1
       <if test="id!=null and id!=''"> and jo.id = #{id} </if>
