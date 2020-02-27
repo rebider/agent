@@ -75,9 +75,8 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
     public PageInfo jobOrderQueryLaunchList(Map map, Page page) {
         logger.info("------我发起的工单列表查询------");
         PageInfo pageInfo = new PageInfo();
-        map.put("page", page);
         int listCount = joOrderMapper.queryJobOrderLaunchListCount(map);
-        List<Map<String, Object>> jobOrderList = joOrderMapper.queryJobOrderLaunchList(map);
+        List<JoTaskVo> jobOrderList = joOrderMapper.queryJobOrderLaunchList(map,page);
         pageInfo.setTotal(listCount);
         pageInfo.setRows(jobOrderList);
         return pageInfo;
