@@ -72,17 +72,6 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
     }
 
     @Override
-    public List<JoKeyManage> queryManageList(String keyType) {
-        JoKeyManageExample joKeyManageExample = new JoKeyManageExample();
-        joKeyManageExample.createCriteria().andJoStatusEqualTo(String.valueOf(Status.STATUS_1.status));
-        if (StringUtils.isNotBlank(keyType)) {
-            joKeyManageExample.createCriteria().andJoKeyTypeEqualTo(keyType);
-        }
-        List<JoKeyManage> selectByExample = joKeyManageMapper.selectByExample(joKeyManageExample);
-        return selectByExample;
-    }
-
-    @Override
     public PageInfo jobOrderQueryLaunchList(Map map, Page page) {
         logger.info("------我发起的工单列表查询------");
         PageInfo pageInfo = new PageInfo();
