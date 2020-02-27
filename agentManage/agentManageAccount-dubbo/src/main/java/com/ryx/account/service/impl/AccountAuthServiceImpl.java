@@ -8,16 +8,14 @@ import com.ryx.account.pojo.AuthLoginTokenExample;
 import com.ryx.account.pojo.AuthSysCode;
 import com.ryx.account.pojo.AuthSysCodeExample;
 import com.ryx.account.service.AccountAuthService;
-import com.ryx.credit.common.enumc.DictGroup;
-import com.ryx.credit.common.enumc.PlatformType;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
+import org.apache.http.auth.AUTH;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -70,11 +68,11 @@ public class AccountAuthServiceImpl implements AccountAuthService {
 
     private void commonVerify(String platformType)throws MessageException{
         if(StringUtils.isBlank(platformType)){
-            throw new MessageException("缺少系统编码");
+            throw new MessageException(AuthCode.LACK_SYSTEM_CODE.getContent());
         }
         String contentByValue = PlatformType.getContentByValue(platformType);
         if(StringUtils.isBlank(contentByValue)){
-            throw new MessageException("未知的系统编码");
+            throw new MessageException(AuthCode.UNKNOWN_SYSTEM_CODE.getContent());
         }
     }
 
@@ -98,7 +96,7 @@ public class AccountAuthServiceImpl implements AccountAuthService {
         criteria.andAuthCodeEndTimeGreaterThan(new Date());
         List<AuthSysCode> authSysCodes = authSysCodeMapper.selectByExample(authSysCodeExample);
         if(authSysCodes.size()!=0){
-            throw new MessageException("授权码尚未失效，请勿重复请求");
+            throw new MessageException(AuthCode.AUTH_CODE_VALID.getContent());
         }
         AuthSysCodeExample authSysCodeExample1 = new AuthSysCodeExample();
         AuthSysCodeExample.Criteria criteria1 = authSysCodeExample1.createCriteria();
@@ -109,7 +107,7 @@ public class AccountAuthServiceImpl implements AccountAuthService {
             authSysCode.setStatus(Status.STATUS_0.status.toString());
             int i = authSysCodeMapper.updateByPrimaryKeySelective(authSysCode);
             if(i!=1){
-                throw new MessageException("获取授权码失败");
+                throw new MessageException(AuthCode.AUTH_CODE_FAIL.getContent());
             }
         }
         AuthSysCode authSysCode = new AuthSysCode();
@@ -142,10 +140,10 @@ public class AccountAuthServiceImpl implements AccountAuthService {
 
         commonVerify(platformType);
         if(StringUtils.isBlank(serverIp)){
-            throw new MessageException("缺少请求ip地址");
+            throw new MessageException(AuthCode.LACK_IP.getContent());
         }
         if(StringUtils.isBlank(authCode)){
-            throw new MessageException("缺少授权码");
+            throw new MessageException(AuthCode.LACK_AUTH.getContent());
         }
         AuthSysCodeExample authSysCodeExample = new AuthSysCodeExample();
         AuthSysCodeExample.Criteria criteria = authSysCodeExample.createCriteria();
@@ -194,7 +192,7 @@ public class AccountAuthServiceImpl implements AccountAuthService {
      */
     private AuthSysCode verifyAuthCode(String platformType,String authCode)throws MessageException{
         if(StringUtils.isBlank(authCode)){
-            throw new MessageException("缺少授权码");
+            throw new MessageException(AuthCode.LACK_AUTH.getContent());
         }
         AuthSysCodeExample authSysCodeExample = new AuthSysCodeExample();
         AuthSysCodeExample.Criteria criteria = authSysCodeExample.createCriteria();
@@ -203,7 +201,7 @@ public class AccountAuthServiceImpl implements AccountAuthService {
         criteria.andAuthCodeEqualTo(authCode);
         List<AuthSysCode> authSysCodes = authSysCodeMapper.selectByExample(authSysCodeExample);
         if(authSysCodes.size()!=1){
-            throw new MessageException("授权码不存在");
+            throw new MessageException(AuthCode.NO_AUTH.getContent());
         }
         return authSysCodes.get(0);
     }
@@ -217,7 +215,7 @@ public class AccountAuthServiceImpl implements AccountAuthService {
     public void approveAuthCode(String platformType,String authCode)throws MessageException{
         AuthSysCode authSysCode = verifyAuthCode(platformType, authCode);
         if(authSysCode.getAuthCodeEndTime().getTime()<new Date().getTime()){
-            throw new MessageException("授权码已过期");
+            throw new MessageException(AuthCode.AUTH_PAST.getContent());
         }
     }
 
@@ -240,13 +238,13 @@ public class AccountAuthServiceImpl implements AccountAuthService {
 
         approveAuthCode(platformType, authCode);
         if(StringUtils.isBlank(loginName)){
-            throw new MessageException("缺少登陆名");
+            throw new MessageException(AuthCode.LACK_LOGIN_NAME.getContent());
         }
         if(StringUtils.isBlank(passWord)){
-            throw new MessageException("缺少密码");
+            throw new MessageException(AuthCode.LACK_PASS_WORD.getContent());
         }
         if(busInfos.size()==0){
-            throw new MessageException("缺少业务信息");
+            throw new MessageException(AuthCode.LACK_BUS_INFO.getContent());
         }
         AuthLoginTokenExample authLoginTokenExample = new AuthLoginTokenExample();
         AuthLoginTokenExample.Criteria criteria = authLoginTokenExample.createCriteria();
@@ -323,7 +321,7 @@ public class AccountAuthServiceImpl implements AccountAuthService {
 
         commonVerify(platformType);
         if(StringUtils.isBlank(serverIp)){
-            throw new MessageException("缺少请求ip地址");
+            throw new MessageException(AuthCode.LACK_IP.getContent());
         }
         AuthLoginToken authLoginToken = tokenVerity(tokenCode, platformType);
 //        if(!serverIp.equals(authLoginToken.getRequestId())){
@@ -345,7 +343,7 @@ public class AccountAuthServiceImpl implements AccountAuthService {
 
     private AuthLoginToken tokenVerity(String tokenCode,String platformType)throws MessageException{
         if(StringUtils.isBlank(tokenCode)){
-            throw new MessageException("缺少令牌");
+            throw new MessageException(AuthCode.LACK_TOKEN.getContent());
         }
         AuthLoginTokenExample authLoginTokenExample = new AuthLoginTokenExample();
         AuthLoginTokenExample.Criteria criteria = authLoginTokenExample.createCriteria();
@@ -354,7 +352,7 @@ public class AccountAuthServiceImpl implements AccountAuthService {
         criteria.andTokenEqualTo(tokenCode);
         List<AuthLoginToken> authLoginTokens = authLoginTokenMapper.selectByExample(authLoginTokenExample);
         if(authLoginTokens.size()!=1){
-            throw new MessageException("令牌不存在");
+            throw new MessageException(AuthCode.NO_TOKEN.getContent());
         }
         AuthLoginToken authLoginToken = authLoginTokens.get(0);
         return authLoginToken;
@@ -371,7 +369,7 @@ public class AccountAuthServiceImpl implements AccountAuthService {
 
         AuthLoginToken authLoginToken = tokenVerity(tokenCode, platformType);
         if(authLoginToken.getTokenEndTime().getTime()<new Date().getTime()){
-            throw new MessageException("令牌已过期");
+            throw new MessageException(AuthCode.TOKEN_PAST.getContent());
         }
         Map<String,Object> resultMap = new HashMap<>();
         resultMap.put("loginName",authLoginToken.getLogName());
