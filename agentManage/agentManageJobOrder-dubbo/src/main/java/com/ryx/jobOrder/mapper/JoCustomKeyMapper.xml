@@ -189,4 +189,23 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="selectMapByExample" parameterType="com.ryx.jobOrder.pojo.JoCustomKeyExample" resultType="map">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    ck.ID,    ck.JO_FIRST_KEY_NUM,    ck.JO_SECOND_KEY_NUM,    ck.JO_KEY_ID,    ck.JO_KEY,
+    ck.JO_KEY_VALUE_TYPE,    ck.JO_KEY_NULL,    ck.JO_KEY_SORT,    km.JO_KEY_NAME
+    from JO_CUSTOM_KEY ck
+    left join jo_key_manage km on km.ID = ck.JO_KEY_ID
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
 </mapper>

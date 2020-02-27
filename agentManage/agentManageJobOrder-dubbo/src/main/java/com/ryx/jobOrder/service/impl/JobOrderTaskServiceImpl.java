@@ -4,6 +4,7 @@ import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.jobOrder.dao.JoTaskMapper;
@@ -19,7 +20,7 @@ import java.util.List;
 @Service("jobOrderTaskService")
 public class JobOrderTaskServiceImpl implements JobOrderTaskService {
 
-    private BigDecimal version = new BigDecimal(0);
+    private final BigDecimal version = new BigDecimal(0);
 
     @Autowired
     private JoTaskMapper joTaskMapper;
@@ -29,7 +30,7 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
 
     @Override
     public FastMap createJobOrderTask(JoTask joTask) throws Exception{
-        joTask.setId( idService.genId(TabId.jo_order_task) );
+        joTask.setId( idService.genId(TabId.jo_task) );
         joTask.setVersion(version);
         int status = joTaskMapper.insert(joTask);
         if(status != 1){
@@ -38,8 +39,13 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         return FastMap.fastSuccessMap();
     }
 
-    public List<JoTaskVo> queryJobOrderTaskVo(JoTaskVo joTaskVo){
-        return  joTaskMapper.selectByJoTaskVo(joTaskVo,new Page(0,10));
+    public PageInfo queryJobOrderTaskVo(JoTaskVo joTaskVo, Page page){
+        List jotaskVolist = joTaskMapper.selectByJoTaskVo(joTaskVo, page);
+        PageInfo pageInfo = new PageInfo();
+        int count = jotaskVolist.size();
+        pageInfo.setTotal(count);
+        pageInfo.setRows(jotaskVolist);
+        return  pageInfo;
     }
 
     @Override
@@ -72,6 +78,6 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         if(StringUtils.isNotBlank(joTask.getDealPersonId())){
             criteria.andDealPersonIdEqualTo(joTask.getDealPersonId());
         }
-        return null;
+        return joTaskExample;
     }
 }

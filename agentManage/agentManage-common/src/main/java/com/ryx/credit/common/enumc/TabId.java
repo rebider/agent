@@ -126,8 +126,8 @@ public enum TabId {
     O_INTERNET_LOGOUT_DETAIL("ILD%s%015d"),
     JO_KEY_MANAGE("JK%s%015d"),
     jo_order("JO%s%015d"),
-    jo_order_task("JT%s%015d"),
-    jo_order_expand("JE%s%015d");
+    jo_task("JT%s%015d"),
+    jo_expand_key("JE%s%015d");
 
     public String patt;
 

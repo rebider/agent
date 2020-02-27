@@ -25,5 +25,5 @@ public interface JoTaskMapper {
 
     int updateByPrimaryKey(JoTask record);
 
-    List<JoTaskVo> selectByJoTaskVo(JoTaskVo example, @Param("page") Page page);
+    List<JoTaskVo> selectByJoTaskVo(@Param("example") JoTaskVo example, @Param("page") Page page);
 }

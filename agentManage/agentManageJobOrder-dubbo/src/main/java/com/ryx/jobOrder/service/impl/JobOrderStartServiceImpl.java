@@ -1,6 +1,7 @@
 package com.ryx.jobOrder.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.JoOrderStatus;
 import com.ryx.credit.common.enumc.JoTaskStatus;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.util.DateUtil;
@@ -12,7 +13,10 @@ import com.ryx.jobOrder.pojo.JoExpandKey;
 import com.ryx.jobOrder.pojo.JoKeyManage;
 import com.ryx.jobOrder.pojo.JoOrder;
 import com.ryx.jobOrder.pojo.JoTask;
+import com.ryx.jobOrder.service.JobOrderAuthService;
+import com.ryx.jobOrder.service.JobOrderManageService;
 import com.ryx.jobOrder.service.JobOrderStartService;
+import com.ryx.jobOrder.service.JobOrderTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,43 +27,67 @@ import java.util.List;
 import java.util.Map;
 @Service("jobOrderStartService")
 public class JobOrderStartServiceImpl implements JobOrderStartService {
-
+    private final BigDecimal version = new BigDecimal(0);
     @Autowired
     private JoOrderMapper joOrderMapper;
+
+    @Autowired
+    private JobOrderAuthService jobOrderAuthService;
 
     @Autowired
     private JoExpandKeyMapper joExpandKeyMapper;
 
     @Autowired
+    private JobOrderTaskService jobOrderTaskService;
+
+    @Autowired
+    private JobOrderManageService jobOrderManageService;
+
+    @Autowired
     private IdService idService;
     /**
      * 创建工单服务
-     * @param jo
-     * @param otherMap
+     * @param jo  工单数据对象
+     * @param otherMap 关键词信息对象
      * @return
      */
     @Override
-    public FastMap createJobOrder(JoOrder jo, Map otherMap) {
-        jo.setId("");// 生成ID
-        joOrderMapper.insert(jo);
-        for(Object keyo : otherMap.keySet()){ //keySet获取map集合key的集合  然后在遍历key即可
-            String key = (String)keyo;
-            String value = (String)otherMap.get(key);
-            // 通过key 查询 key 的类型
-            JoKeyManage joKeyManage = new JoKeyManage();//TODO 方法返回对象
-            JoExpandKey joExpandKey = new JoExpandKey();
-            joExpandKey.setJid(jo.getId());
-            joExpandKey.setJoKeyId(joKeyManage.getId());
-            joExpandKey.setJoKey(joKeyManage.getJoKey());
-            joExpandKey.setJoKeyValueType(joKeyManage.getJoKeyValueType());
-            joExpandKey.setJoKeyName(joKeyManage.getJoKeyName());
-            joExpandKey.setJoKeyValue(value);
-            saveJobOrderExband(joExpandKey);
+    public FastMap createJobOrder(JoOrder jo, Map otherMap) throws Exception {
+        jo.setId(idService.genId(TabId.jo_order));// 生成ID
+        jo.setVersion(version);
+        jo.setJoProgress(JoOrderStatus.WCL.getValue());
+        // 查找受理部门
+        Map acceptMap = jobOrderAuthService.getJobOrderType(jo.getJoSecondKeyNum());
+        if(acceptMap!=null){
+            jo.setAcceptGroup((String)acceptMap.get("name"));
+            jo.setAcceptGroupCode((String)acceptMap.get("desdription"));
         }
+
+        joOrderMapper.insert(jo);
+        if(otherMap!= null ){
+            for(Object keyo : otherMap.keySet()){ //keySet获取map集合key的集合  然后在遍历key即可
+                int index = 0;
+                String key = (String)keyo;
+                String value = (String)otherMap.get(key);
+                // 通过key 查询 key 的类型
+                JoKeyManage joKeyManage = jobOrderManageService.queryKeywordDialog(key);
+                JoExpandKey joExpandKey = new JoExpandKey();
+                joExpandKey.setJid(jo.getId());
+                joExpandKey.setJoKeyId(joKeyManage.getId());
+                joExpandKey.setJoKey(joKeyManage.getJoKey());
+                joExpandKey.setJoKeyValueType(joKeyManage.getJoKeyValueType());
+                joExpandKey.setJoKeyName(joKeyManage.getJoKeyName());
+                joExpandKey.setJoKeyValue(value);
+                joExpandKey.setJoExpandSort(new BigDecimal(index));
+                saveJobOrderExband(joExpandKey);
+                index++;
+            }
+        }
+
         // 查询受理组
         String acceptGroup = "";
         JoTask joTask = new JoTask();
-        joTask.setId( idService.genId(TabId.jo_order_task) );
+        joTask.setId( idService.genId(TabId.jo_task) );
         joTask.setJoId(jo.getId());
         joTask.setJoTaskStatus(JoTaskStatus.WSL.getValue());
         joTask.setJoTaskTime(new Date());
@@ -68,6 +96,7 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
         joTask.setDealPersonId("");
         joTask.setDealPersonName("");
         joTask.setJoTaskContent(jo.getJoContent());
+        jobOrderTaskService.createJobOrderTask(joTask);
         return FastMap.fastSuccessMap();
     }
 

@@ -6,6 +6,10 @@ import java.util.Date;
 
 public class JoTaskVo extends JoOrder {
 
+    private String joDealPersonId;
+
+    private String joDealGroupId;
+
     private String joTaskId;
 
     private String joTaskStatus;
@@ -29,6 +33,22 @@ public class JoTaskVo extends JoOrder {
     private Date joAcceptTimeBegin;
 
     private Date joAcceptTimeEnd;
+
+    public String getJoDealPersonId() {
+        return joDealPersonId;
+    }
+
+    public void setJoDealPersonId(String joDealPersonId) {
+        this.joDealPersonId = joDealPersonId;
+    }
+
+    public String getJoDealGroupId() {
+        return joDealGroupId;
+    }
+
+    public void setJoDealGroupId(String joDealGroupId) {
+        this.joDealGroupId = joDealGroupId;
+    }
 
     public Date getJoStartTimeBegin() {
         return joStartTimeBegin;

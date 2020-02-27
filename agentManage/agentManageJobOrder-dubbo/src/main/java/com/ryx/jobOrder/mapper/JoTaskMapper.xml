@@ -331,15 +331,12 @@
     jt.id as joTaskId, jt.jo_task_status  as joTaskStatus, jt.jo_task_time as joTaskTime,
     jt.jo_task_accept_time as joTaskAcceptTime
   </sql>
-  <select id="selectByJoTaskVo" parameterType="com.ryx.jobOrder.vo.JoTaskVo" resultMap="JoTaskVoBaseResultMap">
+  <select id="selectByJoTaskVo"  resultMap="JoTaskVoBaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
-    <if test="distinct">
-      distinct
-    </if>
     <include refid="JoTaskVo_Column_List" />
     from JO_ORDER jo
-    left join JO_TASK jt on jo.id = jt.id
+    left join JO_TASK jt on jo.id = jt.jo_id
     <if test="_parameter != null">
       <include refid="TaskVoExample_Where_Clause" />
     </if>
@@ -347,41 +344,42 @@
   </select>
   <sql id="TaskVoExample_Where_Clause">
     <where>
-      <if test="joTaskId != null">
-        jt.id = ${joTaskId}
+        1=1
+      <if test="example.id != null and example.id != ''">
+        and jo.id = #{example.id}
       </if>
-      <if test="joFirstKeyNum != null">
-        jo.jo_first_key_num = ${joFirstKeyNum}
+      <if test="example.joTaskId != null and example.joTaskId != ''">
+        and jt.id = #{example.joTaskId}
       </if>
-      <if test="joSecondKeyNum != null">
-        jo.jo_second_key_num = ${joSecondKeyNum}
+      <if test="example.joFirstKeyNum != null and example.joFirstKeyNum != ''">
+        and jo.jo_first_key_num = #{example.joFirstKeyNum}
       </if>
-      <if test="agId != null">
-        jo.ag_id = ${agId}
+      <if test="example.joSecondKeyNum != null and example.joSecondKeyNum != ''">
+        and jo.jo_second_key_num = #{example.joSecondKeyNum}
       </if>
-      <if test="agName != null">
-        jo.ag_name = ${agName}
+      <if test="example.agId != null and example.agId != ''">
+        and jo.ag_id = #{example.agId}
       </if>
-      <if test="busNum != null">
-        jo.bus_num = ${busNum}
+      <if test="example.agName != null and example.agName != ''">
+        and jo.ag_name = #{example.agName}
       </if>
-      <if test="busNum != null">
-        jo.bus_num = ${busNum}
+      <if test="example.busNum != null and example.busNum != '' ">
+        and jo.bus_num = #{example.busNum}
       </if>
-      <if test="priorityLevel != null">
-        jo.priority_level = ${priorityLevel}
+      <if test="example.priorityLevel != null and example.priorityLevel != ''">
+        and jo.priority_level = #{example.priorityLevel}
       </if>
-      <if test="joProgress != null">
-        jo.jo_progress = ${joProgress}
+      <if test="example.joProgress != null and example.joProgress != ''">
+        and jt.jo_progress = #{example.joProgress}
       </if>
-      <if test="joTaskStatus != null">
-        jt.jo_task_status = ${joTaskStatus}
+      <if test="example.joTaskStatus != null and example.joTaskStatus != ''">
+        and jt.jo_task_status = #{example.joTaskStatus}
       </if>
-      <if test="joStartTimeBegin != null and joStartTimeEnd != null">
-        and between #{joStartTimeBegin} and #{joStartTimeEnd}
+      <if test="example.joStartTimeBegin != null and example.joStartTimeEnd != null and example.joStartTimeBegin != '' and example.joStartTimeEnd != ''">
+        and between #{example.joStartTimeBegin} and #{example.joStartTimeEnd}
       </if>
-      <if test="joAcceptTimeBegin != null and joAcceptTimeEnd != null">
-        and between #{joAcceptTimeBegin} and #{joAcceptTimeEnd}
+      <if test="example.joAcceptTimeBegin != null and example.joAcceptTimeEnd != null and example.joAcceptTimeBegin != '' and example.joAcceptTimeEnd != ''">
+        and between #{example.joAcceptTimeBegin} and #{example.joAcceptTimeEnd}
       </if>
     </where>
   </sql>

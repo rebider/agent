@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
@@ -138,4 +139,10 @@ public interface AgentBusinfoService {
      */
     public AgentBusInfo agentPlatformNum(String agentId,String platFormNum);
 
+    /**
+     * 通过 dict 返回对应的业务数据
+     * @param reqMap
+     * @return
+     */
+    public  List<Map> agentBusByDict(FastMap reqMap);
 }

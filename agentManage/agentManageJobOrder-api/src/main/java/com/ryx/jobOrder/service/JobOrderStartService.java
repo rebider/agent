@@ -10,7 +10,7 @@ import java.util.Map;
 
 public interface JobOrderStartService {
 
-    FastMap createJobOrder(JoOrder joOrder, Map orderMap);
+    FastMap createJobOrder(JoOrder joOrder, Map orderMap) throws Exception;
 
     List<FastMap> getStartLaunchVo(JSONObject para);
 

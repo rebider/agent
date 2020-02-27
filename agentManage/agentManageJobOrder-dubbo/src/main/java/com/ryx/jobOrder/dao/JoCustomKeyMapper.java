@@ -20,4 +20,6 @@ public interface JoCustomKeyMapper {
     int updateByPrimaryKeySelective(JoCustomKey record);
 
     int updateByPrimaryKey(JoCustomKey record);
+
+    List selectMapByExample(JoCustomKeyExample example);
 }

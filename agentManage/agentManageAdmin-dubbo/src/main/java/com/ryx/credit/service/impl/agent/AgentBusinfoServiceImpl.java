@@ -1217,4 +1217,13 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		return agentBusInfos;
 	}
 
+
+	@Override
+	public List<Map> agentBusByDict(FastMap reqMap) {
+		List<Map> data = agentBusInfoMapper.queryTreeByBusInfoAndDict(reqMap);
+		for (Map datum : data) {
+			datum.put("BUS_TYPE_NAME",BusType.getContentByValue(String.valueOf(datum.get("BUS_TYPE"))));
+		}
+		return data;
+	}
 }

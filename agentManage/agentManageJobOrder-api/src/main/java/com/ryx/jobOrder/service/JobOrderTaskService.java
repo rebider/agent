@@ -1,6 +1,8 @@
 package com.ryx.jobOrder.service;
 
 import com.ryx.credit.common.util.FastMap;
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.jobOrder.pojo.JoTask;
 import com.ryx.jobOrder.vo.JoTaskVo;
 
@@ -15,5 +17,5 @@ public interface JobOrderTaskService {
 
     FastMap updateJobOrderTask(JoTask queryMap) throws Exception;
 
-    List<JoTaskVo> queryJobOrderTaskVo(JoTaskVo joTaskVo);
+    PageInfo queryJobOrderTaskVo(JoTaskVo joTaskVo, Page page);
 }

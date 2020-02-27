@@ -118,4 +118,6 @@ public interface AgentBusInfoMapper {
     //顶级菜单客服服务-列表查询
     List<Map<String, Object>> queryBusinfoTopMenuList(@Param("reqMap")Map<String, Object> reqMap, @Param("page")Page page);
     int queryBusinfoTopMenuCount(@Param("reqMap") Map<String,Object> reqMap);
+    // 返回字典对应 业务数据
+    List<Map<String,Object>> queryTreeByBusInfoAndDict(Map<String,Object> reqMap);
 }

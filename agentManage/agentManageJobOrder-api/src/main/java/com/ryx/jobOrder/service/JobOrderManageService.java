@@ -33,4 +33,7 @@ public interface JobOrderManageService {
     List selectLevel();
 
     public List selectCustomListBySedType(JoCustomKey joCustomKey);
+
+    public List selectCustomListMapBySedType(JoCustomKey joCustomKey);
+
 }
