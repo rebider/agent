@@ -22,7 +22,6 @@ public enum AuthCode {
     LACK_IP("1006","缺少请求ip地址"),
     LACK_AUTH("1007","缺少授权码"),
     NO_AUTH("1008","授权码不存在"),
-    AUTH_PAST("1009","授权码已过期"),
     LACK_LOGIN_NAME("1010","缺少登陆名"),
     LACK_PASS_WORD("1011","缺少密码"),
     LACK_BUS_INFO("1012","缺少业务信息"),
