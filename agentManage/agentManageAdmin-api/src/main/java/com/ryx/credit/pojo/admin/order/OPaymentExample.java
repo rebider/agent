@@ -2467,6 +2467,76 @@ public class OPaymentExample {
             addCriterion("PROFIT_MOUTH not between", value1, value2, "profitMouth");
             return (Criteria) this;
         }
+
+        public Criteria andCustomStagingIsNull() {
+            addCriterion("CUSTOM_STAGING is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCustomStagingIsNotNull() {
+            addCriterion("CUSTOM_STAGING is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCustomStagingEqualTo(String value) {
+            addCriterion("CUSTOM_STAGING =", value, "customStaging");
+            return (Criteria) this;
+        }
+
+        public Criteria andCustomStagingNotEqualTo(String value) {
+            addCriterion("CUSTOM_STAGING <>", value, "customStaging");
+            return (Criteria) this;
+        }
+
+        public Criteria andCustomStagingGreaterThan(String value) {
+            addCriterion("CUSTOM_STAGING >", value, "customStaging");
+            return (Criteria) this;
+        }
+
+        public Criteria andCustomStagingGreaterThanOrEqualTo(String value) {
+            addCriterion("CUSTOM_STAGING >=", value, "customStaging");
+            return (Criteria) this;
+        }
+
+        public Criteria andCustomStagingLessThan(String value) {
+            addCriterion("CUSTOM_STAGING <", value, "customStaging");
+            return (Criteria) this;
+        }
+
+        public Criteria andCustomStagingLessThanOrEqualTo(String value) {
+            addCriterion("CUSTOM_STAGING <=", value, "customStaging");
+            return (Criteria) this;
+        }
+
+        public Criteria andCustomStagingLike(String value) {
+            addCriterion("CUSTOM_STAGING like", value, "customStaging");
+            return (Criteria) this;
+        }
+
+        public Criteria andCustomStagingNotLike(String value) {
+            addCriterion("CUSTOM_STAGING not like", value, "customStaging");
+            return (Criteria) this;
+        }
+
+        public Criteria andCustomStagingIn(List<String> values) {
+            addCriterion("CUSTOM_STAGING in", values, "customStaging");
+            return (Criteria) this;
+        }
+
+        public Criteria andCustomStagingNotIn(List<String> values) {
+            addCriterion("CUSTOM_STAGING not in", values, "customStaging");
+            return (Criteria) this;
+        }
+
+        public Criteria andCustomStagingBetween(String value1, String value2) {
+            addCriterion("CUSTOM_STAGING between", value1, value2, "customStaging");
+            return (Criteria) this;
+        }
+
+        public Criteria andCustomStagingNotBetween(String value1, String value2) {
+            addCriterion("CUSTOM_STAGING not between", value1, value2, "customStaging");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
