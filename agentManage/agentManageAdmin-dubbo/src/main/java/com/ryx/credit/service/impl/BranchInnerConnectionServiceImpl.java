@@ -20,7 +20,6 @@ import com.ryx.credit.dao.CUserMapper;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.machine.service.LmsUserService;
 import com.ryx.credit.pojo.admin.CBranchInner;
-import com.ryx.credit.pojo.admin.CBranchInnerExample;
 import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.vo.UserVo;
 import com.ryx.credit.service.IBranchInnerConnectionService;
@@ -37,8 +36,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -74,6 +71,53 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
     }
 
     /**
+     * 查询修改所需数据
+     * @param fastMap
+     * @return
+     */
+    @Override
+    public FastMap queryEditData(FastMap fastMap) throws Exception {
+        if (!(null != fastMap && null != fastMap.get("id"))) {
+            throw new Exception("传递数据为空，获取数据失败，请刷新重试！");
+        }
+        CBranchInner cBranchInner = branchInnerMapper.selectByPrimaryKey(fastMap.get("id").toString());
+        List<Map<String, String>> innerList = lmsUserService.queryAllLmsUser();
+        return FastMap.fastMap("innerList", innerList).putKeyV("cBranchInner", cBranchInner);
+    }
+
+    /**
+     * 保存修改后数据
+     * @param fastMap
+     * @return
+     * @throws Exception
+     */
+    @Override
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public FastMap editConnectionAccount(FastMap fastMap) throws Exception {
+        if (null == fastMap || null == fastMap.get("branch") || null == fastMap.get("oldInner") || null == fastMap.get("inner")) {
+            throw new MessageException("系统异常，请稍后再试！");
+        }
+        String branch = fastMap.get("branch").toString();
+        String oldInner = fastMap.get("oldInner").toString();
+        String inner = fastMap.get("inner").toString();
+
+        //查询busNum
+        List<String> busNums = agentBusInfoMapper.selectBusNumByBusProCode(FastMap.fastMap("platformType", PlatformType.POS.code).putKeyV("branchLogin", branch));
+        if (busNums.size() > 0) {
+            JSONObject data = new JSONObject();
+            data.put("addAccounts", inner);
+            data.put("delAccounts", oldInner);
+            data.put("orgId", String.join(",", busNums));
+            AgentResult agentResult = request("ORG021", data);
+            if (!agentResult.isOK()) return FastMap.fastFailMap(agentResult.getMsg());
+        }
+
+        //更新数据库表中数据
+
+         return FastMap.fastSuccessMap();
+    }
+
+    /**
      * 解除关联关系
      * @param id
      * @return
@@ -86,12 +130,14 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
         //查询busNum
         List<String> busNums = agentBusInfoMapper.selectBusNumByBusProCode(FastMap.fastMap("platformType", PlatformType.POS.code).putKeyV("branchLogin", cBranchInner.getBranchLogin()));
 
-        JSONObject data = new JSONObject();
-        data.put("loginname", cBranchInner.getInnerLogin());
-        data.put("dType", "1");
-        data.put("delOrgIds", String.join(",", busNums));
-        AgentResult agentResult = request("ORG020", data);
-        if (!agentResult.isOK()) return FastMap.fastMap("code", "2").putKeyV("msg", agentResult.getMsg());
+        if (busNums.size() > 0) {
+            JSONObject data = new JSONObject();
+            data.put("loginname", cBranchInner.getInnerLogin());
+            data.put("dType", "1");
+            data.put("delOrgIds", String.join(",", busNums));
+            AgentResult agentResult = request("ORG020", data);
+            if (!agentResult.isOK()) return FastMap.fastMap("code", "2").putKeyV("msg", agentResult.getMsg());
+        }
 
         int t = 0;
         //先查询，查询账号是否存在状态为2的，
@@ -421,6 +467,9 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
                     if (respCode.equals("000000")) {
                         return AgentResult.ok();
                     } else {
+                        if (null != respXMLObj.get("data") && null != JSONObject.parseObject(String.valueOf(respXMLObj.get("data"))).get("result_msg")) {
+                            return AgentResult.fail(JSONObject.parseObject(String.valueOf(respXMLObj.get("data"))).get("result_msg").toString());
+                        }
                         return AgentResult.fail("业务系统删除失败！");
                     }
                 }

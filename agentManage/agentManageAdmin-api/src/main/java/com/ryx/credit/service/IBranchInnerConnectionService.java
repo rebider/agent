@@ -1,5 +1,7 @@
 package com.ryx.credit.service;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.commons.utils.PageInfo;
 import com.ryx.credit.pojo.admin.vo.UserVo;
@@ -72,4 +74,7 @@ public interface IBranchInnerConnectionService {
     AgentResult addListItem(List<Object> data, String user) throws Exception;
 
 
+    FastMap queryEditData(FastMap fastMap) throws Exception;
+
+    FastMap editConnectionAccount(FastMap fastMap) throws Exception;
 }
