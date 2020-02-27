@@ -238,9 +238,12 @@ public class CapitalServiceImpl implements CapitalService {
         BigDecimal residueAmt = amt;  //算出未扣足的金额
         for (Capital capital : capitals) {
             BigDecimal fqInAmount = capital.getcFqInAmount();//可用余额
+            if(fqInAmount.compareTo(BigDecimal.ZERO)<=0){
+                  continue;
+            }
             BigDecimal operationAmt = BigDecimal.ZERO; //当前资金要扣除的金额
             //当前可用金额大于要冻结的金额
-            if(fqInAmount.compareTo(residueAmt)>=1){
+            if(fqInAmount.compareTo(residueAmt)>=0){
                 //当前资金需要冻结的金额
                 operationAmt = residueAmt;
                 //下一笔需要扣除 为0  因为本次已经全部扣除
@@ -282,12 +285,12 @@ public class CapitalServiceImpl implements CapitalService {
             capitalFlow.setVersion(BigDecimal.ZERO);
             capitalFlow.setFlowStatus(Status.STATUS_0.status);//未生效
             capitalFlowMapper.insertSelective(capitalFlow);
-            if (residueAmt.compareTo(BigDecimal.ZERO) <= 1) {
+            if (residueAmt.compareTo(BigDecimal.ZERO) <= 0) {
                 break;
             }
         }
 
-        if (residueAmt.compareTo(BigDecimal.ZERO) > 1) {
+        if (residueAmt.compareTo(BigDecimal.ZERO) > 0) {
             throw new MessageException("缴款金额不足，无法进行全额冻结");
         }
     }
