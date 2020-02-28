@@ -34,10 +34,6 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
     private IUserService iUserService;
     @Autowired
     private JoTaskMapper joTaskMapper;
-    @Autowired
-    private JoExpandKeyMapper joExpandKeyMapper;
-    @Autowired
-    private JoKeyManageMapper joKeyManageMapper;
 
     @Override
     public PageInfo jobOrderQueryList(Map map, Page page) {
@@ -54,9 +50,9 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
 //            String organizationCode = String.valueOf(resultMap.get("ORGANIZATIONCODE"));
 //            map.put("organizationCode", organizationCode);
 //        }
-//        int = joOrderMapper.queryJobOrderListCount(map);
+        int jobOrderListCount = joOrderMapper.queryJobOrderListCount(map);
         List<JoTaskVo> jobOrderList = joOrderMapper.queryJobOrderList(map);
-        pageInfo.setTotal(jobOrderList.size());
+        pageInfo.setTotal(jobOrderListCount);
         pageInfo.setRows(jobOrderList);
         return pageInfo;
     }

@@ -503,7 +503,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
 
-  <select id="queryJobOrderListCount" resultMap="JoOrderVoResultMap">
+  <select id="queryJobOrderListCount" resultType="int">
     select count(*) from (
     <include refid="selectByJobOrderSql" />
     )
