@@ -70,7 +70,7 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
             criteria.andIdEqualTo(joTask.getId());
         }
         if(StringUtils.isNotBlank(joTask.getJoId())){
-            criteria.andIdEqualTo(joTask.getJoId());
+            criteria.andJoIdEqualTo(joTask.getJoId());
         }
         if(StringUtils.isNotBlank(joTask.getDealGroupId())){
             criteria.andDealGroupIdEqualTo(joTask.getDealGroupId());
