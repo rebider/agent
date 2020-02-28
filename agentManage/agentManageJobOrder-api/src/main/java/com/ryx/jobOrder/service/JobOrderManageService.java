@@ -4,6 +4,7 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.jobOrder.pojo.JoCustomKey;
 import com.ryx.jobOrder.pojo.JoKeyManage;
 
@@ -36,4 +37,13 @@ public interface JobOrderManageService {
 
     public List selectCustomListMapBySedType(JoCustomKey joCustomKey);
 
+
+    /**
+     * 根据工单类型查询关键词(二级)
+     * @param joCustomKey
+     * @return
+     */
+    List<Map> selectKeyWord(JoCustomKey joCustomKey);
+
+    PageInfo joCustomKeyList(Page page, Map map);
 }
