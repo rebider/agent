@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="agentManageProfit-dubbo" />
+        <module name="agentManageActivity-api" />
+        <module name="agentManageAdmin-api" />
+        <module name="agentManageProfit-api" />
+        <module name="agentManage-common" />
+        <module name="agentManageAccount-api" />
+        <module name="agentManageJob" />
+        <module name="agentManageMachine-dubbo" />
+        <module name="agentManageAdmin-dubbo" />
+        <module name="agentManageMachine-api" />
+        <module name="agentManageInternetCard-dubbo" />
+        <module name="agentManageInternetCard-api" />
+        <module name="agentManageJobOrder-dubbo" />
+        <module name="agentManageAccount-dubbo" />
+        <module name="agentManageJobOrder-api" />
+        <module name="agentManageActivity-dubbo" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel target="8">
+      <module name="agentManage" target="1.8" />
+      <module name="agentManage-common" target="1.8" />
+      <module name="agentManageAccount-api" target="1.8" />
+      <module name="agentManageAccount-dubbo" target="1.8" />
+      <module name="agentManageActivity-api" target="1.8" />
+      <module name="agentManageActivity-dubbo" target="1.8" />
+      <module name="agentManageAdmin-api" target="1.8" />
+      <module name="agentManageAdmin-dubbo" target="1.8" />
+      <module name="agentManageInternetCard-api" target="1.8" />
+      <module name="agentManageInternetCard-dubbo" target="1.8" />
+      <module name="agentManageJob" target="1.8" />
+      <module name="agentManageJobOrder-api" target="1.8" />
+      <module name="agentManageJobOrder-dubbo" target="1.8" />
+      <module name="agentManageMachine-api" target="1.8" />
+      <module name="agentManageMachine-dubbo" target="1.8" />
+      <module name="agentManageProfit-api" target="1.8" />
+      <module name="agentManageProfit-dubbo" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

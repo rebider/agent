@@ -597,4 +597,20 @@
     </where>
     order by jo.launch_time desc
   </sql>
+  <select id="queryListByTaskId" parameterType="string" resultMap="BaseResultMap">
+    select
+    distinct (JO.ID) AS ID,
+    <include refid="JO_Base_Column_List" />
+    from JO_ORDER jo
+    left join  jo_task jt on jt.jo_id = jo.id
+    where jt.id = #{taskId}
+  </select>
+  <sql id="JO_Base_Column_List">
+    jo.AG_ID, jo.AG_NAME, jo.BUS_ID, jo.BUS_NUM, jo.PALTFORM_NUM, jo.PLATFORM_NAME, jo.JO_FIRST_KEY_NUM,
+    jo.JO_SECOND_KEY_NUM, jo.PRIORITY_LEVEL, jo.LAUNCH_TIME, jo.LAUNCH_PERSON_ID, jo.LAUNCH_PERSON_NAME,
+    jo.LAUNCH_PERSON_EMAIL, jo.LAUNCH_BRANCH_ID, jo.LAUNCH_BRANCH_NAME, jo.ACCEPT_GROUP_CODE, jo.ACCEPT_GROUP,
+    jo.ACCEPT_NOW_GROUP, jo.DEAL_TIME_START, jo.DEAL_TIME_END, jo.DEAL_TIME_LENGTH, jo.JO_PROGRESS,
+    jo.JO_TITLE, jo.JO_CONTENT, jo.JO_ASSESS_LEVEL, jo.JO_ASSESSOR_NAME, jo.JO_ASSESSOR_TYPE, jo.JO_ASSESSOR_ID,
+    jo.JO_ASSESS_CONTENT, jo.JO_ASSESS_TIME, jo.VERSION
+  </sql>
 </mapper>

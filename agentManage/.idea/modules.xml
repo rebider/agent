@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/agentManage.iml" filepath="$PROJECT_DIR$/agentManage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/agentManage-common/agentManage-common.iml" filepath="$PROJECT_DIR$/agentManage-common/agentManage-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/agentManageAccount-api/agentManageAccount-api.iml" filepath="$PROJECT_DIR$/agentManageAccount-api/agentManageAccount-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/agentManageAccount-dubbo/agentManageAccount-dubbo.iml" filepath="$PROJECT_DIR$/agentManageAccount-dubbo/agentManageAccount-dubbo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/agentManageActivity-api/agentManageActivity-api.iml" filepath="$PROJECT_DIR$/agentManageActivity-api/agentManageActivity-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/agentManageActivity-dubbo/agentManageActivity-dubbo.iml" filepath="$PROJECT_DIR$/agentManageActivity-dubbo/agentManageActivity-dubbo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/agentManageAdmin-api/agentManageAdmin-api.iml" filepath="$PROJECT_DIR$/agentManageAdmin-api/agentManageAdmin-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/agentManageAdmin-dubbo/agentManageAdmin-dubbo.iml" filepath="$PROJECT_DIR$/agentManageAdmin-dubbo/agentManageAdmin-dubbo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/agentManageInternetCard-api/agentManageInternetCard-api.iml" filepath="$PROJECT_DIR$/agentManageInternetCard-api/agentManageInternetCard-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/agentManageInternetCard-dubbo/agentManageInternetCard-dubbo.iml" filepath="$PROJECT_DIR$/agentManageInternetCard-dubbo/agentManageInternetCard-dubbo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/agentManageJob/agentManageJob.iml" filepath="$PROJECT_DIR$/agentManageJob/agentManageJob.iml" />
+      <module fileurl="file://$PROJECT_DIR$/agentManageJobOrder-api/agentManageJobOrder-api.iml" filepath="$PROJECT_DIR$/agentManageJobOrder-api/agentManageJobOrder-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/agentManageJobOrder-dubbo/agentManageJobOrder-dubbo.iml" filepath="$PROJECT_DIR$/agentManageJobOrder-dubbo/agentManageJobOrder-dubbo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/agentManageMachine-api/agentManageMachine-api.iml" filepath="$PROJECT_DIR$/agentManageMachine-api/agentManageMachine-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/agentManageMachine-dubbo/agentManageMachine-dubbo.iml" filepath="$PROJECT_DIR$/agentManageMachine-dubbo/agentManageMachine-dubbo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/agentManageProfit-api/agentManageProfit-api.iml" filepath="$PROJECT_DIR$/agentManageProfit-api/agentManageProfit-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/agentManageProfit-dubbo/agentManageProfit-dubbo.iml" filepath="$PROJECT_DIR$/agentManageProfit-dubbo/agentManageProfit-dubbo.iml" />
+    </modules>
+  </component>
+</project>

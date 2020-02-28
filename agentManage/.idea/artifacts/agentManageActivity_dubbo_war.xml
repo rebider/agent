@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="agentManageActivity-dubbo:war">
+    <output-path>$PROJECT_DIR$/agentManageActivity-dubbo/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>agentManageActivity-dubbo</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="agentManageActivity-dubbo.war">
+      <element id="artifact" artifact-name="agentManageActivity-dubbo:war exploded" />
+    </root>
+  </artifact>
+</component>

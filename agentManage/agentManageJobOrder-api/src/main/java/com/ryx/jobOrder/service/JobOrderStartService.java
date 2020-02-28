@@ -5,6 +5,7 @@ import com.ryx.credit.common.util.FastMap;
 import com.ryx.jobOrder.pojo.JoExpandKey;
 import com.ryx.jobOrder.pojo.JoOrder;
 
+import javax.management.Query;
 import java.util.List;
 import java.util.Map;
 
@@ -16,4 +17,5 @@ public interface JobOrderStartService {
 
     FastMap saveJobOrderExband(JoExpandKey joExpandKey);
 
+    JoOrder queryListByTaskId(String taskId);
 }

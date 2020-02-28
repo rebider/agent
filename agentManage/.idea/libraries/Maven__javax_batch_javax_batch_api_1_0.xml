@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: javax.batch:javax.batch-api:1.0">
+    <CLASSES>
+      <root url="jar://D:/soft/apache-maven-3.2.5/m2/javax/batch/javax.batch-api/1.0/javax.batch-api-1.0.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://D:/soft/apache-maven-3.2.5/m2/javax/batch/javax.batch-api/1.0/javax.batch-api-1.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://D:/soft/apache-maven-3.2.5/m2/javax/batch/javax.batch-api/1.0/javax.batch-api-1.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,10 +1,7 @@
 package com.ryx.jobOrder.dao;
 
-import com.ryx.credit.common.util.Page;
 import com.ryx.jobOrder.pojo.JoOrder;
 import com.ryx.jobOrder.pojo.JoOrderExample;
-import com.ryx.jobOrder.vo.JoTaskVo;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -26,11 +23,11 @@ public interface JoOrderMapper {
 
     int updateByPrimaryKey(JoOrder record);
 
-    List<JoTaskVo> queryJobOrderList(Map<String, Object> param);
+    List<Map<String, Object>> queryJobOrderList(Map<String, Object> param);
 
-    long queryJobOrderListCount(Map<String, Object> param);
+    int queryJobOrderListCount(Map<String, Object> param);
 
-    List<JoTaskVo> queryJobOrderLaunchList(@Param("map") Map<String, Object> param,@Param("page") Page page);
+    List<Map<String, Object>> queryJobOrderLaunchList(Map<String, Object> param);
 
-    int queryJobOrderLaunchListCount(@Param("map") Map<String, Object> param);
+    int queryJobOrderLaunchListCount(Map<String, Object> param);
 }
