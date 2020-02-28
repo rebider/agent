@@ -760,8 +760,8 @@ public class OrderServiceImpl implements OrderService {
                 payment.setDownPayment(BigDecimal.ZERO);
             }
             //TODO 检查付款明细及打款信息是否和订单金额一致 订单应付金额 = 分期金额+首付金额+抵扣金额
-            if(payment.getPayAmount().compareTo(payment.getDownPayment().add(payment.getDeductionAmount()).add(fqje))!=0){
-              throw new MessageException("分期金额配置失败:应为"+ payment.getPayAmount().subtract(payment.getDownPayment()).subtract(payment.getDeductionAmount()));
+            if(payment.getPayAmount().compareTo(payment.getDownPayment().add(fqje))!=0){
+              throw new MessageException("分期金额配置失败:应为"+ payment.getPayAmount().subtract(payment.getDownPayment()));
             }
         }
         return true;
