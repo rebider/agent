@@ -1,9 +1,10 @@
 package com.ryx.jobOrder.pojo;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class JoTask {
+public class JoTask implements Serializable {
     private String id;
 
     private String joId;
