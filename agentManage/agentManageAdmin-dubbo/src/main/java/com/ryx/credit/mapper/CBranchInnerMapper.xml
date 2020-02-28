@@ -177,10 +177,12 @@
     </update>
     <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.CBranchInner">
         update C_BRANCH_INNER
-        set BRANCH_ID = #{branchId,jdbcType=VARCHAR},
-          INNER = #{inner,jdbcType=VARCHAR},
-          C_USER_ID = #{cUserId,jdbcType=VARCHAR},
+        set
+          BRANCH_LOGIN = #{branchLogin,jdbcType=VARCHAR},
           BRANCH_NAME = #{branchName,jdbcType=VARCHAR},
+          INNER_LOGIN = #{innerLogin,jdbcType=VARCHAR},
+          INNER_NAME = #{innerName,jdbcType=VARCHAR},
+          C_USER_ID = #{cUserId,jdbcType=VARCHAR},
           C_TIME = #{cTime,jdbcType=TIMESTAMP},
           STATUS = #{status,jdbcType=DECIMAL},
           C_USER_NAME = #{cUserName,jdbcType=VARCHAR}
@@ -257,6 +259,6 @@
     </select>
 
     <select id="selectByMap" parameterType="map" resultMap="BaseResultMap">
-        SELECT * FROM C_BRANCH_INNER CBI WHERE CBI.STATUS = #{map.status} AND AND CBI.BRANCH_LOGIN = #{map.branchId} AND CBI.INNER_LOGIN = #{map.innerLogin}
+        SELECT * FROM C_BRANCH_INNER CBI WHERE CBI.STATUS = #{map.status} AND CBI.BRANCH_LOGIN = #{map.branchId} AND CBI.INNER_LOGIN = #{map.innerLogin}
     </select>
 </mapper>

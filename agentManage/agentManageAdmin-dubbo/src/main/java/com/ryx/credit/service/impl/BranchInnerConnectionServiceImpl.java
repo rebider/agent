@@ -104,14 +104,14 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
 
         //校验修改前账号
         List<CBranchInner> oldConnection = branchInnerMapper.selectByMap(FastMap.fastMap("status", 1).putKeyV("branchId", branch).putKeyV("innerLogin", oldInner));
-        if (oldConnection.size() != 1) FastMap.fastFailMap("账户不存在，不能修改！");
+        if (oldConnection.size() != 1) throw new MessageException("账户不存在，不能修改！");
 
         //校验修改后账号
         List<CBranchInner> newConnection = branchInnerMapper.selectByMap(FastMap.fastMap("status", 1).putKeyV("branchId", branch).putKeyV("innerLogin", inner));
-        if (newConnection.size() > 0) FastMap.fastFailMap("修改后的账户关系已存在，不能修改！");
+        if (newConnection.size() > 0) throw new MessageException("修改后的账户关系已存在，不能修改！");
 
         //查询总管账号信息
-        LmsUser lmsUser = lmsUserService.queryByLogin(oldInner);
+        LmsUser lmsUser = lmsUserService.queryByLogin(inner);
         //查询表中数据信息
         List<CBranchInner> cBranchInners = branchInnerMapper.selectByMap(FastMap
                 .fastMap("status", 1)
