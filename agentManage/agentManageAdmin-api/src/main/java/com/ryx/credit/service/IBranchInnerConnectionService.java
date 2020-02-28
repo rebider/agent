@@ -39,7 +39,7 @@ public interface IBranchInnerConnectionService {
      * @param id
      * @return
      */
-    Map<String, Object> removeBranchInnerConnection(String id) throws Exception;
+    FastMap removeBranchInnerConnection(String id) throws Exception;
 
     /**
      * 关联操作

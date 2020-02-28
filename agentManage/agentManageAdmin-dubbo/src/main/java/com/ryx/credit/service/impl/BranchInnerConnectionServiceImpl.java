@@ -18,6 +18,7 @@ import com.ryx.credit.dao.CBranchInnerMapper;
 import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.CUserMapper;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
+import com.ryx.credit.machine.entity.LmsUser;
 import com.ryx.credit.machine.service.LmsUserService;
 import com.ryx.credit.pojo.admin.CBranchInner;
 import com.ryx.credit.pojo.admin.COrganization;
@@ -95,11 +96,35 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public FastMap editConnectionAccount(FastMap fastMap) throws Exception {
         if (null == fastMap || null == fastMap.get("branch") || null == fastMap.get("oldInner") || null == fastMap.get("inner")) {
-            throw new MessageException("系统异常，请稍后再试！");
+            throw new Exception("系统异常，请稍后再试！");
         }
         String branch = fastMap.get("branch").toString();
         String oldInner = fastMap.get("oldInner").toString();
         String inner = fastMap.get("inner").toString();
+
+        //校验修改前账号
+        List<CBranchInner> oldConnection = branchInnerMapper.selectByMap(FastMap.fastMap("status", 1).putKeyV("branchId", branch).putKeyV("innerLogin", oldInner));
+        if (oldConnection.size() != 1) FastMap.fastFailMap("账户不存在，不能修改！");
+
+        //校验修改后账号
+        List<CBranchInner> newConnection = branchInnerMapper.selectByMap(FastMap.fastMap("status", 1).putKeyV("branchId", branch).putKeyV("innerLogin", inner));
+        if (newConnection.size() > 0) FastMap.fastFailMap("修改后的账户关系已存在，不能修改！");
+
+        //查询总管账号信息
+        LmsUser lmsUser = lmsUserService.queryByLogin(oldInner);
+        //查询表中数据信息
+        List<CBranchInner> cBranchInners = branchInnerMapper.selectByMap(FastMap
+                .fastMap("status", 1)
+                .putKeyV("branchId", branch)
+                .putKeyV("innerLogin", oldInner)
+        );
+        CBranchInner cBranchInner = cBranchInners.get(0);
+        cBranchInner.setInnerLogin(inner);
+        cBranchInner.setInnerName(lmsUser.getName());
+        //更新表数据
+        if (1 != branchInnerMapper.updateByPrimaryKey(cBranchInner)) {
+            throw new MessageException("更新失败，请稍后重试！");
+        }
 
         //查询busNum
         List<String> busNums = agentBusInfoMapper.selectBusNumByBusProCode(FastMap.fastMap("platformType", PlatformType.POS.code).putKeyV("branchLogin", branch));
@@ -109,12 +134,10 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
             data.put("delAccounts", oldInner);
             data.put("orgId", String.join(",", busNums));
             AgentResult agentResult = request("ORG021", data);
-            if (!agentResult.isOK()) return FastMap.fastFailMap(agentResult.getMsg());
+            if (!agentResult.isOK()) throw new MessageException(agentResult.getMsg());
         }
 
-        //更新数据库表中数据
-
-         return FastMap.fastSuccessMap();
+        return FastMap.fastSuccessMap("修改成功");
     }
 
     /**
@@ -124,7 +147,19 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
      */
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
-    public Map<String, Object> removeBranchInnerConnection(String id) throws Exception{
+    public FastMap removeBranchInnerConnection(String id) throws Exception{
+
+        int t;
+        //先查询，查询账号是否存在状态为2的，
+        if (branchInnerMapper.countByIdforUpdate(id) == 1) {
+            //存在-删除(此数据)
+            t = branchInnerMapper.deleteInnerByIds(id);
+        } else {
+            //不存在-将状态更新成2
+            t = branchInnerMapper.updateByPrimaryId(id);
+        }
+
+        if (t != 1) throw new MessageException("删除失败,请稍后重试！");
 
         CBranchInner cBranchInner = branchInnerMapper.selectByPrimaryKey(id);
         //查询busNum
@@ -136,24 +171,10 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
             data.put("dType", "1");
             data.put("delOrgIds", String.join(",", busNums));
             AgentResult agentResult = request("ORG020", data);
-            if (!agentResult.isOK()) return FastMap.fastMap("code", "2").putKeyV("msg", agentResult.getMsg());
+            if (!agentResult.isOK()) throw new MessageException(agentResult.getMsg());
         }
 
-        int t = 0;
-        //先查询，查询账号是否存在状态为2的，
-        if (branchInnerMapper.countByIdforUpdate(id) == 1) {
-            //存在-删除(此数据)
-            t = branchInnerMapper.deleteInnerByIds(id);
-        } else {
-            //不存在-将状态更新成2
-            t = branchInnerMapper.updateByPrimaryId(id);
-        }
-
-        if (t == 1) {
-            return FastMap.fastMap("code", "1").putKeyV("msg", "删除成功");
-        } else {
-            return FastMap.fastMap("code", "2").putKeyV("msg", "删除失败");
-        }
+        return FastMap.fastSuccessMap("删除成功");
     }
 
     /**

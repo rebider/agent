@@ -255,4 +255,8 @@
     <select id="selectByBranchAndInnerLogin" parameterType="map" resultType="int">
         SELECT COUNT(1) FROM C_BRANCH_INNER CBI WHERE CBI.STATUS = #{map.status} AND CBI.BRANCH_LOGIN = #{map.branchId} AND CBI.INNER_LOGIN = #{map.innerLogin}
     </select>
+
+    <select id="selectByMap" parameterType="map" resultMap="BaseResultMap">
+        SELECT * FROM C_BRANCH_INNER CBI WHERE CBI.STATUS = #{map.status} AND AND CBI.BRANCH_LOGIN = #{map.branchId} AND CBI.INNER_LOGIN = #{map.innerLogin}
+    </select>
 </mapper>
