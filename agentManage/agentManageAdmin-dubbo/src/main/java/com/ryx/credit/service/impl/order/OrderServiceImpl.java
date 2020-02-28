@@ -760,8 +760,8 @@ public class OrderServiceImpl implements OrderService {
                 payment.setDownPayment(BigDecimal.ZERO);
             }
             //TODO 检查付款明细及打款信息是否和订单金额一致 订单应付金额 = 分期金额+首付金额+抵扣金额
-            if(payment.getPayAmount().compareTo(payment.getDownPayment().add(payment.getDeductionAmount()).add(fqje))!=0){
-              throw new MessageException("分期金额配置失败:应为"+ payment.getPayAmount().subtract(payment.getDownPayment()).subtract(payment.getDeductionAmount()));
+            if(payment.getPayAmount().compareTo(payment.getDownPayment().add(fqje))!=0){
+              throw new MessageException("分期金额配置失败:应为"+ payment.getPayAmount().subtract(payment.getDownPayment()));
             }
         }
         return true;
@@ -1083,6 +1083,19 @@ public class OrderServiceImpl implements OrderService {
         if(!initPaymentDetail(oPayment.getId(),oPayment.getPayMethod(),orderFormVo.getCustomStagingUser())){
             throw new MessageException("自定义分期处理失败");
         }
+
+
+        if("SF1".equals(oPayment.getPayMethod()) || "SF2".equals(oPayment.getPayMethod())) {
+            //抵扣金额
+            BigDecimal dc = oPayment.getDeductionAmount() == null ? BigDecimal.ZERO : oPayment.getDeductionAmount();
+            //首付金额
+            BigDecimal downPayment = oPayment.getDownPayment()== null ? BigDecimal.ZERO : oPayment.getDownPayment();
+            //打款金额+抵扣金额不能大于首付金额
+            if (oPayment.getActualReceipt().add(dc).compareTo(downPayment) > 0) {
+                throw new MessageException("打款金额加抵扣金额不能大于首付金额");
+            }
+        }
+
         return orderFormVo;
     }
 
@@ -1418,6 +1431,18 @@ public class OrderServiceImpl implements OrderService {
         //初始化订单自定义分期
         if(!initPaymentDetail(oPayment.getId(),oPayment.getPayMethod(),orderFormVo.getCustomStagingUser())){
             throw new MessageException("自定义分期处理失败");
+        }
+
+
+        if("SF1".equals(oPayment_db.getPayMethod()) || "SF2".equals(oPayment_db.getPayMethod())) {
+            //抵扣金额
+            BigDecimal dc = oPayment_db.getDeductionAmount() == null ? BigDecimal.ZERO : oPayment_db.getDeductionAmount();
+            //首付金额
+            BigDecimal downPayment = oPayment_db.getDownPayment()== null ? BigDecimal.ZERO : oPayment_db.getDownPayment();
+            //打款金额+抵扣金额不能大于首付金额
+            if (oPayment_db.getActualReceipt().add(dc).compareTo(downPayment) > 0) {
+                throw new MessageException("打款金额加抵扣金额不能大于首付金额");
+            }
         }
         return orderFormVo;
     }
