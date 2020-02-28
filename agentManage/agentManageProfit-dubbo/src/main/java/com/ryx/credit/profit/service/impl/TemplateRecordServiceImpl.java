@@ -839,6 +839,15 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                 }
                 result = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECKNAME, map2.toJSONString());
             }else if ("SSPOS".equals(stringMap.get("PLATFORM_TYPE"))){
+                JSONObject param = new JSONObject();
+                param.put("applyId",templateRecode.getTemplateId());
+                String CheckResult = HttpClientUtil.doPostJson(SS_TEMPLATE_APPLY_CHECK, param.toJSONString());
+                Map<String,Object> resultM = JSONObject.parseObject(CheckResult);
+                Map<String,Object> objectM = (Map<String,Object>)resultM.get("data");
+
+                if(objectM.get("isExist").toString().equals("1")){
+                    return true;
+                }
                 result = HttpClientUtil.doPostJson(SS_TEMPLATE_APPLY_CHECKNAME, map2.toJSONString());
             }
             Map<String,Object> resultMap = JSONObject.parseObject(result);
