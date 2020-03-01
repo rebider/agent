@@ -15,6 +15,8 @@ import com.ryx.jobOrder.pojo.JoCustomKeyExample;
 import com.ryx.jobOrder.pojo.JoKeyManage;
 import com.ryx.jobOrder.pojo.JoKeyManageExample;
 import com.ryx.jobOrder.service.JobOrderManageService;
+import com.ryx.jobOrder.vo.JobKeyManageVo;
+import com.ryx.jobOrder.vo.JobOrderVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -177,5 +179,15 @@ public class JobOrderManageServiceImpl implements JobOrderManageService {
         pageInfo.setRows(joCustomKeyList);
         pageInfo.setTotal(joCustomKeyMapper.joCustomKeyCount(map));
         return pageInfo;
+    }
+
+    @Override
+    public ResultVO joCustomKeyEdit(JobOrderVo jobOrderVo) throws Exception {
+        if (null != jobOrderVo && null != jobOrderVo.getJobKeyManageVoList()) {
+            for (JobKeyManageVo jobKeyManageVo : jobOrderVo.getJobKeyManageVoList()) {
+
+            }
+        }
+        return null;
     }
 }
