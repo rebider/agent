@@ -1959,7 +1959,7 @@
         sum(o_payment_detail.pay_amount) as qiankuan
         from
         o_payment_detail
-        where 1=1
+        where 1=1 and o_payment_detail.status=1
          <if test="time!=null and time!=''"> and to_char(o_payment_detail.plan_pay_time,'yyyy-mm')=#{time} </if>
         and  o_payment_detail.payment_status in (1,3)
         group by to_char(o_payment_detail.plan_pay_time,'yyyy-mm'),o_payment_detail.order_id
@@ -1968,7 +1968,7 @@
       left join o_payment on o_payment.order_id=a.oId
       left join a_agent_businfo on o_order.bus_id=a_agent_businfo.id
       left join a_platform on a_agent_businfo.bus_platform=a_platform.platform_num
-      where 1=1
+      where 1=1 and o_order.status=1 and  o_payment.status=1
       <if test="busPlatform!=null and busPlatform!=''"> and a_agent_businfo.bus_platform=#{busPlatform} </if>
       <if test="agentId !=null and agentId !='' ">
         and  a_agent_businfo.agent_id =#{agentId}
@@ -1991,14 +1991,14 @@
     o_payment_detail
     where 1=1
     <if test="time!=null and time!=''"> and to_char(o_payment_detail.plan_pay_time,'yyyy-mm')=#{time} </if>
-    and  o_payment_detail.payment_status in (1,3)
-    group by to_char(o_payment_detail.plan_pay_time,'yyyy-mm'),o_payment_detail.order_id
+    and  o_payment_detail.payment_status in (1,3) and o_payment_detail.status=1
+    group by to_char(o_payment_detail.plan_pay_time,'yyyy-mm'),o_payment_detail.order_id,o_payment_detail.payment_status
     ) a
     left join o_order on o_order.id=a.oId
     left join o_payment on o_payment.order_id=a.oId
     left join a_agent_businfo on o_order.bus_id=a_agent_businfo.id
     left join a_platform on a_agent_businfo.bus_platform=a_platform.platform_num
-    where 1=1
+    where 1=1  and o_order.status=1 and o_payment.status=1
     <if test="busPlatform!=null and busPlatform!=''"> and a_agent_businfo.bus_platform=#{busPlatform} </if>
     <if test="agentId !=null and agentId !='' ">
       and  a_agent_businfo.agent_id =#{agentId}
@@ -2024,14 +2024,14 @@
     o_payment_detail
     where 1=1
     <if test="time!=null and time!=''"> and to_char(o_payment_detail.plan_pay_time,'yyyy-mm')=#{time} </if>
-    and  o_payment_detail.payment_status in (1,3)
-    group by to_char(o_payment_detail.plan_pay_time,'yyyy-mm'),o_payment_detail.order_id
+    and  o_payment_detail.payment_status in (1,3) and o_payment_detail.status=1
+    group by to_char(o_payment_detail.plan_pay_time,'yyyy-mm'),o_payment_detail.order_id ,o_payment_detail.payment_status
     ) a
     left join o_order on o_order.id=a.oId
     left join o_payment on o_payment.order_id=a.oId
     left join a_agent_businfo on o_order.bus_id=a_agent_businfo.id
     left join a_platform on a_agent_businfo.bus_platform=a_platform.platform_num
-    where 1=1
+    where 1=1 and o_order.status=1 and o_payment.status=1
     <if test="busPlatform!=null and busPlatform!=''"> and a_agent_businfo.bus_platform=#{busPlatform} </if>
     <if test="agentId !=null and agentId !='' ">
       and  a_agent_businfo.agent_id =#{agentId}
