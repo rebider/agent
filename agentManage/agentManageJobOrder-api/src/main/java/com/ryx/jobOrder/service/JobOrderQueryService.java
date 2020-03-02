@@ -28,4 +28,5 @@ public interface JobOrderQueryService {
      */
     AgentResult finishJobOrder(Map map) throws MessageException;
 
+    AgentResult reStartTask(Map map) throws  MessageException;
 }
