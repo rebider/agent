@@ -129,4 +129,18 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
         joExpandKeyMapper.insert(joExpandKey);
         return FastMap.fastSuccessMap();
     }
+
+    /**
+     * 根据taskID返回单条工单数据
+     * @param taskId
+     * @return
+     */
+    @Override
+    public JoOrder queryListByTaskId(String taskId) {
+        List<JoOrder> orders =  joOrderMapper.queryListByTaskId(taskId);
+        if(orders!=null && orders.size()>0){
+            return orders.get(0);
+        }
+        return null;
+    }
 }

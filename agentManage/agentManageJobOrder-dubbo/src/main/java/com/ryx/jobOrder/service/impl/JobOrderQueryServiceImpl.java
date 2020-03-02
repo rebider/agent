@@ -34,10 +34,6 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
     private IUserService iUserService;
     @Autowired
     private JoTaskMapper joTaskMapper;
-    @Autowired
-    private JoExpandKeyMapper joExpandKeyMapper;
-    @Autowired
-    private JoKeyManageMapper joKeyManageMapper;
 
     @Override
     public PageInfo jobOrderQueryList(Map map, Page page) {
@@ -54,9 +50,9 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
 //            String organizationCode = String.valueOf(resultMap.get("ORGANIZATIONCODE"));
 //            map.put("organizationCode", organizationCode);
 //        }
-//        int = joOrderMapper.queryJobOrderListCount(map);
+        int jobOrderListCount = joOrderMapper.queryJobOrderListCount(map);
         List<JoTaskVo> jobOrderList = joOrderMapper.queryJobOrderList(map);
-        pageInfo.setTotal(jobOrderList.size());
+        pageInfo.setTotal(jobOrderListCount);
         pageInfo.setRows(jobOrderList);
         return pageInfo;
     }
@@ -75,9 +71,8 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
     public PageInfo jobOrderQueryLaunchList(Map map, Page page) {
         logger.info("------我发起的工单列表查询------");
         PageInfo pageInfo = new PageInfo();
-        map.put("page", page);
         int listCount = joOrderMapper.queryJobOrderLaunchListCount(map);
-        List<Map<String, Object>> jobOrderList = joOrderMapper.queryJobOrderLaunchList(map);
+        List<JoTaskVo> jobOrderList = joOrderMapper.queryJobOrderLaunchList(map,page);
         pageInfo.setTotal(listCount);
         pageInfo.setRows(jobOrderList);
         return pageInfo;
@@ -113,6 +108,12 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
         }
 
         return agentResult;
+    }
+
+    @Override
+    public AgentResult finishJobOrder(Map map) throws MessageException {
+        logger.info("结束工单");
+        return null;
     }
 
 }

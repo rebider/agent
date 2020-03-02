@@ -6,6 +6,7 @@ import com.ryx.jobOrder.service.JobOrderAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 @Service("jobOrderAuthService")
@@ -15,14 +16,20 @@ public class JobOrderAuthServiceImpl implements JobOrderAuthService {
     private JobOrderAuthMapper jobOrderAuthMapper;
 
     @Override
-    public Map<String,Object> getReqJobOrderAuth(Long userId) {
-        Map<String, Object> reqJobOrderAuth = jobOrderAuthMapper.getReqJobOrderAuth(userId);
+    public List<Map<String,Object>> getReqJobOrderAuth(Long userId) {
+        List<Map<String, Object>> reqJobOrderAuth = jobOrderAuthMapper.getReqJobOrderAuth(userId);
         return reqJobOrderAuth;
     }
 
     @Override
     public Map<String, Object> getJobOrderType(String JobOrderKey) {
         Map<String, Object> acceptCode = jobOrderAuthMapper.getAcceptCode(JobOrderKey);
+        return acceptCode;
+    }
+
+    @Override
+    public Map<String, Object> getAcceptGroup(String userId) {
+        Map<String, Object> acceptCode = jobOrderAuthMapper.getAcceptGroup(userId);
         return acceptCode;
     }
 }

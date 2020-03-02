@@ -503,7 +503,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
 
-  <select id="queryJobOrderListCount" resultMap="JoOrderVoResultMap">
+  <select id="queryJobOrderListCount" resultType="int">
     select count(*) from (
     <include refid="selectByJobOrderSql" />
     )
@@ -511,7 +511,7 @@
 
   <sql id="selectByJobOrderSql">
     select
-    jo.id,
+    distinct (jo.id) as id,
     jo.ag_id,
     jo.ag_name,
     jo.bus_num,
@@ -529,8 +529,8 @@
     jo.accept_now_group
     from jo_order jo
     left join jo_task ta on ta.jo_id = jo.id
-    left join jo_key_manage one on one.jo_key_type = jo.jo_first_key_num
-    left join jo_key_manage two on two.jo_key_type = jo.jo_second_key_num
+    left join jo_key_manage one on one.jo_key = jo.jo_first_key_num
+    left join jo_key_manage two on two.jo_key = jo.jo_second_key_num
     <where>
       1 = 1
       <if test="id!=null and id!=''"> and jo.id = #{id} </if>
@@ -549,50 +549,68 @@
     order by jo.launch_time desc
   </sql>
 
-  <select id="queryJobOrderLaunchList" resultType="java.util.Map">
+  <select id="queryJobOrderLaunchList" resultMap="JoOrderVoResultMap">
     <include refid="OracleDialectPrefix" />
     <include refid="selectByJobOrderLaunchSql" />
     <include refid="OracleDialectSuffix" />
   </select>
-  <select id="queryJobOrderLaunchListCount" resultType="java.lang.Integer">
+  <select id="queryJobOrderLaunchListCount" resultType="int">
     select count(*) from (
     <include refid="selectByJobOrderLaunchSql" />
     )
   </select>
   <sql id="selectByJobOrderLaunchSql">
     select
-    jo.id,
-    jo.ag_id,
-    jo.ag_name,
-    jo.bus_num,
-    jo.platform_name,
-    jo.jo_first_key_num,
-    jo.jo_second_key_num,
-    jo.priority_level,
-    jo.launch_time,
-    jo.launch_person_name,
-    jo.launch_branch_name,
-    jo.launch_person_email,
-    jo.jo_progress,
-    jo.accept_group,
-    ta.deal_person_name,
-    ta.jo_task_accept_time
-    from jo_order jo
-    left join jo_task ta on ta.jo_id = jo.id
+      jo.id,
+      jo.ag_id,
+      jo.ag_name,
+      jo.bus_num,
+      jo.platform_name,
+      one.jo_key_name as jo_first_key_num,
+      two.jo_key_name as jo_second_key_num,
+      jo.priority_level,
+      jo.launch_time,
+      jo.launch_person_name,
+      jo.launch_branch_name,
+      jo.launch_person_email,
+      jo.jo_progress,
+      jo.accept_group,
+      jo.deal_time_start,
+      jo.accept_now_group
+      from jo_order jo
+      left join jo_task ta on ta.jo_id = jo.id
+      left join jo_key_manage one on one.jo_key = jo.jo_first_key_num
+      left join jo_key_manage two on two.jo_key = jo.jo_second_key_num
     <where>
       1 = 1
-      <if test="id!=null and id!=''">and jo.id = #{id} </if>
-      <if test="joFirstKeyNum!=null and joFirstKeyNum!=''"> and jo.jo_first_key_num = #{joFirstKeyNum} </if>
-      <if test="joSecondKeyNum!=null and joSecondKeyNum!=''"> and jo.jo_second_key_num = #{joSecondKeyNum} </if>
-      <if test="agName!=null and agName!=''"> andjo.ag_name like CONCAT(CONCAT('%',#{agName}),'%') </if>
-      <if test="busNum!=null and busNum!=''"> andjo.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
-      <if test="priorityLevel!=null and priorityLevel!=''"> andjo.priority_level = #{priorityLevel} </if>
-      <if test="joProgress!=null and joProgress!=''"> andjo.jo_progress = #{joProgress} </if>
-      <if test="launchBranchName!=null and launchBranchName!=''"> andjo.launch_branch_name = #{launchBranchName} </if>
-      <if test="launchBeginTime!=null and launchEndTime!=''"> and (to_char(jo.taskEndTime,'yyyy-mm-dd') between #{launchBeginTime} and #{taskEndTimime}) </if>
-      <if test="taskBeginTime!=null and taskEndTime!=''"> and (to_char(ta.jo_task_accept_time,'yyyy-mm-dd') between #{taskBeginTime} and #{taskEndTime}) </if>
-      <if test="launchPersonId!=null and launchPersonId!=''"> and jo.launch_person_id = #{launchPersonId} </if>
+      <if test="map.id!=null and map.id!=''">and jo.id = #{map.id} </if>
+      <if test="map.joFirstKeyNum!=null and map.joFirstKeyNum!=''"> and jo.jo_first_key_num = #{map.joFirstKeyNum} </if>
+      <if test="map.joSecondKeyNum!=null and map.joSecondKeyNum!=''"> and jo.jo_second_key_num = #{map.joSecondKeyNum} </if>
+      <if test="map.agName!=null and map.agName!=''"> and jo.ag_name like CONCAT(CONCAT('%',#{map.agName}),'%') </if>
+      <if test="map.busNum!=null and map.busNum!=''"> and jo.bus_num like CONCAT(CONCAT('%',#{map.busNum}),'%') </if>
+      <if test="map.priorityLevel!=null and map.priorityLevel!=''"> and jo.priority_level = #{map.priorityLevel} </if>
+      <if test="map.joProgress!=null and map.joProgress!=''"> and jo.jo_progress = #{map.joProgress} </if>
+      <if test="map.launchBranchName!=null and map.launchBranchName!=''"> and jo.launch_branch_name = #{map.launchBranchName} </if>
+      <if test="map.launchBeginTime!=null and map.launchEndTime!=''"> and (to_char(jo.taskEndTime,'yyyy-mm-dd') between #{map.launchBeginTime} and #{map.taskEndTimime}) </if>
+      <if test="map.taskBeginTime!=null and map.taskEndTime!=''"> and (to_char(ta.jo_task_accept_time,'yyyy-mm-dd') between #{map.taskBeginTime} and #{map.taskEndTime}) </if>
+      <if test="map.launchPersonId!=null and map.launchPersonId!=''"> and jo.launch_person_id = #{map.launchPersonId} </if>
     </where>
     order by jo.launch_time desc
+  </sql>
+  <select id="queryListByTaskId" parameterType="string" resultMap="BaseResultMap">
+    select
+    distinct (JO.ID) AS ID,
+    <include refid="JO_Base_Column_List" />
+    from JO_ORDER jo
+    left join  jo_task jt on jt.jo_id = jo.id
+    where jt.id = #{taskId}
+  </select>
+  <sql id="JO_Base_Column_List">
+    jo.AG_ID, jo.AG_NAME, jo.BUS_ID, jo.BUS_NUM, jo.PALTFORM_NUM, jo.PLATFORM_NAME, jo.JO_FIRST_KEY_NUM,
+    jo.JO_SECOND_KEY_NUM, jo.PRIORITY_LEVEL, jo.LAUNCH_TIME, jo.LAUNCH_PERSON_ID, jo.LAUNCH_PERSON_NAME,
+    jo.LAUNCH_PERSON_EMAIL, jo.LAUNCH_BRANCH_ID, jo.LAUNCH_BRANCH_NAME, jo.ACCEPT_GROUP_CODE, jo.ACCEPT_GROUP,
+    jo.ACCEPT_NOW_GROUP, jo.DEAL_TIME_START, jo.DEAL_TIME_END, jo.DEAL_TIME_LENGTH, jo.JO_PROGRESS,
+    jo.JO_TITLE, jo.JO_CONTENT, jo.JO_ASSESS_LEVEL, jo.JO_ASSESSOR_NAME, jo.JO_ASSESSOR_TYPE, jo.JO_ASSESSOR_ID,
+    jo.JO_ASSESS_CONTENT, jo.JO_ASSESS_TIME, jo.VERSION
   </sql>
 </mapper>
