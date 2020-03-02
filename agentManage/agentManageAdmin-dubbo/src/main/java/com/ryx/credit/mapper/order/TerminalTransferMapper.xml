@@ -342,4 +342,32 @@ select distinct nvl(BUS_NUM, '-') BUS_NUM
           and  b.review_status = ${reviewStatus}
         )
   </select>
+
+  <!--查询划拨配置表-->
+  <select id="queryToolsFloor" resultType="java.util.Map" parameterType="java.util.Map">
+  select * from TERINAL_TRANSFER_TOOLS_SET
+  <where>
+    <if test="ORG_ID!=null and ORG_ID!=''">
+      and ORG_ID = #{ORG_ID,jdbcType=VARCHAR}
+    </if>
+    <if test="PLATFORM_TYPE_CODE!=null and PLATFORM_TYPE_CODE!=''">
+      and PLATFORM_TYPE_CODE = #{PLATFORM_TYPE_CODE,jdbcType=VARCHAR}
+    </if>
+    <if test="BUS_CODE_BIG!=null and BUS_CODE_BIG!=''">
+      and BUS_CODE_BIG = #{BUS_CODE_BIG,jdbcType=VARCHAR}
+    </if>
+    <if test="TERINAL_TRANSFER_TYPE!=null and TERINAL_TRANSFER_TYPE!=''">
+      and TERINAL_TRANSFER_TYPE = #{TERINAL_TRANSFER_TYPE,jdbcType=VARCHAR}
+    </if>
+  </where>
+</select>
+
+
+  <select id="agentBase" resultType="java.util.Map" parameterType="java.lang.String">
+  select bb.* ,aa.BUS_NUM,aa.BUS_TYPE,aa.BUS_PLATFORM from A_AGENT_BUSINFO aa,A_AGENT bb
+  where aa.BUS_NUM = #{BUS_NUM,jdbcType=VARCHAR}
+  and aa.AGENT_ID = bb.ID and aa.STATUS = '1' and aa.BUS_STATUS='1'and bb.STATUS = '1'
+
+</select>
+
 </mapper>

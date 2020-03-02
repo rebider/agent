@@ -1,106 +1,108 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ryx.credit.dao.order.TerminalTransferDetailMapper">
-  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.TerminalTransferDetail">
-    <id column="ID" jdbcType="VARCHAR" property="id" />
-    <result column="TERMINAL_TRANSFER_ID" jdbcType="VARCHAR" property="terminalTransferId" />
-    <result column="SN_BEGIN_NUM" jdbcType="VARCHAR" property="snBeginNum" />
-    <result column="SN_END_NUM" jdbcType="VARCHAR" property="snEndNum" />
-    <result column="PRO_COM" jdbcType="VARCHAR" property="proCom" />
-    <result column="PRO_MODEL" jdbcType="VARCHAR" property="proModel" />
-    <result column="ORIGINAL_ORG_ID" jdbcType="VARCHAR" property="originalOrgId" />
-    <result column="ORIGINAL_ORG_NAME" jdbcType="VARCHAR" property="originalOrgName" />
-    <result column="ORIGINAL_BUS_ID" jdbcType="VARCHAR" property="originalBusId" />
-    <result column="GOAL_ORG_ID" jdbcType="VARCHAR" property="goalOrgId" />
-    <result column="GOAL_ORG_NAME" jdbcType="VARCHAR" property="goalOrgName" />
-    <result column="GOAL_BUS_ID" jdbcType="VARCHAR" property="goalBusId" />
-    <result column="ADJUST_TIME" jdbcType="TIMESTAMP" property="adjustTime" />
-    <result column="SN_COUNT" jdbcType="DECIMAL" property="snCount" />
-    <result column="BUTT_JOINT_PERSON" jdbcType="VARCHAR" property="buttJointPerson" />
-    <result column="ADJUST_STATUS" jdbcType="DECIMAL" property="adjustStatus" />
-    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
-    <result column="BATCH_NUM" jdbcType="VARCHAR" property="batchNum" />
-    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
-    <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
-    <result column="U_TIME" jdbcType="TIMESTAMP" property="uTime" />
-    <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
-    <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
-    <result column="STATUS" jdbcType="DECIMAL" property="status" />
-    <result column="VERSION" jdbcType="DECIMAL" property="version" />
-    <result column="PLATFORM_TYPE" jdbcType="DECIMAL" property="platformType" />
-    <result column="BUS_ID" jdbcType="VARCHAR" property="busId" />
-    <result column="COM_SN_NUM" jdbcType="DECIMAL" property="comSnNum" />
-    <result column="GOAL_TYPE" jdbcType="VARCHAR" property="goalType" />
-    <result column="ORIGINAL_TYPE" jdbcType="VARCHAR" property="originalType" />
-    <result column="IS_NO_PAY" jdbcType="VARCHAR" property="isNoPay" />
-    <result column="ORIGINAL_ORG_ID_S" jdbcType="VARCHAR" property="originalOrgIdS" />
-    <result column="GOAL_ORG_ID_S" jdbcType="VARCHAR" property="goalOrgIdS" />
-  </resultMap>
-  <sql id="Example_Where_Clause">
-    <where>
-      <foreach collection="oredCriteria" item="criteria" separator="or">
-        <if test="criteria.valid">
-          <trim prefix="(" prefixOverrides="and" suffix=")">
-            <foreach collection="criteria.criteria" item="criterion">
-              <choose>
-                <when test="criterion.noValue">
-                  and ${criterion.condition}
-                </when>
-                <when test="criterion.singleValue">
-                  and ${criterion.condition} #{criterion.value}
-                </when>
-                <when test="criterion.betweenValue">
-                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
-                </when>
-                <when test="criterion.listValue">
-                  and ${criterion.condition}
-                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
-                    #{listItem}
-                  </foreach>
-                </when>
-              </choose>
+    <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.TerminalTransferDetail">
+        <id column="ID" jdbcType="VARCHAR" property="id"/>
+        <result column="TERMINAL_TRANSFER_ID" jdbcType="VARCHAR" property="terminalTransferId"/>
+        <result column="SN_BEGIN_NUM" jdbcType="VARCHAR" property="snBeginNum"/>
+        <result column="SN_END_NUM" jdbcType="VARCHAR" property="snEndNum"/>
+        <result column="PRO_COM" jdbcType="VARCHAR" property="proCom"/>
+        <result column="PRO_MODEL" jdbcType="VARCHAR" property="proModel"/>
+        <result column="ORIGINAL_ORG_ID" jdbcType="VARCHAR" property="originalOrgId"/>
+        <result column="ORIGINAL_ORG_NAME" jdbcType="VARCHAR" property="originalOrgName"/>
+        <result column="ORIGINAL_BUS_ID" jdbcType="VARCHAR" property="originalBusId"/>
+        <result column="GOAL_ORG_ID" jdbcType="VARCHAR" property="goalOrgId"/>
+        <result column="GOAL_ORG_NAME" jdbcType="VARCHAR" property="goalOrgName"/>
+        <result column="GOAL_BUS_ID" jdbcType="VARCHAR" property="goalBusId"/>
+        <result column="ADJUST_TIME" jdbcType="TIMESTAMP" property="adjustTime"/>
+        <result column="SN_COUNT" jdbcType="DECIMAL" property="snCount"/>
+        <result column="BUTT_JOINT_PERSON" jdbcType="VARCHAR" property="buttJointPerson"/>
+        <result column="ADJUST_STATUS" jdbcType="DECIMAL" property="adjustStatus"/>
+        <result column="REMARK" jdbcType="VARCHAR" property="remark"/>
+        <result column="BATCH_NUM" jdbcType="VARCHAR" property="batchNum"/>
+        <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId"/>
+        <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime"/>
+        <result column="U_TIME" jdbcType="TIMESTAMP" property="uTime"/>
+        <result column="C_USER" jdbcType="VARCHAR" property="cUser"/>
+        <result column="U_USER" jdbcType="VARCHAR" property="uUser"/>
+        <result column="STATUS" jdbcType="DECIMAL" property="status"/>
+        <result column="VERSION" jdbcType="DECIMAL" property="version"/>
+        <result column="PLATFORM_TYPE" jdbcType="DECIMAL" property="platformType"/>
+        <result column="BUS_ID" jdbcType="VARCHAR" property="busId"/>
+        <result column="COM_SN_NUM" jdbcType="DECIMAL" property="comSnNum"/>
+        <result column="GOAL_TYPE" jdbcType="VARCHAR" property="goalType"/>
+        <result column="ORIGINAL_TYPE" jdbcType="VARCHAR" property="originalType"/>
+        <result column="IS_NO_PAY" jdbcType="VARCHAR" property="isNoPay"/>
+        <result column="ORIGINAL_ORG_ID_S" jdbcType="VARCHAR" property="originalOrgIdS"/>
+        <result column="GOAL_ORG_ID_S" jdbcType="VARCHAR" property="goalOrgIdS"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="("
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
             </foreach>
-          </trim>
-        </if>
-      </foreach>
-    </where>
-  </sql>
-  <sql id="Base_Column_List">
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
     ID, TERMINAL_TRANSFER_ID, SN_BEGIN_NUM, SN_END_NUM, PRO_COM, PRO_MODEL, ORIGINAL_ORG_ID,
     ORIGINAL_ORG_NAME, ORIGINAL_BUS_ID, GOAL_ORG_ID, GOAL_ORG_NAME, GOAL_BUS_ID, ADJUST_TIME,
     SN_COUNT, BUTT_JOINT_PERSON, ADJUST_STATUS, REMARK, BATCH_NUM, AGENT_ID, C_TIME,
     U_TIME, C_USER, U_USER, STATUS, VERSION, PLATFORM_TYPE, BUS_ID, COM_SN_NUM, GOAL_TYPE,
     ORIGINAL_TYPE, IS_NO_PAY, ORIGINAL_ORG_ID_S, GOAL_ORG_ID_S
   </sql>
-  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetailExample" resultMap="BaseResultMap">
-    <include refid="OracleDialectPrefix" />
-    select
-    <if test="distinct">
-      distinct
-    </if>
-    <include refid="Base_Column_List" />
-    from O_TERMINAL_TRANSFER_DETAIL
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-    <if test="orderByClause != null">
-      order by ${orderByClause}
-    </if>
-    <include refid="OracleDialectSuffix" />
-  </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List" />
-    from O_TERMINAL_TRANSFER_DETAIL
-    where ID = #{id,jdbcType=VARCHAR}
-  </select>
-  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetailExample">
-    delete from O_TERMINAL_TRANSFER_DETAIL
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-  </delete>
-  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetail">
+    <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetailExample"
+            resultMap="BaseResultMap">
+        <include refid="OracleDialectPrefix"/>
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from O_TERMINAL_TRANSFER_DETAIL
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+        <include refid="OracleDialectSuffix"/>
+    </select>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from O_TERMINAL_TRANSFER_DETAIL
+        where ID = #{id,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetailExample">
+        delete from O_TERMINAL_TRANSFER_DETAIL
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetail">
     insert into O_TERMINAL_TRANSFER_DETAIL (ID, TERMINAL_TRANSFER_ID, SN_BEGIN_NUM,
       SN_END_NUM, PRO_COM, PRO_MODEL,
       ORIGINAL_ORG_ID, ORIGINAL_ORG_NAME, ORIGINAL_BUS_ID,
@@ -126,320 +128,321 @@
       #{isNoPay,jdbcType=VARCHAR}, #{originalOrgIdS,jdbcType=VARCHAR}, #{goalOrgIdS,jdbcType=VARCHAR}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetail">
-    insert into O_TERMINAL_TRANSFER_DETAIL
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        ID,
-      </if>
-      <if test="terminalTransferId != null">
-        TERMINAL_TRANSFER_ID,
-      </if>
-      <if test="snBeginNum != null">
-        SN_BEGIN_NUM,
-      </if>
-      <if test="snEndNum != null">
-        SN_END_NUM,
-      </if>
-      <if test="proCom != null">
-        PRO_COM,
-      </if>
-      <if test="proModel != null">
-        PRO_MODEL,
-      </if>
-      <if test="originalOrgId != null">
-        ORIGINAL_ORG_ID,
-      </if>
-      <if test="originalOrgName != null">
-        ORIGINAL_ORG_NAME,
-      </if>
-      <if test="originalBusId != null">
-        ORIGINAL_BUS_ID,
-      </if>
-      <if test="goalOrgId != null">
-        GOAL_ORG_ID,
-      </if>
-      <if test="goalOrgName != null">
-        GOAL_ORG_NAME,
-      </if>
-      <if test="goalBusId != null">
-        GOAL_BUS_ID,
-      </if>
-      <if test="adjustTime != null">
-        ADJUST_TIME,
-      </if>
-      <if test="snCount != null">
-        SN_COUNT,
-      </if>
-      <if test="buttJointPerson != null">
-        BUTT_JOINT_PERSON,
-      </if>
-      <if test="adjustStatus != null">
-        ADJUST_STATUS,
-      </if>
-      <if test="remark != null">
-        REMARK,
-      </if>
-      <if test="batchNum != null">
-        BATCH_NUM,
-      </if>
-      <if test="agentId != null">
-        AGENT_ID,
-      </if>
-      <if test="cTime != null">
-        C_TIME,
-      </if>
-      <if test="uTime != null">
-        U_TIME,
-      </if>
-      <if test="cUser != null">
-        C_USER,
-      </if>
-      <if test="uUser != null">
-        U_USER,
-      </if>
-      <if test="status != null">
-        STATUS,
-      </if>
-      <if test="version != null">
-        VERSION,
-      </if>
-      <if test="platformType != null">
-        PLATFORM_TYPE,
-      </if>
-      <if test="busId != null">
-        BUS_ID,
-      </if>
-      <if test="comSnNum != null">
-        COM_SN_NUM,
-      </if>
-      <if test="goalType != null">
-        GOAL_TYPE,
-      </if>
-      <if test="originalType != null">
-        ORIGINAL_TYPE,
-      </if>
-      <if test="isNoPay != null">
-        IS_NO_PAY,
-      </if>
-      <if test="originalOrgIdS != null">
-        ORIGINAL_ORG_ID_S,
-      </if>
-      <if test="goalOrgIdS != null">
-        GOAL_ORG_ID_S,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        #{id,jdbcType=VARCHAR},
-      </if>
-      <if test="terminalTransferId != null">
-        #{terminalTransferId,jdbcType=VARCHAR},
-      </if>
-      <if test="snBeginNum != null">
-        #{snBeginNum,jdbcType=VARCHAR},
-      </if>
-      <if test="snEndNum != null">
-        #{snEndNum,jdbcType=VARCHAR},
-      </if>
-      <if test="proCom != null">
-        #{proCom,jdbcType=VARCHAR},
-      </if>
-      <if test="proModel != null">
-        #{proModel,jdbcType=VARCHAR},
-      </if>
-      <if test="originalOrgId != null">
-        #{originalOrgId,jdbcType=VARCHAR},
-      </if>
-      <if test="originalOrgName != null">
-        #{originalOrgName,jdbcType=VARCHAR},
-      </if>
-      <if test="originalBusId != null">
-        #{originalBusId,jdbcType=VARCHAR},
-      </if>
-      <if test="goalOrgId != null">
-        #{goalOrgId,jdbcType=VARCHAR},
-      </if>
-      <if test="goalOrgName != null">
-        #{goalOrgName,jdbcType=VARCHAR},
-      </if>
-      <if test="goalBusId != null">
-        #{goalBusId,jdbcType=VARCHAR},
-      </if>
-      <if test="adjustTime != null">
-        #{adjustTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="snCount != null">
-        #{snCount,jdbcType=DECIMAL},
-      </if>
-      <if test="buttJointPerson != null">
-        #{buttJointPerson,jdbcType=VARCHAR},
-      </if>
-      <if test="adjustStatus != null">
-        #{adjustStatus,jdbcType=DECIMAL},
-      </if>
-      <if test="remark != null">
-        #{remark,jdbcType=VARCHAR},
-      </if>
-      <if test="batchNum != null">
-        #{batchNum,jdbcType=VARCHAR},
-      </if>
-      <if test="agentId != null">
-        #{agentId,jdbcType=VARCHAR},
-      </if>
-      <if test="cTime != null">
-        #{cTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="uTime != null">
-        #{uTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="cUser != null">
-        #{cUser,jdbcType=VARCHAR},
-      </if>
-      <if test="uUser != null">
-        #{uUser,jdbcType=VARCHAR},
-      </if>
-      <if test="status != null">
-        #{status,jdbcType=DECIMAL},
-      </if>
-      <if test="version != null">
-        #{version,jdbcType=DECIMAL},
-      </if>
-      <if test="platformType != null">
-        #{platformType,jdbcType=DECIMAL},
-      </if>
-      <if test="busId != null">
-        #{busId,jdbcType=VARCHAR},
-      </if>
-      <if test="comSnNum != null">
-        #{comSnNum,jdbcType=DECIMAL},
-      </if>
-      <if test="goalType != null">
-        #{goalType,jdbcType=VARCHAR},
-      </if>
-      <if test="originalType != null">
-        #{originalType,jdbcType=VARCHAR},
-      </if>
-      <if test="isNoPay != null">
-        #{isNoPay,jdbcType=VARCHAR},
-      </if>
-      <if test="originalOrgIdS != null">
-        #{originalOrgIdS,jdbcType=VARCHAR},
-      </if>
-      <if test="goalOrgIdS != null">
-        #{goalOrgIdS,jdbcType=VARCHAR},
-      </if>
-    </trim>
-  </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetailExample" resultType="java.lang.Long">
-    select count(*) from O_TERMINAL_TRANSFER_DETAIL
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-  </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetail">
-    update O_TERMINAL_TRANSFER_DETAIL
-    <set>
-      <if test="terminalTransferId != null">
-        TERMINAL_TRANSFER_ID = #{terminalTransferId,jdbcType=VARCHAR},
-      </if>
-      <if test="snBeginNum != null">
-        SN_BEGIN_NUM = #{snBeginNum,jdbcType=VARCHAR},
-      </if>
-      <if test="snEndNum != null">
-        SN_END_NUM = #{snEndNum,jdbcType=VARCHAR},
-      </if>
-      <if test="proCom != null">
-        PRO_COM = #{proCom,jdbcType=VARCHAR},
-      </if>
-      <if test="proModel != null">
-        PRO_MODEL = #{proModel,jdbcType=VARCHAR},
-      </if>
-      <if test="originalOrgId != null">
-        ORIGINAL_ORG_ID = #{originalOrgId,jdbcType=VARCHAR},
-      </if>
-      <if test="originalOrgName != null">
-        ORIGINAL_ORG_NAME = #{originalOrgName,jdbcType=VARCHAR},
-      </if>
-      <if test="originalBusId != null">
-        ORIGINAL_BUS_ID = #{originalBusId,jdbcType=VARCHAR},
-      </if>
-      <if test="goalOrgId != null">
-        GOAL_ORG_ID = #{goalOrgId,jdbcType=VARCHAR},
-      </if>
-      <if test="goalOrgName != null">
-        GOAL_ORG_NAME = #{goalOrgName,jdbcType=VARCHAR},
-      </if>
-      <if test="goalBusId != null">
-        GOAL_BUS_ID = #{goalBusId,jdbcType=VARCHAR},
-      </if>
-      <if test="adjustTime != null">
-        ADJUST_TIME = #{adjustTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="snCount != null">
-        SN_COUNT = #{snCount,jdbcType=DECIMAL},
-      </if>
-      <if test="buttJointPerson != null">
-        BUTT_JOINT_PERSON = #{buttJointPerson,jdbcType=VARCHAR},
-      </if>
-      <if test="adjustStatus != null">
-        ADJUST_STATUS = #{adjustStatus,jdbcType=DECIMAL},
-      </if>
-      <if test="remark != null">
-        REMARK = #{remark,jdbcType=VARCHAR},
-      </if>
-      <if test="batchNum != null">
-        BATCH_NUM = #{batchNum,jdbcType=VARCHAR},
-      </if>
-      <if test="agentId != null">
-        AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      </if>
-      <if test="cTime != null">
-        C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="uTime != null">
-        U_TIME = #{uTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="cUser != null">
-        C_USER = #{cUser,jdbcType=VARCHAR},
-      </if>
-      <if test="uUser != null">
-        U_USER = #{uUser,jdbcType=VARCHAR},
-      </if>
-      <if test="status != null">
-        STATUS = #{status,jdbcType=DECIMAL},
-      </if>
-      <if test="version != null">
-        VERSION = #{version,jdbcType=DECIMAL},
-      </if>
-      <if test="platformType != null">
-        PLATFORM_TYPE = #{platformType,jdbcType=DECIMAL},
-      </if>
-      <if test="busId != null">
-        BUS_ID = #{busId,jdbcType=VARCHAR},
-      </if>
-      <if test="comSnNum != null">
-        COM_SN_NUM = #{comSnNum,jdbcType=DECIMAL},
-      </if>
-      <if test="goalType != null">
-        GOAL_TYPE = #{goalType,jdbcType=VARCHAR},
-      </if>
-      <if test="originalType != null">
-        ORIGINAL_TYPE = #{originalType,jdbcType=VARCHAR},
-      </if>
-      <if test="isNoPay != null">
-        IS_NO_PAY = #{isNoPay,jdbcType=VARCHAR},
-      </if>
-      <if test="originalOrgIdS != null">
-        ORIGINAL_ORG_ID_S = #{originalOrgIdS,jdbcType=VARCHAR},
-      </if>
-      <if test="goalOrgIdS != null">
-        GOAL_ORG_ID_S = #{goalOrgIdS,jdbcType=VARCHAR},
-      </if>
-    </set>
-    where ID = #{id,jdbcType=VARCHAR}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetail">
+    <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetail">
+        insert into O_TERMINAL_TRANSFER_DETAIL
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                ID,
+            </if>
+            <if test="terminalTransferId != null">
+                TERMINAL_TRANSFER_ID,
+            </if>
+            <if test="snBeginNum != null">
+                SN_BEGIN_NUM,
+            </if>
+            <if test="snEndNum != null">
+                SN_END_NUM,
+            </if>
+            <if test="proCom != null">
+                PRO_COM,
+            </if>
+            <if test="proModel != null">
+                PRO_MODEL,
+            </if>
+            <if test="originalOrgId != null">
+                ORIGINAL_ORG_ID,
+            </if>
+            <if test="originalOrgName != null">
+                ORIGINAL_ORG_NAME,
+            </if>
+            <if test="originalBusId != null">
+                ORIGINAL_BUS_ID,
+            </if>
+            <if test="goalOrgId != null">
+                GOAL_ORG_ID,
+            </if>
+            <if test="goalOrgName != null">
+                GOAL_ORG_NAME,
+            </if>
+            <if test="goalBusId != null">
+                GOAL_BUS_ID,
+            </if>
+            <if test="adjustTime != null">
+                ADJUST_TIME,
+            </if>
+            <if test="snCount != null">
+                SN_COUNT,
+            </if>
+            <if test="buttJointPerson != null">
+                BUTT_JOINT_PERSON,
+            </if>
+            <if test="adjustStatus != null">
+                ADJUST_STATUS,
+            </if>
+            <if test="remark != null">
+                REMARK,
+            </if>
+            <if test="batchNum != null">
+                BATCH_NUM,
+            </if>
+            <if test="agentId != null">
+                AGENT_ID,
+            </if>
+            <if test="cTime != null">
+                C_TIME,
+            </if>
+            <if test="uTime != null">
+                U_TIME,
+            </if>
+            <if test="cUser != null">
+                C_USER,
+            </if>
+            <if test="uUser != null">
+                U_USER,
+            </if>
+            <if test="status != null">
+                STATUS,
+            </if>
+            <if test="version != null">
+                VERSION,
+            </if>
+            <if test="platformType != null">
+                PLATFORM_TYPE,
+            </if>
+            <if test="busId != null">
+                BUS_ID,
+            </if>
+            <if test="comSnNum != null">
+                COM_SN_NUM,
+            </if>
+            <if test="goalType != null">
+                GOAL_TYPE,
+            </if>
+            <if test="originalType != null">
+                ORIGINAL_TYPE,
+            </if>
+            <if test="isNoPay != null">
+                IS_NO_PAY,
+            </if>
+            <if test="originalOrgIdS != null">
+                ORIGINAL_ORG_ID_S,
+            </if>
+            <if test="goalOrgIdS != null">
+                GOAL_ORG_ID_S,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="terminalTransferId != null">
+                #{terminalTransferId,jdbcType=VARCHAR},
+            </if>
+            <if test="snBeginNum != null">
+                #{snBeginNum,jdbcType=VARCHAR},
+            </if>
+            <if test="snEndNum != null">
+                #{snEndNum,jdbcType=VARCHAR},
+            </if>
+            <if test="proCom != null">
+                #{proCom,jdbcType=VARCHAR},
+            </if>
+            <if test="proModel != null">
+                #{proModel,jdbcType=VARCHAR},
+            </if>
+            <if test="originalOrgId != null">
+                #{originalOrgId,jdbcType=VARCHAR},
+            </if>
+            <if test="originalOrgName != null">
+                #{originalOrgName,jdbcType=VARCHAR},
+            </if>
+            <if test="originalBusId != null">
+                #{originalBusId,jdbcType=VARCHAR},
+            </if>
+            <if test="goalOrgId != null">
+                #{goalOrgId,jdbcType=VARCHAR},
+            </if>
+            <if test="goalOrgName != null">
+                #{goalOrgName,jdbcType=VARCHAR},
+            </if>
+            <if test="goalBusId != null">
+                #{goalBusId,jdbcType=VARCHAR},
+            </if>
+            <if test="adjustTime != null">
+                #{adjustTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="snCount != null">
+                #{snCount,jdbcType=DECIMAL},
+            </if>
+            <if test="buttJointPerson != null">
+                #{buttJointPerson,jdbcType=VARCHAR},
+            </if>
+            <if test="adjustStatus != null">
+                #{adjustStatus,jdbcType=DECIMAL},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="batchNum != null">
+                #{batchNum,jdbcType=VARCHAR},
+            </if>
+            <if test="agentId != null">
+                #{agentId,jdbcType=VARCHAR},
+            </if>
+            <if test="cTime != null">
+                #{cTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="uTime != null">
+                #{uTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="cUser != null">
+                #{cUser,jdbcType=VARCHAR},
+            </if>
+            <if test="uUser != null">
+                #{uUser,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=DECIMAL},
+            </if>
+            <if test="version != null">
+                #{version,jdbcType=DECIMAL},
+            </if>
+            <if test="platformType != null">
+                #{platformType,jdbcType=DECIMAL},
+            </if>
+            <if test="busId != null">
+                #{busId,jdbcType=VARCHAR},
+            </if>
+            <if test="comSnNum != null">
+                #{comSnNum,jdbcType=DECIMAL},
+            </if>
+            <if test="goalType != null">
+                #{goalType,jdbcType=VARCHAR},
+            </if>
+            <if test="originalType != null">
+                #{originalType,jdbcType=VARCHAR},
+            </if>
+            <if test="isNoPay != null">
+                #{isNoPay,jdbcType=VARCHAR},
+            </if>
+            <if test="originalOrgIdS != null">
+                #{originalOrgIdS,jdbcType=VARCHAR},
+            </if>
+            <if test="goalOrgIdS != null">
+                #{goalOrgIdS,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetailExample"
+            resultType="java.lang.Long">
+        select count(*) from O_TERMINAL_TRANSFER_DETAIL
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetail">
+        update O_TERMINAL_TRANSFER_DETAIL
+        <set>
+            <if test="terminalTransferId != null">
+                TERMINAL_TRANSFER_ID = #{terminalTransferId,jdbcType=VARCHAR},
+            </if>
+            <if test="snBeginNum != null">
+                SN_BEGIN_NUM = #{snBeginNum,jdbcType=VARCHAR},
+            </if>
+            <if test="snEndNum != null">
+                SN_END_NUM = #{snEndNum,jdbcType=VARCHAR},
+            </if>
+            <if test="proCom != null">
+                PRO_COM = #{proCom,jdbcType=VARCHAR},
+            </if>
+            <if test="proModel != null">
+                PRO_MODEL = #{proModel,jdbcType=VARCHAR},
+            </if>
+            <if test="originalOrgId != null">
+                ORIGINAL_ORG_ID = #{originalOrgId,jdbcType=VARCHAR},
+            </if>
+            <if test="originalOrgName != null">
+                ORIGINAL_ORG_NAME = #{originalOrgName,jdbcType=VARCHAR},
+            </if>
+            <if test="originalBusId != null">
+                ORIGINAL_BUS_ID = #{originalBusId,jdbcType=VARCHAR},
+            </if>
+            <if test="goalOrgId != null">
+                GOAL_ORG_ID = #{goalOrgId,jdbcType=VARCHAR},
+            </if>
+            <if test="goalOrgName != null">
+                GOAL_ORG_NAME = #{goalOrgName,jdbcType=VARCHAR},
+            </if>
+            <if test="goalBusId != null">
+                GOAL_BUS_ID = #{goalBusId,jdbcType=VARCHAR},
+            </if>
+            <if test="adjustTime != null">
+                ADJUST_TIME = #{adjustTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="snCount != null">
+                SN_COUNT = #{snCount,jdbcType=DECIMAL},
+            </if>
+            <if test="buttJointPerson != null">
+                BUTT_JOINT_PERSON = #{buttJointPerson,jdbcType=VARCHAR},
+            </if>
+            <if test="adjustStatus != null">
+                ADJUST_STATUS = #{adjustStatus,jdbcType=DECIMAL},
+            </if>
+            <if test="remark != null">
+                REMARK = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="batchNum != null">
+                BATCH_NUM = #{batchNum,jdbcType=VARCHAR},
+            </if>
+            <if test="agentId != null">
+                AGENT_ID = #{agentId,jdbcType=VARCHAR},
+            </if>
+            <if test="cTime != null">
+                C_TIME = #{cTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="uTime != null">
+                U_TIME = #{uTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="cUser != null">
+                C_USER = #{cUser,jdbcType=VARCHAR},
+            </if>
+            <if test="uUser != null">
+                U_USER = #{uUser,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                STATUS = #{status,jdbcType=DECIMAL},
+            </if>
+            <if test="version != null">
+                VERSION = #{version,jdbcType=DECIMAL},
+            </if>
+            <if test="platformType != null">
+                PLATFORM_TYPE = #{platformType,jdbcType=DECIMAL},
+            </if>
+            <if test="busId != null">
+                BUS_ID = #{busId,jdbcType=VARCHAR},
+            </if>
+            <if test="comSnNum != null">
+                COM_SN_NUM = #{comSnNum,jdbcType=DECIMAL},
+            </if>
+            <if test="goalType != null">
+                GOAL_TYPE = #{goalType,jdbcType=VARCHAR},
+            </if>
+            <if test="originalType != null">
+                ORIGINAL_TYPE = #{originalType,jdbcType=VARCHAR},
+            </if>
+            <if test="isNoPay != null">
+                IS_NO_PAY = #{isNoPay,jdbcType=VARCHAR},
+            </if>
+            <if test="originalOrgIdS != null">
+                ORIGINAL_ORG_ID_S = #{originalOrgIdS,jdbcType=VARCHAR},
+            </if>
+            <if test="goalOrgIdS != null">
+                GOAL_ORG_ID_S = #{goalOrgIdS,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where ID = #{id,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetail">
     update O_TERMINAL_TRANSFER_DETAIL
     set TERMINAL_TRANSFER_ID = #{terminalTransferId,jdbcType=VARCHAR},
       SN_BEGIN_NUM = #{snBeginNum,jdbcType=VARCHAR},
@@ -475,168 +478,168 @@
       GOAL_ORG_ID_S = #{goalOrgIdS,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
-  <sql id="OracleDialectPrefix">
-    <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from (
-    </if>
-  </sql>
-  <sql id="OracleDialectSuffix">
-    <if test="page != null">
-      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
-    </if>
-  </sql>
-<!--==========================以上代码自动生成，请勿修改==========================-->
+    <sql id="OracleDialectPrefix">
+        <if test="page != null">
+            select * from ( select row_.*, rownum rownum_ from (
+        </if>
+    </sql>
+    <sql id="OracleDialectSuffix">
+        <if test="page != null">
+            <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+        </if>
+    </sql>
+    <!--==========================以上代码自动生成，请勿修改==========================-->
 
-  <select id="exprotTerminalTransferDetails" parameterType="map" resultType="map">
-      <include refid="TerminalTransferListSql" />
-  </select>
-  <select id="selectTerminalTransferDetailList" parameterType="map" resultType="map">
-    <include refid="OracleDialectPrefix" />
-    <include refid="TerminalTransferListSql" />
-    <include refid="OracleDialectSuffix" />
-  </select>
-  <select id="selectTerminalTransferDetailCount" parameterType="map" resultType="java.lang.Integer">
-    select count(*) from(
-      <include refid="TerminalTransferListSql" />
-    )
-  </select>
-  <sql id="TerminalTransferListSql">
+    <select id="exprotTerminalTransferDetails" parameterType="map" resultType="map">
+        <include refid="TerminalTransferListSql"/>
+    </select>
+    <select id="selectTerminalTransferDetailList" parameterType="map" resultType="map">
+        <include refid="OracleDialectPrefix"/>
+        <include refid="TerminalTransferListSql"/>
+        <include refid="OracleDialectSuffix"/>
+    </select>
+    <select id="selectTerminalTransferDetailCount" parameterType="map" resultType="java.lang.Integer">
+        select count(*) from(
+        <include refid="TerminalTransferListSql"/>
+        )
+    </select>
+    <sql id="TerminalTransferListSql">
 
-    select * from (
-    <if test="map.intervalList != null">
-      (
-    select
-    t.*,a.ag_name,u.name as BUTT_JOINT_PERSON_NAME,cu.name as C_USER_NAME,uu.name as U_USER_NAME
-    from o_terminal_transfer_detail t
-    left join a_agent a on t.agent_id = a.id
-    left join c_user u on t.butt_joint_person = u.id
-    left join c_user cu on t.c_user = cu.id
-    left join c_user uu on t.u_user = uu.id
-    left join a_agent_businfo b on t.bus_id = b.id
-    left join C_ORGANIZATION oa on oa.id=b.ag_doc_pro
-    left join C_ORGANIZATION ob on ob.id=b.AG_DOC_DISTRICT
-    <where>
-      t.status = #{map.status} and a.status = #{map.status}
-      <if test="map.terminalTransferId != null">
-        and t.terminal_Transfer_Id = #{map.terminalTransferId}
-      </if>
-      <if test="map.agentId != null">
-        and t.agent_Id = #{map.agentId}
-      </if>
-      <if test="map.id != null and map.id!=''">
-        and t.id = #{map.id}
-      </if>
-      <if test="map.intervalList != null">
-        and t.sn_Begin_Num in
-        <foreach close=")" collection="map.intervalList" item="listItem" open="(" separator=",">
-          #{listItem}
-        </foreach>
+        select * from (
+        <if test="map.intervalList != null">
+            (
+            select
+            t.*,a.ag_name,u.name as BUTT_JOINT_PERSON_NAME,cu.name as C_USER_NAME,uu.name as U_USER_NAME
+            from o_terminal_transfer_detail t
+            left join a_agent a on t.agent_id = a.id
+            left join c_user u on t.butt_joint_person = u.id
+            left join c_user cu on t.c_user = cu.id
+            left join c_user uu on t.u_user = uu.id
+            left join a_agent_businfo b on t.bus_id = b.id
+            left join C_ORGANIZATION oa on oa.id=b.ag_doc_pro
+            left join C_ORGANIZATION ob on ob.id=b.AG_DOC_DISTRICT
+            <where>
+                t.status = #{map.status} and a.status = #{map.status}
+                <if test="map.terminalTransferId != null">
+                    and t.terminal_Transfer_Id = #{map.terminalTransferId}
+                </if>
+                <if test="map.agentId != null">
+                    and t.agent_Id = #{map.agentId}
+                </if>
+                <if test="map.id != null and map.id!=''">
+                    and t.id = #{map.id}
+                </if>
+                <if test="map.intervalList != null">
+                    and t.sn_Begin_Num in
+                    <foreach close=")" collection="map.intervalList" item="listItem" open="(" separator=",">
+                        #{listItem}
+                    </foreach>
 
-      </if>
+                </if>
 
-      <if test="map.adjustStatus != null">
-        and t.adjust_Status = #{map.adjustStatus}
-      </if>
-      <if test="map.agName != null">
-        and a.ag_Name = #{map.agName}
-      </if>
-      <if test="map.goalOrgId != null">
-        and t.goal_Org_Id = #{map.goalOrgId}
-      </if>
-      <if test="map.goalOrgName != null">
-        and t.goal_Org_Name = #{map.goalOrgName}
-      </if>
-      <if test="map.originalOrgId != null">
-        and t.original_Org_Id = #{map.originalOrgId}
-      </if>
-      <if test="map.originalOrgName != null">
-        and t.original_Org_Name = #{map.originalOrgName}
-      </if>
-      <if test="map.orgCode!=null and map.orgCode!=''">
-        and (oa.CODE like concat(#{map.orgCode},'%') or ob.CODE like concat(#{map.orgCode},'%') )
-      </if>
-      <if test="map.buttJointPersonName != null and map.buttJointPersonName!=''">
-        and u.name LIKE CONCAT(CONCAT('%',#{map.buttJointPersonName}),'%')
-      </if>
-    </where>
-   )
+                <if test="map.adjustStatus != null">
+                    and t.adjust_Status = #{map.adjustStatus}
+                </if>
+                <if test="map.agName != null">
+                    and a.ag_Name = #{map.agName}
+                </if>
+                <if test="map.goalOrgId != null">
+                    and t.goal_Org_Id = #{map.goalOrgId}
+                </if>
+                <if test="map.goalOrgName != null">
+                    and t.goal_Org_Name = #{map.goalOrgName}
+                </if>
+                <if test="map.originalOrgId != null">
+                    and t.original_Org_Id = #{map.originalOrgId}
+                </if>
+                <if test="map.originalOrgName != null">
+                    and t.original_Org_Name = #{map.originalOrgName}
+                </if>
+                <if test="map.orgCode!=null and map.orgCode!=''">
+                    and (oa.CODE like concat(#{map.orgCode},'%') or ob.CODE like concat(#{map.orgCode},'%') )
+                </if>
+                <if test="map.buttJointPersonName != null and map.buttJointPersonName!=''">
+                    and u.name LIKE CONCAT(CONCAT('%',#{map.buttJointPersonName}),'%')
+                </if>
+            </where>
+            )
 
-    Union
-    </if>
-    (
-    select
-    t.*,a.ag_name,u.name as BUTT_JOINT_PERSON_NAME,cu.name as C_USER_NAME,uu.name as U_USER_NAME
-    from o_terminal_transfer_detail t
-    left join a_agent a on t.agent_id = a.id
-    left join c_user u on t.butt_joint_person = u.id
-    left join c_user cu on t.c_user = cu.id
-    left join c_user uu on t.u_user = uu.id
-    left join a_agent_businfo b on t.bus_id = b.id
-    left join C_ORGANIZATION oa on oa.id=b.ag_doc_pro
-    left join C_ORGANIZATION ob on ob.id=b.AG_DOC_DISTRICT
-    <where>
-      t.status = #{map.status} and a.status = #{map.status}
-      <if test="map.terminalTransferId != null">
-        and t.terminal_Transfer_Id = #{map.terminalTransferId}
-      </if>
-      <if test="map.agentId != null">
-        and t.agent_Id = #{map.agentId}
-      </if>
-      <if test="map.id != null and map.id!=''">
-        and t.id = #{map.id}
-      </if>
-      <if test="map.snBeginNum != null">
-        and t.sn_Begin_Num like concat('%',concat( #{map.snBeginNum},'%'))
-      </if>
-      <if test="map.snEndNum != null">
-        and t.SN_END_NUM like concat('%',concat( #{map.snEndNum},'%'))
-      </if>
-      <if test="map.adjustStatus != null">
-        and t.adjust_Status = #{map.adjustStatus}
-      </if>
-      <if test="map.agName != null">
-        and a.ag_Name = #{map.agName}
-      </if>
-      <if test="map.goalOrgId != null">
-        and t.goal_Org_Id = #{map.goalOrgId}
-      </if>
-      <if test="map.goalOrgName != null">
-        and t.goal_Org_Name = #{map.goalOrgName}
-      </if>
-      <if test="map.originalOrgId != null">
-        and t.original_Org_Id = #{map.originalOrgId}
-      </if>
-      <if test="map.originalOrgName != null">
-        and t.original_Org_Name = #{map.originalOrgName}
-      </if>
-      <if test="map.orgCode!=null and map.orgCode!=''">
-        and (oa.CODE like concat(#{map.orgCode},'%') or ob.CODE like concat(#{map.orgCode},'%') )
-      </if>
-      <if test="map.buttJointPersonName != null and map.buttJointPersonName!=''">
-        and u.name LIKE CONCAT(CONCAT('%',#{map.buttJointPersonName}),'%')
-      </if>
-    </where>)
-    )
-    order by ADJUST_TIME desc nulls last
-  </sql>
+            Union
+        </if>
+        (
+        select
+        t.*,a.ag_name,u.name as BUTT_JOINT_PERSON_NAME,cu.name as C_USER_NAME,uu.name as U_USER_NAME
+        from o_terminal_transfer_detail t
+        left join a_agent a on t.agent_id = a.id
+        left join c_user u on t.butt_joint_person = u.id
+        left join c_user cu on t.c_user = cu.id
+        left join c_user uu on t.u_user = uu.id
+        left join a_agent_businfo b on t.bus_id = b.id
+        left join C_ORGANIZATION oa on oa.id=b.ag_doc_pro
+        left join C_ORGANIZATION ob on ob.id=b.AG_DOC_DISTRICT
+        <where>
+            t.status = #{map.status} and a.status = #{map.status}
+            <if test="map.terminalTransferId != null">
+                and t.terminal_Transfer_Id = #{map.terminalTransferId}
+            </if>
+            <if test="map.agentId != null">
+                and t.agent_Id = #{map.agentId}
+            </if>
+            <if test="map.id != null and map.id!=''">
+                and t.id = #{map.id}
+            </if>
+            <if test="map.snBeginNum != null">
+                and t.sn_Begin_Num like concat('%',concat( #{map.snBeginNum},'%'))
+            </if>
+            <if test="map.snEndNum != null">
+                and t.SN_END_NUM like concat('%',concat( #{map.snEndNum},'%'))
+            </if>
+            <if test="map.adjustStatus != null">
+                and t.adjust_Status = #{map.adjustStatus}
+            </if>
+            <if test="map.agName != null">
+                and a.ag_Name = #{map.agName}
+            </if>
+            <if test="map.goalOrgId != null">
+                and t.goal_Org_Id = #{map.goalOrgId}
+            </if>
+            <if test="map.goalOrgName != null">
+                and t.goal_Org_Name = #{map.goalOrgName}
+            </if>
+            <if test="map.originalOrgId != null">
+                and t.original_Org_Id = #{map.originalOrgId}
+            </if>
+            <if test="map.originalOrgName != null">
+                and t.original_Org_Name = #{map.originalOrgName}
+            </if>
+            <if test="map.orgCode!=null and map.orgCode!=''">
+                and (oa.CODE like concat(#{map.orgCode},'%') or ob.CODE like concat(#{map.orgCode},'%') )
+            </if>
+            <if test="map.buttJointPersonName != null and map.buttJointPersonName!=''">
+                and u.name LIKE CONCAT(CONCAT('%',#{map.buttJointPersonName}),'%')
+            </if>
+        </where>
+        )
+        )
+        order by ADJUST_TIME desc nulls last
+    </sql>
 
-  <update id="updateStatusByTerminalTransferId" parameterType="java.lang.String">
+    <update id="updateStatusByTerminalTransferId" parameterType="java.lang.String">
     update O_TERMINAL_TRANSFER_DETAIL set STATUS = 0  where TERMINAL_TRANSFER_ID = #{map.terminalTransferId}
   </update>
 
-  <select id="queryTerminalTransferDetail" resultMap="BaseResultMap">
+    <select id="queryTerminalTransferDetail" resultMap="BaseResultMap">
    select bb.*  from O_TERMINAL_TRANSFER aa  left join
   O_TERMINAL_TRANSFER_DETAIL bb on aa.ID = bb.TERMINAL_TRANSFER_ID where bb.ADJUST_STATUS='1'and aa.REVIEW_STATUS='3'and aa.STATUS='1'and bb.STATUS='1'
 </select>
 
 
-
-
-  <select id="queryInterval" resultType="java.util.Map" parameterType="java.lang.String">
+    <select id="queryInterval" resultType="java.util.Map" parameterType="java.lang.String">
 
 
 select SN_BEGIN_NUM,SN_END_NUM from O_TERMINAL_TRANSFER_DETAIL where SN_BEGIN_NUM like concat('%',concat( '${snEndNum}','%'))
 
   </select>
+
 
 </mapper>
