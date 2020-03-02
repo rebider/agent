@@ -32,4 +32,6 @@ public interface JoCustomKeyMapper {
     int joCustomKeyCount(@Param("map")Map map);
 
     List<Map> selectKeyWord(@Param("joSecondKeyNum")String joSecondKeyNum);
+
+    int deletejoCustomKeyById(String id);
 }

@@ -12,6 +12,9 @@ import java.util.List;
  */
 public class JobOrderVo implements Serializable {
     private List<JobKeyManageVo> jobKeyManageVoList;
+    private String firstId;
+    private String secondId;
+    private String threeId;
 
     public List<JobKeyManageVo> getJobKeyManageVoList() {
         return jobKeyManageVoList;
@@ -19,5 +22,29 @@ public class JobOrderVo implements Serializable {
 
     public void setJobKeyManageVoList(List<JobKeyManageVo> jobKeyManageVoList) {
         this.jobKeyManageVoList = jobKeyManageVoList;
+    }
+
+    public String getFirstId() {
+        return firstId;
+    }
+
+    public void setFirstId(String firstId) {
+        this.firstId = firstId;
+    }
+
+    public String getSecondId() {
+        return secondId;
+    }
+
+    public void setSecondId(String secondId) {
+        this.secondId = secondId;
+    }
+
+    public String getThreeId() {
+        return threeId;
+    }
+
+    public void setThreeId(String threeId) {
+        this.threeId = threeId;
     }
 }
