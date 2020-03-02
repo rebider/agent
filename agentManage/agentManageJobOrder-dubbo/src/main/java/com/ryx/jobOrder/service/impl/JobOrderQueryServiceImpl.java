@@ -110,4 +110,10 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
         return agentResult;
     }
 
+    @Override
+    public AgentResult finishJobOrder(Map map) throws MessageException {
+        logger.info("结束工单");
+        return null;
+    }
+
 }

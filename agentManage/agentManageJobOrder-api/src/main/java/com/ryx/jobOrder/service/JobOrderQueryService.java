@@ -20,4 +20,12 @@ public interface JobOrderQueryService {
 
     AgentResult jobOrderCancle(Map map) throws MessageException;
 
+    /**
+     * 结束工单
+     * @param map
+     * @return
+     * @throws MessageException
+     */
+    AgentResult finishJobOrder(Map map) throws MessageException;
+
 }
