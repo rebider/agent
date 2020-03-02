@@ -89,8 +89,6 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
         JoTask joTask = new JoTask();
         joTask.setId( idService.genId(TabId.jo_task) );
         joTask.setJoId(jo.getId());
-        joTask.setJoTaskStatus(JoTaskStatus.WSL.getValue());
-        joTask.setJoTaskTime(new Date());
         joTask.setDealGroup(acceptGroup);
         joTask.setDealGroupId("");
         joTask.setDealPersonId("");
@@ -143,4 +141,6 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
         }
         return null;
     }
+
+
 }

@@ -375,11 +375,11 @@
       <if test="example.joTaskStatus != null and example.joTaskStatus != ''">
         and jt.jo_task_status = #{example.joTaskStatus}
       </if>
-      <if test="example.joStartTimeBegin != null and example.joStartTimeEnd != null and example.joStartTimeBegin != '' and example.joStartTimeEnd != ''">
-        and between #{example.joStartTimeBegin} and #{example.joStartTimeEnd}
+      <if test="example.joStartTimeBegin != null and example.joStartTimeEnd != null ">
+        and jo_task_time between #{example.joStartTimeBegin} and #{example.joStartTimeEnd}
       </if>
-      <if test="example.joAcceptTimeBegin != null and example.joAcceptTimeEnd != null and example.joAcceptTimeBegin != '' and example.joAcceptTimeEnd != ''">
-        and between #{example.joAcceptTimeBegin} and #{example.joAcceptTimeEnd}
+      <if test="example.joAcceptTimeBegin != null and example.joAcceptTimeEnd != null ">
+        and jo_task_accept_time between #{example.joAcceptTimeBegin} and #{example.joAcceptTimeEnd}
       </if>
     </where>
   </sql>
