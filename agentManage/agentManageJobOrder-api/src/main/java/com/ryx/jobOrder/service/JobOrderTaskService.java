@@ -1,5 +1,6 @@
 package com.ryx.jobOrder.service;
 
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -18,4 +19,12 @@ public interface JobOrderTaskService {
     FastMap updateJobOrderTask(JoTask queryMap) throws Exception;
 
     PageInfo queryJobOrderTaskVo(JoTaskVo joTaskVo, Page page);
+
+    JoTask queryLastJobOrderTask(JoTask joTask) ;
+
+    FastMap receiveJobOrderTask(JoTask taskMap) throws Exception;
+
+    FastMap endJoTask(JoTask joTask) throws MessageException;
+
+    FastMap acceptOrderByTaskId(JoTask taskId) throws Exception;
 }
