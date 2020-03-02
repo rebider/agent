@@ -41,8 +41,8 @@ public enum OffsetPaytype {
      * @return
      */
     public static String getContentByValue(String value) {
-        AnnoStat[] annoStats = AnnoStat.values();
-        for (AnnoStat cc : annoStats) {
+        OffsetPaytype[] annoStats = OffsetPaytype.values();
+        for (OffsetPaytype cc : annoStats) {
             if(cc.code.equals(value)){
                 return cc.msg;
             }

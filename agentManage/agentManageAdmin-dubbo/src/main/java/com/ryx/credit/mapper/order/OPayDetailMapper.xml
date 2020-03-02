@@ -185,10 +185,10 @@
         STATUS = #{status,jdbcType=DECIMAL},
       </if>
       <if test="version != null">
-        VERSION = #{version,jdbcType=DECIMAL},
+        VERSION = VERSION + 1,
       </if>
       <if test="cUser != null">
-        C_USER = VERSION + 1,
+        C_USER = #{cUser,jdbcType=VARCHAR},
       </if>
       <if test="cTm != null">
         C_TM = #{cTm,jdbcType=TIMESTAMP},

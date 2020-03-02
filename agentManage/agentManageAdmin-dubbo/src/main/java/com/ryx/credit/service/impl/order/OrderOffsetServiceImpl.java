@@ -679,21 +679,6 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                     logger.info("付款明细添加失败");
                     throw new MessageException("付款明细添加失败");
                 }
-
-                if(diff!=null){
-                    if(diff.getMachOweAmt()!=null && diff.getMachOweAmt().compareTo(BigDecimal.ZERO)>0){
-                        logger.info("======错误抵扣=已抵扣{}",JSONObject.toJSONString(diff));
-                        throw new MessageException("已抵扣");
-                    }
-                    if(diff.getMachOweAmt()!=null && diff.getMachOweAmt().compareTo(BigDecimal.ZERO)==0){
-                        logger.info("======抵扣{}",JSONObject.toJSONString(diff));
-                        diff.setMachOweAmt(amount.subtract(residue));
-                        if(1!=refundPriceDiffMapper.updateByPrimaryKeySelective(diff)){
-                            logger.info("======抵扣，更新补差记录失败{}",JSONObject.toJSONString(diff));
-                            throw new MessageException("更新补差记录失败");
-                        }
-                    }
-                }
             }
             resultMap.put("offsetPaymentDetails",resPaymentDetail);
             resultMap.put("residueAmt",residue);
