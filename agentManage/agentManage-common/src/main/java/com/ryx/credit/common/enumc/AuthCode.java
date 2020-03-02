@@ -32,7 +32,8 @@ public enum AuthCode {
     ACCOUNT_LOCK("1017","账号已锁定"),
     PASS_WORD_ERROR("1018","账号或密码错误"),
     NO_BUS_INFO("1019","没有可用的业务"),
-    PLATFORM_NULL("1020","平台不能为空");
+    PLATFORM_NULL("1020","平台不能为空"),
+    PASS_KEY("1021","密钥配置错误");
 
     public String code;
 
