@@ -42,4 +42,9 @@
             and cu.id = #{userId}
         </if>
     </select>
+    <select id="getAllAcceptGroup" resultType="java.util.Map">
+        select cro.id, cro.name, cro.description
+        from c_role cro
+        where cro.description like 'Group%' and cro.status = 0
+    </select>
 </mapper>

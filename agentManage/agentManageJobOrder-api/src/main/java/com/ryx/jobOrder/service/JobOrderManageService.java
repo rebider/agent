@@ -4,6 +4,7 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.jobOrder.pojo.JoCustomKey;
 import com.ryx.jobOrder.pojo.JoKeyManage;
 import com.ryx.jobOrder.vo.JobOrderVo;
@@ -48,4 +49,10 @@ public interface JobOrderManageService {
     PageInfo joCustomKeyList(Page page, Map map);
 
     ResultVO joCustomKeyEdit(JobOrderVo jobOrderVo) throws Exception;
+
+    /**
+     * 获取工单类型下拉列表
+     * @return
+     */
+    List queryJobOrderType();
 }

@@ -32,4 +32,6 @@ public interface JoKeyManageMapper {
 
     List<Map<String,Object>> selectLevel();
 
+    List<Map<String,Object>> queryJobOrderType();
+
 }

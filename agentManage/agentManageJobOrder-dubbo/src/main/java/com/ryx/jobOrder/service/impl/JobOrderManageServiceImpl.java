@@ -182,6 +182,13 @@ public class JobOrderManageServiceImpl implements JobOrderManageService {
         return pageInfo;
     }
 
+    @Override
+    public List queryJobOrderType() {
+        List<Map<String, Object>> mapsList = joKeyManageMapper.queryJobOrderType();
+        return mapsList;
+    }
+
+
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
     public ResultVO joCustomKeyEdit(JobOrderVo jobOrderVo) throws Exception {
