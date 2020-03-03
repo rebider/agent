@@ -13,6 +13,8 @@ public interface JobOrderQueryService {
 
     PageInfo jobOrderQueryList(Map map, Page page);
 
+    PageInfo agentJobOrderQueryList(Map map, Page page);
+
     JoOrder getByJobId(String id);
 
 

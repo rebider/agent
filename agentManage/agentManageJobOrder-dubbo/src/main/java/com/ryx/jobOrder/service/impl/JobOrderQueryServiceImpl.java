@@ -4,6 +4,7 @@ import com.ryx.credit.common.enumc.JoOrderStatus;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.result.Result;
@@ -44,19 +45,55 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
     private IdService idService;
     @Override
     public PageInfo jobOrderQueryList(Map map, Page page) {
-        logger.info("------我收到的工单列表查询------");
+        logger.info("------我收到的工单列表查询-内部人员------");
         PageInfo pageInfo = new PageInfo();
         map.put("page", page);
-//        if(null != map.get("dealPersonId")) {
-//            Long userId = (Long) map.get("dealPersonId");
-//            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
-//            if (orgCodeRes==null && orgCodeRes.size()!=1) {
-//                return null;
-//            }
-//            Map<String, Object> resultMap = orgCodeRes.get(0);
-//            String organizationCode = String.valueOf(resultMap.get("ORGANIZATIONCODE"));
-//            map.put("organizationCode", organizationCode);
-//        }
+        String launchBeginTime = (String) map.get("launchBeginTime");
+        String launchEndTime = (String) map.get("launchEndTime");
+        String taskBeginTime = (String) map.get("taskBeginTime");
+        String taskEndTime = (String) map.get("taskEndTime");
+        if ((StringUtils.isNotBlank(launchBeginTime) && StringUtils.isNotBlank(launchEndTime)) || (StringUtils.isNotBlank(taskBeginTime) && StringUtils.isNotBlank(taskEndTime))) {
+            if (StringUtils.isNotBlank(launchBeginTime)) {
+                launchBeginTime =launchBeginTime.substring(0,10);
+                launchEndTime =launchEndTime.substring(0,10);
+                map.put("launchBeginTime", DateUtil.format(launchBeginTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+                map.put("launchEndTime", DateUtil.format(launchEndTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+            } else {
+                taskBeginTime =taskBeginTime.substring(0,10);
+                taskEndTime =taskEndTime.substring(0,10);
+                map.put("taskBeginTime", DateUtil.format(taskBeginTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+                map.put("taskEndTime", DateUtil.format(taskEndTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+            }
+        }
+        int jobOrderListCount = joOrderMapper.queryJobOrderListCount(map);
+        List<JoTaskVo> jobOrderList = joOrderMapper.queryJobOrderList(map);
+        pageInfo.setTotal(jobOrderListCount);
+        pageInfo.setRows(jobOrderList);
+        return pageInfo;
+    }
+
+    @Override
+    public PageInfo agentJobOrderQueryList(Map map, Page page) {
+        logger.info("------我收到的工单列表查询-代理商------");
+        PageInfo pageInfo = new PageInfo();
+        map.put("page", page);
+        String launchBeginTime = (String) map.get("launchBeginTime");
+        String launchEndTime = (String) map.get("launchEndTime");
+        String taskBeginTime = (String) map.get("taskBeginTime");
+        String taskEndTime = (String) map.get("taskEndTime");
+        if ((StringUtils.isNotBlank(launchBeginTime) && StringUtils.isNotBlank(launchEndTime)) || (StringUtils.isNotBlank(taskBeginTime) && StringUtils.isNotBlank(taskEndTime))) {
+            if (StringUtils.isNotBlank(launchBeginTime)) {
+                launchBeginTime =launchBeginTime.substring(0,10);
+                launchEndTime =launchEndTime.substring(0,10);
+                map.put("launchBeginTime", DateUtil.format(launchBeginTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+                map.put("launchEndTime", DateUtil.format(launchEndTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+            } else {
+                taskBeginTime =taskBeginTime.substring(0,10);
+                taskEndTime =taskEndTime.substring(0,10);
+                map.put("taskBeginTime", DateUtil.format(taskBeginTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+                map.put("taskEndTime", DateUtil.format(taskEndTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+            }
+        }
         int jobOrderListCount = joOrderMapper.queryJobOrderListCount(map);
         List<JoTaskVo> jobOrderList = joOrderMapper.queryJobOrderList(map);
         pageInfo.setTotal(jobOrderListCount);

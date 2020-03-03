@@ -493,8 +493,8 @@
     <result column="ACCEPT_NOW_GROUP" jdbcType="VARCHAR" property="acceptNowGroup" />
     <result column="DEAL_TIME_START" jdbcType="TIMESTAMP" property="dealTimeStart" />
     <result column="LAUNCH_BRANCH_NAME" jdbcType="VARCHAR" property="launchBranchName" />
-    <result column="DEAL_PERSON_ID" jdbcType="VARCHAR" property="dealPersonId" />
-    <result column="DEAL_GROUP_ID" jdbcType="VARCHAR" property="dealGroupId" />
+    <result column="DEAL_PERSON_ID" jdbcType="VARCHAR" property="joDealPersonId" />
+    <result column="DEAL_GROUP_ID" jdbcType="VARCHAR" property="joDealGroupId" />
   </resultMap>
 
   <select id="queryJobOrderList" resultMap="JoOrderVoResultMap">
@@ -534,8 +534,58 @@
     <where>
       1 = 1
       <if test="id!=null and id!=''"> and jo.id = #{id} </if>
-      <if test="joFirstKeyNum!=null and joFirstKeyNum!=''"> and jo.jo_first_key_num = #{joFirstKeyNum} </if>
-      <if test="joSecondKeyNum!=null and joSecondKeyNum!=''"> and jo.jo_second_key_num = #{joSecondKeyNum} </if>
+      <if test="joSecondKeyNum!=null and joSecondKeyNum!=''"> and jo.jo_second_key_num like CONCAT(CONCAT('%',#{joSecondKeyNum}),'%') </if>
+      <if test="agName!=null and agName!=''"> and jo.ag_name like CONCAT(CONCAT('%',#{agName}),'%') </if>
+      <if test="busNum!=null and busNum!=''"> and jo.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
+      <if test="priorityLevel!=null and priorityLevel!=''"> and jo.priority_level = #{priorityLevel} </if>
+      <if test="joTaskStatus!=null and joTaskStatus!=''"> and ta.jo_task_status = #{joTaskStatus} </if>
+      <if test="launchBranchName!=null and launchBranchName!=''"> and jo.launch_branch_name = #{launchBranchName} </if>
+      <if test="launchBeginTime!=null and launchEndTime!=''"> and (to_char(jo.launch_time,'yyyy-mm-dd') between #{launchBeginTime} and #{taskEndTimime}) </if>
+      <if test="taskBeginTime!=null and taskEndTime!=''"> and (to_char(ta.jo_task_accept_time,'yyyy-mm-dd') between #{taskBeginTime} and #{taskEndTime}) </if>
+      <!--<if test="joDealPersonId!=null and joDealPersonId!=''"> and ta.deal_person_id = #{joDealPersonId} </if>-->
+      <!--<if test="joDealGroupId!=null and joDealGroupId!=''"> and ta.deal_group_id = #{joDealGroupId} </if>-->
+    </where>
+    order by jo.launch_time desc
+  </sql>
+
+  <select id="queryAgentJobOrderList" resultMap="JoOrderVoResultMap">
+    <include refid="OracleDialectPrefix" />
+    <include refid="selectByJobOrderSql" />
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="queryAgentJobOrderListCount" resultType="int">
+    select count(*) from (
+    <include refid="selectByAgentJobOrderSql" />
+    )
+  </select>
+
+  <sql id="selectByAgentJobOrderSql">
+    select
+    distinct (jo.id) as id,
+    jo.ag_id,
+    jo.ag_name,
+    jo.bus_num,
+    jo.platform_name,
+    one.jo_key_name as jo_first_key_num,
+    two.jo_key_name as jo_second_key_num,
+    jo.priority_level,
+    jo.launch_time,
+    jo.launch_person_name,
+    jo.launch_branch_name,
+    jo.launch_person_email,,
+    jo.jo_progress,
+    jo.accept_group,
+    jo.deal_time_start,
+    jo.accept_now_group
+    from jo_order jo
+    left join jo_task ta on ta.jo_id = jo.id
+    left join jo_key_manage one on one.jo_key = jo.jo_first_key_num
+    left join jo_key_manage two on two.jo_key = jo.jo_second_key_num
+    <where>
+      1 = 1
+      <if test="id!=null and id!=''"> and jo.id = #{id} </if>
+        <if test="joSecondKeyNum!=null and joSecondKeyNum!=''"> and jo.jo_second_key_num like CONCAT(CONCAT('%',#{joSecondKeyNum}),'%') </if>
       <if test="agName!=null and agName!=''"> and jo.ag_name like CONCAT(CONCAT('%',#{agName}),'%') </if>
       <if test="busNum!=null and busNum!=''"> and jo.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="priorityLevel!=null and priorityLevel!=''"> and jo.priority_level = #{priorityLevel} </if>
@@ -543,8 +593,8 @@
       <if test="launchBranchName!=null and launchBranchName!=''"> and jo.launch_branch_name = #{launchBranchName} </if>
       <!--<if test="launchBeginTime!=null and launchEndTime!=''"> and (to_char(jo.launch_time,'yyyy-mm-dd') between #{launchBeginTime} and #{taskEndTimime}) </if>-->
       <!--<if test="taskBeginTime!=null and taskEndTime!=''"> and (to_char(ta.jo_task_accept_time,'yyyy-mm-dd') between #{taskBeginTime} and #{taskEndTime}) </if>-->
-      <!--<if test="dealPersonId!=null and dealPersonId!=''"> and ta.deal_person_id = #{dealPersonId} </if>-->
-      <!--<if test="dealGroupId!=null and dealGroupId!=''"> and ta.deal_group_id = #{dealGroupId} </if>-->
+      <!--<if test="joDealPersonId!=null and joDealPersonId!=''"> and ta.deal_person_id = #{joDealPersonId} </if>-->
+      <!--<if test="joDealGroupId!=null and joDealGroupId!=''"> and ta.deal_group_id = #{joDealGroupId} </if>-->
     </where>
     order by jo.launch_time desc
   </sql>

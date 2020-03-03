@@ -30,6 +30,10 @@ public interface JoOrderMapper {
 
     int queryJobOrderListCount(Map<String, Object> param);
 
+    List<JoTaskVo> queryAgentJobOrderList(Map<String, Object> param);
+
+    int queryAgentJobOrderListCount(Map<String, Object> param);
+
     List<JoTaskVo> queryJobOrderLaunchList(@Param("map") Map<String, Object> param,@Param("page") Page page);
 
     int queryJobOrderLaunchListCount(@Param("map") Map<String, Object> param);
