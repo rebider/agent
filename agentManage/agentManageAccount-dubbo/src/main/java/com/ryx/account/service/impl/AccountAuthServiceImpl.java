@@ -136,6 +136,7 @@ public class AccountAuthServiceImpl implements AccountAuthService {
      * @throws MessageException
      */
     @Override
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     public Map<String,Object> refreshAuthCode(String authCode,String platformType,String serverIp)throws MessageException{
 
         commonVerify(platformType);
@@ -234,6 +235,7 @@ public class AccountAuthServiceImpl implements AccountAuthService {
      * @throws MessageException
      */
     @Override
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     public Map<String,Object> getTokenCode(String platformType,String authCode,String serverIp,String loginName,String passWord,List<Map<String,Object>> busInfos)throws MessageException{
 
         approveAuthCode(platformType, authCode);
