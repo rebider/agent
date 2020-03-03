@@ -80,6 +80,17 @@ public class JobOrderManageServiceImpl implements JobOrderManageService {
     @Override
     public AgentResult keywordDelete(String id) {
         if (StringUtils.isBlank(id)) return AgentResult.fail("ID不能为空");
+        JoCustomKeyExample joCustomKeyExample = new JoCustomKeyExample();
+        JoCustomKeyExample.Criteria criteria = joCustomKeyExample.createCriteria().andJoKeyIdEqualTo(id);
+        List<JoCustomKey> joCustomKeyList = joCustomKeyMapper.selectByExample(joCustomKeyExample);
+        if (null != joCustomKeyList || joCustomKeyList.size() > 0) {
+            for (JoCustomKey joCustomKey : joCustomKeyList) {
+                if (1 != joCustomKeyMapper.deletejoCustomKeyById(joCustomKey.getId())) {
+                    log.info("工单自定义表删除失败");
+                    AgentResult.fail("工单自定义表删除失败");
+                }
+            }
+        }
         JoKeyManage joKeyManage = new JoKeyManage();
         joKeyManage.setId(id);
         joKeyManage.setJoStatus(Status.STATUS_0.status.toString());
@@ -182,13 +193,6 @@ public class JobOrderManageServiceImpl implements JobOrderManageService {
         return pageInfo;
     }
 
-    @Override
-    public List queryJobOrderType() {
-        List<Map<String, Object>> mapsList = joKeyManageMapper.queryJobOrderType();
-        return mapsList;
-    }
-
-
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
     public ResultVO joCustomKeyEdit(JobOrderVo jobOrderVo) throws Exception {
@@ -236,4 +240,5 @@ public class JobOrderManageServiceImpl implements JobOrderManageService {
         }
         return ResultVO.success(null);
     }
+
 }
