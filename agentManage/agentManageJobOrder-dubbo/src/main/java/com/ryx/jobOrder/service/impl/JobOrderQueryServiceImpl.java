@@ -1,7 +1,6 @@
 package com.ryx.jobOrder.service.impl;
 
 import com.ryx.credit.common.enumc.JoOrderStatus;
-import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;

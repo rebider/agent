@@ -46,4 +46,10 @@ public interface JobOrderManageService {
     List<Map> selectKeyWord(JoCustomKey joCustomKey);
 
     PageInfo joCustomKeyList(Page page, Map map);
+
+    /**
+     * 获取工单类型下拉列表
+     * @return
+     */
+    List queryJobOrderType();
 }
