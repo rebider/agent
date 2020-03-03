@@ -202,7 +202,6 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                 templateRecode.setBusNumS(map1.get("orgId_s"));
                // result = HttpClientUtil.doPostJson(TEMPLATE_APPLY, map2.toJSONString());
             }else if("SSPOS".equals(busInfo.get("PLATFORM_TYPE"))){
-                logger.info("请求参数："+map2.toJSONString());
                 reactSSPOSApply(SS_TEMPLATE_APPLY,map2,templateRecode);
             }
         }catch (MessageException e){
@@ -406,7 +405,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             ssApiApply.put("orgId",json.getString("orgId"));
             ssApiApply.put("applyTemplate",json);
             ssApiApply.put("applyReward",ssApiApplyReward);
-
+            logger.info("请求参数："+ssApiApply.toJSONString());
            String result = HttpClientUtil.doPostJson(url, ssApiApply.toJSONString());
             Map<String,Object> resultMap = JSONObject.parseObject(result);
             if(!(boolean)resultMap.get("result")){
