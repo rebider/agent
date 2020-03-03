@@ -24,4 +24,6 @@ public interface JobOrderAuthService {
      * @return
      */
     Map<String,Object> getAcceptGroup(String userId);
+
+    List<Map<String,Object>> getAllAcceptGroup();
 }

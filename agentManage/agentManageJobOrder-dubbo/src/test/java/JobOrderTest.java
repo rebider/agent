@@ -8,6 +8,7 @@ import com.ryx.internet.service.OInternetRenewService;
 import com.ryx.jobOrder.pojo.JoCustomKey;
 import com.ryx.jobOrder.pojo.JoKeyManage;
 import com.ryx.jobOrder.pojo.JoTask;
+import com.ryx.jobOrder.service.JobOrderAuthService;
 import com.ryx.jobOrder.service.JobOrderManageService;
 import com.ryx.jobOrder.service.JobOrderTaskService;
 import com.ryx.jobOrder.vo.JoTaskVo;
@@ -32,7 +33,8 @@ public class JobOrderTest extends BaseSpringTest {
 
     @Autowired
     private JobOrderManageService jobOrderManageService;
-
+    @Autowired
+    private JobOrderAuthService jobOrderAuthService;
 
     @Test
     public void test1() throws MessageException {
@@ -135,4 +137,9 @@ public class JobOrderTest extends BaseSpringTest {
         System.out.println();
     }
 
+    @Test
+    public void test9(){
+        List<Map<String, Object>> allAcceptGroup = jobOrderAuthService.getAllAcceptGroup();
+        System.out.println(allAcceptGroup);
+    }
 }
