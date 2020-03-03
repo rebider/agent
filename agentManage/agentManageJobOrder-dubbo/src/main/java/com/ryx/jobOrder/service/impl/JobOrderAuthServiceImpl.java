@@ -32,4 +32,10 @@ public class JobOrderAuthServiceImpl implements JobOrderAuthService {
         Map<String, Object> acceptCode = jobOrderAuthMapper.getAcceptGroup(userId);
         return acceptCode;
     }
+
+    @Override
+    public List<Map<String, Object>> getAllAcceptGroup() {
+        List<Map<String, Object>> allAcceptGroup = jobOrderAuthMapper.getAllAcceptGroup();
+        return allAcceptGroup;
+    }
 }
