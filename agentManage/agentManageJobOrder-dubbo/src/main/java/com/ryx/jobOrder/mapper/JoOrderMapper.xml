@@ -633,7 +633,7 @@
       jo.deal_time_start,
       jo.accept_now_group
       from jo_order jo
-      left join jo_task ta on ta.jo_id = jo.id
+      --left join jo_task ta on ta.jo_id = jo.id
       left join jo_key_manage one on one.jo_key = jo.jo_first_key_num
       left join jo_key_manage two on two.jo_key = jo.jo_second_key_num
     <where>

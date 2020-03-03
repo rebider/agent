@@ -14,6 +14,7 @@ import com.ryx.credit.service.dict.IdService;
 import com.ryx.jobOrder.dao.*;
 import com.ryx.jobOrder.pojo.*;
 import com.ryx.jobOrder.service.JobOrderQueryService;
+import com.ryx.jobOrder.service.JobOrderTaskService;
 import com.ryx.jobOrder.vo.JoTaskVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,8 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
     private JoTaskMapper joTaskMapper;
     @Autowired
     private IdService idService;
+    @Autowired
+    private JobOrderTaskService jobOrderTaskService;
     @Override
     public PageInfo jobOrderQueryList(Map map, Page page) {
         logger.info("------我收到的工单列表查询-内部人员------");
@@ -184,20 +187,23 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
     public AgentResult reStartTask(Map map) throws MessageException {
 
         JoTask joTask = new JoTask();
+        joTask.setJoId(String.valueOf(map.get("joId")));
+        List<JoTask> joTaskList = jobOrderTaskService.queryJobOrderTask(joTask);
+        JoTask joTask1 = joTaskList.get(0);
         joTask.setId( idService.genId(TabId.jo_task) );
         joTask.setJoId(String.valueOf(map.get("joId")));
-        joTask.setDealGroup("");
-        joTask.setDealGroupId("");
+        joTask.setDealGroup(joTask1.getDealGroup());
+        joTask.setDealGroupId(joTask1.getDealGroup());
         joTask.setDealPersonId("");
         joTask.setDealPersonName("");
         joTask.setJoTaskContent("");
         joTask.setId( idService.genId(TabId.jo_task) );
         joTask.setVersion(version);
         if(joTaskMapper.insert(joTask) != 1){
-            throw new MessageException("插入失败" + joTask.getId());
+            throw new MessageException("重新提问失败" + joTask.getId());
         }
 
-        return null;
+        return AgentResult.ok();
     }
 
 
