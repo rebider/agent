@@ -1,11 +1,10 @@
 package com.ryx.jobOrder.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.enumc.JoOrderStatus;
-import com.ryx.credit.common.enumc.JoTaskStatus;
-import com.ryx.credit.common.enumc.TabId;
-import com.ryx.credit.common.util.DateUtil;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.util.FastMap;
+import com.ryx.credit.pojo.admin.agent.AttachmentRel;
+import com.ryx.credit.service.agent.AttachmentRelService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.jobOrder.dao.JoExpandKeyMapper;
 import com.ryx.jobOrder.dao.JoOrderMapper;
@@ -45,6 +44,10 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
 
     @Autowired
     private IdService idService;
+
+    @Autowired
+    private AttachmentRelService attachmentRelService;
+
     /**
      * 创建工单服务
      * @param jo  工单数据对象
@@ -62,8 +65,16 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
             jo.setAcceptGroup((String)acceptMap.get("name"));
             jo.setAcceptGroupCode((String)acceptMap.get("desdription"));
         }
-
+        Object annoTableFile = (Object)otherMap.get("annoTableFile");
+        String annexId = null;
+        if(annoTableFile != null && ((String[])annoTableFile).length>0){
+            saveAttachments(jo.getId(), (String)otherMap.get("userId"), (String[])annoTableFile);
+            annexId = ((String[])annoTableFile)[0];
+        }
+        otherMap.remove("userId");
+        otherMap.remove("annoTableFile");
         joOrderMapper.insert(jo);
+
         if(otherMap!= null ){
             for(Object keyo : otherMap.keySet()){ //keySet获取map集合key的集合  然后在遍历key即可
                 int index = 0;
@@ -94,6 +105,7 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
         joTask.setDealPersonId("");
         joTask.setDealPersonName("");
         joTask.setJoTaskContent(jo.getJoContent());
+        joTask.setJoTaskAnnexId(annexId);
         jobOrderTaskService.createJobOrderTask(joTask);
         return FastMap.fastSuccessMap();
     }
@@ -142,5 +154,27 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
         return null;
     }
 
+
+    /**
+     * 保存附件信息
+     */
+    public FastMap saveAttachments(String joId, String userid, String[] attachments) {
+        try {
+            for (String attach : attachments) {
+                AttachmentRel attachmentRel = new AttachmentRel();
+                attachmentRel.setId(idService.genId(TabId.a_attachment_rel));
+                attachmentRel.setSrcId(joId);
+                attachmentRel.setAttId(attach);
+                attachmentRel.setBusType(AttachmentRelType.jobOrder.name());
+                attachmentRel.setcTime(new Date());
+                attachmentRel.setcUser(userid);
+                attachmentRel.setStatus(Status.STATUS_1.status);
+                attachmentRelService.insertSelective(attachmentRel);
+            }
+        } catch (Exception e) {
+            return FastMap.fastFailMap("附件保存失败");
+        }
+        return FastMap.fastSuccessMap();
+    }
 
 }
