@@ -234,8 +234,5 @@
           left join jo_key_manage m2 on m2.jo_key_back_num = m1.jo_key
           left join jo_key_manage m3 on m3.jo_key_back_num = m2.jo_key
           where m1.jo_key_type = '0')
-    <!--<where>-->
-      <!--<if test="jobOrderType!=null and jobOrderType!=''"> and job_order_type like CONCAT(CONCAT('%',#{jobOrderType}),'%') </if>-->
-    <!--</where>-->
   </select>
 </mapper>

@@ -122,6 +122,9 @@ public class JobOrderManageServiceImpl implements JobOrderManageService {
         if (StringUtils.isNotBlank(joKeyManage.getJoKeyType())){
             criteria.andJoKeyTypeEqualTo(joKeyManage.getJoKeyType());
         }
+        if (StringUtils.isNotBlank(joKeyManage.getJoKey())){
+            criteria.andJoKeyEqualTo(joKeyManage.getJoKey());
+        }
         if(StringUtils.isNotBlank(joKeyManage.getJoKeyBackNum())){
             criteria.andJoKeyBackNumEqualTo(joKeyManage.getJoKeyBackNum());
         }
@@ -239,6 +242,12 @@ public class JobOrderManageServiceImpl implements JobOrderManageService {
             }
         }
         return ResultVO.success(null);
+    }
+
+    @Override
+    public List queryJobOrderType() {
+        List<Map<String, Object>> mapsList = joKeyManageMapper.queryJobOrderType();
+        return mapsList;
     }
 
 }

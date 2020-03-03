@@ -50,4 +50,10 @@ public interface JobOrderManageService {
 
     ResultVO joCustomKeyEdit(JobOrderVo jobOrderVo) throws Exception;
 
+    /**
+     * 获取工单类型下拉列表
+     * @return
+     */
+    List queryJobOrderType();
+
 }
