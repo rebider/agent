@@ -18,4 +18,6 @@ public interface JobOrderStartService {
     FastMap saveJobOrderExband(JoExpandKey joExpandKey);
 
     JoOrder queryListByTaskId(String taskId);
+
+    List<Map> queryAgPro(String agId);
 }

@@ -39,4 +39,6 @@ public interface JoOrderMapper {
     int queryJobOrderLaunchListCount(@Param("map") Map<String, Object> param);
 
     List<JoOrder> queryListByTaskId(String taskId);
+
+    List<Map> queryAgPro(String agId);
 }

@@ -57,6 +57,7 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
     @Override
     public FastMap createJobOrder(JoOrder jo, Map otherMap) throws Exception {
         jo.setId(idService.genId(TabId.jo_order));// 生成ID
+        jo.setLaunchTime(new Date());
         jo.setVersion(version);
         jo.setJoProgress(JoOrderStatus.WCL.getValue());
         // 查找受理部门
@@ -154,7 +155,16 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
         return null;
     }
 
-
+    /**
+     * AGID
+     * 查询所在省区
+     * @param agId
+     * @return
+     */
+    @Override
+    public List<Map> queryAgPro(String agId){
+        return  joOrderMapper.queryAgPro(agId);
+    }
     /**
      * 保存附件信息
      */

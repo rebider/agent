@@ -481,6 +481,7 @@
     <result column="AG_NAME" jdbcType="VARCHAR" property="agName" />
     <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
     <result column="PLATFORM_NAME" jdbcType="VARCHAR" property="platformName" />
+    <result column="JO_TOP_KEY_NUM" jdbcType="VARCHAR" property="joTopKeyNum" />
     <result column="JO_FIRST_KEY_NUM" jdbcType="VARCHAR" property="joFirstKeyNum" />
     <result column="JO_SECOND_KEY_NUM" jdbcType="VARCHAR" property="joSecondKeyNum" />
     <result column="PRIORITY_LEVEL" jdbcType="VARCHAR" property="priorityLevel" />
@@ -516,6 +517,7 @@
     jo.ag_name,
     jo.bus_num,
     jo.platform_name,
+    top.jo_key_name as jo_top_key_num,
     one.jo_key_name as jo_first_key_num,
     two.jo_key_name as jo_second_key_num,
     jo.priority_level,
@@ -530,6 +532,7 @@
     from jo_order jo
     left join jo_task ta on ta.jo_id = jo.id
     left join jo_key_manage one on one.jo_key = jo.jo_first_key_num
+    left join jo_key_manage top on top.jo_key = one.jo_key_back_num
     left join jo_key_manage two on two.jo_key = jo.jo_second_key_num
     <where>
       1 = 1
@@ -567,6 +570,7 @@
     jo.ag_name,
     jo.bus_num,
     jo.platform_name,
+    top.jo_key_name as jo_top_key_num,
     one.jo_key_name as jo_first_key_num,
     two.jo_key_name as jo_second_key_num,
     jo.priority_level,
@@ -581,18 +585,19 @@
     from jo_order jo
     left join jo_task ta on ta.jo_id = jo.id
     left join jo_key_manage one on one.jo_key = jo.jo_first_key_num
+    left join jo_key_manage top on top.jo_key = one.jo_key_back_num
     left join jo_key_manage two on two.jo_key = jo.jo_second_key_num
     <where>
       1 = 1
       <if test="id!=null and id!=''"> and jo.id = #{id} </if>
-        <if test="joSecondKeyNum!=null and joSecondKeyNum!=''"> and jo.jo_second_key_num like CONCAT(CONCAT('%',#{joSecondKeyNum}),'%') </if>
+      <if test="joSecondKeyNum!=null and joSecondKeyNum!=''"> and jo.jo_second_key_num like CONCAT(CONCAT('%',#{joSecondKeyNum}),'%') </if>
       <if test="agName!=null and agName!=''"> and jo.ag_name like CONCAT(CONCAT('%',#{agName}),'%') </if>
       <if test="busNum!=null and busNum!=''"> and jo.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="priorityLevel!=null and priorityLevel!=''"> and jo.priority_level = #{priorityLevel} </if>
       <if test="joProgress!=null and joProgress!=''"> and jo.jo_progress = #{joProgress} </if>
       <if test="launchBranchName!=null and launchBranchName!=''"> and jo.launch_branch_name = #{launchBranchName} </if>
-      <!--<if test="launchBeginTime!=null and launchEndTime!=''"> and (to_char(jo.launch_time,'yyyy-mm-dd') between #{launchBeginTime} and #{taskEndTimime}) </if>-->
-      <!--<if test="taskBeginTime!=null and taskEndTime!=''"> and (to_char(ta.jo_task_accept_time,'yyyy-mm-dd') between #{taskBeginTime} and #{taskEndTime}) </if>-->
+      <if test="launchBeginTime!=null and launchEndTime!=''"> and (to_char(jo.launch_time,'yyyy-mm-dd') between #{launchBeginTime} and #{taskEndTimime}) </if>
+      <if test="taskBeginTime!=null and taskEndTime!=''"> and (to_char(ta.jo_task_accept_time,'yyyy-mm-dd') between #{taskBeginTime} and #{taskEndTime}) </if>
       <!--<if test="joDealPersonId!=null and joDealPersonId!=''"> and ta.deal_person_id = #{joDealPersonId} </if>-->
       <!--<if test="joDealGroupId!=null and joDealGroupId!=''"> and ta.deal_group_id = #{joDealGroupId} </if>-->
     </where>
@@ -663,4 +668,16 @@
     jo.JO_TITLE, jo.JO_CONTENT, jo.JO_ASSESS_LEVEL, jo.JO_ASSESSOR_NAME, jo.JO_ASSESSOR_TYPE, jo.JO_ASSESSOR_ID,
     jo.JO_ASSESS_CONTENT, jo.JO_ASSESS_TIME, jo.VERSION
   </sql>
+  <select id="queryAgPro" parameterType="string" resultType="map">
+    SELECT
+      a.id AS agId,
+      a.ag_uniq_num AS agUId,
+      a.ag_name AS agName,
+      a.ag_doc_pro AS agProCode,
+      c.name AS agProName
+    FROM a_agent a
+    LEFT JOIN c_organization c ON c.id = a.ag_doc_pro
+    WHERE a.id = #{agId}
+  </select>
+
 </mapper>
