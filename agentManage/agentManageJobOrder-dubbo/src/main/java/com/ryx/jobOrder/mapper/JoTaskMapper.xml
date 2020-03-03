@@ -303,6 +303,7 @@
     <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
     <result column="PALTFORM_NUM" jdbcType="VARCHAR" property="paltformNum" />
     <result column="PLATFORM_NAME" jdbcType="VARCHAR" property="platformName" />
+    <result column="JO_TOP_KEY_NUM" jdbcType="VARCHAR" property="joTopKeyNum" />
     <result column="JO_FIRST_KEY_NUM" jdbcType="VARCHAR" property="joFirstKeyNum" />
     <result column="JO_SECOND_KEY_NUM" jdbcType="VARCHAR" property="joSecondKeyNum" />
     <result column="PRIORITY_LEVEL" jdbcType="VARCHAR" property="priorityLevel" />
@@ -324,8 +325,12 @@
     <result column="joTaskAcceptTime" jdbcType="VARCHAR" property="joTaskAcceptTime" />
   </resultMap>
   <sql id="JoTaskVo_Column_List">
-    jo.ID, jo.AG_ID, jo.AG_NAME, jo.BUS_ID, jo.BUS_NUM, jo.PALTFORM_NUM, jo.PLATFORM_NAME, jo.JO_FIRST_KEY_NUM,
-    jo.JO_SECOND_KEY_NUM, jo.PRIORITY_LEVEL, jo.LAUNCH_TIME, jo.LAUNCH_PERSON_ID, jo.LAUNCH_PERSON_NAME,
+    jo.ID, jo.AG_ID, jo.AG_NAME, jo.BUS_ID, jo.BUS_NUM, jo.PALTFORM_NUM, jo.PLATFORM_NAME,
+    jm0.jo_key_name as JO_TOP_KEY_NUM,
+    jm1.jo_key_name as JO_FIRST_KEY_NUM,
+    jm2.jo_key_name as JO_SECOND_KEY_NUM,
+    jm3.jo_key_name as PRIORITY_LEVEL,
+    jo.LAUNCH_TIME, jo.LAUNCH_PERSON_ID, jo.LAUNCH_PERSON_NAME,
     jo.LAUNCH_PERSON_EMAIL, jo.LAUNCH_BRANCH_ID, jo.LAUNCH_BRANCH_NAME, jo.ACCEPT_GROUP_CODE, jo.ACCEPT_GROUP,
     jo.ACCEPT_NOW_GROUP, jo.DEAL_TIME_START, jo.DEAL_TIME_END, jo.DEAL_TIME_LENGTH, jo.JO_PROGRESS,
     jt.id as joTaskId, jt.jo_task_status  as joTaskStatus, jt.jo_task_time as joTaskTime,
@@ -337,6 +342,10 @@
     <include refid="JoTaskVo_Column_List" />
     from JO_ORDER jo
     left join JO_TASK jt on jo.id = jt.jo_id
+    left join jo_key_manage jm1 on jm1.id = jo.jo_first_key_num
+    left join jo_key_manage jm0 on jm0.id = jm1.jo_key_back_num
+    left join jo_key_manage jm2 on jm2.id = jo.jo_second_key_num
+    left join jo_key_manage jm3 on jm3.id = jo.priority_level
     <if test="_parameter != null">
       <include refid="TaskVoExample_Where_Clause" />
     </if>

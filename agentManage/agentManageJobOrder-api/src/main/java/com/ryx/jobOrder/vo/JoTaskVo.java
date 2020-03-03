@@ -14,6 +14,8 @@ public class JoTaskVo extends JoOrder {
 
     private String joTaskStatus;
 
+    private String joTopKeyNum;
+
     private Date joTaskTime;
 
     private Date joTaskAcceptTime;
@@ -33,6 +35,14 @@ public class JoTaskVo extends JoOrder {
     private Date joAcceptTimeBegin;
 
     private Date joAcceptTimeEnd;
+
+    public String getJoTopKeyNum() {
+        return joTopKeyNum;
+    }
+
+    public void setJoTopKeyNum(String joTopKeyNum) {
+        this.joTopKeyNum = joTopKeyNum;
+    }
 
     public String getJoDealPersonId() {
         return joDealPersonId;
