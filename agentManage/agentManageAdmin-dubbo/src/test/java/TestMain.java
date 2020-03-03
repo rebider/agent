@@ -33,7 +33,7 @@ public class TestMain {
         try {
 
             JSONObject par = new JSONObject();
-            par.put("identification","RDBPOS");
+            par.put("identification","POS");
             String pars = par.toJSONString();
 
             System.out.println("请求明文:"+pars);
@@ -44,32 +44,33 @@ public class TestMain {
                     "DbN0yZqlvMRRMe059X09hSmV5aaWqxeMEx65jV0GVV1OhgQMtNUvTMCFLNWvGnPZ"+
                     "7w4hhy6g0XqY2YDRpMXEKn6EUINwQiu4OTqQO4G7feeeQKbAYnLKZIAwZOqa7twU"+
                     "QQIDAQAB";
-            String rdb_prim_key = "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDdGkO0506OOLQP"+
-                    "lDDKJUoskFbrntcL8TEmcdx1lKjnT23QI0reL4BL4HRgvf3daL/MpuC4uGpuCKOb"+
-                    "4jB75SJOpZzbBinlIwoVx6+jX/VRYDRZndOvh+KoWfIRUicptoghQwJ5nkaEknxd"+
-                    "Z8AXjD73KPrHV5UFhn8GjTQ3YaK7UPYpNxQOvgCaRiWJkWmvOzTlieAUayw5Mu5Y"+
-                    "k2623lnvYc1+5rMKhLIKITCvPXDmw0WM+qIApAwV7dwbaybFzRs9Yoa6ZKrKb/f8"+
-                    "Mrys1SOnQ1Zb/SHyfCMzy9S5ZJdS8eBIWunngoZ2ZzoWouu19klHhq6XUyfRKDFE"+
-                    "i7S28jJFAgMBAAECggEANvDY1DIJ/iMu8xQSz5hWhx5SyvfMXgZP/UqbyofnNJsz"+
-                    "IV4zs2RAUBp1MLjlRUhLKLJq8tu4bqEs7oZVH+Q/EyXqBS7R6EM9tU3KYiFtFwx9"+
-                    "1ar3OA3fD5BSK2Wrn5zg1MsO6WOgCD9SMe+e9vr9hnMjZbdoq1fRZrJdwEk9o6ez"+
-                    "Q3Rki9ad498WynDARaImZZZWY80+h145MMfMUqotYaLZZtCSW1lN1y+MGuT+Tm/m"+
-                    "GL2BVGtpU3vYOtsWDKBJqYCv/yehqjJxIQER6x8WO3qqB1fKWuVuP9xp8lQNhJbD"+
-                    "+Vilgj/NeeQe7HU8BYjbHrHvLIeUIUm6dFCbGa5HAQKBgQD2iTiLfV9LqtGC/yGH"+
-                    "KkYQdLs6etSBMLtx8pxKNaxVhSEcOUHCoF5uMD52g5R8ZOjlNNbzW00txzZVTWfR"+
-                    "Kf1yUlQtQMMotB+9YvfeKsJdo96lxMwM+2yYIR4c8Pcqj6Mp+gGbqWfjfyWDC/bP"+
-                    "8BvKuJ1MA/cDPAqDighIf7tUwQKBgQDllxonSfeaiKm1/mkdMi9qdiwCHCIRWEfw"+
-                    "nblwpR+XuuB8TQx/7HUxLwzqREqp2KPNyuLF9bQ3uXPzazlBZbKa0hZT0YLvhEXl"+
-                    "T4QMA7NE3VpCbMAnfPeJWtq2Ju+exhnmXDxN9hX8346q0XL1c3+XUwSFEt5fZJ87"+
-                    "KR5GFxeqhQKBgQCsAuX+/USmKNLxkU01X5tvE+MmVFk8omHGiT3e0UAikzac2J43"+
-                    "S2lXfDW4vum1OTr94TYwqX1Z+WrBbbaHy8JYJ3Uv9cW0+qhCnXDQBAmFCDbqdjrg"+
-                    "u/Py2PiHvODXQ0zWlubUUwh3RFlJ6+kTADaD5Pdq+EE6coPrbz2ESArOgQKBgDOw"+
-                    "oFfGJHPrXuI1pC7JlLlQX7od4WGsUY4PxKdi1ckQbugtZKoMb5oiMLMxqumwd7im"+
-                    "fAX7upZtL3jXZC2gGuUWdaZrXiJU0nO9Qkp+LsdLWr3nxB9f2E9ZYDJwc7R4f25I"+
-                    "x975j5u+LV2yCELQvSIxs6vOQriRa/Qi3skC+/YNAoGAFdev2l0gOjoW6pOBaNLt"+
-                    "j0fEmMDZteUWJHh3XCCj3SqSRxhF2EKj+/ah2SVnzF7aynsvXp161fER+9A8x3NV"+
-                    "TEeGu+t69dOkBs1BtFpexGGyHE4DijuhHb6O7VfGKNu4ZDe9jyqz1YHpihhdxBm/"+
-                    "ktN299BPA3Rhg+1Ko1eT+go=";
+            String rdb_prim_key = 
+                    "MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC2cP05SisTRwiO\n" +
+                    "EHXslZnmQ8G5mSLQQRoNwhncq+frFqXEulcQEvMF8QpO0xw0l5ZE/9J/uiHJR47/\n" +
+                    "TiGnAOdBtMQcw4uDP3UBM8TGmK4XcokWh1eCqJ4jbpslJqoQw7hYfY0ApSXgiqSQ\n" +
+                    "AF/VsUuh71TArrMwT4NJZIveaM3BWi0qccxvYGQf6Z+pwJVC7gqcOXbq7vJiYVpF\n" +
+                    "J5VveO9/BqIAV3/nAE5+cmxv3Ag40YZ0m4+TRgUr4yo2g4voXbZKvvhQehycF8PB\n" +
+                    "HyKCU+4Yk2anD0eej7Q3nH2Pqyz7ONZsUe1tntIOnBIOE5aZpGtq9Glozq7CQDwO\n" +
+                    "PA4M8LWHAgMBAAECggEAPTF83iBwflDPH8eJpkcvjbqgWf5xXOTZNlAqmIfYjFPW\n" +
+                    "WjweQ7f3Z8DHslTBGyrVLmOYWVs3ReoInr24L+nvp2xYc0VroCRCvJp+oBZKHnc+\n" +
+                    "YB4ZTiv8junkg/uKA4GCbbv+9X5vS/d05xAZFPYY5kH+bXqrg8LHyHA/MeR5Tya8\n" +
+                    "4zugI8Op7iCHBmZvZ4sb6kWi1l16wL9J5XML/XjZ0Sw9cEmBYcVgAM53h7doT44c\n" +
+                    "TUW0q1tx2epvAaKX3IaiFbM2vCwNITrHiurt+XgYyOp1KAYNGyAo6uyrT81s5Qmf\n" +
+                    "rVzZSvpeXOrPnU0aidOAzJWEaSWJhkBGm/bcFILlgQKBgQDjKxYEgvCGd01BVgzC\n" +
+                    "VPGYKx6GqMhaIGzRfXAU9poSQrwaRgM3KMpLGHAgAp04K5IMyCFQDHiW8OCfXQsx\n" +
+                    "57jbP5ve7e0jpawZPQQRU3uzavZK3J/Z5UHPRQeGzV1/S/dD+pEUTg7cjfFFcxqX\n" +
+                    "5m7V9fxiBaNl+lUSU3V7ll9g4QKBgQDNmK6vCCIZH//JpQsrn//OrzrJ64xX8kYG\n" +
+                    "VmoiEIN5u5R/bgmjSV7epFUS2OmQgCQzyEO5BwW8bbCFcetlQ0CxoHgKCvbjbRHp\n" +
+                    "8W6OynrBnnWmxGlz59+DmT1KdtRX6zn4eWMLY5QK8Ho01bTGcIZCX8UIFBIfEVwk\n" +
+                    "NOaTE3kbZwKBgQDaFxVOQ38zOPn8TeZ18yL2Wf82fHfMvvB5tpmSJqYH/fWkq66O\n" +
+                    "mCSOL+oFcT0LHhlbGA+TUEW9c4fSt3r18GcyZkD4pydRX853dHKhR6qst3W4rVLx\n" +
+                    "1/10RetR6XtnqMC8jKQYAFCYQdVuPXE8f8fMthoU6SDT2J8vttxFSDpNQQKBgQCd\n" +
+                    "5MNLAukE+LE9kDXq8/7GIYb5qZ9nr1Wd6mGp9ZqzM58Q2lYmg+OLAxOe3N1LL04e\n" +
+                    "Qo/YGo+KLYdihKGubB7UC5QEynTfJlWan+MzYEc0SVi7kZ4W+J2MeHQ8qtPbDXjA\n" +
+                    "3aB2D6yTVinUR8eEmshRUzGDSb69A10LJWFq1IquwwKBgAkITiw+NxXjpMUz3/tv\n" +
+                    "YQRu9qPt+ethZo2gOEWzhqKF/+MMPFYDKrASTZu3/5d80YU9T8b1P1Y9VeFjnMuH\n" +
+                    "EN7vrlkj3g7jMv+XCa/VKVJcuHqRY/FiO0JDNwnHPE88SPXsPeR3Zkl0RK4ki475\n" +
+                    "NEPotI6upccEvY6gPe1K69gW";
 
 
             PublicKey publicKey = RSAUtil.getRSAPublicKey(agent_public_key, "pem", "RSA");
@@ -89,16 +90,23 @@ public class TestMain {
             map.put("encryptData", encryptData);
             map.put("encryptKey", encrtptKey);
             map.put("signData", signData);
-            map.put("identification", "RDBPOS");
+            map.put("identification", "POS");
             String s = JSONObject.toJSONString(map);
 
             System.out.println("param值:"+map);
 
             Map<String, String> reqmap = new HashMap<>();
             reqmap.put("param",s);
-            String s1 = HttpClientUtil.doPost("http://localhost:8085/center/authCode", reqmap);
-
-            System.out.println(s1);
+            String s1 = HttpClientUtil.doPost("http://12.3.10.205:8089/center/authCode", reqmap);
+            JSONObject jsonObject = JSONObject.parseObject(s1);
+            String resEncryptData = jsonObject.getString("encryptData");
+            String resEncryptKey = jsonObject.getString("encryptKey");
+            byte[] decodeBase64KeyBytes = Base64.decodeBase64(resEncryptKey.getBytes(charset));
+            byte[] merchantAESKeyBytes = RSAUtil.decrypt(decodeBase64KeyBytes, privateKey, 2048, 11, "RSA/ECB/PKCS1Padding");
+            byte[] decodeBase64DataBytes = Base64.decodeBase64(resEncryptData.getBytes(charset));
+            byte[] merchantXmlDataBytes = AESUtil.decrypt(decodeBase64DataBytes, merchantAESKeyBytes, "AES", "AES/ECB/PKCS5Padding", null);
+            String respXML = new String(merchantXmlDataBytes, charset);
+            System.out.println("返回明文:"+respXML);
 
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
