@@ -1,5 +1,6 @@
 package com.ryx.jobOrder.service.impl;
 
+import com.ryx.credit.common.enumc.JoOrderStatus;
 import com.ryx.credit.common.enumc.JoTaskStatus;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.MessageException;
@@ -9,6 +10,7 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.service.dict.IdService;
+import com.ryx.jobOrder.dao.JoOrderMapper;
 import com.ryx.jobOrder.dao.JoTaskMapper;
 import com.ryx.jobOrder.pojo.JoOrder;
 import com.ryx.jobOrder.pojo.JoTask;
@@ -29,6 +31,9 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
 
     @Autowired
     private JoTaskMapper joTaskMapper;
+
+    @Autowired
+    private JoOrderMapper joOrderMapper;
 
     @Autowired
     private IdService idService;
@@ -83,6 +88,24 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         pageInfo.setTotal(count);
         pageInfo.setRows(jotaskVolist);
         return  pageInfo;
+    }
+
+    /**
+     * 根据 id 查询任务
+     * 查询 工单任务 列表
+     *      工单详情等使用
+     * @param taskId
+     * @return
+     */
+    @Override
+    public JoTask queryJobOrderTaskByTaskId(String taskId) {
+        JoTask query = new JoTask();
+        query.setId(taskId);
+        List<JoTask> list= queryJobOrderTask(query);
+        if(list!=null && list.size()>0){
+            return list.get(0);
+        }
+        return null;
     }
 
     /**
@@ -168,22 +191,31 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
      */
     @Override
     public FastMap receiveJobOrderTask(JoTask joTask) throws Exception {
-        JoTask joTaskOld = queryLastJobOrderTask(joTask);
+        String oldTaskId= joTask.getId();
+        String joId = joTask.getJoId();
+        String content = joTask.getJoTaskContent();
+        JoTask joTaskOld = queryJobOrderTaskByTaskId(oldTaskId);
         // 结束工单
         endJoTask( joTaskOld );
+
         // 查询工单类型受理部门
-        joTask.setDealGroupId("");
-        //
+        String dealCode = joTask.getDealGroupId();
+        if("0".equals(dealCode)){ // 选择的是发起人
+            JoOrder newOrder = joOrderMapper.selectByPrimaryKey(joId);
+            newOrder.setJoProgress(JoOrderStatus.YCL.getValue());
+            newOrder.setDealTimeEnd(new Date());
+            double dLength = (newOrder.getDealTimeEnd().getTime() - newOrder.getDealTimeStart().getTime() ) / (60 * 1000);
+            newOrder.setDealTimeLength(new BigDecimal(dLength).setScale(2, BigDecimal.ROUND_HALF_UP));
+            joOrderMapper.updateByPrimaryKeySelective(newOrder);
+            return FastMap.fastSuccessMap();
+        }
+        // 转发其他部门  jotask 含有受理部门 处理人 处理人姓名
         JoTask joTaskNew = new JoTask();
-        joTaskNew.setJoId(joTask.getJoId());
+        joTaskNew.setJoId(joId);
         joTaskNew.setJoTaskStatus(JoTaskStatus.WSL.getValue());
-        joTaskNew.setDealGroup("");
-        joTaskNew.setDealGroupId("");
-        joTaskNew.setDealPersonId("");
-        joTaskNew.setDealPersonName("");
         joTaskNew.setBackDealGroup(joTaskOld.getDealGroup());
         joTaskNew.setBackDealPerson(joTaskOld.getDealPersonName());
-        joTaskNew.setJoTaskContent(joTask.getDealGroup() + "转发:" + joTask.getJoTaskContent());
+        joTaskNew.setJoTaskContent(joTaskOld.getDealGroup() + "转发到:" + joTask.getDealGroup()+"内容:"+ content);
         FastMap status = createJobOrderTask(joTaskNew);
         if(FastMap.isSuc(status)){
             return FastMap.fastSuccessMap();
@@ -199,9 +231,10 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
      */
     @Override
     public FastMap endJoTask(JoTask joTask) throws MessageException {
+        // 更新工单任务
         joTask.setJoTaskNextTime(new Date());
         joTask.setJoTaskStatus(JoTaskStatus.YHF.getValue());
-        double dLength = (joTask.getJoTaskNextTime().getTime() - joTask.getJoTaskTime().getTime() ) / 3600 / 60;
+        double dLength = (joTask.getJoTaskNextTime().getTime() - joTask.getJoTaskTime().getTime() ) / (60 * 1000);
         joTask.setJoTaskTimeLength(new BigDecimal(dLength).setScale(2, BigDecimal.ROUND_HALF_UP));
         int status = joTaskMapper.updateByPrimaryKeySelective(joTask);
         if(status != 1){
@@ -212,12 +245,26 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
 
     /**
      * 工单受理服务
-     * 1. 将工单任务状态 受理中
+     * 1. 工单首次处理，更新状态和当前处理组
+     * 2. 将工单任务状态 更新为 受理中
      * @param joTask
      * @return
      */
     @Override
     public FastMap acceptOrderByTaskId(JoTask joTask) throws Exception {
+        // 获取joId
+        String joId = joTask.getJoId();
+        // 查询订单的状态
+        JoOrder joOrder = joOrderMapper.selectByPrimaryKey(joId);
+        if(joOrder.getJoProgress().equals(JoOrderStatus.WCL.getValue())){// 工单未处理状态
+            joOrder.setJoProgress(JoOrderStatus.CLZ.getValue());
+            // 更新当前处理组
+            joOrder.setAcceptNowGroup(joTask.getDealGroup());
+            joOrder.setDealTimeStart(new Date());
+            joOrderMapper.updateByPrimaryKeySelective(joOrder);
+        }
+        joTask.setJoId(null);
+        joTask.setDealGroup(null);
         joTask.setJoTaskAcceptTime(new Date());
         joTask.setJoTaskStatus(JoTaskStatus.SLZ.getValue());
         FastMap fastMap = updateJobOrderTask(joTask);

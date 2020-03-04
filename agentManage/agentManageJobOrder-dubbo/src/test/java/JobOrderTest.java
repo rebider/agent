@@ -145,4 +145,10 @@ public class JobOrderTest extends BaseSpringTest {
         List<Map<String, Object>> allAcceptGroup = jobOrderAuthService.getAllAcceptGroup();
 //        System.out.println(allAcceptGroup);
     }
+
+    @Test
+    public void test10(){
+        List list = jobOrderAuthService.getAllAcceptGroup();
+        System.out.println();
+    }
 }

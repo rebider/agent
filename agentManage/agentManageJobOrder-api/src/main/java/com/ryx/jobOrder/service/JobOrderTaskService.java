@@ -14,6 +14,8 @@ public interface JobOrderTaskService {
 
     FastMap createJobOrderTask(JoTask taskMap) throws Exception;
 
+    JoTask queryJobOrderTaskByTaskId(String taskId);
+
     List<JoTask> queryJobOrderTask(JoTask queryMap);
 
     FastMap updateJobOrderTask(JoTask queryMap) throws Exception;
