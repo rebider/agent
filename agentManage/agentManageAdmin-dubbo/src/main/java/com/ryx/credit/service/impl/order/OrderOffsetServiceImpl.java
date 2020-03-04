@@ -691,7 +691,8 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
     public AgentResult OffsetArrearsCommit(BigDecimal amount, String paytype, String srcId) throws MessageException{
         List<OPayDetail> oPayDetails = getOpayMentDetails(srcId,paytype);
         if (null == oPayDetails || oPayDetails.size() == 0){
-            return AgentResult.fail("未查询到付款明细信息");
+            logger.info("未查询到付款明细信息:"+srcId);
+            return AgentResult.ok("未查询到付款明细信息");
         }
 
         BigDecimal offsetAmt = BigDecimal.ZERO;
