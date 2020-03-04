@@ -795,7 +795,7 @@ public class OldCompensateServiceImpl implements OldCompensateService {
             agentResult = orderOffsetService.OffsetArrearsCommit(oRefundPriceDiff.getMachOweAmt(), OffsetPaytype.DDMD.code, oRefundPriceDiff.getId());
             if (!agentResult.isOK()){
                 log.error("换活动抵扣欠款失败!id"+oRefundPriceDiff.getId());
-                throw new MessageException("换活动抵扣欠款失败!id"+oRefundPriceDiff.getId());
+                throw new MessageException("换活动抵扣欠款失败!id"+oRefundPriceDiff.getId()+","+agentResult.getMsg());
             }
             //调用接口调整
             AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "adjust");
