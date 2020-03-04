@@ -60,17 +60,17 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
         jo.setLaunchTime(new Date());
         jo.setVersion(version);
         jo.setJoProgress(JoOrderStatus.WCL.getValue());
-        // 查找受理部门
-        Map acceptMap = jobOrderAuthService.getJobOrderType(jo.getJoSecondKeyNum());
-        if(acceptMap!=null){
-            jo.setAcceptGroup((String)acceptMap.get("name"));
-            jo.setAcceptGroupCode((String)acceptMap.get("desdription"));
-        }
+//        // 查找受理部门
+//        Map acceptMap = jobOrderAuthService.getJobOrderType(jo.getJoSecondKeyNum());
+//        if(acceptMap!=null){
+//            jo.setAcceptGroup((String)acceptMap.get("name"));
+//            jo.setAcceptGroupCode((String)acceptMap.get("desdription"));
+//        }
         Object annoTableFile = (Object)otherMap.get("annoTableFile");
         String annexId = null;
-        if(annoTableFile != null && ((String[])annoTableFile).length>0){
-            saveAttachments(jo.getId(), (String)otherMap.get("userId"), (String[])annoTableFile);
-            annexId = ((String[])annoTableFile)[0];
+        if(annoTableFile != null ){
+            saveAttachments(jo.getId(), (String)otherMap.get("userId"), ((String)annoTableFile).split(","));
+            annexId = (((String)annoTableFile).split(","))[0];
         }
         otherMap.remove("userId");
         otherMap.remove("annoTableFile");
