@@ -1244,6 +1244,32 @@ public class CompensateServiceImpl implements CompensateService {
                         throw new ProcessException("活动调整数据更新完成失败");
                     }
                 });
+
+                //变更后活动
+                OActivity new_oActivity = activityMapper.selectByPrimaryKey(row.getActivityRealId());
+                if(null==new_oActivity) throw new ProcessException("查询新活动失败");
+
+                //变更前活动
+                OActivity old_Activity = activityMapper.selectByPrimaryKey(row.getActivityFrontId());
+                if(old_Activity==null) throw new ProcessException("查询新活动失败");
+
+                //业务平台
+                PlatForm platForm =  platFormService.selectByPlatformNum(old_Activity.getPlatform());
+                if(platForm==null) throw new ProcessException("业务平台未找到:"+old_Activity.getPlatform());
+
+                //封装不同平台所需的不同参数
+                if (PlatformType.whetherPOS(platForm.getPlatformType()) || PlatformType.SSPOS.getValue().equals(platForm.getPlatformType())){
+                    List<PlatForm> oldPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("platformType", platForm.getPlatformType()).putKeyV("busNum",row.getOldOrgId()));
+                    List<PlatForm> newPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("platformType", platForm.getPlatformType()).putKeyV("busNum",row.getNewOrgId()));
+                    if (null == oldPlatForm || oldPlatForm.size() != 1 || null == oldPlatForm.get(0).getBusplatform()) {
+                        throw new ProcessException("未找到原目标业务平台，请核查原目标业务平台！");
+                    }
+                    if (null == newPlatForm || newPlatForm.size() != 1 || null == newPlatForm.get(0).getBusplatform()) {
+                        throw new ProcessException("未找到目标业务平台，请核查目标业务平台！");
+                    }
+                    row.setOldBrandCode(oldPlatForm.get(0).getBusplatform());
+                    row.setNewBrandCode(newPlatForm.get(0).getBusplatform());
+                }
             });
         }else if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
             oRefundPriceDiffDetails.forEach(row->{
@@ -1321,12 +1347,37 @@ public class CompensateServiceImpl implements CompensateService {
                     e.printStackTrace();
                     throw new ProcessException("处理失败");
                 }
+
+                //变更后活动
+                OActivity new_oActivity = activityMapper.selectByPrimaryKey(row.getActivityRealId());
+                if(null==new_oActivity) throw new ProcessException("查询新活动失败");
+
+                //变更前活动
+                OActivity old_Activity = activityMapper.selectByPrimaryKey(row.getActivityFrontId());
+                if(old_Activity==null) throw new ProcessException("查询新活动失败");
+
+                //业务平台
+                PlatForm platForm =  platFormService.selectByPlatformNum(old_Activity.getPlatform());
+                if(platForm==null) throw new ProcessException("业务平台未找到:"+old_Activity.getPlatform());
+
+                //封装不同平台所需的不同参数
+                if (PlatformType.whetherPOS(platForm.getPlatformType()) || PlatformType.SSPOS.getValue().equals(platForm.getPlatformType())){
+                    List<PlatForm> oldPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("platformType", platForm.getPlatformType()).putKeyV("busNum",row.getOldOrgId()));
+                    List<PlatForm> newPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("platformType", platForm.getPlatformType()).putKeyV("busNum",row.getNewOrgId()));
+                    if (null == oldPlatForm || oldPlatForm.size() != 1 || null == oldPlatForm.get(0).getBusplatform()) {
+                        throw new ProcessException("未找到原目标业务平台，请核查原目标业务平台！");
+                    }
+                    if (null == newPlatForm || newPlatForm.size() != 1 || null == newPlatForm.get(0).getBusplatform()) {
+                        throw new ProcessException("未找到目标业务平台，请核查目标业务平台！");
+                    }
+                    row.setOldBrandCode(oldPlatForm.get(0).getBusplatform());
+                    row.setNewBrandCode(newPlatForm.get(0).getBusplatform());
+                }
             });
 
             AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "adjust");
             if(!synOrVerifyResult.isOK()){
                 throw new MessageException(synOrVerifyResult.getMsg());
-                //throw new ProcessException(synOrVerifyResult.getMsg());
             }
         }
         return AgentResult.ok();
