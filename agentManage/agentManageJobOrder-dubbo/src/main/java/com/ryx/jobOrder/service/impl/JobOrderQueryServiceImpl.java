@@ -1,6 +1,7 @@
 package com.ryx.jobOrder.service.impl;
 
 import com.ryx.credit.common.enumc.JoOrderStatus;
+import com.ryx.credit.common.enumc.JoTaskStatus;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
@@ -192,11 +193,13 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
         JoTask joTask1 = joTaskList.get(0);
         joTask.setId( idService.genId(TabId.jo_task) );
         joTask.setJoId(String.valueOf(map.get("joId")));
+        joTask.setJoTaskStatus(JoTaskStatus.WSL.getValue());
+        joTask.setJoTaskTime(new Date());
+        joTask.setJoTaskContent(String.valueOf(map.get("joContent")));
         joTask.setDealGroup(joTask1.getDealGroup());
         joTask.setDealGroupId(joTask1.getDealGroup());
         joTask.setDealPersonId("");
         joTask.setDealPersonName("");
-        joTask.setJoTaskContent("");
         joTask.setId( idService.genId(TabId.jo_task) );
         joTask.setVersion(version);
         if(joTaskMapper.insert(joTask) != 1){
