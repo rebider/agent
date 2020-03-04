@@ -8,10 +8,7 @@ import com.ryx.credit.service.agent.AttachmentRelService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.jobOrder.dao.JoExpandKeyMapper;
 import com.ryx.jobOrder.dao.JoOrderMapper;
-import com.ryx.jobOrder.pojo.JoExpandKey;
-import com.ryx.jobOrder.pojo.JoKeyManage;
-import com.ryx.jobOrder.pojo.JoOrder;
-import com.ryx.jobOrder.pojo.JoTask;
+import com.ryx.jobOrder.pojo.*;
 import com.ryx.jobOrder.service.JobOrderAuthService;
 import com.ryx.jobOrder.service.JobOrderManageService;
 import com.ryx.jobOrder.service.JobOrderStartService;
@@ -187,4 +184,16 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
         return FastMap.fastSuccessMap();
     }
 
+    /**
+     * 查询 扩展字段 列表
+     * @param joId
+     * @return
+     */
+    @Override
+    public List<JoExpandKey> queryExpandKeyByJoid(String joId){
+        JoExpandKeyExample joExpandKeyExample = new JoExpandKeyExample();
+        JoExpandKeyExample.Criteria criteria = joExpandKeyExample.createCriteria();
+        criteria.andJidEqualTo(joId);
+        return joExpandKeyMapper.selectByExample(joExpandKeyExample);
+    }
 }

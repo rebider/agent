@@ -10,6 +10,7 @@ import com.ryx.jobOrder.pojo.JoKeyManage;
 import com.ryx.jobOrder.pojo.JoTask;
 import com.ryx.jobOrder.service.JobOrderAuthService;
 import com.ryx.jobOrder.service.JobOrderManageService;
+import com.ryx.jobOrder.service.JobOrderStartService;
 import com.ryx.jobOrder.service.JobOrderTaskService;
 import com.ryx.jobOrder.vo.JoTaskVo;
 import org.junit.Test;
@@ -30,7 +31,8 @@ public class JobOrderTest extends BaseSpringTest {
 
     @Autowired
     private JobOrderTaskService jobOrderTaskService;
-
+    @Autowired
+    private JobOrderStartService jobOrderStartService;
     @Autowired
     private JobOrderManageService jobOrderManageService;
     @Autowired
@@ -139,7 +141,8 @@ public class JobOrderTest extends BaseSpringTest {
 
     @Test
     public void test9(){
+        List list = jobOrderStartService.queryExpandKeyByJoid("JO20200227000000000000019");
         List<Map<String, Object>> allAcceptGroup = jobOrderAuthService.getAllAcceptGroup();
-        System.out.println(allAcceptGroup);
+//        System.out.println(allAcceptGroup);
     }
 }

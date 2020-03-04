@@ -20,4 +20,6 @@ public interface JobOrderStartService {
     JoOrder queryListByTaskId(String taskId);
 
     List<Map> queryAgPro(String agId);
+
+    List<JoExpandKey> queryExpandKeyByJoid(String joId);
 }
