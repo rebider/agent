@@ -57,12 +57,7 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
         jo.setLaunchTime(new Date());
         jo.setVersion(version);
         jo.setJoProgress(JoOrderStatus.WCL.getValue());
-//        // 查找受理部门
-//        Map acceptMap = jobOrderAuthService.getJobOrderType(jo.getJoSecondKeyNum());
-//        if(acceptMap!=null){
-//            jo.setAcceptGroup((String)acceptMap.get("name"));
-//            jo.setAcceptGroupCode((String)acceptMap.get("desdription"));
-//        }
+        jo.setAcceptNowGroup(jo.getAcceptGroup());
         Object annoTableFile = (Object)otherMap.get("annoTableFile");
         String annexId = null;
         if(annoTableFile != null ){
@@ -103,7 +98,7 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
         joTask.setDealPersonId("");
         joTask.setDealPersonName("");
         joTask.setJoTaskContent(jo.getJoContent());
-        joTask.setJoTaskAnnexId(annexId);
+        joTask.setJoTaskAnnexId(null);
         jobOrderTaskService.createJobOrderTask(joTask);
         return FastMap.fastSuccessMap();
     }

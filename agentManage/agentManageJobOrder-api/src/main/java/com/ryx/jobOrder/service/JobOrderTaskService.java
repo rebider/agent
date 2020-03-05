@@ -29,4 +29,6 @@ public interface JobOrderTaskService {
     FastMap endJoTask(JoTask joTask) throws MessageException;
 
     FastMap acceptOrderByTaskId(JoTask taskId) throws Exception;
+
+    FastMap cancelOrderByTaskId(JoTask joTask) throws Exception;
 }

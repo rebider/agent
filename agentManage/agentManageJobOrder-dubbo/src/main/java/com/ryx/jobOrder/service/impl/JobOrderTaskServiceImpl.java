@@ -17,6 +17,7 @@ import com.ryx.jobOrder.pojo.JoTask;
 import com.ryx.jobOrder.pojo.JoTaskExample;
 import com.ryx.jobOrder.service.JobOrderTaskService;
 import com.ryx.jobOrder.vo.JoTaskVo;
+import javafx.print.PrinterJob;
 import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -259,7 +260,6 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         if(joOrder.getJoProgress().equals(JoOrderStatus.WCL.getValue())){// 工单未处理状态
             joOrder.setJoProgress(JoOrderStatus.CLZ.getValue());
             // 更新当前处理组
-            joOrder.setAcceptNowGroup(joTask.getDealGroup());
             joOrder.setDealTimeStart(new Date());
             joOrderMapper.updateByPrimaryKeySelective(joOrder);
         }
@@ -272,5 +272,40 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
             return FastMap.fastSuccessMap();
         }
         return null;
+    }
+
+    /**
+     * 工单受理服务
+     * 1. 清空当前 工单任务 信息
+     * 2. 判断该工单任务是否是 第一条任务
+     * 3. 是否更新 工单信息
+     * @param joTask
+     * @return
+     */
+    @Override
+    public FastMap cancelOrderByTaskId(JoTask joTask) throws Exception {
+        // 获取joId
+        String joId = joTask.getJoId();
+        // 查询订单的状态
+        JoTask query = new JoTask();
+        query.setJoId(joId);
+        List result = queryJobOrderTask(query);
+        if(result.size() == 1){ // 首次工单任务
+            // 清理工单的信息
+            JoOrder joOrder = joOrderMapper.selectByPrimaryKey(joId);
+            joOrder.setDealTimeStart(null);
+            joOrder.setJoProgress(JoOrderStatus.WCL.getValue());
+            joOrderMapper.updateByPrimaryKey(joOrder);
+        }
+        JoTask update = joTaskMapper.selectByPrimaryKey(joTask.getId());
+        update.setDealPersonId(null);
+        update.setDealPersonName(null);
+        update.setJoTaskAcceptTime(null);
+        update.setJoTaskStatus(JoTaskStatus.WSL.getValue());
+        int status = joTaskMapper.updateByPrimaryKey(update);
+        if(status == 1){
+            return FastMap.fastSuccessMap();
+        }
+        return FastMap.fastFailMap();
     }
 }
