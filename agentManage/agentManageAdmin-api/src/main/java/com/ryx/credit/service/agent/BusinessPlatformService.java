@@ -104,4 +104,6 @@ public interface BusinessPlatformService {
 
     //业务类型更改限制
     void verifyBusinfoType(AgentBusInfo preBusInfoVo, AgentBusInfoVo newBusInfoVo) throws Exception;
+
+    void verifyAgentBusinfo(AgentVo agentVo) throws Exception;
 }
