@@ -4231,7 +4231,11 @@ public class OrderServiceImpl implements OrderService {
         OPayment payment = payments.get(0);
         String paymentMethod = payment.getPayMethod();
         OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
-        oPaymentDetailExample.or().andOrderIdEqualTo(orderUpModelVo.getOrderId()).andPaymentTypeEqualTo(PamentIdType.ORDER_FKD.code).andStatusEqualTo(Status.STATUS_1.status);
+        oPaymentDetailExample.or()
+                .andOrderIdEqualTo(orderUpModelVo.getOrderId())
+                .andPaymentTypeEqualTo(PamentIdType.ORDER_FKD.code)
+                .andStatusEqualTo(Status.STATUS_1.status)
+                .andPaymentStatusEqualTo(PaymentStatus.DF.code);
         oPaymentDetailExample.setOrderByClause(" pay_time asc, plan_num asc, plan_pay_time asc ");
         List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
         BigDecimal unpaySize = BigDecimal.ZERO;
@@ -4311,11 +4315,11 @@ public class OrderServiceImpl implements OrderService {
                 case "FKFQ":
                     //生成自定义预分期数据
                     if (StringUtils.isNotBlank(payment.getCustomStaging()) && Status.STATUS_1.status.toString().equals(payment.getCustomStaging())) {
-                        Date DownPaymentDate = beginDate;
+                        Date DownPaymentDate = new Date();
                         Calendar c = Calendar.getInstance();
                         c.setTime(DownPaymentDate);
-                        c.add(Calendar.MONTH,-1);
-
+                        //c.add(Calendar.MONTH,-1);
+                        c.set(Calendar.DAY_OF_MONTH, 1);
                         for (int i = 0; i < data.size(); i++) {
 
                             c.add(Calendar.MONTH,1);
@@ -4349,11 +4353,11 @@ public class OrderServiceImpl implements OrderService {
                 case "FRFQ":
                     //生成自定义预分期数据
                     if (StringUtils.isNotBlank(payment.getCustomStaging()) && Status.STATUS_1.status.toString().equals(payment.getCustomStaging())) {
-                        Date DownPaymentDate = beginDate;
+                        Date DownPaymentDate = new Date();
                         Calendar c = Calendar.getInstance();
                         c.setTime(DownPaymentDate);
-                        c.add(Calendar.MONTH,-1);
-
+                        //c.add(Calendar.MONTH,-1);
+                        c.set(Calendar.DAY_OF_MONTH, 1);
                         for (int i = 0; i < data.size(); i++) {
 
                             c.add(Calendar.MONTH,1);
@@ -4390,11 +4394,11 @@ public class OrderServiceImpl implements OrderService {
                     break;
                 case "SF1"://首付+分润分期
                     if (StringUtils.isNotBlank(payment.getCustomStaging()) && Status.STATUS_1.status.toString().equals(payment.getCustomStaging())) {
-                        Date DownPaymentDate = beginDate;
+                        Date DownPaymentDate = new Date();
                         Calendar c = Calendar.getInstance();
                         c.setTime(DownPaymentDate);
-                        c.add(Calendar.MONTH,-1);
-
+                        //c.add(Calendar.MONTH,-1);
+                        c.set(Calendar.DAY_OF_MONTH, 1);
                         for (int i = 0; i < data.size(); i++) {
 
                             c.add(Calendar.MONTH,1);
@@ -4426,10 +4430,11 @@ public class OrderServiceImpl implements OrderService {
                     break;
                 case "SF2"://打款分期
                     if (StringUtils.isNotBlank(payment.getCustomStaging()) && Status.STATUS_1.status.toString().equals(payment.getCustomStaging())) {
-                        Date DownPaymentDate = beginDate;
+                        Date DownPaymentDate = new Date();
                         Calendar c = Calendar.getInstance();
                         c.setTime(DownPaymentDate);
-                        c.add(Calendar.MONTH,-1);
+                        //c.add(Calendar.MONTH,-1);
+                        c.set(Calendar.DAY_OF_MONTH, 1);
                         for (int i = 0; i < data.size(); i++) {
                             c.add(Calendar.MONTH,1);
                             String amount = data.get(i);
@@ -4538,15 +4543,43 @@ public class OrderServiceImpl implements OrderService {
 //        deductCapitalExample.or().andSourceIdEqualTo(adjId);
 //        List<ODeductCapital> deductCapitals = deductCapitalMapper.selectByExample(deductCapitalExample);
 //        res.putKeyV("deductCapitals",deductCapitals);
+
             OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
-            oPaymentDetailExample.or()
-                    .andStatusEqualTo(Status.STATUS_0.status)
-                    .andBatchCodeEqualTo(orderAdj.getNewPaymentId())
-                    .andOrderIdEqualTo(orderAdj.getOrderId())
-                    .andPaymentStatusEqualTo(PaymentStatus.DS.code);
+            OPaymentDetailExample oPaymentDetailExample1 = new OPaymentDetailExample();
+            if (orderAdj.getReviewsStat().compareTo(AgStatus.Approved.status) == 0){
+                oPaymentDetailExample.or()
+                        .andBatchCodeEqualTo(orderAdj.getNewPaymentId())
+                        .andOrderIdEqualTo(orderAdj.getOrderId())
+                        .andStatusEqualTo(Status.STATUS_1.status);
+                oPaymentDetailExample1.or()
+                        .andStatusEqualTo(Status.STATUS_1.status)
+                        .andOrderIdEqualTo(orderAdj.getOrderId())
+                        .andBatchCodeEqualTo(orderAdj.getNewPaymentId());
+            }else {
+                oPaymentDetailExample.or()
+                        .andBatchCodeEqualTo(orderAdj.getNewPaymentId())
+                        .andOrderIdEqualTo(orderAdj.getOrderId())
+                        .andPaymentStatusEqualTo(PaymentStatus.DS.code)
+                        .andStatusEqualTo(Status.STATUS_0.status);
+                oPaymentDetailExample1.or()
+                        .andStatusEqualTo(Status.STATUS_1.status)
+                        .andOrderIdEqualTo(orderAdj.getOrderId())
+                        .andPaymentStatusEqualTo(PaymentStatus.DF.code)
+                        .andBatchCodeEqualTo(orderAdj.getOrgPaymentId());
+            }
             oPaymentDetailExample.setOrderByClause(" pay_time asc, plan_num asc, plan_pay_time asc ");
             List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
             res.putKeyV("oPaymentDetails", oPaymentDetails);
+            BigDecimal Arrears = BigDecimal.ZERO;
+            for (OPaymentDetail oPaymentDetail:oPaymentDetails){
+                Arrears = Arrears.add(oPaymentDetail.getPayAmount());
+            }
+            res.putKeyV("arrears",Arrears);
+
+            oPaymentDetailExample1.setOrderByClause(" pay_time asc, plan_num asc, plan_pay_time asc ");
+            List<OPaymentDetail> oPaymentDetails1 = oPaymentDetailMapper.selectByExample(oPaymentDetailExample1);
+            res.putKeyV("beginDate",oPaymentDetails1.get(0).getPlanPayTime());
+
             res.putKeyV("orderAdjDetails",orderAdjDetails);
             String refundMethod = RefundMehod.getContentByValue(orderAdj.getRefundMethod());
             res.putKeyV("refundMethod",refundMethod);
@@ -4781,11 +4814,11 @@ public class OrderServiceImpl implements OrderService {
                 case "FKFQ":
                     //生成自定义预分期数据
                     if (StringUtils.isNotBlank(payment.getCustomStaging()) && Status.STATUS_1.status.toString().equals(payment.getCustomStaging())) {
-                        Date DownPaymentDate = beginDate;
+                        Date DownPaymentDate = new Date();
                         Calendar c = Calendar.getInstance();
                         c.setTime(DownPaymentDate);
-                        c.add(Calendar.MONTH,-1);
-
+                        //c.add(Calendar.MONTH,-1);
+                        c.set(Calendar.DAY_OF_MONTH, 1);
                         for (int i = 0; i < data.size(); i++) {
 
                             c.add(Calendar.MONTH,1);
@@ -4819,10 +4852,11 @@ public class OrderServiceImpl implements OrderService {
                 case "FRFQ":
                     //生成自定义预分期数据
                     if (StringUtils.isNotBlank(payment.getCustomStaging()) && Status.STATUS_1.status.toString().equals(payment.getCustomStaging())) {
-                        Date DownPaymentDate = beginDate;
+                        Date DownPaymentDate = new Date();
                         Calendar c = Calendar.getInstance();
                         c.setTime(DownPaymentDate);
-                        c.add(Calendar.MONTH,-1);
+                        //c.add(Calendar.MONTH,-1);
+                        c.set(Calendar.DAY_OF_MONTH, 1);
                         for (int i = 0; i < data.size(); i++) {
 
                             c.add(Calendar.MONTH,1);
@@ -4859,11 +4893,11 @@ public class OrderServiceImpl implements OrderService {
                     break;
                 case "SF1"://首付+分润分期
                     if (StringUtils.isNotBlank(payment.getCustomStaging()) && Status.STATUS_1.status.toString().equals(payment.getCustomStaging())) {
-                        Date DownPaymentDate = beginDate;
+                        Date DownPaymentDate = new Date();
                         Calendar c = Calendar.getInstance();
                         c.setTime(DownPaymentDate);
-                        c.add(Calendar.MONTH,-1);
-
+                        //c.add(Calendar.MONTH,-1);
+                        c.set(Calendar.DAY_OF_MONTH, 1);
                         for (int i = 0; i < data.size(); i++) {
 
                             c.add(Calendar.MONTH,1);
@@ -4895,10 +4929,11 @@ public class OrderServiceImpl implements OrderService {
                     break;
                 case "SF2"://打款分期
                     if (StringUtils.isNotBlank(payment.getCustomStaging()) && Status.STATUS_1.status.toString().equals(payment.getCustomStaging())) {
-                        Date DownPaymentDate = beginDate;
+                        Date DownPaymentDate = new Date();
                         Calendar c = Calendar.getInstance();
                         c.setTime(DownPaymentDate);
-                        c.add(Calendar.MONTH,-1);
+                        //c.add(Calendar.MONTH,-1);
+                        c.set(Calendar.DAY_OF_MONTH, 1);
                         for (int i = 0; i < data.size(); i++) {
                             c.add(Calendar.MONTH,1);
                             String amount = data.get(i);
@@ -5612,7 +5647,7 @@ public class OrderServiceImpl implements OrderService {
                     List<Map> FKFQ_data = StageUtil.stageOrder(
                             oPayment.getOutstandingAmount(),
                             orderAdj.getOrgPlanNum().intValue(),
-                            oPayment.getDownPaymentDate(), temp.get(Calendar.DAY_OF_MONTH));
+                            new Date(), temp.get(Calendar.DAY_OF_MONTH));
                     //明细处理
                     for (Map datum : FKFQ_data) {
                         OPaymentDetail record = new OPaymentDetail();
@@ -5797,7 +5832,7 @@ public class OrderServiceImpl implements OrderService {
                     List<Map> FRFQ_data = StageUtil.stageOrder(
                             oPayment.getOutstandingAmount(),
                             orderAdj.getOrgPlanNum().intValue(),
-                            oPayment.getDownPaymentDate(), temp.get(Calendar.DAY_OF_MONTH));
+                            new Date(), temp.get(Calendar.DAY_OF_MONTH));
 
                     //明细处理
                     for (Map datum : FRFQ_data) {
@@ -6093,7 +6128,7 @@ public class OrderServiceImpl implements OrderService {
                     List<Map> SF1_data = StageUtil.stageOrder(
                             oPayment.getOutstandingAmount(),
                             orderAdj.getOrgPlanNum().intValue(),
-                            oPayment.getDownPaymentDate(), temp.get(Calendar.DAY_OF_MONTH));
+                            new Date(), temp.get(Calendar.DAY_OF_MONTH));
 
                     //明细处理
                     for (Map datum : SF1_data) {
@@ -6265,7 +6300,7 @@ public class OrderServiceImpl implements OrderService {
                     List<Map> SF2_data = StageUtil.stageOrder(
                             oPayment.getOutstandingAmount(),
                             orderAdj.getOrgPlanNum().intValue(),
-                            oPayment.getDownPaymentDate(), temp.get(Calendar.DAY_OF_MONTH));
+                            new Date(), temp.get(Calendar.DAY_OF_MONTH));
 
                     //明细处理
                     for (Map datum : SF2_data) {
