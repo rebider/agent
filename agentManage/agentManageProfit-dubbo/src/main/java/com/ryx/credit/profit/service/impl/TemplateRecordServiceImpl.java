@@ -210,7 +210,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                         templateRecode.setRewardName(map1.get("rewardName"));
                         templateRecode.setChangeflag("0");//没修改
                     }
-                } catch (Exception e) {
+                } catch(Exception e) {
                     e.printStackTrace();
                     JSONObject map = new JSONObject();
                     map.put("applyId",templateRecode.getTemplateId());
@@ -220,6 +220,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                         logger.info("***********本地异常后删除综管数据失败，***********");
                         throw new MessageException(resultMapDelete.get("msg").toString());
                     }
+                    throw new MessageException(e.getMessage());
                 }
                 // result = HttpClientUtil.doPostJson(TEMPLATE_APPLY, map2.toJSONString());
             }else if("SSPOS".equals(busInfo.get("PLATFORM_TYPE"))){

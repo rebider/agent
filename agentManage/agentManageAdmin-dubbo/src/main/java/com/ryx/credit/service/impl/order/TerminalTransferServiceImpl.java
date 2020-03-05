@@ -1265,7 +1265,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 log.info("不能跨平台划拨：原：" + originalOrgId + "目标：" + goalOrgId);
                 throw new MessageException("不能跨平台划拨：原：" + originalOrgId + "目标：" + goalOrgId);
             }
-            List<Map<String, Object>> maps = terminalTransferMapper.querySubBusNumTopAgentAll(terminalTransferDetail.getOriginalOrgId());
+            List<Map<String, Object>> maps = terminalTransferMapper.querySubBusNumTopAgentAll(terminalTransferDetail.getOriginalOrgId().trim());
             String originalTop = "";
             for (Map<String, Object> map : maps) {
                 if ((map.get("BUS_TYPE").toString().equals(BusType.JG.key)) || (map.get("BUS_TYPE").toString().equals(BusType.BZYD.key))) {
