@@ -715,6 +715,8 @@ public class CompensateServiceImpl implements CompensateService {
                 Map<String,String> par = new HashedMap();
                 par.put("oldMerid",refundPriceDiffDetail.getOldMachineId());
                 par.put("newMerId",refundPriceDiffDetail.getNewMachineId());
+                par.put("newMerType",platFormMapper.selectPlatType(new_oActivity.getPlatform()));
+                par.put("oldMerType",platFormMapper.selectPlatType(old_Activity.getPlatform()));
                 if(!termMachineService.checkModleIsEq(par,refundPriceDiffDetail.getPlatformType())){
                     throw new ProcessException(refundPriceDiffDetail.getBeginSn()+"--"+refundPriceDiffDetail.getEndSn()+":("+old_Activity.getActivityName()+")不支持互换("+new_oActivity.getActivityName()+")");
                 }

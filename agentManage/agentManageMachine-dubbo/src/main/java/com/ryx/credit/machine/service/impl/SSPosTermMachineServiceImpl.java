@@ -552,7 +552,7 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
     @Override
     public boolean checkModleIsEq(Map<String, String> data, String platformType) {
         log.info("checkModleIsEq:{},{}",data,platformType);
-        return imsTermMachineService.checkModleIsEqByMiddle(data.get("oldMerid"), data.get("newMerId"));
+        return imsTermMachineService.checkModleIsEqByMiddle(data.get("oldMerid"), data.get("newMerId"),data.get("newMerType"),data.get("oldMerType"));
     }
 
     @Override

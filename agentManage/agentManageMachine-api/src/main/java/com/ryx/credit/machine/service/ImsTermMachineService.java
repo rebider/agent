@@ -25,5 +25,5 @@ public interface ImsTermMachineService {
      * @param newActId
      * @return
      */
-    boolean checkModleIsEqByMiddle(String oldActId, String newActId);
+    boolean checkModleIsEqByMiddle(String oldActId, String newActId, String newMerType, String oldMerType);
 }
