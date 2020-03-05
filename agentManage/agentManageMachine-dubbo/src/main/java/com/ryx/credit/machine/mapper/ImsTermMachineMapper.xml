@@ -395,12 +395,19 @@
     where b.status=1 and c.status='00'
          <if test="busplatform!=null and brandCode!=''">and c.brand_code=#{busplatform,jdbcType=VARCHAR}</if>
   </select>
-
-
-
   <select id="queryIMS_POS_ACTIVITY" resultType="map">
     select IMS_POS_ACTIVITY.POS_ID,IMS_POS_ACTIVITY.ACTIVITY_ID
     from IMS_POS_ACTIVITY
     where IMS_POS_ACTIVITY.POS_ACTIVITY_ID=#{id,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectByMiddleId" parameterType="java.lang.String" resultMap="BaseResultMap">
+    SELECT
+        <include refid="Base_Column_List" />
+    FROM
+        IMS_TERM_MACHINE m
+        LEFT JOIN IMS_POS_ACTIVITY a ON m.MACHINE_ID = a.POS_ID
+    WHERE
+        a.POS_ACTIVITY_ID = #{machineId,jdbcType=VARCHAR}
   </select>
 </mapper>

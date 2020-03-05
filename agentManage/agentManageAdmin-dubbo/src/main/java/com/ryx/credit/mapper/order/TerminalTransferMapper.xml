@@ -323,4 +323,23 @@ select distinct nvl(BUS_NUM, '-') BUS_NUM
   <select id="queryBusInfo" resultType="java.util.Map" parameterType="java.util.Map">
      select AGENT_ID,BUS_TYPE,BUS_NUM,BUS_PLATFORM from A_AGENT_BUSINFO  where POS_PLAT_CODE = #{POS_PLAT_CODE} and STATUS=1  and BUS_STATUS in('1','2')
   </select>
+
+  <select id="checkSnIsTransfer" parameterType="map" resultType="int">
+    select count(a.id) from o_terminal_transfer_detail a
+    left join o_terminal_transfer b on a.terminal_transfer_id = b.id
+    WHERE
+        (
+          a.sn_begin_num &lt;= #{begin,jdbcType=VARCHAR}
+          and a.sn_end_num &gt;= #{begin,jdbcType=VARCHAR}
+          and length(a.sn_begin_num) = LENGTH(#{begin,jdbcType=VARCHAR})
+          and  b.review_status  = ${reviewStatus}
+        )
+        or
+        (
+          a.sn_begin_num &lt;= #{end,jdbcType=VARCHAR}
+          and a.sn_end_num &gt;= #{end,jdbcType=VARCHAR}
+          and length(a.sn_end_num) = LENGTH(#{end,jdbcType=VARCHAR})
+          and  b.review_status = ${reviewStatus}
+        )
+  </select>
 </mapper>
