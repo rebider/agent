@@ -1,5 +1,6 @@
 package com.ryx.jobOrder.service.impl;
 
+import com.ryx.credit.common.enumc.QueryAcceptType;
 import com.ryx.credit.pojo.admin.CResource;
 import com.ryx.jobOrder.dao.JobOrderAuthMapper;
 import com.ryx.jobOrder.service.JobOrderAuthService;
@@ -38,4 +39,16 @@ public class JobOrderAuthServiceImpl implements JobOrderAuthService {
         List<Map<String, Object>> allAcceptGroup = jobOrderAuthMapper.getAllAcceptGroup();
         return allAcceptGroup;
     }
+
+    @Override
+    public Map<String, Object> getAcceptInfo(String code,String quertTYpe) {
+        Map<String,Object> acceptInfo = null;
+        if (quertTYpe.equals(QueryAcceptType.userId.code)){
+            acceptInfo = jobOrderAuthMapper.getAcceptByuserid(code);
+        }else if (quertTYpe.equals(QueryAcceptType.acceCode.code)){
+            acceptInfo = jobOrderAuthMapper.getAcceptByAcceptCode(code);
+        }
+        return acceptInfo;
+    }
+
 }

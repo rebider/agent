@@ -25,5 +25,18 @@ public interface JobOrderAuthService {
      */
     Map<String,Object> getAcceptGroup(String userId);
 
+    /**
+     * 获取全部受理组
+     * @return
+     */
     List<Map<String,Object>> getAllAcceptGroup();
+
+    /**
+     *
+     * @param code 查询条件code
+     * @param queryType  查询条件类型:0-用户id,1-受理组 enumc:QueryAcceptType
+     * @return
+     */
+    Map<String,Object> getAcceptInfo(String code,String queryType);
+
 }

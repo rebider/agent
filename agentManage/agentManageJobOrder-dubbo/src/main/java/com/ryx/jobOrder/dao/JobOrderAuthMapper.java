@@ -10,4 +10,6 @@ public interface JobOrderAuthMapper {
     Map<String,Object> getAcceptCode(@Param("jobOrderType") String jobOrderType);
     Map<String,Object> getAcceptGroup(@Param("userId") String userId);
     List<Map<String,Object>> getAllAcceptGroup();
+    Map<String,Object> getAcceptByAcceptCode(@Param("acceptCode") String acceptCode);
+    Map<String,Object> getAcceptByuserid(@Param("userId") String userID);
 }
