@@ -1250,6 +1250,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
 
         AgentVo agentVo = agent;
         try {
+            businessPlatformService.verifyAgentBusinfo(agentVo);
 //            verifyOrgAndBZYD(agent.getBusInfoVoList());
             logger.info("用户{}{}修改代理商信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent));
             //根据工商编号验证是否已经存在，禁止重复提交代理商
