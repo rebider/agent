@@ -323,6 +323,8 @@
     <result column="joTaskStatus" jdbcType="VARCHAR" property="joTaskStatus" />
     <result column="joTaskTime" jdbcType="VARCHAR" property="joTaskTime" />
     <result column="joTaskAcceptTime" jdbcType="VARCHAR" property="joTaskAcceptTime" />
+    <result column="joDealPersonId" jdbcType="VARCHAR" property="joDealPersonId" />
+    <result column="joDealPersonName" jdbcType="VARCHAR" property="joDealPersonName" />
   </resultMap>
   <sql id="JoTaskVo_Column_List">
     jo.ID, jo.AG_ID, jo.AG_NAME, jo.BUS_ID, jo.BUS_NUM, jo.PALTFORM_NUM, jo.PLATFORM_NAME,
@@ -334,7 +336,8 @@
     jo.LAUNCH_PERSON_EMAIL, jo.LAUNCH_BRANCH_ID, jo.LAUNCH_BRANCH_NAME, jo.ACCEPT_GROUP_CODE, jo.ACCEPT_GROUP,
     jo.ACCEPT_NOW_GROUP, jo.DEAL_TIME_START, jo.DEAL_TIME_END, jo.DEAL_TIME_LENGTH, jo.JO_PROGRESS,
     jt.id as joTaskId, jt.jo_task_status  as joTaskStatus, jt.jo_task_time as joTaskTime,
-    jt.jo_task_accept_time as joTaskAcceptTime
+    jt.jo_task_accept_time as joTaskAcceptTime, jt.deal_person_id as joDealPersonId,
+    jt.deal_person_name as joDealPersonName
   </sql>
   <select id="selectByJoTaskVo"  resultMap="JoTaskVoBaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -370,7 +373,7 @@
         and jo.ag_id = #{example.agId}
       </if>
       <if test="example.agName != null and example.agName != ''">
-        and jo.ag_name = #{example.agName}
+        and jo.ag_name like  CONCAT(CONCAT('%',#{example.agName}),'%')
       </if>
       <if test="example.busNum != null and example.busNum != '' ">
         and jo.bus_num = #{example.busNum}

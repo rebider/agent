@@ -2,6 +2,7 @@ package com.ryx.jobOrder.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.pojo.admin.agent.AttachmentRel;
 import com.ryx.credit.service.agent.AttachmentRelService;
@@ -89,18 +90,16 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
         }
 
         // 查询受理组
-        String acceptGroup = "";
         JoTask joTask = new JoTask();
         joTask.setId( idService.genId(TabId.jo_task) );
         joTask.setJoId(jo.getId());
-        joTask.setDealGroup(acceptGroup);
-        joTask.setDealGroupId("");
-        joTask.setDealPersonId("");
-        joTask.setDealPersonName("");
-        joTask.setJoTaskContent(jo.getJoContent());
-        joTask.setJoTaskAnnexId(null);
-        jobOrderTaskService.createJobOrderTask(joTask);
-        return FastMap.fastSuccessMap();
+        joTask.setDealGroup(jo.getAcceptGroup());
+        joTask.setDealGroupId(jo.getAcceptGroupCode());
+        FastMap status = jobOrderTaskService.createJobOrderTask(joTask);
+        if(!FastMap.isSuc(status)){
+           throw new MessageException("创建工单任务失败！工单任务:" + joTask.getId());
+        }
+        return FastMap.fastFailMap();
     }
 
     /**
