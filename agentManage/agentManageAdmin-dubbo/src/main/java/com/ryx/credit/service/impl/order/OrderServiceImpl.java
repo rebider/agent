@@ -4232,13 +4232,16 @@ public class OrderServiceImpl implements OrderService {
         String paymentMethod = payment.getPayMethod();
         OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
         oPaymentDetailExample.or().andOrderIdEqualTo(orderUpModelVo.getOrderId()).andPaymentTypeEqualTo(PamentIdType.ORDER_FKD.code).andStatusEqualTo(Status.STATUS_1.status);
+        oPaymentDetailExample.setOrderByClause(" pay_time asc, plan_num asc, plan_pay_time asc ");
         List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
         BigDecimal unpaySize = BigDecimal.ZERO;
-        Date beginDate = payment.getDownPaymentDate();
+        Date beginDate = null;
         for (OPaymentDetail oPaymentDetail:oPaymentDetails){
             if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.DF.code) == 0 || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.YQ.code) == 0 ){
                 unpaySize = unpaySize.add(new BigDecimal("1"));
-                beginDate = oPaymentDetail.getPlanPayTime();
+                if (beginDate == null){
+                    beginDate = oPaymentDetail.getPlanPayTime();
+                }
             }
         }
         OrderAdj orderAdj = new OrderAdj();
@@ -4311,6 +4314,7 @@ public class OrderServiceImpl implements OrderService {
                         Date DownPaymentDate = beginDate;
                         Calendar c = Calendar.getInstance();
                         c.setTime(DownPaymentDate);
+                        c.add(Calendar.MONTH,-1);
 
                         for (int i = 0; i < data.size(); i++) {
 
@@ -4348,6 +4352,7 @@ public class OrderServiceImpl implements OrderService {
                         Date DownPaymentDate = beginDate;
                         Calendar c = Calendar.getInstance();
                         c.setTime(DownPaymentDate);
+                        c.add(Calendar.MONTH,-1);
 
                         for (int i = 0; i < data.size(); i++) {
 
@@ -4388,6 +4393,7 @@ public class OrderServiceImpl implements OrderService {
                         Date DownPaymentDate = beginDate;
                         Calendar c = Calendar.getInstance();
                         c.setTime(DownPaymentDate);
+                        c.add(Calendar.MONTH,-1);
 
                         for (int i = 0; i < data.size(); i++) {
 
@@ -4423,6 +4429,7 @@ public class OrderServiceImpl implements OrderService {
                         Date DownPaymentDate = beginDate;
                         Calendar c = Calendar.getInstance();
                         c.setTime(DownPaymentDate);
+                        c.add(Calendar.MONTH,-1);
                         for (int i = 0; i < data.size(); i++) {
                             c.add(Calendar.MONTH,1);
                             String amount = data.get(i);
@@ -4743,11 +4750,13 @@ public class OrderServiceImpl implements OrderService {
         OPayment payment = payments.get(0);
         OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
         oPaymentDetailExample.or().andOrderIdEqualTo(orderUpModelVo.getOrderId()).andPaymentTypeEqualTo(PamentIdType.ORDER_FKD.code).andStatusEqualTo(Status.STATUS_1.status);
+        oPaymentDetailExample.setOrderByClause(" pay_time asc, plan_num asc, plan_pay_time asc ");
         List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
         Date beginDate = payment.getDownPaymentDate();
         for (OPaymentDetail oPaymentDetail:oPaymentDetails){
             if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.DF.code) == 0 || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.YQ.code) == 0 ){
                 beginDate = oPaymentDetail.getPlanPayTime();
+                break;
             }
         }
 
@@ -4775,6 +4784,7 @@ public class OrderServiceImpl implements OrderService {
                         Date DownPaymentDate = beginDate;
                         Calendar c = Calendar.getInstance();
                         c.setTime(DownPaymentDate);
+                        c.add(Calendar.MONTH,-1);
 
                         for (int i = 0; i < data.size(); i++) {
 
@@ -4812,7 +4822,7 @@ public class OrderServiceImpl implements OrderService {
                         Date DownPaymentDate = beginDate;
                         Calendar c = Calendar.getInstance();
                         c.setTime(DownPaymentDate);
-
+                        c.add(Calendar.MONTH,-1);
                         for (int i = 0; i < data.size(); i++) {
 
                             c.add(Calendar.MONTH,1);
@@ -4852,6 +4862,7 @@ public class OrderServiceImpl implements OrderService {
                         Date DownPaymentDate = beginDate;
                         Calendar c = Calendar.getInstance();
                         c.setTime(DownPaymentDate);
+                        c.add(Calendar.MONTH,-1);
 
                         for (int i = 0; i < data.size(); i++) {
 
@@ -4887,6 +4898,7 @@ public class OrderServiceImpl implements OrderService {
                         Date DownPaymentDate = beginDate;
                         Calendar c = Calendar.getInstance();
                         c.setTime(DownPaymentDate);
+                        c.add(Calendar.MONTH,-1);
                         for (int i = 0; i < data.size(); i++) {
                             c.add(Calendar.MONTH,1);
                             String amount = data.get(i);
