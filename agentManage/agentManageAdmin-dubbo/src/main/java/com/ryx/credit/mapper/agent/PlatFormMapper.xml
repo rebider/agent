@@ -419,7 +419,10 @@
         <if test="platformType != null and (platformType == ZHPOS or platformType == ZPOS)" >
           AND (p.platform_type = 'ZHPOS' OR p.platform_type = 'ZPOS')
         </if>
-        <if test="platformType != null and platformType != ZHPOS and platformType != ZPOS" >
+        <if test="platformType != null and (platformType == POS or platformType == SSPOS)" >
+          AND (p.platform_type = 'POS' OR p.platform_type = 'SSPOS')
+        </if>
+        <if test="platformType != null and platformType != ZHPOS and platformType != ZPOS and platformType != POS and platformType != SSPOS " >
           AND p.platform_type = #{platformType}
         </if>
   </select>
