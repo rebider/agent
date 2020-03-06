@@ -26,19 +26,8 @@ public class ImsTermMachineServiceImpl implements ImsTermMachineService {
         return imsTermMachineMapper.selectByExample(imsTermMachineExample);
     }
 
-    @Override
-    public boolean checkModleIsEq(String oldMerid, String newMerId) {
-        ImsTermMachine oldMeridMachine  = imsTermMachineMapper.selectByPrimaryKey(oldMerid);
-        ImsTermMachine newMerIdMachine  = imsTermMachineMapper.selectByPrimaryKey(newMerId);
-        if(oldMeridMachine==null)return false;
-        if(newMerIdMachine==null)return false;
-        if(StringUtils.isBlank(newMerIdMachine.getModel()))return false;
-        if(StringUtils.isBlank(oldMeridMachine.getModel()))return false;
-        return newMerIdMachine.getModel().equals(oldMeridMachine.getModel());
-    }
-
     /**
-     * 实时POS，校验model
+     * 实时POS，，pos 校验model
      * @param oldActId
      * @param newActId
      * @return
