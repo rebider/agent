@@ -530,7 +530,7 @@
                     and t.id = #{map.id}
                 </if>
                 <if test="map.intervalList != null">
-                    and t.sn_Begin_Num in
+                    and t.ID in
                     <foreach close=")" collection="map.intervalList" item="listItem" open="(" separator=",">
                         #{listItem}
                     </foreach>
@@ -635,11 +635,7 @@
 
 
     <select id="queryInterval" resultType="java.util.Map" parameterType="java.lang.String">
-
-
-select SN_BEGIN_NUM,SN_END_NUM from O_TERMINAL_TRANSFER_DETAIL where SN_BEGIN_NUM like concat('%',concat( '${snEndNum}','%'))
-
-  </select>
-
+    select ID,SN_BEGIN_NUM,SN_END_NUM from O_TERMINAL_TRANSFER_DETAIL where SN_BEGIN_NUM like concat('%',concat( '${snEndNum}','%'))
+    </select>
 
 </mapper>
