@@ -27,4 +27,6 @@ public interface ImsTermMachineMapper {
     List<Map> querySSIMS_TERM_MACHINE(Map<String,String> par);
 
     Map<String,String> queryIMS_POS_ACTIVITY(@Param("id")String id);
+
+    ImsTermMachine selectByMiddleId(String machineId);
 }

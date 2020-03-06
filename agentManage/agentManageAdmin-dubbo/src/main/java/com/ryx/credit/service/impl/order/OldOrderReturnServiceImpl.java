@@ -116,8 +116,8 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
     private ORefundPriceDiffMapper refundPriceDiffMapper;
     @Autowired
     private ODeductCapitalMapper deductCapitalMapper;
-
-
+    @Autowired
+    private OsnOperateService osnOperateService;
 
     /**
      * 提交历史订单退货申请
@@ -146,13 +146,13 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                     oldOrderReturnSubmitProVo.getReturnCount().compareTo(BigDecimal.ZERO)<=0){
                 return AgentResult.fail("数量必须大于0");
             }
-            //检查sn是否在退货中
-            int checkCount = returnOrderDetailMapper.checkSnIsReturn(FastMap
-                   .fastMap("begin",oldOrderReturnSubmitProVo.getSnStart())
-                   .putKeyV("end",oldOrderReturnSubmitProVo.getSnEnd())
-                   .putKeyV("sts",Arrays.asList(RetSchedule.DFH.code,RetSchedule.FHZ.code,RetSchedule.SPZ.code,RetSchedule.TH.code,RetSchedule.TKZ.code,RetSchedule.YFH.code))
+
+            //检查sn是否在划拨，换活动，退货中
+            FastMap fastMap = osnOperateService.checkSNApproval(FastMap
+                    .fastMap("beginSN",oldOrderReturnSubmitProVo.getSnStart())
+                    .putKeyV("endSN",oldOrderReturnSubmitProVo.getSnEnd())
             );
-            if(checkCount>0)  return AgentResult.fail(oldOrderReturnSubmitProVo.getSnStart()+":"+oldOrderReturnSubmitProVo.getSnEnd()+"在退货中");
+            if (!FastMap.isSuc(fastMap)) return AgentResult.fail(fastMap.get("msg").toString());
 
             //检查机构编号
             String org = redisService.getValue(oldOrderReturnSubmitProVo.getSnStart()+","+oldOrderReturnSubmitProVo.getSnEnd()+"_org");
@@ -164,16 +164,6 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                    return AgentResult.fail(oldOrderReturnSubmitProVo.getSnStart()+","+oldOrderReturnSubmitProVo.getSnEnd()+"不是代理商"+agent.getAgName()+"的sn");
                }
             }
-
-            //检查历史订单是否换活动中
-            int approvingRow = refundPriceDiffMapper.selectReviewStatusBySN(FastMap
-                    .fastMap("beginSn", oldOrderReturnSubmitProVo.getSnStart())
-                    .putKeyV("endSn", oldOrderReturnSubmitProVo.getSnEnd())
-                    .putKeyV("reviewStatus", AgStatus.Approving.status));
-            if (approvingRow > 0){
-                return AgentResult.fail(oldOrderReturnSubmitProVo.getSnStart()+","+oldOrderReturnSubmitProVo.getSnEnd()+"：活动调整中，不可退货！");
-            }
-
         }
 
         //保存审批中的退货申请单
@@ -1168,19 +1158,11 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                 throw new MessageException("导入解析文件失败，检查是否缺少字段");
             }
             try {
-                //检查是否在退货中
-                int checkCount = returnOrderDetailMapper.checkSnIsReturn(FastMap
-                        .fastMap("begin",snBegin)
-                        .putKeyV("end",snEnd)
-                        .putKeyV("sts",Arrays.asList(
-                                RetSchedule.DFH.code,
-                                RetSchedule.FHZ.code,
-                                RetSchedule.SPZ.code,
-                                RetSchedule.TH.code,
-                                RetSchedule.TKZ.code,
-                                RetSchedule.YFH.code))
-                );
-                if(checkCount>0)  return AgentResult.fail(snEnd+":"+snEnd+"在退货中");
+                //检查sn是否在划拨，换活动，退货中
+                FastMap fastMap = osnOperateService.checkSNApproval(FastMap
+                        .fastMap("beginSN", snBegin)
+                        .putKeyV("endSN", snEnd));
+                if (!FastMap.isSuc(fastMap)) return AgentResult.fail(fastMap.get("msg").toString());
 
                 Dict modelType = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MODEL_TYPE.name(),proModel);
                 if(modelType==null){

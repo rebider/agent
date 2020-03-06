@@ -47,4 +47,5 @@ public interface TerminalTransferMapper {
 
     List<Map<String, Object>> queryBusInfo(Map<String,String> param);
 
+    int checkSnIsTransfer(Map map);
 }

@@ -36,4 +36,19 @@ public class ImsTermMachineServiceImpl implements ImsTermMachineService {
         if(StringUtils.isBlank(oldMeridMachine.getModel()))return false;
         return newMerIdMachine.getModel().equals(oldMeridMachine.getModel());
     }
+
+    /**
+     * 实时POS，校验model
+     * @param oldActId
+     * @param newActId
+     * @return
+     */
+    @Override
+    public boolean checkModleIsEqByMiddle(String oldActId, String newActId) {
+        ImsTermMachine oldMeridMachine = imsTermMachineMapper.selectByMiddleId(oldActId);
+        ImsTermMachine newMerIdMachine = imsTermMachineMapper.selectByMiddleId(newActId);
+        if (null == newMerIdMachine || StringUtils.isBlank(newMerIdMachine.getModel())) return false;
+        if (null == oldMeridMachine || StringUtils.isBlank(oldMeridMachine.getModel())) return false;
+        return newMerIdMachine.getModel().equals(oldMeridMachine.getModel());
+    }
 }
