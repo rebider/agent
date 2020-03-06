@@ -154,7 +154,9 @@ public class ProfitMonthRdbPosDataJob {
 
                 AgentBusInfo agentBusInfo;
                 try {
-                    agentBusInfo = businfoService.queryAgentBusInfo(agencyId);
+                    //fixme 业务编号使用查询已经废弃，请重新根据具体业务查询
+                    agentBusInfo = null;
+//                    agentBusInfo = businfoService.queryAgentBusInfo(agencyId);
                 }catch (Exception e){//查询失败的代理商
                     notSuccessAgent.add(agencyId);
                     continue;

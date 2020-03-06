@@ -623,4 +623,32 @@ public class DateUtil {
        return format(zero);
    }
 
+    /**
+     * 当前时间+多少秒
+     * @return
+     */
+    public static Date dateAddMinute(Date date,int minute){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.MINUTE, minute);
+        return calendar.getTime();
+    }
+
+
+    /**
+     * 距离下一天还有多少秒
+     * @return
+     */
+    public static long bwtenNextDay(){
+        Calendar calendar = Calendar.getInstance();
+        long mills = calendar.getTimeInMillis();
+        calendar.add(Calendar.DAY_OF_MONTH,1);
+        calendar.set(Calendar.HOUR_OF_DAY,0);
+        calendar.set(Calendar.MINUTE,0);
+        calendar.set(Calendar.SECOND,0);
+        calendar.set(Calendar.MILLISECOND,0);
+        long millisecond = calendar.getTimeInMillis();
+        return millisecond - mills;
+    }
+
 }
