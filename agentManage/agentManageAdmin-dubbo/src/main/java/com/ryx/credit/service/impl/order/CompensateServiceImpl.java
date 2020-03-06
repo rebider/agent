@@ -299,12 +299,19 @@ public class CompensateServiceImpl implements CompensateService {
         ArrayList<Object> recordStatusList = new ArrayList<>();
         recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
         reqParam.put("recordStatusList",recordStatusList);
+
+        //检查sn是否在划拨，换活动，退货中
+        FastMap fastMap = osnOperateService.checkSNApproval(FastMap
+                .fastMap("beginSN", snBegin)
+                .putKeyV("endSN", snEnd));
+        if (!FastMap.isSuc(fastMap)) throw new ProcessException(fastMap.get("msg").toString());
+
         List<Map<String,Object>> compensateLList = logisticsDetailMapper.queryCompensateLList(reqParam);
         if(null==compensateLList){
             throw new ProcessException("导入解析文件失败");
         }
         if(compensateLList.size()==0){
-            throw new ProcessException("sn号在审批中或已退货");
+            throw new ProcessException("当前SN:"+snBegin+"-"+snEnd+"物流或物流明细异常！");
         }
         BigDecimal proNumSum = new BigDecimal(0);
         Set<String> platformTypeSet = new HashSet<>();

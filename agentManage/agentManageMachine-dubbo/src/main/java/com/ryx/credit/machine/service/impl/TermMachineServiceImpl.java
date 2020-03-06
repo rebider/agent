@@ -252,7 +252,7 @@ public class TermMachineServiceImpl  implements TermMachineService {
         } else if (PlatformType.RDBPOS.getValue().equals(platformType)) {
             return rdbTermMachineServiceImpl.checkModleIsEq(data, platformType);
         } else {
-            return false;
+            return true;
         }
     }
 

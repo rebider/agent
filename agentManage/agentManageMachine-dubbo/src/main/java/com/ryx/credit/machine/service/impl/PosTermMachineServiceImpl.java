@@ -65,6 +65,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
 
     @Override
     public List<TermMachineVo> queryTermMachine(PlatformType platformType,Map<String,String> par) throws Exception {
+        log.info("查询POS活动参数：{}，{}",platformType,JSONObject.toJSONString(par));
         List<ImsTermMachine> list = imsTermMachineService.selectByExample();
         List<TermMachineVo> termMachineVoList = new ArrayList<>();
         for (ImsTermMachine imsTermMachine : list) {
@@ -72,9 +73,14 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
             newvo.setId(imsTermMachine.getMachineId());
             String model = imsTermMachine.getModel();
             ImsPos imsPos = imsPosMapper.selectByPrimaryKey(model);
-            newvo.setMechineName("型号代码:" + model + "|厂商型号:" + imsPos.getPosModel() + "|价格:" + imsTermMachine.getPrice()
-                    + "|达标金额:" + imsTermMachine.getStandAmt() + "|返还类型:" + BackType.getContentByValue(imsTermMachine.getBackType())
-                    + "|备注:" + imsTermMachine.getRemark());
+            String activeName = "";
+            if (null != imsTermMachine.getActivityName()) {
+                activeName = imsTermMachine.getActivityName();
+            } else {
+                activeName = imsTermMachine.getRemark();
+            }
+            newvo.setMechineName("活动名称:" + activeName + "|型号代码:" + model + "|厂商型号:" + imsPos.getPosModel() + "|价格:" + imsTermMachine.getPrice()
+                    + "|达标金额:" + imsTermMachine.getStandAmt() + "|返还类型:" + BackType.getContentByValue(imsTermMachine.getBackType()));
             newvo.setStandAmt(String.valueOf(imsTermMachine.getStandAmt()));
             newvo.setBackType(imsTermMachine.getBackType());
             termMachineVoList.add(newvo);

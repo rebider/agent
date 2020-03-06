@@ -423,8 +423,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 if (snBeginNum.length() == snBeginNumMap.length()) {
                     if (map3.get("sb").toString().equals(map4.get("sb").toString())) {
                         if (!((new Integer((String) map4.get("snEndNum1"))<(new Integer((String) map3.get("snBeginNum1")))) || (new Integer((String) map4.get("snBeginNum1"))>(new Integer((String) map3.get("snEndNum1")))))) {
-                            log.info("在区间:" + snBeginNum + "----" + snEndNum + "已经提交过划拨申请");
-                            throw new MessageException("在区间:" + snBeginNum + "----" + snEndNum + "已经提交过划拨申请");
+                            log.info("当前SN:" + snBeginNum + "-" + snEndNum + "已经提交划拨审批，审批结束后，才可以再次提交");
+                            throw new MessageException("当前SN:" + snBeginNum + "-" + snEndNum + "已经提交划拨审批，审批结束后，才可以再次提交");
                         }
                     }
                 }
@@ -1535,8 +1535,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                         if (!((new Integer(map4.get("snEndNum1").toString())<new Integer(map3.get("snBeginNum1").toString())) || (new Integer(map4.get("snBeginNum1").toString())>new Integer(map3.get("snEndNum1").toString())))) {
                             num++;
                             if (num > 1) {
-                                log.info("在区间:" + snBeginNum + "----" + snEndNum + "已经提交过划拨申请");
-                                throw new MessageException("在区间:" + snBeginNum + "----" + snEndNum + "已经提交过划拨申请");
+                                log.info("当前SN:" + snBeginNum + "-" + snEndNum + "已经提交划拨审批，审批结束后，才可以再次提交");
+                                throw new MessageException("当前SN:" + snBeginNum + "-" + snEndNum + "已经提交划拨审批，审批结束后，才可以再次提交");
                             }
                         }
                     }

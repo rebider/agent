@@ -764,7 +764,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             try {
                 AgentResult agentResult = termMachineService.querySnMsg(PlatformType.POS, snStart, snEnd);
                 if (!agentResult.isOK()) {
-                    throw new MessageException("未找到sn信息,请检查sn是否有效!");
+                    throw new MessageException("当前SN状态异常或已经有在审批流程");
                 }
                 logger.info("根据sn查询业务系统返回:" + agentResult.getMsg());
                 JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
