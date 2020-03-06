@@ -10,6 +10,7 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.result.Result;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.jobOrder.dao.*;
@@ -118,6 +119,17 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
     @Override
     public PageInfo jobOrderQueryLaunchList(Map map, Page page) {
         logger.info("------我发起的工单列表查询------");
+        String joAcceptTimeBeginStr = (String) map.get("launchBeginTime");
+        String joAcceptTimeEndStr = (String) map.get("launchEndTime");
+        if((StringUtils.isNotBlank(joAcceptTimeBeginStr) && StringUtils.isNotBlank(joAcceptTimeEndStr))){
+                joAcceptTimeBeginStr =joAcceptTimeBeginStr.substring(0,10);
+                joAcceptTimeEndStr =joAcceptTimeEndStr.substring(0,10);
+                map.put("launchBeginTime",DateUtil.format(joAcceptTimeBeginStr,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+                map.put("launchEndTime",DateUtil.format(joAcceptTimeEndStr,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+        }else {
+            map.put("launchBeginTime",null);
+            map.put("launchEndTime",null);
+        }
         PageInfo pageInfo = new PageInfo();
         int listCount = joOrderMapper.queryJobOrderLaunchListCount(map);
         List<JoTaskVo> jobOrderList = joOrderMapper.queryJobOrderLaunchList(map,page);
