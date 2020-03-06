@@ -92,7 +92,8 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         }
         List jotaskVolist = joTaskMapper.selectByJoTaskVo(joTaskVo, page);
         PageInfo pageInfo = new PageInfo();
-        int count = jotaskVolist.size();
+        List jotaskVolist2 = joTaskMapper.selectByJoTaskVo(joTaskVo, null);
+        int count = jotaskVolist2.size();
         pageInfo.setTotal(count);
         pageInfo.setRows(jotaskVolist);
         return  pageInfo;
@@ -206,13 +207,12 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         String joId = joTask.getJoId();
         String content = joTask.getJoTaskContent();
         JoTask joTaskOld = queryJobOrderTaskByTaskId(oldTaskId);
-        joTaskOld.setJoTaskContent(
-                joTaskOld.getDealGroup() + "转发到:" + joTask.getDealGroup()+":"+
-                content.substring(content.indexOf(":")+1,content.length()));
         if(files!=null){
             saveAttachments(joTaskOld.getId(), joTaskOld.getDealPersonId(), (files).split(","));
             joTaskOld.setJoTaskAnnexId(files);
         }
+        joTaskOld.setDealPersonName(joTask.getDealPersonName());
+        joTaskOld.setDealPersonId(joTask.getDealPersonId());
         // 结束工单
         endJoTask( joTaskOld );
 
@@ -236,6 +236,9 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         joTaskNew.setDealGroupId(joTask.getDealGroupId());
         joTaskNew.setBackDealGroup(joTaskOld.getDealGroup());
         joTaskNew.setBackDealPerson(joTaskOld.getDealPersonName());
+        joTaskNew.setJoTaskContent(
+                joTaskOld.getDealGroup() + "转发到:" + joTask.getDealGroup()+":"+
+                        content.substring(content.indexOf(":")+1,content.length()));
         FastMap status = createJobOrderTask(joTaskNew);
         if(FastMap.isSuc(status)){
             return FastMap.fastSuccessMap();
@@ -290,6 +293,8 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
 //        joTask.setJoTaskAcceptTime(new Date());
 //        joTask.setJoTaskStatus(JoTaskStatus.SLZ.getValue());
         JoTask joT = queryJobOrderTaskByTaskId(joTask.getId());
+        joT.setDealPersonId(joTask.getDealPersonId());
+        joT.setDealPersonName(joTask.getDealPersonName());
         joT.setJoTaskAcceptTime(new Date());
         joT.setJoTaskStatus(JoTaskStatus.SLZ.getValue());
         FastMap fastMap = updateJobOrderTask(joT);

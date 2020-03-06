@@ -97,6 +97,7 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
         joTask.setJoId(jo.getId());
         joTask.setDealGroup(jo.getAcceptGroup());
         joTask.setDealGroupId(jo.getAcceptGroupCode());
+        joTask.setJoTaskContent(jo.getJoContent());
         FastMap status = jobOrderTaskService.createJobOrderTask(joTask);
         if(!FastMap.isSuc(status)){
            throw new MessageException("创建工单任务失败！工单任务:" + joTask.getId());

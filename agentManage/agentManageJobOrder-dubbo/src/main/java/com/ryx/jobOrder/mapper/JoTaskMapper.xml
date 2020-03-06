@@ -400,5 +400,6 @@
         and jo_task_accept_time between #{example.joAcceptTimeBegin} and #{example.joAcceptTimeEnd}
       </if>
     </where>
+        order by joTaskId desc
   </sql>
 </mapper>
