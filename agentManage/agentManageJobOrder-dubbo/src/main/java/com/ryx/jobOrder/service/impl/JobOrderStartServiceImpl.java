@@ -16,6 +16,9 @@ import com.ryx.jobOrder.service.JobOrderStartService;
 import com.ryx.jobOrder.service.JobOrderTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -52,6 +55,7 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
      * @param otherMap 关键词信息对象
      * @return
      */
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public FastMap createJobOrder(JoOrder jo, Map otherMap) throws Exception {
         jo.setId(idService.genId(TabId.jo_order));// 生成ID
@@ -60,10 +64,8 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
         jo.setJoProgress(JoOrderStatus.WCL.getValue());
         jo.setAcceptNowGroup(jo.getAcceptGroup());
         Object annoTableFile = (Object)otherMap.get("annoTableFile");
-        String annexId = null;
         if(annoTableFile != null ){
             saveAttachments(jo.getId(), (String)otherMap.get("userId"), ((String)annoTableFile).split(","));
-            annexId = (((String)annoTableFile).split(","))[0];
         }
         otherMap.remove("userId");
         otherMap.remove("annoTableFile");
@@ -102,30 +104,31 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
         return FastMap.fastFailMap();
     }
 
-    /**
-     * 获取代理商或者内部人员工单页面所需数据
-     * @param para
-     * @return
-     */
-    @Override
-    public List<FastMap> getStartLaunchVo(JSONObject para) {
-        String fir = para.getString("fir");// 一级类型编号
-        String sed = para.getString("sed"); // 二级类型编号
-        // TODO 查询
-        List customs = new ArrayList();
-        customs.add(FastMap.fastMap("key","code").putKeyV("value","编码"));
-        customs.add(FastMap.fastMap("key","date").putKeyV("value","日期"));
-        customs.add(FastMap.fastMap("key","date2").putKeyV("value","日期2"));
-        customs.add(FastMap.fastMap("key","date3").putKeyV("value","日期3"));
-        customs.add(FastMap.fastMap("key","date3").putKeyV("value","日期4"));
-        return customs;
-    }
+//    /**
+//     * 获取代理商或者内部人员工单页面所需数据
+//     * @param para
+//     * @return
+//     */
+//    @Override
+//    public List<FastMap> getStartLaunchVo(JSONObject para) {
+//        String fir = para.getString("fir");// 一级类型编号
+//        String sed = para.getString("sed"); // 二级类型编号
+//        // TODO 查询
+//        List customs = new ArrayList();
+//        customs.add(FastMap.fastMap("key","code").putKeyV("value","编码"));
+//        customs.add(FastMap.fastMap("key","date").putKeyV("value","日期"));
+//        customs.add(FastMap.fastMap("key","date2").putKeyV("value","日期2"));
+//        customs.add(FastMap.fastMap("key","date3").putKeyV("value","日期3"));
+//        customs.add(FastMap.fastMap("key","date3").putKeyV("value","日期4"));
+//        return customs;
+//    }
 
     /**
      * 保存工单扩展字段值
      * @param joExpandKey
      * @return
      */
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public FastMap saveJobOrderExband(JoExpandKey joExpandKey) {
         joExpandKeyMapper.insert(joExpandKey);
@@ -159,6 +162,7 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
     /**
      * 保存附件信息
      */
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public FastMap saveAttachments(String joId, String userid, String[] attachments) {
         try {
             for (String attach : attachments) {

@@ -260,10 +260,10 @@
         JO_TASK_TIME_LENGTH = #{joTaskTimeLength,jdbcType=DECIMAL},
       </if>
       <if test="version != null">
-        VERSION = #{version,jdbcType=DECIMAL},
+        VERSION = VERSION + 1
       </if>
     </set>
-    where ID = #{id,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.jobOrder.pojo.JoTask">
     update JO_TASK
@@ -343,8 +343,8 @@
     <include refid="OracleDialectPrefix" />
     select
     <include refid="JoTaskVo_Column_List" />
-    from JO_ORDER jo
-    left join JO_TASK jt on jo.id = jt.jo_id
+    from JO_TASK jt
+    left join JO_ORDER jo on jo.id = jt.jo_id
     left join jo_key_manage jm1 on jm1.id = jo.jo_first_key_num
     left join jo_key_manage jm0 on jm0.id = jm1.jo_key_back_num
     left join jo_key_manage jm2 on jm2.id = jo.jo_second_key_num
@@ -375,6 +375,9 @@
       <if test="example.agName != null and example.agName != ''">
         and jo.ag_name like  CONCAT(CONCAT('%',#{example.agName}),'%')
       </if>
+      <if test="example.launchBranchName != null and example.launchBranchName != ''">
+        and jo.launch_branch_name like  CONCAT(CONCAT('%',#{example.launchBranchName}),'%')
+      </if>
       <if test="example.busNum != null and example.busNum != '' ">
         and jo.bus_num = #{example.busNum}
       </if>
@@ -382,7 +385,10 @@
         and jo.priority_level = #{example.priorityLevel}
       </if>
       <if test="example.joProgress != null and example.joProgress != ''">
-        and jt.jo_progress = #{example.joProgress}
+        and jo.jo_progress = #{example.joProgress}
+      </if>
+      <if test="example.acceptGroupCode != null and example.acceptGroupCode != ''">
+        and jt.deal_group_id = #{example.acceptGroupCode}
       </if>
       <if test="example.joTaskStatus != null and example.joTaskStatus != ''">
         and jt.jo_task_status = #{example.joTaskStatus}
