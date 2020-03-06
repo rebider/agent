@@ -65,6 +65,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
 
     @Override
     public List<TermMachineVo> queryTermMachine(PlatformType platformType,Map<String,String> par) throws Exception {
+        log.info("查询POS活动参数：{}，{}",platformType,JSONObject.toJSONString(par));
         List<ImsTermMachine> list = imsTermMachineService.selectByExample();
         List<TermMachineVo> termMachineVoList = new ArrayList<>();
         for (ImsTermMachine imsTermMachine : list) {
