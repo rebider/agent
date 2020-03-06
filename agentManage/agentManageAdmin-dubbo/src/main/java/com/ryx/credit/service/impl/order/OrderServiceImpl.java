@@ -4318,7 +4318,7 @@ public class OrderServiceImpl implements OrderService {
                         Date DownPaymentDate = new Date();
                         Calendar c = Calendar.getInstance();
                         c.setTime(DownPaymentDate);
-                        //c.add(Calendar.MONTH,-1);
+                        c.add(Calendar.MONTH,-1);
                         c.set(Calendar.DAY_OF_MONTH, 1);
                         for (int i = 0; i < data.size(); i++) {
 
@@ -4356,7 +4356,7 @@ public class OrderServiceImpl implements OrderService {
                         Date DownPaymentDate = new Date();
                         Calendar c = Calendar.getInstance();
                         c.setTime(DownPaymentDate);
-                        //c.add(Calendar.MONTH,-1);
+                        c.add(Calendar.MONTH,-1);
                         c.set(Calendar.DAY_OF_MONTH, 1);
                         for (int i = 0; i < data.size(); i++) {
 
@@ -4397,7 +4397,7 @@ public class OrderServiceImpl implements OrderService {
                         Date DownPaymentDate = new Date();
                         Calendar c = Calendar.getInstance();
                         c.setTime(DownPaymentDate);
-                        //c.add(Calendar.MONTH,-1);
+                        c.add(Calendar.MONTH,-1);
                         c.set(Calendar.DAY_OF_MONTH, 1);
                         for (int i = 0; i < data.size(); i++) {
 
@@ -4433,7 +4433,7 @@ public class OrderServiceImpl implements OrderService {
                         Date DownPaymentDate = new Date();
                         Calendar c = Calendar.getInstance();
                         c.setTime(DownPaymentDate);
-                        //c.add(Calendar.MONTH,-1);
+                        c.add(Calendar.MONTH,-1);
                         c.set(Calendar.DAY_OF_MONTH, 1);
                         for (int i = 0; i < data.size(); i++) {
                             c.add(Calendar.MONTH,1);
@@ -4817,7 +4817,7 @@ public class OrderServiceImpl implements OrderService {
                         Date DownPaymentDate = new Date();
                         Calendar c = Calendar.getInstance();
                         c.setTime(DownPaymentDate);
-                        //c.add(Calendar.MONTH,-1);
+                        c.add(Calendar.MONTH,-1);
                         c.set(Calendar.DAY_OF_MONTH, 1);
                         for (int i = 0; i < data.size(); i++) {
 
@@ -4855,7 +4855,7 @@ public class OrderServiceImpl implements OrderService {
                         Date DownPaymentDate = new Date();
                         Calendar c = Calendar.getInstance();
                         c.setTime(DownPaymentDate);
-                        //c.add(Calendar.MONTH,-1);
+                        c.add(Calendar.MONTH,-1);
                         c.set(Calendar.DAY_OF_MONTH, 1);
                         for (int i = 0; i < data.size(); i++) {
 
@@ -4896,7 +4896,7 @@ public class OrderServiceImpl implements OrderService {
                         Date DownPaymentDate = new Date();
                         Calendar c = Calendar.getInstance();
                         c.setTime(DownPaymentDate);
-                        //c.add(Calendar.MONTH,-1);
+                        c.add(Calendar.MONTH,-1);
                         c.set(Calendar.DAY_OF_MONTH, 1);
                         for (int i = 0; i < data.size(); i++) {
 
@@ -4932,7 +4932,7 @@ public class OrderServiceImpl implements OrderService {
                         Date DownPaymentDate = new Date();
                         Calendar c = Calendar.getInstance();
                         c.setTime(DownPaymentDate);
-                        //c.add(Calendar.MONTH,-1);
+                        c.add(Calendar.MONTH,-1);
                         c.set(Calendar.DAY_OF_MONTH, 1);
                         for (int i = 0; i < data.size(); i++) {
                             c.add(Calendar.MONTH,1);
