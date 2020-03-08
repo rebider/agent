@@ -1,14 +1,14 @@
 package com.ryx.jobOrder.service.impl;
 
-import com.ryx.credit.common.enumc.JoOrderStatus;
-import com.ryx.credit.common.enumc.JoTaskStatus;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.agent.AttachmentRel;
+import com.ryx.credit.service.agent.AttachmentRelService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.jobOrder.dao.JoOrderMapper;
 import com.ryx.jobOrder.dao.JoTaskMapper;
@@ -21,6 +21,9 @@ import javafx.print.PrinterJob;
 import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -39,12 +42,16 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
     @Autowired
     private IdService idService;
 
+    @Autowired
+    private AttachmentRelService attachmentRelService;
+
     /**
      * 创建 工单任务 记录
      * @param joTask
      * @return
      * @throws Exception
      */
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public FastMap createJobOrderTask(JoTask joTask) throws Exception{
         joTask.setId( idService.genId(TabId.jo_task) );
@@ -85,7 +92,8 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         }
         List jotaskVolist = joTaskMapper.selectByJoTaskVo(joTaskVo, page);
         PageInfo pageInfo = new PageInfo();
-        int count = jotaskVolist.size();
+        List jotaskVolist2 = joTaskMapper.selectByJoTaskVo(joTaskVo, null);
+        int count = jotaskVolist2.size();
         pageInfo.setTotal(count);
         pageInfo.setRows(jotaskVolist);
         return  pageInfo;
@@ -190,15 +198,21 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
      * @return
      * @throws Exception
      */
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public FastMap receiveJobOrderTask(JoTask joTask) throws Exception {
+        String files = joTask.getJoTaskAnnexId();
+        joTask.setJoTaskAnnexId(null);
         String oldTaskId= joTask.getId();
         String joId = joTask.getJoId();
         String content = joTask.getJoTaskContent();
         JoTask joTaskOld = queryJobOrderTaskByTaskId(oldTaskId);
-        joTaskOld.setJoTaskContent(
-                joTaskOld.getDealGroup() + "转发到:" + joTask.getDealGroup()+":"+
-                content.substring(content.indexOf(":")+1,content.length()));
+        if(files!=null){
+            saveAttachments(joTaskOld.getId(), joTaskOld.getDealPersonId(), (files).split(","));
+            joTaskOld.setJoTaskAnnexId(files);
+        }
+        joTaskOld.setDealPersonName(joTask.getDealPersonName());
+        joTaskOld.setDealPersonId(joTask.getDealPersonId());
         // 结束工单
         endJoTask( joTaskOld );
 
@@ -222,6 +236,9 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         joTaskNew.setDealGroupId(joTask.getDealGroupId());
         joTaskNew.setBackDealGroup(joTaskOld.getDealGroup());
         joTaskNew.setBackDealPerson(joTaskOld.getDealPersonName());
+        joTaskNew.setJoTaskContent(
+                joTaskOld.getDealGroup() + "转发到:" + joTask.getDealGroup()+":"+
+                        content.substring(content.indexOf(":")+1,content.length()));
         FastMap status = createJobOrderTask(joTaskNew);
         if(FastMap.isSuc(status)){
             return FastMap.fastSuccessMap();
@@ -229,12 +246,14 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         return FastMap.fastFailMap();
     }
 
+
     /**
      * 结束工单任务
      * @param joTask
      * @return
      * @throws Exception
      */
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public FastMap endJoTask(JoTask joTask) throws MessageException {
         // 更新工单任务
@@ -256,6 +275,7 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
      * @param joTask
      * @return
      */
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public FastMap acceptOrderByTaskId(JoTask joTask) throws Exception {
         // 获取joId
@@ -268,11 +288,16 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
             joOrder.setDealTimeStart(new Date());
             joOrderMapper.updateByPrimaryKeySelective(joOrder);
         }
-        joTask.setJoId(null);
-        joTask.setDealGroup(null);
-        joTask.setJoTaskAcceptTime(new Date());
-        joTask.setJoTaskStatus(JoTaskStatus.SLZ.getValue());
-        FastMap fastMap = updateJobOrderTask(joTask);
+//        joTask.setJoId(null);
+//        joTask.setDealGroup(null);
+//        joTask.setJoTaskAcceptTime(new Date());
+//        joTask.setJoTaskStatus(JoTaskStatus.SLZ.getValue());
+        JoTask joT = queryJobOrderTaskByTaskId(joTask.getId());
+        joT.setDealPersonId(joTask.getDealPersonId());
+        joT.setDealPersonName(joTask.getDealPersonName());
+        joT.setJoTaskAcceptTime(new Date());
+        joT.setJoTaskStatus(JoTaskStatus.SLZ.getValue());
+        FastMap fastMap = updateJobOrderTask(joT);
         if(FastMap.isSuc(fastMap)){
             return FastMap.fastSuccessMap();
         }
@@ -287,6 +312,7 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
      * @param joTask
      * @return
      */
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public FastMap cancelOrderByTaskId(JoTask joTask) throws Exception {
         // 获取joId
@@ -312,5 +338,27 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
             return FastMap.fastSuccessMap();
         }
         return FastMap.fastFailMap();
+    }
+
+    /**
+     * 保存附件信息
+     */
+    public FastMap saveAttachments(String joId, String userid, String[] attachments) {
+        try {
+            for (String attach : attachments) {
+                AttachmentRel attachmentRel = new AttachmentRel();
+                attachmentRel.setId(idService.genId(TabId.a_attachment_rel));
+                attachmentRel.setSrcId(joId);
+                attachmentRel.setAttId(attach);
+                attachmentRel.setBusType(AttachmentRelType.jobOrder.name());
+                attachmentRel.setcTime(new Date());
+                attachmentRel.setcUser(userid);
+                attachmentRel.setStatus(Status.STATUS_1.status);
+                attachmentRelService.insertSelective(attachmentRel);
+            }
+        } catch (Exception e) {
+            return FastMap.fastFailMap("附件保存失败");
+        }
+        return FastMap.fastSuccessMap();
     }
 }

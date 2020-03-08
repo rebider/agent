@@ -1226,4 +1226,29 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		}
 		return data;
 	}
+
+	@Override
+	public AgentBusInfo queryPlatformDict(String agentId, String platFormNum) {
+		Dict dict = new Dict();
+		dict.setdArtifact(platFormNum);
+		List<Dict> platFormList =  dictOptionsService.queryDictList(dict);
+		String busPlatForm = "";
+		if (null!=platFormList || platFormList.size()>0) {
+			for (Dict dicts : platFormList) {
+				busPlatForm = dicts.getdItemvalue();
+			}
+		}
+		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+		AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria()
+				.andAgentIdEqualTo(agentId)
+				.andBusPlatformEqualTo(busPlatForm)
+				.andBusStatusEqualTo(Status.STATUS_1.status)
+				.andStatusEqualTo(Status.STATUS_1.status);
+		List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+		AgentBusInfo agentBusInfo=null;
+		if (null!=agentBusInfoList && agentBusInfoList.size()>0) {
+			agentBusInfo = agentBusInfoList.get(0);
+		}
+		return agentBusInfo;
+	}
 }
