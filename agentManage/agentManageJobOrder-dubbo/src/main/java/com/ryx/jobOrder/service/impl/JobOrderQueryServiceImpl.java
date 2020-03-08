@@ -159,7 +159,7 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
                     logger.error("--撤销工单失败--"+map.get("jobId"));
                     throw new MessageException("撤销工单失败");
                 };
-                logger.error("--撤销工单成功--"+map.get("jobId"));
+                logger.info("--撤销工单成功--"+map.get("jobId"));
                 return agentResult;
             }else {
                 logger.error("--撤销工单失败--"+map.get("jobId"));
@@ -237,7 +237,6 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
 //
 //        int minutes = p.getDays()*1440;
         try {
-            SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
             long from3 = startDate.getTime();
             long to3 = endDate.getTime();
             int minutes = (int) ((to3 - from3) / (1000 * 60));

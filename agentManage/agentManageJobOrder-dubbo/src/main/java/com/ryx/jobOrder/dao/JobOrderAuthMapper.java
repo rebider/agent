@@ -12,4 +12,5 @@ public interface JobOrderAuthMapper {
     List<Map<String,Object>> getAllAcceptGroup();
     Map<String,Object> getAcceptByAcceptCode(@Param("acceptCode") String acceptCode);
     Map<String,Object> getAcceptByuserid(@Param("userId") String userID);
+    List<Map<String,Object>> getViewJobKeyManageNodesByUserId(@Param("userId") String userId);
 }

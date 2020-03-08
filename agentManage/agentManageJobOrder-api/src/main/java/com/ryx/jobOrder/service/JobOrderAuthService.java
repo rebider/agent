@@ -1,5 +1,7 @@
 package com.ryx.jobOrder.service;
 
+import com.ryx.jobOrder.vo.JobKeyManageNodeVo;
+
 import java.util.List;
 import java.util.Map;
 
@@ -38,5 +40,12 @@ public interface JobOrderAuthService {
      * @return
      */
     Map<String,Object> getAcceptInfo(String code,String queryType);
+
+    /**
+     * 获取用户可以申请的工单类型
+     * @param userId
+     * @return
+     */
+    List<JobKeyManageNodeVo> getViewJobKeyManageNodes(String userId);
 
 }

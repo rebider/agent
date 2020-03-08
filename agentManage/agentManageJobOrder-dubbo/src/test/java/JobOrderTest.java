@@ -13,6 +13,7 @@ import com.ryx.jobOrder.service.JobOrderManageService;
 import com.ryx.jobOrder.service.JobOrderStartService;
 import com.ryx.jobOrder.service.JobOrderTaskService;
 import com.ryx.jobOrder.vo.JoTaskVo;
+import com.ryx.jobOrder.vo.JobKeyManageNodeVo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -150,5 +151,25 @@ public class JobOrderTest extends BaseSpringTest {
     public void test10(){
         List list = jobOrderAuthService.getAllAcceptGroup();
         System.out.println();
+    }
+
+    @Test
+    public void  test11(){
+        List<JobKeyManageNodeVo> viewJobKeyManageNodes = jobOrderAuthService.getViewJobKeyManageNodes("18233");
+        for (JobKeyManageNodeVo node:viewJobKeyManageNodes){
+            System.out.print(node.getId());
+            System.out.print(node.getJoKeyType());
+            System.out.print(node.getJoKeyName());
+            for (JobKeyManageNodeVo nodeSecond:node.getChildNodes()){
+                System.out.print(nodeSecond.getId());
+                System.out.print(nodeSecond.getJoKeyType());
+                System.out.print(nodeSecond.getJoKeyName());
+                for (JobKeyManageNodeVo nodeThird:nodeSecond.getChildNodes()){
+                    System.out.print(nodeThird.getId());
+                    System.out.print(nodeThird.getJoKeyType());
+                    System.out.print(nodeThird.getJoKeyName());
+                }
+            }
+        }
     }
 }
