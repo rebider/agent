@@ -157,17 +157,18 @@ public class JobOrderTest extends BaseSpringTest {
     public void  test11(){
         List<JobKeyManageNodeVo> viewJobKeyManageNodes = jobOrderAuthService.getViewJobKeyManageNodes("18233");
         for (JobKeyManageNodeVo node:viewJobKeyManageNodes){
-            System.out.print(node.getId());
-            System.out.print(node.getJoKeyType());
-            System.out.print(node.getJoKeyName());
             for (JobKeyManageNodeVo nodeSecond:node.getChildNodes()){
-                System.out.print(nodeSecond.getId());
-                System.out.print(nodeSecond.getJoKeyType());
-                System.out.print(nodeSecond.getJoKeyName());
                 for (JobKeyManageNodeVo nodeThird:nodeSecond.getChildNodes()){
-                    System.out.print(nodeThird.getId());
-                    System.out.print(nodeThird.getJoKeyType());
-                    System.out.print(nodeThird.getJoKeyName());
+                    System.out.print(node.getId()+"-");
+                    System.out.print(node.getJoKeyType()+"-");
+                    System.out.print(node.getJoKeyName()+"-");
+                    System.out.print(nodeSecond.getId()+"-");
+                    System.out.print(nodeSecond.getJoKeyType()+"-");
+                    System.out.print(nodeSecond.getJoKeyName()+"-");
+                    System.out.print(nodeThird.getId()+"-");
+                    System.out.print(nodeThird.getJoKeyType()+"-");
+                    System.out.print(nodeThird.getJoKeyName()+"-");
+                    System.out.println("***********");
                 }
             }
         }
