@@ -203,7 +203,6 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
             JoOrder joOrder = joOrderMapper.selectByPrimaryKey(String.valueOf(map.get("jobId")));
             if (JoOrderStatus.YCL.key.equals(joOrder.getJoProgress())){
                 joOrder.setJoProgress(JoOrderStatus.CLZ.key);
-                joOrder.setDealTimeLength(BigDecimal.valueOf(getMinutes(joOrder.getDealTimeStart(), joOrder.getDealTimeEnd())));
                 if (joOrderMapper.updateByPrimaryKeySelective(joOrder)!=1){
                     logger.error("工单更新为[处理中]失败!");
                 }else {
