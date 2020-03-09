@@ -198,27 +198,43 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     public AgentResult reStartTask(Map map) throws MessageException {
-
-        JoTask joTask = new JoTask();
-        joTask.setJoId(String.valueOf(map.get("joId")));
-        List<JoTask> joTaskList = jobOrderTaskService.queryJobOrderTask(joTask);
-        JoTask joTask1 = joTaskList.get(0);
-        joTask.setId( idService.genId(TabId.jo_task) );
-        joTask.setJoId(String.valueOf(map.get("joId")));
-        joTask.setJoTaskStatus(JoTaskStatus.WSL.getValue());
-        joTask.setJoTaskTime(new Date());
-        joTask.setJoTaskContent(String.valueOf(map.get("joContent")));
-        joTask.setDealGroup(joTask1.getDealGroup());
-        joTask.setDealGroupId(joTask1.getDealGroup());
-        joTask.setDealPersonId("");
-        joTask.setDealPersonName("");
-        joTask.setId( idService.genId(TabId.jo_task) );
-        joTask.setVersion(version);
-        if(joTaskMapper.insert(joTask) != 1){
-            throw new MessageException("重新提问失败" + joTask.getId());
+        AgentResult agentResult = AgentResult.fail("重新发起提问失败!");
+        try {
+            JoOrder joOrder = joOrderMapper.selectByPrimaryKey(String.valueOf(map.get("jobId")));
+            if (JoOrderStatus.YCL.key.equals(joOrder.getJoProgress())){
+                joOrder.setJoProgress(JoOrderStatus.CLZ.key);
+                joOrder.setDealTimeLength(BigDecimal.valueOf(getMinutes(joOrder.getDealTimeStart(), joOrder.getDealTimeEnd())));
+                if (joOrderMapper.updateByPrimaryKeySelective(joOrder)!=1){
+                    logger.error("工单更新为[处理中]失败!");
+                }else {
+                    JoTask joTask = new JoTask();
+                    joTask.setJoId(String.valueOf(map.get("joId")));
+                    List<JoTask> joTaskList = jobOrderTaskService.queryJobOrderTask(joTask);
+                    JoTask joTask1 = joTaskList.get(0);
+                    joTask.setId( idService.genId(TabId.jo_task) );
+                    joTask.setJoId(String.valueOf(map.get("joId")));
+                    joTask.setJoTaskStatus(JoTaskStatus.WSL.getValue());
+                    joTask.setJoTaskTime(new Date());
+                    joTask.setJoTaskContent(String.valueOf(map.get("joContent")));
+                    joTask.setDealGroup(joTask1.getDealGroup());
+                    joTask.setDealGroupId(joTask1.getDealGroup());
+                    joTask.setDealPersonId("");
+                    joTask.setDealPersonName("");
+                    joTask.setId( idService.genId(TabId.jo_task) );
+                    joTask.setVersion(version);
+                    if(joTaskMapper.insert(joTask) != 1){
+                        throw new MessageException("重新提问失败" + joTask.getId());
+                    }
+                    agentResult.setStatus(200);
+                    agentResult.setMsg("再次提问成功!");
+                }
+            }else {
+                agentResult.setMsg("工单还未处理，不需要再次发起!");
+            }
+        }catch (Exception e){
+            throw new MessageException("工单再次发起提问失败!");
         }
-
-        return AgentResult.ok();
+        return agentResult;
     }
 
 
