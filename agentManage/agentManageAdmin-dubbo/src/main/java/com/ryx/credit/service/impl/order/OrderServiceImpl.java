@@ -5259,7 +5259,7 @@ public class OrderServiceImpl implements OrderService {
                 //机具已抵扣金额
                 BigDecimal takeout_amount = orderAdj.getOffsetAmount() == null ? new BigDecimal(0) : orderAdj.getOffsetAmount();
                 if (amount.subtract(proRefundAmo).subtract(takeout_amount).compareTo(BigDecimal.ZERO) == 1){
-                    logger.info("退款金额大于0,进行抵扣入库");
+                    logger.info("退款金额大于0,进行抵扣入库;应退金额:"+amount+",手续费:"+proRefundAmo+"已抵扣金额:"+takeout_amount);
                     List<OPaymentDetail> paymentDetails = paymentDetailService.getCanTakeoutPaymentsByAgentId(orderAdj.getAgentId(), AdjustType.ORDER_ADJ.adjustType, orderAdj.getId());
                     AgentResult agentResult= orderOffsetService.OffsetArrears(paymentDetails, amount.subtract(proRefundAmo).subtract(takeout_amount), DDTZ.code, orderAdj.getId());
                     if (agentResult.isOK()){
@@ -5279,14 +5279,17 @@ public class OrderServiceImpl implements OrderService {
                 }
                 //第一个财务节点,挂账-无退款
                 if(orderUpModelVo.getSid().equals("sid-F315F787-E98B-40FA-A6DC-6A962201075D")){
+                    logger.info("财务审批进行分期变更");
                     //挂账审批通过
                     if(String.valueOf(OrderAdjRefundType.CDFQ_GZ.code).equals(orderUpModelVo.getRefundType()) ){
+                        logger.info("财务选择挂账:"+orderUpModelVo.getId());
                         orderAdj.setSettleAmount(new BigDecimal(orderUpModelVo.getRefundAmount()));
                         orderAdj.setRealRefundAmo(BigDecimal.ZERO);
                         orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
                         orderAdj.setRefundStat(RefundStat.UNREFUND.key);
                         reqMap.put("remit",false);
                     }else if(String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
+                        logger.info("财务选择线下退款");
                         orderAdj.setRealRefundAmo(new BigDecimal(orderUpModelVo.getRefundAmount()));
                         orderAdj.setSettleAmount(BigDecimal.ZERO);
                         orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
@@ -5574,6 +5577,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     public AgentResult adjustDoPayPlan(String adjId,OrderAdj orderAdj) throws Exception{
+        logger.info("执行订单调整计划,id"+adjId);
         boolean isZero = false;
         boolean sendMsgToPlatm = false;
         Map<String,Object> resMap = new HashMap<>();
@@ -5607,9 +5611,11 @@ public class OrderServiceImpl implements OrderService {
             /******调用调账接口 开始*********/
             BigDecimal refundAmount = orderAdj.getRefundAmount().subtract(orderAdj.getProRefundAmount()).subtract(orderAdj.getOffsetAmount());
                 if (refundAmount.compareTo(BigDecimal.ZERO)>=0){
+                    logger.info(orderAdj.getId()+"订单调整,退款金额大于0");
                     if (orderAdj.getRefundType().compareTo(OrderAdjRefundType.CDFQ_XXTK.code)==0){
                         orderAdj.setRealRefundAmo(refundAmount);
                         orderAdj.setSettleAmount(BigDecimal.ZERO);
+                        orderAdj.setRefundStat(RefundStat.REFUNDING.key);
                     }else {
                         orderAdj.setRefundType(OrderAdjRefundType.CDFQ_GZ.code);
                         orderAdj.setRealRefundAmo(BigDecimal.ZERO);
@@ -5618,6 +5624,7 @@ public class OrderServiceImpl implements OrderService {
                     }
                     sendMsgToPlatm = true;
                 }else {
+                    logger.info(orderAdj.getId()+"订单调整,退款金额小于0");
                     orderAdj.setRefundType(OrderAdjRefundType.CDFQ_GZ.code);
                     orderAdj.setRealRefundAmo(BigDecimal.ZERO);
                     orderAdj.setSettleAmount(refundAmount);
@@ -6647,6 +6654,24 @@ public class OrderServiceImpl implements OrderService {
             throw new MessageException("付款单数据更新异常！");
         }
        return AgentResult.okMap(resMap);
+    }
+
+    @Override
+    public AgentResult enableOrderAdjFinish(String orderAdjId) throws Exception {
+        logger.info("查询是否允许结束该调整流程,id:"+orderAdjId);
+        OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(orderAdjId);
+        if (null == orderAdj){
+            return AgentResult.fail("该记录不存在!");
+        }
+        if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
+         return AgentResult.fail("该记录非审批中!");
+        }
+        BigDecimal refundStat = orderAdj.getRefundStat();
+        if (null != refundStat){
+            logger.info("退款状态为:"+RefundStat.getContentByValue(refundStat));
+            return AgentResult.fail("该记录已执行分期变更!");
+        }
+        return AgentResult.ok();
     }
 
 
