@@ -4443,13 +4443,9 @@ public class OrderServiceImpl implements OrderService {
         oPaymentDetailExample.setOrderByClause(" pay_time asc, plan_num asc, plan_pay_time asc ");
         List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
         BigDecimal unpaySize = BigDecimal.ZERO;
-        Date beginDate = null;
         for (OPaymentDetail oPaymentDetail:oPaymentDetails){
             if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.DF.code) == 0 || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.YQ.code) == 0 ){
                 unpaySize = unpaySize.add(new BigDecimal("1"));
-                if (beginDate == null){
-                    beginDate = oPaymentDetail.getPlanPayTime();
-                }
             }
         }
         OrderAdj orderAdj = new OrderAdj();
@@ -4679,8 +4675,8 @@ public class OrderServiceImpl implements OrderService {
             if(payment.getDownPayment()==null){
                 payment.setDownPayment(BigDecimal.ZERO);
             }
-            //TODO 检查付款明细及打款信息是否和订单金额一致 订单原应付金额 - 订单调整差价  = 已付金额  + 抵扣金额 + 分期金额
-            if(payment.getPayAmount().subtract(difAmount).compareTo(payment.getRealAmount().add(payment.getDeductionAmount()).add(fqje))!=0){
+            //TODO 检查付款明细及打款信息是否和订单金额一致 订单原应付金额 - 订单调整差价  = 已付金额 + 分期金额
+            if(payment.getPayAmount().subtract(difAmount).compareTo(payment.getRealAmount().add(fqje))!=0){
                 throw new MessageException("分期金额配置失败:金额总计应为"+ payment.getPayAmount().subtract(payment.getRealAmount()).subtract(difAmount));
             }
         }
@@ -4784,6 +4780,20 @@ public class OrderServiceImpl implements OrderService {
             List<OPaymentDetail> oPaymentDetails1 = oPaymentDetailMapper.selectByExample(oPaymentDetailExample1);
             res.putKeyV("beginDate",oPaymentDetails1.get(0).getPlanPayTime());
 
+            OPaymentExample oPaymentExample = new OPaymentExample();
+            oPaymentExample.or().andStatusEqualTo(Status.STATUS_1.status).andOrderIdEqualTo(orderAdj.getOrderId());
+            List<OPayment> oPaymentList = oPaymentMapper.selectByExample(oPaymentExample);
+            if (oPaymentList.size() != 1) {
+                return AgentResult.fail("支付信息错误");
+            }
+            if (oPaymentList.get(0).getCustomStaging().equals(Status.STATUS_1.status.toString()) && orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) == 0){
+                Date DownPaymentDate = new Date();
+                Calendar c = Calendar.getInstance();
+                c.setTime(DownPaymentDate);
+                c.set(Calendar.DAY_OF_MONTH, 1);
+                res.putKeyV("beginDate",c.getTime());
+            }
+            OPayment oPayment = oPaymentList.get(0);
             res.putKeyV("orderAdjDetails",orderAdjDetails);
             String refundMethod = RefundMehod.getContentByValue(orderAdj.getRefundMethod());
             res.putKeyV("refundMethod",refundMethod);
@@ -4989,13 +4999,6 @@ public class OrderServiceImpl implements OrderService {
         oPaymentDetailExample.or().andOrderIdEqualTo(orderUpModelVo.getOrderId()).andPaymentTypeEqualTo(PamentIdType.ORDER_FKD.code).andStatusEqualTo(Status.STATUS_1.status);
         oPaymentDetailExample.setOrderByClause(" pay_time asc, plan_num asc, plan_pay_time asc ");
         List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
-        Date beginDate = payment.getDownPaymentDate();
-        for (OPaymentDetail oPaymentDetail:oPaymentDetails){
-            if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.DF.code) == 0 || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.YQ.code) == 0 ){
-                beginDate = oPaymentDetail.getPlanPayTime();
-                break;
-            }
-        }
 
         String paymentMethod = payment.getPayMethod();
         List<String> data = orderUpModelVo.getCustomStagingUser();
@@ -5667,6 +5670,17 @@ public class OrderServiceImpl implements OrderService {
         OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
         oPaymentDetailExample.or().andOrderIdEqualTo(orderAdj.getOrderId()).andPaymentStatusIn(paymentStatus).andStatusEqualTo(Status.STATUS_1.status).andBatchCodeEqualTo(orderAdj.getOrgPaymentId());
         List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
+        Date beginDate = new Date();
+        for (OPaymentDetail oPaymentDetail:oPaymentDetails){
+            if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.DF.code) == 0 || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.YQ.code) == 0 ){
+                beginDate = oPaymentDetail.getPlanPayTime();
+                Calendar c = Calendar.getInstance();
+                c.setTime(beginDate);
+                c.add(Calendar.MONTH,-1);
+                beginDate = c.getTime();
+                break;
+            }
+        }
         for(OPaymentDetail oPaymentDetail:oPaymentDetails){
             if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.BF.code) == 0 ){
                 oPaymentDetail.setPayAmount(oPaymentDetail.getRealPayAmount());
@@ -5828,7 +5842,7 @@ public class OrderServiceImpl implements OrderService {
                     List<Map> FKFQ_data = StageUtil.stageOrder(
                             oPayment.getOutstandingAmount(),
                             orderAdj.getOrgPlanNum().intValue(),
-                            new Date(), temp.get(Calendar.DAY_OF_MONTH));
+                            beginDate, temp.get(Calendar.DAY_OF_MONTH));
                     //明细处理
                     for (Map datum : FKFQ_data) {
                         OPaymentDetail record = new OPaymentDetail();
@@ -6013,7 +6027,7 @@ public class OrderServiceImpl implements OrderService {
                     List<Map> FRFQ_data = StageUtil.stageOrder(
                             oPayment.getOutstandingAmount(),
                             orderAdj.getOrgPlanNum().intValue(),
-                            new Date(), temp.get(Calendar.DAY_OF_MONTH));
+                            beginDate, temp.get(Calendar.DAY_OF_MONTH));
 
                     //明细处理
                     for (Map datum : FRFQ_data) {
@@ -6309,7 +6323,7 @@ public class OrderServiceImpl implements OrderService {
                     List<Map> SF1_data = StageUtil.stageOrder(
                             oPayment.getOutstandingAmount(),
                             orderAdj.getOrgPlanNum().intValue(),
-                            new Date(), temp.get(Calendar.DAY_OF_MONTH));
+                            beginDate, temp.get(Calendar.DAY_OF_MONTH));
 
                     //明细处理
                     for (Map datum : SF1_data) {
@@ -6481,7 +6495,7 @@ public class OrderServiceImpl implements OrderService {
                     List<Map> SF2_data = StageUtil.stageOrder(
                             oPayment.getOutstandingAmount(),
                             orderAdj.getOrgPlanNum().intValue(),
-                            new Date(), temp.get(Calendar.DAY_OF_MONTH));
+                            beginDate, temp.get(Calendar.DAY_OF_MONTH));
 
                     //明细处理
                     for (Map datum : SF2_data) {
