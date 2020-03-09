@@ -623,7 +623,7 @@
       jo.platform_name,
       one.jo_key_name as jo_first_key_num,
       two.jo_key_name as jo_second_key_num,
-      jo.priority_level,
+      jm3.jo_key_name as PRIORITY_LEVEL,
       jo.launch_time,
       jo.launch_person_name,
       jo.launch_branch_name,
@@ -633,9 +633,9 @@
       jo.deal_time_start,
       jo.accept_now_group
       from jo_order jo
-      left join jo_task ta on ta.jo_id = jo.id
       left join jo_key_manage one on one.jo_key = jo.jo_first_key_num
       left join jo_key_manage two on two.jo_key = jo.jo_second_key_num
+      LEFT JOIN jo_key_manage jm3 ON jm3.id = jo.priority_level
     <where>
       1 = 1
       <if test="map.id!=null and map.id!=''">and jo.id = #{map.id} </if>
@@ -646,9 +646,9 @@
       <if test="map.priorityLevel!=null and map.priorityLevel!=''"> and jo.priority_level = #{map.priorityLevel} </if>
       <if test="map.joProgress!=null and map.joProgress!=''"> and jo.jo_progress = #{map.joProgress} </if>
       <if test="map.launchBranchName!=null and map.launchBranchName!=''"> and jo.launch_branch_name = #{map.launchBranchName} </if>
-      <if test="map.launchBeginTime!=null and map.launchEndTime!=''"> and (to_char(jo.taskEndTime,'yyyy-mm-dd') between #{map.launchBeginTime} and #{map.taskEndTimime}) </if>
-      <if test="map.taskBeginTime!=null and map.taskEndTime!=''"> and (to_char(ta.jo_task_accept_time,'yyyy-mm-dd') between #{map.taskBeginTime} and #{map.taskEndTime}) </if>
+      <if test="map.launchBeginTime!=null and map.launchBeginTime != null"> and  jo.launch_time  between #{map.launchBeginTime} and #{map.launchEndTime} </if>
       <if test="map.launchPersonId!=null and map.launchPersonId!=''"> and jo.launch_person_id = #{map.launchPersonId} </if>
+      <if test="map.launchBranchId!=null and map.launchBranchId!=''"> and jo.launch_branch_id = #{map.launchBranchId} </if>
     </where>
     order by jo.launch_time desc
   </sql>

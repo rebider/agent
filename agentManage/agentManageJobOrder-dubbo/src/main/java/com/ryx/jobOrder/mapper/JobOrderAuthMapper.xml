@@ -47,4 +47,38 @@
         from c_role cro
         where cro.description like 'Group%' and cro.status = 0
     </select>
+    <select id="getAcceptByAcceptCode" parameterType="string" resultType="java.util.Map">
+        select NAME,DESCRIPTION from C_ROLE where DESCRIPTION = #{acceptCode}
+    </select>
+    <select id="getAcceptByuserid" parameterType="string" resultType="java.util.Map">
+        select cr.NAME,cr.DESCRIPTION from C_ROLE cr
+        left join C_USER_ROLE cur on cur.ROLE_ID = cr.ID
+        left join C_USER cu on cu.ID = cur.USER_ID
+        where cr.DESCRIPTION like 'Group%'
+        <if test="userId != null"></if>
+          and  cu.ID = #{userId}
+    </select>
+    <select id="getViewJobKeyManageNodesByUserId" parameterType="string" resultType="map">
+        select
+        jm1.ID as jm1_id,jm1.JO_KEY_TYPE as jm1_JO_KEY_TYPE,jm1.JO_KEY_NAME as jm1_JO_KEY_NAME,jm1.JO_KEY_BACK_NUM as jm1_JO_KEY_BACK_NUM,
+        jm2.ID as jm2_id,jm2.JO_KEY_TYPE as jm2_JO_KEY_TYPE,jm2.JO_KEY_NAME as jm2_JO_KEY_NAME,jm2.JO_KEY_BACK_NUM as jm2_JO_KEY_BACK_NUM,
+        jm3.ID as jm3_id,jm3.JO_KEY_TYPE as jm3_JO_KEY_TYPE,jm3.JO_KEY_NAME as jm3_JO_KEY_NAME,jm3.JO_KEY_BACK_NUM as jm3_JO_KEY_BACK_NUM
+        from JO_KEY_MANAGE jm1
+        left join JO_KEY_MANAGE jm2 on jm1.id = jm2.JO_KEY_BACK_NUM
+        left join JO_KEY_MANAGE jm3 on jm2.ID = jm3.JO_KEY_BACK_NUM
+        where jm3.id in
+        (select cre.url from C_RESOURCE cre
+        left join C_ROLE_RESOURCE crr on crr.RESOURCE_ID = cre.ID
+        left join C_ROLE cr on cr.ID = crr.ROLE_ID
+        left join C_USER_ROLE cur on cur.ROLE_ID = cr.ID
+        left join C_USER cu on cu.ID = cur.USER_ID
+        <where>
+            cr.DESCRIPTION like 'View%'
+            AND CRE.PID IS NOT NULL
+            <if test="userId!= null">
+                and cu.id = #{userId}
+            </if>
+        </where>
+        )
+    </select>
 </mapper>

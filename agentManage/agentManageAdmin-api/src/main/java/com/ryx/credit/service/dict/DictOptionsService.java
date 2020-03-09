@@ -39,4 +39,6 @@ public interface DictOptionsService {
     Dict findDictByValueAndName(Dict oldDict);
 
     boolean editDictByOldDict(Dict oldDict, Dict newDict)throws Exception;
+
+    List<Dict> queryDictList(Dict dict);
 }

@@ -260,10 +260,10 @@
         JO_TASK_TIME_LENGTH = #{joTaskTimeLength,jdbcType=DECIMAL},
       </if>
       <if test="version != null">
-        VERSION = #{version,jdbcType=DECIMAL},
+        VERSION = VERSION + 1
       </if>
     </set>
-    where ID = #{id,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.jobOrder.pojo.JoTask">
     update JO_TASK
@@ -323,6 +323,8 @@
     <result column="joTaskStatus" jdbcType="VARCHAR" property="joTaskStatus" />
     <result column="joTaskTime" jdbcType="VARCHAR" property="joTaskTime" />
     <result column="joTaskAcceptTime" jdbcType="VARCHAR" property="joTaskAcceptTime" />
+    <result column="joDealPersonId" jdbcType="VARCHAR" property="joDealPersonId" />
+    <result column="joDealPersonName" jdbcType="VARCHAR" property="joDealPersonName" />
   </resultMap>
   <sql id="JoTaskVo_Column_List">
     jo.ID, jo.AG_ID, jo.AG_NAME, jo.BUS_ID, jo.BUS_NUM, jo.PALTFORM_NUM, jo.PLATFORM_NAME,
@@ -334,14 +336,15 @@
     jo.LAUNCH_PERSON_EMAIL, jo.LAUNCH_BRANCH_ID, jo.LAUNCH_BRANCH_NAME, jo.ACCEPT_GROUP_CODE, jo.ACCEPT_GROUP,
     jo.ACCEPT_NOW_GROUP, jo.DEAL_TIME_START, jo.DEAL_TIME_END, jo.DEAL_TIME_LENGTH, jo.JO_PROGRESS,
     jt.id as joTaskId, jt.jo_task_status  as joTaskStatus, jt.jo_task_time as joTaskTime,
-    jt.jo_task_accept_time as joTaskAcceptTime
+    jt.jo_task_accept_time as joTaskAcceptTime, jt.deal_person_id as joDealPersonId,
+    jt.deal_person_name as joDealPersonName
   </sql>
   <select id="selectByJoTaskVo"  resultMap="JoTaskVoBaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
     <include refid="JoTaskVo_Column_List" />
-    from JO_ORDER jo
-    left join JO_TASK jt on jo.id = jt.jo_id
+    from JO_TASK jt
+    left join JO_ORDER jo on jo.id = jt.jo_id
     left join jo_key_manage jm1 on jm1.id = jo.jo_first_key_num
     left join jo_key_manage jm0 on jm0.id = jm1.jo_key_back_num
     left join jo_key_manage jm2 on jm2.id = jo.jo_second_key_num
@@ -370,7 +373,10 @@
         and jo.ag_id = #{example.agId}
       </if>
       <if test="example.agName != null and example.agName != ''">
-        and jo.ag_name = #{example.agName}
+        and jo.ag_name like  CONCAT(CONCAT('%',#{example.agName}),'%')
+      </if>
+      <if test="example.launchBranchName != null and example.launchBranchName != ''">
+        and jo.launch_branch_name like  CONCAT(CONCAT('%',#{example.launchBranchName}),'%')
       </if>
       <if test="example.busNum != null and example.busNum != '' ">
         and jo.bus_num = #{example.busNum}
@@ -379,7 +385,10 @@
         and jo.priority_level = #{example.priorityLevel}
       </if>
       <if test="example.joProgress != null and example.joProgress != ''">
-        and jt.jo_progress = #{example.joProgress}
+        and jo.jo_progress = #{example.joProgress}
+      </if>
+      <if test="example.acceptGroupCode != null and example.acceptGroupCode != ''">
+        and jt.deal_group_id = #{example.acceptGroupCode}
       </if>
       <if test="example.joTaskStatus != null and example.joTaskStatus != ''">
         and jt.jo_task_status = #{example.joTaskStatus}
@@ -391,5 +400,6 @@
         and jo_task_accept_time between #{example.joAcceptTimeBegin} and #{example.joAcceptTimeEnd}
       </if>
     </where>
+        order by joTaskId desc
   </sql>
 </mapper>

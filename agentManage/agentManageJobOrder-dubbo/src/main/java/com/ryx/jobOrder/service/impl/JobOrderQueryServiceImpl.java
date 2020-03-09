@@ -1,6 +1,7 @@
 package com.ryx.jobOrder.service.impl;
 
 import com.ryx.credit.common.enumc.JoOrderStatus;
+import com.ryx.credit.common.enumc.JoTaskStatus;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
@@ -9,11 +10,13 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.result.Result;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.jobOrder.dao.*;
 import com.ryx.jobOrder.pojo.*;
 import com.ryx.jobOrder.service.JobOrderQueryService;
+import com.ryx.jobOrder.service.JobOrderTaskService;
 import com.ryx.jobOrder.vo.JoTaskVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +46,8 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
     private JoTaskMapper joTaskMapper;
     @Autowired
     private IdService idService;
+    @Autowired
+    private JobOrderTaskService jobOrderTaskService;
     @Override
     public PageInfo jobOrderQueryList(Map map, Page page) {
         logger.info("------我收到的工单列表查询-内部人员------");
@@ -114,6 +119,17 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
     @Override
     public PageInfo jobOrderQueryLaunchList(Map map, Page page) {
         logger.info("------我发起的工单列表查询------");
+        String joAcceptTimeBeginStr = (String) map.get("launchBeginTime");
+        String joAcceptTimeEndStr = (String) map.get("launchEndTime");
+        if((StringUtils.isNotBlank(joAcceptTimeBeginStr) && StringUtils.isNotBlank(joAcceptTimeEndStr))){
+                joAcceptTimeBeginStr =joAcceptTimeBeginStr.substring(0,10);
+                joAcceptTimeEndStr =joAcceptTimeEndStr.substring(0,10);
+                map.put("launchBeginTime",DateUtil.format(joAcceptTimeBeginStr,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+                map.put("launchEndTime",DateUtil.format(joAcceptTimeEndStr,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+        }else {
+            map.put("launchBeginTime",null);
+            map.put("launchEndTime",null);
+        }
         PageInfo pageInfo = new PageInfo();
         int listCount = joOrderMapper.queryJobOrderLaunchListCount(map);
         List<JoTaskVo> jobOrderList = joOrderMapper.queryJobOrderLaunchList(map,page);
@@ -143,7 +159,7 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
                     logger.error("--撤销工单失败--"+map.get("jobId"));
                     throw new MessageException("撤销工单失败");
                 };
-                logger.error("--撤销工单成功--"+map.get("jobId"));
+                logger.info("--撤销工单成功--"+map.get("jobId"));
                 return agentResult;
             }else {
                 logger.error("--撤销工单失败--"+map.get("jobId"));
@@ -184,20 +200,25 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
     public AgentResult reStartTask(Map map) throws MessageException {
 
         JoTask joTask = new JoTask();
+        joTask.setJoId(String.valueOf(map.get("joId")));
+        List<JoTask> joTaskList = jobOrderTaskService.queryJobOrderTask(joTask);
+        JoTask joTask1 = joTaskList.get(0);
         joTask.setId( idService.genId(TabId.jo_task) );
         joTask.setJoId(String.valueOf(map.get("joId")));
-        joTask.setDealGroup("");
-        joTask.setDealGroupId("");
+        joTask.setJoTaskStatus(JoTaskStatus.WSL.getValue());
+        joTask.setJoTaskTime(new Date());
+        joTask.setJoTaskContent(String.valueOf(map.get("joContent")));
+        joTask.setDealGroup(joTask1.getDealGroup());
+        joTask.setDealGroupId(joTask1.getDealGroup());
         joTask.setDealPersonId("");
         joTask.setDealPersonName("");
-        joTask.setJoTaskContent("");
         joTask.setId( idService.genId(TabId.jo_task) );
         joTask.setVersion(version);
         if(joTaskMapper.insert(joTask) != 1){
-            throw new MessageException("插入失败" + joTask.getId());
+            throw new MessageException("重新提问失败" + joTask.getId());
         }
 
-        return null;
+        return AgentResult.ok();
     }
 
 
@@ -216,7 +237,6 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
 //
 //        int minutes = p.getDays()*1440;
         try {
-            SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
             long from3 = startDate.getTime();
             long to3 = endDate.getTime();
             int minutes = (int) ((to3 - from3) / (1000 * 60));
