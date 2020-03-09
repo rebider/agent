@@ -159,15 +159,7 @@ public class JobOrderManageServiceImpl implements JobOrderManageService {
 
     @Override
     public List selectCustomListMapBySedType(JoCustomKey joCustomKey) {
-        JoCustomKeyExample example = new JoCustomKeyExample();
-        JoCustomKeyExample.Criteria criteria = example.createCriteria();
-        if(StringUtils.isNotBlank(joCustomKey.getJoSecondKeyNum())){
-            criteria.andJoSecondKeyNumEqualTo(joCustomKey.getJoSecondKeyNum());
-        }
-        if(StringUtils.isNotBlank(joCustomKey.getJoKeyId())){
-            criteria.andJoKeyIdEqualTo(joCustomKey.getJoKeyId());
-        }
-        List<Map> mapList = joCustomKeyMapper.selectMapByExample(example);
+        List<Map> mapList = joCustomKeyMapper.selectCustomListMapBySedType(joCustomKey);
         return mapList;
     }
 
