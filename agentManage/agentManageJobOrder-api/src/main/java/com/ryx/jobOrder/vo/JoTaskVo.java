@@ -10,6 +10,8 @@ public class JoTaskVo extends JoOrder {
 
     private String joDealPersonName;
 
+    private String secondDealGroup;
+
     private String joDealGroupId;
 
     private String joTaskId;
@@ -37,6 +39,14 @@ public class JoTaskVo extends JoOrder {
     private Date joAcceptTimeBegin;
 
     private Date joAcceptTimeEnd;
+
+    public String getSecondDealGroup() {
+        return secondDealGroup;
+    }
+
+    public void setSecondDealGroup(String secondDealGroup) {
+        this.secondDealGroup = secondDealGroup;
+    }
 
     public String getJoDealPersonName() {
         return joDealPersonName;
