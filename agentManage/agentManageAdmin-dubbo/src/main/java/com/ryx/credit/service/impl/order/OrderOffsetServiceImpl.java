@@ -50,6 +50,8 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
     private IPaymentDetailService paymentDetailService;
     @Autowired
     private ORefundPriceDiffMapper refundPriceDiffMapper;
+    @Autowired
+    private SettleAccountsMapper settleAccountsMapper;
 
     private Logger logger = LoggerFactory.getLogger(OrderOffsetServiceImpl.class);
     @Override
@@ -795,7 +797,8 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                     .andBusStatEqualTo(Status.STATUS_1.status)
                     .andStatusEqualTo(Status.STATUS_1.status);
         }else if (paytype.equals(QueryType.SRCID.code)){
-            oPayDetailExample.or().andSrcIdEqualTo(srcId)
+            SettleAccounts settleAccounts = settleAccountsMapper.selectByPrimaryKey(srcId);
+            oPayDetailExample.or().andSrcIdEqualTo(settleAccounts.getSrcId())
                     .andBusStatEqualTo(Status.STATUS_1.status)
                     .andStatusEqualTo(Status.STATUS_1.status);
         }

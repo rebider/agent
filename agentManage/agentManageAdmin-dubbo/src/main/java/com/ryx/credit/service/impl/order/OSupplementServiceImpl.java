@@ -758,10 +758,13 @@ public class OSupplementServiceImpl implements OSupplementService {
     }
 
     @Override
-    public List<OPayDetail> selectOpayDetail(OSupplement oSupplement) {
-        if(null!=oSupplement){
-            return  orderOffsetService.OffsetArrearsQuery(QueryType.ARRID.code,oSupplement.getSrcId());
-
+    public List<OPayDetail> selectOpayDetail(OPaymentDetail oPaymentDetail) {
+        if(null!=oPaymentDetail){
+            if (oPaymentDetail.getPayType().equals(PaymentType.TK.code) || oPaymentDetail.getPayType().equals(PaymentType.GZ.code)){
+                return  orderOffsetService.OffsetArrearsQuery(QueryType.SRCID.code,oPaymentDetail.getSrcId());
+            }else if (oPaymentDetail.getPayAmount().compareTo(BigDecimal.ZERO)>0){
+                return  orderOffsetService.OffsetArrearsQuery(QueryType.ARRID.code,oPaymentDetail.getId());
+            }
         }
         return new ArrayList<>();
     }

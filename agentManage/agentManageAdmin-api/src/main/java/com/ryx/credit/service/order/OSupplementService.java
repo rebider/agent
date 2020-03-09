@@ -93,6 +93,6 @@ public interface OSupplementService {
     /**
      * 查看补款详情
      */
-    public List<OPayDetail> selectOpayDetail(OSupplement oSupplement);
+    public List<OPayDetail> selectOpayDetail(OPaymentDetail oPaymentDetail);
 
 }
