@@ -673,7 +673,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             if (platformTypeList.size() != 1) {
                 for (String platFormList : platformTypeList) {
                     if(!PlatformType.whetherPOS(platFormList)){
-                        throw new ProcessException("退货只支持一个平台的退货，请重新上传SN");
+                        throw new ProcessException("退货只支持一个业务平台退货，本批次SN中存在多个业务，请分别提交!");
                     }
                 }
             }
