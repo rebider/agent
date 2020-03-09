@@ -145,6 +145,4 @@ public interface AgentBusinfoService {
      * @return
      */
     public  List<Map> agentBusByDict(FastMap reqMap);
-
-    AgentBusInfo queryPlatformDict(String agentId, String platFormNum);
 }
