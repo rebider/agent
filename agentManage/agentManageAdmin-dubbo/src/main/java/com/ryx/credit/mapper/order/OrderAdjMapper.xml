@@ -382,7 +382,7 @@
         STATUS = #{status,jdbcType=DECIMAL},
       </if>
       <if test="version != null">
-        VERSION = #{version,jdbcType=DECIMAL},
+        VERSION = VERSION + 1,
       </if>
       <if test="orgPlanNum != null">
         ORG_PLAN_NUM = #{orgPlanNum,jdbcType=DECIMAL},
@@ -415,7 +415,7 @@
         LOGICAL_VERSION = #{logicalVersion,jdbcType=DECIMAL},
       </if>
     </set>
-    where ID = #{id,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OrderAdj">
     update O_ORDER_ADJ
