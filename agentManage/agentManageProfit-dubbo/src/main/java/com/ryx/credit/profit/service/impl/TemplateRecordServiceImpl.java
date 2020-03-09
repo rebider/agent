@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -87,6 +88,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     private static final String SS_TEMPLATE_APPLY_PASS = AppConfig.getProperty("ss.template.apply.pass"); //通过，分配
     private static final String SS_TEMPLATE_APPLY_CHECK = AppConfig.getProperty("ss.template.apply.check");//校验模板是否相同模板
     private static final String SS_TEMPLATE_APPLY_CHECKNAME = AppConfig.getProperty("ss.template.apply.checkName");//校验模板名称是否重复
+    private static final String SS_TEMPLATE_APPLY_DELAPPLY = AppConfig.getProperty("ss.template.apply.delApply");
 
 
     /**
@@ -187,21 +189,43 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                 templateRecode.setTemplateName(map2.getString("mouldName"));
             }else if("RJPOS".equals(busInfo.get("PLATFORM_TYPE"))){
                 reactRJPOSApply(RJ_TEMPLATE_APPLY,map2.toJSONString(),templateRecode);
-            }else if("POS".equals(busInfo.get("PLATFORM_TYPE"))||"ZHPOS".equals(busInfo.get("PLATFORM_TYPE"))){
+            }else if("POS".equals(busInfo.get("PLATFORM_TYPE"))||"ZHPOS".equals(busInfo.get("PLATFORM_TYPE"))||"ZPOS".equals(busInfo.get("PLATFORM_TYPE"))){
                 // todo POS平台信息申请
-                result = HttpClientUtil.doPostJson(TEMPLATE_APPLY, map2.toJSONString());
-                Map<String,Object> resultMap = JSONObject.parseObject(result);
-                if(!(boolean)resultMap.get("result")){
-                    throw new MessageException(resultMap.get("msg").toString());
+
+                    result = HttpClientUtil.doPostJson(TEMPLATE_APPLY, map2.toJSONString());
+                    Map<String,Object> resultMap = JSONObject.parseObject(result);
+                    if(!(boolean)resultMap.get("result")){
+                        throw new MessageException(resultMap.get("msg").toString());
+                    }
+                try {
+                    Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
+                    templateRecode.setTemplateId(((Map) objectMap.get("applyTemplate")).get("applyId").toString());
+                    templateRecode.setBusNumS(map1.get("orgId_s"));
+                    if((boolean)objectMap.get("changeFlag")){
+                        templateRecode.setChangeflag("1");//修改啦
+                        templateRecode.setTemplateName(((Map) objectMap.get("applyTemplate")).get("templateName").toString());
+                        templateRecode.setRewardName(map1.get("rewardName")==null?"":map1.get("rewardName"));
+                    }else {
+                        if(map1.get("rewardName")==null||"".equals(map1.get("rewardName"))){
+                            throw new MessageException("本次提交没有做任何处理，请确认是否修改分润模板或者申请POS奖励");
+                        }
+                        templateRecode.setRewardName(map1.get("rewardName"));
+                        templateRecode.setChangeflag("0");//没修改
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    JSONObject map = new JSONObject();
+                    map.put("applyId",templateRecode.getTemplateId());
+                    String  resultDelete = HttpClientUtil.doPostJson(TEMPLATE_DELAPPLY, map.toJSONString());
+                    Map<String,Object> resultMapDelete = JSONObject.parseObject(resultDelete);
+                    if(!(boolean)resultMapDelete.get("result")) {
+                        logger.info("***********本地异常后删除综管数据失败，***********");
+                        throw new MessageException(resultMapDelete.get("msg").toString());
+                    }
                 }
-                Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
-                templateRecode.setTemplateId(((Map) objectMap.get("applyTemplate")).get("applyId").toString());
-                templateRecode.setTemplateName(((Map) objectMap.get("applyTemplate")).get("templateName").toString());
-                templateRecode.setBusNumS(map1.get("orgId_s"));
-               // result = HttpClientUtil.doPostJson(TEMPLATE_APPLY, map2.toJSONString());
+                // result = HttpClientUtil.doPostJson(TEMPLATE_APPLY, map2.toJSONString());
             }else if("SSPOS".equals(busInfo.get("PLATFORM_TYPE"))){
-                logger.info("请求参数："+map2.toJSONString());
-                reactRJPOSApply(SS_TEMPLATE_APPLY,map2.toJSONString(),templateRecode);
+                reactSSPOSApply(SS_TEMPLATE_APPLY,map2,templateRecode);
             }
         }catch (MessageException e){
             throw new MessageException(e.getMsg());
@@ -209,16 +233,33 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             e.printStackTrace();
             throw new MessageException("保存分润模板失败，请重试");
         }
-        templateRecode.setAgentId(map1.get("agentId"));
-        templateRecode.setAgentName(map1.get("agentName"));
-        templateRecode.setBusPlatform(map1.get("busPlatform"));
-        templateRecode.setBusNum(map1.get("orgId"));
-        templateRecode.setCreateUser(map1.get("userId"));
-        templateRecode.setCreateDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        templateRecode.setApplyResult("0");  //  0 暂存
-        templateRecode.setRev2(map1.get("rev2"));
+        try {
+            templateRecode.setAgentId(map1.get("agentId"));
+            templateRecode.setAgentName(map1.get("agentName"));
+            templateRecode.setBusPlatform(map1.get("busPlatform"));
+            templateRecode.setBusNum(map1.get("orgId"));
+            templateRecode.setCreateUser(map1.get("userId"));
+            templateRecode.setCreateDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+            templateRecode.setApplyResult("0");  //  0 暂存
+            templateRecode.setRev2(map1.get("rev2"));
 
-        recodeMapper.insertSelective(templateRecode);
+            recodeMapper.insertSelective(templateRecode);
+        }catch (Exception e){
+            e.printStackTrace();
+            try {
+                JSONObject map = new JSONObject();
+                map.put("applyId",templateRecode.getTemplateId());
+                String  resultDelete = HttpClientUtil.doPostJson(TEMPLATE_DELAPPLY, map.toJSONString());
+                Map<String,Object> resultMapDelete = JSONObject.parseObject(resultDelete);
+                if(!(boolean)resultMapDelete.get("result")) {
+                    logger.info("***********本地异常后删除综管数据失败，***********");
+                    throw new MessageException(resultMapDelete.get("msg").toString());
+                }
+            }catch (Exception e1){
+                e1.printStackTrace();
+            }
+        }
+
 
         Map startPar = agentEnterService.startPar(map1.get("userId"));
         String proceId = null;
@@ -236,7 +277,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
 
         if("POS".equals(busInfo.get("PLATFORM_TYPE"))||"ZHPOS".equals(busInfo.get("PLATFORM_TYPE"))||"ZPOS".equals(busInfo.get("PLATFORM_TYPE"))){
 
-            JSONObject monthJSONObject = new JSONObject();
+          /*  JSONObject monthJSONObject = new JSONObject();
             monthJSONObject.put("applyId", templateRecode.getTemplateId());
             monthJSONObject.put("isStartMonth", "1");
             String MonthCheckResult = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, monthJSONObject.toJSONString());
@@ -258,25 +299,37 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                         throw new MessageException("10号后分配模板，开始时间不能小于本月");
                     }
                 }
-            }
+            }*/
 
             if("beijing".equals(startPar.get("party").toString())){
                 try {
-                    JSONObject mapJSONObject = new JSONObject();
+                  /*  JSONObject mapJSONObject = new JSONObject();
                     mapJSONObject.put("applyId",templateRecode.getTemplateId());
                     mapJSONObject.put("isStartMonth","1");
                     String CheckResult = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, mapJSONObject.toJSONString());
                     Map<String,Object> resultMap = JSONObject.parseObject(CheckResult);
 
-                    Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
+                    Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");*/
 
-                    if(objectMap.get("isExist").toString().equals("1")&&map2.get("applyRewardRule")!=null&&((Map<String,String>)map2.get("applyRewardRule")).get("rewardType").equals("1")){
+                    if( templateRecode.getChangeflag().equals("0")&&map2.get("applyRewardRule")!=null&&((Map<String,String>)map2.get("applyRewardRule")).get("rewardType").equals("1")){
                         startPar.put("party","manager");
                     }else {
                         startPar.put("party","beijing");
                     }
                 }catch (Exception e){
                     e.printStackTrace();
+                    try {
+                        JSONObject map = new JSONObject();
+                        map.put("applyId",templateRecode.getTemplateId());
+                        String  resultLX = HttpClientUtil.doPostJson(TEMPLATE_DELAPPLY, map.toJSONString());
+                        Map<String,Object> resultMapLX = JSONObject.parseObject(resultLX);
+                        if(!(boolean)resultMapLX.get("result")) {
+                            logger.info("***********确定审批流向失败，***********");
+                            throw new MessageException(resultMapLX.get("msg").toString());
+                        }
+                    }catch (Exception e2){
+                        e2.printStackTrace();
+                    }
 
                 }
             }
@@ -298,7 +351,14 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             try {
                 JSONObject map = new JSONObject();
                 map.put("applyId",templateRecode.getTemplateId());
-                String  resultde = HttpClientUtil.doPostJson(TEMPLATE_DELAPPLY, map.toJSONString());
+                List<Map<String, String>> agentInfoByBusNum = recodeMapper.getAgentInfoByBusNum(templateRecode.getBusNum());
+                String platformType = agentInfoByBusNum.get(0).get("PLATFORM_TYPE");
+                String  resultde;
+                if ("SSPOS".equals(platformType)){
+                    resultde = HttpClientUtil.doPostJson(SS_TEMPLATE_APPLY_DELAPPLY, map.toJSONString());
+                }else {
+                    resultde = HttpClientUtil.doPostJson(TEMPLATE_DELAPPLY, map.toJSONString());
+                }
                 Map<String,Object> resultMap = JSONObject.parseObject(resultde);
             }catch (Exception e1){
                 e1.printStackTrace();
@@ -307,25 +367,33 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             throw new MessageException("分润模板线上申请审批流启动失败!");
         }
         BusActRel record = new BusActRel();
-        record.setBusId(templateRecode.getId());
-        record.setActivId(proceId);
-        record.setcTime(Calendar.getInstance().getTime());
-        record.setcUser(map1.get("userId"));
-        record.setAgentId(templateRecode.getAgentId());
-        record.setAgentName(templateRecode.getAgentName());
-        record.setActivStatus(AgStatus.Approving.name());
-        record.setBusType(BusActRelBusType.profitTempalteApply.name());
-        record.setDataShiro(BusActRelBusType.profitTempalteApply.key);
-        record.setExplain(templateRecode.getBusNum());
-
-        Map<String,String> reMap = stringList.get(0);
-        record.setNetInBusType("ACTIVITY_"+reMap.get("BUS_PLATFORM"));
-        record.setAgDocPro(reMap.get("AG_DOC_PRO"));
-        record.setAgDocDistrict(reMap.get("AG_DOC_DISTRICT"));
         try{
+            record.setBusId(templateRecode.getId());
+            record.setActivId(proceId);
+            record.setcTime(Calendar.getInstance().getTime());
+            record.setcUser(map1.get("userId"));
+            record.setAgentId(templateRecode.getAgentId());
+            record.setAgentName(templateRecode.getAgentName());
+            record.setActivStatus(AgStatus.Approving.name());
+            record.setBusType(BusActRelBusType.profitTempalteApply.name());
+            record.setDataShiro(BusActRelBusType.profitTempalteApply.key);
+            record.setExplain(templateRecode.getBusNum());
+
+            Map<String,String> reMap = stringList.get(0);
+            record.setNetInBusType("ACTIVITY_"+reMap.get("BUS_PLATFORM"));
+            record.setAgDocPro(reMap.get("AG_DOC_PRO"));
+            record.setAgDocDistrict(reMap.get("AG_DOC_DISTRICT"));
             taskApprovalService.addABusActRel(record);
             logger.info("分润模板线上申请审批流启动成功");
         }catch (Exception e){
+            try {
+                JSONObject map = new JSONObject();
+                map.put("applyId",templateRecode.getTemplateId());
+                String  resultde = HttpClientUtil.doPostJson(TEMPLATE_DELAPPLY, map.toJSONString());
+                Map<String,Object> resultMap = JSONObject.parseObject(resultde);
+            }catch (Exception e1){
+                e1.printStackTrace();
+            }
             e.printStackTrace();
             logger.info("分润模板线上申请审批流启动失败");
             TemplateRecodeExample pExample = new TemplateRecodeExample();
@@ -353,6 +421,52 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     private void reactRJPOSApply(String url,String json,TemplateRecode recode) throws MessageException{
         try {
            String result = HttpClientUtil.doPostJson(url, json);
+            Map<String,Object> resultMap = JSONObject.parseObject(result);
+            if(!(boolean)resultMap.get("result")){
+                 throw new MessageException(resultMap.get("msg").toString());
+             }
+             Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
+
+            recode.setTemplateId(objectMap.get("applyId").toString());
+            recode.setTemplateName(objectMap.get("templateName").toString());
+        }catch (MessageException e){
+            e.printStackTrace();
+            throw new MessageException(e.getMsg());
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new MessageException("联动平台保存信息失败！");
+        }
+    }
+
+    /**
+     * 联动SSPOS保存申请信息
+     * @param url
+     * @param json
+     * @param recode
+     * @throws MessageException
+     */
+    private void reactSSPOSApply(String url,JSONObject json,TemplateRecode recode) throws MessageException{
+        try {
+
+            JSONObject ssApiApply = new JSONObject();
+            //分润奖励(判断是否申请分润奖励)
+            BigDecimal profitReward = json.getBigDecimal("profitReward");//分润奖励值
+            String remarkReward = json.getString("remarkReward");
+            JSONObject ssApiApplyReward=null;
+            if ((remarkReward!=null&&!"".equals(remarkReward))||!profitReward.equals(BigDecimal.ZERO)){ //申请了奖励分润
+                ssApiApplyReward = new JSONObject();
+                ssApiApplyReward.put("applyId",json.getString("templateId"));
+                ssApiApplyReward.put("orgId",json.getString("orgId"));
+                ssApiApplyReward.put("ruleValue",profitReward);
+                ssApiApplyReward.put("description",remarkReward);//描述
+            }
+
+            ssApiApply.put("applyType",json.getString("applyType"));
+            ssApiApply.put("orgId",json.getString("orgId"));
+            ssApiApply.put("applyTemplate",json);
+            ssApiApply.put("applyReward",ssApiApplyReward);
+            logger.info("请求参数："+ssApiApply.toJSONString());
+           String result = HttpClientUtil.doPostJson(url, ssApiApply.toJSONString());
             Map<String,Object> resultMap = JSONObject.parseObject(result);
             if(!(boolean)resultMap.get("result")){
                  throw new MessageException(resultMap.get("msg").toString());
@@ -426,15 +540,15 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     @Override
     public String downDept(TemplateRecode recode){
         try {
-            JSONObject mapJSONObject = new JSONObject();
+       /*     JSONObject mapJSONObject = new JSONObject();
             mapJSONObject.put("applyId",recode.getTemplateId());
-            mapJSONObject.put("isStartMonth","1");
+      *//*      mapJSONObject.put("isStartMonth","1");*//*
             String CheckResult = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, mapJSONObject.toJSONString());
             Map<String,Object> resultMap = JSONObject.parseObject(CheckResult);
-            Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");
+            Map<String,Object> objectMap = (Map<String,Object>)resultMap.get("data");*/
             Map<String, Object> map = getTemplateApplyDetail(recode.getTemplateId());
             Map<String, Object> dataMap = (Map<String, Object>) map.get("data");
-            if(objectMap.get("isExist").toString().equals("1")&&dataMap.get("applyRewardRule")!=null&&((Map<String,String>)dataMap.get("applyRewardRule")).get("rewardType").equals("1")){
+            if(("0").equals(recode.getChangeflag())&&dataMap.get("applyRewardRule")!=null&&((Map<String,String>)dataMap.get("applyRewardRule")).get("rewardType").equals("1")){
                return "yuhua";
             }
         }catch (Exception e){
@@ -542,11 +656,23 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                 if(!(boolean)resultMap.get("result")){
                     throw new MessageException(resultMap.get("msg").toString());
                 }
-
+                Map<String,Object> objectMapA = (Map<String,Object>)resultMap.get("data");
+                if((boolean)objectMapA.get("changeFlag")){
+                    recode.setChangeflag("1");//修改啦
+                    recode.setTemplateName(((Map) map2.get("applyTemplate")).get("templateName").toString());
+                    recode.setRewardName(map1.get("rewardName"));
+                }else {//没修改
+                    if(map1.get("rewardName")==null||"".equals(map1.get("rewardName"))){
+                        throw new MessageException("本次提交没有做任何处理，请确认是否修改分润模板或者申请POS奖励");
+                    }
+                    recode.setTemplateName("");
+                    recode.setRewardName(map1.get("rewardName"));
+                    recode.setChangeflag("0");
+                }
             }else if("SSPOS".equals(platformType)){
                 map2.put("applyId",recode.getTemplateId());
                 map2.put("orgId",recode.getBusNum());
-                reactRJPOSApply(SS_TEMPLATE_APPLY,map2.toJSONString(),recode);
+                reactSSPOSApply(SS_TEMPLATE_APPLY,map2,recode);
             }
         }catch (MessageException e){
             throw new MessageException(e.getMsg());
@@ -577,6 +703,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             BusActRel rel =  taskApprovalService.queryBusActRel(busActRel);
             if (rel != null) {
                 TemplateRecode templateRecode = recodeMapper.selectByPrimaryKey(rel.getBusId());
+                List<Map<String, String>> agentInfoByBusNum = recodeMapper.getAgentInfoByBusNum(templateRecode.getBusNum());
                 if("1".equals(status)){ //通过
                     templateRecode.setApplyResult("4"); // 通过
                     //JSONObject map2 = new JSONObject();
@@ -595,10 +722,16 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
                    // }
                 }else{
                     templateRecode.setApplyResult("3"); // 撤销
+                    String platformType = agentInfoByBusNum.get(0).get("PLATFORM_TYPE");
                     try {
                         JSONObject map = new JSONObject();
                         map.put("applyId",templateRecode.getTemplateId());
-                        String  result = HttpClientUtil.doPostJson(TEMPLATE_DELAPPLY, map.toJSONString());
+                        String  result;
+                        if ("SSPOS".equals(platformType)){
+                           result = HttpClientUtil.doPostJson(SS_TEMPLATE_APPLY_DELAPPLY, map.toJSONString());
+                        }else {
+                            result = HttpClientUtil.doPostJson(TEMPLATE_DELAPPLY, map.toJSONString());
+                        }
                         Map<String,Object> resultMap = JSONObject.parseObject(result);
                         if(!(boolean)resultMap.get("result")) {
                             logger.info("***********修改删除综管数据失败，***********");
@@ -711,7 +844,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             }else if("RJPOS".equals(stringMap.get("PLATFORM_TYPE"))){ // 瑞+
                 result = HttpClientUtil.doPostJson(RJ_TEMPLATE_APPLY_CHECK, map2.toJSONString());
             }else if("POS".equals(stringMap.get("PLATFORM_TYPE"))||"ZHPOS".equals(stringMap.get("PLATFORM_TYPE"))||"ZPOS".equals(stringMap.get("PLATFORM_TYPE"))){
-                JSONObject mapJSONObject = new JSONObject();
+               /* JSONObject mapJSONObject = new JSONObject();
                 mapJSONObject.put("applyId",templateRecode.getTemplateId());
                 mapJSONObject.put("isStartMonth","1");
                 String CheckResult = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, mapJSONObject.toJSONString());
@@ -721,7 +854,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
 
                 if(objectM.get("isExist").toString().equals("1")){
                     map2.put("isStartMonth",1);
-                }
+                }*/
                 result = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, map2.toJSONString());
             }else if("SSPOS".equals(stringMap.get("PLATFORM_TYPE"))){//实时分润
                 result = HttpClientUtil.doPostJson(SS_TEMPLATE_APPLY_CHECK, map2.toJSONString());
@@ -765,18 +898,27 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
             } else if("RJPOS".equals(stringMap.get("PLATFORM_TYPE"))){ // 瑞+
                 result = HttpClientUtil.doPostJson(RJ_TEMPLATE_APPLY_CHECKNAME, map2.toJSONString());
             }else if("POS".equals(stringMap.get("PLATFORM_TYPE"))||"ZHPOS".equals(stringMap.get("PLATFORM_TYPE"))||"ZPOS".equals(stringMap.get("PLATFORM_TYPE"))){
-                JSONObject mapJSONObject = new JSONObject();
+                /*JSONObject mapJSONObject = new JSONObject();
                 mapJSONObject.put("applyId",templateRecode.getTemplateId());
                 mapJSONObject.put("isStartMonth","1");
                 String CheckResult = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECK, mapJSONObject.toJSONString());
+                Map<String,Object> resultM = JSONObject.parseObject(CheckResult);
+                Map<String,Object> objectM = (Map<String,Object>)resultM.get("data");*/
+
+                if(("0").equals(templateRecode.getChangeflag())){
+                    return true;
+                }
+                result = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECKNAME, map2.toJSONString());
+            }else if ("SSPOS".equals(stringMap.get("PLATFORM_TYPE"))){
+                JSONObject param = new JSONObject();
+                param.put("applyId",templateRecode.getTemplateId());
+                String CheckResult = HttpClientUtil.doPostJson(SS_TEMPLATE_APPLY_CHECK, param.toJSONString());
                 Map<String,Object> resultM = JSONObject.parseObject(CheckResult);
                 Map<String,Object> objectM = (Map<String,Object>)resultM.get("data");
 
                 if(objectM.get("isExist").toString().equals("1")){
                     return true;
                 }
-                result = HttpClientUtil.doPostJson(TEMPLATE_APPLY_CHECKNAME, map2.toJSONString());
-            }else if ("SSPOS".equals(stringMap.get("PLATFORM_TYPE"))){
                 result = HttpClientUtil.doPostJson(SS_TEMPLATE_APPLY_CHECKNAME, map2.toJSONString());
             }
             Map<String,Object> resultMap = JSONObject.parseObject(result);

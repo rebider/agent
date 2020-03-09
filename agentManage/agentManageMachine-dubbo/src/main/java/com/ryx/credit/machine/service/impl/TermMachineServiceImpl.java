@@ -176,9 +176,9 @@ public class TermMachineServiceImpl  implements TermMachineService {
 
     @Override
     public AgentResult queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailLists, String operation) throws Exception {
-       String type = terminalTransferDetailLists.get(0).getPlatformType().toString();
+        String type = terminalTransferDetailLists.get(0).getPlatformType().toString();
         logger.info("本次联动请求类型为:{}",type);
-      if("1".equals(type)){//pos
+      if("1".equals(type)||"4".equals(type)){//pos
             return   posTermMachineServiceImpl.queryTerminalTransfer(terminalTransferDetailLists,operation);
         }else if("2".equals(type)){//手刷
             return   mposTermMachineServiceImpl.queryTerminalTransfer(terminalTransferDetailLists,operation);
@@ -246,13 +246,13 @@ public class TermMachineServiceImpl  implements TermMachineService {
         if (PlatformType.whetherPOS(platformType)) {
             return posTermMachineServiceImpl.checkModleIsEq(data, platformType);
         } else if (PlatformType.SSPOS.getValue().equals(platformType)) {
-            return false;
+            return sPosTermMachineServiceImpl.checkModleIsEq(data, platformType);
         } else if (PlatformType.MPOS.getValue().equals(platformType)) {
-            return false;
+            return mposTermMachineServiceImpl.checkModleIsEq(data, platformType);
         } else if (PlatformType.RDBPOS.getValue().equals(platformType)) {
             return rdbTermMachineServiceImpl.checkModleIsEq(data, platformType);
         } else {
-            return false;
+            return true;
         }
     }
 

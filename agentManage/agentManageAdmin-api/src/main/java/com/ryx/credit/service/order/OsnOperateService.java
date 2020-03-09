@@ -2,6 +2,7 @@ package com.ryx.credit.service.order;
 
 import com.ryx.credit.common.enumc.LogType;
 import com.ryx.credit.common.enumc.LogisticsSendStatus;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -71,4 +72,13 @@ public interface OsnOperateService {
      * @return
      */
     Map<String, Object> sendInfoToBusinessSystem(List<OLogisticsDetail>  datas, String logcId, BigDecimal batch)throws Exception;
+
+
+    /**
+     * 检验SN是否处于审批状态
+     * @param fastMap
+     * @return
+     * @throws Exception
+     */
+    FastMap checkSNApproval(FastMap fastMap);
 }

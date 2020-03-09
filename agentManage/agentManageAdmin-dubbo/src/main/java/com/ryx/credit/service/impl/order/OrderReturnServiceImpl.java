@@ -139,6 +139,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     @Autowired
     private OActivityVisibleMapper activityVisibleMapper;
     @Autowired
+    private OsnOperateService osnOperateService;
+    @Autowired
     private OrderOffsetService orderOffsetService;
     @Autowired
     private OPayDetailMapper oPayDetailMapper;
@@ -222,32 +224,56 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      * @Date: 20:25 2018/7/27
      */
     @Override
-    @Transactional
-    public Map<String, Object> saveCut(String returnId, String amt, String ctype) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    public Map<String, Object> saveCut(String returnId, String amt, String ctype) throws MessageException {
 
         Map<String, Object> map = new HashMap<>();
-
         OReturnOrder returnOrder = returnOrderMapper.selectByPrimaryKey(returnId);
 
-        ODeductCapital deductCapital = new ODeductCapital();
-        deductCapital.setId(idService.genId(TabId.o_deduct_capital));
-        deductCapital.setcAmount(new BigDecimal(amt));
-        deductCapital.setcType(ctype);
-        deductCapital.setcAgentId(returnOrder.getAgentId());
-        deductCapital.setSourceId(returnId);
-        deductCapital.setcTime(new Date());
-        deductCapitalMapper.insertSelective(deductCapital);
+        //查询，如果是修改，就更新
+        List<ODeductCapital> deductCapitals = deductCapitalMapper.selectCountByMap(FastMap.fastMap("returnId", returnId).putKeyV("cType", ctype));
+        if (deductCapitals.size() == 1) {
+            ODeductCapital oDeductCapital = deductCapitals.get(0);
+            BigDecimal amtBack = oDeductCapital.getcAmount();
 
-        returnOrder.setCutAmo(returnOrder.getCutAmo().add(new BigDecimal(amt)));
-        returnOrder.setReturnAmo(returnOrder.getReturnAmo().subtract(new BigDecimal(amt)));
-        returnOrder.setuTime(new Date());
-        returnOrderMapper.updateByPrimaryKeySelective(returnOrder);
-
-        map.put("goodsReturnAmo", returnOrder.getGoodsReturnAmo());
-        map.put("returnAmo", returnOrder.getReturnAmo());
-        map.put("cutAmo", returnOrder.getCutAmo());
-        map.put("cutId", deductCapital.getId());
-
+            oDeductCapital.setcAmount(new BigDecimal(amt));
+            deductCapitalMapper.updateByPrimaryKey(oDeductCapital);
+            //退货单更新
+            if (returnOrder.getReturnAmo().add(amtBack).subtract(new BigDecimal(amt)).compareTo(new BigDecimal(0)) < 0) {
+                throw new MessageException("扣款金额不能大于机具金额！");
+            }
+            returnOrder.setCutAmo(returnOrder.getCutAmo().add(new BigDecimal(amt)).subtract(amtBack));
+            returnOrder.setReturnAmo(returnOrder.getReturnAmo().add(amtBack).subtract(new BigDecimal(amt)));
+            returnOrder.setuTime(new Date());
+            returnOrderMapper.updateByPrimaryKeySelective(returnOrder);
+            //返回参数封装
+            map.put("cutId", oDeductCapital.getId());
+            map.put("goodsReturnAmo", returnOrder.getGoodsReturnAmo());
+            map.put("returnAmo", returnOrder.getReturnAmo());
+            map.put("cutAmo", returnOrder.getCutAmo());
+        } else {
+            ODeductCapital deductCapital = new ODeductCapital();
+            deductCapital.setId(idService.genId(TabId.o_deduct_capital));
+            deductCapital.setcAmount(new BigDecimal(amt));
+            deductCapital.setcType(ctype);
+            deductCapital.setcAgentId(returnOrder.getAgentId());
+            deductCapital.setSourceId(returnId);
+            deductCapital.setcTime(new Date());
+            deductCapitalMapper.insertSelective(deductCapital);
+            //退货单更新
+            if (returnOrder.getReturnAmo().subtract(new BigDecimal(amt)).compareTo(new BigDecimal(0)) < 0) {
+                throw new MessageException("扣款金额不能大于机具金额！");
+            }
+            returnOrder.setCutAmo(returnOrder.getCutAmo().add(new BigDecimal(amt)));
+            returnOrder.setReturnAmo(returnOrder.getReturnAmo().subtract(new BigDecimal(amt)));
+            returnOrder.setuTime(new Date());
+            returnOrderMapper.updateByPrimaryKeySelective(returnOrder);
+            //返回参数封装
+            map.put("cutId", deductCapital.getId());
+            map.put("goodsReturnAmo", returnOrder.getGoodsReturnAmo());
+            map.put("returnAmo", returnOrder.getReturnAmo());
+            map.put("cutAmo", returnOrder.getCutAmo());
+        }
         return map;
     }
 
@@ -630,12 +656,13 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 String endSn = (String) map.get("endSn");
                 Integer begins = (Integer) map.get("begins");
                 Integer finish = (Integer) map.get("finish");
-                int checkCount = returnOrderDetailMapper.checkSnIsReturn(FastMap
-                        .fastMap("begin",startSn)
-                        .putKeyV("end",endSn)
-                        .putKeyV("sts",Arrays.asList(RetSchedule.DFH.code,RetSchedule.FHZ.code,RetSchedule.SPZ.code,RetSchedule.TH.code,RetSchedule.TKZ.code,RetSchedule.YFH.code))
-                );
-                if(checkCount>0)throw new ProcessException(startSn+":"+endSn+"在退货中");
+
+                //检查sn是否在划拨，换活动，退货中
+                FastMap fastMap = osnOperateService.checkSNApproval(FastMap
+                        .fastMap("beginSN", startSn)
+                        .putKeyV("endSN", endSn));
+                if (!FastMap.isSuc(fastMap)) throw new ProcessException(fastMap.get("msg").toString());
+
                 List<String> sns = logisticsDetailService.querySnLList(startSn, endSn);
                 for (String sn : sns) {
                     //根据sn查询物流信息
@@ -727,6 +754,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         BigDecimal invoiceTotalAmt = BigDecimal.ZERO;      //发票总金额
         BigDecimal isCloInvoice = Status.STATUS_0.status;  //是否开具发票
         String collectCompany = "7";  //北京财务
+        Set<String> agDocDistrict = new HashSet<>();
+        Set<String> agDocPro = new HashSet<>();
+        Set<String> busPlatform = new HashSet<>();
         for (Map<String, Object> map : list) {
 
             String orderId = (String) map.get("orderId");
@@ -818,6 +848,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             snMap.put("taskId", returnOrderDetail.getId());
             snMap.put("orderId", returnOrderDetail.getOrderId());
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByOrderId(returnOrderDetail.getOrderId());
+            agDocDistrict.add(agentBusInfo.getAgDocDistrict());
+            agDocPro.add(agentBusInfo.getAgDocPro());
+            busPlatform.add(agentBusInfo.getBusPlatform());
             snMap.put("agencyId", agentBusInfo.getBusNum());
             snList.add(snMap);
         }
@@ -977,13 +1010,16 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(agentId);
         record.setDataShiro(BusActRelBusType.refund.key);
-
         Agent agent = agentMapper.selectByPrimaryKey(agentId);
         if(agent!=null) {
             record.setAgentName(agent.getAgName());
         }
-        record.setAgDocDistrict(agent.getAgDocDistrict());
-        record.setAgDocPro(agent.getAgDocPro());
+        if (busPlatform.size() != 1 || agDocDistrict.size() != 1 || agDocPro.size() != 1) {
+            throw new ProcessException("一次只能提交一种业务类型的机具！");
+        }
+        record.setNetInBusType("ACTIVITY_" + busPlatform.iterator().next());
+        record.setAgDocDistrict(agDocDistrict.iterator().next());
+        record.setAgDocPro(agDocPro.iterator().next());
         if (1 != busActRelMapper.insertSelective(record)) {
             log.info("退货提交审批，启动审批异常，添加审批关系失败{}:{}", returnId, proce);
             throw new ProcessException("退货审批流启动失败:添加审批关系失败");
@@ -2787,5 +2823,17 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             throw e;
         }
     }
+    /**
+     * 查询扣款信息
+     */
+    public Map<String, Object> deductDetail(String returnId) throws ProcessException {
+        Map<String, Object> map = new HashMap<>();
+        //查询扣款款项
+        ODeductCapitalExample deductCapitalExample = new ODeductCapitalExample();
+        deductCapitalExample.or().andSourceIdEqualTo(returnId);
+        List<ODeductCapital> deductCapitals = deductCapitalMapper.selectByExample(deductCapitalExample);
 
+        map.put("deductCapitals", deductCapitals);
+        return map;
+    }
 }

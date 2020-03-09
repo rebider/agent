@@ -50,7 +50,6 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
 
     private static final Logger logger = LoggerFactory.getLogger(OldOrderReturnServiceImpl.class);
 
-
     @Resource(name = "oldOrderReturnService")
     private OldOrderReturnService oldOrderReturnService;
     @Autowired
@@ -116,6 +115,10 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
     @Autowired
     private ORefundPriceDiffMapper refundPriceDiffMapper;
     @Autowired
+    private ODeductCapitalMapper deductCapitalMapper;
+    @Autowired
+    private OsnOperateService osnOperateService;
+    @Autowired
     private OrderOffsetService orderOffsetService;
     @Autowired
     private OPayDetailMapper oPayDetailMapper;
@@ -150,13 +153,13 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                     oldOrderReturnSubmitProVo.getReturnCount().compareTo(BigDecimal.ZERO)<=0){
                 return AgentResult.fail("数量必须大于0");
             }
-            //检查sn是否在退货中
-            int checkCount = returnOrderDetailMapper.checkSnIsReturn(FastMap
-                   .fastMap("begin",oldOrderReturnSubmitProVo.getSnStart())
-                   .putKeyV("end",oldOrderReturnSubmitProVo.getSnEnd())
-                   .putKeyV("sts",Arrays.asList(RetSchedule.DFH.code,RetSchedule.FHZ.code,RetSchedule.SPZ.code,RetSchedule.TH.code,RetSchedule.TKZ.code,RetSchedule.YFH.code))
+
+            //检查sn是否在划拨，换活动，退货中
+            FastMap fastMap = osnOperateService.checkSNApproval(FastMap
+                    .fastMap("beginSN",oldOrderReturnSubmitProVo.getSnStart())
+                    .putKeyV("endSN",oldOrderReturnSubmitProVo.getSnEnd())
             );
-            if(checkCount>0)  return AgentResult.fail(oldOrderReturnSubmitProVo.getSnStart()+":"+oldOrderReturnSubmitProVo.getSnEnd()+"在退货中");
+            if (!FastMap.isSuc(fastMap)) return AgentResult.fail(fastMap.get("msg").toString());
 
             //检查机构编号
             String org = redisService.getValue(oldOrderReturnSubmitProVo.getSnStart()+","+oldOrderReturnSubmitProVo.getSnEnd()+"_org");
@@ -168,16 +171,6 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                    return AgentResult.fail(oldOrderReturnSubmitProVo.getSnStart()+","+oldOrderReturnSubmitProVo.getSnEnd()+"不是代理商"+agent.getAgName()+"的sn");
                }
             }
-
-            //检查历史订单是否换活动中
-            int approvingRow = refundPriceDiffMapper.selectReviewStatusBySN(FastMap
-                    .fastMap("beginSn", oldOrderReturnSubmitProVo.getSnStart())
-                    .putKeyV("endSn", oldOrderReturnSubmitProVo.getSnEnd())
-                    .putKeyV("reviewStatus", AgStatus.Approving.status));
-            if (approvingRow > 0){
-                return AgentResult.fail(oldOrderReturnSubmitProVo.getSnStart()+","+oldOrderReturnSubmitProVo.getSnEnd()+"：活动调整中，不可退货！");
-            }
-
         }
 
         //保存审批中的退货申请单
@@ -207,6 +200,9 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         String platform = "";
         BigDecimal tt = BigDecimal.ZERO;
         OReturnOrderDetail oReturnOrderDetail = new OReturnOrderDetail();
+        Set<String> agDocDistrict = new HashSet<>();
+        Set<String> agDocPro = new HashSet<>();
+        Set<String> busPlatform = new HashSet<>();
         for (OldOrderReturnSubmitProVo oldOrderReturnSubmitProVo : oldOrderReturnVo.getOldOrderReturnSubmitProVoList()) {
             List<OLogisticsDetail>  details = logisticsDetailMapper.querySnCountObj(
                     FastMap.fastMap("snBegin",oldOrderReturnSubmitProVo.getSnStart())
@@ -254,6 +250,10 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             platform = redisService.getValue(oldOrderReturnSubmitProVo.getSnStart() + "," + oldOrderReturnSubmitProVo.getSnEnd() + "_plat");
             snMap.put("agencyId", busNum);
             snList.add(snMap);
+            List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.queryBusinfo(FastMap.fastMap("agentId", oldOrderReturnVo.getAgentId()).putKeyV("busNum", busNum));
+            agDocDistrict.add(agentBusInfos.get(0).getAgDocDistrict());
+            agDocPro.add(agentBusInfos.get(0).getAgDocPro());
+            busPlatform.add(agentBusInfos.get(0).getBusPlatform());
         }
 
         //退货单添加
@@ -292,6 +292,12 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         record.setDataShiro(BusActRelBusType.refund.key);//退货权限数据
         record.setAgDocDistrict(agent.getAgDocDistrict());
         record.setAgDocPro(agent.getAgDocPro());
+        if (busPlatform.size() != 1 || agDocDistrict.size() != 1 || agDocPro.size() != 1) {
+            throw new ProcessException("一次只能提交一种业务类型的机具！");
+        }
+        record.setNetInBusType("ACTIVITY_" + busPlatform.iterator().next());
+        record.setAgDocDistrict(agDocDistrict.iterator().next());
+        record.setAgDocPro(agDocPro.iterator().next());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("历史订单退货流程审批，启动审批异常，添加审批关系失败{}:{}", oReturnOrder.getId(), processingId);
             throw new MessageException("审批流启动失败:添加审批关系失败");
@@ -306,9 +312,16 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         return AgentResult.ok();
     }
 
+    /**
+     * 退货明细
+     * @param returnId
+     * @return
+     */
     @Override
     public AgentResult loadOldOrderApproveData(String returnId){
+        //退货单
         OReturnOrder oReturnOrder = returnOrderMapper.selectByPrimaryKey(returnId);
+        //退货明细
         OReturnOrderDetailExample oReturnOrderDetailExample = new OReturnOrderDetailExample();
         oReturnOrderDetailExample.or().andReturnIdEqualTo(returnId).andStatusEqualTo(Status.STATUS_1.status);
         List<OReturnOrderDetail> details  =returnOrderDetailMapper.selectByExample(oReturnOrderDetailExample);
@@ -316,9 +329,16 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             List<String> listAct = redisService.lrange(detail.getBeginSn()+","+detail.getEndSn()+"_act",0,-1);
             detail.setAct(listAct.size()>0?oActivityMapper.selectByPrimaryKey(listAct.get(0)):null);
         }
+        //退款信息
+        ODeductCapitalExample ODeductCapitalExample = new ODeductCapitalExample();
+        ODeductCapitalExample.or().andSourceIdEqualTo(returnId);
+        List<ODeductCapital> oDeductCapitals = deductCapitalMapper.selectByExample(ODeductCapitalExample);
+
         AgentResult agentResult = AgentResult.ok();
         agentResult.setMapData(
-                FastMap.fastMap("details",details).putKeyV("oReturnOrder",oReturnOrder)
+                FastMap.fastMap("details", details)
+                        .putKeyV("oReturnOrder", oReturnOrder)
+                        .putKeyV("oDeductCapitals", oDeductCapitals)
         );
         return agentResult;
     }
@@ -360,7 +380,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         //保存抵扣信息
         if(agentVo.getDeductCapitalList()!=null && agentVo.getDeductCapitalList().size()>0 && "pass".equals(agentVo.getApprovalResult())){
             for (ODeductCapital oDeductCapital : agentVo.getDeductCapitalList()) {
-                if(null!=oDeductCapital.getcAmount() && oDeductCapital.getcAmount().compareTo(BigDecimal.ZERO)>0) {
+                if(null!=oDeductCapital.getcAmount() && oDeductCapital.getcAmount().compareTo(BigDecimal.ZERO) >= 0) {
                     iOrderReturnService.saveCut(agentVo.getReturnId(), oDeductCapital.getcAmount().toString(), oDeductCapital.getcType());
                 }
             }
@@ -1170,19 +1190,11 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                 throw new MessageException("导入解析文件失败，检查是否缺少字段");
             }
             try {
-                //检查是否在退货中
-                int checkCount = returnOrderDetailMapper.checkSnIsReturn(FastMap
-                        .fastMap("begin",snBegin)
-                        .putKeyV("end",snEnd)
-                        .putKeyV("sts",Arrays.asList(
-                                RetSchedule.DFH.code,
-                                RetSchedule.FHZ.code,
-                                RetSchedule.SPZ.code,
-                                RetSchedule.TH.code,
-                                RetSchedule.TKZ.code,
-                                RetSchedule.YFH.code))
-                );
-                if(checkCount>0)  return AgentResult.fail(snEnd+":"+snEnd+"在退货中");
+                //检查sn是否在划拨，换活动，退货中
+                FastMap fastMap = osnOperateService.checkSNApproval(FastMap
+                        .fastMap("beginSN", snBegin)
+                        .putKeyV("endSN", snEnd));
+                if (!FastMap.isSuc(fastMap)) return AgentResult.fail(fastMap.get("msg").toString());
 
                 Dict modelType = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MODEL_TYPE.name(),proModel);
                 if(modelType==null){

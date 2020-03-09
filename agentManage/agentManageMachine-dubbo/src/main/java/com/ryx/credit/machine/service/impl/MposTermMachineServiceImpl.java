@@ -283,7 +283,7 @@ public class MposTermMachineServiceImpl implements TermMachineService {
 
     @Override
     public boolean checkModleIsEq(Map<String, String> data, String platformType) {
-        return false;
+        return true;
     }
 
     @Override

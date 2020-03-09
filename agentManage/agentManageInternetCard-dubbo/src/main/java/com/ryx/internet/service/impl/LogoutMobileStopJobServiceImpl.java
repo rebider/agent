@@ -78,21 +78,22 @@ public class LogoutMobileStopJobServiceImpl implements LogoutMobileStopJobServic
                     OInternetCard oInternetCard = internetCardMapper.selectByPrimaryKey(internetLogoutDetail.getIccidNum());
                     if(StringUtils.isBlank(mobileResult)){
                         log.info("logoutMobileStopJob申请注销明细通知移动，mobileResult：{}",mobileResult);
-                        internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.TJSB.getValue());
-                        internetLogoutDetail.setFailCause("请求异常,结果未知");
-                        internetLogoutDetail.setuTime(new Date());
-                        int i = internetLogoutDetailMapper.updateByPrimaryKey(internetLogoutDetail);
-                        if(i!=1){
-                            AppConfig.sendEmails("logoutMobileStopJob申请注销明细通知移动，更新异常1，iccid："+internetLogoutDetail.getIccidNum(), "申请注销明细通知移动出现异常,logoutMobileStopJob方法");
-                            continue;
-                        }
-                        oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
-                        oInternetCard.setuTime(new Date());
-                        int k = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
-                        if(k!=1){
-                            AppConfig.sendEmails("logoutMobileStopJob申请注销明细通知移动，更新异常2，iccid："+internetLogoutDetail.getIccidNum(), "申请注销明细通知移动出现异常,logoutMobileStopJob方法");
-                            continue;
-                        }
+                        continue;
+//                        internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.TJSB.getValue());
+//                        internetLogoutDetail.setFailCause("请求异常,结果未知");
+//                        internetLogoutDetail.setuTime(new Date());
+//                        int i = internetLogoutDetailMapper.updateByPrimaryKey(internetLogoutDetail);
+//                        if(i!=1){
+//                            AppConfig.sendEmails("logoutMobileStopJob申请注销明细通知移动，更新异常1，iccid："+internetLogoutDetail.getIccidNum(), "申请注销明细通知移动出现异常,logoutMobileStopJob方法");
+//                            continue;
+//                        }
+//                        oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
+//                        oInternetCard.setuTime(new Date());
+//                        int k = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
+//                        if(k!=1){
+//                            AppConfig.sendEmails("logoutMobileStopJob申请注销明细通知移动，更新异常2，iccid："+internetLogoutDetail.getIccidNum(), "申请注销明细通知移动出现异常,logoutMobileStopJob方法");
+//                            continue;
+//                        }
                     }
                     JSONObject jsonObj = JSONObject.parseObject(mobileResult);
                     String code = jsonObj.getString("code");

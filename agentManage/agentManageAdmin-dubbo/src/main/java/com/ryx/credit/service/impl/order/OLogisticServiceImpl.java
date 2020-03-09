@@ -1052,15 +1052,22 @@ public class OLogisticServiceImpl implements OLogisticsService {
         //更新排单表发货数量
         ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(oLogistics.getReceiptPlanId());
         if (receiptPlan != null) {
-            //更新发货数量
-            if(receiptPlan.getSendProNum() != null && (receiptPlan.getSendProNum().subtract(oLogistics.getSendNum())).compareTo(BigDecimal.ZERO) >= 0) {
+            //更新发货数量，和排单状态
+            if(receiptPlan.getSendProNum() != null && (receiptPlan.getSendProNum().subtract(oLogistics.getSendNum())).compareTo(BigDecimal.ZERO) > 0) {
+                //1，多次发货，不更新排单状态，
                 receiptPlan.setSendProNum(receiptPlan.getSendProNum().subtract(oLogistics.getSendNum()));
+            } else if (receiptPlan.getSendProNum() != null && (receiptPlan.getSendProNum().subtract(oLogistics.getSendNum())).compareTo(BigDecimal.ZERO) == 0) {
+                //2，回滚后，发货数量为 0，更新排单状态为‘已排单’
+                receiptPlan.setSendProNum(receiptPlan.getSendProNum().subtract(oLogistics.getSendNum()));
+                receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.InTheDeliver.getValue()));
             } else {
                 throw new MessageException("排单发货数量异常！");
             }
+
             if (receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan)!= 1) {
                 throw new MessageException("更新排单数据失败！");
             }
+
             logger.info("删除物流更新排单数据:{}", JSONObject.toJSON(receiptPlan));
         } else {
             throw new MessageException("排单信息未找到！");

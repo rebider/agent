@@ -465,4 +465,24 @@
             AND dd.end_sn = #{map.endSn,jdbcType=VARCHAR}
             AND d.review_status = #{map.reviewStatus,jdbcType=VARCHAR}
     </select>
+
+    <!-- 查询退补差价是不是审批中 -->
+    <select id="checkSnIsRefund" parameterType="map" resultType="int">
+        select count(a.id) from o_Refund_price_diff_detail a
+        left join o_Refund_price_diff b on a.refund_price_diff_id = b.id
+        WHERE
+            (
+              a.begin_sn &lt;= #{begin,jdbcType=VARCHAR}
+              and a.end_sn &gt;= #{begin,jdbcType=VARCHAR}
+              and length(a.begin_sn) = LENGTH(#{begin,jdbcType=VARCHAR})
+              and  b.review_status  = ${reviewStatus}
+            )
+            or
+            (
+              a.begin_sn &lt;= #{end,jdbcType=VARCHAR}
+              and a.end_sn &gt;= #{end,jdbcType=VARCHAR}
+              and length(a.end_sn) = LENGTH(#{end,jdbcType=VARCHAR})
+              and  b.review_status = ${reviewStatus}
+            )
+    </select>
 </mapper>
