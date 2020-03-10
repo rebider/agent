@@ -349,6 +349,16 @@
     left join jo_key_manage jm0 on jm0.id = jm1.jo_key_back_num
     left join jo_key_manage jm2 on jm2.id = jo.jo_second_key_num
     left join jo_key_manage jm3 on jm3.id = jo.priority_level
+    LEFT JOIN (select m1.jo_key top_key,
+                    m2.jo_key first_key,
+                    m3.jo_key second_key,
+                    m1.jo_key_name || '-' || m2.jo_key_name || '-' || m3.jo_key_name as order_type
+                    from JO_KEY_MANAGE m1
+                    left join JO_KEY_MANAGE m2
+                    on m2.JO_KEY_BACK_NUM = m1.jo_key
+                    left join jo_key_manage m3
+                    on m3.jo_key_back_num = m2.jo_key
+                    where m1.jo_key_type = '0') ot ON ot.second_key = jo.jo_second_key_num
     <if test="_parameter != null">
       <include refid="TaskVoExample_Where_Clause" />
     </if>
@@ -377,6 +387,9 @@
       </if>
       <if test="example.launchBranchName != null and example.launchBranchName != ''">
         and jo.launch_branch_name like  CONCAT(CONCAT('%',#{example.launchBranchName}),'%')
+      </if>
+      <if test="example.orderType != null and example.orderType != ''">
+        and ot.order_type like CONCAT(CONCAT('%',#{example.orderType}),'%')
       </if>
       <if test="example.busNum != null and example.busNum != '' ">
         and jo.bus_num = #{example.busNum}

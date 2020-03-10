@@ -10,6 +10,8 @@ public class JoTaskVo extends JoOrder {
 
     private String joDealPersonName;
 
+    private String orderType;
+
     private String secondDealGroup;
 
     private String joDealGroupId;
@@ -39,6 +41,14 @@ public class JoTaskVo extends JoOrder {
     private Date joAcceptTimeBegin;
 
     private Date joAcceptTimeEnd;
+
+    public String getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
+    }
 
     public String getSecondDealGroup() {
         return secondDealGroup;
