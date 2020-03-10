@@ -204,11 +204,16 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         ODeductCapitalExample deductCapitalExample = new ODeductCapitalExample();
         deductCapitalExample.or().andSourceIdEqualTo(returnId);
         List<ODeductCapital> deductCapitals = deductCapitalMapper.selectByExample(deductCapitalExample);
+        Map<String, Object> typeAmt = new HashMap<>();
+        for (ODeductCapital oDeductCapital : deductCapitals) {
+            typeAmt.put(oDeductCapital.getcType(), oDeductCapital.getcAmount());
+        }
 
         map.put("returnOrder", returnOrder);
         map.put("returnDetails", returnDetails);
         map.put("deductCapitals", deductCapitals);
         map.put("receiptPlans", receiptPlans);
+        map.put("typeAmt", typeAmt);
 
         return map;
     }
