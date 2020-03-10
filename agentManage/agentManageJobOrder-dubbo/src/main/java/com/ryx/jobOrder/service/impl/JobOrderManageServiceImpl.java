@@ -56,6 +56,9 @@ public class JobOrderManageServiceImpl implements JobOrderManageService {
             if (StringUtils.isNotBlank(joKeyManage.getJoKeyName())) {
                 map.put("joKeyName", joKeyManage.getJoKeyName());
             }
+            if (StringUtils.isNotBlank(joKeyManage.getJoKeyBackNum())) {
+                map.put("joKeyBackNum", joKeyManage.getJoKeyBackNum());
+            }
         }
         List<Map<String, Object>> joCustomKeyList = joKeyManageMapper.keywordList(map, page);
         PageInfo pageInfo = new PageInfo();
