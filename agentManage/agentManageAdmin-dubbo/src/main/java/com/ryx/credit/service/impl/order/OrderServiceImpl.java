@@ -5266,6 +5266,7 @@ public class OrderServiceImpl implements OrderService {
                     if (agentResult.isOK()){
                         BigDecimal residue =  (BigDecimal) agentResult.getMapData().get("residueAmt");
                         orderAdj.setOffsetAmount(amount.subtract(proRefundAmo).subtract(takeout_amount).subtract(residue));
+                        orderAdj.setRealRefundAmo(amount.subtract(proRefundAmo).subtract(takeout_amount).subtract(orderAdj.getOffsetAmount()));
                         if(!orderService.approvalTaskSettle(orderAdj).isOK()){
                             throw new ProcessException("更新订单调整记录失败!");
                         };
