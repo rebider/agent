@@ -4439,7 +4439,7 @@ public class OrderServiceImpl implements OrderService {
                 .andOrderIdEqualTo(orderUpModelVo.getOrderId())
                 .andPaymentTypeEqualTo(PamentIdType.ORDER_FKD.code)
                 .andStatusEqualTo(Status.STATUS_1.status)
-                .andPaymentStatusEqualTo(PaymentStatus.DF.code);
+                .andPaymentStatusIn(Arrays.asList(PaymentStatus.DF.code, PaymentStatus.BF.code, PaymentStatus.YQ.code));
         oPaymentDetailExample.setOrderByClause(" pay_time asc, plan_num asc, plan_pay_time asc ");
         List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
         BigDecimal unpaySize = BigDecimal.ZERO;
@@ -4460,7 +4460,7 @@ public class OrderServiceImpl implements OrderService {
         orderAdj.setOrgPlanNum(unpaySize);//剩余分期次数
         orderAdj.setStagesAmount(new BigDecimal(orderUpModelVo.getAdjRepayment()));//预计分期金额
         orderAdj.setRefundAmount(new BigDecimal(orderUpModelVo.getRefundAmount()));//退款金额
-        orderAdj.setOrgPaymentId(oPaymentDetails.get(0).getBatchCode());//原还款计划批次号
+        orderAdj.setOrgPaymentId(oPaymentDetails.size()==0?"":oPaymentDetails.get(0).getBatchCode());//原还款计划批次号
         orderAdj.setReson(orderUpModelVo.getReson());
         orderAdj.setRefundMethod(new BigDecimal(orderUpModelVo.getRefundMethod()));
         orderAdj.setProRefundAmount(BigDecimal.ZERO);
@@ -4748,24 +4748,24 @@ public class OrderServiceImpl implements OrderService {
             OPaymentDetailExample oPaymentDetailExample1 = new OPaymentDetailExample();
             if (orderAdj.getReviewsStat().compareTo(AgStatus.Approved.status) == 0){
                 oPaymentDetailExample.or()
-                        .andBatchCodeEqualTo(orderAdj.getNewPaymentId())
+                        .andBatchCodeEqualTo(orderAdj.getNewPaymentId()==null?"":orderAdj.getNewPaymentId())
                         .andOrderIdEqualTo(orderAdj.getOrderId())
                         .andStatusEqualTo(Status.STATUS_1.status);
                 oPaymentDetailExample1.or()
                         .andStatusEqualTo(Status.STATUS_1.status)
                         .andOrderIdEqualTo(orderAdj.getOrderId())
-                        .andBatchCodeEqualTo(orderAdj.getNewPaymentId());
+                        .andBatchCodeEqualTo(orderAdj.getNewPaymentId()==null?"":orderAdj.getNewPaymentId());
             }else {
                 oPaymentDetailExample.or()
-                        .andBatchCodeEqualTo(orderAdj.getNewPaymentId())
+                        .andBatchCodeEqualTo(orderAdj.getNewPaymentId()==null?"":orderAdj.getNewPaymentId())
                         .andOrderIdEqualTo(orderAdj.getOrderId())
                         .andPaymentStatusEqualTo(PaymentStatus.DS.code)
                         .andStatusEqualTo(Status.STATUS_0.status);
                 oPaymentDetailExample1.or()
                         .andStatusEqualTo(Status.STATUS_1.status)
                         .andOrderIdEqualTo(orderAdj.getOrderId())
-                        .andPaymentStatusEqualTo(PaymentStatus.DF.code)
-                        .andBatchCodeEqualTo(orderAdj.getOrgPaymentId());
+                        .andPaymentStatusIn(Arrays.asList(PaymentStatus.DF.code, PaymentStatus.BF.code, PaymentStatus.YQ.code))
+                        .andBatchCodeEqualTo(orderAdj.getOrgPaymentId()==null?"":orderAdj.getOrgPaymentId());
             }
             oPaymentDetailExample.setOrderByClause(" pay_time asc, plan_num asc, plan_pay_time asc ");
             List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
@@ -4778,7 +4778,7 @@ public class OrderServiceImpl implements OrderService {
 
             oPaymentDetailExample1.setOrderByClause(" pay_time asc, plan_num asc, plan_pay_time asc ");
             List<OPaymentDetail> oPaymentDetails1 = oPaymentDetailMapper.selectByExample(oPaymentDetailExample1);
-            res.putKeyV("beginDate",oPaymentDetails1.get(0).getPlanPayTime());
+            res.putKeyV("beginDate",oPaymentDetails1.size()==0?"":oPaymentDetails1.get(0).getPlanPayTime());
 
             OPaymentExample oPaymentExample = new OPaymentExample();
             oPaymentExample.or().andStatusEqualTo(Status.STATUS_1.status).andOrderIdEqualTo(orderAdj.getOrderId());
@@ -5675,7 +5675,10 @@ public class OrderServiceImpl implements OrderService {
         }
         List<BigDecimal> paymentStatus = Stream.of(PaymentStatus.DF.code,PaymentStatus.YQ.code,PaymentStatus.BF.code).collect(toList());
         OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
-        oPaymentDetailExample.or().andOrderIdEqualTo(orderAdj.getOrderId()).andPaymentStatusIn(paymentStatus).andStatusEqualTo(Status.STATUS_1.status).andBatchCodeEqualTo(orderAdj.getOrgPaymentId());
+        oPaymentDetailExample.or().andOrderIdEqualTo(orderAdj.getOrderId())
+                .andPaymentStatusIn(paymentStatus)
+                .andStatusEqualTo(Status.STATUS_1.status)
+                .andBatchCodeEqualTo(orderAdj.getOrgPaymentId()==null?"":orderAdj.getOrgPaymentId());
         List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
         Date beginDate = new Date();
         for (OPaymentDetail oPaymentDetail:oPaymentDetails){
