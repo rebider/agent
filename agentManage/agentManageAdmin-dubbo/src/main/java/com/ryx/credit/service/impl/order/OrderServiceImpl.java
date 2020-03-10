@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.order;
 
+import com.alibaba.druid.sql.visitor.functions.If;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.activity.entity.ActRuTask;
@@ -6665,6 +6666,24 @@ public class OrderServiceImpl implements OrderService {
         OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(orderAdjId);
         if (null == orderAdj){
             return AgentResult.fail("该记录不存在!");
+        }
+        Date adjTm = orderAdj.getAdjTm();
+        Date nowTm = new Date();
+        Calendar adjtm = Calendar.getInstance();
+        Calendar nowtm = Calendar.getInstance();
+        adjtm.setTime(adjTm);
+        int adjyear = adjtm.get(Calendar.YEAR);
+        int adjmonth = adjtm.get(Calendar.MONTH);
+
+        nowtm.setTime(nowTm);
+        int nowtmyear = nowtm.get(Calendar.YEAR);
+        int nowtmmonth = nowtm.get(Calendar.MONTH);
+        if (adjyear == nowtmyear){
+            if ((adjmonth - nowtmmonth) != 0){
+                return AgentResult.fail("该记录时间跨月!");
+            }
+        }else {
+            return AgentResult.fail("该记录时间跨年!");
         }
         if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
          return AgentResult.fail("该记录非审批中!");
