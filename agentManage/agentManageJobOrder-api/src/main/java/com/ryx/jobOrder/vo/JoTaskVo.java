@@ -3,8 +3,12 @@ package com.ryx.jobOrder.vo;
 import com.ryx.jobOrder.pojo.JoOrder;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class JoTaskVo extends JoOrder {
+
+    private Long userId;
 
     private String joDealPersonId;
 
@@ -41,6 +45,24 @@ public class JoTaskVo extends JoOrder {
     private Date joAcceptTimeBegin;
 
     private Date joAcceptTimeEnd;
+
+    private List<Map>  platfromPerm;
+
+    public List<Map> getPlatfromPerm() {
+        return platfromPerm;
+    }
+
+    public void setPlatfromPerm(List<Map> platfromPerm) {
+        this.platfromPerm = platfromPerm;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
 
     public String getOrderType() {
         return orderType;
