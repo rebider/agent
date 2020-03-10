@@ -545,15 +545,15 @@
       <if test="launchBranchName!=null and launchBranchName!=''"> and jo.launch_branch_name = #{launchBranchName} </if>
       <if test="launchBeginTime!=null and launchEndTime!=''"> and (to_char(jo.launch_time,'yyyy-mm-dd') between #{launchBeginTime} and #{taskEndTimime}) </if>
       <if test="taskBeginTime!=null and taskEndTime!=''"> and (to_char(ta.jo_task_accept_time,'yyyy-mm-dd') between #{taskBeginTime} and #{taskEndTime}) </if>
-      <!--<if test="joDealPersonId!=null and joDealPersonId!=''"> and ta.deal_person_id = #{joDealPersonId} </if>-->
-      <!--<if test="joDealGroupId!=null and joDealGroupId!=''"> and ta.deal_group_id = #{joDealGroupId} </if>-->
+      <if test="launchBranchId!=null and launchBranchId!=''"> and jo.launch_branch_id = #{launchBranchId} </if>
+      <!--<if test="launchPersonId!=null and launchPersonId!=''"> and jo.launch_person_id = #{launchPersonId} </if>-->
     </where>
     order by jo.launch_time desc
   </sql>
 
   <select id="queryAgentJobOrderList" resultMap="JoOrderVoResultMap">
     <include refid="OracleDialectPrefix" />
-    <include refid="selectByJobOrderSql" />
+    <include refid="selectByAgentJobOrderSql" />
     <include refid="OracleDialectSuffix" />
   </select>
 
@@ -577,7 +577,7 @@
     jo.launch_time,
     jo.launch_person_name,
     jo.launch_branch_name,
-    jo.launch_person_email,,
+    jo.launch_person_email,
     jo.jo_progress,
     jo.accept_group,
     jo.deal_time_start,
@@ -598,8 +598,7 @@
       <if test="launchBranchName!=null and launchBranchName!=''"> and jo.launch_branch_name = #{launchBranchName} </if>
       <if test="launchBeginTime!=null and launchEndTime!=''"> and (to_char(jo.launch_time,'yyyy-mm-dd') between #{launchBeginTime} and #{taskEndTimime}) </if>
       <if test="taskBeginTime!=null and taskEndTime!=''"> and (to_char(ta.jo_task_accept_time,'yyyy-mm-dd') between #{taskBeginTime} and #{taskEndTime}) </if>
-      <!--<if test="joDealPersonId!=null and joDealPersonId!=''"> and ta.deal_person_id = #{joDealPersonId} </if>-->
-      <!--<if test="joDealGroupId!=null and joDealGroupId!=''"> and ta.deal_group_id = #{joDealGroupId} </if>-->
+      <if test="agId!=null and agId!=''"> and jo.ag_id = #{agId} </if>
     </where>
     order by jo.launch_time desc
   </sql>

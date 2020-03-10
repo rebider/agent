@@ -70,7 +70,8 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
         otherMap.remove("userId");
         otherMap.remove("annoTableFile");
         joOrderMapper.insert(jo);
-
+        String sedGroup = (String)otherMap.get("sedGroup");
+        otherMap.remove("sedGroup");
         if(otherMap!= null ){
             for(Object keyo : otherMap.keySet()){ //keySet获取map集合key的集合  然后在遍历key即可
                 int index = 0;
@@ -98,6 +99,7 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
         joTask.setDealGroup(jo.getAcceptGroup());
         joTask.setDealGroupId(jo.getAcceptGroupCode());
         joTask.setJoTaskContent(jo.getJoContent());
+        joTask.setSecondDealGroup(sedGroup);
         FastMap status = jobOrderTaskService.createJobOrderTask(joTask);
         if(!FastMap.isSuc(status)){
            throw new MessageException("创建工单任务失败！工单任务:" + joTask.getId());

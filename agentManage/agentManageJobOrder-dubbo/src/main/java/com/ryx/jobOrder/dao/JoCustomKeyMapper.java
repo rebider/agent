@@ -34,4 +34,6 @@ public interface JoCustomKeyMapper {
     List<Map> selectKeyWord(@Param("joSecondKeyNum")String joSecondKeyNum);
 
     int deletejoCustomKeyById(String id);
+
+    List<Map> selectCustomListMapBySedType(@Param("joCustomKey")JoCustomKey joCustomKey);
 }

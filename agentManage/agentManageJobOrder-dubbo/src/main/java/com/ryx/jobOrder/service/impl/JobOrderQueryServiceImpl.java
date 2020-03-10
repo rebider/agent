@@ -99,8 +99,8 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
                 map.put("taskEndTime", DateUtil.format(taskEndTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
             }
         }
-        int jobOrderListCount = joOrderMapper.queryJobOrderListCount(map);
-        List<JoTaskVo> jobOrderList = joOrderMapper.queryJobOrderList(map);
+        int jobOrderListCount = joOrderMapper.queryAgentJobOrderListCount(map);
+        List<JoTaskVo> jobOrderList = joOrderMapper.queryAgentJobOrderList(map);
         pageInfo.setTotal(jobOrderListCount);
         pageInfo.setRows(jobOrderList);
         return pageInfo;

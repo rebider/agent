@@ -8,6 +8,7 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.AttachmentRel;
+import com.ryx.credit.service.IResourceService;
 import com.ryx.credit.service.agent.AttachmentRelService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.jobOrder.dao.JoOrderMapper;
@@ -28,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
 @Service("jobOrderTaskService")
 public class JobOrderTaskServiceImpl implements JobOrderTaskService {
 
@@ -44,7 +47,8 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
 
     @Autowired
     private AttachmentRelService attachmentRelService;
-
+    @Autowired
+    private IResourceService iResourceService;
     /**
      * 创建 工单任务 记录
      * @param joTask
@@ -90,6 +94,8 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
                 joTaskVo.setJoStartTimeEnd(DateUtil.format(joStartTimeEndStr,DateUtil.DATE_FORMAT_yyyy_MM_dd));
             }
         }
+        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(joTaskVo.getUserId());
+        joTaskVo.setPlatfromPerm(platfromPerm);
         List jotaskVolist = joTaskMapper.selectByJoTaskVo(joTaskVo, page);
         PageInfo pageInfo = new PageInfo();
         List jotaskVolist2 = joTaskMapper.selectByJoTaskVo(joTaskVo, null);
