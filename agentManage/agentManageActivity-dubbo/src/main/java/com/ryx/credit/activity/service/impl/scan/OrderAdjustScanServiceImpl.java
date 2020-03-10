@@ -74,36 +74,41 @@ public class OrderAdjustScanServiceImpl implements ActBusRelScanService {
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     @Override
     public FastMap dealEvent(EventSysAct eventSysAct) throws MessageException {
-        try {
+
             switch (eventSysAct.getEventKey()){
-                case EventSysAct.EVENT_END_OF_MOUNTH: //月末结束事件处理
-                    //检查是否可以终止
-                    AgentResult res =  orderService.enableOrderAdjFinish(eventSysAct.getBusActRel().getBusId());
-                    //运行结束
-                    if(res.isOK()){
-                        List<Task> list = activityService.getProcessEngine().getTaskService()
-                                .createTaskQuery()
-                                .processInstanceId(eventSysAct.getBusActRel().getActivId())
-                                .active()
-                                .list();
-                        for (Task task : list) {
-                            //结束流程
-                            Map<String,Object> reqMap = new HashMap<>();
-                            reqMap.put("rs", "reject");
-                            reqMap.put("approvalOpinion", "系统自动终止");
-                            reqMap.put("approvalPerson", systemId);
-                            reqMap.put("createTime", DateUtils.dateToStringss(new Date()));
-                            reqMap.put("taskId", task.getId());
-                            activityService.completeTask(task.getId(),reqMap);
+                case EventSysAct.EVENT_END_OF_MOUNTH:
+                    try {
+                        //检查是否可以终止
+                        AgentResult res =  orderService.enableOrderAdjFinish(eventSysAct.getBusActRel().getBusId());
+                        //运行结束
+                        if(res.isOK()){
+                            //查询任务
+                            List<Task> list = activityService.getProcessEngine().getTaskService()
+                                    .createTaskQuery()
+                                    .processInstanceId(eventSysAct.getBusActRel().getActivId())
+                                    .active()
+                                    .list();
+
+                            for (Task task : list) {
+                                //结束流程
+                                Map<String,Object> reqMap = new HashMap<>();
+                                reqMap.put("rs", "reject");
+                                reqMap.put("approvalOpinion", "系统自动终止");
+                                reqMap.put("approvalPerson", systemId);
+                                reqMap.put("createTime", DateUtils.dateToStringss(new Date()));
+                                reqMap.put("taskId", task.getId());
+                                activityService.completeTask(task.getId(),reqMap);
+                            }
+
                         }
+                        return FastMap.fastSuccessMap();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        throw new MessageException(e.getMessage());
                     }
-                    return FastMap.fastSuccessMap();
                 default:
                     return FastMap.fastSuccessMap();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new MessageException(e.getMessage());
-        }
+
     }
 }

@@ -11,7 +11,10 @@ import com.ryx.credit.spring.MySpringContextHandler;
 import com.ryx.credit.vo.EventSysAct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -25,22 +28,21 @@ import java.util.Set;
  * 描述：扫描整个系统中运行中的工作流，并逐个调用扫描处理类进行相关业务处理
  */
 @Service("actBusRelScanView")
-public class ActBusRelScanServiceImpl implements ActBusRelScanView {
+public class ActBusRelScanServiceImpl implements ActBusRelScanView, ApplicationContextAware {
 
     private static Logger logger = LoggerFactory.getLogger(ActBusRelScanServiceImpl.class);
 
     private Map<String, ActBusRelScanService>  actBusRelScanServices;
-
     @Autowired
     private BusActRelService busActRelService;
     @Autowired
     private ActBusRelScanView actBusRelScanView;
 
-    @PostConstruct
-    public void init(){
-       actBusRelScanServices = MySpringContextHandler.applicationContext.getBeansOfType(ActBusRelScanService.class);
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        actBusRelScanServices = applicationContext.getBeansOfType(ActBusRelScanService.class);
+        System.out.println(actBusRelScanServices);
     }
-
 
     @Override
     public void triggerEventSysAct(EventSysAct eventSysAct) throws MessageException {
