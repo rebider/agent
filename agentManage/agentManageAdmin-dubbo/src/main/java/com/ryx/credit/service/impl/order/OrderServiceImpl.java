@@ -5425,6 +5425,11 @@ public class OrderServiceImpl implements OrderService {
                 logger.info("订单调整审批完成:已审批过:{}", orderAdj.getId());
                 return AgentResult.ok();
             }
+            OOrderExample oOrderExample = new OOrderExample();
+            oOrderExample.or().andIdEqualTo(orderAdj.getOrderId()).andStatusEqualTo(Status.STATUS_1.status);
+            List<OOrder> oOrders = orderMapper.selectByExample(oOrderExample);
+            oOrders.get(0).setOrderStatus(OrderStatus.ENABLE.status);
+            orderMapper.updateByPrimaryKeySelective(oOrders.get(0));
             orderAdj.setReviewsStat(AgStatus.Approved.status);
             orderAdj.setReviewsDate(new Date());
             //订单调整更新
@@ -5436,7 +5441,7 @@ public class OrderServiceImpl implements OrderService {
                 logger.info("订单调整审批通过,有退款,信息开始发送到kafka:{}",orderAdj.getId());
                 paymentDetailService.sendRefundMentToPlatform(orderAdj.getId());
             }
-        } else if(actname.equals("reject_end")) {//审批拒绝
+        } else if(actname.equals("reject_end")) { //审批拒绝
             logger.info("订单调整审批完审批拒绝{}", busActRel.getBusId());
             busActRel.setActivStatus(AgStatus.Refuse.name());
             if (1 != busActRelService.updateByPrimaryKey(busActRel)) {
