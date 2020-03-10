@@ -433,6 +433,10 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             logger.info("退货审批拒绝回调:{},{}", processInstanceId, activityName);
             //审批流关系
             BusActRel rel = busActRelService.findById(processInstanceId);
+            rel.setActivStatus(AgStatus.Refuse.name());
+            if(1!=busActRelService.updateByPrimaryKey(rel)){
+                throw new MessageException("更新流程失败");
+            }
             //退货编号
             String returnId = rel.getBusId();
             //更新退货单
@@ -1091,6 +1095,10 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             logger.info("历史退货审批完成回调:{},{}", processInstanceId, activityName);
             //审批流关系
             BusActRel rel = busActRelService.findById(processInstanceId);
+            rel.setActivStatus(AgStatus.Approved.name());
+            if(1!=busActRelService.updateByPrimaryKey(rel)){
+                throw new MessageException("更新流程失败");
+            }
             //退货编号
             String returnId = rel.getBusId();
             //更新退货单

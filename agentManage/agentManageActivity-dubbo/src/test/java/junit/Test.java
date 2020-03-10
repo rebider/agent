@@ -282,9 +282,12 @@ public class Test {
             System.out.println("--------:"+processInstance.getActivityId());
 
         }
-
-
-
+    }
+    @org.junit.Test
+    public void singleToGobal(){
+        ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
+        RuntimeService runtimeService = processEngine.getRuntimeService();
+        runtimeService.signalEventReceived("testSig");
     }
 
 
