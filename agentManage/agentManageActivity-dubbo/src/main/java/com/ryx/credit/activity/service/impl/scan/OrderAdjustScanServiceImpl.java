@@ -86,7 +86,6 @@ public class OrderAdjustScanServiceImpl implements ActBusRelScanService {
                             List<Task> list = activityService.getProcessEngine().getTaskService()
                                     .createTaskQuery()
                                     .processInstanceId(eventSysAct.getBusActRel().getActivId())
-                                    .active()
                                     .list();
 
                             for (Task task : list) {
