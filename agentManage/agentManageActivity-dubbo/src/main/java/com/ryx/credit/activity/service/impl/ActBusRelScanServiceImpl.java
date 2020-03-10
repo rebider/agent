@@ -1,9 +1,11 @@
 package com.ryx.credit.activity.service.impl;
 
 import com.ryx.credit.common.enumc.AgStatus;
+import com.ryx.credit.common.enumc.BusActRelBusType;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
+import com.ryx.credit.pojo.admin.agent.BusActRelKey;
 import com.ryx.credit.service.ActBusRelScanService;
 import com.ryx.credit.service.ActBusRelScanView;
 import com.ryx.credit.service.agent.BusActRelService;
@@ -68,7 +70,7 @@ public class ActBusRelScanServiceImpl implements ActBusRelScanView, ApplicationC
 
     @Override
     public void triggerMothEndEvent() {
-        List<BusActRel> busActRelList =  busActRelService.queryBysBusTypeAndStatus(null, AgStatus.Approving.name());
+        List<BusActRel> busActRelList =  busActRelService.queryBysBusTypeAndStatus(BusActRelBusType.orderAdjust.name(), AgStatus.Approving.name());
         for (BusActRel busActRel : busActRelList) {
             try {
                 EventSysAct eventSysAct = new EventSysAct(EventSysAct.EVENT_END_OF_MOUNTH,busActRel);
