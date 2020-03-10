@@ -7,6 +7,7 @@ package com.ryx.credit.common.enumc;
 public enum DictGroup {
 
     ALL("所有模块"),
+    AUTH("授权模块"),
     YESORNO("yesorno"),
     YESORNOISYES("yesornoisyes"),
     AGENT("代理商模块"),
@@ -106,7 +107,13 @@ public enum DictGroup {
     ORDER_ADJ_APR_BUSNISS("业务部订单调整审批参数"),
     FINACEORG_CONFIG("出款机构调整逻辑"),
     FINACEORG_PAR("出款机构调整逻辑匹配模式配置"),
-    ;
+    AUTHKEY("授权秘钥"),
+    AUTHPUBKEY("公钥"),
+    AUTHPRIKEY("私钥"),
+    AUTH_TIME("授权失效时间(秒)"),
+    AUTH_CODE("授权码"),
+    TOKEN_CODE("令牌"),
+    PASSKEY("密码AES_KEY");
 
 
 
