@@ -196,7 +196,7 @@ public class JobOrderManageServiceImpl implements JobOrderManageService {
     public ResultVO joCustomKeyEdit(JobOrderVo jobOrderVo) throws Exception {
         if (null != jobOrderVo && null != jobOrderVo.getJobKeyManageVoList()) {
             for (JobKeyManageVo jobKeyManage : jobOrderVo.getJobKeyManageVoList()) {
-                if(null!=jobKeyManage.getJoCustomKeyList() && jobKeyManage.getJoCustomKeyList().size()>0){
+                if(null!=jobKeyManage.getJoCustomKeyList() ){
                     //删除原有的自定义表数据(二级类型可确定唯一性)
                     JoCustomKeyExample joCustomKeyExample = new JoCustomKeyExample();
                     JoCustomKeyExample.Criteria criteria1 = joCustomKeyExample.createCriteria().andJoSecondKeyNumEqualTo(jobOrderVo.getSecondId());
