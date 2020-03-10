@@ -5505,9 +5505,9 @@ public class OrderServiceImpl implements OrderService {
         OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(adjId);
         orderAdj.setProRefundAmount(new BigDecimal(proAmount));
         orderAdjMapper.updateByPrimaryKeySelective(orderAdj);
-        resMap.put("realRefundAmo",orderAdj.getRealRefundAmo());
-        resMap.put("proRefundAmount",orderAdj.getProRefundAmount());
-        resMap.put("settleAmount",orderAdj.getSettleAmount());
+        resMap.put("realRefundAmo",orderAdj.getRealRefundAmo()==null?"0.00":orderAdj.getRealRefundAmo());
+        resMap.put("proRefundAmount",orderAdj.getProRefundAmount()==null?"0.00":orderAdj.getProRefundAmount());
+        resMap.put("settleAmount",orderAdj.getSettleAmount()==null?"0.00":orderAdj.getSettleAmount());
         return resMap;
     }
 
@@ -6689,14 +6689,14 @@ public class OrderServiceImpl implements OrderService {
         if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
          return AgentResult.fail("该记录非审批中!");
         }
-        OPaymentExample oPaymentExample = new OPaymentExample();
-        oPaymentExample.or().andOrderIdEqualTo(orderAdj.getOrderId())
-                .andStatusEqualTo(Status.STATUS_1.status);
-        List<OPayment> oPayments = oPaymentMapper.selectByExample(oPaymentExample);
-        BigDecimal outstandingAmount = oPayments.get(0).getOutstandingAmount();
-        if (outstandingAmount.compareTo(orderAdj.getDifAmount()) == -1 ){
-            logger.info("原订单不存在新的分期计划");
-            return AgentResult.fail("原订单不存在新的分期计划!");
+        if (EnvironmentUtil.isProduction() ){
+            List<Dict> dicts = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.ADJ_ID.name());
+            if (dicts != null && dicts.size()>0){
+                String itemvalue = dicts.get(0).getdItemvalue();
+                if (!itemvalue.equals(orderAdjId)){
+                    return AgentResult.fail("该记录与字典内ID不一致!");
+                }
+            }
         }
         BigDecimal refundStat = orderAdj.getRefundStat();
         if (null != refundStat){
