@@ -1141,9 +1141,9 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
      * @throws MessageException
      */
     public AgentResult parseExcel(List<List<Object>> excelList)throws MessageException{
+        List<String> platformTypeList = new ArrayList<>();
         List<Map<String,Object>> resultList = new ArrayList<>();
         for (List<Object> excel : excelList) {
-            Map<String, Object> resultMap = new HashMap();
             String snBegin = "";
             String snEnd = "";
             String count = "";
@@ -1164,10 +1164,10 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                         .putKeyV("endSN", snEnd));
                 if (!FastMap.isSuc(fastMap)) return AgentResult.fail(fastMap.get("msg").toString());
 
-                Dict modelType = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MODEL_TYPE.name(),proModel);
-                if(modelType==null){
-                    throw new MessageException("导入类型错误");
-                }
+                String proModelValue = PlatformType.getValueByContent(proModel);
+                if(StringUtils.isBlank(proModelValue)) throw new MessageException("导入类型错误");
+                platformTypeList.add(proModelValue);
+
                 AgentResult agentResult = orderActivityService.querySnInfoFromBusSystem(snBegin,snEnd,count,proModel);
                 if(agentResult.isOK()) {
                     resultList.add(agentResult.getMapData());
@@ -1177,6 +1177,13 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             } catch (MessageException e) {
                 e.printStackTrace();
                 return AgentResult.fail(e.getMsg());
+            }
+        }
+        if (platformTypeList.size() != 1) {
+            for (String platFormList : platformTypeList) {
+                if(!PlatformType.whetherPOS(platFormList)){
+                    throw new ProcessException("退货只支持一个业务平台退货，本批次SN中存在多个业务，请分别提交!");
+                }
             }
         }
         return AgentResult.ok(resultList);
