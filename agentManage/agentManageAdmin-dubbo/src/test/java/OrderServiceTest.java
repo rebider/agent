@@ -63,7 +63,7 @@ public class OrderServiceTest  extends BaseSpringTest  {
     @Test
     public void test1(){
         try {
-            AgentResult agentResult = orderService.enableOrderAdjFinish("AD20191224000000000000422");
+            AgentResult agentResult = orderService.enableOrderAdjFinish("AD20200310000000000000690");
             System.out.println(agentResult);
         }catch (Exception e){
             e.toString();

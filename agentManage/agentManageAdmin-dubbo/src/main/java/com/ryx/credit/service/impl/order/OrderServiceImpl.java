@@ -6688,6 +6688,15 @@ public class OrderServiceImpl implements OrderService {
         if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
          return AgentResult.fail("该记录非审批中!");
         }
+        OPaymentExample oPaymentExample = new OPaymentExample();
+        oPaymentExample.or().andOrderIdEqualTo(orderAdj.getOrderId())
+                .andStatusEqualTo(Status.STATUS_1.status);
+        List<OPayment> oPayments = oPaymentMapper.selectByExample(oPaymentExample);
+        BigDecimal outstandingAmount = oPayments.get(0).getOutstandingAmount();
+        if (outstandingAmount.compareTo(orderAdj.getDifAmount()) == -1 ){
+            logger.info("原订单不存在新的分期计划");
+            return AgentResult.fail("原订单不存在新的分期计划!");
+        }
         BigDecimal refundStat = orderAdj.getRefundStat();
         if (null != refundStat){
             logger.info("退款状态为:"+RefundStat.getContentByValue(refundStat));
