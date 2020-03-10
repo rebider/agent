@@ -166,6 +166,11 @@
             <artifactId>agentManageInternetCard-api</artifactId>
             <version>${agentManage.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.ryx.ry</groupId>
+            <artifactId>agentManageActivity-api</artifactId>
+            <version>${agentManage.version}</version>
+        </dependency>
         <!-- import elastic-job lite core -->
         <dependency>
             <groupId>com.dangdang</groupId>
@@ -188,5 +193,6 @@
             <artifactId>elastic-job-lite-spring</artifactId>
             <version>2.1.5</version>
         </dependency>
+
     </dependencies>
 </project>

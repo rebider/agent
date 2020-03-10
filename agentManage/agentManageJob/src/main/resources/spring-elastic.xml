@@ -222,7 +222,7 @@
 
    <import resource="spring-elastic-order.xml"/>
    <import resource="spring-elastic-card.xml"/>
-
+   <import resource="spring-elastic-timer.xml"/>
 
 
 
