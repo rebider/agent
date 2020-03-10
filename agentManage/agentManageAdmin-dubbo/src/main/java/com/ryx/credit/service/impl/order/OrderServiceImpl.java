@@ -4787,7 +4787,7 @@ public class OrderServiceImpl implements OrderService {
             if (oPaymentList.size() != 1) {
                 return AgentResult.fail("支付信息错误");
             }
-            if (oPaymentList.get(0).getCustomStaging().equals(Status.STATUS_1.status.toString()) && orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) == 0){
+            if (Status.STATUS_1.status.toString().equals(oPaymentList.get(0).getCustomStaging()) && orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) == 0){
                 Date DownPaymentDate = new Date();
                 Calendar c = Calendar.getInstance();
                 c.setTime(DownPaymentDate);
