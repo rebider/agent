@@ -384,6 +384,17 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
             resultMap.put("offsetPaymentDetails",resPaymentDetail);
             resultMap.put("residueAmt",residue);
         }else if (paytype.equals(THTK.code)){
+            logger.info("查询是否已经存在抵扣记录,id:"+srcId+"抵扣类型"+THTK.msg);
+            //判断当前是否有抵扣记录
+            OPayDetailExample oPayDetailExample = new OPayDetailExample();
+            oPayDetailExample.or().andSrcIdEqualTo(srcId)
+                    .andPayTypeEqualTo(THTK.code)
+                    .andBusStatEqualTo(Status.STATUS_0.status)
+                    .andStatusEqualTo(Status.STATUS_1.status);
+            List<OPayDetail> querypayDetails = oPayDetailMapper.selectByExample(oPayDetailExample);
+            if (querypayDetails != null && querypayDetails.size()>0){
+                throw new MessageException("已存在抵扣记录,请勿重复提交");
+            }
             logger.info("退货退款进行抵扣入库");
             //待还金额
             BigDecimal arrearsAmt = BigDecimal.ZERO;
@@ -594,6 +605,17 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
             resultMap.put("offsetPaymentDetails",resPaymentDetail);
             resultMap.put("residueAmt",residue);
         }else if (paytype.equals(DDMD.code)){
+            logger.info("查询是否已经存在抵扣记录,id:"+srcId+"抵扣类型"+DDMD.msg);
+            //判断当前是否有抵扣记录
+            OPayDetailExample oPayDetailExample = new OPayDetailExample();
+            oPayDetailExample.or().andSrcIdEqualTo(srcId)
+                    .andPayTypeEqualTo(DDMD.code)
+                    .andBusStatEqualTo(Status.STATUS_0.status)
+                    .andStatusEqualTo(Status.STATUS_1.status);
+            List<OPayDetail> querypayDetails = oPayDetailMapper.selectByExample(oPayDetailExample);
+            if (querypayDetails != null && querypayDetails.size()>0){
+                throw new MessageException("已存在抵扣记录,请勿重复提交");
+            }
             //付款明细
             List<OPayDetail> oPayDetails = new ArrayList<>();
             ORefundPriceDiff diff = refundPriceDiffMapper.selectByPrimaryKey(srcId);
