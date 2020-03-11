@@ -487,6 +487,7 @@
     <result column="PRIORITY_LEVEL" jdbcType="VARCHAR" property="priorityLevel" />
     <result column="LAUNCH_TIME" jdbcType="TIMESTAMP" property="launchTime" />
     <result column="LAUNCH_PERSON_NAME" jdbcType="VARCHAR" property="launchPersonName" />
+    <result column="LAUNCH_PERSON_ID" jdbcType="VARCHAR" property="launchPersonId" />
     <result column="LAUNCH_BRANCH_NAME" jdbcType="VARCHAR" property="launchBranchName" />
     <result column="LAUNCH_PERSON_EMAIL" jdbcType="VARCHAR" property="launchPersonEmail" />
     <result column="JO_PROGRESS" jdbcType="VARCHAR" property="joProgress" />
@@ -603,8 +604,9 @@
       jo.jo_progress,
       jo.accept_group,
       jo.deal_time_start,
-      jo.accept_now_group
-      from jo_order jo
+      jo.accept_now_group,
+      jo.launch_person_id
+    from jo_order jo
       left join jo_key_manage one on one.jo_key = jo.jo_first_key_num
       left join jo_key_manage two on two.jo_key = jo.jo_second_key_num
       LEFT JOIN jo_key_manage jm3 ON jm3.id = jo.priority_level
