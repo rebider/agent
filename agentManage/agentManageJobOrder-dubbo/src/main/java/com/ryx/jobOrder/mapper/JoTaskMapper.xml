@@ -370,6 +370,14 @@
       <if test="example.id != null and example.id != ''">
         and jo.id = #{example.id}
       </if>
+      <if test="example.platfromPerm != null and example.platfromPerm.size > 0">
+        and (jo.paltform_num is null
+        or (jo.paltform_num in
+        <foreach collection="example.platfromPerm" item="platfromPermItem" open="(" separator="," close=")">
+            #{platfromPermItem.PLATFORM_NUM}
+        </foreach>
+        ))
+      </if>
       <if test="example.joTaskId != null and example.joTaskId != ''">
         and jt.id = #{example.joTaskId}
       </if>
