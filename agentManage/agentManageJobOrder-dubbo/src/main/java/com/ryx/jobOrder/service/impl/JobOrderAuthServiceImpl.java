@@ -1,12 +1,18 @@
 package com.ryx.jobOrder.service.impl;
 
 import com.ryx.credit.common.enumc.QueryAcceptType;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.CResource;
+import com.ryx.credit.pojo.admin.agent.Agent;
+import com.ryx.credit.pojo.admin.order.Organization;
+import com.ryx.credit.service.agent.AgentService;
 import com.ryx.jobOrder.dao.JobOrderAuthMapper;
 import com.ryx.jobOrder.service.JobOrderAuthService;
 import com.ryx.jobOrder.vo.JobKeyManageNodeVo;
 import com.ryx.jobOrder.vo.JobKeyManageVo;
 import com.sun.org.apache.xpath.internal.operations.Mod;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +23,14 @@ import java.util.Map;
 @Service("jobOrderAuthService")
 public class JobOrderAuthServiceImpl implements JobOrderAuthService {
 
+    private static final Logger logger = LoggerFactory.getLogger(JobOrderAuthServiceImpl.class);
+
+    @Autowired
+    private AgentService agentService;
+
     @Autowired
     private JobOrderAuthMapper jobOrderAuthMapper;
+
 
     @Override
     public List<Map<String,Object>> getReqJobOrderAuth(Long userId) {
@@ -28,13 +40,22 @@ public class JobOrderAuthServiceImpl implements JobOrderAuthService {
 
     @Override
     public Map<String, Object> getJobOrderType(String JobOrderKey) {
+        if (StringUtils.isBlank(JobOrderKey)){
+            logger.error("根据工单类型查找可以受理该工单的对应工单组参数为空");
+            return null;
+        }
         Map<String, Object> acceptCode = jobOrderAuthMapper.getAcceptCode(JobOrderKey);
         return acceptCode;
     }
 
     @Override
     public Map<String, Object> getAcceptGroup(String userId) {
+        if (StringUtils.isBlank(userId)){
+            logger.error("根据用户id获取用户的工单组参数为空");
+            return  null;
+        }
         Map<String, Object> acceptCode = jobOrderAuthMapper.getAcceptGroup(userId);
+        logger.info("根据用户id获取用户的工单组"+userId+",工单组信息:"+acceptCode);
         return acceptCode;
     }
 
@@ -57,9 +78,18 @@ public class JobOrderAuthServiceImpl implements JobOrderAuthService {
 
     @Override
     public List<JobKeyManageNodeVo> getViewJobKeyManageNodes(String userId) {
+        //判断是否为代理商
+        Agent agent = agentService.queryAgentByUserId(userId);
+        if (agent != null){
+            logger.info("该用户为代理商{}",userId);
+            List<Map<String, Object>> viewJobKeyManageModesByAgent = jobOrderAuthMapper.getViewJobKeyManageModesByAgent();
+            List<JobKeyManageNodeVo> jobKeyManageNodeVos = mapTovo(viewJobKeyManageModesByAgent);
+            logger.info("返回代理商可发起的工单类型{}",jobKeyManageNodeVos);
+            return jobKeyManageNodeVos;
+        }
         List<Map<String,Object>> jobKeyManageNodes = jobOrderAuthMapper.getViewJobKeyManageNodesByUserId(userId);
         List<JobKeyManageNodeVo> jobKeyManageNodeVos = mapTovo(jobKeyManageNodes);
-        System.out.println(jobKeyManageNodeVos);
+        logger.info("{}为非代理商,可申请工单类型{}",userId,jobKeyManageNodes);
         return jobKeyManageNodeVos;
     }
 
