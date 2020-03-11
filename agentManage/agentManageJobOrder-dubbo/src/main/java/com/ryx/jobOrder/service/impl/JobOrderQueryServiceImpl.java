@@ -48,9 +48,10 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
     private IdService idService;
     @Autowired
     private JobOrderTaskService jobOrderTaskService;
+
     @Override
     public PageInfo jobOrderQueryList(Map map, Page page) {
-        logger.info("------我收到的工单列表查询-内部人员------");
+        logger.info("------总部收到的工单-查询所有------");
         PageInfo pageInfo = new PageInfo();
         map.put("page", page);
         String launchBeginTime = (String) map.get("launchBeginTime");
@@ -79,7 +80,7 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
 
     @Override
     public PageInfo agentJobOrderQueryList(Map map, Page page) {
-        logger.info("------我收到的工单列表查询-代理商------");
+        logger.info("------代理商收到的工单-代理商工单组------");
         PageInfo pageInfo = new PageInfo();
         map.put("page", page);
         String launchBeginTime = (String) map.get("launchBeginTime");
@@ -101,6 +102,64 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
         }
         int jobOrderListCount = joOrderMapper.queryAgentJobOrderListCount(map);
         List<JoTaskVo> jobOrderList = joOrderMapper.queryAgentJobOrderList(map);
+        pageInfo.setTotal(jobOrderListCount);
+        pageInfo.setRows(jobOrderList);
+        return pageInfo;
+    }
+
+    @Override
+    public PageInfo cityJobOrderQueryList(Map map, Page page) {
+        logger.info("------省区收到的工单-省区工单组------");
+        PageInfo pageInfo = new PageInfo();
+        map.put("page", page);
+        String launchBeginTime = (String) map.get("launchBeginTime");
+        String launchEndTime = (String) map.get("launchEndTime");
+        String taskBeginTime = (String) map.get("taskBeginTime");
+        String taskEndTime = (String) map.get("taskEndTime");
+        if ((StringUtils.isNotBlank(launchBeginTime) && StringUtils.isNotBlank(launchEndTime)) || (StringUtils.isNotBlank(taskBeginTime) && StringUtils.isNotBlank(taskEndTime))) {
+            if (StringUtils.isNotBlank(launchBeginTime)) {
+                launchBeginTime =launchBeginTime.substring(0,10);
+                launchEndTime =launchEndTime.substring(0,10);
+                map.put("launchBeginTime", DateUtil.format(launchBeginTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+                map.put("launchEndTime", DateUtil.format(launchEndTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+            } else {
+                taskBeginTime =taskBeginTime.substring(0,10);
+                taskEndTime =taskEndTime.substring(0,10);
+                map.put("taskBeginTime", DateUtil.format(taskBeginTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+                map.put("taskEndTime", DateUtil.format(taskEndTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+            }
+        }
+        int jobOrderListCount = joOrderMapper.queryCityJobOrderListCount(map);
+        List<JoTaskVo> jobOrderList = joOrderMapper.queryCityJobOrderList(map);
+        pageInfo.setTotal(jobOrderListCount);
+        pageInfo.setRows(jobOrderList);
+        return pageInfo;
+    }
+
+    @Override
+    public PageInfo groupJobOrderQueryList(Map map, Page page) {
+        logger.info("------工单组收到的工单-总部工单组------");
+        PageInfo pageInfo = new PageInfo();
+        map.put("page", page);
+        String launchBeginTime = (String) map.get("launchBeginTime");
+        String launchEndTime = (String) map.get("launchEndTime");
+        String taskBeginTime = (String) map.get("taskBeginTime");
+        String taskEndTime = (String) map.get("taskEndTime");
+        if ((StringUtils.isNotBlank(launchBeginTime) && StringUtils.isNotBlank(launchEndTime)) || (StringUtils.isNotBlank(taskBeginTime) && StringUtils.isNotBlank(taskEndTime))) {
+            if (StringUtils.isNotBlank(launchBeginTime)) {
+                launchBeginTime =launchBeginTime.substring(0,10);
+                launchEndTime =launchEndTime.substring(0,10);
+                map.put("launchBeginTime", DateUtil.format(launchBeginTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+                map.put("launchEndTime", DateUtil.format(launchEndTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+            } else {
+                taskBeginTime =taskBeginTime.substring(0,10);
+                taskEndTime =taskEndTime.substring(0,10);
+                map.put("taskBeginTime", DateUtil.format(taskBeginTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+                map.put("taskEndTime", DateUtil.format(taskEndTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+            }
+        }
+        int jobOrderListCount = joOrderMapper.queryGroupJobOrderListCount(map);
+        List<JoTaskVo> jobOrderList = joOrderMapper.queryGroupJobOrderList(map);
         pageInfo.setTotal(jobOrderListCount);
         pageInfo.setRows(jobOrderList);
         return pageInfo;

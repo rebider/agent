@@ -497,93 +497,15 @@
     <result column="DEAL_PERSON_ID" jdbcType="VARCHAR" property="joDealPersonId" />
     <result column="DEAL_GROUP_ID" jdbcType="VARCHAR" property="joDealGroupId" />
   </resultMap>
-
-  <select id="queryJobOrderList" resultMap="JoOrderVoResultMap">
-    <include refid="OracleDialectPrefix" />
-    <include refid="selectByJobOrderSql" />
-    <include refid="OracleDialectSuffix" />
-  </select>
-
-  <select id="queryJobOrderListCount" resultType="int">
-    select count(*) from (
-    <include refid="selectByJobOrderSql" />
-    )
-  </select>
-
   <sql id="selectByJobOrderSql">
     select
-    distinct (jo.id) as id,
-    jo.ag_id,
-    jo.ag_name,
-    jo.bus_num,
-    jo.platform_name,
+    distinct (jo.id) as id, jo.ag_id, jo.ag_name, jo.bus_num, jo.platform_name,
     top.jo_key_name as jo_top_key_num,
     one.jo_key_name as jo_first_key_num,
     two.jo_key_name as jo_second_key_num,
-    jo.priority_level,
-    jo.launch_time,
-    jo.launch_person_name,
-    jo.launch_branch_name,
-    jo.launch_person_email,
-    jo.jo_progress,
-    jo.accept_group,
-    jo.deal_time_start,
-    jo.accept_now_group
+    jo.priority_level, jo.launch_time, jo.launch_person_name, jo.launch_branch_name,
+    jo.launch_person_email, jo.jo_progress, jo.accept_group, jo.deal_time_start, jo.accept_now_group
     from jo_order jo
-    left join jo_task ta on ta.jo_id = jo.id
-    left join jo_key_manage one on one.jo_key = jo.jo_first_key_num
-    left join jo_key_manage top on top.jo_key = one.jo_key_back_num
-    left join jo_key_manage two on two.jo_key = jo.jo_second_key_num
-    <where>
-      1 = 1
-      <if test="id!=null and id!=''"> and jo.id = #{id} </if>
-      <if test="joSecondKeyNum!=null and joSecondKeyNum!=''"> and jo.jo_second_key_num like CONCAT(CONCAT('%',#{joSecondKeyNum}),'%') </if>
-      <if test="agName!=null and agName!=''"> and jo.ag_name like CONCAT(CONCAT('%',#{agName}),'%') </if>
-      <if test="busNum!=null and busNum!=''"> and jo.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
-      <if test="priorityLevel!=null and priorityLevel!=''"> and jo.priority_level = #{priorityLevel} </if>
-      <if test="joTaskStatus!=null and joTaskStatus!=''"> and ta.jo_task_status = #{joTaskStatus} </if>
-      <if test="launchBranchName!=null and launchBranchName!=''"> and jo.launch_branch_name = #{launchBranchName} </if>
-      <if test="launchBeginTime!=null and launchEndTime!=''"> and (to_char(jo.launch_time,'yyyy-mm-dd') between #{launchBeginTime} and #{taskEndTimime}) </if>
-      <if test="taskBeginTime!=null and taskEndTime!=''"> and (to_char(ta.jo_task_accept_time,'yyyy-mm-dd') between #{taskBeginTime} and #{taskEndTime}) </if>
-      <if test="launchBranchId!=null and launchBranchId!=''"> and jo.launch_branch_id = #{launchBranchId} </if>
-      <!--<if test="launchPersonId!=null and launchPersonId!=''"> and jo.launch_person_id = #{launchPersonId} </if>-->
-    </where>
-    order by jo.launch_time desc
-  </sql>
-
-  <select id="queryAgentJobOrderList" resultMap="JoOrderVoResultMap">
-    <include refid="OracleDialectPrefix" />
-    <include refid="selectByAgentJobOrderSql" />
-    <include refid="OracleDialectSuffix" />
-  </select>
-
-  <select id="queryAgentJobOrderListCount" resultType="int">
-    select count(*) from (
-    <include refid="selectByAgentJobOrderSql" />
-    )
-  </select>
-
-  <sql id="selectByAgentJobOrderSql">
-    select
-    distinct (jo.id) as id,
-    jo.ag_id,
-    jo.ag_name,
-    jo.bus_num,
-    jo.platform_name,
-    top.jo_key_name as jo_top_key_num,
-    one.jo_key_name as jo_first_key_num,
-    two.jo_key_name as jo_second_key_num,
-    jo.priority_level,
-    jo.launch_time,
-    jo.launch_person_name,
-    jo.launch_branch_name,
-    jo.launch_person_email,
-    jo.jo_progress,
-    jo.accept_group,
-    jo.deal_time_start,
-    jo.accept_now_group
-    from jo_order jo
-    left join jo_task ta on ta.jo_id = jo.id
     left join jo_key_manage one on one.jo_key = jo.jo_first_key_num
     left join jo_key_manage top on top.jo_key = one.jo_key_back_num
     left join jo_key_manage two on two.jo_key = jo.jo_second_key_num
@@ -599,9 +521,60 @@
       <if test="launchBeginTime!=null and launchEndTime!=''"> and (to_char(jo.launch_time,'yyyy-mm-dd') between #{launchBeginTime} and #{taskEndTimime}) </if>
       <if test="taskBeginTime!=null and taskEndTime!=''"> and (to_char(ta.jo_task_accept_time,'yyyy-mm-dd') between #{taskBeginTime} and #{taskEndTime}) </if>
       <if test="agId!=null and agId!=''"> and jo.ag_id = #{agId} </if>
+      <if test="joDealGroupId!=null and joDealGroupId!=''"> and exists(select jt.id from jo_task jt where jt.jo_id = jo.id and jt.deal_group_id = #{joDealGroupId}) </if>
+      <if test="secondDealGroup!=null and secondDealGroup!=''"> and exists(select jt.id from jo_task jt where jt.jo_id = jo.id and jt.second_deal_group like CONCAT(CONCAT('%',#{secondDealGroup}),'%')) </if>
     </where>
     order by jo.launch_time desc
   </sql>
+
+  <!--总部查询所有-->
+  <select id="queryJobOrderList" resultMap="JoOrderVoResultMap">
+    <include refid="OracleDialectPrefix" />
+    <include refid="selectByJobOrderSql" />
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="queryJobOrderListCount" resultType="int">
+    select count(*) from (
+    <include refid="selectByJobOrderSql" />
+    )
+  </select>
+
+  <!--代理商工单组查询-->
+  <select id="queryAgentJobOrderList" resultMap="JoOrderVoResultMap">
+    <include refid="OracleDialectPrefix" />
+    <include refid="selectByJobOrderSql" />
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="queryAgentJobOrderListCount" resultType="int">
+    select count(*) from (
+    <include refid="selectByJobOrderSql" />
+    )
+  </select>
+
+  <!--省区工单组查询-->
+  <select id="queryCityJobOrderList" resultMap="JoOrderVoResultMap">
+    <include refid="OracleDialectPrefix" />
+    <include refid="selectByJobOrderSql" />
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="queryCityJobOrderListCount" resultType="int">
+    select count(*) from (
+    <include refid="selectByJobOrderSql" />
+    )
+  </select>
+
+  <!--总部工单组查询-->
+  <select id="queryGroupJobOrderList" resultMap="JoOrderVoResultMap">
+    <include refid="OracleDialectPrefix" />
+    <include refid="selectByJobOrderSql" />
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="queryGroupJobOrderListCount" resultType="int">
+    select count(*) from (
+    <include refid="selectByJobOrderSql" />
+    )
+  </select>
+
 
   <select id="queryJobOrderLaunchList" resultMap="JoOrderVoResultMap">
     <include refid="OracleDialectPrefix" />
