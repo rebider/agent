@@ -6683,12 +6683,15 @@ public class OrderServiceImpl implements OrderService {
         int nowtmmonth = nowtm.get(Calendar.MONTH);
         if (adjyear == nowtmyear){
             if ((adjmonth - nowtmmonth) != 0){
+                logger.error("该记录时间跨月,id:"+orderAdjId);
                 return AgentResult.fail("该记录时间跨月!");
             }
         }else {
+            logger.error("该记录时间跨年,id:"+orderAdjId);
             return AgentResult.fail("该记录时间跨年!");
         }
         if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
+            logger.error("该记录非审批中,id:"+orderAdjId);
          return AgentResult.fail("该记录非审批中!");
         }
         if (EnvironmentUtil.isProduction() ){
@@ -6696,15 +6699,17 @@ public class OrderServiceImpl implements OrderService {
             if (dicts != null && dicts.size()>0){
                 String itemvalue = dicts.get(0).getdItemvalue();
                 if (!itemvalue.equals(orderAdjId)){
+                    logger.error("该记录与字典内ID不一致,id:"+orderAdjId);
                     return AgentResult.fail("该记录与字典内ID不一致!");
                 }
             }
         }
         BigDecimal refundStat = orderAdj.getRefundStat();
         if (null != refundStat){
-            logger.info("退款状态为:"+RefundStat.getContentByValue(refundStat));
+            logger.error("退款状态为:"+RefundStat.getContentByValue(refundStat));
             return AgentResult.fail("该记录已执行分期变更!");
         }
+        logger.info("该记录可以结束,id:"+orderAdjId);
         return AgentResult.ok();
     }
 
