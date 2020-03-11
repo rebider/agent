@@ -5470,7 +5470,9 @@ public class OrderServiceImpl implements OrderService {
             if (1 != orderAdjMapper.updateByPrimaryKeySelective(orderAdj)) {
                 throw new MessageException("订单调整数据更新异常！");
             }
+            logger.info("订单调整审批完审批拒绝结束", busActRel.getBusId());
         }
+        logger.info("订单调整审批结束", busActRel.getBusId());
         return AgentResult.ok();
     }
 
