@@ -219,6 +219,8 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         }
         joTaskOld.setDealPersonName(joTask.getDealPersonName());
         joTaskOld.setDealPersonId(joTask.getDealPersonId());
+        joTaskOld.setJoTaskContent("转发到:" + joTask.getDealGroup()+":"+
+                content.substring(content.indexOf(":")+1, content.length()));
         // 结束工单
         endJoTask( joTaskOld );
 
@@ -235,16 +237,12 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         }
         // 转发其他部门  jotask 含有受理部门 处理人 处理人姓名
         JoTask joTaskNew = new JoTask();
-        // TODO 写入处理组
         joTaskNew.setJoId(joId);
         joTaskNew.setJoTaskStatus(JoTaskStatus.WSL.getValue());
         joTaskNew.setDealGroup(joTask.getDealGroup());
         joTaskNew.setDealGroupId(joTask.getDealGroupId());
         joTaskNew.setBackDealGroup(joTaskOld.getDealGroup());
         joTaskNew.setBackDealPerson(joTaskOld.getDealPersonName());
-        joTaskNew.setJoTaskContent(
-                joTaskOld.getDealGroup() + "转发到:" + joTask.getDealGroup()+":"+
-                        content.substring(content.indexOf(":")+1,content.length()));
         FastMap status = createJobOrderTask(joTaskNew);
         if(FastMap.isSuc(status)){
             return FastMap.fastSuccessMap();
