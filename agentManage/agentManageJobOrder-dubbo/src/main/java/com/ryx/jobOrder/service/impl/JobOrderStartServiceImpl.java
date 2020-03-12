@@ -106,24 +106,6 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
         return FastMap.fastFailMap();
     }
 
-//    /**
-//     * 获取代理商或者内部人员工单页面所需数据
-//     * @param para
-//     * @return
-//     */
-//    @Override
-//    public List<FastMap> getStartLaunchVo(JSONObject para) {
-//        String fir = para.getString("fir");// 一级类型编号
-//        String sed = para.getString("sed"); // 二级类型编号
-//        // TODO 查询
-//        List customs = new ArrayList();
-//        customs.add(FastMap.fastMap("key","code").putKeyV("value","编码"));
-//        customs.add(FastMap.fastMap("key","date").putKeyV("value","日期"));
-//        customs.add(FastMap.fastMap("key","date2").putKeyV("value","日期2"));
-//        customs.add(FastMap.fastMap("key","date3").putKeyV("value","日期3"));
-//        customs.add(FastMap.fastMap("key","date3").putKeyV("value","日期4"));
-//        return customs;
-//    }
 
     /**
      * 保存工单扩展字段值
