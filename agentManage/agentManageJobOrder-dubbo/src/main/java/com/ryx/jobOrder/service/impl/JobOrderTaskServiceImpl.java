@@ -219,7 +219,7 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         }
         joTaskOld.setDealPersonName(joTask.getDealPersonName());
         joTaskOld.setDealPersonId(joTask.getDealPersonId());
-        joTaskOld.setJoTaskContent("转发到:" + joTask.getDealGroup()+":"+
+        joTaskOld.setJoTaskContent("转发到" + joTask.getDealGroup()+":"+
                 content.substring(content.indexOf(":")+1, content.length()));
         // 结束工单
         endJoTask( joTaskOld );
