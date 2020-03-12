@@ -149,25 +149,21 @@ public class JobOrderAuthServiceImpl implements JobOrderAuthService {
 
         }
 
-        for (JobKeyManageNodeVo second:secondNodes){
-            for (JobKeyManageNodeVo third:thirdNodes){
-                if ( third.getJoKeyBackNum().equals(second.getId())){
-                    second.getChildNodes().add(third);
-                    continue;
-                }
-            }
-        }
+        getNodes(firstNodes,getNodes(secondNodes,thirdNodes));
 
-        for (JobKeyManageNodeVo first:firstNodes){
-            for (JobKeyManageNodeVo second:secondNodes){
+        return  firstNodes;
+    }
+
+    public static List<JobKeyManageNodeVo> getNodes(List<JobKeyManageNodeVo> parentNodes,List<JobKeyManageNodeVo> childNodes){
+        for (JobKeyManageNodeVo first:parentNodes){
+            for (JobKeyManageNodeVo second:childNodes){
                 if (second.getJoKeyBackNum().equals(first.getId())){
                     first.getChildNodes().add(second);
                     continue;
                 }
             }
         }
-
-        return  firstNodes;
+        return parentNodes;
     }
 
 }
