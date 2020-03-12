@@ -98,7 +98,6 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
         joTask.setJoId(jo.getId());
         joTask.setDealGroup(jo.getAcceptGroup());
         joTask.setDealGroupId(jo.getAcceptGroupCode());
-        joTask.setJoTaskContent(jo.getJoContent());
         joTask.setSecondDealGroup(sedGroup);
         FastMap status = jobOrderTaskService.createJobOrderTask(joTask);
         if(!FastMap.isSuc(status)){

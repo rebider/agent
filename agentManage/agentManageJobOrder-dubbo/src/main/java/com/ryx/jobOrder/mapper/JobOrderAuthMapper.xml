@@ -19,14 +19,14 @@
         </if>
     </select>
     <select id="getAcceptCode" resultType="java.util.Map" parameterType="string">
-        select cr.*
+        select cr.id,cr.NAME,cr.SEQ,cr.DESCRIPTION,cr.STATUS
         from c_role cr
         left join c_role_resource crr
-               on crr.role_id = cr.id
+        on crr.role_id = cr.id
         left join c_resource cre
-               on cre.id = crr.resource_id
-        where cr.status = '0'
-          <if test="jobOrderType != null">
+        on cre.id = crr.resource_id
+        where cr.status = '0'  and cr.DESCRIPTION like 'Group%'
+        <if test="jobOrderType != null">
               and cre.url = #{jobOrderType}
           </if>
     </select>
@@ -80,5 +80,21 @@
             </if>
         </where>
         )
+    </select>
+    <select id="getViewJobKeyManageModesByAgent" resultType="java.util.Map">
+        select
+        jm1.ID as jm1_id,jm1.JO_KEY_TYPE as jm1_JO_KEY_TYPE,jm1.JO_KEY_NAME as jm1_JO_KEY_NAME,jm1.JO_KEY_BACK_NUM as jm1_JO_KEY_BACK_NUM,
+        jm2.ID as jm2_id,jm2.JO_KEY_TYPE as jm2_JO_KEY_TYPE,jm2.JO_KEY_NAME as jm2_JO_KEY_NAME,jm2.JO_KEY_BACK_NUM as jm2_JO_KEY_BACK_NUM,
+        jm3.ID as jm3_id,jm3.JO_KEY_TYPE as jm3_JO_KEY_TYPE,jm3.JO_KEY_NAME as jm3_JO_KEY_NAME,jm3.JO_KEY_BACK_NUM as jm3_JO_KEY_BACK_NUM
+        from JO_KEY_MANAGE jm1
+        left join JO_KEY_MANAGE jm2 on jm1.id = jm2.JO_KEY_BACK_NUM
+        left join JO_KEY_MANAGE jm3 on jm2.ID = jm3.JO_KEY_BACK_NUM
+        where jm3.id in
+        (select cre.url from C_RESOURCE cre
+        left join C_ROLE_RESOURCE crr on crr.RESOURCE_ID = cre.ID
+        left join C_ROLE cr on cr.ID = crr.ROLE_ID
+        left join C_USER_ROLE cur on cur.ROLE_ID = cr.ID
+        left join C_USER cu on cu.ID = cur.USER_ID
+        where  cr.DESCRIPTION like 'Views_agent' AND CRE.PID IS NOT NULL )
     </select>
 </mapper>
