@@ -223,11 +223,23 @@ public class OSupplementServiceImpl implements OSupplementService {
         BigDecimal count = new BigDecimal(oPaymentDetailList.size());
         if (count.compareTo(new BigDecimal(1)) == 0) {
             //如果就剩本条待付款  则需全部结清
-            BigDecimal amount = oPaymentDetail.getPayAmount();//这个是订单需补款金额
-            if (oSupplement.getPayAmount().compareTo(amount) == -1 || oSupplement.getPayAmount().compareTo(amount) == 1) {
-                logger.info("应补款金额为{}，请重新补款", amount);
-                throw new MessageException("应补款金额为" + amount + "，请重新补款");
+            OPaymentDetail oPayment_detail = oPaymentDetailList.get(0);
+            if(oPayment_detail.getPaymentStatus().compareTo(new BigDecimal(1))==0 || oPayment_detail.getPaymentStatus().compareTo(new BigDecimal(3))==0 ){
+                //如果是待付款 或者 逾期
+                BigDecimal amount = oPaymentDetail.getPayAmount();//这个是订单需补款金额
+                if (oSupplement.getPayAmount().compareTo(amount) == -1 || oSupplement.getPayAmount().compareTo(amount) == 1) {
+                    logger.info("应补款金额为{}，请重新补款", amount);
+                    throw new MessageException("应补款金额为" + amount + "，请重新补款");
+                }
+            }else if(oPayment_detail.getPaymentStatus().compareTo(new BigDecimal(2))==0){
+                //否则是部分付款
+                BigDecimal amount = oPaymentDetail.getPayAmount().subtract(oPaymentDetail.getRealPayAmount());
+                if (oSupplement.getPayAmount().compareTo(amount) == -1 || oSupplement.getPayAmount().compareTo(amount) == 1) {
+                    logger.info("应补款金额为{}，请重新补款", amount);
+                    throw new MessageException("应补款金额为" + amount + "，请重新补款");
+                }
             }
+
         }
 
         Date date = Calendar.getInstance().getTime();
