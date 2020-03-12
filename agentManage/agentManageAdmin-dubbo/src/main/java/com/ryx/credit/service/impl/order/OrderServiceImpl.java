@@ -4756,6 +4756,9 @@ public class OrderServiceImpl implements OrderService {
                         .andStatusEqualTo(Status.STATUS_1.status)
                         .andOrderIdEqualTo(orderAdj.getOrderId())
                         .andBatchCodeEqualTo(orderAdj.getNewPaymentId()==null?"":orderAdj.getNewPaymentId());
+                oPaymentDetailExample1.setOrderByClause(" pay_time asc, plan_num asc, plan_pay_time asc ");
+                List<OPaymentDetail> oPaymentDetails1 = oPaymentDetailMapper.selectByExample(oPaymentDetailExample1);
+                res.putKeyV("beginDate",oPaymentDetails1.size()==0?"":oPaymentDetails1.get(0).getPlanPayTime());
             }else {
                 oPaymentDetailExample.or()
                         .andBatchCodeEqualTo(orderAdj.getNewPaymentId()==null?"":orderAdj.getNewPaymentId())
@@ -4767,6 +4770,11 @@ public class OrderServiceImpl implements OrderService {
                         .andOrderIdEqualTo(orderAdj.getOrderId())
                         .andPaymentStatusIn(Arrays.asList(PaymentStatus.DF.code, PaymentStatus.BF.code, PaymentStatus.YQ.code))
                         .andBatchCodeEqualTo(orderAdj.getOrgPaymentId()==null?"":orderAdj.getOrgPaymentId());
+                Date DownPaymentDate = new Date();
+                Calendar c = Calendar.getInstance();
+                c.setTime(DownPaymentDate);
+                c.set(Calendar.DAY_OF_MONTH, 1);
+                res.putKeyV("beginDate",c.getTime());
             }
             oPaymentDetailExample.setOrderByClause(" pay_time asc, plan_num asc, plan_pay_time asc ");
             List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
@@ -4777,9 +4785,7 @@ public class OrderServiceImpl implements OrderService {
             }
             res.putKeyV("arrears",Arrears);
 
-            oPaymentDetailExample1.setOrderByClause(" pay_time asc, plan_num asc, plan_pay_time asc ");
-            List<OPaymentDetail> oPaymentDetails1 = oPaymentDetailMapper.selectByExample(oPaymentDetailExample1);
-            res.putKeyV("beginDate",oPaymentDetails1.size()==0?"":oPaymentDetails1.get(0).getPlanPayTime());
+
 
             OPaymentExample oPaymentExample = new OPaymentExample();
             oPaymentExample.or().andStatusEqualTo(Status.STATUS_1.status).andOrderIdEqualTo(orderAdj.getOrderId());
@@ -4787,13 +4793,7 @@ public class OrderServiceImpl implements OrderService {
             if (oPaymentList.size() != 1) {
                 return AgentResult.fail("支付信息错误");
             }
-            if (Status.STATUS_1.status.toString().equals(oPaymentList.get(0).getCustomStaging()) && orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) == 0){
-                Date DownPaymentDate = new Date();
-                Calendar c = Calendar.getInstance();
-                c.setTime(DownPaymentDate);
-                c.set(Calendar.DAY_OF_MONTH, 1);
-                res.putKeyV("beginDate",c.getTime());
-            }
+
             OPayment oPayment = oPaymentList.get(0);
             res.putKeyV("orderAdjDetails",orderAdjDetails);
             String refundMethod = RefundMehod.getContentByValue(orderAdj.getRefundMethod());
@@ -5838,7 +5838,7 @@ public class OrderServiceImpl implements OrderService {
                         dkfqAmount =dkfqAmount.add(oPaymentDetail.getPayAmount());
                     }
                     //欠款和代扣分期是否一致，不一致抛出异常
-                    if(dkfqAmount.compareTo(oPayment.getOutstandingAmount().subtract(orderAdj.getDifAmount()))!=0){
+                    if(dkfqAmount.compareTo(oPayment.getOutstandingAmount())!=0){
                         throw new MessageException("待付款和分期欠款不匹配");
                     }
                     //审批通过更新自定义分期为待付款
@@ -6023,7 +6023,7 @@ public class OrderServiceImpl implements OrderService {
                         dkfqAmount =dkfqAmount.add(oPaymentDetail.getPayAmount());
                     }
                     //欠款和代扣分期是否一致，不一致抛出异常
-                    if(dkfqAmount.compareTo(oPayment.getOutstandingAmount().subtract(orderAdj.getDifAmount()))!=0){
+                    if(dkfqAmount.compareTo(oPayment.getOutstandingAmount())!=0){
                         throw new MessageException("待付款和分期欠款不匹配");
                     }
                     //审批通过更新自定义分期为待付款
@@ -6319,7 +6319,7 @@ public class OrderServiceImpl implements OrderService {
                         dkfqAmount =dkfqAmount.add(oPaymentDetail.getPayAmount());
                     }
                     //欠款和代扣分期是否一致，不一致抛出异常
-                    if(dkfqAmount.compareTo(oPayment.getOutstandingAmount().subtract(orderAdj.getDifAmount()))!=0){
+                    if(dkfqAmount.compareTo(oPayment.getOutstandingAmount())!=0){
                         throw new MessageException("待付款和分期欠款不匹配");
                     }
                     //审批通过更新自定义分期为待付款
@@ -6491,7 +6491,7 @@ public class OrderServiceImpl implements OrderService {
                         dkfqAmount =dkfqAmount.add(oPaymentDetail.getPayAmount());
                     }
                     //欠款和代扣分期是否一致，不一致抛出异常
-                    if(dkfqAmount.compareTo(oPayment.getOutstandingAmount().subtract(orderAdj.getDifAmount()))!=0){
+                    if(dkfqAmount.compareTo(oPayment.getOutstandingAmount())!=0){
                         throw new MessageException("待付款和分期欠款不匹配");
                     }
                     //审批通过更新自定义分期为待付款
