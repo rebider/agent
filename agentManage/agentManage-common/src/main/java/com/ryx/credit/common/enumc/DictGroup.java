@@ -113,6 +113,7 @@ public enum DictGroup {
     AUTH_TIME("授权失效时间(秒)"),
     AUTH_CODE("授权码"),
     TOKEN_CODE("令牌"),
+    PLATFROM_TYPE("平台类型"),
     PASSKEY("密码AES_KEY");
 
 

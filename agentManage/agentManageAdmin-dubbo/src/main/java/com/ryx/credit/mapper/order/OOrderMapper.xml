@@ -861,6 +861,7 @@
   <select id="queryAllOrderListView" parameterType="map" resultType="map">
     <include refid="OracleDialectPrefix" />
     select
+    dict.D_ITEMNAME,
     d.PAY_METHOD,
     o.O_INURETIME,
     o.id,
@@ -926,6 +927,7 @@
     left join c_organization f on f.id = e.ag_doc_district
     left join c_organization g on g.id = e.ag_doc_pro
     left join o_organization org on e.ORGAN_NUM = org.ORG_ID
+    left join d_dict dict on dict.d_itemvalue = c.platform_type AND dict.d_group = 'ORDER' AND dict.d_artifact = 'PLATFROM_TYPE'
  <where>
       <if test="1==1"> and  o.status = 1 and  b.STATUS=1 and e.STATUS=1 </if>
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
@@ -936,6 +938,7 @@
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
       <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  CONCAT(CONCAT('%',#{agName}),'%') </if>
+      <if test="platformType!=null and platformType!=''"> and c.platform_type = #{platformType} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
       <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
       <if test="platformList!=null and platformList.size > 0">
