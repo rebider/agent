@@ -598,16 +598,16 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     //智慧POS、智慧plus、瑞+（条码前置）、实时POS品牌
                     if (platformType.code.equals(PlatformType.ZHPOS.code) || platformType.code.equals(PlatformType.RJQZ.code) || platformType.code.equals(PlatformType.SSPOS.code)) {
                         if (StringUtils.isNotBlank(item.getBusNum()) || StringUtils.isNotBlank(item.getBusLoginNum())) {
-                            logger.info("日结平台不允许升级");
-                            throw new MessageException("日结平台不允许升级");
+                            logger.info("当前平台不允许升级");
+                            throw new MessageException("当前平台不允许升级");
                         }
                     }
                     //POS平台、瑞+、智能POS
                     if (platformType.code.equals(PlatformType.POS.code) || platformType.code.equals(PlatformType.RJPOS.code) || platformType.code.equals(PlatformType.ZPOS.code)) {
                         if (StringUtils.isBlank(item.getBusNum()) && StringUtils.isNotBlank(item.getBusLoginNum())
                                 || StringUtils.isNotBlank(item.getBusNum()) && StringUtils.isBlank(item.getBusLoginNum())) {
-                            logger.info("[业务平台编号][平台登录账号]，平台升级，则需要同时输入；平台新签，则均不允许填写");
-                            throw new MessageException("[业务平台编号][平台登录账号]，平台升级，则需要同时输入；平台新签，则均不允许填写");
+                            logger.info("[业务平台编号][平台登录账号]不一致，如升级，则需要同时输入；如新签，则均不允许填写");
+                            throw new MessageException("[业务平台编号][平台登录账号]不一致，如升级，则需要同时输入；如新签，则均不允许填写");
                         }
                     }
                 }
