@@ -5688,10 +5688,10 @@ public class OrderServiceImpl implements OrderService {
 //        for (OPaymentDetail oPaymentDetail:oPaymentDetails){
 //            if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.DF.code) == 0 || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.YQ.code) == 0 ){
 //                beginDate = oPaymentDetail.getPlanPayTime();
-//                Calendar c = Calendar.getInstance();
-//                c.setTime(beginDate);
-//                c.add(Calendar.MONTH,-1);
-//                beginDate = c.getTime();
+                Calendar c = Calendar.getInstance();
+                c.setTime(beginDate);
+                c.add(Calendar.MONTH,-1);
+                beginDate = c.getTime();
 //                break;
 //            }
 //        }
