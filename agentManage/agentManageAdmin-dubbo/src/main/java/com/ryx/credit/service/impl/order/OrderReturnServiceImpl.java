@@ -984,12 +984,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             throw new ProcessException("启动部门参数为空!");
         }
 
-        //不同的业务类型找到不同的启动流程
-//        List<Dict> actlist = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.ACT_ORDER_RETURN.name());
-//        String workId = null;
-//        for (Dict dict : actlist) {
-//            workId = dict.getdItemvalue();
-//        }
         //启动审批
         String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("refund"), null, null, startPar);
         if (proce == null) {
