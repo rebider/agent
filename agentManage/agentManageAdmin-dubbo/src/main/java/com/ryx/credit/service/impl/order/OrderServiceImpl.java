@@ -5826,7 +5826,7 @@ public class OrderServiceImpl implements OrderService {
                     //更新付款分期为审批通过，检查分期金额是否等于待付金额
                     OPaymentDetailExample customStaginDetailQeury = new OPaymentDetailExample();
                     customStaginDetailQeury.or()
-                            .andStatusEqualTo(Status.STATUS_1.status)
+                            .andStatusEqualTo(Status.STATUS_0.status)
                             .andPayTypeEqualTo(PaymentType.DKFQ.code)
                             .andOrderIdEqualTo(oPayment.getOrderId())
                             .andPaymentStatusEqualTo(PaymentStatus.DS.code)
@@ -6011,7 +6011,7 @@ public class OrderServiceImpl implements OrderService {
                     //更新付款分期为审批通过，检查分期金额是否等于待付金额
                     OPaymentDetailExample customStaginDetailQeury = new OPaymentDetailExample();
                     customStaginDetailQeury.or()
-                            .andStatusEqualTo(Status.STATUS_1.status)
+                            .andStatusEqualTo(Status.STATUS_0.status)
                             .andPayTypeEqualTo(PaymentType.FRFQ.code)
                             .andOrderIdEqualTo(oPayment.getOrderId())
                             .andPaymentStatusEqualTo(PaymentStatus.DS.code)
@@ -6479,7 +6479,7 @@ public class OrderServiceImpl implements OrderService {
                     //更新付款分期为审批通过，检查分期金额是否等于待付金额
                     OPaymentDetailExample customStaginDetailQeury = new OPaymentDetailExample();
                     customStaginDetailQeury.or()
-                            .andStatusEqualTo(Status.STATUS_1.status)
+                            .andStatusEqualTo(Status.STATUS_0.status)
                             .andPayTypeEqualTo(PaymentType.DKFQ.code)
                             .andOrderIdEqualTo(oPayment.getOrderId())
                             .andPaymentStatusEqualTo(PaymentStatus.DS.code)
