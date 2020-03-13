@@ -1091,7 +1091,7 @@ public class OrderServiceImpl implements OrderService {
             //首付金额
             BigDecimal downPayment = oPayment.getDownPayment()== null ? BigDecimal.ZERO : oPayment.getDownPayment();
             //打款金额+抵扣金额不能大于首付金额
-            if (oPayment.getActualReceipt().add(dc).compareTo(downPayment) > 0) {
+            if (oPayment.getActualReceipt().add(dc).compareTo(downPayment) != 0) {
                 throw new MessageException("打款金额加抵扣金额不能大于首付金额");
             }
         }
@@ -1440,7 +1440,7 @@ public class OrderServiceImpl implements OrderService {
             //首付金额
             BigDecimal downPayment = oPayment_db.getDownPayment()== null ? BigDecimal.ZERO : oPayment_db.getDownPayment();
             //打款金额+抵扣金额不能大于首付金额
-            if (oPayment_db.getActualReceipt().add(dc).compareTo(downPayment) > 0) {
+            if (oPayment_db.getActualReceipt().add(dc).compareTo(downPayment) != 0) {
                 throw new MessageException("打款金额加抵扣金额不能大于首付金额");
             }
         }
