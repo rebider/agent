@@ -208,4 +208,29 @@ public class JoTaskVo extends JoOrder {
         this.joTaskAcceptTime = joTaskAcceptTime;
     }
 
+    @Override
+    public String toString() {
+        return "JoTaskVo{" +
+                "userId=" + userId +
+                ", joDealPersonId='" + joDealPersonId + '\'' +
+                ", joDealPersonName='" + joDealPersonName + '\'' +
+                ", orderType='" + orderType + '\'' +
+                ", secondDealGroup='" + secondDealGroup + '\'' +
+                ", joDealGroupId='" + joDealGroupId + '\'' +
+                ", joTaskId='" + joTaskId + '\'' +
+                ", joTaskStatus='" + joTaskStatus + '\'' +
+                ", joTopKeyNum='" + joTopKeyNum + '\'' +
+                ", joTaskTime=" + joTaskTime +
+                ", joTaskAcceptTime=" + joTaskAcceptTime +
+                ", joStartTimeBeginStr='" + joStartTimeBeginStr + '\'' +
+                ", joStartTimeEndStr='" + joStartTimeEndStr + '\'' +
+                ", joAcceptTimeBeginStr='" + joAcceptTimeBeginStr + '\'' +
+                ", joAcceptTimeEndStr='" + joAcceptTimeEndStr + '\'' +
+                ", joStartTimeBegin=" + joStartTimeBegin +
+                ", joStartTimeEnd=" + joStartTimeEnd +
+                ", joAcceptTimeBegin=" + joAcceptTimeBegin +
+                ", joAcceptTimeEnd=" + joAcceptTimeEnd +
+                ", platfromPerm=" + platfromPerm +
+                '}' +super.toString();
+    }
 }

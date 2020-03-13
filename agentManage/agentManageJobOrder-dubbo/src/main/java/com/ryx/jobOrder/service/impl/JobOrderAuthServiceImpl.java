@@ -1,6 +1,7 @@
 package com.ryx.jobOrder.service.impl;
 
 import com.ryx.credit.common.enumc.QueryAcceptType;
+import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.CResource;
 import com.ryx.credit.pojo.admin.agent.Agent;
@@ -84,12 +85,12 @@ public class JobOrderAuthServiceImpl implements JobOrderAuthService {
             logger.info("该用户为代理商{}",userId);
             List<Map<String, Object>> viewJobKeyManageModesByAgent = jobOrderAuthMapper.getViewJobKeyManageModesByAgent();
             List<JobKeyManageNodeVo> jobKeyManageNodeVos = mapTovo(viewJobKeyManageModesByAgent);
-            logger.info("返回代理商可发起的工单类型{}",jobKeyManageNodeVos);
+            logger.info("返回代理商可发起的工单类型{}",JsonUtil.objectToJson(jobKeyManageNodeVos));
             return jobKeyManageNodeVos;
         }
         List<Map<String,Object>> jobKeyManageNodes = jobOrderAuthMapper.getViewJobKeyManageNodesByUserId(userId);
         List<JobKeyManageNodeVo> jobKeyManageNodeVos = mapTovo(jobKeyManageNodes);
-        logger.info("{}为非代理商,可申请工单类型{}",userId,jobKeyManageNodes);
+        logger.info("{}为非代理商,可申请工单类型{}",userId, JsonUtil.objectToJson(jobKeyManageNodes));
         return jobKeyManageNodeVos;
     }
 
@@ -148,21 +149,21 @@ public class JobOrderAuthServiceImpl implements JobOrderAuthService {
 
         }
 
-        for (JobKeyManageNodeVo first:firstNodes){
-            for (JobKeyManageNodeVo second:secondNodes){
-                for (JobKeyManageNodeVo third:thirdNodes){
-                    if ( third.getJoKeyBackNum().equals(second.getId())){
-                        second.getChildNodes().add(third);
-                        continue;
-                    }
-                }
+        getNodes(firstNodes,getNodes(secondNodes,thirdNodes));
+
+        return  firstNodes;
+    }
+
+    public static List<JobKeyManageNodeVo> getNodes(List<JobKeyManageNodeVo> parentNodes,List<JobKeyManageNodeVo> childNodes){
+        for (JobKeyManageNodeVo first:parentNodes){
+            for (JobKeyManageNodeVo second:childNodes){
                 if (second.getJoKeyBackNum().equals(first.getId())){
                     first.getChildNodes().add(second);
                     continue;
                 }
             }
         }
-        return  firstNodes;
+        return parentNodes;
     }
 
 }
