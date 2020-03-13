@@ -518,7 +518,7 @@
       <if test="busNum!=null and busNum!=''"> and jo.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="priorityLevel!=null and priorityLevel!=''"> and jo.priority_level = #{priorityLevel} </if>
       <if test="joProgress!=null and joProgress!=''"> and jo.jo_progress = #{joProgress} </if>
-      <if test="launchBranchName!=null and launchBranchName!=''"> and jo.launch_branch_name = #{launchBranchName} </if>
+      <if test="launchBranchName!=null and launchBranchName!=''"> and jo.launch_branch_name like CONCAT(CONCAT('%',#{launchBranchName}),'%') </if>
       <if test="launchBeginTime!=null and launchEndTime!=null">  and jo.launch_time between #{launchBeginTime} and #{launchEndTime} </if>
       <if test="taskBeginTime!=null and taskEndTime!=null"> and ta.jo_task_accept_time between #{taskBeginTime} and #{taskEndTime}) </if>
       <if test="agId!=null and agId!=''"> and jo.ag_id = #{agId} </if>
