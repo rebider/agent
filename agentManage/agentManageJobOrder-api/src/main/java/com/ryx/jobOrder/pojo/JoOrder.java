@@ -324,4 +324,42 @@ public class JoOrder implements Serializable {
     public void setVersion(BigDecimal version) {
         this.version = version;
     }
+
+    @Override
+    public String toString() {
+        return "JoOrder{" +
+                "id='" + id + '\'' +
+                ", agId='" + agId + '\'' +
+                ", agName='" + agName + '\'' +
+                ", busId='" + busId + '\'' +
+                ", busNum='" + busNum + '\'' +
+                ", paltformNum='" + paltformNum + '\'' +
+                ", platformName='" + platformName + '\'' +
+                ", joFirstKeyNum='" + joFirstKeyNum + '\'' +
+                ", joSecondKeyNum='" + joSecondKeyNum + '\'' +
+                ", priorityLevel='" + priorityLevel + '\'' +
+                ", launchTime=" + launchTime +
+                ", launchPersonId='" + launchPersonId + '\'' +
+                ", launchPersonName='" + launchPersonName + '\'' +
+                ", launchPersonEmail='" + launchPersonEmail + '\'' +
+                ", launchBranchId='" + launchBranchId + '\'' +
+                ", launchBranchName='" + launchBranchName + '\'' +
+                ", acceptGroupCode='" + acceptGroupCode + '\'' +
+                ", acceptGroup='" + acceptGroup + '\'' +
+                ", acceptNowGroup='" + acceptNowGroup + '\'' +
+                ", dealTimeStart=" + dealTimeStart +
+                ", dealTimeEnd=" + dealTimeEnd +
+                ", dealTimeLength=" + dealTimeLength +
+                ", joProgress='" + joProgress + '\'' +
+                ", joTitle='" + joTitle + '\'' +
+                ", joContent='" + joContent + '\'' +
+                ", joAssessLevel=" + joAssessLevel +
+                ", joAssessorName='" + joAssessorName + '\'' +
+                ", joAssessorType='" + joAssessorType + '\'' +
+                ", joAssessorId='" + joAssessorId + '\'' +
+                ", joAssessContent='" + joAssessContent + '\'' +
+                ", joAssessTime=" + joAssessTime +
+                ", version=" + version +
+                '}';
+    }
 }

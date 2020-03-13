@@ -14,6 +14,8 @@ import com.ryx.jobOrder.service.JobOrderAuthService;
 import com.ryx.jobOrder.service.JobOrderManageService;
 import com.ryx.jobOrder.service.JobOrderStartService;
 import com.ryx.jobOrder.service.JobOrderTaskService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -27,6 +29,9 @@ import java.util.List;
 import java.util.Map;
 @Service("jobOrderStartService")
 public class JobOrderStartServiceImpl implements JobOrderStartService {
+
+    private static Logger logger = LoggerFactory.getLogger(JobOrderStartServiceImpl.class);
+
     private final BigDecimal version = new BigDecimal(0);
     @Autowired
     private JoOrderMapper joOrderMapper;
@@ -58,6 +63,7 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public FastMap createJobOrder(JoOrder jo, Map otherMap) throws Exception {
+        logger.info("创建工单，代理商ID"+jo.getAgId());
         jo.setId(idService.genId(TabId.jo_order));// 生成ID
         jo.setLaunchTime(new Date());
         jo.setVersion(version);
@@ -69,7 +75,10 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
         }
         otherMap.remove("userId");
         otherMap.remove("annoTableFile");
-        joOrderMapper.insert(jo);
+        int insertStu =  joOrderMapper.insert(jo);
+        if(insertStu!=1){
+            throw  new  MessageException("工单创建失败,工单编号"+jo.getId()+"代理商ID:"+jo.getAgId());
+        }
         String sedGroup = (String)otherMap.get("sedGroup");
         otherMap.remove("sedGroup");
         if(otherMap!= null ){
@@ -103,7 +112,8 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
         if(!FastMap.isSuc(status)){
            throw new MessageException("创建工单任务失败！工单任务:" + joTask.getId());
         }
-        return FastMap.fastFailMap();
+        logger.info("创建工单成功");
+        return FastMap.fastSuccessMap();
     }
 
 
@@ -126,6 +136,7 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
      */
     @Override
     public JoOrder queryListByTaskId(String taskId) {
+        logger.info("taskId查工单任务，taskID"+taskId);
         List<JoOrder> orders =  joOrderMapper.queryListByTaskId(taskId);
         if(orders!=null && orders.size()>0){
             return orders.get(0);

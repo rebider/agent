@@ -20,6 +20,8 @@ import com.ryx.jobOrder.service.JobOrderTaskService;
 import com.ryx.jobOrder.vo.JoTaskVo;
 import javafx.print.PrinterJob;
 import org.apache.kafka.common.protocol.types.Field;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -33,7 +35,7 @@ import java.util.Map;
 
 @Service("jobOrderTaskService")
 public class JobOrderTaskServiceImpl implements JobOrderTaskService {
-
+    private static Logger logger = LoggerFactory.getLogger(JobOrderTaskServiceImpl.class);
     private final BigDecimal version = new BigDecimal(0);
 
     @Autowired
@@ -58,6 +60,7 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public FastMap createJobOrderTask(JoTask joTask) throws Exception{
+        logger.info("开始保存工单任务");
         joTask.setId( idService.genId(TabId.jo_task) );
         joTask.setJoTaskStatus(JoTaskStatus.WSL.getValue());
         joTask.setJoTaskTime(new Date());
@@ -66,6 +69,7 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         if(status != 1){
             throw new MessageException("插入失败" + joTask.getId());
         }
+        logger.info("工单任务保存成功，taskID"+joTask.getId());
         return FastMap.fastSuccessMap();
     }
 
@@ -76,6 +80,7 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
      * @return
      */
     public PageInfo queryJobOrderTaskVo(JoTaskVo joTaskVo, Page page){
+        logger.info("查询 工单任务VO 列表，条件："+joTaskVo.toString());
         String joAcceptTimeBeginStr = joTaskVo.getJoAcceptTimeBeginStr();
         String joAcceptTimeEndStr = joTaskVo.getJoAcceptTimeEndStr();
         String joStartTimeBeginStr = joTaskVo.getJoStartTimeBeginStr();
@@ -114,6 +119,7 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
      */
     @Override
     public JoTask queryJobOrderTaskByTaskId(String taskId) {
+        logger.info("根据 id 查询任务,taskid" + taskId);
         JoTask query = new JoTask();
         query.setId(taskId);
         List<JoTask> list= queryJobOrderTask(query);
@@ -176,9 +182,6 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
 
     /**
      * 查询最后的一条工单
-     * 1. 查询上条工单
-     * 2. 查询指派部门
-     * 3. 生成新工单任务
      * @param joTask
      * @return
      * @throws Exception
@@ -197,9 +200,6 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
 
     /**
      * 工单受理服务
-     * 1. 查询上条工单
-     * 2. 查询指派部门
-     * 3. 生成新工单任务
      * @param joTask
      * @return
      * @throws Exception
@@ -260,6 +260,7 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public FastMap endJoTask(JoTask joTask) throws MessageException {
+        logger.info("结束工单任务,taskId:"+joTask.getId());
         // 更新工单任务
         joTask.setJoTaskNextTime(new Date());
         joTask.setJoTaskStatus(JoTaskStatus.YHF.getValue());
@@ -267,7 +268,7 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         joTask.setJoTaskTimeLength(new BigDecimal(dLength).setScale(2, BigDecimal.ROUND_HALF_UP));
         int status = joTaskMapper.updateByPrimaryKeySelective(joTask);
         if(status != 1){
-            throw new MessageException("更新失败");
+            throw new MessageException("结束工单任务失败");
         }
         return FastMap.fastSuccessMap();
     }
@@ -282,6 +283,7 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public FastMap acceptOrderByTaskId(JoTask joTask) throws Exception {
+        logger.info("工单单受理服务,taskId:"+joTask.getId());
         // 获取joId
         String joId = joTask.getJoId();
         // 查询订单的状态
@@ -303,13 +305,14 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         joT.setJoTaskStatus(JoTaskStatus.SLZ.getValue());
         FastMap fastMap = updateJobOrderTask(joT);
         if(FastMap.isSuc(fastMap)){
+            logger.info("工单受理成功,taskId:"+joTask.getId());
             return FastMap.fastSuccessMap();
         }
         return null;
     }
 
     /**
-     * 工单受理服务
+     * 取消工单受理服务
      * 1. 清空当前 工单任务 信息
      * 2. 判断该工单任务是否是 第一条任务
      * 3. 是否更新 工单信息
@@ -319,6 +322,7 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public FastMap cancelOrderByTaskId(JoTask joTask) throws Exception {
+        logger.info("取消工单任务受理,taskId:"+joTask.getId());
         // 获取joId
         String joId = joTask.getJoId();
         // 查询订单的状态
@@ -339,6 +343,7 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         update.setJoTaskStatus(JoTaskStatus.WSL.getValue());
         int status = joTaskMapper.updateByPrimaryKey(update);
         if(status == 1){
+            logger.info("取消工单任务受理成功,taskId:"+joTask.getId());
             return FastMap.fastSuccessMap();
         }
         return FastMap.fastFailMap();
