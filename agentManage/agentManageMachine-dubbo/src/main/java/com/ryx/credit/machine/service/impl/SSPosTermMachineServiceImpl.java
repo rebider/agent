@@ -420,7 +420,7 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
             listDetail.add(mapDetail);
         }
         jsonObject.put("snList", listDetail);
-        log.info("活动调整POS请求参数:{}",JSONObject.toJSON(jsonObject));
+        log.info("实时POS活动调整请求参数:{}",JSONObject.toJSON(jsonObject));
         AgentResult res = request("ORG016", jsonObject);
         if(res.isOK()) {
             JSONObject respXMLObj = JSONObject.parseObject(res.getMsg());
@@ -443,7 +443,7 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
             }
         }else{
             try {
-                log.info("活动调整POS返回参数:{}", res.getMsg());
+                log.info("实时POS活动调整返回参数:{}", res.getMsg());
                 JSONObject respXMLObj = JSONObject.parseObject(res.getMsg());
                 JSONObject res_data = respXMLObj.getJSONObject("data");
                 if (res_data != null && res_data.size() > 0) {
@@ -464,7 +464,7 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                log.error("活动调整POS请求参数失敗:",e);
+                log.error("实时POS活动调整请求参数失敗:",e);
                 return AgentResult.fail("服务失败");
             }
         }
