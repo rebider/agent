@@ -582,7 +582,7 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 生成自定义分期
-     * @param agentVo
+     * @param paymentId, paymentMethod, data
      * @return
      * @throws MessageException
      */
