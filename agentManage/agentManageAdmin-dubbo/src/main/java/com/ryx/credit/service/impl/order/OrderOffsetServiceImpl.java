@@ -824,6 +824,10 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                     .andStatusEqualTo(Status.STATUS_1.status);
         }else if (paytype.equals(QueryType.SRCID.code)){
             SettleAccounts settleAccounts = settleAccountsMapper.selectByPrimaryKey(srcId);
+            if(null == settleAccounts){
+                logger.info("不存在补款记录,明细不存在");
+                return null;
+            }
             oPayDetailExample.or().andSrcIdEqualTo(settleAccounts.getSrcId())
                     .andBusStatEqualTo(Status.STATUS_1.status)
                     .andStatusEqualTo(Status.STATUS_1.status);
