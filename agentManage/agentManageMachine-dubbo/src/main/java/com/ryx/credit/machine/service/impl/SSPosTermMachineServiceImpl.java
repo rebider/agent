@@ -476,7 +476,7 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
         data.put("serialNumber", serialNumber);
         log.info("实时POS活动调整结果查询请求参数：{}", JSONObject.toJSONString(data));
         AgentResult agentResult = request("ORG017", data);
-        log.info("活动调整结果查询返回参数：{}", JSONObject.toJSONString(agentResult));
+        log.info("实时POS活动调整结果查询返回参数：{}", JSONObject.toJSONString(agentResult));
         if(agentResult.isOK()){
             String resmsg = agentResult.getMsg();
             if(resmsg!=null) {
