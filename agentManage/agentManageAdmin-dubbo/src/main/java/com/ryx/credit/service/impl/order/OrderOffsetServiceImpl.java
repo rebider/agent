@@ -791,6 +791,10 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
         }
         if (offsetAmt.compareTo(amount)!=0) return AgentResult.fail("冲抵金额与申请不一致");
         for (OPayDetail oPayDetail:opayDetails){
+            if(oPayDetail.getBusStat().compareTo(Status.STATUS_1.status) == 0){
+                logger.info("付款明细{}已生效,不允许取消",oPayDetail.getId());
+                throw new MessageException("付款明细已生效,不允许取消");
+            }
             oPayDetail.setStatus(Status.STATUS_0.status);
             if(oPayDetailMapper.updateByPrimaryKeySelective(oPayDetail)!=1){
                 logger.info("付款明细更新失败");
