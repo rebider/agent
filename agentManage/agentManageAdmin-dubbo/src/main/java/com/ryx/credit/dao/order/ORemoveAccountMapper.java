@@ -35,4 +35,8 @@ public interface ORemoveAccountMapper {
     int orderDetailCount(Map<String, Object> param);
 
     int isRemoveAccount(Map map);
+
+    List<Map<String,Object>> orderDetailListNew(Map<String, Object> param);
+
+    int orderDetailCountNew(Map<String, Object> param);
 }

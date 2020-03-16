@@ -97,4 +97,6 @@ public interface IOrderReturnService {
     List<ReturnOrderVo> exportRetForDetail(Map map);
 
     Map<String, Object> deductDetail(String returnId) throws ProcessException;
+
+    AgentResult updateReturnOrder(OReturnOrder oReturnOrder);
 }

@@ -353,4 +353,11 @@ public interface OrderService {
      * 执行订单调整计划
      */
     AgentResult adjustDoPayPlan(String adjId,OrderAdj orderAdj)throws Exception;
+
+    /**
+     * 查询是否可终止订单调整审批流
+     * @param orderAdjId
+     * @return
+     */
+    AgentResult enableOrderAdjFinish(String orderAdjId)throws Exception;
 }

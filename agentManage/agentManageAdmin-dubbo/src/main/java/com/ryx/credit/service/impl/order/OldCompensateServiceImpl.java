@@ -100,6 +100,9 @@ public class OldCompensateServiceImpl implements OldCompensateService {
     private OActivityVisibleMapper activityVisibleMapper;
     @Autowired
     private OsnOperateService osnOperateService;
+    @Autowired
+    private OrderOffsetService orderOffsetService;
+
     /**
      * 解析提交过来的sn,
      * @param excelList
@@ -754,6 +757,12 @@ public class OldCompensateServiceImpl implements OldCompensateService {
         //审批拒绝处理缴款信息
         if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
             agentResult = cashReceivablesService.refuseProcing(CashPayType.REFUNDPRICEDIFF,oRefundPriceDiff.getId(),oRefundPriceDiff.getcUser());
+            //取消抵扣
+            agentResult = orderOffsetService.OffsetArrearsCancle(oRefundPriceDiff.getMachOweAmt(), OffsetPaytype.DDMD.code, oRefundPriceDiff.getId());
+            if (!agentResult.isOK()){
+                log.error("换活动抵扣欠款取消失败!id"+oRefundPriceDiff.getId());
+                throw new MessageException("换活动抵扣欠款取消失败!id"+oRefundPriceDiff.getId());
+            }
         }
         //审批通过处理缴款信息
         if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
@@ -789,6 +798,12 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                     throw new ProcessException("处理失败");
                 }
             });
+            //提交抵扣
+            agentResult = orderOffsetService.OffsetArrearsCommit(oRefundPriceDiff.getMachOweAmt(), OffsetPaytype.DDMD.code, oRefundPriceDiff.getId());
+            if (!agentResult.isOK()){
+                log.error("换活动抵扣欠款失败!id"+oRefundPriceDiff.getId());
+                throw new MessageException("换活动抵扣欠款失败!id"+oRefundPriceDiff.getId()+","+agentResult.getMsg());
+            }
             //调用接口调整
             AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "adjust");
             if(!synOrVerifyResult.isOK()){

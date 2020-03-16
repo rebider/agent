@@ -68,5 +68,7 @@ public interface CompensateService {
     PageInfo exportRefundPriceDiff(ORefundPriceDiffVo refundPriceDiff, PageInfo pageInfo, Boolean isPlan);
 
     PageInfo exportRefundPriceDiffDetail(ORefundPriceDiffDetail refundPriceDiffDetail, PageInfo pageInfo, Boolean isPlan);
+    AgentResult updateoRefundPriceDiff(ORefundPriceDiff oRefundPriceDiff);
+
 }
 

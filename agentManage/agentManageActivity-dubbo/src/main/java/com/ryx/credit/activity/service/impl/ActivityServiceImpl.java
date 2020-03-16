@@ -77,6 +77,11 @@ public class ActivityServiceImpl implements ActivityService {
         }
     }
 
+    @Override
+    public ProcessEngine getProcessEngine() {
+        return processEngine;
+    }
+
     @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public String createDeloyFlow(String deployName, String workId, String activityPath, String activityImagePath,Map<String,Object> map)throws ProcessException {

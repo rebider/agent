@@ -1,6 +1,7 @@
 package com.ryx.credit.pojo.admin.order;
 
 import com.ryx.credit.common.util.Page;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1237,73 +1238,73 @@ public class OSupplementExample {
             return (Criteria) this;
         }
 
-        public Criteria andCheckPeopleIsNull() {
-            addCriterion("CHECK_PEOPLE is null");
+        public Criteria andLogicalVersionIsNull() {
+            addCriterion("LOGICAL_VERSION is null");
             return (Criteria) this;
         }
 
-        public Criteria andCheckPeopleIsNotNull() {
-            addCriterion("CHECK_PEOPLE is not null");
+        public Criteria andLogicalVersionIsNotNull() {
+            addCriterion("LOGICAL_VERSION is not null");
             return (Criteria) this;
         }
 
-        public Criteria andCheckPeopleEqualTo(String value) {
-            addCriterion("CHECK_PEOPLE =", value, "checkPeople");
+        public Criteria andLogicalVersionEqualTo(String value) {
+            addCriterion("LOGICAL_VERSION =", value, "logicalVersion");
             return (Criteria) this;
         }
 
-        public Criteria andCheckPeopleNotEqualTo(String value) {
-            addCriterion("CHECK_PEOPLE <>", value, "checkPeople");
+        public Criteria andLogicalVersionNotEqualTo(String value) {
+            addCriterion("LOGICAL_VERSION <>", value, "logicalVersion");
             return (Criteria) this;
         }
 
-        public Criteria andCheckPeopleGreaterThan(String value) {
-            addCriterion("CHECK_PEOPLE >", value, "checkPeople");
+        public Criteria andLogicalVersionGreaterThan(String value) {
+            addCriterion("LOGICAL_VERSION >", value, "logicalVersion");
             return (Criteria) this;
         }
 
-        public Criteria andCheckPeopleGreaterThanOrEqualTo(String value) {
-            addCriterion("CHECK_PEOPLE >=", value, "checkPeople");
+        public Criteria andLogicalVersionGreaterThanOrEqualTo(String value) {
+            addCriterion("LOGICAL_VERSION >=", value, "logicalVersion");
             return (Criteria) this;
         }
 
-        public Criteria andCheckPeopleLessThan(String value) {
-            addCriterion("CHECK_PEOPLE <", value, "checkPeople");
+        public Criteria andLogicalVersionLessThan(String value) {
+            addCriterion("LOGICAL_VERSION <", value, "logicalVersion");
             return (Criteria) this;
         }
 
-        public Criteria andCheckPeopleLessThanOrEqualTo(String value) {
-            addCriterion("CHECK_PEOPLE <=", value, "checkPeople");
+        public Criteria andLogicalVersionLessThanOrEqualTo(String value) {
+            addCriterion("LOGICAL_VERSION <=", value, "logicalVersion");
             return (Criteria) this;
         }
 
-        public Criteria andCheckPeopleLike(String value) {
-            addCriterion("CHECK_PEOPLE like", value, "checkPeople");
+        public Criteria andLogicalVersionLike(String value) {
+            addCriterion("LOGICAL_VERSION like", value, "logicalVersion");
             return (Criteria) this;
         }
 
-        public Criteria andCheckPeopleNotLike(String value) {
-            addCriterion("CHECK_PEOPLE not like", value, "checkPeople");
+        public Criteria andLogicalVersionNotLike(String value) {
+            addCriterion("LOGICAL_VERSION not like", value, "logicalVersion");
             return (Criteria) this;
         }
 
-        public Criteria andCheckPeopleIn(List<String> values) {
-            addCriterion("CHECK_PEOPLE in", values, "checkPeople");
+        public Criteria andLogicalVersionIn(List<String> values) {
+            addCriterion("LOGICAL_VERSION in", values, "logicalVersion");
             return (Criteria) this;
         }
 
-        public Criteria andCheckPeopleNotIn(List<String> values) {
-            addCriterion("CHECK_PEOPLE not in", values, "checkPeople");
+        public Criteria andLogicalVersionNotIn(List<String> values) {
+            addCriterion("LOGICAL_VERSION not in", values, "logicalVersion");
             return (Criteria) this;
         }
 
-        public Criteria andCheckPeopleBetween(String value1, String value2) {
-            addCriterion("CHECK_PEOPLE between", value1, value2, "checkPeople");
+        public Criteria andLogicalVersionBetween(String value1, String value2) {
+            addCriterion("LOGICAL_VERSION between", value1, value2, "logicalVersion");
             return (Criteria) this;
         }
 
-        public Criteria andCheckPeopleNotBetween(String value1, String value2) {
-            addCriterion("CHECK_PEOPLE not between", value1, value2, "checkPeople");
+        public Criteria andLogicalVersionNotBetween(String value1, String value2) {
+            addCriterion("LOGICAL_VERSION not between", value1, value2, "logicalVersion");
             return (Criteria) this;
         }
     }
