@@ -129,7 +129,7 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
 
         //查询busNum
         List<String> busNums = agentBusInfoMapper.selectBusNumByBusProCode(
-                FastMap.fastMap("platformType", new String[]{PlatformType.POS.code,
+                FastMap.fastMap("platformTypes", new String[]{PlatformType.POS.code,
                         PlatformType.ZPOS.code,
                         PlatformType.ZHPOS.code,
                         PlatformType.SSPOS.code})
@@ -171,7 +171,7 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
         CBranchInner cBranchInner = branchInnerMapper.selectByPrimaryKey(id);
         //查询busNum
         List<String> busNums = agentBusInfoMapper.selectBusNumByBusProCode(
-                FastMap.fastMap("platformType", new String[]{PlatformType.POS.code,
+                FastMap.fastMap("platformTypes", new String[]{PlatformType.POS.code,
                         PlatformType.ZPOS.code,
                         PlatformType.ZHPOS.code,
                         PlatformType.SSPOS.code})
