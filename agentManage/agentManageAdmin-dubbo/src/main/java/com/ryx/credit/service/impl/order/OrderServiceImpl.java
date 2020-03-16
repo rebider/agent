@@ -5454,7 +5454,7 @@ public class OrderServiceImpl implements OrderService {
             List<OOrder> oOrders = orderMapper.selectByExample(oOrderExample);
             oOrders.get(0).setOrderStatus(OrderStatus.ENABLE.status);
             orderMapper.updateByPrimaryKeySelective(oOrders.get(0));
-            if(orderAdj.getOffsetAmount().compareTo(BigDecimal.ZERO)>0&&orderAdj.getLogicalVersion().compareTo(BigDecimal.ONE)==0){
+            if(orderAdj.getOffsetAmount().compareTo(BigDecimal.ZERO)>0&& orderAdj.getLogicalVersion()!=null && orderAdj.getLogicalVersion().compareTo(BigDecimal.ONE)==0){
                 AgentResult agentResult = orderOffsetService.OffsetArrearsCancle(orderAdj.getOffsetAmount(), DDTZ.code, orderAdj.getId());
                 if (!agentResult.isOK()){
                     throw new MessageException("订单调整抵扣欠款数据更新异常！");
