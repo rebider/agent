@@ -1413,10 +1413,15 @@ union
       LEFT JOIN a_platform p ON b.bus_platform = p.platform_num
       LEFT JOIN c_BRANCH_INNER bi ON bi.branch_login = b.ag_doc_pro
       WHERE 1=1
-      AND p.platform_type = #{platformType}
+      AND b.status=1
+      AND b.bus_status in ('0','1','2')
       AND b.ag_doc_pro IS NOT NULL
       AND b.bus_num IS NOT NULL
       AND bi.branch_login = #{branchLogin}
+      AND p.platform_type IN
+      <foreach collection="platformTypes" open="(" separator="," close=")" item="platformType">
+        #{platformType}
+      </foreach>
       GROUP BY b.bus_num
   </select>
 </mapper>
