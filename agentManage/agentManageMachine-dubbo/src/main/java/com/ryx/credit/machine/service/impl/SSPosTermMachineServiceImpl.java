@@ -474,9 +474,9 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
     public AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception {
         JSONObject data = new JSONObject();
         data.put("serialNumber", serialNumber);
-        log.info("活动调整结果查询返回：{}",serialNumber);
+        log.info("实时POS活动调整结果查询请求参数：{}", JSONObject.toJSONString(data));
         AgentResult agentResult = request("ORG017", data);
-        log.info("活动调整结果查询返回：{},{}",serialNumber,agentResult);
+        log.info("活动调整结果查询返回参数：{}", JSONObject.toJSONString(agentResult));
         if(agentResult.isOK()){
             String resmsg = agentResult.getMsg();
             if(resmsg!=null) {
@@ -488,17 +488,17 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
                 String resMsg = res.getString("resMsg");
                 if(serialNumber.equals(serialNumber_res) && "00".equals(snAdjStatus) && "000000".equals(result_code)){
                     //调整成功
-                    log.info("活动调整成功:{} {}",serialNumber,platformType);
+                    log.info("实时POS活动调整成功:{} {}",serialNumber,platformType);
                     return AgentResult.ok("00");
                 }else if(serialNumber.equals(serialNumber_res) && "01".equals(snAdjStatus) && "000000".equals(result_code)) {
                     //调整中
-                    log.info("活动调整中:{} {}",serialNumber,platformType);
+                    log.info("实时POS活动调整中:{} {}",serialNumber,platformType);
                     AgentResult result = AgentResult.ok("01");
                     result.setMsg(resMsg);
                     return result;
                 }else if(serialNumber.equals(serialNumber_res) && "02".equals(snAdjStatus) && "000000".equals(result_code)) {
                     //调整失败
-                    log.info("活动调整失败:{} {}",serialNumber,platformType);
+                    log.info("实时POS活动调整失败:{} {}",serialNumber,platformType);
                     AgentResult result = AgentResult.ok("02");
                     result.setMsg(resMsg);
                     return result;
