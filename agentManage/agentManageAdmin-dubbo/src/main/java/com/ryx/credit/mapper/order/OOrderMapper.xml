@@ -1937,7 +1937,7 @@
     left join o_payment op on o_payment_detail.payment_id=op.id
     left join o_order o on o.id=op.order_id
     left join a_agent_businfo businfo on businfo.id=o.bus_id
-    where o_payment_detail.status=1 and o.status=1 and op.status=1   and  o_payment_detail.payment_status in (1,2,3)
+    where 1=1 and o_payment_detail.status=1 and o.status=1 and op.status=1   and  o_payment_detail.payment_status in (1,2,3)
     and  businfo.agent_id is not null and order_status=2 and review_status=3
      and payment_type = 'ORDER_FKD'
     <include refid="ARREARAGE_WHERE_SQL"/>
