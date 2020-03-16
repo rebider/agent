@@ -78,7 +78,7 @@
     select
     <include refid="Base_Column_List" />
     from O_REMOVE_ACCOUNT
-    where ID = #{id,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR} and STATUS=1
   </select>
   <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.ORemoveAccountExample">
     delete from O_REMOVE_ACCOUNT
@@ -489,6 +489,69 @@ select count(1) from (
     left join a_platform plat ON plat.platform_num = ra.bus_platform
     left join o_order o on o.id=o_payment_detail.order_id
     where o_payment_detail.Payment_status in(2,4,6)
+    <include refid="RACCOUNTDETAIL_WHERE_SQL"/>
+  </select>
+
+  <select id="orderDetailListNew" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="PAGING_START" />
+    select op.DOWN_PAYMENT_COUNT,
+    o.C_TIME,
+    ag.AG_UNIQ_NUM,
+    plat.platform_name,
+    to_char(o_payment_detail.plan_pay_time, 'yyyy-mm') rmonth,
+    o_payment_detail.Payment_status,
+    o_payment_detail.plan_num,
+    o_payment_detail.pay_amount,
+    o_payment_detail.order_id,
+    o_payment_detail.src_id,
+    ra.AG_NAME,
+    ra.id,
+    ra.AG_ID,
+    ra.BUS_PLATFORM,
+    ra.BUS_NUM,
+    ra.RAMOUNT,
+    ra.REAL_RAMOUNT,
+    ra.PAY_METHOD,
+    d.amount
+    from O_PAYMENT_DETAIL
+    left join O_PAYMENT op
+    on O_PAYMENT_DETAIL.PAYMENT_ID = op.id
+    left join o_order o
+    on o.id = o_payment_detail.order_id
+    left join o_pay_detail d
+    on d.arr_id = o_payment_detail.id
+    left join O_REMOVE_ACCOUNT ra
+    on d.src_id = ra.id
+    left join a_agent ag
+    on ag.id = ra.ag_id
+    left join a_platform plat
+    ON plat.platform_num = ra.bus_platform
+    where o_payment_detail.Payment_status in (2, 4, 6)
+    and d.bus_stat = '1'
+    and d.status = '1'
+    <include refid="RACCOUNTDETAIL_WHERE_SQL"/>
+    <include refid="PAGING_END" />
+  </select>
+
+
+  <select id="orderDetailCountNew" parameterType="java.util.Map" resultType="int">
+    select count(1)
+    from O_PAYMENT_DETAIL
+    left join O_PAYMENT op
+    on O_PAYMENT_DETAIL.PAYMENT_ID = op.id
+    left join o_order o
+    on o.id = o_payment_detail.order_id
+    left join o_pay_detail d
+    on d.arr_id = o_payment_detail.id
+    left join O_REMOVE_ACCOUNT ra
+    on d.src_id = ra.id
+    left join a_agent ag
+    on ag.id = ra.ag_id
+    left join a_platform plat
+    ON plat.platform_num = ra.bus_platform
+    where o_payment_detail.Payment_status in (2, 4, 6)
+    and d.bus_stat = '1'
+    and d.status = '1'
     <include refid="RACCOUNTDETAIL_WHERE_SQL"/>
   </select>
 
