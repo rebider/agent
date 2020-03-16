@@ -1317,7 +1317,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             String returnId = rel.getBusId();
             OReturnOrder oReturnOrder = returnOrderMapper.selectByPrimaryKey(returnId);
             //提交抵扣
-            AgentResult agentResult = orderOffsetService.OffsetArrearsCommit(oReturnOrder.getReturnAmo(), OffsetPaytype.THTK.code, returnId);
+            AgentResult agentResult = orderOffsetService.OffsetArrearsCommit(oReturnOrder.getTakeOutAmo(), OffsetPaytype.THTK.code, returnId);
             if (!agentResult.isOK()){
                 log.error("抵扣欠款提交失败");
                 throw new MessageException(agentResult.getMsg());

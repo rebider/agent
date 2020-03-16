@@ -1162,7 +1162,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                 }
             }
             //提交抵扣
-            AgentResult agentResult = orderOffsetService.OffsetArrearsCommit(returnOrder.getReturnAmo(), OffsetPaytype.THTK.code, returnId);
+            AgentResult agentResult = orderOffsetService.OffsetArrearsCommit(returnOrder.getTakeOutAmo(), OffsetPaytype.THTK.code, returnId);
             if (!agentResult.isOK()){
                 logger.error("抵扣欠款提交失败");
                 throw new MessageException(agentResult.getMsg());
