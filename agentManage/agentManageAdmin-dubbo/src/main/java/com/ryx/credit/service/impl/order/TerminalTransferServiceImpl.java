@@ -763,9 +763,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     public Map<String, Object> disposeSN(String snBeginNum, String snEndNum) throws MessageException {
         Map<String, Object> map = new HashMap<>();
 
-        if(snBeginNum.length()!=snEndNum.length()){
+      /*  if(snBeginNum.length()!=snEndNum.length()){
             throw  new MessageException("请检查两次输入的SN是否是同一批次SN");
-        }
+        }*/
         String snBeginNumArr=snBeginNum;
         String snEndNumArr=snEndNum;
         if(snBeginNum.length()>6){
@@ -798,9 +798,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             }
         }
         String sb2 = snEndNum.replaceAll(sbEnd.reverse().toString(), "");
-        if(!sb1.equals(sb2)){
+       /* if(!sb1.equals(sb2)){
             throw  new MessageException("请检查两次输入的SN是否是同一批次SN");
-        }
+        }*/
         map.put("sb", sb1);
         map.put("snBeginNum1", "".equals(sbBegin) ? "0" : sbBegin.toString());
         map.put("snEndNum1", "".equals(sbEnd) ? "0" : sbEnd.toString());
@@ -1151,18 +1151,14 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 } catch (Exception e) {
                     e.printStackTrace();
                     agentResult = AgentResult.fail();
-                    agentResult.setMsg(JSONObject.toJSONString(FastMap.fastMap("data",
-                            FastMap.fastMap("result_code", "000000"))
-                            .putKeyV("transferStatus", "01")
-                            .putKeyV("resMsg", "未联动")
-                    ));
                 }
                 try {
-                    JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
-                    JSONObject data = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
-                    String result_code = String.valueOf(data.get("result_code"));
-                    String resMsg = String.valueOf(data.get("resMsg"));
+
                     if (agentResult.isOK()) {
+                        JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
+                        JSONObject data = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
+                        String result_code = String.valueOf(data.get("result_code"));
+                        String resMsg = String.valueOf(data.get("resMsg"));
                         if ("000000".equals(result_code)) {
                             String transferStatus = String.valueOf(data.get("transferStatus"));
                             if ("00".equals(transferStatus)) {
@@ -1198,7 +1194,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     } else {
                         log.info("未连通查询请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
                         log.info("未连通查询请求结果：{}", JSONObject.toJSON(agentResult));
-                        terminalTransferDetail.setRemark(resMsg);
+                        terminalTransferDetail.setRemark("POS未联动调整需线下处理");
                         terminalTransferDetail.setAdjustTime(new Date());
                         terminalTransferDetail.setuTime(new Date());
                         terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());
@@ -1208,7 +1204,6 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     e.printStackTrace();
                     log.info("插入或更新数据库失败");
                     log.info("插入或更新数据库失败");
-                    continue;
                 }
             }
             //手刷划拨开始查询
@@ -1230,11 +1225,6 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 } catch (Exception e) {
                     e.printStackTrace();
                     agentResult = AgentResult.fail();
-                    agentResult.setMsg(JSONObject.toJSONString(FastMap.fastMap("data",
-                            FastMap.fastMap("result_code", "000000"))
-                            .putKeyV("transferStatus", "01")
-                            .putKeyV("resMsg", "未联动")
-                    ));
                 }
 
                 try {
@@ -1267,7 +1257,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     } else {
                         log.info("手刷划拨未联动请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
                         log.info("手刷划拨未联动返回参数：{}", JSONObject.toJSON(agentResult));
-                        terminalTransferDetail.setRemark("未联动调整需线下处理");
+                        terminalTransferDetail.setRemark("MPOS未联动调整需线下处理");
                         terminalTransferDetail.setAdjustTime(new Date());
                         terminalTransferDetail.setuTime(new Date());
                         terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());
@@ -1278,7 +1268,6 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     e.printStackTrace();
                     log.info("插入或更新数据库失败");
                     log.info("插入或更新数据库失败");
-                    continue;
                 }
             }
             if (terminalTransferDetail.getPlatformType().toString().equals("3")) {
@@ -1286,17 +1275,24 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
 
             }
 
-            //两天后不处理就自动变为失败
-            long day = (new Date().getTime() - (terminalTransferDetail.getuTime() == null ? terminalTransferDetail.getcTime() : terminalTransferDetail.getuTime()).getTime()) / (24 * 60 * 60 * 1000);
-            if (day >= 2) {
-                log.info("划拨超时失败请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
-                log.info("划拨超时失败请求结果：{}", JSONObject.toJSON(agentResult));
-                terminalTransferDetail.setRemark("划拨超时失败");
-                terminalTransferDetail.setAdjustTime(new Date());
-                terminalTransferDetail.setuTime(new Date());
-                terminalTransferDetail.setAdjustStatus(AdjustStatus.WCDJG.getValue());
-                terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
+            try {
+                //两天后不处理就自动变为失败
+                long day = (new Date().getTime() - (terminalTransferDetail.getuTime() == null ? terminalTransferDetail.getcTime() : terminalTransferDetail.getuTime()).getTime()) / (24 * 60 * 60 * 1000);
+                if (day >= 2) {
+                    log.info("划拨超时失败请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
+                    log.info("划拨超时失败请求结果：{}", JSONObject.toJSON(agentResult));
+                    terminalTransferDetail.setRemark("划拨超时失败");
+                    terminalTransferDetail.setAdjustTime(new Date());
+                    terminalTransferDetail.setuTime(new Date());
+                    terminalTransferDetail.setAdjustStatus(AdjustStatus.WCDJG.getValue());
+                    terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
+                }
+            }catch (Exception e){
+                log.info("划拨超时更新数据库失败");
+                e.printStackTrace();
+                continue;
             }
+
         }
     }
 
