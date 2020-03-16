@@ -512,7 +512,7 @@ select count(1) from (
     ra.RAMOUNT,
     ra.REAL_RAMOUNT,
     ra.PAY_METHOD,
-    d.amount
+    nvl( d.amount,0) as amount
     from O_PAYMENT_DETAIL
     left join O_PAYMENT op
     on O_PAYMENT_DETAIL.PAYMENT_ID = op.id
