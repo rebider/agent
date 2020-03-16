@@ -14,7 +14,7 @@
     <job:dataflow id="mothOfEndJobTrigger"
                   job-ref="mothOfEndJob"
                   registry-center-ref="regCenter"
-                  cron="0 0/30 * * * ? *"
+                  cron="0 0 23 L * ? *"
                   sharding-total-count="1"
                   sharding-item-parameters="0=C"
                   streaming-process="false"
