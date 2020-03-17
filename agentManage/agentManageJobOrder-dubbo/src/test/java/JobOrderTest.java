@@ -155,7 +155,7 @@ public class JobOrderTest extends BaseSpringTest {
 
     @Test
     public void  test11(){
-        List<JobKeyManageNodeVo> viewJobKeyManageNodes = jobOrderAuthService.getViewJobKeyManageNodes("18233");
+        List<JobKeyManageNodeVo> viewJobKeyManageNodes = jobOrderAuthService.getViewJobKeyManageNodes("18232");
         for (JobKeyManageNodeVo node:viewJobKeyManageNodes){
             for (JobKeyManageNodeVo nodeSecond:node.getChildNodes()){
                 for (JobKeyManageNodeVo nodeThird:nodeSecond.getChildNodes()){
@@ -175,7 +175,7 @@ public class JobOrderTest extends BaseSpringTest {
     }
     @Test
     public void test12(){
-        List<JobKeyManageNodeVo> viewJobKeyManageNodes = jobOrderAuthService.getViewJobKeyManageNodes("14153");
+        List<JobKeyManageNodeVo> viewJobKeyManageNodes = jobOrderAuthService.getViewJobKeyManageNodes("18232");
         System.out.println(viewJobKeyManageNodes);
     }
 }
