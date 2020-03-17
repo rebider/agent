@@ -221,19 +221,23 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         joTaskOld.setDealPersonId(joTask.getDealPersonId());
         joTaskOld.setJoTaskContent("转发到" + joTask.getDealGroup()+":"+
                 content.substring(content.indexOf(":")+1, content.length()));
-        // 结束工单
+        // 结束工单任务
         endJoTask( joTaskOld );
 
         // 查询工单类型受理部门
         String dealCode = joTask.getDealGroupId();
+        JoOrder newOrder = joOrderMapper.selectByPrimaryKey(joId);
         if("0".equals(dealCode)){ // 选择的是发起人
-            JoOrder newOrder = joOrderMapper.selectByPrimaryKey(joId);
             newOrder.setJoProgress(JoOrderStatus.YCL.getValue());
             newOrder.setDealTimeEnd(new Date());
+            newOrder.setAcceptNowGroup(joTask.getDealGroup());
             double dLength = (newOrder.getDealTimeEnd().getTime() - newOrder.getDealTimeStart().getTime() ) / (60 * 1000);
             newOrder.setDealTimeLength(new BigDecimal(dLength).setScale(2, BigDecimal.ROUND_HALF_UP));
             joOrderMapper.updateByPrimaryKeySelective(newOrder);
             return FastMap.fastSuccessMap();
+        }else{
+            newOrder.setAcceptNowGroup(joTask.getDealGroup());
+            joOrderMapper.updateByPrimaryKeySelective(newOrder);
         }
         // 转发其他部门  jotask 含有受理部门 处理人 处理人姓名
         JoTask joTaskNew = new JoTask();
