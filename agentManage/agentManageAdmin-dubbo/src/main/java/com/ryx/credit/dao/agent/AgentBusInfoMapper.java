@@ -125,5 +125,5 @@ public interface AgentBusInfoMapper {
     Integer queyrBusInfoByBusNumAndPlatformTypePageCount(Map<String,Object> reqMap);
     List<Map<String, Object>> queryByBusInfo(Map<String, Object> map);
 
-    List<String> selectBusNumByBusProCode(Map reqMap);
+    List<String> selectBusNumByBusProCode(Map<String, Object> reqMap);
 }

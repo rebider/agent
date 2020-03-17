@@ -134,12 +134,15 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
         String POS_ID      =   posInfo.get("POS_ID");
         String ACTIVITY_ID =   posInfo.get("ACTIVITY_ID");
         ImsMachineActivity activity = imsMachineActivityMapper.selectByPrimaryKey(ACTIVITY_ID);
-        //判断是否设置返现模板
-        ImsOrganReturnTemplateExample imsOrganReturnTemplateCheck = new ImsOrganReturnTemplateExample();
-        imsOrganReturnTemplateCheck.or().andOrgIdEqualTo(imsTermWarehouseDetail.getOrgId()).andActivityIdEqualTo(ACTIVITY_ID);
-        if(imsOrganReturnTemplateMapper.countByExample(imsOrganReturnTemplateCheck)<=0){
-            log.info("同步SSPOS入库划拨数据异常:snList:{},请求参数:{},错误消息:{}",lowerHairMachineVo.getSnList().size(),JSONObject.toJSONString(lowerHairMachineVo.getImsTermWarehouseDetail()),"没有设置返现模板");
-            return AgentResult.fail("没有设置返现模板么["+imsTermWarehouseDetail.getOrgId()+"]");
+
+        if (!(null != lowerHairMachineVo.getPosType() && "0".equals(lowerHairMachineVo.getPosType()))) {
+            //判断是否设置返现模板
+            ImsOrganReturnTemplateExample imsOrganReturnTemplateCheck = new ImsOrganReturnTemplateExample();
+            imsOrganReturnTemplateCheck.or().andOrgIdEqualTo(imsTermWarehouseDetail.getOrgId()).andActivityIdEqualTo(ACTIVITY_ID);
+            if(imsOrganReturnTemplateMapper.countByExample(imsOrganReturnTemplateCheck)<=0){
+                log.info("同步SSPOS入库划拨数据异常:snList:{},请求参数:{},错误消息:{}",lowerHairMachineVo.getSnList().size(),JSONObject.toJSONString(lowerHairMachineVo.getImsTermWarehouseDetail()),"没有设置返现模板");
+                return AgentResult.fail("没有设置返现模板么["+imsTermWarehouseDetail.getOrgId()+"]");
+            }
         }
         //检查商户是否有分润模板
         log.info("同步POS入库划拨:POS编号:{},活动编号:{},活动名称:{},sn：{}",POS_ID,ACTIVITY_ID,activity==null?"null":activity.getActivityName(),lowerHairMachineVo.getSnList());

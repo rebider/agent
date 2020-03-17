@@ -813,13 +813,6 @@ public class OsnOperateServiceImpl implements OsnOperateService {
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRES_NEW)
     public Map<String, Object> sendInfoToBusinessSystem(List<OLogisticsDetail> datas, String logcId, BigDecimal batch) throws Exception {
 
-        /*//查询发送邮件接收人
-        List<Dict> dicts = dictOptionsService.dictList(DictGroup.EMAIL.name(), DictGroup.LOGISTICS_FAIL_EMAIL.name());
-        String[] emailArr = new String[dicts.size()];
-        for (int i = 0; i < dicts.size(); i++) {
-            emailArr[i] = String.valueOf(dicts.get(i).getdItemvalue());
-        }*/
-
         Map<String, Object> retMap = new HashMap<String, Object>();
         if (datas == null || datas.size() == 0) {
             retMap.put("code", "1");
@@ -1026,7 +1019,6 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
             if (null == agentBusInfo)throw new MessageException("查询业务数据失败！");
 
-            OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(logistics.getId());
             imsTermWarehouseDetail.setOrgId(agentBusInfo.getBusNum());
             imsTermWarehouseDetail.setMachineId(oActivity_plan.getBusProCode());
             imsTermWarehouseDetail.setPosSpePrice(oActivity_plan.getPosSpePrice());
@@ -1038,6 +1030,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                 lowerHairMachineVo.setPlatformType(platForm.getPlatformType());
                 lowerHairMachineVo.setSnList(snList);
                 lowerHairMachineVo.setImsTermWarehouseDetail(imsTermWarehouseDetail);
+                lowerHairMachineVo.setPosType(oActivity.getPosType());
                 //机具下发接口
                 logger.info("导入物流：下发到实时分润平台请求参数:{}",JSONObject.toJSONString(lowerHairMachineVo));
                 AgentResult posSendRes = termMachineService.lowerHairMachine(lowerHairMachineVo);
@@ -1054,7 +1047,6 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                     return retMap;
                 }else{
                     //下发失败
-                    //AppConfig.sendEmail(emailArr, "SN开始："+logistics.getSnBeginNum()+",SN结束："+logistics.getSnEndNum()+"错误信息:"+LogisticsDetailSendStatus.send_fail.msg, logistics.getProType()+"机具下发失败！");
                     logger.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), posSendRes.getMsg(), platForm.getPlatformType());
                     listOLogisticsDetailSn.forEach(detail -> {
                         detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
@@ -1067,12 +1059,10 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                 }
             } catch (MessageException e) {
                 e.printStackTrace();
-                //AppConfig.sendEmail(emailArr, "SN开始：" + logistics.getSnBeginNum() + ",SN结束：" + logistics.getSnEndNum() + "错误信息:" + e.getLocalizedMessage(), logistics.getProType() + "机具下发失败！");
                 logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage(), platForm.getPlatformType());
                 throw e;
             } catch (Exception e) {
                 e.printStackTrace();
-                //AppConfig.sendEmail(emailArr, "SN开始：" + logistics.getSnBeginNum() + ",SN结束：" + logistics.getSnEndNum() + "错误信息:" + MailUtil.printStackTrace(e), "任务生成物流明细错误报警OsnOperateServiceImpl");
                 logger.info("下发物流接口调用异常：物流编号:{},批次编号:{},时间:{},错误信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), e.getLocalizedMessage(), platForm.getPlatformType());
                 throw e;
             }

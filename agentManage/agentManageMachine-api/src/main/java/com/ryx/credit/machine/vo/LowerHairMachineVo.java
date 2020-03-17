@@ -37,6 +37,16 @@ public class LowerHairMachineVo  implements Serializable {
     List<String> snList;
     //RJ封装参数
     private String jsonString;
+    //机具类型，（普通机，特价机）
+    private String posType;
+
+    public String getPosType() {
+        return posType;
+    }
+
+    public void setPosType(String posType) {
+        this.posType = posType;
+    }
 
     public String getBusNum() {
         return busNum;
