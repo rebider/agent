@@ -604,7 +604,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();
-            throw new MessageException("工作流处理任务异常，请退回或者重新申请，同意审批只能一人审批切勿多人同审!");
+            throw new MessageException("工作流处理任务异常，请退回或者重新申请，同一审批只能一人审批切勿多人同审!");
         }
         return AgentResult.ok();
     }
