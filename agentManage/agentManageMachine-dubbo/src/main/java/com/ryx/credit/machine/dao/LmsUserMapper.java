@@ -25,4 +25,6 @@ public interface LmsUserMapper {
     List<Map<String, String>> selectAllLmsUser();
 
     LmsUser selectByLogin(String loginName);
+
+    List<String> selectByBusNum(String busNum);
 }

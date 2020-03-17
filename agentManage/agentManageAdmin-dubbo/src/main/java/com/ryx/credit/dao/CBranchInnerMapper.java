@@ -82,4 +82,6 @@ public interface CBranchInnerMapper {
     int selectByBranchAndInnerLogin(@Param("map")Map<String, Object> map);
 
     List<CBranchInner> selectByMap(@Param("map")Map map);
+
+    List<String> selectInnerLoginByBranch(String agDocCode);
 }

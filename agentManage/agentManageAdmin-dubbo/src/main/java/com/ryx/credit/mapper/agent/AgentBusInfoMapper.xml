@@ -1414,7 +1414,8 @@ union
       LEFT JOIN c_BRANCH_INNER bi ON bi.branch_login = b.ag_doc_pro
       WHERE 1=1
       AND b.status=1
-      AND b.bus_status in ('0','1','2')
+      AND b.bus_status = '1'
+      AND b.CLO_REVIEW_STATUS = '3'
       AND b.ag_doc_pro IS NOT NULL
       AND b.bus_num IS NOT NULL
       AND bi.branch_login = #{branchLogin}
