@@ -1327,7 +1327,7 @@ union
   </sql>
   <select id="queryTreeByBusInfoAndDict" parameterType="map" resultType="map">
     select
-    A.ID,A.AGENT_ID,A.BUS_NUM,A.BUS_PLATFORM,A.BUS_TYPE,A.BUS_PARENT,
+    A.ID,A.AGENT_ID,A.BUS_NUM,A.BUS_PLATFORM,A.BUS_TYPE,A.BUS_PARENT,A.AG_DOC_PRO,
     B.AG_UNIQ_NUM,B.AG_NAME,C.PLATFORM_NAME,D.D_ITEMNAME,(C.PLATFORM_NAME||'-'||A.BUS_NUM||'-'||D.D_ITEMNAME) as FIELDSHOW,c.PLATFORM_TYPE
     from
     a_agent_businfo a
