@@ -1333,7 +1333,7 @@ union
     a_agent_businfo a
     left join a_agent b on a.agent_id=b.id
     left join a_platform c on c.platform_num = a.bus_platform
-    LEFT JOIN D_DICT D ON D.D_ITEMVALUE = A.BUS_TYPE AND D.D_GROUP=#{dictGroup} AND  D.D_ARTIFACT = #{dictItem}
+    LEFT JOIN D_DICT D ON c.platform_num = A.BUS_PLATFORM AND d.d_itemvalue=c.platform_type AND  D.D_GROUP=#{dictGroup} AND  D.D_ARTIFACT = #{dictItem}
     <where>
       c.platform_type in
       (
