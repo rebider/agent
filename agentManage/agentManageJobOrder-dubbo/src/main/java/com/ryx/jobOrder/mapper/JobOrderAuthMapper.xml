@@ -80,6 +80,7 @@
             </if>
         </where>
         )
+        order by jm1.JO_KEY_SORT,jm2.JO_KEY_SORT,jm3.JO_KEY_SORT asc
     </select>
     <select id="getViewJobKeyManageModesByAgent" resultType="java.util.Map">
         select
@@ -96,5 +97,6 @@
         left join C_USER_ROLE cur on cur.ROLE_ID = cr.ID
         left join C_USER cu on cu.ID = cur.USER_ID
         where  cr.DESCRIPTION like 'Views_agent' AND CRE.PID IS NOT NULL )
+        order by jm1.JO_KEY_SORT,jm2.JO_KEY_SORT,jm3.JO_KEY_SORT asc
     </select>
 </mapper>
