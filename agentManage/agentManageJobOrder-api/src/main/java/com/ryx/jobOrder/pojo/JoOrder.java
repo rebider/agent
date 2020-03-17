@@ -69,6 +69,16 @@ public class JoOrder implements Serializable {
 
     private BigDecimal version;
 
+    private String loginPerson;
+
+    public String getLoginPerson() {
+        return loginPerson;
+    }
+
+    public void setLoginPerson(String loginPerson) {
+        this.loginPerson = loginPerson;
+    }
+
     public String getId() {
         return id;
     }
