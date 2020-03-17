@@ -255,7 +255,7 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
     public AgentResult reStartTask(Map map) throws MessageException {
         AgentResult agentResult = AgentResult.fail("重新发起提问失败!");
         try {
-            JoOrder joOrder = joOrderMapper.selectByPrimaryKey(String.valueOf(map.get("jobId")));
+            JoOrder joOrder = joOrderMapper.selectByPrimaryKey(String.valueOf(map.get("joId")));
             if (JoOrderStatus.YCL.key.equals(joOrder.getJoProgress())){
                 joOrder.setJoProgress(JoOrderStatus.CLZ.key);
                 if (joOrderMapper.updateByPrimaryKeySelective(joOrder)!=1){
