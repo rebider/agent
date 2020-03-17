@@ -1328,12 +1328,12 @@ union
   <select id="queryTreeByBusInfoAndDict" parameterType="map" resultType="map">
     select
     A.ID,A.AGENT_ID,A.BUS_NUM,A.BUS_PLATFORM,A.BUS_TYPE,A.BUS_PARENT,A.AG_DOC_PRO,
-    B.AG_UNIQ_NUM,B.AG_NAME,C.PLATFORM_NAME,D.D_ITEMNAME,(C.PLATFORM_NAME||'-'||A.BUS_NUM||'-'||D.D_ITEMNAME) as FIELDSHOW,c.PLATFORM_TYPE
+    B.AG_UNIQ_NUM,B.AG_NAME,C.PLATFORM_NAME,D.D_ITEMNAME,(C.PLATFORM_NAME||'-'||A.BUS_NUM) as FIELDSHOW,c.PLATFORM_TYPE
     from
     a_agent_businfo a
     left join a_agent b on a.agent_id=b.id
     left join a_platform c on c.platform_num = a.bus_platform
-    LEFT JOIN D_DICT D ON D.D_ITEMVALUE = A.BUS_TYPE AND D.D_GROUP=#{dictGroup} AND  D.D_ARTIFACT = #{dictItem}
+    LEFT JOIN D_DICT D ON c.platform_num = A.BUS_PLATFORM AND d.d_itemvalue=c.platform_type AND  D.D_GROUP=#{dictGroup} AND  D.D_ARTIFACT = #{dictItem}
     <where>
       c.platform_type in
       (
