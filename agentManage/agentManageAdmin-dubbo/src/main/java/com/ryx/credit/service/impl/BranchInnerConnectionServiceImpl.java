@@ -156,31 +156,24 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
     @Override
     public FastMap removeBranchInnerConnection(String id) throws Exception{
 
-        int t;
-        //先查询，查询账号是否存在状态为2的，
-        if (branchInnerMapper.countByIdforUpdate(id) == 1) {
-            //存在-删除(此数据)
-            t = branchInnerMapper.deleteInnerByIds(id);
-        } else {
-            //不存在-将状态更新成2
-            t = branchInnerMapper.updateByPrimaryId(id);
-        }
-
-        if (t != 1) throw new MessageException("删除失败,请稍后重试！");
-
         CBranchInner cBranchInner = branchInnerMapper.selectByPrimaryKey(id);
+        String loginname = cBranchInner.getInnerLogin();
+        String branchLogin = cBranchInner.getBranchLogin();
+
+        if (1 != branchInnerMapper.deleteInnerByIds(id)) throw new MessageException("删除失败,请稍后重试！");
+
         //查询busNum
         List<String> busNums = agentBusInfoMapper.selectBusNumByBusProCode(
                 FastMap.fastMap("platformTypes", new String[]{PlatformType.POS.code,
                         PlatformType.ZPOS.code,
                         PlatformType.ZHPOS.code,
                         PlatformType.SSPOS.code})
-                        .putKeyV("branchLogin", cBranchInner.getBranchLogin())
+                        .putKeyV("branchLogin", branchLogin)
         );
 
         if (busNums.size() > 0) {
             JSONObject data = new JSONObject();
-            data.put("loginname", cBranchInner.getInnerLogin());
+            data.put("loginname", loginname);
             data.put("dType", "1");
             data.put("delOrgIds", String.join(",", busNums));
             AgentResult agentResult = request("ORG020", data);
