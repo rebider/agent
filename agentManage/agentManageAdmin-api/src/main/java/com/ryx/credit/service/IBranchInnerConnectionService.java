@@ -77,4 +77,6 @@ public interface IBranchInnerConnectionService {
     FastMap queryEditData(FastMap fastMap) throws Exception;
 
     FastMap editConnectionAccount(FastMap fastMap) throws Exception;
+
+    FastMap relevanceBranchInner(String id) throws Exception;
 }

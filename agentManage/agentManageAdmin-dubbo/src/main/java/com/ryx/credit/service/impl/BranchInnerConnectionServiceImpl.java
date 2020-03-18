@@ -144,7 +144,7 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
             if (!agentResult.isOK()) throw new MessageException(agentResult.getMsg());
         }
 
-        return FastMap.fastSuccessMap("修改成功");
+        return FastMap.fastSuccessMap("编辑成功");
     }
 
     /**
@@ -513,5 +513,36 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
             logger.info("POS省总账号联动通知失败:{}", e.getMessage());
             throw e;
         }
+    }
+
+    /**
+     * 解除关联关系
+     * @param
+     * @return
+     */
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Override
+    public FastMap relevanceBranchInner(String id) throws Exception {
+
+        CBranchInner cBranchInner = branchInnerMapper.selectByPrimaryKey(id);
+
+        //查询busNum
+        List<String> busNums = agentBusInfoMapper.selectBusNumByBusProCode(
+                FastMap.fastMap("platformTypes", new String[]{PlatformType.POS.code,
+                        PlatformType.ZPOS.code,
+                        PlatformType.ZHPOS.code,
+                        PlatformType.SSPOS.code})
+                        .putKeyV("branchLogin", cBranchInner.getBranchLogin())
+        );
+        if (busNums.size() > 0) {
+            JSONObject data = new JSONObject();
+            data.put("addAccounts", cBranchInner.getInnerLogin());
+            data.put("delAccounts", "");
+            data.put("orgId", String.join(",", busNums));
+            AgentResult agentResult = request("ORG021", data);
+            if (!agentResult.isOK()) throw new MessageException(agentResult.getMsg());
+        }
+
+        return FastMap.fastSuccessMap("关联成功！");
     }
 }

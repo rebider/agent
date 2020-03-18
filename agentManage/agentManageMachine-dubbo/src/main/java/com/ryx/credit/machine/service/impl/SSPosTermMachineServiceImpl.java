@@ -140,8 +140,8 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
             ImsOrganReturnTemplateExample imsOrganReturnTemplateCheck = new ImsOrganReturnTemplateExample();
             imsOrganReturnTemplateCheck.or().andOrgIdEqualTo(imsTermWarehouseDetail.getOrgId()).andActivityIdEqualTo(ACTIVITY_ID);
             if(imsOrganReturnTemplateMapper.countByExample(imsOrganReturnTemplateCheck)<=0){
-                log.info("同步SSPOS入库划拨数据异常:snList:{},请求参数:{},错误消息:{}",lowerHairMachineVo.getSnList().size(),JSONObject.toJSONString(lowerHairMachineVo.getImsTermWarehouseDetail()),"没有设置返现模板");
-                return AgentResult.fail("没有设置返现模板么["+imsTermWarehouseDetail.getOrgId()+"]");
+                log.info("同步SSPOS入库划拨失败原因请查看明细数据异常:snList:{},请求参数:{},错误消息:{}",lowerHairMachineVo.getSnList().size(),JSONObject.toJSONString(lowerHairMachineVo.getImsTermWarehouseDetail()),"没有设置返现模板");
+                return AgentResult.fail("没有设置返现模板["+imsTermWarehouseDetail.getOrgId()+"]");
             }
         }
         //检查商户是否有分润模板
