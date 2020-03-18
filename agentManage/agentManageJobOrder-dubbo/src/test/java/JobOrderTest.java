@@ -178,4 +178,9 @@ public class JobOrderTest extends BaseSpringTest {
         List<JobKeyManageNodeVo> viewJobKeyManageNodes = jobOrderAuthService.getViewJobKeyManageNodes("18232");
         System.out.println(viewJobKeyManageNodes);
     }
+
+    @Test
+    public void test13(){
+        Map<String, Object> acceptGroup = jobOrderAuthService.getAcceptGroup("21401");
+    }
 }
