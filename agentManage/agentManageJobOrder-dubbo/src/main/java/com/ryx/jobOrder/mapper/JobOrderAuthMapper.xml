@@ -3,7 +3,7 @@
 <mapper namespace="com.ryx.jobOrder.dao.JobOrderAuthMapper">
 
     <select id="getReqJobOrderAuth" resultType="java.util.Map">
-        select cr.*
+        select cr.NAME,cr.URL as jobOrderType
         from c_resource cr
                  left join c_role_resource crr
                            on cr.id = crr.resource_id

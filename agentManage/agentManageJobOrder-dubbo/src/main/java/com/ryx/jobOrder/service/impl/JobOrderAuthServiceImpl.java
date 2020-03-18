@@ -67,11 +67,11 @@ public class JobOrderAuthServiceImpl implements JobOrderAuthService {
     }
 
     @Override
-    public Map<String, Object> getAcceptInfo(String code,String quertTYpe) {
+    public Map<String, Object> getAcceptInfo(String code,String quertType) {
         Map<String,Object> acceptInfo = null;
-        if (quertTYpe.equals(QueryAcceptType.userId.code)){
+        if (quertType.equals(QueryAcceptType.userId.code)){
             acceptInfo = jobOrderAuthMapper.getAcceptByuserid(code);
-        }else if (quertTYpe.equals(QueryAcceptType.acceCode.code)){
+        }else if (quertType.equals(QueryAcceptType.acceCode.code)){
             acceptInfo = jobOrderAuthMapper.getAcceptByAcceptCode(code);
         }
         return acceptInfo;
