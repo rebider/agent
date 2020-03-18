@@ -58,6 +58,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     private static String refund_finc1_id = AppConfig.getProperty("refund_finc1_id");
     private static String refund_finc2_id = AppConfig.getProperty("refund_finc2_id");
     private static String refund_agent_upload_id = AppConfig.getProperty("refund_agent_upload_id");
+    private static String refund_business2_id = AppConfig.getProperty("refund_business2_id");
 
 
     @Autowired
@@ -1214,10 +1215,10 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             //如果是退回修改订单信息时，修改SN状态
             if (agentVo.getApprovalResult().equals(ApprovalType.BACK.getValue())) {
                 try {
-                    updateReturnOrderSnStatus(agentVo.getReturnId(), OLogisticsDetailStatus.STATUS_FH.code, OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
-                    updateOrderReturn(agentVo.getReturnId(), new BigDecimal(RetSchedule.TH.code));
-                    //删除排单和物流
-                    delReceiptAndLogistis(agentVo.getReturnId());
+//                    updateReturnOrderSnStatus(agentVo.getReturnId(), OLogisticsDetailStatus.STATUS_FH.code, OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+//                    updateOrderReturn(agentVo.getReturnId(), new BigDecimal(RetSchedule.TH.code));
+//                    //删除排单和物流
+//                    delReceiptAndLogistis(agentVo.getReturnId());
                 } catch (ProcessException e) {
                     return AgentResult.fail(e.getMessage());
                 }
