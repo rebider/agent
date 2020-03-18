@@ -1419,10 +1419,10 @@ union
       AND b.ag_doc_pro IS NOT NULL
       AND b.bus_num IS NOT NULL
       AND bi.branch_login = #{branchLogin}
-      AND p.platform_type IN
-      <foreach collection="platformTypes" open="(" separator="," close=")" item="platformType">
+      AND p.platform_type IN ('POS','ZPOS','ZHPOS','SSPOS')
+      <!--<foreach collection="platformTypes" open="(" separator="," close=")" item="platformType">
         #{platformType}
-      </foreach>
+      </foreach>-->
       GROUP BY b.bus_num
   </select>
 </mapper>

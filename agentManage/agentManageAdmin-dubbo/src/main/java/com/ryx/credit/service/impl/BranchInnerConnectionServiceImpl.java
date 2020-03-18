@@ -128,13 +128,7 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
         }
 
         //查询busNum
-        List<String> busNums = agentBusInfoMapper.selectBusNumByBusProCode(
-                FastMap.fastMap("platformTypes", new String[]{PlatformType.POS.code,
-                        PlatformType.ZPOS.code,
-                        PlatformType.ZHPOS.code,
-                        PlatformType.SSPOS.code})
-                        .putKeyV("branchLogin", branch)
-        );
+        List<String> busNums = agentBusInfoMapper.selectBusNumByBusProCode(FastMap.fastMap("branchLogin", branch));
         if (busNums.size() > 0) {
             JSONObject data = new JSONObject();
             data.put("addAccounts", inner);
@@ -527,13 +521,7 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
         CBranchInner cBranchInner = branchInnerMapper.selectByPrimaryKey(id);
 
         //查询busNum
-        List<String> busNums = agentBusInfoMapper.selectBusNumByBusProCode(
-                FastMap.fastMap("platformTypes", new String[]{PlatformType.POS.code,
-                        PlatformType.ZPOS.code,
-                        PlatformType.ZHPOS.code,
-                        PlatformType.SSPOS.code})
-                        .putKeyV("branchLogin", cBranchInner.getBranchLogin())
-        );
+        List<String> busNums = agentBusInfoMapper.selectBusNumByBusProCode(FastMap.fastMap("branchLogin", cBranchInner.getBranchLogin()));
         if (busNums.size() > 0) {
             JSONObject data = new JSONObject();
             data.put("addAccounts", cBranchInner.getInnerLogin());
