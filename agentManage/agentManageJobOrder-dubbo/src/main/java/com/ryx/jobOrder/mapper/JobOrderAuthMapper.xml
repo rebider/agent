@@ -51,7 +51,7 @@
         select NAME,DESCRIPTION from C_ROLE where DESCRIPTION = #{acceptCode}
     </select>
     <select id="getAcceptByuserid" parameterType="string" resultType="java.util.Map">
-        select cr.NAME,cr.DESCRIPTION from C_ROLE cr
+        select cr.NAME,regexp_substr(cr.description,'[^\_]+', 1, 1)||'_'||regexp_substr(cr.description,'[^\_]+', 1, 2) as description from C_ROLE cr
         left join C_USER_ROLE cur on cur.ROLE_ID = cr.ID
         left join C_USER cu on cu.ID = cur.USER_ID
         where cr.DESCRIPTION like 'Group%'
