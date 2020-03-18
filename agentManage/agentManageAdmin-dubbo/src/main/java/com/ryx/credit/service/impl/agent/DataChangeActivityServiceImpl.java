@@ -845,8 +845,8 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                 }
 
                             }
-                            if(StringUtils.isNotBlank(agentBusInfo.getBusParent())){
-                                AgentBusInfo parent = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
+                            if(StringUtils.isNotBlank(agentBusInfoVo.getBusParent())){
+                                AgentBusInfo parent = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getBusParent());
                                 //上级必须有机构，如果没有机构需要提示补全
                                 if(parent!=null){
                                     //上级机构为空，提示必须填写，上级机构不为空判断与本级是否一致
