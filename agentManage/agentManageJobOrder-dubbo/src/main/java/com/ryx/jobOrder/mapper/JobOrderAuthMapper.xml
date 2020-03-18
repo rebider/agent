@@ -55,8 +55,9 @@
         left join C_USER_ROLE cur on cur.ROLE_ID = cr.ID
         left join C_USER cu on cu.ID = cur.USER_ID
         where cr.DESCRIPTION like 'Group%'
-        <if test="userId != null"></if>
-          and  cu.ID = #{userId}
+        <if test="userId != null">
+        and  cu.ID = #{userId}
+        </if>
     </select>
     <select id="getViewJobKeyManageNodesByUserId" parameterType="string" resultType="map">
         select
