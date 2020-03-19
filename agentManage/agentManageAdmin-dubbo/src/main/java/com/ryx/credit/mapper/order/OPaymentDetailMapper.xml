@@ -571,7 +571,7 @@
     </select>
 
     <select id="selectMoney" parameterType="string" resultType="com.ryx.credit.pojo.admin.order.OPaymentDetail">
-        select PAY_AMOUNT as payAmount,REAL_PAY_AMOUNT as realPayAmount from o_Payment_detail where id=#{id} and  PAYMENT_STATUS in(1,3,5)
+        select PAY_AMOUNT as payAmount,REAL_PAY_AMOUNT as realPayAmount from o_Payment_detail where id=#{id} and  PAYMENT_STATUS in(1,3,2)
         and status=1
     </select>
 
@@ -775,7 +775,7 @@
                 ORDER_ID=#{orderId}
             </if>
         </where>
-        AND PAYMENT_TYPE=#{paymentType} and Payment_status=${paymentStatus}
+        AND PAYMENT_TYPE=#{paymentType} and Payment_status in(1,2,3) and status = 1
         order by PLAN_PAY_TIME
     </select>
 
@@ -795,7 +795,7 @@
                 and  to_char(PLAN_PAY_TIME,'YYYY-MM') = #{omonth}
             </if>
         </where>
-        AND status=1 and PAYMENT_STATUS=1
+        AND status=1 and PAYMENT_STATUS in(1,2,3) order by plan_pay_time
     </select>
     <select id="selectArrMoney" parameterType="string" resultType="java.math.BigDecimal">
       SELECT NVL(SUM(PAY_AMOUNT),0)
@@ -843,7 +843,7 @@
             ON o.id = oad.order_id
             WHERE oad.id = #{adjId})and
             opd.PAY_TYPE in ('FRFQ', 'DKFQ','DK','SF') and opd.PAYMENT_STATUS in (1, 2, 3) and
-            opd.PAYMENT_TYPE = 'ORDER_FKD' and od.order_status = '2' and opd.status = '1'
+            opd.PAYMENT_TYPE = 'ORDER_FKD' and od.order_status = '2' and opd.status = '1' and od.REVIEW_STATUS = '3'
         order by plan_pay_time asc
     </select>
     <select id="selectPaymentDetails" parameterType="string" resultMap="BaseResultMap">
@@ -872,6 +872,42 @@
         WHERE
              PAYMENT_ID = #{paymentId} and opd.PAY_TYPE in ('FRFQ', 'DKFQ','DK','SF') and opd.PAYMENT_STATUS in (1, 2, 3)
           and opd.PAYMENT_TYPE = 'ORDER_FKD'  and opd.status = '1'
+        order by plan_pay_time asc
+    </select>
+    <select id="selectThtkPaymentDetails" parameterType="string" resultMap="BaseResultMap">
+
+        select opd.ID,
+               opd.PAYMENT_ID,
+               opd.PAYMENT_TYPE,
+               opd.ORDER_ID,
+               opd.BATCH_CODE,
+               opd.PAY_TYPE,
+               opd.PAY_AMOUNT,
+               opd.REAL_PAY_AMOUNT,
+               opd.PAY_TIME,
+               opd.SRC_ID,
+               opd.SRC_TYPE,
+               opd.PLAN_PAY_TIME,
+               opd.PLAN_NUM,
+               opd.PAYMENT_STATUS,
+               opd.AGENT_ID,
+               opd.C_USER,
+               opd.C_DATE,
+               opd.REMARK,
+               opd.STATUS,
+               opd.VERSION,
+               opd.O_PD_SUM_ID
+        FROM O_PAYMENT_DETAIL opd
+        left join o_order od
+        on od.id = opd.order_id
+        WHERE
+          opd.AGENT_ID = #{agentId}
+          and opd.PAY_TYPE in ('DKFQ', 'FRFQ')
+          and opd.PAYMENT_STATUS in (1, 2, 3)
+          and opd.PAYMENT_TYPE = 'ORDER_FKD'
+          and od.order_status = '2'
+          and opd.status = '1'
+          and od.REVIEW_STATUS = '3'
         order by plan_pay_time asc
     </select>
 </mapper>

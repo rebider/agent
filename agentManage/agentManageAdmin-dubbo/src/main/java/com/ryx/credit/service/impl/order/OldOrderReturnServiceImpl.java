@@ -118,6 +118,13 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
     private ODeductCapitalMapper deductCapitalMapper;
     @Autowired
     private OsnOperateService osnOperateService;
+    @Autowired
+    private OrderOffsetService orderOffsetService;
+    @Autowired
+    private OPayDetailMapper oPayDetailMapper;
+
+
+
 
     /**
      * 提交历史订单退货申请
@@ -187,6 +194,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         oReturnOrder.setVersion(BigDecimal.ONE);
         oReturnOrder.setStatus(Status.STATUS_1.status);
         oReturnOrder.setOreturntype(Oreturntype.OLD.code);
+        oReturnOrder.setLogicalVersion(String.valueOf(Status.STATUS_1.status));
 
         //保存提货申请明细
         String platform = "";
@@ -381,11 +389,23 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         if(agentVo.getSid().equals(AppConfig.getProperty("old_refund_finc2_id","")) && "pass".equals(agentVo.getApprovalResult())) {
             //财务最后审批时上传打款凭证,并且是已经执行退款方案
             if (agentVo.getApprovalResult()!=null && ApprovalType.PASS.getValue().equals(agentVo.getApprovalResult())) {
-                OAccountAdjustExample oAccountAdjustExample = new OAccountAdjustExample();
-                oAccountAdjustExample.or().andSrcIdEqualTo(agentVo.getReturnId()).andAdjustTypeEqualTo(AdjustType.TKTH.adjustType).andStatusEqualTo(Status.STATUS_1.status);
-                List<OAccountAdjust> oAccountAdjusts = accountAdjustMapper.selectByExample(oAccountAdjustExample);
-                if (oAccountAdjusts == null || oAccountAdjusts.size() <= 0) {//todo cxinfo 是否强制抵扣机具款
+                if (oReturnOrder.getLogicalVersion()!=null && oReturnOrder.getLogicalVersion().equals(String.valueOf(Status.STATUS_1.status))){
+                    //根据新的逻辑版本号，判断是否执行了抵扣计划
+                    OPayDetailExample oPayDetailExample = new OPayDetailExample();
+                    oPayDetailExample.or().andSrcIdEqualTo(oReturnOrder.getId())
+                            .andBusStatEqualTo(Status.STATUS_0.status)
+                            .andStatusEqualTo(Status.STATUS_1.status);
+                    List<OPayDetail> oPayDetails = oPayDetailMapper.selectByExample(oPayDetailExample);
+                    if (oPayDetails == null || oPayDetails.size() <= 0) {
+                        return AgentResult.fail("您还未执行退款方案");
+                    }
+                }else {
+                    OAccountAdjustExample oAccountAdjustExample = new OAccountAdjustExample();
+                    oAccountAdjustExample.or().andSrcIdEqualTo(agentVo.getReturnId()).andAdjustTypeEqualTo(AdjustType.TKTH.adjustType).andStatusEqualTo(Status.STATUS_1.status);
+                    List<OAccountAdjust> oAccountAdjusts = accountAdjustMapper.selectByExample(oAccountAdjustExample);
+                    if (oAccountAdjusts == null || oAccountAdjusts.size() <= 0) {//todo cxinfo 是否强制抵扣机具款
 //                    throw new MessageException("您还未执行退款方案");
+                    }
                 }
 
                 if (oReturnOrder.getRelReturnAmo().compareTo(BigDecimal.ZERO) > 0 && agentVo.getAttachments().length <= 0) {
@@ -512,6 +532,12 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                 logisticsMapper.deleteByExample(logisticsExample);
             }
             receiptPlanMapper.deleteByExample(receiptPlanExample);
+            //取消抵扣
+            AgentResult agentResult = orderOffsetService.OffsetArrearsCancle(returnOrder.getTakeOutAmo(), OffsetPaytype.THTK.code, returnId);
+            if (!agentResult.isOK()){
+                logger.error("抵扣欠款取消失败");
+                throw new MessageException("抵扣欠款取消失败!");
+            }
         } catch (Exception e) {
             logger.error("退货审批拒绝回调错误", e);
             throw e;
@@ -1134,6 +1160,12 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                        throw new MessageException("更新退货数量失败");
                     }
                 }
+            }
+            //提交抵扣
+            AgentResult agentResult = orderOffsetService.OffsetArrearsCommit(returnOrder.getTakeOutAmo(), OffsetPaytype.THTK.code, returnId);
+            if (!agentResult.isOK()){
+                logger.error("抵扣欠款提交失败");
+                throw new MessageException(agentResult.getMsg());
             }
         } catch (Exception e) {
             logger.error("退货审批完成回调异常", e);

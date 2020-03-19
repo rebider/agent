@@ -27,6 +27,8 @@ import com.ryx.credit.service.agent.PlatFormService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.*;
+import com.ryx.internet.pojo.OInternetCardImport;
+import net.sf.jxls.transformer.Row;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,6 +116,9 @@ public class CompensateServiceImpl implements CompensateService {
     private PlatFormMapper platFormMapper;
     @Autowired
     private OsnOperateService osnOperateService;
+    @Autowired
+    private OrderOffsetService orderOffsetService;
+
 
     @Override
     public ORefundPriceDiff selectByPrimaryKey(String id){
@@ -1276,6 +1281,12 @@ public class CompensateServiceImpl implements CompensateService {
                     row.setNewBrandCode(newPlatForm.get(0).getBusplatform());
                 }
             });
+            //取消抵扣
+            agentResult = orderOffsetService.OffsetArrearsCancle(oRefundPriceDiff.getMachOweAmt(), OffsetPaytype.DDMD.code, oRefundPriceDiff.getId());
+            if (!agentResult.isOK()){
+                log.error("换活动抵扣欠款取消失败!id"+oRefundPriceDiff.getId());
+                throw new MessageException("换活动抵扣欠款取消失败!id"+oRefundPriceDiff.getId());
+            }
         }else if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
             oRefundPriceDiffDetails.forEach(row->{
                 try {
@@ -1379,7 +1390,12 @@ public class CompensateServiceImpl implements CompensateService {
                     row.setNewBrandCode(newPlatForm.get(0).getBusplatform());
                 }
             });
-
+            //提交抵扣
+            agentResult = orderOffsetService.OffsetArrearsCommit(oRefundPriceDiff.getMachOweAmt(), OffsetPaytype.DDMD.code, oRefundPriceDiff.getId());
+            if (!agentResult.isOK()){
+                log.error("换活动抵扣欠款失败!id"+oRefundPriceDiff.getId());
+                throw new MessageException("换活动抵扣欠款失败!id"+oRefundPriceDiff.getId()+","+agentResult.getMsg());
+            }
             AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "adjust");
             if(!synOrVerifyResult.isOK()){
                 throw new MessageException(synOrVerifyResult.getMsg());
@@ -2005,6 +2021,14 @@ public class CompensateServiceImpl implements CompensateService {
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
+        }
+        return AgentResult.ok();
+    }
+
+    @Override
+    public AgentResult updateoRefundPriceDiff(ORefundPriceDiff oRefundPriceDiff) {
+        if (refundPriceDiffMapper.updateByPrimaryKeySelective(oRefundPriceDiff)!=1){
+            return AgentResult.fail();
         }
         return AgentResult.ok();
     }

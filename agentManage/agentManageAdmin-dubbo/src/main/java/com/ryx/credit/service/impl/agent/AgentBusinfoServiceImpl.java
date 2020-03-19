@@ -178,6 +178,12 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 			if (debitCappingLower != null) {
 				agentBusInfo.setDebitCappingLower(debitCappingLower.getdItemname());
 			}
+			if (StringUtils.isBlank(agentBusInfo.getAgDocPro())) {
+				throw new ProcessException("对接省区不可为空");
+			}
+			if (StringUtils.isBlank(agentBusInfo.getAgDocDistrict())) {
+				throw new ProcessException("对接大区不可为空");
+			}
 			if(1!=agentBusInfoMapper.insert(agentBusInfo)){
         		throw new ProcessException("业务添加失败");
 			}
@@ -360,7 +366,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 				agentBusInfoVo.setAgentId(agent.getId());
 				if(StringUtils.isEmpty(agentBusInfoVo.getId())) {
 					//直接新曾
-					AgentBusInfo db_AgentBusInfo = agentBusInfoInsert(agentBusInfoVo);
+					AgentBusInfo db_AgentBusInfo = agentBusinfoService.agentBusInfoInsert(agentBusInfoVo);
 					if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentBusInfoVo.getAgentAssProtocol())){
 						AssProtoColRel rel = new AssProtoColRel();
 						rel.setAgentBusinfoId(db_AgentBusInfo.getId());
@@ -420,6 +426,12 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 								throw new MessageException("代理商上级平台和本业务平台不匹配");
 							}
 						}
+					}
+					if (StringUtils.isBlank(db_AgentBusInfo.getAgDocPro())) {
+						throw new ProcessException("对接省区不可为空");
+					}
+					if (StringUtils.isBlank(db_AgentBusInfo.getAgDocDistrict())) {
+						throw new ProcessException("对接大区不可为空");
 					}
 					Dict debitRateLower = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitRateLower");//借记费率下限（%）
 					Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitCapping");//借记封顶额上限（元）

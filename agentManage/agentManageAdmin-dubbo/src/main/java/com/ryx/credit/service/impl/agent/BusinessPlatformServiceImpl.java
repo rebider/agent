@@ -594,6 +594,37 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         }
     }
 
+    /**
+     *【业务平台编号】【平台登陆账号】是否为空校验，入网及新增业务平台限制
+     * @param agentVo
+     * @throws Exception
+     */
+    @Override
+    public void verifyAgentBusinfo(AgentVo agentVo) throws Exception {
+        if (agentVo.getBusInfoVoList() != null) {
+            for (AgentBusInfo item : agentVo.getBusInfoVoList()) {
+                PlatformType platformType = platFormService.byPlatformCode(item.getBusPlatform());
+                if (platformType != null) {
+                    //智慧POS、智慧plus、瑞+（条码前置）、实时POS品牌
+                    if (platformType.code.equals(PlatformType.ZHPOS.code) || platformType.code.equals(PlatformType.RJQZ.code) || platformType.code.equals(PlatformType.SSPOS.code)) {
+                        if (StringUtils.isNotBlank(item.getBusNum()) || StringUtils.isNotBlank(item.getBusLoginNum())) {
+                            logger.info("当前平台不允许升级");
+                            throw new MessageException("当前平台不允许升级");
+                        }
+                    }
+                    //POS平台、瑞+、智能POS
+                    if (platformType.code.equals(PlatformType.POS.code) || platformType.code.equals(PlatformType.RJPOS.code) || platformType.code.equals(PlatformType.ZPOS.code)) {
+                        if (StringUtils.isBlank(item.getBusNum()) && StringUtils.isNotBlank(item.getBusLoginNum())
+                                || StringUtils.isNotBlank(item.getBusNum()) && StringUtils.isBlank(item.getBusLoginNum())) {
+                            logger.info("[业务平台编号][平台登录账号]不一致，如升级，则需要同时输入；如新签，则均不允许填写");
+                            throw new MessageException("[业务平台编号][平台登录账号]不一致，如升级，则需要同时输入；如新签，则均不允许填写");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     public void updateBusinfoData(List<AgentBusInfoVo> busInfoVoList) throws Exception {

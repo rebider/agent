@@ -530,9 +530,9 @@ public class OrderActivityServiceImpl implements OrderActivityService {
 
         //查询参数
         Map<String,String> par = new HashMap<>();
-        //num
+        //num 品牌编号 实时使用了
         par.put("busplatform",platForm.getBusplatform());
-        //type
+        //type 品牌类型 瑞嘉中使用
         par.put("busPlatForm",platFormType);
         if (StringUtils.isNotBlank(platFormType)) {
             try {

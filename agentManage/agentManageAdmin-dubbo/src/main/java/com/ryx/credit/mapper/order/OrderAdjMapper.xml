@@ -32,6 +32,7 @@
     <result column="PRO_REFUND_AMOUNT" jdbcType="DECIMAL" property="proRefundAmount" />
     <result column="OFFSET_AMOUNT" jdbcType="DECIMAL" property="offsetAmount" />
     <result column="DIF_AMOUNT" jdbcType="DECIMAL" property="difAmount" />
+    <result column="LOGICAL_VERSION" jdbcType="DECIMAL" property="logicalVersion" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -67,7 +68,7 @@
     INCENTIVE_AMO, PAY_AMO, RESON, REFUND_AMOUNT, REFUND_TYPE, REFUND_STAT, ORG_PAYMENT_ID, 
     NEW_PAYMENT_ID, REVIEWS_STAT, REVIEWS_DATE, ADJ_TM, STATUS, VERSION, ORG_PLAN_NUM, 
     STAGES_AMOUNT, REFUND_TM, SETTLE_AMOUNT, REAL_REFUND_AMO, REFUND_METHOD, PRO_REFUND_AMOUNT, 
-    OFFSET_AMOUNT, DIF_AMOUNT
+    OFFSET_AMOUNT, DIF_AMOUNT, LOGICAL_VERSION
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -107,8 +108,8 @@
       ADJ_TM, STATUS, VERSION, 
       ORG_PLAN_NUM, STAGES_AMOUNT, REFUND_TM, 
       SETTLE_AMOUNT, REAL_REFUND_AMO, REFUND_METHOD, 
-      PRO_REFUND_AMOUNT, OFFSET_AMOUNT, DIF_AMOUNT
-      )
+      PRO_REFUND_AMOUNT, OFFSET_AMOUNT, DIF_AMOUNT, 
+      LOGICAL_VERSION)
     values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
       #{adjUserId,jdbcType=VARCHAR}, #{orgOAmo,jdbcType=DECIMAL}, #{orgIncentiveAmo,jdbcType=DECIMAL}, 
       #{orgPayAmo,jdbcType=DECIMAL}, #{oAmo,jdbcType=DECIMAL}, #{incentiveAmo,jdbcType=DECIMAL}, 
@@ -118,8 +119,8 @@
       #{adjTm,jdbcType=TIMESTAMP}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, 
       #{orgPlanNum,jdbcType=DECIMAL}, #{stagesAmount,jdbcType=DECIMAL}, #{refundTm,jdbcType=TIMESTAMP}, 
       #{settleAmount,jdbcType=DECIMAL}, #{realRefundAmo,jdbcType=DECIMAL}, #{refundMethod,jdbcType=DECIMAL}, 
-      #{proRefundAmount,jdbcType=DECIMAL}, #{offsetAmount,jdbcType=DECIMAL}, #{difAmount,jdbcType=DECIMAL}
-      )
+      #{proRefundAmount,jdbcType=DECIMAL}, #{offsetAmount,jdbcType=DECIMAL}, #{difAmount,jdbcType=DECIMAL}, 
+      #{logicalVersion,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OrderAdj">
     insert into O_ORDER_ADJ
@@ -214,6 +215,9 @@
       <if test="difAmount != null">
         DIF_AMOUNT,
       </if>
+      <if test="logicalVersion != null">
+        LOGICAL_VERSION,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -306,6 +310,9 @@
       <if test="difAmount != null">
         #{difAmount,jdbcType=DECIMAL},
       </if>
+      <if test="logicalVersion != null">
+        #{logicalVersion,jdbcType=DECIMAL},
+      </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjExample" resultType="java.lang.Long">
@@ -375,7 +382,7 @@
         STATUS = #{status,jdbcType=DECIMAL},
       </if>
       <if test="version != null">
-        VERSION = #{version,jdbcType=DECIMAL},
+        VERSION = VERSION + 1,
       </if>
       <if test="orgPlanNum != null">
         ORG_PLAN_NUM = #{orgPlanNum,jdbcType=DECIMAL},
@@ -404,8 +411,11 @@
       <if test="difAmount != null">
         DIF_AMOUNT = #{difAmount,jdbcType=DECIMAL},
       </if>
+      <if test="logicalVersion != null">
+        LOGICAL_VERSION = #{logicalVersion,jdbcType=DECIMAL},
+      </if>
     </set>
-    where ID = #{id,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OrderAdj">
     update O_ORDER_ADJ
@@ -437,7 +447,8 @@
       REFUND_METHOD = #{refundMethod,jdbcType=DECIMAL},
       PRO_REFUND_AMOUNT = #{proRefundAmount,jdbcType=DECIMAL},
       OFFSET_AMOUNT = #{offsetAmount,jdbcType=DECIMAL},
-      DIF_AMOUNT = #{difAmount,jdbcType=DECIMAL}
+      DIF_AMOUNT = #{difAmount,jdbcType=DECIMAL},
+      LOGICAL_VERSION = #{logicalVersion,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

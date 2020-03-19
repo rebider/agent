@@ -2,6 +2,7 @@ package com.ryx.credit.machine.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.PlatformType;
+import com.ryx.credit.common.enumc.TerminalPlatformType;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.*;
@@ -178,27 +179,25 @@ public class TermMachineServiceImpl  implements TermMachineService {
     public AgentResult queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailLists, String operation) throws Exception {
         String type = terminalTransferDetailLists.get(0).getPlatformType().toString();
         logger.info("本次联动请求类型为:{}",type);
-      if("1".equals(type)||"4".equals(type)){//pos
+      if(String.valueOf(TerminalPlatformType.POS.getValue()).equals(type)||String.valueOf(TerminalPlatformType.ZHPOS.getValue()).equals(type)){//pos
             return   posTermMachineServiceImpl.queryTerminalTransfer(terminalTransferDetailLists,operation);
-        }else if("2".equals(type)){//手刷
+        }else if(String.valueOf(TerminalPlatformType.MPOS.getValue()).equals(type)){//手刷
             return   mposTermMachineServiceImpl.queryTerminalTransfer(terminalTransferDetailLists,operation);
-        }else if("3".equals(type)){//瑞大宝
+        }else if(String.valueOf(TerminalPlatformType.RDBPOS.getValue()).equals(type)){//瑞大宝
             return   AgentResult.fail("未联动");
         }
-
         return AgentResult.fail("未知业务平台");
-
     }
 
     @Override
     public AgentResult queryTerminalTransferResult(String serialNumber,String type) throws Exception {
         AgentResult agentResult=null;
         logger.info("本次联动查询结果类型为:{}",type);
-        if("1".equals(type)){//pos
+        if(String.valueOf(TerminalPlatformType.POS.getValue()).equals(type)||String.valueOf(TerminalPlatformType.ZHPOS.getValue()).equals(type)){//pos
          agentResult =  posTermMachineServiceImpl.queryTerminalTransferResult(serialNumber,type);
-        }else if("2".equals(type)){//手刷
+        }else if(String.valueOf(TerminalPlatformType.MPOS.getValue()).equals(type)){//手刷
             agentResult =  mposTermMachineServiceImpl.queryTerminalTransferResult(serialNumber,type);
-        }else if("3".equals(type)){//瑞大宝
+        }else if(String.valueOf(TerminalPlatformType.RDBPOS.getValue()).equals(type)){//瑞大宝
 
         }
         return agentResult;

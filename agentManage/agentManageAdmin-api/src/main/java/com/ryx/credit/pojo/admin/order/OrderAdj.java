@@ -65,6 +65,8 @@ public class OrderAdj implements Serializable {
 
     private BigDecimal difAmount;
 
+    private BigDecimal logicalVersion;
+
     public String getId() {
         return id;
     }
@@ -303,5 +305,13 @@ public class OrderAdj implements Serializable {
 
     public void setDifAmount(BigDecimal difAmount) {
         this.difAmount = difAmount;
+    }
+
+    public BigDecimal getLogicalVersion() {
+        return logicalVersion;
+    }
+
+    public void setLogicalVersion(BigDecimal logicalVersion) {
+        this.logicalVersion = logicalVersion;
     }
 }
