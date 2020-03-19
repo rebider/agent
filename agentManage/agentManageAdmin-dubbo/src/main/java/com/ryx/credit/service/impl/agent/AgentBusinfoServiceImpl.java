@@ -178,6 +178,12 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 			if (debitCappingLower != null) {
 				agentBusInfo.setDebitCappingLower(debitCappingLower.getdItemname());
 			}
+			if (StringUtils.isBlank(agentBusInfo.getAgDocPro())) {
+				throw new ProcessException("对接省区不可为空");
+			}
+			if (StringUtils.isBlank(agentBusInfo.getAgDocDistrict())) {
+				throw new ProcessException("对接大区不可为空");
+			}
 			if(1!=agentBusInfoMapper.insert(agentBusInfo)){
         		throw new ProcessException("业务添加失败");
 			}
@@ -360,7 +366,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 				agentBusInfoVo.setAgentId(agent.getId());
 				if(StringUtils.isEmpty(agentBusInfoVo.getId())) {
 					//直接新曾
-					AgentBusInfo db_AgentBusInfo = agentBusInfoInsert(agentBusInfoVo);
+					AgentBusInfo db_AgentBusInfo = agentBusinfoService.agentBusInfoInsert(agentBusInfoVo);
 					if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentBusInfoVo.getAgentAssProtocol())){
 						AssProtoColRel rel = new AssProtoColRel();
 						rel.setAgentBusinfoId(db_AgentBusInfo.getId());
@@ -420,6 +426,12 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 								throw new MessageException("代理商上级平台和本业务平台不匹配");
 							}
 						}
+					}
+					if (StringUtils.isBlank(db_AgentBusInfo.getAgDocPro())) {
+						throw new ProcessException("对接省区不可为空");
+					}
+					if (StringUtils.isBlank(db_AgentBusInfo.getAgDocDistrict())) {
+						throw new ProcessException("对接大区不可为空");
 					}
 					Dict debitRateLower = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitRateLower");//借记费率下限（%）
 					Dict debitCapping = dictOptionsService.findDictByName(DictGroup.AGENT.name(), db_AgentBusInfo.getBusPlatform(), "debitCapping");//借记封顶额上限（元）
@@ -1028,27 +1040,15 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	}
 
 
-	public AgentBusInfo queryBusInfo(String busNum)throws MessageException{
-		if(StringUtils.isBlank(busNum)){
-			throw new MessageException("业务编号不能为空");
+	public List<Map<String,Object>> queryBusInfo(String busNum,String platformType)throws MessageException{
+		if(StringUtils.isBlank(platformType)){
+			throw new MessageException("业务平台不能为空");
 		}
-		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
-		AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
-		criteria.andStatusEqualTo(Status.STATUS_1.status);
-		criteria.andBusStatusNotEqualTo(BusinessStatus.pause.status);
-		criteria.andBusNumEqualTo(busNum);
-		List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+		List<Map<String,Object>> agentBusInfos = agentBusInfoMapper.queyrBusInfoByBusNumAndPlatformType(FastMap.fastMap("busNum",busNum).putKeyV("platformType",platformType));
 		if(agentBusInfos==null){
 			throw new MessageException("业务不存在");
 		}
-		if(agentBusInfos.size()==0){
-			throw new MessageException("业务不存在");
-		}
-		if(agentBusInfos.size()!=1){
-			throw new MessageException("业务不唯一");
-		}
-		AgentBusInfo agentBusInfo = agentBusInfos.get(0);
-		return agentBusInfo;
+		return agentBusInfos;
 	}
 
 	/**
@@ -1058,8 +1058,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	 * @throws MessageException
 	 */
 	@Override
-	public AgentBusInfo queryAgentBusInfo(String busNum)throws MessageException{
-		return queryBusInfo(busNum);
+	public List<Map<String,Object>> queryAgentBusInfo(String busNum,String platformType)throws MessageException{
+		return queryBusInfo(busNum,platformType);
 	}
 
 	/**
@@ -1069,16 +1069,36 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	 * @throws MessageException
 	 */
 	@Override
-	public void updateBusLoginNum(String oldBusLoginNum,String busLoginNum)throws MessageException{
-		logger.info("根据平台编号修改登陆手机号请求参数:{},{}",oldBusLoginNum,busLoginNum);
-		Map<String, Object> reqMap = new HashMap<>();
-		reqMap.put("oldBusLoginNum",oldBusLoginNum);
-		reqMap.put("busLoginNum",busLoginNum);
-		reqMap.put("platformType",PlatformType.RDBPOS.code);
-		int i = agentBusInfoMapper.updateBusLoginNum(reqMap);
-		logger.info("根据平台编号修改登陆手机号处理结果:{}",i);
-		if(i==0){
-			throw new MessageException("更新失败");
+	public void updateBusLoginNum(String busNum,String oldBusLoginNum,String busLoginNum,String platformType)throws MessageException{
+		logger.info("根据平台编号修改登陆手机号请求参数:{},{},{},{}",busNum,oldBusLoginNum,busLoginNum,platformType);
+		List<Map<String,Object>> busInfos= queryBusInfo(busNum,platformType);
+		if(busInfos.size()==1){
+			Map<String,Object> bus = busInfos.get(0);
+			Object AGENT_ID =  bus.get("AGENT_ID");
+			Object BUS_NUM = bus.get("BUS_NUM");
+			Object BUS_PLATFORM = bus.get("BUS_PLATFORM");
+			AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+			agentBusInfoExample.or().andAgentIdEqualTo(AGENT_ID+"").andBusNumEqualTo(BUS_NUM.toString()).andBusPlatformEqualTo(BUS_PLATFORM+"");
+			List<AgentBusInfo>  db_bus = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+			if(db_bus.size()==1){
+				AgentBusInfo agentBusInfo = db_bus.get(0);
+				if(StringUtils.isNotBlank(oldBusLoginNum) && oldBusLoginNum.equals(agentBusInfo.getBusLoginNum())){
+					agentBusInfo.setBusLoginNum(busLoginNum);
+					if(1==agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)){
+						return;
+					}else{
+						throw new MessageException("更新失败");
+					}
+				}else{
+					throw new MessageException("老登录账号不唯一");
+				}
+			}else{
+				throw new MessageException("业务查询不唯一");
+			}
+		}else if(busInfos.size()>1){
+			throw new MessageException("业务查询不唯一");
+		}else{
+			throw new MessageException("未找到业务");
 		}
 	}
 
@@ -1217,4 +1237,30 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		return agentBusInfos;
 	}
 
+	public List<Map<String,Object>> selectByBusinfo(String agentId,  List<String> platformTypes) {
+
+		if(platformTypes==null || platformTypes.size()==0)return new ArrayList<Map<String,Object>>();
+
+		List<Map<String,Object>> listMap = agentBusInfoMapper.queryByBusInfo(FastMap.fastMap("agentId", agentId).putKeyV("platformTypes", platformTypes));
+
+		if (listMap.size()==0) {
+			return null;
+		}
+
+		return listMap;
+	}
+
+
+	@Override
+	public PageInfo queyrBusInfoByBusNumAndPlatformTypePage(Page page, String busNum, String platformType) throws MessageException{
+		if(page==null)throw new MessageException("分页数据未获取到");
+		if(StringUtils.isBlank(platformType))throw new MessageException("平台类型未获取到");
+		PageInfo pageInfo = new PageInfo();
+		FastMap PAR = FastMap.fastMap("platformType",platformType).putKeyV("page",page);
+		if(StringUtils.isBlank(busNum))
+		PAR.putKeyV("busNum",busNum);
+		pageInfo.setRows(agentBusInfoMapper.queyrBusInfoByBusNumAndPlatformTypePage(PAR));
+		pageInfo.setTotal(agentBusInfoMapper.queyrBusInfoByBusNumAndPlatformTypePageCount(PAR));
+		return pageInfo;
+	}
 }

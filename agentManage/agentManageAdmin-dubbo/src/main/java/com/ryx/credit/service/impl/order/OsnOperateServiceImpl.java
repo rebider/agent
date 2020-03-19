@@ -100,6 +100,12 @@ public class OsnOperateServiceImpl implements OsnOperateService {
     private AgentMapper agentMapper;
     @Autowired
     private OrgPlatformMapper orgPlatformMapper;
+    @Autowired
+    private ORefundPriceDiffMapper refundPriceDiffMapper;
+    @Autowired
+    private OReturnOrderDetailMapper returnOrderDetailMapper;
+    @Autowired
+    private TerminalTransferMapper terminalTransferMapper;
 
     /**
      * 根据物流联动状态查询物流id
@@ -1242,5 +1248,46 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             retMap.put("code", "2");
             return retMap;
         }
+    }
+
+    /**
+     * 检验SN是否处于审批状态
+     * @param fastMap
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public FastMap checkSNApproval(FastMap fastMap){
+        if (null == fastMap) return FastMap.fastFailMap("查询SN是否审批中，数据传递错误！");
+        if (null == fastMap.get("beginSN")) return FastMap.fastFailMap("起始SN为空！");
+        if (null == fastMap.get("endSN")) return FastMap.fastFailMap("结束SN为空！");
+
+        if (!(null != fastMap.get("type") && "transfer".equals(fastMap.get("type").toString()))) {
+            //检验SN是否处于划拨中
+            int checkTransCount = terminalTransferMapper.checkSnIsTransfer(FastMap
+                    .fastMap("begin", fastMap.get("beginSN"))
+                    .putKeyV("end", fastMap.get("endSN"))
+                    .putKeyV("reviewStatus", AgStatus.Approving.status)
+            );
+            if(checkTransCount > 0)  return FastMap.fastFailMap("SN:"+fastMap.get("beginSN")+"-"+fastMap.get("endSN")+"已经提交划拨审批，审批结束后，才可以再次提交。");
+        }
+
+        //检验SN是否处于换活动中
+        int checkRefundCount = refundPriceDiffMapper.checkSnIsRefund(FastMap
+                .fastMap("begin", fastMap.get("beginSN"))
+                .putKeyV("end", fastMap.get("endSN"))
+                .putKeyV("reviewStatus", AgStatus.Approving.status)
+        );
+        if(checkRefundCount > 0) return FastMap.fastFailMap("SN:"+fastMap.get("beginSN")+"-"+fastMap.get("endSN")+"已经提交换活动审批，审批结束后，才可以再次提交。");
+
+        //检验SN是否处于退货中
+        int checkReturnCount = returnOrderDetailMapper.checkSnIsReturn(FastMap
+                .fastMap("begin", fastMap.get("beginSN"))
+                .putKeyV("end", fastMap.get("endSN"))
+                .putKeyV("sts",Arrays.asList(RetSchedule.DFH.code,RetSchedule.FHZ.code,RetSchedule.SPZ.code,RetSchedule.TH.code,RetSchedule.TKZ.code,RetSchedule.YFH.code))
+        );
+        if(checkReturnCount > 0)  return FastMap.fastFailMap("SN:"+fastMap.get("beginSN")+"-"+fastMap.get("endSN")+"已经提交退货审批，审批结束后，才可以再次提交。");
+
+        return FastMap.fastSuccessMap();
     }
 }

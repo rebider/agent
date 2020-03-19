@@ -2,6 +2,7 @@ package com.ryx.credit.service.impl.agent;
 
 import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.enumc.Status;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
@@ -50,5 +51,16 @@ public class BusActRelServiceImpl implements BusActRelService {
     @Override
     public int updateByPrimaryKey(BusActRel busActRel){
        return busActRelMapper.updateByPrimaryKey(busActRel);
+    }
+
+
+    @Override
+    public List<BusActRel> queryBysBusTypeAndStatus(String busType, String actStatus) {
+        BusActRelExample example = new BusActRelExample();
+        BusActRelExample.Criteria c = example.or().andStatusEqualTo(Status.STATUS_1.status);
+        if(StringUtils.isNotBlank(busType))c = c.andBusTypeEqualTo(busType);
+        if(StringUtils.isNotBlank(actStatus))c = c.andActivStatusEqualTo(actStatus);
+        example.setOrderByClause(" C_TIME ASC ");
+        return busActRelMapper.selectByExample(example);
     }
 }

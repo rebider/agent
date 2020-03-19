@@ -27,7 +27,7 @@ public class ActivityServiceTest extends BaseSpringTest {
     @Test
     public void a(){
         List<String> list = new ArrayList<>();
-        list.add("ORA20191008000000000000142");
+        list.add("ORA20200205000000000000403");
 
         oRemoveAccountService.processData(list);
     }

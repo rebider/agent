@@ -518,6 +518,103 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         }
     }
 
+    //业务类型更改限制
+    @Override
+    public void verifyBusinfoType(AgentBusInfo preBusInfoVo, AgentBusInfoVo newBusInfoVo) throws Exception {
+        if (StringUtils.isNotBlank(preBusInfoVo.getBusType())) {
+            AgentBusInfo busInfoParent = agentBusInfoMapper.selectByPrimaryKey(newBusInfoVo.getBusParent());//上级代理商
+            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+            AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
+            criteria.andBusParentEqualTo(newBusInfoVo.getId());
+            criteria.andBusStatusNotIn(Arrays.asList(BusStatus.YWTC.status, BusStatus.TZQ.status, BusStatus.YWQY.status));
+            List<AgentBusInfo> busInfoLowerList = agentBusInfoMapper.selectByExample(agentBusInfoExample);//下级代理商
+            List<String> stringList = new ArrayList<String>();
+            for (AgentBusInfo busInfoLower : busInfoLowerList) {
+                String busTypeLower = busInfoLower.getBusType();
+                stringList.add(busTypeLower);
+            }
+            if (preBusInfoVo.getBusType().equals(BusType.ZQBZF.key)) {
+                if (!newBusInfoVo.getBusType().equals(BusType.ZQBZF.key)) {
+                    throw new MessageException("直签不直发类型不允许更改！");
+                }
+            } else if (preBusInfoVo.getBusType().equals(BusType.JG.key) || preBusInfoVo.getBusType().equals(BusType.BZYD.key)) {
+                if (newBusInfoVo.getBusType().equals(BusType.JG.key)!=preBusInfoVo.getBusType().equals(BusType.JG.key)
+                        && newBusInfoVo.getBusType().equals(BusType.BZYD.key)!=preBusInfoVo.getBusType().equals(BusType.BZYD.key)) {
+                    throw new MessageException("机构/标准一代类型不允许修改！");
+                }
+            } else if (newBusInfoVo.getBusType().equals(BusType.JG.key)  || newBusInfoVo.getBusType().equals(BusType.BZYD.key)) {
+                if (preBusInfoVo.getBusType().equals(BusType.ZQZF.key) || preBusInfoVo.getBusType().equals(BusType.YDX.key)
+                        || preBusInfoVo.getBusType().equals(BusType.JGYD.key)) {
+                    throw new MessageException("直签代理商类型不允许修改为机构或标准一代！");
+                }
+            } else if (newBusInfoVo.getBusType().equals(BusType.YDX.key)) {
+                if (preBusInfoVo.getBusType().equals(BusType.JGYD.key)) {
+                    if (stringList.size()>0 && stringList!=null) {
+                        for (String strType : stringList) {
+                            if (strType.equals(BusType.YDX.key)) {
+                                throw new MessageException("下级中有一代X类型，不能更改！");
+                            }
+                        }
+                    }
+                } else if (preBusInfoVo.getBusType().equals(BusType.ZQZF.key)) {
+                    if (StringUtils.isNotBlank(busInfoParent.getBusType())) {
+                        if (!busInfoParent.getBusType().equals(BusType.JG.key) && !busInfoParent.getBusType().equals(BusType.JGYD.key)
+                                && !busInfoParent.getBusType().equals(BusType.BZYD.key)) {
+                            String busTypeByValue = BusType.getContentByValue(busInfoParent.getBusType());
+                            throw new MessageException("上级代理商类型为["+busTypeByValue+"]，不允许修改！");
+                        }
+                    }
+                }
+            } else if (newBusInfoVo.getBusType().equals(BusType.ZQZF.key)) {
+                if (preBusInfoVo.getBusType().equals(BusType.JGYD.key) || preBusInfoVo.getBusType().equals(BusType.YDX.key)) {
+                    if (stringList.size()>0 && stringList!=null) {
+                        throw new MessageException("有下级不能修改！");
+                    }
+                }
+            } else if (newBusInfoVo.getBusType().equals(BusType.JGYD.key)) {
+                if (preBusInfoVo.getBusType().equals(BusType.ZQZF.key) || preBusInfoVo.getBusType().equals(BusType.YDX.key)) {
+                    if (StringUtils.isNotBlank(busInfoParent.getBusType())) {
+                        if (!busInfoParent.getBusType().equals(BusType.JG.key)) {
+                            throw new MessageException("修改为机构一代上级必须是机构！");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     *【业务平台编号】【平台登陆账号】是否为空校验，入网及新增业务平台限制
+     * @param agentVo
+     * @throws Exception
+     */
+    @Override
+    public void verifyAgentBusinfo(AgentVo agentVo) throws Exception {
+        if (agentVo.getBusInfoVoList() != null) {
+            for (AgentBusInfo item : agentVo.getBusInfoVoList()) {
+                PlatformType platformType = platFormService.byPlatformCode(item.getBusPlatform());
+                if (platformType != null) {
+                    //智慧POS、智慧plus、瑞+（条码前置）、实时POS品牌
+                    if (platformType.code.equals(PlatformType.ZHPOS.code) || platformType.code.equals(PlatformType.RJQZ.code) || platformType.code.equals(PlatformType.SSPOS.code)) {
+                        if (StringUtils.isNotBlank(item.getBusNum()) || StringUtils.isNotBlank(item.getBusLoginNum())) {
+                            logger.info("当前平台不允许升级");
+                            throw new MessageException("当前平台不允许升级");
+                        }
+                    }
+                    //POS平台、瑞+、智能POS
+                    if (platformType.code.equals(PlatformType.POS.code) || platformType.code.equals(PlatformType.RJPOS.code) || platformType.code.equals(PlatformType.ZPOS.code)) {
+                        if (StringUtils.isBlank(item.getBusNum()) && StringUtils.isNotBlank(item.getBusLoginNum())
+                                || StringUtils.isNotBlank(item.getBusNum()) && StringUtils.isBlank(item.getBusLoginNum())) {
+                            logger.info("[业务平台编号][平台登录账号]不一致，如升级，则需要同时输入；如新签，则均不允许填写");
+                            throw new MessageException("[业务平台编号][平台登录账号]不一致，如升级，则需要同时输入；如新签，则均不允许填写");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     public void updateBusinfoData(List<AgentBusInfoVo> busInfoVoList) throws Exception {
@@ -531,6 +628,14 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             AgentBusInfo agentBusInfo = null;
             for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
                 agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                if (StringUtils.isBlank(agentBusInfoVo.getBusParent())) {
+                    agentBusInfoVo.setBusParent(agentBusInfo.getBusParent());
+                }
+                if (StringUtils.isBlank(agentBusInfoVo.getBusType())) {
+                    agentBusInfoVo.setBusType(agentBusInfo.getBusType());
+                }
+                //校验代理商类型更改规则
+                verifyBusinfoType(agentBusInfo, agentBusInfoVo);
                 //校验业务编码是否存在
                 if (StringUtils.isNotBlank(agentBusInfoVo.getBusNum())) {
                     AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();

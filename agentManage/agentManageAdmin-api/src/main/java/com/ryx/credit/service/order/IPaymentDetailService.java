@@ -54,6 +54,14 @@ public interface IPaymentDetailService {
     ResultVO uploadStatus(List<Map<String, Object>> maps,BigDecimal payStatus );
 
     /**
+     * 分润抵扣
+     * @param maps
+     * @param payStatus
+     * @return
+     */
+    ResultVO fenrunDeduction(List<Map<String, Object>> maps,BigDecimal payStatus );
+
+    /**
      * 生成付款明细
      * @return
      * @throws Exception

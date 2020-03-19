@@ -58,6 +58,8 @@ public class ORefundPriceDiff implements Serializable{
 
     private Date appTime;
 
+    private String logicalVersion;
+
     private List<ORefundPriceDiffDetail> refundPriceDiffDetailList;
 
     private List<Attachment> attachmentList;
@@ -296,5 +298,14 @@ public class ORefundPriceDiff implements Serializable{
 
     public void setOrderType(BigDecimal orderType) {
         this.orderType = orderType;
+    }
+
+
+    public String getLogicalVersion() {
+        return logicalVersion;
+    }
+
+    public void setLogicalVersion(String logicalVersion) {
+        this.logicalVersion = logicalVersion == null ? null : logicalVersion.trim();
     }
 }

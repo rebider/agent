@@ -40,6 +40,8 @@ public class OrderUpModelVo implements Serializable {
     private String orderAdjAprDept;//订单调整审批下个审批部门参数
     private String refundType;//退款类型
     private String settleAmount;
+    private List<String> customStagingUser;//自定义分期数据
+    private String customStaging;
 
     public String getSid() {
         return sid;
@@ -221,5 +223,21 @@ public class OrderUpModelVo implements Serializable {
 
     public void setAdjRepayment(String adjRepayment) {
         this.adjRepayment = adjRepayment;
+    }
+
+    public List<String> getCustomStagingUser() {
+        return customStagingUser;
+    }
+
+    public void setCustomStagingUser(List<String> customStagingUser) {
+        this.customStagingUser = customStagingUser;
+    }
+
+    public String getCustomStaging() {
+        return customStaging;
+    }
+
+    public void setCustomStaging(String customStaging) {
+        this.customStaging = customStaging;
     }
 }

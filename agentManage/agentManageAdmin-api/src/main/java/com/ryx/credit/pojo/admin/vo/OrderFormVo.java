@@ -11,6 +11,7 @@ import java.util.List;
  */
 public class OrderFormVo extends OOrder{
 
+
     private OPayment oPayment;
 
     private List<OSubOrder> oSubOrder;
@@ -22,6 +23,8 @@ public class OrderFormVo extends OOrder{
     private List<Attachment> attachments;
 
     private String isApproveWhenSubmit;
+
+    private List<String> customStagingUser;
 
     public OPayment getoPayment() {
         return oPayment;
@@ -69,5 +72,13 @@ public class OrderFormVo extends OOrder{
 
     public void setIsApproveWhenSubmit(String isApproveWhenSubmit) {
         this.isApproveWhenSubmit = isApproveWhenSubmit;
+    }
+
+    public List<String> getCustomStagingUser() {
+        return customStagingUser;
+    }
+
+    public void setCustomStagingUser(List<String> customStagingUser) {
+        this.customStagingUser = customStagingUser;
     }
 }

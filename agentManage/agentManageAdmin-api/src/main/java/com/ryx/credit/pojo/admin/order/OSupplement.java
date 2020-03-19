@@ -49,6 +49,9 @@ public class OSupplement implements Serializable {
     //付款单的总金额
     private BigDecimal amount;
 
+    //逻辑版本号
+    private String logicalVersion;
+
     public BigDecimal getAmount() {
         return amount;
     }
@@ -215,5 +218,13 @@ public class OSupplement implements Serializable {
 
     public void setCheckPeople(String checkPeople) {
         this.checkPeople = checkPeople == null ? null : checkPeople.trim();
+    }
+
+    public String getLogicalVersion() {
+        return logicalVersion;
+    }
+
+    public void setLogicalVersion(String logicalVersion) {
+        this.logicalVersion = logicalVersion;
     }
 }
