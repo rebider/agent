@@ -287,7 +287,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
 
 
     @Override
-    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws Exception {
+    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws ProcessException {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("operation", operation);
         List<Map<String, Object>> listDetail = new ArrayList<>();
@@ -345,7 +345,13 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
         }
         jsonObject.put("snList", listDetail);
         log.info("活动调整POS请求参数:{}",JSONObject.toJSON(jsonObject));
-        AgentResult res = request("ORG016", jsonObject);
+        AgentResult res = null;
+        try {
+            res = request("ORG016", jsonObject);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ProcessException(e.getMessage());
+        }
         if(res.isOK()) {
             JSONObject respXMLObj = JSONObject.parseObject(res.getMsg());
             JSONObject res_data = respXMLObj.getJSONObject("data");

@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -366,7 +367,7 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
     }
 
     @Override
-    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws Exception {
+    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws ProcessException {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("operation", operation);
         List<Map<String, Object>> listDetail = new ArrayList<>();
@@ -521,7 +522,7 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
     }
 
 
-    private AgentResult request(String tranCode,JSONObject data)throws Exception{
+    private AgentResult request(String tranCode,JSONObject data) throws ProcessException{
         try{
             PrivateKey rsaPrivateKey = RSAUtil.getRSAPrivateKey(AppConfig.getProperty("industryAuth_local_private_key"), "pem", null, "RSA");
             PublicKey rsaPublicKey = RSAUtil.getRSAPublicKey(AppConfig.getProperty("industryAuth_cooper_public_key"), "pem", "RSA");
@@ -559,7 +560,7 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
             JSONObject jsonObject = JSONObject.parseObject(httpResult);
             if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
                 log.info("请求异常======" + httpResult);
-                throw new Exception("http请求异常");
+                throw new ProcessException("http请求异常");
             } else {
                 String resEncryptData = jsonObject.getString("encryptData");
                 String resEncryptKey = jsonObject.getString("encryptKey");
@@ -588,7 +589,10 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
                 }
                 return new AgentResult(500,"http请求异常",respXML);
             }
-        } catch (Exception e) {
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            throw new ProcessException(e.getMessage());
+        } catch (ProcessException e) {
             log.info("http请求超时:{}",e.getMessage());
             throw e;
         }

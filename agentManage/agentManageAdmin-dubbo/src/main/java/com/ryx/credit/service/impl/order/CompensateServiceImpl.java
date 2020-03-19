@@ -870,10 +870,14 @@ public class CompensateServiceImpl implements CompensateService {
                 startCompensateActiviy(priceDiffId,cUser);
             }
             return AgentResult.ok(priceDiffId);
+        }catch (ProcessException e) {
+            e.printStackTrace();
+            log.info("活动调整保存失败");
+            throw new ProcessException(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             log.info("活动调整保存失败");
-            throw new ProcessException(e.getLocalizedMessage());
+            throw new ProcessException("活动调整保存失败");
         }
     }
 

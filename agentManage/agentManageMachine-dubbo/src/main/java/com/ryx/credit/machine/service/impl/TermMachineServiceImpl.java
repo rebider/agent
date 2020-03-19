@@ -3,6 +3,7 @@ package com.ryx.credit.machine.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.common.enumc.TerminalPlatformType;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.*;
@@ -204,7 +205,7 @@ public class TermMachineServiceImpl  implements TermMachineService {
     }
 
     @Override
-    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws Exception {
+    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws ProcessException {
         String platformType = refundPriceDiffDetailList.get(0).getPlatformType();
         AgentResult agentResult = AgentResult.fail();
         if(PlatformType.whetherPOS(platformType)){
