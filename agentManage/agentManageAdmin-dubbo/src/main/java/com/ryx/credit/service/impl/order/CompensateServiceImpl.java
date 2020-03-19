@@ -30,6 +30,7 @@ import com.ryx.credit.service.order.*;
 import com.ryx.internet.pojo.OInternetCardImport;
 import net.sf.jxls.transformer.Row;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.kafka.common.protocol.types.Field;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1593,14 +1594,24 @@ public class CompensateServiceImpl implements CompensateService {
                     log.info("calculatePriceDiff查询Sn失败请检查Sn有效性2");
                     throw new MessageException("查询Sn失败请检查Sn有效性,sn开始:"+oRefundPriceDiffDetail.getBeginSn()+"-sn结束:"+oRefundPriceDiffDetail.getEndSn());
                 }
+                List<String> platformTypes = new ArrayList<>();
+                platformTypes.add(PlatformType.SSPOS.code);
+                platformTypes.add(PlatformType.POS.code);
                 Map<String, Object> oLogisticsDetailMap = oLogisticsDetails.get(0);
                 //TODO 查询业务平台信息进行展示
                 if(StringUtils.isNotBlank(oRefundPriceDiffDetail.getNewOrgId()) && StringUtils.isNotBlank(oRefundPriceDiffDetail.getPlatformType())) {
                     PlatFormExample pe = new PlatFormExample();
-                    pe.or()
-                            .andPlatformTypeEqualTo(oRefundPriceDiffDetail.getPlatformType())
-                            .andStatusEqualTo(Status.STATUS_1.status)
-                            .andPlatformStatusEqualTo(Status.STATUS_1.status);
+                    if (PlatformType.SSPOS.code.equals(oRefundPriceDiffDetail.getPlatformType()) || PlatformType.POS.code.equals(oRefundPriceDiffDetail.getPlatformType())) {
+                        pe.or()
+                                .andPlatformTypeIn(platformTypes)
+                                .andStatusEqualTo(Status.STATUS_1.status)
+                                .andPlatformStatusEqualTo(Status.STATUS_1.status);
+                    } else {
+                        pe.or()
+                                .andPlatformTypeEqualTo(oRefundPriceDiffDetail.getPlatformType())
+                                .andStatusEqualTo(Status.STATUS_1.status)
+                                .andPlatformStatusEqualTo(Status.STATUS_1.status);
+                    }
 
                     List<PlatForm>  platFormList = platFormMapper.selectByExample(pe);
                     AgentBusInfoExample example = new AgentBusInfoExample();
@@ -1614,6 +1625,17 @@ public class CompensateServiceImpl implements CompensateService {
                 }
                 if(StringUtils.isNotBlank(oRefundPriceDiffDetail.getOldOrgId()) && StringUtils.isNotBlank(oRefundPriceDiffDetail.getPlatformType())) {
                     PlatFormExample pe = new PlatFormExample();
+                    if (PlatformType.SSPOS.code.equals(oRefundPriceDiffDetail.getPlatformType()) || PlatformType.POS.code.equals(oRefundPriceDiffDetail.getPlatformType())) {
+                        pe.or()
+                                .andPlatformTypeIn(platformTypes)
+                                .andStatusEqualTo(Status.STATUS_1.status)
+                                .andPlatformStatusEqualTo(Status.STATUS_1.status);
+                    } else {
+                        pe.or()
+                                .andPlatformTypeEqualTo(oRefundPriceDiffDetail.getPlatformType())
+                                .andStatusEqualTo(Status.STATUS_1.status)
+                                .andPlatformStatusEqualTo(Status.STATUS_1.status);
+                    }
                     pe.or().andPlatformTypeEqualTo(oRefundPriceDiffDetail.getPlatformType()).andStatusEqualTo(Status.STATUS_1.status).andPlatformStatusEqualTo(Status.STATUS_1.status);
                     List<PlatForm>  platFormList = platFormMapper.selectByExample(pe);
                     AgentBusInfoExample example = new AgentBusInfoExample();
