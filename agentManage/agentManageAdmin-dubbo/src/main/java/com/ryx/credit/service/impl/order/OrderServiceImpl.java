@@ -3510,8 +3510,8 @@ public class OrderServiceImpl implements OrderService {
         }
 
         if(flag.compareTo(oReceiptPro_db.getSendNum())==-1){
-            logger.info("已部分排单,最低可调整为"+oReceiptPro_db.getSendNum()+"台");
-            throw new MessageException("已部分排单,最低可调整为"+oReceiptPro_db.getSendNum()+"台");
+            logger.info("已部分排单,最低可调整为"+oReceiptPro_db.getSendNum()+"台(如需要调整到"+flag+"台请联系业务部撤销排单)");
+            throw new MessageException("已部分排单,最低可调整为"+oReceiptPro_db.getSendNum()+"台(如需要调整到"+flag+"台请联系业务部撤销排单)");
         } else if(flag.compareTo(oReceiptPro_db.getSendNum())==0){
             oReceiptPro_db.setReceiptProStatus(OReceiptStatus.DISPATCHED_ORDER.code);
         }
