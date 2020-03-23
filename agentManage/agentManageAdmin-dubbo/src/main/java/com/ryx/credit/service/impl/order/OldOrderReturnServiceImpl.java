@@ -350,7 +350,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
 
         //业务部审批提交排单信息， 业务部如果没有排单信息提示必须进行排单
         OReturnOrder oReturnOrder = returnOrderMapper.selectByPrimaryKey(agentVo.getReturnId());
-        if(agentVo.getSid().equals(AppConfig.getProperty("old_refund_business1_id","")) && "pass".equals(agentVo.getApprovalResult())) {
+        if(agentVo.getSid().equals(AppConfig.getProperty("old_refund_business2_id","")) && "pass".equals(agentVo.getApprovalResult())) {
             if(StringUtils.isBlank(agentVo.getPlans())){
                 throw new MessageException("排单信息不能为空");
             }

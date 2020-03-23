@@ -1143,8 +1143,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 }
             }
 
-            //业务审批时添加排单
-            if (approveResult.equals(ApprovalType.PASS.getValue()) && sid.equals(refund_business1_id)) {
+            //业务第二次审批时添加排单
+            if (approveResult.equals(ApprovalType.PASS.getValue()) && sid.equals(refund_business2_id)) {
                 try {
                     AgentResult agentResult = savePlans(agentVo, userId);
                     if (!agentResult.isOK()) {
