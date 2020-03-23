@@ -547,4 +547,15 @@
       </if>
     </where>
   </select>
+
+  <select id="selectPlanNumByReturnId" resultType="int" parameterType="String">
+    SELECT
+      SUM(plan_pro_num)
+    FROM
+      O_RECEIPT_PLAN RP
+      LEFT JOIN o_return_order_detail ROD ON ROD.id = RP.Return_Order_Detail_Id
+    WHERE
+      ROD.STATUS = 1
+      AND ROD.RETURN_ID = #{returnId}
+  </select>
 </mapper>

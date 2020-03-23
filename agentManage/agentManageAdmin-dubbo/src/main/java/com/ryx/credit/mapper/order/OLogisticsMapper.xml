@@ -593,4 +593,17 @@
                 AND RO.RET_SCHEDULE=#{retSchedule}
             </if>
     </select>
+
+    <!--查询退货物流发货数量-->
+    <select id="selectSendNumByReturnId" parameterType="string" resultType="int">
+        SELECT
+          SUM(L.Send_Num)
+        FROM
+          O_LOGISTICS L
+          LEFT JOIN O_RECEIPT_PLAN RP ON L.RECEIPT_PLAN_ID = RP.ID AND RP.STATUS=1
+          LEFT JOIN o_return_order_detail ROD ON ROD.id = RP.Return_Order_Detail_Id
+        WHERE
+          L.log_type = 2
+          AND ROD.RETURN_ID = #{returnId}
+    </select>
 </mapper>

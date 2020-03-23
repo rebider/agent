@@ -417,6 +417,17 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                 }
             }
         }
+        //代理商上传物流
+        if(agentVo.getSid().equals(AppConfig.getProperty("old_refund_agent_upload_id","")) && "pass".equals(agentVo.getApprovalResult())) {
+            //物流发货数量
+            int sendtotal = oLogisticsMapper.selectSendNumByReturnId(agentVo.getReturnId());
+            //排单数量
+            int plantotal = receiptPlanMapper.selectPlanNumByReturnId(agentVo.getReturnId());
+            if (plantotal != sendtotal) {
+                throw new MessageException("物流发货数量必须等于排单数量！");
+            }
+        }
+
         Map<String, Object> reqMap = new HashMap<>();
         reqMap.put("rs", agentVo.getApprovalResult());
         reqMap.put("approvalOpinion", agentVo.getApprovalOpinion());
