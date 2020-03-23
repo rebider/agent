@@ -1412,4 +1412,10 @@ union
            #{platformType}
       </foreach>
   </select>
+  <select id="queryRegionByAccount" resultType="map" parameterType="map">
+    SELECT C_DISTRICT.ID,C_DISTRICT.NAME,C_DISTRICT.ADDRESS
+    FROM C_ORGANIZATION C_DISTRICT
+    LEFT JOIN C_USER CU ON CU.ORGANIZATION_ID = C_DISTRICT.ID
+    WHERE CU.LOGIN_NAME= #{account}
+  </select>
 </mapper>
