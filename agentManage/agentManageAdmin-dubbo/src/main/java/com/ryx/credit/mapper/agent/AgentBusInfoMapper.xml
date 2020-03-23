@@ -1413,9 +1413,9 @@ union
       </foreach>
   </select>
   <select id="queryRegionByAccount" resultType="map" parameterType="map">
-    SELECT C_DISTRICT.NAME as department,C_DISTRICT.ADDRESS as region
-    FROM C_ORGANIZATION C_DISTRICT
-    LEFT JOIN C_USER CU ON CU.ORGANIZATION_ID = C_DISTRICT.ID
-    WHERE CU.LOGIN_NAME= #{account}
+    SELECT c.name,c.NAME as department,c.ADDRESS as region,cbi.INNER_LOGIN
+    FROM C_BRANCH_INNER CBI
+    left join c_organization c on c.id = CBI.BRANCH_LOGIN
+    WHERE CBI.STATUS = 1 and INNER_LOGIN = #{account}
   </select>
 </mapper>
