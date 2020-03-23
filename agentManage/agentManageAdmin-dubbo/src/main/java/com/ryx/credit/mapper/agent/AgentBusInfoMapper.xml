@@ -1413,7 +1413,7 @@ union
       </foreach>
   </select>
   <select id="queryRegionByAccount" resultType="map" parameterType="map">
-    SELECT cbi.INNER_LOGIN,c.name,c.NAME as department,c.ADDRESS as region
+    SELECT cbi.INNER_LOGIN,c.NAME as department,c.ADDRESS as region
     FROM C_BRANCH_INNER CBI
     left join c_organization c on c.id = CBI.BRANCH_LOGIN
     WHERE CBI.STATUS = 1 and INNER_LOGIN = #{account}
