@@ -743,6 +743,7 @@
         where os.order_id = o.id and soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
       </if>
       <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus}</if>
+      <if test="platformType!=null and platformType!=''"> and c.platform_type = #{platformType} </if>
       <if test="platfromPerm!=null and platfromPerm.size>0">
         and o.order_platform in
         <foreach collection="platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
@@ -1075,6 +1076,7 @@
       <if test="agName!=null and agName!=''"> and b.ag_name like  CONCAT(CONCAT('%',#{agName}),'%') </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
       <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
+      <if test="platformType!=null and platformType!=''"> and c.platform_type = #{platformType} </if>
       <if test="platformList!=null and platformList.size > 0">
         and c.PLATFORM_NUM
         <foreach collection="platformList" item="platform" open=" in(" close=")" separator=",">
@@ -1210,6 +1212,7 @@
     aab.bus_num,
     c.platform_name,
     b.ag_name,
+    oorganization.ORG_NICK as orgName,
     nvl((
       select LISTAGG(o_sub_order.pro_code,',') WITHIN GROUP (ORDER BY o_sub_order.order_id)
       from o_sub_order
@@ -1343,6 +1346,7 @@
     nvl((
       select sum(plans.plan_pro_num) from o_receipt_plan plans where plans.order_id = o.id and plans.status = 1
     ),0) as is_plan_num,
+    nvl((select sum(o_receipt_pro.pro_num)-sum(o_receipt_pro.send_num)from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0) as toPlanNum,
     o.review_status,
     to_char(o.o_inuretime,'yyyy-MM-dd hh24:mi:ss') as oinuretime,
     orging.name as ag_doc_district,
@@ -1362,6 +1366,7 @@
     left join o_payment d on d.order_id = o.id and d.status=1
     left join c_organization org on org.id = aab.ag_doc_pro
     left join c_organization orging on orging.id = aab.ag_doc_district
+    left join o_organization oorganization on aab.ORGAN_NUM = oorganization.ORG_ID
     left join d_dict dict on dict.d_itemvalue = c.platform_type AND dict.d_group = 'ORDER' AND dict.d_artifact = 'PLATFROM_TYPE' AND dict.d_status=1
     <where>
       <if test="1==1"> and o.status = 1 and b.status = 1 and aab.status = 1 </if>
