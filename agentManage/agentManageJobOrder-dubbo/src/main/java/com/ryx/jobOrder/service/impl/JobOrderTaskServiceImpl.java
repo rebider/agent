@@ -219,13 +219,20 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         }
         joTaskOld.setDealPersonName(joTask.getDealPersonName());
         joTaskOld.setDealPersonId(joTask.getDealPersonId());
-        joTaskOld.setJoTaskContent("转发到" + joTask.getDealGroup()+":"+
-                content.substring(content.indexOf(":")+1, content.length()));
+        String dealCode = joTask.getDealGroupId();
+        if("0".equals(dealCode)){
+            joTaskOld.setJoTaskContent(StringUtils.isBlank(joTaskOld.getJoTaskContent())?"":joTaskOld.getJoTaskContent()
+                    +"转发到发起人:"+
+                    content.substring(content.indexOf(":")+1, content.length()));
+        }else{
+            joTaskOld.setJoTaskContent(StringUtils.isBlank(joTaskOld.getJoTaskContent())?"":joTaskOld.getJoTaskContent()
+                    +"转发到" + joTask.getDealGroup()+":"+
+            content.substring(content.indexOf(":")+1, content.length()));
+        }
         // 结束工单任务
         endJoTask( joTaskOld );
 
         // 查询工单类型受理部门
-        String dealCode = joTask.getDealGroupId();
         JoOrder newOrder = joOrderMapper.selectByPrimaryKey(joId);
         if("0".equals(dealCode)){ // 选择的是发起人
             newOrder.setJoProgress(JoOrderStatus.YCL.getValue());
