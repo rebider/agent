@@ -1346,7 +1346,7 @@ union
       and a.agent_id = #{agentId}
       <if test="busId != null"> and a.id = #{busId} </if>
       and c.status = 1
-      and d.status = 1
+      and d.d_status = 1
     </where>
   </select>
 </mapper>

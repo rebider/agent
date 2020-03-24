@@ -7,9 +7,12 @@ import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.AttachmentRel;
 import com.ryx.credit.service.IResourceService;
+import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AttachmentRelService;
+import com.ryx.credit.service.dict.DepartmentService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.jobOrder.dao.JoOrderMapper;
 import com.ryx.jobOrder.dao.JoTaskMapper;
@@ -51,6 +54,12 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
     private AttachmentRelService attachmentRelService;
     @Autowired
     private IResourceService iResourceService;
+
+    @Autowired
+    private AgentBusinfoService agentBusinfoService;
+
+    @Autowired
+    private DepartmentService departmentService;
     /**
      * 创建 工单任务 记录
      * @param joTask
@@ -220,6 +229,7 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         joTaskOld.setDealPersonName(joTask.getDealPersonName());
         joTaskOld.setDealPersonId(joTask.getDealPersonId());
         String dealCode = joTask.getDealGroupId();
+        JoOrder newOrder = joOrderMapper.selectByPrimaryKey(joId);
         if("0".equals(dealCode)){
             joTaskOld.setJoTaskContent(StringUtils.isBlank(joTaskOld.getJoTaskContent())?"":joTaskOld.getJoTaskContent()
                     +"转发到发起人:"+
@@ -232,16 +242,18 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         // 结束工单任务
         endJoTask( joTaskOld );
 
-        // 查询工单类型受理部门
-        JoOrder newOrder = joOrderMapper.selectByPrimaryKey(joId);
-        if("0".equals(dealCode)){ // 选择的是发起人
-            newOrder.setJoProgress(JoOrderStatus.YCL.getValue());
-            newOrder.setDealTimeEnd(new Date());
-            newOrder.setAcceptNowGroup(joTask.getDealGroup());
-            double dLength = (newOrder.getDealTimeEnd().getTime() - newOrder.getDealTimeStart().getTime() ) / (60 * 1000);
-            newOrder.setDealTimeLength(new BigDecimal(dLength).setScale(2, BigDecimal.ROUND_HALF_UP));
-            joOrderMapper.updateByPrimaryKeySelective(newOrder);
-            return FastMap.fastSuccessMap();
+
+        if("0".equals(dealCode) || JoPowerGroup.SQ.key.equals(dealCode)){ // 选择的是发起人 或者 省区
+            if("0".equals(dealCode) ||JoPowerGroup.SQ.key.equals(newOrder.getAcceptGroupCode())){
+                // 如果 受理组一开始就是省区 那就是返回发起人
+                newOrder.setJoProgress(JoOrderStatus.YCL.getValue());
+                newOrder.setDealTimeEnd(new Date());
+                newOrder.setAcceptNowGroup(joTask.getDealGroup());
+                double dLength = (newOrder.getDealTimeEnd().getTime() - newOrder.getDealTimeStart().getTime() ) / (60 * 1000);
+                newOrder.setDealTimeLength(new BigDecimal(dLength).setScale(2, BigDecimal.ROUND_HALF_UP));
+                joOrderMapper.updateByPrimaryKeySelective(newOrder);
+                return FastMap.fastSuccessMap();
+            }
         }else{
             newOrder.setAcceptNowGroup(joTask.getDealGroup());
             joOrderMapper.updateByPrimaryKeySelective(newOrder);
@@ -254,6 +266,21 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         joTaskNew.setDealGroupId(joTask.getDealGroupId());
         joTaskNew.setBackDealGroup(joTaskOld.getDealGroup());
         joTaskNew.setBackDealPerson(joTaskOld.getDealPersonName());
+        if(JoPowerGroup.SQ.key.equals(dealCode)){
+            String queryAgId = newOrder.getAgId();
+            String dictItem = newOrder.getJoSecondKeyNum().substring(0,newOrder.getJoSecondKeyNum().indexOf("_"));
+            FastMap reqMap = FastMap.fastMap("agentId", queryAgId)
+                    .putKeyV("dictGroup","JOB")
+                    .putKeyV("dictItem",dictItem ).putKeyV("busId", newOrder.getBusId());
+            List<Map> listPlateform = agentBusinfoService.agentBusByDict(reqMap);
+            Map item = listPlateform.get(0);
+            String agPro =  (String)item.get("AG_DOC_PRO");
+            if(StringUtils.isBlank(agPro)){
+                throw  new MessageException(String.format("该代理商%s，业务%s未配置省区编码，不能转发省区", queryAgId, newOrder.getPlatformName()));
+            }
+            COrganization sqMap = departmentService.getById(agPro);
+            joTaskNew.setSecondDealGroup(sqMap.getCode());
+        }
         FastMap status = createJobOrderTask(joTaskNew);
         if(FastMap.isSuc(status)){
             return FastMap.fastSuccessMap();

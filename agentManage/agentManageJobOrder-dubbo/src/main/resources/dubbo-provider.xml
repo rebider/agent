@@ -22,6 +22,9 @@
     <dubbo:reference interface="com.ryx.credit.service.agent.AttachmentRelService" id="attachmentRelService"  timeout="1200000" registry="myGroup" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.data.AttachmentService" id="attachmentService"  timeout="1200000" registry="myGroup" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.agent.AgentService" id="agentService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.agent.AgentBusinfoService" id="agentBusinfoService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.dict.DepartmentService" id="departmentService" timeout="1200000" registry="myGroup" check="false"/>
+
 
     <dubbo:service interface="com.ryx.jobOrder.service.JobOrderAuthService" ref="jobOrderAuthService" timeout="1200000" registry="myGroup"></dubbo:service>
     <dubbo:service interface="com.ryx.jobOrder.service.JobOrderStartService" ref="jobOrderStartService" timeout="1200000" registry="myGroup"></dubbo:service>
