@@ -797,7 +797,7 @@
     <if test="reqMap.approveTimeEnd != null and reqMap.approveTimeEnd != '' " >
       and to_char(b.approve_time,'yyyy-MM-dd') &lt;= #{reqMap.approveTimeEnd}
     </if>
-    <if test="reqMap.busStatus != null" >
+    <if test="reqMap.busStatus != null and reqMap.busStatus != '' " >
       and b.bus_status = #{reqMap.busStatus}
     </if>
     and b.status = #{reqMap.status}
@@ -1403,5 +1403,15 @@ union
       <foreach collection="platformTypes" open="(" separator="," close=")" item="platformType">
            #{platformType}
       </foreach>
+  </select>
+
+
+  <select id="queryBusInfoType" parameterType="map" resultType="map">
+    select
+    ab.id, ab.agent_id, ab.bus_num, ab.bus_platform, ab.bus_type
+    from a_agent_businfo ab
+    left join a_platform p on p.platform_num = ab.bus_platform
+    where p.status = '1' and ab.status = '1' and ab.clo_review_status = '3' and ab.bus_status = '1'
+    and ab.bus_num = #{busNum} and p.platform_type = #{platformType}
   </select>
 </mapper>
