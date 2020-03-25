@@ -670,7 +670,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         if(StringUtils.isBlank(returnid))return AgentResult.fail("退货单信息未获取到");
         OReturnOrder oReturnOrder = returnOrderMapper.selectByPrimaryKey(returnid);
         oReturnOrder.setGoodsReturnAmo(all_return_amt);
-        oReturnOrder.setReturnAmo(oReturnOrder.getGoodsReturnAmo().add(oReturnOrder.getCutAmo()));
+        oReturnOrder.setReturnAmo(oReturnOrder.getGoodsReturnAmo().subtract(oReturnOrder.getCutAmo()));
         if(1!=returnOrderMapper.updateByPrimaryKeySelective(oReturnOrder)){
             throw new MessageException("更新退货单失败");
         }
