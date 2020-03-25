@@ -90,6 +90,8 @@ public interface OSupplementService {
 
     public List<OPaymentDetail>selectCount(String orderId, String code);;
 
+    public List<OPaymentDetail>selectPaymentDetail(String orderId, String code);;
+
     /**
      * 查看补款详情
      */

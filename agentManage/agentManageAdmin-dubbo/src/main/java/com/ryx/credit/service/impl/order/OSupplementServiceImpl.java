@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.order;
 
+import com.alibaba.druid.sql.visitor.functions.If;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
@@ -740,9 +741,17 @@ public class OSupplementServiceImpl implements OSupplementService {
 
     @Override
     public BigDecimal selectPayAmout(String srcid, String pkType) {
-        BigDecimal payAmout = oSupplementMapper.selectPayAmout(srcid, pkType);
-        OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectMoney(srcid);
-        BigDecimal amount = (oPaymentDetail.getPayAmount().subtract((oPaymentDetail.getRealPayAmount() == null ? new BigDecimal(0) : oPaymentDetail.getRealPayAmount())).subtract(payAmout));
+//        BigDecimal payAmout = oSupplementMapper.selectPayAmout(srcid, pkType);
+        BigDecimal amount=new BigDecimal(BigInteger.ZERO);
+        OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
+        OPaymentDetailExample.Criteria criteria = oPaymentDetailExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andIdEqualTo(srcid);
+        List<OPaymentDetail> oPaymentDetailList = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
+        if(null!=oPaymentDetailList && oPaymentDetailList.size()>0){
+            OPaymentDetail oPaymentDetail = oPaymentDetailList.get(0);
+            if(StringUtils.isNotBlank(oPaymentDetail.getOrderId()) && null!=oPaymentDetail.getPlanPayTime()){
+                amount=oPaymentDetailMapper.selectQk(oPaymentDetail);
+            }
+        }
         return amount;
     }
 
@@ -767,6 +776,11 @@ public class OSupplementServiceImpl implements OSupplementService {
     @Override
     public List<OPaymentDetail> selectCount(String orderId, String code) {
       return   oPaymentDetailMapper.selectCount(orderId,code, null);
+    }
+
+    @Override
+    public List<OPaymentDetail> selectPaymentDetail(String orderId, String code) {
+        return   oPaymentDetailMapper.selectPaymentDetail(orderId,code, null);
     }
 
     @Override
