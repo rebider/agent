@@ -230,7 +230,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      * @Date: 20:25 2018/7/27
      */
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Transactional(propagation = Propagation.NESTED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     public Map<String, Object> saveCut(String returnId, String amt, String ctype) throws MessageException {
 
         Map<String, Object> map = new HashMap<>();

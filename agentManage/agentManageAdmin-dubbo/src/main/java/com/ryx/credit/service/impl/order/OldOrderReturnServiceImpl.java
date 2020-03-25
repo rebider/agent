@@ -348,7 +348,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
     @Override
     public AgentResult taskApprove(AgentVo agentVo, String userId)throws MessageException {
 
-        //业务部审批提交排单信息， 业务部如果没有排单信息提示必须进行排单
+        //业务部第二次审批提交排单信息， 业务部如果没有排单信息提示必须进行排单
         OReturnOrder oReturnOrder = returnOrderMapper.selectByPrimaryKey(agentVo.getReturnId());
         if(agentVo.getSid().equals(AppConfig.getProperty("old_refund_business2_id","")) && "pass".equals(agentVo.getApprovalResult())) {
             if(StringUtils.isBlank(agentVo.getPlans())){
@@ -377,7 +377,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                 }
             }
         }
-        //保存抵扣信息
+        //保存扣款明细
         if(agentVo.getDeductCapitalList()!=null && agentVo.getDeductCapitalList().size()>0 && "pass".equals(agentVo.getApprovalResult())){
             for (ODeductCapital oDeductCapital : agentVo.getDeductCapitalList()) {
                 if(null!=oDeductCapital.getcAmount() && oDeductCapital.getcAmount().compareTo(BigDecimal.ZERO) >= 0) {
