@@ -236,8 +236,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         if ( StringUtils.isNotBlank((String)map.get("approveTimeEnd"))) {
             reqMap.put("approveTimeEnd", (String)map.get("approveTimeEnd"));
         }
-        if ((String)map.get("busStatus") != null) {
-            reqMap.put("busStatus", new BigDecimal((String)map.get("busStatus")));
+        if (StringUtils.isNotBlank((String)map.get("busStatus"))) {
+            reqMap.put("busStatus", (String)map.get("busStatus"));
         }
         reqMap.put("status", Status.STATUS_1.status);
         List<Map> platfromPerm = iResourceService.userHasPlatfromPerm((Long)map.get("userId"));
