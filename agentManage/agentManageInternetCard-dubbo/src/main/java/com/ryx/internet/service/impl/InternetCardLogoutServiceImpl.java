@@ -232,7 +232,14 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
     }
 
 
-
+    /**
+     * 注销服务接口  物联网卡信息-->批量 注销
+     * @param internetLogout
+     * @param iccids
+     * @param cUser
+     * @return
+     * @throws MessageException
+     */
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     public AgentResult saveAndApprove(InternetLogout internetLogout, List<String> iccids, String cUser)throws MessageException {
@@ -245,9 +252,9 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 log.info("续费中请勿重复提交,cUser:{}", cUser);
                 throw new MessageException("注销中请勿重复提交");
             }
-            //流程中的部门参数
+            // 流程中的部门参数
             Map startPar = agentEnterService.startPar(cUser);
-            String party = "";
+            String party = "";// TODO 关注下返回的是什么
             if (null == startPar) {
                 List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(cUser));
                 if(orgCodeRes==null && orgCodeRes.size()!=1){
@@ -256,11 +263,11 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 Map<String, Object> stringObjectMap = orgCodeRes.get(0);
                 String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
                 Map<String,Object> reqMap = new HashMap<>();
-                //省区大区查看自己的代理商 部门权限
+                // 省区大区查看自己的代理商 部门权限
                 if(StringUtils.isNotBlank(organizationCode) && (organizationCode.contains("region") || organizationCode.contains("beijing"))) {
                     reqMap.put("orgCode", organizationCode);
                 }
-                //内部人员根据名称查询指定流量卡
+                // 内部人员根据名称查询指定流量卡
                 List<String> agentNameList = dictOptionsService.getAgentNameList(Long.valueOf(cUser));
                 if(agentNameList.size()!=0) {
                     party = "interior";
@@ -302,9 +309,9 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 criteria.andStatusEqualTo(Status.STATUS_1.status);
                 criteria.andIccidNumEqualTo(iccid);
                 List<String> logoutStatusList = new ArrayList<>();
-                logoutStatusList.add(InternetLogoutStatus.SX.getValue());
-                logoutStatusList.add(InternetLogoutStatus.TJSB.getValue());
-                criteria.andLogoutStatusNotIn(logoutStatusList);
+                logoutStatusList.add(InternetLogoutStatus.SX.getValue()); // 失效
+                logoutStatusList.add(InternetLogoutStatus.TJSB.getValue());// 停机失败
+                criteria.andLogoutStatusNotIn(logoutStatusList);// 除了失效 和 停机失败  其他均是注销中的
                 List<InternetLogoutDetail> internetLogoutDetails = internetLogoutDetailMapper.selectByExample(internetLogoutDetailExample);
                 if (internetLogoutDetails.size() != 0) {
                     throw new MessageException("iccid:" + iccid + "注销中,请勿重复发起");
@@ -324,7 +331,7 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 internetLogoutDetail.setMerName(oInternetCard.getMerName());
                 internetLogoutDetail.setAgentId(oInternetCard.getAgentId());
                 internetLogoutDetail.setAgentName(oInternetCard.getAgentName());
-                internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.ZXZ.getValue());
+                internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.ZXZ.getValue());// TODO  提交申请时审批前  修改为  --> 待注销
                 internetLogoutDetail.setStatus(Status.STATUS_1.status);
                 internetLogoutDetail.setBusNum(oInternetCard.getBusNum());
                 internetLogoutDetail.setBusPlatform(oInternetCard.getBusPlatform());
@@ -335,14 +342,14 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 internetLogoutDetail.setVersion(BigDecimal.ONE);
                 internetLogoutDetail.setIssuer(oInternetCard.getIssuer());
                 if(StringUtils.isNotBlank(oInternetCard.getBusNum()) && StringUtils.isNotBlank(oInternetCard.getBusPlatform())){
-                    //查询最新对接省区大区对接人
+                    // 查询最新对接省区大区对接人
                     AgentBusInfo agentBusInfo = new AgentBusInfo();
                     agentBusInfo.setBusNum(oInternetCard.getBusNum());
                     agentBusInfo.setBusPlatform(oInternetCard.getBusPlatform());
                     List<BigDecimal> busStatusList = new ArrayList<>();
-                    busStatusList.add(BusStatus.QY.getValue());
-                    busStatusList.add(BusStatus.WJH.getValue());
-                    busStatusList.add(BusStatus.WQY.getValue());
+                    busStatusList.add(BusStatus.QY.getValue());// 启用
+                    busStatusList.add(BusStatus.WJH.getValue());//  未激活
+                    busStatusList.add(BusStatus.WQY.getValue());// 未启用
                     agentBusInfo.setBusStatusList(busStatusList);
                     agentBusInfo.setCloReviewStatus(AgStatus.Approved.getValue());
                     List<AgentBusInfo> agentBusInfos = agentBusinfoService.selectByAgentBusInfo(agentBusInfo);
@@ -356,7 +363,7 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 }
                 log.info("注销明细保存参数,internetLogoutDetail:{}",internetLogoutDetail.toString());
                 internetLogoutDetailMapper.insertSelective(internetLogoutDetail);
-                oInternetCard.setRenewStatus(InternetRenewStatus.ZXZ.getValue());
+                oInternetCard.setRenewStatus(InternetRenewStatus.ZXZ.getValue());// 提交申请后 就是注销中
                 int j = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
                 if(j!=1){
                     throw new MessageException("更新物联网卡信息失败");
@@ -386,7 +393,7 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
                 throw new MessageException("缺少平台码或平台");
             }
 
-            internetLogout.setId(internetLogoutId);
+            internetLogout.setId(internetLogoutId);// 注销申请表 记录
             internetLogout.setAgentId(agentId);
             internetLogout.setAgentName(agName);
             if(queryAgentBusInfo!=null){
@@ -530,7 +537,7 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
         InternetLogoutDetailExample internetLogoutDetailExample = new InternetLogoutDetailExample();
         InternetLogoutDetailExample.Criteria criteria = internetLogoutDetailExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
-        criteria.andLogoutStatusEqualTo(InternetLogoutStatus.ZXZ.getValue());
+        criteria.andLogoutStatusEqualTo(InternetLogoutStatus.ZXZ.getValue());// TODO 审核通过后，查询 注销状态为待注销的 记录  -- >  待注销
         criteria.andRenewIdEqualTo(internetLogout.getId());
         List<InternetLogoutDetail> internetLogoutDetails = internetLogoutDetailMapper.selectByExample(internetLogoutDetailExample);
         for (InternetLogoutDetail internetLogoutDetail : internetLogoutDetails) {
@@ -541,11 +548,12 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
             if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
                 internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.SX.getValue());
                 oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());
-            }else if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
+            }else if(agStatus.compareTo(AgStatus.Approved.getValue())==0){// 揭阳移动 和 烟台移动的处理方法不一样
                 if(StringUtils.isNotBlank(internetLogoutDetail.getIssuer()) && internetLogoutDetail.getIssuer().equals(Issuerstatus.JY_MOBILE.getValue())){
-                    internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.TJCLZ.getValue());
+                    internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.TJCLZ.getValue());// TODO 审核通过 修改为  --> 注销中
+                    // TODO 2 审核通过 卡状态更改为  --> 已注销
                 }else{
-                    internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.DZX.getValue());
+                    internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.DZX.getValue()); // TODO  烟台移动 修改为  --> 注销中
                     oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());
                 }
             }
