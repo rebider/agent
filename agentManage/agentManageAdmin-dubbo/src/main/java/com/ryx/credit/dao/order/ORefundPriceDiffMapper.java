@@ -1,5 +1,6 @@
 package com.ryx.credit.dao.order;
 
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.pojo.admin.order.ORefundPriceDiff;
 import com.ryx.credit.pojo.admin.order.ORefundPriceDiffExample;
