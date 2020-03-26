@@ -1145,7 +1145,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
             //业务第一次审批，有排单就保存，没有就不保存
             if (approveResult.equals(ApprovalType.PASS.getValue()) && sid.equals(refund_business1_id)) {
-                if(StringUtils.isNotBlank(agentVo.getPlans())){
+
+                JSONArray jsonArray = JSONObject.parseArray(agentVo.getPlans());
+                if (!jsonArray.isEmpty()) {
                     try {
                         AgentResult agentResult = savePlans(agentVo, userId);
                         if (!agentResult.isOK()) {
@@ -1163,7 +1165,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             if (approveResult.equals(ApprovalType.PASS.getValue()) && sid.equals(refund_business2_id)) {
                 //第一次未排单
                 if (!(receiptPlanMapper.selectPlanNumReturnId(agentVo.getReturnId()) > 0)) {
-                    if(StringUtils.isBlank(agentVo.getPlans())){
+                    JSONArray jsonArray = JSONObject.parseArray(agentVo.getPlans());
+                    if (jsonArray.isEmpty() || "[]".equals(agentVo.getPlans())) {
                         throw new ProcessException("排单信息不能为空");
                     } else {
                         try {
