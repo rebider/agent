@@ -348,9 +348,9 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
     @Override
     public AgentResult taskApprove(AgentVo agentVo, String userId)throws MessageException {
 
-        //业务部审批提交排单信息， 业务部如果没有排单信息提示必须进行排单
+        //业务部第二次审批提交排单信息， 业务部如果没有排单信息提示必须进行排单
         OReturnOrder oReturnOrder = returnOrderMapper.selectByPrimaryKey(agentVo.getReturnId());
-        if(agentVo.getSid().equals(AppConfig.getProperty("old_refund_business1_id","")) && "pass".equals(agentVo.getApprovalResult())) {
+        if(agentVo.getSid().equals(AppConfig.getProperty("old_refund_business2_id","")) && "pass".equals(agentVo.getApprovalResult())) {
             if(StringUtils.isBlank(agentVo.getPlans())){
                 throw new MessageException("排单信息不能为空");
             }
@@ -377,7 +377,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                 }
             }
         }
-        //保存抵扣信息
+        //保存扣款明细
         if(agentVo.getDeductCapitalList()!=null && agentVo.getDeductCapitalList().size()>0 && "pass".equals(agentVo.getApprovalResult())){
             for (ODeductCapital oDeductCapital : agentVo.getDeductCapitalList()) {
                 if(null!=oDeductCapital.getcAmount() && oDeductCapital.getcAmount().compareTo(BigDecimal.ZERO) >= 0) {
@@ -417,6 +417,17 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                 }
             }
         }
+        //代理商上传物流
+        if(agentVo.getSid().equals(AppConfig.getProperty("old_refund_agent_upload_id","")) && "pass".equals(agentVo.getApprovalResult())) {
+            //物流发货数量
+            int sendtotal = oLogisticsMapper.selectSendNumByReturnId(agentVo.getReturnId());
+            //排单数量
+            int plantotal = receiptPlanMapper.selectPlanNumByReturnId(agentVo.getReturnId());
+            if (plantotal != sendtotal) {
+                throw new MessageException("物流发货数量必须等于排单数量！");
+            }
+        }
+
         Map<String, Object> reqMap = new HashMap<>();
         reqMap.put("rs", agentVo.getApprovalResult());
         reqMap.put("approvalOpinion", agentVo.getApprovalOpinion());
@@ -659,7 +670,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         if(StringUtils.isBlank(returnid))return AgentResult.fail("退货单信息未获取到");
         OReturnOrder oReturnOrder = returnOrderMapper.selectByPrimaryKey(returnid);
         oReturnOrder.setGoodsReturnAmo(all_return_amt);
-        oReturnOrder.setReturnAmo(oReturnOrder.getGoodsReturnAmo().add(oReturnOrder.getCutAmo()));
+        oReturnOrder.setReturnAmo(oReturnOrder.getGoodsReturnAmo().subtract(oReturnOrder.getCutAmo()));
         if(1!=returnOrderMapper.updateByPrimaryKeySelective(oReturnOrder)){
             throw new MessageException("更新退货单失败");
         }
@@ -1181,9 +1192,9 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
      * @throws MessageException
      */
     public AgentResult parseExcel(List<List<Object>> excelList)throws MessageException{
+        List<String> platformTypeList = new ArrayList<>();
         List<Map<String,Object>> resultList = new ArrayList<>();
         for (List<Object> excel : excelList) {
-            Map<String, Object> resultMap = new HashMap();
             String snBegin = "";
             String snEnd = "";
             String count = "";
@@ -1204,10 +1215,10 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                         .putKeyV("endSN", snEnd));
                 if (!FastMap.isSuc(fastMap)) return AgentResult.fail(fastMap.get("msg").toString());
 
-                Dict modelType = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MODEL_TYPE.name(),proModel);
-                if(modelType==null){
-                    throw new MessageException("导入类型错误");
-                }
+                String proModelValue = PlatformType.getValueByContent(proModel);
+                if(StringUtils.isBlank(proModelValue)) throw new MessageException("导入类型错误");
+                platformTypeList.add(proModelValue);
+
                 AgentResult agentResult = orderActivityService.querySnInfoFromBusSystem(snBegin,snEnd,count,proModel);
                 if(agentResult.isOK()) {
                     resultList.add(agentResult.getMapData());
@@ -1217,6 +1228,13 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             } catch (MessageException e) {
                 e.printStackTrace();
                 return AgentResult.fail(e.getMsg());
+            }
+        }
+        if (platformTypeList.size() != 1) {
+            for (String platFormList : platformTypeList) {
+                if(!PlatformType.whetherPOS(platFormList)){
+                    throw new ProcessException("退货只支持一个业务平台退货，本批次SN中存在多个业务，请分别提交!");
+                }
             }
         }
         return AgentResult.ok(resultList);

@@ -36,4 +36,6 @@ public interface ReceiptPlanMapper {
     List<Map<String,Object>> queryReveiveAgentData(Map <String, Object> param);
 
     BigDecimal planCountTotal(@Param("orderId") String orderId, @Param("proId") String proId);
+
+    int selectPlanNumByReturnId(String returnId);
 }
