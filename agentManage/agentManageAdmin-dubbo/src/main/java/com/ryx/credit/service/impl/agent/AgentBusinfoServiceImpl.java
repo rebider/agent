@@ -1263,4 +1263,16 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		pageInfo.setTotal(agentBusInfoMapper.queyrBusInfoByBusNumAndPlatformTypePageCount(PAR));
 		return pageInfo;
 	}
+
+	@Override
+	public List<Map<String, Object>> queryRegionByAccount(String account) throws MessageException {
+		if(StringUtils.isBlank(account)){
+			throw new MessageException("账号不能为空");
+		}
+		List<Map<String,Object>> agentBusInfos = agentBusInfoMapper.queryRegionByAccount(FastMap.fastMap("account",account));
+		if(agentBusInfos==null){
+			throw new MessageException("关联账户信息不存在");
+		}
+		return agentBusInfos;
+	}
 }

@@ -148,4 +148,6 @@ public interface AgentBusinfoService {
      * @return
      */
     PageInfo queyrBusInfoByBusNumAndPlatformTypePage(Page page, String busNum, String platformType)throws MessageException;
+
+    List<Map<String,Object>> queryRegionByAccount(String account)throws MessageException;
 }
