@@ -197,6 +197,36 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
         }
 
         for (int i = 0; i < list.size(); i++) {
+            if( list.get(i).get("Cell0")==null|| "".equals(list.get(i).get("Cell0"))){
+                Map<String, Object> saveSheetMap = new HashMap<>();
+                saveSheetMap.put(sheetName + ((i + 2) + (theadi * count)) + "AG码错误", sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行AG码错误为空");
+                saveSheetList.add(saveSheetMap);
+                continue;
+            }
+            if( list.get(i).get("Cell1")==null|| "".equals(list.get(i).get("Cell1"))){
+                Map<String, Object> saveSheetMap = new HashMap<>();
+                saveSheetMap.put(sheetName + ((i + 2) + (theadi * count)) + "代理商名称", sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行代理商名称为空");
+                saveSheetList.add(saveSheetMap);
+                continue;
+            }
+            if( list.get(i).get("Cell2")==null|| "".equals(list.get(i).get("Cell2"))){
+                Map<String, Object> saveSheetMap = new HashMap<>();
+                saveSheetMap.put(sheetName + ((i + 2) + (theadi * count)) + "月份错误", sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行月份为空");
+                saveSheetList.add(saveSheetMap);
+                continue;
+            }
+            if( list.get(i).get("Cell3")==null|| "".equals(list.get(i).get("Cell3"))){
+                Map<String, Object> saveSheetMap = new HashMap<>();
+                saveSheetMap.put(sheetName + ((i + 2) + (theadi * count)) + "品牌码错误", sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行品牌码为空");
+                saveSheetList.add(saveSheetMap);
+                continue;
+            }
+            if( list.get(i).get("Cell4")==null|| "".equals(list.get(i).get("Cell4"))){
+                Map<String, Object> saveSheetMap = new HashMap<>();
+                saveSheetMap.put(sheetName + ((i + 2) + (theadi * count)) + "品牌名称错误", sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行品牌名称为空");
+                saveSheetList.add(saveSheetMap);
+                continue;
+            }
 
             PmsProfitTempWithBLOBs pmsProfitTempWithBLOBs = new PmsProfitTempWithBLOBs();
             pmsProfitTempWithBLOBs.setMonth(month);
