@@ -113,9 +113,10 @@ public enum DictGroup {
     AUTH_TIME("授权失效时间(秒)"),
     AUTH_CODE("授权码"),
     TOKEN_CODE("令牌"),
-    PASSKEY("密码AES_KEY"),
     OFFSET_PAY_TYPE("补款方式"),
-    ADJ_ID("准备拒绝的订单调整id");
+    ADJ_ID("准备拒绝的订单调整id"),
+    PLATFROM_TYPE("平台类型"),
+    PASSKEY("密码AES_KEY");
 
 
 
