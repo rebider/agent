@@ -348,6 +348,15 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
     @Override
     public AgentResult taskApprove(AgentVo agentVo, String userId)throws MessageException {
 
+        //业务部第二次审批节点最终校验排单信息
+        if(agentVo.getSid().equals(AppConfig.getProperty("old_refund_business2_id","")) && "pass".equals(agentVo.getApprovalResult())) {
+            if(StringUtils.isBlank(agentVo.getPlans())){
+                throw new MessageException("排单信息不能为空");
+            }
+
+
+        }
+
         //业务部第二次审批提交排单信息， 业务部如果没有排单信息提示必须进行排单
         OReturnOrder oReturnOrder = returnOrderMapper.selectByPrimaryKey(agentVo.getReturnId());
         if(agentVo.getSid().equals(AppConfig.getProperty("old_refund_business2_id","")) && "pass".equals(agentVo.getApprovalResult())) {
