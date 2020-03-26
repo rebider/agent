@@ -671,10 +671,7 @@
   <!--订单数量调整导出(业务、财务)-->
   <select id="excelOrderAdjustAll" parameterType="map" resultMap="OrderAdjustVo">
     select
-    (
-      select re.id from o_refund_agent re
-      where re.src_id = adj.id and re.status=1
-    ) as refund_id,
+    adj.id as adj_Id,
     adj.order_id,
     adj.agent_id,
     ag.ag_name,
@@ -707,10 +704,10 @@
       where os.order_id = adj.order_id and os.status=1
     ) as pro_name,
     (
-    select LISTAGG(oso.pro_model,',') WITHIN GROUP(ORDER BY os.order_id)
-    from o_sub_order_activity oso
-    left join o_sub_order os on oso.sub_order_id = os.id and os.status=1
-    where os.order_id = adj.order_id and oso.status=1
+      select LISTAGG(oso.pro_model,',') WITHIN GROUP(ORDER BY os.order_id)
+      from o_sub_order_activity oso
+      left join o_sub_order os on oso.sub_order_id = os.id and os.status=1
+      where os.order_id = adj.order_id and oso.status=1
     ) as model,
     nvl((
       select LISTAGG(os.pro_rel_price,',') WITHIN GROUP (ORDER BY os.order_id)
@@ -723,10 +720,21 @@
       where os.order_id = adj.order_id and os.status=1
     ),0) as pro_num,
     nvl(oo.pay_amo,0) as pay_amo,
-    nvl(adj.pro_refund_amount,0) as pro_refund_amount,
-    nvl(adj.offset_amount,0) as offset_amount,
-    nvl(adj.real_refund_amo,0) as real_refund_amo,
     cu.name as adj_user_id,
+    (
+      select dq.name
+      from c_organization dq
+      left join a_agent_businfo ab on dq.id = ab.ag_doc_district
+      left join o_order on o_order.bus_id = ab.id
+      where o_order.id = adj.order_id
+    ) as ag_doc_district,
+    (
+      select sq.name
+      from c_organization sq
+      left join a_agent_businfo ab on sq.id = ab.ag_doc_pro
+      left join o_order on o_order.bus_id = ab.id
+      where o_order.id = adj.order_id
+    ) as ag_doc_pro,
     to_char(adj.adj_tm,'yyyy-MM-dd') as adj_tm,
     adj.reviews_stat,
     adj.refund_stat,
@@ -771,6 +779,7 @@
 
   <!--订单数量调整导出VO-->
   <resultMap id="OrderAdjustVo" type="com.ryx.credit.pojo.admin.vo.OrderAdjustVo">
+    <result column="adj_Id" property="adjId" jdbcType="VARCHAR"/>
     <result column="refund_id" property="refundId" jdbcType="VARCHAR"/>
     <result column="order_id" property="orderId" jdbcType="VARCHAR"/>
     <result column="agent_id" property="agentId" jdbcType="VARCHAR"/>
@@ -788,6 +797,8 @@
     <result column="offset_amount" property="offsetAmount" jdbcType="VARCHAR"/>
     <result column="real_refund_amo" property="realRefundAmo" jdbcType="VARCHAR"/>
     <result column="adj_user_id" property="adjUserId" jdbcType="VARCHAR"/>
+    <result column="ag_doc_district" property="agDocDistrict" jdbcType="VARCHAR"/>
+    <result column="ag_doc_pro" property="agDocPro" jdbcType="VARCHAR"/>
     <result column="adj_tm" property="adjTm" jdbcType="VARCHAR"/>
     <result column="reviews_stat" property="reviewsStat" jdbcType="VARCHAR"/>
     <result column="refund_stat" property="refundStat" jdbcType="VARCHAR"/>
