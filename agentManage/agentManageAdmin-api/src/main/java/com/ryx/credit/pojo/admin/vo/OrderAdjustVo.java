@@ -33,6 +33,10 @@ public class OrderAdjustVo implements Serializable {
     private String reviewsStat;//审批状态
     private String refundStat;//退款状态
     private String refundTm;//退款日期
+    private String maxProNum;//原订单该商品数量
+    private String adjNum;//调整数量
+    private String difAmount;//调整金额
+    private String currentAmo;//调整当前订单金额
 
     public String getAdjId() {
         return adjId;
@@ -224,5 +228,37 @@ public class OrderAdjustVo implements Serializable {
 
     public void setRefundTm(String refundTm) {
         this.refundTm = refundTm;
+    }
+
+    public String getOrgProNum() {
+        return maxProNum;
+    }
+
+    public void setOrgProNum(String orgProNum) {
+        this.maxProNum = orgProNum;
+    }
+
+    public String getAdjNum() {
+        return adjNum;
+    }
+
+    public void setAdjNum(String adjNum) {
+        this.adjNum = adjNum;
+    }
+
+    public String getDifAmount() {
+        return difAmount;
+    }
+
+    public void setDifAmount(String difAmount) {
+        this.difAmount = difAmount;
+    }
+
+    public String getCurrentAmo() {
+        return currentAmo;
+    }
+
+    public void setCurrentAmo(String currentAmo) {
+        this.currentAmo = currentAmo;
     }
 }

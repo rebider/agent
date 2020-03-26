@@ -6713,5 +6713,22 @@ public class OrderServiceImpl implements OrderService {
         return AgentResult.ok();
     }
 
+    @Override
+    public PageInfo queryAgentUpModelDetailList(Map par, Page page) {
+        PageInfo pageInfo = new PageInfo();
+        if (par == null) return pageInfo;
+        if(null!=par.get("userId")) {
+            Long userId = (Long) par.get("userId");
+            List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+            par.put("platfromPerm", platfromPerm);
+        }
+        par.put("page", page);
+
+        pageInfo.setTotal(orderAdjMapper.selectOrderAdjustDetailAllCount(par));
+        pageInfo.setRows(orderAdjMapper.selectOrderAdjustDetailAll(par, page));
+        return pageInfo;
+    }
+
+    
 
 }
