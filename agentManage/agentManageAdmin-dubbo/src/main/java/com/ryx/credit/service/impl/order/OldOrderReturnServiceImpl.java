@@ -348,22 +348,10 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
     @Override
     public AgentResult taskApprove(AgentVo agentVo, String userId)throws MessageException {
 
-        //业务部第二次审批节点最终校验排单信息
-        if(agentVo.getSid().equals(AppConfig.getProperty("old_refund_business2_id","")) && "pass".equals(agentVo.getApprovalResult())) {
-            if(StringUtils.isBlank(agentVo.getPlans())){
-                throw new MessageException("排单信息不能为空");
-            }
-
-
-        }
-
-        //业务部第二次审批提交排单信息， 业务部如果没有排单信息提示必须进行排单
+        //业务第一次审批，有排单就保存，没有就不保存
         OReturnOrder oReturnOrder = returnOrderMapper.selectByPrimaryKey(agentVo.getReturnId());
-        if(agentVo.getSid().equals(AppConfig.getProperty("old_refund_business2_id","")) && "pass".equals(agentVo.getApprovalResult())) {
-            if(StringUtils.isBlank(agentVo.getPlans())){
-                throw new MessageException("排单信息不能为空");
-            }
-            if (StringUtils.isNotBlank(agentVo.getPlans())) {
+        if(agentVo.getSid().equals(AppConfig.getProperty("old_refund_business1_id","")) && "pass".equals(agentVo.getApprovalResult())) {
+            if(org.apache.commons.lang.StringUtils.isNotBlank(agentVo.getPlans())){
                 try {
                     //保存排单信息
                     AgentResult savePlans_agentResult = iOrderReturnService.savePlans(agentVo, userId);
@@ -374,6 +362,30 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                 } catch (Exception e) {
                     e.printStackTrace();
                     throw new MessageException(e.getLocalizedMessage());
+                }
+            }
+        }
+
+        //业务部第二次审批提交排单信息， 业务部如果没有排单信息提示必须进行排单
+        if(agentVo.getSid().equals(AppConfig.getProperty("old_refund_business2_id","")) && "pass".equals(agentVo.getApprovalResult())) {
+
+            //第一次未排单
+            if (!(receiptPlanMapper.selectPlanNumReturnId(agentVo.getReturnId()) > 0)) {
+                if(StringUtils.isBlank(agentVo.getPlans())){
+                    throw new MessageException("排单信息不能为空");
+                }
+                if (StringUtils.isNotBlank(agentVo.getPlans())) {
+                    try {
+                        //保存排单信息
+                        AgentResult savePlans_agentResult = iOrderReturnService.savePlans(agentVo, userId);
+                        logger.info("历史订单退货保存排单结果:" + savePlans_agentResult.getMsg());
+                    } catch (MessageException e) {
+                        e.printStackTrace();
+                        throw new MessageException(e.getMsg());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        throw new MessageException(e.getLocalizedMessage());
+                    }
                 }
             }
             //没有补全历史退货订单信息必须补全历史订单信息
