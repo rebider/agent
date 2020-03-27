@@ -687,9 +687,9 @@ public class InternetCardServiceImpl implements InternetCardService {
             agentBusInfo.setBusNum(internetCard.getBusNum().trim());
             agentBusInfo.setBusPlatform(platForm.getPlatformNum());
             List<BigDecimal> busStatusList = new ArrayList<>();
-            busStatusList.add(BusStatus.QY.getValue());
-            busStatusList.add(BusStatus.WJH.getValue());
-            busStatusList.add(BusStatus.WQY.getValue());
+            busStatusList.add(BusStatus.QY.getValue());// 启用
+            busStatusList.add(BusStatus.WJH.getValue());// 未激活
+            busStatusList.add(BusStatus.WQY.getValue());// 未启用
             agentBusInfo.setBusStatusList(busStatusList);
             agentBusInfo.setCloReviewStatus(AgStatus.Approved.getValue());
             List<AgentBusInfo> agentBusInfos = agentBusinfoService.selectByAgentBusInfo(agentBusInfo);
@@ -773,7 +773,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                 logoutCriteria.andStatusEqualTo(Status.STATUS_1.status);
                 logoutCriteria.andIccidNumEqualTo(internetCard.getIccidNum());
                 List<String> logoutStatusList = new ArrayList<>();
-                logoutStatusList.add(InternetLogoutStatus.ZXZ.getValue());
+                logoutStatusList.add(InternetLogoutStatus.ZXZ.getValue());// TODO
                 logoutStatusList.add(InternetLogoutStatus.TJCLZ.getValue());
                 logoutCriteria.andLogoutStatusIn(logoutStatusList);
                 List<InternetLogoutDetail> internetLogoutDetailList = internetLogoutDetailMapper.selectByExample(internetLogoutDetailEx);
@@ -788,7 +788,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                 InternetLogoutDetailExample.Criteria criteria = internetLogoutDetailExample.createCriteria();
                 criteria.andStatusEqualTo(Status.STATUS_1.status);
                 criteria.andIccidNumEqualTo(internetCard.getIccidNum());
-                criteria.andLogoutStatusEqualTo(InternetLogoutStatus.DZX.getValue());
+                criteria.andLogoutStatusEqualTo(InternetLogoutStatus.DZX.getValue());   // TODO 查询注销失败 的  更新为注销成功
                 List<InternetLogoutDetail> internetLogoutDetails = internetLogoutDetailMapper.selectByExample(internetLogoutDetailExample);
                 for (InternetLogoutDetail internetLogoutDetail : internetLogoutDetails) {
                     internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.ZXCG.getValue());
