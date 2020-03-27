@@ -1221,14 +1221,18 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
 
             //代理商上传物流信息时判断是否上传物流信息
-            int planNum = 0;
-            int logisticsNum = 0;
             if (approveResult.equals(ApprovalType.PASS.getValue()) && sid.equals(refund_agent_upload_id)) {
+                //物流发货数量，必须等于排单数量
+                int sendtotal = oLogisticsMapper.selectSendNumByReturnId(agentVo.getReturnId());
+                int plantotal = receiptPlanMapper.selectPlanNumByReturnId(agentVo.getReturnId());
+                if (plantotal != sendtotal) {
+                    throw new ProcessException("物流发货数量必须等于排单数量！");
+                }
+
                 ReceiptPlanExample example = new ReceiptPlanExample();
                 example.or().andReturnOrderDetailIdEqualTo(agentVo.getReturnId());
                 List<ReceiptPlan> receiptPlans = receiptPlanMapper.selectByExample(example);
                 for (ReceiptPlan receiptPlan : receiptPlans) {
-                    planNum += receiptPlan.getPlanProNum().intValue();
                     String receiptPlanId = receiptPlan.getId();
                     OLogisticsExample example1 = new OLogisticsExample();
                     example1.or().andReceiptPlanIdEqualTo(receiptPlanId);
@@ -1236,12 +1240,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                     if (oLogistics == null || oLogistics.size() <= 0) {
                         throw new ProcessException("排单编号为" + receiptPlanId + "的排单未导入退货物流信息");
                     }
-                    for (OLogistics logistics:oLogistics) {
-                        logisticsNum += logistics.getSendNum().intValue();
-                    }
-                }
-                if (logisticsNum != planNum) {
-                    throw new ProcessException("发货数量应等于排单数量！");
                 }
                 updateOrderReturn(agentVo.getReturnId(), new BigDecimal(RetSchedule.YFH.code));
             }
