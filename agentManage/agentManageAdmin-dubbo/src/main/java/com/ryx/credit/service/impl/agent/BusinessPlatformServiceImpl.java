@@ -714,7 +714,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                                 busInfo.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
                                 busInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
                                 busInfo.setVersion(busInfo.getVersion());
-                                if(1!=agentBusInfoMapper.updateByPrimaryKey(busInfo)){
+                                if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(busInfo)){
                                     logger.info("业务修改大区省区更新失败");
                                     throw new MessageException("业务修改大区省区更新失败");
                                 }
