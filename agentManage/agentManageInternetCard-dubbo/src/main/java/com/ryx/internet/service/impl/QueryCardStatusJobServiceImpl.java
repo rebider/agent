@@ -57,7 +57,7 @@ public class QueryCardStatusJobServiceImpl implements QueryCardStatusJobService 
         expireTimeList.add(DateUtil.getPerDayOfMonth(3));
         reqMap.put("expireTimeList",expireTimeList);
         reqMap.put("issuer",Issuerstatus.JY_MOBILE.getValue());
-        reqMap.put("type",type);
+        reqMap.put("type",type);// TODO 增加一个条件  已经是注销的卡 不在更新范围内
         if(!type.equals("selectNull")){
             reqMap.put("tasksStatusTime",DateUtil.format(new Date(),DateUtil.DATE_FORMAT_yyyy_MM_dd));
         }
@@ -127,7 +127,7 @@ public class QueryCardStatusJobServiceImpl implements QueryCardStatusJobService 
                         InternetLogoutDetailExample.Criteria criteria = internetLogoutDetailExample.createCriteria();
                         criteria.andStatusEqualTo(Status.STATUS_1.status);
                         criteria.andIccidNumEqualTo(oInternetCard.getIccidNum());
-                        criteria.andLogoutStatusEqualTo(InternetLogoutStatus.DZX.getValue());
+                        criteria.andLogoutStatusEqualTo(InternetLogoutStatus.DZX.getValue());// TODO 注销失败的修改为 注销成功  其他的状态无需更改
                         List<InternetLogoutDetail> internetLogoutDetails = internetLogoutDetailMapper.selectByExample(internetLogoutDetailExample);
                         for (InternetLogoutDetail internetLogoutDetail : internetLogoutDetails) {
                             internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.ZXCG.getValue());
@@ -135,6 +135,7 @@ public class QueryCardStatusJobServiceImpl implements QueryCardStatusJobService 
                         }
                         oInternetCard.setRenew(Status.STATUS_0.status);
                         oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());
+                        // TODO 卡状态也更新为注销
                     }
                 }else{
                     if(iccid.length()==20){
