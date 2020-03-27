@@ -793,7 +793,8 @@
            so.pro_name,
            soa.pro_model as model,
            so.pro_rel_price,
-           oad.org_pro_num,
+           oad.org_pro_num as pro_num,
+           oad.org_pro_num * so.pro_rel_price as payAmo,
            oad.adj_num,
            oad.dif_amount,
            oa.pro_refund_amount,
@@ -829,16 +830,11 @@
     <where>
       <if test="1==1"> and oa.status=1 </if>
       <if test="map.agName!=null and map.agName!=''"> and ag.ag_name like concat(concat('%',#{map.agName}),'%') </if>
-      <!--<if test="map.agUniqNum!=null and map.agUniqNum!=''"> and ag.ag_uniq_num = #{map.agUniqNum} </if>-->
+      <if test="map.adjId!=null and map.adjId!=''"> and oad.adj_id = #{map.adjId} </if>
       <if test="map.agUniqNum!=null and map.agUniqNum!=''"> and ag.id = #{map.agUniqNum} </if>
-      <if test="map.refundId!=null and map.refundId!=''"> and oa.order_id = #{map.refundId} </if>
+      <if test="map.orderId!=null and map.orderId!=''"> and oa.order_id = #{map.orderId} </if>
       <if test="map.reviewStatus!=null and map.reviewStatus!=''"> and oa.reviews_stat = #{map.reviewStatus} </if>
-      <if test="map.proName!=null and map.proName!=''">
-        and EXISTS
-        (select * from o_sub_order os
-        where os.pro_name like concat(concat('%',#{map.proName}),'%') and os.status = 1 and os.order_id = oa.order_id)
-      </if>
-      <if test="map.platform!=null and map.platform !=''">
+            <if test="map.platform!=null and map.platform !=''">
         and EXISTS (select ab.bus_num
         FROM a_agent_businfo ab
         LEFT JOIN o_order oo

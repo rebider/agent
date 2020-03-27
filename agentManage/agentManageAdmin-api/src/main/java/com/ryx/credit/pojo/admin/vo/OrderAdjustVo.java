@@ -230,12 +230,12 @@ public class OrderAdjustVo implements Serializable {
         this.refundTm = refundTm;
     }
 
-    public String getOrgProNum() {
+    public String getMaxProNum() {
         return maxProNum;
     }
 
-    public void setOrgProNum(String orgProNum) {
-        this.maxProNum = orgProNum;
+    public void setMaxProNum(String maxProNum) {
+        this.maxProNum = maxProNum;
     }
 
     public String getAdjNum() {
