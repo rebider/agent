@@ -814,8 +814,8 @@
           ) as ag_doc_pro,
            oa.adj_tm,
            oa.reviews_stat,
-           oa.refund_stat,
-           oa.refund_tm,
+           nvl(oa.refund_stat,''),
+           nvl(oa.refund_tm,''),
            oa.real_refund_amo,
     (select max(o_order_adj.org_pay_amo) from o_order_adj where o_order_adj.order_id = oa.order_id)as current_amo,
     (select max(o_order_adj_detail.org_pro_num) from o_order_adj_detail where o_order_adj_detail.sub_order_id = oad.sub_order_id) as max_pro_num

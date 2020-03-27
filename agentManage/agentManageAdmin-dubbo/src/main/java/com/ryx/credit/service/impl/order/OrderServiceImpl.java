@@ -6723,9 +6723,9 @@ public class OrderServiceImpl implements OrderService {
             par.put("platfromPerm", platfromPerm);
         }
         par.put("page", page);
-
+        List<OrderAdjustVo> list = orderAdjMapper.selectOrderAdjustDetailAll(par, page);
         pageInfo.setTotal(orderAdjMapper.selectOrderAdjustDetailAllCount(par));
-        pageInfo.setRows(orderAdjMapper.selectOrderAdjustDetailAll(par, page));
+        pageInfo.setRows(list);
         return pageInfo;
     }
 
