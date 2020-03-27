@@ -37,6 +37,7 @@ public class OrderAdjustVo implements Serializable {
     private String adjNum;//调整数量
     private String difAmount;//调整金额
     private String currentAmo;//调整当前订单金额
+    private String reviewsDate;//审批通过时间
 
     public String getAdjId() {
         return adjId;
@@ -260,5 +261,13 @@ public class OrderAdjustVo implements Serializable {
 
     public void setCurrentAmo(String currentAmo) {
         this.currentAmo = currentAmo;
+    }
+
+    public String getReviewsDate() {
+        return reviewsDate;
+    }
+
+    public void setReviewsDate(String reviewsDate) {
+        this.reviewsDate = reviewsDate;
     }
 }

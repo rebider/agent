@@ -40,4 +40,6 @@ public interface OrderAdjMapper {
     List<OrderAdjustVo> selectOrderAdjustDetailAll(@Param("map") Map<String,Object> map, @Param("page") Page page);
 
     int selectOrderAdjustDetailAllCount(@Param("map") Map<String,Object> map);
+
+    List<OrderAdjustVo> excelOrderAdjustDetailAll(@Param("map") Map map);
 }

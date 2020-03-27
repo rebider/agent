@@ -818,7 +818,8 @@
            nvl(oa.refund_stat,''),
            nvl(oa.refund_tm,''),
            oa.real_refund_amo,
-    (select max(o_order_adj.org_pay_amo) from o_order_adj where o_order_adj.order_id = oa.order_id)as current_amo,
+           oa.reviews_date,
+      (select max(o_order_adj.org_pay_amo) from o_order_adj where o_order_adj.order_id = oa.order_id)as current_amo,
     (select max(o_order_adj_detail.org_pro_num) from o_order_adj_detail where o_order_adj_detail.sub_order_id = oad.sub_order_id) as max_pro_num
     from o_order_adj_detail oad
            left join o_sub_order so on so.id = oad.sub_order_id
@@ -827,6 +828,7 @@
            left join a_agent ag on ag.id = oa.agent_id and ag.status = 1
            left join c_user cu on cu.id = oa.adj_user_id
            left join o_sub_order_activity soa on soa.sub_order_id = oad.sub_order_id  and soa.status = '1'
+           left join a_agent_businfo ab on ab.id = oo.bus_id and ab.agent_id = oa.agent_id
     <where>
       <if test="1==1"> and oa.status=1 </if>
       <if test="map.agName!=null and map.agName!=''"> and ag.ag_name like concat(concat('%',#{map.agName}),'%') </if>
@@ -834,7 +836,15 @@
       <if test="map.agUniqNum!=null and map.agUniqNum!=''"> and ag.id = #{map.agUniqNum} </if>
       <if test="map.orderId!=null and map.orderId!=''"> and oa.order_id = #{map.orderId} </if>
       <if test="map.reviewStatus!=null and map.reviewStatus!=''"> and oa.reviews_stat = #{map.reviewStatus} </if>
-            <if test="map.platform!=null and map.platform !=''">
+      <if test="map.proName!=null and map.proName!=''">
+        and EXISTS
+        (select * from o_sub_order os
+        where os.pro_name like concat(concat('%',#{proName}),'%') and os.status = 1 and os.order_id = oa.order_id)
+      </if>
+      <if test="map.userName!=null and map.userName!=''">
+        and cu.name = #{userName}
+      </if>
+      <if test="map.platform!=null and map.platform !=''">
         and EXISTS (select ab.bus_num
         FROM a_agent_businfo ab
         LEFT JOIN o_order oo
@@ -844,19 +854,9 @@
         and oo.status = 1
         and  ab.bus_num= #{map.platform})
       </if>
-      and EXISTS (select ab.id
-      from a_agent_businfo ab
-      left join o_order on o_order.bus_id = ab.id
-      where o_order.id = oa.order_id
-      <if test="map.platfromPerm!=null and map.platfromPerm.size>0">
-        and ab.bus_platform in
-        <foreach collection="map.platfromPerm" item="platfromPermItem" open="(" separator="," close=")">
-          #{platfromPermItem.PLATFORM_NUM}
-        </foreach>
+      <if test="map.busPlatform!=null and map.busPlatform!=''">
+        and ab.bus_platform =  #{map.busPlatform}
       </if>
-      <if test="map.platfromPerm==null or map.platfromPerm.size==0">
-        and 1=-1
-      </if>)
     </where>
     order by oa.ID desc
   </sql>
@@ -868,6 +868,9 @@
   <select id="selectOrderAdjustDetailAllCount" parameterType="map" resultType="java.lang.Integer">
     select count(*) from(
     <include refid="selectOrderAdjustDetailAllSql"/>)
+  </select>
+  <select id="excelOrderAdjustDetailAll" parameterType="map" resultMap="OrderAdjustVo">
+    <include refid="selectOrderAdjustDetailAllSql"/>
   </select>
   <!--订单数量调整导出VO-->
   <resultMap id="OrderAdjustVo" type="com.ryx.credit.pojo.admin.vo.OrderAdjustVo">
@@ -899,5 +902,6 @@
     <result column="dif_amount" property="difAmount" jdbcType="VARCHAR"/>
     <result column="current_amo" property="currentAmo" jdbcType="VARCHAR"/>
     <result column="max_pro_num" property="maxProNum" jdbcType="VARCHAR"/>
+    <result column="reviews_date" property="reviewsDate" jdbcType="VARCHAR"/>
   </resultMap>
 </mapper>

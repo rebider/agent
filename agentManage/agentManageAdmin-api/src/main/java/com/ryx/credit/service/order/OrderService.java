@@ -369,4 +369,9 @@ public interface OrderService {
      */
     PageInfo queryAgentUpModelDetailList(Map par, Page page);
 
+    /**
+     * 订单数量调整明细导出
+     */
+    List<OrderAdjustVo> excelOrderAdjustDetailAll(Map map);
+
 }

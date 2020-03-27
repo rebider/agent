@@ -6717,11 +6717,6 @@ public class OrderServiceImpl implements OrderService {
     public PageInfo queryAgentUpModelDetailList(Map par, Page page) {
         PageInfo pageInfo = new PageInfo();
         if (par == null) return pageInfo;
-        if(null!=par.get("userId")) {
-            Long userId = (Long) par.get("userId");
-            List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
-            par.put("platfromPerm", platfromPerm);
-        }
         par.put("page", page);
         Map<String,Object> orderMap = new HashMap<>();
         List<OrderAdjustVo> list = orderAdjMapper.selectOrderAdjustDetailAll(par, page);
@@ -6737,6 +6732,29 @@ public class OrderServiceImpl implements OrderService {
         return pageInfo;
     }
 
-    
+    @Override
+    public List<OrderAdjustVo> excelOrderAdjustDetailAll(Map map) {
+
+        List<OrderAdjustVo> orderAdjVoList = orderAdjMapper.excelOrderAdjustDetailAll(map);
+
+        if (null!=orderAdjVoList && orderAdjVoList.size()>0) {
+            for (OrderAdjustVo orderAdjustVo : orderAdjVoList) {
+                if (StringUtils.isNotBlank(orderAdjustVo.getReviewsStat()) && !orderAdjustVo.getReviewsStat().equals("null")) {
+                    String reviewsStatusByValue = AgStatus.getMsg(new BigDecimal(orderAdjustVo.getReviewsStat()));
+                    if (null != reviewsStatusByValue) {
+                        orderAdjustVo.setReviewsStat(reviewsStatusByValue);
+                    }
+                }
+                if (StringUtils.isNotBlank(orderAdjustVo.getRefundStat()) && !orderAdjustVo.getRefundStat().equals("null")) {
+                    Dict refundStatusByValue = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.REFUND_STAT.name(), orderAdjustVo.getRefundStat());
+                    if (null != refundStatusByValue) {
+                        orderAdjustVo.setRefundStat(refundStatusByValue.getdItemname());
+                    }
+                }
+            }
+        }
+        return orderAdjVoList;
+    }
+
 
 }
