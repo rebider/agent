@@ -1222,6 +1222,13 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
             //代理商上传物流信息时判断是否上传物流信息
             if (approveResult.equals(ApprovalType.PASS.getValue()) && sid.equals(refund_agent_upload_id)) {
+                //物流发货数量，必须等于排单数量
+                int sendtotal = oLogisticsMapper.selectSendNumByReturnId(agentVo.getReturnId());
+                int plantotal = receiptPlanMapper.selectPlanNumByReturnId(agentVo.getReturnId());
+                if (plantotal != sendtotal) {
+                    throw new ProcessException("物流发货数量必须等于排单数量！");
+                }
+
                 ReceiptPlanExample example = new ReceiptPlanExample();
                 example.or().andReturnOrderDetailIdEqualTo(agentVo.getReturnId());
                 List<ReceiptPlan> receiptPlans = receiptPlanMapper.selectByExample(example);
