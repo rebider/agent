@@ -1166,7 +1166,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 //第一次未排单
                 if (!(receiptPlanMapper.selectPlanNumReturnId(agentVo.getReturnId()) > 0)) {
                     JSONArray jsonArray = JSONObject.parseArray(agentVo.getPlans());
-                    if (jsonArray.isEmpty() || "[]".equals(agentVo.getPlans())) {
+                    log.info("agentVo:{}",agentVo);
+                    if ("null".equals(agentVo.getPlans()) || jsonArray.size() < 1 || null == agentVo.getPlans() || "[]".equals(agentVo.getPlans())) {
                         throw new ProcessException("排单信息不能为空");
                     } else {
                         try {
