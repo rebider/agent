@@ -38,4 +38,6 @@ public interface ReceiptPlanMapper {
     BigDecimal planCountTotal(@Param("orderId") String orderId, @Param("proId") String proId);
 
     int selectPlanNumByReturnId(String returnId);
+
+    int selectPlanNumReturnId(String returnId);
 }

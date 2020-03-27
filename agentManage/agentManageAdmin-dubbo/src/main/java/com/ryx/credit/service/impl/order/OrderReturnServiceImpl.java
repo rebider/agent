@@ -1143,17 +1143,43 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 }
             }
 
-            //业务第二次审批时添加排单
-            if (approveResult.equals(ApprovalType.PASS.getValue()) && sid.equals(refund_business2_id)) {
-                try {
-                    AgentResult agentResult = savePlans(agentVo, userId);
-                    if (!agentResult.isOK()) {
-                        return AgentResult.fail(agentResult.getMsg());
+            //业务第一次审批，有排单就保存，没有就不保存
+            if (approveResult.equals(ApprovalType.PASS.getValue()) && sid.equals(refund_business1_id)) {
+
+                JSONArray jsonArray = JSONObject.parseArray(agentVo.getPlans());
+                if (!jsonArray.isEmpty()) {
+                    try {
+                        AgentResult agentResult = savePlans(agentVo, userId);
+                        if (!agentResult.isOK()) {
+                            return AgentResult.fail(agentResult.getMsg());
+                        }
+                    } catch (MessageException me){
+                        throw new ProcessException(me.getMsg());
+                    }catch (Exception e){
+                        throw new ProcessException(e.getLocalizedMessage());
                     }
-                } catch (MessageException me){
-                   throw new ProcessException(me.getMsg());
-                }catch (Exception e){
-                    throw new ProcessException(e.getLocalizedMessage());
+                }
+            }
+
+            //业务第二次审批，校验排单信息，必须进行排单
+            if (approveResult.equals(ApprovalType.PASS.getValue()) && sid.equals(refund_business2_id)) {
+                //第一次未排单
+                if (!(receiptPlanMapper.selectPlanNumReturnId(agentVo.getReturnId()) > 0)) {
+                    JSONArray jsonArray = JSONObject.parseArray(agentVo.getPlans());
+                    if (jsonArray.isEmpty() || "[]".equals(agentVo.getPlans())) {
+                        throw new ProcessException("排单信息不能为空");
+                    } else {
+                        try {
+                            AgentResult agentResult = savePlans(agentVo, userId);
+                            if (!agentResult.isOK()) {
+                                return AgentResult.fail(agentResult.getMsg());
+                            }
+                        } catch (MessageException me){
+                            throw new ProcessException(me.getMsg());
+                        }catch (Exception e){
+                            throw new ProcessException(e.getLocalizedMessage());
+                        }
+                    }
                 }
             }
 
@@ -1195,14 +1221,11 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
 
             //代理商上传物流信息时判断是否上传物流信息
-            int planNum = 0;
-            int logisticsNum = 0;
             if (approveResult.equals(ApprovalType.PASS.getValue()) && sid.equals(refund_agent_upload_id)) {
                 ReceiptPlanExample example = new ReceiptPlanExample();
                 example.or().andReturnOrderDetailIdEqualTo(agentVo.getReturnId());
                 List<ReceiptPlan> receiptPlans = receiptPlanMapper.selectByExample(example);
                 for (ReceiptPlan receiptPlan : receiptPlans) {
-                    planNum += receiptPlan.getPlanProNum().intValue();
                     String receiptPlanId = receiptPlan.getId();
                     OLogisticsExample example1 = new OLogisticsExample();
                     example1.or().andReceiptPlanIdEqualTo(receiptPlanId);
@@ -1210,12 +1233,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                     if (oLogistics == null || oLogistics.size() <= 0) {
                         throw new ProcessException("排单编号为" + receiptPlanId + "的排单未导入退货物流信息");
                     }
-                    for (OLogistics logistics:oLogistics) {
-                        logisticsNum += logistics.getSendNum().intValue();
-                    }
-                }
-                if (logisticsNum != planNum) {
-                    throw new ProcessException("发货数量应等于排单数量！");
                 }
                 updateOrderReturn(agentVo.getReturnId(), new BigDecimal(RetSchedule.YFH.code));
             }

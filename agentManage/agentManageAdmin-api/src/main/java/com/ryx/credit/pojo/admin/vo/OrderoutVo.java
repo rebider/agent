@@ -17,6 +17,7 @@ public class OrderoutVo implements Serializable{
     private String agUniqNum;//唯一码
     private String agName;//代理商名称
     private String platformName;//平台
+    private String platformType;//平台
     private String proNum;//数量
     private String payMethod;//结算方式
     private String downPaymentUser;//付款人
@@ -75,6 +76,15 @@ public class OrderoutVo implements Serializable{
     private String agDocPro;//对接省区
     private String proCode;//商品编号
     private String proName;//商品名称
+
+
+    public String getPlatformType() {
+        return platformType;
+    }
+
+    public void setPlatformType(String platformType) {
+        this.platformType = platformType;
+    }
 
     public String getOrderUser() {
         return orderUser;
