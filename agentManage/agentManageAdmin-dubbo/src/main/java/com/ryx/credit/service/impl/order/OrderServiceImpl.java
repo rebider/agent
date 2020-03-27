@@ -6723,7 +6723,15 @@ public class OrderServiceImpl implements OrderService {
             par.put("platfromPerm", platfromPerm);
         }
         par.put("page", page);
+        Map<String,Object> orderMap = new HashMap<>();
         List<OrderAdjustVo> list = orderAdjMapper.selectOrderAdjustDetailAll(par, page);
+        for (OrderAdjustVo orderAdjustVo:list){
+            if (orderMap.get(orderAdjustVo.getAdjId()) == null){
+                orderMap.put(orderAdjustVo.getAdjId(),orderAdjustVo.getProRefundAmount());
+            }else {
+                orderAdjustVo.setProRefundAmount("0");
+            }
+        }
         pageInfo.setTotal(orderAdjMapper.selectOrderAdjustDetailAllCount(par));
         pageInfo.setRows(list);
         return pageInfo;
