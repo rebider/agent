@@ -396,4 +396,13 @@
     WHERE
         LOGINNAME=#{loginName}
   </select>
+
+  <select id="selectByBusNum" parameterType="string" resultType="string">
+    SELECT
+        u.loginName
+    FROM
+        lms_user u LEFT JOIN lms_user_organ uo ON u.id = uo.user_id
+    WHERE
+        uo.org_id = #{busNum}
+  </select>
 </mapper>

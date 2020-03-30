@@ -830,6 +830,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                             for (OActivityVisible oActivityVisible : oActivityVisibles) {
                                 if(oActivityVisible.getAgentId().equals(agentBusInfo.getAgentId())){
                                     rActivity = oActivity;
+                                    priceSet.add(oActivity.getPrice());
                                     break here;
                                 }
                             }

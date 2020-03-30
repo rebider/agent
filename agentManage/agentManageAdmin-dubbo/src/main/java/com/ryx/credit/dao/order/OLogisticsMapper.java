@@ -49,4 +49,10 @@ import java.util.Map;
      * @return
      */
     List<String> queryLogicInfoIdByStatusAndApproved(Map<String, Object> param);
+
+    /**
+     * 查询退货物流发货数量
+     * @return
+     */
+    int selectSendNumByReturnId(String returnId);
 }
