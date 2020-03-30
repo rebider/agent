@@ -858,6 +858,19 @@
       <if test="map.busPlatform!=null and map.busPlatform!=''">
         and ab.bus_platform =  #{map.busPlatform}
       </if>
+      and EXISTS
+      (select ab.id from a_agent_businfo ab
+      left join o_order oo on oo.bus_id = ab.id
+      where oo.id = oa.order_id
+      <if test="map.platfromPerm!=null and map.platfromPerm.size>0">
+        and ab.bus_platform in
+        <foreach collection="map.platfromPerm" item="platfromPermItem" open="(" separator="," close=")">
+          #{platfromPermItem.PLATFORM_NUM}
+        </foreach>
+      </if>)
+      <if test="map.userId != null and map.userId !=''">
+        and oa.adj_user_id = #{map.userId}
+      </if>
     </where>
     order by oa.ID desc
   </sql>

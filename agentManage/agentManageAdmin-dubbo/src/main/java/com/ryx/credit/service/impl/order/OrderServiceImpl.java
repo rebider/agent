@@ -6717,8 +6717,13 @@ public class OrderServiceImpl implements OrderService {
     public PageInfo queryAgentUpModelDetailList(Map par, Page page) {
         PageInfo pageInfo = new PageInfo();
         if (par == null) return pageInfo;
-        if (par.get("proName") != null){
+        if (par.get("proName") != null || StringUtils.isNotBlank((String)par.get("proName"))){
             par.put("proName",Arrays.asList(((String)par.get("proName")).split(",")));
+        }
+        if(null!=par.get("userId")) {
+            Long userId = (Long) par.get("userId");
+            List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+            par.put("platfromPerm", platfromPerm);
         }
         par.put("page", page);
         Map<String,Object> orderMap = new HashMap<>();
@@ -6741,6 +6746,11 @@ public class OrderServiceImpl implements OrderService {
         List<OrderAdjustVo> orderAdjVoList = orderAdjMapper.excelOrderAdjustDetailAll(map);
         if (map.get("proName") != null){
             map.put("proName",Arrays.asList(((String)map.get("proName")).split(",")));
+        }
+        if(null!=map.get("userId")) {
+            Long userId = (Long) map.get("userId");
+            List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+            map.put("platfromPerm", platfromPerm);
         }
         if (null!=orderAdjVoList && orderAdjVoList.size()>0) {
             for (OrderAdjustVo orderAdjustVo : orderAdjVoList) {
