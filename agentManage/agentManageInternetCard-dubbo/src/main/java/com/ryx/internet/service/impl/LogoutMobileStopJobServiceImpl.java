@@ -57,10 +57,10 @@ public class LogoutMobileStopJobServiceImpl implements LogoutMobileStopJobServic
             InternetLogoutDetailExample internetLogoutDetailExample = new InternetLogoutDetailExample();
             InternetLogoutDetailExample.Criteria criteria = internetLogoutDetailExample.createCriteria();
             criteria.andStatusEqualTo(Status.STATUS_1.status);
-            criteria.andLogoutStatusEqualTo(InternetLogoutStatus.TJCLZ.getValue());// TODO 查询需要通知移动的记录 --> 注销中
+            criteria.andLogoutStatusEqualTo(InternetLogoutStatus.TJCLZ.getValue());// 注销中 查询需要通知移动的记录
             criteria.andIssuerEqualTo(Issuerstatus.JY_MOBILE.getValue());// 揭阳移动
             internetLogoutDetailExample.setOrderByClause(" c_time asc ");
-            internetLogoutDetailExample.setPage(new Page(0,3));// 揭阳移动访问限制
+            internetLogoutDetailExample.setPage(new Page(0,3));// 揭阳移动访问次数限制
             List<InternetLogoutDetail> internetLogoutDetails = internetLogoutDetailMapper.selectByExample(internetLogoutDetailExample);
             for (InternetLogoutDetail internetLogoutDetail : internetLogoutDetails) {
                 try {
@@ -104,18 +104,18 @@ public class LogoutMobileStopJobServiceImpl implements LogoutMobileStopJobServic
                             continue;
                         }
                         log.info("logoutMobileStopJob申请注销明细通知移动,code!=0,error:{}",jsonObj.getString("error"));
-                        internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.TJSB.getValue());// TODO 移动关停失败 --> 注销失败
+                        internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.TJSB.getValue());// 移动关停失败 --> 注销失败
                         internetLogoutDetail.setFailCause(error);
                         internetLogoutDetail.setuTime(new Date());
                         if(error.equals("该号码已经是停机")){
-                            internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.DZX.getValue());// TODO 已经是停机状态 --> 已注销
+                            internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.DZX.getValue());// 已经是停机状态 --> 已注销
                         }
                         int i = internetLogoutDetailMapper.updateByPrimaryKey(internetLogoutDetail);
                         if(i!=1){
                             AppConfig.sendEmails("logoutMobileStopJob申请注销明细通知移动，更新异常3，iccid："+internetLogoutDetail.getIccidNum(), "申请注销明细通知移动出现异常,logoutMobileStopJob方法");
                             continue;
                         }
-                        oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());// TODO 通过审批，无论是否成功，卡续费状态是 --> 已注销
+                        oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());// 通过审批，无论是否成功，卡续费状态是 --> 已注销
                         if(error.equals("该号码已经是停机")) {
                             oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());
                             oInternetCard.setRenew(Status.STATUS_0.status);
@@ -126,16 +126,18 @@ public class LogoutMobileStopJobServiceImpl implements LogoutMobileStopJobServic
                             AppConfig.sendEmails("logoutMobileStopJob申请注销明细通知移动，更新异常4，iccid："+internetLogoutDetail.getIccidNum(), "申请注销明细通知移动出现异常,logoutMobileStopJob方法");
                             continue;
                         }
-                    }else {// 处理成功
+                    }else { // 处理成功
                         JSONObject jsonData = JSONObject.parseObject(jsonObj.getString("data"));
                         String dataCode = jsonData.getString("code");
-                        if(dataCode.equals("0")){// 处理成功
-                            internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.DZX.getValue());// TODO 明细注销状态是 --> 已注销
-                            oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());// TODO 通过审批，无论是否成功，卡续费状态是 --> 已注销
-                            oInternetCard.setRenew(Status.STATUS_0.status);// TODO 是否续费 0 否 1 是
-                        }else{// 处理失败
+                        if(dataCode.equals("0")){ // 处理成功
+                            internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.DZX.getValue());// 明细注销状态是 --> 已注销
+                            oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());// 通过审批，无论是否成功，卡续费状态是 --> 已注销
+                            oInternetCard.setRenew(Status.STATUS_0.status);// 是否续费 0 否 1 是
+                            oInternetCard.setInternetCardStatus(InternetCardStatus.LOGOUT.getValue());// 注销成功 更改卡状态 注销
+                        }else{ // 处理失败
                             internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.TJSB.getValue());
-                            oInternetCard.setRenewStatus(InternetRenewStatus.WXF.getValue());// TODO 通过审批，无论是否成功，卡续费状态是 --> 已注销
+                            oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());// 通过审批，无论是否成功，卡续费状态是 --> 已注销
+                            oInternetCard.setRenew(Status.STATUS_0.status);// 是否续费 0 否 1 是
                         }
                         if(StringUtils.isNotBlank(jsonData.getString("orderNo")))
                         internetLogoutDetail.setMobileOrderNo(jsonData.getString("orderNo"));
