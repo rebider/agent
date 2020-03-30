@@ -6717,6 +6717,9 @@ public class OrderServiceImpl implements OrderService {
     public PageInfo queryAgentUpModelDetailList(Map par, Page page) {
         PageInfo pageInfo = new PageInfo();
         if (par == null) return pageInfo;
+        if (par.get("proName") != null){
+            par.put("proName",Arrays.asList(((String)par.get("proName")).split(",")));
+        }
         par.put("page", page);
         Map<String,Object> orderMap = new HashMap<>();
         List<OrderAdjustVo> list = orderAdjMapper.selectOrderAdjustDetailAll(par, page);
@@ -6736,7 +6739,9 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderAdjustVo> excelOrderAdjustDetailAll(Map map) {
 
         List<OrderAdjustVo> orderAdjVoList = orderAdjMapper.excelOrderAdjustDetailAll(map);
-
+        if (map.get("proName") != null){
+            map.put("proName",Arrays.asList(((String)map.get("proName")).split(",")));
+        }
         if (null!=orderAdjVoList && orderAdjVoList.size()>0) {
             for (OrderAdjustVo orderAdjustVo : orderAdjVoList) {
                 if (StringUtils.isNotBlank(orderAdjustVo.getReviewsStat()) && !orderAdjustVo.getReviewsStat().equals("null")) {

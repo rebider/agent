@@ -833,10 +833,14 @@
       <if test="map.agUniqNum!=null and map.agUniqNum!=''"> and ag.id = #{map.agUniqNum} </if>
       <if test="map.orderId!=null and map.orderId!=''"> and oa.order_id = #{map.orderId} </if>
       <if test="map.reviewStatus!=null and map.reviewStatus!=''"> and oa.reviews_stat = #{map.reviewStatus} </if>
-      <if test="map.proName!=null and map.proName!=''">
+      <if test="map.proName!=null and map.proName.size>0">
         and EXISTS
         (select * from o_sub_order os
-        where os.pro_name like concat(concat('%',#{map.proName}),'%') and os.status = 1 and os.id = oad.SUB_ORDER_ID)
+        where os.pro_code in
+          <foreach collection="map.proName" item="proName" open="(" separator="," close=")">
+             #{proName}
+          </foreach>
+      and os.status = 1 and os.id = oad.SUB_ORDER_ID)
       </if>
       <if test="map.userName!=null and map.userName!=''">
         and cu.name = #{map.userName}
