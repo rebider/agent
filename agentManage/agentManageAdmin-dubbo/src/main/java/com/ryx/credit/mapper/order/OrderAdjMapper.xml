@@ -839,10 +839,10 @@
       <if test="map.proName!=null and map.proName!=''">
         and EXISTS
         (select * from o_sub_order os
-        where os.pro_name like concat(concat('%',#{proName}),'%') and os.status = 1 and os.order_id = oa.order_id)
+        where os.pro_name like concat(concat('%',#{map.proName}),'%') and os.status = 1 and os.order_id = oa.order_id)
       </if>
       <if test="map.userName!=null and map.userName!=''">
-        and cu.name = #{userName}
+        and cu.name = #{map.userName}
       </if>
       <if test="map.platform!=null and map.platform !=''">
         and EXISTS (select ab.bus_num
