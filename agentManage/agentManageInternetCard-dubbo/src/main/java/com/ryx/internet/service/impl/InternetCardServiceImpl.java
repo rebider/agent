@@ -773,9 +773,13 @@ public class InternetCardServiceImpl implements InternetCardService {
                 logoutCriteria.andStatusEqualTo(Status.STATUS_1.status);
                 logoutCriteria.andIccidNumEqualTo(internetCard.getIccidNum());
                 List<String> logoutStatusList = new ArrayList<>();
-                logoutStatusList.add(InternetLogoutStatus.ZXZ.getValue());// TODO
-                logoutStatusList.add(InternetLogoutStatus.TJCLZ.getValue());
-                logoutCriteria.andLogoutStatusIn(logoutStatusList);
+                if(oInternetCard.getIssuer().equals(Issuerstatus.YT_MOBILE.code) ){
+                    logoutStatusList.add(InternetLogoutStatus.ZXZ.getValue());// 待注销
+                }else if(oInternetCard.getIssuer().equals(Issuerstatus.JY_MOBILE.code)){
+                    logoutStatusList.add(InternetLogoutStatus.ZXZ.getValue());// 待注销
+                    logoutStatusList.add(InternetLogoutStatus.TJCLZ.getValue()); // 注销中  烟台是注销中需要人工处理  揭阳处理中需要自动处理
+                }
+                logoutCriteria.andLogoutStatusIn(logoutStatusList);// 查询是否有在处理中的 条件： 烟台查询 待注销的  ，揭阳查询 待注销和 注销中的
                 List<InternetLogoutDetail> internetLogoutDetailList = internetLogoutDetailMapper.selectByExample(internetLogoutDetailEx);
                 if(internetLogoutDetailList.size()!=0){
                     oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
@@ -788,10 +792,14 @@ public class InternetCardServiceImpl implements InternetCardService {
                 InternetLogoutDetailExample.Criteria criteria = internetLogoutDetailExample.createCriteria();
                 criteria.andStatusEqualTo(Status.STATUS_1.status);
                 criteria.andIccidNumEqualTo(internetCard.getIccidNum());
-                criteria.andLogoutStatusEqualTo(InternetLogoutStatus.DZX.getValue());   // TODO 查询注销失败 的  更新为注销成功
+                if(oInternetCard.getIssuer().equals(Issuerstatus.YT_MOBILE.code) ){
+                    criteria.andLogoutStatusEqualTo(InternetLogoutStatus.TJCLZ.getValue());// 烟台移动 查询注销中的  更新为注销成功（人工导入处理）
+                }else if(oInternetCard.getIssuer().equals(Issuerstatus.JY_MOBILE.code)){
+                    criteria.andLogoutStatusEqualTo(InternetLogoutStatus.TJSB.getValue());// 揭阳移动 查询注销失败的  更新为注销成功（人工导入处理）
+                }
                 List<InternetLogoutDetail> internetLogoutDetails = internetLogoutDetailMapper.selectByExample(internetLogoutDetailExample);
                 for (InternetLogoutDetail internetLogoutDetail : internetLogoutDetails) {
-                    internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.ZXCG.getValue());
+                    internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.ZXCG.getValue());// 更改为已注销
                     int i = internetLogoutDetailMapper.updateByPrimaryKey(internetLogoutDetail);
                     if(i!=1){
                         oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
