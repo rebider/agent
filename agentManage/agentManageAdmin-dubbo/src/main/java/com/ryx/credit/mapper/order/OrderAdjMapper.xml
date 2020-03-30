@@ -780,10 +780,7 @@
            oa.order_id,
            oa.agent_id,
            ag.ag_name,
-           (select ab.bus_num from a_agent_businfo ab
-            left join o_order oo on oo.bus_id = ab.id
-            where oo.id = oa.order_id and ab.status=1 and oo.status=1
-           ) as bus_num,
+           ab.bus_num  as bus_num,
            (select platform_name
             from a_platform ap
             left join a_agent_businfo ab on ap.platform_num = ab.bus_platform
@@ -828,7 +825,7 @@
            left join a_agent ag on ag.id = oa.agent_id and ag.status = 1
            left join c_user cu on cu.id = oa.adj_user_id
            left join o_sub_order_activity soa on soa.sub_order_id = oad.sub_order_id  and soa.status = '1'
-           left join a_agent_businfo ab on ab.id = oo.bus_id and ab.agent_id = oa.agent_id
+           left join a_agent_businfo ab on ab.id = oo.bus_id and ab.agent_id = oa.agent_id and ab.status=1
     <where>
       <if test="1==1"> and oa.status=1 </if>
       <if test="map.agName!=null and map.agName!=''"> and ag.ag_name like concat(concat('%',#{map.agName}),'%') </if>
@@ -839,7 +836,7 @@
       <if test="map.proName!=null and map.proName!=''">
         and EXISTS
         (select * from o_sub_order os
-        where os.pro_name like concat(concat('%',#{map.proName}),'%') and os.status = 1 and os.order_id = oa.order_id)
+        where os.pro_name like concat(concat('%',#{map.proName}),'%') and os.status = 1 and os.id = oad.SUB_ORDER_ID)
       </if>
       <if test="map.userName!=null and map.userName!=''">
         and cu.name = #{map.userName}
