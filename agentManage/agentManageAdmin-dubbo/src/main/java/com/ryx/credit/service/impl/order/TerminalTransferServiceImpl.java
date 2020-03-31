@@ -1482,8 +1482,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         if(terminalTransferDetailList.size()>(terminalTransferDetailListsPos==null?0:terminalTransferDetailListsPos.size())
         &&terminalTransferDetailList.size()>(terminalTransferDetailListsMpos==null?0:terminalTransferDetailListsMpos.size())
         &&terminalTransferDetailList.size()>(terminalTransferDetailListsRDBPOS==null?0:terminalTransferDetailListsRDBPOS.size())){
-            log.info("一次审批流程申请只允许单个平台提交");
-            throw new MessageException("一次审批流程申请只允许单个平台提交");
+            log.info("划拨仅支持单品牌的提交");
+            throw new MessageException("划拨仅支持单品牌的提交");
         }
 
 
