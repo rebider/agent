@@ -949,7 +949,12 @@
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
       <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  CONCAT(CONCAT('%',#{agName}),'%') </if>
-      <if test="platformType!=null and platformType!=''"> and c.platform_type = #{platformType} </if>
+      <if test="platformType!=null and platformType.size > 0">
+        and c.platform_type
+        <foreach collection="platformType" item="platformItem" open=" in(" close=")" separator=",">
+          #{platformItem}
+        </foreach>
+      </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
       <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
       <if test="platformList!=null and platformList.size > 0">
@@ -1088,7 +1093,12 @@
       <if test="agName!=null and agName!=''"> and b.ag_name like  CONCAT(CONCAT('%',#{agName}),'%') </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
       <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
-      <if test="platformType!=null and platformType!=''"> and c.platform_type = #{platformType} </if>
+      <if test="platformType!=null and platformType.size > 0">
+        and c.platform_type
+        <foreach collection="platformType" item="platformItem" open=" in(" close=")" separator=",">
+          #{platformItem}
+        </foreach>
+      </if>
       <if test="platformList!=null and platformList.size > 0">
         and c.PLATFORM_NUM
         <foreach collection="platformList" item="platform" open=" in(" close=")" separator=",">
