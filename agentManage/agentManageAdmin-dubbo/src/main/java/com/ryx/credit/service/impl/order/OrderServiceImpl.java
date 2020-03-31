@@ -6741,8 +6741,10 @@ public class OrderServiceImpl implements OrderService {
     public PageInfo queryAgentUpModelDetailList(Map par, Page page) {
         PageInfo pageInfo = new PageInfo();
         if (par == null) return pageInfo;
-        if (par.get("proName") != null || StringUtils.isNotBlank((String)par.get("proName"))){
+        if (par.get("proName") != null && StringUtils.isNotBlank((String)par.get("proName"))){
             par.put("proName",Arrays.asList(((String)par.get("proName")).split(",")));
+        }else {
+            par.put("proName",new  ArrayList<String>());
         }
         if(null!=par.get("userId")) {
             Long userId = (Long) par.get("userId");
@@ -6768,7 +6770,7 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderAdjustVo> excelOrderAdjustDetailAll(Map map) {
 
         List<OrderAdjustVo> orderAdjVoList = orderAdjMapper.excelOrderAdjustDetailAll(map);
-        if (map.get("proName") != null){
+        if (map.get("proName") != null && StringUtils.isNotBlank((String)map.get("proName"))){
             map.put("proName",Arrays.asList(((String)map.get("proName")).split(",")));
         }
         if(null!=map.get("userId")) {

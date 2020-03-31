@@ -812,8 +812,8 @@
           ) as ag_doc_pro,
            oa.adj_tm,
            oa.reviews_stat,
-           nvl(oa.refund_stat,''),
-           nvl(oa.refund_tm,''),
+           nvl(oa.refund_stat,'') as refund_stat,
+           nvl(oa.refund_tm,'') as refund_tm,
            oa.real_refund_amo,
            oa.reviews_date,
       (select max(o_order_adj.org_pay_amo) from o_order_adj where o_order_adj.order_id = oa.order_id)as current_amo,
@@ -870,6 +870,15 @@
       </if>)
       <if test="map.userId != null and map.userId !=''">
         and oa.adj_user_id = #{map.userId}
+      </if>
+      <if test="map.reviewTime != null and map.reviewTime !=''">
+        and  to_char(oa.REVIEWS_DATE,'yyyy-mm-dd')  = #{map.reviewTime}
+      </if>
+      <if test="map.refundStatus != null and map.refundStatus != ''">
+        and oa.REFUND_STAT = #{map.refundStatus}
+      </if>
+      <if test="map.refundTime != null and map.refundTime != ''">
+        and  to_char(oa.REFUND_TM,'yyyy-mm-dd')  = #{map.refundTime}
       </if>
     </where>
     order by oa.ID desc
