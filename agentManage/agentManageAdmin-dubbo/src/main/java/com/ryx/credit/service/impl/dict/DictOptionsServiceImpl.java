@@ -218,4 +218,12 @@ public class DictOptionsServiceImpl implements DictOptionsService {
             throw new Exception("更新失败，请稍后再试！");
         }
     }
+
+    @Override
+    public List<Dict> queryDictList(Dict dict) {
+        DictExample example = new DictExample();
+        example.or().andDArtifactEqualTo(dict.getdArtifact()).andDStatusEqualTo(Status.STATUS_1.status);
+        example.setOrderByClause(" D_sort desc");
+        return dictMapper.selectByExample(example);
+    }
 }

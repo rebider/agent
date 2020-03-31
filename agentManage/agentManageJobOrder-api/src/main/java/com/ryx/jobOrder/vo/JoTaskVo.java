@@ -3,16 +3,28 @@ package com.ryx.jobOrder.vo;
 import com.ryx.jobOrder.pojo.JoOrder;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class JoTaskVo extends JoOrder {
 
+    private Long userId;
+
     private String joDealPersonId;
+
+    private String joDealPersonName;
+
+    private String orderType;
+
+    private String secondDealGroup;
 
     private String joDealGroupId;
 
     private String joTaskId;
 
     private String joTaskStatus;
+
+    private String joTopKeyNum;
 
     private Date joTaskTime;
 
@@ -33,6 +45,56 @@ public class JoTaskVo extends JoOrder {
     private Date joAcceptTimeBegin;
 
     private Date joAcceptTimeEnd;
+
+    private List<Map>  platfromPerm;
+
+    public List<Map> getPlatfromPerm() {
+        return platfromPerm;
+    }
+
+    public void setPlatfromPerm(List<Map> platfromPerm) {
+        this.platfromPerm = platfromPerm;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
+    }
+
+    public String getSecondDealGroup() {
+        return secondDealGroup;
+    }
+
+    public void setSecondDealGroup(String secondDealGroup) {
+        this.secondDealGroup = secondDealGroup;
+    }
+
+    public String getJoDealPersonName() {
+        return joDealPersonName;
+    }
+
+    public void setJoDealPersonName(String joDealPersonName) {
+        this.joDealPersonName = joDealPersonName;
+    }
+
+    public String getJoTopKeyNum() {
+        return joTopKeyNum;
+    }
+
+    public void setJoTopKeyNum(String joTopKeyNum) {
+        this.joTopKeyNum = joTopKeyNum;
+    }
 
     public String getJoDealPersonId() {
         return joDealPersonId;
@@ -146,4 +208,29 @@ public class JoTaskVo extends JoOrder {
         this.joTaskAcceptTime = joTaskAcceptTime;
     }
 
+    @Override
+    public String toString() {
+        return "JoTaskVo{" +
+                "userId=" + userId +
+                ", joDealPersonId='" + joDealPersonId + '\'' +
+                ", joDealPersonName='" + joDealPersonName + '\'' +
+                ", orderType='" + orderType + '\'' +
+                ", secondDealGroup='" + secondDealGroup + '\'' +
+                ", joDealGroupId='" + joDealGroupId + '\'' +
+                ", joTaskId='" + joTaskId + '\'' +
+                ", joTaskStatus='" + joTaskStatus + '\'' +
+                ", joTopKeyNum='" + joTopKeyNum + '\'' +
+                ", joTaskTime=" + joTaskTime +
+                ", joTaskAcceptTime=" + joTaskAcceptTime +
+                ", joStartTimeBeginStr='" + joStartTimeBeginStr + '\'' +
+                ", joStartTimeEndStr='" + joStartTimeEndStr + '\'' +
+                ", joAcceptTimeBeginStr='" + joAcceptTimeBeginStr + '\'' +
+                ", joAcceptTimeEndStr='" + joAcceptTimeEndStr + '\'' +
+                ", joStartTimeBegin=" + joStartTimeBegin +
+                ", joStartTimeEnd=" + joStartTimeEnd +
+                ", joAcceptTimeBegin=" + joAcceptTimeBegin +
+                ", joAcceptTimeEnd=" + joAcceptTimeEnd +
+                ", platfromPerm=" + platfromPerm +
+                '}' +super.toString();
+    }
 }

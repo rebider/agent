@@ -1,5 +1,7 @@
 package com.ryx.jobOrder.service;
 
+import com.ryx.jobOrder.vo.JobKeyManageNodeVo;
+
 import java.util.List;
 import java.util.Map;
 
@@ -24,4 +26,26 @@ public interface JobOrderAuthService {
      * @return
      */
     Map<String,Object> getAcceptGroup(String userId);
+
+    /**
+     * 获取全部受理组
+     * @return
+     */
+    List<Map<String,Object>> getAllAcceptGroup();
+
+    /**
+     *
+     * @param code 查询条件code
+     * @param queryType  查询条件类型:0-用户id,1-受理组 enumc:QueryAcceptType
+     * @return
+     */
+    Map<String,Object> getAcceptInfo(String code,String queryType);
+
+    /**
+     * 获取用户可以申请的工单类型
+     * @param userId
+     * @return
+     */
+    List<JobKeyManageNodeVo> getViewJobKeyManageNodes(String userId);
+
 }

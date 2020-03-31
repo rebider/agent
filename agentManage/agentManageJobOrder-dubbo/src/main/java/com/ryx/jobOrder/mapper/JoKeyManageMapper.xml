@@ -212,8 +212,9 @@
   <sql id="jokeyNabageWhere">
     and jo.JO_STATUS=1
     <if test="map.joKeyType!=null and map.joKeyType!=''"> and jo.JO_KEY_TYPE=#{map.joKeyType} </if>
-    <if test="map.joKey!=null and map.joKey!=''"> and jo.JO_KEY=#{map.joKey} </if>
+    <if test="map.joKey!=null and map.joKey!=''"> and jo.JO_KEY LIKE CONCAT(CONCAT('%',#{map.joKey}),'%')</if>
     <if test="map.joKeyName!=null and map.joKeyName!=''"> and jo.JO_KEY_NAME LIKE CONCAT(CONCAT('%',#{map.joKeyName}),'%')</if>
+    <if test="map.joKeyBackNum!=null and map.joKeyBackNum!=''"> and jo.JO_KEY_BACK_NUM LIKE CONCAT(CONCAT('%',#{map.joKeyBackNum}),'%')</if>
   </sql>
 
   <!--查询一级和二级类型-->
@@ -222,5 +223,17 @@
     from (select jk.id as id,jk.JO_KEY as joKey,jk.JO_KEY_NAME as joKeyName,jk.JO_KEY_BACK_NUM  from JO_KEY_MANAGE jk
     where jo_key_type =2 )a
     left join JO_KEY_MANAGE  jo on a.JO_KEY_BACK_NUM=jo.id
+  </select>
+
+  <select id="queryJobOrderType" resultType="map">
+    select *
+    from (select m1.jo_key as top_key,
+                 m2.jo_key as first_key,
+                 m3.jo_key as second_key,
+                 m1.jo_key_name || '-' || m2.jo_key_name || '-' || m3.jo_key_name as job_order_type
+          from jo_key_manage m1
+          left join jo_key_manage m2 on m2.jo_key_back_num = m1.id
+          left join jo_key_manage m3 on m3.jo_key_back_num = m2.id
+          where m1.jo_key_type = '0')
   </select>
 </mapper>

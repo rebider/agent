@@ -27,12 +27,22 @@ public interface JoOrderMapper {
     int updateByPrimaryKey(JoOrder record);
 
     List<JoTaskVo> queryJobOrderList(Map<String, Object> param);
-
     int queryJobOrderListCount(Map<String, Object> param);
+
+    List<JoTaskVo> queryAgentJobOrderList(Map<String, Object> param);
+    int queryAgentJobOrderListCount(Map<String, Object> param);
+
+    List<JoTaskVo> queryCityJobOrderList(Map<String, Object> param);
+    int queryCityJobOrderListCount(Map<String, Object> param);
+
+    List<JoTaskVo> queryGroupJobOrderList(Map<String, Object> param);
+    int queryGroupJobOrderListCount(Map<String, Object> param);
 
     List<JoTaskVo> queryJobOrderLaunchList(@Param("map") Map<String, Object> param,@Param("page") Page page);
 
     int queryJobOrderLaunchListCount(@Param("map") Map<String, Object> param);
 
     List<JoOrder> queryListByTaskId(String taskId);
+
+    List<Map> queryAgPro(String agId);
 }

@@ -39,6 +39,26 @@ public class JoTask implements Serializable {
 
     private BigDecimal version;
 
+    private String attId;
+
+    private String attName;
+
+    public String getAttId() {
+        return attId;
+    }
+
+    public void setAttId(String attId) {
+        this.attId = attId;
+    }
+
+    public String getAttName() {
+        return attName;
+    }
+
+    public void setAttName(String attName) {
+        this.attName = attName;
+    }
+
     public String getId() {
         return id;
     }

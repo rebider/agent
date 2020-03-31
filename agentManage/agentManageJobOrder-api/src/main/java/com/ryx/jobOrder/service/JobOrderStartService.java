@@ -13,9 +13,13 @@ public interface JobOrderStartService {
 
     FastMap createJobOrder(JoOrder joOrder, Map orderMap) throws Exception;
 
-    List<FastMap> getStartLaunchVo(JSONObject para);
+//    List<FastMap> getStartLaunchVo(JSONObject para);
 
     FastMap saveJobOrderExband(JoExpandKey joExpandKey);
 
     JoOrder queryListByTaskId(String taskId);
+
+    List<Map> queryAgPro(String agId);
+
+    List<JoExpandKey> queryExpandKeyByJoid(String joId);
 }

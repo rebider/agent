@@ -8,9 +8,12 @@ import com.ryx.internet.service.OInternetRenewService;
 import com.ryx.jobOrder.pojo.JoCustomKey;
 import com.ryx.jobOrder.pojo.JoKeyManage;
 import com.ryx.jobOrder.pojo.JoTask;
+import com.ryx.jobOrder.service.JobOrderAuthService;
 import com.ryx.jobOrder.service.JobOrderManageService;
+import com.ryx.jobOrder.service.JobOrderStartService;
 import com.ryx.jobOrder.service.JobOrderTaskService;
 import com.ryx.jobOrder.vo.JoTaskVo;
+import com.ryx.jobOrder.vo.JobKeyManageNodeVo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +32,12 @@ public class JobOrderTest extends BaseSpringTest {
 
     @Autowired
     private JobOrderTaskService jobOrderTaskService;
-
+    @Autowired
+    private JobOrderStartService jobOrderStartService;
     @Autowired
     private JobOrderManageService jobOrderManageService;
-
+    @Autowired
+    private JobOrderAuthService jobOrderAuthService;
 
     @Test
     public void test1() throws MessageException {
@@ -135,4 +140,47 @@ public class JobOrderTest extends BaseSpringTest {
         System.out.println();
     }
 
+    @Test
+    public void test9(){
+        List list = jobOrderStartService.queryExpandKeyByJoid("JO20200227000000000000019");
+        List<Map<String, Object>> allAcceptGroup = jobOrderAuthService.getAllAcceptGroup();
+//        System.out.println(allAcceptGroup);
+    }
+
+    @Test
+    public void test10(){
+        List list = jobOrderAuthService.getAllAcceptGroup();
+        System.out.println();
+    }
+
+    @Test
+    public void  test11(){
+        List<JobKeyManageNodeVo> viewJobKeyManageNodes = jobOrderAuthService.getViewJobKeyManageNodes("18232");
+        for (JobKeyManageNodeVo node:viewJobKeyManageNodes){
+            for (JobKeyManageNodeVo nodeSecond:node.getChildNodes()){
+                for (JobKeyManageNodeVo nodeThird:nodeSecond.getChildNodes()){
+                    System.out.print(node.getId()+"-");
+                    System.out.print(node.getJoKeyType()+"-");
+                    System.out.print(node.getJoKeyName()+"-");
+                    System.out.print(nodeSecond.getId()+"-");
+                    System.out.print(nodeSecond.getJoKeyType()+"-");
+                    System.out.print(nodeSecond.getJoKeyName()+"-");
+                    System.out.print(nodeThird.getId()+"-");
+                    System.out.print(nodeThird.getJoKeyType()+"-");
+                    System.out.print(nodeThird.getJoKeyName()+"-");
+                    System.out.println("***********");
+                }
+            }
+        }
+    }
+    @Test
+    public void test12(){
+        List<JobKeyManageNodeVo> viewJobKeyManageNodes = jobOrderAuthService.getViewJobKeyManageNodes("18232");
+        System.out.println(viewJobKeyManageNodes);
+    }
+
+    @Test
+    public void test13(){
+        Map<String, Object> acceptGroup = jobOrderAuthService.getAcceptGroup("21401");
+    }
 }

@@ -211,28 +211,63 @@
 
   <select id="joCustomKeyList" parameterType="map" resultType="map">
     <include refid="OracleDialectPrefix"/>
-    select c.firstLevel,d.secondLevel,nvl(e.count,'0') as tally,e.keyword, d.id as SecId from
-    (select (a.jo_key_name || '-' || b.jo_key_name) as firstLevel,b.jo_key as top2 from jo_key_manage a left join jo_key_manage b on a.jo_key = b.jo_key_back_num where b.jo_key_type = '1') c
+    select c.firstLevel,d.secondLevel,nvl(e.count,'0') as tally,e.keyword, d.top3 as SecId
+    ,c.top2 as firstId
+    from
+    (select a.jo_status,(a.jo_key_name || '-' || b.jo_key_name) as firstLevel,b.id as top2 from jo_key_manage a left join jo_key_manage b on a.id = b.jo_key_back_num where b.jo_key_type = '1') c
     left join
-    (select  b.id,b.jo_key_name as secondLevel,a.jo_key as top2,b.jo_Key as top3 from jo_key_manage a left join jo_key_manage b on a.jo_key = b.jo_key_back_num where b.jo_key_type = '2' ) d on c.top2 = d.top2
+    (select a.jo_status, b.jo_key_name as secondLevel,a.id as top2,b.id as top3 from jo_key_manage a left join jo_key_manage b on a.id = b.jo_key_back_num where b.jo_key_type = '2' ) d on c.top2 = d.top2
     left join
-    (select LISTAGG(a.jo_key_name,',') WITHIN GROUP (ORDER BY a.jo_key_name) as keyword,b.jo_second_key_num as top3,count(1) as count from jo_key_manage a left join jo_custom_key b on a.id=b.jo_key_id where a.jo_key_type = '3' group by b.jo_second_key_num) e
+    (select  LISTAGG(a.jo_key_name,',') WITHIN GROUP (ORDER BY a.jo_key_name) as keyword,b.jo_second_key_num as top3,count(1) as count from jo_key_manage a left join jo_custom_key b on a.id=b.jo_key_id where a.jo_key_type = '3' group by b.jo_second_key_num) e
     on d.top3 = e.top3
+    <include refid="joCustomKeyWhere"/>
     <include refid="OracleDialectSuffix"/>
   </select>
 
+  <sql id="joCustomKeyWhere">
+     WHERE  c.jo_status=1 and d.jo_status=1
+    <if test="map.firstJoKeyName!=null and map.firstJoKeyName!=''">
+      and c.firstLevel LIKE CONCAT(CONCAT('%',#{map.firstJoKeyName}),'%')
+    </if>
+    <if test="map.secondJoKeyName!=null and map.secondJoKeyName!=''"> and d.secondLevel LIKE CONCAT(CONCAT('%',#{map.secondJoKeyName}),'%')</if>
+    <if test="map.keyWordName!=null and map.keyWordName!=''">
+      and e.keyword LIKE CONCAT(CONCAT('%',#{map.keyWordName}),'%')
+    </if>
+  </sql>
+
+
   <select id="joCustomKeyCount" parameterType="map" resultType="int">
     select count(*) from
-    (select (a.jo_key_name || '-' || b.jo_key_name) as firstLevel,b.jo_key as top2 from jo_key_manage a left join jo_key_manage b on a.jo_key = b.jo_key_back_num where b.jo_key_type = '1') c
+    (select a.jo_status, (a.jo_key_name || '-' || b.jo_key_name) as firstLevel,b.id as top2 from jo_key_manage a left join jo_key_manage b on a.id = b.jo_key_back_num where b.jo_key_type = '1') c
     left join
-    (select b.jo_key_name as secondLevel,a.jo_key as top2,b.jo_Key as top3 from jo_key_manage a left join jo_key_manage b on a.jo_key = b.jo_key_back_num where b.jo_key_type = '2' ) d on c.top2 = d.top2
+    (select a.jo_status, b.jo_key_name as secondLevel,a.id as top2,b.id as top3 from jo_key_manage a left join jo_key_manage b on a.id = b.jo_key_back_num where b.jo_key_type = '2' ) d on c.top2 = d.top2
     left join
     (select LISTAGG(a.jo_key_name,',') WITHIN GROUP (ORDER BY a.jo_key_name) as keyword,b.jo_second_key_num as top3,count(1) as count from jo_key_manage a left join jo_custom_key b on a.id=b.jo_key_id where a.jo_key_type = '3' group by b.jo_second_key_num) e
     on d.top3 = e.top3
+    <include refid="joCustomKeyWhere"/>
   </select>
 
   <select id="selectKeyWord" parameterType="string" resultType="map">
     select * from  jo_custom_key a left join jo_key_manage b on b.id=a.JO_KEY_ID
     where a.JO_SECOND_KEY_NUM=#{joSecondKeyNum}
+  </select>
+
+  <delete id="deletejoCustomKeyById" parameterType="string">
+    delete from
+    jo_custom_key
+    where
+    id = #{id}
+  </delete>
+
+
+  <select id="selectCustomListMapBySedType" parameterType="com.ryx.jobOrder.pojo.JoCustomKey" resultType="map">
+    select * from  jo_custom_key a left join jo_key_manage b on b.id=a.JO_KEY_ID
+    where b.JO_STATUS=1
+    <if test="joCustomKey.joKeyId != null and joCustomKey.joKeyId != '' " >
+      and a.JO_KEY_ID = #{joCustomKey.joKeyId}
+    </if>
+    <if test="joCustomKey.joSecondKeyNum != null and joCustomKey.joSecondKeyNum != '' " >
+      and a.JO_SECOND_KEY_NUM = #{joCustomKey.joSecondKeyNum}
+    </if>
   </select>
 </mapper>

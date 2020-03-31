@@ -2,6 +2,7 @@ package com.ryx.jobOrder.service.impl;
 
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -15,6 +16,8 @@ import com.ryx.jobOrder.pojo.JoCustomKeyExample;
 import com.ryx.jobOrder.pojo.JoKeyManage;
 import com.ryx.jobOrder.pojo.JoKeyManageExample;
 import com.ryx.jobOrder.service.JobOrderManageService;
+import com.ryx.jobOrder.vo.JobKeyManageVo;
+import com.ryx.jobOrder.vo.JobOrderVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +56,9 @@ public class JobOrderManageServiceImpl implements JobOrderManageService {
             if (StringUtils.isNotBlank(joKeyManage.getJoKeyName())) {
                 map.put("joKeyName", joKeyManage.getJoKeyName());
             }
+            if (StringUtils.isNotBlank(joKeyManage.getJoKeyBackNum())) {
+                map.put("joKeyBackNum", joKeyManage.getJoKeyBackNum());
+            }
         }
         List<Map<String, Object>> joCustomKeyList = joKeyManageMapper.keywordList(map, page);
         PageInfo pageInfo = new PageInfo();
@@ -77,6 +83,17 @@ public class JobOrderManageServiceImpl implements JobOrderManageService {
     @Override
     public AgentResult keywordDelete(String id) {
         if (StringUtils.isBlank(id)) return AgentResult.fail("ID不能为空");
+        JoCustomKeyExample joCustomKeyExample = new JoCustomKeyExample();
+        JoCustomKeyExample.Criteria criteria = joCustomKeyExample.createCriteria().andJoKeyIdEqualTo(id);
+        List<JoCustomKey> joCustomKeyList = joCustomKeyMapper.selectByExample(joCustomKeyExample);
+        if (null != joCustomKeyList || joCustomKeyList.size() > 0) {
+            for (JoCustomKey joCustomKey : joCustomKeyList) {
+                if (1 != joCustomKeyMapper.deletejoCustomKeyById(joCustomKey.getId())) {
+                    log.info("工单自定义表删除失败");
+                    AgentResult.fail("工单自定义表删除失败");
+                }
+            }
+        }
         JoKeyManage joKeyManage = new JoKeyManage();
         joKeyManage.setId(id);
         joKeyManage.setJoStatus(Status.STATUS_0.status.toString());
@@ -107,6 +124,9 @@ public class JobOrderManageServiceImpl implements JobOrderManageService {
         JoKeyManageExample.Criteria criteria = joKeyManageExample.createCriteria();
         if (StringUtils.isNotBlank(joKeyManage.getJoKeyType())){
             criteria.andJoKeyTypeEqualTo(joKeyManage.getJoKeyType());
+        }
+        if (StringUtils.isNotBlank(joKeyManage.getJoKey())){
+            criteria.andJoKeyEqualTo(joKeyManage.getJoKey());
         }
         if(StringUtils.isNotBlank(joKeyManage.getJoKeyBackNum())){
             criteria.andJoKeyBackNumEqualTo(joKeyManage.getJoKeyBackNum());
@@ -142,15 +162,7 @@ public class JobOrderManageServiceImpl implements JobOrderManageService {
 
     @Override
     public List selectCustomListMapBySedType(JoCustomKey joCustomKey) {
-        JoCustomKeyExample example = new JoCustomKeyExample();
-        JoCustomKeyExample.Criteria criteria = example.createCriteria();
-        if(StringUtils.isNotBlank(joCustomKey.getJoSecondKeyNum())){
-            criteria.andJoSecondKeyNumEqualTo(joCustomKey.getJoSecondKeyNum());
-        }
-        if(StringUtils.isNotBlank(joCustomKey.getJoKeyId())){
-            criteria.andJoKeyIdEqualTo(joCustomKey.getJoKeyId());
-        }
-        List<Map> mapList = joCustomKeyMapper.selectMapByExample(example);
+        List<Map> mapList = joCustomKeyMapper.selectCustomListMapBySedType(joCustomKey);
         return mapList;
     }
 
@@ -178,4 +190,59 @@ public class JobOrderManageServiceImpl implements JobOrderManageService {
         pageInfo.setTotal(joCustomKeyMapper.joCustomKeyCount(map));
         return pageInfo;
     }
+
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    @Override
+    public ResultVO joCustomKeyEdit(JobOrderVo jobOrderVo) throws Exception {
+        if (null != jobOrderVo && null != jobOrderVo.getJobKeyManageVoList()) {
+            for (JobKeyManageVo jobKeyManage : jobOrderVo.getJobKeyManageVoList()) {
+                if(null!=jobKeyManage.getJoCustomKeyList() ){
+                    //删除原有的自定义表数据(二级类型可确定唯一性)
+                    JoCustomKeyExample joCustomKeyExample = new JoCustomKeyExample();
+                    JoCustomKeyExample.Criteria criteria1 = joCustomKeyExample.createCriteria().andJoSecondKeyNumEqualTo(jobOrderVo.getSecondId());
+                    List<JoCustomKey> joCustomKeys = joCustomKeyMapper.selectByExample(joCustomKeyExample);
+                    if(null!=joCustomKeys && joCustomKeys.size()>0){
+                        for (JoCustomKey joCustomKey : joCustomKeys) {
+                            if (1 != joCustomKeyMapper.deletejoCustomKeyById(joCustomKey.getId())) {
+                                log.info("工单自定义表删除失败");
+                                throw new MessageException("工单自定义表删除失败");
+                            }
+                        }
+                    }
+                    //添加
+                    List<JoCustomKey> joCustomKeyList = jobKeyManage.getJoCustomKeyList();
+                    for (JoCustomKey joCustomKey : joCustomKeyList) {
+                        JoKeyManageExample joKeyManageExample = new JoKeyManageExample();
+                        JoKeyManageExample.Criteria criteria = joKeyManageExample.createCriteria().andJoStatusEqualTo(Status.STATUS_1.status.toString()).andJoKeyEqualTo(joCustomKey.getJoKey());
+                        List<JoKeyManage> joKeyManageList = joKeyManageMapper.selectByExample(joKeyManageExample);
+                        if(null==joKeyManageList || joKeyManageList.size()==0){
+                            log.info("查询关键词失败:{}", joKeyManageList);
+                            throw new MessageException("查询关键词失败");
+                        }
+                        JoKeyManage joKeyManage = joKeyManageList.get(0);
+                        joCustomKey.setId(idService.genId(TabId.jo_custom_key));
+                        joCustomKey.setJoFirstKeyNum(jobOrderVo.getFirstId());
+                        joCustomKey.setJoSecondKeyNum(jobOrderVo.getSecondId());
+                        joCustomKey.setJoKey(joCustomKey.getJoKey());
+                        joCustomKey.setJoKeyId(joKeyManage.getId());
+                        joCustomKey.setJoKeyValueType(joKeyManage.getJoKeyValueType());
+                        joCustomKey.setJoKeyNull(joCustomKey.getJoKeyNull());
+                        joCustomKey.setJoKeySort(Status.STATUS_1.status);
+                        if (1 != joCustomKeyMapper.insertSelective(joCustomKey)) {
+                            log.info("添加工单自定义表失败");
+                            throw new MessageException("添加工单自定义表失败");
+                        }
+                    }
+                }
+            }
+        }
+        return ResultVO.success(null);
+    }
+
+    @Override
+    public List queryJobOrderType() {
+        List<Map<String, Object>> mapsList = joKeyManageMapper.queryJobOrderType();
+        return mapsList;
+    }
+
 }

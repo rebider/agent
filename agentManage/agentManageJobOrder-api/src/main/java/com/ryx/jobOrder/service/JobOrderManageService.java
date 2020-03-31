@@ -7,6 +7,7 @@ import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.jobOrder.pojo.JoCustomKey;
 import com.ryx.jobOrder.pojo.JoKeyManage;
+import com.ryx.jobOrder.vo.JobOrderVo;
 
 import java.util.List;
 import java.util.Map;
@@ -46,4 +47,13 @@ public interface JobOrderManageService {
     List<Map> selectKeyWord(JoCustomKey joCustomKey);
 
     PageInfo joCustomKeyList(Page page, Map map);
+
+    ResultVO joCustomKeyEdit(JobOrderVo jobOrderVo) throws Exception;
+
+    /**
+     * 获取工单类型下拉列表
+     * @return
+     */
+    List queryJobOrderType();
+
 }

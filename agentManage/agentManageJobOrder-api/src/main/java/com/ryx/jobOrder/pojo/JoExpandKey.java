@@ -1,8 +1,9 @@
 package com.ryx.jobOrder.pojo;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class JoExpandKey {
+public class JoExpandKey implements Serializable {
     private String jid;
 
     private String joKeyId;

@@ -1226,4 +1226,5 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		}
 		return data;
 	}
+
 }
