@@ -226,6 +226,12 @@ public class InternetCardServiceImpl implements InternetCardService {
         }else if(StringUtils.isNotBlank(internetCard.getAgentName())){
             criteria.andAgentNameLike("%"+internetCard.getAgentName()+"%");
         }
+        if(internetCard.getRenewStatusList()!=null && internetCard.getRenewStatusList().size()>0){
+            reqMap.put("renewStatusList", internetCard.getRenewStatusList());
+        }
+        if(internetCard.getInternetCardStatusList()!=null && internetCard.getInternetCardStatusList().size()>0){
+            reqMap.put("internetCardStatusList", internetCard.getInternetCardStatusList());
+        }
         oInternetCardExample.setReqMap(reqMap);
 //        oInternetCardExample.setOrderByClause("expire_time asc ");
         return oInternetCardExample;
