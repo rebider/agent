@@ -801,4 +801,15 @@ public class OSupplementServiceImpl implements OSupplementService {
         return new ArrayList<>();
     }
 
+    @Override
+    public OPaymentDetail selectoPaymentDetail(String orderId) {
+        if (StringUtils.isBlank(orderId)){
+            return null;
+        }
+        SimpleDateFormat mm = new SimpleDateFormat("YYYY-MM");
+        String time = mm.format(new Date());
+        OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectoPaymentDetail(orderId, time);
+        return oPaymentDetail;
+    }
+
 }

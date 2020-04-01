@@ -97,4 +97,11 @@ public interface OSupplementService {
      */
     public List<OPayDetail> selectOpayDetail(OPaymentDetail oPaymentDetail);
 
+    /**
+     * 查询付款明细的期数
+     * @param opaymentDetailId
+     * @return
+     */
+    public OPaymentDetail selectoPaymentDetail(String opaymentDetailId);
+
 }

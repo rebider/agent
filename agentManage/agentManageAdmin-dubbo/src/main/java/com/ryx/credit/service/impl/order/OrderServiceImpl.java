@@ -3285,7 +3285,7 @@ public class OrderServiceImpl implements OrderService {
         OPaymentDetailExample example = new OPaymentDetailExample();
         example.or().andOrderIdEqualTo(orderId)
                 .andStatusEqualTo(Status.STATUS_1.status)
-                .andPaymentStatusIn(Arrays.asList(PaymentStatus.DF.code, PaymentStatus.BF.code, PaymentStatus.YQ.code))
+                .andPaymentStatusIn(Arrays.asList(PaymentStatus.DF.code, PaymentStatus.YQ.code))
                 .andAgentIdEqualTo(agentId);
         example.setOrderByClause(" plan_pay_time asc ");
         List<OPaymentDetail> paymentDetails = oPaymentDetailMapper.selectByExample(example);

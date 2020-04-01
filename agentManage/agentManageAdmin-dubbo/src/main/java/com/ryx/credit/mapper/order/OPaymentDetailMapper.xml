@@ -938,4 +938,12 @@
           and od.REVIEW_STATUS = '3'
         order by plan_pay_time asc
     </select>
+
+    <select id="selectoPaymentDetail" parameterType="string" resultMap="BaseResultMap">
+       select <include refid="Base_Column_List" /> from o_Payment_detail where ORDER_ID=#{orderId} and  PAYMENT_STATUS in(1,3,2)
+        and status=1
+        <if test="time!=null and time!='' ">
+            and to_char(o_payment_detail.plan_pay_time,'YYYY-MM')=#{time}
+        </if>
+    </select>
 </mapper>
