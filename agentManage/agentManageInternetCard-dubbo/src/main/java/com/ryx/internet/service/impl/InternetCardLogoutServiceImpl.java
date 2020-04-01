@@ -90,6 +90,9 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
         if(null!=internetLogout.getReviewStatus()){
             reqMap.put("reviewStatus",internetLogout.getReviewStatus());
         }
+        if(internetLogout.getReviewStatusList()!=null && internetLogout.getReviewStatusList().size()>0){
+            reqMap.put("reviewStatusList",internetLogout.getReviewStatusList());
+        }
         List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
         if(orgCodeRes==null && orgCodeRes.size()!=1){
             return null;

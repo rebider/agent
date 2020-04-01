@@ -3,6 +3,7 @@ package com.ryx.internet.pojo;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class InternetLogout implements Serializable{
     private String id;
@@ -42,6 +43,16 @@ public class InternetLogout implements Serializable{
     private BigDecimal version;
 
     private String iccidNumIds;
+
+    private List<BigDecimal> reviewStatusList;
+
+    public List<BigDecimal> getReviewStatusList() {
+        return reviewStatusList;
+    }
+
+    public void setReviewStatusList(List<BigDecimal> reviewStatusList) {
+        this.reviewStatusList = reviewStatusList;
+    }
 
     public String getIccidNumIds() {
         return iccidNumIds;

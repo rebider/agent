@@ -394,7 +394,7 @@
       and (oa.CODE like concat(#{reqMap.orgCode},'%') or ob.CODE like concat(#{reqMap.orgCode},'%'))
     </if>
     <if test="reqMap.renewWayList!=null and reqMap.renewWayList.size > 0">
-      and RENEW_WAY
+      and i.RENEW_WAY
       <foreach collection="reqMap.renewWayList" item="renewWay" open=" in(" close=")" separator=",">
         #{renewWay}
       </foreach>
