@@ -1079,7 +1079,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         //智慧pos平台申请
         terminalTransferDetailList = judgeStartsWithS(terminalTransferDetailList);
         //判断提交sn是否重复
-        repetitionSNEdit(terminalTransferDetailList);
+        repetitionSN(terminalTransferDetailList);
         //判断是否属于一个平台
         judgeSubSup(terminalTransferDetailList, agentId);
 
@@ -1282,30 +1282,38 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     /**
      * chenliang
      * 判断重复sn提交时
-     *
      * @param terminalTransferDetailList
      * @throws Exception
      */
     private void repetitionSN(List<TerminalTransferDetail> terminalTransferDetailList) throws Exception {
+        //本次提交是否有重复SN
+        thisTimeSubmit(terminalTransferDetailList);
+        //提交是否含有重复SN在审核中
+        beforeSubmit(terminalTransferDetailList);
 
+    }
+
+
+    //本次提交是否重复判断
+    public void thisTimeSubmit(List<TerminalTransferDetail> terminalTransferDetailList) throws MessageException {
         //本次提交是否有重复SN
         List<TerminalTransferDetail> terminalTransferDetailListA = new ArrayList<>();
         terminalTransferDetailListA.addAll(terminalTransferDetailList);
         if (terminalTransferDetailList.size() > 0) {
             for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailListA) {
-                String snBeginNum1 = terminalTransferDetail.getSnBeginNum();
-                String snEndNum1 = terminalTransferDetail.getSnEndNum();
-                Map<String, Object> map1 = disposeSN(snBeginNum1, snEndNum1);
+                String snBeginNumOut = terminalTransferDetail.getSnBeginNum();
+                String snEndNum1Out = terminalTransferDetail.getSnEndNum();
+                if (snBeginNumOut.length() != snEndNum1Out.length()) {
+                    log.info("repetitionSN 本次提交的SN号" + snBeginNumOut + "---" + snEndNum1Out + "有误请检查");
+                    throw new MessageException("本次提交的SN号" + snBeginNumOut + "---" + snEndNum1Out + "有误请检查");
+                }
+                Map<String, Object> map1 = disposeSN(snBeginNumOut, snEndNum1Out);
                 int number = 0;
                 for (TerminalTransferDetail terminalTransferDetail1 : terminalTransferDetailListA) {
-                    String snBeginNum = terminalTransferDetail1.getSnBeginNum();
-                    String snEndNum = terminalTransferDetail1.getSnEndNum();
-                    if (snBeginNum.length() != snEndNum.length()) {
-                        log.info("repetitionSN 本次提交的SN号" + snBeginNum + "---" + snEndNum + "有误请检查");
-                        throw new MessageException("本次提交的SN号" + snBeginNum + "---" + snEndNum + "有误请检查");
-                    }
-                    Map<String, Object> map2 = disposeSN(snBeginNum, snEndNum);
-                    if (snBeginNum1.length() == snBeginNum.length()) {
+                    String snBeginNumIn = terminalTransferDetail1.getSnBeginNum();
+                    String snEndNumIn = terminalTransferDetail1.getSnEndNum();
+                    Map<String, Object> map2 = disposeSN(snBeginNumIn, snEndNumIn);
+                    if (snBeginNumIn.length() == snEndNumIn.length()) {
                         if (map1.get("sb").toString().equals(map2.get("sb").toString())) {
                             if (!((new Integer((String) map1.get("snEndNum1")) < (new Integer((String) map2.get("snBeginNum1")))) || (new Integer((String) map1.get("snBeginNum1")) > (new Integer((String) map2.get("snEndNum1")))))) {
                                 number++;
@@ -1319,84 +1327,11 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 }
             }
         }
-
-
-//提交是否含有重复SN在审核中
-
-        for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailList) {
-            //检查sn是否在划拨，换活动，退货审批中
-            FastMap fastMap = osnOperateService.checkSNApproval(FastMap
-                    .fastMap("beginSN", terminalTransferDetail.getSnBeginNum())
-                    .putKeyV("endSN", terminalTransferDetail.getSnEndNum())
-                    .putKeyV("type", "transfer"));
-            if (!FastMap.isSuc(fastMap)) throw new MessageException(fastMap.get("msg").toString());
-            String snBeginNum = terminalTransferDetail.getSnBeginNum();
-            String snEndNum = terminalTransferDetail.getSnEndNum();
-            Map<String, Object> map3 = disposeSN(snBeginNum, snEndNum);
-            List<Map<String, Object>> terminalTransferMappers = terminalTransferMapper.getSN((String) map3.get("sb"));
-            for (Map<String, Object> terminalTransferDetailMap : terminalTransferMappers) {
-                String snBeginNumMap = (String) terminalTransferDetailMap.get("SN_BEGIN_NUM");
-                String snEndNumMap = (String) terminalTransferDetailMap.get("SN_END_NUM");
-                Map<String, Object> map4 = disposeSN(snBeginNumMap.trim(), snEndNumMap.trim());
-                if (snBeginNum.length() == snBeginNumMap.length()) {
-                    if (map3.get("sb").toString().equals(map4.get("sb").toString())) {
-                        if (!((new Integer((String) map4.get("snEndNum1")) < (new Integer((String) map3.get("snBeginNum1")))) || (new Integer((String) map4.get("snBeginNum1")) > (new Integer((String) map3.get("snEndNum1")))))) {
-                            log.info("repetitionSN 在区间:" + snBeginNum + "----" + snEndNum + "已经提交过划拨申请");
-                            throw new MessageException("在区间:" + snBeginNum + "----" + snEndNum + "已经提交过划拨申请");
-                        }
-                    }
-                }
-            }
-        }
-
     }
 
-
-    /**
-     * chenliang
-     * 判断重复sn修改时
-     *
-     * @param terminalTransferDetailList
-     * @throws Exception
-     */
-    private void repetitionSNEdit(List<TerminalTransferDetail> terminalTransferDetailList) throws Exception {
-
-        //本次提交是否有重复SN
-        List<TerminalTransferDetail> terminalTransferDetailListA = new ArrayList<>();
-        terminalTransferDetailListA.addAll(terminalTransferDetailList);
-        if (terminalTransferDetailList.size() > 0) {
-            for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailListA) {
-                String snBeginNum1 = terminalTransferDetail.getSnBeginNum();
-                String snEndNum1 = terminalTransferDetail.getSnEndNum();
-                Map<String, Object> map1 = disposeSN(snBeginNum1, snEndNum1);
-                int number = 0;
-                for (TerminalTransferDetail terminalTransferDetail1 : terminalTransferDetailListA) {
-                    String snBeginNum = terminalTransferDetail1.getSnBeginNum();
-                    String snEndNum = terminalTransferDetail1.getSnEndNum();
-                    if (snBeginNum.length() != snEndNum.length()) {
-                        log.info("repetitionSNEdit 本次提交的SN号" + snBeginNum + "---" + snEndNum + "有误请检查");
-                        throw new MessageException("本次提交的SN号" + snBeginNum + "---" + snEndNum + "有误请检查");
-                    }
-                    Map<String, Object> map2 = disposeSN(snBeginNum, snEndNum);
-                    if (snBeginNum1.length() == snBeginNum.length()) {
-                        if (map1.get("sb").toString().equals(map2.get("sb").toString())) {
-                            if (!((new Integer(map1.get("snEndNum1").toString()) < (new Integer(map2.get("snBeginNum1").toString()))) || (new Integer(map1.get("snBeginNum1").toString()) > (new Integer(map2.get("snEndNum1").toString()))))) {
-                                number++;
-                            }
-                        }
-                    }
-                }
-                if (number > 1) {
-                    log.info("repetitionSNEdit 本次提交的SN号存在区间重复，请重新提交");
-                    throw new MessageException("本次提交的SN号存在区间重复，请重新提交");
-                }
-            }
-        }
-
-//提交是否含有重复SN在审核中
-
+    //以前提交是否重复判断
+    public void beforeSubmit(List<TerminalTransferDetail> terminalTransferDetailList) throws MessageException {
         for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailList) {
-
             //检查sn是否在划拨，换活动，退货审批中
             FastMap fastMap = osnOperateService.checkSNApproval(FastMap
                     .fastMap("beginSN", terminalTransferDetail.getSnBeginNum())
@@ -1416,9 +1351,10 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 if (snBeginNum.length() == snBeginNumMap.length()) {
                     if (map3.get("sb").toString().equals(map4.get("sb").toString())) {
                         if (!((new Integer(map4.get("snEndNum1").toString()) < new Integer(map3.get("snBeginNum1").toString())) || (new Integer(map4.get("snBeginNum1").toString()) > new Integer(map3.get("snEndNum1").toString())))) {
-                            num++;
-                            if (num > 1) {
-                                log.info("repetitionSNEdit 在区间:" + snBeginNum + "----" + snEndNum + "已经提交过划拨申请");
+                            if (String.valueOf(terminalTransferDetailMap.get("ID")).equals(terminalTransferDetail.getId())) {
+                                continue;
+                            }else{
+                                log.info("在区间:" + snBeginNum + "----" + snEndNum + "已经提交过划拨申请");
                                 throw new MessageException("在区间:" + snBeginNum + "----" + snEndNum + "已经提交过划拨申请");
                             }
                         }
@@ -1426,9 +1362,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 }
             }
         }
-
     }
-
 
     /**
      * 判断平台是否属于提交平台
@@ -1490,9 +1424,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         if (saveFlag.equals(SaveFlag.TJSP.getValue())) {
             //检查提交数据是否可执行
             if (terminalTransferDetailListsPos != null && terminalTransferDetailListsPos.size() > 0) {
-                String res = redisService.getValue("TerminalTransfer:ISOPEN_RES_trans");
                 AgentResult agentResult = null;
-
                 try {
                     agentResult = termMachineService.queryTerminalTransfer(terminalTransferDetailListsPos, TRANSFER_ZG_CHECK);
                 } catch (Exception e) {
