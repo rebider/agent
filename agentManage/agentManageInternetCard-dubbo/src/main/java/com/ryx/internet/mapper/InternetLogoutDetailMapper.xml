@@ -490,6 +490,18 @@
       <if test="reviewStatus != null">
         and l.review_status = #{reviewStatus}
       </if>
+      <if test="issuerList != null and issuerList.size>0">
+        and i.issuer
+        <foreach collection="issuerList" item="issuer2" open=" in(" close=")" separator=",">
+          #{issuer2}
+        </foreach>
+      </if>
+      <if test="logoutStatusList != null and logoutStatusList.size>0">
+        and i.logout_Status
+        <foreach collection="logoutStatusList" item="logoutStatus2" open=" in(" close=")" separator=",">
+          #{logoutStatus2}
+        </foreach>
+      </if>
       <if test="beginCTime != null">
         <![CDATA[ and i.c_time >= to_date(#{beginCTime},'yyyy-mm-dd hh24:mi:ss') ]]>
       </if>

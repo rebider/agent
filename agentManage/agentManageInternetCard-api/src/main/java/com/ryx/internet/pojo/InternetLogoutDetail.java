@@ -3,6 +3,7 @@ package com.ryx.internet.pojo;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class InternetLogoutDetail implements Serializable{
     private String id;
@@ -70,6 +71,26 @@ public class InternetLogoutDetail implements Serializable{
     private String beginSnNum;
 
     private String endSnNum;
+
+    private List<String> logoutStatusList;
+
+    private List<String> issuerList;
+
+    public List<String> getLogoutStatusList() {
+        return logoutStatusList;
+    }
+
+    public void setLogoutStatusList(List<String> logoutStatusList) {
+        this.logoutStatusList = logoutStatusList;
+    }
+
+    public List<String> getIssuerList() {
+        return issuerList;
+    }
+
+    public void setIssuerList(List<String> issuerList) {
+        this.issuerList = issuerList;
+    }
 
     public String getBeginCTime() {
         return beginCTime;
