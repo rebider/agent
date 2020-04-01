@@ -1304,7 +1304,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 String snBeginNumOut = terminalTransferDetail.getSnBeginNum();
                 String snEndNum1Out = terminalTransferDetail.getSnEndNum();
                 if (snBeginNumOut.length() != snEndNum1Out.length()) {
-                    log.info("repetitionSN 本次提交的SN号" + snBeginNumOut + "---" + snEndNum1Out + "有误请检查");
+                    log.info("本次提交的SN号" + snBeginNumOut + "---" + snEndNum1Out + "有误请检查");
                     throw new MessageException("本次提交的SN号" + snBeginNumOut + "---" + snEndNum1Out + "有误请检查");
                 }
                 Map<String, Object> map1 = disposeSN(snBeginNumOut, snEndNum1Out);
@@ -1322,7 +1322,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     }
                 }
                 if (number > 1) {
-                    log.info("repetitionSN 本次提交的SN号存在区间重复，请重新提交");
+                    log.info(" 本次提交的SN号存在区间重复，请重新提交");
                     throw new MessageException("本次提交的SN号存在区间重复，请重新提交");
                 }
             }
