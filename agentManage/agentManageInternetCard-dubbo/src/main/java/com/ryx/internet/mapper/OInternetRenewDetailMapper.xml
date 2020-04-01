@@ -504,6 +504,12 @@
     <if test="reqMap.orgCode!=null and reqMap.orgCode!='' and reqMap.agentNameList==null">
       and (oa.CODE like concat(#{reqMap.orgCode},'%') or ob.CODE like concat(#{reqMap.orgCode},'%'))
     </if>
+    <if test="reqMap.renewStatusList!=null and reqMap.renewStatusList.size>0">
+      and renew_status
+      <foreach collection="reqMap.renewStatusList" item="renewStatus" open=" in(" close=")" separator=",">
+        #{renewStatus}
+      </foreach>
+    </if>
     <if test="orderByClause != null">
       order by i.${orderByClause}
     </if>
