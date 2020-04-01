@@ -37,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -748,8 +749,13 @@ public class OSupplementServiceImpl implements OSupplementService {
         List<OPaymentDetail> oPaymentDetailList = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
         if(null!=oPaymentDetailList && oPaymentDetailList.size()>0){
             OPaymentDetail oPaymentDetail = oPaymentDetailList.get(0);
-            if(StringUtils.isNotBlank(oPaymentDetail.getOrderId()) && null!=oPaymentDetail.getPlanPayTime()){
-                amount=oPaymentDetailMapper.selectQk(oPaymentDetail);
+            if(StringUtils.isNotBlank(oPaymentDetail.getOrderId())){
+                SimpleDateFormat mm = new SimpleDateFormat("YYYY-MM");
+                String time = mm.format(new Date());
+                amount=oPaymentDetailMapper.selectQk(oPaymentDetail.getOrderId(),time);
+                if (null==amount){
+                    amount=new BigDecimal(BigInteger.ZERO);
+                }
             }
         }
         return amount;

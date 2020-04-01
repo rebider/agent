@@ -84,7 +84,8 @@ public interface OPaymentDetailMapper {
 
     List<OPaymentDetail> selectThtkPaymentDetails(@Param("agentId")String agentId);
 
-    BigDecimal selectQk(OPaymentDetail oPaymentDetail);
+    BigDecimal selectQk(@Param("orderId")String orderId, @Param("time")String time);
 
     List<OPaymentDetail> selectPaymentDetail(@Param("orderId")String orderId, @Param("paymentType")String paymentType, @Param("paymentStatus")BigDecimal paymentStatus);
+
 }
