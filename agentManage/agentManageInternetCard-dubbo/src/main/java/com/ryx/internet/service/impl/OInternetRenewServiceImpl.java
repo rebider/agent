@@ -130,6 +130,9 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }else if(StringUtils.isNotBlank(internetRenew.getAgentName())){
             criteria.andAgentNameLike("%"+internetRenew.getAgentName()+"%");
         }
+        if(internetRenew.getRenewWayList()!=null && internetRenew.getRenewWayList().size()>0){
+            reqMap.put("renewWayList", internetRenew.getRenewWayList());
+        }
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         internetRenewExample.setReqMap(reqMap);
         internetRenewExample.setPage(page);
