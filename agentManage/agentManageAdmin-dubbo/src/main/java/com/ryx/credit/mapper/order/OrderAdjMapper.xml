@@ -816,6 +816,12 @@
            nvl(oa.refund_tm,'') as refund_tm,
            oa.real_refund_amo,
            oa.reviews_date,
+          nvl((
+          select oan.org_name
+          from o_organization oan
+          left join a_agent_businfo ab on ab.organ_num = oan.org_id
+          where ab.id = oo.bus_id and oan.status=1 and ab.status=1
+          ),'') as organ_num,
       (select max(o_order_adj.org_pay_amo) from o_order_adj where o_order_adj.order_id = oa.order_id)as current_amo,
     (select max(o_order_adj_detail.org_pro_num) from o_order_adj_detail where o_order_adj_detail.sub_order_id = oad.sub_order_id) as max_pro_num
     from o_order_adj_detail oad
