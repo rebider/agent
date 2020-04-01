@@ -358,8 +358,6 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
 
             //判断sn是否重复提交
             repetitionSN(terminalTransferDetailList);
-            // * 判断平台是否属于提交平台
-            String result = platformSame(terminalTransferDetailList, saveFlag);
 
             terminalTransfer.setReviewStatus(AgStatus.Create.status);
             String terminalTransferId = idService.genId(TabId.O_TERMINAL_TRANSFER);
@@ -416,7 +414,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 terminalTransferDetail.setBusId(terminalTransfer.getPlatformType());
                 terminalTransferDetailMapper.insert(terminalTransferDetail);
             }
-
+            // * 判断平台是否属于提交平台
+            String result = platformSame(terminalTransferDetailList, saveFlag);
             if (saveFlag.equals(SaveFlag.TJSP.getValue())) {
                 startTerminalTransferActivity(terminalTransferId, cuser, agentId, false);
             }
@@ -527,6 +526,11 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             //判断代理商名称
             Map<String, String> resultMap = saveOrEditVerify(terminalTransferDetail, agentId);
         }
+        //判断上下级
+        judgeSubSup(terminalTransferDetails, agentId);
+
+        //判断sn是否重复提交
+        repetitionSN(terminalTransferDetails);
         //判断平台是否属于提交平台
         platformSame(terminalTransferDetails, SaveFlag.TJSP.getValue());
         if (terminalTransfer == null) {
