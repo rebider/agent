@@ -1010,6 +1010,12 @@ public class CompensateServiceImpl implements CompensateService {
     public AgentResult approvalTask(AgentVo agentVo, String userId) throws ProcessException{
         try {
             if(agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())){
+
+
+
+
+
+
                 BigDecimal deductAmt = new BigDecimal(0);
                 if(agentVo.getDeductCapitalList()!=null && agentVo.getDeductCapitalList().size()!=0){
                     if(agentVo.getDeductCapitalList()!=null)
@@ -1047,6 +1053,20 @@ public class CompensateServiceImpl implements CompensateService {
                 }
                 //1表示机具欠款已抵扣
                 ORefundPriceDiff oRefundPriceDiff= refundPriceDiffMapper.selectByPrimaryKey(agentVo.getAgentBusId());
+
+                //校验
+                ORefundPriceDiffDetailExample oRefundPriceDiffDetailExample = new ORefundPriceDiffDetailExample();
+                ORefundPriceDiffDetailExample.Criteria criteria = oRefundPriceDiffDetailExample.createCriteria();
+                criteria.andRefundPriceDiffIdEqualTo(oRefundPriceDiff.getId());
+                criteria.andStatusEqualTo(Status.STATUS_1.status);
+                List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(oRefundPriceDiffDetailExample);
+
+                //校验是否能通过
+                AgentResult synOrVerifyResult_check = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "check");
+                if(!synOrVerifyResult_check.isOK()){
+                    throw new ProcessException(synOrVerifyResult_check.getMsg());
+                }
+
                 if(agentVo.getFlag().equals("1")){
                     BigDecimal subtract = oRefundPriceDiff.getRelCompAmt().subtract(agentVo.getoRefundPriceDiffVo().getMachOweAmt());
                     String subtractStr = String.valueOf(subtract);
@@ -1237,6 +1257,12 @@ public class CompensateServiceImpl implements CompensateService {
         criteria.andRefundPriceDiffIdEqualTo(rel.getBusId());
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(oRefundPriceDiffDetailExample);
+
+        //校验是否能通过
+        AgentResult synOrVerifyResult_check = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "check");
+        if(!synOrVerifyResult_check.isOK()){
+            throw new ProcessException(synOrVerifyResult_check.getMsg());
+        }
 
         if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
             oRefundPriceDiffDetails.forEach(row->{
