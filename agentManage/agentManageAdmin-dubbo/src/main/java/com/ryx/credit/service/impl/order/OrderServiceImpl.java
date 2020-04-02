@@ -6773,7 +6773,7 @@ public class OrderServiceImpl implements OrderService {
         if (map.get("proName") != null && StringUtils.isNotBlank((String)map.get("proName"))){
             map.put("proName",Arrays.asList(((String)map.get("proName")).split(",")));
         }else {
-            par.put("proName",new  ArrayList<String>());
+            map.put("proName",new  ArrayList<String>());
         }
         if(null!=map.get("userId")) {
             Long userId = (Long) map.get("userId");
