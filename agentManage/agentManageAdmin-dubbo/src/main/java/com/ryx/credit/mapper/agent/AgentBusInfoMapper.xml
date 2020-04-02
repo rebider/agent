@@ -1347,6 +1347,9 @@ union
       <if test="busId != null"> and a.id = #{busId} </if>
       and c.status = 1
       and d.d_status = 1
+      AND b.status =1
+      and a.status = 1
+      and a.clo_review_status IN (2,3)
     </where>
   </select>
 </mapper>

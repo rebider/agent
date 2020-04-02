@@ -230,13 +230,14 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         joTaskOld.setDealPersonId(joTask.getDealPersonId());
         String dealCode = joTask.getDealGroupId();
         JoOrder newOrder = joOrderMapper.selectByPrimaryKey(joId);
+        String oldContent = StringUtils.isBlank(joTaskOld.getJoTaskContent())?"":joTaskOld.getJoTaskContent();
         if("0".equals(dealCode)){
-            joTaskOld.setJoTaskContent(StringUtils.isBlank(joTaskOld.getJoTaskContent())?"":joTaskOld.getJoTaskContent()
-                    +"转发到发起人:"+
+            joTaskOld.setJoTaskContent(oldContent
+                    +" 转发到发起人:"+
                     content.substring(content.indexOf(":")+1, content.length()));
         }else{
-            joTaskOld.setJoTaskContent(StringUtils.isBlank(joTaskOld.getJoTaskContent())?"":joTaskOld.getJoTaskContent()
-                    +"转发到" + joTask.getDealGroup()+":"+
+            joTaskOld.setJoTaskContent(oldContent
+                    +" 转发到" + joTask.getDealGroup()+":"+
             content.substring(content.indexOf(":")+1, content.length()));
         }
         // 结束工单任务
