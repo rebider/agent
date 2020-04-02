@@ -177,10 +177,10 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
         String joAcceptTimeBeginStr = (String) map.get("launchBeginTime");
         String joAcceptTimeEndStr = (String) map.get("launchEndTime");
         if((StringUtils.isNotBlank(joAcceptTimeBeginStr) && StringUtils.isNotBlank(joAcceptTimeEndStr))){
-                joAcceptTimeBeginStr =joAcceptTimeBeginStr.substring(0,10);
-                joAcceptTimeEndStr =joAcceptTimeEndStr.substring(0,10);
-                map.put("launchBeginTime",DateUtil.format(joAcceptTimeBeginStr,DateUtil.DATE_FORMAT_yyyy_MM_dd));
-                map.put("launchEndTime",DateUtil.format(joAcceptTimeEndStr,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+                joAcceptTimeBeginStr =joAcceptTimeBeginStr.substring(0,19);
+                joAcceptTimeEndStr =joAcceptTimeEndStr.substring(0,19);
+                map.put("launchBeginTime",DateUtil.format(joAcceptTimeBeginStr,DateUtil.DATE_FORMAT_1));
+                map.put("launchEndTime",DateUtil.format(joAcceptTimeEndStr,DateUtil.DATE_FORMAT_1));
         }else {
             map.put("launchBeginTime",null);
             map.put("launchEndTime",null);
