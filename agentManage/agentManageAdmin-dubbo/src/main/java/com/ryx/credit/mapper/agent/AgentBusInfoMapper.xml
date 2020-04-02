@@ -1340,9 +1340,6 @@ union
         SELECT  dd.d_itemvalue FROM d_dict dd
         WHERE dd.d_group = #{dictGroup} AND dd.d_artifact = #{dictItem}
       )
-<!--      <foreach collection="reqMap.dictlist" item="dictItem" open="(" separator="," close=")">-->
-<!--        #{dictItem.D_ITEMVALUE}-->
-<!--      </foreach>-->
       and a.agent_id = #{agentId}
       <if test="busId != null"> and a.id = #{busId} </if>
       and c.status = 1
