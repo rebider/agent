@@ -558,7 +558,9 @@ public class CompensateServiceImpl implements CompensateService {
                     throw new ProcessException("应打款金额："+oRefundPriceDiff.getRelCompAmt());
                 }
             }
+
             //遍历补差价明细进行校验和信息补全
+            Set<String> set_platform = new HashSet<>();
             refundPriceDiffDetailList.forEach(refundPriceDiffDetail->{
                 Map<String, Object> logisticsDetail = null;
                 if(StringUtils.isNotBlank(refundPriceDiffDetail.getActivityFrontId()) && !refundPriceDiffDetail.getActivityFrontId().equals("undefined")){
@@ -737,8 +739,17 @@ public class CompensateServiceImpl implements CompensateService {
                     throw new ProcessException("保存失败");
                 }
 
+                if(StringUtils.isBlank(refundPriceDiffDetail.getPlatformType())){
+                    throw new ProcessException("sn "+refundPriceDiffDetail.getBeginSn()+":"+refundPriceDiffDetail.getEndSn()+" 所属平台不能为空!");
+                }
+                set_platform.add(refundPriceDiffDetail.getPlatformType());
 
             });
+
+            if(set_platform.size()>1){
+                log.info("申请sn所属平台必须一致：{}",set_platform);
+                throw new ProcessException("申请sn所属平台必须一致");
+            }
 
             AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(refundPriceDiffDetailList, "check");
             if(!synOrVerifyResult.isOK()){
