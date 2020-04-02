@@ -519,8 +519,10 @@
       <if test="priorityLevel!=null and priorityLevel!=''"> and jo.priority_level = #{priorityLevel} </if>
       <if test="joProgress!=null and joProgress!=''"> and jo.jo_progress = #{joProgress} </if>
       <if test="launchBranchName!=null and launchBranchName!=''"> and jo.launch_branch_name like CONCAT(CONCAT('%',#{launchBranchName}),'%') </if>
-      <if test="launchBeginTime!=null and launchEndTime!=null">  and jo.launch_time between #{launchBeginTime} and #{launchEndTime} </if>
-      <if test="taskBeginTime!=null and taskEndTime!=null"> and ta.jo_task_accept_time between #{taskBeginTime} and #{taskEndTime}) </if>
+      <if test="launchBeginTime!=null and launchEndTime!=null"> and to_date(to_char(jo.launch_time,'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss') between to_date(to_char(#{launchBeginTime},'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss')  and to_date(to_char(#{launchEndTime},'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss') </if>
+      <if test="taskBeginTime!=null and taskEndTime!=null"> and to_date(to_char(ta.jo_task_accept_time,'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss') between to_date(to_char(#{taskBeginTime},'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss')  and to_date(to_char(#{taskEndTime},'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss') </if>
+      <!--<if test="launchBeginTime!=null and launchEndTime!=null">  and jo.launch_time between #{launchBeginTime} and #{launchEndTime} </if>-->
+      <!--<if test="taskBeginTime!=null and taskEndTime!=null"> and ta.jo_task_accept_time between #{taskBeginTime} and #{taskEndTime}) </if>-->
       <if test="agId!=null and agId!=''"> and jo.ag_id = #{agId} </if>
       <if test="joDealGroupId!=null and joDealGroupId!=''"> and exists(select jt.id from jo_task jt where jt.jo_id = jo.id and jt.deal_group_id = #{joDealGroupId}) </if>
       <if test="secondDealGroup!=null and secondDealGroup!=''"> and exists(select jt.id from jo_task jt where jt.jo_id = jo.id and jt.second_deal_group like CONCAT(CONCAT('%',#{secondDealGroup}),'%')) </if>
