@@ -1,9 +1,10 @@
 package com.ryx.credit.pojo.admin;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class CBranchInner {
+public class CBranchInner implements Serializable {
     private String id;
 
     private String branchLogin;

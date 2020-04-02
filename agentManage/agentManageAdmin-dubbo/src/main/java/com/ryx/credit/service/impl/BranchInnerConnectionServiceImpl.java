@@ -17,9 +17,10 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.CBranchInnerMapper;
 import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.CUserMapper;
+import com.ryx.credit.dao.agent.AgentBusInfoMapper;
+import com.ryx.credit.machine.entity.LmsUser;
 import com.ryx.credit.machine.service.LmsUserService;
 import com.ryx.credit.pojo.admin.CBranchInner;
-import com.ryx.credit.pojo.admin.CBranchInnerExample;
 import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.vo.UserVo;
 import com.ryx.credit.service.IBranchInnerConnectionService;
@@ -34,8 +35,9 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.lang.reflect.Array;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.*;
 
 /**
@@ -58,6 +60,8 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
     private COrganizationMapper organizationMapper;
     @Autowired
     private IBranchInnerConnectionService branchInnerConnectionService;
+    @Autowired
+    private AgentBusInfoMapper agentBusInfoMapper;
 
     /**
      * 查询省区账号list
@@ -69,28 +73,114 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
     }
 
     /**
+     * 查询修改所需数据
+     * @param fastMap
+     * @return
+     */
+    @Override
+    public FastMap queryEditData(FastMap fastMap) throws Exception {
+        if (!(null != fastMap && null != fastMap.get("id"))) {
+            throw new Exception("传递数据为空，获取数据失败，请刷新重试！");
+        }
+        CBranchInner cBranchInner = branchInnerMapper.selectByPrimaryKey(fastMap.get("id").toString());
+        List<Map<String, String>> innerList = lmsUserService.queryAllLmsUser();
+        return FastMap.fastMap("innerList", innerList).putKeyV("cBranchInner", cBranchInner);
+    }
+
+    /**
+     * 保存修改后数据
+     * @param fastMap
+     * @return
+     * @throws Exception
+     */
+    @Override
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public FastMap editConnectionAccount(FastMap fastMap) throws Exception {
+        if (null == fastMap || null == fastMap.get("branch") || null == fastMap.get("oldInner") || null == fastMap.get("inner")) {
+            throw new Exception("系统异常，请稍后再试！");
+        }
+        String branch = fastMap.get("branch").toString();
+        String oldInner = fastMap.get("oldInner").toString();
+        String inner = fastMap.get("inner").toString();
+
+        //校验修改前账号
+        List<CBranchInner> oldConnection = branchInnerMapper.selectByMap(FastMap.fastMap("status", 1).putKeyV("branchId", branch).putKeyV("innerLogin", oldInner));
+        if (oldConnection.size() != 1) throw new MessageException("账户不存在，不能修改！");
+
+        //校验修改后账号
+        List<CBranchInner> newConnection = branchInnerMapper.selectByMap(FastMap.fastMap("status", 1).putKeyV("branchId", branch).putKeyV("innerLogin", inner));
+        if (newConnection.size() > 0) throw new MessageException("修改后的账户关系已存在，不能修改！");
+
+        //查询总管账号信息
+        LmsUser lmsUser = lmsUserService.queryByLogin(inner);
+        //查询表中数据信息
+        List<CBranchInner> cBranchInners = branchInnerMapper.selectByMap(FastMap
+                .fastMap("status", 1)
+                .putKeyV("branchId", branch)
+                .putKeyV("innerLogin", oldInner)
+        );
+        CBranchInner cBranchInner = cBranchInners.get(0);
+        cBranchInner.setInnerLogin(inner);
+        cBranchInner.setInnerName(lmsUser.getName());
+        //更新表数据
+        if (1 != branchInnerMapper.updateByPrimaryKey(cBranchInner)) {
+            throw new MessageException("更新失败，请稍后重试！");
+        }
+
+        //查询busNum
+        List<String> busNums = agentBusInfoMapper.selectBusNumByBusProCode(
+                FastMap.fastMap("platformTypes", new String[]{PlatformType.POS.code,
+                        PlatformType.ZPOS.code,
+                        PlatformType.ZHPOS.code,
+                        PlatformType.SSPOS.code})
+                        .putKeyV("branchLogin", branch)
+        );
+        if (busNums.size() > 0) {
+            JSONObject data = new JSONObject();
+            data.put("addAccounts", inner);
+            data.put("delAccounts", oldInner);
+            data.put("orgId", String.join(",", busNums));
+            AgentResult agentResult = request("ORG021", data);
+            if (!agentResult.isOK()) throw new MessageException(agentResult.getMsg());
+        }
+
+        return FastMap.fastSuccessMap("编辑成功");
+    }
+
+    /**
      * 解除关联关系
      * @param id
      * @return
      */
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
-    public Map<String, Object> removeBranchInnerConnection(String id) {
-        int t = 0;
-        //先查询，查询账号是否存在状态为2的，
-        if (branchInnerMapper.countByIdforUpdate(id) == 1) {
-            //存在-删除(此数据)
-            t = branchInnerMapper.deleteInnerByIds(id);
-        } else {
-            //不存在-将状态更新成2
-            t = branchInnerMapper.updateByPrimaryId(id);
+    public FastMap removeBranchInnerConnection(String id) throws Exception{
+
+        CBranchInner cBranchInner = branchInnerMapper.selectByPrimaryKey(id);
+        String loginname = cBranchInner.getInnerLogin();
+        String branchLogin = cBranchInner.getBranchLogin();
+
+        if (1 != branchInnerMapper.deleteInnerByIds(id)) throw new MessageException("删除失败,请稍后重试！");
+
+        //查询busNum
+        List<String> busNums = agentBusInfoMapper.selectBusNumByBusProCode(
+                FastMap.fastMap("platformTypes", new String[]{PlatformType.POS.code,
+                        PlatformType.ZPOS.code,
+                        PlatformType.ZHPOS.code,
+                        PlatformType.SSPOS.code})
+                        .putKeyV("branchLogin", branchLogin)
+        );
+
+        if (busNums.size() > 0) {
+            JSONObject data = new JSONObject();
+            data.put("loginname", loginname);
+            data.put("dType", "1");
+            data.put("delOrgIds", String.join(",", busNums));
+            AgentResult agentResult = request("ORG020", data);
+            if (!agentResult.isOK()) throw new MessageException(agentResult.getMsg());
         }
 
-        if (t == 1) {
-            return FastMap.fastMap("code", "1").putKeyV("msg", "删除成功");
-        } else {
-            return FastMap.fastMap("code", "2").putKeyV("msg", "删除失败");
-        }
+        return FastMap.fastSuccessMap("删除成功");
     }
 
     /**
@@ -335,5 +425,117 @@ public class BranchInnerConnectionServiceImpl implements IBranchInnerConnectionS
 
         logger.info("新建用户:{}", cBranchInner);
         return AgentResult.ok();
+    }
+
+    /**
+     * 请求POS接口封装参数
+     * @param tranCode
+     * @param data
+     * @return
+     * @throws Exception
+     */
+    private AgentResult request(String tranCode, JSONObject data) throws Exception {
+        try {
+            logger.info("POS省总账号联动请求参数明文:{}", data);
+            PrivateKey rsaPrivateKey = RSAUtil.getRSAPrivateKey(AppConfig.getProperty("industryAuth_local_private_key"), "pem", null, "RSA");
+            PublicKey rsaPublicKey = RSAUtil.getRSAPublicKey(AppConfig.getProperty("industryAuth_cooper_public_key"), "pem", "RSA");
+            String cooperator = AppConfig.getProperty("industryAuth_cooperator");
+            String charset = "UTF-8"; // 字符集
+            String reqMsgId = UUID.randomUUID().toString().replace("-", ""); // 请求流水
+            String reqDate = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"); // 请求时间
+
+            JSONObject jsonParams = new JSONObject();
+            jsonParams.put("version", "1.0.0");
+            jsonParams.put("msgType", "01");
+            jsonParams.put("reqDate", reqDate);
+            jsonParams.put("data", data);
+            String plainXML = jsonParams.toString();
+            logger.info("POS省总账号联动请求参数:{}", plainXML);
+            // 请求报文加密开始
+            String keyStr = AESUtil.getAESKey();
+            byte[] plainBytes = plainXML.getBytes(charset);
+            byte[] keyBytes = keyStr.getBytes(charset);
+            String encryptData = new String(org.apache.commons.codec.binary.Base64.encodeBase64((AESUtil.encrypt(plainBytes, keyBytes, "AES", "AES/ECB/PKCS5Padding", null))), charset);
+            String signData = new String(org.apache.commons.codec.binary.Base64.encodeBase64(RSAUtil.digitalSign(plainBytes, rsaPrivateKey, "SHA1WithRSA")), charset);
+            String encrtptKey = new String(org.apache.commons.codec.binary.Base64.encodeBase64(RSAUtil.encrypt(keyBytes, rsaPublicKey, 2048, 11, "RSA/ECB/PKCS1Padding")), charset);
+            // 请求报文加密结束
+
+            Map<String, String> map = new HashMap<>();
+            map.put("encryptData", encryptData);
+            map.put("encryptKey", encrtptKey);
+            map.put("cooperator", cooperator);
+            map.put("signData", signData);
+            map.put("tranCode", tranCode);
+            map.put("reqMsgId", reqMsgId);
+            String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("industryAuth_url"), map);
+            JSONObject jsonObject = JSONObject.parseObject(httpResult);
+            if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
+                logger.info("POS省总账号联动请求异常" + httpResult);
+                return AgentResult.fail("POS省总账号联动接口调用失败");
+            } else {
+                String resEncryptData = jsonObject.getString("encryptData");
+                String resEncryptKey = jsonObject.getString("encryptKey");
+                byte[] decodeBase64KeyBytes = org.apache.commons.codec.binary.Base64.decodeBase64(resEncryptKey.getBytes(charset));
+                byte[] merchantAESKeyBytes = RSAUtil.decrypt(decodeBase64KeyBytes, rsaPrivateKey, 2048, 11, "RSA/ECB/PKCS1Padding");
+                byte[] decodeBase64DataBytes = org.apache.commons.codec.binary.Base64.decodeBase64(resEncryptData.getBytes(charset));
+                byte[] merchantXmlDataBytes = AESUtil.decrypt(decodeBase64DataBytes, merchantAESKeyBytes, "AES", "AES/ECB/PKCS5Padding", null);
+                String respXML = new String(merchantXmlDataBytes, charset);
+                logger.info("POS省总账号联动返回参数：{}", respXML);
+
+                // 报文验签
+                String resSignData = jsonObject.getString("signData");
+                byte[] signBytes = org.apache.commons.codec.binary.Base64.decodeBase64(resSignData);
+                if (!RSAUtil.verifyDigitalSign(respXML.getBytes(charset), signBytes, rsaPublicKey, "SHA1WithRSA")) {
+                    logger.info("POS省总账号联动签名验证失败");
+                } else {
+                    logger.info("POS省总账号联动返回参数:{}", respXML);
+                    JSONObject respXMLObj = JSONObject.parseObject(respXML);
+                    String respCode = String.valueOf(respXMLObj.get("respCode"));
+                    if (respCode.equals("000000")) {
+                        return AgentResult.ok();
+                    } else {
+                        if (null != respXMLObj.get("data") && null != JSONObject.parseObject(String.valueOf(respXMLObj.get("data"))).get("result_msg")) {
+                            return AgentResult.fail(JSONObject.parseObject(String.valueOf(respXMLObj.get("data"))).get("result_msg").toString());
+                        }
+                        return AgentResult.fail("业务系统删除失败！");
+                    }
+                }
+                return AgentResult.fail("POS省总账号联动请求异常");
+            }
+        } catch (Exception e) {
+            logger.info("POS省总账号联动通知失败:{}", e.getMessage());
+            throw e;
+        }
+    }
+
+    /**
+     * 解除关联关系
+     * @param
+     * @return
+     */
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Override
+    public FastMap relevanceBranchInner(String id) throws Exception {
+
+        CBranchInner cBranchInner = branchInnerMapper.selectByPrimaryKey(id);
+
+        //查询busNum
+        List<String> busNums = agentBusInfoMapper.selectBusNumByBusProCode(
+                FastMap.fastMap("platformTypes", new String[]{PlatformType.POS.code,
+                        PlatformType.ZPOS.code,
+                        PlatformType.ZHPOS.code,
+                        PlatformType.SSPOS.code})
+                        .putKeyV("branchLogin", cBranchInner.getBranchLogin())
+        );
+        if (busNums.size() > 0) {
+            JSONObject data = new JSONObject();
+            data.put("addAccounts", cBranchInner.getInnerLogin());
+            data.put("delAccounts", "");
+            data.put("orgId", String.join(",", busNums));
+            AgentResult agentResult = request("ORG021", data);
+            if (!agentResult.isOK()) throw new MessageException(agentResult.getMsg());
+        }
+
+        return FastMap.fastSuccessMap("关联成功！");
     }
 }
