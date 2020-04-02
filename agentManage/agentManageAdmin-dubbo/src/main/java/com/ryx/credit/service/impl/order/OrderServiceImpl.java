@@ -6769,7 +6769,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderAdjustVo> excelOrderAdjustDetailAll(Map map) {
 
-        List<OrderAdjustVo> orderAdjVoList = orderAdjMapper.excelOrderAdjustDetailAll(map);
         if (map.get("proName") != null && StringUtils.isNotBlank((String)map.get("proName"))){
             map.put("proName",Arrays.asList(((String)map.get("proName")).split(",")));
         }else {
@@ -6780,6 +6779,7 @@ public class OrderServiceImpl implements OrderService {
             List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
             map.put("platfromPerm", platfromPerm);
         }
+        List<OrderAdjustVo> orderAdjVoList = orderAdjMapper.excelOrderAdjustDetailAll(map);
         if (null!=orderAdjVoList && orderAdjVoList.size()>0) {
             for (OrderAdjustVo orderAdjustVo : orderAdjVoList) {
                 if (StringUtils.isNotBlank(orderAdjustVo.getReviewsStat()) && !orderAdjustVo.getReviewsStat().equals("null")) {
