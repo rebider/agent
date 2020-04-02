@@ -1583,44 +1583,50 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
      */
     //传入两个sn  返回其共同部分，以及相差区间。
     public Map<String, Object> disposeSN(String snBeginNum, String snEndNum) throws MessageException {
+        log.info("处理传入SN开始处理：开始SN："+snBeginNum+"结束SN："+snEndNum);
         Map<String, Object> map = new HashMap<>();
-        String snBeginNumArr = snBeginNum;
-        String snEndNumArr = snEndNum;
-        if (snBeginNum.length() > 6) {
 
-            snBeginNumArr = snBeginNum.substring(snBeginNum.length() - 6);
-        }
-        if (snEndNum.length() > 6) {
+        try {
+            String snBeginNumArr = snBeginNum;
+            String snEndNumArr = snEndNum;
+            if (snBeginNum.length() > 6) {
 
-            snEndNumArr = snEndNum.substring(snEndNum.length() - 6);
-        }
-        String[] snBeginNumChar = snBeginNumArr.split("");
-        String[] snEndNumChar = snEndNumArr.split("");
-        StringBuffer sbBegin = new StringBuffer();
-        for (int i = snBeginNumChar.length - 1; i >= 0; i--) {
-            if (Character.isDigit(snBeginNumChar[i].charAt(0))) {
-                sbBegin.append(snBeginNumChar[i]);
-            } else {
-                break;
+                snBeginNumArr = snBeginNum.substring(snBeginNum.length() - 6);
             }
-        }
+            if (snEndNum.length() > 6) {
 
-        String sb1 = snBeginNum.replaceAll(sbBegin.reverse().toString(), "");
-
-        StringBuffer sbEnd = new StringBuffer();
-        for (int i = snEndNumChar.length - 1; i >= 0; i--) {
-            if (Character.isDigit(snEndNumChar[i].charAt(0))) {
-                sbEnd.append(snEndNumChar[i]);
-            } else {
-                break;
+                snEndNumArr = snEndNum.substring(snEndNum.length() - 6);
             }
+            String[] snBeginNumChar = snBeginNumArr.split("");
+            String[] snEndNumChar = snEndNumArr.split("");
+            StringBuffer sbBegin = new StringBuffer();
+            for (int i = snBeginNumChar.length - 1; i >= 0; i--) {
+                if (Character.isDigit(snBeginNumChar[i].charAt(0))) {
+                    sbBegin.append(snBeginNumChar[i]);
+                } else {
+                    break;
+                }
+            }
+
+            String sb1 = snBeginNum.replaceAll(sbBegin.reverse().toString(), "");
+
+            StringBuffer sbEnd = new StringBuffer();
+            for (int i = snEndNumChar.length - 1; i >= 0; i--) {
+                if (Character.isDigit(snEndNumChar[i].charAt(0))) {
+                    sbEnd.append(snEndNumChar[i]);
+                } else {
+                    break;
+                }
+            }
+            String sb2 = snEndNum.replaceAll(sbEnd.reverse().toString(), "");
+            map.put("sb", sb1);
+            map.put("snBeginNum1", "".equals(sbBegin) ? "0" : sbBegin.toString());
+            map.put("snEndNum1", "".equals(sbEnd) ? "0" : sbEnd.toString());
+
+        } catch (StringIndexOutOfBoundsException e) {
+            throw new MessageException("StringIndexOutOfBoundsException异常忽略");
         }
-        String sb2 = snEndNum.replaceAll(sbEnd.reverse().toString(), "");
-        map.put("sb", sb1);
-        map.put("snBeginNum1", "".equals(sbBegin) ? "0" : sbBegin.toString());
-        map.put("snEndNum1", "".equals(sbEnd) ? "0" : sbEnd.toString());
         return map;
-
     }
 
 
