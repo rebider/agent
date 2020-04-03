@@ -97,15 +97,15 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         if((StringUtils.isNotBlank(joAcceptTimeBeginStr) && StringUtils.isNotBlank(joAcceptTimeEndStr))
         || (StringUtils.isNotBlank(joStartTimeBeginStr) && StringUtils.isNotBlank(joStartTimeEndStr))){
             if(StringUtils.isNotBlank(joAcceptTimeBeginStr)){
-                joAcceptTimeBeginStr =joAcceptTimeBeginStr.substring(0,10);
-                joAcceptTimeEndStr =joAcceptTimeEndStr.substring(0,10);
-                joTaskVo.setJoAcceptTimeBegin(DateUtil.format(joAcceptTimeBeginStr,DateUtil.DATE_FORMAT_yyyy_MM_dd));
-                joTaskVo.setJoAcceptTimeEnd(DateUtil.format(joAcceptTimeEndStr,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+                joAcceptTimeBeginStr =joAcceptTimeBeginStr.substring(0,19);
+                joAcceptTimeEndStr =joAcceptTimeEndStr.substring(0,19);
+                joTaskVo.setJoAcceptTimeBegin(DateUtil.format(joAcceptTimeBeginStr,DateUtil.DATE_FORMAT_1));
+                joTaskVo.setJoAcceptTimeEnd(DateUtil.format(joAcceptTimeEndStr,DateUtil.DATE_FORMAT_1));
             }else{
-                joStartTimeBeginStr =joStartTimeBeginStr.substring(0,10);
-                joStartTimeEndStr =joStartTimeEndStr.substring(0,10);
-                joTaskVo.setJoStartTimeBegin(DateUtil.format(joStartTimeBeginStr,DateUtil.DATE_FORMAT_yyyy_MM_dd));
-                joTaskVo.setJoStartTimeEnd(DateUtil.format(joStartTimeEndStr,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+                joStartTimeBeginStr =joStartTimeBeginStr.substring(0,19);
+                joStartTimeEndStr =joStartTimeEndStr.substring(0,19);
+                joTaskVo.setJoStartTimeBegin(DateUtil.format(joStartTimeBeginStr,DateUtil.DATE_FORMAT_1));
+                joTaskVo.setJoStartTimeEnd(DateUtil.format(joStartTimeEndStr,DateUtil.DATE_FORMAT_1));
             }
         }
         List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(joTaskVo.getUserId());

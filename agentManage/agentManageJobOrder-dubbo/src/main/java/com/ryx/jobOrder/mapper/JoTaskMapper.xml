@@ -420,12 +420,18 @@
       <if test="example.joTaskStatus != null and example.joTaskStatus != ''">
         and jt.jo_task_status = #{example.joTaskStatus}
       </if>
-      <if test="example.joStartTimeBegin != null and example.joStartTimeEnd != null ">
+      <if test="joStartTimeBegin!=null and joStartTimeEnd!=null">
+        and to_date(to_char(jo_task_time,'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss') between to_date(to_char(#{joStartTimeBegin},'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss')  and to_date(to_char(#{joStartTimeEnd},'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="joAcceptTimeBegin!=null and joAcceptTimeEnd!=null">
+        and to_date(to_char(jo_task_accept_time,'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss') between to_date(to_char(#{joAcceptTimeBegin},'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss')  and to_date(to_char(#{joAcceptTimeEnd},'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss')
+      </if>
+      <!--<if test="example.joStartTimeBegin != null and example.joStartTimeEnd != null ">
         and jo_task_time between #{example.joStartTimeBegin} and #{example.joStartTimeEnd}
       </if>
       <if test="example.joAcceptTimeBegin != null and example.joAcceptTimeEnd != null ">
         and jo_task_accept_time between #{example.joAcceptTimeBegin} and #{example.joAcceptTimeEnd}
-      </if>
+      </if>-->
     </where>
         order by joTaskId desc
   </sql>

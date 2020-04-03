@@ -59,16 +59,16 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
         String taskBeginTime = (String) map.get("taskBeginTime");
         String taskEndTime = (String) map.get("taskEndTime");
         if (StringUtils.isNotBlank(launchBeginTime) && StringUtils.isNotBlank(launchEndTime)) {
-            launchBeginTime =launchBeginTime.substring(0,10);
-            launchEndTime =launchEndTime.substring(0,10);
-            map.put("launchBeginTime", DateUtil.format(launchBeginTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
-            map.put("launchEndTime", DateUtil.format(launchEndTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+            launchBeginTime =launchBeginTime.substring(0,19);
+            launchEndTime =launchEndTime.substring(0,19);
+            map.put("launchBeginTime", DateUtil.format(launchBeginTime,DateUtil.DATE_FORMAT_1));
+            map.put("launchEndTime", DateUtil.format(launchEndTime,DateUtil.DATE_FORMAT_1));
         }
         if (StringUtils.isNotBlank(taskBeginTime) && StringUtils.isNotBlank(taskEndTime)) {
             taskBeginTime =taskBeginTime.substring(0,10);
             taskEndTime =taskEndTime.substring(0,10);
-            map.put("taskBeginTime", DateUtil.format(taskBeginTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
-            map.put("taskEndTime", DateUtil.format(taskEndTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+            map.put("taskBeginTime", DateUtil.format(taskBeginTime,DateUtil.DATE_FORMAT_1));
+            map.put("taskEndTime", DateUtil.format(taskEndTime,DateUtil.DATE_FORMAT_1));
         }
         int jobOrderListCount = joOrderMapper.queryJobOrderListCount(map);
         List<JoTaskVo> jobOrderList = joOrderMapper.queryJobOrderList(map);
@@ -87,16 +87,16 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
         String taskBeginTime = (String) map.get("taskBeginTime");
         String taskEndTime = (String) map.get("taskEndTime");
         if (StringUtils.isNotBlank(launchBeginTime) && StringUtils.isNotBlank(launchEndTime)) {
-            launchBeginTime =launchBeginTime.substring(0,10);
-            launchEndTime =launchEndTime.substring(0,10);
-            map.put("launchBeginTime", DateUtil.format(launchBeginTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
-            map.put("launchEndTime", DateUtil.format(launchEndTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+            launchBeginTime =launchBeginTime.substring(0,19);
+            launchEndTime =launchEndTime.substring(0,19);
+            map.put("launchBeginTime", DateUtil.format(launchBeginTime,DateUtil.DATE_FORMAT_1));
+            map.put("launchEndTime", DateUtil.format(launchEndTime,DateUtil.DATE_FORMAT_1));
         }
         if (StringUtils.isNotBlank(taskBeginTime) && StringUtils.isNotBlank(taskEndTime)) {
-            taskBeginTime =taskBeginTime.substring(0,10);
-            taskEndTime =taskEndTime.substring(0,10);
-            map.put("taskBeginTime", DateUtil.format(taskBeginTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
-            map.put("taskEndTime", DateUtil.format(taskEndTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+            taskBeginTime =taskBeginTime.substring(0,19);
+            taskEndTime =taskEndTime.substring(0,19);
+            map.put("taskBeginTime", DateUtil.format(taskBeginTime,DateUtil.DATE_FORMAT_1));
+            map.put("taskEndTime", DateUtil.format(taskEndTime,DateUtil.DATE_FORMAT_1));
         }
         int jobOrderListCount = joOrderMapper.queryAgentJobOrderListCount(map);
         List<JoTaskVo> jobOrderList = joOrderMapper.queryAgentJobOrderList(map);
@@ -115,16 +115,16 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
         String taskBeginTime = (String) map.get("taskBeginTime");
         String taskEndTime = (String) map.get("taskEndTime");
         if (StringUtils.isNotBlank(launchBeginTime) && StringUtils.isNotBlank(launchEndTime)) {
-            launchBeginTime =launchBeginTime.substring(0,10);
-            launchEndTime =launchEndTime.substring(0,10);
-            map.put("launchBeginTime", DateUtil.format(launchBeginTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
-            map.put("launchEndTime", DateUtil.format(launchEndTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+            launchBeginTime =launchBeginTime.substring(0,19);
+            launchEndTime =launchEndTime.substring(0,19);
+            map.put("launchBeginTime", DateUtil.format(launchBeginTime,DateUtil.DATE_FORMAT_1));
+            map.put("launchEndTime", DateUtil.format(launchEndTime,DateUtil.DATE_FORMAT_1));
         }
         if (StringUtils.isNotBlank(taskBeginTime) && StringUtils.isNotBlank(taskEndTime)) {
-            taskBeginTime =taskBeginTime.substring(0,10);
-            taskEndTime =taskEndTime.substring(0,10);
-            map.put("taskBeginTime", DateUtil.format(taskBeginTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
-            map.put("taskEndTime", DateUtil.format(taskEndTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+            taskBeginTime =taskBeginTime.substring(0,19);
+            taskEndTime =taskEndTime.substring(0,19);
+            map.put("taskBeginTime", DateUtil.format(taskBeginTime,DateUtil.DATE_FORMAT_1));
+            map.put("taskEndTime", DateUtil.format(taskEndTime,DateUtil.DATE_FORMAT_1));
         }
         int jobOrderListCount = joOrderMapper.queryCityJobOrderListCount(map);
         List<JoTaskVo> jobOrderList = joOrderMapper.queryCityJobOrderList(map);
@@ -143,16 +143,16 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
         String taskBeginTime = (String) map.get("taskBeginTime");
         String taskEndTime = (String) map.get("taskEndTime");
         if (StringUtils.isNotBlank(launchBeginTime) && StringUtils.isNotBlank(launchEndTime)) {
-            launchBeginTime =launchBeginTime.substring(0,10);
-            launchEndTime =launchEndTime.substring(0,10);
-            map.put("launchBeginTime", DateUtil.format(launchBeginTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
-            map.put("launchEndTime", DateUtil.format(launchEndTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+            launchBeginTime =launchBeginTime.substring(0,19);
+            launchEndTime =launchEndTime.substring(0,19);
+            map.put("launchBeginTime", DateUtil.format(launchBeginTime,DateUtil.DATE_FORMAT_1));
+            map.put("launchEndTime", DateUtil.format(launchEndTime,DateUtil.DATE_FORMAT_1));
         }
         if (StringUtils.isNotBlank(taskBeginTime) && StringUtils.isNotBlank(taskEndTime)) {
-            taskBeginTime =taskBeginTime.substring(0,10);
-            taskEndTime =taskEndTime.substring(0,10);
-            map.put("taskBeginTime", DateUtil.format(taskBeginTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
-            map.put("taskEndTime", DateUtil.format(taskEndTime,DateUtil.DATE_FORMAT_yyyy_MM_dd));
+            taskBeginTime =taskBeginTime.substring(0,19);
+            taskEndTime =taskEndTime.substring(0,19);
+            map.put("taskBeginTime", DateUtil.format(taskBeginTime,DateUtil.DATE_FORMAT_1));
+            map.put("taskEndTime", DateUtil.format(taskEndTime,DateUtil.DATE_FORMAT_1));
         }
         int jobOrderListCount = joOrderMapper.queryGroupJobOrderListCount(map);
         List<JoTaskVo> jobOrderList = joOrderMapper.queryGroupJobOrderList(map);
