@@ -587,6 +587,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
 
                 List<TerminalTransferDetail> terminalTransferDetails = queryDetailByTerminalId(busId);
                 log.info("本次提交的明细SN:{}", JSONObject.toJSON(terminalTransferDetails));
+                //判断sn是否重复提交
+                repetitionSN(terminalTransferDetails);
                 if (tf) {
                     platformSame(terminalTransferDetails, SaveFlag.TJSP.getValue());
                 }
