@@ -333,8 +333,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
 //                            List<String> list = new ArrayList<>();
 //                            list.add(PlatformType.MPOS.code);
 //                            list.add(PlatformType.RHPOS.code);
-                            platFormExample.or()
-                                    .andStatusEqualTo(Status.STATUS_1.status);
+                            platFormExample.or().andStatusEqualTo(Status.STATUS_1.status);
 //                            .andPlatformTypeIn(list);
                             List<PlatForm>  platForms = platFormMapper.selectByExample(platFormExample);
                             List<String> pltcode = new ArrayList<>();
@@ -342,13 +341,13 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             for (PlatForm platForm : platForms) {
                                 pltcode.add(platForm.getPlatformNum());
                             }
-                            //查询首刷业务
+                            //查询业务
                             AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
                             agentBusInfoExample.or()
                                     .andStatusEqualTo(Status.STATUS_1.status)
                                     .andBusPlatformIn(pltcode)
                                     .andCloReviewStatusEqualTo(AgStatus.Approved.status)
-                                    .andBusStatusEqualTo(BusinessStatus.Enabled.status)
+                                    .andBusStatusIn(Arrays.asList(BusinessStatus.Enabled.status,BusinessStatus.inactive.status,BusinessStatus.lock.status,BusinessStatus.pause.status))
                                     .andAgentIdEqualTo(vo.getAgent().getId());
                             List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
 
@@ -439,31 +438,18 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             logger.info("===============================更新合同信息开始");
                             ResultVO updateAgentContractVoRes = agentContractService.updateAgentContractVo(vo.getContractVoList(), vo.getAgent(),vo.getAgent().getcUser());
                             logger.info("===============================更新合同信息结束");
-
-
                             Agent preVoAgent = preVo.getAgent();
-
                             if (voColinfoVoList.size()>0){
                                 if (voColinfoVoList.size() != preVoColinfoVoList.size()){       //新增收款账户
                                     //一分钱验证、同步至业务系统
-
                                     logger.info("========================一分钱验证状态修改开始");
                                     for (AgentColinfoVo agentColinfo:voColinfoVoList){
                                         agentColinfo.setPayStatus(ColinfoPayStatus.A.getValue());
                                     }
                                     agentColinfoService.updateAgentColinfoVo(voColinfoVoList, vo.getAgent(),rel.getcUser(),null);
                                     logger.info("========================一分钱验证状态修改完成");
-
-                                    logger.info("========================同步至业务系统开始");
-                                    for (AgentBusInfo agentBusInfo : agentBusInfoList) {
-                                        agentNetInNotityService.asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
-                                    }
-                                    logger.info("========================同步至业务系统完成");
-
                                     //建立收款账户和平台码的关系
                                     AgentColinfo agentColinfoVo=voColinfoVoList.get(0);
-
-
                                     for (AgentBusInfo agentBusInfo : agentBusInfoList) {        //为业务平台建立结算卡关系
 
                                         AgentColinfoRel agentColinfoRel = new AgentColinfoRel();
@@ -475,7 +461,11 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
 
                                         agentColinfoService.saveAgentColinfoRel(agentColinfoRel, rel.getcUser());
                                     }
-
+                                    logger.info("========================同步至业务系统开始");
+                                    for (AgentBusInfo agentBusInfo : agentBusInfoList) {
+                                        agentNetInNotityService.asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
+                                    }
+                                    logger.info("========================同步至业务系统完成");
                                 }else{
                                     boolean synTemp=true;
                                     boolean checkTemp=true;

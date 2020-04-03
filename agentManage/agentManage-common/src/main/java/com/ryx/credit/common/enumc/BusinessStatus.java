@@ -10,7 +10,7 @@ import java.util.List;
  */
 public enum BusinessStatus {
 
-    pause(0,"注销"),
+    pause(0,"未启用"),
     Enabled(1,"启用"),
     inactive(2,"未激活"),
     lock(3,"锁定"),
