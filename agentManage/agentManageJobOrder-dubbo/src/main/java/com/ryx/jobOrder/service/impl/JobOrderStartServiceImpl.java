@@ -187,6 +187,8 @@ public class JobOrderStartServiceImpl implements JobOrderStartService {
         JoExpandKeyExample joExpandKeyExample = new JoExpandKeyExample();
         JoExpandKeyExample.Criteria criteria = joExpandKeyExample.createCriteria();
         criteria.andJidEqualTo(joId);
-        return joExpandKeyMapper.selectByExample(joExpandKeyExample);
+        joExpandKeyExample.setOrderByClause("jm.JO_KEY_SORT");
+        List<JoExpandKey> list = joExpandKeyMapper.selectByExampleLeftManage(joExpandKeyExample);
+        return list;
     }
 }

@@ -177,4 +177,25 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <sql id="Base_Column_List2">
+    jk.JID, jk.JO_KEY_ID, jk.JO_KEY, jk.JO_KEY_VALUE_TYPE,jk.JO_KEY_NAME, jk.JO_KEY_VALUE, jk.JO_EXPAND_SORT
+  </sql>
+  <select id="selectByExampleLeftManage" parameterType="com.ryx.jobOrder.pojo.JoExpandKeyExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List2" />
+    from JO_EXPAND_KEY jk
+    left join jo_key_manage jm on jm.id = jk.JO_KEY_ID
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
 </mapper>

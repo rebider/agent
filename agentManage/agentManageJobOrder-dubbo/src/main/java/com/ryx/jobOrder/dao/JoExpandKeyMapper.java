@@ -20,4 +20,6 @@ public interface JoExpandKeyMapper {
     int updateByPrimaryKeySelective(JoExpandKey record);
 
     int updateByPrimaryKey(JoExpandKey record);
+
+    List<JoExpandKey> selectByExampleLeftManage(JoExpandKeyExample example);
 }

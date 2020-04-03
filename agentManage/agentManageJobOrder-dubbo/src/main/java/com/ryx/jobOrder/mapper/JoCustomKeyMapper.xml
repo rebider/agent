@@ -269,5 +269,6 @@
     <if test="joCustomKey.joSecondKeyNum != null and joCustomKey.joSecondKeyNum != '' " >
       and a.JO_SECOND_KEY_NUM = #{joCustomKey.joSecondKeyNum}
     </if>
+    order by b.jo_key_sort
   </select>
 </mapper>
