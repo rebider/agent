@@ -112,6 +112,10 @@ public class PlannerServiceImpl implements PlannerService {
         reqMap.put("agStatus", AgStatus.Approved.name());
         reqMap.put("cIncomStatus", AgentInStatus.NO.status);
         reqMap.put("cloReviewStatus", AgStatus.Approved.status);
+        List<Dict> dictList = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.APPROVAL_OPINION.name());
+        if (dictList.size()>0 && dictList!=null) {
+            reqMap.put("approvalOpinion", dictList);
+        }
         List<Map<String, Object>> plannerList = receiptOrderMapper.queryPlannerAll(reqMap, page);
         //退货子订单编号
         if(plannerList.size()>0 && null!=map.get("O_RETURN_ORDER_DETAIL_ID")){
@@ -312,6 +316,10 @@ public class PlannerServiceImpl implements PlannerService {
             map.put("avtivityName", "%"+map.get("avtivityName")+"%");
         }
 
+        List<Dict> dictList = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.APPROVAL_OPINION.name());
+        if (dictList.size()>0 && dictList!=null) {
+            map.put("approvalOpinion", dictList);
+        }
         List<ReceiptOrderVo> receiptOrderVoList = receiptOrderMapper.exportPlanner(map);
         if (receiptOrderVoList.size()>0 && receiptOrderVoList!=null) {
             for (ReceiptOrderVo receiptOrderVo : receiptOrderVoList) {

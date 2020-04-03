@@ -385,7 +385,19 @@
     businfo.bus_num,
     businfo.ag_doc_district,
     businfo.ag_doc_pro,
-      to_char(P.c_time, 'yyyy-MM-dd hh24:mi:ss') as C_TIME
+    to_char(P.c_time, 'yyyy-MM-dd hh24:mi:ss') as C_TIME,
+    (
+      select LISTAGG(a_approval_flow_record.approval_opinion,';') WITHIN GROUP(ORDER BY R.order_id)
+      from a_approval_flow_record
+      left join o_order on a_approval_flow_record.bus_id = o_order.id and o_order.status = '1'
+      where o_order.id = R.order_id and a_approval_flow_record.status = '1' and a_approval_flow_record.bus_type = 'ORDER'
+      <if test="approvalOpinion!=null and approvalOpinion.size>0">
+        and a_approval_flow_record.approval_person in
+        <foreach collection="approvalOpinion" item="approvalOpinionItem" open="(" separator="," close=")">
+          #{approvalOpinionItem.dItemvalue}
+        </foreach>
+      </if>
+    ) as approval_opinion
     FROM O_RECEIPT_PLAN R
     LEFT JOIN O_RECEIPT_ORDER O ON R.RECEIPT_ID = O.ID and o.status=1 and R.status=1
     LEFT JOIN D_REGION D ON O.ADDR_PROVINCE = D.R_CODE

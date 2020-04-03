@@ -115,7 +115,8 @@ public enum DictGroup {
     TOKEN_CODE("令牌"),
     PASSKEY("密码AES_KEY"),
     OFFSET_PAY_TYPE("补款方式"),
-    ADJ_ID("准备拒绝的订单调整id");
+    ADJ_ID("准备拒绝的订单调整id"),
+    APPROVAL_OPINION("订单审批意见");
 
 
 
