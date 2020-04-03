@@ -421,10 +421,10 @@
         and jt.jo_task_status = #{example.joTaskStatus}
       </if>
       <if test="example.joStartTimeBegin!=null and example.joStartTimeEnd!=null">
-        and to_date(to_char(jo_task_time,'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss') between to_date(to_char(#{example.joStartTimeBegin},'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss')  and to_date(to_char(#{example.joStartTimeEnd},'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss')
+        and to_date(to_char(jt.jo_task_time,'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss') between to_date(to_char(#{example.joStartTimeBegin},'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss')  and to_date(to_char(#{example.joStartTimeEnd},'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss')
       </if>
       <if test="example.joAcceptTimeBegin!=null and example.joAcceptTimeEnd!=null">
-        and to_date(to_char(jo_task_accept_time,'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss') between to_date(to_char(#{example.joAcceptTimeBegin},'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss')  and to_date(to_char(#{example.joAcceptTimeEnd},'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss')
+        and to_date(to_char(jt.jo_task_accept_time,'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss') between to_date(to_char(#{example.joAcceptTimeBegin},'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss')  and to_date(to_char(#{example.joAcceptTimeEnd},'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss')
       </if>
       <!--<if test="example.joStartTimeBegin != null and example.joStartTimeEnd != null ">
         and jo_task_time between #{example.joStartTimeBegin} and #{example.joStartTimeEnd}
