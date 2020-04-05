@@ -25,7 +25,7 @@
         on crr.role_id = cr.id
         left join c_resource cre
         on cre.id = crr.resource_id
-        where cr.status = '0'  and cr.DESCRIPTION like 'Group%' and cr.seq = '0'
+        where cr.status = '0'  and cr.DESCRIPTION like 'Group%' and cr.STATUS = '0'
         <if test="jobOrderType != null">
               and cre.url = #{jobOrderType}
           </if>
@@ -45,7 +45,7 @@
     <select id="getAllAcceptGroup" resultType="java.util.Map">
         select cro.id, cro.name, cro.description
         from c_role cro
-        where cro.description like 'Group%' and cro.status = 0 and cro.seq = '0'
+        where cro.description like 'Group%' and cro.status = 0 and cro.STATUS = '0'
     </select>
     <select id="getAcceptByAcceptCode" parameterType="string" resultType="java.util.Map">
         select NAME,DESCRIPTION from C_ROLE where DESCRIPTION = #{acceptCode}
