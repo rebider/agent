@@ -101,7 +101,8 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
                 joAcceptTimeEndStr =joAcceptTimeEndStr.substring(0,19);
                 joTaskVo.setJoAcceptTimeBegin(DateUtil.format(joAcceptTimeBeginStr,DateUtil.DATE_FORMAT_1));
                 joTaskVo.setJoAcceptTimeEnd(DateUtil.format(joAcceptTimeEndStr,DateUtil.DATE_FORMAT_1));
-            }else{
+            }
+            if(StringUtils.isNotBlank(joStartTimeBeginStr)){
                 joStartTimeBeginStr =joStartTimeBeginStr.substring(0,19);
                 joStartTimeEndStr =joStartTimeEndStr.substring(0,19);
                 joTaskVo.setJoStartTimeBegin(DateUtil.format(joStartTimeBeginStr,DateUtil.DATE_FORMAT_1));
