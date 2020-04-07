@@ -147,6 +147,7 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
     @Override
     public List<JoTask> queryJobOrderTask(JoTask joTask) {
         JoTaskExample joTaskExample = queryParam(joTask);
+        joTaskExample.setOrderByClause("id desc");
         return joTaskMapper.selectByExample(joTaskExample);
     }
 
