@@ -79,6 +79,8 @@
             <if test="userId!= null">
                 and cu.id = #{userId}
             </if>
+            and cre.STATUS = '0'
+            and cre.OPENED = '1'
         </where>
         )
         order by jm1.JO_KEY_SORT,jm2.JO_KEY_SORT,jm3.JO_KEY_SORT asc
@@ -97,7 +99,7 @@
         left join C_ROLE cr on cr.ID = crr.ROLE_ID
         left join C_USER_ROLE cur on cur.ROLE_ID = cr.ID
         left join C_USER cu on cu.ID = cur.USER_ID
-        where  cr.DESCRIPTION like 'Views_agent' AND CRE.PID IS NOT NULL )
+        where  cr.DESCRIPTION like 'Views_agent' AND CRE.PID IS NOT NULL  and cre.STATUS = '0' and cre.OPENED = '1')
         order by jm1.JO_KEY_SORT,jm2.JO_KEY_SORT,jm3.JO_KEY_SORT asc
     </select>
 </mapper>
