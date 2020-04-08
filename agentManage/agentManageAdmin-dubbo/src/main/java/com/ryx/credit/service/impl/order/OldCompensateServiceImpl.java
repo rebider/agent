@@ -323,6 +323,9 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 log.info("活动调整保存打款记录失败1");
                 throw new MessageException("保存打款记录失败");
             }
+
+            Set<String> setOldOrgId = new HashSet<>();
+            Set<String> setPlatform = new HashSet<>();
             for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {
 
                 if(StringUtils.isBlank(refundPriceDiffDetail.getOldOrgId())){
@@ -437,6 +440,18 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                     log.info("插入补退差价详情表异常");
                     throw new MessageException("保存失败");
                 }
+                setPlatform.add(refundPriceDiffDetail.getPlatformType());
+                setOldOrgId.add(refundPriceDiffDetail.getOldOrgId());
+            }
+
+            if(setPlatform.size()>1){
+                log.info("申请sn所属平台必须一致：{}", setPlatform);
+                throw new ProcessException("申请sn所属平台必须一致");
+            }
+
+            if(setOldOrgId.size() > 1){
+                log.info("仅支持单品牌的活动调整申请：{}", setOldOrgId);
+                throw new ProcessException("仅支持单品牌的活动调整申请。");
             }
 
             //校验是否可以调整
