@@ -120,8 +120,8 @@ public class JobOrderManageServiceImpl implements JobOrderManageService {
 
     @Override
     public List<JoKeyManage> queryKeywordByJoStatus(JoKeyManage joKeyManage) {
-        JoKeyManageExample joKeyManageExample = new JoKeyManageExample();
-        JoKeyManageExample.Criteria criteria = joKeyManageExample.createCriteria();
+        JoKeyManageExample example = new JoKeyManageExample();
+        JoKeyManageExample.Criteria criteria = example.or().andJoStatusEqualTo(Status.STATUS_1.status.toString());
         if (StringUtils.isNotBlank(joKeyManage.getJoKeyType())){
             criteria.andJoKeyTypeEqualTo(joKeyManage.getJoKeyType());
         }
@@ -131,8 +131,8 @@ public class JobOrderManageServiceImpl implements JobOrderManageService {
         if(StringUtils.isNotBlank(joKeyManage.getJoKeyBackNum())){
             criteria.andJoKeyBackNumEqualTo(joKeyManage.getJoKeyBackNum());
         }
-        criteria.andJoStatusEqualTo(Status.STATUS_1.status.toString());
-        List<JoKeyManage> joKeyManageList = joKeyManageMapper.selectByExample(joKeyManageExample);
+        example.setOrderByClause(" jo_key_sort desc ");
+        List<JoKeyManage> joKeyManageList = joKeyManageMapper.selectByExample(example);
         if(null!=joKeyManageList && joKeyManageList.size()>0){
             return joKeyManageList;
         }
