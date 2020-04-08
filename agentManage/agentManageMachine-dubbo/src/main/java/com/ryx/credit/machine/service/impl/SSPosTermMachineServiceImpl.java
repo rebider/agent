@@ -370,6 +370,7 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
     public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws ProcessException {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("operation", operation);
+        jsonObject.put("isFreeze", "0");
         List<Map<String, Object>> listDetail = new ArrayList<>();
         for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {
 
@@ -402,6 +403,7 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
             mapDetail.put("oldMachineId", refundPriceDiffDetail.getOldMachineId());
             mapDetail.put("oldBrandCode", refundPriceDiffDetail.getOldBrandCode());
             mapDetail.put("newBrandCode", refundPriceDiffDetail.getNewBrandCode());
+            mapDetail.put("adjNum", refundPriceDiffDetail.getChangeCount());
             if(org.apache.commons.lang.StringUtils.isNotBlank(refundPriceDiffDetail.getDeliveryTimeType())){
                 mapDetail.put("deliveryTimeType", refundPriceDiffDetail.getDeliveryTimeType());
                 if(refundPriceDiffDetail.getDeliveryTimeType().equals(DeliveryTimeType.ZERO.getValue())){
