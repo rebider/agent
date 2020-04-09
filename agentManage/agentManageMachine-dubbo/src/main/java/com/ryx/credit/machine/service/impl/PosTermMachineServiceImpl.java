@@ -323,7 +323,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
             mapDetail.put("oldMachineId", refundPriceDiffDetail.getOldMachineId());
             mapDetail.put("oldBrandCode", refundPriceDiffDetail.getOldBrandCode());
             mapDetail.put("newBrandCode", refundPriceDiffDetail.getNewBrandCode());
-            mapDetail.put("adjNum", refundPriceDiffDetail.getChangeCount());
+            mapDetail.put("adjNum", refundPriceDiffDetail.getChangeCount().toString());
             if(StringUtils.isNotBlank(refundPriceDiffDetail.getDeliveryTimeType())){
                 mapDetail.put("deliveryTimeType", refundPriceDiffDetail.getDeliveryTimeType());
                 if(refundPriceDiffDetail.getDeliveryTimeType().equals(DeliveryTimeType.ZERO.getValue())){
