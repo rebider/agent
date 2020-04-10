@@ -71,7 +71,7 @@ public class OrderAdjustScanServiceImpl implements ActBusRelScanService {
 
 
 
-    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
+    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW,rollbackFor = Exception.class)
     @Override
     public FastMap dealEvent(EventSysAct eventSysAct) throws MessageException {
 

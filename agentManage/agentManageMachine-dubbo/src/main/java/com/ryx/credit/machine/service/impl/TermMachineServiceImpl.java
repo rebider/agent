@@ -224,7 +224,7 @@ public class TermMachineServiceImpl  implements TermMachineService {
     @Override
     public AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception {
         AgentResult agentResult = AgentResult.fail();
-        if(PlatformType.POS.getValue().equals(platformType)){
+        if(PlatformType.whetherPOS(platformType)){
             agentResult =  posTermMachineServiceImpl.queryCompensateResult(serialNumber,platformType);
         }else if(PlatformType.SSPOS.getValue().equals(platformType)){
             agentResult =  sPosTermMachineServiceImpl.queryCompensateResult(serialNumber,platformType);
@@ -261,9 +261,9 @@ public class TermMachineServiceImpl  implements TermMachineService {
         if (PlatformType.whetherPOS(platformType)) {
             return posTermMachineServiceImpl.checkOrderReturnSN(list, platformType);
         } else if (PlatformType.SSPOS.getValue().equals(platformType)) {
-            return rdbTermMachineServiceImpl.checkOrderReturnSN(list, platformType);
+            return sPosTermMachineServiceImpl.checkOrderReturnSN(list, platformType);
         } else if (PlatformType.MPOS.getValue().equals(platformType)) {
-            return rdbTermMachineServiceImpl.checkOrderReturnSN(list, platformType);
+            return mposTermMachineServiceImpl.checkOrderReturnSN(list, platformType);
         } else if (PlatformType.RDBPOS.getValue().equals(platformType)) {
             return rdbTermMachineServiceImpl.checkOrderReturnSN(list, platformType);
         } else {
@@ -277,9 +277,9 @@ public class TermMachineServiceImpl  implements TermMachineService {
         if (PlatformType.whetherPOS(platformType)) {
             return posTermMachineServiceImpl.unfreezeOrderReturnSN(list, platformType);
         } else if (PlatformType.SSPOS.getValue().equals(platformType)) {
-            return rdbTermMachineServiceImpl.unfreezeOrderReturnSN(list, platformType);
+            return sPosTermMachineServiceImpl.unfreezeOrderReturnSN(list, platformType);
         } else if (PlatformType.MPOS.getValue().equals(platformType)) {
-            return rdbTermMachineServiceImpl.unfreezeOrderReturnSN(list, platformType);
+            return mposTermMachineServiceImpl.unfreezeOrderReturnSN(list, platformType);
         } else if (PlatformType.RDBPOS.getValue().equals(platformType)) {
             return rdbTermMachineServiceImpl.unfreezeOrderReturnSN(list, platformType);
         } else {

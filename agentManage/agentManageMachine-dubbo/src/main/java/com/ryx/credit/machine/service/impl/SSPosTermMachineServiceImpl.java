@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -420,7 +421,7 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
             listDetail.add(mapDetail);
         }
         jsonObject.put("snList", listDetail);
-        log.info("活动调整POS请求参数:{}",JSONObject.toJSON(jsonObject));
+        log.info("实时POS活动调整请求参数:{}",JSONObject.toJSON(jsonObject));
         AgentResult res = request("ORG016", jsonObject);
         if(res.isOK()) {
             JSONObject respXMLObj = JSONObject.parseObject(res.getMsg());
@@ -464,7 +465,7 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                log.error("活动调整POS请求参数失敗:",e);
+                log.error("实时POS活动调整请求参数失敗:",e);
                 return AgentResult.fail("服务失败");
             }
         }

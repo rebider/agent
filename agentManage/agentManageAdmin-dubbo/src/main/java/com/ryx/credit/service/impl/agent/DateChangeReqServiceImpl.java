@@ -1,20 +1,18 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.enumc.AgStatus;
-import com.ryx.credit.common.enumc.DictGroup;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.agent.AgentBusInfoMapper;
+import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.DateChangeRequestMapper;
-import com.ryx.credit.pojo.admin.agent.Agent;
-import com.ryx.credit.pojo.admin.agent.DateChangeRequest;
-import com.ryx.credit.pojo.admin.agent.Dict;
+import com.ryx.credit.dao.agent.PlatFormMapper;
+import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.agent.DateChangeReqService;
@@ -44,9 +42,46 @@ public class DateChangeReqServiceImpl implements DateChangeReqService{
     private IdService idService;
     @Autowired
     private DictOptionsService dictOptionsService;
+    @Autowired
+    private AgentBusInfoMapper agentBusInfoMapper;
+    @Autowired
+    private PlatFormMapper platFormMapper;
+    @Autowired
+    private AgentMapper agentMapper;
     @Override
     public ResultVO dateChangeReqIn(String json,String oldJson,String srcId,String type,String userId) {
         try {
+
+            if(DataChangeApyType.DC_Colinfo.name().equals(type)){
+                Agent agent = agentMapper.selectByPrimaryKey(srcId);
+                //检查业务是否有审批通过未启用业务
+                AgentBusInfoExample example = new AgentBusInfoExample();
+                example.or().andStatusEqualTo(Status.STATUS_1.status)
+                        .andCloReviewStatusEqualTo(AgStatus.Approved.status)
+                        .andAgentIdEqualTo(srcId)
+                        .andBusStatusNotIn(Arrays.asList(BusStatus.QY.status,BusStatus.SD.status,BusStatus.WJH.status,BusStatus.WQY.status));
+                List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(example);
+                for (AgentBusInfo agentBusInfo : agentBusInfoList) {
+                    if(agentBusInfo.getBusStatus()!=null){
+                        if(StringUtils.isBlank(agentBusInfo.getBusNum())){
+                            PlatForm p =  platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+                            return ResultVO.fail("请检查["+agent.getAgName()+"]["+p.getPlatformName()+"]业务，出现业务编号为空的无效业务，请处理完成后进行提交");
+                        }
+                        if(agentBusInfo.getBusStatus().compareTo(BusStatus.SD.status)==0){
+                            PlatForm p =  platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+                            return ResultVO.fail("请检查["+agent.getAgName()+"]["+p.getPlatformName()+"]["+agentBusInfo.getBusNum()+"]业务，该业务被锁定，请处理完成后进行提交");
+                        }
+                        if(agentBusInfo.getBusStatus().compareTo(BusStatus.WJH.status)==0){
+                            PlatForm p =  platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+                            return ResultVO.fail("请检查["+agent.getAgName()+"]["+p.getPlatformName()+"]["+agentBusInfo.getBusNum()+"]业务，该业务未激活，请处理完成后进行提交");
+                        }
+                        if(agentBusInfo.getBusStatus().compareTo(BusStatus.WQY.status)==0){
+                            PlatForm p =  platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+                            return ResultVO.fail("请检查["+agent.getAgName()+"]["+p.getPlatformName()+"]["+agentBusInfo.getBusNum()+"]业务，该业务未启用，请处理完成后进行提交");
+                        }
+                    }
+                }
+            }
             logger.info("开始数据变更");
             DateChangeRequest changeRequest = new DateChangeRequest();
             Date date = Calendar.getInstance().getTime();

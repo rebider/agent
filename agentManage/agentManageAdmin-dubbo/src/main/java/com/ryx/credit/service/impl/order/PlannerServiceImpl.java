@@ -178,33 +178,6 @@ public class PlannerServiceImpl implements PlannerService {
             OSubOrderActivity OSubOrderActivityItem = oSubOrderActivities.get(0);
             //排单活动
             OActivity sure_activity = oActivityMapper.selectByPrimaryKey(activityId);
-            //cxinfo  保存排单 确定具体活动 价格计算采用活动中的价格 xx
-
-            //确定活动
-            //            OActivity real_activity = sure_activity;
-            //            OSubOrderActivityItem.setActivityId(real_activity.getId());
-            //            OSubOrderActivityItem.setActivityName(real_activity.getActivityName());
-            //            OSubOrderActivityItem.setActivityWay(real_activity.getActivityWay());
-            //            OSubOrderActivityItem.setActivityRule(real_activity.getActivityRule());
-            //            OSubOrderActivityItem.setVender(real_activity.getVender());
-            //            OSubOrderActivityItem.setProModel(real_activity.getProModel());
-            //            OSubOrderActivityItem.setBusProCode(real_activity.getBusProCode());
-            //            OSubOrderActivityItem.setBusProName(real_activity.getBusProName());
-            //            OSubOrderActivityItem.setTermBatchcode(real_activity.getTermBatchcode());
-            //            OSubOrderActivityItem.setTermBatchname(real_activity.getTermBatchname());
-            //            OSubOrderActivityItem.setTermtype(real_activity.getTermtype());
-            //            OSubOrderActivityItem.setTermtypename(real_activity.getTermtypename());
-            //            OSubOrderActivityItem.setOriginalPrice(real_activity.getOriginalPrice());
-            //            OSubOrderActivityItem.setPrice(real_activity.getPrice());
-            //            OSubOrderActivityItem.setPosType(real_activity.getPosType());
-            //            OSubOrderActivityItem.setPosSpePrice(real_activity.getPosSpePrice());
-            //            OSubOrderActivityItem.setStandTime(real_activity.getStandTime());
-            //            OSubOrderActivityItem.setBackType(real_activity.getBackType());
-            //            OSubOrderActivityItem.setStandAmt(real_activity.getStandAmt());
-            //            if(1!=oSubOrderActivityMapper.updateByPrimaryKeySelective(OSubOrderActivityItem)){
-            //                throw new MessageException("更新活动失败!");
-            //            }
-
 
             receiptPlan.setProType(oSubOrderItem.getProType());
             int receiptInsert = receiptPlanMapper.insert(receiptPlan);
@@ -215,6 +188,8 @@ public class PlannerServiceImpl implements PlannerService {
             OReceiptPro receiptPro = new OReceiptPro();
             receiptPro.setId(receiptProId);
             receiptPro.setSendNum(oReceiptPro.getSendNum().add(receiptPlan.getPlanProNum()));
+            receiptPro.setVersion(oReceiptPro.getVersion());
+            //当前排单数量加上历史排单数量等于配货数量更新为已派单
             if (receiptPro.getSendNum().equals(oReceiptPro.getProNum())) {
                 receiptPro.setReceiptProStatus(OReceiptStatus.DISPATCHED_ORDER.code);
             }
@@ -223,11 +198,14 @@ public class PlannerServiceImpl implements PlannerService {
                 log.info("保存排单异常");
                 throw new MessageException("保存排单异常!");
             }
+
+
             //没有待排单的商品更新收货单状态
             OReceiptProExample oReceiptProExample = new OReceiptProExample();
             OReceiptProExample.Criteria criteria = oReceiptProExample.createCriteria();
             criteria.andReceiptIdEqualTo(receiptPlan.getReceiptId());
             criteria.andReceiptProStatusEqualTo(OReceiptStatus.WAITING_LIST.code);
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
             List<OReceiptPro> oReceiptPros = receiptProMapper.selectByExample(oReceiptProExample);
             if (oReceiptPros.size() == 0) {
                 OReceiptOrder receiptOrder = new OReceiptOrder();

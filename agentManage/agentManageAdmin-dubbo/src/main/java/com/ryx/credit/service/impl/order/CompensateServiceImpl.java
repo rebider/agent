@@ -558,7 +558,10 @@ public class CompensateServiceImpl implements CompensateService {
                     throw new ProcessException("应打款金额："+oRefundPriceDiff.getRelCompAmt());
                 }
             }
+
             //遍历补差价明细进行校验和信息补全
+            Set<String> setPlatform = new HashSet<>();
+            Set<String> setOldOrgId = new HashSet<>();
             refundPriceDiffDetailList.forEach(refundPriceDiffDetail->{
                 Map<String, Object> logisticsDetail = null;
                 if(StringUtils.isNotBlank(refundPriceDiffDetail.getActivityFrontId()) && !refundPriceDiffDetail.getActivityFrontId().equals("undefined")){
@@ -737,8 +740,22 @@ public class CompensateServiceImpl implements CompensateService {
                     throw new ProcessException("保存失败");
                 }
 
-
+                if(StringUtils.isBlank(refundPriceDiffDetail.getPlatformType())){
+                    throw new ProcessException("sn "+refundPriceDiffDetail.getBeginSn()+":"+refundPriceDiffDetail.getEndSn()+" 所属平台不能为空!");
+                }
+                setPlatform.add(refundPriceDiffDetail.getPlatformType());
+                setOldOrgId.add(refundPriceDiffDetail.getOldOrgId());
             });
+
+            if(setPlatform.size()>1){
+                log.info("申请sn所属平台必须一致：{}", setPlatform);
+                throw new ProcessException("申请sn所属平台必须一致");
+            }
+
+            if(setOldOrgId.size() > 1){
+                log.info("仅支持单品牌的活动调整申请：{}", setOldOrgId);
+                throw new ProcessException("仅支持单品牌的活动调整申请。");
+            }
 
             AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(refundPriceDiffDetailList, "check");
             if(!synOrVerifyResult.isOK()){
@@ -1010,6 +1027,12 @@ public class CompensateServiceImpl implements CompensateService {
     public AgentResult approvalTask(AgentVo agentVo, String userId) throws ProcessException{
         try {
             if(agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())){
+
+
+
+
+
+
                 BigDecimal deductAmt = new BigDecimal(0);
                 if(agentVo.getDeductCapitalList()!=null && agentVo.getDeductCapitalList().size()!=0){
                     if(agentVo.getDeductCapitalList()!=null)
@@ -1047,6 +1070,20 @@ public class CompensateServiceImpl implements CompensateService {
                 }
                 //1表示机具欠款已抵扣
                 ORefundPriceDiff oRefundPriceDiff= refundPriceDiffMapper.selectByPrimaryKey(agentVo.getAgentBusId());
+
+                //校验
+                ORefundPriceDiffDetailExample oRefundPriceDiffDetailExample = new ORefundPriceDiffDetailExample();
+                ORefundPriceDiffDetailExample.Criteria criteria = oRefundPriceDiffDetailExample.createCriteria();
+                criteria.andRefundPriceDiffIdEqualTo(oRefundPriceDiff.getId());
+                criteria.andStatusEqualTo(Status.STATUS_1.status);
+                List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(oRefundPriceDiffDetailExample);
+
+                //校验是否能通过
+                AgentResult synOrVerifyResult_check = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "check");
+                if(!synOrVerifyResult_check.isOK()){
+                    throw new ProcessException(synOrVerifyResult_check.getMsg());
+                }
+
                 if(agentVo.getFlag().equals("1")){
                     BigDecimal subtract = oRefundPriceDiff.getRelCompAmt().subtract(agentVo.getoRefundPriceDiffVo().getMachOweAmt());
                     String subtractStr = String.valueOf(subtract);
@@ -1237,6 +1274,12 @@ public class CompensateServiceImpl implements CompensateService {
         criteria.andRefundPriceDiffIdEqualTo(rel.getBusId());
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(oRefundPriceDiffDetailExample);
+
+        //校验是否能通过
+        AgentResult synOrVerifyResult_check = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "check");
+        if(!synOrVerifyResult_check.isOK()){
+            throw new ProcessException(synOrVerifyResult_check.getMsg());
+        }
 
         if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
             oRefundPriceDiffDetails.forEach(row->{

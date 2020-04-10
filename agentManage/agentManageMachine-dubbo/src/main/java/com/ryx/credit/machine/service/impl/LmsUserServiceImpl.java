@@ -37,4 +37,9 @@ public class LmsUserServiceImpl implements LmsUserService {
     public LmsUser queryByLogin(String loginName) {
         return lmsUserMapper.selectByLogin(loginName);
     }
+
+    @Override
+    public List<String> queryByBusNum(String busNum) {
+        return lmsUserMapper.selectByBusNum(busNum);
+    }
 }
