@@ -119,6 +119,7 @@ public class LogoutMobileStopJobServiceImpl implements LogoutMobileStopJobServic
                         if(error.equals("该号码已经是停机")) {
                             oInternetCard.setRenewStatus(InternetRenewStatus.YZX.getValue());
                             oInternetCard.setRenew(Status.STATUS_0.status);
+                            oInternetCard.setInternetCardStatus(InternetCardStatus.LOGOUT.getValue());// 注销成功 更改卡状态 注销
                         }
                         oInternetCard.setuTime(new Date());
                         int k = internetCardMapper.updateByPrimaryKeySelective(oInternetCard);
