@@ -465,6 +465,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     public Map<String, Object> getTemplateApplyDetail(String recordId) throws MessageException {
         JSONObject map = new JSONObject();
         map.put("applyId", recordId);
+        map.put("viewType", '2');//撤销的的详情查看
         String result = null;
         try {
             result = HttpClientUtil.doPostJson(TEMPLATE_APPLY_DETAIL, map.toJSONString());
