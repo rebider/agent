@@ -560,7 +560,8 @@ public class CompensateServiceImpl implements CompensateService {
             }
 
             //遍历补差价明细进行校验和信息补全
-            Set<String> set_platform = new HashSet<>();
+            Set<String> setPlatform = new HashSet<>();
+            Set<String> setOldOrgId = new HashSet<>();
             refundPriceDiffDetailList.forEach(refundPriceDiffDetail->{
                 Map<String, Object> logisticsDetail = null;
                 if(StringUtils.isNotBlank(refundPriceDiffDetail.getActivityFrontId()) && !refundPriceDiffDetail.getActivityFrontId().equals("undefined")){
@@ -742,13 +743,18 @@ public class CompensateServiceImpl implements CompensateService {
                 if(StringUtils.isBlank(refundPriceDiffDetail.getPlatformType())){
                     throw new ProcessException("sn "+refundPriceDiffDetail.getBeginSn()+":"+refundPriceDiffDetail.getEndSn()+" 所属平台不能为空!");
                 }
-                set_platform.add(refundPriceDiffDetail.getPlatformType());
-
+                setPlatform.add(refundPriceDiffDetail.getPlatformType());
+                setOldOrgId.add(refundPriceDiffDetail.getOldOrgId());
             });
 
-            if(set_platform.size()>1){
-                log.info("申请sn所属平台必须一致：{}",set_platform);
+            if(setPlatform.size()>1){
+                log.info("申请sn所属平台必须一致：{}", setPlatform);
                 throw new ProcessException("申请sn所属平台必须一致");
+            }
+
+            if(setOldOrgId.size() > 1){
+                log.info("仅支持单品牌的活动调整申请：{}", setOldOrgId);
+                throw new ProcessException("仅支持单品牌的活动调整申请。");
             }
 
             AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(refundPriceDiffDetailList, "check");
