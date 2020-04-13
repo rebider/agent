@@ -1275,10 +1275,12 @@ public class CompensateServiceImpl implements CompensateService {
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(oRefundPriceDiffDetailExample);
 
-        //校验是否能通过
-        AgentResult synOrVerifyResult_check = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "check");
-        if(!synOrVerifyResult_check.isOK()){
-            throw new ProcessException(synOrVerifyResult_check.getMsg());
+        //审批通过校验是否能通过
+        if (AgStatus.Approved.status.compareTo(agStatus) == 0){
+            AgentResult synOrVerifyResult_check = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "check");
+            if(!synOrVerifyResult_check.isOK()){
+                throw new ProcessException(synOrVerifyResult_check.getMsg());
+            }
         }
 
         if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
