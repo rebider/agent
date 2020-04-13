@@ -1391,11 +1391,13 @@ public class CompensateServiceImpl implements CompensateService {
                 log.error("换活动抵扣欠款失败!id"+oRefundPriceDiff.getId());
                 throw new MessageException("换活动抵扣欠款失败!id"+oRefundPriceDiff.getId()+","+agentResult.getMsg());
             }
+
+            //每次执行前校验
+            AgentResult synOrVerifyResult_check = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "check");
+            if (!synOrVerifyResult_check.isOK()) throw new MessageException(synOrVerifyResult_check.getMsg());
+
             AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "adjust");
-            if(!synOrVerifyResult.isOK()){
-                throw new MessageException(synOrVerifyResult.getMsg());
-                //throw new ProcessException(synOrVerifyResult.getMsg());
-            }
+            if (!synOrVerifyResult.isOK()) throw new MessageException(synOrVerifyResult.getMsg());
         }
         return AgentResult.ok();
     }
