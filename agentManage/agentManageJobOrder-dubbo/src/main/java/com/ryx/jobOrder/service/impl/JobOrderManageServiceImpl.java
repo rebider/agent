@@ -70,14 +70,24 @@ public class JobOrderManageServiceImpl implements JobOrderManageService {
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public boolean keywordAdd(JoKeyManage joKeyManage,String userId) throws Exception {
-        joKeyManage.setId(idService.genJoKeyManageId(TabId.JO_KEY_MANAGE,Integer.valueOf(userId)));
-        joKeyManage.setJoStatus(Status.STATUS_1.status.toString());
-        int insertDict = joKeyManageMapper.insertSelective(joKeyManage);
-        if (1 == insertDict) {
-            return true;
-        } else {
-            throw new Exception("添加失败！");
+        if(null==joKeyManage){
+            return false;
+        }else{
+            if(StringUtils.isBlank(joKeyManage.getJoKey())){
+                throw new Exception("请添加关键词key！");
+            }else {
+                joKeyManage.setId(joKeyManage.getJoKey());
+                joKeyManage.setJoStatus(Status.STATUS_1.status.toString());
+                int insertDict = joKeyManageMapper.insertSelective(joKeyManage);
+                if (1 == insertDict) {
+                    return true;
+                } else {
+                    throw new Exception("添加失败！");
+                }
+            }
+
         }
+
     }
 
     @Override
