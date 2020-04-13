@@ -233,7 +233,11 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         try {
             templateRecode.setAgentId(map1.get("agentId"));
             templateRecode.setAgentName(map1.get("agentName"));
-            templateRecode.setBusPlatform(map1.get("busPlatform"));
+            if(map1.get("busPlatform")==null||"".equals(String.valueOf(map1.get("busPlatform")))){
+                throw new MessageException("业务平台获取为空请刷新页面另关闭多余页面重试一下");
+            }else {
+                templateRecode.setBusPlatform(map1.get("busPlatform"));
+            }
             templateRecode.setBusNum(map1.get("orgId"));
             templateRecode.setCreateUser(map1.get("userId"));
             templateRecode.setCreateDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
